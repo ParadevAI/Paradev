@@ -46,6 +46,7 @@ import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPos
 import { useForkChat } from "../../hooks/useForkChat";
 import { AcpRecovery } from "./components/AcpRecovery";
 import { DraftChat } from "./components/DraftChat";
+import { MoveProgress } from "./components/MoveProgress";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
@@ -78,6 +79,8 @@ export interface AgentSwitchTarget {
 
 export function AcpChatPane({
 	agent,
+	awaitingMove,
+	onMoveArrived,
 	draftId,
 	isActive,
 	onSessionInfo,
@@ -112,6 +115,9 @@ export function AcpChatPane({
 	draftId?: string;
 	/** `sessionId` is absent until the agent has run a turn to report one. */
 	agent: { id: string; sessionId?: string } | undefined;
+	/** The chat is moving here and the host may not have it yet: wait, do not recover. */
+	awaitingMove?: boolean;
+	onMoveArrived?: () => void;
 	isActive: boolean;
 	sessionId: string | null;
 	pendingPrompts: UserContent[][];
@@ -494,11 +500,24 @@ export function AcpChatPane({
 		stored?.session?.closedByUser === true &&
 		!!sessionId &&
 		!isChatSessionReopened(sessionId);
+	// This host may still hold an older copy of the chat, so only the move
+	// reaching `ready` means it arrived.
+	const waitingForMove = awaitingMove === true;
+	const checkSession = useCallback(() => {
+		void queryClient.invalidateQueries({
+			queryKey: ["acp-chat-session", sessionId],
+		});
+	}, [queryClient, sessionId]);
+	const moveArrived = useCallback(() => {
+		checkSession();
+		onMoveArrived?.();
+	}, [checkSession, onMoveArrived]);
 	const recoverable = Boolean(
 		(sessionStopped || sessionDead) &&
 			harness &&
 			!continuedInTerminal &&
-			!closedElsewhere,
+			!closedElsewhere &&
+			!waitingForMove,
 	);
 	const recoveries = useRef(0);
 	if (stored?.live && !sessionDead) recoveries.current = 0;
@@ -743,6 +762,18 @@ export function AcpChatPane({
 			workspaceId={workspaceId}
 		/>
 	);
+
+	if (waitingForMove && sessionId) {
+		return (
+			<MoveProgress
+				chatSessionId={sessionId}
+				workspaceId={workspaceId}
+				sessionLive={stored?.live === true}
+				onCheckSession={checkSession}
+				onArrived={moveArrived}
+			/>
+		);
+	}
 
 	const lost = failure !== null && stored === null;
 	if (

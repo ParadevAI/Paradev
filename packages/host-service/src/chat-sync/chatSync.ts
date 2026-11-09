@@ -28,6 +28,14 @@ export type ChatSync = {
 	noteAppend(envelope: DurableEnvelope): void;
 	/** Keeps pushing every chat that changes, retrying with backoff. */
 	start(): () => void;
+	/**
+	 * Keeps pushing one chat while it moves away, on a host that does not
+	 * sync otherwise, so the move can see a turn taken after it began.
+	 * Stops once the chat has moved.
+	 */
+	follow(sessionId: string): void;
+	/** The chat is on this host again, as when it moves back. */
+	forget(sessionId: string): void;
 };
 
 type Schedule = (run: () => void, ms: number) => () => void;
@@ -79,6 +87,7 @@ export function createChatSync(args: {
 	const schedule = args.schedule ?? defaultSchedule;
 	const dirty = new Set<string>();
 	const moved = new Set<string>();
+	const followed = new Set<string>();
 	const inFlight = new Map<string, Promise<unknown>>();
 	let running = false;
 	let cancelTimer: (() => void) | null = null;
@@ -178,6 +187,8 @@ export function createChatSync(args: {
 
 	let started = false;
 	let catchUp = false;
+	const syncing = () => started || followed.size > 0;
+	const syncs = (sessionId: string) => started || followed.has(sessionId);
 
 	/** Chats a previous run left unpushed; `pushBatch` skips the ones already pushed. */
 	const markAllDirty = () => {
@@ -211,12 +222,12 @@ export function createChatSync(args: {
 			}
 		}
 		let round = [...dirty];
-		while (started && round.length > 0) {
+		while (syncing() && round.length > 0) {
 			const next = new Set<string>();
 			for (const sessionId of round) {
-				if (!started) break;
+				if (!syncing()) break;
 				dirty.delete(sessionId);
-				if (moved.has(sessionId)) continue;
+				if (!syncs(sessionId) || moved.has(sessionId)) continue;
 				try {
 					if (await exclusive(sessionId, () => pushBatch(sessionId))) {
 						next.add(sessionId);
@@ -224,6 +235,7 @@ export function createChatSync(args: {
 				} catch (error) {
 					if (errorCode(error) === "CONFLICT") {
 						moved.add(sessionId);
+						followed.delete(sessionId);
 						continue;
 					}
 					failed.add(sessionId);
@@ -234,11 +246,15 @@ export function createChatSync(args: {
 				}
 			}
 			for (const sessionId of dirty) {
-				if (!failed.has(sessionId)) next.add(sessionId);
+				if (!failed.has(sessionId) && syncs(sessionId)) next.add(sessionId);
 			}
 			round = [...next];
 		}
 		for (const sessionId of failed) dirty.add(sessionId);
+		// `start` marks every chat dirty again, so one this host does not sync can go.
+		for (const sessionId of dirty) {
+			if (!syncs(sessionId)) dirty.delete(sessionId);
+		}
 		running = false;
 		if (readFailed || failed.size > 0) {
 			wake(retryMs);
@@ -250,14 +266,14 @@ export function createChatSync(args: {
 	};
 
 	const wake = (ms: number) => {
-		if (!started || cancelTimer) return;
+		if (!syncing() || cancelTimer) return;
 		cancelTimer = schedule(() => void drain(), ms);
 	};
 
 	return {
 		syncSession,
 		noteAppend(envelope) {
-			if (!started) return;
+			if (!syncs(envelope.sessionId)) return;
 			dirty.add(envelope.sessionId);
 			const turnEnded =
 				envelope.event.type === "turn" &&
@@ -268,12 +284,21 @@ export function createChatSync(args: {
 			}
 			wake(turnEnded ? 0 : SETTLE_MS);
 		},
+		follow(sessionId) {
+			moved.delete(sessionId);
+			followed.add(sessionId);
+		},
+		forget(sessionId) {
+			moved.delete(sessionId);
+			followed.delete(sessionId);
+		},
 		start() {
 			started = true;
 			catchUp = true;
 			wake(0);
 			return () => {
 				started = false;
+				followed.clear();
 				cancelTimer?.();
 				cancelTimer = null;
 			};

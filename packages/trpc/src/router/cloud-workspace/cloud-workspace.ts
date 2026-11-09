@@ -50,6 +50,12 @@ import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { personProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
+import { MAX_MOVED_CHATS } from "../chat-move/schema";
+import {
+	attachWorkspaceMove,
+	type SkippedChat,
+} from "../chat-move/utils/createWorkspaceMove";
+import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import {
 	canOpenWorkspace,
 	isListed,
@@ -396,11 +402,45 @@ export const cloudWorkspaceRouter = {
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
 				/** A size the organization offers (see `machineSizes`); omitted = its default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
+				/**
+				 * A workspace that moves into the new one, in place of an agent:
+				 * the move `workspaceMove.begin` recorded. The new workspace starts
+				 * from `branch`, and these chats move once its host answers. Their
+				 * history and session bundles must be in `chatHistory` first;
+				 * `workspaceMove.latest` tracks the move.
+				 */
+				move: z
+					.object({
+						workspaceMoveId: z.string().uuid(),
+						chatSessionIds: z
+							.array(z.string().uuid())
+							.max(MAX_MOVED_CHATS)
+							.default([]),
+					})
+					.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
+			if (input.move && input.agent) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "A workspace a chat moves into starts no agent of its own",
+				});
+			}
+			if (input.move && !input.branch) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "A workspace that moves starts from its snapshot branch",
+				});
+			}
+			if (input.move && ctx.sandboxCaller) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "A cloud workspace cannot move chats",
+				});
+			}
 			if (input.agent && !isCloudAgentId(input.agent)) {
 				// Only the built-in presets exist inside a sandbox; the clients offer
 				// nothing else, so this is a developer error, not a user one.
@@ -410,6 +450,7 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
+			let skippedChats: SkippedChat[] = [];
 			const row = await startCloudWorkspace({
 				organizationId: input.organizationId,
 				userId: ctx.principal.userId,
@@ -435,6 +476,22 @@ export const cloudWorkspaceRouter = {
 							},
 						}
 					: {}),
+				...(input.move
+					? {
+							beforeProvision: async (workspaceId: string) => {
+								const move = input.move as NonNullable<typeof input.move>;
+								const attached = await attachWorkspaceMove({
+									workspaceMoveId: move.workspaceMoveId,
+									toWorkspaceId: workspaceId,
+									branch: input.branch as string,
+									chatSessionIds: move.chatSessionIds,
+									organizationId: input.organizationId,
+									userId: ctx.principal.userId,
+								});
+								skippedChats = attached.skipped;
+							},
+						}
+					: {}),
 			});
 			// Shaped like a `list` row: clients seed the list with it.
 			const creator = await db.query.users.findFirst({
@@ -448,6 +505,8 @@ export const cloudWorkspaceRouter = {
 					: null,
 				presence: NO_PRESENCE,
 				tags: [] as string[],
+				/** Chats of a moving workspace that could not move, and stay where they were. */
+				skippedChats,
 			};
 		}),
 
@@ -762,6 +821,13 @@ export const cloudWorkspaceRouter = {
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
+				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
+				);
 				// A row from a retired provider has no sandbox left to keep.
 				if (row.provider === "vercel") {
 					await queueReap(

@@ -7,10 +7,23 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
+import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { Ellipsis, Play, Settings, Square, X } from "lucide-react";
+import {
+	CloudUpload,
+	Ellipsis,
+	Laptop,
+	Play,
+	Settings,
+	Square,
+	X,
+} from "lucide-react";
+import { useState } from "react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
+import { useWorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirection";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
+import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
 import { useWorkspaceOpenIn } from "../../hooks/useWorkspaceOpenIn";
 import { useWorkspaceOpenInTarget } from "../../hooks/useWorkspaceOpenInTarget";
@@ -47,78 +60,121 @@ export function WorkspaceMoreMenu({
 	const runHotkey = useHotkeyDisplay("RUN_WORKSPACE_COMMAND").text;
 	const hasRunCommand = (runDefinition?.commands ?? []).length > 0;
 	const label = t({ message: "More actions" });
+	const { workspace } = useWorkspace();
+	const moveDirection = useWorkspaceMoveDirection(workspace.hostId);
+	const [isMoveOpen, setIsMoveOpen] = useState(false);
+	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 
 	return (
-		<DropdownMenu>
-			<Tooltip delayDuration={500}>
-				<TooltipTrigger asChild>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
-							aria-label={label}
-							className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground aria-expanded:bg-foreground/15 aria-expanded:text-foreground aria-expanded:hover:bg-foreground/20"
-						>
-							<Ellipsis className="size-4" strokeWidth={1.5} />
-						</button>
-					</DropdownMenuTrigger>
-				</TooltipTrigger>
-				<TooltipContent side="bottom">{label}</TooltipContent>
-			</Tooltip>
-			<DropdownMenuContent align="end" className="min-w-56">
-				{openInTarget && (
-					<>
-						<WorkspaceOpenInItems openIn={openIn} />
-						<DropdownMenuSeparator />
-					</>
-				)}
-				<DropdownMenuItem
-					disabled={isRunPending}
-					onClick={() => {
-						if (!hasRunCommand && !isRunning) {
-							configureRun();
-							return;
-						}
-						void onToggleRun();
-					}}
+		<>
+			<DropdownMenu>
+				<Tooltip delayDuration={500}>
+					<TooltipTrigger asChild>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								aria-label={label}
+								className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground aria-expanded:bg-foreground/15 aria-expanded:text-foreground aria-expanded:hover:bg-foreground/20"
+							>
+								<Ellipsis className="size-4" strokeWidth={1.5} />
+							</button>
+						</DropdownMenuTrigger>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">{label}</TooltipContent>
+				</Tooltip>
+				<DropdownMenuContent
+					align="end"
+					className="min-w-56"
+					onCloseAutoFocus={onCloseAutoFocus}
 				>
-					{isRunning ? (
-						<Square className="size-4" />
-					) : hasRunCommand ? (
-						<Play className="size-4" />
-					) : (
-						<Settings className="size-4" />
+					{openInTarget && (
+						<>
+							<WorkspaceOpenInItems openIn={openIn} />
+							<DropdownMenuSeparator />
+						</>
 					)}
-					{isRunning ? (
-						<Trans>Stop</Trans>
-					) : hasRunCommand ? (
-						<Trans>Run</Trans>
-					) : (
-						<Trans>Set Run</Trans>
-					)}
-					{(isRunning || hasRunCommand) && runHotkey !== "Unassigned" && (
-						<DropdownMenuShortcut>{runHotkey}</DropdownMenuShortcut>
-					)}
-				</DropdownMenuItem>
-				{canForceStop && (
 					<DropdownMenuItem
-						onClick={() => void onForceStopRun()}
-						className="text-destructive focus:text-destructive"
+						disabled={isRunPending}
+						onClick={() => {
+							if (!hasRunCommand && !isRunning) {
+								configureRun();
+								return;
+							}
+							void onToggleRun();
+						}}
 					>
-						<X className="size-4 text-destructive" />
-						<Trans>Force Stop</Trans>
-					</DropdownMenuItem>
-				)}
-				{(isRunning || hasRunCommand) && (
-					<DropdownMenuItem onClick={configureRun}>
-						<Settings className="size-4" />
-						{runDefinition?.source === "terminal-preset" ? (
-							<Trans>Edit Run Script</Trans>
+						{isRunning ? (
+							<Square className="size-4" />
+						) : hasRunCommand ? (
+							<Play className="size-4" />
 						) : (
-							<Trans>Configure</Trans>
+							<Settings className="size-4" />
+						)}
+						{isRunning ? (
+							<Trans>Stop</Trans>
+						) : hasRunCommand ? (
+							<Trans>Run</Trans>
+						) : (
+							<Trans>Set Run</Trans>
+						)}
+						{(isRunning || hasRunCommand) && runHotkey !== "Unassigned" && (
+							<DropdownMenuShortcut>{runHotkey}</DropdownMenuShortcut>
 						)}
 					</DropdownMenuItem>
-				)}
-			</DropdownMenuContent>
-		</DropdownMenu>
+					{canForceStop && (
+						<DropdownMenuItem
+							onClick={() => void onForceStopRun()}
+							className="text-destructive focus:text-destructive"
+						>
+							<X className="size-4 text-destructive" />
+							<Trans>Force Stop</Trans>
+						</DropdownMenuItem>
+					)}
+					{(isRunning || hasRunCommand) && (
+						<DropdownMenuItem onClick={configureRun}>
+							<Settings className="size-4" />
+							{runDefinition?.source === "terminal-preset" ? (
+								<Trans>Edit Run Script</Trans>
+							) : (
+								<Trans>Configure</Trans>
+							)}
+						</DropdownMenuItem>
+					)}
+					{moveDirection && (
+						<>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onSelect={() => runAfterClose(() => setIsMoveOpen(true))}
+							>
+								{moveDirection === "to-cloud" ? (
+									<>
+										<CloudUpload className="size-4" />
+										<Trans>Move to cloud</Trans>
+									</>
+								) : (
+									<>
+										<Laptop className="size-4" />
+										<Trans>Move to this computer</Trans>
+									</>
+								)}
+							</DropdownMenuItem>
+						</>
+					)}
+				</DropdownMenuContent>
+			</DropdownMenu>
+			{moveDirection && isMoveOpen && (
+				<MoveWorkspaceDialog
+					direction={moveDirection}
+					workspace={{
+						id: workspaceId,
+						hostId: workspace.hostId,
+						projectId: workspace.projectId,
+						name: workspace.name,
+					}}
+					open={isMoveOpen}
+					onOpenChange={setIsMoveOpen}
+				/>
+			)}
+		</>
 	);
 }

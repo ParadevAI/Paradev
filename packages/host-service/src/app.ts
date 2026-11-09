@@ -347,6 +347,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		pullRequests: pullRequestRuntime,
 		pageWatch,
 		chat: () => chatV3.runtime(),
+		chatSync,
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
 		closedMidTurn: {
 			list: () => chatV3.closedMidTurn(),
@@ -386,7 +387,8 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			}),
 		onAppend: (envelope) => chatSync.noteAppend(envelope),
 	});
-	// Only a box keeps its chats in the cloud.
+	// A box keeps its chats in the cloud as they happen; a machine someone
+	// owns pushes a chat only when it moves.
 	const stopChatSync =
 		process.env.SUPERSET_HOST_RUN_MODE === "sandbox" ? chatSync.start() : null;
 	try {
