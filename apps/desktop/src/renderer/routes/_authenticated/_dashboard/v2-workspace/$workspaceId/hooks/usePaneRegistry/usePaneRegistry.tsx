@@ -271,6 +271,34 @@ export function usePaneRegistry({
 		createNewAgentSession,
 	);
 
+	const startNewShell = useCallback(
+		async (ctx: RendererContext<PaneViewerData>) => {
+			const { terminalId } = ctx.pane.data as TerminalPaneData;
+			await replaceEndedTerminal({
+				store: ctx.store,
+				paneId: ctx.pane.id,
+				terminalId,
+				create: () => launcher.create(),
+				dispose: (id) =>
+					workspaceTrpcUtils.client.terminal.killSession.mutate({
+						terminalId: id,
+						workspaceId,
+					}),
+				prepare: () =>
+					terminalRuntimeRegistry.prepareReplacement(
+						terminalId,
+						ctx.pane.id,
+						t({ message: "New shell" }),
+					),
+			});
+			const stillShown = [store, ...(linkedStores ?? [])].some((candidate) =>
+				findTerminalPaneLocation(candidate.getState(), terminalId),
+			);
+			if (!stillShown) terminalRuntimeRegistry.dispose(terminalId);
+		},
+		[launcher, workspaceTrpcUtils, workspaceId, t, store, linkedStores],
+	);
+
 	const chatPaneIcon = useCallback(
 		({ agent, terminalId }: ChatPaneData) => (
 			<TerminalPaneIcon
@@ -544,28 +572,10 @@ export function usePaneRegistry({
 								workspaceId={workspaceId}
 								terminalId={terminalId}
 								terminalInstanceId={ctx.pane.id}
-								onNewShell={() =>
-									replaceEndedTerminal({
-										store: ctx.store,
-										paneId: ctx.pane.id,
-										terminalId,
-										create: () => launcher.create(),
-										dispose: (id) =>
-											workspaceTrpcUtils.client.terminal.killSession.mutate({
-												terminalId: id,
-												workspaceId,
-											}),
-										prepare: () =>
-											terminalRuntimeRegistry.prepareReplacement(
-												terminalId,
-												ctx.pane.id,
-												t({ message: "New shell" }),
-											),
-									})
-								}
+								onNewShell={() => startNewShell(ctx)}
 								onCreateNewAgentSession={createNewAgentSession}
-								onForkIntoOtherSurface={(source, placement) =>
-									void forkIntoOtherSurface(ctx, source, placement)
+								onForkIntoOtherSurface={(source) =>
+									void forkIntoOtherSurface(ctx, source)
 								}
 								onOpenSubagent={onOpenSubagent}
 							/>
@@ -577,6 +587,7 @@ export function usePaneRegistry({
 						ctx={ctx}
 						onOpenFile={onOpenFile}
 						onRevealPath={onRevealPath}
+						onNewShell={() => startNewShell(ctx)}
 						workspaceId={workspaceId}
 					/>
 				),
@@ -952,9 +963,7 @@ export function usePaneRegistry({
 							/>
 							<ChatModeMenu
 								data={data}
-								onFork={(source, placement) =>
-									void forkIntoOtherSurface(ctx, source, placement)
-								}
+								onFork={(source) => void forkIntoOtherSurface(ctx, source)}
 								workspaceId={workspaceId}
 							/>
 						</div>
@@ -1134,6 +1143,7 @@ export function usePaneRegistry({
 			store,
 			linkedStores,
 			workspaceId,
+			startNewShell,
 			forkIntoOtherSurface,
 			closeChatWithUndo,
 			clearWorkspaceRunTerminal,

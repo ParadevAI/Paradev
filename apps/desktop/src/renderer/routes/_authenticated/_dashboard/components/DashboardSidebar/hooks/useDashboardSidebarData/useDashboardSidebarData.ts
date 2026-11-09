@@ -36,6 +36,7 @@ import {
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
+import { useShallow } from "zustand/react/shallow";
 import type {
 	DashboardSidebarGithubHold,
 	DashboardSidebarHiddenProject,
@@ -61,6 +62,7 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { selectPendingInserts } from "./selectPendingInserts";
 import { sidebarHostIsOnline } from "./sidebarHostIsOnline";
 import {
 	type StableDashboardSidebarProjects,
@@ -159,8 +161,10 @@ export function useDashboardSidebarData() {
 		toggleProjectCollapsed,
 	} = useDashboardSidebarState();
 	const queryClient = useQueryClient();
-	const workspaceTransactionsById = useWorkspaceTransactionsStore(
-		(state) => state.byWorkspaceId,
+	// Rows only show create progress. Selecting updates too rebuilt the whole
+	// sidebar each time a tag write settled, once per member on group delete.
+	const pendingInsertsById = useWorkspaceTransactionsStore(
+		useShallow((state) => selectPendingInserts(state.byWorkspaceId)),
 	);
 
 	const { hosts, organizationId: knownHostsOrgId } = useKnownHosts();
@@ -582,9 +586,9 @@ export function useDashboardSidebarData() {
 				hostIsOnline: sidebarHostIsOnline(
 					hostsByMachineId.get(workspace.hostId),
 				),
-				pendingTransaction: workspaceTransactionsById[workspace.id] ?? null,
+				pendingTransaction: pendingInsertsById[workspace.id] ?? null,
 			})),
-		[hostsByMachineId, rawSidebarWorkspaces, workspaceTransactionsById],
+		[hostsByMachineId, rawSidebarWorkspaces, pendingInsertsById],
 	);
 
 	const sidebarWorkspaces = useMemo(

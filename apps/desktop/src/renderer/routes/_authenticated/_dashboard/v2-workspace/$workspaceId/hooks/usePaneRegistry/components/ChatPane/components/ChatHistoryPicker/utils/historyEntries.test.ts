@@ -8,6 +8,7 @@ function saved(overrides: Partial<SavedSession> = {}): SavedSession {
 		sessionId: "saved-1",
 		scopeId: "workspace",
 		harness: "claude-acp",
+		agentConfigId: null,
 		harnessSessionId: "native-1",
 		epoch: "epoch",
 		status: "idle",

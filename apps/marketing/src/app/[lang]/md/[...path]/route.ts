@@ -108,7 +108,7 @@ function pricingPage(i18n: I18n, catalog: PlanFamily[]): MarkdownPage {
 	});
 	const tierNames = allTiers.map(tierName);
 	const comparison = COMPARISON_SECTIONS.flatMap((section) => [
-		`### ${text(i18n, section.title)}${section.badge ? ` (${text(i18n, section.badge)})` : ""}`,
+		`### ${text(i18n, section.title)}`,
 		"",
 		`| | ${tierNames.join(" | ")} |`,
 		`|---|${tierNames.map(() => "---").join("|")}|`,

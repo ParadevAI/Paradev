@@ -102,6 +102,8 @@ export interface PullRequestDetailRead {
 		requiresThreadResolution: boolean;
 		queue: { position: number | null; state: string } | null;
 		allowedMergeMethods: string[];
+		/** GitHub's preselected method for the viewer: their last one, else the first allowed. */
+		defaultMergeMethod: string | null;
 	};
 	capabilities: {
 		/** The viewer may edit the pull request: draft state, open or closed. */
@@ -126,6 +128,7 @@ query($owner: String!, $name: String!, $number: Int!, $activity: Boolean = false
 		squashMergeAllowed
 		mergeCommitAllowed
 		rebaseMergeAllowed
+		viewerDefaultMergeMethod
 		pullRequest(number: $number) {
 			id number title body url baseRefName state isDraft merged mergedAt
 			additions deletions changedFiles
@@ -301,6 +304,7 @@ export interface PullRequestDetailQuery {
 		squashMergeAllowed: boolean;
 		mergeCommitAllowed: boolean;
 		rebaseMergeAllowed: boolean;
+		viewerDefaultMergeMethod?: string | null;
 		pullRequest:
 			| ({
 					id: string;
@@ -490,6 +494,10 @@ export async function readPullRequestDetail(
 	options: { activity?: boolean } = {},
 ): Promise<PullRequestDetailRead> {
 	const activity = options.activity ?? false;
+	const requestedReviewers = client.requestedReviewers(input);
+	// Awaited below; this only stops an unhandled rejection when the read
+	// above fails first.
+	requestedReviewers.catch(() => {});
 	const data = await client.graphql<PullRequestDetailQuery>(
 		PULL_REQUEST_DETAIL_QUERY,
 		{ ...variables(input), activity },
@@ -538,7 +546,7 @@ export async function readPullRequestDetail(
 					}>(CHECK_CONTEXTS_PAGE_QUERY, variables(input, cursor))
 				).repository?.pullRequest?.statusCheckRollup?.contexts,
 		),
-		client.requestedReviewers(input),
+		requestedReviewers,
 	]);
 
 	const reviewers = new Map<string, PullRequestDetailReviewer>();
@@ -657,6 +665,8 @@ export async function readPullRequestDetail(
 					}
 				: null,
 			allowedMergeMethods: allowed,
+			defaultMergeMethod:
+				data.repository?.viewerDefaultMergeMethod?.toLowerCase() ?? null,
 		},
 		capabilities: {
 			// Permission only. Whether GitHub would accept the merge right now

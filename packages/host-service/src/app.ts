@@ -86,6 +86,7 @@ import type {
 } from "./types";
 import { getHostWorkerPool } from "./workers/host-worker-pool";
 import { gitWorkspaceRefsTask } from "./workers/tasks/git";
+import { disposeUsageWorkerPool } from "./workers/usage-worker-pool";
 import { disposeWorkspaceTitleJobs } from "./workspaces/workspace-title-jobs";
 
 export interface CreateAppOptions {
@@ -308,7 +309,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isTerminalAlive: (terminalId, workspaceId) => {
 			const chat = terminalAgentStore.getChat(terminalId);
-			if (chat) return chat.lastEventType !== "Failed";
+			if (chat?.chatSessionId) {
+				const live = chatV3.runtime().live.get(chat.chatSessionId);
+				return live !== null && live.state.status !== "dead";
+			}
 			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
 		},
 		isAgentBusy: (terminalId) =>
@@ -339,6 +343,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		pageWatch,
 		chat: () => chatV3.runtime(),
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
+		closedMidTurn: {
+			list: () => chatV3.closedMidTurn(),
+			resume: () => chatV3.resumeClosedMidTurn(),
+			keepPaused: () => chatV3.keepClosedMidTurnPaused(),
+		},
 	};
 
 	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
@@ -624,6 +633,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			await getHostWorkerPool().dispose();
 		} catch (err) {
 			console.warn("[host-service] hostWorkerPool.dispose failed:", err);
+		}
+		try {
+			await disposeUsageWorkerPool();
+		} catch (err) {
+			console.warn("[host-service] usageWorkerPool.dispose failed:", err);
 		}
 		try {
 			eventBus.close();

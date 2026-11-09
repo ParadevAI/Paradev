@@ -2,8 +2,13 @@ import { afterAll, beforeAll, expect, type mock, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { PaneLayoutSnapshot } from "@superset/shared/pane-layout-ops";
 import { dialog, session, webContents } from "electron";
-import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
+import { BROWSER_PARTITION } from "shared/constants";
+import {
+	type PaneLayoutRendererRequest,
+	paneLayoutRequests,
+} from "../pane-layout/pane-layout-requests";
 import {
 	startBrowserBridge,
 	stopBrowserBridge,
@@ -87,22 +92,22 @@ beforeAll(async () => {
 	});
 	fromIdMock.mockImplementation((id: number) => panes.get(id) ?? null);
 	fakePane(901, BROWSER_PARTITION);
-	fakePane(902, AGENT_BROWSER_PARTITION);
-	browserManager.register("user-pane", 901, "ws-bridge");
-	browserManager.register("agent-pane", 902, "ws-bridge");
+	fakePane(902, BROWSER_PARTITION);
+	browserManager.register("pane-b", 901, "ws-bridge");
+	browserManager.register("pane-a", 902, "ws-bridge");
 	await startBrowserBridge({ homeDir: home, extensions, answerDeadlineMs: 50 });
 });
 
 afterAll(async () => {
 	await stopBrowserBridge();
 	rmSync(home, { recursive: true, force: true });
-	browserManager.unregister("user-pane");
-	browserManager.unregister("agent-pane");
+	browserManager.unregister("pane-b");
+	browserManager.unregister("pane-a");
 	fromIdMock.mockImplementation(preloadFromId ?? (() => null));
 	fromPartitionMock.mockImplementation(preloadFromPartition ?? (() => ({})));
 });
 
-test("agents reach only the panes they opened, never the user's own browser", async () => {
+test("agents reach every browser pane", async () => {
 	const bridge = getBrowserBridgeInfo();
 	if (!bridge) throw new Error("the bridge did not start");
 	const call = (path: string, init?: RequestInit) =>
@@ -113,37 +118,29 @@ test("agents reach only the panes they opened, never the user's own browser", as
 				"content-type": "application/json",
 			},
 		});
-	const evaluate = (paneId: string) =>
-		call(`/panes/${paneId}/eval`, {
-			method: "POST",
-			body: JSON.stringify({
-				workspaceId: "ws-bridge",
-				code: "document.title",
-			}),
-		});
-	const cdpClose = (paneId: string) =>
-		new Promise<number>((resolve) => {
-			const url = new URL(`/panes/${paneId}/cdp`, bridge.endpoint);
-			url.protocol = "ws:";
-			url.searchParams.set("workspaceId", "ws-bridge");
-			url.searchParams.set("token", bridge.secret);
-			const socket = new WebSocket(url);
-			socket.onclose = (event) => resolve(event.code);
-		});
 
 	const listed = await (await call("/panes?workspaceId=ws-bridge")).json();
-	expect(listed.panes.map((pane: { paneId: string }) => pane.paneId)).toEqual([
-		"agent-pane",
-	]);
+	expect(
+		listed.panes.map((pane: { paneId: string }) => pane.paneId).sort(),
+	).toEqual(["pane-a", "pane-b"]);
 
-	const userEval = await evaluate("user-pane");
-	expect(userEval.status).toBe(403);
-	expect(await userEval.text()).not.toContain("page data");
-	expect(await (await evaluate("agent-pane")).json()).toEqual({
-		result: "page data",
+	const userEval = await call("/panes/pane-b/eval", {
+		method: "POST",
+		body: JSON.stringify({ workspaceId: "ws-bridge", code: "document.title" }),
 	});
+	expect(await userEval.json()).toEqual({ result: "page data" });
 
-	expect(await cdpClose("user-pane")).toBe(1008);
+	const cdpClose = await new Promise<number>((resolve) => {
+		const url = new URL("/panes/pane-b/cdp", bridge.endpoint);
+		url.protocol = "ws:";
+		url.searchParams.set("workspaceId", "ws-bridge");
+		url.searchParams.set("token", bridge.secret);
+		const socket = new WebSocket(url);
+		socket.onclose = (event) => resolve(event.code);
+	});
+	expect(cdpClose).not.toBe(1008);
+
+	expect((await call("/panes")).status).toBe(400);
 });
 
 test("an agent copies the user's Chrome logins only after the user allows it", async () => {
@@ -153,7 +150,7 @@ test("an agent copies the user's Chrome logins only after the user allows it", a
 		typeof mock
 	>;
 	const importLogins = () =>
-		fetch(`${bridge.endpoint}/panes/agent-pane/import-cookies`, {
+		fetch(`${bridge.endpoint}/panes/pane-a/import-cookies`, {
 			method: "POST",
 			headers: {
 				authorization: `Bearer ${bridge.secret}`,
@@ -175,14 +172,16 @@ test("an agent copies the user's Chrome logins only after the user allows it", a
 	expect((await importLogins()).status).not.toBe(403);
 });
 
-test("an agent's open answers with its own pane, not a user pane that registers first", async () => {
+test("an open answers with the pane made for it, even when an unloaded pane is rebuilt first", async () => {
 	const bridge = getBrowserBridgeInfo();
 	if (!bridge) throw new Error("the bridge did not start");
 	fakePane(903, BROWSER_PARTITION);
-	fakePane(904, AGENT_BROWSER_PARTITION);
-	browserManager.once("open-request", () => {
-		browserManager.register("late-user-pane", 903, "ws-bridge");
-		browserManager.register("late-agent-pane", 904, "ws-bridge");
+	fakePane(904, BROWSER_PARTITION);
+	browserManager.once("open-request", (request: { requestId: string }) => {
+		// Showing the workspace rebuilds its unloaded tab before the new one exists.
+		browserManager.register("rebuilt-pane", 903, "ws-bridge");
+		browserManager.resolveOpenRequest(request.requestId, "opened-pane");
+		browserManager.register("opened-pane", 904, "ws-bridge");
 	});
 	try {
 		const opened = await fetch(`${bridge.endpoint}/open`, {
@@ -194,14 +193,165 @@ test("an agent's open answers with its own pane, not a user pane that registers 
 			body: JSON.stringify({
 				workspaceId: "ws-bridge",
 				url: "https://example.com/",
+				show: true,
 			}),
 		});
-		const body = await opened.json();
-		expect(body.paneId).toBe("late-agent-pane");
-		expect(body.title).toBe(AGENT_BROWSER_PARTITION);
+		expect((await opened.json()).paneId).toBe("opened-pane");
 	} finally {
-		browserManager.unregister("late-user-pane");
-		browserManager.unregister("late-agent-pane");
+		browserManager.unregister("rebuilt-pane");
+		browserManager.unregister("opened-pane");
+	}
+});
+
+test("an agent lists and uses panes after hidden-pane eviction unloaded them", async () => {
+	const bridge = getBrowserBridgeInfo();
+	if (!bridge) throw new Error("the bridge did not start");
+	const RENDERER = 990;
+	const layoutPane = (id: string) => ({
+		id,
+		kind: "browser",
+		title: id,
+		terminalId: null,
+		active: false,
+		browser: { url: `https://example.com/${id}` },
+	});
+	const layout: PaneLayoutSnapshot = {
+		activeTabId: "tab",
+		tabs: [
+			{
+				id: "tab",
+				title: null,
+				active: true,
+				activePaneId: "pane-a",
+				layout: { type: "pane", paneId: "pane-a" },
+				panes: [
+					layoutPane("pane-a"),
+					layoutPane("unloaded-pane-a"),
+					layoutPane("unloaded-pane-b"),
+				],
+			},
+		],
+	};
+	const renderer = (request: PaneLayoutRendererRequest) => {
+		if (request.op.type === "wakeBrowser") {
+			const woken = { "unloaded-pane-a": 905, "unloaded-pane-b": 906 }[
+				request.op.paneId
+			];
+			if (!woken) {
+				paneLayoutRequests.respond(
+					{
+						requestId: request.requestId,
+						error: { code: "NOT_FOUND", message: "no" },
+					},
+					RENDERER,
+				);
+				return;
+			}
+			fakePane(woken, BROWSER_PARTITION);
+			browserManager.register(request.op.paneId, woken, "ws-bridge");
+		}
+		paneLayoutRequests.respond(
+			{
+				requestId: request.requestId,
+				result: { paneId: null, tabId: null, layout },
+			},
+			RENDERER,
+		);
+	};
+	paneLayoutRequests.addSubscriber(RENDERER);
+	paneLayoutRequests.on("request", renderer);
+	const call = (path: string, init?: RequestInit) =>
+		fetch(`${bridge.endpoint}${path}`, {
+			...init,
+			headers: {
+				authorization: `Bearer ${bridge.secret}`,
+				"content-type": "application/json",
+			},
+		});
+	const evaluate = (paneId: string) =>
+		call(`/panes/${paneId}/eval`, {
+			method: "POST",
+			body: JSON.stringify({
+				workspaceId: "ws-bridge",
+				code: "document.title",
+			}),
+		});
+	try {
+		const listed = await (await call("/panes?workspaceId=ws-bridge")).json();
+		expect(
+			listed.panes.map((pane: { paneId: string; loaded: boolean }) => [
+				pane.paneId,
+				pane.loaded,
+			]),
+		).toEqual([
+			["pane-a", true],
+			["unloaded-pane-a", false],
+			["unloaded-pane-b", false],
+			["pane-b", true],
+		]);
+		for (const paneId of ["unloaded-pane-a", "unloaded-pane-b"]) {
+			expect(await (await evaluate(paneId)).json()).toEqual({
+				result: "page data",
+			});
+		}
+	} finally {
+		paneLayoutRequests.off("request", renderer);
+		paneLayoutRequests.removeSubscriber(RENDERER);
+		browserManager.unregister("unloaded-pane-a");
+		browserManager.unregister("unloaded-pane-b");
+	}
+});
+
+test("before a desktop window is ready, an agent is told to retry, not that its pane is gone", async () => {
+	const bridge = getBrowserBridgeInfo();
+	if (!bridge) throw new Error("the bridge did not start");
+	const response = await fetch(`${bridge.endpoint}/panes/unloaded-pane/eval`, {
+		method: "POST",
+		headers: {
+			authorization: `Bearer ${bridge.secret}`,
+			"content-type": "application/json",
+		},
+		body: JSON.stringify({ workspaceId: "ws-bridge", code: "1" }),
+	});
+	expect(response.status).toBe(503);
+});
+
+test("a CDP client cannot queue unbounded messages while its pane is rebuilt", async () => {
+	const bridge = getBrowserBridgeInfo();
+	if (!bridge) throw new Error("the bridge did not start");
+	const RENDERER = 991;
+	let releaseWake = () => {};
+	const renderer = (request: PaneLayoutRendererRequest) => {
+		releaseWake = () =>
+			paneLayoutRequests.respond(
+				{
+					requestId: request.requestId,
+					error: { code: "NOT_FOUND", message: "gone" },
+				},
+				RENDERER,
+			);
+	};
+	paneLayoutRequests.addSubscriber(RENDERER);
+	paneLayoutRequests.on("request", renderer);
+	try {
+		const url = new URL("/panes/slow-pane/cdp", bridge.endpoint);
+		url.protocol = "ws:";
+		url.searchParams.set("workspaceId", "ws-bridge");
+		url.searchParams.set("token", bridge.secret);
+		const socket = new WebSocket(url);
+		await new Promise((resolve) => {
+			socket.onopen = resolve;
+		});
+		const closed = new Promise<number>((resolve) => {
+			socket.onclose = (event) => resolve(event.code);
+		});
+		for (let i = 0; i < 65; i++)
+			socket.send(JSON.stringify({ id: i, method: "Runtime.enable" }));
+		expect(await closed).toBe(1009);
+	} finally {
+		releaseWake();
+		paneLayoutRequests.off("request", renderer);
+		paneLayoutRequests.removeSubscriber(RENDERER);
 	}
 });
 

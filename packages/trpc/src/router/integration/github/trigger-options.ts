@@ -1,19 +1,15 @@
 import { db } from "@superset/db/client";
-import { githubInstallations, githubRepositories } from "@superset/db/schema";
+import { githubRepositories } from "@superset/db/schema";
 import { findProviderIdentity } from "@superset/db/utils";
 import { desc, eq } from "drizzle-orm";
 import { installationOctokit } from "../../../lib/sandbox/clone-token";
 import type { TriggerOptionSource } from "../trigger-options";
+import { organizationInstallations } from "./organization-installations";
 
-/** The synced repositories of the organization's installation, newest first. */
+/** The synced repositories of the organization's installations, newest first. */
 export async function listGithubRepositories(organizationId: string) {
-	const installation = await db.query.githubInstallations.findFirst({
-		where: eq(githubInstallations.organizationId, organizationId),
-		columns: { id: true },
-	});
-	if (!installation) return [];
 	return db.query.githubRepositories.findMany({
-		where: eq(githubRepositories.installationId, installation.id),
+		where: eq(githubRepositories.organizationId, organizationId),
 		orderBy: [desc(githubRepositories.updatedAt)],
 	});
 }
@@ -25,8 +21,7 @@ export async function listGithubRepositories(organizationId: string) {
 const repositories: TriggerOptionSource = async ({ organizationId }) => {
 	const list = await listGithubRepositories(organizationId);
 	return list.map((repo) => {
-		// Name as the label, owner as the muted hint beside it — every repo in
-		// one installation shares the owner, so repeating it per row is noise.
+		// Name as the label, owner as the muted hint beside it.
 		const slash = repo.fullName.indexOf("/");
 		if (slash < 0) return { id: repo.repoId, label: repo.fullName };
 		return {
@@ -64,53 +59,54 @@ function isPermissionError(error: unknown): boolean {
  * repositories, deduplicated.
  */
 const people: TriggerOptionSource = async ({ organizationId }) => {
-	const installation = await db.query.githubInstallations.findFirst({
-		where: eq(githubInstallations.organizationId, organizationId),
-		columns: {
-			id: true,
-			installationId: true,
-			accountLogin: true,
-			accountType: true,
-		},
-	});
-	if (!installation) return [];
-
-	const octokit = await installationOctokit(installation.installationId);
+	const installations = await organizationInstallations(organizationId);
 	const seen = new Map<string, string>();
-	try {
-		if (installation.accountType === "Organization") {
-			await collect(seen, (page) =>
-				octokit.request("GET /orgs/{org}/members", {
-					org: installation.accountLogin,
-					per_page: PER_PAGE,
-					page,
-				}),
-			);
-		} else {
-			const repositories = await db.query.githubRepositories.findMany({
-				where: eq(githubRepositories.installationId, installation.id),
-				columns: { owner: true, name: true },
-			});
-			for (const repository of repositories) {
-				if (seen.size >= MAX_PEOPLE) break;
+	for (const installation of installations) {
+		if (seen.size >= MAX_PEOPLE) break;
+		try {
+			const octokit = await installationOctokit(installation.installationId);
+			if (installation.accountType === "Organization") {
 				await collect(seen, (page) =>
-					octokit.request("GET /repos/{owner}/{repo}/collaborators", {
-						owner: repository.owner,
-						repo: repository.name,
+					octokit.request("GET /orgs/{org}/members", {
+						org: installation.accountLogin,
 						per_page: PER_PAGE,
 						page,
 					}),
 				);
+				continue;
 			}
-		}
-	} catch (error) {
-		// The App was installed without the members permission (or the
-		// repository is gone): an empty picker, not a red editor.
-		if (isPermissionError(error)) {
+			const repositories = await db.query.githubRepositories.findMany({
+				where: eq(githubRepositories.installationId, installation.id),
+				columns: { owner: true, name: true },
+			});
+			let refusedRepositories = 0;
+			for (const repository of repositories) {
+				if (seen.size >= MAX_PEOPLE) break;
+				try {
+					await collect(seen, (page) =>
+						octokit.request("GET /repos/{owner}/{repo}/collaborators", {
+							owner: repository.owner,
+							repo: repository.name,
+							per_page: PER_PAGE,
+							page,
+						}),
+					);
+				} catch (error) {
+					if (!isPermissionError(error)) throw error;
+					refusedRepositories += 1;
+				}
+			}
+			if (refusedRepositories > 0) {
+				console.warn(
+					`[integration.github] collaborators refused for ${refusedRepositories} of ${repositories.length} repositories of ${installation.accountLogin}`,
+				);
+			}
+		} catch (error) {
+			// The App was installed without the members permission (or the
+			// installation is gone): skip this account, not a red editor.
+			if (!isPermissionError(error)) throw error;
 			console.warn("[integration.github] people refused:", error);
-			return [];
 		}
-		throw error;
 	}
 
 	return [...seen]

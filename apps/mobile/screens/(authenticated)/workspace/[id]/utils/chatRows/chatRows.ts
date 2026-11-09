@@ -4,7 +4,13 @@ import {
 	toolRunKey,
 	transcriptItemKey,
 } from "@superset/chat/core";
-import type { Item, ToolCall, UserMessage } from "@superset/chat/protocol";
+import type {
+	Item,
+	Notice,
+	ToolCall,
+	Turn,
+	UserMessage,
+} from "@superset/chat/protocol";
 
 export type ChatRow =
 	| { kind: "item"; key: string; item: Item }
@@ -12,7 +18,7 @@ export type ChatRow =
 	| {
 			kind: "turn_status";
 			key: string;
-			status: "failed" | "interrupted";
+			status: "failed" | "interrupted" | "paused";
 			message: string | undefined;
 	  }
 	| { kind: "outbox"; key: string; entry: OutboxEntry }
@@ -34,6 +40,21 @@ function lastRowIsLive(group: TurnGroup): boolean {
 }
 
 /**
+ * The error notice a failed or paused turn also writes, which its status line
+ * already says. Returns the notice text, which may add detail to the message.
+ */
+function repeatedTurnFailure(item: Item, turn: Turn | null): string | null {
+	const statusShown =
+		turn?.status === "failed" || turn?.error?.kind === "host_stopped";
+	if (!statusShown || item.kind !== "notice") return null;
+	const notice = item as Notice;
+	if (notice.noticeKind !== "error") return null;
+	const text = notice.text ?? "";
+	const message = turn.error?.message ?? "";
+	return text === message || text.startsWith(`${message}\n`) ? text : null;
+}
+
+/**
  * One flat list for the transcript. A user message is keyed by its client id
  * so the bubble sent from the outbox and its echo are the same row. A running
  * turn whose newest row does not animate on its own ends with a working line.
@@ -46,8 +67,14 @@ export function chatRows(
 	const echoed = new Set<string>();
 
 	for (const group of groups) {
+		let failureText: string | undefined;
 		group.entries.forEach((entry, index) => {
 			if (entry.kind === "item") {
+				const repeated = repeatedTurnFailure(entry.item, group.turn);
+				if (repeated !== null) {
+					failureText = repeated;
+					return;
+				}
 				if (entry.item.kind === "user_message") {
 					const clientId = (entry.item as UserMessage).clientId;
 					if (clientId) echoed.add(clientId);
@@ -59,6 +86,15 @@ export function chatRows(
 				});
 				return;
 			}
+			if (entry.kind === "user_stop") {
+				rows.push({
+					kind: "turn_status",
+					key: `stop:${entry.item.id}`,
+					status: "interrupted",
+					message: undefined,
+				});
+				return;
+			}
 			rows.push({
 				kind: "tool_run",
 				key: toolRunKey(group.turnId, entry.items, index),
@@ -66,12 +102,18 @@ export function chatRows(
 			});
 		});
 		const turn = group.turn;
-		if (turn?.status === "failed" || turn?.status === "interrupted") {
+		const stopShown =
+			turn?.status === "interrupted" &&
+			group.entries.some((entry) => entry.kind === "user_stop");
+		if (
+			(turn?.status === "failed" || turn?.status === "interrupted") &&
+			!stopShown
+		) {
 			rows.push({
 				kind: "turn_status",
 				key: `status:${group.turnId}`,
-				status: turn.status,
-				message: turn.error?.message,
+				status: turn.error?.kind === "host_stopped" ? "paused" : turn.status,
+				message: failureText || turn.error?.message,
 			});
 		}
 	}

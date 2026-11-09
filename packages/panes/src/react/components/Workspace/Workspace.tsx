@@ -7,6 +7,7 @@ import type { Pane, Tab as TabType } from "../../../types";
 import { PaneAppearanceContext } from "../../hooks/usePaneAppearance";
 import { PaneAsideRenderContext } from "../../hooks/usePaneAside";
 import type { WorkspaceProps } from "../../types";
+import { EmptyAreaDropZone } from "./components/EmptyAreaDropZone";
 import { KeptTab } from "./components/KeptTab";
 import { Tab } from "./components/Tab";
 import { TabBar } from "./components/TabBar";
@@ -222,9 +223,12 @@ export function Workspace<TData>({
 								/>
 							))}
 							{!displayedTab && (
-								<div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+								<EmptyAreaDropZone
+									store={store}
+									className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground"
+								>
 									{renderEmptyState?.() ?? "No tabs open"}
-								</div>
+								</EmptyAreaDropZone>
 							)}
 						</div>
 					) : displayedTab ? (
@@ -238,9 +242,12 @@ export function Workspace<TData>({
 							onSplitResizeDragging={onSplitResizeDragging}
 						/>
 					) : (
-						<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
+						<EmptyAreaDropZone
+							store={store}
+							className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground"
+						>
 							{renderEmptyState?.() ?? "No tabs open"}
-						</div>
+						</EmptyAreaDropZone>
 					)}
 				</div>
 			</PaneAsideRenderContext.Provider>

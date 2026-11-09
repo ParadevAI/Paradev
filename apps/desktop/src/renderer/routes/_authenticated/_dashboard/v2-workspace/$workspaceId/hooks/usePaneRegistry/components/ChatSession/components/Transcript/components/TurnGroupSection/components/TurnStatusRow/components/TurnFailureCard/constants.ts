@@ -21,6 +21,7 @@ export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
 	refused: msg({ message: "The model declined to continue" }),
 	usage_limit: msg({ message: "Stopped by the usage limit" }),
 	session_lost: msg({ message: "The agent lost this conversation" }),
+	host_stopped: msg({ message: "Paused when Paradev closed" }),
 	unknown: msg({ message: "Task interrupted" }),
 };
 
@@ -38,6 +39,7 @@ export const FAILURE_ACTIONS: Record<
 	refused: ["continue", "change_model"],
 	usage_limit: [],
 	session_lost: ["new_chat"],
+	host_stopped: ["continue"],
 	unknown: ["continue", "change_model"],
 };
 

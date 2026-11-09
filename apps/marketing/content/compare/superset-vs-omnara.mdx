@@ -1,6 +1,6 @@
 ---
 title: "Paradev vs Omnara (2026): Coding Agent Workspace vs Open-Source Managed Agent Platform"
-description: "Compare Paradev and Omnara. Omnara is now an open-source managed agent platform and API, not a mobile app for Claude Code. See how it differs from a workspace that runs your agent CLIs on your machine, your hosts, your own Linux server, or cloud workspaces (beta)."
+description: "Compare Paradev and Omnara. Omnara is now an open-source managed agent platform and API, not a mobile app for Claude Code. See how it differs from a workspace that runs your agent CLIs on your machine, your hosts, your own Linux server, or cloud workspaces."
 date: 2026-11-05
 lastUpdated: 2026-11-05
 type: "1v1"
@@ -16,7 +16,7 @@ keywords:
   - background coding agents
 ---
 
-Omnara changed shape in 2026. It started as a mobile and web app for watching and steering Claude Code on your own machine. Today it calls itself "the open-source managed agent platform": an API for running agents on any model and any machine, with tools, secrets, permissions, and streaming built in. Paradev is a workspace for the coding agent CLIs you already use, such as Claude Code and Codex. Each task gets its own Git worktree and terminal, on your Mac, on hosts you add, on your own Linux server, or in a Paradev cloud workspace (beta), with review and pull requests in the app. Choose Omnara when you want to build and run your own agents, in your product or for your team, on a platform you can self-host. Choose Paradev when you want to run, watch, and review existing coding agents.
+Omnara changed shape in 2026. It started as a mobile and web app for watching and steering Claude Code on your own machine. Today it calls itself "the open-source managed agent platform": an API for running agents on any model and any machine, with tools, secrets, permissions, and streaming built in. Paradev is a workspace for the coding agent CLIs you already use, such as Claude Code and Codex. Each task gets its own Git worktree and terminal, on your Mac, on hosts you add, on your own Linux server, or in a Paradev cloud workspace, with review and pull requests in the app. Choose Omnara when you want to build and run your own agents, in your product or for your team, on a platform you can self-host. Choose Paradev when you want to run, watch, and review existing coding agents.
 
 This comparison is published by Paradev. Omnara details were checked against [omnara.com](https://www.omnara.com), the [docs](https://docs.omnara.com/introduction), the [changelog](https://docs.omnara.com/changelog), the [machines docs](https://docs.omnara.com/machines/overview), and the [omnara-ai/omnara](https://github.com/omnara-ai/omnara) repository, README, and README history on November 5, 2026.
 
@@ -28,7 +28,7 @@ This comparison is published by Paradev. Omnara details were checked against [om
 | Main user | Developers and teams who code with agents | Developers who build agents for their product or team |
 | Agent | Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Omnara's own agent loop, set by a YAML or API config |
 | Models | Whatever your agent uses, on your own subscriptions or keys | Any compatible model: OpenAI, Anthropic, OpenRouter, Amazon Bedrock, LiteLLM, Ollama, or self-hosted |
-| Where agents run | Your Mac; hosts you add with Remote Access; your own x64 or arm64 Linux server (Bring Your Own Cloud); [cloud workspaces](/cloud) (beta) | No machine; a sandbox from one of twelve providers; or your own macOS or Linux machine with the `omnarad` daemon |
+| Where agents run | Your Mac; hosts you add with Remote Access; your own x64 or arm64 Linux server (Bring Your Own Cloud); [cloud workspaces](/cloud) | No machine; a sandbox from one of twelve providers; or your own macOS or Linux machine with the `omnarad` daemon |
 | Start a task from | Desktop app, iPhone and iPad app, CLI, SDK, MCP server, Slack bot, Automations | REST API, TypeScript SDK, CLI, dashboard, MCP server, Slack, Discord, GitHub, webhooks, cron |
 | Approvals | The agent CLI's own prompts in the terminal; approve or decline in the chat interface | Per-tool rule: run, ask a person first, or block |
 | Review | Changes pane with live diff, commit, push, and open PR; Pull Requests view with CI checks and line comments | Event timeline in the dashboard; GitHub agents read diffs and submit reviews |
@@ -64,7 +64,7 @@ Paradev does not ask you to build an agent. It runs Claude Code, Codex, and othe
 
 Both tools let the work happen away from your laptop, with no inbound ports. Omnara keeps the agent itself in its control plane and treats machines as tools. A machine can be a managed sandbox from one of twelve providers or your own computer with the daemon, and an agent can use several machines at once.
 
-Paradev runs the agent CLI on a host. The default host is your Mac. Remote Access adds any macOS or Linux machine through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account, and repos and agent sign-ins stay on that server. [Cloud workspaces](/cloud) (beta) are hosted by Paradev: you start from an environment with 1 to 20 GitHub repos, variables, secrets, and a region, pick a machine size, and agents keep working when your laptop is closed.
+Paradev runs the agent CLI on a host. The default host is your Mac. Remote Access adds any macOS or Linux machine through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account, and repos and agent sign-ins stay on that server. [Cloud workspaces](/cloud) are hosted by Paradev: you start from an environment with 1 to 20 GitHub repos, variables, secrets, and a region, pick a machine size, and agents keep working when your laptop is closed.
 
 ### Models and subscriptions
 
@@ -89,7 +89,7 @@ Both are open source. Omnara is Apache 2.0, multi-tenant, and self-hosts with Do
 | Free | $0: desktop app, local workspaces, CLI | $0 platform fee on Omnara Cloud with your own model keys and machines; free to self-host |
 | Paid | Pro {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly; Team {{price:team}}; Ultra {{price:ultra}} | Pay as you go with Omnara credits: models at provider token rates, machines by active time |
 | Large teams | Enterprise: custom, with SAML SSO, SCIM, audit logs, SOC 2 Type II | Talk to a founder; startup credits program |
-| Cloud compute | Cloud workspaces included with Team and Ultra (beta); BYOC uses your own server | Omnara-managed machines billed by active time, or your own sandbox provider account |
+| Cloud compute | Cloud workspaces included with Team and Ultra; BYOC uses your own server | Omnara-managed machines billed by active time, or your own sandbox provider account |
 
 Paradev paid plans add Remote Access, Bring Your Own Cloud, and the iPhone and iPad app. Team and Ultra add cloud workspaces. Omnara does not publish a separate pricing page. Check [Paradev pricing](/pricing) and [omnara.com](https://www.omnara.com) for current terms.
 
@@ -105,7 +105,7 @@ Paradev paid plans add Remote Access, Bring Your Own Cloud, and the iPhone and i
 **Choose Paradev if you:**
 
 - Want to run Claude Code, Codex, or another CLI agent as it ships, on your own subscriptions.
-- Want to choose per task between your Mac, your own hosts, your own Linux server, and cloud workspaces (beta).
+- Want to choose per task between your Mac, your own hosts, your own Linux server, and cloud workspaces.
 - Want a live terminal, diff, commits, and pull request review next to the agent.
 - Want an iPhone and iPad app to check on workspaces.
 
@@ -129,5 +129,5 @@ Omnara runs its own agent loop with any compatible model. It offers an MCP serve
 
 ### What is a good Omnara alternative for controlling coding agents from a phone?
 
-Paradev's iPhone and iPad app (iOS or iPadOS 26+, paid plan) opens workspaces on local hosts that are awake and online, on Bring Your Own Cloud servers, and in [cloud workspaces](/cloud) (beta). See [coding agent mobile apps](/compare/coding-agent-mobile-apps) for more options.
+Paradev's iPhone and iPad app (iOS or iPadOS 26+, paid plan) opens workspaces on local hosts that are awake and online, on Bring Your Own Cloud servers, and in [cloud workspaces](/cloud). See [coding agent mobile apps](/compare/coding-agent-mobile-apps) for more options.
 

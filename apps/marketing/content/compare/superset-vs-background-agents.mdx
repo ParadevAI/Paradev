@@ -1,6 +1,6 @@
 ---
 title: "Paradev vs Background Agents: Open-Inspect (2026): Agent Workspace vs Self-Hosted Background Agent System"
-description: "Compare Paradev and Open-Inspect (Background Agents), the open source take on Ramp's Inspect. Self-hosted cloud sandboxes with Slack, GitHub, Linear, and cron triggers vs a workspace that runs your agent CLIs on your machine, your hosts, your own Linux server, or cloud workspaces (beta)."
+description: "Compare Paradev and Open-Inspect (Background Agents), the open source take on Ramp's Inspect. Self-hosted cloud sandboxes with Slack, GitHub, Linear, and cron triggers vs a workspace that runs your agent CLIs on your machine, your hosts, your own Linux server, or cloud workspaces."
 date: 2026-11-05
 lastUpdated: 2026-11-05
 type: "1v1"
@@ -17,7 +17,7 @@ keywords:
   - background coding agents
 ---
 
-Paradev and Background Agents both run coding agents while you do other work, and both are MIT-licensed. They are built for different jobs. Background Agents, which its README calls **Open-Inspect**, is an open source system inspired by Ramp's internal Inspect agent. Your company deploys it on Cloudflare plus a sandbox provider such as Modal, and every session runs in a cloud sandbox that people start from the web, Slack, GitHub, Linear, webhooks, or a schedule. Paradev is a workspace for the agent CLIs you already use, such as Claude Code and Codex. Each task gets its own Git worktree and terminal, on your Mac, on hosts you add, on your own Linux server, or in a Paradev cloud workspace (beta). Choose Open-Inspect when a platform team wants to run an internal background agent for the whole company. Choose Paradev when developers want to run, watch, and review their own agents without operating that system.
+Paradev and Background Agents both run coding agents while you do other work, and both are MIT-licensed. They are built for different jobs. Background Agents, which its README calls **Open-Inspect**, is an open source system inspired by Ramp's internal Inspect agent. Your company deploys it on Cloudflare plus a sandbox provider such as Modal, and every session runs in a cloud sandbox that people start from the web, Slack, GitHub, Linear, webhooks, or a schedule. Paradev is a workspace for the agent CLIs you already use, such as Claude Code and Codex. Each task gets its own Git worktree and terminal, on your Mac, on hosts you add, on your own Linux server, or in a Paradev cloud workspace. Choose Open-Inspect when a platform team wants to run an internal background agent for the whole company. Choose Paradev when developers want to run, watch, and review their own agents without operating that system.
 
 This comparison is published by Paradev. Open-Inspect details were checked against the [open-inspect/background-agents](https://github.com/open-inspect/background-agents) repository, its README, LICENSE, and [Getting Started guide](https://github.com/open-inspect/background-agents/blob/main/docs/GETTING_STARTED.md), and [backgroundagents.dev](https://backgroundagents.dev) on November 5, 2026.
 
@@ -27,7 +27,7 @@ This comparison is published by Paradev. Open-Inspect details were checked again
 |---|---|---|
 | What it is | A workspace that runs any CLI coding agent, one Git worktree per task | A self-hosted background coding agent system for one organization |
 | Who runs it | You install the desktop app; Paradev runs the relay and cloud workspaces | Your team deploys it with Terraform on Cloudflare, Vercel or Cloudflare Workers, and a sandbox provider |
-| Where agents run | Your Mac; hosts you add with Remote Access; your own x64 or arm64 Linux server (Bring Your Own Cloud); [cloud workspaces](/cloud) (beta) | A cloud sandbox per session on Modal, Daytona, Vercel Sandbox, E2B, or Boat |
+| Where agents run | Your Mac; hosts you add with Remote Access; your own x64 or arm64 Linux server (Bring Your Own Cloud); [cloud workspaces](/cloud) | A cloud sandbox per session on Modal, Daytona, Vercel Sandbox, E2B, or Boat |
 | Agents | Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Two harnesses: OpenCode (built in) or the Claude Agent SDK |
 | Models | Whatever your agent uses, on your own subscriptions or keys | Anthropic and OpenAI by default; xAI, OpenCode Zen and Go, Z.AI, and DeepSeek opt-in; ChatGPT, Claude, and SuperGrok subscriptions supported |
 | Start a task from | Desktop app, iPhone and iPad app, CLI, SDK, MCP server, Slack bot, Automations | Web UI, Slack bot, GitHub bot, Linear bot, webhooks, MCP server, Automations |
@@ -58,13 +58,13 @@ Paradev is a workspace for the coding agents you already use. It runs each agent
 
 Open-Inspect is infrastructure. The Getting Started guide has you create accounts with Cloudflare, a web host (Vercel or Cloudflare Workers), and a sandbox provider (Modal by default), make a GitHub App, and fill in one `terraform.tfvars` file. Terraform then builds the Workers, Durable Objects, D1 database, and sandbox setup. An AWS production path also exists. Someone on your team owns upgrades, access settings, and secrets after that.
 
-Paradev is a desktop app you install. Workspaces run on your Mac by default. For work away from your desk, you add a host with Remote Access, run the Paradev host on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or use [cloud workspaces](/cloud) (beta), which Paradev hosts. A BYOC server keeps repos and agent sign-ins on that server and needs no inbound ports.
+Paradev is a desktop app you install. Workspaces run on your Mac by default. For work away from your desk, you add a host with Remote Access, run the Paradev host on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or use [cloud workspaces](/cloud), which Paradev hosts. A BYOC server keeps repos and agent sign-ins on that server and needs no inbound ports.
 
 ### Where the sandbox lives
 
 In Open-Inspect, every session is a fresh cloud sandbox on the provider you choose, with snapshots saved after each prompt. That gives each task a clean, isolated machine and lets many tasks run at once without touching a laptop.
 
-In Paradev, isolation is a Git worktree and branch on the host. A worktree separates files, not processes, so tasks on one host share that machine. Cloud workspaces (beta) give you a hosted machine per workspace, started from an environment with 1 to 20 GitHub repos, variables, secrets, a region, and a machine size. You can save a set-up workspace as an environment snapshot.
+In Paradev, isolation is a Git worktree and branch on the host. A worktree separates files, not processes, so tasks on one host share that machine. Cloud workspaces give you a hosted machine per workspace, started from an environment with 1 to 20 GitHub repos, variables, secrets, a region, and a machine size. You can save a set-up workspace as an environment snapshot.
 
 ### Agents and models
 
@@ -93,7 +93,7 @@ Open-Inspect has no price. The software is free under MIT, and you pay for what 
 | Software | Free tier; open source under MIT | Free; open source under MIT |
 | Paid | Pro {{price:pro}}/user/month, or {{price:pro:yearly}} billed yearly; Team {{price:team}}; Ultra {{price:ultra}} | None |
 | Large teams | Enterprise: custom, with SAML SSO, SCIM, audit logs, SOC 2 Type II | Self-operated |
-| Cloud compute | Cloud workspaces included with Team and Ultra (beta); BYOC uses your own server | Your sandbox provider's rates |
+| Cloud compute | Cloud workspaces included with Team and Ultra; BYOC uses your own server | Your sandbox provider's rates |
 | Models | Your own agent subscriptions or keys | Your own API keys or supported subscriptions |
 
 Paradev paid plans add Remote Access, Bring Your Own Cloud, and the iPhone and iPad app. Team and Ultra add cloud workspaces. Check [Paradev pricing](/pricing) for current terms.
@@ -110,7 +110,7 @@ Paradev paid plans add Remote Access, Bring Your Own Cloud, and the iPhone and i
 **Choose Paradev if you:**
 
 - Want to run Claude Code, Codex, or another CLI agent yourself, without operating infrastructure.
-- Want to choose per task between your Mac, your own hosts, your own Linux server, and cloud workspaces (beta).
+- Want to choose per task between your Mac, your own hosts, your own Linux server, and cloud workspaces.
 - Want a live terminal, diff, commits, and pull request review next to the agent.
 - Want an iPhone and iPad app, Enterprise SSO and SCIM, or a team that is not one trusted tenant.
 
@@ -130,7 +130,7 @@ The project describes itself as open source and self-hostable and does not list 
 
 ### Can Paradev run agents in the background?
 
-Yes. Workspaces on a Remote Access host, a [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) server, or a [cloud workspace](/cloud) (beta) keep running when your laptop is closed. Automations start agents on a schedule or on GitHub, Slack, Linear, and other events.
+Yes. Workspaces on a Remote Access host, a [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) server, or a [cloud workspace](/cloud) keep running when your laptop is closed. Automations start agents on a schedule or on GitHub, Slack, Linear, and other events.
 
 ### Which agents does Open-Inspect support?
 

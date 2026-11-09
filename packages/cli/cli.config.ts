@@ -47,6 +47,7 @@ export default defineConfig({
 					"agents",
 					"terminals",
 					"panes",
+					"ports",
 					"snapshot",
 					"scripts",
 				],

@@ -27,7 +27,7 @@ export function AcpChatSetting() {
 			<div className="min-w-0 flex-1 space-y-0.5">
 				<Label htmlFor="acp-chat" className="text-sm font-medium">
 					<HighlightText
-						text={t({ message: "Chat interface" })}
+						text={t({ message: "Open agents in chat" })}
 						query={searchQuery}
 					/>
 				</Label>
@@ -35,7 +35,7 @@ export function AcpChatSetting() {
 					<HighlightText
 						text={t({
 							message:
-								"Open Claude and Codex sessions in a chat pane instead of a terminal.",
+								"New agent sessions start in chat instead of the terminal. You can switch any session from its menu.",
 						})}
 						query={searchQuery}
 					/>

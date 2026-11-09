@@ -38,8 +38,6 @@ export interface BrowserPaneData {
 	url: string;
 	pageTitle?: string;
 	faviconUrl?: string | null;
-	/** Opened by an agent: it runs in the agent session, without the user's extensions. */
-	agent?: true;
 }
 
 export interface DevtoolsPaneData {
@@ -182,8 +180,7 @@ export type WorkspaceSearchKey =
 	| "subagentType"
 	| "openUrl"
 	| "openUrlTarget"
-	| "openUrlRequestId"
-	| "openUrlAgent";
+	| "openUrlRequestId";
 
 /**
  * Drops the search params a deep link arrived with, once the hook that owns

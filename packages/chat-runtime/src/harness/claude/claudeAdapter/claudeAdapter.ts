@@ -412,7 +412,12 @@ export class ClaudeAdapter implements HarnessAdapter {
 			}
 		} catch (error) {
 			const waiting = this.approvals.size > 0;
-			this.pushAll(translator.interrupt(String(error)));
+			const message = error instanceof Error ? error.message : String(error);
+			const canceled =
+				this.abortController.signal.aborted || translator.interruptRequested;
+			this.pushAll(
+				canceled ? translator.interrupt(message) : translator.fail(message),
+			);
 			if (waiting) {
 				this.events.push({ kind: "session", session: { status: "idle" } });
 				return;
@@ -421,6 +426,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (this.staleApprovals()) {
 			this.events.push({ kind: "session", session: { status: "idle" } });
 		}
+		if (!this.disposed) this.events.close();
 	}
 
 	private pushAll(events: AdapterEvent[]): void {

@@ -17,7 +17,7 @@ keywords:
   - local to cloud agent handoff
 ---
 
-Paradev and Twill both run the coding agents you already use, such as Claude Code and Codex, on your own computer and in the cloud. Both have a desktop app, Git worktrees, a phone path, and triggers from GitHub, Slack, and Linear. The difference is focus. Twill is built around a chat task that can move between your Mac and a Twill cloud workspace, with three supported agents and per-workspace cloud plans. Paradev is a desktop workspace that runs any CLI agent in its own terminal and worktree, on your machine, on hosts you add, on your own Linux server, or in Paradev cloud workspaces (beta). Choose Twill if handing one task from your laptop to the cloud and back is the core of your day. Choose Paradev if you want any agent, a full review path in one app, and the option to keep agents on servers you own.
+Paradev and Twill both run the coding agents you already use, such as Claude Code and Codex, on your own computer and in the cloud. Both have a desktop app, Git worktrees, a phone path, and triggers from GitHub, Slack, and Linear. The difference is focus. Twill is built around a chat task that can move between your Mac and a Twill cloud workspace, with three supported agents and per-workspace cloud plans. Paradev is a desktop workspace that runs any CLI agent in its own terminal and worktree, on your machine, on hosts you add, on your own Linux server, or in Paradev cloud workspaces. Choose Twill if handing one task from your laptop to the cloud and back is the core of your day. Choose Paradev if you want any agent, a full review path in one app, and the option to keep agents on servers you own.
 
 This comparison is published by Paradev. Twill details were checked against [twill.ai](https://twill.ai), its [documentation](https://docs.twill.ai), [pricing docs](https://docs.twill.ai/pricing), and [release notes](https://docs.twill.ai/release-notes) on November 5, 2026.
 
@@ -26,7 +26,7 @@ This comparison is published by Paradev. Twill details were checked against [twi
 | Requirement | Paradev | Twill |
 |---|---|---|
 | Interface | Desktop app with terminals, diff, PRs, and browser | Desktop app, web app, and mobile web; each task is a chat |
-| Where agents run | Your Mac, hosts you add with Remote Access (paid plan), your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or [cloud workspaces](/cloud) (beta) | Your computer, a headless Mac or Linux computer, or a Twill cloud workspace; private VPC deployment on Enterprise |
+| Where agents run | Your Mac, hosts you add with Remote Access (paid plan), your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or [cloud workspaces](/cloud) | Your computer, a headless Mac or Linux computer, or a Twill cloud workspace; private VPC deployment on Enterprise |
 | Agents | Any CLI agent: presets for Claude Code, Codex, Cursor Agent, OpenCode, Gemini CLI, GitHub Copilot CLI, Grok, Kimi Code, Mistral Vibe, Amp, Pi, and custom commands | Claude Code, Codex, and OpenCode |
 | Isolation | Git worktree and terminal per workspace | Local: current folder, a new branch, or a new worktree. Cloud: each task runs in a fork of the workspace environment |
 | Local to cloud | Run the same agents on any host or cloud workspace; continue a session with another agent | Handoff: the local agent pushes and briefs a cloud agent; Continue locally brings the result back |
@@ -57,7 +57,7 @@ Paradev runs any CLI agent in a real terminal. Presets cover Claude Code, Codex,
 
 Twill's handoff is a strong feature. Choose **Handoff** in a local task. The local agent commits, pushes, and writes a brief for a linked cloud task. **Continue locally** brings pushed branches and PR state back into a local chat. Twill states the limits: running processes, local databases, and native logins do not move, and unpushed cloud changes do not come back.
 
-Paradev does not move one live chat from your laptop into the cloud. Instead, the same workspace model runs everywhere. Remote Access (paid plan) adds any macOS or Linux machine as a host through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) (paid plan) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server, and it needs no inbound ports. [Cloud workspaces](/cloud) (beta), included with Team and Ultra, start from an environment with 1 to 20 GitHub repos, variables, secrets, and a region. You pick a machine size and can save a set-up workspace as an environment snapshot.
+Paradev does not move one live chat from your laptop into the cloud. Instead, the same workspace model runs everywhere. Remote Access (paid plan) adds any macOS or Linux machine as a host through the Paradev Relay. [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) (paid plan) runs the Paradev host on an x64 or arm64 Linux server in your own cloud account. Repos and agent sign-ins stay on that server, and it needs no inbound ports. [Cloud workspaces](/cloud), included with Team and Ultra, start from an environment with 1 to 20 GitHub repos, variables, secrets, and a region. You pick a machine size and can save a set-up workspace as an environment snapshot.
 
 ### Team intake and automation
 
@@ -103,13 +103,13 @@ In Twill, one credit is $1 of AI compute at provider cost. Sandbox compute is in
 
 ## Verdict
 
-Twill is a good fit for a developer who works in one chat per task and wants that task to continue in the cloud when the laptop closes. Its handoff is well designed, and its per-workspace pricing suits large teams. Paradev is a better fit when you want any agent in a real terminal, review and pull requests in the same window, and a choice of where agents run: your Mac, your hosts, your own cloud server, or Paradev cloud workspaces (beta). Try the same task in both to see which loop fits your team.
+Twill is a good fit for a developer who works in one chat per task and wants that task to continue in the cloud when the laptop closes. Its handoff is well designed, and its per-workspace pricing suits large teams. Paradev is a better fit when you want any agent in a real terminal, review and pull requests in the same window, and a choice of where agents run: your Mac, your hosts, your own cloud server, or Paradev cloud workspaces. Try the same task in both to see which loop fits your team.
 
 ## Frequently Asked Questions
 
 ### What is the best Twill alternative?
 
-If you want a desktop workspace that runs any CLI agent with worktrees, diff review, and pull requests, Paradev is a close alternative. It also runs agents on hosts you add, on your own Linux server, or in cloud workspaces (beta).
+If you want a desktop workspace that runs any CLI agent with worktrees, diff review, and pull requests, Paradev is a close alternative. It also runs agents on hosts you add, on your own Linux server, or in cloud workspaces.
 
 ### Which agents does Twill support?
 

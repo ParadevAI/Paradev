@@ -18,7 +18,7 @@ export function StatusWord({ status }: { status: ToolCall["status"] }) {
 		case "canceled":
 			return (
 				<span className="shrink-0 font-mono text-[11px] text-muted-foreground/70 lowercase">
-					<Trans>Canceled</Trans>
+					<Trans>Stopped</Trans>
 				</span>
 			);
 		default:

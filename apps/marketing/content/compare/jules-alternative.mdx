@@ -28,7 +28,7 @@ keywords:
 
 On October 29, 2026, Google announced that Jules will wind down on December 31, 2026. You can finish your sessions until November 11, 2026. After that date, Jules is read-only until the end of the year. Google says Jules was an experiment in asynchronous coding agents, and that what it learned now shapes other Google products, including Google Antigravity. See the [Jules changelog](https://jules.google/docs/changelog/).
 
-Jules took a GitHub repository, cloned it into a cloud VM, planned the work with Gemini, and opened a pull request. If you need a new home for that workflow, Paradev runs the CLI agents you already use in parallel workspaces, and [cloud workspaces](/cloud) (beta) keep those agents working when your laptop is closed.
+Jules took a GitHub repository, cloned it into a cloud VM, planned the work with Gemini, and opened a pull request. If you need a new home for that workflow, Paradev runs the CLI agents you already use in parallel workspaces, and [cloud workspaces](/cloud) keep those agents working when your laptop is closed.
 
 **Our recommendation: choose Paradev if you want agents that keep working in the cloud, with any CLI agent, and the option to run on your own machines or your own cloud account.** The alternatives below cover other needs, including single-vendor cloud agents.
 
@@ -41,7 +41,7 @@ Jules took a GitHub repository, cloned it into a cloud VM, planned the work with
 | Alternative | Best for | Where agents run | Agents | License |
 |---|---|---|---|---|
 | **Jules** | Existing users only; read-only after November 11, 2026 | Google cloud VM | Jules (Gemini) | Proprietary |
-| **Paradev** | Any CLI agent in parallel, locally or in the cloud, with review and automations | Your machine, your hosts, your own Linux server (BYOC), or cloud workspaces (beta) | Claude Code, Codex, Gemini CLI, Cursor Agent, Copilot CLI, OpenCode, Amp, custom commands | Open source (MIT) |
+| **Paradev** | Any CLI agent in parallel, locally or in the cloud, with review and automations | Your machine, your hosts, your own Linux server (BYOC), or cloud workspaces | Claude Code, Codex, Gemini CLI, Cursor Agent, Copilot CLI, OpenCode, Amp, custom commands | Open source (MIT) |
 | **Google Antigravity** | Google's agent-first desktop app | Your machine | Antigravity's agent | Proprietary |
 | **Codex cloud** | OpenAI's cloud tasks on a ChatGPT plan | OpenAI cloud, or your machine | Codex | Proprietary app; open-source CLI |
 | **GitHub Copilot** | Cloud sessions inside GitHub | GitHub Actions | Copilot | Proprietary |
@@ -80,7 +80,7 @@ Paradev runs any CLI agent, such as Claude Code, Codex, Gemini CLI, Cursor Agent
 
 For Jules-style work that continues without you, Paradev has three options:
 
-- **[Cloud workspaces](/cloud) (beta).** Paradev runs a cloud sandbox for you, and agents keep working when your laptop is closed. Start from an environment with up to 20 GitHub repositories, variables, secrets, and a region, then pick a machine size. Cloud workspaces are included with Team and Ultra.
+- **[Cloud workspaces](/cloud).** Paradev runs a cloud sandbox for you, and agents keep working when your laptop is closed. Start from an environment with up to 20 GitHub repositories, variables, secrets, and a region, then pick a machine size. Cloud workspaces are included with Team and Ultra.
 - **[Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud).** Run the Paradev host on an x64 or arm64 Linux server in your own cloud account. Your repositories and agent sign-ins stay on that server, and it needs no inbound ports.
 - **Remote Access.** Add any macOS or Linux machine you own as a host.
 

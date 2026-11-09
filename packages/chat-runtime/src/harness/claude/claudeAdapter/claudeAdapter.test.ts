@@ -14,6 +14,7 @@ type Harness = {
 	iterator: AsyncIterator<AdapterEvent>;
 	emit: (message: unknown) => void;
 	crash: (error: Error) => void;
+	exit: () => void;
 	interrupts: number;
 	aborted: () => boolean;
 	options: () => ClaudeQueryOptions | null;
@@ -41,12 +42,14 @@ function createHarness(): Harness {
 	let aborted = false;
 	let queryOptions: ClaudeQueryOptions | null = null;
 	let crashed: Error | null = null;
+	let exited = false;
 	const state = { interrupts: 0 };
 
 	const stream: ClaudeSession = {
 		async *[Symbol.asyncIterator]() {
 			while (true) {
 				if (crashed) throw crashed;
+				if (exited) return;
 				const next = pending.shift();
 				if (next !== undefined) {
 					yield next;
@@ -84,6 +87,12 @@ function createHarness(): Harness {
 		},
 		crash: (error: Error) => {
 			crashed = error;
+			const resume = notify;
+			notify = null;
+			resume?.();
+		},
+		exit: () => {
+			exited = true;
 			const resume = notify;
 			notify = null;
 			resume?.();
@@ -240,6 +249,56 @@ describe("ClaudeAdapter", () => {
 		const approvalId = approval?.kind === "item" ? approval.item.id : "";
 		harness.adapter.respondToApproval(approvalId, { type: "accept" });
 		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
+	});
+
+	test("a stream that fails mid-turn fails the turn instead of reading as a stop", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		harness.crash(new Error("Claude Code process exited with code 1"));
+
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: {
+				status: "failed",
+				error: {
+					kind: "crashed",
+					message: "Claude Code process exited with code 1",
+				},
+			},
+		});
+		for (let index = 0; index < 20; index++) {
+			if ((await harness.iterator.next()).done) return;
+		}
+		throw new Error("the adapter kept its stream open after the agent died");
+	});
+
+	test("a stream the user aborted still reads as a stop", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		harness.adapter.cancelTurn();
+		harness.crash(new Error("aborted"));
+
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
+	});
+
+	test("an agent that exits ends the adapter's stream", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		harness.exit();
+
+		let next = await harness.iterator.next();
+		while (!next.done) next = await harness.iterator.next();
+		expect(next.done).toBe(true);
 	});
 
 	test("a stream that fails while an approval waits leaves the session idle", async () => {

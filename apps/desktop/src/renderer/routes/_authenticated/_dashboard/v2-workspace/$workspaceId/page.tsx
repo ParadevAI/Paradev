@@ -7,7 +7,6 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useMemo, useRef } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
@@ -77,7 +76,6 @@ import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/Browser
 import { browserRuntimeRegistry } from "./hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
 import { useRestoreExpandedPaneArea } from "./hooks/useRestoreExpandedPaneArea";
-import { useRightPaneAreaLifecycle } from "./hooks/useRightPaneAreaLifecycle";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
@@ -127,7 +125,6 @@ interface WorkspaceSearch {
 	openUrl?: string;
 	openUrlTarget?: V2WorkspaceUrlOpenTarget;
 	openUrlRequestId?: string;
-	openUrlAgent?: true;
 }
 
 function parseOpenUrlTarget(
@@ -153,7 +150,6 @@ export const Route = createFileRoute(
 		openUrl: parseNonEmptyString(raw.openUrl),
 		openUrlTarget: parseOpenUrlTarget(raw.openUrlTarget),
 		openUrlRequestId: parseNonEmptyString(raw.openUrlRequestId),
-		openUrlAgent: raw.openUrlAgent === true ? true : undefined,
 	}),
 });
 
@@ -201,7 +197,6 @@ function V2WorkspaceContent() {
 		openUrl,
 		openUrlTarget,
 		openUrlRequestId,
-		openUrlAgent,
 	} = Route.useSearch();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
@@ -229,9 +224,8 @@ function V2WorkspaceContent() {
 		setShowPresetsBar,
 	} = useV2UserPreferences();
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
-	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
-	const rightPaneAreaFlag = useRightPaneAreaEnabled();
-	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
+	const { store, isLayoutReady } = useV2WorkspacePaneLayout();
+	const isRightPaneAreaEnabled = useRightPaneAreaEnabled();
 	const {
 		isOpen: sidebarOpen,
 		setOpen: setRightSidebarOpen,
@@ -251,14 +245,6 @@ function V2WorkspaceContent() {
 		centerStore: store,
 		rightStore,
 		isReady: isLayoutReady && isRightLayoutReady,
-	});
-	useRightPaneAreaLifecycle({
-		workspaceId,
-		flag: rightPaneAreaFlag,
-		centerStore: store,
-		rightStore,
-		isReady: isLayoutReady && isRightLayoutReady,
-		hasRow,
 	});
 	const openRightSidebar = useCallback(
 		() => setRightSidebarOpen(true),
@@ -306,11 +292,9 @@ function V2WorkspaceContent() {
 		openNewChat,
 		focusAgentTerminal,
 	} = useAgentSessionLauncher({ workspaceId, store });
-	const acpChat = useAcpChatEnabled();
 	const addChatTab = useCallback(() => {
 		void openNewChat();
 	}, [openNewChat]);
-	const onAddChat = acpChat ? addChatTab : undefined;
 	const {
 		matchedPresets,
 		newTabPresets,
@@ -378,7 +362,6 @@ function V2WorkspaceContent() {
 		url: openUrl,
 		target: openUrlTarget,
 		requestId: openUrlRequestId,
-		agent: openUrlAgent,
 		consumeSearch,
 	});
 
@@ -578,7 +561,7 @@ function V2WorkspaceContent() {
 		isMobilePaneEnabled,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
-	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat });
+	useHotkey("NEW_CHAT", addChatTab);
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();
 	});
@@ -727,7 +710,7 @@ function V2WorkspaceContent() {
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
 											runAfterClose={runAfterClose}
-											onAddChat={onAddChat}
+											onAddChat={addChatTab}
 											onAddBrowser={
 												isRightPaneAreaEnabled ? undefined : addBrowserTab
 											}
@@ -788,7 +771,7 @@ function V2WorkspaceContent() {
 										<WorkspaceEmptyState
 											onOpenBrowser={addBrowserTab}
 											onOpenChanges={openChanges}
-											onOpenChat={onAddChat}
+											onOpenChat={addChatTab}
 											onOpenQuickOpen={handleQuickOpen}
 											onOpenTerminal={addTerminalTab}
 										/>

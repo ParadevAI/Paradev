@@ -4,6 +4,7 @@ import {
 	type TurnGroup,
 	toolRunKey,
 	transcriptItemKey,
+	type UserStop,
 } from "@superset/chat/core";
 import type {
 	AgentMessage,
@@ -33,6 +34,7 @@ export type TranscriptRow =
 			running: boolean;
 			/** The turn is held on a question or approval only the user can answer. */
 			waiting: boolean;
+			stopped: boolean;
 	  }
 	| {
 			kind: "item";
@@ -68,6 +70,8 @@ export type TranscriptRow =
 			error: TurnError | undefined;
 			/** No turn came after it, so its failure can still be acted on. */
 			latest: boolean;
+			/** The user stopped the response above it, as the agent recorded it. */
+			userStop?: UserStop;
 	  }
 	| {
 			kind: "reply_footer";
@@ -98,7 +102,9 @@ function repeatedTurnFailure(
 	item: Item,
 	turn: Turn | null,
 ): { extra: string } | null {
-	if (turn?.status !== "failed" || item.kind !== "notice") return null;
+	const cardShown =
+		turn?.status === "failed" || turn?.error?.kind === "host_stopped";
+	if (!cardShown || item.kind !== "notice") return null;
 	const notice = item as Notice;
 	if (notice.noticeKind !== "error") return null;
 	const text = notice.text ?? "";
@@ -106,6 +112,10 @@ function repeatedTurnFailure(
 	if (text === message) return { extra: "" };
 	if (message === "" || !text.startsWith(`${message}\n`)) return null;
 	return { extra: text.slice(message.length).trim() };
+}
+
+function stoppedByUser(turn: Turn): boolean {
+	return turn.status === "interrupted" && !turn.error?.kind;
 }
 
 function asksTheUser(entry: TurnGroup["entries"][number]): boolean {
@@ -158,6 +168,7 @@ export function transcriptRows(
 				completedAtMs: turn.completedAtMs,
 				running: turn.status === "running",
 				waiting: turn.status === "running" && group.entries.some(asksTheUser),
+				stopped: stoppedByUser(turn),
 			});
 		};
 		const turnSettled = turn !== null && turn.status !== "running";
@@ -181,9 +192,12 @@ export function transcriptRows(
 				...(run.pages ? { pages: run.pages } : {}),
 			};
 		};
-		const pushItem = (item: Item) => {
+		const endRun = () => {
 			unwrapLoneCall();
 			run = null;
+		};
+		const pushItem = (item: Item) => {
+			endRun();
 			const clientId =
 				item.kind === "user_message"
 					? (item as UserMessage).clientId
@@ -240,6 +254,20 @@ export function transcriptRows(
 		};
 		for (const [index, entry] of group.entries.entries()) {
 			if (index > lastPrompt) placeClock();
+			if (entry.kind === "user_stop") {
+				endRun();
+				push({
+					kind: "turn_status",
+					key: `stop:${entry.item.id}`,
+					groupStart,
+					turnId: group.turnId,
+					status: "interrupted",
+					error: undefined,
+					latest: false,
+					userStop: entry.stop,
+				});
+				continue;
+			}
 			const tools =
 				entry.kind === "tool_run"
 					? entry.items
@@ -298,7 +326,15 @@ export function transcriptRows(
 			if (lastReplyAt === -1) push(card);
 			else rows.splice(lastReplyAt + 1, 0, card);
 		}
-		if (turn?.status === "failed" || turn?.status === "interrupted") {
+		const stopShown =
+			turn !== null &&
+			stoppedByUser(turn) &&
+			((turn.completedAtMs ?? turn.startedAtMs) - turn.startedAtMs >= 1000 ||
+				group.entries.some((entry) => entry.kind === "user_stop"));
+		if (
+			(turn?.status === "failed" || turn?.status === "interrupted") &&
+			!stopShown
+		) {
 			push({
 				kind: "turn_status",
 				key: `status:${group.turnId}`,

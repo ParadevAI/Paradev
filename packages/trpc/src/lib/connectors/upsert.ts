@@ -13,7 +13,6 @@ import {
 	encryptOptional,
 	encryptSecret,
 } from "../../router/plugins/crypto";
-import { isOneOrganizationPerAccount } from "./account-routing";
 import type { ConnectorIdentity, ConnectorTokens } from "./index";
 import { userConnection } from "./lookup";
 import {
@@ -25,6 +24,14 @@ export type ConnectionConflict = {
 	ownerEmail: string | null;
 	ownerOrganizationId: string | null;
 };
+
+// Their inbound events resolve to one org, so a second org on the same
+// account would take over the first org's events.
+const SINGLE_ORG_CONNECTORS: ReadonlySet<string> = new Set([
+	"slack",
+	"microsoft_teams",
+	"sentry",
+]);
 
 export async function connectionConflict(
 	connector: string,
@@ -74,17 +81,21 @@ export async function upsertConnection(input: {
 }): Promise<UpsertConnectionResult> {
 	const { connector, slug, organizationId, userId, tokens, identity } = input;
 
-	const conflict = isOneOrganizationPerAccount(slug, connector)
-		? await connectionConflict(slug, identity.account.id, organizationId)
-		: null;
-	if (conflict) {
-		console.warn(`[connectors/${slug}] account already linked`, {
+	if (SINGLE_ORG_CONNECTORS.has(slug)) {
+		const conflict = await connectionConflict(
+			slug,
+			identity.account.id,
 			organizationId,
-			userId,
-			externalAccountId: identity.account.id,
-			ownerOrganizationId: conflict.ownerOrganizationId,
-		});
-		return { conflict };
+		);
+		if (conflict) {
+			console.warn(`[connectors/${slug}] account already linked`, {
+				organizationId,
+				userId,
+				externalAccountId: identity.account.id,
+				ownerOrganizationId: conflict.ownerOrganizationId,
+			});
+			return { conflict };
+		}
 	}
 
 	const ownerKind = connector.scope;

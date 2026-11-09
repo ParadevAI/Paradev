@@ -7,6 +7,12 @@ export async function GET(request: Request) {
 	const member = await requireOrgMember(request);
 	if (member instanceof Response) return member;
 
+	if (member.role !== "owner" && member.role !== "admin") {
+		return Response.redirect(
+			`${env.NEXT_PUBLIC_WEB_URL}/integrations/github?error=admin_required`,
+		);
+	}
+
 	if (!(await organizationSyncsNow(member.organizationId))) {
 		return Response.redirect(
 			`${env.NEXT_PUBLIC_WEB_URL}/integrations?pro=github`,

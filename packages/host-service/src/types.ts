@@ -2,6 +2,7 @@ import type { Octokit } from "@octokit/rest";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import type { AppRouter } from "@superset/trpc";
 import type { TRPCClient } from "@trpc/client";
+import type { ClosedMidTurnChat } from "./chat-v3/closedMidTurn";
 import type { HostDb } from "./db";
 import type { EventBus } from "./events";
 import type { PageWatchManager } from "./page-watch/index.ts";
@@ -21,6 +22,11 @@ export interface HostServiceRuntime {
 	pageWatch: PageWatchManager;
 	chat?: () => ChatRuntime;
 	closeChats?: (scopeId: string) => Promise<void>;
+	closedMidTurn?: {
+		list(): ClosedMidTurnChat[];
+		resume(): Promise<number>;
+		keepPaused(): void;
+	};
 	agentJobs?: AgentJobRunner;
 }
 
