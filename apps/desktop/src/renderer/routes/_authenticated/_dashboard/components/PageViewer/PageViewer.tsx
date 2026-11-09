@@ -11,6 +11,7 @@ import {
 	CommentsPanel,
 	PageCommentsView,
 	type PageToolHost,
+	PageUpdateBanner,
 	PageVersionBanner,
 } from "@superset/ui/page-comments";
 import { toast } from "@superset/ui/sonner";
@@ -25,6 +26,7 @@ import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/ho
 import { CommentDeepLink } from "./components/CommentDeepLink";
 import { MarkCommentsRead } from "./components/MarkCommentsRead";
 import { PageViewerMessage } from "./components/PageViewerMessage";
+import { usePageUpdates } from "./hooks/usePageUpdates";
 
 const scrollPositions = new Map<string, number>();
 
@@ -69,9 +71,12 @@ export function PageViewer({
 }: PageViewerProps) {
 	const { t } = useLingui();
 	const { data: session } = authClient.useSession();
-	const utils = cloudTrpc.useUtils();
+	const pageRef = useMemo(
+		() => (pageId ? { id: pageId } : { slug }),
+		[pageId, slug],
+	);
 	const pull = cloudTrpc.page.pull.useQuery({
-		...(pageId ? { id: pageId } : { slug }),
+		...pageRef,
 		...(version ? { version } : {}),
 	});
 	const resolvedPageId = pageId ?? pull.data?.id;
@@ -135,13 +140,21 @@ export function PageViewer({
 				})
 			: null;
 	}, [resolvedPageId]);
-	const onPublished = useCallback(() => {
-		if (!resolvedPageId) return;
-		for (const ref of [{ id: resolvedPageId }, { slug }]) {
-			void utils.page.pull.invalidate(ref);
-			void utils.page.versions.invalidate(ref);
-		}
-	}, [utils, resolvedPageId, slug]);
+	const previewing = Boolean(
+		pull.data &&
+			pull.data.servedVersion !== null &&
+			pull.data.version !== pull.data.servedVersion,
+	);
+	const { onPublished, offeredVersion, viewOffered } = usePageUpdates({
+		pageRef,
+		pageId: resolvedPageId,
+		slug,
+		shownVersion: pull.data?.version,
+		pinnedVersion: version,
+		previewing,
+		viewerId: session?.user.id,
+		onUnpin: onExitPreview,
+	});
 	const scrollKey = `${resolvedPageId ?? slug}:${pull.data?.version ?? 0}`;
 
 	const onResolvedRef = useRef(onResolved);
@@ -191,10 +204,6 @@ export function PageViewer({
 		);
 	}
 
-	const previewing =
-		pull.data.servedVersion !== null &&
-		pull.data.version !== pull.data.servedVersion;
-
 	return (
 		<CommentProvider
 			key={resolvedPageId}
@@ -217,6 +226,9 @@ export function PageViewer({
 					/>
 				) : null}
 				<div className="relative flex min-h-0 w-full flex-1">
+					{offeredVersion !== null && !previewing ? (
+						<PageUpdateBanner version={offeredVersion} onView={viewOffered} />
+					) : null}
 					<div className="min-h-0 min-w-0 flex-1">
 						<PageCommentsView
 							pageId={resolvedPageId}
@@ -227,8 +239,9 @@ export function PageViewer({
 							onScrollYChange={(y) => scrollPositions.set(scrollKey, y)}
 							onFramePointerDown={onFramePointerDown}
 							onLinkClick={onLinkClick}
+							{...(resolvedPageId ? { presenceUrl, onPublished } : {})}
 							{...(resolvedPageId && !previewing
-								? { storageTicket, presenceUrl, onPublished, toolHost }
+								? { storageTicket, toolHost }
 								: {})}
 						/>
 					</div>

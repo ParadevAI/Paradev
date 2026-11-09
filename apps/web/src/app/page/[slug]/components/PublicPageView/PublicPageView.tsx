@@ -3,13 +3,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { pagePresenceUrl } from "@superset/shared/page-presence";
 import { Button } from "@superset/ui/button";
-import { PageFrame, usePageToolsUnavailable } from "@superset/ui/page-comments";
+import {
+	PageFrame,
+	PageUpdateBanner,
+	usePageToolsUnavailable,
+} from "@superset/ui/page-comments";
 import { PagePresenceStack, useJoinPresence } from "@superset/ui/presence";
+import { useQueryClient } from "@tanstack/react-query";
 import { Globe } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { env } from "@/env";
+import { useTRPC } from "@/trpc/react";
 import { OpenInSupersetButton } from "../OpenInSupersetButton";
 import { ReportPageDialog } from "./components/ReportPageDialog";
 import { guestId } from "./utils/guestId";
@@ -18,6 +24,7 @@ interface PublicPageViewProps {
 	pageId: string;
 	title: string;
 	viewUrl: string;
+	version: number;
 	slug: string;
 	signedIn: boolean;
 }
@@ -26,11 +33,15 @@ export function PublicPageView({
 	pageId,
 	title,
 	viewUrl,
+	version,
 	slug,
 	signedIn,
 }: PublicPageViewProps) {
 	const { t } = useLingui();
 	const router = useRouter();
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const [offered, setOffered] = useState<number | null>(null);
 	const frameRef = useRef<HTMLIFrameElement>(null);
 	const frameOrigin = useMemo(() => new URL(viewUrl).origin, [viewUrl]);
 	usePageToolsUnavailable({ frameRef, frameOrigin, signedIn });
@@ -42,7 +53,15 @@ export function PublicPageView({
 				pageId,
 				guestId: guestId(),
 			}),
-		onPublished: () => router.refresh(),
+		onPublished: async () => {
+			const next = await queryClient
+				.fetchQuery({
+					...trpc.page.publicView.queryOptions({ slug }),
+					staleTime: 0,
+				})
+				.catch(() => null);
+			if (next && next.version !== version) setOffered(next.version);
+		},
 	});
 
 	return (
@@ -73,7 +92,16 @@ export function PublicPageView({
 				</div>
 			</div>
 
-			<main className="min-h-0 flex-1">
+			<main className="relative min-h-0 flex-1">
+				{offered !== null && offered !== version ? (
+					<PageUpdateBanner
+						version={offered}
+						onView={() => {
+							setOffered(null);
+							router.refresh();
+						}}
+					/>
+				) : null}
 				<PageFrame ref={frameRef} src={viewUrl} title={title} />
 			</main>
 

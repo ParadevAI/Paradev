@@ -21378,6 +21378,9 @@ msgstr "Phiên bản {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "Phiên bản {version} sẽ được cài đặt trong lần khởi động lại tiếp theo."
 
+msgid "Version {version} is available"
+msgstr "Đã có phiên bản {version}"
+
 msgid "Version {version} is the latest version."
 msgstr "Phiên bản {version} là phiên bản mới nhất."
 

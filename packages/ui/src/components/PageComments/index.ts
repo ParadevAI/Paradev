@@ -33,6 +33,7 @@ export {
 	type PageVisibility,
 	RenamePageDialog,
 } from "./components/PageHeader";
+export { PageUpdateBanner } from "./components/PageUpdateBanner";
 export { useFramePointerDown } from "./hooks/useFramePointerDown";
 export { usePageStorageConnect } from "./hooks/usePageStorageConnect";
 export type { PageToolHost } from "./hooks/usePageTools";
@@ -47,3 +48,7 @@ export {
 	type PageCommentUser,
 	useComments,
 } from "./providers/CommentProvider";
+export {
+	type PageUpdateAction,
+	pageUpdateAction,
+} from "./utils/pageUpdateAction";
