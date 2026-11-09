@@ -338,7 +338,7 @@ describe("chat selections", () => {
 		await runtime.dispose();
 	});
 
-	test("a rewind of a stopped chat starts on that chat's model, effort and mode", async () => {
+	test("a rewind of a stopped chat starts on that chat's model, effort, mode and fast mode", async () => {
 		const { runtime, starts, create, pick } = selectionRuntime();
 		const source = create(OTHER_HARNESS, { headless: true });
 		await pick(source.sessionId);
@@ -371,6 +371,7 @@ describe("chat selections", () => {
 			modelId: "deepseek-v4.1-flash",
 			effortId: "high",
 			modeId: "plan",
+			fast: "off",
 		});
 		await runtime.dispose();
 	});

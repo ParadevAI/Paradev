@@ -5825,17 +5825,24 @@ describe("AcpAdapter config options", () => {
 				],
 			},
 		];
+		agent.holdSelections = true;
 		const { adapter } = startAdapter(agent, undefined, {
 			modelId: "sonnet",
 			fast: "on",
 		});
-		await flush(20);
-
-		expect(
+		const configured = () =>
 			agent.sent
 				.filter((f) => f.method === "session/set_config_option")
-				.map((f) => f.params),
-		).toEqual([
+				.map((f) => f.params);
+		await flush();
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+		]);
+
+		agent.holdSelections = false;
+		agent.releaseSelections();
+		await flush(20);
+		expect(configured()).toEqual([
 			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
 			{ sessionId: "sess-1", configId: "fast", value: "on" },
 		]);

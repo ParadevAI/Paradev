@@ -36,10 +36,12 @@ export function isSelectionCategory(
 	return category !== undefined && Object.hasOwn(SELECTION_KEYS, category);
 }
 
-/** Fast mode has no ACP category: agents list it as an on/off option named `fast`. */
+/** Claude lists fast mode as `fast` with no category, Codex as `fast-mode`. */
+const FAST_OPTION_IDS = new Set(["fast", "fast-mode"]);
+
 export function isFastOption(option: SessionConfigOption): boolean {
 	return (
-		option.id === "fast" &&
+		FAST_OPTION_IDS.has(option.id) &&
 		option.options.length === 2 &&
 		option.options.some((entry) => entry.id === "on") &&
 		option.options.some((entry) => entry.id === "off")

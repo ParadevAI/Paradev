@@ -352,6 +352,7 @@ function explicitSelections(input: ChatSelections): ChatSelections {
 		...(input.modelId ? { modelId: input.modelId } : {}),
 		...(input.effortId ? { effortId: input.effortId } : {}),
 		...(input.modeId ? { modeId: input.modeId } : {}),
+		...(input.fast ? { fast: input.fast } : {}),
 	};
 }
 

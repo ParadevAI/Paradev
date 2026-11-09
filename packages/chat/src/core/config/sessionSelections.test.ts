@@ -24,6 +24,9 @@ const fast = {
 
 test("fast mode is a selection by its id, not its category", () => {
 	expect(selectionCategoryOf(fast)).toBe("fast");
+	expect(
+		selectionCategoryOf({ ...fast, id: "fast-mode", category: "model_config" }),
+	).toBe("fast");
 	expect(selectionCategoryOf({ ...fast, id: "turbo" })).toBeUndefined();
 	expect(
 		selectionCategoryOf({ ...fast, id: "speed", category: "fast" }),

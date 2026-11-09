@@ -2025,18 +2025,26 @@ export class AcpAdapter implements HarnessAdapter {
 		wanted: ChatSelections,
 	): Promise<ChatSelections> {
 		const model = this.applyStartSelection("model", wanted.modelId);
-		// Effort levels and fast mode belong to the model, so they are only known once it is set.
-		const afterModel = (category: "thought_level" | "fast", value?: string) => {
-			const taken = model.then((modelId) =>
-				value && (modelId || !wanted.modelId)
-					? this.applyStartSelection(category, value)
-					: undefined,
-			);
-			this.trackSelection(taken);
-			return taken;
-		};
-		const effort = afterModel("thought_level", wanted.effortId);
-		const fast = afterModel("fast", wanted.fast);
+		const { effortId } = wanted;
+		// The effort levels on offer belong to the model, so they are only known once it is set.
+		const effort = model.then((modelId) =>
+			effortId && (modelId || !wanted.modelId)
+				? this.applyStartSelection("thought_level", effortId)
+				: undefined,
+		);
+		this.trackSelection(effort);
+		// Fast mode also belongs to the model. It waits for effort too: a refused
+		// setting rolls back every option to before it was sent.
+		const fast = wanted.fast
+			? effort
+					.then(() => model)
+					.then((modelId) =>
+						modelId || !wanted.modelId
+							? this.applyStartSelection("fast", wanted.fast)
+							: undefined,
+					)
+			: Promise.resolve(undefined);
+		if (wanted.fast) this.trackSelection(fast);
 		const mode = this.applyStartSelection("mode", wanted.modeId);
 		return Promise.all([model, effort, mode, fast]).then(
 			([modelId, effortId, modeId, fastTaken]) => ({
