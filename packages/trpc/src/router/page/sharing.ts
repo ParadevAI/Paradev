@@ -103,6 +103,7 @@ export const pageSharingRouter = {
 				sharedByUserId: userId,
 				added,
 				role: input.role,
+				client: ctx.client,
 			});
 			return { added };
 		}),

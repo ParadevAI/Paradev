@@ -1,3 +1,4 @@
+import type { ApiClientInfo } from "../../trpc";
 import { posthog } from "../analytics";
 import type { GranteeRef } from "./schema";
 import type { ShareTarget } from "./service";
@@ -16,12 +17,14 @@ export function captureResourceShared({
 	sharedByUserId,
 	added,
 	role,
+	client,
 }: {
 	target: ShareTarget;
 	organizationId: string;
 	sharedByUserId: string;
 	added: GranteeRef[];
 	role?: string;
+	client: ApiClientInfo | null;
 }): void {
 	if (!added.length) return;
 	try {
@@ -36,6 +39,9 @@ export function captureResourceShared({
 				resource_id: target.id,
 				organization_id: organizationId,
 				role: role ?? null,
+				// Desktop, mobile, CLI and SDK send a client header; the web app does
+				// not, so a missing header is the web app or an unidentified caller.
+				client_product: client?.product ?? "web",
 				user_count: added.filter((g) => g.kind === "user").length,
 				team_count: added.filter((g) => g.kind === "team").length,
 				invitation_count: invitationIds.length,

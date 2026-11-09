@@ -94,6 +94,7 @@ export const cloudWorkspaceSharingRouter = {
 				organizationId: row.organizationId,
 				sharedByUserId: ctx.principal.userId,
 				added,
+				client: ctx.client,
 			});
 			if (added.length) {
 				await recordShareActivity(
