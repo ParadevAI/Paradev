@@ -82,7 +82,6 @@ export const LINEAR_SENTENCES: Record<LinearTriggerEvent, SentencePart[]> = {
 };
 
 export const LINEAR_MENU: TriggerMenuEntry<LinearConfig>[] = [
-	leaf(msg({ message: "Comment added" }), "comment.created"),
 	{
 		label: msg({
 			message: "Issue…",
@@ -106,6 +105,7 @@ export const LINEAR_MENU: TriggerMenuEntry<LinearConfig>[] = [
 				}),
 				"issue.assigned",
 			),
+			leaf(msg({ message: "Comment added" }), "comment.created"),
 		],
 	},
 	leaf(
