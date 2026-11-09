@@ -1,6 +1,12 @@
 import { describe, expect, it } from "bun:test";
 import type { PagePresenceViewer } from "@superset/shared/page-presence";
-import { presenceMessage, SILENT_MS, sweepSilent } from "./presence";
+import type { PageManifest } from "@superset/shared/usercontent";
+import {
+	presenceMessage,
+	SILENT_MS,
+	sweepSilent,
+	versionMoved,
+} from "./presence";
 
 const viewer = (id: string, guest = false): PagePresenceViewer => ({
 	id,
@@ -70,5 +76,35 @@ describe("sweepSilent", () => {
 		);
 		expect(closed).toEqual(["silent", "never-pinged"]);
 		expect(result).toEqual({ evicted: true, remaining: 2 });
+	});
+});
+
+describe("versionMoved", () => {
+	const manifest = (
+		latestVersion: number,
+		sharedVersion: number | null = null,
+	): PageManifest => ({
+		v: 1,
+		pageId: "p",
+		slug: "p",
+		visibility: "everyone",
+		latestVersion,
+		sharedVersion,
+		versions: {},
+	});
+
+	it("tells members about a new version, and nothing about a rewrite", () => {
+		expect(versionMoved(manifest(1), manifest(2), false)).toBe(true);
+		expect(versionMoved(manifest(2), manifest(2), false)).toBe(false);
+	});
+
+	it("tells guests only when the version they are served moves", () => {
+		expect(versionMoved(manifest(1, 1), manifest(2, 1), false)).toBe(true);
+		expect(versionMoved(manifest(1, 1), manifest(2, 1), true)).toBe(false);
+		expect(versionMoved(manifest(2, 1), manifest(2, null), true)).toBe(true);
+	});
+
+	it("tells everyone when the hub lost what it last read", () => {
+		expect(versionMoved(null, manifest(1), true)).toBe(true);
 	});
 });

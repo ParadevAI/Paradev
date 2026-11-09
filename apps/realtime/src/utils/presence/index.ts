@@ -7,4 +7,5 @@ export {
 	SWEEP_MS,
 	scheduleSweep,
 	sweepSilent,
+	versionMoved,
 } from "./presence";

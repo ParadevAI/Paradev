@@ -28,6 +28,7 @@ export function openPagePresence({
 	url,
 	onViewers,
 	onVisitors,
+	onPublished,
 	createSocket = (address) =>
 		new WebSocket(address) as unknown as PresenceSocket,
 	retryBaseMs = 1000,
@@ -37,6 +38,7 @@ export function openPagePresence({
 	url: () => Promise<string | null>;
 	onViewers: (viewers: PagePresenceViewer[]) => void;
 	onVisitors?: (visitors: PresenceVisitor[]) => void;
+	onPublished?: () => void;
 	createSocket?: (address: string) => PresenceSocket;
 	retryBaseMs?: number;
 	retryMaxMs?: number;
@@ -127,6 +129,8 @@ export function openPagePresence({
 					visitors = presenceVisitorsFrom(message.visitors);
 					onVisitors?.(visitors);
 				}
+			} else if (message.type === "published") {
+				onPublished?.();
 			}
 		});
 		ws.addEventListener("close", (event) => lost(ws, event?.code));

@@ -7,6 +7,7 @@ import { PageFrame, usePageToolsUnavailable } from "@superset/ui/page-comments";
 import { PagePresenceStack, useJoinPresence } from "@superset/ui/presence";
 import { Globe } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useRef } from "react";
 import { env } from "@/env";
 import { OpenInSupersetButton } from "../OpenInSupersetButton";
@@ -29,6 +30,7 @@ export function PublicPageView({
 	signedIn,
 }: PublicPageViewProps) {
 	const { t } = useLingui();
+	const router = useRouter();
 	const frameRef = useRef<HTMLIFrameElement>(null);
 	const frameOrigin = useMemo(() => new URL(viewUrl).origin, [viewUrl]);
 	usePageToolsUnavailable({ frameRef, frameOrigin, signedIn });
@@ -40,6 +42,7 @@ export function PublicPageView({
 				pageId,
 				guestId: guestId(),
 			}),
+		onPublished: () => router.refresh(),
 	});
 
 	return (

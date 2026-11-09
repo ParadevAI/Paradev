@@ -2,6 +2,10 @@ import type {
 	PagePresenceViewer,
 	PresenceVisitor,
 } from "@superset/shared/page-presence";
+import {
+	type PageManifest,
+	servedVersionOf,
+} from "@superset/shared/usercontent";
 
 export const SWEEP_MS = 30_000;
 export const SILENT_MS = 75_000;
@@ -91,4 +95,18 @@ export function broadcastPresence(
 			);
 		} catch {}
 	}
+}
+
+/** Whether a manifest change moved a version this receiver can see. */
+export function versionMoved(
+	before: PageManifest | null,
+	after: PageManifest,
+	guest: boolean,
+): boolean {
+	if (!before) return true;
+	if (guest) return servedVersionOf(before) !== servedVersionOf(after);
+	return (
+		before.latestVersion !== after.latestVersion ||
+		before.sharedVersion !== after.sharedVersion
+	);
 }

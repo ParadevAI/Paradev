@@ -392,7 +392,13 @@ export function PageDetailScreen({
 						) : null}
 					</View>
 
-					{pageId ? <PagePresence key={pageId} url={presenceUrl} /> : null}
+					{pageId ? (
+						<PagePresence
+							key={pageId}
+							url={presenceUrl}
+							onPublished={() => void page.refetch()}
+						/>
+					) : null}
 
 					{commentMode && !selection ? (
 						<View

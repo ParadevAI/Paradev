@@ -69,6 +69,7 @@ export function PageViewer({
 }: PageViewerProps) {
 	const { t } = useLingui();
 	const { data: session } = authClient.useSession();
+	const utils = cloudTrpc.useUtils();
 	const pull = cloudTrpc.page.pull.useQuery({
 		...(pageId ? { id: pageId } : { slug }),
 		...(version ? { version } : {}),
@@ -134,6 +135,10 @@ export function PageViewer({
 				})
 			: null;
 	}, [resolvedPageId]);
+	const onPublished = useCallback(() => {
+		void utils.page.pull.invalidate();
+		void utils.page.versions.invalidate();
+	}, [utils]);
 	const scrollKey = `${resolvedPageId ?? slug}:${pull.data?.version ?? 0}`;
 
 	const onResolvedRef = useRef(onResolved);
@@ -220,7 +225,7 @@ export function PageViewer({
 							onFramePointerDown={onFramePointerDown}
 							onLinkClick={onLinkClick}
 							{...(resolvedPageId && !previewing
-								? { storageTicket, presenceUrl, toolHost }
+								? { storageTicket, presenceUrl, onPublished, toolHost }
 								: {})}
 						/>
 					</div>

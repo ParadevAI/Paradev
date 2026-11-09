@@ -7,6 +7,7 @@ import {
 	type PageToolHost,
 } from "@superset/ui/page-comments";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { env } from "@/env";
 import { useTRPC } from "@/trpc/react";
@@ -44,6 +45,9 @@ export function PageCommentsFrame({
 			: null;
 	}, [pageId]);
 
+	const router = useRouter();
+	const onPublished = useCallback(() => router.refresh(), [router]);
+
 	const trpc = useTRPC();
 	const callTool = useMutation(trpc.page.callTool.mutationOptions());
 	const grantTool = useMutation(trpc.page.grantTool.mutationOptions());
@@ -69,7 +73,9 @@ export function PageCommentsFrame({
 			pageId={pageId}
 			src={src}
 			title={title}
-			{...(previewing ? {} : { storageTicket, presenceUrl, toolHost })}
+			{...(previewing
+				? {}
+				: { storageTicket, presenceUrl, onPublished, toolHost })}
 		/>
 	);
 }

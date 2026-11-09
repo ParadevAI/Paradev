@@ -39,6 +39,7 @@ import {
 	SWEEP_MS,
 	scheduleSweep,
 	sweepSilent,
+	versionMoved,
 } from "./utils/presence";
 
 interface Pinned {
@@ -140,6 +141,7 @@ export class PageHub extends Server<RealtimeEnv> {
 
 	async manifestChanged(): Promise<void> {
 		this.schema();
+		const before = this.manifest;
 		const manifest = await this.readManifest(true);
 		if (!manifest) {
 			this.records.clearAll();
@@ -158,7 +160,16 @@ export class PageHub extends Server<RealtimeEnv> {
 						userId: pinned.userId,
 						organizationIds: [...pinned.organizationIds],
 					});
-			if (!allowed) this.revoke(connection);
+			if (!allowed) {
+				this.revoke(connection);
+			} else if (
+				pinned.presence &&
+				versionMoved(before, manifest, pinned.guest === true)
+			) {
+				try {
+					connection.send(JSON.stringify({ type: "published" }));
+				} catch {}
+			}
 		}
 		this.announce();
 	}

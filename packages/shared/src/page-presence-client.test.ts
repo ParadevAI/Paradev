@@ -39,6 +39,7 @@ function harness(
 	const sockets: FakeSocket[] = [];
 	const states: PagePresenceViewer[][] = [];
 	const visits: PresenceVisitor[][] = [];
+	let published = 0;
 	const urls = [...(options.urls ?? [])];
 	let dialled = 0;
 	const client = openPagePresence({
@@ -48,6 +49,9 @@ function harness(
 		},
 		onViewers: (viewers) => states.push(viewers),
 		onVisitors: (visitors) => visits.push(visitors),
+		onPublished: () => {
+			published += 1;
+		},
 		createSocket: (address) => {
 			const socket = new FakeSocket(address);
 			sockets.push(socket);
@@ -62,7 +66,15 @@ function harness(
 		socket.emit("open");
 		return socket;
 	};
-	return { client, sockets, states, visits, opened, dialled: () => dialled };
+	return {
+		client,
+		sockets,
+		states,
+		visits,
+		opened,
+		dialled: () => dialled,
+		published: () => published,
+	};
 }
 
 const grace = {
@@ -102,6 +114,17 @@ describe("openPagePresence", () => {
 		expect(h.visits.at(-1)).toEqual([ada]);
 		socket.emit("close", { code: 1006 });
 		expect(h.visits.at(-1)).toEqual([{ ...ada, active: false }]);
+		h.client.stop();
+	});
+
+	test("tells the host when the hub says a version was published", async () => {
+		const h = harness();
+		const socket = await h.opened();
+		socket.hub({ type: "presence", viewers: [grace] });
+		expect(h.published()).toBe(0);
+		socket.hub({ type: "published" });
+		expect(h.published()).toBe(1);
+		expect(h.states.at(-1)).toEqual([grace]);
 		h.client.stop();
 	});
 
