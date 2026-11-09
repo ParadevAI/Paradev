@@ -77,6 +77,11 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 	{ id: "anthropic/claude-opus-4-8", label: "Opus 4.8", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-7", label: "Opus 4.7", provider: "Anthropic" },
 	{
+		id: "anthropic/claude-fable-5-2",
+		label: "Fable 5.2",
+		provider: "Anthropic",
+	},
+	{
 		id: "anthropic/claude-fable-5-1",
 		label: "Fable 5.1",
 		provider: "Anthropic",
@@ -131,6 +136,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "opus", label: "Opus", group: LATEST_GROUP },
 			{ id: "sonnet", label: "Sonnet", group: LATEST_GROUP },
 			{ id: "haiku", label: "Haiku", group: LATEST_GROUP },
+			{ id: "claude-fable-5-2", label: "Fable 5.2", group: PINNED_GROUP },
 			{ id: "claude-fable-5-1", label: "Fable 5.1", group: PINNED_GROUP },
 			{ id: "claude-fable-5", label: "Fable 5", group: PINNED_GROUP },
 			{ id: "claude-opus-5-5", label: "Opus 5.5", group: PINNED_GROUP },
