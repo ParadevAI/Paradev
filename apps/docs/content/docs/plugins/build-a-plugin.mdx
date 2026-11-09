@@ -62,7 +62,7 @@ The name must be lowercase letters, digits, dots, and hyphens. The category is o
 			"interface": {
 				"displayName": "Acme",
 				"category": "Developer tools",
-				"icon": "acme"
+				"icon": "./assets/icon.svg"
 			},
 			"mcp": {
 				"type": "streamable-http",
@@ -75,10 +75,12 @@ The name must be lowercase letters, digits, dots, and hyphens. The category is o
 
 | Field | What it does |
 |:------|:-------------|
-| `interface` | The name, category, and icon shown in the Plugins page |
+| `interface` | The name, category, and icon shown in the Plugins page. `icon` is a path to an image in the plugin folder |
 | `mcp` | The MCP server the tools come from. Streamable HTTP only. Omit it for a skills-only plugin |
 | `connector` | The account connection the tools need, as `{ "slug": "..." }`. Omit it when the tools need no account |
 | `bind` | How the connection's credential is added to each call, such as `"headers": { "Authorization": "Bearer ${config.access_token}" }` |
+
+The icon must be an SVG, PNG, WebP, or JPEG file of 256 KB or less, inside the plugin folder. URLs, absolute paths, and symlinks out of the folder are not used. The Plugins page shows the icon after the plugin is installed. Until then, and when the file cannot be used, it shows a generic icon.
 
 The full schema is at [paradev.com/schemas/plugin/1.0.0.json](https://paradev.com/schemas/plugin/1.0.0.json). Your editor uses it to complete and check the file.
 
