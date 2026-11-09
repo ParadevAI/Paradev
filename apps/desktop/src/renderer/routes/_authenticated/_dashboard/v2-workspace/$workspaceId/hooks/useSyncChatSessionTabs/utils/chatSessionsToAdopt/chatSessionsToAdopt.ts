@@ -10,7 +10,6 @@ import {
 	readPendingChatStops,
 	readPendingChatStopTerminalIds,
 } from "../../../../utils/pendingChatStops";
-import { CHAT_ADOPT_MAX_LIVE_CHATS } from "../../constants";
 
 export interface ListedChatSession {
 	sessionId: string;
@@ -20,15 +19,17 @@ export interface ListedChatSession {
 	updatedAt: number;
 	live: boolean;
 	terminalId: string | null;
+	closedByUser?: boolean;
+	closedAt?: number | null;
 }
 
 /**
- * Live chats in the workspace that no pane shows, oldest first. A pane
- * claims a chat by its session id or by its terminal id, so a chat the
- * desktop is still creating (or a pending cloud launch) is never adopted twice.
- * A chat with no terminal uses its session id, as the host's `panes.newTab` does.
- * Only the most recently active live chats are candidates, so a workspace with
- * many idle chats does not open a tab for each of them.
+ * Every open chat in the workspace that no pane shows, oldest first. A chat is
+ * open until a person or the host closes it, whether or not its agent is still
+ * running. A pane claims a chat by its session id or by its terminal id, so a
+ * chat the desktop is still creating (or a pending cloud launch) is never
+ * adopted twice. A chat with no terminal uses its session id, as the host's
+ * `panes.newTab` does.
  */
 export function chatSessionsToAdopt({
 	sessions,
@@ -52,19 +53,14 @@ export function chatSessionsToAdopt({
 				claimedSessionIds.add(data.sessionId);
 		}
 	}
-	const recent = sessions
-		.filter(
-			(session) =>
-				session.live &&
-				presetForAcpHarness(session.harness) &&
-				!isChatSessionClosed(session.sessionId) &&
-				!isChatTerminalIgnored(session.terminalId ?? session.sessionId),
-		)
-		.sort((a, b) => b.updatedAt - a.updatedAt)
-		.slice(0, CHAT_ADOPT_MAX_LIVE_CHATS);
 	const targets: Array<ChatSessionTarget & { updatedAt: number }> = [];
-	for (const session of recent) {
+	for (const session of sessions) {
 		const terminalId = session.terminalId ?? session.sessionId;
+		const open =
+			session.live || (!session.closedAt && session.closedByUser !== true);
+		if (!open) continue;
+		if (isChatSessionClosed(session.sessionId)) continue;
+		if (isChatTerminalIgnored(terminalId)) continue;
 		if (claimedSessionIds.has(session.sessionId)) continue;
 		if (claimedTerminalIds.has(terminalId)) continue;
 		const presetId = presetForAcpHarness(session.harness);

@@ -30,6 +30,7 @@ import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgen
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { resumeChat } from "../utils/resumeChat";
 import { openDesktopChatTab } from "./utils/openDesktopChatTab";
 
 /**
@@ -203,23 +204,16 @@ export function NewSessionSheet() {
 		if (launchingKey !== null) return;
 		setLaunchingKey(chat.sessionId);
 		try {
-			const transport = getChatTransport(hostUrl);
-			await transport
-				.closeSession({ sessionId: chat.sessionId })
-				.catch(() => {});
-			const created = await transport.createSession({
-				commandId: randomUUID(),
+			const sessionId = await resumeChat({
+				transport: getChatTransport(hostUrl),
 				workspaceId: workspace.id,
-				harness: chat.harness,
-				resume: {
-					harnessSessionId: chat.harnessSessionId,
-					replacesSessionId: chat.sessionId,
-				},
+				chat: { ...chat, harnessSessionId: chat.harnessSessionId },
+				commandId: randomUUID(),
 			});
 			openDesktopChatTab(
 				getHostServiceClientByUrl(hostUrl),
 				workspace.id,
-				created.sessionId,
+				sessionId,
 			);
 			if (host) {
 				void queryClient.invalidateQueries({
@@ -227,7 +221,7 @@ export function NewSessionSheet() {
 				});
 			}
 			router.dismissTo(
-				`/(authenticated)/workspace/${workspace.id}?tab=${created.sessionId}`,
+				`/(authenticated)/workspace/${workspace.id}?tab=${sessionId}`,
 			);
 		} catch (error) {
 			setLaunchingKey(null);
