@@ -113,9 +113,14 @@ export class MoveBook {
 		this.ensureSchema();
 		const [row] = this.rows<{ oldest: number | null }>(
 			`SELECT min(oldest) AS oldest FROM (
-				SELECT min(updated_at) AS oldest FROM chat_moves WHERE status IN ${CHAT_IN_FLIGHT_SQL}
-				UNION ALL
 				SELECT min(updated_at) AS oldest FROM workspace_moves WHERE status IN ${WORKSPACE_IN_FLIGHT_SQL}
+				UNION ALL
+				SELECT min(updated_at) AS oldest FROM chat_moves
+				WHERE status IN ${CHAT_IN_FLIGHT_SQL} AND status != 'pending'
+				UNION ALL
+				SELECT min(max(chat.updated_at, parent.updated_at)) AS oldest
+				FROM chat_moves chat JOIN workspace_moves parent ON parent.id = chat.workspace_move_id
+				WHERE chat.status = 'pending'
 			)`,
 		);
 		return row?.oldest == null ? null : row.oldest + STALE_MOVE_MS;
@@ -182,6 +187,31 @@ export class MoveBook {
 				);
 				if (row) this.settle(row.workspace_move_id, now);
 				return reply("claim", { move: row ? this.toChatMove(row) : null });
+			}
+			case "touchWorkspaceMove": {
+				const [row] = this.rows<{ id: string }>(
+					`UPDATE workspace_moves SET updated_at = ?
+					WHERE id = ? AND status IN ${WORKSPACE_IN_FLIGHT_SQL} RETURNING id`,
+					now,
+					request.id,
+				);
+				return reply("touchWorkspaceMove", { alive: !!row });
+			}
+			case "touchChatMove": {
+				const [row] = this.rows<{ workspace_move_id: string }>(
+					`UPDATE chat_moves SET updated_at = ?
+					WHERE id = ? AND status IN ('copying', 'restoring') RETURNING workspace_move_id`,
+					now,
+					request.id,
+				);
+				if (row) {
+					this.exec(
+						`UPDATE workspace_moves SET updated_at = ? WHERE id = ? AND status IN ${WORKSPACE_IN_FLIGHT_SQL}`,
+						now,
+						row.workspace_move_id,
+					);
+				}
+				return reply("touchChatMove", { alive: !!row });
 			}
 			case "finish": {
 				const [row] = this.rows<{ workspace_move_id: string }>(

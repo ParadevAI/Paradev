@@ -168,39 +168,47 @@ export async function completeChatMove(
 		continueChat?: () => Promise<unknown>;
 	},
 ): Promise<void> {
-	let finished = false;
-	const wentOn = await dbWs
-		.transaction(async (tx) => {
+	const outcome = await dbWs
+		.transaction(async (tx): Promise<"switched" | "wentOn" | "already"> => {
 			// The lock orders this check with the source's history uploads, which lock the same row.
-			await tx
-				.select({ id: chatSessions.id })
+			const [chat] = await tx
+				.select({ v2WorkspaceId: chatSessions.v2WorkspaceId })
 				.from(chatSessions)
 				.where(eq(chatSessions.id, move.sessionId))
 				.for("update");
+			if (chat?.v2WorkspaceId === move.toWorkspaceId) return "already";
 			if (move.sourceTurnSeq !== null) {
 				const [turn] = await tx
 					.select({ value: max(chatTurns.firstSeq) })
 					.from(chatTurns)
 					.where(eq(chatTurns.sessionId, move.sessionId));
-				if ((turn?.value ?? 0) > move.sourceTurnSeq) return true;
+				if ((turn?.value ?? 0) > move.sourceTurnSeq) return "wentOn";
 			}
-			({ finished } = await callMoves(move.organizationId, {
+			const { finished } = await callMoves(move.organizationId, {
 				op: "finish",
 				id: move.id,
-			}));
+			});
 			if (!finished) throw new ChatMoveError("The move is no longer running");
 			await tx
 				.update(chatSessions)
 				.set({ v2WorkspaceId: move.toWorkspaceId, lastActiveAt: new Date() })
 				.where(eq(chatSessions.id, move.sessionId));
-			return false;
+			return "switched";
 		})
 		.catch(async (error: unknown) => {
-			// The move was recorded ready, but the chat never switched.
-			if (finished) await failChatMove(move, error, { evenIfReady: true });
+			// The chat never switched, even when the store recorded the move ready
+			// and its answer was lost on the way back.
+			await failChatMove(move, error, { evenIfReady: true }).catch(
+				(failError: unknown) =>
+					console.error(
+						`[chat-move] could not fail move ${move.id}`,
+						failError,
+					),
+			);
 			throw error;
 		});
-	if (wentOn) {
+	if (outcome === "already") return;
+	if (outcome === "wentOn") {
 		const error = wentOnError();
 		await failChatMove(move, error);
 		throw error;

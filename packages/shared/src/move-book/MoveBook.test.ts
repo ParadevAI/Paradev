@@ -170,6 +170,46 @@ describe("MoveBook", () => {
 		expect(book.nextStaleAt()).toBeNull();
 	});
 
+	it("ages a chat waiting its turn by its workspace move, so the next stale time is never past", () => {
+		const { book, clock, ok } = newBook();
+		const parent = begin(ok);
+		const [first] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a"), chat("b")],
+		}).moves;
+		clock.now += STALE_MOVE_MS / 2;
+		ok({ op: "claim", id: first?.id as string });
+		clock.now += STALE_MOVE_MS / 2 + 1;
+		book.sweep();
+		expect(book.nextStaleAt()).toBeGreaterThan(clock.now);
+	});
+
+	it("keeps a move that is still being worked on from going stale", () => {
+		const { book, clock, ok } = newBook();
+		const parent = begin(ok);
+		clock.now += STALE_MOVE_MS - 1;
+		expect(ok({ op: "touchWorkspaceMove", id: parent.id }).alive).toBe(true);
+		const [move] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		const id = move?.id as string;
+		ok({ op: "claim", id });
+		clock.now += STALE_MOVE_MS - 1;
+		expect(ok({ op: "touchChatMove", id }).alive).toBe(true);
+		clock.now += STALE_MOVE_MS - 1;
+		book.sweep();
+		expect(ok({ op: "chatMove", id }).move?.status).toBe("copying");
+		clock.now += STALE_MOVE_MS;
+		expect(ok({ op: "touchChatMove", id }).alive).toBe(false);
+	});
+
 	it("fails a ready move only when asked to", () => {
 		const { ok } = newBook();
 		const parent = begin(ok);

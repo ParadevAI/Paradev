@@ -200,11 +200,15 @@ describe("createChatSync", () => {
 		]);
 	});
 
-	test("stops following a chat once the API says it moved", async () => {
+	test.each([
+		"CONFLICT",
+		"FORBIDDEN",
+		"NOT_FOUND",
+	])("stops following a chat once the API answers %s", async (code) => {
 		let movedAway = false;
 		const { sync, pushes, say, timers, appended } = setup({
 			reject: () => movedAway,
-			rejectCode: "CONFLICT",
+			rejectCode: code,
 		});
 		sync.follow(CHAT);
 		say("a");

@@ -16,6 +16,7 @@ import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { callMoves } from "../../lib/moves";
 import { presignedPutUrl } from "../../lib/r2";
 import { personProcedure, userError } from "../../trpc";
+import { isMovesEnabled } from "../chat-move/utils/assertMovesEnabled";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	chatEventsInputSchema,
@@ -33,6 +34,7 @@ import {
 } from "./utils/access";
 import { foldEvents } from "./utils/foldEvents";
 import { loadChatHistory } from "./utils/loadChatHistory";
+import { loadLatestChatHistory } from "./utils/loadLatestChatHistory";
 import { searchChats } from "./utils/searchChats";
 
 type ProtectedCtx = Parameters<typeof requireActiveOrgMembership>[0] & {
@@ -63,6 +65,43 @@ function stillMovingHere(): TRPCError {
 }
 
 /**
+ * Asked before the row lock, so a slow or unreachable move store never holds
+ * it. A chat with no home yet, as an automation records it, is not moving.
+ */
+async function chatMovingHere(
+	caller: ChatHistoryCaller,
+	input: { sessionId: string; workspaceId: string },
+): Promise<boolean> {
+	const row = await db.query.chatSessions.findFirst({
+		columns: { organizationId: true, createdBy: true, v2WorkspaceId: true },
+		where: eq(chatSessions.id, input.sessionId),
+	});
+	if (
+		!row ||
+		row.v2WorkspaceId === null ||
+		row.v2WorkspaceId === input.workspaceId ||
+		row.organizationId !== caller.organizationId ||
+		row.createdBy !== caller.userId
+	) {
+		return false;
+	}
+	try {
+		const { moving } = await callMoves(caller.organizationId, {
+			op: "chatMoving",
+			sessionId: input.sessionId,
+			freshInto: input.workspaceId,
+		});
+		return moving;
+	} catch (error) {
+		throw new TRPCError({
+			code: "SERVICE_UNAVAILABLE",
+			message: "Could not check whether this chat is moving",
+			cause: error,
+		});
+	}
+}
+
+/**
  * Chats kept off the machine they run on: the latest state of each item and
  * turn, and the agent's own session files. A host pushes as it goes; when a
  * chat moves, `chatMove` hands both to the host it moves to.
@@ -71,12 +110,18 @@ function stillMovingHere(): TRPCError {
 const MAX_WORKSPACE_CHATS = 20;
 
 export const chatHistoryRouter = {
+	/** Whether a cloud box keeps its chats in the cloud as they happen. */
+	syncEnabled: personProcedure.query(async ({ ctx }) => ({
+		enabled: await isMovesEnabled(ctx.session.user),
+	})),
+
 	push: personProcedure
 		.input(pushInputSchema)
 		.mutation(async ({ ctx, input }) => {
 			const caller = await callerOf(ctx);
 			assertBoxWorkspace(caller, input.workspaceId);
 			const folded = foldEvents(input.events);
+			const movingHere = await chatMovingHere(caller, input);
 
 			await dbWs.transaction(async (tx) => {
 				const [existing] = await tx
@@ -97,17 +142,22 @@ export const chatHistoryRouter = {
 						lastSeq: 0,
 					});
 				} else {
-					if (
-						existing.v2WorkspaceId !== input.workspaceId &&
+					const own =
 						existing.organizationId === caller.organizationId &&
-						existing.createdBy === caller.userId
+						existing.createdBy === caller.userId;
+					if (own && existing.v2WorkspaceId === null) {
+						await tx
+							.update(chatSessions)
+							.set({ v2WorkspaceId: input.workspaceId })
+							.where(eq(chatSessions.id, input.sessionId));
+						existing.v2WorkspaceId = input.workspaceId;
+					}
+					if (
+						own &&
+						movingHere &&
+						existing.v2WorkspaceId !== input.workspaceId
 					) {
-						const { moving } = await callMoves(caller.organizationId, {
-							op: "chatMoving",
-							sessionId: input.sessionId,
-							freshInto: input.workspaceId,
-						});
-						if (moving) throw stillMovingHere();
+						throw stillMovingHere();
 					}
 					// Owner only: a box whose chat moved away must hear CONFLICT, not NOT_FOUND.
 					if (!canAccess({ ...caller, sandbox: null }, existing)) {
@@ -336,7 +386,24 @@ export const chatHistoryRouter = {
 				!session.v2WorkspaceId ||
 				!(await isCloudWorkspace(session.v2WorkspaceId))
 			) {
-				return { epoch: null, events: [], nextAfterSeq: null };
+				return {
+					epoch: null,
+					events: [],
+					nextAfterSeq: null,
+					nextBeforeSeq: null,
+				};
+			}
+			if (input.latest) {
+				const { events, nextBeforeSeq } = await loadLatestChatHistory(session, {
+					beforeSeq: input.beforeSeq,
+					limit: input.limit,
+				});
+				return {
+					epoch: session.epoch,
+					events,
+					nextAfterSeq: null,
+					nextBeforeSeq,
+				};
 			}
 			const { events } = await loadChatHistory(session, {
 				afterSeq: input.afterSeq,
@@ -347,6 +414,7 @@ export const chatHistoryRouter = {
 				events,
 				nextAfterSeq:
 					events.length === input.limit ? (events.at(-1)?.seq ?? null) : null,
+				nextBeforeSeq: null,
 			};
 		}),
 

@@ -1,1 +1,1 @@
-export { assertMovesEnabled } from "./assertMovesEnabled";
+export { assertMovesEnabled, isMovesEnabled } from "./assertMovesEnabled";

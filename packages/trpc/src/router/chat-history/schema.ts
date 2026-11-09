@@ -74,4 +74,8 @@ export const chatEventsInputSchema = z.object({
 	/** The seq of the last event already received. */
 	afterSeq: z.number().int().nonnegative().default(0),
 	limit: z.number().int().min(1).max(1000).default(500),
+	/** Pages from the newest event back instead, ignoring `afterSeq`. */
+	latest: z.boolean().default(false),
+	/** With `latest`, the seq a newer page started at. */
+	beforeSeq: z.number().int().positive().optional(),
 });

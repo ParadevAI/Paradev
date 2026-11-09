@@ -20,6 +20,7 @@ import {
 } from "@superset/shared/workspace-tags";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
+import { waitUntil } from "@vercel/functions";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -32,6 +33,7 @@ import {
 	type MemberContext,
 	organizationOrFirst,
 } from "../../lib/cloud-guards";
+import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
 	deleteSandbox,
@@ -487,6 +489,19 @@ export const cloudWorkspaceRouter = {
 									chatSessionIds: move.chatSessionIds,
 									organizationId: input.organizationId,
 									userId: ctx.principal.userId,
+								}).catch(async (error: unknown) => {
+									// An attach that landed before its reply was lost would block the workspace's next move.
+									await callMoves(input.organizationId, {
+										op: "failInto",
+										toWorkspaceId: workspaceId,
+										error: "The cloud workspace could not start",
+									}).catch((failError: unknown) =>
+										console.error(
+											`[cloud-workspace] could not end the move into ${workspaceId}`,
+											failError,
+										),
+									);
+									throw error;
 								});
 								skippedChats = attached.skipped;
 							},
@@ -821,12 +836,14 @@ export const cloudWorkspaceRouter = {
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
-				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
-					(error) =>
-						console.error(
-							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
-							error,
-						),
+				waitUntil(
+					failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+						(error) =>
+							console.error(
+								`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+								error,
+							),
+					),
 				);
 				// A row from a retired provider has no sandbox left to keep.
 				if (row.provider === "vercel") {

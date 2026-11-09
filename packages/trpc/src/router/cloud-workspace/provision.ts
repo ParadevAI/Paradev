@@ -145,7 +145,13 @@ async function provision(
 				columns: { status: true },
 			});
 			if (current?.status === "deleted") {
-				await failChatMovesTo(row.id, "The cloud workspace was deleted");
+				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
+				);
 				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId);
 			}

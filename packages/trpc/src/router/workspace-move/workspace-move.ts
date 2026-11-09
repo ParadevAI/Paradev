@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { callMoves } from "../../lib/moves";
 import { personProcedure } from "../../trpc";
@@ -16,6 +17,7 @@ import {
 	abandonWorkspaceMoveInputSchema,
 	attachWorkspaceMoveInputSchema,
 	beginWorkspaceMoveInputSchema,
+	workspaceMoveHeartbeatInputSchema,
 	workspaceMoveOfWorkspaceInputSchema,
 } from "./schema";
 
@@ -68,6 +70,27 @@ export const workspaceMoveRouter = {
 			const mover = await moverOf(ctx);
 			await abandonWorkspaceMove({ ...input, ...mover });
 			return { workspaceMoveId: input.workspaceMoveId };
+		}),
+
+	/**
+	 * Keeps a begun move from going stale while its work is still being
+	 * pushed. `alive: false` means the move already ended.
+	 */
+	heartbeat: personProcedure
+		.input(workspaceMoveHeartbeatInputSchema)
+		.mutation(async ({ ctx, input }) => {
+			const mover = await moverOf(ctx);
+			const { move } = await callMoves(mover.organizationId, {
+				op: "workspaceMove",
+				id: input.workspaceMoveId,
+			});
+			if (!move || move.createdBy !== mover.userId) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Move not found" });
+			}
+			return callMoves(mover.organizationId, {
+				op: "touchWorkspaceMove",
+				id: input.workspaceMoveId,
+			}).then(({ alive }) => ({ alive }));
 		}),
 
 	/** The newest move out of or into a workspace, or null when it never moved. */

@@ -4,7 +4,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { and, count, eq, inArray } from "drizzle-orm";
 import { callMoves, type SelectChatMove } from "../../lib/moves";
-import { personProcedure } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { loadChatHistory } from "../chat-history/utils/loadChatHistory";
 import {
 	chatMoveEventsInputSchema,
@@ -37,6 +37,28 @@ async function loadOwnMove(
 	if (!move || move.createdBy !== mover.userId)
 		throw new TRPCError({ code: "NOT_FOUND", message: "Move not found" });
 	return move;
+}
+
+/** A claim whose answer was lost: the same owner may take up the copy again. */
+async function reclaimedMove(
+	mover: { organizationId: string; userId: string },
+	moveId: string,
+): Promise<SelectChatMove | null> {
+	const move = await loadOwnMove(mover, moveId);
+	if (move.status !== "copying") return null;
+	const { alive } = await callMoves(mover.organizationId, {
+		op: "touchChatMove",
+		id: moveId,
+	});
+	return alive ? move : null;
+}
+
+function moveStopped(): TRPCError {
+	return userError({
+		code: "PRECONDITION_FAILED",
+		message: "This move stopped. The chat is still in its old workspace.",
+		i18nKey: "serverError.chatMove.moveStopped",
+	});
 }
 
 /** A move to a computer, which the desktop on that computer runs. */
@@ -113,7 +135,9 @@ export const chatMoveRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
 			assertRunsOnComputer(await loadOwnMove(mover, input.moveId));
-			const move = await claimMove(mover.organizationId, input.moveId);
+			const move =
+				(await claimMove(mover.organizationId, input.moveId)) ??
+				(await reclaimedMove(mover, input.moveId));
 			if (!move) {
 				throw new TRPCError({
 					code: "CONFLICT",
@@ -135,6 +159,11 @@ export const chatMoveRouter = {
 			const mover = await moverOf(ctx);
 			const move = await loadOwnMove(mover, input.moveId);
 			assertRunsOnComputer(move);
+			const { alive } = await callMoves(mover.organizationId, {
+				op: "touchChatMove",
+				id: move.id,
+			});
+			if (!alive) throw moveStopped();
 			const session = await db.query.chatSessions.findFirst({
 				where: eq(chatSessions.id, move.sessionId),
 			});

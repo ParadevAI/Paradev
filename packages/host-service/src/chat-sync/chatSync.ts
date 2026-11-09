@@ -19,7 +19,9 @@ import { eventBytes, prepareEventForCloud } from "./prepareEvent";
 const SETTLE_MS = 1_000;
 const MIN_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 5 * 60 * 1000;
+const FOLLOW_MS = 60 * 60 * 1000;
 const REJECTED_CODES = new Set(["BAD_REQUEST", "PAYLOAD_TOO_LARGE"]);
+const NOT_THIS_HOSTS_CODES = new Set(["CONFLICT", "FORBIDDEN", "NOT_FOUND"]);
 
 export type ChatSync = {
 	/** Pushes everything not yet pushed for one chat, and resolves once it is acked. */
@@ -35,7 +37,7 @@ export type ChatSync = {
 	/**
 	 * Keeps pushing one chat while it moves away, on a host that does not
 	 * sync otherwise, so the move can see a turn taken after it began.
-	 * Stops once the chat has moved.
+	 * Stops once the chat has moved, is forgotten, or an hour has passed.
 	 */
 	follow(sessionId: string): void;
 	/** The chat is on this host again, as when it moves back. */
@@ -87,11 +89,21 @@ export function createChatSync(args: {
 	runtime: () => ChatRuntime | null;
 	api: ApiClient;
 	schedule?: Schedule;
+	now?: () => number;
 }): ChatSync {
 	const schedule = args.schedule ?? defaultSchedule;
+	const now = args.now ?? Date.now;
 	const dirty = new Set<string>();
 	const moved = new Set<string>();
-	const followed = new Set<string>();
+	/** Chats moving away, by when the move began; a move that never ends stops being followed. */
+	const followed = new Map<string, number>();
+	const isFollowed = (sessionId: string): boolean => {
+		const since = followed.get(sessionId);
+		if (since === undefined) return false;
+		if (now() - since <= FOLLOW_MS) return true;
+		followed.delete(sessionId);
+		return false;
+	};
 	const inFlight = new Map<string, Promise<unknown>>();
 	const lastTurn = new Map<string, string>();
 	const lastTitle = new Map<string, string | null>();
@@ -194,7 +206,7 @@ export function createChatSync(args: {
 	let started = false;
 	let catchUp = false;
 	const syncing = () => started || followed.size > 0;
-	const syncs = (sessionId: string) => started || followed.has(sessionId);
+	const syncs = (sessionId: string) => started || isFollowed(sessionId);
 
 	/** Chats a previous run left unpushed; `pushBatch` skips the ones already pushed. */
 	const markAllDirty = () => {
@@ -239,7 +251,7 @@ export function createChatSync(args: {
 						next.add(sessionId);
 					}
 				} catch (error) {
-					if (errorCode(error) === "CONFLICT") {
+					if (NOT_THIS_HOSTS_CODES.has(errorCode(error) ?? "")) {
 						moved.add(sessionId);
 						followed.delete(sessionId);
 						continue;
@@ -306,14 +318,14 @@ export function createChatSync(args: {
 			const { sessionId, event } = envelope;
 			if (!syncs(sessionId)) return;
 			const milestone = isMilestone(sessionId, event);
-			const moving = followed.has(sessionId);
+			const moving = isFollowed(sessionId);
 			if (!milestone && !moving) return;
 			dirty.add(sessionId);
 			wake(milestone ? 0 : SETTLE_MS);
 		},
 		follow(sessionId) {
 			moved.delete(sessionId);
-			followed.add(sessionId);
+			followed.set(sessionId, now());
 		},
 		forget(sessionId) {
 			moved.delete(sessionId);

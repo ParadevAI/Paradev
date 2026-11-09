@@ -26,6 +26,7 @@ const {
 const { MoveBook } = await import("@superset/shared/move-book");
 const { posthog } = await import("../../lib/analytics");
 const { callMoves, setMoveStore } = await import("../../lib/moves");
+type MoveStore = Parameters<typeof setMoveStore>[0];
 const { eq, inArray } = await import("drizzle-orm");
 const { chatHistoryRouter } = await import("./chat-history");
 const { loadChatHistory } = await import("./utils/loadChatHistory");
@@ -68,10 +69,20 @@ const moveBook = new MoveBook(
 	(fn) => moveDb.transaction(fn)(),
 	ORG,
 );
-setMoveStore(async (organizationId, request) => {
+const localMoves: MoveStore = async (organizationId, request) => {
 	if (organizationId !== ORG) throw new Error(`no moves for ${organizationId}`);
 	return moveBook.apply(structuredClone(request));
-});
+};
+setMoveStore(localMoves);
+
+async function withMoveStore<T>(store: MoveStore, run: () => Promise<T>) {
+	setMoveStore(store);
+	try {
+		return await run();
+	} finally {
+		setMoveStore(localMoves);
+	}
+}
 
 let movesFlag: boolean | undefined = true;
 stub(posthog, { isFeatureEnabled: () => Promise.resolve(movesFlag) });
@@ -385,7 +396,45 @@ describe("stored chats of a sleeping cloud workspace", () => {
 			epoch: null,
 			events: [],
 			nextAfterSeq: null,
+			nextBeforeSeq: null,
 		});
+	});
+
+	test("a long stored chat pages from its newest events, each with its turn", async () => {
+		const chat = newSession();
+		await push(
+			chat,
+			[
+				{
+					seq: 1,
+					event: {
+						type: "turn",
+						turn: { id: "turn-1", status: "completed", startedAtMs: 1 },
+					} as DurableEvent,
+				},
+				{ seq: 2, event: agentMessage("a1", "first") },
+				{ seq: 3, event: agentMessage("a2", "second") },
+				{ seq: 4, event: agentMessage("a3", "third") },
+			],
+			{ workspaceId: MY_CLOUD },
+		);
+
+		const newest = await owner.events({
+			chatSessionId: chat,
+			latest: true,
+			limit: 2,
+		});
+		expect(newest.events.map(({ seq }) => seq)).toEqual([1, 3, 4]);
+		expect(newest.nextBeforeSeq).toBe(3);
+
+		const older = await owner.events({
+			chatSessionId: chat,
+			latest: true,
+			beforeSeq: 3,
+			limit: 5,
+		});
+		expect(older.events.map(({ seq }) => seq)).toEqual([1, 2]);
+		expect(older.nextBeforeSeq).toBeNull();
 	});
 });
 
@@ -1138,6 +1187,86 @@ describe("chat moves", () => {
 				workspaceId: MY_CLOUD,
 			}),
 		).rejects.toMatchObject({ code: "CONFLICT" });
+	});
+
+	test("a box takes over a chat an automation recorded without a workspace", async () => {
+		const sessionId = newSession();
+		await db.insert(chatSessions).values({
+			id: sessionId,
+			organizationId: ORG,
+			createdBy: USER,
+			v2WorkspaceId: null,
+		});
+		const box = callerFor(USER, MY_CLOUD);
+		await withMoveStore(
+			async () => {
+				throw new Error("the move store is down");
+			},
+			() =>
+				push(sessionId, [{ seq: 1, event: agentMessage("a", "a") }], {
+					as: box,
+					workspaceId: MY_CLOUD,
+				}),
+		);
+		const [row] = await db
+			.select({ v2WorkspaceId: chatSessions.v2WorkspaceId })
+			.from(chatSessions)
+			.where(eq(chatSessions.id, sessionId));
+		expect(row?.v2WorkspaceId).toBe(MY_CLOUD);
+	});
+
+	test("a push asks to try again, not fails, while the move store is down", async () => {
+		const sessionId = newSession();
+		await push(sessionId, [{ seq: 1, event: agentMessage("a", "a") }]);
+		await expect(
+			withMoveStore(
+				async () => {
+					throw new Error("the move store is down");
+				},
+				() =>
+					push(sessionId, [{ seq: 2, event: agentMessage("b", "b") }], {
+						as: callerFor(USER, MY_CLOUD),
+						workspaceId: MY_CLOUD,
+					}),
+			),
+		).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
+	});
+
+	test("a finish whose answer was lost fails the move, and the chat stays", async () => {
+		const sessionId = newSession();
+		const box = callerFor(USER, MY_CLOUD);
+		await push(sessionId, [{ seq: 1, event: agentMessage("a", "a") }], {
+			as: box,
+			workspaceId: MY_CLOUD,
+		});
+		await storeBundle(sessionId);
+		const move = await createChatMove({
+			chatSessionId: sessionId,
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			organizationId: ORG,
+			userId: USER,
+		});
+		await routerFor(USER).chatMove.claim({ moveId: move.id });
+		await expect(
+			withMoveStore(
+				async (organizationId, request) => {
+					const response = await localMoves(organizationId, request);
+					if (request.op === "finish") throw new Error("answer lost");
+					return response;
+				},
+				async () =>
+					completeChatMove(await moveOf(move.id), fakeHosts(), {
+						kind: "computer",
+					}),
+			),
+		).rejects.toThrow();
+		expect((await moveOf(move.id)).status).toBe("failed");
+		const [row] = await db
+			.select({ v2WorkspaceId: chatSessions.v2WorkspaceId })
+			.from(chatSessions)
+			.where(eq(chatSessions.id, sessionId));
+		expect(row?.v2WorkspaceId).toBe(MY_CLOUD);
 	});
 
 	test("a retry refuses a chat that went on after the failed move began", async () => {

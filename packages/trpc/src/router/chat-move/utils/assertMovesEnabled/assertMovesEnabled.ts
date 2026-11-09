@@ -2,14 +2,11 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { TRPCError } from "@trpc/server";
 import { posthog } from "../../../../lib/analytics";
 
-/**
- * Refuses a new workspace move unless the person is in `workspace-moves`.
- * Fails closed: PostHog answers undefined when it cannot be reached.
- */
-export async function assertMovesEnabled(person: {
+/** Fails closed: PostHog answers undefined when it cannot be reached. */
+export async function isMovesEnabled(person: {
 	id: string;
 	email: string;
-}): Promise<void> {
+}): Promise<boolean> {
 	const enabled = await posthog.isFeatureEnabled(
 		FEATURE_FLAGS.WORKSPACE_MOVES,
 		person.id,
@@ -18,7 +15,15 @@ export async function assertMovesEnabled(person: {
 			sendFeatureFlagEvents: false,
 		},
 	);
-	if (!enabled) {
+	return enabled === true;
+}
+
+/** Refuses a new workspace move unless the person is in `workspace-moves`. */
+export async function assertMovesEnabled(person: {
+	id: string;
+	email: string;
+}): Promise<void> {
+	if (!(await isMovesEnabled(person))) {
 		throw new TRPCError({
 			code: "FORBIDDEN",
 			message: "Moving workspaces is not enabled for this account.",

@@ -210,48 +210,55 @@ export const teleportRouter = router({
 
 			assertIdle();
 			const prepared: PreparedChat[] = [];
-			for (const session of movable) {
-				try {
-					await chatSync.syncSession(session.sessionId);
-				} catch (error) {
-					if (errorCode(error) !== "CONFLICT") throw error;
-					skipped.push({
-						chatSessionId: session.sessionId,
-						title: session.title,
-						reason: "moved_away",
+			const followed: string[] = [];
+			try {
+				for (const session of movable) {
+					try {
+						await chatSync.syncSession(session.sessionId);
+					} catch (error) {
+						if (errorCode(error) !== "CONFLICT") throw error;
+						skipped.push({
+							chatSessionId: session.sessionId,
+							title: session.title,
+							reason: "moved_away",
+						});
+						continue;
+					}
+					chatSync.follow(session.sessionId);
+					followed.push(session.sessionId);
+					await withStage(async (stageDir) => {
+						const manifest = await session.provider.collect({
+							harnessSessionId: session.harnessSessionId,
+							worktreePath,
+							env,
+							stageDir,
+							locate: () =>
+								pool.run(harnessSessionFileTask, {
+									ref: {
+										agentId: "claude",
+										sessionId: session.harnessSessionId,
+										worktreePath,
+										env,
+									},
+								}),
+						});
+						await uploadBundle({
+							api: ctx.api,
+							chatSessionId: session.sessionId,
+							harness: session.harness,
+							manifest,
+							stageDir,
+						});
 					});
-					continue;
-				}
-				chatSync.follow(session.sessionId);
-				await withStage(async (stageDir) => {
-					const manifest = await session.provider.collect({
+					prepared.push({
+						chatSessionId: session.sessionId,
 						harnessSessionId: session.harnessSessionId,
-						worktreePath,
-						env,
-						stageDir,
-						locate: () =>
-							pool.run(harnessSessionFileTask, {
-								ref: {
-									agentId: "claude",
-									sessionId: session.harnessSessionId,
-									worktreePath,
-									env,
-								},
-							}),
+						title: session.title,
 					});
-					await uploadBundle({
-						api: ctx.api,
-						chatSessionId: session.sessionId,
-						harness: session.harness,
-						manifest,
-						stageDir,
-					});
-				});
-				prepared.push({
-					chatSessionId: session.sessionId,
-					harnessSessionId: session.harnessSessionId,
-					title: session.title,
-				});
+				}
+			} catch (error) {
+				for (const sessionId of followed) chatSync.forget(sessionId);
+				throw error;
 			}
 
 			return {
@@ -260,6 +267,20 @@ export const teleportRouter = router({
 				chats: prepared,
 				skipped,
 			};
+		}),
+
+	/** The move of these chats failed or was abandoned: they stay here and stop being pushed for it. */
+	releaseChats: protectedProcedure
+		.input(
+			z.object({
+				chatSessionIds: z.array(z.string().uuid()).max(200),
+			}),
+		)
+		.mutation(({ ctx, input }) => {
+			for (const sessionId of input.chatSessionIds) {
+				ctx.runtime.chatSync?.forget(sessionId);
+			}
+			return { ok: true };
 		}),
 
 	/** Stops the copy left behind and says in it where the chat went. */

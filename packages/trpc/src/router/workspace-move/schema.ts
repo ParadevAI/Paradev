@@ -28,3 +28,7 @@ export const abandonWorkspaceMoveInputSchema = z.object({
 export const workspaceMoveOfWorkspaceInputSchema = z.object({
 	workspaceId: z.string().uuid(),
 });
+
+export const workspaceMoveHeartbeatInputSchema = z.object({
+	workspaceMoveId: z.string().uuid(),
+});

@@ -12,7 +12,7 @@ const payloadSchema = z
 	.strict();
 
 /**
- * Runs a chat move that `chatMove.start`, `chatMove.retry` or a cloud
+ * Runs a chat move that `workspaceMove.attach`, `chatMove.retry` or a cloud
  * workspace's provisioning queued. The outcome is recorded on the move, so
  * this answers 200 whether or not it worked: a redelivery finds the move
  * claimed and does nothing.

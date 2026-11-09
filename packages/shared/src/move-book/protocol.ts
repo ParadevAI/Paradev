@@ -123,6 +123,8 @@ export type MoveBookRequest =
 			freshInto?: string;
 	  }
 	| { op: "claim"; id: string }
+	| { op: "touchWorkspaceMove"; id: string }
+	| { op: "touchChatMove"; id: string }
 	| { op: "finish"; id: string }
 	| {
 			op: "fail";
@@ -149,6 +151,8 @@ type Replies = {
 	latestChatMove: { move: ChatMove | null };
 	chatMoving: { moving: boolean };
 	claim: { move: ChatMove | null };
+	touchWorkspaceMove: { alive: boolean };
+	touchChatMove: { alive: boolean };
 	finish: { finished: boolean };
 	fail: Record<never, never>;
 	pendingInto: { ids: string[] };
