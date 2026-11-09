@@ -26,7 +26,7 @@ export function PullRequestFileTree({
 	const { model, fileByTreePath } = useChangedFilesTree({
 		files,
 		foldSignal,
-		initialSelectedPath: selectedPath ?? undefined,
+		selectedPath,
 		flattenEmptyDirectories: true,
 		onSelectFile: (file) => onSelectFile(file.path),
 	});
@@ -43,7 +43,8 @@ export function PullRequestFileTree({
 					node instanceof HTMLElement && node.hasAttribute("data-item-path"),
 			);
 		const treePath = row?.getAttribute("data-item-path");
-		if (!treePath || model.getItem(treePath)?.isSelected() !== true) return;
+		const selected = model.getSelectedPaths();
+		if (!treePath || selected.length !== 1 || selected[0] !== treePath) return;
 		const file = fileByTreePath.get(treePath);
 		if (file) onSelectFile(file.path);
 	};

@@ -1,1 +1,1 @@
-export { expandedDirs, recordExpansion } from "./carryExpansion";
+export { planExpansion, recordExpansion } from "./carryExpansion";

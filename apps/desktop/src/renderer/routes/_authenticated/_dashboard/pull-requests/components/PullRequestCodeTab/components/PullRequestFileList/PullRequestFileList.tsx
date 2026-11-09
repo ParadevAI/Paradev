@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
+import { cn } from "@superset/ui/utils";
 import { memo, useDeferredValue, useMemo, useState } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { ChangedFileFolderList } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileFolderList";
@@ -38,6 +39,7 @@ export const PullRequestFileList = memo(function PullRequestFileList({
 		() => filterChangedFiles(files, deferredQuery),
 		[files, deferredQuery],
 	);
+	const noMatches = visibleFiles.length === 0;
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
@@ -49,12 +51,14 @@ export const PullRequestFileList = memo(function PullRequestFileList({
 				collapsed={collapsed}
 				onToggleFold={toggleFold}
 			/>
-			{visibleFiles.length === 0 ? (
+			{noMatches && (
 				<div className="px-3 py-6 text-center text-sm text-muted-foreground">
 					<Trans>No files match your search</Trans>
 				</div>
-			) : viewMode === "tree" ? (
-				<div className="min-h-0 flex-1 pt-1">
+			)}
+			{/* Kept mounted with no matches, so its folds survive the empty result. */}
+			{viewMode === "tree" ? (
+				<div className={cn("min-h-0 flex-1 pt-1", noMatches && "hidden")}>
 					<PullRequestFileTree
 						files={visibleFiles}
 						foldSignal={foldSignal}
@@ -65,7 +69,10 @@ export const PullRequestFileList = memo(function PullRequestFileList({
 			) : (
 				<OverflowFadeContainer
 					fadeEdges={["top", "bottom"]}
-					className="relative min-h-0 flex-1 overflow-y-auto pt-1"
+					className={cn(
+						"relative min-h-0 flex-1 overflow-y-auto pt-1",
+						noMatches && "hidden",
+					)}
 					data-changes-scroll-container
 				>
 					<ChangedFileFolderList

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
 import type { FileTreeDirectoryHandle } from "@pierre/trees";
 import { act, renderHook } from "@testing-library/react";
 import type { FoldSignal } from "../useFoldSignal";
@@ -54,5 +54,40 @@ describe("useChangedFilesTree", () => {
 		rerender({ files: [file("a/x.ts"), file("c/z.ts")] });
 
 		expect(dir(result.current.model, "c/").isExpanded()).toBe(false);
+	});
+
+	test("a collapse-all after mount also folds folders that appear later", () => {
+		const { result, rerender } = renderHook(
+			({ files, foldSignal }) =>
+				useChangedFilesTree({ files, foldSignal, onSelectFile: () => {} }),
+			{ initialProps: { files: [file("a/x.ts")], foldSignal: NO_FOLD } },
+		);
+		const collapse: FoldSignal = { epoch: 1, action: "collapse" };
+		rerender({ files: [file("a/x.ts")], foldSignal: collapse });
+		expect(dir(result.current.model, "a/").isExpanded()).toBe(false);
+
+		rerender({ files: [file("a/x.ts"), file("c/z.ts")], foldSignal: collapse });
+
+		expect(dir(result.current.model, "c/").isExpanded()).toBe(false);
+	});
+
+	test("restores the selected file after a search hides it, without selecting it again", () => {
+		const onSelectFile = mock(() => {});
+		const all = [file("a/x.ts"), file("b/y.ts")];
+		const { result, rerender } = renderHook(
+			({ files }) =>
+				useChangedFilesTree({
+					files,
+					foldSignal: NO_FOLD,
+					onSelectFile,
+					selectedPath: "a/x.ts",
+				}),
+			{ initialProps: { files: all } },
+		);
+		rerender({ files: [file("b/y.ts")] });
+		rerender({ files: all });
+
+		expect(result.current.model.getSelectedPaths()).toEqual(["a/x.ts"]);
+		expect(onSelectFile).not.toHaveBeenCalled();
 	});
 });

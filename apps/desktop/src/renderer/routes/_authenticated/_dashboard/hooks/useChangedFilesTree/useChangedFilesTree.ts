@@ -17,7 +17,7 @@ import {
 } from "renderer/lib/pierreTree";
 import { type FoldSignal, isFoldCollapsed } from "../useFoldSignal";
 import { buildTreeShape } from "./utils/buildTreeShape";
-import { expandedDirs, recordExpansion } from "./utils/carryExpansion";
+import { planExpansion, recordExpansion } from "./utils/carryExpansion";
 
 const ITEM_HEIGHT = 24;
 
@@ -32,7 +32,7 @@ interface UseChangedFilesTreeParams<T extends ChangedFileEntry> {
 	files: T[];
 	foldSignal: FoldSignal;
 	onSelectFile: (file: T) => void;
-	initialSelectedPath?: string;
+	selectedPath?: string | null;
 	flattenEmptyDirectories?: boolean;
 	unsafeCSS?: string;
 }
@@ -44,14 +44,14 @@ interface UseChangedFilesTreeParams<T extends ChangedFileEntry> {
  * files get disambiguated tree paths; `toRealPath` maps them back.
  *
  * Pierre's `resetPaths` rebuilds the tree from its creation options, so each
- * folder's expansion is carried across resets here; a folder not seen before
- * follows the last fold action.
+ * folder's expansion and the selected file are carried across resets here; a
+ * folder not seen before follows the last fold action.
  */
 export function useChangedFilesTree<T extends ChangedFileEntry>({
 	files,
 	foldSignal,
 	onSelectFile,
-	initialSelectedPath,
+	selectedPath,
 	flattenEmptyDirectories,
 	unsafeCSS = "",
 }: UseChangedFilesTreeParams<T>) {
@@ -74,18 +74,18 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 		known: new Map<string, boolean>(),
 		defaultOpen: !isFoldCollapsed(foldSignal),
 	});
-	const [initial] = useState(() => {
-		const selected =
-			initialSelectedPath == null
-				? undefined
-				: (toTreePath.get(initialSelectedPath) ?? initialSelectedPath);
-		return {
-			gitStatus: buildGitStatus(files, toTreePath),
-			expandedPaths: expansionRef.current.defaultOpen ? dirs : [],
-			selectedPaths:
-				selected && fileByTreePath.has(selected) ? [selected] : undefined,
-		};
-	});
+	const selectedTreePath =
+		selectedPath == null
+			? null
+			: (toTreePath.get(selectedPath) ?? selectedPath);
+	const [initial] = useState(() => ({
+		gitStatus: buildGitStatus(files, toTreePath),
+		expandedPaths: expansionRef.current.defaultOpen ? dirs : [],
+		selectedPaths:
+			selectedTreePath && fileByTreePath.has(selectedTreePath)
+				? [selectedTreePath]
+				: undefined,
+	}));
 
 	// Pierre resolves its handlers once at creation; the ref keeps them current.
 	const handlersRef = useRef({
@@ -135,14 +135,17 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 		const { known, defaultOpen } = expansionRef.current;
 		const flattened = flattenEmptyDirectories === true;
 		recordExpansion(previous, isDirExpanded, known, flattened);
-		model.resetPaths(treePaths, {
-			initialExpandedPaths: expandedDirs(
-				{ dirs, chainDirs },
-				known,
-				defaultOpen,
-				flattened,
-			),
-		});
+		const { expand, collapse } = planExpansion(
+			{ dirs, chainDirs },
+			known,
+			defaultOpen,
+			flattened,
+		);
+		model.resetPaths(treePaths, { initialExpandedPaths: expand });
+		for (const dir of collapse) {
+			if (isDirExpanded(dir))
+				(model.getItem(`${dir}/`) as FileTreeDirectoryHandle).collapse();
+		}
 		shapeRef.current = { treePaths, dirs, chainDirs };
 	}, [
 		model,
@@ -152,6 +155,21 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 		isDirExpanded,
 		flattenEmptyDirectories,
 	]);
+
+	// Restoring the selection must not reach onSelectFile, which scrolls the diff.
+	const syncingSelectionRef = useRef(false);
+	useEffect(() => {
+		if (!selectedTreePath || !fileByTreePath.has(selectedTreePath)) return;
+		const selected = model.getSelectedPaths();
+		if (selected.length === 1 && selected[0] === selectedTreePath) return;
+		syncingSelectionRef.current = true;
+		try {
+			for (const path of selected) model.getItem(path)?.deselect();
+			model.getItem(selectedTreePath)?.select();
+		} finally {
+			syncingSelectionRef.current = false;
+		}
+	}, [model, selectedTreePath, fileByTreePath]);
 
 	useEffect(() => {
 		model.setGitStatus(buildGitStatus(files, toTreePath));
@@ -175,6 +193,7 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 	}, [foldSignal, dirs, model, isDirExpanded]);
 
 	handlersRef.current.onSelect = (treePath) => {
+		if (syncingSelectionRef.current) return;
 		const file = fileByTreePath.get(treePath);
 		if (file) onSelectFile(file);
 	};

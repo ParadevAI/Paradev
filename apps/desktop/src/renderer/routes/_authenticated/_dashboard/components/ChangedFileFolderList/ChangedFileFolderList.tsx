@@ -1,6 +1,10 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
-import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
+import {
+	defaultRangeExtractor,
+	measureElement,
+	useVirtualizer,
+} from "@tanstack/react-virtual";
 import {
 	type ReactNode,
 	useCallback,
@@ -41,7 +45,8 @@ type Row<T> =
  * `[data-changes-scroll-container]` ancestor; several lists can share that
  * scroller, each offset by its own `offsetTop`.
  *
- * Collapse state is a *closed* set, so a folder that appears later starts open.
+ * A folder not toggled since the last fold action follows that action, so one
+ * that appears later (a search cleared, a new change) matches its neighbours.
  */
 export function ChangedFileFolderList<T extends { path: string }>({
 	files,
@@ -50,52 +55,49 @@ export function ChangedFileFolderList<T extends { path: string }>({
 	foldSignal,
 }: ChangedFileFolderListProps<T>) {
 	const groups = useMemo(() => groupFilesByFolder(files), [files]);
-	const [closedFolders, setClosedFolders] = useState<Set<string>>(
-		() =>
-			new Set(
-				isFoldCollapsed(foldSignal) ? groups.map((g) => g.folderPath) : [],
-			),
-	);
+	const [folds, setFolds] = useState(() => ({
+		toggled: new Map<string, boolean>(),
+		defaultOpen: !isFoldCollapsed(foldSignal),
+	}));
 
 	const toggleFolder = useCallback((folderPath: string) => {
-		setClosedFolders((prev) => {
-			const next = new Set(prev);
-			if (next.has(folderPath)) next.delete(folderPath);
-			else next.add(folderPath);
-			return next;
+		setFolds((prev) => {
+			const toggled = new Map(prev.toggled);
+			toggled.set(
+				folderPath,
+				!(prev.toggled.get(folderPath) ?? prev.defaultOpen),
+			);
+			return { ...prev, toggled };
 		});
 	}, []);
 
-	// Apply a new fold signal only. Re-running on `groups` changes would
-	// re-apply the last action over folders the user toggled since.
 	const lastFoldEpochRef = useRef(foldSignal.epoch);
 	useEffect(() => {
 		if (foldSignal.epoch === lastFoldEpochRef.current) return;
 		lastFoldEpochRef.current = foldSignal.epoch;
-		setClosedFolders(
-			foldSignal.action === "collapse"
-				? new Set(groups.map((g) => g.folderPath))
-				: new Set(),
-		);
-	}, [foldSignal, groups]);
+		setFolds({
+			toggled: new Map(),
+			defaultOpen: foldSignal.action === "expand",
+		});
+	}, [foldSignal]);
 
 	const rows = useMemo(() => {
 		const next: Row<T>[] = [];
 		for (const group of groups) {
-			const isOpen = !closedFolders.has(group.folderPath);
+			const open = folds.toggled.get(group.folderPath) ?? folds.defaultOpen;
 			next.push({
 				kind: "folder",
-				key: `folder:${group.folderPath || "__root__"}`,
+				key: `folder:${group.folderPath}`,
 				group,
-				isOpen,
+				isOpen: open,
 			});
-			if (!isOpen) continue;
+			if (!open) continue;
 			for (const file of group.files) {
 				next.push({ kind: "file", key: `file:${getFileKey(file)}`, file });
 			}
 		}
 		return next;
-	}, [groups, closedFolders, getFileKey]);
+	}, [groups, folds, getFileKey]);
 
 	const listRef = useRef<HTMLDivElement>(null);
 	const virtualizer = useVirtualizer({
@@ -107,6 +109,9 @@ export function ChangedFileFolderList<T extends { path: string }>({
 		estimateSize: () => ESTIMATED_ROW_HEIGHT,
 		rangeExtractor: defaultRangeExtractor,
 		overscan: OVERSCAN,
+		// A hidden panel measures every row at 0; keep the estimate instead.
+		measureElement: (element, entry, instance) =>
+			measureElement(element, entry, instance) || ESTIMATED_ROW_HEIGHT,
 		scrollMargin: listRef.current?.offsetTop ?? 0,
 		getItemKey: (index) => rows[index]?.key ?? index,
 	});
