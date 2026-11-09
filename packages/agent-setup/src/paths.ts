@@ -53,6 +53,18 @@ export function getBinDir(): string {
 	return path.join(resolveAppHomeDir(), "bin");
 }
 
+/** Last on PATH, so a tool the app installed is found but never shadows the user's own. */
+export function withBinDirOnPath(
+	env: Record<string, string>,
+	binDir: string = getBinDir(),
+): Record<string, string> {
+	const key =
+		Object.keys(env).find((name) => name.toUpperCase() === "PATH") ?? "PATH";
+	const entries = (env[key] ?? "").split(path.delimiter).filter(Boolean);
+	if (entries.includes(binDir)) return env;
+	return { ...env, [key]: [...entries, binDir].join(path.delimiter) };
+}
+
 export function getHooksDir(): string {
 	return path.join(resolveAppHomeDir(), "hooks");
 }

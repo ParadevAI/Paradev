@@ -1,5 +1,6 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import * as os from "node:os";
+import { withBinDirOnPath } from "@superset/agent-setup/paths";
 import { signalProcessTreeAndGroups } from "@superset/pty-daemon/process-tree";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import { resolveConfiguredShell } from "./user-shell.ts";
@@ -307,7 +308,7 @@ export async function getToolEnvironment(): Promise<Record<string, string>> {
 	});
 	// The login-shell snapshot is cached and predates the control plane's
 	// push on a sandbox; the managed set wins over it, as it does in terminals.
-	return { ...env, ...getManagedEnv() };
+	return withBinDirOnPath({ ...env, ...getManagedEnv() });
 }
 
 export function clearStrictShellEnvCache(): void {

@@ -2948,6 +2948,9 @@ msgstr "Vzhled"
 msgid "Apple logo"
 msgstr "Logo Apple"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple uvádí, že nástroje jsou nainstalované, ale Paradev nemůže najít Git."
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Instalátor od Applu se zavřel dřív, než se Git nainstaloval."
 
@@ -4258,6 +4261,9 @@ msgstr "Kontroluji agenty…"
 msgid "Checking environments…"
 msgstr "Kontrola prostředí…"
 
+msgid "Checking GitHub CLI…"
+msgstr "Kontroluji GitHub CLI…"
+
 msgid "Checking host…"
 msgstr "Kontroluji hosta…"
 
@@ -4269,6 +4275,9 @@ msgstr "Checkout PR vyžaduje projekt"
 
 msgid "Checking pull requests in {what}"
 msgstr "Kontroluji pull requesty v {what}"
+
+msgid "Checking the download…"
+msgstr "Kontroluji stažený soubor…"
 
 msgid "Checking workspaces"
 msgstr "Kontroluji pracovní prostory"
@@ -4888,6 +4897,9 @@ msgstr "Spojovat sekvence jako => a !==."
 msgid "Come build it with us."
 msgstr "Pojďte ho tvořit s námi."
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "Je součástí Command Line Tools od Applu."
+
 msgid "Comes with you"
 msgstr "Jde s vámi"
 
@@ -5284,6 +5296,9 @@ msgstr "Připojeno k"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "Připojeno k {connectedOrgName}"
+
+msgid "Connected to GitHub"
+msgstr "Připojeno ke GitHubu"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Propojeno s GitHubem jako {accountLogin}"
@@ -6170,6 +6185,9 @@ msgstr "Nepodařilo se odeslat odpověď"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Nepodařilo se spojit s cloudem pro {0}: {1}"
 
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "Nepodařilo se spojit s GitHubem. Zkontrolujte připojení k internetu a zkuste to znovu."
+
 msgid "Couldn't reach the model provider"
 msgstr "Nepodařilo se spojit s poskytovatelem modelu"
 
@@ -6299,6 +6317,9 @@ msgstr "Přesun se nepodařilo zkusit znovu"
 
 msgid "Couldn't undo the file changes."
 msgstr "Změny souborů se nepodařilo vrátit."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "GitHub CLI se na tomto Macu nepodařilo rozbalit ani uložit."
 
 msgid "Couldn't unstage changes"
 msgstr "Nepodařilo se zrušit přípravu změn"
@@ -7523,6 +7544,12 @@ msgstr "Stáhnout pro Mac"
 msgid "Download for macOS"
 msgstr "Stáhnout pro macOS"
 
+msgid "Download from Apple"
+msgstr "Stáhnout od Applu"
+
+msgid "Download from GitHub"
+msgstr "Stáhnout z GitHubu"
+
 msgid "Download image"
 msgstr "Stáhnout obrázek"
 
@@ -7552,6 +7579,12 @@ msgstr "staženo"
 
 msgid "Downloading"
 msgstr "Stahování"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "Stažení od Applu vyžaduje Apple ID. Instalace může potřebovat asi 20 GB volného místa."
+
+msgid "Downloading GitHub CLI…"
+msgstr "Stahuji GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Stahuji..."
@@ -9394,6 +9427,9 @@ msgstr "Stáhnout aplikaci pro iPhone a iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "Získávám přihlašovací kód z GitHubu…"
+
 msgid "Getting the computer ready"
 msgstr "Připravuje se počítač"
 
@@ -9427,6 +9463,9 @@ msgstr "Git nepoběží, dokud nepřijmete licenci Xcode. Spusťte v Terminálu 
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "Git na tomto Macu zatím není nainstalovaný. Nainstalujte Command Line Tools od Applu a zkuste to znovu."
 
+msgid "Git still isn't installed."
+msgstr "Git stále není nainstalovaný."
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Soubory v cloudu, které Git ignoruje, třeba .env. Zkopírujte si je"
 
@@ -9439,6 +9478,9 @@ msgstr "Instalace GitHub App byla zrušena."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App byla úspěšně nainstalována!"
 
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub je připojený, ale úvodní synchronizace se nespustila. Zkuste se prosím připojit znovu."
 
@@ -9450,6 +9492,9 @@ msgstr "Instalace GitHubu nenalezena"
 
 msgid "GitHub integration"
 msgstr "Integrace s GitHubem"
+
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub teď omezuje stahování. Počkejte minutu a zkuste to znovu."
 
 msgid "GitHub issues"
 msgstr "GitHub issues"
@@ -10366,12 +10411,18 @@ msgstr "Instalujte, autorizujte a omezujte MCP servery napříč všemi pracovn�
 msgid "Install."
 msgstr "Nainstalujte."
 
+msgid "Installed"
+msgstr "Nainstalováno"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "Nainstalováno"
 
 msgid "Installed by your organization"
 msgstr "Nainstalováno vaší organizací"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Nainstalovali jste ho jinak, třeba přes Homebrew? Klikněte na Zkontrolovat znovu."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Nainstalováno na {appAccountLogin}"
@@ -10385,6 +10436,9 @@ msgstr "Nainstalováno přes"
 
 msgid "Installing..."
 msgstr "Instaluji..."
+
+msgid "Installing…"
+msgstr "Instaluji…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Nainstaluje Paradev na počítač dostupný přes ssh, přihlásí Paradev k vašemu účtu a udržuje Paradev spuštěný jako službu."
@@ -13265,8 +13319,8 @@ msgstr "Není v kanálu"
 msgid "Not included"
 msgstr "Není zahrnuto"
 
-msgid "Not installed"
-msgstr "Nenainstalováno"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "Nenainstalováno · potřeba pro soukromé repozitáře a pull requesty"
 
 msgid "Not loaded"
 msgstr "Nenačteno"
@@ -13304,8 +13358,8 @@ msgstr "Na {hostName} není nastaveno"
 msgid "Not set up on this host"
 msgstr "Na tomto hostu není nastaveno"
 
-msgid "Not signed in"
-msgstr "Nepřihlášeno"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "Nepřihlášeno · potřeba pro soukromé repozitáře a pull requesty"
 
 msgid "not sorted"
 msgstr "neseřazeno"
@@ -13855,6 +13909,12 @@ msgstr "Otevřít ze složky"
 
 msgid "Open full screen"
 msgstr "Otevřít na celou obrazovku"
+
+msgid "Open GitHub"
+msgstr "Otevřít GitHub"
+
+msgid "Open GitHub and enter this code."
+msgstr "Otevřete GitHub a zadejte tento kód."
 
 msgid "Open host"
 msgstr "Otevřít host"
@@ -14620,6 +14680,9 @@ msgstr "Paradev běží lokálně na počítačích vašich vývojářů. Neukl�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev vznikl jako projekt na hackathonu v listopadu 2025. Byla to jednoduchá desktopová aplikace na správu worktree."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev stále nemůže najít GitHub CLI."
+
 msgid "Paradev Teams"
 msgstr "Týmy Paradev"
 
@@ -14630,8 +14693,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev využívá {0} systémové RAM"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev používá GitHub CLI ke klonování repozitářů a otevírání pull requestů. Můžete to udělat i později."
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev používá Git a GitHub CLI ke klonování repozitářů a otevírání pull requestů. Můžete to udělat i později."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev vs. alternativy"
@@ -17896,6 +17959,9 @@ msgstr "Nastavit host přes SSH"
 msgid "Set up an automation"
 msgstr "Nastavte automatizaci"
 
+msgid "Set up Git and GitHub"
+msgstr "Nastavit Git a GitHub"
+
 msgid "Set up once"
 msgstr "Nastavte jednou"
 
@@ -18350,6 +18416,9 @@ msgstr "Zaregistrovat se přes Google"
 msgid "Sign-in didn't finish"
 msgstr "Přihlášení se nedokončilo"
 
+msgid "Sign-in didn't finish."
+msgstr "Přihlášení nebylo dokončeno."
+
 msgid "Sign-in expired"
 msgstr "Přihlášení vypršelo"
 
@@ -18367,6 +18436,9 @@ msgstr "Dokončení registrace"
 
 msgid "Sign-up steps"
 msgstr "Kroky registrace"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "Přihlášeno · klonuje soukromé repozitáře a otevírá pull requesty"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Přihlášeni jako <0>{userName}</0>"
@@ -18469,6 +18541,12 @@ msgstr "Přeskočit vše"
 
 msgid "Skip for now"
 msgstr "Zatím přeskočit"
+
+msgid "Skip Git for now?"
+msgstr "Prozatím Git přeskočit?"
+
+msgid "Skip GitHub for now?"
+msgstr "Prozatím GitHub přeskočit?"
 
 msgid "Skipped"
 msgstr "Přeskočeno"
@@ -19808,6 +19886,12 @@ msgstr "Rozdíly jsou stále aktuální — nenačetly se jen komentáře."
 msgid "The dispatcher appears"
 msgstr "Nastupuje dispečer"
 
+msgid "The download didn't finish. Try again."
+msgstr "Stahování se nedokončilo. Zkuste to znovu."
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "Stažený soubor vypadal špatně, proto ho Paradev nenainstaloval. Zkuste to znovu."
+
 msgid "The endpoint must use https."
 msgstr "Koncový bod musí používat https."
 
@@ -19895,6 +19979,9 @@ msgstr "Člověk přečte každý řádek, než se sloučí."
 
 msgid "The image upload expired — attach it again"
 msgstr "Platnost nahrání obrázku vypršela — připojte ho znovu"
+
+msgid "The install stopped responding."
+msgstr "Instalace přestala odpovídat."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Popis práce se posouvá. Z inženýrů přestávají být písaři s vkusem a stávají se dispečery s vkusem: rozkládají práci, směrují ji flotilám a rozsuzují konflikty mezi agenty, kteří sáhli na stejný modul."
@@ -20322,6 +20409,9 @@ msgstr "Tato pozvánka už byla přijata."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Tento odkaz s pozvánkou je neplatný nebo vypršel."
+
+msgid "This is taking longer than expected."
+msgstr "Trvá to déle, než se čekalo."
 
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "Trvá to déle než obvykle. Níže je poslední uložená kopie chatu; skutečně se otevře, jakmile se pracovní prostor spustí."
@@ -21798,6 +21888,9 @@ msgstr "Čeká se na schválení. Nechte tento dialog otevřený."
 msgid "Waiting for Checks"
 msgstr "Čeká na kontroly"
 
+msgid "Waiting for GitHub…"
+msgstr "Čekám na GitHub…"
+
 msgid "Waiting for it to connect…"
 msgstr "Čeká se na připojení…"
 
@@ -22555,11 +22648,17 @@ msgstr "Můžete ho obnovit v Nastavení → Projekty po dobu 30 dnů. Složka r
 msgid "You can see how we work before you talk to us."
 msgstr "Než s námi začnete mluvit, můžete vidět, jak pracujeme."
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "Veřejné repozitáře můžete klonovat i nadále. Soukromé repozitáře a pull requesty vyžadují připojený GitHub. Připojit ho můžete později v části Nastavení → Git a worktree."
+
 msgid "You can view this page but not change it"
 msgstr "Tuto stránku můžete zobrazit, ale ne změnit"
 
 msgid "You can view this page but not comment on it"
 msgstr "Tuto stránku můžete zobrazit, ale ne komentovat"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Dokud nebude nainstalovaný Git, nemůžete přidat projekt. Další obrazovky ho nabídnou znovu."
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

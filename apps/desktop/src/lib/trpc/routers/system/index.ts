@@ -1,10 +1,22 @@
 import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { promisify } from "node:util";
+import { getBinDir } from "@superset/agent-setup/paths";
 import { TRPCError } from "@trpc/server";
+import { observable } from "@trpc/server/observable";
+import { net } from "electron";
 import { publicProcedure, router } from "../..";
 import { execWithShellEnv } from "../workspaces/utils/shell-env";
 import { COMMAND_LINE_TOOLS_INSTALLER_PATH, detectGit } from "./detect-git";
+import {
+	createGhCliDeps,
+	finishPendingGhGitSetup,
+	type GhAuthLoginEvent,
+	runGhAuthLogin,
+	setUpGhGitCredentials,
+} from "./utils/gh-auth-login";
+import { installCommandLineTools } from "./utils/install-command-line-tools";
+import { type GhInstallEvent, installGhCli } from "./utils/install-gh-cli";
 
 const execFileAsync = promisify(execFile);
 
@@ -56,6 +68,7 @@ async function detectGhCli(): Promise<GhDetectResult> {
 		} catch {}
 	}
 
+	if (authenticated) void finishPendingGhGitSetup();
 	return { installed: true, authenticated, version, path: "gh" };
 }
 
@@ -102,44 +115,52 @@ async function bringInstallerToFront(): Promise<void> {
 	}
 }
 
-export type InstallCommandLineToolsResult =
-	| { status: "requested" }
-	| { status: "already-installed" };
+async function isInstallerRunning(): Promise<boolean> {
+	try {
+		await execFileAsync("/usr/bin/pgrep", [
+			"-f",
+			COMMAND_LINE_TOOLS_INSTALLER_PATH,
+		]);
+		return true;
+	} catch {
+		return false;
+	}
+}
 
-async function installCommandLineTools(): Promise<InstallCommandLineToolsResult> {
+async function installCommandLineToolsOnMac() {
 	if (process.platform !== "darwin") {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: "Command Line Tools are only available on macOS.",
 		});
 	}
-	try {
+	const result = await installCommandLineTools({
+		isInstallerRunning,
 		// Returns as soon as Apple's installer window is requested; the install
 		// itself runs in that window.
-		await execFileAsync("/usr/bin/xcode-select", ["--install"], {
-			timeout: 10_000,
-		});
-		await bringInstallerToFront();
-		return { status: "requested" };
-	} catch (error) {
-		const stderr =
-			error && typeof error === "object" && "stderr" in error
-				? String(error.stderr)
-				: "";
-		// "xcode-select: error: command line tools are already installed, use
-		// "Software Update" in System Settings to install updates"
-		if (/already installed/i.test(stderr)) {
-			return { status: "already-installed" };
-		}
-		const reason = stderr
-			.split("\n")
-			.map((line) => line.replace(/^xcode-select: (?:error|note): /, "").trim())
-			.find(Boolean);
+		runXcodeSelectInstall: async () => {
+			await execFileAsync("/usr/bin/xcode-select", ["--install"], {
+				timeout: 10_000,
+			});
+		},
+		bringInstallerToFront,
+	});
+	if (result.status === "failed") {
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
-			message: reason ?? "xcode-select --install failed.",
-			cause: error,
+			message: result.reason ?? "xcode-select --install failed.",
 		});
+	}
+	return result;
+}
+
+async function installGhWithBrew(): Promise<GhInstallEvent> {
+	try {
+		await execWithShellEnv("brew", ["install", "gh"], { timeout: 600_000 });
+		const { version } = await detectGhCli();
+		return { stage: "done", version: version ?? "" };
+	} catch {
+		return { stage: "failed", reason: "install", downloadUrl: null };
 	}
 }
 
@@ -147,15 +168,53 @@ export const createSystemRouter = () => {
 	return router({
 		detectGhCli: publicProcedure.query(detectGhCli),
 		detectBrew: publicProcedure.query(detectBrew),
-		detectGit: publicProcedure.query(() =>
-			detectGit({
+		detectGit: publicProcedure.query(async () => {
+			const result = await detectGit({
 				platform: process.platform,
 				run: async (command, args) =>
 					(await execWithShellEnv(command, args, { timeout: 5000 })).stdout,
 				fileExists: existsSync,
-			}),
+			});
+			if (result.installed) void finishPendingGhGitSetup();
+			return result;
+		}),
+		installCommandLineTools: publicProcedure.mutation(
+			installCommandLineToolsOnMac,
 		),
-		installCommandLineTools: publicProcedure.mutation(installCommandLineTools),
+		installGhCli: publicProcedure.subscription(() => {
+			return observable<GhInstallEvent>((emit) => {
+				const controller = new AbortController();
+				const finish = (event: GhInstallEvent) => {
+					if (controller.signal.aborted) return;
+					emit.next(event);
+					emit.complete();
+				};
+				if (process.platform === "darwin") {
+					void installGhCli({
+						binDir: getBinDir(),
+						fetch: (url, init) => net.fetch(url, init),
+						signal: controller.signal,
+						onProgress: (event) => {
+							if (event.stage === "done" || event.stage === "failed") return;
+							if (!controller.signal.aborted) emit.next(event);
+						},
+					}).then(finish);
+				} else {
+					emit.next({ stage: "installing" });
+					void installGhWithBrew().then(finish);
+				}
+				return () => controller.abort();
+			});
+		}),
+		setUpGhGitCredentials: publicProcedure.mutation(setUpGhGitCredentials),
+		ghAuthLogin: publicProcedure.subscription(() => {
+			return observable<GhAuthLoginEvent>((emit) =>
+				runGhAuthLogin((event) => {
+					emit.next(event);
+					if (event.type !== "code") emit.complete();
+				}, createGhCliDeps()),
+			);
+		}),
 	});
 };
 

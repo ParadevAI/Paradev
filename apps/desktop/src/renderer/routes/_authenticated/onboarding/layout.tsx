@@ -17,7 +17,14 @@ import { useOnboardingRestartStore } from "../stores/onboardingRestartStore";
 import { OnboardingHelpLinks } from "./components/OnboardingHelpLinks";
 import { OnboardingLanguagePicker } from "./components/OnboardingLanguagePicker";
 import { OnboardingNavigation } from "./components/OnboardingNavigation";
+import { SetupStepContinue } from "./components/SetupStepContinue";
+import { SetupStepRowsProvider } from "./providers/SetupStepRowsProvider";
 import { useAgentModeStore } from "./stores/agentModeStore";
+import {
+	needsSetupStep,
+	type SetupStepRows,
+	setupStepRows,
+} from "./utils/setupStepRows";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
 	component: OnboardingFlowLayout,
@@ -28,10 +35,10 @@ const rootRedirect = <Redirect to="/" replace />;
 const SETUP_STEP = {
 	path: "/onboarding",
 	match: (p: string) => p === "/onboarding",
-	title: msg({ message: "Connect GitHub" }),
+	title: msg({ message: "Set up Git and GitHub" }),
 	subtitle: msg({
 		message:
-			"Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later.",
+			"Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later.",
 	}),
 };
 
@@ -70,8 +77,11 @@ function OnboardingFlowLayout() {
 	);
 	const { data: ghStatus, isPending: isPendingGh } =
 		electronTrpc.system.detectGhCli.useQuery();
+	const { data: gitStatus, isPending: isPendingGit } =
+		electronTrpc.system.detectGit.useQuery();
 	const ghReady =
 		ghStatus?.installed === true && ghStatus.authenticated === true;
+	const gitMissing = gitStatus?.installed === false;
 
 	// Finishing flips onboardedAt while this layout is mounted. The project
 	// step navigates on its own then; a redirect here would race it.
@@ -81,26 +91,27 @@ function OnboardingFlowLayout() {
 	if (!isPending && onboardedOnArrival === null) {
 		setOnboardedOnArrival(Boolean(session?.user?.onboardedAt));
 	}
-	const [ghReadyOnArrival, setGhReadyOnArrival] = useState<boolean | null>(
+	// Decided on arrival: a row that gets fixed mid-step stays and shows it,
+	// and signing in must not unmount its own dialog.
+	const [rowsOnArrival, setRowsOnArrival] = useState<SetupStepRows | null>(
 		null,
 	);
-	if (!isPendingGh && ghReadyOnArrival === null) {
-		setGhReadyOnArrival(ghReady);
+	if (!isPendingGh && !isPendingGit && rowsOnArrival === null) {
+		setRowsOnArrival(setupStepRows({ git: gitStatus, gh: ghStatus }));
 	}
+	const setupNeeded = rowsOnArrival !== null && needsSetupStep(rowsOnArrival);
 
 	if (isPending) return null;
 	if (onboardedOnArrival && !restarting) {
 		return rootRedirect;
 	}
 
-	// Nothing to set up when GitHub CLI already works, so that step drops out.
-	// Decided on arrival: signing in mid-step must not unmount its own dialog.
-	const steps = ghReadyOnArrival
-		? [MODE_STEP, PROJECT_STEP]
-		: [SETUP_STEP, MODE_STEP, PROJECT_STEP];
+	const steps = setupNeeded
+		? [SETUP_STEP, MODE_STEP, PROJECT_STEP]
+		: [MODE_STEP, PROJECT_STEP];
 	if (SETUP_STEP.match(location.pathname)) {
-		if (ghReadyOnArrival === null) return null;
-		if (ghReadyOnArrival) return modeRedirect;
+		if (rowsOnArrival === null) return null;
+		if (!setupNeeded) return modeRedirect;
 	}
 
 	const currentStepIdx = steps.findIndex((s) => s.match(location.pathname));
@@ -147,11 +158,30 @@ function OnboardingFlowLayout() {
 									{i18n._(currentStep.subtitle)}
 								</p>
 							</div>
-							<Outlet />
+							<SetupStepRowsProvider
+								rows={rowsOnArrival ?? { git: false, gitHub: false }}
+							>
+								<Outlet />
+							</SetupStepRowsProvider>
 						</div>
 						<OnboardingNavigation
-							onBack={isFirstStep ? null : handleBack}
+							onBack={
+								!isFirstStep
+									? handleBack
+									: restarting
+										? () => navigate({ to: "/settings/experimental" })
+										: null
+							}
 							onContinue={handleContinue}
+							continueButton={
+								currentStep === SETUP_STEP && handleContinue ? (
+									<SetupStepContinue
+										gitMissing={gitMissing}
+										ghReady={ghReady || rowsOnArrival?.gitHub === false}
+										onContinue={handleContinue}
+									/>
+								) : undefined
+							}
 						/>
 					</div>
 				) : (

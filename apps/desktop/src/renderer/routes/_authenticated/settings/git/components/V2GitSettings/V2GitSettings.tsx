@@ -25,6 +25,7 @@ import {
 	V2WorktreeLocationPicker,
 } from "../../../components/V2WorktreeLocationPicker";
 import { useDefaultWorktreePath } from "../../../components/WorktreeLocationPicker";
+import { GitHubCliRow } from "../GitHubCliRow";
 
 interface V2GitSettingsProps {
 	hostId: string | null;
@@ -201,6 +202,7 @@ export function V2GitSettings({ hostId }: V2GitSettingsProps) {
 			</header>
 
 			<section>
+				<GitHubCliRow />
 				<SettingsRow
 					label={t({
 						message: "Branch prefix",

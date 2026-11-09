@@ -2948,6 +2948,9 @@ msgstr "外觀"
 msgid "Apple logo"
 msgstr "Apple 標誌"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple 顯示工具已安裝，但 Paradev 找不到 Git。"
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Git 安裝完成前，Apple 安裝程式已關閉。"
 
@@ -4258,6 +4261,9 @@ msgstr "正在檢查代理程式…"
 msgid "Checking environments…"
 msgstr "正在檢查環境…"
 
+msgid "Checking GitHub CLI…"
+msgstr "正在檢查 GitHub CLI…"
+
 msgid "Checking host…"
 msgstr "正在檢查主機…"
 
@@ -4269,6 +4275,9 @@ msgstr "檢出PR需要一個專案"
 
 msgid "Checking pull requests in {what}"
 msgstr "正在檢查 {what} 的拉取請求"
+
+msgid "Checking the download…"
+msgstr "正在驗證下載…"
 
 msgid "Checking workspaces"
 msgstr "正在檢查工作區"
@@ -4888,6 +4897,9 @@ msgstr "合併顯示=>和!==等序列。"
 msgid "Come build it with us."
 msgstr "來和我們一起建構吧。"
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "隨 Apple 的 Command Line Tools 一起提供。"
+
 msgid "Comes with you"
 msgstr "可以帶走"
 
@@ -5284,6 +5296,9 @@ msgstr "已連線到"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "已連線到{connectedOrgName}"
+
+msgid "Connected to GitHub"
+msgstr "已連線到 GitHub"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "已以 {accountLogin} 身分連結 GitHub"
@@ -6170,6 +6185,9 @@ msgstr "無法釋出回覆"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "無法為{0}連線雲端：{1}"
 
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "無法連線到 GitHub。請檢查網路連線後再試一次。"
+
 msgid "Couldn't reach the model provider"
 msgstr "無法連線到模型供應商"
 
@@ -6299,6 +6317,9 @@ msgstr "無法重試移動"
 
 msgid "Couldn't undo the file changes."
 msgstr "無法撤銷檔案更改。"
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "無法在這台 Mac 上解壓縮或儲存 GitHub CLI。"
 
 msgid "Couldn't unstage changes"
 msgstr "無法取消暫存更改"
@@ -7523,6 +7544,12 @@ msgstr "下載Mac版"
 msgid "Download for macOS"
 msgstr "下載macOS版"
 
+msgid "Download from Apple"
+msgstr "從 Apple 下載"
+
+msgid "Download from GitHub"
+msgstr "從 GitHub 下載"
+
 msgid "Download image"
 msgstr "下載圖片"
 
@@ -7552,6 +7579,12 @@ msgstr "已下載"
 
 msgid "Downloading"
 msgstr "下載中"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "從 Apple 下載需要 Apple ID。安裝可能需要約 20 GB 可用空間。"
+
+msgid "Downloading GitHub CLI…"
+msgstr "正在下載 GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "正在下載..."
@@ -9394,6 +9427,9 @@ msgstr "取得 iPhone 和 iPad 應用程式"
 msgid "Gets an invite to join {organizationName}"
 msgstr "將收到加入 {organizationName} 的邀請"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "正在從 GitHub 取得登入代碼…"
+
 msgid "Getting the computer ready"
 msgstr "正在準備電腦"
 
@@ -9427,6 +9463,9 @@ msgstr "接受 Xcode 授權合約後才能執行 Git。請在終端機中執行 
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "此 Mac 尚未安裝 Git。請安裝 Apple 的 Command Line Tools，然後再試一次。"
 
+msgid "Git still isn't installed."
+msgstr "Git 仍未安裝。"
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Cloud 中被 Git 忽略的檔案，例如 .env。請把它們複製出來"
 
@@ -9439,6 +9478,9 @@ msgstr "GitHub App安裝已取消。"
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App安裝成功！"
 
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub已連線，但初始同步未能啟動。請嘗試重新連線。"
 
@@ -9450,6 +9492,9 @@ msgstr "未找到GitHub安裝"
 
 msgid "GitHub integration"
 msgstr "GitHub整合"
+
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub 目前正在限制下載。請稍候片刻再試一次。"
 
 msgid "GitHub issues"
 msgstr "GitHub議題"
@@ -10366,12 +10411,18 @@ msgstr "在一處為所有工作區安裝、授權並劃定MCP伺服器的權限
 msgid "Install."
 msgstr "安裝。"
 
+msgid "Installed"
+msgstr "已安裝"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "已安裝"
 
 msgid "Installed by your organization"
 msgstr "由你的組織安裝"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "用其他方式（例如 Homebrew）安裝了嗎？請按一下「重新檢查」。"
 
 msgid "Installed on {appAccountLogin}"
 msgstr "已安裝在 {appAccountLogin}"
@@ -10385,6 +10436,9 @@ msgstr "安裝方式"
 
 msgid "Installing..."
 msgstr "正在安裝..."
+
+msgid "Installing…"
+msgstr "正在安裝…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "在可透過 ssh 連線的機器上安裝 Paradev，將 Paradev 登入你的帳戶，並讓它以服務形式持續執行。"
@@ -13265,8 +13319,8 @@ msgstr "不在頻道中"
 msgid "Not included"
 msgstr "不包含"
 
-msgid "Not installed"
-msgstr "未安裝"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "未安裝 · 私人儲存庫和拉取請求需要它"
 
 msgid "Not loaded"
 msgstr "未載入"
@@ -13304,8 +13358,8 @@ msgstr "尚未在{hostName}上設定"
 msgid "Not set up on this host"
 msgstr "尚未在此主機上配置"
 
-msgid "Not signed in"
-msgstr "未登入"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "未登入 · 私人儲存庫和拉取請求需要它"
 
 msgid "not sorted"
 msgstr "未排序"
@@ -13855,6 +13909,12 @@ msgstr "從資料夾開啟"
 
 msgid "Open full screen"
 msgstr "全螢幕開啟"
+
+msgid "Open GitHub"
+msgstr "開啟 GitHub"
+
+msgid "Open GitHub and enter this code."
+msgstr "開啟 GitHub 並輸入此代碼。"
 
 msgid "Open host"
 msgstr "開啟主機"
@@ -14620,6 +14680,9 @@ msgstr "Paradev在你的開發者機器上本地執行。我們不儲存你的�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev起初是2025年11月的一個駭客松專案，一個用來管理worktree的簡單桌面應用程式。"
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev 仍然找不到 GitHub CLI。"
+
 msgid "Paradev Teams"
 msgstr "Paradev 團隊"
 
@@ -14630,8 +14693,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev佔用了系統RAM的{0}"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev 使用 GitHub CLI 複製儲存庫並建立拉取請求。你也可以稍後再設定。"
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev 使用 Git 和 GitHub CLI 複製儲存庫並開啟拉取要求。你也可以稍後再做。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev與同類方案對比"
@@ -17896,6 +17959,9 @@ msgstr "透過 SSH 設定主機"
 msgid "Set up an automation"
 msgstr "設定自動化"
 
+msgid "Set up Git and GitHub"
+msgstr "設定 Git 和 GitHub"
+
 msgid "Set up once"
 msgstr "只需設定一次"
 
@@ -18350,6 +18416,9 @@ msgstr "使用Google註冊"
 msgid "Sign-in didn't finish"
 msgstr "登入未完成"
 
+msgid "Sign-in didn't finish."
+msgstr "登入未完成。"
+
 msgid "Sign-in expired"
 msgstr "登入已過期"
 
@@ -18367,6 +18436,9 @@ msgstr "註冊完成率"
 
 msgid "Sign-up steps"
 msgstr "註冊步驟"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "已登入 · 用於克隆私人儲存庫和建立拉取請求"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登入為<0>{userName}</0>"
@@ -18469,6 +18541,12 @@ msgstr "全部跳過"
 
 msgid "Skip for now"
 msgstr "暫時跳過"
+
+msgid "Skip Git for now?"
+msgstr "暫時略過 Git？"
+
+msgid "Skip GitHub for now?"
+msgstr "暫時略過 GitHub？"
 
 msgid "Skipped"
 msgstr "已跳過"
@@ -19808,6 +19886,12 @@ msgstr "差異仍是最新的，只是評論沒能載入。"
 msgid "The dispatcher appears"
 msgstr "排程員出現"
 
+msgid "The download didn't finish. Try again."
+msgstr "下載未完成。請再試一次。"
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "下載內容看起來不正確，因此 Paradev 沒有安裝。請再試一次。"
+
 msgid "The endpoint must use https."
 msgstr "端點必須使用 https。"
 
@@ -19895,6 +19979,9 @@ msgstr "合併前人類會逐行閱讀。"
 
 msgid "The image upload expired — attach it again"
 msgstr "圖片上傳已過期 — 請重新附加"
+
+msgid "The install stopped responding."
+msgstr "安裝已停止回應。"
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "崗位描述變了。工程師不再是有品味的打字員，而成了有品味的排程員：拆解工作、分派給代理程式叢集、在兩個改了同一個模組的代理程式之間做裁決。"
@@ -20322,6 +20409,9 @@ msgstr "這個邀請已被接受。"
 
 msgid "This invitation link is invalid or has expired."
 msgstr "這個邀請連結無效或已過期。"
+
+msgid "This is taking longer than expected."
+msgstr "所需時間比預期更久。"
 
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "耗時比平常更久。下方的聊天是最後儲存的副本；工作區啟動後才會真正開啟。"
@@ -21798,6 +21888,9 @@ msgstr "正在等待核准。請保持此對話方塊開啟。"
 msgid "Waiting for Checks"
 msgstr "等待檢查"
 
+msgid "Waiting for GitHub…"
+msgstr "正在等待 GitHub…"
+
 msgid "Waiting for it to connect…"
 msgstr "正在等待連線…"
 
@@ -22555,11 +22648,17 @@ msgstr "你可以在 30 天內從「設定 → 專案」還原。儲存庫資料
 msgid "You can see how we work before you talk to us."
 msgstr "在與我們交流之前，你就能看到我們是如何工作的。"
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "你仍然可以克隆公開儲存庫。私人儲存庫和拉取請求需要連線 GitHub。你可以稍後在「設定 → Git與worktree」中連線。"
+
 msgid "You can view this page but not change it"
 msgstr "你可以檢視此頁面，但不能變更"
 
 msgid "You can view this page but not comment on it"
 msgstr "你可以檢視此頁面，但不能評論"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "安裝 Git 之前無法新增專案。接下來的畫面會再次提供安裝。"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

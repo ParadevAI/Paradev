@@ -164,3 +164,20 @@ describe("settings search - plugins visibility", () => {
 		).toBeGreaterThan(0);
 	});
 });
+
+describe("settings search - GitHub CLI", () => {
+	it.each([
+		"github",
+		"gh",
+		"github cli",
+	])('"%s" finds the GitHub CLI row in Git & Worktrees', (query) => {
+		expect(getIds(searchSettings(query))).toContain(
+			SETTING_ITEM_ID.GIT_GITHUB_CLI,
+		);
+		for (const isV2 of [false, true]) {
+			expect(
+				getVisibleItemsForSection({ section: "git", searchQuery: query, isV2 }),
+			).toContain(SETTING_ITEM_ID.GIT_GITHUB_CLI);
+		}
+	});
+});

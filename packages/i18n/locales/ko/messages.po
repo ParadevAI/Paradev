@@ -2948,6 +2948,9 @@ msgstr "모양"
 msgid "Apple logo"
 msgstr "Apple 로고"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple에서는 도구가 설치되었다고 하지만 Paradev가 Git을 찾을 수 없습니다."
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Git이 설치되기 전에 Apple 설치 프로그램이 닫혔습니다."
 
@@ -4258,6 +4261,9 @@ msgstr "에이전트 확인하는 중…"
 msgid "Checking environments…"
 msgstr "환경 확인 중…"
 
+msgid "Checking GitHub CLI…"
+msgstr "GitHub CLI 확인 중…"
+
 msgid "Checking host…"
 msgstr "호스트 확인하는 중…"
 
@@ -4269,6 +4275,9 @@ msgstr "PR을 체크아웃하려면 프로젝트가 필요합니다"
 
 msgid "Checking pull requests in {what}"
 msgstr "{what}의 풀 리퀘스트 확인 중"
+
+msgid "Checking the download…"
+msgstr "다운로드 확인 중…"
 
 msgid "Checking workspaces"
 msgstr "워크스페이스 확인 중"
@@ -4888,6 +4897,9 @@ msgstr "=> 나 !== 같은 문자열을 하나로 합칩니다."
 msgid "Come build it with us."
 msgstr "우리와 함께 만들어요."
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "Apple의 Command Line Tools에 포함되어 있습니다."
+
 msgid "Comes with you"
 msgstr "가져올 수 있는 것"
 
@@ -5284,6 +5296,9 @@ msgstr "연결 대상"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "{connectedOrgName}에 연결됨"
+
+msgid "Connected to GitHub"
+msgstr "GitHub에 연결됨"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "{accountLogin}(으)로 GitHub에 연결됨"
@@ -6170,6 +6185,9 @@ msgstr "답글을 게시하지 못했습니다"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}에 대해 클라우드에 연결할 수 없습니다: {1}"
 
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요."
+
 msgid "Couldn't reach the model provider"
 msgstr "모델 제공자에 연결할 수 없습니다"
 
@@ -6299,6 +6317,9 @@ msgstr "이동을 다시 시도할 수 없습니다"
 
 msgid "Couldn't undo the file changes."
 msgstr "파일 변경을 실행 취소하지 못했습니다."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "이 Mac에서 GitHub CLI의 압축을 풀거나 저장할 수 없습니다."
 
 msgid "Couldn't unstage changes"
 msgstr "스테이징을 해제하지 못했습니다"
@@ -7523,6 +7544,12 @@ msgstr "Mac용 다운로드"
 msgid "Download for macOS"
 msgstr "macOS용 다운로드"
 
+msgid "Download from Apple"
+msgstr "Apple에서 다운로드"
+
+msgid "Download from GitHub"
+msgstr "GitHub에서 다운로드"
+
 msgid "Download image"
 msgstr "이미지 다운로드"
 
@@ -7552,6 +7579,12 @@ msgstr "다운로드됨"
 
 msgid "Downloading"
 msgstr "다운로드 중"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "Apple에서 다운로드하려면 Apple ID가 필요합니다. 설치에 약 20 GB의 여유 공간이 필요할 수 있습니다."
+
+msgid "Downloading GitHub CLI…"
+msgstr "GitHub CLI 다운로드 중…"
 
 msgid "Downloading..."
 msgstr "다운로드 중..."
@@ -9394,6 +9427,9 @@ msgstr "iPhone 및 iPad 앱 받기"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} 가입 초대를 받습니다"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "GitHub에서 로그인 코드를 받는 중…"
+
 msgid "Getting the computer ready"
 msgstr "컴퓨터를 준비하는 중"
 
@@ -9427,6 +9463,9 @@ msgstr "Xcode 라이선스에 동의해야 Git을 실행할 수 있습니다. �
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "이 Mac에는 아직 Git이 설치되어 있지 않습니다. Apple의 Command Line Tools를 설치한 후 다시 시도하세요."
 
+msgid "Git still isn't installed."
+msgstr "Git이 아직 설치되지 않았습니다."
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Cloud에 있는 Git 무시 파일(.env 등). 직접 복사해 두세요"
 
@@ -9439,6 +9478,9 @@ msgstr "GitHub App 설치가 취소되었습니다."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App을 설치했습니다!"
 
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub는 연결되었지만 초기 동기화를 시작하지 못했습니다. 다시 연결해 보세요."
 
@@ -9450,6 +9492,9 @@ msgstr "GitHub 설치를 찾을 수 없습니다"
 
 msgid "GitHub integration"
 msgstr "GitHub 연동"
+
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub가 지금 다운로드를 제한하고 있습니다. 잠시 후 다시 시도하세요."
 
 msgid "GitHub issues"
 msgstr "GitHub 이슈"
@@ -10366,12 +10411,18 @@ msgstr "모든 워크스페이스의 MCP 서버를 한곳에서 설치하고, �
 msgid "Install."
 msgstr "설치."
 
+msgid "Installed"
+msgstr "설치됨"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "설치됨"
 
 msgid "Installed by your organization"
 msgstr "조직에서 설치함"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Homebrew 같은 다른 방법으로 설치했나요? 다시 확인을 클릭하세요."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "{appAccountLogin}에 설치됨"
@@ -10385,6 +10436,9 @@ msgstr "설치 경로"
 
 msgid "Installing..."
 msgstr "설치 중..."
+
+msgid "Installing…"
+msgstr "설치 중…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh로 접속할 수 있는 머신에 Paradev를 설치하고, Paradev를 내 계정으로 로그인시킨 뒤 서비스로 계속 실행합니다."
@@ -13265,8 +13319,8 @@ msgstr "채널에 없음"
 msgid "Not included"
 msgstr "미포함"
 
-msgid "Not installed"
-msgstr "설치되지 않음"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "설치되지 않음 · 비공개 저장소와 풀 리퀘스트에 필요합니다"
 
 msgid "Not loaded"
 msgstr "로드 안 됨"
@@ -13304,8 +13358,8 @@ msgstr "{hostName}에 설정되지 않음"
 msgid "Not set up on this host"
 msgstr "이 호스트에 설정되지 않음"
 
-msgid "Not signed in"
-msgstr "로그인되지 않음"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "로그인되지 않음 · 비공개 저장소와 풀 리퀘스트에 필요합니다"
 
 msgid "not sorted"
 msgstr "정렬 안 됨"
@@ -13855,6 +13909,12 @@ msgstr "폴더에서 열기"
 
 msgid "Open full screen"
 msgstr "전체 화면으로 열기"
+
+msgid "Open GitHub"
+msgstr "GitHub 열기"
+
+msgid "Open GitHub and enter this code."
+msgstr "GitHub를 열고 이 코드를 입력하세요."
 
 msgid "Open host"
 msgstr "호스트 열기"
@@ -14620,6 +14680,9 @@ msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 A
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev는 2025년 11월 해커톤 프로젝트로 시작했습니다. worktree를 관리하는 간단한 데스크톱 앱이었습니다."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev가 아직 GitHub CLI를 찾을 수 없습니다."
+
 msgid "Paradev Teams"
 msgstr "Paradev 팀"
 
@@ -14630,8 +14693,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev가 시스템 RAM의 {0}을(를) 사용합니다"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev는 GitHub CLI로 저장소를 클론하고 풀 리퀘스트를 엽니다. 나중에 설정해도 됩니다."
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev는 Git과 GitHub CLI로 리포지토리를 복제하고 풀 리퀘스트를 엽니다. 나중에 해도 됩니다."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev와 대안 비교"
@@ -17896,6 +17959,9 @@ msgstr "SSH로 호스트 설정"
 msgid "Set up an automation"
 msgstr "자동화 설정하기"
 
+msgid "Set up Git and GitHub"
+msgstr "Git 및 GitHub 설정"
+
 msgid "Set up once"
 msgstr "한 번만 설정"
 
@@ -18350,6 +18416,9 @@ msgstr "Google로 가입"
 msgid "Sign-in didn't finish"
 msgstr "로그인이 완료되지 않았습니다"
 
+msgid "Sign-in didn't finish."
+msgstr "로그인이 완료되지 않았습니다."
+
 msgid "Sign-in expired"
 msgstr "로그인 만료됨"
 
@@ -18367,6 +18436,9 @@ msgstr "가입 완료율"
 
 msgid "Sign-up steps"
 msgstr "가입 단계"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "로그인됨 · 비공개 저장소를 클론하고 풀 리퀘스트를 엽니다"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>(으)로 로그인됨"
@@ -18469,6 +18541,12 @@ msgstr "모두 건너뛰기"
 
 msgid "Skip for now"
 msgstr "지금은 건너뛰기"
+
+msgid "Skip Git for now?"
+msgstr "Git을 지금은 건너뛸까요?"
+
+msgid "Skip GitHub for now?"
+msgstr "지금은 GitHub를 건너뛸까요?"
 
 msgid "Skipped"
 msgstr "건너뜀"
@@ -19808,6 +19886,12 @@ msgstr "차이는 최신 상태입니다 — 코멘트만 불러오지 못했습
 msgid "The dispatcher appears"
 msgstr "배차원의 등장"
 
+msgid "The download didn't finish. Try again."
+msgstr "다운로드가 완료되지 않았습니다. 다시 시도하세요."
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "다운로드가 올바르지 않아 Paradev가 설치하지 않았습니다. 다시 시도하세요."
+
 msgid "The endpoint must use https."
 msgstr "엔드포인트는 https를 사용해야 합니다."
 
@@ -19895,6 +19979,9 @@ msgstr "사람이 머지 전에 모든 줄을 읽습니다."
 
 msgid "The image upload expired — attach it again"
 msgstr "이미지 업로드가 만료되었습니다 — 다시 첨부하세요"
+
+msgid "The install stopped responding."
+msgstr "설치가 응답하지 않습니다."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "직무의 성격이 바뀝니다. 엔지니어는 안목 있는 타자수가 아니라 안목 있는 배차원이 됩니다. 일을 쪼개고, 플릿에 배분하고, 같은 모듈을 건드린 에이전트들 사이의 충돌을 중재합니다."
@@ -20322,6 +20409,9 @@ msgstr "이 초대는 이미 수락되었습니다."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "이 초대 링크가 유효하지 않거나 만료되었습니다."
+
+msgid "This is taking longer than expected."
+msgstr "예상보다 오래 걸리고 있습니다."
 
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "평소보다 오래 걸리고 있습니다. 아래 채팅은 마지막으로 저장된 사본이며, 워크스페이스가 시작되면 실제로 열립니다."
@@ -21798,6 +21888,9 @@ msgstr "승인을 기다리는 중입니다. 이 대화 상자를 열어 두세�
 msgid "Waiting for Checks"
 msgstr "검사 대기 중"
 
+msgid "Waiting for GitHub…"
+msgstr "GitHub를 기다리는 중…"
+
 msgid "Waiting for it to connect…"
 msgstr "연결을 기다리는 중…"
 
@@ -22555,11 +22648,17 @@ msgstr "30일 동안 설정 → 프로젝트에서 복원할 수 있습니다. �
 msgid "You can see how we work before you talk to us."
 msgstr "대화하기 전에 우리가 일하는 방식을 직접 볼 수 있습니다."
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "공개 저장소는 계속 클론할 수 있습니다. 비공개 저장소와 풀 리퀘스트에는 GitHub 연결이 필요합니다. 나중에 설정 → Git 및 worktree에서 연결할 수 있습니다."
+
 msgid "You can view this page but not change it"
 msgstr "이 페이지를 볼 수는 있지만 변경할 수는 없습니다"
 
 msgid "You can view this page but not comment on it"
 msgstr "이 페이지를 볼 수는 있지만 댓글을 달 수는 없습니다"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Git을 설치하기 전에는 프로젝트를 추가할 수 없습니다. 다음 화면에서 다시 안내합니다."
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

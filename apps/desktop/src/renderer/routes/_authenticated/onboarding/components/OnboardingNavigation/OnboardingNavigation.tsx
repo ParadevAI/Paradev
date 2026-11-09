@@ -1,14 +1,17 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
+import type { ReactNode } from "react";
 
 interface OnboardingNavigationProps {
 	onBack: (() => void) | null;
 	onContinue: (() => void) | null;
+	continueButton?: ReactNode;
 }
 
 export function OnboardingNavigation({
 	onBack,
 	onContinue,
+	continueButton,
 }: OnboardingNavigationProps) {
 	return (
 		<div className="flex items-center justify-between">
@@ -20,11 +23,12 @@ export function OnboardingNavigation({
 				)}
 			</div>
 			<div>
-				{onContinue && (
-					<Button size="sm" onClick={onContinue}>
-						<Trans>Continue</Trans>
-					</Button>
-				)}
+				{continueButton ??
+					(onContinue && (
+						<Button size="sm" onClick={onContinue}>
+							<Trans>Continue</Trans>
+						</Button>
+					))}
 			</div>
 		</div>
 	);

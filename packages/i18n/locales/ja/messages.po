@@ -2948,6 +2948,9 @@ msgstr "外観"
 msgid "Apple logo"
 msgstr "Appleのロゴ"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Appleではツールがインストール済みと表示されますが、ParadevがGitを見つけられません。"
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Git がインストールされる前に Apple のインストーラが閉じられました。"
 
@@ -4258,6 +4261,9 @@ msgstr "エージェントを確認中…"
 msgid "Checking environments…"
 msgstr "環境を確認中…"
 
+msgid "Checking GitHub CLI…"
+msgstr "GitHub CLI を確認中…"
+
 msgid "Checking host…"
 msgstr "ホストを確認中…"
 
@@ -4269,6 +4275,9 @@ msgstr "PRのチェックアウトにはプロジェクトが必要です"
 
 msgid "Checking pull requests in {what}"
 msgstr "{what} のプルリクエストを確認中"
+
+msgid "Checking the download…"
+msgstr "ダウンロードを確認中…"
 
 msgid "Checking workspaces"
 msgstr "ワークスペースを確認中"
@@ -4888,6 +4897,9 @@ msgstr "=> や !== などの並びを合字にします。"
 msgid "Come build it with us."
 msgstr "一緒に作りましょう。"
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "AppleのCommand Line Toolsに含まれています。"
+
 msgid "Comes with you"
 msgstr "引き継げるもの"
 
@@ -5284,6 +5296,9 @@ msgstr "接続先"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "{connectedOrgName}に接続済み"
+
+msgid "Connected to GitHub"
+msgstr "GitHub に接続しました"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "{accountLogin} として GitHub に接続済み"
@@ -6170,6 +6185,9 @@ msgstr "返信を投稿できませんでした"
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}のクラウドに接続できませんでした: {1}"
 
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "GitHubに接続できませんでした。インターネット接続を確認して、もう一度お試しください。"
+
 msgid "Couldn't reach the model provider"
 msgstr "モデルのプロバイダーに接続できませんでした"
 
@@ -6299,6 +6317,9 @@ msgstr "移動を再試行できませんでした"
 
 msgid "Couldn't undo the file changes."
 msgstr "ファイルの変更を取り消せませんでした。"
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "このMacでGitHub CLIを展開または保存できませんでした。"
 
 msgid "Couldn't unstage changes"
 msgstr "変更をステージ解除できませんでした"
@@ -7523,6 +7544,12 @@ msgstr "Mac版をダウンロード"
 msgid "Download for macOS"
 msgstr "macOS版をダウンロード"
 
+msgid "Download from Apple"
+msgstr "Appleからダウンロード"
+
+msgid "Download from GitHub"
+msgstr "GitHubからダウンロード"
+
 msgid "Download image"
 msgstr "画像をダウンロード"
 
@@ -7552,6 +7579,12 @@ msgstr "ダウンロード済み"
 
 msgid "Downloading"
 msgstr "ダウンロード中"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "AppleからのダウンロードにはApple IDが必要です。インストールには約20 GBの空き容量が必要になる場合があります。"
+
+msgid "Downloading GitHub CLI…"
+msgstr "GitHub CLI をダウンロード中…"
 
 msgid "Downloading..."
 msgstr "ダウンロード中..."
@@ -9394,6 +9427,9 @@ msgstr "iPhone・iPad アプリを入手"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "GitHub からサインインコードを取得中…"
+
 msgid "Getting the computer ready"
 msgstr "コンピューターを準備しています"
 
@@ -9427,6 +9463,9 @@ msgstr "Xcode のライセンスに同意するまで Git を実行できませ�
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "この Mac にはまだ Git がインストールされていません。Apple の Command Line Tools をインストールしてから、もう一度お試しください。"
 
+msgid "Git still isn't installed."
+msgstr "Gitはまだインストールされていません。"
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Cloud 上の Git で無視されたファイル（.env など）。コピーして持ち出してください"
 
@@ -9439,6 +9478,9 @@ msgstr "GitHub Appのインストールがキャンセルされました。"
 msgid "GitHub App installed successfully!"
 msgstr "GitHub Appをインストールしました!"
 
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHubは接続しましたが、初回同期を開始できませんでした。再接続をお試しください。"
 
@@ -9450,6 +9492,9 @@ msgstr "GitHubのインストールが見つかりません"
 
 msgid "GitHub integration"
 msgstr "GitHub連携"
+
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHubが現在ダウンロードを制限しています。少し待ってから、もう一度お試しください。"
 
 msgid "GitHub issues"
 msgstr "GitHub issue"
@@ -10366,12 +10411,18 @@ msgstr "すべてのワークスペースにまたがるMCPサーバーのイン
 msgid "Install."
 msgstr "インストール。"
 
+msgid "Installed"
+msgstr "インストール済み"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "インストール済み"
 
 msgid "Installed by your organization"
 msgstr "組織がインストール済み"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Homebrewなど別の方法でインストールしましたか？「再確認」をクリックしてください。"
 
 msgid "Installed on {appAccountLogin}"
 msgstr "{appAccountLogin} にインストール済み"
@@ -10385,6 +10436,9 @@ msgstr "インストール方法"
 
 msgid "Installing..."
 msgstr "インストール中..."
+
+msgid "Installing…"
+msgstr "インストール中…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh で接続できるマシンに Paradev をインストールし、Paradev をあなたのアカウントにサインインさせ、サービスとして実行し続けます。"
@@ -13265,8 +13319,8 @@ msgstr "チャンネル外"
 msgid "Not included"
 msgstr "含まれない"
 
-msgid "Not installed"
-msgstr "未インストール"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "未インストール · プライベートリポジトリとプルリクエストに必要です"
 
 msgid "Not loaded"
 msgstr "未読み込み"
@@ -13304,8 +13358,8 @@ msgstr "{hostName}ではセットアップされていません"
 msgid "Not set up on this host"
 msgstr "このホストではセットアップされていません"
 
-msgid "Not signed in"
-msgstr "未サインイン"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "未サインイン · プライベートリポジトリとプルリクエストに必要です"
 
 msgid "not sorted"
 msgstr "並べ替えなし"
@@ -13855,6 +13909,12 @@ msgstr "フォルダから開く"
 
 msgid "Open full screen"
 msgstr "全画面で開く"
+
+msgid "Open GitHub"
+msgstr "GitHub を開く"
+
+msgid "Open GitHub and enter this code."
+msgstr "GitHub を開いて、このコードを入力してください。"
 
 msgid "Open host"
 msgstr "ホストを開く"
@@ -14620,6 +14680,9 @@ msgstr "Paradevは開発者のマシン上でローカルに動作します。�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradevは2025年11月、ハッカソンのプロジェクトとして始まりました。ワークツリーを管理するだけの、シンプルなデスクトップアプリでした。"
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "ParadevはまだGitHub CLIを見つけられません。"
+
 msgid "Paradev Teams"
 msgstr "Paradev チーム"
 
@@ -14630,8 +14693,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "ParadevはシステムRAMの{0}を使用中"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev は GitHub CLI を使ってリポジトリのクローンやプルリクエストの作成を行います。この設定は後からでもできます。"
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "ParadevはGitとGitHub CLIを使ってリポジトリをクローンし、プルリクエストを作成します。これは後で行うこともできます。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradevと他ツールの比較"
@@ -17896,6 +17959,9 @@ msgstr "SSH でホストを設定"
 msgid "Set up an automation"
 msgstr "自動化を設定する"
 
+msgid "Set up Git and GitHub"
+msgstr "GitとGitHubを設定"
+
 msgid "Set up once"
 msgstr "一度設定するだけ"
 
@@ -18350,6 +18416,9 @@ msgstr "Googleでサインアップ"
 msgid "Sign-in didn't finish"
 msgstr "サインインが完了しませんでした"
 
+msgid "Sign-in didn't finish."
+msgstr "サインインが完了しませんでした。"
+
 msgid "Sign-in expired"
 msgstr "サインインの期限切れ"
 
@@ -18367,6 +18436,9 @@ msgstr "登録完了率"
 
 msgid "Sign-up steps"
 msgstr "登録ステップ数"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "サインイン済み · プライベートリポジトリのクローンとプルリクエストの作成に使用します"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>としてサインイン中"
@@ -18469,6 +18541,12 @@ msgstr "すべてスキップ"
 
 msgid "Skip for now"
 msgstr "今はスキップ"
+
+msgid "Skip Git for now?"
+msgstr "Gitをスキップしますか？"
+
+msgid "Skip GitHub for now?"
+msgstr "GitHub の接続をスキップしますか？"
 
 msgid "Skipped"
 msgstr "スキップ"
@@ -19808,6 +19886,12 @@ msgstr "差分は最新です — コメントの読み込みだけが失敗し�
 msgid "The dispatcher appears"
 msgstr "ディスパッチャーの登場"
 
+msgid "The download didn't finish. Try again."
+msgstr "ダウンロードが完了しませんでした。もう一度お試しください。"
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "ダウンロードに問題があったため、Paradevはインストールしませんでした。もう一度お試しください。"
+
 msgid "The endpoint must use https."
 msgstr "エンドポイントは https を使用する必要があります。"
 
@@ -19895,6 +19979,9 @@ msgstr "人間がマージ前に全行を読む。"
 
 msgid "The image upload expired — attach it again"
 msgstr "画像のアップロードの有効期限が切れました — もう一度添付してください"
+
+msgid "The install stopped responding."
+msgstr "インストールが応答しなくなりました。"
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "職務の中身が変わります。エンジニアは審美眼のあるタイピストであることをやめ、審美眼のあるディスパッチャーになります。作業を分解し、フリートに割り振り、同じモジュールに触れたエージェント同士の衝突を裁く役です。"
@@ -20322,6 +20409,9 @@ msgstr "この招待はすでに承諾されています。"
 
 msgid "This invitation link is invalid or has expired."
 msgstr "この招待リンクは無効か、期限切れです。"
+
+msgid "This is taking longer than expected."
+msgstr "想定より時間がかかっています。"
 
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "通常より時間がかかっています。下のチャットは最後に保存されたコピーです。ワークスペースが起動すると実際に開きます。"
@@ -21798,6 +21888,9 @@ msgstr "承認を待っています。このダイアログは開いたままに
 msgid "Waiting for Checks"
 msgstr "チェックを待機中"
 
+msgid "Waiting for GitHub…"
+msgstr "GitHub を待っています…"
+
 msgid "Waiting for it to connect…"
 msgstr "接続を待っています…"
 
@@ -22555,11 +22648,17 @@ msgstr "30 日間は「設定 → プロジェクト」から復元できます�
 msgid "You can see how we work before you talk to us."
 msgstr "話をする前に、私たちの働き方を見ることができます。"
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "公開リポジトリは引き続きクローンできます。プライベートリポジトリとプルリクエストには GitHub の接続が必要です。あとで「設定 → Gitとワークツリー」から接続できます。"
+
 msgid "You can view this page but not change it"
 msgstr "このページは閲覧できますが、変更はできません"
 
 msgid "You can view this page but not comment on it"
 msgstr "このページは閲覧できますが、コメントはできません"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Gitをインストールするまでプロジェクトを追加できません。次の画面でもう一度案内します。"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
