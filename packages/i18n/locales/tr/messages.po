@@ -5367,9 +5367,6 @@ msgstr "Devam et"
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
-msgid "Continue or fork session"
-msgstr "Oturumu sürdür veya forkla"
-
 msgid "Continue this chat on another login"
 msgstr "Bu sohbete başka bir hesapla devam et"
 
@@ -6015,9 +6012,6 @@ msgstr "Mesaj düzenlenemedi"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Çalışma alanlarını silme işlemi tamamlanamadı"
 
-msgid "Couldn't fork into a chat"
-msgstr "Sohbete forklanamadı"
-
 msgid "Couldn't forward port {portNumber}"
 msgstr "{portNumber} portu yönlendirilemedi"
 
@@ -6076,6 +6070,9 @@ msgstr "Alt ajan arka plana taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "Sohbet arayüzünde açılamadı"
 
 msgid "Couldn't open the screenshot"
 msgstr "Ekran görüntüsü açılamadı"
@@ -9092,26 +9089,11 @@ msgstr "Fork argümanları"
 msgid "Fork conversation"
 msgstr "Konuşmayı ayır"
 
-msgid "Fork into chat"
-msgstr "Sohbete forkla"
-
-msgid "Fork into chat in a new tab"
-msgstr "Yeni sekmede sohbete forkla"
-
-msgid "Fork into CLI"
-msgstr "CLI'ye forkla"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Yeni sekmede CLI'ye forkla"
-
 msgid "Fork session"
 msgstr "Oturumu forkla"
 
 msgid "Fork session…"
 msgstr "Oturumu forkla…"
-
-msgid "Forking into a chat…"
-msgstr "Sohbete forklanıyor…"
 
 msgid "Form controls and field composition"
 msgstr "Form denetimleri ve alan kompozisyonu"
@@ -12189,6 +12171,9 @@ msgstr "Yeni ajan oturumu"
 msgid "New agent sessions"
 msgstr "Yeni ajan oturumları"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Yeni ajan oturumları terminal yerine sohbette başlar. Herhangi bir oturumu menüsünden değiştirebilirsiniz."
+
 msgid "New automation"
 msgstr "Yeni otomasyon"
 
@@ -13208,8 +13193,8 @@ msgstr "Yeniden denenecek bir şey yok"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Son 30 günde henüz hiçbir şey yayınlanmadı. Bu makinedeki kullanım eşitlendiğinde sıralamanız görünür; <0>{handle}</0> olarak yayınlanıyor."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Henüz forklanacak bir şey yok. Önce bir mesaj gönderin."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Henüz açılacak bir şey yok. Önce bir mesaj gönderin."
 
 msgid "Nothing was missed"
 msgstr "Hiçbir şey kaçırılmadı"
@@ -13606,6 +13591,9 @@ msgstr "İnceleme durumunu, kontrolleri ve yorumları görmek için bir pull req
 msgid "Open actions menu"
 msgstr "Eylemler menüsünü aç"
 
+msgid "Open agents in chat"
+msgstr "Ajanları sohbette aç"
+
 msgid "Open anyway"
 msgstr "Yine de aç"
 
@@ -13653,9 +13641,6 @@ msgstr "ChatGPT ayarlarını aç"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code, Codex, OpenCode ve Pi oturumlarını sohbet olarak aç"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Claude Code, Codex, OpenCode ve Pi oturumlarını terminal yerine bir sohbet panelinde açın."
 
 msgid "Open Command Palette"
 msgstr "Komut paletini aç"
@@ -13739,6 +13724,9 @@ msgstr "Tarayıcıda aç"
 msgid "Open in Changes pane"
 msgstr "Değişiklikler bölmesinde aç"
 
+msgid "Open in Chat Interface"
+msgstr "Sohbet arayüzünde aç"
+
 msgid "Open in ChatGPT"
 msgstr "ChatGPT'de aç"
 
@@ -13813,6 +13801,9 @@ msgstr "Sekmede aç"
 
 msgid "Open in Tasks"
 msgstr "Görevlerde aç"
+
+msgid "Open in Terminal Chat"
+msgstr "Terminal sohbetinde aç"
 
 msgid "Open in…"
 msgstr "Şununla aç…"
@@ -14023,11 +14014,11 @@ msgstr "Dosyaları açma"
 msgid "Opening folders"
 msgstr "Klasörleri açma"
 
+msgid "Opening in Chat Interface…"
+msgstr "Sohbet arayüzünde açılıyor…"
+
 msgid "Opening pages"
 msgstr "Sayfaları açma"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Bu bölmenin yanında açılır. Bu bölme çalışmaya devam eder."
 
 msgid "Operator"
 msgstr "Operatör"

@@ -5367,9 +5367,6 @@ msgstr "Doorgaan"
 msgid "Continue in your browser"
 msgstr "Ga verder in je browser"
 
-msgid "Continue or fork session"
-msgstr "Sessie voortzetten of forken"
-
 msgid "Continue this chat on another login"
 msgstr "Deze chat voortzetten met een andere login"
 
@@ -6015,9 +6012,6 @@ msgstr "Kan het bericht niet bewerken"
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Kon het verwijderen van werkruimtes niet afronden"
 
-msgid "Couldn't fork into a chat"
-msgstr "Kon niet forken naar een chat"
-
 msgid "Couldn't forward port {portNumber}"
 msgstr "Kan poort {portNumber} niet doorsturen"
 
@@ -6076,6 +6070,9 @@ msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "Kan niet openen in chatinterface"
 
 msgid "Couldn't open the screenshot"
 msgstr "Kan de screenshot niet openen"
@@ -9092,26 +9089,11 @@ msgstr "Fork-argumenten"
 msgid "Fork conversation"
 msgstr "Gesprek afsplitsen"
 
-msgid "Fork into chat"
-msgstr "Forken naar chat"
-
-msgid "Fork into chat in a new tab"
-msgstr "Forken naar chat in een nieuw tabblad"
-
-msgid "Fork into CLI"
-msgstr "Forken naar CLI"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Forken naar CLI in een nieuw tabblad"
-
 msgid "Fork session"
 msgstr "Sessie forken"
 
 msgid "Fork session…"
 msgstr "Sessie forken…"
-
-msgid "Forking into a chat…"
-msgstr "Forken naar een chat…"
 
 msgid "Form controls and field composition"
 msgstr "Formulierbesturing en veldsamenstelling"
@@ -12189,6 +12171,9 @@ msgstr "Nieuwe agentsessie"
 msgid "New agent sessions"
 msgstr "Nieuwe agentsessies"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Nieuwe agentsessies starten in de chat in plaats van in de terminal. Je kunt elke sessie wisselen via het menu."
+
 msgid "New automation"
 msgstr "Nieuwe automatisering"
 
@@ -13208,8 +13193,8 @@ msgstr "Niets hoeft opnieuw te worden geprobeerd"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nog niets gepubliceerd in de laatste 30 dagen. Je positie verschijnt zodra het gebruik van deze machine is gesynchroniseerd, gepubliceerd als <0>{handle}</0>."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Nog niets om te forken. Stuur eerst een bericht."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Nog niets om te openen. Stuur eerst een bericht."
 
 msgid "Nothing was missed"
 msgstr "Er is niets gemist"
@@ -13606,6 +13591,9 @@ msgstr "Open een pull request om reviewstatus, checks en opmerkingen te zien."
 msgid "Open actions menu"
 msgstr "Actiemenu openen"
 
+msgid "Open agents in chat"
+msgstr "Agents openen in chat"
+
 msgid "Open anyway"
 msgstr "Toch openen"
 
@@ -13653,9 +13641,6 @@ msgstr "ChatGPT-instellingen openen"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code-, Codex-, OpenCode- en Pi-sessies als chats openen"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Open Claude Code-, Codex-, OpenCode- en Pi-sessies in een chatpaneel in plaats van in een terminal."
 
 msgid "Open Command Palette"
 msgstr "Opdrachtenpalet openen"
@@ -13739,6 +13724,9 @@ msgstr "Openen in browser"
 msgid "Open in Changes pane"
 msgstr "Openen in paneel Wijzigingen"
 
+msgid "Open in Chat Interface"
+msgstr "Openen in chatinterface"
+
 msgid "Open in ChatGPT"
 msgstr "Openen in ChatGPT"
 
@@ -13813,6 +13801,9 @@ msgstr "Openen in tabblad"
 
 msgid "Open in Tasks"
 msgstr "Openen in Taken"
+
+msgid "Open in Terminal Chat"
+msgstr "Openen in terminalchat"
 
 msgid "Open in…"
 msgstr "Openen in…"
@@ -14023,11 +14014,11 @@ msgstr "Bestanden openen"
 msgid "Opening folders"
 msgstr "Mappen openen"
 
+msgid "Opening in Chat Interface…"
+msgstr "Openen in chatinterface…"
+
 msgid "Opening pages"
 msgstr "Pagina's openen"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Opent naast dit paneel. Dit paneel blijft draaien."
 
 msgid "Operator"
 msgstr "Operator"
