@@ -4,6 +4,13 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 type PageRef = { id: string } | { slug: string };
 
+function isPinnedPull(query: { queryKey: readonly unknown[] }): boolean {
+	const options = query.queryKey[1];
+	if (typeof options !== "object" || options === null) return false;
+	const input = (options as { input?: { version?: unknown } }).input;
+	return typeof input?.version === "number";
+}
+
 export function usePageUpdates({
 	pageRef,
 	pageId,
@@ -63,6 +70,7 @@ export function usePageUpdates({
 		if (!pageId) return;
 		for (const input of [{ id: pageId }, { slug }]) {
 			void utils.page.versions.invalidate(input);
+			void utils.page.pull.invalidate(input, { predicate: isPinnedPull });
 		}
 		void offer.onPublished();
 	}, [utils, pageId, slug, offer.onPublished]);

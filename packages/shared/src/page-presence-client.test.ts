@@ -58,6 +58,7 @@ function harness(
 			return socket;
 		},
 		retryBaseMs: 1,
+		recheckJitterMs: 1,
 		heartbeatMs: options.heartbeatMs ?? 60_000,
 	});
 	const opened = async () => {
@@ -135,7 +136,7 @@ describe("openPagePresence", () => {
 		socket.emit("close", { code: 1006 });
 		await until(() => h.sockets.length === 2);
 		h.sockets[1]?.emit("open");
-		expect(h.published()).toBe(1);
+		await until(() => h.published() === 1);
 		h.client.stop();
 	});
 
