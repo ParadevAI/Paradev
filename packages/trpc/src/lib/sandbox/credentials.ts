@@ -294,9 +294,22 @@ export async function deriveSandboxCredentials(
 		allow["api.github.com"] = rule({
 			Authorization: `Bearer ${inputs.githubToken}`,
 		});
-		allow["uploads.github.com"] = rule({
-			Authorization: `Bearer ${inputs.githubToken}`,
-		});
+		// Attachment uploads (gh pr edit --attach and friends) are refused for an
+		// installation token, so it only stands in for the placeholder gh sends;
+		// a token the workspace supplies itself, such as a person's PAT in
+		// GH_TOKEN for one command, passes through untouched.
+		allow["uploads.github.com"] = [
+			...swap(
+				"Authorization",
+				`token ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+				`Bearer ${inputs.githubToken}`,
+			),
+			...swap(
+				"Authorization",
+				`Bearer ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+				`Bearer ${inputs.githubToken}`,
+			),
+		];
 		// gh refuses to call without a token in hand; the value never matters.
 		managedEnv.GH_TOKEN = SANDBOX_CREDENTIAL_PLACEHOLDER;
 	}
