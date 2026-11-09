@@ -428,9 +428,15 @@ export class TerminalHost {
 	 * Reschedules if clients are still attached
 	 */
 	private scheduleSessionCleanup(sessionId: string): void {
+		const scheduledSession = this.sessions.get(sessionId);
 		setTimeout(() => {
 			const session = this.sessions.get(sessionId);
-			if (!session || session.isAlive) {
+			if (
+				!session ||
+				session !== scheduledSession ||
+				session.isAlive ||
+				session.isDraining
+			) {
 				return;
 			}
 

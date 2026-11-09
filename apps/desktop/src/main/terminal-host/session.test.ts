@@ -70,6 +70,12 @@ it("blocks new and queued stdin frames after the PTY Exit frame", async () => {
 	});
 	session.spawn({ cwd: "/tmp", cols: 80, rows: 24, env: {} });
 	child.stdout.emit("data", createFrameHeader(PtySubprocessIpcType.Ready, 0));
+	const writesBeforeInput = child.stdin.writes.length;
+	session.write("live input");
+	expect(child.stdin.writes.length).toBeGreaterThan(writesBeforeInput);
+	const writesBeforeResize = child.stdin.writes.length;
+	session.resize(90, 25);
+	expect(child.stdin.writes.length).toBeGreaterThan(writesBeforeResize);
 	const exit = Buffer.alloc(4);
 	exit.writeInt32LE(3);
 	child.stdout.emit(
@@ -88,6 +94,8 @@ it("blocks new and queued stdin frames after the PTY Exit frame", async () => {
 		subprocessStdinQueuedBytes: number;
 		flushSubprocessStdinQueue: () => void;
 	};
+	expect(internals.subprocessStdinQueue).toEqual([]);
+	expect(internals.subprocessStdinQueuedBytes).toBe(0);
 	const queued = createFrameHeader(PtySubprocessIpcType.Resize, 0);
 	internals.subprocessStdinQueue.push(queued);
 	internals.subprocessStdinQueuedBytes += queued.length;
