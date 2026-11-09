@@ -87,14 +87,12 @@ export function PageFindBar({
 				type="text"
 				value={query}
 			/>
-			{status && (
-				<span
-					aria-live="polite"
-					className="whitespace-nowrap px-1 text-muted-foreground text-xs tabular-nums"
-				>
-					{status}
-				</span>
-			)}
+			<span
+				aria-live="polite"
+				className="min-w-[5.5rem] whitespace-nowrap px-1 text-right text-muted-foreground text-xs tabular-nums"
+			>
+				{status}
+			</span>
 			<div className="flex shrink-0 items-center">
 				<FindButton
 					disabled={total === 0 || unavailable}
