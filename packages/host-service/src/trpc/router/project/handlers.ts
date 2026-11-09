@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { projects } from "../../../db/schema";
-import { getLiveProjectAtPath } from "../../../projects/local-project-store";
+import {
+	getLiveProjectAtPath,
+	getProjectAtPathIncludingDeleted,
+} from "../../../projects/local-project-store";
 import { restoreProject } from "../../../projects/project-deletion";
 import type { HostServiceContext } from "../../../types";
 import { persistLocalProject } from "./utils/persist-project";
@@ -124,9 +125,7 @@ export async function createFromImportLocal(
 	// a deleted one; a deleted one is restored.
 	const existing =
 		getLiveProjectAtPath(ctx.db, resolved.repoPath) ??
-		ctx.db.query.projects
-			.findFirst({ where: eq(projects.repoPath, resolved.repoPath) })
-			.sync();
+		getProjectAtPathIncludingDeleted(ctx.db, resolved.repoPath);
 	if (existing) {
 		restoreProject(ctx, existing.id);
 		return {

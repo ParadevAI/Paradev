@@ -22,7 +22,7 @@ import {
 import {
 	emitProjectChanged,
 	getLiveProjectAtPath,
-	getLocalProject,
+	getProjectIncludingDeleted,
 } from "./local-project-store";
 
 export const PROJECT_RESTORE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -50,7 +50,7 @@ export async function softDeleteProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
 ): Promise<{ repoPath: string; deletedAt: number } | null> {
-	const project = getLocalProject(ctx.db, projectId);
+	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project) return null;
 	if (project.deletedAt != null) {
 		return { repoPath: project.repoPath, deletedAt: project.deletedAt };
@@ -153,7 +153,7 @@ export function restoreProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
 ): { restoredWorkspaceCount: number } | null {
-	const project = getLocalProject(ctx.db, projectId);
+	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project) return null;
 	if (project.deletedAt == null) return { restoredWorkspaceCount: 0 };
 	if (getLiveProjectAtPath(ctx.db, project.repoPath)) throw repoTakenError();
@@ -166,7 +166,7 @@ export function restoreProject(
 		.set({ deletedAt: null, deletedByUserId: null, updatedAt: Date.now() })
 		.where(eq(projects.id, projectId))
 		.run();
-	const restored = getLocalProject(ctx.db, projectId);
+	const restored = getProjectIncludingDeleted(ctx.db, projectId);
 	if (restored) emitProjectChanged(ctx.eventBus, "created", restored);
 	for (const row of restorable) unarchiveLocalWorkspace(ctx, row.id);
 	return { restoredWorkspaceCount: restorable.length };
@@ -219,7 +219,7 @@ export async function purgeDeletedProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
 ): Promise<boolean> {
-	const project = getLocalProject(ctx.db, projectId);
+	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project || project.deletedAt == null) return false;
 	await purgeProject(ctx, project);
 	return true;
