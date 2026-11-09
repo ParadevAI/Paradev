@@ -12,6 +12,7 @@ import { projects, workspaces } from "../../../db/schema";
 import type { TagSettingSnapshot } from "../../../events/types";
 import {
 	emitProjectChanged,
+	getLiveProjectAtPath,
 	getLocalProject,
 	toProjectSnapshot,
 	updateLocalProject,
@@ -20,6 +21,7 @@ import {
 	listDeletedProjects,
 	purgeDeletedProject,
 	readDeletionImpact,
+	repoTakenError,
 	restoreProject,
 	softDeleteProject,
 } from "../../../projects/project-deletion";
@@ -508,14 +510,7 @@ export const projectRouter = router({
 				!!cloneUrl &&
 				cloneUrl.toLowerCase() === expectedUrlLower;
 
-			const localProject = ctx.db.query.projects
-				.findFirst({
-					where: and(
-						eq(projects.repoPath, gitRoot),
-						isNull(projects.deletedAt),
-					),
-				})
-				.sync();
+			const localProject = getLiveProjectAtPath(ctx.db, gitRoot);
 
 			// A local-DB row keyed by this repo's git root is authoritative:
 			// the repo is already a v2 project on this device ("local is
@@ -810,17 +805,9 @@ export const projectRouter = router({
 					// would clobber the first. Cloud-side GitHub URL collisions
 					// are allowed (see findBackfillConflict), but local-path
 					// collisions are not.
-					const localOwner = ctx.db
-						.select({ id: projects.id })
-						.from(projects)
-						.where(eq(projects.repoPath, resolved.repoPath))
-						.get();
+					const localOwner = getLiveProjectAtPath(ctx.db, resolved.repoPath);
 					if (localOwner && localOwner.id !== input.projectId) {
-						throw new TRPCError({
-							code: "CONFLICT",
-							message:
-								"Repository is already set up as another project on this device.",
-						});
+						throw repoTakenError();
 					}
 
 					rejectIfRepoint(resolved.repoPath);

@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { projects } from "../db/schema";
 import type { EventBus } from "../events";
@@ -39,6 +39,17 @@ export function getLocalProject(
 	id: string,
 ): HostProjectRow | undefined {
 	return db.query.projects.findFirst({ where: eq(projects.id, id) }).sync();
+}
+
+export function getLiveProjectAtPath(
+	db: HostDb,
+	repoPath: string,
+): HostProjectRow | undefined {
+	return db.query.projects
+		.findFirst({
+			where: and(eq(projects.repoPath, repoPath), isNull(projects.deletedAt)),
+		})
+		.sync();
 }
 
 export function emitProjectChanged(

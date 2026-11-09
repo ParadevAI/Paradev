@@ -333,3 +333,53 @@ describe("listProjectWorktrees", () => {
 		});
 	});
 });
+
+describe("a deleted project on the same repo", () => {
+	async function setUpThenDelete() {
+		const db = createTestDb();
+		const { api } = createRecordingApiStub();
+		const ctx = createTestContext(db, api);
+		const caller = createCallerFactory(projectRouter)(ctx);
+		const root = await createTempGitRepo();
+		const deleted = await createFromImportLocal(ctx, {
+			name: "Deleted",
+			repoPath: root,
+		});
+		await caller.remove({ projectId: deleted.projectId });
+		const projectId = randomUUID();
+		await caller.setup({
+			projectId,
+			origin: { name: "From other machine" },
+			mode: { kind: "import", repoPath: root },
+		});
+		return { db, ctx, caller, root, deletedId: deleted.projectId, projectId };
+	}
+
+	it("does not block setting up the repo as another project", async () => {
+		const { db, deletedId, projectId, root } = await setUpThenDelete();
+
+		const live = db.select().from(projects).where(eq(projects.id, projectId));
+		expect(live.get()?.repoPath).toBe(root);
+		expect(live.get()?.deletedAt).toBeNull();
+		const old = db.select().from(projects).where(eq(projects.id, deletedId));
+		expect(old.get()?.deletedAt).not.toBeNull();
+	});
+
+	it("refuses to restore the deleted project while the repo belongs to another", async () => {
+		const { caller, deletedId } = await setUpThenDelete();
+
+		await expect(caller.restore({ projectId: deletedId })).rejects.toThrow(
+			"Repository is already set up as another project on this device.",
+		);
+	});
+
+	it("re-importing the folder returns the live project, not the deleted one", async () => {
+		const { ctx, root, projectId } = await setUpThenDelete();
+
+		const again = await createFromImportLocal(ctx, {
+			name: "Again",
+			repoPath: root,
+		});
+		expect(again.projectId).toBe(projectId);
+	});
+});
