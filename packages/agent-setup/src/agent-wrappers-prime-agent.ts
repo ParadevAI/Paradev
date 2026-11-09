@@ -10,6 +10,9 @@ import { getHooksDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export const PRIME_AGENT_EXTENSION_FILE = "prime-agent-notify.mjs";
+export const PRIME_AGENT_WATCHER_FILE = "prime-agent-watch.mjs";
+
+const PRIME_AGENT_WATCHER_SIGNATURE = "// Superset Prime Agent watcher";
 
 const PRIME_AGENT_EXTENSION_SIGNATURE = "// Superset Prime Agent extension";
 
@@ -51,6 +54,9 @@ const PRIME_AGENT_PASSTHROUGH_COMMANDS = [
 	"model",
 	"session",
 	"config",
+	"telemetry",
+	"factory",
+	"prompt",
 	"--help",
 	"-h",
 	"--version",
@@ -69,6 +75,10 @@ export function getPrimeAgentExtensionContent(): string {
 	return fs.readFileSync(getTemplatePath(PRIME_AGENT_EXTENSION_FILE), "utf8");
 }
 
+export function getPrimeAgentWatcherPath(): string {
+	return path.join(getHooksDir(), PRIME_AGENT_WATCHER_FILE);
+}
+
 export function createPrimeAgentExtension(): void {
 	const changed = writeFileIfChanged(
 		getPrimeAgentExtensionPath(),
@@ -78,10 +88,19 @@ export function createPrimeAgentExtension(): void {
 	console.log(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Prime Agent extension`,
 	);
+	const watcherChanged = writeFileIfChanged(
+		getPrimeAgentWatcherPath(),
+		fs.readFileSync(getTemplatePath(PRIME_AGENT_WATCHER_FILE), "utf8"),
+		0o644,
+	);
+	console.log(
+		`[agent-setup] ${watcherChanged ? "Updated" : "Verified"} Prime Agent watcher`,
+	);
 }
 
 export function getPrimeAgentWrapperScript(): string {
 	const extensionPath = quoteShellLiteral(getPrimeAgentExtensionPath());
+	const watcherPath = quoteShellLiteral(getPrimeAgentWatcherPath());
 	const bridgeTemplate = quoteShellLiteral(
 		path.join(getHooksDir(), "prime-agent-XXXXXXXX"),
 	);
@@ -103,7 +122,45 @@ export function getPrimeAgentWrapperScript(): string {
   ${PRIME_AGENT_PASSTHROUGH_COMMANDS.join("|")})
     exec "$REAL_BIN" "$@" ;;
 esac
-if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -f ${extensionPath} ]; then
+# Prime Agent's Rust build dropped JS extensions and rejects --extension, so
+# the bridge is only passed to a build whose help still lists the flag. Other
+# builds get a watcher that polls \`sessions --json\` for the status instead.
+_superset_prime_has_extension=""
+if [ -n "$SUPERSET_TERMINAL_ID" ] \\
+  && "$REAL_BIN" --help 2>/dev/null | grep -Eq -- '(^|[[:space:],])--extension([[:space:],=<]|$)'; then
+  _superset_prime_has_extension="1"
+fi
+if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -z "$_superset_prime_has_extension" ] \\
+  && [ -f ${watcherPath} ] && command -v node >/dev/null 2>&1; then
+  # The TUI sends an argv message again on every reconnect, so the watcher
+  # sends it once instead.
+  _superset_prime_prompt=""
+  _superset_prime_prompt_dir="$(mktemp -d "\${TMPDIR:-/tmp}/superset-prime-prompt.XXXXXXXX" 2>/dev/null)"
+  if [ -n "$_superset_prime_prompt_dir" ] \\
+    && node ${watcherPath} split "$_superset_prime_prompt_dir/prompt" "$_superset_prime_prompt_dir/args" "$@" </dev/null \\
+    && [ -f "$_superset_prime_prompt_dir/prompt" ]; then
+    _superset_prime_args=()
+    while IFS= read -r -d '' _superset_prime_arg; do
+      _superset_prime_args+=("$_superset_prime_arg")
+    done < "$_superset_prime_prompt_dir/args"
+    rm -f "$_superset_prime_prompt_dir/args"
+    set -- \${_superset_prime_args[@]+"\${_superset_prime_args[@]}"}
+    _superset_prime_prompt="$_superset_prime_prompt_dir/prompt"
+  fi
+  node ${watcherPath} "$$" "$REAL_BIN" "$PWD" "$_superset_prime_prompt" </dev/null >/dev/null 2>&1 &
+  _superset_prime_watcher_pid=$!
+  "$REAL_BIN" "$@"
+  _superset_prime_status=$?
+  kill -TERM "$_superset_prime_watcher_pid" 2>/dev/null
+  wait "$_superset_prime_watcher_pid" 2>/dev/null
+  if [ -n "$_superset_prime_prompt" ] && [ -f "$_superset_prime_prompt" ]; then
+    echo "Paradev: could not send the first prompt to Prime Agent. It is saved in $_superset_prime_prompt" >&2
+  elif [ -n "$_superset_prime_prompt_dir" ]; then
+    rm -rf "$_superset_prime_prompt_dir"
+  fi
+  exit $_superset_prime_status
+fi
+if [ -n "$_superset_prime_has_extension" ] && [ -f ${extensionPath} ]; then
   _superset_prime_bridge_dir="$(mktemp -d ${bridgeTemplate} 2>/dev/null)"
   if [ -n "$_superset_prime_bridge_dir" ] && node -e ${quoteShellLiteral(writeBridge)} "$_superset_prime_bridge_dir/bridge.mjs" ${extensionPath}; then
     trap 'if [ ! -f "$_superset_prime_bridge_dir/bridge.mjs.loaded" ]; then
@@ -133,5 +190,10 @@ export function removePrimeAgentExtension(): void {
 		getPrimeAgentExtensionPath(),
 		PRIME_AGENT_EXTENSION_SIGNATURE,
 		"Prime Agent extension",
+	);
+	removeOwnedFileIfMarked(
+		getPrimeAgentWatcherPath(),
+		PRIME_AGENT_WATCHER_SIGNATURE,
+		"Prime Agent watcher",
 	);
 }
