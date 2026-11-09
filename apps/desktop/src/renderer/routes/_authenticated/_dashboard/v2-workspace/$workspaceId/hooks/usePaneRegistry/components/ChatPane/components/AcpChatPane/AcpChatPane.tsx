@@ -20,6 +20,7 @@ import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
+import { StoredChatTranscript } from "../../../../../../components/StoredChatTranscript";
 import type { OpenFile } from "../../../../../../types";
 import {
 	ignoreChatTerminal,
@@ -49,6 +50,7 @@ import { DraftChat } from "./components/DraftChat";
 import { MoveProgress } from "./components/MoveProgress";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
+import { useStoredChatSnapshot } from "./hooks/useStoredChatSnapshot";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
 import {
@@ -150,6 +152,7 @@ export function AcpChatPane({
 	const { t } = useLingui();
 	const snapshotWorktree = useChatTurnSnapshotsEnabled();
 	const { client, wiring } = useSessionClient(sessionId);
+	const storedSnapshot = useStoredChatSnapshot(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
 	const hostInfo = useHostServiceInfo(hostUrl);
@@ -809,6 +812,26 @@ export function AcpChatPane({
 				</div>
 			);
 		}
+		if (storedSnapshot && sessionId) {
+			return (
+				<DraftChat
+					draftKey={draftKey}
+					getOpenFilePaths={getOpenFilePaths}
+					isActive={isActive}
+					onOpenHistory={onOpenHistory}
+					onQueue={onQueuePrompt}
+					queued={pendingPrompts}
+					transcript={
+						<StoredChatTranscript
+							chatId={sessionId}
+							pending={pendingPrompts}
+							snapshot={storedSnapshot}
+						/>
+					}
+					workspaceId={workspaceId}
+				/>
+			);
+		}
 		return draft();
 	}
 
@@ -828,6 +851,7 @@ export function AcpChatPane({
 					}
 				: {})}
 			key={sessionId}
+			storedSnapshot={storedSnapshot}
 			onPendingPromptsSent={onPendingPromptsSent}
 			onLaunchPromptDelivered={
 				launchPrompt ? onLaunchPromptDelivered : undefined

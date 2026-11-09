@@ -65,10 +65,6 @@ export const searchInputSchema = z.object({
 	limit: z.number().int().min(1).max(50).default(20),
 });
 
-export const chatsOfWorkspaceInputSchema = z.object({
-	workspaceId: z.string().uuid(),
-});
-
 export const chatEventsInputSchema = z.object({
 	chatSessionId: z.string().uuid(),
 	/** The seq of the last event already received. */

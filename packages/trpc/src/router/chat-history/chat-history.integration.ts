@@ -374,13 +374,10 @@ describe("stored chats of a sleeping cloud workspace", () => {
 			{ seq: 1, event: agentMessage("b1", "from a laptop") },
 		]);
 
-		const stored = await owner.ofWorkspace({ workspaceId: MY_CLOUD });
-		expect(stored.map((chat) => chat.id)).toContain(cloudChat);
 		const page = await owner.events({ chatSessionId: cloudChat });
 		expect(page.epoch).toBe("epoch-1");
 		expect(page.events.map(({ event }) => event.type)).toEqual(["item"]);
 
-		expect(await owner.ofWorkspace({ workspaceId: WORKSPACE })).toEqual([]);
 		expect(await owner.events({ chatSessionId: laptopChat })).toEqual({
 			epoch: null,
 			events: [],
