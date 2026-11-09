@@ -142,9 +142,9 @@ msgstr "{0, plural, one {# chat gesloten} other {# chats gesloten}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# chat kon niet worden verplaatst. Open hem om het opnieuw te proberen.} other {# chats konden niet worden verplaatst. Open ze om het opnieuw te proberen.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# chat is in de oude werkruimte gebleven} other {# chats zijn in de oude werkruimte gebleven}}"
+#. placeholder {0}: move.stayed.length
+msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{0, plural, one {# chat is in de oude werkruimte gebleven.} other {# chats zijn in de oude werkruimte gebleven.}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -366,9 +366,9 @@ msgstr "{0, plural, one {Linear-issue} other {Linear-issues}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {# geselecteerde werkruimte naar een groep verplaatsen} other {# geselecteerde werkruimtes naar een groep verplaatsen}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {# chat wordt hierheen verplaatst…} other {# chats worden hierheen verplaatst…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Chat wordt verplaatst…} other {Chats worden verplaatst…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1369,9 +1369,6 @@ msgstr "{starCount} sterren en het worden er meer"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisering gestart} other {# automatiseringen gestart}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Deze werkruimte is verplaatst. # chat is hier gebleven.} other {Deze werkruimte is verplaatst. # chats zijn hier gebleven.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent actief} other {# subagents actief}}"
 
@@ -1395,9 +1392,6 @@ msgstr "{threshold, plural, one {# agent-PR gemerged} other {# agent-PR's gemerg
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} onderbroken"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {{ready} van # chat hierheen verplaatst} other {{ready} van # chats hierheen verplaatst}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {De check is geslaagd} other {Alle # checks geslaagd}}"
@@ -12173,9 +12167,6 @@ msgstr "{name} wordt verplaatst naar {destination}"
 msgid "Moving this chat here"
 msgstr "Deze chat wordt hierheen verplaatst"
 
-msgid "Moving this workspace here…"
-msgstr "Deze werkruimte wordt hierheen verplaatst…"
-
 msgid "Moving this workspace…"
 msgstr "Deze werkruimte wordt verplaatst…"
 
@@ -18959,6 +18950,9 @@ msgstr "Cloudwerkruimte starten"
 msgid "Starting the agent…"
 msgstr "Agent starten…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Cloudwerkruimte wordt gestart…"
+
 msgid "Starting the simulator…"
 msgstr "Simulator wordt gestart…"
 
@@ -19986,9 +19980,6 @@ msgstr "Er is een time-out opgetreden bij het verplaatsen."
 msgid "The move was cancelled."
 msgstr "Het verplaatsen is geannuleerd."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "Het verplaatsen is gestopt. Deze werkruimte is hier gebleven."
-
 msgid "The name of your organization or team"
 msgstr "De naam van je organisatie of team"
 
@@ -20626,9 +20617,6 @@ msgstr "Hiermee worden alle gestagede wijzigingen ge-unstaged en teruggedraaid. 
 
 msgid "This workspace"
 msgstr "Deze werkruimte"
-
-msgid "This workspace couldn't move."
-msgstr "Deze werkruimte kon niet worden verplaatst."
 
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"

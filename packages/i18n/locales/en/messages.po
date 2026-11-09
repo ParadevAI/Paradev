@@ -142,9 +142,9 @@ msgstr "{0, plural, one {# chat closed} other {# chats closed}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+#. placeholder {0}: move.stayed.length
+msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -366,9 +366,9 @@ msgstr "{0, plural, one {Linear issue} other {Linear issues}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1369,9 +1369,6 @@ msgstr "{starCount} stars and counting"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Started # automation} other {Started # automations}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 
@@ -1395,9 +1392,6 @@ msgstr "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrupted"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {The check passed} other {All # checks passed}}"
@@ -12173,9 +12167,6 @@ msgstr "Moving {name} to {destination}"
 msgid "Moving this chat here"
 msgstr "Moving this chat here"
 
-msgid "Moving this workspace here…"
-msgstr "Moving this workspace here…"
-
 msgid "Moving this workspace…"
 msgstr "Moving this workspace…"
 
@@ -18959,6 +18950,9 @@ msgstr "Starting cloud workspace"
 msgid "Starting the agent…"
 msgstr "Starting the agent…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Starting the cloud workspace…"
+
 msgid "Starting the simulator…"
 msgstr "Starting the simulator…"
 
@@ -19986,9 +19980,6 @@ msgstr "The move timed out."
 msgid "The move was cancelled."
 msgstr "The move was cancelled."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "The move was stopped. This workspace stayed here."
-
 msgid "The name of your organization or team"
 msgstr "The name of your organization or team"
 
@@ -20626,9 +20617,6 @@ msgstr "This will unstage and revert all staged changes. Staged new files will b
 
 msgid "This workspace"
 msgstr "This workspace"
-
-msgid "This workspace couldn't move."
-msgstr "This workspace couldn't move."
 
 msgid "This workspace has no project to branch from"
 msgstr "This workspace has no project to branch from"

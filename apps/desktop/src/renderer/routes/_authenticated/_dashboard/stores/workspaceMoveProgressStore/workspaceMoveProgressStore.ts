@@ -16,6 +16,12 @@ export interface WorkspaceMoveProgress {
 	workspaceMoveId: string | null;
 	name: string;
 	destination: string;
+	/** A new cloud workspace boots before any chat can copy into it. */
+	toCloud: boolean;
+	/** Chats with a conversation that stayed in the old workspace. */
+	stayed: string[];
+	/** Opens the new workspace, once there is one. */
+	open: (() => void) | null;
 	stage: WorkspaceMoveProgressStage;
 	chats: { total: number; ready: number; failed: number } | null;
 	error: string | null;

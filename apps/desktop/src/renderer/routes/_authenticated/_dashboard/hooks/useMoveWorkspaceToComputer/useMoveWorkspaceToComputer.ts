@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
@@ -35,7 +34,6 @@ export type MoveDestination = { hostId: string; name: string | null };
  */
 export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { t } = useLingui();
-	const navigate = useNavigate();
 	const { activeHostUrl, machineId, activeOrganizationId } =
 		useLocalHostService();
 	const relayUrl = useRelayUrl();
@@ -197,15 +195,6 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					title: chat.title,
 				});
 			}
-			await navigate({
-				to: "/v2-workspace/$workspaceId",
-				params: { workspaceId: created.workspaceId },
-			}).catch((error: unknown) => {
-				console.warn(
-					"[workspace-move] could not open the new workspace",
-					error,
-				);
-			});
 			// Each chat's pane shows how far its move got, its failure and a retry.
 			void (async () => {
 				for (const { moveId } of moves) {
@@ -220,10 +209,11 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			})();
 			return {
 				toWorkspaceId: created.workspaceId,
-				skipped: [
-					...prepared.skipped,
+				// A chat that never had a message has nothing to lose by staying.
+				stayed: [
+					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
-				],
+				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
 			};
 		},
 		[
@@ -236,7 +226,6 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			cloudWorkspaces,
 			projects,
 			submit,
-			navigate,
 			collections,
 		],
 	);

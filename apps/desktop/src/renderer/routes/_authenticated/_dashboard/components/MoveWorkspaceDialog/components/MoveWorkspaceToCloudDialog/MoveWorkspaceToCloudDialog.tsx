@@ -28,7 +28,7 @@ import {
 import { useMoveWorkspaceToCloud } from "../../../../hooks/useMoveWorkspaceToCloud";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
 import { startWorkspaceMoveProgress } from "../../../../utils/startWorkspaceMoveProgress";
-import { useReportSkippedChats } from "../../hooks/useReportSkippedChats";
+import { navigateToV2Workspace } from "../../../../utils/workspace-navigation";
 
 interface MoveWorkspaceToCloudDialogProps {
 	open: boolean;
@@ -49,7 +49,6 @@ export function MoveWorkspaceToCloudDialog({
 	const organizationId = useActiveOrganizationId();
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 	const moveWorkspaceToCloud = useMoveWorkspaceToCloud(workspace);
-	const reportSkipped = useReportSkippedChats();
 	const projectId = workspace.projectId;
 
 	const { projects } = useHostProjects();
@@ -95,6 +94,8 @@ export function MoveWorkspaceToCloudDialog({
 		const progress = startWorkspaceMoveProgress({
 			name: workspace.name,
 			destination: t({ message: "the cloud" }),
+			toCloud: true,
+			sourceWorkspaceId: workspace.id,
 			retry: move,
 		});
 		onOpenChange(false);
@@ -109,10 +110,12 @@ export function MoveWorkspaceToCloudDialog({
 			onBegun: progress.begun,
 			signal: progress.signal,
 		})
-			.then(({ toWorkspaceId, skipped }) => {
-				progress.follow(toWorkspaceId);
-				reportSkipped(skipped);
-			})
+			.then(({ toWorkspaceId, stayed }) =>
+				progress.follow(toWorkspaceId, {
+					stayed,
+					open: () => void navigateToV2Workspace(toWorkspaceId, navigate),
+				}),
+			)
 			.catch((error: unknown) =>
 				progress.fail(
 					isMissingProcedureError(error)

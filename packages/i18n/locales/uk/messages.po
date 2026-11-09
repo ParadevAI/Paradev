@@ -136,9 +136,9 @@ msgstr "{0, plural, one {Закрито # чат} few {Закрито # чати
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# чат не вдалося перемістити. Відкрийте його, щоб спробувати ще раз.} few {# чати не вдалося перемістити. Відкрийте їх, щоб спробувати ще раз.} many {# чатів не вдалося перемістити. Відкрийте їх, щоб спробувати ще раз.} other {# чату не вдалося перемістити. Відкрийте їх, щоб спробувати ще раз.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# чат залишився в старому робочому просторі} few {# чати залишилися в старому робочому просторі} many {# чатів залишилися в старому робочому просторі} other {# чату залишилося в старому робочому просторі}}"
+#. placeholder {0}: move.stayed.length
+msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{0, plural, one {# чат залишився в старому робочому просторі.} few {# чати залишилися в старому робочому просторі.} many {# чатів залишилися в старому робочому просторі.} other {# чату залишилося в старому робочому просторі.}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -360,9 +360,9 @@ msgstr "{0, plural, one {issue з Linear} few {issues з Linear} many {issues з
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Перемістити # вибраний робочий простір у групу} few {Перемістити # вибрані робочі простори в групу} many {Перемістити # вибраних робочих просторів у групу} other {Перемістити # вибраного робочого простору в групу}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Сюди переміщується # чат…} few {Сюди переміщуються # чати…} many {Сюди переміщуються # чатів…} other {Сюди переміщуються # чату…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Переміщення чату…} few {Переміщення чатів…} many {Переміщення чатів…} other {Переміщення чатів…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1363,9 +1363,6 @@ msgstr "{starCount} зірок, і це не межа"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущено # автоматизацію} few {Запущено # автоматизації} many {Запущено # автоматизацій} other {Запущено # автоматизації}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Цей робочий простір переміщено. # чат залишився тут.} few {Цей робочий простір переміщено. # чати залишилися тут.} many {Цей робочий простір переміщено. # чатів залишилися тут.} other {Цей робочий простір переміщено. # чату залишилося тут.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {Працює # субагент} few {Працюють # субагенти} many {Працює # субагентів} other {Працює # субагента}}"
 
@@ -1389,9 +1386,6 @@ msgstr "{threshold, plural, one {Злито # агентський PR} few {Зл
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {Сюди переміщено {ready} з # чату} few {Сюди переміщено {ready} з # чатів} many {Сюди переміщено {ready} з # чатів} other {Сюди переміщено {ready} з # чату}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, =1 {Перевірку пройдено} one {Пройдено всі перевірки: #} few {Пройдено всі перевірки: #} many {Пройдено всі перевірки: #} other {Пройдено всі перевірки: #}}"
@@ -12167,9 +12161,6 @@ msgstr "Переміщення {name}: {destination}"
 msgid "Moving this chat here"
 msgstr "Перенесення цього чату сюди"
 
-msgid "Moving this workspace here…"
-msgstr "Цей робочий простір переміщується сюди…"
-
 msgid "Moving this workspace…"
 msgstr "Цей робочий простір переміщується…"
 
@@ -18953,6 +18944,9 @@ msgstr "Запуск хмарного робочого простору"
 msgid "Starting the agent…"
 msgstr "Запускаємо агента…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Запуск хмарного робочого простору…"
+
 msgid "Starting the simulator…"
 msgstr "Запускаємо симулятор…"
 
@@ -19980,9 +19974,6 @@ msgstr "Час очікування переміщення минув."
 msgid "The move was cancelled."
 msgstr "Перенесення скасовано."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "Переміщення зупинено. Цей робочий простір залишився тут."
-
 msgid "The name of your organization or team"
 msgstr "Назва вашої організації чи команди"
 
@@ -20620,9 +20611,6 @@ msgstr "Це зніме з індексу та відкотить усі про�
 
 msgid "This workspace"
 msgstr "Цей робочий простір"
-
-msgid "This workspace couldn't move."
-msgstr "Не вдалося перемістити цей робочий простір."
 
 msgid "This workspace has no project to branch from"
 msgstr "У цього робочого простору немає проєкту, від якого можна створити гілку"

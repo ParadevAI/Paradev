@@ -142,9 +142,9 @@ msgstr "{0, plural, one {# chat fechado} other {# chats fechados}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# chat não pôde ser movido. Abra-o para tentar novamente.} other {# chats não puderam ser movidos. Abra-os para tentar novamente.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# chat ficou na área de trabalho antiga} other {# chats ficaram na área de trabalho antiga}}"
+#. placeholder {0}: move.stayed.length
+msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{0, plural, one {# chat ficou na área de trabalho antiga.} other {# chats ficaram na área de trabalho antiga.}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -366,9 +366,9 @@ msgstr "{0, plural, one {issue do Linear} other {issues do Linear}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Mover # área de trabalho selecionada para um grupo} other {Mover # áreas de trabalho selecionadas para um grupo}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Movendo # chat para cá…} other {Movendo # chats para cá…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Movendo o chat…} other {Movendo os chats…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -1369,9 +1369,6 @@ msgstr "{starCount} estrelas e subindo"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automação iniciada} other {# automações iniciadas}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Esta área de trabalho foi movida. # chat ficou aqui.} other {Esta área de trabalho foi movida. # chats ficaram aqui.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagente em execução} other {# subagentes em execução}}"
 
@@ -1395,9 +1392,6 @@ msgstr "{threshold, plural, one {# PR de agente mesclado} other {# PRs de agente
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrompida"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {{ready} de # chat movido para cá} other {{ready} de # chats movidos para cá}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {A verificação passou} other {Todas as # verificações passaram}}"
@@ -12173,9 +12167,6 @@ msgstr "Movendo {name} para {destination}"
 msgid "Moving this chat here"
 msgstr "Movendo este chat para cá"
 
-msgid "Moving this workspace here…"
-msgstr "Movendo esta área de trabalho para cá…"
-
 msgid "Moving this workspace…"
 msgstr "Movendo esta área de trabalho…"
 
@@ -18959,6 +18950,9 @@ msgstr "Iniciando a área de trabalho na nuvem"
 msgid "Starting the agent…"
 msgstr "Iniciando o agente…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Iniciando a área de trabalho na nuvem…"
+
 msgid "Starting the simulator…"
 msgstr "Iniciando o simulador…"
 
@@ -19986,9 +19980,6 @@ msgstr "A movimentação excedeu o tempo limite."
 msgid "The move was cancelled."
 msgstr "A movimentação foi cancelada."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "A movimentação foi interrompida. Esta área de trabalho ficou aqui."
-
 msgid "The name of your organization or team"
 msgstr "O nome da sua organização ou equipe"
 
@@ -20626,9 +20617,6 @@ msgstr "Isso remove do stage e reverte todas as alterações no stage. Arquivos 
 
 msgid "This workspace"
 msgstr "Esta área de trabalho"
-
-msgid "This workspace couldn't move."
-msgstr "Não foi possível mover esta área de trabalho."
 
 msgid "This workspace has no project to branch from"
 msgstr "Este workspace não tem projeto do qual ramificar"

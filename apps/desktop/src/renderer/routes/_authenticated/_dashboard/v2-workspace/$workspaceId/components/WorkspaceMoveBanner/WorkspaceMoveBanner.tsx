@@ -1,4 +1,3 @@
-import { plural } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
@@ -9,10 +8,7 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useWorkspaceMoveProgressStore } from "renderer/routes/_authenticated/_dashboard/stores/workspaceMoveProgressStore";
-import {
-	describeMoveError,
-	MOVE_CANCELLED,
-} from "renderer/routes/_authenticated/_dashboard/utils/describeMoveError";
+import { MOVE_CANCELLED } from "renderer/routes/_authenticated/_dashboard/utils/describeMoveError";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 
 const POLL_MS = 2_000;
@@ -48,79 +44,46 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 				description: errorMessage(error, t({ message: "Unknown error" })),
 			}),
 	});
+	const trackedHere = useWorkspaceMoveProgressStore((state) =>
+		Object.values(state.moves).some(
+			(progress) => move !== undefined && progress.workspaceMoveId === move?.id,
+		),
+	);
 	if (!move || move.id === dismissed) return null;
 
 	const inFlight = IN_FLIGHT.has(move.status);
 	const destination = move.toWorkspaceId;
-	const isSource = move.fromWorkspaceId === workspaceId;
-	const stayed = move.chats.total - move.chats.ready;
 	const isMine = move.isMine !== false;
-	const cancellable =
-		isMine && isSource && move.status === "pending" && !move.toWorkspaceId;
-	const cancelled = move.status === "failed" && move.error === MOVE_CANCELLED;
-	const failure =
-		move.status === "failed" && !cancelled
-			? describeMoveError(move.error)
-			: null;
-	const cancel = () => {
-		stopLocalProgress(move.id);
+	// Only the workspace that moved says so; the new one shows its chats.
+	if (move.fromWorkspaceId !== workspaceId) return null;
+	// The mover's toast already says how it is going.
+	if (inFlight && isMine && trackedHere) return null;
+	// A move that never left is not news once its toast is gone.
+	if (!inFlight && !destination) return null;
+	// The box failed to start and no chat arrived: nothing moved.
+	if (move.status === "failed" && move.chats.ready === 0) return null;
+	const cancellable = isMine && move.status === "pending" && !destination;
+	const cancel = () =>
 		abandon.mutate({ workspaceMoveId: move.id, error: MOVE_CANCELLED });
-	};
-	let label: ReactNode = null;
-	if (cancelled) {
-		if (!isSource) return null;
-		label = <Trans>The move was stopped. This workspace stayed here.</Trans>;
-	} else if (failure) {
-		if (!isSource) return null;
-		label =
-			destination && move.chats.ready > 0 ? (
-				<Plural
-					value={move.chats.total - move.chats.ready}
-					one="This workspace moved. Its # chat stayed here."
-					other="This workspace moved. Its # chats stayed here."
-				/>
-			) : (
-				<Trans>This workspace couldn't move.</Trans>
-			);
-	} else if (isSource) {
-		if (inFlight) {
-			label = isMine ? (
-				<Trans>Moving this workspace…</Trans>
-			) : (
-				<Trans>Someone is moving this workspace…</Trans>
-			);
-		} else if (move.status === "ready") {
-			label = <Trans>This workspace moved</Trans>;
-		} else if (move.status === "partial") {
-			label = (
-				<Plural
-					value={stayed}
-					one="This workspace moved. # chat stayed here."
-					other="This workspace moved. # chats stayed here."
-				/>
-			);
-		}
-	} else if (inFlight) {
-		label =
-			move.chats.total > 0 ? (
-				<Plural
-					value={move.chats.total - move.chats.ready - move.chats.failed}
-					one="Moving # chat here…"
-					other="Moving # chats here…"
-				/>
-			) : (
-				<Trans>Moving this workspace here…</Trans>
-			);
-	} else if (move.status === "partial") {
-		const { ready, total } = move.chats;
-		label = t({
-			message: plural(total, {
-				one: `${ready} of # chat moved here`,
-				other: `${ready} of # chats moved here`,
-			}),
-		});
+	const stayed = move.chats.total - move.chats.ready;
+	let label: ReactNode;
+	if (inFlight) {
+		label = isMine ? (
+			<Trans>Moving this workspace…</Trans>
+		) : (
+			<Trans>Someone is moving this workspace…</Trans>
+		);
+	} else if (stayed === 0) {
+		label = <Trans>This workspace moved</Trans>;
+	} else {
+		label = (
+			<Plural
+				value={move.chats.total - move.chats.ready}
+				one="This workspace moved. Its # chat stayed here."
+				other="This workspace moved. Its # chats stayed here."
+			/>
+		);
 	}
-	if (!label) return null;
 
 	return (
 		<div className="pointer-events-none absolute inset-x-0 top-20 z-20 flex justify-center px-4">
@@ -128,12 +91,7 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 				aria-live="polite"
 				className="pointer-events-auto flex max-w-full items-center gap-2.5 rounded-full border border-border bg-popover py-1.5 pr-1.5 pl-3 text-sm text-popover-foreground shadow-lg"
 			>
-				<span
-					className="truncate font-medium"
-					title={failure ? (failure.details ?? failure.reason) : undefined}
-				>
-					{label}
-				</span>
+				<span className="truncate font-medium">{label}</span>
 				{cancellable ? (
 					<button
 						type="button"
@@ -144,7 +102,7 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 						<Trans>Cancel move</Trans>
 					</button>
 				) : null}
-				{isSource && !inFlight && destination ? (
+				{!inFlight && destination ? (
 					<button
 						type="button"
 						onClick={() => void navigateToV2Workspace(destination, navigate)}
@@ -166,12 +124,4 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 			</div>
 		</div>
 	);
-}
-
-/** The toast of a move this app is running stops at once, not at the next heartbeat. */
-function stopLocalProgress(workspaceMoveId: string): void {
-	const { moves } = useWorkspaceMoveProgressStore.getState();
-	for (const progress of Object.values(moves)) {
-		if (progress.workspaceMoveId === workspaceMoveId) progress.cancel?.();
-	}
 }

@@ -757,6 +757,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			if (!options.live.supports(session.harness)) {
 				throw new Error(`unknown harness ${session.harness}`);
 			}
+			// A chat moved from another host keeps the mode, model and effort it had there.
+			const replay = replaySession(input.sessionId);
+			const selections = replay.ok
+				? sessionSelections(replay.snapshot.session)
+				: {};
 			const opened = options.journal.open({
 				sessionId: input.sessionId,
 				scopeId: session.scopeId,
@@ -779,6 +784,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				scopeId: session.scopeId,
 				harness: session.harness,
 				cwd: input.cwd,
+				...selections,
 				// The history is already in the journal: replaying it again would show it twice.
 				resume: { harnessSessionId: input.harnessSessionId, quiet: true },
 				terminalId: input.terminalId,
