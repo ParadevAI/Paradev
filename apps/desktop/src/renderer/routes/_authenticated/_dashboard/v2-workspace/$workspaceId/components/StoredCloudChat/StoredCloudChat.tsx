@@ -1,11 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	keepPreviousData,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useEffect } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
@@ -42,17 +40,13 @@ export function StoredCloudChat({
 	const { t } = useLingui();
 	const queryClient = useQueryClient();
 	const secondsLeft = useCountdown(WAKE_UP_ESTIMATE_SECONDS);
-	const enabled = useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
-	const chats = cloudTrpc.chatHistory.ofWorkspace.useQuery(
-		{ workspaceId },
-		{ enabled },
-	);
+	const chats = cloudTrpc.chatHistory.ofWorkspace.useQuery({ workspaceId });
 	const chatId = chats.data?.[0]?.id ?? null;
 	const stored = useQuery(
 		{
 			queryKey: storedChatSnapshotKey(chatId),
 			queryFn: () => loadStoredChatSnapshot(chatId as string),
-			enabled: enabled && chatId !== null,
+			enabled: chatId !== null,
 			placeholderData: keepPreviousData,
 			staleTime: STALE_MS,
 			retry: false,
@@ -77,7 +71,7 @@ export function StoredCloudChat({
 			});
 		}
 	}, [chats.data]);
-	if (!enabled || !chatId || !stored.data) return fallback;
+	if (!chatId || !stored.data) return fallback;
 	return (
 		<div
 			className="relative flex h-full w-full flex-col"
