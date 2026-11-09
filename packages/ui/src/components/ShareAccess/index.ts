@@ -1,4 +1,4 @@
-export { shareDirectory } from "@superset/shared/sharing";
+export { shareDirectory, shareUiEventPayload } from "@superset/shared/sharing";
 export {
 	keepOpenForToasts,
 	keepOpenWhileInviting,

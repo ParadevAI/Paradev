@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
+import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
 import { effectiveRole, sortGrantees } from "@superset/shared/sharing";
 import { Check, Link2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -21,6 +21,7 @@ import type {
 	ShareGranteeRef,
 	SharePerson,
 	ShareRoleOption,
+	ShareUiEvent,
 } from "./types";
 
 const COPIED_MS = 1500;
@@ -50,6 +51,11 @@ export interface ShareAccessProps {
 	onCopyLink: () => Promise<void>;
 	/** Extra sections, after general access. */
 	children?: ReactNode;
+	/**
+	 * Analytics hook: opened on mount, closed (and whether anything was shared)
+	 * on unmount, and failed shares. Mount it only while the dialog is open.
+	 */
+	onEvent?: (event: ShareUiEvent) => void;
 }
 
 function refOf(grantee: ShareGrantee): ShareGranteeRef {
@@ -89,8 +95,10 @@ export function ShareAccess({
 	onResendInvite,
 	onCopyLink,
 	children,
+	onEvent,
 }: ShareAccessProps) {
 	const { t } = useLingui();
+	const trackedAdd = useShareEvents(onAdd, onEvent);
 	const [copied, setCopied] = useState(false);
 	const [view, setView] = useState<{ query: string } | null>(null);
 	const highlighted = useNewKeys(grantees.map(keyOf));
@@ -154,7 +162,7 @@ export function ShareAccess({
 				defaultRole={defaultRole}
 				roleNote={roleNote}
 				initialQuery={view.query}
-				onAdd={onAdd}
+				onAdd={trackedAdd}
 				onUpgrade={onUpgrade}
 				onBack={() => setView(null)}
 				onDone={() => setView(null)}
@@ -299,6 +307,41 @@ export function ShareAccess({
 			{children}
 		</div>
 	);
+}
+
+/**
+ * Reports the dialog's lifetime to `onEvent` and wraps `onAdd` so failures are
+ * reported and successes mark the session as shared. The latest `onEvent` is
+ * read through a ref, so an inline callback doesn't re-fire opened.
+ */
+function useShareEvents(
+	onAdd: ShareAccessProps["onAdd"],
+	onEvent: ShareAccessProps["onEvent"],
+): ShareAccessProps["onAdd"] {
+	const onEventRef = useRef(onEvent);
+	onEventRef.current = onEvent;
+	const shared = useRef(false);
+
+	useEffect(() => {
+		onEventRef.current?.({ type: "opened" });
+		return () => {
+			onEventRef.current?.({ type: "closed", shared: shared.current });
+		};
+	}, []);
+
+	return async (request) => {
+		try {
+			await onAdd(request);
+			shared.current = true;
+		} catch (error) {
+			onEventRef.current?.({
+				type: "failed",
+				request,
+				error: rawErrorMessage(error),
+			});
+			throw error;
+		}
+	};
 }
 
 /** Keys that appeared since the last render, for a moment, so new rows stand out. */

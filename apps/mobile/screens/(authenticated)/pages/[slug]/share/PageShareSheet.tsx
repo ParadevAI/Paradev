@@ -4,6 +4,7 @@ import {
 	granteeKey,
 	ShareAccessSheet,
 	useShareDirectory,
+	useShareSession,
 } from "@/screens/(authenticated)/components/ShareAccess";
 import { usePageQuery } from "../../hooks/usePages";
 import {
@@ -28,6 +29,7 @@ export function PageShareSheet() {
 	const share = useShareDirectory();
 	const roles = usePageShareRoles();
 	const general = usePageGeneralAccess(slug);
+	useShareSession("page");
 
 	const owner = access.data?.owner;
 	const canManage =

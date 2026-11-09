@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
+import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
 import {
 	getInvitableRoles,
 	type OrganizationRole,
@@ -10,6 +10,7 @@ import {
 	type InviteNewMode,
 	type ShareAddRequest,
 	type ShareGranteeRef,
+	type ShareResourceKind,
 	shareDirectory,
 } from "@superset/shared/sharing";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ import { apiClient } from "@/lib/trpc/client";
 import { billingSettingsUrl } from "@/lib/web-links";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { useOrgMembers } from "@/screens/(authenticated)/hooks/useOrgMembers";
+import { captureShareEvent, markShared } from "../../utils/shareSession";
 
 /** Who the share sheet can find in the active organization, and whether new people can be invited. */
 export function useShareDirectory() {
@@ -87,9 +89,11 @@ export function useShareDirectory() {
 
 	/** Invites any new emails, then grants everyone access through `add`. Resolves false after showing the error. */
 	const share = async (
-		{ grantees, emails, role }: ShareAddRequest,
+		request: ShareAddRequest,
 		add: (grantees: ShareGranteeRef[], role: string) => Promise<unknown>,
+		resourceKind: ShareResourceKind,
 	) => {
+		const { grantees, emails, role } = request;
 		try {
 			const invitationIds = await inviteEmails(emails);
 			await add(
@@ -104,9 +108,14 @@ export function useShareDirectory() {
 				],
 				role,
 			);
+			markShared();
 			void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 			return true;
 		} catch (error) {
+			captureShareEvent(
+				{ type: "failed", request, error: rawErrorMessage(error) },
+				resourceKind,
+			);
 			Alert.alert(errorMessage(error, t({ message: "Could not share" })));
 			return false;
 		}

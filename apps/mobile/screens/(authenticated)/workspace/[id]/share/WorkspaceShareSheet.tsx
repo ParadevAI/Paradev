@@ -5,6 +5,7 @@ import {
 	granteeKey,
 	ShareAccessSheet,
 	useShareDirectory,
+	useShareSession,
 } from "@/screens/(authenticated)/components/ShareAccess";
 import { useWorkspaceGeneralAccess } from "./hooks/useWorkspaceGeneralAccess";
 import { useWorkspaceShareRoles } from "./hooks/useWorkspaceShareRoles";
@@ -18,6 +19,7 @@ export function WorkspaceShareSheet() {
 	const share = useShareDirectory();
 	const roles = useWorkspaceShareRoles();
 	const general = useWorkspaceGeneralAccess(id);
+	useShareSession("cloud_workspace");
 
 	return (
 		<ShareAccessSheet

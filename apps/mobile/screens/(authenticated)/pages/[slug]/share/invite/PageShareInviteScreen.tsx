@@ -29,11 +29,14 @@ export function PageShareInviteScreen() {
 			defaultRole="comment"
 			onUpgrade={share.onUpgrade}
 			onSubmit={(request) =>
-				share.share(request, (grantees, role) =>
-					mutations.add.mutateAsync({
-						grantees,
-						role: role === "view" ? "view" : "comment",
-					}),
+				share.share(
+					request,
+					(grantees, role) =>
+						mutations.add.mutateAsync({
+							grantees,
+							role: role === "view" ? "view" : "comment",
+						}),
+					"page",
 				)
 			}
 		/>

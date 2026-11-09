@@ -1,3 +1,4 @@
+export * from "./analytics";
 export * from "./effectiveRole";
 export * from "./inviteSuggestions";
 export * from "./shareDirectory";

@@ -23,7 +23,11 @@ export function WorkspaceShareInviteScreen() {
 			defaultRole="full"
 			onUpgrade={share.onUpgrade}
 			onSubmit={(request) =>
-				share.share(request, (grantees) => add.mutateAsync(grantees))
+				share.share(
+					request,
+					(grantees) => add.mutateAsync(grantees),
+					"cloud_workspace",
+				)
 			}
 		/>
 	);

@@ -5,6 +5,7 @@ import type {
 	ShareDirectory,
 	ShareGrantee,
 	ShareGranteeRef,
+	ShareUiEvent,
 } from "../../../ShareAccess";
 
 export type { PageVisibility } from "@superset/shared/usercontent";
@@ -54,6 +55,8 @@ export interface PageHeaderSharing {
 	onSetRole: (grantee: ShareGranteeRef, role: PageShareRole) => Promise<void>;
 	onSetOrganizationRole: (role: PageShareRole) => Promise<void>;
 	onResendInvite: (invitationId: string) => Promise<void>;
+	/** Analytics for the share dialog; see `ShareAccess`'s `onEvent`. */
+	onEvent?: (event: ShareUiEvent) => void;
 }
 
 export interface PageHeaderActions {

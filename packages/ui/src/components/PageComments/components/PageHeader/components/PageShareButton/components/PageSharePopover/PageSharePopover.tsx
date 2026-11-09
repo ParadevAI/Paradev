@@ -181,6 +181,7 @@ export function PageSharePopover({
 						sharing.onSetRole(grantee, role as PageShareRole)
 					}
 					onResendInvite={sharing.onResendInvite}
+					onEvent={sharing.onEvent}
 					general={{
 						value: page.visibility,
 						options: [

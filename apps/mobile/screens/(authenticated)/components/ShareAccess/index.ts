@@ -4,6 +4,7 @@ export {
 	useGeneralAccess,
 } from "./hooks/useGeneralAccess";
 export { useShareDirectory } from "./hooks/useShareDirectory";
+export { useShareSession } from "./hooks/useShareSession";
 export { ShareAccessSheet } from "./ShareAccessSheet";
 export { ShareGeneralAccessSheet } from "./ShareGeneralAccessSheet";
 export { ShareGranteeSheet } from "./ShareGranteeSheet";

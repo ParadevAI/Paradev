@@ -12,6 +12,7 @@ import { LuBuilding2, LuLock } from "react-icons/lu";
 import { env } from "renderer/env.renderer";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { trackShareEvent } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useShareDirectory } from "../../hooks/useShareDirectory";
 import { SharePortsSection } from "./components/SharePortsSection";
@@ -110,6 +111,7 @@ export function CloudWorkspaceShareButton({
 					inviteNew={share.inviteNew}
 					onUpgrade={share.onUpgrade}
 					onCopyLink={() => copyToClipboard(linkUrl)}
+					onEvent={trackShareEvent("cloud_workspace")}
 					onAdd={async ({ grantees: picked, emails }) => {
 						const invitationIds = await share.inviteEmails(emails);
 						await add.mutateAsync({

@@ -8,8 +8,10 @@ export type {
 	ShareGrantee,
 	ShareGranteeRef,
 	SharePerson,
+	ShareResourceKind,
 	ShareRoleOption,
 	ShareTeam,
+	ShareUiEvent,
 	StagedPick,
 } from "@superset/shared/sharing";
 

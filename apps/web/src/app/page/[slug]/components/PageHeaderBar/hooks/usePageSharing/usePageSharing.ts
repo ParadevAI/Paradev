@@ -11,9 +11,11 @@ import {
 	type InviteNewMode,
 	type ShareGranteeRef,
 	shareDirectory,
+	shareUiEventPayload,
 } from "@superset/ui/share-access";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useMemo } from "react";
 import { useTRPC } from "@/trpc/react";
 
@@ -98,6 +100,10 @@ export function usePageSharing(pageId: string): PageHeaderSharing {
 			null,
 		inviteNew,
 		onUpgrade: () => router.push("/settings/billing"),
+		onEvent: (event) => {
+			const { name, properties } = shareUiEventPayload(event, "page");
+			posthog.capture(name, properties);
+		},
 		onAdd: async ({ grantees: picked, emails, role: shareRole }) => {
 			const invitationIds = await inviteEmails(emails);
 			await add.mutateAsync({
