@@ -97,6 +97,15 @@ export function usePageUpdateOffer<Next extends PageUpdateCandidate>({
 	}, [order]);
 
 	useEffect(() => {
+		setOffered((current) =>
+			current &&
+			(current.pageKey !== pageKey || current.shownVersion !== shownVersion)
+				? null
+				: current,
+		);
+	}, [pageKey, shownVersion]);
+
+	useEffect(() => {
 		if (paused || !missedWhilePaused.current) return;
 		missedWhilePaused.current = false;
 		void onPublished();
