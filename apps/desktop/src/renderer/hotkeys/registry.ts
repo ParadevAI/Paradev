@@ -666,6 +666,44 @@ export const HOTKEYS_REGISTRY = {
 			message: "Focus the next tab in the active workspace",
 		}),
 	},
+	PREV_RIGHT_SIDEBAR_TAB: {
+		key: {
+			mac: "meta+ctrl+left",
+			windows: "ctrl+shift+alt+pageup",
+			linux: "ctrl+shift+alt+pageup",
+		},
+		label: msg({ message: "Previous Right Sidebar Tab" }),
+		category: "Layout",
+		description: msg({
+			message:
+				"Show the previous tab in the right sidebar without moving focus",
+		}),
+	},
+	NEXT_RIGHT_SIDEBAR_TAB: {
+		key: {
+			mac: "meta+ctrl+right",
+			windows: "ctrl+shift+alt+pagedown",
+			linux: "ctrl+shift+alt+pagedown",
+		},
+		label: msg({ message: "Next Right Sidebar Tab" }),
+		category: "Layout",
+		description: msg({
+			message: "Show the next tab in the right sidebar without moving focus",
+		}),
+	},
+	TOGGLE_RIGHT_SIDEBAR_FOCUS: {
+		key: {
+			mac: L("meta+alt+l"),
+			windows: L("ctrl+shift+alt+e"),
+			linux: L("ctrl+shift+alt+e"),
+		},
+		label: msg({ message: "Switch Focus to Right Sidebar" }),
+		category: "Layout",
+		description: msg({
+			message:
+				"Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed",
+		}),
+	},
 	FOCUS_PANE_LEFT: {
 		key: { mac: null, windows: null, linux: null },
 		label: msg({

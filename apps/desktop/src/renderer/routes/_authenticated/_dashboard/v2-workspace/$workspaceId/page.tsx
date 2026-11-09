@@ -4,7 +4,7 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -77,6 +77,7 @@ import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/Browser
 import { browserRuntimeRegistry } from "./hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
 import { useRestoreExpandedPaneArea } from "./hooks/useRestoreExpandedPaneArea";
+import { useRightSidebarHotkeys } from "./hooks/useRightSidebarHotkeys";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
@@ -523,6 +524,9 @@ function V2WorkspaceContent() {
 	const onBeforeCloseTab = useTabCloseGuard(store);
 	const onBeforeCloseRightTab = useTabCloseGuard(rightStore);
 	const activeAreaRef = useRef<PaneArea>("center");
+	const [focusedArea, setFocusedArea] = useState<PaneArea>("center");
+	const isRightAreaFocused =
+		isRightPaneAreaEnabled && sidebarOpen && focusedArea === "right";
 	const getCloseTarget = useCallback(
 		() =>
 			isRightPaneAreaEnabled && sidebarOpen && activeAreaRef.current === "right"
@@ -560,6 +564,15 @@ function V2WorkspaceContent() {
 		getCloseTarget,
 		isSandbox,
 		isMobilePaneEnabled,
+	});
+	useRightSidebarHotkeys({
+		centerStore: store,
+		rightStore,
+		enabled: isRightPaneAreaEnabled,
+		isOpen: sidebarOpen,
+		isExpanded: rightPaneMode === "expanded",
+		open: openRightSidebar,
+		activeAreaRef,
 	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
 	useHotkey("NEW_CHAT", addChatTab);
@@ -622,6 +635,7 @@ function V2WorkspaceContent() {
 			toolbar={renderWorkspaceToolbar(true)}
 			isFullScreen={rightPaneMode === "expanded"}
 			onToggleFullScreen={toggleRightPaneAreaFullScreen}
+			isFocused={isRightAreaFocused}
 		/>
 	);
 
@@ -633,6 +647,7 @@ function V2WorkspaceContent() {
 					<WorkspaceSplitLayout
 						mode={rightPaneMode}
 						activeAreaRef={activeAreaRef}
+						onActiveAreaChange={setFocusedArea}
 						{...(isRightPaneAreaEnabled
 							? {
 									width: v2UserPreferences.rightPaneAreaWidth,
@@ -688,6 +703,7 @@ function V2WorkspaceContent() {
 										inert: rightPaneMode === "expanded",
 									})}
 									appearance={isParadevShell ? "cards" : "default"}
+									isFocused={!isRightAreaFocused}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}
