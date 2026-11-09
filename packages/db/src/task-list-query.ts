@@ -19,11 +19,7 @@ import {
 } from "drizzle-orm";
 import { QueryBuilder } from "drizzle-orm/pg-core";
 import { taskStatuses, tasks } from "./schema";
-import {
-	type IntegrationProvider,
-	type TaskPriority,
-	taskPriorityValues,
-} from "./schema/enums";
+import { type TaskPriority, taskPriorityValues } from "./schema/enums";
 import { escapeLikePattern } from "./utils/like";
 
 export const taskStatusTypeValues = [
@@ -54,31 +50,9 @@ export const taskLabelNames = sql<
 const { legacyLabels: _legacyLabels, ...taskTableColumns } =
 	getTableColumns(tasks);
 
-/**
- * Columns the Linear mirror had. Released clients still read these keys, so a task carries them as nulls.
- * TODO: remove once MINIMUM_DESKTOP_VERSION is past the first release with #8222, with the external* list filters below.
- */
-export const retiredTaskColumns = {
-	externalProvider: sql<IntegrationProvider | null>`null`,
-	externalId: sql<string | null>`null`,
-	externalKey: sql<string | null>`null`,
-	externalUrl: sql<string | null>`null`,
-	lastSyncedAt: sql<Date | null>`null`,
-	syncError: sql<string | null>`null`,
-	externalUpdatedAt: sql<Date | null>`null`,
-	externalProjectId: sql<string | null>`null`,
-	externalProjectName: sql<string | null>`null`,
-	externalCycleId: sql<string | null>`null`,
-	externalCycleName: sql<string | null>`null`,
-	assigneeExternalId: sql<string | null>`null`,
-	assigneeDisplayName: sql<string | null>`null`,
-	assigneeAvatarUrl: sql<string | null>`null`,
-};
-
 /** A task's columns with its label names, for selecting whole tasks. */
 export const taskColumns = {
 	...taskTableColumns,
-	...retiredTaskColumns,
 	labels: taskLabelNames,
 };
 
@@ -100,9 +74,6 @@ export interface TaskListFilters {
 	priority?: TaskPriority;
 	labels?: string[];
 	search?: string;
-	externalProjectId?: string;
-	externalProjectName?: string;
-	externalCycleId?: string;
 	dueDateFrom?: Date;
 	dueDateTo?: Date;
 }
@@ -184,14 +155,6 @@ export function buildTaskListConditions(
 		if (searchCondition) {
 			conditions.push(searchCondition);
 		}
-	}
-
-	if (
-		filters.externalProjectId ||
-		filters.externalProjectName ||
-		filters.externalCycleId
-	) {
-		conditions.push(sql`false`);
 	}
 
 	if (filters.dueDateFrom) {

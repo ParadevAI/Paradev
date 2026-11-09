@@ -58,8 +58,6 @@ const meta = {
 			{
 				id: "t1",
 				slug: "SUPER-2311",
-				externalProvider: null,
-				externalKey: null,
 				title:
 					"Figure out how to get plugins and skills working in cloud boxes",
 				status: { type: "started", color: "#f2c94c", progressPercent: 50 },
@@ -67,8 +65,6 @@ const meta = {
 			{
 				id: "t2",
 				slug: "SUPER-2470",
-				externalProvider: null,
-				externalKey: null,
 				title: "Sidebar hover lag with 40+ workspaces",
 				status: { type: "unstarted", color: "#8c8c8f", progressPercent: null },
 			},

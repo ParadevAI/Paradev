@@ -91,8 +91,6 @@ export function ProjectRecordScreen({
 						tasks: [
 							{
 								...task,
-								externalProvider: null,
-								externalKey: null,
 								status: null,
 								assignee: null,
 							},
