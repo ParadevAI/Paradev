@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset, acpStartModes } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
-import type { CreatePaneInput, RendererContext } from "@superset/panes";
+import type { RendererContext } from "@superset/panes";
 import { hostRemembersChatSelections } from "@superset/shared/host-version";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient } from "@superset/workspace-client";
@@ -17,12 +17,9 @@ export type SurfaceForkSource =
 	| { into: "chat"; presetId: string; harnessSessionId: string }
 	| { into: "cli"; configId: string; harnessSessionId: string };
 
-export type SurfaceForkPlacement = "beside" | "tab";
-
 export type ForkIntoOtherSurface = (
 	ctx: RendererContext<PaneViewerData>,
 	source: SurfaceForkSource,
-	placement: SurfaceForkPlacement,
 ) => Promise<void>;
 
 type ChatFork =
@@ -111,24 +108,10 @@ export function useSurfaceFork(
 	);
 
 	return useCallback<ForkIntoOtherSurface>(
-		async (ctx, source, placement) => {
+		async (ctx, source) => {
 			const nothingToFork = t({
-				message: "Nothing to fork yet. Send a message first.",
+				message: "Nothing to open yet. Send a message first.",
 			});
-			const place = (newPane: CreatePaneInput<PaneViewerData>) => {
-				const state = ctx.store.getState();
-				const current = state.getPane(ctx.pane.id);
-				if (placement === "tab" || !current) {
-					state.addTab({ panes: [newPane] });
-					return;
-				}
-				state.splitPane({
-					tabId: current.tabId,
-					paneId: ctx.pane.id,
-					position: "right",
-					newPane,
-				});
-			};
 
 			if (source.into === "cli") {
 				const { sessionId } = ctx.pane.data as ChatPaneData;
@@ -138,8 +121,7 @@ export function useSurfaceFork(
 				}
 				await createNewAgentSession({
 					configId: source.configId,
-					placement: placement === "tab" ? "new-tab" : "split-pane",
-					besidePaneId: ctx.pane.id,
+					placement: "new-tab",
 					prompt: "",
 					forkSessionId: source.harnessSessionId,
 				});
@@ -148,7 +130,9 @@ export function useSurfaceFork(
 
 			const terminalId = crypto.randomUUID();
 			ignoreChatTerminal(terminalId);
-			const toastId = toast.loading(t({ message: "Forking into a chat…" }));
+			const toastId = toast.loading(
+				t({ message: "Opening in Chat Interface…" }),
+			);
 			try {
 				const forked = await forkIntoChat(
 					source.presetId,
@@ -165,19 +149,23 @@ export function useSurfaceFork(
 					return;
 				}
 				toast.dismiss(toastId);
-				place({
-					kind: "chat-v3",
-					...(ctx.pane.titleOverride
-						? { titleOverride: ctx.pane.titleOverride }
-						: {}),
-					data: {
-						terminalId,
-						sessionId: forked.sessionId,
-						agent: { id: source.presetId },
-					} satisfies ChatPaneData,
+				ctx.store.getState().addTab({
+					panes: [
+						{
+							kind: "chat-v3",
+							...(ctx.pane.titleOverride
+								? { titleOverride: ctx.pane.titleOverride }
+								: {}),
+							data: {
+								terminalId,
+								sessionId: forked.sessionId,
+								agent: { id: source.presetId },
+							} satisfies ChatPaneData,
+						},
+					],
 				});
 			} catch (error) {
-				toast.error(t({ message: "Couldn't fork into a chat" }), {
+				toast.error(t({ message: "Couldn't open in Chat Interface" }), {
 					id: toastId,
 					description: errorMessage(error, t({ message: "Unknown error" })),
 				});

@@ -41,7 +41,7 @@ export function SharePortsSection({ workspaceId }: SharePortsSectionProps) {
 					</Trans>
 				</p>
 			) : (
-				<div className="mt-1.5 -mx-2">
+				<div className="mt-1.5 -mx-2 max-h-60 overflow-y-auto">
 					{ports.map((port) => (
 						<SharePortRow key={`${port.terminalId}:${port.port}`} port={port} />
 					))}

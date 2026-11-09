@@ -19,6 +19,8 @@ export type HarnessFactoryOptions = ChatSelections & {
 	sessionId: string;
 	scopeId: string;
 	harness: string;
+	/** The host agent config the harness launches with. */
+	agentConfigId?: string;
 	cwd: string;
 	resume?: { harnessSessionId: string; quiet?: boolean };
 	terminalId?: string;
@@ -92,6 +94,7 @@ export class LiveSessionRegistry {
 		harness: string;
 		scopeId: string;
 		cwd: string;
+		agentConfigId?: string;
 		cursor?: string;
 	}): Promise<DiscoverSessionsResult> {
 		const query: DiscoverNativeSessionsInput = {
@@ -102,6 +105,7 @@ export class LiveSessionRegistry {
 			(session) =>
 				session.harness === input.harness &&
 				session.scopeId === input.scopeId &&
+				session.agentConfigId === input.agentConfigId &&
 				session.state.status !== "dead" &&
 				session.supportsNativeDiscovery(),
 		);
@@ -113,6 +117,7 @@ export class LiveSessionRegistry {
 			sessionId: `discover-${randomUUID()}`,
 			scopeId: input.scopeId,
 			harness: input.harness,
+			...(input.agentConfigId ? { agentConfigId: input.agentConfigId } : {}),
 			cwd: input.cwd,
 		});
 		let failure: unknown;
@@ -144,6 +149,9 @@ export class LiveSessionRegistry {
 			scopeId: options.scopeId,
 			cwd: options.cwd,
 			harness: options.harness,
+			...(options.agentConfigId
+				? { agentConfigId: options.agentConfigId }
+				: {}),
 			terminalId: options.terminalId,
 			journal: this.options.journal,
 			publish: (envelope) => {
@@ -172,6 +180,7 @@ export class LiveSessionRegistry {
 				modeId: options.modeId,
 				modelId: options.modelId,
 				effortId: options.effortId,
+				...(options.fast ? { fast: options.fast } : {}),
 				resume: options.resume,
 			});
 		} catch (error) {

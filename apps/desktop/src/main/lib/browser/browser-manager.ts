@@ -13,6 +13,7 @@ import type {
 } from "shared/browser-design-mode";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
+import { cookieRefusal, redactCookies } from "./cdp-cookie-guard";
 import { createExtensionWorldFilter } from "./cdp-extension-worlds";
 import {
 	forwardSessionFor,
@@ -286,6 +287,7 @@ class BrowserManager extends EventEmitter {
 	private focusListeners = new Map<string, () => void>();
 	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	private requestedPanes = new Set<string>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
 	// un-throttled — see acquireAgentWake. The entry object's identity ties
@@ -348,6 +350,7 @@ class BrowserManager extends EventEmitter {
 	}
 
 	unregister(paneId: string): void {
+		this.requestedPanes.delete(paneId);
 		for (const map of [
 			this.consoleListeners,
 			this.contextMenuListeners,
@@ -495,10 +498,16 @@ class BrowserManager extends EventEmitter {
 	}
 
 	resolveOpenRequest(requestId: string, paneId: string): void {
+		this.requestedPanes.add(paneId);
 		this.emit(`open-resolved:${requestId}`, paneId);
 	}
 
-	markAgentUse(paneId: string): void {
+	/** Made for a `requestOpen`, so it is not the pane an extension's new tab is waiting for. */
+	isRequestedPane(paneId: string): boolean {
+		return this.requestedPanes.has(paneId);
+	}
+
+	markUse(paneId: string): void {
 		this.emit("agent-use", { paneId });
 	}
 
@@ -592,7 +601,7 @@ class BrowserManager extends EventEmitter {
 			onMessage(
 				JSON.stringify({
 					method,
-					params,
+					params: redactCookies(method, params),
 					...(outSessionId ? { sessionId: outSessionId } : {}),
 				}),
 			);
@@ -675,7 +684,9 @@ class BrowserManager extends EventEmitter {
 					);
 					return;
 				}
-				const refusal = extensionWorlds.refusal(method, params);
+				const refusal =
+					cookieRefusal(method, params) ??
+					extensionWorlds.refusal(method, params);
 				if (refusal) {
 					onMessage(
 						JSON.stringify({

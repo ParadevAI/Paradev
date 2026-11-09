@@ -117,8 +117,8 @@ export interface PaneLayoutPane {
 	terminalTitle?: string | null;
 	/** Filled in by the host when an agent runs in the pane's terminal. */
 	agent?: { id: string; state: AgentRunState } | null;
-	/** Browser panes only. `agent` marks a pane an agent opened, in the agent session. */
-	browser?: { url: string; agent: boolean };
+	/** Browser panes only. */
+	browser?: { url: string };
 }
 
 export interface PaneLayoutTab {

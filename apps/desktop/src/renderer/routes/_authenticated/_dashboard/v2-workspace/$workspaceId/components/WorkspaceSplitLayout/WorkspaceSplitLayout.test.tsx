@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, mock, test } from "bun:test";
 import type { SidebarSlideMode } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
 import type { PaneArea } from "./WorkspaceSplitLayout";
 
@@ -18,10 +18,12 @@ const settle = () =>
 
 function renderLayout(initial: SidebarSlideMode) {
 	const activeAreaRef: { current: PaneArea } = { current: "center" };
+	const onActiveAreaChange = mock((_area: PaneArea) => {});
 	const ui = (next: SidebarSlideMode) => (
 		<WorkspaceSplitLayout
 			mode={next}
 			activeAreaRef={activeAreaRef}
+			onActiveAreaChange={onActiveAreaChange}
 			width={300}
 			minWidth={200}
 			maxWidth={Number.POSITIVE_INFINITY}
@@ -49,6 +51,7 @@ function renderLayout(initial: SidebarSlideMode) {
 	return {
 		...result,
 		activeAreaRef,
+		onActiveAreaChange,
 		center: () =>
 			result.getByTestId("center").parentElement?.parentElement as HTMLElement,
 		setMode: (next: SidebarSlideMode) => result.rerender(ui(next)),
@@ -100,5 +103,16 @@ describe("WorkspaceSplitLayout", () => {
 		const layout = renderLayout("open");
 		layout.setMode("expanded");
 		expect(layout.activeAreaRef.current).toBe("right");
+	});
+
+	test("reports the active area only when it changes", () => {
+		const layout = renderLayout("open");
+		fireEvent.pointerDown(layout.getByTestId("side"));
+		fireEvent.pointerDown(layout.getByTestId("side"));
+		act(() => layout.getByTestId("center").focus());
+		expect(layout.onActiveAreaChange.mock.calls).toEqual([
+			["right"],
+			["center"],
+		]);
 	});
 });
