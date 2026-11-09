@@ -21396,6 +21396,9 @@ msgstr "버전 {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "다음에 재시작하면 {version} 버전이 설치됩니다."
 
+msgid "Version {version} is available"
+msgstr "버전 {version} 사용 가능"
+
 msgid "Version {version} is the latest version."
 msgstr "버전 {version}이 최신 버전입니다."
 

@@ -21396,6 +21396,9 @@ msgstr "版本{version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "版本{version}將在下次重新啟動時安裝。"
 
+msgid "Version {version} is available"
+msgstr "版本{version}現已可用"
+
 msgid "Version {version} is the latest version."
 msgstr "版本{version}已是最新版本。"
 

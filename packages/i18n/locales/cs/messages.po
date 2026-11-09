@@ -21396,6 +21396,9 @@ msgstr "Verze {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "Verze {version} se nainstaluje při příštím restartu."
 
+msgid "Version {version} is available"
+msgstr "Je k dispozici verze {version}"
+
 msgid "Version {version} is the latest version."
 msgstr "Verze {version} je nejnovější."
 

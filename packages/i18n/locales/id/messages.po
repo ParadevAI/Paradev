@@ -21396,6 +21396,9 @@ msgstr "Versi {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "Versi {version} akan dipasang saat Anda memulai ulang berikutnya."
 
+msgid "Version {version} is available"
+msgstr "Versi {version} tersedia"
+
 msgid "Version {version} is the latest version."
 msgstr "Versi {version} adalah versi terbaru."
 

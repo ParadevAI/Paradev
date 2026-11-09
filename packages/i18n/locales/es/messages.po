@@ -21396,6 +21396,9 @@ msgstr "Versión {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "La versión {version} se instalará la próxima vez que reinicies."
 
+msgid "Version {version} is available"
+msgstr "La versión {version} está disponible"
+
 msgid "Version {version} is the latest version."
 msgstr "La versión {version} es la más reciente."
 

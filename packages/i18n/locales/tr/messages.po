@@ -21396,6 +21396,9 @@ msgstr "Sürüm {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "{version} sürümü bir sonraki yeniden başlatmada yüklenecek."
 
+msgid "Version {version} is available"
+msgstr "{version} sürümü kullanılabilir"
+
 msgid "Version {version} is the latest version."
 msgstr "{version} sürümü en son sürümdür."
 
