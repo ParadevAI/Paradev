@@ -6332,9 +6332,6 @@ msgstr "Vytvořit Linear issue"
 msgid "Create manually"
 msgstr "Vytvořit ručně"
 
-msgid "Create merge commit"
-msgstr "Vytvořit merge commit"
-
 msgid "Create Merge Commit"
 msgstr "Vytvořit merge commit"
 

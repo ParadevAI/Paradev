@@ -6332,9 +6332,6 @@ msgstr "Utwórz zgłoszenie Linear"
 msgid "Create manually"
 msgstr "Utwórz ręcznie"
 
-msgid "Create merge commit"
-msgstr "Utwórz commit scalający"
-
 msgid "Create Merge Commit"
 msgstr "Utwórz commit scalający"
 

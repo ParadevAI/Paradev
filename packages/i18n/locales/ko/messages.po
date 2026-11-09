@@ -6332,9 +6332,6 @@ msgstr "Linear 이슈 만들기"
 msgid "Create manually"
 msgstr "수동으로 만들기"
 
-msgid "Create merge commit"
-msgstr "머지 커밋 만들기"
-
 msgid "Create Merge Commit"
 msgstr "머지 커밋 만들기"
 

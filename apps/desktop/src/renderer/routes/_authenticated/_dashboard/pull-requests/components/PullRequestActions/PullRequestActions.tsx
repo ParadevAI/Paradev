@@ -47,6 +47,7 @@ import {
 	type LinkedPR,
 	useNewWorkspaceDraftStore,
 } from "renderer/stores/new-workspace-draft";
+import { useMergeMethodLabels } from "../../hooks/useMergeMethodLabels";
 import { usePullRequestAgentHandoff } from "../../hooks/usePullRequestAgentHandoff";
 import {
 	type PullRequestDetail,
@@ -141,11 +142,7 @@ export function PullRequestActions({
 }: PullRequestActionsProps) {
 	const { t } = useLingui();
 	const prNumber = target?.prNumber ?? null;
-	const mergeMethodLabels: Record<MergeMethod, string> = {
-		squash: t({ message: "Squash and merge" }),
-		merge: t({ message: "Merge commit" }),
-		rebase: t({ message: "Rebase and merge" }),
-	};
+	const mergeMethodLabels = useMergeMethodLabels();
 	const mergeMethodDescriptions: Record<MergeMethod, string> = {
 		squash: t({ message: "Combine all commits" }),
 		merge: t({ message: "Preserve commit history" }),
@@ -491,10 +488,16 @@ export function PullRequestActions({
 												/>
 												{mergeMethodLabels[method]}
 												{method === data.mergeMethods.primary ? (
-													<Check
-														strokeWidth={1.75}
-														className="ml-auto size-3.5 text-muted-foreground"
-													/>
+													<>
+														<span className="sr-only">
+															{t({ message: "Default" })}
+														</span>
+														<Check
+															aria-hidden
+															strokeWidth={1.75}
+															className="ml-auto size-3.5 text-muted-foreground"
+														/>
+													</>
 												) : null}
 											</span>
 											<span className="pl-[1.375rem] text-[11px] text-muted-foreground">

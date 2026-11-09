@@ -6332,9 +6332,6 @@ msgstr "Tạo issue Linear"
 msgid "Create manually"
 msgstr "Tạo thủ công"
 
-msgid "Create merge commit"
-msgstr "Tạo merge commit"
-
 msgid "Create Merge Commit"
 msgstr "Tạo merge commit"
 

@@ -8,7 +8,11 @@ import { cn } from "@superset/ui/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import { VscGitMerge } from "react-icons/vsc";
-import { pullRequestDetailQueryOptions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
+import { useMergeMethodLabels } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useMergeMethodLabels";
+import {
+	cachedMergeMethods,
+	pullRequestDetailQueryOptions,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 
 interface MergeMethodMenuItemsProps {
@@ -32,36 +36,36 @@ export function MergeMethodMenuItems({
 	iconClassName,
 }: MergeMethodMenuItemsProps) {
 	const { t } = useLingui();
-	const { data: choices } = useQuery({
+	const labels = useMergeMethodLabels();
+	const { data: choices, isLoading } = useQuery({
 		...pullRequestDetailQueryOptions({
 			organizationId: target?.organizationId ?? null,
 			repoFullName: target?.repoFullName ?? null,
 			prNumber: target?.prNumber ?? null,
 		}),
 		enabled: Boolean(target?.repoFullName),
-		select: (detail) => detail.mergeMethods,
+		select: cachedMergeMethods,
 	});
 	const { methods, primary } = choices ?? mergeMethodChoices(null);
-	const labels: Record<MergeMethod, string> = {
-		squash: t({ message: "Squash and merge" }),
-		merge: t({ message: "Create merge commit" }),
-		rebase: t({ message: "Rebase and merge" }),
-	};
 
 	return methods.map((method) => (
 		<DropdownMenuItem
 			key={method}
 			className={className}
-			disabled={isMerging}
+			disabled={isMerging || isLoading}
 			onClick={() => onMerge(method)}
 		>
 			<VscGitMerge className={iconClassName} />
 			{labels[method]}
 			{choices && method === primary ? (
-				<Check
-					strokeWidth={1.75}
-					className={cn("ml-auto text-muted-foreground", iconClassName)}
-				/>
+				<>
+					<span className="sr-only">{t({ message: "Default" })}</span>
+					<Check
+						aria-hidden
+						strokeWidth={1.75}
+						className={cn("ml-auto text-muted-foreground", iconClassName)}
+					/>
+				</>
 			) : null}
 		</DropdownMenuItem>
 	));

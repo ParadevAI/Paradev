@@ -6332,9 +6332,6 @@ msgstr "Linear issue'su oluştur"
 msgid "Create manually"
 msgstr "Manuel oluştur"
 
-msgid "Create merge commit"
-msgstr "Birleştirme commit'i oluştur"
-
 msgid "Create Merge Commit"
 msgstr "Birleştirme commit'i oluştur"
 

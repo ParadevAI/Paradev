@@ -88,6 +88,22 @@ test("offers only the merge methods the repository allows, with its default as t
 		primary: "merge",
 	});
 
+	const mergeDefaultBesideSquash = toPullRequestDetail(
+		{
+			...base,
+			mergeability: {
+				...base.mergeability,
+				allowedMergeMethods: ["squash", "merge"],
+				defaultMergeMethod: "merge",
+			},
+		},
+		"owner/repo",
+	);
+	expect(mergeDefaultBesideSquash.mergeMethods).toEqual({
+		methods: ["merge", "squash"],
+		primary: "merge",
+	});
+
 	const squashOnly = toPullRequestDetail(base, "owner/repo");
 	expect(squashOnly.mergeMethods).toEqual({
 		methods: ["squash"],
