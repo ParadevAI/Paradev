@@ -148,6 +148,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 			"desktop-notice-dismissals-v1",
 			"v2-setup-card-dismissals-v1",
 			"browser-import-banner-dismissals-v1",
+			"payment-failed-card-dismissals-v1",
 		],
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
