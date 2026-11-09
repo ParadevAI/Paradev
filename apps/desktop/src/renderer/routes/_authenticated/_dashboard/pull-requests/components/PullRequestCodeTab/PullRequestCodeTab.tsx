@@ -23,6 +23,7 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
+	buildCollisionSafeTreePaths,
 	createPierreTreeStyle,
 	diffStatsDecoration,
 	PIERRE_TREE_UNSAFE_CSS,
@@ -692,18 +693,21 @@ export function PullRequestCodeTab({
 		[options, pathByItemId, canUseProject],
 	);
 
-	const treePaths = useMemo(() => files.map((f) => f.path), [files]);
-	const fileByPath = useMemo(
-		() => new Map(files.map((f) => [f.path, f])),
+	const { treePaths } = useMemo(
+		() => buildCollisionSafeTreePaths(files.map((f) => f.path)),
 		[files],
+	);
+	const fileByPath = useMemo(
+		() => new Map(files.map((f, i) => [treePaths[i], f])),
+		[files, treePaths],
 	);
 	const gitStatus = useMemo(
-		() => files.map((f) => ({ path: f.path, status: f.status })),
-		[files],
+		() => files.map((f, i) => ({ path: treePaths[i], status: f.status })),
+		[files, treePaths],
 	);
 	const itemIdByPath = useMemo(
-		() => new Map(files.map((f) => [f.path, f.item.id])),
-		[files],
+		() => new Map(files.map((f, i) => [treePaths[i], f.item.id])),
+		[files, treePaths],
 	);
 
 	// Routed through a ref so Pierre's handler closures (resolved once at
