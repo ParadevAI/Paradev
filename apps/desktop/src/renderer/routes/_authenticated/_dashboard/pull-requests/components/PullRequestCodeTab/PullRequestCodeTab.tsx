@@ -6,7 +6,6 @@ import type {
 	SelectedLineRange,
 } from "@pierre/diffs";
 import { CodeView, type CodeViewHandle } from "@pierre/diffs/react";
-import { FileTree as PierreFileTree, useFileTree } from "@pierre/trees/react";
 import { errorMessage } from "@superset/i18n/errors";
 import { useIsTabVisible } from "@superset/panes";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
@@ -22,12 +21,7 @@ import {
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import {
-	createPierreTreeStyle,
-	diffStatsDecoration,
-	PIERRE_TREE_UNSAFE_CSS,
-	type PierreGitStatus,
-} from "renderer/lib/pierreTree";
+import type { FileStatus } from "renderer/lib/pierreTree";
 import type { AgentTarget } from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
 import { buildContentKey } from "renderer/routes/_authenticated/_dashboard/utils/buildContentKey";
@@ -49,6 +43,7 @@ import {
 } from "../../utils/pullRequestClient";
 import { PullRequestCommentComposer } from "./components/PullRequestCommentComposer";
 import { PullRequestCommentThread } from "./components/PullRequestCommentThread";
+import { PullRequestFileList } from "./components/PullRequestFileList";
 import { getFileItemVersion } from "./utils/getFileItemVersion";
 import { parsePullRequestPatch } from "./utils/parsePullRequestPatch";
 
@@ -113,19 +108,9 @@ const DEFAULT_TREE_WIDTH = 288;
 const MIN_TREE_WIDTH = 200;
 const MAX_TREE_WIDTH = 560;
 
-const ITEM_HEIGHT = 24;
-const TREE_STYLE = createPierreTreeStyle({
-	levelIndent: 8,
-});
-
-// Below this window width, the tree+diff split gets cramped enough that a
-// fully-expanded tree (Pierre's "open" default) eats more room than it's
-// worth — default to collapsed so the diff gets the space and the reviewer
-// expands only the folders they need. `useFileTree`'s initialExpansion is
-// a one-time value baked into the tree's store at creation, so this reads
-// window.innerWidth once at mount rather than reactively tracking the
-// pane's own width — a fully reactive re-collapse on resize would need a
-// bulk collapse-all the tree model doesn't expose.
+// Below this window width a fully expanded tree view takes more room than
+// the split can spare, so it starts collapsed. Pierre fixes initialExpansion
+// when the tree is created, so this reads window.innerWidth once at mount.
 const NARROW_WINDOW_WIDTH_THRESHOLD = 1400;
 // Below this (stricter) *pane* width — this tab's own rendered width, via
 // ResizeObserver, not the window's — even a collapsed-folders tree panel is
@@ -135,10 +120,9 @@ const NARROW_WINDOW_WIDTH_THRESHOLD = 1400;
 // nothing stops it tracking width for the tab's whole lifetime.
 const NARROW_PANE_WIDTH_HIDE_TREE_THRESHOLD = 1150;
 
-// GitHub's diff-file-type vocabulary (from parsePatchFiles) mapped onto
-// Pierre's tree git-status vocabulary — a distinct mapping from
-// FILE_STATUS_TO_PIERRE, which targets local-filesystem status instead.
-const CHANGE_TYPE_TO_PIERRE_STATUS: Record<string, PierreGitStatus> = {
+// GitHub's diff-file-type vocabulary (from parsePatchFiles) mapped onto the
+// git status the changed-file rows and tree render.
+const CHANGE_TYPE_TO_FILE_STATUS: Record<string, FileStatus> = {
 	change: "modified",
 	"rename-pure": "renamed",
 	"rename-changed": "renamed",
@@ -150,7 +134,8 @@ interface ParsedFileDiff {
 	item: CodeViewItem<PrAnnotationMetadata>;
 	contentKey: string;
 	path: string;
-	status: PierreGitStatus;
+	oldPath?: string;
+	status: FileStatus;
 	additions: number;
 	deletions: number;
 }
@@ -177,7 +162,8 @@ function parseFileDiffs(diff: PullRequestDiff): ParsedFileDiff[] {
 			},
 			contentKey,
 			path: fileDiff.name,
-			status: CHANGE_TYPE_TO_PIERRE_STATUS[fileDiff.type] ?? "modified",
+			oldPath: fileDiff.prevName,
+			status: CHANGE_TYPE_TO_FILE_STATUS[fileDiff.type] ?? "modified",
 			additions,
 			deletions,
 		};
@@ -239,6 +225,7 @@ export function PullRequestCodeTab({
 		(containerWidth != null &&
 			containerWidth < NARROW_PANE_WIDTH_HIDE_TREE_THRESHOLD);
 	const [treeWidth, setTreeWidth] = useState(DEFAULT_TREE_WIDTH);
+	const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
 	const [composer, updateComposer] = useState<ComposerState | null>(null);
 	// Cancel/Escape/successful-submit close, as opposed to updateComposer(null)
 	// from onLineSelectionEnd's !range branch — there Pierre has *already*
@@ -692,31 +679,14 @@ export function PullRequestCodeTab({
 		[options, pathByItemId, canUseProject],
 	);
 
-	const treePaths = useMemo(() => files.map((f) => f.path), [files]);
-	const fileByPath = useMemo(
-		() => new Map(files.map((f) => [f.path, f])),
-		[files],
-	);
-	const gitStatus = useMemo(
-		() => files.map((f) => ({ path: f.path, status: f.status })),
-		[files],
-	);
 	const itemIdByPath = useMemo(
 		() => new Map(files.map((f) => [f.path, f.item.id])),
 		[files],
 	);
-
-	// Routed through a ref so Pierre's handler closures (resolved once at
-	// useFileTree time) always see the latest data.
-	const handlersRef = useRef({
-		onSelect(_path: string) {},
-		renderRowDecoration(_ctx: { item: { kind: string; path: string } }) {
-			return null as ReturnType<typeof diffStatsDecoration>;
-		},
-	});
-	handlersRef.current.onSelect = (path) => {
+	const selectFile = (path: string) => {
 		const itemId = itemIdByPath.get(path);
 		if (!itemId) return;
+		setSelectedFilePath(path);
 		codeViewRef.current?.scrollTo({
 			type: "item",
 			id: itemId,
@@ -724,39 +694,6 @@ export function PullRequestCodeTab({
 			behavior: "smooth-auto",
 		});
 	};
-	handlersRef.current.renderRowDecoration = (ctx) => {
-		if (ctx.item.kind === "directory") return null;
-		const file = fileByPath.get(ctx.item.path);
-		if (!file) return null;
-		return diffStatsDecoration(file.additions, file.deletions);
-	};
-
-	const { model } = useFileTree({
-		paths: treePaths,
-		initialExpansion: initialTreeExpansion,
-		search: false,
-		unsafeCSS: PIERRE_TREE_UNSAFE_CSS,
-		gitStatus,
-		icons: { set: "complete", colored: true },
-		itemHeight: ITEM_HEIGHT,
-		overscan: 20,
-		stickyFolders: true,
-		flattenEmptyDirectories: true,
-		onSelectionChange: (selected) => {
-			const last = selected[selected.length - 1];
-			if (!last || last.endsWith("/")) return;
-			handlersRef.current.onSelect(last);
-		},
-		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
-	});
-
-	useEffect(() => {
-		model.resetPaths(treePaths);
-	}, [model, treePaths]);
-
-	useEffect(() => {
-		model.setGitStatus(gitStatus);
-	}, [model, gitStatus]);
 
 	if (isLoading) {
 		return (
@@ -832,9 +769,11 @@ export function PullRequestCodeTab({
 						onDoubleClickHandle={() => setTreeWidth(DEFAULT_TREE_WIDTH)}
 						className="flex flex-col"
 					>
-						<PierreFileTree
-							model={model}
-							style={{ ...TREE_STYLE, height: "100%" }}
+						<PullRequestFileList
+							files={files}
+							selectedPath={selectedFilePath}
+							onSelectFile={selectFile}
+							initialTreeExpansion={initialTreeExpansion}
 						/>
 					</ResizablePanel>
 				)}
