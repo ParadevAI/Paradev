@@ -11,11 +11,7 @@ interface ChangesSearchInputProps {
 	autoFocus?: boolean;
 }
 
-/**
- * The Changes tab's file search row, mounted while the toolbar's search
- * toggle is on. Filters the changed-file list by path as the user types;
- * Escape or the toolbar toggle dismisses it, the ✕ only clears the query.
- */
+/** Search row for a changed-file list. Escape calls `onClose`; the ✕ only clears the query. */
 export function ChangesSearchInput({
 	query,
 	onQueryChange,
