@@ -9,7 +9,19 @@ export type BundleManifest = {
 	sourceCwd: string;
 	/** The directory the files sat in, which absolute paths inside them name. */
 	sourceDir: string;
+	/** The chat's permission mode and model, which its history does not carry. */
+	selections?: { modeId?: string; modelId?: string };
 };
+
+const MAX_SELECTION_LENGTH = 200;
+
+function selectionValue(value: unknown): string | undefined {
+	return typeof value === "string" &&
+		value.length > 0 &&
+		value.length <= MAX_SELECTION_LENGTH
+		? value
+		: undefined;
+}
 
 const PLAIN_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,199}$/;
 
@@ -33,11 +45,25 @@ export function parseBundleManifest(value: unknown): BundleManifest | null {
 	if (!isPlainSessionId(manifest.harnessSessionId)) return null;
 	if (!isAbsolutePath(manifest.sourceCwd)) return null;
 	if (!isAbsolutePath(manifest.sourceDir)) return null;
+	const selections =
+		typeof manifest.selections === "object" && manifest.selections !== null
+			? (manifest.selections as Record<string, unknown>)
+			: {};
+	const modeId = selectionValue(selections.modeId);
+	const modelId = selectionValue(selections.modelId);
 	return {
 		version: 1,
 		harnessSessionId: manifest.harnessSessionId,
 		sourceCwd: manifest.sourceCwd,
 		sourceDir: manifest.sourceDir,
+		...(modeId || modelId
+			? {
+					selections: {
+						...(modeId ? { modeId } : {}),
+						...(modelId ? { modelId } : {}),
+					},
+				}
+			: {}),
 	};
 }
 

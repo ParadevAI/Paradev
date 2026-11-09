@@ -142,10 +142,6 @@ msgstr "{0, plural, one {# chat fermé} other {# chats fermés}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# discussion n’a pas pu être déplacée. Ouvrez-la pour réessayer.} other {# discussions n’ont pas pu être déplacées. Ouvrez-les pour réessayer.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# discussion est restée dans l'ancien espace de travail} other {# discussions sont restées dans l'ancien espace de travail}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# commentaire joint} other {# commentaires joints}}"
@@ -366,9 +362,9 @@ msgstr "{0, plural, one {issue Linear} other {issues Linear}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Déplacer # espace de travail sélectionné vers un groupe} other {Déplacer # espaces de travail sélectionnés vers un groupe}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Déplacement de # discussion ici…} other {Déplacement de # discussions ici…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Déplacement de sa discussion…} other {Déplacement de ses discussions…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -870,6 +866,9 @@ msgstr "{cookieCount} cookies — oublier ce site"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automatisation} other {# automatisations}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# discussion est restée dans l'ancien espace de travail.} other {# discussions sont restées dans l'ancien espace de travail.}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# vérification en échec} other {# vérifications en échec}}"
 
@@ -1369,9 +1368,6 @@ msgstr "{starCount} étoiles, et ça continue"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisation lancée} other {# automatisations lancées}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Cet espace de travail a été déplacé. # discussion est restée ici.} other {Cet espace de travail a été déplacé. # discussions sont restées ici.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# sous-agent en cours} other {# sous-agents en cours}}"
 
@@ -1395,9 +1391,6 @@ msgstr "{threshold, plural, one {# PR d'agent fusionnée} other {# PR d'agent fu
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrompu"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {{ready} discussion sur # déplacée ici} other {{ready} discussions sur # déplacées ici}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {La vérification a réussi} other {Les # vérifications ont toutes réussi}}"
@@ -12173,9 +12166,6 @@ msgstr "Déplacement de {name} vers {destination}"
 msgid "Moving this chat here"
 msgstr "Déplacement de cette discussion ici"
 
-msgid "Moving this workspace here…"
-msgstr "Déplacement de cet espace de travail ici…"
-
 msgid "Moving this workspace…"
 msgstr "Déplacement de cet espace de travail…"
 
@@ -18959,6 +18949,9 @@ msgstr "Démarrage de l'espace de travail cloud"
 msgid "Starting the agent…"
 msgstr "Démarrage de l'agent…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Démarrage de l'espace de travail cloud…"
+
 msgid "Starting the simulator…"
 msgstr "Démarrage du simulateur…"
 
@@ -19986,9 +19979,6 @@ msgstr "Le déplacement a expiré."
 msgid "The move was cancelled."
 msgstr "Le déplacement a été annulé."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "Le déplacement a été arrêté. Cet espace de travail est resté ici."
-
 msgid "The name of your organization or team"
 msgstr "Le nom de votre organisation ou équipe"
 
@@ -20626,9 +20616,6 @@ msgstr "Cette action désindexera et annulera toutes les modifications indexées
 
 msgid "This workspace"
 msgstr "Cet espace de travail"
-
-msgid "This workspace couldn't move."
-msgstr "Impossible de déplacer cet espace de travail."
 
 msgid "This workspace has no project to branch from"
 msgstr "Cet espace de travail n'a aucun projet depuis lequel dupliquer"

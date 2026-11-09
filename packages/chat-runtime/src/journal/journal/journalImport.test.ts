@@ -131,6 +131,60 @@ describe("commands.continueSession", () => {
 	});
 });
 
+describe("commands.continueSession of a chat moved in a mode", () => {
+	test("starts the agent in the mode the chat had on its old host", async () => {
+		const { FakeHarness } = await import("../../harness/fake");
+		const modes: unknown[] = [];
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					"claude-acp",
+					() => {
+						const adapter = new FakeHarness({ turns: [] });
+						const start = adapter.start.bind(adapter);
+						adapter.start = (options) => {
+							modes.push(options.modeId);
+							return start(options);
+						};
+						return adapter;
+					},
+				],
+			]),
+		});
+		try {
+			const session = moved(10);
+			runtime.journal.importSession({
+				...session,
+				events: [
+					...session.events,
+					{
+						seq: 10,
+						event: {
+							type: "session",
+							session: {
+								status: "idle",
+								harness: "claude-acp",
+								modeId: "bypassPermissions",
+							},
+						},
+					},
+				],
+			});
+
+			runtime.commands.continueSession({
+				sessionId: SESSION,
+				cwd: "/tmp",
+				harnessSessionId: "claude-session",
+			});
+
+			await Bun.sleep(0);
+			expect(modes).toEqual(["bypassPermissions"]);
+		} finally {
+			await runtime.dispose();
+		}
+	});
+});
+
 describe("commands.continueSession with a dead agent", () => {
 	test("starts the agent again instead of keeping the dead one", async () => {
 		const { FakeHarness } = await import("../../harness/fake");

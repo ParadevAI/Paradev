@@ -142,10 +142,6 @@ msgstr "{0, plural, one {# chat zavřen} few {# chaty zavřeny} many {# chatů z
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# chat se nepodařilo přesunout. Otevřete ho a zkuste to znovu.} few {# chaty se nepodařilo přesunout. Otevřete je a zkuste to znovu.} many {# chatu se nepodařilo přesunout. Otevřete je a zkuste to znovu.} other {# chatů se nepodařilo přesunout. Otevřete je a zkuste to znovu.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# chat zůstal v původním pracovním prostoru} few {# chaty zůstaly v původním pracovním prostoru} many {# chatu zůstalo v původním pracovním prostoru} other {# chatů zůstalo v původním pracovním prostoru}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# připojený komentář} few {# připojené komentáře} many {# připojeného komentáře} other {# připojených komentářů}}"
@@ -366,9 +362,9 @@ msgstr "{0, plural, one {Linear issue} few {Linear issues} many {Linear issues} 
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Přesunout # vybraný pracovní prostor do skupiny} few {Přesunout # vybrané pracovní prostory do skupiny} many {Přesunout # vybraného pracovního prostoru do skupiny} other {Přesunout # vybraných pracovních prostorů do skupiny}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Sem se přesouvá # chat…} few {Sem se přesouvají # chaty…} many {Sem se přesouvá # chatu…} other {Sem se přesouvá # chatů…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Přesouvání chatu…} few {Přesouvání chatů…} many {Přesouvání chatů…} other {Přesouvání chatů…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -870,6 +866,9 @@ msgstr "{cookieCount} cookies — zapomenout tento web"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automatizace} few {# automatizace} many {# automatizace} other {# automatizací}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# chat zůstal v původním pracovním prostoru.} few {# chaty zůstaly v původním pracovním prostoru.} many {# chatu zůstalo v původním pracovním prostoru.} other {# chatů zůstalo v původním pracovním prostoru.}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrola selhala} few {# kontroly selhaly} many {# kontroly selhalo} other {# kontrol selhalo}}"
 
@@ -1369,9 +1368,6 @@ msgstr "{starCount} hvězd a přibývá"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Spuštěna # automatizace} few {Spuštěny # automatizace} many {Spuštěno # automatizace} other {Spuštěno # automatizací}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Tento pracovní prostor byl přesunut. # chat zůstal zde.} few {Tento pracovní prostor byl přesunut. # chaty zůstaly zde.} many {Tento pracovní prostor byl přesunut. # chatu zůstalo zde.} other {Tento pracovní prostor byl přesunut. # chatů zůstalo zde.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent běží} few {# subagenti běží} many {# subagenta běží} other {# subagentů běží}}"
 
@@ -1395,9 +1391,6 @@ msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agent
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {Sem přesunuto {ready} z # chatu} few {Sem přesunuto {ready} z # chatů} many {Sem přesunuto {ready} z # chatu} other {Sem přesunuto {ready} z # chatů}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
@@ -12173,9 +12166,6 @@ msgstr "Přesouvání {name} do: {destination}"
 msgid "Moving this chat here"
 msgstr "Tento chat se přesouvá sem"
 
-msgid "Moving this workspace here…"
-msgstr "Sem se přesouvá tento pracovní prostor…"
-
 msgid "Moving this workspace…"
 msgstr "Přesouvá se tento pracovní prostor…"
 
@@ -18959,6 +18949,9 @@ msgstr "Spouštím cloudový pracovní prostor"
 msgid "Starting the agent…"
 msgstr "Spouštění agenta…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Spouštění cloudového pracovního prostoru…"
+
 msgid "Starting the simulator…"
 msgstr "Spouštění simulátoru…"
 
@@ -19986,9 +19979,6 @@ msgstr "Časový limit přesunu vypršel."
 msgid "The move was cancelled."
 msgstr "Přesun byl zrušen."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "Přesun byl zastaven. Tento pracovní prostor zůstal tady."
-
 msgid "The name of your organization or team"
 msgstr "Název vaší organizace nebo týmu"
 
@@ -20626,9 +20616,6 @@ msgstr "Tímto zrušíte přípravu a vrátíte všechny připravené změny. P�
 
 msgid "This workspace"
 msgstr "Tento pracovní prostor"
-
-msgid "This workspace couldn't move."
-msgstr "Tento pracovní prostor se nepodařilo přesunout."
 
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"

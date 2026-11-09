@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { promisify } from "node:util";
+import { sessionSelections } from "@superset/chat/core";
 import type { DurableEvent } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -12,7 +13,10 @@ import {
 	uploadBundle,
 	withStage,
 } from "../../../teleport/bundle";
-import { teleportProviderFor } from "../../../teleport/providers";
+import {
+	type BundleManifest,
+	teleportProviderFor,
+} from "../../../teleport/providers";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
 	gitPushSnapshotTask,
@@ -88,6 +92,26 @@ function busyError() {
 	});
 }
 
+/** The bundle's manifest with the chat's mode and model, which its history does not carry. */
+function withSelections(
+	manifest: BundleManifest,
+	chat: ChatRuntime,
+	sessionId: string,
+): BundleManifest {
+	const outline = chat.commands.getOutline({ sessionId });
+	const { modeId, modelId } = outline.ok
+		? sessionSelections(outline.outline.session)
+		: {};
+	if (!modeId && !modelId) return manifest;
+	return {
+		...manifest,
+		selections: {
+			...(modeId ? { modeId } : {}),
+			...(modelId ? { modelId } : {}),
+		},
+	};
+}
+
 /** Cancels the running turn and waits until the chat is idle. */
 async function stopRunningTurn(chat: ChatRuntime, sessionId: string) {
 	const outline = chat.commands.getOutline({ sessionId });
@@ -144,6 +168,8 @@ export const teleportRouter = router({
 			const skipped: SkippedChat[] = [];
 			const movable: MovableChat[] = [];
 			for (const session of sessions) {
+				// A chat closed here is gone for the person; moving it would open it again.
+				if (session.closedAt) continue;
 				const provider = teleportProviderFor(session.harness);
 				if (!provider || !session.harnessSessionId) {
 					skipped.push({
@@ -248,7 +274,7 @@ export const teleportRouter = router({
 							api: ctx.api,
 							chatSessionId: session.sessionId,
 							harness: session.harness,
-							manifest,
+							manifest: withSelections(manifest, chat, session.sessionId),
 							stageDir,
 						});
 						return "uploaded" as const;
@@ -398,7 +424,7 @@ export const teleportRouter = router({
 				});
 			}
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			await withStage(async (stageDir) => {
+			const selections = await withStage(async (stageDir) => {
 				const manifest = await downloadBundle({
 					bundle: {
 						...input.bundle,
@@ -417,6 +443,7 @@ export const teleportRouter = router({
 					},
 					{ timeoutMs: 120_000 },
 				);
+				return manifest.selections;
 			});
 			if (chat.live.get(input.chatSessionId)) {
 				await chat.commands.closeSession({ sessionId: input.chatSessionId });
@@ -434,6 +461,21 @@ export const teleportRouter = router({
 				events: input.events as { seq: number; event: DurableEvent }[],
 				replace: true,
 			});
+			if (selections) {
+				const outline = chat.commands.getOutline({
+					sessionId: input.chatSessionId,
+				});
+				// A session event replaces the whole state, so it carries what the history set.
+				chat.journal.append(input.chatSessionId, {
+					type: "session",
+					session: {
+						...(outline.ok ? outline.outline.session : null),
+						status: "idle",
+						harness: input.session.harness,
+						...selections,
+					},
+				});
+			}
 			ctx.runtime.chatSync?.forget(input.chatSessionId);
 			return { sessionId: input.chatSessionId };
 		}),

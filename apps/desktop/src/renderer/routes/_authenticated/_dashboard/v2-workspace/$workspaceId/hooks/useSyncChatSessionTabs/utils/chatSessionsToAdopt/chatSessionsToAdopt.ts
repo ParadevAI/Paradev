@@ -12,7 +12,7 @@ import {
 } from "../../../../utils/pendingChatStops";
 import { CHAT_ADOPT_MAX_LIVE_CHATS } from "../../constants";
 
-interface ListedChatSession {
+export interface ListedChatSession {
 	sessionId: string;
 	harness: string;
 	harnessSessionId: string | null;

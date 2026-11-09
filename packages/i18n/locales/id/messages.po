@@ -142,10 +142,6 @@ msgstr "{0, plural, other {# chat ditutup}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {# obrolan tidak dapat dipindahkan. Buka untuk mencoba lagi.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# chat tetap di workspace lama} other {# chat tetap di workspace lama}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# komentar dilampirkan} other {# komentar dilampirkan}}"
@@ -366,9 +362,9 @@ msgstr "{0, plural, one {issue Linear} other {issue Linear}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Pindahkan # workspace terpilih ke grup} other {Pindahkan # workspace terpilih ke grup}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Memindahkan # chat ke sini…} other {Memindahkan # chat ke sini…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Memindahkan chat…} other {Memindahkan chat…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -870,6 +866,9 @@ msgstr "{cookieCount} cookie — lupakan situs ini"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# otomatisasi} other {# otomatisasi}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# chat tetap di workspace lama.} other {# chat tetap di workspace lama.}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# Check Gagal} other {# Check Gagal}}"
 
@@ -1369,9 +1368,6 @@ msgstr "{starCount} star dan terus bertambah"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomatisasi dimulai} other {# otomatisasi dimulai}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Workspace ini telah dipindahkan. # chat tetap di sini.} other {Workspace ini telah dipindahkan. # chat tetap di sini.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# subagen berjalan}}"
 
@@ -1395,9 +1391,6 @@ msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {{ready} dari # chat dipindahkan ke sini} other {{ready} dari # chat dipindahkan ke sini}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
@@ -12173,9 +12166,6 @@ msgstr "Memindahkan {name} ke {destination}"
 msgid "Moving this chat here"
 msgstr "Memindahkan chat ini ke sini"
 
-msgid "Moving this workspace here…"
-msgstr "Memindahkan workspace ini ke sini…"
-
 msgid "Moving this workspace…"
 msgstr "Memindahkan workspace ini…"
 
@@ -18959,6 +18949,9 @@ msgstr "Memulai workspace cloud"
 msgid "Starting the agent…"
 msgstr "Memulai agen…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Memulai workspace cloud…"
+
 msgid "Starting the simulator…"
 msgstr "Memulai simulator…"
 
@@ -19986,9 +19979,6 @@ msgstr "Waktu pemindahan habis."
 msgid "The move was cancelled."
 msgstr "Pemindahan dibatalkan."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "Pemindahan dihentikan. Workspace ini tetap di sini."
-
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
 
@@ -20626,9 +20616,6 @@ msgstr "Ini akan meng-unstage dan mengembalikan semua perubahan yang di-stage. F
 
 msgid "This workspace"
 msgstr "Workspace ini"
-
-msgid "This workspace couldn't move."
-msgstr "Workspace ini tidak dapat dipindahkan."
 
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"

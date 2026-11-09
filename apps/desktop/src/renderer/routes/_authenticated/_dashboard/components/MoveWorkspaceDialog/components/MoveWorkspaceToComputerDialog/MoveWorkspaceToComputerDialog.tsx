@@ -17,6 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@superset/ui/select";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
@@ -24,7 +25,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { useMoveWorkspaceToComputer } from "../../../../hooks/useMoveWorkspaceToComputer";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
 import { startWorkspaceMoveProgress } from "../../../../utils/startWorkspaceMoveProgress";
-import { useReportSkippedChats } from "../../hooks/useReportSkippedChats";
+import { navigateToV2Workspace } from "../../../../utils/workspace-navigation";
 
 interface MoveWorkspaceToComputerDialogProps {
 	open: boolean;
@@ -38,11 +39,11 @@ export function MoveWorkspaceToComputerDialog({
 	workspace,
 }: MoveWorkspaceToComputerDialogProps) {
 	const { t } = useLingui();
+	const navigate = useNavigate();
 	const { machineId } = useLocalHostService();
 	const { hosts } = useKnownHosts();
 	const { workspaces: cloudWorkspaces = [] } = useCloudWorkspaces();
 	const moveWorkspaceToComputer = useMoveWorkspaceToComputer(workspace);
-	const reportSkipped = useReportSkippedChats();
 
 	const computers = useMemo(() => {
 		const others = hosts
@@ -81,6 +82,8 @@ export function MoveWorkspaceToComputerDialog({
 		const progress = startWorkspaceMoveProgress({
 			name: workspace.name,
 			destination: destination.label ?? t({ message: "this computer" }),
+			toCloud: false,
+			sourceWorkspaceId: workspace.id,
 			retry: move,
 		});
 		onOpenChange(false);
@@ -90,10 +93,12 @@ export function MoveWorkspaceToComputerDialog({
 			onBegun: progress.begun,
 			signal: progress.signal,
 		})
-			.then(({ toWorkspaceId, skipped }) => {
-				progress.follow(toWorkspaceId);
-				reportSkipped(skipped);
-			})
+			.then(({ toWorkspaceId, stayed }) =>
+				progress.follow(toWorkspaceId, {
+					stayed,
+					open: () => void navigateToV2Workspace(toWorkspaceId, navigate),
+				}),
+			)
 			.catch((error: unknown) =>
 				progress.fail(
 					isMissingProcedureError(error)

@@ -1,11 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	keepPreviousData,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useEffect } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
@@ -13,7 +11,6 @@ import { sandboxWakeQueryKey } from "renderer/routes/_authenticated/providers/Sa
 import { useCountdown } from "../../hooks/useCountdown";
 import {
 	loadStoredChatSnapshot,
-	shownStoredChatKey,
 	storedChatSnapshotKey,
 } from "../../utils/loadStoredChatSnapshot";
 import { ConnectionPill, WAKE_UP_ESTIMATE_SECONDS } from "../ConnectionPill";
@@ -42,32 +39,19 @@ export function StoredCloudChat({
 	const { t } = useLingui();
 	const queryClient = useQueryClient();
 	const secondsLeft = useCountdown(WAKE_UP_ESTIMATE_SECONDS);
-	const enabled = useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
-	const chats = cloudTrpc.chatHistory.ofWorkspace.useQuery(
-		{ workspaceId },
-		{ enabled },
-	);
+	const chats = cloudTrpc.chatHistory.ofWorkspace.useQuery({ workspaceId });
 	const chatId = chats.data?.[0]?.id ?? null;
 	const stored = useQuery(
 		{
 			queryKey: storedChatSnapshotKey(chatId),
 			queryFn: () => loadStoredChatSnapshot(chatId as string),
-			enabled: enabled && chatId !== null,
+			enabled: chatId !== null,
 			placeholderData: keepPreviousData,
 			staleTime: STALE_MS,
 			retry: false,
 		},
 		electronQueryClient,
 	);
-	const shownChatId = stored.isPlaceholderData ? null : chatId;
-	useEffect(() => {
-		if (shownChatId) {
-			electronQueryClient.setQueryData(
-				shownStoredChatKey(workspaceId),
-				shownChatId,
-			);
-		}
-	}, [shownChatId, workspaceId]);
 	useEffect(() => {
 		for (const chat of chats.data?.slice(1, PREFETCHED_CHATS) ?? []) {
 			void electronQueryClient.prefetchQuery({
@@ -77,7 +61,7 @@ export function StoredCloudChat({
 			});
 		}
 	}, [chats.data]);
-	if (!enabled || !chatId || !stored.data) return fallback;
+	if (!chatId || !stored.data) return fallback;
 	return (
 		<div
 			className="relative flex h-full w-full flex-col"

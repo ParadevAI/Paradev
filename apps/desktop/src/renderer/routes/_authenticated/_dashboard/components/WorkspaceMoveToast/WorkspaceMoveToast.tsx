@@ -34,6 +34,7 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 			? describeMoveError(move.error)
 			: null;
 	const retry = failure ? move.retry : null;
+	const openable = move.open !== null && !failure && ended;
 
 	const title =
 		move.stage === "failed"
@@ -82,10 +83,17 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 					<p className="mt-1 font-mono break-words">{failure.details}</p>
 				</details>
 			)}
+			{ended && !failure && move.stayed.length > 0 && (
+				<p className="mt-1 truncate text-xs text-muted-foreground/70">
+					{move.stage === "ready"
+						? move.stayed.join(", ")
+						: `${stayedSentence(move.stayed.length, i18n)} ${move.stayed.join(", ")}`}
+				</p>
+			)}
 			{!ended && (
 				<Progress className="mt-3 h-1.5" value={progressPercent(move)} />
 			)}
-			{((move.cancel && CANCELLABLE.has(move.stage)) || retry) && (
+			{((move.cancel && CANCELLABLE.has(move.stage)) || retry || openable) && (
 				<div className="mt-3 flex justify-end gap-2">
 					{move.cancel && CANCELLABLE.has(move.stage) && (
 						<Button size="sm" variant="outline" onClick={move.cancel}>
@@ -95,6 +103,11 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 					{retry && (
 						<Button size="sm" onClick={retry}>
 							<Trans>Try again</Trans>
+						</Button>
+					)}
+					{openable && move.open && (
+						<Button size="sm" onClick={move.open}>
+							<Trans>Open</Trans>
 						</Button>
 					)}
 				</div>
@@ -131,6 +144,18 @@ function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 				return i18n._(msg({ message: "Finishing the move…" }));
 			}
 			const done = chats.ready + chats.failed;
+			if (done === 0) {
+				return move.toCloud
+					? i18n._(msg({ message: "Starting the cloud workspace…" }))
+					: i18n._(
+							msg({
+								message: plural(chats.total, {
+									one: "Moving its chat…",
+									other: "Moving its chats…",
+								}),
+							}),
+						);
+			}
 			return i18n._(
 				msg({
 					message: plural(chats.total, {
@@ -141,7 +166,9 @@ function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 			);
 		}
 		case "ready":
-			return i18n._(msg({ message: "Everything moved." }));
+			return move.stayed.length === 0
+				? i18n._(msg({ message: "Everything moved." }))
+				: stayedSentence(move.stayed.length, i18n);
 		case "partial":
 			return i18n._(
 				msg({
@@ -172,4 +199,15 @@ function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 				}),
 			);
 	}
+}
+
+function stayedSentence(count: number, i18n: I18n): string {
+	return i18n._(
+		msg({
+			message: plural(count, {
+				one: "# chat stayed in the old workspace.",
+				other: "# chats stayed in the old workspace.",
+			}),
+		}),
+	);
 }

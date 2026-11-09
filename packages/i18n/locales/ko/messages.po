@@ -142,10 +142,6 @@ msgstr "{0, plural, other {채팅 #개를 닫았습니다}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {채팅 #개를 옮기지 못했습니다. 열어서 다시 시도하세요.}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {채팅 #개가 이전 워크스페이스에 남았습니다} other {채팅 #개가 이전 워크스페이스에 남았습니다}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {코멘트 #개 첨부됨} other {코멘트 #개 첨부됨}}"
@@ -366,9 +362,9 @@ msgstr "{0, plural, one {Linear 이슈} other {Linear 이슈}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {선택한 워크스페이스 #개를 그룹으로 이동} other {선택한 워크스페이스 #개를 그룹으로 이동}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {채팅 #개를 여기로 옮기는 중…} other {채팅 #개를 여기로 옮기는 중…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {채팅을 이동하는 중…} other {채팅을 이동하는 중…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -870,6 +866,9 @@ msgstr "쿠키 {cookieCount}개 — 이 사이트 잊기"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {자동화 #개} other {자동화 #개}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {채팅 #개가 이전 워크스페이스에 남았습니다.} other {채팅 #개가 이전 워크스페이스에 남았습니다.}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {검사 #개 실패} other {검사 #개 실패}}"
 
@@ -1369,9 +1368,6 @@ msgstr "스타 {starCount}개, 계속 늘어나는 중"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {자동화 #개를 시작했습니다} other {자동화 #개를 시작했습니다}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {이 워크스페이스를 옮겼습니다. 채팅 #개는 여기에 남았습니다.} other {이 워크스페이스를 옮겼습니다. 채팅 #개는 여기에 남았습니다.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {서브 에이전트 #개 실행 중}}"
 
@@ -1395,9 +1391,6 @@ msgstr "{threshold, plural, other {에이전트 PR # 건 머지}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} 중단됨"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {채팅 #개 중 {ready}개를 여기로 옮겼습니다} other {채팅 #개 중 {ready}개를 여기로 옮겼습니다}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
@@ -12173,9 +12166,6 @@ msgstr "{name}을(를) {destination}(으)로 옮기는 중"
 msgid "Moving this chat here"
 msgstr "이 채팅을 여기로 옮기는 중"
 
-msgid "Moving this workspace here…"
-msgstr "이 워크스페이스를 여기로 옮기는 중…"
-
 msgid "Moving this workspace…"
 msgstr "이 워크스페이스를 옮기는 중…"
 
@@ -18959,6 +18949,9 @@ msgstr "클라우드 워크스페이스 시작 중"
 msgid "Starting the agent…"
 msgstr "에이전트를 시작하는 중…"
 
+msgid "Starting the cloud workspace…"
+msgstr "클라우드 워크스페이스를 시작하는 중…"
+
 msgid "Starting the simulator…"
 msgstr "시뮬레이터를 시작하는 중…"
 
@@ -19986,9 +19979,6 @@ msgstr "이동 시간이 초과되었습니다."
 msgid "The move was cancelled."
 msgstr "옮기기가 취소되었습니다."
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "이동이 중지되었습니다. 이 워크스페이스는 여기에 남아 있습니다."
-
 msgid "The name of your organization or team"
 msgstr "조직 또는 팀의 이름"
 
@@ -20626,9 +20616,6 @@ msgstr "스테이징된 변경 사항을 모두 스테이징 해제하고 되돌
 
 msgid "This workspace"
 msgstr "이 워크스페이스"
-
-msgid "This workspace couldn't move."
-msgstr "이 워크스페이스를 옮기지 못했습니다."
 
 msgid "This workspace has no project to branch from"
 msgstr "이 워크스페이스에는 분기할 프로젝트가 없습니다"

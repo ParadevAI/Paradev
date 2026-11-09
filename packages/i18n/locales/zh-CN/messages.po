@@ -142,10 +142,6 @@ msgstr "{0, plural, other {已关闭 # 个聊天}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {# 个聊天未能移动。打开后重试。}}"
 
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# 个聊天留在了原工作区} other {# 个聊天留在了原工作区}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {已附上#条评论} other {已附上#条评论}}"
@@ -366,9 +362,9 @@ msgstr "{0, plural, one {Linear议题} other {Linear议题}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {把选中的#个工作区移动到分组} other {把选中的#个工作区移动到分组}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {正在将 # 个聊天移到这里…} other {正在将 # 个聊天移到这里…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {正在移动聊天…} other {正在移动聊天…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -870,6 +866,9 @@ msgstr "{cookieCount}个cookie——忘记此站点"
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# 个自动化} other {# 个自动化}}"
 
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# 个聊天留在了原工作区。} other {# 个聊天留在了原工作区。}}"
+
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {#项检查失败} other {#项检查失败}}"
 
@@ -1369,9 +1368,6 @@ msgstr "{starCount}个星标，还在增长"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个自动化}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {此工作区已移动。# 个聊天留在了这里。} other {此工作区已移动。# 个聊天留在了这里。}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 个子智能体运行中}}"
 
@@ -1395,9 +1391,6 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
-
-msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
-msgstr "{total, plural, one {已将 {ready}/# 个聊天移到这里} other {已将 {ready}/# 个聊天移到这里}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
@@ -12173,9 +12166,6 @@ msgstr "正在将 {name} 移至{destination}"
 msgid "Moving this chat here"
 msgstr "正在将此聊天移到这里"
 
-msgid "Moving this workspace here…"
-msgstr "正在将此工作区移到这里…"
-
 msgid "Moving this workspace…"
 msgstr "正在移动此工作区…"
 
@@ -18959,6 +18949,9 @@ msgstr "正在启动云端工作区"
 msgid "Starting the agent…"
 msgstr "正在启动智能体…"
 
+msgid "Starting the cloud workspace…"
+msgstr "正在启动云端工作区…"
+
 msgid "Starting the simulator…"
 msgstr "正在启动模拟器…"
 
@@ -19986,9 +19979,6 @@ msgstr "移动超时。"
 msgid "The move was cancelled."
 msgstr "移动已取消。"
 
-msgid "The move was stopped. This workspace stayed here."
-msgstr "移动已停止。此工作区仍在这里。"
-
 msgid "The name of your organization or team"
 msgstr "你的组织或团队的名称"
 
@@ -20626,9 +20616,6 @@ msgstr "这将取消暂存并还原所有已暂存的更改。已暂存的新文
 
 msgid "This workspace"
 msgstr "此工作区"
-
-msgid "This workspace couldn't move."
-msgstr "此工作区无法移动。"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作区没有可供分叉的项目"

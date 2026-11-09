@@ -26,15 +26,6 @@ export function storedChatSnapshotKey(chatSessionId: string | null) {
 }
 
 /**
- * The stored chat a sleeping workspace showed last. A woken box resumes a chat
- * as a new session with the same history, so the pane shows this one until its
- * own arrives.
- */
-export function shownStoredChatKey(workspaceId: string) {
-	return ["stored-chat-shown", workspaceId] as const;
-}
-
-/**
  * A chat as the database holds it, built the way the live chat builds its own.
  * A long chat keeps its newest events, the part a person reads first.
  */
