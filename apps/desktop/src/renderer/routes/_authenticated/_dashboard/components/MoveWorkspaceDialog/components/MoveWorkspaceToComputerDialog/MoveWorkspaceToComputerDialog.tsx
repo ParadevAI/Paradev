@@ -19,7 +19,7 @@ import {
 } from "@superset/ui/select";
 import { useMemo, useState } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
-import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useMoveWorkspaceToComputer } from "../../../../hooks/useMoveWorkspaceToComputer";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
@@ -40,7 +40,7 @@ export function MoveWorkspaceToComputerDialog({
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
 	const { hosts } = useKnownHosts();
-	const { cache } = useHostWorkspaces();
+	const { workspaces: cloudWorkspaces = [] } = useCloudWorkspaces();
 	const moveWorkspaceToComputer = useMoveWorkspaceToComputer(workspace);
 	const reportSkipped = useReportSkippedChats();
 
@@ -50,7 +50,7 @@ export function MoveWorkspaceToComputerDialog({
 				(host) =>
 					host.machineId !== workspace.hostId &&
 					host.machineId !== machineId &&
-					!cache.isSandboxHost(host.machineId),
+					!cloudWorkspaces.some((row) => row.id === host.machineId),
 			)
 			.map((host) => ({
 				hostId: host.machineId,
@@ -63,7 +63,7 @@ export function MoveWorkspaceToComputerDialog({
 				? [{ hostId: machineId, label: null, online: true }]
 				: [];
 		return [...thisComputer, ...others];
-	}, [hosts, workspace.hostId, cache, machineId]);
+	}, [hosts, workspace.hostId, cloudWorkspaces, machineId]);
 	const [picked, setPicked] = useState<string | null>(null);
 	const destination =
 		computers.find((computer) => computer.hostId === picked) ??
@@ -87,6 +87,7 @@ export function MoveWorkspaceToComputerDialog({
 		void moveWorkspaceToComputer({
 			destination: { hostId: destination.hostId, name: destination.label },
 			onStage: progress.setStage,
+			onBegun: progress.begun,
 			signal: progress.signal,
 		})
 			.then(({ toWorkspaceId, skipped }) => {

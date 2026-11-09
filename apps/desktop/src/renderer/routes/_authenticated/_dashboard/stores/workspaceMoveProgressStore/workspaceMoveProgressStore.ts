@@ -12,6 +12,8 @@ export type WorkspaceMoveProgressStage =
 
 export interface WorkspaceMoveProgress {
 	id: string;
+	/** The control plane's record of this move, once it began. */
+	workspaceMoveId: string | null;
 	name: string;
 	destination: string;
 	stage: WorkspaceMoveProgressStage;

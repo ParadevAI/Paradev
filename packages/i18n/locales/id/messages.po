@@ -102,6 +102,10 @@ msgstr "(Anda)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {{done} dari # chat dipindahkan} other {{done} dari # chat dipindahkan}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# port aktif — sembunyikan detail} other {# port aktif — sembunyikan detail}}"
@@ -396,6 +400,10 @@ msgstr "{0, plural, one {Tampilkan # baris lagi} other {Tampilkan # baris lagi}}
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Ini akan mengimpor # worktree yang ada ke Paradev sebagai workspace. Tiap worktree di disk akan dilacak dan muncul di sidebar Anda. Tidak ada file yang diubah.} other {Ini akan mengimpor # worktree yang ada ke Paradev sebagai workspace. Tiap worktree di disk akan dilacak dan muncul di sidebar Anda. Tidak ada file yang diubah.}}"
 
+#. placeholder {0}: move.chats.total
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Workspace ini sudah dipindahkan. # chat-nya tetap di sini.} other {Workspace ini sudah dipindahkan. # chat-nya tetap di sini.}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, other {Lihat # komentar yang terselesaikan}}"
@@ -594,6 +602,10 @@ msgstr "{0} dipilih"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "{0} sesi dihentikan"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} tetap di tempat semula. Jika ada agen yang sedang bekerja, agen itu mungkin telah dihentikan."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -1003,9 +1015,6 @@ msgstr "{duration, plural, one {Berpikir # detik} other {Berpikir # detik}}"
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} di workspace ini sudah diterbitkan sebagai halaman di organisasi lain. Pindahkan berkasnya atau terbitkan dengan id halaman tersebut."
 
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, other {# chat tidak dapat dipindahkan ke komputer}}"
-
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# gagal} other {# gagal}}"
 
@@ -1168,6 +1177,12 @@ msgstr "{name} bawaan dan tidak dapat diganti"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} belum ditambahkan"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu mungkin telah dihentikan."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu telah dihentikan."
+
 msgid "{name} plugin"
 msgstr "Plugin {name}"
 
@@ -1311,9 +1326,6 @@ msgstr "{rate} per GB-jam. Dipakai setelah kumpulan bulanan, dan tidak pernah ke
 msgid "{readPercent}% read"
 msgstr "{readPercent}% dibaca"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "{ready} dari {total} chat telah dipindahkan ke sini"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1384,8 +1396,8 @@ msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
 
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {{done} dari # obrolan dipindahkan}}"
+msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
+msgstr "{total, plural, one {{ready} dari # chat dipindahkan ke sini} other {{ready} dari # chat dipindahkan ke sini}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
@@ -8067,6 +8079,9 @@ msgstr "Semua fitur Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Semua fitur Ultra ditambah GB-jam cloud khusus, SSO & SAML, provisioning SCIM, pembatasan IP, log audit, SLA khusus, dukungan khusus, dan kontrak khusus. Harga disesuaikan dengan organisasi Anda. Hubungi kami dan kami akan menyusun yang sesuai."
 
+msgid "Everything moved."
+msgstr "Semuanya sudah dipindahkan."
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Semua yang kami bangun di atas primitif — orisinal Paradev, suite"
 
@@ -8939,6 +8954,9 @@ msgstr "Selesai · belum dibaca"
 
 msgid "finished · worked for 7s"
 msgstr "selesai · bekerja 7 dtk"
+
+msgid "Finishing the move…"
+msgstr "Menyelesaikan pemindahan…"
 
 msgid "Fit"
 msgstr "Sesuaikan"
@@ -10628,6 +10646,9 @@ msgstr "Item"
 
 msgid "Iterate."
 msgstr "Iterasi."
+
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Chat-nya tidak dipindahkan dan masih ada di workspace asli. Buka workspace baru untuk melihat penyebabnya, lalu coba lagi."
 
 msgid "Its comments and history go with it."
 msgstr "Komentar dan riwayatnya ikut terhapus."
@@ -14132,6 +14153,9 @@ msgstr "Buka command palette global"
 msgid "Open the new workspace modal"
 msgstr "Buka modal workspace baru"
 
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Buka workspace baru untuk melihat setiap chat. Chat yang tidak dipindahkan masih ada di workspace asli."
+
 msgid "Open the original workspace"
 msgstr "Buka workspace asli"
 
@@ -17180,6 +17204,9 @@ msgstr "Disimpan ke Downloads"
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
 
+msgid "Saving its work and its chats…"
+msgstr "Menyimpan pekerjaan dan chat-nya…"
+
 msgid "Saving..."
 msgstr "Menyimpan..."
 
@@ -17920,6 +17947,9 @@ msgstr "Pengaturan disimpan"
 msgid "Setting up in the background..."
 msgstr "Menyiapkan di latar belakang..."
 
+msgid "Setting up the new workspace…"
+msgstr "Menyiapkan workspace baru…"
+
 msgid "Settings"
 msgstr "Pengaturan"
 
@@ -18591,6 +18621,9 @@ msgstr "Seseorang"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Orang lain sudah menerbitkan {entryPath} dari workspace ini. Terbitkan dengan id halaman yang eksplisit untuk menambahkan versi ke halaman mereka, atau pindahkan berkasnya."
+
+msgid "Someone is moving this workspace…"
+msgstr "Seseorang sedang memindahkan workspace ini…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Seseorang dari tim Paradev akan meninjau halaman ini. Kami hanya menghubungi Anda jika perlu informasi tambahan."
@@ -19760,6 +19793,9 @@ msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siap
 msgid "the cloud"
 msgstr "cloud"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "Workspace cloud tidak berjalan. Jalankan, lalu coba lagi."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."
 
@@ -19938,17 +19974,20 @@ msgstr "Mayoritas PR agen yang di-merge hanya perlu direview, tanpa suntingan ma
 msgid "The model declined to continue"
 msgstr "Model menolak untuk melanjutkan"
 
-msgid "The move into this workspace failed."
-msgstr "Pemindahan ke workspace ini gagal."
-
 msgid "The move service couldn't be reached."
 msgstr "Layanan pemindahan tidak dapat dijangkau."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Pemindahan berhenti merespons, jadi dihentikan."
 
+msgid "The move timed out."
+msgstr "Waktu pemindahan habis."
+
 msgid "The move was cancelled."
 msgstr "Pemindahan dibatalkan."
+
+msgid "The move was stopped. This workspace stayed here."
+msgstr "Pemindahan dihentikan. Workspace ini tetap di sini."
 
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
@@ -19961,6 +20000,9 @@ msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun.
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host komputer, lalu coba lagi."
 
 msgid "The overnight shift"
 msgstr "Shift malam"
@@ -20097,6 +20139,9 @@ msgstr "Pembaruan ini juga dapat:"
 msgid "The very beginning"
 msgstr "Paling awal"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "Workspace tidak dapat dijangkau. Pastikan workspace sedang berjalan, lalu coba lagi."
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "Workspace belum siap. Coba lagi."
 
@@ -20138,9 +20183,6 @@ msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke 
 
 msgid "These ports are still in use"
 msgstr "Port ini masih dipakai"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Semuanya masih ada di workspace asli. Buka satu per satu untuk mencoba lagi."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Agen berjalan dengan langganan dan kunci yang sudah Anda miliki."
@@ -20588,8 +20630,8 @@ msgstr "Ini akan meng-unstage dan mengembalikan semua perubahan yang di-stage. F
 msgid "This workspace"
 msgstr "Workspace ini"
 
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Workspace ini tidak dapat dipindahkan. Tidak ada yang berubah."
+msgid "This workspace couldn't move."
+msgstr "Workspace ini tidak dapat dipindahkan."
 
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"

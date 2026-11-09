@@ -102,6 +102,10 @@ msgstr "（你）"
 msgid "[prompt]"
 msgstr "[提示词]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {已移动 {done}/# 个聊天} other {已移动 {done}/# 个聊天}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#个活动端口 — 隐藏详情} other {#个活动端口 — 隐藏详情}}"
@@ -396,6 +400,10 @@ msgstr "{0, plural, one {再显示#行} other {再显示#行}}"
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {这会把#个已有worktree作为工作区导入Paradev。磁盘上的每个worktree都会被跟踪并出现在侧边栏里。不会修改任何文件。} other {这会把#个已有worktree作为工作区导入Paradev。磁盘上的每个worktree都会被跟踪并出现在侧边栏里。不会修改任何文件。}}"
 
+#. placeholder {0}: move.chats.total
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {此工作区已移动。它的 # 个聊天留在了这里。} other {此工作区已移动。它的 # 个聊天留在了这里。}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, other {查看 # 条已解决的评论}}"
@@ -594,6 +602,10 @@ msgstr "已选择 {0} 个"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "已终止{0}个会话"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} 保持原样。如果智能体正在工作，它可能已被停止。"
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -1003,9 +1015,6 @@ msgstr "{duration, plural, one {思考了#秒} other {思考了#秒}}"
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "该工作区中的 {entryPath} 已在另一个组织中发布为页面。请移动该文件，或使用那个页面的 id 发布。"
 
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, other {# 个聊天无法移到计算机}}"
-
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#项失败} other {#项失败}}"
 
@@ -1168,6 +1177,12 @@ msgstr "{name} 是内置的，无法替换"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未添加"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} 未改变。如果智能体正在工作，它可能已被停止。"
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} 未改变。如果智能体正在工作，它已被停止。"
+
 msgid "{name} plugin"
 msgstr "{name} 插件"
 
@@ -1311,9 +1326,6 @@ msgstr "每 GB 小时 {rate}。在每月额度池之后使用，永不过期。"
 msgid "{readPercent}% read"
 msgstr "已读{readPercent}%"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "已将 {total} 个聊天中的 {ready} 个移到这里"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1384,8 +1396,8 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
 
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {已移动 {done}/# 个聊天}}"
+msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
+msgstr "{total, plural, one {已将 {ready}/# 个聊天移到这里} other {已将 {ready}/# 个聊天移到这里}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
@@ -8067,6 +8079,9 @@ msgstr "Ultra 的全部功能"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra 的全部功能，外加定制云 GB 小时、SSO 与 SAML、SCIM 配置、IP 限制、审计日志、定制 SLA、专属支持和定制合同。价格根据您的组织定制。联系我们，我们会为您制定合适的方案。"
 
+msgid "Everything moved."
+msgstr "已全部移动。"
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "我们在基础组件之上构建的一切——Paradev原创组件、面向智能体界面的"
 
@@ -8939,6 +8954,9 @@ msgstr "已完成 · 未读"
 
 msgid "finished · worked for 7s"
 msgstr "已完成 · 用时7秒"
+
+msgid "Finishing the move…"
+msgstr "正在完成移动…"
 
 msgid "Fit"
 msgstr "适应窗口"
@@ -10628,6 +10646,9 @@ msgstr "条目"
 
 msgid "Iterate."
 msgstr "迭代。"
+
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "它的聊天没有移动，仍在原工作区中。打开新工作区查看原因并重试。"
 
 msgid "Its comments and history go with it."
 msgstr "其评论和历史记录也会一并删除。"
@@ -14132,6 +14153,9 @@ msgstr "打开全局命令面板"
 msgid "Open the new workspace modal"
 msgstr "打开新建工作区弹窗"
 
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "打开新工作区可查看每个聊天。未移动的聊天仍在原工作区中。"
+
 msgid "Open the original workspace"
 msgstr "打开原工作区"
 
@@ -17180,6 +17204,9 @@ msgstr "已保存到“下载”文件夹"
 msgid "Saving as an environment..."
 msgstr "正在保存为环境..."
 
+msgid "Saving its work and its chats…"
+msgstr "正在保存它的工作和聊天…"
+
 msgid "Saving..."
 msgstr "正在保存..."
 
@@ -17920,6 +17947,9 @@ msgstr "设置已保存"
 msgid "Setting up in the background..."
 msgstr "正在后台配置..."
 
+msgid "Setting up the new workspace…"
+msgstr "正在设置新工作区…"
+
 msgid "Settings"
 msgstr "设置"
 
@@ -18591,6 +18621,9 @@ msgstr "某人"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "其他人已发布该工作区中的 {entryPath}。使用明确的页面 id 发布以向其页面添加版本，或移动该文件。"
+
+msgid "Someone is moving this workspace…"
+msgstr "有人正在移动此工作区…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev 团队会审核此页面。只有在需要你补充信息时我们才会联系你。"
@@ -19760,6 +19793,9 @@ msgstr "聊天保持不变。自本轮以来被任何人编辑过的文件将保
 msgid "the cloud"
 msgstr "云端"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "云端工作区未运行。请先启动它，然后重试。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "云端工作区本应已启动，但没有及时响应。下次运行时会重试。"
 
@@ -19938,17 +19974,20 @@ msgstr "多数已合并的智能体PR只需审查，无需任何人工修改。"
 msgid "The model declined to continue"
 msgstr "模型拒绝继续"
 
-msgid "The move into this workspace failed."
-msgstr "移动到此工作区失败。"
-
 msgid "The move service couldn't be reached."
 msgstr "无法连接移动服务。"
 
 msgid "The move stopped responding, so it was ended."
 msgstr "移动已停止响应，因此已结束。"
 
+msgid "The move timed out."
+msgstr "移动超时。"
+
 msgid "The move was cancelled."
 msgstr "移动已取消。"
+
+msgid "The move was stopped. This workspace stayed here."
+msgstr "移动已停止。此工作区仍在这里。"
 
 msgid "The name of your organization or team"
 msgstr "你的组织或团队的名称"
@@ -19961,6 +20000,9 @@ msgstr "开源工作区，容纳Claude Code、Codex和任何编码智能体。"
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "开源工作区，容纳 Claude Code、Codex、OpenCode 和任何编码智能体。在不同分支上并行运行任务，并在一个地方审查所有内容。"
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "移动的另一端运行的是旧版本。请重启云端工作区或更新计算机的主机，然后重试。"
 
 msgid "The overnight shift"
 msgstr "夜班"
@@ -20097,6 +20139,9 @@ msgstr "此更新还可以："
 msgid "The very beginning"
 msgstr "最开始"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "无法连接到工作区。请检查它是否正在运行，然后重试。"
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "工作区尚未就绪。请重试。"
 
@@ -20138,9 +20183,6 @@ msgstr "这些文件夹中仍有你的文件，但没有自动迁移到新版 Pa
 
 msgid "These ports are still in use"
 msgstr "这些端口仍在使用中"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "它们仍在原工作区中。逐个打开即可重试。"
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "它们使用你已有的订阅和密钥运行。"
@@ -20588,8 +20630,8 @@ msgstr "这将取消暂存并还原所有已暂存的更改。已暂存的新文
 msgid "This workspace"
 msgstr "此工作区"
 
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "无法移动此工作区。它没有任何变化。"
+msgid "This workspace couldn't move."
+msgstr "此工作区无法移动。"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作区没有可供分叉的项目"

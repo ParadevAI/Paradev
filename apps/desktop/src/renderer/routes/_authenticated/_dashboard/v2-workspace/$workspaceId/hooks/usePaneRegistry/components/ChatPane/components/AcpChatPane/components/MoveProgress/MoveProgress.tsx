@@ -55,7 +55,7 @@ export function MoveProgress({
 		errorUpdatedAt,
 		refetch,
 	} = cloudTrpc.chatMove.latest.useQuery(
-		{ chatSessionId },
+		{ chatSessionId, anyone: true },
 		{
 			refetchInterval: (query) =>
 				lostRef.current || isSettledHere(query.state.data, workspaceId)
@@ -66,6 +66,7 @@ export function MoveProgress({
 	);
 	// Until this move is recorded, the newest one is an earlier move elsewhere.
 	const move = latest?.toWorkspaceId === workspaceId ? latest : null;
+	const isMine = move?.isMine !== false;
 	const messageCount = move?.messageCount ?? 0;
 	// A newer move out of this workspace means the chat arrived here and left again.
 	const movedOn = latest?.fromWorkspaceId === workspaceId;
@@ -93,7 +94,10 @@ export function MoveProgress({
 		useLocalHostService();
 	// A move here that no run on this computer has taken yet, as after a reload.
 	const waitingHere =
-		move?.status === "pending" && !!machineId && move.toHostId === machineId;
+		isMine &&
+		move?.status === "pending" &&
+		!!machineId &&
+		move.toHostId === machineId;
 	const pickedUp = useRef<string | null>(null);
 	useEffect(() => {
 		if (!waitingHere || !move || !activeHostUrl) return;
@@ -111,7 +115,8 @@ export function MoveProgress({
 	const retry = cloudTrpc.chatMove.retry.useMutation({
 		onSuccess: ({ moveId, runsOnThisComputer }) => {
 			void utils.chatMove.latest.invalidate({ chatSessionId });
-			void utils.workspaceMove.latest.invalidate({ workspaceId });
+			// The source workspace's banner counts this chat too.
+			void utils.workspaceMove.latest.invalidate();
 			if (!runsOnThisComputer) return;
 			const toHostId = move?.toHostId ?? machineId;
 			const hostUrl =
@@ -149,7 +154,10 @@ export function MoveProgress({
 				.catch((error: unknown) =>
 					console.warn("[chat-move] the move to the computer failed", error),
 				)
-				.finally(() => utils.chatMove.latest.invalidate({ chatSessionId }));
+				.finally(() => {
+					void utils.chatMove.latest.invalidate({ chatSessionId });
+					void utils.workspaceMove.latest.invalidate();
+				});
 		},
 		onError: (error) =>
 			toast.error(t({ message: "Couldn't try the move again" }), {
@@ -186,13 +194,15 @@ export function MoveProgress({
 				)}
 				<div className="flex gap-2">
 					{originButton}
-					<Button
-						size="sm"
-						disabled={retry.isPending}
-						onClick={() => retry.mutate({ moveId: move.id })}
-					>
-						<Trans>Try again</Trans>
-					</Button>
+					{isMine ? (
+						<Button
+							size="sm"
+							disabled={retry.isPending}
+							onClick={() => retry.mutate({ moveId: move.id })}
+						>
+							<Trans>Try again</Trans>
+						</Button>
+					) : null}
 				</div>
 			</div>
 		);

@@ -102,6 +102,10 @@ msgstr "(vy)"
 msgid "[prompt]"
 msgstr "[prompt]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {Přesunuto {done} z # chatu} few {Přesunuto {done} z # chatů} many {Přesunuto {done} z # chatu} other {Přesunuto {done} z # chatů}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {# aktivní port — skrýt podrobnosti} few {# aktivní porty — skrýt podrobnosti} many {# aktivního portu — skrýt podrobnosti} other {# aktivních portů — skrýt podrobnosti}}"
@@ -396,6 +400,10 @@ msgstr "{0, plural, one {Zobrazit ještě # řádek} few {Zobrazit ještě # ř�
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Tímto se do Paradev naimportuje # existující worktree jako pracovní prostor. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.} few {Tímto se do Paradev naimportují # existující worktree jako pracovní prostory. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.} many {Tímto se do Paradev naimportuje # existujícího worktree jako pracovní prostory. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.} other {Tímto se do Paradev naimportuje # existujících worktree jako pracovní prostory. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.}}"
 
+#. placeholder {0}: move.chats.total
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Tento pracovní prostor byl přesunut. Jeho # chat zůstal tady.} few {Tento pracovní prostor byl přesunut. Jeho # chaty zůstaly tady.} many {Tento pracovní prostor byl přesunut. Jeho # chatu zůstalo tady.} other {Tento pracovní prostor byl přesunut. Jeho # chatů zůstalo tady.}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, one {Zobrazit # vyřešený komentář} few {Zobrazit # vyřešené komentáře} many {Zobrazit # vyřešeného komentáře} other {Zobrazit # vyřešených komentářů}}"
@@ -594,6 +602,10 @@ msgstr "Vybráno: {0}"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "Ukončeno relací: {0}"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} zůstává tam, kde byl. Pokud pracoval agent, mohl být zastaven."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -1003,9 +1015,6 @@ msgstr "{duration, plural, one {Přemýšlel # sekundu} few {Přemýšlel # seku
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} v tomto workspace je už publikovaný jako stránka v jiné organizaci. Přesuň soubor nebo publikuj s ID té stránky."
 
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, one {# chat se nepodařilo přesunout na počítač} few {# chaty se nepodařilo přesunout na počítač} many {# chatu se nepodařilo přesunout na počítač} other {# chatů se nepodařilo přesunout na počítač}}"
-
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# selhalo} few {# selhalo} many {# selhalo} other {# selhalo}}"
 
@@ -1168,6 +1177,12 @@ msgstr "{name} je vestavěný a nelze jej nahradit"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} není přidán"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} zůstává beze změny. Pokud pracoval agent, mohl být zastaven."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} zůstává beze změny. Pokud pracoval agent, byl zastaven."
+
 msgid "{name} plugin"
 msgstr "Plugin {name}"
 
@@ -1311,9 +1326,6 @@ msgstr "{rate} za GB-hodinu. Čerpají se po měsíčním fondu a nikdy nevyprš
 msgid "{readPercent}% read"
 msgstr "přečteno {readPercent} %"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "Sem se přesunulo {ready} z {total} chatů"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1384,8 +1396,8 @@ msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agent
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
 
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {Přesunuto {done} z # chatu} few {Přesunuto {done} z # chatů} many {Přesunuto {done} z # chatu} other {Přesunuto {done} z # chatů}}"
+msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
+msgstr "{total, plural, one {Sem přesunuto {ready} z # chatu} few {Sem přesunuto {ready} z # chatů} many {Sem přesunuto {ready} z # chatu} other {Sem přesunuto {ready} z # chatů}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
@@ -8067,6 +8079,9 @@ msgstr "Vše z Ultra"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Vše z Ultra a navíc GB-hodiny v cloudu na míru, SSO a SAML, zřizování SCIM, omezení IP, auditní protokoly, SLA na míru, vyhrazená podpora a smlouvy na míru. Cena se přizpůsobí vaší organizaci. Ozvěte se a navrhneme vhodné řešení."
 
+msgid "Everything moved."
+msgstr "Vše bylo přesunuto."
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Vše, co jsme postavili nad primitivy — originály Paradev, sada"
 
@@ -8939,6 +8954,9 @@ msgstr "Hotovo · nepřečteno"
 
 msgid "finished · worked for 7s"
 msgstr "hotovo · pracoval 7 s"
+
+msgid "Finishing the move…"
+msgstr "Dokončování přesunu…"
 
 msgid "Fit"
 msgstr "Přizpůsobit"
@@ -10628,6 +10646,9 @@ msgstr "Položka"
 
 msgid "Iterate."
 msgstr "Vylepšujte."
+
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Jeho chaty se nepřesunuly a zůstávají v původním pracovním prostoru. Otevřete nový pracovní prostor, zjistěte proč, a zkuste to znovu."
 
 msgid "Its comments and history go with it."
 msgstr "Smažou se i jeho komentáře a historie."
@@ -14132,6 +14153,9 @@ msgstr "Otevřít globální paletu příkazů"
 msgid "Open the new workspace modal"
 msgstr "Otevřít okno nového pracovního prostoru"
 
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Otevřete nový pracovní prostor a uvidíte jednotlivé chaty. Chat, který se nepřesunul, zůstává v původním pracovním prostoru."
+
 msgid "Open the original workspace"
 msgstr "Otevřít původní pracovní prostor"
 
@@ -17180,6 +17204,9 @@ msgstr "Uloženo do Stažených souborů"
 msgid "Saving as an environment..."
 msgstr "Ukládání jako prostředí..."
 
+msgid "Saving its work and its chats…"
+msgstr "Ukládání jeho práce a chatů…"
+
 msgid "Saving..."
 msgstr "Ukládání…"
 
@@ -17920,6 +17947,9 @@ msgstr "Nastavení uloženo"
 msgid "Setting up in the background..."
 msgstr "Nastavuji na pozadí..."
 
+msgid "Setting up the new workspace…"
+msgstr "Připravuje se nový pracovní prostor…"
+
 msgid "Settings"
 msgstr "Nastavení"
 
@@ -18591,6 +18621,9 @@ msgstr "Někdo"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Někdo jiný už {entryPath} z tohoto workspace publikoval. Publikuj s výslovným ID stránky a přidej verzi k jeho stránce, nebo soubor přesuň."
+
+msgid "Someone is moving this workspace…"
+msgstr "Někdo přesouvá tento pracovní prostor…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Někdo z týmu Paradev tuto stránku posoudí. Ozveme se jen tehdy, když budeme potřebovat víc informací."
@@ -19760,6 +19793,9 @@ msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, z
 msgid "the cloud"
 msgstr "cloud"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "Cloudový pracovní prostor neběží. Spusťte ho a zkuste to znovu."
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Další běh to zkusí znovu."
 
@@ -19938,17 +19974,20 @@ msgstr "Většina sloučených PR od agentů potřebuje jen revizi, bez jediné 
 msgid "The model declined to continue"
 msgstr "Model odmítl pokračovat"
 
-msgid "The move into this workspace failed."
-msgstr "Přesun do tohoto pracovního prostoru se nezdařil."
-
 msgid "The move service couldn't be reached."
 msgstr "Službu pro přesun se nepodařilo zastihnout."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Přesun přestal odpovídat, a proto byl ukončen."
 
+msgid "The move timed out."
+msgstr "Časový limit přesunu vypršel."
+
 msgid "The move was cancelled."
 msgstr "Přesun byl zrušen."
+
+msgid "The move was stopped. This workspace stayed here."
+msgstr "Přesun byl zastaven. Tento pracovní prostor zůstal tady."
 
 msgid "The name of your organization or team"
 msgstr "Název vaší organizace nebo týmu"
@@ -19961,6 +20000,9 @@ msgstr "Open-source pracovní prostor pro Claude Code, Codex a jakéhokoli kódo
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Open-source pracovní prostor pro Claude Code, Codex, OpenCode a jakéhokoli kódovacího agenta. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "Druhá strana přesunu používá starší verzi. Restartujte cloudový pracovní prostor nebo aktualizujte hostitele počítače a zkuste to znovu."
 
 msgid "The overnight shift"
 msgstr "Noční směna"
@@ -20097,6 +20139,9 @@ msgstr "Aktualizace může navíc:"
 msgid "The very beginning"
 msgstr "Úplný začátek"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "K pracovnímu prostoru se nepodařilo připojit. Zkontrolujte, že běží, a zkuste to znovu."
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "Pracovní prostor ještě není připravený. Zkuste to znovu."
 
@@ -20138,9 +20183,6 @@ msgstr "Tyto složky stále obsahují vaše soubory, ale do nového Paradevu se 
 
 msgid "These ports are still in use"
 msgstr "Tyto porty se stále používají"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Jsou stále v původním pracovním prostoru. Otevřete je jednotlivě a zkuste to znovu."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Běží na předplatných a klíčích, které už máte."
@@ -20588,8 +20630,8 @@ msgstr "Tímto zrušíte přípravu a vrátíte všechny připravené změny. P�
 msgid "This workspace"
 msgstr "Tento pracovní prostor"
 
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Tento pracovní prostor se nepodařilo přesunout. Nic se nezměnilo."
+msgid "This workspace couldn't move."
+msgstr "Tento pracovní prostor se nepodařilo přesunout."
 
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"

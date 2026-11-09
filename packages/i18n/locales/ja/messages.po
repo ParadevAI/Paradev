@@ -102,6 +102,10 @@ msgstr "（自分）"
 msgid "[prompt]"
 msgstr "[プロンプト]"
 
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {{done}/#件のチャットを移動しました} other {{done}/#件のチャットを移動しました}}"
+
 #. placeholder {0}: ports.length
 msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
 msgstr "{0, plural, one {#個のアクティブなポート — 詳細を隠す} other {#個のアクティブなポート — 詳細を隠す}}"
@@ -396,6 +400,10 @@ msgstr "{0, plural, one {さらに#行を表示} other {さらに#行を表示}}
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {既存のワークツリー#件をワークスペースとしてParadevにインポートします。ディスク上の各ワークツリーが追跡され、サイドバーに表示されます。ファイルは変更されません。} other {既存のワークツリー#件をワークスペースとしてParadevにインポートします。ディスク上の各ワークツリーが追跡され、サイドバーに表示されます。ファイルは変更されません。}}"
 
+#. placeholder {0}: move.chats.total
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {このワークスペースは移動しました。#件のチャットはここに残りました。} other {このワークスペースは移動しました。#件のチャットはここに残りました。}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, other {解決済みのコメント # 件を表示}}"
@@ -594,6 +602,10 @@ msgstr "{0} 件選択"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "{0}件のセッションを終了しました"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} は元の場所に残っています。エージェントが作業中だった場合は、停止された可能性があります。"
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -1003,9 +1015,6 @@ msgstr "{duration, plural, one {#秒間思考しました} other {#秒間思考�
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "このワークスペースの {entryPath} は、別の組織のページとしてすでに公開されています。ファイルを移動するか、そのページの ID を指定して公開してください。"
 
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, other {# 件のチャットをコンピューターに移動できませんでした}}"
-
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#件失敗} other {#件失敗}}"
 
@@ -1168,6 +1177,12 @@ msgstr "{name} は組み込みのため置き換えられません"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} は追加されていません"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} は変更されていません。エージェントが作業中だった場合は、停止された可能性があります。"
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} は変更されていません。エージェントが作業中だった場合は、停止されました。"
+
 msgid "{name} plugin"
 msgstr "{name} プラグイン"
 
@@ -1311,9 +1326,6 @@ msgstr "GB 時間あたり {rate}。月間プールの後に使われ、期限�
 msgid "{readPercent}% read"
 msgstr "{readPercent}%読了"
 
-msgid "{ready} of {total} chats moved here"
-msgstr "{total}件中{ready}件のチャットをここに移動しました"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1384,8 +1396,8 @@ msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
 
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {#件中{done}件のチャットを移動しました}}"
+msgid "{total, plural, one {{ready} of # chat moved here} other {{ready} of # chats moved here}}"
+msgstr "{total, plural, one {{ready}/#件のチャットをここに移動しました} other {{ready}/#件のチャットをここに移動しました}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
@@ -8067,6 +8079,9 @@ msgstr "Ultra のすべて"
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra のすべてに加えて、カスタムのクラウド GB 時間、SSO と SAML、SCIM プロビジョニング、IP 制限、監査ログ、カスタム SLA、専任サポート、カスタム契約。価格は組織に合わせて設定します。お問い合わせいただければ、最適なプランをご提案します。"
 
+msgid "Everything moved."
+msgstr "すべて移動しました。"
+
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "プリミティブの上に作ったもの一式 — Paradev独自のコンポーネント、エージェントUI向けの"
 
@@ -8939,6 +8954,9 @@ msgstr "完了 · 未読"
 
 msgid "finished · worked for 7s"
 msgstr "完了 · 7秒稼働"
+
+msgid "Finishing the move…"
+msgstr "移動を完了しています…"
 
 msgid "Fit"
 msgstr "全体表示"
@@ -10628,6 +10646,9 @@ msgstr "Item"
 
 msgid "Iterate."
 msgstr "改善。"
+
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "チャットは移動されず、元のワークスペースに残っています。新しいワークスペースを開いて理由を確認し、もう一度お試しください。"
 
 msgid "Its comments and history go with it."
 msgstr "コメントと履歴も削除されます。"
@@ -14132,6 +14153,9 @@ msgstr "グローバルコマンドパレットを開く"
 msgid "Open the new workspace modal"
 msgstr "新規ワークスペースのモーダルを開く"
 
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "新しいワークスペースを開くと、各チャットを確認できます。移動されなかったチャットは元のワークスペースに残っています。"
+
 msgid "Open the original workspace"
 msgstr "元のワークスペースを開く"
 
@@ -17180,6 +17204,9 @@ msgstr "ダウンロードフォルダに保存しました"
 msgid "Saving as an environment..."
 msgstr "環境として保存しています..."
 
+msgid "Saving its work and its chats…"
+msgstr "作業内容とチャットを保存しています…"
+
 msgid "Saving..."
 msgstr "保存中..."
 
@@ -17920,6 +17947,9 @@ msgstr "設定を保存しました"
 msgid "Setting up in the background..."
 msgstr "バックグラウンドでセットアップ中..."
 
+msgid "Setting up the new workspace…"
+msgstr "新しいワークスペースを準備しています…"
+
 msgid "Settings"
 msgstr "設定"
 
@@ -18591,6 +18621,9 @@ msgstr "誰か"
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "このワークスペースの {entryPath} は、他の人がすでに公開しています。ページ ID を明示して相手のページにバージョンを追加するか、ファイルを移動してください。"
+
+msgid "Someone is moving this workspace…"
+msgstr "誰かがこのワークスペースを移動しています…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev チームがこのページを確認します。追加の情報が必要な場合にのみご連絡します。"
@@ -19760,6 +19793,9 @@ msgstr "チャットはそのまま残ります。このターンの後に誰か
 msgid "the cloud"
 msgstr "クラウド"
 
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "クラウドワークスペースが起動していません。起動してから、もう一度お試しください。"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "クラウドワークスペースは起動しているはずですが、時間内に応答がありませんでした。次回の実行で再試行します。"
 
@@ -19938,17 +19974,20 @@ msgstr "マージされたエージェントのPRの過半数が、レビュー�
 msgid "The model declined to continue"
 msgstr "モデルが続行を拒否しました"
 
-msgid "The move into this workspace failed."
-msgstr "このワークスペースへの移動に失敗しました。"
-
 msgid "The move service couldn't be reached."
 msgstr "移動サービスに接続できませんでした。"
 
 msgid "The move stopped responding, so it was ended."
 msgstr "移動が応答しなくなったため終了しました。"
 
+msgid "The move timed out."
+msgstr "移動がタイムアウトしました。"
+
 msgid "The move was cancelled."
 msgstr "移動はキャンセルされました。"
+
+msgid "The move was stopped. This workspace stayed here."
+msgstr "移動を停止しました。このワークスペースはここに残っています。"
 
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
@@ -19961,6 +20000,9 @@ msgstr "Claude Code、Codex、そしてあらゆるコーディングエージ�
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code、Codex、OpenCode、そしてあらゆるコーディングエージェントのための、オープンソースのワークスペース。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "移動先または移動元で古いバージョンが動作しています。クラウドワークスペースを再起動するか、コンピューターのホストを更新してから、もう一度お試しください。"
 
 msgid "The overnight shift"
 msgstr "夜間シフト"
@@ -20097,6 +20139,9 @@ msgstr "この更新では次の操作も可能になります:"
 msgid "The very beginning"
 msgstr "最初"
 
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "ワークスペースに接続できませんでした。起動していることを確認してから、もう一度お試しください。"
+
 msgid "The workspace is not ready yet. Try again."
 msgstr "ワークスペースの準備がまだできていません。もう一度お試しください。"
 
@@ -20138,9 +20183,6 @@ msgstr "これらのフォルダにはファイルが残っていますが、新
 
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "元のワークスペースに残っています。もう一度試すには、それぞれを開いてください。"
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "お持ちのサブスクリプションとキーでそのまま動きます。"
@@ -20588,8 +20630,8 @@ msgstr "ステージ済みの変更をすべてステージ解除して元に戻
 msgid "This workspace"
 msgstr "このワークスペース"
 
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "このワークスペースを移動できませんでした。変更はありません。"
+msgid "This workspace couldn't move."
+msgstr "このワークスペースを移動できませんでした。"
 
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
