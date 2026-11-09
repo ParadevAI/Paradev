@@ -2919,6 +2919,9 @@ msgstr "Instalátor od Applu se zavřel dřív, než se Git nainstaloval."
 msgid "Apple's installer did not open: {0}"
 msgstr "Instalátor od Applu se neotevřel: {0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Odhad času od Applu bývá obvykle mnohem delší než skutečná instalace."
+
 msgid "Application menu"
 msgstr "Nabídka aplikace"
 
@@ -10272,6 +10275,9 @@ msgstr "Nainstalovat Command Line Tools"
 
 msgid "Install failed"
 msgstr "Instalace selhala"
+
+msgid "Install Git first. See the message above."
+msgstr "Nejdřív nainstalujte Git. Viz zprávu výše."
 
 msgid "Install Git, then come back."
 msgstr "Nainstalujte Git a pak se sem vraťte."
