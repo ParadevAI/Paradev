@@ -13,7 +13,7 @@ afterAll(() => {
 	fromIdMock.mockImplementation(preloadFromId ?? (() => null));
 });
 
-test("each of an extension's new tabs gets its own user pane, never an agent pane", async () => {
+test("each of an extension's new tabs gets its own pane, never one a browser open request made", async () => {
 	const userSession = {} as Electron.Session;
 	const fakePane = (paneSession: object) => ({
 		session: paneSession,
@@ -27,7 +27,7 @@ test("each of an extension's new tabs gets its own user pane, never an agent pan
 		off: () => {},
 	});
 	const panes = new Map<number, object>([
-		[801, fakePane({})],
+		[801, fakePane(userSession)],
 		[802, fakePane(userSession)],
 		[803, fakePane(userSession)],
 	]);
@@ -35,6 +35,7 @@ test("each of an extension's new tabs gets its own user pane, never an agent pan
 
 	const opened = waitForNewPane("ws-ext", userSession);
 	const openedNext = waitForNewPane("ws-ext", userSession);
+	browserManager.resolveOpenRequest("agent-open", "ext-agent-pane");
 	browserManager.register("ext-agent-pane", 801, "ws-ext");
 	browserManager.register("ext-user-pane", 802, "ws-ext");
 	browserManager.register("ext-second-pane", 803, "ws-ext");

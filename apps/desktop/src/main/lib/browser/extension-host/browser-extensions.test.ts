@@ -10,6 +10,7 @@ import path from "node:path";
 import { app } from "electron";
 import type { ElectronChromeExtensions } from "electron-chrome-extensions";
 import {
+	activateBrowserExtension,
 	attachBrowserExtensions,
 	removeBrowserExtension,
 	setTurnedOffBrowserExtensions,
@@ -58,6 +59,7 @@ function attachTurnedOff(onRemoved: (id: string) => void = () => {}) {
 		session: session as unknown as Electron.Session,
 		extensions,
 		tabOf: () => undefined,
+		selectPane: () => {},
 		onRemoved,
 	});
 	mkdirSync(path.join(turnedOffDir(), "1.0_0"), { recursive: true });
@@ -104,4 +106,45 @@ test("a removed extension's saved state is forgotten even when clearing its data
 
 	expect(existsSync(turnedOffDir())).toBe(false);
 	expect(onRemoved).toHaveBeenCalledWith(EXTENSION_ID);
+});
+
+test("a click on a pane's extension button makes that pane the active tab first", () => {
+	const calls: string[] = [];
+	const tab = {
+		id: 7,
+		isDestroyed: () => false,
+	} as unknown as Electron.WebContents;
+	attachBrowserExtensions({
+		session: {
+			extensions: {
+				on: () => {},
+				getExtension: () => undefined,
+				getAllExtensions: () => [],
+			},
+		} as unknown as Electron.Session,
+		extensions: {
+			on: () => {},
+			api: {
+				browserAction: {
+					getState: () => ({ actions: [] }),
+					activate: (_sender: unknown, details: { tabId: number }) =>
+						calls.push(`activate tab ${details.tabId}`),
+					handleCRXRequest: () => new Response(null, { status: 404 }),
+					observers: new Set(),
+				},
+			},
+		} as unknown as ElectronChromeExtensions,
+		tabOf: (paneId) => (paneId === "pane-b" ? tab : undefined),
+		selectPane: (paneId) => calls.push(`select ${paneId}`),
+		onRemoved: () => {},
+	});
+
+	activateBrowserExtension("pane-b", EXTENSION_ID, {
+		x: 0,
+		y: 0,
+		width: 1,
+		height: 1,
+	});
+
+	expect(calls).toEqual(["select pane-b", "activate tab 7"]);
 });

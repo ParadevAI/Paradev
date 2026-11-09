@@ -6,17 +6,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
-import {
-	ChevronDown,
-	MessageSquare,
-	SquareStack,
-	SquareTerminal,
-} from "lucide-react";
+import { ChevronDown, MessageSquare, SquareTerminal } from "lucide-react";
 import type { ReactNode } from "react";
-import type {
-	SurfaceForkPlacement,
-	SurfaceForkSource,
-} from "../../hooks/useSurfaceFork";
+import type { SurfaceForkSource } from "../../hooks/useSurfaceFork";
 
 export function SurfaceModeMenu({
 	mode,
@@ -28,7 +20,7 @@ export function SurfaceModeMenu({
 }: {
 	mode: "cli" | "chat";
 	source: SurfaceForkSource | null;
-	onFork: (source: SurfaceForkSource, placement: SurfaceForkPlacement) => void;
+	onFork: (source: SurfaceForkSource) => void;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	children?: ReactNode;
@@ -56,34 +48,14 @@ export function SurfaceModeMenu({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-64">
 				{source && (
-					<>
-						<DropdownMenuItem
-							className="items-start"
-							onSelect={() => onFork(source, "beside")}
-						>
-							<TargetIcon className="mt-0.5" />
-							<div className="flex flex-col gap-0.5">
-								<span>
-									{mode === "cli" ? (
-										<Trans>Fork into chat</Trans>
-									) : (
-										<Trans>Fork into CLI</Trans>
-									)}
-								</span>
-								<span className="text-[11px] text-muted-foreground">
-									<Trans>Opens beside this pane. This one keeps running.</Trans>
-								</span>
-							</div>
-						</DropdownMenuItem>
-						<DropdownMenuItem onSelect={() => onFork(source, "tab")}>
-							<SquareStack />
-							{mode === "cli" ? (
-								<Trans>Fork into chat in a new tab</Trans>
-							) : (
-								<Trans>Fork into CLI in a new tab</Trans>
-							)}
-						</DropdownMenuItem>
-					</>
+					<DropdownMenuItem onSelect={() => onFork(source)}>
+						<TargetIcon />
+						{mode === "cli" ? (
+							<Trans>Open in Chat Interface</Trans>
+						) : (
+							<Trans>Open in Terminal Chat</Trans>
+						)}
+					</DropdownMenuItem>
 				)}
 				{source && children && <DropdownMenuSeparator />}
 				{children}

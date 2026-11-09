@@ -134,6 +134,14 @@ msgstr "{0, plural, one {#个已更改文件} other {#个已更改文件}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {已关闭 # 个聊天}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, other {# 个聊天未能移动。打开后重试。}}"
+
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# 个聊天留在了原工作区} other {# 个聊天留在了原工作区}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {已附上#条评论} other {已附上#条评论}}"
@@ -353,6 +361,10 @@ msgstr "{0, plural, one {Linear议题} other {Linear议题}}"
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {把选中的#个工作区移动到分组} other {把选中的#个工作区移动到分组}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {正在将 # 个聊天移到这里…} other {正在将 # 个聊天移到这里…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -831,6 +843,9 @@ msgstr "{0}项检查中已完成{completed}项"
 msgid "{completed} of {total} completed"
 msgstr "已完成 {completed}/{total} 项"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName}（离线）"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle}字号"
 
@@ -988,6 +1003,9 @@ msgstr "{duration, plural, one {思考了#秒} other {思考了#秒}}"
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "该工作区中的 {entryPath} 已在另一个组织中发布为页面。请移动该文件，或使用那个页面的 id 发布。"
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, other {# 个聊天无法移到计算机}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#项失败} other {#项失败}}"
 
@@ -1097,6 +1115,9 @@ msgstr "{localHostName}（此设备）"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {正在复制对话（# 条消息）} other {正在复制对话（# 条消息）}}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1290,6 +1311,9 @@ msgstr "每 GB 小时 {rate}。在每月额度池之后使用，永不过期。"
 msgid "{readPercent}% read"
 msgstr "已读{readPercent}%"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "已将 {total} 个聊天中的 {ready} 个移到这里"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1333,6 +1357,9 @@ msgstr "{starCount}个星标，还在增长"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个自动化}}"
 
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {此工作区已移动。# 个聊天留在了这里。} other {此工作区已移动。# 个聊天留在了这里。}}"
+
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 个子智能体运行中}}"
 
@@ -1356,6 +1383,9 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {已移动 {done}/# 个聊天}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
@@ -1976,6 +2006,12 @@ msgstr "将{0}添加到工作区"
 
 msgid "Add {localizedName}?"
 msgstr "要添加“{localizedName}”吗？"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "请先在 {computer} 上将 {repositoryName} 添加为项目"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "请先将 {repositoryName} 添加为此电脑上的项目"
 
 msgid "Add a comment…"
 msgstr "添加评论…"
@@ -3925,6 +3961,9 @@ msgstr "取消编辑"
 msgid "Cancel invite"
 msgstr "取消邀请"
 
+msgid "Cancel move"
+msgstr "取消移动"
+
 msgid "Cancel plan"
 msgstr "取消方案"
 
@@ -5367,9 +5406,6 @@ msgstr "继续"
 msgid "Continue in your browser"
 msgstr "请在浏览器中继续"
 
-msgid "Continue or fork session"
-msgstr "继续或分叉会话"
-
 msgid "Continue this chat on another login"
 msgstr "使用其他账号继续此对话"
 
@@ -5622,6 +5658,9 @@ msgstr "把其他浏览器的浏览历史和登录信息复制到Paradev。原�
 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "请立即复制你的密钥，之后将无法再次查看。"
+
+msgid "Copying the conversation"
+msgstr "正在复制对话"
 
 msgid "Copyright or trademark"
 msgstr "版权或商标"
@@ -5967,11 +6006,17 @@ msgstr "无法分叉到新的 worktree"
 msgid "Couldn't branch the conversation"
 msgstr "无法分叉对话"
 
+msgid "Couldn't cancel the move"
+msgstr "无法取消移动"
+
 msgid "Couldn't change the routine"
 msgstr "无法更改例行任务"
 
 msgid "Couldn't check"
 msgstr "无法检查"
+
+msgid "Couldn't check the move"
+msgstr "无法检查移动状态"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "无法检查移除此成员会影响哪些内容"
@@ -6018,11 +6063,14 @@ msgstr "无法放弃未暂存的更改"
 msgid "Couldn't edit the message"
 msgstr "无法编辑该消息"
 
+msgid "Couldn't end the move"
+msgstr "无法结束移动"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "不清楚此聊天的移动进度。如果它没有被移动，仍在原来的工作区中。"
+
 msgid "Couldn’t finish deleting workspaces"
 msgstr "没能完成工作区的删除"
-
-msgid "Couldn't fork into a chat"
-msgstr "无法分叉到聊天"
 
 msgid "Couldn't forward port {portNumber}"
 msgstr "无法转发端口 {portNumber}"
@@ -6077,11 +6125,17 @@ msgstr "无法标记为可评审"
 msgid "Couldn't merge pull request"
 msgstr "无法合并拉取请求"
 
+msgid "Couldn't move {name}"
+msgstr "无法移动 {name}"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "无法将子智能体移到后台"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "无法在聊天界面中打开"
 
 msgid "Couldn't open the screenshot"
 msgstr "无法打开截图"
@@ -6164,6 +6218,9 @@ msgstr "无法保存例行任务"
 msgid "Couldn't save your choice. Try again."
 msgstr "无法保存你的选择。请重试。"
 
+msgid "Couldn't search your chats"
+msgstr "无法搜索你的聊天"
+
 msgid "Couldn't send comment"
 msgstr "无法发送评论"
 
@@ -6226,6 +6283,9 @@ msgstr "无法停止聊天"
 
 msgid "Couldn't take a screenshot"
 msgstr "无法截图"
+
+msgid "Couldn't try the move again"
+msgstr "无法重试移动"
 
 msgid "Couldn't undo the file changes."
 msgstr "无法撤销文件更改。"
@@ -6337,9 +6397,6 @@ msgstr "创建Linear议题"
 
 msgid "Create manually"
 msgstr "手动创建"
-
-msgid "Create merge commit"
-msgstr "创建合并提交"
 
 msgid "Create Merge Commit"
 msgstr "创建合并提交"
@@ -7970,6 +8027,12 @@ msgstr "每个工作日上午9点，阅读新的GitHub议题，打上标签，�
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在争论这能否推广。这场争论本身就说明这一级别已经达到了。"
 
+msgid "Everyone in this organization uses this account."
+msgstr "此组织中的所有人都使用此账号。"
+
+msgid "Everyone in this organization uses this connection."
+msgstr "此组织中的所有人都使用此连接。"
+
 msgid "Everyone sees new versions as they are published"
 msgstr "新版本一经发布，所有人都会看到"
 
@@ -9098,26 +9161,11 @@ msgstr "分叉参数"
 msgid "Fork conversation"
 msgstr "分叉对话"
 
-msgid "Fork into chat"
-msgstr "分叉到聊天"
-
-msgid "Fork into chat in a new tab"
-msgstr "在新标签页中分叉到聊天"
-
-msgid "Fork into CLI"
-msgstr "分叉到CLI"
-
-msgid "Fork into CLI in a new tab"
-msgstr "在新标签页中分叉到CLI"
-
 msgid "Fork session"
 msgstr "分叉会话"
 
 msgid "Fork session…"
 msgstr "分叉会话…"
-
-msgid "Forking into a chat…"
-msgstr "正在分叉到聊天…"
 
 msgid "Form controls and field composition"
 msgstr "表单控件与字段组合"
@@ -9332,6 +9380,9 @@ msgstr "获取 iPhone 和 iPad 应用"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "将收到加入 {organizationName} 的邀请"
+
+msgid "Getting the computer ready"
+msgstr "正在准备计算机"
 
 msgid "Getting Work Done"
 msgstr "工作常用"
@@ -10517,8 +10568,8 @@ msgstr "它可以："
 msgid "It can't be brought back."
 msgstr "删除后无法恢复。"
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到智能体打开的浏览器窗格中。之后智能体可以在你已登录的网站上执行操作。"
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到应用内浏览器中。之后智能体可以在你已登录的网站上执行操作。"
 
 msgid "It keeps the title from your prompt."
 msgstr "将保留根据你的提示生成的标题。"
@@ -10567,6 +10618,9 @@ msgstr "同步完成后，其插件会显示出来。"
 
 msgid "Its replies go with it."
 msgstr "其回复也会一并删除。"
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的更改）会推送到一个新分支。所选电脑上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重启之前，其工作区和终端都不可用，请使用Paradev托盘菜单 > 主机服务 > 重启。"
@@ -12013,6 +12067,9 @@ msgstr "多数开发者"
 msgid "Most of software history"
 msgstr "软件史的大部分时间"
 
+msgid "Move"
+msgstr "移动"
+
 msgid "Move {count} to Group"
 msgstr "将{count}个移动到分组"
 
@@ -12022,8 +12079,26 @@ msgstr "将 {name} 移到后台"
 msgid "Move cloud work"
 msgstr "迁移云端工作"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关闭则将其打开"
+
+msgid "Move this workspace to a computer?"
+msgstr "将此工作区移至一台电脑？"
+
+msgid "Move this workspace to the cloud?"
+msgstr "将此工作区移至云端？"
+
+msgid "Move to a computer"
+msgstr "移至一台电脑"
+
+msgid "Move to another computer"
+msgstr "移至另一台电脑"
+
 msgid "Move to background"
 msgstr "移到后台"
+
+msgid "Move to cloud"
+msgstr "移至云端"
 
 msgid "Move to group"
 msgstr "移动到分组"
@@ -12042,6 +12117,21 @@ msgstr "请在{shutdownDate}之前迁移你的智能体。"
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "已将“{name}”移动到 {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "已将 {name} 移至{destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "正在将 {name} 移至{destination}"
+
+msgid "Moving this chat here"
+msgstr "正在将此聊天移到这里"
+
+msgid "Moving this workspace here…"
+msgstr "正在将此工作区移到这里…"
+
+msgid "Moving this workspace…"
+msgstr "正在移动此工作区…"
 
 msgid "Multi-select"
 msgstr "多选"
@@ -12204,6 +12294,9 @@ msgstr "新建智能体会话"
 msgid "New agent sessions"
 msgstr "新智能体会话"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "新的智能体会话将在聊天中启动，而不是在终端中。你可以从会话菜单中切换任意会话。"
+
 msgid "New automation"
 msgstr "新建自动化"
 
@@ -12353,6 +12446,9 @@ msgstr "下一张图片"
 
 msgid "Next match"
 msgstr "下一个匹配"
+
+msgid "Next Right Sidebar Tab"
+msgstr "右侧边栏下一个标签页"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -12779,6 +12875,9 @@ msgstr "未选择组织"
 
 msgid "No other chats here"
 msgstr "这里没有其他聊天"
+
+msgid "No other computer is set up for this account."
+msgstr "此账户没有设置其他电脑。"
 
 msgid "No pages match"
 msgstr "没有匹配的页面"
@@ -13223,8 +13322,8 @@ msgstr "没有需要重试的运行"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "最近30天还没有已公开的数据。待本机用量同步后，你的排名就会显示，将以<0>{handle}</0>身份公开。"
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "还没有可分叉的内容。请先发送一条消息。"
+msgid "Nothing to open yet. Send a message first."
+msgstr "暂无可打开的内容。请先发送一条消息。"
 
 msgid "Nothing was missed"
 msgstr "没有错过的运行"
@@ -13554,6 +13653,12 @@ msgstr "仅你自己"
 msgid "Only you can see this page"
 msgstr "仅你可见此页面"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "只有你可以使用这些账号。队友会连接自己的账号。"
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "只有你可以使用此连接。队友会连接自己的 {name} 账号。"
+
 msgid "Only you. Teammates forward their own."
 msgstr "仅你自己。队友各自转发。"
 
@@ -13621,6 +13726,9 @@ msgstr "创建拉取请求后即可查看评审状态、检查和评论。"
 msgid "Open actions menu"
 msgstr "打开操作菜单"
 
+msgid "Open agents in chat"
+msgstr "在聊天中打开智能体"
+
 msgid "Open anyway"
 msgstr "仍然打开"
 
@@ -13668,9 +13776,6 @@ msgstr "打开 ChatGPT 设置"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "以聊天形式打开 Claude Code、Codex、OpenCode 和 Pi 会话"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "在聊天窗格而不是终端中打开 Claude Code、Codex、OpenCode 和 Pi 会话。"
 
 msgid "Open Command Palette"
 msgstr "打开命令面板"
@@ -13754,6 +13859,9 @@ msgstr "在浏览器中打开"
 msgid "Open in Changes pane"
 msgstr "在“改动”面板中打开"
 
+msgid "Open in Chat Interface"
+msgstr "在聊天界面中打开"
+
 msgid "Open in ChatGPT"
 msgstr "在ChatGPT中打开"
 
@@ -13828,6 +13936,9 @@ msgstr "在标签页中打开"
 
 msgid "Open in Tasks"
 msgstr "在任务中打开"
+
+msgid "Open in Terminal Chat"
+msgstr "在终端聊天中打开"
 
 msgid "Open in…"
 msgstr "打开方式…"
@@ -13993,6 +14104,9 @@ msgstr "打开全局命令面板"
 msgid "Open the new workspace modal"
 msgstr "打开新建工作区弹窗"
 
+msgid "Open the original workspace"
+msgstr "打开原工作区"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "在命令面板中打开资源用量视图"
 
@@ -14038,11 +14152,11 @@ msgstr "打开文件"
 msgid "Opening folders"
 msgstr "打开文件夹"
 
+msgid "Opening in Chat Interface…"
+msgstr "正在聊天界面中打开…"
+
 msgid "Opening pages"
 msgstr "打开页面"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "在此窗格旁打开。原窗格会继续运行。"
 
 msgid "Operator"
 msgstr "操作员"
@@ -14680,6 +14794,9 @@ msgstr "个人账号"
 msgid "Personal plan"
 msgstr "个人方案"
 
+msgid "Personal to you"
+msgstr "仅限你使用"
+
 msgid "Phantom Forklift"
 msgstr "幽灵叉车"
 
@@ -15058,6 +15175,9 @@ msgstr "上一个匹配"
 
 msgid "Previous prompts"
 msgstr "历史提示词"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "右侧边栏上一个标签页"
 
 msgid "Previous slide"
 msgstr "上一张"
@@ -16522,6 +16642,9 @@ msgstr "已恢复“{workspaceName}”"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "正在恢复“{workspaceName}”…"
 
+msgid "Restoring Claude's session"
+msgstr "正在恢复 Claude 的会话"
+
 msgid "Restoring your session"
 msgstr "正在恢复你的会话"
 
@@ -17865,6 +17988,9 @@ msgstr "已与所有人共享"
 msgid "Shared with me"
 msgstr "与我共享"
 
+msgid "Shared with your organization"
+msgstr "与你的组织共享"
+
 msgid "Sheet"
 msgstr "侧边面板"
 
@@ -18041,6 +18167,12 @@ msgstr "为此智能体显示状态并发送通知。"
 
 msgid "Show text"
 msgstr "显示文本"
+
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "显示右侧边栏中的下一个标签页，不移动焦点"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "显示右侧边栏中的上一个标签页，不移动焦点"
 
 msgid "Show the triggering payload"
 msgstr "显示触发负载"
@@ -18438,6 +18570,9 @@ msgstr "还有其他？输入你自己的回答"
 msgid "Something went wrong"
 msgstr "出了点问题"
 
+msgid "Something went wrong during the move."
+msgstr "移动过程中出现问题。"
+
 msgid "Something went wrong."
 msgstr "出了点问题。"
 
@@ -18757,6 +18892,9 @@ msgstr "正在启动智能体…"
 msgid "Starting the simulator…"
 msgstr "正在启动模拟器…"
 
+msgid "Starting the workspace"
+msgstr "正在启动工作区"
+
 msgid "Starting up. This should only take a moment."
 msgstr "正在启动，请稍等片刻。"
 
@@ -18878,6 +19016,9 @@ msgstr "已停止"
 
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
+
+msgid "Stopped moving {name}"
+msgstr "已停止移动 {name}"
 
 msgid "Stopping the agent in {what}"
 msgstr "正在停止 {what} 中的代理"
@@ -19479,6 +19620,9 @@ msgstr "该账号已断开连接，请选择其他账号。"
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "该智能体会话还没有可打开的对话——它已启动但从未收到指令。"
 
+msgid "That computer can't be reached"
+msgstr "无法连接到那台电脑"
+
 msgid "That endpoint could not be resolved."
 msgstr "无法解析该端点。"
 
@@ -19576,6 +19720,9 @@ msgstr "变更立即生效。您只需支付本期剩余时间的差价。"
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "聊天保持不变。自本轮以来被任何人编辑过的文件将保持不动并列出。"
 
+msgid "the cloud"
+msgstr "云端"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "云端工作区本应已启动，但没有及时响应。下次运行时会重试。"
 
@@ -19593,6 +19740,9 @@ msgstr "连接已超时"
 
 msgid "The connection was closed"
 msgstr "连接已被关闭"
+
+msgid "The connection was lost."
+msgstr "连接已断开。"
 
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "当前提示词会被所选版本替换。历史中会新增一条“已恢复”记录，方便你撤销。"
@@ -19750,6 +19900,18 @@ msgstr "多数已合并的智能体PR只需审查，无需任何人工修改。"
 
 msgid "The model declined to continue"
 msgstr "模型拒绝继续"
+
+msgid "The move into this workspace failed."
+msgstr "移动到此工作区失败。"
+
+msgid "The move service couldn't be reached."
+msgstr "无法连接移动服务。"
+
+msgid "The move stopped responding, so it was ended."
+msgstr "移动已停止响应，因此已结束。"
+
+msgid "The move was cancelled."
+msgstr "移动已取消。"
 
 msgid "The name of your organization or team"
 msgstr "你的组织或团队的名称"
@@ -19940,6 +20102,9 @@ msgstr "这些文件夹中仍有你的文件，但没有自动迁移到新版 Pa
 msgid "These ports are still in use"
 msgstr "这些端口仍在使用中"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "它们仍在原工作区中。逐个打开即可重试。"
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "它们使用你已有的订阅和密钥运行。"
 
@@ -20010,11 +20175,17 @@ msgstr "此操作无法撤销。"
 msgid "This channel is archived"
 msgstr "此频道已归档"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "无法将此聊天移到这里。它仍在原来的工作区中。"
+
 msgid "This chat has ended."
 msgstr "此聊天已结束。"
 
 msgid "This chat is empty."
 msgstr "此聊天为空。"
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "此聊天较长，因此只显示最新部分。工作区启动后会完整打开。"
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "此聊天可能已被删除，或你没有访问权限。"
@@ -20042,6 +20213,15 @@ msgstr "无法启动此云端工作区"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需要最多 30 秒。"
+
+msgid "this computer"
+msgstr "此电脑"
+
+msgid "This computer"
+msgstr "此电脑"
+
+msgid "This computer's host is not running"
+msgstr "此电脑的主机服务未运行"
 
 msgid "This conversation is too long for the model"
 msgstr "此对话对模型来说太长了"
@@ -20073,6 +20253,9 @@ msgstr "此邮箱已通过其他登录方式注册，且提供方未将其确认
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此环境没有仓库。请先在设置中创建包含仓库的环境，再从该环境启动工作区"
 
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "此环境打开的是 {environmentRepository}，而不是 {repository}"
+
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此环境的仓库已固定；请再次提升一个工作区以更改它们"
 
@@ -20102,6 +20285,9 @@ msgstr "这个邀请已被接受。"
 
 msgid "This invitation link is invalid or has expired."
 msgstr "这个邀请链接无效或已过期。"
+
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "耗时比平常更长。下面的聊天是最后保存的副本；工作区启动后才会真正打开。"
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "这比平时耗时更久。沙箱可能仍在拉取镜像 — 无论此窗口是否打开，它都会继续。"
@@ -20153,6 +20339,9 @@ msgstr "此模型不可用"
 
 msgid "This month"
 msgstr "本月"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "此次移动已停止。聊天仍在原来的工作区中。"
 
 msgid "This only changes the display name, not the branch."
 msgstr "这只会更改显示名称，不会更改分支。"
@@ -20362,11 +20551,17 @@ msgstr "这将取消暂存并还原所有已暂存的更改。已暂存的新文
 msgid "This workspace"
 msgstr "此工作区"
 
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "无法移动此工作区。它没有任何变化。"
+
 msgid "This workspace has no project to branch from"
 msgstr "此工作区没有可供分叉的项目"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "此工作区可能已被移除，或者你不再拥有它的访问权限。"
+
+msgid "This workspace moved"
+msgstr "此工作区已移动"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "此工作区记录仍然存在，但它的worktree文件夹已不在此主机上。终端和文件操作不可用。"
@@ -20487,6 +20682,9 @@ msgstr "切换右侧边栏"
 
 msgid "Toggle Right Sidebar"
 msgstr "切换右侧边栏"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "切换右侧边栏焦点"
 
 msgid "Toggle Scripts Bar"
 msgstr "切换脚本栏"
@@ -21137,6 +21335,12 @@ msgstr "需要更新"
 msgid "update the branch prefix"
 msgstr "更新分支前缀"
 
+msgid "Update the host service on both computers and try again."
+msgstr "请更新两台电脑上的主机服务，然后重试。"
+
+msgid "Update the host service on this device and try again."
+msgstr "请更新此设备上的主机服务，然后重试。"
+
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"
 
@@ -21405,6 +21609,9 @@ msgstr "版本{version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "版本{version}将在下次重启时安装。"
 
+msgid "Version {version} is available"
+msgstr "版本{version}现已可用"
+
 msgid "Version {version} is the latest version."
 msgstr "版本{version}已是最新版本。"
 
@@ -21568,6 +21775,9 @@ msgstr "正在等待子智能体的第一条消息…"
 
 msgid "Waiting for your input"
 msgstr "等待你的输入"
+
+msgid "Waking the workspace…"
+msgstr "正在唤醒工作区…"
 
 msgid "Waking up workspace"
 msgstr "正在唤醒工作区"
@@ -22567,8 +22777,14 @@ msgstr "你的 v1 项目和工作区正在迁移到新版 Paradev。每一项准
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
 
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "你的工作（包括未提交的更改）会推送到远程的一个新分支。云端工作区会在你选择的环境中从该分支启动，每个 Claude 聊天都将在那里继续。正在工作的智能体会先停止。终端和其他聊天会留在这里。"
+
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的设备码登录由你的工作区管理员开启。"
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "你的工作区没有变化。几分钟后可以再次移动。"
 
 msgid "Zap"
 msgstr "闪电"

@@ -1,7 +1,7 @@
 import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { AGENT_BROWSER_PARTITION, BROWSER_PARTITION } from "shared/constants";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
 import { selectWebviewsToUnload } from "./utils/selectWebviewsToUnload";
@@ -61,26 +61,15 @@ interface RegistryEntry {
 	visible: boolean;
 	/** Time of last use in ms, kept strictly increasing so ties never happen. */
 	lastUsedAt: number;
-	agent: boolean;
 }
 
 // Each hidden webview is a full guest Chromium process. (SUPER-1545)
-const HIDDEN_POOLS = [
-	{
-		agent: false,
-		budgetShare: 0.06,
-		minLoaded: 3,
-		maxLoaded: 20,
-		idleMs: Number.POSITIVE_INFINITY,
-	},
-	{
-		agent: true,
-		budgetShare: 0.06,
-		minLoaded: 3,
-		maxLoaded: 20,
-		idleMs: 30 * 60_000,
-	},
-];
+const HIDDEN_POOL = {
+	budgetShare: 0.06,
+	minLoaded: 3,
+	maxLoaded: 20,
+	idleMs: Number.POSITIVE_INFINITY,
+};
 const UNLOAD_SWEEP_INTERVAL_MS = 60_000;
 const UNLOAD_INFO_TIMEOUT_MS = 5_000;
 
@@ -352,11 +341,10 @@ export class BrowserRuntimeRegistryImpl {
 		paneId: string,
 		initialUrl: string,
 		workspaceId: string,
-		partition: string,
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
 		const detachViewportZoom = attachBrowserViewportZoom(webview);
-		webview.setAttribute("partition", partition);
+		webview.setAttribute("partition", BROWSER_PARTITION);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
 		webview.style.top = "0";
@@ -396,7 +384,6 @@ export class BrowserRuntimeRegistryImpl {
 			resizeObserver: null,
 			visible: false,
 			lastUsedAt: 0,
-			agent: partition === AGENT_BROWSER_PARTITION,
 		};
 
 		const firePersist = () => {
@@ -582,18 +569,17 @@ export class BrowserRuntimeRegistryImpl {
 		return entry;
 	}
 
-	/** Create an agent's guest without mounting or focusing its workspace route. */
+	/** Create a guest without mounting or focusing its workspace route. */
 	openBackground(
 		paneId: string,
 		url: string,
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
-		partition = BROWSER_PARTITION,
 	): RegistryEntry {
 		const existing = this.entries.get(paneId);
 		if (existing) return existing;
 		const root = this.ensureRootContainer();
-		const entry = this.createEntry(paneId, url, workspaceId, partition);
+		const entry = this.createEntry(paneId, url, workspaceId);
 		entry.onPersist = onPersist;
 		entry.lastUsedAt = this.stamp();
 		// Give automation a usable viewport before this pane has ever been shown.
@@ -614,14 +600,12 @@ export class BrowserRuntimeRegistryImpl {
 		workspaceId: string,
 		onPersist: (state: PersistableBrowserState) => void,
 		onClose: () => void,
-		partition = BROWSER_PARTITION,
 	): void {
 		const entry = this.openBackground(
 			paneId,
 			initialUrl,
 			workspaceId,
 			onPersist,
-			partition,
 		);
 		// A reused pane can move between workspaces (the attach effect keys on
 		// workspaceId). Keep the registration's workspace current so main-side
@@ -704,38 +688,34 @@ export class BrowserRuntimeRegistryImpl {
 				return null;
 			});
 			const now = Date.now();
-			for (const pool of HIDDEN_POOLS) {
-				const candidates = hidden
-					.filter(([, entry]) => entry.agent === pool.agent)
-					.map(([paneId, entry]) => {
-						const pane = info?.panes[paneId];
-						return {
-							paneId,
-							lastUsedAt: entry.lastUsedAt,
-							memoryKb: pane?.memoryKb ?? 0,
-							keepLoaded:
-								this.agentActivePaneIds.has(paneId) ||
-								pane?.audible === true ||
-								pane?.unsavedInput === true,
-						};
-					});
-				const unload = selectWebviewsToUnload(candidates, {
-					now,
-					budgetKb: info
-						? info.totalMemoryKb * pool.budgetShare
-						: Number.POSITIVE_INFINITY,
-					minLoaded: pool.minLoaded,
-					maxLoaded: pool.maxLoaded,
-					idleMs: pool.idleMs,
-				});
-				for (const paneId of unload) {
-					const entry = this.entries.get(paneId);
-					const seen = candidates.find((c) => c.paneId === paneId);
-					// Shown or used while the info was on its way.
-					if (!entry || entry.visible || entry.lastUsedAt !== seen?.lastUsedAt)
-						continue;
-					this.destroy(paneId);
-				}
+			const candidates = hidden.map(([paneId, entry]) => {
+				const pane = info?.panes[paneId];
+				return {
+					paneId,
+					lastUsedAt: entry.lastUsedAt,
+					memoryKb: pane?.memoryKb ?? 0,
+					keepLoaded:
+						this.agentActivePaneIds.has(paneId) ||
+						pane?.audible === true ||
+						pane?.unsavedInput === true,
+				};
+			});
+			const unload = selectWebviewsToUnload(candidates, {
+				now,
+				budgetKb: info
+					? info.totalMemoryKb * HIDDEN_POOL.budgetShare
+					: Number.POSITIVE_INFINITY,
+				minLoaded: HIDDEN_POOL.minLoaded,
+				maxLoaded: HIDDEN_POOL.maxLoaded,
+				idleMs: HIDDEN_POOL.idleMs,
+			});
+			for (const paneId of unload) {
+				const entry = this.entries.get(paneId);
+				const seen = candidates.find((c) => c.paneId === paneId);
+				// Shown or used while the info was on its way.
+				if (!entry || entry.visible || entry.lastUsedAt !== seen?.lastUsedAt)
+					continue;
+				this.destroy(paneId);
 			}
 		} finally {
 			this.sweeping = false;

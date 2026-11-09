@@ -134,6 +134,14 @@ msgstr "{0, plural, one {# gewijzigd bestand} other {# gewijzigde bestanden}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat gesloten} other {# chats gesloten}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# chat kon niet worden verplaatst. Open hem om het opnieuw te proberen.} other {# chats konden niet worden verplaatst. Open ze om het opnieuw te proberen.}}"
+
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# chat is in de oude werkruimte gebleven} other {# chats zijn in de oude werkruimte gebleven}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# opmerking toegevoegd} other {# opmerkingen toegevoegd}}"
@@ -353,6 +361,10 @@ msgstr "{0, plural, one {Linear-issue} other {Linear-issues}}"
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {# geselecteerde werkruimte naar een groep verplaatsen} other {# geselecteerde werkruimtes naar een groep verplaatsen}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {# chat wordt hierheen verplaatst…} other {# chats worden hierheen verplaatst…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -831,6 +843,9 @@ msgstr "{completed} van {0} checks afgerond"
 msgid "{completed} of {total} completed"
 msgstr "{completed} van {total} voltooid"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (offline)"
+
 msgid "{configTitle} font size"
 msgstr "Tekengrootte van {configTitle}"
 
@@ -988,6 +1003,9 @@ msgstr "{duration, plural, one {# seconde nagedacht} other {# seconden nagedacht
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} in deze workspace is al gepubliceerd als pagina in een andere organisatie. Verplaats het bestand of publiceer met het id van die pagina."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# chat kon niet naar de computer worden verplaatst} other {# chats konden niet naar de computer worden verplaatst}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# mislukt} other {# mislukt}}"
 
@@ -1097,6 +1115,9 @@ msgstr "{localHostName} (dit apparaat)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Gesprek kopiëren (# bericht)} other {Gesprek kopiëren (# berichten)}}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1290,6 +1311,9 @@ msgstr "{rate} per GB-uur. Gebruikt na de maandelijkse pool, en verlopen nooit."
 msgid "{readPercent}% read"
 msgstr "{readPercent}% gelezen"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{ready} van {total} chats zijn hierheen verplaatst"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1333,6 +1357,9 @@ msgstr "{starCount} sterren en het worden er meer"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisering gestart} other {# automatiseringen gestart}}"
 
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Deze werkruimte is verplaatst. # chat is hier gebleven.} other {Deze werkruimte is verplaatst. # chats zijn hier gebleven.}}"
+
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent actief} other {# subagents actief}}"
 
@@ -1356,6 +1383,9 @@ msgstr "{threshold, plural, one {# agent-PR gemerged} other {# agent-PR's gemerg
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} onderbroken"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {{done} van # chat verplaatst} other {{done} van # chats verplaatst}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {De check is geslaagd} other {Alle # checks geslaagd}}"
@@ -1976,6 +2006,12 @@ msgstr "{0} toevoegen aan werkruimte"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} toevoegen?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Voeg {repositoryName} eerst toe als project op {computer}"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Voeg {repositoryName} eerst toe als project op deze computer"
 
 msgid "Add a comment…"
 msgstr "Voeg een reactie toe…"
@@ -3925,6 +3961,9 @@ msgstr "Bewerkingen annuleren"
 msgid "Cancel invite"
 msgstr "Uitnodiging annuleren"
 
+msgid "Cancel move"
+msgstr "Verplaatsen annuleren"
+
 msgid "Cancel plan"
 msgstr "Plan opzeggen"
 
@@ -5367,9 +5406,6 @@ msgstr "Doorgaan"
 msgid "Continue in your browser"
 msgstr "Ga verder in je browser"
 
-msgid "Continue or fork session"
-msgstr "Sessie voortzetten of forken"
-
 msgid "Continue this chat on another login"
 msgstr "Deze chat voortzetten met een andere login"
 
@@ -5622,6 +5658,9 @@ msgstr "Kopieer je browsegeschiedenis en logins uit een andere browser naar Para
 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Kopieer je sleutel nu — je kunt hem later niet meer zien."
+
+msgid "Copying the conversation"
+msgstr "Gesprek kopiëren"
 
 msgid "Copyright or trademark"
 msgstr "Auteursrecht of handelsmerk"
@@ -5967,11 +6006,17 @@ msgstr "Kon niet afsplitsen naar een nieuwe worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Kon het gesprek niet afsplitsen"
 
+msgid "Couldn't cancel the move"
+msgstr "Kan het verplaatsen niet annuleren"
+
 msgid "Couldn't change the routine"
 msgstr "Kan de routine niet wijzigen"
 
 msgid "Couldn't check"
 msgstr "Kon niet controleren"
+
+msgid "Couldn't check the move"
+msgstr "Kan het verplaatsen niet controleren"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Kon niet controleren wat het verwijderen van dit lid beïnvloedt"
@@ -6018,11 +6063,14 @@ msgstr "Kan niet-gestagede wijzigingen niet verwerpen"
 msgid "Couldn't edit the message"
 msgstr "Kan het bericht niet bewerken"
 
+msgid "Couldn't end the move"
+msgstr "Kan het verplaatsen niet beëindigen"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Onbekend hoe het verplaatsen van deze chat gaat. Als hij niet is verplaatst, staat hij nog in de werkruimte waar hij vandaan kwam."
+
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Kon het verwijderen van werkruimtes niet afronden"
-
-msgid "Couldn't fork into a chat"
-msgstr "Kon niet forken naar een chat"
 
 msgid "Couldn't forward port {portNumber}"
 msgstr "Kan poort {portNumber} niet doorsturen"
@@ -6077,11 +6125,17 @@ msgstr "Kon niet markeren als klaar voor review"
 msgid "Couldn't merge pull request"
 msgstr "Kan pull request niet mergen"
 
+msgid "Couldn't move {name}"
+msgstr "{name} kon niet worden verplaatst"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "Kan niet openen in chatinterface"
 
 msgid "Couldn't open the screenshot"
 msgstr "Kan de screenshot niet openen"
@@ -6164,6 +6218,9 @@ msgstr "Kan de routine niet opslaan"
 msgid "Couldn't save your choice. Try again."
 msgstr "Je keuze kon niet worden opgeslagen. Probeer het opnieuw."
 
+msgid "Couldn't search your chats"
+msgstr "Kon je chats niet doorzoeken"
+
 msgid "Couldn't send comment"
 msgstr "Kan opmerking niet versturen"
 
@@ -6226,6 +6283,9 @@ msgstr "Kon de chat niet stoppen"
 
 msgid "Couldn't take a screenshot"
 msgstr "Screenshot maken mislukt"
+
+msgid "Couldn't try the move again"
+msgstr "De verplaatsing kon niet opnieuw worden geprobeerd"
 
 msgid "Couldn't undo the file changes."
 msgstr "De bestandswijzigingen konden niet ongedaan worden gemaakt."
@@ -6337,9 +6397,6 @@ msgstr "Linear-issue aanmaken"
 
 msgid "Create manually"
 msgstr "Handmatig maken"
-
-msgid "Create merge commit"
-msgstr "Merge-commit maken"
 
 msgid "Create Merge Commit"
 msgstr "Merge-commit maken"
@@ -7970,6 +8027,12 @@ msgstr "Elke werkdag om 9 uur: lees nieuwe GitHub-issues, plaats labels en stel 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Iedereen discussieert over de vraag of dit generaliseert. Die discussie is het teken dat het niveau is bereikt."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Iedereen in deze organisatie gebruikt dit account."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Iedereen in deze organisatie gebruikt deze verbinding."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Iedereen ziet nieuwe versies zodra ze worden gepubliceerd"
 
@@ -9098,26 +9161,11 @@ msgstr "Fork-argumenten"
 msgid "Fork conversation"
 msgstr "Gesprek afsplitsen"
 
-msgid "Fork into chat"
-msgstr "Forken naar chat"
-
-msgid "Fork into chat in a new tab"
-msgstr "Forken naar chat in een nieuw tabblad"
-
-msgid "Fork into CLI"
-msgstr "Forken naar CLI"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Forken naar CLI in een nieuw tabblad"
-
 msgid "Fork session"
 msgstr "Sessie forken"
 
 msgid "Fork session…"
 msgstr "Sessie forken…"
-
-msgid "Forking into a chat…"
-msgstr "Forken naar een chat…"
 
 msgid "Form controls and field composition"
 msgstr "Formulierbesturing en veldsamenstelling"
@@ -9332,6 +9380,9 @@ msgstr "Download de iPhone- en iPad-app"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Krijgt een uitnodiging voor {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "De computer wordt voorbereid"
 
 msgid "Getting Work Done"
 msgstr "Werk gedaan krijgen"
@@ -10517,8 +10568,8 @@ msgstr "De extensie kan:"
 msgid "It can't be brought back."
 msgstr "Dit kan niet ongedaan worden gemaakt."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar een browservenster dat de agent heeft geopend. De agent kan dan handelen op de sites waar je bent ingelogd."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar de browser in de app. Agents kunnen dan handelen op de sites waar je bent ingelogd."
 
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
@@ -10567,6 +10618,9 @@ msgstr "De plugins verschijnen zodra de synchronisatie klaar is."
 
 msgid "Its replies go with it."
 msgstr "De antwoorden worden ook verwijderd."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Het werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op de computer die je kiest begint vanaf die branch, en elke Claude-chat gaat daar verder. Agents die aan het werk zijn, stoppen eerst. Terminals en andere chats blijven waar ze zijn."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "De werkruimtes en terminals zijn niet beschikbaar tot de service opnieuw start — gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
@@ -12013,6 +12067,9 @@ msgstr "de meeste ontwikkelaars"
 msgid "Most of software history"
 msgstr "Het grootste deel van de softwaregeschiedenis"
 
+msgid "Move"
+msgstr "Verplaatsen"
+
 msgid "Move {count} to Group"
 msgstr "{count} naar groep verplaatsen"
 
@@ -12022,8 +12079,26 @@ msgstr "{name} naar de achtergrond verplaatsen"
 msgid "Move cloud work"
 msgstr "Cloudwerk verhuizen"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "De focus verplaatsen tussen de hoofdtabbladen en de rechterzijbalk, en de zijbalk openen als die gesloten is"
+
+msgid "Move this workspace to a computer?"
+msgstr "Deze werkruimte naar een computer verplaatsen?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Deze werkruimte naar de cloud verplaatsen?"
+
+msgid "Move to a computer"
+msgstr "Naar een computer verplaatsen"
+
+msgid "Move to another computer"
+msgstr "Naar een andere computer verplaatsen"
+
 msgid "Move to background"
 msgstr "Naar de achtergrond"
+
+msgid "Move to cloud"
+msgstr "Naar cloud verplaatsen"
 
 msgid "Move to group"
 msgstr "Naar groep verplaatsen"
@@ -12042,6 +12117,21 @@ msgstr "Verhuis je agents vóór {shutdownDate}."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" verplaatst naar {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name} verplaatst naar {destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "{name} wordt verplaatst naar {destination}"
+
+msgid "Moving this chat here"
+msgstr "Deze chat wordt hierheen verplaatst"
+
+msgid "Moving this workspace here…"
+msgstr "Deze werkruimte wordt hierheen verplaatst…"
+
+msgid "Moving this workspace…"
+msgstr "Deze werkruimte wordt verplaatst…"
 
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
@@ -12204,6 +12294,9 @@ msgstr "Nieuwe agentsessie"
 msgid "New agent sessions"
 msgstr "Nieuwe agentsessies"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Nieuwe agentsessies starten in de chat in plaats van in de terminal. Je kunt elke sessie wisselen via het menu."
+
 msgid "New automation"
 msgstr "Nieuwe automatisering"
 
@@ -12353,6 +12446,9 @@ msgstr "Volgende afbeelding"
 
 msgid "Next match"
 msgstr "Volgende overeenkomst"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Volgend tabblad in de rechterzijbalk"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -12779,6 +12875,9 @@ msgstr "Geen organisatie geselecteerd"
 
 msgid "No other chats here"
 msgstr "Geen andere chats hier"
+
+msgid "No other computer is set up for this account."
+msgstr "Er is geen andere computer ingesteld voor dit account."
 
 msgid "No pages match"
 msgstr "Geen overeenkomende pagina's"
@@ -13223,8 +13322,8 @@ msgstr "Niets hoeft opnieuw te worden geprobeerd"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nog niets gepubliceerd in de laatste 30 dagen. Je positie verschijnt zodra het gebruik van deze machine is gesynchroniseerd, gepubliceerd als <0>{handle}</0>."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Nog niets om te forken. Stuur eerst een bericht."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Nog niets om te openen. Stuur eerst een bericht."
 
 msgid "Nothing was missed"
 msgstr "Er is niets gemist"
@@ -13554,6 +13653,12 @@ msgstr "Alleen jij"
 msgid "Only you can see this page"
 msgstr "Alleen jij kunt deze pagina zien"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Alleen jij kunt deze accounts gebruiken. Teamgenoten koppelen hun eigen accounts."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Alleen jij kunt deze verbinding gebruiken. Teamgenoten koppelen hun eigen {name}-accounts."
+
 msgid "Only you. Teammates forward their own."
 msgstr "Alleen jij. Teamgenoten sturen hun eigen poorten door."
 
@@ -13621,6 +13726,9 @@ msgstr "Open een pull request om reviewstatus, checks en opmerkingen te zien."
 msgid "Open actions menu"
 msgstr "Actiemenu openen"
 
+msgid "Open agents in chat"
+msgstr "Agents openen in chat"
+
 msgid "Open anyway"
 msgstr "Toch openen"
 
@@ -13668,9 +13776,6 @@ msgstr "ChatGPT-instellingen openen"
 
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code-, Codex-, OpenCode- en Pi-sessies als chats openen"
-
-msgid "Open Claude Code, Codex, OpenCode, and Pi sessions in a chat pane instead of a terminal."
-msgstr "Open Claude Code-, Codex-, OpenCode- en Pi-sessies in een chatpaneel in plaats van in een terminal."
 
 msgid "Open Command Palette"
 msgstr "Opdrachtenpalet openen"
@@ -13754,6 +13859,9 @@ msgstr "Openen in browser"
 msgid "Open in Changes pane"
 msgstr "Openen in paneel Wijzigingen"
 
+msgid "Open in Chat Interface"
+msgstr "Openen in chatinterface"
+
 msgid "Open in ChatGPT"
 msgstr "Openen in ChatGPT"
 
@@ -13828,6 +13936,9 @@ msgstr "Openen in tabblad"
 
 msgid "Open in Tasks"
 msgstr "Openen in Taken"
+
+msgid "Open in Terminal Chat"
+msgstr "Openen in terminalchat"
 
 msgid "Open in…"
 msgstr "Openen in…"
@@ -13993,6 +14104,9 @@ msgstr "Het globale opdrachtenpalet openen"
 msgid "Open the new workspace modal"
 msgstr "Het venster voor een nieuwe werkruimte openen"
 
+msgid "Open the original workspace"
+msgstr "Oorspronkelijke werkruimte openen"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "De weergave van resourcegebruik in het opdrachtenpalet openen"
 
@@ -14038,11 +14152,11 @@ msgstr "Bestanden openen"
 msgid "Opening folders"
 msgstr "Mappen openen"
 
+msgid "Opening in Chat Interface…"
+msgstr "Openen in chatinterface…"
+
 msgid "Opening pages"
 msgstr "Pagina's openen"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Opent naast dit paneel. Dit paneel blijft draaien."
 
 msgid "Operator"
 msgstr "Operator"
@@ -14680,6 +14794,9 @@ msgstr "Persoonlijk account"
 msgid "Personal plan"
 msgstr "Persoonlijk abonnement"
 
+msgid "Personal to you"
+msgstr "Alleen voor jou"
+
 msgid "Phantom Forklift"
 msgstr "Fantoomheftruck"
 
@@ -15058,6 +15175,9 @@ msgstr "Vorige overeenkomst"
 
 msgid "Previous prompts"
 msgstr "Eerdere prompts"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Vorig tabblad in de rechterzijbalk"
 
 msgid "Previous slide"
 msgstr "Vorige slide"
@@ -16522,6 +16642,9 @@ msgstr "\"{workspaceName}\" hersteld"
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" wordt hersteld…"
 
+msgid "Restoring Claude's session"
+msgstr "Sessie van Claude herstellen"
+
 msgid "Restoring your session"
 msgstr "Je sessie wordt hersteld"
 
@@ -17865,6 +17988,9 @@ msgstr "Gedeeld met iedereen"
 msgid "Shared with me"
 msgstr "Gedeeld met mij"
 
+msgid "Shared with your organization"
+msgstr "Gedeeld met je organisatie"
+
 msgid "Sheet"
 msgstr "Sheet"
 
@@ -18041,6 +18167,12 @@ msgstr "Status tonen en meldingen sturen voor deze agent."
 
 msgid "Show text"
 msgstr "Tekst tonen"
+
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Het volgende tabblad in de rechterzijbalk tonen zonder de focus te verplaatsen"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Het vorige tabblad in de rechterzijbalk tonen zonder de focus te verplaatsen"
 
 msgid "Show the triggering payload"
 msgstr "Activerende payload tonen"
@@ -18438,6 +18570,9 @@ msgstr "Iets anders? Typ je eigen antwoord"
 msgid "Something went wrong"
 msgstr "Er is iets misgegaan"
 
+msgid "Something went wrong during the move."
+msgstr "Er ging iets mis tijdens het verplaatsen."
+
 msgid "Something went wrong."
 msgstr "Er is iets misgegaan."
 
@@ -18757,6 +18892,9 @@ msgstr "Agent starten…"
 msgid "Starting the simulator…"
 msgstr "Simulator wordt gestart…"
 
+msgid "Starting the workspace"
+msgstr "Werkruimte starten"
+
 msgid "Starting up. This should only take a moment."
 msgstr "Bezig met starten. Dit duurt maar even."
 
@@ -18878,6 +19016,9 @@ msgstr "Gestopt"
 
 msgid "Stopped by the usage limit"
 msgstr "Gestopt door de gebruikslimiet"
+
+msgid "Stopped moving {name}"
+msgstr "Verplaatsen van {name} gestopt"
 
 msgid "Stopping the agent in {what}"
 msgstr "Agent in {what} wordt gestopt"
@@ -19479,6 +19620,9 @@ msgstr "Dit account is niet meer verbonden — kies een ander."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Die agentsessie heeft nog geen gesprek om te openen — hij is gestart maar nooit aangestuurd."
 
+msgid "That computer can't be reached"
+msgstr "Die computer is niet bereikbaar"
+
 msgid "That endpoint could not be resolved."
 msgstr "Dat endpoint kon niet worden omgezet."
 
@@ -19576,6 +19720,9 @@ msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan ook zijn bewerkt, blijven ongemoeid en worden vermeld."
 
+msgid "the cloud"
+msgstr "de cloud"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "De cloudwerkruimte had gestart moeten zijn, maar reageerde niet op tijd. De volgende run probeert het opnieuw."
 
@@ -19593,6 +19740,9 @@ msgstr "De verbinding is verlopen"
 
 msgid "The connection was closed"
 msgstr "De verbinding is gesloten"
+
+msgid "The connection was lost."
+msgstr "De verbinding is verbroken."
 
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "De huidige prompt wordt vervangen door de geselecteerde versie. Er wordt een nieuw item \"Hersteld\" aan de geschiedenis toegevoegd, zodat je dit ongedaan kunt maken."
@@ -19750,6 +19900,18 @@ msgstr "De meeste gemergede agent-PR's hoeven alleen gereviewd te worden, zonder
 
 msgid "The model declined to continue"
 msgstr "Het model weigerde verder te gaan"
+
+msgid "The move into this workspace failed."
+msgstr "Het verplaatsen naar deze werkruimte is mislukt."
+
+msgid "The move service couldn't be reached."
+msgstr "De verplaatsdienst was niet bereikbaar."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Het verplaatsen reageerde niet meer en is beëindigd."
+
+msgid "The move was cancelled."
+msgstr "Het verplaatsen is geannuleerd."
 
 msgid "The name of your organization or team"
 msgstr "De naam van je organisatie of team"
@@ -19940,6 +20102,9 @@ msgstr "Deze mappen bevatten nog je bestanden, maar zijn niet vanzelf naar het n
 msgid "These ports are still in use"
 msgstr "Deze poorten zijn nog in gebruik"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Ze staan nog in de oorspronkelijke werkruimte. Open ze een voor een om het opnieuw te proberen."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Ze draaien op de abonnementen en sleutels die je al hebt."
 
@@ -20010,11 +20175,17 @@ msgstr "Dit kan niet ongedaan worden gemaakt."
 msgid "This channel is archived"
 msgstr "Dit kanaal is gearchiveerd"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Deze chat kon niet hierheen worden verplaatst. Hij staat nog in de werkruimte waar hij vandaan kwam."
+
 msgid "This chat has ended."
 msgstr "Deze chat is beëindigd."
 
 msgid "This chat is empty."
 msgstr "Deze chat is leeg."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Deze chat is lang, dus alleen het nieuwste deel wordt getoond. Alles opent zodra de werkruimte is gestart."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Deze chat is mogelijk verwijderd of je hebt geen toegang."
@@ -20042,6 +20213,15 @@ msgstr "Deze cloudwerkruimte kan niet starten"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 seconden duren."
+
+msgid "this computer"
+msgstr "deze computer"
+
+msgid "This computer"
+msgstr "Deze computer"
+
+msgid "This computer's host is not running"
+msgstr "De host van deze computer draait niet"
 
 msgid "This conversation is too long for the model"
 msgstr "Dit gesprek is te lang voor het model"
@@ -20073,6 +20253,9 @@ msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de pr
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"
 
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Deze omgeving opent {environmentRepository}, niet {repository}"
+
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "De repositories van deze omgeving liggen vast; promoveer opnieuw een werkruimte om ze te wijzigen"
 
@@ -20102,6 +20285,9 @@ msgstr "Deze uitnodiging is al geaccepteerd."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Deze uitnodigingslink is ongeldig of verlopen."
+
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Dit duurt langer dan normaal. Hieronder staat de laatst opgeslagen kopie van de chat; hij opent echt zodra de werkruimte is gestart."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Dit duurt langer dan gewoonlijk. De sandbox haalt mogelijk nog zijn image op — dat gaat door of dit venster nu open is of niet."
@@ -20153,6 +20339,9 @@ msgstr "Dit model is niet beschikbaar"
 
 msgid "This month"
 msgstr "Deze maand"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Dit verplaatsen is gestopt. De chat staat nog in de oude werkruimte."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Dit verandert alleen de weergavenaam, niet de branch."
@@ -20362,11 +20551,17 @@ msgstr "Hiermee worden alle gestagede wijzigingen ge-unstaged en teruggedraaid. 
 msgid "This workspace"
 msgstr "Deze werkruimte"
 
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Deze werkruimte kon niet worden verplaatst. Er is niets veranderd."
+
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Deze werkruimte is mogelijk verwijderd, of je hebt er geen toegang meer toe."
+
+msgid "This workspace moved"
+msgstr "Deze werkruimte is verplaatst"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Dit werkruimterecord bestaat nog, maar de worktree-map staat niet meer op deze host. Terminals en bestandsacties zijn niet beschikbaar."
@@ -20487,6 +20682,9 @@ msgstr "Rechterzijbalk tonen/verbergen"
 
 msgid "Toggle Right Sidebar"
 msgstr "Rechterzijbalk tonen/verbergen"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Focus op de rechterzijbalk wisselen"
 
 msgid "Toggle Scripts Bar"
 msgstr "Scriptsbalk tonen/verbergen"
@@ -21137,6 +21335,12 @@ msgstr "Update vereist"
 msgid "update the branch prefix"
 msgstr "de branchprefix bijwerken"
 
+msgid "Update the host service on both computers and try again."
+msgstr "Werk de hostservice op beide computers bij en probeer het opnieuw."
+
+msgid "Update the host service on this device and try again."
+msgstr "Werk de hostservice op dit apparaat bij en probeer het opnieuw."
+
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
 
@@ -21405,6 +21609,9 @@ msgstr "Versie {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "Versie {version} wordt geïnstalleerd zodra je opnieuw opstart."
 
+msgid "Version {version} is available"
+msgstr "Versie {version} is beschikbaar"
+
 msgid "Version {version} is the latest version."
 msgstr "Versie {version} is de nieuwste versie."
 
@@ -21568,6 +21775,9 @@ msgstr "Wachten op het eerste bericht van de subagent…"
 
 msgid "Waiting for your input"
 msgstr "Wacht op je invoer"
+
+msgid "Waking the workspace…"
+msgstr "Werkruimte wordt gewekt…"
 
 msgid "Waking up workspace"
 msgstr "Werkruimte wordt gewekt"
@@ -22567,8 +22777,14 @@ msgstr "Je v1-projecten en -workspaces worden overgezet naar het nieuwe Paradev.
 msgid "Your version: {currentVersion}"
 msgstr "Jouw versie: {currentVersion}"
 
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Je werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch op de remote gepusht. Een cloudwerkruimte start vanaf die branch in de omgeving die je kiest, en elke Claude-chat gaat daar verder. Agents die bezig zijn, stoppen eerst. Terminals en andere chats blijven hier."
+
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "De beheerder van je workspace zet aanmelden met apparaatcode voor Codex aan."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Je werkruimte is niet veranderd. Je kunt hem over een paar minuten opnieuw verplaatsen."
 
 msgid "Zap"
 msgstr "Bliksem"

@@ -27,6 +27,7 @@ import { useArchivedCloudWorkspace } from "../hooks/useArchivedCloudWorkspace";
 import { useRemoteHostStatus } from "../hooks/useRemoteHostStatus";
 import { useWorkspaceMissVerdict } from "../hooks/useWorkspaceMissVerdict";
 import { WorkspaceProvider } from "../providers/WorkspaceProvider";
+import { StoredCloudChat } from "./components/StoredCloudChat";
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/v2-workspace/$workspaceId",
@@ -158,13 +159,23 @@ function V2WorkspaceLayout() {
 	// A `ready` row only means the box has started booting. Its address request
 	// is batched with the wake, which waits for host-service to answer.
 	if (!workspace && cloudWorkspace) {
+		const provisioning = (
+			<CloudWorkspaceProvisioningState
+				workspaceId={cloudWorkspace.id}
+				name={cloudWorkspace.name}
+				status={cloudWorkspace.status}
+			/>
+		);
 		return (
 			<StateScreenShell>
-				<CloudWorkspaceProvisioningState
-					workspaceId={cloudWorkspace.id}
-					name={cloudWorkspace.name}
-					status={cloudWorkspace.status}
-				/>
+				{cloudWorkspace.status === "ready" ? (
+					<StoredCloudChat
+						fallback={provisioning}
+						workspaceId={cloudWorkspace.id}
+					/>
+				) : (
+					provisioning
+				)}
 			</StateScreenShell>
 		);
 	}

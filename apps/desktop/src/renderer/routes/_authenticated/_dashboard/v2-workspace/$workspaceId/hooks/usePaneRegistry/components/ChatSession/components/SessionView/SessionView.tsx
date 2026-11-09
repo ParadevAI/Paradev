@@ -6,6 +6,7 @@ import {
 	latestSessionUsage,
 	type OutboxEntry,
 	presetForAnyHarness,
+	type SessionSnapshot,
 	userMessageText,
 } from "@superset/chat/core";
 import type {
@@ -87,6 +88,7 @@ import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
+import { withStoredHistory } from "./utils/withStoredHistory";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
@@ -106,6 +108,7 @@ export function SessionView({
 	draftKey,
 	headerLeft,
 	held,
+	storedSnapshot,
 	isActive,
 	onModeChange,
 	pendingPrompts,
@@ -143,6 +146,8 @@ export function SessionView({
 		launched?: UserContent[];
 	};
 	isActive?: boolean;
+	/** The chat as the database holds it, shown until the host sends the live one. */
+	storedSnapshot?: SessionSnapshot | null;
 	pendingPrompts: UserContent[][];
 	onPendingPromptsSent: () => void;
 	onLaunchPromptDelivered?: () => void;
@@ -239,7 +244,14 @@ export function SessionView({
 		}
 	}, [outbox]);
 	useRestoreUnsentPrompts(draftKey, outbox, draftOf);
-	const timeline = useTimeline(session.snapshot, { nestChildItems: true });
+	const shownSnapshot = useMemo(
+		() =>
+			storedSnapshot
+				? withStoredHistory(storedSnapshot, session.snapshot)
+				: session.snapshot,
+		[storedSnapshot, session.snapshot],
+	);
+	const timeline = useTimeline(shownSnapshot, { nestChildItems: true });
 	const rail = useStableList(
 		useMemo(() => railMessages(timeline), [timeline]),
 		(previous, next) =>
@@ -508,10 +520,10 @@ export function SessionView({
 
 	const onBackgroundSubagent = useMoveToBackground(client);
 	const plugins = usePluginMentionOptions();
-	const childrenByParent = useChildrenByParent(session.snapshot);
+	const childrenByParent = useChildrenByParent(shownSnapshot);
 	const nestedItems = useMemo(
 		() => ({
-			snapshot: session.snapshot,
+			snapshot: shownSnapshot,
 			childrenByParent,
 			requestItemBodies: session.requestItemBodies,
 			respondToApproval: onRespond,
@@ -519,7 +531,7 @@ export function SessionView({
 			moveToBackground: onBackgroundSubagent,
 		}),
 		[
-			session.snapshot,
+			shownSnapshot,
 			childrenByParent,
 			session.requestItemBodies,
 			onRespond,
@@ -702,7 +714,7 @@ export function SessionView({
 											ref={transcriptRef}
 											revealMessageId={revealMessageId}
 											sessionId={client.sessionId}
-											snapshot={session.snapshot}
+											snapshot={shownSnapshot}
 										/>
 									</TurnFailureActionsProvider>
 								)}

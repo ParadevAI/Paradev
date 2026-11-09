@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
-import { projects, workspaces } from "../../../../db/schema";
+import { workspaces } from "../../../../db/schema";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import type { HostServiceContext } from "../../../../types";
 import {
 	type HostWorkspaceRow,
@@ -126,9 +127,7 @@ function requireUnchangedProjectCheckout(
 	projectId: string,
 	repoPath: string,
 ): void {
-	const project = ctx.db.query.projects
-		.findFirst({ where: eq(projects.id, projectId) })
-		.sync();
+	const project = getLocalProject(ctx.db, projectId);
 	if (!project)
 		throw new TRPCError({
 			code: "NOT_FOUND",

@@ -8,6 +8,10 @@ import type {
 	PullRequestMergeability,
 } from "@superset/shared/pull-request";
 import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail";
+import {
+	type MergeMethodChoices,
+	mergeMethodChoices,
+} from "@superset/shared/pull-request-merge-methods";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
@@ -35,7 +39,30 @@ export type PullRequestDetail = PullRequestDetailBase &
 	PullRequestActivity & {
 		/** What GitHub lets the viewer do, so nothing is offered that would be refused. */
 		capabilities: PullRequestDetailRead["capabilities"];
+		/** The repository's allowed merge methods and the main button's choice. */
+		mergeMethods: MergeMethodChoices;
 	};
+
+/**
+ * A detail as the query cache holds it. Entries persisted by builds older
+ * than `mergeMethods` hydrate without it for up to a day.
+ */
+export type CachedPullRequestDetail = Omit<
+	PullRequestDetail,
+	"mergeMethods"
+> & {
+	mergeMethods?: MergeMethodChoices;
+};
+
+export function cachedMergeMethods(
+	detail: CachedPullRequestDetail,
+): MergeMethodChoices {
+	return detail.mergeMethods ?? mergeMethodChoices(null);
+}
+
+function withMergeMethods(detail: CachedPullRequestDetail): PullRequestDetail {
+	return { ...detail, mergeMethods: cachedMergeMethods(detail) };
+}
 
 export function pullRequestDetailQueryKey(
 	repoFullName: string | null,
@@ -57,7 +84,7 @@ export function pullRequestDetailQueryOptions({
 	repoFullName: string | null;
 	prNumber: number | null;
 }) {
-	return queryOptions<PullRequestDetail>({
+	return queryOptions<CachedPullRequestDetail, Error, PullRequestDetail>({
 		queryKey: [
 			...pullRequestDetailQueryKey(repoFullName, prNumber),
 			organizationId,
@@ -66,6 +93,7 @@ export function pullRequestDetailQueryOptions({
 			if (prNumber === null) throw new Error("Invalid pull request number");
 			return readPullRequestDetail({ organizationId, repoFullName, prNumber });
 		},
+		select: withMergeMethods,
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});

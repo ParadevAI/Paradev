@@ -285,6 +285,12 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.chatMove.moveStopped": () =>
+		i18n._(
+			msg({
+				message: "This move stopped. The chat is still in its old workspace.",
+			}),
+		),
 	"serverError.channel.notFound": () =>
 		i18n._(
 			msg({
