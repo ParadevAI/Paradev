@@ -1158,8 +1158,9 @@ superset worktrees list --project prj_…
 	name="superset worktrees open"
 	options={[
 		{ flag: "--project <projectId>", description: "Project ID. Required." },
-		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path` or `--branch`. Must be absolute on another host." },
+		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path`, `--branch` or `--all`. Must be absolute on another host." },
 		{ flag: "--branch <name>", description: "Branch checked out in the worktree." },
+		{ flag: "--all", description: "Every worktree that is not the main checkout and has no workspace." },
 		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
 		{ flag: "--local", description: "This machine (the default)." },
 		{ flag: "--run-setup", description: "Run the project's setup script in a newly opened workspace. Off by default." },
@@ -1171,14 +1172,15 @@ files. If a workspace already tracks it, the command returns that workspace with
 `alreadyExists: true` and changes nothing, so it is safe to re-run. The project's main
 checkout is not a worktree; use `superset workspaces create --checkout local` for it.
 
-To open every untracked worktree, for example after a machine registers as a new host
-(run `superset projects setup` for the project there first):
+To open every untracked worktree, for example after a machine registers as a new host,
+pass `--all` (run `superset projects setup` for the project there first). It returns
+`{ opened, alreadyExisted, failed }`. If a worktree fails, the others still open, and the
+command exits non-zero with the same object as its `--json` output. `superset worktrees
+list` shows what `--all` will open: the rows with `isMain: false` and `hasWorkspace: false`.
 
 ```bash
 superset worktrees open --project prj_… --branch fix/login-bug
-superset worktrees list --project prj_… --json \
-  | jq -r '.[] | select(.isMain == false and .hasWorkspace == false) | .path' \
-  | while read -r path; do superset worktrees open --project prj_… --path "$path"; done
+superset worktrees open --project prj_… --all
 ```
 </Command>
 
