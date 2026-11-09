@@ -2813,6 +2813,9 @@ msgstr "Cualquier agente que hayas configurado en Paradev, como Claude Code o Co
 msgid "Any channel"
 msgstr "Cualquier canal"
 
+msgid "Any comment"
+msgstr "Cualquier comentario"
+
 msgid "Any conclusion"
 msgstr "Cualquier resultado"
 
@@ -3834,6 +3837,9 @@ msgstr "Comprar por {total}"
 
 msgid "Buy GB-hours"
 msgstr "Comprar GB-horas"
+
+msgid "by"
+msgstr "por"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Acciones del comentario"
 
 msgid "Comment added"
 msgstr "Comentario añadido"
+
+msgid "Comment added in"
+msgstr "Comentario añadido en"
 
 msgid "Comment mentions user"
 msgstr "Un comentario menciona a un usuario"
@@ -10173,6 +10182,9 @@ msgstr "Mejorar las instrucciones del agente"
 msgid "Improved diff viewer"
 msgstr "Visor de diff mejorado"
 
+msgid "in"
+msgstr "en"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "en {0}"
@@ -11727,6 +11739,9 @@ msgstr "Sigue los patrones existentes"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Ajusta los atajos a las etiquetas de tu teclado (p. ej. ⌘Z siempre se activa en la tecla marcada como \"Z\", la tecla física KeyY en QWERTZ). Si está desactivado, los atajos se anclan a las posiciones físicas de las teclas e ignoran la fuente de entrada actual."
+
+msgid "Matching \"{pattern}\""
+msgstr "Coincide con «{pattern}»"
 
 msgid "Max"
 msgstr "Máx."
@@ -22206,6 +22221,9 @@ msgstr "Con flecha"
 
 msgid "With icon"
 msgstr "Con icono"
+
+msgid "with label"
+msgstr "con etiqueta"
 
 msgid "With label"
 msgstr "Con etiqueta"

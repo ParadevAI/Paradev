@@ -51,12 +51,14 @@ An event trigger starts a run when the event arrives. Pick the provider, the eve
 | --- | --- | --- |
 | GitHub | Pull request opened, pushed, merged, closed, review requested, or assigned; draft opened; comment added; PR review comment; PR review submitted; review thread resolved or unresolved; issue comment; label change; checks completed; workflow run completed; new push to branch; release published, created, edited, unpublished, or deleted | One repository (required), branches, labels, comment text, and people (Anyone, Me, or specific people) |
 | Slack | Message in channel, reaction added, channel created | Channels (required, except for channel created), message text or new channel name, emoji (required for reaction added), people |
-| Linear | Issue created, status changed, or assigned; cycle ended | Teams (required), projects, labels, status, assignee |
+| Linear | Issue created, status changed, or assigned; comment added; cycle ended | Teams (required), projects, labels, status, assignee, comment author and text |
 | Sentry | Issue created, resolved, assigned, archived, or unresolved; any issue event | Projects (required), level (Fatal, Error, Warning, Info, Debug) |
 | Notion | Rows changed, comment added, comment mentions user | Data sources (required), pages, people |
 | Microsoft Teams | Message in channel, channel created | Team (required), channels (required for message in channel), message or channel name text, people |
 
 Text filters are plain, case-insensitive "contains" matches against the first 4,096 characters, not regular expressions. Thread replies in Slack don't count as a message in channel.
+
+For a Linear comment command, add **Linear → Comment added**, select a team, and set the comment text filter to `/superset`. New issue comments containing that text start a run; edits and comments on projects or documents do not. The agent receives the comment and its parent issue context. This is a text command, not a native Linear agent @mention. The Linear OAuth application must have **Comment** webhook events enabled.
 
 GitHub triggers skip pull request events from forks (opened, pushed, reviews, review comments, threads), and a run never checks out a fork's branch. A top-level comment on a fork's pull request can still fire **Comment added**, and checks and workflow runs from fork pull requests still fire.
 

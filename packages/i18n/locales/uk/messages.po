@@ -2807,6 +2807,9 @@ msgstr "Будь-який агент, якого ви налаштували в 
 msgid "Any channel"
 msgstr "Будь-який канал"
 
+msgid "Any comment"
+msgstr "Будь-який коментар"
+
 msgid "Any conclusion"
 msgstr "Будь-який результат"
 
@@ -3828,6 +3831,9 @@ msgstr "Купити за {total}"
 
 msgid "Buy GB-hours"
 msgstr "Купити ГБ-години"
+
+msgid "by"
+msgstr "від"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4937,6 +4943,9 @@ msgstr "Дії з коментарем"
 
 msgid "Comment added"
 msgstr "Коментар додано"
+
+msgid "Comment added in"
+msgstr "Коментар додано в"
 
 msgid "Comment mentions user"
 msgstr "Коментар згадує користувача"
@@ -10167,6 +10176,9 @@ msgstr "Покращ інструкції агента"
 msgid "Improved diff viewer"
 msgstr "Покращений переглядач diff"
 
+msgid "in"
+msgstr "у"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "у {0}"
@@ -11721,6 +11733,9 @@ msgstr "Дотримуватися наявних патернів"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Зіставляти комбінації клавіш із позначками на клавіатурі (наприклад, ⌘Z завжди спрацьовує на клавіші з позначкою «Z» — фізична KeyY на QWERTZ). Якщо вимкнено, комбінації прив'язані до фізичного розташування клавіш і не враховують поточне джерело введення."
+
+msgid "Matching \"{pattern}\""
+msgstr "Відповідає «{pattern}»"
 
 msgid "Max"
 msgstr "Макс."
@@ -22200,6 +22215,9 @@ msgstr "Зі стрілкою"
 
 msgid "With icon"
 msgstr "Зі значком"
+
+msgid "with label"
+msgstr "з міткою"
 
 msgid "With label"
 msgstr "З підписом"

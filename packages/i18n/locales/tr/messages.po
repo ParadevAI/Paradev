@@ -2813,6 +2813,9 @@ msgstr "Paradev'de kurduğunuz herhangi bir ajan, örneğin Claude Code veya Cod
 msgid "Any channel"
 msgstr "Tüm kanallar"
 
+msgid "Any comment"
+msgstr "Herhangi bir yorum"
+
 msgid "Any conclusion"
 msgstr "Tüm sonuçlar"
 
@@ -3834,6 +3837,9 @@ msgstr "{total} karşılığında satın al"
 
 msgid "Buy GB-hours"
 msgstr "GB-saat satın al"
+
+msgid "by"
+msgstr "yazan"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Yorum işlemleri"
 
 msgid "Comment added"
 msgstr "Yorum eklendi"
+
+msgid "Comment added in"
+msgstr "Yorum eklenen yer"
 
 msgid "Comment mentions user"
 msgstr "Yorumda kullanıcıdan bahsedildi"
@@ -10173,6 +10182,9 @@ msgstr "Ajan yönergelerini iyileştir"
 msgid "Improved diff viewer"
 msgstr "Geliştirilmiş fark görüntüleyici"
 
+msgid "in"
+msgstr "içinde"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0} içinde"
@@ -11727,6 +11739,9 @@ msgstr "Mevcut desenlere uy"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Kısayolları klavyenizdeki etiketlerle eşleştirin (örn. ⌘Z her zaman \"Z\" etiketli tuşta çalışır — QWERTZ'de fiziksel KeyY). Kapalıyken kısayollar fiziksel tuş konumlarına sabitlenir ve geçerli giriş kaynağını yok sayar."
+
+msgid "Matching \"{pattern}\""
+msgstr "\"{pattern}\" ile eşleşen"
 
 msgid "Max"
 msgstr "En yüksek"
@@ -22206,6 +22221,9 @@ msgstr "Oklu"
 
 msgid "With icon"
 msgstr "Simgeli"
+
+msgid "with label"
+msgstr "etiketi"
 
 msgid "With label"
 msgstr "Etiketli"

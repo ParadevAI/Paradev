@@ -2813,6 +2813,9 @@ msgstr "Bất kỳ agent nào bạn đã thiết lập trong Paradev, như Claud
 msgid "Any channel"
 msgstr "Kênh bất kỳ"
 
+msgid "Any comment"
+msgstr "Bất kỳ bình luận nào"
+
 msgid "Any conclusion"
 msgstr "Kết quả bất kỳ"
 
@@ -3834,6 +3837,9 @@ msgstr "Mua với giá {total}"
 
 msgid "Buy GB-hours"
 msgstr "Mua GB-giờ"
+
+msgid "by"
+msgstr "bởi"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Thao tác bình luận"
 
 msgid "Comment added"
 msgstr "Có bình luận mới"
+
+msgid "Comment added in"
+msgstr "Bình luận được thêm trong"
 
 msgid "Comment mentions user"
 msgstr "Bình luận nhắc đến người dùng"
@@ -10173,6 +10182,9 @@ msgstr "Cải thiện hướng dẫn cho agent"
 msgid "Improved diff viewer"
 msgstr "Khung xem diff cải tiến"
 
+msgid "in"
+msgstr "trong"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "trong {0}"
@@ -11727,6 +11739,9 @@ msgstr "Bám theo mẫu hiện có"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Khớp phím tắt với ký tự in trên bàn phím của bạn (ví dụ ⌘Z luôn kích hoạt ở phím có nhãn \"Z\" — tức phím vật lý KeyY trên QWERTZ). Khi tắt, phím tắt gắn với vị trí phím vật lý và bỏ qua nguồn nhập hiện tại."
+
+msgid "Matching \"{pattern}\""
+msgstr "Khớp với \"{pattern}\""
 
 msgid "Max"
 msgstr "Tối đa"
@@ -22206,6 +22221,9 @@ msgstr "Có mũi tên"
 
 msgid "With icon"
 msgstr "Có biểu tượng"
+
+msgid "with label"
+msgstr "có nhãn"
 
 msgid "With label"
 msgstr "Có nhãn"

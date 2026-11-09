@@ -2813,6 +2813,9 @@ msgstr "Paradev에서 설정한 모든 에이전트, 예를 들어 Claude Code�
 msgid "Any channel"
 msgstr "모든 채널"
 
+msgid "Any comment"
+msgstr "모든 댓글"
+
 msgid "Any conclusion"
 msgstr "모든 결과"
 
@@ -3834,6 +3837,9 @@ msgstr "{total}에 구매"
 
 msgid "Buy GB-hours"
 msgstr "GB 시간 구매"
+
+msgid "by"
+msgstr "작성자"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "댓글 작업"
 
 msgid "Comment added"
 msgstr "댓글 추가됨"
+
+msgid "Comment added in"
+msgstr "댓글이 추가된 위치"
 
 msgid "Comment mentions user"
 msgstr "댓글이 사용자를 멘션함"
@@ -10173,6 +10182,9 @@ msgstr "에이전트 지침 개선하기"
 msgid "Improved diff viewer"
 msgstr "차이 뷰어 개선"
 
+msgid "in"
+msgstr "위치"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0}에서"
@@ -11727,6 +11739,9 @@ msgstr "기존 패턴을 따라 주세요"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "키보드에 인쇄된 문자에 맞춰 단축키를 매핑합니다(예: ⌘Z는 항상 \"Z\"라고 적힌 키에서 동작하며, QWERTZ에서는 물리 키 KeyY입니다). 끄면 단축키가 물리적 키 위치에 고정되며 현재 입력 소스를 무시합니다."
+
+msgid "Matching \"{pattern}\""
+msgstr "\"{pattern}\" 일치"
 
 msgid "Max"
 msgstr "최대"
@@ -22206,6 +22221,9 @@ msgstr "화살표 포함"
 
 msgid "With icon"
 msgstr "아이콘 포함"
+
+msgid "with label"
+msgstr "레이블"
 
 msgid "With label"
 msgstr "레이블 포함"

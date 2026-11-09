@@ -2813,6 +2813,9 @@ msgstr "Любой агент, которого вы настроили в Parad
 msgid "Any channel"
 msgstr "Любой канал"
 
+msgid "Any comment"
+msgstr "Любой комментарий"
+
 msgid "Any conclusion"
 msgstr "Любой итог"
 
@@ -3834,6 +3837,9 @@ msgstr "Купить за {total}"
 
 msgid "Buy GB-hours"
 msgstr "Купить ГБ-часы"
+
+msgid "by"
+msgstr "от"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Действия с комментарием"
 
 msgid "Comment added"
 msgstr "Добавлен комментарий"
+
+msgid "Comment added in"
+msgstr "Комментарий добавлен в"
 
 msgid "Comment mentions user"
 msgstr "В комментарии упомянут пользователь"
@@ -10173,6 +10182,9 @@ msgstr "Улучшить инструкции для агентов"
 msgid "Improved diff viewer"
 msgstr "Улучшенный просмотр diff"
 
+msgid "in"
+msgstr "в"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "в {0}"
@@ -11727,6 +11739,9 @@ msgstr "Следуй существующим шаблонам"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Привязывать сочетания к обозначениям на вашей клавиатуре (например, ⌘Z всегда срабатывает на клавише с надписью «Z» — физическая KeyY на QWERTZ). Когда выключено, сочетания привязаны к физическим позициям клавиш и не зависят от текущего источника ввода."
+
+msgid "Matching \"{pattern}\""
+msgstr "Соответствует «{pattern}»"
 
 msgid "Max"
 msgstr "Макс."
@@ -22206,6 +22221,9 @@ msgstr "Со стрелкой"
 
 msgid "With icon"
 msgstr "С иконкой"
+
+msgid "with label"
+msgstr "с меткой"
 
 msgid "With label"
 msgstr "С подписью"

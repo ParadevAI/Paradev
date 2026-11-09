@@ -2813,6 +2813,9 @@ msgstr "Any agent you've set up in Paradev, such as Claude Code or Codex."
 msgid "Any channel"
 msgstr "Any channel"
 
+msgid "Any comment"
+msgstr "Any comment"
+
 msgid "Any conclusion"
 msgstr "Any conclusion"
 
@@ -3834,6 +3837,9 @@ msgstr "Buy for {total}"
 
 msgid "Buy GB-hours"
 msgstr "Buy GB-hours"
+
+msgid "by"
+msgstr "by"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Comment actions"
 
 msgid "Comment added"
 msgstr "Comment added"
+
+msgid "Comment added in"
+msgstr "Comment added in"
 
 msgid "Comment mentions user"
 msgstr "Comment mentions user"
@@ -10173,6 +10182,9 @@ msgstr "Improve the agent instructions"
 msgid "Improved diff viewer"
 msgstr "Improved diff viewer"
 
+msgid "in"
+msgstr "in"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "in {0}"
@@ -11727,6 +11739,9 @@ msgstr "Match existing patterns"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
+
+msgid "Matching \"{pattern}\""
+msgstr "Matching \"{pattern}\""
 
 msgid "Max"
 msgstr "Max"
@@ -22206,6 +22221,9 @@ msgstr "With arrow"
 
 msgid "With icon"
 msgstr "With icon"
+
+msgid "with label"
+msgstr "with label"
 
 msgid "With label"
 msgstr "With label"

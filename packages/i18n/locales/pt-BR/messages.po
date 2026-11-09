@@ -2813,6 +2813,9 @@ msgstr "Qualquer agente que você configurou no Paradev, como Claude Code ou Cod
 msgid "Any channel"
 msgstr "Qualquer canal"
 
+msgid "Any comment"
+msgstr "Qualquer comentário"
+
 msgid "Any conclusion"
 msgstr "Qualquer conclusão"
 
@@ -3834,6 +3837,9 @@ msgstr "Comprar por {total}"
 
 msgid "Buy GB-hours"
 msgstr "Comprar GB-horas"
+
+msgid "by"
+msgstr "por"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Ações do comentário"
 
 msgid "Comment added"
 msgstr "Comentário adicionado"
+
+msgid "Comment added in"
+msgstr "Comentário adicionado em"
 
 msgid "Comment mentions user"
 msgstr "Comentário menciona usuário"
@@ -10173,6 +10182,9 @@ msgstr "Melhorar as instruções do agente"
 msgid "Improved diff viewer"
 msgstr "Visualizador de diff melhorado"
 
+msgid "in"
+msgstr "em"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "em {0}"
@@ -11727,6 +11739,9 @@ msgstr "Siga os padrões existentes"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Faz os atalhos seguirem os rótulos do seu teclado (ex.: ⌘Z sempre dispara na tecla marcada \"Z\" — a KeyY física no QWERTZ). Quando desligado, os atalhos ficam presos às posições físicas e ignoram a fonte de entrada atual."
+
+msgid "Matching \"{pattern}\""
+msgstr "Corresponde a \"{pattern}\""
 
 msgid "Max"
 msgstr "Máx."
@@ -22206,6 +22221,9 @@ msgstr "Com seta"
 
 msgid "With icon"
 msgstr "Com ícone"
+
+msgid "with label"
+msgstr "com etiqueta"
 
 msgid "With label"
 msgstr "Com rótulo"

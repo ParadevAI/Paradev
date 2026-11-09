@@ -1,6 +1,7 @@
 import type { LinearTriggerEvent, TriggerScope } from "../automation-triggers";
 import {
 	type BaseMatchableEvent,
+	bodyMatches,
 	type MatchResult,
 	no,
 	scopeAllows,
@@ -35,8 +36,12 @@ export function linearEventNames(delivery: {
 	updatedFrom: Record<string, unknown> | null;
 	assigneeId: string | null;
 	completedAt: string | null;
+	issueId?: string | null;
 }): LinearTriggerEvent[] {
 	const { type, action, updatedFrom } = delivery;
+	if (type === "Comment" && action === "create" && delivery.issueId) {
+		return ["comment.created"];
+	}
 	if (type === "Issue") {
 		if (action === "create") {
 			// An issue created with an assignee is an assignment too, the same
@@ -77,6 +82,8 @@ export function linearTriggerMatches(
 		labels: TriggerScope;
 		toStatus: TriggerScope;
 		assignee: TriggerScope;
+		actor?: TriggerScope;
+		commentFilter?: { pattern: string; isRegex: boolean } | null;
 	},
 	event: LinearMatchableEvent,
 ): MatchResult {
@@ -97,6 +104,14 @@ export function linearTriggerMatches(
 	}
 	if (!scopeAllows(config.assignee, event.assigneeId)) {
 		return no("assignee");
+	}
+	if (config.event === "comment.created") {
+		if (!scopeAllows(config.actor ?? { mode: "any" }, event.actorId)) {
+			return no("actor");
+		}
+		if (!bodyMatches(config.commentFilter ?? null, event.body)) {
+			return no("commentFilter");
+		}
 	}
 	return { matches: true };
 }

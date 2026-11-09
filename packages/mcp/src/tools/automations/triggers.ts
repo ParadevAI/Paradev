@@ -13,6 +13,7 @@ const SHAPE_HELP = [
 	'schedule: {"config":{"kind":"schedule","rrule":"FREQ=DAILY;BYHOUR=9;BYMINUTE=0","dtstart":"2026-01-01T09:00:00Z","timezone":"America/New_York"}}',
 	'slack: {"config":{"kind":"slack","event":"reaction_added","channels":{"mode":"list","ids":["C123"]},"emoji":{"mode":"list","ids":["bug"]},"actor":{"mode":"any"}}}',
 	'github: {"config":{"kind":"github","event":"pull_request.opened","repositories":{"mode":"list","ids":["123456789"]},"branches":{"mode":"any"},"labels":{"mode":"any"},"actor":{"mode":"any"}}}',
+	'linear comment: {"config":{"kind":"linear","event":"comment.created","teams":{"mode":"list","ids":["<team-uuid>"]},"actor":{"mode":"me"},"commentFilter":{"pattern":"/superset","isRegex":false}}}',
 	'linear: {"config":{"kind":"linear","event":"issue.assigned","teams":{"mode":"list","ids":["<team-uuid>"]},"projects":{"mode":"any"},"labels":{"mode":"any"},"toStatus":{"mode":"any"},"assignee":{"mode":"me"}}}',
 ].join(" ");
 

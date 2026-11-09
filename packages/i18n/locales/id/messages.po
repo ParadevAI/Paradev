@@ -2813,6 +2813,9 @@ msgstr "Agen apa pun yang sudah Anda siapkan di Paradev, seperti Claude Code ata
 msgid "Any channel"
 msgstr "Channel mana pun"
 
+msgid "Any comment"
+msgstr "Komentar apa pun"
+
 msgid "Any conclusion"
 msgstr "Kesimpulan apa pun"
 
@@ -3834,6 +3837,9 @@ msgstr "Beli seharga {total}"
 
 msgid "Buy GB-hours"
 msgstr "Beli GB-jam"
+
+msgid "by"
+msgstr "oleh"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Tindakan komentar"
 
 msgid "Comment added"
 msgstr "Komentar ditambahkan"
+
+msgid "Comment added in"
+msgstr "Komentar ditambahkan di"
 
 msgid "Comment mentions user"
 msgstr "Komentar menyebut pengguna"
@@ -10173,6 +10182,9 @@ msgstr "Perbaiki instruksi agen"
 msgid "Improved diff viewer"
 msgstr "Penampil diff yang lebih baik"
 
+msgid "in"
+msgstr "di"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "di {0}"
@@ -11727,6 +11739,9 @@ msgstr "Ikuti pola yang ada"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Cocokkan pintasan dengan label pada keyboard Anda (mis. ⌘Z selalu aktif pada tombol berlabel \"Z\" — KeyY fisik di QWERTZ). Saat mati, pintasan terikat pada posisi tombol fisik dan mengabaikan sumber input saat ini."
+
+msgid "Matching \"{pattern}\""
+msgstr "Cocok dengan \"{pattern}\""
 
 msgid "Max"
 msgstr "Maks"
@@ -22206,6 +22221,9 @@ msgstr "Dengan panah"
 
 msgid "With icon"
 msgstr "Dengan ikon"
+
+msgid "with label"
+msgstr "dengan label"
 
 msgid "With label"
 msgstr "Dengan label"

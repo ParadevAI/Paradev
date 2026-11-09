@@ -2813,6 +2813,9 @@ msgstr "Paradevで設定済みのエージェントなら何でも使えます�
 msgid "Any channel"
 msgstr "すべてのチャンネル"
 
+msgid "Any comment"
+msgstr "すべてのコメント"
+
 msgid "Any conclusion"
 msgstr "すべての結果"
 
@@ -3834,6 +3837,9 @@ msgstr "{total} で購入"
 
 msgid "Buy GB-hours"
 msgstr "GB 時間を購入"
+
+msgid "by"
+msgstr "投稿者"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "コメントの操作"
 
 msgid "Comment added"
 msgstr "コメント追加"
+
+msgid "Comment added in"
+msgstr "コメント追加先"
 
 msgid "Comment mentions user"
 msgstr "コメントでユーザーをメンション"
@@ -10173,6 +10182,9 @@ msgstr "エージェント向け指示を改善"
 msgid "Improved diff viewer"
 msgstr "差分ビューアの改善"
 
+msgid "in"
+msgstr "対象"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "{0} 内"
@@ -11727,6 +11739,9 @@ msgstr "既存のパターンに合わせて"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "ショートカットをキーボードの刻印に合わせます(例: ⌘Zは常に「Z」と刻印されたキーで発火 — QWERTZでは物理KeyY)。オフの場合、ショートカットは物理キー位置に固定され、現在の入力ソースを無視します。"
+
+msgid "Matching \"{pattern}\""
+msgstr "「{pattern}」に一致"
 
 msgid "Max"
 msgstr "最大"
@@ -22206,6 +22221,9 @@ msgstr "矢印あり"
 
 msgid "With icon"
 msgstr "アイコンあり"
+
+msgid "with label"
+msgstr "ラベル"
 
 msgid "With label"
 msgstr "ラベルあり"

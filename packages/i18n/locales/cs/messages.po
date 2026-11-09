@@ -2813,6 +2813,9 @@ msgstr "Jakýkoli agent, kterého máte v Paradevu nastaveného, například Cla
 msgid "Any channel"
 msgstr "Jakýkoli kanál"
 
+msgid "Any comment"
+msgstr "Libovolný komentář"
+
 msgid "Any conclusion"
 msgstr "Jakýkoli výsledek"
 
@@ -3834,6 +3837,9 @@ msgstr "Koupit za {total}"
 
 msgid "Buy GB-hours"
 msgstr "Koupit GB-hodiny"
+
+msgid "by"
+msgstr "od"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -4943,6 +4949,9 @@ msgstr "Akce komentáře"
 
 msgid "Comment added"
 msgstr "Přidán komentář"
+
+msgid "Comment added in"
+msgstr "Komentář přidán v"
 
 msgid "Comment mentions user"
 msgstr "Komentář zmiňuje uživatele"
@@ -10173,6 +10182,9 @@ msgstr "Vylepšit instrukce pro agenty"
 msgid "Improved diff viewer"
 msgstr "Vylepšený prohlížeč rozdílů"
 
+msgid "in"
+msgstr "v"
+
 #. placeholder {0}: intent.path
 msgid "in {0}"
 msgstr "v {0}"
@@ -11727,6 +11739,9 @@ msgstr "Dodrž stávající vzory"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Přiřadit zkratky k popiskům na vaší klávesnici (např. ⌘Z se vždy spustí na klávese označené „Z“ — fyzicky KeyY na QWERTZ). Když je vypnuto, zkratky se vážou k fyzickým pozicím kláves a ignorují aktuální vstupní zdroj."
+
+msgid "Matching \"{pattern}\""
+msgstr "Odpovídá „{pattern}“"
 
 msgid "Max"
 msgstr "Max"
@@ -22206,6 +22221,9 @@ msgstr "Se šipkou"
 
 msgid "With icon"
 msgstr "S ikonou"
+
+msgid "with label"
+msgstr "se štítkem"
 
 msgid "With label"
 msgstr "S popiskem"
