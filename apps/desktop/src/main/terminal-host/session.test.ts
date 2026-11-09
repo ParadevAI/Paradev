@@ -52,6 +52,50 @@ class FakeChildProcess extends EventEmitter {
 let fakeChildProcess: FakeChildProcess;
 let spawnCalls: Array<{ command: string; args: string[] }> = [];
 
+it("blocks new and queued stdin frames after the PTY Exit frame", async () => {
+	const child = Object.assign(new EventEmitter(), {
+		stdout: new FakeStdout(),
+		stdin: new FakeStdin(),
+	});
+	const session = new Session({
+		sessionId: "session-pty-exit-input",
+		workspaceId: "workspace-1",
+		paneId: "pane-1",
+		tabId: "tab-1",
+		cols: 80,
+		rows: 24,
+		cwd: "/tmp",
+		shell: "/bin/sh",
+		spawnProcess: () => child as unknown as ChildProcess,
+	});
+	session.spawn({ cwd: "/tmp", cols: 80, rows: 24, env: {} });
+	child.stdout.emit("data", createFrameHeader(PtySubprocessIpcType.Ready, 0));
+	const exit = Buffer.alloc(4);
+	exit.writeInt32LE(3);
+	child.stdout.emit(
+		"data",
+		Buffer.concat([
+			createFrameHeader(PtySubprocessIpcType.Exit, exit.length),
+			exit,
+		]),
+	);
+	const writesAtExit = child.stdin.writes.length;
+	session.write("late input");
+	session.resize(90, 25);
+	expect(child.stdin.writes.length).toBe(writesAtExit);
+	const internals = session as unknown as {
+		subprocessStdinQueue: Buffer[];
+		subprocessStdinQueuedBytes: number;
+		flushSubprocessStdinQueue: () => void;
+	};
+	const queued = createFrameHeader(PtySubprocessIpcType.Resize, 0);
+	internals.subprocessStdinQueue.push(queued);
+	internals.subprocessStdinQueuedBytes += queued.length;
+	internals.flushSubprocessStdinQueue();
+	expect(child.stdin.writes.length).toBe(writesAtExit);
+	await session.dispose();
+});
+
 it("drains paused output and the PTY exit frame before closing the subprocess", async () => {
 	const child = Object.assign(new EventEmitter(), {
 		stdout: new PassThrough(),

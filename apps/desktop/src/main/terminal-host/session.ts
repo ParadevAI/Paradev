@@ -516,8 +516,7 @@ export class Session {
 	 * Flush queued frames to subprocess stdin, respecting stream backpressure.
 	 */
 	private flushSubprocessStdinQueue(): void {
-		if (!this.subprocess?.stdin || this.subprocessExited || this.disposed)
-			return;
+		if (!this.subprocess?.stdin || this.isDraining || this.disposed) return;
 
 		while (this.subprocessStdinQueue.length > 0) {
 			const buf = this.subprocessStdinQueue[0];
@@ -549,7 +548,7 @@ export class Session {
 		type: PtySubprocessIpcType,
 		payload?: Buffer,
 	): boolean {
-		if (!this.subprocess?.stdin || this.subprocessExited || this.disposed)
+		if (!this.subprocess?.stdin || this.isDraining || this.disposed)
 			return false;
 
 		const payloadBuffer = payload ?? Buffer.alloc(0);
