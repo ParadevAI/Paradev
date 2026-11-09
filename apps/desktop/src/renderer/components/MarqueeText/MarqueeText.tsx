@@ -36,6 +36,11 @@ interface MarqueeTextProps {
 	forceActive?: boolean;
 }
 
+/**
+ * Single-line text that slides its overflow into view while hovered or
+ * focused, and fades its trailing edge while it is parked, so a truncated
+ * name can still be read in place.
+ */
 export function MarqueeText({
 	children,
 	title,
