@@ -377,6 +377,49 @@ describe("FsWatcherManager idle keep-alive", () => {
 		expect(fake.subscriptions).toHaveLength(1);
 	});
 
+	it("attaches afresh when a .gitignore changed while idle", async () => {
+		const fake = createFakeBackend();
+		const rootPath = await createTempRoot();
+		const manager = createManager(fake.backend, { idleKeepAliveMs: 60_000 });
+
+		const unsubscribe = await manager.subscribe(
+			{ absolutePath: rootPath },
+			() => {},
+		);
+		await unsubscribe();
+		fake.subscriptions[0]?.request.onEvents([
+			{ type: "update", path: path.join(rootPath, ".gitignore") },
+		]);
+
+		await manager.subscribe({ absolutePath: rootPath }, () => {});
+		expect(fake.subscriptions).toHaveLength(2);
+		expect(fake.live(rootPath)).toHaveLength(1);
+	});
+
+	it("gives concurrent re-subscribes one shared reuse check", async () => {
+		const fake = createFakeBackend();
+		const rootPath = await createTempRoot();
+		const manager = createManager(fake.backend, { idleKeepAliveMs: 60_000 });
+		const unsubscribe = await manager.subscribe(
+			{ absolutePath: rootPath },
+			() => {},
+		);
+		await unsubscribe();
+
+		const verdicts = [true, false];
+		let checks = 0;
+		(
+			manager as unknown as { isStillAttached: () => Promise<boolean> }
+		).isStillAttached = async () => verdicts[checks++] ?? false;
+
+		await Promise.all([
+			manager.subscribe({ absolutePath: rootPath }, () => {}),
+			manager.subscribe({ absolutePath: rootPath }, () => {}),
+		]);
+		expect(checks).toBe(1);
+		expect(fake.live(rootPath)).toHaveLength(1);
+	});
+
 	it("sees writes in a directory removed and recreated while idle", async () => {
 		const rootPath = await createTempRoot();
 		const dirPath = path.join(rootPath, "x");

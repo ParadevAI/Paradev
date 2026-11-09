@@ -192,8 +192,13 @@ interface WatcherState {
 	listeners: Set<WatchListener>;
 	/** Disposes the watcher once it has sat without listeners for the keep-alive. */
 	idleTimer: ReturnType<typeof setTimeout> | null;
-	/** A directory under the root was removed while no listener was attached. */
-	removedDirWhileIdle: boolean;
+	/**
+	 * Something changed while no listener was attached that a reused watcher
+	 * would get wrong: a directory removal or a .gitignore edit.
+	 */
+	staleWhileIdle: boolean;
+	/** Whether to reuse the idle watcher, decided once for every subscriber. */
+	reuseCheck: Promise<boolean> | null;
 	/**
 	 * Root-relative directories pruned from the native subscription beyond the
 	 * static defaults (nested repos + gitignored dirs), kept queryable so
@@ -296,6 +301,15 @@ export interface FsWatcherManagerOptions {
 	maxIdleWatchers?: number;
 }
 
+// A reused watcher keeps its attach-time prune set, and chokidar under bun
+// doesn't re-watch a directory recreated at the same path.
+function isStaleWhileIdle(event: NativeWatchEvent): boolean {
+	return (
+		(event.type === "delete" && event.isDirectory === true) ||
+		path.basename(event.path) === ".gitignore"
+	);
+}
+
 export class FsWatcherManager {
 	private readonly debounceMs: number;
 	private readonly ignore: string[];
@@ -373,14 +387,8 @@ export class FsWatcherManager {
 		const absolutePath = normalizeAbsolutePath(options.absolutePath);
 		options.signal?.throwIfAborted();
 		const idle = this.watchers.get(absolutePath);
-		if (
-			idle?.listeners.size === 0 &&
-			(idle.removedDirWhileIdle || !(await this.isStillAttached(idle)))
-		) {
-			// A concurrent subscribe may have claimed it during the stat.
-			if (idle.listeners.size === 0) {
-				await this.releaseWatcher(idle);
-			}
+		if (idle?.listeners.size === 0 && !(await this.canReuse(idle))) {
+			await this.releaseWatcher(idle);
 		}
 		options.signal?.throwIfAborted();
 		let state = this.watchers.get(absolutePath);
@@ -450,6 +458,13 @@ export class FsWatcherManager {
 		}
 	}
 
+	private canReuse(state: WatcherState): Promise<boolean> {
+		state.reuseCheck ??= this.isStillAttached(state).then(
+			(attached) => attached && !state.staleWhileIdle,
+		);
+		return state.reuseCheck;
+	}
+
 	private async isStillAttached(state: WatcherState): Promise<boolean> {
 		if (state.subscription === null) {
 			return false;
@@ -481,6 +496,7 @@ export class FsWatcherManager {
 	}
 
 	private async markIdle(state: WatcherState): Promise<void> {
+		state.reuseCheck = null;
 		state.idleTimer = setTimeout(() => {
 			state.idleTimer = null;
 			void this.releaseWatcher(state);
@@ -694,7 +710,8 @@ export class FsWatcherManager {
 			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
 			idleTimer: null,
-			removedDirWhileIdle: false,
+			staleWhileIdle: false,
+			reuseCheck: null,
 			prunedRelPrefixes: [],
 			filePaths: new Map<string, true>(),
 			directoryPaths: new Set<string>(),
@@ -799,15 +816,8 @@ export class FsWatcherManager {
 			return;
 		}
 
-		// chokidar doesn't re-watch a directory recreated at the same path, so a
-		// warm watcher reused after this would miss events under it.
-		if (
-			state.listeners.size === 0 &&
-			visibleEvents.some(
-				(event) => event.type === "delete" && event.isDirectory,
-			)
-		) {
-			state.removedDirWhileIdle = true;
+		if (state.listeners.size === 0 && visibleEvents.some(isStaleWhileIdle)) {
+			state.staleWhileIdle = true;
 		}
 
 		if (process.env.SUPERSET_FS_EVENTS_DEBUG === "1") {
