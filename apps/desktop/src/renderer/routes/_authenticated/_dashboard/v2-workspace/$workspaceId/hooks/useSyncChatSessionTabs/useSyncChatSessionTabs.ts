@@ -90,7 +90,7 @@ export function useSyncChatSessionTabs({
 			tabs.every((tab) =>
 				Object.values(tab.panes).every((pane) => pane.kind === "terminal"),
 			);
-		openedEmpty.current = false;
+		if (sessions.length > 0) openedEmpty.current = false;
 		if (toAdopt.length === 0) return;
 		// One write with the user's tab still selected: `addTab` selects each new
 		// tab, and a selection change alone is not saved.
