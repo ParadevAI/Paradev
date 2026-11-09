@@ -1,4 +1,6 @@
 export {
+	type CachedPullRequestDetail,
+	cachedMergeMethods,
 	type PullRequestDetail,
 	type PullRequestDetailActor,
 	type PullRequestDetailComment,
@@ -6,6 +8,7 @@ export {
 	type PullRequestDetailCommitAuthor,
 	type PullRequestMergeability,
 	pullRequestDetailQueryKey,
+	pullRequestDetailQueryOptions,
 	useInvalidatePullRequestDetail,
 	usePullRequestDetail,
 } from "./usePullRequestDetail";

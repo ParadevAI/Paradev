@@ -14,8 +14,10 @@ import {
 	useState,
 } from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
-import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import { setHostServiceSecret } from "renderer/lib/host-service-auth";
+import {
+	requestSandboxAccess,
+	type SandboxAccess,
+} from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import {
 	accessRefetchInterval,
 	createFailureStreak,
@@ -51,33 +53,8 @@ export const SandboxAccessContext = createContext<SandboxAccessValue | null>(
 	null,
 );
 
-interface SandboxAccess {
-	url: string;
-	desktopUrl: string;
-	expiresAt: number;
-	agentCredentialsChanged: boolean;
-}
-
 function sandboxAccessQueryKey(workspaceId: string) {
 	return ["cloud-workspace", "access", workspaceId] as const;
-}
-
-async function requestAccess(
-	workspaceId: string,
-	wake: boolean,
-): Promise<SandboxAccess> {
-	const granted = await apiTrpcClient.cloudWorkspace.access.mutate({
-		id: workspaceId,
-		wake,
-	});
-	setHostServiceSecret(granted.url, granted.token);
-	setHostServiceSecret(granted.desktop.url, granted.desktop.token);
-	return {
-		url: granted.url,
-		desktopUrl: granted.desktop.url,
-		expiresAt: new Date(granted.expiresAt).getTime(),
-		agentCredentialsChanged: granted.agentCredentialsChanged,
-	};
 }
 
 // Module-level so useQueries keeps the combined result stable across renders:
@@ -130,7 +107,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 			// The gate is reachable over the public internet, so this must not
 			// pause with navigator.onLine the way the default mode would.
 			networkMode: "always" as const,
-			queryFn: () => requestAccess(workspace.id, false),
+			queryFn: () => requestSandboxAccess(workspace.id, false),
 			refetchInterval: (query: {
 				queryHash: string;
 				state: {
@@ -158,7 +135,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		networkMode: "always",
 		queryFn: async () => {
 			if (!openWorkspace) return null;
-			const access = await requestAccess(openWorkspace.id, true);
+			const access = await requestSandboxAccess(openWorkspace.id, true);
 			queryClient.setQueryData(sandboxAccessQueryKey(openWorkspace.id), access);
 			return access;
 		},

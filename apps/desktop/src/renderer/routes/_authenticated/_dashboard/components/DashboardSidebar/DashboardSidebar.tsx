@@ -228,7 +228,13 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		groups.map((p) => p.id),
 	);
 	useEffect(() => {
-		setProjectOrder(groups.map((p) => p.id));
+		setProjectOrder((current) => {
+			const next = groups.map((p) => p.id);
+			return next.length === current.length &&
+				next.every((id, index) => id === current[index])
+				? current
+				: next;
+		});
 	}, [groups]);
 
 	const orderedGroups = useMemo(() => {

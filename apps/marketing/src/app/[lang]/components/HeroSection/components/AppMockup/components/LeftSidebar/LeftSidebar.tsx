@@ -5,6 +5,7 @@ import { m } from "framer-motion";
 import {
 	LuChevronDown,
 	LuChevronRight,
+	LuFileText,
 	LuLayers,
 	LuPlus,
 	LuZap,
@@ -21,7 +22,7 @@ interface LeftSidebarProps {
 export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 	const { t } = useLingui();
 	const isOrchestrate = activeDemo === "Orchestrate Parallel Agents";
-	const isRemote = activeDemo === "Remote Access";
+	const isCloud = activeDemo === "Cloud Workspaces";
 
 	return (
 		<div className="flex w-[232px] shrink-0 flex-col border-r border-border/60 bg-card text-[11px]">
@@ -43,6 +44,14 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 					label={t({
 						message: "Automations",
 					})}
+					active={activeDemo === "Automate Tasks"}
+				/>
+				<NavRow
+					icon={LuFileText}
+					label={t({
+						message: "Pages",
+					})}
+					active={activeDemo === "Publish Pages"}
 				/>
 				<NavRow
 					icon={LuPlus}
@@ -57,7 +66,7 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 
 				<m.div
 					className="overflow-hidden"
-					initial={{ height: 0, opacity: 0 }}
+					initial={false}
 					animate={{
 						height: isOrchestrate ? "auto" : 0,
 						opacity: isOrchestrate ? 1 : 0,
@@ -86,7 +95,6 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 							add={workspace.add}
 							del={workspace.del}
 							pr={workspace.pr}
-							isActive={!isOrchestrate && !isRemote && workspace.isActive}
 							status={workspace.status}
 							icon={workspace.icon}
 						/>
@@ -94,14 +102,14 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 				</div>
 
 				<div className="mt-3">
-					<GroupHeader label="cloud" count={3} expanded={isRemote} />
+					<GroupHeader label="cloud" count={3} expanded={isCloud} />
 				</div>
 				<m.div
 					className="overflow-hidden"
-					initial={{ height: 0, opacity: 0 }}
+					initial={false}
 					animate={{
-						height: isRemote ? "auto" : 0,
-						opacity: isRemote ? 1 : 0,
+						height: isCloud ? "auto" : 0,
+						opacity: isCloud ? 1 : 0,
 					}}
 					transition={{ duration: 0.25, ease: "easeOut" }}
 				>
@@ -113,7 +121,7 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 								branch={workspace.branch}
 								add={workspace.add}
 								del={workspace.del}
-								isActive={isRemote && index === 0}
+								isActive={isCloud && index === 0}
 								status={workspace.status}
 								icon={workspace.icon}
 							/>
@@ -137,13 +145,23 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 function NavRow({
 	icon: Icon,
 	label,
+	active,
 }: {
 	icon: typeof LuLayers;
 	label: string;
+	active?: boolean;
 }) {
 	return (
-		<div className="flex h-6 cursor-pointer items-center gap-2 px-2 text-muted-foreground/55 hover:text-foreground/80">
-			<Icon className="size-3.5 text-muted-foreground/55" />
+		<div
+			className={`flex h-6 cursor-pointer items-center gap-2 rounded-sm px-2 transition-colors duration-200 ${
+				active
+					? "bg-foreground/[0.06] text-foreground/95"
+					: "text-muted-foreground/55 hover:text-foreground/80"
+			}`}
+		>
+			<Icon
+				className={`size-3.5 ${active ? "text-brand-light" : "text-muted-foreground/55"}`}
+			/>
 			<span>{label}</span>
 		</div>
 	);

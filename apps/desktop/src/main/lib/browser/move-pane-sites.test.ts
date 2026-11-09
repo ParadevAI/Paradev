@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { movePaneSitesOnce } from "./move-pane-sites";
+import { clearMovedPaneSitesOnce, movePaneSitesOnce } from "./move-pane-sites";
 
 function cookie(overrides: Partial<Electron.Cookie>): Electron.Cookie {
 	return {
@@ -39,15 +39,19 @@ function move(
 	visitedUrls: string[] = [],
 ) {
 	const cleared: string[][] = [];
-	const copied = movePaneSitesOnce({
-		from,
-		to,
-		markerPath,
-		readVisitedUrls: () => visitedUrls,
-		clearOldSites: async (origins) => {
-			cleared.push(origins);
+	const copied = movePaneSitesOnce({ from, to, markerPath }).then(
+		async (count) => {
+			await clearMovedPaneSitesOnce({
+				from,
+				markerPath,
+				readVisitedUrls: () => visitedUrls,
+				clearOldSites: async (origins) => {
+					cleared.push(origins);
+				},
+			});
+			return count;
 		},
-	});
+	);
 	return { cleared, copied };
 }
 
@@ -129,10 +133,10 @@ describe("movePaneSitesOnce", () => {
 		const to = store();
 		const markerPath = join(dir, "copied");
 		const attempts: string[][] = [];
-		const run = (fail: boolean) =>
-			movePaneSitesOnce({
+		const run = async (fail: boolean) => {
+			await movePaneSitesOnce({ from, to, markerPath });
+			await clearMovedPaneSitesOnce({
 				from,
-				to,
 				markerPath,
 				readVisitedUrls: () => [],
 				clearOldSites: async (origins) => {
@@ -140,6 +144,7 @@ describe("movePaneSitesOnce", () => {
 					if (fail) throw new Error("clear failed");
 				},
 			});
+		};
 
 		await expect(run(true)).rejects.toThrow("clear failed");
 		await run(false);
@@ -147,5 +152,34 @@ describe("movePaneSitesOnce", () => {
 
 		expect(to.written).toHaveLength(1);
 		expect(attempts).toEqual([["https://a.test"], ["https://a.test"]]);
+	});
+
+	it("copies without clearing, and a clean-up cut off part way runs again", async () => {
+		const from = store([cookie({ domain: "a.test" })]);
+		const to = store();
+		const markerPath = join(dir, "copied");
+
+		expect(await movePaneSitesOnce({ from, to, markerPath })).toBe(1);
+		const hung = clearMovedPaneSitesOnce({
+			from,
+			markerPath,
+			readVisitedUrls: () => [],
+			clearOldSites: () => new Promise(() => {}),
+		});
+		const timedOut = new Promise((resolve) => setTimeout(resolve, 50, "hung"));
+		expect(await Promise.race([hung, timedOut])).toBe("hung");
+
+		const cleared: string[][] = [];
+		await clearMovedPaneSitesOnce({
+			from,
+			markerPath,
+			readVisitedUrls: () => [],
+			clearOldSites: async (origins) => {
+				cleared.push(origins);
+			},
+		});
+		expect(cleared).toEqual([["https://a.test"]]);
+		expect(await movePaneSitesOnce({ from, to, markerPath })).toBe(0);
+		expect(to.written).toHaveLength(1);
 	});
 });

@@ -36,8 +36,11 @@ export function collectCopilotEntries(
 				 LEFT JOIN sessions s ON s.id = e.session_id
 				 WHERE e.created_at >= datetime(? / 1000, 'unixepoch')`,
 			)
-			.all(cutoffMs) as CopilotUsageRow[];
-		copilotRowsToEntries(rows, cutoffMs, out, sessionLabels);
+			.iterate(cutoffMs) as Iterable<CopilotUsageRow>;
+		// Added only once the read finishes: an error mid-stream adds nothing.
+		const entries: UsageLogEntry[] = [];
+		copilotRowsToEntries(rows, cutoffMs, entries, sessionLabels);
+		for (const entry of entries) out.push(entry);
 		return 1;
 	} catch {
 		return 0;

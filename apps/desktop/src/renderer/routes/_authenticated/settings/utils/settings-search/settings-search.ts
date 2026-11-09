@@ -894,16 +894,21 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 	{
 		id: SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT,
 		section: "behavior",
-		title: "Chat interface",
+		title: "Open agents in chat",
 		description:
-			"Open Claude and Codex sessions in a chat pane instead of a terminal",
+			"New agent sessions start in chat instead of the terminal. You can switch any session from its menu.",
 		keywords: [
 			"chat",
 			"interface",
+			"default",
+			"terminal",
+			"open",
 			"acp",
 			"agent",
 			"claude",
 			"codex",
+			"opencode",
+			"pi",
 			"session",
 			"pane",
 			"toggle",

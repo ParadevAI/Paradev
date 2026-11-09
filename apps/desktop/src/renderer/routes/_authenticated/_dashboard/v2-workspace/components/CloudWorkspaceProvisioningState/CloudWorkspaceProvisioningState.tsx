@@ -1,17 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { AlertCircle, Cloud } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { provisioningSince } from "renderer/routes/_authenticated/_dashboard/utils/provisioningSince";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
-
-/**
- * A warm sandbox is up in a second or two; the first ones after an image
- * rebuild pull the image and take tens of seconds. Past this, it is more
- * likely stuck than slow.
- */
-const STUCK_AFTER_SECONDS = 45;
+import {
+	CLOUD_START_STUCK_AFTER_SECONDS,
+	formatElapsed,
+	useElapsedSeconds,
+} from "../../hooks/useElapsedSeconds";
 
 interface CloudWorkspaceProvisioningStateProps {
 	workspaceId: string;
@@ -65,7 +63,7 @@ export function CloudWorkspaceProvisioningState({
 					{formatElapsed(elapsed)}
 				</span>
 
-				{elapsed >= STUCK_AFTER_SECONDS && (
+				{elapsed >= CLOUD_START_STUCK_AFTER_SECONDS && (
 					<div className="flex w-full flex-col gap-2 border-t border-border/60 pt-4 animate-in fade-in slide-in-from-bottom-1 duration-500">
 						<p className="select-text cursor-text text-[12px] leading-relaxed text-muted-foreground">
 							<Trans>
@@ -145,19 +143,4 @@ function CloudWorkspaceFailedState({
 			</div>
 		</div>
 	);
-}
-
-function formatElapsed(seconds: number): string {
-	const total = Math.max(0, Math.floor(seconds));
-	const minutes = Math.floor(total / 60);
-	return `${minutes}:${(total % 60).toString().padStart(2, "0")}`;
-}
-
-function useElapsedSeconds(since: number): number {
-	const [now, setNow] = useState(Date.now);
-	useEffect(() => {
-		const id = window.setInterval(() => setNow(Date.now()), 250);
-		return () => window.clearInterval(id);
-	}, []);
-	return (now - since) / 1000;
 }

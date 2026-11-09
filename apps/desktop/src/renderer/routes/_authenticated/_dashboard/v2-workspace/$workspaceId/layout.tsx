@@ -24,10 +24,10 @@ import { WorkspaceCreateErrorState } from "../components/WorkspaceCreateErrorSta
 import { WorkspaceCreatingState } from "../components/WorkspaceCreatingState";
 import { WorkspaceHostIncompatibleState } from "../components/WorkspaceHostIncompatibleState";
 import { useArchivedCloudWorkspace } from "../hooks/useArchivedCloudWorkspace";
-import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useRemoteHostStatus } from "../hooks/useRemoteHostStatus";
 import { useWorkspaceMissVerdict } from "../hooks/useWorkspaceMissVerdict";
 import { WorkspaceProvider } from "../providers/WorkspaceProvider";
+import { StoredCloudChat } from "./components/StoredCloudChat";
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/v2-workspace/$workspaceId",
@@ -43,7 +43,6 @@ function V2WorkspaceLayout() {
 	// could always reach and this one cannot.
 	const { workspaceId } = Route.useParams();
 	const collections = useCollections();
-	const pendingCloudChat = usePendingCloudChat(workspaceId);
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const pendingTransaction = useWorkspaceTransactionsStore((state) =>
 		workspaceId ? (state.byWorkspaceId[workspaceId] ?? null) : null,
@@ -157,20 +156,26 @@ function V2WorkspaceLayout() {
 		cache.refetchAll,
 	);
 
-	// A cloud workspace is navigated to as soon as its row exists. While it is
-	// provisioning there is no box to open, and once it has failed there never
-	// will be; a ready one only waits for its address to be minted.
+	// A `ready` row only means the box has started booting. Its address request
+	// is batched with the wake, which waits for host-service to answer.
 	if (!workspace && cloudWorkspace) {
-		if (cloudWorkspace.status === "ready" && !pendingCloudChat) {
-			return <StateScreenShell>{null}</StateScreenShell>;
-		}
+		const provisioning = (
+			<CloudWorkspaceProvisioningState
+				workspaceId={cloudWorkspace.id}
+				name={cloudWorkspace.name}
+				status={cloudWorkspace.status}
+			/>
+		);
 		return (
 			<StateScreenShell>
-				<CloudWorkspaceProvisioningState
-					workspaceId={cloudWorkspace.id}
-					name={cloudWorkspace.name}
-					status={cloudWorkspace.status}
-				/>
+				{cloudWorkspace.status === "ready" ? (
+					<StoredCloudChat
+						fallback={provisioning}
+						workspaceId={cloudWorkspace.id}
+					/>
+				) : (
+					provisioning
+				)}
 			</StateScreenShell>
 		);
 	}

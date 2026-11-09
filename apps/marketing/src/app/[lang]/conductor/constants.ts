@@ -20,7 +20,6 @@ interface TextLink {
 interface Highlight {
 	title: MessageDescriptor;
 	detail: MessageDescriptor;
-	beta?: boolean;
 }
 
 export const HIGHLIGHTS: Highlight[] = [
@@ -41,7 +40,6 @@ export const HIGHLIGHTS: Highlight[] = [
 	{
 		title: msg({ message: "Cloud" }),
 		detail: msg({ message: "Agents keep working when your laptop is closed." }),
-		beta: true,
 	},
 	{
 		title: msg({ message: "Mobile" }),
@@ -149,7 +147,6 @@ interface ComparisonRow {
 	paradev: MessageDescriptor;
 	unpricedParadev?: MessageDescriptor;
 	conductor: MessageDescriptor;
-	beta?: boolean;
 }
 
 export const COMPARISON_ROWS: ComparisonRow[] = [
@@ -181,7 +178,6 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 		label: msg({ message: "Cloud workspaces" }),
 		paradev: msg({ message: "Team and Ultra plans" }),
 		conductor: msg({ message: "Shuts down {shutdownDate}" }),
-		beta: true,
 	},
 	{
 		id: "chat",

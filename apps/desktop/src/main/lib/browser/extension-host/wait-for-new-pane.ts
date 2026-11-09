@@ -22,6 +22,7 @@ function onRegistered(event: {
 		(waiter) =>
 			waiter.workspaceId === event.workspaceId &&
 			!waiter.known.has(event.paneId) &&
+			!browserManager.isRequestedPane(event.paneId) &&
 			waiter.paneSession === session,
 	);
 	const [waiter] = index === -1 ? [] : waiters.splice(index, 1);

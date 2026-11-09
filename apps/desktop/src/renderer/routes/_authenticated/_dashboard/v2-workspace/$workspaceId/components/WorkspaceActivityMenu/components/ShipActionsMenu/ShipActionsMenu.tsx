@@ -11,16 +11,20 @@ import { Ellipsis } from "lucide-react";
 import { useRef, useState } from "react";
 import {
 	VscGitCommit,
-	VscGitMerge,
 	VscGitPullRequest,
 	VscGitPullRequestCreate,
 	VscRepoPush,
 } from "react-icons/vsc";
-import type { PullRequestMergeMethod } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import type {
+	PullRequestMergeMethod,
+	PullRequestTarget,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import { MergeMethodMenuItems } from "../../../MergeMethodMenuItems";
 
 export type ShipView = "commit" | "pr";
 
 export interface PullRequestMenuActions {
+	target: PullRequestTarget | null;
 	canMarkReady: boolean;
 	canMerge: boolean;
 	isMarkingReady: boolean;
@@ -168,27 +172,12 @@ export function ShipActionsMenu({
 								<DropdownMenuLabel className="font-normal text-muted-foreground">
 									<Trans>Merge</Trans>
 								</DropdownMenuLabel>
-								<DropdownMenuItem
-									disabled={pullRequest.isMerging}
-									onClick={() => pullRequest.onMerge("squash")}
-								>
-									<VscGitMerge className="size-4" />
-									<Trans>Squash and merge</Trans>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									disabled={pullRequest.isMerging}
-									onClick={() => pullRequest.onMerge("merge")}
-								>
-									<VscGitMerge className="size-4" />
-									<Trans>Create merge commit</Trans>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									disabled={pullRequest.isMerging}
-									onClick={() => pullRequest.onMerge("rebase")}
-								>
-									<VscGitMerge className="size-4" />
-									<Trans>Rebase and merge</Trans>
-								</DropdownMenuItem>
+								<MergeMethodMenuItems
+									target={pullRequest.target}
+									isMerging={pullRequest.isMerging}
+									onMerge={pullRequest.onMerge}
+									iconClassName="size-4"
+								/>
 							</>
 						)}
 					</>

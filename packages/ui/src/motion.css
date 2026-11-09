@@ -3,6 +3,54 @@
 	--animate-spin-slow: spin-slow 3.6s linear infinite;
 	--animate-block-fade: block-fade 320ms ease-out both;
 	--animate-thinking-pulse: thinking-pulse 1.8s ease-in-out infinite;
+	--animate-wave-cell: wave-cell 1.2s steps(3, end) infinite both;
+	--animate-braille-spin: braille-spin 0.8s step-end infinite;
+
+	@keyframes wave-cell {
+		0%,
+		58.333%,
+		100% {
+			opacity: 0;
+		}
+		12.5%,
+		45.833% {
+			opacity: 1;
+		}
+	}
+
+	@keyframes braille-spin {
+		0% {
+			content: "⠋";
+		}
+		10% {
+			content: "⠙";
+		}
+		20% {
+			content: "⠹";
+		}
+		30% {
+			content: "⠸";
+		}
+		40% {
+			content: "⠼";
+		}
+		50% {
+			content: "⠴";
+		}
+		60% {
+			content: "⠦";
+		}
+		70% {
+			content: "⠧";
+		}
+		80% {
+			content: "⠇";
+		}
+		90%,
+		100% {
+			content: "⠏";
+		}
+	}
 
 	@keyframes shimmer {
 		from {

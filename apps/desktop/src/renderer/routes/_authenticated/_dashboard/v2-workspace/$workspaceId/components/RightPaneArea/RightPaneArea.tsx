@@ -55,6 +55,7 @@ interface RightPaneAreaProps {
 	toolbar: ReactNode;
 	isFullScreen: boolean;
 	onToggleFullScreen: () => void;
+	isFocused: boolean;
 }
 
 export function RightPaneArea({
@@ -67,6 +68,7 @@ export function RightPaneArea({
 	toolbar,
 	isFullScreen,
 	onToggleFullScreen,
+	isFocused,
 }: RightPaneAreaProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
@@ -102,6 +104,7 @@ export function RightPaneArea({
 			<Workspace<PaneViewerData>
 				{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
 				appearance={isParadevShell ? "cards" : "default"}
+				isFocused={isFocused}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
 				paneActions={rightPaneActions}

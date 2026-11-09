@@ -47,6 +47,7 @@ import {
 	type LinkedPR,
 	useNewWorkspaceDraftStore,
 } from "renderer/stores/new-workspace-draft";
+import { useMergeMethodLabels } from "../../hooks/useMergeMethodLabels";
 import { useMergePullRequestStack } from "../../hooks/useMergePullRequestStack";
 import { usePullRequestAgentHandoff } from "../../hooks/usePullRequestAgentHandoff";
 import {
@@ -153,11 +154,7 @@ export function PullRequestActions({
 	const { t } = useLingui();
 	const stackCopy = usePullRequestStackCopy();
 	const prNumber = target?.prNumber ?? null;
-	const mergeMethodLabels: Record<MergeMethod, string> = {
-		squash: t({ message: "Squash and merge" }),
-		merge: t({ message: "Merge commit" }),
-		rebase: t({ message: "Rebase and merge" }),
-	};
+	const mergeMethodLabels = useMergeMethodLabels();
 	const mergeMethodDescriptions: Record<MergeMethod, string> = {
 		squash: t({ message: "Combine all commits" }),
 		merge: t({ message: "Preserve commit history" }),
@@ -420,7 +417,7 @@ export function PullRequestActions({
 									aria-busy={isMerging}
 									onClick={() => {
 										if (mergeBlocked) return;
-										openMerge("squash");
+										openMerge(data.mergeMethods.primary);
 									}}
 								>
 									{isMerging ? (
@@ -528,19 +525,31 @@ export function PullRequestActions({
 									<PullRequestMenuLabel className="pt-1">
 										<Trans>Select method</Trans>
 									</PullRequestMenuLabel>
-									{(["squash", "merge", "rebase"] as const).map((method) => (
+									{data.mergeMethods.methods.map((method) => (
 										<PullRequestMenuItem
 											key={method}
 											className="flex-col items-start gap-0 py-1.5"
 											disabled={mergeBlocked}
 											onClick={() => openMerge(method)}
 										>
-											<span className="flex items-center gap-2">
+											<span className="flex w-full items-center gap-2">
 												<GitMerge
 													strokeWidth={1.75}
 													className="size-3.5 opacity-80"
 												/>
 												{mergeMethodLabels[method]}
+												{method === data.mergeMethods.primary ? (
+													<>
+														<span className="sr-only">
+															{t({ message: "Default" })}
+														</span>
+														<Check
+															aria-hidden
+															strokeWidth={1.75}
+															className="ml-auto size-3.5 text-muted-foreground"
+														/>
+													</>
+												) : null}
 											</span>
 											<span className="pl-[1.375rem] text-[11px] text-muted-foreground">
 												{mergeMethodDescriptions[method]}
@@ -556,7 +565,7 @@ export function PullRequestActions({
 												onClick={() =>
 													setPendingAction({
 														kind: "merge",
-														method: "squash",
+														method: data.mergeMethods.primary,
 														force: true,
 													})
 												}

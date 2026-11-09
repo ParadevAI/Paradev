@@ -23,7 +23,7 @@ Devin is a cloud-based AI software engineer that works autonomously in a remote 
 | | **Paradev** | **Devin** |
 |---|---|---|
 | **Category** | Agent orchestration workspace | Autonomous AI software engineer |
-| **Architecture** | Local-first: worktrees run on your machine, remote hosts you own, or your own Linux server (BYOC); cloud workspaces (beta) run in the cloud | Fully remote: runs in cloud VMs |
+| **Architecture** | Local-first: worktrees run on your machine, remote hosts you own, or your own Linux server (BYOC); cloud workspaces each get their own cloud sandbox | Fully remote: runs in cloud VMs |
 | **AI approach** | Agent-agnostic: orchestrates external CLI agents, with a chat interface and MCP tools | Proprietary AI with browser, editor, and terminal in cloud |
 | **Parallelism** | Multiple agents across separate local worktrees | Parallel cloud sessions |
 | **Code privacy** | Local-first; outbound model traffic depends on your chosen agents/providers | Code runs on Cognition's cloud infrastructure |
@@ -48,7 +48,7 @@ Devin is Cognition's AI software engineer: a cloud-based autonomous agent that r
 
 ### Local vs Cloud
 
-Paradev is local-first. By default your repo, worktrees, review flow, chat, and browser preview stay on your machine, on remote hosts you own, or on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Outbound traffic depends on the specific agents or providers you choose. [Cloud workspaces](https://docs.paradev.com/cloud-workspaces) (beta) are there when you want Paradev to run a task in the cloud instead. Devin runs entirely in Cognition's cloud: your code is cloned into remote VMs where Devin operates. This is the fundamental architectural difference and drives most of the trade-offs below.
+Paradev is local-first. By default your repo, worktrees, review flow, chat, and browser preview stay on your machine, on remote hosts you own, or on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). Outbound traffic depends on the specific agents or providers you choose. [Cloud workspaces](https://docs.paradev.com/cloud-workspaces) are there when you want Paradev to run a task in the cloud instead. Devin runs entirely in Cognition's cloud: your code is cloned into remote VMs where Devin operates. This is the fundamental architectural difference and drives most of the trade-offs below.
 
 ### Control vs Autonomy
 

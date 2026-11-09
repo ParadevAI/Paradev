@@ -4,6 +4,7 @@ import { findOrgMembership } from "@superset/db/utils";
 export type OrgMember = {
 	organizationId: string;
 	userId: string;
+	role: string;
 };
 
 /**
@@ -43,5 +44,5 @@ export async function requireOrgMember(
 		);
 	}
 
-	return { organizationId, userId: session.user.id };
+	return { organizationId, userId: session.user.id, role: membership.role };
 }

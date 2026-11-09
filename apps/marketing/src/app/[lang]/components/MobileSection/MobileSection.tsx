@@ -21,7 +21,7 @@ export function MobileSection() {
 					<Trans>Start work from anywhere</Trans>
 				</h2>
 				<p className="mt-3 text-base text-muted-foreground sm:text-lg">
-					<Trans>Run your agents from your phone.</Trans>
+					<Trans>Mobile, Cloud, or bring your own Cloud</Trans>
 				</p>
 				<div className="mt-12 sm:mt-20">
 					<PhoneShowcase layout="spread" />

@@ -1,15 +1,14 @@
 "use client";
 
 import { m } from "framer-motion";
-import type { ActiveDemo } from "../../types";
 import { AsciiSpinner } from "../AsciiSpinner";
 
 interface RemoteSessionPopupProps {
-	activeDemo: ActiveDemo;
+	visible: boolean;
 }
 
-export function RemoteSessionPopup({ activeDemo }: RemoteSessionPopupProps) {
-	const isRemote = activeDemo === "Remote Access";
+export function RemoteSessionPopup({ visible }: RemoteSessionPopupProps) {
+	const isRemote = visible;
 
 	return (
 		<m.div

@@ -146,6 +146,7 @@ describe("galleryImages", () => {
 				completedAtMs: 1,
 				running: false,
 				waiting: false,
+				stopped: false,
 			},
 			userRow(
 				"u1",

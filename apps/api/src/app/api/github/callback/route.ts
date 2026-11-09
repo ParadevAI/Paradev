@@ -7,6 +7,7 @@ import { env } from "@/env";
 import { exitOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { resolveCallback } from "@/lib/integrations/resolveCallback";
 import { githubApp } from "../octokit";
+import { saveInstallation } from "./utils/saveInstallation";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
@@ -30,7 +31,10 @@ export async function GET(request: Request) {
 		cookie: STATE_COOKIES.github,
 	});
 	if (callback instanceof Response) return callback;
-	const { organizationId, userId, params, exit } = callback;
+	const { organizationId, userId, role, params, exit } = callback;
+	if (role !== "owner" && role !== "admin") {
+		return exit(`${settingsUrl}?error=admin_required`);
+	}
 	const installationId = params.installation_id;
 
 	try {
@@ -78,34 +82,17 @@ export async function GET(request: Request) {
 			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
-		// Save the installation to our database
-		const [savedInstallation] = await db
-			.insert(githubInstallations)
-			.values({
-				organizationId,
-				connectedByUserId: userId,
-				installationId: String(installation.id),
-				accountLogin,
-				accountType,
-				permissions: installation.permissions as Record<string, string>,
-			})
-			.onConflictDoUpdate({
-				target: [githubInstallations.organizationId],
-				set: {
-					connectedByUserId: userId,
-					installationId: String(installation.id),
-					accountLogin,
-					accountType,
-					permissions: installation.permissions as Record<string, string>,
-					suspended: false,
-					suspendedAt: null, // Clear suspension if reinstalling
-					updatedAt: new Date(),
-				},
-			})
-			.returning();
+		const savedInstallation = await saveInstallation({
+			organizationId,
+			userId,
+			installationId: String(installation.id),
+			accountLogin,
+			accountType,
+			permissions: installation.permissions as Record<string, string>,
+		});
 
 		if (!savedInstallation) {
-			return exit(`${settingsUrl}?error=save_failed`);
+			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
 		// Queue initial sync job. In development the queue cannot reach

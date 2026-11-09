@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { projects } from "../../../db/schema";
+import {
+	getLiveProjectAtPath,
+	getProjectAtPathIncludingDeleted,
+} from "../../../projects/local-project-store";
 import { restoreProject } from "../../../projects/project-deletion";
 import type { HostServiceContext } from "../../../types";
 import { persistLocalProject } from "./utils/persist-project";
@@ -119,10 +121,11 @@ export async function createFromImportLocal(
 	// Idempotency guard: importing a repo that is already a project on this
 	// device returns the existing project instead of minting a duplicate
 	// row. Deliberately leaves the row untouched (no rename, no repo-field
-	// refresh) — the user may have customized it in v2.
-	const existing = ctx.db.query.projects
-		.findFirst({ where: eq(projects.repoPath, resolved.repoPath) })
-		.sync();
+	// refresh) — the user may have customized it in v2. A live row wins over
+	// a deleted one; a deleted one is restored.
+	const existing =
+		getLiveProjectAtPath(ctx.db, resolved.repoPath) ??
+		getProjectAtPathIncludingDeleted(ctx.db, resolved.repoPath);
 	if (existing) {
 		restoreProject(ctx, existing.id);
 		return {

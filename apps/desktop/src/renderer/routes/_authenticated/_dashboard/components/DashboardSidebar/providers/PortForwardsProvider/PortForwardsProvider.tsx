@@ -44,7 +44,7 @@ export function usePortForwardLookup(): (
 ) => PortForward | null {
 	const byId = useContext(PortForwardsContext);
 	return (port) => {
-		if (!byId || port.hostType !== "remote-device") return null;
+		if (!byId || port.hostType === "local-device") return null;
 		return (
 			byId.get(
 				portForwardId({
@@ -60,4 +60,16 @@ export function usePortForwardLookup(): (
 /** The forward for a sidebar port row, or null when none runs for it. */
 export function usePortForward(port: DashboardSidebarPort): PortForward | null {
 	return usePortForwardLookup()(port);
+}
+
+export function useExplicitForwards(workspaceId: string): PortForward[] {
+	const byId = useContext(PortForwardsContext);
+	return useMemo(
+		() =>
+			Array.from(byId?.values() ?? []).filter(
+				(forward) =>
+					forward.explicit && forward.target.workspaceId === workspaceId,
+			),
+		[byId, workspaceId],
+	);
 }

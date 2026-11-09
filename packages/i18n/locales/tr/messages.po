@@ -134,6 +134,14 @@ msgstr "{0, plural, one {# değişen dosya} other {# değişen dosya}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {# sohbet kapatıldı}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# sohbet taşınamadı. Yeniden denemek için açın.} other {# sohbet taşınamadı. Yeniden denemek için açın.}}"
+
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# sohbet eski çalışma alanında kaldı} other {# sohbet eski çalışma alanında kaldı}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# yorum eklendi} other {# yorum eklendi}}"
@@ -358,6 +366,10 @@ msgstr "{0, plural, one {Linear issue'su} other {Linear issue'su}}"
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Seçili # çalışma alanını bir gruba taşı} other {Seçili # çalışma alanını bir gruba taşı}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {# sohbet buraya taşınıyor…} other {# sohbet buraya taşınıyor…}}"
+
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
 msgstr "{0, plural, one {# otomasyon duraklatıldı.} other {# otomasyon duraklatıldı.}}"
@@ -487,11 +499,6 @@ msgstr "{0} GB-saat"
 msgid "{0} installed"
 msgstr "{0} kuruldu"
 
-#. placeholder {0}: data.head.ref
-#. placeholder {1}: data.base.ref
-msgid "{0} into {1}"
-msgstr "{0} → {1}"
-
 #. placeholder {0}: conflictDisplay.text
 #. placeholder {1}: i18n._( HOTKEYS[pendingConflict.conflictId].label, )
 msgid "{0} is already assigned to \"{1}\"."
@@ -561,7 +568,6 @@ msgid "{0} of {1} checks running"
 msgstr "{1} kontrolden {0} tanesi çalışıyor"
 
 #. placeholder {0}: issues.length
-#. placeholder {0}: pullRequests.length
 msgid "{0} of {totalCount}"
 msgstr "{totalCount} içinden {0}"
 
@@ -633,6 +639,10 @@ msgstr "{0} - {1}"
 #. placeholder {0}: file.path
 msgid "{0} was deleted in this change."
 msgstr "{0} bu değişiklikte silindi."
+
+#. placeholder {0}: port.port
+msgid "{0} was in use on this computer, so it moved to {localPort}."
+msgstr "{0} bu bilgisayarda kullanımdaydı, bu yüzden {localPort} kullanıldı."
 
 #. placeholder {0}: winner?.name
 #. placeholder {1}: result.events.length
@@ -837,6 +847,9 @@ msgstr "{0} kontrolden {completed} tanesi tamamlandı"
 msgid "{completed} of {total} completed"
 msgstr "{total} adımdan {completed} tanesi tamamlandı"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (çevrimdışı)"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle} yazı tipi boyutu"
 
@@ -930,6 +943,12 @@ msgstr "{count, plural, one {# dosya okundu} other {# dosya okundu}}"
 msgid "{count, plural, one {Removed # automation from its group} other {Removed # automations from their groups}}"
 msgstr "{count, plural, one {# otomasyon grubundan çıkarıldı} other {# otomasyon grubundan çıkarıldı}}"
 
+msgid "{count, plural, one {Resume # chat?} other {Resume # chats?}}"
+msgstr "{count, plural, one {# sohbet sürdürülsün mü?} other {# sohbet sürdürülsün mü?}}"
+
+msgid "{count, plural, one {This chat hadn't finished when Paradev closed} other {These chats hadn't finished when Paradev closed}}"
+msgstr "{count, plural, one {Bu sohbet, Paradev kapandığında bitmemişti} other {Bu sohbetler, Paradev kapandığında bitmemişti}}"
+
 msgid "{count, plural, one {Used # source} other {Used # sources}}"
 msgstr "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı}}"
 
@@ -990,6 +1009,9 @@ msgstr "{duration, plural, one {# saniye düşündü} other {# saniye düşünd�
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "Bu çalışma alanındaki {entryPath} başka bir organizasyonda zaten sayfa olarak yayımlanmış. Dosyayı taşı ya da o sayfanın kimliğiyle yayımla."
+
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# sohbet bilgisayara taşınamadı} other {# sohbet bilgisayara taşınamadı}}"
 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# başarısız} other {# başarısız}}"
@@ -1100,6 +1122,9 @@ msgstr "{localHostName} (bu cihaz)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Konuşma kopyalanıyor (# mesaj)} other {Konuşma kopyalanıyor (# mesaj)}}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1296,6 +1321,9 @@ msgstr "GB-saat başına {rate}. Aylık havuzdan sonra kullanılır ve süresi d
 msgid "{readPercent}% read"
 msgstr "%{readPercent} okundu"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{total} sohbetten {ready} tanesi buraya taşındı"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1339,6 +1367,9 @@ msgstr "{starCount} yıldız ve artıyor"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomasyon başlatıldı} other {# otomasyon başlatıldı}}"
 
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Bu çalışma alanı taşındı. # sohbet burada kaldı.} other {Bu çalışma alanı taşındı. # sohbet burada kaldı.}}"
+
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# alt ajan çalışıyor} other {# alt ajan çalışıyor}}"
 
@@ -1363,14 +1394,14 @@ msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'�
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
 
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {# sohbetten {done} tanesi taşındı} other {# sohbetten {done} tanesi taşındı}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {# kontrolün tümü geçti} other {# kontrolün tümü geçti}}"
 
 msgid "{totalCount, plural, one {GitHub issue} other {GitHub issues}}"
 msgstr "{totalCount, plural, one {GitHub issue} other {GitHub issue}}"
-
-msgid "{totalCount, plural, one {pull request} other {pull requests}}"
-msgstr "{totalCount, plural, one {pull request} other {pull request}}"
 
 msgid "{totalImported, plural, one {Imported # custom theme} other {Imported # custom themes}}"
 msgstr "{totalImported, plural, one {# özel tema içe aktarıldı} other {# özel tema içe aktarıldı}}"
@@ -1995,6 +2026,12 @@ msgstr "{0} öğesini çalışma alanına ekle"
 msgid "Add {localizedName}?"
 msgstr "{localizedName} eklensin mi?"
 
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Önce {repositoryName} deposunu {computer} üzerinde proje olarak ekleyin"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Önce {repositoryName} deposunu bu bilgisayarda proje olarak ekleyin"
+
 msgid "Add a comment…"
 msgstr "Yorum ekle…"
 
@@ -2046,9 +2083,6 @@ msgstr "Bulut çalışma alanı oluşturmadan önce Ayarlar'da bir ortam ekleyin
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Başka bir hesap bağla ya da artık kullanmadığın birini kaldır."
 
-msgid "Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are."
-msgstr "Herhangi bir makineyi host olarak ekleyin. Dizüstünüz uykuya geçtiğinde çalışma alanları çalışmaya devam eder ve nerede olursanız olun durumu kontrol edebilirsiniz."
-
 msgid "Add Attachment"
 msgstr "Ek ekle"
 
@@ -2084,6 +2118,9 @@ msgstr "Dosya, uygulama ve daha fazlasını ekleyin"
 
 msgid "Add files, apps, and more (@)"
 msgstr "Dosya, uygulama ve daha fazlasını ekleyin (@)"
+
+msgid "Add GitHub organization"
+msgstr "GitHub organizasyonu ekle"
 
 msgid "Add instructions"
 msgstr "Talimat ekle"
@@ -2384,6 +2421,9 @@ msgstr "Ajanlar yalnızca bir yer tutucu görür. Paradev, giden isteklere oturu
 
 msgid "Agents that run while you're away"
 msgstr "Siz yokken çalışan ajanlar"
+
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgstr "Ajanlar issue'ları ayıklar, changelog taslakları yazar ve bağımlılıkları kendi başına günceller. Siz PR'ları incelersiniz."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Ajanlar Linear araçlarını çağırırken bu hesabı kullanır."
@@ -2961,9 +3001,6 @@ msgctxt "job application"
 msgid "Apply"
 msgstr "Başvur"
 
-msgid "Approve"
-msgstr "Onayla"
-
 msgid "Approve edits"
 msgstr "Düzenlemeleri onayla"
 
@@ -3491,9 +3528,6 @@ msgstr "main dalının ? commit gerisinde, rebase gerekiyor"
 msgid "Being built right now."
 msgstr "Şu anda geliştiriliyor."
 
-msgid "Beta"
-msgstr "Beta"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Ötesi: F5 yakın vadeli bir iddia değil"
 
@@ -3945,6 +3979,9 @@ msgstr "Düzenlemeleri iptal et"
 
 msgid "Cancel invite"
 msgstr "Daveti iptal et"
+
+msgid "Cancel move"
+msgstr "Taşımayı iptal et"
 
 msgid "Cancel plan"
 msgstr "Planı iptal et"
@@ -4715,6 +4752,10 @@ msgstr "Bu sekmeyi kapatmak çalışan süreci sonlandırır."
 msgid "Closing this terminal will end the running process."
 msgstr "Bu terminali kapatmak çalışan süreci sonlandırır."
 
+msgctxt "port location"
+msgid "cloud"
+msgstr "bulut"
+
 msgid "Cloud"
 msgstr "Bulut"
 
@@ -4761,6 +4802,9 @@ msgid "Cloud workspace — connecting"
 msgstr "Bulut çalışma alanı — bağlanılıyor"
 
 msgid "Cloud workspaces"
+msgstr "Bulut çalışma alanları"
+
+msgid "Cloud Workspaces"
 msgstr "Bulut çalışma alanları"
 
 #. js-lingui-explicit-id
@@ -5381,9 +5425,6 @@ msgstr "Devam et"
 msgid "Continue in your browser"
 msgstr "Tarayıcınızda devam edin"
 
-msgid "Continue or fork session"
-msgstr "Oturumu sürdür veya forkla"
-
 msgid "Continue this chat on another login"
 msgstr "Bu sohbete başka bir hesapla devam et"
 
@@ -5485,6 +5526,9 @@ msgstr "CSV olarak kopyala"
 
 msgid "Copy as Markdown"
 msgstr "Markdown olarak kopyala"
+
+msgid "Copy branch name"
+msgstr "Dal adını kopyala"
 
 msgid "Copy Branch Name"
 msgstr "Dal adını kopyala"
@@ -5622,6 +5666,9 @@ msgstr "Panoya kopyala"
 msgid "Copy URL"
 msgstr "URL'yi kopyala"
 
+msgid "Copy username"
+msgstr "Kullanıcı adını kopyala"
+
 msgid "Copy Workspace ID"
 msgstr "Çalışma alanı kimliğini kopyala"
 
@@ -5630,6 +5677,9 @@ msgstr "Tarama geçmişinizi ve oturum bilgilerinizi başka bir tarayıcıdan Pa
 
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Anahtarınızı şimdi kopyalayın — bir daha göremezsiniz."
+
+msgid "Copying the conversation"
+msgstr "Konuşma kopyalanıyor"
 
 msgid "Copyright or trademark"
 msgstr "Telif hakkı veya ticari marka"
@@ -5969,11 +6019,17 @@ msgstr "Yeni bir worktree'ye çatallanamadı"
 msgid "Couldn't branch the conversation"
 msgstr "Konuşma çatallanamadı"
 
+msgid "Couldn't cancel the move"
+msgstr "Taşıma iptal edilemedi"
+
 msgid "Couldn't change the routine"
 msgstr "Rutin değiştirilemedi"
 
 msgid "Couldn't check"
 msgstr "Kontrol edilemedi"
+
+msgid "Couldn't check the move"
+msgstr "Taşıma kontrol edilemedi"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Bu üyeyi kaldırmanın nelere etki edeceği kontrol edilemedi"
@@ -6020,11 +6076,17 @@ msgstr "Hazırlanmamış değişiklikler atılamadı"
 msgid "Couldn't edit the message"
 msgstr "Mesaj düzenlenemedi"
 
+msgid "Couldn't end the move"
+msgstr "Taşıma sonlandırılamadı"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Bu sohbetin taşınmasının ne durumda olduğu bilinmiyor. Taşınmadıysa hâlâ geldiği çalışma alanındadır."
+
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Çalışma alanlarını silme işlemi tamamlanamadı"
 
-msgid "Couldn't fork into a chat"
-msgstr "Sohbete forklanamadı"
+msgid "Couldn't forward port {portNumber}"
+msgstr "{portNumber} portu yönlendirilemedi"
 
 msgid "Couldn't hand this to an agent"
 msgstr "Bu bir ajana devredilemedi"
@@ -6079,11 +6141,17 @@ msgstr "Pull request birleştirilemedi"
 msgid "Couldn't merge stack"
 msgstr "Yığın birleştirilemedi"
 
+msgid "Couldn't move {name}"
+msgstr "{name} taşınamadı"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Alt ajan arka plana taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
+
+msgid "Couldn't open in Chat Interface"
+msgstr "Sohbet arayüzünde açılamadı"
 
 msgid "Couldn't open the screenshot"
 msgstr "Ekran görüntüsü açılamadı"
@@ -6166,6 +6234,9 @@ msgstr "Rutin kaydedilemedi"
 msgid "Couldn't save your choice. Try again."
 msgstr "Seçiminiz kaydedilemedi. Tekrar deneyin."
 
+msgid "Couldn't search your chats"
+msgstr "Sohbetleriniz aranamadı"
+
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
 
@@ -6217,6 +6288,9 @@ msgstr "Sesli mod başlatılamadı"
 msgid "Couldn't start workspace"
 msgstr "Çalışma alanı başlatılamadı"
 
+msgid "Couldn't stop forwarding port {portNumber}"
+msgstr "{portNumber} portunun yönlendirmesi durdurulamadı"
+
 msgid "Couldn't stop the background task"
 msgstr "Arka plan görevi durdurulamadı"
 
@@ -6225,6 +6299,9 @@ msgstr "Sohbet durdurulamadı"
 
 msgid "Couldn't take a screenshot"
 msgstr "Ekran görüntüsü alınamadı"
+
+msgid "Couldn't try the move again"
+msgstr "Taşıma yeniden denenemedi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Dosya değişiklikleri geri alınamadı."
@@ -6337,9 +6414,6 @@ msgstr "Linear issue'su oluştur"
 msgid "Create manually"
 msgstr "Manuel oluştur"
 
-msgid "Create merge commit"
-msgstr "Birleştirme commit'i oluştur"
-
 msgid "Create Merge Commit"
 msgstr "Birleştirme commit'i oluştur"
 
@@ -6400,6 +6474,9 @@ msgstr "AI ile oluştur"
 
 msgid "Create workspace"
 msgstr "Çalışma alanı oluştur"
+
+msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
+msgstr "CLI, SDK veya MCP üzerinden çalışma alanları oluşturun ve ajanları başlatın."
 
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Herhangi bir terminal veya betikten çalışma alanları oluşturun, ajanlar başlatın ve çıktılarını okuyun. macOS ve Linux."
@@ -7252,6 +7329,9 @@ msgstr "Atıldı — bir daha sorulmayacak"
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
 
+msgid "Disconnect {accountLogin}?"
+msgstr "{accountLogin} bağlantısı kesilsin mi?"
+
 msgid "Disconnect {credential}?"
 msgstr "{credential} bağlantısı kesilsin mi?"
 
@@ -7589,9 +7669,6 @@ msgstr "ör. Bulut incelemelerim"
 msgid "e.g. plan-budget"
 msgstr "ör. plan-budget"
 
-msgid "Each agent works in its own Git worktree and branch, so agents don't overwrite each other's files. Review and merge work when you're ready."
-msgstr "Her ajan kendi Git worktree'sinde ve dalında çalışır, böylece ajanlar birbirlerinin dosyalarının üzerine yazmaz. Hazır olduğunuzda işi inceleyin ve birleştirin."
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "Her ek en fazla {0} MB olabilir."
@@ -7616,9 +7693,6 @@ msgstr "Her oturum kaldığı yerden devam eder."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Her yüzeyin kendi tipografisi vardır. Değişiklikler canlı önizlemelerde hemen görünür."
-
-msgid "Each task on its own branch"
-msgstr "Her görev kendi dalında"
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Her çalışma alanı kendi bulut makinesini alır ve dizüstünüz kapalıyken de çalışmaya devam eder. Masaüstünden, iPhone'dan veya iPad'den kontrol edin."
@@ -7969,6 +8043,12 @@ msgstr "Her hafta içi 09.00'da yeni GitHub issue'larını oku, etiket uygula ve
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Herkes bunun genellenebilir olup olmadığını tartışır. Bu tartışma, düzeye ulaşıldığının işaretidir."
 
+msgid "Everyone in this organization uses this account."
+msgstr "Bu kuruluştaki herkes bu hesabı kullanır."
+
+msgid "Everyone in this organization uses this connection."
+msgstr "Bu kuruluştaki herkes bu bağlantıyı kullanır."
+
 msgid "Everyone sees new versions as they are published"
 msgstr "Herkes yeni sürümleri yayımlandıkça görür"
 
@@ -7992,9 +8072,6 @@ msgstr "Ultra'daki her şey"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Ultra'daki her şeye ek olarak özel bulut GB-saatleri, SSO ve SAML, SCIM sağlama, IP kısıtlamaları, denetim günlükleri, özel SLA, özel destek ve özel sözleşmeler. Fiyat kuruluşunuza göre belirlenir. Bize ulaşın, size uygun bir paket hazırlayalım."
-
-msgid "Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP."
-msgstr "Her şey betiklenebilir. CLI'den çalışma alanı ve ajan başlatın, SDK ile Paradev'i CI'ye bağlayın veya ajanınızın MCP üzerinden yönetmesine izin verin."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "İlkellerin üzerine kurduğumuz her şey — Paradev özgünleri, ajan arayüzleri için"
@@ -9100,32 +9177,21 @@ msgstr "Fork argümanları"
 msgid "Fork conversation"
 msgstr "Konuşmayı ayır"
 
-msgid "Fork into chat"
-msgstr "Sohbete forkla"
-
-msgid "Fork into chat in a new tab"
-msgstr "Yeni sekmede sohbete forkla"
-
-msgid "Fork into CLI"
-msgstr "CLI'ye forkla"
-
-msgid "Fork into CLI in a new tab"
-msgstr "Yeni sekmede CLI'ye forkla"
-
 msgid "Fork session"
 msgstr "Oturumu forkla"
 
 msgid "Fork session…"
 msgstr "Oturumu forkla…"
 
-msgid "Forking into a chat…"
-msgstr "Sohbete forklanıyor…"
-
 msgid "Form controls and field composition"
 msgstr "Form denetimleri ve alan kompozisyonu"
 
 msgid "Forward"
 msgstr "İleri"
+
+msgctxt "port forwarding"
+msgid "Forward"
+msgstr "Yönlendir"
 
 msgid "Found 12 tooltip call sites"
 msgstr "12 tooltip çağrı noktası bulundu"
@@ -9225,9 +9291,6 @@ msgstr "Tam ekran"
 
 msgid "Full self-driving"
 msgstr "Tam otonomi"
-
-msgid "Full source on GitHub under the MIT License. Inspect, audit, and contribute to the code. No black boxes, no hidden functionality."
-msgstr "Tüm kaynak kodu GitHub'da MIT Lisansı altındadır. Kodu inceleyin, denetleyin ve katkıda bulunun. Kara kutu yok, gizli işlev yok."
 
 msgid "Funding"
 msgstr "Yatırım"
@@ -9333,6 +9396,9 @@ msgstr "iPhone ve iPad uygulamasını edinin"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
+
+msgid "Getting the computer ready"
+msgstr "Bilgisayar hazırlanıyor"
 
 msgid "Getting Work Done"
 msgstr "İş Bitirme"
@@ -10100,6 +10166,9 @@ msgstr "komutunu çalıştırın."
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Yalnızca birkaç ayda <0>on binlerce mühendis</0> Paradev'i birincil IDE'si olarak kullanmaya başladı; Wix, DoorDash ve Netflix gibi şirketlerde."
 
+msgid "In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox."
+msgstr "Yerel çalışma alanlarında kodunuz ve ajan oturumlarınız makinenizde kalır. Bulut çalışma alanları bir sandbox içinde çalışır."
+
 msgid "In manual mode, Paradev doesn't sign this agent in. Have your script sign it in again and continue, or turn off manual mode in agent settings."
 msgstr "Manuel modda Paradev bu ajanın oturumunu açmaz. Betiğinizin yeniden oturum açmasını sağlayıp devam edin ya da ajan ayarlarından manuel modu kapatın."
 
@@ -10270,8 +10339,8 @@ msgstr "Eklenti kur"
 msgid "Install the desktop app"
 msgstr "Masaüstü uygulamasını kurun"
 
-msgid "Install the Paradev GitHub App to connect your repositories."
-msgstr "Depolarınızı bağlamak için Paradev GitHub App'i kurun."
+msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
+msgstr "Depolarını bağlamak istediğiniz her GitHub organizasyonuna veya hesabına Paradev GitHub App'i yükleyin."
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "MCP sunucularını tek bir yerden, merkezi OAuth ile tüm çalışma alanlarınıza kurun, yetkilendirin ve kapsamlandırın."
@@ -10506,8 +10575,8 @@ msgstr "Şunları yapabilir:"
 msgid "It can't be brought back."
 msgstr "Geri getirilemez."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "\"{profileName}\" profilinizdeki çerezleri, ajanın açtığı bir tarayıcı bölmesine kopyalar. Ajan böylece oturum açtığınız sitelerde işlem yapabilir."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "\"{profileName}\" profilinizdeki çerezleri uygulama içi tarayıcıya kopyalar. Ajanlar böylece oturum açtığınız sitelerde işlem yapabilir."
 
 msgid "It keeps the title from your prompt."
 msgstr "İsteminizdeki başlık korunur."
@@ -10556,6 +10625,9 @@ msgstr "Eklentileri eşitleme bitince görünür."
 
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Seçtiğiniz bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz — Paradev tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
@@ -10639,9 +10711,6 @@ msgstr "Katılınıyor…"
 msgid "Jump"
 msgstr "Git"
 
-msgid "Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them."
-msgstr "Tek tıkla en sevdiğiniz düzenleyiciye atlayın. VS Code, Cursor, Xcode, JetBrains IDE'leri veya herhangi bir terminal: worktree'leri tam ihtiyacınız olan yerde açın."
-
 msgid "Jump to a specific date"
 msgstr "Belirli bir tarihe git"
 
@@ -10683,6 +10752,9 @@ msgstr "Belgeleri güncel tut"
 
 msgid "Keep editing"
 msgstr "Düzenlemeye devam et"
+
+msgid "Keep paused"
+msgstr "Duraklatılmış kalsın"
 
 msgid "Keep typing an email to invite"
 msgstr "Davet etmek için e-postayı yazmaya devam edin"
@@ -10876,9 +10948,6 @@ msgstr "Son haberler"
 
 msgid "Launch"
 msgstr "Başlatma"
-
-msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
-msgstr "Özellikler, hata düzeltmeleri ve yeniden düzenlemeler için ajanları paralel başlatın. Tek bakışta durum, hangi ajanların çalıştığını, hangilerinin engellendiğini ve hangilerinin sizi beklediğini gösterir."
 
 msgid "Launch mode"
 msgstr "Başlatma modu"
@@ -11339,8 +11408,15 @@ msgstr "Yerel çalışma alanı"
 msgid "Local workspaces"
 msgstr "Yerel çalışma alanları"
 
+msgid "Local workspaces run on your machine. You decide what connects to them."
+msgstr "Yerel çalışma alanları makinenizde çalışır. Onlara neyin bağlanacağına siz karar verirsiniz."
+
 msgid "Local, on a host, or in the cloud"
 msgstr "Yerelde, bir host'ta veya bulutta"
+
+#. placeholder {0}: status.localPort
+msgid "localhost:{0} is in use on this computer."
+msgstr "localhost:{0} bu bilgisayarda kullanımda."
 
 msgid "Location"
 msgstr "Konum"
@@ -11896,6 +11972,9 @@ msgstr "Mobil uygulama"
 msgid "Mobile App"
 msgstr "Mobil uygulama"
 
+msgid "Mobile, Cloud, or bring your own Cloud"
+msgstr "Mobil, bulut veya kendi bulutunuz"
+
 msgid "Mode"
 msgstr "Mod"
 
@@ -12010,6 +12089,9 @@ msgstr "çoğu geliştirici"
 msgid "Most of software history"
 msgstr "Yazılım tarihinin çoğu"
 
+msgid "Move"
+msgstr "Taşı"
+
 msgid "Move {count} to Group"
 msgstr "{count} öğeyi gruba taşı"
 
@@ -12019,8 +12101,26 @@ msgstr "{name} öğesini arka plana taşı"
 msgid "Move cloud work"
 msgstr "Bulut işinizi taşıyın"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Odağı ana sekmeler ile sağ kenar çubuğu arasında taşı ve kapalıysa kenar çubuğunu aç"
+
+msgid "Move this workspace to a computer?"
+msgstr "Bu çalışma alanı bir bilgisayara taşınsın mı?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Bu çalışma alanı buluta taşınsın mı?"
+
+msgid "Move to a computer"
+msgstr "Bir bilgisayara taşı"
+
+msgid "Move to another computer"
+msgstr "Başka bir bilgisayara taşı"
+
 msgid "Move to background"
 msgstr "Arka plana taşı"
+
+msgid "Move to cloud"
+msgstr "Buluta taşı"
 
 msgid "Move to group"
 msgstr "Gruba taşı"
@@ -12039,6 +12139,21 @@ msgstr "Ajanlarınızı {shutdownDate} tarihinden önce taşıyın."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\", {group} grubuna taşındı"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name}, {destination} hedefine taşındı"
+
+msgid "Moving {name} to {destination}"
+msgstr "{name}, {destination} hedefine taşınıyor"
+
+msgid "Moving this chat here"
+msgstr "Bu sohbet buraya taşınıyor"
+
+msgid "Moving this workspace here…"
+msgstr "Bu çalışma alanı buraya taşınıyor…"
+
+msgid "Moving this workspace…"
+msgstr "Bu çalışma alanı taşınıyor…"
 
 msgid "Multi-select"
 msgstr "Çoklu seçim"
@@ -12201,6 +12316,9 @@ msgstr "Yeni ajan oturumu"
 msgid "New agent sessions"
 msgstr "Yeni ajan oturumları"
 
+msgid "New agent sessions start in chat instead of the terminal. You can switch any session from its menu."
+msgstr "Yeni ajan oturumları terminal yerine sohbette başlar. Herhangi bir oturumu menüsünden değiştirebilirsiniz."
+
 msgid "New automation"
 msgstr "Yeni otomasyon"
 
@@ -12350,6 +12468,9 @@ msgstr "Sonraki görsel"
 
 msgid "Next match"
 msgstr "Sonraki eşleşme"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Sağ kenar çubuğunda sonraki sekme"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -12777,6 +12898,9 @@ msgstr "Kuruluş seçilmedi"
 msgid "No other chats here"
 msgstr "Burada başka sohbet yok"
 
+msgid "No other computer is set up for this account."
+msgstr "Bu hesap için başka bir bilgisayar ayarlanmamış."
+
 msgid "No pages match"
 msgstr "Eşleşen sayfa yok"
 
@@ -12807,6 +12931,9 @@ msgstr "\"{0}\" ile eşleşen eklenti yok"
 
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Henüz eklenti yok. Eşitlemek için bir depo ekleyin."
+
+msgid "No ports yet. Start a dev server in a terminal and it shows up here."
+msgstr "Henüz port yok. Bir terminalde geliştirme sunucusu başlatın, burada görünür."
 
 msgid "No posts yet."
 msgstr "Henüz yazı yok."
@@ -13120,6 +13247,9 @@ msgstr "Bağlı değil · bulut çalışma alanları organizasyonunun GitHub App
 msgid "Not demoed here"
 msgstr "Burada gösterilmiyor"
 
+msgid "Not detected in the workspace right now"
+msgstr "Şu anda çalışma alanında algılanmıyor"
+
 msgid "Not found"
 msgstr "Bulunamadı"
 
@@ -13214,8 +13344,8 @@ msgstr "Yeniden denenecek bir şey yok"
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Son 30 günde henüz hiçbir şey yayınlanmadı. Bu makinedeki kullanım eşitlendiğinde sıralamanız görünür; <0>{handle}</0> olarak yayınlanıyor."
 
-msgid "Nothing to fork yet. Send a message first."
-msgstr "Henüz forklanacak bir şey yok. Önce bir mesaj gönderin."
+msgid "Nothing to open yet. Send a message first."
+msgstr "Henüz açılacak bir şey yok. Önce bir mesaj gönderin."
 
 msgid "Nothing was missed"
 msgstr "Hiçbir şey kaçırılmadı"
@@ -13455,6 +13585,9 @@ msgstr "Bu ajanı yalnızca oluşturan kişi veya bir kuruluş yöneticisi deği
 msgid "Only on this machine: gitignored, and applied to every worktree of this repository. Any key set here replaces the shared one."
 msgstr "Yalnızca bu makinede: git tarafından yok sayılır ve bu deponun her worktree'sine uygulanır. Burada ayarlanan her anahtar paylaşılanın yerini alır."
 
+msgid "Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it."
+msgstr "GitHub hesaplarını yalnızca kuruluş sahipleri ve yöneticileri bağlayabilir. Hesabı bağlaması için bunlardan birine başvurun."
+
 msgid "Only organization owners and admins can manage plugins."
 msgstr "Eklentileri yalnızca kuruluş sahipleri ve yöneticileri yönetebilir."
 
@@ -13542,6 +13675,15 @@ msgstr "Yalnızca siz"
 msgid "Only you can see this page"
 msgstr "Bu sayfayı yalnızca siz görebilirsiniz"
 
+msgid "Only you can use these accounts. Teammates connect their own."
+msgstr "Bu hesapları yalnızca siz kullanabilirsiniz. Ekip arkadaşlarınız kendi hesaplarını bağlar."
+
+msgid "Only you can use this connection. Teammates connect their own {name} accounts."
+msgstr "Bu bağlantıyı yalnızca siz kullanabilirsiniz. Ekip arkadaşlarınız kendi {name} hesaplarını bağlar."
+
+msgid "Only you. Teammates forward their own."
+msgstr "Yalnızca siz. Ekip arkadaşları kendilerininkini yönlendirir."
+
 msgid "open"
 msgstr "aç"
 
@@ -13606,14 +13748,14 @@ msgstr "İnceleme durumunu, kontrolleri ve yorumları görmek için bir pull req
 msgid "Open actions menu"
 msgstr "Eylemler menüsünü aç"
 
+msgid "Open agents in chat"
+msgstr "Ajanları sohbette aç"
+
 msgid "Open anyway"
 msgstr "Yine de aç"
 
 msgid "Open Anyway"
 msgstr "Yine de aç"
-
-msgid "Open Anywhere"
-msgstr "Her yerde aç"
 
 msgid "Open App Store"
 msgstr "App Store’u aç"
@@ -13654,11 +13796,8 @@ msgstr "ChatGPT yönetici ayarlarını aç"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT ayarlarını aç"
 
-msgid "Open Claude and Codex sessions as chats"
-msgstr "Claude ve Codex oturumlarını sohbet olarak aç"
-
-msgid "Open Claude and Codex sessions in a chat pane instead of a terminal."
-msgstr "Claude ve Codex oturumlarını terminal yerine bir sohbet panelinde açın."
+msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
+msgstr "Claude Code, Codex, OpenCode ve Pi oturumlarını sohbet olarak aç"
 
 msgid "Open Command Palette"
 msgstr "Komut paletini aç"
@@ -13727,9 +13866,6 @@ msgstr "{0} ile aç"
 msgid "Open in {app}"
 msgstr "{app} ile aç"
 
-msgid "Open in any IDE"
-msgstr "Herhangi bir IDE'de açın"
-
 msgid "Open in Any IDE"
 msgstr "Herhangi bir IDE'de açın"
 
@@ -13744,6 +13880,9 @@ msgstr "Tarayıcıda aç"
 
 msgid "Open in Changes pane"
 msgstr "Değişiklikler bölmesinde aç"
+
+msgid "Open in Chat Interface"
+msgstr "Sohbet arayüzünde aç"
 
 msgid "Open in ChatGPT"
 msgstr "ChatGPT'de aç"
@@ -13820,6 +13959,9 @@ msgstr "Sekmede aç"
 msgid "Open in Tasks"
 msgstr "Görevlerde aç"
 
+msgid "Open in Terminal Chat"
+msgstr "Terminal sohbetinde aç"
+
 msgid "Open in…"
 msgstr "Şununla aç…"
 
@@ -13854,6 +13996,9 @@ msgstr "Bağlantıları uygulama içi tarayıcıda aç"
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "localhost:{0} adresini harici tarayıcıda aç"
+
+msgid "Open localhost:{localPort}"
+msgstr "localhost:{localPort} adresini aç"
 
 msgid "Open menu"
 msgstr "Menüyü aç"
@@ -13981,6 +14126,9 @@ msgstr "Genel komut paletini aç"
 msgid "Open the new workspace modal"
 msgstr "Yeni çalışma alanı penceresini aç"
 
+msgid "Open the original workspace"
+msgstr "Orijinal çalışma alanını aç"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Komut paletinde kaynak kullanımı görünümünü aç"
 
@@ -14026,11 +14174,11 @@ msgstr "Dosyaları açma"
 msgid "Opening folders"
 msgstr "Klasörleri açma"
 
+msgid "Opening in Chat Interface…"
+msgstr "Sohbet arayüzünde açılıyor…"
+
 msgid "Opening pages"
 msgstr "Sayfaları açma"
-
-msgid "Opens beside this pane. This one keeps running."
-msgstr "Bu bölmenin yanında açılır. Bu bölme çalışmaya devam eder."
 
 msgid "Operator"
 msgstr "Operatör"
@@ -14046,9 +14194,6 @@ msgstr "Option kısayolları özel karakter yazmayı engelleyebilir"
 
 msgid "Optional"
 msgstr "İsteğe bağlı"
-
-msgid "Optional · Beta"
-msgstr "İsteğe bağlı · Beta"
 
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Terminal betikleri listesinde gösterilen isteğe bağlı açıklama."
@@ -14403,6 +14548,9 @@ msgstr "Paradev, Paradev içinde geliştiriliyor; yani en büyük kullanıcımı
 msgid "Paradev is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Paradev mevcut aracınızla çalışacak şekilde tasarlandı; Cursor gibi IDE'lere derin bağlantıyı yerel olarak destekliyoruz, böylece çalışma alanlarınızı ve dosyalarınızı IDE'nizde açabilirsiniz."
 
+msgid "Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub."
+msgstr "Paradev MIT lisanslıdır, yani asla bağlı kalmazsınız. Kodu GitHub'da okuyun veya değiştirin."
+
 msgid "Paradev is open source. Every pull request, review and bug is public on GitHub."
 msgstr "Paradev açık kaynaklıdır. Her pull request, inceleme ve hata GitHub'da herkese açık."
 
@@ -14583,6 +14731,9 @@ msgstr "Duraklatıldı"
 msgid "Paused until {0}"
 msgstr "{0} saatine kadar duraklatıldı"
 
+msgid "Paused when Paradev closed"
+msgstr "Paradev kapanınca duraklatıldı"
+
 msgid "Pay {total}"
 msgstr "{total} öde"
 
@@ -14659,8 +14810,14 @@ msgstr "Kişi"
 msgid "Personal"
 msgstr "Kişisel"
 
+msgid "Personal account"
+msgstr "Kişisel hesap"
+
 msgid "Personal plan"
 msgstr "Kişisel plan"
+
+msgid "Personal to you"
+msgstr "Yalnızca size özel"
 
 msgid "Phantom Forklift"
 msgstr "Hayalet Forklift"
@@ -14886,6 +15043,9 @@ msgstr "Üst çubuk açılır menüsünde portlar"
 msgid "Ports on remote hosts"
 msgstr "Uzak host'lardaki portlar"
 
+msgid "Ports on this computer"
+msgstr "Bu bilgisayardaki portlar"
+
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "İyi günlerde mümkün. Denetim maliyeti hâlâ çok hızlı büyüyor."
 
@@ -15040,6 +15200,9 @@ msgstr "Önceki eşleşme"
 
 msgid "Previous prompts"
 msgstr "Önceki istemler"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Sağ kenar çubuğunda önceki sekme"
 
 msgid "Previous slide"
 msgstr "Önceki slayt"
@@ -15317,9 +15480,15 @@ msgstr "Kendi deponuzdan yayımlayın"
 msgid "Publish new versions, rename and share"
 msgstr "Yeni sürümler yayımlayabilir, yeniden adlandırabilir ve paylaşabilir"
 
+msgid "Publish Pages"
+msgstr "Sayfaları yayınlayın"
+
 msgctxt "github release action"
 msgid "Published"
 msgstr "Yayınlandı"
+
+msgid "Published version 1."
+msgstr "Sürüm 1 yayınlandı."
 
 msgid "Publishes your token counts and model names, never repo names, file paths or prompts. You can leave at any time, which deletes everything you've published."
 msgstr "Token sayılarınızı ve model adlarınızı yayımlar; depo adlarını, dosya yollarını veya istemleri asla yayımlamaz. İstediğiniz zaman ayrılabilirsiniz; ayrıldığınızda yayımladığınız her şey silinir."
@@ -15423,6 +15592,9 @@ msgstr "Kesintiye uğrattığınız için kuyruk duraklatıldı"
 
 msgid "Queue paused by the usage limit"
 msgstr "Kuyruk kullanım sınırı nedeniyle duraklatıldı"
+
+msgid "Queue paused when Paradev closed"
+msgstr "Paradev kapandığında kuyruk duraklatıldı"
 
 msgid "Queue work for agents"
 msgstr "Ajanlar için işi kuyruğa alın"
@@ -15886,6 +16058,10 @@ msgstr "rövanş"
 msgid "remote"
 msgstr "uzak"
 
+msgctxt "port location"
+msgid "remote"
+msgstr "uzak"
+
 msgid "Remote"
 msgstr "Uzak"
 
@@ -16194,14 +16370,14 @@ msgstr "Depolar"
 msgid "Repos, worktrees and branches"
 msgstr "Depolar, worktree'ler ve dallar"
 
-msgid "Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only."
-msgstr "Depolar, worktree'ler, terminal çıktısı ve ajan oturumları makinenizde kalır. Bulut eşitlemesi yalnızca hesap ve kuruluş meta verilerini kapsar."
-
 msgid "Repositories"
 msgstr "Depolar"
 
-msgid "Repositories accessible through the GitHub App installation."
-msgstr "GitHub App kurulumu üzerinden erişilebilen depolar."
+msgid "Repositories accessible through your connected GitHub accounts."
+msgstr "Bağlı GitHub hesaplarınız üzerinden erişilebilen depolar."
+
+msgid "Repositories from {accountLogin} will stop syncing. Other connected GitHub accounts are not affected. The GitHub App stays installed on {accountLogin}, and you can reconnect at any time."
+msgstr "{accountLogin} depoları artık senkronize edilmeyecek. Bağlı diğer GitHub hesapları etkilenmez. GitHub App {accountLogin} üzerinde yüklü kalır ve istediğiniz zaman yeniden bağlayabilirsiniz."
 
 msgid "Repositories refreshed"
 msgstr "Depolar yenilendi"
@@ -16497,6 +16673,9 @@ msgstr "\"{workspaceName}\" geri yüklendi"
 
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" geri yükleniyor…"
+
+msgid "Restoring Claude's session"
+msgstr "Claude oturumu geri yükleniyor"
 
 msgid "Restoring your session"
 msgstr "Oturumunuz geri yükleniyor"
@@ -16818,6 +16997,9 @@ msgstr "Şimdi çalıştır"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Zamanlamayla veya olaylarla çalıştırın, isteğe bağlı çalıştırın, duraklatın, sürdürün ve günlükleri okuyun."
 
+msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
+msgstr "Özellikler, düzeltmeler ve yeniden düzenlemeler için paralel kodlama ajanları çalıştırın. Her biri yerelde ya da bulutta kendi dalında çalışır."
+
 msgid "Run parallel coding agents with Paradev"
 msgstr "Paradev ile paralel kodlama ajanları çalıştırın"
 
@@ -16839,6 +17021,9 @@ msgstr "Terminal komutları çalıştırın ve diğer uygulamalarla etkileşin."
 msgid "Run the agent in the Workspace Setup terminal once setup finishes instead of starting a second terminal alongside it"
 msgstr "Yanında ikinci bir terminal başlatmak yerine, kurulum bittikten sonra ajanı Çalışma Alanı Kurulumu terminalinde çalıştır"
 
+msgid "Run the nightly evals and fix any regressions"
+msgstr "Gece değerlendirmelerini çalıştır ve gerilemeleri düzelt"
+
 msgid "Run this command?"
 msgstr "Bu komut çalıştırılsın mı?"
 
@@ -16851,14 +17036,8 @@ msgstr "Çalışma alanı komutunu çalıştır"
 msgid "Run Workspace Command"
 msgstr "Çalışma alanı komutunu çalıştır"
 
-msgid "Run workspaces anywhere"
-msgstr "Çalışma alanlarını her yerde çalıştırın"
-
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Ajanlarınızı masaüstünden, herhangi bir terminalden veya telefonunuzdan çalıştırın."
-
-msgid "Run your agents from your phone."
-msgstr "Ajanlarınızı telefonunuzdan çalıştırın."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Kodlama ajanlarınızı bulutta çalıştırın."
@@ -17642,6 +17821,9 @@ msgstr "Oturum ayrıntıları"
 msgid "Session ended"
 msgstr "Oturum sona erdi"
 
+msgid "Session ended. Press Enter to start a new shell."
+msgstr "Oturum sona erdi. Yeni bir kabuk başlatmak için Enter tuşuna basın."
+
 msgid "Session name"
 msgstr "Oturum adı"
 
@@ -17766,6 +17948,9 @@ msgstr "Kurulum betikleri, conductor.json'u dönüştürdükten sonra"
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Kurulum durdu. Nedeni aşağıdaki çıktıda."
 
+msgid "Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI."
+msgstr "Birden fazla GitHub hesabı bağlı. Bağlantısını kesmek istediğiniz hesabı web uygulamasında seçin veya CLI'yi güncelleyin."
+
 msgid "Sexual content"
 msgstr "Cinsel içerik"
 
@@ -17834,6 +18019,9 @@ msgstr "Herkesle paylaşıldı"
 
 msgid "Shared with me"
 msgstr "Benimle paylaşılanlar"
+
+msgid "Shared with your organization"
+msgstr "Kuruluşunuzla paylaşılır"
 
 msgid "Sheet"
 msgstr "Sayfa"
@@ -18012,6 +18200,12 @@ msgstr "Bu ajan için durum göster ve bildirim gönder."
 msgid "Show text"
 msgstr "Metni göster"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Odağı taşımadan sağ kenar çubuğunda sonraki sekmeyi göster"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Odağı taşımadan sağ kenar çubuğunda önceki sekmeyi göster"
+
 msgid "Show the triggering payload"
 msgstr "Tetikleyen yükü göster"
 
@@ -18162,6 +18356,12 @@ msgstr "Oturum açılamadı"
 
 msgid "Sign-in failed ({reason}). Please try again."
 msgstr "Oturum açılamadı ({reason}). Lütfen tekrar deneyin."
+
+msgid "Sign-up completion"
+msgstr "Kayıt tamamlama"
+
+msgid "Sign-up steps"
+msgstr "Kayıt adımları"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"
@@ -18401,6 +18601,9 @@ msgstr "Başka bir şey mi? Kendi yanıtınızı yazın"
 
 msgid "Something went wrong"
 msgstr "Bir şeyler ters gitti"
+
+msgid "Something went wrong during the move."
+msgstr "Taşıma sırasında bir şeyler ters gitti."
 
 msgid "Something went wrong."
 msgstr "Bir şeyler ters gitti."
@@ -18743,6 +18946,9 @@ msgstr "Aracı başlatılıyor…"
 msgid "Starting the simulator…"
 msgstr "Simülatör başlatılıyor…"
 
+msgid "Starting the workspace"
+msgstr "Çalışma alanı başlatılıyor"
+
 msgid "Starting up. This should only take a moment."
 msgstr "Başlatılıyor. Yalnızca kısa bir süre alacaktır."
 
@@ -18864,6 +19070,9 @@ msgstr "Durduruldu"
 
 msgid "Stopped by the usage limit"
 msgstr "Kullanım sınırı nedeniyle durduruldu"
+
+msgid "Stopped moving {name}"
+msgstr "{name} taşınması durduruldu"
 
 msgid "Stopping the agent in {what}"
 msgstr "{what} içindeki ajan durduruluyor"
@@ -19465,6 +19674,9 @@ msgstr "Bu hesap artık bağlı değil — başka bir hesap seçin."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Bu aracı oturumunda açılacak bir konuşma yok — başlatıldı ama hiç istek almadı."
 
+msgid "That computer can't be reached"
+msgstr "Bu bilgisayara ulaşılamıyor"
+
 msgid "That endpoint could not be resolved."
 msgstr "Bu uç nokta çözümlenemedi."
 
@@ -19562,6 +19774,9 @@ msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı öde
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
 
+msgid "the cloud"
+msgstr "bulut"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
@@ -19579,6 +19794,9 @@ msgstr "Bağlantı zaman aşımına uğradı"
 
 msgid "The connection was closed"
 msgstr "Bağlantı kapatıldı"
+
+msgid "The connection was lost."
+msgstr "Bağlantı koptu."
 
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Geçerli istem, seçilen sürümle değiştirilecek. Bunu geri alabilmeniz için geçmişe yeni bir \"Geri yüklendi\" kaydı eklenecek."
@@ -19736,6 +19954,18 @@ msgstr "Birleştirilen ajan PR'larının çoğu yalnızca inceleme gerektirir, h
 
 msgid "The model declined to continue"
 msgstr "Model devam etmeyi reddetti"
+
+msgid "The move into this workspace failed."
+msgstr "Bu çalışma alanına taşıma başarısız oldu."
+
+msgid "The move service couldn't be reached."
+msgstr "Taşıma hizmetine ulaşılamadı."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Taşıma yanıt vermeyi bıraktı, bu yüzden sonlandırıldı."
+
+msgid "The move was cancelled."
+msgstr "Taşıma iptal edildi."
 
 msgid "The name of your organization or team"
 msgstr "Kuruluşunuzun veya takımınızın adı"
@@ -19926,6 +20156,9 @@ msgstr "Bu klasörlerde hâlâ dosyalarınız var, ancak yeni Paradev'e kendili�
 msgid "These ports are still in use"
 msgstr "Bu portlar hâlâ kullanımda"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Hâlâ orijinal çalışma alanındalar. Yeniden denemek için her birini açın."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Zaten sahip olduğunuz abonelikler ve anahtarlarla çalışırlar."
 
@@ -19941,11 +20174,11 @@ msgstr "Düşünülüyor..."
 msgid "Thirty"
 msgstr "Otuz"
 
-msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
-msgstr "Bu {plugin} hesabını zaten {owner} bağlamış. Önce bağlantıyı kesmesini isteyin."
-
 msgid "This {plugin} account is already connected by another Paradev organization."
 msgstr "Bu {plugin} hesabı zaten başka bir Paradev kuruluşuna bağlı."
+
+msgid "This {plugin} account is already connected to another Paradev organization by {owner}. Ask them to disconnect it there first."
+msgstr "Bu {plugin} hesabını {owner} zaten başka bir Paradev kuruluşuna bağlamış. Önce oradaki bağlantıyı kesmesini isteyin."
 
 msgid "This action is irreversible."
 msgstr "Bu işlem geri alınamaz."
@@ -19996,11 +20229,17 @@ msgstr "Bu geri alınamaz."
 msgid "This channel is archived"
 msgstr "Bu kanal arşivlendi"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Bu sohbet buraya taşınamadı. Geldiği çalışma alanında duruyor."
+
 msgid "This chat has ended."
 msgstr "Bu sohbet sona erdi."
 
 msgid "This chat is empty."
 msgstr "Bu sohbet boş."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Bu sohbet uzun, bu yüzden yalnızca en son kısmı gösteriliyor. Çalışma alanı başlayınca tamamı açılır."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Bu sohbet kaldırılmış olabilir veya erişiminiz olmayabilir."
@@ -20028,6 +20267,15 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
+
+msgid "this computer"
+msgstr "bu bilgisayar"
+
+msgid "This computer"
+msgstr "Bu bilgisayar"
+
+msgid "This computer's host is not running"
+msgstr "Bu bilgisayarın host hizmeti çalışmıyor"
 
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
@@ -20059,6 +20307,9 @@ msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağla
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
 
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Bu ortam {repository} değil, {environmentRepository} açar"
+
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Bu ortamın depoları sabittir; değiştirmek için bir çalışma alanını yeniden yükseltin"
 
@@ -20088,6 +20339,9 @@ msgstr "Bu davet zaten kabul edilmiş."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Bu davet bağlantısı geçersiz veya süresi dolmuş."
+
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Bu, normalden uzun sürüyor. Aşağıdaki sohbet son kaydedilen kopyası; çalışma alanı başlayınca gerçekten açılır."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Bu normalden uzun sürüyor. Sandbox hâlâ imajını çekiyor olabilir — bu pencere açık olsa da olmasa da devam eder."
@@ -20139,6 +20393,9 @@ msgstr "Bu model kullanılamıyor"
 
 msgid "This month"
 msgstr "Bu ay"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Bu taşıma durdu. Sohbet hâlâ eski çalışma alanında."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Bu yalnızca görünen adı değiştirir, dalı değil."
@@ -20318,9 +20575,6 @@ msgstr "Bu, kuruluşunuzun herkese açık URL'sini değiştirir. Yer imlerinizi 
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Bu işlem <0>{0}</0> takımını siler ve tüm üyelerini kaldırır. Bu geri alınamaz."
 
-msgid "This will disconnect GitHub from your organization. The GitHub App will remain installed but will no longer sync data. You can reconnect at any time."
-msgstr "Bu işlem GitHub bağlantısını kuruluşunuzdan kaldırır. GitHub App kurulu kalır ancak artık veri eşitlemez. İstediğiniz zaman yeniden bağlanabilirsiniz."
-
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Bu işlem çalışan tüm oturumları sonlandırır ve terminal daemon'unu yeniden başlatır. Uygulama, terminalleri yeni bir daemon ile yeniden başlatır."
 
@@ -20363,11 +20617,17 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 msgid "This workspace"
 msgstr "Bu çalışma alanı"
 
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Bu çalışma alanı taşınamadı. Değişmedi."
+
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."
+
+msgid "This workspace moved"
+msgstr "Bu çalışma alanı taşındı"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Bu çalışma alanı kaydı hâlâ var, ancak worktree klasörü artık bu host'ta değil. Terminaller ve dosya eylemleri kullanılamıyor."
@@ -20413,6 +20673,9 @@ msgstr "Katman"
 
 msgid "Time"
 msgstr "Zaman"
+
+msgid "Time to first workspace"
+msgstr "İlk çalışma alanına kadar geçen süre"
 
 msgid "Time zone"
 msgstr "Saat dilimi"
@@ -20485,6 +20748,9 @@ msgstr "Sağ kenar çubuğunu aç/kapat"
 
 msgid "Toggle Right Sidebar"
 msgstr "Sağ kenar çubuğunu aç/kapat"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Sağ kenar çubuğu odağını değiştir"
 
 msgid "Toggle Scripts Bar"
 msgstr "Betikler çubuğunu aç/kapat"
@@ -20731,9 +20997,6 @@ msgstr "Tufte"
 
 msgid "Tunnel established"
 msgstr "Tünel kuruldu"
-
-msgid "Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review."
-msgstr "Rutin işleri zamanlamayla veya bir olay geldiğinde çalışan ajanlara dönüştürün: issue önceliklendirme, değişiklik günlüğü taslakları, bağımlılık güncellemeleri. Kendi başlarına çalışır ve incelemeniz için PR açarlar."
 
 msgid "Turn Fast mode on or off"
 msgstr "Hızlı modu aç veya kapat"
@@ -21138,6 +21401,12 @@ msgstr "Güncelleme gerekli"
 msgid "update the branch prefix"
 msgstr "dal ön ekini güncelleme"
 
+msgid "Update the host service on both computers and try again."
+msgstr "Her iki bilgisayardaki host hizmetini güncelleyip yeniden deneyin."
+
+msgid "Update the host service on this device and try again."
+msgstr "Bu cihazdaki host hizmetini güncelleyip yeniden deneyin."
+
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
 
@@ -21266,8 +21535,8 @@ msgstr "Çalışma alanı çalıştırması olarak kullan"
 msgid "Use cases"
 msgstr "Kullanım alanları"
 
-msgid "Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same."
-msgstr "Her görev için Claude Code, Codex, OpenCode veya herhangi bir kodlama ajanını kullanın. Çalışma alanlarınız, dallarınız ve inceleme akışınız aynı kalır."
+msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
+msgstr "Claude Code, Codex, OpenCode veya herhangi bir CLI ajanını kullanın. Çalışma alanlarınız, dallarınız ve incelemeleriniz aynı kalır."
 
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Claude Code, Codex veya herhangi bir kodlama ajanını kullanın. Göreve göre seçin ya da birkaçını yan yana çalıştırın."
@@ -21293,6 +21562,9 @@ msgstr "Paradev’i mobilde kullanın"
 msgid "Use Paradev on your phone with Pro."
 msgstr "Pro ile Paradev’i telefonunuzda kullanın."
 
+msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+msgstr "Elinizdeki ajan planlarını ve API anahtarlarını kullanın. Model çağrıları doğrudan sağlayıcınıza gider."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Paralel kodlama ajanları çalıştırmaya başlamak için masaüstü uygulamasını kullanın."
 
@@ -21316,9 +21588,6 @@ msgstr "Paradev API'yi çağırırken bunu kullanın."
 
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Sesli yazıya dökme ve bas-konuş özelliklerini kullanın."
-
-msgid "Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider."
-msgstr "Mevcut ajan aboneliklerinizi ve API anahtarlarınızı kullanın. Paradev model çağrılarını asla vekil olarak iletmez ve iş akışınızı tek bir sağlayıcıya kilitlemez."
 
 msgid "Used"
 msgstr "Kullanılan"
@@ -21405,6 +21674,9 @@ msgstr "Sürüm {version}"
 
 msgid "Version {version} installs the next time you restart."
 msgstr "{version} sürümü bir sonraki yeniden başlatmada yüklenecek."
+
+msgid "Version {version} is available"
+msgstr "{version} sürümü kullanılabilir"
 
 msgid "Version {version} is the latest version."
 msgstr "{version} sürümü en son sürümdür."
@@ -21580,6 +21852,9 @@ msgstr "Alt ajanın ilk mesajı bekleniyor…"
 msgid "Waiting for your input"
 msgstr "Girdinizi bekliyor"
 
+msgid "Waking the workspace…"
+msgstr "Çalışma alanı uyandırılıyor…"
+
 msgid "Waking up workspace"
 msgstr "Çalışma alanı uyandırılıyor"
 
@@ -21741,6 +22016,9 @@ msgstr "Haftalık Opus sınırına ulaşıldı"
 
 msgid "Weekly release notes"
 msgstr "Haftalık sürüm notları"
+
+msgid "Weekly sign-up completion"
+msgstr "Haftalık kayıt tamamlama"
 
 msgid "Weekly Sonnet limit reached"
 msgstr "Haftalık Sonnet sınırına ulaşıldı"
@@ -22362,6 +22640,20 @@ msgstr "Hesap bağlamak için bir organizasyona üye olmanız gerekir."
 msgid "You need to be part of an organization to use integrations."
 msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerekir."
 
+#. placeholder {0}: Math.floor(seconds / 60)
+#. placeholder {1}: seconds % 60
+msgid "You stopped after {0}m {1}s"
+msgstr "{0} dk {1} sn sonra durdurdunuz"
+
+msgid "You stopped after {seconds}s"
+msgstr "{seconds} sn sonra durdurdunuz"
+
+msgid "You stopped this response"
+msgstr "Bu yanıtı durdurdunuz"
+
+msgid "You stopped this response at a tool call"
+msgstr "Bu yanıtı bir araç çağrısında durdurdunuz"
+
 #. placeholder {0}: preview.rank
 #. placeholder {1}: preview.total
 msgid "You'd be <0>#{0}</0> of {1}."
@@ -22441,9 +22733,6 @@ msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Bulut çalışma alanlarınız artık bu host'a erişemeyecek."
-
-msgid "Your code stays local by default, with explicit control over connected services."
-msgstr "Kodunuz varsayılan olarak yerelde kalır; bağlı hizmetler üzerinde açık denetiminiz olur."
 
 msgid "Your download starts automatically."
 msgstr "İndirmen otomatik olarak başlar."
@@ -22564,8 +22853,14 @@ msgstr "v1 projeleriniz ve çalışma alanlarınız yeni Paradev'e aktarılıyor
 msgid "Your version: {currentVersion}"
 msgstr "Sürümünüz: {currentVersion}"
 
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Commit edilmemiş değişiklikler dahil çalışmanız uzak depoda yeni bir dala gönderilir. Seçtiğiniz ortamda bu daldan bir bulut çalışma alanı başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler burada kalır."
+
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex için cihaz koduyla girişi çalışma alanı yöneticiniz açar."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Çalışma alanınız değişmedi. Birkaç dakika sonra yeniden taşıyabilirsiniz."
 
 msgid "Zap"
 msgstr "Şimşek"
