@@ -142,10 +142,6 @@ msgstr "{0, plural, other {已關閉 # 個聊天}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {# 個聊天無法移動。開啟後再試一次。}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# 個聊天留在了原工作區。} other {# 個聊天留在了原工作區。}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {已附上#條評論} other {已附上#條評論}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount}個cookie——忘記此站點"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# 個自動化} other {# 個自動化}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# 個聊天留在了原工作區。} other {# 個聊天留在了原工作區。}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {#項檢查失敗} other {#項檢查失敗}}"

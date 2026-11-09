@@ -142,10 +142,6 @@ msgstr "{0, plural, one {# czat zamknięty} few {# czaty zamknięte} many {# cza
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {Nie udało się przenieść # czatu. Otwórz go, aby spróbować ponownie.} few {Nie udało się przenieść # czatów. Otwórz je, aby spróbować ponownie.} many {Nie udało się przenieść # czatów. Otwórz je, aby spróbować ponownie.} other {Nie udało się przenieść # czatu. Otwórz je, aby spróbować ponownie.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# czat pozostał w starym obszarze roboczym.} few {# czaty pozostały w starym obszarze roboczym.} many {# czatów pozostało w starym obszarze roboczym.} other {# czatu pozostało w starym obszarze roboczym.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {Dołączono # komentarz} few {Dołączono # komentarze} many {Dołączono # komentarzy} other {Dołączono # komentarza}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount} cookies — zapomnij tę witrynę"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automatyzacja} few {# automatyzacje} many {# automatyzacji} other {# automatyzacji}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# czat pozostał w starym obszarze roboczym.} few {# czaty pozostały w starym obszarze roboczym.} many {# czatów pozostało w starym obszarze roboczym.} other {# czatu pozostało w starym obszarze roboczym.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrola nie przeszła} few {# kontrole nie przeszły} many {# kontroli nie przeszło} other {# kontroli nie przeszło}}"

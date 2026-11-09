@@ -169,7 +169,7 @@ export const teleportRouter = router({
 			const movable: MovableChat[] = [];
 			for (const session of sessions) {
 				// A chat closed here is gone for the person; moving it would open it again.
-				if (session.closedAt !== null) continue;
+				if (session.closedAt) continue;
 				const provider = teleportProviderFor(session.harness);
 				if (!provider || !session.harnessSessionId) {
 					skipped.push({
@@ -462,9 +462,14 @@ export const teleportRouter = router({
 				replace: true,
 			});
 			if (selections) {
+				const outline = chat.commands.getOutline({
+					sessionId: input.chatSessionId,
+				});
+				// A session event replaces the whole state, so it carries what the history set.
 				chat.journal.append(input.chatSessionId, {
 					type: "session",
 					session: {
+						...(outline.ok ? outline.outline.session : null),
 						status: "idle",
 						harness: input.session.harness,
 						...selections,

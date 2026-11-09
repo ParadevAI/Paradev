@@ -11,7 +11,6 @@ import { sandboxWakeQueryKey } from "renderer/routes/_authenticated/providers/Sa
 import { useCountdown } from "../../hooks/useCountdown";
 import {
 	loadStoredChatSnapshot,
-	shownStoredChatKey,
 	storedChatSnapshotKey,
 } from "../../utils/loadStoredChatSnapshot";
 import { ConnectionPill, WAKE_UP_ESTIMATE_SECONDS } from "../ConnectionPill";
@@ -53,15 +52,6 @@ export function StoredCloudChat({
 		},
 		electronQueryClient,
 	);
-	const shownChatId = stored.isPlaceholderData ? null : chatId;
-	useEffect(() => {
-		if (shownChatId) {
-			electronQueryClient.setQueryData(
-				shownStoredChatKey(workspaceId),
-				shownChatId,
-			);
-		}
-	}, [shownChatId, workspaceId]);
 	useEffect(() => {
 		for (const chat of chats.data?.slice(1, PREFETCHED_CHATS) ?? []) {
 			void electronQueryClient.prefetchQuery({

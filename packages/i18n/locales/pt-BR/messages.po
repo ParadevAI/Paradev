@@ -142,10 +142,6 @@ msgstr "{0, plural, one {# chat fechado} other {# chats fechados}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# chat não pôde ser movido. Abra-o para tentar novamente.} other {# chats não puderam ser movidos. Abra-os para tentar novamente.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# chat ficou na área de trabalho antiga.} other {# chats ficaram na área de trabalho antiga.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# comentário anexado} other {# comentários anexados}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount} cookies — esquecer este site"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automação} other {# automações}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# chat ficou na área de trabalho antiga.} other {# chats ficaram na área de trabalho antiga.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# verificação falhou} other {# verificações falharam}}"

@@ -209,7 +209,6 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			})();
 			return {
 				toWorkspaceId: created.workspaceId,
-				// A chat that never had a message has nothing to lose by staying.
 				stayed: [
 					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),

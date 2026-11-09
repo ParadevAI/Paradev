@@ -142,10 +142,6 @@ msgstr "{0, plural, other {채팅 #개를 닫았습니다}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {채팅 #개를 옮기지 못했습니다. 열어서 다시 시도하세요.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {채팅 #개가 이전 워크스페이스에 남았습니다.} other {채팅 #개가 이전 워크스페이스에 남았습니다.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {코멘트 #개 첨부됨} other {코멘트 #개 첨부됨}}"
@@ -869,6 +865,9 @@ msgstr "쿠키 {cookieCount}개 — 이 사이트 잊기"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {자동화 #개} other {자동화 #개}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {채팅 #개가 이전 워크스페이스에 남았습니다.} other {채팅 #개가 이전 워크스페이스에 남았습니다.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {검사 #개 실패} other {검사 #개 실패}}"

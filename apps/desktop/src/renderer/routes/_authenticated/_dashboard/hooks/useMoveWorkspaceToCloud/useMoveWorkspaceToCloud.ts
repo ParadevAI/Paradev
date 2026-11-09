@@ -139,7 +139,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			void utils.cloudWorkspace.list.invalidate();
 			return {
 				toWorkspaceId: created.id,
-				// A chat that never had a message has nothing to lose by staying.
 				stayed: [
 					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),

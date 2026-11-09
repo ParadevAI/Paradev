@@ -83,9 +83,11 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 					<p className="mt-1 font-mono break-words">{failure.details}</p>
 				</details>
 			)}
-			{move.stage === "ready" && move.stayed.length > 0 && (
+			{ended && !failure && move.stayed.length > 0 && (
 				<p className="mt-1 truncate text-xs text-muted-foreground/70">
-					{move.stayed.join(", ")}
+					{move.stage === "ready"
+						? move.stayed.join(", ")
+						: `${stayedSentence(move.stayed.length, i18n)} ${move.stayed.join(", ")}`}
 				</p>
 			)}
 			{!ended && (
@@ -166,14 +168,7 @@ function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 		case "ready":
 			return move.stayed.length === 0
 				? i18n._(msg({ message: "Everything moved." }))
-				: i18n._(
-						msg({
-							message: plural(move.stayed.length, {
-								one: "# chat stayed in the old workspace.",
-								other: "# chats stayed in the old workspace.",
-							}),
-						}),
-					);
+				: stayedSentence(move.stayed.length, i18n);
 		case "partial":
 			return i18n._(
 				msg({
@@ -204,4 +199,15 @@ function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 				}),
 			);
 	}
+}
+
+function stayedSentence(count: number, i18n: I18n): string {
+	return i18n._(
+		msg({
+			message: plural(count, {
+				one: "# chat stayed in the old workspace.",
+				other: "# chats stayed in the old workspace.",
+			}),
+		}),
+	);
 }

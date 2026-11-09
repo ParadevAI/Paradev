@@ -54,13 +54,9 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 	const inFlight = IN_FLIGHT.has(move.status);
 	const destination = move.toWorkspaceId;
 	const isMine = move.isMine !== false;
-	// Only the workspace that moved says so; the new one shows its chats.
 	if (move.fromWorkspaceId !== workspaceId) return null;
-	// The mover's toast already says how it is going.
 	if (inFlight && isMine && trackedHere) return null;
-	// A move that never left is not news once its toast is gone.
 	if (!inFlight && !destination) return null;
-	// The box failed to start and no chat arrived: nothing moved.
 	if (move.status === "failed" && move.chats.ready === 0) return null;
 	const cancellable = isMine && move.status === "pending" && !destination;
 	const cancel = () =>

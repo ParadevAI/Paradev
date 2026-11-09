@@ -142,10 +142,6 @@ msgstr "{0, plural, other {Đã đóng # cuộc trò chuyện}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, other {Không thể chuyển # cuộc trò chuyện. Hãy mở để thử lại.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# cuộc trò chuyện vẫn ở không gian làm việc cũ.} other {# cuộc trò chuyện vẫn ở không gian làm việc cũ.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {Đã đính kèm # bình luận} other {Đã đính kèm # bình luận}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount} cookie — quên trang này"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# tự động hóa} other {# tự động hóa}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# cuộc trò chuyện vẫn ở không gian làm việc cũ.} other {# cuộc trò chuyện vẫn ở không gian làm việc cũ.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# check thất bại} other {# check thất bại}}"

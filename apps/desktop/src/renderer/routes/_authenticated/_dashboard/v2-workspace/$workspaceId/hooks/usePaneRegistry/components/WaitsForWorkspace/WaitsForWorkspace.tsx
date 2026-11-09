@@ -5,6 +5,9 @@ import { useSandboxAccess } from "renderer/routes/_authenticated/providers/Sandb
 import { useHostReachability } from "../../../../../hooks/useHostReachability";
 import { useWorkspace } from "../../../../../providers/WorkspaceProvider";
 
+/** Hosts that answered since the app started, so a pane remounted during a later drop keeps its contents. */
+const answeredHosts = new Set<string>();
+
 /**
  * A pane that reads the cloud box itself (a shell, its files, its git) waits
  * here until the box first answers. Once it has, a later drop is the pane's
@@ -17,7 +20,10 @@ export function WaitsForWorkspace({ children }: { children: ReactNode }) {
 		(target) => target.workspaceId === workspace.hostId,
 	);
 	const { isReconnecting, hasConnected } = useHostReachability(hostUrl);
-	if (!isCloud || hasConnected || !isReconnecting) return children;
+	if (hasConnected) answeredHosts.add(hostUrl);
+	if (!isCloud || answeredHosts.has(hostUrl) || !isReconnecting) {
+		return children;
+	}
 	return (
 		<div className="flex h-full w-full items-center justify-center gap-2 p-4 text-muted-foreground text-sm">
 			<WaveSpinner className="text-amber-500" />

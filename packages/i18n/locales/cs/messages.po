@@ -142,10 +142,6 @@ msgstr "{0, plural, one {# chat zavřen} few {# chaty zavřeny} many {# chatů z
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# chat se nepodařilo přesunout. Otevřete ho a zkuste to znovu.} few {# chaty se nepodařilo přesunout. Otevřete je a zkuste to znovu.} many {# chatu se nepodařilo přesunout. Otevřete je a zkuste to znovu.} other {# chatů se nepodařilo přesunout. Otevřete je a zkuste to znovu.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# chat zůstal v původním pracovním prostoru.} few {# chaty zůstaly v původním pracovním prostoru.} many {# chatu zůstalo v původním pracovním prostoru.} other {# chatů zůstalo v původním pracovním prostoru.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# připojený komentář} few {# připojené komentáře} many {# připojeného komentáře} other {# připojených komentářů}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount} cookies — zapomenout tento web"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automatizace} few {# automatizace} many {# automatizace} other {# automatizací}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# chat zůstal v původním pracovním prostoru.} few {# chaty zůstaly v původním pracovním prostoru.} many {# chatu zůstalo v původním pracovním prostoru.} other {# chatů zůstalo v původním pracovním prostoru.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrola selhala} few {# kontroly selhaly} many {# kontroly selhalo} other {# kontrol selhalo}}"

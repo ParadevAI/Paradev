@@ -14,6 +14,7 @@ import { CHAT_ADOPT_POLL_MS, CHAT_ADOPT_SESSIONS_LIMIT } from "./constants";
 import { chatPanesClosedElsewhere } from "./utils/chatPanesClosedElsewhere";
 import { chatSessionsToAdopt } from "./utils/chatSessionsToAdopt";
 import { storedChatsAsListed } from "./utils/storedChatsAsListed";
+import { storedPanesTheHostClosed } from "./utils/storedPanesTheHostClosed";
 
 interface UseSyncChatSessionTabsArgs {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -65,6 +66,7 @@ export function useSyncChatSessionTabs({
 		{ enabled: isLayoutReady && isCloud && !sessions, staleTime: 60_000 },
 	).data;
 	const adoptedStored = useRef(false);
+	const storedSessionIds = useRef(new Set<string>());
 	const openedEmpty = useRef<boolean | null>(null);
 	useEffect(() => {
 		if (!isLayoutReady || openedEmpty.current !== null) return;
@@ -94,6 +96,7 @@ export function useSyncChatSessionTabs({
 		});
 		for (const session of toAdopt) {
 			addChatTab({ store: next, session, focus: false });
+			if (session.sessionId) storedSessionIds.current.add(session.sessionId);
 		}
 		store.getState().replaceState({
 			version,
@@ -105,14 +108,19 @@ export function useSyncChatSessionTabs({
 	useEffect(() => {
 		if (!isLayoutReady || !sessions || isFetchingSessions) return;
 		for (const paneStore of [store, ...linkedStores]) {
-			const panes = chatPanesClosedElsewhere(
-				sessions,
-				paneStore.getState().tabs,
-			);
+			const panes = [
+				...chatPanesClosedElsewhere(sessions, paneStore.getState().tabs),
+				...storedPanesTheHostClosed({
+					sessions,
+					tabs: paneStore.getState().tabs,
+					storedSessionIds: storedSessionIds.current,
+				}),
+			];
 			for (const { tabId, paneId } of panes) {
 				paneStore.getState().closePane({ tabId, paneId, intent: "remove" });
 			}
 		}
+		storedSessionIds.current.clear();
 		const { version, tabs, activeTabId } = store.getState();
 		const toAdopt = chatSessionsToAdopt({
 			sessions,

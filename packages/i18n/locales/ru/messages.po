@@ -142,10 +142,6 @@ msgstr "{0, plural, one {# чат закрыт} few {# чата закрыто} 
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# чат не удалось перенести. Откройте его, чтобы попробовать снова.} few {# чата не удалось перенести. Откройте их, чтобы попробовать снова.} many {# чатов не удалось перенести. Откройте их, чтобы попробовать снова.} other {# чата не удалось перенести. Откройте их, чтобы попробовать снова.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# чат остался в старой рабочей области.} few {# чата остались в старой рабочей области.} many {# чатов остались в старой рабочей области.} other {# чата остались в старой рабочей области.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# комментарий приложен} few {# комментария приложено} many {# комментариев приложено} other {# комментария приложено}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount} cookies — забыть этот сайт"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# автоматизация} few {# автоматизации} many {# автоматизаций} other {# автоматизации}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# чат остался в старой рабочей области.} few {# чата остались в старой рабочей области.} many {# чатов остались в старой рабочей области.} other {# чата остались в старой рабочей области.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# проверка не пройдена} few {# проверки не пройдено} many {# проверок не пройдено} other {# проверки не пройдено}}"

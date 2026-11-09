@@ -757,7 +757,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			if (!options.live.supports(session.harness)) {
 				throw new Error(`unknown harness ${session.harness}`);
 			}
-			// A chat moved from another host keeps the mode, model and effort it had there.
+			// A chat moved from another host keeps the mode and model it had there.
 			const replay = replaySession(input.sessionId);
 			const selections = replay.ok
 				? sessionSelections(replay.snapshot.session)

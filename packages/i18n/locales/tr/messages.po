@@ -142,10 +142,6 @@ msgstr "{0, plural, other {# sohbet kapatıldı}}"
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# sohbet taşınamadı. Yeniden denemek için açın.} other {# sohbet taşınamadı. Yeniden denemek için açın.}}"
 
-#. placeholder {0}: move.stayed.length
-msgid "{0, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
-msgstr "{0, plural, one {# sohbet eski çalışma alanında kaldı.} other {# sohbet eski çalışma alanında kaldı.}}"
-
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# yorum eklendi} other {# yorum eklendi}}"
@@ -869,6 +865,9 @@ msgstr "{cookieCount} çerez — bu siteyi unut"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# otomasyon} other {# otomasyon}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# sohbet eski çalışma alanında kaldı.} other {# sohbet eski çalışma alanında kaldı.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {# kontrol başarısız} other {# kontrol başarısız}}"
