@@ -115,7 +115,7 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 							<Trans>Exit design mode (esc)</Trans>
 						) : (
 							<Trans>
-								Design mode — click any element in the page to send it to an
+								Design mode: click any element in the page to send it to an
 								agent
 							</Trans>
 						)}

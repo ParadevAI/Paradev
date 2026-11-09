@@ -297,7 +297,7 @@ export function PullRequestCodeTab({
 			{
 				description: t({
 					message:
-						"The diff is still up to date — only comments failed to load.",
+						"The diff is still up to date. Only comments failed to load.",
 				}),
 			},
 		);

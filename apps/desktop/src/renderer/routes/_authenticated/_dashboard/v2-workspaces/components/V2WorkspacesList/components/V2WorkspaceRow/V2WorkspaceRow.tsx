@@ -165,7 +165,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	const whereLabel = isCloud
 		? t({ message: "Cloud workspace" })
 		: isDeviceOffline
-			? t({ message: `${workspace.hostName} — device offline` })
+			? t({ message: `${workspace.hostName}: device offline` })
 			: workspace.hostName;
 
 	const renderHoverActions = (actions: V2WorkspaceActions) =>
@@ -174,7 +174,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 				<RowHoverAction
 					label={
 						actions.isRestoreBlocked
-							? t({ message: `${workspace.hostName} — device offline` })
+							? t({ message: `${workspace.hostName}: device offline` })
 							: t({ message: "Restore workspace" })
 					}
 					onClick={actions.restore}

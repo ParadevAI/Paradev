@@ -42,7 +42,7 @@ export const githubPrContributor: ContextContributor<{
 		return {
 			id: `pr:${pr.number}`,
 			kind: "github-pr",
-			label: `PR #${pr.number} — ${pr.title}`,
+			label: `PR #${pr.number} · ${pr.title}`,
 			content: [{ type: "text", text }],
 			meta: { url: pr.url },
 		};

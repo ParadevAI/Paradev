@@ -186,7 +186,7 @@ function AccountCard({
 							disabled={isSwitching}
 							title={t({
 								message:
-									"Make default — launch new terminals and agents on this account.",
+									"Make default: launch new terminals and agents on this account.",
 							})}
 							onClick={onMakeDefault ?? undefined}
 						>
@@ -293,7 +293,7 @@ function AccountCard({
 			) : expiredCommand !== null ? (
 				<div className="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[11px] text-muted-foreground">
 					<span>
-						<Trans>Sign-in expired — run</Trans>
+						<Trans>Sign-in expired. Run</Trans>
 					</span>
 					<button
 						type="button"
@@ -592,7 +592,7 @@ export function UsageView({
 						) : agentAccounts.length === 0 ? (
 							<div className="rounded-lg border border-dashed px-3 py-2 text-[11px] text-muted-foreground">
 								<Trans>
-									No {AGENT_LABELS[agent]} logins on this host — sign in and
+									No {AGENT_LABELS[agent]} logins on this host. Sign in and
 									usage appears here.
 								</Trans>
 							</div>

@@ -236,8 +236,8 @@ export function AddSecretSheet({
 		if (Object.keys(errors).length > 0) {
 			toast.error(
 				Object.keys(errors).length === 1
-					? "One variable can't be saved — see the highlighted row"
-					: `${Object.keys(errors).length} variables can't be saved — see the highlighted rows`,
+					? "One variable can't be saved. See the highlighted row"
+					: `${Object.keys(errors).length} variables can't be saved. See the highlighted rows`,
 			);
 			return;
 		}
