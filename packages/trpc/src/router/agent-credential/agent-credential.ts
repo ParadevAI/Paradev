@@ -330,24 +330,19 @@ function isFresh(tokens: ChatgptTokens): boolean {
 	);
 }
 
-interface ChatgptSession {
-	/** Null once OpenAI refuses the session for good. */
-	tokens: ChatgptTokens | null;
-	renewed: boolean;
-}
-
 /**
  * The stored ChatGPT session, renewed first when its access token is close to
  * expiring. The row is locked for the renewal: a refresh token works once, so
- * two boxes renewing together would sign the person out. Only a refusal that
- * proves the session is dead removes the row, so Settings asks for a new
- * sign-in; any other failure keeps it for the next try.
+ * two boxes renewing together would sign the person out. Null once OpenAI
+ * refuses the session as dead: the row is removed under the lock, so a
+ * sign-in made meanwhile is never the one removed, and Settings asks for a
+ * new one. Any other failure keeps the stored session for the next try.
  */
-async function currentChatgptSession(
+async function currentChatgptTokens(
 	row: AgentCredentialRow,
-): Promise<ChatgptSession> {
+): Promise<ChatgptTokens | null> {
 	const stored = chatgptTokensSchema.parse(JSON.parse(decryptRow(row)));
-	if (isFresh(stored)) return { tokens: stored, renewed: false };
+	if (isFresh(stored)) return stored;
 	const save = (tokens: ChatgptTokens) => ({
 		encryptedValue: encryptAgentCredential(JSON.stringify(tokens), {
 			userId: row.userId,
@@ -364,17 +359,36 @@ async function currentChatgptSession(
 				.where(eq(agentCredentials.id, row.id))
 				.for("update");
 			// Removed or set to Manual since it was read: the box gets no session.
-			if (!locked || locked.provider !== CHATGPT_PROVIDER) {
-				return { tokens: null, renewed: false };
-			}
+			if (!locked || locked.provider !== CHATGPT_PROVIDER) return null;
 			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
-			if (isFresh(current)) return { tokens: current, renewed: false };
-			renewed = await refreshChatgptTokens(current);
+			if (isFresh(current)) return current;
+			try {
+				renewed = await refreshChatgptTokens(current);
+			} catch (error) {
+				if (
+					!(error instanceof ChatgptSignInError) ||
+					error.reason !== "rejected"
+				) {
+					throw error;
+				}
+				console.warn(
+					`[agent-credential] OpenAI refused the ChatGPT sign-in (${error.code}); removing it`,
+				);
+				Sentry.captureMessage("ChatGPT sign-in refused; removed", {
+					level: "warning",
+					tags: { chatgpt_refresh_code: error.code ?? "none" },
+					extra: { credentialId: row.id },
+				});
+				await tx
+					.delete(agentCredentials)
+					.where(eq(agentCredentials.id, locked.id));
+				return null;
+			}
 			await tx
 				.update(agentCredentials)
 				.set(save(renewed))
 				.where(eq(agentCredentials.id, locked.id));
-			return { tokens: renewed, renewed: true };
+			return renewed;
 		});
 	} catch (error) {
 		if (renewed) {
@@ -391,38 +405,32 @@ async function currentChatgptSession(
 						extra: { credentialId: row.id },
 					});
 				});
-			return { tokens: renewed, renewed: true };
-		}
-		const code = error instanceof ChatgptSignInError ? error.code : undefined;
-		if (error instanceof ChatgptSignInError && error.reason === "rejected") {
-			console.warn(
-				`[agent-credential] OpenAI refused the ChatGPT sign-in (${code}); removing it`,
-			);
-			Sentry.captureMessage("ChatGPT sign-in refused; removed", {
-				level: "warning",
-				extra: { credentialId: row.id, code },
-			});
-			await dbWs
-				.delete(agentCredentials)
-				.where(eq(agentCredentials.id, row.id));
-			return { tokens: null, renewed: false };
+			return renewed;
 		}
 		console.warn("[agent-credential] ChatGPT sign-in was not renewed", error);
 		Sentry.captureException(error, {
-			extra: { credentialId: row.id, code },
+			tags: {
+				chatgpt_refresh_code:
+					(error instanceof ChatgptSignInError && error.code) || "none",
+			},
+			extra: { credentialId: row.id },
 		});
-		return { tokens: stored, renewed: false };
+		return stored;
 	}
 }
 
+/** Refreshes run this many at a time, so a few that hang to the timeout cannot use a whole run. */
+const RENEWAL_CONCURRENCY = 8;
+
 /**
  * Renews every ChatGPT sign-in close to expiring, whether or not a box is
- * running, so a session nobody uses for a while does not lapse. Returns who
- * was renewed, whose running boxes still carry the old token.
+ * running, so a session nobody uses for a while does not lapse. The order is
+ * shuffled each run: sign-ins that keep failing cannot keep the same others
+ * waiting behind them.
  */
 export async function renewChatgptSignIns(args: {
 	deadline: number;
-}): Promise<{ checked: number; renewedUserIds: string[] }> {
+}): Promise<{ checked: number }> {
 	const rows = await db
 		.select()
 		.from(agentCredentials)
@@ -432,19 +440,22 @@ export async function renewChatgptSignIns(args: {
 				eq(agentCredentials.provider, CHATGPT_PROVIDER),
 			),
 		);
-	const renewedUserIds: string[] = [];
+	const queue = rows
+		.map((row) => ({ row, order: Math.random() }))
+		.sort((a, b) => a.order - b.order)
+		.map(({ row }) => row);
 	let checked = 0;
-	for (const row of rows) {
-		if (Date.now() > args.deadline) break;
-		checked++;
-		try {
-			const session = await currentChatgptSession(row);
-			if (session.renewed) renewedUserIds.push(row.userId);
-		} catch (error) {
-			Sentry.captureException(error, { extra: { credentialId: row.id } });
+	const worker = async () => {
+		for (let row = queue.shift(); row; row = queue.shift()) {
+			if (Date.now() > args.deadline) return;
+			checked++;
+			await currentChatgptTokens(row).catch((error) =>
+				Sentry.captureException(error, { extra: { credentialId: row.id } }),
+			);
 		}
-	}
-	return { checked, renewedUserIds };
+	};
+	await Promise.all(Array.from({ length: RENEWAL_CONCURRENCY }, worker));
+	return { checked };
 }
 
 /**
@@ -462,6 +473,6 @@ export async function resolveAgentSignIns(args: {
 		.where(eq(agentCredentials.userId, args.userId));
 	return signInsFromRows(rows, {
 		value: decryptRow,
-		chatgptTokens: async (row) => (await currentChatgptSession(row)).tokens,
+		chatgptTokens: currentChatgptTokens,
 	});
 }

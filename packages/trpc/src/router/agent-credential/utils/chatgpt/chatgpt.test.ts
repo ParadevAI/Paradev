@@ -94,7 +94,9 @@ describe("refreshChatgptTokens", () => {
 		const error = await refreshChatgptTokens(tokens).catch((e) => e);
 		expect(error).toBeInstanceOf(ChatgptSignInError);
 		expect(error).toMatchObject({ reason: "unexpected" });
-		answer([[401, "not json"]]);
+		globalThis.fetch = mock(
+			async () => new Response("not json", { status: 401 }),
+		) as unknown as typeof fetch;
 		await expect(refreshChatgptTokens(tokens)).rejects.toMatchObject({
 			reason: "unexpected",
 		});
