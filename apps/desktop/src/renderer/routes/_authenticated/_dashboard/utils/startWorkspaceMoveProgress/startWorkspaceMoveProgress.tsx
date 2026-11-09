@@ -13,6 +13,8 @@ const POLL_MS = 2_000;
 const GIVE_UP_MS = 15 * 60 * 1000;
 const MAX_MISSED_READS = 5;
 const SUCCESS_LINGER_MS = 5_000;
+/** Long enough to reach the toast's Open from wherever the person went. */
+const OPEN_LINGER_MS = 12_000;
 
 export interface WorkspaceMoveProgressHandle {
 	/** Aborts when the person cancels the move from the toast. */
@@ -80,11 +82,14 @@ export function startWorkspaceMoveProgress(args: {
 		window.location.hash.includes(`/v2-workspace/${args.sourceWorkspaceId}`);
 	const finish = (stage: WorkspaceMoveProgressStage, land: () => void) => {
 		if (stage === "failed") return;
-		if (stillViewingSource()) {
+		const landed = stillViewingSource();
+		if (landed) {
 			land();
 			update(id, { open: null });
 		}
-		if (stage === "ready") setTimeout(dismiss, SUCCESS_LINGER_MS);
+		if (stage === "ready") {
+			setTimeout(dismiss, landed ? SUCCESS_LINGER_MS : OPEN_LINGER_MS);
+		}
 	};
 
 	return {
