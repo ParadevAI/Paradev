@@ -536,10 +536,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		if (
 			replacedRow?.scopeId === input.scopeId &&
 			replacedRow.harness === input.harness &&
-			replacedRow.harnessSessionId === input.resume.harnessSessionId &&
-			replacedRow.agentConfigId
+			replacedRow.harnessSessionId === input.resume.harnessSessionId
 		)
-			return replacedRow.agentConfigId;
+			return replacedRow.agentConfigId ?? null;
 		return (
 			options.sessions.findByHarnessSession(
 				input.scopeId,

@@ -353,6 +353,32 @@ describe("the agent config a chat launched with", () => {
 			...extra,
 		});
 
+	test("keeps a default-account chat on the default account when the pane resumes it", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const onDefault = open(runtime);
+		await waitFor(
+			() => runtime.live.get(onDefault.sessionId)?.state.status === "idle",
+		);
+		await runtime.commands.closeSession({ sessionId: onDefault.sessionId });
+		await new Promise((resolve) => setTimeout(resolve, 5));
+		const onConfigB = open(runtime, { agentConfigId: "config-b" });
+		await waitFor(
+			() => runtime.live.get(onConfigB.sessionId)?.state.status === "idle",
+		);
+		await runtime.commands.closeSession({ sessionId: onConfigB.sessionId });
+
+		const resumed = open(runtime, {
+			resume: {
+				harnessSessionId: "agent-1",
+				replacesSessionId: onDefault.sessionId,
+			},
+		});
+
+		expect(started.at(-1)?.agentConfigId).toBeUndefined();
+		expect(runtime.sessions.get(resumed.sessionId)?.agentConfigId).toBeNull();
+		await runtime.dispose();
+	});
+
 	test("follows the chat it continues when two chats share an agent session", async () => {
 		const { runtime, started } = runtimeWithStartedAgents();
 		const ids: string[] = [];
