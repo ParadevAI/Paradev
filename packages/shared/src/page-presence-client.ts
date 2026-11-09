@@ -54,6 +54,7 @@ export function openPagePresence({
 	let awaitingPong = false;
 	let ponged = false;
 	let visitors: PresenceVisitor[] = [];
+	let connectedBefore = false;
 
 	const lost = (ws: PresenceSocket, code?: number) => {
 		if (ws !== socket) return;
@@ -104,6 +105,8 @@ export function openPagePresence({
 		ws.addEventListener("open", () => {
 			if (ws !== socket) return;
 			attempts = 0;
+			if (connectedBefore) onPublished?.();
+			connectedBefore = true;
 			awaitingPong = true;
 			try {
 				ws.send("ping");

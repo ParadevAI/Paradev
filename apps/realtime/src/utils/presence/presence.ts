@@ -2,7 +2,10 @@ import type {
 	PagePresenceViewer,
 	PresenceVisitor,
 } from "@superset/shared/page-presence";
-import type { PageManifest } from "@superset/shared/usercontent";
+import {
+	type PageManifest,
+	servedVersionOf,
+} from "@superset/shared/usercontent";
 
 export const SWEEP_MS = 30_000;
 export const SILENT_MS = 75_000;
@@ -106,12 +109,7 @@ export function versionMoved(
 	guest: boolean,
 ): boolean {
 	if (!seen) return true;
-	if (guest) {
-		return (
-			(seen.sharedVersion ?? seen.latestVersion) !==
-			(after.sharedVersion ?? after.latestVersion)
-		);
-	}
+	if (guest) return servedVersionOf(seen) !== servedVersionOf(after);
 	return (
 		seen.latestVersion !== after.latestVersion ||
 		seen.sharedVersion !== after.sharedVersion

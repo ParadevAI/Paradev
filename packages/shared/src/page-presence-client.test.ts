@@ -128,6 +128,17 @@ describe("openPagePresence", () => {
 		h.client.stop();
 	});
 
+	test("checks for a missed publish after a reconnect, not on the first connect", async () => {
+		const h = harness();
+		const socket = await h.opened();
+		expect(h.published()).toBe(0);
+		socket.emit("close", { code: 1006 });
+		await until(() => h.sockets.length === 2);
+		h.sockets[1]?.emit("open");
+		expect(h.published()).toBe(1);
+		h.client.stop();
+	});
+
 	test("a dropped socket clears everyone and dials again with a fresh url", async () => {
 		const h = harness();
 		const socket = await h.opened();

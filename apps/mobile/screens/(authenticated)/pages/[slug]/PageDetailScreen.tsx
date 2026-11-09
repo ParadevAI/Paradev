@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { env } from "@/lib/env";
-import { errorCopy } from "@/lib/errors";
+import { errorCopy, isTransportError } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
@@ -99,7 +99,8 @@ export function PageDetailScreen({
 	const loaded = viewUrl !== undefined && loadedSrc === viewUrl;
 	const frameFailed = viewUrl !== undefined && failedSrc === viewUrl;
 	const offline = page.status === "pending" && page.fetchStatus === "paused";
-	const pageError = page.data ? null : page.error;
+	const pageError =
+		page.data && isTransportError(page.error) ? null : page.error;
 
 	const { threads, refetch: refetchComments } = usePageCommentThreads({
 		pageId: pageId ?? "",
