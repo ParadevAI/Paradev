@@ -1345,6 +1345,13 @@
       "when": 1793929228633,
       "tag": "0191_github_installations_multiple_per_org",
       "breakpoints": true
+    },
+    {
+      "idx": 192,
+      "version": "7",
+      "when": 1794194624056,
+      "tag": "0192_chat_storage",
+      "breakpoints": true
     }
   ]
 }

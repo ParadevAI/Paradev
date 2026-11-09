@@ -36,6 +36,13 @@
       "when": 1794151549057,
       "tag": "0004_session_agent_config",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794194559956,
+      "tag": "0005_chat_sync_state",
+      "breakpoints": true
     }
   ]
 }

@@ -11,11 +11,11 @@ import { useMemo } from "react";
 import { HiOutlineComputerDesktop, HiOutlineServer } from "react-icons/hi2";
 import { LuBox, LuContainer, LuCpu } from "react-icons/lu";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
+import type { EnvironmentOption } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import type { MachineSizeOption } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceHostOptions } from "../../../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
-import type { EnvironmentOption } from "../../../DashboardNewWorkspaceForm/PromptGroup/components/EnvironmentPickerPill";
 import type { ProjectOption } from "../../../DashboardNewWorkspaceForm/PromptGroup/types";
 
 const SETTING_MENTION_TRIGGER = "#";
