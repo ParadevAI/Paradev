@@ -82,6 +82,7 @@ export function useSyncChatSessionTabs({
 				...linkedStores.flatMap((linked) => linked.getState().tabs),
 			],
 			workspaceId,
+			openedEmpty: openedEmpty.current === true,
 		});
 		// A workspace opened with no tabs of the user's lands on the newest chat,
 		// not on a setup terminal that was opened for it a moment earlier.

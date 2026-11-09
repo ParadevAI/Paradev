@@ -148,6 +148,30 @@ describe("chatSessionsToAdopt", () => {
 		expect(adopted.at(-1)).toBe(`chat-${CHAT_ADOPT_MAX_LIVE_CHATS + 1}`);
 	});
 
+	it("adopts the newest stopped chat nobody closed when an empty workspace has no live chat", () => {
+		const stopped = [
+			listed("older", { live: false, terminalId: null, updatedAt: NOW - 3 }),
+			listed("newest", { live: false, terminalId: null, updatedAt: NOW - 2 }),
+			listed("closed", { live: false, closedAt: NOW - 1, updatedAt: NOW - 1 }),
+		];
+		const adopt = (
+			sessions: ReturnType<typeof listed>[],
+			openedEmpty: boolean,
+		) =>
+			chatSessionsToAdopt({
+				sessions,
+				tabs: [],
+				workspaceId: WORKSPACE_ID,
+				openedEmpty,
+			}).map((target) => [target.sessionId, target.terminalId]);
+
+		expect(adopt(stopped, true)).toEqual([["newest", "newest"]]);
+		expect(adopt(stopped, false)).toEqual([]);
+		expect(adopt([...stopped, listed("running")], true)).toEqual([
+			["running", "terminal-running"],
+		]);
+	});
+
 	it("skips chats on an ignored terminal, such as a closed tab's or a fork loader's", () => {
 		cleanups.push(ignoreChatTerminal("terminal-stray"));
 		expect(adoptedIds([listed("stray"), listed("other")])).toEqual(["other"]);

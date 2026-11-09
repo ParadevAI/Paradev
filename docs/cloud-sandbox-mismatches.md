@@ -496,6 +496,16 @@ either: gate a new host feature on the version the box reports
 (`health.check`), the same way as a remote host. The chat attachment parts
 floor (`ATTACHMENT_PARTS_MIN_HOST_VERSION`) works like this.
 
+**A box's chats are not live after it wakes.** The desktop opens a tab only
+for a chat a pane already shows, or for a live chat it adopts
+(`chatSessionsToAdopt`). A chat that the CLI, an automation or another box
+started has no pane. When the box sleeps, its harness processes stop, and
+after the wake `listSessions` reports `live: false` with no terminal. So a
+worker that went to sleep before anyone opened it opened blank, and its chat
+could be found only in the history picker. **Fixed:** a workspace that opens
+with no tabs and has no live chat adopts its newest stopped chat with no
+`closedAt` (every close sets it), and the pane resumes the agent session.
+
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
 session length. Vercel's server-side tag filter uses creation-order pagination
