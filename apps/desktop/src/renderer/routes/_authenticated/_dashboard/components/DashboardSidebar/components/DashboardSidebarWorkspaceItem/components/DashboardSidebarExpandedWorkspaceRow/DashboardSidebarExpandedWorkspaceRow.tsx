@@ -41,7 +41,7 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
-import { workspaceRowNeedsAttention } from "./utils/workspaceRowNeedsAttention";
+import { emphasizeWorkspaceRowName } from "./utils/emphasizeWorkspaceRowName";
 
 const PR_STATE_LABEL: Record<
 	DashboardSidebarWorkspacePullRequest["state"],
@@ -69,8 +69,8 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
 	workspace: DashboardSidebarWorkspace;
 	isActive: boolean;
-	/** A manual unread mark, or a terminal in review/failed. */
-	isUnread?: boolean;
+	/** Unread, or an agent waiting on an answer. Emphasizes the name. */
+	needsAttention?: boolean;
 	isRenaming: boolean;
 	renameValue: string;
 	shortcutLabel?: string;
@@ -101,7 +101,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		{
 			workspace,
 			isActive,
-			isUnread = false,
+			needsAttention = false,
 			isRenaming,
 			renameValue,
 			shortcutLabel,
@@ -178,9 +178,8 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 				: sandboxStatus === "provisioning"
 					? t({ message: "Creating the sandbox" })
 					: null;
-		const needsAttention = workspaceRowNeedsAttention({
-			isUnread,
-			workspaceStatus,
+		const isEmphasized = emphasizeWorkspaceRowName({
+			needsAttention,
 			isActive,
 			isSelected,
 			isCreatePending: isPending,
@@ -379,10 +378,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									forceActive={isFocused}
 									className={cn(
 										"min-w-0 text-[13px] leading-tight transition-colors",
-										isActive || isSelected || needsAttention
+										isActive || isSelected || isEmphasized
 											? "text-foreground"
 											: "text-foreground/80",
-										needsAttention ? "font-semibold" : "font-normal",
+										isEmphasized ? "font-semibold" : "font-normal",
 									)}
 								/>
 								{isSelected && (

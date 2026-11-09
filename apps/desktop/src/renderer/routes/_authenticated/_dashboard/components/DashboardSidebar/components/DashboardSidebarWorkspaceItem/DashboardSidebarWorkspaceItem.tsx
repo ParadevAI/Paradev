@@ -81,7 +81,8 @@ export function DashboardSidebarWorkspaceItem({
 					workspace: { id, hostId: workspace.hostId, projectId, name },
 				}
 			: undefined;
-	const { status: workspaceStatus } = useSidebarWorkspaceStatus(id);
+	const { status: workspaceStatus, needsAttention } =
+		useSidebarWorkspaceStatus(id);
 	const {
 		cancelRename,
 		pendingName,
@@ -329,7 +330,7 @@ export function DashboardSidebarWorkspaceItem({
 			<DashboardSidebarExpandedWorkspaceRow
 				workspace={displayWorkspace}
 				isActive={isActive}
-				isUnread={isUnread}
+				needsAttention={needsAttention}
 				isRenaming={isRenaming}
 				renameValue={renameValue}
 				shortcutLabel={shortcutLabel}
