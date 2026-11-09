@@ -162,7 +162,7 @@
 		"@googleapis/gmail": "18.0.0",
 		"@linear/sdk": "68.1.1",
 		"@microsoft/microsoft-graph-client": "3.0.7",
-		"@modelcontextprotocol/sdk": "1.31.0",
+		"@modelcontextprotocol/sdk": "1.32.0",
 		"@notionhq/client": "5.25.2",
 		"@octokit/app": "16.1.2",
 		"@octokit/core": "7.0.8",
@@ -191,7 +191,7 @@
 		"resend": "6.18.0",
 		"superjson": "2.2.6",
 		"undici": "7.30.0",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@microsoft/microsoft-graph-types": "2.43.1",
