@@ -36,6 +36,7 @@ import {
 	broadcastPresence,
 	type PresenceReceiver,
 	type PresentViewer,
+	type SeenVersions,
 	SWEEP_MS,
 	scheduleSweep,
 	sweepSilent,
@@ -58,6 +59,7 @@ interface Pinned {
 	colorSlot?: number;
 	viewerKey?: string;
 	connectedAt?: number;
+	seen?: SeenVersions;
 }
 
 interface PresenceClaims {
@@ -74,6 +76,13 @@ const CALLS_PER_WINDOW = 60;
 const WINDOW_MS = 10_000;
 const MANIFEST_TTL_MS = 60_000;
 const NO_VIEWER = "\u0000";
+
+function seenVersions(manifest: PageManifest): SeenVersions {
+	return {
+		latestVersion: manifest.latestVersion,
+		sharedVersion: manifest.sharedVersion,
+	};
+}
 
 export class PageHub extends Server<RealtimeEnv> {
 	static options = { hibernate: true };
@@ -141,7 +150,6 @@ export class PageHub extends Server<RealtimeEnv> {
 
 	async manifestChanged(): Promise<void> {
 		this.schema();
-		const before = this.manifest;
 		const manifest = await this.readManifest(true);
 		if (!manifest) {
 			this.records.clearAll();
@@ -164,8 +172,13 @@ export class PageHub extends Server<RealtimeEnv> {
 				this.revoke(connection);
 			} else if (
 				pinned.presence &&
-				versionMoved(before, manifest, pinned.guest === true)
+				versionMoved(pinned.seen, manifest, pinned.guest === true)
 			) {
+				connection.setState({
+					...pinned,
+					organizationIds: [...pinned.organizationIds],
+					seen: seenVersions(manifest),
+				});
 				try {
 					connection.send(JSON.stringify({ type: "published" }));
 				} catch {}
@@ -314,6 +327,7 @@ export class PageHub extends Server<RealtimeEnv> {
 				colorSlot: this.colorSlotFor(claims.userId),
 				viewerKey,
 				connectedAt: Date.now(),
+				seen: seenVersions(manifest),
 			});
 		} finally {
 			if (claims.guest) this.connectingGuests--;

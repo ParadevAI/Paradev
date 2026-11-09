@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import type { PagePresenceViewer } from "@superset/shared/page-presence";
-import type { PageManifest } from "@superset/shared/usercontent";
 import {
 	presenceMessage,
+	type SeenVersions,
 	SILENT_MS,
 	sweepSilent,
 	versionMoved,
@@ -80,31 +80,23 @@ describe("sweepSilent", () => {
 });
 
 describe("versionMoved", () => {
-	const manifest = (
+	const seen = (
 		latestVersion: number,
 		sharedVersion: number | null = null,
-	): PageManifest => ({
-		v: 1,
-		pageId: "p",
-		slug: "p",
-		visibility: "everyone",
-		latestVersion,
-		sharedVersion,
-		versions: {},
-	});
+	): SeenVersions => ({ latestVersion, sharedVersion });
 
-	it("tells members about a new version, and nothing about a rewrite", () => {
-		expect(versionMoved(manifest(1), manifest(2), false)).toBe(true);
-		expect(versionMoved(manifest(2), manifest(2), false)).toBe(false);
+	it("tells members when the latest or the shared version moves", () => {
+		expect(versionMoved(seen(1), seen(2), false)).toBe(true);
+		expect(versionMoved(seen(2), seen(2, 1), false)).toBe(true);
+		expect(versionMoved(seen(2, 1), seen(2, 1), false)).toBe(false);
 	});
 
 	it("tells guests only when the version they are served moves", () => {
-		expect(versionMoved(manifest(1, 1), manifest(2, 1), false)).toBe(true);
-		expect(versionMoved(manifest(1, 1), manifest(2, 1), true)).toBe(false);
-		expect(versionMoved(manifest(2, 1), manifest(2, null), true)).toBe(true);
+		expect(versionMoved(seen(1, 1), seen(2, 1), true)).toBe(false);
+		expect(versionMoved(seen(2, 1), seen(2), true)).toBe(true);
 	});
 
-	it("tells everyone when the hub lost what it last read", () => {
-		expect(versionMoved(null, manifest(1), true)).toBe(true);
+	it("tells a socket that joined before baselines were kept", () => {
+		expect(versionMoved(undefined, seen(1), true)).toBe(true);
 	});
 });

@@ -136,9 +136,12 @@ export function PageViewer({
 			: null;
 	}, [resolvedPageId]);
 	const onPublished = useCallback(() => {
-		void utils.page.pull.invalidate();
-		void utils.page.versions.invalidate();
-	}, [utils]);
+		if (!resolvedPageId) return;
+		for (const ref of [{ id: resolvedPageId }, { slug }]) {
+			void utils.page.pull.invalidate(ref);
+			void utils.page.versions.invalidate(ref);
+		}
+	}, [utils, resolvedPageId, slug]);
 	const scrollKey = `${resolvedPageId ?? slug}:${pull.data?.version ?? 0}`;
 
 	const onResolvedRef = useRef(onResolved);
