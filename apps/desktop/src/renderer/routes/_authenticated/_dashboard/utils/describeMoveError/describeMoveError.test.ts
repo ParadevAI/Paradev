@@ -25,6 +25,16 @@ describe("describeMoveError", () => {
 		);
 	});
 
+	test("explains a host too old for the move, keeping the stored text", () => {
+		const raw =
+			'teleport.importChat: No procedure found on path "teleport.importChat"';
+		expect(describeMoveError(raw)).toEqual({
+			reason:
+				"The host this chat moves to runs an older version. Update it, then try again.",
+			details: raw,
+		});
+	});
+
 	test("explains a lost connection", () => {
 		expect(describeMoveError("TypeError: Failed to fetch").reason).toBe(
 			"The connection was lost.",

@@ -19835,6 +19835,9 @@ msgstr "호스트가 업데이트 실패를 보고했습니다."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "다운로드 검증이 끝나면 호스트 서비스가 다시 시작됩니다. 터미널은 자동으로 재연결되며, 새 빌드가 응답할 때까지 이전 빌드가 유지됩니다."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "이 채팅을 옮길 호스트의 버전이 오래되었습니다. 호스트를 업데이트한 후 다시 시도하세요."
+
 msgid "The host went back to its previous build."
 msgstr "호스트가 이전 빌드로 돌아갔습니다."
 
@@ -19885,9 +19888,6 @@ msgstr "머지된 에이전트 PR의 대부분이 사람의 수정 없이 리뷰
 
 msgid "The model declined to continue"
 msgstr "모델이 계속하기를 거부했습니다"
-
-msgid "The move into this workspace failed."
-msgstr "이 워크스페이스로 옮기지 못했습니다."
 
 msgid "The move service couldn't be reached."
 msgstr "옮기기 서비스에 연결할 수 없습니다."

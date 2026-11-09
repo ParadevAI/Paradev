@@ -19835,6 +19835,9 @@ msgstr "Ana makine başarısız bir güncelleme bildirdi."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "İndirme doğrulandıktan sonra ana makine hizmeti yeniden başlar. Terminaller kendiliğinden yeniden bağlanır; yeni derleme yanıt verene kadar önceki derleme korunur."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "Bu sohbetin taşındığı ana makine eski bir sürüm çalıştırıyor. Güncelleyin ve tekrar deneyin."
+
 msgid "The host went back to its previous build."
 msgstr "Ana makine önceki derlemesine geri döndü."
 
@@ -19885,9 +19888,6 @@ msgstr "Birleştirilen ajan PR'larının çoğu yalnızca inceleme gerektirir, h
 
 msgid "The model declined to continue"
 msgstr "Model devam etmeyi reddetti"
-
-msgid "The move into this workspace failed."
-msgstr "Bu çalışma alanına taşıma başarısız oldu."
 
 msgid "The move service couldn't be reached."
 msgstr "Taşıma hizmetine ulaşılamadı."

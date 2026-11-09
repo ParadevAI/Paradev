@@ -19835,6 +19835,9 @@ msgstr "ホストが更新の失敗を報告しました。"
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "ダウンロードの検証後にホストサービスが再起動します。ターミナルは自動的に再接続され、新しいビルドが応答するまで以前のビルドは保持されます。"
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "このチャットの移動先のホストは古いバージョンです。ホストを更新してから、もう一度お試しください。"
+
 msgid "The host went back to its previous build."
 msgstr "ホストは以前のビルドに戻りました。"
 
@@ -19885,9 +19888,6 @@ msgstr "マージされたエージェントのPRの過半数が、レビュー�
 
 msgid "The model declined to continue"
 msgstr "モデルが続行を拒否しました"
-
-msgid "The move into this workspace failed."
-msgstr "このワークスペースへの移動に失敗しました。"
 
 msgid "The move service couldn't be reached."
 msgstr "移動サービスに接続できませんでした。"

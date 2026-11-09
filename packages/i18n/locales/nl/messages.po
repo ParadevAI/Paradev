@@ -19835,6 +19835,9 @@ msgstr "De host meldde een mislukte update."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "De hostservice start opnieuw zodra de download is geverifieerd. Terminals verbinden vanzelf opnieuw; de vorige build blijft bewaard tot de nieuwe antwoordt."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "De host waar deze chat naartoe gaat, draait een oudere versie. Werk hem bij en probeer het opnieuw."
+
 msgid "The host went back to its previous build."
 msgstr "De host is teruggegaan naar de vorige build."
 
@@ -19885,9 +19888,6 @@ msgstr "De meeste gemergede agent-PR's hoeven alleen gereviewd te worden, zonder
 
 msgid "The model declined to continue"
 msgstr "Het model weigerde verder te gaan"
-
-msgid "The move into this workspace failed."
-msgstr "Het verplaatsen naar deze werkruimte is mislukt."
 
 msgid "The move service couldn't be reached."
 msgstr "De verplaatsdienst was niet bereikbaar."

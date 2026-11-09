@@ -19835,6 +19835,9 @@ msgstr "O host relatou uma falha na atualização."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "O serviço de host reinicia assim que o download for verificado. Os terminais reconectam sozinhos; o build anterior é mantido até o novo responder."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "O host para onde este chat está sendo movido usa uma versão mais antiga. Atualize-o e tente novamente."
+
 msgid "The host went back to its previous build."
 msgstr "O host voltou ao build anterior."
 
@@ -19885,9 +19888,6 @@ msgstr "A maioria dos PRs de agentes mesclados precisa só de revisão, sem nenh
 
 msgid "The model declined to continue"
 msgstr "O modelo se recusou a continuar"
-
-msgid "The move into this workspace failed."
-msgstr "A movimentação para esta área de trabalho falhou."
 
 msgid "The move service couldn't be reached."
 msgstr "Não foi possível acessar o serviço de movimentação."

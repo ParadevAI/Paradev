@@ -19835,6 +19835,9 @@ msgstr "Hostitel nahlásil neúspěšnou aktualizaci."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Služba hostitele se restartuje po ověření stažení. Terminály se připojí samy; předchozí sestavení zůstane, dokud nové neodpoví."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "Hostitel, kam se tento chat přesouvá, používá starší verzi. Aktualizujte ho a zkuste to znovu."
+
 msgid "The host went back to its previous build."
 msgstr "Hostitel se vrátil k předchozímu sestavení."
 
@@ -19885,9 +19888,6 @@ msgstr "Většina sloučených PR od agentů potřebuje jen revizi, bez jediné 
 
 msgid "The model declined to continue"
 msgstr "Model odmítl pokračovat"
-
-msgid "The move into this workspace failed."
-msgstr "Přesun do tohoto pracovního prostoru se nezdařil."
 
 msgid "The move service couldn't be reached."
 msgstr "Službu pro přesun se nepodařilo zastihnout."

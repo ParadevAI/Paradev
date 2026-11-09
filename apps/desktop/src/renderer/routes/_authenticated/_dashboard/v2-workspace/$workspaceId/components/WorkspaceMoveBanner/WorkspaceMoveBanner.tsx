@@ -19,7 +19,7 @@ const IN_FLIGHT = new Set(["pending", "moving"]);
 /**
  * Where this workspace's newest move stands: on the workspace it left, that it
  * moved and where to; on the one it moved to, how many chats are still on
- * their way. Each moved chat's own pane shows its progress and retry.
+ * their way. Each moved chat's own pane shows its progress, failure and retry.
  */
 export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 	const { t } = useLingui();
@@ -58,11 +58,8 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 		move.status === "failed" ? describeMoveError(move.error) : null;
 	let label: ReactNode = null;
 	if (failure) {
-		label = isSource ? (
-			<Trans>This workspace couldn't move. It is unchanged.</Trans>
-		) : (
-			<Trans>The move into this workspace failed.</Trans>
-		);
+		if (!isSource) return null;
+		label = <Trans>This workspace couldn't move. It is unchanged.</Trans>;
 	} else if (isSource) {
 		if (inFlight) {
 			label = <Trans>Moving this workspace…</Trans>;
@@ -105,11 +102,6 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 					title={failure ? (failure.details ?? failure.reason) : undefined}
 				>
 					{label}
-					{failure ? (
-						<span className="ml-1.5 font-normal text-muted-foreground">
-							{failure.reason}
-						</span>
-					) : null}
 				</span>
 				{cancellable ? (
 					<button

@@ -19835,6 +19835,9 @@ msgstr "Der Host hat ein fehlgeschlagenes Update gemeldet."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Der Host-Dienst startet neu, sobald der Download geprüft ist. Terminals verbinden sich von selbst wieder; der vorherige Build bleibt erhalten, bis der neue antwortet."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "Der Host, auf den dieser Chat verschoben wird, hat eine ältere Version. Aktualisiere ihn und versuche es dann erneut."
+
 msgid "The host went back to its previous build."
 msgstr "Der Host ist auf seinen vorherigen Build zurückgegangen."
 
@@ -19885,9 +19888,6 @@ msgstr "Die Mehrheit der gemergten Agenten-PRs braucht nur Review, ohne menschli
 
 msgid "The model declined to continue"
 msgstr "Das Modell hat abgelehnt weiterzumachen"
-
-msgid "The move into this workspace failed."
-msgstr "Das Verschieben in diesen Arbeitsbereich ist fehlgeschlagen."
 
 msgid "The move service couldn't be reached."
 msgstr "Der Dienst zum Verschieben war nicht erreichbar."

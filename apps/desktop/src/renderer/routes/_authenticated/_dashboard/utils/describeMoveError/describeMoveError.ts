@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { MOVE_STOPPED_ANSWERING } from "@superset/shared/move-book";
 
 export interface MoveErrorDescription {
@@ -43,6 +44,17 @@ export function describeMoveError(raw: string | null): MoveErrorDescription {
 	) {
 		return {
 			reason: i18n._(msg({ message: "The move service couldn't be reached." })),
+			details: text,
+		};
+	}
+	if (isMissingProcedureError({ message: text })) {
+		return {
+			reason: i18n._(
+				msg({
+					message:
+						"The host this chat moves to runs an older version. Update it, then try again.",
+				}),
+			),
 			details: text,
 		};
 	}

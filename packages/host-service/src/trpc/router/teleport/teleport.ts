@@ -226,7 +226,7 @@ export const teleportRouter = router({
 					}
 					chatSync.follow(session.sessionId);
 					followed.push(session.sessionId);
-					await withStage(async (stageDir) => {
+					const collected = await withStage(async (stageDir) => {
 						const manifest = await session.provider.collect({
 							harnessSessionId: session.harnessSessionId,
 							worktreePath,
@@ -242,6 +242,7 @@ export const teleportRouter = router({
 									},
 								}),
 						});
+						if (!manifest) return false;
 						await uploadBundle({
 							api: ctx.api,
 							chatSessionId: session.sessionId,
@@ -249,7 +250,18 @@ export const teleportRouter = router({
 							manifest,
 							stageDir,
 						});
+						return true;
 					});
+					if (!collected) {
+						chatSync.forget(session.sessionId);
+						followed.pop();
+						skipped.push({
+							chatSessionId: session.sessionId,
+							title: session.title,
+							reason: "not_started",
+						});
+						continue;
+					}
 					prepared.push({
 						chatSessionId: session.sessionId,
 						harnessSessionId: session.harnessSessionId,

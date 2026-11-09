@@ -19835,6 +19835,9 @@ msgstr "The host reported a failed update."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "The host this chat moves to runs an older version. Update it, then try again."
+
 msgid "The host went back to its previous build."
 msgstr "The host went back to its previous build."
 
@@ -19885,9 +19888,6 @@ msgstr "The majority of merged agent PRs need review only, with zero human edits
 
 msgid "The model declined to continue"
 msgstr "The model declined to continue"
-
-msgid "The move into this workspace failed."
-msgstr "The move into this workspace failed."
 
 msgid "The move service couldn't be reached."
 msgstr "The move service couldn't be reached."

@@ -19829,6 +19829,9 @@ msgstr "Хост повідомив про невдале оновлення."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Служба хоста перезапуститься, щойно завантаження буде перевірено. Термінали під'єднаються знову самі; попередня збірка зберігається, доки нова не відповість."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "На хості, куди переноситься цей чат, встановлено старішу версію. Оновіть його й спробуйте ще раз."
+
 msgid "The host went back to its previous build."
 msgstr "Хост повернувся до попередньої збірки."
 
@@ -19879,9 +19882,6 @@ msgstr "Більшість злитих PR від агентів потребу�
 
 msgid "The model declined to continue"
 msgstr "Модель відмовилася продовжувати"
-
-msgid "The move into this workspace failed."
-msgstr "Перенесення в цей робочий простір не вдалося."
 
 msgid "The move service couldn't be reached."
 msgstr "Сервіс перенесення недоступний."

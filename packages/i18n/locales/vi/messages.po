@@ -19835,6 +19835,9 @@ msgstr "Máy chủ báo cáo cập nhật thất bại."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Dịch vụ máy chủ sẽ khởi động lại sau khi xác minh bản tải xuống. Các terminal tự kết nối lại; bản dựng cũ được giữ cho đến khi bản mới phản hồi."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "Máy chủ mà cuộc trò chuyện này được chuyển đến đang chạy phiên bản cũ hơn. Hãy cập nhật rồi thử lại."
+
 msgid "The host went back to its previous build."
 msgstr "Máy chủ đã quay lại bản dựng trước."
 
@@ -19885,9 +19888,6 @@ msgstr "Phần lớn PR của agent được merge chỉ cần review, không c�
 
 msgid "The model declined to continue"
 msgstr "Mô hình đã từ chối tiếp tục"
-
-msgid "The move into this workspace failed."
-msgstr "Chuyển vào không gian làm việc này không thành công."
 
 msgid "The move service couldn't be reached."
 msgstr "Không thể kết nối với dịch vụ chuyển."

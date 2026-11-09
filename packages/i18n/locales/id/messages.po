@@ -19835,6 +19835,9 @@ msgstr "Host melaporkan pembaruan yang gagal."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Layanan host dimulai ulang setelah unduhan diverifikasi. Terminal tersambung kembali sendiri; build sebelumnya disimpan sampai yang baru merespons."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "Host tujuan chat ini menjalankan versi lama. Perbarui host tersebut, lalu coba lagi."
+
 msgid "The host went back to its previous build."
 msgstr "Host kembali ke build sebelumnya."
 
@@ -19885,9 +19888,6 @@ msgstr "Mayoritas PR agen yang di-merge hanya perlu direview, tanpa suntingan ma
 
 msgid "The model declined to continue"
 msgstr "Model menolak untuk melanjutkan"
-
-msgid "The move into this workspace failed."
-msgstr "Pemindahan ke workspace ini gagal."
 
 msgid "The move service couldn't be reached."
 msgstr "Layanan pemindahan tidak dapat dijangkau."

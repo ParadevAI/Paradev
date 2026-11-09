@@ -19835,6 +19835,9 @@ msgstr "L'hôte a signalé un échec de la mise à jour."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Le service d'hôte redémarre une fois le téléchargement vérifié. Les terminaux se reconnectent d'eux-mêmes ; la version précédente est conservée jusqu'à ce que la nouvelle réponde."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "L'hôte vers lequel ce chat est déplacé utilise une version plus ancienne. Mettez-le à jour, puis réessayez."
+
 msgid "The host went back to its previous build."
 msgstr "L'hôte est revenu à sa version précédente."
 
@@ -19885,9 +19888,6 @@ msgstr "La majorité des PR d'agents fusionnées ne demandent qu'une revue, sans
 
 msgid "The model declined to continue"
 msgstr "Le modèle a refusé de continuer"
-
-msgid "The move into this workspace failed."
-msgstr "Le déplacement vers cet espace de travail a échoué."
 
 msgid "The move service couldn't be reached."
 msgstr "Le service de déplacement est injoignable."

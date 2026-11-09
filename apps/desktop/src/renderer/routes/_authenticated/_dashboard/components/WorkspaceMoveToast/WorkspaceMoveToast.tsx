@@ -27,8 +27,12 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 	if (!move) return null;
 	const ended = ENDED.has(move.stage);
 	const { name, destination } = move;
+	// Chats that did not arrive show their own reason in their pane.
 	const failure =
-		move.stage === "failed" ? describeMoveError(move.error) : null;
+		move.stage === "failed" && move.failedDuring !== "moving-chats"
+			? describeMoveError(move.error)
+			: null;
+	const retry = failure ? move.retry : null;
 
 	const title =
 		move.stage === "failed"
@@ -64,7 +68,7 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 			<p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
 				{failure ? failure.reason : describe(move, t)}
 			</p>
-			{move.stage === "failed" && (
+			{failure && (
 				<p className="mt-1 text-xs text-muted-foreground">
 					{describeOutcome(move, t)}
 				</p>
@@ -80,16 +84,15 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 			{!ended && (
 				<Progress className="mt-3 h-1.5" value={progressPercent(move)} />
 			)}
-			{((move.cancel && CANCELLABLE.has(move.stage)) ||
-				(move.retry && move.stage === "failed")) && (
+			{((move.cancel && CANCELLABLE.has(move.stage)) || retry) && (
 				<div className="mt-3 flex justify-end gap-2">
 					{move.cancel && CANCELLABLE.has(move.stage) && (
 						<Button size="sm" variant="outline" onClick={move.cancel}>
 							<Trans>Cancel move</Trans>
 						</Button>
 					)}
-					{move.retry && move.stage === "failed" && (
-						<Button size="sm" onClick={move.retry}>
+					{retry && (
+						<Button size="sm" onClick={retry}>
 							<Trans>Try again</Trans>
 						</Button>
 					)}
@@ -117,11 +120,6 @@ function describeOutcome(
 	t: ReturnType<typeof useLingui>["t"],
 ): string {
 	const { name } = move;
-	if (move.failedDuring === "moving-chats") {
-		return t({
-			message: "Chats that didn't move are still in the original workspace.",
-		});
-	}
 	if (move.failedDuring === "creating") {
 		return t({
 			message: `${name} is unchanged. If an agent was working, it was stopped.`,
@@ -164,6 +162,9 @@ function describe(
 					"Open the new workspace to see each chat. A chat that didn't move is still in the original workspace.",
 			});
 		case "failed":
-			return describeMoveError(move.error).reason;
+			return t({
+				message:
+					"Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again.",
+			});
 	}
 }

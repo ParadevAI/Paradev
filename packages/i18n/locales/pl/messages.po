@@ -19835,6 +19835,9 @@ msgstr "Host zgłosił nieudaną aktualizację."
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "Usługa hosta uruchomi się ponownie po zweryfikowaniu pobrania. Terminale połączą się same; poprzednia kompilacja jest zachowana, dopóki nowa nie odpowie."
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "Host, do którego przenoszony jest ten czat, ma starszą wersję. Zaktualizuj go i spróbuj ponownie."
+
 msgid "The host went back to its previous build."
 msgstr "Host wrócił do poprzedniej kompilacji."
 
@@ -19885,9 +19888,6 @@ msgstr "Większość scalonych PR-ów od agentów wymaga tylko przeglądu, bez �
 
 msgid "The model declined to continue"
 msgstr "Model odmówił kontynuowania"
-
-msgid "The move into this workspace failed."
-msgstr "Przenoszenie do tego obszaru roboczego nie powiodło się."
 
 msgid "The move service couldn't be reached."
 msgstr "Nie udało się połączyć z usługą przenoszenia."

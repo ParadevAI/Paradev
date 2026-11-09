@@ -19835,6 +19835,9 @@ msgstr "主机报告更新失败。"
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "下载校验完成后主机服务会重启。终端会自动重连；在新版本响应之前会保留之前的版本。"
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "此聊天要移入的主机运行的是旧版本。请先更新，然后重试。"
+
 msgid "The host went back to its previous build."
 msgstr "主机已回退到之前的版本。"
 
@@ -19885,9 +19888,6 @@ msgstr "多数已合并的智能体PR只需审查，无需任何人工修改。"
 
 msgid "The model declined to continue"
 msgstr "模型拒绝继续"
-
-msgid "The move into this workspace failed."
-msgstr "移动到此工作区失败。"
 
 msgid "The move service couldn't be reached."
 msgstr "无法连接移动服务。"

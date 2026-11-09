@@ -47,14 +47,17 @@ export function parseBundleManifest(value: unknown): BundleManifest | null {
  */
 export type TeleportProvider = {
 	harnesses: readonly string[];
-	/** Copies the session's files into `stageDir`; returns what `place` needs. */
+	/**
+	 * Copies the session's files into `stageDir`; returns what `place` needs,
+	 * or null when the agent has not written its session yet.
+	 */
 	collect(input: {
 		harnessSessionId: string;
 		worktreePath: string;
 		env: HarnessEnv;
 		locate: () => Promise<string | null>;
 		stageDir: string;
-	}): Promise<BundleManifest>;
+	}): Promise<BundleManifest | null>;
 	/** Puts the files from `stageDir` where the agent looks, paths rewritten. */
 	place(input: {
 		manifest: BundleManifest;

@@ -19835,6 +19835,9 @@ msgstr "主機回報更新失敗。"
 msgid "The host service restarts once the download is verified. Terminals reconnect on their own; the previous build is kept until the new one answers."
 msgstr "下載驗證完成後主機服務會重新啟動。終端機會自動重新連線；在新版本回應之前會保留先前的版本。"
 
+msgid "The host this chat moves to runs an older version. Update it, then try again."
+msgstr "此聊天要移入的主機執行的是舊版本。請先更新，然後再試一次。"
+
 msgid "The host went back to its previous build."
 msgstr "主機已回退到先前的版本。"
 
@@ -19885,9 +19888,6 @@ msgstr "多數已合併的代理程式PR只需審查，無需任何人工修改�
 
 msgid "The model declined to continue"
 msgstr "模型拒絕繼續"
-
-msgid "The move into this workspace failed."
-msgstr "移動到此工作區失敗。"
 
 msgid "The move service couldn't be reached."
 msgstr "無法連線到移動服務。"
