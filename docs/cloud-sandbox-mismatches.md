@@ -216,6 +216,16 @@ never tries to renew) written with the identity on every create and wake; the
 firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
 including a forced rotation while it ran.
 
+An hourly QStash job (`/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins`)
+renews every session near expiry, also with no box running, and re-applies
+the rules on the running boxes of every sign-in saved in the last three
+hours. Not yet verified on a real box. Only a refusal that names a dead
+session (`refresh_token_expired`, `refresh_token_reused`,
+`refresh_token_invalidated`, `invalid_grant`) removes the sign-in; any other
+failure keeps it and goes to Sentry, tagged `chatgpt_refresh_code`. **Open:** Codex in the box cannot recover
+from a 401 by itself: it refreshes with the placeholder against
+`auth.openai.com`, which nothing swaps, and asks the person to sign in again.
+
 **Some people keep the agent signed in themselves.** The brokering above assumes Paradev owns the
 model credential. Some teams run their own script that rotates Claude or Codex logins, and our
 placeholder overrides it: `CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY` take precedence over
