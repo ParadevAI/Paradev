@@ -12,7 +12,6 @@ interface ChangesListHeaderProps {
 	onToggleFold: () => void;
 }
 
-/** A changed-file list's top row: an always-open search and the view menu. */
 export function ChangesListHeader({
 	query,
 	onQueryChange,

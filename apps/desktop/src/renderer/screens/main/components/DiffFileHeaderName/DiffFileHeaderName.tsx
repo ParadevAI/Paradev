@@ -1,4 +1,4 @@
-import { splitPath } from "./utils/splitPath";
+import { splitPath } from "renderer/lib/splitPath";
 
 interface DiffFileHeaderNameProps {
 	path: string;

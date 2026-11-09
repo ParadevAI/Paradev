@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
-import { useDeferredValue, useMemo, useState } from "react";
+import { memo, useDeferredValue, useMemo, useState } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { ChangedFileFolderList } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileFolderList";
 import { ChangedFileRow } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileRow";
@@ -16,28 +16,22 @@ export interface PullRequestFileListEntry extends ChangedFileEntry {
 
 interface PullRequestFileListProps {
 	files: PullRequestFileListEntry[];
-	/** Last file the reviewer jumped to; highlighted in the folder view. */
 	selectedPath: string | null;
 	onSelectFile: (path: string) => void;
-	initialTreeExpansion: "open" | "closed";
+	startCollapsed: boolean;
 }
 
 const getPath = (file: PullRequestFileListEntry) => file.path;
 
-/**
- * The PR Code tab's file list, styled like the workspace Changes pane: search,
- * a Folder/Tree view menu, and expand/collapse all. The view mode is the same
- * preference the Changes pane uses.
- */
-export function PullRequestFileList({
+export const PullRequestFileList = memo(function PullRequestFileList({
 	files,
 	selectedPath,
 	onSelectFile,
-	initialTreeExpansion,
+	startCollapsed,
 }: PullRequestFileListProps) {
 	const { preferences, setChangesViewMode } = useV2UserPreferences();
 	const viewMode = preferences.changesViewMode;
-	const { foldSignal, collapsed, toggleFold } = useFoldSignal();
+	const { foldSignal, collapsed, toggleFold } = useFoldSignal(startCollapsed);
 	const [query, setQuery] = useState("");
 	const deferredQuery = useDeferredValue(query);
 	const visibleFiles = useMemo(
@@ -64,7 +58,7 @@ export function PullRequestFileList({
 					<PullRequestFileTree
 						files={visibleFiles}
 						foldSignal={foldSignal}
-						initialExpansion={initialTreeExpansion}
+						selectedPath={selectedPath}
 						onSelectFile={onSelectFile}
 					/>
 				</div>
@@ -95,4 +89,4 @@ export function PullRequestFileList({
 			)}
 		</div>
 	);
-}
+});

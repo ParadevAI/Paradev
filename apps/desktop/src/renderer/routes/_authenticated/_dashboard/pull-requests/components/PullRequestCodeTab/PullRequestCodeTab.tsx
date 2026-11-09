@@ -108,9 +108,8 @@ const DEFAULT_TREE_WIDTH = 288;
 const MIN_TREE_WIDTH = 200;
 const MAX_TREE_WIDTH = 560;
 
-// Below this window width a fully expanded tree view takes more room than
-// the split can spare, so it starts collapsed. Pierre fixes initialExpansion
-// when the tree is created, so this reads window.innerWidth once at mount.
+// Below this window width the file list starts with its folders collapsed.
+// Read once at mount, so a later resize never overrides the reviewer's folds.
 const NARROW_WINDOW_WIDTH_THRESHOLD = 1400;
 // Below this (stricter) *pane* width — this tab's own rendered width, via
 // ResizeObserver, not the window's — even a collapsed-folders tree panel is
@@ -195,8 +194,8 @@ export function PullRequestCodeTab({
 	const { options, style: codeViewStyle } = useDiffCardCodeViewTheme();
 	const codeViewRef =
 		useRef<CodeViewHandle<PrAnnotationMetadata, undefined>>(null);
-	const [initialTreeExpansion] = useState<"open" | "closed">(() =>
-		window.innerWidth < NARROW_WINDOW_WIDTH_THRESHOLD ? "closed" : "open",
+	const [startTreeCollapsed] = useState(
+		() => window.innerWidth < NARROW_WINDOW_WIDTH_THRESHOLD,
 	);
 	// Tracks this tab's own rendered width, not the window's — the PR list
 	// pane, an app sidebar, or a split view can all make the detail pane
@@ -683,17 +682,20 @@ export function PullRequestCodeTab({
 		() => new Map(files.map((f) => [f.path, f.item.id])),
 		[files],
 	);
-	const selectFile = (path: string) => {
-		const itemId = itemIdByPath.get(path);
-		if (!itemId) return;
-		setSelectedFilePath(path);
-		codeViewRef.current?.scrollTo({
-			type: "item",
-			id: itemId,
-			align: "start",
-			behavior: "smooth-auto",
-		});
-	};
+	const selectFile = useCallback(
+		(path: string) => {
+			const itemId = itemIdByPath.get(path);
+			if (!itemId) return;
+			setSelectedFilePath(path);
+			codeViewRef.current?.scrollTo({
+				type: "item",
+				id: itemId,
+				align: "start",
+				behavior: "smooth-auto",
+			});
+		},
+		[itemIdByPath],
+	);
 
 	if (isLoading) {
 		return (
@@ -759,24 +761,23 @@ export function PullRequestCodeTab({
 			)}
 		>
 			<div className="flex min-h-0 flex-1 overflow-hidden">
-				{!isTreeCollapsed && (
-					<ResizablePanel
-						width={treeWidth}
-						onWidthChange={setTreeWidth}
-						minWidth={MIN_TREE_WIDTH}
-						maxWidth={MAX_TREE_WIDTH}
-						handleSide="right"
-						onDoubleClickHandle={() => setTreeWidth(DEFAULT_TREE_WIDTH)}
-						className="flex flex-col"
-					>
-						<PullRequestFileList
-							files={files}
-							selectedPath={selectedFilePath}
-							onSelectFile={selectFile}
-							initialTreeExpansion={initialTreeExpansion}
-						/>
-					</ResizablePanel>
-				)}
+				{/* Hidden, not unmounted, so search and folds survive the toggle. */}
+				<ResizablePanel
+					width={treeWidth}
+					onWidthChange={setTreeWidth}
+					minWidth={MIN_TREE_WIDTH}
+					maxWidth={MAX_TREE_WIDTH}
+					handleSide="right"
+					onDoubleClickHandle={() => setTreeWidth(DEFAULT_TREE_WIDTH)}
+					className={cn("flex flex-col", isTreeCollapsed && "hidden")}
+				>
+					<PullRequestFileList
+						files={files}
+						selectedPath={selectedFilePath}
+						onSelectFile={selectFile}
+						startCollapsed={startTreeCollapsed}
+					/>
+				</ResizablePanel>
 				<div className="flex min-h-0 flex-1 flex-col">
 					<DiffViewToolbar
 						tree={{

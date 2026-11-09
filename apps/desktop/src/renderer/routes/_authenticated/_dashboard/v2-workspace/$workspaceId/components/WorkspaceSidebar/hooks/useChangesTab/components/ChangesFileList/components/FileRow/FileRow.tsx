@@ -35,6 +35,7 @@ import {
 	modifierLabel,
 	useChangesSidebarFilePolicy,
 } from "renderer/lib/clickPolicy";
+import { splitPath } from "renderer/lib/splitPath";
 import { ChangedFileRow } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileRow";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
 import { PathActionsMenuItems } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/PathActionsMenuItems";
@@ -71,7 +72,7 @@ export const FileRow = memo(function FileRow({
 	onOpenInEditor,
 }: FileRowProps) {
 	const { t } = useLingui();
-	const basename = file.path.slice(file.path.lastIndexOf("/") + 1);
+	const basename = splitPath(file.path).name;
 	const isRename = file.status === "renamed" || file.status === "copied";
 	const absolutePath = worktreePath
 		? toAbsoluteWorkspacePath(worktreePath, file.path)
@@ -121,7 +122,7 @@ export const FileRow = memo(function FileRow({
 				deletions={file.deletions}
 				hideDir={hideDir}
 				isSelected={isSelected}
-				hasHoverActions
+				hideStatsOnHover
 				{...fileDrag}
 				onClick={(e) => {
 					const intent = policy.getIntent(e);

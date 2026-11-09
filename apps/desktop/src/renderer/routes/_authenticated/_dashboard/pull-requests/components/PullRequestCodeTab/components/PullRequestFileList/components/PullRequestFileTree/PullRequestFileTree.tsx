@@ -13,25 +13,44 @@ const TREE_STYLE = createPierreTreeStyle({
 interface PullRequestFileTreeProps {
 	files: ChangedFileEntry[];
 	foldSignal: FoldSignal;
-	initialExpansion: "open" | "closed";
+	selectedPath: string | null;
 	onSelectFile: (path: string) => void;
 }
 
 export function PullRequestFileTree({
 	files,
 	foldSignal,
-	initialExpansion,
+	selectedPath,
 	onSelectFile,
 }: PullRequestFileTreeProps) {
-	const { model } = useChangedFilesTree({
+	const { model, fileByTreePath } = useChangedFilesTree({
 		files,
 		foldSignal,
-		initialExpansion,
-		// PR diffs nest deep; one row per single-child folder chain keeps names readable.
+		initialSelectedPath: selectedPath ?? undefined,
 		flattenEmptyDirectories: true,
 		onSelectFile: (file) => onSelectFile(file.path),
 	});
+
+	// Pierre ignores a click on the row that is already selected, which would
+	// drop "click again to jump back to this file".
+	const onClickCapture = (e: React.MouseEvent) => {
+		if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+			return;
+		const row = e.nativeEvent
+			.composedPath()
+			.find(
+				(node): node is HTMLElement =>
+					node instanceof HTMLElement && node.hasAttribute("data-item-path"),
+			);
+		const treePath = row?.getAttribute("data-item-path");
+		if (!treePath || model.getItem(treePath)?.isSelected() !== true) return;
+		const file = fileByTreePath.get(treePath);
+		if (file) onSelectFile(file.path);
+	};
+
 	return (
-		<PierreFileTree model={model} style={{ ...TREE_STYLE, height: "100%" }} />
+		<div className="h-full" onClickCapture={onClickCapture}>
+			<PierreFileTree model={model} style={{ ...TREE_STYLE, height: "100%" }} />
+		</div>
 	);
 }

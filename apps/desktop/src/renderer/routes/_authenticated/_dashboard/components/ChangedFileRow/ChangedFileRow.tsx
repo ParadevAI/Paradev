@@ -1,31 +1,23 @@
+import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import type { ComponentProps } from "react";
 import { FileIcon } from "renderer/lib/fileIcons";
-import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/DiffStatText";
-import { StatusIndicator } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/StatusIndicator";
+import type { FileStatus } from "renderer/lib/pierreTree";
+import { splitPath } from "renderer/lib/splitPath";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
+import { StatusIndicator } from "renderer/routes/_authenticated/_dashboard/components/StatusIndicator";
+import { renameSourceLabel } from "./utils/renameSourceLabel";
 
 interface ChangedFileRowProps
 	extends Omit<ComponentProps<"button">, "children" | "className" | "type"> {
 	path: string;
-	/** Pre-rename path; its basename shows as "old → new". */
 	oldPath?: string;
-	status: string;
+	status: FileStatus;
 	additions: number | null;
 	deletions: number | null;
-	/** Drop the directory prefix when the row sits under a folder header. */
 	hideDir?: boolean;
 	isSelected?: boolean;
-	/** Hide the stats on hover so actions overlaid on the row end can show. */
-	hasHoverActions?: boolean;
-}
-
-function splitPath(path: string): { dir: string; basename: string } {
-	const lastSlash = path.lastIndexOf("/");
-	if (lastSlash < 0) return { dir: "", basename: path };
-	return {
-		dir: `${path.slice(0, lastSlash)}/`,
-		basename: path.slice(lastSlash + 1),
-	};
+	hideStatsOnHover?: boolean;
 }
 
 export function ChangedFileRow({
@@ -36,12 +28,14 @@ export function ChangedFileRow({
 	deletions,
 	hideDir,
 	isSelected,
-	hasHoverActions,
+	hideStatsOnHover,
 	...buttonProps
 }: ChangedFileRowProps) {
-	const { dir: fullDir, basename } = splitPath(path);
-	const dir = hideDir ? "" : fullDir;
-	const oldBasename = oldPath ? splitPath(oldPath).basename : null;
+	const { t } = useLingui();
+	const { dir, name } = splitPath(path);
+	const oldLabel = oldPath
+		? renameSourceLabel(path, oldPath) || t({ message: "./" })
+		: null;
 	return (
 		<button
 			type="button"
@@ -51,23 +45,27 @@ export function ChangedFileRow({
 			)}
 			{...buttonProps}
 		>
-			<FileIcon fileName={basename} className="size-3.5 shrink-0" />
+			<FileIcon fileName={name} className="size-3.5 shrink-0" />
 			<span className="flex min-w-0 flex-1 items-baseline overflow-hidden">
-				{dir && <span className="truncate text-muted-foreground">{dir}</span>}
-				{oldBasename && (
-					<span className="truncate text-muted-foreground">
-						{oldBasename}
-						<span className="px-1">→</span>
-					</span>
+				{dir && !hideDir && (
+					<span className="truncate text-muted-foreground">{dir}</span>
+				)}
+				{oldLabel && (
+					<>
+						<span className="min-w-8 truncate text-muted-foreground" dir="rtl">
+							<span dir="ltr">{oldLabel}</span>
+						</span>
+						<span className="shrink-0 px-1 text-muted-foreground">→</span>
+					</>
 				)}
 				<span className="min-w-[120px] truncate font-medium text-foreground">
-					{basename}
+					{name}
 				</span>
 			</span>
 			<span
 				className={cn(
 					"ml-auto flex shrink-0 items-center gap-1.5",
-					hasHoverActions &&
+					hideStatsOnHover &&
 						"group-hover:invisible group-has-[[data-state=open]]:invisible",
 				)}
 			>

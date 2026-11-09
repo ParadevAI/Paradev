@@ -15,8 +15,9 @@ import {
 	type PierreGitStatusEntry,
 	stripTrailingSlash,
 } from "renderer/lib/pierreTree";
-import type { FoldSignal } from "../useFoldSignal";
+import { type FoldSignal, isFoldCollapsed } from "../useFoldSignal";
 import { buildTreeShape } from "./utils/buildTreeShape";
+import { expandedDirs, recordExpansion } from "./utils/carryExpansion";
 
 const ITEM_HEIGHT = 24;
 
@@ -29,12 +30,10 @@ export interface ChangedFileEntry {
 
 interface UseChangedFilesTreeParams<T extends ChangedFileEntry> {
 	files: T[];
-	/** Bumped by an expand-all / collapse-all control. */
 	foldSignal: FoldSignal;
 	onSelectFile: (file: T) => void;
-	initialExpansion?: "open" | "closed";
+	initialSelectedPath?: string;
 	flattenEmptyDirectories?: boolean;
-	/** Appended to the shared tree CSS. */
 	unsafeCSS?: string;
 }
 
@@ -43,12 +42,16 @@ interface UseChangedFilesTreeParams<T extends ChangedFileEntry> {
  * files, file counts on directories, fallthrough icons, and fold signals.
  * Pierre throws on a path that is both a file and a directory, so colliding
  * files get disambiguated tree paths; `toRealPath` maps them back.
+ *
+ * Pierre's `resetPaths` rebuilds the tree from its creation options, so each
+ * folder's expansion is carried across resets here; a folder not seen before
+ * follows the last fold action.
  */
 export function useChangedFilesTree<T extends ChangedFileEntry>({
 	files,
 	foldSignal,
 	onSelectFile,
-	initialExpansion = "open",
+	initialSelectedPath,
 	flattenEmptyDirectories,
 	unsafeCSS = "",
 }: UseChangedFilesTreeParams<T>) {
@@ -62,11 +65,27 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 			map.set(toTreePath.get(file.path) ?? file.path, file);
 		return map;
 	}, [files, toTreePath]);
-	const { dirs, dirFileCount } = useMemo(
+	const { dirs, dirFileCount, chainDirs } = useMemo(
 		() => buildTreeShape(treePaths),
 		[treePaths],
 	);
-	const [initialGitStatus] = useState(() => buildGitStatus(files, toTreePath));
+
+	const expansionRef = useRef({
+		known: new Map<string, boolean>(),
+		defaultOpen: !isFoldCollapsed(foldSignal),
+	});
+	const [initial] = useState(() => {
+		const selected =
+			initialSelectedPath == null
+				? undefined
+				: (toTreePath.get(initialSelectedPath) ?? initialSelectedPath);
+		return {
+			gitStatus: buildGitStatus(files, toTreePath),
+			expandedPaths: expansionRef.current.defaultOpen ? dirs : [],
+			selectedPaths:
+				selected && fileByTreePath.has(selected) ? [selected] : undefined,
+		};
+	});
 
 	// Pierre resolves its handlers once at creation; the ref keeps them current.
 	const handlersRef = useRef({
@@ -80,11 +99,13 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 
 	const { model } = useFileTree({
 		paths: treePaths,
-		initialExpansion,
+		initialExpansion: "closed",
+		initialExpandedPaths: initial.expandedPaths,
+		initialSelectedPaths: initial.selectedPaths,
 		flattenEmptyDirectories,
 		search: false,
 		unsafeCSS: PIERRE_TREE_UNSAFE_CSS + unsafeCSS,
-		gitStatus: initialGitStatus,
+		gitStatus: initial.gitStatus,
 		icons: { set: "complete", colored: true },
 		itemHeight: ITEM_HEIGHT,
 		overscan: 20,
@@ -97,9 +118,40 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
 	});
 
+	const isDirExpanded = useCallback(
+		(dir: string) => {
+			const handle = model.getItem(`${dir}/`);
+			return handle?.isDirectory() === true
+				? (handle as FileTreeDirectoryHandle).isExpanded()
+				: undefined;
+		},
+		[model],
+	);
+
+	const shapeRef = useRef({ treePaths, dirs, chainDirs });
 	useEffect(() => {
-		model.resetPaths(treePaths);
-	}, [model, treePaths]);
+		const previous = shapeRef.current;
+		if (previous.treePaths === treePaths) return;
+		const { known, defaultOpen } = expansionRef.current;
+		const flattened = flattenEmptyDirectories === true;
+		recordExpansion(previous, isDirExpanded, known, flattened);
+		model.resetPaths(treePaths, {
+			initialExpandedPaths: expandedDirs(
+				{ dirs, chainDirs },
+				known,
+				defaultOpen,
+				flattened,
+			),
+		});
+		shapeRef.current = { treePaths, dirs, chainDirs };
+	}, [
+		model,
+		treePaths,
+		dirs,
+		chainDirs,
+		isDirExpanded,
+		flattenEmptyDirectories,
+	]);
 
 	useEffect(() => {
 		model.setGitStatus(buildGitStatus(files, toTreePath));
@@ -107,27 +159,20 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 
 	useFallthroughIcons(model);
 
-	const setAllDirsExpanded = useCallback(
-		(expanded: boolean) => {
-			for (const dir of dirs) {
-				const handle = model.getItem(`${dir}/`);
-				if (handle?.isDirectory() !== true) continue;
-				const dirHandle = handle as FileTreeDirectoryHandle;
-				if (dirHandle.isExpanded() === expanded) continue;
-				if (expanded) dirHandle.expand();
-				else dirHandle.collapse();
-			}
-		},
-		[model, dirs],
-	);
-
-	const lastFoldEpochRef = useRef(0);
+	const lastFoldEpochRef = useRef(foldSignal.epoch);
 	useEffect(() => {
-		if (foldSignal.epoch === 0 || foldSignal.epoch === lastFoldEpochRef.current)
-			return;
+		if (foldSignal.epoch === lastFoldEpochRef.current) return;
 		lastFoldEpochRef.current = foldSignal.epoch;
-		setAllDirsExpanded(foldSignal.action === "expand");
-	}, [foldSignal, setAllDirsExpanded]);
+		const expand = foldSignal.action === "expand";
+		expansionRef.current = { known: new Map(), defaultOpen: expand };
+		for (const dir of dirs) {
+			const expanded = isDirExpanded(dir);
+			if (expanded === undefined || expanded === expand) continue;
+			const handle = model.getItem(`${dir}/`) as FileTreeDirectoryHandle;
+			if (expand) handle.expand();
+			else handle.collapse();
+		}
+	}, [foldSignal, dirs, model, isDirExpanded]);
 
 	handlersRef.current.onSelect = (treePath) => {
 		const file = fileByTreePath.get(treePath);

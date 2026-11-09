@@ -1,7 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 
 interface FolderHeaderProps {
-	/** Display label — a folder path like "src/components", or "Root Path". */
+	/** A folder path like "src/components", or "./" for the root. */
 	label: string;
 	fileCount: number;
 	isOpen: boolean;
@@ -31,9 +31,10 @@ export function FolderHeader({
 					aria-expanded={isOpen}
 					className="flex w-full items-center gap-1.5 py-1 pr-3 pl-3 text-left text-xs text-muted-foreground hover:bg-accent/30"
 				>
-					{/* `dir="rtl"` right-truncates long paths so the deepest segment stays visible. */}
+					{/* `dir="rtl"` cuts long paths from the left so the deepest segment stays
+					    visible; the inner `dir="ltr"` keeps edge `.` and `/` in place. */}
 					<span className="min-w-0 flex-1 truncate" dir="rtl">
-						{label}
+						<span dir="ltr">{label}</span>
 					</span>
 					<span className="ml-auto shrink-0 text-[11px] tabular-nums">
 						{fileCount}

@@ -9,7 +9,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { FoldSignal } from "../../hooks/useFoldSignal";
+import { type FoldSignal, isFoldCollapsed } from "../../hooks/useFoldSignal";
 import { FolderHeader } from "./components/FolderHeader";
 import {
 	type FolderGroup,
@@ -28,7 +28,6 @@ interface ChangedFileFolderListProps<T extends { path: string }> {
 	files: T[];
 	getFileKey: (file: T) => string;
 	renderFile: (file: T) => ReactNode;
-	/** Bumped by an expand-all / collapse-all control. */
 	foldSignal: FoldSignal;
 }
 
@@ -51,7 +50,12 @@ export function ChangedFileFolderList<T extends { path: string }>({
 	foldSignal,
 }: ChangedFileFolderListProps<T>) {
 	const groups = useMemo(() => groupFilesByFolder(files), [files]);
-	const [closedFolders, setClosedFolders] = useState<Set<string>>(new Set());
+	const [closedFolders, setClosedFolders] = useState<Set<string>>(
+		() =>
+			new Set(
+				isFoldCollapsed(foldSignal) ? groups.map((g) => g.folderPath) : [],
+			),
+	);
 
 	const toggleFolder = useCallback((folderPath: string) => {
 		setClosedFolders((prev) => {
@@ -64,10 +68,9 @@ export function ChangedFileFolderList<T extends { path: string }>({
 
 	// Apply a new fold signal only. Re-running on `groups` changes would
 	// re-apply the last action over folders the user toggled since.
-	const lastFoldEpochRef = useRef(0);
+	const lastFoldEpochRef = useRef(foldSignal.epoch);
 	useEffect(() => {
-		if (foldSignal.epoch === 0 || foldSignal.epoch === lastFoldEpochRef.current)
-			return;
+		if (foldSignal.epoch === lastFoldEpochRef.current) return;
 		lastFoldEpochRef.current = foldSignal.epoch;
 		setClosedFolders(
 			foldSignal.action === "collapse"

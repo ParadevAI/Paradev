@@ -1,1 +1,5 @@
-export { type FoldSignal, useFoldSignal } from "./useFoldSignal";
+export {
+	type FoldSignal,
+	isFoldCollapsed,
+	useFoldSignal,
+} from "./useFoldSignal";
