@@ -19,6 +19,8 @@ export const createSessionInputSchema = z.object({
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
 	effortId: z.string().optional(),
+	/** `on` or `off`, carried by a fork or rewind from the chat it came from. */
+	fast: z.string().optional(),
 	/** The model, effort and mode sent here are the user's own picks, so later chats start on them too. */
 	rememberSelections: z.boolean().optional(),
 	/** The mode to start in when neither the request nor the user's remembered picks name one. */

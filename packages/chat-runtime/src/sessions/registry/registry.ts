@@ -180,6 +180,7 @@ export class LiveSessionRegistry {
 				modeId: options.modeId,
 				modelId: options.modelId,
 				effortId: options.effortId,
+				...(options.fast ? { fast: options.fast } : {}),
 				resume: options.resume,
 			});
 		} catch (error) {
