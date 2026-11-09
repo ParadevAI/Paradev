@@ -6329,9 +6329,6 @@ msgstr "Create Linear issue"
 msgid "Create manually"
 msgstr "Create manually"
 
-msgid "Create merge commit"
-msgstr "Create merge commit"
-
 msgid "Create Merge Commit"
 msgstr "Create Merge Commit"
 

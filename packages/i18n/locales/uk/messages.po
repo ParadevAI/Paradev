@@ -6323,9 +6323,6 @@ msgstr "Створити issue в Linear"
 msgid "Create manually"
 msgstr "Створити вручну"
 
-msgid "Create merge commit"
-msgstr "Створити коміт злиття"
-
 msgid "Create Merge Commit"
 msgstr "Створити коміт злиття"
 

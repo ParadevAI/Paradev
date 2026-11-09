@@ -6329,9 +6329,6 @@ msgstr "Linear issueを作成"
 msgid "Create manually"
 msgstr "手動で作成"
 
-msgid "Create merge commit"
-msgstr "マージコミットを作成"
-
 msgid "Create Merge Commit"
 msgstr "マージコミットを作成"
 

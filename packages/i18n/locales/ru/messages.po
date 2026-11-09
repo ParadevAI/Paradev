@@ -6329,9 +6329,6 @@ msgstr "Создать задачу Linear"
 msgid "Create manually"
 msgstr "Создать вручную"
 
-msgid "Create merge commit"
-msgstr "Создать коммит слияния"
-
 msgid "Create Merge Commit"
 msgstr "Создать коммит слияния"
 

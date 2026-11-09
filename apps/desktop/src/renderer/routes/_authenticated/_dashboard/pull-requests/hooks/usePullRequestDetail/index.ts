@@ -1,4 +1,6 @@
 export {
+	type CachedPullRequestDetail,
+	cachedMergeMethods,
 	type PullRequestDetail,
 	type PullRequestDetailActor,
 	type PullRequestDetailComment,

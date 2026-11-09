@@ -6329,9 +6329,6 @@ msgstr "建立Linear議題"
 msgid "Create manually"
 msgstr "手動建立"
 
-msgid "Create merge commit"
-msgstr "建立合併提交"
-
 msgid "Create Merge Commit"
 msgstr "建立合併提交"
 
