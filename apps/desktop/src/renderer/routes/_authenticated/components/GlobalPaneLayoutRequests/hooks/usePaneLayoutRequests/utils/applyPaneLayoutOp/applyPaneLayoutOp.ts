@@ -16,7 +16,6 @@ import type {
 	PaneSplitDirection,
 } from "@superset/shared/pane-layout-ops";
 import { DEFAULT_BROWSER_URL } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/constants";
-import { CENTER_PANE_KINDS } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRightPaneAreaLifecycle/constants";
 import { preserveLocalPaneSelection } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2WorkspacePaneLayout/utils/preserveLocalPaneSelection";
 import type {
 	BrowserPaneData,
@@ -119,15 +118,6 @@ function keepSelection(previous: PaneAreas, next: PaneAreas): PaneAreas {
 	};
 }
 
-/** The app moves any other kind of pane out of the main area as soon as it lands there. */
-function requireMainAreaKind(located: Located): void {
-	if (CENTER_PANE_KINDS.has(located.pane.kind)) return;
-	throw new PaneLayoutOpError(
-		"BAD_REQUEST",
-		`Pane ${located.pane.id} is a ${located.pane.kind} pane, which stays in the sidebar. Only terminals and chats go in the main area`,
-	);
-}
-
 function tabIdOf(areas: PaneAreas, paneId: string): string | null {
 	return (
 		[...areas.main.tabs, ...areas.sidebar.tabs].find((tab) => tab.panes[paneId])
@@ -144,8 +134,6 @@ function swapPanes(areas: PaneAreas, aId: string, bId: string): PaneAreas {
 	}
 	const a = locatePane(areas, aId);
 	const b = locatePane(areas, bId);
-	if (a.area === "sidebar" && b.area === "main") requireMainAreaKind(a);
-	if (b.area === "sidebar" && a.area === "main") requireMainAreaKind(b);
 	if (a.tab.id === b.tab.id) {
 		const placeholder = `${aId}:swap`;
 		const layout = replacePaneIdInLayout(
@@ -452,7 +440,6 @@ export function applyPaneLayoutOp(
 					"Cannot move a pane next to itself",
 				);
 			}
-			if (target.area === "main") requireMainAreaKind(source);
 			const position = SPLIT_POSITIONS[op.direction];
 			const next =
 				source.area === target.area
@@ -482,7 +469,6 @@ export function applyPaneLayoutOp(
 		case "moveToNewTab": {
 			const source = locatePane(areas, op.paneId);
 			const area = op.area ?? source.area;
-			if (area === "main") requireMainAreaKind(source);
 			const next =
 				area === source.area
 					? inArea(area, (store) =>

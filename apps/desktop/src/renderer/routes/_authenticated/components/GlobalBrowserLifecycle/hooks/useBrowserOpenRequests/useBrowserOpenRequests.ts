@@ -40,7 +40,11 @@ export function useBrowserOpenRequests() {
 									[],
 								);
 							}
-							const paneId = openBackgroundBrowser({ collections, ...request });
+							const paneId = openBackgroundBrowser({
+								collections,
+								workspaceId: request.workspaceId,
+								url: request.url,
+							});
 							browserRuntimeRegistry.openBackground(
 								paneId,
 								request.url,
