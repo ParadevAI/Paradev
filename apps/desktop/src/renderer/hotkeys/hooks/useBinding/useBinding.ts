@@ -39,7 +39,6 @@ export function getDispatchChord(id: HotkeyId): string | null {
 	return bindingToDispatchChord(getBinding(id), getEffectiveLayoutMap());
 }
 
-/** Reactive version of {@link getDispatchChord}. */
 export function useDispatchChord(id: HotkeyId): string | null {
 	return bindingToDispatchChord(useBinding(id), useEffectiveLayoutMap());
 }

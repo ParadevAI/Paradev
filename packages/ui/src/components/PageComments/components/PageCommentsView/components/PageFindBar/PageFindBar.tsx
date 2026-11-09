@@ -16,11 +16,6 @@ interface PageFindBarProps {
 	onClose: () => void;
 }
 
-/**
- * The find bar over a page, in the shape of the chat's: an input, the count,
- * and previous, next and close. Enter and Shift+Enter step through the hits;
- * Esc closes it.
- */
 export function PageFindBar({
 	state,
 	className,

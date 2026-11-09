@@ -338,8 +338,6 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 		post({ type: "find-result", ...result });
 	});
 
-	// A live page rewrites itself; keep the count and highlights on what is
-	// there now.
 	const scheduleFindRefresh = () => {
 		if (findTimer || !find.active()) return;
 		findTimer = setTimeout(() => {

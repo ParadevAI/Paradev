@@ -12,12 +12,6 @@ export interface PageFindResult {
 	capped: boolean;
 }
 
-/**
- * Find in the served page's visible text, case-insensitive, with whitespace
- * collapsed the way the page renders it. Matches are painted with the CSS
- * Custom Highlight API, so the page's DOM is never changed. A match can cross
- * inline markup but not a block boundary.
- */
 export const PAGE_FIND_RUNTIME_SOURCE = `(onResult = () => {}) => {
 	const MATCH = ${JSON.stringify(PAGE_FIND_MATCH_HIGHLIGHT)};
 	const CURRENT = ${JSON.stringify(PAGE_FIND_CURRENT_HIGHLIGHT)};
