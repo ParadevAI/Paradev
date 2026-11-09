@@ -20365,9 +20365,6 @@ msgstr "To zaproszenie zostało już przyjęte."
 msgid "This invitation link is invalid or has expired."
 msgstr "Ten link z zaproszeniem jest nieprawidłowy lub wygasł."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Trwa to dłużej niż zwykle. Poniżej jest ostatnia zapisana kopia czatu; otworzy się naprawdę po uruchomieniu obszaru roboczego."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Trwa to dłużej niż zwykle. Piaskownica może wciąż pobierać obraz — działa dalej niezależnie od tego, czy to okno jest otwarte."
 
@@ -21854,9 +21851,6 @@ msgstr "Oczekiwanie na pierwszą wiadomość subagenta…"
 
 msgid "Waiting for your input"
 msgstr "Czeka na Twoją odpowiedź"
-
-msgid "Waking the workspace…"
-msgstr "Wybudzanie obszaru roboczego…"
 
 msgid "Waking up workspace"
 msgstr "Wybudzanie obszaru roboczego"

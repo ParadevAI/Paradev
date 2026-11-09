@@ -53,6 +53,11 @@ export const SandboxAccessContext = createContext<SandboxAccessValue | null>(
 	null,
 );
 
+/** Invalidating it wakes the open workspace's box again. */
+export function sandboxWakeQueryKey(workspaceId: string | undefined) {
+	return ["cloud-workspace", "wake", workspaceId] as const;
+}
+
 function sandboxAccessQueryKey(workspaceId: string) {
 	return ["cloud-workspace", "access", workspaceId] as const;
 }
@@ -130,7 +135,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 	const openWorkspace =
 		workspaces.find((workspace) => workspace.id === openWorkspaceId) ?? null;
 	const wake = useQuery({
-		queryKey: ["cloud-workspace", "wake", openWorkspace?.id] as const,
+		queryKey: sandboxWakeQueryKey(openWorkspace?.id),
 		enabled: openWorkspace !== null,
 		networkMode: "always",
 		queryFn: async () => {

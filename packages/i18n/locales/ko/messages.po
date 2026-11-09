@@ -20365,9 +20365,6 @@ msgstr "이 초대는 이미 수락되었습니다."
 msgid "This invitation link is invalid or has expired."
 msgstr "이 초대 링크가 유효하지 않거나 만료되었습니다."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "평소보다 오래 걸리고 있습니다. 아래 채팅은 마지막으로 저장된 사본이며, 워크스페이스가 시작되면 실제로 열립니다."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "평소보다 오래 걸리고 있습니다. 샌드박스가 아직 이미지를 받는 중일 수 있으며, 이 창이 열려 있든 아니든 계속 진행됩니다."
 
@@ -21854,9 +21851,6 @@ msgstr "서브 에이전트의 첫 메시지를 기다리는 중…"
 
 msgid "Waiting for your input"
 msgstr "입력을 기다리는 중"
-
-msgid "Waking the workspace…"
-msgstr "워크스페이스를 깨우는 중…"
 
 msgid "Waking up workspace"
 msgstr "워크스페이스 깨우는 중"

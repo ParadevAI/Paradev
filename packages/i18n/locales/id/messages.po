@@ -20365,9 +20365,6 @@ msgstr "Undangan ini sudah diterima."
 msgid "This invitation link is invalid or has expired."
 msgstr "Tautan undangan ini tidak valid atau sudah kedaluwarsa."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Ini memakan waktu lebih lama dari biasanya. Chat di bawah adalah salinan terakhir yang tersimpan; chat benar-benar terbuka setelah workspace mulai."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Ini lebih lama dari biasanya. Sandbox-nya mungkin masih menarik image-nya — prosesnya tetap jalan baik jendela ini terbuka atau tidak."
 
@@ -21854,9 +21851,6 @@ msgstr "Menunggu pesan pertama dari subagen…"
 
 msgid "Waiting for your input"
 msgstr "Menunggu masukan Anda"
-
-msgid "Waking the workspace…"
-msgstr "Membangunkan workspace…"
 
 msgid "Waking up workspace"
 msgstr "Membangunkan workspace"

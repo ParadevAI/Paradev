@@ -20365,9 +20365,6 @@ msgstr "Cette invitation a déjà été acceptée."
 msgid "This invitation link is invalid or has expired."
 msgstr "Ce lien d'invitation est invalide ou a expiré."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Cela prend plus de temps que d’habitude. La discussion ci-dessous est sa dernière copie enregistrée ; elle s’ouvre vraiment dès que l’espace de travail démarre."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Cela prend plus de temps que d'habitude. Le bac à sable est peut-être encore en train de télécharger son image — cela continue que cette fenêtre soit ouverte ou non."
 
@@ -21854,9 +21851,6 @@ msgstr "En attente du premier message du sous-agent…"
 
 msgid "Waiting for your input"
 msgstr "En attente de votre réponse"
-
-msgid "Waking the workspace…"
-msgstr "Réveil de l’espace de travail…"
 
 msgid "Waking up workspace"
 msgstr "Réveil de l’espace de travail"

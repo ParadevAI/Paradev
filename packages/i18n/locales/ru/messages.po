@@ -20365,9 +20365,6 @@ msgstr "Это приглашение уже принято."
 msgid "This invitation link is invalid or has expired."
 msgstr "Эта ссылка-приглашение недействительна или истекла."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Это занимает больше времени, чем обычно. Ниже — последняя сохранённая копия чата; по-настоящему он откроется, когда рабочая область запустится."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Это занимает больше времени, чем обычно. Возможно, песочница ещё скачивает образ — процесс идёт, открыто это окно или нет."
 
@@ -21854,9 +21851,6 @@ msgstr "Ожидание первого сообщения субагента…
 
 msgid "Waiting for your input"
 msgstr "Ждёт вашего ответа"
-
-msgid "Waking the workspace…"
-msgstr "Пробуждение рабочей области…"
 
 msgid "Waking up workspace"
 msgstr "Пробуждение рабочей области"

@@ -20359,9 +20359,6 @@ msgstr "Це запрошення вже прийнято."
 msgid "This invitation link is invalid or has expired."
 msgstr "Це посилання-запрошення недійсне, або термін його дії минув."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Це триває довше, ніж зазвичай. Нижче — остання збережена копія чату; по-справжньому він відкриється, коли робочий простір запуститься."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Це триває довше, ніж зазвичай. Можливо, пісочниця ще завантажує свій образ — процес триває незалежно від того, чи відкрите це вікно."
 
@@ -21848,9 +21845,6 @@ msgstr "Очікування першого повідомлення субаг�
 
 msgid "Waiting for your input"
 msgstr "Чекає на вашу відповідь"
-
-msgid "Waking the workspace…"
-msgstr "Пробудження робочого простору…"
 
 msgid "Waking up workspace"
 msgstr "Пробудження робочого простору"

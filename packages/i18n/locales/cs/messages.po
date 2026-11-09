@@ -20365,9 +20365,6 @@ msgstr "Tato pozvánka už byla přijata."
 msgid "This invitation link is invalid or has expired."
 msgstr "Tento odkaz s pozvánkou je neplatný nebo vypršel."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Trvá to déle než obvykle. Níže je poslední uložená kopie chatu; skutečně se otevře, jakmile se pracovní prostor spustí."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Trvá to déle než obvykle. Sandbox možná pořád stahuje svůj image — pokračuje, ať je toto okno otevřené, nebo ne."
 
@@ -21854,9 +21851,6 @@ msgstr "Čekání na první zprávu subagenta…"
 
 msgid "Waiting for your input"
 msgstr "Čeká na váš vstup"
-
-msgid "Waking the workspace…"
-msgstr "Probouzí se pracovní prostor…"
 
 msgid "Waking up workspace"
 msgstr "Probouzení pracovního prostoru"

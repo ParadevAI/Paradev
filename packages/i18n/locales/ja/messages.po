@@ -20365,9 +20365,6 @@ msgstr "この招待はすでに承諾されています。"
 msgid "This invitation link is invalid or has expired."
 msgstr "この招待リンクは無効か、期限切れです。"
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "通常より時間がかかっています。下のチャットは最後に保存されたコピーです。ワークスペースが起動すると実際に開きます。"
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "通常より時間がかかっています。サンドボックスはまだイメージを取得中かもしれません — このウィンドウを閉じても処理は続きます。"
 
@@ -21854,9 +21851,6 @@ msgstr "サブエージェントの最初のメッセージを待っています
 
 msgid "Waiting for your input"
 msgstr "入力を待っています"
-
-msgid "Waking the workspace…"
-msgstr "ワークスペースを起動しています…"
 
 msgid "Waking up workspace"
 msgstr "ワークスペースを起動中"

@@ -20365,9 +20365,6 @@ msgstr "这个邀请已被接受。"
 msgid "This invitation link is invalid or has expired."
 msgstr "这个邀请链接无效或已过期。"
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "耗时比平常更长。下面的聊天是最后保存的副本；工作区启动后才会真正打开。"
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "这比平时耗时更久。沙箱可能仍在拉取镜像 — 无论此窗口是否打开，它都会继续。"
 
@@ -21854,9 +21851,6 @@ msgstr "正在等待子智能体的第一条消息…"
 
 msgid "Waiting for your input"
 msgstr "等待你的输入"
-
-msgid "Waking the workspace…"
-msgstr "正在唤醒工作区…"
 
 msgid "Waking up workspace"
 msgstr "正在唤醒工作区"

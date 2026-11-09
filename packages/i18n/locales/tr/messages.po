@@ -20365,9 +20365,6 @@ msgstr "Bu davet zaten kabul edilmiş."
 msgid "This invitation link is invalid or has expired."
 msgstr "Bu davet bağlantısı geçersiz veya süresi dolmuş."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Bu, normalden uzun sürüyor. Aşağıdaki sohbet son kaydedilen kopyası; çalışma alanı başlayınca gerçekten açılır."
-
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Bu normalden uzun sürüyor. Sandbox hâlâ imajını çekiyor olabilir — bu pencere açık olsa da olmasa da devam eder."
 
@@ -21854,9 +21851,6 @@ msgstr "Alt ajanın ilk mesajı bekleniyor…"
 
 msgid "Waiting for your input"
 msgstr "Girdinizi bekliyor"
-
-msgid "Waking the workspace…"
-msgstr "Çalışma alanı uyandırılıyor…"
 
 msgid "Waking up workspace"
 msgstr "Çalışma alanı uyandırılıyor"
