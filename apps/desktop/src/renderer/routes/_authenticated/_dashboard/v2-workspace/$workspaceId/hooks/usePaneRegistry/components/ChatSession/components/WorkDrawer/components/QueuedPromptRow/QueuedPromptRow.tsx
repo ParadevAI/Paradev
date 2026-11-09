@@ -21,7 +21,10 @@ import {
 	ListEnd,
 	Trash2,
 } from "lucide-react";
-import { parseAttachmentTags } from "../../../../utils/attachmentTags";
+import {
+	attachmentDisplayName,
+	parseAttachmentTags,
+} from "../../../../utils/attachmentTags";
 
 export function QueuedPromptRow({
 	rowKey,
@@ -49,9 +52,7 @@ export function QueuedPromptRow({
 		userMessageText(prompt),
 	);
 	const attachmentNames = [
-		...attachments.map(
-			(attachment) => attachment.path.split("/").pop() ?? attachment.path,
-		),
+		...attachments.map(attachmentDisplayName),
 		...prompt.content.flatMap((content) =>
 			content.type === "attachment" ? [content.name] : [],
 		),

@@ -62,7 +62,7 @@ export default command({
 		attachment: string()
 			.variadic()
 			.desc(
-				"Local file path to upload as an attachment to the host. Repeatable. Only used when --agent is set",
+				"Local file path to give the agent as an attachment. Repeatable. Only used when --agent is set",
 			),
 		tag: string()
 			.variadic()
@@ -215,7 +215,11 @@ export default command({
 		}
 
 		const attachmentIds = options.attachment
-			? await uploadAttachments(target.client, options.attachment)
+			? await uploadAttachments({
+					target,
+					api: ctx.api,
+					paths: options.attachment,
+				})
 			: [];
 
 		const agents =

@@ -6,8 +6,10 @@ import {
 	type SelectChannelMember,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
-import { and, eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { and, eq, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
+import type { DevPrincipal, Principal } from "../../principal";
 
 type OrgRole = string;
 
@@ -83,6 +85,64 @@ export async function loadChannelAccess(
 		membership: membership ?? null,
 		orgRole: orgMembership.role,
 	};
+}
+
+/**
+ * The channel as the caller may use it. A Dev reads where it is a member;
+ * when its owner asks, also where the owner can read, and when anyone else
+ * asks, only where that person can read too. It posts only as a member.
+ */
+export async function loadChannelAccessFor(
+	principal: Principal,
+	channelId: string,
+): Promise<ChannelAccess> {
+	if (principal.kind === "person") {
+		return loadChannelAccess(principal.userId, channelId);
+	}
+	const [dev, asker] = await Promise.all([
+		devChannelAccess(principal, channelId),
+		loadChannelAccess(principal.askerId, channelId).catch((error) => {
+			if (error instanceof TRPCError && error.code === "NOT_FOUND") return null;
+			throw error;
+		}),
+	]);
+	const readable = principal.ownerAsks
+		? Boolean(dev || asker)
+		: Boolean(dev && asker);
+	const channel = dev?.channel ?? asker?.channel;
+	if (!readable || channel?.organizationId !== principal.organizationId) {
+		throw channelNotFound();
+	}
+	return { channel, membership: dev?.membership ?? null, orgRole: "member" };
+}
+
+async function devChannelAccess(dev: DevPrincipal, channelId: string) {
+	const [channel] = await db
+		.select()
+		.from(channels)
+		.where(
+			and(
+				eq(channels.id, channelId),
+				eq(channels.organizationId, dev.organizationId),
+			),
+		)
+		.limit(1);
+	if (!channel) return null;
+	const { rows } = await db.execute<{ allowed: number }>(
+		sql`select authz.check_permission('agent', ${dev.agentId}, 'can_read', 'channel', ${channel.id}) as allowed`,
+	);
+	if (rows[0]?.allowed !== 1) return null;
+	const [membership] = await db
+		.select()
+		.from(channelMembers)
+		.where(
+			and(
+				eq(channelMembers.channelId, channelId),
+				eq(channelMembers.actorId, dev.agentId),
+			),
+		)
+		.limit(1);
+	return { channel, membership: membership ?? null };
 }
 
 export function assertNotArchived(access: ChannelAccess): void {

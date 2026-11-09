@@ -1,3 +1,4 @@
+import { presetForAcpHarness } from "@superset/chat/core";
 import {
 	allLayoutTabs,
 	PANE_AREAS,
@@ -13,8 +14,10 @@ import { listTerminalSessions } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { createCallerFactory, protectedProcedure, router } from "../../index";
+import { requireChatSession } from "../sessions/session-service";
 import { terminalRouter } from "../terminal";
 import { addPaneDetails } from "./add-pane-details";
+import { closeChatsOnTerminal } from "./close-chats-on-terminal";
 import { resolveOpenPath } from "./resolve-open-path";
 
 const createTerminalCaller = createCallerFactory(terminalRouter);
@@ -57,6 +60,26 @@ async function applyOp(
 				.map((binding) => [binding.terminalId, binding]),
 		),
 	});
+}
+
+function chatTabTarget(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	sessionId: string,
+) {
+	const { chat, session } = requireChatSession(ctx, workspaceId, sessionId);
+	const agentId = presetForAcpHarness(session.harness);
+	if (!agentId) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "This is not an ACP chat session.",
+		});
+	}
+	return {
+		sessionId,
+		terminalId: chat.live.get(sessionId)?.terminalId ?? sessionId,
+		agentId,
+	};
 }
 
 function requireWorkspaceTerminal(
@@ -104,16 +127,35 @@ export const panesRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				terminalId: z.string().min(1),
+				/** Exactly one of `terminalId` and `sessionId`. */
+				terminalId: z.string().min(1).optional(),
+				sessionId: z.string().min(1).optional(),
 				area: area.optional(),
+				focus: z.boolean().optional(),
 			}),
 		)
 		.mutation(({ ctx, input }) => {
-			requireWorkspaceTerminal(ctx, input.workspaceId, input.terminalId);
+			if (!input.terminalId === !input.sessionId) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Pass a terminalId or a sessionId, not both",
+				});
+			}
+			if (input.sessionId) {
+				return applyOp(ctx, input.workspaceId, {
+					type: "newTab",
+					chat: chatTabTarget(ctx, input.workspaceId, input.sessionId),
+					area: input.area,
+					focus: input.focus,
+				});
+			}
+			const terminalId = input.terminalId as string;
+			requireWorkspaceTerminal(ctx, input.workspaceId, terminalId);
 			return applyOp(ctx, input.workspaceId, {
 				type: "newTab",
-				terminalId: input.terminalId,
+				terminalId,
 				area: input.area,
+				focus: input.focus,
 			});
 		}),
 
@@ -154,13 +196,14 @@ export const panesRouter = router({
 				paneId: input.paneId,
 				keepTerminal: input.keepTerminal,
 			});
-			// A live terminal left without a pane is re-adopted into a new tab
-			// by the desktop, so closing ends it unless it was backgrounded.
+			// A live terminal or chat left without a pane is re-adopted into a new
+			// tab by the desktop, so closing ends it unless it was backgrounded.
 			if (terminalId && !input.keepTerminal) {
 				await createTerminalCaller(ctx).killSession({
 					workspaceId: input.workspaceId,
 					terminalId,
 				});
+				await closeChatsOnTerminal(ctx, input.workspaceId, terminalId);
 			}
 			return { ...result, terminalId: terminalId ?? null };
 		}),

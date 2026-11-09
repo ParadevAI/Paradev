@@ -92,6 +92,9 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 				repository: {
 					pr88: {
 						number: 88,
+						additions: 5,
+						deletions: 2,
+						headRefName: "ci-fix",
 						statusCheckRollup: {
 							contexts: {
 								pageInfo: { hasNextPage: false, endCursor: null },
@@ -396,6 +399,30 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 		).toMatchObject({ owner: "octocat", name: "hello" });
 	});
 
+	test("getPullRequestRowDetails falls back to Octokit GraphQL when gh fails", async () => {
+		const result =
+			await host.trpc.workspaceCreation.getPullRequestRowDetails.query({
+				projects: [{ projectId, prNumbers: [88] }],
+			});
+		expect(result.rows).toEqual([
+			{
+				projectId,
+				prNumber: 88,
+				checks: [
+					{
+						name: "CI",
+						status: "success",
+						url: "https://github.com/octocat/hello/actions/2",
+					},
+				],
+				checksStatus: "success",
+				additions: 5,
+				deletions: 2,
+				headRefName: "ci-fix",
+			},
+		]);
+	});
+
 	test("searchPullRequests clamps Octokit pagination to GitHub's 1000-result cap", async () => {
 		const midway = await host.trpc.workspaceCreation.searchPullRequests.query({
 			projectId,
@@ -689,6 +716,9 @@ describe("gh CLI is first-class when execGh succeeds", () => {
 					repository: {
 						pr101: {
 							number: 101,
+							additions: 12,
+							deletions: 3,
+							headRefName: "fix-checks",
 							statusCheckRollup: {
 								contexts: {
 									pageInfo: {
@@ -902,6 +932,40 @@ describe("gh CLI is first-class when execGh succeeds", () => {
 		);
 		expect(result.pullRequests[0].checks).toHaveLength(2);
 		expect(result.pullRequests[0].checksStatus).toBe("failure");
+	});
+
+	test("searchPullRequests with deferChecks returns search hits without the checks query", async () => {
+		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
+			projectId,
+			query: "find me",
+			deferChecks: true,
+		});
+		expect(result.checksDeferred).toBe(true);
+		expect(result.pullRequests.map((pr) => pr.prNumber)).toEqual([101]);
+		expect(result.pullRequests[0].checks).toEqual([]);
+		expect(ghCalls).toHaveLength(1);
+		expect(ghCalls[0].args).toContain("search/issues");
+	});
+
+	test("getPullRequestRowDetails reads every check page of the listed PRs", async () => {
+		const result =
+			await host.trpc.workspaceCreation.getPullRequestRowDetails.query({
+				projects: [{ projectId, prNumbers: [101] }],
+			});
+		expect(result.rows).toHaveLength(1);
+		expect(result.rows[0]).toMatchObject({
+			projectId,
+			prNumber: 101,
+			checksStatus: "failure",
+			additions: 12,
+			deletions: 3,
+			headRefName: "fix-checks",
+		});
+		expect(result.rows[0].checks).toHaveLength(2);
+		expect(ghCalls.map((call) => call.args.slice(0, 2))).toEqual([
+			["api", "graphql"],
+			["api", "graphql"],
+		]);
 	});
 
 	test("searchPullRequests distinguishes individual review requests", async () => {

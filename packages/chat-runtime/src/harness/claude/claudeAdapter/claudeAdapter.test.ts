@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type { AdapterEvent } from "../../types";
+import type { SDKUserMessage } from "@anthropic-ai/claude-agent-sdk";
+import { attachedFilesBlock } from "../../attachedFiles";
+import type { AdapterEvent, ResolveAttachment } from "../../types";
 import {
 	ClaudeAdapter,
 	type ClaudeQuery,
@@ -12,6 +14,7 @@ type Harness = {
 	iterator: AsyncIterator<AdapterEvent>;
 	emit: (message: unknown) => void;
 	crash: (error: Error) => void;
+	exit: () => void;
 	interrupts: number;
 	aborted: () => boolean;
 	options: () => ClaudeQueryOptions | null;
@@ -39,12 +42,14 @@ function createHarness(): Harness {
 	let aborted = false;
 	let queryOptions: ClaudeQueryOptions | null = null;
 	let crashed: Error | null = null;
+	let exited = false;
 	const state = { interrupts: 0 };
 
 	const stream: ClaudeSession = {
 		async *[Symbol.asyncIterator]() {
 			while (true) {
 				if (crashed) throw crashed;
+				if (exited) return;
 				const next = pending.shift();
 				if (next !== undefined) {
 					yield next;
@@ -82,6 +87,12 @@ function createHarness(): Harness {
 		},
 		crash: (error: Error) => {
 			crashed = error;
+			const resume = notify;
+			notify = null;
+			resume?.();
+		},
+		exit: () => {
+			exited = true;
 			const resume = notify;
 			notify = null;
 			resume?.();
@@ -238,6 +249,56 @@ describe("ClaudeAdapter", () => {
 		const approvalId = approval?.kind === "item" ? approval.item.id : "";
 		harness.adapter.respondToApproval(approvalId, { type: "accept" });
 		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
+	});
+
+	test("a stream that fails mid-turn fails the turn instead of reading as a stop", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		harness.crash(new Error("Claude Code process exited with code 1"));
+
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: {
+				status: "failed",
+				error: {
+					kind: "crashed",
+					message: "Claude Code process exited with code 1",
+				},
+			},
+		});
+		for (let index = 0; index < 20; index++) {
+			if ((await harness.iterator.next()).done) return;
+		}
+		throw new Error("the adapter kept its stream open after the agent died");
+	});
+
+	test("a stream the user aborted still reads as a stop", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		harness.adapter.cancelTurn();
+		harness.crash(new Error("aborted"));
+
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
+	});
+
+	test("an agent that exits ends the adapter's stream", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		harness.exit();
+
+		let next = await harness.iterator.next();
+		while (!next.done) next = await harness.iterator.next();
+		expect(next.done).toBe(true);
 	});
 
 	test("a stream that fails while an approval waits leaves the session idle", async () => {
@@ -402,5 +463,131 @@ describe("ClaudeAdapter permission modes", () => {
 			session: { modeId: "bypassPermissions" },
 		});
 		expect(reverted.value).toMatchObject({ session: { modeId: "default" } });
+	});
+});
+
+describe("ClaudeAdapter attachments", () => {
+	function capturePrompts(resolveAttachment: ResolveAttachment) {
+		const sent: SDKUserMessage[] = [];
+		const stream: ClaudeSession = {
+			async *[Symbol.asyncIterator]() {
+				await new Promise(() => {});
+			},
+		};
+		const adapter = new ClaudeAdapter({
+			resolveAttachment,
+			query: ({ prompt }) => {
+				void (async () => {
+					for await (const message of prompt as AsyncIterable<SDKUserMessage>)
+						sent.push(message);
+				})();
+				return stream;
+			},
+		});
+		adapter.start({ cwd: "/workspace" });
+		return { adapter, sent };
+	}
+
+	const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+	const part = (name: string, mimeType: string) => ({
+		type: "attachment" as const,
+		attachmentId: name,
+		name,
+		mimeType,
+	});
+
+	test("sends an image as an image block", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/a/a.png",
+			mimeType: "image/png",
+			data: "cG5n",
+		}));
+		adapter.prompt([
+			{ type: "text", text: "what is this" },
+			part("shot.png", "image/png"),
+		]);
+		await flush();
+		expect(sent.map((message) => message.message.content)).toEqual([
+			[
+				{ type: "text", text: "what is this" },
+				{
+					type: "image",
+					source: { type: "base64", media_type: "image/png", data: "cG5n" },
+				},
+			],
+		]);
+	});
+
+	test("hands a non-image over as its name and path", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/b/b.pdf",
+			mimeType: "application/pdf",
+			data: "cGRm",
+		}));
+		adapter.prompt([part("spec.pdf", "application/pdf")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{
+				type: "text",
+				text: attachedFilesBlock([
+					{ name: "spec.pdf", path: "/store/b/b.pdf" },
+				]),
+			},
+		]);
+	});
+
+	test("drops an empty text part, which the API refuses as a block", async () => {
+		const { adapter, sent } = capturePrompts(async () => ({
+			path: "/store/a/a.png",
+			mimeType: "image/png",
+			data: "cG5n",
+		}));
+		adapter.prompt([{ type: "text", text: "" }, part("shot.png", "image/png")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{
+				type: "image",
+				source: { type: "base64", media_type: "image/png", data: "cG5n" },
+			},
+		]);
+	});
+
+	test("tells the agent which file it could not read", async () => {
+		const { adapter, sent } = capturePrompts(async () => null);
+		adapter.prompt([part("gone.png", "image/png")]);
+		await flush();
+		expect(sent[0]?.message.content).toEqual([
+			{ type: "text", text: "[gone.png: could not be read]" },
+		]);
+	});
+
+	test("a prompt sent while an attachment resolves still goes second", async () => {
+		let release: () => void = () => {};
+		const { adapter, sent } = capturePrompts(
+			() =>
+				new Promise((resolve) => {
+					release = () =>
+						resolve({
+							path: "/store/c/c.png",
+							mimeType: "image/png",
+							data: "",
+						});
+				}),
+		);
+		adapter.prompt([part("first.png", "image/png")]);
+		adapter.prompt([{ type: "text", text: "second" }]);
+		await flush();
+		expect(sent).toEqual([]);
+		release();
+		await flush();
+		expect(sent.map((message) => message.message.content)).toEqual([
+			[
+				{
+					type: "image",
+					source: { type: "base64", media_type: "image/png", data: "" },
+				},
+			],
+			[{ type: "text", text: "second" }],
+		]);
 	});
 });

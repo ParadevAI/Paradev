@@ -1,4 +1,5 @@
 import type { ChatRuntime } from "@superset/chat-runtime";
+import type { ChatLaunchAttachment } from "../agents/agents";
 import type {
 	ChatSessionResult,
 	CreateChatSessionInput,
@@ -7,7 +8,9 @@ import type {
 type ChatTarget = {
 	harness: string;
 	label: string;
-	attachments: Array<{ attachmentId: string; name: string; mimeType: string }>;
+	/** `null`: the default account, with no config inherited from another chat. */
+	agentConfigId?: string | null;
+	attachments: ChatLaunchAttachment[];
 };
 
 export function createChatSession(
@@ -15,6 +18,7 @@ export function createChatSession(
 	target: ChatTarget,
 	input: CreateChatSessionInput,
 	cwd: string,
+	terminalId: string = crypto.randomUUID(),
 ): ChatSessionResult {
 	const commandId = input.commandId ?? crypto.randomUUID();
 	const created = chat.commands.createSession({
@@ -22,7 +26,10 @@ export function createChatSession(
 		scopeId: input.workspaceId,
 		cwd,
 		harness: target.harness,
-		terminalId: crypto.randomUUID(),
+		...(target.agentConfigId !== undefined
+			? { agentConfigId: target.agentConfigId }
+			: {}),
+		terminalId,
 		...(input.model ? { modelId: input.model } : {}),
 		...(input.mode ? { modeId: input.mode } : {}),
 		...(input.resumeSessionId

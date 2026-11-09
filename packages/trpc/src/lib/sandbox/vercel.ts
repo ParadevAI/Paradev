@@ -356,6 +356,7 @@ export async function applySandboxPolicy(args: {
 export async function describeSandbox(providerSandboxId: string): Promise<{
 	hostTarget: string;
 	running: boolean;
+	vcpus: number | undefined;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -363,9 +364,12 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 			name: providerSandboxId,
 			resume: false,
 		});
+		const running = sandbox.status === "running";
 		return {
 			hostTarget: sandbox.domain(HOST_SERVICE_PORT),
-			running: sandbox.status === "running",
+			running,
+			// `sandbox.vcpus` is the configured size, which a running session does not pick up.
+			vcpus: running ? sandbox.currentSession().vcpus : sandbox.vcpus,
 		};
 	} catch (error) {
 		if (isUnavailable(error))
@@ -422,6 +426,9 @@ export async function wakeSandbox(args: {
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
 	booted: boolean;
+	/** The boot command ran: the session was stopped, or host-service in it had stopped answering. */
+	rebooted: boolean;
+	answer: HostAnswer;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -433,17 +440,19 @@ export async function wakeSandbox(args: {
 		const wasRunning = sandbox.status === "running";
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
-			await sandbox
-				.update({ resources: { vcpus: args.claim.vcpus } })
-				.then(() => {
-					vcpus = args.claim.vcpus;
-				})
-				.catch((error) =>
-					console.warn(
-						`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
-						error,
+			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
+				sandbox
+					.update({ resources: { vcpus: args.claim.vcpus } })
+					.then(() => {
+						vcpus = args.claim.vcpus;
+					})
+					.catch((error) =>
+						console.warn(
+							`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
+							error,
+						),
 					),
-				);
+			);
 		}
 		if (!wasRunning && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
@@ -459,25 +468,37 @@ export async function wakeSandbox(args: {
 		// A box that is already serving needs neither a fresh identity file nor
 		// another boot. The policy still goes out: a credential may have aged.
 		const serving = wasRunning && (await hostServiceAnswers(hostTarget));
-		await Promise.all([
-			sandbox
-				.update({ networkPolicy: args.claim.networkPolicy })
-				.catch((error) =>
-					console.warn(
-						`[sandbox] policy update failed for ${args.providerSandboxId}`,
-						error,
-					),
-				),
-			serving ? null : writeIdentity(sandbox, args.claim.identity),
-			writeSignInFiles(sandbox, args.claim.files),
-		]);
-		if (!serving) await runBoot(sandbox, args.claim.hostSecret);
-		await settleSandbox({
-			providerSandboxId: args.providerSandboxId,
-			hostTarget,
-			claim: args.claim,
-		});
-		return { hostTarget, booted: !wasRunning };
+		await Sentry.startSpan(
+			{ name: "apply claim", op: "sandbox.provider" },
+			() =>
+				Promise.all([
+					sandbox
+						.update({ networkPolicy: args.claim.networkPolicy })
+						.catch((error) =>
+							console.warn(
+								`[sandbox] policy update failed for ${args.providerSandboxId}`,
+								error,
+							),
+						),
+					serving ? null : writeIdentity(sandbox, args.claim.identity),
+					writeSignInFiles(sandbox, args.claim.files),
+				]),
+		);
+		if (!serving) {
+			await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
+				runBoot(sandbox, args.claim.hostSecret),
+			);
+		}
+		const answer = await Sentry.startSpan(
+			{ name: "settle", op: "sandbox" },
+			() =>
+				settleSandbox({
+					providerSandboxId: args.providerSandboxId,
+					hostTarget,
+					claim: args.claim,
+				}),
+		);
+		return { hostTarget, booted: !wasRunning, rebooted: !serving, answer };
 	} catch (error) {
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(args.providerSandboxId, error);

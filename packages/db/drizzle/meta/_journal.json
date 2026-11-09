@@ -1303,6 +1303,55 @@
       "when": 1793583125863,
       "tag": "0185_channel_linear_project",
       "breakpoints": true
+    },
+    {
+      "idx": 186,
+      "version": "7",
+      "when": 1793679430808,
+      "tag": "0186_agent_turn_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 187,
+      "version": "7",
+      "when": 1793682579399,
+      "tag": "0187_page_share_role_edit",
+      "breakpoints": true
+    },
+    {
+      "idx": 188,
+      "version": "7",
+      "when": 1793684241648,
+      "tag": "0188_automation_archived_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 189,
+      "version": "7",
+      "when": 1793841262226,
+      "tag": "0189_automation_reuse_workspace",
+      "breakpoints": true
+    },
+    {
+      "idx": 190,
+      "version": "7",
+      "when": 1793918434220,
+      "tag": "0190_v2_hosts_allow_cloud_workspaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 191,
+      "version": "7",
+      "when": 1793929228633,
+      "tag": "0191_github_installations_multiple_per_org",
+      "breakpoints": true
+    },
+    {
+      "idx": 192,
+      "version": "7",
+      "when": 1794194624056,
+      "tag": "0192_chat_storage",
+      "breakpoints": true
     }
   ]
 }

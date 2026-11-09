@@ -1,1 +1,0 @@
-export { recordHeadlineExposure } from "./recordHeadlineExposure";

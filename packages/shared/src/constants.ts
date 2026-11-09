@@ -162,6 +162,12 @@ export const FEATURE_FLAGS = {
 	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
 	/** In-app channels in the desktop sidebar. */
 	CHANNELS: "channels",
+	/**
+	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
+	 * card, pane cards and the inline home composer. Read once per launch, so
+	 * a change in PostHog applies on the next start.
+	 */
+	PARADEV_SHELL: "paradev-shell",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**
@@ -205,6 +211,13 @@ export const FEATURE_FLAGS = {
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
 	/**
+	 * Moving a workspace and its chats to the cloud or to another computer:
+	 * shows the Move items, and gates
+	 * `workspaceMove.begin` server-side. Moving to the cloud also needs
+	 * `cloud-workspaces`.
+	 */
+	WORKSPACE_MOVES: "workspace-moves",
+	/**
 	 * Lets the Slack agent answer replies in a thread it has already replied
 	 * in without an @-mention. Evaluated per Slack team; off, unloaded or
 	 * offline all mean mention-only.
@@ -225,16 +238,9 @@ export const FEATURE_FLAGS = {
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
 	/**
-	 * Legacy gate for the ACP chat pane, replaced by the account's Chat
-	 * experimental setting (`user_settings.experimental_chat`). Read only by released
-	 * desktop and mobile builds; remove it once no live build reads it.
-	 */
-	ACP_CHAT: "acp-chat",
-	/**
-	 * Shows Fork into chat on agent terminal headers and Fork into CLI on chat
-	 * headers: a native fork of the session, opened in the other surface beside
-	 * it. Off, unloaded or offline hide them. Audience is a release condition on
-	 * the flag, in both the Production and Local Development projects.
+	 * Legacy gate for the CLI mode / Chat mode fork menus, replaced by the account's
+	 * Chat experimental setting. Read only by released desktop builds 2.0.2 and 2.0.3;
+	 * remove it once no live build reads it.
 	 */
 	AGENT_SURFACE_FORK: "agent-surface-fork",
 	MOBILE_PANE: "mobile-pane",
@@ -305,6 +311,9 @@ export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 export const CLOUD_WORKSPACE_START_TRANSACTION = "cloud-workspace.start";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
+/** Every wake records one; only those that ran the boot command are sent (`CLOUD_WORKSPACE_BOOTED_ATTRIBUTE`). */
+export const CLOUD_WORKSPACE_WAKE_TRANSACTION = "cloud-workspace.wake";
+export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code

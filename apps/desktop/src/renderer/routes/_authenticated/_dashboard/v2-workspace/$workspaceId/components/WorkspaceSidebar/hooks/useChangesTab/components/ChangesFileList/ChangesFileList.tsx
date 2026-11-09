@@ -4,17 +4,12 @@ import { Trans } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { memo, useMemo } from "react";
+import type { FoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type { ChangesViewMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { ChangesFoldersView } from "./components/ChangesFoldersView";
 import { ChangesSection } from "./components/ChangesSection";
 import { ChangesTreeView } from "./components/ChangesTreeView";
-
-/** Pulse from the toolbar's expand-all / collapse-all buttons. `epoch` is 0 until the first press. */
-export interface FoldSignal {
-	epoch: number;
-	action: "collapse" | "expand";
-}
 
 interface ChangesFileListProps {
 	files: ChangesetFile[];

@@ -19,6 +19,7 @@ import {
 	formatSubscriptionCancelled,
 	formatSubscriptionStarted,
 	getDiscountInfo,
+	type PreviousPlan,
 	planLabel,
 } from "./slack-blocks";
 
@@ -81,6 +82,8 @@ const payloadSchema = z.discriminatedUnion("eventType", [
 	basePayload.extend({
 		eventType: z.literal("plan_changed"),
 		previousInterval: z.string().optional(),
+		previousPriceId: z.string().optional(),
+		previousSeats: z.number().nullish(),
 	}),
 ]);
 
@@ -135,6 +138,34 @@ async function enrichFromSubscription(
 		cancellationDetails: stripeSub.cancellation_details,
 		customerEmail: customer && !customer.deleted ? customer.email : null,
 	};
+}
+
+async function previousPlanFromPrice(
+	priceId: string,
+	seatCount: number,
+): Promise<PreviousPlan | null> {
+	try {
+		const price = await stripeClient.prices.retrieve(priceId, {
+			expand: ["product"],
+		});
+		if (price.unit_amount == null) return null;
+		const product =
+			typeof price.product === "string" || price.product.deleted
+				? null
+				: price.product;
+		return {
+			planName: product?.name ?? null,
+			pricePerSeatCents: price.unit_amount,
+			interval: price.recurring?.interval === "year" ? "yearly" : "monthly",
+			seatCount,
+		};
+	} catch (error) {
+		console.error(
+			`[stripe/notify-slack] Failed to read previous price ${priceId}:`,
+			error,
+		);
+		return null;
+	}
 }
 
 // --- Route handler ---
@@ -222,9 +253,16 @@ export async function POST(request: Request) {
 				payload.periodEnd,
 			);
 			break;
-		case "plan_changed":
-			blocks = formatPlanChanged(enriched, payload.previousInterval);
+		case "plan_changed": {
+			const previous = payload.previousPriceId
+				? await previousPlanFromPrice(
+						payload.previousPriceId,
+						payload.previousSeats ?? enriched.seatCount,
+					)
+				: null;
+			blocks = formatPlanChanged(enriched, previous, payload.previousInterval);
 			break;
+		}
 	}
 
 	const response = await fetch(env.SLACK_BILLING_WEBHOOK_URL, {

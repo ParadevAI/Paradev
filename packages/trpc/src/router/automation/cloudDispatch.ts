@@ -33,6 +33,7 @@ import {
 	type AgentRunResult,
 	nonForkPullRequest,
 	type PreviousRunSession,
+	pinCreatedWorkspace,
 	previousRunSession,
 	RunFailure,
 	type RunWorkspace,
@@ -106,6 +107,7 @@ export async function runInCloud(
 		branch: launch.branch,
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
 		chat,
+		tags: automation.tags,
 		machineSize: (
 			await resolveMachineSize(
 				automation.organizationId,
@@ -136,6 +138,8 @@ export async function runInCloud(
 			{ cloudWorkspaceId: automation.cloudWorkspaceId },
 			created.id,
 		);
+	} else if (automation.reuseWorkspace) {
+		await pinCreatedWorkspace(automation.id, { cloudWorkspaceId: created.id });
 	}
 	return null;
 }
@@ -232,7 +236,7 @@ async function assertOwnerMayUseCloud(
 		);
 	}
 	const { enabled } = await cloudAccess(
-		{ userId: automation.ownerUserId, session: null },
+		{ principal: { userId: automation.ownerUserId }, session: null },
 		automation.organizationId,
 	);
 	if (enabled === undefined) {

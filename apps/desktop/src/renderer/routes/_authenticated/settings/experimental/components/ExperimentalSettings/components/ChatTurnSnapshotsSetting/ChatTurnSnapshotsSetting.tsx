@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Label } from "@superset/ui/label";
 import { Switch } from "@superset/ui/switch";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import {
 	useChatTurnSnapshotsEnabled,
@@ -12,7 +11,6 @@ import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 export function ChatTurnSnapshotsSetting() {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
-	const acpChatEnabled = useAcpChatEnabled();
 	const enabled = useChatTurnSnapshotsEnabled();
 	const setEnabled = useChatTurnSnapshotsStore((state) => state.setEnabled);
 	return (
@@ -37,7 +35,6 @@ export function ChatTurnSnapshotsSetting() {
 			<Switch
 				id="chat-turn-snapshots"
 				checked={enabled}
-				disabled={!acpChatEnabled}
 				onCheckedChange={setEnabled}
 			/>
 		</div>

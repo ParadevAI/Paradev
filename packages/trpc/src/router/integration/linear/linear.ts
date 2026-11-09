@@ -3,8 +3,11 @@ import { connections, type LinearConfig } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { userConnection } from "../../../lib/connectors";
-import { protectedProcedure } from "../../../trpc";
+import {
+	grantSharedWithAnotherConnection,
+	userConnection,
+} from "../../../lib/connectors";
+import { personProcedure } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
 import { linearLiveRouter } from "./live";
 import { callLinear, callLinearForConnection } from "./refresh";
@@ -13,7 +16,7 @@ import { trackTasksInSupersetWithoutLinear } from "./tracker";
 export const linearRouter = {
 	...linearLiveRouter,
 
-	getConnection: protectedProcedure
+	getConnection: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -33,7 +36,7 @@ export const linearRouter = {
 			};
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -47,17 +50,19 @@ export const linearRouter = {
 				return { success: false, error: "No connection found" };
 			}
 
-			try {
-				await callLinearForConnection(connection.id, (client) =>
-					client.logout(),
-				);
-			} catch {}
+			if (!(await grantSharedWithAnotherConnection(connection))) {
+				try {
+					await callLinearForConnection(connection.id, (client) =>
+						client.logout(),
+					);
+				} catch {}
+			}
 			await db.delete(connections).where(eq(connections.id, connection.id));
 			await trackTasksInSupersetWithoutLinear(input.organizationId);
 			return { success: true };
 		}),
 
-	getTeams: protectedProcedure
+	getTeams: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -70,7 +75,7 @@ export const linearRouter = {
 			return teams.nodes.map((t) => ({ id: t.id, name: t.name, key: t.key }));
 		}),
 
-	updateConfig: protectedProcedure
+	updateConfig: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),

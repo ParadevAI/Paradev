@@ -13,6 +13,7 @@ import {
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
+import { getLocalProject } from "../../projects/local-project-store";
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
@@ -1052,9 +1053,7 @@ export class PullRequestRuntimeManager {
 	private async getProjectRepository(
 		projectId: string,
 	): Promise<NormalizedRepoIdentity | null> {
-		const project = this.db.query.projects
-			.findFirst({ where: eq(projects.id, projectId) })
-			.sync();
+		const project = getLocalProject(this.db, projectId);
 		if (!project) return null;
 
 		let identity: Omit<NormalizedRepoIdentity, "defaultBranch">;

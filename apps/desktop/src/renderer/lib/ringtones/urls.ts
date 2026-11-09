@@ -45,4 +45,8 @@ export const builtInRingtoneUrls: Record<string, string> = {
 		"../../../resources/sounds/shabalabadingdong.mp3",
 		import.meta.url,
 	).href,
+	"tribute.mp3": new URL(
+		"../../../resources/sounds/tribute.mp3",
+		import.meta.url,
+	).href,
 };

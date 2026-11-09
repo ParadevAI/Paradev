@@ -137,11 +137,23 @@ export const serverErrorMessages: Record<
 				message: `This automation belongs to ${params?.organizationName}. Switch to that organization to open it.`,
 			}),
 		),
-	"serverError.automation.onlyTheOwnerOrAnOrganizationOwner": () =>
+	"serverError.automation.archiveBeforeDelete": () =>
+		i18n._(
+			msg({
+				message: "Archive this automation before you delete it.",
+			}),
+		),
+	"serverError.automation.automationIsArchived": () =>
+		i18n._(
+			msg({
+				message: "This automation is archived. Restore it first.",
+			}),
+		),
+	"serverError.automation.onlyTheOwnerOrAnOrganizationOwnerCanArchive": () =>
 		i18n._(
 			msg({
 				message:
-					"Only the owner or an organization owner can delete this automation",
+					"Only the owner or an organization owner can archive this automation",
 			}),
 		),
 	"serverError.automation.automationsRequireThePro": () =>
@@ -271,6 +283,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "No active organization selected",
+			}),
+		),
+	"serverError.chatMove.moveStopped": () =>
+		i18n._(
+			msg({
+				message: "This move stopped. The chat is still in its old workspace.",
 			}),
 		),
 	"serverError.channel.notFound": () =>
@@ -562,6 +580,12 @@ export const serverErrorMessages: Record<
 				message: "Not a member of this organization",
 			}),
 		),
+	"serverError.host.onlyTheHostOwnerCanAllowCloudWorkspaces": () =>
+		i18n._(
+			msg({
+				message: "Only the host owner can let cloud workspaces reach it",
+			}),
+		),
 	"serverError.host.onlyTheHostOwnerCanSet": () =>
 		i18n._(
 			msg({
@@ -578,6 +602,13 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "GitHub installation not found",
+			}),
+		),
+	"serverError.integration.severalGithubAccountsConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
 			}),
 		),
 	"serverError.integration.githubSyncRequiresThePro": () =>
@@ -771,6 +802,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "You don't have permission to remove this member",
+			}),
+		),
+	"serverError.page.cannotEdit": () =>
+		i18n._(
+			msg({
+				message: "You can view this page but not change it",
 			}),
 		),
 	"serverError.page.cannotComment": () =>

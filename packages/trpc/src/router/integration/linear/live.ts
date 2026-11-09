@@ -4,7 +4,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 import { env } from "../../../env";
 import { userError } from "../../../i18n-error";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import {
 	archiveIssue,
@@ -52,19 +52,19 @@ export async function withLinear<T>(
 const organizationInput = z.object({ organizationId: z.uuid() });
 
 export const linearLiveRouter = {
-	workspace: protectedProcedure
+	workspace: personProcedure
 		.input(organizationInput)
 		.query(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, getWorkspace),
 		),
 
-	projects: protectedProcedure
+	projects: personProcedure
 		.input(organizationInput)
 		.query(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, listProjects),
 		),
 
-	issues: protectedProcedure
+	issues: personProcedure
 		.input(
 			organizationInput.extend({
 				teamId: z.string().nullish(),
@@ -85,7 +85,7 @@ export const linearLiveRouter = {
 			),
 		),
 
-	issue: protectedProcedure
+	issue: personProcedure
 		.input(organizationInput.extend({ issueId: z.string().min(1) }))
 		.query(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, (client) =>
@@ -93,7 +93,7 @@ export const linearLiveRouter = {
 			),
 		),
 
-	updateIssue: protectedProcedure
+	updateIssue: personProcedure
 		.input(
 			organizationInput.extend({
 				issueId: z.string().min(1),
@@ -113,7 +113,7 @@ export const linearLiveRouter = {
 			);
 		}),
 
-	archiveIssue: protectedProcedure
+	archiveIssue: personProcedure
 		.input(organizationInput.extend({ issueId: z.string().min(1) }))
 		.mutation(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, (client) =>
@@ -121,7 +121,7 @@ export const linearLiveRouter = {
 			),
 		),
 
-	createIssue: protectedProcedure
+	createIssue: personProcedure
 		.input(
 			organizationInput.extend({
 				teamId: z.string().min(1),

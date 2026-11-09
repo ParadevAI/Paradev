@@ -43,6 +43,8 @@ import {
 	gte,
 	ilike,
 	inArray,
+	isNotNull,
+	isNull,
 	notInArray,
 	sql,
 } from "drizzle-orm";
@@ -50,7 +52,7 @@ import { z } from "zod";
 import { env } from "../../env";
 import { assertCloudAccess } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
-import { planRequiredError, protectedProcedure, userError } from "../../trpc";
+import { personProcedure, planRequiredError, userError } from "../../trpc";
 import {
 	assertMachineSizeOffered,
 	loadUsableEnvironment,
@@ -62,6 +64,7 @@ import {
 } from "../utils/active-org";
 import { dispatchAutomation } from "./dispatch";
 import {
+	assertNotArchived,
 	automationBaseColumns,
 	automationNotFound,
 	getAutomationForUser,
@@ -69,7 +72,7 @@ import {
 	promptSourceFromSession,
 	recordPromptVersion,
 	refreshScheduleNextRuns,
-	requireAutomationDeleteAccess,
+	requireAutomationArchiveAccess,
 	resolveAutomationGroup,
 	scheduleSummariesFor,
 	summarizeSchedules,
@@ -167,6 +170,20 @@ async function verifyHostAccess(
 	}
 }
 
+async function archiveAutomation(
+	ctx: Parameters<typeof requireActiveOrgMembership>[0],
+	id: string,
+) {
+	const organizationId = await requireActiveOrgMembership(ctx);
+	await requireAutomationArchiveAccess(ctx.session.user.id, organizationId, id);
+
+	await db
+		.update(automations)
+		.set({ archivedAt: new Date(), enabled: false })
+		.where(and(eq(automations.id, id), isNull(automations.archivedAt)));
+	nudge(organizationId, "automation_runs");
+}
+
 /**
  * The one run query. Both run lists read through this: All runs org-wide, and
  * an automation's own history as the same list filtered to it. Two queries
@@ -215,7 +232,7 @@ function selectRuns(args: {
 				eq(automationRuns.organizationId, args.organizationId),
 				args.automationId
 					? eq(automationRuns.automationId, args.automationId)
-					: undefined,
+					: isNull(automations.archivedAt),
 				args.status === "failed"
 					? inArray(automationRuns.status, [...FAILED_RUN_STATUSES])
 					: args.status === "missed"
@@ -298,7 +315,10 @@ async function resolveTarget(
 		await verifyHostAccess(userId, organizationId, hostId);
 	}
 	if (plan.cloud) {
-		await assertCloudAccess({ userId, session: ctx.session }, organizationId);
+		await assertCloudAccess(
+			{ principal: { userId }, session: ctx.session },
+			organizationId,
+		);
 		if (!isCloudAgentId(agent)) {
 			throw userError({
 				code: "BAD_REQUEST",
@@ -441,7 +461,7 @@ export const automationRouter = {
 	 * List automations scoped to the caller's active organization. The
 	 * `prompt` body is omitted — call `getPrompt` to fetch it for one row.
 	 */
-	list: protectedProcedure
+	list: personProcedure
 		.input(
 			z
 				.object({
@@ -451,6 +471,10 @@ export const automationRouter = {
 						.min(1)
 						.optional()
 						.describe("Case-insensitive substring match on automation name."),
+					archived: z
+						.boolean()
+						.optional()
+						.describe("List archived automations instead of active ones."),
 				})
 				.optional(),
 		)
@@ -463,6 +487,9 @@ export const automationRouter = {
 				.where(
 					and(
 						eq(automations.organizationId, organizationId),
+						input?.archived
+							? isNotNull(automations.archivedAt)
+							: isNull(automations.archivedAt),
 						input?.name
 							? ilike(automations.name, `%${escapeLikePattern(input.name)}%`)
 							: undefined,
@@ -492,7 +519,7 @@ export const automationRouter = {
 	 * large markdown) — call `getPrompt` to fetch it. Use `listRuns` for
 	 * run history.
 	 */
-	get: protectedProcedure
+	get: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -540,7 +567,7 @@ export const automationRouter = {
 			};
 		}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
@@ -558,6 +585,7 @@ export const automationRouter = {
 					cloudWorkspaceId: input.cloudWorkspaceId,
 					environmentId: input.environmentId,
 					continueAgentSession: input.continueAgentSession,
+					reuseWorkspace: input.reuseWorkspace,
 				},
 				input.agent,
 			);
@@ -657,7 +685,7 @@ export const automationRouter = {
 			return withSchedule(created, input.triggers ?? null, legacySchedule);
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateAutomationSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -679,6 +707,7 @@ export const automationRouter = {
 					cloudWorkspaceId: input.cloudWorkspaceId,
 					environmentId: input.environmentId,
 					continueAgentSession: input.continueAgentSession,
+					reuseWorkspace: input.reuseWorkspace,
 				},
 				input.agent ?? existing.agent,
 			);
@@ -799,7 +828,7 @@ export const automationRouter = {
 			);
 		}),
 
-	getPrompt: protectedProcedure
+	getPrompt: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -819,7 +848,7 @@ export const automationRouter = {
 			return existing;
 		}),
 
-	setGroup: protectedProcedure
+	setGroup: personProcedure
 		.input(setAutomationGroupSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -834,7 +863,7 @@ export const automationRouter = {
 			return { id: input.id, group };
 		}),
 
-	setPrompt: protectedProcedure
+	setPrompt: personProcedure
 		.input(setAutomationPromptSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -885,23 +914,71 @@ export const automationRouter = {
 			};
 		}),
 
-	delete: protectedProcedure
+	/** @deprecated Archives; use `archive`. Released clients still call it. */
+	delete: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await archiveAutomation(ctx, input.id);
+			return { ok: true };
+		}),
+
+	/** Archive an automation: it stops firing and leaves the list. `unarchive` restores it, paused. */
+	archive: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await archiveAutomation(ctx, input.id);
+			return { ok: true };
+		}),
+
+	unarchive: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
-			await requireAutomationDeleteAccess(
+			await requireAutomationArchiveAccess(
 				ctx.session.user.id,
 				organizationId,
 				input.id,
 			);
 
-			await db.delete(automations).where(eq(automations.id, input.id));
+			await db
+				.update(automations)
+				.set({ archivedAt: null })
+				.where(eq(automations.id, input.id));
 			nudge(organizationId, "automation_runs");
 
 			return { ok: true };
 		}),
 
-	setEnabled: protectedProcedure
+	/** Permanently delete an archived automation and its run history. */
+	deleteArchived: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			await requireAutomationArchiveAccess(
+				ctx.session.user.id,
+				organizationId,
+				input.id,
+			);
+
+			const [deleted] = await db
+				.delete(automations)
+				.where(
+					and(eq(automations.id, input.id), isNotNull(automations.archivedAt)),
+				)
+				.returning({ id: automations.id });
+			if (!deleted) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message: "Archive this automation before you delete it.",
+					i18nKey: "serverError.automation.archiveBeforeDelete",
+				});
+			}
+			nudge(organizationId, "automation_runs");
+
+			return { ok: true };
+		}),
+
+	setEnabled: personProcedure
 		.input(z.object({ id: z.string().uuid(), enabled: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
 			// Pausing is always allowed; resuming is what needs the plan.
@@ -914,6 +991,7 @@ export const automationRouter = {
 				input.id,
 			);
 
+			if (input.enabled) assertNotArchived(existing);
 			const resuming = input.enabled && !existing.enabled;
 
 			const updated = await dbWs.transaction(async (tx) => {
@@ -950,7 +1028,7 @@ export const automationRouter = {
 			};
 		}),
 
-	runNow: protectedProcedure
+	runNow: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAutomationsPlan(ctx);
@@ -959,6 +1037,8 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+
+			assertNotArchived(automation);
 
 			// The dispatcher refuses this too, but through runNow it would surface
 			// as a 500 — an expected user state, not a server fault.
@@ -1007,7 +1087,7 @@ export const automationRouter = {
 	 * Issues a new bearer token for a webhook trigger, replacing any previous
 	 * one. The token is returned once; only its hash is stored.
 	 */
-	rotateWebhookSecret: protectedProcedure
+	rotateWebhookSecret: personProcedure
 		.input(z.object({ triggerId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1058,7 +1138,7 @@ export const automationRouter = {
 	 * Stores a provider-issued signing secret on a trigger, verbatim — an HMAC
 	 * verifier needs the raw key. Bearer-token kinds use `rotateWebhookSecret`.
 	 */
-	setTriggerSecret: protectedProcedure
+	setTriggerSecret: personProcedure
 		.input(
 			z.object({
 				triggerId: z.string().uuid(),
@@ -1111,7 +1191,7 @@ export const automationRouter = {
 		}),
 
 	/** Run history for a given automation (paginated). */
-	listRuns: protectedProcedure
+	listRuns: personProcedure
 		.input(listRunsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1133,7 +1213,7 @@ export const automationRouter = {
 			return rows.map(({ cursorAt: _cursorAt, ...run }) => run);
 		}),
 
-	listOrgRuns: protectedProcedure
+	listOrgRuns: personProcedure
 		.input(listOrgRunsSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1174,7 +1254,7 @@ export const automationRouter = {
 			};
 		}),
 
-	runPayload: protectedProcedure
+	runPayload: personProcedure
 		.input(runPayloadSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -1206,7 +1286,7 @@ export const automationRouter = {
 	 * A cloud workspace reporting the session its first-boot launch started,
 	 * for the automation run that created it. Only the box itself may call it.
 	 */
-	reportCloudLaunch: protectedProcedure
+	reportCloudLaunch: personProcedure
 		.input(reportCloudLaunchSchema)
 		.mutation(async ({ ctx, input }) => {
 			if (!ctx.sandboxCaller) {
@@ -1223,7 +1303,7 @@ export const automationRouter = {
 		}),
 
 	/** Most recent run per automation across the caller's active organization. */
-	latestRuns: protectedProcedure.query(async ({ ctx }) => {
+	latestRuns: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 
 		return db
@@ -1249,7 +1329,7 @@ export const automationRouter = {
 	 * stat cards and 6-hour activity buckets for the run-history sparkline.
 	 * Aggregated in SQL — an org can have tens of thousands of runs a week.
 	 */
-	orgRunStats: protectedProcedure.query(async ({ ctx }) => {
+	orgRunStats: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const bucketSeconds = 6 * 60 * 60;
 		const bucketCount = 28;
@@ -1267,10 +1347,12 @@ export const automationRouter = {
 				count: sql<number>`count(*)::int`,
 			})
 			.from(automationRuns)
+			.innerJoin(automations, eq(automations.id, automationRuns.automationId))
 			.where(
 				and(
 					eq(automationRuns.organizationId, organizationId),
 					gte(automationRuns.createdAt, since),
+					isNull(automations.archivedAt),
 				),
 			)
 			.groupBy(sql`1`, automationRuns.status);
@@ -1293,7 +1375,7 @@ export const automationRouter = {
 	}),
 
 	/** Validate an RRule body + preview its next occurrences. */
-	validateRrule: protectedProcedure
+	validateRrule: personProcedure
 		.input(parseRruleSchema)
 		.mutation(async ({ input }) => {
 			const dtstart = input.dtstart ?? new Date();

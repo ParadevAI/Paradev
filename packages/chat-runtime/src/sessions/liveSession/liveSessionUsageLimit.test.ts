@@ -324,7 +324,7 @@ function timerSession() {
 		prompt,
 		cancelTurn: () => undefined,
 		respondToApproval: () => undefined,
-		setMode: () => undefined,
+		setMode: () => Promise.resolve(true),
 		dispose: async () => events.close(),
 	};
 	const runtime = createTestRuntime({

@@ -1,7 +1,7 @@
 import type { ToolCall, ToolContent } from "@superset/chat/protocol";
 import { ShimmerLabel } from "@superset/ui/ai-elements/shimmer-label";
 import { useMemo } from "react";
-import { DiffStatText } from "../../../../../../../../../../components/DiffStatText";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { diffStats } from "../../../../utils/diffStats";
 import type { FileChange } from "../../../../utils/fileChange";
 import { FileChangePreview } from "../FileChangePreview";

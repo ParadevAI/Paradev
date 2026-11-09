@@ -7,16 +7,14 @@ description: Drive Paradev programmatically from any TypeScript or JavaScript co
 The SDK is in early alpha. It is not meant for production use and may be removed in the future. Stay on the latest version (`@superset_sh/sdk@latest`) while we iterate.
 </Callout>
 
-The Paradev TypeScript SDK lets you create and manage your workspaces, tasks, projects, and automations from code. Anything you can do in the dashboard, your scripts and services can do too.
-
-A few things you might use it for:
+The Paradev TypeScript SDK manages workspaces, tasks, projects, and automations from code. Common uses:
 
 - **Bulk task management**: script the creation, triage, or cleanup of tasks across one or many projects.
 - **Integrations**: sync tasks to/from your CRM, issue tracker, or internal tools.
 - **Provisioning**: spin up workspaces on a developer's machine when an issue is opened, a PR is reviewed, or a customer ticket lands.
 - **On-demand agents**: kick off a recurring automation off-schedule when a webhook fires.
 
-Everything is fully typed and works in Node, Bun, and Deno. The bundle also runs in browsers, but **don't ship `sk_live_…` keys to a frontend**: they're long-lived and grant full org access. From the browser, talk to a thin server proxy that holds the key.
+The SDK is fully typed and works in Node, Bun, and Deno. It also runs in browsers, but **do not ship `sk_live_…` keys to a frontend**: they are long-lived and grant full org access. From a browser, call a server proxy that holds the key.
 
 ## Install
 
@@ -43,11 +41,11 @@ bun add @superset_sh/sdk
 </Tab>
 </Tabs>
 
-We're under active development. The SDK follows the API as it grows, so **stay on the latest version** rather than pinning. New methods get added; existing ones don't change shape without a version bump and a note in the changelog.
+Stay on the **latest version** rather than pinning. New methods get added; existing ones do not change shape without a version bump and a changelog note.
 
 ## Get an API key
 
-1. Open the [Paradev desktop app](https://paradev.com/download) → **Settings → API Keys** → **Create**. The key starts with `sk_live_…`. Copy it now (you won't be able to see it again).
+1. Open the [Paradev desktop app](https://paradev.com/download) → **Settings → API Keys** → **Create**. The key starts with `sk_live_…`. Copy it now. It is shown only once.
 2. Note your **organization ID**. Find it in the org switcher inside the desktop app.
 
 ```bash
@@ -64,7 +62,7 @@ const client = new Superset();
 // reads SUPERSET_API_KEY and SUPERSET_ORGANIZATION_ID from env
 ```
 
-That's all the setup. From here, every resource works the same way:
+Every resource works the same way:
 
 ```ts
 // Create a task
@@ -108,7 +106,7 @@ See the [reference](/docs/sdk/reference) for every method, parameter, and return
 
 ## Configuration
 
-You can configure the client explicitly instead of (or alongside) the env vars:
+Configure the client explicitly instead of (or with) the env vars:
 
 ```ts
 const client = new Superset({
@@ -120,11 +118,11 @@ const client = new Superset({
 });
 ```
 
-The client retries automatically on network errors and 429/5xx responses, so transient failures usually fix themselves.
+The client retries automatically on network errors and 429/5xx responses.
 
 ## Handling errors
 
-The SDK throws typed errors for any non-success response, so you can catch what you actually care about:
+The SDK throws typed errors for any non-success response:
 
 ```ts
 import Superset, { APIError, NotFoundError, RateLimitError } from '@superset_sh/sdk';
@@ -144,7 +142,3 @@ try {
   }
 }
 ```
-
-## Next
-
-Head to the [reference](/docs/sdk/reference) for the complete surface.

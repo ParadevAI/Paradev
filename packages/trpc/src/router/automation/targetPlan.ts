@@ -10,6 +10,7 @@ export interface AutomationTarget {
 	cloudWorkspaceId: string | null;
 	environmentId: string | null;
 	continueAgentSession: boolean;
+	reuseWorkspace: boolean;
 }
 
 export const NO_TARGET: AutomationTarget = {
@@ -19,6 +20,7 @@ export const NO_TARGET: AutomationTarget = {
 	cloudWorkspaceId: null,
 	environmentId: null,
 	continueAgentSession: false,
+	reuseWorkspace: false,
 };
 
 /** Undefined keeps what the automation has; null clears it. */
@@ -76,22 +78,28 @@ export function planTarget(
 			? planCloud(existing, input, lookups, hostChanged)
 			: planHost(existing, input, lookups, hostChanged);
 
-	const pinned = Boolean(
-		plan.target.v2WorkspaceId ?? plan.target.cloudWorkspaceId,
-	);
-	// Asking for it without a pin is a mistake worth reporting; losing the pin
-	// some other way just takes the flag with it, since the session it would
-	// continue lived in that workspace.
-	if (input.continueAgentSession === true && !pinned) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message: "Continuing an agent session requires a pinned workspace",
-			i18nKey: "serverError.automation.continueNeedsPinnedWorkspace",
-		});
+	const { v2WorkspaceId, cloudWorkspaceId } = plan.target;
+	const pinned = Boolean(v2WorkspaceId ?? cloudWorkspaceId);
+	const newPin =
+		(Boolean(input.v2WorkspaceId) &&
+			input.v2WorkspaceId !== existing.v2WorkspaceId) ||
+		(Boolean(input.cloudWorkspaceId) &&
+			input.cloudWorkspaceId !== existing.cloudWorkspaceId);
+	let reuseWorkspace =
+		input.reuseWorkspace ?? (newPin ? false : existing.reuseWorkspace);
+	// Continuing with no pin and no say on reuse means keeping the first run's workspace.
+	if (
+		input.continueAgentSession === true &&
+		!pinned &&
+		input.reuseWorkspace == null
+	) {
+		reuseWorkspace = true;
 	}
-	plan.target.continueAgentSession = pinned
-		? (input.continueAgentSession ?? existing.continueAgentSession)
-		: false;
+	plan.target.reuseWorkspace = reuseWorkspace;
+	plan.target.continueAgentSession =
+		pinned || reuseWorkspace
+			? (input.continueAgentSession ?? existing.continueAgentSession)
+			: false;
 	return plan;
 }
 
@@ -161,6 +169,7 @@ function planHost(
 			cloudWorkspaceId: null,
 			environmentId: null,
 			continueAgentSession: false,
+			reuseWorkspace: false,
 		},
 		hostsToVerify,
 		cloud: null,
@@ -207,6 +216,7 @@ function planCloud(
 			cloudWorkspaceId,
 			environmentId,
 			continueAgentSession: false,
+			reuseWorkspace: false,
 		},
 		hostsToVerify: [],
 		// Only a named environment is checked; one taken from a pin is just the fallback.

@@ -33,9 +33,10 @@ import {
 	useState,
 } from "react";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
+import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
 import { useHotkey } from "renderer/hotkeys";
-import { FileIcon, getFileIcon } from "renderer/lib/fileIcons";
+import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
 	type AgentSwitcher,
@@ -47,17 +48,21 @@ import {
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
+import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import type { ChatForkTarget } from "../../types";
 import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
 import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
+import { fileMentionChip, fileMentionMatches } from "../../utils/fileMentions";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
 	prependToDraft,
@@ -121,6 +126,9 @@ export type ComposerProps = {
 	onEnterDrawer?: (options: { actionableOnly: boolean }) => boolean;
 	sessionUsage?: SessionUsage | null;
 	turnRunning?: boolean;
+	/** A prompt is on its way: Stop shows, disabled until there is a turn to stop. */
+	promptPending?: boolean;
+	awaitingBackground?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
 	/** A usage limit holds the chat; its notice sits above the composer. */
@@ -183,6 +191,8 @@ export const Composer = memo(function Composer({
 	sessionUsage,
 	target,
 	turnRunning = false,
+	promptPending = false,
+	awaitingBackground = false,
 	terminalId,
 	usageLimited = false,
 	workspaceId,
@@ -308,33 +318,39 @@ export const Composer = memo(function Composer({
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [isActive]);
+	const collections = useCollections();
+	const { getOpenFilePaths } = useChatPaneActions();
 	const searchFiles = useCallback(
 		async (query: string) => {
-			if (!query) return [];
-			const { matches } = await trpcUtils.filesystem.searchFiles.fetch({
-				workspaceId,
+			const { matches } = query.trim()
+				? await trpcUtils.filesystem.searchFiles
+						.fetch({
+							workspaceId,
+							query,
+							includeHidden: false,
+							limit: FILE_SEARCH_LIMIT,
+						})
+						.catch(() => ({ matches: [] }))
+				: { matches: [] };
+			// Read at call time: a subscription re-renders on every pane change
+			// and restarts the open menu's search.
+			return fileMentionMatches(
 				query,
-				includeHidden: false,
-				limit: 20,
-			});
-			return matches.map(
-				(match): ComposerMentionEntry => ({
-					id: match.absolutePath,
-					label: match.name,
-					description: match.relativePath,
-					icon: <FileIcon className="size-4" fileName={match.name} />,
-					// The agent reads the path itself, so a mention is the path.
-					select: (ctx) =>
-						ctx.insertChip({
-							label: match.name,
-							serialized: match.relativePath,
-							iconUrl: getFileIcon(match.name, false).src,
-							data: { elementKind: "file_mention" },
-						}),
+				collections.v2WorkspaceLocalState.get(workspaceId)
+					?.recentlyViewedFiles ?? [],
+				getOpenFilePaths?.() ?? new Set(),
+				matches,
+			).map(
+				(file): ComposerMentionEntry => ({
+					id: file.absolutePath,
+					label: file.name,
+					description: file.relativePath,
+					icon: <FileIcon className="size-4" fileName={file.name} />,
+					select: (ctx) => ctx.insertChip(fileMentionChip(file.relativePath)),
 				}),
 			);
 		},
-		[trpcUtils, workspaceId],
+		[trpcUtils, workspaceId, collections, getOpenFilePaths],
 	);
 
 	const { transport } = useChatWiring();
@@ -371,6 +387,7 @@ export const Composer = memo(function Composer({
 						id: session.sessionId,
 						label: title,
 						description: formatRelativeTime(new Date(session.updatedAt)),
+						icon: <PluginIcon className="size-4" pluginName="superset" />,
 						select: (ctx) =>
 							ctx.insertChip(
 								chatReferenceChip(
@@ -511,13 +528,21 @@ export const Composer = memo(function Composer({
 			steer: boolean,
 			draft: ComposerDraft,
 		) => {
-			const tags = await uploadAttachments(files);
-			if (!tags) {
+			const upload = await uploadAttachments(files);
+			if (!upload.ok) {
+				const keep = new Set(upload.keep);
+				const restored: ComposerDraft = {
+					...draft,
+					attachments: draft.attachments.filter((attachment) =>
+						keep.has(attachment.file),
+					),
+				};
 				const input = promptInputRef.current;
-				if (input) input.restoreDraft(draft);
-				else prependToDraft(draftKey, [draft]);
+				if (input) input.restoreDraft(restored);
+				else prependToDraft(draftKey, [restored]);
 				return;
 			}
+			const { tags, parts } = upload;
 			const message = text.trim();
 			const elements = elementsForChips(message, mentions);
 			const mcpContext = mcpContextLine(
@@ -528,18 +553,24 @@ export const Composer = memo(function Composer({
 				env.NEXT_PUBLIC_WEB_URL,
 				otherHostOf,
 			);
+			const body = [message, ...tags].filter(Boolean).join("\n");
 			onSend(
 				[
-					{
-						type: "text",
-						text: [message, ...tags].filter(Boolean).join("\n"),
-						...(elements.length > 0 ? { elements } : {}),
-					},
+					...(body || parts.length === 0
+						? [
+								{
+									type: "text" as const,
+									text: body,
+									...(elements.length > 0 ? { elements } : {}),
+								},
+							]
+						: []),
 					...[mcpContext, chatContext].flatMap((context) =>
 						context
 							? [{ type: "text" as const, text: context, hidden: true }]
 							: [],
 					),
+					...parts,
 				],
 				{ steer, draft },
 			);
@@ -611,7 +642,13 @@ export const Composer = memo(function Composer({
 						: (placeholder ??
 							t({ message: "Ask the agent, @mention files, run /commands" }))
 				}
-				status={stop ? "streaming" : "ready"}
+				status={
+					stop || promptPending
+						? "streaming"
+						: awaitingBackground && !target
+							? "background"
+							: "ready"
+				}
 				stopOnEscape={!escapeGoesBack}
 				toolbar={
 					target ? (

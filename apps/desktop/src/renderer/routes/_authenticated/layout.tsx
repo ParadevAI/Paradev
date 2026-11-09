@@ -33,8 +33,10 @@ import { InitGitDialog } from "renderer/react-query/projects/InitGitDialog";
 import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
+import { InterruptedChatsDialog } from "renderer/routes/_authenticated/components/InterruptedChatsDialog";
 import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/components/LeaderboardAutoPublish";
 import { OrganizationPluginSync } from "renderer/routes/_authenticated/components/OrganizationPluginSync";
+import { ParadevShellSync } from "renderer/routes/_authenticated/components/ParadevShellSync";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
 import { PostHogPlanFlags } from "renderer/routes/_authenticated/components/PostHogPlanFlags";
 import { RealtimeNudges } from "renderer/routes/_authenticated/components/RealtimeNudges";
@@ -327,6 +329,7 @@ function AuthenticatedLayout() {
 			<CollectionsProvider>
 				<WindowTitle />
 				<PostHogPlanFlags />
+				<ParadevShellSync />
 				<GlobalBrowserLifecycle />
 				<GlobalPaneLayoutRequests />
 				<FileAutoSave />
@@ -351,6 +354,7 @@ function AuthenticatedLayout() {
 									<RealtimeNudges />
 									<ChannelsRealtime />
 									<DaemonAutoUpdateFailureDialog />
+									<InterruptedChatsDialog />
 									<Outlet />
 									<V1ImportModal />
 									{isV2CloudEnabled ? (

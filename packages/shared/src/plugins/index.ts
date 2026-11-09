@@ -140,6 +140,8 @@ export interface PluginCatalogEntry {
 	interface: {
 		displayName: string;
 		category: PluginCategory;
+		/** A built-in icon key, or an image path inside the plugin (`./assets/icon.png`). */
+		icon?: string;
 	};
 	/**
 	 * Server-name → config. Names land verbatim as config keys in agent CLIs

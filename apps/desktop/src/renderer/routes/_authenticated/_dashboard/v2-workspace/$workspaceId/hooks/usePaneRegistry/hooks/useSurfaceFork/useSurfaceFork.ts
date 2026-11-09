@@ -1,24 +1,25 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
+import { acpHarnessForPreset, acpStartModes } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
-import type { CreatePaneInput, RendererContext } from "@superset/panes";
+import type { RendererContext } from "@superset/panes";
+import { hostRemembersChatSelections } from "@superset/shared/host-version";
 import { toast } from "@superset/ui/sonner";
+import { useWorkspaceClient } from "@superset/workspace-client";
 import { useCallback } from "react";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
-import { markChatTerminalClosed } from "../../../../utils/closedChatSessions";
+import { ignoreChatTerminal } from "../../../../utils/closedChatSessions";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
+import { readSavedChatMode } from "../../utils/savedChatMode";
 
 export type SurfaceForkSource =
 	| { into: "chat"; presetId: string; harnessSessionId: string }
 	| { into: "cli"; configId: string; harnessSessionId: string };
 
-export type SurfaceForkPlacement = "beside" | "tab";
-
 export type ForkIntoOtherSurface = (
 	ctx: RendererContext<PaneViewerData>,
 	source: SurfaceForkSource,
-	placement: SurfaceForkPlacement,
 ) => Promise<void>;
 
 type ChatFork =
@@ -32,6 +33,8 @@ export function useSurfaceFork(
 ): ForkIntoOtherSurface {
 	const { t } = useLingui();
 	const { transport } = useChatWiring();
+	const { hostUrl } = useWorkspaceClient();
+	const hostInfo = useHostServiceInfo(hostUrl);
 
 	const hasMessages = useCallback(
 		async (sessionId: string) => {
@@ -58,16 +61,23 @@ export function useSurfaceFork(
 			const harness = acpHarnessForPreset(presetId);
 			if (!harness) return { status: "unsupported" };
 			// The host forks only a live chat, so the terminal's session is first
-			// loaded into a hidden one. It needs its own terminal id (the CLI's would
-			// rebind that terminal's agent), closed before the request so auto-adopt
-			// never opens it.
+			// loaded into a hidden one. It needs its own terminal id: the CLI's would
+			// rebind that terminal's agent.
 			const loaderTerminalId = crypto.randomUUID();
-			markChatTerminalClosed(loaderTerminalId);
+			ignoreChatTerminal(loaderTerminalId);
+			const defaultModeId = acpStartModes(presetId)?.defaultModeId;
+			const modeId =
+				readSavedChatMode(presetId) ??
+				(hostRemembersChatSelections(hostInfo.data?.version)
+					? undefined
+					: defaultModeId);
 			const loader = await transport.createSession({
 				commandId: crypto.randomUUID(),
 				workspaceId,
 				harness,
 				terminalId: loaderTerminalId,
+				...(modeId ? { modeId } : {}),
+				...(defaultModeId ? { fallbackModeId: defaultModeId } : {}),
 				resume: { harnessSessionId },
 			});
 			try {
@@ -94,28 +104,14 @@ export function useSurfaceFork(
 					.catch(() => undefined);
 			}
 		},
-		[transport, workspaceId, hasMessages],
+		[transport, workspaceId, hasMessages, hostInfo.data?.version],
 	);
 
 	return useCallback<ForkIntoOtherSurface>(
-		async (ctx, source, placement) => {
+		async (ctx, source) => {
 			const nothingToFork = t({
-				message: "Nothing to fork yet. Send a message first.",
+				message: "Nothing to open yet. Send a message first.",
 			});
-			const place = (newPane: CreatePaneInput<PaneViewerData>) => {
-				const state = ctx.store.getState();
-				const current = state.getPane(ctx.pane.id);
-				if (placement === "tab" || !current) {
-					state.addTab({ panes: [newPane] });
-					return;
-				}
-				state.splitPane({
-					tabId: current.tabId,
-					paneId: ctx.pane.id,
-					position: "right",
-					newPane,
-				});
-			};
 
 			if (source.into === "cli") {
 				const { sessionId } = ctx.pane.data as ChatPaneData;
@@ -125,8 +121,7 @@ export function useSurfaceFork(
 				}
 				await createNewAgentSession({
 					configId: source.configId,
-					placement: placement === "tab" ? "new-tab" : "split-pane",
-					besidePaneId: ctx.pane.id,
+					placement: "new-tab",
 					prompt: "",
 					forkSessionId: source.harnessSessionId,
 				});
@@ -134,9 +129,10 @@ export function useSurfaceFork(
 			}
 
 			const terminalId = crypto.randomUUID();
-			// Kept from auto-adopt until its pane exists, or it opens twice.
-			const releaseTerminal = markChatTerminalClosed(terminalId);
-			const toastId = toast.loading(t({ message: "Forking into a chat…" }));
+			ignoreChatTerminal(terminalId);
+			const toastId = toast.loading(
+				t({ message: "Opening in Chat Interface…" }),
+			);
 			try {
 				const forked = await forkIntoChat(
 					source.presetId,
@@ -153,24 +149,26 @@ export function useSurfaceFork(
 					return;
 				}
 				toast.dismiss(toastId);
-				place({
-					kind: "chat-v3",
-					...(ctx.pane.titleOverride
-						? { titleOverride: ctx.pane.titleOverride }
-						: {}),
-					data: {
-						terminalId,
-						sessionId: forked.sessionId,
-						agent: { id: source.presetId },
-					} satisfies ChatPaneData,
+				ctx.store.getState().addTab({
+					panes: [
+						{
+							kind: "chat-v3",
+							...(ctx.pane.titleOverride
+								? { titleOverride: ctx.pane.titleOverride }
+								: {}),
+							data: {
+								terminalId,
+								sessionId: forked.sessionId,
+								agent: { id: source.presetId },
+							} satisfies ChatPaneData,
+						},
+					],
 				});
 			} catch (error) {
-				toast.error(t({ message: "Couldn't fork into a chat" }), {
+				toast.error(t({ message: "Couldn't open in Chat Interface" }), {
 					id: toastId,
 					description: errorMessage(error, t({ message: "Unknown error" })),
 				});
-			} finally {
-				releaseTerminal();
 			}
 		},
 		[forkIntoChat, hasMessages, createNewAgentSession, t],

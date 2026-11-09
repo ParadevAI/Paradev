@@ -20,6 +20,8 @@ interface ActivityPanelStore {
 	setFits: (workspaceId: string, fits: boolean) => void;
 	hidden: Record<string, true>;
 	setHidden: (workspaceId: string, hidden: boolean) => void;
+	floatingOpen: Record<string, true>;
+	setFloatingOpen: (workspaceId: string, open: boolean) => void;
 	stoppedKeys: ReadonlySet<string>;
 	noteStopped: (key: string) => void;
 	forgetStopped: (keys: readonly string[]) => void;
@@ -50,6 +52,15 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 			if ((state.hidden[workspaceId] === true) === hidden) return state;
 			const { [workspaceId]: _previous, ...rest } = state.hidden;
 			return { hidden: hidden ? { ...rest, [workspaceId]: true } : rest };
+		}),
+	floatingOpen: {},
+	setFloatingOpen: (workspaceId, open) =>
+		set((state) => {
+			if ((state.floatingOpen[workspaceId] === true) === open) return state;
+			const { [workspaceId]: _previous, ...rest } = state.floatingOpen;
+			return {
+				floatingOpen: open ? { ...rest, [workspaceId]: true } : rest,
+			};
 		}),
 	stoppedKeys: new Set(),
 	noteStopped: (key) =>

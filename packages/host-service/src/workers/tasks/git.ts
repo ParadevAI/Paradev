@@ -4,7 +4,14 @@
 // the credential provider) and crosses as plain data.
 
 import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import {
+	detectExternalWorktrees,
+	EXTERNAL_WORKTREE_SOURCES,
+	type ExternalWorktreeRepo,
+} from "../../projects/external-worktrees/index.ts";
 import {
 	getGitAuthorName,
 	type ResolvedGitInfo,
@@ -724,6 +731,109 @@ export const gitRestoreWorktreeTask = defineWorkerTask<
 	},
 });
 
+export const gitDetectExternalWorktreesTask = defineWorkerTask<
+	{ homeDir: string; trackedWorktreePaths: string[]; gitEnv: GitTaskEnv },
+	ExternalWorktreeRepo[]
+>({
+	type: "git/detectExternalWorktrees",
+	handler: ({ homeDir, trackedWorktreePaths, gitEnv }) =>
+		detectExternalWorktrees({
+			homeDir,
+			sources: EXTERNAL_WORKTREE_SOURCES,
+			trackedWorktreePaths: new Set(trackedWorktreePaths),
+			listWorktrees: async (repoPath) =>
+				parseWorktreeList(
+					await createUserSimpleGit(repoPath, { env: gitEnv }).raw([
+						"worktree",
+						"list",
+						"--porcelain",
+					]),
+				),
+		}),
+});
+
+const SNAPSHOT_COMMIT_MESSAGE = "Work in progress, moved to a cloud workspace";
+/** Used only when git has no identity of the user's own. */
+const SNAPSHOT_IDENTITY = {
+	GIT_AUTHOR_NAME: "Superset",
+	GIT_AUTHOR_EMAIL: "teleport@superset.sh",
+	GIT_COMMITTER_NAME: "Superset",
+	GIT_COMMITTER_EMAIL: "teleport@superset.sh",
+};
+
+/** The remote a snapshot goes to (`origin`, else the first), and every URL `git push` uses for it. */
+export const gitSnapshotRemoteTask = defineWorkerTask<
+	{ worktreePath: string; gitEnv: GitTaskEnv },
+	{ remote: string; pushUrls: string[] } | null
+>({
+	type: "git/snapshotRemote",
+	handler: async ({ worktreePath, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+		const remotes = await git.getRemotes(false);
+		const remote =
+			remotes.find((entry) => entry.name === "origin")?.name ??
+			remotes[0]?.name;
+		if (!remote) return null;
+		const pushUrls = (
+			await git.raw(["remote", "get-url", "--push", "--all", remote])
+		)
+			.split("\n")
+			.map((url) => url.trim())
+			.filter(Boolean);
+		return { remote, pushUrls };
+	},
+});
+
+/**
+ * Pushes the worktree as it is now, with uncommitted and untracked files, to
+ * `branch` on `remote`. The snapshot is staged in a separate index, so the
+ * user's index, working tree and branch do not change.
+ */
+export const gitPushSnapshotTask = defineWorkerTask<
+	{ worktreePath: string; remote: string; branch: string; gitEnv: GitTaskEnv },
+	{ commit: string }
+>({
+	type: "git/pushSnapshot",
+	handler: async ({ worktreePath, remote, branch, gitEnv }) => {
+		const scratch = await mkdtemp(join(tmpdir(), "superset-snapshot-"));
+		try {
+			const identity = await createUserSimpleGit(worktreePath, { env: gitEnv })
+				.raw(["var", "GIT_COMMITTER_IDENT"])
+				.then(() => ({}))
+				.catch(() => SNAPSHOT_IDENTITY);
+			const git = createUserSimpleGit(worktreePath, {
+				env: {
+					...gitEnv,
+					...identity,
+					GIT_INDEX_FILE: join(scratch, "index"),
+				},
+			});
+			const head = (await git.revparse(["HEAD"])).trim();
+			await git.raw(["read-tree", head]);
+			await git.raw(["add", "-A"]);
+			const tree = (await git.raw(["write-tree"])).trim();
+			const headTree = (await git.revparse([`${head}^{tree}`])).trim();
+			const commit =
+				tree === headTree
+					? head
+					: (
+							await git.raw([
+								"commit-tree",
+								tree,
+								"-p",
+								head,
+								"-m",
+								SNAPSHOT_COMMIT_MESSAGE,
+							])
+						).trim();
+			await git.raw(["push", remote, `${commit}:refs/heads/${branch}`]);
+			return { commit };
+		} finally {
+			await rm(scratch, { recursive: true, force: true });
+		}
+	},
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitStatusPartialTask,
@@ -743,6 +853,9 @@ export const gitTasks = [
 	gitStagePathsTask,
 	gitCommitTask,
 	gitPushTask,
+	gitSnapshotRemoteTask,
+	gitPushSnapshotTask,
 	gitPrHeadBaseTask,
 	gitRestoreWorktreeTask,
+	gitDetectExternalWorktreesTask,
 ];

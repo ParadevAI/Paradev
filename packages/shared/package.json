@@ -73,6 +73,10 @@
 			"types": "./src/page-tools-runtime.ts",
 			"default": "./src/page-tools-runtime.ts"
 		},
+		"./move-book": {
+			"types": "./src/move-book/index.ts",
+			"default": "./src/move-book/index.ts"
+		},
 		"./page-storage-hub": {
 			"types": "./src/page-storage-hub.ts",
 			"default": "./src/page-storage-hub.ts"
@@ -208,6 +212,10 @@
 		"./pull-request-detail": {
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
+		},
+		"./pull-request-merge-methods": {
+			"types": "./src/pull-request-merge-methods/index.ts",
+			"default": "./src/pull-request-merge-methods/index.ts"
 		},
 		"./pull-request-checks": {
 			"types": "./src/pull-request-checks/index.ts",
@@ -377,6 +385,10 @@
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"
 		},
+		"./workspace-attachments-dir": {
+			"types": "./src/workspace-attachments-dir.ts",
+			"default": "./src/workspace-attachments-dir.ts"
+		},
 		"./agent-permissions-migration": {
 			"types": "./src/agent-permissions-migration.ts",
 			"default": "./src/agent-permissions-migration.ts"
@@ -530,7 +542,7 @@
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
 		"smol-toml": "1.9.1",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",

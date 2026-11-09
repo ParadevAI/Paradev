@@ -12,29 +12,10 @@ import { DownloadRing } from "./DownloadRing";
 import { useAutoUpdateStatus } from "./useAutoUpdateStatus";
 
 const STROKE_WIDTH = 1.5;
-const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-const BAR_CELLS = 6;
-const BAR_WINDOW = 2;
-const FRAME_INTERVAL_MS = 80;
 /** How long the post-update "✓ vX.Y.Z" confirmation shows before hiding */
 const CONFIRM_MS = 5000;
 /** Duration of the pixel-dissolve exit once the confirmation expires */
 const EXIT_MS = 450;
-
-function useAsciiFrame(active: boolean): number {
-	const [frame, setFrame] = useState(0);
-
-	useEffect(() => {
-		if (!active) return;
-		const interval = setInterval(
-			() => setFrame((f) => f + 1),
-			FRAME_INTERVAL_MS,
-		);
-		return () => clearInterval(interval);
-	}, [active]);
-
-	return frame;
-}
 
 /**
  * Compact version for the inline pill — canary builds carry a timestamp
@@ -50,14 +31,6 @@ function displayVersion(version: string): string {
 function tooltipVersion(version: string): string {
 	const [base, prereleaseTag] = version.split("-", 2);
 	return prereleaseTag ? `${base}-${prereleaseTag.split(".")[0]}` : base;
-}
-
-/** Marquee-style terminal progress bar, e.g. `[·##···]` */
-function asciiBar(frame: number): string {
-	const cells = Array.from({ length: BAR_CELLS }, (_, i) =>
-		(i - (frame % BAR_CELLS) + BAR_CELLS) % BAR_CELLS < BAR_WINDOW ? "#" : "·",
-	);
-	return `[${cells.join("")}]`;
 }
 
 interface UpdatesPillProps {
@@ -80,7 +53,6 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 	const [isLeaving, setIsLeaving] = useState(false);
 	const installMutation = electronTrpc.autoUpdate.install.useMutation();
 	const checkMutation = electronTrpc.autoUpdate.check.useMutation();
-	const frame = useAsciiFrame(isInstalling);
 
 	const status = event?.status;
 
@@ -132,7 +104,6 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 	const isBusy = isDownloading || isInstalling || isUpdated;
 	const version = event?.version;
 	const percent = event?.progress?.percent ?? null;
-	const spinnerGlyph = SPINNER_FRAMES[frame % SPINNER_FRAMES.length];
 
 	const startInstall = () => {
 		setIsConfirming(false);
@@ -189,9 +160,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					{isDownloading ? (
 						<DownloadRing percent={percent} className="size-3.5" />
 					) : isInstalling ? (
-						<span className="font-mono text-xs leading-none text-orange-600 dark:text-orange-300">
-							{spinnerGlyph}
-						</span>
+						<span className="font-mono text-xs leading-none text-orange-600 dark:text-orange-300 before:animate-braille-spin" />
 					) : isUpdated ? (
 						<LuCircleCheck
 							strokeWidth={STROKE_WIDTH}
@@ -222,6 +191,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					type="button"
 					onClick={handleClick}
 					aria-disabled={isBusy}
+					aria-label={isInstalling ? tooltip : undefined}
 					className={cn(
 						"relative inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-1",
 						"font-mono text-[10px] tabular-nums leading-none",
@@ -248,10 +218,14 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					)}
 					{isInstalling ? (
 						<>
-							<span className="w-3 text-center text-xs leading-none">
-								{spinnerGlyph}
-							</span>
-							<span className="tracking-tighter">{asciiBar(frame)}</span>
+							<span
+								aria-hidden="true"
+								className="w-3 text-center text-xs leading-none before:animate-braille-spin"
+							/>
+							<span
+								aria-hidden="true"
+								className="tracking-tighter before:animate-[ascii-bar_480ms_step-end_infinite]"
+							/>
 						</>
 					) : isDownloading ? (
 						<>

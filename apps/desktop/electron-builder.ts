@@ -5,11 +5,13 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import type { Configuration } from "electron-builder";
 import pkg from "./package.json";
 import {
 	packagedAsarUnpackGlobs,
 	packagedNodeModuleCopies,
+	packagedNodeModuleExclusions,
 } from "./runtime-dependencies";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
@@ -18,6 +20,8 @@ const productName = pkg.productName;
 // productName names the bundle, userData, logs and the keychain entry, so it
 // never changes; the menu bar, Dock and launchers show displayName.
 export const displayName = process.env.DESKTOP_DISPLAY_NAME || productName;
+export const toInstallerFileName = (name: string) =>
+	name.trim().replace(/\s+/g, "-");
 const macIconPath = join(pkg.resources, "build/icons/icon.icns");
 const linuxIconPath = join(pkg.resources, "build/icons");
 const winIconPath = join(pkg.resources, "build/icons/icon.ico");
@@ -25,6 +29,22 @@ const dmgBackgroundPath = join(
 	pkg.resources,
 	"build/installer/background.tiff",
 );
+const extraResourceDirs = [
+	"migrations",
+	"host-migrations",
+	"chat-migrations",
+	"bin",
+];
+// Chromium names its macOS locale folders zh_CN, zh_CN_FEMININE, and so on.
+const macElectronLanguages = SUPPORTED_LOCALES.flatMap((locale) => {
+	const folder = locale.replace("-", "_");
+	return [
+		folder,
+		...["FEMININE", "MASCULINE", "NEUTER"].map(
+			(gender) => `${folder}_${gender}`,
+		),
+	];
+});
 
 const config: Configuration = {
 	appId: "com.superset.desktop",
@@ -60,45 +80,41 @@ const config: Configuration = {
 		"**/resources/tray/**/*",
 	],
 
-	// Extra resources placed outside asar archive (accessible via process.resourcesPath)
-	extraResources: [
-		// Database migrations - must be outside asar for drizzle-orm to read
-		{
-			from: "dist/resources/migrations",
-			to: "resources/migrations",
-			filter: ["**/*"],
-		},
-		{
-			from: "dist/resources/host-migrations",
-			to: "resources/host-migrations",
-			filter: ["**/*"],
-		},
-		{
-			from: "dist/resources/chat-migrations",
-			to: "resources/chat-migrations",
-			filter: ["**/*"],
-		},
-		{
-			from: "dist/resources/bin",
-			to: "resources/bin",
-			filter: ["**/*"],
-		},
-	],
+	// Extra resources placed outside asar archive (accessible via process.resourcesPath).
+	// Migrations must be outside asar for drizzle-orm to read.
+	extraResources: extraResourceDirs.map((dir) => ({
+		from: `dist/resources/${dir}`,
+		to: `resources/${dir}`,
+		filter: ["**/*"],
+	})),
 
+	// electron-builder moves top-level "!" patterns ahead of the includes, so an
+	// exclusion that must beat an include goes in that entry's own filter.
 	files: [
-		"dist/**/*",
+		{
+			from: "dist",
+			to: "dist",
+			// CI uploads source maps to Sentry during the build, which symbolicates by debug ID.
+			filter: [
+				"**/*",
+				"!**/*.map",
+				...extraResourceDirs.map((dir) => `!resources/${dir}/**`),
+			],
+		},
 		"package.json",
 		{
 			from: pkg.resources,
 			to: "resources",
-			filter: ["**/*"],
+			filter: ["**/*", "!build/icons/*.icns", "!build/icons/*.ico"],
 		},
 		// Runtime modules that stay external to the main bundle.
 		// bun creates symlinks for direct deps in workspace node_modules.
 		// The copy:native-modules script replaces symlinks with real files
 		// before building (required for Bun 1.3+ isolated installs).
 		...packagedNodeModuleCopies,
+		...packagedNodeModuleExclusions,
 		"!**/.DS_Store",
+		"!**/*.map",
 		"!**/node_modules/@anthropic-ai/claude-agent-sdk-*/**",
 		"!**/node_modules/@openai/codex*/**",
 	],
@@ -113,6 +129,8 @@ const config: Configuration = {
 		// the last large file above ~1.7GB of contents. `shrink: true` (default) keeps
 		// the final artifact compact.
 		size: "4g",
+		title: displayName,
+		artifactName: `${toInstallerFileName(displayName)}-\${version}-\${arch}.\${ext}`,
 	},
 
 	// macOS
@@ -120,6 +138,7 @@ const config: Configuration = {
 		...(existsSync(macIconPath) ? { icon: macIconPath } : {}),
 		category: "public.app-category.utilities",
 		target: "default",
+		electronLanguages: macElectronLanguages,
 		hardenedRuntime: true,
 		gatekeeperAssess: false,
 		notarize: true,

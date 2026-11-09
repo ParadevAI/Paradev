@@ -3,7 +3,7 @@ title: Slack Integration
 description: Mention @superset in Slack to file tasks or dispatch coding agents
 ---
 
-`@superset` in Slack is an agent, not just a task-filer. Mention it in a channel or DM it, describe what you want, and it acts.
+Mention `@superset` in a Slack channel or DM it, describe what you want, and the agent acts on it.
 
 ![The Paradev Slack bot spinning up a workspace and reporting back in-thread](/images/slack-bot.png)
 
@@ -11,9 +11,9 @@ To give a coding agent tools to read and post in Slack, install the [Slack plugi
 
 ## What It Can Do
 
-- **Create, update, search, and triage tasks** from the conversation it's standing in, pulling assignees, statuses, and priorities from your team's Linear/Paradev setup
-- **Spin up a cloud workspace and launch a coding agent** to actually do the work. Code-change requests ("bump our Sentry SDK to v9 across all apps") default to spawning a workspace and agent rather than filing a ticket
-- **Read the thread or channel history** on its own to gather context, no copy-pasting prior messages
+- **Create, update, search, and triage tasks** from the conversation, using assignees, statuses, and priorities from your team's Linear/Paradev setup
+- **Spin up a cloud workspace and launch a coding agent** to do the work. Code-change requests ("bump our Sentry SDK to v9 across all apps") start a workspace and agent instead of filing a ticket by default
+- **Read the thread or channel history** for context
 - **Search the web with citations** when a request needs current information
 - **Unfurl Paradev task, workspace, and [Page](/pages) links** with rich previews
 
@@ -43,7 +43,7 @@ These controls are available when thread follow-ups are enabled for your Slack t
 - Send `!mute` to require mentions in that thread again, or `!unmute` to resume automatic follow-ups. Direct mentions still work in a muted thread.
 - Send `!stop` or `!cancel` in the thread or DM to end the running Slack turn. Work already completed remains in the reply's Changes footer. This does not undo actions or stop coding agents already launched in workspaces.
 
-Without thread follow-ups enabled, continue to mention `@superset` for each channel request.
+Without thread follow-ups, mention `@superset` for each channel request.
 
 ## Good First Prompts
 

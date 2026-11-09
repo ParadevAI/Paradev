@@ -20,30 +20,44 @@ import { toast } from "@superset/ui/sonner";
 import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 
+export interface DisconnectCopy {
+	action: string;
+	title: string;
+	description: string;
+	done: string;
+	doneDetail?: string;
+}
+
 export function DisconnectMenu({
 	agentLabel,
 	credential,
 	disconnect,
 	onReconnect,
+	copy: copyOverride,
 }: {
 	agentLabel: string;
 	credential: string;
 	disconnect: () => Promise<unknown>;
 	onReconnect?: () => void;
+	copy?: DisconnectCopy;
 }) {
 	const { t } = useLingui();
+	const copy = copyOverride ?? {
+		action: t({ message: "Disconnect" }),
+		title: t({ message: `Disconnect ${credential}?` }),
+		description: t({
+			message: `Cloud workspaces will stop running ${agentLabel} with it.`,
+		}),
+		done: t({ message: `Removed ${credential} for ${agentLabel}.` }),
+		doneDetail: t({
+			message: "Restart workspaces to pick up new agent credentials.",
+		}),
+	};
 	const [confirming, setConfirming] = useState(false);
 	const handleDisconnect = async () => {
 		try {
 			await disconnect();
-			toast.success(
-				t({ message: `Removed ${credential} for ${agentLabel}.` }),
-				{
-					description: t({
-						message: "Restart workspaces to pick up new agent credentials.",
-					}),
-				},
-			);
+			toast.success(copy.done, { description: copy.doneDetail });
 		} catch (error) {
 			toast.error(
 				error instanceof Error
@@ -75,21 +89,15 @@ export function DisconnectMenu({
 						onSelect={() => setConfirming(true)}
 						variant="destructive"
 					>
-						<Trans>Disconnect</Trans>
+						{copy.action}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<AlertDialog onOpenChange={setConfirming} open={confirming}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>
-							<Trans>Disconnect {credential}?</Trans>
-						</AlertDialogTitle>
-						<AlertDialogDescription>
-							<Trans>
-								Cloud workspaces will stop running {agentLabel} with it.
-							</Trans>
-						</AlertDialogDescription>
+						<AlertDialogTitle>{copy.title}</AlertDialogTitle>
+						<AlertDialogDescription>{copy.description}</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>
@@ -99,7 +107,7 @@ export function DisconnectMenu({
 							onClick={() => void handleDisconnect()}
 							variant="destructive"
 						>
-							<Trans>Disconnect</Trans>
+							{copy.action}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

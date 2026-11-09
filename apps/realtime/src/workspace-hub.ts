@@ -1,5 +1,6 @@
 import { MAX_PRESENCE_VISITORS } from "@superset/shared/page-presence";
 import { PresenceVisits } from "@superset/shared/presence-visits";
+import type { WorkspaceForward } from "@superset/shared/realtime";
 import {
 	canOpenWorkspace,
 	parseVersionedWorkspaceAccess,
@@ -9,6 +10,7 @@ import {
 import { type Connection, type ConnectionContext, Server } from "partyserver";
 import type { RealtimeEnv } from "./types";
 import { admission, type StoredAccess, supersedes } from "./utils/admission";
+import { parseForwardsReport, WorkspaceForwards } from "./utils/forwards";
 import {
 	broadcastPresence,
 	SWEEP_MS,
@@ -20,15 +22,20 @@ interface Viewer extends WorkspaceActor {
 	name: string;
 	image: string | null;
 	observer: boolean;
+	/** A desktop reporting the ports it forwards; not part of presence. */
+	forwarder: boolean;
 	connectedAt: number;
 }
 
 export const WORKSPACE_CLAIMS_HEADER = "x-superset-workspace-claims";
 
+const MAX_FORWARDS_MESSAGE_CHARS = 4_096;
+
 /**
  * One object per cloud workspace: who is in it now and who has been. An
  * observer (the workspace's record view) sees both without counting as a
- * visit.
+ * visit. A forwarder (a desktop app) reports which of the workspace's ports
+ * it forwards to its machine, for `superset ports`, and sees nothing.
  */
 export class WorkspaceHub extends Server<RealtimeEnv> {
 	static options = { hibernate: true };
@@ -36,10 +43,12 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 	private ready = false;
 	private access: StoredAccess | undefined;
 	private readonly visits: PresenceVisits;
+	private readonly forwards: WorkspaceForwards;
 
 	constructor(ctx: DurableObjectState, env: RealtimeEnv) {
 		super(ctx, env);
 		this.visits = new PresenceVisits(ctx.storage.sql);
+		this.forwards = new WorkspaceForwards(ctx.storage.sql);
 		ctx.setWebSocketAutoResponse(
 			new WebSocketRequestResponsePair("ping", "pong"),
 		);
@@ -48,6 +57,7 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 	private schema(): void {
 		if (this.ready) return;
 		this.visits.ensureSchema();
+		this.forwards.ensureSchema();
 		this.ready = true;
 	}
 
@@ -63,6 +73,7 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 			organizationIds?: unknown;
 			teamIds?: unknown;
 			observer?: unknown;
+			forwarder?: unknown;
 		};
 		try {
 			claims = JSON.parse(
@@ -90,6 +101,7 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 			),
 			teamIds: claims.teamIds,
 			observer: claims.observer === true,
+			forwarder: claims.forwarder === true,
 			connectedAt: Date.now(),
 		};
 		let admitted: boolean;
@@ -105,6 +117,10 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 		}
 		const now = Date.now();
 		connection.setState(viewer);
+		if (viewer.forwarder) {
+			await scheduleSweep(this.ctx.storage, now);
+			return;
+		}
 		if (!viewer.observer) {
 			this.visits.record(
 				{ userId: viewer.userId, name: viewer.name, image: viewer.image },
@@ -192,10 +208,46 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 			: { access: null, readAt: versioned.readAt };
 	}
 
+	async onMessage(
+		connection: Connection<Viewer>,
+		message: string | ArrayBuffer,
+	): Promise<void> {
+		const viewer = connection.state;
+		if (!viewer?.forwarder || typeof message !== "string") return;
+		if (message.length > MAX_FORWARDS_MESSAGE_CHARS) {
+			connection.close(1009, "report too large");
+			return;
+		}
+		const reported = parseForwardsReport(message);
+		if (!reported) return;
+		this.schema();
+		this.forwards.report(
+			connection.id,
+			{ id: viewer.userId, name: viewer.name, image: viewer.image },
+			reported,
+			Date.now(),
+		);
+	}
+
+	/** No access check here: the API checks before it asks. */
+	async listForwards(): Promise<WorkspaceForward[]> {
+		this.schema();
+		const live = new Set(
+			[...this.getConnections<Viewer>()]
+				.filter((connection) => connection.state?.forwarder)
+				.map((connection) => connection.id),
+		);
+		return this.forwards.list(live);
+	}
+
 	async onClose(connection: Connection<Viewer>): Promise<void> {
 		const viewer = connection.state;
 		if (!viewer) return;
 		this.schema();
+		if (viewer.forwarder) {
+			this.forwards.remove(connection.id);
+			return;
+		}
 		if (!viewer.observer) this.visits.touch(viewer.userId, Date.now());
 		this.announce(connection.id);
 	}
@@ -220,7 +272,10 @@ export class WorkspaceHub extends Server<RealtimeEnv> {
 	/** Observers hear presence but are not part of it. */
 	private announce(leaving?: string): void {
 		const connections = [...this.getConnections<Viewer>()].filter(
-			(connection) => connection.state && connection.id !== leaving,
+			(connection) =>
+				connection.state &&
+				!connection.state.forwarder &&
+				connection.id !== leaving,
 		);
 		broadcastPresence(
 			connections.map((connection) => ({

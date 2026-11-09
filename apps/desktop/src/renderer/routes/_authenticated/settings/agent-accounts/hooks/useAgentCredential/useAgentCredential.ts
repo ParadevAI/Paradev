@@ -1,8 +1,9 @@
+import { isManualSignIn } from "@superset/shared/agent-credentials";
 import { useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 /** How the dialog is showing the credential; not every one of these is stored. */
-export type CloudAuthMethod = "subscription" | "api_key" | "custom";
+export type CloudAuthMethod = "subscription" | "api_key" | "custom" | "manual";
 /** Only providers a credential row can actually hold: one value plus a base URL. */
 export type CustomProvider = "gateway";
 
@@ -12,6 +13,8 @@ export interface CloudAuthState {
 	apiKeySaved: boolean;
 	customProvider: CustomProvider | null;
 	customSaved: boolean;
+	/** The person's own tooling keeps the agent signed in; nothing is stored or injected. */
+	manualOn: boolean;
 }
 
 export interface SaveCredentialInput {
@@ -31,6 +34,7 @@ function methodOf(credential: {
 	kind: "subscription" | "api_key";
 	provider: string | null;
 }): CloudAuthMethod {
+	if (isManualSignIn(credential)) return "manual";
 	if (credential.kind === "subscription") return "subscription";
 	return credential.provider ? "custom" : "api_key";
 }
@@ -56,6 +60,12 @@ export function useAgentCredential(presetId: string) {
 	const remove = cloudTrpc.agentCredential.remove.useMutation({
 		onSuccess: () => invalidate(),
 	});
+	const manual = cloudTrpc.agentCredential.setManual.useMutation({
+		onSuccess: async () => {
+			await invalidate();
+			setChosen(null);
+		},
+	});
 
 	const state: CloudAuthState = {
 		method,
@@ -63,6 +73,7 @@ export function useAgentCredential(presetId: string) {
 		apiKeySaved: stored === "api_key",
 		customProvider: credential?.provider === "gateway" ? "gateway" : null,
 		customSaved: stored === "custom",
+		manualOn: stored === "manual",
 	};
 
 	return {
@@ -78,9 +89,17 @@ export function useAgentCredential(presetId: string) {
 		},
 		disconnect: () => remove.mutateAsync({ agent: presetId }),
 		removing: remove.isPending,
+		setManual: () =>
+			manual.mutateAsync({ agent: presetId as "claude" | "codex" }),
+		settingManual: manual.isPending,
 	};
 }
 
 export function isConfigured(state: CloudAuthState): boolean {
-	return state.subscriptionConnected || state.apiKeySaved || state.customSaved;
+	return (
+		state.subscriptionConnected ||
+		state.apiKeySaved ||
+		state.customSaved ||
+		state.manualOn
+	);
 }

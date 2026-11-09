@@ -1,4 +1,5 @@
 export { adopt } from "./adopt";
+export { getPullRequestRowDetails } from "./get-pull-request-row-details";
 export { getRepoContributors } from "./get-repo-contributors";
 export { listProjectWorktrees } from "./list-project-worktrees";
 export { searchBranches } from "./search-branches";

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { bootSegments, bootStampsFrom } from "./boot-trace";
+import { bootBeganSince, bootSegments, bootStampsFrom } from "./boot-trace";
 
 const stamps = [
 	{ phase: "boot.start", at: 1_789_000_000_000 },
@@ -27,6 +27,22 @@ describe("bootStampsFrom", () => {
 			bootStampsFrom({ result: { data: { json: { status: "ok" } } } }),
 		).toEqual([]);
 		expect(bootStampsFrom({})).toEqual([]);
+	});
+});
+
+describe("bootBeganSince", () => {
+	const answer = { stamps, answeredAt: 1_789_000_001_300 };
+
+	test("counts a boot that began during the wake", () => {
+		expect(bootBeganSince(answer, 1_788_999_999_000)).toBe(true);
+	});
+
+	test("rejects an earlier boot's stamps from a host-service that kept running", () => {
+		expect(bootBeganSince(answer, 1_789_000_600_000)).toBe(false);
+	});
+
+	test("rejects an answer with no stamps", () => {
+		expect(bootBeganSince({ stamps: [], answeredAt: 0 }, 0)).toBe(false);
 	});
 });
 

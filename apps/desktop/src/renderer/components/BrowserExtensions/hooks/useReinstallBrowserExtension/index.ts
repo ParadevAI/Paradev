@@ -1,0 +1,1 @@
+export { useReinstallBrowserExtension } from "./useReinstallBrowserExtension";

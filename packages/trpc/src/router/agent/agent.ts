@@ -29,13 +29,14 @@ import {
 	exists,
 	inArray,
 	isNull,
+	ne,
 	or,
 	sql,
 } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
 import { agentTemporal } from "../../lib/agent-runtime";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { agentNotFound, loadAgentAccess, loadManagedAgent } from "./access";
 import { announceAgentChanged } from "./agents-changed";
 import { ensureDirectMessage } from "./direct-message";
@@ -68,9 +69,9 @@ const listColumns = {
 	).mapWith(Boolean),
 };
 
-/** People managing and talking to agents. Agents themselves use `agentApi`. */
+/** People managing and talking to agents. */
 export const agentRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const membership = await findOrgMembership({
@@ -91,7 +92,7 @@ export const agentRouter = {
 		}),
 
 	/** One agent with what its page shows: the channels it is in and its recent turns. */
-	get: protectedProcedure.input(agentIdSchema).query(async ({ ctx, input }) => {
+	get: personProcedure.input(agentIdSchema).query(async ({ ctx, input }) => {
 		const { agent, canManage } = await loadAgentAccess(
 			ctx.session.user.id,
 			input.agentId,
@@ -130,7 +131,12 @@ export const agentRouter = {
 					settledAt: agentTurns.settledAt,
 				})
 				.from(agentTurns)
-				.where(eq(agentTurns.agentId, agent.id))
+				.where(
+					and(
+						eq(agentTurns.agentId, agent.id),
+						ne(agentTurns.status, "queued"),
+					),
+				)
 				.orderBy(desc(agentTurns.startedAt))
 				.limit(10),
 		]);
@@ -147,7 +153,7 @@ export const agentRouter = {
 	}),
 
 	/** A Dev's turns, newest first, only where the caller can see them: their own DM with it and channels they can read. */
-	activity: protectedProcedure
+	activity: personProcedure
 		.input(
 			agentIdSchema.extend({
 				/** The id of the last turn on the previous page. */
@@ -188,6 +194,7 @@ export const agentRouter = {
 				.where(
 					and(
 						eq(agentTurns.agentId, agent.id),
+						ne(agentTurns.status, "queued"),
 						input.cursor
 							? sql`(${agentTurns.startedAt}, ${agentTurns.id}) < (select t.started_at, t.id from ${agentTurns} t where t.id = ${input.cursor})`
 							: undefined,
@@ -216,7 +223,7 @@ export const agentRouter = {
 			};
 		}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -246,7 +253,7 @@ export const agentRouter = {
 			return agent;
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			agentIdSchema.extend({
 				name: nameSchema.optional(),
@@ -268,7 +275,7 @@ export const agentRouter = {
 		}),
 
 	/** A paused agent starts no turns until it is resumed. */
-	pause: protectedProcedure
+	pause: personProcedure
 		.input(agentIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
@@ -280,7 +287,7 @@ export const agentRouter = {
 			return { paused: true };
 		}),
 
-	resume: protectedProcedure
+	resume: personProcedure
 		.input(agentIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
@@ -293,7 +300,7 @@ export const agentRouter = {
 		}),
 
 	/** Revokes everything at once: Melange stops seeing an archived agent's grants. */
-	archive: protectedProcedure
+	archive: personProcedure
 		.input(agentIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const agent = await loadManagedAgent(ctx.session.user.id, input.agentId);
@@ -317,7 +324,7 @@ export const agentRouter = {
 		}),
 
 	/** The caller's DM room with a Dev, made on first open. */
-	openDirectMessage: protectedProcedure
+	openDirectMessage: personProcedure
 		.input(agentIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { agent } = await loadAgentAccess(
@@ -328,7 +335,7 @@ export const agentRouter = {
 		}),
 
 	/** Where the person in a DM reads its live session log. */
-	sessionStream: protectedProcedure
+	sessionStream: personProcedure
 		.input(z.object({ sessionId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const session = await loadViewableSession(
@@ -350,7 +357,7 @@ export const agentRouter = {
 			};
 		}),
 
-	interruptTurn: protectedProcedure
+	interruptTurn: personProcedure
 		.input(z.object({ sessionId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const session = await loadViewableSession(
@@ -366,7 +373,7 @@ export const agentRouter = {
 	 * cloud workspace narrows them to that box. A main session holds everything
 	 * a Dev was told, so only its creator and org admins look inside.
 	 */
-	listSessions: protectedProcedure
+	listSessions: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid().optional(),
@@ -417,7 +424,7 @@ export const agentRouter = {
 		}),
 
 	/** A message in a session the person already has open, as chat sends it. */
-	promptSession: protectedProcedure
+	promptSession: personProcedure
 		.input(
 			z.object({
 				sessionId: z.string().uuid(),

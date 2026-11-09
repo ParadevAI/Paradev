@@ -171,11 +171,10 @@ export function resolveImportSource(id: string): string | null {
  */
 export function resolveImportProfile(
 	id: string,
-): { profileDir: string; browserKey: string } | null {
-	const match = listAllChromiumProfiles().find(
+	homeDir?: string,
+): (ChromeImportSource & { profileDir: string }) | null {
+	const match = listAllChromiumProfiles(homeDir).find(
 		(profile) => profile.profileDir === id,
 	);
-	return match
-		? { profileDir: match.profileDir, browserKey: match.browser.key }
-		: null;
+	return match ? { ...toSource(match), profileDir: match.profileDir } : null;
 }

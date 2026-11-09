@@ -30,7 +30,7 @@ import {
 	toStoredDocument,
 } from "../../lib/document-files";
 import { setTaskLabels } from "../../lib/labels";
-import { protectedProcedure, type TRPCContext } from "../../trpc";
+import { personProcedure, type TRPCContext } from "../../trpc";
 import { getIssue, type LinearStateType } from "../integration/linear/api";
 import { withLinear } from "../integration/linear/live";
 import { verifyOrgMembership } from "../integration/utils";
@@ -613,7 +613,7 @@ export const taskRouter = {
 	 * shipped CLI on `main` keeps compiling against the new backend during
 	 * the CLI-v1 split rollout.
 	 */
-	all: protectedProcedure.query(async ({ ctx }) => {
+	all: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const assignee = alias(users, "assignee");
 		const creator = alias(users, "creator");
@@ -640,7 +640,7 @@ export const taskRouter = {
 			.orderBy(desc(tasks.createdAt));
 	}),
 
-	list: protectedProcedure
+	list: personProcedure
 		.input(taskListInputSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -663,7 +663,7 @@ export const taskRouter = {
 				.offset(input?.offset ?? 0);
 		}),
 
-	listPage: protectedProcedure
+	listPage: personProcedure
 		.input(taskListPageInputSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -700,7 +700,7 @@ export const taskRouter = {
 			return { items, nextCursor };
 		}),
 
-	byOrganization: protectedProcedure
+	byOrganization: personProcedure
 		.input(z.string().uuid())
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input);
@@ -712,16 +712,16 @@ export const taskRouter = {
 				.orderBy(desc(tasks.createdAt));
 		}),
 
-	byId: protectedProcedure
+	byId: personProcedure
 		.input(z.string().uuid())
 		.query(({ ctx, input }) => getTaskById(ctx.session.user.id, input)),
 
-	bySlug: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+	bySlug: personProcedure.input(z.string()).query(async ({ ctx, input }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		return getTaskBySlug(ctx.session.user.id, organizationId, input);
 	}),
 
-	byIdOrSlug: protectedProcedure
+	byIdOrSlug: personProcedure
 		.input(z.string().min(1))
 		.query(async ({ ctx, input }) => {
 			const looksLikeUuid =
@@ -752,15 +752,15 @@ export const taskRouter = {
 	 * shipped renderer/CLI on `main` keep working during the CLI-v1 split
 	 * rollout.
 	 */
-	createFromUi: protectedProcedure
+	createFromUi: personProcedure
 		.input(createTaskSchema)
 		.mutation(({ ctx, input }) => createTask(ctx, input)),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createTaskSchema)
 		.mutation(({ ctx, input }) => createTask(ctx, input)),
 
-	importSource: protectedProcedure
+	importSource: personProcedure
 		.input(z.string().uuid())
 		.query(async ({ ctx, input }) => {
 			await getTaskAccess(db, ctx.session.user.id, input);
@@ -775,7 +775,7 @@ export const taskRouter = {
 			return source ?? null;
 		}),
 
-	importFromLinear: protectedProcedure
+	importFromLinear: personProcedure
 		.input(z.object({ issueId: z.string().min(1) }))
 		.mutation(({ ctx, input }) => importLinearIssue(ctx, input.issueId)),
 
@@ -787,7 +787,7 @@ export const taskRouter = {
 	 * already in progress or done. An unassigned task is assigned to the
 	 * acting user; an existing assignee is never overwritten.
 	 */
-	start: protectedProcedure
+	start: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const result = await dbWs.transaction(async (tx) => {
@@ -811,7 +811,7 @@ export const taskRouter = {
 			return result;
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { id, labels, ...data } = input;
@@ -917,7 +917,7 @@ export const taskRouter = {
 			return result;
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(z.string().uuid())
 		.mutation(async ({ ctx, input }) => {
 			const result = await dbWs.transaction(async (tx) => {

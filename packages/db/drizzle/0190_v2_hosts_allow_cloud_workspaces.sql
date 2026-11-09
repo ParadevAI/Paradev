@@ -1,0 +1,1 @@
+ALTER TABLE "v2_hosts" ADD COLUMN "allow_cloud_workspaces" boolean DEFAULT false NOT NULL;
