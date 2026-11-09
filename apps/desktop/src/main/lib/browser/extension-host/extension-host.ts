@@ -194,11 +194,19 @@ function startExtensionHost(): void {
 			: [],
 	);
 
+	const selectPane = (paneId: string) => {
+		const contents = paneTabs.get(paneId);
+		if (!contents || contents.isDestroyed()) return;
+		activePaneId = paneId;
+		extensions.selectTab(contents);
+	};
+
 	try {
 		attachBrowserExtensions({
 			session: browserSession,
 			extensions,
 			tabOf: (paneId) => paneTabs.get(paneId),
+			selectPane,
 			onRemoved: (extensionId) => state.forget(extensionId),
 		});
 	} catch (error) {
@@ -228,7 +236,7 @@ function startExtensionHost(): void {
 		if (!window) return;
 		paneTabs.set(paneId, contents);
 		extensions.addTab(contents, window);
-		activePaneId = paneId;
+		activePaneId ??= paneId;
 		notifyBrowserExtensionsChanged();
 	});
 	onPaneEvent("pane-unregistered", (paneId) => {
@@ -238,12 +246,7 @@ function startExtensionHost(): void {
 		if (contents && !contents.isDestroyed()) extensions.removeTab(contents);
 		notifyBrowserExtensionsChanged();
 	});
-	onPaneEvent("pane-focused", (paneId) => {
-		const contents = paneTabs.get(paneId);
-		if (!contents || contents.isDestroyed()) return;
-		activePaneId = paneId;
-		extensions.selectTab(contents);
-	});
+	onPaneEvent("pane-focused", selectPane);
 
 	void installBrowserWebStore(browserSession, {
 		removeExtension: removeBrowserExtension,
