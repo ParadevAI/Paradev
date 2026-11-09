@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import type { ChildProcess } from "node:child_process";
 import { EventEmitter } from "node:events";
 import path from "node:path";
+import { PassThrough } from "node:stream";
 import { TERMINAL_ATTACH_CANCELED_MESSAGE } from "../lib/terminal/errors";
 import {
 	createFrameHeader,
@@ -49,6 +50,66 @@ class FakeChildProcess extends EventEmitter {
 
 let fakeChildProcess: FakeChildProcess;
 let spawnCalls: Array<{ command: string; args: string[] }> = [];
+
+it("drains paused output and the PTY exit frame before closing the subprocess", async () => {
+	const child = Object.assign(new EventEmitter(), {
+		stdout: new PassThrough(),
+		stdin: new FakeStdin(),
+	});
+	const session = new Session({
+		sessionId: "session-exit-drain",
+		workspaceId: "workspace-1",
+		paneId: "pane-1",
+		tabId: "tab-1",
+		cols: 80,
+		rows: 24,
+		cwd: "/tmp",
+		shell: "/bin/sh",
+		spawnProcess: () => child as unknown as ChildProcess,
+	});
+	const exits: number[] = [];
+	session.onExit((_id, code) => exits.push(code));
+	session.spawn({ cwd: "/tmp", cols: 80, rows: 24, env: {} });
+	child.stdout.write(createFrameHeader(PtySubprocessIpcType.Ready, 0));
+	const socket = new EventEmitter() as import("node:net").Socket;
+	const internals = session as unknown as {
+		handleClientBackpressure: (socket: import("node:net").Socket) => void;
+		emulator: { flush: () => Promise<void> };
+	};
+	internals.handleClientBackpressure(socket);
+	const output = Buffer.from("final output\r\n");
+	child.stdout.write(
+		Buffer.concat([
+			createFrameHeader(PtySubprocessIpcType.Data, output.length),
+			output,
+		]),
+	);
+	const exit = Buffer.alloc(4);
+	exit.writeInt32LE(3);
+	child.stdout.write(
+		Buffer.concat([
+			createFrameHeader(PtySubprocessIpcType.Exit, exit.length),
+			exit,
+		]),
+	);
+	const writesBeforeExit = child.stdin.writes.length;
+	child.emit("exit", 0);
+	expect(exits).toEqual([]);
+	expect(session.isAlive).toBe(false);
+	session.resize(90, 25);
+	expect(child.stdin.writes.length).toBe(writesBeforeExit);
+	expect(child.stdout.isPaused()).toBe(false);
+	await new Promise<void>((resolve) => {
+		child.stdout.once("end", resolve);
+		child.stdout.end();
+	});
+	child.emit("close", 0);
+	await new Promise<void>((resolve) => setImmediate(resolve));
+	await internals.emulator.flush();
+	expect(exits).toEqual([3]);
+	expect(session.getSnapshot().snapshotAnsi).toContain("final output");
+	await session.dispose();
+});
 
 function sendFrame(
 	proc: FakeChildProcess,

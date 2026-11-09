@@ -335,6 +335,7 @@ describe("TerminalHost — spawn failure cause", () => {
 		const session = spawnSession();
 		emitReadyThenError(fakeChild, "Spawn failed: posix_spawn failed: EAGAIN");
 		fakeChild.emit("exit", 1);
+		fakeChild.emit("close", 1);
 
 		expect(session.describeSpawnFailure()).toEqual({
 			kind: "PTY_SPAWN_FAILED",
