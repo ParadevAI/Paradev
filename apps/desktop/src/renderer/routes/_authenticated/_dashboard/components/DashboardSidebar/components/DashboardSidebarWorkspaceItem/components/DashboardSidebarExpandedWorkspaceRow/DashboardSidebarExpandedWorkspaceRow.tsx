@@ -41,6 +41,7 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
+import { workspaceRowNeedsAttention } from "./utils/workspaceRowNeedsAttention";
 
 const PR_STATE_LABEL: Record<
 	DashboardSidebarWorkspacePullRequest["state"],
@@ -68,6 +69,8 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
 	workspace: DashboardSidebarWorkspace;
 	isActive: boolean;
+	/** A manual unread mark, or a terminal in review/failed. */
+	isUnread?: boolean;
 	isRenaming: boolean;
 	renameValue: string;
 	shortcutLabel?: string;
@@ -98,6 +101,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		{
 			workspace,
 			isActive,
+			isUnread = false,
 			isRenaming,
 			renameValue,
 			shortcutLabel,
@@ -174,6 +178,13 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 				: sandboxStatus === "provisioning"
 					? t({ message: "Creating the sandbox" })
 					: null;
+		const needsAttention = workspaceRowNeedsAttention({
+			isUnread,
+			workspaceStatus,
+			isActive,
+			isSelected,
+			isCreatePending: isPending,
+		});
 		const leadIndicator = (
 			<DashboardSidebarWorkspaceLeadIndicator
 				workspaceStatus={workspaceStatus}
@@ -368,9 +379,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									forceActive={isFocused}
 									className={cn(
 										"min-w-0 text-[13px] leading-tight transition-colors",
-										isActive || isSelected
+										isActive || isSelected || needsAttention
 											? "text-foreground"
 											: "text-foreground/80",
+										needsAttention ? "font-semibold" : "font-normal",
 									)}
 								/>
 								{isSelected && (

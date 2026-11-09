@@ -329,6 +329,7 @@ export function DashboardSidebarWorkspaceItem({
 			<DashboardSidebarExpandedWorkspaceRow
 				workspace={displayWorkspace}
 				isActive={isActive}
+				isUnread={isUnread}
 				isRenaming={isRenaming}
 				renameValue={renameValue}
 				shortcutLabel={shortcutLabel}
