@@ -14,10 +14,8 @@ import type { StatusType } from "renderer/routes/_authenticated/_dashboard/tasks
 import { TASK_PICKER_INPUT } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/hooks/useTasksData";
 import { linkedIssueFromLinear } from "renderer/routes/_authenticated/utils/linkedIssueFromLinear";
 import type { LinkedIssue } from "renderer/stores/new-workspace-draft";
-import {
-	linkedIssueChip,
-	linkedRefFromText,
-} from "../../utils/linkedContextChips";
+import { linkedIssueChip } from "../../utils/linkedContextChips";
+import { searchLinearIssues } from "./utils/searchLinearIssues";
 
 const MAX_RESULTS = 20;
 
@@ -57,21 +55,14 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 					kind: "search",
 					emptyState: t({ message: "No matching Linear issues" }),
 					search: async (query) => {
-						const ref = linkedRefFromText(query);
-						if (ref && ref.kind !== "linear") return [];
-						const includeClosed = query !== "";
-						const search = ref ? ref.identifier : query || null;
-						const { issues } = await cloudUtils.integration.linear.issues.fetch(
-							{
-								organizationId,
-								status: includeClosed ? "all" : "open",
-								assignee: search ? null : "me",
-								search,
-							},
+						const issues = await searchLinearIssues(
+							(input) => cloudUtils.integration.linear.issues.fetch(input),
+							organizationId,
+							query,
 						);
-						return issues
-							.filter((issue) => !ref || issue.identifier === ref.identifier)
-							.map((issue) => entry(linkedIssueFromLinear(issue), "linear"));
+						return issues.map((issue) =>
+							entry(linkedIssueFromLinear(issue), "linear"),
+						);
 					},
 				},
 			};
