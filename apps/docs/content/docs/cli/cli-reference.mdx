@@ -858,42 +858,6 @@ superset workspaces create --project prj_… --name "perf-spike" --branch perf/s
 </Command>
 
 <Command
-	name="superset workspaces import"
-	options={[
-		{ flag: "--project <projectId>", description: "Project the worktrees belong to. Required." },
-		{ flag: "--host <id>", description: "Host the worktrees live on (machineId). Mutually exclusive with `--local`; one of the two is required." },
-		{ flag: "--local", description: "The worktrees are on this machine." },
-		{ flag: "--path <dir>", description: "Worktree path to import. Repeatable. Mutually exclusive with `--all`." },
-		{ flag: "--all", description: "Import every untracked worktree of the project." },
-		{ flag: "--run-setup", description: "Run the project's setup script in each imported workspace. Off by default." },
-		{ flag: "--dry-run", description: "List what would be imported without changing anything." },
-	]}
-	output={`{ imported: { branch; path; workspaceId }[]; skipped: { branch; path; reason; workspaceId? }[]; failed: { branch?; path; reason }[] }`}
->
-Import git worktrees that already exist on a host as workspaces, the same as
-**Import untracked worktrees** in the desktop app. The host reads the project's
-`git worktree list`; each worktree keeps its folder, branch, and files.
-
-Without `--all` or `--path`, the command lists the untracked worktrees and
-exits non-zero if there are any. `--dry-run` prints the same list as
-`{ dryRun: true; wouldImport; skipped; failed }` and exits zero. Worktrees that
-already have a workspace, and the project's main checkout, land in `skipped`,
-so a re-run is a no-op. A `--path` that is not a worktree of the project, or a
-worktree the host fails to import, lands in `failed`; the rest still import,
-and the command exits non-zero.
-
-This also re-adopts worktrees after a machine registers as a new host: run
-`superset projects setup` for the project on the new host first, then import.
-
-```bash
-superset workspaces import --project prj_… --local --dry-run
-superset workspaces import --project prj_… --local --all
-superset workspaces import --project prj_… --host <machineId> \
-  --path ~/.paradev/worktrees/my-repo/fix-login --run-setup
-```
-</Command>
-
-<Command
 	name="superset workspaces archive <id...>"
 	args={[
 		{ name: "id", required: true, variadic: true, description: "Workspace IDs to archive." },
@@ -1164,6 +1128,59 @@ Linux/Windows substitute your platform's URL opener (`xdg-open`, `start`) for
 `open`.
 
 ---
+
+### worktrees
+
+Git worktrees that already exist on a host, and the workspaces that track them. This is the
+CLI form of **Import untracked worktrees** in the desktop app. Both commands target this
+machine unless `--host` names another.
+
+<Command
+	name="superset worktrees list"
+	options={[
+		{ flag: "--project <projectId>", description: "Project ID. Required." },
+		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
+		{ flag: "--local", description: "This machine (the default)." },
+	]}
+	output={`{ branch: string; path: string; isMain: boolean; hasWorkspace: boolean; workspaceId: string | null }[]`}
+>
+List the project's git worktrees that have a branch checked out. `isMain` marks the
+project's own checkout. `workspaceId` is the workspace that tracks the worktree, or
+`null` when none does yet. Older hosts report only `hasWorkspace`, so
+`workspaceId` is `null` there even for a tracked worktree.
+
+```bash
+superset worktrees list --project prj_…
+```
+</Command>
+
+<Command
+	name="superset worktrees open"
+	options={[
+		{ flag: "--project <projectId>", description: "Project ID. Required." },
+		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path` or `--branch`. Must be absolute on another host." },
+		{ flag: "--branch <name>", description: "Branch checked out in the worktree." },
+		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
+		{ flag: "--local", description: "This machine (the default)." },
+		{ flag: "--run-setup", description: "Run the project's setup script in a newly opened workspace. Off by default." },
+	]}
+	output={`{ workspace: Workspace; worktree: { branch: string; path: string }; alreadyExists: boolean; url: string; webUrl: string }`}
+>
+Open one existing worktree as a workspace. The worktree keeps its folder, branch, and
+files. If a workspace already tracks it, the command returns that workspace with
+`alreadyExists: true` and changes nothing, so it is safe to re-run. The project's main
+checkout is not a worktree; use `superset workspaces create --checkout local` for it.
+
+To open every untracked worktree, for example after a machine registers as a new host
+(run `superset projects setup` for the project there first):
+
+```bash
+superset worktrees open --project prj_… --branch fix/login-bug
+superset worktrees list --project prj_… --json \
+  | jq -r '.[] | select(.isMain == false and .hasWorkspace == false) | .path' \
+  | while read -r path; do superset worktrees open --project prj_… --path "$path"; done
+```
+</Command>
 
 ### environments
 
