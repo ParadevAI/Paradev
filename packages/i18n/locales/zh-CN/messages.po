@@ -5734,6 +5734,9 @@ msgstr "无法创建项目"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "无法创建项目。请换一个名称，或查看日志。"
 
+msgid "Could not create the project. Please try again."
+msgstr "无法创建项目。请重试。"
+
 msgid "Could not delete"
 msgstr "无法删除"
 
@@ -5754,6 +5757,9 @@ msgstr "无法断开连接。"
 
 msgid "Could not download {names}."
 msgstr "无法下载 {names}。"
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "无法下载模板。请检查网络连接后重试。"
 
 msgid "Could not forget {domain}"
 msgstr "无法忘记{domain}"
@@ -9398,6 +9404,15 @@ msgstr "Git与worktree"
 
 msgid "Git author name"
 msgstr "Git作者名"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "Git 无法在此位置运行。请选择其他位置后重试。"
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "接受 Xcode 许可协议后才能运行 Git。请在终端中运行 sudo xcodebuild -license，然后重试。"
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "此 Mac 尚未安装 Git。请安装 Apple 的 Command Line Tools，然后重试。"
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Cloud 中被 Git 忽略的文件，例如 .env。请把它们复制出来"

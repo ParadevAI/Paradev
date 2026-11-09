@@ -5734,6 +5734,9 @@ msgstr "Tidak bisa membuat proyek"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "Tidak bisa membuat proyek. Coba nama lain atau periksa log."
 
+msgid "Could not create the project. Please try again."
+msgstr "Tidak dapat membuat proyek. Silakan coba lagi."
+
 msgid "Could not delete"
 msgstr "Tidak dapat menghapus"
 
@@ -5754,6 +5757,9 @@ msgstr "Tidak dapat memutuskan."
 
 msgid "Could not download {names}."
 msgstr "Tidak dapat mengunduh {names}."
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "Tidak dapat mengunduh template. Periksa koneksi internet Anda, lalu coba lagi."
 
 msgid "Could not forget {domain}"
 msgstr "Tidak bisa melupakan {domain}"
@@ -9398,6 +9404,15 @@ msgstr "Git & Worktree"
 
 msgid "Git author name"
 msgstr "Nama author Git"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "Git tidak dapat berjalan di lokasi ini. Pilih lokasi lain, lalu coba lagi."
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "Git tidak dapat berjalan sampai Anda menerima lisensi Xcode. Jalankan sudo xcodebuild -license di Terminal, lalu coba lagi."
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "Git belum terpasang di Mac ini. Pasang Command Line Tools dari Apple, lalu coba lagi."
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "File yang diabaikan Git di Cloud, seperti .env. Salin keluar"

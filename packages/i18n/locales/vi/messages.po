@@ -5734,6 +5734,9 @@ msgstr "Không thể tạo dự án"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "Không thể tạo dự án. Hãy thử tên khác hoặc xem log."
 
+msgid "Could not create the project. Please try again."
+msgstr "Không thể tạo dự án. Vui lòng thử lại."
+
 msgid "Could not delete"
 msgstr "Không thể xóa"
 
@@ -5754,6 +5757,9 @@ msgstr "Không thể ngắt kết nối."
 
 msgid "Could not download {names}."
 msgstr "Không thể tải xuống {names}."
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "Không thể tải mẫu xuống. Hãy kiểm tra kết nối internet rồi thử lại."
 
 msgid "Could not forget {domain}"
 msgstr "Không thể quên {domain}"
@@ -9398,6 +9404,15 @@ msgstr "Git & Worktree"
 
 msgid "Git author name"
 msgstr "Tên tác giả Git"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "Git không thể chạy ở vị trí này. Hãy chọn vị trí khác rồi thử lại."
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "Git chỉ chạy được sau khi bạn chấp nhận giấy phép Xcode. Hãy chạy sudo xcodebuild -license trong Terminal rồi thử lại."
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "Git chưa được cài trên máy Mac này. Hãy cài Command Line Tools của Apple rồi thử lại."
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Các tệp bị Git bỏ qua trên Cloud, như .env. Hãy sao chép chúng ra"

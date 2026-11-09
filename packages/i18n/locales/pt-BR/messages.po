@@ -5734,6 +5734,9 @@ msgstr "Não foi possível criar o projeto"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "Não foi possível criar o projeto. Tente outro nome ou verifique os logs."
 
+msgid "Could not create the project. Please try again."
+msgstr "Não foi possível criar o projeto. Tente novamente."
+
 msgid "Could not delete"
 msgstr "Não foi possível excluir"
 
@@ -5754,6 +5757,9 @@ msgstr "Não foi possível desconectar."
 
 msgid "Could not download {names}."
 msgstr "Não foi possível baixar {names}."
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "Não foi possível baixar o modelo. Verifique sua conexão com a internet e tente novamente."
 
 msgid "Could not forget {domain}"
 msgstr "Não foi possível esquecer {domain}"
@@ -9398,6 +9404,15 @@ msgstr "Git e worktrees"
 
 msgid "Git author name"
 msgstr "Nome do autor no Git"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "O Git não pode ser executado neste local. Escolha outro local e tente novamente."
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "O Git só pode ser executado depois que você aceitar a licença do Xcode. Execute sudo xcodebuild -license no Terminal e tente novamente."
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "O Git ainda não está instalado neste Mac. Instale as Command Line Tools da Apple e tente novamente."
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Arquivos ignorados pelo Git no Cloud, como .env. Copie-os para fora"

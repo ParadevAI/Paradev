@@ -5734,6 +5734,9 @@ msgstr "Proje oluşturulamadı"
 msgid "Could not create project. Please try a different name or check the logs."
 msgstr "Proje oluşturulamadı. Lütfen farklı bir ad deneyin veya günlükleri kontrol edin."
 
+msgid "Could not create the project. Please try again."
+msgstr "Proje oluşturulamadı. Lütfen tekrar deneyin."
+
 msgid "Could not delete"
 msgstr "Silinemedi"
 
@@ -5754,6 +5757,9 @@ msgstr "Bağlantı kesilemedi."
 
 msgid "Could not download {names}."
 msgstr "{names} indirilemedi."
+
+msgid "Could not download the template. Check your internet connection and try again."
+msgstr "Şablon indirilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."
 
 msgid "Could not forget {domain}"
 msgstr "{domain} unutulamadı"
@@ -9398,6 +9404,15 @@ msgstr "Git ve worktree'ler"
 
 msgid "Git author name"
 msgstr "Git yazar adı"
+
+msgid "Git can't run in this location. Choose a different location and try again."
+msgstr "Git bu konumda çalışamıyor. Farklı bir konum seçip tekrar deneyin."
+
+msgid "Git can't run until you accept the Xcode license. Run sudo xcodebuild -license in Terminal, then try again."
+msgstr "Xcode lisansını kabul edene kadar Git çalışamaz. Terminal'de sudo xcodebuild -license komutunu çalıştırın, ardından tekrar deneyin."
+
+msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
+msgstr "Git bu Mac'te henüz yüklü değil. Apple'ın Command Line Tools paketini yükleyin, ardından tekrar deneyin."
 
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Buluttaki Git tarafından yok sayılan dosyalar, örneğin .env. Bunları dışarı kopyalayın"
