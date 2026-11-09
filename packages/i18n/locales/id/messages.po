@@ -2948,6 +2948,16 @@ msgstr "Tampilan"
 msgid "Apple logo"
 msgstr "Logo Apple"
 
+msgid "Apple's installer closed before Git was installed."
+msgstr "Penginstal Apple tertutup sebelum Git terpasang."
+
+#. placeholder {0}: phase.reason
+msgid "Apple's installer did not open: {0}"
+msgstr "Penginstal Apple tidak terbuka: {0}"
+
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Perkiraan waktu dari Apple biasanya jauh lebih lama daripada instalasi sebenarnya."
+
 msgid "Application menu"
 msgstr "Menu aplikasi"
 
@@ -9348,6 +9358,9 @@ msgstr "Lihat detail saluran"
 msgid "Get extensions"
 msgstr "Dapatkan ekstensi"
 
+msgid "Get Git"
+msgstr "Dapatkan Git"
+
 msgid "Get in touch with the {companyName} team."
 msgstr "Hubungi tim {companyName}."
 
@@ -10156,6 +10169,9 @@ msgstr "di {0}"
 msgid "in a terminal on this host."
 msgstr "di terminal pada host ini."
 
+msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
+msgstr "Di jendela Apple, klik Instal. Prosesnya beberapa menit, dan halaman ini diperbarui setelah selesai."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Hanya dalam beberapa bulan, <0>puluhan ribu engineer</0> memakai Paradev sebagai IDE utama mereka, di perusahaan seperti Wix, DoorDash, dan Netflix."
 
@@ -10305,8 +10321,17 @@ msgstr "Pasang & Mulai Ulang"
 msgid "Install a plugin in the Paradev app and every agent can use it."
 msgstr "Instal plugin di aplikasi Paradev dan setiap agen bisa menggunakannya."
 
+msgid "Install Command Line Tools"
+msgstr "Instal Command Line Tools"
+
 msgid "Install failed"
 msgstr "Pemasangan gagal"
+
+msgid "Install Git first. See the message above."
+msgstr "Instal Git terlebih dahulu. Lihat pesan di atas."
+
+msgid "Install Git, then come back."
+msgstr "Instal Git, lalu kembali ke sini."
 
 msgid "Install GitHub App"
 msgstr "Pasang GitHub App"
@@ -13443,6 +13468,9 @@ msgstr "di {offScopeHostName} — tidak akan berjalan di sini"
 msgid "On a date"
 msgstr "Pada tanggal"
 
+msgid "On a Mac, Git comes with Apple's Command Line Tools."
+msgstr "Di Mac, Git disertakan dalam Command Line Tools dari Apple."
+
 msgid "On focus change"
 msgstr "Saat fokus berubah"
 
@@ -14276,6 +14304,9 @@ msgstr "Orang lain sedang menggunakan proyek ini. Ketik <0>{projectName}</0> unt
 msgid "Other Team Members"
 msgstr "Anggota Tim Lainnya"
 
+msgid "Other ways to get Git"
+msgstr "Cara lain mendapatkan Git"
+
 msgid "Other ways to reach us"
 msgstr "Cara lain menghubungi kami"
 
@@ -14558,6 +14589,9 @@ msgstr "Terminal Paradev Mobile di iPhone"
 
 msgid "Paradev needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Paradev butuh Full Disk Access untuk membaca data browser lain. Berikan izinnya di System Settings, lalu periksa lagi."
+
+msgid "Paradev needs Git to add a project."
+msgstr "Paradev memerlukan Git untuk menambahkan proyek."
 
 msgid "Paradev next to others"
 msgstr "Paradev dibanding yang lain"
@@ -18041,6 +18075,9 @@ msgstr "Tampilkan semua komentar"
 
 msgid "Show all lines"
 msgstr "Tampilkan semua baris"
+
+msgid "Show Apple's installer"
+msgstr "Tampilkan penginstal Apple"
 
 msgid "Show archived"
 msgstr "Tampilkan yang diarsipkan"
