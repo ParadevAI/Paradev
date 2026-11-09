@@ -48,8 +48,8 @@ msgstr "\"{0}\" wordt op GitHub als gesloten gemarkeerd. Je kunt hem hier op elk
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
-msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet — this overrides them. This can't be undone from here."
-msgstr "\"{0}\" wordt via {2} in {1} gemerged. De checks zijn nog niet geslaagd — dit overschrijft ze. Dit kan hier niet ongedaan worden gemaakt."
+msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet, so this overrides them. This can't be undone from here."
+msgstr "\"{0}\" wordt via {2} in {1} gemerged. De checks zijn nog niet geslaagd, dit overschrijft ze. Dit kan hier niet ongedaan worden gemaakt."
 
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
@@ -57,11 +57,11 @@ msgstr "\"{0}\" wordt via {2} in {1} gemerged. De checks zijn nog niet geslaagd 
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" wordt via {2} in {1} gemerged. Dit kan hier niet ongedaan worden gemaakt."
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached"
-msgstr "\"{name}\" is {size} — bestanden groter dan {limit} kunnen niet worden bijgevoegd"
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached"
+msgstr "\"{name}\" is {size}. Bestanden groter dan {limit} kunnen niet worden bijgevoegd"
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
-msgstr "\"{name}\" is {size} — bestanden groter dan {limit} kunnen niet aan deze werkruimte worden bijgevoegd. Staat het bestand op de machine van de werkruimte, noem dan in plaats daarvan het pad."
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" is {size}. Bestanden groter dan {limit} kunnen niet aan deze werkruimte worden bijgevoegd. Staat het bestand op de machine van de werkruimte, noem dan in plaats daarvan het pad."
 
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" is een map. Voeg in plaats daarvan de bestanden in de map toe."
@@ -103,12 +103,12 @@ msgid "[prompt]"
 msgstr "[prompt]"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
-msgstr "{0, plural, one {# actieve poort — details verbergen} other {# actieve poorten — details verbergen}}"
+msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
+msgstr "{0, plural, one {# actieve poort: details verbergen} other {# actieve poorten: details verbergen}}"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — show details} other {# active ports — show details}}"
-msgstr "{0, plural, one {# actieve poort — details tonen} other {# actieve poorten — details tonen}}"
+msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
+msgstr "{0, plural, one {# actieve poort: details tonen} other {# actieve poorten: details tonen}}"
 
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
@@ -252,12 +252,12 @@ msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {# resultaat} other {# resultaten}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — hide details} other {# running agents — hide details}}"
-msgstr "{0, plural, one {# actieve agent — details verbergen} other {# actieve agents — details verbergen}}"
+msgid "{0, plural, one {# running agent: hide details} other {# running agents: hide details}}"
+msgstr "{0, plural, one {# actieve agent: details verbergen} other {# actieve agents: details verbergen}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — show details} other {# running agents — show details}}"
-msgstr "{0, plural, one {# actieve agent — details tonen} other {# actieve agents — details tonen}}"
+msgid "{0, plural, one {# running agent: show details} other {# running agents: show details}}"
+msgstr "{0, plural, one {# actieve agent: details tonen} other {# actieve agents: details tonen}}"
 
 #. placeholder {0}: aliveCount ?? 0
 msgid "{0, plural, one {# session running} other {# sessions running}}"
@@ -289,8 +289,8 @@ msgid "{0, plural, one {# workspace} other {# workspaces}}"
 msgstr "{0, plural, one {# werkruimte} other {# werkruimtes}}"
 
 #. placeholder {0}: shown?.count ?? 0
-msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
-msgstr "{0, plural, one {Eén draaiende agent gebruikt nog het vorige account — de wissel geldt alleen voor nieuwe starts.} other {# draaiende agents gebruiken nog het vorige account — de wissel geldt alleen voor nieuwe starts.}}"
+msgid "{0, plural, one {A running agent still uses the previous account. The switch only reaches new launches.} other {# running agents still use the previous account. The switch only reaches new launches.}}"
+msgstr "{0, plural, one {Eén draaiende agent gebruikt nog het vorige account. De wissel geldt alleen voor nieuwe starts.} other {# draaiende agents gebruiken nog het vorige account. De wissel geldt alleen voor nieuwe starts.}}"
 
 #. placeholder {0}: targets.length
 msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
@@ -408,14 +408,6 @@ msgstr "{0, plural, one {Volgt # pagina voor reacties} other {Volgt # pagina's v
 #. placeholder {1}: formatDayLabel(lastDay)
 msgid "{0} – {1} · API-rate estimate from local session logs"
 msgstr "{0} – {1} · schatting op API-tarief uit lokale sessielogs"
-
-#. placeholder {0}: workspace.hostName
-msgid "{0} — device offline"
-msgstr "{0} — apparaat offline"
-
-#. placeholder {0}: error.message
-msgid "{0} — try the Paradev tray menu > Host Service > Restart."
-msgstr "{0} — probeer het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
 
 #. placeholder {0}: window.label
 #. placeholder {1}: formatPercent(window.usedPercent / 100)
@@ -544,8 +536,8 @@ msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} is ingesteld op deze machine, maar niet op je account"
 
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
-msgid "{0} more — refine your search"
-msgstr "Nog {0} — verfijn je zoekopdracht"
+msgid "{0} more. Refine your search"
+msgstr "Nog {0}. Verfijn je zoekopdracht"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: pages.length
@@ -654,6 +646,14 @@ msgstr "{0} wint op schade na {1} beurten"
 #. placeholder {1}: took ? `, ${took}` : ""
 msgid "{0}, {outcome}{1}"
 msgstr "{0}, {outcome}{1}"
+
+#. placeholder {0}: workspace.hostName
+msgid "{0}: device offline"
+msgstr "{0}: apparaat offline"
+
+#. placeholder {0}: error.message
+msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
+msgstr "{0}. Probeer het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
 
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
@@ -852,8 +852,8 @@ msgstr "Tekengrootte van {configTitle}"
 msgid "{connectorName} account"
 msgstr "{connectorName}-account"
 
-msgid "{cookieCount} cookies — forget this site"
-msgstr "{cookieCount} cookies — deze site vergeten"
+msgid "{cookieCount} cookies · Forget this site"
+msgstr "{cookieCount} cookies · deze site vergeten"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# automatisering} other {# automatiseringen}}"
@@ -951,8 +951,8 @@ msgstr "{count, plural, one {# tool gebruikt} other {# tools gebruikt}}"
 msgid "{count} files are over {limit} and were not added"
 msgstr "{count} bestanden zijn groter dan {limit} en zijn niet toegevoegd"
 
-msgid "{count} files attached — a message carries at most {max}"
-msgstr "{count} bestanden bijgevoegd — een bericht kan er maximaal {max} bevatten"
+msgid "{count} files attached. A message carries at most {max}"
+msgstr "{count} bestanden bijgevoegd. Een bericht kan er maximaal {max} bevatten"
 
 msgid "{count} GitHub stars"
 msgstr "{count} GitHub-sterren"
@@ -1616,8 +1616,8 @@ msgstr "Seedronde van $ 11,5 mln onder leiding van Union Square Ventures"
 msgid "1"
 msgstr "1"
 
-msgid "1 cookie — forget this site"
-msgstr "1 cookie — deze site vergeten"
+msgid "1 cookie · Forget this site"
+msgstr "1 cookie · deze site vergeten"
 
 msgid "1 file is over {limit} and was not added"
 msgstr "1 bestand is groter dan {limit} en is niet toegevoegd"
@@ -2233,8 +2233,8 @@ msgstr "{bought} GB-uren toegevoegd."
 msgid "Added 1 file to {where}"
 msgstr "1 bestand toegevoegd aan {where}"
 
-msgid "Added only when launching with a prompt — e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
-msgstr "Alleen toegevoegd bij starten met een prompt — bijv. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgid "Added only when launching with a prompt, e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgstr "Alleen toegevoegd bij starten met een prompt, bijv. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
 
 msgid "Added to agent input"
 msgstr "Toegevoegd aan de invoer van de agent"
@@ -2294,8 +2294,8 @@ msgstr "Agent"
 msgid "Agent commands"
 msgstr "Agentcommando's"
 
-msgid "Agent Complete — {workspaceName}"
-msgstr "Agent klaar — {workspaceName}"
+msgid "Agent Complete · {workspaceName}"
+msgstr "Agent klaar · {workspaceName}"
 
 msgid "Agent Configs"
 msgstr "Agentconfiguraties"
@@ -2496,8 +2496,8 @@ msgid "All commits"
 msgstr "Alle commits"
 
 #. placeholder {0}: members.length
-msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
-msgstr "Alle gegevens worden definitief verwijderd voor alle {0} leden — dit kan niet ongedaan worden gemaakt."
+msgid "All data will be permanently deleted for all {0} members. This cannot be undone."
+msgstr "Alle gegevens worden definitief verwijderd voor alle {0} leden. Dit kan niet ongedaan worden gemaakt."
 
 msgid "All downloads"
 msgstr "Alle downloads"
@@ -2532,8 +2532,8 @@ msgstr "Alle nieuwe berichten"
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "Alle doelen gehaald. Hoogste trede, er is niets meer om naar te streven."
 
-msgid "All of the organization's data will be permanently deleted — this cannot be undone."
-msgstr "Alle gegevens van de organisatie worden definitief verwijderd — dit kan niet ongedaan worden gemaakt."
+msgid "All of the organization's data will be permanently deleted. This cannot be undone."
+msgstr "Alle gegevens van de organisatie worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt."
 
 msgid "All of this project's worktrees are already tracked"
 msgstr "Alle worktrees van dit project worden al gevolgd"
@@ -3389,8 +3389,8 @@ msgstr "Avi Peltz, Satya Patel en Kiet Ho op YC Demo Day"
 msgid "Awaiting {0}"
 msgstr "Wacht op {0}"
 
-msgid "Awaiting Response — {workspaceName}"
-msgstr "Wacht op antwoord — {workspaceName}"
+msgid "Awaiting Response · {workspaceName}"
+msgstr "Wacht op antwoord · {workspaceName}"
 
 msgid "Awaiting review from you"
 msgstr "Wacht op review van jou"
@@ -3543,14 +3543,14 @@ msgstr "Facturering weigerde een cloudwerkruimte te starten: het abonnement van 
 msgid "Binary"
 msgstr "Binair"
 
-msgid "Binary file — cannot display"
-msgstr "Binair bestand — kan niet worden weergegeven"
-
 msgid "Binary file changed"
 msgstr "Binair bestand gewijzigd"
 
 msgid "Binary file hidden"
 msgstr "Binair bestand verborgen"
+
+msgid "Binary file. Cannot display"
+msgstr "Binair bestand. Kan niet worden weergegeven"
 
 msgid "Bio"
 msgstr "Bio"
@@ -3999,10 +3999,13 @@ msgstr "Geannuleerd"
 msgid "Cancelled the invite for {name}"
 msgstr "Uitnodiging voor {name} geannuleerd"
 
-#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(cancelAt)
 msgid "Cancels {0} — downgrades to Free at the end of the billing period."
 msgstr "Stopt {0} — gaat aan het eind van de factuurperiode terug naar Free."
+
+#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
+msgid "Cancels {0}, then downgrades to Free at the end of the billing period."
+msgstr "Stopt {0}, gaat aan het eind van de factuurperiode terug naar Free."
 
 msgid "Cannot {action}: no active organization is selected. Select an organization or sign in again."
 msgstr "Kan {action} niet: er is geen actieve organisatie geselecteerd. Kies een organisatie of log opnieuw in."
@@ -4485,8 +4488,8 @@ msgstr "Wis het filter om de zijbalk te herschikken"
 msgid "Clear workspace selection"
 msgstr "Werkruimteselectie wissen"
 
-msgid "Cleared {succeededLabels} — could not clear {failedLabels}"
-msgstr "{succeededLabels} gewist — {failedLabels} kon niet worden gewist"
+msgid "Cleared {succeededLabels}. Could not clear {failedLabels}"
+msgstr "{succeededLabels} gewist. {failedLabels} kon niet worden gewist"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "Operator gehaald binnen het Run 01-venster"
@@ -4789,8 +4792,8 @@ msgstr "Cloudgebruik"
 msgid "Cloud workspace"
 msgstr "Cloudwerkruimte"
 
-msgid "Cloud workspace — connecting"
-msgstr "Cloudwerkruimte — verbinden"
+msgid "Cloud workspace: connecting"
+msgstr "Cloudwerkruimte: verbinden"
 
 msgid "Cloud workspaces"
 msgstr "Cloudwerkruimtes"
@@ -5478,8 +5481,8 @@ msgstr "Omzetten naar concept…"
 msgid "cookies and site data"
 msgstr "cookies en sitegegevens"
 
-msgid "Cookies and site data — signs you out of most sites"
-msgstr "Cookies en sitegegevens — je wordt bij de meeste sites uitgelogd"
+msgid "Cookies and site data (signs you out of most sites)"
+msgstr "Cookies en sitegegevens (je wordt bij de meeste sites uitgelogd)"
 
 msgid "Copied"
 msgstr "Gekopieerd"
@@ -5666,8 +5669,8 @@ msgstr "Werkruimte-ID kopiëren"
 msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
 msgstr "Kopieer je browsegeschiedenis en logins uit een andere browser naar Paradev. Je oorspronkelijke browser verandert niet."
 
-msgid "Copy your key now — you won't be able to see it again."
-msgstr "Kopieer je sleutel nu — je kunt hem later niet meer zien."
+msgid "Copy your key now. You won't be able to see it again."
+msgstr "Kopieer je sleutel nu. Je kunt hem later niet meer zien."
 
 msgid "Copying the conversation"
 msgstr "Gesprek kopiëren"
@@ -6031,8 +6034,8 @@ msgstr "Kan het verplaatsen niet controleren"
 msgid "Couldn't check what removing this member affects"
 msgstr "Kon niet controleren wat het verwijderen van dit lid beïnvloedt"
 
-msgid "Couldn't confirm star status — check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
-msgstr "Kan de sterstatus niet bevestigen — controleer of de GitHub-CLI (`gh`) is geïnstalleerd, of je bent ingelogd en of je een netwerkverbinding hebt"
+msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
+msgstr "Kan de sterstatus niet bevestigen. Controleer of de GitHub-CLI (`gh`) is geïnstalleerd, of je bent ingelogd en of je een netwerkverbinding hebt"
 
 msgid "Couldn't connect (error {status}). Please try again."
 msgstr "Verbinden mislukt (fout {status}). Probeer het opnieuw."
@@ -6105,8 +6108,8 @@ msgstr "Kan automatisering niet laden: {0}"
 msgid "Couldn't load automations"
 msgstr "Kan automatiseringen niet laden"
 
-msgid "Couldn't load contributors — type a username instead."
-msgstr "Kan contributors niet laden — typ in plaats daarvan een gebruikersnaam."
+msgid "Couldn't load contributors. Type a username instead."
+msgstr "Kan contributors niet laden. Typ in plaats daarvan een gebruikersnaam."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Eerdere berichten konden niet worden geladen. Opnieuw proberen"
@@ -6173,8 +6176,8 @@ msgstr "Kan de cloud niet bereiken voor {0}: {1}"
 msgid "Couldn't reach the model provider"
 msgstr "Kon de modelprovider niet bereiken"
 
-msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
-msgstr "Kan deze cloudwerkruimte niet bereiken. Mogelijk wordt deze nog gewekt — probeer het opnieuw."
+msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
+msgstr "Kan deze cloudwerkruimte niet bereiken. Mogelijk wordt deze nog gewekt. Probeer het opnieuw."
 
 msgid "Couldn't reach workspace"
 msgstr "Kan werkruimte niet bereiken"
@@ -6207,12 +6210,6 @@ msgstr "Kan \"{workspaceName}\" niet herstellen"
 msgid "Couldn't save"
 msgstr "Kan niet opslaan"
 
-msgid "Couldn't save — edit or click away to retry"
-msgstr "Kan niet opslaan — bewerk of klik ernaast om opnieuw te proberen"
-
-msgid "Couldn't save — retrying…"
-msgstr "Kan niet opslaan — opnieuw proberen…"
-
 msgid "Couldn't save edits"
 msgstr "Kan bewerkingen niet opslaan"
 
@@ -6227,6 +6224,12 @@ msgstr "Kan de routine niet opslaan"
 
 msgid "Couldn't save your choice. Try again."
 msgstr "Je keuze kon niet worden opgeslagen. Probeer het opnieuw."
+
+msgid "Couldn't save. Edit or click away to retry"
+msgstr "Kan niet opslaan. Bewerk of klik ernaast om opnieuw te proberen"
+
+msgid "Couldn't save. Retrying…"
+msgstr "Kan niet opslaan. Opnieuw proberen…"
 
 msgid "Couldn't search your chats"
 msgstr "Kon je chats niet doorzoeken"
@@ -7032,8 +7035,8 @@ msgstr "Verwijderd door {deletedBy} {deletedWhen} · {deviceNames}"
 msgid "Deleted group \"{group}\""
 msgstr "Groep \"{group}\" verwijderd"
 
-msgid "deleted or unavailable — pick another"
-msgstr "verwijderd of niet beschikbaar — kies een andere"
+msgid "deleted or unavailable, pick another"
+msgstr "verwijderd of niet beschikbaar, kies een andere"
 
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "Verwijderde projecten kunnen 30 dagen lang worden hersteld, samen met de workspaces die ermee zijn verwijderd. Daarna worden ze verwijderd; de repositorymap en worktrees met niet-gecommitte wijzigingen blijven op de schijf."
@@ -7127,14 +7130,14 @@ msgstr "Design"
 msgid "Design a complex system on a whiteboard."
 msgstr "Ontwerp een complex systeem op een whiteboard."
 
-msgid "Design mode — click any element in the page to send it to an agent"
-msgstr "Designmodus — klik op een element op de pagina om het naar een agent te sturen"
-
-msgid "Design mode — click any element in the page to send it to an agent."
-msgstr "Designmodus — klik op een element op de pagina om het naar een agent te sturen."
-
 msgid "Design mode failed"
 msgstr "Designmodus mislukt"
+
+msgid "Design mode: click any element in the page to send it to an agent"
+msgstr "Designmodus: klik op een element op de pagina om het naar een agent te sturen"
+
+msgid "Design mode: click any element in the page to send it to an agent."
+msgstr "Designmodus: klik op een element op de pagina om het naar een agent te sturen."
 
 msgid "Design review"
 msgstr "Designreview"
@@ -7814,8 +7817,8 @@ msgstr "Effort"
 msgid "Electron/tRPC-coupled, so referenced rather than rendered. Badge = import sites today; high counts are promotion candidates for packages/ui"
 msgstr "Gekoppeld aan Electron/tRPC, dus alleen genoemd in plaats van gerenderd. Badge = huidige importplekken; hoge aantallen zijn kandidaten voor promotie naar packages/ui"
 
-msgid "Element captured — describe the change, or press esc to pick again."
-msgstr "Element vastgelegd — beschrijf de wijziging, of druk op esc om opnieuw te kiezen."
+msgid "Element captured. Describe the change, or press esc to pick again."
+msgstr "Element vastgelegd. Beschrijf de wijziging, of druk op esc om opnieuw te kiezen."
 
 msgid "Element captured. Describe the change."
 msgstr "Element vastgelegd. Beschrijf de wijziging."
@@ -9262,11 +9265,11 @@ msgstr "Uit snapshots van de worktree voor en na deze beurt. Een andere chat wer
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Uit snapshots van de worktree voor en na deze beurt. Een andere chat werkte hier tegelijk, dus deze lijst bevat alleen de bestanden die deze chat met zijn bestandstools heeft bewerkt. Andere wijzigingen staan apart."
 
-msgid "Front matter hidden — switch to Markdown to edit it"
-msgstr "Front matter verborgen — schakel over naar Markdown om die te bewerken"
+msgid "Front matter hidden. Switch to Markdown to edit it"
+msgstr "Front matter verborgen. Schakel over naar Markdown om die te bewerken"
 
-msgid "Front matter hidden — switch to the Markdown view to edit it"
-msgstr "Front matter verborgen — schakel over naar de Markdown-weergave om die te bewerken"
+msgid "Front matter hidden. Switch to the Markdown view to edit it"
+msgstr "Front matter verborgen. Schakel over naar de Markdown-weergave om die te bewerken"
 
 msgid "Full access"
 msgstr "Volledige toegang"
@@ -10647,8 +10650,8 @@ msgstr "De antwoorden worden ook verwijderd."
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Het werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op de computer die je kiest begint vanaf die branch, en elke Claude-chat gaat daar verder. Agents die aan het werk zijn, stoppen eerst. Terminals en andere chats blijven waar ze zijn."
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
-msgstr "De werkruimtes en terminals zijn niet beschikbaar tot de service opnieuw start — gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
+msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
+msgstr "De werkruimtes en terminals zijn niet beschikbaar tot de service opnieuw start. Gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
 msgstr "De workspaces en hun worktrees worden nu van de schijf verwijderd in plaats van na 30 dagen. De repositorymap en worktrees met niet-gecommitte wijzigingen blijven behouden."
@@ -10783,11 +10786,11 @@ msgstr "Blijven wachten"
 msgid "Keep working"
 msgstr "Doorwerken"
 
-msgid "Kept the new file — it changed after it was created"
-msgstr "Nieuw bestand behouden — het is na het aanmaken gewijzigd"
+msgid "Kept the new file because it changed after it was created"
+msgstr "Nieuw bestand behouden, het is na het aanmaken gewijzigd"
 
-msgid "Kept the new folder — it is no longer empty"
-msgstr "Nieuwe map behouden — die is niet meer leeg"
+msgid "Kept the new folder because it is no longer empty"
+msgstr "Nieuwe map behouden, die is niet meer leeg"
 
 msgid "Key dates"
 msgstr "Belangrijke datums"
@@ -11545,8 +11548,8 @@ msgstr "Alle panelen even groot maken"
 msgid "Make default"
 msgstr "Standaard maken"
 
-msgid "Make default — launch new terminals and agents on this account."
-msgstr "Standaard maken — start nieuwe terminals en agents op dit account."
+msgid "Make default: launch new terminals and agents on this account."
+msgstr "Standaard maken: start nieuwe terminals en agents op dit account."
 
 msgid "Make public"
 msgstr "Openbaar maken"
@@ -11696,8 +11699,8 @@ msgstr "Markdown-stijl"
 msgid "Marked as viewed"
 msgstr "Gemarkeerd als bekeken"
 
-msgid "Marked ready, but couldn't refresh PR state — try again in a moment"
-msgstr "Gemarkeerd als klaar, maar de PR-status kon niet worden vernieuwd — probeer het zo opnieuw"
+msgid "Marked ready, but couldn't refresh PR state. Try again in a moment"
+msgstr "Gemarkeerd als klaar, maar de PR-status kon niet worden vernieuwd. Probeer het zo opnieuw"
 
 msgid "Marketplace"
 msgstr "Marketplace"
@@ -11849,8 +11852,8 @@ msgstr "Gemerged"
 msgid "Merged by {0}"
 msgstr "Gemerged door {0}"
 
-msgid "Merged, but couldn't refresh PR state — try again in a moment"
-msgstr "Gemerged, maar de PR-status kon niet worden ververst — probeer het zo opnieuw"
+msgid "Merged, but couldn't refresh PR state. Try again in a moment"
+msgstr "Gemerged, maar de PR-status kon niet worden ververst. Probeer het zo opnieuw"
 
 msgid "Merging PR..."
 msgstr "PR mergen..."
@@ -12516,8 +12519,8 @@ msgid "No"
 msgstr "Nee"
 
 #. placeholder {0}: AGENT_LABELS[agent]
-msgid "No {0} logins on this host — sign in and usage appears here."
-msgstr "Geen {0}-logins op deze host — log in en het gebruik verschijnt hier."
+msgid "No {0} logins on this host. Sign in and usage appears here."
+msgstr "Geen {0}-logins op deze host. Log in en het gebruik verschijnt hier."
 
 msgid "No access to this host"
 msgstr "Geen toegang tot deze host"
@@ -13462,8 +13465,8 @@ msgstr "Ouder"
 msgid "On"
 msgstr "Aan"
 
-msgid "on {offScopeHostName} — won't run here"
-msgstr "op {offScopeHostName} — draait hier niet"
+msgid "on {offScopeHostName}, won't run here"
+msgstr "op {offScopeHostName}, draait hier niet"
 
 msgid "On a date"
 msgstr "Op een datum"
@@ -14362,8 +14365,8 @@ msgid "Overwrite file"
 msgstr "Bestand overschrijven"
 
 #. placeholder {0}: ownerName ?? t({ message: "a teammate", })
-msgid "Owned by {0} — only they can edit this automation."
-msgstr "Eigendom van {0} — alleen die persoon kan deze automatisering bewerken."
+msgid "Owned by {0}. Only they can edit this automation."
+msgstr "Eigendom van {0}. Alleen die persoon kan deze automatisering bewerken."
 
 msgid "Owner"
 msgstr "Eigenaar"
@@ -15046,9 +15049,6 @@ msgstr "Populaire modellen"
 msgid "Ports"
 msgstr "Poorten"
 
-msgid "Ports — {totalPortCount} live"
-msgstr "Poorten — {totalPortCount} actief"
-
 msgid "Ports in top bar dropdown"
 msgstr "Poorten in dropdown in de bovenbalk"
 
@@ -15057,6 +15057,9 @@ msgstr "Poorten op externe hosts"
 
 msgid "Ports on this computer"
 msgstr "Poorten op deze computer"
+
+msgid "Ports: {totalPortCount} live"
+msgstr "Poorten: {totalPortCount} actief"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Mogelijk op goede dagen. De kosten van toezicht groeien nog te snel."
@@ -15075,8 +15078,8 @@ msgstr "PR"
 
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} — {1}"
-msgstr "PR #{0} — {1}"
+msgid "PR #{0} · {1}"
+msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -15267,11 +15270,11 @@ msgstr "Privacybeleid"
 msgid "Private"
 msgstr "Privé"
 
-msgid "Private — only specific people"
-msgstr "Privé — alleen bepaalde mensen"
-
 msgid "Private by default.<0/>You're in control."
 msgstr "Standaard privé.<0/>Jij houdt de controle."
+
+msgid "Private: only specific people"
+msgstr "Privé: alleen bepaalde mensen"
 
 msgid "Pro"
 msgstr "Pro"
@@ -15371,8 +15374,8 @@ msgstr "Project niet vertrouwd in Codex"
 msgid "Project on another device"
 msgstr "Project op een ander apparaat"
 
-msgid "Project ready — open it from the sidebar."
-msgstr "Project klaar — open het via de zijbalk."
+msgid "Project ready. Open it from the sidebar."
+msgstr "Project klaar. Open het via de zijbalk."
 
 #. placeholder {0}: result.repoPath
 msgid "Project relocated to {0}"
@@ -15398,11 +15401,11 @@ msgstr "Zoeken door het hele project"
 msgid "Project: {0}"
 msgstr "Project: {0}"
 
-msgid "Project's host is unreachable — cannot import worktrees right now"
-msgstr "De host van het project is onbereikbaar — worktrees kunnen nu niet worden geïmporteerd"
+msgid "Project's host is unreachable. Cannot import worktrees right now"
+msgstr "De host van het project is onbereikbaar. Worktrees kunnen nu niet worden geïmporteerd"
 
-msgid "Project's host is unreachable — cannot rename right now"
-msgstr "De host van het project is onbereikbaar — naam kan nu niet worden gewijzigd"
+msgid "Project's host is unreachable. Cannot rename right now"
+msgstr "De host van het project is onbereikbaar. Naam kan nu niet worden gewijzigd"
 
 msgid "Projects"
 msgstr "Projecten"
@@ -15437,8 +15440,8 @@ msgstr "Promptvoorbeeld"
 msgid "Prompt restored"
 msgstr "Prompt hersteld"
 
-msgid "Prompt submitted — thanks!"
-msgstr "Prompt ingestuurd — bedankt!"
+msgid "Prompt submitted. Thanks!"
+msgstr "Prompt ingestuurd. Bedankt!"
 
 msgid "Prompt transport"
 msgstr "Prompttransport"
@@ -15462,8 +15465,8 @@ msgstr "Geef een id of een slug op"
 msgid "Provider: {0}"
 msgstr "Provider: {0}"
 
-msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened — create a new one to try again."
-msgstr "Het provisioneren is mislukt en de sandbox is afgebroken. Er draait niets en deze werkruimte kan niet worden geopend — maak een nieuwe aan om het opnieuw te proberen."
+msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
+msgstr "Het provisioneren is mislukt en de sandbox is afgebroken. Er draait niets en deze werkruimte kan niet worden geopend. Maak een nieuwe aan om het opnieuw te proberen."
 
 msgid "PRs a week"
 msgstr "PR's per week"
@@ -15471,11 +15474,11 @@ msgstr "PR's per week"
 msgid "Public"
 msgstr "Openbaar"
 
-msgid "Public — anyone in <0>{organizationName}</0>"
-msgstr "Openbaar — iedereen in <0>{organizationName}</0>"
-
 msgid "Public leaderboard"
 msgstr "Openbare ranglijst"
+
+msgid "Public: anyone in <0>{organizationName}</0>"
+msgstr "Openbaar: iedereen in <0>{organizationName}</0>"
 
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "Publiceer opnieuw en de link blijft hetzelfde. Eerdere versies blijven bewaard in de geschiedenis."
@@ -15988,8 +15991,8 @@ msgstr "Opnieuw genereren"
 msgid "Region"
 msgstr "Regio"
 
-msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
-msgstr "Registreert lifecycle-hooks in de globale configuratie van deze agent zodat Paradev status kan tonen en meldingen kan sturen. Uitzetten verwijdert de items van Paradev overal — status en meldingen stoppen voor deze agent, ook binnen Paradev."
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere. Status and notifications stop for this agent, including inside Paradev."
+msgstr "Registreert lifecycle-hooks in de globale configuratie van deze agent zodat Paradev status kan tonen en meldingen kan sturen. Uitzetten verwijdert de items van Paradev overal. Status en meldingen stoppen voor deze agent, ook binnen Paradev."
 
 msgid "Reinstall {name}"
 msgstr "{name} opnieuw installeren"
@@ -16076,14 +16079,14 @@ msgstr "Externe toegang"
 msgid "Remote Access may be off"
 msgstr "Externe toegang staat mogelijk uit"
 
-msgid "Remote MCP server — connects over HTTP"
-msgstr "Externe MCP-server — verbindt via HTTP"
+msgid "Remote MCP server, connects over HTTP"
+msgstr "Externe MCP-server, verbindt via HTTP"
 
 msgid "Remote workspace"
 msgstr "Externe werkruimte"
 
-msgid "Remote workspace — device offline"
-msgstr "Externe werkruimte — apparaat offline"
+msgid "Remote workspace: device offline"
+msgstr "Externe werkruimte: apparaat offline"
 
 msgid "Remove"
 msgstr "Verwijderen"
@@ -18353,8 +18356,8 @@ msgstr "Inloggen is niet voltooid"
 msgid "Sign-in expired"
 msgstr "Login verlopen"
 
-msgid "Sign-in expired — run"
-msgstr "Login verlopen — voer"
+msgid "Sign-in expired. Run"
+msgstr "Login verlopen. Voer"
 
 msgid "Sign-in failed"
 msgstr "Inloggen mislukt"
@@ -18805,8 +18808,8 @@ msgstr "Paradev een ster geven op GitHub"
 msgid "Starred"
 msgstr "Ster gegeven"
 
-msgid "Starred — thank you!"
-msgstr "Ster gegeven — bedankt!"
+msgid "Starred. Thank you!"
+msgstr "Ster gegeven. Bedankt!"
 
 msgid "Starring…"
 msgstr "Ster geven…"
@@ -19654,8 +19657,8 @@ msgstr "Die aanmeldlink voor {plugin} is verlopen. Probeer opnieuw verbinding te
 msgid "That account is no longer connected — choose another."
 msgstr "Dit account is niet meer verbonden — kies een ander."
 
-msgid "That agent session has no conversation to open yet — it was started but never prompted."
-msgstr "Die agentsessie heeft nog geen gesprek om te openen — hij is gestart maar nooit aangestuurd."
+msgid "That agent session has no conversation to open yet. It was started but never prompted."
+msgstr "Die agentsessie heeft nog geen gesprek om te openen. Hij is gestart maar nooit aangestuurd."
 
 msgid "That computer can't be reached"
 msgstr "Die computer is niet bereikbaar"
@@ -19727,8 +19730,8 @@ msgstr "De agent reageert niet meer"
 msgid "The agent stopped while resuming the conversation."
 msgstr "De agent stopte tijdens het hervatten van het gesprek."
 
-msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
-msgstr "De agent waarmee deze automatisering zou draaien bestaat niet meer op de host — de agents van die host zijn mogelijk gereset of verwijderd. Kies opnieuw een agent in de instellingen van de automatisering."
+msgid "The agent this automation was set to run no longer exists on its host. The host's agents may have been reset or removed. Re-select an agent in the automation's settings."
+msgstr "De agent waarmee deze automatisering zou draaien bestaat niet meer op de host. De agents van die host zijn mogelijk gereset of verwijderd. Kies opnieuw een agent in de instellingen van de automatisering."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "De agent gebruikt zijn skills en tools. Het issue komt in Linear terecht."
@@ -19802,8 +19805,8 @@ msgstr "Het apparaat dat dit project host is niet beschikbaar."
 msgid "The device was offline when this run started. It may have been asleep or shut down."
 msgstr "Het apparaat was offline toen deze run startte. Het stond misschien in slaapstand of was uitgeschakeld."
 
-msgid "The diff is still up to date — only comments failed to load."
-msgstr "De diff is nog actueel — alleen de opmerkingen konden niet worden geladen."
+msgid "The diff is still up to date. Only comments failed to load."
+msgstr "De diff is nog actueel. Alleen de opmerkingen konden niet worden geladen."
 
 msgid "The dispatcher appears"
 msgstr "De dispatcher verschijnt"
@@ -19926,8 +19929,8 @@ msgstr "De lokale hostservice is niet beschikbaar voor {organization} op {device
 msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
 msgstr "De lokale hostservice reageert niet. Opnieuw starten lost dit meestal op; blijft het gebeuren, herstart Paradev dan."
 
-msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
-msgstr "De lokale hostservice draait niet, dus niets op dit apparaat kan de werkruimte bedienen. Opnieuw starten koppelt je terminals en bestanden weer aan — er gaat niets op schijf verloren."
+msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files. Nothing on disk is lost."
+msgstr "De lokale hostservice draait niet, dus niets op dit apparaat kan de werkruimte bedienen. Opnieuw starten koppelt je terminals en bestanden weer aan. Er gaat niets op schijf verloren."
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "De lokale hostservice is net gestart. Er wordt nu opnieuw verbinding mee gemaakt."
@@ -20233,11 +20236,11 @@ msgstr "Deze chat is gestopt omdat het gesprek in een terminal verderging."
 msgid "This chat was stopped."
 msgstr "Deze chat is gestopt."
 
-msgid "This closes every terminal session — in this workspace and any others — and can't be undone. If they're only briefly stuck, waiting usually brings them back."
-msgstr "Hiermee worden alle terminalsessies gesloten — in deze werkruimte en in alle andere — en dat kan niet ongedaan worden gemaakt. Zitten ze maar even vast, dan helpt wachten meestal."
-
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Hiermee wordt elke terminalsessie van je organisatie{runningCountSuffix} gesloten en start een verse daemon."
+
+msgid "This closes every terminal session, in this workspace and any others, and can't be undone. If they're only briefly stuck, waiting usually brings them back."
+msgstr "Hiermee worden alle terminalsessies gesloten, in deze werkruimte en in alle andere, en dat kan niet ongedaan worden gemaakt. Zitten ze maar even vast, dan helpt wachten meestal."
 
 msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
 msgstr "Hiermee sluit je de geselecteerde werkruimtes en hun terminals. De bestanden en branches van het project blijven ongewijzigd."
@@ -20326,14 +20329,14 @@ msgstr "Deze uitnodigingslink is ongeldig of verlopen."
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "Dit duurt langer dan normaal. Hieronder staat de laatst opgeslagen kopie van de chat; hij opent echt zodra de werkruimte is gestart."
 
-msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
-msgstr "Dit duurt langer dan gewoonlijk. De sandbox haalt mogelijk nog zijn image op — dat gaat door of dit venster nu open is of niet."
+msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
+msgstr "Dit duurt langer dan gewoonlijk. De sandbox haalt mogelijk nog zijn image op. Dat gaat door of dit venster nu open is of niet."
 
-msgid "This is taking longer than usual. The session may already be ready — reloading can pick it up."
-msgstr "Dit duurt langer dan gewoonlijk. De sessie is mogelijk al klaar — herladen kan hem oppikken."
+msgid "This is taking longer than usual. The session may already be ready. Reloading can pick it up."
+msgstr "Dit duurt langer dan gewoonlijk. De sessie is mogelijk al klaar. Herladen kan hem oppikken."
 
-msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
-msgstr "Dit duurt langer dan gewoonlijk. De werkruimte is mogelijk al klaar — herladen kan hem oppikken."
+msgid "This is taking longer than usual. The workspace may already be ready. Reloading can pick it up."
+msgstr "Dit duurt langer dan gewoonlijk. De werkruimte is mogelijk al klaar. Herladen kan hem oppikken."
 
 msgid "This is the very beginning of the {name} channel."
 msgstr "Dit is het allereerste begin van het kanaal {name}."
@@ -21569,8 +21572,8 @@ msgstr "Wordt gebruikt in URL's en API's."
 msgid "Used to clone a previous session without changing it. Put <0>{sessionId}</0> where the source id belongs, or leave empty if the agent cannot fork sessions."
 msgstr "Wordt gebruikt om een eerdere sessie te klonen zonder die te wijzigen. Zet <0>{sessionId}</0> op de plek van de bron-ID, of laat leeg als de agent geen sessies kan forken."
 
-msgid "Used to restore a previous session — the session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
-msgstr "Gebruikt om een eerdere sessie te herstellen — de sessie-id komt hierachter, bijv. <0>--resume</0>. Laat leeg als de agent niet op id kan hervatten."
+msgid "Used to restore a previous session. The session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
+msgstr "Gebruikt om een eerdere sessie te herstellen. De sessie-id komt hierachter, bijv. <0>--resume</0>. Laat leeg als de agent niet op id kan hervatten."
 
 msgid "Used when your system is in dark mode."
 msgstr "Gebruikt wanneer je systeem in donkere modus staat."

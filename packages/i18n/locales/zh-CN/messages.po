@@ -48,7 +48,7 @@ msgstr "“{0}”会在GitHub上被标记为关闭。你随时可以在这里重
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
-msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet — this overrides them. This can't be undone from here."
+msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet, so this overrides them. This can't be undone from here."
 msgstr "“{0}”将通过{2}合并到{1}。检查还没通过，此操作会绕过它们。在这里无法撤销。"
 
 #. placeholder {0}: data.title
@@ -57,11 +57,11 @@ msgstr "“{0}”将通过{2}合并到{1}。检查还没通过，此操作会绕
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "“{0}”将通过{2}合并到{1}。在这里无法撤销。"
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached"
-msgstr "“{name}”大小为 {size} — 无法附加超过 {limit} 的文件"
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached"
+msgstr "“{name}”大小为 {size}。无法附加超过 {limit} 的文件"
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
-msgstr "“{name}”大小为 {size} — 无法向此工作区附加超过 {limit} 的文件。如果该文件位于工作区所在的机器上，请改为提及其路径。"
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "“{name}”大小为 {size}。无法向此工作区附加超过 {limit} 的文件。如果该文件位于工作区所在的机器上，请改为提及其路径。"
 
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "“{name}”是一个文件夹。请改为附加其中的文件。"
@@ -103,12 +103,12 @@ msgid "[prompt]"
 msgstr "[提示词]"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
-msgstr "{0, plural, one {#个活动端口 — 隐藏详情} other {#个活动端口 — 隐藏详情}}"
+msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
+msgstr "{0, plural, one {#个活动端口：隐藏详情} other {#个活动端口：隐藏详情}}"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — show details} other {# active ports — show details}}"
-msgstr "{0, plural, one {#个活动端口 — 显示详情} other {#个活动端口 — 显示详情}}"
+msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
+msgstr "{0, plural, one {#个活动端口：显示详情} other {#个活动端口：显示详情}}"
 
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
@@ -252,11 +252,11 @@ msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {#个结果} other {#个结果}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — hide details} other {# running agents — hide details}}"
+msgid "{0, plural, one {# running agent: hide details} other {# running agents: hide details}}"
 msgstr "{0, plural, one {#个运行中的智能体，隐藏详情} other {#个运行中的智能体，隐藏详情}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — show details} other {# running agents — show details}}"
+msgid "{0, plural, one {# running agent: show details} other {# running agents: show details}}"
 msgstr "{0, plural, one {#个运行中的智能体，显示详情} other {#个运行中的智能体，显示详情}}"
 
 #. placeholder {0}: aliveCount ?? 0
@@ -289,7 +289,7 @@ msgid "{0, plural, one {# workspace} other {# workspaces}}"
 msgstr "{0, plural, one {#个工作区} other {#个工作区}}"
 
 #. placeholder {0}: shown?.count ?? 0
-msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
+msgid "{0, plural, one {A running agent still uses the previous account. The switch only reaches new launches.} other {# running agents still use the previous account. The switch only reaches new launches.}}"
 msgstr "{0, plural, one {#个运行中的智能体仍在使用之前的账户。切换只对新启动生效。} other {#个运行中的智能体仍在使用之前的账户。切换只对新启动生效。}}"
 
 #. placeholder {0}: targets.length
@@ -408,14 +408,6 @@ msgstr "{0, plural, one {正在关注#个页面的评论} other {正在关注#�
 #. placeholder {1}: formatDayLabel(lastDay)
 msgid "{0} – {1} · API-rate estimate from local session logs"
 msgstr "{0} – {1} · 根据本地会话日志按API价格估算"
-
-#. placeholder {0}: workspace.hostName
-msgid "{0} — device offline"
-msgstr "{0}，设备离线"
-
-#. placeholder {0}: error.message
-msgid "{0} — try the Paradev tray menu > Host Service > Restart."
-msgstr "{0} — 请尝试Paradev托盘菜单 > 主机服务 > 重启。"
 
 #. placeholder {0}: window.label
 #. placeholder {1}: formatPercent(window.usedPercent / 100)
@@ -544,8 +536,8 @@ msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} 已在本机设置，但未在你的账户中设置"
 
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
-msgid "{0} more — refine your search"
-msgstr "还有{0}个——请细化搜索"
+msgid "{0} more. Refine your search"
+msgstr "还有{0}个。。请细化搜索"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: pages.length
@@ -654,6 +646,14 @@ msgstr "{1} 回合结束，{0} 以伤害判定获胜"
 #. placeholder {1}: took ? `, ${took}` : ""
 msgid "{0}, {outcome}{1}"
 msgstr "{0}，{outcome}{1}"
+
+#. placeholder {0}: workspace.hostName
+msgid "{0}: device offline"
+msgstr "{0}，设备离线"
+
+#. placeholder {0}: error.message
+msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
+msgstr "{0}。请尝试Paradev托盘菜单 > 主机服务 > 重启。"
 
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
@@ -852,8 +852,8 @@ msgstr "{configTitle}字号"
 msgid "{connectorName} account"
 msgstr "{connectorName} 账号"
 
-msgid "{cookieCount} cookies — forget this site"
-msgstr "{cookieCount}个cookie——忘记此站点"
+msgid "{cookieCount} cookies · Forget this site"
+msgstr "{cookieCount}个cookie ·  · 忘记此站点"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# 个自动化} other {# 个自动化}}"
@@ -951,8 +951,8 @@ msgstr "{count, plural, one {使用了 # 个工具} other {使用了 # 个工具
 msgid "{count} files are over {limit} and were not added"
 msgstr "{count} 个文件超过 {limit}，未添加"
 
-msgid "{count} files attached — a message carries at most {max}"
-msgstr "已附加 {count} 个文件 — 一条消息最多可包含 {max} 个"
+msgid "{count} files attached. A message carries at most {max}"
+msgstr "已附加 {count} 个文件。一条消息最多可包含 {max} 个"
 
 msgid "{count} GitHub stars"
 msgstr "{count}个GitHub星标"
@@ -1616,8 +1616,8 @@ msgstr "由 Union Square Ventures 领投的 1150 万美元种子轮"
 msgid "1"
 msgstr "1"
 
-msgid "1 cookie — forget this site"
-msgstr "1个cookie——忘记此站点"
+msgid "1 cookie · Forget this site"
+msgstr "1个cookie ·  · 忘记此站点"
 
 msgid "1 file is over {limit} and was not added"
 msgstr "1 个文件超过 {limit}，未添加"
@@ -2233,7 +2233,7 @@ msgstr "已添加 {bought} GB 小时。"
 msgid "Added 1 file to {where}"
 msgstr "已向{where}添加1个文件"
 
-msgid "Added only when launching with a prompt — e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgid "Added only when launching with a prompt, e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
 msgstr "仅在带提示词启动时添加，例如<0>--</0>、<1>--prompt</1>、<2>-i</2>。"
 
 msgid "Added to agent input"
@@ -2294,8 +2294,8 @@ msgstr "智能体"
 msgid "Agent commands"
 msgstr "智能体命令"
 
-msgid "Agent Complete — {workspaceName}"
-msgstr "智能体已完成 — {workspaceName}"
+msgid "Agent Complete · {workspaceName}"
+msgstr "智能体已完成 · {workspaceName}"
 
 msgid "Agent Configs"
 msgstr "智能体配置"
@@ -2496,8 +2496,8 @@ msgid "All commits"
 msgstr "所有提交"
 
 #. placeholder {0}: members.length
-msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
-msgstr "全部{0}名成员的所有数据都将被永久删除——此操作无法撤销。"
+msgid "All data will be permanently deleted for all {0} members. This cannot be undone."
+msgstr "全部{0}名成员的所有数据都将被永久删除。。此操作无法撤销。"
 
 msgid "All downloads"
 msgstr "所有下载"
@@ -2532,8 +2532,8 @@ msgstr "所有新消息"
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "所有目标均已达成。已在最高一级，没有更高可追。"
 
-msgid "All of the organization's data will be permanently deleted — this cannot be undone."
-msgstr "该组织的所有数据都将被永久删除——此操作无法撤销。"
+msgid "All of the organization's data will be permanently deleted. This cannot be undone."
+msgstr "该组织的所有数据都将被永久删除。。此操作无法撤销。"
 
 msgid "All of this project's worktrees are already tracked"
 msgstr "此项目的所有worktree均已跟踪"
@@ -3389,8 +3389,8 @@ msgstr "Avi Peltz、Satya Patel 和 Kiet Ho 在 YC Demo Day"
 msgid "Awaiting {0}"
 msgstr "等待{0}"
 
-msgid "Awaiting Response — {workspaceName}"
-msgstr "等待回复 — {workspaceName}"
+msgid "Awaiting Response · {workspaceName}"
+msgstr "等待回复 · {workspaceName}"
 
 msgid "Awaiting review from you"
 msgstr "等待你的审查"
@@ -3543,14 +3543,14 @@ msgstr "计费系统拒绝启动云工作区：组织的方案不包含云工作
 msgid "Binary"
 msgstr "二进制"
 
-msgid "Binary file — cannot display"
-msgstr "二进制文件 — 无法显示"
-
 msgid "Binary file changed"
 msgstr "二进制文件已更改"
 
 msgid "Binary file hidden"
 msgstr "二进制文件已隐藏"
+
+msgid "Binary file. Cannot display"
+msgstr "二进制文件。无法显示"
 
 msgid "Bio"
 msgstr "简介"
@@ -3999,9 +3999,12 @@ msgstr "已取消"
 msgid "Cancelled the invite for {name}"
 msgstr "已取消对 {name} 的邀请"
 
-#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(cancelAt)
 msgid "Cancels {0} — downgrades to Free at the end of the billing period."
+msgstr "将于{0}取消，在计费周期结束时降级为免费版。"
+
+#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
+msgid "Cancels {0}, then downgrades to Free at the end of the billing period."
 msgstr "将于{0}取消，在计费周期结束时降级为免费版。"
 
 msgid "Cannot {action}: no active organization is selected. Select an organization or sign in again."
@@ -4485,8 +4488,8 @@ msgstr "清除筛选即可重新排列侧边栏"
 msgid "Clear workspace selection"
 msgstr "清除工作区选择"
 
-msgid "Cleared {succeededLabels} — could not clear {failedLabels}"
-msgstr "已清除{succeededLabels}——无法清除{failedLabels}"
+msgid "Cleared {succeededLabels}. Could not clear {failedLabels}"
+msgstr "已清除{succeededLabels}。。无法清除{failedLabels}"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "在 Run 01 期间达到 Operator"
@@ -4789,7 +4792,7 @@ msgstr "云端用量"
 msgid "Cloud workspace"
 msgstr "云端工作区"
 
-msgid "Cloud workspace — connecting"
+msgid "Cloud workspace: connecting"
 msgstr "云端工作区，正在连接"
 
 msgid "Cloud workspaces"
@@ -5478,8 +5481,8 @@ msgstr "正在转为草稿…"
 msgid "cookies and site data"
 msgstr "Cookie和站点数据"
 
-msgid "Cookies and site data — signs you out of most sites"
-msgstr "Cookie和站点数据——会让你退出大多数网站的登录"
+msgid "Cookies and site data (signs you out of most sites)"
+msgstr "Cookie和站点数据（）（会让你退出大多数网站的登录）"
 
 msgid "Copied"
 msgstr "已复制"
@@ -5666,7 +5669,7 @@ msgstr "复制工作区ID"
 msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
 msgstr "把其他浏览器的浏览历史和登录信息复制到Paradev。原浏览器不会被修改。"
 
-msgid "Copy your key now — you won't be able to see it again."
+msgid "Copy your key now. You won't be able to see it again."
 msgstr "请立即复制你的密钥，之后将无法再次查看。"
 
 msgid "Copying the conversation"
@@ -6031,7 +6034,7 @@ msgstr "无法检查移动状态"
 msgid "Couldn't check what removing this member affects"
 msgstr "无法检查移除此成员会影响哪些内容"
 
-msgid "Couldn't confirm star status — check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
+msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "无法确认加星状态，请检查是否已安装并登录GitHub CLI（`gh`），以及网络是否连通"
 
 msgid "Couldn't connect (error {status}). Please try again."
@@ -6105,7 +6108,7 @@ msgstr "无法加载自动化：{0}"
 msgid "Couldn't load automations"
 msgstr "无法加载自动化"
 
-msgid "Couldn't load contributors — type a username instead."
+msgid "Couldn't load contributors. Type a username instead."
 msgstr "无法加载贡献者，请直接输入用户名。"
 
 msgid "Couldn't load earlier messages. Retry"
@@ -6173,8 +6176,8 @@ msgstr "无法为{0}连接云端：{1}"
 msgid "Couldn't reach the model provider"
 msgstr "无法连接到模型提供商"
 
-msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
-msgstr "无法连接到此云工作区。它可能仍在唤醒中——请重试。"
+msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
+msgstr "无法连接到此云工作区。它可能仍在唤醒中。。请重试。"
 
 msgid "Couldn't reach workspace"
 msgstr "无法连接到工作区"
@@ -6207,12 +6210,6 @@ msgstr "无法恢复“{workspaceName}”"
 msgid "Couldn't save"
 msgstr "保存失败"
 
-msgid "Couldn't save — edit or click away to retry"
-msgstr "保存失败——编辑或点击别处以重试"
-
-msgid "Couldn't save — retrying…"
-msgstr "保存失败——正在重试…"
-
 msgid "Couldn't save edits"
 msgstr "无法保存编辑"
 
@@ -6227,6 +6224,12 @@ msgstr "无法保存例行任务"
 
 msgid "Couldn't save your choice. Try again."
 msgstr "无法保存你的选择。请重试。"
+
+msgid "Couldn't save. Edit or click away to retry"
+msgstr "保存失败。。编辑或点击别处以重试"
+
+msgid "Couldn't save. Retrying…"
+msgstr "保存失败。。正在重试…"
 
 msgid "Couldn't search your chats"
 msgstr "无法搜索你的聊天"
@@ -7032,7 +7035,7 @@ msgstr "{deletedBy} {deletedWhen}删除 · {deviceNames}"
 msgid "Deleted group \"{group}\""
 msgstr "已删除分组“{group}”"
 
-msgid "deleted or unavailable — pick another"
+msgid "deleted or unavailable, pick another"
 msgstr "已删除或不可用，请另选一个"
 
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
@@ -7127,14 +7130,14 @@ msgstr "设计"
 msgid "Design a complex system on a whiteboard."
 msgstr "在白板上设计一个复杂系统。"
 
-msgid "Design mode — click any element in the page to send it to an agent"
-msgstr "设计模式——点击页面中的任意元素即可发送给智能体"
-
-msgid "Design mode — click any element in the page to send it to an agent."
-msgstr "设计模式——点击页面中的任意元素即可发送给智能体。"
-
 msgid "Design mode failed"
 msgstr "设计模式失败"
+
+msgid "Design mode: click any element in the page to send it to an agent"
+msgstr "设计模式：：点击页面中的任意元素即可发送给智能体"
+
+msgid "Design mode: click any element in the page to send it to an agent."
+msgstr "设计模式：：点击页面中的任意元素即可发送给智能体。"
 
 msgid "Design review"
 msgstr "设计评审"
@@ -7814,8 +7817,8 @@ msgstr "推理强度"
 msgid "Electron/tRPC-coupled, so referenced rather than rendered. Badge = import sites today; high counts are promotion candidates for packages/ui"
 msgstr "与Electron/tRPC耦合，因此只做引用而不实际渲染。徽章=当前的导入处数量；数量高的可以考虑提升到packages/ui"
 
-msgid "Element captured — describe the change, or press esc to pick again."
-msgstr "已捕获元素——描述要做的更改，或按esc重新选择。"
+msgid "Element captured. Describe the change, or press esc to pick again."
+msgstr "已捕获元素。。描述要做的更改，或按esc重新选择。"
 
 msgid "Element captured. Describe the change."
 msgstr "已捕获元素。请描述改动。"
@@ -9262,11 +9265,11 @@ msgstr "根据本轮前后的 worktree 快照统计。另一个聊天同时在�
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "根据本轮前后的 worktree 快照统计。另一个聊天同时在此工作，因此此列表只包含本聊天用文件工具编辑过的文件，其他更改单独列出。"
 
-msgid "Front matter hidden — switch to Markdown to edit it"
+msgid "Front matter hidden. Switch to Markdown to edit it"
 msgstr "已隐藏front matter，切换到Markdown可编辑"
 
-msgid "Front matter hidden — switch to the Markdown view to edit it"
-msgstr "已隐藏front matter — 切换到Markdown视图进行编辑"
+msgid "Front matter hidden. Switch to the Markdown view to edit it"
+msgstr "已隐藏front matter。切换到Markdown视图进行编辑"
 
 msgid "Full access"
 msgstr "完全访问"
@@ -10647,7 +10650,7 @@ msgstr "其回复也会一并删除。"
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "它的工作（包括未提交的更改）会推送到一个新分支。所选电脑上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
+msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重启之前，其工作区和终端都不可用，请使用Paradev托盘菜单 > 主机服务 > 重启。"
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
@@ -10783,11 +10786,11 @@ msgstr "继续等待"
 msgid "Keep working"
 msgstr "继续工作"
 
-msgid "Kept the new file — it changed after it was created"
-msgstr "已保留新文件 — 它在创建后发生了更改"
+msgid "Kept the new file because it changed after it was created"
+msgstr "已保留新文件，它在创建后发生了更改"
 
-msgid "Kept the new folder — it is no longer empty"
-msgstr "已保留新文件夹 — 它已不再为空"
+msgid "Kept the new folder because it is no longer empty"
+msgstr "已保留新文件夹，它已不再为空"
 
 msgid "Key dates"
 msgstr "关键日期"
@@ -11545,8 +11548,8 @@ msgstr "使所有窗格大小相同"
 msgid "Make default"
 msgstr "设为默认"
 
-msgid "Make default — launch new terminals and agents on this account."
-msgstr "设为默认——新终端和智能体将使用此账户启动。"
+msgid "Make default: launch new terminals and agents on this account."
+msgstr "设为默认：：新终端和智能体将使用此账户启动。"
 
 msgid "Make public"
 msgstr "公开"
@@ -11696,8 +11699,8 @@ msgstr "Markdown样式"
 msgid "Marked as viewed"
 msgstr "已标记为已查看"
 
-msgid "Marked ready, but couldn't refresh PR state — try again in a moment"
-msgstr "已标记为可评审，但无法刷新PR状态 — 请稍后重试"
+msgid "Marked ready, but couldn't refresh PR state. Try again in a moment"
+msgstr "已标记为可评审，但无法刷新PR状态。请稍后重试"
 
 msgid "Marketplace"
 msgstr "市场"
@@ -11849,8 +11852,8 @@ msgstr "已合并"
 msgid "Merged by {0}"
 msgstr "由{0}合并"
 
-msgid "Merged, but couldn't refresh PR state — try again in a moment"
-msgstr "已合并，但无法刷新PR状态 — 请稍后重试"
+msgid "Merged, but couldn't refresh PR state. Try again in a moment"
+msgstr "已合并，但无法刷新PR状态。请稍后重试"
 
 msgid "Merging PR..."
 msgstr "正在合并PR..."
@@ -12516,8 +12519,8 @@ msgid "No"
 msgstr "否"
 
 #. placeholder {0}: AGENT_LABELS[agent]
-msgid "No {0} logins on this host — sign in and usage appears here."
-msgstr "此主机上没有{0}登录——登录后用量会显示在这里。"
+msgid "No {0} logins on this host. Sign in and usage appears here."
+msgstr "此主机上没有{0}登录。。登录后用量会显示在这里。"
 
 msgid "No access to this host"
 msgstr "没有此主机的访问权限"
@@ -13462,7 +13465,7 @@ msgstr "更早"
 msgid "On"
 msgstr "开启"
 
-msgid "on {offScopeHostName} — won't run here"
+msgid "on {offScopeHostName}, won't run here"
 msgstr "在{offScopeHostName}上，不会在这里运行"
 
 msgid "On a date"
@@ -14362,7 +14365,7 @@ msgid "Overwrite file"
 msgstr "覆盖文件"
 
 #. placeholder {0}: ownerName ?? t({ message: "a teammate", })
-msgid "Owned by {0} — only they can edit this automation."
+msgid "Owned by {0}. Only they can edit this automation."
 msgstr "归{0}所有，只有本人能编辑这个自动化。"
 
 msgid "Owner"
@@ -15046,9 +15049,6 @@ msgstr "热门模型"
 msgid "Ports"
 msgstr "端口"
 
-msgid "Ports — {totalPortCount} live"
-msgstr "端口 — {totalPortCount}个活动"
-
 msgid "Ports in top bar dropdown"
 msgstr "顶栏下拉菜单中的端口"
 
@@ -15057,6 +15057,9 @@ msgstr "远程主机上的端口"
 
 msgid "Ports on this computer"
 msgstr "此计算机上的端口"
+
+msgid "Ports: {totalPortCount} live"
+msgstr "端口：{totalPortCount}个活动"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "状态好的时候能做到。监督成本增长仍然太快。"
@@ -15075,8 +15078,8 @@ msgstr "PR"
 
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} — {1}"
-msgstr "PR #{0} — {1}"
+msgid "PR #{0} · {1}"
+msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -15267,11 +15270,11 @@ msgstr "隐私政策"
 msgid "Private"
 msgstr "私有"
 
-msgid "Private — only specific people"
-msgstr "私密 — 仅限特定人员"
-
 msgid "Private by default.<0/>You're in control."
 msgstr "默认私密。<0/>掌控权在你。"
+
+msgid "Private: only specific people"
+msgstr "私密：仅限特定人员"
 
 msgid "Pro"
 msgstr "专业版"
@@ -15371,7 +15374,7 @@ msgstr "项目在Codex中未受信任"
 msgid "Project on another device"
 msgstr "其他设备上的项目"
 
-msgid "Project ready — open it from the sidebar."
+msgid "Project ready. Open it from the sidebar."
 msgstr "项目已就绪，可从侧边栏打开。"
 
 #. placeholder {0}: result.repoPath
@@ -15398,10 +15401,10 @@ msgstr "全项目搜索"
 msgid "Project: {0}"
 msgstr "项目：{0}"
 
-msgid "Project's host is unreachable — cannot import worktrees right now"
+msgid "Project's host is unreachable. Cannot import worktrees right now"
 msgstr "项目所在主机不可达，暂时无法导入worktree"
 
-msgid "Project's host is unreachable — cannot rename right now"
+msgid "Project's host is unreachable. Cannot rename right now"
 msgstr "项目所在主机不可达，暂时无法重命名"
 
 msgid "Projects"
@@ -15437,7 +15440,7 @@ msgstr "提示词预览"
 msgid "Prompt restored"
 msgstr "提示词已恢复"
 
-msgid "Prompt submitted — thanks!"
+msgid "Prompt submitted. Thanks!"
 msgstr "提示词已提交，谢谢！"
 
 msgid "Prompt transport"
@@ -15462,8 +15465,8 @@ msgstr "请提供id或slug"
 msgid "Provider: {0}"
 msgstr "提供方：{0}"
 
-msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened — create a new one to try again."
-msgstr "预配失败，沙箱已被销毁。当前没有任何进程在运行，此工作区也无法打开 — 请新建一个再试。"
+msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
+msgstr "预配失败，沙箱已被销毁。当前没有任何进程在运行，此工作区也无法打开。请新建一个再试。"
 
 msgid "PRs a week"
 msgstr "PR/周"
@@ -15471,11 +15474,11 @@ msgstr "PR/周"
 msgid "Public"
 msgstr "公开"
 
-msgid "Public — anyone in <0>{organizationName}</0>"
-msgstr "公开 — <0>{organizationName}</0> 中的任何人"
-
 msgid "Public leaderboard"
 msgstr "公开排行榜"
+
+msgid "Public: anyone in <0>{organizationName}</0>"
+msgstr "公开：<0>{organizationName}</0> 中的任何人"
 
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "再次发布时链接不变。旧版本会保留在历史记录中。"
@@ -15988,7 +15991,7 @@ msgstr "重新生成"
 msgid "Region"
 msgstr "区域"
 
-msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere. Status and notifications stop for this agent, including inside Paradev."
 msgstr "在该智能体的全局配置中注册生命周期钩子，以便Paradev显示状态并发送通知。关闭后会在所有位置移除Paradev的条目，该智能体的状态和通知都会停止，包括在Paradev内部。"
 
 msgid "Reinstall {name}"
@@ -16076,13 +16079,13 @@ msgstr "远程访问"
 msgid "Remote Access may be off"
 msgstr "远程访问可能已关闭"
 
-msgid "Remote MCP server — connects over HTTP"
+msgid "Remote MCP server, connects over HTTP"
 msgstr "远程MCP服务器，通过HTTP连接"
 
 msgid "Remote workspace"
 msgstr "远程工作区"
 
-msgid "Remote workspace — device offline"
+msgid "Remote workspace: device offline"
 msgstr "远程工作区，设备离线"
 
 msgid "Remove"
@@ -18353,8 +18356,8 @@ msgstr "登录未完成"
 msgid "Sign-in expired"
 msgstr "登录已过期"
 
-msgid "Sign-in expired — run"
-msgstr "登录已过期——请运行"
+msgid "Sign-in expired. Run"
+msgstr "登录已过期。。请运行"
 
 msgid "Sign-in failed"
 msgstr "登录失败"
@@ -18805,7 +18808,7 @@ msgstr "在GitHub上为Paradev加星"
 msgid "Starred"
 msgstr "已加星"
 
-msgid "Starred — thank you!"
+msgid "Starred. Thank you!"
 msgstr "已加星，谢谢！"
 
 msgid "Starring…"
@@ -19654,8 +19657,8 @@ msgstr "该 {plugin} 登录链接已过期。请重新连接。"
 msgid "That account is no longer connected — choose another."
 msgstr "该账号已断开连接，请选择其他账号。"
 
-msgid "That agent session has no conversation to open yet — it was started but never prompted."
-msgstr "该智能体会话还没有可打开的对话——它已启动但从未收到指令。"
+msgid "That agent session has no conversation to open yet. It was started but never prompted."
+msgstr "该智能体会话还没有可打开的对话。。它已启动但从未收到指令。"
 
 msgid "That computer can't be reached"
 msgstr "无法连接到那台电脑"
@@ -19727,7 +19730,7 @@ msgstr "智能体已停止响应"
 msgid "The agent stopped while resuming the conversation."
 msgstr "恢复对话时代理已停止。"
 
-msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
+msgid "The agent this automation was set to run no longer exists on its host. The host's agents may have been reset or removed. Re-select an agent in the automation's settings."
 msgstr "这个自动化原本要运行的智能体在它的主机上已不存在，该主机的智能体可能被重置或删除了。请在自动化的设置中重新选择一个智能体。"
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
@@ -19802,7 +19805,7 @@ msgstr "承载这个项目的设备不可用。"
 msgid "The device was offline when this run started. It may have been asleep or shut down."
 msgstr "此次运行开始时设备处于离线状态。设备可能处于睡眠或关机状态。"
 
-msgid "The diff is still up to date — only comments failed to load."
+msgid "The diff is still up to date. Only comments failed to load."
 msgstr "差异仍是最新的，只是评论没能加载。"
 
 msgid "The dispatcher appears"
@@ -19926,8 +19929,8 @@ msgstr "{device}上{organization}的本地主机服务不可用。状态：{stat
 msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
 msgstr "本地主机服务没有响应。重启它通常能解决；如果反复出现，请重启Paradev。"
 
-msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
-msgstr "本地主机服务未运行，因此此设备上没有任何服务能提供该工作区。重启它会重新接上你的终端和文件 — 磁盘上的内容不会丢失。"
+msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files. Nothing on disk is lost."
+msgstr "本地主机服务未运行，因此此设备上没有任何服务能提供该工作区。重启它会重新接上你的终端和文件。磁盘上的内容不会丢失。"
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "本地主机服务刚刚启动。正在重新连接。"
@@ -20233,11 +20236,11 @@ msgstr "由于对话已在终端中继续，此聊天已停止。"
 msgid "This chat was stopped."
 msgstr "此聊天已停止。"
 
-msgid "This closes every terminal session — in this workspace and any others — and can't be undone. If they're only briefly stuck, waiting usually brings them back."
-msgstr "这会关闭所有终端会话 — 包括此工作区和其他工作区中的 — 且无法撤销。如果它们只是短暂卡住，等待通常就能恢复。"
-
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "这会关闭你组织的所有终端会话{runningCountSuffix}并启动全新的守护进程。"
+
+msgid "This closes every terminal session, in this workspace and any others, and can't be undone. If they're only briefly stuck, waiting usually brings them back."
+msgstr "这会关闭所有终端会话，包括此工作区和其他工作区中的，且无法撤销。如果它们只是短暂卡住，等待通常就能恢复。"
 
 msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
 msgstr "这将关闭所选工作区及其终端。项目的文件和分支保持不变。"
@@ -20326,14 +20329,14 @@ msgstr "这个邀请链接无效或已过期。"
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "耗时比平常更长。下面的聊天是最后保存的副本；工作区启动后才会真正打开。"
 
-msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
-msgstr "这比平时耗时更久。沙箱可能仍在拉取镜像 — 无论此窗口是否打开，它都会继续。"
+msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
+msgstr "这比平时耗时更久。沙箱可能仍在拉取镜像。无论此窗口是否打开，它都会继续。"
 
-msgid "This is taking longer than usual. The session may already be ready — reloading can pick it up."
-msgstr "这比平时耗时更久。会话可能已经就绪 — 重新加载即可接上。"
+msgid "This is taking longer than usual. The session may already be ready. Reloading can pick it up."
+msgstr "这比平时耗时更久。会话可能已经就绪。重新加载即可接上。"
 
-msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
-msgstr "这比平时耗时更久。工作区可能已经就绪 — 重新加载即可接上。"
+msgid "This is taking longer than usual. The workspace may already be ready. Reloading can pick it up."
+msgstr "这比平时耗时更久。工作区可能已经就绪。重新加载即可接上。"
 
 msgid "This is the very beginning of the {name} channel."
 msgstr "这是 {name} 频道的开端。"
@@ -21569,7 +21572,7 @@ msgstr "用于URL和API。"
 msgid "Used to clone a previous session without changing it. Put <0>{sessionId}</0> where the source id belongs, or leave empty if the agent cannot fork sessions."
 msgstr "用于克隆之前的会话而不改动它。把 <0>{sessionId}</0> 放在源 ID 应在的位置；若该智能体无法分叉会话，请留空。"
 
-msgid "Used to restore a previous session — the session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
+msgid "Used to restore a previous session. The session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
 msgstr "用于恢复之前的会话，会话id会追加在其后，例如<0>--resume</0>。如果该智能体无法按id恢复，请留空。"
 
 msgid "Used when your system is in dark mode."

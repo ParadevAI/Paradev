@@ -48,8 +48,8 @@ msgstr "\"{0}\" sẽ được đánh dấu là đã đóng trên GitHub. Bạn c
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
-msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet — this overrides them. This can't be undone from here."
-msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Các check chưa qua — thao tác này bỏ qua chúng. Không thể hoàn tác từ đây."
+msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet, so this overrides them. This can't be undone from here."
+msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Các check chưa qua, thao tác này bỏ qua chúng. Không thể hoàn tác từ đây."
 
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
@@ -57,11 +57,11 @@ msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Các check chưa qua �
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "\"{0}\" sẽ được merge vào {1} bằng {2}. Không thể hoàn tác từ đây."
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached"
-msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit}"
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached"
+msgstr "\"{name}\" có dung lượng {size}. Không thể đính kèm tệp lớn hơn {limit}"
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
-msgstr "\"{name}\" có dung lượng {size} — không thể đính kèm tệp lớn hơn {limit} vào workspace này. Nếu tệp nằm trên máy của workspace, hãy ghi đường dẫn của tệp thay vào đó."
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "\"{name}\" có dung lượng {size}. Không thể đính kèm tệp lớn hơn {limit} vào workspace này. Nếu tệp nằm trên máy của workspace, hãy ghi đường dẫn của tệp thay vào đó."
 
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "\"{name}\" là một thư mục. Hãy đính kèm các tệp bên trong thay thế."
@@ -103,12 +103,12 @@ msgid "[prompt]"
 msgstr "[prompt]"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
-msgstr "{0, plural, one {# cổng đang hoạt động — ẩn chi tiết} other {# cổng đang hoạt động — ẩn chi tiết}}"
+msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
+msgstr "{0, plural, one {# cổng đang hoạt động: ẩn chi tiết} other {# cổng đang hoạt động: ẩn chi tiết}}"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — show details} other {# active ports — show details}}"
-msgstr "{0, plural, one {# cổng đang hoạt động — hiện chi tiết} other {# cổng đang hoạt động — hiện chi tiết}}"
+msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
+msgstr "{0, plural, one {# cổng đang hoạt động: hiện chi tiết} other {# cổng đang hoạt động: hiện chi tiết}}"
 
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
@@ -252,12 +252,12 @@ msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {# kết quả} other {# kết quả}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — hide details} other {# running agents — hide details}}"
-msgstr "{0, plural, one {# agent đang chạy — ẩn chi tiết} other {# agent đang chạy — ẩn chi tiết}}"
+msgid "{0, plural, one {# running agent: hide details} other {# running agents: hide details}}"
+msgstr "{0, plural, one {# agent đang chạy: ẩn chi tiết} other {# agent đang chạy: ẩn chi tiết}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — show details} other {# running agents — show details}}"
-msgstr "{0, plural, one {# agent đang chạy — hiện chi tiết} other {# agent đang chạy — hiện chi tiết}}"
+msgid "{0, plural, one {# running agent: show details} other {# running agents: show details}}"
+msgstr "{0, plural, one {# agent đang chạy: hiện chi tiết} other {# agent đang chạy: hiện chi tiết}}"
 
 #. placeholder {0}: aliveCount ?? 0
 msgid "{0, plural, one {# session running} other {# sessions running}}"
@@ -289,8 +289,8 @@ msgid "{0, plural, one {# workspace} other {# workspaces}}"
 msgstr "{0, plural, one {# workspace} other {# workspace}}"
 
 #. placeholder {0}: shown?.count ?? 0
-msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
-msgstr "{0, plural, one {# agent đang chạy vẫn dùng tài khoản trước — việc chuyển chỉ áp dụng cho lần khởi chạy mới.} other {# agent đang chạy vẫn dùng tài khoản trước — việc chuyển chỉ áp dụng cho lần khởi chạy mới.}}"
+msgid "{0, plural, one {A running agent still uses the previous account. The switch only reaches new launches.} other {# running agents still use the previous account. The switch only reaches new launches.}}"
+msgstr "{0, plural, one {# agent đang chạy vẫn dùng tài khoản trước. Việc chuyển chỉ áp dụng cho lần khởi chạy mới.} other {# agent đang chạy vẫn dùng tài khoản trước. Việc chuyển chỉ áp dụng cho lần khởi chạy mới.}}"
 
 #. placeholder {0}: targets.length
 msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
@@ -408,14 +408,6 @@ msgstr "{0, plural, one {Đang theo dõi # trang để nhận bình luận} othe
 #. placeholder {1}: formatDayLabel(lastDay)
 msgid "{0} – {1} · API-rate estimate from local session logs"
 msgstr "{0} – {1} · ước tính theo giá API từ log phiên cục bộ"
-
-#. placeholder {0}: workspace.hostName
-msgid "{0} — device offline"
-msgstr "{0} — thiết bị ngoại tuyến"
-
-#. placeholder {0}: error.message
-msgid "{0} — try the Paradev tray menu > Host Service > Restart."
-msgstr "{0} — hãy thử menu khay Paradev > Dịch vụ host > Khởi động lại."
 
 #. placeholder {0}: window.label
 #. placeholder {1}: formatPercent(window.usedPercent / 100)
@@ -544,8 +536,8 @@ msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} đã được thiết lập trên máy này, nhưng chưa có trên tài khoản của bạn"
 
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
-msgid "{0} more — refine your search"
-msgstr "còn {0} nữa — hãy thu hẹp tìm kiếm"
+msgid "{0} more. Refine your search"
+msgstr "còn {0} nữa. Hãy thu hẹp tìm kiếm"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: pages.length
@@ -654,6 +646,14 @@ msgstr "{0} thắng nhờ sát thương sau {1} lượt"
 #. placeholder {1}: took ? `, ${took}` : ""
 msgid "{0}, {outcome}{1}"
 msgstr "{0}, {outcome}{1}"
+
+#. placeholder {0}: workspace.hostName
+msgid "{0}: device offline"
+msgstr "{0}: thiết bị ngoại tuyến"
+
+#. placeholder {0}: error.message
+msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
+msgstr "{0}. Hãy thử menu khay Paradev > Dịch vụ host > Khởi động lại."
 
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
@@ -852,8 +852,8 @@ msgstr "Cỡ chữ {configTitle}"
 msgid "{connectorName} account"
 msgstr "Tài khoản {connectorName}"
 
-msgid "{cookieCount} cookies — forget this site"
-msgstr "{cookieCount} cookie — quên trang này"
+msgid "{cookieCount} cookies · Forget this site"
+msgstr "{cookieCount} cookie · quên trang này"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# tự động hóa} other {# tự động hóa}}"
@@ -951,8 +951,8 @@ msgstr "{count, plural, one {đã dùng # công cụ} other {đã dùng # công 
 msgid "{count} files are over {limit} and were not added"
 msgstr "{count} tệp vượt quá {limit} và không được thêm"
 
-msgid "{count} files attached — a message carries at most {max}"
-msgstr "Đã đính kèm {count} tệp — mỗi tin nhắn chứa tối đa {max} tệp"
+msgid "{count} files attached. A message carries at most {max}"
+msgstr "Đã đính kèm {count} tệp. Mỗi tin nhắn chứa tối đa {max} tệp"
 
 msgid "{count} GitHub stars"
 msgstr "{count} star GitHub"
@@ -1616,8 +1616,8 @@ msgstr "Vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắ
 msgid "1"
 msgstr "1"
 
-msgid "1 cookie — forget this site"
-msgstr "1 cookie — quên trang này"
+msgid "1 cookie · Forget this site"
+msgstr "1 cookie · quên trang này"
 
 msgid "1 file is over {limit} and was not added"
 msgstr "1 tệp vượt quá {limit} và không được thêm"
@@ -2233,8 +2233,8 @@ msgstr "Đã thêm {bought} GB-giờ."
 msgid "Added 1 file to {where}"
 msgstr "Đã thêm 1 tệp vào {where}"
 
-msgid "Added only when launching with a prompt — e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
-msgstr "Chỉ thêm vào khi khởi chạy kèm prompt — ví dụ <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgid "Added only when launching with a prompt, e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgstr "Chỉ thêm vào khi khởi chạy kèm prompt, ví dụ <0>--</0>, <1>--prompt</1>, <2>-i</2>."
 
 msgid "Added to agent input"
 msgstr "Đã thêm vào ô nhập của agent"
@@ -2294,8 +2294,8 @@ msgstr "Agent"
 msgid "Agent commands"
 msgstr "Lệnh của agent"
 
-msgid "Agent Complete — {workspaceName}"
-msgstr "Agent đã xong — {workspaceName}"
+msgid "Agent Complete · {workspaceName}"
+msgstr "Agent đã xong · {workspaceName}"
 
 msgid "Agent Configs"
 msgstr "Cấu hình agent"
@@ -2496,8 +2496,8 @@ msgid "All commits"
 msgstr "Tất cả commit"
 
 #. placeholder {0}: members.length
-msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
-msgstr "Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn với cả {0} thành viên — không thể hoàn tác."
+msgid "All data will be permanently deleted for all {0} members. This cannot be undone."
+msgstr "Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn với cả {0} thành viên. Không thể hoàn tác."
 
 msgid "All downloads"
 msgstr "Tất cả bản tải xuống"
@@ -2532,8 +2532,8 @@ msgstr "Tất cả tin nhắn mới"
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "Đã đạt mọi mục tiêu. Nấc cao nhất, không còn gì để với tới."
 
-msgid "All of the organization's data will be permanently deleted — this cannot be undone."
-msgstr "Toàn bộ dữ liệu của tổ chức sẽ bị xóa vĩnh viễn — không thể hoàn tác."
+msgid "All of the organization's data will be permanently deleted. This cannot be undone."
+msgstr "Toàn bộ dữ liệu của tổ chức sẽ bị xóa vĩnh viễn. Không thể hoàn tác."
 
 msgid "All of this project's worktrees are already tracked"
 msgstr "Mọi worktree của dự án này đều đã được theo dõi"
@@ -3389,8 +3389,8 @@ msgstr "Avi Peltz, Satya Patel và Kiet Ho tại YC Demo Day"
 msgid "Awaiting {0}"
 msgstr "Đang chờ {0}"
 
-msgid "Awaiting Response — {workspaceName}"
-msgstr "Đang chờ phản hồi — {workspaceName}"
+msgid "Awaiting Response · {workspaceName}"
+msgstr "Đang chờ phản hồi · {workspaceName}"
 
 msgid "Awaiting review from you"
 msgstr "Đang chờ bạn review"
@@ -3543,14 +3543,14 @@ msgstr "Thanh toán đã từ chối khởi động không gian làm việc trê
 msgid "Binary"
 msgstr "Nhị phân"
 
-msgid "Binary file — cannot display"
-msgstr "Tệp nhị phân — không hiển thị được"
-
 msgid "Binary file changed"
 msgstr "Tệp nhị phân đã thay đổi"
 
 msgid "Binary file hidden"
 msgstr "Đã ẩn tệp nhị phân"
+
+msgid "Binary file. Cannot display"
+msgstr "Tệp nhị phân. Không hiển thị được"
 
 msgid "Bio"
 msgstr "Giới thiệu"
@@ -3999,10 +3999,13 @@ msgstr "Đã hủy"
 msgid "Cancelled the invite for {name}"
 msgstr "Đã hủy lời mời cho {name}"
 
-#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(cancelAt)
 msgid "Cancels {0} — downgrades to Free at the end of the billing period."
 msgstr "Hủy vào {0} — chuyển xuống Free khi hết kỳ thanh toán."
+
+#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
+msgid "Cancels {0}, then downgrades to Free at the end of the billing period."
+msgstr "Hủy vào {0}, chuyển xuống Free khi hết kỳ thanh toán."
 
 msgid "Cannot {action}: no active organization is selected. Select an organization or sign in again."
 msgstr "Không thể {action}: chưa chọn tổ chức nào đang hoạt động. Hãy chọn một tổ chức hoặc đăng nhập lại."
@@ -4485,8 +4488,8 @@ msgstr "Xóa bộ lọc để sắp xếp lại thanh bên"
 msgid "Clear workspace selection"
 msgstr "Bỏ chọn workspace"
 
-msgid "Cleared {succeededLabels} — could not clear {failedLabels}"
-msgstr "Đã xóa {succeededLabels} — không xóa được {failedLabels}"
+msgid "Cleared {succeededLabels}. Could not clear {failedLabels}"
+msgstr "Đã xóa {succeededLabels}. Không xóa được {failedLabels}"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "Đạt Operator trong khoảng thời gian Run 01"
@@ -4789,8 +4792,8 @@ msgstr "Mức sử dụng đám mây"
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
-msgid "Cloud workspace — connecting"
-msgstr "Workspace cloud — đang kết nối"
+msgid "Cloud workspace: connecting"
+msgstr "Workspace cloud: đang kết nối"
 
 msgid "Cloud workspaces"
 msgstr "Không gian làm việc đám mây"
@@ -5478,8 +5481,8 @@ msgstr "Đang chuyển thành bản nháp…"
 msgid "cookies and site data"
 msgstr "cookie và dữ liệu trang"
 
-msgid "Cookies and site data — signs you out of most sites"
-msgstr "Cookie và dữ liệu trang — sẽ đăng xuất bạn khỏi hầu hết các trang"
+msgid "Cookies and site data (signs you out of most sites)"
+msgstr "Cookie và dữ liệu trang (sẽ đăng xuất bạn khỏi hầu hết các trang)"
 
 msgid "Copied"
 msgstr "Đã sao chép"
@@ -5666,8 +5669,8 @@ msgstr "Sao chép ID workspace"
 msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
 msgstr "Sao chép lịch sử duyệt web và thông tin đăng nhập từ trình duyệt khác vào Paradev. Trình duyệt gốc của bạn không bị thay đổi."
 
-msgid "Copy your key now — you won't be able to see it again."
-msgstr "Hãy sao chép khóa ngay — bạn sẽ không xem lại được nữa."
+msgid "Copy your key now. You won't be able to see it again."
+msgstr "Hãy sao chép khóa ngay. Bạn sẽ không xem lại được nữa."
 
 msgid "Copying the conversation"
 msgstr "Đang sao chép cuộc trò chuyện"
@@ -6031,8 +6034,8 @@ msgstr "Không thể kiểm tra việc chuyển"
 msgid "Couldn't check what removing this member affects"
 msgstr "Không kiểm tra được việc gỡ thành viên này ảnh hưởng đến những gì"
 
-msgid "Couldn't confirm star status — check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
-msgstr "Không xác nhận được trạng thái sao — hãy kiểm tra GitHub CLI (`gh`) đã cài, đã đăng nhập và bạn có kết nối mạng"
+msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
+msgstr "Không xác nhận được trạng thái sao. Hãy kiểm tra GitHub CLI (`gh`) đã cài, đã đăng nhập và bạn có kết nối mạng"
 
 msgid "Couldn't connect (error {status}). Please try again."
 msgstr "Không thể kết nối (lỗi {status}). Vui lòng thử lại."
@@ -6105,8 +6108,8 @@ msgstr "Không thể tải tự động hóa: {0}"
 msgid "Couldn't load automations"
 msgstr "Không thể tải tự động hóa"
 
-msgid "Couldn't load contributors — type a username instead."
-msgstr "Không thể tải danh sách người đóng góp — hãy nhập tên người dùng."
+msgid "Couldn't load contributors. Type a username instead."
+msgstr "Không thể tải danh sách người đóng góp. Hãy nhập tên người dùng."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Không thể tải các tin nhắn trước đó. Thử lại"
@@ -6173,8 +6176,8 @@ msgstr "Không kết nối được tới cloud cho {0}: {1}"
 msgid "Couldn't reach the model provider"
 msgstr "Không kết nối được với nhà cung cấp mô hình"
 
-msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
-msgstr "Không kết nối được với không gian làm việc đám mây này. Có thể nó vẫn đang được đánh thức — hãy thử lại."
+msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
+msgstr "Không kết nối được với không gian làm việc đám mây này. Có thể nó vẫn đang được đánh thức. Hãy thử lại."
 
 msgid "Couldn't reach workspace"
 msgstr "Không kết nối được workspace"
@@ -6207,12 +6210,6 @@ msgstr "Không thể khôi phục \"{workspaceName}\""
 msgid "Couldn't save"
 msgstr "Không lưu được"
 
-msgid "Couldn't save — edit or click away to retry"
-msgstr "Không lưu được — hãy sửa hoặc nhấp ra ngoài để thử lại"
-
-msgid "Couldn't save — retrying…"
-msgstr "Không lưu được — đang thử lại…"
-
 msgid "Couldn't save edits"
 msgstr "Không thể lưu chỉnh sửa"
 
@@ -6227,6 +6224,12 @@ msgstr "Không thể lưu quy trình"
 
 msgid "Couldn't save your choice. Try again."
 msgstr "Không thể lưu lựa chọn của bạn. Hãy thử lại."
+
+msgid "Couldn't save. Edit or click away to retry"
+msgstr "Không lưu được. Hãy sửa hoặc nhấp ra ngoài để thử lại"
+
+msgid "Couldn't save. Retrying…"
+msgstr "Không lưu được. Đang thử lại…"
 
 msgid "Couldn't search your chats"
 msgstr "Không thể tìm kiếm các cuộc trò chuyện của bạn"
@@ -7032,8 +7035,8 @@ msgstr "{deletedBy} đã xóa {deletedWhen} · {deviceNames}"
 msgid "Deleted group \"{group}\""
 msgstr "Đã xóa nhóm \"{group}\""
 
-msgid "deleted or unavailable — pick another"
-msgstr "đã bị xóa hoặc không khả dụng — hãy chọn cái khác"
+msgid "deleted or unavailable, pick another"
+msgstr "đã bị xóa hoặc không khả dụng, hãy chọn cái khác"
 
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "Dự án đã xóa có thể được khôi phục trong 30 ngày, cùng với các workspace bị xóa theo. Sau đó chúng sẽ bị xóa hẳn; thư mục repository và các worktree có thay đổi chưa commit vẫn được giữ trên ổ đĩa."
@@ -7127,14 +7130,14 @@ msgstr "Thiết kế"
 msgid "Design a complex system on a whiteboard."
 msgstr "Thiết kế một hệ thống phức tạp trên bảng trắng."
 
-msgid "Design mode — click any element in the page to send it to an agent"
-msgstr "Chế độ thiết kế — nhấp vào phần tử bất kỳ trong trang để gửi cho agent"
-
-msgid "Design mode — click any element in the page to send it to an agent."
-msgstr "Chế độ thiết kế — nhấp vào phần tử bất kỳ trong trang để gửi cho agent."
-
 msgid "Design mode failed"
 msgstr "Chế độ thiết kế thất bại"
+
+msgid "Design mode: click any element in the page to send it to an agent"
+msgstr "Chế độ thiết kế: nhấp vào phần tử bất kỳ trong trang để gửi cho agent"
+
+msgid "Design mode: click any element in the page to send it to an agent."
+msgstr "Chế độ thiết kế: nhấp vào phần tử bất kỳ trong trang để gửi cho agent."
 
 msgid "Design review"
 msgstr "Duyệt thiết kế"
@@ -7814,8 +7817,8 @@ msgstr "Mức nỗ lực"
 msgid "Electron/tRPC-coupled, so referenced rather than rendered. Badge = import sites today; high counts are promotion candidates for packages/ui"
 msgstr "Gắn với Electron/tRPC nên chỉ được nhắc tới chứ không dựng. Badge = số nơi import hiện tại; số cao là ứng viên đưa lên packages/ui"
 
-msgid "Element captured — describe the change, or press esc to pick again."
-msgstr "Đã bắt được phần tử — hãy mô tả thay đổi, hoặc nhấn esc để chọn lại."
+msgid "Element captured. Describe the change, or press esc to pick again."
+msgstr "Đã bắt được phần tử. Hãy mô tả thay đổi, hoặc nhấn esc để chọn lại."
 
 msgid "Element captured. Describe the change."
 msgstr "Đã chọn phần tử. Mô tả thay đổi."
@@ -9262,11 +9265,11 @@ msgstr "Lấy từ ảnh chụp worktree trước và sau lượt này. Một ch
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Lấy từ ảnh chụp worktree trước và sau lượt này. Một chat khác đã làm việc ở đây cùng lúc, nên danh sách này chỉ có các tệp mà chat này đã sửa bằng công cụ tệp của nó. Các thay đổi khác được liệt kê riêng."
 
-msgid "Front matter hidden — switch to Markdown to edit it"
-msgstr "Front matter đang ẩn — chuyển sang Markdown để sửa"
+msgid "Front matter hidden. Switch to Markdown to edit it"
+msgstr "Front matter đang ẩn. Chuyển sang Markdown để sửa"
 
-msgid "Front matter hidden — switch to the Markdown view to edit it"
-msgstr "Đã ẩn front matter — hãy chuyển sang chế độ xem Markdown để sửa"
+msgid "Front matter hidden. Switch to the Markdown view to edit it"
+msgstr "Đã ẩn front matter. Hãy chuyển sang chế độ xem Markdown để sửa"
 
 msgid "Full access"
 msgstr "Toàn quyền truy cập"
@@ -10647,8 +10650,8 @@ msgstr "Các câu trả lời cũng bị xóa theo."
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính bạn chọn bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
-msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại — dùng menu khay Paradev > Host Service > Restart."
+msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
+msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại. Dùng menu khay Paradev > Host Service > Restart."
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
 msgstr "Các workspace và worktree của nó sẽ bị xóa khỏi ổ đĩa ngay bây giờ thay vì sau 30 ngày. Thư mục repository và các worktree có thay đổi chưa commit vẫn được giữ lại."
@@ -10783,11 +10786,11 @@ msgstr "Tiếp tục chờ"
 msgid "Keep working"
 msgstr "Tiếp tục làm"
 
-msgid "Kept the new file — it changed after it was created"
-msgstr "Đã giữ tệp mới — nó đã thay đổi sau khi được tạo"
+msgid "Kept the new file because it changed after it was created"
+msgstr "Đã giữ tệp mới, nó đã thay đổi sau khi được tạo"
 
-msgid "Kept the new folder — it is no longer empty"
-msgstr "Đã giữ thư mục mới — nó không còn rỗng"
+msgid "Kept the new folder because it is no longer empty"
+msgstr "Đã giữ thư mục mới, nó không còn rỗng"
 
 msgid "Key dates"
 msgstr "Các mốc quan trọng"
@@ -11545,8 +11548,8 @@ msgstr "Làm mọi khung bằng nhau"
 msgid "Make default"
 msgstr "Đặt làm mặc định"
 
-msgid "Make default — launch new terminals and agents on this account."
-msgstr "Đặt làm mặc định — mở terminal và agent mới trên tài khoản này."
+msgid "Make default: launch new terminals and agents on this account."
+msgstr "Đặt làm mặc định: mở terminal và agent mới trên tài khoản này."
 
 msgid "Make public"
 msgstr "Công khai"
@@ -11696,8 +11699,8 @@ msgstr "Kiểu markdown"
 msgid "Marked as viewed"
 msgstr "Đã đánh dấu là đã xem"
 
-msgid "Marked ready, but couldn't refresh PR state — try again in a moment"
-msgstr "Đã đánh dấu sẵn sàng nhưng không thể làm mới trạng thái PR — thử lại sau giây lát"
+msgid "Marked ready, but couldn't refresh PR state. Try again in a moment"
+msgstr "Đã đánh dấu sẵn sàng nhưng không thể làm mới trạng thái PR. Thử lại sau giây lát"
 
 msgid "Marketplace"
 msgstr "Marketplace"
@@ -11849,8 +11852,8 @@ msgstr "Đã merge"
 msgid "Merged by {0}"
 msgstr "Được merge bởi {0}"
 
-msgid "Merged, but couldn't refresh PR state — try again in a moment"
-msgstr "Đã merge, nhưng không làm mới được trạng thái PR — hãy thử lại sau giây lát"
+msgid "Merged, but couldn't refresh PR state. Try again in a moment"
+msgstr "Đã merge, nhưng không làm mới được trạng thái PR. Hãy thử lại sau giây lát"
 
 msgid "Merging PR..."
 msgstr "Đang merge PR..."
@@ -12516,8 +12519,8 @@ msgid "No"
 msgstr "Không"
 
 #. placeholder {0}: AGENT_LABELS[agent]
-msgid "No {0} logins on this host — sign in and usage appears here."
-msgstr "Chưa có lần đăng nhập {0} nào trên host này — hãy đăng nhập và mức sử dụng sẽ hiện ở đây."
+msgid "No {0} logins on this host. Sign in and usage appears here."
+msgstr "Chưa có lần đăng nhập {0} nào trên host này. Hãy đăng nhập và mức sử dụng sẽ hiện ở đây."
 
 msgid "No access to this host"
 msgstr "Không có quyền truy cập host này"
@@ -13462,8 +13465,8 @@ msgstr "Cũ hơn"
 msgid "On"
 msgstr "Bật"
 
-msgid "on {offScopeHostName} — won't run here"
-msgstr "trên {offScopeHostName} — sẽ không chạy ở đây"
+msgid "on {offScopeHostName}, won't run here"
+msgstr "trên {offScopeHostName}, sẽ không chạy ở đây"
 
 msgid "On a date"
 msgstr "Vào một ngày"
@@ -14362,8 +14365,8 @@ msgid "Overwrite file"
 msgstr "Ghi đè tệp"
 
 #. placeholder {0}: ownerName ?? t({ message: "a teammate", })
-msgid "Owned by {0} — only they can edit this automation."
-msgstr "Thuộc sở hữu của {0} — chỉ họ mới sửa được tự động hóa này."
+msgid "Owned by {0}. Only they can edit this automation."
+msgstr "Thuộc sở hữu của {0}. Chỉ họ mới sửa được tự động hóa này."
 
 msgid "Owner"
 msgstr "Chủ sở hữu"
@@ -15046,9 +15049,6 @@ msgstr "Mô hình phổ biến"
 msgid "Ports"
 msgstr "Cổng"
 
-msgid "Ports — {totalPortCount} live"
-msgstr "Cổng — {totalPortCount} đang mở"
-
 msgid "Ports in top bar dropdown"
 msgstr "Cổng trong menu thả xuống trên thanh trên cùng"
 
@@ -15057,6 +15057,9 @@ msgstr "Cổng trên host từ xa"
 
 msgid "Ports on this computer"
 msgstr "Cổng trên máy tính này"
+
+msgid "Ports: {totalPortCount} live"
+msgstr "Cổng: {totalPortCount} đang mở"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Khả thi vào những ngày đẹp trời. Chi phí giám sát vẫn tăng quá nhanh."
@@ -15075,8 +15078,8 @@ msgstr "PR"
 
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} — {1}"
-msgstr "PR #{0} — {1}"
+msgid "PR #{0} · {1}"
+msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -15267,11 +15270,11 @@ msgstr "Chính sách quyền riêng tư"
 msgid "Private"
 msgstr "Riêng tư"
 
-msgid "Private — only specific people"
-msgstr "Riêng tư — chỉ những người cụ thể"
-
 msgid "Private by default.<0/>You're in control."
 msgstr "Riêng tư theo mặc định.<0/>Bạn nắm quyền kiểm soát."
+
+msgid "Private: only specific people"
+msgstr "Riêng tư: chỉ những người cụ thể"
 
 msgid "Pro"
 msgstr "Pro"
@@ -15371,8 +15374,8 @@ msgstr "Dự án chưa được tin cậy trong Codex"
 msgid "Project on another device"
 msgstr "Dự án trên thiết bị khác"
 
-msgid "Project ready — open it from the sidebar."
-msgstr "Dự án đã sẵn sàng — mở nó từ thanh bên."
+msgid "Project ready. Open it from the sidebar."
+msgstr "Dự án đã sẵn sàng. Mở nó từ thanh bên."
 
 #. placeholder {0}: result.repoPath
 msgid "Project relocated to {0}"
@@ -15398,11 +15401,11 @@ msgstr "Tìm kiếm toàn dự án"
 msgid "Project: {0}"
 msgstr "Dự án: {0}"
 
-msgid "Project's host is unreachable — cannot import worktrees right now"
-msgstr "Không kết nối được host của dự án — hiện không thể nhập worktree"
+msgid "Project's host is unreachable. Cannot import worktrees right now"
+msgstr "Không kết nối được host của dự án. Hiện không thể nhập worktree"
 
-msgid "Project's host is unreachable — cannot rename right now"
-msgstr "Không kết nối được host của dự án — hiện không thể đổi tên"
+msgid "Project's host is unreachable. Cannot rename right now"
+msgstr "Không kết nối được host của dự án. Hiện không thể đổi tên"
 
 msgid "Projects"
 msgstr "Dự án"
@@ -15437,8 +15440,8 @@ msgstr "Xem trước prompt"
 msgid "Prompt restored"
 msgstr "Đã khôi phục prompt"
 
-msgid "Prompt submitted — thanks!"
-msgstr "Đã gửi prompt — cảm ơn bạn!"
+msgid "Prompt submitted. Thanks!"
+msgstr "Đã gửi prompt. Cảm ơn bạn!"
 
 msgid "Prompt transport"
 msgstr "Cách truyền prompt"
@@ -15462,8 +15465,8 @@ msgstr "Hãy cung cấp id hoặc slug"
 msgid "Provider: {0}"
 msgstr "Nhà cung cấp: {0}"
 
-msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened — create a new one to try again."
-msgstr "Việc cấp phát thất bại và sandbox đã bị dỡ bỏ. Không có gì đang chạy và không thể mở workspace này — hãy tạo cái mới để thử lại."
+msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
+msgstr "Việc cấp phát thất bại và sandbox đã bị dỡ bỏ. Không có gì đang chạy và không thể mở workspace này. Hãy tạo cái mới để thử lại."
 
 msgid "PRs a week"
 msgstr "PR mỗi tuần"
@@ -15471,11 +15474,11 @@ msgstr "PR mỗi tuần"
 msgid "Public"
 msgstr "Công khai"
 
-msgid "Public — anyone in <0>{organizationName}</0>"
-msgstr "Công khai — mọi người trong <0>{organizationName}</0>"
-
 msgid "Public leaderboard"
 msgstr "Bảng xếp hạng công khai"
+
+msgid "Public: anyone in <0>{organizationName}</0>"
+msgstr "Công khai: mọi người trong <0>{organizationName}</0>"
 
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "Xuất bản lại và liên kết vẫn giữ nguyên. Các phiên bản trước được lưu trong lịch sử."
@@ -15988,8 +15991,8 @@ msgstr "Tạo lại"
 msgid "Region"
 msgstr "Region"
 
-msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
-msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Paradev hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Paradev ở mọi nơi — trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Paradev."
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere. Status and notifications stop for this agent, including inside Paradev."
+msgstr "Đăng ký các hook vòng đời vào cấu hình toàn cục của agent này để Paradev hiển thị trạng thái và gửi thông báo. Tắt tùy chọn này sẽ gỡ các mục của Paradev ở mọi nơi. Trạng thái và thông báo cho agent này sẽ dừng, kể cả bên trong Paradev."
 
 msgid "Reinstall {name}"
 msgstr "Cài lại {name}"
@@ -16076,14 +16079,14 @@ msgstr "Truy cập từ xa"
 msgid "Remote Access may be off"
 msgstr "Truy cập từ xa có thể đang tắt"
 
-msgid "Remote MCP server — connects over HTTP"
-msgstr "Server MCP từ xa — kết nối qua HTTP"
+msgid "Remote MCP server, connects over HTTP"
+msgstr "Server MCP từ xa, kết nối qua HTTP"
 
 msgid "Remote workspace"
 msgstr "Workspace từ xa"
 
-msgid "Remote workspace — device offline"
-msgstr "Workspace từ xa — thiết bị ngoại tuyến"
+msgid "Remote workspace: device offline"
+msgstr "Workspace từ xa: thiết bị ngoại tuyến"
 
 msgid "Remove"
 msgstr "Gỡ"
@@ -18353,8 +18356,8 @@ msgstr "Đăng nhập chưa hoàn tất"
 msgid "Sign-in expired"
 msgstr "Đăng nhập đã hết hạn"
 
-msgid "Sign-in expired — run"
-msgstr "Đăng nhập đã hết hạn — hãy chạy"
+msgid "Sign-in expired. Run"
+msgstr "Đăng nhập đã hết hạn. Hãy chạy"
 
 msgid "Sign-in failed"
 msgstr "Đăng nhập thất bại"
@@ -18805,8 +18808,8 @@ msgstr "Gắn sao cho Paradev trên GitHub"
 msgid "Starred"
 msgstr "Đã star"
 
-msgid "Starred — thank you!"
-msgstr "Đã gắn sao — cảm ơn bạn!"
+msgid "Starred. Thank you!"
+msgstr "Đã gắn sao. Cảm ơn bạn!"
 
 msgid "Starring…"
 msgstr "Đang star…"
@@ -19654,8 +19657,8 @@ msgstr "Liên kết đăng nhập {plugin} đó đã hết hạn. Hãy thử k�
 msgid "That account is no longer connected — choose another."
 msgstr "Tài khoản đó không còn được kết nối — hãy chọn tài khoản khác."
 
-msgid "That agent session has no conversation to open yet — it was started but never prompted."
-msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở — nó đã khởi động nhưng chưa từng nhận yêu cầu."
+msgid "That agent session has no conversation to open yet. It was started but never prompted."
+msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở. Nó đã khởi động nhưng chưa từng nhận yêu cầu."
 
 msgid "That computer can't be reached"
 msgstr "Không thể kết nối tới máy tính đó"
@@ -19727,8 +19730,8 @@ msgstr "Agent đã ngừng phản hồi"
 msgid "The agent stopped while resuming the conversation."
 msgstr "Tác tử đã dừng khi đang tiếp tục cuộc trò chuyện."
 
-msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
-msgstr "Agent mà tự động hóa này được đặt để chạy không còn tồn tại trên host của nó — agent của host có thể đã bị đặt lại hoặc gỡ bỏ. Hãy chọn lại agent trong cài đặt của tự động hóa."
+msgid "The agent this automation was set to run no longer exists on its host. The host's agents may have been reset or removed. Re-select an agent in the automation's settings."
+msgstr "Agent mà tự động hóa này được đặt để chạy không còn tồn tại trên host của nó. Agent của host có thể đã bị đặt lại hoặc gỡ bỏ. Hãy chọn lại agent trong cài đặt của tự động hóa."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Agent dùng skill và công cụ của nó. Issue xuất hiện trong Linear."
@@ -19802,8 +19805,8 @@ msgstr "Thiết bị chứa dự án này không khả dụng."
 msgid "The device was offline when this run started. It may have been asleep or shut down."
 msgstr "Thiết bị đang ngoại tuyến khi lần chạy này bắt đầu. Thiết bị có thể đang ngủ hoặc đã tắt."
 
-msgid "The diff is still up to date — only comments failed to load."
-msgstr "Diff vẫn là mới nhất — chỉ có bình luận không tải được."
+msgid "The diff is still up to date. Only comments failed to load."
+msgstr "Diff vẫn là mới nhất. Chỉ có bình luận không tải được."
 
 msgid "The dispatcher appears"
 msgstr "Người điều phối xuất hiện"
@@ -19926,8 +19929,8 @@ msgstr "Dịch vụ host cục bộ không khả dụng cho {organization} trên
 msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
 msgstr "Dịch vụ host cục bộ không phản hồi. Khởi động lại thường xử lý được; nếu vẫn lặp lại, hãy khởi động lại Paradev."
 
-msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
-msgstr "Dịch vụ host cục bộ không chạy nên không có gì trên thiết bị này phục vụ được workspace. Khởi động lại sẽ gắn lại terminal và tệp của bạn — không mất gì trên đĩa."
+msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files. Nothing on disk is lost."
+msgstr "Dịch vụ host cục bộ không chạy nên không có gì trên thiết bị này phục vụ được workspace. Khởi động lại sẽ gắn lại terminal và tệp của bạn. Không mất gì trên đĩa."
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Dịch vụ host cục bộ vừa khởi động. Đang kết nối lại tới nó."
@@ -20233,11 +20236,11 @@ msgstr "Cuộc trò chuyện này đã dừng vì nó được tiếp tục tron
 msgid "This chat was stopped."
 msgstr "Cuộc trò chuyện này đã bị dừng."
 
-msgid "This closes every terminal session — in this workspace and any others — and can't be undone. If they're only briefly stuck, waiting usually brings them back."
-msgstr "Thao tác này đóng mọi phiên terminal — trong workspace này và mọi workspace khác — và không thể hoàn tác. Nếu chúng chỉ kẹt trong chốc lát, chờ thêm thường là đủ."
-
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Thao tác này đóng mọi phiên terminal của tổ chức bạn{runningCountSuffix} và khởi động một daemon mới."
+
+msgid "This closes every terminal session, in this workspace and any others, and can't be undone. If they're only briefly stuck, waiting usually brings them back."
+msgstr "Thao tác này đóng mọi phiên terminal, trong workspace này và mọi workspace khác, và không thể hoàn tác. Nếu chúng chỉ kẹt trong chốc lát, chờ thêm thường là đủ."
 
 msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
 msgstr "Thao tác này đóng các workspace đã chọn và terminal của chúng. Tệp và nhánh của dự án vẫn giữ nguyên."
@@ -20326,14 +20329,14 @@ msgstr "Liên kết mời này không hợp lệ hoặc đã hết hạn."
 msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
 msgstr "Việc này lâu hơn bình thường. Cuộc trò chuyện bên dưới là bản lưu gần nhất; nó sẽ mở thật khi không gian làm việc khởi động."
 
-msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
-msgstr "Việc này lâu hơn bình thường. Sandbox có thể vẫn đang tải image — nó tiếp tục chạy dù cửa sổ này có mở hay không."
+msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
+msgstr "Việc này lâu hơn bình thường. Sandbox có thể vẫn đang tải image. Nó tiếp tục chạy dù cửa sổ này có mở hay không."
 
-msgid "This is taking longer than usual. The session may already be ready — reloading can pick it up."
-msgstr "Việc này lâu hơn bình thường. Phiên có thể đã sẵn sàng — tải lại có thể nhận được nó."
+msgid "This is taking longer than usual. The session may already be ready. Reloading can pick it up."
+msgstr "Việc này lâu hơn bình thường. Phiên có thể đã sẵn sàng. Tải lại có thể nhận được nó."
 
-msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
-msgstr "Việc này lâu hơn bình thường. Workspace có thể đã sẵn sàng — tải lại có thể nhận được nó."
+msgid "This is taking longer than usual. The workspace may already be ready. Reloading can pick it up."
+msgstr "Việc này lâu hơn bình thường. Workspace có thể đã sẵn sàng. Tải lại có thể nhận được nó."
 
 msgid "This is the very beginning of the {name} channel."
 msgstr "Đây là khởi đầu của kênh {name}."
@@ -21569,8 +21572,8 @@ msgstr "Dùng trong URL và API."
 msgid "Used to clone a previous session without changing it. Put <0>{sessionId}</0> where the source id belongs, or leave empty if the agent cannot fork sessions."
 msgstr "Dùng để nhân bản một phiên trước đó mà không thay đổi nó. Đặt <0>{sessionId}</0> vào vị trí của ID nguồn, hoặc để trống nếu agent không thể fork phiên."
 
-msgid "Used to restore a previous session — the session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
-msgstr "Dùng để khôi phục phiên trước — id phiên được nối vào sau các tham số này, ví dụ <0>--resume</0>. Để trống nếu agent không thể resume theo id."
+msgid "Used to restore a previous session. The session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
+msgstr "Dùng để khôi phục phiên trước. Id phiên được nối vào sau các tham số này, ví dụ <0>--resume</0>. Để trống nếu agent không thể resume theo id."
 
 msgid "Used when your system is in dark mode."
 msgstr "Dùng khi hệ thống ở chế độ tối."
