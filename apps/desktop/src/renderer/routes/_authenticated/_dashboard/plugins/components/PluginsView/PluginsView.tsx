@@ -27,6 +27,7 @@ export function PluginsView() {
 	useEffect(() => {
 		void utils.plugins.list.invalidate();
 		void machineUtils.plugins.organizationVersions.invalidate();
+		void machineUtils.plugins.installedIcons.invalidate();
 	}, [utils, machineUtils]);
 
 	const {
