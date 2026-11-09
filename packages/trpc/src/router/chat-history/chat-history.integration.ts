@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite";
 import {
 	afterAll,
 	beforeAll,
@@ -7,10 +8,10 @@ import {
 	test,
 } from "bun:test";
 import type { DurableEvent } from "@superset/chat/protocol";
+import { stub } from "../../../test/stub";
 
 const { db } = await import("@superset/db/client");
 const {
-	chatMoves,
 	chatSessions,
 	chatTranscripts,
 	cloudWorkspaces,
@@ -21,8 +22,10 @@ const {
 	users,
 	v2Hosts,
 	v2UsersHosts,
-	workspaceMoves,
 } = await import("@superset/db/schema");
+const { MoveBook } = await import("@superset/shared/move-book");
+const { posthog } = await import("../../lib/analytics");
+const { callMoves, setMoveStore } = await import("../../lib/moves");
 const { eq, inArray } = await import("drizzle-orm");
 const { chatHistoryRouter } = await import("./chat-history");
 const { loadChatHistory } = await import("./utils/loadChatHistory");
@@ -53,6 +56,32 @@ const fileIds: string[] = [];
 
 const MY_CLOUD = crypto.randomUUID();
 const THEIR_CLOUD = crypto.randomUUID();
+
+const moveDb = new Database(":memory:");
+const moveBook = new MoveBook(
+	{
+		exec(query, ...bindings) {
+			const rows = moveDb.query(query).all(...(bindings as never[]));
+			return { toArray: () => rows as never[] };
+		},
+	},
+	(fn) => moveDb.transaction(fn)(),
+	ORG,
+);
+setMoveStore(async (organizationId, request) => {
+	if (organizationId !== ORG) throw new Error(`no moves for ${organizationId}`);
+	return moveBook.apply(structuredClone(request));
+});
+
+let movesFlag: boolean | undefined = true;
+stub(posthog, { isFeatureEnabled: () => Promise.resolve(movesFlag) });
+
+/** Makes a move look as if it last changed state an hour ago. */
+function backdateMove(table: "chat_moves" | "workspace_moves", id: string) {
+	moveDb
+		.query(`UPDATE ${table} SET updated_at = ? WHERE id = ?`)
+		.run(Date.now() - 60 * 60 * 1000, id);
+}
 
 const createCaller = createCallerFactory(
 	createTRPCRouter({
@@ -330,6 +359,36 @@ describe("chatHistory.push", () => {
 	});
 });
 
+describe("stored chats of a sleeping cloud workspace", () => {
+	test("a cloud box's chat can be read back, a computer's cannot", async () => {
+		const cloudChat = newSession();
+		await push(
+			cloudChat,
+			[{ seq: 1, event: agentMessage("a1", "from the box") }],
+			{
+				workspaceId: MY_CLOUD,
+			},
+		);
+		const laptopChat = newSession();
+		await push(laptopChat, [
+			{ seq: 1, event: agentMessage("b1", "from a laptop") },
+		]);
+
+		const stored = await owner.ofWorkspace({ workspaceId: MY_CLOUD });
+		expect(stored.map((chat) => chat.id)).toContain(cloudChat);
+		const page = await owner.events({ chatSessionId: cloudChat });
+		expect(page.epoch).toBe("epoch-1");
+		expect(page.events.map(({ event }) => event.type)).toEqual(["item"]);
+
+		expect(await owner.ofWorkspace({ workspaceId: WORKSPACE })).toEqual([]);
+		expect(await owner.events({ chatSessionId: laptopChat })).toEqual({
+			epoch: null,
+			events: [],
+			nextAfterSeq: null,
+		});
+	});
+});
+
 describe("chatHistory.search", () => {
 	test("finds code names, groups copies of one conversation, and shows only the caller's chats", async () => {
 		const first = newSession();
@@ -434,11 +493,13 @@ async function storeBundle(sessionId: string) {
 }
 
 async function moveOf(id: string) {
-	const move = await db.query.chatMoves.findFirst({
-		where: eq(chatMoves.id, id),
-	});
+	const { move } = await callMoves(ORG, { op: "chatMove", id });
 	if (!move) throw new Error(`no move ${id}`);
 	return move;
+}
+
+async function loadWorkspaceMove(id: string) {
+	return (await callMoves(ORG, { op: "workspaceMove", id })).move;
 }
 
 async function chatOnLaptop() {
@@ -568,9 +629,7 @@ async function startOne(
 
 async function workspaceMoveOf(moveId: string) {
 	const move = await moveOf(moveId);
-	const parent = await db.query.workspaceMoves.findFirst({
-		where: eq(workspaceMoves.id, move.workspaceMoveId),
-	});
+	const parent = await loadWorkspaceMove(move.workspaceMoveId);
 	if (!parent) throw new Error(`no workspace move for ${moveId}`);
 	return parent;
 }
@@ -679,11 +738,7 @@ describe("workspace moves", () => {
 			userId: USER,
 		});
 		await failChatMovesTo(MY_CLOUD, "The cloud workspace could not start");
-		expect(
-			await db.query.workspaceMoves.findFirst({
-				where: eq(workspaceMoves.id, workspaceMoveId),
-			}),
-		).toMatchObject({
+		expect(await loadWorkspaceMove(workspaceMoveId)).toMatchObject({
 			status: "failed",
 			error: "The cloud workspace could not start",
 		});
@@ -744,10 +799,7 @@ describe("workspace move safety", () => {
 			organizationId: ORG,
 			userId: USER,
 		});
-		await db
-			.update(chatMoves)
-			.set({ status: "failed" })
-			.where(eq(chatMoves.id, move.id));
+		await callMoves(ORG, { op: "fail", id: move.id, error: "lost" });
 		await db
 			.update(cloudWorkspaces)
 			.set({ status: "failed" })
@@ -775,20 +827,24 @@ describe("workspace move safety", () => {
 			fromHostId: LAPTOP,
 		});
 		const waiting = started.moves.find((move) => move.chatSessionId === second);
-		const long = new Date(Date.now() - 60 * 60 * 1000);
-		await db
-			.update(chatMoves)
-			.set({ updatedAt: long })
-			.where(eq(chatMoves.id, waiting?.moveId as string));
+		backdateMove("chat_moves", waiting?.moveId as string);
 		await routerFor(USER).chatMove.latest({ chatSessionId: second });
 		expect((await moveOf(waiting?.moveId as string)).status).toBe("pending");
 
-		await db
-			.update(workspaceMoves)
-			.set({ updatedAt: long })
-			.where(eq(workspaceMoves.id, started.workspaceMoveId));
+		backdateMove("workspace_moves", started.workspaceMoveId);
 		await routerFor(USER).chatMove.latest({ chatSessionId: second });
 		expect((await moveOf(waiting?.moveId as string)).status).toBe("failed");
+	});
+
+	test("a workspace cannot begin moving without the workspace-moves flag", async () => {
+		movesFlag = undefined;
+		try {
+			await expect(
+				routerFor(USER).workspaceMove.begin({ fromWorkspaceId: WORKSPACE }),
+			).rejects.toThrow("not enabled");
+		} finally {
+			movesFlag = true;
+		}
 	});
 
 	test("an abandoned move frees the workspace to move again", async () => {
@@ -800,11 +856,10 @@ describe("workspace move safety", () => {
 			"already moving",
 		);
 		await mover.abandon({ workspaceMoveId, error: "push failed" });
-		expect(
-			await db.query.workspaceMoves.findFirst({
-				where: eq(workspaceMoves.id, workspaceMoveId),
-			}),
-		).toMatchObject({ status: "failed", error: "push failed" });
+		expect(await loadWorkspaceMove(workspaceMoveId)).toMatchObject({
+			status: "failed",
+			error: "push failed",
+		});
 		await mover.begin({ fromWorkspaceId: WORKSPACE });
 	});
 });
@@ -903,8 +958,12 @@ describe("chat moves", () => {
 		expect(move.toHostId).toBeNull();
 		const hosts = fakeHosts();
 
-		expect(await runChatMove(move.id, hosts)).toBe("ready");
-		expect(await runChatMove(move.id, hosts)).toBe("skipped");
+		expect(
+			await runChatMove({ organizationId: ORG, moveId: move.id }, hosts),
+		).toBe("ready");
+		expect(
+			await runChatMove({ organizationId: ORG, moveId: move.id }, hosts),
+		).toBe("skipped");
 
 		expect(
 			hosts.calls.map((call) => [call.workspaceId, call.procedure]),
@@ -1026,7 +1085,9 @@ describe("chat moves", () => {
 			userId: USER,
 		});
 		const hosts = fakeHosts("teleport.importChat");
-		expect(await runChatMove(move.id, hosts)).toBe("failed");
+		expect(
+			await runChatMove({ organizationId: ORG, moveId: move.id }, hosts),
+		).toBe("failed");
 		expect(hosts.calls.map((call) => call.procedure)).toEqual([
 			"teleport.importChat",
 		]);
@@ -1138,15 +1199,8 @@ describe("chat moves", () => {
 			organizationId: ORG,
 			userId: USER,
 		});
-		const long = new Date(Date.now() - 60 * 60 * 1000);
-		await db
-			.update(chatMoves)
-			.set({ updatedAt: long })
-			.where(eq(chatMoves.id, move.id));
-		await db
-			.update(workspaceMoves)
-			.set({ updatedAt: long })
-			.where(eq(workspaceMoves.id, (await moveOf(move.id)).workspaceMoveId));
+		backdateMove("chat_moves", move.id);
+		backdateMove("workspace_moves", (await moveOf(move.id)).workspaceMoveId);
 		const latest = await routerFor(USER).chatMove.latest({
 			chatSessionId: sessionId,
 		});

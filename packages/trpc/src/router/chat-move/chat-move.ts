@@ -1,14 +1,9 @@
 import { db } from "@superset/db/client";
-import {
-	CHAT_MOVE_IN_FLIGHT,
-	chatItems,
-	chatMoves,
-	chatSessions,
-	type SelectChatMove,
-} from "@superset/db/schema";
+import { chatItems, chatSessions } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
+import { callMoves, type SelectChatMove } from "../../lib/moves";
 import { personProcedure } from "../../trpc";
 import { loadChatHistory } from "../chat-history/utils/loadChatHistory";
 import {
@@ -26,7 +21,6 @@ import {
 	completeChatMove,
 	failChatMove,
 } from "./utils/runChatMove";
-import { failStaleMoves, staleBefore } from "./utils/settleWorkspaceMove";
 import { startChatMove } from "./utils/startChatMove";
 import { workspaceHost } from "./utils/workspaceHost";
 
@@ -36,37 +30,13 @@ async function loadOwnMove(
 	mover: { organizationId: string; userId: string },
 	moveId: string,
 ): Promise<SelectChatMove> {
-	const move = await db.query.chatMoves.findFirst({
-		where: and(
-			eq(chatMoves.id, moveId),
-			eq(chatMoves.organizationId, mover.organizationId),
-			eq(chatMoves.createdBy, mover.userId),
-		),
+	const { move } = await callMoves(mover.organizationId, {
+		op: "chatMove",
+		id: moveId,
 	});
-	if (!move)
+	if (!move || move.createdBy !== mover.userId)
 		throw new TRPCError({ code: "NOT_FOUND", message: "Move not found" });
 	return move;
-}
-
-function newestMove(
-	mover: { organizationId: string; userId: string },
-	chatSessionId: string,
-) {
-	return db.query.chatMoves.findFirst({
-		where: and(
-			eq(chatMoves.sessionId, chatSessionId),
-			eq(chatMoves.organizationId, mover.organizationId),
-			eq(chatMoves.createdBy, mover.userId),
-		),
-		orderBy: desc(chatMoves.createdAt),
-	});
-}
-
-function isStale(move: SelectChatMove): boolean {
-	return (
-		(CHAT_MOVE_IN_FLIGHT as readonly string[]).includes(move.status) &&
-		move.updatedAt < staleBefore()
-	);
 }
 
 /** A move to a computer, which the desktop on that computer runs. */
@@ -91,11 +61,11 @@ export const chatMoveRouter = {
 		.input(chatMoveOfChatInputSchema)
 		.query(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			let move = await newestMove(mover, input.chatSessionId);
-			if (move && isStale(move)) {
-				await failStaleMoves(input.chatSessionId);
-				move = await newestMove(mover, input.chatSessionId);
-			}
+			const { move } = await callMoves(mover.organizationId, {
+				op: "latestChatMove",
+				sessionId: input.chatSessionId,
+				createdBy: mover.userId,
+			});
 			if (!move) return null;
 			const [messages] = await db
 				.select({ value: count() })
@@ -143,7 +113,7 @@ export const chatMoveRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
 			assertRunsOnComputer(await loadOwnMove(mover, input.moveId));
-			const move = await claimMove(input.moveId);
+			const move = await claimMove(mover.organizationId, input.moveId);
 			if (!move) {
 				throw new TRPCError({
 					code: "CONFLICT",
@@ -153,7 +123,7 @@ export const chatMoveRouter = {
 			try {
 				return await buildChatImportHeader(move);
 			} catch (error) {
-				await failChatMove(move.id, error);
+				await failChatMove(move, error);
 				throw error;
 			}
 		}),
@@ -207,7 +177,7 @@ export const chatMoveRouter = {
 			const mover = await moverOf(ctx);
 			const move = await loadOwnMove(mover, input.moveId);
 			assertRunsOnComputer(move);
-			await failChatMove(move.id, new Error(input.error));
+			await failChatMove(move, new Error(input.error));
 			return { moveId: move.id };
 		}),
 } satisfies TRPCRouterRecord;

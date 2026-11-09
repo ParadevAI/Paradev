@@ -1,40 +1,23 @@
-import { db, dbWs } from "@superset/db/client";
+import { db } from "@superset/db/client";
 import {
-	chatMoves,
 	cloudWorkspaces,
-	type SelectChatMove,
-	type SelectWorkspaceMove,
 	v2Hosts,
 	v2UsersHosts,
 	v2Workspaces,
-	WORKSPACE_MOVE_IN_FLIGHT,
-	workspaceMoves,
 } from "@superset/db/schema";
+import type { NewChatMove } from "@superset/shared/move-book";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, isNull, ne } from "drizzle-orm";
-import { findMovableChat, lastTurnSeq } from "../findMovableChat";
+import { and, eq } from "drizzle-orm";
 import {
-	failStaleWorkspaceMoves,
-	settleWorkspaceMove,
-} from "../settleWorkspaceMove";
+	callMoves,
+	type SelectChatMove,
+	type SelectWorkspaceMove,
+} from "../../../../lib/moves";
+import { findMovableChat, lastTurnSeq } from "../findMovableChat";
 
 type Owner = { organizationId: string; userId: string };
 
-type CreatedMove = {
-	id: string;
-	chatSessionId: string;
-	toWorkspaceId: string;
-	toHostId: string | null;
-};
-
 export type SkippedChat = { chatSessionId: string; reason: string };
-
-const createdColumns = {
-	id: chatMoves.id,
-	chatSessionId: chatMoves.sessionId,
-	toWorkspaceId: chatMoves.toWorkspaceId,
-	toHostId: chatMoves.toHostId,
-};
 
 /**
  * Records that a workspace is about to move, before any of its work is
@@ -61,34 +44,19 @@ export async function beginWorkspaceMove(
 	if (args.toHostId && !(await canUseHost(args, args.toHostId))) {
 		throw new TRPCError({ code: "NOT_FOUND", message: "Host not found" });
 	}
-	await failStaleWorkspaceMoves(args.organizationId, args.fromWorkspaceId);
-
-	const [move] = await db
-		.insert(workspaceMoves)
-		.values({
-			organizationId: args.organizationId,
-			createdBy: args.userId,
-			fromWorkspaceId: args.fromWorkspaceId,
-			fromHostId,
-			toHostId: args.toHostId ?? null,
-		})
-		.returning({ id: workspaceMoves.id })
-		.catch((error: unknown) => {
-			if (isUniqueViolation(error)) {
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: "This workspace is already moving",
-				});
-			}
-			throw error;
-		});
-	if (!move) throw new Error("Could not record the move");
+	const { move } = await callMoves(args.organizationId, {
+		op: "begin",
+		createdBy: args.userId,
+		fromWorkspaceId: args.fromWorkspaceId,
+		fromHostId,
+		toHostId: args.toHostId ?? null,
+	});
 	return { workspaceMoveId: move.id };
 }
 
 /**
  * Gives a begun workspace move its destination and branch, and records a
- * `pending` move for each chat that can move, in one transaction. A chat that
+ * `pending` move for each chat that can move, all at once. A chat that
  * cannot (not synced, no session bundle, already moving, not in the workspace)
  * is returned in `skipped` and stays where it is.
  */
@@ -99,7 +67,7 @@ export async function attachWorkspaceMove(
 		branch: string;
 		chatSessionIds: string[];
 	},
-): Promise<{ moves: CreatedMove[]; skipped: SkippedChat[] }> {
+): Promise<{ moves: SelectChatMove[]; skipped: SkippedChat[] }> {
 	const parent = await loadOwnWorkspaceMove(args, args.workspaceMoveId);
 	if (parent.toWorkspaceId !== null || parent.status !== "pending") {
 		throw new TRPCError({
@@ -127,7 +95,7 @@ export async function attachWorkspaceMove(
 	}
 
 	const skipped: SkippedChat[] = [];
-	const values: Awaited<ReturnType<typeof chatMoveValues>>[] = [];
+	const chats: NewChatMove[] = [];
 	for (const chatSessionId of new Set(args.chatSessionIds)) {
 		const chat = await findMovableChat({ ...args, chatSessionId }).catch(
 			(error: unknown) => {
@@ -144,52 +112,21 @@ export async function attachWorkspaceMove(
 			});
 			continue;
 		}
-		values.push(
-			await chatMoveValues(args, chat, {
+		chats.push(
+			await newChatMove(args, chat, {
 				...parent,
 				toWorkspaceId: args.toWorkspaceId,
 			}),
 		);
 	}
 
-	const moves = await dbWs
-		.transaction(async (tx) => {
-			const [attached] = await tx
-				.update(workspaceMoves)
-				.set({
-					toWorkspaceId: args.toWorkspaceId,
-					branch: args.branch,
-					...(values.length > 0 ? { status: "moving" as const } : {}),
-				})
-				.where(
-					and(
-						eq(workspaceMoves.id, parent.id),
-						eq(workspaceMoves.status, "pending"),
-						isNull(workspaceMoves.toWorkspaceId),
-					),
-				)
-				.returning({ id: workspaceMoves.id });
-			if (!attached) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "This move already has its destination",
-				});
-			}
-			if (values.length === 0) return [];
-			return tx
-				.insert(chatMoves)
-				.values(values.map((row) => ({ ...row, workspaceMoveId: parent.id })))
-				.returning(createdColumns);
-		})
-		.catch((error: unknown) => {
-			if (isUniqueViolation(error)) {
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: "One of these chats is already moving",
-				});
-			}
-			throw error;
-		});
+	const { moves } = await callMoves(args.organizationId, {
+		op: "attach",
+		workspaceMoveId: parent.id,
+		toWorkspaceId: args.toWorkspaceId,
+		branch: args.branch,
+		chats,
+	});
 	return { moves, skipped };
 }
 
@@ -198,16 +135,11 @@ export async function abandonWorkspaceMove(
 	args: Owner & { workspaceMoveId: string; error: string },
 ): Promise<void> {
 	const parent = await loadOwnWorkspaceMove(args, args.workspaceMoveId);
-	await db
-		.update(workspaceMoves)
-		.set({ status: "failed", error: args.error, finishedAt: new Date() })
-		.where(
-			and(
-				eq(workspaceMoves.id, parent.id),
-				eq(workspaceMoves.status, "pending"),
-				isNull(workspaceMoves.toWorkspaceId),
-			),
-		);
+	await callMoves(args.organizationId, {
+		op: "abandon",
+		workspaceMoveId: parent.id,
+		error: args.error,
+	});
 }
 
 /**
@@ -217,7 +149,7 @@ export async function abandonWorkspaceMove(
  */
 export async function retryChatMove(
 	args: Owner & { failed: SelectChatMove },
-): Promise<CreatedMove> {
+): Promise<SelectChatMove> {
 	const { failed } = args;
 	const parent = await loadOwnWorkspaceMove(args, failed.workspaceMoveId);
 	const chat = await findMovableChat({
@@ -245,69 +177,29 @@ export async function retryChatMove(
 			});
 		}
 	}
-	const [newer] = await db
-		.select({ id: workspaceMoves.id })
-		.from(workspaceMoves)
-		.where(
-			and(
-				eq(workspaceMoves.organizationId, parent.organizationId),
-				eq(workspaceMoves.fromWorkspaceId, parent.fromWorkspaceId),
-				inArray(workspaceMoves.status, WORKSPACE_MOVE_IN_FLIGHT),
-				ne(workspaceMoves.id, parent.id),
-			),
-		)
-		.limit(1);
-	if (newer) {
-		throw new TRPCError({
-			code: "CONFLICT",
-			message: "This workspace is moving again",
-		});
-	}
-	const values = await chatMoveValues(
-		args,
-		chat,
-		{ ...failed, toWorkspaceId: failed.toWorkspaceId },
-		failed,
-	);
-	return dbWs
-		.transaction(async (tx) => {
-			const [move] = await tx
-				.insert(chatMoves)
-				.values({ ...values, workspaceMoveId: parent.id })
-				.returning(createdColumns);
-			if (!move) throw new Error("Could not record the move");
-			await settleWorkspaceMove(parent.id, tx);
-			return move;
-		})
-		.catch((error: unknown) => {
-			if (isUniqueViolation(error)) {
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: "This chat or its workspace is already moving",
-				});
-			}
-			throw error;
-		});
+	const { move } = await callMoves(args.organizationId, {
+		op: "retry",
+		workspaceMoveId: parent.id,
+		chat: await newChatMove(args, chat, failed, failed),
+	});
+	return move;
 }
 
 export async function loadOwnWorkspaceMove(
 	owner: Owner,
 	workspaceMoveId: string,
 ): Promise<SelectWorkspaceMove> {
-	const move = await db.query.workspaceMoves.findFirst({
-		where: and(
-			eq(workspaceMoves.id, workspaceMoveId),
-			eq(workspaceMoves.organizationId, owner.organizationId),
-			eq(workspaceMoves.createdBy, owner.userId),
-		),
+	const { move } = await callMoves(owner.organizationId, {
+		op: "workspaceMove",
+		id: workspaceMoveId,
 	});
-	if (!move) {
+	if (!move || move.createdBy !== owner.userId) {
 		throw new TRPCError({ code: "NOT_FOUND", message: "Move not found" });
 	}
 	return move;
 }
 
-async function chatMoveValues(
+async function newChatMove(
 	args: Owner,
 	{ session, transcript }: Awaited<ReturnType<typeof findMovableChat>>,
 	sides: {
@@ -317,10 +209,9 @@ async function chatMoveValues(
 	},
 	/** A retry keeps its failed move's turn while it hands on the same bundle. */
 	retryOf?: SelectChatMove,
-) {
+): Promise<NewChatMove> {
 	return {
 		sessionId: session.id,
-		organizationId: session.organizationId,
 		createdBy: args.userId,
 		fromWorkspaceId: session.v2WorkspaceId,
 		fromHostId: sides.fromHostId,
@@ -429,9 +320,4 @@ async function hostOf(
 	if (await canUseHost(owner, resolved)) return resolved;
 	if (options.unregistered === "omit") return undefined;
 	throw new TRPCError({ code: "NOT_FOUND", message: "Host not found" });
-}
-
-function isUniqueViolation(error: unknown): boolean {
-	const { code, cause } = error as { code?: string; cause?: { code?: string } };
-	return code === "23505" || cause?.code === "23505";
 }

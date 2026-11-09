@@ -1,20 +1,22 @@
 import { db } from "@superset/db/client";
-import { CHAT_MOVE_IN_FLIGHT, chatMoves } from "@superset/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { cloudWorkspaces } from "@superset/db/schema";
+import { eq } from "drizzle-orm";
+import { callMoves } from "../../../../lib/moves";
 import { publishCloudWorkspaceJob } from "../../../cloud-workspace/jobs";
 import { failChatMove, runChatMove } from "../runChatMove";
-import { finishWorkspaceMovesTo } from "../settleWorkspaceMove";
+
+type MoveRef = { organizationId: string; id: string };
 
 /** Queues a move into a cloud workspace; a move that cannot be queued fails. */
-export async function queueChatMove(moveId: string): Promise<void> {
+export async function queueChatMove(move: MoveRef): Promise<void> {
 	try {
 		await publishCloudWorkspaceJob({
 			path: "/api/chat-moves/run",
-			body: { moveId },
-			runLocally: ({ moveId }) => runChatMove(moveId),
+			body: { organizationId: move.organizationId, moveId: move.id },
+			runLocally: runChatMove,
 		});
 	} catch (error) {
-		await failChatMove(moveId, error);
+		await failChatMove(move, error);
 		throw error;
 	}
 }
@@ -24,24 +26,24 @@ export async function queueChatMove(moveId: string): Promise<void> {
  * workspace move with no chats is done once the workspace is up.
  */
 export async function queueChatMovesTo(workspaceId: string): Promise<void> {
-	const waiting = await db
-		.select({ id: chatMoves.id })
-		.from(chatMoves)
-		.where(
-			and(
-				eq(chatMoves.toWorkspaceId, workspaceId),
-				eq(chatMoves.status, "pending"),
-			),
-		);
-	for (const move of waiting) {
-		await queueChatMove(move.id).catch((error: unknown) =>
+	const organizationId = await organizationOf(workspaceId);
+	if (!organizationId) return;
+	const { ids } = await callMoves(organizationId, {
+		op: "pendingInto",
+		toWorkspaceId: workspaceId,
+	});
+	for (const id of ids) {
+		await queueChatMove({ organizationId, id }).catch((error: unknown) =>
 			console.error(
-				`[chat-move] could not queue move ${move.id} into ${workspaceId}`,
+				`[chat-move] could not queue move ${id} into ${workspaceId}`,
 				error,
 			),
 		);
 	}
-	await finishWorkspaceMovesTo(workspaceId);
+	await callMoves(organizationId, {
+		op: "finishInto",
+		toWorkspaceId: workspaceId,
+	});
 }
 
 /** Fails the moves still running into a cloud workspace that will never answer. */
@@ -49,14 +51,19 @@ export async function failChatMovesTo(
 	workspaceId: string,
 	error: string,
 ): Promise<void> {
-	await db
-		.update(chatMoves)
-		.set({ status: "failed", error, finishedAt: new Date() })
-		.where(
-			and(
-				eq(chatMoves.toWorkspaceId, workspaceId),
-				inArray(chatMoves.status, CHAT_MOVE_IN_FLIGHT),
-			),
-		);
-	await finishWorkspaceMovesTo(workspaceId, error);
+	const organizationId = await organizationOf(workspaceId);
+	if (!organizationId) return;
+	await callMoves(organizationId, {
+		op: "failInto",
+		toWorkspaceId: workspaceId,
+		error,
+	});
+}
+
+async function organizationOf(workspaceId: string): Promise<string | null> {
+	const workspace = await db.query.cloudWorkspaces.findFirst({
+		where: eq(cloudWorkspaces.id, workspaceId),
+		columns: { organizationId: true },
+	});
+	return workspace?.organizationId ?? null;
 }

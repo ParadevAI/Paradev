@@ -1,21 +1,12 @@
 import type { DurableEvent } from "@superset/chat/protocol";
 import { db, dbWs } from "@superset/db/client";
-import {
-	chatMoves,
-	chatSessions,
-	chatTranscripts,
-	chatTurns,
-	type SelectChatMove,
-} from "@superset/db/schema";
+import { chatSessions, chatTranscripts, chatTurns } from "@superset/db/schema";
 import { fileOriginalKey } from "@superset/shared/usercontent";
-import { and, eq, inArray, max } from "drizzle-orm";
+import { eq, max } from "drizzle-orm";
+import { callMoves, type SelectChatMove } from "../../../../lib/moves";
 import { presignedGetUrl } from "../../../../lib/r2";
 import { loadChatHistory } from "../../../chat-history/utils/loadChatHistory";
 import { lastTurnSeq } from "../findMovableChat";
-import {
-	settleWorkspaceMove,
-	settleWorkspaceMoves,
-} from "../settleWorkspaceMove";
 import { type WorkspaceHost, workspaceHost } from "../workspaceHost";
 
 // Wake (up to a minute) plus these stays inside the job's 300 s.
@@ -53,10 +44,10 @@ export class ChatMoveError extends Error {}
  * Claims the move from `pending`, so a second delivery of the job is a no-op.
  */
 export async function runChatMove(
-	moveId: string,
+	job: { organizationId: string; moveId: string },
 	deps: RunChatMoveDeps = { hostFor: workspaceHost },
 ): Promise<"ready" | "failed" | "skipped"> {
-	const move = await claimMove(moveId);
+	const move = await claimMove(job.organizationId, job.moveId);
 	if (!move) return "skipped";
 	try {
 		if (move.toHostId) {
@@ -88,22 +79,18 @@ export async function runChatMove(
 		});
 		return "ready";
 	} catch (error) {
-		await failChatMove(move.id, error);
+		await failChatMove(move, error);
 		return "failed";
 	}
 }
 
 /** Moves a `pending` move to `copying`, or returns null when it was not pending. */
 export async function claimMove(
+	organizationId: string,
 	moveId: string,
 ): Promise<SelectChatMove | null> {
-	const [move] = await db
-		.update(chatMoves)
-		.set({ status: "copying" })
-		.where(and(eq(chatMoves.id, moveId), eq(chatMoves.status, "pending")))
-		.returning();
-	if (move) await settleWorkspaceMove(move.workspaceMoveId);
-	return move ?? null;
+	const { move } = await callMoves(organizationId, { op: "claim", id: moveId });
+	return move;
 }
 
 function wentOnError(): ChatMoveError {
@@ -181,43 +168,43 @@ export async function completeChatMove(
 		continueChat?: () => Promise<unknown>;
 	},
 ): Promise<void> {
-	const wentOn = await dbWs.transaction(async (tx) => {
-		// The lock orders this check with the source's history uploads, which lock the same row.
-		await tx
-			.select({ id: chatSessions.id })
-			.from(chatSessions)
-			.where(eq(chatSessions.id, move.sessionId))
-			.for("update");
-		if (move.sourceTurnSeq !== null) {
-			const [turn] = await tx
-				.select({ value: max(chatTurns.firstSeq) })
-				.from(chatTurns)
-				.where(eq(chatTurns.sessionId, move.sessionId));
-			if ((turn?.value ?? 0) > move.sourceTurnSeq) return true;
-		}
-		const [current] = await tx
-			.update(chatMoves)
-			.set({ status: "ready", finishedAt: new Date() })
-			.where(
-				and(
-					eq(chatMoves.id, move.id),
-					inArray(chatMoves.status, ["copying", "restoring"]),
-				),
-			)
-			.returning({ id: chatMoves.id });
-		if (!current) throw new ChatMoveError("The move is no longer running");
-		await tx
-			.update(chatSessions)
-			.set({ v2WorkspaceId: move.toWorkspaceId, lastActiveAt: new Date() })
-			.where(eq(chatSessions.id, move.sessionId));
-		return false;
-	});
+	let finished = false;
+	const wentOn = await dbWs
+		.transaction(async (tx) => {
+			// The lock orders this check with the source's history uploads, which lock the same row.
+			await tx
+				.select({ id: chatSessions.id })
+				.from(chatSessions)
+				.where(eq(chatSessions.id, move.sessionId))
+				.for("update");
+			if (move.sourceTurnSeq !== null) {
+				const [turn] = await tx
+					.select({ value: max(chatTurns.firstSeq) })
+					.from(chatTurns)
+					.where(eq(chatTurns.sessionId, move.sessionId));
+				if ((turn?.value ?? 0) > move.sourceTurnSeq) return true;
+			}
+			({ finished } = await callMoves(move.organizationId, {
+				op: "finish",
+				id: move.id,
+			}));
+			if (!finished) throw new ChatMoveError("The move is no longer running");
+			await tx
+				.update(chatSessions)
+				.set({ v2WorkspaceId: move.toWorkspaceId, lastActiveAt: new Date() })
+				.where(eq(chatSessions.id, move.sessionId));
+			return false;
+		})
+		.catch(async (error: unknown) => {
+			// The move was recorded ready, but the chat never switched.
+			if (finished) await failChatMove(move, error, { evenIfReady: true });
+			throw error;
+		});
 	if (wentOn) {
 		const error = wentOnError();
-		await failChatMove(move.id, error);
+		await failChatMove(move, error);
 		throw error;
 	}
-	await settleWorkspaceMove(move.workspaceMoveId);
 	await destination
 		.continueChat?.()
 		.catch((error: unknown) =>
@@ -236,25 +223,17 @@ export async function completeChatMove(
 }
 
 export async function failChatMove(
-	moveId: string,
+	move: { organizationId: string; id: string },
 	error: unknown,
+	options: { evenIfReady?: boolean } = {},
 ): Promise<void> {
-	console.error(`[chat-move] move ${moveId} failed`, error);
-	const failed = await db
-		.update(chatMoves)
-		.set({
-			status: "failed",
-			error: error instanceof Error ? error.message : String(error),
-			finishedAt: new Date(),
-		})
-		.where(
-			and(
-				eq(chatMoves.id, moveId),
-				inArray(chatMoves.status, ["pending", "copying", "restoring"]),
-			),
-		)
-		.returning({ workspaceMoveId: chatMoves.workspaceMoveId });
-	await settleWorkspaceMoves(failed.map((row) => row.workspaceMoveId));
+	console.error(`[chat-move] move ${move.id} failed`, error);
+	await callMoves(move.organizationId, {
+		op: "fail",
+		id: move.id,
+		error: error instanceof Error ? error.message : String(error),
+		...options,
+	});
 }
 
 async function markSourceMoved(

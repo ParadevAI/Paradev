@@ -7,7 +7,9 @@ import { verifyQstashRequest } from "@/lib/verifyQstash";
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
-const payloadSchema = z.object({ moveId: z.string().uuid() }).strict();
+const payloadSchema = z
+	.object({ organizationId: z.string().uuid(), moveId: z.string().uuid() })
+	.strict();
 
 /**
  * Runs a chat move that `chatMove.start`, `chatMove.retry` or a cloud
@@ -29,6 +31,6 @@ export async function POST(request: Request): Promise<Response> {
 		console.error("[chat-moves/run] invalid payload", parsed.error);
 		return Response.json({ error: "Invalid payload" }, { status: 400 });
 	}
-	const outcome = await runChatMove(parsed.data.moveId);
+	const outcome = await runChatMove(parsed.data);
 	return Response.json({ ok: true, outcome });
 }

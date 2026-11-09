@@ -1,22 +1,16 @@
 import { db } from "@superset/db/client";
-import {
-	chatMoves,
-	cloudWorkspaces,
-	workspaceMoves,
-} from "@superset/db/schema";
+import { cloudWorkspaces } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, desc, eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { callMoves } from "../../lib/moves";
 import { personProcedure } from "../../trpc";
+import { assertMovesEnabled } from "../chat-move/utils/assertMovesEnabled";
 import {
 	abandonWorkspaceMove,
 	attachWorkspaceMove,
 	beginWorkspaceMove,
 } from "../chat-move/utils/createWorkspaceMove";
 import { moverOf } from "../chat-move/utils/moverOf";
-import {
-	failStaleWorkspaceMoves,
-	finishWorkspaceMovesTo,
-} from "../chat-move/utils/settleWorkspaceMove";
 import { startChatMove } from "../chat-move/utils/startChatMove";
 import {
 	abandonWorkspaceMoveInputSchema,
@@ -36,6 +30,7 @@ export const workspaceMoveRouter = {
 		.input(beginWorkspaceMoveInputSchema)
 		.mutation(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
+			await assertMovesEnabled(ctx.session.user);
 			return beginWorkspaceMove({ ...input, ...mover });
 		}),
 
@@ -51,10 +46,13 @@ export const workspaceMoveRouter = {
 			const started = [];
 			for (const move of moves) {
 				const { moveId } = await startChatMove(move);
-				started.push({ moveId, chatSessionId: move.chatSessionId });
+				started.push({ moveId, chatSessionId: move.sessionId });
 			}
 			if (moves.length === 0 && !(await isProvisioning(input.toWorkspaceId))) {
-				await finishWorkspaceMovesTo(input.toWorkspaceId);
+				await callMoves(mover.organizationId, {
+					op: "finishInto",
+					toWorkspaceId: input.toWorkspaceId,
+				});
 			}
 			return {
 				moves: started,
@@ -77,35 +75,12 @@ export const workspaceMoveRouter = {
 		.input(workspaceMoveOfWorkspaceInputSchema)
 		.query(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			await failStaleWorkspaceMoves(mover.organizationId, input.workspaceId);
-			const move = await db.query.workspaceMoves.findFirst({
-				where: and(
-					or(
-						eq(workspaceMoves.fromWorkspaceId, input.workspaceId),
-						eq(workspaceMoves.toWorkspaceId, input.workspaceId),
-					),
-					eq(workspaceMoves.organizationId, mover.organizationId),
-					eq(workspaceMoves.createdBy, mover.userId),
-				),
-				orderBy: desc(workspaceMoves.createdAt),
+			const { move, chats } = await callMoves(mover.organizationId, {
+				op: "latestWorkspaceMove",
+				workspaceId: input.workspaceId,
+				createdBy: mover.userId,
 			});
 			if (!move) return null;
-			const attempts = await db
-				.select({
-					sessionId: chatMoves.sessionId,
-					status: chatMoves.status,
-					createdAt: chatMoves.createdAt,
-				})
-				.from(chatMoves)
-				.where(eq(chatMoves.workspaceMoveId, move.id));
-			const newest = new Map<string, { status: string; createdAt: Date }>();
-			for (const attempt of attempts) {
-				const known = newest.get(attempt.sessionId);
-				if (!known || attempt.createdAt > known.createdAt) {
-					newest.set(attempt.sessionId, attempt);
-				}
-			}
-			const statuses = [...newest.values()].map((chat) => chat.status);
 			return {
 				id: move.id,
 				status: move.status,
@@ -114,11 +89,7 @@ export const workspaceMoveRouter = {
 				toWorkspaceId: move.toWorkspaceId,
 				toHostId: move.toHostId,
 				branch: move.branch,
-				chats: {
-					total: statuses.length,
-					ready: statuses.filter((status) => status === "ready").length,
-					failed: statuses.filter((status) => status === "failed").length,
-				},
+				chats,
 				createdAt: move.createdAt,
 			};
 		}),

@@ -1,7 +1,5 @@
 import { db } from "@superset/db/client";
 import {
-	CHAT_MOVE_IN_FLIGHT,
-	chatMoves,
 	chatSessions,
 	chatTranscripts,
 	chatTurns,
@@ -9,8 +7,8 @@ import {
 	type SelectChatSession,
 } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, inArray, max } from "drizzle-orm";
-import { failStaleMoves } from "../settleWorkspaceMove";
+import { and, desc, eq, max } from "drizzle-orm";
+import { callMoves } from "../../../../lib/moves";
 
 /** The seq of the chat's newest turn, or 0 when it has none. */
 export async function lastTurnSeq(sessionId: string): Promise<number> {
@@ -65,13 +63,9 @@ export async function findMovableChat(args: {
 		});
 	}
 
-	await failStaleMoves(session.id);
-	const moving = await db.query.chatMoves.findFirst({
-		where: and(
-			eq(chatMoves.sessionId, session.id),
-			inArray(chatMoves.status, CHAT_MOVE_IN_FLIGHT),
-		),
-		columns: { id: true },
+	const { moving } = await callMoves(args.organizationId, {
+		op: "chatMoving",
+		sessionId: session.id,
 	});
 	if (moving) {
 		throw new TRPCError({

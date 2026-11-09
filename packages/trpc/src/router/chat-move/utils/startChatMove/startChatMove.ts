@@ -10,6 +10,7 @@ import { queueChatMove } from "../queueChatMove";
  */
 export async function startChatMove(move: {
 	id: string;
+	organizationId: string;
 	toWorkspaceId: string;
 	toHostId: string | null;
 }) {
@@ -18,7 +19,7 @@ export async function startChatMove(move: {
 			where: eq(cloudWorkspaces.id, move.toWorkspaceId),
 			columns: { status: true },
 		});
-		if (destination?.status !== "provisioning") await queueChatMove(move.id);
+		if (destination?.status !== "provisioning") await queueChatMove(move);
 	}
 	return { moveId: move.id, runsOnThisComputer: move.toHostId !== null };
 }

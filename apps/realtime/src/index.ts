@@ -4,6 +4,7 @@ import {
 	USER_EVENTS_PATH,
 	USERS_PUBLISH_PATH,
 } from "@superset/shared/channels";
+import type { MoveBookRequest } from "@superset/shared/move-book";
 import {
 	MAX_PAGE_STORAGE_KEY_LENGTH,
 	MAX_PAGE_STORAGE_VALUE_BYTES,
@@ -31,6 +32,7 @@ import { cors } from "hono/cors";
 import { getServerByName } from "partyserver";
 import type { AppendInput } from "./agent-session/AgentSessionLog";
 import { AgentSessionHub } from "./agent-session-hub";
+import { MoveHub } from "./move-hub";
 import { ORG_USER_HEADER, OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
@@ -104,6 +106,24 @@ app.post("/v2/page/:pageId/storage/admin", async (c) => {
 		return c.json({ error: "op required" }, 400);
 	}
 	const stub = await getServerByName(c.env.PageHub, c.req.param("pageId"));
+	return c.json(await stub.apply(request));
+});
+
+app.post("/v2/org/:organizationId/moves", async (c) => {
+	const token = extractToken(c);
+	if (!token || token !== c.env.NUDGE_SECRET) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const request = (await c.req
+		.json()
+		.catch(() => null)) as MoveBookRequest | null;
+	if (!request || typeof request.op !== "string") {
+		return c.json({ error: "op required" }, 400);
+	}
+	const stub = await getServerByName(
+		c.env.MoveHub,
+		c.req.param("organizationId"),
+	);
 	return c.json(await stub.apply(request));
 });
 
@@ -674,12 +694,17 @@ const InstrumentedAgentSessionHub = Sentry.instrumentDurableObjectWithSentry(
 	sentryOptions,
 	AgentSessionHub,
 );
+const InstrumentedMoveHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	MoveHub,
+);
 export {
 	InstrumentedOrgHub as OrgHub,
 	InstrumentedPageHub as PageHub,
 	InstrumentedWorkspaceHub as WorkspaceHub,
 	InstrumentedUserHub as UserHub,
 	InstrumentedAgentSessionHub as AgentSessionHub,
+	InstrumentedMoveHub as MoveHub,
 };
 
 export default Sentry.withSentry(sentryOptions, {

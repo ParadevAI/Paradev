@@ -1,24 +1,25 @@
 import { db, dbWs } from "@superset/db/client";
 import {
-	CHAT_MOVE_IN_FLIGHT,
 	chatItems,
-	chatMoves,
 	chatSessions,
 	chatTranscripts,
 	chatTurns,
+	cloudWorkspaces,
 	files,
 } from "@superset/db/schema";
 import { fileOriginalKey } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
+import { callMoves } from "../../lib/moves";
 import { presignedPutUrl } from "../../lib/r2";
 import { personProcedure, userError } from "../../trpc";
-import { staleBefore } from "../chat-move/utils/settleWorkspaceMove";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
+	chatEventsInputSchema,
+	chatsOfWorkspaceInputSchema,
 	createTranscriptUploadInputSchema,
 	pushInputSchema,
 	searchInputSchema,
@@ -31,6 +32,7 @@ import {
 	loadAccessibleSession,
 } from "./utils/access";
 import { foldEvents } from "./utils/foldEvents";
+import { loadChatHistory } from "./utils/loadChatHistory";
 import { searchChats } from "./utils/searchChats";
 
 type ProtectedCtx = Parameters<typeof requireActiveOrgMembership>[0] & {
@@ -65,6 +67,9 @@ function stillMovingHere(): TRPCError {
  * turn, and the agent's own session files. A host pushes as it goes; when a
  * chat moves, `chatMove` hands both to the host it moves to.
  */
+/** As many chats as the preview of a sleeping cloud workspace lists. */
+const MAX_WORKSPACE_CHATS = 20;
+
 export const chatHistoryRouter = {
 	push: personProcedure
 		.input(pushInputSchema)
@@ -97,18 +102,11 @@ export const chatHistoryRouter = {
 						existing.organizationId === caller.organizationId &&
 						existing.createdBy === caller.userId
 					) {
-						const [moving] = await tx
-							.select({ id: chatMoves.id })
-							.from(chatMoves)
-							.where(
-								and(
-									eq(chatMoves.sessionId, input.sessionId),
-									eq(chatMoves.toWorkspaceId, input.workspaceId),
-									inArray(chatMoves.status, CHAT_MOVE_IN_FLIGHT),
-									gt(chatMoves.updatedAt, staleBefore()),
-								),
-							)
-							.limit(1);
+						const { moving } = await callMoves(caller.organizationId, {
+							op: "chatMoving",
+							sessionId: input.sessionId,
+							freshInto: input.workspaceId,
+						});
 						if (moving) throw stillMovingHere();
 					}
 					// Owner only: a box whose chat moved away must hear CONFLICT, not NOT_FOUND.
@@ -301,6 +299,57 @@ export const chatHistoryRouter = {
 			return { transcriptId: transcript.id };
 		}),
 
+	/** The caller's chats stored for a cloud workspace, newest first; none for a computer's. */
+	ofWorkspace: personProcedure
+		.input(chatsOfWorkspaceInputSchema)
+		.query(async ({ ctx, input }) => {
+			const caller = await callerOf(ctx);
+			if (!(await isCloudWorkspace(input.workspaceId))) return [];
+			return db
+				.select({
+					id: chatSessions.id,
+					title: chatSessions.title,
+					harness: chatSessions.harness,
+					lastActiveAt: chatSessions.lastActiveAt,
+				})
+				.from(chatSessions)
+				.where(
+					and(
+						eq(chatSessions.v2WorkspaceId, input.workspaceId),
+						eq(chatSessions.organizationId, caller.organizationId),
+						eq(chatSessions.createdBy, caller.userId),
+						isNotNull(chatSessions.epoch),
+					),
+				)
+				.orderBy(desc(chatSessions.lastActiveAt))
+				.limit(MAX_WORKSPACE_CHATS);
+		}),
+
+	/** A page of a stored chat, in the order it shows, as its host recorded it. */
+	events: personProcedure
+		.input(chatEventsInputSchema)
+		.query(async ({ ctx, input }) => {
+			const caller = await callerOf(ctx);
+			const session = await loadAccessibleSession(caller, input.chatSessionId);
+			// Only a cloud box keeps its chats here; a computer's copy is as old as its last move.
+			if (
+				!session.v2WorkspaceId ||
+				!(await isCloudWorkspace(session.v2WorkspaceId))
+			) {
+				return { epoch: null, events: [], nextAfterSeq: null };
+			}
+			const { events } = await loadChatHistory(session, {
+				afterSeq: input.afterSeq,
+				limit: input.limit,
+			});
+			return {
+				epoch: session.epoch,
+				events,
+				nextAfterSeq:
+					events.length === input.limit ? (events.at(-1)?.seq ?? null) : null,
+			};
+		}),
+
 	search: personProcedure
 		.input(searchInputSchema)
 		.query(async ({ ctx, input }) => {
@@ -313,6 +362,14 @@ export const chatHistoryRouter = {
 			});
 		}),
 } satisfies TRPCRouterRecord;
+
+async function isCloudWorkspace(workspaceId: string): Promise<boolean> {
+	const row = await db.query.cloudWorkspaces.findFirst({
+		where: eq(cloudWorkspaces.id, workspaceId),
+		columns: { id: true },
+	});
+	return row !== undefined;
+}
 
 /** The box's workspace held the chat until a move took it elsewhere. */
 async function loadTranscript(transcriptId: string) {
