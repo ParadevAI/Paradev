@@ -55,6 +55,7 @@ export function PageCommentsFrame({
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const { onPublished, offered, viewOffered } = usePageUpdateOffer({
+		pageKey: pageId,
 		check: async () => {
 			const [page, versions] = await Promise.all([
 				queryClient.fetchQuery({

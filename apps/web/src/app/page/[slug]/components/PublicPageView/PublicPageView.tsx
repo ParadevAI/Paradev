@@ -43,6 +43,7 @@ export function PublicPageView({
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const { onPublished, offered, viewOffered } = usePageUpdateOffer({
+		pageKey: pageId,
 		check: async () => {
 			const shared = await queryClient.fetchQuery({
 				...trpc.page.publicView.queryOptions({ slug }),

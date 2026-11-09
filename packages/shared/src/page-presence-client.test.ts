@@ -34,7 +34,11 @@ async function until(condition: () => boolean) {
 }
 
 function harness(
-	options: { heartbeatMs?: number; urls?: (string | null)[] } = {},
+	options: {
+		heartbeatMs?: number;
+		urls?: (string | null)[];
+		recheckJitterMs?: number;
+	} = {},
 ) {
 	const sockets: FakeSocket[] = [];
 	const states: PagePresenceViewer[][] = [];
@@ -58,7 +62,7 @@ function harness(
 			return socket;
 		},
 		retryBaseMs: 1,
-		recheckJitterMs: 1,
+		recheckJitterMs: options.recheckJitterMs ?? 1,
 		heartbeatMs: options.heartbeatMs ?? 60_000,
 	});
 	const opened = async () => {
@@ -137,6 +141,29 @@ describe("openPagePresence", () => {
 		await until(() => h.sockets.length === 2);
 		h.sockets[1]?.emit("open");
 		await until(() => h.published() === 1);
+		h.client.stop();
+	});
+
+	test("checks for a missed publish when the first dial failed and a retry connects", async () => {
+		const h = harness({ urls: [null] });
+		const socket = await h.opened();
+		expect(h.sockets).toHaveLength(1);
+		expect(h.dialled()).toBe(2);
+		await until(() => h.published() === 1);
+		socket.hub({ type: "presence", viewers: [] });
+		h.client.stop();
+	});
+
+	test("a published message cancels the pending reconnect check", async () => {
+		const h = harness({ recheckJitterMs: 50 });
+		const first = await h.opened();
+		first.emit("close", { code: 1006 });
+		await until(() => h.sockets.length === 2);
+		const second = h.sockets[1] as FakeSocket;
+		second.emit("open");
+		second.hub({ type: "published" });
+		await sleep(80);
+		expect(h.published()).toBe(1);
 		h.client.stop();
 	});
 

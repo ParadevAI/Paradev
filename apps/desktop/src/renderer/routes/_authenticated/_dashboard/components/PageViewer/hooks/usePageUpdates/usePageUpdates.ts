@@ -59,6 +59,7 @@ export function usePageUpdates({
 	);
 
 	const offer = usePageUpdateOffer({
+		pageKey: pageId ?? slug,
 		check,
 		apply,
 		shownVersion,

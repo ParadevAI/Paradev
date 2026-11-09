@@ -56,7 +56,7 @@ export function openPagePresence({
 	let awaitingPong = false;
 	let ponged = false;
 	let visitors: PresenceVisitor[] = [];
-	let connectedBefore = false;
+	let mayHaveMissed = false;
 	let recheckTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const lost = (ws: PresenceSocket, code?: number) => {
@@ -108,13 +108,13 @@ export function openPagePresence({
 		ws.addEventListener("open", () => {
 			if (ws !== socket) return;
 			attempts = 0;
-			if (connectedBefore && onPublished && !recheckTimer) {
+			if (mayHaveMissed && onPublished && !recheckTimer) {
 				recheckTimer = setTimeout(() => {
 					recheckTimer = null;
 					if (!stopped) onPublished();
 				}, Math.random() * recheckJitterMs);
 			}
-			connectedBefore = true;
+			mayHaveMissed = false;
 			awaitingPong = true;
 			try {
 				ws.send("ping");
@@ -141,6 +141,8 @@ export function openPagePresence({
 					onVisitors?.(visitors);
 				}
 			} else if (message.type === "published") {
+				if (recheckTimer) clearTimeout(recheckTimer);
+				recheckTimer = null;
 				onPublished?.();
 			}
 		});
@@ -149,6 +151,7 @@ export function openPagePresence({
 
 	const retry = () => {
 		if (stopped || refused || socket || retryTimer) return;
+		mayHaveMissed = true;
 		const delay = Math.min(retryMaxMs, retryBaseMs * 2 ** attempts);
 		attempts += 1;
 		retryTimer = setTimeout(() => {
