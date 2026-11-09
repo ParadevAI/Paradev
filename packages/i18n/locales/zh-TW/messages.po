@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {思考了#秒} other {思考了#秒}}"
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "此工作區中的 {entryPath} 已在其他組織中發佈為頁面。請移動該檔案，或使用那個頁面的 id 發佈。"
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, other {# 個聊天無法移到電腦}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#項失敗} other {#項失敗}}"
 
@@ -3958,6 +3961,9 @@ msgstr "取消編輯"
 msgid "Cancel invite"
 msgstr "取消邀請"
 
+msgid "Cancel move"
+msgstr "取消移動"
+
 msgid "Cancel plan"
 msgstr "取消方案"
 
@@ -5994,11 +6000,17 @@ msgstr "無法分叉到新的 worktree"
 msgid "Couldn't branch the conversation"
 msgstr "無法分叉對話"
 
+msgid "Couldn't cancel the move"
+msgstr "無法取消移動"
+
 msgid "Couldn't change the routine"
 msgstr "無法變更例行任務"
 
 msgid "Couldn't check"
 msgstr "無法檢查"
+
+msgid "Couldn't check the move"
+msgstr "無法檢查移動狀態"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "無法檢查移除此成員會影響哪些內容"
@@ -6044,6 +6056,12 @@ msgstr "無法放棄未暫存的更改"
 
 msgid "Couldn't edit the message"
 msgstr "無法編輯該訊息"
+
+msgid "Couldn't end the move"
+msgstr "無法結束移動"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "不清楚此聊天的移動進度。如果它沒有被移動，仍在原本的工作區中。"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "沒能完成工作區的刪除"
@@ -9356,6 +9374,9 @@ msgstr "取得 iPhone 和 iPad 應用程式"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "將收到加入 {organizationName} 的邀請"
+
+msgid "Getting the computer ready"
+msgstr "正在準備電腦"
 
 msgid "Getting Work Done"
 msgstr "工作常用"
@@ -14062,6 +14083,9 @@ msgstr "開啟全域性命令面板"
 msgid "Open the new workspace modal"
 msgstr "開啟新建工作區彈窗"
 
+msgid "Open the original workspace"
+msgstr "開啟原工作區"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "在命令面板中開啟資源用量檢視"
 
@@ -18516,6 +18540,9 @@ msgstr "還有其他？輸入你自己的回答"
 msgid "Something went wrong"
 msgstr "出了點問題"
 
+msgid "Something went wrong during the move."
+msgstr "移動過程中發生問題。"
+
 msgid "Something went wrong."
 msgstr "出了點問題。"
 
@@ -18959,6 +18986,9 @@ msgstr "已停止"
 
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
+
+msgid "Stopped moving {name}"
+msgstr "已停止移動 {name}"
 
 msgid "Stopping the agent in {what}"
 msgstr "正在停止 {what} 中的代理程式"
@@ -19681,6 +19711,9 @@ msgstr "連線已逾時"
 msgid "The connection was closed"
 msgstr "連線已被關閉"
 
+msgid "The connection was lost."
+msgstr "連線已中斷。"
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "目前提示詞會被所選版本替換。歷史中會新增一條「已恢復」記錄，方便你復原。"
 
@@ -19837,6 +19870,18 @@ msgstr "多數已合併的代理程式PR只需審查，無需任何人工修改�
 
 msgid "The model declined to continue"
 msgstr "模型拒絕繼續"
+
+msgid "The move into this workspace failed."
+msgstr "移動到此工作區失敗。"
+
+msgid "The move service couldn't be reached."
+msgstr "無法連線到移動服務。"
+
+msgid "The move stopped responding, so it was ended."
+msgstr "移動已停止回應，因此已結束。"
+
+msgid "The move was cancelled."
+msgstr "移動已取消。"
 
 msgid "The name of your organization or team"
 msgstr "你的組織或團隊的名稱"
@@ -20027,6 +20072,9 @@ msgstr "這些資料夾中仍有你的檔案，但沒有自動移轉到新版 Pa
 msgid "These ports are still in use"
 msgstr "這些埠仍在使用中"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "它們仍在原工作區中。逐一開啟即可重試。"
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "它們使用你已有的訂閱和金鑰執行。"
 
@@ -20105,6 +20153,9 @@ msgstr "此聊天已結束。"
 
 msgid "This chat is empty."
 msgstr "此聊天為空。"
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "此聊天較長，因此只顯示最新部分。工作區啟動後會完整開啟。"
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "此聊天可能已被移除，或你沒有存取權限。"
@@ -20205,6 +20256,9 @@ msgstr "這個邀請已被接受。"
 msgid "This invitation link is invalid or has expired."
 msgstr "這個邀請連結無效或已過期。"
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "耗時比平常更久。下方的聊天是最後儲存的副本；工作區啟動後才會真正開啟。"
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "這比平時耗時更久。沙箱可能仍在拉取映象 — 無論此視窗是否開啟，它都會繼續。"
 
@@ -20255,6 +20309,9 @@ msgstr "此模型無法使用"
 
 msgid "This month"
 msgstr "本月"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "此次移動已停止。聊天仍在原本的工作區中。"
 
 msgid "This only changes the display name, not the branch."
 msgstr "這只會更改顯示名稱，不會更改分支。"
@@ -20463,6 +20520,9 @@ msgstr "這將取消暫存並還原所有已暫存的更改。已暫存的新檔
 
 msgid "This workspace"
 msgstr "此工作區"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "無法移動此工作區。它沒有任何變化。"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
@@ -21680,6 +21740,9 @@ msgstr "正在等待子代理程式的第一則訊息…"
 msgid "Waiting for your input"
 msgstr "等待你的輸入"
 
+msgid "Waking the workspace…"
+msgstr "正在喚醒工作區…"
+
 msgid "Waking up workspace"
 msgstr "正在喚醒工作區"
 
@@ -22683,6 +22746,9 @@ msgstr "你的工作（包括未提交的變更）會推送到遠端的一個新
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的裝置碼登入由你的工作區管理員開啟。"
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "你的工作區沒有變化。幾分鐘後可以再次移動。"
 
 msgid "Zap"
 msgstr "閃電"

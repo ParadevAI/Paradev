@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {#秒間思考しました} other {#秒間思考�
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "このワークスペースの {entryPath} は、別の組織のページとしてすでに公開されています。ファイルを移動するか、そのページの ID を指定して公開してください。"
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, other {# 件のチャットをコンピューターに移動できませんでした}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#件失敗} other {#件失敗}}"
 
@@ -3958,6 +3961,9 @@ msgstr "編集をキャンセル"
 msgid "Cancel invite"
 msgstr "招待を取り消す"
 
+msgid "Cancel move"
+msgstr "移動をキャンセル"
+
 msgid "Cancel plan"
 msgstr "プランをキャンセル"
 
@@ -5994,11 +6000,17 @@ msgstr "新しい worktree へ分岐できませんでした"
 msgid "Couldn't branch the conversation"
 msgstr "会話を分岐できませんでした"
 
+msgid "Couldn't cancel the move"
+msgstr "移動をキャンセルできませんでした"
+
 msgid "Couldn't change the routine"
 msgstr "ルーティンを変更できませんでした"
 
 msgid "Couldn't check"
 msgstr "確認できませんでした"
+
+msgid "Couldn't check the move"
+msgstr "移動を確認できませんでした"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "このメンバーの削除による影響を確認できませんでした"
@@ -6044,6 +6056,12 @@ msgstr "未ステージの変更を破棄できませんでした"
 
 msgid "Couldn't edit the message"
 msgstr "メッセージを編集できませんでした"
+
+msgid "Couldn't end the move"
+msgstr "移動を終了できませんでした"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "このチャットの移動の状況がわかりません。移動していない場合は、元のワークスペースにあります。"
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
@@ -9356,6 +9374,9 @@ msgstr "iPhone・iPad アプリを入手"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
+
+msgid "Getting the computer ready"
+msgstr "コンピューターを準備しています"
 
 msgid "Getting Work Done"
 msgstr "仕事に役立つ"
@@ -14062,6 +14083,9 @@ msgstr "グローバルコマンドパレットを開く"
 msgid "Open the new workspace modal"
 msgstr "新規ワークスペースのモーダルを開く"
 
+msgid "Open the original workspace"
+msgstr "元のワークスペースを開く"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "コマンドパレットでリソース使用状況ビューを開く"
 
@@ -18516,6 +18540,9 @@ msgstr "ほかの回答がありますか？自由に入力"
 msgid "Something went wrong"
 msgstr "問題が発生しました"
 
+msgid "Something went wrong during the move."
+msgstr "移動中に問題が発生しました。"
+
 msgid "Something went wrong."
 msgstr "問題が発生しました。"
 
@@ -18959,6 +18986,9 @@ msgstr "停止しました"
 
 msgid "Stopped by the usage limit"
 msgstr "使用量の上限により停止"
+
+msgid "Stopped moving {name}"
+msgstr "{name} の移動を停止しました"
 
 msgid "Stopping the agent in {what}"
 msgstr "{what} のエージェントを停止中"
@@ -19681,6 +19711,9 @@ msgstr "接続がタイムアウトしました"
 msgid "The connection was closed"
 msgstr "接続が閉じられました"
 
+msgid "The connection was lost."
+msgstr "接続が切れました。"
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "現在のプロンプトが選択したバージョンで置き換えられます。履歴に新しい「復元済み」エントリが追加されるので、元に戻せます。"
 
@@ -19837,6 +19870,18 @@ msgstr "マージされたエージェントのPRの過半数が、レビュー�
 
 msgid "The model declined to continue"
 msgstr "モデルが続行を拒否しました"
+
+msgid "The move into this workspace failed."
+msgstr "このワークスペースへの移動に失敗しました。"
+
+msgid "The move service couldn't be reached."
+msgstr "移動サービスに接続できませんでした。"
+
+msgid "The move stopped responding, so it was ended."
+msgstr "移動が応答しなくなったため終了しました。"
+
+msgid "The move was cancelled."
+msgstr "移動はキャンセルされました。"
 
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
@@ -20027,6 +20072,9 @@ msgstr "これらのフォルダにはファイルが残っていますが、新
 msgid "These ports are still in use"
 msgstr "これらのポートはまだ使用中です"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "元のワークスペースに残っています。もう一度試すには、それぞれを開いてください。"
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "お持ちのサブスクリプションとキーでそのまま動きます。"
 
@@ -20105,6 +20153,9 @@ msgstr "このチャットは終了しました。"
 
 msgid "This chat is empty."
 msgstr "このチャットは空です。"
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "このチャットは長いため、最新の部分だけを表示しています。ワークスペースが起動するとすべて開きます。"
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "このチャットは削除されたか、アクセス権がない可能性があります。"
@@ -20205,6 +20256,9 @@ msgstr "この招待はすでに承諾されています。"
 msgid "This invitation link is invalid or has expired."
 msgstr "この招待リンクは無効か、期限切れです。"
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "通常より時間がかかっています。下のチャットは最後に保存されたコピーです。ワークスペースが起動すると実際に開きます。"
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "通常より時間がかかっています。サンドボックスはまだイメージを取得中かもしれません — このウィンドウを閉じても処理は続きます。"
 
@@ -20255,6 +20309,9 @@ msgstr "このモデルは利用できません"
 
 msgid "This month"
 msgstr "今月"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "この移動は停止しました。チャットは元のワークスペースにあります。"
 
 msgid "This only changes the display name, not the branch."
 msgstr "変更されるのは表示名だけで、ブランチは変わりません。"
@@ -20463,6 +20520,9 @@ msgstr "ステージ済みの変更をすべてステージ解除して元に戻
 
 msgid "This workspace"
 msgstr "このワークスペース"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "このワークスペースを移動できませんでした。変更はありません。"
 
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
@@ -21680,6 +21740,9 @@ msgstr "サブエージェントの最初のメッセージを待っています
 msgid "Waiting for your input"
 msgstr "入力を待っています"
 
+msgid "Waking the workspace…"
+msgstr "ワークスペースを起動しています…"
+
 msgid "Waking up workspace"
 msgstr "ワークスペースを起動中"
 
@@ -22683,6 +22746,9 @@ msgstr "コミットされていない変更を含む作業は、リモートの
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex のデバイスコードによるサインインは、ワークスペースの管理者が有効にします。"
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "ワークスペースは変更されていません。数分後にもう一度移動できます。"
 
 msgid "Zap"
 msgstr "稲妻"

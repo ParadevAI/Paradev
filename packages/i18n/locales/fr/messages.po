@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {A réfléchi pendant # seconde} other {A réflé
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} de cet espace de travail est déjà publié comme page dans une autre organisation. Déplacez le fichier ou publiez avec l'id de cette page."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# discussion n’a pas pu être déplacée vers l’ordinateur} other {# discussions n’ont pas pu être déplacées vers l’ordinateur}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# en échec} other {# en échec}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Annuler les modifications"
 msgid "Cancel invite"
 msgstr "Annuler l’invitation"
 
+msgid "Cancel move"
+msgstr "Annuler le déplacement"
+
 msgid "Cancel plan"
 msgstr "Annuler le forfait"
 
@@ -5994,11 +6000,17 @@ msgstr "Impossible de dupliquer dans un nouveau worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Impossible de dupliquer la conversation"
 
+msgid "Couldn't cancel the move"
+msgstr "Impossible d’annuler le déplacement"
+
 msgid "Couldn't change the routine"
 msgstr "Impossible de modifier la routine"
 
 msgid "Couldn't check"
 msgstr "Vérification impossible"
+
+msgid "Couldn't check the move"
+msgstr "Impossible de vérifier le déplacement"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Impossible de vérifier ce que le retrait de ce membre affecte"
@@ -6044,6 +6056,12 @@ msgstr "Impossible d'abandonner les modifications non indexées"
 
 msgid "Couldn't edit the message"
 msgstr "Impossible de modifier le message"
+
+msgid "Couldn't end the move"
+msgstr "Impossible de terminer le déplacement"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Impossible de savoir où en est le déplacement de cette discussion. Si elle n’a pas été déplacée, elle est toujours dans l’espace de travail d’origine."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Impossible de terminer la suppression des espaces de travail"
@@ -9356,6 +9374,9 @@ msgstr "Obtenir l'app iPhone et iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Recevra une invitation à rejoindre {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "Préparation de l’ordinateur"
 
 msgid "Getting Work Done"
 msgstr "Pour le travail"
@@ -14062,6 +14083,9 @@ msgstr "Ouvrir la palette de commandes globale"
 msgid "Open the new workspace modal"
 msgstr "Ouvrir la fenêtre de création d'espace de travail"
 
+msgid "Open the original workspace"
+msgstr "Ouvrir l’espace de travail d’origine"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Ouvrir la vue d'utilisation des ressources dans la palette de commandes"
 
@@ -18516,6 +18540,9 @@ msgstr "Autre chose ? Saisissez votre propre réponse"
 msgid "Something went wrong"
 msgstr "Une erreur est survenue"
 
+msgid "Something went wrong during the move."
+msgstr "Une erreur s’est produite pendant le déplacement."
+
 msgid "Something went wrong."
 msgstr "Une erreur est survenue."
 
@@ -18959,6 +18986,9 @@ msgstr "Arrêté"
 
 msgid "Stopped by the usage limit"
 msgstr "Arrêté par la limite d'utilisation"
+
+msgid "Stopped moving {name}"
+msgstr "Déplacement de {name} arrêté"
 
 msgid "Stopping the agent in {what}"
 msgstr "Arrêt de l’agent dans {what}"
@@ -19681,6 +19711,9 @@ msgstr "Le délai de connexion a été dépassé"
 msgid "The connection was closed"
 msgstr "La connexion a été fermée"
 
+msgid "The connection was lost."
+msgstr "La connexion a été perdue."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Le prompt actuel sera remplacé par la version sélectionnée. Une nouvelle entrée « Restauré » sera ajoutée à l'historique pour vous permettre d'annuler."
 
@@ -19837,6 +19870,18 @@ msgstr "La majorité des PR d'agents fusionnées ne demandent qu'une revue, sans
 
 msgid "The model declined to continue"
 msgstr "Le modèle a refusé de continuer"
+
+msgid "The move into this workspace failed."
+msgstr "Le déplacement vers cet espace de travail a échoué."
+
+msgid "The move service couldn't be reached."
+msgstr "Le service de déplacement est injoignable."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Le déplacement ne répondait plus, il a donc été arrêté."
+
+msgid "The move was cancelled."
+msgstr "Le déplacement a été annulé."
 
 msgid "The name of your organization or team"
 msgstr "Le nom de votre organisation ou équipe"
@@ -20027,6 +20072,9 @@ msgstr "Ces dossiers contiennent toujours vos fichiers, mais ils n’ont pas ét
 msgid "These ports are still in use"
 msgstr "Ces ports sont toujours utilisés"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Elles sont toujours dans l’espace de travail d’origine. Ouvrez-les une par une pour réessayer."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Ils fonctionnent avec les abonnements et clés que vous avez déjà."
 
@@ -20105,6 +20153,9 @@ msgstr "Ce chat est terminé."
 
 msgid "This chat is empty."
 msgstr "Cette discussion est vide."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Cette discussion est longue, seule sa partie la plus récente est affichée. Elle s’ouvre en entier dès que l’espace de travail démarre."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Cette discussion a peut-être été supprimée, ou vous n’y avez pas accès."
@@ -20205,6 +20256,9 @@ msgstr "Cette invitation a déjà été acceptée."
 msgid "This invitation link is invalid or has expired."
 msgstr "Ce lien d'invitation est invalide ou a expiré."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Cela prend plus de temps que d’habitude. La discussion ci-dessous est sa dernière copie enregistrée ; elle s’ouvre vraiment dès que l’espace de travail démarre."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Cela prend plus de temps que d'habitude. Le bac à sable est peut-être encore en train de télécharger son image — cela continue que cette fenêtre soit ouverte ou non."
 
@@ -20255,6 +20309,9 @@ msgstr "Ce modèle n'est pas disponible"
 
 msgid "This month"
 msgstr "Ce mois-ci"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Ce déplacement s’est arrêté. La discussion est toujours dans son ancien espace de travail."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Cela ne change que le nom affiché, pas la branche."
@@ -20463,6 +20520,9 @@ msgstr "Cette action désindexera et annulera toutes les modifications indexées
 
 msgid "This workspace"
 msgstr "Cet espace de travail"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Impossible de déplacer cet espace de travail. Il n’a pas changé."
 
 msgid "This workspace has no project to branch from"
 msgstr "Cet espace de travail n'a aucun projet depuis lequel dupliquer"
@@ -21680,6 +21740,9 @@ msgstr "En attente du premier message du sous-agent…"
 msgid "Waiting for your input"
 msgstr "En attente de votre réponse"
 
+msgid "Waking the workspace…"
+msgstr "Réveil de l’espace de travail…"
+
 msgid "Waking up workspace"
 msgstr "Réveil de l’espace de travail"
 
@@ -22683,6 +22746,9 @@ msgstr "Votre travail, y compris les modifications non commitées, est poussé v
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "L’administrateur de votre espace de travail active la connexion par code d’appareil pour Codex."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Votre espace de travail n’a pas changé. Vous pourrez le déplacer de nouveau dans quelques minutes."
 
 msgid "Zap"
 msgstr "Éclair"

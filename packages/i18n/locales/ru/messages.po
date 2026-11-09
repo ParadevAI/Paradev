@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {Думал # секунду} few {Думал # �
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} в этом рабочем пространстве уже опубликован как страница в другой организации. Переместите файл или опубликуйте с идентификатором той страницы."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# чат не удалось перенести на компьютер} few {# чата не удалось перенести на компьютер} many {# чатов не удалось перенести на компьютер} other {# чата не удалось перенести на компьютер}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# не пройдено} few {# не пройдено} many {# не пройдено} other {# не пройдено}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Отменить правки"
 msgid "Cancel invite"
 msgstr "Отменить приглашение"
 
+msgid "Cancel move"
+msgstr "Отменить перенос"
+
 msgid "Cancel plan"
 msgstr "Отменить тариф"
 
@@ -5994,11 +6000,17 @@ msgstr "Не удалось ответвить в новый worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Не удалось ответвить разговор"
 
+msgid "Couldn't cancel the move"
+msgstr "Не удалось отменить перенос"
+
 msgid "Couldn't change the routine"
 msgstr "Не удалось изменить рутину"
 
 msgid "Couldn't check"
 msgstr "Не удалось проверить"
+
+msgid "Couldn't check the move"
+msgstr "Не удалось проверить перенос"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Не удалось проверить, на что повлияет удаление этого участника"
@@ -6044,6 +6056,12 @@ msgstr "Не удалось отменить непроиндексирован�
 
 msgid "Couldn't edit the message"
 msgstr "Не удалось изменить сообщение"
+
+msgid "Couldn't end the move"
+msgstr "Не удалось завершить перенос"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Неизвестно, как идёт перенос этого чата. Если он не перенёсся, он всё ещё в исходной рабочей области."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Не удалось завершить удаление рабочих областей"
@@ -9356,6 +9374,9 @@ msgstr "Скачать приложение для iPhone и iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Получит приглашение в {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "Подготовка компьютера"
 
 msgid "Getting Work Done"
 msgstr "Для работы"
@@ -14062,6 +14083,9 @@ msgstr "Открыть глобальную палитру команд"
 msgid "Open the new workspace modal"
 msgstr "Открыть окно создания рабочей области"
 
+msgid "Open the original workspace"
+msgstr "Открыть исходную рабочую область"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Открыть просмотр потребления ресурсов в палитре команд"
 
@@ -18516,6 +18540,9 @@ msgstr "Что-то другое? Введите свой ответ"
 msgid "Something went wrong"
 msgstr "Что-то пошло не так"
 
+msgid "Something went wrong during the move."
+msgstr "Во время переноса что-то пошло не так."
+
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
@@ -18959,6 +18986,9 @@ msgstr "Остановлено"
 
 msgid "Stopped by the usage limit"
 msgstr "Остановлено лимитом использования"
+
+msgid "Stopped moving {name}"
+msgstr "Перенос {name} остановлен"
 
 msgid "Stopping the agent in {what}"
 msgstr "Остановка агента в {what}"
@@ -19681,6 +19711,9 @@ msgstr "Истекло время ожидания соединения"
 msgid "The connection was closed"
 msgstr "Соединение было закрыто"
 
+msgid "The connection was lost."
+msgstr "Соединение потеряно."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Текущий промпт будет заменён выбранной версией. В историю добавится запись «Восстановлено», чтобы это можно было отменить."
 
@@ -19837,6 +19870,18 @@ msgstr "Большинству объединённых агентских PR н
 
 msgid "The model declined to continue"
 msgstr "Модель отказалась продолжать"
+
+msgid "The move into this workspace failed."
+msgstr "Перенос в эту рабочую область не удался."
+
+msgid "The move service couldn't be reached."
+msgstr "Сервис переноса недоступен."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Перенос перестал отвечать и был завершён."
+
+msgid "The move was cancelled."
+msgstr "Перенос отменён."
 
 msgid "The name of your organization or team"
 msgstr "Название организации или команды"
@@ -20027,6 +20072,9 @@ msgstr "В этих папках всё ещё есть ваши файлы, н�
 msgid "These ports are still in use"
 msgstr "Эти порты ещё используются"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Они всё ещё в исходной рабочей области. Откройте каждый, чтобы повторить попытку."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Они работают на подписках и ключах, которые у вас уже есть."
 
@@ -20105,6 +20153,9 @@ msgstr "Этот чат завершён."
 
 msgid "This chat is empty."
 msgstr "Этот чат пуст."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Этот чат длинный, поэтому показана только последняя часть. Целиком он откроется, когда рабочая область запустится."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Возможно, этот чат удалён или у вас нет к нему доступа."
@@ -20205,6 +20256,9 @@ msgstr "Это приглашение уже принято."
 msgid "This invitation link is invalid or has expired."
 msgstr "Эта ссылка-приглашение недействительна или истекла."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Это занимает больше времени, чем обычно. Ниже — последняя сохранённая копия чата; по-настоящему он откроется, когда рабочая область запустится."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Это занимает больше времени, чем обычно. Возможно, песочница ещё скачивает образ — процесс идёт, открыто это окно или нет."
 
@@ -20255,6 +20309,9 @@ msgstr "Эта модель недоступна"
 
 msgid "This month"
 msgstr "В этом месяце"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Этот перенос остановлен. Чат всё ещё в прежней рабочей области."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Это меняет только отображаемое имя, а не ветку."
@@ -20463,6 +20520,9 @@ msgstr "Это снимет индексацию и откатит все про
 
 msgid "This workspace"
 msgstr "Эта рабочая область"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Не удалось перенести эту рабочую область. Она не изменилась."
 
 msgid "This workspace has no project to branch from"
 msgstr "В этом рабочем пространстве нет проекта для ответвления"
@@ -21680,6 +21740,9 @@ msgstr "Ожидание первого сообщения субагента…
 msgid "Waiting for your input"
 msgstr "Ждёт вашего ответа"
 
+msgid "Waking the workspace…"
+msgstr "Пробуждение рабочей области…"
+
 msgid "Waking up workspace"
 msgstr "Пробуждение рабочей области"
 
@@ -22683,6 +22746,9 @@ msgstr "Ваша работа, включая незакоммиченные и�
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Вход по коду устройства для Codex включает администратор вашего рабочего пространства."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Ваша рабочая область не изменилась. Её можно перенести снова через несколько минут."
 
 msgid "Zap"
 msgstr "Молния"

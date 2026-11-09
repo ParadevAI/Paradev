@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {Myślał # sekundę} few {Myślał # sekundy} ma
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} w tym workspace jest już opublikowany jako strona w innej organizacji. Przenieś plik albo opublikuj z identyfikatorem tamtej strony."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# czatu nie udało się przenieść na komputer} few {# czatów nie udało się przenieść na komputer} many {# czatów nie udało się przenieść na komputer} other {# czatu nie udało się przenieść na komputer}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# nieudany} few {# nieudane} many {# nieudanych} other {# nieudanego}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Anuluj edycję"
 msgid "Cancel invite"
 msgstr "Anuluj zaproszenie"
 
+msgid "Cancel move"
+msgstr "Anuluj przenoszenie"
+
 msgid "Cancel plan"
 msgstr "Anuluj plan"
 
@@ -5994,11 +6000,17 @@ msgstr "Nie udało się rozgałęzić do nowego worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Nie udało się rozgałęzić rozmowy"
 
+msgid "Couldn't cancel the move"
+msgstr "Nie udało się anulować przenoszenia"
+
 msgid "Couldn't change the routine"
 msgstr "Nie udało się zmienić rutyny"
 
 msgid "Couldn't check"
 msgstr "Nie udało się sprawdzić"
+
+msgid "Couldn't check the move"
+msgstr "Nie udało się sprawdzić przenoszenia"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Nie udało się sprawdzić, na co wpłynie usunięcie tego członka"
@@ -6044,6 +6056,12 @@ msgstr "Nie udało się odrzucić niezaindeksowanych zmian"
 
 msgid "Couldn't edit the message"
 msgstr "Nie udało się edytować wiadomości"
+
+msgid "Couldn't end the move"
+msgstr "Nie udało się zakończyć przenoszenia"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Nie wiadomo, jak idzie przenoszenie tego czatu. Jeśli nie został przeniesiony, nadal jest w obszarze roboczym, z którego pochodzi."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Nie udało się dokończyć usuwania obszarów roboczych"
@@ -9356,6 +9374,9 @@ msgstr "Pobierz aplikację na iPhone’a i iPada"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Otrzyma zaproszenie do {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "Przygotowywanie komputera"
 
 msgid "Getting Work Done"
 msgstr "Do pracy"
@@ -14062,6 +14083,9 @@ msgstr "Otwórz globalną paletę poleceń"
 msgid "Open the new workspace modal"
 msgstr "Otwórz okno nowego obszaru roboczego"
 
+msgid "Open the original workspace"
+msgstr "Otwórz pierwotny obszar roboczy"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Otwórz widok zużycia zasobów w palecie poleceń"
 
@@ -18516,6 +18540,9 @@ msgstr "Coś innego? Wpisz własną odpowiedź"
 msgid "Something went wrong"
 msgstr "Coś poszło nie tak"
 
+msgid "Something went wrong during the move."
+msgstr "Podczas przenoszenia coś poszło nie tak."
+
 msgid "Something went wrong."
 msgstr "Coś poszło nie tak."
 
@@ -18959,6 +18986,9 @@ msgstr "Zatrzymano"
 
 msgid "Stopped by the usage limit"
 msgstr "Zatrzymano przez limit użycia"
+
+msgid "Stopped moving {name}"
+msgstr "Zatrzymano przenoszenie {name}"
 
 msgid "Stopping the agent in {what}"
 msgstr "Zatrzymywanie agenta w {what}"
@@ -19681,6 +19711,9 @@ msgstr "Przekroczono czas połączenia"
 msgid "The connection was closed"
 msgstr "Połączenie zostało zamknięte"
 
+msgid "The connection was lost."
+msgstr "Połączenie zostało przerwane."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Bieżący prompt zostanie zastąpiony wybraną wersją. W historii pojawi się nowy wpis „Przywrócona”, dzięki czemu można to cofnąć."
 
@@ -19837,6 +19870,18 @@ msgstr "Większość scalonych PR-ów od agentów wymaga tylko przeglądu, bez �
 
 msgid "The model declined to continue"
 msgstr "Model odmówił kontynuowania"
+
+msgid "The move into this workspace failed."
+msgstr "Przenoszenie do tego obszaru roboczego nie powiodło się."
+
+msgid "The move service couldn't be reached."
+msgstr "Nie udało się połączyć z usługą przenoszenia."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Przenoszenie przestało odpowiadać, więc zostało zakończone."
+
+msgid "The move was cancelled."
+msgstr "Przenoszenie zostało anulowane."
 
 msgid "The name of your organization or team"
 msgstr "Nazwa organizacji lub zespołu"
@@ -20027,6 +20072,9 @@ msgstr "Te foldery nadal zawierają Twoje pliki, ale nie zostały same przeniesi
 msgid "These ports are still in use"
 msgstr "Te porty są nadal używane"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Nadal są w pierwotnym obszarze roboczym. Otwórz każdy, aby spróbować ponownie."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Działają na subskrypcjach i kluczach, które już masz."
 
@@ -20105,6 +20153,9 @@ msgstr "Ten czat się zakończył."
 
 msgid "This chat is empty."
 msgstr "Ten czat jest pusty."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Ten czat jest długi, więc widać tylko jego najnowszą część. Całość otworzy się po uruchomieniu obszaru roboczego."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Ten czat mógł zostać usunięty lub nie masz do niego dostępu."
@@ -20205,6 +20256,9 @@ msgstr "To zaproszenie zostało już przyjęte."
 msgid "This invitation link is invalid or has expired."
 msgstr "Ten link z zaproszeniem jest nieprawidłowy lub wygasł."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Trwa to dłużej niż zwykle. Poniżej jest ostatnia zapisana kopia czatu; otworzy się naprawdę po uruchomieniu obszaru roboczego."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Trwa to dłużej niż zwykle. Piaskownica może wciąż pobierać obraz — działa dalej niezależnie od tego, czy to okno jest otwarte."
 
@@ -20255,6 +20309,9 @@ msgstr "Ten model jest niedostępny"
 
 msgid "This month"
 msgstr "W tym miesiącu"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "To przenoszenie zostało zatrzymane. Czat nadal jest w poprzednim obszarze roboczym."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Zmienia to tylko nazwę wyświetlaną, nie gałąź."
@@ -20463,6 +20520,9 @@ msgstr "Usunie to z indeksu i cofnie wszystkie zaindeksowane zmiany. Zaindeksowa
 
 msgid "This workspace"
 msgstr "Ten obszar roboczy"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Nie udało się przenieść tego obszaru roboczego. Nic się nie zmieniło."
 
 msgid "This workspace has no project to branch from"
 msgstr "Ten obszar roboczy nie ma projektu, z którego można się rozgałęzić"
@@ -21680,6 +21740,9 @@ msgstr "Oczekiwanie na pierwszą wiadomość subagenta…"
 msgid "Waiting for your input"
 msgstr "Czeka na Twoją odpowiedź"
 
+msgid "Waking the workspace…"
+msgstr "Wybudzanie obszaru roboczego…"
+
 msgid "Waking up workspace"
 msgstr "Wybudzanie obszaru roboczego"
 
@@ -22683,6 +22746,9 @@ msgstr "Twoja praca, w tym niezatwierdzone zmiany, zostanie wypchnięta do nowej
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Logowanie kodem urządzenia dla Codex włącza administrator Twojego obszaru roboczego."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Twój obszar roboczy się nie zmienił. Możesz przenieść go ponownie za kilka minut."
 
 msgid "Zap"
 msgstr "Błyskawica"

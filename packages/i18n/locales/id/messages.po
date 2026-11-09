@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {Berpikir # detik} other {Berpikir # detik}}"
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} di workspace ini sudah diterbitkan sebagai halaman di organisasi lain. Pindahkan berkasnya atau terbitkan dengan id halaman tersebut."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, other {# chat tidak dapat dipindahkan ke komputer}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# gagal} other {# gagal}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Batalkan suntingan"
 msgid "Cancel invite"
 msgstr "Batalkan undangan"
 
+msgid "Cancel move"
+msgstr "Batalkan pemindahan"
+
 msgid "Cancel plan"
 msgstr "Batalkan paket"
 
@@ -5994,11 +6000,17 @@ msgstr "Tidak dapat mencabangkan ke worktree baru"
 msgid "Couldn't branch the conversation"
 msgstr "Tidak dapat mencabangkan percakapan"
 
+msgid "Couldn't cancel the move"
+msgstr "Tidak dapat membatalkan pemindahan"
+
 msgid "Couldn't change the routine"
 msgstr "Tidak dapat mengubah rutinitas"
 
 msgid "Couldn't check"
 msgstr "Tidak bisa diperiksa"
+
+msgid "Couldn't check the move"
+msgstr "Tidak dapat memeriksa pemindahan"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Tidak dapat memeriksa apa yang terdampak jika anggota ini dihapus"
@@ -6044,6 +6056,12 @@ msgstr "Tidak bisa membuang perubahan yang belum di-stage"
 
 msgid "Couldn't edit the message"
 msgstr "Tidak dapat mengedit pesan"
+
+msgid "Couldn't end the move"
+msgstr "Tidak dapat mengakhiri pemindahan"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Tidak diketahui bagaimana pemindahan chat ini berjalan. Jika tidak dipindahkan, chat masih ada di workspace asalnya."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Tidak bisa menyelesaikan penghapusan workspace"
@@ -9356,6 +9374,9 @@ msgstr "Dapatkan aplikasi iPhone dan iPad"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "Menyiapkan komputer"
 
 msgid "Getting Work Done"
 msgstr "Menyelesaikan Pekerjaan"
@@ -14062,6 +14083,9 @@ msgstr "Buka command palette global"
 msgid "Open the new workspace modal"
 msgstr "Buka modal workspace baru"
 
+msgid "Open the original workspace"
+msgstr "Buka workspace asli"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Buka tampilan penggunaan sumber daya di command palette"
 
@@ -18516,6 +18540,9 @@ msgstr "Ada yang lain? Ketik jawaban Anda sendiri"
 msgid "Something went wrong"
 msgstr "Terjadi kesalahan"
 
+msgid "Something went wrong during the move."
+msgstr "Terjadi kesalahan saat pemindahan."
+
 msgid "Something went wrong."
 msgstr "Terjadi kesalahan."
 
@@ -18959,6 +18986,9 @@ msgstr "Dihentikan"
 
 msgid "Stopped by the usage limit"
 msgstr "Dihentikan oleh batas penggunaan"
+
+msgid "Stopped moving {name}"
+msgstr "Pemindahan {name} dihentikan"
 
 msgid "Stopping the agent in {what}"
 msgstr "Menghentikan agen di {what}"
@@ -19681,6 +19711,9 @@ msgstr "Koneksinya kehabisan waktu"
 msgid "The connection was closed"
 msgstr "Koneksinya ditutup"
 
+msgid "The connection was lost."
+msgstr "Koneksi terputus."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Prompt saat ini akan diganti dengan versi yang dipilih. Entri \"Dipulihkan\" yang baru akan ditambahkan ke riwayat sehingga Anda bisa membatalkannya."
 
@@ -19837,6 +19870,18 @@ msgstr "Mayoritas PR agen yang di-merge hanya perlu direview, tanpa suntingan ma
 
 msgid "The model declined to continue"
 msgstr "Model menolak untuk melanjutkan"
+
+msgid "The move into this workspace failed."
+msgstr "Pemindahan ke workspace ini gagal."
+
+msgid "The move service couldn't be reached."
+msgstr "Layanan pemindahan tidak dapat dijangkau."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Pemindahan berhenti merespons, jadi dihentikan."
+
+msgid "The move was cancelled."
+msgstr "Pemindahan dibatalkan."
 
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
@@ -20027,6 +20072,9 @@ msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke 
 msgid "These ports are still in use"
 msgstr "Port ini masih dipakai"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Semuanya masih ada di workspace asli. Buka satu per satu untuk mencoba lagi."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Agen berjalan dengan langganan dan kunci yang sudah Anda miliki."
 
@@ -20105,6 +20153,9 @@ msgstr "Chat ini telah berakhir."
 
 msgid "This chat is empty."
 msgstr "Obrolan ini kosong."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Chat ini panjang, jadi hanya bagian terbarunya yang ditampilkan. Semuanya terbuka setelah workspace mulai."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Obrolan ini mungkin telah dihapus atau Anda tidak memiliki akses."
@@ -20205,6 +20256,9 @@ msgstr "Undangan ini sudah diterima."
 msgid "This invitation link is invalid or has expired."
 msgstr "Tautan undangan ini tidak valid atau sudah kedaluwarsa."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Ini memakan waktu lebih lama dari biasanya. Chat di bawah adalah salinan terakhir yang tersimpan; chat benar-benar terbuka setelah workspace mulai."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Ini lebih lama dari biasanya. Sandbox-nya mungkin masih menarik image-nya — prosesnya tetap jalan baik jendela ini terbuka atau tidak."
 
@@ -20255,6 +20309,9 @@ msgstr "Model ini tidak tersedia"
 
 msgid "This month"
 msgstr "Bulan ini"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Pemindahan ini berhenti. Chat masih ada di workspace lamanya."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Ini hanya mengubah nama tampilan, bukan branch-nya."
@@ -20463,6 +20520,9 @@ msgstr "Ini akan meng-unstage dan mengembalikan semua perubahan yang di-stage. F
 
 msgid "This workspace"
 msgstr "Workspace ini"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Workspace ini tidak dapat dipindahkan. Tidak ada yang berubah."
 
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
@@ -21680,6 +21740,9 @@ msgstr "Menunggu pesan pertama dari subagen…"
 msgid "Waiting for your input"
 msgstr "Menunggu masukan Anda"
 
+msgid "Waking the workspace…"
+msgstr "Membangunkan workspace…"
+
 msgid "Waking up workspace"
 msgstr "Membangunkan workspace"
 
@@ -22683,6 +22746,9 @@ msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke bra
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Admin workspace Anda mengaktifkan masuk dengan kode perangkat untuk Codex."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Workspace Anda tidak berubah. Anda dapat memindahkannya lagi dalam beberapa menit."
 
 msgid "Zap"
 msgstr "Petir"

@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {# seconde nagedacht} other {# seconden nagedacht
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} in deze workspace is al gepubliceerd als pagina in een andere organisatie. Verplaats het bestand of publiceer met het id van die pagina."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# chat kon niet naar de computer worden verplaatst} other {# chats konden niet naar de computer worden verplaatst}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# mislukt} other {# mislukt}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Bewerkingen annuleren"
 msgid "Cancel invite"
 msgstr "Uitnodiging annuleren"
 
+msgid "Cancel move"
+msgstr "Verplaatsen annuleren"
+
 msgid "Cancel plan"
 msgstr "Plan opzeggen"
 
@@ -5994,11 +6000,17 @@ msgstr "Kon niet afsplitsen naar een nieuwe worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Kon het gesprek niet afsplitsen"
 
+msgid "Couldn't cancel the move"
+msgstr "Kan het verplaatsen niet annuleren"
+
 msgid "Couldn't change the routine"
 msgstr "Kan de routine niet wijzigen"
 
 msgid "Couldn't check"
 msgstr "Kon niet controleren"
+
+msgid "Couldn't check the move"
+msgstr "Kan het verplaatsen niet controleren"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Kon niet controleren wat het verwijderen van dit lid beïnvloedt"
@@ -6044,6 +6056,12 @@ msgstr "Kan niet-gestagede wijzigingen niet verwerpen"
 
 msgid "Couldn't edit the message"
 msgstr "Kan het bericht niet bewerken"
+
+msgid "Couldn't end the move"
+msgstr "Kan het verplaatsen niet beëindigen"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Onbekend hoe het verplaatsen van deze chat gaat. Als hij niet is verplaatst, staat hij nog in de werkruimte waar hij vandaan kwam."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Kon het verwijderen van werkruimtes niet afronden"
@@ -9356,6 +9374,9 @@ msgstr "Download de iPhone- en iPad-app"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Krijgt een uitnodiging voor {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "De computer wordt voorbereid"
 
 msgid "Getting Work Done"
 msgstr "Werk gedaan krijgen"
@@ -14062,6 +14083,9 @@ msgstr "Het globale opdrachtenpalet openen"
 msgid "Open the new workspace modal"
 msgstr "Het venster voor een nieuwe werkruimte openen"
 
+msgid "Open the original workspace"
+msgstr "Oorspronkelijke werkruimte openen"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "De weergave van resourcegebruik in het opdrachtenpalet openen"
 
@@ -18516,6 +18540,9 @@ msgstr "Iets anders? Typ je eigen antwoord"
 msgid "Something went wrong"
 msgstr "Er is iets misgegaan"
 
+msgid "Something went wrong during the move."
+msgstr "Er ging iets mis tijdens het verplaatsen."
+
 msgid "Something went wrong."
 msgstr "Er is iets misgegaan."
 
@@ -18959,6 +18986,9 @@ msgstr "Gestopt"
 
 msgid "Stopped by the usage limit"
 msgstr "Gestopt door de gebruikslimiet"
+
+msgid "Stopped moving {name}"
+msgstr "Verplaatsen van {name} gestopt"
 
 msgid "Stopping the agent in {what}"
 msgstr "Agent in {what} wordt gestopt"
@@ -19681,6 +19711,9 @@ msgstr "De verbinding is verlopen"
 msgid "The connection was closed"
 msgstr "De verbinding is gesloten"
 
+msgid "The connection was lost."
+msgstr "De verbinding is verbroken."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "De huidige prompt wordt vervangen door de geselecteerde versie. Er wordt een nieuw item \"Hersteld\" aan de geschiedenis toegevoegd, zodat je dit ongedaan kunt maken."
 
@@ -19837,6 +19870,18 @@ msgstr "De meeste gemergede agent-PR's hoeven alleen gereviewd te worden, zonder
 
 msgid "The model declined to continue"
 msgstr "Het model weigerde verder te gaan"
+
+msgid "The move into this workspace failed."
+msgstr "Het verplaatsen naar deze werkruimte is mislukt."
+
+msgid "The move service couldn't be reached."
+msgstr "De verplaatsdienst was niet bereikbaar."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Het verplaatsen reageerde niet meer en is beëindigd."
+
+msgid "The move was cancelled."
+msgstr "Het verplaatsen is geannuleerd."
 
 msgid "The name of your organization or team"
 msgstr "De naam van je organisatie of team"
@@ -20027,6 +20072,9 @@ msgstr "Deze mappen bevatten nog je bestanden, maar zijn niet vanzelf naar het n
 msgid "These ports are still in use"
 msgstr "Deze poorten zijn nog in gebruik"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Ze staan nog in de oorspronkelijke werkruimte. Open ze een voor een om het opnieuw te proberen."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Ze draaien op de abonnementen en sleutels die je al hebt."
 
@@ -20105,6 +20153,9 @@ msgstr "Deze chat is beëindigd."
 
 msgid "This chat is empty."
 msgstr "Deze chat is leeg."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Deze chat is lang, dus alleen het nieuwste deel wordt getoond. Alles opent zodra de werkruimte is gestart."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Deze chat is mogelijk verwijderd of je hebt geen toegang."
@@ -20205,6 +20256,9 @@ msgstr "Deze uitnodiging is al geaccepteerd."
 msgid "This invitation link is invalid or has expired."
 msgstr "Deze uitnodigingslink is ongeldig of verlopen."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Dit duurt langer dan normaal. Hieronder staat de laatst opgeslagen kopie van de chat; hij opent echt zodra de werkruimte is gestart."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Dit duurt langer dan gewoonlijk. De sandbox haalt mogelijk nog zijn image op — dat gaat door of dit venster nu open is of niet."
 
@@ -20255,6 +20309,9 @@ msgstr "Dit model is niet beschikbaar"
 
 msgid "This month"
 msgstr "Deze maand"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Dit verplaatsen is gestopt. De chat staat nog in de oude werkruimte."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Dit verandert alleen de weergavenaam, niet de branch."
@@ -20463,6 +20520,9 @@ msgstr "Hiermee worden alle gestagede wijzigingen ge-unstaged en teruggedraaid. 
 
 msgid "This workspace"
 msgstr "Deze werkruimte"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Deze werkruimte kon niet worden verplaatst. Er is niets veranderd."
 
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
@@ -21680,6 +21740,9 @@ msgstr "Wachten op het eerste bericht van de subagent…"
 msgid "Waiting for your input"
 msgstr "Wacht op je invoer"
 
+msgid "Waking the workspace…"
+msgstr "Werkruimte wordt gewekt…"
+
 msgid "Waking up workspace"
 msgstr "Werkruimte wordt gewekt"
 
@@ -22683,6 +22746,9 @@ msgstr "Je werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe br
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "De beheerder van je workspace zet aanmelden met apparaatcode voor Codex aan."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Je werkruimte is niet veranderd. Je kunt hem over een paar minuten opnieuw verplaatsen."
 
 msgid "Zap"
 msgstr "Bliksem"

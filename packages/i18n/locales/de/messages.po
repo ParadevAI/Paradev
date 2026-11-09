@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {# Sekunde nachgedacht} other {# Sekunden nachged
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} wird in diesem Workspace bereits als Seite in einer anderen Organisation veröffentlicht. Verschiebe die Datei oder veröffentliche mit der ID jener Seite."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# Chat konnte nicht auf den Computer verschoben werden} other {# Chats konnten nicht auf den Computer verschoben werden}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# fehlgeschlagen} other {# fehlgeschlagen}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Bearbeitung abbrechen"
 msgid "Cancel invite"
 msgstr "Einladung zurückziehen"
 
+msgid "Cancel move"
+msgstr "Verschieben abbrechen"
+
 msgid "Cancel plan"
 msgstr "Tarif kündigen"
 
@@ -5994,11 +6000,17 @@ msgstr "Verzweigen in einen neuen Worktree fehlgeschlagen"
 msgid "Couldn't branch the conversation"
 msgstr "Unterhaltung konnte nicht verzweigt werden"
 
+msgid "Couldn't cancel the move"
+msgstr "Das Verschieben konnte nicht abgebrochen werden"
+
 msgid "Couldn't change the routine"
 msgstr "Die Routine konnte nicht geändert werden"
 
 msgid "Couldn't check"
 msgstr "Konnte nicht geprüft werden"
+
+msgid "Couldn't check the move"
+msgstr "Das Verschieben konnte nicht geprüft werden"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Die Auswirkungen der Entfernung dieses Mitglieds konnten nicht geprüft werden"
@@ -6044,6 +6056,12 @@ msgstr "Nicht gestagede Änderungen konnten nicht verworfen werden"
 
 msgid "Couldn't edit the message"
 msgstr "Die Nachricht konnte nicht bearbeitet werden"
+
+msgid "Couldn't end the move"
+msgstr "Das Verschieben konnte nicht beendet werden"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Der Stand des Verschiebens dieses Chats ist nicht bekannt. Wurde er nicht verschoben, ist er noch im ursprünglichen Arbeitsbereich."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Das Löschen der Arbeitsbereiche konnte nicht abgeschlossen werden"
@@ -9356,6 +9374,9 @@ msgstr "iPhone- und iPad-App holen"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Erhält eine Einladung zu {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "Der Computer wird vorbereitet"
 
 msgid "Getting Work Done"
 msgstr "Arbeit erledigen"
@@ -14062,6 +14083,9 @@ msgstr "Die globale Befehlspalette öffnen"
 msgid "Open the new workspace modal"
 msgstr "Den Dialog für einen neuen Arbeitsbereich öffnen"
 
+msgid "Open the original workspace"
+msgstr "Ursprünglichen Arbeitsbereich öffnen"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Die Ressourcen-Ansicht in der Befehlspalette öffnen"
 
@@ -18516,6 +18540,9 @@ msgstr "Etwas anderes? Eigene Antwort eingeben"
 msgid "Something went wrong"
 msgstr "Etwas ist schiefgelaufen"
 
+msgid "Something went wrong during the move."
+msgstr "Beim Verschieben ist ein Fehler aufgetreten."
+
 msgid "Something went wrong."
 msgstr "Etwas ist schiefgelaufen."
 
@@ -18959,6 +18986,9 @@ msgstr "Gestoppt"
 
 msgid "Stopped by the usage limit"
 msgstr "Durch das Nutzungslimit gestoppt"
+
+msgid "Stopped moving {name}"
+msgstr "Verschieben von {name} gestoppt"
 
 msgid "Stopping the agent in {what}"
 msgstr "Agent in {what} wird gestoppt"
@@ -19681,6 +19711,9 @@ msgstr "Zeitüberschreitung bei der Verbindung"
 msgid "The connection was closed"
 msgstr "Die Verbindung wurde geschlossen"
 
+msgid "The connection was lost."
+msgstr "Die Verbindung wurde unterbrochen."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Der aktuelle Prompt wird durch die ausgewählte Version ersetzt. Im Verlauf wird ein neuer Eintrag \"Wiederhergestellt\" angelegt, damit du das rückgängig machen kannst."
 
@@ -19837,6 +19870,18 @@ msgstr "Die Mehrheit der gemergten Agenten-PRs braucht nur Review, ohne menschli
 
 msgid "The model declined to continue"
 msgstr "Das Modell hat abgelehnt weiterzumachen"
+
+msgid "The move into this workspace failed."
+msgstr "Das Verschieben in diesen Arbeitsbereich ist fehlgeschlagen."
+
+msgid "The move service couldn't be reached."
+msgstr "Der Dienst zum Verschieben war nicht erreichbar."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Das Verschieben hat nicht mehr reagiert und wurde beendet."
+
+msgid "The move was cancelled."
+msgstr "Das Verschieben wurde abgebrochen."
 
 msgid "The name of your organization or team"
 msgstr "Der Name deiner Organisation oder deines Teams"
@@ -20027,6 +20072,9 @@ msgstr "Diese Ordner enthalten noch deine Dateien, wurden aber nicht automatisch
 msgid "These ports are still in use"
 msgstr "Diese Ports sind noch in Benutzung"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Sie sind noch im ursprünglichen Arbeitsbereich. Öffne sie einzeln, um es erneut zu versuchen."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Sie laufen mit den Abos und Schlüsseln, die du bereits hast."
 
@@ -20105,6 +20153,9 @@ msgstr "Dieser Chat ist beendet."
 
 msgid "This chat is empty."
 msgstr "Dieser Chat ist leer."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Dieser Chat ist lang, daher wird nur der neueste Teil angezeigt. Alles öffnet sich, sobald der Arbeitsbereich gestartet ist."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Dieser Chat wurde möglicherweise entfernt oder du hast keinen Zugriff."
@@ -20205,6 +20256,9 @@ msgstr "Diese Einladung wurde bereits angenommen."
 msgid "This invitation link is invalid or has expired."
 msgstr "Dieser Einladungslink ist ungültig oder abgelaufen."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Das dauert länger als üblich. Unten siehst du die zuletzt gespeicherte Kopie des Chats; er öffnet sich richtig, sobald der Arbeitsbereich gestartet ist."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Das dauert länger als sonst. Die Sandbox lädt womöglich noch ihr Image — das läuft weiter, egal ob dieses Fenster offen ist oder nicht."
 
@@ -20255,6 +20309,9 @@ msgstr "Dieses Modell ist nicht verfügbar"
 
 msgid "This month"
 msgstr "Diesen Monat"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Dieses Verschieben wurde gestoppt. Der Chat ist noch im alten Arbeitsbereich."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Das ändert nur den Anzeigenamen, nicht den Branch."
@@ -20463,6 +20520,9 @@ msgstr "Damit werden alle gestageden Änderungen aus dem Index genommen und zur�
 
 msgid "This workspace"
 msgstr "Dieser Arbeitsbereich"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Dieser Arbeitsbereich konnte nicht verschoben werden. Er ist unverändert."
 
 msgid "This workspace has no project to branch from"
 msgstr "Dieser Workspace hat kein Projekt, von dem aus verzweigt werden kann"
@@ -21680,6 +21740,9 @@ msgstr "Warten auf die erste Nachricht des Subagenten …"
 msgid "Waiting for your input"
 msgstr "Wartet auf deine Eingabe"
 
+msgid "Waking the workspace…"
+msgstr "Arbeitsbereich wird geweckt…"
+
 msgid "Waking up workspace"
 msgstr "Arbeitsbereich wird aufgeweckt"
 
@@ -22683,6 +22746,9 @@ msgstr "Deine Arbeit, einschließlich nicht committeter Änderungen, wird auf ei
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Die Anmeldung per Gerätecode für Codex aktiviert der Admin deines Workspace."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Dein Arbeitsbereich ist unverändert. Du kannst ihn in ein paar Minuten erneut verschieben."
 
 msgid "Zap"
 msgstr "Blitz"

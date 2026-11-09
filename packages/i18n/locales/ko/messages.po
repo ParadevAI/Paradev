@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {#초 동안 생각함} other {#초 동안 생각
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "이 워크스페이스의 {entryPath}는 다른 조직에서 이미 페이지로 게시되었습니다. 파일을 옮기거나 해당 페이지 ID로 게시하세요."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, other {채팅 #개를 컴퓨터로 옮기지 못했습니다}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#개 실패} other {#개 실패}}"
 
@@ -3958,6 +3961,9 @@ msgstr "편집 취소"
 msgid "Cancel invite"
 msgstr "초대 취소"
 
+msgid "Cancel move"
+msgstr "옮기기 취소"
+
 msgid "Cancel plan"
 msgstr "플랜 해지"
 
@@ -5994,11 +6000,17 @@ msgstr "새 worktree로 분기할 수 없습니다"
 msgid "Couldn't branch the conversation"
 msgstr "대화를 분기할 수 없습니다"
 
+msgid "Couldn't cancel the move"
+msgstr "옮기기를 취소하지 못했습니다"
+
 msgid "Couldn't change the routine"
 msgstr "루틴을 변경할 수 없습니다"
 
 msgid "Couldn't check"
 msgstr "확인할 수 없음"
+
+msgid "Couldn't check the move"
+msgstr "옮기기를 확인하지 못했습니다"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "이 멤버 제거의 영향을 확인할 수 없습니다"
@@ -6044,6 +6056,12 @@ msgstr "스테이징되지 않은 변경 사항을 버리지 못했습니다"
 
 msgid "Couldn't edit the message"
 msgstr "메시지를 편집할 수 없습니다"
+
+msgid "Couldn't end the move"
+msgstr "옮기기를 끝내지 못했습니다"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "이 채팅의 옮기기 상태를 알 수 없습니다. 옮겨지지 않았다면 원래 워크스페이스에 그대로 있습니다."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "워크스페이스 삭제를 끝내지 못했습니다"
@@ -9356,6 +9374,9 @@ msgstr "iPhone 및 iPad 앱 받기"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} 가입 초대를 받습니다"
+
+msgid "Getting the computer ready"
+msgstr "컴퓨터를 준비하는 중"
 
 msgid "Getting Work Done"
 msgstr "업무용"
@@ -14062,6 +14083,9 @@ msgstr "전역 명령 팔레트를 엽니다"
 msgid "Open the new workspace modal"
 msgstr "새 워크스페이스 모달을 엽니다"
 
+msgid "Open the original workspace"
+msgstr "원래 워크스페이스 열기"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "명령 팔레트에서 리소스 사용량 보기를 엽니다"
 
@@ -18516,6 +18540,9 @@ msgstr "다른 답이 있나요? 직접 입력하세요"
 msgid "Something went wrong"
 msgstr "문제가 발생했습니다"
 
+msgid "Something went wrong during the move."
+msgstr "옮기는 중에 문제가 발생했습니다."
+
 msgid "Something went wrong."
 msgstr "문제가 발생했습니다."
 
@@ -18959,6 +18986,9 @@ msgstr "중지됨"
 
 msgid "Stopped by the usage limit"
 msgstr "사용량 한도로 중단됨"
+
+msgid "Stopped moving {name}"
+msgstr "{name} 옮기기를 중지했습니다"
 
 msgid "Stopping the agent in {what}"
 msgstr "{what}의 에이전트 중지 중"
@@ -19681,6 +19711,9 @@ msgstr "연결 시간이 초과되었습니다"
 msgid "The connection was closed"
 msgstr "연결이 닫혔습니다"
 
+msgid "The connection was lost."
+msgstr "연결이 끊어졌습니다."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "현재 프롬프트가 선택한 버전으로 교체됩니다. 기록에 \"복원됨\" 항목이 새로 추가되므로 되돌릴 수 있습니다."
 
@@ -19837,6 +19870,18 @@ msgstr "머지된 에이전트 PR의 대부분이 사람의 수정 없이 리뷰
 
 msgid "The model declined to continue"
 msgstr "모델이 계속하기를 거부했습니다"
+
+msgid "The move into this workspace failed."
+msgstr "이 워크스페이스로 옮기지 못했습니다."
+
+msgid "The move service couldn't be reached."
+msgstr "옮기기 서비스에 연결할 수 없습니다."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "옮기기가 응답하지 않아 종료했습니다."
+
+msgid "The move was cancelled."
+msgstr "옮기기가 취소되었습니다."
 
 msgid "The name of your organization or team"
 msgstr "조직 또는 팀의 이름"
@@ -20027,6 +20072,9 @@ msgstr "이 폴더들에는 아직 파일이 있지만 새 Paradev로 자동으�
 msgid "These ports are still in use"
 msgstr "이 포트들은 아직 사용 중입니다"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "원래 워크스페이스에 그대로 있습니다. 다시 시도하려면 각각 여세요."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "이미 가지고 있는 구독과 키로 실행됩니다."
 
@@ -20105,6 +20153,9 @@ msgstr "이 채팅은 종료되었습니다."
 
 msgid "This chat is empty."
 msgstr "이 채팅은 비어 있습니다."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "이 채팅은 길어서 최신 부분만 표시합니다. 워크스페이스가 시작되면 전체가 열립니다."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "이 채팅은 삭제되었거나 접근 권한이 없을 수 있습니다."
@@ -20205,6 +20256,9 @@ msgstr "이 초대는 이미 수락되었습니다."
 msgid "This invitation link is invalid or has expired."
 msgstr "이 초대 링크가 유효하지 않거나 만료되었습니다."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "평소보다 오래 걸리고 있습니다. 아래 채팅은 마지막으로 저장된 사본이며, 워크스페이스가 시작되면 실제로 열립니다."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "평소보다 오래 걸리고 있습니다. 샌드박스가 아직 이미지를 받는 중일 수 있으며, 이 창이 열려 있든 아니든 계속 진행됩니다."
 
@@ -20255,6 +20309,9 @@ msgstr "이 모델은 사용할 수 없습니다"
 
 msgid "This month"
 msgstr "이번 달"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "이 옮기기가 중지되었습니다. 채팅은 이전 워크스페이스에 그대로 있습니다."
 
 msgid "This only changes the display name, not the branch."
 msgstr "표시 이름만 변경되며 브랜치는 바뀌지 않습니다."
@@ -20463,6 +20520,9 @@ msgstr "스테이징된 변경 사항을 모두 스테이징 해제하고 되돌
 
 msgid "This workspace"
 msgstr "이 워크스페이스"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "이 워크스페이스를 옮기지 못했습니다. 변경된 내용은 없습니다."
 
 msgid "This workspace has no project to branch from"
 msgstr "이 워크스페이스에는 분기할 프로젝트가 없습니다"
@@ -21680,6 +21740,9 @@ msgstr "서브 에이전트의 첫 메시지를 기다리는 중…"
 msgid "Waiting for your input"
 msgstr "입력을 기다리는 중"
 
+msgid "Waking the workspace…"
+msgstr "워크스페이스를 깨우는 중…"
+
 msgid "Waking up workspace"
 msgstr "워크스페이스 깨우는 중"
 
@@ -22683,6 +22746,9 @@ msgstr "커밋하지 않은 변경 사항을 포함한 작업이 원격의 새 �
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex용 기기 코드 로그인은 워크스페이스 관리자가 켭니다."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "워크스페이스는 변경되지 않았습니다. 몇 분 후에 다시 옮길 수 있습니다."
 
 msgid "Zap"
 msgstr "번개"

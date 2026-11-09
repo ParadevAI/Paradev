@@ -1003,6 +1003,9 @@ msgstr "{duration, plural, one {Thought for # second} other {Thought for # secon
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} in this workspace is already published as a page in another organization. Move the file, or publish with that page's id."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# failed} other {# failed}}"
 
@@ -3958,6 +3961,9 @@ msgstr "Cancel edits"
 msgid "Cancel invite"
 msgstr "Cancel invite"
 
+msgid "Cancel move"
+msgstr "Cancel move"
+
 msgid "Cancel plan"
 msgstr "Cancel plan"
 
@@ -5994,11 +6000,17 @@ msgstr "Couldn't branch into a new worktree"
 msgid "Couldn't branch the conversation"
 msgstr "Couldn't branch the conversation"
 
+msgid "Couldn't cancel the move"
+msgstr "Couldn't cancel the move"
+
 msgid "Couldn't change the routine"
 msgstr "Couldn't change the routine"
 
 msgid "Couldn't check"
 msgstr "Couldn't check"
+
+msgid "Couldn't check the move"
+msgstr "Couldn't check the move"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Couldn't check what removing this member affects"
@@ -6044,6 +6056,12 @@ msgstr "Couldn't discard unstaged changes"
 
 msgid "Couldn't edit the message"
 msgstr "Couldn't edit the message"
+
+msgid "Couldn't end the move"
+msgstr "Couldn't end the move"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Couldn’t finish deleting workspaces"
@@ -9356,6 +9374,9 @@ msgstr "Get the iPhone and iPad app"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Gets an invite to join {organizationName}"
+
+msgid "Getting the computer ready"
+msgstr "Getting the computer ready"
 
 msgid "Getting Work Done"
 msgstr "Getting Work Done"
@@ -14062,6 +14083,9 @@ msgstr "Open the global command palette"
 msgid "Open the new workspace modal"
 msgstr "Open the new workspace modal"
 
+msgid "Open the original workspace"
+msgstr "Open the original workspace"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Open the resource usage view in the command palette"
 
@@ -18516,6 +18540,9 @@ msgstr "Something else? Type your own answer"
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
+msgid "Something went wrong during the move."
+msgstr "Something went wrong during the move."
+
 msgid "Something went wrong."
 msgstr "Something went wrong."
 
@@ -18959,6 +18986,9 @@ msgstr "Stopped"
 
 msgid "Stopped by the usage limit"
 msgstr "Stopped by the usage limit"
+
+msgid "Stopped moving {name}"
+msgstr "Stopped moving {name}"
 
 msgid "Stopping the agent in {what}"
 msgstr "Stopping the agent in {what}"
@@ -19681,6 +19711,9 @@ msgstr "The connection timed out"
 msgid "The connection was closed"
 msgstr "The connection was closed"
 
+msgid "The connection was lost."
+msgstr "The connection was lost."
+
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 
@@ -19837,6 +19870,18 @@ msgstr "The majority of merged agent PRs need review only, with zero human edits
 
 msgid "The model declined to continue"
 msgstr "The model declined to continue"
+
+msgid "The move into this workspace failed."
+msgstr "The move into this workspace failed."
+
+msgid "The move service couldn't be reached."
+msgstr "The move service couldn't be reached."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "The move stopped responding, so it was ended."
+
+msgid "The move was cancelled."
+msgstr "The move was cancelled."
 
 msgid "The name of your organization or team"
 msgstr "The name of your organization or team"
@@ -20027,6 +20072,9 @@ msgstr "These folders still have your files, but they did not come over to the n
 msgid "These ports are still in use"
 msgstr "These ports are still in use"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "They are still in the original workspace. Open each one to try again."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "They run on the subscriptions and keys you already have."
 
@@ -20105,6 +20153,9 @@ msgstr "This chat has ended."
 
 msgid "This chat is empty."
 msgstr "This chat is empty."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "This chat may have been removed or you may not have access."
@@ -20205,6 +20256,9 @@ msgstr "This invitation has already been accepted."
 msgid "This invitation link is invalid or has expired."
 msgstr "This invitation link is invalid or has expired."
 
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 
@@ -20255,6 +20309,9 @@ msgstr "This model isn't available"
 
 msgid "This month"
 msgstr "This month"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "This move stopped. The chat is still in its old workspace."
 
 msgid "This only changes the display name, not the branch."
 msgstr "This only changes the display name, not the branch."
@@ -20463,6 +20520,9 @@ msgstr "This will unstage and revert all staged changes. Staged new files will b
 
 msgid "This workspace"
 msgstr "This workspace"
+
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "This workspace couldn't move. It is unchanged."
 
 msgid "This workspace has no project to branch from"
 msgstr "This workspace has no project to branch from"
@@ -21680,6 +21740,9 @@ msgstr "Waiting for the subagent's first message…"
 msgid "Waiting for your input"
 msgstr "Waiting for your input"
 
+msgid "Waking the workspace…"
+msgstr "Waking the workspace…"
+
 msgid "Waking up workspace"
 msgstr "Waking up workspace"
 
@@ -22683,6 +22746,9 @@ msgstr "Your work, including uncommitted changes, is pushed to a new branch on t
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Your workspace admin turns on device code sign-in for Codex."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Your workspace is unchanged. You can move it again in a few minutes."
 
 msgid "Zap"
 msgstr "Zap"
