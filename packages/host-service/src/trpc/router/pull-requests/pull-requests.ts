@@ -7,10 +7,8 @@ import { getContentByRepo } from "./procedures/get-content-by-repo";
 import { getDiff } from "./procedures/get-diff";
 import { getDiffByRepo } from "./procedures/get-diff-by-repo";
 import { getLinkedWorkspace } from "./procedures/get-linked-workspace";
-import { getStack } from "./procedures/get-stack";
 import { getThreads } from "./procedures/get-threads";
 import { mergePR } from "./procedures/merge";
-import { mergeStack } from "./procedures/merge-stack";
 import { replyToThread } from "./procedures/reply-to-thread";
 import { setDraft } from "./procedures/set-draft";
 import { setState } from "./procedures/set-state";
@@ -88,7 +86,6 @@ export const pullRequestsRouter = router({
 	/** @deprecated Use the API's `integration.github.getPullRequestDiff`, which acts as the viewer. Kept for released clients. */
 	getDiffByRepo,
 	getLinkedWorkspace,
-	getStack,
 	/** @deprecated Use the API's `integration.github.getPullRequestThreads`, which acts as the viewer. Kept for released clients. */
 	getThreads,
 	/** @deprecated Use the API's `integration.github.setPullRequestDraft`, which acts as the viewer. Kept for released clients. */
@@ -101,5 +98,4 @@ export const pullRequestsRouter = router({
 	replyToThread,
 	/** @deprecated Use the API's `integration.github.mergePullRequest`, which acts as the viewer. Kept for released clients. */
 	mergePR,
-	mergeStack,
 });
