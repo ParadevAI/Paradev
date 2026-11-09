@@ -138,6 +138,7 @@ export default async function PublishedPage({
 				pageId={shared.id}
 				title={shared.title}
 				viewUrl={shared.viewUrl}
+				version={shared.version}
 				slug={slug}
 				signedIn={Boolean(session)}
 			/>
@@ -209,6 +210,8 @@ export default async function PublishedPage({
 							pageId={page.id}
 							src={page.viewUrl}
 							title={page.title}
+							version={page.version}
+							viewerId={session.user.id}
 							previewing={
 								page.servedVersion !== null &&
 								page.version !== page.servedVersion

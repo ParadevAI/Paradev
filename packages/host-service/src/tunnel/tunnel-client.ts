@@ -282,30 +282,36 @@ export class TunnelClient {
 				if (n < DIAL_ATTEMPTS) attempt(n + 1);
 				else this.reportDialFailed(ticket);
 			};
-			const timer = setTimeout(() => {
+			// Node can keep a listener after its signal aborts, and Node 22's
+			// close() on a connecting socket fires error again, so settle once.
+			let settled = false;
+			const settle = () => {
+				if (settled) return false;
+				settled = true;
+				clearTimeout(timer);
 				listeners.abort();
+				return true;
+			};
+			const timer = setTimeout(() => {
+				if (!settle()) return;
 				closeQuietly(ws, 1000, "Dial connect timed out");
 				this.reportDialFailed(ticket);
 			}, remaining);
 			ws.addEventListener(
 				"open",
 				() => {
-					clearTimeout(timer);
-					listeners.abort();
-					attach(ws);
+					if (settle()) attach(ws);
 				},
 				{ signal: listeners.signal },
 			);
-			// close always follows error
-			ws.addEventListener(
-				"close",
-				() => {
-					clearTimeout(timer);
-					listeners.abort();
-					retry();
-				},
-				{ signal: listeners.signal },
-			);
+			// Node 22's WebSocket fires only error when the handshake fails.
+			const fail = () => {
+				if (!settle()) return;
+				closeQuietly(ws, 1000, "Dial connect failed");
+				retry();
+			};
+			ws.addEventListener("error", fail, { signal: listeners.signal });
+			ws.addEventListener("close", fail, { signal: listeners.signal });
 		};
 		attempt(1);
 	}
@@ -462,7 +468,7 @@ function pipe(from: WebSocket, to: WebSocket): void {
 		closeQuietly(to, code, "Peer closed");
 	});
 	from.addEventListener("error", () => {
-		// close always follows error
+		closeQuietly(to, 1011, "Peer failed");
 	});
 }
 

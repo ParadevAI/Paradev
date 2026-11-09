@@ -19,6 +19,7 @@ function pullRequest(
 			squashMergeAllowed: true,
 			mergeCommitAllowed: false,
 			rebaseMergeAllowed: true,
+			viewerDefaultMergeMethod: "REBASE",
 			pullRequest: {
 				id: "PR_1",
 				number: 7,
@@ -133,6 +134,7 @@ describe("readPullRequestDetail", () => {
 			unresolvedThreads: 1,
 			requiresThreadResolution: true,
 			allowedMergeMethods: ["squash", "rebase"],
+			defaultMergeMethod: "rebase",
 		});
 		expect(
 			detail.checks.map((check) => [check.name, check.conclusion]),

@@ -49,6 +49,7 @@ interface PageCommentsViewProps {
 	onLinkClick?: (click: PageLinkClick) => void;
 	storageTicket?: () => Promise<string | null>;
 	presenceUrl?: () => Promise<string | null>;
+	onPublished?: () => void;
 	toolHost?: PageToolHost;
 	/** Opt in to the find bar; a browser host leaves it to its own find. */
 	find?: PageFindOptions;
@@ -65,6 +66,7 @@ export function PageCommentsView({
 	onLinkClick,
 	storageTicket,
 	presenceUrl,
+	onPublished,
 	toolHost,
 	find: findOptions,
 }: PageCommentsViewProps) {
@@ -117,7 +119,7 @@ export function PageCommentsView({
 		host: toolHost,
 		pageId,
 	});
-	useJoinPresence({ roomId: pageId, url: presenceUrl });
+	useJoinPresence({ roomId: pageId, url: presenceUrl, onPublished });
 
 	const [lastHoverRect, setLastHoverRect] = useState<FrameRect | null>(null);
 	useEffect(() => {

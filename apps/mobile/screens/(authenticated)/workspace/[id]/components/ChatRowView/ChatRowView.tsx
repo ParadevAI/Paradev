@@ -100,7 +100,9 @@ export const ChatRowView = memo(
 			case "turn_status":
 				return (
 					<SystemLine tone={row.status === "failed" ? "error" : "muted"}>
-						{row.status === "interrupted" ? (
+						{row.status === "paused" ? (
+							<Trans>Paused when Paradev closed</Trans>
+						) : row.status === "interrupted" ? (
 							<Trans>Stopped</Trans>
 						) : (
 							(row.message ?? <Trans>The turn failed</Trans>)

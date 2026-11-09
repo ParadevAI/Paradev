@@ -150,6 +150,31 @@ describe("applyPortEventsToHostPortsResult", () => {
 });
 
 describe("deriveHostPortQueryTargets", () => {
+	it("asks the open cloud workspace's sandbox for its ports through the gate", () => {
+		const targets = deriveHostPortQueryTargets({
+			activeHostUrl: null,
+			hosts: [],
+			machineId: null,
+			relayUrl: "https://relay.example.com",
+			workspaces: [{ id: "cloud-ws", name: "Cloud", hostId: "cloud-ws" }],
+			openSandbox: {
+				workspaceId: "cloud-ws",
+				organizationId: "org-1",
+				url: "https://cloud-ws-4879.sandbox.example.com",
+			},
+		});
+
+		expect(targets).toEqual([
+			{
+				organizationId: "org-1",
+				machineId: "cloud-ws",
+				hostType: "cloud",
+				hostUrl: "https://cloud-ws-4879.sandbox.example.com",
+				workspaceIds: ["cloud-ws"],
+			},
+		]);
+	});
+
 	it("groups workspace ids by host, sorts them, and resolves local/remote host urls", () => {
 		const targets = deriveHostPortQueryTargets({
 			activeHostUrl: "http://127.0.0.1:4567",

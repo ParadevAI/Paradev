@@ -9,12 +9,12 @@ import { CgLaptop } from "react-icons/cg";
 import { HiCheck } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
-import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
-import { PickerChevron } from "../../../components/PickerChevron";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
-} from "../FormPickerTrigger";
+} from "renderer/routes/_authenticated/components/FormPickerTrigger";
+import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
+import { PickerChevron } from "../../../components/PickerChevron";
 
 interface CheckoutPickerPillProps {
 	checkout: WorkspaceCheckout;

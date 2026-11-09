@@ -10,14 +10,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@superset/ui/dropdown-menu";
+import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { Label } from "@superset/ui/label";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { Bot, GitFork, PanelRight, SquareStack } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -26,10 +20,7 @@ import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminal
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
-import type {
-	SurfaceForkPlacement,
-	SurfaceForkSource,
-} from "../../../../../../hooks/useSurfaceFork";
+import type { SurfaceForkSource } from "../../../../../../hooks/useSurfaceFork";
 import { useSurfaceForkSource } from "../../../../../../hooks/useSurfaceForkSource";
 import { SurfaceModeMenu } from "../../../../../SurfaceModeMenu";
 import { resolveDefaultTargetConfigId } from "./resolveDefaultTargetConfigId";
@@ -54,10 +45,7 @@ interface TerminalSessionHandoffMenuProps {
 		prompt: string;
 		forkSessionId?: string;
 	}) => Promise<{ terminalId: string } | null>;
-	onForkIntoOtherSurface: (
-		source: SurfaceForkSource,
-		placement: SurfaceForkPlacement,
-	) => void;
+	onForkIntoOtherSurface: (source: SurfaceForkSource) => void;
 }
 
 export function TerminalSessionHandoffMenu({
@@ -204,43 +192,16 @@ export function TerminalSessionHandoffMenu({
 
 	return (
 		<>
-			{surfaceFork.enabled ? (
-				<SurfaceModeMenu
-					mode="cli"
-					source={surfaceFork.source}
-					onFork={onForkIntoOtherSurface}
-					open={menuOpen}
-					onOpenChange={setMenuOpen}
-				>
-					{forkItem}
-					{continueItem}
-				</SurfaceModeMenu>
-			) : (
-				<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<DropdownMenuTrigger asChild>
-								<button
-									type="button"
-									aria-label={t({
-										message: "Continue or fork session",
-									})}
-									className="hidden rounded p-1 text-muted-foreground/60 transition-colors hover:text-muted-foreground @min-[200px]/pane-header:block"
-								>
-									<GitFork className="size-3.5" />
-								</button>
-							</DropdownMenuTrigger>
-						</TooltipTrigger>
-						<TooltipContent side="bottom">
-							<Trans>Continue or fork session</Trans>
-						</TooltipContent>
-					</Tooltip>
-					<DropdownMenuContent align="end" className="w-64">
-						{continueItem}
-						{forkItem}
-					</DropdownMenuContent>
-				</DropdownMenu>
-			)}
+			<SurfaceModeMenu
+				mode="cli"
+				source={surfaceFork}
+				onFork={onForkIntoOtherSurface}
+				open={menuOpen}
+				onOpenChange={setMenuOpen}
+			>
+				{forkItem}
+				{continueItem}
+			</SurfaceModeMenu>
 
 			<Dialog
 				modal

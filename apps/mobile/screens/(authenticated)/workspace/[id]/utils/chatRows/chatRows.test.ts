@@ -62,6 +62,123 @@ describe("chatRows", () => {
 		];
 		expect(chatRows(groups, []).at(-1)?.kind).toBe("working");
 	});
+
+	test("a stop recorded in the agent's history is a stopped line where it happened", () => {
+		const groups: TurnGroup[] = [
+			{
+				turn: turn("t1", "completed"),
+				turnId: "t1",
+				entries: [
+					{
+						kind: "user_stop",
+						item: {
+							id: "s1",
+							kind: "user_message",
+							startedAtMs: 1,
+							content: [
+								{ type: "text", text: "[Request interrupted by user]" },
+							],
+						},
+						stop: "response",
+					},
+					{ kind: "item", item: user("u1", "client-1") },
+				],
+			},
+		];
+		expect(chatRows(groups, []).map((row) => [row.kind, row.key])).toEqual([
+			["turn_status", "stop:s1"],
+			["item", "client-1"],
+		]);
+	});
+
+	test("a stopped turn whose stop the agent recorded says so once", () => {
+		const groups: TurnGroup[] = [
+			{
+				turn: { id: "t1", status: "interrupted", startedAtMs: 1 },
+				turnId: "t1",
+				entries: [
+					{ kind: "item", item: user("u1", "client-1") },
+					{
+						kind: "user_stop",
+						item: {
+							id: "s1",
+							kind: "user_message",
+							startedAtMs: 2,
+							content: [
+								{ type: "text", text: "[Request interrupted by user]" },
+							],
+						},
+						stop: "response",
+					},
+				],
+			},
+		];
+		expect(
+			chatRows(groups, []).filter((row) => row.kind === "turn_status"),
+		).toHaveLength(1);
+	});
+});
+
+describe("a turn that ended without the user", () => {
+	const notice = (text: string) => ({
+		kind: "item" as const,
+		item: {
+			id: "n1",
+			kind: "notice" as const,
+			noticeKind: "error" as const,
+			text,
+			startedAtMs: 2,
+		},
+	});
+
+	test("a turn Paradev's shutdown paused reads as paused, once, without the red notice", () => {
+		const groups: TurnGroup[] = [
+			{
+				turn: {
+					id: "t1",
+					status: "interrupted",
+					startedAtMs: 1,
+					error: {
+						message: "Commands the agent was running were stopped.",
+						kind: "host_stopped",
+					},
+				},
+				turnId: "t1",
+				entries: [
+					{ kind: "item", item: user("u1", "client-1") },
+					notice("Commands the agent was running were stopped."),
+				],
+			},
+		];
+		expect(
+			chatRows(groups, []).map((row) =>
+				row.kind === "turn_status" ? row.status : row.kind,
+			),
+		).toEqual(["item", "paused"]);
+	});
+
+	test("a failed turn's notice folds into its status line, keeping the detail", () => {
+		const groups: TurnGroup[] = [
+			{
+				turn: {
+					id: "t1",
+					status: "failed",
+					startedAtMs: 1,
+					error: { message: "The agent exited", kind: "crashed" },
+				},
+				turnId: "t1",
+				entries: [notice("The agent exited\nexit code 1")],
+			},
+		];
+		expect(chatRows(groups, [])).toEqual([
+			{
+				kind: "turn_status",
+				key: "status:t1",
+				status: "failed",
+				message: "The agent exited\nexit code 1",
+			},
+		]);
+	});
 });
 
 describe("groupPositions", () => {

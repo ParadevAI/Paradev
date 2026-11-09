@@ -41,6 +41,8 @@ If you have existing git worktrees on disk, use the **Import** tab in the New Wo
 
 You can also right-click a project in the sidebar and choose **Import untracked worktrees**. A confirmation dialog lists the branches and paths that will be imported; the **Run setup script** checkbox is off by default, since existing worktrees are usually already set up.
 
+From a shell, use [`superset worktrees list` and `superset worktrees open`](/cli/cli-reference#worktrees) to list and open a project's worktrees on any host.
+
 ## Sessions
 
 A **session** is a workspace without a project. Pick **No project** in the new-workspace picker, or click **+** on the sidebar's **Sessions** section. Each session gets its own git-initialized folder under `~/.paradev/sessions`. Terminals, agents, chat, and the Changes panel work as usual; there's no branch or PR link.

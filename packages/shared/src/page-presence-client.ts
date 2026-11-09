@@ -28,8 +28,10 @@ export function openPagePresence({
 	url,
 	onViewers,
 	onVisitors,
+	onPublished,
 	createSocket = (address) =>
 		new WebSocket(address) as unknown as PresenceSocket,
+	recheckJitterMs = 5000,
 	retryBaseMs = 1000,
 	retryMaxMs = 30000,
 	heartbeatMs = 25000,
@@ -37,7 +39,9 @@ export function openPagePresence({
 	url: () => Promise<string | null>;
 	onViewers: (viewers: PagePresenceViewer[]) => void;
 	onVisitors?: (visitors: PresenceVisitor[]) => void;
+	onPublished?: () => void;
 	createSocket?: (address: string) => PresenceSocket;
+	recheckJitterMs?: number;
 	retryBaseMs?: number;
 	retryMaxMs?: number;
 	heartbeatMs?: number;
@@ -52,6 +56,8 @@ export function openPagePresence({
 	let awaitingPong = false;
 	let ponged = false;
 	let visitors: PresenceVisitor[] = [];
+	let mayHaveMissed = false;
+	let recheckTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const lost = (ws: PresenceSocket, code?: number) => {
 		if (ws !== socket) return;
@@ -102,6 +108,13 @@ export function openPagePresence({
 		ws.addEventListener("open", () => {
 			if (ws !== socket) return;
 			attempts = 0;
+			if (mayHaveMissed && onPublished && !recheckTimer) {
+				recheckTimer = setTimeout(() => {
+					recheckTimer = null;
+					if (!stopped) onPublished();
+				}, Math.random() * recheckJitterMs);
+			}
+			mayHaveMissed = false;
 			awaitingPong = true;
 			try {
 				ws.send("ping");
@@ -127,6 +140,10 @@ export function openPagePresence({
 					visitors = presenceVisitorsFrom(message.visitors);
 					onVisitors?.(visitors);
 				}
+			} else if (message.type === "published") {
+				if (recheckTimer) clearTimeout(recheckTimer);
+				recheckTimer = null;
+				onPublished?.();
 			}
 		});
 		ws.addEventListener("close", (event) => lost(ws, event?.code));
@@ -134,6 +151,7 @@ export function openPagePresence({
 
 	const retry = () => {
 		if (stopped || refused || socket || retryTimer) return;
+		mayHaveMissed = true;
 		const delay = Math.min(retryMaxMs, retryBaseMs * 2 ** attempts);
 		attempts += 1;
 		retryTimer = setTimeout(() => {
@@ -156,8 +174,10 @@ export function openPagePresence({
 			stopped = true;
 			if (retryTimer) clearTimeout(retryTimer);
 			if (beatTimer) clearTimeout(beatTimer);
+			if (recheckTimer) clearTimeout(recheckTimer);
 			retryTimer = null;
 			beatTimer = null;
+			recheckTimer = null;
 			const ws = socket;
 			socket = null;
 			try {

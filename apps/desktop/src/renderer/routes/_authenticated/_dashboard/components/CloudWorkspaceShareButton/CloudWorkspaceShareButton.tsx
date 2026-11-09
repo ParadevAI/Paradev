@@ -14,6 +14,7 @@ import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useShareDirectory } from "../../hooks/useShareDirectory";
+import { SharePortsSection } from "./components/SharePortsSection";
 
 interface CloudWorkspaceShareButtonProps {
 	workspaceId: string;
@@ -23,6 +24,8 @@ interface CloudWorkspaceShareButtonProps {
 	onSetVisibility: (
 		visibility: CloudWorkspaceRow["visibility"],
 	) => Promise<unknown>;
+	/** Ports are only known for the workspace that is open. */
+	showPorts?: boolean;
 }
 
 export function CloudWorkspaceShareButton({
@@ -31,6 +34,7 @@ export function CloudWorkspaceShareButton({
 	visibility,
 	canEdit,
 	onSetVisibility,
+	showPorts = false,
 }: CloudWorkspaceShareButtonProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
@@ -170,7 +174,9 @@ export function CloudWorkspaceShareButton({
 							onChange: async () => {},
 						},
 					}}
-				/>
+				>
+					{showPorts && <SharePortsSection workspaceId={workspaceId} />}
+				</ShareAccess>
 			</PopoverContent>
 		</Popover>
 	);

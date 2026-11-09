@@ -11,6 +11,7 @@ import {
 	CommentsPanel,
 	PageCommentsView,
 	type PageToolHost,
+	PageUpdateBanner,
 	PageVersionBanner,
 } from "@superset/ui/page-comments";
 import { toast } from "@superset/ui/sonner";
@@ -22,12 +23,13 @@ import { useDispatchChord, useHotkey } from "renderer/hotkeys";
 import { authClient, ensureFreshJwt, getJwt } from "renderer/lib/auth-client";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
-import { usePaneAreaHotkeyGuard } from "renderer/routes/_authenticated/_dashboard/providers/PaneAreaProvider";
 import { canonicalizeChord } from "shared/hotkey-chord";
 import { CommentDeepLink } from "./components/CommentDeepLink";
 import { MarkCommentsRead } from "./components/MarkCommentsRead";
 import { PageViewerMessage } from "./components/PageViewerMessage";
+import { usePageUpdates } from "./hooks/usePageUpdates";
 
 const scrollPositions = new Map<string, number>();
 
@@ -75,22 +77,25 @@ export function PageViewer({
 }: PageViewerProps) {
 	const { t } = useLingui();
 	const [findRequest, setFindRequest] = useState(0);
-	const ignoreOtherPaneArea = usePaneAreaHotkeyGuard();
+	const findEnabled = usePaneHotkeyEnabled(findActive);
 	useHotkey("FIND_IN_PAGE", () => setFindRequest((count) => count + 1), {
-		enabled: findActive,
-		ignoreEventWhen: ignoreOtherPaneArea,
+		enabled: findEnabled,
 	});
 	const findChord = useDispatchChord("FIND_IN_PAGE");
 	const find = useMemo(
 		() => ({
 			request: findRequest,
-			chords: findActive && findChord ? [canonicalizeChord(findChord)] : [],
+			chords: findEnabled && findChord ? [canonicalizeChord(findChord)] : [],
 		}),
-		[findActive, findChord, findRequest],
+		[findEnabled, findChord, findRequest],
 	);
 	const { data: session } = authClient.useSession();
+	const pageRef = useMemo(
+		() => (pageId ? { id: pageId } : { slug }),
+		[pageId, slug],
+	);
 	const pull = cloudTrpc.page.pull.useQuery({
-		...(pageId ? { id: pageId } : { slug }),
+		...pageRef,
 		...(version ? { version } : {}),
 	});
 	const resolvedPageId = pageId ?? pull.data?.id;
@@ -154,6 +159,21 @@ export function PageViewer({
 				})
 			: null;
 	}, [resolvedPageId]);
+	const previewing = Boolean(
+		pull.data &&
+			pull.data.servedVersion !== null &&
+			pull.data.version !== pull.data.servedVersion,
+	);
+	const { onPublished, offeredVersion, viewOffered } = usePageUpdates({
+		pageRef,
+		pageId: resolvedPageId,
+		slug,
+		shownVersion: pull.data?.version,
+		pinnedVersion: version,
+		previewing,
+		viewerId: session?.user.id,
+		onUnpin: onExitPreview,
+	});
 	const scrollKey = `${resolvedPageId ?? slug}:${pull.data?.version ?? 0}`;
 
 	const onResolvedRef = useRef(onResolved);
@@ -203,10 +223,6 @@ export function PageViewer({
 		);
 	}
 
-	const previewing =
-		pull.data.servedVersion !== null &&
-		pull.data.version !== pull.data.servedVersion;
-
 	return (
 		<CommentProvider
 			key={resolvedPageId}
@@ -229,6 +245,9 @@ export function PageViewer({
 					/>
 				) : null}
 				<div className="relative flex min-h-0 w-full flex-1">
+					{offeredVersion !== null && !previewing ? (
+						<PageUpdateBanner version={offeredVersion} onView={viewOffered} />
+					) : null}
 					<div className="min-h-0 min-w-0 flex-1">
 						<PageCommentsView
 							pageId={resolvedPageId}
@@ -240,8 +259,9 @@ export function PageViewer({
 							onFramePointerDown={onFramePointerDown}
 							onLinkClick={onLinkClick}
 							find={find}
+							{...(resolvedPageId ? { presenceUrl, onPublished } : {})}
 							{...(resolvedPageId && !previewing
-								? { storageTicket, presenceUrl, toolHost }
+								? { storageTicket, toolHost }
 								: {})}
 						/>
 					</div>

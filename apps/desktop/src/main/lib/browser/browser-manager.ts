@@ -1,8 +1,9 @@
 import { EventEmitter } from "node:events";
+import { totalmem } from "node:os";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
-import { clipboard, Menu, webContents } from "electron";
+import { app, clipboard, Menu, webContents } from "electron";
 import { writeClipboardImage } from "main/lib/clipboard-image";
 import { safeOpenExternal } from "main/lib/safe-url";
 import type {
@@ -12,6 +13,7 @@ import type {
 } from "shared/browser-design-mode";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
+import { cookieRefusal, redactCookies } from "./cdp-cookie-guard";
 import { createExtensionWorldFilter } from "./cdp-extension-worlds";
 import {
 	forwardSessionFor,
@@ -43,6 +45,30 @@ export interface BrowserPaneInfo {
 	title: string;
 	isLoading: boolean;
 }
+
+export interface PaneUnloadInfo {
+	totalMemoryKb: number;
+	panes: Record<
+		string,
+		{ memoryKb: number; audible: boolean; unsavedInput: boolean }
+	>;
+}
+
+const FORM_EDITS_WORLD_ID = 1999;
+const UNLOAD_CHECK_TIMEOUT_MS = 500;
+// Comparing values with their defaults flags untouched selects, range and
+// color inputs, so record real edits instead. Runs in an isolated world: the
+// page cannot see or change the flag. A submit clears it.
+const TRACK_FORM_EDITS_SCRIPT = `if (!globalThis.__formEdits) {
+	const state = (globalThis.__formEdits = { dirty: false });
+	const edited = (event) => {
+		if (event.isTrusted && event.target?.closest?.("input, textarea, select, [contenteditable]")) state.dirty = true;
+	};
+	document.addEventListener("input", edited, true);
+	document.addEventListener("change", edited, true);
+	document.addEventListener("submit", () => { state.dirty = false; }, true);
+}`;
+const HAS_UNSAVED_INPUT_SCRIPT = "globalThis.__formEdits?.dirty === true";
 
 export interface BrowserOpenRequest {
 	workspaceId: string;
@@ -259,7 +285,9 @@ class BrowserManager extends EventEmitter {
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
+	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	private requestedPanes = new Set<string>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
 	// un-throttled — see acquireAgentWake. The entry object's identity ties
@@ -286,6 +314,7 @@ class BrowserManager extends EventEmitter {
 				this.navigationListeners,
 				this.popupListeners,
 				this.focusListeners,
+				this.formEditListeners,
 			]) {
 				const cleanup = map.get(paneId);
 				if (cleanup) {
@@ -312,6 +341,7 @@ class BrowserManager extends EventEmitter {
 			this.setupBeforeInput(paneId, wc);
 			this.setupNavigationGuard(paneId, wc);
 			this.setupFocusForward(paneId, wc);
+			this.setupFormEditTracking(paneId, wc);
 		}
 		this.emit("pane-registered", {
 			paneId,
@@ -320,6 +350,7 @@ class BrowserManager extends EventEmitter {
 	}
 
 	unregister(paneId: string): void {
+		this.requestedPanes.delete(paneId);
 		for (const map of [
 			this.consoleListeners,
 			this.contextMenuListeners,
@@ -327,6 +358,7 @@ class BrowserManager extends EventEmitter {
 			this.navigationListeners,
 			this.popupListeners,
 			this.focusListeners,
+			this.formEditListeners,
 		]) {
 			const cleanup = map.get(paneId);
 			if (cleanup) {
@@ -458,11 +490,52 @@ class BrowserManager extends EventEmitter {
 
 	/**
 	 * Ask the renderer to open a URL in a workspace's browser pane. Consumed by
-	 * the `browser.onOpenRequest` subscription; the resulting pane announces
-	 * itself back through a `pane-registered` event.
+	 * the `browser.onOpenRequest` subscription; the renderer names the pane it
+	 * made through `resolveOpenRequest`.
 	 */
 	requestOpen(request: BrowserOpenRequest): void {
 		this.emit("open-request", request);
+	}
+
+	resolveOpenRequest(requestId: string, paneId: string): void {
+		this.requestedPanes.add(paneId);
+		this.emit(`open-resolved:${requestId}`, paneId);
+	}
+
+	/** Made for a `requestOpen`, so it is not the pane an extension's new tab is waiting for. */
+	isRequestedPane(paneId: string): boolean {
+		return this.requestedPanes.has(paneId);
+	}
+
+	markUse(paneId: string): void {
+		this.emit("agent-use", { paneId });
+	}
+
+	whenRegistered(
+		paneId: string,
+		workspaceId: string,
+		timeoutMs: number,
+	): { ready: Promise<Electron.WebContents | null>; cancel: () => void } {
+		let cancel = () => {};
+		const ready = new Promise<Electron.WebContents | null>((resolve) => {
+			const check = () => {
+				const wc = this.getWebContents(paneId, workspaceId);
+				if (!wc) return;
+				cancel();
+				resolve(wc);
+			};
+			const timer = setTimeout(() => {
+				cancel();
+				resolve(null);
+			}, timeoutMs);
+			cancel = () => {
+				clearTimeout(timer);
+				this.off("pane-registered", check);
+			};
+			this.on("pane-registered", check);
+			check();
+		});
+		return { ready, cancel };
 	}
 
 	/** Open `url` in a new pane beside `paneId`, as a `target="_blank"` link in it does. */
@@ -528,7 +601,7 @@ class BrowserManager extends EventEmitter {
 			onMessage(
 				JSON.stringify({
 					method,
-					params,
+					params: redactCookies(method, params),
 					...(outSessionId ? { sessionId: outSessionId } : {}),
 				}),
 			);
@@ -611,7 +684,9 @@ class BrowserManager extends EventEmitter {
 					);
 					return;
 				}
-				const refusal = extensionWorlds.refusal(method, params);
+				const refusal =
+					cookieRefusal(method, params) ??
+					extensionWorlds.refusal(method, params);
 				if (refusal) {
 					onMessage(
 						JSON.stringify({
@@ -784,6 +859,43 @@ class BrowserManager extends EventEmitter {
 			},
 			detach,
 		};
+	}
+
+	async getUnloadInfo(paneIds: string[]): Promise<PaneUnloadInfo> {
+		const memoryByPid = new Map(
+			app
+				.getAppMetrics()
+				.map((metric) => [metric.pid, metric.memory.workingSetSize]),
+		);
+		const panesByPid = new Map<number, number>();
+		for (const paneId of this.panes.keys()) {
+			const pid = this.getWebContents(paneId)?.getOSProcessId();
+			if (pid) panesByPid.set(pid, (panesByPid.get(pid) ?? 0) + 1);
+		}
+		const panes: PaneUnloadInfo["panes"] = {};
+		await Promise.all(
+			paneIds.map(async (paneId) => {
+				const wc = this.getWebContents(paneId);
+				if (!wc) return;
+				const pid = wc.getOSProcessId();
+				panes[paneId] = {
+					// A process can serve several panes; split its memory between them.
+					memoryKb: (memoryByPid.get(pid) ?? 0) / (panesByPid.get(pid) ?? 1),
+					audible: wc.isCurrentlyAudible(),
+					unsavedInput: await withTimeout(
+						wc.executeJavaScriptInIsolatedWorld(FORM_EDITS_WORLD_ID, [
+							{ code: HAS_UNSAVED_INPUT_SCRIPT },
+						]),
+						UNLOAD_CHECK_TIMEOUT_MS,
+						"unsaved input check timed out",
+					).then(
+						(result) => result === true,
+						() => false,
+					),
+				};
+			}),
+		);
+		return { totalMemoryKb: Math.round(totalmem() / 1024), panes };
 	}
 
 	/**
@@ -1385,6 +1497,32 @@ class BrowserManager extends EventEmitter {
 			}
 		});
 		void loop(generation);
+	}
+
+	private setupFormEditTracking(
+		paneId: string,
+		wc: Electron.WebContents,
+	): void {
+		const install = (): void => {
+			Promise.resolve()
+				.then(() =>
+					wc.executeJavaScriptInIsolatedWorld(FORM_EDITS_WORLD_ID, [
+						{ code: TRACK_FORM_EDITS_SCRIPT },
+					]),
+				)
+				.catch(() => {
+					// Mid-navigation or a crashed page; the next dom-ready installs again.
+				});
+		};
+		wc.on("dom-ready", install);
+		this.formEditListeners.set(paneId, () => {
+			try {
+				wc.off("dom-ready", install);
+			} catch {
+				// webContents may be destroyed
+			}
+		});
+		install();
 	}
 
 	private setupConsoleCapture(paneId: string, wc: Electron.WebContents): void {

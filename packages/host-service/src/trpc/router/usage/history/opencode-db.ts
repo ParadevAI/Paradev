@@ -22,17 +22,36 @@ export function collectOpencodeDbEntries(
 	let db: InstanceType<typeof Database> | null = null;
 	try {
 		db = new Database(dbPath, { readonly: true, fileMustExist: true });
+		// Only the usage fields leave SQLite, one row at a time.
 		const rows = db
 			.prepare(
-				`SELECT m.session_id, m.data, s.directory, s.title
+				`SELECT m.session_id,
+				        json_object(
+				          'role', 'assistant',
+				          'modelID', json_extract(m.data, '$.modelID'),
+				          'time', m.data -> '$.time',
+				          'path', json_object('cwd', json_extract(m.data, '$.path.cwd')),
+				          'cost', json_extract(m.data, '$.cost'),
+				          'tokens', m.data -> '$.tokens'
+				        ) AS data,
+				        s.directory, s.title
 				 FROM message m
 				 LEFT JOIN session s ON s.id = m.session_id
 				 WHERE m.time_created >= ?
-				   AND json_extract(m.data, '$.role') = 'assistant'`,
+				   AND CASE WHEN json_valid(m.data)
+				         THEN json_extract(m.data, '$.role') = 'assistant'
+				       END`,
 			)
-			.all(cutoffMs) as OpencodeMessageRow[];
-		opencodeRowsToEntries(rows, cutoffMs, out, sessionLabels);
-		return rows.length;
+			.iterate(cutoffMs) as Iterable<OpencodeMessageRow>;
+		let read = 0;
+		const counted = (function* () {
+			for (const row of rows) {
+				read++;
+				yield row;
+			}
+		})();
+		opencodeRowsToEntries(counted, cutoffMs, out, sessionLabels);
+		return read;
 	} finally {
 		db?.close();
 	}
