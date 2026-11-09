@@ -1,6 +1,12 @@
 import { Database } from "bun:sqlite";
 import { afterAll, describe, expect, it } from "bun:test";
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import {
+	mkdtempSync,
+	readdirSync,
+	readFileSync,
+	rmSync,
+	statSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { eq } from "drizzle-orm";
@@ -207,7 +213,9 @@ describe("lookups that must still see a deleted project", () => {
 		const deleted = await env.project.listDeleted();
 		expect(deleted.map((row) => row.id)).toEqual([env.projectId]);
 		await env.project.purge({ projectId: env.projectId });
-		expect(getProjectIncludingDeleted(env.ctx.db, env.projectId)).toBeUndefined();
+		expect(
+			getProjectIncludingDeleted(env.ctx.db, env.projectId),
+		).toBeUndefined();
 	});
 
 	it("setup of the deleted project's own id restores it in place", async () => {
@@ -247,8 +255,11 @@ describe("lookups that must still see a deleted project", () => {
 			env.projectId,
 		);
 		expect(
-			env.ctx.db.select().from(projects).where(eq(projects.id, env.projectId)).get()
-				?.deletedAt,
+			env.ctx.db
+				.select()
+				.from(projects)
+				.where(eq(projects.id, env.projectId))
+				.get()?.deletedAt,
 		).not.toBeNull();
 	});
 });
