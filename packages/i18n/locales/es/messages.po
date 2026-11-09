@@ -10502,8 +10502,8 @@ msgstr "Puede:"
 msgid "It can't be brought back."
 msgstr "No se podrá recuperar."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Copia las cookies de tu perfil \"{profileName}\" a un panel de navegador que abrió el agente. Así el agente puede actuar en los sitios donde tienes la sesión iniciada."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Copia las cookies de tu perfil \"{profileName}\" al navegador de la app. Así los agentes pueden actuar en los sitios donde tienes la sesión iniciada."
 
 msgid "It keeps the title from your prompt."
 msgstr "Conserva el título de tu instrucción."

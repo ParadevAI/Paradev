@@ -20,7 +20,7 @@ import {
 import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
-import { persistAgentBrowserState } from "renderer/routes/_authenticated/utils/persistAgentBrowserState";
+import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
 import {
 	getV2PaneLayoutStore,
@@ -30,7 +30,6 @@ import {
 	applyRememberedV2PaneSelection,
 	rememberV2PaneSelection,
 } from "renderer/stores/v2-pane-selection";
-import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import {
 	applyPaneLayoutOp,
 	type PaneAreas,
@@ -195,7 +194,7 @@ function runPaneLayoutOp(
 	};
 }
 
-function wakeAgentBrowser(
+function wakeBrowser(
 	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
 	workspaceId: string,
 	paneId: string,
@@ -205,18 +204,17 @@ function wakeAgentBrowser(
 		tab.panes.some((pane) => pane.id === paneId),
 	);
 	const pane = tab?.panes.find((pane) => pane.id === paneId);
-	if (!tab || !pane?.browser?.agent) {
+	if (!tab || !pane?.browser) {
 		throw new PaneLayoutOpError(
 			"NOT_FOUND",
-			`No agent browser pane ${paneId} in this workspace`,
+			`No browser pane ${paneId} in this workspace`,
 		);
 	}
 	browserRuntimeRegistry.openBackground(
 		paneId,
 		pane.browser.url || "about:blank",
 		workspaceId,
-		persistAgentBrowserState(collections, workspaceId, paneId),
-		AGENT_BROWSER_PARTITION,
+		persistBrowserPaneState(collections, workspaceId, paneId),
 	);
 	return { ...listed, paneId, tabId: tab.id };
 }
@@ -236,7 +234,7 @@ export function usePaneLayoutRequests() {
 					try {
 						const { paneId, tabId, layout } =
 							op.type === "wakeBrowser"
-								? wakeAgentBrowser(collections, workspaceId, op.paneId)
+								? wakeBrowser(collections, workspaceId, op.paneId)
 								: runPaneLayoutOp(collections, workspaceId, op);
 						reply = { requestId, result: { paneId, tabId, layout } };
 					} catch (error) {

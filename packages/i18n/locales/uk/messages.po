@@ -10496,8 +10496,8 @@ msgstr "Розширення зможе:"
 msgid "It can't be brought back."
 msgstr "Відновити його не вийде."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Файли cookie з вашого профілю «{profileName}» буде скопійовано в панель браузера, яку відкрив агент. Після цього агент зможе діяти на сайтах, де ви ввійшли в обліковий запис."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Файли cookie з вашого профілю «{profileName}» буде скопійовано у вбудований браузер застосунку. Після цього агенти зможуть діяти на сайтах, де ви ввійшли в обліковий запис."
 
 msgid "It keeps the title from your prompt."
 msgstr "Назва з вашого промпту залишиться."

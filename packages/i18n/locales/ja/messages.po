@@ -10502,8 +10502,8 @@ msgstr "次の操作を行えます:"
 msgid "It can't be brought back."
 msgstr "元に戻すことはできません。"
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "エージェントが開いたブラウザペインに、\"{profileName}\" プロファイルの Cookie をコピーします。エージェントはその後、あなたがログインしているサイトで操作できます。"
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "\"{profileName}\" プロファイルの Cookie をアプリ内ブラウザにコピーします。エージェントはその後、あなたがログインしているサイトで操作できます。"
 
 msgid "It keeps the title from your prompt."
 msgstr "プロンプトから付けたタイトルのままになります。"

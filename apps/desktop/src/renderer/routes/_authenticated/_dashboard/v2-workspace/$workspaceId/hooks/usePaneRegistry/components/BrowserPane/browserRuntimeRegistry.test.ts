@@ -41,7 +41,7 @@ const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
 	},
 } as unknown as ConstructorParameters<typeof BrowserRuntimeRegistryImpl>[0]);
 
-const hiddenEntry = (lastUsedAt: number, agent: boolean) => ({
+const hiddenEntry = (lastUsedAt: number) => ({
 	webview: { remove: () => {}, style: { visibility: "hidden" } },
 	overlay: { remove: () => {}, style: { visibility: "hidden" } },
 	state: {},
@@ -52,7 +52,6 @@ const hiddenEntry = (lastUsedAt: number, agent: boolean) => ({
 	resizeObserver: null,
 	visible: false,
 	lastUsedAt,
-	agent,
 });
 
 describe("browserRuntimeRegistry detached persistence", () => {
@@ -94,16 +93,16 @@ describe("browserRuntimeRegistry detached persistence", () => {
 		evictExcessHiddenWebviews: () => Promise<void>;
 		touch: (paneId: string) => void;
 	};
-	// Hidden 1 GB pages, oldest first, on a 16 GB machine: each group's budget is under 1 GB.
+	// Hidden 1 GB pages, oldest first, on a 16 GB machine: the budget is under 1 GB.
 	async function sweep(
-		pages: { id: string; agent?: boolean }[],
+		pages: { id: string }[],
 		setup: () => void = () => {},
 	): Promise<string[]> {
 		const now = Date.now();
 		for (const [i, page] of pages.entries()) {
 			registryInternals.entries.set(
 				page.id,
-				hiddenEntry(now - (pages.length - i), page.agent ?? false),
+				hiddenEntry(now - (pages.length - i)),
 			);
 		}
 		setup();
@@ -131,20 +130,6 @@ describe("browserRuntimeRegistry detached persistence", () => {
 			},
 		);
 		expect(unloaded).toEqual(["p4", "p5"]);
-	});
-
-	test("agent pages have their own budget, and agent use keeps a page loaded", async () => {
-		const unloaded = await sweep(
-			[
-				...[1, 2, 3].map((i) => ({ id: `user-${i}` })),
-				...[1, 2, 3, 4, 5, 6, 7].map((i) => ({
-					id: `agent-${i}`,
-					agent: true,
-				})),
-			],
-			() => registryInternals.touch("agent-1"),
-		);
-		expect(unloaded).toEqual(["agent-2", "agent-3", "agent-4", "agent-5"]);
 	});
 
 	test("a page an agent uses while the sweep waits on main stays loaded", async () => {

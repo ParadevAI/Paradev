@@ -10502,8 +10502,8 @@ msgstr "Může:"
 msgid "It can't be brought back."
 msgstr "Nepůjde ho obnovit."
 
-msgid "It copies the cookies from your \"{profileName}\" profile into a browser pane the agent opened. The agent can then act on the sites you are signed in to."
-msgstr "Zkopíruje soubory cookie z vašeho profilu „{profileName}“ do panelu prohlížeče, který agent otevřel. Agent pak může jednat na webech, kde jste přihlášeni."
+msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
+msgstr "Zkopíruje soubory cookie z vašeho profilu „{profileName}“ do prohlížeče v aplikaci. Agenti pak mohou jednat na webech, kde jste přihlášeni."
 
 msgid "It keeps the title from your prompt."
 msgstr "Zůstane mu název z vašeho zadání."
