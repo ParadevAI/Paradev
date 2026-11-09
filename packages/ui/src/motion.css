@@ -3,7 +3,7 @@
 	--animate-spin-slow: spin-slow 3.6s linear infinite;
 	--animate-block-fade: block-fade 320ms ease-out both;
 	--animate-thinking-pulse: thinking-pulse 1.8s ease-in-out infinite;
-	--animate-wave-cell: wave-cell 1.2s linear infinite both;
+	--animate-wave-cell: wave-cell 1.2s steps(3, end) infinite both;
 	--animate-braille-spin: braille-spin 0.8s step-end infinite;
 
 	@keyframes wave-cell {
