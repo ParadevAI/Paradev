@@ -2919,6 +2919,9 @@ msgstr "Apple'ın yükleyicisi Git yüklenmeden kapandı."
 msgid "Apple's installer did not open: {0}"
 msgstr "Apple'ın yükleyicisi açılmadı: {0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Apple'ın süre tahmini genellikle gerçek kurulumdan çok daha uzundur."
+
 msgid "Application menu"
 msgstr "Uygulama menüsü"
 
@@ -10272,6 +10275,9 @@ msgstr "Command Line Tools'u yükle"
 
 msgid "Install failed"
 msgstr "Kurulum başarısız"
+
+msgid "Install Git first. See the message above."
+msgstr "Önce Git'i yükleyin. Yukarıdaki mesaja bakın."
 
 msgid "Install Git, then come back."
 msgstr "Git'i yükle, sonra buraya geri dön."

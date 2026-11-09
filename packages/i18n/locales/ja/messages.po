@@ -2919,6 +2919,9 @@ msgstr "Git がインストールされる前に Apple のインストーラが�
 msgid "Apple's installer did not open: {0}"
 msgstr "Apple のインストーラを開けませんでした: {0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Apple が表示する所要時間は、実際のインストールよりかなり長いことがよくあります。"
+
 msgid "Application menu"
 msgstr "アプリケーションメニュー"
 
@@ -10272,6 +10275,9 @@ msgstr "Command Line Toolsをインストール"
 
 msgid "Install failed"
 msgstr "インストールに失敗しました"
+
+msgid "Install Git first. See the message above."
+msgstr "先に Git をインストールしてください。上のメッセージを参照してください。"
 
 msgid "Install Git, then come back."
 msgstr "Gitをインストールしてから、ここに戻ってきてください。"

@@ -2919,6 +2919,9 @@ msgstr "Установщик Apple закрылся до того, как Git б
 msgid "Apple's installer did not open: {0}"
 msgstr "Установщик Apple не открылся: {0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Оценка времени от Apple обычно намного больше, чем занимает реальная установка."
+
 msgid "Application menu"
 msgstr "Меню приложения"
 
@@ -10272,6 +10275,9 @@ msgstr "Установить Command Line Tools"
 
 msgid "Install failed"
 msgstr "Не удалось установить"
+
+msgid "Install Git first. See the message above."
+msgstr "Сначала установите Git. См. сообщение выше."
 
 msgid "Install Git, then come back."
 msgstr "Установите Git и вернитесь сюда."

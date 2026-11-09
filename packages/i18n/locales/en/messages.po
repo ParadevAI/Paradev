@@ -2919,6 +2919,9 @@ msgstr "Apple's installer closed before Git was installed."
 msgid "Apple's installer did not open: {0}"
 msgstr "Apple's installer did not open: {0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Apple's time estimate is usually much longer than the real install."
+
 msgid "Application menu"
 msgstr "Application menu"
 
@@ -10272,6 +10275,9 @@ msgstr "Install Command Line Tools"
 
 msgid "Install failed"
 msgstr "Install failed"
+
+msgid "Install Git first. See the message above."
+msgstr "Install Git first. See the message above."
 
 msgid "Install Git, then come back."
 msgstr "Install Git, then come back."

@@ -48,6 +48,7 @@ import {
 	buildAcquisitionSourceProperties,
 	EMPTY_ACQUISITION_SOURCE_ANSWER,
 } from "./utils/acquisitionSource";
+import { gitDetectionPolling } from "./utils/gitDetectionPolling";
 import { isGitToolsMissingError } from "./utils/isGitToolsMissingError";
 
 export const Route = createFileRoute("/_authenticated/onboarding/project/")({
@@ -118,18 +119,18 @@ function OnboardingProjectPage() {
 		data: gitStatus,
 		dataUpdatedAt: gitCheckedAt,
 		refetch: refetchGit,
-	} = electronTrpc.system.detectGit.useQuery(undefined, {
-		refetchInterval: (query) =>
-			query.state.data?.installed === false ||
-			(gitToolsReportedAt !== null &&
-				query.state.dataUpdatedAt <= gitToolsReportedAt)
-				? GIT_POLL_MS
-				: false,
-	});
+	} = electronTrpc.system.detectGit.useQuery(
+		undefined,
+		gitDetectionPolling({
+			reportedAt: gitToolsReportedAt,
+			intervalMs: GIT_POLL_MS,
+		}),
+	);
 	const gitDetectedMissing = gitStatus?.installed === false;
 	const gitToolsReported =
 		gitToolsReportedAt !== null && gitCheckedAt <= gitToolsReportedAt;
 	const gitMissing = gitDetectedMissing || gitToolsReported;
+	const gitMissingTileHint = t`Install Git first. See the message above.`;
 	const gitMissingMessage = `${t`Paradev needs Git to add a project.`} ${t`On a Mac, Git comes with Apple's Command Line Tools.`}`;
 	const showGitToolsNotice = () => {
 		setEmptyProjectOpen(false);
@@ -324,6 +325,7 @@ function OnboardingProjectPage() {
 					label={t`Open a folder`}
 					onClick={handleOpenFolder}
 					disabled={busy || gitMissing}
+					disabledReason={gitMissing ? gitMissingTileHint : undefined}
 				/>
 				<OnboardingTile
 					icon={<LuGitBranch />}
@@ -331,18 +333,21 @@ function OnboardingProjectPage() {
 					active={cloneOpen}
 					onClick={() => setCloneOpen((open) => !open)}
 					disabled={busy || gitMissing}
+					disabledReason={gitMissing ? gitMissingTileHint : undefined}
 				/>
 				<OnboardingTile
 					icon={<LuLayoutTemplate />}
 					label={t`From a template`}
 					onClick={() => setTemplateOpen(true)}
 					disabled={busy || gitMissing}
+					disabledReason={gitMissing ? gitMissingTileHint : undefined}
 				/>
 				<OnboardingTile
 					icon={<LuFolderPlus />}
 					label={t`Empty project`}
 					onClick={() => setEmptyProjectOpen(true)}
 					disabled={busy || gitMissing}
+					disabledReason={gitMissing ? gitMissingTileHint : undefined}
 				/>
 			</div>
 			{importOffer.shown && (

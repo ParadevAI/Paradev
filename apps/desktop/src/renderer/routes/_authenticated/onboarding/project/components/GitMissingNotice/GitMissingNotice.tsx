@@ -103,7 +103,7 @@ export function GitMissingNotice({
 			case "idle":
 				return t`On a Mac, Git comes with Apple's Command Line Tools.`;
 			case "requested":
-				return t`In Apple's window, click Install. It takes a few minutes, and this page updates when it's done.`;
+				return `${t`In Apple's window, click Install. It takes a few minutes, and this page updates when it's done.`} ${t`Apple's time estimate is usually much longer than the real install.`}`;
 			case "closed":
 				return t`Apple's installer closed before Git was installed.`;
 			case "failed":

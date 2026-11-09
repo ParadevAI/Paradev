@@ -2919,6 +2919,9 @@ msgstr "Git 安装完成前，Apple 安装器已关闭。"
 msgid "Apple's installer did not open: {0}"
 msgstr "Apple 安装器未能打开：{0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Apple 显示的预计时间通常比实际安装时间长得多。"
+
 msgid "Application menu"
 msgstr "应用程序菜单"
 
@@ -10272,6 +10275,9 @@ msgstr "安装 Command Line Tools"
 
 msgid "Install failed"
 msgstr "安装失败"
+
+msgid "Install Git first. See the message above."
+msgstr "请先安装 Git。请参阅上方的提示。"
 
 msgid "Install Git, then come back."
 msgstr "请先安装 Git，然后回到这里。"

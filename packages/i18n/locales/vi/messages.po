@@ -2919,6 +2919,9 @@ msgstr "Trình cài đặt của Apple đã đóng trước khi Git được cà
 msgid "Apple's installer did not open: {0}"
 msgstr "Trình cài đặt của Apple không mở được: {0}"
 
+msgid "Apple's time estimate is usually much longer than the real install."
+msgstr "Thời gian Apple ước tính thường lâu hơn nhiều so với thời gian cài đặt thực tế."
+
 msgid "Application menu"
 msgstr "Menu ứng dụng"
 
@@ -10272,6 +10275,9 @@ msgstr "Cài đặt Command Line Tools"
 
 msgid "Install failed"
 msgstr "Cài đặt thất bại"
+
+msgid "Install Git first. See the message above."
+msgstr "Hãy cài đặt Git trước. Xem thông báo ở trên."
 
 msgid "Install Git, then come back."
 msgstr "Hãy cài đặt Git, rồi quay lại đây."
