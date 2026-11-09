@@ -243,12 +243,12 @@ export function BrowserPane({
 					<span className="min-w-0 flex-1 truncate">
 						{designMode.phase === "selecting" ? (
 							<Trans>
-								Design mode — click any element in the page to send it to an
+								Design mode: click any element in the page to send it to an
 								agent.
 							</Trans>
 						) : (
 							<Trans>
-								Element captured — describe the change, or press esc to pick
+								Element captured. Describe the change, or press esc to pick
 								again.
 							</Trans>
 						)}

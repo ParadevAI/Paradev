@@ -279,7 +279,7 @@ export function AccountSettings({ visibleItems }: AccountSettingsProps) {
 										<AlertDialogDescription>
 											<Trans>
 												All of your data will be permanently deleted after{" "}
-												{ACCOUNT_DELETION_GRACE_DAYS} days — sign back in before
+												{ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before
 												then to restore your account.
 											</Trans>
 										</AlertDialogDescription>

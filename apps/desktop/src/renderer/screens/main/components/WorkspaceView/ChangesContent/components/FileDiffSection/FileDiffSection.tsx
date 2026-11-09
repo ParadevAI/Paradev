@@ -421,7 +421,7 @@ export function FileDiffSection({
 			style={{ minHeight: FILE_DIFF_SECTION_PLACEHOLDER_HEIGHT }}
 		>
 			<span className="select-text cursor-text">
-				Binary file — cannot display diff
+				Binary file. Cannot display diff
 			</span>
 			<span className="max-w-md text-xs">
 				Use the file header to open this file outside the diff viewer.
@@ -465,7 +465,7 @@ export function FileDiffSection({
 							<p className="text-sm">
 								{isGenerated
 									? "Generated file hidden"
-									: `Large diff hidden — ${formatNumber(totalChanges, undefined)} lines changed`}
+									: `Large diff hidden: ${formatNumber(totalChanges, undefined)} lines changed`}
 							</p>
 							<Button
 								variant="outline"

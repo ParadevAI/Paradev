@@ -32,7 +32,7 @@ export const internalTaskContributor: ContextContributor<{
 		return {
 			id: `task:${task.id}`,
 			kind: "internal-task",
-			label: `Task ${task.id} — ${task.title}`,
+			label: `Task ${task.id} · ${task.title}`,
 			content: [{ type: "text", text }],
 			meta: { taskSlug: task.slug },
 		};

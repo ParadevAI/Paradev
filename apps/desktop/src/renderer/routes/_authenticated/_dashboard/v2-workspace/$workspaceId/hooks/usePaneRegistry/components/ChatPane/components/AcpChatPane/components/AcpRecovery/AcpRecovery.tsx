@@ -32,7 +32,7 @@ export function AcpRecovery({
 					</Trans>
 				) : reason === "no-transcript" ? (
 					<Trans>
-						That agent session has no conversation to open yet — it was started
+						That agent session has no conversation to open yet. It was started
 						but never prompted.
 					</Trans>
 				) : (

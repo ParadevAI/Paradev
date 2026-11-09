@@ -60,7 +60,7 @@ export function HostConnectionPill() {
 					})
 				: t({
 						message:
-							"Couldn't reach this cloud workspace. It may still be waking up — try again.",
+							"Couldn't reach this cloud workspace. It may still be waking up. Try again.",
 					})
 			: isCheckFailing
 				? workspace.hostId === machineId
