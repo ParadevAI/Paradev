@@ -8,6 +8,7 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { useHostUsageHistory } from "../../hooks/useHostUsageHistory";
+import { ShareUsageCard } from "../ShareUsageCard";
 import { UsageAreaChart } from "./components/UsageAreaChart";
 import { UsageMetricTiles } from "./components/UsageMetricTiles";
 import { UsageModelTable } from "./components/UsageModelTable";
@@ -95,6 +96,7 @@ export function UsageHistorySection({ hostUrl }: { hostUrl: string | null }) {
 					</span>
 				)}
 				<div className="ml-auto flex items-center gap-1.5">
+					<ShareUsageCard hostUrl={hostUrl} />
 					<Tabs
 						value={metric}
 						onValueChange={(value) => setMetric(value as HistoryMetric)}

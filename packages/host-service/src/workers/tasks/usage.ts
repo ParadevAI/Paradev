@@ -9,6 +9,10 @@ import type {
 import { computeUsageHistory } from "../../trpc/router/usage/history/aggregate.ts";
 import type { LeaderboardPayload } from "../../trpc/router/usage/history/leaderboard-days.ts";
 import { computeLeaderboardPayload } from "../../trpc/router/usage/history/leaderboard-days.ts";
+import {
+	summarizeWrapped,
+	type WrappedPrs,
+} from "../../trpc/router/usage/history/wrapped.ts";
 import { defineWorkerTask } from "../define-worker-task.ts";
 
 export const usageHistoryTask = defineWorkerTask<
@@ -28,4 +32,17 @@ export const leaderboardPayloadTask = defineWorkerTask<
 		computeLeaderboardPayload(days, agentPrsByDay, new Date(nowMs)),
 });
 
-export const usageTasks = [usageHistoryTask, leaderboardPayloadTask];
+export const wrappedUsageTask = defineWorkerTask<
+	{ days: number; prs: WrappedPrs; cwdLabels: CwdLabel[] },
+	ReturnType<typeof summarizeWrapped>
+>({
+	type: "usage/wrapped",
+	handler: async ({ days, prs, cwdLabels }) =>
+		summarizeWrapped(await computeUsageHistory(days, cwdLabels), prs),
+});
+
+export const usageTasks = [
+	usageHistoryTask,
+	leaderboardPayloadTask,
+	wrappedUsageTask,
+];

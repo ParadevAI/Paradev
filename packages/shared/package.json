@@ -524,6 +524,10 @@
 		"./automation-group": {
 			"types": "./src/automation-group.ts",
 			"default": "./src/automation-group.ts"
+		},
+		"./usage-card": {
+			"types": "./src/usage-card/index.ts",
+			"default": "./src/usage-card/index.ts"
 		}
 	},
 	"scripts": {

@@ -1847,6 +1847,9 @@ msgstr "トークン単位で課金される別プロファイルです。キー
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "スキル、プラグイン、MCPサーバー、設定を共有する別プロファイルです。"
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "ローカルのエージェントログから共有されたスナップショットです。統計は自己申告です。推定コストはAPI料金に基づく見積もりで、請求額ではありません。"
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "タスクキーは英字で始まる 1〜5 文字の英数字です。"
 
@@ -2291,6 +2294,9 @@ msgstr "mainとの比較"
 msgid "Agent"
 msgstr "エージェント"
 
+msgid "Agent breakdown"
+msgstr "エージェント別の内訳"
+
 msgid "Agent commands"
 msgstr "エージェントコマンド"
 
@@ -2408,6 +2414,9 @@ msgstr "エージェントが issue の仕分け、changelog の下書き、依�
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "エージェントは、Linearのツールを呼び出すときにこのアカウントを使います。"
+
+msgid "Agents used"
+msgstr "使用したエージェント数"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Paradevリーダーボード上の全開発者を横断したエージェント利用の集計 — トークン、コスト、キャッシュの挙動、実際に選ばれているモデル。"
@@ -6252,6 +6261,9 @@ msgstr "エージェントに送信できませんでした"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "メッセージを送信できませんでした。入力欄に戻しました。"
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "使用状況カードを共有できませんでした。画像のダウンロードをお試しください。"
+
 msgid "Couldn't stage changes"
 msgstr "変更をステージできませんでした"
 
@@ -6627,6 +6639,9 @@ msgstr "現在"
 
 msgid "Current access"
 msgstr "現在のアクセス"
+
+msgid "Current leaderboard tier"
+msgstr "現在のランキングティア"
 
 msgid "Current level"
 msgstr "現在のレベル"
@@ -7971,6 +7986,9 @@ msgstr "escで閉じる"
 msgid "esc to exit"
 msgstr "escで終了"
 
+msgid "Estimated cost"
+msgstr "推定コスト"
+
 msgid "Event"
 msgstr "イベント"
 
@@ -9262,6 +9280,9 @@ msgstr "このターンの前後のワークツリーのスナップショット
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "このターンの前後のワークツリーのスナップショットから集計しています。同時に別のチャットがここで作業していたため、この一覧にはこのチャットがファイルツールで編集したファイルだけを表示します。その他の変更は別に表示されます。"
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "このホストのローカルログに基づきます。推定コストはAPIの定価で計算され、請求額とは異なります。PRはワークスペースのエージェントに紐付き、複数のエージェントに計上される場合があります。"
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "フロントマターは非表示です — 編集するにはMarkdownに切り替えてください"
 
@@ -9372,6 +9393,9 @@ msgstr "Paradevをもっと活用する"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "ParadevがWindowsで使えるようになったらお知らせします。"
+
+msgid "Get Paradev"
+msgstr "Paradevを入手"
 
 msgid "Get Paradev on your Mac"
 msgstr "MacでParadevを使う"
@@ -10881,6 +10905,12 @@ msgstr "直近3か月"
 msgid "last 30 days"
 msgstr "直近30日"
 
+msgid "Last 30 days"
+msgstr "過去30日間"
+
+msgid "Last 365 days"
+msgstr "過去365日間"
+
 msgid "Last 4 weeks"
 msgstr "直近4週間"
 
@@ -11481,6 +11511,9 @@ msgstr "長時間にわたる信頼性がしきい値を超えます。18時に�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "長めのホバーでショートカットだけを出すtooltip。そのチップスタイルが現在のTooltipContentのデフォルトです"
 
+msgid "Longest streak (days)"
+msgstr "最長連続日数"
+
 msgid "Looking at {what}"
 msgstr "{what} を確認中"
 
@@ -11848,6 +11881,9 @@ msgstr "マージ済み"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "{0}がマージ"
+
+msgid "Merged PRs"
+msgstr "マージ済みPR"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "マージしましたが、PRの状態を更新できませんでした — 少し待って再試行してください"
@@ -13626,6 +13662,9 @@ msgstr "招待したユーザーのみ"
 
 msgid "Only people who opted in appear here."
 msgstr "参加を選んだ人だけがここに表示されます。"
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "選択した統計だけが画像と公開リンクに含まれます。リポジトリ名やPRのタイトルは含まれません。"
 
 msgid "Only the author can change a comment"
 msgstr "コメントを変更できるのは作成者だけです"
@@ -17602,6 +17641,9 @@ msgstr "環境を選択してください"
 msgid "Select an organization"
 msgstr "組織を選択"
 
+msgid "Select at least one available stat."
+msgstr "利用可能な統計を1つ以上選択してください。"
+
 msgid "Select base branch…"
 msgstr "ベースブランチを選択…"
 
@@ -17985,6 +18027,12 @@ msgstr "GitHubリポジトリからプラグインを共有。gitタグでリリ
 
 msgid "Share this page"
 msgstr "このページを共有"
+
+msgid "Share to X"
+msgstr "Xで共有"
+
+msgid "Share usage"
+msgstr "使用状況を共有"
 
 msgid "Share via…"
 msgstr "共有方法を選択…"
@@ -20828,6 +20876,12 @@ msgstr "ツールチップ付き"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "トークン数上位のエージェント"
+
+msgid "Top model"
+msgstr "最多使用モデル"
+
 msgid "Top models"
 msgstr "上位のモデル"
 
@@ -21469,6 +21523,12 @@ msgstr "組織内で一意のURLフレンドリーな識別子。"
 msgid "Usage"
 msgstr "使用量"
 
+msgid "Usage card"
+msgstr "使用状況カード"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "このホストでは使用状況カードを利用できません。ホストを更新して再試行してください。"
+
 msgid "Usage is out of date"
 msgstr "使用状況が古くなっています"
 
@@ -21753,6 +21813,9 @@ msgstr "GitHubでリリースを見る"
 
 msgid "View usage"
 msgstr "使用量を表示"
+
+msgid "View usage dashboard"
+msgstr "使用状況ダッシュボードを表示"
 
 msgid "Violence or harassment"
 msgstr "暴力または嫌がらせ"

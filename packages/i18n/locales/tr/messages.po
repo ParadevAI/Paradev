@@ -1847,6 +1847,9 @@ msgstr "Token başına faturalandırılan ayrı bir profil. Anahtar {0} CLI içi
 msgid "A separate profile that shares your skills, plugins, MCP servers, and settings."
 msgstr "Becerilerinizi, eklentilerinizi, MCP sunucularınızı ve ayarlarınızı paylaşan ayrı bir profil."
 
+msgid "A shared snapshot from local agent logs. Stats are self-reported. Estimated cost is an API-rate estimate, not a bill."
+msgstr "Yerel ajan günlüklerinden paylaşılan bir anlık görüntü. İstatistikler kullanıcı beyanıdır. Tahmini maliyet API tarifelerine dayanır, fatura tutarı değildir."
+
 msgid "A task key is 1 to 5 letters or numbers and starts with a letter."
 msgstr "Görev anahtarı 1 ila 5 harf veya rakamdan oluşur ve bir harfle başlar."
 
@@ -2291,6 +2294,9 @@ msgstr "main ile karşılaştır"
 msgid "Agent"
 msgstr "Ajan"
 
+msgid "Agent breakdown"
+msgstr "Ajan dökümü"
+
 msgid "Agent commands"
 msgstr "Ajan komutları"
 
@@ -2408,6 +2414,9 @@ msgstr "Ajanlar issue'ları ayıklar, changelog taslakları yazar ve bağımlıl
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Ajanlar Linear araçlarını çağırırken bu hesabı kullanır."
+
+msgid "Agents used"
+msgstr "Kullanılan ajanlar"
 
 msgid "Aggregate agent usage across every developer on the Paradev leaderboard — tokens, cost, cache behaviour and which models people actually reach for."
 msgstr "Paradev liderlik tablosundaki her geliştiricinin toplam ajan kullanımı — token, maliyet, önbellek davranışı ve insanların gerçekte tercih ettiği modeller."
@@ -6252,6 +6261,9 @@ msgstr "Ajana gönderilemedi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Mesajınız gönderilemedi. Yazma alanına geri kondu."
 
+msgid "Couldn't share usage card. Try downloading the image."
+msgstr "Kullanım kartı paylaşılamadı. Görseli indirmeyi deneyin."
+
 msgid "Couldn't stage changes"
 msgstr "Değişiklikler hazırlanamadı"
 
@@ -6627,6 +6639,9 @@ msgstr "Geçerli"
 
 msgid "Current access"
 msgstr "Mevcut erişim"
+
+msgid "Current leaderboard tier"
+msgstr "Güncel sıralama seviyesi"
 
 msgid "Current level"
 msgstr "Mevcut düzey"
@@ -7971,6 +7986,9 @@ msgstr "kapatmak için esc"
 msgid "esc to exit"
 msgstr "çıkmak için esc"
 
+msgid "Estimated cost"
+msgstr "Tahmini maliyet"
+
 msgid "Event"
 msgstr "Olay"
 
@@ -9262,6 +9280,9 @@ msgstr "Bu turdan önceki ve sonraki worktree anlık görüntülerinden alındı
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "Bu turdan önceki ve sonraki worktree anlık görüntülerinden alındı. Aynı anda burada başka bir sohbet çalıştı, bu yüzden bu liste yalnızca bu sohbetin dosya araçlarıyla düzenlediği dosyaları içerir. Diğer değişiklikler ayrı listelenir."
 
+msgid "From this host's local logs. Estimated cost uses API list rates, not your bill. PRs are linked to workspace agents and may count for more than one agent."
+msgstr "Bu sunucunun yerel günlüklerinden. Tahmini maliyet, faturanız yerine API liste fiyatlarını kullanır. PR’lar çalışma alanı ajanlarıyla ilişkilidir ve birden fazla ajan için sayılabilir."
+
 msgid "Front matter hidden — switch to Markdown to edit it"
 msgstr "Front matter gizli — düzenlemek için Markdown'a geçin"
 
@@ -9372,6 +9393,9 @@ msgstr "Paradev'den daha fazlasını al"
 
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Paradev, Windows'ta kullanılabilir olduğunda haberdar olun."
+
+msgid "Get Paradev"
+msgstr "Paradev’i edinin"
 
 msgid "Get Paradev on your Mac"
 msgstr "Paradev'i Mac'inize alın"
@@ -10881,6 +10905,12 @@ msgstr "Son 3 ay"
 msgid "last 30 days"
 msgstr "son 30 gün"
 
+msgid "Last 30 days"
+msgstr "Son 30 gün"
+
+msgid "Last 365 days"
+msgstr "Son 365 gün"
+
 msgid "Last 4 weeks"
 msgstr "Son 4 hafta"
 
@@ -11481,6 +11511,9 @@ msgstr "Uzun vadeli güvenilirlik bir eşiği aşar. Akşam 18.00'de verilen iş
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Uzun bekletmede yalnızca kısayol gösteren tooltip; çip stili artık TooltipContent varsayılanı"
 
+msgid "Longest streak (days)"
+msgstr "En uzun seri (gün)"
+
 msgid "Looking at {what}"
 msgstr "{what} inceleniyor"
 
@@ -11848,6 +11881,9 @@ msgstr "Birleştirildi"
 #. placeholder {0}: mergedBy.login
 msgid "Merged by {0}"
 msgstr "{0} birleştirdi"
+
+msgid "Merged PRs"
+msgstr "Birleştirilen PR’lar"
 
 msgid "Merged, but couldn't refresh PR state — try again in a moment"
 msgstr "Birleştirildi, ancak PR durumu yenilenemedi — birazdan yeniden deneyin"
@@ -13626,6 +13662,9 @@ msgstr "Yalnızca davet edilen kişiler"
 
 msgid "Only people who opted in appear here."
 msgstr "Burada yalnızca katılmayı seçenler görünür."
+
+msgid "Only selected stats go into your image and public link. Repository names and PR titles are never included."
+msgstr "Görsele ve herkese açık bağlantıya yalnızca seçilen istatistikler eklenir. Depo adları ve PR başlıkları asla eklenmez."
 
 msgid "Only the author can change a comment"
 msgstr "Yorumu yalnızca yazarı değiştirebilir"
@@ -17602,6 +17641,9 @@ msgstr "Bir ortam seçin"
 msgid "Select an organization"
 msgstr "Bir kuruluş seçin"
 
+msgid "Select at least one available stat."
+msgstr "En az bir kullanılabilir istatistik seçin."
+
 msgid "Select base branch…"
 msgstr "Temel dal seçin…"
 
@@ -17985,6 +18027,12 @@ msgstr "Eklentileri bir GitHub deposundan paylaşın. Sürümleri git etiketleri
 
 msgid "Share this page"
 msgstr "Bu sayfayı paylaş"
+
+msgid "Share to X"
+msgstr "X’te paylaş"
+
+msgid "Share usage"
+msgstr "Kullanımı paylaş"
 
 msgid "Share via…"
 msgstr "Şununla paylaş…"
@@ -20828,6 +20876,12 @@ msgstr "Tooltip açık"
 msgid "tooltip-refactor.diff"
 msgstr "tooltip-refactor.diff"
 
+msgid "Top agents by tokens"
+msgstr "Token sayısına göre en iyi ajanlar"
+
+msgid "Top model"
+msgstr "En çok kullanılan model"
+
 msgid "Top models"
 msgstr "En çok kullanılan modeller"
 
@@ -21469,6 +21523,12 @@ msgstr "Kuruluşunuz içinde benzersiz, URL dostu tanımlayıcı."
 msgid "Usage"
 msgstr "Kullanım"
 
+msgid "Usage card"
+msgstr "Kullanım kartı"
+
+msgid "Usage cards are unavailable on this host. Update the host and try again."
+msgstr "Kullanım kartları bu sunucuda kullanılamıyor. Sunucuyu güncelleyip tekrar deneyin."
+
 msgid "Usage is out of date"
 msgstr "Kullanım verileri güncel değil"
 
@@ -21753,6 +21813,9 @@ msgstr "Sürümleri GitHub'da görüntüle"
 
 msgid "View usage"
 msgstr "Kullanımı görüntüle"
+
+msgid "View usage dashboard"
+msgstr "Kullanım panelini görüntüle"
 
 msgid "Violence or harassment"
 msgstr "Şiddet veya taciz"
