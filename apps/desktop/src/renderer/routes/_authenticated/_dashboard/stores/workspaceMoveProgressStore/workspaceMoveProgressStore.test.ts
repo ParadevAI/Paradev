@@ -11,6 +11,9 @@ const move: WorkspaceMoveProgress = {
 	stage: "moving-chats",
 	chats: { total: 4, ready: 1, failed: 1 },
 	error: null,
+	failedDuring: null,
+	retry: null,
+	cancel: null,
 };
 
 describe("progressPercent", () => {

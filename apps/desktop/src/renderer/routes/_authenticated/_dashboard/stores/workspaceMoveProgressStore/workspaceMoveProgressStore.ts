@@ -6,7 +6,9 @@ export type WorkspaceMoveProgressStage =
 	| "moving-chats"
 	| "ready"
 	| "partial"
-	| "failed";
+	| "failed"
+	| "cancelled"
+	| "unverified";
 
 export interface WorkspaceMoveProgress {
 	id: string;
@@ -15,6 +17,10 @@ export interface WorkspaceMoveProgress {
 	stage: WorkspaceMoveProgressStage;
 	chats: { total: number; ready: number; failed: number } | null;
 	error: string | null;
+	/** The stage the move was in when it failed: past `saving`, working agents were stopped. */
+	failedDuring: WorkspaceMoveProgressStage | null;
+	retry: (() => void) | null;
+	cancel: (() => void) | null;
 }
 
 interface WorkspaceMoveProgressState {

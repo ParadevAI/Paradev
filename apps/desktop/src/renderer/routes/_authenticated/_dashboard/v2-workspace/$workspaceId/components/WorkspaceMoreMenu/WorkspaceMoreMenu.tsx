@@ -90,7 +90,9 @@ export function WorkspaceMoreMenu({
 				<DropdownMenuContent
 					align="end"
 					className="min-w-56"
-					onCloseAutoFocus={onCloseAutoFocus}
+					onCloseAutoFocus={
+						moveDirections.length > 0 ? onCloseAutoFocus : undefined
+					}
 				>
 					{openInTarget && (
 						<>

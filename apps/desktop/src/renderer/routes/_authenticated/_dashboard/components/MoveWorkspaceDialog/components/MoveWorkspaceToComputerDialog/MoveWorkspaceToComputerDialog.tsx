@@ -81,11 +81,13 @@ export function MoveWorkspaceToComputerDialog({
 		const progress = startWorkspaceMoveProgress({
 			name: workspace.name,
 			destination: destination.label ?? t({ message: "this computer" }),
+			retry: move,
 		});
 		onOpenChange(false);
 		void moveWorkspaceToComputer({
 			destination: { hostId: destination.hostId, name: destination.label },
 			onStage: progress.setStage,
+			signal: progress.signal,
 		})
 			.then(({ toWorkspaceId, skipped }) => {
 				progress.follow(toWorkspaceId);

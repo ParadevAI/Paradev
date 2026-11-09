@@ -10,6 +10,8 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
+import { keepMoveAlive } from "../../utils/keepMoveAlive";
+import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToCloudStage = "saving" | "starting";
@@ -41,10 +43,12 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			environment,
 			machineSize,
 			onStage,
+			signal,
 		}: {
 			environment: { id: string; repositoryFullName: string | null };
 			machineSize: MachineSize;
 			onStage: (stage: MoveToCloudStage) => void;
+			signal?: AbortSignal;
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
 			if (!activeHostUrl) {
@@ -68,33 +72,51 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					fromWorkspaceId: workspace.id,
 					fromHostId: workspace.hostId,
 				});
-			const { prepared, created } = await (async () => {
-				const prepared = await getHostServiceClientByUrl(
-					activeHostUrl,
-				).teleport.prepareWorkspace.mutate({
-					workspaceId: workspace.id,
-					stopIfBusy: true,
-				});
-				assertEnvironmentOpens(prepared.repositoryFullName);
-				onStage("starting");
-				const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
-					organizationId,
-					environmentId: environment.id,
-					machineSize,
-					name: workspace.name,
-					branch: prepared.branch,
-					move: {
-						workspaceMoveId,
-						chatSessionIds: prepared.chats.map((chat) => chat.chatSessionId),
-					},
-				});
-				return { prepared, created };
-			})().catch(async (error: unknown) => {
+			const source = getHostServiceClientByUrl(activeHostUrl);
+			const leaving: { chats: string[] } = { chats: [] };
+			const { prepared, created } = await keepMoveAlive({
+				workspaceMoveId,
+				signal,
+				heartbeat: (id) =>
+					cloudTrpcClient.workspaceMove.heartbeat.mutate({
+						workspaceMoveId: id,
+					}),
+				work: async (moveSignal) => {
+					moveSignal.throwIfAborted();
+					const prepared = await source.teleport.prepareWorkspace.mutate({
+						workspaceId: workspace.id,
+						stopIfBusy: true,
+					});
+					leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
+					assertEnvironmentOpens(prepared.repositoryFullName);
+					moveSignal.throwIfAborted();
+					onStage("starting");
+					const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
+						organizationId,
+						environmentId: environment.id,
+						machineSize,
+						name: workspace.name,
+						branch: prepared.branch,
+						move: {
+							workspaceMoveId,
+							chatSessionIds: prepared.chats.map((chat) => chat.chatSessionId),
+						},
+					});
+					return { prepared, created };
+				},
+			}).catch(async (error: unknown) => {
 				await abandonWorkspaceMove(workspaceMoveId, error);
+				await releaseSourceChats(source, leaving.chats);
 				throw error;
 			});
 			const refused = new Set(
 				created.skippedChats.map((chat) => chat.chatSessionId),
+			);
+			void releaseSourceChats(
+				source,
+				prepared.chats
+					.map((chat) => chat.chatSessionId)
+					.filter((id) => refused.has(id)),
 			);
 			for (const chat of prepared.chats) {
 				if (refused.has(chat.chatSessionId)) continue;

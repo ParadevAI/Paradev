@@ -9,6 +9,17 @@ import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 const PAGE_SIZE = 1000;
 const MAX_PAGES = 5;
 
+const truncatedSnapshots = new WeakSet<SessionSnapshot>();
+const truncatedChats = new Set<string>();
+
+/** Whether a stored chat had more history than was loaded. */
+export function isTruncatedStoredChat(
+	chatSessionId: string,
+	snapshot: SessionSnapshot,
+): boolean {
+	return truncatedChats.has(chatSessionId) || truncatedSnapshots.has(snapshot);
+}
+
 /** Shared by every view of one stored chat, so the next one shows it from cache. */
 export function storedChatSnapshotKey(chatSessionId: string | null) {
 	return ["stored-chat-snapshot", chatSessionId] as const;
@@ -23,30 +34,49 @@ export function shownStoredChatKey(workspaceId: string) {
 	return ["stored-chat-shown", workspaceId] as const;
 }
 
-/** A chat as the database holds it, built the way the live chat builds its own. */
+/**
+ * A chat as the database holds it, built the way the live chat builds its own.
+ * A long chat keeps its newest events, the part a person reads first.
+ */
 export async function loadStoredChatSnapshot(
 	chatSessionId: string,
 ): Promise<SessionSnapshot | null> {
-	const envelopes: Envelope[] = [];
-	let afterSeq = 0;
+	const pages: Envelope[][] = [];
+	let beforeSeq: number | undefined;
+	let more = false;
 	for (let page = 0; page < MAX_PAGES; page += 1) {
 		const result = await cloudTrpcClient.chatHistory.events.query({
 			chatSessionId,
-			afterSeq,
+			latest: true,
+			beforeSeq,
 			limit: PAGE_SIZE,
 		});
-		if (!result.epoch) return null;
-		for (const { seq, event } of result.events) {
-			envelopes.push({
+		const epoch = result.epoch;
+		if (!epoch) return null;
+		pages.unshift(
+			result.events.map(({ seq, event }) => ({
 				v: 1,
 				sessionId: chatSessionId,
 				ts: 0,
-				cursor: { epoch: result.epoch, seq },
+				cursor: { epoch, seq },
 				event,
-			});
+			})),
+		);
+		if (result.nextBeforeSeq === null) {
+			more = false;
+			break;
 		}
-		if (result.nextAfterSeq === null) break;
-		afterSeq = result.nextAfterSeq;
+		more = true;
+		beforeSeq = result.nextBeforeSeq;
 	}
-	return envelopes.length > 0 ? reduceMany(emptySnapshot(), envelopes) : null;
+	const envelopes = pages.flat();
+	if (envelopes.length === 0) return null;
+	const snapshot = reduceMany(emptySnapshot(), envelopes);
+	if (more) {
+		truncatedSnapshots.add(snapshot);
+		truncatedChats.add(chatSessionId);
+	} else {
+		truncatedChats.delete(chatSessionId);
+	}
+	return snapshot;
 }

@@ -3,16 +3,24 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
+import { useNavigate } from "@tanstack/react-router";
 import { Check, Circle, Loader2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
+import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { describeMoveError } from "renderer/routes/_authenticated/_dashboard/utils/describeMoveError";
 import { runMoveOnComputer } from "renderer/routes/_authenticated/_dashboard/utils/runMoveOnComputer";
+import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useMissedReads } from "./hooks/useMissedReads";
 import { useMoveArrival } from "./hooks/useMoveArrival";
 
 const STEPS = ["pending", "copying", "restoring"] as const;
-const POLL_MS = 1_000;
+const POLL_MS = 2_000;
+/** About a minute of reads that find no move here. */
+const MAX_MISSED_READS = 30;
 // Longer than the control plane waits for `teleport.continueChat`.
 const ARRIVAL_GRACE_MS = 35_000;
 
@@ -37,13 +45,23 @@ export function MoveProgress({
 	arrivalGraceMs?: number;
 }) {
 	const { t } = useLingui();
+	const navigate = useNavigate();
 	const utils = cloudTrpc.useUtils();
-	const { data: latest } = cloudTrpc.chatMove.latest.useQuery(
+	const relayUrl = useRelayUrl();
+	const lostRef = useRef(false);
+	const {
+		data: latest,
+		dataUpdatedAt,
+		errorUpdatedAt,
+		refetch,
+	} = cloudTrpc.chatMove.latest.useQuery(
 		{ chatSessionId },
 		{
 			refetchInterval: (query) =>
-				isSettledHere(query.state.data, workspaceId) ? false : POLL_MS,
-			refetchIntervalInBackground: true,
+				lostRef.current || isSettledHere(query.state.data, workspaceId)
+					? false
+					: POLL_MS,
+			refetchIntervalInBackground: false,
 		},
 	);
 	// Until this move is recorded, the newest one is an earlier move elsewhere.
@@ -52,6 +70,17 @@ export function MoveProgress({
 	// A newer move out of this workspace means the chat arrived here and left again.
 	const movedOn = latest?.fromWorkspaceId === workspaceId;
 	const ready = move?.status === "ready" || movedOn;
+	const { missed, reset: resetMissed } = useMissedReads(
+		!!move || movedOn,
+		Math.max(dataUpdatedAt, errorUpdatedAt),
+	);
+	const lost = missed >= MAX_MISSED_READS;
+	lostRef.current = lost;
+	const origin = move ? move.fromWorkspaceId : homeOf(latest);
+	const openOrigin =
+		origin && origin !== workspaceId
+			? () => void navigateToV2Workspace(origin, navigate)
+			: null;
 	useMoveArrival({
 		ready,
 		live: sessionLive,
@@ -60,7 +89,8 @@ export function MoveProgress({
 		onCheck: onCheckSession,
 		onArrived,
 	});
-	const { activeHostUrl, machineId } = useLocalHostService();
+	const { activeHostUrl, machineId, activeOrganizationId } =
+		useLocalHostService();
 	// A move here that no run on this computer has taken yet, as after a reload.
 	const waitingHere =
 		move?.status === "pending" && !!machineId && move.toHostId === machineId;
@@ -83,9 +113,26 @@ export function MoveProgress({
 			void utils.chatMove.latest.invalidate({ chatSessionId });
 			void utils.workspaceMove.latest.invalidate({ workspaceId });
 			if (!runsOnThisComputer) return;
-			if (!activeHostUrl) {
+			const toHostId = move?.toHostId ?? machineId;
+			const hostUrl =
+				toHostId && activeOrganizationId
+					? resolveHostUrl({
+							hostId: toHostId,
+							machineId,
+							activeHostUrl,
+							organizationId: activeOrganizationId,
+							relayUrl,
+						})
+					: null;
+			if (!hostUrl) {
 				void cloudTrpcClient.chatMove.fail
-					.mutate({ moveId, error: "This computer's host is not running" })
+					.mutate({
+						moveId,
+						error:
+							toHostId === machineId
+								? "This computer's host is not running"
+								: "The computer this chat moves to can't be reached",
+					})
 					.catch((error: unknown) =>
 						console.warn(
 							`[chat-move] could not record that move ${moveId} failed`,
@@ -97,10 +144,10 @@ export function MoveProgress({
 			}
 			void runMoveOnComputer({
 				moveId,
-				host: getHostServiceClientByUrl(activeHostUrl),
+				host: getHostServiceClientByUrl(hostUrl),
 			})
 				.catch((error: unknown) =>
-					console.warn("[chat-move] the move to this computer failed", error),
+					console.warn("[chat-move] the move to the computer failed", error),
 				)
 				.finally(() => utils.chatMove.latest.invalidate({ chatSessionId }));
 		},
@@ -110,7 +157,14 @@ export function MoveProgress({
 			}),
 	});
 
+	const originButton = openOrigin ? (
+		<Button size="sm" variant="outline" onClick={openOrigin}>
+			<Trans>Open the original workspace</Trans>
+		</Button>
+	) : null;
+
 	if (move?.status === "failed") {
+		const failure = describeMoveError(move.error);
 		return (
 			<div className="flex h-full w-full flex-col items-center justify-center gap-3 p-8 text-center">
 				<p className="max-w-sm text-muted-foreground text-sm">
@@ -119,25 +173,63 @@ export function MoveProgress({
 						from.
 					</Trans>
 				</p>
-				{move.error && (
-					<p className="max-w-lg font-mono text-[11px] text-muted-foreground/60">
-						{move.error}
-					</p>
+				<p className="max-w-sm text-muted-foreground text-sm">
+					{failure.reason}
+				</p>
+				{failure.details && (
+					<details className="max-w-lg text-[11px] text-muted-foreground/60">
+						<summary className="cursor-pointer select-none">
+							<Trans>Details</Trans>
+						</summary>
+						<p className="mt-1 font-mono break-words">{failure.details}</p>
+					</details>
 				)}
-				<Button
-					size="sm"
-					disabled={retry.isPending}
-					onClick={() => retry.mutate({ moveId: move.id })}
-				>
-					<Trans>Try again</Trans>
-				</Button>
+				<div className="flex gap-2">
+					{originButton}
+					<Button
+						size="sm"
+						disabled={retry.isPending}
+						onClick={() => retry.mutate({ moveId: move.id })}
+					>
+						<Trans>Try again</Trans>
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
+	if (lost && !ready) {
+		return (
+			<div className="flex h-full w-full flex-col items-center justify-center gap-3 p-8 text-center">
+				<p className="max-w-sm text-muted-foreground text-sm">
+					<Trans>
+						Couldn't find how this chat's move is going. If it didn't move, it
+						is still in the workspace it came from.
+					</Trans>
+				</p>
+				<div className="flex gap-2">
+					{originButton}
+					<Button
+						size="sm"
+						onClick={() => {
+							resetMissed();
+							void refetch();
+						}}
+					>
+						<Trans>Check again</Trans>
+					</Button>
+				</div>
 			</div>
 		);
 	}
 
 	const current = ready ? STEPS.length : stepIndex(move);
 	const labels: Record<(typeof STEPS)[number], ReactNode> = {
-		pending: <Trans>Starting the workspace</Trans>,
+		pending: move?.toHostId ? (
+			<Trans>Getting the computer ready</Trans>
+		) : (
+			<Trans>Starting the workspace</Trans>
+		),
 		copying: move ? (
 			<Plural
 				value={messageCount}
@@ -175,8 +267,28 @@ export function MoveProgress({
 					</li>
 				))}
 			</ol>
+			{openOrigin ? (
+				<button
+					type="button"
+					onClick={openOrigin}
+					className="text-muted-foreground text-xs underline-offset-2 hover:text-foreground hover:underline"
+				>
+					<Trans>Open the original workspace</Trans>
+				</button>
+			) : null}
 		</div>
 	);
+}
+
+/** Where the chat lives by its newest move recorded elsewhere. */
+function homeOf(
+	move:
+		| { status: string; toWorkspaceId: string; fromWorkspaceId: string | null }
+		| null
+		| undefined,
+): string | null {
+	if (!move) return null;
+	return move.status === "ready" ? move.toWorkspaceId : move.fromWorkspaceId;
 }
 
 function stepIndex(move: { status: string } | null | undefined): number {

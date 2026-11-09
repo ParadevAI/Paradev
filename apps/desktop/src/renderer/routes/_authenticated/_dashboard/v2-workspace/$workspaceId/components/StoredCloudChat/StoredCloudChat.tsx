@@ -10,6 +10,7 @@ import {
 	storedChatSnapshotKey,
 } from "../../utils/loadStoredChatSnapshot";
 import { StoredChatTranscript } from "../StoredChatTranscript";
+import { CloudWorkspaceWakingStrip } from "./components/CloudWorkspaceWakingStrip";
 
 /** The tab bar, agent row and pane header above a chat pane's transcript, so these rows sit where the pane's will. */
 const PANE_CHROME_PX = 118;
@@ -69,9 +70,10 @@ export function StoredCloudChat({
 	if (!enabled || !chatId || !stored.data) return fallback;
 	return (
 		<div
-			className="flex h-full w-full flex-col"
+			className="relative flex h-full w-full flex-col"
 			style={{ paddingTop: PANE_CHROME_PX }}
 		>
+			<CloudWorkspaceWakingStrip workspaceId={workspaceId} />
 			<StoredChatTranscript
 				chatId={chatId}
 				pending={NO_PROMPTS}

@@ -1,4 +1,5 @@
 export {
+	isTruncatedStoredChat,
 	loadStoredChatSnapshot,
 	shownStoredChatKey,
 	storedChatSnapshotKey,

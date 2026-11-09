@@ -23,9 +23,10 @@ export async function runMoveOnComputer({
 	};
 	const claimed = await cloudTrpcClient.chatMove.claim
 		.mutate({ moveId })
-		.catch((error: unknown) => {
+		.catch(async (error: unknown) => {
 			// Another run, or an earlier one, already took it.
 			if (isClaimed(error)) return null;
+			await recordFailure(moveId, error);
 			throw error;
 		});
 	if (!claimed) return;
@@ -49,25 +50,29 @@ export async function runMoveOnComputer({
 			harnessSessionId: claimed.session.harnessSessionId,
 		};
 	} catch (error) {
-		await cloudTrpcClient.chatMove.fail
-			.mutate({
-				moveId,
-				error:
-					rawErrorMessage(error).slice(0, 2000) ||
-					"The move to the computer failed",
-			})
-			.catch((failError: unknown) =>
-				console.warn(
-					`[chat-move] could not record that move ${moveId} failed`,
-					failError,
-				),
-			);
+		await recordFailure(moveId, error);
 		throw error;
 	}
 	// The chat already moved; one whose agent did not start resumes when opened.
 	await host.teleport.continueChat.mutate(started).catch((error: unknown) => {
 		console.warn("[chat-move] the moved chat's agent did not start", error);
 	});
+}
+
+async function recordFailure(moveId: string, error: unknown): Promise<void> {
+	await cloudTrpcClient.chatMove.fail
+		.mutate({
+			moveId,
+			error:
+				rawErrorMessage(error).slice(0, 2000) ||
+				"The move to the computer failed",
+		})
+		.catch((failError: unknown) =>
+			console.warn(
+				`[chat-move] could not record that move ${moveId} failed`,
+				failError,
+			),
+		);
 }
 
 function isClaimed(error: unknown): boolean {

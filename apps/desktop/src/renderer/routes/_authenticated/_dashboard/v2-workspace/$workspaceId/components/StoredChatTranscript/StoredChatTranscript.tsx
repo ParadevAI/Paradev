@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import type { OutboxEntry, SessionSnapshot } from "@superset/chat/core";
 import type { UserContent } from "@superset/chat/protocol";
 import { useTimeline } from "@superset/chat/react";
@@ -6,6 +7,7 @@ import { useMemo } from "react";
 import { Transcript } from "../../hooks/usePaneRegistry/components/ChatSession/components/Transcript";
 import { useChildrenByParent } from "../../hooks/usePaneRegistry/components/ChatSession/components/Transcript/hooks/useChildrenByParent";
 import { NestedItemsProvider } from "../../hooks/usePaneRegistry/components/ChatSession/components/Transcript/providers/NestedItemsProvider";
+import { isTruncatedStoredChat } from "../../utils/loadStoredChatSnapshot";
 
 const ignore = () => {};
 const noOlder = async () => false;
@@ -57,6 +59,14 @@ export function StoredChatTranscript({
 			scrollEdgeThreshold={24}
 			scrollPreviousItemPeek={0}
 		>
+			{isTruncatedStoredChat(chatId, snapshot) && (
+				<p className="shrink-0 px-4 py-1.5 text-center text-muted-foreground text-xs">
+					<Trans>
+						This chat is long, so only its latest part is shown. All of it opens
+						once the workspace starts.
+					</Trans>
+				</p>
+			)}
 			<div className="@container relative flex min-h-0 flex-1">
 				<NestedItemsProvider value={nestedItems}>
 					<Transcript

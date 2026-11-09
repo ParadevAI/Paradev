@@ -95,6 +95,7 @@ export function MoveWorkspaceToCloudDialog({
 		const progress = startWorkspaceMoveProgress({
 			name: workspace.name,
 			destination: t({ message: "the cloud" }),
+			retry: move,
 		});
 		onOpenChange(false);
 		void moveWorkspaceToCloud({
@@ -105,6 +106,7 @@ export function MoveWorkspaceToCloudDialog({
 			machineSize: selection.machineSize,
 			onStage: (stage) =>
 				progress.setStage(stage === "saving" ? "saving" : "creating"),
+			signal: progress.signal,
 		})
 			.then(({ toWorkspaceId, skipped }) => {
 				progress.follow(toWorkspaceId);
