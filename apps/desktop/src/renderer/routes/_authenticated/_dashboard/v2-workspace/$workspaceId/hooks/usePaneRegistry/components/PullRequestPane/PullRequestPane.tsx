@@ -119,10 +119,12 @@ export function PullRequestPane({
 		onOpenInDiff,
 	]);
 	const flow = usePullRequestMergeFlow({ target });
+	const handoffProjectId =
+		(isLinkedPR ? workspace.projectId : null) ?? detail.projectId;
 	const restack = useStackRestack(
-		detail.projectId
+		handoffProjectId
 			? {
-					projectId: detail.projectId,
+					projectId: handoffProjectId,
 					hostId: workspace.hostId,
 					hostUrl,
 					prNumber: data.number,
