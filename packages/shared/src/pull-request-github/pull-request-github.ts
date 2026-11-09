@@ -1,4 +1,9 @@
 import {
+	type AsyncMergeRequest,
+	readPullRequestMergeResult,
+	requestPullRequestMerge,
+} from "../pull-request-async-merge";
+import {
 	type PullRequestDetailRead,
 	PullRequestReadError,
 	pullRequestNodeId,
@@ -9,6 +14,10 @@ import {
 	isPullRequestDiffTooLarge,
 	type PullRequestDiff,
 } from "../pull-request-diff";
+import {
+	createPullRequestStack,
+	readPullRequestStack,
+} from "../pull-request-stack";
 import {
 	type ConversationQueryResult,
 	type PullRequestIssueComment,
@@ -205,6 +214,23 @@ export function pullRequestOnGithub(
 			};
 		},
 
+		/**
+		 * The merge that understands stacks and merge queues: for a pull request
+		 * in a stack it lands every open pull request below it too, and it can
+		 * add to the base branch's merge queue. It runs in the background, so
+		 * the caller polls `mergeResult` while the answer is `pending`.
+		 */
+		requestMerge: (request: AsyncMergeRequest = {}) =>
+			requestPullRequestMerge(client, pr, request),
+
+		mergeResult: (uuid: string) => readPullRequestMergeResult(client, pr, uuid),
+
+		stack: () => readPullRequestStack(client, pr),
+
+		/** `pullRequests`: the chain's numbers, bottom to top. */
+		createStack: (pullRequests: number[]) =>
+			createPullRequestStack(client, pr, pullRequests),
+
 		/** Only open/closed: a merged pull request has no way back. */
 		setState: async (state: "open" | "closed") => {
 			await client.request("PATCH /repos/{owner}/{repo}/pulls/{pull_number}", {
@@ -228,6 +254,15 @@ export function pullRequestOnGithub(
 			await client.request(
 				"PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch",
 				rest,
+			);
+		},
+
+		/** `expectedHead`: GitHub refuses when the head moved past this commit. */
+		enqueue: async (expectedHead?: string) => {
+			const id = await pullRequestNodeId(graphql, ref);
+			await client.graphql(
+				"mutation($id: ID!, $head: GitObjectID) { enqueuePullRequest(input: { pullRequestId: $id, expectedHeadOid: $head }) { mergeQueueEntry { position } } }",
+				{ id, head: expectedHead ?? null },
 			);
 		},
 

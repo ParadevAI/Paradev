@@ -101,6 +101,8 @@ export interface PullRequestDetailRead {
 		unresolvedThreads: number;
 		requiresThreadResolution: boolean;
 		queue: { position: number | null; state: string } | null;
+		/** The base branch merges through a merge queue. Absent from API builds older than this field. */
+		queueEnabled?: boolean;
 		allowedMergeMethods: string[];
 		/** GitHub's preselected method for the viewer: their last one, else the first allowed. */
 		defaultMergeMethod: string | null;
@@ -136,6 +138,7 @@ query($owner: String!, $name: String!, $number: Int!, $activity: Boolean = false
 			viewerCanUpdate viewerCanMergeAsAdmin
 			mergedBy { login avatarUrl }
 			mergeQueueEntry { position state }
+			isMergeQueueEnabled
 			baseRef {
 				branchProtectionRule {
 					requiredApprovingReviewCount
@@ -327,6 +330,7 @@ export interface PullRequestDetailQuery {
 					viewerCanMergeAsAdmin: boolean;
 					mergedBy: { login: string; avatarUrl: string | null } | null;
 					mergeQueueEntry: { position: number | null; state: string } | null;
+					isMergeQueueEnabled?: boolean;
 					baseRef: {
 						branchProtectionRule: {
 							requiredApprovingReviewCount: number | null;
@@ -664,6 +668,7 @@ export async function readPullRequestDetail(
 						state: pr.mergeQueueEntry.state,
 					}
 				: null,
+			queueEnabled: pr.isMergeQueueEnabled === true,
 			allowedMergeMethods: allowed,
 			defaultMergeMethod:
 				data.repository?.viewerDefaultMergeMethod?.toLowerCase() ?? null,

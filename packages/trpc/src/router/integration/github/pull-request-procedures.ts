@@ -12,6 +12,11 @@ const pullRequestInput = z.object({
 });
 // GitHub rejects bodies past 65536 characters.
 const body = z.string().trim().min(1).max(65536);
+const mergeRequest = {
+	mergeMethod: z.enum(["merge", "squash", "rebase"]).optional(),
+	mergeAction: z.enum(["default", "direct_merge", "merge_queue"]).optional(),
+	sha: z.string().min(7).max(64).optional(),
+};
 
 async function onGithub<T>(
 	fallback: string,
@@ -143,6 +148,69 @@ export const pullRequestProcedures = {
 			const pr = await asViewer(ctx.session.user.id, input);
 			await onGithub("GitHub refused to update the branch.", () =>
 				pr.updateBranch(),
+			);
+			return { ok: true as const };
+		}),
+
+	/** The pull request's stack: GitHub's own, or the chain of base branches it sits in. Null when it stands alone. */
+	getPullRequestStack: personProcedure
+		.input(pullRequestInput)
+		.query(async ({ ctx, input }) => {
+			const pr = await asViewer(ctx.session.user.id, input);
+			return onGithub(
+				`Failed to read the stack of pull request #${pr.number}`,
+				() => pr.stack(),
+			);
+		}),
+
+	/**
+	 * Starts a background merge, which is the only merge that lands a stack
+	 * or joins a merge queue. The caller polls `getPullRequestMergeResult`
+	 * while the answer is `pending`.
+	 */
+	requestPullRequestMerge: personProcedure
+		.input(pullRequestInput.extend(mergeRequest))
+		.mutation(async ({ ctx, input }) => {
+			const pr = await asViewer(ctx.session.user.id, input);
+			return onGithub("GitHub refused the merge.", () =>
+				pr.requestMerge({
+					mergeMethod: input.mergeMethod,
+					mergeAction: input.mergeAction,
+					sha: input.sha,
+				}),
+			);
+		}),
+
+	getPullRequestMergeResult: personProcedure
+		.input(pullRequestInput.extend({ uuid: z.string().min(1).max(200) }))
+		.query(async ({ ctx, input }) => {
+			const pr = await asViewer(ctx.session.user.id, input);
+			return onGithub("Failed to read the merge result", () =>
+				pr.mergeResult(input.uuid),
+			);
+		}),
+
+	/** Turns a chain of pull requests into a stack on GitHub; `pullRequests` runs bottom to top. */
+	createPullRequestStack: personProcedure
+		.input(
+			pullRequestInput.extend({
+				pullRequests: z.array(z.number().int().positive()).min(2).max(100),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const pr = await asViewer(ctx.session.user.id, input);
+			return onGithub("GitHub refused to create the stack.", () =>
+				pr.createStack(input.pullRequests),
+			);
+		}),
+
+	enqueuePullRequest: personProcedure
+		.input(pullRequestInput.extend({ sha: mergeRequest.sha }))
+		.mutation(async ({ ctx, input }) => {
+			const pr = await asViewer(ctx.session.user.id, input);
+			await onGithub(
+				"GitHub refused to add the pull request to the merge queue.",
+				() => pr.enqueue(input.sha),
 			);
 			return { ok: true as const };
 		}),

@@ -14,6 +14,11 @@ const pullRequestInput = z.object({
 	number: z.number().int().positive(),
 });
 const body = z.string().trim().min(1).max(65536);
+const mergeRequest = {
+	mergeMethod: z.enum(["merge", "squash", "rebase"]).optional(),
+	mergeAction: z.enum(["default", "direct_merge", "merge_queue"]).optional(),
+	sha: z.string().min(7).max(64).optional(),
+};
 const MISSING_LOGIN_TTL_MS = 30_000;
 
 /**
@@ -171,6 +176,66 @@ export function createViewerGithubRouter(
 			.mutation(({ input }) =>
 				onGithub(input, "GitHub refused to change the draft state.", (pr) =>
 					pr.setDraft(input.draft),
+				),
+			),
+
+		getPullRequestStack: publicProcedure
+			.input(pullRequestInput)
+			.query(({ input }) =>
+				onGithub(input, "Failed to read the pull request's stack", (pr) =>
+					pr.stack(),
+				),
+			),
+
+		requestPullRequestMerge: publicProcedure
+			.input(pullRequestInput.extend(mergeRequest))
+			.mutation(({ input }) =>
+				onGithub(input, "GitHub refused the merge.", (pr) =>
+					pr.requestMerge({
+						mergeMethod: input.mergeMethod,
+						mergeAction: input.mergeAction,
+						sha: input.sha,
+					}),
+				),
+			),
+
+		getPullRequestMergeResult: publicProcedure
+			.input(pullRequestInput.extend({ uuid: z.string().min(1).max(200) }))
+			.query(({ input }) =>
+				onGithub(input, "Failed to read the merge result", (pr) =>
+					pr.mergeResult(input.uuid),
+				),
+			),
+
+		createPullRequestStack: publicProcedure
+			.input(
+				pullRequestInput.extend({
+					pullRequests: z.array(z.number().int().positive()).min(2).max(100),
+				}),
+			)
+			.mutation(({ input }) =>
+				onGithub(input, "GitHub refused to create the stack.", (pr) =>
+					pr.createStack(input.pullRequests),
+				),
+			),
+
+		enqueuePullRequest: publicProcedure
+			.input(pullRequestInput.extend({ sha: mergeRequest.sha }))
+			.mutation(({ input }) =>
+				onGithub(
+					input,
+					"GitHub refused to add the pull request to the merge queue.",
+					(pr) => pr.enqueue(input.sha),
+				),
+			),
+
+		dequeuePullRequest: publicProcedure
+			.input(pullRequestInput)
+			.mutation(({ input }) =>
+				onGithub(
+					input,
+					"GitHub refused to remove the pull request from the queue.",
+					(pr) => pr.dequeue(),
 				),
 			),
 	});

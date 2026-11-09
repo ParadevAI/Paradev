@@ -69,4 +69,19 @@ describe("viewer GitHub on this machine", () => {
 		});
 		expect(tokensUsed).toEqual(["local-token"]);
 	});
+
+	test("a background merge that GitHub rejects surfaces GitHub's reason as a conflict", async () => {
+		const { call } = caller("local-token", {
+			request: (async () => ({
+				data: { status: "failed", details: { message: "#12 is a draft" } },
+			})) as unknown as Octokit["request"],
+		});
+		await expect(
+			call.requestPullRequestMerge({
+				repoFullName: "acme/widgets",
+				number: 7,
+				mergeAction: "merge_queue",
+			}),
+		).rejects.toMatchObject({ code: "CONFLICT", message: "#12 is a draft" });
+	});
 });
