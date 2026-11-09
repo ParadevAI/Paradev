@@ -7,10 +7,6 @@ import { findPullRequestWorkspace } from "renderer/routes/_authenticated/_dashbo
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 
-/**
- * Opens a stack layer where its work lives: the workspace on its branch when
- * this host has one, otherwise its pull request pane here.
- */
 export function useOpenStackLayer(
 	onOpenPullRequest: OpenPullRequestPane,
 ): (layer: PullRequestStackLayer) => void {

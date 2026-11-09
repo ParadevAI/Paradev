@@ -244,10 +244,7 @@ export async function setPullRequestDraft(
 	await (await githubFor(target, deps)).setDraft(draft);
 }
 
-/**
- * The stack the pull request sits in, or null when it stands alone. An API
- * that predates the read has no stacks to show.
- */
+/** An API that predates the read has no stacks to show. */
 export async function readPullRequestStack(
 	target: PullRequestTarget,
 	deps: PullRequestGateways = gateways,
@@ -273,10 +270,6 @@ export type BackgroundMergeOutcome =
 const MERGE_POLL_INTERVAL_MS = 1_500;
 const MERGE_POLL_LIMIT = 120;
 
-/**
- * The merge that lands a stack as one operation and can join a merge queue.
- * It runs in the background on GitHub, so this polls until GitHub settles.
- */
 export async function mergeInBackground(
 	target: PullRequestTarget,
 	request: AsyncMergeRequest,
@@ -318,7 +311,7 @@ export async function createPullRequestStack(
 	await (await githubFor(target, deps)).createStack(pullRequests);
 }
 
-/** Joins the base branch's merge queue; `sha` is the head the person looked at. */
+/** `sha`: the head the person looked at. */
 export async function enqueuePullRequest(
 	target: PullRequestTarget,
 	sha?: string,

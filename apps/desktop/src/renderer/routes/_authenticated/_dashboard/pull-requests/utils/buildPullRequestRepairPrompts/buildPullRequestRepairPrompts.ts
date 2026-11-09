@@ -100,7 +100,6 @@ export function buildResolveConflictsPrompt(
 	].join("\n");
 }
 
-/** What an agent needs to drop a merged layer's commits from the branch that was stacked on it. */
 export function buildRestackPrompt(restack: {
 	number: number;
 	url: string;

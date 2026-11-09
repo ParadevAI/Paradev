@@ -42,7 +42,6 @@ interface PullRequestPaneProps {
 	data: PullRequestPaneData;
 	onOpenDiff: OpenReviewDiff;
 	onOpenPage: (page: PagePaneData) => void;
-	/** Shows another PR here; a stack layer without its own workspace opens this way. */
 	onOpenPullRequest: (ref: PullRequestRef) => void;
 }
 

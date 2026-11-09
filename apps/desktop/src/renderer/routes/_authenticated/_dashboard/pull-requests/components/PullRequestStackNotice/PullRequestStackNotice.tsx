@@ -2,7 +2,6 @@ import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { TriangleAlert } from "lucide-react";
 
-/** Shown while an open PR's stack could not be read; merging waits for it. */
 export function PullRequestStackNotice({
 	onRefresh,
 }: {

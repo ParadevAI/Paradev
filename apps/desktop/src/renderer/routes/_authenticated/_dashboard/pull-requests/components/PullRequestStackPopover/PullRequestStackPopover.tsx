@@ -51,11 +51,6 @@ function layerStatusTone(layer: PullRequestStackLayer): StackLayerStatusTone {
 	return issue ? ISSUE_TONE[issue] : "muted";
 }
 
-/**
- * The stack chip ("2/4") and the navigator it opens: one verdict for what a
- * merge here would land and why it cannot yet, then every layer top to
- * bottom on a rail that ends at the base branch.
- */
 export function PullRequestStackPopover({
 	stack,
 	flow,

@@ -47,9 +47,8 @@ export type PullRequestDetail = PullRequestDetailBase &
 	};
 
 export interface PullRequestMergeQueue {
-	/** The base branch merges through a merge queue. */
 	enabled: boolean;
-	/** This pull request's place in it; position 1 merges next. */
+	/** Position 1 merges next. */
 	entry: { position: number | null; state: string } | null;
 }
 

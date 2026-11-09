@@ -214,12 +214,7 @@ export function pullRequestOnGithub(
 			};
 		},
 
-		/**
-		 * The merge that understands stacks and merge queues: for a pull request
-		 * in a stack it lands every open pull request below it too, and it can
-		 * add to the base branch's merge queue. It runs in the background, so
-		 * the caller polls `mergeResult` while the answer is `pending`.
-		 */
+		/** The caller polls `mergeResult` while the answer is `pending`. */
 		requestMerge: (request: AsyncMergeRequest = {}) =>
 			requestPullRequestMerge(client, pr, request),
 

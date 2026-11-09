@@ -20,11 +20,9 @@ type StackIdentity = Pick<
 export interface MergeActionKind {
 	/** A stack lands several pull requests; otherwise the one. */
 	stack: boolean;
-	/** The base branch merges through a merge queue. */
 	queue: boolean;
 }
 
-/** Every sentence the stack and merge-queue surfaces say, from structured state. */
 export function usePullRequestStackCopy() {
 	const { t } = useLingui();
 	return useMemo(() => {
@@ -105,7 +103,6 @@ export function usePullRequestStackCopy() {
 						return t({ message: `#${number} is not ready to merge.` });
 				}
 			},
-			/** One layer's state in a word or two; null when there is nothing to say. */
 			layerStatus(layer: PullRequestStackLayer): string | null {
 				if (layer.state !== "open") return null;
 				if (layer.queue) return queued(layer.queue.position);

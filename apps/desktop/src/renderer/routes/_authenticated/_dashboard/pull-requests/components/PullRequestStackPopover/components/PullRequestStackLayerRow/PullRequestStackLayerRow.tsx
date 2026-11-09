@@ -36,7 +36,6 @@ export function PullRequestStackLayerRow({
 	layer: PullRequestStackLayer;
 	/** Where this layer stands for the reader ("This workspace", "Viewing"). */
 	tag: string | null;
-	/** What stands between this layer and a merge, in a word or two. */
 	status: { label: string; tone: StackLayerStatusTone } | null;
 	onSelect: (layer: PullRequestStackLayer) => void;
 }) {

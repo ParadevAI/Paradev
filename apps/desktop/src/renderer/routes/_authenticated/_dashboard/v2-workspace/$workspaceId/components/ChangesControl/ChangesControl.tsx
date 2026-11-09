@@ -18,7 +18,6 @@ interface ChangesControlProps {
 	onToggleChanges: () => void;
 	/** Open or focus the pane showing the linked PR's summary. */
 	onOpenPullRequest: OpenPullRequestPane;
-	/** The PR the workspace's pull-request pane shows, if one is in view. */
 	viewingPullRequestNumber?: number | null;
 }
 

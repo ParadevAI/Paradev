@@ -101,7 +101,7 @@ export interface PullRequestDetailRead {
 		unresolvedThreads: number;
 		requiresThreadResolution: boolean;
 		queue: { position: number | null; state: string } | null;
-		/** The base branch merges through a merge queue. Absent from API builds older than this field. */
+		/** Absent from API builds older than this field. */
 		queueEnabled?: boolean;
 		allowedMergeMethods: string[];
 		/** GitHub's preselected method for the viewer: their last one, else the first allowed. */

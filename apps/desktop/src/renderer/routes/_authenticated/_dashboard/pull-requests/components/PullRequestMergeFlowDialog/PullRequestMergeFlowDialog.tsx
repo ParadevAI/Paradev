@@ -15,10 +15,6 @@ import { useState } from "react";
 import type { PullRequestMergeFlow } from "../../hooks/usePullRequestMergeFlow";
 import { usePullRequestStackCopy } from "../../hooks/usePullRequestStackCopy";
 
-/**
- * Confirms the merges the flow runs: a stack, or a pull request joining the
- * merge queue. It names every pull request that lands and what stays open.
- */
 export function PullRequestMergeFlowDialog({
 	flow,
 	prNumber,

@@ -3,14 +3,12 @@ import { cn } from "@superset/ui/utils";
 import { LoaderCircle } from "lucide-react";
 import { PR_STATE_INK_CLASS_NAME } from "../../../PullRequestStateGlyph";
 
-/** One sentence about the stack, with the one action that answers it. */
 export function PullRequestStackCallout({
 	text,
 	tone = "muted",
 	action = null,
 }: {
 	text: string;
-	/** `warning`: the stack is in a state the person should fix. */
 	tone?: "muted" | "warning";
 	action?: { label: string; run: () => void; isPending: boolean } | null;
 }) {

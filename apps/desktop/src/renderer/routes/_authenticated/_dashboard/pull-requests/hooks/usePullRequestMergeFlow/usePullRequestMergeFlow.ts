@@ -23,10 +23,6 @@ import {
 	readPullRequestStack,
 } from "../../utils/pullRequestClient";
 import {
-	PullRequestMergeRefusal,
-	runPullRequestMerge,
-} from "../../utils/runPullRequestMerge";
-import {
 	pullRequestDetailQueryOptions,
 	useInvalidatePullRequestDetail,
 } from "../usePullRequestDetail";
@@ -40,6 +36,10 @@ import {
 	type MergeActionKind,
 	usePullRequestStackCopy,
 } from "../usePullRequestStackCopy";
+import {
+	PullRequestMergeRefusal,
+	runPullRequestMerge,
+} from "./utils/runPullRequestMerge";
 
 export interface PullRequestMergeFlow {
 	stackQuery: PullRequestStackQuery;
@@ -47,26 +47,19 @@ export interface PullRequestMergeFlow {
 	assessment: PullRequestStackAssessment | null;
 	/** The pull request sits in a stack, so GitHub merges it as part of one. */
 	isStack: boolean;
-	/** What the merge control says it does. */
 	kind: MergeActionKind;
-	/** The base branch merges through a merge queue. */
 	usesQueue: boolean;
-	/** This pull request's place in the merge queue, when it is in it. */
 	queued: { position: number | null } | null;
 	/** How many pull requests the merge lands, when it lands several. */
 	count: number | null;
 	blocker: PullRequestStackMergeBlocker | null;
-	/**
-	 * This flow runs the merge: a stack, or a merge queue. Otherwise the
-	 * caller keeps its own single pull request merge.
-	 */
+	/** False: the caller merges the one pull request itself. */
 	handlesMerge: boolean;
 	/** The chain's open pull requests, when they can become a GitHub stack. */
 	chain: number[];
 	isMerging: boolean;
 	isDequeuing: boolean;
 	isCreatingStack: boolean;
-	/** The merge awaiting confirmation. */
 	confirm: { method: MergeMethod } | null;
 	request: (method: MergeMethod) => void;
 	cancel: () => void;
@@ -75,10 +68,6 @@ export interface PullRequestMergeFlow {
 	createStack: () => void;
 }
 
-/**
- * The merge control's state for one pull request: whether it merges alone,
- * as a stack, or through a merge queue, what blocks it, and the actions.
- */
 export function usePullRequestMergeFlow({
 	target,
 	onMerged,

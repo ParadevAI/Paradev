@@ -1,9 +1,6 @@
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
-/**
- * The live workspace on this host that is checked out on the pull request,
- * if any. A host that cannot answer reads as none.
- */
+/** A host that cannot answer reads as no workspace. */
 export async function findPullRequestWorkspace({
 	hostUrl,
 	projectId,

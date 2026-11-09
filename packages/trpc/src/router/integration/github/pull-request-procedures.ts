@@ -152,7 +152,6 @@ export const pullRequestProcedures = {
 			return { ok: true as const };
 		}),
 
-	/** The pull request's stack: GitHub's own, or the chain of base branches it sits in. Null when it stands alone. */
 	getPullRequestStack: personProcedure
 		.input(pullRequestInput)
 		.query(async ({ ctx, input }) => {
@@ -163,11 +162,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	/**
-	 * Starts a background merge, which is the only merge that lands a stack
-	 * or joins a merge queue. The caller polls `getPullRequestMergeResult`
-	 * while the answer is `pending`.
-	 */
+	/** The caller polls `getPullRequestMergeResult` while the answer is `pending`. */
 	requestPullRequestMerge: personProcedure
 		.input(pullRequestInput.extend(mergeRequest))
 		.mutation(async ({ ctx, input }) => {
@@ -190,7 +185,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	/** Turns a chain of pull requests into a stack on GitHub; `pullRequests` runs bottom to top. */
+	/** `pullRequests` runs bottom to top. */
 	createPullRequestStack: personProcedure
 		.input(
 			pullRequestInput.extend({

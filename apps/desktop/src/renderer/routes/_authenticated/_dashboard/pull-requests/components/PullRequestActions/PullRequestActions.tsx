@@ -94,7 +94,6 @@ interface PullRequestActionsProps {
 	hostUrl: string | null;
 	data: PullRequestDetail | null | undefined;
 	isLoading: boolean;
-	/** How this pull request merges: alone, as a stack, or through a merge queue. */
 	flow: PullRequestMergeFlow;
 	/**
 	 * Offer "Start workspace". Off inside a workspace pane, where the PR is

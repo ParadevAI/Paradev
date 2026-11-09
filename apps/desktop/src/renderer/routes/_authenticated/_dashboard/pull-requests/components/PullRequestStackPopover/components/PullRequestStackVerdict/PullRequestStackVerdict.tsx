@@ -42,7 +42,6 @@ export function PullRequestStackVerdict({
 	verdict: Verdict;
 	label: string;
 	summary: string;
-	/** Why the stack cannot merge yet. */
 	reason: string | null;
 }) {
 	const Icon = VERDICT_ICON[verdict];

@@ -1,9 +1,6 @@
 /**
- * A pull request's stack: GitHub's own when the pull request is in one,
- * otherwise the chain of pull requests whose base branch is another's head
- * branch. No query here asks for check rollups: across many pull requests
- * they make GitHub's GraphQL edge answer 502, and `mergeStateStatus` already
- * says whether checks fail.
+ * No query here asks for check rollups: across many pull requests they make
+ * GitHub's GraphQL answer 502. `mergeStateStatus` says whether checks fail.
  */
 
 export interface StackGithubClient {
@@ -37,7 +34,6 @@ export interface PullRequestStackLayer {
 	state: StackLayerState;
 	isDraft: boolean;
 	headRefName: string;
-	/** The head commit when the stack was read. */
 	headRefOid: string;
 	baseRefName: string;
 	mergeable: StackMergeability;
@@ -66,13 +62,8 @@ export interface PullRequestStack {
 	/** Ordered by position, trunk-most first. Merged layers stay listed. */
 	layers: PullRequestStackLayer[];
 	currentPosition: number;
-	/** The base branch merges through a merge queue. */
 	usesMergeQueue: boolean;
-	/**
-	 * Set while the current branch still carries the commits of a layer that
-	 * merged below it. Until it is restacked onto the trunk, its diff repeats
-	 * that layer and GitHub may report conflicts against the squashed copy.
-	 */
+	/** Set while the current branch still carries a layer that merged below it. */
 	restack: StackRestack | null;
 }
 
@@ -162,9 +153,8 @@ const NATIVE_STACK_SELECTION = `
 			stackEntry { position }`;
 
 /**
- * The pull request itself with its native stack, if any. `includeNativeStack`
- * exists for hosts whose schema predates stacks, where the unknown fields
- * would fail validation for the whole query.
+ * `includeNativeStack` is off for hosts whose schema predates stacks: the
+ * unknown fields would fail validation for the whole query.
  */
 export function buildStackRootQuery(includeNativeStack: boolean): string {
 	return `
@@ -179,7 +169,6 @@ query($owner: String!, $name: String!, $number: Int!) {
 ${LAYER_FRAGMENTS}`;
 }
 
-/** The open pull request whose head is `$head`: the layer beneath a base branch. */
 export const OPEN_BY_HEAD_QUERY = `
 query($owner: String!, $name: String!, $head: String!) {
 	repository(owner: $owner, name: $name) {
@@ -190,7 +179,6 @@ query($owner: String!, $name: String!, $head: String!) {
 }
 ${LAYER_FRAGMENTS}`;
 
-/** Open pull requests targeting `$base`: the layers built on a head branch. */
 export const OPEN_BY_BASE_QUERY = `
 query($owner: String!, $name: String!, $base: String!) {
 	repository(owner: $owner, name: $name) {
@@ -204,7 +192,6 @@ query($owner: String!, $name: String!, $base: String!) {
 }
 ${LAYER_FRAGMENTS}`;
 
-/** The merged pull request whose head was `$head`: a layer that already landed. */
 export const MERGED_BY_HEAD_QUERY = `
 query($owner: String!, $name: String!, $head: String!) {
 	repository(owner: $owner, name: $name) {
@@ -228,12 +215,9 @@ function isUnknownStackFieldError(error: unknown): boolean {
 }
 
 /**
- * Runs the root query, tolerating the two ways the native-stack fields fail.
- * Octokit rejects any response that carries `errors`, even with usable
- * partial data: a repository with stacks switched off answers the `stack`
- * field with an error and everything else intact, so the partial payload is
- * kept. A schema that lacks the fields fails validation for the whole query,
- * and is retried without them.
+ * Octokit rejects a response that carries `errors`, even with usable data. A
+ * repository with stacks off errors only on `stack`, so that payload is kept;
+ * a schema without the fields fails the whole query and is retried without them.
  */
 export async function runStackRootQuery(
 	graphql: StackGraphqlRunner,
@@ -257,13 +241,11 @@ export async function runStackRootQuery(
 	}
 }
 
-/** The targeted lookups a chain walk needs, so tests can back them in memory. */
 export interface StackChainFetchers {
-	/** The open pull request in this repository whose head branch is `headRefName`. */
 	findOpenByHead(headRefName: string): Promise<StackPullRequestNode | null>;
-	/** Open pull requests in this repository based on `baseRefName`, newest first. */
+	/** Newest first. */
 	findOpenByBase(baseRefName: string): Promise<StackPullRequestNode[]>;
-	/** The most recently merged pull request whose head branch was `headRefName`. */
+	/** The most recently merged one. */
 	findMergedByHead(headRefName: string): Promise<StackPullRequestNode | null>;
 }
 
@@ -358,7 +340,6 @@ export function mapStackLayer(
 	};
 }
 
-/** GitHub listed a stack this pull request is in, but not all of it. */
 export class IncompleteStackError extends Error {
 	constructor() {
 		super("GitHub returned a partial or inconsistent pull request stack.");
@@ -367,10 +348,8 @@ export class IncompleteStackError extends Error {
 }
 
 /**
- * Layers from GitHub's own stack, or null when the pull request isn't in one.
- * Throws when GitHub's answer does not add up (a missing entry, a gap in the
- * positions, the pull request at another position than it claims): a merge
- * planned from part of a stack would land the wrong prefix.
+ * Throws when GitHub's answer does not add up: a merge planned from part of a
+ * stack would land the wrong prefix.
  */
 export function buildNativeStackLayers(
 	pr: StackRootPullRequest | null | undefined,
@@ -419,11 +398,8 @@ const MAX_CHAIN_LENGTH = 25;
 const MAX_MERGED_BELOW = 10;
 
 /**
- * Walks the base-branch chain: down until a base is no open pull request's
- * head (the trunk), up while an open pull request builds on the head. A fork
- * above (two pull requests based on the same branch) follows the most
- * recently updated one, so the chain stays linear like a native stack. The
- * default branch is never looked up as a layer.
+ * Two pull requests based on the same branch: the walk follows the most
+ * recently updated one. The default branch is never looked up as a layer.
  */
 export async function walkInferredChain(
 	current: StackPullRequestNode,
@@ -464,7 +440,6 @@ export async function walkInferredChain(
 	return [...below, current, ...above];
 }
 
-/** The branch a pull request targeted before GitHub moved it to its present base. */
 function previousBase(node: StackPullRequestNode): string | null {
 	const events = node.timelineItems?.nodes ?? [];
 	for (let index = events.length - 1; index >= 0; index--) {
@@ -477,10 +452,8 @@ function previousBase(node: StackPullRequestNode): string | null {
 }
 
 /**
- * The layers that already merged beneath `bottom`, trunk-most first. When a
- * layer merges, GitHub retargets the one above it to the trunk and the chain
- * loses its link; the retarget stays in the pull request's timeline and
- * names the branch it sat on.
+ * When a layer merges, GitHub retargets the one above it to the trunk. The
+ * retarget stays in that pull request's timeline and names the old branch.
  */
 export async function walkMergedBelow(
 	bottom: StackPullRequestNode,
@@ -508,9 +481,8 @@ function field<T>(data: unknown, key: string): T | undefined {
 }
 
 /**
- * Whether `branchHead` still contains the merged layer's last commit while
- * the trunk does not. A merge-commit merge keeps that commit reachable from
- * the trunk, so it needs no restack; a squash or rebase merge rewrites it.
+ * A merge-commit merge keeps the layer's last commit reachable from the
+ * trunk, so it needs no restack; a squash or rebase merge rewrites it.
  */
 export async function carriesMergedCommits(
 	client: Pick<StackGithubClient, "request">,
@@ -533,10 +505,7 @@ export async function carriesMergedCommits(
 	return missingFromTrunk !== null && missingFromTrunk > 0;
 }
 
-/**
- * The stack `pr` belongs to, or null for a pull request that stands alone.
- * Throws when GitHub cannot be read or answers with part of a native stack.
- */
+/** Null for a pull request that stands alone. Throws on part of a native stack. */
 export async function readPullRequestStack(
 	client: StackGithubClient,
 	pr: StackPullRequestRef,
@@ -609,10 +578,7 @@ export async function readPullRequestStack(
 	};
 }
 
-/**
- * The layers a merge of the current one lands: itself and every unmerged
- * layer below it, trunk-most first.
- */
+/** The current layer and every unmerged layer below it, trunk-most first. */
 export function stackMergeTargets(
 	stack: Pick<PullRequestStack, "layers" | "currentPosition">,
 ): PullRequestStackLayer[] {
@@ -622,10 +588,7 @@ export function stackMergeTargets(
 	);
 }
 
-/**
- * Turns a chain of pull requests into a stack on GitHub, bottom to top. Each
- * one's base branch must be the head branch of the one before it.
- */
+/** `pullRequests` runs bottom to top: each base is the head of the one before. */
 export async function createPullRequestStack(
 	client: Pick<StackGithubClient, "request">,
 	repo: { owner: string; repo: string },

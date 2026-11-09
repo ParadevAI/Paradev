@@ -4,8 +4,6 @@ import type {
 	PullRequestStackLayer,
 } from "../../hooks/usePullRequestStack";
 
-export { stackMergeTargets };
-
 export type PullRequestStackVerdict =
 	| "merged"
 	| "queued"
@@ -116,9 +114,8 @@ export function assessPullRequestStack(
 }
 
 /**
- * Why a stack merge cannot run now, or null when it can. A chain inferred
- * from base branches is no stack on GitHub, so only its lowest open layer
- * can merge into the trunk.
+ * A chain inferred from base branches is no stack on GitHub, so only its
+ * lowest open layer can merge into the trunk.
  */
 export function resolveStackMergeBlocker({
 	stack,

@@ -15,7 +15,6 @@ interface PullRequestMergeMenuSectionProps {
 	target: PullRequestTarget | null;
 	flow: PullRequestMergeFlow;
 	isQueued: boolean;
-	/** The caller's own merge of the one pull request is running. */
 	isMergingAlone: boolean;
 	/** Merges the one pull request when it is no stack and has no merge queue. */
 	onMergeAlone: (method: MergeMethod) => void;
@@ -23,10 +22,6 @@ interface PullRequestMergeMenuSectionProps {
 	iconClassName?: string;
 }
 
-/**
- * A pull request menu's merge items: the repository's merge methods, the
- * whole stack with its count, the merge queue, or the way out of the queue.
- */
 export function PullRequestMergeMenuSection({
 	target,
 	flow,

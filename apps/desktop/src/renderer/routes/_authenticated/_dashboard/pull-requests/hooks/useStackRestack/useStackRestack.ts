@@ -6,17 +6,12 @@ import {
 import type { PullRequestStack } from "../usePullRequestStack";
 
 export interface StackRestackAction {
-	/** The merged pull request whose commits the branch still carries. */
 	mergedNumber: number;
 	/** Hands the restack to an agent; null when there is none to give it to. */
 	run: (() => void) | null;
 	isPending: boolean;
 }
 
-/**
- * The restack a pull request needs when its branch still carries a layer
- * that merged below it. Null when there is nothing to restack.
- */
 export function useStackRestack(
 	handoffTarget: PullRequestHandoffTarget | null,
 	stack: PullRequestStack | null,

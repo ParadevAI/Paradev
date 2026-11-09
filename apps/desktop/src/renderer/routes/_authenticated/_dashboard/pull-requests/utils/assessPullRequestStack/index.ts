@@ -8,5 +8,4 @@ export {
 	type StackLayerIssue,
 	stackableChain,
 	stackLayerIssue,
-	stackMergeTargets,
 } from "./assessPullRequestStack";

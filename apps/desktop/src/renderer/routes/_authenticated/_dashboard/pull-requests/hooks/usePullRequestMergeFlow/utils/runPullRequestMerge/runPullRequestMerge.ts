@@ -6,7 +6,7 @@ import {
 import type {
 	AsyncMergeRequest,
 	BackgroundMergeOutcome,
-} from "../pullRequestClient";
+} from "../../../../utils/pullRequestClient";
 
 export interface PullRequestMergeOperations {
 	/** The stack as GitHub has it now, never from a cache. */
@@ -18,7 +18,6 @@ export interface PullRequestMergeOperations {
 	merge: (method: MergeMethod) => Promise<void>;
 }
 
-/** The merge did not start, for a reason the person can act on. */
 export class PullRequestMergeRefusal extends Error {
 	constructor(readonly reason: "stack-changed" | "stack-needs-background") {
 		super(reason);
@@ -35,10 +34,8 @@ function targetNumbers(stack: PullRequestStack | null): string {
 }
 
 /**
- * Merges what the person confirmed. A stack is read again first, so a layer
- * that joined or left since the dialog opened stops the merge. Without
- * GitHub's background merge, one pull request still merges or joins the
- * queue the plain way; a stack of several cannot.
+ * A stack is read again first: a layer that joined or left since the dialog
+ * opened stops the merge.
  */
 export async function runPullRequestMerge(
 	{

@@ -98,11 +98,8 @@ function target(pr: AsyncMergePullRequest) {
 }
 
 /**
- * Asks GitHub to merge in the background. For a pull request in a stack the
- * request covers every open pull request below it as one operation. GitHub
- * answers a duplicate in-flight request with 409 and the existing request's
- * id, and a closed or draft pull request with 400 and a `failed` result: both
- * bodies say more than the status does.
+ * GitHub answers a duplicate in-flight request with 409 and the existing
+ * request's id, and a closed or draft pull request with 400 and `failed`.
  */
 export async function requestPullRequestMerge(
 	client: AsyncMergeClient,

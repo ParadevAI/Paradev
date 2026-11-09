@@ -3,7 +3,7 @@ import type {
 	PullRequestStack,
 	PullRequestStackLayer,
 } from "@superset/shared/pull-request-stack";
-import type { BackgroundMergeOutcome } from "../pullRequestClient";
+import type { BackgroundMergeOutcome } from "../../../../utils/pullRequestClient";
 import {
 	type PullRequestMergeOperations,
 	PullRequestMergeRefusal,

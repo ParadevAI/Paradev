@@ -23,7 +23,6 @@ export interface PullRequestStackQuery {
 
 export const PULL_REQUEST_STACK_QUERY_KEY_PREFIX = ["pull-request-stack"];
 
-/** The stack a pull request sits in, read as the viewer by repository and number. */
 export function usePullRequestStack(
 	target: PullRequestTarget | null,
 ): PullRequestStackQuery {
