@@ -105,15 +105,17 @@ export const chatMoveRouter = {
 						inArray(chatItems.kind, MESSAGE_KINDS),
 					),
 				);
+			// Someone else's chat history is private: their move shows only where it stands.
+			const isMine = move.createdBy === mover.userId;
 			return {
 				id: move.id,
-				isMine: move.createdBy === mover.userId,
+				isMine,
 				status: move.status,
-				error: move.error,
+				error: isMine ? move.error : null,
 				fromWorkspaceId: move.fromWorkspaceId,
 				toWorkspaceId: move.toWorkspaceId,
-				toHostId: move.toHostId,
-				messageCount: messages?.value ?? 0,
+				toHostId: isMine ? move.toHostId : null,
+				messageCount: isMine ? (messages?.value ?? 0) : 0,
 				updatedAt: move.updatedAt,
 			};
 		}),

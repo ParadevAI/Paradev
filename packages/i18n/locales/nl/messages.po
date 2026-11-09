@@ -400,7 +400,7 @@ msgstr "{0, plural, one {# regel meer tonen} other {# regels meer tonen}}"
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Hiermee wordt # bestaande worktree als werkruimte in Paradev geïmporteerd. Elke worktree op schijf wordt gevolgd en verschijnt in je zijbalk. Er worden geen bestanden gewijzigd.} other {Hiermee worden # bestaande worktrees als werkruimtes in Paradev geïmporteerd. Elke worktree op schijf wordt gevolgd en verschijnt in je zijbalk. Er worden geen bestanden gewijzigd.}}"
 
-#. placeholder {0}: move.chats.total
+#. placeholder {0}: move.chats.total - move.chats.ready
 msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
 msgstr "{0, plural, one {Deze werkruimte is verplaatst. De # chat ervan is hier gebleven.} other {Deze werkruimte is verplaatst. De # chats ervan zijn hier gebleven.}}"
 

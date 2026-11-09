@@ -475,7 +475,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			.listByScope(input.scopeId)
 			.filter(
 				(row) =>
-					row.closedAt === null &&
+					!row.closedAt &&
 					row.harness === input.harness &&
 					row.harnessSessionId === harnessSessionId,
 			);
@@ -496,6 +496,21 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			await options.live.dispose(sessionId);
 		} finally {
 			if (wasLive) options.journal.announce(sessionId);
+		}
+	};
+
+	const retireStopped = (
+		sharing: readonly ChatSessionRow[],
+		keptSessionId: string,
+	): void => {
+		for (const row of sharing) {
+			if (row.sessionId === keptSessionId || running(row.sessionId)) continue;
+			void closeChat(row.sessionId).catch((error: unknown) =>
+				console.warn(
+					`[chat-runtime] could not close ${row.sessionId}, which ${keptSessionId} now resumes`,
+					error,
+				),
+			);
 		}
 	};
 
@@ -606,7 +621,6 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						: null;
 				const handedOff = resumed && handOff(resumed);
 				if (handedOff) return handedOff;
-				// Two agents resuming one agent session write to the same history at once.
 				const sharing = openOnAgentSession(parsed);
 				const alreadyRunning = sharing.find(
 					(row) =>
@@ -614,6 +628,8 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						runsConfig(row.sessionId, parsed.agentConfigId),
 				);
 				if (alreadyRunning) {
+					if (resumed) sendPending(resumed, alreadyRunning.sessionId);
+					retireStopped(sharing, alreadyRunning.sessionId);
 					return {
 						sessionId: alreadyRunning.sessionId,
 						epoch: alreadyRunning.epoch,
@@ -687,15 +703,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						.carryFrom(carriedFrom(replay.snapshot, parsed.harness));
 				}
 				if (resumed) sendPending(resumed, sessionId);
-				for (const row of sharing) {
-					if (running(row.sessionId)) continue;
-					void closeChat(row.sessionId).catch((error: unknown) =>
-						console.warn(
-							`[chat-runtime] could not close ${row.sessionId}, which ${sessionId} now resumes`,
-							error,
-						),
-					);
-				}
+				retireStopped(sharing, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});
 		},

@@ -170,7 +170,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						return { prepared, project, created, moves, skipped };
 					},
 				}).catch(async (error: unknown) => {
-					await abandonWorkspaceMove(workspaceMoveId, error);
+					await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 					if (leaving.source) {
 						await releaseSourceChats(leaving.source, leaving.chats);
 					}

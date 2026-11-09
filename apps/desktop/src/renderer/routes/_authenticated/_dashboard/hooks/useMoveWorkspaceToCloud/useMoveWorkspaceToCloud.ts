@@ -108,7 +108,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					return { prepared, created };
 				},
 			}).catch(async (error: unknown) => {
-				await abandonWorkspaceMove(workspaceMoveId, error);
+				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 				await releaseSourceChats(source, leaving.chats);
 				throw error;
 			});

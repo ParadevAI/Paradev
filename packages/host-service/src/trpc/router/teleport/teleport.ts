@@ -211,6 +211,7 @@ export const teleportRouter = router({
 			assertIdle();
 			const prepared: PreparedChat[] = [];
 			const followed: string[] = [];
+			let firstFailure: unknown = null;
 			try {
 				for (const session of movable) {
 					try {
@@ -256,6 +257,7 @@ export const teleportRouter = router({
 							`[teleport] could not pack chat ${session.sessionId}; it stays here`,
 							error,
 						);
+						firstFailure ??= error;
 						return "failed" as const;
 					});
 					if (outcome !== "uploaded") {
@@ -274,6 +276,8 @@ export const teleportRouter = router({
 						title: session.title,
 					});
 				}
+				// Every chat failing is the move failing (an upload outage, say), not a choice to leave them.
+				if (prepared.length === 0 && firstFailure) throw firstFailure;
 			} catch (error) {
 				for (const sessionId of followed) chatSync.forget(sessionId);
 				throw error;

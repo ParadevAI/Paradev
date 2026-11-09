@@ -1,6 +1,6 @@
+import type { I18n } from "@lingui/core";
 import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import { Button } from "@superset/ui/button";
 import { Progress } from "@superset/ui/progress";
 import { toast } from "@superset/ui/sonner";
@@ -22,7 +22,7 @@ const ENDED = new Set([
 const CANCELLABLE = new Set(["saving"]);
 
 export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
-	const { t } = useLingui();
+	const { t, i18n } = useLingui();
 	const move = useWorkspaceMoveProgressStore((state) => state.moves[moveId]);
 	const remove = useWorkspaceMoveProgressStore((state) => state.remove);
 	if (!move) return null;
@@ -67,11 +67,11 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 				</button>
 			</div>
 			<p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-				{failure ? failure.reason : describe(move)}
+				{failure ? failure.reason : describe(move, i18n)}
 			</p>
 			{failure && (
 				<p className="mt-1 text-xs text-muted-foreground">
-					{describeOutcome(move)}
+					{describeOutcome(move, i18n)}
 				</p>
 			)}
 			{failure?.details && (
@@ -103,7 +103,7 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 	);
 }
 
-function describeOutcome(move: WorkspaceMoveProgress): string {
+function describeOutcome(move: WorkspaceMoveProgress, i18n: I18n): string {
 	const { name } = move;
 	if (move.failedDuring === "creating") {
 		return i18n._(
@@ -119,7 +119,7 @@ function describeOutcome(move: WorkspaceMoveProgress): string {
 	);
 }
 
-function describe(move: WorkspaceMoveProgress): string {
+function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 	const chats = move.chats;
 	switch (move.stage) {
 		case "saving":

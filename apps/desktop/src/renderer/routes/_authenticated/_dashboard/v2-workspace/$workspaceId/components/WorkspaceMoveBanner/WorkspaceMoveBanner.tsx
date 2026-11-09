@@ -72,15 +72,16 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 		label = <Trans>The move was stopped. This workspace stayed here.</Trans>;
 	} else if (failure) {
 		if (!isSource) return null;
-		label = destination ? (
-			<Plural
-				value={move.chats.total}
-				one="This workspace moved. Its # chat stayed here."
-				other="This workspace moved. Its # chats stayed here."
-			/>
-		) : (
-			<Trans>This workspace couldn't move.</Trans>
-		);
+		label =
+			destination && move.chats.ready > 0 ? (
+				<Plural
+					value={move.chats.total - move.chats.ready}
+					one="This workspace moved. Its # chat stayed here."
+					other="This workspace moved. Its # chats stayed here."
+				/>
+			) : (
+				<Trans>This workspace couldn't move.</Trans>
+			);
 	} else if (isSource) {
 		if (inFlight) {
 			label = isMine ? (

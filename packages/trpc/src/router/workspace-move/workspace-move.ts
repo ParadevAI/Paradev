@@ -91,7 +91,12 @@ export const workspaceMoveRouter = {
 				op: "touchWorkspaceMove",
 				id: input.workspaceMoveId,
 			});
-			return { alive, error: alive ? null : move.error };
+			if (alive) return { alive, error: null };
+			const ended = await callMoves(mover.organizationId, {
+				op: "workspaceMove",
+				id: input.workspaceMoveId,
+			});
+			return { alive, error: ended.move?.error ?? null };
 		}),
 
 	/** The newest move out of or into a workspace, or null when it never moved. */
@@ -109,15 +114,16 @@ export const workspaceMoveRouter = {
 			if (!found?.move) found = await latestBy(mover.userId);
 			const { move, chats } = found;
 			if (!move) return null;
+			const isMine = move.createdBy === mover.userId;
 			return {
 				id: move.id,
-				isMine: move.createdBy === mover.userId,
+				isMine,
 				status: move.status,
-				error: move.error,
+				error: isMine ? move.error : null,
 				fromWorkspaceId: move.fromWorkspaceId,
 				toWorkspaceId: move.toWorkspaceId,
-				toHostId: move.toHostId,
-				branch: move.branch,
+				toHostId: isMine ? move.toHostId : null,
+				branch: isMine ? move.branch : null,
 				chats,
 				createdAt: move.createdAt,
 			};

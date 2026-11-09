@@ -9,13 +9,15 @@ import { MOVE_CANCELLED } from "../describeMoveError";
 export async function abandonWorkspaceMove(
 	workspaceMoveId: string,
 	error: unknown,
+	cancelled = false,
 ): Promise<void> {
 	await cloudTrpcClient.workspaceMove.abandon
 		.mutate({
 			workspaceMoveId,
-			error: isAbort(error)
-				? MOVE_CANCELLED
-				: rawErrorMessage(error).slice(0, 2000) || "The move could not start",
+			error:
+				cancelled || isAbort(error)
+					? MOVE_CANCELLED
+					: rawErrorMessage(error).slice(0, 2000) || "The move could not start",
 		})
 		.catch((abandonError: unknown) => {
 			console.warn(

@@ -400,7 +400,7 @@ msgstr "{0, plural, one {Zobrazit ještě # řádek} few {Zobrazit ještě # ř�
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Tímto se do Paradev naimportuje # existující worktree jako pracovní prostor. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.} few {Tímto se do Paradev naimportují # existující worktree jako pracovní prostory. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.} many {Tímto se do Paradev naimportuje # existujícího worktree jako pracovní prostory. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.} other {Tímto se do Paradev naimportuje # existujících worktree jako pracovní prostory. Každý worktree na disku bude sledován a objeví se v postranním panelu. Žádné soubory se nezmění.}}"
 
-#. placeholder {0}: move.chats.total
+#. placeholder {0}: move.chats.total - move.chats.ready
 msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
 msgstr "{0, plural, one {Tento pracovní prostor byl přesunut. Jeho # chat zůstal tady.} few {Tento pracovní prostor byl přesunut. Jeho # chaty zůstaly tady.} many {Tento pracovní prostor byl přesunut. Jeho # chatu zůstalo tady.} other {Tento pracovní prostor byl přesunut. Jeho # chatů zůstalo tady.}}"
 

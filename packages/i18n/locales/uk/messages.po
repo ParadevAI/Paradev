@@ -394,7 +394,7 @@ msgstr "{0, plural, one {Показати ще # рядок} few {Показат
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {# наявний worktree буде імпортовано в Paradev як робочий простір. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} few {# наявні worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} many {# наявних worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} other {# наявного worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.}}"
 
-#. placeholder {0}: move.chats.total
+#. placeholder {0}: move.chats.total - move.chats.ready
 msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
 msgstr "{0, plural, one {Цей робочий простір переміщено. Його # чат залишився тут.} few {Цей робочий простір переміщено. Його # чати залишилися тут.} many {Цей робочий простір переміщено. Його # чатів залишилися тут.} other {Цей робочий простір переміщено. Його # чату залишилося тут.}}"
 
