@@ -2,7 +2,8 @@ import { delimiter } from "node:path";
 import { getBinDir } from "@superset/agent-setup";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../db";
-import { projects, workspaces } from "../db/schema";
+import { workspaces } from "../db/schema";
+import { getProjectIncludingDeleted } from "../projects/local-project-store";
 import { waitForSandboxManagedEnv } from "../runtime/sandbox-managed-env";
 import { buildHostLaunchEnv, waitForTerminalBaseEnv } from "../terminal/env";
 import {
@@ -20,9 +21,7 @@ function workspacePaths(
 		.findFirst({ where: eq(workspaces.id, workspaceId) })
 		.sync();
 	const project = workspace?.projectId
-		? db.query.projects
-				.findFirst({ where: eq(projects.id, workspace.projectId) })
-				.sync()
+		? getProjectIncludingDeleted(db, workspace.projectId)
 		: undefined;
 	return {
 		workspacePath: workspace?.worktreePath ?? "",

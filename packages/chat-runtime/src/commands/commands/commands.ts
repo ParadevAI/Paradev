@@ -269,6 +269,14 @@ export type ResumeSessionInput = Omit<
 	sourceSessionId?: string;
 };
 
+/** A chat whose journal is already here (imported from another host) brought back to life. */
+export type ContinueSessionInput = {
+	sessionId: string;
+	cwd: string;
+	harnessSessionId: string;
+	terminalId?: string;
+};
+
 type ResumedChat = {
 	terminalId: string;
 	sessionId: string;
@@ -287,6 +295,7 @@ export type ChatSessionListEntry = ChatSessionRow & {
 export type ChatCommands = {
 	createSession(input: CreateSessionCommandInput): CreateSessionResult;
 	resumeSession(input: ResumeSessionInput): CreateSessionResult;
+	continueSession(input: ContinueSessionInput): CreateSessionResult;
 	prompt(input: PromptInput): PromptResult;
 	removeQueuedPrompt(input: QueuedPromptInput): void;
 	steerQueuedPrompt(input: QueuedPromptInput): void;
@@ -669,6 +678,46 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			resumedByTerminal.set(input.terminalId, resumed);
 			sendPending(resumed, created.sessionId);
 			return created;
+		},
+
+		continueSession(input) {
+			const session = options.sessions.get(input.sessionId);
+			if (!session)
+				throw new Error(`chat session ${input.sessionId} not found`);
+			const live = options.live.get(input.sessionId);
+			if (live && live.state.status !== "dead") {
+				return { sessionId: input.sessionId, epoch: session.epoch };
+			}
+			if (!options.live.supports(session.harness)) {
+				throw new Error(`unknown harness ${session.harness}`);
+			}
+			const opened = options.journal.open({
+				sessionId: input.sessionId,
+				scopeId: session.scopeId,
+				harness: session.harness,
+				harnessSessionId: input.harnessSessionId,
+			});
+			// Removes the dead entry at once, so `create` can take its id.
+			if (live) {
+				void options.live
+					.dispose(input.sessionId)
+					.catch((error: unknown) =>
+						console.warn(
+							`[chat-runtime] could not dispose the dead agent of ${input.sessionId}`,
+							error,
+						),
+					);
+			}
+			options.live.create({
+				sessionId: input.sessionId,
+				scopeId: session.scopeId,
+				harness: session.harness,
+				cwd: input.cwd,
+				// The history is already in the journal: replaying it again would show it twice.
+				resume: { harnessSessionId: input.harnessSessionId, quiet: true },
+				terminalId: input.terminalId,
+			});
+			return { sessionId: input.sessionId, epoch: opened.epoch };
 		},
 
 		prompt(input) {

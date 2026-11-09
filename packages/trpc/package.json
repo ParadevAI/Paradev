@@ -52,6 +52,10 @@
 			"types": "./src/router/integration/linear/lookup.ts",
 			"default": "./src/router/integration/linear/lookup.ts"
 		},
+		"./chat-history-schema": {
+			"types": "./src/router/chat-history/schema.ts",
+			"default": "./src/router/chat-history/schema.ts"
+		},
 		"./page-schema": {
 			"types": "./src/router/page/schema.ts",
 			"default": "./src/router/page/schema.ts"
@@ -108,6 +112,10 @@
 			"types": "./src/lib/integrations/*/index.ts",
 			"default": "./src/lib/integrations/*/index.ts"
 		},
+		"./chat-move-run": {
+			"types": "./src/router/chat-move/run.ts",
+			"default": "./src/router/chat-move/run.ts"
+		},
 		"./cloud-workspace-provision": {
 			"types": "./src/router/cloud-workspace/provision.ts",
 			"default": "./src/router/cloud-workspace/provision.ts"
@@ -162,7 +170,7 @@
 		"@googleapis/gmail": "18.0.0",
 		"@linear/sdk": "68.1.1",
 		"@microsoft/microsoft-graph-client": "3.0.7",
-		"@modelcontextprotocol/sdk": "1.31.0",
+		"@modelcontextprotocol/sdk": "1.32.0",
 		"@notionhq/client": "5.25.2",
 		"@octokit/app": "16.1.2",
 		"@octokit/core": "7.0.8",
@@ -170,6 +178,7 @@
 		"@slack/web-api": "7.15.0",
 		"@superset/agent-harness": "workspace:*",
 		"@superset/auth": "workspace:*",
+		"@superset/chat": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/email": "workspace:*",
 		"@superset/i18n": "workspace:*",
@@ -191,7 +200,7 @@
 		"resend": "6.18.0",
 		"superjson": "2.2.6",
 		"undici": "7.30.0",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@microsoft/microsoft-graph-types": "2.43.1",

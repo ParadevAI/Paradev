@@ -134,6 +134,14 @@ msgstr "{0, plural, one {# değişen dosya} other {# değişen dosya}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {# sohbet kapatıldı}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# sohbet taşınamadı. Yeniden denemek için açın.} other {# sohbet taşınamadı. Yeniden denemek için açın.}}"
+
+#. placeholder {0}: skipped.length
+msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
+msgstr "{0, plural, one {# sohbet eski çalışma alanında kaldı} other {# sohbet eski çalışma alanında kaldı}}"
+
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
 msgstr "{0, plural, one {# yorum eklendi} other {# yorum eklendi}}"
@@ -353,6 +361,10 @@ msgstr "{0, plural, one {Linear issue'su} other {Linear issue'su}}"
 #. placeholder {0}: selectedWorkspaces.length
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Seçili # çalışma alanını bir gruba taşı} other {Seçili # çalışma alanını bir gruba taşı}}"
+
+#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
+msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
+msgstr "{0, plural, one {# sohbet buraya taşınıyor…} other {# sohbet buraya taşınıyor…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -831,6 +843,9 @@ msgstr "{0} kontrolden {completed} tanesi tamamlandı"
 msgid "{completed} of {total} completed"
 msgstr "{total} adımdan {completed} tanesi tamamlandı"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (çevrimdışı)"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle} yazı tipi boyutu"
 
@@ -988,6 +1003,9 @@ msgstr "{duration, plural, one {# saniye düşündü} other {# saniye düşünd�
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "Bu çalışma alanındaki {entryPath} başka bir organizasyonda zaten sayfa olarak yayımlanmış. Dosyayı taşı ya da o sayfanın kimliğiyle yayımla."
 
+msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
+msgstr "{failed, plural, one {# sohbet bilgisayara taşınamadı} other {# sohbet bilgisayara taşınamadı}}"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# başarısız} other {# başarısız}}"
 
@@ -1097,6 +1115,9 @@ msgstr "{localHostName} (bu cihaz)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
+msgstr "{messageCount, plural, one {Konuşma kopyalanıyor (# mesaj)} other {Konuşma kopyalanıyor (# mesaj)}}"
 
 #. placeholder {0}: gaps.length
 msgid "{met} of {0} objectives carrying for {nextLabel} — {laggingLabels} furthest behind."
@@ -1290,6 +1311,9 @@ msgstr "GB-saat başına {rate}. Aylık havuzdan sonra kullanılır ve süresi d
 msgid "{readPercent}% read"
 msgstr "%{readPercent} okundu"
 
+msgid "{ready} of {total} chats moved here"
+msgstr "{total} sohbetten {ready} tanesi buraya taşındı"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
 msgstr "{reason}"
@@ -1333,6 +1357,9 @@ msgstr "{starCount} yıldız ve artıyor"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomasyon başlatıldı} other {# otomasyon başlatıldı}}"
 
+msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
+msgstr "{stayed, plural, one {Bu çalışma alanı taşındı. # sohbet burada kaldı.} other {Bu çalışma alanı taşındı. # sohbet burada kaldı.}}"
+
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# alt ajan çalışıyor} other {# alt ajan çalışıyor}}"
 
@@ -1356,6 +1383,9 @@ msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'�
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {# sohbetten {done} tanesi taşındı} other {# sohbetten {done} tanesi taşındı}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {# kontrolün tümü geçti} other {# kontrolün tümü geçti}}"
@@ -1976,6 +2006,12 @@ msgstr "{0} öğesini çalışma alanına ekle"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} eklensin mi?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Önce {repositoryName} deposunu {computer} üzerinde proje olarak ekleyin"
+
+msgid "Add {repositoryName} as a project on this computer first"
+msgstr "Önce {repositoryName} deposunu bu bilgisayarda proje olarak ekleyin"
 
 msgid "Add a comment…"
 msgstr "Yorum ekle…"
@@ -3925,6 +3961,9 @@ msgstr "Düzenlemeleri iptal et"
 msgid "Cancel invite"
 msgstr "Daveti iptal et"
 
+msgid "Cancel move"
+msgstr "Taşımayı iptal et"
+
 msgid "Cancel plan"
 msgstr "Planı iptal et"
 
@@ -5620,6 +5659,9 @@ msgstr "Tarama geçmişinizi ve oturum bilgilerinizi başka bir tarayıcıdan Pa
 msgid "Copy your key now — you won't be able to see it again."
 msgstr "Anahtarınızı şimdi kopyalayın — bir daha göremezsiniz."
 
+msgid "Copying the conversation"
+msgstr "Konuşma kopyalanıyor"
+
 msgid "Copyright or trademark"
 msgstr "Telif hakkı veya ticari marka"
 
@@ -5958,11 +6000,17 @@ msgstr "Yeni bir worktree'ye çatallanamadı"
 msgid "Couldn't branch the conversation"
 msgstr "Konuşma çatallanamadı"
 
+msgid "Couldn't cancel the move"
+msgstr "Taşıma iptal edilemedi"
+
 msgid "Couldn't change the routine"
 msgstr "Rutin değiştirilemedi"
 
 msgid "Couldn't check"
 msgstr "Kontrol edilemedi"
+
+msgid "Couldn't check the move"
+msgstr "Taşıma kontrol edilemedi"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Bu üyeyi kaldırmanın nelere etki edeceği kontrol edilemedi"
@@ -6008,6 +6056,12 @@ msgstr "Hazırlanmamış değişiklikler atılamadı"
 
 msgid "Couldn't edit the message"
 msgstr "Mesaj düzenlenemedi"
+
+msgid "Couldn't end the move"
+msgstr "Taşıma sonlandırılamadı"
+
+msgid "Couldn't find how this chat's move is going. If it didn't move, it is still in the workspace it came from."
+msgstr "Bu sohbetin taşınmasının ne durumda olduğu bilinmiyor. Taşınmadıysa hâlâ geldiği çalışma alanındadır."
 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Çalışma alanlarını silme işlemi tamamlanamadı"
@@ -6064,6 +6118,9 @@ msgstr "İncelemeye hazır olarak işaretlenemedi"
 
 msgid "Couldn't merge pull request"
 msgstr "Pull request birleştirilemedi"
+
+msgid "Couldn't move {name}"
+msgstr "{name} taşınamadı"
 
 msgid "Couldn't move the subagent to the background"
 msgstr "Alt ajan arka plana taşınamadı"
@@ -6155,6 +6212,9 @@ msgstr "Rutin kaydedilemedi"
 msgid "Couldn't save your choice. Try again."
 msgstr "Seçiminiz kaydedilemedi. Tekrar deneyin."
 
+msgid "Couldn't search your chats"
+msgstr "Sohbetleriniz aranamadı"
+
 msgid "Couldn't send comment"
 msgstr "Yorum gönderilemedi"
 
@@ -6217,6 +6277,9 @@ msgstr "Sohbet durdurulamadı"
 
 msgid "Couldn't take a screenshot"
 msgstr "Ekran görüntüsü alınamadı"
+
+msgid "Couldn't try the move again"
+msgstr "Taşıma yeniden denenemedi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Dosya değişiklikleri geri alınamadı."
@@ -9312,6 +9375,9 @@ msgstr "iPhone ve iPad uygulamasını edinin"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
 
+msgid "Getting the computer ready"
+msgstr "Bilgisayar hazırlanıyor"
+
 msgid "Getting Work Done"
 msgstr "İş Bitirme"
 
@@ -10537,6 +10603,9 @@ msgstr "Eklentileri eşitleme bitince görünür."
 
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Seçtiğiniz bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
 
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz — Paradev tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
@@ -11983,6 +12052,9 @@ msgstr "çoğu geliştirici"
 msgid "Most of software history"
 msgstr "Yazılım tarihinin çoğu"
 
+msgid "Move"
+msgstr "Taşı"
+
 msgid "Move {count} to Group"
 msgstr "{count} öğeyi gruba taşı"
 
@@ -11992,8 +12064,26 @@ msgstr "{name} öğesini arka plana taşı"
 msgid "Move cloud work"
 msgstr "Bulut işinizi taşıyın"
 
+msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
+msgstr "Odağı ana sekmeler ile sağ kenar çubuğu arasında taşı ve kapalıysa kenar çubuğunu aç"
+
+msgid "Move this workspace to a computer?"
+msgstr "Bu çalışma alanı bir bilgisayara taşınsın mı?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Bu çalışma alanı buluta taşınsın mı?"
+
+msgid "Move to a computer"
+msgstr "Bir bilgisayara taşı"
+
+msgid "Move to another computer"
+msgstr "Başka bir bilgisayara taşı"
+
 msgid "Move to background"
 msgstr "Arka plana taşı"
+
+msgid "Move to cloud"
+msgstr "Buluta taşı"
 
 msgid "Move to group"
 msgstr "Gruba taşı"
@@ -12012,6 +12102,21 @@ msgstr "Ajanlarınızı {shutdownDate} tarihinden önce taşıyın."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\", {group} grubuna taşındı"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name}, {destination} hedefine taşındı"
+
+msgid "Moving {name} to {destination}"
+msgstr "{name}, {destination} hedefine taşınıyor"
+
+msgid "Moving this chat here"
+msgstr "Bu sohbet buraya taşınıyor"
+
+msgid "Moving this workspace here…"
+msgstr "Bu çalışma alanı buraya taşınıyor…"
+
+msgid "Moving this workspace…"
+msgstr "Bu çalışma alanı taşınıyor…"
 
 msgid "Multi-select"
 msgstr "Çoklu seçim"
@@ -12326,6 +12431,9 @@ msgstr "Sonraki görsel"
 
 msgid "Next match"
 msgstr "Sonraki eşleşme"
+
+msgid "Next Right Sidebar Tab"
+msgstr "Sağ kenar çubuğunda sonraki sekme"
 
 #. placeholder {0}: formatDateTimeInTimezone( new Date(automation.nextRunAt), automation.timezone ?? "UTC", )
 msgid "Next run {0}"
@@ -12752,6 +12860,9 @@ msgstr "Kuruluş seçilmedi"
 
 msgid "No other chats here"
 msgstr "Burada başka sohbet yok"
+
+msgid "No other computer is set up for this account."
+msgstr "Bu hesap için başka bir bilgisayar ayarlanmamış."
 
 msgid "No pages match"
 msgstr "Eşleşen sayfa yok"
@@ -13978,6 +14089,9 @@ msgstr "Genel komut paletini aç"
 msgid "Open the new workspace modal"
 msgstr "Yeni çalışma alanı penceresini aç"
 
+msgid "Open the original workspace"
+msgstr "Orijinal çalışma alanını aç"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Komut paletinde kaynak kullanımı görünümünü aç"
 
@@ -15046,6 +15160,9 @@ msgstr "Önceki eşleşme"
 
 msgid "Previous prompts"
 msgstr "Önceki istemler"
+
+msgid "Previous Right Sidebar Tab"
+msgstr "Sağ kenar çubuğunda önceki sekme"
 
 msgid "Previous slide"
 msgstr "Önceki slayt"
@@ -16509,6 +16626,9 @@ msgstr "\"{workspaceName}\" geri yüklendi"
 
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "\"{workspaceName}\" geri yükleniyor…"
+
+msgid "Restoring Claude's session"
+msgstr "Claude oturumu geri yükleniyor"
 
 msgid "Restoring your session"
 msgstr "Oturumunuz geri yükleniyor"
@@ -18033,6 +18153,12 @@ msgstr "Bu ajan için durum göster ve bildirim gönder."
 msgid "Show text"
 msgstr "Metni göster"
 
+msgid "Show the next tab in the right sidebar without moving focus"
+msgstr "Odağı taşımadan sağ kenar çubuğunda sonraki sekmeyi göster"
+
+msgid "Show the previous tab in the right sidebar without moving focus"
+msgstr "Odağı taşımadan sağ kenar çubuğunda önceki sekmeyi göster"
+
 msgid "Show the triggering payload"
 msgstr "Tetikleyen yükü göster"
 
@@ -18429,6 +18555,9 @@ msgstr "Başka bir şey mi? Kendi yanıtınızı yazın"
 msgid "Something went wrong"
 msgstr "Bir şeyler ters gitti"
 
+msgid "Something went wrong during the move."
+msgstr "Taşıma sırasında bir şeyler ters gitti."
+
 msgid "Something went wrong."
 msgstr "Bir şeyler ters gitti."
 
@@ -18748,6 +18877,9 @@ msgstr "Aracı başlatılıyor…"
 msgid "Starting the simulator…"
 msgstr "Simülatör başlatılıyor…"
 
+msgid "Starting the workspace"
+msgstr "Çalışma alanı başlatılıyor"
+
 msgid "Starting up. This should only take a moment."
 msgstr "Başlatılıyor. Yalnızca kısa bir süre alacaktır."
 
@@ -18869,6 +19001,9 @@ msgstr "Durduruldu"
 
 msgid "Stopped by the usage limit"
 msgstr "Kullanım sınırı nedeniyle durduruldu"
+
+msgid "Stopped moving {name}"
+msgstr "{name} taşınması durduruldu"
 
 msgid "Stopping the agent in {what}"
 msgstr "{what} içindeki ajan durduruluyor"
@@ -19470,6 +19605,9 @@ msgstr "Bu hesap artık bağlı değil — başka bir hesap seçin."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Bu aracı oturumunda açılacak bir konuşma yok — başlatıldı ama hiç istek almadı."
 
+msgid "That computer can't be reached"
+msgstr "Bu bilgisayara ulaşılamıyor"
+
 msgid "That endpoint could not be resolved."
 msgstr "Bu uç nokta çözümlenemedi."
 
@@ -19567,6 +19705,9 @@ msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı öde
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
 
+msgid "the cloud"
+msgstr "bulut"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
 
@@ -19584,6 +19725,9 @@ msgstr "Bağlantı zaman aşımına uğradı"
 
 msgid "The connection was closed"
 msgstr "Bağlantı kapatıldı"
+
+msgid "The connection was lost."
+msgstr "Bağlantı koptu."
 
 msgid "The current prompt will be replaced with the selected version. A new \"Restored\" entry will be added to history so you can undo this."
 msgstr "Geçerli istem, seçilen sürümle değiştirilecek. Bunu geri alabilmeniz için geçmişe yeni bir \"Geri yüklendi\" kaydı eklenecek."
@@ -19741,6 +19885,18 @@ msgstr "Birleştirilen ajan PR'larının çoğu yalnızca inceleme gerektirir, h
 
 msgid "The model declined to continue"
 msgstr "Model devam etmeyi reddetti"
+
+msgid "The move into this workspace failed."
+msgstr "Bu çalışma alanına taşıma başarısız oldu."
+
+msgid "The move service couldn't be reached."
+msgstr "Taşıma hizmetine ulaşılamadı."
+
+msgid "The move stopped responding, so it was ended."
+msgstr "Taşıma yanıt vermeyi bıraktı, bu yüzden sonlandırıldı."
+
+msgid "The move was cancelled."
+msgstr "Taşıma iptal edildi."
 
 msgid "The name of your organization or team"
 msgstr "Kuruluşunuzun veya takımınızın adı"
@@ -19931,6 +20087,9 @@ msgstr "Bu klasörlerde hâlâ dosyalarınız var, ancak yeni Paradev'e kendili�
 msgid "These ports are still in use"
 msgstr "Bu portlar hâlâ kullanımda"
 
+msgid "They are still in the original workspace. Open each one to try again."
+msgstr "Hâlâ orijinal çalışma alanındalar. Yeniden denemek için her birini açın."
+
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Zaten sahip olduğunuz abonelikler ve anahtarlarla çalışırlar."
 
@@ -20001,11 +20160,17 @@ msgstr "Bu geri alınamaz."
 msgid "This channel is archived"
 msgstr "Bu kanal arşivlendi"
 
+msgid "This chat couldn't move here. It is still in the workspace it came from."
+msgstr "Bu sohbet buraya taşınamadı. Geldiği çalışma alanında duruyor."
+
 msgid "This chat has ended."
 msgstr "Bu sohbet sona erdi."
 
 msgid "This chat is empty."
 msgstr "Bu sohbet boş."
+
+msgid "This chat is long, so only its latest part is shown. All of it opens once the workspace starts."
+msgstr "Bu sohbet uzun, bu yüzden yalnızca en son kısmı gösteriliyor. Çalışma alanı başlayınca tamamı açılır."
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Bu sohbet kaldırılmış olabilir veya erişiminiz olmayabilir."
@@ -20033,6 +20198,15 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
+
+msgid "this computer"
+msgstr "bu bilgisayar"
+
+msgid "This computer"
+msgstr "Bu bilgisayar"
+
+msgid "This computer's host is not running"
+msgstr "Bu bilgisayarın host hizmeti çalışmıyor"
 
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
@@ -20064,6 +20238,9 @@ msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağla
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
 
+msgid "This environment opens {environmentRepository}, not {repository}"
+msgstr "Bu ortam {repository} değil, {environmentRepository} açar"
+
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Bu ortamın depoları sabittir; değiştirmek için bir çalışma alanını yeniden yükseltin"
 
@@ -20093,6 +20270,9 @@ msgstr "Bu davet zaten kabul edilmiş."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Bu davet bağlantısı geçersiz veya süresi dolmuş."
+
+msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
+msgstr "Bu, normalden uzun sürüyor. Aşağıdaki sohbet son kaydedilen kopyası; çalışma alanı başlayınca gerçekten açılır."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
 msgstr "Bu normalden uzun sürüyor. Sandbox hâlâ imajını çekiyor olabilir — bu pencere açık olsa da olmasa da devam eder."
@@ -20144,6 +20324,9 @@ msgstr "Bu model kullanılamıyor"
 
 msgid "This month"
 msgstr "Bu ay"
+
+msgid "This move stopped. The chat is still in its old workspace."
+msgstr "Bu taşıma durdu. Sohbet hâlâ eski çalışma alanında."
 
 msgid "This only changes the display name, not the branch."
 msgstr "Bu yalnızca görünen adı değiştirir, dalı değil."
@@ -20353,11 +20536,17 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 msgid "This workspace"
 msgstr "Bu çalışma alanı"
 
+msgid "This workspace couldn't move. It is unchanged."
+msgstr "Bu çalışma alanı taşınamadı. Değişmedi."
+
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."
+
+msgid "This workspace moved"
+msgstr "Bu çalışma alanı taşındı"
 
 msgid "This workspace record still exists, but its worktree folder is no longer on this host. Terminals and file actions are unavailable."
 msgstr "Bu çalışma alanı kaydı hâlâ var, ancak worktree klasörü artık bu host'ta değil. Terminaller ve dosya eylemleri kullanılamıyor."
@@ -20478,6 +20667,9 @@ msgstr "Sağ kenar çubuğunu aç/kapat"
 
 msgid "Toggle Right Sidebar"
 msgstr "Sağ kenar çubuğunu aç/kapat"
+
+msgid "Toggle Right Sidebar Focus"
+msgstr "Sağ kenar çubuğu odağını değiştir"
 
 msgid "Toggle Scripts Bar"
 msgstr "Betikler çubuğunu aç/kapat"
@@ -21128,6 +21320,12 @@ msgstr "Güncelleme gerekli"
 msgid "update the branch prefix"
 msgstr "dal ön ekini güncelleme"
 
+msgid "Update the host service on both computers and try again."
+msgstr "Her iki bilgisayardaki host hizmetini güncelleyip yeniden deneyin."
+
+msgid "Update the host service on this device and try again."
+msgstr "Bu cihazdaki host hizmetini güncelleyip yeniden deneyin."
+
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
 
@@ -21396,6 +21594,9 @@ msgstr "Sürüm {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "{version} sürümü bir sonraki yeniden başlatmada yüklenecek."
 
+msgid "Version {version} is available"
+msgstr "{version} sürümü kullanılabilir"
+
 msgid "Version {version} is the latest version."
 msgstr "{version} sürümü en son sürümdür."
 
@@ -21559,6 +21760,9 @@ msgstr "Alt ajanın ilk mesajı bekleniyor…"
 
 msgid "Waiting for your input"
 msgstr "Girdinizi bekliyor"
+
+msgid "Waking the workspace…"
+msgstr "Çalışma alanı uyandırılıyor…"
 
 msgid "Waking up workspace"
 msgstr "Çalışma alanı uyandırılıyor"
@@ -22558,8 +22762,14 @@ msgstr "v1 projeleriniz ve çalışma alanlarınız yeni Paradev'e aktarılıyor
 msgid "Your version: {currentVersion}"
 msgstr "Sürümünüz: {currentVersion}"
 
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Commit edilmemiş değişiklikler dahil çalışmanız uzak depoda yeni bir dala gönderilir. Seçtiğiniz ortamda bu daldan bir bulut çalışma alanı başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler burada kalır."
+
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex için cihaz koduyla girişi çalışma alanı yöneticiniz açar."
+
+msgid "Your workspace is unchanged. You can move it again in a few minutes."
+msgstr "Çalışma alanınız değişmedi. Birkaç dakika sonra yeniden taşıyabilirsiniz."
 
 msgid "Zap"
 msgstr "Şimşek"

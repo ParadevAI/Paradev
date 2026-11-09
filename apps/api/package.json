@@ -15,7 +15,7 @@
 		"@anthropic-ai/sdk": "0.78.0",
 		"@better-auth/oauth-provider": "1.6.22",
 		"@linear/sdk": "68.1.1",
-		"@modelcontextprotocol/sdk": "1.31.0",
+		"@modelcontextprotocol/sdk": "1.32.0",
 		"@notionhq/client": "5.25.2",
 		"@octokit/app": "16.1.2",
 		"@octokit/rest": "22.0.1",
@@ -48,7 +48,7 @@
 		"rrule": "2.8.1",
 		"stripe": "20.4.1",
 		"svix": "2.8.0",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@lingui/swc-plugin": "6.7.1",

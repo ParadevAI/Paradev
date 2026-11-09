@@ -211,6 +211,13 @@ export const FEATURE_FLAGS = {
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
 	/**
+	 * Moving a workspace and its chats to the cloud or to another computer:
+	 * shows the Move items, and gates
+	 * `workspaceMove.begin` server-side. Moving to the cloud also needs
+	 * `cloud-workspaces`.
+	 */
+	WORKSPACE_MOVES: "workspace-moves",
+	/**
 	 * Lets the Slack agent answer replies in a thread it has already replied
 	 * in without an @-mention. Evaluated per Slack team; off, unloaded or
 	 * offline all mean mention-only.

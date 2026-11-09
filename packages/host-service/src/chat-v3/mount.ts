@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { NodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
-import type { DeltaChannel } from "@superset/chat/protocol";
+import type { DeltaChannel, DurableEnvelope } from "@superset/chat/protocol";
 import { isDurableEnvelope, parseCursor } from "@superset/chat/protocol";
 import type {
 	ChatRuntime,
@@ -15,6 +15,7 @@ import type {
 	WsSinkSocket,
 } from "@superset/chat-runtime";
 import {
+	CHAT_DB_FILENAME,
 	CodexAdapter,
 	createChatRouter,
 	createChatRuntime,
@@ -132,6 +133,8 @@ function harnessRegistry(
 
 export type ChatV3Mount = {
 	runtime(): ChatRuntime;
+	/** The runtime, without creating chat.db on a host that has never had a chat. */
+	existingRuntime(): ChatRuntime | null;
 	closeScope(scopeId: string): Promise<void>;
 	recordUnfinished(): void;
 	resumeAfterUpdate(): void;
@@ -151,6 +154,7 @@ export function createChatV3Mount(options: {
 	dbPath: string;
 	agents?: ChatAgentBridge;
 	onSessionChanged?: (change: ChatSessionChange) => void;
+	onAppend?: (envelope: DurableEnvelope) => void;
 }): ChatV3Mount {
 	let built: ChatRuntime | null = null;
 	const markerPath = join(
@@ -216,6 +220,7 @@ export function createChatV3Mount(options: {
 			observer,
 			checkpoints: createGitCheckpoints(),
 			onSessionChanged: options.onSessionChanged,
+			onAppend: options.onAppend,
 		});
 		return built;
 	};
@@ -228,6 +233,11 @@ export function createChatV3Mount(options: {
 
 	return {
 		runtime,
+		existingRuntime: () =>
+			built ??
+			(existsSync(join(dirname(options.dbPath), CHAT_DB_FILENAME))
+				? runtime()
+				: null),
 		closeScope: async (scopeId) => {
 			await built?.commands.closeScope(scopeId);
 		},

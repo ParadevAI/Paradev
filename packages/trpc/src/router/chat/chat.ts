@@ -5,6 +5,7 @@ import { SUPERSET_CHAT_MODELS } from "@superset/shared/agent-models";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 
@@ -174,6 +175,21 @@ export const chatRouter = {
 				return { deleted, txid };
 			});
 			const { deleted, txid } = result;
+			if (deleted) {
+				try {
+					await reapOrphanFiles(
+						await detachAll({
+							parentKind: "chat_session",
+							parentIds: [input.sessionId],
+						}),
+					);
+				} catch (error) {
+					console.error("[chat] session bundle cleanup failed after delete", {
+						sessionId: input.sessionId,
+						error,
+					});
+				}
+			}
 
 			return { deleted: !!deleted, txid };
 		}),
