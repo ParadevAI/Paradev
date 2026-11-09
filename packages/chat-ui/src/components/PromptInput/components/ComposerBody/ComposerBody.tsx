@@ -13,7 +13,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
-import { $getNearestNodeOfType } from "@lexical/utils";
+import { $getNearestNodeOfType, IS_APPLE } from "@lexical/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { isLargePaste, normalizePastedText } from "@superset/chat/core";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
@@ -38,6 +38,7 @@ import {
 	FORMAT_TEXT_COMMAND,
 	INDENT_CONTENT_COMMAND,
 	INSERT_PARAGRAPH_COMMAND,
+	isExactShortcutMatch,
 	KEY_ARROW_RIGHT_COMMAND,
 	KEY_BACKSPACE_COMMAND,
 	KEY_DELETE_COMMAND,
@@ -748,15 +749,20 @@ export function ComposerBody({
 				const key = event.key.toLowerCase();
 				const mod = event.metaKey || event.ctrlKey;
 				pasteAsTextRef.current = event.shiftKey && mod && key === "v";
-				// ⌘B and ⌘I format here; app hotkeys on the same keys must not also fire.
+				const formatShortcut = { ctrlKey: !IS_APPLE, metaKey: IS_APPLE };
 				if (
-					mod &&
-					!event.shiftKey &&
-					!event.altKey &&
-					(key === "b" || key === "i")
+					!isExactShortcutMatch(event, "b", formatShortcut) &&
+					!isExactShortcutMatch(event, "i", formatShortcut)
 				)
+					return false;
+				// ⌘B and ⌘I format a selection; with none, they go to the app hotkeys.
+				const selection = $getSelection();
+				if ($isRangeSelection(selection) && !selection.isCollapsed()) {
 					event.stopPropagation();
-				return false;
+					return false;
+				}
+				event.preventDefault();
+				return true;
 			},
 			COMMAND_PRIORITY_LOW,
 		);
