@@ -134,6 +134,10 @@ msgstr "{0, plural, one {#个已更改文件} other {#个已更改文件}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {已关闭 # 个聊天}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, other {# 个聊天未能移动。打开后重试。}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {# 个聊天留在了原工作区} other {# 个聊天留在了原工作区}}"
@@ -839,6 +843,9 @@ msgstr "{0}项检查中已完成{completed}项"
 msgid "{completed} of {total} completed"
 msgstr "已完成 {completed}/{total} 项"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName}（离线）"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle}字号"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {已移动 {done}/# 个聊天}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
@@ -1993,6 +2003,9 @@ msgstr "将{0}添加到工作区"
 
 msgid "Add {localizedName}?"
 msgstr "要添加“{localizedName}”吗？"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "请先在 {computer} 上将 {repositoryName} 添加为项目"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "请先将 {repositoryName} 添加为此电脑上的项目"
@@ -6088,14 +6101,11 @@ msgstr "无法标记为可评审"
 msgid "Couldn't merge pull request"
 msgstr "无法合并拉取请求"
 
+msgid "Couldn't move {name}"
+msgstr "无法移动 {name}"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "无法将子智能体移到后台"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "无法将此工作区移至云端"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "无法将此工作区移到此电脑"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
@@ -6522,9 +6532,6 @@ msgstr "正在创建任务"
 
 msgid "Creating a workspace"
 msgstr "正在创建工作区"
-
-msgid "Creating a workspace on this computer…"
-msgstr "正在此电脑上创建工作区…"
 
 msgid "Creating PR..."
 msgstr "正在创建PR…"
@@ -10576,6 +10583,9 @@ msgstr "同步完成后，其插件会显示出来。"
 msgid "Its replies go with it."
 msgstr "其回复也会一并删除。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的更改）会推送到一个新分支。所选电脑上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重启之前，其工作区和终端都不可用，请使用Paradev托盘菜单 > 主机服务 > 重启。"
 
@@ -12021,6 +12031,9 @@ msgstr "多数开发者"
 msgid "Most of software history"
 msgstr "软件史的大部分时间"
 
+msgid "Move"
+msgstr "移动"
+
 msgid "Move {count} to Group"
 msgstr "将{count}个移动到分组"
 
@@ -12030,11 +12043,17 @@ msgstr "将 {name} 移到后台"
 msgid "Move cloud work"
 msgstr "迁移云端工作"
 
+msgid "Move this workspace to a computer?"
+msgstr "将此工作区移至一台电脑？"
+
 msgid "Move this workspace to the cloud?"
 msgstr "将此工作区移至云端？"
 
-msgid "Move this workspace to this computer?"
-msgstr "将此工作区移到此电脑？"
+msgid "Move to a computer"
+msgstr "移至一台电脑"
+
+msgid "Move to another computer"
+msgstr "移至另一台电脑"
 
 msgid "Move to background"
 msgstr "移到后台"
@@ -12057,11 +12076,14 @@ msgstr "移动到标签页"
 msgid "Move your agents before {shutdownDate}."
 msgstr "请在{shutdownDate}之前迁移你的智能体。"
 
-msgid "Move to this computer"
-msgstr "移到此电脑"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "已将“{name}”移动到 {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "已将 {name} 移至{destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "正在将 {name} 移至{destination}"
 
 msgid "Moving this chat here"
 msgstr "正在将此聊天移到这里"
@@ -12071,9 +12093,6 @@ msgstr "正在将此工作区移到这里…"
 
 msgid "Moving this workspace…"
 msgstr "正在移动此工作区…"
-
-msgid "Moving..."
-msgstr "正在移动..."
 
 msgid "Multi-select"
 msgstr "多选"
@@ -12814,6 +12833,9 @@ msgstr "未选择组织"
 
 msgid "No other chats here"
 msgstr "这里没有其他聊天"
+
+msgid "No other computer is set up for this account."
+msgstr "此账户没有设置其他电脑。"
 
 msgid "No pages match"
 msgstr "没有匹配的页面"
@@ -17076,12 +17098,6 @@ msgstr "已保存到“下载”文件夹"
 msgid "Saving as an environment..."
 msgstr "正在保存为环境..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "正在保存云端工作区的工作及其聊天…"
-
-msgid "Saving your work and its chats…"
-msgstr "正在保存你的工作及其聊天…"
-
 msgid "Saving..."
 msgstr "正在保存..."
 
@@ -18816,9 +18832,6 @@ msgstr "正在启动云端工作区"
 msgid "Starting the agent…"
 msgstr "正在启动智能体…"
 
-msgid "Starting the cloud workspace…"
-msgstr "正在启动云端工作区…"
-
 msgid "Starting the simulator…"
 msgstr "正在启动模拟器…"
 
@@ -19547,6 +19560,9 @@ msgstr "该账号已断开连接，请选择其他账号。"
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "该智能体会话还没有可打开的对话——它已启动但从未收到指令。"
 
+msgid "That computer can't be reached"
+msgstr "无法连接到那台电脑"
+
 msgid "That endpoint could not be resolved."
 msgstr "无法解析该端点。"
 
@@ -19644,11 +19660,11 @@ msgstr "变更立即生效。您只需支付本期剩余时间的差价。"
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "聊天保持不变。自本轮以来被任何人编辑过的文件将保持不动并列出。"
 
+msgid "the cloud"
+msgstr "云端"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "云端工作区本应已启动，但没有及时响应。下次运行时会重试。"
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "云端工作区的工作（包括未提交的更改）会推送到一个新分支。此电脑上的工作区会从该分支启动，每个 Claude 聊天都将在那里继续。正在工作的智能体会先停止。终端和其他聊天会留在云端。"
 
 msgid "The code expired. Start again."
 msgstr "代码已过期。请重新开始。"
@@ -20116,6 +20132,12 @@ msgstr "无法启动此云端工作区"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需要最多 30 秒。"
+
+msgid "this computer"
+msgstr "此电脑"
+
+msgid "This computer"
+msgstr "此电脑"
 
 msgid "This computer's host is not running"
 msgstr "此电脑的主机服务未运行"
@@ -21219,6 +21241,9 @@ msgstr "需要更新"
 
 msgid "update the branch prefix"
 msgstr "更新分支前缀"
+
+msgid "Update the host service on both computers and try again."
+msgstr "请更新两台电脑上的主机服务，然后重试。"
 
 msgid "Update the host service on this device and try again."
 msgstr "请更新此设备上的主机服务，然后重试。"

@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# changed file} other {# changed files}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat closed} other {# chats closed}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
@@ -839,6 +843,9 @@ msgstr "{completed} of {0} checks complete"
 msgid "{completed} of {total} completed"
 msgstr "{completed} of {total} completed"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (offline)"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle} font size"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrupted"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {The check passed} other {All # checks passed}}"
@@ -1993,6 +2003,9 @@ msgstr "Add {0} to workspace"
 
 msgid "Add {localizedName}?"
 msgstr "Add {localizedName}?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Add {repositoryName} as a project on {computer} first"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Add {repositoryName} as a project on this computer first"
@@ -6088,14 +6101,11 @@ msgstr "Couldn't mark ready for review"
 msgid "Couldn't merge pull request"
 msgstr "Couldn't merge pull request"
 
+msgid "Couldn't move {name}"
+msgstr "Couldn't move {name}"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Couldn't move the subagent to the background"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "Couldn't move this workspace to the cloud"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "Couldn't move this workspace to this computer"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
@@ -6522,9 +6532,6 @@ msgstr "Creating a task"
 
 msgid "Creating a workspace"
 msgstr "Creating a workspace"
-
-msgid "Creating a workspace on this computer…"
-msgstr "Creating a workspace on this computer…"
 
 msgid "Creating PR..."
 msgstr "Creating PR..."
@@ -10576,6 +10583,9 @@ msgstr "Its plugins appear when the sync finishes."
 msgid "Its replies go with it."
 msgstr "Its replies go with it."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 
@@ -12021,6 +12031,9 @@ msgstr "most developers"
 msgid "Most of software history"
 msgstr "Most of software history"
 
+msgid "Move"
+msgstr "Move"
+
 msgid "Move {count} to Group"
 msgstr "Move {count} to Group"
 
@@ -12030,11 +12043,17 @@ msgstr "Move {name} to background"
 msgid "Move cloud work"
 msgstr "Move cloud work"
 
+msgid "Move this workspace to a computer?"
+msgstr "Move this workspace to a computer?"
+
 msgid "Move this workspace to the cloud?"
 msgstr "Move this workspace to the cloud?"
 
-msgid "Move this workspace to this computer?"
-msgstr "Move this workspace to this computer?"
+msgid "Move to a computer"
+msgstr "Move to a computer"
+
+msgid "Move to another computer"
+msgstr "Move to another computer"
 
 msgid "Move to background"
 msgstr "Move to background"
@@ -12057,11 +12076,14 @@ msgstr "Move to Tab"
 msgid "Move your agents before {shutdownDate}."
 msgstr "Move your agents before {shutdownDate}."
 
-msgid "Move to this computer"
-msgstr "Move to this computer"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "Moved \"{name}\" to {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "Moved {name} to {destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "Moving {name} to {destination}"
 
 msgid "Moving this chat here"
 msgstr "Moving this chat here"
@@ -12071,9 +12093,6 @@ msgstr "Moving this workspace here…"
 
 msgid "Moving this workspace…"
 msgstr "Moving this workspace…"
-
-msgid "Moving..."
-msgstr "Moving..."
 
 msgid "Multi-select"
 msgstr "Multi-select"
@@ -12814,6 +12833,9 @@ msgstr "No organization selected"
 
 msgid "No other chats here"
 msgstr "No other chats here"
+
+msgid "No other computer is set up for this account."
+msgstr "No other computer is set up for this account."
 
 msgid "No pages match"
 msgstr "No pages match"
@@ -17076,12 +17098,6 @@ msgstr "Saved to Downloads"
 msgid "Saving as an environment..."
 msgstr "Saving as an environment..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "Saving the cloud workspace's work and its chats…"
-
-msgid "Saving your work and its chats…"
-msgstr "Saving your work and its chats…"
-
 msgid "Saving..."
 msgstr "Saving..."
 
@@ -18816,9 +18832,6 @@ msgstr "Starting cloud workspace"
 msgid "Starting the agent…"
 msgstr "Starting the agent…"
 
-msgid "Starting the cloud workspace…"
-msgstr "Starting the cloud workspace…"
-
 msgid "Starting the simulator…"
 msgstr "Starting the simulator…"
 
@@ -19547,6 +19560,9 @@ msgstr "That account is no longer connected — choose another."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "That agent session has no conversation to open yet — it was started but never prompted."
 
+msgid "That computer can't be reached"
+msgstr "That computer can't be reached"
+
 msgid "That endpoint could not be resolved."
 msgstr "That endpoint could not be resolved."
 
@@ -19644,11 +19660,11 @@ msgstr "The change starts now. You pay only the difference for the rest of this 
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 
+msgid "the cloud"
+msgstr "the cloud"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "The cloud workspace should have started but didn't answer in time. The next run tries again."
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
 
 msgid "The code expired. Start again."
 msgstr "The code expired. Start again."
@@ -20116,6 +20132,12 @@ msgstr "This cloud workspace can't start"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
+
+msgid "this computer"
+msgstr "this computer"
+
+msgid "This computer"
+msgstr "This computer"
 
 msgid "This computer's host is not running"
 msgstr "This computer's host is not running"
@@ -21219,6 +21241,9 @@ msgstr "Update Required"
 
 msgid "update the branch prefix"
 msgstr "update the branch prefix"
+
+msgid "Update the host service on both computers and try again."
+msgstr "Update the host service on both computers and try again."
 
 msgid "Update the host service on this device and try again."
 msgstr "Update the host service on this device and try again."

@@ -10,7 +10,7 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
-import type { MovableWorkspace } from "../useWorkspaceMoveDirection";
+import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToCloudStage = "saving" | "starting";
 
@@ -124,6 +124,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				);
 			});
 			return {
+				toWorkspaceId: created.id,
 				skipped: [
 					...prepared.skipped,
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),

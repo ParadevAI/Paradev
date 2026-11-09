@@ -42,7 +42,7 @@ import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hook
 import type {
 	MovableWorkspace,
 	WorkspaceMoveDirection,
-} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirection";
+} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
@@ -52,8 +52,8 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	workspaceId: string;
 	/** Null for project-less session workspaces. */
 	projectId: string | null;
-	/** Absent when the workspace can't move between this computer and the cloud. */
-	move?: { direction: WorkspaceMoveDirection; workspace: MovableWorkspace };
+	/** Absent when the workspace can move nowhere. */
+	move?: { directions: WorkspaceMoveDirection[]; workspace: MovableWorkspace };
 	/** Only sessions and project workspaces can join a group. */
 	isSessionWorkspace?: boolean;
 	isInSection?: boolean;
@@ -125,7 +125,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	const showDeleteShortcut =
 		showDeleteHotkey && deleteHotkeyText !== "Unassigned";
 	const canJoinGroup = projectId !== null || isSessionWorkspace;
-	const [isMoveOpen, setIsMoveOpen] = useState(false);
+	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
 	const handleCloseAllPorts = () => {
 		if (isKillingPorts) return;
 		void killPorts(ports);
@@ -252,21 +252,28 @@ export function DashboardSidebarWorkspaceContextMenu({
 					{move && (
 						<>
 							<ContextMenuSeparator />
-							<ContextMenuItem
-								onSelect={() => runAfterClose(() => setIsMoveOpen(true))}
-							>
-								{move.direction === "to-cloud" ? (
-									<>
-										<LuCloudUpload className="size-4 mr-2" />
-										<Trans>Move to cloud</Trans>
-									</>
-								) : (
-									<>
-										<LuLaptop className="size-4 mr-2" />
-										<Trans>Move to this computer</Trans>
-									</>
-								)}
-							</ContextMenuItem>
+							{move.directions.map((direction) => (
+								<ContextMenuItem
+									key={direction}
+									onSelect={() => runAfterClose(() => setMoveOpen(direction))}
+								>
+									{direction === "to-cloud" ? (
+										<>
+											<LuCloudUpload className="size-4 mr-2" />
+											<Trans>Move to cloud</Trans>
+										</>
+									) : (
+										<>
+											<LuLaptop className="size-4 mr-2" />
+											{isLocalWorkspace ? (
+												<Trans>Move to another computer</Trans>
+											) : (
+												<Trans>Move to a computer</Trans>
+											)}
+										</>
+									)}
+								</ContextMenuItem>
+							))}
 						</>
 					)}
 					<ContextMenuSeparator />
@@ -309,12 +316,14 @@ export function DashboardSidebarWorkspaceContextMenu({
 					) : null}
 				</ContextMenuContent>
 			</ContextMenu>
-			{move && isMoveOpen && (
+			{move && moveOpen && (
 				<MoveWorkspaceDialog
-					direction={move.direction}
+					direction={moveOpen}
 					workspace={move.workspace}
-					open={isMoveOpen}
-					onOpenChange={setIsMoveOpen}
+					open
+					onOpenChange={(open) => {
+						if (!open) setMoveOpen(null);
+					}}
 				/>
 			)}
 		</>

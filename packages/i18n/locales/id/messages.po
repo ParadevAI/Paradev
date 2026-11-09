@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# file berubah} other {# file berubah}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {# chat ditutup}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, other {# obrolan tidak dapat dipindahkan. Buka untuk mencoba lagi.}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {# chat tetap di workspace lama} other {# chat tetap di workspace lama}}"
@@ -839,6 +843,9 @@ msgstr "{completed} dari {0} check selesai"
 msgid "{completed} of {total} completed"
 msgstr "{completed} dari {total} selesai"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (offline)"
+
 msgid "{configTitle} font size"
 msgstr "Ukuran font {configTitle}"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {{done} dari # obrolan dipindahkan}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
@@ -1993,6 +2003,9 @@ msgstr "Tambahkan {0} ke workspace"
 
 msgid "Add {localizedName}?"
 msgstr "Tambahkan {localizedName}?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Tambahkan {repositoryName} sebagai proyek di {computer} terlebih dahulu"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Tambahkan {repositoryName} sebagai proyek di komputer ini terlebih dahulu"
@@ -6088,14 +6101,11 @@ msgstr "Tidak dapat menandai siap ditinjau"
 msgid "Couldn't merge pull request"
 msgstr "Tidak bisa merge pull request"
 
+msgid "Couldn't move {name}"
+msgstr "Tidak dapat memindahkan {name}"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Tidak dapat memindahkan subagen ke latar belakang"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "Tidak dapat memindahkan workspace ini ke cloud"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "Tidak dapat memindahkan workspace ini ke komputer ini"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
@@ -6522,9 +6532,6 @@ msgstr "Membuat tugas"
 
 msgid "Creating a workspace"
 msgstr "Membuat workspace"
-
-msgid "Creating a workspace on this computer…"
-msgstr "Membuat workspace di komputer ini…"
 
 msgid "Creating PR..."
 msgstr "Membuat PR…"
@@ -10576,6 +10583,9 @@ msgstr "Plugin-pluginnya muncul setelah sinkronisasi selesai."
 msgid "Its replies go with it."
 msgstr "Balasannya ikut terhapus."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di komputer yang Anda pilih dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Workspace dan terminalnya tidak tersedia sampai layanan ini dimulai ulang — pakai menu tray Paradev > Host Service > Restart."
 
@@ -12021,6 +12031,9 @@ msgstr "sebagian besar developer"
 msgid "Most of software history"
 msgstr "Sebagian besar sejarah perangkat lunak"
 
+msgid "Move"
+msgstr "Pindahkan"
+
 msgid "Move {count} to Group"
 msgstr "Pindahkan {count} ke Grup"
 
@@ -12030,11 +12043,17 @@ msgstr "Pindahkan {name} ke latar belakang"
 msgid "Move cloud work"
 msgstr "Pindahkan pekerjaan cloud"
 
+msgid "Move this workspace to a computer?"
+msgstr "Pindahkan workspace ini ke komputer?"
+
 msgid "Move this workspace to the cloud?"
 msgstr "Pindahkan workspace ini ke cloud?"
 
-msgid "Move this workspace to this computer?"
-msgstr "Pindahkan workspace ini ke komputer ini?"
+msgid "Move to a computer"
+msgstr "Pindahkan ke komputer"
+
+msgid "Move to another computer"
+msgstr "Pindahkan ke komputer lain"
 
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
@@ -12057,11 +12076,14 @@ msgstr "Pindahkan ke Tab"
 msgid "Move your agents before {shutdownDate}."
 msgstr "Pindahkan agen Anda sebelum {shutdownDate}."
 
-msgid "Move to this computer"
-msgstr "Pindahkan ke komputer ini"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" dipindahkan ke {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name} dipindahkan ke {destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "Memindahkan {name} ke {destination}"
 
 msgid "Moving this chat here"
 msgstr "Memindahkan chat ini ke sini"
@@ -12071,9 +12093,6 @@ msgstr "Memindahkan workspace ini ke sini…"
 
 msgid "Moving this workspace…"
 msgstr "Memindahkan workspace ini…"
-
-msgid "Moving..."
-msgstr "Memindahkan..."
 
 msgid "Multi-select"
 msgstr "Pilih banyak"
@@ -12814,6 +12833,9 @@ msgstr "Tidak ada organisasi yang dipilih"
 
 msgid "No other chats here"
 msgstr "Tidak ada obrolan lain di sini"
+
+msgid "No other computer is set up for this account."
+msgstr "Tidak ada komputer lain yang disiapkan untuk akun ini."
 
 msgid "No pages match"
 msgstr "Tidak ada halaman yang cocok"
@@ -17076,12 +17098,6 @@ msgstr "Disimpan ke Downloads"
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "Menyimpan pekerjaan workspace cloud dan chat-nya…"
-
-msgid "Saving your work and its chats…"
-msgstr "Menyimpan pekerjaan Anda dan chat-nya…"
-
 msgid "Saving..."
 msgstr "Menyimpan..."
 
@@ -18816,9 +18832,6 @@ msgstr "Memulai workspace cloud"
 msgid "Starting the agent…"
 msgstr "Memulai agen…"
 
-msgid "Starting the cloud workspace…"
-msgstr "Memulai workspace cloud…"
-
 msgid "Starting the simulator…"
 msgstr "Memulai simulator…"
 
@@ -19547,6 +19560,9 @@ msgstr "Akun itu sudah tidak terhubung — pilih yang lain."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Sesi agen itu belum punya percakapan untuk dibuka — sudah dimulai tetapi belum pernah diberi perintah."
 
+msgid "That computer can't be reached"
+msgstr "Komputer itu tidak dapat dijangkau"
+
 msgid "That endpoint could not be resolved."
 msgstr "Endpoint itu tidak dapat ditemukan."
 
@@ -19644,11 +19660,11 @@ msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa perio
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siapa pun, dibiarkan dan dicantumkan."
 
+msgid "the cloud"
+msgstr "cloud"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Workspace cloud seharusnya sudah berjalan, tetapi tidak merespons tepat waktu. Run berikutnya akan mencoba lagi."
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "Pekerjaan workspace cloud, termasuk perubahan yang belum di-commit, didorong ke branch baru. Workspace di komputer ini dimulai dari branch tersebut, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di cloud."
 
 msgid "The code expired. Start again."
 msgstr "Kode kedaluwarsa. Mulai lagi."
@@ -20116,6 +20132,12 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
+
+msgid "this computer"
+msgstr "komputer ini"
+
+msgid "This computer"
+msgstr "Komputer ini"
 
 msgid "This computer's host is not running"
 msgstr "Host komputer ini tidak berjalan"
@@ -21219,6 +21241,9 @@ msgstr "Pembaruan Diperlukan"
 
 msgid "update the branch prefix"
 msgstr "memperbarui prefix branch"
+
+msgid "Update the host service on both computers and try again."
+msgstr "Perbarui layanan host di kedua komputer, lalu coba lagi."
 
 msgid "Update the host service on this device and try again."
 msgstr "Perbarui layanan host di perangkat ini, lalu coba lagi."

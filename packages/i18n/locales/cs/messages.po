@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# změněný soubor} few {# změněné soubory} many {#
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat zavřen} few {# chaty zavřeny} many {# chatů zavřeno} other {# chatů zavřeno}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# chat se nepodařilo přesunout. Otevřete ho a zkuste to znovu.} few {# chaty se nepodařilo přesunout. Otevřete je a zkuste to znovu.} many {# chatu se nepodařilo přesunout. Otevřete je a zkuste to znovu.} other {# chatů se nepodařilo přesunout. Otevřete je a zkuste to znovu.}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {# chat zůstal v původním pracovním prostoru} few {# chaty zůstaly v původním pracovním prostoru} many {# chatu zůstalo v původním pracovním prostoru} other {# chatů zůstalo v původním pracovním prostoru}}"
@@ -839,6 +843,9 @@ msgstr "Dokončeno {completed} z {0} kontrol"
 msgid "{completed} of {total} completed"
 msgstr "Dokončeno {completed} z {total}"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (offline)"
+
 msgid "{configTitle} font size"
 msgstr "Velikost písma: {configTitle}"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agent
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {Přesunuto {done} z # chatu} few {Přesunuto {done} z # chatů} many {Přesunuto {done} z # chatu} other {Přesunuto {done} z # chatů}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
@@ -1993,6 +2003,9 @@ msgstr "Přidat {0} do pracovního prostoru"
 
 msgid "Add {localizedName}?"
 msgstr "Přidat {localizedName}?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Nejdřív přidejte {repositoryName} jako projekt na počítači {computer}"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto počítači"
@@ -6088,14 +6101,11 @@ msgstr "Nepodařilo se označit jako připravený k revizi"
 msgid "Couldn't merge pull request"
 msgstr "Pull request se nepodařilo sloučit"
 
+msgid "Couldn't move {name}"
+msgstr "{name} se nepodařilo přesunout"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Subagenta se nepodařilo přesunout na pozadí"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "Tento pracovní prostor se nepodařilo přesunout do cloudu"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "Tento pracovní prostor se nepodařilo přesunout na tento počítač"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
@@ -6522,9 +6532,6 @@ msgstr "Vytváří se úkol"
 
 msgid "Creating a workspace"
 msgstr "Vytváří se pracovní prostor"
-
-msgid "Creating a workspace on this computer…"
-msgstr "Vytváří se pracovní prostor na tomto počítači…"
 
 msgid "Creating PR..."
 msgstr "Vytváření PR…"
@@ -10576,6 +10583,9 @@ msgstr "Jeho pluginy se objeví po dokončení synchronizace."
 msgid "Its replies go with it."
 msgstr "Smažou se i odpovědi."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na vybraném počítači začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Její pracovní prostory a terminály nebudou dostupné, dokud se nerestartuje — použijte nabídku Paradev na liště > Host Service > Restart."
 
@@ -12021,6 +12031,9 @@ msgstr "většina vývojářů"
 msgid "Most of software history"
 msgstr "Většina historie softwaru"
 
+msgid "Move"
+msgstr "Přesunout"
+
 msgid "Move {count} to Group"
 msgstr "Přesunout {count} do skupiny"
 
@@ -12030,11 +12043,17 @@ msgstr "Přesunout {name} na pozadí"
 msgid "Move cloud work"
 msgstr "Přesuňte práci z cloudu"
 
+msgid "Move this workspace to a computer?"
+msgstr "Přesunout tento pracovní prostor na počítač?"
+
 msgid "Move this workspace to the cloud?"
 msgstr "Přesunout tento pracovní prostor do cloudu?"
 
-msgid "Move this workspace to this computer?"
-msgstr "Přesunout tento pracovní prostor na tento počítač?"
+msgid "Move to a computer"
+msgstr "Přesunout na počítač"
+
+msgid "Move to another computer"
+msgstr "Přesunout na jiný počítač"
 
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
@@ -12057,11 +12076,14 @@ msgstr "Přesunout na kartu"
 msgid "Move your agents before {shutdownDate}."
 msgstr "Přesuňte své agenty před {shutdownDate}."
 
-msgid "Move to this computer"
-msgstr "Přesunout na tento počítač"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "„{name}“ přesunuto do skupiny {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name} přesunuto do: {destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "Přesouvání {name} do: {destination}"
 
 msgid "Moving this chat here"
 msgstr "Tento chat se přesouvá sem"
@@ -12071,9 +12093,6 @@ msgstr "Sem se přesouvá tento pracovní prostor…"
 
 msgid "Moving this workspace…"
 msgstr "Přesouvá se tento pracovní prostor…"
-
-msgid "Moving..."
-msgstr "Přesouvání..."
 
 msgid "Multi-select"
 msgstr "Výběr více možností"
@@ -12814,6 +12833,9 @@ msgstr "Není vybraná žádná organizace"
 
 msgid "No other chats here"
 msgstr "Žádné další chaty"
+
+msgid "No other computer is set up for this account."
+msgstr "Pro tento účet není nastavený žádný další počítač."
 
 msgid "No pages match"
 msgstr "Žádná stránka neodpovídá"
@@ -17076,12 +17098,6 @@ msgstr "Uloženo do Stažených souborů"
 msgid "Saving as an environment..."
 msgstr "Ukládání jako prostředí..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "Ukládá se práce cloudového pracovního prostoru a jeho chaty…"
-
-msgid "Saving your work and its chats…"
-msgstr "Ukládá se vaše práce a její chaty…"
-
 msgid "Saving..."
 msgstr "Ukládání…"
 
@@ -18816,9 +18832,6 @@ msgstr "Spouštím cloudový pracovní prostor"
 msgid "Starting the agent…"
 msgstr "Spouštění agenta…"
 
-msgid "Starting the cloud workspace…"
-msgstr "Spouští se cloudový pracovní prostor…"
-
 msgid "Starting the simulator…"
 msgstr "Spouštění simulátoru…"
 
@@ -19547,6 +19560,9 @@ msgstr "Tento účet už není připojený — vyberte jiný."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Tato agentní relace zatím nemá konverzaci k otevření — byla spuštěna, ale nikdy nedostala zadání."
 
+msgid "That computer can't be reached"
+msgstr "Tento počítač není dostupný"
+
 msgid "That endpoint could not be resolved."
 msgstr "Tento koncový bod se nepodařilo přeložit."
 
@@ -19644,11 +19660,11 @@ msgstr "Změna platí hned. Platíte jen rozdíl za zbytek období."
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, zůstanou beze změny a budou vypsány."
 
+msgid "the cloud"
+msgstr "cloud"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Cloudový pracovní prostor se měl spustit, ale neodpověděl včas. Další běh to zkusí znovu."
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "Práce cloudového pracovního prostoru, včetně nepotvrzených změn, se odešle do nové větve. Z této větve se spustí pracovní prostor na tomto počítači a každý chat s Claude tam bude pokračovat. Agenti, kteří pracují, se nejprve zastaví. Terminály a ostatní chaty zůstanou v cloudu."
 
 msgid "The code expired. Start again."
 msgstr "Platnost kódu vypršela. Začněte znovu."
@@ -20116,6 +20132,12 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
+
+msgid "this computer"
+msgstr "tento počítač"
+
+msgid "This computer"
+msgstr "Tento počítač"
 
 msgid "This computer's host is not running"
 msgstr "Hostitel tohoto počítače neběží"
@@ -21219,6 +21241,9 @@ msgstr "Vyžadována aktualizace"
 
 msgid "update the branch prefix"
 msgstr "aktualizovat prefix větve"
+
+msgid "Update the host service on both computers and try again."
+msgstr "Aktualizujte službu hostitele na obou počítačích a zkuste to znovu."
 
 msgid "Update the host service on this device and try again."
 msgstr "Aktualizujte službu hostitele na tomto zařízení a zkuste to znovu."

@@ -10,13 +10,20 @@ import {
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
 import { Button } from "@superset/ui/button";
-import { toast } from "@superset/ui/sonner";
-import { useState } from "react";
 import {
-	type MoveToComputerStage,
-	useMoveWorkspaceToComputer,
-} from "../../../../hooks/useMoveWorkspaceToComputer";
-import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirection";
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@superset/ui/select";
+import { useMemo, useState } from "react";
+import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useMoveWorkspaceToComputer } from "../../../../hooks/useMoveWorkspaceToComputer";
+import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
+import { startWorkspaceMoveProgress } from "../../../../utils/startWorkspaceMoveProgress";
 import { useReportSkippedChats } from "../../hooks/useReportSkippedChats";
 
 interface MoveWorkspaceToComputerDialogProps {
@@ -31,77 +38,118 @@ export function MoveWorkspaceToComputerDialog({
 	workspace,
 }: MoveWorkspaceToComputerDialogProps) {
 	const { t } = useLingui();
-	const [stage, setStage] = useState<MoveToComputerStage | null>(null);
+	const { machineId } = useLocalHostService();
+	const { hosts } = useKnownHosts();
+	const { cache } = useHostWorkspaces();
 	const moveWorkspaceToComputer = useMoveWorkspaceToComputer(workspace);
 	const reportSkipped = useReportSkippedChats();
 
-	const move = async () => {
-		setStage("saving");
-		try {
-			const { skipped } = await moveWorkspaceToComputer({ onStage: setStage });
-			onOpenChange(false);
-			reportSkipped(skipped);
-		} catch (error) {
-			toast.error(
-				t({ message: "Couldn't move this workspace to this computer" }),
-				{
-					description: isMissingProcedureError(error)
+	const computers = useMemo(() => {
+		const others = hosts
+			.filter(
+				(host) =>
+					host.machineId !== workspace.hostId &&
+					host.machineId !== machineId &&
+					!cache.isSandboxHost(host.machineId),
+			)
+			.map((host) => ({
+				hostId: host.machineId,
+				label: host.name as string | null,
+				online: host.isOnline,
+			}))
+			.sort((a, b) => Number(b.online) - Number(a.online));
+		const thisComputer =
+			machineId && machineId !== workspace.hostId
+				? [{ hostId: machineId, label: null, online: true }]
+				: [];
+		return [...thisComputer, ...others];
+	}, [hosts, workspace.hostId, cache, machineId]);
+	const [picked, setPicked] = useState<string | null>(null);
+	const destination =
+		computers.find((computer) => computer.hostId === picked) ??
+		computers.find((computer) => computer.online) ??
+		null;
+	const labelOf = (computer: (typeof computers)[number]) =>
+		computer.label ?? t({ message: "This computer" });
+	const offlineLabel = (computer: (typeof computers)[number]) => {
+		const computerName = labelOf(computer);
+		return t({ message: `${computerName} (offline)` });
+	};
+
+	const move = () => {
+		if (!destination?.online) return;
+		const progress = startWorkspaceMoveProgress({
+			name: workspace.name,
+			destination: destination.label ?? t({ message: "this computer" }),
+		});
+		onOpenChange(false);
+		void moveWorkspaceToComputer({
+			destination: { hostId: destination.hostId, name: destination.label },
+			onStage: progress.setStage,
+		})
+			.then(({ toWorkspaceId, skipped }) => {
+				progress.follow(toWorkspaceId);
+				reportSkipped(skipped);
+			})
+			.catch((error: unknown) =>
+				progress.fail(
+					isMissingProcedureError(error)
 						? t({
 								message:
-									"Update the host service on this device and try again.",
+									"Update the host service on both computers and try again.",
 							})
 						: errorMessage(error, t({ message: "Unknown error" })),
-				},
+				),
 			);
-		} finally {
-			setStage(null);
-		}
 	};
 
 	return (
-		<AlertDialog
-			open={open}
-			onOpenChange={(nextOpen) => {
-				if (!stage) onOpenChange(nextOpen);
-			}}
-		>
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent onClick={(event) => event.stopPropagation()}>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
-						<Trans>Move this workspace to this computer?</Trans>
+						<Trans>Move this workspace to a computer?</Trans>
 					</AlertDialogTitle>
 					<AlertDialogDescription>
 						<Trans>
-							The cloud workspace's work, including uncommitted changes, is
-							pushed to a new branch. A workspace on this computer starts from
-							that branch, and each Claude chat continues there. Agents that are
-							working stop first. Terminals and other chats stay in the cloud.
+							Its work, including uncommitted changes, is pushed to a new
+							branch. A workspace on the computer you pick starts from that
+							branch, and each Claude chat continues there. Agents that are
+							working stop first. Terminals and other chats stay where they are.
 						</Trans>
 					</AlertDialogDescription>
 				</AlertDialogHeader>
-				{stage && (
-					<p className="text-sm text-muted-foreground" aria-live="polite">
-						{stage === "saving" ? (
-							<Trans>Saving the cloud workspace's work and its chats…</Trans>
-						) : (
-							<Trans>Creating a workspace on this computer…</Trans>
-						)}
+				{computers.length > 0 ? (
+					<Select
+						value={destination?.hostId}
+						onValueChange={(hostId) => setPicked(hostId)}
+					>
+						<SelectTrigger className="w-full">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{computers.map((computer) => (
+								<SelectItem
+									key={computer.hostId}
+									value={computer.hostId}
+									disabled={!computer.online}
+								>
+									{computer.online ? labelOf(computer) : offlineLabel(computer)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				) : (
+					<p className="text-sm text-muted-foreground">
+						<Trans>No other computer is set up for this account.</Trans>
 					</p>
 				)}
 				<AlertDialogFooter>
-					<Button
-						variant="outline"
-						disabled={!!stage}
-						onClick={() => onOpenChange(false)}
-					>
+					<Button variant="outline" onClick={() => onOpenChange(false)}>
 						<Trans>Cancel</Trans>
 					</Button>
-					<Button disabled={!!stage} onClick={() => void move()}>
-						{stage ? (
-							<Trans>Moving...</Trans>
-						) : (
-							<Trans>Move to this computer</Trans>
-						)}
+					<Button disabled={!destination?.online} onClick={move}>
+						<Trans>Move</Trans>
 					</Button>
 				</AlertDialogFooter>
 			</AlertDialogContent>

@@ -8,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useWorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirection";
+import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import {
@@ -73,16 +73,14 @@ export function DashboardSidebarWorkspaceItem({
 	} = workspace;
 	const isSessionWorkspace = workspace.type === "session";
 	const isCloudWorkspace = hostType === "cloud";
-	const moveDirection = useWorkspaceMoveDirection(
-		workspace.hostId,
-		isCloudWorkspace,
-	);
-	const move = moveDirection
-		? {
-				direction: moveDirection,
-				workspace: { id, hostId: workspace.hostId, projectId, name },
-			}
-		: undefined;
+	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
+	const move =
+		moveDirections.length > 0
+			? {
+					directions: moveDirections,
+					workspace: { id, hostId: workspace.hostId, projectId, name },
+				}
+			: undefined;
 	const { status: workspaceStatus } = useSidebarWorkspaceStatus(id);
 	const {
 		cancelRename,

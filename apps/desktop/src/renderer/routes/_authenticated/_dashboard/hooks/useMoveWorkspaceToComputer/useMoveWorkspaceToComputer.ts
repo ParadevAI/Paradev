@@ -2,88 +2,115 @@ import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
-import { runMoveOnThisComputer } from "../../utils/runMoveOnThisComputer";
-import type { MovableWorkspace } from "../useWorkspaceMoveDirection";
+import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
+import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToComputerStage = "saving" | "creating";
 
+/** The computer a workspace moves to; `name` is null for this computer. */
+export type MoveDestination = { hostId: string; name: string | null };
+
 /**
- * Moves a cloud workspace into a new workspace on this computer: its work
- * comes over on one branch, and each of its chats moves on its own. The
- * control plane records the moves; this computer carries them out, since the
- * control plane cannot reach it. Returns the chats that could not move.
+ * Moves a workspace, from the cloud or from a computer, into a new workspace
+ * on a computer: its work comes over on one branch, and each of its chats
+ * moves on its own. The control plane records the moves; this desktop
+ * carries them out, since the control plane cannot reach a computer's
+ * host-service to bring a chat in. Returns the chats that could not move.
  */
 export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
-	const { activeHostUrl, machineId } = useLocalHostService();
+	const { activeHostUrl, machineId, activeOrganizationId } =
+		useLocalHostService();
+	const relayUrl = useRelayUrl();
+	const { cache } = useHostWorkspaces();
 	const { projects } = useHostProjects();
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
 
 	return useCallback(
-		async ({ onStage }: { onStage: (stage: MoveToComputerStage) => void }) => {
-			if (!activeHostUrl) {
-				throw new Error(t`This computer's host is not running`);
-			}
-			const requireLocalProject = (repositoryName: string) => {
+		async ({
+			destination,
+			onStage,
+		}: {
+			destination: MoveDestination;
+			onStage: (stage: MoveToComputerStage) => void;
+		}) => {
+			const hostUrlOf = (hostId: string) => {
+				const url = activeOrganizationId
+					? resolveHostUrl({
+							hostId,
+							machineId,
+							activeHostUrl,
+							organizationId: activeOrganizationId,
+							relayUrl,
+						})
+					: null;
+				if (!url) throw new Error(t`That computer can't be reached`);
+				return url;
+			};
+			const destinationUrl = hostUrlOf(destination.hostId);
+			const fromCloud = cache.isSandboxHost(workspace.hostId);
+			const requireProject = (repositoryName: string) => {
 				const repository = repositoryName.toLowerCase();
 				const found = projects.find(
 					(row) =>
-						row.hostIds.includes(machineId) &&
+						row.hostIds.includes(destination.hostId) &&
 						`${row.repoOwner}/${row.repoName}`.toLowerCase() === repository,
 				);
-				if (!found) {
-					throw new Error(
-						t`Add ${repositoryName} as a project on this computer first`,
-					);
-				}
-				return found;
+				if (found) return found;
+				const computer = destination.name;
+				throw new Error(
+					computer
+						? t`Add ${repositoryName} as a project on ${computer} first`
+						: t`Add ${repositoryName} as a project on this computer first`,
+				);
 			};
 			const sourceProject = projects.find(
 				(row) => row.id === workspace.projectId,
 			);
 			if (sourceProject?.repoOwner && sourceProject.repoName) {
-				requireLocalProject(
-					`${sourceProject.repoOwner}/${sourceProject.repoName}`,
-				);
+				requireProject(`${sourceProject.repoOwner}/${sourceProject.repoName}`);
 			}
 			onStage("saving");
 			const { workspaceMoveId } =
 				await cloudTrpcClient.workspaceMove.begin.mutate({
 					fromWorkspaceId: workspace.id,
-					toHostId: machineId,
+					...(fromCloud ? {} : { fromHostId: workspace.hostId }),
+					toHostId: destination.hostId,
 				});
-			const local = getHostServiceClientByUrl(activeHostUrl);
+			const target = getHostServiceClientByUrl(destinationUrl);
 			const { prepared, project, created } = await (async () => {
-				// From the sidebar the box may be asleep: waking it also gives a fresh address.
-				const { url: remoteUrl } = await requestSandboxAccess(
-					workspace.id,
-					true,
-				);
+				// From the sidebar a cloud box may be asleep: waking it also gives a fresh address.
+				const sourceUrl = fromCloud
+					? (await requestSandboxAccess(workspace.id, true)).url
+					: hostUrlOf(workspace.hostId);
 				const prepared = await getHostServiceClientByUrl(
-					remoteUrl,
+					sourceUrl,
 				).teleport.prepareWorkspace.mutate({
 					workspaceId: workspace.id,
 					stopIfBusy: true,
 				});
-				const project = requireLocalProject(prepared.repositoryFullName);
+				const project = requireProject(prepared.repositoryFullName);
 
 				onStage("creating");
-				await local.teleport.fetchBranch.mutate({
+				await target.teleport.fetchBranch.mutate({
 					projectId: project.id,
 					branch: prepared.branch,
 				});
 				const handle = submit({
-					hostId: machineId,
+					hostId: destination.hostId,
 					snapshot: {
 						id: crypto.randomUUID(),
 						projectId: project.id,
@@ -132,10 +159,10 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			// Each chat's pane shows how far its move got, and a retry.
 			void (async () => {
 				for (const { moveId } of moves) {
-					await runMoveOnThisComputer({ moveId, host: local }).catch(
+					await runMoveOnComputer({ moveId, host: target }).catch(
 						(error: unknown) => {
 							console.warn(
-								`[workspace-move] move ${moveId} to this computer failed`,
+								`[workspace-move] move ${moveId} to the computer failed`,
 								error,
 							);
 						},
@@ -143,6 +170,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				}
 			})();
 			return {
+				toWorkspaceId: created.workspaceId,
 				skipped: [
 					...prepared.skipped,
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
@@ -154,6 +182,9 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			workspace,
 			activeHostUrl,
 			machineId,
+			activeOrganizationId,
+			relayUrl,
+			cache,
 			projects,
 			submit,
 			navigate,

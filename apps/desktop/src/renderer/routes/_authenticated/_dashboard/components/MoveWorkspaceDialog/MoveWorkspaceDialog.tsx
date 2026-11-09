@@ -1,7 +1,7 @@
 import type {
 	MovableWorkspace,
 	WorkspaceMoveDirection,
-} from "../../hooks/useWorkspaceMoveDirection";
+} from "../../hooks/useWorkspaceMoveDirections";
 import { MoveWorkspaceToCloudDialog } from "./components/MoveWorkspaceToCloudDialog";
 import { MoveWorkspaceToComputerDialog } from "./components/MoveWorkspaceToComputerDialog";
 

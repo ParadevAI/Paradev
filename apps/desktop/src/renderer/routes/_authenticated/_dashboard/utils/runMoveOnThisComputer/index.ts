@@ -1,1 +1,0 @@
-export { runMoveOnThisComputer } from "./runMoveOnThisComputer";

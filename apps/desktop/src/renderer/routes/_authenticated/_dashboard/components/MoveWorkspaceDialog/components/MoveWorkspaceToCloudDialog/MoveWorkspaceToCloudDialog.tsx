@@ -11,7 +11,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
@@ -26,11 +25,9 @@ import {
 	NO_PROJECT_KEY,
 	useV2WorkspaceCreateDefaultsStore,
 } from "renderer/stores/v2-workspace-create-defaults";
-import {
-	type MoveToCloudStage,
-	useMoveWorkspaceToCloud,
-} from "../../../../hooks/useMoveWorkspaceToCloud";
-import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirection";
+import { useMoveWorkspaceToCloud } from "../../../../hooks/useMoveWorkspaceToCloud";
+import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
+import { startWorkspaceMoveProgress } from "../../../../utils/startWorkspaceMoveProgress";
 import { useReportSkippedChats } from "../../hooks/useReportSkippedChats";
 
 interface MoveWorkspaceToCloudDialogProps {
@@ -50,8 +47,6 @@ export function MoveWorkspaceToCloudDialog({
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const organizationId = useActiveOrganizationId();
-	const [stage, setStage] = useState<MoveToCloudStage | null>(null);
-	const isMoving = stage !== null;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 	const moveWorkspaceToCloud = useMoveWorkspaceToCloud(workspace);
 	const reportSkipped = useReportSkippedChats();
@@ -95,41 +90,41 @@ export function MoveWorkspaceToCloudDialog({
 	);
 	const environment = selection.environment;
 
-	const move = async () => {
+	const move = () => {
 		if (!environment) return;
-		setStage("saving");
-		try {
-			const { skipped } = await moveWorkspaceToCloud({
-				environment: {
-					id: environment.id,
-					repositoryFullName: environment.repositories?.[0]?.fullName ?? null,
-				},
-				machineSize: selection.machineSize,
-				onStage: setStage,
-			});
-			onOpenChange(false);
-			reportSkipped(skipped);
-		} catch (error) {
-			toast.error(t({ message: "Couldn't move this workspace to the cloud" }), {
-				description: isMissingProcedureError(error)
-					? t({
-							message: "Update the host service on this device and try again.",
-						})
-					: errorMessage(error, t({ message: "Unknown error" })),
-			});
-		} finally {
-			setStage(null);
-		}
+		const progress = startWorkspaceMoveProgress({
+			name: workspace.name,
+			destination: t({ message: "the cloud" }),
+		});
+		onOpenChange(false);
+		void moveWorkspaceToCloud({
+			environment: {
+				id: environment.id,
+				repositoryFullName: environment.repositories?.[0]?.fullName ?? null,
+			},
+			machineSize: selection.machineSize,
+			onStage: (stage) =>
+				progress.setStage(stage === "saving" ? "saving" : "creating"),
+		})
+			.then(({ toWorkspaceId, skipped }) => {
+				progress.follow(toWorkspaceId);
+				reportSkipped(skipped);
+			})
+			.catch((error: unknown) =>
+				progress.fail(
+					isMissingProcedureError(error)
+						? t({
+								message:
+									"Update the host service on this device and try again.",
+							})
+						: errorMessage(error, t({ message: "Unknown error" })),
+				),
+			);
 	};
 
 	return (
 		<>
-			<Dialog
-				open={open}
-				onOpenChange={(nextOpen) => {
-					if (!isMoving) onOpenChange(nextOpen);
-				}}
-			>
+			<Dialog open={open} onOpenChange={onOpenChange}>
 				<DialogContent onClick={(event) => event.stopPropagation()}>
 					<DialogHeader>
 						<DialogTitle>
@@ -170,32 +165,12 @@ export function MoveWorkspaceToCloudDialog({
 							}
 						/>
 					</div>
-					{stage && (
-						<p className="text-sm text-muted-foreground" aria-live="polite">
-							{stage === "saving" ? (
-								<Trans>Saving your work and its chats…</Trans>
-							) : (
-								<Trans>Starting the cloud workspace…</Trans>
-							)}
-						</p>
-					)}
 					<DialogFooter>
-						<Button
-							variant="outline"
-							disabled={isMoving}
-							onClick={() => onOpenChange(false)}
-						>
+						<Button variant="outline" onClick={() => onOpenChange(false)}>
 							<Trans>Cancel</Trans>
 						</Button>
-						<Button
-							disabled={isMoving || !environment}
-							onClick={() => void move()}
-						>
-							{isMoving ? (
-								<Trans>Moving...</Trans>
-							) : (
-								<Trans>Move to cloud</Trans>
-							)}
+						<Button disabled={!environment} onClick={move}>
+							<Trans>Move to cloud</Trans>
 						</Button>
 					</DialogFooter>
 				</DialogContent>

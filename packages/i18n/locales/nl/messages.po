@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# gewijzigd bestand} other {# gewijzigde bestanden}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, one {# chat gesloten} other {# chats gesloten}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# chat kon niet worden verplaatst. Open hem om het opnieuw te proberen.} other {# chats konden niet worden verplaatst. Open ze om het opnieuw te proberen.}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {# chat is in de oude werkruimte gebleven} other {# chats zijn in de oude werkruimte gebleven}}"
@@ -839,6 +843,9 @@ msgstr "{completed} van {0} checks afgerond"
 msgid "{completed} of {total} completed"
 msgstr "{completed} van {total} voltooid"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (offline)"
+
 msgid "{configTitle} font size"
 msgstr "Tekengrootte van {configTitle}"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, one {# agent-PR gemerged} other {# agent-PR's gemerg
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} onderbroken"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {{done} van # chat verplaatst} other {{done} van # chats verplaatst}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {De check is geslaagd} other {Alle # checks geslaagd}}"
@@ -1993,6 +2003,9 @@ msgstr "{0} toevoegen aan werkruimte"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} toevoegen?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Voeg {repositoryName} eerst toe als project op {computer}"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Voeg {repositoryName} eerst toe als project op deze computer"
@@ -6088,14 +6101,11 @@ msgstr "Kon niet markeren als klaar voor review"
 msgid "Couldn't merge pull request"
 msgstr "Kan pull request niet mergen"
 
+msgid "Couldn't move {name}"
+msgstr "{name} kon niet worden verplaatst"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "Kon deze werkruimte niet naar de cloud verplaatsen"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "Kan deze werkruimte niet naar deze computer verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
@@ -6522,9 +6532,6 @@ msgstr "Taak wordt aangemaakt"
 
 msgid "Creating a workspace"
 msgstr "Werkruimte wordt aangemaakt"
-
-msgid "Creating a workspace on this computer…"
-msgstr "Werkruimte op deze computer wordt gemaakt…"
 
 msgid "Creating PR..."
 msgstr "PR wordt aangemaakt…"
@@ -10576,6 +10583,9 @@ msgstr "De plugins verschijnen zodra de synchronisatie klaar is."
 msgid "Its replies go with it."
 msgstr "De antwoorden worden ook verwijderd."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Het werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op de computer die je kiest begint vanaf die branch, en elke Claude-chat gaat daar verder. Agents die aan het werk zijn, stoppen eerst. Terminals en andere chats blijven waar ze zijn."
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "De werkruimtes en terminals zijn niet beschikbaar tot de service opnieuw start — gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
 
@@ -12021,6 +12031,9 @@ msgstr "de meeste ontwikkelaars"
 msgid "Most of software history"
 msgstr "Het grootste deel van de softwaregeschiedenis"
 
+msgid "Move"
+msgstr "Verplaatsen"
+
 msgid "Move {count} to Group"
 msgstr "{count} naar groep verplaatsen"
 
@@ -12030,11 +12043,17 @@ msgstr "{name} naar de achtergrond verplaatsen"
 msgid "Move cloud work"
 msgstr "Cloudwerk verhuizen"
 
+msgid "Move this workspace to a computer?"
+msgstr "Deze werkruimte naar een computer verplaatsen?"
+
 msgid "Move this workspace to the cloud?"
 msgstr "Deze werkruimte naar de cloud verplaatsen?"
 
-msgid "Move this workspace to this computer?"
-msgstr "Deze werkruimte naar deze computer verplaatsen?"
+msgid "Move to a computer"
+msgstr "Naar een computer verplaatsen"
+
+msgid "Move to another computer"
+msgstr "Naar een andere computer verplaatsen"
 
 msgid "Move to background"
 msgstr "Naar de achtergrond"
@@ -12057,11 +12076,14 @@ msgstr "Verplaatsen naar tabblad"
 msgid "Move your agents before {shutdownDate}."
 msgstr "Verhuis je agents vóór {shutdownDate}."
 
-msgid "Move to this computer"
-msgstr "Naar deze computer verplaatsen"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" verplaatst naar {group}"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name} verplaatst naar {destination}"
+
+msgid "Moving {name} to {destination}"
+msgstr "{name} wordt verplaatst naar {destination}"
 
 msgid "Moving this chat here"
 msgstr "Deze chat wordt hierheen verplaatst"
@@ -12071,9 +12093,6 @@ msgstr "Deze werkruimte wordt hierheen verplaatst…"
 
 msgid "Moving this workspace…"
 msgstr "Deze werkruimte wordt verplaatst…"
-
-msgid "Moving..."
-msgstr "Verplaatsen..."
 
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
@@ -12814,6 +12833,9 @@ msgstr "Geen organisatie geselecteerd"
 
 msgid "No other chats here"
 msgstr "Geen andere chats hier"
+
+msgid "No other computer is set up for this account."
+msgstr "Er is geen andere computer ingesteld voor dit account."
 
 msgid "No pages match"
 msgstr "Geen overeenkomende pagina's"
@@ -17076,12 +17098,6 @@ msgstr "Opgeslagen in Downloads"
 msgid "Saving as an environment..."
 msgstr "Opslaan als omgeving..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "Werk van de cloudwerkruimte en de chats worden opgeslagen…"
-
-msgid "Saving your work and its chats…"
-msgstr "Je werk en de chats worden opgeslagen…"
-
 msgid "Saving..."
 msgstr "Opslaan..."
 
@@ -18816,9 +18832,6 @@ msgstr "Cloudwerkruimte starten"
 msgid "Starting the agent…"
 msgstr "Agent starten…"
 
-msgid "Starting the cloud workspace…"
-msgstr "Cloudwerkruimte wordt gestart…"
-
 msgid "Starting the simulator…"
 msgstr "Simulator wordt gestart…"
 
@@ -19547,6 +19560,9 @@ msgstr "Dit account is niet meer verbonden — kies een ander."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Die agentsessie heeft nog geen gesprek om te openen — hij is gestart maar nooit aangestuurd."
 
+msgid "That computer can't be reached"
+msgstr "Die computer is niet bereikbaar"
+
 msgid "That endpoint could not be resolved."
 msgstr "Dat endpoint kon niet worden omgezet."
 
@@ -19644,11 +19660,11 @@ msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan ook zijn bewerkt, blijven ongemoeid en worden vermeld."
 
+msgid "the cloud"
+msgstr "de cloud"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "De cloudwerkruimte had gestart moeten zijn, maar reageerde niet op tijd. De volgende run probeert het opnieuw."
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "Het werk van de cloudwerkruimte, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op deze computer start vanaf die branch, en elke Claude-chat gaat daar verder. Agents die bezig zijn, stoppen eerst. Terminals en andere chats blijven in de cloud."
 
 msgid "The code expired. Start again."
 msgstr "De code is verlopen. Begin opnieuw."
@@ -20116,6 +20132,12 @@ msgstr "Deze cloudwerkruimte kan niet starten"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 seconden duren."
+
+msgid "this computer"
+msgstr "deze computer"
+
+msgid "This computer"
+msgstr "Deze computer"
 
 msgid "This computer's host is not running"
 msgstr "De host van deze computer draait niet"
@@ -21219,6 +21241,9 @@ msgstr "Update vereist"
 
 msgid "update the branch prefix"
 msgstr "de branchprefix bijwerken"
+
+msgid "Update the host service on both computers and try again."
+msgstr "Werk de hostservice op beide computers bij en probeer het opnieuw."
 
 msgid "Update the host service on this device and try again."
 msgstr "Werk de hostservice op dit apparaat bij en probeer het opnieuw."

@@ -134,6 +134,10 @@ msgstr "{0, plural, one {# değişen dosya} other {# değişen dosya}}"
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {# sohbet kapatıldı}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, one {# sohbet taşınamadı. Yeniden denemek için açın.} other {# sohbet taşınamadı. Yeniden denemek için açın.}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {# sohbet eski çalışma alanında kaldı} other {# sohbet eski çalışma alanında kaldı}}"
@@ -839,6 +843,9 @@ msgstr "{0} kontrolden {completed} tanesi tamamlandı"
 msgid "{completed} of {total} completed"
 msgstr "{total} adımdan {completed} tanesi tamamlandı"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName} (çevrimdışı)"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle} yazı tipi boyutu"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'�
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {# sohbetten {done} tanesi taşındı} other {# sohbetten {done} tanesi taşındı}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {# kontrolün tümü geçti} other {# kontrolün tümü geçti}}"
@@ -1993,6 +2003,9 @@ msgstr "{0} öğesini çalışma alanına ekle"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} eklensin mi?"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "Önce {repositoryName} deposunu {computer} üzerinde proje olarak ekleyin"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Önce {repositoryName} deposunu bu bilgisayarda proje olarak ekleyin"
@@ -6088,14 +6101,11 @@ msgstr "İncelemeye hazır olarak işaretlenemedi"
 msgid "Couldn't merge pull request"
 msgstr "Pull request birleştirilemedi"
 
+msgid "Couldn't move {name}"
+msgstr "{name} taşınamadı"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "Alt ajan arka plana taşınamadı"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "Bu çalışma alanı buluta taşınamadı"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "Bu çalışma alanı bu bilgisayara taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
@@ -6522,9 +6532,6 @@ msgstr "Görev oluşturuluyor"
 
 msgid "Creating a workspace"
 msgstr "Çalışma alanı oluşturuluyor"
-
-msgid "Creating a workspace on this computer…"
-msgstr "Bu bilgisayarda çalışma alanı oluşturuluyor…"
 
 msgid "Creating PR..."
 msgstr "PR oluşturuluyor…"
@@ -10576,6 +10583,9 @@ msgstr "Eklentileri eşitleme bitince görünür."
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Seçtiğiniz bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz — Paradev tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
 
@@ -12021,6 +12031,9 @@ msgstr "çoğu geliştirici"
 msgid "Most of software history"
 msgstr "Yazılım tarihinin çoğu"
 
+msgid "Move"
+msgstr "Taşı"
+
 msgid "Move {count} to Group"
 msgstr "{count} öğeyi gruba taşı"
 
@@ -12030,11 +12043,17 @@ msgstr "{name} öğesini arka plana taşı"
 msgid "Move cloud work"
 msgstr "Bulut işinizi taşıyın"
 
+msgid "Move this workspace to a computer?"
+msgstr "Bu çalışma alanı bir bilgisayara taşınsın mı?"
+
 msgid "Move this workspace to the cloud?"
 msgstr "Bu çalışma alanı buluta taşınsın mı?"
 
-msgid "Move this workspace to this computer?"
-msgstr "Bu çalışma alanı bu bilgisayara taşınsın mı?"
+msgid "Move to a computer"
+msgstr "Bir bilgisayara taşı"
+
+msgid "Move to another computer"
+msgstr "Başka bir bilgisayara taşı"
 
 msgid "Move to background"
 msgstr "Arka plana taşı"
@@ -12057,11 +12076,14 @@ msgstr "Sekmeye taşı"
 msgid "Move your agents before {shutdownDate}."
 msgstr "Ajanlarınızı {shutdownDate} tarihinden önce taşıyın."
 
-msgid "Move to this computer"
-msgstr "Bu bilgisayara taşı"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\", {group} grubuna taşındı"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name}, {destination} hedefine taşındı"
+
+msgid "Moving {name} to {destination}"
+msgstr "{name}, {destination} hedefine taşınıyor"
 
 msgid "Moving this chat here"
 msgstr "Bu sohbet buraya taşınıyor"
@@ -12071,9 +12093,6 @@ msgstr "Bu çalışma alanı buraya taşınıyor…"
 
 msgid "Moving this workspace…"
 msgstr "Bu çalışma alanı taşınıyor…"
-
-msgid "Moving..."
-msgstr "Taşınıyor..."
 
 msgid "Multi-select"
 msgstr "Çoklu seçim"
@@ -12814,6 +12833,9 @@ msgstr "Kuruluş seçilmedi"
 
 msgid "No other chats here"
 msgstr "Burada başka sohbet yok"
+
+msgid "No other computer is set up for this account."
+msgstr "Bu hesap için başka bir bilgisayar ayarlanmamış."
 
 msgid "No pages match"
 msgstr "Eşleşen sayfa yok"
@@ -17076,12 +17098,6 @@ msgstr "İndirilenler klasörüne kaydedildi"
 msgid "Saving as an environment..."
 msgstr "Ortam olarak kaydediliyor..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "Bulut çalışma alanının işi ve sohbetleri kaydediliyor…"
-
-msgid "Saving your work and its chats…"
-msgstr "İşiniz ve sohbetleri kaydediliyor…"
-
 msgid "Saving..."
 msgstr "Kaydediliyor..."
 
@@ -18816,9 +18832,6 @@ msgstr "Bulut çalışma alanı başlatılıyor"
 msgid "Starting the agent…"
 msgstr "Aracı başlatılıyor…"
 
-msgid "Starting the cloud workspace…"
-msgstr "Bulut çalışma alanı başlatılıyor…"
-
 msgid "Starting the simulator…"
 msgstr "Simülatör başlatılıyor…"
 
@@ -19547,6 +19560,9 @@ msgstr "Bu hesap artık bağlı değil — başka bir hesap seçin."
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "Bu aracı oturumunda açılacak bir konuşma yok — başlatıldı ama hiç istek almadı."
 
+msgid "That computer can't be reached"
+msgstr "Bu bilgisayara ulaşılamıyor"
+
 msgid "That endpoint could not be resolved."
 msgstr "Bu uç nokta çözümlenemedi."
 
@@ -19644,11 +19660,11 @@ msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı öde
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
 
+msgid "the cloud"
+msgstr "bulut"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Bulut çalışma alanının başlamış olması gerekiyordu ancak zamanında yanıt vermedi. Bir sonraki çalıştırma yeniden deneyecek."
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "Commit edilmemiş değişiklikler dahil bulut çalışma alanının işi yeni bir dala gönderilir. Bu bilgisayardaki bir çalışma alanı bu daldan başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler bulutta kalır."
 
 msgid "The code expired. Start again."
 msgstr "Kodun süresi doldu. Yeniden başlayın."
@@ -20116,6 +20132,12 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
+
+msgid "this computer"
+msgstr "bu bilgisayar"
+
+msgid "This computer"
+msgstr "Bu bilgisayar"
 
 msgid "This computer's host is not running"
 msgstr "Bu bilgisayarın host hizmeti çalışmıyor"
@@ -21219,6 +21241,9 @@ msgstr "Güncelleme gerekli"
 
 msgid "update the branch prefix"
 msgstr "dal ön ekini güncelleme"
+
+msgid "Update the host service on both computers and try again."
+msgstr "Her iki bilgisayardaki host hizmetini güncelleyip yeniden deneyin."
 
 msgid "Update the host service on this device and try again."
 msgstr "Bu cihazdaki host hizmetini güncelleyip yeniden deneyin."

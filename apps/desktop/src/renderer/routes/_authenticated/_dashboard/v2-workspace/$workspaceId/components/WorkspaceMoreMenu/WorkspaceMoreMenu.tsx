@@ -21,7 +21,11 @@ import {
 import { useState } from "react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
-import { useWorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirection";
+import {
+	useWorkspaceMoveDirections,
+	type WorkspaceMoveDirection,
+} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
@@ -61,8 +65,9 @@ export function WorkspaceMoreMenu({
 	const hasRunCommand = (runDefinition?.commands ?? []).length > 0;
 	const label = t({ message: "More actions" });
 	const { workspace } = useWorkspace();
-	const moveDirection = useWorkspaceMoveDirection(workspace.hostId);
-	const [isMoveOpen, setIsMoveOpen] = useState(false);
+	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
+	const { machineId } = useLocalHostService();
+	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 
 	return (
@@ -140,39 +145,44 @@ export function WorkspaceMoreMenu({
 							)}
 						</DropdownMenuItem>
 					)}
-					{moveDirection && (
-						<>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem
-								onSelect={() => runAfterClose(() => setIsMoveOpen(true))}
-							>
-								{moveDirection === "to-cloud" ? (
-									<>
-										<CloudUpload className="size-4" />
-										<Trans>Move to cloud</Trans>
-									</>
-								) : (
-									<>
-										<Laptop className="size-4" />
-										<Trans>Move to this computer</Trans>
-									</>
-								)}
-							</DropdownMenuItem>
-						</>
-					)}
+					{moveDirections.length > 0 && <DropdownMenuSeparator />}
+					{moveDirections.map((direction) => (
+						<DropdownMenuItem
+							key={direction}
+							onSelect={() => runAfterClose(() => setMoveOpen(direction))}
+						>
+							{direction === "to-cloud" ? (
+								<>
+									<CloudUpload className="size-4" />
+									<Trans>Move to cloud</Trans>
+								</>
+							) : (
+								<>
+									<Laptop className="size-4" />
+									{workspace.hostId === machineId ? (
+										<Trans>Move to another computer</Trans>
+									) : (
+										<Trans>Move to a computer</Trans>
+									)}
+								</>
+							)}
+						</DropdownMenuItem>
+					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{moveDirection && isMoveOpen && (
+			{moveOpen && (
 				<MoveWorkspaceDialog
-					direction={moveDirection}
+					direction={moveOpen}
 					workspace={{
 						id: workspaceId,
 						hostId: workspace.hostId,
 						projectId: workspace.projectId,
 						name: workspace.name,
 					}}
-					open={isMoveOpen}
-					onOpenChange={setIsMoveOpen}
+					open
+					onOpenChange={(open) => {
+						if (!open) setMoveOpen(null);
+					}}
 				/>
 			)}
 		</>

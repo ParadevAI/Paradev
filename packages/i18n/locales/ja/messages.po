@@ -134,6 +134,10 @@ msgstr "{0, plural, one {#件の変更ファイル} other {#件の変更ファ�
 msgid "{0, plural, one {# chat closed} other {# chats closed}}"
 msgstr "{0, plural, other {# 件のチャットを閉じました}}"
 
+#. placeholder {0}: chats?.failed ?? 0
+msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
+msgstr "{0, plural, other {#件のチャットを移動できませんでした。開いてもう一度お試しください。}}"
+
 #. placeholder {0}: skipped.length
 msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
 msgstr "{0, plural, one {#件のチャットが元のワークスペースに残りました} other {#件のチャットが元のワークスペースに残りました}}"
@@ -839,6 +843,9 @@ msgstr "{0}件中{completed}件のチェックが完了"
 msgid "{completed} of {total} completed"
 msgstr "{total} 件中 {completed} 件完了"
 
+msgid "{computerName} (offline)"
+msgstr "{computerName}（オフライン）"
+
 msgid "{configTitle} font size"
 msgstr "{configTitle}のフォントサイズ"
 
@@ -1373,6 +1380,9 @@ msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {#件中{done}件のチャットを移動しました}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
@@ -1993,6 +2003,9 @@ msgstr "{0} をワークスペースに追加"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} を追加しますか？"
+
+msgid "Add {repositoryName} as a project on {computer} first"
+msgstr "先に {computer} で {repositoryName} をプロジェクトとして追加してください"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "まず {repositoryName} をこのコンピューターのプロジェクトとして追加してください"
@@ -6088,14 +6101,11 @@ msgstr "レビュー準備完了にできませんでした"
 msgid "Couldn't merge pull request"
 msgstr "プルリクエストをマージできませんでした"
 
+msgid "Couldn't move {name}"
+msgstr "{name} を移動できませんでした"
+
 msgid "Couldn't move the subagent to the background"
 msgstr "サブエージェントをバックグラウンドに移動できませんでした"
-
-msgid "Couldn't move this workspace to the cloud"
-msgstr "このワークスペースをクラウドに移動できませんでした"
-
-msgid "Couldn't move this workspace to this computer"
-msgstr "このワークスペースをこのコンピューターに移動できませんでした"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
@@ -6522,9 +6532,6 @@ msgstr "タスクを作成中"
 
 msgid "Creating a workspace"
 msgstr "ワークスペースを作成中"
-
-msgid "Creating a workspace on this computer…"
-msgstr "このコンピューターにワークスペースを作成しています…"
 
 msgid "Creating PR..."
 msgstr "PRを作成中…"
@@ -10576,6 +10583,9 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。選んだコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません — Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
 
@@ -12021,6 +12031,9 @@ msgstr "大半の開発者"
 msgid "Most of software history"
 msgstr "ソフトウェアの歴史のほとんど"
 
+msgid "Move"
+msgstr "移動"
+
 msgid "Move {count} to Group"
 msgstr "{count}件をグループへ移動"
 
@@ -12030,11 +12043,17 @@ msgstr "{name} をバックグラウンドに移動"
 msgid "Move cloud work"
 msgstr "クラウドの作業を移行"
 
+msgid "Move this workspace to a computer?"
+msgstr "このワークスペースをコンピューターに移動しますか？"
+
 msgid "Move this workspace to the cloud?"
 msgstr "このワークスペースをクラウドに移動しますか？"
 
-msgid "Move this workspace to this computer?"
-msgstr "このワークスペースをこのコンピューターに移動しますか？"
+msgid "Move to a computer"
+msgstr "コンピューターに移動"
+
+msgid "Move to another computer"
+msgstr "別のコンピューターに移動"
 
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
@@ -12057,11 +12076,14 @@ msgstr "タブに移動"
 msgid "Move your agents before {shutdownDate}."
 msgstr "{shutdownDate}までにエージェントを移行しましょう。"
 
-msgid "Move to this computer"
-msgstr "このコンピューターに移動"
-
 msgid "Moved \"{name}\" to {group}"
 msgstr "「{name}」を {group} へ移動しました"
+
+msgid "Moved {name} to {destination}"
+msgstr "{name} を {destination} に移動しました"
+
+msgid "Moving {name} to {destination}"
+msgstr "{name} を {destination} に移動しています"
 
 msgid "Moving this chat here"
 msgstr "このチャットをここに移動しています"
@@ -12071,9 +12093,6 @@ msgstr "このワークスペースをここに移動しています…"
 
 msgid "Moving this workspace…"
 msgstr "このワークスペースを移動しています…"
-
-msgid "Moving..."
-msgstr "移動中..."
 
 msgid "Multi-select"
 msgstr "複数選択"
@@ -12814,6 +12833,9 @@ msgstr "組織が選択されていません"
 
 msgid "No other chats here"
 msgstr "ほかのチャットはありません"
+
+msgid "No other computer is set up for this account."
+msgstr "このアカウントには他のコンピューターが設定されていません。"
 
 msgid "No pages match"
 msgstr "一致するページがありません"
@@ -17076,12 +17098,6 @@ msgstr "ダウンロードフォルダに保存しました"
 msgid "Saving as an environment..."
 msgstr "環境として保存しています..."
 
-msgid "Saving the cloud workspace's work and its chats…"
-msgstr "クラウドワークスペースの作業とそのチャットを保存しています…"
-
-msgid "Saving your work and its chats…"
-msgstr "作業とそのチャットを保存しています…"
-
 msgid "Saving..."
 msgstr "保存中..."
 
@@ -18816,9 +18832,6 @@ msgstr "クラウドワークスペースを開始中"
 msgid "Starting the agent…"
 msgstr "エージェントを起動しています…"
 
-msgid "Starting the cloud workspace…"
-msgstr "クラウドワークスペースを起動しています…"
-
 msgid "Starting the simulator…"
 msgstr "シミュレーターを起動しています…"
 
@@ -19547,6 +19560,9 @@ msgstr "このアカウントは接続されていません。別のアカウン
 msgid "That agent session has no conversation to open yet — it was started but never prompted."
 msgstr "このエージェントセッションにはまだ開ける会話がありません。開始されましたが、一度も指示を受けていません。"
 
+msgid "That computer can't be reached"
+msgstr "そのコンピューターに接続できません"
+
 msgid "That endpoint could not be resolved."
 msgstr "そのエンドポイントを解決できませんでした。"
 
@@ -19644,11 +19660,11 @@ msgstr "変更はすぐに適用されます。期間の残りについて差額
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "チャットはそのまま残ります。このターンの後に誰かが編集したファイルはそのままにし、一覧に表示します。"
 
+msgid "the cloud"
+msgstr "クラウド"
+
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "クラウドワークスペースは起動しているはずですが、時間内に応答がありませんでした。次回の実行で再試行します。"
-
-msgid "The cloud workspace's work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay in the cloud."
-msgstr "コミットされていない変更を含むクラウドワークスペースの作業は、新しいブランチにプッシュされます。そのブランチからこのコンピューターのワークスペースが起動し、Claude の各チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはクラウドに残ります。"
 
 msgid "The code expired. Start again."
 msgstr "コードの有効期限が切れました。やり直してください。"
@@ -20116,6 +20132,12 @@ msgstr "このクラウドワークスペースを起動できません"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
+
+msgid "this computer"
+msgstr "このコンピューター"
+
+msgid "This computer"
+msgstr "このコンピューター"
 
 msgid "This computer's host is not running"
 msgstr "このコンピューターのホストが実行されていません"
@@ -21219,6 +21241,9 @@ msgstr "アップデートが必要です"
 
 msgid "update the branch prefix"
 msgstr "ブランチのプレフィックスを更新する"
+
+msgid "Update the host service on both computers and try again."
+msgstr "両方のコンピューターでホストサービスを更新してから、もう一度お試しください。"
 
 msgid "Update the host service on this device and try again."
 msgstr "このデバイスのホストサービスを更新してから、もう一度お試しください。"

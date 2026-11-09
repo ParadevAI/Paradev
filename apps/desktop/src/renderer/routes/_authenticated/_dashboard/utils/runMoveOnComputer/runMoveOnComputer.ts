@@ -3,13 +3,13 @@ import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import type { HostServiceClient } from "renderer/lib/host-service-client";
 
 /**
- * Carries out a move to this computer, which the control plane recorded but
- * cannot reach: the chat's history and session files go into this
- * computer's host, the control plane switches the chat here, then its agent
+ * Carries out a move to a computer, which the control plane recorded but
+ * cannot reach: the chat's history and session files go into that
+ * computer's host, the control plane switches the chat there, then its agent
  * starts. Any failure is reported, so the move shows as failed and the chat
  * stays where it was. A move another run already claimed is left to it.
  */
-export async function runMoveOnThisComputer({
+export async function runMoveOnComputer({
 	moveId,
 	host,
 }: {
@@ -24,7 +24,7 @@ export async function runMoveOnThisComputer({
 	const claimed = await cloudTrpcClient.chatMove.claim
 		.mutate({ moveId })
 		.catch((error: unknown) => {
-			// Another run on this computer, or an earlier one, already took it.
+			// Another run, or an earlier one, already took it.
 			if (isClaimed(error)) return null;
 			throw error;
 		});
@@ -54,7 +54,7 @@ export async function runMoveOnThisComputer({
 				moveId,
 				error:
 					rawErrorMessage(error).slice(0, 2000) ||
-					"The move to this computer failed",
+					"The move to the computer failed",
 			})
 			.catch((failError: unknown) =>
 				console.warn(

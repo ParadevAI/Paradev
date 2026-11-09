@@ -7,7 +7,7 @@ import { Check, Circle, Loader2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { runMoveOnThisComputer } from "renderer/routes/_authenticated/_dashboard/utils/runMoveOnThisComputer";
+import { runMoveOnComputer } from "renderer/routes/_authenticated/_dashboard/utils/runMoveOnComputer";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useMoveArrival } from "./hooks/useMoveArrival";
 
@@ -69,7 +69,7 @@ export function MoveProgress({
 		if (!waitingHere || !move || !activeHostUrl) return;
 		if (pickedUp.current === move.id) return;
 		pickedUp.current = move.id;
-		void runMoveOnThisComputer({
+		void runMoveOnComputer({
 			moveId: move.id,
 			host: getHostServiceClientByUrl(activeHostUrl),
 		})
@@ -95,7 +95,7 @@ export function MoveProgress({
 					.finally(() => utils.chatMove.latest.invalidate({ chatSessionId }));
 				return;
 			}
-			void runMoveOnThisComputer({
+			void runMoveOnComputer({
 				moveId,
 				host: getHostServiceClientByUrl(activeHostUrl),
 			})
