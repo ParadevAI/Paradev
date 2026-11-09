@@ -21576,6 +21576,9 @@ msgstr "Версия {version}"
 msgid "Version {version} installs the next time you restart."
 msgstr "Версия {version} установится при следующем перезапуске."
 
+msgid "Version {version} is available"
+msgstr "Доступна версия {version}"
+
 msgid "Version {version} is the latest version."
 msgstr "Версия {version} — самая свежая."
 

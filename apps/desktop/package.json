@@ -114,7 +114,7 @@
 		"@replit/codemirror-css-color-picker": "6.3.0",
 		"@sentry/electron": "7.16.0",
 		"@sentry/vite-plugin": "5.4.0",
-		"@storybook/react-vite": "10.4.2",
+		"@storybook/react-vite": "10.6.2",
 		"@streamdown/mermaid": "1.0.2",
 		"@superset/agent-setup": "workspace:*",
 		"@superset/auth": "workspace:*",
@@ -279,7 +279,7 @@
 		"shell-quote": "1.11.0",
 		"shiki": "3.23.0",
 		"simple-git": "4.0.2",
-		"storybook": "10.4.2",
+		"storybook": "10.6.2",
 		"streamdown": "2.5.0",
 		"strip-ansi": "7.2.0",
 		"superjson": "2.2.6",
@@ -297,7 +297,7 @@
 		"uuid": "14.0.0",
 		"vite": "7.3.7",
 		"vite-tsconfig-paths": "5.1.4",
-		"zod": "4.6.5",
+		"zod": "4.6.6",
 		"zustand": "5.0.12"
 	}
 }
