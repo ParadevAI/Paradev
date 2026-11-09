@@ -170,6 +170,7 @@ export class Session {
 	private outputHead = "";
 	private ptyExitSignal: number | undefined;
 	private ptyExitReported = false;
+	private exitNotified = false;
 	private ptySpawnError: string | null = null;
 
 	// Promise that resolves when PTY is ready to accept writes
@@ -439,18 +440,6 @@ export class Session {
 				this.exitCode = exitCode;
 				this.ptyExitSignal = signal !== 0 ? signal : undefined;
 				this.ptyExitReported = true;
-
-				this.broadcastEvent("exit", {
-					type: "exit",
-					exitCode,
-					signal: signal !== 0 ? signal : undefined,
-				} satisfies TerminalExitEvent);
-
-				this.onSessionExit?.(
-					this.sessionId,
-					exitCode,
-					signal !== 0 ? signal : undefined,
-				);
 				break;
 			}
 
@@ -484,15 +473,17 @@ export class Session {
 	 * Handle subprocess exiting
 	 */
 	private handleSubprocessExit(exitCode: number): void {
-		if (this.exitCode === null) {
-			this.exitCode = exitCode;
+		if (!this.exitNotified) {
+			this.exitCode ??= exitCode;
+			this.exitNotified = true;
 
 			this.broadcastEvent("exit", {
 				type: "exit",
-				exitCode,
+				exitCode: this.exitCode,
+				signal: this.ptyExitSignal,
 			} satisfies TerminalExitEvent);
 
-			this.onSessionExit?.(this.sessionId, exitCode);
+			this.onSessionExit?.(this.sessionId, this.exitCode, this.ptyExitSignal);
 		}
 
 		// Ensure waiters don't hang forever if the subprocess exits before sending Spawned.
@@ -507,6 +498,7 @@ export class Session {
 	}
 
 	private async finishSubprocessExit(exitCode: number): Promise<void> {
+		if (this.disposed) return;
 		this.resolveShellReady("timed_out");
 		if (this.emulatorWriteQueue.length > 0) {
 			await new Promise<void>((resolve) => {
@@ -514,6 +506,9 @@ export class Session {
 				this.scheduleEmulatorWrite();
 			});
 		}
+		if (this.disposed) return;
+		await this.emulator.flush();
+		if (this.disposed) return;
 		this.handleSubprocessExit(exitCode);
 	}
 
@@ -807,6 +802,14 @@ export class Session {
 			this.subprocess !== null &&
 			!this.subprocessExited &&
 			this.exitCode === null
+		);
+	}
+
+	get isDraining(): boolean {
+		return (
+			!this.disposed &&
+			this.subprocess !== null &&
+			(this.subprocessExited || this.ptyExitReported)
 		);
 	}
 

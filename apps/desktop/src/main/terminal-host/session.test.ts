@@ -12,6 +12,7 @@ import {
 import "./xterm-env-polyfill";
 
 const { Session } = await import("./session");
+const { TerminalHost } = await import("./terminal-host");
 
 class FakeStdout extends EventEmitter {
 	pauseCalls = 0;
@@ -71,7 +72,9 @@ it("drains paused output and the PTY exit frame before closing the subprocess", 
 	session.onExit((_id, code) => exits.push(code));
 	session.spawn({ cwd: "/tmp", cols: 80, rows: 24, env: {} });
 	child.stdout.write(createFrameHeader(PtySubprocessIpcType.Ready, 0));
-	const socket = new EventEmitter() as import("node:net").Socket;
+	const socket = Object.assign(new EventEmitter(), {
+		write: () => true,
+	}) as unknown as import("node:net").Socket;
 	const internals = session as unknown as {
 		handleClientBackpressure: (socket: import("node:net").Socket) => void;
 		emulator: { flush: () => Promise<void> };
@@ -103,12 +106,69 @@ it("drains paused output and the PTY exit frame before closing the subprocess", 
 		child.stdout.once("end", resolve);
 		child.stdout.end();
 	});
+	expect(exits).toEqual([]);
+	const host = new TerminalHost();
+	const hostSessions = (
+		host as unknown as { sessions: Map<string, typeof session> }
+	).sessions;
+	hostSessions.set(session.sessionId, session);
+	host.detach(socket, { sessionId: session.sessionId });
+	expect(hostSessions.get(session.sessionId)).toBe(session);
+	host.detachFromAllSessions(socket);
+	expect(hostSessions.get(session.sessionId)).toBe(session);
+	const flush = internals.emulator.flush.bind(internals.emulator);
+	let releaseFlush!: () => void;
+	const pendingFlush = new Promise<void>((resolve) => {
+		releaseFlush = resolve;
+	});
+	internals.emulator.flush = async () => {
+		await pendingFlush;
+		await flush();
+	};
+	const reconnect = host.createOrAttach(socket, {
+		sessionId: session.sessionId,
+		workspaceId: session.workspaceId,
+		paneId: session.paneId,
+		tabId: session.tabId,
+		cols: 80,
+		rows: 24,
+	});
 	child.emit("close", 0);
 	await new Promise<void>((resolve) => setImmediate(resolve));
+	expect(exits).toEqual([]);
+	releaseFlush();
 	await internals.emulator.flush();
+	await new Promise<void>((resolve) => setImmediate(resolve));
+	const reattached = await reconnect;
+	expect(reattached.isNew).toBe(false);
+	expect(reattached.snapshot.snapshotAnsi).toContain("final output");
 	expect(exits).toEqual([3]);
 	expect(session.getSnapshot().snapshotAnsi).toContain("final output");
 	await session.dispose();
+});
+
+it("does not notify exit if disposed while final output is draining", async () => {
+	const session = new Session({
+		sessionId: "session-disposed-drain",
+		workspaceId: "workspace-1",
+		paneId: "pane-1",
+		tabId: "tab-1",
+		cols: 80,
+		rows: 24,
+		cwd: "/tmp",
+		shell: "/bin/sh",
+	});
+	const exits: number[] = [];
+	session.onExit((_id, code) => exits.push(code));
+	const internals = session as unknown as {
+		enqueueEmulatorWrite: (data: string) => void;
+		finishSubprocessExit: (code: number) => Promise<void>;
+	};
+	internals.enqueueEmulatorWrite("last output");
+	const finishing = internals.finishSubprocessExit(0);
+	await session.dispose();
+	await finishing;
+	expect(exits).toEqual([]);
 });
 
 function sendFrame(

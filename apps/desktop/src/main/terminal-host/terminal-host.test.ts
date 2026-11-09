@@ -334,8 +334,12 @@ describe("TerminalHost — spawn failure cause", () => {
 	it("does NOT report SHELL_EXITED when the PTY helper failed before opening a PTY", async () => {
 		const session = spawnSession();
 		emitReadyThenError(fakeChild, "Spawn failed: posix_spawn failed: EAGAIN");
+		const exited = new Promise<void>((resolve) =>
+			session.onExit(() => resolve()),
+		);
 		fakeChild.emit("exit", 1);
 		fakeChild.emit("close", 1);
+		await exited;
 
 		expect(session.describeSpawnFailure()).toEqual({
 			kind: "PTY_SPAWN_FAILED",

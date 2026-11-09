@@ -100,14 +100,14 @@ export class TerminalHost {
 
 		try {
 			// Force-dispose terminating sessions to prevent race conditions
-			if (session?.isTerminating) {
+			if (session?.isTerminating && !session.isDraining) {
 				void session.dispose();
 				this.sessions.delete(sessionId);
 				this.clearKillTimer(sessionId);
 				session = undefined;
 			}
 
-			if (session && !session.isAlive) {
+			if (session && !session.isAlive && !session.isDraining) {
 				void session.dispose();
 				this.sessions.delete(sessionId);
 				session = undefined;
@@ -236,7 +236,11 @@ export class TerminalHost {
 		const session = this.sessions.get(request.sessionId);
 		if (session) {
 			session.detach(socket);
-			if (!session.isAlive && session.clientCount === 0) {
+			if (
+				!session.isAlive &&
+				!session.isDraining &&
+				session.clientCount === 0
+			) {
 				void session.dispose();
 				this.sessions.delete(request.sessionId);
 			}
@@ -347,7 +351,11 @@ export class TerminalHost {
 		for (const [sessionId, session] of this.sessions.entries()) {
 			session.detach(socket);
 			// Clean up dead sessions when last client detaches
-			if (!session.isAlive && session.clientCount === 0) {
+			if (
+				!session.isAlive &&
+				!session.isDraining &&
+				session.clientCount === 0
+			) {
 				void session.dispose();
 				this.sessions.delete(sessionId);
 			}
