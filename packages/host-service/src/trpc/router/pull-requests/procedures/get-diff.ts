@@ -9,8 +9,8 @@ export const getDiff = protectedProcedure
 		z.object({ projectId: z.string(), prNumber: z.number().int().positive() }),
 	)
 	.query(async ({ ctx, input }) => {
+		const repo = await resolveGithubRepo(ctx, input.projectId);
 		try {
-			const repo = await resolveGithubRepo(ctx, input.projectId);
 			return await fetchPullRequestDiff(
 				`${repo.owner}/${repo.name}`,
 				input.prNumber,
