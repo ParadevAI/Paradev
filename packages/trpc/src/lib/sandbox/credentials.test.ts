@@ -127,22 +127,19 @@ describe("deriveSandboxCredentials", () => {
 		expect(
 			rules(networkPolicy)["github.com"]?.[0]?.transform[0]?.headers,
 		).toEqual({ Authorization: `Basic ${basic}` });
-		expect(
-			rules(networkPolicy)["api.github.com"]?.[0]?.transform[0]?.headers,
-		).toEqual({ Authorization: "Bearer ghs_token" });
-		expect(rules(networkPolicy)["uploads.github.com"]).toEqual(
-			[
-				`token ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
-				`Bearer ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
-			].map((placeholder) => ({
-				match: {
-					headers: [
-						{ key: { exact: "Authorization" }, value: { exact: placeholder } },
-					],
-				},
-				transform: [{ headers: { Authorization: "Bearer ghs_token" } }],
-			})),
-		);
+		const placeholderSwap = [
+			`token ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+			`Bearer ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+		].map((placeholder) => ({
+			match: {
+				headers: [
+					{ key: { exact: "Authorization" }, value: { exact: placeholder } },
+				],
+			},
+			transform: [{ headers: { Authorization: "Bearer ghs_token" } }],
+		}));
+		expect(rules(networkPolicy)["api.github.com"]).toEqual(placeholderSwap);
+		expect(rules(networkPolicy)["uploads.github.com"]).toEqual(placeholderSwap);
 		expect(managedEnv.GH_TOKEN).toBe(SANDBOX_CREDENTIAL_PLACEHOLDER);
 		expect(JSON.stringify(managedEnv)).not.toContain("ghs_token");
 	});
