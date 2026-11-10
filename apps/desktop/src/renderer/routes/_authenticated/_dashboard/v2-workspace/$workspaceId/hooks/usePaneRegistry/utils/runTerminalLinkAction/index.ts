@@ -4,5 +4,5 @@ export {
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
-	terminalPullRequestLinkAction,
+	terminalUrlLinkAction,
 } from "./runTerminalLinkAction";
