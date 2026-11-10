@@ -8,7 +8,7 @@ import { type SimpleGit, simpleGit } from "simple-git";
 import { projects, workspaces } from "../../../db/schema";
 import type { HostServiceContext } from "../../../types";
 import { createTestDb } from "../pull-requests/shared/test-db";
-import { gitRouter, worktreeHoldingBranch } from "./git";
+import { gitRouter } from "./git";
 
 function createCaller(worktreePath: string) {
 	const db = createTestDb();
@@ -29,6 +29,10 @@ function createCaller(worktreePath: string) {
 		db,
 		eventBus: { emit: () => {}, broadcastWorkspaceChanged: () => {} },
 		git: async (path: string) => simpleGit(path),
+		credentials: {
+			getCredentials: async () => ({ env: {} }),
+			getToken: async () => null,
+		},
 	} as unknown as HostServiceContext;
 	return {
 		caller: gitRouter.createCaller(ctx),
@@ -98,14 +102,13 @@ test("a branch another worktree holds is refused with a conflict", async () => {
 	).rejects.toMatchObject({ code: "CONFLICT" });
 });
 
-test("worktreeHoldingBranch reads the porcelain listing", () => {
-	const porcelain = [
-		"worktree /repo\nHEAD abc\nbranch refs/heads/main\n",
-		"worktree /repo/.wt/two\nHEAD def\nbranch refs/heads/layer-2\n",
-		"worktree /repo/.wt/detached\nHEAD 123\ndetached\n",
-	].join("\n");
-	expect(worktreeHoldingBranch(porcelain, "layer-2")).toBe("/repo/.wt/two");
-	expect(worktreeHoldingBranch(porcelain, "layer-3")).toBeNull();
+test("a branch name git could read as an option is refused", async () => {
+	await expect(
+		createCaller(repo).caller.checkoutBranch({
+			workspaceId: "ws",
+			branch: "--upload-pack=x",
+		}),
+	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
 test("fetchBranches with missingOnly leaves known branches alone", async () => {

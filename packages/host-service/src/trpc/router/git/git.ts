@@ -1,9 +1,7 @@
-import { realpathSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import type { SimpleGit } from "simple-git";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
@@ -11,12 +9,14 @@ import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
+	gitCheckoutBranchTask,
 	gitCommitFilesTask,
 	gitCommitTask,
 	gitDiffBulkTask,
 	gitDiffPatchTask,
 	gitDiffSideBlobTask,
 	gitFetchBaseRefTask,
+	gitFetchBranchesTask,
 	gitPushTask,
 	gitStagePathsTask,
 	gitStatusPartialTask,
@@ -135,46 +135,31 @@ function invalidateStatus(workspaceId: string): void {
 	gitStatusStore.recordChange(workspaceId, undefined);
 }
 
-/** The worktree path `git worktree list --porcelain` shows for a branch, if any. */
-export function worktreeHoldingBranch(
-	porcelain: string,
-	branch: string,
-): string | null {
-	for (const block of porcelain.split("\n\n")) {
-		const path = block.match(/^worktree (.+)$/m)?.[1];
-		const head = block.match(/^branch refs\/heads\/(.+)$/m)?.[1];
-		if (path && head === branch) return path;
-	}
-	return null;
-}
+// A name git could read as an option (`--upload-pack=...`) never reaches it.
+const branchName = z
+	.string()
+	.min(1)
+	.refine((name) => !name.startsWith("-"), "Not a branch name");
 
-/** Git prints resolved paths; a stored one can differ by symlink or letter case. */
-function isSamePath(a: string, b: string): boolean {
-	const resolve = (path: string) => {
-		try {
-			return realpathSync.native(path);
-		} catch {
-			return path;
-		}
-	};
-	return resolve(a) === resolve(b);
-}
-
-/** Branch names `git switch` can resolve without a fetch: local, or tracked from origin. */
-async function knownBranches(git: SimpleGit): Promise<Set<string>> {
-	const refs = await git.raw([
-		"for-each-ref",
-		"--format=%(refname)",
-		"refs/heads",
-		"refs/remotes/origin",
-	]);
-	return new Set(
-		refs
-			.split("\n")
-			.map((ref) => ref.replace(/^refs\/(heads|remotes\/origin)\//, "").trim())
-			.filter(Boolean),
-	);
-}
+const CHECKOUT_REFUSALS = {
+	dirty: {
+		code: "PRECONDITION_FAILED",
+		message: () => "Commit or discard the changes in this workspace first.",
+	},
+	"held-elsewhere": {
+		code: "CONFLICT",
+		message: (branch: string) =>
+			`${branch} is checked out in another workspace.`,
+	},
+	"fetch-failed": {
+		code: "INTERNAL_SERVER_ERROR",
+		message: (branch: string) => `Could not fetch ${branch} from origin.`,
+	},
+	"not-found": {
+		code: "NOT_FOUND",
+		message: (branch: string) => `No branch ${branch} here or on origin.`,
+	},
+} as const;
 
 function runStatusSnapshot(
 	ctx: Parameters<typeof resolveWorktreePath>[0] &
@@ -600,46 +585,26 @@ export const gitRouter = router({
 	 * branch, because git allows a branch in one worktree at a time.
 	 */
 	checkoutBranch: protectedProcedure
-		.input(z.object({ workspaceId: z.string(), branch: z.string().min(1) }))
+		.input(z.object({ workspaceId: z.string(), branch: branchName }))
 		.mutation(async ({ ctx, input }) => {
 			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
-			if (!(await git.status()).isClean()) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Commit or discard the changes in this workspace first.",
-				});
-			}
-			const holder = worktreeHoldingBranch(
-				await git.raw(["worktree", "list", "--porcelain"]),
-				input.branch,
-			);
-			if (holder && !isSamePath(holder, worktreePath)) {
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: `${input.branch} is checked out in another workspace.`,
-				});
-			}
-			if (!(await knownBranches(git)).has(input.branch)) {
-				await git.fetch("origin", input.branch).catch((error) => {
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			const result = await getHostWorkerPool()
+				.run(
+					gitCheckoutBranchTask,
+					{ worktreePath, branch: input.branch, gitEnv },
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
 					rethrowEnvironmentalGitError(error);
-					if (/couldn't find remote ref/i.test(String(error))) return;
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: `Could not fetch ${input.branch} from origin.`,
-						cause: error,
-					});
+					throw error;
 				});
-			}
-			try {
-				await git.raw(["switch", input.branch]);
-			} catch (error) {
-				rethrowEnvironmentalGitError(error);
+			if (!result.ok) {
+				const refusal = CHECKOUT_REFUSALS[result.reason];
 				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: `No branch ${input.branch} here or on origin.`,
-					cause: error,
+					code: refusal.code,
+					message: refusal.message(input.branch),
 				});
 			}
 			updateLocalWorkspace(
@@ -655,21 +620,30 @@ export const gitRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
-				branches: z.array(z.string().min(1)).max(20),
+				branches: z.array(branchName).max(20),
 				missingOnly: z.boolean().default(false),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const git = await ctx.git(resolveWorktreePath(ctx, input.workspaceId));
-			let branches = input.branches;
-			if (input.missingOnly) {
-				const known = await knownBranches(git);
-				branches = branches.filter((branch) => !known.has(branch));
-			}
-			if (branches.length === 0) return { fetched: [] };
-			await git.fetch(["origin", ...branches]);
-			invalidateStatus(input.workspaceId);
-			return { fetched: branches };
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			const result = await getHostWorkerPool()
+				.run(
+					gitFetchBranchesTask,
+					{
+						worktreePath,
+						branches: input.branches,
+						missingOnly: input.missingOnly,
+						gitEnv,
+					},
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
+					rethrowEnvironmentalGitError(error);
+					throw error;
+				});
+			if (result.fetched.length > 0) invalidateStatus(input.workspaceId);
+			return result;
 		}),
 
 	discardChanges: protectedProcedure
