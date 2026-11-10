@@ -57,6 +57,17 @@ const hostServiceSentryPlugin = process.env.SENTRY_AUTH_TOKEN
 
 const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
 
+const reactCompilerDirs = [
+	resolve(
+		__dirname,
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession",
+	),
+	resolve(__dirname, "../../packages/chat-ui/src"),
+];
+
+const isReactCompilerSource = (filename: string) =>
+	reactCompilerDirs.some((dir) => filename.startsWith(`${dir}/`));
+
 export default defineConfig({
 	main: {
 		plugins: [tsconfigPaths, linguiMacroPlugin(), copyResourcesPlugin()],
@@ -260,8 +271,13 @@ export default defineConfig({
 			tsconfigPaths,
 			tailwindcss(),
 			reactPlugin({
-				// Compiles @lingui/react/macro (Trans, useLingui) at build time.
-				babel: { plugins: ["@lingui/babel-plugin-lingui-macro"] },
+				babel: {
+					plugins: [
+						// Macro first: it cannot read `t` calls the compiler has already rewritten.
+						"@lingui/babel-plugin-lingui-macro",
+						["babel-plugin-react-compiler", { sources: isReactCompilerSource }],
+					],
+				},
 			}),
 			htmlEnvTransformPlugin(),
 		],
