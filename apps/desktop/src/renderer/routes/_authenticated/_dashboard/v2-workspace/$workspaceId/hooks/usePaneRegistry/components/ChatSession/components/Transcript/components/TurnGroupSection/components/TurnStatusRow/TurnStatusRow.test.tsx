@@ -2,6 +2,8 @@ import { afterEach, expect, mock, test } from "bun:test";
 import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { ChatPaneActionsProvider } from "../../../../../../providers/ChatPaneActionsProvider";
 import {
 	type TurnFailureActions,
 	TurnFailureActionsProvider,
@@ -222,4 +224,34 @@ test("an older paused turn offers no Resume", () => {
 		/>,
 	);
 	expect(view.container.textContent).toBe("Paused when Paradev closed");
+});
+
+test("a cloud workspace shows no paused row", () => {
+	const view = render(
+		<SandboxAccessContext.Provider
+			value={{
+				targets: [
+					{
+						workspaceId: "w1",
+						organizationId: "o1",
+						url: "https://box",
+						desktopUrl: "https://box/desktop",
+					},
+				],
+				isReady: true,
+				agentCredentialsChangedWorkspaceId: null,
+				usageRefusal: null,
+			}}
+		>
+			<ChatPaneActionsProvider workspaceId="w1">
+				<TurnStatusRow
+					error={{ message: "Paradev closed", kind: "host_stopped" }}
+					latest
+					status="interrupted"
+					turnId="t1"
+				/>
+			</ChatPaneActionsProvider>
+		</SandboxAccessContext.Provider>,
+	);
+	expect(view.container.textContent).toBe("");
 });

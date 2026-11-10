@@ -2,6 +2,8 @@ import { Trans } from "@lingui/react/macro";
 import type { UserStop } from "@superset/chat/core";
 import type { TurnError } from "@superset/chat/protocol";
 import { Gauge } from "lucide-react";
+import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { useChatPaneActions } from "../../../../../../providers/ChatPaneActionsProvider";
 import { PausedOnCloseRow } from "./components/PausedOnCloseRow";
 import { StoppedDivider } from "./components/StoppedDivider";
 import { TurnFailureCard } from "./components/TurnFailureCard";
@@ -19,8 +21,14 @@ export function TurnStatusRow({
 	turnId: string;
 	userStop?: UserStop | undefined;
 }) {
-	if (error?.kind === "host_stopped")
-		return <PausedOnCloseRow latest={latest} />;
+	const { workspaceId } = useChatPaneActions();
+	const { targets: sandboxes } = useSandboxAccess();
+	if (error?.kind === "host_stopped") {
+		const onSandbox = sandboxes.some(
+			(sandbox) => sandbox.workspaceId === workspaceId,
+		);
+		return onSandbox ? null : <PausedOnCloseRow latest={latest} />;
+	}
 	if (status === "interrupted") return <StoppedDivider userStop={userStop} />;
 	// The composer's limit notice carries the recovery; history only says why.
 	if (error?.kind === "usage_limit") {
