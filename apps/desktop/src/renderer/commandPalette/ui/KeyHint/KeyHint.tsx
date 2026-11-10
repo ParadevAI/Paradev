@@ -6,7 +6,6 @@ interface KeyHintProps {
 	label: ReactNode;
 }
 
-/** Key caps and what they do, for a palette footer. */
 export function KeyHint({ keys, label }: KeyHintProps) {
 	return (
 		<span className="flex items-center gap-1.5">

@@ -13,7 +13,6 @@ export interface SwitchDetails {
 	hold: boolean;
 }
 
-/** Closes the palette and opens the row's workspace, recording how it was reached. */
 export function useSwitchToWorkspace(via: SwitchedVia) {
 	const navigate = useNavigate();
 	const setOpen = useFrameStackStore((s) => s.setOpen);

@@ -2,7 +2,6 @@ import { useLingui } from "@lingui/react/macro";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { KeyHint } from "../KeyHint";
 
-/** The commands root's footer: how to open, reach every workspace, or narrow to commands. */
 export function CommandPaletteFooter() {
 	const { t } = useLingui();
 	const switcher = useHotkeyDisplay("OPEN_WORKSPACE_LIST");

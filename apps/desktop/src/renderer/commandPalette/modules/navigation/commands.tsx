@@ -8,10 +8,6 @@ import { settingsTabCommands } from "../settings/commands";
 
 export const WORKSPACES_COMMAND_ID = "nav.workspaces";
 
-/**
- * Opens the workspace switcher. With the modifier still held, the switcher
- * steps on each further press and switches when the modifier is released.
- */
 export function openWorkspaceList(
 	options: { via?: SwitcherOpenedVia; holdsModifier?: boolean } = {},
 ): void {

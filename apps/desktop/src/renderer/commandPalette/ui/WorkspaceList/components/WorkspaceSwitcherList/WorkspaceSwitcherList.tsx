@@ -23,11 +23,9 @@ const BUCKET_LABELS: Record<SwitcherBucket, MessageDescriptor> = {
 
 interface WorkspaceSwitcherListProps {
 	query: string;
-	/** Set by the root switcher: controlled selection, hotkey stepping, hold-to-switch. */
 	cycle?: SwitcherCycle;
 }
 
-/** Every workspace, ordered by what needs you; a query ranks them into one list. */
 export function WorkspaceSwitcherList({
 	query,
 	cycle,

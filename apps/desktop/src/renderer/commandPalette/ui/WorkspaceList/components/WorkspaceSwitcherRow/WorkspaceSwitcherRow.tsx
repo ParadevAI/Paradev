@@ -19,7 +19,6 @@ interface WorkspaceSwitcherRowProps {
 	onSelect: () => void;
 }
 
-/** The sidebar's signals on one 34px line: lead glyph, name, project · branch, PR, place, age. */
 export function WorkspaceSwitcherRow({
 	workspace,
 	isCurrent,

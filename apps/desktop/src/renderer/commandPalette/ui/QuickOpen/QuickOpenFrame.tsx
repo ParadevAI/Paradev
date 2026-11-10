@@ -17,7 +17,6 @@ function fileNameOf(relativePath: string): string {
 	return relativePath.split("/").at(-1) ?? relativePath;
 }
 
-/** The files frame: recently viewed files, then matches from the open workspace. */
 export function QuickOpenFrame() {
 	const query = useCommandPaletteQuery();
 	const provider = useQuickOpenStore((s) => s.provider);

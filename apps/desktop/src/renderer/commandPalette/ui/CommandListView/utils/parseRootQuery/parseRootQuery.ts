@@ -1,7 +1,6 @@
 const COMMANDS_ONLY_PREFIX = ">";
 
 export interface RootQuery {
-	/** A leading ">" narrows the root to commands, the VS Code convention. */
 	commandsOnly: boolean;
 	query: string;
 }

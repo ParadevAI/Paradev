@@ -8,7 +8,6 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getAllowedSectionsForVariant } from "../../utils/settings-search";
 import type { SettingsSectionVisibility } from "../../utils/settingsSections";
 
-/** Which settings sections this user can open here: platform, role, flags and app variant. */
 export function useSettingsSectionVisibility(): SettingsSectionVisibility {
 	const mobileEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH) === true;

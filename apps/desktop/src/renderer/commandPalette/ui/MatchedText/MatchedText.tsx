@@ -3,7 +3,6 @@ interface MatchedTextProps {
 	query: string;
 }
 
-/** The text with the first occurrence of the query marked, if it occurs. */
 export function MatchedText({ text, query }: MatchedTextProps) {
 	const needle = query.trim().toLowerCase();
 	const start = needle ? text.toLowerCase().indexOf(needle) : -1;

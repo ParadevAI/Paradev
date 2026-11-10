@@ -6,11 +6,7 @@ type ScopeInputs = Pick<
 	"id" | "isInSidebar" | "createdByName"
 >;
 
-/**
- * The workspaces a query reaches: the sidebar's by default (plus the one
- * you are in, which may have been opened from elsewhere), everyone's with
- * "#", and one person's with "#name".
- */
+/** The current workspace stays in scope: it may have been opened from outside the sidebar. */
 export function scopeWorkspaces<T extends ScopeInputs>(
 	workspaces: T[],
 	query: Pick<SwitcherQuery, "scope" | "creator">,

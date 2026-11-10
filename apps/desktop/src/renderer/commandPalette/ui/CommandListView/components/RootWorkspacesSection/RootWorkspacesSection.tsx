@@ -14,7 +14,6 @@ interface RootWorkspacesSectionProps {
 	query: string;
 }
 
-/** The workspaces that most need you, in the commands root, with the way to every other one. */
 export function RootWorkspacesSection({
 	rows,
 	query,

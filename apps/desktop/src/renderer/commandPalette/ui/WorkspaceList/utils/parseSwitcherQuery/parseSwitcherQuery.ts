@@ -1,7 +1,6 @@
 export type SwitcherScope = "sidebar" | "all";
 
 export interface SwitcherQuery {
-	/** The sidebar's workspaces, or every workspace you can reach. */
 	scope: SwitcherScope;
 	/** A creator name prefix, from "#name"; null for anyone. */
 	creator: string | null;
@@ -13,7 +12,6 @@ function words(text: string): string[] {
 	return text.toLowerCase().split(/\s+/).filter(Boolean);
 }
 
-/** True when some word of the name starts with the token. */
 export function matchesCreator(name: string | null, token: string): boolean {
 	if (!name) return false;
 	return words(name).some((word) => word.startsWith(token));

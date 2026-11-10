@@ -8,7 +8,6 @@ export interface Frame {
 	command: Command;
 }
 
-/** What the palette shows with no frame pushed: commands, or the workspace switcher. */
 export type PaletteRoot = "commands" | "switcher";
 
 export type SwitcherOpenedVia = "hotkey" | "pill" | "command";

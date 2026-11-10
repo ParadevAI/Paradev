@@ -7,7 +7,6 @@ export interface QuickOpenFileMatch {
 	relativePath: string;
 }
 
-/** What the open workspace page lends the palette's files frame. */
 export interface QuickOpenProvider {
 	workspaceId: string;
 	recentFiles: RecentFile[];

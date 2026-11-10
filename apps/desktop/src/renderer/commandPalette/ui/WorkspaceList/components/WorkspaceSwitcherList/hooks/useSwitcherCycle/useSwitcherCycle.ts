@@ -14,11 +14,6 @@ function holdsAnyModifier(e: KeyboardEvent): boolean {
 	return e.metaKey || e.ctrlKey || e.altKey;
 }
 
-/**
- * The root switcher's keyboard model: the selection always lands on a row,
- * each further press of the switcher hotkey moves it down one, typing ends
- * hold-to-switch, and releasing the held modifier opens the selection.
- */
 export function useSwitcherCycle(
 	cycle: SwitcherCycle | undefined,
 	ordered: Row[],

@@ -19,7 +19,6 @@ export interface SwitcherGroups {
 	query: SwitcherQuery;
 }
 
-/** The workspaces the query reaches, in switcher order, with the viewed one marked current. */
 export function useSwitcherGroups(rawQuery: string): SwitcherGroups {
 	const { all: workspaces } = useAccessibleV2Workspaces();
 	const currentPath = useLocation({ select: (loc) => loc.pathname });

@@ -50,11 +50,7 @@ export function bucketOf(
 	}
 }
 
-/**
- * The switcher's order: what needs you, then what finished, then what is
- * still running, then everything else by last activity. The current
- * workspace leads "recent" whatever its status, since you are already there.
- */
+/** The current workspace leads "recent" whatever its status: you are already there. */
 export function bucketWorkspaces<T extends BucketInputs>(
 	workspaces: T[],
 	currentId: string | null,
@@ -93,10 +89,6 @@ function searchable(workspace: BucketInputs) {
 	};
 }
 
-/**
- * Query results as one flat list: best match first, and among equal
- * matches the switcher's own order (bucket, then activity).
- */
 export function rankSwitcherRows<T extends BucketInputs>(
 	groups: SwitcherGroup<T>[],
 	query: string,
@@ -116,7 +108,6 @@ export function rankSwitcherRows<T extends BucketInputs>(
 		.map((entry) => entry.row);
 }
 
-/** The row's match score for the query, on the palette's own scale. */
 export function switcherRowScore<T extends BucketInputs>(
 	row: SwitcherRow<T>,
 	query: string,

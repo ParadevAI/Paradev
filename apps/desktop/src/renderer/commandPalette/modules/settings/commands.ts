@@ -4,7 +4,6 @@ import {
 } from "renderer/routes/_authenticated/settings/utils/settingsSections";
 import type { Command, CommandContext } from "../../core/types";
 
-/** The settings sidebar's pages, as commands: same order, labels and visibility. */
 export function settingsTabCommands(context: CommandContext): Command[] {
 	return SETTINGS_SECTION_GROUPS.flatMap((group) => group.items)
 		.filter((item) =>

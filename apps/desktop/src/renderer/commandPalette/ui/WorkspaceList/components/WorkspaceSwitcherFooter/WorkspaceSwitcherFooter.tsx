@@ -3,7 +3,6 @@ import { PLATFORM, useHotkeyDisplay } from "renderer/hotkeys";
 import type { SwitcherSelection } from "../../../../core/frames";
 import { KeyHint } from "../../../KeyHint";
 
-/** The keys that act on the selected row, so they can be learned without a tooltip. */
 export function WorkspaceSwitcherFooter({
 	selection,
 }: {

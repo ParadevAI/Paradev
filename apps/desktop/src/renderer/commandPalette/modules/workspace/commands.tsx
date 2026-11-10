@@ -28,7 +28,6 @@ const quickOpenCommand: Command = {
 	framePlaceholder: msg({ message: "Search files..." }),
 };
 
-/** Opens the palette on its files frame, for the open workspace. */
 export function openQuickOpen(): void {
 	const { setOpen, reset, pushFrame } = useFrameStackStore.getState();
 	setOpen(true);

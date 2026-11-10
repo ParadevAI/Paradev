@@ -12,7 +12,6 @@ interface WorkspaceSwitcherViewProps {
 	cycle: SwitcherCycle;
 }
 
-/** The palette's switcher root: the list plus the keys that act on its selection. */
 export function WorkspaceSwitcherView({
 	query,
 	cycle,

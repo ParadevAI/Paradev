@@ -61,7 +61,6 @@ export interface SettingsSectionItem {
 	section: SettingsSection;
 	label: MessageDescriptor;
 	icon: ElementType<{ className?: string }>;
-	/** Extra search terms for the command palette's Settings list. */
 	keywords?: string[];
 	macOnly?: boolean;
 	adminOnly?: boolean;
@@ -74,7 +73,7 @@ export interface SettingsSectionGroup {
 	items: SettingsSectionItem[];
 }
 
-/** Every settings page, in sidebar order. The settings sidebar and the command palette both list these. */
+/** The settings sidebar and the command palette both list these. */
 export const SETTINGS_SECTION_GROUPS: SettingsSectionGroup[] = [
 	{
 		label: msg({
