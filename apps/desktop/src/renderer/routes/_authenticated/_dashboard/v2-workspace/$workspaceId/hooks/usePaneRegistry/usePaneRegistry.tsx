@@ -448,6 +448,7 @@ export function usePaneRegistry({
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
 						<DiffPane
 							context={ctx}
+							mainStore={store}
 							workspaceId={workspaceId}
 							onOpenFile={onOpenFile}
 							onCreateNewAgentSession={createNewAgentSession}

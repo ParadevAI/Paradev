@@ -20,7 +20,11 @@ import {
 	EditProvider,
 } from "@pierre/diffs/react";
 import { errorMessage } from "@superset/i18n/errors";
-import { type RendererContext, useIsTabVisible } from "@superset/panes";
+import {
+	type RendererContext,
+	useIsTabVisible,
+	type WorkspaceStore,
+} from "@superset/panes";
 import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
@@ -38,8 +42,14 @@ import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFil
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import { useStore } from "zustand";
+import type { StoreApi } from "zustand/vanilla";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
-import type { DiffPaneData, PaneViewerData } from "../../../../types";
+import type {
+	ChatPaneData,
+	DiffPaneData,
+	PaneViewerData,
+} from "../../../../types";
 import { changesPillStats } from "../../../../utils/changesPillStats";
 import {
 	type ChangesetFile,
@@ -97,6 +107,7 @@ interface CreateNewAgentSessionInput {
 
 interface DiffPaneProps {
 	context: RendererContext<PaneViewerData>;
+	mainStore: StoreApi<WorkspaceStore<PaneViewerData>>;
 	workspaceId: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
 	onCreateNewAgentSession?: (
@@ -123,10 +134,17 @@ const createDiffEditor: EditorFactory<DiffAnnotationMetadata, undefined> = (
 
 export function DiffPane({
 	context,
+	mainStore,
 	workspaceId,
 	onOpenFile,
 	onCreateNewAgentSession,
 }: DiffPaneProps) {
+	const activeChatTerminalId = useStore(mainStore, (state) => {
+		const pane = state.getActivePane()?.pane;
+		return pane?.kind === "chat-v3"
+			? (pane.data as ChatPaneData).terminalId
+			: undefined;
+	});
 	const { t } = useLingui();
 	const data = context.pane.data as DiffPaneData;
 	const codeViewRef =
@@ -866,6 +884,7 @@ export function DiffPane({
 				return (
 					<AgentCommentComposer
 						workspaceId={workspaceId}
+						preferredTerminalId={activeChatTerminalId}
 						contextLabel={
 							m.startLine === m.endLine
 								? t({
@@ -915,6 +934,7 @@ export function DiffPane({
 		},
 		[
 			workspaceId,
+			activeChatTerminalId,
 			targetItemId,
 			data.focusLine,
 			data.focusSide,

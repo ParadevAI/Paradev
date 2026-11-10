@@ -6,6 +6,7 @@ import type {
 } from "@pierre/diffs";
 import type { CodeViewHandle } from "@pierre/diffs/react";
 import { toast } from "@superset/ui/sonner";
+import { workspaceTrpc } from "@superset/workspace-client";
 import { type RefObject, useCallback, useMemo, useRef, useState } from "react";
 import {
 	type AgentPromptFileSide,
@@ -79,8 +80,7 @@ interface UseDiffCommentComposerResult {
  *   - tracks the live pierre selection that anchors the composer
  *   - synthesises the composer annotation injected via
  *     useDiffCodeViewItems' `extraAnnotationsByItemId`
- *   - dispatches submit between the existing-terminal send path
- *     and the host `agents.run`-backed new-session path
+ *   - sends to the selected chat or terminal, or starts a new session
  *
  * DiffPane only wires CodeView events; all composer state lives here.
  */
@@ -95,6 +95,7 @@ export function useDiffCommentComposer({
 	const composerRef = useRef(composer);
 	composerRef.current = composer;
 	const { send: sendToTerminalAgent } = useSendToTerminalAgent();
+	const sendToChat = workspaceTrpc.sessions.send.useMutation();
 
 	const clear = useCallback(() => {
 		setComposer(null);
@@ -191,14 +192,23 @@ export function useDiffCommentComposer({
 			}
 
 			try {
-				await sendToTerminalAgent({
-					workspaceId,
-					terminalId: input.target.terminalId,
-					text,
-					submit: true,
-				});
+				if (input.target.chatSessionId) {
+					await sendToChat.mutateAsync({
+						workspaceId,
+						sessionId: input.target.chatSessionId,
+						prompt: text,
+					});
+				} else
+					await sendToTerminalAgent({
+						workspaceId,
+						terminalId: input.target.terminalId,
+						text,
+						submit: true,
+					});
 				clearIfStillCurrent(submitted);
 			} catch {
+				if (input.target.chatSessionId)
+					toast.error(t({ message: "Couldn't send to agent" }));
 				// Toast surfaced by the hook; keep composer open so the user
 				// can retry or edit.
 			}
@@ -208,6 +218,7 @@ export function useDiffCommentComposer({
 			getFile,
 			workspaceId,
 			sendToTerminalAgent,
+			sendToChat,
 			clearIfStillCurrent,
 			onCreateNewAgentSession,
 			t,
