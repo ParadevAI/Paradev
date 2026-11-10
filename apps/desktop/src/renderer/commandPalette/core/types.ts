@@ -3,6 +3,7 @@ import type { ExternalApp } from "@superset/local-db";
 import type { ElementType } from "react";
 import type { HotkeyId } from "renderer/hotkeys/registry";
 import type { HostServiceAvailabilityStatus } from "renderer/lib/host-service-unavailable";
+import type { SettingsSectionVisibility } from "renderer/routes/_authenticated/settings/utils/settingsSections";
 
 export type SectionId =
 	| "workspace"
@@ -31,6 +32,7 @@ export interface CommandContext {
 	localMachineId: string | null;
 	notificationSoundsMuted: boolean;
 	isV2CloudEnabled: boolean;
+	settingsSectionVisibility: SettingsSectionVisibility;
 	navigate: (path: string) => void;
 	/** Opens the new-workspace surface (v2 route, or the v1 modal). */
 	openNewWorkspace: (projectId?: string | null) => void;

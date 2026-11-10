@@ -3518,9 +3518,6 @@ msgstr "Son 30 gündeki {0} token temel alınmıştır; {1} sayılıyor."
 msgid "Before"
 msgstr "Önce"
 
-msgid "Behavior"
-msgstr "Davranış"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "main dalının ? commit gerisinde, rebase gerekiyor"
 
@@ -9434,9 +9431,6 @@ msgstr "Hayalet"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Hayalet tetikleyici: simge + kısaltılan etiket + yukarı-aşağı ok (Primitives sayfasında gösterilen kalıp)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git ve worktree'ler"
@@ -16886,9 +16880,6 @@ msgstr "sağ panel"
 
 msgid "Right-click here"
 msgstr "Buraya sağ tıklayın"
-
-msgid "Ringtones"
-msgstr "Zil sesleri"
 
 msgid "Roadmap"
 msgstr "Yol haritası"

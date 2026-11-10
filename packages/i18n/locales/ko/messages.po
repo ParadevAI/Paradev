@@ -3518,9 +3518,6 @@ msgstr "최근 30일간 토큰 {0}개 기준이며, {1}을(를) 집계했습니�
 msgid "Before"
 msgstr "변경 전"
 
-msgid "Behavior"
-msgstr "동작 방식"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "main보다 커밋 ?개 뒤처짐, 리베이스 필요"
 
@@ -9434,9 +9431,6 @@ msgstr "고스트"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "고스트 트리거: 아이콘 + 말줄임 라벨 + 상하 셰브런(Primitives 페이지에서 시연하는 패턴)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git 및 worktree"
@@ -16886,9 +16880,6 @@ msgstr "오른쪽 패널"
 
 msgid "Right-click here"
 msgstr "여기를 오른쪽 클릭"
-
-msgid "Ringtones"
-msgstr "알림음"
 
 msgid "Roadmap"
 msgstr "로드맵"

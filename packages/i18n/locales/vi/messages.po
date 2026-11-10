@@ -3518,9 +3518,6 @@ msgstr "Dựa trên {0} token trong 30 ngày qua, tính cả {1}."
 msgid "Before"
 msgstr "Trước"
 
-msgid "Behavior"
-msgstr "Hành vi"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Chậm hơn main ? commit, cần rebase"
 
@@ -9434,9 +9431,6 @@ msgstr "Ghost"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Trigger ghost: biểu tượng + nhãn cắt ngắn + chevron lên-xuống (mẫu được demo ở trang Primitives)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git & worktree"
@@ -16886,9 +16880,6 @@ msgstr "ngăn bên phải"
 
 msgid "Right-click here"
 msgstr "Nhấp chuột phải ở đây"
-
-msgid "Ringtones"
-msgstr "Nhạc chuông"
 
 msgid "Roadmap"
 msgstr "Lộ trình"

@@ -3518,9 +3518,6 @@ msgstr "基于最近30天的{0}个token，统计{1}。"
 msgid "Before"
 msgstr "变更前"
 
-msgid "Behavior"
-msgstr "行为"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "落后main ?个提交，需要变基"
 
@@ -9434,9 +9431,6 @@ msgstr "幽灵"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "幽灵触发器：图标+可截断标签+上下箭头（该模式在Primitives页面有演示）"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git与worktree"
@@ -16886,9 +16880,6 @@ msgstr "右侧面板"
 
 msgid "Right-click here"
 msgstr "在这里右键点击"
-
-msgid "Ringtones"
-msgstr "提示音"
 
 msgid "Roadmap"
 msgstr "路线图"

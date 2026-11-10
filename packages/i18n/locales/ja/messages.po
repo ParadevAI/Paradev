@@ -3518,9 +3518,6 @@ msgstr "過去30日間の{0}トークンに基づく({1}を集計)。"
 msgid "Before"
 msgstr "変更前"
 
-msgid "Behavior"
-msgstr "全般"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "mainより?コミット遅れています。リベースが必要です"
 
@@ -9434,9 +9431,6 @@ msgstr "Ghost"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "ghostトリガー: アイコン + 省略表示のラベル + 上下シェブロン(Primitivesページでデモしているパターン)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Gitとワークツリー"
@@ -16886,9 +16880,6 @@ msgstr "右ペイン"
 
 msgid "Right-click here"
 msgstr "ここを右クリック"
-
-msgid "Ringtones"
-msgstr "通知"
 
 msgid "Roadmap"
 msgstr "ロードマップ"

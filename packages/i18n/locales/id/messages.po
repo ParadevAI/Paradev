@@ -3518,9 +3518,6 @@ msgstr "Berdasarkan {0} token dalam 30 hari terakhir, menghitung {1}."
 msgid "Before"
 msgstr "Sebelum"
 
-msgid "Behavior"
-msgstr "Perilaku"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Tertinggal ? commit dari main, perlu rebase"
 
@@ -9434,9 +9431,6 @@ msgstr "Ghost"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Pemicu ghost: ikon + label terpotong + chevron atas-bawah (pola didemokan di halaman Primitives)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git & worktree"
@@ -16886,9 +16880,6 @@ msgstr "panel kanan"
 
 msgid "Right-click here"
 msgstr "Klik kanan di sini"
-
-msgid "Ringtones"
-msgstr "Nada dering"
 
 msgid "Roadmap"
 msgstr "Roadmap"

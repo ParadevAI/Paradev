@@ -3518,9 +3518,6 @@ msgstr "Basé sur {0} tokens au cours des 30 derniers jours, en comptant {1}."
 msgid "Before"
 msgstr "Avant"
 
-msgid "Behavior"
-msgstr "Comportement"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "En retard de ? commits sur main, rebase nécessaire"
 
@@ -9434,9 +9431,6 @@ msgstr "Fantôme"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Déclencheur ghost : icône + libellé tronqué + chevron haut-bas (motif démontré sur la page Primitives)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git et worktrees"
@@ -16886,9 +16880,6 @@ msgstr "panneau de droite"
 
 msgid "Right-click here"
 msgstr "Clic droit ici"
-
-msgid "Ringtones"
-msgstr "Sonneries"
 
 msgid "Roadmap"
 msgstr "Feuille de route"
