@@ -42,24 +42,24 @@ export const DESTROY_WORKTREE_STATE_TIMEOUT_MS = 10 * 60_000;
 /** A timeout kills git mid-delete, so this only stops a hung removal. */
 export const WORKTREE_REMOVE_TIMEOUT_MS = 30 * 60_000;
 
-/** Long removals must not take every shared worker slot from status and diff reads. */
-export const MAX_CONCURRENT_WORKTREE_REMOVALS = 2;
+/** Long delete tasks must not take every shared worker slot from status and diff reads. */
+export const MAX_CONCURRENT_LONG_DELETE_TASKS = 2;
 
-let activeWorktreeRemovals = 0;
-const queuedWorktreeRemovals: Array<() => void> = [];
+let activeLongDeleteTasks = 0;
+const queuedLongDeleteTasks: Array<() => void> = [];
 
-async function withWorktreeRemovalSlot<T>(run: () => Promise<T>): Promise<T> {
-	if (activeWorktreeRemovals < MAX_CONCURRENT_WORKTREE_REMOVALS) {
-		activeWorktreeRemovals++;
+async function withLongDeleteTaskSlot<T>(run: () => Promise<T>): Promise<T> {
+	if (activeLongDeleteTasks < MAX_CONCURRENT_LONG_DELETE_TASKS) {
+		activeLongDeleteTasks++;
 	} else {
-		await new Promise<void>((resolve) => queuedWorktreeRemovals.push(resolve));
+		await new Promise<void>((resolve) => queuedLongDeleteTasks.push(resolve));
 	}
 	try {
 		return await run();
 	} finally {
-		const next = queuedWorktreeRemovals.shift();
+		const next = queuedLongDeleteTasks.shift();
 		if (next) next();
-		else activeWorktreeRemovals--;
+		else activeLongDeleteTasks--;
 	}
 }
 
@@ -84,13 +84,25 @@ export const cleanupGitOps = {
 		return getHostWorkerPool().run(gitWorktreeStateTask, input, options);
 	},
 
+	/** For a caller that does not wait on the answer (no dialog, no relay). */
+	readWorktreeStateUnattended(input: {
+		worktreePath: string;
+		gitEnv: GitTaskEnv;
+	}): Promise<{ hasChanges: boolean; hasUnpushedCommits: boolean }> {
+		return withLongDeleteTaskSlot(() =>
+			getHostWorkerPool().run(gitWorktreeStateTask, input, {
+				timeoutMs: DESTROY_WORKTREE_STATE_TIMEOUT_MS,
+			}),
+		);
+	},
+
 	removeWorktree(input: {
 		repoPath: string;
 		worktreePath: string;
 		gitEnv: GitTaskEnv;
 		force?: boolean;
 	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
-		return withWorktreeRemovalSlot(() =>
+		return withLongDeleteTaskSlot(() =>
 			getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
 				timeoutMs: WORKTREE_REMOVE_TIMEOUT_MS,
 			}),

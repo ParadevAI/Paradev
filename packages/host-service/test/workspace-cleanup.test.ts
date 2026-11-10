@@ -16,7 +16,7 @@ import { join } from "node:path";
 import { workspaceRouter } from "../src/trpc/router/workspace";
 import {
 	cleanupGitOps,
-	MAX_CONCURRENT_WORKTREE_REMOVALS,
+	MAX_CONCURRENT_LONG_DELETE_TASKS,
 } from "../src/trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../src/trpc/router/workspace-cleanup/is-local-checkout-workspace";
 import {
@@ -26,7 +26,10 @@ import {
 } from "../src/trpc/router/workspace-cleanup/workspace-cleanup";
 import type { HostServiceContext } from "../src/types";
 import { getHostWorkerPool } from "../src/workers/host-worker-pool";
-import { WorkerTaskError } from "../src/workers/WorkerTaskRunner";
+import {
+	WorkerTaskAbortedError,
+	WorkerTaskError,
+} from "../src/workers/WorkerTaskRunner";
 
 type WorkspaceRow = {
 	id: string;
@@ -72,6 +75,12 @@ interface ContextSpec {
 let gitOpsSpec: ContextSpec = {};
 
 const realGitOps = { ...cleanupGitOps };
+
+function readSpecWorktreeState(): Promise<WorktreeState> | WorktreeState {
+	const state = gitOpsSpec.worktreeState;
+	if (typeof state === "function") return state();
+	return state ?? { hasChanges: false, hasUnpushedCommits: false };
+}
 const realTeardownOps = { ...cleanupTeardownOps };
 afterAll(() => {
 	Object.assign(cleanupGitOps, realGitOps);
@@ -83,11 +92,8 @@ Object.assign(cleanupGitOps, {
 		if (gitOpsSpec.resolveGitEnvThrows) throw new Error("git env boom");
 		return {};
 	},
-	readWorktreeState: async () => {
-		const state = gitOpsSpec.worktreeState;
-		if (typeof state === "function") return state();
-		return state ?? { hasChanges: false, hasUnpushedCommits: false };
-	},
+	readWorktreeState: async () => readSpecWorktreeState(),
+	readWorktreeStateUnattended: async () => readSpecWorktreeState(),
 	removeWorktree: async () =>
 		gitOpsSpec.removeWorktree
 			? gitOpsSpec.removeWorktree()
@@ -354,6 +360,20 @@ describe("workspaceCleanup.inspect", () => {
 		await expect(caller.inspect({ workspaceId: "ws-1" })).rejects.toThrow(
 			/Couldn't verify worktree state/,
 		);
+	});
+
+	test("a cancelled worktree-state read reports the closed request, not a server error", async () => {
+		const ctx = makeCtx({
+			...wsAndProject,
+			worktreeState: () =>
+				Promise.reject(new WorkerTaskAbortedError("cancelled")),
+		});
+		const caller = workspaceCleanupRouter.createCaller(ctx);
+		const error = await caller
+			.inspect({ workspaceId: "ws-1" })
+			.then(() => null)
+			.catch((err: { code?: string }) => err);
+		expect(error?.code).toBe("CLIENT_CLOSED_REQUEST");
 	});
 
 	test("swallows git env-resolution failures and returns canDelete: true with no warnings", async () => {
@@ -1063,12 +1083,12 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 		).rejects.toThrow(/Couldn't verify worktree state/);
 	});
 
-	test("a preflight that needs minutes deletes instead of restoring the row", async () => {
-		// `git status` that needs 5 min, as on a large worktree on a cold or
-		// busy disk: the pool rejects any shorter budget, as it does in the field.
+	async function destroyWithSlowStatus(longPreflight: boolean) {
+		// A `git status` that needs 5 min, as on a large worktree on a cold or
+		// busy disk: the pool rejects any shorter budget.
 		const pool = getHostWorkerPool();
 		const realRun = pool.run;
-		const patchedReadWorktreeState = cleanupGitOps.readWorktreeState;
+		const patched = { ...cleanupGitOps };
 		pool.run = (async (_def, _input, options) => {
 			const timeoutMs = options?.timeoutMs ?? 0;
 			if (timeoutMs < 5 * 60_000) {
@@ -1079,6 +1099,8 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			return { hasChanges: false, hasUnpushedCommits: false };
 		}) as typeof pool.run;
 		cleanupGitOps.readWorktreeState = realGitOps.readWorktreeState;
+		cleanupGitOps.readWorktreeStateUnattended =
+			realGitOps.readWorktreeStateUnattended;
 		const worktree = mkdtempSync(join(tmpdir(), "workspace-delete-"));
 		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-repo-"));
 		try {
@@ -1091,26 +1113,46 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 				},
 				project: { id: "p-1", repoPath: repo },
 			});
-			const caller = workspaceCleanupRouter.createCaller(ctx);
-
-			const result = await caller.destroy({
-				workspaceId: "ws-1",
-				deleteBranch: false,
-				force: false,
-			});
-
-			expect(result.success).toBe(true);
-			// One broadcast is the archive; an un-archive would add a second.
-			expect(ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(1);
+			const outcome = await workspaceCleanupRouter
+				.createCaller(ctx)
+				.destroy({
+					workspaceId: "ws-1",
+					deleteBranch: false,
+					force: false,
+					longPreflight,
+				})
+				.then(
+					(result) => ({ result, error: null }),
+					(error: Error) => ({ result: null, error }),
+				);
+			return {
+				...outcome,
+				broadcasts: ctx.__mocks.broadcastWorkspaceChanged.mock.calls.length,
+			};
 		} finally {
 			pool.run = realRun;
-			cleanupGitOps.readWorktreeState = patchedReadWorktreeState;
+			Object.assign(cleanupGitOps, patched);
 			rmSync(worktree, { recursive: true, force: true });
 			rmSync(repo, { recursive: true, force: true });
 		}
+	}
+
+	test("a long preflight that needs minutes deletes instead of restoring the row", async () => {
+		const { result, broadcasts } = await destroyWithSlowStatus(true);
+
+		expect(result?.success).toBe(true);
+		// One broadcast is the archive; an un-archive would add a second.
+		expect(broadcasts).toBe(1);
 	});
 
-	test("worktree removals beyond the limit wait for a slot instead of taking another worker", async () => {
+	test("without longPreflight the preflight keeps the dialog's budget and fails closed", async () => {
+		const { error, broadcasts } = await destroyWithSlowStatus(false);
+
+		expect(error?.message).toMatch(/Couldn't verify worktree state/);
+		expect(broadcasts).toBe(2);
+	});
+
+	test("long delete tasks beyond the limit wait for a slot instead of taking another worker", async () => {
 		const pool = getHostWorkerPool();
 		const realRun = pool.run;
 		const finishers: Array<() => void> = [];
@@ -1120,15 +1162,21 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			)) as typeof pool.run;
 		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 		try {
-			const removals = [1, 2, 3].map((n) =>
-				realGitOps.removeWorktree({
-					repoPath: "/repo",
-					worktreePath: `/wt-${n}`,
+			const removals = [
+				...[1, 2].map((n) =>
+					realGitOps.removeWorktree({
+						repoPath: "/repo",
+						worktreePath: `/wt-${n}`,
+						gitEnv: {},
+					}),
+				),
+				realGitOps.readWorktreeStateUnattended({
+					worktreePath: "/wt-3",
 					gitEnv: {},
 				}),
-			);
+			];
 			await flush();
-			expect(finishers).toHaveLength(MAX_CONCURRENT_WORKTREE_REMOVALS);
+			expect(finishers).toHaveLength(MAX_CONCURRENT_LONG_DELETE_TASKS);
 
 			finishers[0]?.();
 			await flush();
@@ -1137,6 +1185,7 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			for (const finish of finishers.slice(1)) finish();
 			await Promise.all(removals);
 		} finally {
+			for (const finish of finishers) finish();
 			pool.run = realRun;
 		}
 	});

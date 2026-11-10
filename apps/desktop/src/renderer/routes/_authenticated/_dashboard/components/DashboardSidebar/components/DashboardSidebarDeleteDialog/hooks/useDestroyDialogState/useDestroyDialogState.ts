@@ -111,7 +111,7 @@ export function useDestroyDialogState({
 		}) => {
 			if (inFlight.current) return;
 			inFlight.current = true;
-			const checkedClean = inspectState.status === "ready";
+			const inspectFinished = inspectState.status === "ready";
 
 			setError(null);
 			onOpenChange(false);
@@ -141,7 +141,7 @@ export function useDestroyDialogState({
 					// retry. Do NOT extend this to `in-progress` (that's a
 					// different CONFLICT cause; retrying just races the same
 					// guard).
-					if (canSilentlyForceRetry(e, { force, checkedClean })) {
+					if (canSilentlyForceRetry(e, { force, inspectFinished })) {
 						result = await destroy({ deleteBranch, force: true, skipTeardown });
 					} else {
 						throw firstErr;

@@ -16,6 +16,7 @@ import {
 import { disposeSessionsByWorkspaceId } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import type { GitTaskEnv } from "../../../workers/tasks/git";
+import { WorkerTaskAbortedError } from "../../../workers/WorkerTaskRunner";
 import {
 	archiveLocalWorkspace,
 	trackWorkspaceDeleted,
@@ -32,7 +33,6 @@ import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
 import {
 	cleanupGitOps,
-	DESTROY_WORKTREE_STATE_TIMEOUT_MS,
 	INSPECT_WORKTREE_STATE_TIMEOUT_MS,
 	isIndeterminateGitTaskFailure,
 } from "./git-ops";
@@ -91,6 +91,12 @@ export interface DestroyWorkspaceInput {
 	 *   - "skip":        don't run — the interactive force-retry contract.
 	 */
 	teardownMode: "blocking" | "best-effort" | "skip";
+	/**
+	 * The caller does not wait on a relay or show an unchecked dialog, so the
+	 * dirty check may take minutes. Released desktops silently force-retry any
+	 * CONFLICT, so without this the check keeps the dialog's budget.
+	 */
+	longPreflight?: boolean;
 }
 
 /**
@@ -171,6 +177,9 @@ export const workspaceCleanupRouter = router({
 					sharesProjectCheckout: false,
 				};
 			} catch (err) {
+				if (err instanceof WorkerTaskAbortedError && err.kind === "cancelled") {
+					throw new TRPCError({ code: "CLIENT_CLOSED_REQUEST", cause: err });
+				}
 				if (isIndeterminateGitTaskFailure(err)) {
 					throw new TRPCError({
 						code: "INTERNAL_SERVER_ERROR",
@@ -244,6 +253,7 @@ export const workspaceCleanupRouter = router({
 				// anyway" must still run teardown, otherwise editing any
 				// tracked file silently disables the user's cleanup script.
 				skipTeardown: z.boolean().default(false),
+				longPreflight: z.boolean().default(false),
 			}),
 		)
 		.mutation(async ({ ctx, input }) =>
@@ -252,6 +262,7 @@ export const workspaceCleanupRouter = router({
 				deleteBranch: input.deleteBranch,
 				force: input.force,
 				teardownMode: input.skipTeardown ? "skip" : "blocking",
+				longPreflight: input.longPreflight,
 			}),
 		),
 });
@@ -329,10 +340,15 @@ async function runDestroy(
 					ctx,
 					local.worktreePath,
 				);
-				const state = await cleanupGitOps.readWorktreeState(
-					{ worktreePath: local.worktreePath, gitEnv },
-					{ timeoutMs: DESTROY_WORKTREE_STATE_TIMEOUT_MS },
-				);
+				const state = input.longPreflight
+					? await cleanupGitOps.readWorktreeStateUnattended({
+							worktreePath: local.worktreePath,
+							gitEnv,
+						})
+					: await cleanupGitOps.readWorktreeState(
+							{ worktreePath: local.worktreePath, gitEnv },
+							{ timeoutMs: INSPECT_WORKTREE_STATE_TIMEOUT_MS },
+						);
 				if (state.hasChanges) {
 					throw new TRPCError({
 						code: "CONFLICT",

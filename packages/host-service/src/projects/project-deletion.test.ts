@@ -242,7 +242,7 @@ describe("interrupted-delete reconciler", () => {
 	test("never deletes uncommitted files", async () => {
 		const { ctx, addWorkspace, workspace } = setup();
 		const dirty = strand(addWorkspace, "dirty");
-		cleanupGitOps.readWorktreeState = async () =>
+		cleanupGitOps.readWorktreeStateUnattended = async () =>
 			({ hasChanges: true }) as never;
 		await runArchivedWorkspaceReconcile(ctx);
 		expect(existsSync(dirty)).toBe(true);
@@ -252,7 +252,7 @@ describe("interrupted-delete reconciler", () => {
 	test("finishes a clean interrupted delete", async () => {
 		const { ctx, addWorkspace, workspace } = setup();
 		const stranded = strand(addWorkspace, "stranded");
-		cleanupGitOps.readWorktreeState = async () =>
+		cleanupGitOps.readWorktreeStateUnattended = async () =>
 			({ hasChanges: false }) as never;
 		await runArchivedWorkspaceReconcile(ctx);
 		expect(existsSync(stranded)).toBe(false);
@@ -269,7 +269,7 @@ describe("interrupted-delete reconciler", () => {
 			archivedAt: Date.now() + 1_000,
 			archiveReason: "deleted",
 		});
-		cleanupGitOps.readWorktreeState = async () =>
+		cleanupGitOps.readWorktreeStateUnattended = async () =>
 			({ hasChanges: false }) as never;
 		await runArchivedWorkspaceReconcile(ctx);
 		expect(gitCalls).toEqual([]);

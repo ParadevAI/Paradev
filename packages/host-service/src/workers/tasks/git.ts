@@ -328,8 +328,7 @@ export const gitWorktreeStateTask = defineWorkerTask<
 	type: "git/worktreeState",
 	handler: async ({ worktreePath, gitEnv, ignoreInitialCommit }) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
-		// `git.status()` passes `-u` (all), which lists every file in every
-		// untracked directory. One entry per directory is enough to say "dirty".
+		// Not `git.status()`: its `-u` lists every file in untracked directories.
 		const status = await git.raw([
 			"status",
 			"--porcelain",

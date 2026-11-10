@@ -19,6 +19,7 @@ import type { DashboardSidebarWorkspace } from "renderer/routes/_authenticated/_
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	type BulkWorkspaceInspectionState,
 	buildBulkWorkspaceInspectionSummary,
@@ -75,6 +76,7 @@ export function useBulkWorkspaceDelete({
 }: UseBulkWorkspaceDeleteOptions) {
 	const { t } = useLingui();
 	const { cache: hostWorkspacesCache } = useHostWorkspaces();
+	const { activeHostUrl } = useLocalHostService();
 	const { navigateAwayFromWorkspace } = useNavigateAwayFromWorkspace();
 	const { removeWorkspaceFromSidebar } = useDashboardSidebarState();
 	const { preferences, setDeleteLocalBranch } = useV2UserPreferences();
@@ -217,12 +219,15 @@ export function useBulkWorkspaceDelete({
 					shouldRetryWithForce: (workspace, error) =>
 						error.kind === "conflict" &&
 						inspections.get(workspace.id)?.status !== "ready",
-					destroy: (workspace, force) =>
-						destroyWorkspaceAtHost(targetFor(workspace), {
+					destroy: (workspace, force) => {
+						const target = targetFor(workspace);
+						return destroyWorkspaceAtHost(target, {
 							deleteBranch: preferences.deleteLocalBranch,
 							force,
 							skipTeardown,
-						}),
+							longPreflight: target.hostUrl === activeHostUrl,
+						});
+					},
 					onSettled: () => {
 						completedCount += 1;
 						if (completedCount < total) {
@@ -323,6 +328,7 @@ export function useBulkWorkspaceDelete({
 			}
 		},
 		[
+			activeHostUrl,
 			hostWorkspacesCache,
 			inspections,
 			navigateAwayFromWorkspace,
