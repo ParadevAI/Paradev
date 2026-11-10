@@ -95,7 +95,15 @@ export function ShareAccess({
 	onEvent,
 }: ShareAccessProps) {
 	const { t } = useLingui();
-	const trackedAdd = useShareEvents(onAdd, onEvent);
+	// Read through a ref so an inline `onEvent` doesn't re-fire opened.
+	const onEventRef = useRef(onEvent);
+	onEventRef.current = onEvent;
+	const shared = useRef(false);
+	useEffect(() => {
+		onEventRef.current?.({ type: "opened" });
+		return () =>
+			onEventRef.current?.({ type: "closed", shared: shared.current });
+	}, []);
 	const [copied, setCopied] = useState(false);
 	const [view, setView] = useState<{ query: string } | null>(null);
 	const highlighted = useNewKeys(grantees.map(keyOf));
@@ -159,10 +167,13 @@ export function ShareAccess({
 				defaultRole={defaultRole}
 				roleNote={roleNote}
 				initialQuery={view.query}
-				onAdd={trackedAdd}
+				onAdd={onAdd}
 				onUpgrade={onUpgrade}
 				onBack={() => setView(null)}
-				onDone={() => setView(null)}
+				onDone={() => {
+					shared.current = true;
+					setView(null);
+				}}
 			/>
 		);
 	}
@@ -304,32 +315,6 @@ export function ShareAccess({
 			{children}
 		</div>
 	);
-}
-
-/**
- * Reports opened on mount and closed on unmount, with whether anything was
- * shared in between. `onEvent` is read through a ref so an inline callback
- * doesn't re-fire opened.
- */
-function useShareEvents(
-	onAdd: ShareAccessProps["onAdd"],
-	onEvent: ShareAccessProps["onEvent"],
-): ShareAccessProps["onAdd"] {
-	const onEventRef = useRef(onEvent);
-	onEventRef.current = onEvent;
-	const shared = useRef(false);
-
-	useEffect(() => {
-		onEventRef.current?.({ type: "opened" });
-		return () => {
-			onEventRef.current?.({ type: "closed", shared: shared.current });
-		};
-	}, []);
-
-	return async (request) => {
-		await onAdd(request);
-		shared.current = true;
-	};
 }
 
 /** Keys that appeared since the last render, for a moment, so new rows stand out. */
