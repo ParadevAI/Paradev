@@ -1018,8 +1018,13 @@ export class PullRequestRuntimeManager {
 			}
 			const rawMatch = keyToPullRequest.get(key);
 			// A PR the user unlinked stays unlinked; a different PR still links.
+			// A head=<default> PR that is merged or closed is a past promotion
+			// (e.g. main -> staging), never the default-branch workspace's work.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId
+				rawMatch?.id === workspace.suppressedPullRequestId ||
+				(rawMatch &&
+					!rawMatch.isOpen &&
+					this.tracksBaseDefaultBranch(workspace, repo))
 					? undefined
 					: rawMatch;
 			if (match) {
@@ -1120,28 +1125,37 @@ export class PullRequestRuntimeManager {
 		}
 	}
 
+	// Base repo only, so fork / `gh pr checkout` renames whose head is
+	// `<default>` are not treated as tracking the default branch.
+	private tracksBaseDefaultBranch(
+		workspace: typeof workspaces.$inferSelect,
+		repo: NormalizedRepoIdentity,
+	): boolean {
+		return (
+			repo.defaultBranch !== null &&
+			(workspace.upstreamBranch ?? workspace.branch) === repo.defaultBranch &&
+			workspace.upstreamOwner?.toLowerCase() === repo.owner.toLowerCase() &&
+			workspace.upstreamRepo?.toLowerCase() === repo.name.toLowerCase()
+		);
+	}
+
 	// Guard: a workspace that merely tracks `origin/<default>` (branched off it,
 	// never pushed) must not key on `<default>` and grab a head=<default> PR —
-	// only its own default-branch workspace may. Base repo only, so fork /
-	// `gh pr checkout` renames whose head is `<default>` still link.
+	// only its own default-branch workspace may.
 	private effectiveUpstreamKey(
 		workspace: typeof workspaces.$inferSelect,
 		repo: NormalizedRepoIdentity,
 	): string | null {
-		const upstreamBranch = workspace.upstreamBranch ?? workspace.branch;
 		if (
-			repo.defaultBranch &&
-			upstreamBranch === repo.defaultBranch &&
-			workspace.branch !== repo.defaultBranch &&
-			workspace.upstreamOwner?.toLowerCase() === repo.owner.toLowerCase() &&
-			workspace.upstreamRepo?.toLowerCase() === repo.name.toLowerCase()
+			this.tracksBaseDefaultBranch(workspace, repo) &&
+			workspace.branch !== repo.defaultBranch
 		) {
 			return null;
 		}
 		return upstreamKey(
 			workspace.upstreamOwner,
 			workspace.upstreamRepo,
-			upstreamBranch,
+			workspace.upstreamBranch ?? workspace.branch,
 		);
 	}
 
@@ -1553,10 +1567,10 @@ export class PullRequestRuntimeManager {
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<{
-		matched: Map<string, { id: string }>;
+		matched: Map<string, { id: string; isOpen: boolean }>;
 		failedKeys: Set<string>;
 	}> {
-		const matched = new Map<string, { id: string }>();
+		const matched = new Map<string, { id: string; isOpen: boolean }>();
 		const failedKeys = new Set<string>();
 		if (wantedRefs.size === 0) return { matched, failedKeys };
 
@@ -1691,7 +1705,7 @@ export class PullRequestRuntimeManager {
 				now,
 			});
 
-			matched.set(key, { id: rowId });
+			matched.set(key, { id: rowId, isOpen: node.state === "OPEN" });
 		}
 
 		return { matched, failedKeys };
