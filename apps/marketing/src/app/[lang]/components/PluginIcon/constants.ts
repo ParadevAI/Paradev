@@ -32,6 +32,7 @@ export const IMAGE_ICONS: Record<string, string> = {
 
 export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	amplitude: { icon: AmplitudeIcon },
+	"amplitude-eu": { icon: AmplitudeIcon },
 	autumn: { icon: AutumnIcon },
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
