@@ -283,8 +283,13 @@ function extensionHost({
 		lastFocusedWindowId: window.id,
 		impl: {},
 		getTabById: (id: number) => [mail, bank].find((tab) => tab.id === id),
-		getWindowById: (id: number) => (id === window.id ? window : undefined),
-		getLastFocusedWindow: () => window,
+		// As the real store resolves them, so a test can move the focus.
+		getWindowById: (id: number) =>
+			[...store.windows].find((each) => each.id === id),
+		getLastFocusedWindow: () =>
+			[...store.windows].find(
+				(each) => each.id === store.lastFocusedWindowId,
+			) ?? [...store.windows].at(-1),
 		getActiveTabFromWebContents: () => mail,
 		getActiveTabOfCurrentWindow: () => mail,
 		createTab: async () => bank,
@@ -881,6 +886,24 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 		expect(await ids({ index: 1 })).toEqual([2]);
 		expect(await ids({ windowType: "popup" })).toEqual([3]);
 		expect(await ids({ windowType: "normal" })).toEqual([1, 2]);
+	});
+
+	test("with no window focused, currentWindow answers for the newest window, as windows.getCurrent does", async () => {
+		const { store, call } = extensionHost(api);
+		const popup = fakeTab(3, "https://accounts.google.com/signin", "Sign in");
+		const popupWindow = fakeWindow(10);
+		store.tabs.add(popup);
+		store.windows.add(popupWindow);
+		store.tabToWindow.set(popup, popupWindow);
+		Object.assign(store, { lastFocusedWindowId: undefined });
+
+		const ids = (
+			(await call("tabs", "tabs.query", {
+				currentWindow: true,
+			})) as TabDetails[]
+		).map((tab) => tab.id);
+
+		expect(ids).toEqual([3]);
 	});
 
 	test("a window that already has focus when it is added becomes the current one", () => {

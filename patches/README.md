@@ -737,7 +737,9 @@ boundary.
    package read and ignored, so every window's active tab came back and the
    caller took the first. A password manager filling a field in a sign-in
    popup got the pane behind it instead. Both flags answer for the focused
-   window, as `windows.getCurrent` already does. A window that is focused when
+   window — resolved through `getLastFocusedWindow`, so a query agrees with
+   `windows.getCurrent` when no window has recorded focus and the newest one
+   stands in. A window that is focused when
    it is added becomes that window: Chromium focuses a popup as it opens it,
    before the app hands it over, so waiting for a `focus` event left the
    extension answering for the window behind the popup.

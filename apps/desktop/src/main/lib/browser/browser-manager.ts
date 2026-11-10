@@ -1197,7 +1197,6 @@ class BrowserManager extends EventEmitter {
 	): void {
 		const wc = window.webContents;
 		markBrowserPanePopup(wc);
-		this.emit("popup-created", { window });
 		wc.on("context-menu", (_event, params) => {
 			this.popupContextMenu(wc, params);
 		});
@@ -1211,6 +1210,13 @@ class BrowserManager extends EventEmitter {
 			this.configurePopupWindow(paneId, child);
 		});
 		window.on("closed", detachGuard);
+		// Last, and guarded: a listener that throws must not leave the popup
+		// without its scheme guard and window-open policy.
+		try {
+			this.emit("popup-created", { window });
+		} catch (error) {
+			console.error("[browser-manager] A popup listener failed:", error);
+		}
 	}
 
 	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
