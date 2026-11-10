@@ -2,9 +2,13 @@ import { execFile } from "node:child_process";
 import { accessSync, constants, statSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { promisify } from "node:util";
-import { getBinDir } from "@superset/agent-setup";
+import {
+	getBinDir,
+	isManagedCodingAgent,
+	managedAgentBinaryPath,
+} from "@superset/agent-setup";
 import { coerce, gte } from "semver";
-import { UNGATED_VERSION } from "./acpCatalogue";
+import { agentCliMissingMessage, UNGATED_VERSION } from "./acpCatalogue";
 
 const execFileAsync = promisify(execFile);
 
@@ -53,7 +57,18 @@ export function agentCliCommand(
 	binary: string,
 	env: NodeJS.ProcessEnv,
 ): string {
-	return supersetWrapper(binary) ?? findOnPath(binary, env) ?? binary;
+	return (
+		supersetWrapper(binary) ??
+		findOnPath(binary, env) ??
+		managedAgent(binary) ??
+		binary
+	);
+}
+
+function managedAgent(binary: string): string | null {
+	if (!isManagedCodingAgent(binary)) return null;
+	const managed = managedAgentBinaryPath(binary);
+	return isExecutableFile(managed) ? managed : null;
 }
 
 const cache = new Map<string, { at: number; version: string | null }>();
@@ -78,7 +93,8 @@ async function probeVersion(
 	} catch {
 		version = null;
 	}
-	cache.set(command, { at: Date.now(), version });
+	// A miss is not kept: the app can install the agent a moment later.
+	if (version) cache.set(command, { at: Date.now(), version });
 	return version;
 }
 
@@ -99,8 +115,8 @@ export function agentCliUnsupported(options: {
 			: ` ${options.minVersion} or newer`;
 	if (!options.found) {
 		return (
-			`${options.binary} was not found, so this chat cannot start. Install` +
-			` ${options.binary}${wanted} and make sure it is on your PATH.${upgrade}`
+			agentCliMissingMessage(options.binary) +
+			` Install ${options.binary}${wanted} and make sure it is on your PATH.${upgrade}`
 		);
 	}
 	return `${options.binary} ${options.minVersion} or newer is needed for chat, and ${options.found} is installed.${upgrade}`;

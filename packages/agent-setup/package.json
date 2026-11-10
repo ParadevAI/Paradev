@@ -24,6 +24,10 @@
 			"types": "./src/legacy-home-move.ts",
 			"default": "./src/legacy-home-move.ts"
 		},
+		"./managed-agent-binaries": {
+			"types": "./src/managed-agent-binaries.ts",
+			"default": "./src/managed-agent-binaries.ts"
+		},
 		"./config": {
 			"types": "./src/config.ts",
 			"default": "./src/config.ts"

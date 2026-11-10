@@ -4,7 +4,11 @@ import { SetupStepContinue } from "./SetupStepContinue";
 
 afterEach(cleanup);
 
-function openSkipConfirm(props: { gitMissing: boolean; ghReady: boolean }) {
+function openSkipConfirm(props: {
+	gitMissing: boolean;
+	ghReady: boolean;
+	missingAgents?: string[];
+}) {
 	const onContinue = mock(() => {});
 	render(<SetupStepContinue {...props} onContinue={onContinue} />);
 	fireEvent.click(screen.getByRole("button", { name: "Skip for now" }));
@@ -32,6 +36,32 @@ describe("SetupStepContinue", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Go back" }));
 		expect(onContinue).not.toHaveBeenCalled();
 		fireEvent.click(screen.getByRole("button", { name: "Skip for now" }));
+		fireEvent.click(screen.getByRole("button", { name: "Skip" }));
+		expect(onContinue).toHaveBeenCalledTimes(1);
+	});
+
+	test("GitHub and agents missing: names every tool that isn't set up", () => {
+		openSkipConfirm({
+			gitMissing: false,
+			ghReady: false,
+			missingAgents: ["Claude Code", "Codex"],
+		});
+		expect(screen.getByText("Skip setup for now?")).toBeTruthy();
+		expect(
+			screen.getByText(
+				"GitHub CLI, Claude Code, and Codex aren't set up yet. You can set them up later in Settings.",
+			),
+		).toBeTruthy();
+	});
+
+	test("only an agent missing: names it and where to install it later", () => {
+		const onContinue = openSkipConfirm({
+			gitMissing: false,
+			ghReady: true,
+			missingAgents: ["Claude Code"],
+		});
+		expect(screen.getByText("Skip the coding agent for now?")).toBeTruthy();
+		expect(screen.getByText(/Chats and tasks need Claude Code\./)).toBeTruthy();
 		fireEvent.click(screen.getByRole("button", { name: "Skip" }));
 		expect(onContinue).toHaveBeenCalledTimes(1);
 	});

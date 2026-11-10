@@ -1185,6 +1185,9 @@ msgstr "{name} yerleşiktir ve kaldırılamaz"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} yerleşiktir ve değiştirilemez"
 
+msgid "{name} is installed"
+msgstr "{name} kurulu"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} eklenmedi"
@@ -1194,6 +1197,8 @@ msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durdurulmuş olabilir."
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durduruldu."
+msgid "{name} isn't installed yet"
+msgstr "{name} henüz kurulu değil"
 
 msgid "{name} plugin"
 msgstr "{name} eklentisi"
@@ -1405,6 +1410,12 @@ msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'�
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} henüz ayarlanmadı. Bunları daha sonra Ayarlar'dan ayarlayabilirsiniz."
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {# sohbetten {done} tanesi taşındı} other {# sohbetten {done} tanesi taşındı}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {# kontrolün tümü geçti} other {# kontrolün tümü geçti}}"
 
@@ -1467,9 +1478,6 @@ msgstr "{user} yeniden katıldı."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor} şu anda indirmeleri sınırlıyor. Bir dakika bekleyip yeniden deneyin."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} bekliyor"
@@ -4286,6 +4294,9 @@ msgstr "Sohbet yüzeyleri: mesajlar, akıl yürütme, öneriler"
 msgid "Chats"
 msgstr "Sohbetler"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "Sohbetler ve görevler {agents} gerektirir. Bunu daha sonra Ayarlar → Ajanlar'dan veya ilk sohbetinizi başlattığınızda kurabilirsiniz."
+
 msgid "Check again"
 msgstr "Yeniden denetle"
 
@@ -6264,13 +6275,16 @@ msgstr "Yorum gönderilemedi"
 msgid "Couldn't post reply"
 msgstr "Yanıt gönderilemedi"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "{vendor} sunucusuna ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0} için buluta erişilemedi: {1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "GitHub'a ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "İndirme sunucusuna ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin."
 
 msgid "Couldn't reach the model provider"
 msgstr "Model sağlayıcısına ulaşılamadı"
@@ -6357,8 +6371,8 @@ msgstr "Ajana gönderilemedi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Mesajınız gönderilemedi. Yazma alanına geri kondu."
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "{name} bu bilgisayarda ayarlanamadı."
+msgid "Couldn't set up {name} on this Mac."
+msgstr "{name} bu Mac'te ayarlanamadı."
 
 msgid "Couldn't stage changes"
 msgstr "Değişiklikler hazırlanamadı"
@@ -6410,6 +6424,9 @@ msgstr "Taşıma yeniden denenemedi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Dosya değişiklikleri geri alınamadı."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "GitHub CLI bu Mac'te açılamadı veya kaydedilemedi."
 
 msgid "Couldn't unstage changes"
 msgstr "Değişiklikler hazırlıktan çıkarılamadı"
@@ -7343,6 +7360,9 @@ msgstr "Bu cihazda sesle yazma kullanılamıyor"
 msgid "Dictation is not available right now"
 msgstr "Sesle yazma şu anda kullanılamıyor"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "Sayfa bir kod gösterdi mi? Buraya yapıştırın"
+
 msgid "Didn't hear back"
 msgstr "Yanıt alınamadı"
 
@@ -7675,6 +7695,9 @@ msgstr "{name} indiriliyor…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Apple'dan indirmek için Apple Kimliği gerekir. Yükleme yaklaşık 20 GB boş alan gerektirebilir."
+
+msgid "Downloading GitHub CLI…"
+msgstr "GitHub CLI indiriliyor…"
 
 msgid "Downloading..."
 msgstr "İndiriliyor..."
@@ -9066,6 +9089,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "İncelemeyi bitir"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "Tarayıcınızda oturum açmayı tamamlayın. Bu kendiliğinden güncellenir."
+
 msgid "Finished"
 msgstr "Tamamlandı"
 
@@ -9606,6 +9632,8 @@ msgstr "GitHub entegrasyonu"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub hâlâ birleştiriyor. Bittiğinde bu güncellenecek."
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub şu anda indirmeleri sınırlıyor. Bir dakika bekleyip yeniden deneyin."
 
 msgid "GitHub issues"
 msgstr "GitHub issue'ları"
@@ -10513,6 +10541,9 @@ msgstr "GitHub App'i kur"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI'yi yükle"
 
+msgid "Install it yourself"
+msgstr "Kendiniz kurun"
+
 msgid "Install on your iPhone"
 msgstr "iPhone’unuza yükleyin"
 
@@ -10540,6 +10571,9 @@ msgstr "MCP sunucularını tek bir yerden, merkezi OAuth ile tüm çalışma ala
 msgid "Install."
 msgstr "Kurun."
 
+msgid "Installation"
+msgstr "Kurulum"
+
 msgid "Installed"
 msgstr "Yüklendi"
 
@@ -10547,8 +10581,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "Yüklü"
 
+msgid "Installed · {version}"
+msgstr "Kurulu · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "Kurulu · ChatGPT hesabınızla oturum açın"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "Kurulu · Claude hesabınızla oturum açın"
+
 msgid "Installed by your organization"
 msgstr "Kuruluşunuz tarafından yüklendi"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Homebrew gibi başka bir yolla mı yüklediniz? Yeniden denetle'ye tıklayın."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Başka bir yolla mı kurdunuz? Yeniden denetle'ye tıklayın."
@@ -10568,6 +10614,9 @@ msgstr "Kuruluyor..."
 
 msgid "Installing…"
 msgstr "Kuruluyor…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "Kuruluyor… Mac'inizde başka hiçbir şey değişmez."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh ile erişebildiğin bir makineye Paradev'i kurar, Paradev'de hesabınla oturum açar ve Paradev'i bir hizmet olarak çalışır durumda tutar."
@@ -13469,8 +13518,14 @@ msgstr "Kanalda değil"
 msgid "Not included"
 msgstr "Dahil değil"
 
+msgid "Not installed"
+msgstr "Kurulu değil"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "Kurulu değil · özel depolar ve pull request'ler için gerekli"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "Kurulu değil · sohbetlerinizi ve görevlerinizi çalıştırır"
 
 msgid "Not loaded"
 msgstr "Yüklenmedi"
@@ -13507,6 +13562,9 @@ msgstr "{hostName} üzerinde kurulu değil"
 
 msgid "Not set up on this host"
 msgstr "Bu host'ta kurulu değil"
+
+msgid "not signed in"
+msgstr "oturum açılmadı"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "Oturum açılmadı · özel depolar ve pull request'ler için gerekli"
@@ -14339,6 +14397,9 @@ msgstr "Her sohbeti görmek için yeni çalışma alanını açın. Taşınmayan
 msgid "Open the original workspace"
 msgstr "Orijinal çalışma alanını aç"
 
+msgid "Open the page again"
+msgstr "Sayfayı yeniden aç"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Komut paletinde kaynak kullanımı görünümünü aç"
 
@@ -14390,6 +14451,9 @@ msgstr "Sohbet arayüzünde açılıyor…"
 msgid "Opening pages"
 msgstr "Sayfaları açma"
 
+msgid "Opening the sign-in page…"
+msgstr "Oturum açma sayfası açılıyor…"
+
 msgid "Operator"
 msgstr "Operatör"
 
@@ -14416,6 +14480,9 @@ msgstr "İsteğe bağlı. Neyin işe yaradığını anlamamıza yardımcı olur.
 
 msgid "Options"
 msgstr "Seçenekler"
+
+msgid "Or sign in from a terminal:"
+msgstr "Ya da bir terminalden oturum açın:"
 
 msgid "Orange"
 msgstr "Turuncu"
@@ -14830,6 +14897,9 @@ msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree
 msgid "Paradev still can't find {name}."
 msgstr "Paradev hâlâ {name} bulamıyor."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev hâlâ GitHub CLI'ı bulamıyor."
+
 msgid "Paradev Teams"
 msgstr "Paradev Takımlar"
 
@@ -14840,8 +14910,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev sistem RAM'inin {0} kadarını kullanıyor"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev, depoları klonlamak ve pull request açmak için Git ve GitHub CLI kullanır. Bunu daha sonra da yapabilirsiniz."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev bunları depoları klonlamak, pull request açmak ve görevlerinizi çalıştırmak için kullanır. Bunu daha sonra da yapabilirsiniz."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev ve alternatifleri"
@@ -18157,9 +18227,6 @@ msgstr "SSH ile host kur"
 msgid "Set up an automation"
 msgstr "Bir otomasyon kur"
 
-msgid "Set up Git and GitHub"
-msgstr "Git ve GitHub'ı kurun"
-
 msgid "Set up once"
 msgstr "Bir kez kurun"
 
@@ -18174,6 +18241,9 @@ msgstr "Bu projeyi Paradev için kur"
 
 msgid "Set up your organization to get started"
 msgstr "Başlamak için kuruluşunuzu kurun"
+
+msgid "Set up your tools"
+msgstr "Araçlarınızı ayarlayın"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Yüklü bir eklentiyi yeniden Kullanılabilir yapmak herkesin kopyasını korur; sonra kaldırabilirler. Kullanılamaz yapmak onu kaldırır."
@@ -18620,6 +18690,9 @@ msgstr "GitHub ile kaydol"
 msgid "Sign up with Google"
 msgstr "Google ile kaydol"
 
+msgid "Sign-in code"
+msgstr "Oturum açma kodu"
+
 msgid "Sign-in didn't finish"
 msgstr "Giriş tamamlanmadı"
 
@@ -18644,8 +18717,20 @@ msgstr "Kayıt tamamlama"
 msgid "Sign-up steps"
 msgstr "Kayıt adımları"
 
+msgid "signed in"
+msgstr "oturum açıldı"
+
+msgid "Signed in"
+msgstr "Oturum açıldı"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "Oturum açıldı · özel depoları klonlar ve pull request açar"
+
+msgid "signed in as {account}"
+msgstr "{account} olarak oturum açıldı"
+
+msgid "Signed in as {account}"
+msgstr "{account} olarak oturum açıldı"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"
@@ -18754,6 +18839,12 @@ msgstr "Git şimdilik atlansın mı?"
 
 msgid "Skip GitHub for now?"
 msgstr "GitHub şimdilik atlansın mı?"
+
+msgid "Skip setup for now?"
+msgstr "Kurulum şimdilik atlansın mı?"
+
+msgid "Skip the coding agent for now?"
+msgstr "Kodlama ajanı şimdilik atlansın mı?"
 
 msgid "Skipped"
 msgstr "Atlandı"
@@ -20567,6 +20658,9 @@ msgstr "Bu sohbet uzun, bu yüzden yalnızca en son kısmı gösteriliyor. Çal�
 msgid "This chat may have been removed or you may not have access."
 msgstr "Bu sohbet kaldırılmış olabilir veya erişiminiz olmayabilir."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "Bu sohbet {name} gerektirir. Paradev bunu sizin için kurabilir. Yaklaşık bir dakika sürer ve Mac'inizde başka hiçbir şey değişmez."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Konuşma bir terminalde devam ettiği için bu sohbet durdu."
 
@@ -21303,6 +21397,9 @@ msgstr "Farklı bir arama terimi veya başka bir yer deneyin."
 msgid "Try again"
 msgstr "Yeniden dene"
 
+msgid "Try again to start this chat."
+msgstr "Bu sohbeti başlatmak için yeniden deneyin."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Tekrar deneyin veya sistem tepsisindeki Paradev menüsünden ana makine hizmetini yeniden başlatın."
 
@@ -21851,6 +21948,9 @@ msgstr "“{0}” kullan"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Çalışma alanına göreli bir yol ya da mutlak bir klasör kullanın."
+
+msgid "Use another agent"
+msgstr "Başka bir ajan kullan"
 
 msgid "Use another port"
 msgstr "Başka bir port kullan"
@@ -23138,6 +23238,9 @@ msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Sınır artırılmazs
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlarına erişmesini sağlar; kendi hesaplarını bağladığında Paradev'in senin için yaptığı işler senin adınla görünür."
 
+msgid "your own install"
+msgstr "kendi kurulumunuz"
+
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."
 
@@ -23232,3 +23335,4 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
+

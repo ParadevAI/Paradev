@@ -3296,3 +3296,45 @@ describe("agent-wrappers omp", () => {
 		);
 	});
 });
+
+describe("buildWrapperScript fallbackBinary", () => {
+	const root = path.join(TEST_ROOT, "fallback");
+	const pathBin = path.join(root, "path-bin");
+	const fallback = path.join(root, "managed", "claude");
+	const wrapperPath = path.join(root, "wrapper", "claude");
+
+	beforeEach(() => {
+		mkdirSync(pathBin, { recursive: true });
+		mkdirSync(path.dirname(fallback), { recursive: true });
+		mkdirSync(path.dirname(wrapperPath), { recursive: true });
+		writeFileSync(fallback, "#!/bin/sh\necho managed\n", { mode: 0o755 });
+		writeFileSync(
+			wrapperPath,
+			buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
+				fallbackBinary: fallback,
+			}),
+			{ mode: 0o755 },
+		);
+	});
+
+	afterEach(() => {
+		rmSync(root, { recursive: true, force: true });
+	});
+
+	const run = () =>
+		execFileSync(wrapperPath, [], {
+			env: { ...process.env, PATH: `${pathBin}:/usr/bin:/bin` },
+			encoding: "utf-8",
+		}).trim();
+
+	it("runs the fallback only when PATH has no such binary", () => {
+		expect(run()).toBe("managed");
+	});
+
+	it("lets the user's own install on PATH win", () => {
+		writeFileSync(path.join(pathBin, "claude"), "#!/bin/sh\necho user\n", {
+			mode: 0o755,
+		});
+		expect(run()).toBe("user");
+	});
+});

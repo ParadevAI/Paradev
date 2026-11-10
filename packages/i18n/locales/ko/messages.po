@@ -1185,6 +1185,9 @@ msgstr "{name}은(는) 기본 제공이라 제거할 수 없습니다"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name}은(는) 기본 제공이라 교체할 수 없습니다"
 
+msgid "{name} is installed"
+msgstr "{name}이(가) 설치되었습니다"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name}이(가) 추가되지 않았습니다"
@@ -1194,6 +1197,8 @@ msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중이었다면 중지되었습니다."
+msgid "{name} isn't installed yet"
+msgstr "{name}이(가) 아직 설치되지 않았습니다"
 
 msgid "{name} plugin"
 msgstr "{name} 플러그인"
@@ -1405,6 +1410,12 @@ msgstr "{threshold, plural, other {에이전트 PR # 건 머지}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName} 중단됨"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools}이(가) 아직 설정되지 않았습니다. 나중에 설정에서 설정할 수 있습니다."
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {채팅 #개 중 {done}개를 옮겼습니다}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
 
@@ -1467,9 +1478,6 @@ msgstr "{user}님이 다시 참여했습니다."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor}에서 지금 다운로드를 제한하고 있습니다. 잠시 후 다시 시도하세요."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}명 대기 중"
@@ -4286,6 +4294,9 @@ msgstr "채팅 화면: 메시지, 추론, 제안"
 msgid "Chats"
 msgstr "채팅"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "채팅과 작업에는 {agents}이(가) 필요합니다. 나중에 설정 → 에이전트에서 설치하거나 첫 채팅을 시작할 때 설치할 수 있습니다."
+
 msgid "Check again"
 msgstr "다시 확인"
 
@@ -6264,13 +6275,16 @@ msgstr "댓글을 게시할 수 없습니다"
 msgid "Couldn't post reply"
 msgstr "답글을 게시하지 못했습니다"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "{vendor}에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요."
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}에 대해 클라우드에 연결할 수 없습니다: {1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요."
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "다운로드 서버에 연결할 수 없습니다. 인터넷 연결을 확인한 후 다시 시도하세요."
 
 msgid "Couldn't reach the model provider"
 msgstr "모델 제공자에 연결할 수 없습니다"
@@ -6357,8 +6371,8 @@ msgstr "에이전트에 보내지 못했습니다"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "메시지를 보내지 못했습니다. 입력란으로 다시 옮겼습니다."
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "이 컴퓨터에서 {name}을(를) 설정할 수 없습니다."
+msgid "Couldn't set up {name} on this Mac."
+msgstr "이 Mac에서 {name}을(를) 설정할 수 없습니다."
 
 msgid "Couldn't stage changes"
 msgstr "변경 사항을 스테이징하지 못했습니다"
@@ -6410,6 +6424,9 @@ msgstr "이동을 다시 시도할 수 없습니다"
 
 msgid "Couldn't undo the file changes."
 msgstr "파일 변경을 실행 취소하지 못했습니다."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "이 Mac에서 GitHub CLI의 압축을 풀거나 저장할 수 없습니다."
 
 msgid "Couldn't unstage changes"
 msgstr "스테이징을 해제하지 못했습니다"
@@ -7343,6 +7360,9 @@ msgstr "이 기기에서는 받아쓰기를 사용할 수 없습니다"
 msgid "Dictation is not available right now"
 msgstr "지금은 받아쓰기를 사용할 수 없습니다"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "페이지에 코드가 표시되었나요? 여기에 붙여넣으세요"
+
 msgid "Didn't hear back"
 msgstr "응답이 없습니다"
 
@@ -7675,6 +7695,9 @@ msgstr "{name} 다운로드 중…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Apple에서 다운로드하려면 Apple ID가 필요합니다. 설치에 약 20 GB의 여유 공간이 필요할 수 있습니다."
+
+msgid "Downloading GitHub CLI…"
+msgstr "GitHub CLI 다운로드 중…"
 
 msgid "Downloading..."
 msgstr "다운로드 중..."
@@ -9066,6 +9089,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "리뷰 마치기"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "브라우저에서 로그인을 완료하세요. 이 화면은 자동으로 업데이트됩니다."
+
 msgid "Finished"
 msgstr "완료"
 
@@ -9606,6 +9632,8 @@ msgstr "GitHub 연동"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub가 아직 머지 중입니다. 끝나면 업데이트됩니다."
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub가 지금 다운로드를 제한하고 있습니다. 잠시 후 다시 시도하세요."
 
 msgid "GitHub issues"
 msgstr "GitHub 이슈"
@@ -10513,6 +10541,9 @@ msgstr "GitHub App 설치"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI 설치"
 
+msgid "Install it yourself"
+msgstr "직접 설치"
+
 msgid "Install on your iPhone"
 msgstr "iPhone에 설치"
 
@@ -10540,6 +10571,9 @@ msgstr "모든 워크스페이스의 MCP 서버를 한곳에서 설치하고, �
 msgid "Install."
 msgstr "설치."
 
+msgid "Installation"
+msgstr "설치"
+
 msgid "Installed"
 msgstr "설치됨"
 
@@ -10547,8 +10581,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "설치됨"
 
+msgid "Installed · {version}"
+msgstr "설치됨 · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "설치됨 · ChatGPT 계정으로 로그인하세요"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "설치됨 · Claude 계정으로 로그인하세요"
+
 msgid "Installed by your organization"
 msgstr "조직에서 설치함"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Homebrew 같은 다른 방법으로 설치했나요? 다시 확인을 클릭하세요."
 
 msgid "Installed it another way? Click Check again."
 msgstr "다른 방법으로 설치했나요? 다시 확인을 클릭하세요."
@@ -10568,6 +10614,9 @@ msgstr "설치 중..."
 
 msgid "Installing…"
 msgstr "설치 중…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "설치 중… Mac의 다른 부분은 바뀌지 않습니다."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh로 접속할 수 있는 머신에 Paradev를 설치하고, Paradev를 내 계정으로 로그인시킨 뒤 서비스로 계속 실행합니다."
@@ -13469,8 +13518,14 @@ msgstr "채널에 없음"
 msgid "Not included"
 msgstr "미포함"
 
+msgid "Not installed"
+msgstr "설치되지 않음"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "설치되지 않음 · 비공개 저장소와 풀 리퀘스트에 필요합니다"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "설치되지 않음 · 채팅과 작업을 실행합니다"
 
 msgid "Not loaded"
 msgstr "로드 안 됨"
@@ -13507,6 +13562,9 @@ msgstr "{hostName}에 설정되지 않음"
 
 msgid "Not set up on this host"
 msgstr "이 호스트에 설정되지 않음"
+
+msgid "not signed in"
+msgstr "로그인 안 됨"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "로그인되지 않음 · 비공개 저장소와 풀 리퀘스트에 필요합니다"
@@ -14339,6 +14397,9 @@ msgstr "새 워크스페이스를 열어 각 채팅을 확인하세요. 옮겨�
 msgid "Open the original workspace"
 msgstr "원래 워크스페이스 열기"
 
+msgid "Open the page again"
+msgstr "페이지 다시 열기"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "명령 팔레트에서 리소스 사용량 보기를 엽니다"
 
@@ -14390,6 +14451,9 @@ msgstr "채팅 인터페이스에서 여는 중…"
 msgid "Opening pages"
 msgstr "페이지 열기"
 
+msgid "Opening the sign-in page…"
+msgstr "로그인 페이지 여는 중…"
+
 msgid "Operator"
 msgstr "작업자"
 
@@ -14416,6 +14480,9 @@ msgstr "선택 사항입니다. 무엇이 효과적인지 파악하는 데 도�
 
 msgid "Options"
 msgstr "옵션"
+
+msgid "Or sign in from a terminal:"
+msgstr "또는 터미널에서 로그인:"
 
 msgid "Orange"
 msgstr "주황"
@@ -14830,6 +14897,9 @@ msgstr "Paradev는 2025년 11월 해커톤 프로젝트로 시작했습니다. w
 msgid "Paradev still can't find {name}."
 msgstr "Paradev가 아직 {name}을(를) 찾을 수 없습니다."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev가 아직 GitHub CLI를 찾을 수 없습니다."
+
 msgid "Paradev Teams"
 msgstr "Paradev 팀"
 
@@ -14840,8 +14910,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev가 시스템 RAM의 {0}을(를) 사용합니다"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev는 Git과 GitHub CLI로 리포지토리를 복제하고 풀 리퀘스트를 엽니다. 나중에 해도 됩니다."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev는 이 도구들로 저장소를 복제하고, 풀 리퀘스트를 열고, 작업을 실행합니다. 나중에 해도 됩니다."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev와 대안 비교"
@@ -18157,9 +18227,6 @@ msgstr "SSH로 호스트 설정"
 msgid "Set up an automation"
 msgstr "자동화 설정하기"
 
-msgid "Set up Git and GitHub"
-msgstr "Git 및 GitHub 설정"
-
 msgid "Set up once"
 msgstr "한 번만 설정"
 
@@ -18174,6 +18241,9 @@ msgstr "이 프로젝트를 Paradev에 맞게 설정하기"
 
 msgid "Set up your organization to get started"
 msgstr "조직을 설정하고 시작하세요"
+
+msgid "Set up your tools"
+msgstr "도구 설정"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "설치된 플러그인을 다시 사용 가능으로 바꾸면 모두의 사본은 그대로 남고, 이후 각자 제거할 수 있습니다. 사용 불가로 바꾸면 제거됩니다."
@@ -18620,6 +18690,9 @@ msgstr "GitHub로 가입"
 msgid "Sign up with Google"
 msgstr "Google로 가입"
 
+msgid "Sign-in code"
+msgstr "로그인 코드"
+
 msgid "Sign-in didn't finish"
 msgstr "로그인이 완료되지 않았습니다"
 
@@ -18644,8 +18717,20 @@ msgstr "가입 완료율"
 msgid "Sign-up steps"
 msgstr "가입 단계"
 
+msgid "signed in"
+msgstr "로그인됨"
+
+msgid "Signed in"
+msgstr "로그인됨"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "로그인됨 · 비공개 저장소를 클론하고 풀 리퀘스트를 엽니다"
+
+msgid "signed in as {account}"
+msgstr "{account}(으)로 로그인됨"
+
+msgid "Signed in as {account}"
+msgstr "{account}(으)로 로그인됨"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>(으)로 로그인됨"
@@ -18754,6 +18839,12 @@ msgstr "Git을 지금은 건너뛸까요?"
 
 msgid "Skip GitHub for now?"
 msgstr "지금은 GitHub를 건너뛸까요?"
+
+msgid "Skip setup for now?"
+msgstr "지금은 설정을 건너뛸까요?"
+
+msgid "Skip the coding agent for now?"
+msgstr "지금은 코딩 에이전트를 건너뛸까요?"
 
 msgid "Skipped"
 msgstr "건너뜀"
@@ -20567,6 +20658,9 @@ msgstr "이 채팅은 길어서 최신 부분만 표시합니다. 워크스페�
 msgid "This chat may have been removed or you may not have access."
 msgstr "이 채팅은 삭제되었거나 접근 권한이 없을 수 있습니다."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "이 채팅에는 {name}이(가) 필요합니다. Paradev가 대신 설치할 수 있습니다. 1분 정도 걸리며 Mac의 다른 부분은 바뀌지 않습니다."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "대화가 터미널에서 계속되어 이 채팅이 중지되었습니다."
 
@@ -21303,6 +21397,9 @@ msgstr "다른 검색어를 쓰거나 다른 위치를 선택해 보세요."
 msgid "Try again"
 msgstr "다시 시도"
 
+msgid "Try again to start this chat."
+msgstr "다시 시도해 이 채팅을 시작하세요."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "다시 시도하거나 Paradev 트레이 메뉴에서 호스트 서비스를 다시 시작해 주세요."
 
@@ -21851,6 +21948,9 @@ msgstr "“{0}” 사용"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "워크스페이스 기준 상대 경로나 절대 경로 폴더를 사용하세요."
+
+msgid "Use another agent"
+msgstr "다른 에이전트 사용"
 
 msgid "Use another port"
 msgstr "다른 포트 사용"
@@ -23138,6 +23238,9 @@ msgstr "조직이 클라우드 사용 한도에 도달했습니다. 한도를 �
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
 
+msgid "your own install"
+msgstr "직접 설치한 버전"
+
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."
 
@@ -23232,3 +23335,4 @@ msgstr "축소"
 
 msgid "zsh"
 msgstr "zsh"
+

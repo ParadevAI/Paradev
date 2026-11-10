@@ -102,6 +102,11 @@ export {
 	writeInstalledPlugins,
 } from "./installed-plugins";
 export {
+	isManagedCodingAgent,
+	type ManagedCodingAgent,
+	managedAgentBinaryPath,
+} from "./managed-agent-binaries";
+export {
 	hashMcpServerValue,
 	readExternallyConfiguredMcpServers,
 	type SyncManagedMcpServersOptions,

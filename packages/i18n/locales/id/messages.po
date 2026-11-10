@@ -1185,6 +1185,9 @@ msgstr "{name} bawaan dan tidak dapat dihapus"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} bawaan dan tidak dapat diganti"
 
+msgid "{name} is installed"
+msgstr "{name} sudah terpasang"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} belum ditambahkan"
@@ -1194,6 +1197,8 @@ msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu mungki
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu telah dihentikan."
+msgid "{name} isn't installed yet"
+msgstr "{name} belum terpasang"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
@@ -1405,6 +1410,12 @@ msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} belum diatur. Anda bisa mengaturnya nanti di Pengaturan."
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {{done} dari # obrolan dipindahkan}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
 
@@ -1467,9 +1478,6 @@ msgstr "{user} bergabung kembali."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor} sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} Menunggu"
@@ -4286,6 +4294,9 @@ msgstr "Permukaan chat: pesan, penalaran, saran"
 msgid "Chats"
 msgstr "Obrolan"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "Chat dan tugas membutuhkan {agents}. Anda bisa memasangnya nanti di Pengaturan → Agen, atau saat memulai chat pertama Anda."
+
 msgid "Check again"
 msgstr "Periksa lagi"
 
@@ -6264,13 +6275,16 @@ msgstr "Tidak dapat memposting komentar"
 msgid "Couldn't post reply"
 msgstr "Tidak bisa mengirim balasan"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "Tidak dapat menjangkau {vendor}. Periksa koneksi internet Anda, lalu coba lagi."
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Tidak bisa menjangkau cloud untuk {0}: {1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "Tidak dapat menjangkau GitHub. Periksa koneksi internet Anda, lalu coba lagi."
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "Tidak dapat menjangkau server unduhan. Periksa koneksi internet Anda lalu coba lagi."
 
 msgid "Couldn't reach the model provider"
 msgstr "Tidak dapat menghubungi penyedia model"
@@ -6357,8 +6371,8 @@ msgstr "Tidak bisa mengirim ke agen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Pesan Anda tidak dapat dikirim. Pesan sudah kembali di kolom penulisan."
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "Tidak dapat mengatur {name} di komputer ini."
+msgid "Couldn't set up {name} on this Mac."
+msgstr "Tidak dapat mengatur {name} di Mac ini."
 
 msgid "Couldn't stage changes"
 msgstr "Tidak bisa men-stage perubahan"
@@ -6410,6 +6424,9 @@ msgstr "Tidak dapat mencoba memindahkan lagi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Perubahan file tidak bisa dibatalkan."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "Tidak dapat mengekstrak atau menyimpan GitHub CLI di Mac ini."
 
 msgid "Couldn't unstage changes"
 msgstr "Tidak bisa meng-unstage perubahan"
@@ -7343,6 +7360,9 @@ msgstr "Dikte tidak tersedia di perangkat ini"
 msgid "Dictation is not available right now"
 msgstr "Dikte sedang tidak tersedia"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "Halaman menampilkan kode? Tempelkan di sini"
+
 msgid "Didn't hear back"
 msgstr "Tidak ada respons"
 
@@ -7675,6 +7695,9 @@ msgstr "Mengunduh {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Mengunduh dari Apple memerlukan Apple ID. Pemasangan dapat memerlukan sekitar 20 GB ruang kosong."
+
+msgid "Downloading GitHub CLI…"
+msgstr "Mengunduh GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Mengunduh..."
@@ -9066,6 +9089,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Selesaikan review"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "Selesaikan masuk di browser Anda. Ini akan diperbarui dengan sendirinya."
+
 msgid "Finished"
 msgstr "Selesai"
 
@@ -9606,6 +9632,8 @@ msgstr "Integrasi GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub masih me-merge. Ini akan diperbarui setelah selesai."
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
 
 msgid "GitHub issues"
 msgstr "Issue GitHub"
@@ -10513,6 +10541,9 @@ msgstr "Pasang GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Pasang GitHub CLI"
 
+msgid "Install it yourself"
+msgstr "Pasang sendiri"
+
 msgid "Install on your iPhone"
 msgstr "Instal di iPhone Anda"
 
@@ -10540,6 +10571,9 @@ msgstr "Pasang, otorisasi, dan atur cakupan server MCP di semua workspace Anda d
 msgid "Install."
 msgstr "Instal."
 
+msgid "Installation"
+msgstr "Pemasangan"
+
 msgid "Installed"
 msgstr "Terpasang"
 
@@ -10547,8 +10581,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "Terpasang"
 
+msgid "Installed · {version}"
+msgstr "Terpasang · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "Terpasang · masuk dengan akun ChatGPT Anda"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "Terpasang · masuk dengan akun Claude Anda"
+
 msgid "Installed by your organization"
 msgstr "Dipasang oleh organisasi Anda"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Memasang dengan cara lain, seperti Homebrew? Klik Periksa lagi."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Sudah memasangnya dengan cara lain? Klik Periksa lagi."
@@ -10568,6 +10614,9 @@ msgstr "Memasang..."
 
 msgid "Installing…"
 msgstr "Memasang…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "Memasang… Tidak ada lagi yang berubah di Mac Anda."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Memasang Paradev di mesin yang bisa Anda jangkau dengan ssh, menghubungkan Paradev ke akun Anda, dan menjaga Paradev tetap berjalan sebagai layanan."
@@ -13469,8 +13518,14 @@ msgstr "Tidak di kanal"
 msgid "Not included"
 msgstr "Tidak termasuk"
 
+msgid "Not installed"
+msgstr "Belum terpasang"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "Belum terpasang · diperlukan untuk repositori pribadi dan pull request"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "Belum terpasang · menjalankan chat dan tugas Anda"
 
 msgid "Not loaded"
 msgstr "Belum dimuat"
@@ -13507,6 +13562,9 @@ msgstr "Belum disiapkan di {hostName}"
 
 msgid "Not set up on this host"
 msgstr "Belum disiapkan di host ini"
+
+msgid "not signed in"
+msgstr "belum masuk"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "Belum masuk · diperlukan untuk repositori pribadi dan pull request"
@@ -14339,6 +14397,9 @@ msgstr "Buka workspace baru untuk melihat setiap chat. Chat yang tidak dipindahk
 msgid "Open the original workspace"
 msgstr "Buka workspace asli"
 
+msgid "Open the page again"
+msgstr "Buka halaman lagi"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Buka tampilan penggunaan sumber daya di command palette"
 
@@ -14390,6 +14451,9 @@ msgstr "Membuka di antarmuka chat…"
 msgid "Opening pages"
 msgstr "Membuka halaman"
 
+msgid "Opening the sign-in page…"
+msgstr "Membuka halaman masuk…"
+
 msgid "Operator"
 msgstr "Operator"
 
@@ -14416,6 +14480,9 @@ msgstr "Opsional. Membantu kami mengetahui apa yang berhasil."
 
 msgid "Options"
 msgstr "Opsi"
+
+msgid "Or sign in from a terminal:"
+msgstr "Atau masuk dari terminal:"
 
 msgid "Orange"
 msgstr "Oranye"
@@ -14830,6 +14897,9 @@ msgstr "Paradev bermula sebagai proyek hackathon pada November 2025. Waktu itu s
 msgid "Paradev still can't find {name}."
 msgstr "Paradev masih tidak dapat menemukan {name}."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev masih tidak dapat menemukan GitHub CLI."
+
 msgid "Paradev Teams"
 msgstr "Tim Paradev"
 
@@ -14840,8 +14910,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev memakai {0} dari RAM sistem"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev menggunakan Git dan GitHub CLI untuk mengkloning repo dan membuka pull request. Anda juga dapat melakukannya nanti."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev memakai alat-alat ini untuk meng-clone repo, membuka pull request, dan menjalankan tugas Anda. Anda juga bisa melakukannya nanti."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev vs Alternatifnya"
@@ -18157,9 +18227,6 @@ msgstr "Siapkan host lewat SSH"
 msgid "Set up an automation"
 msgstr "Siapkan otomatisasi"
 
-msgid "Set up Git and GitHub"
-msgstr "Siapkan Git dan GitHub"
-
 msgid "Set up once"
 msgstr "Atur sekali"
 
@@ -18174,6 +18241,9 @@ msgstr "Siapkan proyek ini untuk Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Siapkan organisasi Anda untuk memulai"
+
+msgid "Set up your tools"
+msgstr "Atur alat Anda"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Mengembalikan plugin terpasang ke Tersedia membuat semua orang tetap memiliki salinannya; mereka lalu bisa menghapusnya. Tidak tersedia akan menghapusnya."
@@ -18620,6 +18690,9 @@ msgstr "Daftar dengan GitHub"
 msgid "Sign up with Google"
 msgstr "Daftar dengan Google"
 
+msgid "Sign-in code"
+msgstr "Kode masuk"
+
 msgid "Sign-in didn't finish"
 msgstr "Proses masuk tidak selesai"
 
@@ -18644,8 +18717,20 @@ msgstr "Penyelesaian pendaftaran"
 msgid "Sign-up steps"
 msgstr "Langkah pendaftaran"
 
+msgid "signed in"
+msgstr "sudah masuk"
+
+msgid "Signed in"
+msgstr "Sudah masuk"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "Sudah masuk · mengklon repositori pribadi dan membuka pull request"
+
+msgid "signed in as {account}"
+msgstr "masuk sebagai {account}"
+
+msgid "Signed in as {account}"
+msgstr "Masuk sebagai {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Masuk sebagai <0>{userName}</0>"
@@ -18754,6 +18839,12 @@ msgstr "Lewati Git untuk sekarang?"
 
 msgid "Skip GitHub for now?"
 msgstr "Lewati GitHub untuk sekarang?"
+
+msgid "Skip setup for now?"
+msgstr "Lewati pengaturan dulu?"
+
+msgid "Skip the coding agent for now?"
+msgstr "Lewati agen coding dulu?"
 
 msgid "Skipped"
 msgstr "Dilewati"
@@ -20567,6 +20658,9 @@ msgstr "Chat ini panjang, jadi hanya bagian terbarunya yang ditampilkan. Semuany
 msgid "This chat may have been removed or you may not have access."
 msgstr "Obrolan ini mungkin telah dihapus atau Anda tidak memiliki akses."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "Chat ini membutuhkan {name}. Paradev bisa memasangnya untuk Anda. Butuh sekitar satu menit, dan tidak ada lagi yang berubah di Mac Anda."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Chat ini berhenti karena percakapan dilanjutkan di terminal."
 
@@ -21303,6 +21397,9 @@ msgstr "Coba kata kunci lain atau tempat lain."
 msgid "Try again"
 msgstr "Coba lagi"
 
+msgid "Try again to start this chat."
+msgstr "Coba lagi untuk memulai chat ini."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Coba lagi, atau mulai ulang layanan host dari menu Paradev di baki sistem."
 
@@ -21851,6 +21948,9 @@ msgstr "Pakai “{0}”"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Pakai path relatif terhadap workspace atau folder absolut."
+
+msgid "Use another agent"
+msgstr "Gunakan agen lain"
 
 msgid "Use another port"
 msgstr "Gunakan port lain"
@@ -23138,6 +23238,9 @@ msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Workspace ini aka
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."
 
+msgid "your own install"
+msgstr "pemasangan Anda sendiri"
+
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."
 
@@ -23232,3 +23335,4 @@ msgstr "Perkecil"
 
 msgid "zsh"
 msgstr "zsh"
+

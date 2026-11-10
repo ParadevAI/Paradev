@@ -18,6 +18,7 @@ import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceIn
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import { StoredChatTranscript } from "../../../../../../components/StoredChatTranscript";
@@ -44,6 +45,7 @@ import type {
 import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPosition";
 import { useForkChat } from "../../hooks/useForkChat";
 import { AcpRecovery } from "./components/AcpRecovery";
+import { AgentMissingCard } from "./components/AgentMissingCard";
 import { DraftChat } from "./components/DraftChat";
 import { MoveProgress } from "./components/MoveProgress";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
@@ -51,6 +53,7 @@ import { useReplacementSession } from "./hooks/useReplacementSession";
 import { useStoredChatSnapshot } from "./hooks/useStoredChatSnapshot";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
+import { missingCodingAgent } from "./utils/missingCodingAgent";
 import {
 	type SessionInfo,
 	sessionInfoFromState,
@@ -154,6 +157,7 @@ export function AcpChatPane({
 	const storedSnapshot = useStoredChatSnapshot(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
+	const { activeHostUrl: localHostUrl } = useLocalHostService();
 	const hostInfo = useHostServiceInfo(hostUrl);
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const agentLabel = agentConfigs?.find(
@@ -758,6 +762,35 @@ export function AcpChatPane({
 		);
 	}
 
+	const missingAgentCard = (
+		detail: string | undefined,
+		onRetry: () => void,
+	) => {
+		const missing = missingCodingAgent(detail, { hostUrl, localHostUrl });
+		if (!missing) return null;
+		return (
+			<AgentMissingCard
+				agent={missing}
+				detail={detail}
+				otherAgents={(agentSwitch?.agents ?? []).filter(
+					(other) => other.presetId !== agent?.id,
+				)}
+				onUseAgent={(presetId) =>
+					onSwitchAgent?.({
+						presetId,
+						label:
+							agentSwitch?.agents.find((other) => other.presetId === presetId)
+								?.label ?? presetId,
+						model: null,
+						modeId: undefined,
+						handoffPrompt: null,
+					})
+				}
+				onRetry={onRetry}
+			/>
+		);
+	};
+
 	const lost = failure !== null && stored === null;
 	if (
 		harness &&
@@ -765,6 +798,11 @@ export function AcpChatPane({
 		(sessionDead || sessionStopped || lost) &&
 		!recovering
 	) {
+		const detail = failure ?? stored?.lastError ?? undefined;
+		const card = continuedInTerminal
+			? null
+			: missingAgentCard(detail, retryRecovery);
+		if (card) return card;
 		return (
 			<AcpRecovery
 				detail={failure ?? stored?.lastError ?? undefined}
@@ -777,6 +815,8 @@ export function AcpChatPane({
 
 	if (!client || !sessionId) {
 		if (failure && harness) {
+			const card = missingAgentCard(failure, startFresh);
+			if (card) return card;
 			return (
 				<AcpRecovery
 					detail={failure}

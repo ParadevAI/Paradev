@@ -1179,6 +1179,9 @@ msgstr "{name} вбудовано, тому його не можна видал�
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} вбудовано, тому його не можна замінити"
 
+msgid "{name} is installed"
+msgstr "{name} встановлено"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} не додано"
@@ -1188,6 +1191,8 @@ msgstr "{name} без змін. Якщо агент працював, його �
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} без змін. Якщо агент працював, його зупинено."
+msgid "{name} isn't installed yet"
+msgstr "{name} ще не встановлено"
 
 msgid "{name} plugin"
 msgstr "Плагін {name}"
@@ -1399,6 +1404,12 @@ msgstr "{threshold, plural, one {Злито # агентський PR} few {Зл
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} ще не налаштовано. Їх можна налаштувати пізніше в Налаштуваннях."
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {Переміщено {done} з # чату} few {Переміщено {done} з # чатів} many {Переміщено {done} з # чатів} other {Переміщено {done} з # чату}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, =1 {Перевірку пройдено} one {Пройдено всі перевірки: #} few {Пройдено всі перевірки: #} many {Пройдено всі перевірки: #} other {Пройдено всі перевірки: #}}"
 
@@ -1461,9 +1472,6 @@ msgstr "{user} знову приєднався(-лася)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor} зараз обмежує завантаження. Зачекайте хвилину й спробуйте ще раз."
 
 msgid "{waiting} Waiting"
 msgstr "Очікують: {waiting}"
@@ -4280,6 +4288,9 @@ msgstr "Елементи чату: повідомлення, міркуванн�
 msgid "Chats"
 msgstr "Чати"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "Чатам і завданням потрібен {agents}. Його можна встановити пізніше в Налаштування → Агенти або під час запуску першого чату."
+
 msgid "Check again"
 msgstr "Перевірити знову"
 
@@ -6258,13 +6269,16 @@ msgstr "Не вдалося опублікувати коментар"
 msgid "Couldn't post reply"
 msgstr "Не вдалося опублікувати відповідь"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "Не вдалося під’єднатися до {vendor}. Перевірте підключення до інтернету й спробуйте ще раз."
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Не вдалося зв'язатися з хмарою для {0}: {1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "Не вдалося під’єднатися до GitHub. Перевірте підключення до інтернету й спробуйте ще раз."
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "Не вдалося зв’язатися із сервером завантаження. Перевірте підключення до інтернету та спробуйте знову."
 
 msgid "Couldn't reach the model provider"
 msgstr "Не вдалося зв'язатися з провайдером моделі"
@@ -6351,8 +6365,8 @@ msgstr "Не вдалося надіслати агенту"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Не вдалося надіслати повідомлення. Його повернуто в поле введення."
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "Не вдалося налаштувати {name} на цьому комп’ютері."
+msgid "Couldn't set up {name} on this Mac."
+msgstr "Не вдалося налаштувати {name} на цьому Mac."
 
 msgid "Couldn't stage changes"
 msgstr "Не вдалося проіндексувати зміни"
@@ -6404,6 +6418,9 @@ msgstr "Не вдалося повторити перенесення"
 
 msgid "Couldn't undo the file changes."
 msgstr "Не вдалося скасувати зміни у файлах."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "Не вдалося розпакувати або зберегти GitHub CLI на цьому Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Не вдалося зняти зміни з індексу"
@@ -7337,6 +7354,9 @@ msgstr "Диктування недоступне на цьому пристро
 msgid "Dictation is not available right now"
 msgstr "Диктування зараз недоступне"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "Сторінка показала код? Вставте його сюди"
+
 msgid "Didn't hear back"
 msgstr "Відповіді не надійшло"
 
@@ -7669,6 +7689,9 @@ msgstr "Завантаження {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Для завантаження з сайту Apple потрібен Apple ID. Для встановлення може знадобитися близько 20 ГБ вільного місця."
+
+msgid "Downloading GitHub CLI…"
+msgstr "Завантаження GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Завантаження..."
@@ -9060,6 +9083,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Завершити рев'ю"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "Завершіть вхід у браузері. Це оновиться само."
+
 msgid "Finished"
 msgstr "Завершено"
 
@@ -9600,6 +9626,8 @@ msgstr "Інтеграція з GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub ще зливає. Це оновиться, коли він закінчить."
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub зараз обмежує завантаження. Зачекайте хвилину й спробуйте ще раз."
 
 msgid "GitHub issues"
 msgstr "GitHub issues"
@@ -10507,6 +10535,9 @@ msgstr "Встановити GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Встановити GitHub CLI"
 
+msgid "Install it yourself"
+msgstr "Встановити самостійно"
+
 msgid "Install on your iPhone"
 msgstr "Встановити на iPhone"
 
@@ -10534,6 +10565,9 @@ msgstr "Встановлюйте й авторизуйте MCP-сервери т
 msgid "Install."
 msgstr "Встановіть."
 
+msgid "Installation"
+msgstr "Встановлення"
+
 msgid "Installed"
 msgstr "Встановлено"
 
@@ -10541,8 +10575,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "Встановлений"
 
+msgid "Installed · {version}"
+msgstr "Встановлено · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "Встановлено · увійдіть з обліковим записом ChatGPT"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "Встановлено · увійдіть з обліковим записом Claude"
+
 msgid "Installed by your organization"
 msgstr "Встановлено вашою організацією"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Встановили іншим способом, наприклад через Homebrew? Натисніть «Перевірити знову»."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Встановили іншим способом? Натисніть «Перевірити знову»."
@@ -10562,6 +10608,9 @@ msgstr "Встановлення..."
 
 msgid "Installing…"
 msgstr "Встановлення…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "Встановлення… Більше нічого на вашому Mac не зміниться."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Встановлює Paradev на машину, до якої ви маєте доступ через ssh, входить у Paradev під вашим обліковим записом і запускає його як службу."
@@ -13463,8 +13512,14 @@ msgstr "Не в каналі"
 msgid "Not included"
 msgstr "Не входить"
 
+msgid "Not installed"
+msgstr "Не встановлено"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "Не встановлено · потрібно для приватних репозиторіїв і пул-реквестів"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "Не встановлено · запускає ваші чати й завдання"
 
 msgid "Not loaded"
 msgstr "Не завантажено"
@@ -13501,6 +13556,9 @@ msgstr "Не налаштовано на {hostName}"
 
 msgid "Not set up on this host"
 msgstr "Не налаштовано на цьому хості"
+
+msgid "not signed in"
+msgstr "вхід не виконано"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "Вхід не виконано · потрібно для приватних репозиторіїв і пул-реквестів"
@@ -14333,6 +14391,9 @@ msgstr "Відкрийте новий робочий простір, щоб по
 msgid "Open the original workspace"
 msgstr "Відкрити початковий робочий простір"
 
+msgid "Open the page again"
+msgstr "Відкрити сторінку знову"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Відкрити перегляд використання ресурсів у палітрі команд"
 
@@ -14384,6 +14445,9 @@ msgstr "Відкриття в інтерфейсі чату…"
 msgid "Opening pages"
 msgstr "Відкриття сторінок"
 
+msgid "Opening the sign-in page…"
+msgstr "Відкриваємо сторінку входу…"
+
 msgid "Operator"
 msgstr "Оператор"
 
@@ -14410,6 +14474,9 @@ msgstr "Необов'язково. Допомагає нам зрозуміти,
 
 msgid "Options"
 msgstr "Параметри"
+
+msgid "Or sign in from a terminal:"
+msgstr "Або увійдіть із термінала:"
 
 msgid "Orange"
 msgstr "Помаранчевий"
@@ -14824,6 +14891,9 @@ msgstr "Paradev почався як хакатонний проєкт у лис�
 msgid "Paradev still can't find {name}."
 msgstr "Paradev досі не знаходить {name}."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev досі не знаходить GitHub CLI."
+
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
 
@@ -14834,8 +14904,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev використовує {0} оперативної пам'яті системи"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev використовує Git і GitHub CLI, щоб клонувати репозиторії та відкривати пул-реквести. Це можна зробити й пізніше."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev використовує їх, щоб клонувати репозиторії, відкривати пул-реквести й виконувати ваші завдання. Це можна зробити й пізніше."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev порівняно з альтернативами"
@@ -18151,9 +18221,6 @@ msgstr "Налаштувати хост через SSH"
 msgid "Set up an automation"
 msgstr "Налаштуйте автоматизацію"
 
-msgid "Set up Git and GitHub"
-msgstr "Налаштування Git і GitHub"
-
 msgid "Set up once"
 msgstr "Налаштуйте один раз"
 
@@ -18168,6 +18235,9 @@ msgstr "Налаштуй цей проєкт для Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Щоб почати, налаштуйте свою організацію"
+
+msgid "Set up your tools"
+msgstr "Налаштуйте інструменти"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Якщо повернути встановлений плагін у стан «Доступний», у всіх залишиться їхня копія, і її можна буде видалити. «Недоступний» видаляє його."
@@ -18614,6 +18684,9 @@ msgstr "Зареєструватися через GitHub"
 msgid "Sign up with Google"
 msgstr "Зареєструватися через Google"
 
+msgid "Sign-in code"
+msgstr "Код входу"
+
 msgid "Sign-in didn't finish"
 msgstr "Вхід не завершено"
 
@@ -18638,8 +18711,20 @@ msgstr "Частка завершених реєстрацій"
 msgid "Sign-up steps"
 msgstr "Кроки реєстрації"
 
+msgid "signed in"
+msgstr "вхід виконано"
+
+msgid "Signed in"
+msgstr "Вхід виконано"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "Вхід виконано · клонує приватні репозиторії й відкриває пул-реквести"
+
+msgid "signed in as {account}"
+msgstr "вхід виконано як {account}"
+
+msgid "Signed in as {account}"
+msgstr "Вхід виконано як {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ви ввійшли як <0>{userName}</0>"
@@ -18748,6 +18833,12 @@ msgstr "Поки пропустити Git?"
 
 msgid "Skip GitHub for now?"
 msgstr "Поки що пропустити GitHub?"
+
+msgid "Skip setup for now?"
+msgstr "Поки пропустити налаштування?"
+
+msgid "Skip the coding agent for now?"
+msgstr "Поки пропустити агента для коду?"
 
 msgid "Skipped"
 msgstr "Пропущено"
@@ -20561,6 +20652,9 @@ msgstr "Цей чат довгий, тому показано лише оста�
 msgid "This chat may have been removed or you may not have access."
 msgstr "Можливо, цей чат видалено або у вас немає до нього доступу."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "Цьому чату потрібен {name}. Paradev може встановити його за вас. Це займе близько хвилини, і більше нічого на вашому Mac не зміниться."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Цей чат зупинено, бо розмова продовжилася в терміналі."
 
@@ -21297,6 +21391,9 @@ msgstr "Спробуйте інший пошуковий запит або ін�
 msgid "Try again"
 msgstr "Спробувати знову"
 
+msgid "Try again to start this chat."
+msgstr "Спробуйте знову, щоб запустити цей чат."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Спробуйте ще раз або перезапустіть службу хоста з меню Paradev у системному треї."
 
@@ -21845,6 +21942,9 @@ msgstr "Використати «{0}»"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Використовуйте шлях відносно робочого простору або абсолютний шлях до папки."
+
+msgid "Use another agent"
+msgstr "Використати іншого агента"
 
 msgid "Use another port"
 msgstr "Використати інший порт"
@@ -23132,6 +23232,9 @@ msgstr "Ваша організація досягла ліміту хмарно
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваші власні облікові записи. Інтеграції вашої організації дають Paradev доступ до її інструментів; якщо підключити власні, робота, яку Paradev виконує для вас, відображатиметься від вашого імені."
 
+msgid "your own install"
+msgstr "ваше власне встановлення"
+
 msgid "Your Paradev download is starting."
 msgstr "Завантаження Paradev починається."
 
@@ -23226,3 +23329,4 @@ msgstr "Зменшити"
 
 msgid "zsh"
 msgstr "zsh"
+

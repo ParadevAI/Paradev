@@ -13,6 +13,7 @@ import {
 } from "./agent-wrappers-common";
 import { getArtifactGuardScriptPath } from "./artifact-guard-hook";
 import { getTemplatePath } from "./config";
+import { managedAgentBinaryPath } from "./managed-agent-binaries";
 import {
 	buildNestedDesiredEntries,
 	cleanNestedHookDefinition,
@@ -320,6 +321,7 @@ export function createClaudeWrapper(): void {
 			"CLAUDE_CONFIG_DIR",
 			"default-claude-config-dir",
 		),
+		fallbackBinary: managedAgentBinaryPath("claude"),
 	});
 	createWrapper("claude", script);
 }
@@ -340,6 +342,7 @@ export function createCodexWrapper(): void {
 				"default-codex-home",
 				"SUPERSET_AMBIENT_CODEX_HOME",
 			),
+			fallbackBinary: managedAgentBinaryPath("codex"),
 		},
 	);
 	createWrapper("codex", script);

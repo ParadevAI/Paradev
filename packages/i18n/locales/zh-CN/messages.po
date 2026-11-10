@@ -1185,6 +1185,9 @@ msgstr "{name} 是内置的，无法移除"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} 是内置的，无法替换"
 
+msgid "{name} is installed"
+msgstr "{name} 已安装"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未添加"
@@ -1194,6 +1197,8 @@ msgstr "{name} 未改变。如果智能体正在工作，它可能已被停止�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} 未改变。如果智能体正在工作，它已被停止。"
+msgid "{name} isn't installed yet"
+msgstr "{name} 尚未安装"
 
 msgid "{name} plugin"
 msgstr "{name} 插件"
@@ -1405,6 +1410,12 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} 尚未设置。你可以稍后在设置中设置。"
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {已移动 {done}/# 个聊天}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
 
@@ -1467,9 +1478,6 @@ msgstr "{user} 已重新加入。"
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor} 当前正在限制下载。请稍等片刻后重试。"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
@@ -4286,6 +4294,9 @@ msgstr "聊天界面：消息、推理、建议"
 msgid "Chats"
 msgstr "聊天"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "聊天和任务需要 {agents}。你可以稍后在 设置 → 智能体 中安装，或在开始第一个聊天时安装。"
+
 msgid "Check again"
 msgstr "重新检查"
 
@@ -6264,13 +6275,16 @@ msgstr "无法发布评论"
 msgid "Couldn't post reply"
 msgstr "无法发布回复"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "无法连接到 {vendor}。请检查网络连接后重试。"
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "无法为{0}连接云端：{1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "无法连接到 GitHub。请检查网络连接后重试。"
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "无法连接下载服务器。请检查网络连接后重试。"
 
 msgid "Couldn't reach the model provider"
 msgstr "无法连接到模型提供商"
@@ -6357,8 +6371,8 @@ msgstr "无法发送给智能体"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "无法发送你的消息。消息已放回输入框。"
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "无法在这台电脑上设置 {name}。"
+msgid "Couldn't set up {name} on this Mac."
+msgstr "无法在这台 Mac 上设置 {name}。"
 
 msgid "Couldn't stage changes"
 msgstr "无法暂存更改"
@@ -6410,6 +6424,9 @@ msgstr "无法重试移动"
 
 msgid "Couldn't undo the file changes."
 msgstr "无法撤销文件更改。"
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "无法在这台 Mac 上解压或保存 GitHub CLI。"
 
 msgid "Couldn't unstage changes"
 msgstr "无法取消暂存更改"
@@ -7343,6 +7360,9 @@ msgstr "此设备不支持语音输入"
 msgid "Dictation is not available right now"
 msgstr "语音输入暂时不可用"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "页面显示了代码？请粘贴到这里"
+
 msgid "Didn't hear back"
 msgstr "未收到响应"
 
@@ -7675,6 +7695,9 @@ msgstr "正在下载 {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "从 Apple 下载需要 Apple ID。安装可能需要约 20 GB 可用空间。"
+
+msgid "Downloading GitHub CLI…"
+msgstr "正在下载 GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "正在下载..."
@@ -9066,6 +9089,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "完成审查"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "请在浏览器中完成登录。此处会自动更新。"
+
 msgid "Finished"
 msgstr "已完成"
 
@@ -9606,6 +9632,8 @@ msgstr "GitHub集成"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub 仍在合并。完成后此处会更新。"
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub 当前正在限制下载。请稍等片刻后重试。"
 
 msgid "GitHub issues"
 msgstr "GitHub议题"
@@ -10513,6 +10541,9 @@ msgstr "安装GitHub App"
 msgid "Install GitHub CLI"
 msgstr "安装 GitHub CLI"
 
+msgid "Install it yourself"
+msgstr "自行安装"
+
 msgid "Install on your iPhone"
 msgstr "在 iPhone 上安装"
 
@@ -10540,6 +10571,9 @@ msgstr "在一处为所有工作区安装、授权并划定MCP服务器的权限
 msgid "Install."
 msgstr "安装。"
 
+msgid "Installation"
+msgstr "安装"
+
 msgid "Installed"
 msgstr "已安装"
 
@@ -10547,8 +10581,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "已安装"
 
+msgid "Installed · {version}"
+msgstr "已安装 · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "已安装 · 使用你的 ChatGPT 账号登录"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "已安装 · 使用你的 Claude 账号登录"
+
 msgid "Installed by your organization"
 msgstr "由你的组织安装"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "用其他方式（如 Homebrew）安装的？请点击“重新检查”。"
 
 msgid "Installed it another way? Click Check again."
 msgstr "已通过其他方式安装？请点击重新检查。"
@@ -10568,6 +10614,9 @@ msgstr "正在安装..."
 
 msgid "Installing…"
 msgstr "正在安装…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "正在安装… Mac 上的其他内容不会改变。"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "在可通过 ssh 访问的机器上安装 Paradev，将 Paradev 登录到你的账户，并让它作为服务持续运行。"
@@ -13469,8 +13518,14 @@ msgstr "不在频道中"
 msgid "Not included"
 msgstr "不包含"
 
+msgid "Not installed"
+msgstr "未安装"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "未安装 · 私有仓库和拉取请求需要它"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "未安装 · 用于运行你的聊天和任务"
 
 msgid "Not loaded"
 msgstr "未加载"
@@ -13507,6 +13562,9 @@ msgstr "尚未在{hostName}上设置"
 
 msgid "Not set up on this host"
 msgstr "尚未在此主机上配置"
+
+msgid "not signed in"
+msgstr "未登录"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "未登录 · 私有仓库和拉取请求需要它"
@@ -14339,6 +14397,9 @@ msgstr "打开新工作区可查看每个聊天。未移动的聊天仍在原工
 msgid "Open the original workspace"
 msgstr "打开原工作区"
 
+msgid "Open the page again"
+msgstr "再次打开页面"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "在命令面板中打开资源用量视图"
 
@@ -14390,6 +14451,9 @@ msgstr "正在聊天界面中打开…"
 msgid "Opening pages"
 msgstr "打开页面"
 
+msgid "Opening the sign-in page…"
+msgstr "正在打开登录页面…"
+
 msgid "Operator"
 msgstr "操作员"
 
@@ -14416,6 +14480,9 @@ msgstr "可选。帮助我们了解哪些渠道有效。"
 
 msgid "Options"
 msgstr "选项"
+
+msgid "Or sign in from a terminal:"
+msgstr "或在终端中登录："
 
 msgid "Orange"
 msgstr "橙色"
@@ -14830,6 +14897,9 @@ msgstr "Paradev起初是2025年11月的一个黑客松项目，一个用来管�
 msgid "Paradev still can't find {name}."
 msgstr "Paradev 仍然找不到 {name}。"
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev 仍然找不到 GitHub CLI。"
+
 msgid "Paradev Teams"
 msgstr "Paradev 团队"
 
@@ -14840,8 +14910,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev占用了系统RAM的{0}"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev 使用 Git 和 GitHub CLI 克隆仓库并创建拉取请求。你也可以稍后再做。"
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev 用这些工具克隆仓库、创建拉取请求并运行你的任务。你也可以稍后再设置。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev与同类方案对比"
@@ -18157,9 +18227,6 @@ msgstr "通过 SSH 设置主机"
 msgid "Set up an automation"
 msgstr "设置自动化"
 
-msgid "Set up Git and GitHub"
-msgstr "设置 Git 和 GitHub"
-
 msgid "Set up once"
 msgstr "只需设置一次"
 
@@ -18174,6 +18241,9 @@ msgstr "为Paradev配置这个项目"
 
 msgid "Set up your organization to get started"
 msgstr "设置你的组织即可开始"
+
+msgid "Set up your tools"
+msgstr "设置你的工具"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "把已安装的插件改回“可用”后，每个人的副本仍会保留，之后可以自行移除。改为“不可用”会将其移除。"
@@ -18620,6 +18690,9 @@ msgstr "使用GitHub注册"
 msgid "Sign up with Google"
 msgstr "使用Google注册"
 
+msgid "Sign-in code"
+msgstr "登录代码"
+
 msgid "Sign-in didn't finish"
 msgstr "登录未完成"
 
@@ -18644,8 +18717,20 @@ msgstr "注册完成率"
 msgid "Sign-up steps"
 msgstr "注册步骤"
 
+msgid "signed in"
+msgstr "已登录"
+
+msgid "Signed in"
+msgstr "已登录"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "已登录 · 用于克隆私有仓库和创建拉取请求"
+
+msgid "signed in as {account}"
+msgstr "已登录为 {account}"
+
+msgid "Signed in as {account}"
+msgstr "已登录为 {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登录为<0>{userName}</0>"
@@ -18754,6 +18839,12 @@ msgstr "暂时跳过 Git？"
 
 msgid "Skip GitHub for now?"
 msgstr "暂时跳过 GitHub？"
+
+msgid "Skip setup for now?"
+msgstr "暂时跳过设置？"
+
+msgid "Skip the coding agent for now?"
+msgstr "暂时跳过编程智能体？"
 
 msgid "Skipped"
 msgstr "已跳过"
@@ -20567,6 +20658,9 @@ msgstr "此聊天较长，因此只显示最新部分。工作区启动后会完
 msgid "This chat may have been removed or you may not have access."
 msgstr "此聊天可能已被删除，或你没有访问权限。"
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "此聊天需要 {name}。Paradev 可以为你安装，大约需要一分钟，Mac 上的其他内容不会改变。"
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "由于对话已在终端中继续，此聊天已停止。"
 
@@ -21303,6 +21397,9 @@ msgstr "试试其他搜索词或其他位置。"
 msgid "Try again"
 msgstr "重试"
 
+msgid "Try again to start this chat."
+msgstr "请重试以开始此聊天。"
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "请重试，或从 Paradev 托盘菜单重启主机服务。"
 
@@ -21851,6 +21948,9 @@ msgstr "使用“{0}”"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "使用相对于工作区的路径或绝对路径文件夹。"
+
+msgid "Use another agent"
+msgstr "使用其他智能体"
 
 msgid "Use another port"
 msgstr "使用其他端口"
@@ -23138,6 +23238,9 @@ msgstr "你的组织已达到云端用量上限。除非提高上限，此工作
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接你自己的账户后，Paradev 为你完成的工作会以你的名义显示。"
 
+msgid "your own install"
+msgstr "你自己安装的版本"
+
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"
 
@@ -23232,3 +23335,4 @@ msgstr "缩小"
 
 msgid "zsh"
 msgstr "zsh"
+

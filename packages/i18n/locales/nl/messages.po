@@ -1185,6 +1185,9 @@ msgstr "{name} is ingebouwd en kan niet worden verwijderd"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} is ingebouwd en kan niet worden vervangen"
 
+msgid "{name} is installed"
+msgstr "{name} is geïnstalleerd"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} is niet toegevoegd"
@@ -1194,6 +1197,8 @@ msgstr "{name} is ongewijzigd. Als een agent aan het werk was, is die mogelijk g
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} is ongewijzigd. Als een agent aan het werk was, is die gestopt."
+msgid "{name} isn't installed yet"
+msgstr "{name} is nog niet geïnstalleerd"
 
 msgid "{name} plugin"
 msgstr "Plug-in {name}"
@@ -1405,6 +1410,12 @@ msgstr "{threshold, plural, one {# agent-PR gemerged} other {# agent-PR's gemerg
 msgid "{toolName} interrupted"
 msgstr "{toolName} onderbroken"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} zijn nog niet ingesteld. Je kunt ze later instellen in Instellingen."
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, one {{done} van # chat verplaatst} other {{done} van # chats verplaatst}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {De check is geslaagd} other {Alle # checks geslaagd}}"
 
@@ -1467,9 +1478,6 @@ msgstr "{user} is opnieuw erbij gekomen."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor} beperkt op dit moment downloads. Wacht een minuut en probeer het opnieuw."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} wachten"
@@ -4286,6 +4294,9 @@ msgstr "Chatoppervlakken: berichten, redeneren, suggesties"
 msgid "Chats"
 msgstr "Chats"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "Chats en taken hebben {agents} nodig. Je kunt het later installeren via Instellingen → Agents, of wanneer je je eerste chat start."
+
 msgid "Check again"
 msgstr "Opnieuw controleren"
 
@@ -6264,13 +6275,16 @@ msgstr "Kon reactie niet plaatsen"
 msgid "Couldn't post reply"
 msgstr "Kan antwoord niet plaatsen"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "Kan {vendor} niet bereiken. Controleer je internetverbinding en probeer het opnieuw."
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Kan de cloud niet bereiken voor {0}: {1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "Kan GitHub niet bereiken. Controleer je internetverbinding en probeer het opnieuw."
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "Kan de downloadserver niet bereiken. Controleer je internetverbinding en probeer het opnieuw."
 
 msgid "Couldn't reach the model provider"
 msgstr "Kon de modelprovider niet bereiken"
@@ -6357,8 +6371,8 @@ msgstr "Kan niet naar de agent sturen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Je bericht kon niet worden verzonden. Het staat weer in het invoerveld."
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "Kan {name} niet instellen op deze computer."
+msgid "Couldn't set up {name} on this Mac."
+msgstr "Kan {name} niet instellen op deze Mac."
 
 msgid "Couldn't stage changes"
 msgstr "Kan wijzigingen niet stagen"
@@ -6410,6 +6424,9 @@ msgstr "De verplaatsing kon niet opnieuw worden geprobeerd"
 
 msgid "Couldn't undo the file changes."
 msgstr "De bestandswijzigingen konden niet ongedaan worden gemaakt."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "Kan GitHub CLI niet uitpakken of opslaan op deze Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Kan wijzigingen niet unstagen"
@@ -7343,6 +7360,9 @@ msgstr "Dicteren is niet beschikbaar op dit apparaat"
 msgid "Dictation is not available right now"
 msgstr "Dicteren is nu niet beschikbaar"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "Toont de pagina een code? Plak die hier"
+
 msgid "Didn't hear back"
 msgstr "Geen reactie ontvangen"
 
@@ -7675,6 +7695,9 @@ msgstr "{name} downloaden…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Downloaden van Apple vereist een Apple ID. De installatie kan ongeveer 20 GB vrije ruimte nodig hebben."
+
+msgid "Downloading GitHub CLI…"
+msgstr "GitHub CLI downloaden…"
 
 msgid "Downloading..."
 msgstr "Downloaden..."
@@ -9066,6 +9089,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Review afronden"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "Rond het inloggen af in je browser. Dit wordt vanzelf bijgewerkt."
+
 msgid "Finished"
 msgstr "Voltooid"
 
@@ -9606,6 +9632,8 @@ msgstr "GitHub-integratie"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub is nog aan het mergen. Dit wordt bijgewerkt zodra het klaar is."
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub beperkt op dit moment downloads. Wacht een minuut en probeer het opnieuw."
 
 msgid "GitHub issues"
 msgstr "GitHub-issues"
@@ -10513,6 +10541,9 @@ msgstr "GitHub App installeren"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI installeren"
 
+msgid "Install it yourself"
+msgstr "Zelf installeren"
+
 msgid "Install on your iPhone"
 msgstr "Installeer op je iPhone"
 
@@ -10540,6 +10571,9 @@ msgstr "Installeer, autoriseer en begrens MCP-servers voor al je werkruimtes van
 msgid "Install."
 msgstr "Installeer."
 
+msgid "Installation"
+msgstr "Installatie"
+
 msgid "Installed"
 msgstr "Geïnstalleerd"
 
@@ -10547,8 +10581,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "Geïnstalleerd"
 
+msgid "Installed · {version}"
+msgstr "Geïnstalleerd · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "Geïnstalleerd · log in met je ChatGPT-account"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "Geïnstalleerd · log in met je Claude-account"
+
 msgid "Installed by your organization"
 msgstr "Geïnstalleerd door je organisatie"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Op een andere manier geïnstalleerd, bijvoorbeeld met Homebrew? Klik op Opnieuw controleren."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Op een andere manier geïnstalleerd? Klik op Opnieuw controleren."
@@ -10568,6 +10614,9 @@ msgstr "Installeren..."
 
 msgid "Installing…"
 msgstr "Installeren…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "Installeren… Verder verandert er niets op je Mac."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Installeert Paradev op een machine die je via ssh bereikt, meldt Paradev aan bij je account en houdt Paradev actief als service."
@@ -13469,8 +13518,14 @@ msgstr "Niet in kanaal"
 msgid "Not included"
 msgstr "Niet inbegrepen"
 
+msgid "Not installed"
+msgstr "Niet geïnstalleerd"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "Niet geïnstalleerd · nodig voor privérepository's en pull requests"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "Niet geïnstalleerd · voert je chats en taken uit"
 
 msgid "Not loaded"
 msgstr "Niet geladen"
@@ -13507,6 +13562,9 @@ msgstr "Niet ingesteld op {hostName}"
 
 msgid "Not set up on this host"
 msgstr "Niet ingesteld op deze host"
+
+msgid "not signed in"
+msgstr "niet ingelogd"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "Niet ingelogd · nodig voor privérepository's en pull requests"
@@ -14339,6 +14397,9 @@ msgstr "Open de nieuwe werkruimte om elke chat te zien. Een chat die niet is ver
 msgid "Open the original workspace"
 msgstr "Oorspronkelijke werkruimte openen"
 
+msgid "Open the page again"
+msgstr "Pagina opnieuw openen"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "De weergave van resourcegebruik in het opdrachtenpalet openen"
 
@@ -14390,6 +14451,9 @@ msgstr "Openen in chatinterface…"
 msgid "Opening pages"
 msgstr "Pagina's openen"
 
+msgid "Opening the sign-in page…"
+msgstr "Inlogpagina openen…"
+
 msgid "Operator"
 msgstr "Operator"
 
@@ -14416,6 +14480,9 @@ msgstr "Optioneel. Helpt ons te zien wat werkt."
 
 msgid "Options"
 msgstr "Opties"
+
+msgid "Or sign in from a terminal:"
+msgstr "Of log in vanuit een terminal:"
 
 msgid "Orange"
 msgstr "Oranje"
@@ -14830,6 +14897,9 @@ msgstr "Paradev begon in november 2025 als hackathonproject. Het was een simpele
 msgid "Paradev still can't find {name}."
 msgstr "Paradev kan {name} nog steeds niet vinden."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev kan GitHub CLI nog steeds niet vinden."
+
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
 
@@ -14840,8 +14910,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev gebruikt {0} van het systeem-RAM"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev gebruikt Git en de GitHub CLI om repo's te klonen en pull requests te openen. Je kunt dit ook later doen."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev gebruikt deze om repo's te klonen, pull requests te openen en je taken uit te voeren. Je kunt dit ook later doen."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev versus de alternatieven"
@@ -18157,9 +18227,6 @@ msgstr "Host instellen via SSH"
 msgid "Set up an automation"
 msgstr "Stel een automatisering in"
 
-msgid "Set up Git and GitHub"
-msgstr "Git en GitHub instellen"
-
 msgid "Set up once"
 msgstr "Eén keer instellen"
 
@@ -18174,6 +18241,9 @@ msgstr "Dit project instellen voor Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Stel je organisatie in om te beginnen"
+
+msgid "Set up your tools"
+msgstr "Stel je tools in"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Zet je een geïnstalleerde plugin terug op Beschikbaar, dan houdt iedereen zijn kopie en kan die daarna verwijderen. Niet beschikbaar verwijdert hem."
@@ -18620,6 +18690,9 @@ msgstr "Registreren met GitHub"
 msgid "Sign up with Google"
 msgstr "Registreren met Google"
 
+msgid "Sign-in code"
+msgstr "Inlogcode"
+
 msgid "Sign-in didn't finish"
 msgstr "Inloggen is niet voltooid"
 
@@ -18644,8 +18717,20 @@ msgstr "Voltooiingsgraad aanmeldingen"
 msgid "Sign-up steps"
 msgstr "Aanmeldstappen"
 
+msgid "signed in"
+msgstr "ingelogd"
+
+msgid "Signed in"
+msgstr "Ingelogd"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "Ingelogd · kloont privérepository's en opent pull requests"
+
+msgid "signed in as {account}"
+msgstr "ingelogd als {account}"
+
+msgid "Signed in as {account}"
+msgstr "Ingelogd als {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ingelogd als <0>{userName}</0>"
@@ -18754,6 +18839,12 @@ msgstr "Git voorlopig overslaan?"
 
 msgid "Skip GitHub for now?"
 msgstr "GitHub voorlopig overslaan?"
+
+msgid "Skip setup for now?"
+msgstr "Instellen nu overslaan?"
+
+msgid "Skip the coding agent for now?"
+msgstr "Coding-agent nu overslaan?"
 
 msgid "Skipped"
 msgstr "Overgeslagen"
@@ -20567,6 +20658,9 @@ msgstr "Deze chat is lang, dus alleen het nieuwste deel wordt getoond. Alles ope
 msgid "This chat may have been removed or you may not have access."
 msgstr "Deze chat is mogelijk verwijderd of je hebt geen toegang."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "Deze chat heeft {name} nodig. Paradev kan het voor je installeren. Het duurt ongeveer een minuut en verder verandert er niets op je Mac."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Deze chat is gestopt omdat het gesprek in een terminal verderging."
 
@@ -21303,6 +21397,9 @@ msgstr "Probeer een andere zoekterm of een andere plek."
 msgid "Try again"
 msgstr "Opnieuw proberen"
 
+msgid "Try again to start this chat."
+msgstr "Probeer het opnieuw om deze chat te starten."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Probeer het opnieuw of herstart de hostservice via het Paradev-menu in het systeemvak."
 
@@ -21851,6 +21948,9 @@ msgstr "“{0}” gebruiken"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Gebruik een pad relatief aan de werkruimte of een absolute map."
+
+msgid "Use another agent"
+msgstr "Een andere agent gebruiken"
 
 msgid "Use another port"
 msgstr "Een andere poort gebruiken"
@@ -23138,6 +23238,9 @@ msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Deze werkrui
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Je eigen accounts. De integraties van je organisatie geven Paradev toegang tot haar tools; als je die van jou koppelt, verschijnt het werk dat Paradev voor je doet onder jouw naam."
 
+msgid "your own install"
+msgstr "je eigen installatie"
+
 msgid "Your Paradev download is starting."
 msgstr "Je Paradev-download start."
 
@@ -23232,3 +23335,4 @@ msgstr "Uitzoomen"
 
 msgid "zsh"
 msgstr "zsh"
+

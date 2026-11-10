@@ -106,3 +106,19 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 export function acpHarnessForPreset(presetId: string): string | undefined {
 	return ACP_HARNESS_BY_PRESET[presetId];
 }
+
+const MISSING_SUFFIX = " was not found, so this chat cannot start.";
+
+export function agentCliMissingMessage(binary: string): string {
+	return `${binary}${MISSING_SUFFIX}`;
+}
+
+/** The binary a chat failed to find, read back from its error text. */
+export function parseAgentCliMissing(
+	message: string | null | undefined,
+): string | null {
+	const match = message?.match(
+		/(?:^|\s)([\w.-]+) was not found, so this chat cannot start\./,
+	);
+	return match?.[1] ?? null;
+}

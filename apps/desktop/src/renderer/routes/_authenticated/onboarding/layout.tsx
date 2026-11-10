@@ -13,6 +13,7 @@ import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { WindowControlsInset } from "../_dashboard/components/WindowControlsInset";
+import { CODING_AGENT_NAMES } from "../components/CodingAgentSetup";
 import { useOnboardingRestartStore } from "../stores/onboardingRestartStore";
 import { OnboardingHelpLinks } from "./components/OnboardingHelpLinks";
 import { OnboardingLanguagePicker } from "./components/OnboardingLanguagePicker";
@@ -21,6 +22,7 @@ import { SetupStepContinue } from "./components/SetupStepContinue";
 import { SetupStepRowsProvider } from "./providers/SetupStepRowsProvider";
 import { useAgentModeStore } from "./stores/agentModeStore";
 import {
+	agentsStillMissing,
 	needsSetupStep,
 	type SetupStepRows,
 	setupStepRows,
@@ -35,10 +37,10 @@ const rootRedirect = <Redirect to="/" replace />;
 const SETUP_STEP = {
 	path: "/onboarding",
 	match: (p: string) => p === "/onboarding",
-	title: msg({ message: "Set up Git and GitHub" }),
+	title: msg({ message: "Set up your tools" }),
 	subtitle: msg({
 		message:
-			"Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later.",
+			"Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later.",
 	}),
 };
 
@@ -62,7 +64,8 @@ const modeRedirect = <Redirect to="/onboarding/mode" replace />;
 
 function OnboardingFlowLayout() {
 	const { data: session, isPending } = authClient.useSession();
-	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
+	const { data: platform, isPending: isPendingPlatform } =
+		electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -79,6 +82,10 @@ function OnboardingFlowLayout() {
 		electronTrpc.system.detectGhCli.useQuery();
 	const { data: gitStatus, isPending: isPendingGit } =
 		electronTrpc.system.detectGit.useQuery();
+	const { data: claudeStatus, isPending: isPendingClaude } =
+		electronTrpc.codingAgents.status.useQuery({ agent: "claude" });
+	const { data: codexStatus, isPending: isPendingCodex } =
+		electronTrpc.codingAgents.status.useQuery({ agent: "codex" });
 	const ghReady =
 		ghStatus?.installed === true && ghStatus.authenticated === true;
 	const gitMissing = gitStatus?.installed === false;
@@ -96,9 +103,30 @@ function OnboardingFlowLayout() {
 	const [rowsOnArrival, setRowsOnArrival] = useState<SetupStepRows | null>(
 		null,
 	);
-	if (!isPendingGh && !isPendingGit && platform && rowsOnArrival === null) {
-		setRowsOnArrival(setupStepRows({ git: gitStatus, gh: ghStatus, platform }));
+	if (
+		!isPendingGh &&
+		!isPendingGit &&
+		!isPendingClaude &&
+		!isPendingCodex &&
+		platform &&
+		rowsOnArrival === null
+	) {
+		setRowsOnArrival(
+			setupStepRows({
+				git: gitStatus,
+				gh: ghStatus,
+				claude: claudeStatus,
+				codex: codexStatus,
+				platform,
+			}),
+		);
 	}
+	const missingAgents = rowsOnArrival
+		? agentsStillMissing(rowsOnArrival, {
+				claude: claudeStatus,
+				codex: codexStatus,
+			}).map((agent) => CODING_AGENT_NAMES[agent])
+		: [];
 	const setupNeeded = rowsOnArrival !== null && needsSetupStep(rowsOnArrival);
 
 	if (isPending) return null;
@@ -159,7 +187,14 @@ function OnboardingFlowLayout() {
 								</p>
 							</div>
 							<SetupStepRowsProvider
-								rows={rowsOnArrival ?? { git: false, gitHub: false }}
+								rows={
+									rowsOnArrival ?? {
+										git: false,
+										gitHub: false,
+										claude: false,
+										codex: false,
+									}
+								}
 							>
 								<Outlet />
 							</SetupStepRowsProvider>
@@ -178,6 +213,7 @@ function OnboardingFlowLayout() {
 									<SetupStepContinue
 										gitMissing={gitMissing}
 										ghReady={ghReady || rowsOnArrival?.gitHub === false}
+										missingAgents={missingAgents}
 										onContinue={handleContinue}
 									/>
 								) : undefined

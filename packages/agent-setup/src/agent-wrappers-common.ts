@@ -201,6 +201,8 @@ export interface BuildWrapperScriptOptions {
 	 */
 	agentId?: string;
 	beforeLaunch?: string;
+	/** Used only when PATH has no such binary, so the user's own install wins. */
+	fallbackBinary?: string;
 }
 
 /**
@@ -240,6 +242,15 @@ fi
 `;
 }
 
+function buildFallbackBinaryBlock(fallbackBinary: string | undefined): string {
+	if (!fallbackBinary) return "";
+	const quoted = `'${fallbackBinary.replaceAll("'", `'"'"'`)}'`;
+	return `if [ -z "$REAL_BIN" ] && [ -x ${quoted} ] && [ ! -d ${quoted} ]; then
+  REAL_BIN=${quoted}
+fi
+`;
+}
+
 export function buildWrapperScript(
 	binaryName: string,
 	execLine: string,
@@ -261,7 +272,7 @@ ${WRAPPER_MARKER}
 
 ${buildRealBinaryResolver()}
 REAL_BIN="$(find_real_binary "${binaryName}")"
-if [ -z "$REAL_BIN" ]; then
+${buildFallbackBinaryBlock(options.fallbackBinary)}if [ -z "$REAL_BIN" ]; then
   echo "${getMissingBinaryMessage(binaryName)}" >&2
   exit 127
 fi

@@ -1185,6 +1185,9 @@ msgstr "{name} là tích hợp sẵn nên không thể gỡ"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} là tích hợp sẵn nên không thể thay thế"
 
+msgid "{name} is installed"
+msgstr "{name} đã được cài đặt"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} chưa được thêm"
@@ -1194,6 +1197,8 @@ msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó có thể 
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó đã bị dừng."
+msgid "{name} isn't installed yet"
+msgstr "{name} chưa được cài đặt"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
@@ -1405,6 +1410,12 @@ msgstr "{threshold, plural, other {đã hợp nhất # PR của tác nhân}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName} bị gián đoạn"
 
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} chưa được thiết lập. Bạn có thể thiết lập sau trong Cài đặt."
+
+msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{total, plural, other {Đã chuyển {done}/# cuộc trò chuyện}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Cả # check đều đạt} other {Cả # check đều đạt}}"
 
@@ -1467,9 +1478,6 @@ msgstr "{user} đã tham gia lại."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
-msgstr "{vendor} đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
@@ -4286,6 +4294,9 @@ msgstr "Các bề mặt chat: tin nhắn, suy luận, gợi ý"
 msgid "Chats"
 msgstr "Cuộc trò chuyện"
 
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "Chat và tác vụ cần {agents}. Bạn có thể cài đặt sau trong Cài đặt → Agent, hoặc khi bắt đầu chat đầu tiên."
+
 msgid "Check again"
 msgstr "Kiểm tra lại"
 
@@ -6264,13 +6275,16 @@ msgstr "Không thể đăng bình luận"
 msgid "Couldn't post reply"
 msgstr "Không thể đăng trả lời"
 
-msgid "Couldn't reach {vendor}. Check your internet connection and try again."
-msgstr "Không thể kết nối với {vendor}. Hãy kiểm tra kết nối internet rồi thử lại."
-
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Không kết nối được tới cloud cho {0}: {1}"
+
+msgid "Couldn't reach GitHub. Check your internet connection and try again."
+msgstr "Không thể kết nối với GitHub. Hãy kiểm tra kết nối internet rồi thử lại."
+
+msgid "Couldn't reach the download server. Check your internet connection and try again."
+msgstr "Không thể kết nối máy chủ tải xuống. Hãy kiểm tra kết nối internet rồi thử lại."
 
 msgid "Couldn't reach the model provider"
 msgstr "Không kết nối được với nhà cung cấp mô hình"
@@ -6357,8 +6371,8 @@ msgstr "Không thể gửi cho agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Không gửi được tin nhắn. Tin nhắn đã được trả lại ô soạn thảo."
 
-msgid "Couldn't set up {name} on this computer."
-msgstr "Không thể thiết lập {name} trên máy tính này."
+msgid "Couldn't set up {name} on this Mac."
+msgstr "Không thể thiết lập {name} trên máy Mac này."
 
 msgid "Couldn't stage changes"
 msgstr "Không thể stage các thay đổi"
@@ -6410,6 +6424,9 @@ msgstr "Không thể thử chuyển lại"
 
 msgid "Couldn't undo the file changes."
 msgstr "Không thể hoàn tác thay đổi tệp."
+
+msgid "Couldn't unpack or save GitHub CLI on this Mac."
+msgstr "Không thể giải nén hoặc lưu GitHub CLI trên máy Mac này."
 
 msgid "Couldn't unstage changes"
 msgstr "Không thể bỏ stage các thay đổi"
@@ -7343,6 +7360,9 @@ msgstr "Đọc chính tả không khả dụng trên thiết bị này"
 msgid "Dictation is not available right now"
 msgstr "Đọc chính tả hiện không khả dụng"
 
+msgid "Did the page show a code? Paste it here"
+msgstr "Trang có hiện mã không? Dán vào đây"
+
 msgid "Didn't hear back"
 msgstr "Không có phản hồi"
 
@@ -7675,6 +7695,9 @@ msgstr "Đang tải {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Tải xuống từ Apple cần có Apple ID. Quá trình cài đặt có thể cần khoảng 20 GB dung lượng trống."
+
+msgid "Downloading GitHub CLI…"
+msgstr "Đang tải GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Đang tải xuống..."
@@ -9066,6 +9089,9 @@ msgstr "Finder"
 msgid "Finish review"
 msgstr "Hoàn tất review"
 
+msgid "Finish signing in in your browser. This updates on its own."
+msgstr "Hãy hoàn tất đăng nhập trong trình duyệt. Mục này tự cập nhật."
+
 msgid "Finished"
 msgstr "Đã xong"
 
@@ -9606,6 +9632,8 @@ msgstr "Tích hợp GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub vẫn đang merge. Mục này sẽ cập nhật khi xong."
+msgid "GitHub is limiting downloads right now. Wait a minute and try again."
+msgstr "GitHub đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
 
 msgid "GitHub issues"
 msgstr "Issue GitHub"
@@ -10513,6 +10541,9 @@ msgstr "Cài GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Cài đặt GitHub CLI"
 
+msgid "Install it yourself"
+msgstr "Tự cài đặt"
+
 msgid "Install on your iPhone"
 msgstr "Cài đặt trên iPhone"
 
@@ -10540,6 +10571,9 @@ msgstr "Cài đặt, ủy quyền và giới hạn phạm vi server MCP trên m�
 msgid "Install."
 msgstr "Cài đặt."
 
+msgid "Installation"
+msgstr "Cài đặt"
+
 msgid "Installed"
 msgstr "Đã cài đặt"
 
@@ -10547,8 +10581,20 @@ msgctxt "plugin access"
 msgid "Installed"
 msgstr "Đã cài"
 
+msgid "Installed · {version}"
+msgstr "Đã cài đặt · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "Đã cài đặt · đăng nhập bằng tài khoản ChatGPT"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "Đã cài đặt · đăng nhập bằng tài khoản Claude"
+
 msgid "Installed by your organization"
 msgstr "Do tổ chức của bạn cài"
+
+msgid "Installed it another way, like Homebrew? Click Check again."
+msgstr "Bạn đã cài bằng cách khác, như Homebrew? Nhấn Kiểm tra lại."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Đã cài bằng cách khác? Nhấn Kiểm tra lại."
@@ -10568,6 +10614,9 @@ msgstr "Đang cài đặt..."
 
 msgid "Installing…"
 msgstr "Đang cài đặt…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "Đang cài đặt… Không có gì khác thay đổi trên máy Mac của bạn."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Cài Paradev lên một máy bạn truy cập được bằng ssh, đăng nhập Paradev vào tài khoản của bạn và giữ Paradev chạy như một dịch vụ."
@@ -13469,8 +13518,14 @@ msgstr "Không ở trong kênh"
 msgid "Not included"
 msgstr "Không có"
 
+msgid "Not installed"
+msgstr "Chưa cài đặt"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "Chưa cài đặt · cần cho kho mã riêng tư và pull request"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "Chưa cài đặt · chạy các chat và tác vụ của bạn"
 
 msgid "Not loaded"
 msgstr "Chưa tải"
@@ -13507,6 +13562,9 @@ msgstr "Chưa thiết lập trên {hostName}"
 
 msgid "Not set up on this host"
 msgstr "Chưa thiết lập trên host này"
+
+msgid "not signed in"
+msgstr "chưa đăng nhập"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "Chưa đăng nhập · cần cho kho mã riêng tư và pull request"
@@ -14339,6 +14397,9 @@ msgstr "Hãy mở không gian làm việc mới để xem từng cuộc trò chu
 msgid "Open the original workspace"
 msgstr "Mở không gian làm việc ban đầu"
 
+msgid "Open the page again"
+msgstr "Mở lại trang"
+
 msgid "Open the resource usage view in the command palette"
 msgstr "Mở khung tài nguyên trong bảng lệnh"
 
@@ -14390,6 +14451,9 @@ msgstr "Đang mở trong giao diện chat…"
 msgid "Opening pages"
 msgstr "Mở trang"
 
+msgid "Opening the sign-in page…"
+msgstr "Đang mở trang đăng nhập…"
+
 msgid "Operator"
 msgstr "Người vận hành"
 
@@ -14416,6 +14480,9 @@ msgstr "Không bắt buộc. Giúp chúng tôi biết kênh nào hiệu quả."
 
 msgid "Options"
 msgstr "Tùy chọn"
+
+msgid "Or sign in from a terminal:"
+msgstr "Hoặc đăng nhập từ terminal:"
 
 msgid "Orange"
 msgstr "Cam"
@@ -14830,6 +14897,9 @@ msgstr "Paradev khởi đầu là một dự án hackathon vào tháng 11 năm 2
 msgid "Paradev still can't find {name}."
 msgstr "Paradev vẫn chưa tìm thấy {name}."
 
+msgid "Paradev still can't find GitHub CLI."
+msgstr "Paradev vẫn không tìm thấy GitHub CLI."
+
 msgid "Paradev Teams"
 msgstr "Nhóm Paradev"
 
@@ -14840,8 +14910,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev dùng {0} RAM hệ thống"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev dùng Git và GitHub CLI để sao chép kho mã và mở pull request. Bạn cũng có thể làm việc này sau."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev dùng các công cụ này để clone repo, mở pull request và chạy tác vụ của bạn. Bạn cũng có thể làm việc này sau."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev và các lựa chọn khác"
@@ -18157,9 +18227,6 @@ msgstr "Thiết lập host qua SSH"
 msgid "Set up an automation"
 msgstr "Thiết lập tự động hóa"
 
-msgid "Set up Git and GitHub"
-msgstr "Thiết lập Git và GitHub"
-
 msgid "Set up once"
 msgstr "Thiết lập một lần"
 
@@ -18174,6 +18241,9 @@ msgstr "Thiết lập dự án này cho Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Thiết lập tổ chức của bạn để bắt đầu"
+
+msgid "Set up your tools"
+msgstr "Thiết lập công cụ của bạn"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Đặt lại một plugin đã cài thành Khả dụng thì mọi người vẫn giữ bản của mình; sau đó họ có thể gỡ. Không khả dụng sẽ gỡ nó."
@@ -18620,6 +18690,9 @@ msgstr "Đăng ký bằng GitHub"
 msgid "Sign up with Google"
 msgstr "Đăng ký bằng Google"
 
+msgid "Sign-in code"
+msgstr "Mã đăng nhập"
+
 msgid "Sign-in didn't finish"
 msgstr "Đăng nhập chưa hoàn tất"
 
@@ -18644,8 +18717,20 @@ msgstr "Tỷ lệ hoàn tất đăng ký"
 msgid "Sign-up steps"
 msgstr "Số bước đăng ký"
 
+msgid "signed in"
+msgstr "đã đăng nhập"
+
+msgid "Signed in"
+msgstr "Đã đăng nhập"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "Đã đăng nhập · sao chép kho mã riêng tư và mở pull request"
+
+msgid "signed in as {account}"
+msgstr "đã đăng nhập bằng {account}"
+
+msgid "Signed in as {account}"
+msgstr "Đã đăng nhập bằng {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Đang đăng nhập với <0>{userName}</0>"
@@ -18754,6 +18839,12 @@ msgstr "Tạm bỏ qua Git?"
 
 msgid "Skip GitHub for now?"
 msgstr "Bỏ qua GitHub lúc này?"
+
+msgid "Skip setup for now?"
+msgstr "Bỏ qua thiết lập bây giờ?"
+
+msgid "Skip the coding agent for now?"
+msgstr "Bỏ qua agent lập trình bây giờ?"
 
 msgid "Skipped"
 msgstr "Đã bỏ qua"
@@ -20567,6 +20658,9 @@ msgstr "Cuộc trò chuyện này dài nên chỉ hiển thị phần mới nh�
 msgid "This chat may have been removed or you may not have access."
 msgstr "Cuộc trò chuyện này có thể đã bị xóa hoặc bạn không có quyền truy cập."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "Chat này cần {name}. Paradev có thể cài đặt giúp bạn. Mất khoảng một phút và không có gì khác thay đổi trên máy Mac của bạn."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Cuộc trò chuyện này đã dừng vì nó được tiếp tục trong một terminal."
 
@@ -21303,6 +21397,9 @@ msgstr "Hãy thử từ khóa khác hoặc nơi khác."
 msgid "Try again"
 msgstr "Thử lại"
 
+msgid "Try again to start this chat."
+msgstr "Thử lại để bắt đầu chat này."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Thử lại hoặc khởi động lại dịch vụ máy chủ từ menu Paradev ở khay hệ thống."
 
@@ -21851,6 +21948,9 @@ msgstr "Dùng “{0}”"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Dùng đường dẫn tương đối với workspace hoặc một thư mục tuyệt đối."
+
+msgid "Use another agent"
+msgstr "Dùng agent khác"
 
 msgid "Use another port"
 msgstr "Dùng port khác"
@@ -23138,6 +23238,9 @@ msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Work
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giúp Paradev truy cập công cụ của tổ chức; kết nối tài khoản của bạn giúp công việc Paradev làm cho bạn hiển thị dưới tên bạn."
 
+msgid "your own install"
+msgstr "bản cài đặt của bạn"
+
 msgid "Your Paradev download is starting."
 msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
 
@@ -23232,3 +23335,4 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
+
