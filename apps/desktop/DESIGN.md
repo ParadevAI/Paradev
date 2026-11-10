@@ -68,7 +68,7 @@ to match the in-page picker outline.
 | Token | Value | Source | Used for |
 | --- | --- | --- | --- |
 | `font-sans` | `ui-sans-serif, system-ui, sans-serif, ...` (SF Pro on macOS) | Tailwind `theme.css`, not overridden | All UI |
-| terminal font | `var(--superset-terminal-font-family, ui-monospace, monospace)`; SF Mono loaded from `superset-font://` | `globals.css`, `styles/bundled-fonts.css` | Terminal |
+| terminal font | `var(--superset-terminal-font-family, ui-monospace, monospace)`; SF Mono loaded from `superset-font://` | `globals.css`, `styles/bundled-fonts.ts` | Terminal |
 | `text-sm` | 14 px / 20 px | Tailwind | Menu items, menu label |
 | `text-xs` | 12 px / 16 px | Tailwind | URL bar, tooltip, menu shortcut |
 | `text-[11px] font-medium leading-none` | 11 px / 1 | `BrowserPaneToolbar.tsx`, `OpenBrowserPageInAppButton` | Toolbar pill buttons |
