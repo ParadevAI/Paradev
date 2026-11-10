@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	projects,
@@ -653,10 +653,11 @@ export class PullRequestRuntimeManager {
 	}
 
 	/**
-	 * Append-only memory of every PR a workspace has been linked to. The
-	 * current-link pointer moves on when the branch does; this row stays, so
-	 * the workspace's whole PR history remains listable. Unlinking hides a PR
-	 * from the sidebar surfaces, never from here.
+	 * Memory of every PR a workspace has been linked to. The current-link
+	 * pointer moves on when the branch does; this row stays, so the
+	 * workspace's whole PR history remains listable. Unlinking hides a PR
+	 * from the sidebar surfaces, never from here. Only
+	 * `forgetPastPromotionLinks` deletes rows.
 	 */
 	private recordWorkspacePullRequestLink(
 		workspaceId: string,
@@ -672,22 +673,54 @@ export class PullRequestRuntimeManager {
 		for (const listener of this.linkListeners) listener();
 	}
 
-	// Only for links that were never the workspace's work, such as a past
-	// promotion PR linked before the default-branch rule existed.
-	private forgetWorkspacePullRequestLink(
+	// Drops head=<default> PRs this workspace only picked up after they had
+	// closed (past promotions such as main -> staging). A PR linked while
+	// open, e.g. a git-flow release PR, keeps its history row.
+	private forgetPastPromotionLinks(
 		workspaceId: string,
-		pullRequestId: string,
+		projectId: string,
+		repo: NormalizedRepoIdentity,
 	): void {
-		const { changes } = this.db
+		if (!repo.defaultBranch) return;
+		const staleIds = this.db
+			.select({
+				pullRequestId: workspacePullRequests.pullRequestId,
+				linkedAt: workspacePullRequests.linkedAt,
+				mergedAt: pullRequests.mergedAt,
+			})
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.innerJoin(
+				workspaces,
+				eq(workspacePullRequests.workspaceId, workspaces.id),
+			)
+			.where(
+				and(
+					eq(workspacePullRequests.workspaceId, workspaceId),
+					isNull(workspaces.archivedAt),
+					eq(pullRequests.projectId, projectId),
+					eq(pullRequests.repoOwner, repo.owner),
+					eq(pullRequests.repoName, repo.name),
+					eq(pullRequests.headBranch, repo.defaultBranch),
+					notInArray(pullRequests.state, ["open", "draft"]),
+				),
+			)
+			.all()
+			.filter((row) => row.mergedAt == null || row.mergedAt <= row.linkedAt)
+			.map((row) => row.pullRequestId);
+		if (staleIds.length === 0) return;
+		this.db
 			.delete(workspacePullRequests)
 			.where(
 				and(
 					eq(workspacePullRequests.workspaceId, workspaceId),
-					eq(workspacePullRequests.pullRequestId, pullRequestId),
+					inArray(workspacePullRequests.pullRequestId, staleIds),
 				),
 			)
 			.run();
-		if (changes === 0) return;
 		for (const listener of this.linkListeners) listener();
 	}
 
@@ -1042,8 +1075,8 @@ export class PullRequestRuntimeManager {
 				!!rawMatch &&
 				!rawMatch.isOpen &&
 				this.tracksBaseDefaultBranch(workspace, repo);
-			if (rawMatch && isPastPromotion) {
-				this.forgetWorkspacePullRequestLink(workspace.id, rawMatch.id);
+			if (this.tracksBaseDefaultBranch(workspace, repo)) {
+				this.forgetPastPromotionLinks(workspace.id, projectId, repo);
 			}
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
