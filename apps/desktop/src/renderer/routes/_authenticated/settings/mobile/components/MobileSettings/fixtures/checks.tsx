@@ -1,6 +1,6 @@
 import { beforeEach, expect, mock, test } from "bun:test";
 import { COMPANY } from "@superset/shared/constants";
-import { type ComponentType, createElement } from "react";
+import type { ComponentType } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { GATED_FEATURES } from "renderer/components/Paywall/constants";
 
@@ -14,9 +14,6 @@ let enabled: boolean | undefined = true;
 mock.module("posthog-js/react", () => ({
 	useActiveFeatureFlags: () => flags,
 	useFeatureFlagEnabled: () => enabled,
-}));
-mock.module("renderer/components/Redirect", () => ({
-	Redirect: ({ to }: { to: string }) => createElement("span", null, to),
 }));
 mock.module("renderer/components/Paywall", () => ({
 	GATED_FEATURES,
@@ -83,16 +80,16 @@ test("reflects the saved remote access state and disables the switch while busy"
 	expect(renderToStaticMarkup(<MobileSettings />)).toContain('disabled=""');
 });
 
-test("mobile route waits for flags, then redirects for disabled or omitted flags", () => {
-	flags = undefined;
-	enabled = undefined;
-	expect(renderToStaticMarkup(<MobilePage />)).toBe("");
-	flags = [];
-	expect(renderToStaticMarkup(<MobilePage />)).toContain("/settings/account");
-	enabled = false;
-	expect(renderToStaticMarkup(<MobilePage />)).toContain("/settings/account");
-	enabled = true;
-	expect(renderToStaticMarkup(<MobilePage />)).toContain(
-		"Install on your iPhone",
-	);
+test("mobile route opens without the mobile-launch flag", () => {
+	for (const [loaded, value] of [
+		[undefined, undefined],
+		[[], undefined],
+		[[], false],
+	] as const) {
+		flags = loaded ? [...loaded] : undefined;
+		enabled = value;
+		expect(renderToStaticMarkup(<MobilePage />)).toContain(
+			"Install on your iPhone",
+		);
+	}
 });
