@@ -1,7 +1,4 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
@@ -31,7 +28,6 @@ import type { ActivePaneStatus } from "shared/tabs-types";
 import type {
 	DashboardSidebarWorkspace,
 	DashboardSidebarWorkspaceIndentation,
-	DashboardSidebarWorkspacePullRequest,
 } from "../../../../types";
 import { DashboardSidebarWorkspaceQueuedBadge } from "../DashboardSidebarWorkspaceQueuedBadge";
 import { DashboardSidebarOpenCloudHostGlyph } from "./components/DashboardSidebarOpenCloudHostGlyph";
@@ -40,33 +36,6 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
-import { useDashboardSidebarChipHoverSuppression } from "./hooks/useDashboardSidebarChipHoverSuppression";
-
-const PR_STATE_LABEL: Record<
-	DashboardSidebarWorkspacePullRequest["state"],
-	MessageDescriptor
-> = {
-	open: msg({
-		message: "Open",
-		context: "status",
-	}),
-	merged: msg({
-		message: "Merged",
-	}),
-	closed: msg({
-		message: "Closed",
-	}),
-	draft: msg({
-		message: "Draft",
-	}),
-	queued: msg({
-		message: "Queued",
-	}),
-};
-
-// Below the workspace hover card's open delay, so resting on the glyph shows
-// its tooltip and the card never opens under it.
-const LEAD_TOOLTIP_DELAY_MS = 300;
 
 interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
@@ -176,17 +145,6 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 				: sandboxStatus === "provisioning"
 					? t({ message: "Creating the sandbox" })
 					: null;
-		// Both portal to the row's right edge at the same z-index, so the
-		// tooltip holds the hover card instead of stacking over it.
-		const { isOpen: isLeadTooltipOpen, onOpenChange: onLeadTooltipOpenChange } =
-			useDashboardSidebarChipHoverSuppression();
-		const hasLeadTooltip =
-			!isSelected &&
-			(showsPullRequest || !!sandboxLabel || (!!workspaceStatus && !isPending));
-		// An unmounted Radix tooltip never reports close, so release the hold here.
-		useEffect(() => {
-			if (!hasLeadTooltip) onLeadTooltipOpenChange(false);
-		}, [hasLeadTooltip, onLeadTooltipOpenChange]);
 		const leadIndicator = (
 			<DashboardSidebarWorkspaceLeadIndicator
 				workspaceStatus={workspaceStatus}
@@ -250,74 +208,39 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<HiCheck className="size-3.5" />
 						</span>
 					) : showsPullRequest && pullRequest ? (
-						<Tooltip
-							delayDuration={LEAD_TOOLTIP_DELAY_MS}
-							open={isLeadTooltipOpen}
-							onOpenChange={onLeadTooltipOpenChange}
+						<button
+							type="button"
+							onClick={(event) => {
+								event.stopPropagation();
+								// Lands in the workspace with its PR pane open, rather
+								// than on GitHub; the pane keeps the GitHub link.
+								openPullRequestLink(
+									pullRequest.url,
+									linkPolicy.getAction(event),
+									(ref, placement) => {
+										usePullRequestPaneIntent.getState().request({
+											workspaceId: workspace.id,
+											...ref,
+											placement,
+										});
+										void navigateToV2Workspace(workspace.id, navigate);
+									},
+								);
+							}}
+							onKeyDown={(event) => {
+								if (event.key === "Enter" || event.key === " ") {
+									event.stopPropagation();
+								}
+							}}
+							aria-label={t({
+								message: `Open pull request #${pullRequest.number}`,
+							})}
+							className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
 						>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={(event) => {
-										event.stopPropagation();
-										// Lands in the workspace with its PR pane open, rather
-										// than on GitHub; the pane keeps the GitHub link.
-										openPullRequestLink(
-											pullRequest.url,
-											linkPolicy.getAction(event),
-											(ref, placement) => {
-												usePullRequestPaneIntent.getState().request({
-													workspaceId: workspace.id,
-													...ref,
-													placement,
-												});
-												void navigateToV2Workspace(workspace.id, navigate);
-											},
-										);
-									}}
-									onKeyDown={(event) => {
-										if (event.key === "Enter" || event.key === " ") {
-											event.stopPropagation();
-										}
-									}}
-									aria-label={t({
-										message: `Open pull request #${pullRequest.number}`,
-									})}
-									className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
-								>
-									{leadIndicator}
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="right" sideOffset={8}>
-								<p className="text-xs font-medium">
-									<Trans>
-										PR #{pullRequest.number} ·{" "}
-										{i18n._(PR_STATE_LABEL[pullRequest.state])}
-									</Trans>
-								</p>
-								{(sandboxLabel ??
-									(workspaceStatus && getStatusTooltip(workspaceStatus))) && (
-									<p className="text-xs text-muted-foreground">
-										{sandboxLabel ??
-											(workspaceStatus
-												? getStatusTooltip(workspaceStatus)
-												: null)}
-									</p>
-								)}
-								<p className="text-xs text-muted-foreground">
-									<Trans>Click to open the pull request</Trans>
-								</p>
-								<p className="text-xs text-muted-foreground">
-									{linkPolicy.hint}
-								</p>
-							</TooltipContent>
-						</Tooltip>
+							{leadIndicator}
+						</button>
 					) : sandboxLabel || (workspaceStatus && !isPending) ? (
-						<Tooltip
-							delayDuration={LEAD_TOOLTIP_DELAY_MS}
-							open={isLeadTooltipOpen}
-							onOpenChange={onLeadTooltipOpenChange}
-						>
+						<Tooltip delayDuration={500}>
 							<TooltipTrigger asChild>
 								<span className="mr-2 flex size-4 shrink-0 items-center justify-center">
 									{leadIndicator}
