@@ -45,7 +45,10 @@ type TabsApi = {
 	onUpdated(tabId: number): void;
 	createTabDetails(tab: object): TabDetails;
 };
-type WindowsApi = { onCreated(windowId: number): void };
+type WindowsApi = {
+	onCreated(windowId: number): void;
+	observeWindow(window: { id: number; isFocused(): boolean }): void;
+};
 type WebNavigationApi = {
 	onBeforeNavigate(
 		tab: object,
@@ -353,6 +356,18 @@ function extensionHost({
 			),
 	};
 }
+
+const fakeWindow = (id: number) => ({
+	id,
+	isDestroyed: () => false,
+	getSize: () => [500, 600],
+	getPosition: () => [0, 0],
+	isFocused: () => false,
+	isMaximized: () => false,
+	isMinimized: () => false,
+	isFullScreen: () => false,
+	isAlwaysOnTop: () => false,
+});
 
 const visibleFields = (details: unknown) =>
 	typeof details === "object" && details !== null
@@ -790,6 +805,103 @@ describe.each(bundles)("$name bundle", ({ source }) => {
 		);
 		expect(preload).not.toContain("connectNative: (application)");
 		expect(preload).not.toContain("sendNativeMessage:");
+	});
+
+	test("tabs.query answers currentWindow with the focused window's tabs", async () => {
+		const { store, call } = extensionHost(api);
+		const popup = fakeTab(3, "https://accounts.google.com/signin", "Sign in");
+		const popupWindow = {
+			id: 10,
+			isDestroyed: () => false,
+			getSize: () => [500, 600],
+			getPosition: () => [0, 0],
+			isFocused: () => true,
+			isMaximized: () => false,
+			isMinimized: () => false,
+			isFullScreen: () => false,
+			isAlwaysOnTop: () => false,
+		};
+		store.tabs.add(popup);
+		store.windows.add(popupWindow);
+		store.tabToWindow.set(popup, popupWindow);
+		store.lastFocusedWindowId = popupWindow.id;
+		const ids = async (info: object) =>
+			((await call("tabs", "tabs.query", info)) as TabDetails[]).map(
+				(tab) => tab.id,
+			);
+
+		// The package ignored both flags, so a password manager asking for the
+		// field it was filling got every window's tab and took the first.
+		expect(await ids({ currentWindow: true })).toEqual([3]);
+		expect(await ids({ lastFocusedWindow: true })).toEqual([3]);
+		expect(await ids({ currentWindow: false })).toEqual([1, 2]);
+		expect(await ids({})).toEqual([1, 2, 3]);
+	});
+
+	test("a popup window says so, and windows.getAll filters on the type", async () => {
+		const { store, call } = extensionHost(api);
+		const popupWindow = fakeWindow(10);
+		store.windows.add(popupWindow);
+		Object.assign(store.impl, {
+			windowType: (win: { id: number }) =>
+				win.id === popupWindow.id ? "popup" : "normal",
+		});
+		const types = async (info?: object) =>
+			((await call("tabs", "windows.getAll", info)) as WindowDetails[]).map(
+				(win) => [win.id, (win as { type?: string }).type],
+			);
+
+		// The package called every window "normal", so an extension could not
+		// tell its own popout from the window a page is in.
+		expect(await types()).toEqual([
+			[9, "normal"],
+			[10, "popup"],
+		]);
+		expect(await types({ windowTypes: ["popup"] })).toEqual([[10, "popup"]]);
+	});
+
+	test("tabs carry their index in the window, and query filters on index and windowType", async () => {
+		const { store, call } = extensionHost(api);
+		const popup = fakeTab(3, "https://accounts.google.com/signin", "Sign in");
+		const popupWindow = fakeWindow(10);
+		store.tabs.add(popup);
+		store.windows.add(popupWindow);
+		store.tabToWindow.set(popup, popupWindow);
+		Object.assign(store.impl, {
+			windowType: (win: { id: number }) =>
+				win.id === popupWindow.id ? "popup" : "normal",
+		});
+		const ids = async (info: object) =>
+			((await call("tabs", "tabs.query", info)) as TabDetails[]).map(
+				(tab) => tab.id,
+			);
+
+		// Every tab reported index -1, so no extension could order or address them.
+		expect(await ids({})).toEqual([1, 2, 3]);
+		expect(await ids({ index: 1 })).toEqual([2]);
+		expect(await ids({ windowType: "popup" })).toEqual([3]);
+		expect(await ids({ windowType: "normal" })).toEqual([1, 2]);
+	});
+
+	test("a window that already has focus when it is added becomes the current one", () => {
+		// A popup is focused the moment Chromium opens it, before the app can
+		// hand it over, so waiting for a `focus` event leaves the extension
+		// answering for the window behind it until the user clicks that popup.
+		const store = new api.ExtensionStore({});
+		const windows = new api.WindowsAPI({
+			store,
+			router: { apiHandler: () => () => {}, broadcastEvent: () => {} },
+		});
+		const window = {
+			id: 7,
+			isDestroyed: () => false,
+			isFocused: () => true,
+			on: () => {},
+			once: () => {},
+		};
+		windows.observeWindow(window);
+
+		expect(store.lastFocusedWindowId).toBe(7);
 	});
 
 	test("the current window moves to an open window when the focused one closes", async () => {
