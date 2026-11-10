@@ -33,6 +33,19 @@ export function isIndeterminateGitTaskFailure(err: unknown): boolean {
 	return err instanceof WorkerTaskError && err.name === "WorkerTaskError";
 }
 
+/** The delete dialog waits on this read before it can show its warnings. */
+export const INSPECT_WORKTREE_STATE_TIMEOUT_MS = 15_000;
+
+/** Destroy reads the state after the row is archived, so nobody waits on
+ * it, and a timeout restores the row. A cold or busy disk (a batch delete)
+ * can need far more than the dialog's budget. */
+export const DESTROY_WORKTREE_STATE_TIMEOUT_MS = 120_000;
+
+/** A timeout kills `git worktree remove` partway through its delete and
+ * leaves a half-deleted worktree. A multi-GB pnpm tree on a full disk
+ * needs minutes, so this budget only stops a removal that is hung. */
+export const WORKTREE_REMOVE_TIMEOUT_MS = 30 * 60_000;
+
 export const cleanupGitOps = {
 	/** Same failure surface as `ctx.git(repoPath)` — a throw here maps to the
 	 * saga's "failed to open project repo" handling. */
@@ -49,12 +62,9 @@ export const cleanupGitOps = {
 			gitEnv: GitTaskEnv;
 			ignoreInitialCommit?: boolean;
 		},
-		signal?: AbortSignal,
+		options: { timeoutMs: number; signal?: AbortSignal },
 	): Promise<{ hasChanges: boolean; hasUnpushedCommits: boolean }> {
-		return getHostWorkerPool().run(gitWorktreeStateTask, input, {
-			timeoutMs: 15_000,
-			signal,
-		});
+		return getHostWorkerPool().run(gitWorktreeStateTask, input, options);
 	},
 
 	removeWorktree(input: {
@@ -63,11 +73,8 @@ export const cleanupGitOps = {
 		gitEnv: GitTaskEnv;
 		force?: boolean;
 	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
-		// Generous timeout: removal recursively deletes the worktree
-		// directory, which can take a while for large trees (node_modules
-		// etc.).
 		return getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
-			timeoutMs: 120_000,
+			timeoutMs: WORKTREE_REMOVE_TIMEOUT_MS,
 		});
 	},
 

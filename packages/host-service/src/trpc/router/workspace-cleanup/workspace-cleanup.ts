@@ -30,7 +30,12 @@ import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
-import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
+import {
+	cleanupGitOps,
+	DESTROY_WORKTREE_STATE_TIMEOUT_MS,
+	INSPECT_WORKTREE_STATE_TIMEOUT_MS,
+	isIndeterminateGitTaskFailure,
+} from "./git-ops";
 import { isLocalCheckoutWorkspace } from "./is-local-checkout-workspace";
 import { removeDirectoryTree } from "./remove-directory-tree";
 
@@ -155,7 +160,7 @@ export const workspaceCleanupRouter = router({
 						gitEnv,
 						ignoreInitialCommit: local.type === "session",
 					},
-					signal,
+					{ timeoutMs: INSPECT_WORKTREE_STATE_TIMEOUT_MS, signal },
 				);
 				return {
 					canDelete: true,
@@ -317,10 +322,10 @@ async function runDestroy(
 					ctx,
 					local.worktreePath,
 				);
-				const state = await cleanupGitOps.readWorktreeState({
-					worktreePath: local.worktreePath,
-					gitEnv,
-				});
+				const state = await cleanupGitOps.readWorktreeState(
+					{ worktreePath: local.worktreePath, gitEnv },
+					{ timeoutMs: DESTROY_WORKTREE_STATE_TIMEOUT_MS },
+				);
 				if (state.hasChanges) {
 					throw new TRPCError({
 						code: "CONFLICT",
@@ -411,7 +416,13 @@ async function runDestroy(
 		if (marked && local) trackWorkspaceDeleted(ctx, local);
 		return result;
 	} catch (err) {
-		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
+		if (marked) {
+			console.warn("[workspace-cleanup] delete failed; restoring workspace", {
+				workspaceId: input.workspaceId,
+				error: err instanceof Error ? err.message : String(err),
+			});
+			unarchiveLocalWorkspace(ctx, input.workspaceId);
+		}
 		throw err;
 	}
 }

@@ -328,7 +328,13 @@ export const gitWorktreeStateTask = defineWorkerTask<
 	type: "git/worktreeState",
 	handler: async ({ worktreePath, gitEnv, ignoreInitialCommit }) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
-		const status = await git.status();
+		// `git.status()` passes `-u` (all), which lists every file in every
+		// untracked directory. One entry per directory is enough to say "dirty".
+		const status = await git.raw([
+			"status",
+			"--porcelain",
+			"--untracked-files=normal",
+		]);
 		let hasUnpushedCommits = false;
 		try {
 			const result = await git.raw([
@@ -344,7 +350,7 @@ export const gitWorktreeStateTask = defineWorkerTask<
 		} catch {
 			// Leave false — `rev-list` failure isn't a signal we can act on.
 		}
-		return { hasChanges: !status.isClean(), hasUnpushedCommits };
+		return { hasChanges: status.trim() !== "", hasUnpushedCommits };
 	},
 });
 

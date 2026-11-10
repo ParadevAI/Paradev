@@ -22,6 +22,7 @@ import {
 	workspaceCleanupRouter,
 } from "../src/trpc/router/workspace-cleanup/workspace-cleanup";
 import type { HostServiceContext } from "../src/types";
+import { getHostWorkerPool } from "../src/workers/host-worker-pool";
 import { WorkerTaskError } from "../src/workers/WorkerTaskRunner";
 
 type WorkspaceRow = {
@@ -1041,6 +1042,53 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 				force: false,
 			}),
 		).rejects.toThrow(/Couldn't verify worktree state/);
+	});
+
+	test("a preflight slower than the delete dialog's budget deletes instead of restoring the row", async () => {
+		// `git status` that needs 20 s, as on a cold or busy disk: the pool
+		// rejects any shorter budget, exactly as it does in the field.
+		const pool = getHostWorkerPool();
+		const realRun = pool.run;
+		const patchedReadWorktreeState = cleanupGitOps.readWorktreeState;
+		pool.run = (async (_def, _input, options) => {
+			const timeoutMs = options?.timeoutMs ?? 0;
+			if (timeoutMs < 20_000) {
+				throw new WorkerTaskError(
+					`[host-worker] Task "git/worktreeState" timed out after ${timeoutMs}ms`,
+				);
+			}
+			return { hasChanges: false, hasUnpushedCommits: false };
+		}) as typeof pool.run;
+		cleanupGitOps.readWorktreeState = realGitOps.readWorktreeState;
+		const worktree = mkdtempSync(join(tmpdir(), "workspace-delete-"));
+		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-repo-"));
+		try {
+			const ctx = makeCtx({
+				workspace: {
+					id: "ws-1",
+					projectId: "p-1",
+					worktreePath: worktree,
+					branch: "feature",
+				},
+				project: { id: "p-1", repoPath: repo },
+			});
+			const caller = workspaceCleanupRouter.createCaller(ctx);
+
+			const result = await caller.destroy({
+				workspaceId: "ws-1",
+				deleteBranch: false,
+				force: false,
+			});
+
+			expect(result.success).toBe(true);
+			// One broadcast is the archive; an un-archive would add a second.
+			expect(ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(1);
+		} finally {
+			pool.run = realRun;
+			cleanupGitOps.readWorktreeState = patchedReadWorktreeState;
+			rmSync(worktree, { recursive: true, force: true });
+			rmSync(repo, { recursive: true, force: true });
+		}
 	});
 
 	test("preflight git failure (missing worktree) still proceeds idempotently", async () => {
