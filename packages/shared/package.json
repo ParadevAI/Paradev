@@ -205,6 +205,10 @@
 			"types": "./src/pull-request.ts",
 			"default": "./src/pull-request.ts"
 		},
+		"./github-attachment": {
+			"types": "./src/github-attachment/index.ts",
+			"default": "./src/github-attachment/index.ts"
+		},
 		"./pull-request-github": {
 			"types": "./src/pull-request-github/index.ts",
 			"default": "./src/pull-request-github/index.ts"

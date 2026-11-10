@@ -69,4 +69,33 @@ describe("viewer GitHub on this machine", () => {
 		});
 		expect(tokensUsed).toEqual(["local-token"]);
 	});
+
+	test("signs a private attachment with the local token, and gives null without one", async () => {
+		const attachment =
+			"https://github.com/user-attachments/assets/eba1526e-7388-4ed6-b058-c2ffcca091dd";
+		const signedWith: string[] = [];
+		const routerFor = (token: string | null) =>
+			createViewerGithubRouter(
+				{ getToken: async () => token },
+				() => ({}) as Octokit,
+				() => 0,
+				async (_url, used) => {
+					signedWith.push(used);
+					return "https://signed.example/shot.png";
+				},
+			).createCaller({} as never);
+
+		expect(
+			await routerFor("local-token").getAttachmentUrl({ url: attachment }),
+		).toEqual({ url: "https://signed.example/shot.png" });
+		expect(await routerFor(null).getAttachmentUrl({ url: attachment })).toEqual(
+			{ url: null },
+		);
+		expect(signedWith).toEqual(["local-token"]);
+		await expect(
+			routerFor("local-token").getAttachmentUrl({
+				url: "https://example.com/x.png",
+			}),
+		).rejects.toMatchObject({ code: "BAD_REQUEST" });
+	});
 });

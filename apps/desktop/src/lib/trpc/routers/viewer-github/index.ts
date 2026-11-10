@@ -1,6 +1,10 @@
 import { Octokit } from "@octokit/core";
 import { LocalGitCredentialProvider } from "@superset/host-service/git-credentials";
 import {
+	isGithubAttachmentUrl,
+	signedGithubAttachmentUrl,
+} from "@superset/shared/github-attachment";
+import {
 	githubErrorCode,
 	type PullRequestOnGithub,
 	pullRequestOnGithub,
@@ -30,6 +34,10 @@ export function createViewerGithubRouter(
 	clientFor: (token: string) => Octokit = (token) =>
 		new Octokit({ auth: token }),
 	now: () => number = () => performance.now(),
+	signAttachment: (
+		url: string,
+		token: string,
+	) => Promise<string | null> = signedGithubAttachmentUrl,
 ) {
 	// Each miss spawns `git credential fill` and `gh auth token`, and PR panes
 	// ask on every poll.
@@ -101,6 +109,22 @@ export function createViewerGithubRouter(
 					),
 				),
 			),
+
+		getAttachmentUrl: publicProcedure
+			.input(z.object({ url: z.string().refine(isGithubAttachmentUrl) }))
+			.query(async ({ input }) => {
+				const token = await credentials.getToken("github.com");
+				if (!token) return { url: null };
+				try {
+					return { url: await signAttachment(input.url, token) };
+				} catch (error) {
+					console.warn(
+						"[viewerGithub.getAttachmentUrl]",
+						error instanceof Error ? error.message : error,
+					);
+					return { url: null };
+				}
+			}),
 
 		getPullRequestDiff: publicProcedure
 			.input(pullRequestInput)
