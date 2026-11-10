@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mars host: intermittent relay "Request timed out" (2026-11-10)</title>
+    <style>
+      main { max-width: 980px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+      .lede { font-size: 1.1rem; color: var(--sp-muted); max-width: var(--sp-measure); }
+      .verdict { border-left: 3px solid var(--sp-chart-1); padding: .75rem 1rem; background: var(--sp-surface); border-radius: var(--sp-radius); }
+      .tag { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding: .1rem .45rem; border-radius: 4px; border: 1px solid var(--sp-border); color: var(--sp-muted); }
+      .tag.high { color: var(--sp-chart-1); border-color: currentColor; }
+      .tag.med { color: var(--sp-chart-3); border-color: currentColor; }
+      .tag.low, .tag.out { color: var(--sp-muted); }
+      .wide { overflow-x: auto; }
+      table { width: 100%; }
+      td, th { vertical-align: top; }
+      pre { overflow-x: auto; }
+      h2 { margin-top: 2.5rem; }
+      .seq { font-family: var(--sp-font-mono); font-size: .85rem; line-height: 1.6; background: var(--sp-code-bg); padding: 1rem; border-radius: var(--sp-radius); overflow-x: auto; white-space: pre; }
+    </style>
+  </head>
+  <body class="auto">
+    <main>
+      <h1>Mars host: intermittent relay "Request timed out"</h1>
+      <p class="lede">
+        Host <code>e89c80f0047616c8e1a3bf4b1791dd8d</code>, org <code>7b3ff211-…2400</code>, host-service 2.0.5.
+        Seven <code>workspace.create</code> calls failed after about 66–68 s in two windows on 2026-11-10
+        (17:55:53–17:59:03 and 18:10:00–18:11:19 UTC). <code>workspace.list</code> and terminal list also stalled.
+        The control tunnel stayed connected for the whole time. This is a read-only investigation. No code was changed.
+      </p>
+
+      <div class="verdict">
+        <strong>Most likely cause:</strong> the relay does not notice when the per-request dial-back socket
+        closes before the response comes back. If that socket drops with a 1006 during an exchange, nothing fails the
+        request. The relay waits for the full 65 s exchange timeout, then answers "Request timed out" because the
+        control socket is still up. A network blip that lasts less than a second becomes a 65 s hang. The
+        customer's repeated 1006 closes with quick reconnects match this. Control-socket health does not protect against it,
+        because each request uses its own new socket.
+      </div>
+
+      <h2>Evidence</h2>
+      <h3>1. Only one code path makes this exact error, and its timing matches</h3>
+      <ul>
+        <li><code>"Request timed out"</code> appears only at <code>apps/relay/src/index.ts:377-385</code>. The relay returns it only when the
+          HTTP exchange failed with <code>reason: "timeout"</code> <em>and</em> <code>isConnected()</code> says the host control socket is open.
+          This is consistent with "control stayed connected".</li>
+        <li>The exchange timeout is <code>EXCHANGE_TIMEOUT_MS = DIAL_TIMEOUT_MS + 30_000</code> (<code>apps/relay/src/http-exchange.ts:7</code>).
+          <code>DIAL_TIMEOUT_MS = RELAY_CONNECT_TIMEOUT_MS + 5_000 = 35 s</code> (<code>packages/shared/src/tunnel-protocol.ts:98-101</code>).
+          So the timeout is <strong>65 s</strong>. Add JWT verification, the access check and the extra <code>isConnected</code> round trip, and you get the observed 66–68 s.</li>
+        <li>So the relay received neither <code>http:end</code> nor <code>stream:dial-failed</code> for that ticket in 65 s.</li>
+      </ul>
+
+      <h3>2. The failed creates never finished on the host (PostHog)</h3>
+      <p>Host-service <code>workspace_created</code> events for this host, 17:40–18:40 UTC. The client puts the request time (HHMM) into each branch name:</p>
+      <div class="wide">
+        <table>
+          <thead><tr><th>Event time (UTC)</th><th>Branch suffix (request minute)</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td>17:59:32</td><td><code>…-2026-11-10-1759-5962</code></td><td>First success, 29 s after window 1 ended</td></tr>
+            <tr><td>18:02:47</td><td><code>…-1802-7b7e</code></td><td></td></tr>
+            <tr><td>18:11:31</td><td><code>…-1811-d382</code></td><td>First success, 12 s after window 2 ended</td></tr>
+            <tr><td>18:12:04</td><td><code>…-1811-46d5</code></td><td></td></tr>
+            <tr><td>18:24:11, 18:27:39, 18:33:43</td><td><code>1824</code>, <code>1827</code>, <code>1833</code></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>No event has a request minute of 1755–1758 or 1810. The seven timed-out creates never produced a workspace.
+        So the <code>workspace.create</code> handler either never ran or never got its request.
+        Slow host-side work is therefore not the main suspect. List queries stalled in the same windows, so the failure is in the request path, not in one procedure.</p>
+
+      <h3>3. A dial socket that closes during an exchange is ignored on both ends</h3>
+      <p>Each relayed tRPC HTTP call is one <code>kind:"http"</code> dial. The relay sends <code>stream:dial</code> over control. The host opens a <em>new</em>
+        WebSocket to <code>/v2/dial</code>. The relay pushes the request frames on that socket, and the host answers on the same socket.</p>
+      <ul>
+        <li><strong>Relay:</strong> <code>HostTunnel.handleGone()</code> (<code>apps/relay/src/host-tunnel.ts:348-382</code>) handles a closing
+          <em>dial</em> socket by clearing early frames and timers and closing a peer, if one exists (lines 372-381). It never calls
+          <code>httpExchanges.fail(ticket)</code>. Pending exchanges are settled only by the 65 s timer, a host-sent
+          <code>stream:dial-failed</code>, or <code>abortAll()</code> when the <em>control</em> socket goes (line 364). No test covers
+          "dial closes mid-exchange" (<code>apps/relay/src/http-exchange.test.ts</code> covers slow dial, expiry, dial-failed, completion and shutdown only).</li>
+        <li><strong>Host:</strong> <code>serveHttpDial()</code> (<code>packages/host-service/src/tunnel/tunnel-client.ts:332-363</code>) sets
+          <code>onmessage</code> and <code>onerror</code> but no <code>onclose</code>. After the socket opens, nothing reports a lost exchange or retries it.
+          <code>forwardHttp()</code> (lines 365-429) sends <code>fetch</code> to localhost with no abort signal. If the socket dies while
+          the handler runs, the response goes to a closed socket and is lost without an error. This code is the same in 2.0.5 and on main.</li>
+      </ul>
+      <div class="seq">client ──HTTP──▶ Worker ──RPC proxyHttp──▶ HostTunnel DO  (exchange timer 65 s starts)
+DO ──control: stream:dial{ticket,kind:http}──▶ host            ✓ control is healthy
+host ──new WS /v2/dial?ticket──▶ edge ─▶ Worker ─▶ DO          ✓ onDialConnect sends http:request + http:end
+            ✗ dial socket drops (1006): network, edge or Worker↔DO hop
+DO.handleGone(dial)   → exchange not failed
+host (no onclose)     → no dial-failed, no retry, handler never runs
+…65 s… timer → reason "timeout" → isConnected()=true → 502 "Request timed out"</div>
+
+      <h3>4. Why control survives while requests fail</h3>
+      <p>The control socket is one long-lived connection. Each request opens a fresh TCP+TLS+WS connection from the GCP VM through Cloud NAT to Cloudflare anycast.
+        That connection can land on a different edge colo than control, and from there it crosses a Worker→DO hop to the host's Durable Object.
+        A path problem that affects only <em>new</em> connections, or only the edge→DO leg, hits every request in a window and leaves control alone.
+        This also fits "retries minutes later work". We cannot yet say which hop drops the sockets. That needs the logs below.</p>
+
+      <h2>Hypotheses, ranked</h2>
+      <div class="wide">
+        <table>
+          <thead><tr><th>Hypothesis</th><th>Fit</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Dial-back socket drops after open. The relay and host ignore it, so the request waits for the 65 s timer (section 3).</td>
+              <td><span class="tag high">High</span></td>
+              <td>Explains the error text, the 66–68 s timing, control staying up, missing <code>workspace_created</code>, lists stalling too, and the 1006s. Code-confirmed gap.</td>
+            </tr>
+            <tr>
+              <td>The host never received <code>stream:dial</code> (half-open control in the relay→host direction).</td>
+              <td><span class="tag low">Low</span></td>
+              <td>Pongs go on the same socket. The host watchdog forces a reconnect after 75 s with no inbound traffic (<code>tunnel-client.ts:13-14, 150-160</code>), and the relay closes a host after 90 s with no ping (<code>host-tunnel.ts:35-38, 386-406</code>). Window 1 lasted 3 min 10 s with no reconnect, so control traffic was flowing.</td>
+            </tr>
+            <tr>
+              <td>Requests went to a stale host socket after a 1006.</td>
+              <td><span class="tag low">Low</span></td>
+              <td>A new host socket closes every older one (<code>host-tunnel.ts:206-219</code>), and <code>hostConn()</code> uses only OPEN sockets (<code>428-433</code>). Control did not reconnect between 17:54:52 and 18:37:12 anyway.</td>
+            </tr>
+            <tr>
+              <td>The dial-back landed on another DO generation (placement KV lag).</td>
+              <td><span class="tag low">Low</span></td>
+              <td><code>placement.ts</code> creates a new generation only when the continent changes. Even then the result is a 4404 close, the host retries, then sends <code>dial-failed</code>, and the client gets a fast 502 "Host could not reach the relay", not a timeout.</td>
+            </tr>
+            <tr>
+              <td>The 2.0.5 Node 22 dial-back bug, fixed in #9514 (041c29650, after 2.0.5). On Node 22 a failed handshake fires only <code>error</code>, so 2.0.5 never retries and waits the full 30 s.</td>
+              <td><span class="tag med">Contributes</span></td>
+              <td>Only if this host runs on Node 22 (CLI install). It adds 30 s stalls and kills the second dial attempt. On its own it gives "Host could not reach the relay" after about 30 s, not "Request timed out" after 65 s. Upgrading to ≥ 2.0.6 is still worth doing.</td>
+            </tr>
+            <tr>
+              <td>Head-of-line blocking or serialization in the relay or tunnel.</td>
+              <td><span class="tag out">Ruled out in code</span></td>
+              <td>Each request gets its own dial socket and ticket. The DO keeps no queue. The tunnel client sets no concurrency limit. Host-side, <code>workspace.create</code> and list do not go through the shared <code>HostWorkerPool</code> in 2.0.5. Only git, usage, project and branch-prefix procedures do.</td>
+            </tr>
+            <tr>
+              <td>A relay deploy restarted the DOs.</td>
+              <td><span class="tag out">Ruled out</span></td>
+              <td>No <code>apps/relay</code> or tunnel-protocol commits on 2026-11-10. A deploy would also have dropped the control socket.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Proposed fix</h2>
+      <ol>
+        <li><strong>Relay: fail or retry an exchange when its dial socket goes away.</strong> In <code>handleGone</code>, when
+          <code>state.kind === "dial"</code> and <code>httpExchanges.has(state.ticket)</code>, settle the exchange right away. Give it a distinct
+          reason (for example <code>"stream-lost"</code>) and map it to <code>BAD_GATEWAY "Connection to host dropped"</code>. This turns a 65 s hang into a fast,
+          retryable error. Add the regression test "dial closes before http:end".</li>
+        <li><strong>Make it safe to re-dial automatically.</strong> Have the host send an <code>http:accepted</code> frame right before it calls
+          <code>fetch</code> locally. If the dial drops <em>before</em> that frame, the handler never ran, so the DO can re-dial once with a
+          new ticket, even for mutations. If it drops <em>after</em>, surface the error and do not replay a non-idempotent call.</li>
+        <li><strong>Host: watch the dial socket after it opens.</strong> Add <code>onclose</code> in <code>serveHttpDial</code> and abort the
+          local <code>fetch</code> through an <code>AbortController</code>. If the socket closes before <code>http:end</code> arrives, send <code>stream:dial-failed</code>
+          over control. Old relays treat that frame the same way.</li>
+        <li><strong>Split the timeout.</strong> Allow one deadline for "request delivered/accepted" (about 35 s) and a separate one for the handler. A host
+          that has accepted a long create should not share a budget with a dial that never landed.</li>
+        <li><strong>Correlation logging (cheap, ship first).</strong> Log the ticket on both legs. Relay: dial sent, dial connected,
+          dial closed (code, ms since open), exchange outcome and duration. Host: dial received, dial open/fail (attempt n), <code>http:end</code>
+          received, local fetch status and ms, dial closed (code). Today 2.0.5 logs nothing when it receives a dial, so we cannot tell these cases apart from host logs.</li>
+        <li>Ask the customer to upgrade host-service to ≥ 2.0.6. That release includes #9514, which retries the Node 22 handshake failure and closes the relay stream on a local socket error.</li>
+        <li>Small fix: <code>apps/mobile/hooks/useDeleteWorkspace/useDeleteWorkspace.ts:147</code> still says "30s exchange cap". The cap is 65 s.</li>
+      </ol>
+
+      <h2>What to ask the customer for</h2>
+      <ul>
+        <li>Full host-service log for 17:50–18:15 UTC, unfiltered. We need the exact lines for each 1006. Which socket logged it: control (<code>[host-service:tunnel] control closed</code>) or something else? Look also for
+          <code>dial-back failed or timed out</code> and <code>HTTP proxy failed</code>.</li>
+        <li>How host-service runs on Mars: CLI or desktop, the <code>node --version</code> it uses, and whether a second host-service (or a cloned VM image with the same machine-id) could register the same host ID.</li>
+        <li>Did any request in a window reach the local server? Look for access or tRPC logs for <code>/trpc/workspace.create</code>, <code>workspace.list</code> and terminal list. Run <code>ss -tnp</code> or a conntrack sample for connections to <code>relay.superset.sh</code> during a failure.</li>
+        <li>Cloud NAT and VPC flow logs for <em>new</em> connections to Cloudflare in the windows: SYN with no reply, RSTs, port allocation. They checked drops, but not new-connection failures.</li>
+        <li>The client and exact timestamp of each failed call (the CLI, guild automation and the desktop app are all possible). The client machine was <code>3534fc40…</code>.</li>
+        <li>If they can reproduce: run <code>curl -w '%{time_connect} %{time_appconnect}\n' https://relay.superset.sh/health</code> in a loop during a window, along with the colo from <code>/cdn-cgi/trace</code>.</li>
+      </ul>
+
+      <h2>What we should pull on our side</h2>
+      <ul>
+        <li>Cloudflare Workers observability for <code>superset-relay</code> filtered on this host ID: <code>/v2/dial</code> invocations and outcomes, DO <code>webSocketClose</code> codes on dial sockets, <code>Unknown or expired ticket</code>,
+          <code>[relay] placed host</code>, <code>host stale</code>, and the edge colo of control vs dial requests in the windows.</li>
+        <li>Cloudflare status and incidents for the involved colo(s) at 17:55–17:59 and 18:10–18:11 UTC.</li>
+        <li>Sentry (host-service) <code>reportTunnelRescue</code> events for this host. I could not query Sentry from this session because it is not authenticated. PostHog was queried (section 2).</li>
+      </ul>
+
+      <h2>Code map</h2>
+      <div class="wide">
+        <table>
+          <thead><tr><th>Concern</th><th>Where</th></tr></thead>
+          <tbody>
+            <tr><td>Client-facing HTTP proxy, error mapping</td><td><code>apps/relay/src/index.ts:330-395</code></td></tr>
+            <tr><td>Per-host DO: dial, exchange, liveness</td><td><code>apps/relay/src/host-tunnel.ts</code> (proxyHttp 139-161, onConnect 202-284, handleGone 348-382, alarm 386-406)</td></tr>
+            <tr><td>HTTP exchange state + 65 s timer</td><td><code>apps/relay/src/http-exchange.ts</code></td></tr>
+            <tr><td>Protocol + timeouts</td><td><code>packages/shared/src/tunnel-protocol.ts:98-101</code></td></tr>
+            <tr><td>Host control, ping 30 s, watchdog 75 s</td><td><code>packages/host-service/src/tunnel/tunnel-client.ts:13-20, 92-175</code></td></tr>
+            <tr><td>Dial-back connect/retry (changed after 2.0.5 by #9514)</td><td><code>tunnel-client.ts:267-317</code></td></tr>
+            <tr><td>HTTP-over-dial on the host</td><td><code>tunnel-client.ts:332-429</code></td></tr>
+            <tr><td>Placement directory</td><td><code>apps/relay/src/placement.ts</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--sp-muted)">Tunnel diff from 2.0.5 to main: only #9514 (dial-back handshake on Node 22) and a cloud-workspace <code>preAuthorized</code> shortcut in <code>authorize()</code>. Neither changes how a dial that closes mid-exchange is handled.</p>
+    </main>
+  </body>
+</html>
