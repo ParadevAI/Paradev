@@ -332,7 +332,7 @@ export function ApiKeysSettings({ visibleItems }: ApiKeysSettingsProps) {
 						</DialogTitle>
 						<DialogDescription>
 							<Trans>
-								Copy your key now — you won't be able to see it again.
+								Copy your key now. You won't be able to see it again.
 							</Trans>
 						</DialogDescription>
 					</DialogHeader>

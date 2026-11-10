@@ -120,12 +120,12 @@ export function WorkspaceCreatingState({
 							{isSession ? (
 								<Trans>
 									This is taking longer than usual. The session may already be
-									ready — reloading can pick it up.
+									ready. Reloading can pick it up.
 								</Trans>
 							) : (
 								<Trans>
 									This is taking longer than usual. The workspace may already be
-									ready — reloading can pick it up.
+									ready. Reloading can pick it up.
 								</Trans>
 							)}
 						</p>

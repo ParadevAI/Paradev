@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { promisify } from "node:util";
+import { sessionSelections } from "@superset/chat/core";
 import type { DurableEvent } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -12,7 +13,10 @@ import {
 	uploadBundle,
 	withStage,
 } from "../../../teleport/bundle";
-import { teleportProviderFor } from "../../../teleport/providers";
+import {
+	type BundleManifest,
+	teleportProviderFor,
+} from "../../../teleport/providers";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
 	gitPushSnapshotTask,
@@ -36,7 +40,7 @@ const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
 const STOP_TIMEOUT_MS = 20_000;
 const STOP_POLL_MS = 200;
-/** As many chats as `workspaceMove.start` takes in one workspace move. */
+/** As many chats as `workspaceMove.attach` takes in one workspace move. */
 const MAX_MOVED_CHATS = 50;
 
 type MovableChat = {
@@ -56,7 +60,7 @@ type PreparedChat = {
 type SkippedChat = {
 	chatSessionId: string;
 	title: string | null;
-	reason: "unsupported_agent" | "not_started" | "moved_away";
+	reason: "unsupported_agent" | "not_started" | "moved_away" | "failed";
 };
 
 function errorCode(error: unknown): string | undefined {
@@ -86,6 +90,26 @@ function busyError() {
 		code: "PRECONDITION_FAILED",
 		message: "Wait for the agent to finish, or stop it, before moving",
 	});
+}
+
+/** The bundle's manifest with the chat's mode and model, which its history does not carry. */
+function withSelections(
+	manifest: BundleManifest,
+	chat: ChatRuntime,
+	sessionId: string,
+): BundleManifest {
+	const outline = chat.commands.getOutline({ sessionId });
+	const { modeId, modelId } = outline.ok
+		? sessionSelections(outline.outline.session)
+		: {};
+	if (!modeId && !modelId) return manifest;
+	return {
+		...manifest,
+		selections: {
+			...(modeId ? { modeId } : {}),
+			...(modelId ? { modelId } : {}),
+		},
+	};
 }
 
 /** Cancels the running turn and waits until the chat is idle. */
@@ -144,6 +168,8 @@ export const teleportRouter = router({
 			const skipped: SkippedChat[] = [];
 			const movable: MovableChat[] = [];
 			for (const session of sessions) {
+				// A chat closed here is gone for the person; moving it would open it again.
+				if (session.closedAt) continue;
 				const provider = teleportProviderFor(session.harness);
 				if (!provider || !session.harnessSessionId) {
 					skipped.push({
@@ -211,6 +237,7 @@ export const teleportRouter = router({
 			assertIdle();
 			const prepared: PreparedChat[] = [];
 			const followed: string[] = [];
+			let firstFailure: unknown = null;
 			try {
 				for (const session of movable) {
 					try {
@@ -226,7 +253,7 @@ export const teleportRouter = router({
 					}
 					chatSync.follow(session.sessionId);
 					followed.push(session.sessionId);
-					await withStage(async (stageDir) => {
+					const outcome = await withStage(async (stageDir) => {
 						const manifest = await session.provider.collect({
 							harnessSessionId: session.harnessSessionId,
 							worktreePath,
@@ -242,20 +269,41 @@ export const teleportRouter = router({
 									},
 								}),
 						});
+						if (!manifest) return "not_started" as const;
 						await uploadBundle({
 							api: ctx.api,
 							chatSessionId: session.sessionId,
 							harness: session.harness,
-							manifest,
+							manifest: withSelections(manifest, chat, session.sessionId),
 							stageDir,
 						});
+						return "uploaded" as const;
+					}).catch((error: unknown) => {
+						console.warn(
+							`[teleport] could not pack chat ${session.sessionId}; it stays here`,
+							error,
+						);
+						firstFailure ??= error;
+						return "failed" as const;
 					});
+					if (outcome !== "uploaded") {
+						chatSync.forget(session.sessionId);
+						followed.pop();
+						skipped.push({
+							chatSessionId: session.sessionId,
+							title: session.title,
+							reason: outcome,
+						});
+						continue;
+					}
 					prepared.push({
 						chatSessionId: session.sessionId,
 						harnessSessionId: session.harnessSessionId,
 						title: session.title,
 					});
 				}
+				// Every chat failing is the move failing (an upload outage, say), not a choice to leave them.
+				if (prepared.length === 0 && firstFailure) throw firstFailure;
 			} catch (error) {
 				for (const sessionId of followed) chatSync.forget(sessionId);
 				throw error;
@@ -376,7 +424,7 @@ export const teleportRouter = router({
 				});
 			}
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			await withStage(async (stageDir) => {
+			const selections = await withStage(async (stageDir) => {
 				const manifest = await downloadBundle({
 					bundle: {
 						...input.bundle,
@@ -395,6 +443,7 @@ export const teleportRouter = router({
 					},
 					{ timeoutMs: 120_000 },
 				);
+				return manifest.selections;
 			});
 			if (chat.live.get(input.chatSessionId)) {
 				await chat.commands.closeSession({ sessionId: input.chatSessionId });
@@ -412,6 +461,21 @@ export const teleportRouter = router({
 				events: input.events as { seq: number; event: DurableEvent }[],
 				replace: true,
 			});
+			if (selections) {
+				const outline = chat.commands.getOutline({
+					sessionId: input.chatSessionId,
+				});
+				// A session event replaces the whole state, so it carries what the history set.
+				chat.journal.append(input.chatSessionId, {
+					type: "session",
+					session: {
+						...(outline.ok ? outline.outline.session : null),
+						status: "idle",
+						harness: input.session.harness,
+						...selections,
+					},
+				});
+			}
 			ctx.runtime.chatSync?.forget(input.chatSessionId);
 			return { sessionId: input.chatSessionId };
 		}),

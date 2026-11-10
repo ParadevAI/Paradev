@@ -300,7 +300,7 @@ export function ScopeChip({
 								<CommandItem disabled>Loading…</CommandItem>
 							) : state?.isError ? (
 								<CommandItem onSelect={() => state.refetch()}>
-									Couldn't load — retry
+									Couldn't load. Retry
 								</CommandItem>
 							) : (
 								!allowCustom && (

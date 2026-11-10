@@ -1,16 +1,20 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useFeatureFlagEnabled } from "posthog-js/react";
+import { useLingui } from "@lingui/react/macro";
+import {
+	keepPreviousData,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { type ReactNode, useEffect } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
+import { sandboxWakeQueryKey } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { useCountdown } from "../../hooks/useCountdown";
 import {
 	loadStoredChatSnapshot,
-	shownStoredChatKey,
 	storedChatSnapshotKey,
 } from "../../utils/loadStoredChatSnapshot";
+import { ConnectionPill, WAKE_UP_ESTIMATE_SECONDS } from "../ConnectionPill";
 import { StoredChatTranscript } from "../StoredChatTranscript";
-import { CloudWorkspaceWakingStrip } from "./components/CloudWorkspaceWakingStrip";
 
 /** The tab bar, agent row and pane header above a chat pane's transcript, so these rows sit where the pane's will. */
 const PANE_CHROME_PX = 118;
@@ -32,32 +36,22 @@ export function StoredCloudChat({
 	fallback: ReactNode;
 	workspaceId: string;
 }) {
-	const enabled = useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
-	const chats = cloudTrpc.chatHistory.ofWorkspace.useQuery(
-		{ workspaceId },
-		{ enabled },
-	);
+	const { t } = useLingui();
+	const queryClient = useQueryClient();
+	const secondsLeft = useCountdown(WAKE_UP_ESTIMATE_SECONDS);
+	const chats = cloudTrpc.chatHistory.ofWorkspace.useQuery({ workspaceId });
 	const chatId = chats.data?.[0]?.id ?? null;
 	const stored = useQuery(
 		{
 			queryKey: storedChatSnapshotKey(chatId),
 			queryFn: () => loadStoredChatSnapshot(chatId as string),
-			enabled: enabled && chatId !== null,
+			enabled: chatId !== null,
 			placeholderData: keepPreviousData,
 			staleTime: STALE_MS,
 			retry: false,
 		},
 		electronQueryClient,
 	);
-	const shownChatId = stored.isPlaceholderData ? null : chatId;
-	useEffect(() => {
-		if (shownChatId) {
-			electronQueryClient.setQueryData(
-				shownStoredChatKey(workspaceId),
-				shownChatId,
-			);
-		}
-	}, [shownChatId, workspaceId]);
 	useEffect(() => {
 		for (const chat of chats.data?.slice(1, PREFETCHED_CHATS) ?? []) {
 			void electronQueryClient.prefetchQuery({
@@ -67,13 +61,31 @@ export function StoredCloudChat({
 			});
 		}
 	}, [chats.data]);
-	if (!enabled || !chatId || !stored.data) return fallback;
+	if (!chatId || !stored.data) return fallback;
 	return (
 		<div
 			className="relative flex h-full w-full flex-col"
 			style={{ paddingTop: PANE_CHROME_PX }}
 		>
-			<CloudWorkspaceWakingStrip workspaceId={workspaceId} />
+			<ConnectionPill
+				className="top-6"
+				label={
+					secondsLeft > 0
+						? t({ message: "Waking up workspace" })
+						: t({ message: "Still waking up…" })
+				}
+				detail={t({
+					message:
+						"This cloud workspace is waking up, which can take up to 30 seconds after it has been idle.",
+				})}
+				dialing
+				trailing={secondsLeft > 0 ? t({ message: `~${secondsLeft}s` }) : null}
+				onRetry={() =>
+					void queryClient.invalidateQueries({
+						queryKey: sandboxWakeQueryKey(workspaceId),
+					})
+				}
+			/>
 			<StoredChatTranscript
 				chatId={chatId}
 				pending={NO_PROMPTS}

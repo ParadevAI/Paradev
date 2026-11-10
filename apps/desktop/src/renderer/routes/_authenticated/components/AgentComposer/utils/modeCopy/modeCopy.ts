@@ -29,7 +29,7 @@ const APPROVE_FOR_ME: ModeCopy = {
 
 const FULL_ACCESS: ModeCopy = {
 	title: msg({ message: "Full access" }),
-	description: msg({ message: "Never asks before acting" }),
+	description: msg({ message: "Rarely asks before acting" }),
 	icon: FastForward,
 };
 

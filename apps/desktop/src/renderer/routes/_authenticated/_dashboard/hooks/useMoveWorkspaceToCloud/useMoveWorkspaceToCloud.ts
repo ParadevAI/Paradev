@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
 import type { MachineSize } from "@superset/shared/billing";
-import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -23,7 +22,6 @@ export type MoveToCloudStage = "saving" | "starting";
  */
 export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const { t } = useLingui();
-	const navigate = useNavigate();
 	const organizationId = useActiveOrganizationId();
 	const collections = useCollections();
 	const utils = cloudTrpc.useUtils();
@@ -43,11 +41,13 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			environment,
 			machineSize,
 			onStage,
+			onBegun,
 			signal,
 		}: {
 			environment: { id: string; repositoryFullName: string | null };
 			machineSize: MachineSize;
 			onStage: (stage: MoveToCloudStage) => void;
+			onBegun?: (workspaceMoveId: string) => void;
 			signal?: AbortSignal;
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
@@ -72,6 +72,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					fromWorkspaceId: workspace.id,
 					fromHostId: workspace.hostId,
 				});
+			onBegun?.(workspaceMoveId);
 			const source = getHostServiceClientByUrl(activeHostUrl);
 			const leaving: { chats: string[] } = { chats: [] };
 			const { prepared, created } = await keepMoveAlive({
@@ -105,7 +106,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					return { prepared, created };
 				},
 			}).catch(async (error: unknown) => {
-				await abandonWorkspaceMove(workspaceMoveId, error);
+				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 				await releaseSourceChats(source, leaving.chats);
 				throw error;
 			});
@@ -136,21 +137,12 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				rows ? [created, ...rows] : [created],
 			);
 			void utils.cloudWorkspace.list.invalidate();
-			await navigate({
-				to: "/v2-workspace/$workspaceId",
-				params: { workspaceId: created.id },
-			}).catch((error: unknown) => {
-				console.warn(
-					"[workspace-move] could not open the cloud workspace",
-					error,
-				);
-			});
 			return {
 				toWorkspaceId: created.id,
-				skipped: [
-					...prepared.skipped,
+				stayed: [
+					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
-				],
+				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
 			};
 		},
 		[
@@ -159,7 +151,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			t,
 			workspace,
 			utils,
-			navigate,
 			collections,
 			sourceRepository,
 		],

@@ -87,10 +87,16 @@ export const workspaceMoveRouter = {
 			if (!move || move.createdBy !== mover.userId) {
 				throw new TRPCError({ code: "NOT_FOUND", message: "Move not found" });
 			}
-			return callMoves(mover.organizationId, {
+			const { alive } = await callMoves(mover.organizationId, {
 				op: "touchWorkspaceMove",
 				id: input.workspaceMoveId,
-			}).then(({ alive }) => ({ alive }));
+			});
+			if (alive) return { alive, error: null };
+			const ended = await callMoves(mover.organizationId, {
+				op: "workspaceMove",
+				id: input.workspaceMoveId,
+			});
+			return { alive, error: ended.move?.error ?? null };
 		}),
 
 	/** The newest move out of or into a workspace, or null when it never moved. */
@@ -98,20 +104,26 @@ export const workspaceMoveRouter = {
 		.input(workspaceMoveOfWorkspaceInputSchema)
 		.query(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			const { move, chats } = await callMoves(mover.organizationId, {
-				op: "latestWorkspaceMove",
-				workspaceId: input.workspaceId,
-				createdBy: mover.userId,
-			});
+			const latestBy = (createdBy: string | null) =>
+				callMoves(mover.organizationId, {
+					op: "latestWorkspaceMove",
+					workspaceId: input.workspaceId,
+					createdBy,
+				});
+			let found = input.anyone ? await latestBy(null) : null;
+			if (!found?.move) found = await latestBy(mover.userId);
+			const { move, chats } = found;
 			if (!move) return null;
+			const isMine = move.createdBy === mover.userId;
 			return {
 				id: move.id,
+				isMine,
 				status: move.status,
-				error: move.error,
+				error: isMine ? move.error : null,
 				fromWorkspaceId: move.fromWorkspaceId,
 				toWorkspaceId: move.toWorkspaceId,
-				toHostId: move.toHostId,
-				branch: move.branch,
+				toHostId: isMine ? move.toHostId : null,
+				branch: isMine ? move.branch : null,
 				chats,
 				createdAt: move.createdAt,
 			};

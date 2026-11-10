@@ -19,7 +19,7 @@ export async function loadLatestChatHistory(
 	session: SelectChatSession,
 	page: { beforeSeq?: number; limit: number },
 ): Promise<{ events: StoredEvent[]; nextBeforeSeq: number | null }> {
-	const before = page.beforeSeq ?? Number.MAX_SAFE_INTEGER;
+	const { beforeSeq } = page;
 	const [items, turns] = await Promise.all([
 		db
 			.select({
@@ -31,7 +31,9 @@ export async function loadLatestChatHistory(
 			.where(
 				and(
 					eq(chatItems.sessionId, session.id),
-					lt(chatItems.firstSeq, before),
+					beforeSeq === undefined
+						? undefined
+						: lt(chatItems.firstSeq, beforeSeq),
 				),
 			)
 			.orderBy(desc(chatItems.firstSeq))
@@ -46,7 +48,9 @@ export async function loadLatestChatHistory(
 			.where(
 				and(
 					eq(chatTurns.sessionId, session.id),
-					lt(chatTurns.firstSeq, before),
+					beforeSeq === undefined
+						? undefined
+						: lt(chatTurns.firstSeq, beforeSeq),
 				),
 			)
 			.orderBy(desc(chatTurns.firstSeq))

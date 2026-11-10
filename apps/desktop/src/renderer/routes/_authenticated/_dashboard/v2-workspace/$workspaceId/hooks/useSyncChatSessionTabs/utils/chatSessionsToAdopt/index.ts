@@ -1,1 +1,4 @@
-export { chatSessionsToAdopt } from "./chatSessionsToAdopt";
+export {
+	chatSessionsToAdopt,
+	type ListedChatSession,
+} from "./chatSessionsToAdopt";

@@ -51,7 +51,7 @@ export function PortsDropdown({ align = "end" }: PortsDropdownProps) {
 						<button
 							type="button"
 							aria-label={t({
-								message: `Ports — ${totalPortCount} live`,
+								message: `Ports: ${totalPortCount} live`,
 							})}
 							className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground data-[state=open]:bg-fill-hover data-[state=open]:text-foreground"
 						>
