@@ -1,15 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure } from "../../../index";
-
-const PER_PAGE = 100;
-
-const ghBranchSchema = z.array(
-	z.object({
-		name: z.string(),
-		commit: z.object({ url: z.string() }).partial().optional(),
-	}),
-);
+import { listRemoteBranchNames } from "../utils/list-remote-branch-names";
 
 /**
  * Branches for a repo the user may not have checked out, read through `gh`
@@ -22,17 +14,19 @@ export const searchRemoteBranches = protectedProcedure
 		z.object({
 			owner: z.string().min(1),
 			repo: z.string().min(1),
-			query: z.string().optional(),
 		}),
 	)
 	.query(async ({ ctx, input }) => {
-		let raw: unknown;
+		let names: string[];
 		try {
-			raw = await ctx.execGh([
-				"api",
-				`repos/${input.owner}/${input.repo}/branches?per_page=${PER_PAGE}`,
-			]);
+			names = await listRemoteBranchNames(ctx.execGh, input.owner, input.repo);
 		} catch (error) {
+			if (error instanceof z.ZodError) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Unexpected branch payload from gh",
+				});
+			}
 			throw new TRPCError({
 				code: "PRECONDITION_FAILED",
 				message:
@@ -41,19 +35,5 @@ export const searchRemoteBranches = protectedProcedure
 			});
 		}
 
-		const parsed = ghBranchSchema.safeParse(raw);
-		if (!parsed.success) {
-			throw new TRPCError({
-				code: "INTERNAL_SERVER_ERROR",
-				message: "Unexpected branch payload from gh",
-			});
-		}
-
-		const needle = input.query?.trim().toLowerCase();
-		const items = parsed.data
-			.map((branch) => branch.name)
-			.filter((name) => (needle ? name.toLowerCase().includes(needle) : true))
-			.sort((a, b) => a.localeCompare(b));
-
-		return { items };
+		return { items: names.sort((a, b) => a.localeCompare(b)) };
 	});
