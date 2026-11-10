@@ -145,7 +145,7 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 				<Trans>No results</Trans>
 			</CommandEmpty>
 			{blocks.map((block) => block.node)}
-			{chatSearchEnabled && !parsed.commandsOnly && (
+			{chatSearchEnabled && showsCommands && !parsed.commandsOnly && (
 				<ChatSearchResults query={parsed.query} />
 			)}
 		</CommandList>
