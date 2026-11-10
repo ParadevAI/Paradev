@@ -69,4 +69,32 @@ describe("viewer GitHub on this machine", () => {
 		});
 		expect(tokensUsed).toEqual(["local-token"]);
 	});
+
+	test("a request that never reached GitHub is unavailable, not a server bug", async () => {
+		const failWith = (error: Error) =>
+			caller("local-token", {
+				graphql: (async () => {
+					throw error;
+				}) as unknown as Octokit["graphql"],
+				request: (async () => {
+					throw error;
+				}) as unknown as Octokit["request"],
+			}).call.getPullRequestDetail({ repoFullName: "acme/widgets", number: 7 });
+
+		const reset = Object.assign(new Error("read ECONNRESET"), {
+			code: "ECONNRESET",
+		});
+		await expect(
+			failWith(
+				Object.assign(new Error("read ECONNRESET"), {
+					status: 500,
+					cause: new TypeError("fetch failed", { cause: reset }),
+				}),
+			),
+		).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
+
+		await expect(
+			failWith(Object.assign(new Error("Server Error"), { status: 500 })),
+		).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR" });
+	});
 });
