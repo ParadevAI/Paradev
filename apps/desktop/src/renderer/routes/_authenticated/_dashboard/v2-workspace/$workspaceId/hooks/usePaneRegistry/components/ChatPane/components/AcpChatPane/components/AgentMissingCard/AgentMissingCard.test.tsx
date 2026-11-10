@@ -41,4 +41,19 @@ describe("AgentMissingCard", () => {
 		).toBeNull();
 		expect(screen.queryByText("Details")).toBeNull();
 	});
+
+	test("offers Try again straight away when the agent was installed elsewhere", () => {
+		render(
+			<AgentMissingCard
+				agent="claude"
+				installed
+				otherAgents={[]}
+				onUseAgent={() => {}}
+				onRetry={() => {}}
+			/>,
+		);
+		expect(screen.getByText("Claude Code is installed")).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+		expect(screen.queryByRole("button", { name: "Install" })).toBeNull();
+	});
 });

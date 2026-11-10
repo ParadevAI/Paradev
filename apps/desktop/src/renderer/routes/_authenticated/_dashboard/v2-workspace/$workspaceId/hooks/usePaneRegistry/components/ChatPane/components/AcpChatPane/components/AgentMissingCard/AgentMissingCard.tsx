@@ -19,6 +19,8 @@ interface AgentMissingCardProps {
 	agent: CodingAgentId;
 	/** The raw error, kept behind Details. */
 	detail?: string | undefined;
+	/** Installed elsewhere, from Settings say, while this chat waited. */
+	installed?: boolean;
 	otherAgents: Array<{ presetId: string; label: string }>;
 	onUseAgent: (presetId: string) => void;
 	onRetry: () => void;
@@ -28,14 +30,16 @@ interface AgentMissingCardProps {
 export function AgentMissingCard({
 	agent,
 	detail,
+	installed = false,
 	otherAgents,
 	onUseAgent,
 	onRetry,
 }: AgentMissingCardProps) {
 	const name = CODING_AGENT_NAMES[agent];
-	const [phase, setPhase] = useState<"missing" | "installing" | "installed">(
-		"missing",
-	);
+	const [picked, setPhase] = useState<
+		"missing" | "installing" | "installed" | null
+	>(null);
+	const phase = picked ?? (installed ? "installed" : "missing");
 
 	return (
 		<div className="flex h-full w-full items-center justify-center p-8">
