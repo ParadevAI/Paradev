@@ -52,6 +52,7 @@ export function SidebarCardSlot({
 				>
 					<SidebarCard
 						badge={entry.badge}
+						tone={entry.tone}
 						title={entry.title}
 						description={entry.description}
 						actionLabel={entry.actionLabel}

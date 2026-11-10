@@ -59,7 +59,11 @@ export function PluginCard({
 			}}
 			className="flex cursor-pointer items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-fill-hover"
 		>
-			<PluginIcon pluginName={plugin.name} />
+			<PluginIcon
+				pluginName={plugin.name}
+				icon={plugin.interface.icon}
+				iconUrl={plugin.iconUrl}
+			/>
 			<div className="min-w-0 flex-1">
 				<div className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-foreground">
 					{/* Truncates so the badges and status keep their width; without

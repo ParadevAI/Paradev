@@ -670,7 +670,7 @@ export function PullRequestActions({
 								<Trans>
 									"{data.title}" will be merged into {data.base.ref} via{" "}
 									{mergeMethodLabels[pendingAction.method]}. Checks haven't
-									passed yet — this overrides them. This can't be undone from
+									passed yet, so this overrides them. This can't be undone from
 									here.
 								</Trans>
 							) : pendingAction?.kind === "merge" ? (

@@ -4,12 +4,13 @@ import {
 	type WorkspaceState,
 	type WorkspaceStore,
 } from "@superset/panes";
+import { type LinkTierMap, tierFor } from "renderer/lib/clickPolicy";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../../../types";
 import {
 	runChatPullRequestLink,
 	runUrlLinkAction,
-	terminalPullRequestLinkAction,
+	terminalUrlLinkAction,
 } from "./runTerminalLinkAction";
 
 const PR_URL = "https://github.com/superset-sh/superset/pull/8412";
@@ -112,9 +113,10 @@ describe("runUrlLinkAction", () => {
 			expect(panesOfKind(store, "pull-request")).toHaveLength(0);
 			expect(panesOfKind(store, "browser")).toHaveLength(1);
 			expect(
-				terminalPullRequestLinkAction(
+				terminalUrlLinkAction(
 					{ metaKey: false, ctrlKey: false, shiftKey: false },
 					url,
+					() => null,
 				),
 			).toBeNull();
 		}
@@ -180,22 +182,43 @@ describe("runChatPullRequestLink", () => {
 	});
 });
 
-describe("terminalPullRequestLinkAction", () => {
+describe("terminalUrlLinkAction", () => {
 	const click = { metaKey: false, ctrlKey: false, shiftKey: false };
+	const FILES_URL = `${PR_URL}/files`;
+	const unbound = () => null;
+	const external = () => "external" as const;
+	const DEFAULT_URL_LINKS: LinkTierMap = {
+		plain: null,
+		shift: "newTab",
+		meta: "pane",
+		metaShift: "external",
+	};
+	const defaultMap = (event: typeof click) =>
+		DEFAULT_URL_LINKS[tierFor(event, "4-tier")];
 
-	it("opens the PR pane on plain click and the system browser on shift-click", () => {
-		expect(terminalPullRequestLinkAction(click, PR_URL)).toBe("pane");
-		expect(
-			terminalPullRequestLinkAction({ ...click, shiftKey: true }, PR_URL),
-		).toBe("external");
+	it("opens the PR pane on a plain click the user left unbound", () => {
+		expect(terminalUrlLinkAction(click, PR_URL, unbound)).toBe("pane");
+		expect(terminalUrlLinkAction(click, PR_URL, defaultMap)).toBe("pane");
 	});
 
-	it("leaves cmd-clicks and non-PR URLs to the URL link settings", () => {
-		expect(
-			terminalPullRequestLinkAction({ ...click, metaKey: true }, PR_URL),
-		).toBeNull();
-		expect(
-			terminalPullRequestLinkAction(click, "https://github.com/a/b/issues/1"),
-		).toBeNull();
+	it("opens the system browser on shift-click whatever the map says", () => {
+		const shift = { ...click, shiftKey: true };
+		expect(terminalUrlLinkAction(shift, PR_URL, defaultMap)).toBe("external");
+		expect(terminalUrlLinkAction(shift, PR_URL, unbound)).toBe("external");
+	});
+
+	it("follows a bound plain click for a bare PR URL", () => {
+		expect(terminalUrlLinkAction(click, PR_URL, external)).toBe("external");
+	});
+
+	it("leaves cmd-clicks and non-bare URLs to the URL link settings", () => {
+		const meta = { ...click, metaKey: true };
+		const ctrl = { ...click, ctrlKey: true };
+		expect(terminalUrlLinkAction(meta, PR_URL, unbound)).toBeNull();
+		expect(terminalUrlLinkAction(ctrl, PR_URL, unbound)).toBeNull();
+		expect(terminalUrlLinkAction(meta, PR_URL, defaultMap)).toBe("pane");
+		expect(terminalUrlLinkAction(ctrl, PR_URL, defaultMap)).toBe("pane");
+		expect(terminalUrlLinkAction(click, FILES_URL, unbound)).toBeNull();
+		expect(terminalUrlLinkAction(click, FILES_URL, external)).toBe("external");
 	});
 });

@@ -271,7 +271,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<TooltipContent side="right" sideOffset={8}>
 								<p className="text-xs font-medium">
 									<Trans>
-										PR #{pullRequest.number} —{" "}
+										PR #{pullRequest.number} ·{" "}
 										{i18n._(PR_STATE_LABEL[pullRequest.state])}
 									</Trans>
 								</p>

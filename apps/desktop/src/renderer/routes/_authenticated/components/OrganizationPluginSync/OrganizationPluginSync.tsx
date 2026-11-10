@@ -23,7 +23,11 @@ function SyncOnCatalogChange() {
 	const [attempt, setAttempt] = useState(0);
 	const machineUtils = electronTrpc.useUtils();
 	const { mutate: sync } = electronTrpc.plugins.sync.useMutation({
-		onSettled: () => machineUtils.plugins.organizationVersions.invalidate(),
+		onSettled: () =>
+			Promise.all([
+				machineUtils.plugins.organizationVersions.invalidate(),
+				machineUtils.plugins.installedIcons.invalidate(),
+			]),
 		onSuccess: () => setFailures(0),
 		onError: () => {
 			lastSyncedKey = null;

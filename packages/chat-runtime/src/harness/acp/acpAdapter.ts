@@ -46,6 +46,7 @@ import {
 	airAsyncTaskSpawnedSchema,
 	airAsyncTaskStateSchema,
 	airForkPointMeta,
+	airPermissionReason,
 	airSubagentSpawnedSchema,
 	airSubagentStateSchema,
 	isCompactionCall,
@@ -2157,6 +2158,7 @@ export class AcpAdapter implements HarnessAdapter {
 			parsed.data.subject?.toolCall?.title ??
 			"Permission required";
 		const description = parsed.data.description;
+		const reason = airPermissionReason(request.params);
 		const asking = [...this.main.allToolCalls()].some(
 			(call) => call.status === "running" && call.title === "ask_user_question",
 		);
@@ -2194,6 +2196,7 @@ export class AcpAdapter implements HarnessAdapter {
 			...(description && description !== title
 				? { detail: [{ type: "text" as const, text: description }] }
 				: {}),
+			...(reason ? { reason } : {}),
 			status: "pending",
 			startedAtMs: this.nextStartMs(),
 			...(question

@@ -7,6 +7,7 @@ import {
 } from "../../../projects/local-project-store";
 import { restoreProject } from "../../../projects/project-deletion";
 import type { HostServiceContext } from "../../../types";
+import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { persistLocalProject } from "./utils/persist-project";
 import {
 	adoptLocalRepo,
@@ -30,6 +31,15 @@ function dirNameForEmpty(name: string): string {
 		});
 	}
 	return slug;
+}
+
+async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
+	try {
+		return await work;
+	} catch (err) {
+		rethrowEnvironmentalGitError(err);
+		throw err;
+	}
 }
 
 export interface CreateResult {
@@ -151,9 +161,8 @@ export async function createFromEmpty(
 	ctx: HostServiceContext,
 	args: { name: string; parentDir: string },
 ): Promise<CreateResult> {
-	const resolved = await initEmptyRepo(
-		args.parentDir,
-		dirNameForEmpty(args.name),
+	const resolved = await classifyGitFailure(
+		initEmptyRepo(args.parentDir, dirNameForEmpty(args.name)),
 	);
 	return persistFromResolved(ctx, {
 		name: args.name,
@@ -171,11 +180,13 @@ export async function createFromTemplate(
 	ctx: HostServiceContext,
 	args: { name: string; parentDir: string; url: string },
 ): Promise<CreateResult> {
-	const resolved = await cloneTemplateInto(
-		args.url,
-		args.parentDir,
-		dirNameForEmpty(args.name),
-		ctx.credentials,
+	const resolved = await classifyGitFailure(
+		cloneTemplateInto(
+			args.url,
+			args.parentDir,
+			dirNameForEmpty(args.name),
+			ctx.credentials,
+		),
 	);
 	return persistFromResolved(ctx, {
 		name: args.name,

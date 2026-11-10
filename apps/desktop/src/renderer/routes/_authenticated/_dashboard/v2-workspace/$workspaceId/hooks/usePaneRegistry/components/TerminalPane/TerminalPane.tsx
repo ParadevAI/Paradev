@@ -31,6 +31,7 @@ import {
 	type ConnectionState,
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRevealInFinder";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -53,7 +54,7 @@ import {
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
-	terminalPullRequestLinkAction,
+	terminalUrlLinkAction,
 } from "../../utils/runTerminalLinkAction";
 import { AttachmentLimitError } from "../../utils/sendAttachmentsToWorkspace";
 import { LinkActionMenu } from "./components/LinkActionMenu";
@@ -382,9 +383,7 @@ export function TerminalPane({
 					);
 				},
 				onUrlClick: (event, url) => {
-					const action =
-						terminalPullRequestLinkAction(event, url) ??
-						getUrlAction(event, url);
+					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
 						if (tierFor(event, "4-tier") === "plain") {
 							event.preventDefault();
@@ -529,8 +528,9 @@ export function TerminalPane({
 		{ enabled: ctx.isActive },
 	);
 
+	const findEnabled = usePaneHotkeyEnabled(ctx.isActive);
 	useHotkey("FIND_IN_TERMINAL", () => setIsSearchOpen((prev) => !prev), {
-		enabled: ctx.isActive,
+		enabled: findEnabled,
 		preventDefault: true,
 	});
 
@@ -737,9 +737,7 @@ function resolveHoverLabel(
 		shiftKey: hovered.shift,
 	};
 	if (hovered.info.kind === "url") {
-		const action =
-			terminalPullRequestLinkAction(event, hovered.info.url) ??
-			getUrlAction(event, hovered.info.url);
+		const action = terminalUrlLinkAction(event, hovered.info.url, getUrlAction);
 		return action ? actionLabel(action, "url") : null;
 	}
 	if (hovered.info.isDirectory) {

@@ -21,6 +21,7 @@ import { PortForwardsProvider } from "renderer/routes/_authenticated/_dashboard/
 import { WorkspaceSidebarPanel } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
 import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
+import { useResumeMovesToThisComputer } from "renderer/routes/_authenticated/_dashboard/hooks/useResumeMovesToThisComputer";
 import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
@@ -138,6 +139,7 @@ function DashboardLayout() {
 	const { machineId: localMachineId } = useLocalHostService();
 	const openNewWorkspaceInViewedProject = useOpenNewWorkspaceInViewedProject();
 	useWorkspaceNamingFailedToast();
+	useResumeMovesToThisComputer();
 	// Forwarding needs port data only for a workspace on another machine;
 	// a local selection must not switch on cross-host port polling.
 	// machineId is "" until the device query answers; treat unknown as local

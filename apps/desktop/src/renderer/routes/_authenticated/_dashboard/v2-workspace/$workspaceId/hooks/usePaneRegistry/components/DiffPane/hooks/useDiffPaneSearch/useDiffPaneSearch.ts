@@ -7,6 +7,7 @@ import type { CodeViewHandle } from "@pierre/diffs/react";
 import type { RefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkey } from "renderer/hotkeys";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { getDiffSearchRoots } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/utils/diffRendererRoots";
 import type { UseTextSearchReturn } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/hooks";
 import {
@@ -415,6 +416,7 @@ export function useDiffPaneSearch({
 		}
 	}, [paneId]);
 
+	const findEnabled = usePaneHotkeyEnabled(isActive);
 	useHotkey(
 		"FIND_IN_CHANGES",
 		() => {
@@ -424,7 +426,7 @@ export function useDiffPaneSearch({
 			}
 			setIsSearchOpen(true);
 		},
-		{ enabled: isActive, preventDefault: true },
+		{ enabled: findEnabled, preventDefault: true },
 	);
 
 	return {

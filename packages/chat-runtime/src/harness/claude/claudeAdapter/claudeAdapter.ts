@@ -15,6 +15,12 @@ import type {
 	HarnessStartOptions,
 	ResolveAttachment,
 } from "../../types";
+import {
+	type AskedQuestion,
+	answeredInput,
+	askedQuestions,
+	questionForm,
+} from "../askUserQuestion";
 import { ClaudeTranslator } from "../translateStream";
 
 type SdkParams = Parameters<typeof sdkQuery>[0];
@@ -88,6 +94,8 @@ type PendingApproval = {
 	toolUseId: string;
 	turnId: string;
 	input: Record<string, unknown>;
+	reason: string | undefined;
+	questions: AskedQuestion[] | undefined;
 	settle: (result: PermissionResult) => void;
 };
 
@@ -270,8 +278,8 @@ export class ClaudeAdapter implements HarnessAdapter {
 				allowDangerouslySkipPermissions: true,
 				abortController: this.abortController,
 				resume: startOptions.resume?.harnessSessionId,
-				canUseTool: (_toolName, input, { toolUseID }) =>
-					this.requestApproval(input, toolUseID),
+				canUseTool: (toolName, input, { toolUseID, decisionReason }) =>
+					this.requestApproval(toolName, input, toolUseID, decisionReason),
 			},
 		});
 
@@ -350,7 +358,14 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (!pending) return;
 		this.approvals.delete(approvalId);
 
-		if (decision.type === "accept" || decision.type === "accept_for_session") {
+		if (pending.questions) {
+			pending.settle(
+				questionResult(pending.input, pending.questions, decision),
+			);
+		} else if (
+			decision.type === "accept" ||
+			decision.type === "accept_for_session"
+		) {
 			pending.settle({ behavior: "allow", updatedInput: pending.input });
 		} else {
 			this.translator?.markDeclined(pending.toolUseId);
@@ -460,13 +475,24 @@ export class ClaudeAdapter implements HarnessAdapter {
 	}
 
 	private requestApproval(
+		toolName: string,
 		input: Record<string, unknown>,
 		toolUseId: string,
+		decisionReason: string | undefined,
 	): Promise<PermissionResult> {
+		const questions =
+			toolName === "AskUserQuestion" ? askedQuestions(input) : undefined;
+		if (questions === null) {
+			return Promise.resolve({
+				behavior: "deny",
+				message: "AskUserQuestion called with no valid questions.",
+			});
+		}
+		const reason = questions ? undefined : decisionReason?.trim() || undefined;
 		const approvalId = this.mintId();
 		const turnId = this.translator?.currentTurnId ?? "unattributed";
 		return new Promise<PermissionResult>((settle) => {
-			const pending = { toolUseId, turnId, input, settle };
+			const pending = { toolUseId, turnId, input, reason, questions, settle };
 			this.approvals.set(approvalId, pending);
 			this.emitApproval(approvalId, pending, "pending");
 			this.events.push({
@@ -478,17 +504,20 @@ export class ClaudeAdapter implements HarnessAdapter {
 
 	private emitApproval(
 		approvalId: string,
-		{ toolUseId, turnId }: PendingApproval,
+		{ toolUseId, turnId, reason, questions }: PendingApproval,
 		status: ApprovalRequest["status"],
 		decision?: Decision,
 	): void {
+		const form = questions ? questionForm(questions) : undefined;
 		const item: ApprovalRequest = {
 			id: approvalId,
 			kind: "approval_request",
 			startedAtMs: this.now(),
 			...(status === "pending" ? {} : { completedAtMs: this.now() }),
 			targetItemId: toolUseId,
-			title: "Allow this tool call?",
+			title: form?.message ?? "Allow this tool call?",
+			...(form ? { form } : {}),
+			...(reason ? { reason } : {}),
 			status,
 			...(decision ? { decision } : {}),
 		};
@@ -502,4 +531,21 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private mintId(): string {
 		return (this.options.mintId ?? randomUUID)();
 	}
+}
+
+function questionResult(
+	input: Record<string, unknown>,
+	questions: AskedQuestion[],
+	decision: Decision,
+): PermissionResult {
+	if (decision.type === "cancel") {
+		return { behavior: "deny", message: "User canceled.", interrupt: true };
+	}
+	return {
+		behavior: "allow",
+		updatedInput:
+			decision.type === "form"
+				? answeredInput(input, questions, decision.values)
+				: { ...input, answers: {} },
+	};
 }

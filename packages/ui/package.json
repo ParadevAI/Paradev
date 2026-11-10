@@ -37,8 +37,8 @@
 	},
 	"dependencies": {
 		"@hookform/resolvers": "5.2.2",
-		"@lingui/core": "6.8.0",
-		"@lingui/react": "6.8.0",
+		"@lingui/core": "6.12.0",
+		"@lingui/react": "6.12.0",
 		"@paper-design/shaders-react": "0.0.77",
 		"@radix-ui/react-accordion": "1.2.12",
 		"@radix-ui/react-alert-dialog": "1.1.15",
@@ -102,7 +102,9 @@
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
-		"@lingui/babel-plugin-lingui-macro": "6.8.0",
+		"@babel/core": "7.29.7",
+		"@lingui/babel-plugin-lingui-macro": "6.12.0",
+		"@rolldown/plugin-babel": "0.3.0",
 		"@storybook/react-vite": "10.6.2",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/postcss": "4.2.2",
@@ -111,14 +113,14 @@
 		"@types/node": "24.12.0",
 		"@types/react": "19.3.0",
 		"@types/react-dom": "19.2.3",
-		"@vitejs/plugin-react": "5.2.0",
+		"@vitejs/plugin-react": "6.2.1",
 		"react": "19.3.0",
 		"react-dom": "19.3.0",
 		"shadcn": "4.16.2",
 		"storybook": "10.6.2",
 		"tailwindcss": "4.2.2",
 		"typescript": "7.0.2",
-		"vite": "7.3.7"
+		"vite": "8.3.6"
 	},
 	"peerDependencies": {
 		"react": "19.3.0"

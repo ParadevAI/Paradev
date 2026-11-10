@@ -7,7 +7,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
-import { type LiveChat, listLiveChats } from "./utils/listLiveChats";
+import { listOpenChats, type OpenChat } from "./utils/listOpenChats";
 
 export interface TerminalsHost {
 	organizationId: string;
@@ -52,6 +52,8 @@ export interface TerminalRowData {
 	/** Specific agent definition (a custom config id, or the preset id). */
 	definitionId: string | null;
 	attention: TerminalAttention | null;
+	/** Set on chat rows: a finished chat resumes its agent session when opened. */
+	chat?: { live: boolean; harness: string; harnessSessionId: string | null };
 }
 
 const TERMINALS_REFETCH_INTERVAL_MS = 5_000;
@@ -66,7 +68,7 @@ export function getHostTerminalsQueryKey(machineId: string | null) {
  * when the seen mark catches up to the binding's lastEventAt.
  */
 function chatAttention(
-	chat: LiveChat,
+	chat: OpenChat,
 	lastSeenAt: number | undefined,
 ): TerminalAttention | null {
 	switch (chat.status) {
@@ -159,8 +161,8 @@ export function useHostsTerminals(
 					client.terminal.list.query({}),
 					client.terminalAgents.list.query(),
 					// A host without chat, or one too old to serve it, has no chats.
-					listLiveChats(getChatTransport(host.hostUrl)).catch(
-						(): LiveChat[] => [],
+					listOpenChats(getChatTransport(host.hostUrl)).catch(
+						(): OpenChat[] => [],
 					),
 				]);
 				return { sessions: listed.sessions, bindings, chats };
@@ -237,6 +239,11 @@ export function useHostsTerminals(
 					agentId,
 					definitionId: agentId,
 					attention,
+					chat: {
+						live: chat.live,
+						harness: chat.harness,
+						harnessSessionId: chat.harnessSessionId,
+					},
 				};
 				const group = terminalsByWorkspace.get(chat.workspaceId);
 				if (group) group.push(row);

@@ -133,10 +133,10 @@ export function SignedInSitesSubmenu() {
 										title={
 											cookieCount === 1
 												? t({
-														message: "1 cookie — forget this site",
+														message: "1 cookie · Forget this site",
 													})
 												: t({
-														message: `${cookieCount} cookies — forget this site`,
+														message: `${cookieCount} cookies · Forget this site`,
 													})
 										}
 										className="shrink-0 rounded p-0.5 text-muted-foreground/60 transition-colors hover:text-foreground"
@@ -148,7 +148,7 @@ export function SignedInSitesSubmenu() {
 							{matches.length > VISIBLE_LIMIT && (
 								<div className="px-2 py-1.5 text-xs text-muted-foreground/60">
 									<Trans>
-										{matches.length - VISIBLE_LIMIT} more — refine your search
+										{matches.length - VISIBLE_LIMIT} more. Refine your search
 									</Trans>
 								</div>
 							)}

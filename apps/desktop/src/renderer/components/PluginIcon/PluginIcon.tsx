@@ -1,4 +1,5 @@
 import { cn } from "@superset/ui/utils";
+import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
@@ -108,11 +109,29 @@ export function getPluginIconUrl(
 
 interface PluginIconProps {
 	pluginName: string;
+	/** The manifest's `interface.icon`: a built-in icon key, used when the name has none. */
+	icon?: string;
+	/** Artwork the plugin ships in its own tree, used when no built-in icon matches. */
+	iconUrl?: string | null;
 	className?: string;
 }
 
-export function PluginIcon({ pluginName, className }: PluginIconProps) {
+function builtInKey(pluginName: string, icon: string | undefined) {
+	const known = (key: string) =>
+		Object.hasOwn(IMAGE_ICONS, key) || Object.hasOwn(PLUGIN_ICONS, key);
+	if (known(pluginName)) return pluginName;
+	if (icon !== undefined && known(icon)) return icon;
+	return undefined;
+}
+
+export function PluginIcon({
+	pluginName,
+	icon,
+	iconUrl,
+	className,
+}: PluginIconProps) {
 	const supersetIcon = usePresetIcon("superset");
+	const [brokenUrl, setBrokenUrl] = useState<string | null>(null);
 	const size = className ?? "size-9";
 
 	if (pluginName === "superset") {
@@ -125,8 +144,11 @@ export function PluginIcon({ pluginName, className }: PluginIconProps) {
 		);
 	}
 
-	const imageIcon = ownEntry(IMAGE_ICONS, pluginName);
-	const entry = ownEntry(PLUGIN_ICONS, pluginName);
+	const key = builtInKey(pluginName, icon);
+	const candidate =
+		key !== undefined ? ownEntry(IMAGE_ICONS, key) : iconUrl || undefined;
+	const imageIcon = candidate !== brokenUrl ? candidate : undefined;
+	const entry = key !== undefined ? ownEntry(PLUGIN_ICONS, key) : undefined;
 	const Icon = entry?.icon ?? LuPuzzle;
 	return (
 		<div
@@ -139,6 +161,7 @@ export function PluginIcon({ pluginName, className }: PluginIconProps) {
 				<img
 					src={imageIcon}
 					alt=""
+					onError={() => setBrokenUrl(imageIcon)}
 					className="size-3/5 object-contain @max-[1.5rem]:size-5/6"
 				/>
 			) : (

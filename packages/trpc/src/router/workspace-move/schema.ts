@@ -27,6 +27,8 @@ export const abandonWorkspaceMoveInputSchema = z.object({
 
 export const workspaceMoveOfWorkspaceInputSchema = z.object({
 	workspaceId: z.string().uuid(),
+	/** The newest move by anyone in the organization, not only the caller's. */
+	anyone: z.boolean().optional(),
 });
 
 export const workspaceMoveHeartbeatInputSchema = z.object({

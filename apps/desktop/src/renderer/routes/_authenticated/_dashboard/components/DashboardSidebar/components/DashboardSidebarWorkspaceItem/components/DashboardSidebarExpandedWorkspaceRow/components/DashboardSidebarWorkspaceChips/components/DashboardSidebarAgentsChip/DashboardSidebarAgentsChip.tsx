@@ -75,14 +75,14 @@ export function DashboardSidebarAgentsChip({
 							isOpen
 								? t({
 										message: plural(agents.length, {
-											one: "# running agent — hide details",
-											other: "# running agents — hide details",
+											one: "# running agent: hide details",
+											other: "# running agents: hide details",
 										}),
 									})
 								: t({
 										message: plural(agents.length, {
-											one: "# running agent — show details",
-											other: "# running agents — show details",
+											one: "# running agent: show details",
+											other: "# running agents: show details",
 										}),
 									}),
 							subagentCount > 0

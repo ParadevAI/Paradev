@@ -60,6 +60,7 @@ describe("claudeTeleportProvider", () => {
 			locate: async () => mainFile,
 			stageDir,
 		});
+		if (!manifest) throw new Error("expected a manifest");
 		await claudeTeleportProvider.place({
 			manifest,
 			worktreePath: box,
@@ -81,6 +82,20 @@ describe("claudeTeleportProvider", () => {
 			"utf8",
 		);
 		expect(JSON.parse(subagent).cwd).toBe(box);
+	});
+
+	test("collects nothing for a chat whose agent has not written its session", async () => {
+		const stageDir = join(root, "stage");
+		mkdirSync(stageDir);
+		expect(
+			await claudeTeleportProvider.collect({
+				harnessSessionId: SESSION,
+				worktreePath: root,
+				env: { CLAUDE_CONFIG_DIR: join(root, "claude") },
+				locate: async () => null,
+				stageDir,
+			}),
+		).toBeNull();
 	});
 
 	test("refuses a session id that would leave Claude's session directory", async () => {

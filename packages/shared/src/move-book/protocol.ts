@@ -114,8 +114,19 @@ export type MoveBookRequest =
 	| { op: "retry"; workspaceMoveId: string; chat: NewChatMove }
 	| { op: "workspaceMove"; id: string }
 	| { op: "chatMove"; id: string }
-	| { op: "latestWorkspaceMove"; workspaceId: string; createdBy: string }
-	| { op: "latestChatMove"; sessionId: string; createdBy: string }
+	| {
+			op: "latestWorkspaceMove";
+			workspaceId: string;
+			/** Null for the newest move by anyone. */
+			createdBy: string | null;
+	  }
+	| {
+			op: "latestChatMove";
+			sessionId: string;
+			/** Null for the newest move by anyone. */
+			createdBy: string | null;
+	  }
+	| { op: "waitingOnHost"; toHostId: string; createdBy: string }
 	| {
 			op: "chatMoving";
 			sessionId: string;
@@ -156,6 +167,7 @@ type Replies = {
 	finish: { finished: boolean };
 	fail: Record<never, never>;
 	pendingInto: { ids: string[] };
+	waitingOnHost: { ids: string[] };
 	finishInto: Record<never, never>;
 	failInto: Record<never, never>;
 };

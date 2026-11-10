@@ -553,6 +553,20 @@ export const HOTKEYS_REGISTRY = {
 			message: "Search text in the changes diff",
 		}),
 	},
+	FIND_IN_PAGE: {
+		key: {
+			mac: L("meta+f"),
+			windows: L("ctrl+shift+f"),
+			linux: L("ctrl+shift+f"),
+		},
+		label: msg({
+			message: "Find in Page",
+		}),
+		category: "Navigation",
+		description: msg({
+			message: "Search text in the active page",
+		}),
+	},
 	NEW_GROUP: {
 		key: {
 			mac: L("meta+t"),

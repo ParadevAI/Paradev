@@ -9,7 +9,21 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
  * starts. Any failure is reported, so the move shows as failed and the chat
  * stays where it was. A move another run already claimed is left to it.
  */
-export async function runMoveOnComputer({
+export function runMoveOnComputer(args: {
+	moveId: string;
+	host: HostServiceClient;
+}): Promise<void> {
+	const running = runningMoves.get(args.moveId);
+	if (running) return running;
+	const run = carryOut(args).finally(() => runningMoves.delete(args.moveId));
+	runningMoves.set(args.moveId, run);
+	return run;
+}
+
+/** The pane, the workspace move and the boot pickup may all start the same move. */
+const runningMoves = new Map<string, Promise<void>>();
+
+async function carryOut({
 	moveId,
 	host,
 }: {
