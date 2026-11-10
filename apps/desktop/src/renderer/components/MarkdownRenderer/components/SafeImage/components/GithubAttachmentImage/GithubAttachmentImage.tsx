@@ -19,7 +19,7 @@ export function GithubAttachmentImage({
 	const signed = electronTrpc.viewerGithub.getAttachmentUrl.useQuery(
 		{ url },
 		{
-			staleTime: SIGNED_URL_FRESH_MS,
+			staleTime: (query) => (query.state.data?.url ? SIGNED_URL_FRESH_MS : 0),
 			gcTime: SIGNED_URL_FRESH_MS,
 			retry: false,
 			refetchOnWindowFocus: false,

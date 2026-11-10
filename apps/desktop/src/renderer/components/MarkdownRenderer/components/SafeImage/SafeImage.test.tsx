@@ -22,7 +22,11 @@ const ATTACHMENT =
 	"https://github.com/user-attachments/assets/eba1526e-7388-4ed6-b058-c2ffcca091dd";
 const SIGNED = "https://signed.example/shot.png";
 
-function renderImage(src: string, signedUrl: string | null) {
+function renderImage(
+	src: string,
+	signedUrl: string | null,
+	queryClient = new QueryClient(),
+) {
 	const asked: unknown[] = [];
 	const link: TRPCLink<AppRouter> = () => (call) =>
 		observable((observer) => {
@@ -33,7 +37,7 @@ function renderImage(src: string, signedUrl: string | null) {
 	const view = render(
 		<electronTrpc.Provider
 			client={electronTrpc.createClient({ links: [link] })}
-			queryClient={new QueryClient()}
+			queryClient={queryClient}
 		>
 			<SafeImage src={src} alt="shot" />
 		</electronTrpc.Provider>,
@@ -59,6 +63,20 @@ describe("SafeImage on the web", () => {
 		const { view } = renderImage(ATTACHMENT, null);
 		fireEvent.error(view.getByAltText("shot"));
 		await waitFor(() => view.getByText("Could not load image"));
+	});
+
+	test("after a lookup finds no login, the next mount asks again", async () => {
+		const queryClient = new QueryClient();
+		const before = renderImage(ATTACHMENT, null, queryClient);
+		fireEvent.error(before.view.getByAltText("shot"));
+		await waitFor(() => before.view.getByText("Could not load image"));
+		before.view.unmount();
+
+		const after = renderImage(ATTACHMENT, SIGNED, queryClient);
+		fireEvent.error(after.view.getByAltText("shot"));
+		await waitFor(() =>
+			expect(after.view.getByAltText("shot").getAttribute("src")).toBe(SIGNED),
+		);
 	});
 
 	test("any other web image that fails shows the placeholder without asking GitHub", async () => {
