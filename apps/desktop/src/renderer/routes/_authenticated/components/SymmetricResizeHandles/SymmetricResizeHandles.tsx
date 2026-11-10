@@ -32,6 +32,17 @@ export function SymmetricResizeHandles({
 	const lastWidthRef = useRef<number | null>(null);
 	const handleRef = useRef<HTMLDivElement>(null);
 	const [renderedWidth, setRenderedWidth] = useState<number | null>(null);
+	const onWidthCommitRef = useRef(onWidthCommit);
+	onWidthCommitRef.current = onWidthCommit;
+
+	useEffect(
+		() => () => {
+			if (dragRef.current && lastWidthRef.current !== null) {
+				onWidthCommitRef.current(lastWidthRef.current);
+			}
+		},
+		[],
+	);
 
 	useEffect(() => {
 		const parent = handleRef.current?.parentElement;
