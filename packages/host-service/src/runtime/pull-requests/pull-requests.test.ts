@@ -1627,6 +1627,55 @@ describe("default-branch guard", () => {
 		expect(getWorkspace(db, "ws-main")?.pullRequestId).toBeNull();
 	});
 
+	test("drops a merged head=main PR from the default-branch workspace's link history", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-promote",
+			prNumber: 350,
+			headBranch: "main",
+			headSha: "old-main-sha",
+			title: "getting staging up to date",
+			state: "merged",
+		});
+		seedWorkspace(db, {
+			id: "ws-main",
+			branch: "main",
+			headSha: "main-sha",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "main",
+			pullRequestId: "pr-promote",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({
+				workspaceId: "ws-main",
+				pullRequestId: "pr-promote",
+				linkedAt: 1,
+			})
+			.run();
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({
+				main: makePrNode({
+					number: 350,
+					headRef: "main",
+					headSha: "old-main-sha",
+					title: "getting staging up to date",
+					state: "closed",
+					mergedAt: "2026-01-05T10:00:00Z",
+				}),
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-main"]);
+
+		const history = await manager.getPullRequestHistoryByWorkspaces([
+			"ws-main",
+		]);
+		expect(history[0]?.pullRequests).toEqual([]);
+	});
+
 	test("still links a fork PR whose head branch is named main", async () => {
 		const db = createRealDb();
 		seedProject(db);

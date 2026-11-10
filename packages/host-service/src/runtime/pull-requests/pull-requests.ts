@@ -672,6 +672,25 @@ export class PullRequestRuntimeManager {
 		for (const listener of this.linkListeners) listener();
 	}
 
+	// Only for links that were never the workspace's work, such as a past
+	// promotion PR linked before the default-branch rule existed.
+	private forgetWorkspacePullRequestLink(
+		workspaceId: string,
+		pullRequestId: string,
+	): void {
+		const { changes } = this.db
+			.delete(workspacePullRequests)
+			.where(
+				and(
+					eq(workspacePullRequests.workspaceId, workspaceId),
+					eq(workspacePullRequests.pullRequestId, pullRequestId),
+				),
+			)
+			.run();
+		if (changes === 0) return;
+		for (const listener of this.linkListeners) listener();
+	}
+
 	onPullRequestLinked(listener: () => void): () => void {
 		this.linkListeners.add(listener);
 		return () => this.linkListeners.delete(listener);
@@ -1017,14 +1036,18 @@ export class PullRequestRuntimeManager {
 				continue;
 			}
 			const rawMatch = keyToPullRequest.get(key);
-			// A PR the user unlinked stays unlinked; a different PR still links.
 			// A head=<default> PR that is merged or closed is a past promotion
 			// (e.g. main -> staging), never the default-branch workspace's work.
+			const isPastPromotion =
+				!!rawMatch &&
+				!rawMatch.isOpen &&
+				this.tracksBaseDefaultBranch(workspace, repo);
+			if (rawMatch && isPastPromotion) {
+				this.forgetWorkspacePullRequestLink(workspace.id, rawMatch.id);
+			}
+			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId ||
-				(rawMatch &&
-					!rawMatch.isOpen &&
-					this.tracksBaseDefaultBranch(workspace, repo))
+				rawMatch?.id === workspace.suppressedPullRequestId || isPastPromotion
 					? undefined
 					: rawMatch;
 			if (match) {
