@@ -58,9 +58,22 @@ describe("getTerminalDisplayTitle", () => {
 			getTerminalDisplayTitle({
 				customTitle: "review bot",
 				agentLabel: "Claude",
-				runtimeTitle: "claude -c",
+				runtimeTitle: "review bot",
 			}),
 		).toBe("review bot");
+	});
+
+	it("follows the live title when a named session is renamed elsewhere", () => {
+		expect(
+			getTerminalDisplayTitle({
+				customTitle: "build",
+				agentLabel: "Claude",
+				runtimeTitle: "deploy",
+			}),
+		).toBe("deploy");
+		expect(
+			getTerminalDisplayTitle({ customTitle: "build", runtimeTitle: "deploy" }),
+		).toBe("deploy");
 	});
 
 	it("falls back through runtime, session, and default titles", () => {

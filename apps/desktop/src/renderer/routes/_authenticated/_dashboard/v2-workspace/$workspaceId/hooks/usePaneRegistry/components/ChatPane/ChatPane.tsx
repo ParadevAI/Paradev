@@ -10,13 +10,13 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { openChatHistory } from "../../utils/chatHistoryOpen";
 import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
-import { openChatHistory } from "./utils/chatHistoryOpen";
 import {
 	pendingChatPrompts,
 	prependChatPrompts,
@@ -203,6 +203,9 @@ export function ChatPane({
 						panes: [
 							{
 								kind: "chat-v3",
+								...(ctx.pane.titleOverride
+									? { titleOverride: ctx.pane.titleOverride }
+									: {}),
 								data: forkedChatPaneData(latest.current, fork),
 							},
 						],

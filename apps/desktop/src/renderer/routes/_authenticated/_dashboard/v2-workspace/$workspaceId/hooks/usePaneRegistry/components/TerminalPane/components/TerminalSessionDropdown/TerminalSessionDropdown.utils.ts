@@ -39,11 +39,11 @@ export function getTerminalDisplayTitle({
 }): string {
 	// Explicit pane titles come from user/preset labels, so they should not be
 	// hidden by transient shell-reported titles such as "zsh" or "Terminal".
+	const liveTitle =
+		agentLabel && !customTitle ? agentLabel : (runtimeTitle ?? customTitle);
 	return (
 		titleOverride ??
-		customTitle ??
-		agentLabel ??
-		runtimeTitle ??
+		liveTitle ??
 		sessionTitle ??
 		i18n._(
 			msg({

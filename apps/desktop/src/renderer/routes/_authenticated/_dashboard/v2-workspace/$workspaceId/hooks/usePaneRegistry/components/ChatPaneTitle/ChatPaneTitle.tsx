@@ -27,8 +27,8 @@ import {
 	type SubagentCrumb,
 	useChatSubagentStore,
 } from "../../stores/chatSubagentStore";
+import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
 import { AccountUsageMenuSection } from "../AccountUsageMenuSection";
-import { onOpenChatHistory } from "../ChatPane/utils/chatHistoryOpen";
 import { ForkMenuItems } from "../ForkMenuItems";
 import { RenameDialog } from "../RenameDialog";
 import { StopHeaderEvents } from "../StopHeaderEvents";
@@ -70,8 +70,8 @@ export function ChatPaneTitle({
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [historyOpen, setHistoryOpen] = useState(false);
 	const [renaming, setRenaming] = useState(false);
-	// Opening a dialog or popover while the menu still holds focus lets the
-	// menu's focus return close it again, so these wait for the menu to close.
+	// The menu's focus return would close a popover opened from it, so the
+	// history search waits for the menu to close; rename follows the same path.
 	const afterMenuClose = useRef<AfterMenuClose | null>(null);
 	const forkSource = useSurfaceForkSource(workspaceId, { kind: "chat", data });
 	const forkIntoChat = useForkChatIntoChat(context, workspaceId);
