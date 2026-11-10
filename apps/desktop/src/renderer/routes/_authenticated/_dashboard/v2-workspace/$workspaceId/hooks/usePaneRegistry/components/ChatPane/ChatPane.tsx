@@ -9,7 +9,10 @@ import type {
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
-import { useNewWorkspaceWidthStore } from "renderer/stores/new-workspace-width";
+import {
+	useLiveChatWidthStore,
+	useNewWorkspaceWidthStore,
+} from "renderer/stores/new-workspace-width";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
@@ -38,9 +41,11 @@ export function ChatPane({
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
 	const data = ctx.pane.data as ChatPaneData;
-	const chatWidth = useNewWorkspaceWidthStore(
-		(state) => state.liveWidth ?? state.screenWidth,
+	const liveChatWidth = useLiveChatWidthStore((state) => state.width);
+	const savedChatWidth = useNewWorkspaceWidthStore(
+		(state) => state.screenWidth,
 	);
+	const chatWidth = liveChatWidth ?? savedChatWidth;
 	const chatWidthStyle =
 		chatWidth === null
 			? undefined

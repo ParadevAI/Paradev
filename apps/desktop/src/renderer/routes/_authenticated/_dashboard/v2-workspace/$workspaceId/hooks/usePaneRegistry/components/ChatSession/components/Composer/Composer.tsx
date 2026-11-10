@@ -54,6 +54,7 @@ import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/Host
 import {
 	NEW_WORKSPACE_SCREEN_MAX_WIDTH,
 	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
+	useLiveChatWidthStore,
 	useNewWorkspaceWidthStore,
 } from "renderer/stores/new-workspace-width";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
@@ -270,9 +271,7 @@ export const Composer = memo(function Composer({
 	const setChatWidth = useNewWorkspaceWidthStore(
 		(state) => state.setScreenWidth,
 	);
-	const setLiveChatWidth = useNewWorkspaceWidthStore(
-		(state) => state.setLiveWidth,
-	);
+	const setLiveChatWidth = useLiveChatWidthStore((state) => state.setWidth);
 	const composerId = useId();
 	useEffect(() => {
 		const { register, unregister } = useChatComposerStore.getState();
