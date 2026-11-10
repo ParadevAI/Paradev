@@ -37,7 +37,11 @@ export function RecentChatsMenuItems({
 		enabled,
 		recentOnly: true,
 	});
-	const recent = entries.slice(0, RECENT_CHAT_COUNT);
+	// Untitled entries are mostly the hidden sessions a terminal fork loads
+	// through; the full search still lists them.
+	const recent = entries
+		.filter((entry) => entry.title || isCurrent(entry))
+		.slice(0, RECENT_CHAT_COUNT);
 	if (recent.length === 0 && !saved.isPending) return null;
 	return (
 		<>

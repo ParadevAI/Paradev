@@ -26,7 +26,14 @@ import {
 	Plus,
 	Trash2,
 } from "lucide-react";
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react";
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -52,6 +59,7 @@ import {
 	getTerminalSessionListRefetchInterval,
 	getTerminalSessionListStaleTime,
 	shouldQueryTerminalSessionList,
+	TERMINAL_TITLE_SETTLE_MS,
 } from "./TerminalSessionDropdown.utils";
 
 interface TerminalSessionDropdownProps {
@@ -379,6 +387,20 @@ export function TerminalSessionDropdown({
 	const hostTitle =
 		runtimeTitle !== undefined ? runtimeTitle : currentSession?.title;
 	const titleOverride = context.pane.titleOverride;
+	// A first name given on another client arrives only as a new live title,
+	// so an unnamed agent session re-reads the list once that title settles.
+	const watchesForName = Boolean(binding) && !currentSession?.customTitle;
+	const seenHostTitle = useRef(hostTitle);
+	useEffect(() => {
+		if (hostTitle === seenHostTitle.current) return;
+		seenHostTitle.current = hostTitle;
+		if (!watchesForName || isOpen) return;
+		const timer = setTimeout(
+			() => void utils.terminal.list.invalidate({ workspaceId }),
+			TERMINAL_TITLE_SETTLE_MS,
+		);
+		return () => clearTimeout(timer);
+	}, [hostTitle, watchesForName, isOpen, utils, workspaceId]);
 	const triggerTitle = getTerminalDisplayTitle({
 		titleOverride,
 		customTitle: currentSession?.customTitle,

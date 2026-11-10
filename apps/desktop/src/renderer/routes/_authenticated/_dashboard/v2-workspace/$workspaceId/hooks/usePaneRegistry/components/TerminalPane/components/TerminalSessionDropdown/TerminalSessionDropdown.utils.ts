@@ -4,6 +4,7 @@ import { i18n } from "@superset/i18n";
 export const TERMINAL_SESSION_LIST_REFETCH_INTERVAL_MS = 2_000;
 export const TERMINAL_SESSION_LIST_STALE_MS = 5_000;
 export const TERMINAL_SESSION_LIST_CLOSED_STALE_MS = 5 * 60_000;
+export const TERMINAL_TITLE_SETTLE_MS = 1_500;
 
 export function shouldQueryTerminalSessionList(
 	isOpen: boolean,
