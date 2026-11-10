@@ -5,7 +5,12 @@ import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { ArrowLeft, GitCompareArrows, ListTree } from "lucide-react";
+import {
+	ArrowLeft,
+	GitCompareArrows,
+	ListTree,
+	LoaderCircle,
+} from "lucide-react";
 import {
 	type MouseEvent,
 	type ReactNode,
@@ -45,7 +50,10 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-works
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
-import { useOpenStackLayer } from "../../hooks/useOpenStackLayer";
+import {
+	useOpenStackLayer,
+	usePendingStackLayer,
+} from "../../hooks/useOpenStackLayer";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { usePullRequestActions } from "../../hooks/usePullRequestActions";
 import { useShipActions } from "../../hooks/useShipActions";
@@ -243,9 +251,6 @@ export function WorkspaceActivityMenu({
 		target: currentPrTarget,
 		onRefresh: refreshFlowState,
 	});
-	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
-		onSwitched: refreshFlowState,
-	});
 	const refreshWorkspacePullRequest =
 		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
 	const mergeFlow = usePullRequestMergeFlow({
@@ -261,6 +266,16 @@ export function WorkspaceActivityMenu({
 			refreshFlowState();
 		},
 	});
+
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
+		onSwitched: refreshFlowState,
+		layers: mergeFlow.stack?.layers,
+	});
+	const stackSwitch = usePendingStackLayer(
+		workspaceId,
+		currentPr?.number ?? null,
+	);
+	const pendingLayer = stackSwitch?.layer ?? null;
 
 	const pagePolicy = usePagePolicy("4-tier");
 	const rightPane = useRightPaneLinkTarget();
@@ -429,7 +444,13 @@ export function WorkspaceActivityMenu({
 						layers={stack.layers.filter(
 							(layer) => layer.number !== pullRequest.number,
 						)}
-						onSelect={openStackLayer}
+						pendingNumber={
+							stackSwitch?.isCheckingOut ? stackSwitch.layer.number : null
+						}
+						onSelect={(layer) => {
+							openStackLayer(layer);
+							if (!fits) setFloating(false);
+						}}
 					/>
 				) : null}
 			</div>
@@ -847,16 +868,37 @@ export function WorkspaceActivityMenu({
 						{changes && currentPr && currentPrState ? (
 							<>
 								<span className="h-3.5 w-px shrink-0 bg-border" />
-								<PRIcon state={currentPrState} className="size-3.5 shrink-0" />
-								<span className="tabular-nums">#{currentPr.number}</span>
+								<PRIcon
+									state={
+										pendingLayer
+											? pendingLayer.isDraft
+												? "draft"
+												: "open"
+											: currentPrState
+									}
+									className="size-3.5 shrink-0"
+								/>
+								<span className="tabular-nums">
+									#{pendingLayer?.number ?? currentPr.number}
+								</span>
 								{mergeFlow.stack ? (
 									<PullRequestStackPosition
-										position={mergeFlow.stack.currentPosition}
+										position={
+											pendingLayer?.position ?? mergeFlow.stack.currentPosition
+										}
 										size={mergeFlow.stack.layers.length}
 									/>
 								) : null}
-								{currentPrChecks && showsChecks(currentPrState) && (
-									<PRStatusIndicators checks={currentPrChecks} />
+								{pendingLayer ? (
+									<LoaderCircle
+										aria-hidden
+										className="size-3 shrink-0 animate-spin text-muted-foreground"
+									/>
+								) : (
+									currentPrChecks &&
+									showsChecks(currentPrState) && (
+										<PRStatusIndicators checks={currentPrChecks} />
+									)
 								)}
 							</>
 						) : (

@@ -107,3 +107,12 @@ test("worktreeHoldingBranch reads the porcelain listing", () => {
 	expect(worktreeHoldingBranch(porcelain, "layer-2")).toBe("/repo/.wt/two");
 	expect(worktreeHoldingBranch(porcelain, "layer-3")).toBeNull();
 });
+
+test("fetchBranches with missingOnly leaves known branches alone", async () => {
+	const result = await createCaller(repo).caller.fetchBranches({
+		workspaceId: "ws",
+		branches: ["layer-2"],
+		missingOnly: true,
+	});
+	expect(result).toEqual({ fetched: [] });
+});

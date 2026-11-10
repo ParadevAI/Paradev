@@ -19422,16 +19422,10 @@ msgstr "워크스페이스 8로 전환"
 msgid "Switch to Workspace 9"
 msgstr "워크스페이스 9로 전환"
 
-msgid "Switched to #{number}"
-msgstr "#{number}(으)로 전환했습니다"
-
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "{0}에 {nextPlanName}(으)로 전환됩니다."
-
-msgid "Switching to #{number}…"
-msgstr "#{number}(으)로 전환 중…"
 
 msgid "Symbol, light"
 msgstr "심볼, 밝은 색"

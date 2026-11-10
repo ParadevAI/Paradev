@@ -19422,16 +19422,10 @@ msgstr "Przełącz na obszar roboczy 8"
 msgid "Switch to Workspace 9"
 msgstr "Przełącz na obszar roboczy 9"
 
-msgid "Switched to #{number}"
-msgstr "Przełączono na #{number}"
-
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "Zmiana na {nextPlanName} dnia {0}."
-
-msgid "Switching to #{number}…"
-msgstr "Przełączanie na #{number}…"
 
 msgid "Symbol, light"
 msgstr "Symbol, jasny"

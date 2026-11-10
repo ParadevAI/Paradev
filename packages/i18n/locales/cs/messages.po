@@ -19422,16 +19422,10 @@ msgstr "Přepnout na pracovní prostor 8"
 msgid "Switch to Workspace 9"
 msgstr "Přepnout na pracovní prostor 9"
 
-msgid "Switched to #{number}"
-msgstr "Přepnuto na #{number}"
-
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "Přejde na {nextPlanName} dne {0}."
-
-msgid "Switching to #{number}…"
-msgstr "Přepínání na #{number}…"
 
 msgid "Symbol, light"
 msgstr "Symbol, světlý"

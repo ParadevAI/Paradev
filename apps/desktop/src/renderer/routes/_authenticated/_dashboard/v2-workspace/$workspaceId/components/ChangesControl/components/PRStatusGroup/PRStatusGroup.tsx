@@ -37,7 +37,10 @@ import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboar
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
-import { useOpenStackLayer } from "../../../../hooks/useOpenStackLayer";
+import {
+	useOpenStackLayer,
+	usePendingStackLayer,
+} from "../../../../hooks/useOpenStackLayer";
 import { usePullRequestActions } from "../../../../hooks/usePullRequestActions";
 import { useShipActions } from "../../../../hooks/useShipActions";
 import type { PRFlowState } from "../../../../utils/getPRFlowState";
@@ -133,7 +136,10 @@ export function PRStatusGroup({
 	);
 	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
 		onSwitched: onRefresh,
+		layers: flow.stack?.layers,
 	});
+	const pendingLayer =
+		usePendingStackLayer(workspaceId, pr?.number ?? null)?.layer ?? null;
 
 	const sync = state.kind === "pr-exists" ? state.sync : null;
 	const canCommit = sync?.hasUncommitted === true;
@@ -175,7 +181,10 @@ export function PRStatusGroup({
 	// Queued PRs are still actively running checks, so keep CI/review indicators.
 	const showIndicators = pr.state === "open" || pr.state === "queued";
 
-	const stack = flow.stack;
+	const stack =
+		flow.stack && pendingLayer
+			? { ...flow.stack, currentPosition: pendingLayer.position }
+			: flow.stack;
 	const isQueued = pr.state === "queued" || flow.queued !== null;
 	const isMerging = prActions.isMerging || flow.isMerging;
 
@@ -198,9 +207,16 @@ export function PRStatusGroup({
 					isChangesOpen ? "text-foreground" : "text-muted-foreground",
 				)}
 			>
-				#{pr.number}
+				#{pendingLayer?.number ?? pr.number}
 			</span>
-			{showIndicators && <PRStatusIndicators checks={checks} />}
+			{pendingLayer ? (
+				<VscLoading
+					aria-hidden
+					className="size-3 animate-spin text-muted-foreground"
+				/>
+			) : (
+				showIndicators && <PRStatusIndicators checks={checks} />
+			)}
 		</>
 	);
 	const badgeClass = cn(
@@ -255,7 +271,7 @@ export function PRStatusGroup({
 								restack={restack}
 								appearance="segment"
 								className={tint.hover}
-								workspaceNumber={pr.number}
+								workspaceNumber={pendingLayer?.number ?? pr.number}
 								viewingNumber={viewingPullRequestNumber}
 								onSelectLayer={openStackLayer}
 							/>

@@ -2,6 +2,7 @@ import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import type { SimpleGit } from "simple-git";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
@@ -144,6 +145,22 @@ export function worktreeHoldingBranch(
 		if (path && head === branch) return path;
 	}
 	return null;
+}
+
+/** Branch names `git switch` can resolve without a fetch: local, or tracked from origin. */
+async function knownBranches(git: SimpleGit): Promise<Set<string>> {
+	const refs = await git.raw([
+		"for-each-ref",
+		"--format=%(refname)",
+		"refs/heads",
+		"refs/remotes/origin",
+	]);
+	return new Set(
+		refs
+			.split("\n")
+			.map((ref) => ref.replace(/^refs\/(heads|remotes\/origin)\//, "").trim())
+			.filter(Boolean),
+	);
 }
 
 function runStatusSnapshot(
@@ -591,9 +608,7 @@ export const gitRouter = router({
 					message: `${input.branch} is checked out in another workspace.`,
 				});
 			}
-			const hasLocalBranch =
-				(await git.raw(["branch", "--list", input.branch])).trim() !== "";
-			if (!hasLocalBranch) {
+			if (!(await knownBranches(git)).has(input.branch)) {
 				await git.fetch("origin", input.branch).catch(() => {});
 			}
 			try {
@@ -613,6 +628,27 @@ export const gitRouter = router({
 			);
 			invalidateStatus(input.workspaceId);
 			return { branch: input.branch };
+		}),
+
+	fetchBranches: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				branches: z.array(z.string().min(1)).max(20),
+				missingOnly: z.boolean().default(false),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const git = await ctx.git(resolveWorktreePath(ctx, input.workspaceId));
+			let branches = input.branches;
+			if (input.missingOnly) {
+				const known = await knownBranches(git);
+				branches = branches.filter((branch) => !known.has(branch));
+			}
+			if (branches.length === 0) return { fetched: [] };
+			await git.fetch(["origin", ...branches]);
+			invalidateStatus(input.workspaceId);
+			return { fetched: branches };
 		}),
 
 	discardChanges: protectedProcedure
