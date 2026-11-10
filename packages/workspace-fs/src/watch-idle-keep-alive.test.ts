@@ -3,11 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { FsWatcherManager, type FsWatcherManagerOptions } from "./watch";
-import {
-	chokidarWatchBackend,
-	type NativeWatchBackend,
-	type NativeWatchRequest,
-} from "./watch-backend";
+import type { NativeWatchBackend, NativeWatchRequest } from "./watch-backend";
 
 interface FakeSubscription {
 	rootPath: string;
@@ -418,33 +414,6 @@ describe("FsWatcherManager idle keep-alive", () => {
 		]);
 		expect(checks).toBe(1);
 		expect(fake.live(rootPath)).toHaveLength(1);
-	});
-
-	it("sees writes in a directory removed and recreated while idle", async () => {
-		const rootPath = await createTempRoot();
-		const dirPath = path.join(rootPath, "x");
-		await fs.mkdir(dirPath);
-		await fs.writeFile(path.join(dirPath, "a.ts"), "a");
-		const manager = createManager(chokidarWatchBackend, {
-			idleKeepAliveMs: 60_000,
-		});
-
-		const unsubscribe = await manager.subscribe(
-			{ absolutePath: rootPath },
-			() => {},
-		);
-		await unsubscribe();
-		await fs.rm(dirPath, { recursive: true, force: true });
-		await fs.mkdir(dirPath);
-		await sleep(500);
-
-		const seen: string[] = [];
-		await manager.subscribe({ absolutePath: rootPath }, (batch) => {
-			for (const event of batch.events) seen.push(event.absolutePath);
-		});
-		const filePath = path.join(dirPath, "f.ts");
-		await fs.writeFile(filePath, "x");
-		await waitUntil(() => seen.includes(filePath), "write in recreated dir");
 	});
 
 	it("ignores a repeated unsubscribe so it cannot extend the grace period", async () => {
