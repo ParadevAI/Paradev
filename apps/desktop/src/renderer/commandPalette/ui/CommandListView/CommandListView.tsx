@@ -9,6 +9,7 @@ import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections, scoreCommand } from "../../core/rankCommands";
 import type { Command } from "../../core/types";
 import { useActiveCommands } from "../../core/useActiveCommands";
+import { WORKSPACES_COMMAND_ID } from "../../modules/navigation/commands";
 import { ChatSearchResults } from "../ChatSearchResults";
 import { CommandItemRow } from "../CommandItemRow/CommandItemRow";
 import { useSwitcherGroups } from "../WorkspaceList/hooks/useSwitcherGroups";
@@ -87,11 +88,14 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 		trimmed,
 	);
 	const showsWorkspaces = isV2CloudEnabled && !parsed.commandsOnly;
+	const showsWorkspaceSection =
+		showsWorkspaces && (workspaceRows.length > 0 || !text);
+	const showsCommands = !(showsWorkspaces && workspacesOnly);
 
 	// With a query, workspaces and command sections rank against each other
 	// on the same score; without one, workspaces lead.
 	const blocks: Block[] = [];
-	if (showsWorkspaces && (workspaceRows.length > 0 || !text)) {
+	if (showsWorkspaceSection) {
 		const first = workspaceRows[0];
 		blocks.push({
 			key: "workspaces",
@@ -105,15 +109,22 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 			),
 		});
 	}
-	if (!(showsWorkspaces && workspacesOnly)) {
+	if (showsCommands) {
 		for (const section of ranked) {
-			const first = section.commands[0];
+			// The section's "All workspaces" row stands in for the Workspaces command.
+			const commands = showsWorkspaceSection
+				? section.commands.filter(
+						(command) => command.id !== WORKSPACES_COMMAND_ID,
+					)
+				: section.commands;
+			const first = commands[0];
+			if (!first) continue;
 			blocks.push({
 				key: section.id,
-				best: trimmed && first ? scoreCommand(first, trimmed) : 0.5,
+				best: trimmed ? scoreCommand(first, trimmed) : 0.5,
 				node: (
 					<CommandGroup key={section.id} heading={i18n._(section.label)}>
-						{section.commands.map((command) => (
+						{commands.map((command) => (
 							<CommandItemRow
 								key={command.id}
 								command={command}

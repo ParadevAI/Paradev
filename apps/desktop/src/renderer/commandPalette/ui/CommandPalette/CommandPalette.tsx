@@ -79,6 +79,8 @@ export function CommandPalette() {
 				return;
 			}
 			void executeCommand(command, context);
+			// The Workspaces command reopens the palette on the switcher.
+			if (useFrameStackStore.getState().root === "switcher") return;
 			handleOpenChange(false);
 		},
 		[pushFrame, context, handleOpenChange],
