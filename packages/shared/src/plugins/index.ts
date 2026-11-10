@@ -619,7 +619,7 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 	{
 		name: "devstack",
 		version: "0.1.0",
-		description: "Plan, fan out, review, and ship with parallel agents",
+		description: "Plan changes and ship them as reviewed PRs",
 		interface: { displayName: "devstack", category: "Developer tools" },
 		mcpServers: {},
 		skills: ["init", "plan", "ship"],

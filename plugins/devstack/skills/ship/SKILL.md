@@ -15,7 +15,9 @@ Read `.devstack/config.md` for `base_branch`, `checks`, `pr`, `tracker` and `pla
 it, take the base branch from `git symbolic-ref --short refs/remotes/origin/HEAD`, find checks in
 the CI workflow, and say what you assumed.
 
-If a PR for this branch is already open (`gh pr view --json number,state,url`), skip to step 6.
+If a PR for this branch is already open (`gh pr view --json number,state,url`), run steps 1–4
+only for local changes that are not on the remote yet (`git status`, `git log @{u}..HEAD`), then
+go to step 6. With nothing pending, go straight to step 6.
 
 ## 1. Look at the change
 
@@ -23,8 +25,8 @@ If a PR for this branch is already open (`gh pr view --json number,state,url`), 
 file in the diff. Unrelated changes (stray files, debug code, someone else's edits) do not ship;
 ask about them.
 
-Find the plan, if there is one: a file in `plans_dir` whose `branch` frontmatter matches, or the
-one the user names.
+Find the plan, if there is one: the one the user names, or a file whose `branch` frontmatter
+matches, in `plans_dir` or in any area plan directory that the config prose names.
 
 ## 2. Run the checks
 
@@ -53,8 +55,6 @@ Limitations in the PR), or discuss. Continue only after the user answers.
 ## 4. Commit and push
 
 - On the base branch, create a branch first: `git switch -c <short-descriptive-name>`.
-- If this PR completes the plan, fill in its Outcomes & Retrospective, set `status: done`, and
-  `git mv` it to `<plans_dir>/done/`. Skip this when the plan spans more PRs.
 - Stage paths by name, not `git add -A`. Make commits that tell the story; follow the repo's commit
   style (`git log` shows it). Use a HEREDOC for multi-line messages.
 - `git push -u origin <branch>`. Never change `git config`.
@@ -95,6 +95,10 @@ gh pr edit <number> --add-label <label>      # for each pr.labels
 If one fails (no permission, unknown label), the PR still exists: say so and go on. Do not run
 `gh pr create` again.
 
+If this PR completes the plan, now that the PR exists: fill in its Outcomes & Retrospective
+with the PR link, set `status: done`, `git mv` it to the `done/` folder next to it, then commit
+and push. Skip this when the plan spans more PRs.
+
 Link the tracker: with `tracker: linear`, put the issue key in the branch name or PR body so the
 integration links it, or comment the PR URL on the issue through the Linear plugin; with
 `tracker: github`, write `Closes #<n>` in the body.
@@ -114,10 +118,12 @@ When a check fails:
 ## 7. Address review findings
 
 Reviews can come from people, from bots, or from an automated reviewer the repo triggers through
-an assignee (it may post a comment that links its findings). Wait for them: check every few
-minutes with `gh pr view <number> --json reviews,comments` and
+an assignee (it may post a comment that links its findings). If no reviewer, assignee or review
+bot is set up, ask the user who should review (`gh pr edit <number> --add-reviewer <login>`), or
+stop and report that the PR is waiting for review. Otherwise wait: check every few minutes with `gh pr view <number> --json reviews,comments` and
 `gh api repos/{owner}/{repo}/pulls/<number>/comments`. Read any linked findings page
-(`superset pages pull <slug>` for a Paradev page).
+(`superset pages pull <slug>` for a Paradev page). If nothing arrives within about 30 minutes,
+stop and report that the PR is waiting for review rather than poll forever.
 
 List each finding with the reviewer, file and line, and text, then sort:
 

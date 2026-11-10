@@ -249,7 +249,7 @@
 		},
 		{
 			"name": "devstack",
-			"description": "An agent-first sprint: plan the work, split it across parallel agents, review it independently, and ship the PR.",
+			"description": "Set up a repo, plan a change as independent work units for agents, and ship it as a green, reviewed PR.",
 			"author": {
 				"name": "Paradev"
 			},
