@@ -6,6 +6,7 @@ import { CloudSimulator } from "./components/CloudSimulator";
 import { LocalDevices } from "./components/LocalDevices";
 import { LocalHostClient } from "./components/LocalHostClient";
 import { PaneMessage } from "./components/PaneMessage";
+import { useLatch } from "./hooks/useLatch";
 import { fallsBackToLocalHost } from "./utils/fallsBackToLocalHost";
 
 /** Mobile simulator backed by whichever this host can produce: a hosted
@@ -25,7 +26,11 @@ export function MobilePane({
 	const statusQuery = workspaceTrpc.mobile.status.useQuery();
 	const backend = statusQuery.data?.backend;
 
-	if (!onLocalHost && fallsBackToLocalHost({ workspaceHost, backend })) {
+	const fellBack = useLatch(
+		!onLocalHost && fallsBackToLocalHost({ workspaceHost, backend }),
+	);
+
+	if (fellBack) {
 		return (
 			<LocalHostClient>
 				<MobilePane workspaceId={workspaceId} onLocalHost />
