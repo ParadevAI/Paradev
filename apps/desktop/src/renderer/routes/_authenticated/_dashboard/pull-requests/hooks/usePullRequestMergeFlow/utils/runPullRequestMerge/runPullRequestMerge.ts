@@ -25,12 +25,11 @@ export class PullRequestMergeRefusal extends Error {
 	}
 }
 
-function targetNumbers(stack: PullRequestStack | null): string {
-	return stack
-		? stackMergeTargets(stack)
-				.map((layer) => layer.number)
-				.join(",")
-		: "";
+/** Which stack it is and what it would land: both must hold across the re-read. */
+function mergePlan(stack: PullRequestStack | null): string {
+	if (!stack) return "";
+	const numbers = stackMergeTargets(stack).map((layer) => layer.number);
+	return [stack.source, stack.stackNumber, ...numbers].join(",");
 }
 
 /**
@@ -53,7 +52,7 @@ export async function runPullRequestMerge(
 	let targetCount = 1;
 	if (stack) {
 		const fresh = await operations.readStack();
-		if (targetNumbers(fresh) !== targetNumbers(stack)) {
+		if (mergePlan(fresh) !== mergePlan(stack)) {
 			throw new PullRequestMergeRefusal("stack-changed");
 		}
 		head = fresh?.layers.find((layer) => layer.isCurrent)?.headRefOid;

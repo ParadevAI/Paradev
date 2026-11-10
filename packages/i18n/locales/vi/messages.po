@@ -11957,9 +11957,6 @@ msgstr "Merge"
 msgid "Merge #{0}?"
 msgstr "Merge #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Hãy merge #{number} trước, hoặc tạo stack GitHub để merge tất cả cùng lúc."
-
 msgid "Merge #{prNumber}?"
 msgstr "Merge #{prNumber}?"
 
@@ -20369,8 +20366,8 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "Chủ đề"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Chúng được nối với nhau qua nhánh base. Một stack GitHub sẽ merge chúng trong một bước."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Chúng được liên kết qua nhánh gốc, nên mỗi cái được merge vào cái bên dưới nó. Stack của GitHub merge tất cả trong một bước."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Các lệnh này chạy tự động khi một workspace được tạo. <0>Đọc tài liệu<1/></0>"

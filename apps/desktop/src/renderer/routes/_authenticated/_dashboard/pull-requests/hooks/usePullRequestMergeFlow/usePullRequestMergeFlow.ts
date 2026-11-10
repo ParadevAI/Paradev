@@ -23,6 +23,7 @@ import {
 	readPullRequestStack,
 } from "../../utils/pullRequestClient";
 import {
+	pullRequestDetailQueryKey,
 	pullRequestDetailQueryOptions,
 	useInvalidatePullRequestDetail,
 } from "../usePullRequestDetail";
@@ -68,6 +69,9 @@ export interface PullRequestMergeFlow {
 	createStack: () => void;
 }
 
+/** GitHub outlasted the polling: look again a few times so the page catches up. */
+const PENDING_MERGE_REFRESH_DELAYS_MS = [30_000, 120_000, 300_000];
+
 export function usePullRequestMergeFlow({
 	target,
 	onMerged,
@@ -100,27 +104,26 @@ export function usePullRequestMergeFlow({
 		[stack],
 	);
 	const targetCount = assessment?.targets.length ?? 0;
-	const isStack =
-		stack !== null && (stack.source === "github" || targetCount > 1);
+	const isStack = stack?.source === "github";
 	const usesQueue = stack
 		? stack.usesMergeQueue
 		: detailQueue?.enabled === true;
 	const queued = stack
 		? (stack.layers.find((layer) => layer.isCurrent)?.queue ?? null)
 		: (detailQueue?.entry ?? null);
-	const blocker =
-		isStack || stackQuery.isIncomplete
-			? resolveStackMergeBlocker({
-					stack,
-					isIncomplete: stackQuery.isIncomplete,
-				})
-			: null;
+	const blocker = resolveStackMergeBlocker(stack);
 	const landsSeveral = isStack && targetCount > 1;
 	const kind: MergeActionKind = { stack: landsSeveral, queue: usesQueue };
 
 	const refresh = async () => {
 		await onMerged?.();
 		await invalidate();
+		for (const layer of assessment?.targets ?? []) {
+			if (!target || layer.number === target.prNumber) continue;
+			void queryClient.invalidateQueries({
+				queryKey: pullRequestDetailQueryKey(target.repoFullName, layer.number),
+			});
+		}
 	};
 
 	const merge = useMutation({
@@ -136,7 +139,7 @@ export function usePullRequestMergeFlow({
 			}
 			try {
 				return await runPullRequestMerge(
-					{ stack, usesQueue, method },
+					{ stack: isStack ? stack : null, usesQueue, method },
 					{
 						readStack: () =>
 							queryClient.fetchQuery({
@@ -173,6 +176,9 @@ export function usePullRequestMergeFlow({
 					}),
 					{ id },
 				);
+				for (const delay of PENDING_MERGE_REFRESH_DELAYS_MS) {
+					setTimeout(() => void refresh(), delay);
+				}
 			} else if (outcome === "enqueued") {
 				toast.success(
 					landsSeveral

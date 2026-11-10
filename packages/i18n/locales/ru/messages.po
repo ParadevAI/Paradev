@@ -11957,9 +11957,6 @@ msgstr "Объединить"
 msgid "Merge #{0}?"
 msgstr "Объединить #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Сначала объедините #{number} или создайте стек GitHub, чтобы объединить их вместе."
-
 msgid "Merge #{prNumber}?"
 msgstr "Объединить #{prNumber}?"
 
@@ -20369,8 +20366,8 @@ msgstr "Карточка предпросмотра темы"
 msgid "Themes"
 msgstr "Темы"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Они связаны через базовые ветки. Стек GitHub объединяет их за один шаг."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Они связаны базовой веткой, поэтому каждый объединяется с тем, что ниже. Стек GitHub объединяет их за один шаг."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Эти команды выполняются автоматически при создании рабочей области. <0>Читать документацию<1/></0>"

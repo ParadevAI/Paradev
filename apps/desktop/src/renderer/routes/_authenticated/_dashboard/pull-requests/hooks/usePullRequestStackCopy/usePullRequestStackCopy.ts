@@ -71,18 +71,6 @@ export function usePullRequestStackCopy() {
 				}
 			},
 			blocker(blocker: PullRequestStackMergeBlocker): string {
-				if (blocker.kind === "incomplete") {
-					return t({
-						message:
-							"Stack details could not be loaded. Refresh before merging.",
-					});
-				}
-				if (blocker.kind === "not-a-stack") {
-					const number = blocker.lowest;
-					return t({
-						message: `Merge #${number} first, or create a GitHub stack to merge these together.`,
-					});
-				}
 				const number = blocker.number;
 				switch (blocker.kind) {
 					case "closed":

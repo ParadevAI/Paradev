@@ -162,6 +162,18 @@ describe("mergeInBackground", () => {
 		expect(cloud.getPullRequestMergeResult.query).toHaveBeenCalledTimes(2);
 	});
 
+	test("a result read that keeps failing after GitHub accepted reads as pending, not failed", async () => {
+		cloud.requestPullRequestMerge.mutate.mockResolvedValue({
+			status: "pending",
+			uuid: "u-3",
+		});
+		cloud.getPullRequestMergeResult.query.mockRejectedValue(new Error("502"));
+		expect(
+			await mergeInBackground(target, {}, deps, { sleep: async () => {} }),
+		).toBe("pending");
+		expect(cloud.getPullRequestMergeResult.query).toHaveBeenCalledTimes(3);
+	});
+
 	test("an API that predates the background merge reads as unavailable", async () => {
 		cloud.requestPullRequestMerge.mutate.mockRejectedValue(
 			new Error(

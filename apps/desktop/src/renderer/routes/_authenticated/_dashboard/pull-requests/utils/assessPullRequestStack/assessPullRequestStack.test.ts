@@ -161,43 +161,23 @@ describe("assessPullRequestStack", () => {
 });
 
 describe("resolveStackMergeBlocker", () => {
-	test("blocks every merge while the stack could not be read", () => {
-		expect(
-			resolveStackMergeBlocker({ stack: null, isIncomplete: true }),
-		).toEqual({ kind: "incomplete" });
-	});
-
-	test("passes the verdict's blocker through", () => {
+	test("passes a GitHub stack's blocker through", () => {
 		expect(
 			resolveStackMergeBlocker({
-				stack: { ...stackAt3({ 1: { isDraft: true } }), source: "github" },
-				isIncomplete: false,
+				...stackAt3({ 1: { isDraft: true } }),
+				source: "github",
 			}),
 		).toEqual({ kind: "draft", number: 4177 });
 	});
 
-	test("lets a chain of base branches merge only its lowest open layer", () => {
+	test("never blocks a chain of base branches or a missing stack", () => {
 		expect(
 			resolveStackMergeBlocker({
-				stack: { ...stackAt3(), source: "inferred" },
-				isIncomplete: false,
-			}),
-		).toEqual({ kind: "not-a-stack", lowest: 4177 });
-		expect(
-			resolveStackMergeBlocker({
-				stack: {
-					...stackAt3({ 1: { state: "merged" }, 2: { state: "merged" } }),
-					source: "inferred",
-				},
-				isIncomplete: false,
+				...stackAt3({ 1: { isDraft: true } }),
+				source: "inferred",
 			}),
 		).toBeNull();
-		expect(
-			resolveStackMergeBlocker({
-				stack: { ...stackAt3(), source: "github" },
-				isIncomplete: false,
-			}),
-		).toBeNull();
+		expect(resolveStackMergeBlocker(null)).toBeNull();
 	});
 });
 

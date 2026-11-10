@@ -88,6 +88,21 @@ test("a layer that merged since the dialog opened stops the merge", async () => 
 	expect(ops.mergeInBackground).not.toHaveBeenCalled();
 });
 
+test("a stack that was dissolved into a chain of the same pull requests stops the merge", async () => {
+	const ops = operations("merged", {
+		...twoLayers,
+		source: "inferred",
+		stackNumber: null,
+	});
+	await expect(
+		runPullRequestMerge(
+			{ stack: twoLayers, usesQueue: false, method: "squash" },
+			ops,
+		),
+	).rejects.toMatchObject({ reason: "stack-changed" });
+	expect(ops.mergeInBackground).not.toHaveBeenCalled();
+});
+
 test("a merge queue picks its own method", async () => {
 	const ops = operations("enqueued");
 	await runPullRequestMerge(

@@ -11957,9 +11957,6 @@ msgstr "Sloučit"
 msgid "Merge #{0}?"
 msgstr "Sloučit #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Nejprve slučte #{number}, nebo vytvořte GitHub stack a slučte je společně."
-
 msgid "Merge #{prNumber}?"
 msgstr "Sloučit #{prNumber}?"
 
@@ -20369,8 +20366,8 @@ msgstr "Karta náhledu motivu"
 msgid "Themes"
 msgstr "Motivy"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Jsou propojené přes základní větve. GitHub stack je sloučí v jednom kroku."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Jsou propojeny základní větví, takže se každý sloučí do toho pod ním. Stack na GitHubu je sloučí v jednom kroku."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Tyto příkazy se spustí automaticky při vytvoření pracovního prostoru. <0>Přečtěte si dokumentaci<1/></0>"

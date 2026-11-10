@@ -1,3 +1,4 @@
+import { realpathSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
@@ -145,6 +146,18 @@ export function worktreeHoldingBranch(
 		if (path && head === branch) return path;
 	}
 	return null;
+}
+
+/** Git prints resolved paths; a stored one can differ by symlink or letter case. */
+function isSamePath(a: string, b: string): boolean {
+	const resolve = (path: string) => {
+		try {
+			return realpathSync.native(path);
+		} catch {
+			return path;
+		}
+	};
+	return resolve(a) === resolve(b);
 }
 
 /** Branch names `git switch` can resolve without a fetch: local, or tracked from origin. */
@@ -602,14 +615,22 @@ export const gitRouter = router({
 				await git.raw(["worktree", "list", "--porcelain"]),
 				input.branch,
 			);
-			if (holder && holder !== worktreePath) {
+			if (holder && !isSamePath(holder, worktreePath)) {
 				throw new TRPCError({
 					code: "CONFLICT",
 					message: `${input.branch} is checked out in another workspace.`,
 				});
 			}
 			if (!(await knownBranches(git)).has(input.branch)) {
-				await git.fetch("origin", input.branch).catch(() => {});
+				await git.fetch("origin", input.branch).catch((error) => {
+					rethrowEnvironmentalGitError(error);
+					if (/couldn't find remote ref/i.test(String(error))) return;
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: `Could not fetch ${input.branch} from origin.`,
+						cause: error,
+					});
+				});
 			}
 			try {
 				await git.raw(["switch", input.branch]);

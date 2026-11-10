@@ -11957,9 +11957,6 @@ msgstr "Birleştir"
 msgid "Merge #{0}?"
 msgstr "#{0} birleştirilsin mi?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Önce #{number} birleştirin veya hepsini birlikte birleştirmek için bir GitHub yığını oluşturun."
-
 msgid "Merge #{prNumber}?"
 msgstr "#{prNumber} birleştirilsin mi?"
 
@@ -20369,8 +20366,8 @@ msgstr "Tema önizleme kartı"
 msgid "Themes"
 msgstr "Temalar"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Bunlar taban dallarıyla bağlı. Bir GitHub yığını onları tek adımda birleştirir."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Bunlar temel dal üzerinden bağlı, bu yüzden her biri altındakine birleştirilir. Bir GitHub stack'i hepsini tek adımda birleştirir."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Bu komutlar bir çalışma alanı oluşturulduğunda otomatik olarak çalışır. <0>Belgelerimizi okuyun<1/></0>"

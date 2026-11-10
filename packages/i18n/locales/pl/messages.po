@@ -11957,9 +11957,6 @@ msgstr "Scal"
 msgid "Merge #{0}?"
 msgstr "Scalić #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Najpierw scal #{number} albo utwórz stos GitHub, aby scalić je razem."
-
 msgid "Merge #{prNumber}?"
 msgstr "Scalić #{prNumber}?"
 
@@ -20369,8 +20366,8 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "Motywy"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Są połączone gałęziami bazowymi. Stos GitHub scala je w jednym kroku."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Są połączone gałęzią bazową, więc każdy jest scalany z tym poniżej. Stack na GitHubie scala je w jednym kroku."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Te polecenia uruchamiają się automatycznie przy tworzeniu obszaru roboczego. <0>Przeczytaj dokumentację<1/></0>"

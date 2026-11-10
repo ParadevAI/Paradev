@@ -11957,9 +11957,6 @@ msgstr "Merge"
 msgid "Merge #{0}?"
 msgstr "Merge #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Merge #{number} first, or create a GitHub stack to merge these together."
-
 msgid "Merge #{prNumber}?"
 msgstr "Merge #{prNumber}?"
 
@@ -20369,8 +20366,8 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "Themes"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "These are linked by base branch. A GitHub stack merges them in one step."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"

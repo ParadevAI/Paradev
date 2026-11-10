@@ -78,10 +78,7 @@ export function PullRequestStackPopover({
 	const copy = usePullRequestStackCopy();
 	const verdict = flow.assessment?.verdict ?? "pending";
 	const canCreateStack = flow.chain.length >= 2;
-	const reason =
-		flow.blocker && !(flow.blocker.kind === "not-a-stack" && canCreateStack)
-			? copy.blocker(flow.blocker)
-			: null;
+	const reason = flow.blocker ? copy.blocker(flow.blocker) : null;
 	const layersTopDown = [...stack.layers].reverse();
 	const mergedNumber = restack?.mergedNumber;
 	const run = restack?.run ?? null;
@@ -140,7 +137,7 @@ export function PullRequestStackPopover({
 					<PullRequestStackCallout
 						text={t({
 							message:
-								"These are linked by base branch. A GitHub stack merges them in one step.",
+								"These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step.",
 						})}
 						action={{
 							label: t({ message: "Create stack" }),

@@ -11957,9 +11957,6 @@ msgstr "머지"
 msgid "Merge #{0}?"
 msgstr "#{0}을(를) 머지할까요?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "먼저 #{number}을(를) 머지하거나, GitHub 스택을 만들어 함께 머지하세요."
-
 msgid "Merge #{prNumber}?"
 msgstr "#{prNumber}을(를) 머지할까요?"
 
@@ -20369,8 +20366,8 @@ msgstr "테마 미리 보기 카드"
 msgid "Themes"
 msgstr "테마"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "베이스 브랜치로 연결되어 있습니다. GitHub 스택으로 만들면 한 번에 머지됩니다."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "베이스 브랜치로 연결되어 있어 각각 바로 아래 항목에 머지됩니다. GitHub 스택은 한 번에 모두 머지합니다."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "워크스페이스를 만들 때 이 명령이 자동으로 실행됩니다. <0>문서 보기<1/></0>"

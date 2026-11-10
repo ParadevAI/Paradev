@@ -11951,9 +11951,6 @@ msgstr "Злити"
 msgid "Merge #{0}?"
 msgstr "Злити #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Спершу злийте #{number} або створіть стек GitHub, щоб злити їх разом."
-
 msgid "Merge #{prNumber}?"
 msgstr "Злити #{prNumber}?"
 
@@ -20363,8 +20360,8 @@ msgstr "Картка попереднього перегляду теми"
 msgid "Themes"
 msgstr "Теми"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Вони пов'язані базовими гілками. Стек GitHub зливає їх за один крок."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Вони пов'язані базовою гілкою, тож кожен зливається в той, що нижче. Стек GitHub зливає їх за один крок."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Ці команди виконуються автоматично під час створення робочого простору. <0>Читати документацію<1/></0>"

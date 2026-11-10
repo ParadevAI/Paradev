@@ -11957,9 +11957,6 @@ msgstr "マージ"
 msgid "Merge #{0}?"
 msgstr "#{0}をマージしますか?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "先に #{number} をマージするか、GitHub スタックを作成してまとめてマージしてください。"
-
 msgid "Merge #{prNumber}?"
 msgstr "#{prNumber} をマージしますか?"
 
@@ -20369,8 +20366,8 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "テーマ"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "ベースブランチでつながっています。GitHub スタックにすると 1 回でマージできます。"
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "これらはベースブランチでつながっているため、それぞれが 1 つ下のものにマージされます。GitHub スタックなら 1 回でまとめてマージできます。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "これらのコマンドはワークスペース作成時に自動的に実行されます。<0>ドキュメントを読む<1/></0>"

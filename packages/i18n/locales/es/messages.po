@@ -11957,9 +11957,6 @@ msgstr "Fusionar"
 msgid "Merge #{0}?"
 msgstr "¿Fusionar #{0}?"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "Fusiona primero #{number}, o crea una pila de GitHub para fusionarlas juntas."
-
 msgid "Merge #{prNumber}?"
 msgstr "¿Fusionar #{prNumber}?"
 
@@ -20369,8 +20366,8 @@ msgstr "Tarjeta de vista previa del tema"
 msgid "Themes"
 msgstr "Temas"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "Están enlazadas por su rama base. Una pila de GitHub las fusiona en un solo paso."
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Están enlazados por rama base, así que cada uno se fusiona en el que tiene debajo. Un stack de GitHub los fusiona en un solo paso."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Estos comandos se ejecutan automáticamente al crear un espacio de trabajo. <0>Consulta la documentación<1/></0>"

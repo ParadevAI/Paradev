@@ -92,7 +92,8 @@ export function useOpenStackLayer(
 					void navigateToV2Workspace(workspaceId, navigate);
 					return;
 				}
-				if (!switches) {
+				if (!switches || workspaceId === workspace.id) {
+					end(workspace.id, number);
 					view();
 					return;
 				}
@@ -125,10 +126,10 @@ export function useOpenStackLayer(
 				const isUnsettled = () =>
 					useStackSwitchStore.getState().switchByWorkspace[workspace.id]?.layer
 						.number === number;
+				await host.pullRequests.refreshByWorkspaces
+					.mutate({ workspaceIds: [workspace.id] })
+					.catch(() => {});
 				for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt++) {
-					await host.pullRequests.refreshByWorkspaces
-						.mutate({ workspaceIds: [workspace.id] })
-						.catch(() => {});
 					onSwitched?.();
 					await new Promise((resolve) => setTimeout(resolve, SETTLE_CHECK_MS));
 					if (!isUnsettled()) return;

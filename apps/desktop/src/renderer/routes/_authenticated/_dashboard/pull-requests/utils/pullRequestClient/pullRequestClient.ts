@@ -269,6 +269,7 @@ export type BackgroundMergeOutcome =
 
 const MERGE_POLL_INTERVAL_MS = 1_500;
 const MERGE_POLL_LIMIT = 120;
+const MERGE_POLL_FAILURE_LIMIT = 3;
 
 export async function mergeInBackground(
 	target: PullRequestTarget,
@@ -291,13 +292,20 @@ export async function mergeInBackground(
 		if (isMissingProcedureError(error)) return "unavailable";
 		throw error;
 	}
+	let failures = 0;
 	for (
 		let poll = 0;
 		progress.status === "pending" && poll < (polling.limit ?? MERGE_POLL_LIMIT);
 		poll++
 	) {
 		await sleep(polling.intervalMs ?? MERGE_POLL_INTERVAL_MS);
-		progress = await github.mergeResult(progress.uuid);
+		try {
+			progress = await github.mergeResult(progress.uuid);
+			failures = 0;
+		} catch {
+			// GitHub already accepted the merge: a failed read is not a failed merge.
+			if (++failures >= MERGE_POLL_FAILURE_LIMIT) return "pending";
+		}
 	}
 	return progress.status;
 }

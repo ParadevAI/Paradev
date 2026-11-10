@@ -11957,9 +11957,6 @@ msgstr "合并"
 msgid "Merge #{0}?"
 msgstr "合并#{0}？"
 
-msgid "Merge #{number} first, or create a GitHub stack to merge these together."
-msgstr "请先合并 #{number}，或创建 GitHub 堆栈将它们一起合并。"
-
 msgid "Merge #{prNumber}?"
 msgstr "合并 #{prNumber}？"
 
@@ -20369,8 +20366,8 @@ msgstr "主题预览卡片"
 msgid "Themes"
 msgstr "主题"
 
-msgid "These are linked by base branch. A GitHub stack merges them in one step."
-msgstr "它们通过基础分支相连。GitHub 堆栈可一步合并它们。"
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "它们通过基础分支相连，因此每一个都会合并到它下面的那一个。GitHub 堆栈可一步合并全部。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "创建工作区时会自动运行这些命令。<0>阅读文档<1/></0>"

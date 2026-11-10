@@ -21,6 +21,13 @@ export interface PullRequestStackQuery {
 	refetch: () => void;
 }
 
+// A stack changes when someone acts on it, and our own actions invalidate it.
+const STACK_STALE_MS = 5 * 60_000;
+
+function isRateLimited(error: unknown): boolean {
+	return /rate limit/i.test(error instanceof Error ? error.message : "");
+}
+
 export const PULL_REQUEST_STACK_QUERY_KEY_PREFIX = ["pull-request-stack"];
 
 export function usePullRequestStack(
@@ -30,9 +37,11 @@ export function usePullRequestStack(
 		queryKey: pullRequestStackQueryKey(target),
 		queryFn: () => (target ? readPullRequestStack(target) : null),
 		enabled: target !== null && canActOnPullRequest(target),
-		staleTime: 30_000,
+		staleTime: STACK_STALE_MS,
 		gcTime: 10 * 60_000,
-		retry: 1,
+		refetchOnWindowFocus: false,
+		retryOnMount: false,
+		retry: (failures, error) => failures < 1 && !isRateLimited(error),
 	});
 	return {
 		stack: query.data ?? null,

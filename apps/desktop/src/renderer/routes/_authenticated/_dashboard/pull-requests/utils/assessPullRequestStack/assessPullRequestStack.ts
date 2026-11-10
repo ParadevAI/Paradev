@@ -61,11 +61,7 @@ export interface PullRequestStackBlocker {
 	number: number;
 }
 
-export type PullRequestStackMergeBlocker =
-	| PullRequestStackBlocker
-	| { kind: "incomplete" }
-	/** A chain of base branches: GitHub merges it one pull request at a time. */
-	| { kind: "not-a-stack"; lowest: number };
+export type PullRequestStackMergeBlocker = PullRequestStackBlocker;
 
 export interface PullRequestStackAssessment {
 	verdict: PullRequestStackVerdict;
@@ -137,25 +133,15 @@ export function assessPullRequestStack(
 }
 
 /**
- * A chain inferred from base branches is no stack on GitHub, so only its
- * lowest open layer can merge into the trunk.
+ * Only a GitHub stack lands several pull requests at once, so only its layers
+ * can hold the merge back. A chain of base branches merges one pull request
+ * at a time, each into its own base.
  */
-export function resolveStackMergeBlocker({
-	stack,
-	isIncomplete,
-}: {
-	stack: Pick<PullRequestStack, "layers" | "currentPosition" | "source"> | null;
-	isIncomplete: boolean;
-}): PullRequestStackMergeBlocker | null {
-	if (isIncomplete) return { kind: "incomplete" };
-	if (!stack) return null;
-	const { targets, blocker } = assessPullRequestStack(stack);
-	if (blocker) return blocker;
-	const lowest = targets[0];
-	if (stack.source === "inferred" && lowest && targets.length > 1) {
-		return { kind: "not-a-stack", lowest: lowest.number };
-	}
-	return null;
+export function resolveStackMergeBlocker(
+	stack: Pick<PullRequestStack, "layers" | "currentPosition" | "source"> | null,
+): PullRequestStackMergeBlocker | null {
+	if (!stack || stack.source !== "github") return null;
+	return assessPullRequestStack(stack).blocker;
 }
 
 /** The open layers of a chain, bottom to top: what a new GitHub stack would hold. */
