@@ -419,6 +419,7 @@ async function runDestroy(
 		if (marked) {
 			console.warn("[workspace-cleanup] delete failed; restoring workspace", {
 				workspaceId: input.workspaceId,
+				code: err instanceof TRPCError ? err.code : undefined,
 				error: err instanceof Error ? err.message : String(err),
 			});
 			unarchiveLocalWorkspace(ctx, input.workspaceId);

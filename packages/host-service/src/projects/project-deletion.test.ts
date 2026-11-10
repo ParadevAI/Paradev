@@ -333,6 +333,22 @@ describe("delete permanently", () => {
 		expect(existsSync(repoPath)).toBe(true);
 	});
 
+	test("a worktree whose removal fails does not stop the others", async () => {
+		const { ctx, addWorkspace, project } = setup();
+		const stuck = addWorkspace("stuck");
+		const other = addWorkspace("other");
+		const removeAndRecord = cleanupGitOps.removeWorktree;
+		cleanupGitOps.removeWorktree = async (input) => {
+			if (input.worktreePath === stuck) throw new Error("timed out");
+			return removeAndRecord(input);
+		};
+		await softDeleteProject(ctx, PROJECT_ID);
+		expect(await purgeDeletedProject(ctx, PROJECT_ID)).toBe(true);
+		expect(project()).toBeUndefined();
+		expect(existsSync(stuck)).toBe(true);
+		expect(existsSync(other)).toBe(false);
+	});
+
 	test("refuses a project that was never deleted", async () => {
 		const { ctx, addWorkspace, gitCalls, project } = setup();
 		addWorkspace("live");

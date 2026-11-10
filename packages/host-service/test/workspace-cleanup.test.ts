@@ -14,7 +14,10 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { workspaceRouter } from "../src/trpc/router/workspace";
-import { cleanupGitOps } from "../src/trpc/router/workspace-cleanup/git-ops";
+import {
+	cleanupGitOps,
+	MAX_CONCURRENT_WORKTREE_REMOVALS,
+} from "../src/trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../src/trpc/router/workspace-cleanup/is-local-checkout-workspace";
 import {
 	__testDestroysInFlight,
@@ -1088,6 +1091,37 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			cleanupGitOps.readWorktreeState = patchedReadWorktreeState;
 			rmSync(worktree, { recursive: true, force: true });
 			rmSync(repo, { recursive: true, force: true });
+		}
+	});
+
+	test("worktree removals beyond the limit wait for a slot instead of taking another worker", async () => {
+		const pool = getHostWorkerPool();
+		const realRun = pool.run;
+		const finishers: Array<() => void> = [];
+		pool.run = (() =>
+			new Promise((resolve) =>
+				finishers.push(() => resolve({ stillRegistered: false })),
+			)) as typeof pool.run;
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		try {
+			const removals = [1, 2, 3].map((n) =>
+				realGitOps.removeWorktree({
+					repoPath: "/repo",
+					worktreePath: `/wt-${n}`,
+					gitEnv: {},
+				}),
+			);
+			await flush();
+			expect(finishers).toHaveLength(MAX_CONCURRENT_WORKTREE_REMOVALS);
+
+			finishers[0]?.();
+			await flush();
+			expect(finishers).toHaveLength(3);
+
+			for (const finish of finishers.slice(1)) finish();
+			await Promise.all(removals);
+		} finally {
+			pool.run = realRun;
 		}
 	});
 

@@ -33,18 +33,35 @@ export function isIndeterminateGitTaskFailure(err: unknown): boolean {
 	return err instanceof WorkerTaskError && err.name === "WorkerTaskError";
 }
 
-/** The delete dialog waits on this read before it can show its warnings. */
+/** The delete dialog waits on this read. */
 export const INSPECT_WORKTREE_STATE_TIMEOUT_MS = 15_000;
 
-/** Destroy reads the state after the row is archived, so nobody waits on
- * it, and a timeout restores the row. A cold or busy disk (a batch delete)
- * can need far more than the dialog's budget. */
+/** Runs after the row is archived, so nobody waits on it. */
 export const DESTROY_WORKTREE_STATE_TIMEOUT_MS = 120_000;
 
-/** A timeout kills `git worktree remove` partway through its delete and
- * leaves a half-deleted worktree. A multi-GB pnpm tree on a full disk
- * needs minutes, so this budget only stops a removal that is hung. */
+/** A timeout kills git mid-delete, so this only stops a hung removal. */
 export const WORKTREE_REMOVE_TIMEOUT_MS = 30 * 60_000;
+
+/** Long removals must not take every shared worker slot from status and diff reads. */
+export const MAX_CONCURRENT_WORKTREE_REMOVALS = 2;
+
+let activeWorktreeRemovals = 0;
+const queuedWorktreeRemovals: Array<() => void> = [];
+
+async function withWorktreeRemovalSlot<T>(run: () => Promise<T>): Promise<T> {
+	if (activeWorktreeRemovals < MAX_CONCURRENT_WORKTREE_REMOVALS) {
+		activeWorktreeRemovals++;
+	} else {
+		await new Promise<void>((resolve) => queuedWorktreeRemovals.push(resolve));
+	}
+	try {
+		return await run();
+	} finally {
+		const next = queuedWorktreeRemovals.shift();
+		if (next) next();
+		else activeWorktreeRemovals--;
+	}
+}
 
 export const cleanupGitOps = {
 	/** Same failure surface as `ctx.git(repoPath)` — a throw here maps to the
@@ -73,9 +90,11 @@ export const cleanupGitOps = {
 		gitEnv: GitTaskEnv;
 		force?: boolean;
 	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
-		return getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
-			timeoutMs: WORKTREE_REMOVE_TIMEOUT_MS,
-		});
+		return withWorktreeRemovalSlot(() =>
+			getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
+				timeoutMs: WORKTREE_REMOVE_TIMEOUT_MS,
+			}),
+		);
 	},
 
 	deleteLocalBranch(input: {
