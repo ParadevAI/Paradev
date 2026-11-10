@@ -126,6 +126,7 @@ export const workspaceCleanupRouter = router({
 	 *   - hasChanges/Unpushed   → render as warnings; user can still confirm.
 	 *   - git failures (missing worktree, broken repo) → return as canDelete
 	 *     with no warnings; the destroy saga handles those states best-effort.
+	 *   - timeout / pool failure → throw: the state is unknown, not clean.
 	 *
 	 * The git reads run in the host worker pool (gitWorktreeStateTask) so a
 	 * slow status on a large worktree can't block the event loop.
@@ -169,7 +170,13 @@ export const workspaceCleanupRouter = router({
 					hasUnpushedCommits: state.hasUnpushedCommits,
 					sharesProjectCheckout: false,
 				};
-			} catch {
+			} catch (err) {
+				if (isIndeterminateGitTaskFailure(err)) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: `Couldn't verify worktree state at ${local.worktreePath}: ${err instanceof Error ? err.message : String(err)}`,
+					});
+				}
 				return {
 					canDelete: true,
 					reason: null,

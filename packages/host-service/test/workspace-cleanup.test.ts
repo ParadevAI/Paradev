@@ -340,6 +340,22 @@ describe("workspaceCleanup.inspect", () => {
 		});
 	});
 
+	test("a timed-out worktree-state read fails instead of reporting a clean worktree", async () => {
+		const ctx = makeCtx({
+			...wsAndProject,
+			worktreeState: () =>
+				Promise.reject(
+					new WorkerTaskError(
+						'[host-worker] Task "git/worktreeState" timed out after 15000ms',
+					),
+				),
+		});
+		const caller = workspaceCleanupRouter.createCaller(ctx);
+		await expect(caller.inspect({ workspaceId: "ws-1" })).rejects.toThrow(
+			/Couldn't verify worktree state/,
+		);
+	});
+
 	test("swallows git env-resolution failures and returns canDelete: true with no warnings", async () => {
 		const ctx = makeCtx({
 			...wsAndProject,
@@ -1047,15 +1063,15 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 		).rejects.toThrow(/Couldn't verify worktree state/);
 	});
 
-	test("a preflight slower than the delete dialog's budget deletes instead of restoring the row", async () => {
-		// `git status` that needs 20 s, as on a cold or busy disk: the pool
-		// rejects any shorter budget, exactly as it does in the field.
+	test("a preflight that needs minutes deletes instead of restoring the row", async () => {
+		// `git status` that needs 5 min, as on a large worktree on a cold or
+		// busy disk: the pool rejects any shorter budget, as it does in the field.
 		const pool = getHostWorkerPool();
 		const realRun = pool.run;
 		const patchedReadWorktreeState = cleanupGitOps.readWorktreeState;
 		pool.run = (async (_def, _input, options) => {
 			const timeoutMs = options?.timeoutMs ?? 0;
-			if (timeoutMs < 20_000) {
+			if (timeoutMs < 5 * 60_000) {
 				throw new WorkerTaskError(
 					`[host-worker] Task "git/worktreeState" timed out after ${timeoutMs}ms`,
 				);

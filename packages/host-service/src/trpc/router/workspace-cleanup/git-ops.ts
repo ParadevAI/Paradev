@@ -37,7 +37,7 @@ export function isIndeterminateGitTaskFailure(err: unknown): boolean {
 export const INSPECT_WORKTREE_STATE_TIMEOUT_MS = 15_000;
 
 /** Runs after the row is archived, so nobody waits on it. */
-export const DESTROY_WORKTREE_STATE_TIMEOUT_MS = 120_000;
+export const DESTROY_WORKTREE_STATE_TIMEOUT_MS = 10 * 60_000;
 
 /** A timeout kills git mid-delete, so this only stops a hung removal. */
 export const WORKTREE_REMOVE_TIMEOUT_MS = 30 * 60_000;
