@@ -591,7 +591,11 @@ export const gitRouter = router({
 					message: `${input.branch} is checked out in another workspace.`,
 				});
 			}
-			await git.fetch("origin", input.branch).catch(() => {});
+			const hasLocalBranch =
+				(await git.raw(["branch", "--list", input.branch])).trim() !== "";
+			if (!hasLocalBranch) {
+				await git.fetch("origin", input.branch).catch(() => {});
+			}
 			try {
 				await git.raw(["switch", input.branch]);
 			} catch (error) {

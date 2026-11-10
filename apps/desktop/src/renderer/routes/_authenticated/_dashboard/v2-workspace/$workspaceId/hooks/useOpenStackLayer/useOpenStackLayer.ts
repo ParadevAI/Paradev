@@ -66,17 +66,17 @@ export function useOpenStackLayer(
 						workspaceId: workspace.id,
 						branch: layer.headRefName,
 					});
-					await host.pullRequests.refreshByWorkspaces
-						.mutate({ workspaceIds: [workspace.id] })
-						.catch(() => {});
-					await queryClient.invalidateQueries({
-						queryKey: PULL_REQUEST_STACK_QUERY_KEY_PREFIX,
-					});
 					toast.success(t({ message: `Switched to #${number}` }), {
 						id: toastId,
 					});
-					onSwitched?.();
 					view();
+					void host.pullRequests.refreshByWorkspaces
+						.mutate({ workspaceIds: [workspace.id] })
+						.catch(() => {})
+						.then(() => onSwitched?.());
+					void queryClient.invalidateQueries({
+						queryKey: PULL_REQUEST_STACK_QUERY_KEY_PREFIX,
+					});
 				} catch (error) {
 					toast.error(t({ message: `Couldn't switch to #${number}` }), {
 						id: toastId,
