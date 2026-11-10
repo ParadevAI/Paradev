@@ -55,6 +55,7 @@ import { MachineSizePickerPill } from "renderer/routes/_authenticated/components
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { pickCloudRepository } from "renderer/routes/_authenticated/utils/pickCloudRepository";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
@@ -406,15 +407,18 @@ export function NewWorkspaceScreen({
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 	const cloudRepository = useMemo(() => {
 		if (!isCloudHost) return null;
-		const primary = resolvedEnvironment?.repositories?.[0];
-		return primary
+		const repository = pickCloudRepository(
+			resolvedEnvironment?.repositories,
+			projectRepositoryFullName,
+		);
+		return repository
 			? {
-					owner: primary.owner,
-					name: primary.name,
-					defaultBranch: primary.defaultBranch,
+					owner: repository.owner,
+					name: repository.name,
+					defaultBranch: repository.defaultBranch,
 				}
 			: null;
-	}, [isCloudHost, resolvedEnvironment]);
+	}, [isCloudHost, resolvedEnvironment, projectRepositoryFullName]);
 	const isPromptEmpty = !draftText(draft.promptDraft).trim();
 	// The markdown editor is uncontrolled after mount, so programmatic prompt
 	// insertion bumps promptSeed to remount it with the new content.
