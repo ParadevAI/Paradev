@@ -9,6 +9,7 @@ import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v
 import { useRingtoneStore } from "renderer/stores/ringtone";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { applyRememberedV2PaneSelection } from "renderer/stores/v2-pane-selection";
+import { lifecycleChimes } from "./lifecycleChime";
 import { getV2NativeNotificationContent } from "./notificationContent";
 import {
 	isV2NotificationTargetVisible,
@@ -96,8 +97,10 @@ export function handleV2AgentLifecycleEvent({
 	}
 	if (shouldSuppress(target, layouts)) return;
 
-	const ringtoneId = useRingtoneStore.getState().selectedRingtoneId;
-	void playRingtone({ ringtoneId, volume, muted });
+	if (lifecycleChimes(payload)) {
+		const ringtoneId = useRingtoneStore.getState().selectedRingtoneId;
+		void playRingtone({ ringtoneId, volume, muted });
+	}
 
 	showNativeNotification({
 		payload,

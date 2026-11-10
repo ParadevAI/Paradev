@@ -46,6 +46,7 @@ describe("AgentMissingCard", () => {
 		render(
 			<AgentMissingCard
 				agent="claude"
+				detail={DETAIL}
 				installed
 				otherAgents={[]}
 				onUseAgent={() => {}}
@@ -55,5 +56,6 @@ describe("AgentMissingCard", () => {
 		expect(screen.getByText("Claude Code is installed")).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
 		expect(screen.queryByRole("button", { name: "Install" })).toBeNull();
+		expect(screen.queryByText("Details")).toBeNull();
 	});
 });

@@ -33,6 +33,7 @@ import {
 	freshStartMode,
 	readSavedChatMode,
 } from "../../../../utils/savedChatMode";
+import { PendingPromptsView } from "../../../ChatSession/components/PendingPromptsView";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -54,6 +55,7 @@ import { MoveProgress } from "./components/MoveProgress";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
 import { useStoredChatSnapshot } from "./hooks/useStoredChatSnapshot";
+import { chatStartFailure } from "./utils/chatStartFailure";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
 import { loadUnsentPrompts } from "./utils/loadUnsentPrompts";
@@ -717,13 +719,62 @@ export function AcpChatPane({
 		[sessionId],
 	);
 
-	const agentFailed =
-		startFailed !== null || failure !== null || Boolean(stored?.lastError);
+	const liveStartFailure =
+		startFailed?.sessionId === sessionId ? startFailed.failure : null;
+	const chatFailure = chatStartFailure({
+		canChat: Boolean(harness),
+		sessionId,
+		hasClient: Boolean(client),
+		recovering,
+		liveStartFailure,
+		sessionDead,
+		sessionStopped,
+		createFailure: failure,
+		storedError: stored?.lastError,
+		stored,
+	});
+	// A chat the user carried on in a terminal is not waiting for an install.
+	const installFailure =
+		chatFailure?.path === "stopped" && continuedInTerminal ? null : chatFailure;
 	const installable = isCodingAgentId(agent?.id) ? agent.id : null;
+	const onThisMachine = Boolean(localHostUrl) && hostUrl === localHostUrl;
 	const agentStatus = electronTrpc.codingAgents.status.useQuery(
 		{ agent: installable ?? "claude" },
-		{ enabled: agentFailed && installable !== null },
+		{
+			enabled: installFailure !== null && installable !== null && onThisMachine,
+		},
 	);
+	const missingNow = missingCodingAgent({
+		agentId: agent?.id,
+		failed: installFailure !== null,
+		installed: agentStatus.data?.installed,
+		hostUrl,
+		localHostUrl,
+	});
+	// The card stays once shown, so an install from Settings turns it into Try again.
+	const failureKey = sessionId ?? terminalId;
+	const [missingIn, setMissingIn] = useState<string | null>(null);
+	useEffect(() => {
+		if (missingNow) setMissingIn(failureKey);
+	}, [missingNow, failureKey]);
+	const missingAgent =
+		installFailure && (missingNow || missingIn === failureKey)
+			? (missingNow ?? installable)
+			: null;
+	const lookingUpAgent =
+		installFailure !== null &&
+		installable !== null &&
+		onThisMachine &&
+		agentStatus.isPending;
+	const { data: stoppedPrompts } = useQuery({
+		enabled:
+			missingAgent !== null &&
+			installFailure?.path === "stopped" &&
+			sessionId !== null &&
+			!agentSessionId,
+		queryKey: ["acp-chat-unsent-prompts", sessionId],
+		queryFn: () => loadUnsentPrompts(wiring.transport, sessionId as string),
+	});
 
 	const draftKey = `chat-v3-draft:${draftId ?? terminalId}`;
 
@@ -835,44 +886,63 @@ export function AcpChatPane({
 		);
 	}
 
-	const missingAgentCard = (
-		detail: string | undefined,
-		onRetry: () => void,
-	) => {
-		const missing = missingCodingAgent(detail, { hostUrl, localHostUrl });
-		if (!missing) return null;
+	if (installFailure && (missingAgent || lookingUpAgent)) {
+		const carried =
+			installFailure.path === "live"
+				? installFailure.failure.prompts
+				: installFailure.path === "stopped"
+					? (stoppedPrompts ?? [])
+					: [];
+		const queued = new Set(pendingPrompts.map((p) => JSON.stringify(p)));
+		const shownPrompts = [
+			...carried.filter((p) => !queued.has(JSON.stringify(p))),
+			...pendingPrompts,
+		];
+		const retry =
+			installFailure.path === "live"
+				? () => void startAgain(installFailure.failure.prompts)
+				: installFailure.path === "stopped"
+					? retryRecovery
+					: startFresh;
 		return (
-			<AgentMissingCard
-				agent={missing}
-				detail={detail}
-				installed={missing === installable && agentStatus.data?.installed}
-				otherAgents={(agentSwitch?.agents ?? []).filter(
-					(other) => other.presetId !== agent?.id,
-				)}
-				onUseAgent={(presetId) =>
-					onSwitchAgent?.({
-						presetId,
-						label:
-							agentSwitch?.agents.find((other) => other.presetId === presetId)
-								?.label ?? presetId,
-						model: null,
-						modeId: undefined,
-						handoffPrompt: null,
-					})
+			<DraftChat
+				draftKey={draftKey}
+				getOpenFilePaths={getOpenFilePaths}
+				isActive={isActive}
+				onOpenHistory={onOpenHistory}
+				onQueue={onQueuePrompt}
+				queued={pendingPrompts}
+				transcript={
+					<div className="flex min-h-0 flex-1 flex-col">
+						<PendingPromptsView prompts={shownPrompts} />
+						{missingAgent && (
+							<AgentMissingCard
+								agent={missingAgent}
+								detail={installFailure.detail}
+								installed={agentStatus.data?.installed === true}
+								otherAgents={(agentSwitch?.agents ?? []).filter(
+									(other) => other.presetId !== agent?.id,
+								)}
+								onUseAgent={(presetId) =>
+									onSwitchAgent?.({
+										presetId,
+										label:
+											agentSwitch?.agents.find(
+												(other) => other.presetId === presetId,
+											)?.label ?? presetId,
+										model: null,
+										modeId: undefined,
+										handoffPrompt: null,
+									})
+								}
+								onRetry={retry}
+							/>
+						)}
+					</div>
 				}
-				onRetry={onRetry}
+				workspaceId={workspaceId}
 			/>
 		);
-	};
-
-	const liveStartFailure =
-		startFailed?.sessionId === sessionId ? startFailed.failure : null;
-	if (harness && liveStartFailure && !recovering) {
-		const card = missingAgentCard(
-			liveStartFailure.detail,
-			() => void startAgain(liveStartFailure.prompts),
-		);
-		if (card) return card;
 	}
 
 	const lost = failure !== null && stored === null;
@@ -882,11 +952,6 @@ export function AcpChatPane({
 		(sessionDead || sessionStopped || lost) &&
 		!recovering
 	) {
-		const detail = failure ?? stored?.lastError ?? undefined;
-		const card = continuedInTerminal
-			? null
-			: missingAgentCard(detail, retryRecovery);
-		if (card) return card;
 		return (
 			<AcpRecovery
 				detail={failure ?? stored?.lastError ?? undefined}
@@ -899,8 +964,6 @@ export function AcpChatPane({
 
 	if (!client || !sessionId) {
 		if (failure && harness) {
-			const card = missingAgentCard(failure, startFresh);
-			if (card) return card;
 			return (
 				<AcpRecovery
 					detail={failure}

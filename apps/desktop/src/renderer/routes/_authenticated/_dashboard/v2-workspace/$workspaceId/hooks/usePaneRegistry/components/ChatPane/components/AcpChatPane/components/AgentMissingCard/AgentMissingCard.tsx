@@ -26,7 +26,7 @@ interface AgentMissingCardProps {
 	onRetry: () => void;
 }
 
-/** Shown in place of a chat that stopped because its agent isn't installed. */
+/** Shown above the composer of a chat that stopped because its agent isn't installed. */
 export function AgentMissingCard({
 	agent,
 	detail,
@@ -42,7 +42,7 @@ export function AgentMissingCard({
 	const phase = picked ?? (installed ? "installed" : "missing");
 
 	return (
-		<div className="flex h-full w-full items-center justify-center p-8">
+		<div className="flex w-full justify-center px-4 pt-2 pb-4">
 			<div className="flex w-full max-w-md flex-col gap-4 rounded-lg border bg-muted/30 p-5">
 				<div className="flex items-start gap-3">
 					<span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-background">
@@ -114,7 +114,7 @@ export function AgentMissingCard({
 						)}
 					</div>
 				)}
-				{detail && (
+				{detail && phase !== "installed" && (
 					<details className="text-muted-foreground text-xs">
 						<summary className="cursor-pointer select-none">
 							<Trans>Details</Trans>

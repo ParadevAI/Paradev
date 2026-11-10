@@ -5,44 +5,48 @@ const LOCAL = {
 	hostUrl: "http://127.0.0.1:1",
 	localHostUrl: "http://127.0.0.1:1",
 };
-const claudeMissing =
-	"claude was not found, so this chat cannot start. Install claude 2.1.226 or newer and make sure it is on your PATH. Upgrade with: npm i -g @anthropic-ai/claude-code@latest";
 
 describe("missingCodingAgent", () => {
-	test("offers the install for Claude Code or Codex on this machine", () => {
-		expect(missingCodingAgent(claudeMissing, LOCAL)).toBe("claude");
-		expect(
-			missingCodingAgent(
-				"codex was not found, so this chat cannot start. Install codex.",
-				LOCAL,
-			),
-		).toBe("codex");
+	test("offers the install when the lookup finds no binary", () => {
+		const missing = { failed: true, installed: false, ...LOCAL };
+		expect(missingCodingAgent({ agentId: "claude", ...missing })).toBe(
+			"claude",
+		);
+		expect(missingCodingAgent({ agentId: "codex", ...missing })).toBe("codex");
 	});
 
-	test("keeps the plain error for another host, agent, or failure", () => {
+	test("keeps the plain error when the binary is there or not yet looked up", () => {
+		for (const installed of [true, undefined]) {
+			expect(
+				missingCodingAgent({
+					agentId: "claude",
+					failed: true,
+					installed,
+					...LOCAL,
+				}),
+			).toBeNull();
+		}
+	});
+
+	test("offers nothing for a chat that did not fail, another host, or another agent", () => {
+		const base = { agentId: "claude", failed: true, installed: false };
+		expect(missingCodingAgent({ ...base, ...LOCAL, failed: false })).toBeNull();
 		expect(
-			missingCodingAgent(claudeMissing, {
+			missingCodingAgent({
+				...base,
 				hostUrl: "https://relay.example/host-2",
 				localHostUrl: LOCAL.localHostUrl,
 			}),
 		).toBeNull();
 		expect(
-			missingCodingAgent(claudeMissing, {
+			missingCodingAgent({
+				...base,
 				hostUrl: LOCAL.hostUrl,
 				localHostUrl: null,
 			}),
 		).toBeNull();
 		expect(
-			missingCodingAgent(
-				"gemini was not found, so this chat cannot start.",
-				LOCAL,
-			),
-		).toBeNull();
-		expect(
-			missingCodingAgent(
-				"claude 2.1.226 or newer is needed for chat, and 2.0.0 is installed.",
-				LOCAL,
-			),
+			missingCodingAgent({ ...base, ...LOCAL, agentId: "gemini" }),
 		).toBeNull();
 	});
 });
