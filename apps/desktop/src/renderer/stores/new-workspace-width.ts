@@ -11,6 +11,9 @@ interface NewWorkspaceWidthState {
 	/** User-resized screen composer width; null = default. */
 	screenWidth: number | null;
 	setScreenWidth: (width: number | null) => void;
+	/** Width while a resize drag is in flight; not persisted. */
+	liveWidth: number | null;
+	setLiveWidth: (width: number | null) => void;
 }
 
 /** Persisted symmetric-resize width for the new-workspace screen composer. */
@@ -19,6 +22,8 @@ export const useNewWorkspaceWidthStore = create<NewWorkspaceWidthState>()(
 		persist(
 			(set) => ({
 				screenWidth: null,
+				liveWidth: null,
+				setLiveWidth: (liveWidth) => set({ liveWidth }),
 				setScreenWidth: (width) =>
 					set({
 						screenWidth:
@@ -32,7 +37,10 @@ export const useNewWorkspaceWidthStore = create<NewWorkspaceWidthState>()(
 									),
 					}),
 			}),
-			{ name: "new-workspace-width" },
+			{
+				name: "new-workspace-width",
+				partialize: (state) => ({ screenWidth: state.screenWidth }),
+			},
 		),
 		{ name: "NewWorkspaceWidthStore" },
 	),

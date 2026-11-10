@@ -11,7 +11,6 @@ import type {
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useNewWorkspaceWidthStore } from "renderer/stores/new-workspace-width";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
-import { CHAT_DEFAULT_WIDTH } from "../ChatSession/constants";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -39,10 +38,13 @@ export function ChatPane({
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
 	const data = ctx.pane.data as ChatPaneData;
-	const chatWidth = useNewWorkspaceWidthStore((state) => state.screenWidth);
-	const chatWidthStyle = {
-		"--chat-max-width": `${chatWidth ?? CHAT_DEFAULT_WIDTH}px`,
-	} as CSSProperties;
+	const chatWidth = useNewWorkspaceWidthStore(
+		(state) => state.liveWidth ?? state.screenWidth,
+	);
+	const chatWidthStyle =
+		chatWidth === null
+			? undefined
+			: ({ "--chat-max-width": `${chatWidth}px` } as CSSProperties);
 	const openPage = useOpenChatPage(ctx.store);
 	const { hint, showHint } = useLinkClickHint();
 	const openLink = useOpenChatLink({

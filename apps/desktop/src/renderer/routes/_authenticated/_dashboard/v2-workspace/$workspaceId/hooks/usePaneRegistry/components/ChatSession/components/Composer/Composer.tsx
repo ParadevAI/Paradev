@@ -271,9 +271,14 @@ export const Composer = memo(function Composer({
 	);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const footerTier = useFooterTier(rootRef);
-	const chatWidth = useNewWorkspaceWidthStore((state) => state.screenWidth);
+	const chatWidth = useNewWorkspaceWidthStore(
+		(state) => state.liveWidth ?? state.screenWidth,
+	);
 	const setChatWidth = useNewWorkspaceWidthStore(
 		(state) => state.setScreenWidth,
+	);
+	const setLiveChatWidth = useNewWorkspaceWidthStore(
+		(state) => state.setLiveWidth,
 	);
 	const composerId = useId();
 	useEffect(() => {
@@ -642,9 +647,15 @@ export const Composer = memo(function Composer({
 					currentWidth={chatWidth ?? CHAT_DEFAULT_WIDTH}
 					minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
 					maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
-					onWidthChange={setChatWidth}
-					onWidthCommit={setChatWidth}
-					onReset={() => setChatWidth(null)}
+					onWidthChange={setLiveChatWidth}
+					onWidthCommit={(width) => {
+						setChatWidth(width);
+						setLiveChatWidth(null);
+					}}
+					onReset={() => {
+						setChatWidth(null);
+						setLiveChatWidth(null);
+					}}
 				/>
 				<AgentComposer
 					className="w-full"

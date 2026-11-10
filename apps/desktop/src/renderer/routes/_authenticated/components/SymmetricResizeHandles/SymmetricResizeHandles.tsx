@@ -60,10 +60,9 @@ export function SymmetricResizeHandles({
 			lastWidthRef.current = width;
 			onWidthChange(width);
 		},
-		onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => {
+		onLostPointerCapture: () => {
 			if (!dragRef.current) return;
 			dragRef.current = null;
-			e.currentTarget.releasePointerCapture(e.pointerId);
 			if (lastWidthRef.current !== null) onWidthCommit(lastWidthRef.current);
 		},
 		onDoubleClick: () => {
