@@ -9285,6 +9285,9 @@ msgstr "已隐藏front matter。切换到Markdown视图进行编辑"
 msgid "Full access"
 msgstr "完全访问"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "完全访问会跳过大多数审批，但智能体在执行某些有风险的操作前仍会询问。"
+
 msgid "Full changelog →"
 msgstr "完整更新日志 →"
 
@@ -12303,9 +12306,6 @@ msgstr "网络已变更"
 
 msgid "Never"
 msgstr "从未"
-
-msgid "Never asks before acting"
-msgstr "执行前从不询问"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15705,6 +15705,9 @@ msgstr "排序依据"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "把你的智能体用量与其他工程师排名比较。仅包含token数量和模型名称，不含仓库名、文件路径或提示词。"
 
+msgid "Rarely asks before acting"
+msgstr "执行操作前很少询问"
+
 msgid "Rate {appName}"
 msgstr "为{appName}评分"
 
@@ -19020,6 +19023,9 @@ msgstr "第 2 步，共 2 步"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "第 3 步和第 4 步会重复，直到页面满意为止。"
+
+msgid "Still asks in Full access mode"
+msgstr "完全访问模式下仍会询问"
 
 msgid "Still can't reach the host."
 msgstr "仍然无法连接到主机。"

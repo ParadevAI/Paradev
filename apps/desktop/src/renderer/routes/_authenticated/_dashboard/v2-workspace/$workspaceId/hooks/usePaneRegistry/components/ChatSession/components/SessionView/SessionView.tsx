@@ -64,6 +64,7 @@ import { SubagentView } from "../SubagentView";
 import { Transcript, type TranscriptHandle } from "../Transcript";
 import { useChildrenByParent } from "../Transcript/hooks/useChildrenByParent";
 import { NestedItemsProvider } from "../Transcript/providers/NestedItemsProvider";
+import { SessionModeProvider } from "../Transcript/providers/SessionModeProvider";
 import { TranscriptPluginsProvider } from "../Transcript/providers/TranscriptPluginsProvider";
 import {
 	type DrawerExit,
@@ -687,39 +688,41 @@ export function SessionView({
 					scrollPreviousItemPeek={0}
 				>
 					<div className="@container relative flex min-h-0 flex-1">
-						<TranscriptPluginsProvider value={plugins}>
-							<NestedItemsProvider value={nestedItems}>
-								{focusedSubagentId ? (
-									<SubagentView
-										itemId={focusedSubagentId}
-										queued={subagent.queued}
-									/>
-								) : (
-									<TurnFailureActionsProvider value={failureActions}>
-										<Transcript
-											approvals={approvals}
-											canForkToWorktree={canForkToWorktree}
-											groups={timeline}
-											hasOlder={session.hasOlder}
-											isActive={isActive}
-											onCloseFind={focusComposer}
-											onDiscardPrompt={session.discardPrompt}
-											onFork={onFork ? forkWithTranscript : undefined}
-											onLoadOlder={loadOlder}
-											onRequestItemBodies={session.requestItemBodies}
-											onRespond={onRespond}
-											onMessageRevealed={clearRevealMessage}
-											onRetryPrompt={session.retryPrompt}
-											outbox={transcriptOutbox}
-											ref={transcriptRef}
-											revealMessageId={revealMessageId}
-											sessionId={client.sessionId}
-											snapshot={shownSnapshot}
+						<SessionModeProvider value={sessionState?.modeId}>
+							<TranscriptPluginsProvider value={plugins}>
+								<NestedItemsProvider value={nestedItems}>
+									{focusedSubagentId ? (
+										<SubagentView
+											itemId={focusedSubagentId}
+											queued={subagent.queued}
 										/>
-									</TurnFailureActionsProvider>
-								)}
-							</NestedItemsProvider>
-						</TranscriptPluginsProvider>
+									) : (
+										<TurnFailureActionsProvider value={failureActions}>
+											<Transcript
+												approvals={approvals}
+												canForkToWorktree={canForkToWorktree}
+												groups={timeline}
+												hasOlder={session.hasOlder}
+												isActive={isActive}
+												onCloseFind={focusComposer}
+												onDiscardPrompt={session.discardPrompt}
+												onFork={onFork ? forkWithTranscript : undefined}
+												onLoadOlder={loadOlder}
+												onRequestItemBodies={session.requestItemBodies}
+												onRespond={onRespond}
+												onMessageRevealed={clearRevealMessage}
+												onRetryPrompt={session.retryPrompt}
+												outbox={transcriptOutbox}
+												ref={transcriptRef}
+												revealMessageId={revealMessageId}
+												sessionId={client.sessionId}
+												snapshot={shownSnapshot}
+											/>
+										</TurnFailureActionsProvider>
+									)}
+								</NestedItemsProvider>
+							</TranscriptPluginsProvider>
+						</SessionModeProvider>
 						{!focusedSubagentId && rail.length > 1 && (
 							<ChatHistorySidebarScroller
 								className="absolute inset-y-0 left-0 my-auto hidden h-fit max-h-full flex-col pl-3 @[56rem]:flex"

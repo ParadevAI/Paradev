@@ -9285,6 +9285,9 @@ msgstr "フロントマターは非表示です。編集するにはMarkdownビ�
 msgid "Full access"
 msgstr "フルアクセス"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "フルアクセスではほとんどの承認が省略されますが、一部の危険な操作の前にはエージェントが確認します。"
+
 msgid "Full changelog →"
 msgstr "Changelog全体 →"
 
@@ -12303,9 +12306,6 @@ msgstr "ネットワークが変更されました"
 
 msgid "Never"
 msgstr "未使用"
-
-msgid "Never asks before acting"
-msgstr "確認なしで実行"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15705,6 +15705,9 @@ msgstr "ランキングの基準"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "エージェント使用量を他のエンジニアと比較してランキングします。トークン数とモデル名のみで、リポジトリ名、ファイルパス、プロンプトは含まれません。"
 
+msgid "Rarely asks before acting"
+msgstr "操作前に確認することはほとんどありません"
+
 msgid "Rate {appName}"
 msgstr "{appName}を評価"
 
@@ -19020,6 +19023,9 @@ msgstr "ステップ 2/2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "ページが仕上がるまでステップ3と4を繰り返します。"
+
+msgid "Still asks in Full access mode"
+msgstr "フルアクセスでも確認が必要です"
 
 msgid "Still can't reach the host."
 msgstr "ホストにまだ接続できません。"

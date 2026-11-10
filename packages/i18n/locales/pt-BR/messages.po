@@ -9285,6 +9285,9 @@ msgstr "Front matter oculto. Mude para a visualização Markdown para editá-lo"
 msgid "Full access"
 msgstr "Acesso total"
 
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "O Acesso total pula a maioria das aprovações, mas o agente ainda pergunta antes de algumas ações arriscadas."
+
 msgid "Full changelog →"
 msgstr "Changelog completo →"
 
@@ -12303,9 +12306,6 @@ msgstr "A rede mudou"
 
 msgid "Never"
 msgstr "Nunca"
-
-msgid "Never asks before acting"
-msgstr "Nunca pergunta antes de agir"
 
 msgctxt "changed file badge"
 msgid "new"
@@ -15705,6 +15705,9 @@ msgstr "Classificar por"
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Compare seu uso de agentes com o de outras pessoas. Só contagens de tokens e nomes de modelos, sem nomes de repositórios, caminhos de arquivos ou prompts."
 
+msgid "Rarely asks before acting"
+msgstr "Raramente pergunta antes de agir"
+
 msgid "Rate {appName}"
 msgstr "Avaliar o {appName}"
 
@@ -19020,6 +19023,9 @@ msgstr "Etapa 2 de 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Os passos 3 e 4 se repetem até a página ficar certa."
+
+msgid "Still asks in Full access mode"
+msgstr "Ainda pergunta no modo Acesso total"
 
 msgid "Still can't reach the host."
 msgstr "O host continua inacessível."
