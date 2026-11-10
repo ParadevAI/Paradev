@@ -733,6 +733,23 @@ boundary.
    `runtime.sendNativeMessage` handlers are removed. They read one message per
    chunk of host output, counted characters instead of bytes, and left hosts
    running. The app's `extension-host/native-messaging/` is the only path.
+11. `tabs.query` applies `currentWindow` and `lastFocusedWindow`, which the
+   package read and ignored, so every window's active tab came back and the
+   caller took the first. A password manager filling a field in a sign-in
+   popup got the pane behind it instead. Both flags answer for the focused
+   window — resolved through `getLastFocusedWindow`, so a query agrees with
+   `windows.getCurrent` when no window has recorded focus and the newest one
+   stands in. A window that is focused when
+   it is added becomes that window: Chromium focuses a popup as it opens it,
+   before the app hands it over, so waiting for a `focus` event left the
+   extension answering for the window behind the popup.
+12. Window and tab shape: a window's `type` comes from the app
+   (`windowType` in `ChromeExtensionImpl`) instead of always being `"normal"`,
+   and `windows.getAll` filters on `windowTypes`. A tab's `index` is its
+   position in its own window instead of `-1`, and `tabs.query` stops
+   renumbering `index` by the position in the result it returns — the two
+   together are what makes `index` mean anything. `query` also applies
+   `index` and `windowType`.
 
 **What it changes** (`dist/chrome-extension-api.preload.js`): `chrome.storage`
 is no longer replaced. The package made `sync` and `managed` the same object
@@ -756,12 +773,22 @@ through `permissions.request`. Two tests list every handler the API classes
 register and every event name their code sends, and fail when one has no rule
 in `extensionApiRules`. One drives `ContextMenusAPI` through each handler and
 `restoreContextMenuItems`, and one reads the preload for the two changes there.
+Four more cover the window a query answers for and the shape it answers with:
+`tabs.query` with `currentWindow`, `observeWindow` on a window that already has
+focus, `windows.getAll` with `windowTypes`, and `tabs.query` on `index` and
+`windowType`.
 
 **Regenerating after a version bump:** `CI=1 bun patch electron-chrome-extensions`.
 In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
 `RoutingDelegate` and call it first in the three handlers; add the helpers and
 the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
-add the `canSeeTabUrl` line to the `TabsAPI.query` filter; add `update` and
+add the `canSeeTabUrl`, `inFocusedWindow`, `index` and `windowType` lines to the
+`TabsAPI.query` filter and drop its trailing `index` renumbering; add
+`windowTypeOf` and `tabIndexOf` before `tabDetailsForExtension` and call them
+from `createWindowDetails` and `createTabDetails`; add the `windowTypes` filter
+to `WindowsAPI.getAll` and the `isFocused` line to `WindowsAPI.observeWindow`;
+add `windowType` to `ChromeExtensionImpl` in `dist/types/browser/impl.d.ts`;
+add `update` and
 `emitChanged` to `ContextMenusAPI` and `restoreContextMenuItems` after
 `addWindow`; remove the `runtime.connectNative`, `runtime.disconnectNative`
 and `runtime.sendNativeMessage` handlers from `RuntimeAPI`. In the preload,
