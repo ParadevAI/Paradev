@@ -4200,6 +4200,9 @@ msgstr "Giao diện chat"
 msgid "Chat is being reworked"
 msgstr "Chat đang được làm lại"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Chat đang tắt, không tải được cài đặt của chat, hoặc không thể mở agent này dưới dạng chat. Hãy kiểm tra Chat trong Cài đặt > Hành vi và kết nối của bạn, rồi thử lại."
+
 msgid "Chat Launch"
 msgstr "Khởi chạy chat"
 
@@ -6154,6 +6157,9 @@ msgstr "Không thể chuyển agent con sang chạy nền"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
+
+msgid "Couldn't open chat"
+msgstr "Không thể mở chat"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Không thể mở trong giao diện chat"

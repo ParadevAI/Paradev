@@ -4200,6 +4200,9 @@ msgstr "Interfejs czatu"
 msgid "Chat is being reworked"
 msgstr "Czat jest przebudowywany"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Czat jest wyłączony, jego ustawienia się nie wczytały albo tego agenta nie można otworzyć jako czatu. Sprawdź Czat w Ustawienia > Zachowanie oraz połączenie i spróbuj ponownie."
+
 msgid "Chat Launch"
 msgstr "Uruchomienie czatu"
 
@@ -6154,6 +6157,9 @@ msgstr "Nie udało się przenieść subagenta w tło"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nie udało się automatycznie nazwać „{name}”"
+
+msgid "Couldn't open chat"
+msgstr "Nie udało się otworzyć czatu"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Nie udało się otworzyć w interfejsie czatu"

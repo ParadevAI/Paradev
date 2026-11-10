@@ -4200,6 +4200,9 @@ msgstr "聊天介面"
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "聊天已關閉、其設定未能載入，或此代理程式無法以聊天方式開啟。請檢查「設定 > 行為」中的聊天選項與網路連線，然後再試一次。"
+
 msgid "Chat Launch"
 msgstr "聊天啟動"
 
@@ -6154,6 +6157,9 @@ msgstr "無法將子代理程式移到背景"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
+
+msgid "Couldn't open chat"
+msgstr "無法開啟聊天"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "無法在聊天介面中開啟"

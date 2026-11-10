@@ -4200,6 +4200,9 @@ msgstr "Интерфейс чата"
 msgid "Chat is being reworked"
 msgstr "Чат перерабатывается"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Чат выключен, его настройки не загрузились, или этот агент нельзя открыть как чат. Проверьте «Чат» в разделе Настройки > Поведение и подключение, затем повторите попытку."
+
 msgid "Chat Launch"
 msgstr "Запуск в чате"
 
@@ -6154,6 +6157,9 @@ msgstr "Не удалось перевести субагента в фон"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
+
+msgid "Couldn't open chat"
+msgstr "Не удалось открыть чат"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Не удалось открыть в интерфейсе чата"

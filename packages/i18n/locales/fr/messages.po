@@ -4200,6 +4200,9 @@ msgstr "Interface de chat"
 msgid "Chat is being reworked"
 msgstr "Le chat est en cours de refonte"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Le chat est désactivé, ses paramètres n’ont pas pu être chargés, ou cet agent ne peut pas s’ouvrir en chat. Vérifiez Chat dans Paramètres > Comportement ainsi que votre connexion, puis réessayez."
+
 msgid "Chat Launch"
 msgstr "Lancement du chat"
 
@@ -6154,6 +6157,9 @@ msgstr "Impossible de passer le sous-agent en arrière-plan"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossible de nommer « {name} » automatiquement"
+
+msgid "Couldn't open chat"
+msgstr "Impossible d’ouvrir le chat"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Impossible d’ouvrir dans l’interface de chat"

@@ -4200,6 +4200,9 @@ msgstr "Chatinterface"
 msgid "Chat is being reworked"
 msgstr "Chat wordt herbouwd"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Chat staat uit, de instellingen zijn niet geladen, of deze agent kan niet als chat worden geopend. Controleer Chat in Instellingen > Gedrag en je verbinding en probeer het opnieuw."
+
 msgid "Chat Launch"
 msgstr "Start via chat"
 
@@ -6154,6 +6157,9 @@ msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
+
+msgid "Couldn't open chat"
+msgstr "Kan chat niet openen"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Kan niet openen in chatinterface"

@@ -4200,6 +4200,9 @@ msgstr "聊天界面"
 msgid "Chat is being reworked"
 msgstr "聊天功能正在重做"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "聊天已关闭、其设置未能加载，或此智能体无法以聊天方式打开。请检查“设置 > 行为”中的聊天选项和网络连接，然后重试。"
+
 msgid "Chat Launch"
 msgstr "聊天启动"
 
@@ -6154,6 +6157,9 @@ msgstr "无法将子智能体移到后台"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
+
+msgid "Couldn't open chat"
+msgstr "无法打开聊天"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "无法在聊天界面中打开"

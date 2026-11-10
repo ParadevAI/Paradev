@@ -4200,6 +4200,9 @@ msgstr "Rozhraní chatu"
 msgid "Chat is being reworked"
 msgstr "Chat se předělává"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Chat je vypnutý, jeho nastavení se nenačetlo, nebo tohoto agenta nelze otevřít jako chat. Zkontrolujte Chat v Nastavení > Chování a své připojení a zkuste to znovu."
+
 msgid "Chat Launch"
 msgstr "Spuštění chatu"
 
@@ -6154,6 +6157,9 @@ msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
+
+msgid "Couldn't open chat"
+msgstr "Chat se nepodařilo otevřít"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Nepodařilo se otevřít v rozhraní chatu"

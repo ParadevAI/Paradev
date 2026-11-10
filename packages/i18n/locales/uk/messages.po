@@ -4194,6 +4194,9 @@ msgstr "Інтерфейс чату"
 msgid "Chat is being reworked"
 msgstr "Чат зараз переробляють"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Чат вимкнено, його налаштування не завантажилися, або цього агента не можна відкрити як чат. Перевірте «Чат» у Налаштування > Поведінка та підключення, а потім спробуйте ще раз."
+
 msgid "Chat Launch"
 msgstr "Запуск у чаті"
 
@@ -6148,6 +6151,9 @@ msgstr "Не вдалося перевести субагента у фонов�
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
+
+msgid "Couldn't open chat"
+msgstr "Не вдалося відкрити чат"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Не вдалося відкрити в інтерфейсі чату"
