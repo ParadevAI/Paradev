@@ -1,5 +1,10 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
+	CONTEXTS_CHANNEL,
+	type ExtensionContext,
+	type ExtensionContextFilter,
+} from "shared/browser-extension-contexts";
+import {
 	DNR_CHANNEL,
 	DNR_CONSTANTS,
 	DNR_METHODS,
@@ -49,6 +54,9 @@ contextBridge.executeInMainWorld({
 		installedEvent: (
 			...request: InstalledRequest
 		) => Promise<PendingInstalled | null>,
+		listContexts: (
+			filter?: ExtensionContextFilter,
+		) => Promise<ExtensionContext[]>,
 	) => {
 		// Session preloads run in website frames and workers too. The checks run
 		// here because a service worker's preload realm has no `location`.
@@ -152,6 +160,21 @@ contextBridge.executeInMainWorld({
 			}
 			Object.defineProperty(chrome, "declarativeNetRequest", {
 				value: dnr,
+				writable: true,
+				enumerable: true,
+				configurable: true,
+			});
+		}
+		// Electron's own `runtime.getContexts` answers with the service worker
+		// and nothing else: the app's panes and windows are not Chromium tabs,
+		// so none of the extension's open pages are in its view. The older
+		// `extension.getViews` cannot be fixed at all — it would have to hand
+		// back `Window` objects that live in another process. An extension that
+		// cannot see its own popup opens a second one.
+		const runtimeApi = chrome?.runtime as Record<string, unknown> | undefined;
+		if (isServiceWorker && runtimeApi) {
+			Object.defineProperty(runtimeApi, "getContexts", {
+				value: (filter?: ExtensionContextFilter) => listContexts(filter),
 				writable: true,
 				enumerable: true,
 				configurable: true,
@@ -383,6 +406,8 @@ contextBridge.executeInMainWorld({
 		DNR_CONSTANTS,
 		(...request: InstalledRequest) =>
 			ipcRenderer.invoke(INSTALLED_CHANNEL, ...request),
+		(filter?: ExtensionContextFilter) =>
+			ipcRenderer.invoke(CONTEXTS_CHANNEL, filter),
 	],
 });
 

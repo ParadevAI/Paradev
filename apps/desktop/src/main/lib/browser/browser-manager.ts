@@ -1,11 +1,8 @@
 import { EventEmitter } from "node:events";
 import { totalmem } from "node:os";
-import { msg } from "@lingui/core/macro";
-import { i18n } from "@superset/i18n";
 import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
-import { app, clipboard, Menu, webContents } from "electron";
+import { app, BrowserWindow, Menu, webContents } from "electron";
 import { writeClipboardImage } from "main/lib/clipboard-image";
-import { safeOpenExternal } from "main/lib/safe-url";
 import type {
 	DesignModeRect,
 	DesignModeScreenshot,
@@ -24,6 +21,7 @@ import {
 import { DesignModeController } from "./design-mode-controller";
 import { captureDesignModeScreenshot } from "./design-mode-screenshot";
 import { buildDesignModeScript } from "./design-mode-script";
+import { buildGuestContextMenu } from "./guest-context-menu";
 import { markBrowserPanePopup, shouldOpenAsPopup } from "./popup-window";
 
 interface ConsoleEntry {
@@ -1186,6 +1184,12 @@ class BrowserManager extends EventEmitter {
 	 * A popup loads arbitrary web content in the pane's session, so it gets the
 	 * pane's scheme guard, and the same window-open policy so the nested consent
 	 * window Google opens mid-flow stays a popup too.
+	 *
+	 * `popup-created` is what makes the window a tab for extensions. Chrome
+	 * counts a popup as a tab of its own window; while the extension host knew
+	 * only about panes, a password manager asking `chrome.tabs.query({active:
+	 * true, currentWindow: true})` for the field it was filling got the pane
+	 * behind the popup instead.
 	 */
 	private configurePopupWindow(
 		paneId: string,
@@ -1193,6 +1197,9 @@ class BrowserManager extends EventEmitter {
 	): void {
 		const wc = window.webContents;
 		markBrowserPanePopup(wc);
+		wc.on("context-menu", (_event, params) => {
+			this.popupContextMenu(wc, params);
+		});
 		const detachGuard = attachNavigationGuard(wc, (url) =>
 			this.emit("deep-link", url),
 		);
@@ -1203,6 +1210,13 @@ class BrowserManager extends EventEmitter {
 			this.configurePopupWindow(paneId, child);
 		});
 		window.on("closed", detachGuard);
+		// Last, and guarded: a listener that throws must not leave the popup
+		// without its scheme guard and window-open policy.
+		try {
+			this.emit("popup-created", { window });
+		} catch (error) {
+			console.error("[browser-manager] A popup listener failed:", error);
+		}
 	}
 
 	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
@@ -1227,153 +1241,12 @@ class BrowserManager extends EventEmitter {
 			_event: Electron.Event,
 			params: Electron.ContextMenuParams,
 		) => {
-			const { linkURL, pageURL, selectionText, editFlags } = params;
-
-			const menuItems: (
-				| Electron.MenuItemConstructorOptions
-				| Electron.MenuItem
-			)[] = [];
-
-			if (linkURL) {
-				menuItems.push(
-					{
-						label: i18n._(
-							msg({
-								message: "Open Link in Default Browser",
-							}),
-						),
-						click: () => {
-							void safeOpenExternal(linkURL);
-						},
-					},
-					{
-						label: i18n._(
-							msg({
-								message: "Open Link as New Split",
-							}),
-						),
-						click: () =>
-							this.emit(`context-menu-action:${paneId}`, {
-								action: "open-in-split" as const,
-								url: linkURL,
-							}),
-					},
-					{
-						label: i18n._(
-							msg({
-								message: "Copy Link Address",
-							}),
-						),
-						click: () => void clipboard.writeText(linkURL),
-					},
-					{ type: "separator" },
-				);
-			}
-
-			if (selectionText) {
-				menuItems.push({
-					label: i18n._(
-						msg({
-							message: "Copy",
-						}),
-					),
-					enabled: editFlags.canCopy,
-					click: () => wc.copy(),
-				});
-			}
-
-			if (editFlags.canPaste) {
-				menuItems.push({
-					label: i18n._(
-						msg({
-							message: "Paste",
-						}),
-					),
-					click: () => wc.paste(),
-				});
-			}
-
-			if (editFlags.canSelectAll) {
-				menuItems.push({
-					label: i18n._(
-						msg({
-							message: "Select All",
-						}),
-					),
-					click: () => wc.selectAll(),
-				});
-			}
-
-			if (selectionText || editFlags.canPaste || editFlags.canSelectAll) {
-				menuItems.push({ type: "separator" });
-			}
-
-			const extensionItems = this.safeExtensionMenuItems(wc, params);
-			if (extensionItems.length > 0) {
-				menuItems.push(...extensionItems, { type: "separator" });
-			}
-
-			menuItems.push(
-				{
-					label: i18n._(
-						msg({
-							message: "Back",
-						}),
-					),
-					enabled: wc.canGoBack(),
-					click: () => wc.goBack(),
-				},
-				{
-					label: i18n._(
-						msg({
-							message: "Forward",
-						}),
-					),
-					enabled: wc.canGoForward(),
-					click: () => wc.goForward(),
-				},
-				{
-					label: i18n._(
-						msg({
-							message: "Reload",
-						}),
-					),
-					click: () => wc.reload(),
-				},
+			this.popupContextMenu(wc, params, (url) =>
+				this.emit(`context-menu-action:${paneId}`, {
+					action: "open-in-split" as const,
+					url,
+				}),
 			);
-
-			if (!linkURL) {
-				menuItems.push(
-					{ type: "separator" },
-					{
-						label: i18n._(
-							msg({
-								message: "Open Page in Default Browser",
-							}),
-						),
-						click: () => {
-							if (pageURL && pageURL !== "about:blank") {
-								void safeOpenExternal(pageURL);
-							}
-						},
-						enabled: !!pageURL && pageURL !== "about:blank",
-					},
-					{
-						label: i18n._(
-							msg({
-								message: "Copy Page URL",
-							}),
-						),
-						click: () => {
-							if (pageURL) void clipboard.writeText(pageURL);
-						},
-						enabled: !!pageURL && pageURL !== "about:blank",
-					},
-				);
-			}
-
-			const menu = Menu.buildFromTemplate(menuItems);
-			menu.popup();
 		};
 
 		wc.on("context-menu", handler);
@@ -1384,6 +1257,25 @@ class BrowserManager extends EventEmitter {
 				// webContents may be destroyed
 			}
 		});
+	}
+
+	private popupContextMenu(
+		wc: Electron.WebContents,
+		params: Electron.ContextMenuParams,
+		openInSplit?: (url: string) => void,
+	): void {
+		const menu = Menu.buildFromTemplate(
+			buildGuestContextMenu({
+				wc,
+				params,
+				extensionItems: this.safeExtensionMenuItems(wc, params),
+				openInSplit,
+			}),
+		);
+		// Without a window the menu goes to whichever one has focus, which is
+		// the window behind a popup that has not been clicked into yet.
+		const window = BrowserWindow.fromWebContents(wc.hostWebContents ?? wc);
+		menu.popup(window ? { window } : undefined);
 	}
 
 	/** The keystroke as a forwardable chord, or null when it is not one. */
