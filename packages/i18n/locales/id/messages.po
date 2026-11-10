@@ -1944,6 +1944,9 @@ msgstr "Akun menunggu penghapusan"
 msgid "Account usage"
 msgstr "Penggunaan akun"
 
+msgid "Account usage: {percent} used"
+msgstr "Penggunaan akun: {percent} terpakai"
+
 msgid "Achievements"
 msgstr "Pencapaian"
 
@@ -2349,9 +2352,6 @@ msgstr "Proses agen gagal"
 
 msgid "Agent self-verification"
 msgstr "Verifikasi mandiri agen"
-
-msgid "agent session ID"
-msgstr "ID sesi agen"
 
 msgid "Agent session started"
 msgstr "Sesi agen dimulai"
@@ -3443,6 +3443,9 @@ msgstr "Kembali ke Integrasi"
 msgid "Back to Linear"
 msgstr "Kembali ke Linear"
 
+msgid "Back to main chat"
+msgstr "Kembali ke obrolan utama"
+
 msgid "Back to pages"
 msgstr "Kembali ke halaman"
 
@@ -4200,8 +4203,8 @@ msgstr "Chat sedang dirombak"
 msgid "Chat Launch"
 msgstr "Peluncuran Chat"
 
-msgid "Chat mode"
-msgstr "Mode chat"
+msgid "Chat name"
+msgstr "Nama obrolan"
 
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
@@ -4516,9 +4519,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentasi CLI"
-
-msgid "CLI mode"
-msgstr "Mode CLI"
 
 msgid "CLI reference"
 msgstr "Referensi CLI"
@@ -5496,14 +5496,8 @@ msgstr "Tersalin"
 msgid "Copied {0}"
 msgstr "Menyalin {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Menyalin {copiedLabel}"
-
 msgid "Copied Link"
 msgstr "Tautan Disalin"
-
-msgid "Copied terminal ID"
-msgstr "ID terminal disalin"
 
 msgid "Copied to clipboard."
 msgstr "Disalin ke clipboard."
@@ -5569,9 +5563,6 @@ msgid "Copy file name"
 msgstr "Salin nama file"
 
 msgid "Copy ID"
-msgstr "Salin ID"
-
-msgid "Copy IDs"
 msgstr "Salin ID"
 
 msgid "Copy image"
@@ -6355,9 +6346,6 @@ msgstr "Buat environment cloud"
 
 msgid "Create a Dev"
 msgstr "Buat Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Membuat fork asli di penyedia dengan konteks percakapan yang sama. Sesi aslinya tidak berubah."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Buat kunci API baru untuk integrasi eksternal seperti Claude Desktop atau Claude Code."
@@ -9185,11 +9173,11 @@ msgstr "Argumen fork"
 msgid "Fork conversation"
 msgstr "Cabangkan percakapan"
 
-msgid "Fork session"
-msgstr "Fork sesi"
+msgid "Fork into Chat"
+msgstr "Fork ke Obrolan"
 
-msgid "Fork session…"
-msgstr "Fork sesi…"
+msgid "Fork into CLI"
+msgstr "Fork ke CLI"
 
 msgid "Form controls and field composition"
 msgstr "Kontrol form dan komposisi field"
@@ -11054,6 +11042,9 @@ msgstr "Keluar dari kanal"
 msgid "Leave comment mode"
 msgstr "Keluar dari mode komentar"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Kosongkan untuk kembali ke nama bawaan."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Kosongkan untuk kembali ke nama yang dilaporkan terminal."
 
@@ -12347,6 +12338,9 @@ msgstr "Browser Baru"
 
 msgid "new challengers"
 msgstr "penantang baru"
+
+msgid "New chat"
+msgstr "Obrolan baru"
 
 msgid "New Chat"
 msgstr "Chat Baru"
@@ -13901,9 +13895,6 @@ msgstr "Buka di Browser"
 msgid "Open in Changes pane"
 msgstr "Buka di panel Perubahan"
 
-msgid "Open in Chat Interface"
-msgstr "Buka di antarmuka chat"
-
 msgid "Open in ChatGPT"
 msgstr "Buka di ChatGPT"
 
@@ -13978,9 +13969,6 @@ msgstr "Buka di tab"
 
 msgid "Open in Tasks"
 msgstr "Buka di Tugas"
-
-msgid "Open in Terminal Chat"
-msgstr "Buka di chat terminal"
 
 msgid "Open in…"
 msgstr "Buka di…"
@@ -14073,9 +14061,6 @@ msgstr "Buka yang terbaru"
 
 msgid "Open roles"
 msgstr "Lowongan terbuka"
-
-msgid "Open session in"
-msgstr "Buka sesi di"
 
 msgid "Open settings"
 msgstr "Buka pengaturan"
@@ -15475,10 +15460,6 @@ msgstr "Properti"
 msgid "Provide either id or slug"
 msgstr "Berikan id atau slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Penyedia: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Provisioning gagal dan sandbox-nya dibongkar. Tidak ada yang berjalan, dan workspace ini tidak bisa dibuka. Buat yang baru untuk mencoba lagi."
 
@@ -15894,6 +15875,9 @@ msgstr "Aktivitas Terbaru"
 msgid "Recent apps"
 msgstr "Aplikasi terbaru"
 
+msgid "Recent chats"
+msgstr "Obrolan terbaru"
+
 msgid "Recent invoices"
 msgstr "Faktur terbaru"
 
@@ -16244,6 +16228,9 @@ msgstr "Ganti nama akun"
 
 msgid "Rename branch"
 msgstr "Ganti nama branch"
+
+msgid "Rename chat"
+msgstr "Ganti nama obrolan"
 
 msgid "Rename failed"
 msgstr "Ganti nama gagal"
@@ -17300,6 +17287,9 @@ msgstr "Cari pengembang"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cari isi file dan seluruh workspace Anda sekaligus."
+
+msgid "Search all chats…"
+msgstr "Cari semua obrolan…"
 
 msgid "Search all emoji"
 msgstr "Cari semua emoji"
@@ -19608,9 +19598,6 @@ msgstr "Ukuran font terminal"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Ukuran font terminal saat terminal difokuskan, zoom halaman di panel browser, selain itu seluruh aplikasi"
 
-msgid "terminal ID"
-msgstr "ID terminal"
-
 msgid "Terminal input"
 msgstr "Input terminal"
 
@@ -19631,9 +19618,6 @@ msgstr "Sesi terminal dimatikan"
 
 msgid "Terminal sessions"
 msgstr "Sesi terminal"
-
-msgid "Terminal Sessions"
-msgstr "Sesi Terminal"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Pratinjau palet warna tema terminal"

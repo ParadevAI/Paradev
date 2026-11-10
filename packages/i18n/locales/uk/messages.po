@@ -1938,6 +1938,9 @@ msgstr "Обліковий запис очікує на видалення"
 msgid "Account usage"
 msgstr "Використання облікового запису"
 
+msgid "Account usage: {percent} used"
+msgstr "Використання облікового запису: використано {percent}"
+
 msgid "Achievements"
 msgstr "Досягнення"
 
@@ -2343,9 +2346,6 @@ msgstr "Запуск агента завершився помилкою"
 
 msgid "Agent self-verification"
 msgstr "Самоперевірка агента"
-
-msgid "agent session ID"
-msgstr "ID сеансу агента"
 
 msgid "Agent session started"
 msgstr "Сеанс агента запущено"
@@ -3437,6 +3437,9 @@ msgstr "Назад до інтеграцій"
 msgid "Back to Linear"
 msgstr "Назад до Linear"
 
+msgid "Back to main chat"
+msgstr "Повернутися до основного чату"
+
 msgid "Back to pages"
 msgstr "Назад до сторінок"
 
@@ -4194,8 +4197,8 @@ msgstr "Чат зараз переробляють"
 msgid "Chat Launch"
 msgstr "Запуск у чаті"
 
-msgid "Chat mode"
-msgstr "Режим чату"
+msgid "Chat name"
+msgstr "Назва чату"
 
 msgid "Chat session not found"
 msgstr "Сеанс чату не знайдено"
@@ -4510,9 +4513,6 @@ msgstr "CLI і SDK"
 
 msgid "CLI docs"
 msgstr "Документація CLI"
-
-msgid "CLI mode"
-msgstr "Режим CLI"
 
 msgid "CLI reference"
 msgstr "Довідник CLI"
@@ -5490,14 +5490,8 @@ msgstr "Скопійовано"
 msgid "Copied {0}"
 msgstr "Скопійовано {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Скопійовано {copiedLabel}"
-
 msgid "Copied Link"
 msgstr "Посилання скопійовано"
-
-msgid "Copied terminal ID"
-msgstr "ID термінала скопійовано"
 
 msgid "Copied to clipboard."
 msgstr "Скопійовано в буфер обміну."
@@ -5563,9 +5557,6 @@ msgid "Copy file name"
 msgstr "Копіювати назву файлу"
 
 msgid "Copy ID"
-msgstr "Копіювати ID"
-
-msgid "Copy IDs"
 msgstr "Копіювати ID"
 
 msgid "Copy image"
@@ -6349,9 +6340,6 @@ msgstr "Створити хмарне середовище"
 
 msgid "Create a Dev"
 msgstr "Створити Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Створює нативний форк на боці провайдера з тим самим контекстом розмови. Початковий сеанс залишається без змін."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Створіть новий ключ API для зовнішніх інтеграцій, як-от Claude Desktop або Claude Code."
@@ -9179,11 +9167,11 @@ msgstr "Аргументи форка"
 msgid "Fork conversation"
 msgstr "Форкнути розмову"
 
-msgid "Fork session"
-msgstr "Створити форк сеансу"
+msgid "Fork into Chat"
+msgstr "Відгалузити в чат"
 
-msgid "Fork session…"
-msgstr "Створити форк сеансу…"
+msgid "Fork into CLI"
+msgstr "Відгалузити в CLI"
 
 msgid "Form controls and field composition"
 msgstr "Елементи форм і компонування полів"
@@ -11048,6 +11036,9 @@ msgstr "Вийти з каналу"
 msgid "Leave comment mode"
 msgstr "Вийти з режиму коментування"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Залиште порожнім, щоб повернути типову назву."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Залиште порожнім, щоб повернути назву, яку повідомляє термінал."
 
@@ -12341,6 +12332,9 @@ msgstr "Новий браузер"
 
 msgid "new challengers"
 msgstr "нові претенденти"
+
+msgid "New chat"
+msgstr "Новий чат"
 
 msgid "New Chat"
 msgstr "Новий чат"
@@ -13895,9 +13889,6 @@ msgstr "Відкрити в браузері"
 msgid "Open in Changes pane"
 msgstr "Відкрити на панелі «Зміни»"
 
-msgid "Open in Chat Interface"
-msgstr "Відкрити в інтерфейсі чату"
-
 msgid "Open in ChatGPT"
 msgstr "Відкрити в ChatGPT"
 
@@ -13972,9 +13963,6 @@ msgstr "Відкрити у вкладці"
 
 msgid "Open in Tasks"
 msgstr "Відкрити в розділі «Завдання»"
-
-msgid "Open in Terminal Chat"
-msgstr "Відкрити в чаті терміналу"
 
 msgid "Open in…"
 msgstr "Відкрити в…"
@@ -14067,9 +14055,6 @@ msgstr "Відкрити нещодавні"
 
 msgid "Open roles"
 msgstr "Вакансії"
-
-msgid "Open session in"
-msgstr "Відкрити сеанс у"
 
 msgid "Open settings"
 msgstr "Відкрити налаштування"
@@ -15469,10 +15454,6 @@ msgstr "Властивості"
 msgid "Provide either id or slug"
 msgstr "Укажіть id або slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Постачальник: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Розгортання не вдалося, і пісочницю видалено. Нічого не запущено, і цей робочий простір не можна відкрити. Створіть новий, щоб спробувати знову."
 
@@ -15888,6 +15869,9 @@ msgstr "Нещодавня активність"
 msgid "Recent apps"
 msgstr "Нещодавні застосунки"
 
+msgid "Recent chats"
+msgstr "Нещодавні чати"
+
 msgid "Recent invoices"
 msgstr "Нещодавні рахунки"
 
@@ -16238,6 +16222,9 @@ msgstr "Перейменувати обліковий запис"
 
 msgid "Rename branch"
 msgstr "Перейменувати гілку"
+
+msgid "Rename chat"
+msgstr "Перейменувати чат"
 
 msgid "Rename failed"
 msgstr "Не вдалося перейменувати"
@@ -17294,6 +17281,9 @@ msgstr "Знайти розробника"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Шукайте у вмісті файлів і в усіх своїх робочих просторах одночасно."
+
+msgid "Search all chats…"
+msgstr "Шукати в усіх чатах…"
 
 msgid "Search all emoji"
 msgstr "Шукати серед усіх емодзі"
@@ -19602,9 +19592,6 @@ msgstr "Розмір шрифту термінала"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Розмір шрифту термінала, коли термінал у фокусі; масштаб сторінки на панелі браузера; в інших випадках — увесь застосунок"
 
-msgid "terminal ID"
-msgstr "ID термінала"
-
 msgid "Terminal input"
 msgstr "Введення в термінал"
 
@@ -19624,9 +19611,6 @@ msgid "Terminal session killed"
 msgstr "Сеанс термінала завершено"
 
 msgid "Terminal sessions"
-msgstr "Сеанси термінала"
-
-msgid "Terminal Sessions"
 msgstr "Сеанси термінала"
 
 msgid "Terminal theme color-palette preview"

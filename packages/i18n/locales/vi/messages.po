@@ -1944,6 +1944,9 @@ msgstr "Tài khoản đang chờ xóa"
 msgid "Account usage"
 msgstr "Mức sử dụng tài khoản"
 
+msgid "Account usage: {percent} used"
+msgstr "Mức sử dụng tài khoản: đã dùng {percent}"
+
 msgid "Achievements"
 msgstr "Thành tích"
 
@@ -2349,9 +2352,6 @@ msgstr "Lượt chạy của agent thất bại"
 
 msgid "Agent self-verification"
 msgstr "Agent tự kiểm chứng"
-
-msgid "agent session ID"
-msgstr "ID phiên agent"
 
 msgid "Agent session started"
 msgstr "Phiên agent đã bắt đầu"
@@ -3443,6 +3443,9 @@ msgstr "Quay lại Tích hợp"
 msgid "Back to Linear"
 msgstr "Quay lại Linear"
 
+msgid "Back to main chat"
+msgstr "Quay lại cuộc trò chuyện chính"
+
 msgid "Back to pages"
 msgstr "Quay lại danh sách trang"
 
@@ -4200,8 +4203,8 @@ msgstr "Chat đang được làm lại"
 msgid "Chat Launch"
 msgstr "Khởi chạy chat"
 
-msgid "Chat mode"
-msgstr "Chế độ chat"
+msgid "Chat name"
+msgstr "Tên cuộc trò chuyện"
 
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
@@ -4516,9 +4519,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Tài liệu CLI"
-
-msgid "CLI mode"
-msgstr "Chế độ CLI"
 
 msgid "CLI reference"
 msgstr "Tài liệu tham chiếu CLI"
@@ -5496,14 +5496,8 @@ msgstr "Đã sao chép"
 msgid "Copied {0}"
 msgstr "Đã sao chép {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Đã sao chép {copiedLabel}"
-
 msgid "Copied Link"
 msgstr "Đã sao chép liên kết"
-
-msgid "Copied terminal ID"
-msgstr "Đã sao chép ID terminal"
 
 msgid "Copied to clipboard."
 msgstr "Đã sao chép vào clipboard."
@@ -5569,9 +5563,6 @@ msgid "Copy file name"
 msgstr "Sao chép tên tệp"
 
 msgid "Copy ID"
-msgstr "Sao chép ID"
-
-msgid "Copy IDs"
 msgstr "Sao chép ID"
 
 msgid "Copy image"
@@ -6355,9 +6346,6 @@ msgstr "Tạo environment đám mây"
 
 msgid "Create a Dev"
 msgstr "Tạo Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Tạo một bản fork gốc ở nhà cung cấp với cùng ngữ cảnh hội thoại. Phiên ban đầu giữ nguyên."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Tạo khóa API mới cho các tích hợp bên ngoài như Claude Desktop hoặc Claude Code."
@@ -9185,11 +9173,11 @@ msgstr "Tham số fork"
 msgid "Fork conversation"
 msgstr "Tách cuộc trò chuyện"
 
-msgid "Fork session"
-msgstr "Fork phiên"
+msgid "Fork into Chat"
+msgstr "Tách sang Trò chuyện"
 
-msgid "Fork session…"
-msgstr "Fork phiên…"
+msgid "Fork into CLI"
+msgstr "Tách sang CLI"
 
 msgid "Form controls and field composition"
 msgstr "Các điều khiển form và cách ghép trường"
@@ -11054,6 +11042,9 @@ msgstr "Rời kênh"
 msgid "Leave comment mode"
 msgstr "Thoát chế độ bình luận"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Để trống để quay về tên mặc định."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Để trống để quay lại tên do terminal báo cáo."
 
@@ -12347,6 +12338,9 @@ msgstr "Trình duyệt mới"
 
 msgid "new challengers"
 msgstr "đối thủ mới"
+
+msgid "New chat"
+msgstr "Cuộc trò chuyện mới"
 
 msgid "New Chat"
 msgstr "Chat mới"
@@ -13901,9 +13895,6 @@ msgstr "Mở trong trình duyệt"
 msgid "Open in Changes pane"
 msgstr "Mở trong khung Thay đổi"
 
-msgid "Open in Chat Interface"
-msgstr "Mở trong giao diện chat"
-
 msgid "Open in ChatGPT"
 msgstr "Mở trong ChatGPT"
 
@@ -13978,9 +13969,6 @@ msgstr "Mở trong tab"
 
 msgid "Open in Tasks"
 msgstr "Mở trong Tác vụ"
-
-msgid "Open in Terminal Chat"
-msgstr "Mở trong chat terminal"
 
 msgid "Open in…"
 msgstr "Mở trong…"
@@ -14073,9 +14061,6 @@ msgstr "Mở gần đây"
 
 msgid "Open roles"
 msgstr "Vị trí đang tuyển"
-
-msgid "Open session in"
-msgstr "Mở phiên trong"
 
 msgid "Open settings"
 msgstr "Mở cài đặt"
@@ -15475,10 +15460,6 @@ msgstr "Thuộc tính"
 msgid "Provide either id or slug"
 msgstr "Hãy cung cấp id hoặc slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Nhà cung cấp: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Việc cấp phát thất bại và sandbox đã bị dỡ bỏ. Không có gì đang chạy và không thể mở workspace này. Hãy tạo cái mới để thử lại."
 
@@ -15894,6 +15875,9 @@ msgstr "Hoạt động gần đây"
 msgid "Recent apps"
 msgstr "Ứng dụng gần đây"
 
+msgid "Recent chats"
+msgstr "Cuộc trò chuyện gần đây"
+
 msgid "Recent invoices"
 msgstr "Hóa đơn gần đây"
 
@@ -16244,6 +16228,9 @@ msgstr "Đổi tên tài khoản"
 
 msgid "Rename branch"
 msgstr "Đổi tên nhánh"
+
+msgid "Rename chat"
+msgstr "Đổi tên cuộc trò chuyện"
 
 msgid "Rename failed"
 msgstr "Đổi tên thất bại"
@@ -17300,6 +17287,9 @@ msgstr "Tìm nhà phát triển"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Tìm trong nội dung tệp và trên mọi workspace cùng lúc."
+
+msgid "Search all chats…"
+msgstr "Tìm tất cả cuộc trò chuyện…"
 
 msgid "Search all emoji"
 msgstr "Tìm tất cả emoji"
@@ -19608,9 +19598,6 @@ msgstr "Cỡ chữ terminal"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Cỡ chữ terminal khi terminal đang được focus, thu phóng trang trong khung trình duyệt, nếu không thì toàn bộ ứng dụng"
 
-msgid "terminal ID"
-msgstr "ID terminal"
-
 msgid "Terminal input"
 msgstr "Ô nhập terminal"
 
@@ -19630,9 +19617,6 @@ msgid "Terminal session killed"
 msgstr "Đã kết thúc phiên terminal"
 
 msgid "Terminal sessions"
-msgstr "Phiên terminal"
-
-msgid "Terminal Sessions"
 msgstr "Phiên terminal"
 
 msgid "Terminal theme color-palette preview"

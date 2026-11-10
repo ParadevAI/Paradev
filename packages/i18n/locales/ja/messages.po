@@ -1944,6 +1944,9 @@ msgstr "アカウントは削除待ちです"
 msgid "Account usage"
 msgstr "アカウントの使用状況"
 
+msgid "Account usage: {percent} used"
+msgstr "アカウントの使用状況: {percent} 使用済み"
+
 msgid "Achievements"
 msgstr "実績"
 
@@ -2349,9 +2352,6 @@ msgstr "エージェントの実行に失敗しました"
 
 msgid "Agent self-verification"
 msgstr "エージェントの自己検証"
-
-msgid "agent session ID"
-msgstr "エージェントセッションID"
 
 msgid "Agent session started"
 msgstr "エージェントセッションを開始しました"
@@ -3443,6 +3443,9 @@ msgstr "連携に戻る"
 msgid "Back to Linear"
 msgstr "Linearに戻る"
 
+msgid "Back to main chat"
+msgstr "メインのチャットに戻る"
+
 msgid "Back to pages"
 msgstr "ページ"
 
@@ -4200,8 +4203,8 @@ msgstr "チャットは再構築中です"
 msgid "Chat Launch"
 msgstr "チャット起動"
 
-msgid "Chat mode"
-msgstr "チャットモード"
+msgid "Chat name"
+msgstr "チャット名"
 
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
@@ -4516,9 +4519,6 @@ msgstr "CLIとSDK"
 
 msgid "CLI docs"
 msgstr "CLIドキュメント"
-
-msgid "CLI mode"
-msgstr "CLIモード"
 
 msgid "CLI reference"
 msgstr "CLIリファレンス"
@@ -5496,14 +5496,8 @@ msgstr "コピーしました"
 msgid "Copied {0}"
 msgstr "{0}をコピーしました"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel}をコピーしました"
-
 msgid "Copied Link"
 msgstr "リンクをコピーしました"
-
-msgid "Copied terminal ID"
-msgstr "ターミナルIDをコピーしました"
 
 msgid "Copied to clipboard."
 msgstr "クリップボードにコピーしました。"
@@ -5569,9 +5563,6 @@ msgid "Copy file name"
 msgstr "ファイル名をコピー"
 
 msgid "Copy ID"
-msgstr "IDをコピー"
-
-msgid "Copy IDs"
 msgstr "IDをコピー"
 
 msgid "Copy image"
@@ -6355,9 +6346,6 @@ msgstr "クラウド環境を作成"
 
 msgid "Create a Dev"
 msgstr "Devを作成"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "同じ会話コンテキストを持つネイティブのフォークをプロバイダー側に作成します。元のセッションは変更されません。"
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Claude DesktopやClaude Codeなどの外部連携用に新しいAPIキーを作成します。"
@@ -9185,11 +9173,11 @@ msgstr "フォーク引数"
 msgid "Fork conversation"
 msgstr "会話を分岐"
 
-msgid "Fork session"
-msgstr "セッションをフォーク"
+msgid "Fork into Chat"
+msgstr "チャットにフォーク"
 
-msgid "Fork session…"
-msgstr "セッションをフォーク…"
+msgid "Fork into CLI"
+msgstr "CLI にフォーク"
 
 msgid "Form controls and field composition"
 msgstr "フォームコントロールとフィールドの組み立て"
@@ -11054,6 +11042,9 @@ msgstr "チャンネルから退出"
 msgid "Leave comment mode"
 msgstr "コメントモードを終了"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "空のままにすると既定の名前に戻ります。"
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "空欄にすると、ターミナルが報告する名前に戻ります。"
 
@@ -12347,6 +12338,9 @@ msgstr "新規ブラウザ"
 
 msgid "new challengers"
 msgstr "別の対戦相手"
+
+msgid "New chat"
+msgstr "新しいチャット"
 
 msgid "New Chat"
 msgstr "新規チャット"
@@ -13901,9 +13895,6 @@ msgstr "ブラウザで開く"
 msgid "Open in Changes pane"
 msgstr "変更ペインで開く"
 
-msgid "Open in Chat Interface"
-msgstr "チャット画面で開く"
-
 msgid "Open in ChatGPT"
 msgstr "ChatGPTで開く"
 
@@ -13978,9 +13969,6 @@ msgstr "タブで開く"
 
 msgid "Open in Tasks"
 msgstr "タスクで開く"
-
-msgid "Open in Terminal Chat"
-msgstr "ターミナルチャットで開く"
 
 msgid "Open in…"
 msgstr "アプリで開く…"
@@ -14073,9 +14061,6 @@ msgstr "最近使った項目を開く"
 
 msgid "Open roles"
 msgstr "募集中のポジション"
-
-msgid "Open session in"
-msgstr "セッションを開く場所"
 
 msgid "Open settings"
 msgstr "設定を開く"
@@ -15475,10 +15460,6 @@ msgstr "プロパティ"
 msgid "Provide either id or slug"
 msgstr "idまたはslugのいずれかを指定してください"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "プロバイダー: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "プロビジョニングに失敗し、サンドボックスは破棄されました。何も実行されておらず、このワークスペースは開けません。新しく作成してやり直してください。"
 
@@ -15894,6 +15875,9 @@ msgstr "最近のアクティビティ"
 msgid "Recent apps"
 msgstr "最近使ったアプリ"
 
+msgid "Recent chats"
+msgstr "最近のチャット"
+
 msgid "Recent invoices"
 msgstr "最近の請求書"
 
@@ -16244,6 +16228,9 @@ msgstr "アカウント名を変更"
 
 msgid "Rename branch"
 msgstr "ブランチ名を変更"
+
+msgid "Rename chat"
+msgstr "チャットの名前を変更"
 
 msgid "Rename failed"
 msgstr "名前の変更に失敗しました"
@@ -17300,6 +17287,9 @@ msgstr "開発者を検索"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "ファイルの中身も、すべてのワークスペースも、まとめて横断検索できます。"
+
+msgid "Search all chats…"
+msgstr "すべてのチャットを検索…"
 
 msgid "Search all emoji"
 msgstr "すべての絵文字を検索"
@@ -19608,9 +19598,6 @@ msgstr "ターミナルのフォントサイズ"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "ターミナルにフォーカスがあるときはターミナルのフォントサイズ、ブラウザペインではページのズーム、それ以外はアプリ全体"
 
-msgid "terminal ID"
-msgstr "ターミナルID"
-
 msgid "Terminal input"
 msgstr "ターミナル入力"
 
@@ -19630,9 +19617,6 @@ msgid "Terminal session killed"
 msgstr "ターミナルセッションを終了しました"
 
 msgid "Terminal sessions"
-msgstr "ターミナルセッション"
-
-msgid "Terminal Sessions"
 msgstr "ターミナルセッション"
 
 msgid "Terminal theme color-palette preview"

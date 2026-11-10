@@ -10,6 +10,7 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -197,22 +198,12 @@ export function ChatPane({
 						],
 					})
 				}
-				onOpenForkedChat={({ sessionId, terminalId }) => {
-					const { agent, chatModelId, chatEffortId, chatModeId, chatTitle } =
-						latest.current;
+				onOpenForkedChat={(fork) => {
 					ctx.store.getState().addTab({
 						panes: [
 							{
 								kind: "chat-v3",
-								data: {
-									terminalId,
-									sessionId,
-									...(agent ? { agent: { id: agent.id } } : {}),
-									...(chatModelId ? { chatModelId } : {}),
-									...(chatEffortId ? { chatEffortId } : {}),
-									...(chatModeId ? { chatModeId } : {}),
-									...(chatTitle ? { chatTitle } : {}),
-								} satisfies ChatPaneData,
+								data: forkedChatPaneData(latest.current, fork),
 							},
 						],
 					});

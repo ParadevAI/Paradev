@@ -1944,6 +1944,9 @@ msgstr "Account in attesa di eliminazione"
 msgid "Account usage"
 msgstr "Utilizzo dell’account"
 
+msgid "Account usage: {percent} used"
+msgstr "Utilizzo dell'account: {percent} utilizzato"
+
 msgid "Achievements"
 msgstr "Riconoscimenti"
 
@@ -2349,9 +2352,6 @@ msgstr "Esecuzione dell’agente non riuscita"
 
 msgid "Agent self-verification"
 msgstr "Auto-verifica degli agenti"
-
-msgid "agent session ID"
-msgstr "ID della sessione dell'agente"
 
 msgid "Agent session started"
 msgstr "Sessione dell'agente avviata"
@@ -3443,6 +3443,9 @@ msgstr "Torna alle integrazioni"
 msgid "Back to Linear"
 msgstr "Torna a Linear"
 
+msgid "Back to main chat"
+msgstr "Torna alla chat principale"
+
 msgid "Back to pages"
 msgstr "Torna alle pagine"
 
@@ -4200,8 +4203,8 @@ msgstr "La chat è in fase di rifacimento"
 msgid "Chat Launch"
 msgstr "Avvio in chat"
 
-msgid "Chat mode"
-msgstr "Modalità chat"
+msgid "Chat name"
+msgstr "Nome della chat"
 
 msgid "Chat session not found"
 msgstr "Sessione di chat non trovata"
@@ -4516,9 +4519,6 @@ msgstr "CLI e SDK"
 
 msgid "CLI docs"
 msgstr "Documentazione CLI"
-
-msgid "CLI mode"
-msgstr "Modalità CLI"
 
 msgid "CLI reference"
 msgstr "Riferimento CLI"
@@ -5496,14 +5496,8 @@ msgstr "Copiato"
 msgid "Copied {0}"
 msgstr "Copiato {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} copiato"
-
 msgid "Copied Link"
 msgstr "Link copiato"
-
-msgid "Copied terminal ID"
-msgstr "ID del terminale copiato"
 
 msgid "Copied to clipboard."
 msgstr "Copiato negli appunti."
@@ -5570,9 +5564,6 @@ msgstr "Copia il nome del file"
 
 msgid "Copy ID"
 msgstr "Copia l'ID"
-
-msgid "Copy IDs"
-msgstr "Copia gli ID"
 
 msgid "Copy image"
 msgstr "Copia immagine"
@@ -6355,9 +6346,6 @@ msgstr "Crea un ambiente cloud"
 
 msgid "Create a Dev"
 msgstr "Crea un Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Crea un fork nativo del provider con lo stesso contesto della conversazione. La sessione originale resta invariata."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Crea una nuova chiave API per integrazioni esterne come Claude Desktop o Claude Code."
@@ -9185,11 +9173,11 @@ msgstr "Argomenti di fork"
 msgid "Fork conversation"
 msgstr "Dirama conversazione"
 
-msgid "Fork session"
-msgstr "Biforca sessione"
+msgid "Fork into Chat"
+msgstr "Crea un fork nella chat"
 
-msgid "Fork session…"
-msgstr "Biforca sessione…"
+msgid "Fork into CLI"
+msgstr "Crea un fork nella CLI"
 
 msgid "Form controls and field composition"
 msgstr "Controlli dei form e composizione dei campi"
@@ -11054,6 +11042,9 @@ msgstr "Lascia il canale"
 msgid "Leave comment mode"
 msgstr "Esci dalla modalità commento"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Lascia vuoto per tornare al nome predefinito."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Lascialo vuoto per tornare al nome indicato dal terminale."
 
@@ -12347,6 +12338,9 @@ msgstr "Nuovo browser"
 
 msgid "new challengers"
 msgstr "nuovi sfidanti"
+
+msgid "New chat"
+msgstr "Nuova chat"
 
 msgid "New Chat"
 msgstr "Nuova chat"
@@ -13901,9 +13895,6 @@ msgstr "Apri nel browser"
 msgid "Open in Changes pane"
 msgstr "Apri nel pannello Modifiche"
 
-msgid "Open in Chat Interface"
-msgstr "Apri nell’interfaccia chat"
-
 msgid "Open in ChatGPT"
 msgstr "Apri in ChatGPT"
 
@@ -13978,9 +13969,6 @@ msgstr "Apri in una scheda"
 
 msgid "Open in Tasks"
 msgstr "Apri in Attività"
-
-msgid "Open in Terminal Chat"
-msgstr "Apri nella chat del terminale"
 
 msgid "Open in…"
 msgstr "Apri in…"
@@ -14073,9 +14061,6 @@ msgstr "Apri recenti"
 
 msgid "Open roles"
 msgstr "Posizioni aperte"
-
-msgid "Open session in"
-msgstr "Apri sessione in"
 
 msgid "Open settings"
 msgstr "Apri le impostazioni"
@@ -15475,10 +15460,6 @@ msgstr "Proprietà"
 msgid "Provide either id or slug"
 msgstr "Fornisci un id oppure uno slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Provider: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Il provisioning non è riuscito e la sandbox è stata smontata. Non è in esecuzione nulla e questo workspace non può essere aperto. Creane uno nuovo per riprovare."
 
@@ -15894,6 +15875,9 @@ msgstr "Attività recente"
 msgid "Recent apps"
 msgstr "App recenti"
 
+msgid "Recent chats"
+msgstr "Chat recenti"
+
 msgid "Recent invoices"
 msgstr "Fatture recenti"
 
@@ -16244,6 +16228,9 @@ msgstr "Rinomina account"
 
 msgid "Rename branch"
 msgstr "Rinomina il branch"
+
+msgid "Rename chat"
+msgstr "Rinomina la chat"
 
 msgid "Rename failed"
 msgstr "Rinomina non riuscita"
@@ -17300,6 +17287,9 @@ msgstr "Cerca uno sviluppatore"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cerca nel contenuto dei file e in tutti i tuoi workspace insieme."
+
+msgid "Search all chats…"
+msgstr "Cerca in tutte le chat…"
 
 msgid "Search all emoji"
 msgstr "Cerca tutte le emoji"
@@ -19608,9 +19598,6 @@ msgstr "Dimensione del font del terminale"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Dimensione del carattere del terminale quando un terminale ha il focus, zoom della pagina in un riquadro browser, altrimenti l'intera app"
 
-msgid "terminal ID"
-msgstr "ID del terminale"
-
 msgid "Terminal input"
 msgstr "Input del terminale"
 
@@ -19630,9 +19617,6 @@ msgid "Terminal session killed"
 msgstr "Sessione del terminale terminata"
 
 msgid "Terminal sessions"
-msgstr "Sessioni del terminale"
-
-msgid "Terminal Sessions"
 msgstr "Sessioni del terminale"
 
 msgid "Terminal theme color-palette preview"

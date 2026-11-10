@@ -1944,6 +1944,9 @@ msgstr "账户待删除"
 msgid "Account usage"
 msgstr "账户用量"
 
+msgid "Account usage: {percent} used"
+msgstr "账户用量：已使用 {percent}"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2349,9 +2352,6 @@ msgstr "智能体运行失败"
 
 msgid "Agent self-verification"
 msgstr "智能体自我验证"
-
-msgid "agent session ID"
-msgstr "智能体会话ID"
 
 msgid "Agent session started"
 msgstr "智能体会话已开始"
@@ -3443,6 +3443,9 @@ msgstr "返回集成"
 msgid "Back to Linear"
 msgstr "返回Linear"
 
+msgid "Back to main chat"
+msgstr "返回主聊天"
+
 msgid "Back to pages"
 msgstr "返回页面"
 
@@ -4200,8 +4203,8 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天启动"
 
-msgid "Chat mode"
-msgstr "聊天模式"
+msgid "Chat name"
+msgstr "聊天名称"
 
 msgid "Chat session not found"
 msgstr "未找到聊天会话"
@@ -4516,9 +4519,6 @@ msgstr "CLI与SDK"
 
 msgid "CLI docs"
 msgstr "CLI文档"
-
-msgid "CLI mode"
-msgstr "CLI模式"
 
 msgid "CLI reference"
 msgstr "CLI 参考"
@@ -5496,14 +5496,8 @@ msgstr "已复制"
 msgid "Copied {0}"
 msgstr "已复制{0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "已复制{copiedLabel}"
-
 msgid "Copied Link"
 msgstr "已复制链接"
-
-msgid "Copied terminal ID"
-msgstr "已复制终端ID"
 
 msgid "Copied to clipboard."
 msgstr "已复制到剪贴板。"
@@ -5569,9 +5563,6 @@ msgid "Copy file name"
 msgstr "复制文件名"
 
 msgid "Copy ID"
-msgstr "复制ID"
-
-msgid "Copy IDs"
 msgstr "复制ID"
 
 msgid "Copy image"
@@ -6355,9 +6346,6 @@ msgstr "创建云环境"
 
 msgid "Create a Dev"
 msgstr "创建 Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "在提供方创建一个具有相同对话上下文的原生分叉。原会话保持不变。"
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "为Claude Desktop或Claude Code等外部集成创建新的API密钥。"
@@ -9185,11 +9173,11 @@ msgstr "分叉参数"
 msgid "Fork conversation"
 msgstr "分叉对话"
 
-msgid "Fork session"
-msgstr "分叉会话"
+msgid "Fork into Chat"
+msgstr "分叉到聊天"
 
-msgid "Fork session…"
-msgstr "分叉会话…"
+msgid "Fork into CLI"
+msgstr "分叉到 CLI"
 
 msgid "Form controls and field composition"
 msgstr "表单控件与字段组合"
@@ -11054,6 +11042,9 @@ msgstr "退出频道"
 msgid "Leave comment mode"
 msgstr "退出评论模式"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "留空则恢复为默认名称。"
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "留空即可恢复终端报告的名称。"
 
@@ -12347,6 +12338,9 @@ msgstr "新建浏览器"
 
 msgid "new challengers"
 msgstr "换对手"
+
+msgid "New chat"
+msgstr "新聊天"
 
 msgid "New Chat"
 msgstr "新建聊天"
@@ -13901,9 +13895,6 @@ msgstr "在浏览器中打开"
 msgid "Open in Changes pane"
 msgstr "在“改动”面板中打开"
 
-msgid "Open in Chat Interface"
-msgstr "在聊天界面中打开"
-
 msgid "Open in ChatGPT"
 msgstr "在ChatGPT中打开"
 
@@ -13978,9 +13969,6 @@ msgstr "在标签页中打开"
 
 msgid "Open in Tasks"
 msgstr "在任务中打开"
-
-msgid "Open in Terminal Chat"
-msgstr "在终端聊天中打开"
 
 msgid "Open in…"
 msgstr "打开方式…"
@@ -14073,9 +14061,6 @@ msgstr "打开最近使用"
 
 msgid "Open roles"
 msgstr "空缺职位"
-
-msgid "Open session in"
-msgstr "会话打开位置"
 
 msgid "Open settings"
 msgstr "打开设置"
@@ -15475,10 +15460,6 @@ msgstr "属性"
 msgid "Provide either id or slug"
 msgstr "请提供id或slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "提供方：{0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "预配失败，沙箱已被销毁。当前没有任何进程在运行，此工作区也无法打开。请新建一个再试。"
 
@@ -15894,6 +15875,9 @@ msgstr "最近动态"
 msgid "Recent apps"
 msgstr "最近使用的应用"
 
+msgid "Recent chats"
+msgstr "最近的聊天"
+
 msgid "Recent invoices"
 msgstr "最近的账单"
 
@@ -16244,6 +16228,9 @@ msgstr "重命名账号"
 
 msgid "Rename branch"
 msgstr "重命名分支"
+
+msgid "Rename chat"
+msgstr "重命名聊天"
 
 msgid "Rename failed"
 msgstr "重命名失败"
@@ -17300,6 +17287,9 @@ msgstr "搜索开发者"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜索所有文件内容和所有工作区。"
+
+msgid "Search all chats…"
+msgstr "搜索所有聊天…"
 
 msgid "Search all emoji"
 msgstr "搜索所有表情"
@@ -19608,9 +19598,6 @@ msgstr "终端字号"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "终端获得焦点时调整终端字号，浏览器窗格中调整页面缩放，其他情况下缩放整个应用"
 
-msgid "terminal ID"
-msgstr "终端ID"
-
 msgid "Terminal input"
 msgstr "终端输入"
 
@@ -19630,9 +19617,6 @@ msgid "Terminal session killed"
 msgstr "终端会话已终止"
 
 msgid "Terminal sessions"
-msgstr "终端会话"
-
-msgid "Terminal Sessions"
 msgstr "终端会话"
 
 msgid "Terminal theme color-palette preview"

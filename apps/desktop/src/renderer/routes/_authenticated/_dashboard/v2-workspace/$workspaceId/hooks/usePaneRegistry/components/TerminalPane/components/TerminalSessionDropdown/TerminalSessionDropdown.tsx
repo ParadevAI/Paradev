@@ -3,6 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { formatCompactRelativeTime } from "@superset/i18n/format";
 import { type RendererContext, usePaneAppearance } from "@superset/panes";
+import { AGENT_IDENTITY_LABELS } from "@superset/shared/agent-catalog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,24 +17,41 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { Check, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+	Bot,
+	Check,
+	ChevronDown,
+	LoaderCircle,
+	Pencil,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import type { CreateNewAgentSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useAgentSessionLauncher";
 import type { TerminalLauncher } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2TerminalLauncher";
 import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import type { SurfaceForkSource } from "../../../../hooks/useSurfaceFork";
+import { useSurfaceForkSource } from "../../../../hooks/useSurfaceForkSource";
+import { AccountUsageMenuSection } from "../../../AccountUsageMenuSection";
+import { ForkMenuItems } from "../../../ForkMenuItems";
+import { RenameDialog } from "../../../RenameDialog";
+import { StopHeaderEvents } from "../../../StopHeaderEvents";
+import { UsageWarningDot } from "../../../UsageWarningDot";
 import { TerminalPaneIcon } from "../TerminalPaneIcon";
-import { RenameSessionDialog } from "./components/RenameSessionDialog";
+import { ContinueWithAgentDialog } from "./components/ContinueWithAgentDialog";
+import { useTerminalAgentConfig } from "./hooks/useTerminalAgentConfig";
 import {
 	getTerminalDisplayTitle,
 	getTerminalSessionListRefetchInterval,
+	getTerminalSessionListStaleTime,
 	shouldQueryTerminalSessionList,
-	TERMINAL_SESSION_LIST_STALE_MS,
 } from "./TerminalSessionDropdown.utils";
 
 interface TerminalSessionDropdownProps {
@@ -41,6 +59,8 @@ interface TerminalSessionDropdownProps {
 	launcher: TerminalLauncher;
 	workspaceId: string;
 	onSessionRemoved: (terminalId: string) => void;
+	onCreateNewAgentSession: CreateNewAgentSession;
+	onForkIntoOtherSurface: (source: SurfaceForkSource) => void;
 }
 
 interface VisibleTerminalSession {
@@ -106,6 +126,8 @@ export function TerminalSessionDropdown({
 	launcher,
 	workspaceId,
 	onSessionRemoved,
+	onCreateNewAgentSession,
+	onForkIntoOtherSurface,
 }: TerminalSessionDropdownProps) {
 	const { t } = useLingui();
 	const isCards = usePaneAppearance() === "cards";
@@ -117,13 +139,22 @@ export function TerminalSessionDropdown({
 	const killTerminalSession = workspaceTrpc.terminal.killSession.useMutation();
 	const renameTerminalSession = workspaceTrpc.terminal.rename.useMutation();
 	const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
+	const [continuing, setContinuing] = useState(false);
+	const { binding, sourceConfig, canFork } = useTerminalAgentConfig(
+		workspaceId,
+		terminalId,
+	);
+	const surfaceFork = useSurfaceForkSource(workspaceId, {
+		kind: "terminal",
+		data: { terminalId },
+	});
 	const sessionsInput = useMemo(() => ({ workspaceId }), [workspaceId]);
 	const sessionsQuery = workspaceTrpc.terminal.list.useQuery(sessionsInput, {
-		enabled: shouldQueryTerminalSessionList(isOpen),
-		notifyOnChangeProps: ["data", "isFetching"],
+		enabled: shouldQueryTerminalSessionList(isOpen, Boolean(binding)),
+		notifyOnChangeProps: isOpen ? ["data", "isFetching"] : ["data"],
 		refetchInterval: getTerminalSessionListRefetchInterval(isOpen),
 		refetchOnWindowFocus: false,
-		staleTime: TERMINAL_SESSION_LIST_STALE_MS,
+		staleTime: getTerminalSessionListStaleTime(isOpen),
 	});
 	useRenderStressInstrumentation("TerminalSessionDropdown", {
 		warnAt: 30,
@@ -350,27 +381,56 @@ export function TerminalSessionDropdown({
 	const titleOverride = context.pane.titleOverride;
 	const triggerTitle = getTerminalDisplayTitle({
 		titleOverride,
+		customTitle: currentSession?.customTitle,
+		agentLabel: binding ? AGENT_IDENTITY_LABELS[binding.agentId] : undefined,
 		runtimeTitle: hostTitle,
 	});
 
+	const forkIntoCli = () => {
+		if (!sourceConfig || !binding?.agentSessionId) return;
+		void onCreateNewAgentSession({
+			configId: sourceConfig.id,
+			placement: "new-tab",
+			prompt: "",
+			forkSessionId: binding.agentSessionId,
+		});
+	};
+
 	return (
 		<>
-			{renameTarget && (
-				<RenameSessionDialog
-					key={renameTarget.terminalId}
-					name={renameTarget.name}
-					onClose={() => setRenameTarget(null)}
-					onSubmit={(name) => handleRenameSession(renameTarget, name)}
-				/>
-			)}
+			<StopHeaderEvents>
+				{renameTarget && (
+					<RenameDialog
+						key={renameTarget.terminalId}
+						name={renameTarget.name}
+						title={t({ message: "Rename session" })}
+						description={t({
+							message:
+								"Leave it empty to go back to the name the terminal reports.",
+						})}
+						inputLabel={t({ message: "Session name" })}
+						onClose={() => setRenameTarget(null)}
+						onSubmit={(name) => handleRenameSession(renameTarget, name)}
+					/>
+				)}
+				{continuing && (
+					<ContinueWithAgentDialog
+						workspaceId={workspaceId}
+						terminalId={terminalId}
+						onClose={() => setContinuing(false)}
+						onCreateNewAgentSession={onCreateNewAgentSession}
+					/>
+				)}
+			</StopHeaderEvents>
 			<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
 				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
-						aria-label={t({
-							message: "Terminal sessions",
-						})}
-						title={triggerTitle}
+						title={
+							hostTitle && hostTitle !== triggerTitle
+								? `${triggerTitle} · ${hostTitle}`
+								: triggerTitle
+						}
 						className={cn(
 							"flex min-w-0 max-w-96 items-center gap-1.5 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
 							isCards && "-ml-1.5",
@@ -398,142 +458,168 @@ export function TerminalSessionDropdown({
 						<span className="min-w-0 flex-1 truncate text-left">
 							{triggerTitle}
 						</span>
-						{sessionsQuery.isFetching && isOpen && (
-							<LoaderCircle className="size-3 shrink-0 animate-spin" />
-						)}
+						<ChevronDown className="size-3 shrink-0 opacity-60" />
+						<UsageWarningDot
+							workspaceId={workspaceId}
+							terminalId={terminalId}
+						/>
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="start" className="w-96">
-					<DropdownMenuLabel className="flex items-center gap-2 text-xs">
-						<span className="min-w-0 flex-1 truncate">
-							<Trans>Terminal Sessions</Trans>
-						</span>
-						<button
-							type="button"
-							aria-label={t({
-								message: "New terminal",
-							})}
-							title={t({
-								message: "New terminal",
-							})}
-							className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-							onClick={(event) => {
-								event.preventDefault();
-								event.stopPropagation();
-								handleNewTerminal();
-							}}
-						>
-							<Plus className="size-3.5" />
-						</button>
-					</DropdownMenuLabel>
-					<DropdownMenuSeparator />
-					<div className="max-h-80 overflow-y-auto">
-						{sessions.length > 0 ? (
-							sessions.map((session) => {
-								const isCurrent = session.terminalId === terminalId;
-								const location = renderTerminalPaneLocations.get(
-									session.terminalId,
-								)?.[0];
-								const createdAtLabel = formatCreatedAt(session.createdAt);
-								const status = isCurrent
-									? t({
-											message: "Current",
-										})
-									: workspaceRunTerminals[session.terminalId]
+				<StopHeaderEvents>
+					<DropdownMenuContent align="start" className="w-96">
+						<DropdownMenuItem onSelect={handleNewTerminal}>
+							<Plus />
+							<Trans>New terminal</Trans>
+						</DropdownMenuItem>
+						{!currentSession?.pending && (
+							<DropdownMenuItem
+								onSelect={() =>
+									setRenameTarget({
+										terminalId,
+										name: currentSession?.customTitle ?? "",
+									})
+								}
+							>
+								<Pencil />
+								<Trans>Rename session</Trans>
+							</DropdownMenuItem>
+						)}
+						<DropdownMenuSeparator />
+						<DropdownMenuLabel className="flex items-center gap-2 font-normal text-muted-foreground text-xs">
+							<Trans>Terminal sessions</Trans>
+							{sessionsQuery.isFetching && (
+								<LoaderCircle className="size-3 shrink-0 animate-spin" />
+							)}
+						</DropdownMenuLabel>
+						<div className="max-h-80 overflow-y-auto">
+							{sessions.length > 0 ? (
+								sessions.map((session) => {
+									const isCurrent = session.terminalId === terminalId;
+									const location = renderTerminalPaneLocations.get(
+										session.terminalId,
+									)?.[0];
+									const createdAtLabel = formatCreatedAt(session.createdAt);
+									const status = isCurrent
 										? t({
-												message: "Run",
+												message: "Current",
 											})
-										: session.pending
+										: workspaceRunTerminals[session.terminalId]
 											? t({
-													message: "Starting",
+													message: "Run",
 												})
-											: session.attached
+											: session.pending
 												? t({
-														message: "Attached",
+														message: "Starting",
 													})
-												: t({
-														message: "Detached",
-													});
-								const title = isCurrent
-									? triggerTitle
-									: getTerminalDisplayTitle({
-											titleOverride: location?.titleOverride,
-											sessionTitle: session.title,
-										});
-
-								return (
-									<DropdownMenuItem
-										key={session.terminalId}
-										className="group flex items-center gap-2"
-										onSelect={(_event) => {
-											handleSelectSession(session);
-										}}
-									>
-										<span className="w-4 shrink-0">
-											{isCurrent && <Check className="size-3.5" />}
-										</span>
-										<span className="min-w-0 flex-1 truncate text-xs">
-											{title}
-										</span>
-										<span className="shrink-0 text-xs text-muted-foreground/70">
-											{createdAtLabel}
-										</span>
-										<span className="shrink-0 text-xs text-muted-foreground">
-											{status}
-										</span>
-										{/* Nothing to rename until the session exists on the
-										    host: a pending row is a terminal id this pane has
-										    minted and not yet attached. */}
-										<button
-											type="button"
-											hidden={session.pending}
-											aria-label={t({
-												message: `Rename ${title}`,
-											})}
-											className="shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100"
-											onClick={(event) => {
-												event.preventDefault();
-												event.stopPropagation();
-												setIsOpen(false);
-												setRenameTarget({
-													terminalId: session.terminalId,
-													name: session.customTitle ?? "",
-												});
-											}}
-										>
-											<Pencil className="size-3" />
-										</button>
-										<button
-											type="button"
-											aria-label={
-												session.createdAt
+												: session.attached
 													? t({
-															message: `Remove terminal ${createdAtLabel}`,
+															message: "Attached",
 														})
 													: t({
-															message: "Remove terminal session",
-														})
-											}
-											disabled={killTerminalSession.isPending}
-											className="shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-30 group-hover:opacity-100"
-											onClick={(event) => {
-												event.preventDefault();
-												event.stopPropagation();
-												handleRemoveTerminal(session);
+															message: "Detached",
+														});
+									const title = isCurrent
+										? triggerTitle
+										: getTerminalDisplayTitle({
+												titleOverride: location?.titleOverride,
+												sessionTitle: session.title,
+											});
+
+									return (
+										<DropdownMenuItem
+											key={session.terminalId}
+											className="group flex items-center gap-2"
+											onSelect={(_event) => {
+												handleSelectSession(session);
 											}}
 										>
-											<Trash2 className="size-3" />
-										</button>
-									</DropdownMenuItem>
-								);
-							})
-						) : (
-							<div className="px-2 py-1.5 text-xs text-muted-foreground">
-								<Trans>No live sessions</Trans>
-							</div>
+											<span className="w-4 shrink-0">
+												{isCurrent && <Check className="size-3.5" />}
+											</span>
+											<span className="min-w-0 flex-1 truncate text-xs">
+												{title}
+											</span>
+											<span className="shrink-0 text-xs text-muted-foreground/70">
+												{createdAtLabel}
+											</span>
+											<span className="shrink-0 text-xs text-muted-foreground">
+												{status}
+											</span>
+											{/* Nothing to rename until the session exists on the
+										    host: a pending row is a terminal id this pane has
+										    minted and not yet attached. */}
+											<button
+												type="button"
+												hidden={session.pending}
+												aria-label={t({
+													message: `Rename ${title}`,
+												})}
+												className="shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100"
+												onClick={(event) => {
+													event.preventDefault();
+													event.stopPropagation();
+													setIsOpen(false);
+													setRenameTarget({
+														terminalId: session.terminalId,
+														name: session.customTitle ?? "",
+													});
+												}}
+											>
+												<Pencil className="size-3" />
+											</button>
+											<button
+												type="button"
+												aria-label={
+													session.createdAt
+														? t({
+																message: `Remove terminal ${createdAtLabel}`,
+															})
+														: t({
+																message: "Remove terminal session",
+															})
+												}
+												disabled={killTerminalSession.isPending}
+												className="shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-30 group-hover:opacity-100"
+												onClick={(event) => {
+													event.preventDefault();
+													event.stopPropagation();
+													handleRemoveTerminal(session);
+												}}
+											>
+												<Trash2 className="size-3" />
+											</button>
+										</DropdownMenuItem>
+									);
+								})
+							) : (
+								<div className="px-2 py-1.5 text-xs text-muted-foreground">
+									<Trans>No live sessions</Trans>
+								</div>
+							)}
+						</div>
+						<AccountUsageMenuSection
+							workspaceId={workspaceId}
+							terminalId={terminalId}
+						/>
+						{binding && (
+							<>
+								<DropdownMenuSeparator />
+								<ForkMenuItems
+									onForkIntoCli={canFork ? forkIntoCli : undefined}
+									onForkIntoChat={
+										surfaceFork
+											? () => onForkIntoOtherSurface(surfaceFork)
+											: undefined
+									}
+								/>
+								<DropdownMenuItem onSelect={() => setContinuing(true)}>
+									<Bot />
+									<Trans>Continue with another agent…</Trans>
+								</DropdownMenuItem>
+							</>
 						)}
-					</div>
-				</DropdownMenuContent>
+					</DropdownMenuContent>
+				</StopHeaderEvents>
 			</DropdownMenu>
 		</>
 	);
