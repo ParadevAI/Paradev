@@ -983,6 +983,9 @@ msgstr "{credit} of credit goes toward your next invoices."
 msgid "{current} of {total}"
 msgstr "{current} of {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} of {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} of {totalBranches}"
 
@@ -8927,11 +8930,17 @@ msgstr "Find in File Viewer"
 msgid "Find in page"
 msgstr "Find in page"
 
+msgid "Find in Page"
+msgstr "Find in Page"
+
 msgid "Find in Terminal"
 msgstr "Find in Terminal"
 
 msgid "Find in this chat"
 msgstr "Find in this chat"
+
+msgid "Find is not available for this page"
+msgstr "Find is not available for this page"
 
 msgid "Find people and Devs"
 msgstr "Find people and Devs"
@@ -17438,6 +17447,9 @@ msgstr "Search tasks…"
 
 msgid "Search text in the active chat"
 msgstr "Search text in the active chat"
+
+msgid "Search text in the active page"
+msgstr "Search text in the active page"
 
 msgid "Search text in the active terminal"
 msgstr "Search text in the active terminal"

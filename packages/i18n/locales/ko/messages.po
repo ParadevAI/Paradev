@@ -983,6 +983,9 @@ msgstr "{credit} 크레딧은 다음 청구서에 적용됩니다."
 msgid "{current} of {total}"
 msgstr "{total}개 중 {current}번째"
 
+msgid "{current} of {total}+"
+msgstr "{total}+개 중 {current}번째"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{totalBranches} 중 {currentPage}"
 
@@ -8927,11 +8930,17 @@ msgstr "파일 뷰어에서 찾기"
 msgid "Find in page"
 msgstr "페이지에서 찾기"
 
+msgid "Find in Page"
+msgstr "페이지에서 찾기"
+
 msgid "Find in Terminal"
 msgstr "터미널에서 찾기"
 
 msgid "Find in this chat"
 msgstr "이 채팅에서 찾기"
+
+msgid "Find is not available for this page"
+msgstr "이 페이지에서는 찾기를 사용할 수 없습니다"
 
 msgid "Find people and Devs"
 msgstr "사람 및 Dev 찾기"
@@ -17438,6 +17447,9 @@ msgstr "작업 검색…"
 
 msgid "Search text in the active chat"
 msgstr "활성 채팅에서 텍스트를 검색합니다"
+
+msgid "Search text in the active page"
+msgstr "활성 페이지에서 텍스트 검색"
 
 msgid "Search text in the active terminal"
 msgstr "활성 터미널에서 텍스트를 검색합니다"

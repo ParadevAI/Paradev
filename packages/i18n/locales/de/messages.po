@@ -983,6 +983,9 @@ msgstr "{credit} Guthaben wird mit Ihren nächsten Rechnungen verrechnet."
 msgid "{current} of {total}"
 msgstr "{current} von {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} von {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} von {totalBranches}"
 
@@ -8927,11 +8930,17 @@ msgstr "Im Dateibetrachter suchen"
 msgid "Find in page"
 msgstr "Auf der Seite suchen"
 
+msgid "Find in Page"
+msgstr "Auf der Seite suchen"
+
 msgid "Find in Terminal"
 msgstr "Im Terminal suchen"
 
 msgid "Find in this chat"
 msgstr "In diesem Chat suchen"
+
+msgid "Find is not available for this page"
+msgstr "Die Suche ist für diese Seite nicht verfügbar"
 
 msgid "Find people and Devs"
 msgstr "Personen und Devs finden"
@@ -17438,6 +17447,9 @@ msgstr "Aufgaben durchsuchen…"
 
 msgid "Search text in the active chat"
 msgstr "Text im aktiven Chat suchen"
+
+msgid "Search text in the active page"
+msgstr "Text auf der aktiven Seite suchen"
 
 msgid "Search text in the active terminal"
 msgstr "Text im aktiven Terminal suchen"

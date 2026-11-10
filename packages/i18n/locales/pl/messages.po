@@ -983,6 +983,9 @@ msgstr "{credit} kredytu zostanie odliczone od kolejnych faktur."
 msgid "{current} of {total}"
 msgstr "{current} z {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} z {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} z {totalBranches}"
 
@@ -8927,11 +8930,17 @@ msgstr "Znajdź w podglądzie pliku"
 msgid "Find in page"
 msgstr "Znajdź na stronie"
 
+msgid "Find in Page"
+msgstr "Znajdź na stronie"
+
 msgid "Find in Terminal"
 msgstr "Znajdź w terminalu"
 
 msgid "Find in this chat"
 msgstr "Znajdź w tym czacie"
+
+msgid "Find is not available for this page"
+msgstr "Wyszukiwanie nie jest dostępne dla tej strony"
 
 msgid "Find people and Devs"
 msgstr "Znajdź osoby i Devy"
@@ -17438,6 +17447,9 @@ msgstr "Szukaj zadań…"
 
 msgid "Search text in the active chat"
 msgstr "Szukaj tekstu w aktywnym czacie"
+
+msgid "Search text in the active page"
+msgstr "Wyszukaj tekst na aktywnej stronie"
 
 msgid "Search text in the active terminal"
 msgstr "Szukaj tekstu w aktywnym terminalu"

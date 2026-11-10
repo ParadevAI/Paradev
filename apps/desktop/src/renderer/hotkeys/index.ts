@@ -5,6 +5,7 @@ export {
 	getBinding,
 	getDispatchChord,
 	useBinding,
+	useDispatchChord,
 	useFormatBinding,
 	useHotkey,
 	useHotkeyDisplay,

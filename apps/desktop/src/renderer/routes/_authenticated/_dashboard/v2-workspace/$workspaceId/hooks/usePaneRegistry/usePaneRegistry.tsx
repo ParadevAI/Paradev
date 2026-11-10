@@ -1125,6 +1125,7 @@ export function usePaneRegistry({
 								ctx.actions.updateData(data as PaneViewerData)
 							}
 							onFocus={ctx.actions.focus}
+							isActive={ctx.isActive}
 						/>
 					),
 					contextMenuActions: (_ctx, defaults) =>

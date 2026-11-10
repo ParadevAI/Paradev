@@ -983,6 +983,9 @@ msgstr "{credit} kredit akan dipotong dari tagihan berikutnya."
 msgid "{current} of {total}"
 msgstr "{current} dari {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} dari {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} dari {totalBranches}"
 
@@ -8927,11 +8930,17 @@ msgstr "Cari di Penampil File"
 msgid "Find in page"
 msgstr "Cari di halaman"
 
+msgid "Find in Page"
+msgstr "Cari di halaman"
+
 msgid "Find in Terminal"
 msgstr "Cari di Terminal"
 
 msgid "Find in this chat"
 msgstr "Cari di chat ini"
+
+msgid "Find is not available for this page"
+msgstr "Pencarian tidak tersedia untuk halaman ini"
 
 msgid "Find people and Devs"
 msgstr "Cari orang dan Dev"
@@ -17438,6 +17447,9 @@ msgstr "Cari tugas…"
 
 msgid "Search text in the active chat"
 msgstr "Cari teks di chat aktif"
+
+msgid "Search text in the active page"
+msgstr "Cari teks di halaman aktif"
 
 msgid "Search text in the active terminal"
 msgstr "Cari teks di terminal aktif"

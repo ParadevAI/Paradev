@@ -983,6 +983,9 @@ msgstr "{credit} tegoed wordt verrekend met je volgende facturen."
 msgid "{current} of {total}"
 msgstr "{current} van {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} van {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} van {totalBranches}"
 
@@ -8927,11 +8930,17 @@ msgstr "Zoeken in bestandsviewer"
 msgid "Find in page"
 msgstr "Zoeken op pagina"
 
+msgid "Find in Page"
+msgstr "Zoeken op pagina"
+
 msgid "Find in Terminal"
 msgstr "Zoeken in terminal"
 
 msgid "Find in this chat"
 msgstr "Zoeken in deze chat"
+
+msgid "Find is not available for this page"
+msgstr "Zoeken is niet beschikbaar voor deze pagina"
 
 msgid "Find people and Devs"
 msgstr "Mensen en Devs zoeken"
@@ -17438,6 +17447,9 @@ msgstr "Taken zoeken…"
 
 msgid "Search text in the active chat"
 msgstr "Tekst zoeken in de actieve chat"
+
+msgid "Search text in the active page"
+msgstr "Tekst zoeken op de actieve pagina"
 
 msgid "Search text in the active terminal"
 msgstr "Tekst zoeken in de actieve terminal"

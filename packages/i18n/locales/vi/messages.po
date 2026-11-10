@@ -983,6 +983,9 @@ msgstr "{credit} tín dụng sẽ được trừ vào các hóa đơn tiếp the
 msgid "{current} of {total}"
 msgstr "{current} / {total}"
 
+msgid "{current} of {total}+"
+msgstr "{current} / {total}+"
+
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage}/{totalBranches}"
 
@@ -8927,11 +8930,17 @@ msgstr "Tìm trong khung xem tệp"
 msgid "Find in page"
 msgstr "Tìm trong trang"
 
+msgid "Find in Page"
+msgstr "Tìm trong trang"
+
 msgid "Find in Terminal"
 msgstr "Tìm trong terminal"
 
 msgid "Find in this chat"
 msgstr "Tìm trong cuộc trò chuyện này"
+
+msgid "Find is not available for this page"
+msgstr "Không thể tìm kiếm trên trang này"
 
 msgid "Find people and Devs"
 msgstr "Tìm người và Dev"
@@ -17438,6 +17447,9 @@ msgstr "Tìm tác vụ…"
 
 msgid "Search text in the active chat"
 msgstr "Tìm văn bản trong chat đang mở"
+
+msgid "Search text in the active page"
+msgstr "Tìm văn bản trong trang đang mở"
 
 msgid "Search text in the active terminal"
 msgstr "Tìm văn bản trong terminal đang mở"
