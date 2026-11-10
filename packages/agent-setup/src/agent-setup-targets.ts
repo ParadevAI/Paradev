@@ -17,6 +17,7 @@ export const AGENT_SETUP_TARGETS = [
 	{ id: "amp", managedBinary: true },
 	{ id: "claude", managedBinary: true },
 	{ id: "codex", managedBinary: true },
+	{ id: "codewhale", managedBinary: true },
 	{ id: "droid", managedBinary: true },
 	{ id: "opencode", managedBinary: true },
 	{ id: "omp" },

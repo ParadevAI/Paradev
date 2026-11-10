@@ -44,6 +44,7 @@ export {
 	removeCodexManagedHooks,
 	removeOpenCodeTuiPlugin,
 } from "./agent-wrappers-claude-codex-opencode";
+export { createCodewhaleWrapper } from "./agent-wrappers-codewhale";
 export {
 	buildWrapperScript,
 	getWrapperPath,

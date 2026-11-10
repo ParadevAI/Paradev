@@ -1,6 +1,8 @@
 import ampIcon from "./amp.svg";
 import antigravityIcon from "./antigravity.svg";
 import claudeIcon from "./claude.svg";
+import codewhaleIcon from "./codewhale.svg";
+import codewhaleWhiteIcon from "./codewhale-white.svg";
 import codexIcon from "./codex.svg";
 import codexWhiteIcon from "./codex-white.svg";
 import copilotIcon from "./copilot.svg";
@@ -48,6 +50,7 @@ export const PRESET_ICONS: Record<string, PresetIconSet> = {
 	agy: { light: antigravityIcon, dark: antigravityIcon },
 	claude: { light: claudeIcon, dark: claudeIcon },
 	codex: { light: codexIcon, dark: codexWhiteIcon },
+	codewhale: { light: codewhaleIcon, dark: codewhaleWhiteIcon },
 	copilot: { light: copilotIcon, dark: copilotWhiteIcon },
 	devin: { light: devinIcon, dark: devinWhiteIcon },
 	fx: { light: fxIcon, dark: fxWhiteIcon },
@@ -96,6 +99,8 @@ export {
 	claudeIcon,
 	codexIcon,
 	codexWhiteIcon,
+	codewhaleIcon,
+	codewhaleWhiteIcon,
 	copilotIcon,
 	copilotWhiteIcon,
 	cursorAgentIcon,

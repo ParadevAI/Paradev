@@ -7,6 +7,7 @@ export const AGENT_ICONS: Record<string, number> = {
 	amp: require("@/assets/agents/amp.png"),
 	claude: require("@/assets/agents/claude.png"),
 	codex: require("@/assets/agents/codex.png"),
+	codewhale: require("@/assets/agents/codewhale.png"),
 	copilot: require("@/assets/agents/copilot.png"),
 	"cursor-agent": require("@/assets/agents/cursor-agent.png"),
 	"cursor-composer": require("@/assets/agents/cursor-agent.png"),
