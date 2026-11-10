@@ -15601,6 +15601,9 @@ msgstr "Ustaw powtarzalną pracę według harmonogramu lub po wystąpieniu zdarz
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Zapytania o wykresy, kohorty i eksperymenty"
+
 msgid "Query events and feature flags"
 msgstr "Zapytania o zdarzenia i feature flagi"
 

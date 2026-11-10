@@ -23,6 +23,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)notion\.(so|site)$/, "notion"],
 	[/(^|\.)sentry\.io$/, "sentry"],
 	[/(^|\.)posthog\.com$/, "posthog"],
+	[/(^|\.)amplitude\.com$/, "amplitude"],
 	[/(^|\.)vercel\.com$/, "vercel"],
 	[/(^|\.)resend\.com$/, "resend"],
 	[/(^|\.)figma\.com$/, "figma"],

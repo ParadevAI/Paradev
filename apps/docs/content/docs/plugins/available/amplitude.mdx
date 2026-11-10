@@ -1,0 +1,29 @@
+---
+title: Amplitude
+description: Query charts, events, and users, and manage dashboards, cohorts, experiments, and feature flags in Amplitude
+---
+
+Query charts, events, and users, and manage dashboards, cohorts, experiments, and feature flags in Amplitude.
+
+## Regions
+
+Amplitude keeps US and EU organizations in separate data centers, so there is one plugin for each. Install the one that matches where your organization lives. If you sign in at `app.eu.amplitude.com`, use **Amplitude EU**.
+
+| Plugin | Data center | MCP server |
+|:-------|:------------|:-----------|
+| Amplitude | US | `https://mcp.amplitude.com/mcp` |
+| Amplitude EU | EU | `https://mcp.eu.amplitude.com/mcp` |
+
+## MCP Server
+
+Tools come from Amplitude's own MCP server. Paradev proxies each call and adds your credentials. Amplitude decides which tools the server offers, so see [Amplitude's MCP documentation](https://amplitude.com/docs/amplitude-ai/amplitude-mcp) for the current list.
+
+The tools act with your own permissions in Amplitude, and some of them change dashboards, cohorts, experiments, and feature flags.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Amplitude in your browser and approve access. Paradev registers itself with Amplitude when you connect, so there is no app to set up first. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

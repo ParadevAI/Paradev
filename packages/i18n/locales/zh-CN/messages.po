@@ -15601,6 +15601,9 @@ msgstr "按计划或事件触发重复性工作。智能体会自行运行，结
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "查询图表、群组和实验"
+
 msgid "Query events and feature flags"
 msgstr "查询事件和功能开关"
 

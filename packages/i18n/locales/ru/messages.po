@@ -15601,6 +15601,9 @@ msgstr "Поставьте повторяющуюся работу на расп
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Запросы к графикам, когортам и экспериментам"
+
 msgid "Query events and feature flags"
 msgstr "Запросы к событиям и feature-флагам"
 

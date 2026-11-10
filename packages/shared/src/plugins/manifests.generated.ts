@@ -1063,6 +1063,93 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"amplitude": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "amplitude",
+		"version": "1.0.0",
+		"description": "Ask Amplitude about your product: query charts, events, and users, and manage dashboards, cohorts, experiments, and feature flags.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"amplitude",
+			"analytics",
+			"events",
+			"experiments",
+			"feature-flags",
+			"product"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Amplitude",
+					"category": "Data & APIs",
+					"icon": "amplitude"
+				},
+				"connector": {
+					"slug": "amplitude_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.amplitude.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"amplitude-eu": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "amplitude-eu",
+		"version": "1.0.0",
+		"description": "Ask Amplitude about your product in the EU data center: query charts, events, and users, and manage dashboards, cohorts, experiments, and feature flags.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"amplitude",
+			"analytics",
+			"events",
+			"experiments",
+			"feature-flags",
+			"product",
+			"eu"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Amplitude EU",
+					"category": "Data & APIs",
+					"icon": "amplitude"
+				},
+				"connector": {
+					"slug": "amplitude_eu_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.eu.amplitude.com/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

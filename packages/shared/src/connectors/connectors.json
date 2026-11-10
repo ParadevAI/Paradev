@@ -884,6 +884,70 @@
 				}
 			]
 		},
+		"amplitude_mcp": {
+			"displayName": "Amplitude",
+			"icon": "amplitude",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.amplitude.com/mcp",
+					"scopes": ["all:read", "all:write", "offline_access"],
+					"identity": {
+						"mcp": "https://mcp.amplitude.com/mcp",
+						"tool": "get_amplitude_context",
+						"account": {
+							"id": "$.org.id",
+							"label": "$.org.name"
+						},
+						"user": {
+							"id": "$.user.id",
+							"label": "$.user.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"amplitude_eu_mcp": {
+			"displayName": "Amplitude EU",
+			"icon": "amplitude",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.eu.amplitude.com/mcp",
+					"scopes": ["all:read", "all:write", "offline_access"],
+					"identity": {
+						"mcp": "https://mcp.eu.amplitude.com/mcp",
+						"tool": "get_amplitude_context",
+						"account": {
+							"id": "$.org.id",
+							"label": "$.org.name"
+						},
+						"user": {
+							"id": "$.user.id",
+							"label": "$.user.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"peec_mcp": {
 			"displayName": "Peec AI",
 			"icon": "peec",

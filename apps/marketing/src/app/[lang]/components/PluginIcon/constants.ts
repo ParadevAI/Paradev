@@ -8,6 +8,7 @@ import {
 	SiSupabase,
 	SiVercel,
 } from "react-icons/si";
+import { AmplitudeIcon } from "./components/AmplitudeIcon";
 import { AutumnIcon } from "./components/AutumnIcon";
 import { FirecrawlIcon } from "./components/FirecrawlIcon";
 import { InngestIcon } from "./components/InngestIcon";
@@ -30,6 +31,7 @@ export const IMAGE_ICONS: Record<string, string> = {
 };
 
 export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
+	amplitude: { icon: AmplitudeIcon },
 	autumn: { icon: AutumnIcon },
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },

@@ -15601,6 +15601,9 @@ msgstr "Metti il lavoro ricorrente su una pianificazione o un evento. Gli agenti
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Interroga grafici, coorti ed esperimenti"
+
 msgid "Query events and feature flags"
 msgstr "Interroga eventi e feature flag"
 

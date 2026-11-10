@@ -15601,6 +15601,9 @@ msgstr "Jadwalkan pekerjaan berulang berdasarkan waktu atau picu lewat event. Ag
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Kueri grafik, kohort, dan eksperimen"
+
 msgid "Query events and feature flags"
 msgstr "Kueri event dan feature flag"
 

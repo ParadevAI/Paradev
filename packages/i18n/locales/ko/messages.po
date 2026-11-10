@@ -15601,6 +15601,9 @@ msgstr "반복되는 작업을 일정이나 이벤트에 맡기세요. 에이전
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "차트, 코호트, 실험 조회"
+
 msgid "Query events and feature flags"
 msgstr "이벤트와 기능 플래그 조회"
 

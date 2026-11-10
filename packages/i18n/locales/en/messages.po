@@ -15601,6 +15601,9 @@ msgstr "Put recurring work on a schedule or an event. Agents run on their own an
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Query charts, cohorts, and experiments"
+
 msgid "Query events and feature flags"
 msgstr "Query events and feature flags"
 

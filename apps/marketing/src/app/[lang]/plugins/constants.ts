@@ -171,6 +171,11 @@ export const CATALOG: {
 				displayName: "Peec AI",
 				description: msg({ message: "Track your brand in AI search" }),
 			},
+			{
+				name: "amplitude",
+				displayName: "Amplitude",
+				description: msg({ message: "Query charts, cohorts, and experiments" }),
+			},
 		],
 	},
 ];
