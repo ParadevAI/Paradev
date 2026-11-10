@@ -1,5 +1,6 @@
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
+import { LuLayers } from "react-icons/lu";
 import {
 	SiLinear,
 	SiNotion,
@@ -31,6 +32,7 @@ export const IMAGE_ICONS: Record<string, string> = {
 
 export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	autumn: { icon: AutumnIcon },
+	devstack: { icon: LuLayers },
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
 	inngest: { icon: InngestIcon },

@@ -12,7 +12,8 @@ Take the current branch to a PR that is green and has no open review findings. S
 **never merge**, never push to the base branch, never force-push a branch someone else pushed to.
 
 Read `.devstack/config.md` for `base_branch`, `checks`, `pr`, `tracker` and `plans_dir`. Without
-it, take the base branch from `git symbolic-ref --short refs/remotes/origin/HEAD`, find checks in
+it, take the base branch from `git symbolic-ref --short refs/remotes/origin/HEAD` (or
+`gh repo view --json defaultBranchRef -q .defaultBranchRef.name` when that is unset), find checks in
 the CI workflow, and say what you assumed.
 
 If a PR for this branch is already open (`gh pr view --json number,state,url`), run steps 1–4
@@ -50,7 +51,9 @@ missing for changed logic, generated files edited by hand.
 
 If you find problems, **stop and report** each one with the file, the rule it breaks (quoted), the
 code, and the fix you propose. Then ask: fix all, fix some, proceed anyway (listed under Known
-Limitations in the PR), or discuss. Continue only after the user answers.
+Limitations in the PR), or discuss. Continue only after the user answers. If nobody can answer
+(an unattended run), fix the clear violations, list the rest under Known Limitations, and open
+the PR as a draft.
 
 ## 4. Commit and push
 

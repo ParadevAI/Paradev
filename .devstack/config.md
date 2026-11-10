@@ -8,10 +8,13 @@ checks:
     - bun run lint:fix
     - bunx sherif --fix
   verify:
+    - bun run lint
     - bun run typecheck
     - bun run test
     - bun run check:i18n
     - bun run check:plugins
+    - bun run check:versions
+    - bun run check:durable-objects
 pr:
   draft: false
   assignees: [superset-home]
@@ -24,9 +27,12 @@ max_workers: 4
 
 # devstack conventions for paradev
 
-Plans go where the work lives: `apps/desktop/plans/` for desktop work, `apps/marketing/plans/`
-for the marketing site, and `plans/` for shared packages, plugins, or work across apps. A plan
-moves to `done/` in the PR that completes it.
+Plans go where the work lives: `apps/desktop/plans/` for desktop work, `apps/mobile/plans/` for
+the mobile app, `apps/marketing/plans/` for the marketing site, and `plans/` for shared packages,
+plugins, or work across apps. A plan moves to `done/` in the PR that completes it.
+
+A change to `apps/marketing` content also needs `bun run lint:prose` in `apps/marketing`, which
+runs Vale; CI installs it, so install Vale locally or rely on CI for that check.
 
 Assigning a PR to `superset-home` starts an automated review in a cloud workspace. It publishes
 its findings as a Paradev page and links it in a PR comment; address those findings before you

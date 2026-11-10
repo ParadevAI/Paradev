@@ -24,7 +24,7 @@ Edit it in place; do not overwrite values the user set.
 
 | Key | How to find it |
 | --- | --- |
-| `base_branch` | `git symbolic-ref --short refs/remotes/origin/HEAD`, minus `origin/` |
+| `base_branch` | `git symbolic-ref --short refs/remotes/origin/HEAD`, minus `origin/`; if `origin/HEAD` is unset, `gh repo view --json defaultBranchRef -q .defaultBranchRef.name` |
 | `plans_dir` | An existing `plans/`, `docs/plans/` or similar with dated markdown files; else `.devstack/plans` |
 | `checks.fix` | Commands that rewrite files: formatters and lint `--fix` scripts in `package.json`, `Makefile`, `justfile`, `pyproject.toml` |
 | `checks.verify` | Typecheck, lint, test, and any CI-only check you can see in `.github/workflows/` |

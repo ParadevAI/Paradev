@@ -3,7 +3,7 @@ import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
-import { LuBookOpen, LuDrama, LuPuzzle } from "react-icons/lu";
+import { LuBookOpen, LuDrama, LuLayers, LuPuzzle } from "react-icons/lu";
 import {
 	SiGooglechrome,
 	SiGoogledocs,
@@ -66,6 +66,7 @@ const IMAGE_ICONS: Record<string, string> = {
 
 const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	autumn: { icon: AutumnIcon },
+	devstack: { icon: LuLayers },
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
 	inngest: { icon: InngestIcon },
