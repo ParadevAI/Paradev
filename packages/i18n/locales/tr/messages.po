@@ -2381,6 +2381,9 @@ msgstr "Ajanlar rutin biletleri görev ortasında müdahale olmadan tamamlar."
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Bulut çalışma alanlarındaki ajanlar <0>--host</0> ile bu host üzerinde komut çalıştırabilir. Host'a röle üzerinden erişilebilmesi gerekir."
 
+msgid "Agents in your pocket"
+msgstr "Ajanlar cebinizde"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Ajanlar bulutta çalışmaya devam eder. Çalışma alanını masaüstünden, iPhone'dan veya iPad'den yeniden açın."
 
@@ -17019,6 +17022,9 @@ msgstr "Şimdi çalıştır"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Zamanlamayla veya olaylarla çalıştırın, isteğe bağlı çalıştırın, duraklatın, sürdürün ve günlükleri okuyun."
 
+msgid "Run on any machine"
+msgstr "Herhangi bir makinede çalışır"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Özellikler, düzeltmeler ve yeniden düzenlemeler için paralel kodlama ajanları çalıştırın. Her biri yerelde ya da bulutta kendi dalında çalışır."
 
@@ -17117,6 +17123,9 @@ msgstr "Yeni bir çalışma alanı oluşturulduğunda çalışır."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Bir çalışma alanı silindiğinde çalışır."
+
+msgid "Runs while you sleep"
+msgstr "Siz uyurken çalışır"
 
 msgid "Same session"
 msgstr "Aynı oturum"
@@ -17561,6 +17570,9 @@ msgstr "Bu eşiği puan tablosunda gör"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Neyin değiştiğini görün, geri bildirim verin ve hazır olduğunda işi birleştirin."
 
+msgid "See what it can do"
+msgstr "Neler yapabildiğini görün"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Şu anda ne geliştirdiğimizi, sırada ne olduğunu ve Paradev'in nereye gittiğini görün."
 
@@ -17732,6 +17744,9 @@ msgstr "Seçili çalışma alanı eylemleri"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Terminalde metin seçmek, sondaki boşluklar kırpılmış olarak panoya hemen kopyalar"
+
+msgid "Self-hosted"
+msgstr "Kendi sunucunuzda"
 
 msgid "Send"
 msgstr "Gönder"
@@ -18185,6 +18200,9 @@ msgstr "Bağlantı menüsünü göster"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linear sınıflandırma otomasyonumun son 10 çalıştırmasını göster"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Paradev CLI’ın neler yapabildiğini göster. Komutlarını görmek için `superset --help` ve `superset schema` çalıştır, ardından hesabımda birkaç salt okunur komut dene: `superset workspaces list`, `superset tasks list`, `superset automations list` ve `superset hosts list`. Bulduklarını özetle ve CLI’ı iş akışımda kullanmanın veya betiklemenin üç yolunu öner. Hiçbir şey oluşturma, değiştirme veya silme."
 
 msgid "Show more"
 msgstr "Daha fazla göster"
@@ -21561,6 +21579,9 @@ msgstr "Manuel oturum açmayı kullan"
 
 msgid "Use more browser features: {features}"
 msgstr "Daha fazla tarayıcı özelliği kullanma: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Paradev’i her yerde kullanın"
 
 msgid "Use Paradev on mobile"
 msgstr "Paradev’i mobilde kullanın"

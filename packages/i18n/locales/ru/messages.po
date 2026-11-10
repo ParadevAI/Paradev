@@ -2381,6 +2381,9 @@ msgstr "Агенты закрывают рутинные тикеты без в�
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Агенты в ваших облачных рабочих областях смогут с помощью <0>--host</0> выполнять команды на этом хосте. Хост должен быть доступен через реле."
 
+msgid "Agents in your pocket"
+msgstr "Агенты в кармане"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенты продолжают работать в облаке. Снова откройте рабочую область на компьютере, iPhone или iPad."
 
@@ -17019,6 +17022,9 @@ msgstr "Запустить сейчас"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Запуск по расписанию или по событиям, запуск по требованию, пауза, возобновление и чтение логов."
 
+msgid "Run on any machine"
+msgstr "На любой машине"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Запускайте параллельных агентов для фич, исправлений и рефакторинга. Каждый работает в своей ветке, локально или в облаке."
 
@@ -17117,6 +17123,9 @@ msgstr "Выполняется при создании рабочего прос
 
 msgid "Runs when a workspace is deleted."
 msgstr "Выполняется при удалении рабочего пространства."
+
+msgid "Runs while you sleep"
+msgstr "Работает, пока вы спите"
 
 msgid "Same session"
 msgstr "Та же сессия"
@@ -17561,6 +17570,9 @@ msgstr "Посмотреть этот шлюз в таблице"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Посмотрите, что изменилось, дайте обратную связь и объедините работу, когда она готова."
 
+msgid "See what it can do"
+msgstr "Посмотрите, что он умеет"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Посмотрите, что мы делаем сейчас, что будет дальше и куда движется Paradev."
 
@@ -17732,6 +17744,9 @@ msgstr "Действия с выбранными рабочими областя
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Выделенный в терминале текст сразу копируется в буфер обмена, без конечных пробелов"
+
+msgid "Self-hosted"
+msgstr "Собственный хостинг"
 
 msgid "Send"
 msgstr "Отправить"
@@ -18185,6 +18200,9 @@ msgstr "Показать меню ссылки"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Покажи последние 10 запусков моей автоматизации разбора Linear"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Покажи, что умеет Paradev CLI. Запусти `superset --help` и `superset schema`, чтобы увидеть команды, затем попробуй несколько команд только для чтения в моём аккаунте: `superset workspaces list`, `superset tasks list`, `superset automations list` и `superset hosts list`. Кратко опиши результаты и предложи три способа использовать CLI или писать с ним скрипты в моей работе. Ничего не создавай, не меняй и не удаляй."
 
 msgid "Show more"
 msgstr "Показать больше"
@@ -21561,6 +21579,9 @@ msgstr "Использовать ручной вход"
 
 msgid "Use more browser features: {features}"
 msgstr "Использовать дополнительные функции браузера: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Используйте Paradev где угодно"
 
 msgid "Use Paradev on mobile"
 msgstr "Используйте Paradev на телефоне"

@@ -2381,6 +2381,9 @@ msgstr "Agen menyelesaikan tiket rutin tanpa intervensi di tengah tugas."
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Agen di workspace cloud Anda lalu bisa memakai <0>--host</0> untuk menjalankan perintah di host ini. Host harus bisa dijangkau melalui relay."
 
+msgid "Agents in your pocket"
+msgstr "Agen di saku Anda"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop, iPhone, atau iPad."
 
@@ -17019,6 +17022,9 @@ msgstr "Jalankan sekarang"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Jalankan sesuai jadwal atau saat ada event, sesuai permintaan, jeda, lanjutkan, dan baca log."
 
+msgid "Run on any machine"
+msgstr "Di mesin mana pun"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Jalankan agen coding paralel untuk fitur, perbaikan, dan refactor. Masing-masing bekerja di branch sendiri, secara lokal atau di cloud."
 
@@ -17117,6 +17123,9 @@ msgstr "Dijalankan saat ruang kerja baru dibuat."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Dijalankan saat ruang kerja dihapus."
+
+msgid "Runs while you sleep"
+msgstr "Berjalan saat Anda tidur"
 
 msgid "Same session"
 msgstr "Sesi yang sama"
@@ -17561,6 +17570,9 @@ msgstr "Lihat gerbang ini di kartu skor"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Lihat apa yang berubah, beri masukan, dan merge pekerjaannya saat siap."
 
+msgid "See what it can do"
+msgstr "Lihat apa yang bisa dilakukannya"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Lihat apa yang sedang kami bangun, apa yang akan datang, dan ke mana arah Paradev."
 
@@ -17732,6 +17744,9 @@ msgstr "Aksi workspace terpilih"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Memilih teks di terminal langsung menyalinnya ke clipboard, tanpa spasi di akhir"
+
+msgid "Self-hosted"
+msgstr "Hosting mandiri"
 
 msgid "Send"
 msgstr "Kirim"
@@ -18185,6 +18200,9 @@ msgstr "Tampilkan menu tautan"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Tunjukkan 10 run terakhir otomatisasi triase Linear saya"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Tunjukkan apa yang bisa dilakukan CLI Paradev. Jalankan `superset --help` dan `superset schema` untuk melihat perintahnya, lalu coba beberapa perintah baca-saja di akun saya: `superset workspaces list`, `superset tasks list`, `superset automations list`, dan `superset hosts list`. Rangkum hasilnya dan sarankan tiga cara saya bisa memakai atau membuat skrip CLI dalam alur kerja saya. Jangan membuat, mengubah, atau menghapus apa pun."
 
 msgid "Show more"
 msgstr "Tampilkan selengkapnya"
@@ -21561,6 +21579,9 @@ msgstr "Gunakan login manual"
 
 msgid "Use more browser features: {features}"
 msgstr "Memakai fitur browser lainnya: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Gunakan Paradev di mana saja"
 
 msgid "Use Paradev on mobile"
 msgstr "Gunakan Paradev di ponsel"

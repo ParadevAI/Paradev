@@ -2381,6 +2381,9 @@ msgstr "Agent hoàn thành các ticket thường ngày mà không cần can thi�
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Agent trong các workspace cloud của bạn khi đó có thể dùng <0>--host</0> để chạy lệnh trên host này. Host phải truy cập được qua relay."
 
+msgid "Agents in your pocket"
+msgstr "Agent trong túi bạn"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính, iPhone hoặc iPad."
 
@@ -17019,6 +17022,9 @@ msgstr "Chạy ngay"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Chạy theo lịch hoặc theo sự kiện, chạy khi cần, tạm dừng, tiếp tục và đọc log."
 
+msgid "Run on any machine"
+msgstr "Chạy trên mọi máy"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Chạy song song các agent lập trình cho tính năng, sửa lỗi và refactor. Mỗi agent làm việc trên nhánh riêng, cục bộ hoặc trên cloud."
 
@@ -17117,6 +17123,9 @@ msgstr "Chạy khi tạo không gian làm việc mới."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Chạy khi xóa không gian làm việc."
+
+msgid "Runs while you sleep"
+msgstr "Chạy cả khi bạn ngủ"
 
 msgid "Same session"
 msgstr "Cùng phiên"
@@ -17561,6 +17570,9 @@ msgstr "Xem cổng này trên bảng điểm"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Xem những gì đã thay đổi, góp ý, và merge khi đã sẵn sàng."
 
+msgid "See what it can do"
+msgstr "Xem nó làm được gì"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Xem chúng tôi đang xây dựng gì, sắp tới có gì và Paradev đang hướng tới đâu."
 
@@ -17732,6 +17744,9 @@ msgstr "Hành động cho workspace đã chọn"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Chọn văn bản trong terminal sẽ sao chép ngay vào clipboard, đã cắt khoảng trắng ở cuối"
+
+msgid "Self-hosted"
+msgstr "Tự lưu trữ"
 
 msgid "Send"
 msgstr "Gửi"
@@ -18185,6 +18200,9 @@ msgstr "Hiện menu liên kết"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Cho tôi xem 10 lần chạy gần nhất của tự động hóa phân loại Linear"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Cho tôi xem Paradev CLI làm được gì. Chạy `superset --help` và `superset schema` để xem các lệnh, rồi thử vài lệnh chỉ đọc trên tài khoản của tôi: `superset workspaces list`, `superset tasks list`, `superset automations list` và `superset hosts list`. Tóm tắt những gì bạn tìm thấy và gợi ý ba cách tôi có thể dùng hoặc viết script với CLI trong quy trình làm việc. Không tạo, sửa hay xóa bất cứ thứ gì."
 
 msgid "Show more"
 msgstr "Hiện thêm"
@@ -21561,6 +21579,9 @@ msgstr "Dùng đăng nhập thủ công"
 
 msgid "Use more browser features: {features}"
 msgstr "Dùng thêm tính năng trình duyệt: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Dùng Paradev ở mọi nơi"
 
 msgid "Use Paradev on mobile"
 msgstr "Dùng Paradev trên điện thoại"

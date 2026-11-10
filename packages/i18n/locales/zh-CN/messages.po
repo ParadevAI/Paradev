@@ -2381,6 +2381,9 @@ msgstr "智能体无需中途干预即可完成常规工单。"
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "之后，你的云端工作区中的智能体就可以使用 <0>--host</0> 参数在此主机上运行命令。该主机必须能通过中继访问。"
 
+msgid "Agents in your pocket"
+msgstr "智能体随身带"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "智能体在云端持续工作。可在桌面端、iPhone 或 iPad 上重新打开工作区。"
 
@@ -17019,6 +17022,9 @@ msgstr "立即运行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "按计划或事件运行、按需运行、暂停、恢复并查看日志。"
 
+msgid "Run on any machine"
+msgstr "在任意机器上运行"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "在新功能、修复和重构上并行运行编码智能体。每个智能体都在自己的分支上工作，本地或云端皆可。"
 
@@ -17117,6 +17123,9 @@ msgstr "创建新工作区时运行。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "删除工作区时运行。"
+
+msgid "Runs while you sleep"
+msgstr "你睡觉时也在运行"
 
 msgid "Same session"
 msgstr "同一会话"
@@ -17561,6 +17570,9 @@ msgstr "在评分表中查看这道关卡"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "查看改动、给出反馈，就绪后合并成果。"
 
+msgid "See what it can do"
+msgstr "看看它能做什么"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "了解我们正在构建什么、接下来会做什么，以及 Paradev 的发展方向。"
 
@@ -17732,6 +17744,9 @@ msgstr "选中工作区的操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "在终端中选中文本后立即复制到剪贴板，并去除行尾空白"
+
+msgid "Self-hosted"
+msgstr "自托管"
 
 msgid "Send"
 msgstr "发送"
@@ -18185,6 +18200,9 @@ msgstr "显示链接菜单"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "给我看看Linear分类自动化最近10次运行"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "向我展示 Paradev CLI 能做什么。运行 `superset --help` 和 `superset schema` 查看它的命令，然后在我的账号上试几个只读命令：`superset workspaces list`、`superset tasks list`、`superset automations list` 和 `superset hosts list`。总结你的发现，并建议三种在我的工作流中使用 CLI 或用它编写脚本的方式。不要创建、修改或删除任何内容。"
 
 msgid "Show more"
 msgstr "显示更多"
@@ -21561,6 +21579,9 @@ msgstr "使用手动登录"
 
 msgid "Use more browser features: {features}"
 msgstr "使用更多浏览器功能：{features}"
+
+msgid "Use Paradev anywhere"
+msgstr "随处使用 Paradev"
 
 msgid "Use Paradev on mobile"
 msgstr "在手机上使用 Paradev"

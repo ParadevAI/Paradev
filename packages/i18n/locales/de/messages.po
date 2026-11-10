@@ -2381,6 +2381,9 @@ msgstr "Agenten erledigen Routine-Tickets ohne Eingriff mitten in der Aufgabe."
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Agenten in deinen Cloud-Arbeitsbereichen können dann mit <0>--host</0> Befehle auf diesem Host ausführen. Der Host muss über den Relay erreichbar sein."
 
+msgid "Agents in your pocket"
+msgstr "Agenten für die Hosentasche"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agenten arbeiten in der Cloud weiter. Öffne den Arbeitsbereich wieder auf dem Desktop, iPhone oder iPad."
 
@@ -17019,6 +17022,9 @@ msgstr "Jetzt ausführen"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Nach Zeitplan oder bei Ereignissen ausführen, bei Bedarf starten, pausieren, fortsetzen und Logs lesen."
 
+msgid "Run on any machine"
+msgstr "Auf jedem Rechner"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Starte parallele Coding-Agenten für Features, Fixes und Refactorings. Jeder arbeitet auf seinem eigenen Branch, lokal oder in der Cloud."
 
@@ -17117,6 +17123,9 @@ msgstr "Wird beim Erstellen eines Arbeitsbereichs ausgeführt."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Wird beim Löschen eines Arbeitsbereichs ausgeführt."
+
+msgid "Runs while you sleep"
+msgstr "Läuft, während du schläfst"
 
 msgid "Same session"
 msgstr "Gleiche Sitzung"
@@ -17561,6 +17570,9 @@ msgstr "Diese Schwelle im Scorecard ansehen"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Sieh, was sich geändert hat, gib Feedback und merge die Arbeit, wenn sie bereit ist."
 
+msgid "See what it can do"
+msgstr "Sieh, was es kann"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Sieh, woran wir gerade bauen, was als Nächstes kommt und wohin sich Paradev entwickelt."
 
@@ -17732,6 +17744,9 @@ msgstr "Aktionen für ausgewählte Arbeitsbereiche"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Markierter Text im Terminal wird sofort in die Zwischenablage kopiert, ohne Leerzeichen am Ende"
+
+msgid "Self-hosted"
+msgstr "Selbst gehostet"
 
 msgid "Send"
 msgstr "Senden"
@@ -18185,6 +18200,9 @@ msgstr "Linkmenü anzeigen"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Zeig mir die letzten 10 Läufe meiner Linear-Triage-Automatisierung"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Zeig mir, was die Paradev CLI kann. Führe `superset --help` und `superset schema` aus, um ihre Befehle zu sehen, und probiere dann ein paar Befehle ohne Schreibzugriff mit meinem Konto aus: `superset workspaces list`, `superset tasks list`, `superset automations list` und `superset hosts list`. Fasse zusammen, was du gefunden hast, und schlage drei Wege vor, wie ich die CLI in meinem Workflow nutzen oder skripten kann. Erstelle, ändere oder lösche nichts."
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
@@ -21561,6 +21579,9 @@ msgstr "Manuelle Anmeldung verwenden"
 
 msgid "Use more browser features: {features}"
 msgstr "Weitere Browserfunktionen nutzen: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Paradev überall nutzen"
 
 msgid "Use Paradev on mobile"
 msgstr "Paradev auf dem Handy nutzen"

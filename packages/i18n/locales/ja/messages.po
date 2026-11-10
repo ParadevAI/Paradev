@@ -2381,6 +2381,9 @@ msgstr "エージェントが定型チケットを途中の介入なしに完了
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "クラウドワークスペースのエージェントが <0>--host</0> を使って、このホストでコマンドを実行できるようになります。ホストにリレー経由で接続できる必要があります。"
 
+msgid "Agents in your pocket"
+msgstr "エージェントをポケットに"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "エージェントはクラウドで動き続けます。デスクトップ、iPhone、iPad からワークスペースをもう一度開けます。"
 
@@ -17019,6 +17022,9 @@ msgstr "今すぐ実行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "スケジュールやイベントで実行、オンデマンド実行、一時停止、再開、ログの確認。"
 
+msgid "Run on any machine"
+msgstr "どのマシンでも実行"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "機能開発、修正、リファクタリングに並列でコーディングエージェントを走らせます。各エージェントはローカルでもクラウドでも、専用のブランチで作業します。"
 
@@ -17117,6 +17123,9 @@ msgstr "新しいワークスペースの作成時に実行します。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "ワークスペースの削除時に実行します。"
+
+msgid "Runs while you sleep"
+msgstr "寝ている間も動く"
 
 msgid "Same session"
 msgstr "同じセッション"
@@ -17561,6 +17570,9 @@ msgstr "このゲートをスコアカードで見る"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "変更内容を確認し、フィードバックを送り、準備ができたら成果をマージします。"
 
+msgid "See what it can do"
+msgstr "できることを見る"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "現在開発中のもの、次に来るもの、そしてParadevの向かう先をご覧ください。"
 
@@ -17732,6 +17744,9 @@ msgstr "選択したワークスペースの操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "ターミナルでテキストを選択すると、行末の空白を取り除いてすぐにクリップボードへコピーします"
+
+msgid "Self-hosted"
+msgstr "セルフホスト"
 
 msgid "Send"
 msgstr "送信"
@@ -18185,6 +18200,9 @@ msgstr "リンクメニューを表示"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Linearトリアージのオートメーションの直近10件の実行を見せて"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Paradev CLI で何ができるか見せてください。`superset --help` と `superset schema` を実行してコマンドを確認し、次に私のアカウントで読み取り専用のコマンドをいくつか試してください: `superset workspaces list`、`superset tasks list`、`superset automations list`、`superset hosts list`。わかったことをまとめ、私のワークフローで CLI を使ったりスクリプト化したりする方法を 3 つ提案してください。何も作成、変更、削除しないでください。"
 
 msgid "Show more"
 msgstr "もっと見る"
@@ -21561,6 +21579,9 @@ msgstr "手動サインインを使う"
 
 msgid "Use more browser features: {features}"
 msgstr "ブラウザの追加機能を使用: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "どこでもParadevを使う"
 
 msgid "Use Paradev on mobile"
 msgstr "モバイルでParadevを使う"

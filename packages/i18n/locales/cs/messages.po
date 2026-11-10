@@ -2381,6 +2381,9 @@ msgstr "Agenti dokončí rutinní tickety bez zásahu uprostřed úkolu."
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Agenti ve vašich cloudových pracovních prostorech pak mohou pomocí <0>--host</0> spouštět příkazy na tomto hostu. Host musí být dostupný přes relay."
 
+msgid "Agents in your pocket"
+msgstr "Agenti v kapse"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agenti pracují dál v cloudu. Pracovní prostor znovu otevřete na počítači, iPhonu nebo iPadu."
 
@@ -17019,6 +17022,9 @@ msgstr "Spustit teď"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Spouštění podle plánu nebo událostí, na vyžádání, pozastavení, obnovení a čtení logů."
 
+msgid "Run on any machine"
+msgstr "Na jakémkoli počítači"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Spouštějte paralelní kódovací agenty na funkce, opravy a refaktory. Každý pracuje na vlastní větvi, lokálně nebo v cloudu."
 
@@ -17117,6 +17123,9 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
+
+msgid "Runs while you sleep"
+msgstr "Běží, i když spíte"
 
 msgid "Same session"
 msgstr "Stejná relace"
@@ -17561,6 +17570,9 @@ msgstr "Zobrazit tuto bránu v hodnoticí tabulce"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Podívejte se, co se změnilo, dejte zpětnou vazbu a slučte práci, až bude hotová."
 
+msgid "See what it can do"
+msgstr "Podívejte se, co umí"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Podívejte se, co právě stavíme, co přijde dál a kam Paradev míří."
 
@@ -17732,6 +17744,9 @@ msgstr "Akce pro vybrané pracovní prostory"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Výběr textu v terminálu ho hned zkopíruje do schránky, bez koncových mezer"
+
+msgid "Self-hosted"
+msgstr "Vlastní hosting"
 
 msgid "Send"
 msgstr "Odeslat"
@@ -18185,6 +18200,9 @@ msgstr "Zobrazit nabídku odkazu"
 
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Ukaž mi posledních 10 běhů mé automatizace na třídění v Linearu"
+
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Ukaž mi, co umí Paradev CLI. Spusť `superset --help` a `superset schema` pro přehled příkazů a pak vyzkoušej několik příkazů jen pro čtení na mém účtu: `superset workspaces list`, `superset tasks list`, `superset automations list` a `superset hosts list`. Shrň zjištění a navrhni tři způsoby, jak CLI používat nebo skriptovat v mém pracovním postupu. Nic nevytvářej, neměň ani nemaž."
 
 msgid "Show more"
 msgstr "Zobrazit více"
@@ -21561,6 +21579,9 @@ msgstr "Použít ruční přihlášení"
 
 msgid "Use more browser features: {features}"
 msgstr "Používat další funkce prohlížeče: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Používejte Paradev kdekoli"
 
 msgid "Use Paradev on mobile"
 msgstr "Používejte Paradev na mobilu"
