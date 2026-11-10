@@ -40,6 +40,7 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
+import { useDashboardSidebarChipHoverSuppression } from "./hooks/useDashboardSidebarChipHoverSuppression";
 
 const PR_STATE_LABEL: Record<
 	DashboardSidebarWorkspacePullRequest["state"],
@@ -62,6 +63,10 @@ const PR_STATE_LABEL: Record<
 		message: "Queued",
 	}),
 };
+
+// Below the workspace hover card's open delay, so resting on the glyph shows
+// its tooltip and the card never opens under it.
+const LEAD_TOOLTIP_DELAY_MS = 300;
 
 interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
@@ -171,6 +176,17 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 				: sandboxStatus === "provisioning"
 					? t({ message: "Creating the sandbox" })
 					: null;
+		// Both portal to the row's right edge at the same z-index, so the
+		// tooltip holds the hover card instead of stacking over it.
+		const { isOpen: isLeadTooltipOpen, onOpenChange: onLeadTooltipOpenChange } =
+			useDashboardSidebarChipHoverSuppression();
+		const hasLeadTooltip =
+			!isSelected &&
+			(showsPullRequest || !!sandboxLabel || (!!workspaceStatus && !isPending));
+		// An unmounted Radix tooltip never reports close, so release the hold here.
+		useEffect(() => {
+			if (!hasLeadTooltip) onLeadTooltipOpenChange(false);
+		}, [hasLeadTooltip, onLeadTooltipOpenChange]);
 		const leadIndicator = (
 			<DashboardSidebarWorkspaceLeadIndicator
 				workspaceStatus={workspaceStatus}
@@ -234,7 +250,11 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<HiCheck className="size-3.5" />
 						</span>
 					) : showsPullRequest && pullRequest ? (
-						<Tooltip delayDuration={500}>
+						<Tooltip
+							delayDuration={LEAD_TOOLTIP_DELAY_MS}
+							open={isLeadTooltipOpen}
+							onOpenChange={onLeadTooltipOpenChange}
+						>
 							<TooltipTrigger asChild>
 								<button
 									type="button"
@@ -293,7 +313,11 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							</TooltipContent>
 						</Tooltip>
 					) : sandboxLabel || (workspaceStatus && !isPending) ? (
-						<Tooltip delayDuration={500}>
+						<Tooltip
+							delayDuration={LEAD_TOOLTIP_DELAY_MS}
+							open={isLeadTooltipOpen}
+							onOpenChange={onLeadTooltipOpenChange}
+						>
 							<TooltipTrigger asChild>
 								<span className="mr-2 flex size-4 shrink-0 items-center justify-center">
 									{leadIndicator}
