@@ -113,6 +113,7 @@ export function createViewerGithubRouter(
 		getAttachmentUrl: publicProcedure
 			.input(z.object({ url: z.string().refine(isGithubAttachmentUrl) }))
 			.query(async ({ input }) => {
+				if (!(await isAvailable())) return { url: null };
 				const token = await credentials.getToken("github.com");
 				if (!token) return { url: null };
 				try {

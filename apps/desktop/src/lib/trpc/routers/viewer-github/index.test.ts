@@ -98,4 +98,26 @@ describe("viewer GitHub on this machine", () => {
 			}),
 		).rejects.toMatchObject({ code: "BAD_REQUEST" });
 	});
+
+	test("without a login, failed attachments look the login up once per window", async () => {
+		let lookups = 0;
+		const call = createViewerGithubRouter(
+			{
+				getToken: async () => {
+					lookups++;
+					return null;
+				},
+			},
+			() => ({}) as Octokit,
+			() => 0,
+		).createCaller({} as never);
+		for (const id of ["0", "1", "2"]) {
+			expect(
+				await call.getAttachmentUrl({
+					url: `https://github.com/user-attachments/assets/eba1526e-7388-4ed6-b058-c2ffcca091d${id}`,
+				}),
+			).toEqual({ url: null });
+		}
+		expect(lookups).toBe(1);
+	});
 });
