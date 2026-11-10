@@ -57,11 +57,7 @@ import {
 	useNewWorkspaceWidthStore,
 } from "renderer/stores/new-workspace-width";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
-import {
-	CHAT_COLUMN_CLASSNAME,
-	CHAT_DEFAULT_WIDTH,
-	CHAT_GUTTER_CLASSNAME,
-} from "../../constants";
+import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import type { ChatForkTarget } from "../../types";
@@ -271,9 +267,6 @@ export const Composer = memo(function Composer({
 	);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const footerTier = useFooterTier(rootRef);
-	const chatWidth = useNewWorkspaceWidthStore(
-		(state) => state.liveWidth ?? state.screenWidth,
-	);
 	const setChatWidth = useNewWorkspaceWidthStore(
 		(state) => state.setScreenWidth,
 	);
@@ -644,7 +637,6 @@ export const Composer = memo(function Composer({
 			)}
 			<div className={cn(CHAT_COLUMN_CLASSNAME, "relative")}>
 				<SymmetricResizeHandles
-					currentWidth={chatWidth ?? CHAT_DEFAULT_WIDTH}
 					minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
 					maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
 					onWidthChange={setLiveChatWidth}

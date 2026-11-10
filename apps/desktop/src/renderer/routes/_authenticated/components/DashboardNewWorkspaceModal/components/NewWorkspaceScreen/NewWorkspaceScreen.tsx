@@ -1063,7 +1063,6 @@ export function NewWorkspaceScreen({
 	);
 	const resizeHandles = (
 		<SymmetricResizeHandles
-			currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}
 			minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
 			maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
 			onWidthChange={setLiveComposerWidth}

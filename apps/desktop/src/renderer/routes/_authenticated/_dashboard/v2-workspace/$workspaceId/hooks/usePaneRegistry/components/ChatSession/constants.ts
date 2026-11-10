@@ -12,7 +12,6 @@ export const CHAT_SCROLLER_GUTTER_CLASSNAME =
 /** ChatPane sets the variable from the shared, user-resized composer width. */
 export const CHAT_COLUMN_CLASSNAME =
 	"mx-auto w-full max-w-[var(--chat-max-width,48rem)]";
-export const CHAT_DEFAULT_WIDTH = 768;
 
 export const CHAT_MARKDOWN_COMPONENTS = {
 	code: ChatCodeBlock,

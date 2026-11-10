@@ -1,10 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface SymmetricResizeHandlesProps {
-	/** Currently rendered box width, for aria-valuenow. */
-	currentWidth: number;
 	minWidth: number;
 	maxWidth: number;
 	/** Live width while dragging (not yet persisted). */
@@ -23,7 +21,6 @@ interface SymmetricResizeHandlesProps {
  * width is measured from the parent's rendered box.
  */
 export function SymmetricResizeHandles({
-	currentWidth,
 	minWidth,
 	maxWidth,
 	onWidthChange,
@@ -33,6 +30,18 @@ export function SymmetricResizeHandles({
 	const { t } = useLingui();
 	const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
 	const lastWidthRef = useRef<number | null>(null);
+	const handleRef = useRef<HTMLDivElement>(null);
+	const [renderedWidth, setRenderedWidth] = useState<number | null>(null);
+
+	useEffect(() => {
+		const parent = handleRef.current?.parentElement;
+		if (!parent) return;
+		const observer = new ResizeObserver(() =>
+			setRenderedWidth(Math.round(parent.getBoundingClientRect().width)),
+		);
+		observer.observe(parent);
+		return () => observer.disconnect();
+	}, []);
 
 	const clamp = useCallback(
 		(width: number) => Math.max(minWidth, Math.min(maxWidth, width)),
@@ -98,8 +107,9 @@ export function SymmetricResizeHandles({
 									message: "Resize right edge",
 								})
 					}
-					aria-valuenow={Math.round(currentWidth)}
-					aria-valuemin={minWidth}
+					ref={side === "left" ? handleRef : undefined}
+					aria-valuenow={renderedWidth ?? undefined}
+					aria-valuemin={Math.min(minWidth, renderedWidth ?? minWidth)}
 					aria-valuemax={maxWidth}
 					tabIndex={0}
 					className={cn(
