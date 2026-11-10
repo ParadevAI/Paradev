@@ -9688,6 +9688,9 @@ msgstr "«{0}» приховано з бічної панелі"
 msgid "Hidden folders"
 msgstr "Приховані папки"
 
+msgid "Hidden from the sidebar"
+msgstr "Приховано з бічної панелі"
+
 msgid "Hidden until you join"
 msgstr "Приховано, доки ви не приєднаєтеся"
 
@@ -18249,6 +18252,9 @@ msgstr "Показати наступну вкладку правої бічно
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Показати попередню вкладку правої бічної панелі, не переміщуючи фокус"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Показувати на бічній панелі кнопку з посиланнями на «Мобільні», «Хмара», CLI і «Власний хостинг»."
+
 msgid "Show the triggering payload"
 msgstr "Показати payload тригера"
 
@@ -21019,6 +21025,9 @@ msgstr "Тунель встановлено"
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Його можна знову ввімкнути в розділі «Налаштування → Загальні»."
+
 msgid "Turn off"
 msgstr "Вимкнути"
 
@@ -21576,6 +21585,9 @@ msgstr "Використовувати більше можливостей бр�
 
 msgid "Use Paradev anywhere"
 msgstr "Використовуйте Paradev будь-де"
+
+msgid "Use Paradev anywhere button"
+msgstr "Кнопка «Використовуйте Paradev будь-де»"
 
 msgid "Use Paradev on mobile"
 msgstr "Використовуйте Paradev на мобільних пристроях"

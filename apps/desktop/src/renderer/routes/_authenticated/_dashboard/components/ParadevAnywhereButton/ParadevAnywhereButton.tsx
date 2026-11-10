@@ -5,6 +5,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@superset/ui/popover";
+import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { type ComponentProps, type RefObject, useState } from "react";
@@ -14,6 +15,7 @@ import {
 	RAIL_ICON_STROKE_WIDTH,
 	railButtonClass,
 } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
+import { useSettings } from "renderer/stores/settings";
 import { DevicesIcon } from "./components/DevicesIcon";
 import { ParadevAnywherePanel } from "./components/ParadevAnywherePanel";
 
@@ -34,12 +36,29 @@ export function ParadevAnywhereButton({
 }: ParadevAnywhereButtonProps) {
 	const { t } = useLingui();
 	const [isOpen, setIsOpen] = useState(false);
+	const isShown = useSettings((s) => s.showParadevAnywhereButton);
+	const updateSetting = useSettings((s) => s.update);
 	const label = t({ message: "Use Paradev anywhere" });
 
 	const handleOpenChange = (open: boolean) => {
 		if (open) track("paradev_anywhere_opened", { variant });
 		setIsOpen(open);
 	};
+
+	const hide = () => {
+		track("paradev_anywhere_hidden", { variant });
+		setIsOpen(false);
+		updateSetting("showParadevAnywhereButton", false);
+		toast(t({ message: "Hidden from the sidebar" }), {
+			description: t({ message: "Turn it back on in Settings → General." }),
+			action: {
+				label: t({ message: "Undo" }),
+				onClick: () => updateSetting("showParadevAnywhereButton", true),
+			},
+		});
+	};
+
+	if (!isShown) return null;
 
 	return (
 		<Popover open={isOpen} onOpenChange={handleOpenChange}>
@@ -80,7 +99,7 @@ export function ParadevAnywhereButton({
 				onCloseAutoFocus={(event) => event.preventDefault()}
 				className="w-[332px] rounded-xl p-3.5 shadow-lg"
 			>
-				<ParadevAnywherePanel onClose={() => setIsOpen(false)} />
+				<ParadevAnywherePanel onClose={() => setIsOpen(false)} onHide={hide} />
 			</PopoverContent>
 		</Popover>
 	);

@@ -9694,6 +9694,9 @@ msgstr "\"{0}\" uit de zijbalk verborgen"
 msgid "Hidden folders"
 msgstr "Verborgen mappen"
 
+msgid "Hidden from the sidebar"
+msgstr "Verborgen in de zijbalk"
+
 msgid "Hidden until you join"
 msgstr "Verborgen tot je meedoet"
 
@@ -18255,6 +18258,9 @@ msgstr "Het volgende tabblad in de rechterzijbalk tonen zonder de focus te verpl
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Het vorige tabblad in de rechterzijbalk tonen zonder de focus te verplaatsen"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Toon de zijbalkknop met links naar Mobiel, Cloud, de CLI en Zelf gehost."
+
 msgid "Show the triggering payload"
 msgstr "Activerende payload tonen"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunnel opgezet"
 msgid "Turn Fast mode on or off"
 msgstr "Snelle modus in- of uitschakelen"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Je kunt het weer aanzetten via Instellingen → Algemeen."
+
 msgid "Turn off"
 msgstr "Uitzetten"
 
@@ -21582,6 +21591,9 @@ msgstr "Meer browserfuncties gebruiken: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Gebruik Paradev overal"
+
+msgid "Use Paradev anywhere button"
+msgstr "Knop \"Gebruik Paradev overal\""
 
 msgid "Use Paradev on mobile"
 msgstr "Gebruik Paradev op je mobiel"

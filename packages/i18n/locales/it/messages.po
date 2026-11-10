@@ -9694,6 +9694,9 @@ msgstr "\"{0}\" nascosto dalla barra laterale"
 msgid "Hidden folders"
 msgstr "Cartelle nascoste"
 
+msgid "Hidden from the sidebar"
+msgstr "Nascosto dalla barra laterale"
+
 msgid "Hidden until you join"
 msgstr "Nascosta finché non partecipi"
 
@@ -18255,6 +18258,9 @@ msgstr "Mostra la scheda successiva nella barra laterale destra senza spostare i
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Mostra la scheda precedente nella barra laterale destra senza spostare il focus"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Mostra il pulsante della barra laterale con i link a Mobile, Cloud, la CLI e Self-hosted."
+
 msgid "Show the triggering payload"
 msgstr "Mostra il payload che ha attivato questa esecuzione"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunnel stabilito"
 msgid "Turn Fast mode on or off"
 msgstr "Attiva o disattiva la modalità veloce"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Puoi riattivarlo in Impostazioni → Generali."
+
 msgid "Turn off"
 msgstr "Disattiva"
 
@@ -21582,6 +21591,9 @@ msgstr "Usare altre funzioni del browser: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Usa Paradev ovunque"
+
+msgid "Use Paradev anywhere button"
+msgstr "Pulsante \"Usa Paradev ovunque\""
 
 msgid "Use Paradev on mobile"
 msgstr "Usa Paradev sul cellulare"

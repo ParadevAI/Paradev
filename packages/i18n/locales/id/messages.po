@@ -9694,6 +9694,9 @@ msgstr "\"{0}\" disembunyikan dari sidebar"
 msgid "Hidden folders"
 msgstr "Folder tersembunyi"
 
+msgid "Hidden from the sidebar"
+msgstr "Disembunyikan dari sidebar"
+
 msgid "Hidden until you join"
 msgstr "Tersembunyi sampai Anda bergabung"
 
@@ -18255,6 +18258,9 @@ msgstr "Tampilkan tab berikutnya di sidebar kanan tanpa memindahkan fokus"
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Tampilkan tab sebelumnya di sidebar kanan tanpa memindahkan fokus"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Tampilkan tombol sidebar yang menautkan ke Mobile, Cloud, CLI, dan Hosting mandiri."
+
 msgid "Show the triggering payload"
 msgstr "Tampilkan payload pemicu"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunnel tersambung"
 msgid "Turn Fast mode on or off"
 msgstr "Aktifkan atau nonaktifkan mode cepat"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Anda dapat mengaktifkannya lagi di Pengaturan → Umum."
+
 msgid "Turn off"
 msgstr "Matikan"
 
@@ -21582,6 +21591,9 @@ msgstr "Memakai fitur browser lainnya: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Gunakan Paradev di mana saja"
+
+msgid "Use Paradev anywhere button"
+msgstr "Tombol \"Gunakan Paradev di mana saja\""
 
 msgid "Use Paradev on mobile"
 msgstr "Gunakan Paradev di ponsel"

@@ -28,9 +28,13 @@ interface Surface {
 
 interface ParadevAnywherePanelProps {
 	onClose: () => void;
+	onHide: () => void;
 }
 
-export function ParadevAnywherePanel({ onClose }: ParadevAnywherePanelProps) {
+export function ParadevAnywherePanel({
+	onClose,
+	onHide,
+}: ParadevAnywherePanelProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const { gateFeature } = usePaywall();
@@ -109,6 +113,13 @@ export function ParadevAnywherePanel({ onClose }: ParadevAnywherePanelProps) {
 					</SurfaceTile>
 				))}
 			</div>
+			<button
+				type="button"
+				onClick={onHide}
+				className="self-start rounded-sm px-0.5 text-xs text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
+			>
+				<Trans>Hide from sidebar</Trans>
+			</button>
 		</div>
 	);
 }

@@ -9694,6 +9694,9 @@ msgstr "« {0} » masqué de la barre latérale"
 msgid "Hidden folders"
 msgstr "Dossiers masqués"
 
+msgid "Hidden from the sidebar"
+msgstr "Masqué de la barre latérale"
+
 msgid "Hidden until you join"
 msgstr "Masqué tant que vous n'avez pas rejoint"
 
@@ -18255,6 +18258,9 @@ msgstr "Afficher l’onglet suivant de la barre latérale droite sans déplacer 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Afficher l’onglet précédent de la barre latérale droite sans déplacer le focus"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Affiche le bouton de la barre latérale qui mène à Mobile, Cloud, la CLI et Auto-hébergé."
+
 msgid "Show the triggering payload"
 msgstr "Afficher la charge utile déclenchante"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunnel établi"
 msgid "Turn Fast mode on or off"
 msgstr "Activer ou désactiver le mode rapide"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Vous pouvez le réactiver dans Paramètres → Général."
+
 msgid "Turn off"
 msgstr "Désactiver"
 
@@ -21582,6 +21591,9 @@ msgstr "Utiliser d'autres fonctionnalités du navigateur : {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Utiliser Paradev partout"
+
+msgid "Use Paradev anywhere button"
+msgstr "Bouton « Utiliser Paradev partout »"
 
 msgid "Use Paradev on mobile"
 msgstr "Utiliser Paradev sur mobile"

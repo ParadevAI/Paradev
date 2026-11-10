@@ -9694,6 +9694,9 @@ msgstr "«{0}» скрыт с боковой панели"
 msgid "Hidden folders"
 msgstr "Скрытые папки"
 
+msgid "Hidden from the sidebar"
+msgstr "Скрыто из боковой панели"
+
 msgid "Hidden until you join"
 msgstr "Скрыто, пока вы не присоединитесь"
 
@@ -18255,6 +18258,9 @@ msgstr "Показать следующую вкладку правой боко
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Показать предыдущую вкладку правой боковой панели, не перемещая фокус"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Показывать в боковой панели кнопку со ссылками на «Мобильные», «Облако», CLI и «Собственный хостинг»."
+
 msgid "Show the triggering payload"
 msgstr "Показать полезную нагрузку триггера"
 
@@ -21025,6 +21031,9 @@ msgstr "Туннель установлен"
 msgid "Turn Fast mode on or off"
 msgstr "Включить или выключить быстрый режим"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Его можно снова включить в разделе «Настройки → Общие»."
+
 msgid "Turn off"
 msgstr "Выключить"
 
@@ -21582,6 +21591,9 @@ msgstr "Использовать дополнительные функции б�
 
 msgid "Use Paradev anywhere"
 msgstr "Используйте Paradev где угодно"
+
+msgid "Use Paradev anywhere button"
+msgstr "Кнопка «Используйте Paradev где угодно»"
 
 msgid "Use Paradev on mobile"
 msgstr "Используйте Paradev на телефоне"

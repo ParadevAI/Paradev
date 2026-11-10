@@ -9694,6 +9694,9 @@ msgstr "「{0}」をサイドバーから非表示にしました"
 msgid "Hidden folders"
 msgstr "非表示のフォルダ"
 
+msgid "Hidden from the sidebar"
+msgstr "サイドバーから非表示にしました"
+
 msgid "Hidden until you join"
 msgstr "参加するまで非表示"
 
@@ -18255,6 +18258,9 @@ msgstr "フォーカスを移動せずに右サイドバーの次のタブを表
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "フォーカスを移動せずに右サイドバーの前のタブを表示"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "モバイル、クラウド、CLI、セルフホストへのリンクがあるサイドバーのボタンを表示します。"
+
 msgid "Show the triggering payload"
 msgstr "トリガーのペイロードを表示"
 
@@ -21025,6 +21031,9 @@ msgstr "トンネル確立"
 msgid "Turn Fast mode on or off"
 msgstr "高速モードのオン/オフを切り替え"
 
+msgid "Turn it back on in Settings → General."
+msgstr "「設定 → 全般」から再び表示できます。"
+
 msgid "Turn off"
 msgstr "オフにする"
 
@@ -21582,6 +21591,9 @@ msgstr "ブラウザの追加機能を使用: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "どこでもParadevを使う"
+
+msgid "Use Paradev anywhere button"
+msgstr "「どこでもParadevを使う」ボタン"
 
 msgid "Use Paradev on mobile"
 msgstr "モバイルでParadevを使う"

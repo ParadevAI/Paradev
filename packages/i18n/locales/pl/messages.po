@@ -9694,6 +9694,9 @@ msgstr "Ukryto „{0}” z paska bocznego"
 msgid "Hidden folders"
 msgstr "Ukryte foldery"
 
+msgid "Hidden from the sidebar"
+msgstr "Ukryto na pasku bocznym"
+
 msgid "Hidden until you join"
 msgstr "Ukryta do czasu dołączenia"
 
@@ -18255,6 +18258,9 @@ msgstr "Pokaż następną kartę w prawym pasku bocznym bez przenoszenia fokusu"
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Pokaż poprzednią kartę w prawym pasku bocznym bez przenoszenia fokusu"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Pokaż na pasku bocznym przycisk z linkami do sekcji Mobile, Chmura, CLI i Własny hosting."
+
 msgid "Show the triggering payload"
 msgstr "Pokaż ładunek wyzwalający"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunel nawiązany"
 msgid "Turn Fast mode on or off"
 msgstr "Włącz lub wyłącz tryb szybki"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Możesz go ponownie włączyć w Ustawienia → Ogólne."
+
 msgid "Turn off"
 msgstr "Wyłącz"
 
@@ -21582,6 +21591,9 @@ msgstr "Używać dodatkowych funkcji przeglądarki: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Korzystaj z Paradev wszędzie"
+
+msgid "Use Paradev anywhere button"
+msgstr "Przycisk „Korzystaj z Paradev wszędzie”"
 
 msgid "Use Paradev on mobile"
 msgstr "Korzystaj z Paradev na telefonie"

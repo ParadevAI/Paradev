@@ -9694,6 +9694,9 @@ msgstr "\"{0}\" kenar çubuğundan gizlendi"
 msgid "Hidden folders"
 msgstr "Gizli klasörler"
 
+msgid "Hidden from the sidebar"
+msgstr "Kenar çubuğunda gizlendi"
+
 msgid "Hidden until you join"
 msgstr "Katılana kadar gizli"
 
@@ -18255,6 +18258,9 @@ msgstr "Odağı taşımadan sağ kenar çubuğunda sonraki sekmeyi göster"
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Odağı taşımadan sağ kenar çubuğunda önceki sekmeyi göster"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Mobil, Bulut, CLI ve Kendi sunucunuzda bağlantılarını içeren kenar çubuğu düğmesini gösterir."
+
 msgid "Show the triggering payload"
 msgstr "Tetikleyen yükü göster"
 
@@ -21025,6 +21031,9 @@ msgstr "Tünel kuruldu"
 msgid "Turn Fast mode on or off"
 msgstr "Hızlı modu aç veya kapat"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Ayarlar → Genel bölümünden yeniden açabilirsiniz."
+
 msgid "Turn off"
 msgstr "Kapat"
 
@@ -21582,6 +21591,9 @@ msgstr "Daha fazla tarayıcı özelliği kullanma: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Paradev’i her yerde kullanın"
+
+msgid "Use Paradev anywhere button"
+msgstr "\"Paradev’i her yerde kullanın\" düğmesi"
 
 msgid "Use Paradev on mobile"
 msgstr "Paradev’i mobilde kullanın"

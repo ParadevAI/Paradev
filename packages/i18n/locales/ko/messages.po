@@ -9694,6 +9694,9 @@ msgstr "\"{0}\"을(를) 사이드바에서 숨겼습니다"
 msgid "Hidden folders"
 msgstr "숨긴 폴더"
 
+msgid "Hidden from the sidebar"
+msgstr "사이드바에서 숨겼습니다"
+
 msgid "Hidden until you join"
 msgstr "참여 전까지 숨김"
 
@@ -18255,6 +18258,9 @@ msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 다음 탭 표�
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 이전 탭 표시"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "모바일, 클라우드, CLI, 셀프 호스팅으로 연결되는 사이드바 버튼을 표시합니다."
+
 msgid "Show the triggering payload"
 msgstr "트리거 페이로드 표시"
 
@@ -21025,6 +21031,9 @@ msgstr "터널 연결됨"
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
 
+msgid "Turn it back on in Settings → General."
+msgstr "설정 → 일반에서 다시 켤 수 있습니다."
+
 msgid "Turn off"
 msgstr "끄기"
 
@@ -21582,6 +21591,9 @@ msgstr "추가 브라우저 기능 사용: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "어디서나 Paradev 사용하기"
+
+msgid "Use Paradev anywhere button"
+msgstr "\"어디서나 Paradev 사용하기\" 버튼"
 
 msgid "Use Paradev on mobile"
 msgstr "모바일에서 Paradev 사용하기"

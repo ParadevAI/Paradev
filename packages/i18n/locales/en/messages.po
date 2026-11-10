@@ -9694,6 +9694,9 @@ msgstr "Hid \"{0}\" from the sidebar"
 msgid "Hidden folders"
 msgstr "Hidden folders"
 
+msgid "Hidden from the sidebar"
+msgstr "Hidden from the sidebar"
+
 msgid "Hidden until you join"
 msgstr "Hidden until you join"
 
@@ -18255,6 +18258,9 @@ msgstr "Show the next tab in the right sidebar without moving focus"
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Show the previous tab in the right sidebar without moving focus"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+
 msgid "Show the triggering payload"
 msgstr "Show the triggering payload"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunnel established"
 msgid "Turn Fast mode on or off"
 msgstr "Turn Fast mode on or off"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Turn it back on in Settings → General."
+
 msgid "Turn off"
 msgstr "Turn off"
 
@@ -21582,6 +21591,9 @@ msgstr "Use more browser features: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Use Paradev anywhere"
+
+msgid "Use Paradev anywhere button"
+msgstr "Use Paradev anywhere button"
 
 msgid "Use Paradev on mobile"
 msgstr "Use Paradev on mobile"

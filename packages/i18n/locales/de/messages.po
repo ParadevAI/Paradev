@@ -9694,6 +9694,9 @@ msgstr "\"{0}\" aus der Seitenleiste ausgeblendet"
 msgid "Hidden folders"
 msgstr "Ausgeblendete Ordner"
 
+msgid "Hidden from the sidebar"
+msgstr "In der Seitenleiste ausgeblendet"
+
 msgid "Hidden until you join"
 msgstr "Verborgen bis zur Teilnahme"
 
@@ -18255,6 +18258,9 @@ msgstr "Nächsten Tab in der rechten Seitenleiste anzeigen, ohne den Fokus zu ve
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Vorherigen Tab in der rechten Seitenleiste anzeigen, ohne den Fokus zu verschieben"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Zeigt in der Seitenleiste die Schaltfläche mit Links zu Mobil, Cloud, CLI und Selbst gehostet."
+
 msgid "Show the triggering payload"
 msgstr "Auslösende Nutzlast anzeigen"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunnel aufgebaut"
 msgid "Turn Fast mode on or off"
 msgstr "Schnellmodus ein- oder ausschalten"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Du kannst es unter Einstellungen → Allgemein wieder einschalten."
+
 msgid "Turn off"
 msgstr "Ausschalten"
 
@@ -21582,6 +21591,9 @@ msgstr "Weitere Browserfunktionen nutzen: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Paradev überall nutzen"
+
+msgid "Use Paradev anywhere button"
+msgstr "Schaltfläche „Paradev überall nutzen“"
 
 msgid "Use Paradev on mobile"
 msgstr "Paradev auf dem Handy nutzen"

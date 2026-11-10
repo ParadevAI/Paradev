@@ -9694,6 +9694,9 @@ msgstr "„{0}“ skryto z postranního panelu"
 msgid "Hidden folders"
 msgstr "Skryté složky"
 
+msgid "Hidden from the sidebar"
+msgstr "Skryto z postranního panelu"
+
 msgid "Hidden until you join"
 msgstr "Skryto, dokud se nepřidáte"
 
@@ -18255,6 +18258,9 @@ msgstr "Zobrazit další kartu v pravém postranním panelu bez přesunu fokusu"
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Zobrazit předchozí kartu v pravém postranním panelu bez přesunu fokusu"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Zobrazit v postranním panelu tlačítko s odkazy na Mobil, Cloud, CLI a Vlastní hosting."
+
 msgid "Show the triggering payload"
 msgstr "Zobrazit spouštěcí data"
 
@@ -21025,6 +21031,9 @@ msgstr "Tunel navázán"
 msgid "Turn Fast mode on or off"
 msgstr "Zapnout nebo vypnout rychlý režim"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Znovu ho můžete zapnout v Nastavení → Obecné."
+
 msgid "Turn off"
 msgstr "Vypnout"
 
@@ -21582,6 +21591,9 @@ msgstr "Používat další funkce prohlížeče: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Používejte Paradev kdekoli"
+
+msgid "Use Paradev anywhere button"
+msgstr "Tlačítko „Používejte Paradev kdekoli“"
 
 msgid "Use Paradev on mobile"
 msgstr "Používejte Paradev na mobilu"

@@ -9694,6 +9694,9 @@ msgstr "已从侧边栏隐藏“{0}”"
 msgid "Hidden folders"
 msgstr "已隐藏的文件夹"
 
+msgid "Hidden from the sidebar"
+msgstr "已从侧边栏隐藏"
+
 msgid "Hidden until you join"
 msgstr "加入后才会显示"
 
@@ -18255,6 +18258,9 @@ msgstr "显示右侧边栏中的下一个标签页，不移动焦点"
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "显示右侧边栏中的上一个标签页，不移动焦点"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "在侧边栏显示链接到移动端、云端、CLI 和自托管的按钮。"
+
 msgid "Show the triggering payload"
 msgstr "显示触发负载"
 
@@ -21025,6 +21031,9 @@ msgstr "隧道已建立"
 msgid "Turn Fast mode on or off"
 msgstr "开启或关闭快速模式"
 
+msgid "Turn it back on in Settings → General."
+msgstr "可在“设置 → 通用”中重新打开。"
+
 msgid "Turn off"
 msgstr "关闭"
 
@@ -21582,6 +21591,9 @@ msgstr "使用更多浏览器功能：{features}"
 
 msgid "Use Paradev anywhere"
 msgstr "随处使用 Paradev"
+
+msgid "Use Paradev anywhere button"
+msgstr "“随处使用 Paradev”按钮"
 
 msgid "Use Paradev on mobile"
 msgstr "在手机上使用 Paradev"

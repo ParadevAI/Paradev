@@ -9694,6 +9694,9 @@ msgstr "Đã ẩn \"{0}\" khỏi thanh bên"
 msgid "Hidden folders"
 msgstr "Thư mục đã ẩn"
 
+msgid "Hidden from the sidebar"
+msgstr "Đã ẩn khỏi thanh bên"
+
 msgid "Hidden until you join"
 msgstr "Ẩn cho đến khi bạn tham gia"
 
@@ -18255,6 +18258,9 @@ msgstr "Hiển thị tab kế tiếp trong thanh bên phải mà không di chuy�
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Hiển thị tab trước trong thanh bên phải mà không di chuyển tiêu điểm"
 
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Hiện nút trên thanh bên dẫn đến Di động, Cloud, CLI và Tự lưu trữ."
+
 msgid "Show the triggering payload"
 msgstr "Hiển thị payload kích hoạt"
 
@@ -21025,6 +21031,9 @@ msgstr "Đã thiết lập tunnel"
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Bạn có thể bật lại trong Cài đặt → Chung."
+
 msgid "Turn off"
 msgstr "Tắt"
 
@@ -21582,6 +21591,9 @@ msgstr "Dùng thêm tính năng trình duyệt: {features}"
 
 msgid "Use Paradev anywhere"
 msgstr "Dùng Paradev ở mọi nơi"
+
+msgid "Use Paradev anywhere button"
+msgstr "Nút \"Dùng Paradev ở mọi nơi\""
 
 msgid "Use Paradev on mobile"
 msgstr "Dùng Paradev trên điện thoại"
