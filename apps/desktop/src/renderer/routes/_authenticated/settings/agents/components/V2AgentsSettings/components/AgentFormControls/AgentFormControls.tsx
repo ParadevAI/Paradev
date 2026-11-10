@@ -4,7 +4,7 @@ import type { PromptTransport } from "@superset/shared/agent-prompt-launch";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import { cn } from "@superset/ui/utils";
-import { AgentIcon } from "../AgentIcon";
+import { AgentIcon } from "renderer/components/AgentIcon";
 
 /**
  * Shared layout primitives and composites for the agent settings forms, used by
@@ -113,7 +113,7 @@ export function AgentLaunchFields({
 				})}
 				hint={
 					<Trans>
-						Added only when launching with a prompt — e.g. <code>--</code>,{" "}
+						Added only when launching with a prompt, e.g. <code>--</code>,{" "}
 						<code>--prompt</code>, <code>-i</code>.
 					</Trans>
 				}
@@ -135,9 +135,9 @@ export function AgentLaunchFields({
 				})}
 				hint={
 					<Trans>
-						Used to restore a previous session — the session id is appended
-						after these, e.g. <code>--resume</code>. Leave empty if the agent
-						can't resume by id.
+						Used to restore a previous session. The session id is appended after
+						these, e.g. <code>--resume</code>. Leave empty if the agent can't
+						resume by id.
 					</Trans>
 				}
 				htmlFor={`${idPrefix}-resume-args`}

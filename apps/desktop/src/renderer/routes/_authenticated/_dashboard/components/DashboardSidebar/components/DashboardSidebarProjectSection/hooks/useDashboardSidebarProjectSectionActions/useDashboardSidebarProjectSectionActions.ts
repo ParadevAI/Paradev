@@ -109,7 +109,7 @@ export function useDashboardSidebarProjectSectionActions({
 		if (!servingHostUrl) {
 			toast.error(
 				t({
-					message: "Project's host is unreachable — cannot rename right now",
+					message: "Project's host is unreachable. Cannot rename right now",
 				}),
 			);
 			return;
@@ -199,7 +199,7 @@ export function useDashboardSidebarProjectSectionActions({
 			toast.error(
 				t({
 					message:
-						"Project's host is unreachable — cannot import worktrees right now",
+						"Project's host is unreachable. Cannot import worktrees right now",
 				}),
 			);
 			return;
@@ -246,7 +246,7 @@ export function useDashboardSidebarProjectSectionActions({
 			toast.error(
 				t({
 					message:
-						"Project's host is unreachable — cannot import worktrees right now",
+						"Project's host is unreachable. Cannot import worktrees right now",
 				}),
 			);
 			return;

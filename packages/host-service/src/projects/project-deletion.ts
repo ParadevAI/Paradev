@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import {
 	projects,
@@ -18,10 +19,21 @@ import {
 	trackWorkspaceDeleted,
 	unarchiveLocalWorkspace,
 } from "../workspaces/local-workspace-store";
-import { emitProjectChanged, getLocalProject } from "./local-project-store";
+import {
+	emitProjectChanged,
+	getLiveProjectAtPath,
+	getProjectIncludingDeleted,
+} from "./local-project-store";
 
 export const PROJECT_RESTORE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 export const PROJECT_PURGE_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
+export function repoTakenError() {
+	return new TRPCError({
+		code: "CONFLICT",
+		message: "Repository is already set up as another project on this device.",
+	});
+}
 
 type ProjectDeletionContext = Pick<
 	HostServiceContext,
@@ -38,7 +50,7 @@ export async function softDeleteProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
 ): Promise<{ repoPath: string; deletedAt: number } | null> {
-	const project = getLocalProject(ctx.db, projectId);
+	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project) return null;
 	if (project.deletedAt != null) {
 		return { repoPath: project.repoPath, deletedAt: project.deletedAt };
@@ -135,14 +147,16 @@ function workspacesDeletedWith(
 /**
  * Bring back a soft-deleted project and the workspaces that were deleted
  * with it. A workspace whose worktree has since disappeared stays archived.
+ * Refused while another live project owns the same repo path.
  */
 export function restoreProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
 ): { restoredWorkspaceCount: number } | null {
-	const project = getLocalProject(ctx.db, projectId);
+	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project) return null;
 	if (project.deletedAt == null) return { restoredWorkspaceCount: 0 };
+	if (getLiveProjectAtPath(ctx.db, project.repoPath)) throw repoTakenError();
 	const restorable = workspacesDeletedWith(ctx, {
 		id: project.id,
 		deletedAt: project.deletedAt,
@@ -152,7 +166,7 @@ export function restoreProject(
 		.set({ deletedAt: null, deletedByUserId: null, updatedAt: Date.now() })
 		.where(eq(projects.id, projectId))
 		.run();
-	const restored = getLocalProject(ctx.db, projectId);
+	const restored = getProjectIncludingDeleted(ctx.db, projectId);
 	if (restored) emitProjectChanged(ctx.eventBus, "created", restored);
 	for (const row of restorable) unarchiveLocalWorkspace(ctx, row.id);
 	return { restoredWorkspaceCount: restorable.length };
@@ -205,7 +219,7 @@ export async function purgeDeletedProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
 ): Promise<boolean> {
-	const project = getLocalProject(ctx.db, projectId);
+	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project || project.deletedAt == null) return false;
 	await purgeProject(ctx, project);
 	return true;

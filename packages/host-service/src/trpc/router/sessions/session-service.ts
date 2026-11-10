@@ -90,14 +90,16 @@ export function requireChatSession(
 	return { chat, ...result, session: result.session };
 }
 
+/** `launch.terminalId` is host-internal: the id a cloud launch was promised. */
 export async function createChatSessionInWorkspace(
 	ctx: SessionContext,
 	rawInput: CreateChatSessionInput,
+	launch: { terminalId?: string; withoutAgentConfig?: boolean } = {},
 ): Promise<ChatSessionResult> {
 	const input = createChatSessionSchema.parse(rawInput);
 	const workspace = requireSessionWorkspace(ctx, input.workspaceId);
 	seedDefaultsIfEmpty(ctx.db);
-	const target = chatLaunchTarget(ctx.db, {
+	const resolved = chatLaunchTarget(ctx.db, {
 		workspaceId: input.workspaceId,
 		agent: input.agent,
 		prompt: input.prompt,
@@ -105,6 +107,10 @@ export async function createChatSessionInWorkspace(
 		model: input.model,
 		attachmentIds: input.attachmentIds,
 	});
+	const target =
+		resolved && launch.withoutAgentConfig
+			? { ...resolved, agentConfigId: null }
+			: resolved;
 	if (!target)
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -169,5 +175,6 @@ export async function createChatSessionInWorkspace(
 		target,
 		{ ...input, commandId },
 		workspace.worktreePath,
+		launch.terminalId,
 	);
 }

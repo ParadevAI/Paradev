@@ -6,9 +6,8 @@ import {
 } from "@superset/shared/project-config";
 import { resolveProjectConfigDirName } from "@superset/shared/project-config/dir";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { projects } from "../../../db/schema";
+import { getLocalProject } from "../../../projects/local-project-store";
 import {
 	getProjectConfigPath,
 	hasProjectConfig,
@@ -81,9 +80,7 @@ function requireProject(
 	ctx: HostServiceContext,
 	projectId: string,
 ): { id: string; repoPath: string } {
-	const row = ctx.db.query.projects
-		.findFirst({ where: eq(projects.id, projectId) })
-		.sync();
+	const row = getLocalProject(ctx.db, projectId);
 	if (!row || !row.repoPath) {
 		throw new TRPCError({
 			code: "NOT_FOUND",

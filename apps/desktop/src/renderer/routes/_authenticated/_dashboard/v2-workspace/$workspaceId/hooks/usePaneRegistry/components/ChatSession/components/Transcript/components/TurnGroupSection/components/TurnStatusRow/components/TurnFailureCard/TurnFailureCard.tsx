@@ -18,6 +18,8 @@ import {
 	FAILURE_ACTIONS,
 	FAILURE_TITLES,
 	type FailureAction,
+	MANUAL_SIGN_IN_ACTIONS,
+	MANUAL_SIGN_IN_TITLE,
 } from "./constants";
 
 type Running = "continue" | "restart" | "new_chat";
@@ -44,7 +46,10 @@ export function TurnFailureCard({
 	const { i18n, t } = useLingui();
 	const actions = useTurnFailureActions();
 	const kind = error?.kind ?? "unknown";
-	const title = i18n._(FAILURE_TITLES[kind]);
+	const manualSignIn = kind === "auth" && actions?.manualSignIn === true;
+	const title = i18n._(
+		manualSignIn ? MANUAL_SIGN_IN_TITLE : FAILURE_TITLES[kind],
+	);
 	const text = [error?.message, error?.detail].filter(Boolean).join("\n\n");
 	const [expanded, setExpanded] = useState(false);
 	const [clamped, setClamped] = useState(false);
@@ -141,6 +146,13 @@ export function TurnFailureCard({
 					expanded: signingIn,
 					onClick: () => setSigningIn((open) => !open),
 				},
+				agent_settings: recovery.openAgentSettings
+					? {
+							label: <Trans>Agent settings</Trans>,
+							disabled: false,
+							onClick: recovery.openAgentSettings,
+						}
+					: null,
 				new_chat: newChat
 					? {
 							label:
@@ -156,10 +168,12 @@ export function TurnFailureCard({
 			}
 		: null;
 	const offered = buttons
-		? FAILURE_ACTIONS[kind].flatMap((action) => {
-				const button = buttons[action];
-				return button ? [{ action, ...button }] : [];
-			})
+		? (manualSignIn ? MANUAL_SIGN_IN_ACTIONS : FAILURE_ACTIONS[kind]).flatMap(
+				(action) => {
+					const button = buttons[action];
+					return button ? [{ action, ...button }] : [];
+				},
+			)
 		: [];
 
 	return (
@@ -186,7 +200,16 @@ export function TurnFailureCard({
 						{text}
 					</p>
 				)}
-				{signingIn && recovery && (
+				{manualSignIn && (
+					<p className="text-muted-foreground">
+						<Trans>
+							In manual mode, Paradev doesn't sign this agent in. Have your
+							script sign it in again and continue, or turn off manual mode in
+							agent settings.
+						</Trans>
+					</p>
+				)}
+				{signingIn && recovery && !manualSignIn && (
 					<SignInCommand command={error?.loginCommand} />
 				)}
 				{newChatFailed && (

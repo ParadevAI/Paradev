@@ -5,6 +5,7 @@ import { createElement, memo, useMemo } from "react";
 import type { Components, ExtraProps, StreamdownProps } from "streamdown";
 import { defaultRemarkPlugins, Streamdown } from "streamdown";
 import { TABLE_CLASSNAME, TABLE_SCROLLER_CLASSNAME } from "./constants";
+import { separateOrderedLists } from "./utils/separateOrderedLists";
 
 /**
  * Streamdown's `Components` is an intersection — per-tag props on one side, an
@@ -155,6 +156,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 	// Streamdown tells a code renderer its fence is still open only while
 	// the text is animating; a block that ends inside a fence is exactly that.
 	const fenceOpen = useMemo(() => fenceState(children).open, [children]);
+	const markdown = useMemo(() => separateOrderedLists(children), [children]);
 	const mergedRemarkPlugins = useMemo(
 		() =>
 			remarkPlugins
@@ -175,7 +177,7 @@ export const ChatMarkdown = memo(function ChatMarkdown({
 			remarkPlugins={mergedRemarkPlugins}
 			remend={REMEND_OPTIONS}
 		>
-			{children}
+			{markdown}
 		</Streamdown>
 	);
 });

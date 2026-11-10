@@ -2,6 +2,19 @@ import { describe, expect, test } from "bun:test";
 import { agentCredentialToEnv } from "./agent-credentials";
 
 describe("agentCredentialToEnv", () => {
+	test("a Manual row puts nothing in the environment, for either agent", () => {
+		for (const agent of ["claude", "codex"]) {
+			expect(
+				agentCredentialToEnv({
+					agent,
+					kind: "api_key",
+					value: "",
+					provider: "manual",
+				}),
+			).toEqual({});
+		}
+	});
+
 	test("a Claude gateway key is the bearer variable against the gateway's Claude Code endpoint", () => {
 		expect(
 			agentCredentialToEnv({

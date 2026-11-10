@@ -112,6 +112,8 @@ export interface PullRequestMergeability {
 	requiresThreadResolution: boolean;
 	queue: { position: number | null; state: MergeQueueState } | null;
 	allowedMergeMethods: MergeMethod[];
+	/** Null from API builds older than the field. */
+	defaultMergeMethod: MergeMethod | null;
 }
 
 /** Everything one pull request view needs, which is what the query returns. */

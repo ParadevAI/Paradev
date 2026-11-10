@@ -34,7 +34,7 @@ interface DevinChatMessage {
  * the non-cached share — cache reads sit in their own field.
  */
 export function devinRowsToEntries(
-	rows: DevinMessageRow[],
+	rows: Iterable<DevinMessageRow>,
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,

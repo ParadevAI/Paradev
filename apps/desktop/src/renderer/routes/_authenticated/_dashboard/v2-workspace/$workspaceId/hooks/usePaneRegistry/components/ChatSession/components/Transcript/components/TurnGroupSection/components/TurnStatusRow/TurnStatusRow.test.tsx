@@ -104,6 +104,24 @@ test("a turn the user stopped is one quiet line", () => {
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 });
 
+test("a stop the agent recorded says the user stopped it, and whether it was at a tool call", () => {
+	const line = (userStop: "response" | "tool_use") =>
+		render(
+			<TurnStatusRow
+				error={undefined}
+				latest={false}
+				status="interrupted"
+				turnId="t1"
+				userStop={userStop}
+			/>,
+		).container;
+	expect(line("response").textContent).toBe("You stopped this response");
+	expect(line("tool_use").textContent).toBe(
+		"You stopped this response at a tool call",
+	);
+	expect(line("response").querySelector("button, textarea")).toBeNull();
+});
+
 test("a turn the usage limit stopped is one quiet line, not a failure card", () => {
 	const view = render(
 		<TurnStatusRow
@@ -116,4 +134,92 @@ test("a turn the usage limit stopped is one quiet line, not a failure card", () 
 	expect(view.container.textContent).toBe("Stopped by the usage limit");
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 	expect(view.queryByText("Copy error")).toBeNull();
+});
+
+function authCard(actions: Partial<TurnFailureActions>) {
+	return render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+				...actions,
+			}}
+		>
+			<TurnStatusRow
+				error={{ message: "Not logged in. Please run /login", kind: "auth" }}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+}
+
+test("an auth failure offers Sign in", () => {
+	const view = authCard({});
+	expect(view.container.textContent).toContain("Sign in to continue");
+	expect(view.getByText("Sign in")).toBeTruthy();
+});
+
+test("an auth failure in manual mode offers no sign-in: Continue or agent settings", () => {
+	const restartAndContinue = mock(async () => true);
+	const openAgentSettings = mock(() => {});
+	const view = authCard({
+		manualSignIn: true,
+		openAgentSettings,
+		restartAndContinue,
+		changeModel: () => {},
+		startNewChat: async () => true,
+	});
+	expect(view.container.textContent).toContain("The agent is signed out");
+	expect(view.container.textContent).toContain("In manual mode");
+	expect(view.container.textContent).toContain("turn off manual mode");
+	expect(view.queryByText("Sign in")).toBeNull();
+	expect(view.queryByText("Sign in to continue")).toBeNull();
+	expect(view.queryByText("Change model")).toBeNull();
+	expect(view.queryByText("Start a new chat")).toBeNull();
+	fireEvent.click(view.getByText("Continue"));
+	expect(restartAndContinue).toHaveBeenCalledTimes(1);
+	fireEvent.click(view.getByText("Agent settings"));
+	expect(openAgentSettings).toHaveBeenCalledTimes(1);
+});
+
+test("a turn cut off when Paradev closed is a quiet paused line that resumes", () => {
+	const continueTask = mock(() => {});
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask,
+				dismissed: new Set(),
+				setDismissed: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{ message: "Paradev closed", kind: "host_stopped" }}
+				latest
+				status="interrupted"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+
+	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
+	expect(view.container.textContent).toContain("Paused when Paradev closed");
+	fireEvent.click(view.getByText("Resume"));
+	expect(continueTask).toHaveBeenCalledTimes(1);
+});
+
+test("an older paused turn offers no Resume", () => {
+	const view = render(
+		<TurnStatusRow
+			error={{ message: "Paradev closed", kind: "host_stopped" }}
+			latest={false}
+			status="interrupted"
+			turnId="t1"
+		/>,
+	);
+	expect(view.container.textContent).toBe("Paused when Paradev closed");
 });

@@ -11,11 +11,18 @@ const workspace = getWorkspaceName();
 export const PROTOCOL_SCHEME = workspace
 	? `superset-${workspace}`
 	: PROTOCOL_SCHEMES.PROD;
+/** Height of the Windows/Linux window-controls overlay the window opens with. */
+export const TITLE_BAR_OVERLAY_HEIGHT = 40;
+
 export const WORKTREES_DIR_NAME = "worktrees";
 export const PROJECTS_DIR_NAME = "projects";
 export const CONFIG_FILE_NAME = "config.json";
 export const LOCAL_CONFIG_FILE_NAME = "config.local.json";
 export const PORTS_FILE_NAME = "ports.json";
+
+// Separate sessions keep browser-pane extensions away from the app's own requests.
+export const APP_PARTITION = "persist:superset";
+export const BROWSER_PARTITION = "persist:browser";
 
 export const CONFIG_TEMPLATE = `{
   "setup": [],

@@ -4,13 +4,18 @@ import {
 	type BrowserOpenRequest,
 	browserManager,
 } from "main/lib/browser/browser-manager";
+import { clearPaneData } from "main/lib/browser/clear-pane-data";
 import { screenshotManager } from "main/lib/screenshot-manager";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { ForwardedKey } from "shared/hotkey-chord";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+import { createBrowserExtensionsRouter } from "./extensions";
 
 export const createBrowserRouter = () => {
 	return router({
+		extensions: createBrowserExtensionsRouter(),
+
 		register: publicProcedure
 			.input(
 				z.object({
@@ -304,6 +309,29 @@ export const createBrowserRouter = () => {
 			});
 		}),
 
+		resolveOpenRequest: publicProcedure
+			.input(z.object({ requestId: z.string(), paneId: z.string() }))
+			.mutation(({ input }) => {
+				browserManager.resolveOpenRequest(input.requestId, input.paneId);
+				return { success: true };
+			}),
+
+		getUnloadInfo: publicProcedure
+			.input(z.object({ paneIds: z.array(z.string()) }))
+			.query(({ input }) => browserManager.getUnloadInfo(input.paneIds)),
+
+		onAgentUse: publicProcedure.subscription(() => {
+			return observable<{ paneId: string }>((emit) => {
+				const handler = (event: { paneId: string }) => {
+					emit.next(event);
+				};
+				browserManager.on("agent-use", handler);
+				return () => {
+					browserManager.off("agent-use", handler);
+				};
+			});
+		}),
+
 		// Panes with agent work in flight (a live CDP session or an in-flight
 		// capture). The renderer registry parks these presentable — a
 		// visibility-hidden webview gets no compositor frames, so screenshots
@@ -351,24 +379,10 @@ export const createBrowserRouter = () => {
 				}),
 			)
 			.mutation(async ({ input }) => {
-				const ses = session.fromPartition("persist:superset");
-				switch (input.type) {
-					case "cookies":
-						await ses.clearStorageData({ storages: ["cookies"] });
-						break;
-					case "cache":
-						await ses.clearCache();
-						break;
-					case "storage":
-						await ses.clearStorageData({
-							storages: ["localstorage", "indexdb"],
-						});
-						break;
-					case "all":
-						await ses.clearStorageData();
-						await ses.clearCache();
-						break;
-				}
+				await clearPaneData(
+					session.fromPartition(BROWSER_PARTITION),
+					input.type,
+				);
 				return { success: true };
 			}),
 
@@ -393,7 +407,7 @@ export const createBrowserRouter = () => {
 		// (imported "logins" are cookies, not stored passwords).
 		getCookieDomains: publicProcedure.query(async () => {
 			const cookies = await session
-				.fromPartition("persist:superset")
+				.fromPartition(BROWSER_PARTITION)
 				.cookies.get({});
 			const domains = new Map<string, number>();
 			for (const cookie of cookies) {
@@ -409,7 +423,7 @@ export const createBrowserRouter = () => {
 		clearCookiesForDomain: publicProcedure
 			.input(z.object({ domain: z.string() }))
 			.mutation(async ({ input }) => {
-				const ses = session.fromPartition("persist:superset");
+				const ses = session.fromPartition(BROWSER_PARTITION);
 				const cookies = await ses.cookies.get({ domain: input.domain });
 				await Promise.all(
 					cookies.map((cookie) => {

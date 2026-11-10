@@ -212,7 +212,7 @@ export function AuthorFilter({
 						{singleTarget && !isLoading && error && (
 							<div className="px-3 py-4 text-center text-sm text-muted-foreground">
 								<Trans>
-									Couldn't load contributors — type a username instead.
+									Couldn't load contributors. Type a username instead.
 								</Trans>
 							</div>
 						)}

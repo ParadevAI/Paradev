@@ -1,0 +1,1 @@
+ALTER TABLE `chat_sessions_local` ADD `agent_config_id` text;

@@ -8,7 +8,7 @@ import type { UsageAgent } from "../types";
  * Longest-prefix match on the lowercased model id; unknown models fall back
  * to the agent's cheapest rate and mark the result approximate.
  */
-export const PRICING_TABLE_UPDATED = "2026-09-30";
+export const PRICING_TABLE_UPDATED = "2026-11-09";
 
 export interface ModelRate {
 	inputPerM: number;
@@ -28,6 +28,8 @@ export const CACHE_WRITE_5M_MULTIPLIER = 1.25;
 export const CACHE_WRITE_1H_MULTIPLIER = 2;
 
 const CLAUDE_RATES: Record<string, ModelRate> = {
+	"claude-fable-5-2": { inputPerM: 8, outputPerM: 40, cacheReadPerM: 0.2 },
+	"claude-mythos-5-2": { inputPerM: 8, outputPerM: 40, cacheReadPerM: 0.2 },
 	// Fable 5.1 and Mythos 5.1 keep Fable 5's token price but cut cache reads
 	// to $0.25/M (0.025x input) instead of the usual 0.1x.
 	"claude-fable-5-1": { inputPerM: 10, outputPerM: 50, cacheReadPerM: 0.25 },
@@ -58,6 +60,7 @@ const CODEX_RATES: Record<string, ModelRate> = {
 		longContextThreshold: 272_000,
 		longContext: { inputPerM: 4, outputPerM: 15, cacheReadPerM: 0.2 },
 	},
+	"gpt-6.1-terra": { inputPerM: 1, outputPerM: 5, cacheReadPerM: 0.05 },
 	// GPT-6 Astra (2026-09-03): cached input is $1/M, the usual 0.1x.
 	"gpt-6-astra": { inputPerM: 10, outputPerM: 50 },
 	"gpt-6-sol": { inputPerM: 2, outputPerM: 10 },

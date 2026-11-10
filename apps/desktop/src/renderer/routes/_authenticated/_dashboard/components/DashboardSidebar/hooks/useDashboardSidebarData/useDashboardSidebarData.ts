@@ -17,6 +17,7 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
 import {
@@ -35,6 +36,7 @@ import {
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
+import { useShallow } from "zustand/react/shallow";
 import type {
 	DashboardSidebarGithubHold,
 	DashboardSidebarHiddenProject,
@@ -60,6 +62,7 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { selectPendingInserts } from "./selectPendingInserts";
 import { sidebarHostIsOnline } from "./sidebarHostIsOnline";
 import {
 	type StableDashboardSidebarProjects,
@@ -158,8 +161,10 @@ export function useDashboardSidebarData() {
 		toggleProjectCollapsed,
 	} = useDashboardSidebarState();
 	const queryClient = useQueryClient();
-	const workspaceTransactionsById = useWorkspaceTransactionsStore(
-		(state) => state.byWorkspaceId,
+	// Rows only show create progress. Selecting updates too rebuilt the whole
+	// sidebar each time a tag write settled, once per member on group delete.
+	const pendingInsertsById = useWorkspaceTransactionsStore(
+		useShallow((state) => selectPendingInserts(state.byWorkspaceId)),
 	);
 
 	const { hosts, organizationId: knownHostsOrgId } = useKnownHosts();
@@ -581,9 +586,9 @@ export function useDashboardSidebarData() {
 				hostIsOnline: sidebarHostIsOnline(
 					hostsByMachineId.get(workspace.hostId),
 				),
-				pendingTransaction: workspaceTransactionsById[workspace.id] ?? null,
+				pendingTransaction: pendingInsertsById[workspace.id] ?? null,
 			})),
-		[hostsByMachineId, rawSidebarWorkspaces, workspaceTransactionsById],
+		[hostsByMachineId, rawSidebarWorkspaces, pendingInsertsById],
 	);
 
 	const sidebarWorkspaces = useMemo(
@@ -644,13 +649,11 @@ export function useDashboardSidebarData() {
 			// Unreachable host: keep the query mounted so cached chips stay
 			// rendered through the outage; fetches resume when the URL returns.
 			enabled: target.hostUrl !== null,
-			queryFn: async () => {
-				if (!target.hostUrl) return { workspaces: [], github: null };
-				const client = getHostServiceClientByUrl(target.hostUrl);
-				return client.pullRequests.getByWorkspaces.query({
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).pullRequests.getByWorkspaces.query({
 					workspaceIds: target.workspaceIds,
-				});
-			},
+				}),
+			),
 		})),
 	});
 

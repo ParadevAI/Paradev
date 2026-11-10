@@ -19,6 +19,7 @@ function pullRequest(
 			squashMergeAllowed: true,
 			mergeCommitAllowed: false,
 			rebaseMergeAllowed: true,
+			viewerDefaultMergeMethod: "REBASE",
 			pullRequest: {
 				id: "PR_1",
 				number: 7,
@@ -133,6 +134,7 @@ describe("readPullRequestDetail", () => {
 			unresolvedThreads: 1,
 			requiresThreadResolution: true,
 			allowedMergeMethods: ["squash", "rebase"],
+			defaultMergeMethod: "rebase",
 		});
 		expect(
 			detail.checks.map((check) => [check.name, check.conclusion]),
@@ -172,12 +174,43 @@ describe("readPullRequestDetail", () => {
 		const error = await readPullRequestDetail(
 			{
 				graphql: async <T>() => ({ repository: { pullRequest: null } }) as T,
-				requestedReviewers: async () => ({ users: [], teams: [] }),
+				requestedReviewers: async () => {
+					throw new Error("Not Found");
+				},
 			},
 			input,
 		).catch((e) => e);
 		expect(error).toBeInstanceOf(PullRequestReadError);
 		expect(error.code).toBe("NOT_FOUND");
+	});
+
+	test("requested reviewers are asked for alongside the main read, not after it", async () => {
+		let releaseRead = () => {};
+		let reviewersAsked = false;
+		const read = readPullRequestDetail(
+			{
+				graphql: <T>() =>
+					new Promise<T>((resolve) => {
+						releaseRead = () =>
+							resolve(
+								pullRequest({
+									reviewThreads: {
+										pageInfo: { hasNextPage: false, endCursor: null },
+										nodes: [],
+									},
+								}) as T,
+							);
+					}),
+				requestedReviewers: async () => {
+					reviewersAsked = true;
+					return { users: [], teams: [] };
+				},
+			},
+			input,
+		);
+		expect(reviewersAsked).toBe(true);
+		releaseRead();
+		await read;
 	});
 
 	test("activity is read only when asked for, with reviews folded into the conversation", async () => {

@@ -28,7 +28,7 @@ export interface StartTaskInput {
 	agentId: string;
 	organizationId: string;
 	parentSessionId: string;
-	requestedByUserId: string | null;
+	requestedByUserId: string;
 	/** Work on this Paradev task; without it a new task is made from title and instructions. */
 	taskId?: string;
 	title?: string;
@@ -119,16 +119,9 @@ async function ownedTask(organizationId: string, taskId: string) {
 }
 
 async function newTask(input: StartTaskInput): Promise<string> {
-	const [agent] = await db
-		.select({ createdByUserId: agents.createdByUserId })
-		.from(agents)
-		.where(eq(agents.id, input.agentId))
-		.limit(1);
-	const creatorId = input.requestedByUserId ?? agent?.createdByUserId;
-	if (!creatorId) throw new Error("no person to own the task");
 	const { task } = await insertTask({
 		organizationId: input.organizationId,
-		creatorId,
+		creatorId: input.requestedByUserId,
 		input: {
 			title:
 				input.title ??
@@ -342,8 +335,8 @@ async function launchTask(session: SelectAgentSession) {
 		.limit(1);
 	if (!agent) throw new Error("Dev is gone");
 	const task = session.taskId ? await taskOf(session.taskId) : null;
-	const userId = session.requestedByUserId ?? agent.createdByUserId;
-	if (!userId) throw new Error("no person to start a box for");
+	const userId = session.requestedByUserId;
+	if (!userId) throw new Error("the person who asked for the task is gone");
 	if (!session.environmentId) throw new Error("task has no environment");
 	if (!session.cloudWorkspaceId) {
 		await startCloudWorkspace({
@@ -382,7 +375,7 @@ async function launchTask(session: SelectAgentSession) {
 	await submitPrompt({
 		agent,
 		sessionId: session.id,
-		actingUserId: session.requestedByUserId,
+		actingUserId: userId,
 		promptId:
 			start === 0
 				? `task-start:${session.id}`
@@ -514,7 +507,14 @@ async function reportToParent(
 		.where(eq(agentSessions.id, sessionId))
 		.limit(1);
 	const parentSessionId = row?.session.parentSessionId;
+	const requestedByUserId = row?.session.requestedByUserId;
 	if (!row || !parentSessionId) return;
+	if (!requestedByUserId) {
+		console.warn(
+			`[agent-tasks] report for session ${sessionId} dropped: the person who asked for the task is gone`,
+		);
+		return;
+	}
 	const { session, task } = row;
 	const [agent] = await db
 		.select({ id: agents.id, organizationId: agents.organizationId })
@@ -530,7 +530,7 @@ async function reportToParent(
 	await submitPrompt({
 		agent,
 		sessionId: parentSessionId,
-		actingUserId: session.requestedByUserId,
+		actingUserId: requestedByUserId,
 		promptId: `task-update:${turnId ?? session.id}`,
 		text: eventText({
 			from: `your task: ${task?.title ?? session.id}`,

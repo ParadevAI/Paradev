@@ -1,3 +1,5 @@
+import { SANDBOX_API_CREDENTIAL_HEADER } from "./sandbox-gate";
+
 /**
  * Routing key the relay uses to identify a host service tunnel. The same
  * physical machine can be a host in multiple orgs, so machineId alone is
@@ -54,13 +56,19 @@ export function buildUpstreamHeaders(
 ): Record<string, string> {
 	const headers: Record<string, string> = {};
 	for (const [key, value] of incoming.entries()) {
-		if (key === "host" || key === "authorization") continue;
-		if (key === SUPERSET_USER_ID_HEADER) continue;
+		if (NEVER_FORWARDED_HEADERS.has(key)) continue;
 		headers[key] = value;
 	}
 	headers[SUPERSET_USER_ID_HEADER] = userId;
 	return headers;
 }
+
+const NEVER_FORWARDED_HEADERS = new Set([
+	"host",
+	"authorization",
+	SANDBOX_API_CREDENTIAL_HEADER,
+	SUPERSET_USER_ID_HEADER,
+]);
 
 /** The host id for the cloud. A cloud workspace has no `v2_hosts` row. */
 export const CLOUD_HOST_ID = "cloud";

@@ -9,21 +9,11 @@ The Paradev MCP server lives at `https://api.superset.sh/mcp`. The versioned URL
 
 ## Overview
 
-Paradev provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI agents interact with your tasks, workspaces, and devices programmatically.
+Paradev provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server. AI agents use it to work with your tasks, workspaces, terminals, pages, automations, and hosts.
 
 ## Capabilities
 
-| Category | Operations |
-|----------|------------|
-| **Tasks** | list, get (by id or slug), create, update, delete, list statuses |
-| **Workspaces** | list (per host), create on a host, update, delete |
-| **Agents** | list agents on a host, launch an agent session in a workspace |
-| **Terminals** | create in a workspace, list, send input, read screen, close |
-| **Pages** | list, get, list versions, pull content, publish, read storage; list/reply/resolve page comments |
-| **Automations** | list, get metadata, get/set prompt body, create, update metadata and triggers, list trigger options, pause, resume, run on demand, list runs, delete |
-| **Projects** | list projects on a host |
-| **Hosts** | list hosts (registered machines) you have access to |
-| **Organization** | list members |
+See [Available Tools](#available-tools) for every tool, grouped by category.
 
 ## Setup
 
@@ -109,7 +99,7 @@ https://api.superset.sh/mcp
 
 ### Manual Configuration
 
-Alternatively, you can manually configure the MCP server for each client:
+Or configure each client by hand:
 
 <Tabs items={["Claude Code", "Claude Desktop", "Cursor", "Codex", "Gemini CLI", "Open Code", "Amp CLI", "Mistral Vibe", "Kimi Code", "Grok"]}>
 <Tab value="Claude Code">
@@ -239,18 +229,18 @@ url = "https://api.superset.sh/mcp"
 
 ## Authentication
 
-The MCP server uses OAuth 2.1. When you first connect, you'll be prompted to authorize the connection in your browser. The token is scoped to your active organization.
+The MCP server uses OAuth 2.1. On first connect, your browser asks you to authorize the connection. The token is scoped to your active organization.
 
 ### API Key Authentication
 
-For headless environments, CI/CD pipelines, or scripts where browser-based OAuth isn't practical, you can authenticate with an API key instead.
+For headless environments, CI, and scripts where browser OAuth is not practical, use an API key.
 
 **Generating an API key:**
 
 1. Open the Paradev desktop app
 2. Go to **Settings > API Keys**
 3. Click **Create API Key**
-4. Copy the key (it starts with `sk_live_`). You won't be able to see it again.
+4. Copy the key (it starts with `sk_live_`). It is shown only once.
 
 **Using the API key:**
 
@@ -277,7 +267,7 @@ MCP clients that support custom headers can use this directly. For Claude Code, 
 ```
 
 <Callout type="warn">
-API keys grant full access to your organization. Keep them secret and never commit them to version control. Use environment variables or secrets managers for CI/CD.
+API keys grant full access to your organization. Never commit them. Use environment variables or a secrets manager in CI.
 </Callout>
 
 **When to use which method:**
@@ -328,7 +318,7 @@ API keys grant full access to your organization. Keep them secret and never comm
 
 ### Pages
 
-[Paradev Pages](/pages) lets agents present designs and reports to your team and act on feedback left directly on the page. The MCP publish tool accepts a self-contained HTML document and returns a shareable URL. Every publish creates a new version; nothing is overwritten.
+[Paradev Pages](/pages) publish agent output as a shareable URL. `pages_publish` takes a self-contained HTML document. Every publish creates a new version; nothing is overwritten.
 
 | Tool | Description |
 |------|-------------|
@@ -371,7 +361,9 @@ publishing updates. Otherwise each publish creates a separate page.
 | `automations_run` | Dispatch an automation immediately, without waiting for a schedule or event |
 | `automations_trigger_options` | List the values an event trigger can filter on (channels, repositories, teams, ...) |
 | `automations_logs` | List recent runs for an automation |
-| `automations_delete` | Delete an automation |
+| `automations_archive` | Archive an automation |
+| `automations_unarchive` | Restore an archived automation, paused |
+| `automations_delete` | Permanently delete an archived automation |
 
 ### Projects
 
@@ -397,7 +389,7 @@ In the built-in chat panel, use the `/mcp` slash command to see your workspace's
 
 ## Example Usage
 
-Once connected, you can ask your AI agent to:
+Once connected, ask your agent to:
 
 - "Create a task for fixing the login bug"
 - "List all my assigned tasks"

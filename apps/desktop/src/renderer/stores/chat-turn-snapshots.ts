@@ -1,11 +1,9 @@
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 /**
  * EXPERIMENT: snapshot the worktree around each ACP chat turn, for the turn's
- * changes card and its Undo. Off by default; the toggle shows only while the
- * chat experiment is on.
+ * changes card and its Undo. Off by default.
  *
  * To conclude the experiment, remove: this store, moving its
  * `chat-turn-snapshots` key to `DEAD_KEYS` in `lib/persisted-keys`; its toggle
@@ -32,7 +30,5 @@ export const useChatTurnSnapshotsStore = create<ChatTurnSnapshotsState>()(
 );
 
 export function useChatTurnSnapshotsEnabled(): boolean {
-	const chatEnabled = useAcpChatEnabled();
-	const enabled = useChatTurnSnapshotsStore((state) => state.enabled);
-	return chatEnabled && enabled;
+	return useChatTurnSnapshotsStore((state) => state.enabled);
 }

@@ -1,4 +1,4 @@
-import { string, table } from "@superset/cli-framework";
+import { boolean, string, table } from "@superset/cli-framework";
 import { normalizeAutomationGroup } from "@superset/shared/automation-group";
 import { command } from "../../../lib/command";
 import { formatAutomationDate } from "../format";
@@ -10,11 +10,13 @@ export default command({
 			.alias("n")
 			.desc("Filter by name (case-insensitive substring match)"),
 		group: string().desc("Only automations in this group (case-insensitive)"),
+		archived: boolean().desc("List archived automations instead"),
 	},
 	run: async ({ ctx, options }) => {
-		const rows = await ctx.api.automation.list.query(
-			options.name ? { name: options.name } : undefined,
-		);
+		const rows = await ctx.api.automation.list.query({
+			...(options.name ? { name: options.name } : {}),
+			...(options.archived ? { archived: true } : {}),
+		});
 		const group = normalizeAutomationGroup(options.group)?.toLowerCase();
 		if (!group) return rows;
 		return rows.filter((row) => row.group?.toLowerCase() === group);

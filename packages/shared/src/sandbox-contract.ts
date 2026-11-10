@@ -108,6 +108,8 @@ export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_AGENT_SURFACE: z.enum(["terminal", "chat"]).optional(),
 	/** Automation run that created this box; absent for a manual launch. */
 	SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID: z.string().uuid().optional(),
+	/** The terminal id the creator promised; the agent launches under it. */
+	SUPERSET_SANDBOX_AGENT_TERMINAL_ID: z.string().uuid().optional(),
 });
 
 export type SandboxIdentity = z.infer<typeof sandboxIdentitySchema>;

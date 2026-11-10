@@ -1,20 +1,21 @@
 import { db } from "@superset/db/client";
-import { connections } from "@superset/db/schema";
+import { connections, type SelectConnection } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import {
 	decryptOptional,
 	decryptSecret,
+	grantSharedWithAnotherConnection,
 	userConnection,
 } from "../../../lib/connectors";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import { stopMailboxWatch } from "./gmail";
 import { findGoogleConnection, googleConfigOf } from "./state";
 
 export const googleRouter = {
-	getConnection: protectedProcedure
+	getConnection: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -40,7 +41,7 @@ export const googleRouter = {
 			};
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -49,24 +50,7 @@ export const googleRouter = {
 				input.organizationId,
 				ctx.session.user.id,
 			);
-			if (connection) {
-				// Best effort: Google keeps pushing until the watch is stopped or
-				// expires, and the push route would only reject pushes for a missing
-				// connection. A failure here must not block the disconnect.
-				const config = googleConfigOf(connection.state);
-				await Promise.allSettled([
-					// The grant outlives the row unless it is revoked: without this
-					// the refresh token would be gone from our side and the app would
-					// still hold read access on Google's.
-					revokeGrant(
-						(await decryptOptional(connection.refreshToken)) ??
-							(await decryptSecret(connection.accessToken)),
-					),
-					config.gmail?.watchExpiresAt
-						? stopMailboxWatch(connection.id)
-						: Promise.resolve(),
-				]);
-			}
+			if (connection) await releaseGoogleGrant(connection);
 
 			const result = await db
 				.delete(connections)
@@ -85,6 +69,32 @@ export const googleRouter = {
 			return { success: true };
 		}),
 } satisfies TRPCRouterRecord;
+
+/**
+ * Revokes the grant and stops the mailbox watch, unless another connection
+ * still uses them.
+ */
+export async function releaseGoogleGrant(
+	connection: SelectConnection,
+): Promise<void> {
+	if (await grantSharedWithAnotherConnection(connection)) return;
+	// Best effort: Google keeps pushing until the watch is stopped or
+	// expires, and the push route would only reject pushes for a missing
+	// connection. A failure here must not block the disconnect.
+	const config = googleConfigOf(connection.state);
+	await Promise.allSettled([
+		// The grant outlives the row unless it is revoked: without this
+		// the refresh token would be gone from our side and the app would
+		// still hold read access on Google's.
+		revokeGrant(
+			(await decryptOptional(connection.refreshToken)) ??
+				(await decryptSecret(connection.accessToken)),
+		),
+		config.gmail?.watchExpiresAt
+			? stopMailboxWatch(connection.id)
+			: Promise.resolve(),
+	]);
+}
 
 async function revokeGrant(token: string): Promise<void> {
 	await fetch(

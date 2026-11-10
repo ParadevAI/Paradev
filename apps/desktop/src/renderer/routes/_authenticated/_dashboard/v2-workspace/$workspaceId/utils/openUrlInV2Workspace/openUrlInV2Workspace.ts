@@ -12,7 +12,7 @@ export function openUrlInV2Workspace({
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	target: V2WorkspaceUrlOpenTarget;
 	url: string;
-}): void {
+}): string | null {
 	const pane = {
 		kind: "browser",
 		data: { url } satisfies BrowserPaneData,
@@ -21,8 +21,11 @@ export function openUrlInV2Workspace({
 
 	if (target === "new-tab") {
 		state.addTab({ panes: [pane] });
-		return;
+	} else {
+		state.openPane({ pane });
 	}
-
-	state.openPane({ pane });
+	const next = store.getState();
+	return (
+		next.tabs.find((tab) => tab.id === next.activeTabId)?.activePaneId ?? null
+	);
 }

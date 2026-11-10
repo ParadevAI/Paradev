@@ -30,6 +30,8 @@ import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgen
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { resumeChat } from "../utils/resumeChat";
+import { openDesktopChatTab } from "./utils/openDesktopChatTab";
 
 /**
  * Bottom sheet for the tab strip's + — the host's agent presets plus a plain
@@ -145,6 +147,9 @@ export function NewSessionSheet() {
 					model: model?.id,
 					surface: "chat",
 				});
+				if (result.chatSessionId) {
+					openDesktopChatTab(client, workspace.id, result.chatSessionId);
+				}
 				terminalId = result.chatSessionId ?? result.sessionId;
 			} else if (chatHarness) {
 				const { model, effort } = launchFor(preset);
@@ -159,6 +164,7 @@ export function NewSessionSheet() {
 					modelLabel: model?.label ?? null,
 					effortLabel: effort?.label ?? null,
 				});
+				openDesktopChatTab(client, workspace.id, created.sessionId);
 				terminalId = created.sessionId;
 			} else {
 				const { model, effort } = launchFor(preset);
@@ -198,23 +204,24 @@ export function NewSessionSheet() {
 		if (launchingKey !== null) return;
 		setLaunchingKey(chat.sessionId);
 		try {
-			const transport = getChatTransport(hostUrl);
-			await transport
-				.closeSession({ sessionId: chat.sessionId })
-				.catch(() => {});
-			const created = await transport.createSession({
-				commandId: randomUUID(),
+			const sessionId = await resumeChat({
+				transport: getChatTransport(hostUrl),
 				workspaceId: workspace.id,
-				harness: chat.harness,
-				resume: { harnessSessionId: chat.harnessSessionId },
+				chat: { ...chat, harnessSessionId: chat.harnessSessionId },
+				commandId: randomUUID(),
 			});
+			openDesktopChatTab(
+				getHostServiceClientByUrl(hostUrl),
+				workspace.id,
+				sessionId,
+			);
 			if (host) {
 				void queryClient.invalidateQueries({
 					queryKey: getHostTerminalsQueryKey(host.machineId),
 				});
 			}
 			router.dismissTo(
-				`/(authenticated)/workspace/${workspace.id}?tab=${created.sessionId}`,
+				`/(authenticated)/workspace/${workspace.id}?tab=${sessionId}`,
 			);
 		} catch (error) {
 			setLaunchingKey(null);

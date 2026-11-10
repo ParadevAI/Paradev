@@ -72,6 +72,19 @@ the filesystem snapshot with no processes, so host-service is started again)
 and extends a running one so it never hits the idle stop while someone is in
 it. `resolveSandboxAddress` is the one place that knows the difference.
 
+**A box reaches other hosts only through the relay, and only if they allow
+it.** The CLI assumed its bearer is a user token the relay accepts. A box has
+no bearer: its credential is a header the firewall adds, so `--host` calls
+used to fail as "Session expired" while `auth whoami` worked, and `host.list`
+showed every host offline because it forwarded the caller's absent bearer for
+presence. Now `host.list` mints a server presence token when the caller has no
+bearer, the firewall adds the workspace credential for the relay host too, and
+the relay checks it with the API per call. A host is reachable only when its
+owner allowed cloud workspaces on the host's settings page; otherwise the call
+fails with a message that says so. Only HTTP calls work: the firewall refuses
+WebSocket upgrades on a host whose headers it rewrites, so live terminal
+streams from a box to a host do not.
+
 **A box's agent status doesn't come from the box.** A host row's dot is a
 live subscription to that host's terminal bindings; the sidebar deliberately
 opens no such socket to a sandbox, since holding one keeps the VM awake all
@@ -203,6 +216,26 @@ never tries to renew) written with the identity on every create and wake; the
 firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
 including a forced rotation while it ran.
 
+An hourly QStash job (`/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins`)
+renews every session near expiry, also with no box running, and re-applies
+the rules on the running boxes of every sign-in saved in the last three
+hours. Not yet verified on a real box. Only a refusal that names a dead
+session (`refresh_token_expired`, `refresh_token_reused`,
+`refresh_token_invalidated`, `invalid_grant`) removes the sign-in; any other
+failure keeps it and goes to Sentry, tagged `chatgpt_refresh_code`. **Open:** Codex in the box cannot recover
+from a 401 by itself: it refreshes with the placeholder against
+`auth.openai.com`, which nothing swaps, and asks the person to sign in again.
+
+**Some people keep the agent signed in themselves.** The brokering above assumes Paradev owns the
+model credential. Some teams run their own script that rotates Claude or Codex logins, and our
+placeholder overrides it: `CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY` take precedence over
+`~/.claude/.credentials.json` in Claude Code. A Manual row (`agent_credentials.provider =
+"manual"`, no secret) makes `resolveAgentSignIns` skip that agent, so create, wake and the
+credential-refresh timer hand the box no variable, firewall rule or login file for it. The box
+reaches the provider through the `"*"` catch-all with whatever the script wrote. **Open:** a
+`~/.codex/auth.json` of placeholders written by an earlier ChatGPT sign-in stays on the box until
+the script replaces it; the auth-failure card knows about Manual only in the viewer's own box.
+
 **The firewall refuses a WebSocket upgrade on a host whose headers it
 rewrites.** Codex's built-in provider opens `wss://chatgpt.com/...` first; with
 the bearer swap in place the upgrade fails ("Attack attempt detected") and
@@ -231,12 +264,14 @@ rule applies to every process in the box, so that list is the boundary —
 widen it deliberately, and never to a procedure that can grant more access.
 A box acts in its own organization only. In `packages/trpc/src/trpc.ts`,
 `jwtProcedure` drops the creator's other memberships, both builders refuse an
-organization header that names one, and `protectedProcedure` keeps the box's
+organization header that names one, and `personProcedure` keeps the box's
 organization as the active one; `user.myOrganizations` lists only the box's.
 Archiving the box from inside it
 (`workspaces archive`) cuts off the box's API access at once and stops the box
 about a minute later: put the box's own id last when archiving several, and
-unarchive from a signed-in client.
+unarchive from a signed-in client. Resizing the box's own workspace
+(`workspaces update --machine-size`) restarts it, which ends the agent that
+asked, usually before the answer comes back; resize it last, as with archive.
 
 **pdev signs in to its router with the box's credential.** On a laptop pdev
 gets a token from `superset auth mcp-headers`, which a box refuses because it
@@ -415,6 +450,16 @@ host-service in sandbox-mode PTY env), `SSH_CONNECTION` or `SSH_TTY`. It is
 deliberately not `shouldOpenBrowser()` from `lib/auth.ts`, whose extra TTY
 test is right for an interactive login prompt and wrong for an agent running
 the CLI with piped stdout.
+
+**A copy lands on the box's clipboard.** The same `DISPLAY` makes the box's
+X clipboard reachable, so a TUI that prefers the native clipboard writes there
+and reports success. Codex sends OSC 52 to the user's terminal only under SSH
+or tmux, so select-and-copy in a cloud terminal reached nobody (SUPER-3146).
+Claude Code sends OSC 52 either way, which hid it. A box terminal sets
+`SSH_CONNECTION` (`buildV2TerminalEnv`), so agents treat it as the remote
+session it is and copy through the desktop's xterm. A tool that checks only
+for a display, such as Neovim with `clipboard=unnamedplus`, still writes the
+box's clipboard.
 
 **A box has no agents until something lists them. Worked around, Open.**
 `agents.run` finds its agent in host-service's `host_agent_configs` table, and
@@ -596,6 +641,16 @@ wedged every exec — the reason goldens ran at 32 GB. The internal golden runs
 8 vCPU for the dev stack's RAM, forks inherit it, and image workspaces get
 the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
+
+**A resize does not reach a running session.** `sandbox.update({ resources })`
+changes the sandbox's configured size at once, but a running session keeps the
+vCPUs and memory it booted with; only the next session gets the new size. So
+`sandbox.vcpus` is the configured size, and what a running box has is
+`sandbox.currentSession().vcpus`. Checked on a probe box (2026-11-04): after a
+2 → 4 vCPU update the session still had `nproc` 2 and 4 GB; after stop and
+resume it had 4 and 8 GB, with its files kept and its processes gone. That is
+why `cloudWorkspace.setMachineSize` restarts a running box, and why
+`describeSandbox` reports the session's vCPUs.
 
 **A session ends; the sandbox does not.** A session stops at its timeout
 (`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on

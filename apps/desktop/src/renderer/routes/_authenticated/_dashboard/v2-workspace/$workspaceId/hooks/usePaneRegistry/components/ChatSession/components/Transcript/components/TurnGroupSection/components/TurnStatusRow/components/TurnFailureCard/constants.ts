@@ -6,6 +6,7 @@ export type FailureAction =
 	| "continue"
 	| "change_model"
 	| "sign_in"
+	| "agent_settings"
 	| "new_chat";
 
 export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
@@ -20,6 +21,7 @@ export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
 	refused: msg({ message: "The model declined to continue" }),
 	usage_limit: msg({ message: "Stopped by the usage limit" }),
 	session_lost: msg({ message: "The agent lost this conversation" }),
+	host_stopped: msg({ message: "Paused when Paradev closed" }),
 	unknown: msg({ message: "Task interrupted" }),
 };
 
@@ -37,5 +39,14 @@ export const FAILURE_ACTIONS: Record<
 	refused: ["continue", "change_model"],
 	usage_limit: [],
 	session_lost: ["new_chat"],
+	host_stopped: ["continue"],
 	unknown: ["continue", "change_model"],
 };
+
+export const MANUAL_SIGN_IN_TITLE = msg({
+	message: "The agent is signed out",
+});
+export const MANUAL_SIGN_IN_ACTIONS: readonly FailureAction[] = [
+	"continue",
+	"agent_settings",
+];

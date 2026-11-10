@@ -16,7 +16,6 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
@@ -43,6 +42,8 @@ export function useSubmitWorkspace(
 	promptContext: NewWorkspacePromptContextApi,
 	cloudEnvironmentId: string | null = null,
 	cloudMachineSize: MachineSize | null = null,
+	hostId: string | null = null,
+	isSession = false,
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -55,13 +56,10 @@ export function useSubmitWorkspace(
 	);
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
-	const { machineId } = useLocalHostService();
 	const activeOrganizationId = useActiveOrganizationId();
 	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
 	const utils = cloudTrpc.useUtils();
-
-	const isSession = draft.isSession;
 
 	// Submit is reachable from Cmd+Enter, the editor's Enter handler, and the
 	// create button, and it awaits uploads / environment lookup / prompt
@@ -73,7 +71,6 @@ export function useSubmitWorkspace(
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const submitWorkspaceInner = useCallback(async () => {
-		const hostId = draft.hostId ?? machineId;
 		const isCloud = hostId === CLOUD_HOST_ID;
 		// A cloud workspace clones the one cloud repo, so it has no use for a
 		// project — and the create surface hides the project picker when cloud
@@ -195,6 +192,7 @@ export function useSubmitWorkspace(
 								model: selectedModel ?? undefined,
 								effort: selectedEffort ?? undefined,
 								mode: selectedMode ?? undefined,
+								agentTerminalId: crypto.randomUUID(),
 							}
 						: {}),
 				});
@@ -409,7 +407,7 @@ export function useSubmitWorkspace(
 		linkedPR,
 		isSession,
 		matchRoute,
-		machineId,
+		hostId,
 		navigate,
 		projectId,
 		promptContext,

@@ -7,10 +7,24 @@ export interface BrowserPane {
 	url: string;
 	title: string;
 	isLoading: boolean;
+	/** False when hidden-pane eviction unloaded it; the next command rebuilds it. Absent from older desktop apps. */
+	loaded?: boolean;
 }
 
 export interface ConsoleEntry {
 	level: string;
 	message: string;
 	timestamp: number;
+}
+
+export interface BrowserExtension {
+	id: string;
+	name: string;
+	version: string;
+	pinned: boolean;
+}
+
+export interface BrowserExtensionInstall {
+	status: "installed" | "already-installed";
+	extension: Omit<BrowserExtension, "pinned">;
 }

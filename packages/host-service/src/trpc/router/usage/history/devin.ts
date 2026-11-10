@@ -28,17 +28,35 @@ export function collectDevinEntries(
 	let db: InstanceType<typeof Database> | null = null;
 	try {
 		db = new Database(dbPath, { readonly: true, fileMustExist: true });
+		// `chat_message` holds the full reply text and can total gigabytes, so
+		// only the usage fields leave SQLite, one row at a time.
 		const rows = db
 			.prepare(
-				`SELECT m.session_id, m.chat_message, m.created_at,
+				`SELECT m.session_id, m.created_at,
+				        json_object(
+				          'message_id', json_extract(m.chat_message, '$.message_id'),
+				          'role', 'assistant',
+				          'metadata', json_object(
+				            'request_id', json_extract(m.chat_message, '$.metadata.request_id'),
+				            'generation_model', json_extract(m.chat_message, '$.metadata.generation_model'),
+				            'created_at', json_extract(m.chat_message, '$.metadata.created_at'),
+				            'metrics', json(json_extract(m.chat_message, '$.metadata.metrics'))
+				          )
+				        ) AS chat_message,
 				        s.working_directory, s.model, s.title
 				 FROM message_nodes m
 				 LEFT JOIN sessions s ON s.id = m.session_id
 				 WHERE m.created_at >= ?
-				   AND json_extract(m.chat_message, '$.role') = 'assistant'`,
+				   AND CASE WHEN json_valid(m.chat_message)
+				         THEN json_extract(m.chat_message, '$.role') = 'assistant'
+				              AND json_type(m.chat_message, '$.metadata.metrics') = 'object'
+				       END`,
 			)
-			.all(Math.floor(cutoffMs / 1000)) as DevinMessageRow[];
-		devinRowsToEntries(rows, cutoffMs, out, sessionLabels);
+			.iterate(Math.floor(cutoffMs / 1000)) as Iterable<DevinMessageRow>;
+		// Added only once the read finishes: an error mid-stream adds nothing.
+		const entries: UsageLogEntry[] = [];
+		devinRowsToEntries(rows, cutoffMs, entries, sessionLabels);
+		for (const entry of entries) out.push(entry);
 		return 1;
 	} catch {
 		return 0;

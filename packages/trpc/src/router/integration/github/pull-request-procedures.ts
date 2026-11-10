@@ -1,7 +1,7 @@
 import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { githubRequestError } from "./github-request-error";
 import { asViewer } from "./viewer-octokit";
 
@@ -31,7 +31,7 @@ async function onGithub<T>(
  */
 export const pullRequestProcedures = {
 	/** Mergeability, checks, reviewers and the viewer's own capabilities; with `activity`, the conversation and commits too. */
-	getPullRequestDetail: protectedProcedure
+	getPullRequestDetail: personProcedure
 		.input(pullRequestInput.extend({ activity: z.boolean().optional() }))
 		.query(async ({ ctx, input }): Promise<PullRequestDetailRead> => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -40,7 +40,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	getPullRequestThreads: protectedProcedure
+	getPullRequestThreads: personProcedure
 		.input(pullRequestInput)
 		.query(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -53,7 +53,7 @@ export const pullRequestProcedures = {
 		}),
 
 	/** Additions and deletions alone, for a row in a list. */
-	getPullRequestDiffstat: protectedProcedure
+	getPullRequestDiffstat: personProcedure
 		.input(pullRequestInput)
 		.query(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -62,7 +62,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	addPullRequestComment: protectedProcedure
+	addPullRequestComment: personProcedure
 		.input(pullRequestInput.extend({ body }))
 		.mutation(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -71,7 +71,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	replyToPullRequestThread: protectedProcedure
+	replyToPullRequestThread: personProcedure
 		.input(
 			pullRequestInput.extend({ commentId: z.number().int().positive(), body }),
 		)
@@ -82,7 +82,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	setPullRequestThreadResolution: protectedProcedure
+	setPullRequestThreadResolution: personProcedure
 		.input(
 			pullRequestInput.extend({
 				threadId: z.string().min(1),
@@ -96,7 +96,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	mergePullRequest: protectedProcedure
+	mergePullRequest: personProcedure
 		.input(
 			pullRequestInput.extend({
 				mergeMethod: z.enum(["merge", "squash", "rebase"]).default("merge"),
@@ -113,7 +113,7 @@ export const pullRequestProcedures = {
 			);
 		}),
 
-	setPullRequestState: protectedProcedure
+	setPullRequestState: personProcedure
 		.input(pullRequestInput.extend({ state: z.enum(["open", "closed"]) }))
 		.mutation(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -124,7 +124,7 @@ export const pullRequestProcedures = {
 			return { ok: true as const };
 		}),
 
-	setPullRequestDraft: protectedProcedure
+	setPullRequestDraft: personProcedure
 		.input(pullRequestInput.extend({ draft: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -137,7 +137,7 @@ export const pullRequestProcedures = {
 			return { ok: true as const };
 		}),
 
-	updatePullRequestBranch: protectedProcedure
+	updatePullRequestBranch: personProcedure
 		.input(pullRequestInput)
 		.mutation(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);
@@ -147,7 +147,7 @@ export const pullRequestProcedures = {
 			return { ok: true as const };
 		}),
 
-	dequeuePullRequest: protectedProcedure
+	dequeuePullRequest: personProcedure
 		.input(pullRequestInput)
 		.mutation(async ({ ctx, input }) => {
 			const pr = await asViewer(ctx.session.user.id, input);

@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bot, LoaderCircle } from "lucide-react";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
+import { AgentIcon } from "renderer/components/AgentIcon";
 import type { PageWatcherRow } from "renderer/hooks/host-service/usePageWatchersForPage";
 import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -17,7 +18,6 @@ import {
 	type AgentTarget,
 	useAgentSessionTarget,
 } from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
-import { AgentIcon } from "renderer/routes/_authenticated/settings/agents/components/V2AgentsSettings/components/AgentIcon";
 import type { CreateNewAgentSession } from "../../../../../../../useAgentSessionLauncher";
 import { waitForPageAgent } from "../../utils/waitForPageAgent";
 

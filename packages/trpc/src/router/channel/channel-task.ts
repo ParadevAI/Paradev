@@ -13,7 +13,7 @@ import { pickEntityColor } from "@superset/shared/entity-colors";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure } from "../../trpc";
+import { actorProcedure, personProcedure } from "../../trpc";
 import {
 	assertTaskInOrganization,
 	taskColumns,
@@ -21,7 +21,11 @@ import {
 	toTaskChip,
 } from "../cloud-workspace/record";
 import { recordTaskActivity } from "../task/activity";
-import { assertCanPost, loadChannelAccess } from "./access";
+import {
+	assertCanPost,
+	loadChannelAccess,
+	loadChannelAccessFor,
+} from "./access";
 import { channelMemberIds } from "./members";
 import { publishToUsers } from "./publish";
 import {
@@ -99,7 +103,7 @@ async function ensureChannelProject(channel: {
 
 export const channelTaskRouter = {
 	/** The project whose tasks the channel shows; null when it has none. */
-	project: protectedProcedure
+	project: personProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -122,7 +126,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** The Linear project whose issues the channel shows; null when it has none. */
-	linearProject: protectedProcedure
+	linearProject: personProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -134,7 +138,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** Points the channel at a Linear project instead of one of ours, or at none. */
-	setLinearProject: protectedProcedure
+	setLinearProject: personProcedure
 		.input(channelLinearProjectSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -154,7 +158,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** Points the channel at a project of its organization, or at none. */
-	setProject: protectedProcedure
+	setProject: personProcedure
 		.input(channelProjectSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -187,7 +191,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** A channel showing the task's project, when the reader can see one. */
-	forTask: protectedProcedure
+	forTask: personProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -231,41 +235,33 @@ export const channelTaskRouter = {
 		}),
 
 	/** The tasks in the channel's project, newest added first. */
-	list: protectedProcedure
-		.input(channelIdSchema)
-		.query(async ({ ctx, input }) => {
-			const access = await loadChannelAccess(
-				ctx.session.user.id,
-				input.channelId,
-			);
-			const projectId = access.channel.taskProjectId;
-			if (!projectId) return [];
-			const rows = await db
-				.select({
-					...taskColumns,
-					assigneeId: tasks.assigneeId,
-					assigneeName: users.name,
-					assigneeImage: users.image,
-				})
-				.from(taskProjectTasks)
-				.innerJoin(tasks, eq(tasks.id, taskProjectTasks.taskId))
-				.leftJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
-				.leftJoin(users, eq(users.id, tasks.assigneeId))
-				.where(
-					and(
-						eq(taskProjectTasks.projectId, projectId),
-						isNull(tasks.deletedAt),
-					),
-				)
-				.orderBy(desc(taskProjectTasks.createdAt));
-			return rows.map((row) => ({
-				...toTaskChip(row),
-				assignee: toAssignee(row),
-			}));
-		}),
+	list: actorProcedure.input(channelIdSchema).query(async ({ ctx, input }) => {
+		const access = await loadChannelAccessFor(ctx.principal, input.channelId);
+		const projectId = access.channel.taskProjectId;
+		if (!projectId) return [];
+		const rows = await db
+			.select({
+				...taskColumns,
+				assigneeId: tasks.assigneeId,
+				assigneeName: users.name,
+				assigneeImage: users.image,
+			})
+			.from(taskProjectTasks)
+			.innerJoin(tasks, eq(tasks.id, taskProjectTasks.taskId))
+			.leftJoin(taskStatuses, eq(taskStatuses.id, tasks.statusId))
+			.leftJoin(users, eq(users.id, tasks.assigneeId))
+			.where(
+				and(eq(taskProjectTasks.projectId, projectId), isNull(tasks.deletedAt)),
+			)
+			.orderBy(desc(taskProjectTasks.createdAt));
+		return rows.map((row) => ({
+			...toTaskChip(row),
+			assignee: toAssignee(row),
+		}));
+	}),
 
 	/** Moves the task into the channel's project, making the project if needed. */
-	add: protectedProcedure
+	add: personProcedure
 		.input(channelTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -307,7 +303,7 @@ export const channelTaskRouter = {
 		}),
 
 	/** Takes the task out of the channel's project. */
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(channelTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(

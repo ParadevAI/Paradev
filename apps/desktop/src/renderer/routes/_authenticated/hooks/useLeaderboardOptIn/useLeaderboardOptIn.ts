@@ -76,11 +76,11 @@ export function useLeaderboardOptIn(period: LeaderboardPeriod = "all") {
 
 				if (published === null) {
 					toast.success(`Joined as ${handle}`);
-					toast.error("Couldn't publish your usage yet — it'll retry shortly");
+					toast.error("Couldn't publish your usage yet. It'll retry shortly");
 				} else {
 					toast.success(
 						published > 0
-							? `Joined as ${handle} — published ${published} ${published === 1 ? "day" : "days"}`
+							? `Joined as ${handle}. Published ${published} ${published === 1 ? "day" : "days"}`
 							: `Joined as ${handle}`,
 					);
 				}

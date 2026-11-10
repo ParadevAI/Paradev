@@ -21,7 +21,7 @@
 	],
 	"private": true,
 	"type": "module",
-	"license": "Apache-2.0",
+	"license": "MIT",
 	"exports": {
 		".": {
 			"types": "./src/index.ts",

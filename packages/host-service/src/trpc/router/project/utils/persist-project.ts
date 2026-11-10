@@ -2,7 +2,7 @@ import { basename } from "node:path";
 import { projects } from "../../../../db/schema";
 import {
 	emitProjectChanged,
-	getLocalProject,
+	getProjectIncludingDeleted,
 } from "../../../../projects/local-project-store";
 import type { HostServiceContext } from "../../../../types";
 import type { ResolvedRepo } from "./resolve-repo";
@@ -17,7 +17,7 @@ export function persistLocalProject(
 	resolved: ResolvedRepo,
 	identity?: ProjectIdentityFields,
 ): void {
-	const existing = getLocalProject(ctx.db, projectId);
+	const existing = getProjectIncludingDeleted(ctx.db, projectId);
 	const repoFields = {
 		repoPath: resolved.repoPath,
 		repoProvider: resolved.parsed ? ("github" as const) : null,
@@ -38,7 +38,7 @@ export function persistLocalProject(
 			set: { ...repoFields, ...identityFields },
 		})
 		.run();
-	const row = getLocalProject(ctx.db, projectId);
+	const row = getProjectIncludingDeleted(ctx.db, projectId);
 	if (row) {
 		emitProjectChanged(ctx.eventBus, existing ? "updated" : "created", row);
 	}

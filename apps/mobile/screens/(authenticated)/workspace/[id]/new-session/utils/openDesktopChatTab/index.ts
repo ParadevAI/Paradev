@@ -1,0 +1,1 @@
+export { openDesktopChatTab } from "./openDesktopChatTab";

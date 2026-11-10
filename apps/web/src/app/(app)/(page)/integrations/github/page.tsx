@@ -51,6 +51,12 @@ export default async function GitHubIntegrationPage() {
 					"This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again.",
 			}),
 		),
+		admin_required: i18n._(
+			msg({
+				message:
+					"Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it.",
+			}),
+		),
 		unauthorized: i18n._(
 			msg({
 				message: "You are not authorized to perform this action.",
@@ -104,10 +110,13 @@ export default async function GitHubIntegrationPage() {
 		redirect("/integrations?pro=github");
 	}
 
-	const installation = await trpc.integration.github.getInstallation.query({
+	const installations = await trpc.integration.github.listInstallations.query({
 		organizationId: organization.id,
 	});
-	const isConnected = !!installation;
+	const hasInstallations = installations.length > 0;
+	const isConnected = installations.some(
+		(installation) => !installation.suspended,
+	);
 
 	return (
 		<div className="space-y-8">
@@ -180,7 +189,7 @@ export default async function GitHubIntegrationPage() {
 						{i18n._(
 							msg({
 								message:
-									"Install the Paradev GitHub App to connect your repositories.",
+									"Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect.",
 							}),
 						)}
 					</CardDescription>
@@ -188,32 +197,12 @@ export default async function GitHubIntegrationPage() {
 				<CardContent>
 					<ConnectionControls
 						organizationId={organization.id}
-						isConnected={isConnected}
+						installations={installations}
 					/>
-					{installation && (
-						<div className="mt-4 text-sm text-muted-foreground">
-							{i18n._(
-								msg({
-									message: "Connected to",
-								}),
-							)}{" "}
-							<strong>{installation.accountLogin}</strong> (
-							{installation.accountType})
-							{installation.suspended && (
-								<Badge variant="destructive" className="ml-2">
-									{i18n._(
-										msg({
-											message: "Suspended",
-										}),
-									)}
-								</Badge>
-							)}
-						</div>
-					)}
 				</CardContent>
 			</Card>
 
-			{installation && (
+			{hasInstallations && (
 				<Card>
 					<CardHeader>
 						<CardTitle>
@@ -227,7 +216,7 @@ export default async function GitHubIntegrationPage() {
 							{i18n._(
 								msg({
 									message:
-										"Repositories accessible through the GitHub App installation.",
+										"Repositories accessible through your connected GitHub accounts.",
 								}),
 							)}
 						</CardDescription>

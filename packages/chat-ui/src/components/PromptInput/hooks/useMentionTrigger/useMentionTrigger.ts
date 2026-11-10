@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import type { ComposerMentionProvider } from "../../types";
 import { matchToken } from "../../utils/matchToken";
 
-const DEFAULT_TRIGGER = "@";
+export const DEFAULT_TRIGGER = "@";
 
 const triggerOf = (provider: ComposerMentionProvider) =>
 	provider.trigger ?? DEFAULT_TRIGGER;
@@ -38,5 +38,5 @@ export function useMentionTrigger(
 		() => providers.filter((provider) => triggerOf(provider) === active),
 		[providers, active],
 	);
-	return { matchTrigger, activeProviders };
+	return { matchTrigger, activeProviders, activeTrigger: active };
 }

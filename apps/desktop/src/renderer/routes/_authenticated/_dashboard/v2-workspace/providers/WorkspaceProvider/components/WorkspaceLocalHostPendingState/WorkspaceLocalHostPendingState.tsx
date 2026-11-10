@@ -28,7 +28,7 @@ export function WorkspaceLocalHostPendingState({ hostId }: { hostId: string }) {
 				}),
 				{
 					description: t({
-						message: `${error.message} — try the Paradev tray menu > Host Service > Restart.`,
+						message: `${error.message.replace(/[.\s]+$/, "")}. Try the Paradev tray menu > Host Service > Restart.`,
 					}),
 				},
 			);

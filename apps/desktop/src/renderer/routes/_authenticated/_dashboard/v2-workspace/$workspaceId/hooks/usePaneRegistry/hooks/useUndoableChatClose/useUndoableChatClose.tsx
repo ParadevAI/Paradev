@@ -6,10 +6,9 @@ import { useUndoStack } from "renderer/stores/undo-stack";
 import type { StoreApi } from "zustand/vanilla";
 import type { ChatPaneData, PaneViewerData } from "../../../../types";
 import {
+	ignoreChatTerminal,
 	isChatSessionClosed,
 	markChatSessionClosed,
-	markChatTerminalClosed,
-	reopenChatTerminal,
 } from "../../../../utils/closedChatSessions";
 import {
 	addPendingChatStop,
@@ -30,6 +29,7 @@ interface ClosedChat {
 	sessionId: string;
 	title: string;
 	reopen: () => void;
+	showAgain: () => void;
 }
 
 export function useUndoableChatClose({
@@ -47,7 +47,7 @@ export function useUndoableChatClose({
 		async (sessionId: string) => {
 			const reopen = markChatSessionClosed(sessionId);
 			try {
-				await wiring.transport.closeSession({ sessionId });
+				await wiring.transport.closeSession({ sessionId, userClosed: true });
 				return true;
 			} catch (error) {
 				console.warn("[acp-chat] could not stop the chat session", error);
@@ -101,13 +101,13 @@ export function useUndoableChatClose({
 	);
 
 	const [batches] = useState(() => {
-		const stopSession = (sessionId: string, terminalId?: string) => {
+		const stopSession = (sessionId: string, showAgain?: () => void) => {
 			if (!isChatSessionClosed(sessionId)) return;
 			void latest.current
 				.stopChat(sessionId)
 				.then((stopped) => {
 					if (!stopped) {
-						if (terminalId) reopenChatTerminal(terminalId);
+						showAgain?.();
 						toast.error(
 							latest.current.t({ message: "Couldn't stop the chat" }),
 						);
@@ -155,7 +155,7 @@ export function useUndoableChatClose({
 			},
 			stop: (chat) => {
 				const { terminalId } = chat.pane.data as ChatPaneData;
-				stopSession(chat.sessionId, terminalId);
+				stopSession(chat.sessionId, chat.showAgain);
 				useChatSubagentStore.getState().forget(terminalId);
 			},
 		});
@@ -174,14 +174,14 @@ export function useUndoableChatClose({
 		(pane) => {
 			const data = pane.data as ChatPaneData;
 			const { sessionId, terminalId } = data;
-			const reopenTerminal = markChatTerminalClosed(terminalId);
+			const reopenTerminal = ignoreChatTerminal(terminalId);
 			void stopStrayChats(terminalId, sessionId);
 			if (!sessionId || isChatSessionClosed(sessionId)) return;
 			const index = previousTabs.current.findIndex(
 				(tab) => tab.panes[pane.id] !== undefined,
 			);
 			const tab = previousTabs.current[index];
-			addPendingChatStop(workspaceId, sessionId);
+			addPendingChatStop(workspaceId, sessionId, terminalId);
 			const reopenSession = markChatSessionClosed(sessionId);
 			batches.closed.add({
 				pane,
@@ -193,6 +193,7 @@ export function useUndoableChatClose({
 					reopenSession();
 					reopenTerminal();
 				},
+				showAgain: reopenTerminal,
 			});
 		},
 		[batches, workspaceId, t, stopStrayChats],

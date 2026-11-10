@@ -452,7 +452,7 @@ export function Transcript({
 						{contentChildren}
 					</MessageScroller.Content>
 				</MessageScroller.Viewport>
-				<div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+				<div className="pointer-events-none absolute inset-x-0 bottom-9 flex justify-center">
 					<ScrollToBottomButton />
 				</div>
 			</ChatImageGalleryProvider>

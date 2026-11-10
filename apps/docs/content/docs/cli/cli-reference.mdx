@@ -3,10 +3,6 @@ title: Paradev CLI Reference
 description: Complete reference for Paradev command-line interface, including commands and flags.
 ---
 
-<Callout type="warn">
-The CLI is currently in Beta. Commands and flags are still evolving. Make sure you're on the latest version of the CLI if you run into issues.
-</Callout>
-
 ## Synopsis
 
 ```text
@@ -15,6 +11,10 @@ superset <command> [subcommand] [options]
 
 Run `superset --help` for the top-level command list, or
 `superset <command> --help` for any group.
+
+## Choosing a host
+
+Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. If the cloud check fails, they target this machine. Remote hosts go through the relay. `snapshot`, `panes`, `browser`, and `notifications` default to this machine. Each cloud workspace runs its own host, so commands about one host, such as `projects list` and `agents list`, take a machineId rather than `cloud`; `snapshot --host cloud` needs `--workspace`.
 
 ## Global options
 
@@ -55,8 +55,7 @@ lifecycle scripts. The legacy `presets` command name remains an alias.
 Add a terminal script to the desktop app on this machine. The desktop app must
 have been launched once so its local database exists, and the CLI must have an
 active organization so the script is imported into the correct v2 profile.
-When iterating on one script, pass `--upsert` so each revision replaces the
-last instead of piling up copies in the Scripts bar.
+Pass `--upsert` when iterating so each revision replaces the last.
 
 ```bash
 superset scripts add --name dev --command "bun run dev"
@@ -167,19 +166,18 @@ Authentication and session inspection.
 Authenticate via browser OAuth and store a session token at
 `~/.paradev/config.json`.
 
-Single-org accounts are selected automatically. With multiple orgs and a
-TTY, the CLI prompts; with multiple orgs and no TTY, you must pass
-`--organization` or the command exits 1 listing the available slugs.
+Single-org accounts are selected automatically. With multiple orgs, the CLI
+prompts on a TTY. Without a TTY, pass `--organization` or the command exits 1
+and lists the available slugs.
 
 ```bash
 superset auth login
 superset auth login --organization acme
 ```
 
-To sign in with an API key (useful for CI or any environment where the
-OAuth browser flow isn't an option), pass `--api-key`. The CLI validates
-the key, stores it at `~/.paradev/config.json`, and clears any prior
-OAuth session.
+To sign in with an API key (for CI or any place without a browser), pass
+`--api-key`. The CLI validates the key, stores it at `~/.paradev/config.json`,
+and clears any prior OAuth session.
 
 ```bash
 superset auth login --api-key sk_live_…
@@ -332,12 +330,12 @@ and the manifest is left in place.
 
 The terminal daemon keeps running after the host server stops, so the next
 `superset start` picks up the same terminals. With `--terminals`, the command
-stops the host server first, then the terminal daemon, the same way. It
-signals only the pid the daemon reports over its socket, never the pid in its
-manifest, which can be stale. If the socket is missing or refuses the
-connection, the manifest is removed without a signal. If the socket accepts
-the connection but the daemon does not answer, the command errors after it
-has stopped the host server, and leaves the daemon and its manifest in place.
+stops the host server first, then the terminal daemon. It signals only the pid
+the daemon reports over its socket, never the pid in its manifest, which can be
+stale. If the socket is missing or refuses the connection, the manifest is
+removed without a signal. If the socket accepts the connection but the daemon
+does not answer, the command errors after it stops the host server and leaves
+the daemon and its manifest in place.
 
 ```bash
 superset stop
@@ -426,8 +424,8 @@ Update the Paradev CLI and host server binary.
 	]}
 >
 Downloads the matching `superset-<platform>.tar.gz` from GitHub Releases
-and atomically replaces the install root. Only available in built
-binaries; running from `bun run dev` errors out.
+and replaces the install root. Only available in built binaries; it errors
+under `bun run dev`.
 
 ```bash
 superset update                     # upgrade to the latest release
@@ -568,15 +566,15 @@ another host.
   created: boolean;
 }`}
 >
-Create a fresh project on a host. Two modes:
+Create a project on a host. Two modes:
 
 - **Clone**: pass `--clone <url>` and `--parent-dir`. The host clones the
   repo into `<parent-dir>/<derived-name>/`.
 - **Import**: pass `--import <path>` to register a repo that already exists
   on disk.
 
-Either way, the project is registered on the host with no workspaces yet;
-create one with `superset ws create --project <id> --name local --checkout local --local` (the
+Either way, the project has no workspaces yet. Create one with
+`superset ws create --project <id> --name local --checkout local --local` (the
 repo's checkout as it is) or `--branch <name>` (its own worktree).
 
 `create` always creates a new cloud project, even if your org already has
@@ -608,13 +606,10 @@ superset projects create --name "my-app" --local --import ~/code/my-app
 }`}
 >
 Adopt an existing project onto a host without creating a duplicate cloud
-record. Counterpart to [`create`](#superset-projects-create) for the
-"new machine, repo already in the org" case.
-
-Find the project ID via [`projects list`](#superset-projects-list).
-
-Idempotent: re-running against a project that's already set up at the same
-path is a no-op.
+record. Use it instead of [`create`](#superset-projects-create) on a new
+machine when the repo is already in the org. Find the project ID with
+[`projects list`](#superset-projects-list) (add `--host <id>` for the host that already has the project). Re-running against a project already
+set up at the same path is a no-op.
 
 ```bash
 # Pick an ID from `superset projects list`, then clone it onto this machine
@@ -754,13 +749,11 @@ superset hosts wake my-sandbox
 
 Workspaces use a shared project checkout, a separate worktree and branch, or a project-less session folder on a host.
 
-**Routing:** when `--host` resolves to the local machine, the CLI calls
-the host server directly over loopback HTTP: no cloud roundtrip, works
-offline. Otherwise it routes through the cloud API and the relay.
-
-If the resolved host is the local machine but the host server isn't
-responding, the CLI errors out and points you at `superset start` rather
-than silently falling through to the cloud.
+**Routing:** when `--host` resolves to the local machine, the CLI calls the
+host server directly over loopback HTTP, with no cloud roundtrip, and works
+offline. Otherwise it routes through the cloud API and the relay. If the host
+is the local machine but the host server does not respond, the CLI errors and
+points you at `superset start`.
 
 <Command
 	name="superset workspaces list"
@@ -787,10 +780,9 @@ than silently falling through to the cloud.
 	humanColumns={["NAME", "BRANCH", "PROJECT", "GROUP", "ID"]}
 	quiet="workspace IDs"
 >
-List workspaces: by default the cloud if your account has cloud workspaces, else this machine's. Pass `--local` or `--host <id>` for a
-host. Host workspaces are host-owned; there is no org-wide listing of them (the
-desktop app is the cross-host view). `projectName` falls back to the raw
-project id when the host doesn't know the project's name. `group` shows the
+List workspaces. Host workspaces are host-owned; there is no org-wide listing
+(the desktop app is the cross-host view). `projectName` falls back to the raw
+project id when the host does not know the project's name. `group` shows the
 name the desktop shows for each of the workspace's groups; see
 [Sidebar groups](#sidebar-groups).
 </Command>
@@ -816,7 +808,7 @@ name the desktop shows for each of the workspace's groups; see
 		{ flag: "--model <id>", description: "Model for the spawned agent. Supported values depend on the agent; omit to use its default." },
 		{ flag: "--effort <level>", description: "Reasoning effort for the spawned agent. Omit to use the agent default." },
 		{ flag: "--command <cmd>", description: "Shell command to run in the new workspace after creation." },
-		{ flag: "--attachment <path>", description: "Local file to upload for the spawned agent. Repeatable." },
+		{ flag: "--attachment <path>", description: "Local file to upload for the spawned agent. Repeatable. Up to 25 MB a file on a host, 200 MB in the cloud." },
 		{ flag: "--group <name>", description: "Sidebar group to put the workspace in, by the name the desktop shows (case-insensitive). Makes a new group when none has that name. Mutually exclusive with --tag." },
 		{ flag: "--tag <tag>", description: "Workspace tag. Repeatable. Each tag is a sidebar group; prefer --group to pick a group by name." },
 	]}
@@ -829,10 +821,9 @@ runs a one-off shell command in the workspace directory and is independent of
 `--agent`/`--prompt`. Pass either or both. `--model` and `--effort` require
 `--agent`; see the [agent effort levels](#agent-effort-levels) below.
 
-`--checkout local` shares the project's existing files, git index and checked-out branch.
+`--checkout local` shares the project's existing files, git index, and checked-out branch.
 It does not switch branches or run setup. Do not combine it with `--branch`, `--pr`,
-`--base-branch`, or `--skip-branch-prefix`. Local creation requires a host that
-supports local workspaces; older hosts reject it without creating a worktree.
+`--base-branch`, or `--skip-branch-prefix`. Older hosts reject it without creating a worktree.
 `--local` selects this machine and is independent of `--checkout local`.
 
 Pass `--session` explicitly to create a **session**: a project-less workspace backed
@@ -847,8 +838,9 @@ Without `--host` or `--local`, the command creates a [cloud workspace](/cloud-wo
 if your account has cloud workspaces. A cloud workspace takes no project: it starts from an
 environment, and Paradev creates a new working branch from `--branch`. `--project`,
 `--session`, `--checkout`, `--pr`, `--task`, `--base-branch`, `--skip-branch-prefix`,
-`--tag`, `--attachment`, and `--command` are rejected for a cloud workspace. The command
-returns while the workspace is still provisioning.
+`--tag`, and `--command` are rejected for a cloud workspace. `--attachment` needs `--agent`:
+the files go to the agent through Paradev's storage, up to 200 MB each and 10 at a time.
+The command returns while the workspace is still provisioning.
 
 ```bash
 superset workspaces create \
@@ -1006,7 +998,7 @@ superset workspaces share remove ws_a --user ann@example.com
 		{ name: "id", description: "Workspace ID. Defaults to `$SUPERSET_WORKSPACE_ID` when run inside a workspace." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--field <name>", description: "Print a single field's raw value (e.g. name, branch, group, worktreePath). Alias: -f." },
 	]}
 	output={`{
@@ -1043,7 +1035,7 @@ superset workspaces get --field branch   # inside a workspace
 		{ name: "id", required: true, description: "Workspace UUID." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--name <name>", description: "New workspace name." },
 		{ flag: "--task-id <id>", description: "Link the workspace to a task by id." },
 		{ flag: "--clear-task", description: "Unlink the workspace from its current task. Mutually exclusive with --task-id." },
@@ -1053,6 +1045,7 @@ superset workspaces get --field branch   # inside a workspace
 		{ flag: "--visibility <just_me|org>", description: "Who sees a cloud workspace. Only its creator can change it." },
 		{ flag: "--add-label <name>", description: "Add a label to a cloud workspace, creating it when new. Repeatable." },
 		{ flag: "--remove-label <name>", description: "Remove a label from a cloud workspace. Repeatable." },
+		{ flag: "--machine-size <size>", description: "Resize a cloud workspace: `small`, `medium`, `large`, or `xlarge` and `2xlarge` where your plan includes them. A running sandbox restarts at the new size." },
 	]}
 	output="Workspace"
 >
@@ -1064,12 +1057,18 @@ On a cloud workspace every field is saved by the API, so it works while the
 sandbox is asleep. There, `--task-id` also takes a task slug and adds a link
 (a cloud workspace can link several tasks), and `--clear-task` removes them all.
 
+`--machine-size` is the one field that reaches the sandbox. A running sandbox
+restarts at the new size: files and uncommitted changes stay, but every
+terminal and agent on it ends, and agents resume when you open the workspace.
+A sleeping sandbox starts at the new size the next time it wakes.
+
 ```bash
 superset workspaces update ws_… --name "better-name"
 superset workspaces update ws_… --task-id tsk_…
 superset workspaces update ws_… --group Review
 superset workspaces update ws_… --clear-task
 superset workspaces update ws_… --add-label bug --visibility org
+superset workspaces update ws_… --machine-size xlarge
 ```
 </Command>
 
@@ -1097,7 +1096,7 @@ group names are kept on the host.
 		{ name: "id", required: true, description: "Workspace ID." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--print", description: "Print the deep link instead of opening the desktop app." },
 	]}
 	output={`{
@@ -1124,13 +1123,12 @@ superset workspaces open ws_… --print
 #### Opening a specific session
 
 `workspaces open` targets a workspace, not a session. Terminal sessions started
-with [`agents create`](#superset-agents-create) are automatically adopted into
-panes while their workspace is open. Opening the workspace later also creates
-panes for running terminal sessions that aren't already attached, without
-stealing focus from the active tab. `workspaces open` can't focus a specific
-session, so use a session deep link when focus matters. The same deep link
-creates or focuses the pane for a Paradev chat session. Choose the query param
-from the session `kind` returned by `agents create`:
+with [`agents create`](#superset-agents-create) get panes automatically while
+their workspace is open. Opening the workspace later also creates panes for
+running terminal sessions that are not attached yet, without moving focus. To
+focus a specific session, use a session deep link. The same deep link creates
+or focuses the pane for a Paradev chat session. Choose the query param from the
+session `kind` returned by `agents create`:
 
 | `kind` | Example agents | Query param |
 | --- | --- | --- |
@@ -1157,6 +1155,61 @@ Linux/Windows substitute your platform's URL opener (`xdg-open`, `start`) for
 `open`.
 
 ---
+
+### worktrees
+
+Git worktrees that already exist on a host, and the workspaces that track them. This is the
+CLI form of **Import untracked worktrees** in the desktop app. Both commands target this
+machine unless `--host` names another.
+
+<Command
+	name="superset worktrees list"
+	options={[
+		{ flag: "--project <projectId>", description: "Project ID. Required." },
+		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
+		{ flag: "--local", description: "This machine (the default)." },
+	]}
+	output={`{ branch: string; path: string; isMain: boolean; hasWorkspace: boolean; workspaceId: string | null }[]`}
+>
+List the project's git worktrees that have a branch checked out. `isMain` marks the
+project's own checkout. `workspaceId` is the workspace that tracks the worktree, or
+`null` when none does yet. Older hosts report only `hasWorkspace`, so
+`workspaceId` is `null` there even for a tracked worktree.
+
+```bash
+superset worktrees list --project prj_…
+```
+</Command>
+
+<Command
+	name="superset worktrees open"
+	options={[
+		{ flag: "--project <projectId>", description: "Project ID. Required." },
+		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path`, `--branch` or `--all`. Must be absolute on another host." },
+		{ flag: "--branch <name>", description: "Branch checked out in the worktree." },
+		{ flag: "--all", description: "Every worktree that is not the main checkout and has no workspace." },
+		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
+		{ flag: "--local", description: "This machine (the default)." },
+		{ flag: "--run-setup", description: "Run the project's setup script in a newly opened workspace. Off by default." },
+	]}
+	output={`{ workspace: Workspace; worktree: { branch: string; path: string }; alreadyExists: boolean; url: string; webUrl: string }`}
+>
+Open one existing worktree as a workspace. The worktree keeps its folder, branch, and
+files. If a workspace already tracks it, the command returns that workspace with
+`alreadyExists: true` and changes nothing, so it is safe to re-run. The project's main
+checkout is not a worktree; use `superset workspaces create --checkout local` for it.
+
+To open every untracked worktree, for example after a machine registers as a new host,
+pass `--all` (run `superset projects setup` for the project there first). It returns
+`{ opened, alreadyExisted, failed }`. If a worktree fails, the others still open, and the
+command exits non-zero with the same object as its `--json` output. `superset worktrees
+list` shows what `--all` will open: the rows with `isMain: false` and `hasWorkspace: false`.
+
+```bash
+superset worktrees open --project prj_… --branch fix/login-bug
+superset worktrees open --project prj_… --all
+```
+</Command>
 
 ### environments
 
@@ -1310,10 +1363,9 @@ waits until you approve it in the browser.
 
 ### agents
 
-Agents are terminal-agent rows configured on a host (the same rows shown in
-Settings → Agents on that machine). Each row stores a `command`, `args`,
-prompt-transport mode, and environment used to launch the agent in a fresh
-terminal session inside a workspace.
+Agents are terminal-agent rows configured on a host (the rows in Settings →
+Agents on that machine). Each row stores the `command`, `args`, prompt-transport
+mode, and environment used to launch the agent in a fresh terminal session.
 
 <Command
 	name="superset agents list"
@@ -1348,7 +1400,7 @@ superset agents list --host host_…
 	name="superset agents create"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID to create the agent session in." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--agent <preset|uuid|superset>", required: true, description: "Agent preset id (e.g. `claude`, `codex`), HostAgentConfig instance UUID, or `superset`." },
 		{ flag: "--prompt <text>", description: "Prompt sent to the agent. Required unless `--resume-session`, `--fork-session`, or `--from-terminal` is set. Not allowed with `--from-terminal`." },
@@ -1359,7 +1411,7 @@ superset agents list --host host_…
 		{ flag: "--model <id>", description: "Model for this launch. Supported values depend on the agent; omit to use its default." },
 		{ flag: "--effort <level>", description: "Reasoning effort for this launch. Omit to use the agent default." },
 		{ flag: "--attachment-id <uuid>", description: "Pre-uploaded attachment UUID; pass repeatedly for multiple attachments." },
-		{ flag: "--attachment <path>", description: "Local file path to upload as an attachment. Repeatable." },
+		{ flag: "--attachment <path>", description: "Local file path to upload as an attachment. Repeatable. Up to 25 MB a file for a workspace on a host, 200 MB for a cloud workspace." },
 	]}
 	output={`{
   kind: "terminal" | "chat";
@@ -1367,9 +1419,8 @@ superset agents list --host host_…
   label: string;
 }`}
 >
-Create an agent session in an existing workspace on its host (default: this
-machine): starts the named preset (or HostAgentConfig instance) in a fresh
-terminal session there.
+Create an agent session in an existing workspace: starts the named preset (or
+HostAgentConfig instance) in a fresh terminal session on its host.
 
 ```bash
 superset agents create --workspace ws_… --agent claude --model sonnet --effort high --prompt "Audit the login flow"
@@ -1399,9 +1450,7 @@ for which agents can fork and what a handoff sends.
 	]}
 >
 Read the agent's saved transcript, beyond the visible screen returned by
-`terminals read`. Without `--host` or `--local`, the target defaults to cloud
-when your account has cloud workspaces, otherwise this machine. The command
-fails if Paradev cannot read a transcript for that terminal.
+`terminals read`. Fails if Paradev cannot read a transcript for that terminal.
 
 ```bash
 superset agents read --local --workspace <workspace-id> --terminal <terminal-id>
@@ -1419,7 +1468,7 @@ The transcript object in JSON mode, or its text in human-readable mode.
 		{ flag: "--terminal <id>", required: true, description: "Terminal the agent runs in (the sessionId from agents create)." },
 		{ flag: "--until <state>", description: "settled (default: finished its turn or needs input), idle, blocked, or working." },
 		{ flag: "--timeout <seconds>", description: "Give up after this long. Default 600." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
@@ -1450,7 +1499,7 @@ superset agents wait --workspace ws_… --terminal "$T"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal the agent runs in." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
@@ -1483,8 +1532,8 @@ The last hook arrived 1 second ago; the session started 2 seconds ago.
 
 #### Agent models
 
-Model is an explicit override for one launch. If you omit `--model`, Paradev
-passes no model flag and the agent uses its own configured default. Ids match
+Model is an override for one launch. Without `--model`, Paradev passes no
+model flag and the agent uses its own default. Ids match
 the desktop model picker: Claude takes a family alias (`fable`, `opus`,
 `sonnet`, `haiku`) that tracks the newest release, or a pinned id such as
 `claude-opus-5-5` or `claude-sonnet-5-5`. Codex includes `gpt-6-astra`, `gpt-6-sol`, and `gpt-6-luna`. The host rejects an unknown id before launching the agent,
@@ -1493,9 +1542,9 @@ picker, including Paradev chat, reject an explicit model override.
 
 #### Agent effort levels
 
-Effort is an explicit override for one launch. If you omit `--effort`,
-Paradev passes no effort flag and the agent uses its own configured default.
-The host rejects unsupported values before launching the agent.
+Effort is an override for one launch. Without `--effort`, Paradev passes no
+effort flag and the agent uses its own default. The host rejects unsupported
+values before launching the agent.
 
 | Agent | Supported levels |
 | --- | --- |
@@ -1523,7 +1572,7 @@ a one-off command in a worktree or to open an interactive shell.
 	name="superset terminals create"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID to create the terminal in." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--command <cmd>", description: "Shell command to run in the terminal. Omit to open an interactive shell." },
 		{ flag: "--cwd <path>", description: "Working directory for the terminal. Defaults to the worktree." },
@@ -1533,8 +1582,7 @@ a one-off command in a worktree or to open an interactive shell.
   status: string;
 }`}
 >
-Create a terminal session in an existing workspace on its host (default: this
-machine): opens a fresh PTY in the worktree, optionally running a command.
+Open a fresh PTY in the workspace's worktree, optionally running a command.
 
 ```bash
 superset terminals create --workspace ws_… --command "bun install && bun test"
@@ -1546,7 +1594,7 @@ superset terminals create --workspace ws_…
 	name="superset terminals list"
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 	output={`{
@@ -1562,7 +1610,7 @@ PTY exists, not that an agent inside it is working or idle.
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--max-lines <n>", description: "Limit how many trailing lines to return." },
 	]}
@@ -1591,7 +1639,7 @@ superset terminals read --workspace ws_… --terminal term_… --max-lines 240
 		{ flag: "--wait", description: "Block until the agent in the terminal reaches --until. A text send must cause a new hook event, and fails after 10s with none (a prompt left in the input box). After an interrupt key (esc, ctrl+c) it waits for the resulting state. Errors when no agent runs in the terminal." },
 		{ flag: "--until <state>", description: "With --wait: settled (default), idle, blocked, or working." },
 		{ flag: "--timeout <seconds>", description: "With --wait: give up after this long. Default 600." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
@@ -1613,7 +1661,7 @@ superset terminals send --workspace ws_… --terminal term_… --keys esc
 		{ flag: "--match <regex>", required: true, description: "Regular expression to look for on the screen. Text already on screen counts." },
 		{ flag: "--max-lines <n>", description: "Only search this many rows from the bottom." },
 		{ flag: "--timeout <seconds>", description: "Give up after this long. Default 600." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
@@ -1642,7 +1690,7 @@ superset terminals wait --workspace ws_… --terminal term_… --match "listenin
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine). Remote hosts go through the relay." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 		{ flag: "--ssh <user@machine>", description: "Instead of --host or --local (it cannot be combined with them): run superset terminals attach --local on that machine over ssh -t. Needs superset installed and signed in there." },
 	]}
@@ -1661,7 +1709,7 @@ superset terminals attach --ssh me@build-box --workspace ws_… --terminal term_
 	options={[
 		{ flag: "--workspace <id>", required: true, description: "Workspace UUID." },
 		{ flag: "--terminal <id>", required: true, description: "Terminal session ID." },
-		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)." },
+		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
 		{ flag: "--local", description: "The workspace is on this machine." },
 	]}
 >
@@ -1675,7 +1723,7 @@ Close (dispose) a terminal running in a workspace. This ends the session.
 <Command
 	name="superset snapshot"
 	options={[
-		{ flag: "--host <id>", description: "Host to read (default: this machine)." },
+		{ flag: "--host <id>", description: "Host to read (default: this machine), or `cloud` with `--workspace` for that cloud workspace's own host." },
 		{ flag: "--workspace <id>", description: "Only this workspace." },
 	]}
 >
@@ -1843,10 +1891,10 @@ superset notifications show "Tests pass" --body "12 passed" --sound
 
 Drive a workspace's [in-app browser](/browser) panes: open and navigate URLs,
 screenshot, read console, evaluate JavaScript, and get a raw Chrome DevTools
-Protocol endpoint for click/type/scroll automation. Every operation runs in the
-pane the user sees, against the browser's real session. Browser panes live in
-the desktop app, so a standalone host with no desktop attached has no panes and
-these commands error. A `paneId` is scoped to its workspace; pass the same
+Protocol endpoint for click, type, and scroll automation. Every operation runs
+in the pane the user sees, against the browser's real session. Browser panes
+live in the desktop app, so these commands error on a standalone host with no
+desktop attached. A `paneId` is scoped to its workspace; pass the same
 `--workspace` it was opened under. See the [`browser` skill](/skills) for the
 agent-facing protocol.
 
@@ -1955,6 +2003,54 @@ Read the pane's captured console output.
 Print a raw Chrome DevTools Protocol WebSocket endpoint for the pane, for
 browser-use / Playwright-class tools (mouse, keyboard, scroll, DOM, network).
 The URL embeds an auth token; treat it as a secret.
+</Command>
+
+<Command
+	name="superset browser extensions list"
+	options={[
+		{ flag: "--host <id>", description: "Host to ask (default: this machine)." },
+	]}
+	output={`Array<{ id; name; version; pinned }>`}
+>
+List the Chrome extensions installed in your browser panes. Only extensions
+installed from the Chrome Web Store appear.
+</Command>
+
+<Command
+	name="superset browser extensions install"
+	options={[
+		{ flag: "<extension>", required: true, description: "Extension ID or Chrome Web Store URL." },
+		{ flag: "--host <id>", description: "Host to install on (default: this machine)." },
+	]}
+>
+Install a Chrome Web Store extension in your browser panes. The app shows the
+extension's permission warnings and asks you first; a refusal fails the command,
+so an agent can't install an extension on its own.
+
+```bash
+superset browser extensions install <extension-id>
+```
+</Command>
+
+<Command
+	name="superset browser extensions remove"
+	options={[
+		{ flag: "<extension>", required: true, description: "Extension ID (from `browser extensions list`)." },
+		{ flag: "--host <id>", description: "Host to remove it from (default: this machine)." },
+	]}
+>
+Remove an extension and its data. The app asks you first.
+</Command>
+
+<Command
+	name="superset browser extensions pin"
+	options={[
+		{ flag: "<extension>", required: true, description: "Extension ID (from `browser extensions list`)." },
+		{ flag: "--host <id>", description: "Host the extension is on (default: this machine)." },
+	]}
+>
+Pin an extension to the browser pane toolbar. `superset browser extensions unpin`
+takes the same arguments and unpins it. Neither asks for confirmation.
 </Command>
 
 ---
@@ -2455,7 +2551,7 @@ Use [`automations logs`](#superset-automations-logs-id) for run history.
 		{ flag: "--host <hostId>", description: "Host the automation dispatches to, or `cloud` for `--cloud` (default: this machine)." },
 		{ flag: "--cloud", description: "Run in the cloud: each run starts a cloud workspace from `--environment`, or reuses the one `--workspace` names." },
 		{ flag: "--agent <agent>", description: "Host agent presetId, instance UUID, or 'superset' for built-in chat. Default: claude." },
-		{ flag: "--continue-session", description: "Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace." },
+		{ flag: "--continue-session", description: "Deliver each run's prompt into the agent session the previous run left, instead of starting another. Without --workspace, the first run's workspace is kept for the next runs." },
 		{ flag: "--tag <tag>", description: "Workspace tag applied to each run's created workspace. Repeatable. Default: automation." },
 		{ flag: "--group <name>", description: "Group the automation is listed under in the automations table. Default: none." },
 	]}
@@ -2520,7 +2616,7 @@ superset automations trigger-options --group slack
 		{ flag: "--workspace <workspaceId>", description: "New v2 workspace ID." },
 		{ flag: "--session", description: "Switch to session mode: clears the project and any workspace pin; each run creates a project-less session workspace. Mutually exclusive with --project/--workspace." },
 		{ flag: "--agent <agent>", description: "New host agent presetId, instance UUID, or 'superset'." },
-		{ flag: "--continue-session / --no-continue-session", description: "Continue the agent session the previous run left, or start a new one each run. Requires a pinned workspace." },
+		{ flag: "--continue-session / --no-continue-session", description: "Continue the agent session the previous run left, or start a new one each run. With no pinned workspace, the next run's workspace is kept for the runs after it." },
 		{ flag: "--mcp-scope <a,b,c>", description: "Comma-separated MCP scope strings." },
 		{ flag: "--tag <tag>", description: "Replace the tag set applied to each run's created workspace. Repeatable." },
 		{ flag: "--clear-tags", description: "Remove every tag (runs stop grouping). Mutually exclusive with --tag." },
@@ -2580,15 +2676,48 @@ cat ./prompt.md | superset automations prompt set aut_… --from-file -
 </Command>
 
 <Command
+	name="superset automations archive <id>"
+	args={[
+		{ name: "id", required: true, description: "Automation ID." },
+	]}
+	output={`{ ok: true }`}
+>
+Archive an automation. It stops firing and leaves `automations list`; its run
+history stays.
+
+```bash
+superset automations archive aut_…
+```
+</Command>
+
+<Command
+	name="superset automations unarchive <id>"
+	args={[
+		{ name: "id", required: true, description: "Automation ID." },
+	]}
+	output={`{ ok: true }`}
+>
+Restore an archived automation. It comes back paused; run `automations resume`
+to start it. `restore` is an alias.
+
+```bash
+superset automations list --archived
+superset automations unarchive aut_…
+```
+</Command>
+
+<Command
 	name="superset automations delete <id>"
 	args={[
 		{ name: "id", required: true, description: "Automation ID." },
 	]}
 	output={`{ ok: true }`}
 >
-Delete an automation.
+Permanently delete an archived automation and its run history. This can't be
+undone. Archive the automation first; an active automation is refused.
 
 ```bash
+superset automations archive aut_…
 superset automations delete aut_…
 ```
 </Command>
@@ -2667,13 +2796,12 @@ behavior, git, notifications, terminal, terminal/editor appearance, and the
 app theme. These commands work offline and don't require login.
 
 After every write the CLI nudges the running desktop app, which refreshes
-immediately, themes included, no restart (the command output confirms
-with "refreshed immediately" / "applied to the running desktop app").
-Without a running app (or on older app versions) settings apply on next
-window focus and theme changes on next launch. Git settings
-(`branchPrefixMode`, `branchPrefixCustom`, `worktreeBaseDir`) are
-host-wide and written through the local host service, so the desktop app
-or `superset start` must be running for those.
+at once, themes included, with no restart (the output says "refreshed
+immediately" or "applied to the running desktop app"). Without a running app
+(or on older app versions), settings apply on next window focus and theme
+changes on next launch. Git settings (`branchPrefixMode`, `branchPrefixCustom`,
+`worktreeBaseDir`) are host-wide and written through the local host service, so
+the desktop app or `superset start` must be running for those.
 
 <Command
 	name="superset settings list"
@@ -2865,7 +2993,7 @@ superset settings theme set system --system-light light --system-dark monokai
 ### completion
 
 Shell completion for bash and zsh, generated from the installed version's
-command tree, so it never drifts from what the binary accepts.
+command tree.
 
 <Command
 	name="superset completion <shell>"
@@ -2873,12 +3001,11 @@ command tree, so it never drifts from what the binary accepts.
 		{ name: "shell", required: true, description: "`bash` or `zsh`." },
 	]}
 >
-Prints the script to stdout, byte for byte, in every output mode: `--json`,
-`--quiet` and agent environments do not wrap it. The script completes command
-names at every level and walks through an alias already typed
-(`superset ws cr<Tab>`), each command's flags and their aliases, enum values
-for flags (`--priority=u<Tab>` included) and arguments, and the global
-options.
+Prints the script to stdout unchanged in every output mode: `--json`,
+`--quiet`, and agent environments do not wrap it. The script completes command
+names at every level (including after an alias, as in `superset ws cr<Tab>`),
+each command's flags and their aliases, enum values for flags
+(`--priority=u<Tab>`) and arguments, and the global options.
 
 ```bash
 # This shell session
@@ -2894,11 +3021,10 @@ superset completion zsh > ~/.zfunc/_superset   # with fpath=(~/.zfunc $fpath) be
 ### schema
 
 <Command name="superset schema">
-Prints every command, option and argument as JSON, for tooling that must not
+Prints every command, option, and argument as JSON, for tooling that must not
 parse `--help`. Commands hidden from this run (internal-only, or unavailable
 in a cloud workspace) are left out, as they are from `--help`. Commands and
-options are sorted and absent fields are omitted, so the output of two
-versions diffs cleanly.
+options are sorted and absent fields are omitted, so two versions diff cleanly.
 
 ```bash
 superset schema | jq '.commands[] | select(.path == ["terminals"]) | .commands[].path'

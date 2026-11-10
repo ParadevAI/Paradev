@@ -3,19 +3,12 @@ title: Getting Started
 description: Install the Paradev CLI, sign in, and run your first commands.
 ---
 
-<Callout type="warn">
-The CLI is currently in Beta. Commands and flags are still evolving. Make sure you're on the latest version of the CLI if you run into issues.
-</Callout>
-
-The Paradev CLI (`superset`) is a single static binary that drives the same
+The Paradev CLI (`superset`) is a single static binary that uses the same
 backend as the desktop app. Use it to manage workspaces, tasks, automations,
-and the local host server from your terminal or from CI. Scripts and other
-agents can also use it to dispatch coding-agent tasks. One command creates a
-workspace on its own branch and starts Claude Code, Codex, or another agent
-with a prompt. The result waits in the app for review. See
-[Dispatch agent tasks](#dispatch-agent-tasks-from-a-script-or-another-agent).
-`paradev` is an alias for `superset`: every install below puts both on `PATH`,
-and either name runs the same binary.
+and the local host server from a terminal or CI. Scripts and other agents can
+also [dispatch agent tasks](#dispatch-agent-tasks-from-a-script-or-another-agent)
+with it. `paradev` is an alias for `superset`: every install below puts both on
+`PATH`.
 
 <YouTubeVideo id="8g-l5kYEGBc" title="Paradev CLI + Skills Demo" thumbnail="/images/cli-skills-demo.jpg" />
 
@@ -60,23 +53,22 @@ The CLI starts a loopback callback server on `127.0.0.1:51789` (or `51790`
 through `51793` if earlier ports are busy), opens your browser to the
 consent page, and stores a session token at `~/.paradev/config.json`.
 
-If you belong to multiple organizations, you'll be prompted to pick one. To
-skip the prompt and pick directly:
+If you belong to multiple organizations, the CLI asks you to pick one. To
+skip the prompt:
 
 ```bash
 superset auth login --organization acme
 ```
 
-For CI or other non-interactive environments (where there's no browser to
-complete the OAuth flow), use an API key instead. You can either store it
-once with `auth login --api-key`:
+In CI or other non-interactive environments with no browser, use an API
+key. Store it once with `auth login --api-key`:
 
 ```bash
 superset auth login --api-key sk_live_…
 superset auth whoami
 ```
 
-…or set `SUPERSET_API_KEY` per-invocation without writing anything to disk:
+Or set `SUPERSET_API_KEY` without writing anything to disk:
 
 ```bash
 export SUPERSET_API_KEY=sk_live_…
@@ -99,12 +91,11 @@ Auth: Session (expires in 32 min)
 
 ## Explore interactively
 
-Bare `superset` in a terminal opens an interactive command browser:
-arrow-key through the commands, read their flags, and fill in required
-inputs with guided prompts. The confirmation screen shows the exact
-command before running it. `superset --help` prints the same catalog as
-static, grouped help. Agents and CI always get static help; the browser
-never opens there.
+Bare `superset` in a terminal opens an interactive command browser. Use
+the arrow keys to browse commands and flags, and fill in required inputs
+with guided prompts. A confirmation screen shows the exact command before
+it runs. `superset --help` prints the same catalog as static help. Agents
+and CI always get static help.
 
 ![The interactive command browser](/images/cli-command-browser.png)
 
@@ -205,8 +196,7 @@ superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local
 ```
 
 Each dispatched task opens in the desktop and iPhone apps like any other
-workspace, with its diff ready to review. When an agent or CI runs the CLI,
-the output is JSON by default.
+workspace, with its diff ready to review.
 
 Another agent can do the same through the [Paradev MCP server](/mcp-server).
 An automation with a webhook trigger starts a run when any service sends a
@@ -224,8 +214,8 @@ superset automations logs AUTOMATION_ID
 
 ## Output modes
 
-Every command prints a TTY-friendly view by default. Two flags switch the
-shape of the output for scripting:
+Commands print a terminal-friendly view by default. Two flags change the
+output for scripts:
 
 | Flag | Output |
 | --- | --- |
@@ -246,9 +236,9 @@ output unless you pass `--quiet`.
 
 Commands that touch a host accept `--host HOST_ID` to pick which host
 handles the request, or `--local` for this machine. `superset hosts list`
-gives each `HOST_ID`. Local-targeted calls go
-straight to the host server over loopback (offline-friendly); remote
-calls route through the cloud API and the relay.
+gives each `HOST_ID`. Local calls go straight to the host server over
+loopback and work offline. Remote calls route through the cloud API and the
+relay.
 
 ```bash
 superset hosts list
@@ -274,7 +264,4 @@ listing; the desktop app is the cross-host view.
 
 `SUPERSET_HOME_DIR` relocates the whole tree, matching the desktop app.
 
-## Next steps
-
-Continue to the [CLI reference](/cli/cli-reference) for every command,
-flag, and output shape.
+See the [CLI reference](/cli/cli-reference) for every command, flag, and output shape.

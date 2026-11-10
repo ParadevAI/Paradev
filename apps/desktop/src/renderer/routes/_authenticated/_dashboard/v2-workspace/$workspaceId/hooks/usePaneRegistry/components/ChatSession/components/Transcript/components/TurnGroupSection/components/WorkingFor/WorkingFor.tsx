@@ -22,6 +22,7 @@ export function WorkingFor({
 	expanded,
 	onToggle,
 	startedAtMs,
+	stopped = false,
 	waiting = false,
 }: {
 	startedAtMs: number;
@@ -29,6 +30,7 @@ export function WorkingFor({
 	expanded?: boolean | undefined;
 	onToggle?: (() => void) | undefined;
 	waiting?: boolean | undefined;
+	stopped?: boolean | undefined;
 }) {
 	const { t } = useLingui();
 	const running = completedAtMs === undefined;
@@ -51,13 +53,17 @@ export function WorkingFor({
 
 	const label = waiting
 		? t({ message: "Needs input" })
-		: seconds < 60
-			? running
-				? t`Working for ${seconds}s`
-				: t`Worked for ${seconds}s`
-			: running
-				? t`Working for ${Math.floor(seconds / 60)}m ${seconds % 60}s`
-				: t`Worked for ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+		: stopped && !running
+			? seconds < 60
+				? t`You stopped after ${seconds}s`
+				: t`You stopped after ${Math.floor(seconds / 60)}m ${seconds % 60}s`
+			: seconds < 60
+				? running
+					? t`Working for ${seconds}s`
+					: t`Worked for ${seconds}s`
+				: running
+					? t`Working for ${Math.floor(seconds / 60)}m ${seconds % 60}s`
+					: t`Worked for ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 
 	const content = (
 		<>

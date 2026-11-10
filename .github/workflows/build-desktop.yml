@@ -210,18 +210,21 @@ jobs:
         run: |
           APP_DIR=$(find release -maxdepth 2 -name "*.app" -type d | head -1)
           UNPACKED="$APP_DIR/Contents/Resources/app.asar.unpacked/node_modules"
-          # @ast-grep/napi is the arch-specific native package copy-native-modules
-          # resolves for the *target* arch (fetching from npm and failing hard if
-          # it cannot), so its absence here means a genuine cross-arch packaging
-          # miss rather than a package we only copy opportunistically.
-          PKG_DIR="$UNPACKED/@ast-grep/napi-darwin-${{ matrix.arch }}"
-          BINDING=$(find "$PKG_DIR" -name '*.node' 2>/dev/null | head -1)
-          test -n "$BINDING" || {
-            echo "::error::@ast-grep/napi native binding missing from packaged app — Intel/arm launch will crash. Expected a .node in: $PKG_DIR"
-            ls -la "$UNPACKED/@ast-grep" 2>/dev/null || echo "  (no @ast-grep directory in app.asar.unpacked)"
+          EXPECTED_ARCH=$([ "${{ matrix.arch }}" = "x64" ] && echo x86_64 || echo arm64)
+          test -f "$UNPACKED/better-sqlite3/build/Release/better_sqlite3.node" || {
+            echo "::error::better-sqlite3 native binding missing from packaged app."
             exit 1
           }
-          echo "OK: bundled $BINDING ($(du -h "$BINDING" | cut -f1))"
+          WRONG=0
+          while IFS= read -r BINDING; do
+            if lipo -archs "$BINDING" | grep -qw "$EXPECTED_ARCH"; then
+              echo "OK: $EXPECTED_ARCH ${BINDING#"$UNPACKED"/}"
+            else
+              echo "::error::${BINDING#"$UNPACKED"/} is $(lipo -archs "$BINDING"), expected $EXPECTED_ARCH — it will fail to load."
+              WRONG=1
+            fi
+          done < <(find "$UNPACKED" -path "*/build/Release/*.node")
+          exit "$WRONG"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

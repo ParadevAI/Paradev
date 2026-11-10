@@ -80,6 +80,22 @@ async function sendCode(email: string, payload: Payload): Promise<Outcome> {
 	return { status: "code_sent", promotionCode: code };
 }
 
+async function alertFailure(payload: Payload, error: unknown): Promise<void> {
+	const reason = error instanceof Error ? error.message : String(error);
+	const who = payload.email ?? "unknown email";
+	try {
+		await fetch(env.SLACK_BILLING_WEBHOOK_URL, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: `:rotating_light: YC Bookface redemption ${payload.id} (${who}) failed, and the founder sees "The deal provider rejected this redemption". ${reason}`,
+			}),
+		});
+	} catch (slackError) {
+		console.error("[yc-deals/webhook] Slack alert failed:", slackError);
+	}
+}
+
 async function resolveOutcome(payload: Payload): Promise<Outcome> {
 	const email = payload.email?.trim().toLowerCase();
 	if (!email) return { status: "pending" };
@@ -134,6 +150,7 @@ export async function POST(request: Request) {
 			`[yc-deals/webhook] Failed to process redemption ${externalRedemptionId}:`,
 			error,
 		);
+		await alertFailure(payload, error);
 		return Response.json({ error: "Processing failed" }, { status: 500 });
 	}
 

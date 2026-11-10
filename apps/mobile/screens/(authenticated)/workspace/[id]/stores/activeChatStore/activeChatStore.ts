@@ -12,6 +12,8 @@ export interface ActiveChat {
 	running: boolean;
 	queued: UserMessage[];
 	queuePaused: boolean;
+	/** Paradev closed while it waited, not the user's interrupt. */
+	queuePausedByShutdown: boolean;
 	queueControls: boolean;
 	selectMode: (modeId: string) => void;
 	stop: () => void;
@@ -28,6 +30,7 @@ const EMPTY: ActiveChat = {
 	running: false,
 	queued: [],
 	queuePaused: false,
+	queuePausedByShutdown: false,
 	queueControls: false,
 	selectMode: noop,
 	stop: noop,

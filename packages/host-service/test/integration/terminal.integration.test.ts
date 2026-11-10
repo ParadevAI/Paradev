@@ -35,11 +35,16 @@ import { seedTerminalSession } from "../helpers/seed";
 
 describe("terminal router integration", () => {
 	let scenario: BasicScenario;
+	let sessionHome: string;
 
 	beforeEach(async () => {
+		// Real daemon sessions start a login shell. Pin it to /bin/sh and give it
+		// an empty HOME, or it runs the developer's account shell and dotfiles.
+		sessionHome = mkdtempSync(join(tmpdir(), "host-service-terminal-home-"));
+		__setAccountShellForTesting(null);
 		initTerminalBaseEnv({
 			PATH: process.env.PATH ?? "/usr/bin:/bin",
-			HOME: process.env.HOME ?? tmpdir(),
+			HOME: sessionHome,
 			SHELL: "/bin/sh",
 		});
 		scenario = await createBasicScenario();
@@ -57,6 +62,7 @@ describe("terminal router integration", () => {
 		await scenario?.dispose();
 		delete process.env.SUPERSET_PTY_DAEMON_SOCKET;
 		delete process.env.SUPERSET_HOME_DIR;
+		rmSync(sessionHome, { recursive: true, force: true });
 	});
 
 	test("list returns empty when no sessions exist", async () => {
@@ -157,6 +163,46 @@ describe("terminal router integration", () => {
 					workspaceId: scenario.workspaceId,
 					terminalId,
 				})
+				.catch(() => {});
+			await disposeDaemonClient();
+			await server.close();
+			rmSync(tmp, { recursive: true, force: true });
+		}
+	});
+
+	test("createSession never hands the daemon the developer's shell or home", async () => {
+		const tmp = mkdtempSync(join(tmpdir(), "host-service-terminal-hermetic-"));
+		const socketPath = join(tmp, "pty-daemon.sock");
+		const terminalId = randomUUID();
+		const spawned: Array<{
+			meta: { shell: string; env?: Record<string, string> };
+		}> = [];
+		const server = new Server({
+			socketPath,
+			daemonVersion: "0.0.0-terminal-hermetic-test",
+			spawnPty: ({ meta }) => {
+				spawned.push({ meta });
+				return createFakePty(4300 + spawned.length, meta);
+			},
+		});
+
+		try {
+			await server.listen();
+			process.env.SUPERSET_PTY_DAEMON_SOCKET = socketPath;
+			process.env.SUPERSET_HOME_DIR = tmp;
+
+			await scenario.host.trpc.terminal.createSession.mutate({
+				workspaceId: scenario.workspaceId,
+				terminalId,
+			});
+
+			expect(spawned).toHaveLength(1);
+			const [{ meta }] = spawned;
+			expect(meta.shell).toBe("/bin/sh");
+			expect(meta.env?.HOME).toBe(sessionHome);
+		} finally {
+			await scenario.host.trpc.terminal.killSession
+				.mutate({ workspaceId: scenario.workspaceId, terminalId })
 				.catch(() => {});
 			await disposeDaemonClient();
 			await server.close();
