@@ -52,6 +52,7 @@ import { draftLinkedContext } from "renderer/routes/_authenticated/components/Ag
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
 import { MachineSizePickerPill } from "renderer/routes/_authenticated/components/MachineSizePickerPill";
+import { SymmetricResizeHandles } from "renderer/routes/_authenticated/components/SymmetricResizeHandles";
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -89,7 +90,6 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
-import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
 import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
@@ -1084,7 +1084,7 @@ export function NewWorkspaceScreen({
 				<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
 					{headerActions}
 				</div>
-				<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
+				<div className="flex flex-1 flex-col items-center justify-center px-14 py-10">
 					<h1 className="sr-only">
 						<Trans>What should we build next?</Trans>
 					</h1>
@@ -1194,7 +1194,7 @@ export function NewWorkspaceScreen({
 				</h1>
 				<GitHubStarPill surface="new_workspace" reserveSpace />
 			</div>
-			<div className="flex w-full flex-col items-center px-6 pb-8">
+			<div className="flex w-full flex-col items-center px-14 pb-8">
 				<div
 					className="relative flex w-full flex-col"
 					style={{

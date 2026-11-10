@@ -48,10 +48,20 @@ import {
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
+import { SymmetricResizeHandles } from "renderer/routes/_authenticated/components/SymmetricResizeHandles";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import {
+	NEW_WORKSPACE_SCREEN_MAX_WIDTH,
+	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
+	useNewWorkspaceWidthStore,
+} from "renderer/stores/new-workspace-width";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
-import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
+import {
+	CHAT_COLUMN_CLASSNAME,
+	CHAT_DEFAULT_WIDTH,
+	CHAT_GUTTER_CLASSNAME,
+} from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import type { ChatForkTarget } from "../../types";
@@ -261,6 +271,10 @@ export const Composer = memo(function Composer({
 	);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const footerTier = useFooterTier(rootRef);
+	const chatWidth = useNewWorkspaceWidthStore((state) => state.screenWidth);
+	const setChatWidth = useNewWorkspaceWidthStore(
+		(state) => state.setScreenWidth,
+	);
 	const composerId = useId();
 	useEffect(() => {
 		const { register, unregister } = useChatComposerStore.getState();
@@ -623,74 +637,84 @@ export const Composer = memo(function Composer({
 					workspaceId={workspaceId}
 				/>
 			)}
-			<AgentComposer
-				className={CHAT_COLUMN_CLASSNAME}
-				commands={commands}
-				draft={storedDraft}
-				chipForPaste={linkChips.chipForPaste}
-				renderChip={linkChips.renderChip}
-				history={history}
-				key={draftKey}
-				mentionProviders={mentionProviders}
-				onDraftChange={onDraftChange}
-				onStop={stop}
-				onSubmit={handleSubmit}
-				ref={promptInputRef}
-				placeholder={
-					target
-						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
-						: (placeholder ??
-							t({ message: "Ask the agent, @mention files, run /commands" }))
-				}
-				status={
-					stop || promptPending
-						? "streaming"
-						: awaitingBackground && !target
-							? "background"
-							: "ready"
-				}
-				stopOnEscape={!escapeGoesBack}
-				toolbar={
-					target ? (
-						<span className="flex h-6 min-w-0 max-w-48 items-center rounded-md border border-border/60 px-2 font-sans text-foreground/70 text-xs">
-							<span className="min-w-0 truncate">
-								<Trans>to {name}</Trans>
+			<div className={cn(CHAT_COLUMN_CLASSNAME, "relative")}>
+				<SymmetricResizeHandles
+					currentWidth={chatWidth ?? CHAT_DEFAULT_WIDTH}
+					minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
+					maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
+					onWidthChange={setChatWidth}
+					onWidthCommit={setChatWidth}
+					onReset={() => setChatWidth(null)}
+				/>
+				<AgentComposer
+					className="w-full"
+					commands={commands}
+					draft={storedDraft}
+					chipForPaste={linkChips.chipForPaste}
+					renderChip={linkChips.renderChip}
+					history={history}
+					key={draftKey}
+					mentionProviders={mentionProviders}
+					onDraftChange={onDraftChange}
+					onStop={stop}
+					onSubmit={handleSubmit}
+					ref={promptInputRef}
+					placeholder={
+						target
+							? (target.disabledReason ?? t({ message: `Message ${name}…` }))
+							: (placeholder ??
+								t({ message: "Ask the agent, @mention files, run /commands" }))
+					}
+					status={
+						stop || promptPending
+							? "streaming"
+							: awaitingBackground && !target
+								? "background"
+								: "ready"
+					}
+					stopOnEscape={!escapeGoesBack}
+					toolbar={
+						target ? (
+							<span className="flex h-6 min-w-0 max-w-48 items-center rounded-md border border-border/60 px-2 font-sans text-foreground/70 text-xs">
+								<span className="min-w-0 truncate">
+									<Trans>to {name}</Trans>
+								</span>
 							</span>
-						</span>
-					) : modes && onSetMode ? (
-						<ModePicker
-							currentModeId={currentModeId}
-							iconOnly={footerTier >= 2}
-							modes={modes}
-							onSelect={onSetMode}
-						/>
-					) : undefined
-				}
-				toolbarEnd={
-					target ? undefined : (
-						<>
-							{sessionUsage && (
-								<ContextWindowRing
-									usage={sessionUsage}
-									onCompact={canCompact ? compact : undefined}
-									compactDisabled={blocked || turnRunning}
-								/>
-							)}
-							{configOptions && onSetConfigOption && (
-								<ModelPicker
-									agentSwitcher={agentModelsOnly ? undefined : agentSwitcher}
-									configOptions={configOptions}
-									hideEffortLabel={footerTier >= 1}
-									hideModelLabel={footerTier >= 3}
-									onOpenChange={changeModelPickerOpen}
-									onSelect={onSetConfigOption}
-									open={modelPickerOpen}
-								/>
-							)}
-						</>
-					)
-				}
-			/>
+						) : modes && onSetMode ? (
+							<ModePicker
+								currentModeId={currentModeId}
+								iconOnly={footerTier >= 2}
+								modes={modes}
+								onSelect={onSetMode}
+							/>
+						) : undefined
+					}
+					toolbarEnd={
+						target ? undefined : (
+							<>
+								{sessionUsage && (
+									<ContextWindowRing
+										usage={sessionUsage}
+										onCompact={canCompact ? compact : undefined}
+										compactDisabled={blocked || turnRunning}
+									/>
+								)}
+								{configOptions && onSetConfigOption && (
+									<ModelPicker
+										agentSwitcher={agentModelsOnly ? undefined : agentSwitcher}
+										configOptions={configOptions}
+										hideEffortLabel={footerTier >= 1}
+										hideModelLabel={footerTier >= 3}
+										onOpenChange={changeModelPickerOpen}
+										onSelect={onSetConfigOption}
+										open={modelPickerOpen}
+									/>
+								)}
+							</>
+						)
+					}
+				/>
+			</div>
 			{mcpPicker.dialog}
 			{status.dialog}
 		</div>
