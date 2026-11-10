@@ -21,12 +21,10 @@ import {
 import { WindowControlsInset } from "../_dashboard/components/WindowControlsInset";
 import { ContentBoundary } from "../components/ContentBoundary";
 import { SearchResultsBanner } from "./components/SearchResultsBanner";
-import {
-	FULL_WIDTH_SECTION_PATHS,
-	SettingsSidebar,
-} from "./components/SettingsSidebar";
+import { SettingsSidebar } from "./components/SettingsSidebar";
 import { useScrollReset } from "./hooks/useScrollReset";
 import { getVisibleMatchCountBySection } from "./utils/settings-search";
+import { FULL_WIDTH_SECTION_PATHS } from "./utils/settingsSections";
 
 export const Route = createFileRoute("/_authenticated/settings")({
 	component: SettingsLayout,

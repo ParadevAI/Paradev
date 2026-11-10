@@ -19,6 +19,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useSettingsSectionVisibility } from "renderer/routes/_authenticated/settings/hooks/useSettingsSectionVisibility";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 import type { CommandContext } from "./types";
 
@@ -30,6 +31,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 	const navigate = useNavigate();
 	const collections = useCollections();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const settingsSectionVisibility = useSettingsSectionVisibility();
 	const openNewWorkspace = useOpenNewWorkspace();
 	const {
 		activeHostUrl,
@@ -99,6 +101,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 			localMachineId: machineId ?? null,
 			notificationSoundsMuted,
 			isV2CloudEnabled,
+			settingsSectionVisibility,
 			navigate: navigateTo,
 			openNewWorkspace,
 		}),
@@ -113,6 +116,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 			machineId,
 			notificationSoundsMuted,
 			isV2CloudEnabled,
+			settingsSectionVisibility,
 			navigateTo,
 			openNewWorkspace,
 		],

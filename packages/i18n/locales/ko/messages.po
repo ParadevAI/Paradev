@@ -3518,9 +3518,6 @@ msgstr "최근 30일간 토큰 {0}개 기준이며, {1}을(를) 집계했습니�
 msgid "Before"
 msgstr "변경 전"
 
-msgid "Behavior"
-msgstr "동작 방식"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "main보다 커밋 ?개 뒤처짐, 리베이스 필요"
 
@@ -4937,6 +4934,9 @@ msgstr "명령..."
 
 msgid "Commands"
 msgstr "명령"
+
+msgid "Commands only"
+msgstr "명령만"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "워크스페이스 설정, 정리, 실행 버튼에 사용되는 명령입니다."
@@ -9432,9 +9432,6 @@ msgstr "고스트"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "고스트 트리거: 아이콘 + 말줄임 라벨 + 상하 셰브런(Primitives 페이지에서 시연하는 패턴)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git 및 worktree"
 
@@ -12563,9 +12560,6 @@ msgstr "활성 서비스 없음"
 msgid "No active terminal sessions"
 msgstr "활성 터미널 세션 없음"
 
-msgid "No active workspaces"
-msgstr "활성 워크스페이스 없음"
-
 msgid "No agent"
 msgstr "에이전트 없음"
 
@@ -12662,9 +12656,6 @@ msgstr "색상 없음"
 
 msgid "No command configured."
 msgstr "구성된 명령이 없습니다."
-
-msgid "No commands found."
-msgstr "명령을 찾을 수 없습니다."
 
 msgid "No comment body"
 msgstr "코멘트 본문 없음"
@@ -14911,9 +14902,6 @@ msgstr "테마를 고르거나 시스템 모양을 따르세요. <0>마켓플레
 msgid "Pick a workspace"
 msgstr "워크스페이스 선택"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "에이전트가 입력을 기다리고 있거나, 마지막으로 확인한 뒤 작업을 마쳤거나, 아직 실행 중인 워크스페이스를 선택합니다"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "아이콘과 색상을 고르거나 직접 만든 이미지를 업로드하세요. 기본값은 연결된 GitHub 소유자의 아바타입니다."
 
@@ -15896,6 +15884,9 @@ msgstr "리베이스 후 머지"
 
 msgid "Recall what was said in meetings"
 msgstr "회의에서 나온 이야기 다시 보기"
+
+msgid "Recent"
+msgstr "최근"
 
 msgid "Recent Activity"
 msgstr "최근 활동"
@@ -16890,9 +16881,6 @@ msgstr "오른쪽 패널"
 msgid "Right-click here"
 msgstr "여기를 오른쪽 클릭"
 
-msgid "Ringtones"
-msgstr "알림음"
-
 msgid "Roadmap"
 msgstr "로드맵"
 
@@ -17126,6 +17114,9 @@ msgstr "새 작업 공간을 만들 때 실행됩니다."
 
 msgid "Runs when a workspace is deleted."
 msgstr "작업 공간을 삭제할 때 실행됩니다."
+
+msgid "Same as Switch Workspace"
+msgstr "‘워크스페이스 전환’과(와) 동일"
 
 msgid "Same session"
 msgstr "같은 세션"
@@ -17475,6 +17466,9 @@ msgstr "트리거 검색..."
 msgid "Search workspaces"
 msgstr "워크스페이스 검색"
 
+msgid "Search workspaces, commands, files…"
+msgstr "워크스페이스, 명령, 파일 검색…"
+
 msgid "Search workspaces..."
 msgstr "워크스페이스 검색..."
 
@@ -17483,6 +17477,9 @@ msgstr "워크스페이스 검색…"
 
 msgid "Search your meeting notes"
 msgstr "회의 노트 검색"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "워크스페이스를 검색해 열거나 새 워크스페이스를 시작합니다"
 
 msgid "Search..."
 msgstr "검색..."
@@ -19340,6 +19337,15 @@ msgstr "워크스페이스 8로 전환"
 
 msgid "Switch to Workspace 9"
 msgstr "워크스페이스 9로 전환"
+
+msgid "Switch to…"
+msgstr "전환 대상…"
+
+msgid "Switch workspace"
+msgstr "워크스페이스 전환"
+
+msgid "Switch Workspace"
+msgstr "워크스페이스 전환"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

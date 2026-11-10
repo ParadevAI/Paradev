@@ -1,11 +1,15 @@
 import { Workspace } from "@superset/panes";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
+import {
+	useMaybeWorkspaceClient,
+	workspaceTrpc,
+} from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { openQuickOpen } from "renderer/commandPalette";
+import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
@@ -24,7 +28,6 @@ import {
 	parseSubagentSearch,
 	readSubagentSearch,
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { CommandPalette } from "renderer/screens/main/components/CommandPalette";
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
 import { useStore } from "zustand";
@@ -108,6 +111,8 @@ import {
 } from "./utils/openChangesPaneInStore";
 import { openSubagentPaneInStore } from "./utils/openSubagentPaneInStore";
 import type { V2WorkspaceUrlOpenTarget } from "./utils/openUrlInV2Workspace";
+
+const QUICK_OPEN_SEARCH_LIMIT = 50;
 
 const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 
@@ -397,21 +402,9 @@ function V2WorkspaceContent() {
 		executePreset,
 		setRightSidebarOpen,
 	});
-	const quickOpenOpen = useQuickOpenStore(
-		(s) => s.open && s.target?.workspaceId === workspaceId,
-	);
-	const closeQuickOpen = useQuickOpenStore((s) => s.close);
-	const openQuickOpenFor = useQuickOpenStore((s) => s.openFor);
-	const handleQuickOpen = useCallback(
-		() => openQuickOpenFor({ workspaceId }),
-		[openQuickOpenFor, workspaceId],
-	);
-	const handleQuickOpenChange = useCallback(
-		(next: boolean) => {
-			if (!next) closeQuickOpen();
-		},
-		[closeQuickOpen],
-	);
+	const registerQuickOpen = useQuickOpenStore((s) => s.register);
+	const unregisterQuickOpen = useQuickOpenStore((s) => s.unregister);
+	const handleQuickOpen = useCallback(() => openQuickOpen(), []);
 	// Picking a file from Quick Open should surface the sidebar/Files tab so
 	// the reveal (expand + highlight + scroll) is actually visible.
 	const handleQuickOpenSelectFile = useCallback(
@@ -431,6 +424,40 @@ function V2WorkspaceContent() {
 			isRightPaneAreaEnabled,
 		],
 	);
+	// The palette's files frame searches whichever workspace page is open,
+	// through this page's client: the palette mounts above the provider.
+	const workspaceClient = useMaybeWorkspaceClient();
+	const searchFiles = useCallback(
+		async (query: string) => {
+			if (!workspaceClient) return [];
+			const { matches } =
+				await workspaceClient.trpcClient.filesystem.searchFiles.query({
+					workspaceId,
+					query,
+					limit: QUICK_OPEN_SEARCH_LIMIT,
+				});
+			return matches;
+		},
+		[workspaceClient, workspaceId],
+	);
+	useEffect(() => {
+		registerQuickOpen({
+			workspaceId,
+			recentFiles,
+			openFilePaths,
+			searchFiles,
+			onSelectFile: handleQuickOpenSelectFile,
+		});
+		return () => unregisterQuickOpen(workspaceId);
+	}, [
+		registerQuickOpen,
+		unregisterQuickOpen,
+		workspaceId,
+		recentFiles,
+		openFilePaths,
+		searchFiles,
+		handleQuickOpenSelectFile,
+	]);
 	const paneRegistry = usePaneRegistry({
 		onOpenDiff: openDiffPane,
 		onOpenFile: openFilePaneFromTreeClick,
@@ -803,15 +830,6 @@ function V2WorkspaceContent() {
 					</WorkspaceSplitLayout>
 				</WorkspaceGitStatusProvider>
 			</RightPaneLinkTargetProvider>
-			<CommandPalette
-				workspaceId={workspaceId}
-				open={quickOpenOpen}
-				onOpenChange={handleQuickOpenChange}
-				onSelectFile={handleQuickOpenSelectFile}
-				variant="v2"
-				recentlyViewedFiles={recentFiles}
-				openFilePaths={openFilePaths}
-			/>
 		</FileDocumentStoreProvider>
 	);
 }

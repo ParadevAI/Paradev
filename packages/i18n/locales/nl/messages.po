@@ -3518,9 +3518,6 @@ msgstr "Op basis van {0} tokens in de laatste 30 dagen, gerekend over {1}."
 msgid "Before"
 msgstr "Voor"
 
-msgid "Behavior"
-msgstr "Gedrag"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "? commits achter op main, rebase nodig"
 
@@ -4937,6 +4934,9 @@ msgstr "Commando..."
 
 msgid "Commands"
 msgstr "Commando's"
+
+msgid "Commands only"
+msgstr "Alleen opdrachten"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Commando's voor setup en teardown van werkruimtes en voor de knop Uitvoeren."
@@ -9432,9 +9432,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Ghost-trigger: icoon + afgekapt label + chevron omhoog-omlaag (patroon gedemonstreerd op de Primitives-pagina)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git en worktrees"
 
@@ -12563,9 +12560,6 @@ msgstr "Geen actieve services"
 msgid "No active terminal sessions"
 msgstr "Geen actieve terminalsessies"
 
-msgid "No active workspaces"
-msgstr "Geen actieve werkruimtes"
-
 msgid "No agent"
 msgstr "Geen agent"
 
@@ -12662,9 +12656,6 @@ msgstr "Geen kleur"
 
 msgid "No command configured."
 msgstr "Geen commando geconfigureerd."
-
-msgid "No commands found."
-msgstr "Geen opdrachten gevonden."
 
 msgid "No comment body"
 msgstr "Geen tekst in de opmerking"
@@ -14911,9 +14902,6 @@ msgstr "Kies een thema of volg het uiterlijk van je systeem. Bekijk de <0>market
 msgid "Pick a workspace"
 msgstr "Kies een werkruimte"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Kies een werkruimte waarvan de agent op je invoer wacht, klaar is sinds je laatst keek of nog bezig is"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Kies een icoon en een kleur, of upload een eigen afbeelding. Standaard is de avatar van de gekoppelde GitHub-eigenaar."
 
@@ -15896,6 +15884,9 @@ msgstr "Rebasen en mergen"
 
 msgid "Recall what was said in meetings"
 msgstr "Terugvinden wat er in vergaderingen is gezegd"
+
+msgid "Recent"
+msgstr "Recent"
 
 msgid "Recent Activity"
 msgstr "Recente activiteit"
@@ -16890,9 +16881,6 @@ msgstr "rechterpaneel"
 msgid "Right-click here"
 msgstr "Klik hier met rechts"
 
-msgid "Ringtones"
-msgstr "Beltonen"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17126,6 +17114,9 @@ msgstr "Wordt uitgevoerd bij het aanmaken van een werkruimte."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Wordt uitgevoerd bij het verwijderen van een werkruimte."
+
+msgid "Same as Switch Workspace"
+msgstr "Hetzelfde als ‘Van werkruimte wisselen’"
 
 msgid "Same session"
 msgstr "Dezelfde sessie"
@@ -17475,6 +17466,9 @@ msgstr "Triggers zoeken..."
 msgid "Search workspaces"
 msgstr "Werkruimtes zoeken"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Zoek werkruimtes, opdrachten, bestanden…"
+
 msgid "Search workspaces..."
 msgstr "Werkruimtes zoeken..."
 
@@ -17483,6 +17477,9 @@ msgstr "Werkruimtes zoeken…"
 
 msgid "Search your meeting notes"
 msgstr "Doorzoek je vergadernotities"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Zoek in je werkruimtes en open er een, of start een nieuwe werkruimte"
 
 msgid "Search..."
 msgstr "Zoeken..."
@@ -19340,6 +19337,15 @@ msgstr "Naar werkruimte 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Naar werkruimte 9"
+
+msgid "Switch to…"
+msgstr "Wisselen naar…"
+
+msgid "Switch workspace"
+msgstr "Van werkruimte wisselen"
+
+msgid "Switch Workspace"
+msgstr "Van werkruimte wisselen"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

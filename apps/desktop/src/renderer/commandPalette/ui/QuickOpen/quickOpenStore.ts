@@ -1,19 +1,31 @@
+import type { RecentFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
 import { create } from "zustand";
 
-interface QuickOpenTarget {
+export interface QuickOpenFileMatch {
+	absolutePath: string;
+	name: string;
+	relativePath: string;
+}
+
+export interface QuickOpenProvider {
 	workspaceId: string;
+	recentFiles: RecentFile[];
+	openFilePaths: Set<string>;
+	searchFiles: (query: string) => Promise<QuickOpenFileMatch[]>;
+	onSelectFile: (filePath: string) => void;
 }
 
 interface QuickOpenState {
-	open: boolean;
-	target: QuickOpenTarget | null;
-	openFor: (target: QuickOpenTarget) => void;
-	close: () => void;
+	provider: QuickOpenProvider | null;
+	register: (provider: QuickOpenProvider) => void;
+	unregister: (workspaceId: string) => void;
 }
 
 export const useQuickOpenStore = create<QuickOpenState>((set) => ({
-	open: false,
-	target: null,
-	openFor: (target) => set({ open: true, target }),
-	close: () => set({ open: false }),
+	provider: null,
+	register: (provider) => set({ provider }),
+	unregister: (workspaceId) =>
+		set((state) =>
+			state.provider?.workspaceId === workspaceId ? { provider: null } : state,
+		),
 }));

@@ -3518,9 +3518,6 @@ msgstr "Na základě {0} tokenů za posledních 30 dní, počítáno z {1}."
 msgid "Before"
 msgstr "Před"
 
-msgid "Behavior"
-msgstr "Chování"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Zaostává za main o ? commitů, je potřeba rebase"
 
@@ -4937,6 +4934,9 @@ msgstr "Příkaz..."
 
 msgid "Commands"
 msgstr "Příkazy"
+
+msgid "Commands only"
+msgstr "Pouze příkazy"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Příkazy spouštěné při setupu a teardownu pracovního prostoru a tlačítkem Spustit."
@@ -9432,9 +9432,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Ghost spouštěč: ikona + zkracovaný popisek + šipka nahoru-dolů (vzor ukázaný na stránce Primitives)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git a worktree"
 
@@ -12563,9 +12560,6 @@ msgstr "Žádné aktivní služby"
 msgid "No active terminal sessions"
 msgstr "Žádné aktivní relace terminálu"
 
-msgid "No active workspaces"
-msgstr "Žádné aktivní pracovní prostory"
-
 msgid "No agent"
 msgstr "Žádný agent"
 
@@ -12662,9 +12656,6 @@ msgstr "Bez barvy"
 
 msgid "No command configured."
 msgstr "Není nastavený žádný příkaz."
-
-msgid "No commands found."
-msgstr "Nenalezeny žádné příkazy."
 
 msgid "No comment body"
 msgstr "Bez textu komentáře"
@@ -14911,9 +14902,6 @@ msgstr "Vyberte motiv nebo se řiďte vzhledem systému. Prohlédněte si <0>mar
 msgid "Pick a workspace"
 msgstr "Vyberte pracovní prostor"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Vyberte pracovní prostor, jehož agent čeká na váš vstup, od vaší poslední návštěvy dokončil práci, nebo stále běží"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Vyberte ikonu a barvu nebo nahrajte vlastní obrázek. Ve výchozím stavu se použije avatar propojeného vlastníka na GitHubu."
 
@@ -15896,6 +15884,9 @@ msgstr "Rebase a sloučit"
 
 msgid "Recall what was said in meetings"
 msgstr "Připomeňte si, co zaznělo na schůzkách"
+
+msgid "Recent"
+msgstr "Nedávné"
 
 msgid "Recent Activity"
 msgstr "Nedávná aktivita"
@@ -16890,9 +16881,6 @@ msgstr "pravý panel"
 msgid "Right-click here"
 msgstr "Klikněte sem pravým tlačítkem"
 
-msgid "Ringtones"
-msgstr "Vyzvánění"
-
 msgid "Roadmap"
 msgstr "Roadmapa"
 
@@ -17126,6 +17114,9 @@ msgstr "Spouští se při vytvoření pracovního prostoru."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Spouští se při smazání pracovního prostoru."
+
+msgid "Same as Switch Workspace"
+msgstr "Stejné jako „Přepnout pracovní prostor“"
 
 msgid "Same session"
 msgstr "Stejná relace"
@@ -17475,6 +17466,9 @@ msgstr "Hledat spouštěče..."
 msgid "Search workspaces"
 msgstr "Hledat pracovní prostory"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Hledat pracovní prostory, příkazy, soubory…"
+
 msgid "Search workspaces..."
 msgstr "Hledat pracovní prostory..."
 
@@ -17483,6 +17477,9 @@ msgstr "Hledat pracovní prostory…"
 
 msgid "Search your meeting notes"
 msgstr "Prohledávání poznámek ze schůzek"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Prohledejte své pracovní prostory a otevřete jeden, nebo založte nový"
 
 msgid "Search..."
 msgstr "Hledat..."
@@ -19340,6 +19337,15 @@ msgstr "Přepnout na pracovní prostor 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Přepnout na pracovní prostor 9"
+
+msgid "Switch to…"
+msgstr "Přepnout na…"
+
+msgid "Switch workspace"
+msgstr "Přepnout pracovní prostor"
+
+msgid "Switch Workspace"
+msgstr "Přepnout pracovní prostor"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

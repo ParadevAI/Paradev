@@ -1,0 +1,1 @@
+export { scopeWorkspaces } from "./scopeWorkspaces";

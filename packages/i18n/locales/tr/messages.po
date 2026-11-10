@@ -3518,9 +3518,6 @@ msgstr "Son 30 gündeki {0} token temel alınmıştır; {1} sayılıyor."
 msgid "Before"
 msgstr "Önce"
 
-msgid "Behavior"
-msgstr "Davranış"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "main dalının ? commit gerisinde, rebase gerekiyor"
 
@@ -4937,6 +4934,9 @@ msgstr "Komut..."
 
 msgid "Commands"
 msgstr "Komutlar"
+
+msgid "Commands only"
+msgstr "Yalnızca komutlar"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Çalışma alanı kurulumu, kapatması ve Çalıştır düğmesi için çalıştırılan komutlar."
@@ -9432,9 +9432,6 @@ msgstr "Hayalet"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Hayalet tetikleyici: simge + kısaltılan etiket + yukarı-aşağı ok (Primitives sayfasında gösterilen kalıp)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git ve worktree'ler"
 
@@ -12563,9 +12560,6 @@ msgstr "Etkin hizmet yok"
 msgid "No active terminal sessions"
 msgstr "Etkin terminal oturumu yok"
 
-msgid "No active workspaces"
-msgstr "Etkin çalışma alanı yok"
-
 msgid "No agent"
 msgstr "Ajan yok"
 
@@ -12662,9 +12656,6 @@ msgstr "Renk yok"
 
 msgid "No command configured."
 msgstr "Yapılandırılmış komut yok."
-
-msgid "No commands found."
-msgstr "Komut bulunamadı."
 
 msgid "No comment body"
 msgstr "Yorum gövdesi yok"
@@ -14911,9 +14902,6 @@ msgstr "Bir tema seçin veya sistem görünümünüzü izleyin. <0>Pazar yerine<
 msgid "Pick a workspace"
 msgstr "Bir çalışma alanı seçin"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Ajanı sizden yanıt bekleyen, son bakışınızdan beri işini bitiren veya hâlâ çalışan bir çalışma alanı seçin"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Bir simge ve renk seçin ya da özel bir görsel yükleyin. Varsayılan olarak bağlı GitHub sahibinin avatarı kullanılır."
 
@@ -15896,6 +15884,9 @@ msgstr "Rebase ve birleştir"
 
 msgid "Recall what was said in meetings"
 msgstr "Toplantılarda söylenenleri hatırlayın"
+
+msgid "Recent"
+msgstr "Son"
 
 msgid "Recent Activity"
 msgstr "Son etkinlik"
@@ -16890,9 +16881,6 @@ msgstr "sağ panel"
 msgid "Right-click here"
 msgstr "Buraya sağ tıklayın"
 
-msgid "Ringtones"
-msgstr "Zil sesleri"
-
 msgid "Roadmap"
 msgstr "Yol haritası"
 
@@ -17126,6 +17114,9 @@ msgstr "Yeni bir çalışma alanı oluşturulduğunda çalışır."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Bir çalışma alanı silindiğinde çalışır."
+
+msgid "Same as Switch Workspace"
+msgstr "“Çalışma alanı değiştir” ile aynı"
 
 msgid "Same session"
 msgstr "Aynı oturum"
@@ -17475,6 +17466,9 @@ msgstr "Tetikleyici ara..."
 msgid "Search workspaces"
 msgstr "Çalışma alanlarında ara"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Çalışma alanı, komut, dosya ara…"
+
 msgid "Search workspaces..."
 msgstr "Çalışma alanı ara..."
 
@@ -17483,6 +17477,9 @@ msgstr "Çalışma alanlarında ara…"
 
 msgid "Search your meeting notes"
 msgstr "Toplantı notlarınızda arayın"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Çalışma alanlarınızda arama yapıp birini açın veya yeni bir çalışma alanı başlatın"
 
 msgid "Search..."
 msgstr "Ara..."
@@ -19340,6 +19337,15 @@ msgstr "8. çalışma alanına geç"
 
 msgid "Switch to Workspace 9"
 msgstr "9. çalışma alanına geç"
+
+msgid "Switch to…"
+msgstr "Şuraya geç…"
+
+msgid "Switch workspace"
+msgstr "Çalışma alanı değiştir"
+
+msgid "Switch Workspace"
+msgstr "Çalışma alanı değiştir"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

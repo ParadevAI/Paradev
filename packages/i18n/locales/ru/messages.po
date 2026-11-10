@@ -3518,9 +3518,6 @@ msgstr "На основе {0} токенов за последние 30 дней
 msgid "Before"
 msgstr "До"
 
-msgid "Behavior"
-msgstr "Поведение"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Отстаёт от main на ? коммитов, нужен rebase"
 
@@ -4937,6 +4934,9 @@ msgstr "Команда..."
 
 msgid "Commands"
 msgstr "Команды"
+
+msgid "Commands only"
+msgstr "Только команды"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Команды для настройки и очистки рабочей области и для кнопки «Запустить»."
@@ -9432,9 +9432,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Ghost-триггер: иконка + обрезаемая подпись + шеврон вверх-вниз (паттерн показан на странице Primitives)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git и worktree"
 
@@ -12563,9 +12560,6 @@ msgstr "Нет активных служб"
 msgid "No active terminal sessions"
 msgstr "Нет активных сессий терминала"
 
-msgid "No active workspaces"
-msgstr "Нет активных рабочих областей"
-
 msgid "No agent"
 msgstr "Без агента"
 
@@ -12662,9 +12656,6 @@ msgstr "Без цвета"
 
 msgid "No command configured."
 msgstr "Команда не настроена."
-
-msgid "No commands found."
-msgstr "Команды не найдены."
 
 msgid "No comment body"
 msgstr "Нет текста комментария"
@@ -14911,9 +14902,6 @@ msgstr "Выберите тему или следуйте оформлению �
 msgid "Pick a workspace"
 msgstr "Выберите рабочую область"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Выберите рабочую область, где агент ждёт вашего ввода, завершил работу с момента вашего последнего просмотра или всё ещё выполняется"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Выберите иконку и цвет или загрузите своё изображение. По умолчанию используется аватар связанного владельца на GitHub."
 
@@ -15896,6 +15884,9 @@ msgstr "Перебазировать и объединить"
 
 msgid "Recall what was said in meetings"
 msgstr "Вспомнить, что говорили на встречах"
+
+msgid "Recent"
+msgstr "Недавние"
 
 msgid "Recent Activity"
 msgstr "Недавняя активность"
@@ -16890,9 +16881,6 @@ msgstr "правая панель"
 msgid "Right-click here"
 msgstr "Кликните здесь правой кнопкой"
 
-msgid "Ringtones"
-msgstr "Мелодии"
-
 msgid "Roadmap"
 msgstr "Дорожная карта"
 
@@ -17126,6 +17114,9 @@ msgstr "Выполняется при создании рабочего прос
 
 msgid "Runs when a workspace is deleted."
 msgstr "Выполняется при удалении рабочего пространства."
+
+msgid "Same as Switch Workspace"
+msgstr "То же, что «Сменить рабочую область»"
 
 msgid "Same session"
 msgstr "Та же сессия"
@@ -17475,6 +17466,9 @@ msgstr "Поиск триггеров..."
 msgid "Search workspaces"
 msgstr "Поиск рабочих областей"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Поиск рабочих областей, команд, файлов…"
+
 msgid "Search workspaces..."
 msgstr "Поиск рабочих областей..."
 
@@ -17483,6 +17477,9 @@ msgstr "Поиск рабочих областей…"
 
 msgid "Search your meeting notes"
 msgstr "Поиск по заметкам со встреч"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Найдите рабочую область и откройте её или создайте новую"
 
 msgid "Search..."
 msgstr "Поиск..."
@@ -19340,6 +19337,15 @@ msgstr "Перейти в рабочую область 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Перейти в рабочую область 9"
+
+msgid "Switch to…"
+msgstr "Перейти к…"
+
+msgid "Switch workspace"
+msgstr "Сменить рабочую область"
+
+msgid "Switch Workspace"
+msgstr "Сменить рабочую область"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

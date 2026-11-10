@@ -1,15 +1,12 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui as useTranslation } from "@lingui/react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { CommandPrimitive, CommandSeparator } from "@superset/ui/command";
+import { CommandPrimitive } from "@superset/ui/command";
 import { SearchIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LuChevronDown, LuChevronRight } from "react-icons/lu";
-import type { RecentFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
-import { matchRecentFiles } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
+import { FileResultItem } from "renderer/components/FileResultItem";
 import { useFileSearch } from "renderer/screens/main/components/WorkspaceView/RightSidebar/FilesView/hooks/useFileSearch/useFileSearch";
-import { FileResultItem } from "./components/FileResultItem";
-import { useV2FileSearch } from "./hooks/useV2FileSearch";
 
 // 48px input + 10 * 40px items
 const MAX_DIALOG_HEIGHT = 448;
@@ -20,24 +17,14 @@ export interface CommandPaletteProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSelectFile: (filePath: string) => void;
-	variant?: "v1" | "v2";
-	recentlyViewedFiles?: RecentFile[];
-	openFilePaths?: Set<string>;
 }
 
-function getFileName(relativePath: string): string {
-	const segments = relativePath.split("/");
-	return segments[segments.length - 1] ?? relativePath;
-}
-
+/** The v1 workspace's file search modal; v2 searches files from the command palette. */
 export function CommandPalette({
 	workspaceId,
 	open,
 	onOpenChange,
 	onSelectFile,
-	variant = "v1",
-	recentlyViewedFiles,
-	openFilePaths,
 }: CommandPaletteProps) {
 	const { _: translate } = useTranslation();
 
@@ -47,45 +34,13 @@ export function CommandPalette({
 	const [excludePattern, setExcludePattern] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const v1Search = useFileSearch({
-		workspaceId: variant === "v1" && open ? workspaceId : undefined,
-		searchTerm: variant === "v1" ? query : "",
-		includePattern: variant === "v1" ? includePattern : "",
-		excludePattern: variant === "v1" ? excludePattern : "",
+	const { searchResults } = useFileSearch({
+		workspaceId: open ? workspaceId : undefined,
+		searchTerm: query,
+		includePattern,
+		excludePattern,
 		limit: SEARCH_LIMIT,
 	});
-
-	const v2Search = useV2FileSearch(
-		variant === "v2" && open ? workspaceId : undefined,
-		variant === "v2" ? query : "",
-	);
-
-	const rawResults =
-		variant === "v2" ? v2Search.results : v1Search.searchResults;
-	const trimmedQuery = query.trim();
-	const showRecentSection = variant === "v2" && Boolean(recentlyViewedFiles);
-
-	const filteredRecent = useMemo<RecentFile[]>(
-		() =>
-			showRecentSection && recentlyViewedFiles
-				? matchRecentFiles(
-						recentlyViewedFiles,
-						trimmedQuery,
-						openFilePaths ?? new Set(),
-					)
-				: [],
-		[showRecentSection, recentlyViewedFiles, trimmedQuery, openFilePaths],
-	);
-
-	const recentAbsSet = useMemo(
-		() => new Set(filteredRecent.map((f) => f.absolutePath)),
-		[filteredRecent],
-	);
-
-	const dedupedResults = useMemo(() => {
-		if (!showRecentSection) return rawResults;
-		return rawResults.filter((r) => !recentAbsSet.has(r.path));
-	}, [showRecentSection, rawResults, recentAbsSet]);
 
 	const handleOpenChange = useCallback(
 		(nextOpen: boolean) => {
@@ -106,12 +61,6 @@ export function CommandPalette({
 	useEffect(() => {
 		if (open) requestAnimationFrame(() => inputRef.current?.focus());
 	}, [open]);
-
-	const showHeading = showRecentSection && filteredRecent.length > 0;
-	const showSeparator =
-		showRecentSection && filteredRecent.length > 0 && dedupedResults.length > 0;
-	const showEmptyState =
-		filteredRecent.length === 0 && dedupedResults.length === 0;
 
 	return (
 		<DialogPrimitive.Root open={open} onOpenChange={handleOpenChange} modal>
@@ -141,23 +90,21 @@ export function CommandPalette({
 								onValueChange={setQuery}
 								className="flex h-12 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
 							/>
-							{variant === "v1" && (
-								<button
-									type="button"
-									className="shrink-0 rounded p-1 text-muted-foreground hover:text-foreground"
-									onClick={() => setFiltersOpen((v) => !v)}
-									aria-label={filtersOpen ? "Hide Filters" : "Show Filters"}
-								>
-									{filtersOpen ? (
-										<LuChevronDown className="size-4" />
-									) : (
-										<LuChevronRight className="size-4" />
-									)}
-								</button>
-							)}
+							<button
+								type="button"
+								className="shrink-0 rounded p-1 text-muted-foreground hover:text-foreground"
+								onClick={() => setFiltersOpen((v) => !v)}
+								aria-label={filtersOpen ? "Hide Filters" : "Show Filters"}
+							>
+								{filtersOpen ? (
+									<LuChevronDown className="size-4" />
+								) : (
+									<LuChevronRight className="size-4" />
+								)}
+							</button>
 						</div>
 
-						{variant === "v1" && filtersOpen && (
+						{filtersOpen && (
 							<div className="grid grid-cols-2 gap-2 border-b px-3 py-2">
 								<input
 									value={includePattern}
@@ -179,33 +126,12 @@ export function CommandPalette({
 						)}
 
 						<CommandPrimitive.List className="max-h-[400px] overflow-x-hidden overflow-y-auto scroll-py-1 p-1">
-							{showEmptyState && (
+							{searchResults.length === 0 && (
 								<CommandPrimitive.Empty className="py-6 text-center text-sm text-muted-foreground">
 									No files found.
 								</CommandPrimitive.Empty>
 							)}
-
-							{showHeading && (
-								<div className="px-2 pt-2 pb-1 text-muted-foreground text-xs">
-									Recently Viewed
-								</div>
-							)}
-
-							{filteredRecent.map((file) => (
-								<FileResultItem
-									key={`recent:${file.absolutePath}`}
-									value={`recent:${file.absolutePath}`}
-									fileName={getFileName(file.relativePath)}
-									relativePath={file.relativePath}
-									onSelect={() => handleSelectFile(file.absolutePath)}
-								/>
-							))}
-
-							{showSeparator && (
-								<CommandSeparator alwaysRender className="my-1" />
-							)}
-
-							{dedupedResults.map((file) => (
+							{searchResults.map((file) => (
 								<FileResultItem
 									key={file.id}
 									value={file.path}

@@ -3518,9 +3518,6 @@ msgstr "Com base em {0} tokens nos últimos 30 dias, contando {1}."
 msgid "Before"
 msgstr "Antes"
 
-msgid "Behavior"
-msgstr "Comportamento"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "? commits atrás da main, precisa de rebase"
 
@@ -4937,6 +4934,9 @@ msgstr "Comando..."
 
 msgid "Commands"
 msgstr "Comandos"
+
+msgid "Commands only"
+msgstr "Apenas comandos"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Comandos executados no setup e no teardown da área de trabalho e no botão Executar."
@@ -9432,9 +9432,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Gatilho ghost: ícone + rótulo truncado + chevron para cima e para baixo (padrão demonstrado na página de Primitivos)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git e worktrees"
 
@@ -12563,9 +12560,6 @@ msgstr "Nenhum serviço ativo"
 msgid "No active terminal sessions"
 msgstr "Nenhuma sessão de terminal ativa"
 
-msgid "No active workspaces"
-msgstr "Nenhuma área de trabalho ativa"
-
 msgid "No agent"
 msgstr "Nenhum agente"
 
@@ -12662,9 +12656,6 @@ msgstr "Sem cor"
 
 msgid "No command configured."
 msgstr "Nenhum comando configurado."
-
-msgid "No commands found."
-msgstr "Nenhum comando encontrado."
 
 msgid "No comment body"
 msgstr "Sem corpo no comentário"
@@ -14911,9 +14902,6 @@ msgstr "Escolha um tema ou siga a aparência do sistema. Veja o <0>marketplace<1
 msgid "Pick a workspace"
 msgstr "Escolha uma área de trabalho"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Escolha uma área de trabalho cujo agente está esperando sua resposta, terminou desde a última vez que você olhou ou ainda está em execução"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Escolha um ícone e uma cor, ou envie uma imagem. Por padrão, usa o avatar do dono do repositório no GitHub."
 
@@ -15896,6 +15884,9 @@ msgstr "Rebase e merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Relembrar o que foi dito nas reuniões"
+
+msgid "Recent"
+msgstr "Recentes"
 
 msgid "Recent Activity"
 msgstr "Atividade recente"
@@ -16890,9 +16881,6 @@ msgstr "painel direito"
 msgid "Right-click here"
 msgstr "Clique com o botão direito aqui"
 
-msgid "Ringtones"
-msgstr "Toques"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17126,6 +17114,9 @@ msgstr "Executado quando um espaço de trabalho é criado."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Executado quando um espaço de trabalho é excluído."
+
+msgid "Same as Switch Workspace"
+msgstr "Igual a “Trocar de área de trabalho”"
 
 msgid "Same session"
 msgstr "Mesma sessão"
@@ -17475,6 +17466,9 @@ msgstr "Buscar gatilhos..."
 msgid "Search workspaces"
 msgstr "Buscar áreas de trabalho"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Buscar áreas de trabalho, comandos, arquivos…"
+
 msgid "Search workspaces..."
 msgstr "Buscar áreas de trabalho..."
 
@@ -17483,6 +17477,9 @@ msgstr "Buscar áreas de trabalho…"
 
 msgid "Search your meeting notes"
 msgstr "Pesquisar suas notas de reunião"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Pesquise suas áreas de trabalho e abra uma, ou crie uma nova área de trabalho"
 
 msgid "Search..."
 msgstr "Buscar..."
@@ -19340,6 +19337,15 @@ msgstr "Ir para a área de trabalho 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Ir para a área de trabalho 9"
+
+msgid "Switch to…"
+msgstr "Alternar para…"
+
+msgid "Switch workspace"
+msgstr "Trocar de área de trabalho"
+
+msgid "Switch Workspace"
+msgstr "Trocar de área de trabalho"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

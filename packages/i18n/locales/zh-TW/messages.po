@@ -3518,9 +3518,6 @@ msgstr "基於最近30天的{0}個token，統計{1}。"
 msgid "Before"
 msgstr "變更前"
 
-msgid "Behavior"
-msgstr "行為"
-
 msgid "Behind main by ? commits, needs rebase"
 msgstr "落後main ?個提交，需要變基"
 
@@ -4937,6 +4934,9 @@ msgstr "命令..."
 
 msgid "Commands"
 msgstr "命令"
+
+msgid "Commands only"
+msgstr "僅指令"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "用於工作區初始化、清理和「執行」按鈕的命令。"
@@ -9432,9 +9432,6 @@ msgstr "幽靈"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "幽靈觸發器：圖示+可截斷標籤+上下箭頭（該模式在Primitives頁面有演示）"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git與worktree"
 
@@ -12563,9 +12560,6 @@ msgstr "沒有活動的服務"
 msgid "No active terminal sessions"
 msgstr "沒有活動的終端會話"
 
-msgid "No active workspaces"
-msgstr "沒有作用中的工作區"
-
 msgid "No agent"
 msgstr "無代理程式"
 
@@ -12662,9 +12656,6 @@ msgstr "無顏色"
 
 msgid "No command configured."
 msgstr "未配置命令。"
-
-msgid "No commands found."
-msgstr "未找到命令。"
 
 msgid "No comment body"
 msgstr "沒有評論正文"
@@ -14911,9 +14902,6 @@ msgstr "選擇一個主題，或跟隨系統外觀。瀏覽<0>市場<1/></0>或<
 msgid "Pick a workspace"
 msgstr "選擇一個工作區"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "選擇一個工作區：其代理正在等待你的輸入、自你上次查看後已完成，或仍在執行"
-
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "選擇圖示和顏色，或上傳自訂圖片。預設使用關聯的GitHub擁有者頭像。"
 
@@ -15896,6 +15884,9 @@ msgstr "變基併合併"
 
 msgid "Recall what was said in meetings"
 msgstr "回顧會議中說過的內容"
+
+msgid "Recent"
+msgstr "最近"
 
 msgid "Recent Activity"
 msgstr "最近動態"
@@ -16890,9 +16881,6 @@ msgstr "右側面板"
 msgid "Right-click here"
 msgstr "在這裡右鍵點選"
 
-msgid "Ringtones"
-msgstr "提示音"
-
 msgid "Roadmap"
 msgstr "路線圖"
 
@@ -17126,6 +17114,9 @@ msgstr "建立新工作區時執行。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "刪除工作區時執行。"
+
+msgid "Same as Switch Workspace"
+msgstr "與「切換工作區」相同"
 
 msgid "Same session"
 msgstr "同一會話"
@@ -17475,6 +17466,9 @@ msgstr "搜尋觸發條件..."
 msgid "Search workspaces"
 msgstr "搜尋工作區"
 
+msgid "Search workspaces, commands, files…"
+msgstr "搜尋工作區、指令、檔案…"
+
 msgid "Search workspaces..."
 msgstr "搜尋工作區..."
 
@@ -17483,6 +17477,9 @@ msgstr "搜尋工作區…"
 
 msgid "Search your meeting notes"
 msgstr "搜尋你的會議記錄"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "搜尋你的工作區並開啟其中一個，或新建工作區"
 
 msgid "Search..."
 msgstr "搜尋..."
@@ -19340,6 +19337,15 @@ msgstr "切換到工作區8"
 
 msgid "Switch to Workspace 9"
 msgstr "切換到工作區9"
+
+msgid "Switch to…"
+msgstr "切換至…"
+
+msgid "Switch workspace"
+msgstr "切換工作區"
+
+msgid "Switch Workspace"
+msgstr "切換工作區"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
