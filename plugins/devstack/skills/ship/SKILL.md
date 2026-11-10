@@ -12,13 +12,19 @@ Take the current branch to a PR that is green and has no open review findings. S
 **never merge**, never push to the base branch, never force-push a branch someone else pushed to.
 
 Read `.devstack/config.md` for `base_branch`, `checks`, `pr`, `tracker` and `plans_dir`. Without
-it, take the base branch from `git symbolic-ref --short refs/remotes/origin/HEAD` (or
-`gh repo view --json defaultBranchRef -q .defaultBranchRef.name` when that is unset), find checks in
-the CI workflow, and say what you assumed.
+it, take the base branch from `git symbolic-ref --short refs/remotes/origin/HEAD` minus the
+leading `origin/` (or `gh repo view --json defaultBranchRef -q .defaultBranchRef.name` when that
+is unset), find checks in the CI workflow, and say what you assumed.
 
-If a PR for this branch is already open (`gh pr view --json number,state,url`), run steps 1–4
-only for local changes that are not on the remote yet (`git status`, `git log @{u}..HEAD`), then
-go to step 6. With nothing pending, go straight to step 6.
+If a PR for this branch is already open (`gh pr view --json number,state,url`), do not create
+another one:
+
+1. Run steps 1–4 only for local changes that are not on the remote yet (`git status`,
+   `git log @{u}..HEAD`). If an unattended standards gate leaves violations, mark the PR as a
+   draft (`gh pr ready <number> --undo`) and add them under Known Limitations in its body
+   (`gh pr edit <number> --body-file <file>`).
+2. Find the plan (step 1) and, if this PR completes it, do the plan update from step 5.
+3. Go to step 6.
 
 ## 1. Look at the change
 
@@ -104,7 +110,8 @@ and push. Skip this when the plan spans more PRs.
 
 Link the tracker: with `tracker: linear`, put the issue key in the branch name or PR body so the
 integration links it, or comment the PR URL on the issue through the Linear plugin; with
-`tracker: github`, write `Closes #<n>` in the body.
+`tracker: github`, write `Closes #<n>` in the body only when this PR completes the issue, and
+`Refs #<n>` when the plan spans more PRs.
 
 ## 6. Wait for CI
 
