@@ -1,5 +1,4 @@
 import { cn } from "@superset/ui/utils";
-import { LoaderCircle } from "lucide-react";
 import { PullRequestStateGlyph } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStateGlyph";
 import { PR_RED_TEXT_CLASS_NAME } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/pull-request-colors";
 import type { PullRequestStackLayer } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
@@ -8,6 +7,7 @@ import {
 	stackLayerGlyphState,
 	stackLayerIssue,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/assessPullRequestStack";
+import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 
 const DANGER_ISSUES = new Set(["closed", "conflicts", "changes_requested"]);
 
@@ -37,10 +37,9 @@ export function StackLayerRows({
 						className="flex min-h-6 w-full items-center gap-2 rounded-sm px-1.5 py-0.5 text-left text-[11px] outline-none transition-colors hover:bg-accent focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-60"
 					>
 						{pendingNumber === layer.number ? (
-							<LoaderCircle
-								aria-hidden
-								className="size-3 animate-spin text-muted-foreground"
-							/>
+							<span className="flex size-3 items-center justify-center">
+								<AsciiSpinner className="text-[10px] leading-none" />
+							</span>
 						) : (
 							<PullRequestStateGlyph
 								state={stackLayerGlyphState(layer)}

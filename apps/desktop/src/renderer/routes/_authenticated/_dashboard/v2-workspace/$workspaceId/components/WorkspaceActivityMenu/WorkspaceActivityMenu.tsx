@@ -5,12 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
-import {
-	ArrowLeft,
-	GitCompareArrows,
-	ListTree,
-	LoaderCircle,
-} from "lucide-react";
+import { ArrowLeft, GitCompareArrows, ListTree } from "lucide-react";
 import {
 	type MouseEvent,
 	type ReactNode,
@@ -47,6 +42,7 @@ import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboa
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
@@ -868,16 +864,16 @@ export function WorkspaceActivityMenu({
 						{changes && currentPr && currentPrState ? (
 							<>
 								<span className="h-3.5 w-px shrink-0 bg-border" />
-								<PRIcon
-									state={
-										pendingLayer
-											? pendingLayer.isDraft
-												? "draft"
-												: "open"
-											: currentPrState
-									}
-									className="size-3.5 shrink-0"
-								/>
+								{pendingLayer ? (
+									<span className="flex size-3.5 shrink-0 items-center justify-center">
+										<AsciiSpinner className="text-xs leading-none" />
+									</span>
+								) : (
+									<PRIcon
+										state={currentPrState}
+										className="size-3.5 shrink-0"
+									/>
+								)}
 								<span className="tabular-nums">
 									#{pendingLayer?.number ?? currentPr.number}
 								</span>
@@ -889,17 +885,11 @@ export function WorkspaceActivityMenu({
 										size={mergeFlow.stack.layers.length}
 									/>
 								) : null}
-								{pendingLayer ? (
-									<LoaderCircle
-										aria-hidden
-										className="size-3 shrink-0 animate-spin text-muted-foreground"
-									/>
-								) : (
+								{!pendingLayer &&
 									currentPrChecks &&
 									showsChecks(currentPrState) && (
 										<PRStatusIndicators checks={currentPrChecks} />
-									)
-								)}
+									)}
 							</>
 						) : (
 							triggerChangesStats && (

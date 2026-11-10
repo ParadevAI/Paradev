@@ -36,6 +36,7 @@ import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
 import {
 	useOpenStackLayer,
@@ -198,7 +199,13 @@ export function PRStatusGroup({
 
 	const badgeContent = (
 		<>
-			<PRIcon state={linkState} className="size-4" />
+			{pendingLayer ? (
+				<span className="flex size-4 items-center justify-center">
+					<AsciiSpinner className="text-sm leading-none" />
+				</span>
+			) : (
+				<PRIcon state={linkState} className="size-4" />
+			)}
 			{/* The number brightens while pressed — the state tint alone moves
 			    the fill too little to read as a toggle. */}
 			<span
@@ -209,13 +216,8 @@ export function PRStatusGroup({
 			>
 				#{pendingLayer?.number ?? pr.number}
 			</span>
-			{pendingLayer ? (
-				<VscLoading
-					aria-hidden
-					className="size-3 animate-spin text-muted-foreground"
-				/>
-			) : (
-				showIndicators && <PRStatusIndicators checks={checks} />
+			{!pendingLayer && showIndicators && (
+				<PRStatusIndicators checks={checks} />
 			)}
 		</>
 	);
