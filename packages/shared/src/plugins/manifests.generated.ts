@@ -1063,6 +1063,49 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"devstack": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "devstack",
+		"version": "0.1.0",
+		"description": "An agent-first sprint: plan the work, split it across parallel agents, review it independently, and ship the PR.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"workflow",
+			"planning",
+			"code-review",
+			"pull-requests",
+			"agents"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "devstack",
+					"category": "Developer tools",
+					"icon": "./assets/icon.svg"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "init",
+				"description": "Set up a repository for the devstack sprint (plan, fan out, review, ship, retro) by writing .devstack/config.md with its tracker, base branch, plans directory, check commands, PR settings, and which agent codes or reviews. Use once per repo, when the user says \"set up devstack\", \"init devstack\", or when another devstack skill finds no .devstack/config.md."
+			},
+			{
+				"name": "plan",
+				"description": "Write a self-contained engineering plan for a change — context, decisions, validation, and a split into independent work units with file ownership that parallel agents can build at the same time. Use when the user asks to plan, spec, design, or scope a feature or fix before building it, says \"write a plan\", \"how should we build this\", or \"split this up for agents\", or hands over a ticket to plan. First step of the devstack sprint; devstack:fanout builds the plan."
+			},
+			{
+				"name": "ship",
+				"description": "Take a finished branch to a green, reviewed pull request — run the repo's checks, review the diff against AGENTS.md, commit, push, open the PR with a body scaled to the change, wait for CI, triage failures, and fix review findings. Never merges. Use when the user says \"ship it\", \"open a PR\", \"create a PR\", \"get this merged\", \"run the checks and push\", or asks to address review comments on their PR. Last step of the devstack sprint."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

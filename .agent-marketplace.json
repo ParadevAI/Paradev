@@ -246,6 +246,16 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "devstack",
+			"description": "An agent-first sprint: plan the work, split it across parallel agents, review it independently, and ship the PR.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "development",
+			"source": "./plugins/devstack",
+			"version": "0.1.0"
 		}
 	],
 	"featured": ["github", "linear"],

@@ -616,6 +616,14 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		auth: [{ type: "api_key", label: "Personal Access Token" }],
 		mcpServers: {},
 	},
+	{
+		name: "devstack",
+		version: "0.1.0",
+		description: "Plan, fan out, review, and ship with parallel agents",
+		interface: { displayName: "devstack", category: "Developer tools" },
+		mcpServers: {},
+		skills: ["init", "plan", "ship"],
+	},
 ];
 
 export const SUPERSET_API_URL = "https://api.superset.sh";
