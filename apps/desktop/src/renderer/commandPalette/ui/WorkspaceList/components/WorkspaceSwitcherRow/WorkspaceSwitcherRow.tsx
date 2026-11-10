@@ -2,40 +2,21 @@ import { useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { CommandItem } from "@superset/ui/command";
 import { cn } from "@superset/ui/utils";
-import { Check, Monitor, MonitorOff } from "lucide-react";
+import { Monitor, MonitorOff } from "lucide-react";
 import { V2WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceProjectIcon";
 import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceChecksDot";
-import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceStateGlyph";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
-import { hasLiveWorkspaceState } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/hasLiveWorkspaceState";
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
 import { MatchedText } from "../../../MatchedText";
+import { WorkspaceSwitcherRowLead } from "./components/WorkspaceSwitcherRowLead";
 
 interface WorkspaceSwitcherRowProps {
 	workspace: AccessibleV2Workspace;
 	isCurrent: boolean;
 	query: string;
 	onSelect: () => void;
-}
-
-function Lead({
-	workspace,
-	isCurrent,
-}: Pick<WorkspaceSwitcherRowProps, "workspace" | "isCurrent">) {
-	if (isCurrent) {
-		return (
-			<Check className="size-3.5 text-muted-foreground" strokeWidth={2.2} />
-		);
-	}
-	if (hasLiveWorkspaceState(workspace)) {
-		return <WorkspaceStateGlyph workspace={workspace} />;
-	}
-	if (workspace.pr) {
-		return <PRIcon state={workspace.pr.state} className="size-3" />;
-	}
-	return <span className="size-1.5 rounded-full bg-muted-foreground/50" />;
 }
 
 /** The sidebar's signals on one 34px line: lead glyph, name, project · branch, PR, place, age. */
@@ -68,7 +49,7 @@ export function WorkspaceSwitcherRow({
 			)}
 		>
 			<span className="flex size-4 shrink-0 items-center justify-center">
-				<Lead workspace={workspace} isCurrent={isCurrent} />
+				<WorkspaceSwitcherRowLead workspace={workspace} isCurrent={isCurrent} />
 			</span>
 			<span className="flex min-w-0 flex-1 items-center gap-2">
 				<span
