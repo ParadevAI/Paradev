@@ -102,7 +102,14 @@ export function buildAgentCommandString(
 	if (config.promptTransport === "argv") {
 		// Plain quoted positional, not the shared "$(cat <<…)" form: the command
 		// is typed into the user's configured shell, and fish has no heredocs.
-		return buildArgvCommand([...baseArgv, ...config.promptArgs, prompt]);
+		const endOfOptions =
+			config.promptArgs.length === 0 && prompt.startsWith("-") ? ["--"] : [];
+		return buildArgvCommand([
+			...baseArgv,
+			...config.promptArgs,
+			...endOfOptions,
+			prompt,
+		]);
 	}
 
 	return buildPromptCommandString({
