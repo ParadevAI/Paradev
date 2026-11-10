@@ -6357,6 +6357,9 @@ msgstr "Tidak dapat menghentikan tugas latar belakang"
 msgid "Couldn't stop the chat"
 msgstr "Tidak dapat menghentikan obrolan"
 
+msgid "Couldn't switch to #{number}"
+msgstr "Gagal beralih ke #{number}"
+
 msgid "Couldn't take a screenshot"
 msgstr "Gagal mengambil tangkapan layar"
 
@@ -19419,10 +19422,16 @@ msgstr "Beralih ke Workspace 8"
 msgid "Switch to Workspace 9"
 msgstr "Beralih ke Workspace 9"
 
+msgid "Switched to #{number}"
+msgstr "Beralih ke #{number}"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "Beralih ke {nextPlanName} pada {0}."
+
+msgid "Switching to #{number}…"
+msgstr "Beralih ke #{number}…"
 
 msgid "Symbol, light"
 msgstr "Simbol, terang"
@@ -21863,6 +21872,9 @@ msgstr "Lihat ukuran penuh"
 
 msgid "View in GitHub"
 msgstr "Lihat di GitHub"
+
+msgid "View instead"
+msgstr "Lihat saja"
 
 msgid "View log"
 msgstr "Lihat log"

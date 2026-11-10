@@ -131,7 +131,9 @@ export function PRStatusGroup({
 			: null,
 		flow.stack,
 	);
-	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
+		onSwitched: onRefresh,
+	});
 
 	const sync = state.kind === "pr-exists" ? state.sync : null;
 	const canCommit = sync?.hasUncommitted === true;

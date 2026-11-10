@@ -6357,6 +6357,9 @@ msgstr "バックグラウンドタスクを停止できませんでした"
 msgid "Couldn't stop the chat"
 msgstr "チャットを停止できませんでした"
 
+msgid "Couldn't switch to #{number}"
+msgstr "#{number} に切り替えられませんでした"
+
 msgid "Couldn't take a screenshot"
 msgstr "スクリーンショットを撮れませんでした"
 
@@ -19419,10 +19422,16 @@ msgstr "ワークスペース8に切り替え"
 msgid "Switch to Workspace 9"
 msgstr "ワークスペース9に切り替え"
 
+msgid "Switched to #{number}"
+msgstr "#{number} に切り替えました"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "{0} に {nextPlanName} に切り替わります。"
+
+msgid "Switching to #{number}…"
+msgstr "#{number} に切り替え中…"
 
 msgid "Symbol, light"
 msgstr "シンボル（明色）"
@@ -21863,6 +21872,9 @@ msgstr "フルサイズで表示"
 
 msgid "View in GitHub"
 msgstr "GitHubで見る"
+
+msgid "View instead"
+msgstr "代わりに表示"
 
 msgid "View log"
 msgstr "ログを表示"

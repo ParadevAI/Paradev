@@ -33,6 +33,29 @@ const BLOCKING_ISSUES: ReadonlySet<StackLayerIssue> = new Set([
 	"blocked",
 ]);
 
+export type StackLayerGlyphState =
+	| "open"
+	| "draft"
+	| "merged"
+	| "closed"
+	| "queued"
+	| "conflicting";
+
+export function stackLayerGlyphState(
+	layer: Pick<
+		PullRequestStackLayer,
+		"state" | "isDraft" | "mergeable" | "mergeStateStatus" | "queue"
+	>,
+): StackLayerGlyphState {
+	if (layer.state === "merged") return "merged";
+	if (layer.state === "closed") return "closed";
+	if (layer.isDraft) return "draft";
+	if (layer.mergeable === "conflicting" || layer.mergeStateStatus === "DIRTY") {
+		return "conflicting";
+	}
+	return layer.queue ? "queued" : "open";
+}
+
 export interface PullRequestStackBlocker {
 	kind: StackLayerIssue;
 	number: number;

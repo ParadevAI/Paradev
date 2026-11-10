@@ -6357,6 +6357,9 @@ msgstr "Kan de achtergrondtaak niet stoppen"
 msgid "Couldn't stop the chat"
 msgstr "Kon de chat niet stoppen"
 
+msgid "Couldn't switch to #{number}"
+msgstr "Overschakelen naar #{number} mislukt"
+
 msgid "Couldn't take a screenshot"
 msgstr "Screenshot maken mislukt"
 
@@ -19419,10 +19422,16 @@ msgstr "Naar werkruimte 8"
 msgid "Switch to Workspace 9"
 msgstr "Naar werkruimte 9"
 
+msgid "Switched to #{number}"
+msgstr "Overgeschakeld naar #{number}"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "Gaat op {0} over naar {nextPlanName}."
+
+msgid "Switching to #{number}…"
+msgstr "Overschakelen naar #{number}…"
 
 msgid "Symbol, light"
 msgstr "Symbool, licht"
@@ -21863,6 +21872,9 @@ msgstr "Op volledige grootte bekijken"
 
 msgid "View in GitHub"
 msgstr "Bekijken in GitHub"
+
+msgid "View instead"
+msgstr "Toch bekijken"
 
 msgid "View log"
 msgstr "Log bekijken"

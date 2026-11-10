@@ -6357,6 +6357,9 @@ msgstr "Не удалось остановить фоновую задачу"
 msgid "Couldn't stop the chat"
 msgstr "Не удалось остановить чат"
 
+msgid "Couldn't switch to #{number}"
+msgstr "Не удалось переключиться на #{number}"
+
 msgid "Couldn't take a screenshot"
 msgstr "Не удалось сделать снимок экрана"
 
@@ -19419,10 +19422,16 @@ msgstr "Перейти в рабочую область 8"
 msgid "Switch to Workspace 9"
 msgstr "Перейти в рабочую область 9"
 
+msgid "Switched to #{number}"
+msgstr "Переключено на #{number}"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "Переход на {nextPlanName} {0}."
+
+msgid "Switching to #{number}…"
+msgstr "Переключение на #{number}…"
 
 msgid "Symbol, light"
 msgstr "Символ, светлый"
@@ -21863,6 +21872,9 @@ msgstr "Открыть в полном размере"
 
 msgid "View in GitHub"
 msgstr "Посмотреть на GitHub"
+
+msgid "View instead"
+msgstr "Просто посмотреть"
 
 msgid "View log"
 msgstr "Смотреть лог"

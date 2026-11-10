@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import { ArrowUpRight } from "lucide-react";
 import type { PullRequestStackLayer } from "../../../../hooks/usePullRequestStack";
+import { stackLayerGlyphState } from "../../../../utils/assessPullRequestStack";
 import {
 	PR_STATE_INK_CLASS_NAME,
 	type PullRequestGlyphState,
@@ -17,16 +18,6 @@ const STATUS_TONE_CLASS_NAME: Record<StackLayerStatusTone, string> = {
 	muted: "text-muted-foreground",
 };
 
-function layerGlyphState(layer: PullRequestStackLayer): PullRequestGlyphState {
-	if (layer.state === "merged") return "merged";
-	if (layer.state === "closed") return "closed";
-	if (layer.isDraft) return "draft";
-	if (layer.mergeable === "conflicting" || layer.mergeStateStatus === "DIRTY") {
-		return "conflicting";
-	}
-	return layer.queue ? "queued" : "open";
-}
-
 export function PullRequestStackLayerRow({
 	layer,
 	tag,
@@ -40,7 +31,7 @@ export function PullRequestStackLayerRow({
 	onSelect: (layer: PullRequestStackLayer) => void;
 }) {
 	const { t } = useLingui();
-	const glyphState = layerGlyphState(layer);
+	const glyphState = stackLayerGlyphState(layer);
 	const stateLabels: Record<PullRequestGlyphState, string> = {
 		open: t({ message: "Open", context: "status" }),
 		draft: t({ message: "Draft" }),

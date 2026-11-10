@@ -6357,6 +6357,9 @@ msgstr "Impossibile interrompere l'attività in background"
 msgid "Couldn't stop the chat"
 msgstr "Non è stato possibile arrestare la chat"
 
+msgid "Couldn't switch to #{number}"
+msgstr "Impossibile passare a #{number}"
+
 msgid "Couldn't take a screenshot"
 msgstr "Impossibile acquisire lo screenshot"
 
@@ -19419,10 +19422,16 @@ msgstr "Passa al workspace 8"
 msgid "Switch to Workspace 9"
 msgstr "Passa al workspace 9"
 
+msgid "Switched to #{number}"
+msgstr "Passato a #{number}"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "Passa a {nextPlanName} il {0}."
+
+msgid "Switching to #{number}…"
+msgstr "Passaggio a #{number}…"
 
 msgid "Symbol, light"
 msgstr "Simbolo, chiaro"
@@ -21863,6 +21872,9 @@ msgstr "Visualizza a grandezza intera"
 
 msgid "View in GitHub"
 msgstr "Vedi in GitHub"
+
+msgid "View instead"
+msgstr "Visualizza invece"
 
 msgid "View log"
 msgstr "Vedi il log"

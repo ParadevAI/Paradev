@@ -6357,6 +6357,9 @@ msgstr "Arka plan görevi durdurulamadı"
 msgid "Couldn't stop the chat"
 msgstr "Sohbet durdurulamadı"
 
+msgid "Couldn't switch to #{number}"
+msgstr "#{number} dalına geçilemedi"
+
 msgid "Couldn't take a screenshot"
 msgstr "Ekran görüntüsü alınamadı"
 
@@ -19419,10 +19422,16 @@ msgstr "8. çalışma alanına geç"
 msgid "Switch to Workspace 9"
 msgstr "9. çalışma alanına geç"
 
+msgid "Switched to #{number}"
+msgstr "#{number} dalına geçildi"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "{0} tarihinde {nextPlanName} planına geçer."
+
+msgid "Switching to #{number}…"
+msgstr "#{number} dalına geçiliyor…"
 
 msgid "Symbol, light"
 msgstr "Sembol, açık"
@@ -21863,6 +21872,9 @@ msgstr "Tam boyutta görüntüle"
 
 msgid "View in GitHub"
 msgstr "GitHub'da görüntüle"
+
+msgid "View instead"
+msgstr "Bunun yerine görüntüle"
 
 msgid "View log"
 msgstr "Günlüğü görüntüle"

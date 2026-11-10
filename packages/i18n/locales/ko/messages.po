@@ -6357,6 +6357,9 @@ msgstr "백그라운드 작업을 중지할 수 없습니다"
 msgid "Couldn't stop the chat"
 msgstr "채팅을 중지할 수 없습니다"
 
+msgid "Couldn't switch to #{number}"
+msgstr "#{number}(으)로 전환하지 못했습니다"
+
 msgid "Couldn't take a screenshot"
 msgstr "스크린샷을 찍지 못했습니다"
 
@@ -19419,10 +19422,16 @@ msgstr "워크스페이스 8로 전환"
 msgid "Switch to Workspace 9"
 msgstr "워크스페이스 9로 전환"
 
+msgid "Switched to #{number}"
+msgstr "#{number}(으)로 전환했습니다"
+
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
 msgid "Switches to {nextPlanName} on {0}."
 msgstr "{0}에 {nextPlanName}(으)로 전환됩니다."
+
+msgid "Switching to #{number}…"
+msgstr "#{number}(으)로 전환 중…"
 
 msgid "Symbol, light"
 msgstr "심볼, 밝은 색"
@@ -21863,6 +21872,9 @@ msgstr "전체 크기로 보기"
 
 msgid "View in GitHub"
 msgstr "GitHub에서 보기"
+
+msgid "View instead"
+msgstr "대신 보기"
 
 msgid "View log"
 msgstr "로그 보기"

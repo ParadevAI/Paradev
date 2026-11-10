@@ -20,7 +20,10 @@ import {
 	gitStatusPartialTask,
 	gitStatusSnapshotTask,
 } from "../../../workers/tasks/git";
-import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
+import {
+	getLocalWorkspace,
+	updateLocalWorkspace,
+} from "../../../workspaces/local-workspace-store";
 import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
@@ -128,6 +131,19 @@ export const MAX_DIFF_STATS_BATCH = 500;
  */
 function invalidateStatus(workspaceId: string): void {
 	gitStatusStore.recordChange(workspaceId, undefined);
+}
+
+/** The worktree path `git worktree list --porcelain` shows for a branch, if any. */
+export function worktreeHoldingBranch(
+	porcelain: string,
+	branch: string,
+): string | null {
+	for (const block of porcelain.split("\n\n")) {
+		const path = block.match(/^worktree (.+)$/m)?.[1];
+		const head = block.match(/^branch refs\/heads\/(.+)$/m)?.[1];
+		if (path && head === branch) return path;
+	}
+	return null;
 }
 
 function runStatusSnapshot(
@@ -544,6 +560,55 @@ export const gitRouter = router({
 			await git.raw(["branch", "-m", oldName, input.newName]);
 			invalidateStatus(input.workspaceId);
 			return { name: input.newName };
+		}),
+
+	/**
+	 * Moves the workspace onto another branch of its repository. A branch that
+	 * only exists on the remote is fetched first; `git switch` then creates the
+	 * tracking branch. Refused while the tree is dirty, because the switch
+	 * would carry the changes along, and while another worktree holds the
+	 * branch, because git allows a branch in one worktree at a time.
+	 */
+	checkoutBranch: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), branch: z.string().min(1) }))
+		.mutation(async ({ ctx, input }) => {
+			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const git = await ctx.git(worktreePath);
+			if (!(await git.status()).isClean()) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "Commit or discard the changes in this workspace first.",
+				});
+			}
+			const holder = worktreeHoldingBranch(
+				await git.raw(["worktree", "list", "--porcelain"]),
+				input.branch,
+			);
+			if (holder && holder !== worktreePath) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: `${input.branch} is checked out in another workspace.`,
+				});
+			}
+			await git.fetch("origin", input.branch).catch(() => {});
+			try {
+				await git.raw(["switch", input.branch]);
+			} catch (error) {
+				rethrowEnvironmentalGitError(error);
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `No branch ${input.branch} here or on origin.`,
+					cause: error,
+				});
+			}
+			updateLocalWorkspace(
+				{ db: ctx.db, eventBus: ctx.eventBus, userId: ctx.userId },
+				input.workspaceId,
+				{ branch: input.branch },
+			);
+			invalidateStatus(input.workspaceId);
+			return { branch: input.branch };
 		}),
 
 	discardChanges: protectedProcedure

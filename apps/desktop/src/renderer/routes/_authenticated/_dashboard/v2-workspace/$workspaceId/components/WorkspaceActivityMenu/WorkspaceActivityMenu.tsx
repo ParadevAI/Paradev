@@ -45,6 +45,7 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-works
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
+import { useOpenStackLayer } from "../../hooks/useOpenStackLayer";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { usePullRequestActions } from "../../hooks/usePullRequestActions";
 import { useShipActions } from "../../hooks/useShipActions";
@@ -82,6 +83,7 @@ import {
 	PullRequestRow,
 } from "./components/PullRequestRow";
 import { ShipActionsMenu, type ShipView } from "./components/ShipActionsMenu";
+import { StackLayerRows } from "./components/StackLayerRows";
 import {
 	PANEL_EXIT_MS,
 	PANEL_MAX_HEIGHT_PX,
@@ -241,6 +243,9 @@ export function WorkspaceActivityMenu({
 		target: currentPrTarget,
 		onRefresh: refreshFlowState,
 	});
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
+		onSwitched: refreshFlowState,
+	});
 	const refreshWorkspacePullRequest =
 		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
 	const mergeFlow = usePullRequestMergeFlow({
@@ -328,9 +333,22 @@ export function WorkspaceActivityMenu({
 		[detachedTerminals],
 	);
 	const agentWork = useAgentWork(workspaceId);
+	const stackLayerNumbers = new Set(
+		mergeFlow.stack?.layers
+			.filter((layer) => layer.number !== currentPr?.number)
+			.map((layer) => layer.number) ?? [],
+	);
 	const linkedPullRequests = useWorkspacePullRequests(workspaceId, {
 		enabled: open,
-	});
+	}).filter(
+		(pullRequest) =>
+			!(
+				currentPr &&
+				pullRequest.repoOwner === currentPr.repoOwner &&
+				pullRequest.repoName === currentPr.repoName &&
+				stackLayerNumbers.has(pullRequest.number)
+			),
+	);
 	const pullRequests: PullRequestEntry[] =
 		changes &&
 		currentPr &&
@@ -362,39 +380,61 @@ export function WorkspaceActivityMenu({
 		pullRequest.number === currentPr.number &&
 		pullRequest.repoOwner === currentPr.repoOwner &&
 		pullRequest.repoName === currentPr.repoName;
-	const pullRequestRow = (pullRequest: PullRequestEntry) => (
-		<PullRequestRow
-			key={`${pullRequest.repoOwner}/${pullRequest.repoName}#${pullRequest.number}`}
-			pullRequest={pullRequest}
-			menu={
-				isCurrentPullRequest(pullRequest) && currentPr ? (
-					<ShipActionsMenu
-						canCreatePr={false}
-						{...shipMenuProps}
-						pullRequest={{
-							target: currentPrTarget,
-							flow: mergeFlow,
-							canMarkReady: currentPrState === "draft",
-							canMerge: currentPr.state === "open" && !currentPr.isDraft,
-							isQueued:
-								currentPr.state === "queued" || mergeFlow.queued !== null,
-							isMarkingReady: prActions.isMarkingReady,
-							isMerging: prActions.isMerging,
-							onMarkReady: prActions.markReady,
-							onMerge: prActions.merge,
-						}}
+	const pullRequestRow = (pullRequest: PullRequestEntry) => {
+		const stack =
+			isCurrentPullRequest(pullRequest) && mergeFlow.stack
+				? mergeFlow.stack
+				: null;
+		return (
+			<div
+				key={`${pullRequest.repoOwner}/${pullRequest.repoName}#${pullRequest.number}`}
+			>
+				<PullRequestRow
+					pullRequest={pullRequest}
+					stack={
+						stack
+							? { position: stack.currentPosition, size: stack.layers.length }
+							: null
+					}
+					menu={
+						isCurrentPullRequest(pullRequest) && currentPr ? (
+							<ShipActionsMenu
+								canCreatePr={false}
+								{...shipMenuProps}
+								pullRequest={{
+									target: currentPrTarget,
+									flow: mergeFlow,
+									canMarkReady: currentPrState === "draft",
+									canMerge: currentPr.state === "open" && !currentPr.isDraft,
+									isQueued:
+										currentPr.state === "queued" || mergeFlow.queued !== null,
+									isMarkingReady: prActions.isMarkingReady,
+									isMerging: prActions.isMerging,
+									onMarkReady: prActions.markReady,
+									onMerge: prActions.merge,
+								}}
+							/>
+						) : undefined
+					}
+					onOpen={(target, event) =>
+						openPullRequestLink(
+							target.url,
+							pullRequestLinkPolicy.getAction(event),
+							onOpenPullRequest,
+						)
+					}
+				/>
+				{stack ? (
+					<StackLayerRows
+						layers={stack.layers.filter(
+							(layer) => layer.number !== pullRequest.number,
+						)}
+						onSelect={openStackLayer}
 					/>
-				) : undefined
-			}
-			onOpen={(target, event) =>
-				openPullRequestLink(
-					target.url,
-					pullRequestLinkPolicy.getAction(event),
-					onOpenPullRequest,
-				)
-			}
-		/>
-	);
+				) : null}
+			</div>
+		);
+	};
 	const paneStores = useMemo(
 		() => [store, ...linkedStores],
 		[store, linkedStores],
