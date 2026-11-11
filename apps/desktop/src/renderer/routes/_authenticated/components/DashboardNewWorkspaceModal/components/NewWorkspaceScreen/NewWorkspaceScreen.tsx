@@ -1198,9 +1198,9 @@ export function NewWorkspaceScreen({
 				/>
 			</div>
 			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
-				{/* The editor stops growing before it reaches the centred heading. */}
+				{/* At most 10 lines, and never into the centred heading on short windows. */}
 				<div
-					className="relative flex w-full flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]"
+					className="relative flex w-full flex-col [--prompt-input-max-height:min(10lh,max(4.5rem,calc(50vh-16rem)))]"
 					style={{
 						maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
 					}}
