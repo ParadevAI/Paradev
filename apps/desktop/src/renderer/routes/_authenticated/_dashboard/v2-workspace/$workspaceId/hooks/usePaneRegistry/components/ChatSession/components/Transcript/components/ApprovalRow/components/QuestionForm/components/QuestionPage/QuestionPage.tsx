@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { FormField } from "@superset/chat/protocol";
+import { isImeComposing } from "@superset/ui/lib/keyboard";
 import { cn } from "@superset/ui/utils";
 import { Check, PencilLine } from "lucide-react";
 import {
@@ -125,7 +126,7 @@ export function QuestionPage({
 							onChange={(event) => onType(textField.id, event.target.value)}
 							onKeyDown={(event) => {
 								event.stopPropagation();
-								if (event.key === "Enter") onEnter();
+								if (event.key === "Enter" && !isImeComposing(event)) onEnter();
 							}}
 							placeholder={
 								field.input === "integer"
