@@ -104,7 +104,12 @@ if [ "$_superset_has_superset_context" = "1" ] && [ -f "$_superset_notify_path" 
     fi
     _superset_debug "watching session=$_superset_session_log"
 
-    tail -n +1 -F "$_superset_session_log" 2>/dev/null | while IFS= read -r _superset_line; do
+    _superset_tail_args=()
+    # GNU tail's default polling interval can miss short sessions.
+    if tail --version 2>/dev/null | grep -q 'GNU coreutils'; then
+      _superset_tail_args=(-s 0.05)
+    fi
+    tail -n +1 -F "${_superset_tail_args[@]}" "$_superset_session_log" 2>/dev/null | while IFS= read -r _superset_line; do
       case "$_superset_line" in
         *'"dir":"from_tui"'*'"kind":"op"'*'"UserTurn"'*) _superset_emit_event "Start" ;;
         *'_approval_request"'*) _superset_emit_event "PermissionRequest" ;;

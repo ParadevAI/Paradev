@@ -1010,7 +1010,9 @@ exit 0
 		});
 
 		const notifications = readFileSync(notifyCapturePath, "utf-8");
-		expect(notifications).toContain('{"hook_event_name":"Start"}');
+		expect(notifications.match(/\{"hook_event_name":"Start"\}/g)).toHaveLength(
+			1,
+		);
 		expect(notifications).not.toContain('{"hook_event_name":"Stop"}');
 
 		const debugLog = readFileSync(debugLogPath, "utf-8");
@@ -1069,7 +1071,9 @@ exit 0
 		});
 
 		const notifications = readFileSync(notifyCapturePath, "utf-8");
-		expect(notifications).toContain('{"hook_event_name":"Start"}');
+		expect(notifications.match(/\{"hook_event_name":"Start"\}/g)).toHaveLength(
+			1,
+		);
 		expect(notifications).not.toContain('{"hook_event_name":"Stop"}');
 
 		const debugLog = readFileSync(debugLogPath, "utf-8");
