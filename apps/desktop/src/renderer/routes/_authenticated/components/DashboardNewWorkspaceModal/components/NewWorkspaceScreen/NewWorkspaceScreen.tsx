@@ -12,6 +12,7 @@ import type { MachineSize } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
+import { hostLaunchesChatWithEffort } from "@superset/shared/host-version";
 import { Button } from "@superset/ui/button";
 import { isEnterSubmit } from "@superset/ui/lib/keyboard";
 import { toast } from "@superset/ui/sonner";
@@ -770,6 +771,10 @@ export function NewWorkspaceScreen({
 		isCloudHost ? cloudSelection.machineSize : null,
 		hostId,
 		isSession,
+		hostId === machineId ||
+			hostLaunchesChatWithEffort(
+				otherHosts.find((host) => host.id === hostId)?.version,
+			),
 	);
 
 	const submitBlocker = useMemo<string | null>(() => {

@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { ATTACHMENT_PARTS_MIN_HOST_VERSION } from "./attachment-limits";
 import {
+	CHAT_LAUNCH_EFFORT_MIN_HOST_VERSION,
 	CHAT_SELECTIONS_MIN_HOST_VERSION,
 	deriveHostVersionState,
+	hostLaunchesChatWithEffort,
 	hostNeedsUpdate,
 	hostReadsAttachmentParts,
 	hostRemembersChatSelections,
@@ -104,5 +106,15 @@ describe("hostRemembersChatSelections", () => {
 		);
 		expect(hostRemembersChatSelections("2.0.5")).toBe(false);
 		expect(hostRemembersChatSelections(undefined)).toBe(false);
+	});
+});
+
+describe("hostLaunchesChatWithEffort", () => {
+	test("a host at or above the floor starts a chat on its effort; an older or unknown one does not", () => {
+		expect(
+			hostLaunchesChatWithEffort(CHAT_LAUNCH_EFFORT_MIN_HOST_VERSION),
+		).toBe(true);
+		expect(hostLaunchesChatWithEffort("2.0.8")).toBe(false);
+		expect(hostLaunchesChatWithEffort(null)).toBe(false);
 	});
 });

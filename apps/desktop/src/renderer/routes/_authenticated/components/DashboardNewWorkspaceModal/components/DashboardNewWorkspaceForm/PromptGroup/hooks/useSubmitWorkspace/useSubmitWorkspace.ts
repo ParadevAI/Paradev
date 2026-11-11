@@ -24,6 +24,7 @@ import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorksp
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
 import { resolveNames } from "./resolveNames";
+import { launchEffort } from "./utils/launchEffort";
 
 /**
  * Submits a workspace create against the new `workspaces.create` host
@@ -44,6 +45,7 @@ export function useSubmitWorkspace(
 	cloudMachineSize: MachineSize | null = null,
 	hostId: string | null = null,
 	isSession = false,
+	hostLaunchesChatWithEffort = false,
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -204,6 +206,7 @@ export function useSubmitWorkspace(
 						launch: initialLaunch,
 						prompt: prompt.trim(),
 						modelId: selectedModel,
+						effortId: selectedEffort,
 						modeId: selectedMode,
 					});
 				}
@@ -291,7 +294,10 @@ export function useSubmitWorkspace(
 						prompt: finalPrompt ?? "",
 						attachmentIds: attachmentIds.length > 0 ? attachmentIds : undefined,
 						model: selectedModel ?? undefined,
-						effort: openAsChat ? undefined : (selectedEffort ?? undefined),
+						effort: launchEffort(selectedEffort, {
+							openAsChat,
+							hostLaunchesChatWithEffort,
+						}),
 						mode: selectedMode ?? undefined,
 						...(openAsChat ? { surface: "chat" as const } : {}),
 					},
@@ -421,6 +427,7 @@ export function useSubmitWorkspace(
 		utils,
 		cloudEnvironmentId,
 		cloudMachineSize,
+		hostLaunchesChatWithEffort,
 	]);
 
 	const submitWorkspace = useCallback(async () => {

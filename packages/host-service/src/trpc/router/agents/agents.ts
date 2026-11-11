@@ -673,7 +673,6 @@ export function chatLaunchTarget(
 } | null {
 	if (
 		input.surface !== "chat" ||
-		input.effort ||
 		input.resumeSessionId ||
 		input.forkSessionId
 	) {
@@ -697,6 +696,12 @@ export function chatLaunchTarget(
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
 	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	validateAgentEffortSelection(
+		launchPresetId,
+		config.label,
+		input.effort,
+		input.model,
+	);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
 	return {
 		harness,

@@ -31,6 +31,7 @@ export function createChatSession(
 			: {}),
 		terminalId,
 		...(input.model ? { modelId: input.model } : {}),
+		...(input.effort ? { effortId: input.effort } : {}),
 		...(input.mode ? { modeId: input.mode } : {}),
 		...(input.resumeSessionId
 			? { resume: { harnessSessionId: input.resumeSessionId } }
