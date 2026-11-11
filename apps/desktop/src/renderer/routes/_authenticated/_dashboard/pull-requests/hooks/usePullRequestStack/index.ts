@@ -4,4 +4,5 @@ export {
 	type PullRequestStackLayer,
 	type PullRequestStackQuery,
 	usePullRequestStack,
+	useStackedPullRequestsEnabled,
 } from "./usePullRequestStack";

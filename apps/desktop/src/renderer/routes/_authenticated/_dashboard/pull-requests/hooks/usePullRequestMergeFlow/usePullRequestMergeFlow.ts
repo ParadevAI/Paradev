@@ -32,6 +32,7 @@ import {
 	type PullRequestStack,
 	type PullRequestStackQuery,
 	usePullRequestStack,
+	useStackedPullRequestsEnabled,
 } from "../usePullRequestStack";
 import {
 	type MergeActionKind,
@@ -87,6 +88,7 @@ export function usePullRequestMergeFlow({
 	const { t } = useLingui();
 	const copy = usePullRequestStackCopy();
 	const queryClient = useQueryClient();
+	const isEnabled = useStackedPullRequestsEnabled();
 	const stackQuery = usePullRequestStack(target);
 	const invalidate = useInvalidatePullRequestDetail(target);
 	// Read from the cache only: the pull request page and the merge menus load
@@ -110,12 +112,13 @@ export function usePullRequestMergeFlow({
 	);
 	const targetCount = assessment?.targets.length ?? 0;
 	const isStack = stack?.source === "github";
-	const usesQueue = stack
-		? stack.usesMergeQueue
-		: detailQueue?.enabled === true;
-	const queued = stack
-		? (stack.layers.find((layer) => layer.isCurrent)?.queue ?? null)
-		: (detailQueue?.entry ?? null);
+	const usesQueue =
+		isEnabled && (stack ? stack.usesMergeQueue : detailQueue?.enabled === true);
+	const queued = !isEnabled
+		? null
+		: stack
+			? (stack.layers.find((layer) => layer.isCurrent)?.queue ?? null)
+			: (detailQueue?.entry ?? null);
 	const blocker = resolveStackMergeBlocker(stack);
 	const landsSeveral = isStack && targetCount > 1;
 	const kind: MergeActionKind = { stack: landsSeveral, queue: usesQueue };
@@ -281,6 +284,7 @@ export function usePullRequestMergeFlow({
 		confirmsDequeue,
 		cancelDequeue: () => setConfirmsDequeue(false),
 		runDequeue: () => {
+			if (!confirmsDequeue || leaveQueue.isPending) return;
 			setConfirmsDequeue(false);
 			leaveQueue.mutate();
 		},
