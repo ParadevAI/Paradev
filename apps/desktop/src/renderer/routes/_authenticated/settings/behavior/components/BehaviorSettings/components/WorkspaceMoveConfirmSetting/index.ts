@@ -1,0 +1,1 @@
+export { WorkspaceMoveConfirmSetting } from "./WorkspaceMoveConfirmSetting";

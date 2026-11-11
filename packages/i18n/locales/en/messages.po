@@ -5138,6 +5138,9 @@ msgstr "Configure workspace run command"
 msgid "Configured for {agent}"
 msgstr "Configured for {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Confirm before moving a workspace"
+
 msgid "Confirm before quitting"
 msgstr "Confirm before quitting"
 
@@ -8172,6 +8175,9 @@ msgstr "Explain how this repository works…"
 
 msgid "Explain to me how this repository works"
 msgstr "Explain to me how this repository works"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Explain what a move does before a workspace moves to another computer"
 
 msgid "Explore"
 msgstr "Explore"

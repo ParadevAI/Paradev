@@ -1,6 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
-import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import {
 	AlertDialog,
 	AlertDialogContent,
@@ -10,6 +8,8 @@ import {
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
 import { Button } from "@superset/ui/button";
+import { Checkbox } from "@superset/ui/checkbox";
+import { Label } from "@superset/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -17,16 +17,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@superset/ui/select";
-import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useWorkspaceMoveConfirmStore } from "renderer/stores/workspace-move-confirm/store";
 import {
 	type MoveDestinationComputer,
 	useMoveDestinationComputers,
 } from "../../../../hooks/useMoveDestinationComputers";
-import { useMoveWorkspaceToComputer } from "../../../../hooks/useMoveWorkspaceToComputer";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
-import { startWorkspaceMoveProgress } from "../../../../utils/startWorkspaceMoveProgress";
-import { navigateToV2Workspace } from "../../../../utils/workspace-navigation";
+import { useStartMoveToComputer } from "../../hooks/useStartMoveToComputer";
 
 interface MoveWorkspaceToComputerDialogProps {
 	open: boolean;
@@ -42,18 +40,19 @@ export function MoveWorkspaceToComputerDialog({
 	initialHostId,
 }: MoveWorkspaceToComputerDialogProps) {
 	const { t } = useLingui();
-	const navigate = useNavigate();
-	const moveWorkspaceToComputer = useMoveWorkspaceToComputer(workspace);
+	const startMove = useStartMoveToComputer(workspace);
+	const suppress = useWorkspaceMoveConfirmStore((state) => state.suppress);
 	const computers = useMoveDestinationComputers(workspace.hostId);
 	const [picked, setPicked] = useState<string | null>(initialHostId ?? null);
+	const [dontAskAgain, setDontAskAgain] = useState(false);
 	const destination =
 		computers.find((computer) => computer.hostId === picked) ??
 		computers.find((computer) => computer.online) ??
 		null;
-	const nameOf = (computer: MoveDestinationComputer) =>
-		computer.isThisComputer ? null : computer.name;
 	const labelOf = (computer: MoveDestinationComputer) =>
-		nameOf(computer) ?? t({ message: "This computer" });
+		computer.isThisComputer || !computer.name
+			? t({ message: "This computer" })
+			: computer.name;
 	const offlineLabel = (computer: MoveDestinationComputer) => {
 		const computerName = labelOf(computer);
 		return t({ message: `${computerName} (offline)` });
@@ -61,36 +60,9 @@ export function MoveWorkspaceToComputerDialog({
 
 	const move = () => {
 		if (!destination?.online) return;
-		const progress = startWorkspaceMoveProgress({
-			name: workspace.name,
-			destination: nameOf(destination) ?? t({ message: "this computer" }),
-			toCloud: false,
-			sourceWorkspaceId: workspace.id,
-			retry: move,
-		});
+		if (dontAskAgain) suppress();
 		onOpenChange(false);
-		void moveWorkspaceToComputer({
-			destination: { hostId: destination.hostId, name: nameOf(destination) },
-			onStage: progress.setStage,
-			onBegun: progress.begun,
-			signal: progress.signal,
-		})
-			.then(({ toWorkspaceId, stayed }) =>
-				progress.follow(toWorkspaceId, {
-					stayed,
-					open: () => void navigateToV2Workspace(toWorkspaceId, navigate),
-				}),
-			)
-			.catch((error: unknown) =>
-				progress.fail(
-					isMissingProcedureError(error)
-						? t({
-								message:
-									"Update the host service on both computers and try again.",
-							})
-						: errorMessage(error, t({ message: "Unknown error" })),
-				),
-			);
+		startMove(destination);
 	};
 
 	return (
@@ -134,13 +106,28 @@ export function MoveWorkspaceToComputerDialog({
 						<Trans>No other computer is set up for this account.</Trans>
 					</p>
 				)}
-				<AlertDialogFooter>
-					<Button variant="outline" onClick={() => onOpenChange(false)}>
-						<Trans>Cancel</Trans>
-					</Button>
-					<Button disabled={!destination?.online} onClick={move}>
-						<Trans>Move</Trans>
-					</Button>
+				<AlertDialogFooter className="sm:justify-between">
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="workspace-move-dont-ask-again"
+							checked={dontAskAgain}
+							onCheckedChange={(checked) => setDontAskAgain(checked === true)}
+						/>
+						<Label
+							htmlFor="workspace-move-dont-ask-again"
+							className="text-sm font-normal text-muted-foreground"
+						>
+							<Trans>Don't ask again</Trans>
+						</Label>
+					</div>
+					<div className="flex gap-2">
+						<Button variant="outline" onClick={() => onOpenChange(false)}>
+							<Trans>Cancel</Trans>
+						</Button>
+						<Button disabled={!destination?.online} onClick={move}>
+							<Trans>Move</Trans>
+						</Button>
+					</div>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

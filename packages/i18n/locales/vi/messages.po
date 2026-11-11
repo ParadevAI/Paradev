@@ -5138,6 +5138,9 @@ msgstr "Cấu hình lệnh chạy của workspace"
 msgid "Configured for {agent}"
 msgstr "Đã cấu hình cho {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Xác nhận trước khi chuyển không gian làm việc"
+
 msgid "Confirm before quitting"
 msgstr "Xác nhận trước khi thoát"
 
@@ -8172,6 +8175,9 @@ msgstr "Giải thích repository này hoạt động thế nào…"
 
 msgid "Explain to me how this repository works"
 msgstr "Giải thích cho tôi repository này hoạt động thế nào"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Giải thích việc chuyển sẽ làm gì trước khi chuyển không gian làm việc sang máy tính khác"
 
 msgid "Explore"
 msgstr "Khám phá"

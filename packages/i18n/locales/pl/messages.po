@@ -5138,6 +5138,9 @@ msgstr "Skonfiguruj polecenie uruchamiania obszaru roboczego"
 msgid "Configured for {agent}"
 msgstr "Skonfigurowany dla {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Potwierdzaj przed przeniesieniem obszaru roboczego"
+
 msgid "Confirm before quitting"
 msgstr "Potwierdzaj przed zamknięciem"
 
@@ -8172,6 +8175,9 @@ msgstr "Wyjaśnij, jak działa to repozytorium…"
 
 msgid "Explain to me how this repository works"
 msgstr "Wyjaśnij mi, jak działa to repozytorium"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Wyjaśniaj skutki przeniesienia, zanim obszar roboczy trafi na inny komputer"
 
 msgid "Explore"
 msgstr "Odkrywaj"
