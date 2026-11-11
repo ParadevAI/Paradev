@@ -12272,12 +12272,6 @@ msgstr "Mover esta área de trabalho para a nuvem?"
 msgid "Move to"
 msgstr "Mover para"
 
-msgid "Move to a computer"
-msgstr "Mover para um computador"
-
-msgid "Move to another computer"
-msgstr "Mover para outro computador"
-
 msgid "Move to background"
 msgstr "Mover para segundo plano"
 

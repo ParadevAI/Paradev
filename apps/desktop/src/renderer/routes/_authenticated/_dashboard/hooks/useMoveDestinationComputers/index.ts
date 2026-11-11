@@ -1,4 +1,2 @@
-export {
-	type MoveDestinationComputer,
-	useMoveDestinationComputers,
-} from "./useMoveDestinationComputers";
+export { useMoveDestinationComputers } from "./useMoveDestinationComputers";
+export type { MoveDestinationComputer } from "./utils/listMoveDestinationComputers";

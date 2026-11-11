@@ -12272,12 +12272,6 @@ msgstr "Chuyển không gian làm việc này lên cloud?"
 msgid "Move to"
 msgstr "Chuyển sang"
 
-msgid "Move to a computer"
-msgstr "Chuyển sang một máy tính"
-
-msgid "Move to another computer"
-msgstr "Chuyển sang máy tính khác"
-
 msgid "Move to background"
 msgstr "Chuyển sang chạy nền"
 

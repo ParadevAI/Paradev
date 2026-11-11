@@ -5,14 +5,16 @@ import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import {
-	CloudUpload,
+	ArrowRightLeft,
 	Ellipsis,
-	Laptop,
 	Play,
 	Settings,
 	Square,
@@ -20,12 +22,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
-import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
 import {
-	useWorkspaceMoveDirections,
-	type WorkspaceMoveDirection,
-} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+	type MoveDestinationPick,
+	MoveToDestinationItems,
+} from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
+import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
+import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
@@ -66,8 +68,7 @@ export function WorkspaceMoreMenu({
 	const label = t({ message: "More actions" });
 	const { workspace } = useWorkspace();
 	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
-	const { machineId } = useLocalHostService();
-	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
+	const [moveOpen, setMoveOpen] = useState<MoveDestinationPick | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 
 	return (
@@ -147,34 +148,31 @@ export function WorkspaceMoreMenu({
 							)}
 						</DropdownMenuItem>
 					)}
-					{moveDirections.length > 0 && <DropdownMenuSeparator />}
-					{moveDirections.map((direction) => (
-						<DropdownMenuItem
-							key={direction}
-							onSelect={() => runAfterClose(() => setMoveOpen(direction))}
-						>
-							{direction === "to-cloud" ? (
-								<>
-									<CloudUpload className="size-4" />
-									<Trans>Move to cloud</Trans>
-								</>
-							) : (
-								<>
-									<Laptop className="size-4" />
-									{workspace.hostId === machineId ? (
-										<Trans>Move to another computer</Trans>
-									) : (
-										<Trans>Move to a computer</Trans>
-									)}
-								</>
-							)}
-						</DropdownMenuItem>
-					))}
+					{moveDirections.length > 0 && (
+						<>
+							<DropdownMenuSeparator />
+							<DropdownMenuSub>
+								<DropdownMenuSubTrigger>
+									<ArrowRightLeft className="size-4" />
+									<Trans>Move to</Trans>
+								</DropdownMenuSubTrigger>
+								<DropdownMenuSubContent>
+									<MoveToDestinationItems
+										item={DropdownMenuItem}
+										directions={moveDirections}
+										fromHostId={workspace.hostId}
+										onPick={(pick) => runAfterClose(() => setMoveOpen(pick))}
+									/>
+								</DropdownMenuSubContent>
+							</DropdownMenuSub>
+						</>
+					)}
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{moveOpen && (
 				<MoveWorkspaceDialog
-					direction={moveOpen}
+					direction={moveOpen.direction}
+					destinationHostId={moveOpen.hostId}
 					workspace={{
 						id: workspaceId,
 						hostId: workspace.hostId,

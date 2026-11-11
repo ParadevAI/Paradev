@@ -12272,12 +12272,6 @@ msgstr "将此工作区移至云端？"
 msgid "Move to"
 msgstr "移至"
 
-msgid "Move to a computer"
-msgstr "移至一台电脑"
-
-msgid "Move to another computer"
-msgstr "移至另一台电脑"
-
 msgid "Move to background"
 msgstr "移到后台"
 

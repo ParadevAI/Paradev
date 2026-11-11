@@ -12272,12 +12272,6 @@ msgstr "Przenieść ten obszar roboczy do chmury?"
 msgid "Move to"
 msgstr "Przenieś do"
 
-msgid "Move to a computer"
-msgstr "Przenieś na komputer"
-
-msgid "Move to another computer"
-msgstr "Przenieś na inny komputer"
-
 msgid "Move to background"
 msgstr "Przenieś w tło"
 

@@ -12272,12 +12272,6 @@ msgstr "이 워크스페이스를 클라우드로 옮길까요?"
 msgid "Move to"
 msgstr "옮길 위치"
 
-msgid "Move to a computer"
-msgstr "컴퓨터로 옮기기"
-
-msgid "Move to another computer"
-msgstr "다른 컴퓨터로 옮기기"
-
 msgid "Move to background"
 msgstr "백그라운드로 이동"
 

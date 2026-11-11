@@ -12272,12 +12272,6 @@ msgstr "Перенести эту рабочую область в облако?
 msgid "Move to"
 msgstr "Перенести"
 
-msgid "Move to a computer"
-msgstr "Перенести на компьютер"
-
-msgid "Move to another computer"
-msgstr "Перенести на другой компьютер"
-
 msgid "Move to background"
 msgstr "Перевести в фон"
 
