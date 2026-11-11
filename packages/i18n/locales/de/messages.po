@@ -12142,6 +12142,9 @@ msgstr "Diesen Arbeitsbereich auf einen Computer verschieben?"
 msgid "Move this workspace to the cloud?"
 msgstr "Diesen Arbeitsbereich in die Cloud verschieben?"
 
+msgid "Move to"
+msgstr "Verschieben nach"
+
 msgid "Move to a computer"
 msgstr "Auf einen Computer verschieben"
 
@@ -12359,6 +12362,9 @@ msgstr "neue Herausforderer"
 
 msgid "New Chat"
 msgstr "Neuer Chat"
+
+msgid "New cloud workspace"
+msgstr "Neuer Cloud-Arbeitsbereich"
 
 msgid "New environment"
 msgstr "Neue Umgebung"

@@ -12142,6 +12142,9 @@ msgstr "このワークスペースをコンピューターに移動しますか
 msgid "Move this workspace to the cloud?"
 msgstr "このワークスペースをクラウドに移動しますか？"
 
+msgid "Move to"
+msgstr "移動先"
+
 msgid "Move to a computer"
 msgstr "コンピューターに移動"
 
@@ -12359,6 +12362,9 @@ msgstr "別の対戦相手"
 
 msgid "New Chat"
 msgstr "新規チャット"
+
+msgid "New cloud workspace"
+msgstr "新しいクラウドワークスペース"
 
 msgid "New environment"
 msgstr "新しい環境"

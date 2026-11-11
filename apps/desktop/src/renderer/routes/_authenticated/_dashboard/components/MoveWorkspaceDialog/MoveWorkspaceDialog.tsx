@@ -8,17 +8,22 @@ import { MoveWorkspaceToComputerDialog } from "./components/MoveWorkspaceToCompu
 interface MoveWorkspaceDialogProps {
 	direction: WorkspaceMoveDirection;
 	workspace: MovableWorkspace;
+	destinationHostId?: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
 export function MoveWorkspaceDialog({
 	direction,
+	destinationHostId,
 	...props
 }: MoveWorkspaceDialogProps) {
 	return direction === "to-cloud" ? (
 		<MoveWorkspaceToCloudDialog {...props} />
 	) : (
-		<MoveWorkspaceToComputerDialog {...props} />
+		<MoveWorkspaceToComputerDialog
+			{...props}
+			initialHostId={destinationHostId}
+		/>
 	);
 }

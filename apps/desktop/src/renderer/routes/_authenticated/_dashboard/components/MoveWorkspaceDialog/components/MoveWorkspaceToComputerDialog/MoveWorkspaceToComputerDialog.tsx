@@ -18,10 +18,11 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
-import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useState } from "react";
+import {
+	type MoveDestinationComputer,
+	useMoveDestinationComputers,
+} from "../../../../hooks/useMoveDestinationComputers";
 import { useMoveWorkspaceToComputer } from "../../../../hooks/useMoveWorkspaceToComputer";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
 import { startWorkspaceMoveProgress } from "../../../../utils/startWorkspaceMoveProgress";
@@ -31,48 +32,29 @@ interface MoveWorkspaceToComputerDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	workspace: MovableWorkspace;
+	initialHostId?: string;
 }
 
 export function MoveWorkspaceToComputerDialog({
 	open,
 	onOpenChange,
 	workspace,
+	initialHostId,
 }: MoveWorkspaceToComputerDialogProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
-	const { machineId } = useLocalHostService();
-	const { hosts } = useKnownHosts();
-	const { workspaces: cloudWorkspaces = [] } = useCloudWorkspaces();
 	const moveWorkspaceToComputer = useMoveWorkspaceToComputer(workspace);
-
-	const computers = useMemo(() => {
-		const others = hosts
-			.filter(
-				(host) =>
-					host.machineId !== workspace.hostId &&
-					host.machineId !== machineId &&
-					!cloudWorkspaces.some((row) => row.id === host.machineId),
-			)
-			.map((host) => ({
-				hostId: host.machineId,
-				label: host.name as string | null,
-				online: host.isOnline,
-			}))
-			.sort((a, b) => Number(b.online) - Number(a.online));
-		const thisComputer =
-			machineId && machineId !== workspace.hostId
-				? [{ hostId: machineId, label: null, online: true }]
-				: [];
-		return [...thisComputer, ...others];
-	}, [hosts, workspace.hostId, cloudWorkspaces, machineId]);
-	const [picked, setPicked] = useState<string | null>(null);
+	const computers = useMoveDestinationComputers(workspace.hostId);
+	const [picked, setPicked] = useState<string | null>(initialHostId ?? null);
 	const destination =
 		computers.find((computer) => computer.hostId === picked) ??
 		computers.find((computer) => computer.online) ??
 		null;
-	const labelOf = (computer: (typeof computers)[number]) =>
-		computer.label ?? t({ message: "This computer" });
-	const offlineLabel = (computer: (typeof computers)[number]) => {
+	const nameOf = (computer: MoveDestinationComputer) =>
+		computer.isThisComputer ? null : computer.name;
+	const labelOf = (computer: MoveDestinationComputer) =>
+		nameOf(computer) ?? t({ message: "This computer" });
+	const offlineLabel = (computer: MoveDestinationComputer) => {
 		const computerName = labelOf(computer);
 		return t({ message: `${computerName} (offline)` });
 	};
@@ -81,14 +63,14 @@ export function MoveWorkspaceToComputerDialog({
 		if (!destination?.online) return;
 		const progress = startWorkspaceMoveProgress({
 			name: workspace.name,
-			destination: destination.label ?? t({ message: "this computer" }),
+			destination: nameOf(destination) ?? t({ message: "this computer" }),
 			toCloud: false,
 			sourceWorkspaceId: workspace.id,
 			retry: move,
 		});
 		onOpenChange(false);
 		void moveWorkspaceToComputer({
-			destination: { hostId: destination.hostId, name: destination.label },
+			destination: { hostId: destination.hostId, name: nameOf(destination) },
 			onStage: progress.setStage,
 			onBegun: progress.begun,
 			signal: progress.signal,

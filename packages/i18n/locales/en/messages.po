@@ -12142,6 +12142,9 @@ msgstr "Move this workspace to a computer?"
 msgid "Move this workspace to the cloud?"
 msgstr "Move this workspace to the cloud?"
 
+msgid "Move to"
+msgstr "Move to"
+
 msgid "Move to a computer"
 msgstr "Move to a computer"
 
@@ -12359,6 +12362,9 @@ msgstr "new challengers"
 
 msgid "New Chat"
 msgstr "New Chat"
+
+msgid "New cloud workspace"
+msgstr "New cloud workspace"
 
 msgid "New environment"
 msgstr "New environment"

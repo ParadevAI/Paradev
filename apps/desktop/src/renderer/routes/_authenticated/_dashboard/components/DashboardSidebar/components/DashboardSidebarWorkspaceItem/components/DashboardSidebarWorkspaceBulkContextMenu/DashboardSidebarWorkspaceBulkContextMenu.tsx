@@ -11,9 +11,9 @@ import {
 } from "@superset/ui/context-menu";
 import type { ReactNode } from "react";
 import {
-	LuArrowRightLeft,
 	LuArrowUp,
 	LuFolderPlus,
+	LuFolderSymlink,
 	LuTrash2,
 	LuX,
 } from "react-icons/lu";
@@ -59,7 +59,7 @@ export function DashboardSidebarWorkspaceBulkContextMenu({
 			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
 				<ContextMenuSub>
 					<ContextMenuSubTrigger>
-						<LuArrowRightLeft className="size-4 mr-2" />
+						<LuFolderSymlink className="size-4 mr-2" />
 						<Trans>Move {count} to Group</Trans>
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent>
