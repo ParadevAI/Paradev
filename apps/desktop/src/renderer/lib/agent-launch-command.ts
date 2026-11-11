@@ -90,10 +90,19 @@ type IsAgentPresetEnabled = (presetId: string) => boolean;
 
 const ENV_ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
 
+function tokenize(command: string): ReturnType<typeof parse> {
+	try {
+		return parse(command);
+	} catch {
+		// shell-quote throws on shell it cannot read, such as an unclosed `${`.
+		return [];
+	}
+}
+
 function commandPrograms(command: string): string[] {
 	const programs: string[] = [];
 	let atCommandStart = true;
-	for (const token of parse(command)) {
+	for (const token of tokenize(command)) {
 		if (typeof token !== "string") {
 			atCommandStart = "op" in token && token.op !== "glob";
 			continue;
