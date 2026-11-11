@@ -1450,6 +1450,9 @@ msgstr "{user} が再参加しました。"
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} が現在ダウンロードを制限しています。少し待ってから、もう一度お試しください。"
+
 msgid "{waiting} Waiting"
 msgstr "{waiting}件待機中"
 
@@ -6180,13 +6183,13 @@ msgstr "コメントを投稿できませんでした"
 msgid "Couldn't post reply"
 msgstr "返信を投稿できませんでした"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor} に接続できませんでした。インターネット接続を確認して、もう一度お試しください。"
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}のクラウドに接続できませんでした: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "GitHubに接続できませんでした。インターネット接続を確認して、もう一度お試しください。"
 
 msgid "Couldn't reach the model provider"
 msgstr "モデルのプロバイダーに接続できませんでした"
@@ -6270,6 +6273,9 @@ msgstr "エージェントに送信できませんでした"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "メッセージを送信できませんでした。入力欄に戻しました。"
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "このコンピュータで {name} を設定できませんでした。"
+
 msgid "Couldn't stage changes"
 msgstr "変更をステージできませんでした"
 
@@ -6317,9 +6323,6 @@ msgstr "移動を再試行できませんでした"
 
 msgid "Couldn't undo the file changes."
 msgstr "ファイルの変更を取り消せませんでした。"
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "このMacでGitHub CLIを展開または保存できませんでした。"
 
 msgid "Couldn't unstage changes"
 msgstr "変更をステージ解除できませんでした"
@@ -7580,11 +7583,11 @@ msgstr "ダウンロード済み"
 msgid "Downloading"
 msgstr "ダウンロード中"
 
+msgid "Downloading {name}…"
+msgstr "{name} をダウンロード中…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "AppleからのダウンロードにはApple IDが必要です。インストールには約20 GBの空き容量が必要になる場合があります。"
-
-msgid "Downloading GitHub CLI…"
-msgstr "GitHub CLI をダウンロード中…"
 
 msgid "Downloading..."
 msgstr "ダウンロード中..."
@@ -9493,9 +9496,6 @@ msgstr "GitHubのインストールが見つかりません"
 msgid "GitHub integration"
 msgstr "GitHub連携"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHubが現在ダウンロードを制限しています。少し待ってから、もう一度お試しください。"
-
 msgid "GitHub issues"
 msgstr "GitHub issue"
 
@@ -10421,8 +10421,8 @@ msgstr "インストール済み"
 msgid "Installed by your organization"
 msgstr "組織がインストール済み"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Homebrewなど別の方法でインストールしましたか？「再確認」をクリックしてください。"
+msgid "Installed it another way? Click Check again."
+msgstr "別の方法でインストールしましたか？ 再確認をクリックしてください。"
 
 msgid "Installed on {appAccountLogin}"
 msgstr "{appAccountLogin} にインストール済み"
@@ -14536,6 +14536,9 @@ msgstr "Paradevアプリ"
 msgid "Paradev Automations"
 msgstr "Paradev オートメーション"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev が {name} をインストールできるのは Mac だけです。自分でインストールしてから、再確認をクリックしてください。"
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradevは開発者のマシン上でローカルに動作します。�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradevは2025年11月、ハッカソンのプロジェクトとして始まりました。ワークツリーを管理するだけの、シンプルなデスクトップアプリでした。"
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "ParadevはまだGitHub CLIを見つけられません。"
+msgid "Paradev still can't find {name}."
+msgstr "Paradev はまだ {name} を見つけられません。"
 
 msgid "Paradev Teams"
 msgstr "Paradev チーム"
@@ -19889,6 +19892,9 @@ msgstr "ディスパッチャーの登場"
 msgid "The download didn't finish. Try again."
 msgstr "ダウンロードが完了しませんでした。もう一度お試しください。"
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "ダウンロードが {vendor} によって署名されていないため、Paradev はインストールしませんでした。"
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "ダウンロードに問題があったため、Paradevはインストールしませんでした。もう一度お試しください。"
 
@@ -20216,6 +20222,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "テーマ"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "{name} をインストールするための空きディスク容量が足りません。空き容量を確保して、もう一度お試しください。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "これらのコマンドはワークスペース作成時に自動的に実行されます。<0>ドキュメントを読む<1/></0>"

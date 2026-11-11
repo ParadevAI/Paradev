@@ -1450,6 +1450,9 @@ msgstr "{user} bergabung kembali."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} Menunggu"
 
@@ -6180,13 +6183,13 @@ msgstr "Tidak dapat memposting komentar"
 msgid "Couldn't post reply"
 msgstr "Tidak bisa mengirim balasan"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Tidak dapat menjangkau {vendor}. Periksa koneksi internet Anda, lalu coba lagi."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Tidak bisa menjangkau cloud untuk {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Tidak dapat menjangkau GitHub. Periksa koneksi internet Anda, lalu coba lagi."
 
 msgid "Couldn't reach the model provider"
 msgstr "Tidak dapat menghubungi penyedia model"
@@ -6270,6 +6273,9 @@ msgstr "Tidak bisa mengirim ke agen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Pesan Anda tidak dapat dikirim. Pesan sudah kembali di kolom penulisan."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Tidak dapat mengatur {name} di komputer ini."
+
 msgid "Couldn't stage changes"
 msgstr "Tidak bisa men-stage perubahan"
 
@@ -6317,9 +6323,6 @@ msgstr "Tidak dapat mencoba memindahkan lagi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Perubahan file tidak bisa dibatalkan."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Tidak dapat mengekstrak atau menyimpan GitHub CLI di Mac ini."
 
 msgid "Couldn't unstage changes"
 msgstr "Tidak bisa meng-unstage perubahan"
@@ -7580,11 +7583,11 @@ msgstr "terunduh"
 msgid "Downloading"
 msgstr "Mengunduh"
 
+msgid "Downloading {name}…"
+msgstr "Mengunduh {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Mengunduh dari Apple memerlukan Apple ID. Pemasangan dapat memerlukan sekitar 20 GB ruang kosong."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Mengunduh GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Mengunduh..."
@@ -9493,9 +9496,6 @@ msgstr "Instalasi GitHub tidak ditemukan"
 msgid "GitHub integration"
 msgstr "Integrasi GitHub"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
-
 msgid "GitHub issues"
 msgstr "Issue GitHub"
 
@@ -10421,8 +10421,8 @@ msgstr "Terpasang"
 msgid "Installed by your organization"
 msgstr "Dipasang oleh organisasi Anda"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Memasang dengan cara lain, seperti Homebrew? Klik Periksa lagi."
+msgid "Installed it another way? Click Check again."
+msgstr "Sudah memasangnya dengan cara lain? Klik Periksa lagi."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Terpasang di {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Aplikasi Paradev"
 msgid "Paradev Automations"
 msgstr "Otomatisasi Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev hanya bisa memasang {name} di Mac. Pasang sendiri, lalu klik Periksa lagi."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev berjalan lokal di mesin developer Anda. Kami tidak menyimpan kod
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev bermula sebagai proyek hackathon pada November 2025. Waktu itu sekadar aplikasi desktop untuk mengelola worktree."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev masih tidak dapat menemukan GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev masih tidak dapat menemukan {name}."
 
 msgid "Paradev Teams"
 msgstr "Tim Paradev"
@@ -19889,6 +19892,9 @@ msgstr "Munculnya sang pengatur"
 msgid "The download didn't finish. Try again."
 msgstr "Unduhan tidak selesai. Coba lagi."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Unduhan tidak ditandatangani oleh {vendor}, jadi Paradev tidak memasangnya."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "Unduhan tampak tidak benar, jadi Paradev tidak memasangnya. Coba lagi."
 
@@ -20216,6 +20222,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Tema"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Ruang disk tidak cukup untuk memasang {name}. Kosongkan sebagian ruang, lalu coba lagi."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Perintah ini berjalan otomatis saat workspace dibuat. <0>Baca dokumentasi kami<1/></0>"

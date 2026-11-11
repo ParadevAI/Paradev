@@ -1,1 +1,0 @@
-export { gitDetectionPolling } from "./gitDetectionPolling";

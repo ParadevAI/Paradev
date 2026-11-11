@@ -1,9 +1,17 @@
 import { execFile } from "node:child_process";
-import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { isSignedByTeam, TEAM_IDS } from "../../../utils/code-signature";
+import {
+	downloadVerified,
+	type Fetcher,
+	fetchOk,
+	InstallError,
+	type InstallFailure,
+	installFailureOf,
+} from "../../../utils/download-verified";
 
 const execFileAsync = promisify(execFile);
 
@@ -11,18 +19,15 @@ const LATEST_RELEASE_API_URL =
 	"https://api.github.com/repos/cli/cli/releases/latest";
 // Redirects to /releases/tag/v<version>, and is not under the API rate limit.
 const LATEST_RELEASE_PAGE_URL = "https://github.com/cli/cli/releases/latest";
+const GITHUB_API_HEADERS = { Accept: "application/vnd.github+json" };
 
-export type GhInstallFailure =
-	| "offline"
-	| "rate-limited"
-	| "download"
-	| "checksum"
-	| "install";
+export type GhInstallFailure = InstallFailure;
 
 export type GhInstallEvent =
 	| { stage: "downloading"; receivedBytes: number; totalBytes: number | null }
 	| { stage: "verifying" }
-	| { stage: "installing" }
+	/** `untimed`: the step prints no progress (brew), so no stall timer applies. */
+	| { stage: "installing"; untimed?: boolean }
 	| { stage: "done"; version: string }
 	| {
 			stage: "failed";
@@ -31,22 +36,15 @@ export type GhInstallEvent =
 			downloadUrl: string | null;
 	  };
 
-type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
-
 export interface InstallGhCliOptions {
 	binDir: string;
-	arch?: string;
+	arch: "arm64" | "x64";
 	fetch?: Fetcher;
 	extractZip?: (zipPath: string, destDir: string) => Promise<void>;
 	readVersion?: (ghPath: string) => Promise<string>;
+	isSignedByGitHub?: (binaryPath: string) => Promise<boolean>;
 	onProgress?: (event: GhInstallEvent) => void;
 	signal?: AbortSignal;
-}
-
-class InstallFailure extends Error {
-	constructor(readonly reason: GhInstallFailure) {
-		super(reason);
-	}
 }
 
 export function expectedSha256(
@@ -73,51 +71,32 @@ async function ghVersionOutput(ghPath: string): Promise<string> {
 	return stdout;
 }
 
-async function get(
-	fetcher: Fetcher,
-	url: string,
-	signal?: AbortSignal,
-): Promise<Response> {
-	return fetcher(url, {
-		headers: {
-			Accept: "application/vnd.github+json",
-			"User-Agent": "Paradev-Desktop",
-		},
-		signal,
-	}).catch(() => {
-		throw new InstallFailure("offline");
-	});
-}
-
-async function getOk(
-	fetcher: Fetcher,
-	url: string,
-	signal?: AbortSignal,
-): Promise<Response> {
-	const response = await get(fetcher, url, signal);
-	if (!response.ok) throw new InstallFailure("download");
-	return response;
-}
-
 async function latestVersion(
 	fetcher: Fetcher,
 	signal?: AbortSignal,
 ): Promise<string> {
-	const api = await get(fetcher, LATEST_RELEASE_API_URL, signal);
+	const get = (url: string) =>
+		fetcher(url, {
+			headers: { "User-Agent": "Paradev-Desktop", ...GITHUB_API_HEADERS },
+			signal,
+		}).catch(() => {
+			throw new InstallError("offline");
+		});
+	const api = await get(LATEST_RELEASE_API_URL);
 	if (api.ok) {
 		const release = (await api.json()) as { tag_name?: string };
 		const version = release.tag_name?.replace(/^v/, "");
 		if (version) return version;
-		throw new InstallFailure("download");
+		throw new InstallError("download");
 	}
 	if (api.status !== 403 && api.status !== 429) {
-		throw new InstallFailure("download");
+		throw new InstallError("download");
 	}
-	const page = await get(fetcher, LATEST_RELEASE_PAGE_URL, signal);
+	const page = await get(LATEST_RELEASE_PAGE_URL);
 	const version = page.ok
 		? page.url.match(/\/releases\/tag\/v([^/?#]+)/)?.[1]
 		: undefined;
-	if (!version) throw new InstallFailure("rate-limited");
+	if (!version) throw new InstallError("rate-limited");
 	return version;
 }
 
@@ -126,7 +105,8 @@ export function ghReleaseAssetUrl(version: string, assetName: string): string {
 }
 
 /**
- * Installs the official macOS `gh` build into `binDir`. The binary is fetched
+ * Installs the official macOS `gh` build into `binDir`, checked against the
+ * release's SHA-256 and GitHub's Developer ID signature. The binary is fetched
  * by the app, not a browser, so it carries no quarantine flag for Gatekeeper.
  */
 export async function installGhCli(
@@ -135,8 +115,11 @@ export async function installGhCli(
 	const fetcher = options.fetch ?? fetch;
 	const extract = options.extractZip ?? dittoExtract;
 	const readVersion = options.readVersion ?? ghVersionOutput;
+	const isSignedByGitHub =
+		options.isSignedByGitHub ??
+		((binaryPath: string) => isSignedByTeam(binaryPath, TEAM_IDS.github));
 	const emit = (event: GhInstallEvent) => options.onProgress?.(event);
-	const arch = (options.arch ?? process.arch) === "arm64" ? "arm64" : "amd64";
+	const arch = options.arch === "arm64" ? "arm64" : "amd64";
 	let workDir: string | null = null;
 	let downloadUrl: string | null = null;
 
@@ -146,52 +129,42 @@ export async function installGhCli(
 		downloadUrl = ghReleaseAssetUrl(version, assetName);
 
 		const checksums = await (
-			await getOk(
+			await fetchOk(
 				fetcher,
 				ghReleaseAssetUrl(version, `gh_${version}_checksums.txt`),
-				options.signal,
+				{ signal: options.signal },
 			)
 		).text();
 		const expected = expectedSha256(checksums, assetName);
-		if (!expected) throw new InstallFailure("checksum");
+		if (!expected) throw new InstallError("checksum");
 
-		const zipResponse = await getOk(fetcher, downloadUrl, options.signal);
-		const totalBytes =
-			Number(zipResponse.headers.get("content-length")) || null;
-		const hash = createHash("sha256");
-		const chunks: Uint8Array[] = [];
-		let receivedBytes = 0;
-		emit({ stage: "downloading", receivedBytes, totalBytes });
-		const reader = zipResponse.body?.getReader();
-		if (!reader) throw new InstallFailure("download");
-		for (;;) {
-			const { done, value } = await reader.read().catch(() => {
-				throw new InstallFailure("download");
-			});
-			if (done) break;
-			chunks.push(value);
-			hash.update(value);
-			receivedBytes += value.byteLength;
-			emit({ stage: "downloading", receivedBytes, totalBytes });
-		}
-
-		emit({ stage: "verifying" });
-		if (hash.digest("hex") !== expected) throw new InstallFailure("checksum");
-
-		emit({ stage: "installing" });
 		workDir = await fs.mkdtemp(path.join(os.tmpdir(), "paradev-gh-"));
 		const zipPath = path.join(workDir, assetName);
+		await downloadVerified({
+			fetch: fetcher,
+			url: downloadUrl,
+			destPath: zipPath,
+			digest: { algorithm: "sha256", encoding: "hex", value: expected },
+			signal: options.signal,
+			onProgress: (receivedBytes, totalBytes) =>
+				emit({ stage: "downloading", receivedBytes, totalBytes }),
+		});
+
+		emit({ stage: "verifying" });
 		const extractDir = path.join(workDir, "extracted");
-		await fs.writeFile(zipPath, Buffer.concat(chunks));
 		await fs.mkdir(extractDir);
 		await extract(zipPath, extractDir);
-
 		const extractedBinary = path.join(
 			extractDir,
 			assetName.replace(/\.zip$/, ""),
 			"bin",
 			"gh",
 		);
+		if (!(await isSignedByGitHub(extractedBinary))) {
+			throw new InstallError("signature");
+		}
+
+		emit({ stage: "installing" });
 		const target = path.join(options.binDir, "gh");
 		const staged = `${target}.${process.pid}.tmp`;
 		await fs.mkdir(options.binDir, { recursive: true });
@@ -201,17 +174,9 @@ export async function installGhCli(
 
 		const installedVersion =
 			(await readVersion(target)).match(/gh version (\S+)/)?.[1] ?? version;
-		const done: GhInstallEvent = { stage: "done", version: installedVersion };
-		emit(done);
-		return done;
+		return { stage: "done", version: installedVersion };
 	} catch (error) {
-		const failed: GhInstallEvent = {
-			stage: "failed",
-			reason: error instanceof InstallFailure ? error.reason : "install",
-			downloadUrl,
-		};
-		emit(failed);
-		return failed;
+		return { stage: "failed", reason: installFailureOf(error), downloadUrl };
 	} finally {
 		if (workDir) {
 			await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});

@@ -1450,6 +1450,9 @@ msgstr "{user} rejoined."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} is limiting downloads right now. Wait a minute and try again."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} Waiting"
 
@@ -6180,13 +6183,13 @@ msgstr "Couldn't post comment"
 msgid "Couldn't post reply"
 msgstr "Couldn't post reply"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Couldn't reach {vendor}. Check your internet connection and try again."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Couldn't reach cloud for {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Couldn't reach GitHub. Check your internet connection and try again."
 
 msgid "Couldn't reach the model provider"
 msgstr "Couldn't reach the model provider"
@@ -6270,6 +6273,9 @@ msgstr "Couldn't send to agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Couldn't send your message. It's back in the composer."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Couldn't set up {name} on this computer."
+
 msgid "Couldn't stage changes"
 msgstr "Couldn't stage changes"
 
@@ -6317,9 +6323,6 @@ msgstr "Couldn't try the move again"
 
 msgid "Couldn't undo the file changes."
 msgstr "Couldn't undo the file changes."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Couldn't unpack or save GitHub CLI on this Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Couldn't unstage changes"
@@ -7580,11 +7583,11 @@ msgstr "downloaded"
 msgid "Downloading"
 msgstr "Downloading"
 
+msgid "Downloading {name}…"
+msgstr "Downloading {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Downloading GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Downloading..."
@@ -9493,9 +9496,6 @@ msgstr "GitHub installation not found"
 msgid "GitHub integration"
 msgstr "GitHub integration"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub is limiting downloads right now. Wait a minute and try again."
-
 msgid "GitHub issues"
 msgstr "GitHub issues"
 
@@ -10421,8 +10421,8 @@ msgstr "Installed"
 msgid "Installed by your organization"
 msgstr "Installed by your organization"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Installed it another way, like Homebrew? Click Check again."
+msgid "Installed it another way? Click Check again."
+msgstr "Installed it another way? Click Check again."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Installed on {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Paradev App"
 msgid "Paradev Automations"
 msgstr "Paradev Automations"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev runs locally on your developers' machines. We don't store your c
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev still can't find GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev still can't find {name}."
 
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
@@ -19889,6 +19892,9 @@ msgstr "The dispatcher appears"
 msgid "The download didn't finish. Try again."
 msgstr "The download didn't finish. Try again."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "The download isn't signed by {vendor}, so Paradev didn't install it."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "The download looked wrong, so Paradev didn't install it. Try again."
 
@@ -20216,6 +20222,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Themes"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "There isn't enough free disk space to install {name}. Free up some space and try again."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"

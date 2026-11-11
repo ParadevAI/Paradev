@@ -1450,6 +1450,9 @@ msgstr "{user} снова присоединился(-ась)."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} сейчас ограничивает загрузки. Подождите минуту и повторите попытку."
+
 msgid "{waiting} Waiting"
 msgstr "Ожидают: {waiting}"
 
@@ -6180,13 +6183,13 @@ msgstr "Не удалось опубликовать комментарий"
 msgid "Couldn't post reply"
 msgstr "Не удалось отправить ответ"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Не удалось подключиться к {vendor}. Проверьте подключение к интернету и повторите попытку."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Не удалось связаться с облаком для {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Не удалось подключиться к GitHub. Проверьте подключение к интернету и повторите попытку."
 
 msgid "Couldn't reach the model provider"
 msgstr "Не удалось связаться с поставщиком модели"
@@ -6270,6 +6273,9 @@ msgstr "Не удалось отправить агенту"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Не удалось отправить сообщение. Оно снова в поле ввода."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Не удалось настроить {name} на этом компьютере."
+
 msgid "Couldn't stage changes"
 msgstr "Не удалось проиндексировать изменения"
 
@@ -6317,9 +6323,6 @@ msgstr "Не удалось повторить перенос"
 
 msgid "Couldn't undo the file changes."
 msgstr "Не удалось отменить изменения файлов."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Не удалось распаковать или сохранить GitHub CLI на этом Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Не удалось снять индексацию"
@@ -7580,11 +7583,11 @@ msgstr "загружено"
 msgid "Downloading"
 msgstr "Загрузка"
 
+msgid "Downloading {name}…"
+msgstr "Загрузка {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Для загрузки с сайта Apple нужен Apple ID. Для установки может понадобиться около 20 ГБ свободного места."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Загрузка GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Загрузка..."
@@ -9493,9 +9496,6 @@ msgstr "Установка GitHub не найдена"
 msgid "GitHub integration"
 msgstr "Интеграция с GitHub"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub сейчас ограничивает загрузки. Подождите минуту и повторите попытку."
-
 msgid "GitHub issues"
 msgstr "Задачи GitHub"
 
@@ -10421,8 +10421,8 @@ msgstr "Установлен"
 msgid "Installed by your organization"
 msgstr "Установлено вашей организацией"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Установили другим способом, например через Homebrew? Нажмите «Проверить снова»."
+msgid "Installed it another way? Click Check again."
+msgstr "Установили другим способом? Нажмите «Проверить снова»."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Установлено в {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Приложение Paradev"
 msgid "Paradev Automations"
 msgstr "Paradev Автоматизации"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev может установить {name} только на Mac. Установите его самостоятельно, затем нажмите «Проверить снова»."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev работает локально на машинах ваших
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev начался как проект на хакатоне в ноябре 2025 года. Это было простое десктопное приложение для управления worktree."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev всё ещё не находит GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev всё ещё не находит {name}."
 
 msgid "Paradev Teams"
 msgstr "Paradev Команды"
@@ -19889,6 +19892,9 @@ msgstr "Появляется диспетчер"
 msgid "The download didn't finish. Try again."
 msgstr "Загрузка не завершилась. Повторите попытку."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Загрузка не подписана {vendor}, поэтому Paradev не стал её устанавливать."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "Загруженный файл выглядел неправильно, поэтому Paradev не установил его. Повторите попытку."
 
@@ -20216,6 +20222,9 @@ msgstr "Карточка предпросмотра темы"
 
 msgid "Themes"
 msgstr "Темы"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Недостаточно свободного места на диске для установки {name}. Освободите место и повторите попытку."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Эти команды выполняются автоматически при создании рабочей области. <0>Читать документацию<1/></0>"

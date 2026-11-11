@@ -1450,6 +1450,9 @@ msgstr "{user} đã tham gia lại."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
 
@@ -6180,13 +6183,13 @@ msgstr "Không thể đăng bình luận"
 msgid "Couldn't post reply"
 msgstr "Không thể đăng trả lời"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Không thể kết nối với {vendor}. Hãy kiểm tra kết nối internet rồi thử lại."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Không kết nối được tới cloud cho {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Không thể kết nối với GitHub. Hãy kiểm tra kết nối internet rồi thử lại."
 
 msgid "Couldn't reach the model provider"
 msgstr "Không kết nối được với nhà cung cấp mô hình"
@@ -6270,6 +6273,9 @@ msgstr "Không thể gửi cho agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Không gửi được tin nhắn. Tin nhắn đã được trả lại ô soạn thảo."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Không thể thiết lập {name} trên máy tính này."
+
 msgid "Couldn't stage changes"
 msgstr "Không thể stage các thay đổi"
 
@@ -6317,9 +6323,6 @@ msgstr "Không thể thử chuyển lại"
 
 msgid "Couldn't undo the file changes."
 msgstr "Không thể hoàn tác thay đổi tệp."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Không thể giải nén hoặc lưu GitHub CLI trên máy Mac này."
 
 msgid "Couldn't unstage changes"
 msgstr "Không thể bỏ stage các thay đổi"
@@ -7580,11 +7583,11 @@ msgstr "đã tải"
 msgid "Downloading"
 msgstr "Đang tải xuống"
 
+msgid "Downloading {name}…"
+msgstr "Đang tải {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Tải xuống từ Apple cần có Apple ID. Quá trình cài đặt có thể cần khoảng 20 GB dung lượng trống."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Đang tải GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Đang tải xuống..."
@@ -9493,9 +9496,6 @@ msgstr "Không tìm thấy bản cài đặt GitHub"
 msgid "GitHub integration"
 msgstr "Tích hợp GitHub"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
-
 msgid "GitHub issues"
 msgstr "Issue GitHub"
 
@@ -10421,8 +10421,8 @@ msgstr "Đã cài"
 msgid "Installed by your organization"
 msgstr "Do tổ chức của bạn cài"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Bạn đã cài bằng cách khác, như Homebrew? Nhấn Kiểm tra lại."
+msgid "Installed it another way? Click Check again."
+msgstr "Đã cài bằng cách khác? Nhấn Kiểm tra lại."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Đã cài trên {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Ứng dụng Paradev"
 msgid "Paradev Automations"
 msgstr "Tự động hóa Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev chỉ cài được {name} trên máy Mac. Hãy tự cài đặt rồi nhấn Kiểm tra lại."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev chạy cục bộ trên máy của lập trình viên. Chúng t�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev khởi đầu là một dự án hackathon vào tháng 11 năm 2025. Đó là một ứng dụng máy tính đơn giản để quản lý worktree."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev vẫn không tìm thấy GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev vẫn chưa tìm thấy {name}."
 
 msgid "Paradev Teams"
 msgstr "Nhóm Paradev"
@@ -19889,6 +19892,9 @@ msgstr "Người điều phối xuất hiện"
 msgid "The download didn't finish. Try again."
 msgstr "Quá trình tải xuống chưa hoàn tất. Hãy thử lại."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Tệp tải về không được {vendor} ký, nên Paradev không cài đặt."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "Tệp tải xuống có vẻ không đúng nên Paradev đã không cài đặt. Hãy thử lại."
 
@@ -20216,6 +20222,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Chủ đề"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Không đủ dung lượng ổ đĩa trống để cài đặt {name}. Hãy giải phóng bớt dung lượng rồi thử lại."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Các lệnh này chạy tự động khi một workspace được tạo. <0>Đọc tài liệu<1/></0>"

@@ -21,7 +21,7 @@ function fakeDeps(gitUsable: boolean) {
 		runGh: async (args) => {
 			ghCalls.push(args);
 		},
-		spawnGh: (args, env) => {
+		spawnGh: async (args, env) => {
 			state.loginArgs = args;
 			state.loginPath = env.PATH ?? "";
 			let emitOutput: (chunk: string) => void = () => {};

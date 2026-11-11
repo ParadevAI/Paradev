@@ -1450,6 +1450,9 @@ msgstr "{user}님이 다시 참여했습니다."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor}에서 지금 다운로드를 제한하고 있습니다. 잠시 후 다시 시도하세요."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting}명 대기 중"
 
@@ -6180,13 +6183,13 @@ msgstr "댓글을 게시할 수 없습니다"
 msgid "Couldn't post reply"
 msgstr "답글을 게시하지 못했습니다"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor}에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}에 대해 클라우드에 연결할 수 없습니다: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요."
 
 msgid "Couldn't reach the model provider"
 msgstr "모델 제공자에 연결할 수 없습니다"
@@ -6270,6 +6273,9 @@ msgstr "에이전트에 보내지 못했습니다"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "메시지를 보내지 못했습니다. 입력란으로 다시 옮겼습니다."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "이 컴퓨터에서 {name}을(를) 설정할 수 없습니다."
+
 msgid "Couldn't stage changes"
 msgstr "변경 사항을 스테이징하지 못했습니다"
 
@@ -6317,9 +6323,6 @@ msgstr "이동을 다시 시도할 수 없습니다"
 
 msgid "Couldn't undo the file changes."
 msgstr "파일 변경을 실행 취소하지 못했습니다."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "이 Mac에서 GitHub CLI의 압축을 풀거나 저장할 수 없습니다."
 
 msgid "Couldn't unstage changes"
 msgstr "스테이징을 해제하지 못했습니다"
@@ -7580,11 +7583,11 @@ msgstr "다운로드됨"
 msgid "Downloading"
 msgstr "다운로드 중"
 
+msgid "Downloading {name}…"
+msgstr "{name} 다운로드 중…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Apple에서 다운로드하려면 Apple ID가 필요합니다. 설치에 약 20 GB의 여유 공간이 필요할 수 있습니다."
-
-msgid "Downloading GitHub CLI…"
-msgstr "GitHub CLI 다운로드 중…"
 
 msgid "Downloading..."
 msgstr "다운로드 중..."
@@ -9493,9 +9496,6 @@ msgstr "GitHub 설치를 찾을 수 없습니다"
 msgid "GitHub integration"
 msgstr "GitHub 연동"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub가 지금 다운로드를 제한하고 있습니다. 잠시 후 다시 시도하세요."
-
 msgid "GitHub issues"
 msgstr "GitHub 이슈"
 
@@ -10421,8 +10421,8 @@ msgstr "설치됨"
 msgid "Installed by your organization"
 msgstr "조직에서 설치함"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Homebrew 같은 다른 방법으로 설치했나요? 다시 확인을 클릭하세요."
+msgid "Installed it another way? Click Check again."
+msgstr "다른 방법으로 설치했나요? 다시 확인을 클릭하세요."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "{appAccountLogin}에 설치됨"
@@ -14536,6 +14536,9 @@ msgstr "Paradev 앱"
 msgid "Paradev Automations"
 msgstr "Paradev 자동화"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev는 Mac에서만 {name}을(를) 설치할 수 있습니다. 직접 설치한 후 다시 확인을 클릭하세요."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 A
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev는 2025년 11월 해커톤 프로젝트로 시작했습니다. worktree를 관리하는 간단한 데스크톱 앱이었습니다."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev가 아직 GitHub CLI를 찾을 수 없습니다."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev가 아직 {name}을(를) 찾을 수 없습니다."
 
 msgid "Paradev Teams"
 msgstr "Paradev 팀"
@@ -19889,6 +19892,9 @@ msgstr "배차원의 등장"
 msgid "The download didn't finish. Try again."
 msgstr "다운로드가 완료되지 않았습니다. 다시 시도하세요."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "다운로드가 {vendor}의 서명을 받지 않아 Paradev가 설치하지 않았습니다."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "다운로드가 올바르지 않아 Paradev가 설치하지 않았습니다. 다시 시도하세요."
 
@@ -20216,6 +20222,9 @@ msgstr "테마 미리 보기 카드"
 
 msgid "Themes"
 msgstr "테마"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "{name}을(를) 설치할 디스크 공간이 부족합니다. 공간을 확보한 후 다시 시도하세요."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "워크스페이스를 만들 때 이 명령이 자동으로 실행됩니다. <0>문서 보기<1/></0>"

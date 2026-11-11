@@ -53,6 +53,8 @@ async function fakeExtract(_zip: string, destDir: string) {
 	fs.writeFileSync(path.join(bin, "gh"), "pretend gh");
 }
 
+const signedByGitHub = async () => true;
+
 async function fakeReadVersion() {
 	return "gh version 9.9.9 (test)\n";
 }
@@ -72,6 +74,7 @@ describe("installGhCli", () => {
 			fetch: fakeGitHub("f".repeat(64)),
 			extractZip: fakeExtract,
 			readVersion: fakeReadVersion,
+			isSignedByGitHub: signedByGitHub,
 		});
 		expect(rejected).toEqual({
 			stage: "failed",
@@ -87,9 +90,41 @@ describe("installGhCli", () => {
 			fetch: fakeGitHub(GOOD_SUM),
 			extractZip: fakeExtract,
 			readVersion: fakeReadVersion,
+			isSignedByGitHub: signedByGitHub,
 		});
 		expect(installed).toEqual({ stage: "done", version: "9.9.9" });
 		expect(fs.statSync(path.join(binDir, "gh")).mode & 0o111).toBeTruthy();
+	});
+
+	test("installs nothing that GitHub did not sign", async () => {
+		const binDir = newBinDir();
+		const result = await installGhCli({
+			binDir,
+			arch: "arm64",
+			fetch: fakeGitHub(GOOD_SUM),
+			extractZip: fakeExtract,
+			readVersion: fakeReadVersion,
+			isSignedByGitHub: async () => false,
+		});
+		expect(result).toEqual({
+			stage: "failed",
+			reason: "signature",
+			downloadUrl: ZIP_URL,
+		});
+		expect(fs.existsSync(path.join(binDir, "gh"))).toBe(false);
+	});
+
+	test("says the disk is full when it is", async () => {
+		const result = await installGhCli({
+			binDir: newBinDir(),
+			arch: "arm64",
+			fetch: fakeGitHub(GOOD_SUM),
+			extractZip: async () => {
+				throw Object.assign(new Error("no space"), { code: "ENOSPC" });
+			},
+			isSignedByGitHub: signedByGitHub,
+		});
+		expect(result).toMatchObject({ stage: "failed", reason: "disk-full" });
 	});
 
 	test("reports each failure with the macOS zip to download by hand", async () => {
@@ -156,6 +191,7 @@ describe("installGhCli", () => {
 			}),
 			extractZip: fakeExtract,
 			readVersion: fakeReadVersion,
+			isSignedByGitHub: signedByGitHub,
 		});
 		expect(installed).toEqual({ stage: "done", version: "9.9.9" });
 	});

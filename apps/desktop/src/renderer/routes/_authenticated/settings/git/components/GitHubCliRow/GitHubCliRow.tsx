@@ -1,6 +1,5 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
-import { Label } from "@superset/ui/label";
 import { Skeleton } from "@superset/ui/skeleton";
 import { useState } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -8,11 +7,13 @@ import {
 	GitHubCliDialog,
 	type GitHubCliDialogStart,
 } from "renderer/routes/_authenticated/components/GitHubCliDialog";
+import { SettingsRow } from "../../../components/SettingsRow";
 
 const GH_CLI_HOME_URL = "https://cli.github.com/";
 const isMac = navigator.platform.toUpperCase().includes("MAC");
 
 export function GitHubCliRow() {
+	const { t } = useLingui();
 	const [dialogStart, setDialogStart] = useState<GitHubCliDialogStart | null>(
 		null,
 	);
@@ -34,32 +35,22 @@ export function GitHubCliRow() {
 	};
 
 	return (
-		<div className="flex items-center justify-between gap-8 py-2.5">
-			<div className="min-w-0 space-y-0.5">
-				<Label className="text-sm font-medium">
-					<Trans>GitHub CLI</Trans>
-				</Label>
-				<div className="text-xs text-muted-foreground">
-					{status.isPending ? (
-						<Skeleton className="h-3 w-40" />
-					) : ready ? (
-						<Trans>
-							Signed in · clones private repos and opens pull requests
-						</Trans>
-					) : installed ? (
-						<Trans>
-							Not signed in · needed for private repos and pull requests
-						</Trans>
-					) : (
-						<Trans>
-							Not installed · needed for private repos and pull requests
-						</Trans>
-					)}
-				</div>
-			</div>
+		<SettingsRow
+			label={t`GitHub CLI`}
+			hint={
+				status.isPending ? (
+					<Skeleton className="h-3 w-40" />
+				) : ready ? (
+					t`Signed in · clones private repos and opens pull requests`
+				) : installed ? (
+					t`Not signed in · needed for private repos and pull requests`
+				) : (
+					t`Not installed · needed for private repos and pull requests`
+				)
+			}
+		>
 			{!status.isPending && !ready && (
 				<Button
-					className="shrink-0"
 					onClick={installed ? () => setDialogStart("auth") : install}
 					size="sm"
 					variant="outline"
@@ -74,6 +65,6 @@ export function GitHubCliRow() {
 					if (!open) setDialogStart(null);
 				}}
 			/>
-		</div>
+		</SettingsRow>
 	);
 }

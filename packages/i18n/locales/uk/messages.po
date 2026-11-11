@@ -1444,6 +1444,9 @@ msgstr "{user} знову приєднався(-лася)."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} зараз обмежує завантаження. Зачекайте хвилину й спробуйте ще раз."
+
 msgid "{waiting} Waiting"
 msgstr "Очікують: {waiting}"
 
@@ -6174,13 +6177,13 @@ msgstr "Не вдалося опублікувати коментар"
 msgid "Couldn't post reply"
 msgstr "Не вдалося опублікувати відповідь"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Не вдалося під’єднатися до {vendor}. Перевірте підключення до інтернету й спробуйте ще раз."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Не вдалося зв'язатися з хмарою для {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Не вдалося під’єднатися до GitHub. Перевірте підключення до інтернету й спробуйте ще раз."
 
 msgid "Couldn't reach the model provider"
 msgstr "Не вдалося зв'язатися з провайдером моделі"
@@ -6264,6 +6267,9 @@ msgstr "Не вдалося надіслати агенту"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Не вдалося надіслати повідомлення. Його повернуто в поле введення."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Не вдалося налаштувати {name} на цьому комп’ютері."
+
 msgid "Couldn't stage changes"
 msgstr "Не вдалося проіндексувати зміни"
 
@@ -6311,9 +6317,6 @@ msgstr "Не вдалося повторити перенесення"
 
 msgid "Couldn't undo the file changes."
 msgstr "Не вдалося скасувати зміни у файлах."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Не вдалося розпакувати або зберегти GitHub CLI на цьому Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Не вдалося зняти зміни з індексу"
@@ -7574,11 +7577,11 @@ msgstr "завантажено"
 msgid "Downloading"
 msgstr "Завантаження"
 
+msgid "Downloading {name}…"
+msgstr "Завантаження {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Для завантаження з сайту Apple потрібен Apple ID. Для встановлення може знадобитися близько 20 ГБ вільного місця."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Завантаження GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Завантаження..."
@@ -9487,9 +9490,6 @@ msgstr "Встановлення GitHub не знайдено"
 msgid "GitHub integration"
 msgstr "Інтеграція з GitHub"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub зараз обмежує завантаження. Зачекайте хвилину й спробуйте ще раз."
-
 msgid "GitHub issues"
 msgstr "GitHub issues"
 
@@ -10415,8 +10415,8 @@ msgstr "Встановлений"
 msgid "Installed by your organization"
 msgstr "Встановлено вашою організацією"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Встановили іншим способом, наприклад через Homebrew? Натисніть «Перевірити знову»."
+msgid "Installed it another way? Click Check again."
+msgstr "Встановили іншим способом? Натисніть «Перевірити знову»."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Встановлено в {appAccountLogin}"
@@ -14530,6 +14530,9 @@ msgstr "Застосунок Paradev"
 msgid "Paradev Automations"
 msgstr "Автоматизації Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev може встановити {name} лише на Mac. Встановіть його самостійно, а тоді натисніть «Перевірити знову»."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14674,8 +14677,8 @@ msgstr "Paradev працює локально на комп'ютерах ваш�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev почався як хакатонний проєкт у листопаді 2025 року. Це був простий десктопний застосунок для керування worktree."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev досі не знаходить GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev досі не знаходить {name}."
 
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
@@ -19883,6 +19886,9 @@ msgstr "З'являється диспетчер"
 msgid "The download didn't finish. Try again."
 msgstr "Завантаження не завершилося. Спробуйте ще раз."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Завантаження не підписано {vendor}, тому Paradev його не встановив."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "Завантажений файл виглядав неправильно, тому Paradev його не встановив. Спробуйте ще раз."
 
@@ -20210,6 +20216,9 @@ msgstr "Картка попереднього перегляду теми"
 
 msgid "Themes"
 msgstr "Теми"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Недостатньо вільного місця на диску, щоб установити {name}. Звільніть місце й спробуйте ще раз."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Ці команди виконуються автоматично під час створення робочого простору. <0>Читати документацію<1/></0>"

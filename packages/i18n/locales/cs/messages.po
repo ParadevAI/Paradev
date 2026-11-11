@@ -1450,6 +1450,9 @@ msgstr "{user} se znovu připojil(a)."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} teď omezuje stahování. Počkejte minutu a zkuste to znovu."
+
 msgid "{waiting} Waiting"
 msgstr "Čeká: {waiting}"
 
@@ -6180,13 +6183,13 @@ msgstr "Komentář se nepodařilo odeslat"
 msgid "Couldn't post reply"
 msgstr "Nepodařilo se odeslat odpověď"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Nepodařilo se spojit s {vendor}. Zkontrolujte připojení k internetu a zkuste to znovu."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Nepodařilo se spojit s cloudem pro {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Nepodařilo se spojit s GitHubem. Zkontrolujte připojení k internetu a zkuste to znovu."
 
 msgid "Couldn't reach the model provider"
 msgstr "Nepodařilo se spojit s poskytovatelem modelu"
@@ -6270,6 +6273,9 @@ msgstr "Nepodařilo se odeslat agentovi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Zprávu se nepodařilo odeslat. Je zpět v poli pro psaní."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "{name} se na tomto počítači nepodařilo nastavit."
+
 msgid "Couldn't stage changes"
 msgstr "Nepodařilo se připravit změny"
 
@@ -6317,9 +6323,6 @@ msgstr "Přesun se nepodařilo zkusit znovu"
 
 msgid "Couldn't undo the file changes."
 msgstr "Změny souborů se nepodařilo vrátit."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "GitHub CLI se na tomto Macu nepodařilo rozbalit ani uložit."
 
 msgid "Couldn't unstage changes"
 msgstr "Nepodařilo se zrušit přípravu změn"
@@ -7580,11 +7583,11 @@ msgstr "staženo"
 msgid "Downloading"
 msgstr "Stahování"
 
+msgid "Downloading {name}…"
+msgstr "Stahuji {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Stažení od Applu vyžaduje Apple ID. Instalace může potřebovat asi 20 GB volného místa."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Stahuji GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Stahuji..."
@@ -9493,9 +9496,6 @@ msgstr "Instalace GitHubu nenalezena"
 msgid "GitHub integration"
 msgstr "Integrace s GitHubem"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub teď omezuje stahování. Počkejte minutu a zkuste to znovu."
-
 msgid "GitHub issues"
 msgstr "GitHub issues"
 
@@ -10421,8 +10421,8 @@ msgstr "Nainstalováno"
 msgid "Installed by your organization"
 msgstr "Nainstalováno vaší organizací"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Nainstalovali jste ho jinak, třeba přes Homebrew? Klikněte na Zkontrolovat znovu."
+msgid "Installed it another way? Click Check again."
+msgstr "Nainstalovali jste ho jinak? Klikněte na Zkontrolovat znovu."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Nainstalováno na {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Aplikace Paradev"
 msgid "Paradev Automations"
 msgstr "Automatizace Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev umí nainstalovat {name} jen na Macu. Nainstalujte ho ručně a pak klikněte na Zkontrolovat znovu."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev běží lokálně na počítačích vašich vývojářů. Neukl�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev vznikl jako projekt na hackathonu v listopadu 2025. Byla to jednoduchá desktopová aplikace na správu worktree."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev stále nemůže najít GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev stále nemůže najít {name}."
 
 msgid "Paradev Teams"
 msgstr "Týmy Paradev"
@@ -19889,6 +19892,9 @@ msgstr "Nastupuje dispečer"
 msgid "The download didn't finish. Try again."
 msgstr "Stahování se nedokončilo. Zkuste to znovu."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Stažený soubor není podepsaný společností {vendor}, proto ho Paradev nenainstaloval."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "Stažený soubor vypadal špatně, proto ho Paradev nenainstaloval. Zkuste to znovu."
 
@@ -20216,6 +20222,9 @@ msgstr "Karta náhledu motivu"
 
 msgid "Themes"
 msgstr "Motivy"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Na disku není dost volného místa pro instalaci {name}. Uvolněte místo a zkuste to znovu."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Tyto příkazy se spustí automaticky při vytvoření pracovního prostoru. <0>Přečtěte si dokumentaci<1/></0>"

@@ -17,17 +17,25 @@ describe("setupStepRows", () => {
 			[GIT_OK, GH_SIGNED_OUT, { git: false, gitHub: true }],
 		] as const;
 		for (const [git, gh, rows] of cases) {
-			expect(setupStepRows({ git, gh })).toEqual(rows);
+			expect(setupStepRows({ git, gh, platform: "darwin" })).toEqual(rows);
 			expect(needsSetupStep(rows)).toBe(true);
 		}
 	});
 
 	test("skips the step when nothing is missing or detection failed", () => {
 		for (const status of [
-			{ git: GIT_OK, gh: GH_READY },
-			{ git: undefined, gh: undefined },
+			{ git: GIT_OK, gh: GH_READY, platform: "darwin" },
+			{ git: undefined, gh: undefined, platform: "darwin" },
 		]) {
 			expect(needsSetupStep(setupStepRows(status))).toBe(false);
+		}
+	});
+
+	test("shows no Git row off macOS, where the project step reports missing Git", () => {
+		for (const platform of ["linux", "win32"]) {
+			expect(
+				setupStepRows({ git: GIT_MISSING, gh: GH_READY, platform }),
+			).toEqual({ git: false, gitHub: false });
 		}
 	});
 });

@@ -1450,6 +1450,9 @@ msgstr "{user} is opnieuw erbij gekomen."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} beperkt op dit moment downloads. Wacht een minuut en probeer het opnieuw."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} wachten"
 
@@ -6180,13 +6183,13 @@ msgstr "Kon reactie niet plaatsen"
 msgid "Couldn't post reply"
 msgstr "Kan antwoord niet plaatsen"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Kan {vendor} niet bereiken. Controleer je internetverbinding en probeer het opnieuw."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Kan de cloud niet bereiken voor {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Kan GitHub niet bereiken. Controleer je internetverbinding en probeer het opnieuw."
 
 msgid "Couldn't reach the model provider"
 msgstr "Kon de modelprovider niet bereiken"
@@ -6270,6 +6273,9 @@ msgstr "Kan niet naar de agent sturen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Je bericht kon niet worden verzonden. Het staat weer in het invoerveld."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Kan {name} niet instellen op deze computer."
+
 msgid "Couldn't stage changes"
 msgstr "Kan wijzigingen niet stagen"
 
@@ -6317,9 +6323,6 @@ msgstr "De verplaatsing kon niet opnieuw worden geprobeerd"
 
 msgid "Couldn't undo the file changes."
 msgstr "De bestandswijzigingen konden niet ongedaan worden gemaakt."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Kan GitHub CLI niet uitpakken of opslaan op deze Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Kan wijzigingen niet unstagen"
@@ -7580,11 +7583,11 @@ msgstr "gedownload"
 msgid "Downloading"
 msgstr "Downloaden"
 
+msgid "Downloading {name}…"
+msgstr "{name} downloaden…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Downloaden van Apple vereist een Apple ID. De installatie kan ongeveer 20 GB vrije ruimte nodig hebben."
-
-msgid "Downloading GitHub CLI…"
-msgstr "GitHub CLI downloaden…"
 
 msgid "Downloading..."
 msgstr "Downloaden..."
@@ -9493,9 +9496,6 @@ msgstr "GitHub-installatie niet gevonden"
 msgid "GitHub integration"
 msgstr "GitHub-integratie"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub beperkt op dit moment downloads. Wacht een minuut en probeer het opnieuw."
-
 msgid "GitHub issues"
 msgstr "GitHub-issues"
 
@@ -10421,8 +10421,8 @@ msgstr "Geïnstalleerd"
 msgid "Installed by your organization"
 msgstr "Geïnstalleerd door je organisatie"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Op een andere manier geïnstalleerd, bijvoorbeeld met Homebrew? Klik op Opnieuw controleren."
+msgid "Installed it another way? Click Check again."
+msgstr "Op een andere manier geïnstalleerd? Klik op Opnieuw controleren."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Geïnstalleerd op {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Paradev-app"
 msgid "Paradev Automations"
 msgstr "Paradev Automatiseringen"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev kan {name} alleen op een Mac installeren. Installeer het zelf en klik dan op Opnieuw controleren."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev draait lokaal op de machines van je ontwikkelaars. We slaan je c
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev begon in november 2025 als hackathonproject. Het was een simpele desktop-app om worktrees te beheren."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev kan GitHub CLI nog steeds niet vinden."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev kan {name} nog steeds niet vinden."
 
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
@@ -19889,6 +19892,9 @@ msgstr "De dispatcher verschijnt"
 msgid "The download didn't finish. Try again."
 msgstr "De download is niet voltooid. Probeer het opnieuw."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "De download is niet ondertekend door {vendor}, dus Paradev heeft hem niet geïnstalleerd."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "De download zag er verkeerd uit, dus Paradev heeft hem niet geïnstalleerd. Probeer het opnieuw."
 
@@ -20216,6 +20222,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Thema's"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Er is niet genoeg vrije schijfruimte om {name} te installeren. Maak ruimte vrij en probeer het opnieuw."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Deze commando's draaien automatisch wanneer een werkruimte wordt aangemaakt. <0>Lees onze docs<1/></0>"

@@ -53,16 +53,29 @@ export function getBinDir(): string {
 	return path.join(resolveAppHomeDir(), "bin");
 }
 
-/** Last on PATH, so a tool the app installed is found but never shadows the user's own. */
-export function withBinDirOnPath(
+/** Tools the app installs for the user (gh). Last on PATH, so the user's own install wins. */
+export function getToolsBinDir(): string {
+	return path.join(resolveAppHomeDir(), "tools", "bin");
+}
+
+/** `first` dirs go to the front of PATH and `last` dirs to the end, each once. */
+export function withPathDirs(
 	env: Record<string, string>,
-	binDir: string = getBinDir(),
+	{ first = [], last = [] }: { first?: string[]; last?: string[] },
 ): Record<string, string> {
 	const key =
 		Object.keys(env).find((name) => name.toUpperCase() === "PATH") ?? "PATH";
-	const entries = (env[key] ?? "").split(path.delimiter).filter(Boolean);
-	if (entries.includes(binDir)) return env;
-	return { ...env, [key]: [...entries, binDir].join(path.delimiter) };
+	const placed = new Set([...first, ...last]);
+	const rest = (env[key] ?? "")
+		.split(path.delimiter)
+		.filter((entry) => entry && !placed.has(entry));
+	return { ...env, [key]: [...first, ...rest, ...last].join(path.delimiter) };
+}
+
+export function withAppToolsOnPath(
+	env: Record<string, string>,
+): Record<string, string> {
+	return withPathDirs(env, { last: [getToolsBinDir()] });
 }
 
 export function getHooksDir(): string {

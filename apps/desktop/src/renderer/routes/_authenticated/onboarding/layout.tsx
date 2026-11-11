@@ -96,8 +96,8 @@ function OnboardingFlowLayout() {
 	const [rowsOnArrival, setRowsOnArrival] = useState<SetupStepRows | null>(
 		null,
 	);
-	if (!isPendingGh && !isPendingGit && rowsOnArrival === null) {
-		setRowsOnArrival(setupStepRows({ git: gitStatus, gh: ghStatus }));
+	if (!isPendingGh && !isPendingGit && platform && rowsOnArrival === null) {
+		setRowsOnArrival(setupStepRows({ git: gitStatus, gh: ghStatus, platform }));
 	}
 	const setupNeeded = rowsOnArrival !== null && needsSetupStep(rowsOnArrival);
 

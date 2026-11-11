@@ -1450,6 +1450,9 @@ msgstr "{user} yeniden katıldı."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} şu anda indirmeleri sınırlıyor. Bir dakika bekleyip yeniden deneyin."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} bekliyor"
 
@@ -6180,13 +6183,13 @@ msgstr "Yorum gönderilemedi"
 msgid "Couldn't post reply"
 msgstr "Yanıt gönderilemedi"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor} sunucusuna ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0} için buluta erişilemedi: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "GitHub'a ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
 
 msgid "Couldn't reach the model provider"
 msgstr "Model sağlayıcısına ulaşılamadı"
@@ -6270,6 +6273,9 @@ msgstr "Ajana gönderilemedi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Mesajınız gönderilemedi. Yazma alanına geri kondu."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "{name} bu bilgisayarda ayarlanamadı."
+
 msgid "Couldn't stage changes"
 msgstr "Değişiklikler hazırlanamadı"
 
@@ -6317,9 +6323,6 @@ msgstr "Taşıma yeniden denenemedi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Dosya değişiklikleri geri alınamadı."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "GitHub CLI bu Mac'te açılamadı veya kaydedilemedi."
 
 msgid "Couldn't unstage changes"
 msgstr "Değişiklikler hazırlıktan çıkarılamadı"
@@ -7580,11 +7583,11 @@ msgstr "indirildi"
 msgid "Downloading"
 msgstr "İndiriliyor"
 
+msgid "Downloading {name}…"
+msgstr "{name} indiriliyor…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Apple'dan indirmek için Apple Kimliği gerekir. Yükleme yaklaşık 20 GB boş alan gerektirebilir."
-
-msgid "Downloading GitHub CLI…"
-msgstr "GitHub CLI indiriliyor…"
 
 msgid "Downloading..."
 msgstr "İndiriliyor..."
@@ -9493,9 +9496,6 @@ msgstr "GitHub kurulumu bulunamadı"
 msgid "GitHub integration"
 msgstr "GitHub entegrasyonu"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub şu anda indirmeleri sınırlıyor. Bir dakika bekleyip yeniden deneyin."
-
 msgid "GitHub issues"
 msgstr "GitHub issue'ları"
 
@@ -10421,8 +10421,8 @@ msgstr "Yüklü"
 msgid "Installed by your organization"
 msgstr "Kuruluşunuz tarafından yüklendi"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Homebrew gibi başka bir yolla mı yüklediniz? Yeniden denetle'ye tıklayın."
+msgid "Installed it another way? Click Check again."
+msgstr "Başka bir yolla mı kurdunuz? Yeniden denetle'ye tıklayın."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "{appAccountLogin} üzerinde kurulu"
@@ -14536,6 +14536,9 @@ msgstr "Paradev uygulaması"
 msgid "Paradev Automations"
 msgstr "Paradev Otomasyonlar"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev {name} uygulamasını yalnızca Mac'te kurabilir. Kendiniz kurun, ardından Yeniden denetle'ye tıklayın."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. K
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev hâlâ GitHub CLI'ı bulamıyor."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev hâlâ {name} bulamıyor."
 
 msgid "Paradev Teams"
 msgstr "Paradev Takımlar"
@@ -19889,6 +19892,9 @@ msgstr "Dağıtıcı ortaya çıkar"
 msgid "The download didn't finish. Try again."
 msgstr "İndirme tamamlanmadı. Yeniden deneyin."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "İndirilen dosya {vendor} tarafından imzalanmamış, bu yüzden Paradev onu kurmadı."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "İndirilen dosya hatalı göründüğü için Paradev onu yüklemedi. Yeniden deneyin."
 
@@ -20216,6 +20222,9 @@ msgstr "Tema önizleme kartı"
 
 msgid "Themes"
 msgstr "Temalar"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "{name} kurmak için yeterli boş disk alanı yok. Biraz yer açıp yeniden deneyin."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Bu komutlar bir çalışma alanı oluşturulduğunda otomatik olarak çalışır. <0>Belgelerimizi okuyun<1/></0>"

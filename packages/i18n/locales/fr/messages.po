@@ -1450,6 +1450,9 @@ msgstr "{user} a de nouveau rejoint le canal."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} Go"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} limite les téléchargements en ce moment. Patientez une minute et réessayez."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} en attente"
 
@@ -6180,13 +6183,13 @@ msgstr "Impossible de publier le commentaire"
 msgid "Couldn't post reply"
 msgstr "Impossible de publier la réponse"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Impossible de joindre {vendor}. Vérifiez votre connexion Internet et réessayez."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Impossible de joindre le cloud pour {0} : {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Impossible de joindre GitHub. Vérifiez votre connexion Internet et réessayez."
 
 msgid "Couldn't reach the model provider"
 msgstr "Impossible de joindre le fournisseur du modèle"
@@ -6270,6 +6273,9 @@ msgstr "Impossible d'envoyer à l'agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Impossible d'envoyer votre message. Il est de retour dans la zone de saisie."
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "Impossible de configurer {name} sur cet ordinateur."
+
 msgid "Couldn't stage changes"
 msgstr "Impossible d'indexer les modifications"
 
@@ -6317,9 +6323,6 @@ msgstr "Impossible de relancer le déplacement"
 
 msgid "Couldn't undo the file changes."
 msgstr "Impossible d'annuler les modifications de fichiers."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Impossible de décompresser ou d'enregistrer GitHub CLI sur ce Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Impossible de désindexer les modifications"
@@ -7580,11 +7583,11 @@ msgstr "téléchargée"
 msgid "Downloading"
 msgstr "Téléchargement"
 
+msgid "Downloading {name}…"
+msgstr "Téléchargement de {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Le téléchargement depuis Apple nécessite un identifiant Apple. L'installation peut nécessiter environ 20 Go d'espace libre."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Téléchargement de GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Téléchargement..."
@@ -9493,9 +9496,6 @@ msgstr "Installation GitHub introuvable"
 msgid "GitHub integration"
 msgstr "Intégration GitHub"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub limite les téléchargements en ce moment. Patientez une minute et réessayez."
-
 msgid "GitHub issues"
 msgstr "Issues GitHub"
 
@@ -10421,8 +10421,8 @@ msgstr "Installé"
 msgid "Installed by your organization"
 msgstr "Installé par votre organisation"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Installé autrement, par exemple avec Homebrew ? Cliquez sur Vérifier à nouveau."
+msgid "Installed it another way? Click Check again."
+msgstr "Installé autrement ? Cliquez sur Vérifier à nouveau."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Installée sur {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Application Paradev"
 msgid "Paradev Automations"
 msgstr "Automatisations Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev ne peut installer {name} que sur un Mac. Installez-le vous-même, puis cliquez sur Vérifier à nouveau."
+
 msgid "Paradev CLI"
 msgstr "CLI Paradev"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev tourne en local sur les machines de vos développeurs. Nous ne s
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev a commencé comme un projet de hackathon en novembre 2025. C'était une simple application de bureau pour gérer des worktrees."
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev ne trouve toujours pas GitHub CLI."
+msgid "Paradev still can't find {name}."
+msgstr "Paradev ne trouve toujours pas {name}."
 
 msgid "Paradev Teams"
 msgstr "Équipes Paradev"
@@ -19889,6 +19892,9 @@ msgstr "Le répartiteur apparaît"
 msgid "The download didn't finish. Try again."
 msgstr "Le téléchargement n'a pas abouti. Réessayez."
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Le téléchargement n'est pas signé par {vendor}, Paradev ne l'a donc pas installé."
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "Le téléchargement semblait incorrect, Paradev ne l'a donc pas installé. Réessayez."
 
@@ -20216,6 +20222,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Thèmes"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Il n'y a pas assez d'espace disque libre pour installer {name}. Libérez de l'espace et réessayez."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Ces commandes s'exécutent automatiquement lorsqu'un espace de travail est créé. <0>Lire notre documentation<1/></0>"

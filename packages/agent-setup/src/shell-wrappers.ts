@@ -5,11 +5,13 @@ import {
 	SUPERSET_MANAGED_BINARIES,
 	type SupersetManagedBinary,
 } from "./agent-setup-targets";
-import { getBashDir, getBinDir, getZshDir } from "./paths";
+import { getBashDir, getBinDir, getToolsBinDir, getZshDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export interface ShellWrapperPaths {
 	BIN_DIR: string;
+	/** Tools the app installed (gh): last on PATH, so the user's own win. */
+	TOOLS_BIN_DIR: string;
 	ZSH_DIR: string;
 	BASH_DIR: string;
 }
@@ -19,6 +21,7 @@ export interface ShellWrapperPaths {
 function getDefaultPaths(): ShellWrapperPaths {
 	return {
 		BIN_DIR: getBinDir(),
+		TOOLS_BIN_DIR: getToolsBinDir(),
 		ZSH_DIR: getZshDir(),
 		BASH_DIR: getBashDir(),
 	};
@@ -94,13 +97,27 @@ ${name}() {
 	).join("\n");
 }
 
-/** Build a shell snippet that idempotently prepends BIN_DIR to PATH. */
-function buildPathPrependFunction(binDir: string): string {
-	return `_superset_prepend_bin() {
-  case ":$PATH:" in
-    *:${quoteShellLiteral(binDir)}:*) ;;
-    *) export PATH=${quoteShellLiteral(binDir)}:"$PATH" ;;
+/** Shell lines that put BIN_DIR first and TOOLS_BIN_DIR last on PATH, once each. */
+function buildPathFixLines(
+	paths: ShellWrapperPaths,
+	exportWord: string,
+): string {
+	const bin = quoteShellLiteral(paths.BIN_DIR);
+	const tools = quoteShellLiteral(paths.TOOLS_BIN_DIR);
+	return `  case ":$PATH:" in
+    *:${bin}:*) ;;
+    *) ${exportWord}PATH=${bin}:"$PATH" ;;
   esac
+  case ":$PATH:" in
+    *:${tools}:*) ;;
+    *) ${exportWord}PATH="$PATH":${tools} ;;
+  esac`;
+}
+
+/** Build a shell snippet that idempotently prepends BIN_DIR and appends TOOLS_BIN_DIR. */
+function buildPathPrependFunction(paths: ShellWrapperPaths): string {
+	return `_superset_prepend_bin() {
+${buildPathFixLines(paths, "export ")}
 }
 _superset_prepend_bin`;
 }
@@ -111,13 +128,10 @@ _superset_prepend_bin`;
  * which can remove our BIN_DIR. This is intentionally best-effort so
  * unusual user zsh configs don't break shell startup.
  */
-function buildZshPrecmdHook(binDir: string): string {
+function buildZshPrecmdHook(paths: ShellWrapperPaths): string {
 	return `typeset -ga precmd_functions 2>/dev/null || true
 _superset_ensure_path() {
-  case ":$PATH:" in
-    *:${quoteShellLiteral(binDir)}:*) ;;
-    *) PATH=${quoteShellLiteral(binDir)}:"$PATH" ;;
-  esac
+${buildPathFixLines(paths, "")}
 }
 {
   # Keep our hook last so it wins over other PATH-mutating precmd hooks.
@@ -173,8 +187,8 @@ _superset_home="\${SUPERSET_ORIG_ZDOTDIR:-$HOME}"
 export ZDOTDIR="$_superset_home"
 [[ -f "$_superset_home/.zshrc" ]] && source "$_superset_home/.zshrc"
 ${SUPERSET_ENV_RESTORE}
-${buildPathPrependFunction(paths.BIN_DIR)}
-${buildZshPrecmdHook(paths.BIN_DIR)}
+${buildPathPrependFunction(paths)}
+${buildZshPrecmdHook(paths)}
 rehash 2>/dev/null || true
 # Restore ZDOTDIR so our .zlogin runs after user's .zlogin
 export ZDOTDIR=${quotedZshDir}
@@ -194,8 +208,8 @@ if [[ -o interactive ]]; then
   [[ -f "$_superset_home/.zlogin" ]] && source "$_superset_home/.zlogin"
 fi
 ${SUPERSET_ENV_RESTORE}
-${buildZshPrecmdHook(paths.BIN_DIR)}
-${buildPathPrependFunction(paths.BIN_DIR)}
+${buildZshPrecmdHook(paths)}
+${buildPathPrependFunction(paths)}
 rehash 2>/dev/null || true
 # Shell readiness markers. Emitting both keeps us compatible across daemon
 # versions: the legacy v1 daemon scans for OSC 777, the current scanner (v1
@@ -248,7 +262,7 @@ fi
 ${SUPERSET_ENV_RESTORE}
 
 # Keep superset bin first without duplicating entries
-${buildPathPrependFunction(paths.BIN_DIR)}
+${buildPathPrependFunction(paths)}
 hash -r 2>/dev/null || true
 # Minimal prompt (path/env shown in toolbar) - emerald to match app theme
 export PS1=$'\\[\\e[1;38;2;52;211;153m\\]❯\\[\\e[0m\\] '
@@ -302,6 +316,7 @@ export function getShellArgs(
 		// Emit both OSC 777 (legacy v1 daemon) and OSC 133;A (current scanner)
 		// on fish_prompt. See zsh wrapper for rationale.
 		const escapedBinDir = escapeFishDoubleQuoted(paths.BIN_DIR);
+		const escapedToolsDir = escapeFishDoubleQuoted(paths.TOOLS_BIN_DIR);
 		return [
 			"-l",
 			"--init-command",
@@ -309,6 +324,9 @@ export function getShellArgs(
 				`set -l _superset_bin "${escapedBinDir}"`,
 				`contains -- "$_superset_bin" $PATH`,
 				`or set -gx PATH "$_superset_bin" $PATH`,
+				`set -l _superset_tools "${escapedToolsDir}"`,
+				`contains -- "$_superset_tools" $PATH`,
+				`or set -gx PATH $PATH "$_superset_tools"`,
 				`function _superset_prompt_mark --on-event fish_prompt`,
 				`printf '\\033]777;superset-shell-ready\\007\\033]133;A\\007'`,
 				`end`,

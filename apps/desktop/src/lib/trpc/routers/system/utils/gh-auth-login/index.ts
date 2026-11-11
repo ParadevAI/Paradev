@@ -9,5 +9,6 @@ export {
 export {
 	createGhCliDeps,
 	finishPendingGhGitSetup,
+	resolveInstalledGh,
 	setUpGhGitCredentials,
 } from "./gh-cli-deps";

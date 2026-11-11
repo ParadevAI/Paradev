@@ -1,3 +1,4 @@
+import { withPathDirs } from "@superset/agent-setup/paths";
 import { parseGhDeviceCode } from "../parse-gh-device-code";
 
 export type GhAuthLoginEvent =
@@ -17,7 +18,7 @@ export interface GhAuthLoginDeps {
 	/** A directory holding a `git` that exits 1, for gh to find before Apple's stub. */
 	gitShimDir: () => Promise<string>;
 	runGh: (args: string[]) => Promise<void>;
-	spawnGh: (args: string[], env: Record<string, string>) => GhProcess;
+	spawnGh: (args: string[], env: Record<string, string>) => Promise<GhProcess>;
 	isGitSetupPending: () => Promise<boolean>;
 	setGitSetupPending: (pending: boolean) => Promise<void>;
 }
@@ -34,15 +35,6 @@ export function ghLoginArgs(gitUsable: boolean): string[] {
 	return gitUsable
 		? [...LOGIN_BASE_ARGS, "--git-protocol", "https", "--skip-ssh-key"]
 		: [...LOGIN_BASE_ARGS, "--git-protocol", "ssh", "--skip-ssh-key"];
-}
-
-export function withPathFirst(
-	env: Record<string, string>,
-	dir: string,
-): Record<string, string> {
-	const key =
-		Object.keys(env).find((name) => name.toUpperCase() === "PATH") ?? "PATH";
-	return { ...env, [key]: [dir, env[key]].filter(Boolean).join(":") };
 }
 
 export function runGhAuthLogin(
@@ -62,9 +54,14 @@ export function runGhAuthLogin(
 		// whatever the protocol.
 		const loginEnv = gitUsable
 			? env
-			: withPathFirst(env, await deps.gitShimDir());
+			: withPathDirs(env, { first: [await deps.gitShimDir()] });
 		if (stopped) return;
-		child = deps.spawnGh(ghLoginArgs(gitUsable), loginEnv);
+		const spawned = await deps.spawnGh(ghLoginArgs(gitUsable), loginEnv);
+		if (stopped) {
+			spawned.kill();
+			return;
+		}
+		child = spawned;
 		let output = "";
 		let sentCode = false;
 		child.onOutput((chunk) => {

@@ -1450,6 +1450,9 @@ msgstr "{user} 已重新加入。"
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} 目前正在限制下載。請稍候片刻再試一次。"
+
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
 
@@ -6180,13 +6183,13 @@ msgstr "無法發佈留言"
 msgid "Couldn't post reply"
 msgstr "無法釋出回覆"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "無法連線到 {vendor}。請檢查網路連線後再試一次。"
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "無法為{0}連線雲端：{1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "無法連線到 GitHub。請檢查網路連線後再試一次。"
 
 msgid "Couldn't reach the model provider"
 msgstr "無法連線到模型供應商"
@@ -6270,6 +6273,9 @@ msgstr "無法傳送給代理程式"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "無法傳送你的訊息。訊息已放回輸入框。"
 
+msgid "Couldn't set up {name} on this computer."
+msgstr "無法在這台電腦上設定 {name}。"
+
 msgid "Couldn't stage changes"
 msgstr "無法暫存更改"
 
@@ -6317,9 +6323,6 @@ msgstr "無法重試移動"
 
 msgid "Couldn't undo the file changes."
 msgstr "無法撤銷檔案更改。"
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "無法在這台 Mac 上解壓縮或儲存 GitHub CLI。"
 
 msgid "Couldn't unstage changes"
 msgstr "無法取消暫存更改"
@@ -7580,11 +7583,11 @@ msgstr "已下載"
 msgid "Downloading"
 msgstr "下載中"
 
+msgid "Downloading {name}…"
+msgstr "正在下載 {name}…"
+
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "從 Apple 下載需要 Apple ID。安裝可能需要約 20 GB 可用空間。"
-
-msgid "Downloading GitHub CLI…"
-msgstr "正在下載 GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "正在下載..."
@@ -9493,9 +9496,6 @@ msgstr "未找到GitHub安裝"
 msgid "GitHub integration"
 msgstr "GitHub整合"
 
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub 目前正在限制下載。請稍候片刻再試一次。"
-
 msgid "GitHub issues"
 msgstr "GitHub議題"
 
@@ -10421,8 +10421,8 @@ msgstr "已安裝"
 msgid "Installed by your organization"
 msgstr "由你的組織安裝"
 
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "用其他方式（例如 Homebrew）安裝了嗎？請按一下「重新檢查」。"
+msgid "Installed it another way? Click Check again."
+msgstr "已透過其他方式安裝？請點選重新檢查。"
 
 msgid "Installed on {appAccountLogin}"
 msgstr "已安裝在 {appAccountLogin}"
@@ -14536,6 +14536,9 @@ msgstr "Paradev應用程式"
 msgid "Paradev Automations"
 msgstr "Paradev 自動化"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev 只能在 Mac 上安裝 {name}。請自行安裝，然後點選重新檢查。"
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14680,8 +14683,8 @@ msgstr "Paradev在你的開發者機器上本地執行。我們不儲存你的�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev起初是2025年11月的一個駭客松專案，一個用來管理worktree的簡單桌面應用程式。"
 
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev 仍然找不到 GitHub CLI。"
+msgid "Paradev still can't find {name}."
+msgstr "Paradev 仍然找不到 {name}。"
 
 msgid "Paradev Teams"
 msgstr "Paradev 團隊"
@@ -19889,6 +19892,9 @@ msgstr "排程員出現"
 msgid "The download didn't finish. Try again."
 msgstr "下載未完成。請再試一次。"
 
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "下載內容未經 {vendor} 簽署，因此 Paradev 沒有安裝。"
+
 msgid "The download looked wrong, so Paradev didn't install it. Try again."
 msgstr "下載內容看起來不正確，因此 Paradev 沒有安裝。請再試一次。"
 
@@ -20216,6 +20222,9 @@ msgstr "主題預覽卡片"
 
 msgid "Themes"
 msgstr "主題"
+
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "磁碟空間不足，無法安裝 {name}。請釋出一些空間後再試一次。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "建立工作區時會自動執行這些命令。<0>閱讀文件<1/></0>"

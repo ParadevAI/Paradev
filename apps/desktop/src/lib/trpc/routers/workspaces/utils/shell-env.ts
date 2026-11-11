@@ -3,7 +3,7 @@ import {
 	execFile,
 } from "node:child_process";
 import { promisify } from "node:util";
-import { withBinDirOnPath } from "@superset/agent-setup/paths";
+import { withAppToolsOnPath } from "@superset/agent-setup/paths";
 import { shellEnv } from "shell-env";
 
 const execFileAsync = promisify(execFile);
@@ -218,7 +218,7 @@ export async function execWithShellEnv(
 		return await execFileAsync(cmd, args, {
 			...options,
 			encoding: "utf8",
-			env: withBinDirOnPath(await getProcessEnvWithShellEnv(baseEnv)),
+			env: withAppToolsOnPath(await getProcessEnvWithShellEnv(baseEnv)),
 		});
 	} catch (error) {
 		// Only retry on ENOENT (command not found), only on macOS
@@ -245,7 +245,7 @@ export async function execWithShellEnv(
 			);
 
 			// Retry with fixed env (respect caller's other env vars, force PATH if present)
-			const retryEnv = withBinDirOnPath(
+			const retryEnv = withAppToolsOnPath(
 				shellEnvResult.PATH
 					? { ...mergedShellEnv, PATH: shellEnvResult.PATH }
 					: mergedShellEnv,

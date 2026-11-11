@@ -9,9 +9,9 @@ import { Spinner } from "@superset/ui/spinner";
 import { useEffect, useRef, useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { StepError } from "renderer/routes/_authenticated/components/StepError";
 import { InstallStep } from "./components/InstallStep";
 import { SignInStep } from "./components/SignInStep";
-import { StepError } from "./components/StepError";
 
 export type GitHubCliDialogStart = "install" | "auth";
 

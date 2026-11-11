@@ -1,17 +1,26 @@
 import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { promisify } from "node:util";
-import { getBinDir } from "@superset/agent-setup/paths";
+import {
+	getToolsBinDir,
+	withAppToolsOnPath,
+} from "@superset/agent-setup/paths";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { net } from "electron";
 import { publicProcedure, router } from "../..";
-import { execWithShellEnv } from "../workspaces/utils/shell-env";
+import { macArch } from "../utils/mac-arch";
+import { createSingleInstall } from "../utils/single-install";
+import {
+	execWithShellEnv,
+	getProcessEnvWithShellEnv,
+} from "../workspaces/utils/shell-env";
 import { COMMAND_LINE_TOOLS_INSTALLER_PATH, detectGit } from "./detect-git";
 import {
 	createGhCliDeps,
 	finishPendingGhGitSetup,
 	type GhAuthLoginEvent,
+	resolveInstalledGh,
 	runGhAuthLogin,
 	setUpGhGitCredentials,
 } from "./utils/gh-auth-login";
@@ -28,17 +37,8 @@ interface GhDetectResult {
 }
 
 async function detectGhCli(): Promise<GhDetectResult> {
-	// Resolve `gh` via the user's login-shell PATH (execWithShellEnv retries with
-	// the derived shell env on ENOENT), so we find it wherever it's installed —
-	// homebrew, MacPorts, nix, asdf, etc. — not just a hardcoded path list.
-	let version: string | null = null;
-	try {
-		const { stdout } = await execWithShellEnv("gh", ["--version"], {
-			timeout: 5000,
-		});
-		const firstLine = stdout.split("\n")[0]?.trim() ?? "";
-		version = firstLine.match(/gh version (\S+)/)?.[1] ?? null;
-	} catch {
+	const gh = await resolveInstalledGh();
+	if (!gh) {
 		return {
 			installed: false,
 			authenticated: false,
@@ -46,30 +46,30 @@ async function detectGhCli(): Promise<GhDetectResult> {
 			path: null,
 		};
 	}
+	const version =
+		gh.versionOutput.split("\n")[0]?.match(/gh version (\S+)/)?.[1] ?? null;
+	const env = withAppToolsOnPath(await getProcessEnvWithShellEnv());
+	const authStatus = (args: string[]) =>
+		execFileAsync(gh.command, ["auth", "status", ...args], {
+			env,
+			timeout: 5000,
+		});
 
 	let authenticated = false;
 	try {
-		await execWithShellEnv(
-			"gh",
-			["auth", "status", "--active", "--hostname", "github.com"],
-			{ timeout: 5000 },
-		);
+		await authStatus(["--active", "--hostname", "github.com"]);
 		authenticated = true;
 	} catch {
 		// `--active` requires gh >= 2.40; retry without it for older installs.
 		// Both variants exit non-zero when not logged in.
 		try {
-			await execWithShellEnv(
-				"gh",
-				["auth", "status", "--hostname", "github.com"],
-				{ timeout: 5000 },
-			);
+			await authStatus(["--hostname", "github.com"]);
 			authenticated = true;
 		} catch {}
 	}
 
 	if (authenticated) void finishPendingGhGitSetup();
-	return { installed: true, authenticated, version, path: "gh" };
+	return { installed: true, authenticated, version, path: gh.command };
 }
 
 interface BrewDetectResult {
@@ -164,6 +164,25 @@ async function installGhWithBrew(): Promise<GhInstallEvent> {
 	}
 }
 
+async function installGh(
+	emit: (event: GhInstallEvent) => void,
+	signal: AbortSignal,
+): Promise<GhInstallEvent> {
+	if (process.platform !== "darwin") {
+		emit({ stage: "installing", untimed: true });
+		return installGhWithBrew();
+	}
+	return installGhCli({
+		binDir: getToolsBinDir(),
+		arch: await macArch(),
+		fetch: (url, init) => net.fetch(url, init),
+		signal,
+		onProgress: emit,
+	});
+}
+
+const subscribeToInstall = createSingleInstall<GhInstallEvent>();
+
 export const createSystemRouter = () => {
 	return router({
 		detectGhCli: publicProcedure.query(detectGhCli),
@@ -182,29 +201,14 @@ export const createSystemRouter = () => {
 			installCommandLineToolsOnMac,
 		),
 		installGhCli: publicProcedure.subscription(() => {
-			return observable<GhInstallEvent>((emit) => {
-				const controller = new AbortController();
-				const finish = (event: GhInstallEvent) => {
-					if (controller.signal.aborted) return;
+			return observable<GhInstallEvent>((emit) =>
+				subscribeToInstall("gh", installGh, (event) => {
 					emit.next(event);
-					emit.complete();
-				};
-				if (process.platform === "darwin") {
-					void installGhCli({
-						binDir: getBinDir(),
-						fetch: (url, init) => net.fetch(url, init),
-						signal: controller.signal,
-						onProgress: (event) => {
-							if (event.stage === "done" || event.stage === "failed") return;
-							if (!controller.signal.aborted) emit.next(event);
-						},
-					}).then(finish);
-				} else {
-					emit.next({ stage: "installing" });
-					void installGhWithBrew().then(finish);
-				}
-				return () => controller.abort();
-			});
+					if (event.stage === "done" || event.stage === "failed") {
+						emit.complete();
+					}
+				}),
+			);
 		}),
 		setUpGhGitCredentials: publicProcedure.mutation(setUpGhGitCredentials),
 		ghAuthLogin: publicProcedure.subscription(() => {

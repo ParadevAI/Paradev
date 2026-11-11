@@ -4,8 +4,8 @@ import { Spinner } from "@superset/ui/spinner";
 import { useState } from "react";
 import { LuArrowUpRight, LuCheck, LuCopy } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { StepError } from "renderer/routes/_authenticated/components/StepError";
 import { useStallTimeout } from "renderer/routes/_authenticated/hooks/useStallTimeout";
-import { StepError } from "../StepError";
 
 const CODE_STALL_TIMEOUT_MS = 30_000;
 

@@ -3,11 +3,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 import {
+	getToolsBinDir,
 	resolveAppHomeDir,
-	withBinDirOnPath,
+	withAppToolsOnPath,
 } from "@superset/agent-setup/paths";
 import { getProcessEnvWithShellEnv } from "../../../workspaces/utils/shell-env";
 import { detectGit } from "../../detect-git";
+import { type ResolvedGh, resolveGh } from "../resolve-gh";
 import {
 	finishPendingGitSetup,
 	type GhAuthLoginDeps,
@@ -21,7 +23,25 @@ function pendingMarkerPath(): string {
 }
 
 async function toolEnv(): Promise<Record<string, string>> {
-	return withBinDirOnPath(await getProcessEnvWithShellEnv());
+	return withAppToolsOnPath(await getProcessEnvWithShellEnv());
+}
+
+export async function resolveInstalledGh(): Promise<ResolvedGh | null> {
+	const env = await toolEnv();
+	return resolveGh({
+		appGhPath: path.join(getToolsBinDir(), "gh"),
+		runVersion: async (command) =>
+			(
+				await execFileAsync(command, ["--version"], {
+					env,
+					timeout: 5000,
+				})
+			).stdout,
+	});
+}
+
+async function ghCommand(): Promise<string> {
+	return (await resolveInstalledGh())?.command ?? "gh";
 }
 
 export function createGhCliDeps(): GhAuthLoginDeps {
@@ -46,13 +66,13 @@ export function createGhCliDeps(): GhAuthLoginDeps {
 			return dir;
 		},
 		runGh: async (args) => {
-			await execFileAsync("gh", args, {
+			await execFileAsync(await ghCommand(), args, {
 				env: await toolEnv(),
 				timeout: 15_000,
 			});
 		},
-		spawnGh: (args, env) => {
-			const child = spawn("gh", args, {
+		spawnGh: async (args, env) => {
+			const child = spawn(await ghCommand(), args, {
 				env,
 				stdio: ["ignore", "pipe", "pipe"],
 			});
