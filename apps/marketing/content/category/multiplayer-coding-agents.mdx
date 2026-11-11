@@ -63,6 +63,8 @@ The approach Paradev takes with [cloud workspaces](/cloud). Each workspace is it
 
 The appeal is that the unit of sharing is the work itself, and the agent inside it can be any agent. The constraint is that it is sharing by invitation, not agents negotiating with each other on their own.
 
+![A cloud workspace running on its own machine: the Cloud, Large chip on the session, the agent editing files and running the build](/changelog/2026-11-08-cloud-hero.png)
+
 ---
 
 ## What Paradev shares
@@ -71,7 +73,7 @@ Paradev runs the CLI agents you already pay for, so the team part is built aroun
 
 **A workspace a teammate can open and drive.** Cloud workspaces come with the Team and Ultra plans. Each one runs on its own machine and keeps working with your laptop closed. Share sets who can reach it: anyone in your organization, or only the people you invite. Full access means a teammate can open the terminals and prompt the agents, not only read the result. From a shell, `superset workspaces share add ws_a --user ann@example.com` and `--team` do the same thing, and `superset workspaces share list` shows the owner, the visibility, and who it reached.
 
-![Cloud workspaces grouped by the person who started them: two under Satya Patel, two under Kiet Ho, each row showing its repository, its pull request, and a status dot](/images/guides/cloud-workspaces-by-person.png)
+![A cloud workspace mid-task: the agent is working in the chat pane, the workspace carries a cloud badge in the sidebar, and Share sits in the tab bar](/images/guides/cloud-workspace-running.png)
 
 **An environment the team starts from.** An environment holds the repositories, the variables, and the region. Set it up once, mark it visible to the organization, and every teammate starts workspaces from the same ground. Your agent sign-ins and GitHub access are not copied into the sandbox: the agent sees a placeholder, and Paradev adds your sign-in to outgoing requests. The variables and secrets you set on the environment are delivered to the sandbox as you configured them.
 
