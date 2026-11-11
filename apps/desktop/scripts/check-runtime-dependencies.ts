@@ -19,6 +19,13 @@ const shipped = new Set(["electron", ...Object.keys(dependencies)]);
 // A quote before the call means generated code held in a string (ajv), not a real load.
 const RUNTIME_LOAD =
 	/(?<!["'`])\b(?:require(?:\$\d+)?(?:\.resolve)?|\)\.resolve|import)\s*\(\s*["']([^"'./][^"']*)["']/g;
+// Bundled packages keep their JSDoc, and express's shows `require('express')`.
+const COMMENT_LINE = /^\s*(?:\*|\/\/)/;
+
+function isInComment(source: string, index: number): boolean {
+	const lineStart = source.lastIndexOf("\n", index) + 1;
+	return COMMENT_LINE.test(source.slice(lineStart, index));
+}
 
 function packageName(specifier: string): string {
 	const parts = specifier.split("/");
@@ -42,9 +49,9 @@ function* compiledFiles(dir: string): Generator<string> {
 const loadedBy = new Map<string, Set<string>>();
 for (const dir of scannedDirs) {
 	for (const file of compiledFiles(dir)) {
-		for (const [, specifier] of readFileSync(file, "utf8").matchAll(
-			RUNTIME_LOAD,
-		)) {
+		const source = readFileSync(file, "utf8");
+		for (const { 1: specifier, index } of source.matchAll(RUNTIME_LOAD)) {
+			if (isInComment(source, index)) continue;
 			const name = packageName(specifier);
 			if (!isInstalledPackage(name)) continue;
 			const files = loadedBy.get(name) ?? new Set<string>();
