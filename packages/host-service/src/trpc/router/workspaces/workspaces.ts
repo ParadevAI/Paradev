@@ -134,6 +134,9 @@ const createInputSchema = z
 		skipBranchPrefix: z.boolean().optional(),
 		pr: z.number().int().positive().optional(),
 		baseBranch: z.string().min(1).optional(),
+		// Multi-repo projects: the base branch of each repository, by its project id.
+		// A repository left out branches from its default branch.
+		repositoryBaseBranches: z.record(z.string(), z.string().min(1)).optional(),
 		taskId: z.string().uuid().optional(),
 		agents: z.array(agentLaunchSchema).optional(),
 		// Desktop "Wait for workspace setup before starting agents" setting,
@@ -433,6 +436,7 @@ async function createRepositoryCheckouts(
 		branch: string;
 		root: string;
 		repositoryProjects: ReturnType<typeof listRepositoryProjects>;
+		baseBranches?: Record<string, string>;
 	},
 ): Promise<Array<{ id: string; worktreePath: string; branch: string }>> {
 	const created: Array<{ id: string; worktreePath: string; branch: string }> =
@@ -445,7 +449,7 @@ async function createRepositoryCheckouts(
 			const plan = await planBranchSource(
 				git,
 				args.branch,
-				undefined,
+				args.baseBranches?.[repository.id],
 				createWorkerBaseRefFetcher(ctx, repository.repoPath),
 			);
 			await addBranchWorktree({
@@ -455,6 +459,14 @@ async function createRepositoryCheckouts(
 				sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
 			});
 			await enablePushAutoSetupRemote(git, worktreePath, "[workspaces.create]");
+			if (!plan.usedExistingBranch && plan.startPoint.kind !== "head") {
+				await recordBaseBranchConfig({
+					git,
+					worktreePath,
+					branch: plan.branch,
+					baseBranch: plan.startPoint.shortName,
+				});
+			}
 		} catch (err) {
 			// ponytail: a repository that fails to check out is skipped, not
 			// rolled back with the rest; the workspace opens without it.
@@ -563,6 +575,7 @@ async function createContainerWorkspace(
 		branch,
 		root,
 		repositoryProjects: repositories,
+		baseBranches: input.repositoryBaseBranches,
 	});
 	writeWorkspaceContextFiles(root, checkouts);
 

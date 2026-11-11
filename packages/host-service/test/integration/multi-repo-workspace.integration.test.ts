@@ -30,7 +30,12 @@ async function containerScenario() {
 		name: "orbit",
 		repoPaths: [web.repoPath, api.repoPath],
 	});
-	return { host, projectId, repoPaths: [web.repoPath, api.repoPath] };
+	return {
+		host,
+		projectId,
+		repoPaths: [web.repoPath, api.repoPath],
+		fixtures: [web, api],
+	};
 }
 
 test("a container workspace holds a checkout of every repository and removes them together", async () => {
@@ -186,4 +191,33 @@ test("each checkout reports its own pull request, for the Review tab", async () 
 	);
 	expect(first).toBeNull();
 	expect(second).toMatchObject({ number: 7 });
+});
+
+test("each repository branches from the base branch picked for it", async () => {
+	const { host, projectId, fixtures } = await containerScenario();
+	const api = fixtures[1];
+	await api?.git.checkoutLocalBranch("release");
+	await api?.commit("release work", { "release.txt": "v2" });
+	await api?.git.checkout("main");
+	const repositories = await host.trpc.project.repositories.query({
+		projectId,
+	});
+
+	const { workspace } = await host.trpc.workspaces.create.mutate({
+		projectId,
+		name: "both",
+		branch: "feature/both",
+		repositoryBaseBranches: { [repositories[1]?.id ?? ""]: "release" },
+	});
+
+	const [web, apiCheckout] = await host.trpc.workspace.repositories.query({
+		workspaceId: workspace.id,
+	});
+	expect(existsSync(join(web?.worktreePath ?? "", "release.txt"))).toBe(false);
+	expect(existsSync(join(apiCheckout?.worktreePath ?? "", "release.txt"))).toBe(
+		true,
+	);
+	expect(
+		(await api?.git.raw(["config", "branch.feature/both.base"]))?.trim(),
+	).toBe("release");
 });
