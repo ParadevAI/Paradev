@@ -66,6 +66,7 @@ import {
 import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
 import { useMigrateLegacySidebarFolders } from "./hooks/useMigrateLegacySidebarFolders";
+import { usePruneStaleSidebarSections } from "./hooks/usePruneStaleSidebarSections";
 import { useDashboardSidebarDnd } from "./hooks/useSidebarDnd";
 import { DashboardSidebarActionsProvider } from "./providers/DashboardSidebarActionsProvider";
 import { DashboardSidebarDndProvider } from "./providers/DashboardSidebarDndProvider";
@@ -194,6 +195,9 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	// Converts legacy uuid-keyed folders to tag-backed folders in the
 	// background; retries whenever the workspace cache changes.
 	useMigrateLegacySidebarFolders();
+	// Drops stored folder rows whose last tagged workspace is gone (the
+	// "empty group" otherwise left behind forever).
+	usePruneStaleSidebarSections();
 	const navigate = useNavigate();
 	const matchRoute = useMatchRoute();
 	const settingsHotkey = useHotkeyDisplay("OPEN_SETTINGS").text;

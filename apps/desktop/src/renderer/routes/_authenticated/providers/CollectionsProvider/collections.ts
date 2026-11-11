@@ -180,6 +180,10 @@ function createOrgCollections(organizationId: string): OrgCollections {
 		basicIndexConfig,
 	);
 
+	// Presentation cache per tag folder. Bounded by reconciliation: rows whose
+	// folder has no active workspace and no host tag setting are deleted by
+	// DashboardSidebar's usePruneStaleSidebarSections; "Delete group" and the
+	// legacy-folder migration delete explicitly.
 	const v2SidebarSections = createIndexedCollection(
 		localStorageCollectionOptions(
 			hardenLocalCollection({
