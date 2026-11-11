@@ -5210,6 +5210,9 @@ msgstr "Run-Befehl des Arbeitsbereichs konfigurieren"
 msgid "Configured for {agent}"
 msgstr "Für {agent} eingerichtet"
 
+msgid "Confirm before moving a workspace"
+msgstr "Vor dem Verschieben eines Arbeitsbereichs bestätigen"
+
 msgid "Confirm before quitting"
 msgstr "Vor dem Beenden bestätigen"
 
@@ -8254,6 +8257,9 @@ msgstr "Erklären, wie dieses Repository funktioniert…"
 
 msgid "Explain to me how this repository works"
 msgstr "Erklär mir, wie dieses Repository funktioniert"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Vor dem Verschieben eines Arbeitsbereichs auf einen anderen Computer erklären, was dabei passiert"
 
 msgid "Explore"
 msgstr "Entdecken"

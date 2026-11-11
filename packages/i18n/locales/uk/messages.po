@@ -5204,6 +5204,9 @@ msgstr "Налаштувати команду запуску робочого п
 msgid "Configured for {agent}"
 msgstr "Налаштовано для {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Підтверджувати перед переміщенням робочого простору"
+
 msgid "Confirm before quitting"
 msgstr "Підтверджувати перед виходом"
 
@@ -8248,6 +8251,9 @@ msgstr "Поясни, як працює цей репозиторій…"
 
 msgid "Explain to me how this repository works"
 msgstr "Поясни мені, як працює цей репозиторій"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Пояснювати, що робить переміщення, перш ніж робочий простір перейде на інший комп’ютер"
 
 msgid "Explore"
 msgstr "Огляд"

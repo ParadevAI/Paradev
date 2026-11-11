@@ -42,6 +42,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
 	BEHAVIOR_ACP_CHAT: "behavior-acp-chat",
+	BEHAVIOR_WORKSPACE_MOVE_CONFIRM: "behavior-workspace-move-confirm",
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
@@ -202,6 +203,8 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT]: "v2",
+	// Workspace moves are a v2-only surface.
+	[SETTING_ITEM_ID.BEHAVIOR_WORKSPACE_MOVE_CONFIRM]: "v2",
 	// The top-bar Changes control is a v2-only surface.
 	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
@@ -915,6 +918,24 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"pane",
 			"toggle",
 			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_WORKSPACE_MOVE_CONFIRM,
+		section: "behavior",
+		title: "Confirm before moving a workspace",
+		description:
+			"Explain what a move does before a workspace moves to another computer",
+		keywords: [
+			"move",
+			"teleport",
+			"workspace",
+			"computer",
+			"host",
+			"confirm",
+			"dialog",
+			"ask",
+			"warn",
 		],
 	},
 	{

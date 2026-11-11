@@ -5210,6 +5210,9 @@ msgstr "Run-commando van werkruimte configureren"
 msgid "Configured for {agent}"
 msgstr "Ingesteld voor {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Bevestigen voordat je een werkruimte verplaatst"
+
 msgid "Confirm before quitting"
 msgstr "Bevestigen voor afsluiten"
 
@@ -8254,6 +8257,9 @@ msgstr "Leg uit hoe deze repository werkt…"
 
 msgid "Explain to me how this repository works"
 msgstr "Leg me uit hoe deze repository werkt"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Uitleggen wat een verplaatsing doet voordat een werkruimte naar een andere computer gaat"
 
 msgid "Explore"
 msgstr "Ontdekken"

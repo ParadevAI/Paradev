@@ -5210,6 +5210,9 @@ msgstr "配置工作区运行命令"
 msgid "Configured for {agent}"
 msgstr "已为 {agent} 配置"
 
+msgid "Confirm before moving a workspace"
+msgstr "移动工作区前确认"
+
 msgid "Confirm before quitting"
 msgstr "退出前确认"
 
@@ -8254,6 +8257,9 @@ msgstr "讲讲这个仓库是怎么运作的…"
 
 msgid "Explain to me how this repository works"
 msgstr "讲讲这个仓库是怎么运作的"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "在将工作区移至另一台电脑前，说明移动会带来什么影响"
 
 msgid "Explore"
 msgstr "探索"

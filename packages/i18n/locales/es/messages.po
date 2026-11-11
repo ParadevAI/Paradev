@@ -5210,6 +5210,9 @@ msgstr "Configurar el comando de ejecución del espacio de trabajo"
 msgid "Configured for {agent}"
 msgstr "Configurado para {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Confirmar antes de mover un espacio de trabajo"
+
 msgid "Confirm before quitting"
 msgstr "Confirmar antes de salir"
 
@@ -8254,6 +8257,9 @@ msgstr "Explicar cómo funciona este repositorio…"
 
 msgid "Explain to me how this repository works"
 msgstr "Explícame cómo funciona este repositorio"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Explicar qué hace el traslado antes de mover un espacio de trabajo a otro equipo"
 
 msgid "Explore"
 msgstr "Explorar"

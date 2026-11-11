@@ -5210,6 +5210,9 @@ msgstr "Atur perintah run workspace"
 msgid "Configured for {agent}"
 msgstr "Dikonfigurasi untuk {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Konfirmasi sebelum memindahkan workspace"
+
 msgid "Confirm before quitting"
 msgstr "Konfirmasi sebelum keluar"
 
@@ -8254,6 +8257,9 @@ msgstr "Jelaskan cara kerja repositori ini…"
 
 msgid "Explain to me how this repository works"
 msgstr "Jelaskan cara kerja repositori ini"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Jelaskan apa yang dilakukan pemindahan sebelum workspace dipindahkan ke komputer lain"
 
 msgid "Explore"
 msgstr "Jelajahi"

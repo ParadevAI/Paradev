@@ -5210,6 +5210,9 @@ msgstr "Настроить команду запуска рабочей обла
 msgid "Configured for {agent}"
 msgstr "Настроен для {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Подтверждать перед переносом рабочей области"
+
 msgid "Confirm before quitting"
 msgstr "Подтверждать выход"
 
@@ -8254,6 +8257,9 @@ msgstr "Объясни, как устроен этот репозиторий…
 
 msgid "Explain to me how this repository works"
 msgstr "Объясни, как устроен этот репозиторий"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Объяснять, что делает перенос, прежде чем рабочая область перейдёт на другой компьютер"
 
 msgid "Explore"
 msgstr "Обзор"

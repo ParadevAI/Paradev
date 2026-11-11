@@ -5210,6 +5210,9 @@ msgstr "ワークスペースの実行コマンドを設定"
 msgid "Configured for {agent}"
 msgstr "{agent} 用に設定済み"
 
+msgid "Confirm before moving a workspace"
+msgstr "ワークスペースを移動する前に確認"
+
 msgid "Confirm before quitting"
 msgstr "終了前に確認"
 
@@ -8254,6 +8257,9 @@ msgstr "このリポジトリの仕組みを説明…"
 
 msgid "Explain to me how this repository works"
 msgstr "このリポジトリの仕組みを教えて"
+
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "ワークスペースを別のコンピューターに移動する前に、移動による影響を説明します"
 
 msgid "Explore"
 msgstr "探す"
