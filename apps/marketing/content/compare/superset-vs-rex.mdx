@@ -36,7 +36,7 @@ This comparison is published by Paradev. Rex details were checked against [super
 | **Agent status** | Status per workspace with notifications | Program Status Protocol (OSC 7501), with activity in tabs, notifications, and a Dock badge |
 | **Review** | Changes pane with diff, commit, push, and pull request; Pull Requests view with checks and line comments | Your own tools, in a block |
 | **Remote** | Remote Access hosts, Bring Your Own Cloud, and cloud workspaces | Tailscale built into the server, Tailscale Serve, a tailnet address, or an SSH forward |
-| **Team** | Cloud workspaces shared with your organization or named people, with full access to terminals and agents | Not available today; live session sharing is described as a plan |
+| **Team** | Cloud workspaces shared with your organization or named people, with full access to terminals and agents | A shared server lets a group reach every session on it, through one `rex` account; per-session sharing is described as a plan |
 | **Platforms** | macOS, experimental Linux, iPhone and iPad; no Windows yet | macOS app and a Linux or FreeBSD server, in invite-only testing |
 | **Price** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Free, with no account. Superlogical has not published a commercialization plan |
 | **License** | Open source, MIT | Not stated on the site or in the docs |
@@ -57,7 +57,7 @@ Rex collects no telemetry, has no account, and runs no license checks. Testing i
 
 ## What Is Paradev?
 
-Paradev is a desktop workspace for the CLI coding agents you already pay for. Each local workspace gets its own Git worktree, branch, and persistent terminals, and the agent runs with its own login, settings, and MCP servers. Beside it are a Changes pane with diff review, commit, push, and pull request, a Pull Requests view with CI checks and line comments, a file editor, and an in-app browser with Design Mode. For Claude Code, Codex, OpenCode, and Pi, a [chat interface](https://docs.paradev.com/chat) shows the same session as a chat, and a toggle switches between the two.
+Paradev is a desktop workspace for the CLI coding agents you already pay for. Each new local branch-based workspace gets its own Git worktree, branch, and persistent terminals, and the agent runs with its own login, settings, and MCP servers. Beside it are a Changes pane with diff review, commit, push, and pull request, a Pull Requests view with CI checks and line comments, a file editor, and an in-app browser with Design Mode. For Claude Code, Codex, OpenCode, and Pi, a [chat interface](https://docs.paradev.com/chat) shows the same session as a chat, and a toggle switches between the two.
 
 Agents keep running in a background terminal daemon, so quitting the app or installing an update does not kill them, and they reattach with scrollback. Work runs on your Mac, on machines you add through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud). Paradev is open source under the MIT License.
 
@@ -75,15 +75,15 @@ Paradev treats the terminal as one pane. The diff, the file editor, the browser 
 
 This is the sharpest difference today. Both tools keep a session alive on the machine that runs it, and both survive a client disconnect. Neither survives the machine going away: a Rex server stops when its host stops, and so does a Paradev host.
 
-Paradev adds a machine that is not yours to keep awake. A [cloud workspace](/cloud) runs on its own cloud sandbox on the Team and Ultra plans, from an environment that holds the repositories, variables, and region. The agent keeps working when your laptop is closed, and you reopen it from the desktop app, an iPhone, or an iPad. Agents in a cloud workspace never receive your keys: they see a placeholder, and Paradev adds your sign-in to outgoing requests.
+Paradev adds a machine that is not yours to keep awake. A [cloud workspace](/cloud) runs on its own cloud sandbox on the Team and Ultra plans, from an environment that holds the repositories, variables, and region. The agent keeps working when your laptop is closed, and you reopen it from the desktop app, an iPhone, or an iPad. Your agent sign-ins and GitHub access are not copied into the sandbox: the agent sees a placeholder, and Paradev adds your sign-in to outgoing requests. The variables and secrets you set on the environment are delivered to the sandbox as you configured them.
 
 Rex has no cloud offering. Its remote story is your own server on your own tailnet, which is a good answer for a machine you already run and no answer for "I do not want to own a machine."
 
 ### Multiplayer: who else can open this
 
-Rex's homepage describes sharing a live session with other people as part of the plan, written in the future tense alongside web and iOS clients. Today, a Rex session belongs to the person whose server runs it.
+Rex has an answer already, at the level of the server rather than the session. Its [server modes](https://www.superlogical.com/rex/docs/linux/server-modes) are personal (just you, your account), shared ("a few people you trust with one account", running as `rex`), and login (several people, each as themselves, each on their own account). On a shared server, in Superlogical's words, "Anyone in the group can see and type into every session on it," and "access to the shared server is access to the `rex` account", so the docs tell you to add only people you would trust with that account. A login server keeps people on separate accounts, and therefore separate sessions. Picking one teammate to let into one session is the part Rex's homepage still describes in the future tense.
 
-In Paradev, a cloud workspace can be shared with anyone in your organization or only with the people you invite, and full access lets a teammate open the terminals and prompt the agents that are running there. From a shell, `superset workspaces share add --user ann@example.com` or `--team` does the same, and `superset workspaces share list` shows the owner, the visibility, and who it reached. [Automations](https://docs.paradev.com/automations) start agents on a schedule or an event, and the run becomes a live workspace you or a teammate can open and continue. For discussion rather than code, an agent publishes a [Page](https://docs.paradev.com/pages), teammates pin comments to it, and a watching agent publishes an updated version. More on the approaches in [multiplayer coding agents](/multiplayer-coding-agents).
+In Paradev, a cloud workspace can be shared with anyone in your organization or only with the people you invite, and full access lets a teammate open the terminals and prompt the agents that are running there. From a shell, `superset workspaces share add ws_a --user ann@example.com` or `--team` does the same, and `superset workspaces share list` shows the owner, the visibility, and who it reached. [Automations](https://docs.paradev.com/automations) start agents on a schedule or an event, and the run becomes a live workspace you or a teammate can open and continue. For discussion rather than code, an agent publishes a [Page](https://docs.paradev.com/pages), teammates pin comments to it, and a watching agent publishes an updated version. More on the approaches in [multiplayer coding agents](/multiplayer-coding-agents).
 
 ### Agents that drive the tool
 
@@ -132,7 +132,7 @@ Both bring your own agent subscriptions. Paradev's Team and Ultra plans add clou
 - Want agents to create workspaces and other agents over a CLI, an MCP server, or an SDK
 - Want an iPhone and iPad app, or code under the MIT License
 
-**Verdict:** Rex is an excellent multiplexer with real taste behind it, and it is early: invite-only, macOS client, license unstated, sharing still on the roadmap. Paradev is further along the other axis, with review, cloud workspaces, sharing, and automations around the same persistent sessions. If your agents run on machines you own and you review elsewhere, Rex fits. If the rest of the loop and the rest of the team matter, Paradev fits.
+**Verdict:** Rex is an excellent multiplexer with real taste behind it, and it is early: invite-only, macOS client, license unstated, and sharing that stops at the server rather than the session. Paradev is further along the other axis, with review, cloud workspaces, sharing, and automations around the same persistent sessions. If your agents run on machines you own and you review elsewhere, Rex fits. If the rest of the loop and the rest of the team matter, Paradev fits.
 
 ---
 
@@ -152,7 +152,7 @@ No. Rex runs sessions on machines you own, reachable over Tailscale or an SSH fo
 
 ### Can two people share a Rex session?
 
-Not today. Superlogical describes live session sharing as part of the plan. In Paradev, a cloud workspace can be shared with your organization or named teammates, and full access lets them open the terminals and prompt the agents.
+On a shared server, yes, but it is all or nothing: everyone in its group runs as the same `rex` account and can see and type into every session on that server. A login server gives each person their own account and their own sessions. Sharing one session with one person is described as a plan. In Paradev, sharing is per workspace: pick the organization or named teammates, and full access lets them open the terminals and prompt the agents in that workspace only.
 
 ### Do both keep agents running when I close the window?
 

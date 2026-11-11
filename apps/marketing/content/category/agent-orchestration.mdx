@@ -66,7 +66,7 @@ Recurring prompts on a schedule: nightly dependency bumps, morning triage of new
 
 Persistence keeps an agent alive when the app closes. It does nothing when the machine sleeps, loses its network, or goes into a bag. Orchestration at any real size needs somewhere else to run: a second machine you own, a server in your own cloud account, or a hosted sandbox per workspace.
 
-Paradev covers the three: Remote Access for a macOS or Linux machine you add, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) for a Linux server in your own account, and [cloud workspaces](/cloud) on the Team and Ultra plans, where each workspace gets its own cloud machine and keeps working with your laptop closed. Agents in a cloud workspace never receive your keys: they see a placeholder, and Paradev adds your sign-in to outgoing requests.
+Paradev covers the three: Remote Access for a macOS or Linux machine you add, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) for a Linux server in your own account, and [cloud workspaces](/cloud) on the Team and Ultra plans, where each workspace gets its own cloud machine and keeps working with your laptop closed. Your agent sign-ins and GitHub access are not copied into the sandbox: the agent sees a placeholder, and Paradev adds your sign-in to outgoing requests. The variables and secrets you set on the environment are delivered to the sandbox as you configured them.
 
 ### Programmatic control
 
