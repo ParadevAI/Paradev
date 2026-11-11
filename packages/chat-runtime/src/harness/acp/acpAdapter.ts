@@ -2028,11 +2028,19 @@ export class AcpAdapter implements HarnessAdapter {
 		const model = this.applyStartSelection("model", wanted.modelId);
 		const { effortId } = wanted;
 		// The effort levels on offer belong to the model, so they are only known once it is set.
-		const effort = model.then((modelId) =>
-			effortId && (modelId || !wanted.modelId)
-				? this.applyStartSelection("thought_level", effortId)
-				: undefined,
-		);
+		const effort = model
+			.then((modelId) =>
+				effortId && (modelId || !wanted.modelId)
+					? this.applyStartSelection("thought_level", effortId)
+					: undefined,
+			)
+			.then((taken) => {
+				if (effortId && !taken)
+					console.warn(
+						`[acp] the agent did not take reasoning effort "${effortId}"; it runs at its default`,
+					);
+				return taken;
+			});
 		this.trackSelection(effort);
 		// Fast mode also belongs to the model. It waits for effort too: a refused
 		// setting rolls back every option to before it was sent.

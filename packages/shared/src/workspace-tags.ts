@@ -65,6 +65,9 @@ export function normalizeWorkspaceTags(
 	return [...unique].sort();
 }
 
+// biome-ignore lint/suspicious/noControlCharactersInRegex: matching them is the point.
+const CONTROL_CHARACTER = /[\u0000-\u001f\u007f]/;
+
 /** Router-boundary schema for one tag; parses to its stored normalized form. */
 export const workspaceTagInputSchema = z
 	.string()
@@ -73,6 +76,12 @@ export const workspaceTagInputSchema = z
 			ctx.addIssue({
 				code: "custom",
 				message: `Tag must be 1-${WORKSPACE_TAG_MAX_LENGTH} characters after trimming`,
+			});
+		}
+		if (CONTROL_CHARACTER.test(tag)) {
+			ctx.addIssue({
+				code: "custom",
+				message: "Tag must not contain control characters",
 			});
 		}
 	})
