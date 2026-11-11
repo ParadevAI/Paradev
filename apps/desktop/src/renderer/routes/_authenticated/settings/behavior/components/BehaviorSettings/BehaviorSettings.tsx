@@ -20,6 +20,7 @@ import {
 import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
+import { SendIntoRunningTurnSetting } from "./components/SendIntoRunningTurnSetting";
 
 interface BehaviorSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -149,6 +150,11 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
 					<AcpChatSetting />
 				)}
+
+				{isItemVisible(
+					SETTING_ITEM_ID.BEHAVIOR_SEND_INTO_RUNNING_TURN,
+					visibleItems,
+				) && <SendIntoRunningTurnSetting searchQuery={searchQuery} />}
 
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">
