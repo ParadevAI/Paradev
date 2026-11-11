@@ -81,6 +81,7 @@ import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
 import { useRepositoryChangesets } from "./hooks/useRepositoryChangesets";
+import { useRepositoryReviewThreads } from "./hooks/useRepositoryReviewThreads";
 import { useDiffRepositoryFilterStore } from "./stores/diffRepositoryFilterStore";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
@@ -169,6 +170,17 @@ export function DiffPane({
 	);
 	const selectRepository = useSelectRepository();
 	const repositoryChangesets = useRepositoryChangesets(repositoryIds);
+	const repositoryReviewThreads = useRepositoryReviewThreads(repositoryIds);
+	const annotationsByWorkspace = useMemo(
+		() =>
+			new Map(
+				[...repositoryReviewThreads.byWorkspace].map(([id, threads]) => [
+					id,
+					threads.annotationsByPath,
+				]),
+			),
+		[repositoryReviewThreads.byWorkspace],
+	);
 	const pickedRepositoryIds = useDiffRepositoryFilterStore(
 		(state) => state.byWorkspace[groupId],
 	);
@@ -381,6 +393,7 @@ export function DiffPane({
 		collapsedSet,
 		editingSet,
 		annotationsByPath: threadAnnotationsByPath,
+		annotationsByWorkspace,
 		extraAnnotationsByItemId: composerAnnotationsByItemId,
 	});
 	fileByItemIdRef.current = fileByItemId;
@@ -963,6 +976,12 @@ export function DiffPane({
 				);
 			}
 			if (m.kind !== "thread") return null;
+			const threadFile = getFile(item.id);
+			const actions =
+				(threadFile?.workspaceId &&
+					repositoryReviewThreads.byWorkspace.get(threadFile.workspaceId)
+						?.actions) ||
+				threadActions;
 			const annotationSide = "side" in annotation ? annotation.side : undefined;
 			const focusLine = m.sourceLine ?? annotation.lineNumber;
 			const focused =
@@ -978,9 +997,9 @@ export function DiffPane({
 					url={m.url}
 					comments={m.comments}
 					replyToCommentId={m.replyToCommentId}
-					onReply={threadActions.reply}
+					onReply={actions.reply}
 					onSetResolved={(resolved) =>
-						threadActions.setResolved(m.threadId, resolved)
+						actions.setResolved(m.threadId, resolved)
 					}
 					focusTick={
 						focused
@@ -1009,6 +1028,7 @@ export function DiffPane({
 			t,
 			getFileWorktreePath,
 			threadActions,
+			repositoryReviewThreads.byWorkspace,
 		],
 	);
 
@@ -1018,6 +1038,7 @@ export function DiffPane({
 			className="relative flex h-full min-h-0 w-full min-w-0"
 		>
 			{repositoryChangesets.sources}
+			{repositoryReviewThreads.sources}
 			{worktreePath && <BinaryPreviewRefresh workspaceId={workspaceId} />}
 			{repositoryIds.map((id) =>
 				id === workspaceId ? null : (

@@ -56,6 +56,11 @@ interface UseDiffCodeViewItemsOptions {
 		string,
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	> | null;
+	/** A multi-repo workspace's threads, per checkout. */
+	annotationsByWorkspace?: ReadonlyMap<
+		string,
+		ReadonlyMap<string, DiffLineAnnotation<DiffAnnotationMetadata>[]>
+	>;
 }
 
 interface UseDiffCodeViewItemsResult {
@@ -177,6 +182,7 @@ export function useDiffCodeViewItems({
 	collapsedSet,
 	editingSet,
 	annotationsByPath,
+	annotationsByWorkspace,
 	extraAnnotationsByItemId,
 }: UseDiffCodeViewItemsOptions): UseDiffCodeViewItemsResult {
 	const { client: trpcClient } = workspaceTrpc.useUtils();
@@ -473,11 +479,11 @@ export function useDiffCodeViewItems({
 		for (const file of files) {
 			const itemId = getDiffItemId(file);
 			const collapsed = collapsedSet.has(getChangesetFileKey(file));
-			// Review threads come from the pane checkout's pull request.
+			// Review threads come from the pull request of the file's checkout.
+			const fileWorkspaceId = getChangesetFileWorkspaceId(file, workspaceId);
 			const fileAnnotations =
-				getChangesetFileWorkspaceId(file, workspaceId) === workspaceId
-					? annotationsByPath
-					: NO_ANNOTATIONS;
+				annotationsByWorkspace?.get(fileWorkspaceId) ??
+				(fileWorkspaceId === workspaceId ? annotationsByPath : NO_ANNOTATIONS);
 			const editing = editingSet.has(getChangesetFileKey(file));
 
 			if (file.isBinary) {
@@ -570,6 +576,7 @@ export function useDiffCodeViewItems({
 		reasonByItemId,
 		requestedItemIds,
 		annotationsByPath,
+		annotationsByWorkspace,
 		collapsedSet,
 		workspaceId,
 		editingSet,
