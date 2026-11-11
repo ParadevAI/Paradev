@@ -169,7 +169,10 @@ function matchCommandToken(text: string) {
 }
 
 export type ComposerBodyProps = Required<
-	Pick<PromptInputProps, "placeholder" | "status" | "layout">
+	Pick<
+		PromptInputProps,
+		"placeholder" | "status" | "layout" | "sendsIntoRunningTurn"
+	>
 > &
 	Pick<
 		PromptInputProps,
@@ -234,6 +237,7 @@ export function ComposerBody({
 	commands,
 	dictation,
 	status,
+	sendsIntoRunningTurn,
 	toolbar,
 	toolbarEnd,
 	draft,
@@ -1319,13 +1323,17 @@ export function ComposerBody({
 				<button
 					type="button"
 					aria-label={
-						status === "ready"
+						status === "ready" || sendsIntoRunningTurn
 							? t({ message: "Send message" })
 							: t({ message: "Queue message" })
 					}
 					title={
 						(status === "streaming" && onStop) || status === "background"
-							? t({ message: "Queue; ⌘↩ to steer the running turn" })
+							? sendsIntoRunningTurn
+								? t({
+										message: "Send into the running turn; ⌘↩ to interrupt it",
+									})
+								: t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}
 					disabled={!canSend || disabled || pending}

@@ -47,6 +47,7 @@ export function PromptInput({
 	commands,
 	dictation,
 	status = "ready",
+	sendsIntoRunningTurn = false,
 	toolbar,
 	toolbarEnd,
 	draft,
@@ -86,6 +87,7 @@ export function PromptInput({
 						commands={commands}
 						dictation={dictation}
 						status={status}
+						sendsIntoRunningTurn={sendsIntoRunningTurn}
 						toolbar={toolbar}
 						toolbarEnd={toolbarEnd}
 						draft={draft}

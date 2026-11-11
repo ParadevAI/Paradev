@@ -10295,6 +10295,9 @@ msgstr "in einem Terminal auf diesem Host aus."
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "Klicke in Apples Fenster auf „Installieren“. Das dauert ein paar Minuten, und diese Seite aktualisiert sich, sobald es fertig ist."
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "Im Chat übergibt die Eingabetaste die Nachricht an den laufenden Zug, und der Agent liest sie, wenn er bereit ist. Ein Agent, der sie nicht annehmen kann, lässt sie in der Warteschlange, und ⌘↩ unterbricht den Zug weiterhin."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "In nur wenigen Monaten nutzen <0>Zehntausende Entwickler</0> Paradev als ihre primäre IDE, in Unternehmen wie Wix, DoorDash und Netflix."
 
@@ -17914,6 +17917,9 @@ msgstr "Sende eine Einladung zu {organizationName}. Läuft in 48 Stunden ab."
 msgid "Send email and debug delivery"
 msgstr "E-Mails senden und Zustellung debuggen"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "In den laufenden Zug senden; ⌘↩ unterbricht ihn"
+
 msgid "Send Invitation"
 msgstr "Einladung senden"
 
@@ -17952,6 +17958,9 @@ msgstr "An Chat senden"
 
 msgid "Send to chat ({draftCount})"
 msgstr "An Chat senden ({draftCount})"
+
+msgid "Send while the agent works"
+msgstr "Senden, während der Agent arbeitet"
 
 msgid "Sending"
 msgstr "Wird gesendet"

@@ -42,6 +42,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
 	BEHAVIOR_ACP_CHAT: "behavior-acp-chat",
+	BEHAVIOR_SEND_INTO_RUNNING_TURN: "behavior-send-into-running-turn",
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
@@ -202,6 +203,8 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT]: "v2",
+	// The chat composer this changes is a v2-only surface.
+	[SETTING_ITEM_ID.BEHAVIOR_SEND_INTO_RUNNING_TURN]: "v2",
 	// The top-bar Changes control is a v2-only surface.
 	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
@@ -915,6 +918,26 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"pane",
 			"toggle",
 			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_SEND_INTO_RUNNING_TURN,
+		section: "behavior",
+		title: "Send while the agent works",
+		description:
+			"In chat, Enter hands the message to the running turn instead of queueing it",
+		keywords: [
+			"chat",
+			"send",
+			"queue",
+			"steer",
+			"interrupt",
+			"running",
+			"turn",
+			"enter",
+			"composer",
+			"message",
+			"prompt",
 		],
 	},
 	{

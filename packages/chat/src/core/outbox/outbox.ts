@@ -2,15 +2,20 @@ import type { UserContent } from "../../protocol/items";
 
 export type OutboxEntryState = "queued" | "inflight" | "failed";
 
+/** How the entry reaches a running turn: `steer` interrupts one it cannot join, `join` queues. */
+export type PromptDelivery = {
+	steer?: { expectedTurnId: string };
+	join?: { expectedTurnId: string };
+};
+
 export type OutboxEntry = {
 	commandId: string;
 	clientId: string;
 	content: UserContent[];
-	steer?: { expectedTurnId: string };
 	state: OutboxEntryState;
 	attempts: number;
 	lastError: string | null;
-};
+} & PromptDelivery;
 
 export type OutboxOptions = {
 	send: (entry: OutboxEntry) => Promise<void>;
@@ -34,15 +39,13 @@ export class Outbox {
 		this.maxAttempts = options.maxAttempts ?? 5;
 	}
 
-	enqueue(
-		content: UserContent[],
-		steer?: { expectedTurnId: string },
-	): OutboxEntry {
+	enqueue(content: UserContent[], delivery: PromptDelivery = {}): OutboxEntry {
 		const entry: OutboxEntry = {
 			commandId: this.mintId(),
 			clientId: this.mintId(),
 			content,
-			...(steer ? { steer } : {}),
+			...(delivery.steer ? { steer: delivery.steer } : {}),
+			...(delivery.join ? { join: delivery.join } : {}),
 			state: "queued",
 			attempts: 0,
 			lastError: null,

@@ -5,6 +5,7 @@ import {
 	runningTurnId as findRunningTurnId,
 	latestSessionUsage,
 	type OutboxEntry,
+	type PromptDelivery,
 	presetForAnyHarness,
 	type SessionSnapshot,
 	userMessageText,
@@ -33,6 +34,7 @@ import { env } from "renderer/env.renderer";
 import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
+import { useSendIntoRunningTurn } from "renderer/hooks/useSendIntoRunningTurn";
 import { useStableList } from "renderer/hooks/useStableList";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
@@ -452,15 +454,16 @@ export function SessionView({
 	const sendKeepingDraft = useCallback(
 		(
 			content: UserContent[],
-			options: { expectedTurnId: string } | undefined,
+			delivery: PromptDelivery | undefined,
 			draft: ComposerDraft,
 		) => {
-			const entry = sendPrompt(content, options);
+			const entry = sendPrompt(content, delivery);
 			sentDrafts.current.set(entry.clientId, draft);
 			return entry;
 		},
 		[sendPrompt],
 	);
+	const sendIntoRunningTurn = useSendIntoRunningTurn();
 	const onSend = useMainSend({
 		approvals,
 		holdPrompt,
@@ -469,6 +472,7 @@ export function SessionView({
 		onUserPrompt,
 		respondToApproval,
 		runningTurnId,
+		sendIntoRunningTurn,
 		sendPrompt: sendKeepingDraft,
 	});
 	const {

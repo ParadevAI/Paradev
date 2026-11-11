@@ -41,6 +41,8 @@ export const promptInputSchema = z.object({
 	clientId: z.string().min(1),
 	content: z.array(userContentSchema).min(1),
 	steer: z.object({ expectedTurnId: z.string().min(1) }).optional(),
+	/** Like `steer`, but it queues rather than interrupt a turn the agent will not take it into. */
+	join: z.object({ expectedTurnId: z.string().min(1) }).optional(),
 	snapshotWorktree: z.boolean().optional(),
 });
 export type PromptInput = z.infer<typeof promptInputSchema>;

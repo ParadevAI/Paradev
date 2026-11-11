@@ -10295,6 +10295,9 @@ msgstr "trong một terminal trên host này."
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "Trong cửa sổ của Apple, bấm Cài đặt. Quá trình mất vài phút và trang này sẽ cập nhật khi xong."
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "Trong chat, Enter đưa tin nhắn vào lượt đang chạy và tác nhân đọc nó khi sẵn sàng. Tác nhân không nhận được sẽ giữ tin nhắn trong hàng đợi, còn ⌘↩ vẫn ngắt lượt."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Chỉ trong vài tháng, <0>hàng chục nghìn kỹ sư</0> dùng Paradev làm IDE chính, tại các công ty như Wix, DoorDash và Netflix."
 
@@ -17914,6 +17917,9 @@ msgstr "Gửi lời mời tham gia {organizationName}. Hết hạn sau 48 giờ.
 msgid "Send email and debug delivery"
 msgstr "Gửi email và gỡ lỗi việc gửi thư"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "Gửi vào lượt đang chạy; ⌘↩ để ngắt"
+
 msgid "Send Invitation"
 msgstr "Gửi lời mời"
 
@@ -17952,6 +17958,9 @@ msgstr "Gửi vào chat"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Gửi vào chat ({draftCount})"
+
+msgid "Send while the agent works"
+msgstr "Gửi khi tác nhân đang làm việc"
 
 msgid "Sending"
 msgstr "Đang gửi"

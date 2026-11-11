@@ -45,6 +45,7 @@ export type PromptOptions = {
 	clientId: string;
 	commandId?: string;
 	steer?: { expectedTurnId: string };
+	join?: { expectedTurnId: string };
 	snapshotWorktree?: boolean;
 };
 
@@ -166,6 +167,7 @@ export function createSessionClient(
 				clientId: promptOptions.clientId,
 				content: promptOptions.content,
 				...(promptOptions.steer ? { steer: promptOptions.steer } : {}),
+				...(promptOptions.join ? { join: promptOptions.join } : {}),
 				...(promptOptions.snapshotWorktree ? { snapshotWorktree: true } : {}),
 			}),
 

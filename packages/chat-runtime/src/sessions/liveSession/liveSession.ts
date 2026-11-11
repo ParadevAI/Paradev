@@ -340,18 +340,24 @@ export class LiveSession {
 	prompt(
 		content: UserContent[],
 		clientId: string,
-		options: { steerTurnId?: string; snapshotWorktree?: boolean } = {},
+		options: {
+			steerTurnId?: string;
+			joinTurnId?: string;
+			snapshotWorktree?: boolean;
+		} = {},
 	): PromptResult {
-		const { steerTurnId, snapshotWorktree } = options;
+		const { steerTurnId, joinTurnId, snapshotWorktree } = options;
 		const itemId = this.mintId();
 		const seq = ++this.sent;
 		const shown = content.filter(
 			(part) => !(part.type === "text" && part.hidden),
 		);
 		const sent = withHiddenWrapped(content);
+		// A join reaches a steerable turn like a steer, but stops at the queue below.
+		const joinable = steerTurnId ?? joinTurnId;
 		const running =
-			steerTurnId !== undefined && this.queue.length === 0
-				? this.steerableTurn(steerTurnId)
+			joinable !== undefined && this.queue.length === 0
+				? this.steerableTurn(joinable)
 				: null;
 		if (running) {
 			const item: UserMessage = {
