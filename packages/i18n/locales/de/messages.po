@@ -12654,6 +12654,9 @@ msgstr "Es wurden keine Chromium-Browser wie Chrome, Brave oder Arc gefunden."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Auf diesem Rechner wurde noch keine Claude- oder Codex-Nutzung gefunden. Tritt jetzt bei und du erscheinst, sobald du einen Agenten genutzt hast."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Keine Cloud-Umgebung öffnet {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Keine Cloud-Workspaces"
 
@@ -14919,6 +14922,9 @@ msgstr "Arbeitsbereich auswählen"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Wähle einen Arbeitsbereich, dessen Agent auf deine Eingabe wartet, seit deinem letzten Blick fertig geworden ist oder noch läuft"
+
+msgid "Pick an environment"
+msgstr "Umgebung auswählen"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Wähle ein Icon und eine Farbe oder lade ein eigenes Bild hoch. Standard ist der Avatar des verknüpften GitHub-Eigentümers."
@@ -19710,6 +19716,9 @@ msgstr "Dieses Konto ist nicht mehr verbunden — wähle ein anderes."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Diese Agenten-Sitzung hat noch keine Unterhaltung zum Öffnen. Sie wurde gestartet, aber nie beauftragt."
 
+msgid "that computer"
+msgstr "diesem Computer"
+
 msgid "That computer can't be reached"
 msgstr "Dieser Computer ist nicht erreichbar"
 
@@ -20005,6 +20014,9 @@ msgstr "Beim Verschieben ist eine Zeitüberschreitung aufgetreten."
 
 msgid "The move was cancelled."
 msgstr "Das Verschieben wurde abgebrochen."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Der verschobene Workspace erscheint auf der Startseite, sobald er bereit ist."
 
 msgid "The name of your organization or team"
 msgstr "Der Name deiner Organisation oder deines Teams"
@@ -20664,6 +20676,9 @@ msgstr "Der Host dieses Arbeitsbereichs ist offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Der Host dieses Workspace führt einen älteren Host-Dienst aus, als diese App unterstützt. Aktualisiere ihn, um dich wieder zu verbinden; der Workspace und seine Dateien bleiben unberührt."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Das Projekt dieses Workspaces ist nicht auf GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Gründliches Reasoning"
@@ -21409,6 +21424,9 @@ msgstr "Benennungsvorgaben aktualisieren"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Benennungsvorgaben für {0} aktualisieren"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Aktualisiere Paradev auf {sourceName}, um seine Workspaces von diesem Telefon aus zu verschieben."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Aktualisiere Paradev auf diesem Gerät. Updates aus der App erfordern eine unterstützte eigenständige Installation und eine veröffentlichte App-Version."

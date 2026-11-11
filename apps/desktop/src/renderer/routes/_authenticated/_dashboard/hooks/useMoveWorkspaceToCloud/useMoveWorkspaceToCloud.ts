@@ -9,7 +9,7 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
-import { keepMoveAlive } from "../../utils/keepMoveAlive";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 

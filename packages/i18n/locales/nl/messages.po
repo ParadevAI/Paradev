@@ -12654,6 +12654,9 @@ msgstr "Er zijn geen Chrome-, Brave-, Arc- of andere Chromium-browsers gevonden.
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Nog geen Claude- of Codex-gebruik gevonden op deze machine. Doe nu mee, dan verschijn je zodra je een agent hebt gebruikt."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Geen cloudomgeving opent {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Geen cloudwerkruimtes"
 
@@ -14919,6 +14922,9 @@ msgstr "Kies een werkruimte"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Kies een werkruimte waarvan de agent op je invoer wacht, klaar is sinds je laatst keek of nog bezig is"
+
+msgid "Pick an environment"
+msgstr "Kies een omgeving"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Kies een icoon en een kleur, of upload een eigen afbeelding. Standaard is de avatar van de gekoppelde GitHub-eigenaar."
@@ -19710,6 +19716,9 @@ msgstr "Dit account is niet meer verbonden — kies een ander."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Die agentsessie heeft nog geen gesprek om te openen. Hij is gestart maar nooit aangestuurd."
 
+msgid "that computer"
+msgstr "die computer"
+
 msgid "That computer can't be reached"
 msgstr "Die computer is niet bereikbaar"
 
@@ -20005,6 +20014,9 @@ msgstr "Er is een time-out opgetreden bij het verplaatsen."
 
 msgid "The move was cancelled."
 msgstr "Het verplaatsen is geannuleerd."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "De verplaatste werkruimte verschijnt op Start zodra hij klaar is."
 
 msgid "The name of your organization or team"
 msgstr "De naam van je organisatie of team"
@@ -20664,6 +20676,9 @@ msgstr "De host van deze werkruimte is offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "De host van deze werkruimte draait een oudere hostservice dan deze app ondersteunt. Werk hem bij om opnieuw te verbinden; de werkruimte en de bestanden blijven onaangeroerd."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Het project van deze werkruimte staat niet op GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Grondige redeneerinspanning"
@@ -21409,6 +21424,9 @@ msgstr "Naamgevingsinstructies bijwerken"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Naamgevingsinstructies bijwerken voor {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Werk Paradev bij op {sourceName} om de werkruimten ervan vanaf deze telefoon te verplaatsen."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Werk Paradev bij op dat apparaat. Updates vanuit de app vereisen een ondersteunde zelfstandige installatie en een uitgebrachte appversie."

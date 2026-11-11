@@ -12648,6 +12648,9 @@ msgstr "Не знайдено Chrome, Brave, Arc чи інших браузер�
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "На цій машині ще не знайдено використання Claude або Codex. Приєднайтеся зараз, і ви з'явитеся тут, щойно скористаєтеся агентом."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Жодне хмарне середовище не відкриває {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Немає хмарних робочих просторів"
 
@@ -14913,6 +14916,9 @@ msgstr "Виберіть робочий простір"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Виберіть робочий простір, агент якого чекає на ваше введення, завершив роботу після вашого останнього перегляду або ще працює"
+
+msgid "Pick an environment"
+msgstr "Виберіть середовище"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Виберіть значок і колір або завантажте власне зображення. За замовчуванням використовується аватар пов'язаного власника GitHub."
@@ -19704,6 +19710,9 @@ msgstr "Цей обліковий запис більше не підключе�
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити. Його запустили, але так і не надіслали промпт."
 
+msgid "that computer"
+msgstr "цьому комп'ютері"
+
 msgid "That computer can't be reached"
 msgstr "Цей комп’ютер недоступний"
 
@@ -19999,6 +20008,9 @@ msgstr "Час очікування переміщення минув."
 
 msgid "The move was cancelled."
 msgstr "Перенесення скасовано."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Переміщений робочий простір з'явиться на головній, коли буде готовий."
 
 msgid "The name of your organization or team"
 msgstr "Назва вашої організації чи команди"
@@ -20658,6 +20670,9 @@ msgstr "Хост цього робочого простору офлайн"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "На хості цього робочого простору працює старіша служба хоста, ніж підтримує цей застосунок. Оновіть її, щоб під'єднатися знову; робочий простір і його файли не змінено."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Проєкт цього робочого простору не на GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Ретельні міркування"
@@ -21403,6 +21418,9 @@ msgstr "Оновити інструкції з іменування"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Оновити інструкції з іменування для {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Оновіть Paradev на {sourceName}, щоб переміщувати його робочі простори з цього телефона."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Оновіть Paradev на тому пристрої. Оновлення із застосунку потребують підтримуваної окремої інсталяції та випущеної версії застосунку."

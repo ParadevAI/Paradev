@@ -4,6 +4,7 @@ import { type ReactNode, useRef } from "react";
 import type { ViewInstance } from "react-native";
 import { View } from "react-native";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
+import type { MoveComputer } from "../../hooks/useWorkspaceMove/utils/listMoveComputers";
 
 export function WorkspaceRowMenu({
 	pinned,
@@ -17,6 +18,7 @@ export function WorkspaceRowMenu({
 	onDelete,
 	onCopyId,
 	onShare,
+	move,
 	children,
 }: {
 	pinned: boolean;
@@ -32,6 +34,13 @@ export function WorkspaceRowMenu({
 	onCopyId: () => void;
 	/** Gets the row's tag, so iPad's share popover points at the row. */
 	onShare: (anchor?: number) => void;
+	/** Where the workspace can move; absent where it cannot move from here. */
+	move?: {
+		computers: MoveComputer[];
+		canMoveToCloud: boolean;
+		moveToCloud: () => void;
+		moveToComputer: (computer: MoveComputer) => void;
+	};
 	children: ReactNode;
 }) {
 	const { t } = useLingui();
@@ -76,6 +85,37 @@ export function WorkspaceRowMenu({
 					<Link.MenuAction icon="pencil" onPress={onRename}>
 						{t({ message: "Rename" })}
 					</Link.MenuAction>
+				) : null}
+				{move && (move.canMoveToCloud || move.computers.length > 0) ? (
+					<Link.Menu
+						title={t({ message: "Move to" })}
+						icon="arrow.right.square"
+					>
+						{move.canMoveToCloud ? (
+							<Link.MenuAction
+								icon="icloud.and.arrow.up"
+								subtitle={t({ message: "New cloud workspace" })}
+								onPress={move.moveToCloud}
+							>
+								{t({ message: "Cloud" })}
+							</Link.MenuAction>
+						) : null}
+						{move.computers.map((computer) => (
+							<Link.MenuAction
+								key={computer.hostId}
+								icon="laptopcomputer"
+								disabled={!computer.online}
+								subtitle={
+									computer.online
+										? t({ message: "Online" })
+										: t({ message: "Offline" })
+								}
+								onPress={() => move.moveToComputer(computer)}
+							>
+								{computer.name}
+							</Link.MenuAction>
+						))}
+					</Link.Menu>
 				) : null}
 				{canDelete && isCloud ? (
 					<Link.MenuAction icon="archivebox" onPress={onDelete}>

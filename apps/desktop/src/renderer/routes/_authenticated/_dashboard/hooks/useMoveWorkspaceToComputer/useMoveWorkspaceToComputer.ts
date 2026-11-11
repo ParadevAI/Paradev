@@ -15,7 +15,7 @@ import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/reque
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
-import { keepMoveAlive } from "../../utils/keepMoveAlive";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";

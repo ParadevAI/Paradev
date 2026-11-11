@@ -12654,6 +12654,9 @@ msgstr "Không tìm thấy Chrome, Brave, Arc hay trình duyệt Chromium nào k
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Chưa tìm thấy mức sử dụng Claude hay Codex nào trên máy này. Hãy tham gia ngay và bạn sẽ xuất hiện khi đã dùng một agent."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Không có môi trường đám mây nào mở {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Không có workspace đám mây"
 
@@ -14919,6 +14922,9 @@ msgstr "Chọn một workspace"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Chọn workspace có agent đang chờ bạn nhập, đã hoàn tất kể từ lần cuối bạn xem, hoặc vẫn đang chạy"
+
+msgid "Pick an environment"
+msgstr "Chọn một môi trường"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Chọn biểu tượng và màu, hoặc tải ảnh riêng lên. Mặc định dùng ảnh đại diện của chủ sở hữu GitHub đã liên kết."
@@ -19710,6 +19716,9 @@ msgstr "Tài khoản đó không còn được kết nối — hãy chọn tài 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở. Nó đã khởi động nhưng chưa từng nhận yêu cầu."
 
+msgid "that computer"
+msgstr "máy tính đó"
+
 msgid "That computer can't be reached"
 msgstr "Không thể kết nối tới máy tính đó"
 
@@ -20005,6 +20014,9 @@ msgstr "Việc chuyển đã hết thời gian chờ."
 
 msgid "The move was cancelled."
 msgstr "Đã hủy việc chuyển."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Không gian làm việc đã chuyển sẽ hiện ở Trang chủ khi sẵn sàng."
 
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
@@ -20664,6 +20676,9 @@ msgstr "Host của workspace này đang ngoại tuyến"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Máy chủ của workspace này chạy dịch vụ máy chủ cũ hơn mức ứng dụng hỗ trợ. Hãy cập nhật để kết nối lại; workspace và các tệp không bị ảnh hưởng."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Dự án của không gian làm việc này không có trên GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Mức suy luận kỹ lưỡng"
@@ -21409,6 +21424,9 @@ msgstr "Cập nhật quy tắc đặt tên"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Cập nhật quy tắc đặt tên cho {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Cập nhật Paradev trên {sourceName} để chuyển các không gian làm việc của nó từ điện thoại này."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Cập nhật Paradev trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."
