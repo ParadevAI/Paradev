@@ -209,7 +209,12 @@ async function reconcile(
 			: check.oauthError === "invalid_grant"
 				? await store(winner, ours, ourRedeemedToken)
 				: undefined;
-	return kept ?? (await readConnection(winner.id)) ?? winner;
+	if (kept) return kept;
+
+	// A third process stored first; its token may be the superseded one too.
+	const latest = await readConnection(winner.id);
+	if (!latest || latest.refreshToken === winner.refreshToken) return winner;
+	return await reconcile(latest, endpoints, ours, ourRedeemedToken);
 }
 
 type IssuedTokens = Record<string, unknown> & { access_token: string };
@@ -260,10 +265,11 @@ async function redeem(
 			`${response.status} ${response.statusText}`,
 		);
 	}
-	const payload = (await response.json().catch(() => null)) as Record<
-		string,
-		unknown
-	> | null;
+	const parsed: unknown = await response.json().catch(() => null);
+	const payload =
+		parsed && typeof parsed === "object"
+			? (parsed as Record<string, unknown>)
+			: null;
 	if (payload && response.ok && typeof payload.access_token === "string")
 		return { kind: "issued", tokens: payload as IssuedTokens };
 

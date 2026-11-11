@@ -275,6 +275,19 @@ describe("a refresh race the server let both sides win", () => {
 		]);
 	});
 
+	test("checks again when a third process stores before our reconciliation", async () => {
+		// A stored `a`, B redeemed after it, and we redeem last: only ours is live.
+		grant = { previous: "refresh", current: "b" };
+		reads = [connection(), winnerRow("a"), winnerRow("b")];
+		swaps = [false, false];
+
+		await ensureFreshConnection(connection());
+		expect(grant.current).toBe("rotated-1");
+		expect(written).toEqual([
+			expect.objectContaining({ refreshToken: "rotated-1" }),
+		]);
+	});
+
 	test("rotates the winner's token when it is the live one", async () => {
 		// Our redemption landed first; the winner's came later and is current.
 		grant = { previous: "refresh", current: "rotated-0" };
@@ -316,6 +329,15 @@ describe("a token endpoint that is merely down", () => {
 			status: 429,
 			body: { error: "temporarily_unavailable" },
 		};
+
+		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
+			ConnectorUnavailableError,
+		);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("a JSON body that is not an object is unavailable", async () => {
+		response = { ok: false, status: 400, body: "\"Bad Request\"" };
 
 		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
 			ConnectorUnavailableError,
