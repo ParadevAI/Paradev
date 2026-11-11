@@ -5117,6 +5117,9 @@ msgstr "命令..."
 msgid "Commands"
 msgstr "命令"
 
+msgid "Commands run for this repository's setup, teardown, and the Run menu."
+msgstr "此儲存庫的設定、清理以及執行選單所用的命令。"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "用於工作區初始化、清理和「執行」按鈕的命令。"
 
@@ -8284,6 +8287,9 @@ msgstr "每週三上午9點，回顧本週合併的PR，更新被它們改過時
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每個工作日上午9點，閱讀新的GitHub議題，打上標籤，並起草初步回覆供我審閱。"
+
+msgid "Every workspace of the multi-repo project checks out this repository beside the others."
+msgstr "多儲存庫專案的每個工作區都會把此儲存庫與其他儲存庫並排簽出。"
 
 msgid "Every workspace of this project checks out all of them, side by side, on one branch."
 msgstr "此專案的每個工作區都會在同一分支上並排簽出所有儲存庫。"
@@ -12496,6 +12502,9 @@ msgstr "正在將此聊天移到這裡"
 
 msgid "Moving this workspace…"
 msgstr "正在移動此工作區…"
+
+msgid "Multi-repo project"
+msgstr "多儲存庫專案"
 
 msgid "Multi-select"
 msgstr "多選"
@@ -16824,6 +16833,9 @@ msgstr "已移除儲存庫"
 msgid "Repository root"
 msgstr "儲存庫根目錄"
 
+msgid "Repository settings"
+msgstr "儲存庫設定"
+
 msgid "Repository URL or path"
 msgstr "儲存庫URL或路徑"
 
@@ -20347,6 +20359,9 @@ msgstr "代碼已過期。請重新開始。"
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev 在設定、執行及封存此專案的工作區時執行的命令，來自儲存庫的 config.toml。"
+
+msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
+msgstr "Paradev 用於設定、執行和封存此儲存庫簽出的命令，來自其 config.toml。"
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1,150 萬美元的種子輪募資，由 Union Square Ventures 領投，Y Combinator 與 Paul Graham 參投。TechCrunch 將其評為 YC Demo Day 的傑出新創公司之一。"

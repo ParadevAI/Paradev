@@ -1,6 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { NotFound } from "renderer/routes/not-found";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { ProjectSettings } from "../../project/$projectId/components/ProjectSettings";
@@ -33,6 +36,18 @@ function ProjectDetailPage() {
 		[hostProjects, projectId],
 	);
 
+	// A repository of a multi-repo project is not listed, only fetched.
+	const hostUrl = useHostUrl(hostId ?? null);
+	const repositoryProject = useQuery({
+		queryKey: ["host-project", "get", hostUrl, projectId],
+		enabled: isReady && v2Match.length === 0 && !!hostUrl,
+		queryFn: () =>
+			hostUrl
+				? getHostServiceClientByUrl(hostUrl).project.get.query({ projectId })
+				: null,
+	});
+	const isRepositoryProject = Boolean(repositoryProject.data?.parentProjectId);
+
 	const visibleItems = useMemo(() => {
 		if (!searchQuery) return null;
 		return getMatchingItemsForSection(searchQuery, "project").map(
@@ -40,7 +55,7 @@ function ProjectDetailPage() {
 		);
 	}, [searchQuery]);
 
-	if (v2Match.length > 0) {
+	if (v2Match.length > 0 || isRepositoryProject) {
 		return (
 			<V2ProjectSettings
 				projectId={projectId}
@@ -51,6 +66,6 @@ function ProjectDetailPage() {
 	}
 	// Cache-first rule: no match + hosts not settled = loading, not the v1
 	// fallback — otherwise every v2 project flashes the legacy settings page.
-	if (!isReady) return null;
+	if (!isReady || repositoryProject.isLoading) return null;
 	return <ProjectSettings projectId={projectId} visibleItems={visibleItems} />;
 }

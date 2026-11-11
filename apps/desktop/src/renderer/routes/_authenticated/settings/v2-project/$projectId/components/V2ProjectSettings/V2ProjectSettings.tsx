@@ -12,6 +12,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import type { HostSelectOption } from "../../../../components/HostSelect";
 import { DeleteProjectSection } from "./components/DeleteProjectSection";
 import { ProjectLocationSection } from "./components/ProjectLocationSection";
+import { RepositoryProjectSettings } from "./components/RepositoryProjectSettings";
 import { V2ProjectSettingsBody } from "./components/V2ProjectSettingsBody";
 import { V2ScriptsEditor } from "./components/V2ScriptsEditor";
 import { WorkspaceConfigEditor } from "./components/WorkspaceConfigEditor";
@@ -127,8 +128,36 @@ export function V2ProjectSettings({
 		el.focus({ preventScroll: true });
 	}, [focusField, hostProject, projectId]);
 
+	const scriptsEditor = !targetHostUrl ? null : usesConfigToml ? (
+		<WorkspaceConfigEditor hostUrl={targetHostUrl} projectId={projectId} />
+	) : (
+		<V2ScriptsEditor hostUrl={targetHostUrl} projectId={projectId} />
+	);
+
+	// A repository of a multi-repo project is not listed on its own.
+	if (!project && hostProject?.parentProjectId && targetHostUrl) {
+		const parentProjectId = hostProject.parentProjectId;
+		return (
+			<RepositoryProjectSettings
+				projectId={projectId}
+				parentProjectId={parentProjectId}
+				parentProjectName={
+					hostProjects.find((item) => item.projectKey === parentProjectId)
+						?.name ?? null
+				}
+				name={hostProject.name}
+				repoPath={hostProject.repoPath}
+				sparseCheckoutPaths={hostProject.sparseCheckoutPaths ?? []}
+				hostUrl={targetHostUrl}
+				usesConfigToml={usesConfigToml}
+				scriptsEditor={scriptsEditor}
+				onChanged={refetchHostProject}
+			/>
+		);
+	}
+
 	if (!project) {
-		if (!isReady) return null;
+		if (!isReady || hostProject === undefined) return null;
 		return (
 			<div className="p-6 text-sm text-muted-foreground select-text cursor-text">
 				<Trans>Project not found.</Trans>
@@ -170,16 +199,7 @@ export function V2ProjectSettings({
 				/>
 			}
 			usesConfigToml={usesConfigToml}
-			scriptsEditor={
-				!targetHostUrl ? null : usesConfigToml ? (
-					<WorkspaceConfigEditor
-						hostUrl={targetHostUrl}
-						projectId={projectId}
-					/>
-				) : (
-					<V2ScriptsEditor hostUrl={targetHostUrl} projectId={projectId} />
-				)
-			}
+			scriptsEditor={scriptsEditor}
 			dangerZone={
 				<DeleteProjectSection
 					projectId={projectId}

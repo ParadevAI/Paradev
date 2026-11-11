@@ -238,6 +238,8 @@ export const projectRouter = router({
 				id: row.id,
 				// Same fallback rule as project.list / toProjectSnapshot.
 				kind: row.kind,
+				// Set on a repository of a multi-repo project.
+				parentProjectId: row.parentProjectId,
 				name: row.name || basename(row.repoPath),
 				repoPath: row.repoPath,
 				repoPathExists:

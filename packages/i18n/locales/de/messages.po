@@ -5117,6 +5117,9 @@ msgstr "Befehl..."
 msgid "Commands"
 msgstr "Befehle"
 
+msgid "Commands run for this repository's setup, teardown, and the Run menu."
+msgstr "Befehle für Setup und Teardown dieses Repositorys und für das Run-Menü."
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Befehle für Arbeitsbereich-Setup, Teardown und die Schaltfläche „Ausführen“."
 
@@ -8284,6 +8287,9 @@ msgstr "Jeden Mittwoch um 9 Uhr die diese Woche gemergten PRs durchsehen und die
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Jeden Werktag um 9 Uhr neue GitHub-Issues lesen, Labels vergeben und eine erste Antwort für mein Review entwerfen."
+
+msgid "Every workspace of the multi-repo project checks out this repository beside the others."
+msgstr "Jeder Arbeitsbereich des Multi-Repo-Projekts checkt dieses Repository neben den anderen aus."
 
 msgid "Every workspace of this project checks out all of them, side by side, on one branch."
 msgstr "Jeder Arbeitsbereich dieses Projekts checkt sie alle nebeneinander auf einem Branch aus."
@@ -12496,6 +12502,9 @@ msgstr "Dieser Chat wird hierher verschoben"
 
 msgid "Moving this workspace…"
 msgstr "Dieser Arbeitsbereich wird verschoben…"
+
+msgid "Multi-repo project"
+msgstr "Multi-Repo-Projekt"
 
 msgid "Multi-select"
 msgstr "Mehrfachauswahl"
@@ -16824,6 +16833,9 @@ msgstr "Repository entfernt"
 msgid "Repository root"
 msgstr "Repository-Stammverzeichnis"
 
+msgid "Repository settings"
+msgstr "Repository-Einstellungen"
+
 msgid "Repository URL or path"
 msgstr "Repository-URL oder -Pfad"
 
@@ -20347,6 +20359,9 @@ msgstr "Der Code ist abgelaufen. Starte erneut."
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Die Befehle aus der config.toml des Repositorys, mit denen Paradev die Arbeitsbereiche dieses Projekts einrichtet, startet und archiviert."
+
+msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
+msgstr "Die Befehle, mit denen Paradev die Checkouts dieses Repositorys einrichtet, ausführt und archiviert, aus seiner config.toml."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Das Unternehmen hat eine Seed-Finanzierungsrunde über 11,5 Mio. US-Dollar abgeschlossen, angeführt von Union Square Ventures, mit Y Combinator und Paul Graham. TechCrunch zählte es zu den herausragenden Startups des YC Demo Day."

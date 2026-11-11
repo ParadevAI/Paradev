@@ -5117,6 +5117,9 @@ msgstr "Lệnh..."
 msgid "Commands"
 msgstr "Lệnh"
 
+msgid "Commands run for this repository's setup, teardown, and the Run menu."
+msgstr "Các lệnh chạy khi thiết lập, dọn dẹp repository này và từ menu Chạy."
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Các lệnh chạy khi thiết lập, dọn dẹp workspace và khi nhấn nút Chạy."
 
@@ -8284,6 +8287,9 @@ msgstr "Mỗi thứ Tư lúc 9h sáng, xem lại các PR đã merge trong tuần
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Mỗi ngày trong tuần lúc 9h sáng, đọc issue GitHub mới, gán nhãn và soạn câu trả lời đầu tiên để tôi xem lại."
+
+msgid "Every workspace of the multi-repo project checks out this repository beside the others."
+msgstr "Mỗi workspace của dự án nhiều repository sẽ checkout repository này cạnh các repository khác."
 
 msgid "Every workspace of this project checks out all of them, side by side, on one branch."
 msgstr "Mỗi workspace của dự án này checkout tất cả chúng, đặt cạnh nhau, trên một nhánh."
@@ -12496,6 +12502,9 @@ msgstr "Đang chuyển cuộc trò chuyện này đến đây"
 
 msgid "Moving this workspace…"
 msgstr "Đang chuyển không gian làm việc này…"
+
+msgid "Multi-repo project"
+msgstr "Dự án nhiều repository"
 
 msgid "Multi-select"
 msgstr "Chọn nhiều"
@@ -16824,6 +16833,9 @@ msgstr "Đã gỡ repository"
 msgid "Repository root"
 msgstr "Thư mục gốc của repository"
 
+msgid "Repository settings"
+msgstr "Cài đặt repository"
+
 msgid "Repository URL or path"
 msgstr "URL hoặc đường dẫn repository"
 
@@ -20347,6 +20359,9 @@ msgstr "Mã đã hết hạn. Hãy bắt đầu lại."
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Các lệnh Paradev chạy để thiết lập, chạy và lưu trữ các workspace của dự án này, từ config.toml của repository."
+
+msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
+msgstr "Các lệnh Paradev dùng để thiết lập, chạy và lưu trữ các bản checkout của repository này, lấy từ config.toml của nó."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Công ty đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn công ty là một trong những startup nổi bật tại YC Demo Day."

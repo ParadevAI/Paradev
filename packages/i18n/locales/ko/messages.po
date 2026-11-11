@@ -5117,6 +5117,9 @@ msgstr "명령..."
 msgid "Commands"
 msgstr "명령"
 
+msgid "Commands run for this repository's setup, teardown, and the Run menu."
+msgstr "이 리포지토리의 설정, 정리 및 실행 메뉴에서 쓰는 명령."
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "워크스페이스 설정, 정리, 실행 버튼에 사용되는 명령입니다."
 
@@ -8284,6 +8287,9 @@ msgstr "매주 수요일 오전 9시에 이번 주 머지된 PR을 검토하고,
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "평일 오전 9시마다 새 GitHub 이슈를 읽고, 라벨을 적용하고, 검토용 첫 답변 초안을 작성합니다."
+
+msgid "Every workspace of the multi-repo project checks out this repository beside the others."
+msgstr "멀티 리포지토리 프로젝트의 모든 워크스페이스는 이 리포지토리를 다른 리포지토리와 나란히 체크아웃합니다."
 
 msgid "Every workspace of this project checks out all of them, side by side, on one branch."
 msgstr "이 프로젝트의 각 워크스페이스는 모든 리포지토리를 하나의 브랜치에서 나란히 체크아웃합니다."
@@ -12496,6 +12502,9 @@ msgstr "이 채팅을 여기로 옮기는 중"
 
 msgid "Moving this workspace…"
 msgstr "이 워크스페이스를 옮기는 중…"
+
+msgid "Multi-repo project"
+msgstr "멀티 리포지토리 프로젝트"
 
 msgid "Multi-select"
 msgstr "다중 선택"
@@ -16824,6 +16833,9 @@ msgstr "리포지토리를 제거했습니다"
 msgid "Repository root"
 msgstr "리포지토리 루트"
 
+msgid "Repository settings"
+msgstr "리포지토리 설정"
+
 msgid "Repository URL or path"
 msgstr "리포지토리 URL 또는 경로"
 
@@ -20347,6 +20359,9 @@ msgstr "코드가 만료되었습니다. 다시 시작하세요."
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
+
+msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
+msgstr "Paradev가 이 리포지토리의 체크아웃을 설정, 실행, 보관할 때 쓰는 명령으로, config.toml에서 읽습니다."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."

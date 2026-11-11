@@ -3,7 +3,8 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { LuFolderGit2, LuPlus, LuX } from "react-icons/lu";
+import { Link } from "@tanstack/react-router";
+import { LuFolderGit2, LuPlus, LuSettings, LuX } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
@@ -68,6 +69,15 @@ export function RepositoriesSection({
 					<span className="min-w-0 flex-1 truncate" title={repository.repoPath}>
 						{repository.name}
 					</span>
+					<Button asChild variant="ghost" size="icon" className="size-6">
+						<Link
+							to="/settings/projects/$projectId"
+							params={{ projectId: repository.id }}
+							aria-label={t({ message: "Repository settings" })}
+						>
+							<LuSettings className="size-3.5" />
+						</Link>
+					</Button>
 					<Button
 						type="button"
 						variant="ghost"

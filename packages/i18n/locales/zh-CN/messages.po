@@ -5117,6 +5117,9 @@ msgstr "命令..."
 msgid "Commands"
 msgstr "命令"
 
+msgid "Commands run for this repository's setup, teardown, and the Run menu."
+msgstr "此仓库的设置、清理以及运行菜单所用的命令。"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "用于工作区初始化、清理和“运行”按钮的命令。"
 
@@ -8284,6 +8287,9 @@ msgstr "每周三上午9点，回顾本周合并的PR，更新被它们改过时
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每个工作日上午9点，阅读新的GitHub议题，打上标签，并起草初步回复供我审阅。"
+
+msgid "Every workspace of the multi-repo project checks out this repository beside the others."
+msgstr "多仓库项目的每个工作区都会把此仓库与其他仓库并排检出。"
 
 msgid "Every workspace of this project checks out all of them, side by side, on one branch."
 msgstr "此项目的每个工作区都会在同一分支上并排检出所有仓库。"
@@ -12496,6 +12502,9 @@ msgstr "正在将此聊天移到这里"
 
 msgid "Moving this workspace…"
 msgstr "正在移动此工作区…"
+
+msgid "Multi-repo project"
+msgstr "多仓库项目"
 
 msgid "Multi-select"
 msgstr "多选"
@@ -16824,6 +16833,9 @@ msgstr "已移除仓库"
 msgid "Repository root"
 msgstr "仓库根目录"
 
+msgid "Repository settings"
+msgstr "仓库设置"
+
 msgid "Repository URL or path"
 msgstr "仓库URL或路径"
 
@@ -20347,6 +20359,9 @@ msgstr "代码已过期。请重新开始。"
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自仓库的 config.toml。"
+
+msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
+msgstr "Paradev 用于设置、运行和归档此仓库检出的命令，来自其 config.toml。"
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
