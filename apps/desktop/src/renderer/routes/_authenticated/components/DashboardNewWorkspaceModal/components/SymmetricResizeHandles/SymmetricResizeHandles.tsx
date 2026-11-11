@@ -105,8 +105,7 @@ export function SymmetricResizeHandles({
 					tabIndex={0}
 					className={cn(
 						"absolute top-0 z-20 h-full w-2 cursor-ew-resize touch-none",
-						"after:absolute after:inset-y-0 after:w-[2px] after:transition-colors hover:after:bg-border",
-						side === "left" ? "left-0 after:left-0" : "right-0 after:right-0",
+						side === "left" ? "left-0" : "right-0",
 					)}
 					{...makeHandlers(side)}
 				/>

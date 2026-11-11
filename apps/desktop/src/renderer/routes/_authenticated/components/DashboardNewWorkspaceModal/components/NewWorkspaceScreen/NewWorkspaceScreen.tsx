@@ -1187,14 +1187,18 @@ export function NewWorkspaceScreen({
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}
 			/>
-			<div className="flex flex-1 flex-col items-center justify-center gap-8">
+			<div className="pointer-events-none absolute inset-x-0 top-[40%] flex -translate-y-1/2 flex-col items-center gap-8 [@media(max-height:640px)]:hidden">
 				<SupersetIcon className="h-10 w-auto text-muted-foreground/70" />
 				<h1 className="text-center text-3xl font-medium text-foreground/90">
 					<Trans>What should we build next?</Trans>
 				</h1>
-				<GitHubStarPill surface="new_workspace" reserveSpace />
+				<GitHubStarPill
+					surface="new_workspace"
+					className="pointer-events-auto"
+					reserveSpace
+				/>
 			</div>
-			<div className="flex w-full flex-col items-center px-6 pb-8">
+			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
 				<div
 					className="relative flex w-full flex-col"
 					style={{
