@@ -17,6 +17,7 @@ export const createChatSessionSchema = z
 		agent: z.string().min(1),
 		prompt: z.string().default(""),
 		model: z.string().min(1).optional(),
+		effort: z.string().min(1).optional(),
 		mode: z.string().min(1).optional(),
 		resumeSessionId: z.string().min(1).optional(),
 		continueSessionId: z.string().min(1).optional(),
@@ -105,6 +106,7 @@ export async function createChatSessionInWorkspace(
 		prompt: input.prompt,
 		surface: "chat",
 		model: input.model,
+		effort: input.effort,
 		attachmentIds: input.attachmentIds,
 	});
 	const target =
@@ -126,6 +128,7 @@ export async function createChatSessionInWorkspace(
 	if (
 		input.continueSessionId &&
 		!input.model &&
+		!input.effort &&
 		!input.mode &&
 		!input.attachmentIds?.length
 	) {

@@ -34,6 +34,7 @@ export function seedPendingCloudChat({
 	launch,
 	prompt,
 	modelId,
+	effortId,
 	modeId,
 }: {
 	collections: AppCollections;
@@ -41,6 +42,7 @@ export function seedPendingCloudChat({
 	launch: CloudAgentLaunchDescriptor | null | undefined;
 	prompt?: string;
 	modelId?: string | null;
+	effortId?: string | null;
 	modeId?: string | null;
 }): void {
 	if (launch?.surface !== "chat" || !launch.terminalId) return;
@@ -70,6 +72,7 @@ export function seedPendingCloudChat({
 					terminalId: launch.terminalId,
 					...(prompt ? { launchPrompt: prompt } : {}),
 					...(modelId ? { chatModelId: modelId } : {}),
+					...(effortId ? { chatEffortId: effortId } : {}),
 					...(modeId ? { chatModeId: modeId } : {}),
 				} satisfies PendingCloudChatPaneData,
 			},
@@ -112,6 +115,7 @@ function carriedOver(data: PendingCloudChatPaneData) {
 		draftId: data.draftId,
 		...(data.queuedPrompts ? { queuedPrompts: data.queuedPrompts } : {}),
 		...(data.chatModelId ? { chatModelId: data.chatModelId } : {}),
+		...(data.chatEffortId ? { chatEffortId: data.chatEffortId } : {}),
 		...(data.chatModeId ? { chatModeId: data.chatModeId } : {}),
 	};
 }

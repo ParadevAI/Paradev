@@ -99,6 +99,7 @@ export interface PendingCloudChatPaneData {
 	launchPrompt?: string;
 	queuedPrompts?: UserContent[][];
 	chatModelId?: string;
+	chatEffortId?: string;
 	chatModeId?: string;
 }
 

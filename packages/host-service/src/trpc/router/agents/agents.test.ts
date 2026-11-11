@@ -1184,9 +1184,27 @@ describe("continuationTarget", () => {
 			attachments: [],
 		});
 		expect(chatLaunchTarget(db, launch)).toBeNull();
-		expect(
-			chatLaunchTarget(db, { ...launch, surface: "chat", effort: "high" }),
-		).toBeNull();
+	});
+
+	it("keeps a chat launch a chat when it asks for an effort", () => {
+		const db = createTestDb();
+		seedClaude(db);
+		const launch = {
+			workspaceId,
+			agent: "claude",
+			prompt: "go",
+			surface: "chat" as const,
+		};
+
+		expect(chatLaunchTarget(db, { ...launch, effort: "high" })).toEqual({
+			harness: "claude-acp",
+			label: "Claude",
+			agentConfigId: "00000000-0000-0000-0000-00000000000a",
+			attachments: [],
+		});
+		expect(() =>
+			chatLaunchTarget(db, { ...launch, effort: "ludicrous" }),
+		).toThrow(TRPCError);
 	});
 
 	it("chats as a custom agent that runs the claude or codex CLI", () => {

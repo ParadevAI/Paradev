@@ -374,6 +374,7 @@ export async function launchSandboxAgentOnce(
 						agent,
 						prompt,
 						model,
+						effort,
 						attachmentIds,
 						surface: "chat",
 					})
@@ -388,6 +389,7 @@ export async function launchSandboxAgentOnce(
 						agent,
 						prompt,
 						model,
+						effort,
 						mode,
 						...(attachmentIds?.length ? { attachmentIds } : {}),
 					},
