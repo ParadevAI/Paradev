@@ -134,51 +134,26 @@ export const workspaceCleanupRouter = router({
 	inspect: protectedProcedure
 		.input(z.object({ workspaceId: z.string() }))
 		.query(async ({ ctx, input, signal }): Promise<InspectResult> => {
-			const { local, sharesProjectCheckout } = await isLocalCheckoutWorkspace(
-				ctx,
-				input.workspaceId,
+			const repositories = listRepositoryWorkspaces(ctx.db, input.workspaceId);
+			if (repositories.length === 0) {
+				return {
+					canDelete: true,
+					reason: null,
+					...(await inspectCheckout(ctx, input.workspaceId, signal)),
+				};
+			}
+			const states = await Promise.all(
+				repositories.map((repository) =>
+					inspectCheckout(ctx, repository.id, signal),
+				),
 			);
-			// Nothing on disk goes away with a local workspace, so there is
-			// no uncommitted or unpushed work to warn about losing.
-			if (!local || sharesProjectCheckout) {
-				return {
-					canDelete: true,
-					reason: null,
-					hasChanges: false,
-					hasUnpushedCommits: false,
-					sharesProjectCheckout,
-				};
-			}
-
-			try {
-				const gitEnv = await cleanupGitOps.resolveGitEnv(
-					ctx,
-					local.worktreePath,
-				);
-				const state = await cleanupGitOps.readWorktreeState(
-					{
-						worktreePath: local.worktreePath,
-						gitEnv,
-						ignoreInitialCommit: local.type === "session",
-					},
-					signal,
-				);
-				return {
-					canDelete: true,
-					reason: null,
-					hasChanges: state.hasChanges,
-					hasUnpushedCommits: state.hasUnpushedCommits,
-					sharesProjectCheckout: false,
-				};
-			} catch {
-				return {
-					canDelete: true,
-					reason: null,
-					hasChanges: false,
-					hasUnpushedCommits: false,
-					sharesProjectCheckout: false,
-				};
-			}
+			return {
+				canDelete: true,
+				reason: null,
+				hasChanges: states.some((state) => state.hasChanges),
+				hasUnpushedCommits: states.some((state) => state.hasUnpushedCommits),
+				sharesProjectCheckout: false,
+			};
 		}),
 
 	/**
@@ -250,6 +225,44 @@ export const workspaceCleanupRouter = router({
 		),
 });
 
+async function inspectCheckout(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	signal: AbortSignal | undefined,
+) {
+	const { local, sharesProjectCheckout } = await isLocalCheckoutWorkspace(
+		ctx,
+		workspaceId,
+	);
+	const clean = {
+		hasChanges: false,
+		hasUnpushedCommits: false,
+		sharesProjectCheckout,
+	};
+	// Nothing on disk goes away with a local workspace, so there is
+	// no uncommitted or unpushed work to warn about losing.
+	if (!local || sharesProjectCheckout) return clean;
+
+	try {
+		const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, local.worktreePath);
+		const state = await cleanupGitOps.readWorktreeState(
+			{
+				worktreePath: local.worktreePath,
+				gitEnv,
+				ignoreInitialCommit: local.type === "session",
+			},
+			signal,
+		);
+		return {
+			hasChanges: state.hasChanges,
+			hasUnpushedCommits: state.hasUnpushedCommits,
+			sharesProjectCheckout: false,
+		};
+	} catch {
+		return clean;
+	}
+}
+
 export async function destroyWorkspace(
 	ctx: HostServiceContext,
 	input: DestroyWorkspaceInput,
@@ -272,8 +285,16 @@ export async function destroyWorkspace(
 	try {
 		const repositories = listRepositoryWorkspaces(ctx.db, input.workspaceId);
 		const root = getLocalWorkspace(ctx.db, input.workspaceId)?.worktreePath;
-		// Each checkout is destroyed like a workspace of its own, so a dirty one
-		// stops the delete before the container goes.
+		// Every checkout is checked before any is removed, so one dirty checkout
+		// leaves the whole workspace in place.
+		if (!input.force) {
+			for (const repository of repositories) {
+				await assertCheckoutClean(
+					ctx,
+					await isLocalCheckoutWorkspace(ctx, repository.id),
+				);
+			}
+		}
 		for (const repository of repositories) {
 			await runDestroy(ctx, { ...input, workspaceId: repository.id });
 		}
@@ -332,45 +353,7 @@ async function runDestroy(
 		// case). Missing/broken local state is handled by the cleanup phase.
 		// Sessions are standalone repos — the same dirty check applies even
 		// though they have no project row.
-		if (
-			!input.force &&
-			!sharesProjectCheckout &&
-			local &&
-			(project || local.type === "session")
-		) {
-			try {
-				const gitEnv = await cleanupGitOps.resolveGitEnv(
-					ctx,
-					local.worktreePath,
-				);
-				const state = await cleanupGitOps.readWorktreeState({
-					worktreePath: local.worktreePath,
-					gitEnv,
-				});
-				if (state.hasChanges) {
-					throw new TRPCError({
-						code: "CONFLICT",
-						message: "Worktree has uncommitted changes",
-					});
-				}
-			} catch (err) {
-				if (err instanceof TRPCError) throw err;
-				if (isIndeterminateGitTaskFailure(err)) {
-					// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
-					// this destructive path rather than silently skipping the
-					// dirty-worktree block — a retry usually succeeds (the first
-					// attempt warmed the FS cache), and force skips preflight
-					// entirely as the explicit escape hatch.
-					const message = err instanceof Error ? err.message : String(err);
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
-					});
-				}
-				// Can't read status (missing worktree dir, etc.) — not a
-				// conflict. Continue; step 3b will skip idempotently.
-			}
-		}
+		if (!input.force) await assertCheckoutClean(ctx, checkout);
 
 		// ─── Step 2: Teardown ──────────────────────────────────────
 		// Script is the user's last chance to stop services / flush state
@@ -439,6 +422,51 @@ async function runDestroy(
 	} catch (err) {
 		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
 		throw err;
+	}
+}
+
+async function assertCheckoutClean(
+	ctx: HostServiceContext,
+	{
+		local,
+		project,
+		sharesProjectCheckout,
+	}: Awaited<ReturnType<typeof isLocalCheckoutWorkspace>>,
+) {
+	if (sharesProjectCheckout || !local) return;
+	// A container's folder is not a repository: its checkouts are checked
+	// one by one.
+	if (local.type !== "session" && (!project || isContainerProject(project))) {
+		return;
+	}
+	try {
+		const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, local.worktreePath);
+		const state = await cleanupGitOps.readWorktreeState({
+			worktreePath: local.worktreePath,
+			gitEnv,
+		});
+		if (state.hasChanges) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: "Worktree has uncommitted changes",
+			});
+		}
+	} catch (err) {
+		if (err instanceof TRPCError) throw err;
+		if (isIndeterminateGitTaskFailure(err)) {
+			// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
+			// this destructive path rather than silently skipping the
+			// dirty-worktree block — a retry usually succeeds (the first
+			// attempt warmed the FS cache), and force skips preflight
+			// entirely as the explicit escape hatch.
+			const message = err instanceof Error ? err.message : String(err);
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
+			});
+		}
+		// Can't read status (missing worktree dir, etc.) — not a
+		// conflict. Continue; step 3b will skip idempotently.
 	}
 }
 
