@@ -18,6 +18,7 @@ interface UseDiffCodeViewScrollOptions {
 		DiffAnnotationMetadata,
 		undefined
 	> | null>;
+	codeViewMounted?: boolean;
 	data: DiffPaneData;
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	items: CodeViewItem<DiffAnnotationMetadata>[];
@@ -48,6 +49,7 @@ const PROGRAMMATIC_SCROLL_SETTLE_MS = 700;
 
 export function useDiffCodeViewScroll({
 	codeViewRef,
+	codeViewMounted = true,
 	data,
 	fileByItemId,
 	items,
@@ -86,6 +88,7 @@ export function useDiffCodeViewScroll({
 	}, [data.changeKey, data.path, items, fileByItemId]);
 
 	useEffect(() => {
+		if (!codeViewMounted) return;
 		const scrollKey = [
 			targetItemId ?? "",
 			data.focusLine ?? "",
@@ -173,6 +176,7 @@ export function useDiffCodeViewScroll({
 		lastProgrammaticScrollAtRef.current = Date.now();
 	}, [
 		codeViewRef,
+		codeViewMounted,
 		data.focusLine,
 		data.focusSide,
 		data.focusTick,

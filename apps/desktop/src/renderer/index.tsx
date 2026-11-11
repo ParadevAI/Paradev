@@ -19,6 +19,7 @@ import { sweepDeadPersistedKeys } from "./lib/persisted-keys";
 import { persistentHistory } from "./lib/persistent-hash-history";
 import { posthog } from "./lib/posthog";
 import { pruneExpiredTerminalState } from "./lib/terminal/terminal-buffer-gc";
+import { watchOpenOverlays } from "./lib/watchOpenOverlays";
 import { electronQueryClient } from "./providers/ElectronTRPCProvider";
 import { NotFound } from "./routes/not-found";
 import { routeTree } from "./routeTree.gen";
@@ -31,6 +32,8 @@ initBootErrorHandling(rootElement);
 pruneExpiredTerminalState();
 // Keys from removed features otherwise live on user profiles forever.
 sweepDeadPersistedKeys();
+
+watchOpenOverlays();
 
 const router = createRouter({
 	routeTree,
