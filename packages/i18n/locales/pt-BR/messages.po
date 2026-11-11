@@ -16672,14 +16672,8 @@ msgstr "Memória residente usada pelo Paradev e pelas árvores de processos de t
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Redimensionar pela borda esquerda"
-
 msgid "Resize panel"
 msgstr "Redimensionar painel"
-
-msgid "Resize right edge"
-msgstr "Redimensionar pela borda direita"
 
 msgid "Resolve"
 msgstr "Resolver"

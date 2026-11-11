@@ -16672,14 +16672,8 @@ msgstr "Paradevと監視対象のターミナルプロセスツリーが使用�
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "左端をリサイズ"
-
 msgid "Resize panel"
 msgstr "パネルのサイズを変更"
-
-msgid "Resize right edge"
-msgstr "右端をリサイズ"
 
 msgid "Resolve"
 msgstr "解決する"

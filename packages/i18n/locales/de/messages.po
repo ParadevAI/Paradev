@@ -16672,14 +16672,8 @@ msgstr "Resident belegter Speicher von Paradev und den überwachten Terminal-Pro
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Linken Rand verschieben"
-
 msgid "Resize panel"
 msgstr "Bereichsgröße ändern"
-
-msgid "Resize right edge"
-msgstr "Rechten Rand verschieben"
 
 msgid "Resolve"
 msgstr "Erledigen"

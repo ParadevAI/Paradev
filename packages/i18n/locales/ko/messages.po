@@ -16672,14 +16672,8 @@ msgstr "Paradev와 모니터링 중인 터미널 프로세스 트리가 사용�
 msgid "Resizable"
 msgstr "크기 조절 가능"
 
-msgid "Resize left edge"
-msgstr "왼쪽 가장자리 크기 조절"
-
 msgid "Resize panel"
 msgstr "패널 크기 조정"
-
-msgid "Resize right edge"
-msgstr "오른쪽 가장자리 크기 조절"
 
 msgid "Resolve"
 msgstr "해결"
