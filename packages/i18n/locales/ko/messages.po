@@ -12784,6 +12784,9 @@ msgstr "Chrome, Brave, Arc 등 Chromium 기반 브라우저를 찾을 수 없습
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "이 컴퓨터에서 아직 Claude 또는 Codex 사용량을 찾지 못했습니다. 지금 참여하면 에이전트를 사용한 뒤 순위에 표시됩니다."
 
+msgid "No cloud environment opens {repository}."
+msgstr "{repository}을(를) 여는 클라우드 환경이 없습니다."
+
 msgid "No cloud workspaces"
 msgstr "클라우드 워크스페이스 없음"
 
@@ -15043,6 +15046,9 @@ msgstr "워크스페이스 선택"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "에이전트가 입력을 기다리고 있거나, 마지막으로 확인한 뒤 작업을 마쳤거나, 아직 실행 중인 워크스페이스를 선택합니다"
+
+msgid "Pick an environment"
+msgstr "환경 선택"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "아이콘과 색상을 고르거나 직접 만든 이미지를 업로드하세요. 기본값은 연결된 GitHub 소유자의 아바타입니다."
@@ -19907,6 +19913,9 @@ msgstr "해당 계정은 더 이상 연결되어 있지 않습니다. 다른 계
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "이 에이전트 세션에는 아직 열 대화가 없습니다. 시작되었지만 한 번도 요청을 받지 않았습니다."
 
+msgid "that computer"
+msgstr "그 컴퓨터"
+
 msgid "That computer can't be reached"
 msgstr "그 컴퓨터에 연결할 수 없습니다"
 
@@ -20202,6 +20211,9 @@ msgstr "이동 시간이 초과되었습니다."
 
 msgid "The move was cancelled."
 msgstr "옮기기가 취소되었습니다."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "이동한 워크스페이스는 준비되면 홈에 표시됩니다."
 
 msgid "The name of your organization or team"
 msgstr "조직 또는 팀의 이름"
@@ -20888,6 +20900,9 @@ msgstr "이 워크스페이스의 호스트가 오프라인입니다"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "이 워크스페이스의 호스트는 이 앱이 지원하는 것보다 오래된 호스트 서비스를 실행 중입니다. 업데이트하면 다시 연결됩니다. 워크스페이스와 파일은 그대로 유지됩니다."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "이 워크스페이스의 프로젝트가 GitHub에 없습니다."
 
 msgid "Thorough reasoning effort"
 msgstr "철저한 추론"
@@ -21636,6 +21651,9 @@ msgstr "이름 지정 지침 업데이트"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0}의 이름 지정 지침 업데이트"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "이 휴대폰에서 워크스페이스를 이동하려면 {sourceName}의 Paradev를 업데이트하세요."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "해당 기기에서 Paradev를 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."

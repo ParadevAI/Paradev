@@ -12784,6 +12784,9 @@ msgstr "Tidak ditemukan Chrome, Brave, Arc, atau browser Chromium lainnya."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Belum ada penggunaan Claude atau Codex di mesin ini. Gabung sekarang dan Anda akan muncul setelah memakai agen."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Tidak ada lingkungan cloud yang membuka {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Tidak ada workspace cloud"
 
@@ -15043,6 +15046,9 @@ msgstr "Pilih workspace"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Pilih workspace yang agennya menunggu input Anda, sudah selesai sejak terakhir Anda melihatnya, atau masih berjalan"
+
+msgid "Pick an environment"
+msgstr "Pilih lingkungan"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pilih ikon dan warna, atau unggah gambar kustom. Bawaannya memakai avatar pemilik GitHub yang ditautkan."
@@ -19907,6 +19913,9 @@ msgstr "Akun itu sudah tidak terhubung — pilih yang lain."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Sesi agen itu belum punya percakapan untuk dibuka. Sudah dimulai tetapi belum pernah diberi perintah."
 
+msgid "that computer"
+msgstr "komputer itu"
+
 msgid "That computer can't be reached"
 msgstr "Komputer itu tidak dapat dijangkau"
 
@@ -20202,6 +20211,9 @@ msgstr "Waktu pemindahan habis."
 
 msgid "The move was cancelled."
 msgstr "Pemindahan dibatalkan."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Workspace yang dipindahkan akan muncul di Beranda saat siap."
 
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
@@ -20888,6 +20900,9 @@ msgstr "Host workspace ini sedang offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Host workspace ini menjalankan layanan host yang lebih lama dari yang didukung aplikasi ini. Perbarui untuk tersambung kembali; workspace dan berkasnya tidak tersentuh."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Proyek workspace ini tidak ada di GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Upaya penalaran menyeluruh"
@@ -21636,6 +21651,9 @@ msgstr "Perbarui instruksi penamaan"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Perbarui instruksi penamaan untuk {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Perbarui Paradev di {sourceName} untuk memindahkan workspace-nya dari ponsel ini."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Perbarui Paradev di perangkat tersebut. Pembaruan dari aplikasi memerlukan instalasi mandiri yang didukung dan versi aplikasi yang telah dirilis."

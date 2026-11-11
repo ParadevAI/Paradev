@@ -12784,6 +12784,9 @@ msgstr "Non sono stati trovati Chrome, Brave, Arc o altri browser Chromium."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Nessun utilizzo di Claude o Codex trovato su questa macchina. Unisciti ora e comparirai dopo aver usato un agente."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Nessun ambiente cloud apre {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Nessun workspace cloud"
 
@@ -15043,6 +15046,9 @@ msgstr "Scegli un workspace"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Scegli un workspace il cui agente attende un tuo input, ha finito dall'ultima volta che l'hai guardato o è ancora in esecuzione"
+
+msgid "Pick an environment"
+msgstr "Scegli un ambiente"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Scegli un'icona e un colore oppure carica un'immagine personalizzata. Per impostazione predefinita usa l'avatar del proprietario GitHub collegato."
@@ -19907,6 +19913,9 @@ msgstr "Questo account non è più connesso — scegline un altro."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Quella sessione dell'agente non ha ancora una conversazione da aprire: è stata avviata ma non ha mai ricevuto una richiesta."
 
+msgid "that computer"
+msgstr "quel computer"
+
 msgid "That computer can't be reached"
 msgstr "Quel computer non è raggiungibile"
 
@@ -20202,6 +20211,9 @@ msgstr "Lo spostamento è scaduto."
 
 msgid "The move was cancelled."
 msgstr "Lo spostamento è stato annullato."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Lo spazio di lavoro spostato apparirà nella Home quando sarà pronto."
 
 msgid "The name of your organization or team"
 msgstr "Il nome della tua organizzazione o del tuo team"
@@ -20888,6 +20900,9 @@ msgstr "L'host di questo workspace è offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "L'host di questo workspace esegue un servizio host più vecchio di quello supportato da questa app. Aggiornalo per riconnetterti; il workspace e i suoi file restano intatti."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Il progetto di questo spazio di lavoro non è su GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Ragionamento approfondito"
@@ -21636,6 +21651,9 @@ msgstr "Aggiorna le istruzioni di denominazione"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Aggiorna le istruzioni di denominazione per {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Aggiorna Paradev su {sourceName} per spostarne gli spazi di lavoro da questo telefono."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Aggiorna Paradev su quel dispositivo. Gli aggiornamenti dall’app richiedono un’installazione autonoma supportata e una versione rilasciata dell’app."

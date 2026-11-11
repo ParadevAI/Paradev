@@ -12784,6 +12784,9 @@ msgstr "Chrome, Brave, Arc veya başka bir Chromium tarayıcısı bulunamadı."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Bu makinede henüz Claude veya Codex kullanımı bulunamadı. Şimdi katılın; bir ajan kullandığınızda listede görüneceksiniz."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Hiçbir bulut ortamı {repository} deposunu açmıyor."
+
 msgid "No cloud workspaces"
 msgstr "Bulut çalışma alanı yok"
 
@@ -15043,6 +15046,9 @@ msgstr "Bir çalışma alanı seçin"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Ajanı sizden yanıt bekleyen, son bakışınızdan beri işini bitiren veya hâlâ çalışan bir çalışma alanı seçin"
+
+msgid "Pick an environment"
+msgstr "Bir ortam seçin"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Bir simge ve renk seçin ya da özel bir görsel yükleyin. Varsayılan olarak bağlı GitHub sahibinin avatarı kullanılır."
@@ -19907,6 +19913,9 @@ msgstr "Bu hesap artık bağlı değil — başka bir hesap seçin."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Bu aracı oturumunda açılacak bir konuşma yok. Başlatıldı ama hiç istek almadı."
 
+msgid "that computer"
+msgstr "o bilgisayar"
+
 msgid "That computer can't be reached"
 msgstr "Bu bilgisayara ulaşılamıyor"
 
@@ -20202,6 +20211,9 @@ msgstr "Taşıma zaman aşımına uğradı."
 
 msgid "The move was cancelled."
 msgstr "Taşıma iptal edildi."
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Taşınan çalışma alanı hazır olduğunda Ana Sayfa'da görünür."
 
 msgid "The name of your organization or team"
 msgstr "Kuruluşunuzun veya takımınızın adı"
@@ -20888,6 +20900,9 @@ msgstr "Bu çalışma alanının host'u çevrimdışı"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Bu çalışma alanının ana makinesi, bu uygulamanın desteklediğinden daha eski bir ana makine hizmeti çalıştırıyor. Yeniden bağlanmak için güncelleyin; çalışma alanı ve dosyaları olduğu gibi kalır."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Bu çalışma alanının projesi GitHub'da değil."
 
 msgid "Thorough reasoning effort"
 msgstr "Kapsamlı akıl yürütme çabası"
@@ -21636,6 +21651,9 @@ msgstr "Adlandırma yönergelerini güncelle"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0} için adlandırma yönergelerini güncelle"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Çalışma alanlarını bu telefondan taşımak için {sourceName} üzerindeki Paradev'i güncelleyin."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Paradev’i o cihazda güncelleyin. Uygulama içinden güncelleme için desteklenen bağımsız bir kurulum ve yayımlanmış bir uygulama sürümü gerekir."

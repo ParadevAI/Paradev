@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { MOVE_STOPPED_ANSWERING } from "@superset/shared/move-book";
+import { MOVE_STOPPED_ANSWERING } from "../protocol";
 import { keepMoveAlive } from "./keepMoveAlive";
 
 const never = (signal: AbortSignal) =>

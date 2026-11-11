@@ -4,15 +4,23 @@ import { promisify } from "node:util";
 import { sessionSelections } from "@superset/chat/core";
 import type { DurableEvent } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { getHostId } from "@superset/shared/host-info";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
 import {
 	downloadBundle,
 	uploadBundle,
 	withStage,
 } from "../../../teleport/bundle";
+import {
+	beginWorkspaceMove,
+	createRelayHostClient,
+} from "../../../teleport/moveWorkspace";
 import {
 	type BundleManifest,
 	teleportProviderFor,
@@ -26,7 +34,12 @@ import {
 	harnessPlaceSessionTask,
 	harnessSessionFileTask,
 } from "../../../workers/tasks/harness";
-import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
+import {
+	createCallerFactory,
+	machineOnlyProcedure,
+	protectedProcedure,
+	router,
+} from "../../index";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { requireChatRuntime } from "../sessions/session-service";
@@ -317,6 +330,108 @@ export const teleportRouter = router({
 			};
 		}),
 
+	/**
+	 * Moves a workspace on this computer to the cloud or to another of the
+	 * person's computers, and carries the move out here, so the client that
+	 * asked (a phone, say) need not stay open. Answers once the move is
+	 * recorded; `workspaceMove.latest` follows it from there.
+	 */
+	moveWorkspace: machineOnlyProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				/** What the destination workspace is called; defaults to this one's name. */
+				name: z.string().min(1).max(200).optional(),
+				destination: z.discriminatedUnion("kind", [
+					z.object({
+						kind: z.literal("cloud"),
+						environmentId: z.string().uuid(),
+						machineSize: z.enum(MACHINE_SIZES).optional(),
+					}),
+					z.object({
+						kind: z.literal("computer"),
+						hostId: z.string().min(1).max(200),
+					}),
+				]),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			const fromHostId = getHostId();
+			const { destination } = input;
+			if (
+				destination.kind === "computer" &&
+				destination.hostId === fromHostId
+			) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "The workspace is already on this computer",
+				});
+			}
+			const auth = ctx.apiAuth;
+			if (destination.kind === "computer" && !auth) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "This computer cannot reach your other computers",
+				});
+			}
+			if (movesInFlight.has(input.workspaceId)) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "This workspace is already moving",
+				});
+			}
+			movesInFlight.add(input.workspaceId);
+			const teleport = createTeleportCaller(ctx);
+			try {
+				const { workspaceMoveId, done } = await beginWorkspaceMove(
+					{
+						api: ctx.api,
+						organizationId: ctx.organizationId,
+						fromHostId,
+						prepare: (workspaceId) =>
+							teleport.prepareWorkspace({ workspaceId, stopIfBusy: true }),
+						releaseChats: async (chatSessionIds) => {
+							if (chatSessionIds.length === 0) return;
+							await teleport.releaseChats({ chatSessionIds });
+						},
+						destinationHost: async (hostId) => {
+							const endpoint = await ctx.api.host.relayEndpoint.query();
+							if (!endpoint?.url || !auth) {
+								throw new Error("This computer cannot reach the relay");
+							}
+							return createRelayHostClient({
+								relayUrl: endpoint.url,
+								organizationId: ctx.organizationId,
+								hostId,
+								auth,
+							});
+						},
+					},
+					{
+						workspaceId: input.workspaceId,
+						name: input.name ?? (workspace.name || workspace.branch),
+						destination,
+					},
+				);
+				void done
+					.catch(() => {})
+					.finally(() => movesInFlight.delete(input.workspaceId));
+				return { workspaceMoveId };
+			} catch (error) {
+				movesInFlight.delete(input.workspaceId);
+				throw error;
+			}
+		}),
+
 	/** The move of these chats failed or was abandoned: they stay here and stop being pushed for it. */
 	releaseChats: protectedProcedure
 		.input(
@@ -505,3 +620,9 @@ export const teleportRouter = router({
 			};
 		}),
 });
+
+/** Workspaces whose move this host is carrying out. */
+const movesInFlight = new Set<string>();
+
+// Declared after the router; the procedures dereference it only at request time.
+const createTeleportCaller = createCallerFactory(teleportRouter);

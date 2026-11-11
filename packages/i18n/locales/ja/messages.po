@@ -12784,6 +12784,9 @@ msgstr "Chrome、Brave、ArcなどのChromiumブラウザが見つかりませ�
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "このマシンでClaudeやCodexの使用がまだ見つかりません。今参加すれば、エージェントを使い始めた時点で表示されます。"
 
+msgid "No cloud environment opens {repository}."
+msgstr "{repository} を開くクラウド環境がありません。"
+
 msgid "No cloud workspaces"
 msgstr "クラウドワークスペースはありません"
 
@@ -15043,6 +15046,9 @@ msgstr "ワークスペースを選択"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "エージェントがあなたの入力を待っている、前回確認してから完了した、またはまだ実行中のワークスペースを選択します"
+
+msgid "Pick an environment"
+msgstr "環境を選択"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "アイコンと色を選ぶか、独自の画像をアップロードします。既定ではリンクされたGitHubオーナーのアバターになります。"
@@ -19907,6 +19913,9 @@ msgstr "このアカウントは接続されていません。別のアカウン
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "このエージェントセッションにはまだ開ける会話がありません。開始されましたが、一度も指示を受けていません。"
 
+msgid "that computer"
+msgstr "そのコンピューター"
+
 msgid "That computer can't be reached"
 msgstr "そのコンピューターに接続できません"
 
@@ -20202,6 +20211,9 @@ msgstr "移動がタイムアウトしました。"
 
 msgid "The move was cancelled."
 msgstr "移動はキャンセルされました。"
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "移動したワークスペースは、準備ができるとホームに表示されます。"
 
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
@@ -20888,6 +20900,9 @@ msgstr "このワークスペースのホストはオフラインです"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "このワークスペースのホストは、このアプリが対応するより古いホストサービスを実行しています。更新して再接続してください。ワークスペースとファイルはそのまま残ります。"
+
+msgid "This workspace's project is not on GitHub."
+msgstr "このワークスペースのプロジェクトは GitHub にありません。"
 
 msgid "Thorough reasoning effort"
 msgstr "徹底的な推論"
@@ -21636,6 +21651,9 @@ msgstr "命名指示を更新"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0}の命名指示を更新"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "このスマートフォンからワークスペースを移動するには、{sourceName} の Paradev を更新してください。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "そのデバイスで Paradev を更新してください。アプリ内からの更新には、対応するスタンドアロンインストールとリリース済みのアプリバージョンが必要です。"

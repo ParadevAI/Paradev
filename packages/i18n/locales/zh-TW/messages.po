@@ -12784,6 +12784,9 @@ msgstr "未找到Chrome、Brave、Arc或其他Chromium瀏覽器。"
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "這臺機器上還沒有發現Claude或Codex的用量。現在加入，用過代理程式後你就會出現在榜單上。"
 
+msgid "No cloud environment opens {repository}."
+msgstr "沒有雲端環境開啟 {repository}。"
+
 msgid "No cloud workspaces"
 msgstr "沒有雲端工作區"
 
@@ -15043,6 +15046,9 @@ msgstr "選擇一個工作區"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "選擇一個工作區：其代理正在等待你的輸入、自你上次查看後已完成，或仍在執行"
+
+msgid "Pick an environment"
+msgstr "選擇環境"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "選擇圖示和顏色，或上傳自訂圖片。預設使用關聯的GitHub擁有者頭像。"
@@ -19907,6 +19913,9 @@ msgstr "該帳號已中斷連線，請選擇其他帳號。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "該代理工作階段還沒有可開啟的對話。它已啟動但從未收到指令。"
 
+msgid "that computer"
+msgstr "那台電腦"
+
 msgid "That computer can't be reached"
 msgstr "無法連線到那台電腦"
 
@@ -20202,6 +20211,9 @@ msgstr "移動逾時。"
 
 msgid "The move was cancelled."
 msgstr "移動已取消。"
+
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "移動後的工作區準備好後會顯示在首頁。"
 
 msgid "The name of your organization or team"
 msgstr "你的組織或團隊的名稱"
@@ -20888,6 +20900,9 @@ msgstr "此工作區的主機已離線"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "此工作區的主機執行的主機服務版本低於此應用程式支援的版本。更新後即可重新連線；工作區及其檔案不受影響。"
+
+msgid "This workspace's project is not on GitHub."
+msgstr "此工作區的專案不在 GitHub 上。"
 
 msgid "Thorough reasoning effort"
 msgstr "深入的推理投入"
@@ -21636,6 +21651,9 @@ msgstr "更新命名規則"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名規則"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "請在 {sourceName} 上更新 Paradev，才能從這支手機移動它的工作區。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "請在該裝置上更新 Paradev。應用程式內更新需要受支援的獨立安裝和已發佈的應用程式版本。"
