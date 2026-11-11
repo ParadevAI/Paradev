@@ -1,4 +1,5 @@
 export {
+	hasCheckouts,
 	useActiveRepositoryWorkspaceId,
 	useSelectRepository,
 	useWorkspaceLocalStateRow,

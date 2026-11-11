@@ -1,6 +1,9 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
-import { useWorkspaceRepositories } from "../../../../../../state/activeRepositoryStore";
+import {
+	hasCheckouts,
+	useWorkspaceRepositories,
+} from "../../../../../../state/activeRepositoryStore";
 import { checkoutForPullRequest } from "../../utils/checkoutForPullRequest";
 
 /**
@@ -12,10 +15,9 @@ export function usePullRequestCheckoutId(
 	pullRequest: PullRequestRef,
 ): string | null {
 	const repositories = useWorkspaceRepositories(workspaceId);
-	const ids =
-		repositories.length > 1
-			? repositories.map((repository) => repository.id)
-			: [workspaceId];
+	const ids = hasCheckouts(workspaceId, repositories)
+		? repositories.map((repository) => repository.id)
+		: [workspaceId];
 	const linked = workspaceTrpc.useQueries((t) =>
 		ids.map((id) => t.git.getPullRequest({ workspaceId: id })),
 	);

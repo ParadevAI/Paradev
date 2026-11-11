@@ -5,7 +5,10 @@ import { memo, useMemo } from "react";
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
-import { useWorkspaceRepositories } from "../../state/activeRepositoryStore";
+import {
+	hasCheckouts,
+	useWorkspaceRepositories,
+} from "../../state/activeRepositoryStore";
 import { changesPillStats } from "../../utils/changesPillStats";
 import { ChangesStats } from "../ChangesStats";
 import { MultiRepoShipControl } from "./components/MultiRepoShipControl";
@@ -48,7 +51,7 @@ export const ChangesControl = memo(function ChangesControl({
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
 	const repositories = useWorkspaceRepositories(workspaceId);
-	const isMultiRepo = repositories.length > 1;
+	const isMultiRepo = hasCheckouts(workspaceId, repositories);
 	const { flowState, onRetry } = usePRFlowState(workspaceId, {
 		enabled: !isMultiRepo,
 	});

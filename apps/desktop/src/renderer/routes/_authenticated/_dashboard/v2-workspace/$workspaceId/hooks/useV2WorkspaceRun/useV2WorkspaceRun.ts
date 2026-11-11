@@ -19,7 +19,10 @@ import type {
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { selectWorkspaceRunDefinition } from "shared/workspace-run-definition";
 import type { StoreApi } from "zustand/vanilla";
-import { useWorkspaceRepositories } from "../../state/activeRepositoryStore";
+import {
+	hasCheckouts,
+	useWorkspaceRepositories,
+} from "../../state/activeRepositoryStore";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -141,7 +144,7 @@ export function useV2WorkspaceRun({
 	);
 
 	const repositories = useWorkspaceRepositories(workspaceId);
-	const isMultiRepo = repositories.length > 1;
+	const isMultiRepo = hasCheckouts(workspaceId, repositories);
 
 	// Session workspaces (null projectId) have no project config; only global
 	// terminal presets can define their run.

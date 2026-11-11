@@ -60,6 +60,7 @@ import type { StoreApi } from "zustand/vanilla";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
 import {
+	hasCheckouts,
 	useActiveRepositoryWorkspaceId,
 	useWorkspaceRepositories,
 } from "../../state/activeRepositoryStore";
@@ -218,7 +219,7 @@ export function usePaneRegistry({
 	const fileWorkspaceId = useCallback(
 		(filePath: string) =>
 			checkoutForPath(repositories, filePath) ??
-			(repositories.length > 1 ? workspaceId : repoWorkspaceId),
+			(hasCheckouts(workspaceId, repositories) ? workspaceId : repoWorkspaceId),
 		[repositories, workspaceId, repoWorkspaceId],
 	);
 	const closeChatWithUndo = useUndoableChatClose({

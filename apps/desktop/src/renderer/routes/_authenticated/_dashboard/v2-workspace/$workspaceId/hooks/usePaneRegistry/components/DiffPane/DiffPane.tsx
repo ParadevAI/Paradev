@@ -42,6 +42,7 @@ import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/C
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
 import {
+	hasCheckouts,
 	useSelectRepository,
 	useWorkspaceRepositories,
 } from "../../../../state/activeRepositoryStore";
@@ -156,7 +157,7 @@ export function DiffPane({
 	// with its checkout; the pane's own workspaceId is then the active checkout.
 	const groupId = useWorkspace().workspace.id;
 	const repositories = useWorkspaceRepositories(groupId);
-	const isMultiRepo = repositories.length > 1;
+	const isMultiRepo = hasCheckouts(groupId, repositories);
 	const repositoryIds = useMemo(
 		() => (isMultiRepo ? repositories.map((repository) => repository.id) : []),
 		[isMultiRepo, repositories],

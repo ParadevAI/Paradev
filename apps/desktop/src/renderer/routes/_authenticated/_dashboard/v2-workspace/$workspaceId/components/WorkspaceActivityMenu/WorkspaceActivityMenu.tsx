@@ -56,7 +56,10 @@ import { useRepositoryShipSnapshots } from "../../hooks/useRepositoryShipSnapsho
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
-import { useWorkspaceRepositories } from "../../state/activeRepositoryStore";
+import {
+	hasCheckouts,
+	useWorkspaceRepositories,
+} from "../../state/activeRepositoryStore";
 import type { PagePaneData, PaneViewerData } from "../../types";
 import {
 	BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS,
@@ -146,7 +149,7 @@ export function WorkspaceActivityMenu({
 	const { favoritePageIds } = usePageFavorites();
 	const gitStatus = useWorkspaceGitStatus();
 	const repositories = useWorkspaceRepositories(workspaceId);
-	const isMultiRepo = repositories.length > 1;
+	const isMultiRepo = hasCheckouts(workspaceId, repositories);
 	const repositoryShip = useRepositoryShipSnapshots(
 		isMultiRepo ? repositories.map(({ id }) => id) : [],
 	);

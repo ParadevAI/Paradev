@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { LuGitCompareArrows } from "react-icons/lu";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import {
+	hasCheckouts,
 	useSelectRepository,
 	useWorkspaceRepositories,
 } from "../../../../state/activeRepositoryStore";
@@ -44,7 +45,7 @@ export function useChangesTab(
 		[],
 	);
 
-	const isMultiRepo = repositories.length > 1;
+	const isMultiRepo = hasCheckouts(groupId, repositories);
 	const changedPathCount = isMultiRepo
 		? repositories.reduce(
 				(sum, repository) => sum + (counts[repository.id] ?? 0),

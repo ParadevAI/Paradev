@@ -57,3 +57,11 @@ export function useSelectRepository(): (
 		[collections],
 	);
 }
+
+/** Whether the workspace is a multi-repo folder, even one holding a single checkout. */
+export function hasCheckouts(
+	workspaceId: string,
+	repositories: Array<{ id: string }>,
+): boolean {
+	return repositories.some((repository) => repository.id !== workspaceId);
+}
