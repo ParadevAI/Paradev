@@ -26,15 +26,18 @@ interface CodingAgentSetupProps {
 function AgentInstall({
 	agent,
 	onInstalled,
+	onCancelled,
 	onRetry,
 	onCheckAgain,
 }: {
 	agent: CodingAgentId;
 	onInstalled: () => void;
+	onCancelled: () => void;
 	onRetry: () => void;
 	onCheckAgain: () => Promise<boolean>;
 }) {
-	const install = useToolInstallState(onInstalled);
+	const install = useToolInstallState({ onInstalled, onCancelled });
+	const cancel = electronTrpc.codingAgents.cancelInstall.useMutation();
 	electronTrpc.codingAgents.install.useSubscription(
 		{ agent },
 		{ onData: install.onData, onError: install.onError },
@@ -50,6 +53,7 @@ function AgentInstall({
 			}}
 			onRetry={onRetry}
 			onCheckAgain={onCheckAgain}
+			onCancel={() => cancel.mutate({ agent })}
 		/>
 	);
 }
@@ -76,6 +80,7 @@ export function CodingAgentSetup({
 				key={attempt}
 				agent={agent}
 				onInstalled={() => void refresh().then(onInstalled)}
+				onCancelled={onCancel}
 				onRetry={() => setAttempt((prev) => prev + 1)}
 				onCheckAgain={async () => {
 					const next = await refresh();

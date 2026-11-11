@@ -8,4 +8,5 @@ export {
 	type CodingAgentId,
 	isCodingAgentId,
 } from "./constants";
+export { useAgentInstallRunning } from "./hooks/useAgentInstallRunning";
 export { useAgentSignInState } from "./hooks/useAgentSignInState";

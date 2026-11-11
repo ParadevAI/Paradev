@@ -21,6 +21,8 @@ interface AgentMissingCardProps {
 	detail?: string | undefined;
 	/** Installed elsewhere, from Settings say, while this chat waited. */
 	installed?: boolean;
+	/** An install of this agent is running, maybe started on another screen. */
+	installRunning?: boolean;
 	/** Installed, but older than chat needs. */
 	outdated?: { version: string; minVersion: string; ownInstall: boolean };
 	otherAgents: Array<{ presetId: string; label: string }>;
@@ -33,6 +35,7 @@ export function AgentMissingCard({
 	agent,
 	detail,
 	installed = false,
+	installRunning = false,
 	outdated,
 	otherAgents,
 	onUseAgent,
@@ -42,7 +45,9 @@ export function AgentMissingCard({
 	const [picked, setPhase] = useState<
 		"missing" | "installing" | "installed" | null
 	>(null);
-	const phase = picked ?? (installed ? "installed" : "missing");
+	const phase =
+		picked ??
+		(installRunning ? "installing" : installed ? "installed" : "missing");
 	const version = outdated?.version;
 	const minVersion = outdated?.minVersion;
 
@@ -70,13 +75,13 @@ export function AgentMissingCard({
 								<Trans>Try again to start this chat.</Trans>
 							) : outdated?.ownInstall ? (
 								<Trans>
-									Chat needs {minVersion} or newer. Update your {name},
-									then click Try again.
+									Chat needs {minVersion} or newer. Update your {name}, then
+									click Try again.
 								</Trans>
 							) : outdated ? (
 								<Trans>
-									Chat needs {minVersion} or newer. Paradev can update
-									it for you.
+									Chat needs {minVersion} or newer. Paradev can update it for
+									you.
 								</Trans>
 							) : (
 								<Trans>

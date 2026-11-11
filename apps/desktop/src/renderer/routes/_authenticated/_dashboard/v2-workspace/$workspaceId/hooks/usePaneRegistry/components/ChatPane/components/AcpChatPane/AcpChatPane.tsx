@@ -19,7 +19,10 @@ import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTermina
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { isCodingAgentId } from "renderer/routes/_authenticated/components/CodingAgentSetup";
+import {
+	isCodingAgentId,
+	useAgentInstallRunning,
+} from "renderer/routes/_authenticated/components/CodingAgentSetup";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
@@ -761,6 +764,9 @@ export function AcpChatPane({
 		installFailure && (missingNow || missingIn === failureKey)
 			? (missingNow ?? installable)
 			: null;
+	const installRunning = useAgentInstallRunning(installable ?? "claude", {
+		enabled: missingAgent !== null,
+	});
 	const lookingUpAgent =
 		installFailure !== null &&
 		installable !== null &&
@@ -920,6 +926,7 @@ export function AcpChatPane({
 								agent={missingAgent}
 								detail={installFailure.detail}
 								installed={agentStatus.data?.usable === true}
+								installRunning={installRunning}
 								outdated={
 									agentStatus.data?.installed && agentStatus.data.version
 										? {

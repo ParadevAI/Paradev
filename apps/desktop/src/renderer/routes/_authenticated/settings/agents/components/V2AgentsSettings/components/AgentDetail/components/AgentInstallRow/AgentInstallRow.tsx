@@ -8,6 +8,7 @@ import {
 	type CodingAgentId,
 	CodingAgentSetup,
 	type CodingAgentSetupStep,
+	useAgentInstallRunning,
 	useAgentSignInState,
 } from "renderer/routes/_authenticated/components/CodingAgentSetup";
 import { SettingsRow } from "renderer/routes/_authenticated/settings/components/SettingsRow";
@@ -19,7 +20,9 @@ interface AgentInstallRowProps {
 export function AgentInstallRow({ agent }: AgentInstallRowProps) {
 	const { t } = useLingui();
 	const name = CODING_AGENT_NAMES[agent];
-	const [step, setStep] = useState<CodingAgentSetupStep | null>(null);
+	const [pickedStep, setStep] = useState<CodingAgentSetupStep | null>(null);
+	const installRunning = useAgentInstallRunning(agent);
+	const step = pickedStep ?? (installRunning ? "install" : null);
 	const status = electronTrpc.codingAgents.status.useQuery(
 		{ agent },
 		{ refetchOnWindowFocus: "always" },

@@ -4,13 +4,15 @@ import {
 	managedAgentBinaryPath,
 	managedCodexRootDir,
 } from "@superset/agent-setup/managed-agent-binaries";
-import { observable } from "@trpc/server/observable";
 import { net } from "electron";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
 import { isSignedByTeam, TEAM_IDS } from "../utils/code-signature";
 import { macArch } from "../utils/mac-arch";
-import { createSingleInstall } from "../utils/single-install";
+import {
+	createSingleInstall,
+	installSubscription,
+} from "../utils/single-install";
 import { getProcessEnvWithShellEnv } from "../workspaces/utils/shell-env";
 import type { AgentInstallEvent } from "./utils/agent-install-event";
 import {
@@ -91,7 +93,11 @@ async function install(
 	});
 }
 
-const subscribeToInstall = createSingleInstall<AgentInstallEvent>();
+type AgentInstallUpdate = AgentInstallEvent | { stage: "cancelled" };
+
+const agentInstalls = createSingleInstall<AgentInstallUpdate>({
+	cancelled: { stage: "cancelled" },
+});
 
 export const createCodingAgentsRouter = () => {
 	// No install runs yet at startup, so a download a quit app left is stale.
@@ -101,19 +107,27 @@ export const createCodingAgentsRouter = () => {
 		status: publicProcedure
 			.input(agentInput)
 			.query(({ input }) => detect(input.agent)),
-		install: publicProcedure.input(agentInput).subscription(({ input }) => {
-			return observable<AgentInstallEvent>((emit) =>
-				subscribeToInstall(
-					input.agent,
-					(emitProgress, signal) => install(input.agent, emitProgress, signal),
-					(event) => {
-						emit.next(event);
-						if (event.stage === "done" || event.stage === "failed") {
-							emit.complete();
-						}
-					},
+		install: publicProcedure
+			.input(agentInput)
+			.subscription(({ input }) =>
+				installSubscription<AgentInstallUpdate>((listener) =>
+					agentInstalls.join(
+						input.agent,
+						(emit, signal) => install(input.agent, emit, signal),
+						listener,
+					),
 				),
-			);
+			),
+		installProgress: publicProcedure
+			.input(agentInput)
+			.subscription(({ input }) =>
+				installSubscription<AgentInstallUpdate>(
+					(listener) => agentInstalls.watch(input.agent, listener),
+					{ endAtLast: false },
+				),
+			),
+		cancelInstall: publicProcedure.input(agentInput).mutation(({ input }) => {
+			agentInstalls.cancel(input.agent);
 		}),
 	});
 };
