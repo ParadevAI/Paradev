@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
 	isWorkspaceTagVisibleTo,
+	mintFolderTag,
 	normalizeWorkspaceTag,
 	normalizeWorkspaceTags,
 	SESSIONS_TAG_SCOPE,
@@ -79,6 +80,34 @@ describe("normalizeWorkspaceTags", () => {
 			"a",
 			"b",
 		]);
+	});
+});
+
+describe("mintFolderTag", () => {
+	test("normalizes the name into a tag", () => {
+		expect(mintFolderTag("  Perf Work ", [])).toBe("perf work");
+	});
+
+	test("falls back to `group` for a name that can't be a tag", () => {
+		expect(mintFolderTag("   ", [])).toBe("group");
+		expect(mintFolderTag(null, [])).toBe("group");
+		expect(mintFolderTag(undefined, [])).toBe("group");
+	});
+
+	test("suffixes -2, -3 on collisions", () => {
+		expect(mintFolderTag("Perf", ["perf"])).toBe("perf-2");
+		expect(mintFolderTag("Perf", ["perf", "perf-2"])).toBe("perf-3");
+	});
+
+	test("normalizes taken tags before comparing", () => {
+		expect(mintFolderTag("perf", [" PERF "])).toBe("perf-2");
+	});
+
+	test("keeps collision suffixes within the tag length cap", () => {
+		const base = "a".repeat(64);
+		const minted = mintFolderTag(base, [base]);
+		expect(minted.length).toBeLessThanOrEqual(64);
+		expect(minted.endsWith("-2")).toBe(true);
 	});
 });
 

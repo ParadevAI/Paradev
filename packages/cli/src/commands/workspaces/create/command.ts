@@ -1,10 +1,12 @@
 import { boolean, CLIError, number, string } from "@superset/cli-framework";
 import { MACHINE_SIZES } from "@superset/shared/billing";
+import { tagFolderScope } from "@superset/shared/workspace-tags";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
 import { workspaceLinks } from "../../../lib/open-url";
 import { uploadAttachments } from "../../../lib/upload-attachments";
+import { claimGroupTag, loadGroupContext } from "../../../lib/workspace-groups";
 import { createCloudWorkspace } from "./createCloudWorkspace";
 
 export default command({
@@ -64,10 +66,13 @@ export default command({
 			.desc(
 				"Local file path to give the agent as an attachment. Repeatable. Only used when --agent is set",
 			),
+		group: string().desc(
+			"Sidebar group to put the workspace in, by the name the desktop shows (case-insensitive). Makes a new group when none has that name. Cannot be combined with --tag",
+		),
 		tag: string()
 			.variadic()
 			.desc(
-				"Workspace tag. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
+				"Workspace tag. Repeatable. Each tag is a sidebar group; a group renamed in the desktop keeps its first tag, so prefer --group",
 			),
 	},
 	run: async ({ ctx, options }) => {
@@ -132,7 +137,6 @@ export default command({
 				["--base-branch", options.baseBranch],
 				["--task", options.task],
 				["--skip-branch-prefix", options.skipBranchPrefix || undefined],
-				["--tag", options.tag?.length ? options.tag : undefined],
 			] as const) {
 				if (value !== undefined) {
 					throw new CLIError(
@@ -168,6 +172,13 @@ export default command({
 					"Use --branch <name>, --pr <number>, --task <id>, or --checkout local",
 				);
 			}
+		}
+
+		if (options.group !== undefined && options.tag?.length) {
+			throw new CLIError(
+				"Cannot combine --group and --tag",
+				"--group sets the workspace's tag; pass one or the other",
+			);
 		}
 
 		if (options.prompt && !options.agent) {
@@ -214,6 +225,19 @@ export default command({
 			throw new CLIError("--name is required when --project is set");
 		}
 
+		const tags =
+			options.group !== undefined
+				? [
+						await claimGroupTag(
+							target.client,
+							await loadGroupContext(target.client),
+							{ name: options.group, scope: tagFolderScope(projectId ?? null) },
+						),
+					]
+				: options.tag?.length
+					? options.tag
+					: undefined;
+
 		const attachmentIds = options.attachment
 			? await uploadAttachments({
 					target,
@@ -240,6 +264,7 @@ export default command({
 				name: options.name,
 				agents,
 				command: options.command ?? undefined,
+				...(tags ? { tags } : {}),
 			});
 			const links = workspaceLinks(result.workspace.id);
 			return {
@@ -266,7 +291,7 @@ export default command({
 			skipBranchPrefix: options.skipBranchPrefix ?? undefined,
 			agents,
 			command: options.command ?? undefined,
-			...(options.tag?.length ? { tags: options.tag } : {}),
+			...(tags ? { tags } : {}),
 		});
 
 		const links = workspaceLinks(result.workspace.id);

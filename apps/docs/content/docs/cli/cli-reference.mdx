@@ -762,6 +762,7 @@ points you at `superset start`.
 		{ flag: "--local", description: "List workspaces on this machine (the default)." },
 		{ flag: "--project <nameOrId>", description: "Filter by project name (case-insensitive) or id." },
 		{ flag: "--search <text>", description: "Substring match against workspace name or branch. Alias: -s." },
+		{ flag: "--group <name>", description: "Filter to workspaces in the sidebar group the desktop shows by this name (case-insensitive)." },
 		{ flag: "--tag <tag>", description: "Filter to workspaces carrying this tag (case-insensitive)." },
 	]}
 	output={`Array<{
@@ -772,15 +773,18 @@ points you at `superset start`.
   projectName: string;
   hostId: string;
   tags: string;   // comma-joined tag set
+  group: string;  // comma-joined group names, as the desktop shows them
   url: string;
   webUrl: string;
 }>`}
-	humanColumns={["NAME", "BRANCH", "PROJECT", "TAGS", "ID"]}
+	humanColumns={["NAME", "BRANCH", "PROJECT", "GROUP", "ID"]}
 	quiet="workspace IDs"
 >
 List workspaces. Host workspaces are host-owned; there is no org-wide listing
 (the desktop app is the cross-host view). `projectName` falls back to the raw
-project id when the host does not know the project's name.
+project id when the host does not know the project's name. `group` shows the
+name the desktop shows for each of the workspace's groups; see
+[Sidebar groups](#sidebar-groups).
 </Command>
 
 <Command
@@ -805,7 +809,8 @@ project id when the host does not know the project's name.
 		{ flag: "--effort <level>", description: "Reasoning effort for the spawned agent. Omit to use the agent default." },
 		{ flag: "--command <cmd>", description: "Shell command to run in the new workspace after creation." },
 		{ flag: "--attachment <path>", description: "Local file to upload for the spawned agent. Repeatable. Up to 25 MB a file on a host, 200 MB in the cloud." },
-		{ flag: "--tag <tag>", description: "Workspace tag. Repeatable. Each tag groups the workspace into a sidebar folder of the same name." },
+		{ flag: "--group <name>", description: "Sidebar group to put the workspace in, by the name the desktop shows (case-insensitive). Makes a new group when none has that name. Mutually exclusive with --tag." },
+		{ flag: "--tag <tag>", description: "Workspace tag. Repeatable. Each tag is a sidebar group; prefer --group to pick a group by name." },
 	]}
 	output={`{ workspace: Workspace; alreadyExists: boolean; url: string; webUrl: string }`}
 >
@@ -824,8 +829,9 @@ It does not switch branches or run setup. Do not combine it with `--branch`, `--
 Pass `--session` explicitly to create a **session**: a project-less workspace backed
 by a managed folder under `~/.paradev/sessions`, initialized as its own git
 repo. Sessions have no branch semantics, so `--branch`, `--pr`, `--task`,
-`--base-branch`, `--checkout`, `--skip-branch-prefix`, and `--tag` are rejected, `--name` is
-optional, and the output has no `alreadyExists` field. Host workspace creation
+`--base-branch`, `--checkout`, and `--skip-branch-prefix` are rejected, `--name` is
+optional, and the output has no `alreadyExists` field. `--group` and `--tag` put a
+session in a group of the Sessions section. Host workspace creation
 requires either `--project <id>` or `--session`; omitting both is an error.
 
 Without `--host` or `--local`, the command creates a [cloud workspace](/cloud-workspaces)
@@ -852,8 +858,8 @@ superset workspaces create \
 # Project-less session with an agent
 superset workspaces create --session --local --agent claude --prompt "…"
 
-# Tags group the workspace into sidebar folders
-superset workspaces create --project prj_… --name "perf-spike" --branch perf/spike --local --tag perf
+# Put the workspace in the "Active Build" sidebar group (made if missing)
+superset workspaces create --project prj_… --name "perf-spike" --branch perf/spike --local --group "Active Build"
 ```
 </Command>
 
@@ -993,7 +999,7 @@ superset workspaces share remove ws_a --user ann@example.com
 	]}
 	options={[
 		{ flag: "--host <id>", description: "Host the workspace lives on, or `cloud`. See [Choosing a host](#choosing-a-host)." },
-		{ flag: "--field <name>", description: "Print a single field's raw value (e.g. name, branch, worktreePath). Alias: -f." },
+		{ flag: "--field <name>", description: "Print a single field's raw value (e.g. name, branch, group, worktreePath). Alias: -f." },
 	]}
 	output={`{
   id: string;
@@ -1005,6 +1011,8 @@ superset workspaces share remove ws_a --user ann@example.com
   hostId: string;
   hostName: string;
   taskId: string | null;
+  group: string | null;  // comma-joined group names, as the desktop shows them
+  tags: string | null;   // comma-joined tag set
   worktreePath: string;
   worktreeExists: boolean;
   createdAt: Date;
@@ -1031,8 +1039,9 @@ superset workspaces get --field branch   # inside a workspace
 		{ flag: "--name <name>", description: "New workspace name." },
 		{ flag: "--task-id <id>", description: "Link the workspace to a task by id." },
 		{ flag: "--clear-task", description: "Unlink the workspace from its current task. Mutually exclusive with --task-id." },
-		{ flag: "--tag <tag>", description: "Replace the workspace's tag set. Repeatable. Each tag groups the workspace into a sidebar folder of the same name." },
-		{ flag: "--clear-tags", description: "Remove every tag. Mutually exclusive with --tag." },
+		{ flag: "--group <name>", description: "Move a workspace on a host to the sidebar group the desktop shows by this name (case-insensitive), or to a new group by that name. Replaces the tag set. Mutually exclusive with --tag and --clear-tags." },
+		{ flag: "--tag <tag>", description: "Replace the workspace's tag set. Repeatable. Each tag is a sidebar group; prefer --group to pick a group by name." },
+		{ flag: "--clear-tags", description: "Remove every tag, which takes the workspace out of its group. Mutually exclusive with --tag." },
 		{ flag: "--visibility <just_me|org>", description: "Who sees a cloud workspace. Only its creator can change it." },
 		{ flag: "--add-label <name>", description: "Add a label to a cloud workspace, creating it when new. Repeatable." },
 		{ flag: "--remove-label <name>", description: "Remove a label from a cloud workspace. Repeatable." },
@@ -1040,9 +1049,9 @@ superset workspaces get --field branch   # inside a workspace
 	]}
 	output="Workspace"
 >
-Update a workspace (default: the cloud if your account has cloud workspaces, else this machine). `--tag` replaces the
-whole tag set: tagging is how workspaces group into sidebar folders, so
-retagging moves the workspace between folders.
+Update a workspace (default: the cloud if your account has cloud workspaces, else this machine). `--group` and `--tag`
+replace the whole tag set, so they move the workspace from one sidebar group to
+another. `--group` works only on a host, where group names are kept.
 
 On a cloud workspace every field is saved by the API, so it works while the
 sandbox is asleep. There, `--task-id` also takes a task slug and adds a link
@@ -1056,12 +1065,30 @@ A sleeping sandbox starts at the new size the next time it wakes.
 ```bash
 superset workspaces update ws_… --name "better-name"
 superset workspaces update ws_… --task-id tsk_…
-superset workspaces update ws_… --tag perf --tag infra
+superset workspaces update ws_… --group Review
 superset workspaces update ws_… --clear-task
 superset workspaces update ws_… --add-label bug --visibility org
 superset workspaces update ws_… --machine-size xlarge
 ```
 </Command>
+
+#### Sidebar groups
+
+A sidebar group is a tag. The desktop puts every workspace of a project that
+carries a tag into the group for that tag. When you rename a group in the
+desktop, only its shown name changes; the tag stays the same. A group made in
+the desktop starts as "New group", so its tag is usually `new group` or
+`new group-2`, whatever name it shows.
+
+For this reason, use `--group` with the name the desktop shows. The CLI finds
+the tag of that group on the host. When no group has that name, the CLI makes a
+new group that shows the name as you typed it. `--tag` uses the tag as it is,
+so `--tag review` can make a second group next to the one named "Review".
+
+The position of a workspace in a group is kept by each desktop app, so the CLI
+cannot set it. A cloud workspace takes `--tag` on `update`, which files it into
+the matching folder of its project; `--group` is for workspaces on a host, since
+group names are kept on the host.
 
 <Command
 	name="superset workspaces open <id>"

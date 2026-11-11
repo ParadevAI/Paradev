@@ -65,6 +65,35 @@ export function normalizeWorkspaceTags(
 	return [...unique].sort();
 }
 
+/**
+ * Mint a tag for a folder from its display name: normalize (trim+lowercase —
+ * tags allow spaces, no further slugging), fall back to "group" for a name
+ * that can't be a tag, and suffix `-2`, `-3`, … while the tag is taken.
+ */
+export function mintFolderTag(
+	name: string | null | undefined,
+	takenTags: Iterable<string>,
+): string {
+	const taken = new Set<string>();
+	for (const tag of takenTags) {
+		const normalized = normalizeWorkspaceTag(tag);
+		if (normalized != null) taken.add(normalized);
+	}
+	const base = normalizeWorkspaceTag(name) ?? "group";
+	if (!taken.has(base)) return base;
+	let counter = 2;
+	for (;;) {
+		const suffix = `-${counter}`;
+		// Trim the base so the suffixed tag stays within the length cap —
+		// the host rejects (never trims) over-length tags.
+		const candidate =
+			base.slice(0, WORKSPACE_TAG_MAX_LENGTH - suffix.length).trimEnd() +
+			suffix;
+		if (!taken.has(candidate)) return candidate;
+		counter += 1;
+	}
+}
+
 /** Router-boundary schema for one tag; parses to its stored normalized form. */
 export const workspaceTagInputSchema = z
 	.string()
