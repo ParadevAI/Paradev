@@ -322,3 +322,33 @@ test("the container's diff stats sum every checkout, for the Workspaces board", 
 		{ workspaceId: workspace.id, additions: 3, deletions: 0, fileCount: 2 },
 	]);
 });
+
+test("renaming the branch in one checkout renames it in every checkout", async () => {
+	const { host, workspace, checkouts } = await containerWorkspace();
+
+	await host.trpc.git.renameBranch.mutate({
+		workspaceId: checkouts[0]?.id ?? "",
+		oldName: "feature/both",
+		newName: "feature/renamed",
+	});
+
+	const renamed = await host.trpc.workspace.repositories.query({
+		workspaceId: workspace.id,
+	});
+	expect(renamed.map((checkout) => checkout.branch)).toEqual([
+		"feature/renamed",
+		"feature/renamed",
+	]);
+	for (const checkout of checkouts) {
+		const head = Bun.spawnSync(["git", "branch", "--show-current"], {
+			cwd: checkout.worktreePath,
+		});
+		expect(head.stdout.toString().trim()).toBe("feature/renamed");
+	}
+	const container = host.db
+		.select({ branch: workspaces.branch })
+		.from(workspaces)
+		.where(eq(workspaces.id, workspace.id))
+		.get();
+	expect(container?.branch).toBe("feature/renamed");
+});

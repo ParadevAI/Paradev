@@ -1,7 +1,8 @@
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
+import type { SimpleGit } from "simple-git";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
@@ -161,6 +162,24 @@ const CHECKOUT_REFUSALS = {
 		message: (branch: string) => `No branch ${branch} here or on origin.`,
 	},
 } as const;
+
+async function assertBranchNotPushed(
+	git: SimpleGit,
+	branch: string,
+): Promise<void> {
+	try {
+		const remote = await git.raw(["ls-remote", "--heads", "origin", branch]);
+		if (remote.trim()) {
+			throw new TRPCError({
+				code: "PRECONDITION_FAILED",
+				message: "Cannot rename a branch that has been pushed to remote",
+			});
+		}
+	} catch (error) {
+		if (error instanceof TRPCError) throw error;
+		// ls-remote failed — probably no remote, safe to rename
+	}
+}
 
 function runStatusSnapshot(
 	ctx: Parameters<typeof resolveWorktreePath>[0] &
@@ -554,41 +573,68 @@ export const gitRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
-			// Background naming may have renamed the branch after the caller
-			// read it. Only then does the caller's name no longer exist, and
-			// the row holds the branch the workspace has now. The row can lag
-			// a checkout, so an existing name is always taken as given.
-			const callerBranchExists =
-				(await git.raw(["branch", "--list", input.oldName])).trim() !== "";
-			const oldName = callerBranchExists
-				? input.oldName
-				: (getLocalWorkspace(ctx.db, input.workspaceId)?.branch ??
-					input.oldName);
+			// A multi-repo workspace keeps one branch name across its checkouts.
+			const containerId =
+				getLocalWorkspace(ctx.db, input.workspaceId)?.parentWorkspaceId ??
+				(listRepositoryWorkspaces(ctx.db, input.workspaceId).length > 0
+					? input.workspaceId
+					: null);
+			const targetIds = containerId
+				? listRepositoryWorkspaces(ctx.db, containerId).map(
+						(checkout) => checkout.id,
+					)
+				: [input.workspaceId];
 
-			// Check if branch has been pushed to remote
-			try {
-				const remote = await git.raw([
-					"ls-remote",
-					"--heads",
-					"origin",
-					oldName,
-				]);
-				if (remote.trim()) {
-					throw new TRPCError({
-						code: "PRECONDITION_FAILED",
-						message: "Cannot rename a branch that has been pushed to remote",
-					});
-				}
-			} catch (error) {
-				if (error instanceof TRPCError) throw error;
-				// ls-remote failed — probably no remote, safe to rename
+			const renames: {
+				workspaceId: string;
+				git: SimpleGit;
+				oldName: string;
+			}[] = [];
+			for (const workspaceId of targetIds) {
+				await cancelAndWaitWorkspaceTitleCommit(ctx.db, workspaceId);
+				const git = await ctx.git(resolveWorktreePath(ctx, workspaceId));
+				// Background naming may have renamed the branch after the caller
+				// read it. Only then does the caller's name no longer exist, and
+				// the row holds the branch the workspace has now. The row can lag
+				// a checkout, so an existing name is always taken as given.
+				const callerBranchExists =
+					(await git.raw(["branch", "--list", input.oldName])).trim() !== "";
+				if (!callerBranchExists && workspaceId !== input.workspaceId) continue;
+				const oldName = callerBranchExists
+					? input.oldName
+					: (getLocalWorkspace(ctx.db, workspaceId)?.branch ?? input.oldName);
+				await assertBranchNotPushed(git, oldName);
+				renames.push({ workspaceId, git, oldName });
 			}
 
-			await git.raw(["branch", "-m", oldName, input.newName]);
-			invalidateStatus(input.workspaceId);
+			const done: typeof renames = [];
+			try {
+				for (const rename of renames) {
+					await rename.git.raw(["branch", "-m", rename.oldName, input.newName]);
+					done.push(rename);
+				}
+			} catch (error) {
+				for (const rename of done) {
+					await rename.git
+						.raw(["branch", "-m", input.newName, rename.oldName])
+						.catch(() => {});
+				}
+				throw error;
+			}
+
+			if (containerId) {
+				ctx.db
+					.update(workspaces)
+					.set({ branch: input.newName })
+					.where(
+						inArray(workspaces.id, [
+							containerId,
+							...renames.map((rename) => rename.workspaceId),
+						]),
+					)
+					.run();
+			}
+			for (const rename of renames) invalidateStatus(rename.workspaceId);
 			return { name: input.newName };
 		}),
 

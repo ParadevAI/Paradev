@@ -79,7 +79,10 @@ export function useChangesScope(workspaceId: string): ChangesScope {
 		{ refetchInterval: 30_000, refetchOnWindowFocus: true },
 	);
 
-	const renameBranchMutation = workspaceTrpc.git.renameBranch.useMutation();
+	const renameBranchMutation = workspaceTrpc.git.renameBranch.useMutation({
+		// A multi-repo rename changes every repository's branch.
+		onSuccess: () => utils.workspace.repositories.invalidate(),
+	});
 
 	const renameBranch = useCallback(
 		(newName: string) => {
