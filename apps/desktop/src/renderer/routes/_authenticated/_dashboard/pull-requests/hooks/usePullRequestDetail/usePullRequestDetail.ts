@@ -28,6 +28,7 @@ import {
 	type PullRequestProject,
 	resolvePullRequestTarget,
 } from "../../utils/resolvePullRequestTarget";
+import { PULL_REQUEST_STACK_QUERY_KEY_PREFIX } from "../usePullRequestStack";
 
 export type { PullRequestMergeability };
 export type PullRequestDetailActor = PullRequestActor;
@@ -41,7 +42,15 @@ export type PullRequestDetail = PullRequestDetailBase &
 		capabilities: PullRequestDetailRead["capabilities"];
 		/** The repository's allowed merge methods and the main button's choice. */
 		mergeMethods: MergeMethodChoices;
+		/** Absent from details cached by builds older than this field. */
+		mergeQueue?: PullRequestMergeQueue;
 	};
+
+export interface PullRequestMergeQueue {
+	enabled: boolean;
+	/** Position 1 merges next. */
+	entry: { position: number | null; state: string } | null;
+}
 
 /**
  * A detail as the query cache holds it. Entries persisted by builds older
@@ -187,6 +196,9 @@ export function useInvalidatePullRequestDetail(
 			});
 			void client.invalidateQueries({
 				queryKey: V2_WORKSPACES_PULL_REQUEST_QUERY_KEY_PREFIX,
+			});
+			void client.invalidateQueries({
+				queryKey: PULL_REQUEST_STACK_QUERY_KEY_PREFIX,
 			});
 		}
 		if (prNumber !== null) {

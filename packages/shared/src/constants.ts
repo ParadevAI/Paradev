@@ -168,6 +168,14 @@ export const FEATURE_FLAGS = {
 	 * a change in PostHog applies on the next start.
 	 */
 	PARADEV_SHELL: "paradev-shell",
+	/**
+	 * Kill switch for stacked pull requests on the desktop: the stack read and
+	 * chip, stack merge, merge queue actions, and switching a workspace between
+	 * layers. On for everyone. Unloaded or offline means on, and so does a
+	 * disabled or deleted flag: to turn it off, keep the flag enabled and set
+	 * its rollout to 0%. Plain Merge works either way.
+	 */
+	STACKED_PULL_REQUESTS: "stacked-pull-requests",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**
