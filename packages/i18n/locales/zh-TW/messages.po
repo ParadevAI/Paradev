@@ -1053,6 +1053,9 @@ msgstr "{total}項檢查中有{failing}項失敗"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {此工作區中有 # 個檔案更改} other {此工作區中有 # 個檔案更改}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# 個檔案已變更} other {# 個檔案已變更}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {編輯了 # 個檔案} other {編輯了 # 個檔案}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, other {# 個 PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · 目標 {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# 個待拉取的提交} other {# 個待拉取的提交}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# 個未推送的提交} other {# 個未推送的提交}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {佇列中有 # 則訊息等待} other {佇列中有 # 則訊息等待}}"
@@ -3795,6 +3804,9 @@ msgstr "分支名不可用"
 msgid "Branch names cannot end with a space."
 msgstr "分支名不能以空格結尾。"
 
+msgid "Branch not published"
+msgstr "分支未發佈"
+
 msgid "Branch or tag (optional)"
 msgstr "分支或標籤（選填）"
 
@@ -5981,6 +5993,9 @@ msgstr "無法載入外掛。請檢查連線後再試一次。"
 msgid "Could not load presets from the host"
 msgstr "無法從主機載入預設"
 
+msgid "Could not load the repository's status"
+msgstr "無法載入儲存庫狀態"
+
 msgid "Could not load this diff"
 msgstr "無法載入這個差異"
 
@@ -7360,11 +7375,17 @@ msgstr "危險"
 msgid "Detached"
 msgstr "已分離"
 
+msgid "Detached HEAD"
+msgstr "分離的 HEAD"
+
 msgid "Details"
 msgstr "詳情"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "此處無法顯示詳細資料，但連結仍可開啟。"
+
+msgid "Details for {repositoryName}"
+msgstr "{repositoryName} 的詳細資料"
 
 msgid "Detect your physical location"
 msgstr "偵測你的實際位置"
@@ -13344,6 +13365,9 @@ msgstr "未找到拉取請求。"
 msgid "No release notes at {url}"
 msgstr "{url} 上沒有版本說明"
 
+msgid "No remote repository"
+msgstr "沒有遠端儲存庫"
+
 msgid "No repositories found."
 msgstr "找不到儲存庫。"
 
@@ -13466,6 +13490,9 @@ msgstr "還沒有討論串"
 
 msgid "No triggers"
 msgstr "沒有觸發器"
+
+msgid "No uncommitted changes"
+msgstr "沒有未提交的變更"
 
 msgid "No Updates"
 msgstr "無可用更新"
@@ -13684,6 +13711,9 @@ msgstr "最近 30 天尚未發佈任何資料。這台機器的用量同步後�
 msgid "Nothing to open yet. Send a message first."
 msgstr "目前沒有可開啟的內容。請先傳送一則訊息。"
 
+msgid "Nothing to ship"
+msgstr "沒有可發佈的內容"
+
 msgid "Nothing was missed"
 msgstr "沒有錯過的執行"
 
@@ -13819,6 +13849,9 @@ msgstr "收到審查請求時"
 
 msgid "on the board"
 msgstr "在榜上"
+
+msgid "On the default branch"
+msgstr "位於預設分支"
 
 msgid "On this pace"
 msgstr "按此速度"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0}（{1}）"
 msgid "PR #{0} created"
 msgstr "已建立PR #{0}"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR已關閉"
 
@@ -16194,6 +16230,9 @@ msgstr "可讀可發"
 
 msgid "Ready"
 msgstr "就緒"
+
+msgid "Ready for a pull request"
+msgstr "可以建立PR"
 
 msgid "Ready for review"
 msgstr "待審查"
@@ -18497,6 +18536,9 @@ msgstr "使用Shiki高亮，行號可選"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "微光 · 微光標籤"
+
+msgid "Ship"
+msgstr "發佈"
 
 msgid "Ship every week"
 msgstr "每週發布"

@@ -5,8 +5,10 @@ import { memo, useMemo } from "react";
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useWorkspaceRepositories } from "../../state/activeRepositoryStore";
 import { changesPillStats } from "../../utils/changesPillStats";
 import { ChangesStats } from "../ChangesStats";
+import { MultiRepoShipControl } from "./components/MultiRepoShipControl";
 import { PRStatusGroup } from "./components/PRStatusGroup";
 import { ShipControl } from "./components/ShipControl";
 
@@ -45,7 +47,11 @@ export const ChangesControl = memo(function ChangesControl({
 }: ChangesControlProps) {
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
-	const { flowState, onRetry } = usePRFlowState(workspaceId);
+	const repositories = useWorkspaceRepositories(workspaceId);
+	const isMultiRepo = repositories.length > 1;
+	const { flowState, onRetry } = usePRFlowState(workspaceId, {
+		enabled: !isMultiRepo,
+	});
 	const stats = useMemo(
 		() => (status.data ? changesPillStats(status.data) : null),
 		[status.data],
@@ -58,6 +64,19 @@ export const ChangesControl = memo(function ChangesControl({
 		: t({
 				message: "Open changes",
 			});
+
+	if (isMultiRepo) {
+		return (
+			<MultiRepoShipControl
+				workspaceId={workspaceId}
+				repositories={repositories}
+				isChangesOpen={isChangesOpen}
+				toggleLabel={label}
+				onToggleChanges={onToggleChanges}
+				onOpenPullRequest={onOpenPullRequest}
+			/>
+		);
+	}
 
 	const hasPr =
 		flowState.kind === "pr-exists" ||

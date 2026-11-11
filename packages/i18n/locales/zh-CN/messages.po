@@ -1053,6 +1053,9 @@ msgstr "{total}项检查中有{failing}项失败"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {此工作区中有 # 个文件更改} other {此工作区中有 # 个文件更改}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# 个文件已更改} other {# 个文件已更改}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · 目标 {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# 个待拉取的提交} other {# 个待拉取的提交}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# 个未推送的提交} other {# 个未推送的提交}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {队列中有 # 条消息等待} other {队列中有 # 条消息等待}}"
@@ -3795,6 +3804,9 @@ msgstr "分支名不可用"
 msgid "Branch names cannot end with a space."
 msgstr "分支名不能以空格结尾。"
 
+msgid "Branch not published"
+msgstr "分支未发布"
+
 msgid "Branch or tag (optional)"
 msgstr "分支或标签（可选）"
 
@@ -5981,6 +5993,9 @@ msgstr "无法加载插件。请检查网络连接后重试。"
 msgid "Could not load presets from the host"
 msgstr "无法从主机加载预设"
 
+msgid "Could not load the repository's status"
+msgstr "无法加载仓库状态"
+
 msgid "Could not load this diff"
 msgstr "无法加载这个差异"
 
@@ -7360,11 +7375,17 @@ msgstr "危险"
 msgid "Detached"
 msgstr "已分离"
 
+msgid "Detached HEAD"
+msgstr "分离的 HEAD"
+
 msgid "Details"
 msgstr "详情"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "此处无法显示详情，但链接仍可打开。"
+
+msgid "Details for {repositoryName}"
+msgstr "{repositoryName} 的详情"
 
 msgid "Detect your physical location"
 msgstr "检测您的实际位置"
@@ -13344,6 +13365,9 @@ msgstr "未找到拉取请求。"
 msgid "No release notes at {url}"
 msgstr "{url} 上没有版本说明"
 
+msgid "No remote repository"
+msgstr "没有远程仓库"
+
 msgid "No repositories found."
 msgstr "未找到仓库。"
 
@@ -13466,6 +13490,9 @@ msgstr "还没有话题"
 
 msgid "No triggers"
 msgstr "没有触发器"
+
+msgid "No uncommitted changes"
+msgstr "没有未提交的更改"
 
 msgid "No Updates"
 msgstr "无可用更新"
@@ -13684,6 +13711,9 @@ msgstr "最近30天还没有已公开的数据。待本机用量同步后，你�
 msgid "Nothing to open yet. Send a message first."
 msgstr "暂无可打开的内容。请先发送一条消息。"
 
+msgid "Nothing to ship"
+msgstr "没有可发布的内容"
+
 msgid "Nothing was missed"
 msgstr "没有错过的运行"
 
@@ -13819,6 +13849,9 @@ msgstr "收到审查请求时"
 
 msgid "on the board"
 msgstr "在榜上"
+
+msgid "On the default branch"
+msgstr "位于默认分支"
 
 msgid "On this pace"
 msgstr "按此速度"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0}（{1}）"
 msgid "PR #{0} created"
 msgstr "已创建PR #{0}"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR已关闭"
 
@@ -16194,6 +16230,9 @@ msgstr "可读可发"
 
 msgid "Ready"
 msgstr "就绪"
+
+msgid "Ready for a pull request"
+msgstr "可以创建PR"
 
 msgid "Ready for review"
 msgstr "待审查"
@@ -18497,6 +18536,9 @@ msgstr "使用Shiki高亮，行号可选"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "微光 · 微光标签"
+
+msgid "Ship"
+msgstr "发布"
 
 msgid "Ship every week"
 msgstr "每周发布"

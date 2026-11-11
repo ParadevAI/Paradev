@@ -1053,6 +1053,9 @@ msgstr "{failing} из {total} проверок не пройдены"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {В этой рабочей области изменён # файл} few {В этой рабочей области изменены # файла} many {В этой рабочей области изменены # файлов} other {В этой рабочей области изменены # файла}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# файл изменён} few {# файла изменено} many {# файлов изменено} other {# файла изменено}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Изменён # файл} few {Изменено # файла} many {Изменено # файлов} other {Изменено # файла}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · в {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# коммит для пула} few {# коммита для пула} many {# коммитов для пула} other {# коммита для пула}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# незапушенный коммит} few {# незапушенных коммита} many {# незапушенных коммитов} other {# незапушенного коммита}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# сообщение ждёт в очереди} few {# сообщения ждут в очереди} many {# сообщений ждут в очереди} other {# сообщения ждут в очереди}}"
@@ -3795,6 +3804,9 @@ msgstr "Имя ветки недоступно"
 msgid "Branch names cannot end with a space."
 msgstr "Имена веток не могут заканчиваться пробелом."
 
+msgid "Branch not published"
+msgstr "Ветка не опубликована"
+
 msgid "Branch or tag (optional)"
 msgstr "Ветка или тег (необязательно)"
 
@@ -5981,6 +5993,9 @@ msgstr "Не удалось загрузить плагины. Проверьт�
 msgid "Could not load presets from the host"
 msgstr "Не удалось загрузить пресеты с хоста"
 
+msgid "Could not load the repository's status"
+msgstr "Не удалось загрузить состояние репозитория"
+
 msgid "Could not load this diff"
 msgstr "Не удалось загрузить этот diff"
 
@@ -7360,11 +7375,17 @@ msgstr "Разрушающая"
 msgid "Detached"
 msgstr "Отключена"
 
+msgid "Detached HEAD"
+msgstr "Отсоединённый HEAD"
+
 msgid "Details"
 msgstr "Детали"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Сведения здесь недоступны, но ссылка всё равно открывается."
+
+msgid "Details for {repositoryName}"
+msgstr "Подробности: {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Определять ваше местоположение"
@@ -13344,6 +13365,9 @@ msgstr "Пул-реквесты не найдены."
 msgid "No release notes at {url}"
 msgstr "Нет заметок о релизе по адресу {url}"
 
+msgid "No remote repository"
+msgstr "Нет удалённого репозитория"
+
 msgid "No repositories found."
 msgstr "Репозитории не найдены."
 
@@ -13466,6 +13490,9 @@ msgstr "Веток пока нет"
 
 msgid "No triggers"
 msgstr "Нет триггеров"
+
+msgid "No uncommitted changes"
+msgstr "Нет незакоммиченных изменений"
 
 msgid "No Updates"
 msgstr "Обновлений нет"
@@ -13684,6 +13711,9 @@ msgstr "За последние 30 дней ещё ничего не опубл�
 msgid "Nothing to open yet. Send a message first."
 msgstr "Пока нечего открывать. Сначала отправьте сообщение."
 
+msgid "Nothing to ship"
+msgstr "Нечего отправлять"
+
 msgid "Nothing was missed"
 msgstr "Ничего не пропущено"
 
@@ -13819,6 +13849,9 @@ msgstr "по запросу ревью"
 
 msgid "on the board"
 msgstr "в рейтинге"
+
+msgid "On the default branch"
+msgstr "На ветке по умолчанию"
 
 msgid "On this pace"
 msgstr "При таком темпе"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "PR #{0} создан"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR закрыт"
 
@@ -16194,6 +16230,9 @@ msgstr "Читает и пишет"
 
 msgid "Ready"
 msgstr "Готов"
+
+msgid "Ready for a pull request"
+msgstr "Готово к PR"
 
 msgid "Ready for review"
 msgstr "Готово к ревью"
@@ -18497,6 +18536,9 @@ msgstr "Подсветка Shiki, с опциональными номерами
 
 msgid "Shimmer · Shimmer Label"
 msgstr "Мерцание · метка мерцания"
+
+msgid "Ship"
+msgstr "Отправить"
 
 msgid "Ship every week"
 msgstr "Релизы каждую неделю"

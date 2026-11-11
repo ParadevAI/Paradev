@@ -1053,6 +1053,9 @@ msgstr "{failing} von {total} Prüfungen fehlgeschlagen"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# Datei in diesem Arbeitsbereich geändert} other {# Dateien in diesem Arbeitsbereich geändert}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# Datei geändert} other {# Dateien geändert}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# Datei bearbeitet} other {# Dateien bearbeitet}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · Ziel {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# Commit zum Pullen} other {# Commits zum Pullen}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# Commit nicht gepusht} other {# Commits nicht gepusht}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# Nachricht wartet in der Warteschlange} other {# Nachrichten warten in der Warteschlange}}"
@@ -3795,6 +3804,9 @@ msgstr "Branch-Name ist nicht verfügbar"
 msgid "Branch names cannot end with a space."
 msgstr "Branch-Namen dürfen nicht mit einem Leerzeichen enden."
 
+msgid "Branch not published"
+msgstr "Branch nicht veröffentlicht"
+
 msgid "Branch or tag (optional)"
 msgstr "Branch oder Tag (optional)"
 
@@ -5981,6 +5993,9 @@ msgstr "Plugins konnten nicht geladen werden. Prüfe deine Verbindung und versuc
 msgid "Could not load presets from the host"
 msgstr "Presets konnten nicht vom Host geladen werden"
 
+msgid "Could not load the repository's status"
+msgstr "Status des Repositorys konnte nicht geladen werden"
+
 msgid "Could not load this diff"
 msgstr "Dieser Diff konnte nicht geladen werden"
 
@@ -7360,11 +7375,17 @@ msgstr "Destruktiv"
 msgid "Detached"
 msgstr "Abgelöst"
 
+msgid "Detached HEAD"
+msgstr "Losgelöster HEAD"
+
 msgid "Details"
 msgstr "Details"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details sind hier nicht verfügbar, der Link lässt sich aber trotzdem öffnen."
+
+msgid "Details for {repositoryName}"
+msgstr "Details zu {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Deinen Standort ermitteln"
@@ -13344,6 +13365,9 @@ msgstr "Keine Pull Requests gefunden."
 msgid "No release notes at {url}"
 msgstr "Keine Release Notes unter {url}"
 
+msgid "No remote repository"
+msgstr "Kein Remote-Repository"
+
 msgid "No repositories found."
 msgstr "Keine Repositories gefunden."
 
@@ -13466,6 +13490,9 @@ msgstr "Noch keine Threads"
 
 msgid "No triggers"
 msgstr "Keine Trigger"
+
+msgid "No uncommitted changes"
+msgstr "Keine nicht committeten Änderungen"
 
 msgid "No Updates"
 msgstr "Keine Updates"
@@ -13684,6 +13711,9 @@ msgstr "In den letzten 30 Tagen wurde noch nichts veröffentlicht. Dein Rang ers
 msgid "Nothing to open yet. Send a message first."
 msgstr "Noch nichts zum Öffnen. Sende zuerst eine Nachricht."
 
+msgid "Nothing to ship"
+msgstr "Nichts zu shippen"
+
 msgid "Nothing was missed"
 msgstr "Nichts wurde verpasst"
 
@@ -13819,6 +13849,9 @@ msgstr "bei Review-Anfrage"
 
 msgid "on the board"
 msgstr "auf dem Board"
+
+msgid "On the default branch"
+msgstr "Auf dem Standard-Branch"
 
 msgid "On this pace"
 msgstr "In diesem Tempo"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "PR #{0} erstellt"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR geschlossen"
 
@@ -16194,6 +16230,9 @@ msgstr "Liest und postet"
 
 msgid "Ready"
 msgstr "Bereit"
+
+msgid "Ready for a pull request"
+msgstr "Bereit für einen Pull Request"
 
 msgid "Ready for review"
 msgstr "Bereit für Review"
@@ -18497,6 +18536,9 @@ msgstr "Mit Shiki hervorgehoben, optional mit Zeilennummern"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer-Label"
+
+msgid "Ship"
+msgstr "Shippen"
 
 msgid "Ship every week"
 msgstr "Jede Woche ausliefern"

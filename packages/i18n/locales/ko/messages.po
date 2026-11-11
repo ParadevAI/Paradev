@@ -1053,6 +1053,9 @@ msgstr "검사 {total}개 중 {failing}개 실패"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {이 워크스페이스에서 변경된 파일 #개} other {이 워크스페이스에서 변경된 파일 #개}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {파일 #개 변경됨} other {파일 #개 변경됨}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {파일 #개 편집} other {파일 #개 편집}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, other {PR #개}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · 대상 {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {풀할 커밋 #개} other {풀할 커밋 #개}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {푸시하지 않은 커밋 #개} other {푸시하지 않은 커밋 #개}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {대기열에서 대기 중인 메시지 #개} other {대기열에서 대기 중인 메시지 #개}}"
@@ -3795,6 +3804,9 @@ msgstr "브랜치 이름을 사용할 수 없습니다"
 msgid "Branch names cannot end with a space."
 msgstr "브랜치 이름은 공백으로 끝날 수 없습니다."
 
+msgid "Branch not published"
+msgstr "브랜치가 게시되지 않음"
+
 msgid "Branch or tag (optional)"
 msgstr "브랜치 또는 태그(선택 사항)"
 
@@ -5981,6 +5993,9 @@ msgstr "플러그인을 불러오지 못했습니다. 연결을 확인하고 다
 msgid "Could not load presets from the host"
 msgstr "호스트에서 프리셋을 불러올 수 없습니다"
 
+msgid "Could not load the repository's status"
+msgstr "리포지토리 상태를 불러올 수 없습니다"
+
 msgid "Could not load this diff"
 msgstr "이 차이를 불러올 수 없습니다"
 
@@ -7360,11 +7375,17 @@ msgstr "위험"
 msgid "Detached"
 msgstr "분리됨"
 
+msgid "Detached HEAD"
+msgstr "분리된 HEAD"
+
 msgid "Details"
 msgstr "세부 정보"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "여기서는 세부 정보를 볼 수 없지만 링크는 열립니다."
+
+msgid "Details for {repositoryName}"
+msgstr "{repositoryName} 세부 정보"
 
 msgid "Detect your physical location"
 msgstr "실제 위치 감지"
@@ -13344,6 +13365,9 @@ msgstr "풀 리퀘스트를 찾을 수 없습니다."
 msgid "No release notes at {url}"
 msgstr "{url}에 릴리스 노트가 없습니다"
 
+msgid "No remote repository"
+msgstr "원격 리포지토리 없음"
+
 msgid "No repositories found."
 msgstr "리포지토리를 찾을 수 없습니다."
 
@@ -13466,6 +13490,9 @@ msgstr "아직 스레드가 없습니다"
 
 msgid "No triggers"
 msgstr "트리거 없음"
+
+msgid "No uncommitted changes"
+msgstr "커밋하지 않은 변경 사항 없음"
 
 msgid "No Updates"
 msgstr "업데이트 없음"
@@ -13684,6 +13711,9 @@ msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기�
 msgid "Nothing to open yet. Send a message first."
 msgstr "아직 열 내용이 없습니다. 먼저 메시지를 보내세요."
 
+msgid "Nothing to ship"
+msgstr "보낼 항목 없음"
+
 msgid "Nothing was missed"
 msgstr "놓친 실행이 없습니다"
 
@@ -13819,6 +13849,9 @@ msgstr "리뷰 요청 시"
 
 msgid "on the board"
 msgstr "순위표 등록"
+
+msgid "On the default branch"
+msgstr "기본 브랜치에 있음"
 
 msgid "On this pace"
 msgstr "이 속도라면"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "PR #{0} 생성됨"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR 닫힘"
 
@@ -16194,6 +16230,9 @@ msgstr "읽기 및 게시"
 
 msgid "Ready"
 msgstr "준비됨"
+
+msgid "Ready for a pull request"
+msgstr "PR을 만들 준비가 됨"
 
 msgid "Ready for review"
 msgstr "리뷰 준비됨"
@@ -18497,6 +18536,9 @@ msgstr "Shiki로 하이라이트하고, 줄 번호는 선택 사항입니다"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "시머 · 시머 레이블"
+
+msgid "Ship"
+msgstr "보내기"
 
 msgid "Ship every week"
 msgstr "매주 출시합니다"

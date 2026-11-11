@@ -1,0 +1,1 @@
+export { RepositoryShipDetail } from "./RepositoryShipDetail";

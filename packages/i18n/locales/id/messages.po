@@ -1053,6 +1053,9 @@ msgstr "{failing} dari {total} check gagal"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# file berubah di workspace ini} other {# file berubah di workspace ini}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# file berubah} other {# file berubah}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Mengedit # file} other {Mengedit # file}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · ke {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit untuk di-pull} other {# commit untuk di-pull}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# commit belum di-push} other {# commit belum di-push}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# pesan menunggu dalam antrean} other {# pesan menunggu dalam antrean}}"
@@ -3795,6 +3804,9 @@ msgstr "Nama branch tidak tersedia"
 msgid "Branch names cannot end with a space."
 msgstr "Nama branch tidak boleh diakhiri spasi."
 
+msgid "Branch not published"
+msgstr "Branch belum dipublikasikan"
+
 msgid "Branch or tag (optional)"
 msgstr "Branch atau tag (opsional)"
 
@@ -5981,6 +5993,9 @@ msgstr "Tidak dapat memuat plugin. Periksa koneksi Anda dan coba lagi."
 msgid "Could not load presets from the host"
 msgstr "Tidak bisa memuat preset dari host"
 
+msgid "Could not load the repository's status"
+msgstr "Tidak dapat memuat status repositori"
+
 msgid "Could not load this diff"
 msgstr "Tidak bisa memuat diff ini"
 
@@ -7360,11 +7375,17 @@ msgstr "Destructive"
 msgid "Detached"
 msgstr "Terlepas"
 
+msgid "Detached HEAD"
+msgstr "HEAD terlepas"
+
 msgid "Details"
 msgstr "Detail"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Detail tidak tersedia di sini, tetapi tautan tetap bisa dibuka."
+
+msgid "Details for {repositoryName}"
+msgstr "Detail untuk {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Mendeteksi lokasi fisik Anda"
@@ -13344,6 +13365,9 @@ msgstr "Tidak ada pull request ditemukan."
 msgid "No release notes at {url}"
 msgstr "Tidak ada catatan rilis di {url}"
 
+msgid "No remote repository"
+msgstr "Tidak ada repositori remote"
+
 msgid "No repositories found."
 msgstr "Repositori tidak ditemukan."
 
@@ -13466,6 +13490,9 @@ msgstr "Belum ada utas"
 
 msgid "No triggers"
 msgstr "Tanpa pemicu"
+
+msgid "No uncommitted changes"
+msgstr "Tidak ada perubahan yang belum di-commit"
 
 msgid "No Updates"
 msgstr "Tidak Ada Pembaruan"
@@ -13684,6 +13711,9 @@ msgstr "Belum ada yang dipublikasikan dalam 30 hari terakhir. Peringkat Anda mun
 msgid "Nothing to open yet. Send a message first."
 msgstr "Belum ada yang bisa dibuka. Kirim pesan dulu."
 
+msgid "Nothing to ship"
+msgstr "Tidak ada yang perlu dikirim"
+
 msgid "Nothing was missed"
 msgstr "Tidak ada yang terlewat"
 
@@ -13819,6 +13849,9 @@ msgstr "saat review diminta"
 
 msgid "on the board"
 msgstr "di papan ini"
+
+msgid "On the default branch"
+msgstr "Di branch default"
 
 msgid "On this pace"
 msgstr "Dengan laju ini"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "PR #{0} dibuat"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR Ditutup"
 
@@ -16194,6 +16230,9 @@ msgstr "Membaca dan memposting"
 
 msgid "Ready"
 msgstr "Siap"
+
+msgid "Ready for a pull request"
+msgstr "Siap untuk pull request"
 
 msgid "Ready for review"
 msgstr "Siap direview"
@@ -18497,6 +18536,9 @@ msgstr "Disorot Shiki, dengan nomor baris opsional"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Label Shimmer"
+
+msgid "Ship"
+msgstr "Kirim"
 
 msgid "Ship every week"
 msgstr "Rilis setiap minggu"

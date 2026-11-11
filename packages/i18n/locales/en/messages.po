@@ -1053,6 +1053,9 @@ msgstr "{failing} of {total} checks failing"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# file changed} other {# files changed}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · targets {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
@@ -3795,6 +3804,9 @@ msgstr "Branch name is not available"
 msgid "Branch names cannot end with a space."
 msgstr "Branch names cannot end with a space."
 
+msgid "Branch not published"
+msgstr "Branch not published"
+
 msgid "Branch or tag (optional)"
 msgstr "Branch or tag (optional)"
 
@@ -5981,6 +5993,9 @@ msgstr "Could not load plugins. Check your connection and try again."
 msgid "Could not load presets from the host"
 msgstr "Could not load presets from the host"
 
+msgid "Could not load the repository's status"
+msgstr "Could not load the repository's status"
+
 msgid "Could not load this diff"
 msgstr "Could not load this diff"
 
@@ -7360,11 +7375,17 @@ msgstr "Destructive"
 msgid "Detached"
 msgstr "Detached"
 
+msgid "Detached HEAD"
+msgstr "Detached HEAD"
+
 msgid "Details"
 msgstr "Details"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details are not available here, but the link still opens."
+
+msgid "Details for {repositoryName}"
+msgstr "Details for {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Detect your physical location"
@@ -13344,6 +13365,9 @@ msgstr "No pull requests found."
 msgid "No release notes at {url}"
 msgstr "No release notes at {url}"
 
+msgid "No remote repository"
+msgstr "No remote repository"
+
 msgid "No repositories found."
 msgstr "No repositories found."
 
@@ -13466,6 +13490,9 @@ msgstr "No threads yet"
 
 msgid "No triggers"
 msgstr "No triggers"
+
+msgid "No uncommitted changes"
+msgstr "No uncommitted changes"
 
 msgid "No Updates"
 msgstr "No Updates"
@@ -13684,6 +13711,9 @@ msgstr "Nothing published in the last 30 days yet. Your rank appears once usage 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Nothing to open yet. Send a message first."
 
+msgid "Nothing to ship"
+msgstr "Nothing to ship"
+
 msgid "Nothing was missed"
 msgstr "Nothing was missed"
 
@@ -13819,6 +13849,9 @@ msgstr "on review request"
 
 msgid "on the board"
 msgstr "on the board"
+
+msgid "On the default branch"
+msgstr "On the default branch"
 
 msgid "On this pace"
 msgstr "On this pace"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "PR #{0} created"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR Closed"
 
@@ -16194,6 +16230,9 @@ msgstr "Reads and posts"
 
 msgid "Ready"
 msgstr "Ready"
+
+msgid "Ready for a pull request"
+msgstr "Ready for a pull request"
 
 msgid "Ready for review"
 msgstr "Ready for review"
@@ -18497,6 +18536,9 @@ msgstr "Shiki-highlighted, with optional line numbers"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer Label"
+
+msgid "Ship"
+msgstr "Ship"
 
 msgid "Ship every week"
 msgstr "Ship every week"

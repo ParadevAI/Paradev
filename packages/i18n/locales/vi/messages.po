@@ -1053,6 +1053,9 @@ msgstr "{failing}/{total} check đang thất bại"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# tệp đã thay đổi trong workspace này} other {# tệp đã thay đổi trong workspace này}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {# tệp đã thay đổi} other {# tệp đã thay đổi}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Đã sửa # tệp} other {Đã sửa # tệp}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · vào {base}"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit cần pull} other {# commit cần pull}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {# commit chưa push} other {# commit chưa push}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# tin nhắn đang chờ trong hàng đợi} other {# tin nhắn đang chờ trong hàng đợi}}"
@@ -3795,6 +3804,9 @@ msgstr "Không có tên nhánh"
 msgid "Branch names cannot end with a space."
 msgstr "Tên nhánh không được kết thúc bằng dấu cách."
 
+msgid "Branch not published"
+msgstr "Nhánh chưa được xuất bản"
+
 msgid "Branch or tag (optional)"
 msgstr "Nhánh hoặc tag (tùy chọn)"
 
@@ -5981,6 +5993,9 @@ msgstr "Không tải được plugin. Hãy kiểm tra kết nối và thử lạ
 msgid "Could not load presets from the host"
 msgstr "Không thể tải preset từ host"
 
+msgid "Could not load the repository's status"
+msgstr "Không thể tải trạng thái của repository"
+
 msgid "Could not load this diff"
 msgstr "Không thể tải diff này"
 
@@ -7360,11 +7375,17 @@ msgstr "Destructive"
 msgid "Detached"
 msgstr "Đã tách"
 
+msgid "Detached HEAD"
+msgstr "HEAD tách rời"
+
 msgid "Details"
 msgstr "Chi tiết"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Không có chi tiết ở đây, nhưng liên kết vẫn mở được."
+
+msgid "Details for {repositoryName}"
+msgstr "Chi tiết của {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Phát hiện vị trí thực của bạn"
@@ -13344,6 +13365,9 @@ msgstr "Không tìm thấy pull request nào."
 msgid "No release notes at {url}"
 msgstr "Không có ghi chú phát hành tại {url}"
 
+msgid "No remote repository"
+msgstr "Không có repository từ xa"
+
 msgid "No repositories found."
 msgstr "Không tìm thấy repository."
 
@@ -13466,6 +13490,9 @@ msgstr "Chưa có chuỗi nào"
 
 msgid "No triggers"
 msgstr "Không có trigger"
+
+msgid "No uncommitted changes"
+msgstr "Không có thay đổi chưa commit"
 
 msgid "No Updates"
 msgstr "Không có cập nhật"
@@ -13684,6 +13711,9 @@ msgstr "Chưa có gì được công khai trong 30 ngày qua. Thứ hạng của
 msgid "Nothing to open yet. Send a message first."
 msgstr "Chưa có gì để mở. Hãy gửi tin nhắn trước."
 
+msgid "Nothing to ship"
+msgstr "Không có gì để gửi"
+
 msgid "Nothing was missed"
 msgstr "Không có lần chạy nào bị bỏ lỡ"
 
@@ -13819,6 +13849,9 @@ msgstr "khi có yêu cầu review"
 
 msgid "on the board"
 msgstr "trên bảng xếp hạng"
+
+msgid "On the default branch"
+msgstr "Trên nhánh mặc định"
 
 msgid "On this pace"
 msgstr "Với tốc độ này"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "Đã tạo PR #{0}"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PR đã đóng"
 
@@ -16194,6 +16230,9 @@ msgstr "Đọc và đăng"
 
 msgid "Ready"
 msgstr "Sẵn sàng"
+
+msgid "Ready for a pull request"
+msgstr "Sẵn sàng tạo pull request"
 
 msgid "Ready for review"
 msgstr "Sẵn sàng review"
@@ -18497,6 +18536,9 @@ msgstr "Tô màu bằng Shiki, có thể kèm số dòng"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer Label"
+
+msgid "Ship"
+msgstr "Gửi"
 
 msgid "Ship every week"
 msgstr "Phát hành mỗi tuần"

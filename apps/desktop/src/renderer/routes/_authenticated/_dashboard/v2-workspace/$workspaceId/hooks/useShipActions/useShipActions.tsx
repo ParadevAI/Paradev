@@ -11,6 +11,8 @@ import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvide
 
 interface UseShipActionsOptions {
 	workspaceId: string;
+	/** Where the new pull request opens: the multi-repo workspace when shipping one of its checkouts. */
+	paneWorkspaceId?: string;
 	onRefresh: () => void;
 	isPrFormOpen: boolean;
 	onCommitted: () => void;
@@ -22,6 +24,7 @@ export type ShipActions = ReturnType<typeof useShipActions>;
 
 export function useShipActions({
 	workspaceId,
+	paneWorkspaceId = workspaceId,
 	onRefresh,
 	isPrFormOpen,
 	onCommitted,
@@ -222,10 +225,10 @@ export function useShipActions({
 								return;
 							}
 							usePullRequestPaneIntent.getState().request({
-								workspaceId,
+								workspaceId: paneWorkspaceId,
 								...ref,
 							});
-							void navigateToV2Workspace(workspaceId, navigate);
+							void navigateToV2Workspace(paneWorkspaceId, navigate);
 						},
 					},
 				},

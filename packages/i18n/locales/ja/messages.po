@@ -1053,6 +1053,9 @@ msgstr "{total}件中{failing}件のチェックが失敗"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {このワークスペースで変更されたファイル: #件} other {このワークスペースで変更されたファイル: #件}}"
 
+msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
+msgstr "{fileCount, plural, one {#個のファイルを変更} other {#個のファイルを変更}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
 
@@ -1348,6 +1351,12 @@ msgstr "{pullRequestCount, plural, other {# 件の PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · {base} 向け"
+
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {プルするコミット: #件} other {プルするコミット: #件}}"
+
+msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
+msgstr "{pushCount, plural, one {未プッシュのコミット: #件} other {未プッシュのコミット: #件}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {キューで待機中のメッセージ #件} other {キューで待機中のメッセージ #件}}"
@@ -3795,6 +3804,9 @@ msgstr "ブランチ名は利用できません"
 msgid "Branch names cannot end with a space."
 msgstr "ブランチ名の末尾にスペースは使えません。"
 
+msgid "Branch not published"
+msgstr "ブランチは未公開"
+
 msgid "Branch or tag (optional)"
 msgstr "ブランチまたはタグ（任意）"
 
@@ -5981,6 +5993,9 @@ msgstr "プラグインを読み込めませんでした。接続を確認して
 msgid "Could not load presets from the host"
 msgstr "ホストからプリセットを読み込めませんでした"
 
+msgid "Could not load the repository's status"
+msgstr "リポジトリの状態を読み込めませんでした"
+
 msgid "Could not load this diff"
 msgstr "この差分を読み込めませんでした"
 
@@ -7360,11 +7375,17 @@ msgstr "Destructive"
 msgid "Detached"
 msgstr "切断中"
 
+msgid "Detached HEAD"
+msgstr "デタッチされたHEAD"
+
 msgid "Details"
 msgstr "詳細"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "ここでは詳細を表示できませんが、リンクは開けます。"
+
+msgid "Details for {repositoryName}"
+msgstr "{repositoryName}の詳細"
 
 msgid "Detect your physical location"
 msgstr "現在地を検出する"
@@ -13344,6 +13365,9 @@ msgstr "プルリクエストが見つかりません。"
 msgid "No release notes at {url}"
 msgstr "{url} にリリースノートがありません"
 
+msgid "No remote repository"
+msgstr "リモートリポジトリなし"
+
 msgid "No repositories found."
 msgstr "リポジトリが見つかりません。"
 
@@ -13466,6 +13490,9 @@ msgstr "スレッドはまだありません"
 
 msgid "No triggers"
 msgstr "トリガーなし"
+
+msgid "No uncommitted changes"
+msgstr "未コミットの変更はありません"
 
 msgid "No Updates"
 msgstr "アップデートはありません"
@@ -13684,6 +13711,9 @@ msgstr "直近30日に公開された実績はまだありません。このマ�
 msgid "Nothing to open yet. Send a message first."
 msgstr "まだ開く内容がありません。先にメッセージを送信してください。"
 
+msgid "Nothing to ship"
+msgstr "シップするものはありません"
+
 msgid "Nothing was missed"
 msgstr "未実行はありません"
 
@@ -13819,6 +13849,9 @@ msgstr "レビューリクエスト時"
 
 msgid "on the board"
 msgstr "ボード上"
+
+msgid "On the default branch"
+msgstr "デフォルトブランチ上"
 
 msgid "On this pace"
 msgstr "このペースなら"
@@ -15443,6 +15476,9 @@ msgstr "PR #{0} ({1})"
 msgid "PR #{0} created"
 msgstr "PR #{0} を作成しました"
 
+msgid "PR #{prNumber}"
+msgstr "PR #{prNumber}"
+
 msgid "PR Closed"
 msgstr "PRはクローズ済み"
 
@@ -16194,6 +16230,9 @@ msgstr "閲覧・投稿"
 
 msgid "Ready"
 msgstr "準備完了"
+
+msgid "Ready for a pull request"
+msgstr "PRを作成できます"
 
 msgid "Ready for review"
 msgstr "レビュー可能"
@@ -18497,6 +18536,9 @@ msgstr "Shikiでハイライト、行番号は任意"
 
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer Label"
+
+msgid "Ship"
+msgstr "シップ"
 
 msgid "Ship every week"
 msgstr "毎週リリース"

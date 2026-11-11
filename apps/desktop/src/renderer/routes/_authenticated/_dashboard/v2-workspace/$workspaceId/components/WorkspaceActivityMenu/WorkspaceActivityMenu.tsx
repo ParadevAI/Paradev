@@ -52,9 +52,11 @@ import {
 } from "../../hooks/useOpenStackLayer";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { usePullRequestActions } from "../../hooks/usePullRequestActions";
+import { useRepositoryShipSnapshots } from "../../hooks/useRepositoryShipSnapshots";
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useWorkspaceRepositories } from "../../state/activeRepositoryStore";
 import type { PagePaneData, PaneViewerData } from "../../types";
 import {
 	BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS,
@@ -75,6 +77,7 @@ import { CommitForm } from "../CommitForm";
 import { CreatePrForm } from "../CreatePrForm";
 import { NewPageComposer } from "../NewPageComposer";
 import { PRStatusIndicators } from "../PRStatusIndicators";
+import { RepositoryShipList } from "../RepositoryShipList";
 import { ActivityMenuHeader } from "./components/ActivityMenuHeader";
 import { AnimatedHeight } from "./components/AnimatedHeight";
 import { BackgroundWorkRow } from "./components/BackgroundWorkRow";
@@ -142,10 +145,16 @@ export function WorkspaceActivityMenu({
 	const paneAreaStyle = changes != null;
 	const { favoritePageIds } = usePageFavorites();
 	const gitStatus = useWorkspaceGitStatus();
-	const changesStats = useMemo(
+	const repositories = useWorkspaceRepositories(workspaceId);
+	const isMultiRepo = repositories.length > 1;
+	const repositoryShip = useRepositoryShipSnapshots(
+		isMultiRepo ? repositories.map(({ id }) => id) : [],
+	);
+	const singleRepoStats = useMemo(
 		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
 		[gitStatus.data],
 	);
+	const changesStats = isMultiRepo ? repositoryShip.totals : singleRepoStats;
 	const triggerChangesStats =
 		paneAreaStyle && changesStats && changesStats.fileCount > 0
 			? changesStats
@@ -189,7 +198,7 @@ export function WorkspaceActivityMenu({
 		sync: branchSync,
 		onRetry: refreshFlowState,
 	} = usePRFlowState(workspaceId, {
-		enabled: paneAreaStyle,
+		enabled: paneAreaStyle && !isMultiRepo,
 	});
 	const currentPr =
 		flowState.kind === "pr-exists" ||
@@ -206,7 +215,7 @@ export function WorkspaceActivityMenu({
 		workspaceId,
 		onRefresh: refreshFlowState,
 		isPrFormOpen: shipView === "pr",
-		enabled: paneAreaStyle && open,
+		enabled: paneAreaStyle && open && !isMultiRepo,
 		onCommitted: () => setShipView(null),
 		onPrCreated: () => setShipView(null),
 	});
@@ -731,19 +740,41 @@ export function WorkspaceActivityMenu({
 						key="list"
 						className={cn("divide-y divide-border", VIEW_ENTER_CLASSNAME)}
 					>
-						{changes && !currentPr && (
+						{changes && isMultiRepo ? (
 							<section className="py-1">
-								<ActivityMenuHeader
-									title={currentWorkspace.name}
-									canCreatePr={shipMenu.canCreatePr}
-									{...shipMenuProps}
-								/>
+								<div className="flex h-8 items-center pl-2 pr-1">
+									<span className="min-w-0 truncate text-xs text-muted-foreground">
+										{currentWorkspace.name}
+									</span>
+								</div>
 								<ChangesMenuRow
 									stats={changesStats}
 									isOpen={changes.isOpen}
 									onToggle={changes.onToggle}
 								/>
+								<RepositoryShipList
+									workspaceId={workspaceId}
+									repositories={repositories}
+									snapshots={repositoryShip.byId}
+									onOpenPullRequest={onOpenPullRequest}
+								/>
 							</section>
+						) : (
+							changes &&
+							!currentPr && (
+								<section className="py-1">
+									<ActivityMenuHeader
+										title={currentWorkspace.name}
+										canCreatePr={shipMenu.canCreatePr}
+										{...shipMenuProps}
+									/>
+									<ChangesMenuRow
+										stats={changesStats}
+										isOpen={changes.isOpen}
+										onToggle={changes.onToggle}
+									/>
+								</section>
+							)
 						)}
 						{pullRequests.length > 0 && (
 							<MenuGroup
@@ -821,137 +852,141 @@ export function WorkspaceActivityMenu({
 	);
 
 	return (
-		<Popover open={floating} onOpenChange={setFloating}>
-			<PopoverAnchor
-				virtualRef={{ current: anchorNode ?? triggerRef.current }}
-			/>
-			<Tooltip disableHoverableContent>
-				<TooltipTrigger asChild>
-					<button
-						ref={triggerRef}
-						type="button"
-						onClick={onTriggerClick}
-						aria-label={
-							changes && currentPr
-								? t({
-										message: `Workspace activity, pull request #${currentPr.number}`,
-									})
-								: t({ message: "Workspace activity" })
-						}
-						aria-expanded={open}
-						aria-controls={open ? panelId : undefined}
-						aria-describedby={hasNew ? newPageStatusId : undefined}
-						className={cn(
-							"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
-							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-							open
-								? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
-								: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
-						)}
-					>
-						<ListTree className="size-3.5 shrink-0" />
-						{runningCount > 0 ? (
-							<>
-								<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
-								<span className="tabular-nums">{runningCount}</span>
-							</>
-						) : (
-							!paneAreaStyle &&
-							workspace.length > 0 && (
-								<span className="tabular-nums">{workspace.length}</span>
-							)
-						)}
-						{changes && currentPr && currentPrState ? (
-							<>
-								<span className="h-3.5 w-px shrink-0 bg-border" />
-								{pendingLayer ? (
-									<span className="flex size-3.5 shrink-0 items-center justify-center">
-										<AsciiSpinner className="text-base leading-none" />
-									</span>
-								) : (
-									<PRIcon
-										state={currentPrState}
-										className="size-3.5 shrink-0"
-									/>
-								)}
-								<span className="tabular-nums">
-									#{pendingLayer?.number ?? currentPr.number}
-								</span>
-								{mergeFlow.stack ? (
-									<PullRequestStackPosition
-										position={
-											pendingLayer?.position ?? mergeFlow.stack.currentPosition
-										}
-										size={mergeFlow.stack.layers.length}
-									/>
-								) : null}
-								{!pendingLayer &&
-									currentPrChecks &&
-									showsChecks(currentPrState) && (
-										<PRStatusIndicators checks={currentPrChecks} />
-									)}
-							</>
-						) : (
-							triggerChangesStats && (
+		<>
+			{repositoryShip.sources}
+			<Popover open={floating} onOpenChange={setFloating}>
+				<PopoverAnchor
+					virtualRef={{ current: anchorNode ?? triggerRef.current }}
+				/>
+				<Tooltip disableHoverableContent>
+					<TooltipTrigger asChild>
+						<button
+							ref={triggerRef}
+							type="button"
+							onClick={onTriggerClick}
+							aria-label={
+								changes && currentPr
+									? t({
+											message: `Workspace activity, pull request #${currentPr.number}`,
+										})
+									: t({ message: "Workspace activity" })
+							}
+							aria-expanded={open}
+							aria-controls={open ? panelId : undefined}
+							aria-describedby={hasNew ? newPageStatusId : undefined}
+							className={cn(
+								"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
+								"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+								open
+									? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
+									: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
+							)}
+						>
+							<ListTree className="size-3.5 shrink-0" />
+							{runningCount > 0 ? (
+								<>
+									<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+									<span className="tabular-nums">{runningCount}</span>
+								</>
+							) : (
+								!paneAreaStyle &&
+								workspace.length > 0 && (
+									<span className="tabular-nums">{workspace.length}</span>
+								)
+							)}
+							{changes && currentPr && currentPrState ? (
 								<>
 									<span className="h-3.5 w-px shrink-0 bg-border" />
-									<GitCompareArrows className="size-3.5 shrink-0" />
-									<span className="flex items-center gap-1">
-										<ChangesStats stats={triggerChangesStats} />
+									{pendingLayer ? (
+										<span className="flex size-3.5 shrink-0 items-center justify-center">
+											<AsciiSpinner className="text-base leading-none" />
+										</span>
+									) : (
+										<PRIcon
+											state={currentPrState}
+											className="size-3.5 shrink-0"
+										/>
+									)}
+									<span className="tabular-nums">
+										#{pendingLayer?.number ?? currentPr.number}
+									</span>
+									{mergeFlow.stack ? (
+										<PullRequestStackPosition
+											position={
+												pendingLayer?.position ??
+												mergeFlow.stack.currentPosition
+											}
+											size={mergeFlow.stack.layers.length}
+										/>
+									) : null}
+									{!pendingLayer &&
+										currentPrChecks &&
+										showsChecks(currentPrState) && (
+											<PRStatusIndicators checks={currentPrChecks} />
+										)}
+								</>
+							) : (
+								triggerChangesStats && (
+									<>
+										<span className="h-3.5 w-px shrink-0 bg-border" />
+										<GitCompareArrows className="size-3.5 shrink-0" />
+										<span className="flex items-center gap-1">
+											<ChangesStats stats={triggerChangesStats} />
+										</span>
+									</>
+								)
+							)}
+							{hasNew && (
+								<>
+									<span
+										aria-hidden="true"
+										className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
+									/>
+									<span id={newPageStatusId} className="sr-only">
+										<Trans context="badge on a page published since the menu was last opened">
+											New
+										</Trans>
 									</span>
 								</>
-							)
+							)}
+						</button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
+						{open ? (
+							<Trans>Hide workspace activity</Trans>
+						) : (
+							<Trans>Show workspace activity</Trans>
 						)}
-						{hasNew && (
-							<>
-								<span
-									aria-hidden="true"
-									className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
-								/>
-								<span id={newPageStatusId} className="sr-only">
-									<Trans context="badge on a page published since the menu was last opened">
-										New
-									</Trans>
-								</span>
-							</>
-						)}
-					</button>
-				</TooltipTrigger>
-				<TooltipContent side="bottom">
-					{open ? (
-						<Trans>Hide workspace activity</Trans>
-					) : (
-						<Trans>Show workspace activity</Trans>
-					)}
-				</TooltipContent>
-			</Tooltip>
-			<PopoverContent
-				align="end"
-				sideOffset={0}
-				className="w-80 border-0 bg-transparent p-0 shadow-none duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[state=closed]:duration-150 data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)] data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
-				onEscapeKeyDown={(event) => {
-					if (shipView || composing) event.preventDefault();
-				}}
-				onInteractOutside={(event) => {
-					const target = event.target as Element;
-					if (
-						triggerRef.current?.contains(target) ||
-						target.closest?.(`[${WORKSPACE_SIDEBAR_ATTRIBUTE}]`)
-					)
-						event.preventDefault();
-				}}
-			>
-				{renderPanel("floating")}
-			</PopoverContent>
-			{asideNode &&
-				dockedMounted &&
-				createPortal(renderPanel("docked"), asideNode)}
-			{currentPr ? (
-				<PullRequestMergeFlowDialog
-					flow={mergeFlow}
-					prNumber={currentPr.number}
-				/>
-			) : null}
-		</Popover>
+					</TooltipContent>
+				</Tooltip>
+				<PopoverContent
+					align="end"
+					sideOffset={0}
+					className="w-80 border-0 bg-transparent p-0 shadow-none duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[state=closed]:duration-150 data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)] data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
+					onEscapeKeyDown={(event) => {
+						if (shipView || composing) event.preventDefault();
+					}}
+					onInteractOutside={(event) => {
+						const target = event.target as Element;
+						if (
+							triggerRef.current?.contains(target) ||
+							target.closest?.(`[${WORKSPACE_SIDEBAR_ATTRIBUTE}]`)
+						)
+							event.preventDefault();
+					}}
+				>
+					{renderPanel("floating")}
+				</PopoverContent>
+				{asideNode &&
+					dockedMounted &&
+					createPortal(renderPanel("docked"), asideNode)}
+				{currentPr ? (
+					<PullRequestMergeFlowDialog
+						flow={mergeFlow}
+						prNumber={currentPr.number}
+					/>
+				) : null}
+			</Popover>
+		</>
 	);
 }
