@@ -790,10 +790,10 @@ project id when the host does not know the project's name.
 		{ flag: "--session", description: "Create a project-less session (a managed scratch folder) on a host. Mutually exclusive with `--project`." },
 		{ flag: "--name <name>", description: "Workspace name. Required when `--project` is set; optional for sessions." },
 		{ flag: "--checkout <local|worktree>", description: "Use the shared project checkout or a separate worktree (default). Requires `--project`." },
-		{ flag: "--branch <branch>", description: "Workspace branch. On a host, required unless `--pr`, `--task`, or `--checkout local` is set. For a cloud workspace, the base branch (default: the repository's default branch)." },
+		{ flag: "--branch <branch>", description: "Workspace branch. On a host, required unless `--pr`, `--task`, or `--checkout local` is set. Not accepted for a cloud workspace, which always works on a new branch of its own; use `--base-branch`." },
 		{ flag: "--pr <number>", description: "Pull request number. Checks out the verified PR head." },
 		{ flag: "--task <id>", description: "Task ID to link. When `--branch` is omitted, the task's provider branch name (e.g. Linear's) is used verbatim." },
-		{ flag: "--base-branch <branch>", description: "Branch to fork from when `--branch` does not exist. Defaults to the project default branch." },
+		{ flag: "--base-branch <branch>", description: "On a host, the branch to fork from when `--branch` does not exist (default: the project default branch). For a cloud workspace, the branch its new branch is cut from (default: the repository's default branch)." },
 		{ flag: "--skip-branch-prefix", description: "Use `--branch` exactly as given instead of namespacing it under the project branch prefix." },
 		{ flag: "--host <id>", description: "Target host machineId, or `cloud`. Mutually exclusive with `--local`. Without either, creates in the cloud if your account has cloud workspaces, else on this machine." },
 		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`." },
@@ -830,9 +830,9 @@ requires either `--project <id>` or `--session`; omitting both is an error.
 
 Without `--host` or `--local`, the command creates a [cloud workspace](/cloud-workspaces)
 if your account has cloud workspaces. A cloud workspace takes no project: it starts from an
-environment, and Paradev creates a new working branch from `--branch`. `--project`,
-`--session`, `--checkout`, `--pr`, `--task`, `--base-branch`, `--skip-branch-prefix`,
-`--tag`, and `--command` are rejected for a cloud workspace. `--attachment` needs `--agent`:
+environment, and Paradev creates a new working branch from `--base-branch` (default: the
+repository's default branch). `--project`, `--session`, `--checkout`, `--branch`, `--pr`,
+`--task`, `--skip-branch-prefix`, and `--command` are rejected for a cloud workspace. `--attachment` needs `--agent`:
 the files go to the agent through Paradev's storage, up to 200 MB each and 10 at a time.
 The command returns while the workspace is still provisioning.
 
