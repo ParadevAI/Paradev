@@ -1947,6 +1947,9 @@ msgstr "삭제 예정 계정"
 msgid "Account usage"
 msgstr "계정 사용량"
 
+msgid "Account usage: {percent} used"
+msgstr "계정 사용량: {percent} 사용"
+
 msgid "Achievements"
 msgstr "업적"
 
@@ -2352,9 +2355,6 @@ msgstr "에이전트 실행 실패"
 
 msgid "Agent self-verification"
 msgstr "에이전트 자체 검증"
-
-msgid "agent session ID"
-msgstr "에이전트 세션 ID"
 
 msgid "Agent session started"
 msgstr "에이전트 세션을 시작했습니다"
@@ -3446,6 +3446,9 @@ msgstr "연동으로 돌아가기"
 msgid "Back to Linear"
 msgstr "Linear로 돌아가기"
 
+msgid "Back to main chat"
+msgstr "기본 채팅으로 돌아가기"
+
 msgid "Back to pages"
 msgstr "페이지로 돌아가기"
 
@@ -4203,8 +4206,8 @@ msgstr "채팅을 개편하는 중입니다"
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
-msgid "Chat mode"
-msgstr "채팅 모드"
+msgid "Chat name"
+msgstr "채팅 이름"
 
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
@@ -4519,9 +4522,6 @@ msgstr "CLI 및 SDK"
 
 msgid "CLI docs"
 msgstr "CLI 문서"
-
-msgid "CLI mode"
-msgstr "CLI 모드"
 
 msgid "CLI reference"
 msgstr "CLI 레퍼런스"
@@ -5499,14 +5499,8 @@ msgstr "복사됨"
 msgid "Copied {0}"
 msgstr "{0} 복사됨"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} 복사됨"
-
 msgid "Copied Link"
 msgstr "링크 복사됨"
-
-msgid "Copied terminal ID"
-msgstr "터미널 ID 복사됨"
 
 msgid "Copied to clipboard."
 msgstr "클립보드에 복사했습니다."
@@ -5572,9 +5566,6 @@ msgid "Copy file name"
 msgstr "파일 이름 복사"
 
 msgid "Copy ID"
-msgstr "ID 복사"
-
-msgid "Copy IDs"
 msgstr "ID 복사"
 
 msgid "Copy image"
@@ -6358,9 +6349,6 @@ msgstr "클라우드 환경 만들기"
 
 msgid "Create a Dev"
 msgstr "Dev 만들기"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "같은 대화 컨텍스트로 제공자의 네이티브 포크를 만듭니다. 원래 세션은 그대로 유지됩니다."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Claude Desktop이나 Claude Code 같은 외부 연동에 사용할 새 API 키를 만듭니다."
@@ -9194,11 +9182,11 @@ msgstr "포크 인자"
 msgid "Fork conversation"
 msgstr "대화 분기"
 
-msgid "Fork session"
-msgstr "세션 포크"
+msgid "Fork into Chat"
+msgstr "채팅으로 포크"
 
-msgid "Fork session…"
-msgstr "세션 포크…"
+msgid "Fork into CLI"
+msgstr "CLI로 포크"
 
 msgid "Form controls and field composition"
 msgstr "폼 컨트롤과 필드 구성"
@@ -11063,6 +11051,9 @@ msgstr "채널 나가기"
 msgid "Leave comment mode"
 msgstr "댓글 모드 나가기"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "비워 두면 기본 이름으로 돌아갑니다."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "비워 두면 터미널이 보고하는 이름으로 돌아갑니다."
 
@@ -12356,6 +12347,9 @@ msgstr "새 브라우저"
 
 msgid "new challengers"
 msgstr "새 도전자"
+
+msgid "New chat"
+msgstr "새 채팅"
 
 msgid "New Chat"
 msgstr "새 채팅"
@@ -13910,9 +13904,6 @@ msgstr "브라우저에서 열기"
 msgid "Open in Changes pane"
 msgstr "변경 사항 패널에서 열기"
 
-msgid "Open in Chat Interface"
-msgstr "채팅 인터페이스에서 열기"
-
 msgid "Open in ChatGPT"
 msgstr "ChatGPT에서 열기"
 
@@ -13987,9 +13978,6 @@ msgstr "탭에서 열기"
 
 msgid "Open in Tasks"
 msgstr "작업에서 열기"
-
-msgid "Open in Terminal Chat"
-msgstr "터미널 채팅에서 열기"
 
 msgid "Open in…"
 msgstr "다음으로 열기…"
@@ -14082,9 +14070,6 @@ msgstr "최근 항목 열기"
 
 msgid "Open roles"
 msgstr "채용 공고"
-
-msgid "Open session in"
-msgstr "세션 열기 위치"
 
 msgid "Open settings"
 msgstr "설정 열기"
@@ -15484,10 +15469,6 @@ msgstr "속성"
 msgid "Provide either id or slug"
 msgstr "id 또는 슬러그 중 하나를 제공하세요"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "제공자: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "프로비저닝에 실패해 샌드박스가 정리되었습니다. 실행 중인 것은 없으며 이 워크스페이스는 열 수 없습니다. 다시 시도하려면 새로 만드세요."
 
@@ -15903,6 +15884,9 @@ msgstr "최근 활동"
 msgid "Recent apps"
 msgstr "최근 앱"
 
+msgid "Recent chats"
+msgstr "최근 채팅"
+
 msgid "Recent invoices"
 msgstr "최근 청구서"
 
@@ -16253,6 +16237,9 @@ msgstr "계정 이름 변경"
 
 msgid "Rename branch"
 msgstr "브랜치 이름 변경"
+
+msgid "Rename chat"
+msgstr "채팅 이름 변경"
 
 msgid "Rename failed"
 msgstr "이름 변경 실패"
@@ -17309,6 +17296,9 @@ msgstr "개발자 검색"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "파일 내용과 모든 워크스페이스를 한 번에 검색하세요."
+
+msgid "Search all chats…"
+msgstr "모든 채팅 검색…"
 
 msgid "Search all emoji"
 msgstr "모든 이모지 검색"
@@ -19620,9 +19610,6 @@ msgstr "터미널 글꼴 크기"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "터미널에 포커스가 있으면 터미널 글꼴 크기, 브라우저 패널에서는 페이지 확대/축소, 그 외에는 앱 전체"
 
-msgid "terminal ID"
-msgstr "터미널 ID"
-
 msgid "Terminal input"
 msgstr "터미널 입력"
 
@@ -19642,9 +19629,6 @@ msgid "Terminal session killed"
 msgstr "터미널 세션을 종료했습니다"
 
 msgid "Terminal sessions"
-msgstr "터미널 세션"
-
-msgid "Terminal Sessions"
 msgstr "터미널 세션"
 
 msgid "Terminal theme color-palette preview"

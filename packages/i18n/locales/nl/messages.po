@@ -1947,6 +1947,9 @@ msgstr "Account wordt verwijderd"
 msgid "Account usage"
 msgstr "Accountgebruik"
 
+msgid "Account usage: {percent} used"
+msgstr "Accountgebruik: {percent} gebruikt"
+
 msgid "Achievements"
 msgstr "Prestaties"
 
@@ -2352,9 +2355,6 @@ msgstr "Agentrun mislukt"
 
 msgid "Agent self-verification"
 msgstr "Zelfverificatie door agents"
-
-msgid "agent session ID"
-msgstr "agentsessie-ID"
 
 msgid "Agent session started"
 msgstr "Agentsessie gestart"
@@ -3446,6 +3446,9 @@ msgstr "Terug naar integraties"
 msgid "Back to Linear"
 msgstr "Terug naar Linear"
 
+msgid "Back to main chat"
+msgstr "Terug naar de hoofdchat"
+
 msgid "Back to pages"
 msgstr "Terug naar pagina's"
 
@@ -4203,8 +4206,8 @@ msgstr "Chat wordt herbouwd"
 msgid "Chat Launch"
 msgstr "Start via chat"
 
-msgid "Chat mode"
-msgstr "Chatmodus"
+msgid "Chat name"
+msgstr "Chatnaam"
 
 msgid "Chat session not found"
 msgstr "Chatsessie niet gevonden"
@@ -4519,9 +4522,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-docs"
-
-msgid "CLI mode"
-msgstr "CLI-modus"
 
 msgid "CLI reference"
 msgstr "CLI-referentie"
@@ -5499,14 +5499,8 @@ msgstr "Gekopieerd"
 msgid "Copied {0}"
 msgstr "{0} gekopieerd"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} gekopieerd"
-
 msgid "Copied Link"
 msgstr "Link gekopieerd"
-
-msgid "Copied terminal ID"
-msgstr "Terminal-ID gekopieerd"
 
 msgid "Copied to clipboard."
 msgstr "Gekopieerd naar klembord."
@@ -5573,9 +5567,6 @@ msgstr "Bestandsnaam kopiëren"
 
 msgid "Copy ID"
 msgstr "ID kopiëren"
-
-msgid "Copy IDs"
-msgstr "ID's kopiëren"
 
 msgid "Copy image"
 msgstr "Afbeelding kopiëren"
@@ -6358,9 +6349,6 @@ msgstr "Een cloudomgeving maken"
 
 msgid "Create a Dev"
 msgstr "Een Dev maken"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Maakt bij de provider een native fork met dezelfde gesprekscontext. De oorspronkelijke sessie blijft ongewijzigd."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Maak een nieuwe API-sleutel voor externe integraties zoals Claude Desktop of Claude Code."
@@ -9194,11 +9182,11 @@ msgstr "Fork-argumenten"
 msgid "Fork conversation"
 msgstr "Gesprek afsplitsen"
 
-msgid "Fork session"
-msgstr "Sessie forken"
+msgid "Fork into Chat"
+msgstr "Afsplitsen naar chat"
 
-msgid "Fork session…"
-msgstr "Sessie forken…"
+msgid "Fork into CLI"
+msgstr "Afsplitsen naar CLI"
 
 msgid "Form controls and field composition"
 msgstr "Formulierbesturing en veldsamenstelling"
@@ -11063,6 +11051,9 @@ msgstr "Kanaal verlaten"
 msgid "Leave comment mode"
 msgstr "Opmerkingsmodus verlaten"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Laat leeg om terug te gaan naar de standaardnaam."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Laat leeg om terug te gaan naar de naam die de terminal doorgeeft."
 
@@ -12356,6 +12347,9 @@ msgstr "Nieuwe browser"
 
 msgid "new challengers"
 msgstr "nieuwe uitdagers"
+
+msgid "New chat"
+msgstr "Nieuwe chat"
 
 msgid "New Chat"
 msgstr "Nieuwe chat"
@@ -13910,9 +13904,6 @@ msgstr "Openen in browser"
 msgid "Open in Changes pane"
 msgstr "Openen in paneel Wijzigingen"
 
-msgid "Open in Chat Interface"
-msgstr "Openen in chatinterface"
-
 msgid "Open in ChatGPT"
 msgstr "Openen in ChatGPT"
 
@@ -13987,9 +13978,6 @@ msgstr "Openen in tabblad"
 
 msgid "Open in Tasks"
 msgstr "Openen in Taken"
-
-msgid "Open in Terminal Chat"
-msgstr "Openen in terminalchat"
 
 msgid "Open in…"
 msgstr "Openen in…"
@@ -14082,9 +14070,6 @@ msgstr "Recent openen"
 
 msgid "Open roles"
 msgstr "Openstaande vacatures"
-
-msgid "Open session in"
-msgstr "Sessie openen in"
 
 msgid "Open settings"
 msgstr "Instellingen openen"
@@ -15484,10 +15469,6 @@ msgstr "Eigenschappen"
 msgid "Provide either id or slug"
 msgstr "Geef een id of een slug op"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Provider: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Het provisioneren is mislukt en de sandbox is afgebroken. Er draait niets en deze werkruimte kan niet worden geopend. Maak een nieuwe aan om het opnieuw te proberen."
 
@@ -15903,6 +15884,9 @@ msgstr "Recente activiteit"
 msgid "Recent apps"
 msgstr "Recente apps"
 
+msgid "Recent chats"
+msgstr "Recente chats"
+
 msgid "Recent invoices"
 msgstr "Recente facturen"
 
@@ -16253,6 +16237,9 @@ msgstr "Accountnaam wijzigen"
 
 msgid "Rename branch"
 msgstr "Branchnaam wijzigen"
+
+msgid "Rename chat"
+msgstr "Chatnaam wijzigen"
 
 msgid "Rename failed"
 msgstr "Naam wijzigen mislukt"
@@ -17309,6 +17296,9 @@ msgstr "Een ontwikkelaar zoeken"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Zoek door bestandsinhoud en door al je werkruimtes tegelijk."
+
+msgid "Search all chats…"
+msgstr "Alle chats doorzoeken…"
 
 msgid "Search all emoji"
 msgstr "Alle emoji doorzoeken"
@@ -19620,9 +19610,6 @@ msgstr "Tekengrootte terminal"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Tekengrootte van een terminal met focus, paginazoom in een browserpaneel, anders de hele app"
 
-msgid "terminal ID"
-msgstr "terminal-ID"
-
 msgid "Terminal input"
 msgstr "Terminalinvoer"
 
@@ -19642,9 +19629,6 @@ msgid "Terminal session killed"
 msgstr "Terminalsessie beëindigd"
 
 msgid "Terminal sessions"
-msgstr "Terminalsessies"
-
-msgid "Terminal Sessions"
 msgstr "Terminalsessies"
 
 msgid "Terminal theme color-palette preview"

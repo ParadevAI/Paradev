@@ -1947,6 +1947,9 @@ msgstr "Hesap silinmeyi bekliyor"
 msgid "Account usage"
 msgstr "Hesap kullanımı"
 
+msgid "Account usage: {percent} used"
+msgstr "Hesap kullanımı: {percent} kullanıldı"
+
 msgid "Achievements"
 msgstr "Başarımlar"
 
@@ -2352,9 +2355,6 @@ msgstr "Ajan çalıştırması başarısız oldu"
 
 msgid "Agent self-verification"
 msgstr "Ajan öz doğrulaması"
-
-msgid "agent session ID"
-msgstr "ajan oturum kimliği"
 
 msgid "Agent session started"
 msgstr "Ajan oturumu başladı"
@@ -3446,6 +3446,9 @@ msgstr "Entegrasyonlara dön"
 msgid "Back to Linear"
 msgstr "Linear'a dön"
 
+msgid "Back to main chat"
+msgstr "Ana sohbete dön"
+
 msgid "Back to pages"
 msgstr "Sayfalara dön"
 
@@ -4203,8 +4206,8 @@ msgstr "Sohbet yeniden düzenleniyor"
 msgid "Chat Launch"
 msgstr "Sohbet başlatma"
 
-msgid "Chat mode"
-msgstr "Sohbet modu"
+msgid "Chat name"
+msgstr "Sohbet adı"
 
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
@@ -4519,9 +4522,6 @@ msgstr "CLI ve SDK"
 
 msgid "CLI docs"
 msgstr "CLI belgeleri"
-
-msgid "CLI mode"
-msgstr "CLI modu"
 
 msgid "CLI reference"
 msgstr "CLI referansı"
@@ -5499,14 +5499,8 @@ msgstr "Kopyalandı"
 msgid "Copied {0}"
 msgstr "{0} kopyalandı"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} kopyalandı"
-
 msgid "Copied Link"
 msgstr "Bağlantı kopyalandı"
-
-msgid "Copied terminal ID"
-msgstr "Terminal kimliği kopyalandı"
 
 msgid "Copied to clipboard."
 msgstr "Panoya kopyalandı."
@@ -5573,9 +5567,6 @@ msgstr "Dosya adını kopyala"
 
 msgid "Copy ID"
 msgstr "Kimliği kopyala"
-
-msgid "Copy IDs"
-msgstr "Kimlikleri kopyala"
 
 msgid "Copy image"
 msgstr "Görseli kopyala"
@@ -6358,9 +6349,6 @@ msgstr "Bulut ortamı oluştur"
 
 msgid "Create a Dev"
 msgstr "Dev oluştur"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Sağlayıcıda aynı konuşma bağlamına sahip yerel bir fork oluşturur. Özgün oturum değişmeden kalır."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Claude Desktop veya Claude Code gibi harici entegrasyonlar için yeni bir API anahtarı oluşturun."
@@ -9194,11 +9182,11 @@ msgstr "Fork argümanları"
 msgid "Fork conversation"
 msgstr "Konuşmayı ayır"
 
-msgid "Fork session"
-msgstr "Oturumu forkla"
+msgid "Fork into Chat"
+msgstr "Sohbete çatalla"
 
-msgid "Fork session…"
-msgstr "Oturumu forkla…"
+msgid "Fork into CLI"
+msgstr "CLI'ya çatalla"
 
 msgid "Form controls and field composition"
 msgstr "Form denetimleri ve alan kompozisyonu"
@@ -11063,6 +11051,9 @@ msgstr "Kanaldan ayrıl"
 msgid "Leave comment mode"
 msgstr "Yorum modundan çık"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Varsayılan ada dönmek için boş bırakın."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Terminalin bildirdiği ada dönmek için boş bırakın."
 
@@ -12356,6 +12347,9 @@ msgstr "Yeni tarayıcı"
 
 msgid "new challengers"
 msgstr "yeni rakipler"
+
+msgid "New chat"
+msgstr "Yeni sohbet"
 
 msgid "New Chat"
 msgstr "Yeni sohbet"
@@ -13910,9 +13904,6 @@ msgstr "Tarayıcıda aç"
 msgid "Open in Changes pane"
 msgstr "Değişiklikler bölmesinde aç"
 
-msgid "Open in Chat Interface"
-msgstr "Sohbet arayüzünde aç"
-
 msgid "Open in ChatGPT"
 msgstr "ChatGPT'de aç"
 
@@ -13987,9 +13978,6 @@ msgstr "Sekmede aç"
 
 msgid "Open in Tasks"
 msgstr "Görevlerde aç"
-
-msgid "Open in Terminal Chat"
-msgstr "Terminal sohbetinde aç"
 
 msgid "Open in…"
 msgstr "Şununla aç…"
@@ -14082,9 +14070,6 @@ msgstr "Son kullanılanı aç"
 
 msgid "Open roles"
 msgstr "Açık pozisyonlar"
-
-msgid "Open session in"
-msgstr "Oturumu şurada aç"
 
 msgid "Open settings"
 msgstr "Ayarları aç"
@@ -15484,10 +15469,6 @@ msgstr "Özellikler"
 msgid "Provide either id or slug"
 msgstr "id veya slug değerlerinden birini sağlayın"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Sağlayıcı: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Sağlama başarısız oldu ve sandbox kaldırıldı. Hiçbir şey çalışmıyor ve bu çalışma alanı açılamaz. Yeniden denemek için yeni bir tane oluşturun."
 
@@ -15903,6 +15884,9 @@ msgstr "Son etkinlik"
 msgid "Recent apps"
 msgstr "Son uygulamalar"
 
+msgid "Recent chats"
+msgstr "Son sohbetler"
+
 msgid "Recent invoices"
 msgstr "Son faturalar"
 
@@ -16253,6 +16237,9 @@ msgstr "Hesabı yeniden adlandır"
 
 msgid "Rename branch"
 msgstr "Dalı yeniden adlandır"
+
+msgid "Rename chat"
+msgstr "Sohbeti yeniden adlandır"
 
 msgid "Rename failed"
 msgstr "Yeniden adlandırılamadı"
@@ -17309,6 +17296,9 @@ msgstr "Geliştirici ara"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Dosya içeriklerinde ve tüm çalışma alanlarınızda aynı anda arama yapın."
+
+msgid "Search all chats…"
+msgstr "Tüm sohbetlerde ara…"
 
 msgid "Search all emoji"
 msgstr "Tüm emojilerde ara"
@@ -19620,9 +19610,6 @@ msgstr "Terminal yazı tipi boyutu"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Bir terminal odaktayken terminal yazı tipi boyutu, tarayıcı bölmesinde sayfa yakınlaştırma, aksi halde tüm uygulama"
 
-msgid "terminal ID"
-msgstr "terminal kimliği"
-
 msgid "Terminal input"
 msgstr "Terminal girişi"
 
@@ -19642,9 +19629,6 @@ msgid "Terminal session killed"
 msgstr "Terminal oturumu sonlandırıldı"
 
 msgid "Terminal sessions"
-msgstr "Terminal oturumları"
-
-msgid "Terminal Sessions"
 msgstr "Terminal oturumları"
 
 msgid "Terminal theme color-palette preview"

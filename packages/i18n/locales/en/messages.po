@@ -1947,6 +1947,9 @@ msgstr "Account pending deletion"
 msgid "Account usage"
 msgstr "Account usage"
 
+msgid "Account usage: {percent} used"
+msgstr "Account usage: {percent} used"
+
 msgid "Achievements"
 msgstr "Achievements"
 
@@ -2352,9 +2355,6 @@ msgstr "Agent run failed"
 
 msgid "Agent self-verification"
 msgstr "Agent self-verification"
-
-msgid "agent session ID"
-msgstr "agent session ID"
 
 msgid "Agent session started"
 msgstr "Agent session started"
@@ -3446,6 +3446,9 @@ msgstr "Back to Integrations"
 msgid "Back to Linear"
 msgstr "Back to Linear"
 
+msgid "Back to main chat"
+msgstr "Back to main chat"
+
 msgid "Back to pages"
 msgstr "Back to pages"
 
@@ -4203,8 +4206,8 @@ msgstr "Chat is being reworked"
 msgid "Chat Launch"
 msgstr "Chat Launch"
 
-msgid "Chat mode"
-msgstr "Chat mode"
+msgid "Chat name"
+msgstr "Chat name"
 
 msgid "Chat session not found"
 msgstr "Chat session not found"
@@ -4519,9 +4522,6 @@ msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI docs"
-
-msgid "CLI mode"
-msgstr "CLI mode"
 
 msgid "CLI reference"
 msgstr "CLI reference"
@@ -5499,14 +5499,8 @@ msgstr "Copied"
 msgid "Copied {0}"
 msgstr "Copied {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Copied {copiedLabel}"
-
 msgid "Copied Link"
 msgstr "Copied Link"
-
-msgid "Copied terminal ID"
-msgstr "Copied terminal ID"
 
 msgid "Copied to clipboard."
 msgstr "Copied to clipboard."
@@ -5573,9 +5567,6 @@ msgstr "Copy file name"
 
 msgid "Copy ID"
 msgstr "Copy ID"
-
-msgid "Copy IDs"
-msgstr "Copy IDs"
 
 msgid "Copy image"
 msgstr "Copy image"
@@ -6358,9 +6349,6 @@ msgstr "Create a cloud environment"
 
 msgid "Create a Dev"
 msgstr "Create a Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Create a native provider fork with the same conversation context. The original session stays unchanged."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Create a new API key for external integrations like Claude Desktop or Claude Code."
@@ -9194,11 +9182,11 @@ msgstr "Fork args"
 msgid "Fork conversation"
 msgstr "Fork conversation"
 
-msgid "Fork session"
-msgstr "Fork session"
+msgid "Fork into Chat"
+msgstr "Fork into Chat"
 
-msgid "Fork session…"
-msgstr "Fork session…"
+msgid "Fork into CLI"
+msgstr "Fork into CLI"
 
 msgid "Form controls and field composition"
 msgstr "Form controls and field composition"
@@ -11063,6 +11051,9 @@ msgstr "Leave channel"
 msgid "Leave comment mode"
 msgstr "Leave comment mode"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "Leave it empty to go back to the default name."
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Leave it empty to go back to the name the terminal reports."
 
@@ -12356,6 +12347,9 @@ msgstr "New Browser"
 
 msgid "new challengers"
 msgstr "new challengers"
+
+msgid "New chat"
+msgstr "New chat"
 
 msgid "New Chat"
 msgstr "New Chat"
@@ -13910,9 +13904,6 @@ msgstr "Open in Browser"
 msgid "Open in Changes pane"
 msgstr "Open in Changes pane"
 
-msgid "Open in Chat Interface"
-msgstr "Open in Chat Interface"
-
 msgid "Open in ChatGPT"
 msgstr "Open in ChatGPT"
 
@@ -13987,9 +13978,6 @@ msgstr "Open in tab"
 
 msgid "Open in Tasks"
 msgstr "Open in Tasks"
-
-msgid "Open in Terminal Chat"
-msgstr "Open in Terminal Chat"
 
 msgid "Open in…"
 msgstr "Open in…"
@@ -14082,9 +14070,6 @@ msgstr "Open recent"
 
 msgid "Open roles"
 msgstr "Open roles"
-
-msgid "Open session in"
-msgstr "Open session in"
 
 msgid "Open settings"
 msgstr "Open settings"
@@ -15484,10 +15469,6 @@ msgstr "Properties"
 msgid "Provide either id or slug"
 msgstr "Provide either id or slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Provider: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 
@@ -15903,6 +15884,9 @@ msgstr "Recent Activity"
 msgid "Recent apps"
 msgstr "Recent apps"
 
+msgid "Recent chats"
+msgstr "Recent chats"
+
 msgid "Recent invoices"
 msgstr "Recent invoices"
 
@@ -16253,6 +16237,9 @@ msgstr "Rename account"
 
 msgid "Rename branch"
 msgstr "Rename branch"
+
+msgid "Rename chat"
+msgstr "Rename chat"
 
 msgid "Rename failed"
 msgstr "Rename failed"
@@ -17309,6 +17296,9 @@ msgstr "Search a developer"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Search across file contents and across all your workspaces at once."
+
+msgid "Search all chats…"
+msgstr "Search all chats…"
 
 msgid "Search all emoji"
 msgstr "Search all emoji"
@@ -19620,9 +19610,6 @@ msgstr "Terminal font size"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 
-msgid "terminal ID"
-msgstr "terminal ID"
-
 msgid "Terminal input"
 msgstr "Terminal input"
 
@@ -19643,9 +19630,6 @@ msgstr "Terminal session killed"
 
 msgid "Terminal sessions"
 msgstr "Terminal sessions"
-
-msgid "Terminal Sessions"
-msgstr "Terminal Sessions"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Terminal theme color-palette preview"

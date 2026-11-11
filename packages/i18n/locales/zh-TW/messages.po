@@ -1947,6 +1947,9 @@ msgstr "帳戶待刪除"
 msgid "Account usage"
 msgstr "帳戶用量"
 
+msgid "Account usage: {percent} used"
+msgstr "帳戶用量：已使用 {percent}"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2352,9 +2355,6 @@ msgstr "代理程式執行失敗"
 
 msgid "Agent self-verification"
 msgstr "代理程式自我驗證"
-
-msgid "agent session ID"
-msgstr "代理程式會話ID"
 
 msgid "Agent session started"
 msgstr "代理程式會話已開始"
@@ -3446,6 +3446,9 @@ msgstr "返回整合"
 msgid "Back to Linear"
 msgstr "返回Linear"
 
+msgid "Back to main chat"
+msgstr "返回主聊天"
+
 msgid "Back to pages"
 msgstr "返回頁面"
 
@@ -4203,8 +4206,8 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天啟動"
 
-msgid "Chat mode"
-msgstr "聊天模式"
+msgid "Chat name"
+msgstr "聊天名稱"
 
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
@@ -4519,9 +4522,6 @@ msgstr "CLI與SDK"
 
 msgid "CLI docs"
 msgstr "CLI文件"
-
-msgid "CLI mode"
-msgstr "CLI模式"
 
 msgid "CLI reference"
 msgstr "CLI 參考文件"
@@ -5499,14 +5499,8 @@ msgstr "已複製"
 msgid "Copied {0}"
 msgstr "已複製{0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "已複製{copiedLabel}"
-
 msgid "Copied Link"
 msgstr "已複製連結"
-
-msgid "Copied terminal ID"
-msgstr "已複製終端ID"
 
 msgid "Copied to clipboard."
 msgstr "已複製到剪貼簿。"
@@ -5572,9 +5566,6 @@ msgid "Copy file name"
 msgstr "複製檔名"
 
 msgid "Copy ID"
-msgstr "複製ID"
-
-msgid "Copy IDs"
 msgstr "複製ID"
 
 msgid "Copy image"
@@ -6358,9 +6349,6 @@ msgstr "建立雲端環境"
 
 msgid "Create a Dev"
 msgstr "建立 Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "在供應商端建立具有相同對話上下文的原生分支。原本的會話維持不變。"
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "為Claude Desktop或Claude Code等外部整合建立新的API金鑰。"
@@ -9194,11 +9182,11 @@ msgstr "分支參數"
 msgid "Fork conversation"
 msgstr "分岔對話"
 
-msgid "Fork session"
-msgstr "分支會話"
+msgid "Fork into Chat"
+msgstr "分叉到聊天"
 
-msgid "Fork session…"
-msgstr "分支會話…"
+msgid "Fork into CLI"
+msgstr "分叉到 CLI"
 
 msgid "Form controls and field composition"
 msgstr "表單控制項與欄位組合"
@@ -11063,6 +11051,9 @@ msgstr "離開頻道"
 msgid "Leave comment mode"
 msgstr "退出評論模式"
 
+msgid "Leave it empty to go back to the default name."
+msgstr "留空則恢復為預設名稱。"
+
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "留空即可恢復終端回報的名稱。"
 
@@ -12356,6 +12347,9 @@ msgstr "新建瀏覽器"
 
 msgid "new challengers"
 msgstr "換對手"
+
+msgid "New chat"
+msgstr "新聊天"
 
 msgid "New Chat"
 msgstr "新建聊天"
@@ -13910,9 +13904,6 @@ msgstr "在瀏覽器中開啟"
 msgid "Open in Changes pane"
 msgstr "在「改動」面板中開啟"
 
-msgid "Open in Chat Interface"
-msgstr "在聊天介面中開啟"
-
 msgid "Open in ChatGPT"
 msgstr "在ChatGPT中開啟"
 
@@ -13987,9 +13978,6 @@ msgstr "在分頁中開啟"
 
 msgid "Open in Tasks"
 msgstr "在任務中開啟"
-
-msgid "Open in Terminal Chat"
-msgstr "在終端聊天中開啟"
 
 msgid "Open in…"
 msgstr "開啟方式…"
@@ -14082,9 +14070,6 @@ msgstr "開啟最近使用"
 
 msgid "Open roles"
 msgstr "空缺職位"
-
-msgid "Open session in"
-msgstr "會話開啟於"
 
 msgid "Open settings"
 msgstr "開啟設定"
@@ -15484,10 +15469,6 @@ msgstr "屬性"
 msgid "Provide either id or slug"
 msgstr "請提供id或slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "供應商：{0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "預配失敗，沙箱已被銷燬。目前沒有任何處理程序在執行，此工作區也無法開啟。請新建一個再試。"
 
@@ -15903,6 +15884,9 @@ msgstr "最近動態"
 msgid "Recent apps"
 msgstr "最近使用的 App"
 
+msgid "Recent chats"
+msgstr "最近的聊天"
+
 msgid "Recent invoices"
 msgstr "最近的帳單"
 
@@ -16253,6 +16237,9 @@ msgstr "重新命名帳號"
 
 msgid "Rename branch"
 msgstr "重新命名分支"
+
+msgid "Rename chat"
+msgstr "重新命名聊天"
 
 msgid "Rename failed"
 msgstr "重新命名失敗"
@@ -17309,6 +17296,9 @@ msgstr "搜尋開發者"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜尋所有檔案內容和所有工作區。"
+
+msgid "Search all chats…"
+msgstr "搜尋所有聊天…"
 
 msgid "Search all emoji"
 msgstr "搜尋所有表情符號"
@@ -19620,9 +19610,6 @@ msgstr "終端字型大小"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "終端取得焦點時調整終端字型大小，瀏覽器窗格中調整頁面縮放，其他情況下縮放整個應用程式"
 
-msgid "terminal ID"
-msgstr "終端ID"
-
 msgid "Terminal input"
 msgstr "終端輸入"
 
@@ -19642,9 +19629,6 @@ msgid "Terminal session killed"
 msgstr "終端會話已終止"
 
 msgid "Terminal sessions"
-msgstr "終端會話"
-
-msgid "Terminal Sessions"
 msgstr "終端會話"
 
 msgid "Terminal theme color-palette preview"
