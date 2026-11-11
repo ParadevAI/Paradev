@@ -40,6 +40,7 @@ import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHea
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
+import { WorkspaceGitStatusProvider } from "../../../../providers/WorkspaceGitStatusProvider";
 import {
 	hasCheckouts,
 	useSelectRepository,
@@ -79,10 +80,10 @@ import { useDiffCommentComposer } from "./hooks/useDiffCommentComposer";
 import { useDiffCommentNavigation } from "./hooks/useDiffCommentNavigation";
 import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
+import { useDiffRepositoryFilter } from "./hooks/useDiffRepositoryFilter";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
 import { useRepositoryChangesets } from "./hooks/useRepositoryChangesets";
 import { useRepositoryReviewThreads } from "./hooks/useRepositoryReviewThreads";
-import { useDiffRepositoryFilterStore } from "./stores/diffRepositoryFilterStore";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
 	isDiffContentStale,
@@ -181,16 +182,17 @@ export function DiffPane({
 			),
 		[repositoryReviewThreads.byWorkspace],
 	);
-	const pickedRepositoryIds = useDiffRepositoryFilterStore(
-		(state) => state.byWorkspace[groupId],
-	);
-	const setPickedRepositoryIds = useDiffRepositoryFilterStore(
-		(state) => state.setRepositories,
-	);
+	const [pickedRepositoryIds, setPickedRepositoryIds] =
+		useDiffRepositoryFilter(groupId);
 	const shownRepositories = useMemo(
 		() => shownRepositoryIds(repositoryIds, pickedRepositoryIds),
 		[repositoryIds, pickedRepositoryIds],
 	);
+	// One repository shown: the header scopes that checkout's diff.
+	const scopeWorkspaceId =
+		isMultiRepo && shownRepositories.size === 1
+			? ([...shownRepositories][0] ?? workspaceId)
+			: workspaceId;
 
 	const sidebarRef = useSidebarDiffRef(workspaceId);
 	const filter = data.filter;
@@ -1047,22 +1049,24 @@ export function DiffPane({
 			)}
 			{titleSlot &&
 				createPortal(
-					<DiffPaneScope
-						workspaceId={workspaceId}
-						additions={totals.additions}
-						deletions={totals.deletions}
-						filter={filter}
-						onClearFilter={clearFilter}
-						repositoryFilter={
-							isMultiRepo
-								? {
-										repositories,
-										shown: shownRepositories,
-										onChange: (ids) => setPickedRepositoryIds(groupId, ids),
-									}
-								: undefined
-						}
-					/>,
+					<WorkspaceGitStatusProvider workspaceId={scopeWorkspaceId}>
+						<DiffPaneScope
+							workspaceId={scopeWorkspaceId}
+							additions={totals.additions}
+							deletions={totals.deletions}
+							filter={filter}
+							onClearFilter={clearFilter}
+							repositoryFilter={
+								isMultiRepo
+									? {
+											repositories,
+											shown: shownRepositories,
+											onChange: setPickedRepositoryIds,
+										}
+									: undefined
+							}
+						/>
+					</WorkspaceGitStatusProvider>,
 					titleSlot,
 				)}
 			{actionsSlot &&

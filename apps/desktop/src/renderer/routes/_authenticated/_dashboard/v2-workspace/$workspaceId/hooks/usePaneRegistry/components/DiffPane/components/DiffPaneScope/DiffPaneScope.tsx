@@ -31,9 +31,8 @@ export function DiffPaneScope({
 	const clearLabel = t({ message: "Show all changes" });
 	return (
 		<div className="flex min-w-0 items-center gap-1 text-xs">
-			{repositoryFilter ? (
-				<RepositoryFilter {...repositoryFilter} />
-			) : (
+			{repositoryFilter && <RepositoryFilter {...repositoryFilter} />}
+			{(!repositoryFilter || repositoryFilter.shown.size === 1) &&
 				status &&
 				!filter?.range && (
 					<ChangesScopeControl
@@ -56,8 +55,7 @@ export function DiffPaneScope({
 						baseClassName="hidden @min-[420px]/pane-header:flex"
 						commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
 					/>
-				)
-			)}
+				)}
 			{filter && (
 				<span className="flex min-w-0 shrink-0 items-center gap-0.5 rounded-md bg-accent py-0.5 pr-0.5 pl-1.5 text-[11px] text-accent-foreground">
 					<span className="truncate">

@@ -264,6 +264,8 @@ export const workspaceLocalStateSchema = z.object({
 	repositoryChangesFilters: z
 		.record(z.string(), changesFilterSchema)
 		.default({}),
+	// Checkouts the Changes pane shows; empty shows them all.
+	diffRepositoryIds: z.array(z.string()).default([]),
 });
 
 // Defaults for fields heal can synthesize. Identity fields (workspaceId,
@@ -299,6 +301,7 @@ const WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS = {
 	pendingChatHandoff: null as PendingChatHandoff | null,
 	activeRepositoryId: null as string | null,
 	repositoryChangesFilters: {} as Record<string, ChangesFilter>,
+	diffRepositoryIds: [] as string[],
 };
 
 /**
@@ -627,6 +630,9 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		repositoryChangesFilters:
 			r.repositoryChangesFilters ??
 			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.repositoryChangesFilters,
+		diffRepositoryIds:
+			r.diffRepositoryIds ??
+			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.diffRepositoryIds,
 		sidebarState: {
 			...SIDEBAR_STATE_DEFAULTS,
 			...sidebar,
