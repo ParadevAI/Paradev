@@ -16,9 +16,11 @@ function focusActivePane(store: Store): void {
 	if (paneId) state.focusPane(paneId);
 }
 
+// Hidden kept workspaces render their own right area too, inside an inert
+// wrapper, so look for one that is not inert.
 function isSidebarInteractive(): boolean {
-	const area = document.querySelector('[data-pane-area="right"]');
-	return area !== null && area.closest("[inert]") === null;
+	const areas = document.querySelectorAll('[data-pane-area="right"]');
+	return [...areas].some((area) => area.closest("[inert]") === null);
 }
 
 export function useRightSidebarHotkeys({

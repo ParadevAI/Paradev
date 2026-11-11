@@ -37,6 +37,7 @@ import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
 import { useHotkey } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
 	type AgentSwitcher,
@@ -299,8 +300,9 @@ export const Composer = memo(function Composer({
 		() => promptInputRef.current?.openFileDialog(),
 		{ enabled: Boolean(isActive) },
 	);
+	const isScreenActive = useIsScreenActive();
 	useEffect(() => {
-		if (!isActive) return;
+		if (!isActive || !isScreenActive) return;
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "/" || event.defaultPrevented) return;
 			if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -317,7 +319,7 @@ export const Composer = memo(function Composer({
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [isActive]);
+	}, [isActive, isScreenActive]);
 	const collections = useCollections();
 	const { getOpenFilePaths } = useChatPaneActions();
 	const searchFiles = useCallback(

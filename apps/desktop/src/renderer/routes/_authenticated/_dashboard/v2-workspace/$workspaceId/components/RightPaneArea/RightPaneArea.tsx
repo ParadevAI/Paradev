@@ -18,6 +18,7 @@ import {
 import { LuMaximize2, LuMinimize2 } from "react-icons/lu";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { RightPaneHeaderButton } from "renderer/routes/_authenticated/_dashboard/components/RightPaneHeaderButton";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import {
@@ -94,6 +95,7 @@ export function RightPaneArea({
 		setPaneBox(node?.closest<HTMLElement>("[data-sidebar-slide]") ?? null);
 	}, []);
 	const titleBarSideSlot = useTitleBarSideSlot(paneBox);
+	const isScreenActive = useIsScreenActive();
 	const isParadevShell = useParadevShell();
 
 	return (
@@ -102,7 +104,10 @@ export function RightPaneArea({
 				<PullRequestCountsPrefetch key={pr.url} pullRequest={pr.ref} />
 			))}
 			<Workspace<PaneViewerData>
-				{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
+				{...titleBarTabBarProps(titleBarSideSlot, {
+					paneArea: "right",
+					inert: !isScreenActive,
+				})}
 				appearance={isParadevShell ? "cards" : "default"}
 				isFocused={isFocused}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}

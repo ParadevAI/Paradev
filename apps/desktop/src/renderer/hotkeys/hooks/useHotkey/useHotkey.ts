@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { type Options, useHotkeys } from "react-hotkeys-hook";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { formatHotkeyDisplay } from "../../display";
 import type { HotkeyId } from "../../registry";
 import { PLATFORM } from "../../registry";
@@ -7,6 +8,7 @@ import { useEffectiveLayoutMap } from "../../stores/keyboardPreferencesStore";
 import type { HotkeyDisplay } from "../../types";
 import { bindingToDispatchChord } from "../../utils/binding";
 import { useBinding } from "../useBinding";
+import { resolveHotkeyEnabled } from "./utils/resolveHotkeyEnabled";
 
 // react-hotkeys-hook doesn't check AltGraph or IME composition. Use its
 // `ignoreEventWhen` option (runs after match, before preventDefault) to
@@ -29,6 +31,7 @@ export function useHotkey(
 	const callbackRef = useRef(callback);
 	callbackRef.current = callback;
 	const callerIgnore = options?.ignoreEventWhen;
+	const isScreenActive = useIsScreenActive();
 	useHotkeys(
 		chord ?? "",
 		(e, _h) => {
@@ -41,11 +44,12 @@ export function useHotkey(
 			enableOnFormTags: true,
 			enableOnContentEditable: true,
 			...options,
+			enabled: resolveHotkeyEnabled(options?.enabled, isScreenActive),
 			ignoreEventWhen: callerIgnore
 				? (e) => shouldIgnoreEvent(e) || callerIgnore(e)
 				: shouldIgnoreEvent,
 		},
-		[chord],
+		[chord, isScreenActive],
 	);
 	return formatHotkeyDisplay(chord, PLATFORM, layoutMap);
 }
