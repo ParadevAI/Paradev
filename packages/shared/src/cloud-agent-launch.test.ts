@@ -16,7 +16,7 @@ describe("cloud agent launch", () => {
 	it.each([
 		["claude", true],
 		["pdev", true],
-		["codex", false],
+		["codex", true],
 		["opencode", false],
 		[undefined, false],
 	] as const)("chat support for %s is %s", (agent, supported) => {

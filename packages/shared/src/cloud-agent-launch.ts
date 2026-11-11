@@ -9,6 +9,9 @@ import { HOST_AGENT_PRESETS } from "./host-agent-presets";
  */
 const INSTALLED_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
 
+/** The installed presets whose ACP adapter the sandbox also bundles (`packages/sandbox/src/assets/produce.ts`). */
+const CHAT_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
+
 export const CLOUD_AGENT_IDS: readonly string[] = HOST_AGENT_PRESETS.filter(
 	(preset) => INSTALLED_IN_SANDBOX.has(preset.presetId),
 ).map((preset) => preset.presetId);
@@ -21,7 +24,7 @@ export function isCloudAgentId(id: string): boolean {
 }
 
 export function supportsCloudAgentChat(agent: string | undefined): boolean {
-	return agent === "claude" || agent === "pdev";
+	return !!agent && CHAT_IN_SANDBOX.has(agent);
 }
 
 /**
