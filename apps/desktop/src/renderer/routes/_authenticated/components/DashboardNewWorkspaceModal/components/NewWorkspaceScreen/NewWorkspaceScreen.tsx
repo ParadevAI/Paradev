@@ -12,7 +12,6 @@ import type { MachineSize } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
-import { hostLaunchesChatWithEffort } from "@superset/shared/host-version";
 import { Button } from "@superset/ui/button";
 import { isEnterSubmit } from "@superset/ui/lib/keyboard";
 import { toast } from "@superset/ui/sonner";
@@ -26,7 +25,9 @@ import { LuGitPullRequest } from "react-icons/lu";
 import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceInfo";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useAppVersion } from "renderer/hooks/host-version/useHostVersionState";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
@@ -93,6 +94,7 @@ import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
+import { hostAppliesChatEffort } from "./utils/hostAppliesChatEffort";
 import {
 	AGENT_DEFAULT_OPTION_ID,
 	LAUNCH_EFFORT_OPTION_ID,
@@ -463,6 +465,8 @@ export function NewWorkspaceScreen({
 			}) ?? null
 		);
 	}, [hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
+	const launchHostInfo = useHostServiceInfo(isCloudHost ? null : launchHostUrl);
+	const appVersion = useAppVersion();
 	const githubProviders = useGitHubMentionProviders(
 		useMemo(
 			() =>
@@ -771,10 +775,7 @@ export function NewWorkspaceScreen({
 		isCloudHost ? cloudSelection.machineSize : null,
 		hostId,
 		isSession,
-		hostId === machineId ||
-			hostLaunchesChatWithEffort(
-				otherHosts.find((host) => host.id === hostId)?.version,
-			),
+		hostAppliesChatEffort(launchHostInfo.data?.version, appVersion),
 	);
 
 	const submitBlocker = useMemo<string | null>(() => {
