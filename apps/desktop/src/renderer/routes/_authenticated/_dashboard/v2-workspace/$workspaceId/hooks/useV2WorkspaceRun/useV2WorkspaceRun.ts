@@ -24,6 +24,7 @@ import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
 const CTRL_C_INPUT = "\u0003";
 const BOOT_RUN_POLL_MS = 10_000;
+const BOOT_RUN_GRACE_MS = 30_000;
 const TERMINAL_GONE_ERROR_MESSAGES = [
 	"Terminal session not found",
 	"Terminal session has exited",
@@ -129,24 +130,32 @@ export function useV2WorkspaceRun({
 	const isSandbox =
 		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
 	// A cloud box starts the project's run terminal on boot, once setup ends.
-	// Hosts that predate `runTerminalId` never report one, so polling stops.
+	// Polling stops when it appears, once setup has been over for a while, or
+	// on a host that predates `runTerminalId`.
 	const { data: sandboxStatus } = workspaceTrpc.sandbox.status.useQuery(
 		undefined,
 		{
 			enabled: isSandbox && Boolean(configRunDefinition),
-			refetchInterval: (query) =>
-				query.state.data?.runTerminalId === null ? BOOT_RUN_POLL_MS : false,
+			refetchInterval: (query) => {
+				const status = query.state.data;
+				if (status?.runTerminalId !== null) return false;
+				const setup = status.startHook;
+				const awaitingRun =
+					setup.state === "running" ||
+					(setup.state === "exited" &&
+						Date.now() - setup.since < BOOT_RUN_GRACE_MS);
+				return awaitingRun ? BOOT_RUN_POLL_MS : false;
+			},
 		},
 	);
 	const bootRunTerminalId = sandboxStatus?.runTerminalId ?? null;
-	const { data: liveSessions } = workspaceTrpc.terminal.list.useQuery(
-		{ workspaceId },
-		{ enabled: bootRunTerminalId !== null },
-	);
-	// The cached list can predate the boot terminal.
-	useEffect(() => {
-		if (bootRunTerminalId) void utils.terminal.list.invalidate({ workspaceId });
-	}, [bootRunTerminalId, utils, workspaceId]);
+	// A default terminal that daemonizes (`tmux new-session -d`) leaves an idle
+	// shell, which Stop could not stop; only a running command is adopted.
+	const { data: bootRunProcess } =
+		workspaceTrpc.terminal.hasRunningProcess.useQuery(
+			{ terminalId: bootRunTerminalId ?? "", workspaceId },
+			{ enabled: bootRunTerminalId !== null },
+		);
 
 	const resolvedMatchedPresets = useMemo(
 		() =>
@@ -192,12 +201,7 @@ export function useV2WorkspaceRun({
 		[collections.v2WorkspaceLocalState, workspaceId],
 	);
 
-	const isBootRunLive =
-		bootRunTerminalId !== null &&
-		(liveSessions?.sessions.some(
-			(session) => session.terminalId === bootRunTerminalId,
-		) ??
-			false);
+	const isBootRunLive = bootRunProcess?.running === true;
 	const bootRunCommand = buildTerminalCommand(configRunDefinition?.commands);
 	useEffect(() => {
 		if (!isBootRunLive || !bootRunTerminalId || !projectId) return;
@@ -250,17 +254,24 @@ export function useV2WorkspaceRun({
 			const priorRunTerminalIds = new Set(Object.keys(workspaceRunTerminals));
 			// Ctrl-C can leave a server holding its port; the new run replaces
 			// these terminals in the pane, so nothing else would end them.
-			const { sessions } = await utils.terminal.list.fetch({ workspaceId });
-			await Promise.allSettled(
-				sessions
-					.filter((session) => priorRunTerminalIds.has(session.terminalId))
-					.map((session) =>
-						killSessionMutation.mutateAsync({
-							terminalId: session.terminalId,
-							workspaceId,
-						}),
-					),
-			);
+			try {
+				const { sessions } = await utils.terminal.list.fetch({ workspaceId });
+				await Promise.allSettled(
+					sessions
+						.filter((session) => priorRunTerminalIds.has(session.terminalId))
+						.map((session) =>
+							killSessionMutation.mutateAsync({
+								terminalId: session.terminalId,
+								workspaceId,
+							}),
+						),
+				);
+			} catch (error) {
+				console.warn(
+					"[workspace-run] could not end earlier run terminals",
+					error,
+				);
+			}
 
 			const terminalId = await launcher.create({
 				command,

@@ -49,6 +49,7 @@ import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 } from "./runtime/sandbox-self-seed";
 import {
@@ -711,6 +712,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			browserBridge: config.browserBridge,
 		} as HostServiceContext;
 		await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		if (sandboxIdentity) await resumeSandboxStartHookRun(ctx, sandboxIdentity);
 	};
 
 	return {

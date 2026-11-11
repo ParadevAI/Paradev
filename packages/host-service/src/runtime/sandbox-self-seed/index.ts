@@ -8,6 +8,7 @@ export {
 	getStartHookState,
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 	runSandboxStartHook,
 	type SandboxIdentity,
