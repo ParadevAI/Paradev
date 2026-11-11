@@ -59,7 +59,10 @@ import { getV2NotificationSourcesForPane } from "renderer/stores/v2-notification
 import type { StoreApi } from "zustand/vanilla";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
-import { useActiveRepositoryWorkspaceId } from "../../state/activeRepositoryStore";
+import {
+	useActiveRepositoryWorkspaceId,
+	useWorkspaceRepositories,
+} from "../../state/activeRepositoryStore";
 import {
 	getDocument,
 	useSharedFileDocument,
@@ -81,6 +84,7 @@ import {
 	type SubagentPaneData,
 	type TerminalPaneData,
 } from "../../types";
+import { checkoutForPath } from "../../utils/checkoutForPath";
 import { ignoreChatTerminal } from "../../utils/closedChatSessions";
 import {
 	findTerminalPaneLocation,
@@ -208,6 +212,15 @@ export function usePaneRegistry({
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
 	const repoWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
+	const repositories = useWorkspaceRepositories(workspaceId);
+	// A file pane works on the checkout that holds its file, not the picked one;
+	// a file in no checkout (the multi-repo folder's own files) uses the folder.
+	const fileWorkspaceId = useCallback(
+		(filePath: string) =>
+			checkoutForPath(repositories, filePath) ??
+			(repositories.length > 1 ? workspaceId : repoWorkspaceId),
+		[repositories, workspaceId, repoWorkspaceId],
+	);
 	const closeChatWithUndo = useUndoableChatClose({
 		workspaceId,
 		store,
@@ -336,22 +349,26 @@ export function usePaneRegistry({
 								isActive={ctx.isActive}
 								pinned={Boolean(ctx.pane.pinned)}
 								showDirty={ctx.store !== rightStore}
-								workspaceId={repoWorkspaceId}
+								workspaceId={fileWorkspaceId(data.filePath)}
 							/>
 						);
 					},
 					renderPane: (ctx: RendererContext<PaneViewerData>) => {
 						const inRightPane = ctx.store === rightStore;
+						const paneWorkspaceId = fileWorkspaceId(
+							(ctx.pane.data as FilePaneData).filePath,
+						);
 						return (
 							<FileViewLayout
 								context={ctx}
 								workspaceId={repoWorkspaceId}
+								fileWorkspaceId={paneWorkspaceId}
 								showTree={inRightPane}
 								onSearch={onSearch}
 							>
 								<FilePane
 									context={ctx}
-									workspaceId={repoWorkspaceId}
+									workspaceId={paneWorkspaceId}
 									inRightPane={inRightPane}
 								/>
 							</FileViewLayout>
@@ -360,7 +377,9 @@ export function usePaneRegistry({
 					renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
 						<FilePaneHeaderExtras
 							context={ctx}
-							workspaceId={repoWorkspaceId}
+							workspaceId={fileWorkspaceId(
+								(ctx.pane.data as FilePaneData).filePath,
+							)}
 							inRightPane={ctx.store === rightStore}
 						/>
 					),
@@ -368,7 +387,10 @@ export function usePaneRegistry({
 						ctx.actions.pin(),
 					onBeforeClose: (pane) => {
 						const data = pane.data as FilePaneData;
-						const doc = getDocument(repoWorkspaceId, data.filePath);
+						const doc = getDocument(
+							fileWorkspaceId(data.filePath),
+							data.filePath,
+						);
 						if (!doc?.dirty) return true;
 						const name = getFileName(data.filePath);
 						return new Promise<boolean>((resolve) => {
@@ -386,7 +408,10 @@ export function usePaneRegistry({
 											message: "Save",
 										}),
 										onClick: async () => {
-											const doc = getDocument(repoWorkspaceId, data.filePath);
+											const doc = getDocument(
+												fileWorkspaceId(data.filePath),
+												data.filePath,
+											);
 											if (!doc) {
 												resolve(true);
 												return;
@@ -412,7 +437,10 @@ export function usePaneRegistry({
 										}),
 										variant: "secondary",
 										onClick: async () => {
-											const doc = getDocument(repoWorkspaceId, data.filePath);
+											const doc = getDocument(
+												fileWorkspaceId(data.filePath),
+												data.filePath,
+											);
 											if (doc) await doc.reload();
 											resolve(true);
 										},
