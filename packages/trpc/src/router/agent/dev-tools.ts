@@ -17,6 +17,7 @@ import { agentTemporal } from "../../lib/agent-runtime";
 import { devProcedure } from "../../trpc";
 import { channelNotFound } from "../channel/access";
 import { sendChannelMessage } from "../channel/channel-message";
+import { sendMessageSchema } from "../channel/schema";
 import { devChannelTools } from "./dev-channel-tools";
 import { devRoutineTools } from "./dev-routine-tools";
 import { fillSlots, startTask } from "./tasks";
@@ -100,7 +101,7 @@ export const devToolsRouter = {
 		.input(
 			z.object({
 				target: z.string().regex(REPLY_TARGET),
-				body: z.string().min(1).max(40_000),
+				body: sendMessageSchema.shape.body.min(1),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
