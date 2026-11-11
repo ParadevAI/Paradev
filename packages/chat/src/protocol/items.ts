@@ -224,6 +224,7 @@ export const planSchema = z.looseObject({
 export type Plan = z.infer<typeof planSchema>;
 
 export const formFieldSchema = z.looseObject({
+	answerFor: z.string().optional(),
 	id: z.string().min(1),
 	title: z.string().optional(),
 	description: z.string().optional(),

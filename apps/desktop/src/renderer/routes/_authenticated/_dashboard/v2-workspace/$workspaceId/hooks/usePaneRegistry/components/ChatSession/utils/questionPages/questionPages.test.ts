@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import type { FormField } from "@superset/chat/protocol";
-import { isInvalidNumber, questionPages } from "./questionPages";
+import {
+	isInvalidNumber,
+	isPageAnswered,
+	questionPages,
+} from "./questionPages";
 
 const choice = (id: string): FormField => ({
 	id,
@@ -23,6 +27,18 @@ describe("questionPages", () => {
 			["q1", "q1_custom"],
 			["note", undefined],
 		]);
+	});
+
+	it("accepts a Codex note as the only answer to its required choice", () => {
+		const pages = questionPages([
+			{ ...choice("delivery"), required: true },
+			{ ...text("delivery_note1"), answerFor: "delivery" },
+		]);
+		expect(pages).toHaveLength(1);
+		const [page] = pages;
+		if (!page) throw new Error("Missing question");
+		expect(isPageAnswered(page, { delivery_note1: "Pickup" })).toBe(true);
+		expect(isPageAnswered(page, { delivery_note1: " " })).toBe(false);
 	});
 
 	it("keeps a generic text field on its own page", () => {

@@ -1709,6 +1709,41 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
+	it("returns a written Codex answer without requiring an unrelated choice", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		const id = agent.requestElicitation({
+			message: "Delivery?",
+			requestedSchema: {
+				type: "object",
+				required: ["delivery"],
+				properties: {
+					delivery: { type: "string", oneOf: [{ const: "Mail" }] },
+					delivery_note: {
+						type: "string",
+						_meta: { codex: { role: "user_note", questionId: "delivery" } },
+					},
+				},
+			},
+		});
+		await flush();
+		const approval = itemsOf(events).find(
+			(item) => item.kind === "approval_request",
+		);
+		expect(approval?.form?.fields[1]?.answerFor).toBe("delivery");
+		adapter.respondToApproval(approval?.id ?? "", {
+			type: "form",
+			values: { delivery_note: "Pickup" },
+		});
+		await flush();
+		expect(agent.responseTo(id)?.result).toEqual({
+			action: "accept",
+			content: { delivery_note: "Pickup" },
+		});
+		await adapter.dispose();
+	});
+
 	it("types a generic form's answers by its schema", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(agent);
