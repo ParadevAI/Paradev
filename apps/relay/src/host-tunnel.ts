@@ -425,8 +425,8 @@ export class HostTunnel extends Server<RelayEnv> {
 		this.httpExchanges.fail(ticket);
 	}
 
-	// readyState alone is not enough: a closed socket whose peer never answered
-	// reads OPEN again after the object wakes from hibernation.
+	// getConnections() trusts readyState, but a closed socket whose peer never
+	// answered reads OPEN again after a wake. The retired mark survives it.
 	private hostConn(): Connection | null {
 		for (const conn of this.getConnections(HOST_TAG)) {
 			const state = conn.state as ConnState | undefined;
