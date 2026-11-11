@@ -375,3 +375,35 @@ test("a terminal inside a checkout gets that repository's main checkout as its r
 	).toBe(repoPaths[1] ?? "missing");
 	expect(repositoryRootPathFor(host.db, workspace.id, root)).toBe("");
 });
+
+test("a shared base branch applies to every repository that has it", async () => {
+	const { host, projectId, fixtures } = await containerScenario();
+	const api = fixtures[1];
+	if (!api) throw new Error("missing fixture");
+	await api.git.checkoutLocalBranch("release");
+	await api.commit("release only", { "release.txt": "release" });
+	await api.git.checkout("main");
+
+	const { workspace } = await host.trpc.workspaces.create.mutate({
+		projectId,
+		name: "from release",
+		branch: "feature/from-release",
+		baseBranch: "release",
+	});
+
+	const [web, apiCheckout] = await host.trpc.workspace.repositories.query({
+		workspaceId: workspace.id,
+	});
+	expect(existsSync(join(apiCheckout?.worktreePath ?? "", "release.txt"))).toBe(
+		true,
+	);
+	expect(existsSync(join(web?.worktreePath ?? "", "README.md"))).toBe(true);
+});
+
+test("a local-checkout workspace is refused for a multi-repo project", async () => {
+	const { host, projectId } = await containerScenario();
+
+	await expect(
+		host.trpc.workspaces.create.mutate({ projectId, checkout: "local" }),
+	).rejects.toThrow("A multi-repo project has no single checkout");
+});

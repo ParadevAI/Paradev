@@ -108,6 +108,7 @@ import {
 	type BaseRefFetcher,
 	resolveNewBranchStartPoint,
 } from "../workspace-creation/utils/resolve-new-branch-start-point";
+import { resolveStartPoint } from "../workspace-creation/utils/resolve-start-point";
 import { deduplicateBranchName } from "../workspace-creation/utils/sanitize-branch";
 import { scheduleWorkspaceNaming } from "../workspace-creation/utils/workspace-naming-job";
 
@@ -438,6 +439,8 @@ async function createRepositoryCheckouts(
 		root: string;
 		repositoryProjects: ReturnType<typeof listRepositoryProjects>;
 		baseBranches?: Record<string, string>;
+		/** Used by each repository that has this branch and no base of its own. */
+		sharedBaseBranch?: string;
 	},
 ): Promise<Array<{ id: string; worktreePath: string; branch: string }>> {
 	const created: Array<{ id: string; worktreePath: string; branch: string }> =
@@ -447,10 +450,17 @@ async function createRepositoryCheckouts(
 		try {
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
+			const sharedBase = args.sharedBaseBranch?.trim();
+			const baseBranch =
+				args.baseBranches?.[repository.id] ??
+				(sharedBase &&
+				(await resolveStartPoint(git, sharedBase)).kind !== "head"
+					? sharedBase
+					: undefined);
 			const plan = await planBranchSource(
 				git,
 				args.branch,
-				args.baseBranches?.[repository.id],
+				baseBranch,
 				createWorkerBaseRefFetcher(ctx, repository.repoPath),
 			);
 			await addBranchWorktree({
@@ -515,8 +525,15 @@ async function createContainerWorkspace(
 			message: "Add a repository to this project first",
 		});
 	}
-	// ponytail: only new-branch worktree workspaces; `checkout` is ignored, and
-	// PR and adopt creates wait for the UX of those flows to settle.
+	if (input.checkout === "local") {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"A multi-repo project has no single checkout to work in; create a worktree workspace instead",
+		});
+	}
+	// ponytail: only new-branch worktree workspaces; PR and adopt creates wait
+	// for the UX of those flows to settle.
 	if (input.pr !== undefined || input.worktreePath !== undefined) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -577,6 +594,7 @@ async function createContainerWorkspace(
 		root,
 		repositoryProjects: repositories,
 		baseBranches: input.repositoryBaseBranches,
+		sharedBaseBranch: input.baseBranch,
 	});
 	writeWorkspaceContextFiles(root, checkouts);
 
