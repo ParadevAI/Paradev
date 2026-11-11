@@ -17,6 +17,7 @@ import { getProjectIncludingDeleted } from "../../../projects/local-project-stor
 import {
 	isContainerProject,
 	listRepositoryProjects,
+	listRepositoryWorkspaces,
 	writeWorkspaceContextFiles,
 } from "../../../projects/multi-repo";
 import { createGitEnvResolver } from "../../../runtime/git";
@@ -776,6 +777,16 @@ async function restoreArchivedWorkspace(
 		});
 	}
 	try {
+		if (
+			row.projectId &&
+			isContainerProject(requireLocalProject(ctx, row.projectId))
+		) {
+			await restoreContainerCheckouts(ctx, row);
+			return toCloudShape(
+				getLocalWorkspace(ctx.db, workspaceId) ?? row,
+				ctx.organizationId,
+			);
+		}
 		const recreated = await recreateArchivedCheckout(ctx, row);
 		unarchiveLocalWorkspace(ctx, workspaceId);
 		if (recreated) {
@@ -796,6 +807,41 @@ async function restoreArchivedWorkspace(
 	}
 	const restored = getLocalWorkspace(ctx.db, workspaceId) ?? row;
 	return toCloudShape(restored, ctx.organizationId);
+}
+
+/**
+ * Checks out every repository again before any row is un-archived, so a
+ * failure leaves the whole workspace archived and the restore retryable.
+ */
+async function restoreContainerCheckouts(
+	ctx: HostServiceContext,
+	row: HostWorkspaceRow,
+): Promise<void> {
+	const checkouts = listRepositoryWorkspaces(ctx.db, row.id, {
+		includeArchived: true,
+	});
+	mkdirSync(row.worktreePath, { recursive: true });
+	const recreated: HostWorkspaceRow[] = [];
+	for (const checkout of checkouts) {
+		if (await recreateArchivedCheckout(ctx, checkout)) recreated.push(checkout);
+	}
+	writeWorkspaceContextFiles(row.worktreePath, checkouts);
+	for (const checkout of checkouts) unarchiveLocalWorkspace(ctx, checkout.id);
+	unarchiveLocalWorkspace(ctx, row.id);
+	for (const checkout of recreated) {
+		try {
+			const { warning } = await startSetupTerminalIfPresent({
+				ctx,
+				workspaceId: row.id,
+				repositoryWorkspaceId: checkout.id,
+			});
+			if (warning) {
+				console.warn(`[workspaces.restore] setup warning: ${warning}`);
+			}
+		} catch (err) {
+			console.warn("[workspaces.restore] setup terminal failed:", err);
+		}
+	}
 }
 
 /** Returns true when a new worktree was checked out. */

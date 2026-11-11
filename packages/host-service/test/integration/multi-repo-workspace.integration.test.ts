@@ -1,7 +1,13 @@
 import { afterEach, expect, test } from "bun:test";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { workspaces } from "../../src/db/schema";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
@@ -22,7 +28,15 @@ async function containerScenario() {
 	const web = await createGitFixture();
 	const api = await createGitFixture();
 	dispose = async () => {
+		const roots = host.db
+			.select({ worktreePath: workspaces.worktreePath })
+			.from(workspaces)
+			.where(isNull(workspaces.parentWorkspaceId))
+			.all();
 		await host.dispose();
+		for (const { worktreePath } of roots) {
+			rmSync(worktreePath, { recursive: true, force: true });
+		}
 		web.dispose();
 		api.dispose();
 	};
@@ -238,4 +252,27 @@ test("file search finds files deep inside every checkout", async () => {
 	expect(matches.map((match) => match.relativePath)).toEqual([
 		`${basename(api.worktreePath)}/a/b/c/d/e/f/g/h/i/deep-target.ts`,
 	]);
+});
+
+test("restoring a deleted container workspace brings back every checkout", async () => {
+	const { host, workspace, checkouts } = await containerWorkspace();
+	const root = dirname(checkouts[0]?.worktreePath ?? "");
+	await host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	expect(existsSync(root)).toBe(false);
+
+	await host.trpc.workspaces.restore.mutate({ workspaceId: workspace.id });
+
+	const restored = await host.trpc.workspace.repositories.query({
+		workspaceId: workspace.id,
+	});
+	expect(restored.map((checkout) => checkout.id)).toEqual(
+		checkouts.map((checkout) => checkout.id),
+	);
+	for (const checkout of restored) {
+		expect(checkout.branch).toBe("feature/both");
+		expect(existsSync(join(checkout.worktreePath, ".git"))).toBe(true);
+	}
+	expect(existsSync(join(root, "AGENTS.md"))).toBe(true);
 });

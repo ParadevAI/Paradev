@@ -22,14 +22,18 @@ export function listRepositoryProjects(db: HostDb, projectId: string) {
 		.sort((a, b) => a.createdAt - b.createdAt);
 }
 
-export function listRepositoryWorkspaces(db: HostDb, workspaceId: string) {
+export function listRepositoryWorkspaces(
+	db: HostDb,
+	workspaceId: string,
+	{ includeArchived = false }: { includeArchived?: boolean } = {},
+) {
 	return db
 		.select()
 		.from(workspaces)
 		.where(
 			and(
 				eq(workspaces.parentWorkspaceId, workspaceId),
-				isNull(workspaces.archivedAt),
+				includeArchived ? undefined : isNull(workspaces.archivedAt),
 			),
 		)
 		.all()
