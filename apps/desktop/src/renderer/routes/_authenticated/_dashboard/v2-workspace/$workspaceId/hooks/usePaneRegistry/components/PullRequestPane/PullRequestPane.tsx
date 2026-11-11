@@ -3,11 +3,7 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import {
-	isSamePullRequest,
-	type PullRequestRef,
-	pullRequestRefFromUrl,
-} from "renderer/lib/github/pullRequestRef";
+import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
 import type { PullRequestActivityThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActivity";
 import { PullRequestDetailContent } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailContent";
@@ -34,6 +30,7 @@ import {
 	useReviewCommentNavigation,
 } from "../../../useReviewCommentNavigation";
 import { PullRequestEvidence } from "./components/PullRequestEvidence";
+import { usePullRequestCheckoutId } from "./hooks/usePullRequestCheckoutId";
 import { usePullRequestEvidence } from "./hooks/usePullRequestEvidence";
 import { usePullRequestPaneDetail } from "./hooks/usePullRequestPaneDetail";
 import { buildReviewThreadEntries } from "./utils/buildReviewThreadEntries";
@@ -73,19 +70,20 @@ export function PullRequestPane({
 
 	// Pages and "open in diff" belong to the workspace, so they exist only
 	// when this workspace's linked PR is the one on screen.
+	const linkedWorkspaceId = usePullRequestCheckoutId(workspace.id, data);
+	const isLinkedPR = linkedWorkspaceId !== null;
 	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery({
-		workspaceId: workspace.id,
+		workspaceId: linkedWorkspaceId ?? workspace.id,
 	});
-	const linkedRef = linkedPR.data?.url
-		? pullRequestRefFromUrl(linkedPR.data.url)
-		: null;
-	const isLinkedPR = linkedRef !== null && isSamePullRequest(linkedRef, data);
 	const evidence = usePullRequestEvidence(
-		workspace.id,
+		linkedWorkspaceId ?? workspace.id,
 		isLinkedPR && activeTab === "summary" && isTabVisible,
 	);
 	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
-	const onOpenInDiff = useReviewCommentNavigation(workspace.id, onOpenDiff);
+	const onOpenInDiff = useReviewCommentNavigation(
+		linkedWorkspaceId ?? workspace.id,
+		onOpenDiff,
+	);
 	const prUrl =
 		detail.data?.url ??
 		`https://github.com/${data.repoFullName}/pull/${data.number}`;

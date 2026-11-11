@@ -21,6 +21,9 @@ mock.module(`${root}/v2-workspace/providers/WorkspaceProvider`, () => ({
 		hostUrl: "http://host.test",
 	}),
 }));
+mock.module(`${pane}/hooks/usePullRequestCheckoutId`, () => ({
+	usePullRequestCheckoutId: () => null,
+}));
 mock.module(`${pane}/hooks/usePullRequestPaneDetail`, () => ({
 	usePullRequestPaneDetail: () => detail,
 }));
