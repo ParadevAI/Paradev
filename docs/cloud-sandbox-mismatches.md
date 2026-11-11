@@ -527,6 +527,17 @@ sandbox running (and billing) plus the `cloud_workspaces` row intact — the
 workspace reappeared on the next refetch. **Fixed:** `useDestroyWorkspace`
 sends a cloud workspace to `cloudWorkspace.delete`.
 
+**The boot-started Run command was invisible. Fixed.** Locally, Run starts the
+default terminal when the person asks for it. A box starts it at boot, so the
+workspace opens with its dev server up. It used to run as a detached bash beside
+`[setup]`, with no terminal: the port scanner, which only attributes processes
+under a terminal session, never saw its ports, so nothing forwarded them, and
+the desktop's Run started a second copy (`next dev` then fails with "Another
+next dev server is already running"). `runSandboxStartHook` now starts the
+default terminal in a terminal session once setup ends, `sandbox.status`
+reports it as `runTerminalId`, and the desktop adopts it as the running
+workspace run (SUPER-3421).
+
 **Archive ran no teardown.** Locally, deleting a workspace runs the repository's
 teardown before the worktree goes. A cloud archive only stopped the box and
 deleted it seven days later, so anything `setup` created outside the box
