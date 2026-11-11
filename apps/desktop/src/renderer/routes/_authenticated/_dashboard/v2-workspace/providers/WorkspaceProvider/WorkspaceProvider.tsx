@@ -14,6 +14,7 @@ import {
 } from "renderer/lib/host-service-auth";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { RepositoryHostProvider } from "../RepositoryHostProvider";
 import { WorkspaceTrpcProvider } from "../WorkspaceTrpcProvider";
 import { WorkspaceHostGate } from "./components/WorkspaceHostGate";
 import { WorkspaceLocalHostPendingState } from "./components/WorkspaceLocalHostPendingState";
@@ -79,7 +80,15 @@ export function WorkspaceProvider({
 				headers={() => getHostServiceHeaders(hostUrl)}
 				wsToken={() => getHostServiceWsToken(hostUrl)}
 			>
-				<WorkspaceHostGate workspace={workspace}>{children}</WorkspaceHostGate>
+				<WorkspaceHostGate workspace={workspace}>
+					<RepositoryHostProvider
+						workspaceId={workspace.id}
+						hostId={workspace.hostId}
+						hostUrl={hostUrl}
+					>
+						{children}
+					</RepositoryHostProvider>
+				</WorkspaceHostGate>
 			</WorkspaceTrpcProvider>
 		</WorkspaceContext.Provider>
 	);
