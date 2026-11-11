@@ -1158,9 +1158,7 @@ export function NewWorkspaceScreen({
 			</div>
 			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
 				{/* On short windows the editor stops before the centred heading. */}
-				<div
-					className="relative flex w-full max-w-[592px] flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]"
-				>
+				<div className="relative flex w-full max-w-[592px] flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]">
 					<AnimatePresence initial={false}>
 						{isPromptEmpty &&
 							!samplePromptsPending &&
