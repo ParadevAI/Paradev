@@ -13,7 +13,7 @@ export function isChatTerminal(
 		(layout?.tabs ?? []).some((tab) =>
 			Object.values(tab.panes).some(
 				(pane) =>
-					pane.kind === "chat" &&
+					pane.kind === "chat-v3" &&
 					(pane.data as { terminalId?: string }).terminalId === terminalId,
 			),
 		),

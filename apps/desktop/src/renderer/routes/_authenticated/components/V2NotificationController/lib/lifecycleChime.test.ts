@@ -39,7 +39,7 @@ describe("isChatTerminal", () => {
 					id: "tab-1",
 					panes: {
 						a: { id: "a", kind: "terminal", data: { terminalId: "t-term" } },
-						b: { id: "b", kind: "chat", data: { terminalId: "t-chat" } },
+						b: { id: "b", kind: "chat-v3", data: { terminalId: "t-chat" } },
 					},
 				},
 			],
