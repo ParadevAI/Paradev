@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 import { NotFound } from "renderer/routes/not-found";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { ProjectSettings } from "../../project/$projectId/components/ProjectSettings";

@@ -35,7 +35,7 @@ export interface UseHostTagFoldersResult {
  * and colour for one paint is a non-event — unlike a missing project, which
  * would empty the sidebar.
  */
-export function useHostTagFolders(): UseHostTagFoldersResult {
+export function useHostTagFoldersSource(): UseHostTagFoldersResult {
 	const queryClient = useQueryClient();
 	const { activeHostUrl, machineId, activeOrganizationId } =
 		useLocalHostService();

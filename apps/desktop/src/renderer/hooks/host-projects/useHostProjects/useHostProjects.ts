@@ -47,7 +47,7 @@ export interface UseHostProjectsResult {
  * `project:changed` events, and persist last-seen lists per host to
  * IndexedDB. Projects are fully local — there is no cloud source.
  */
-export function useHostProjects(): UseHostProjectsResult {
+export function useHostProjectsSource(): UseHostProjectsResult {
 	const queryClient = useQueryClient();
 	const { activeHostUrl, machineId, activeOrganizationId } =
 		useLocalHostService();

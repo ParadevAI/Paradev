@@ -13,10 +13,10 @@ import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { LuLink } from "react-icons/lu";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { cloudRepoProjectId } from "renderer/lib/github/cloudRepoProjectId";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 
 function projectIconUrl(project: {
 	icon: string | null;

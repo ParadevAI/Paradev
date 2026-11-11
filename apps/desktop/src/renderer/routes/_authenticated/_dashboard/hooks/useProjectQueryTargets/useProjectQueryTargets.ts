@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrls } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { selectServingHostId } from "../useProjectHost/useProjectHost";
 

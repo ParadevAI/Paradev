@@ -32,9 +32,12 @@ mock.module(`${root}/v2-workspace/providers/WorkspaceProvider`, () => ({
 		hostUrl: "https://sandbox.test",
 	}),
 }));
-mock.module("renderer/hooks/host-projects/useHostProjects", () => ({
-	useHostProjects: () => hostProjects,
-}));
+mock.module(
+	"renderer/routes/_authenticated/providers/HostProjectsProvider",
+	() => ({
+		useHostProjects: () => hostProjects,
+	}),
+);
 mock.module("renderer/hooks/useActiveOrganizationId", () => ({
 	useActiveOrganizationId: () => "org",
 }));

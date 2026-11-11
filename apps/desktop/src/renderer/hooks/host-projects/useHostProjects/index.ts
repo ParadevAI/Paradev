@@ -1,7 +1,7 @@
-export {
-	type HostProjectItem,
-	type HostProjectRow,
-	type HostProjectRowsResult,
-	type UseHostProjectsResult,
-	useHostProjects,
+export type {
+	HostProjectItem,
+	HostProjectRow,
+	HostProjectRowsResult,
+	UseHostProjectsResult,
 } from "./useHostProjects";
+export { useHostProjectsSource } from "./useHostProjects";
