@@ -1369,6 +1369,9 @@ msgstr "{total} içinden {received}"
 msgid "{remaining} tokens left"
 msgstr "{remaining} token kaldı"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# depo} other {# depo}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "Bu sekmede hâlâ bir süreç çalışıyor"
 
 msgid "A process is still running in this terminal"
 msgstr "Bu terminalde hâlâ bir süreç çalışıyor"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Bir proje bir veya daha fazla depo içerir. Her çalışma alanı hepsini yan yana checkout eder."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Bir istem, birkaç tetikleyici ve her çalıştırma için bir çalışma alanı"
@@ -8243,6 +8249,9 @@ msgstr "Her çarşamba 09.00'da bu haftanın birleştirilen PR'larını incele v
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Her hafta içi 09.00'da yeni GitHub issue'larını oku, etiket uygula ve incelemem için ilk yanıt taslağını hazırla."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Bu projenin her çalışma alanı hepsini tek bir dalda, yan yana checkout eder."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Herkes bunun genellenebilir olup olmadığını tartışır. Bu tartışma, düzeye ulaşıldığının işaretidir."
 
@@ -13940,6 +13949,9 @@ msgstr "Yalnızca davet edilen kişiler"
 msgid "Only people who opted in appear here."
 msgstr "Burada yalnızca katılmayı seçenler görünür."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Yalnızca tek depolu projelerde desteklenir"
+
 msgid "Only the author can change a comment"
 msgstr "Yorumu yalnızca yazarı değiştirebilir"
 
@@ -14340,9 +14352,6 @@ msgstr "PR #{0} aç"
 
 msgid "Open Preview"
 msgstr "Önizlemeyi aç"
-
-msgid "Open project"
-msgstr "Projeyi aç"
 
 msgid "Open Project"
 msgstr "Proje aç"
@@ -18092,6 +18101,9 @@ msgstr "Aralık seçin..."
 
 msgid "Select repositories"
 msgstr "Depoları seç"
+
+msgid "Select repositories to add"
+msgstr "Eklenecek depoları seç"
 
 msgid "Select run"
 msgstr "Çalıştırmayı seç"

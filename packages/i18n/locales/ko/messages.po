@@ -1369,6 +1369,9 @@ msgstr "{total} 중 {received}"
 msgid "{remaining} tokens left"
 msgstr "{remaining} 토큰 남음"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {리포지토리 #개} other {리포지토리 #개}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "이 탭에서 프로세스가 아직 실행 중입니다"
 
 msgid "A process is still running in this terminal"
 msgstr "이 터미널에서 프로세스가 아직 실행 중입니다"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "프로젝트에는 하나 이상의 리포지토리가 포함됩니다. 각 워크스페이스는 모든 리포지토리를 나란히 체크아웃합니다."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "프롬프트, 몇 가지 트리거, 그리고 실행마다 워크스페이스"
@@ -8243,6 +8249,9 @@ msgstr "매주 수요일 오전 9시에 이번 주 머지된 PR을 검토하고,
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "평일 오전 9시마다 새 GitHub 이슈를 읽고, 라벨을 적용하고, 검토용 첫 답변 초안을 작성합니다."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "이 프로젝트의 각 워크스페이스는 모든 리포지토리를 하나의 브랜치에서 나란히 체크아웃합니다."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "이것이 일반화될 수 있는지를 두고 모두가 논쟁합니다. 그 논쟁 자체가 해당 단계에 도달했다는 신호입니다."
 
@@ -13940,6 +13949,9 @@ msgstr "초대된 사람만"
 msgid "Only people who opted in appear here."
 msgstr "참여를 선택한 사람만 여기에 표시됩니다."
 
+msgid "Only supported in projects with a single repository"
+msgstr "리포지토리가 하나인 프로젝트에서만 지원됩니다"
+
 msgid "Only the author can change a comment"
 msgstr "작성자만 댓글을 변경할 수 있습니다"
 
@@ -14340,9 +14352,6 @@ msgstr "PR #{0} 열기"
 
 msgid "Open Preview"
 msgstr "미리보기 열기"
-
-msgid "Open project"
-msgstr "프로젝트 열기"
 
 msgid "Open Project"
 msgstr "프로젝트 열기"
@@ -18092,6 +18101,9 @@ msgstr "범위 선택..."
 
 msgid "Select repositories"
 msgstr "리포지토리 선택"
+
+msgid "Select repositories to add"
+msgstr "추가할 리포지토리 선택"
 
 msgid "Select run"
 msgstr "실행 선택"

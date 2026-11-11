@@ -1369,6 +1369,9 @@ msgstr "{received} dari {total}"
 msgid "{remaining} tokens left"
 msgstr "Sisa {remaining} token"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# repositori} other {# repositori}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Perubahan pada # file dibatalkan.} other {Perubahan pada # file dibatalkan.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "Masih ada proses yang berjalan di tab ini"
 
 msgid "A process is still running in this terminal"
 msgstr "Masih ada proses yang berjalan di terminal ini"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Sebuah proyek berisi satu atau beberapa repositori. Setiap workspace men-checkout semuanya, berdampingan."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Prompt, beberapa pemicu, dan workspace untuk setiap run"
@@ -8243,6 +8249,9 @@ msgstr "Tiap Rabu jam 9 pagi, tinjau PR yang di-merge minggu ini dan perbarui do
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Tiap hari kerja jam 9 pagi, baca issue GitHub baru, terapkan label, dan susun draf balasan pertama untuk saya review."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Setiap workspace dalam proyek ini men-checkout semuanya, berdampingan, di satu branch."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Semua orang berdebat apakah ini bisa digeneralisasi. Perdebatan itu justru tanda bahwa levelnya sudah tercapai."
 
@@ -13940,6 +13949,9 @@ msgstr "Hanya orang yang diundang"
 msgid "Only people who opted in appear here."
 msgstr "Hanya orang yang memilih ikut serta yang muncul di sini."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Hanya didukung di proyek dengan satu repositori"
+
 msgid "Only the author can change a comment"
 msgstr "Hanya penulis yang bisa mengubah komentar"
 
@@ -14340,9 +14352,6 @@ msgstr "Buka PR #{0}"
 
 msgid "Open Preview"
 msgstr "Buka Pratinjau"
-
-msgid "Open project"
-msgstr "Buka proyek"
 
 msgid "Open Project"
 msgstr "Buka Proyek"
@@ -18092,6 +18101,9 @@ msgstr "Pilih rentang..."
 
 msgid "Select repositories"
 msgstr "Pilih repositori"
+
+msgid "Select repositories to add"
+msgstr "Pilih repositori yang akan ditambahkan"
 
 msgid "Select run"
 msgstr "Pilih run"

@@ -1369,6 +1369,9 @@ msgstr "{received} of {total}"
 msgid "{remaining} tokens left"
 msgstr "{remaining} tokens left"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# repository} other {# repositories}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "A process is still running in this tab"
 
 msgid "A process is still running in this terminal"
 msgstr "A process is still running in this terminal"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "A project holds one or more repositories. Every workspace checks out all of them, side by side."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "A prompt, some triggers, and a workspace for each run"
@@ -8243,6 +8249,9 @@ msgstr "Every Wednesday at 9am, review this week's merged PRs and update any doc
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Every workspace of this project checks out all of them, side by side, on one branch."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 
@@ -13940,6 +13949,9 @@ msgstr "Only people invited"
 msgid "Only people who opted in appear here."
 msgstr "Only people who opted in appear here."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Only supported in projects with a single repository"
+
 msgid "Only the author can change a comment"
 msgstr "Only the author can change a comment"
 
@@ -14340,9 +14352,6 @@ msgstr "Open PR #{0}"
 
 msgid "Open Preview"
 msgstr "Open Preview"
-
-msgid "Open project"
-msgstr "Open project"
 
 msgid "Open Project"
 msgstr "Open Project"
@@ -18092,6 +18101,9 @@ msgstr "Select range..."
 
 msgid "Select repositories"
 msgstr "Select repositories"
+
+msgid "Select repositories to add"
+msgstr "Select repositories to add"
 
 msgid "Select run"
 msgstr "Select run"

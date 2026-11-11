@@ -1369,6 +1369,9 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "残り {remaining} トークン"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {#個のリポジトリ} other {#個のリポジトリ}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
 
@@ -1877,6 +1880,9 @@ msgstr "このタブではプロセスがまだ実行中です"
 
 msgid "A process is still running in this terminal"
 msgstr "このターミナルではプロセスがまだ実行中です"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "プロジェクトには1つ以上のリポジトリが含まれます。各ワークスペースはそれらすべてを並べてチェックアウトします。"
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "プロンプトとトリガー、そして実行ごとのワークスペース"
@@ -8243,6 +8249,9 @@ msgstr "毎週水曜午前9時に、今週マージされたPRを確認し、古
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "平日午前9時に、新しいGitHub issueを読み、ラベルを付け、レビュー用の返信を下書きする。"
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "このプロジェクトの各ワークスペースは、それらすべてを1つのブランチで並べてチェックアウトします。"
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "これが一般化するかどうかで議論が起きます。その議論こそ、このレベルに到達した証拠です。"
 
@@ -13940,6 +13949,9 @@ msgstr "招待したユーザーのみ"
 msgid "Only people who opted in appear here."
 msgstr "参加を選んだ人だけがここに表示されます。"
 
+msgid "Only supported in projects with a single repository"
+msgstr "リポジトリが1つのプロジェクトでのみサポートされます"
+
 msgid "Only the author can change a comment"
 msgstr "コメントを変更できるのは作成者だけです"
 
@@ -14340,9 +14352,6 @@ msgstr "PR #{0} を開く"
 
 msgid "Open Preview"
 msgstr "プレビューを開く"
-
-msgid "Open project"
-msgstr "プロジェクトを開く"
 
 msgid "Open Project"
 msgstr "プロジェクトを開く"
@@ -18092,6 +18101,9 @@ msgstr "範囲を選択..."
 
 msgid "Select repositories"
 msgstr "リポジトリを選択"
+
+msgid "Select repositories to add"
+msgstr "追加するリポジトリを選択"
 
 msgid "Select run"
 msgstr "実行を選択"

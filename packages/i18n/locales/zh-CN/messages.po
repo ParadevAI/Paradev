@@ -1369,6 +1369,9 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "剩余 {remaining} 个 token"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {#个仓库} other {#个仓库}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
 
@@ -1877,6 +1880,9 @@ msgstr "此标签页中仍有进程在运行"
 
 msgid "A process is still running in this terminal"
 msgstr "此终端中仍有进程在运行"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "一个项目包含一个或多个仓库。每个工作区都会并排检出所有仓库。"
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "一个提示词、几个触发器，每次运行一个工作区"
@@ -8243,6 +8249,9 @@ msgstr "每周三上午9点，回顾本周合并的PR，更新被它们改过时
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每个工作日上午9点，阅读新的GitHub议题，打上标签，并起草初步回复供我审阅。"
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "此项目的每个工作区都会在同一分支上并排检出所有仓库。"
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在争论这能否推广。这场争论本身就说明这一级别已经达到了。"
 
@@ -13940,6 +13949,9 @@ msgstr "仅受邀者"
 msgid "Only people who opted in appear here."
 msgstr "只有选择加入的人才会出现在这里。"
 
+msgid "Only supported in projects with a single repository"
+msgstr "仅在只有一个仓库的项目中支持"
+
 msgid "Only the author can change a comment"
 msgstr "只有作者可以修改评论"
 
@@ -14340,9 +14352,6 @@ msgstr "打开PR #{0}"
 
 msgid "Open Preview"
 msgstr "打开预览"
-
-msgid "Open project"
-msgstr "打开项目"
 
 msgid "Open Project"
 msgstr "打开项目"
@@ -18092,6 +18101,9 @@ msgstr "选择范围..."
 
 msgid "Select repositories"
 msgstr "选择仓库"
+
+msgid "Select repositories to add"
+msgstr "选择要添加的仓库"
 
 msgid "Select run"
 msgstr "选择运行"

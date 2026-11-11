@@ -1369,6 +1369,9 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "剩餘 {remaining} 個 token"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {#個儲存庫} other {#個儲存庫}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤銷 # 個檔案的更改。} other {已撤銷 # 個檔案的更改。}}"
 
@@ -1877,6 +1880,9 @@ msgstr "此分頁中仍有處理程序在執行"
 
 msgid "A process is still running in this terminal"
 msgstr "此終端中仍有處理程序在執行"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "一個專案包含一或多個儲存庫。每個工作區都會並排簽出所有儲存庫。"
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "一個提示詞、幾個觸發器，每次執行一個工作區"
@@ -8243,6 +8249,9 @@ msgstr "每週三上午9點，回顧本週合併的PR，更新被它們改過時
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每個工作日上午9點，閱讀新的GitHub議題，打上標籤，並起草初步回覆供我審閱。"
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "此專案的每個工作區都會在同一分支上並排簽出所有儲存庫。"
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在爭論這能否推廣。這場爭論本身就說明這一級別已經達到了。"
 
@@ -13940,6 +13949,9 @@ msgstr "僅受邀者"
 msgid "Only people who opted in appear here."
 msgstr "只有選擇加入的人才會出現在這裡。"
 
+msgid "Only supported in projects with a single repository"
+msgstr "僅在只有一個儲存庫的專案中支援"
+
 msgid "Only the author can change a comment"
 msgstr "只有作者可以修改留言"
 
@@ -14340,9 +14352,6 @@ msgstr "開啟PR #{0}"
 
 msgid "Open Preview"
 msgstr "開啟預覽"
-
-msgid "Open project"
-msgstr "開啟專案"
 
 msgid "Open Project"
 msgstr "開啟專案"
@@ -18092,6 +18101,9 @@ msgstr "選擇範圍..."
 
 msgid "Select repositories"
 msgstr "選擇儲存庫"
+
+msgid "Select repositories to add"
+msgstr "選擇要新增的儲存庫"
 
 msgid "Select run"
 msgstr "選擇執行"

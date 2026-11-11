@@ -1363,6 +1363,9 @@ msgstr "{received} з {total}"
 msgid "{remaining} tokens left"
 msgstr "Залишилося токенів: {remaining}"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# репозиторій} few {# репозиторії} many {# репозиторіїв} other {# репозиторію}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Скасовано зміни в # файлі.} few {Скасовано зміни в # файлах.} many {Скасовано зміни в # файлах.} other {Скасовано зміни в # файла.}}"
 
@@ -1871,6 +1874,9 @@ msgstr "У цій вкладці ще працює процес"
 
 msgid "A process is still running in this terminal"
 msgstr "У цьому терміналі ще працює процес"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Проєкт містить один або кілька репозиторіїв. Кожен робочий простір робить checkout усіх них поруч."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Промпт, кілька тригерів і робочий простір для кожного запуску"
@@ -8237,6 +8243,9 @@ msgstr "Щосереди о 9:00 переглядай злиті цього ти
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Кожного буднього дня о 9:00 читай нові issues у GitHub, розставляй мітки й готуй першу чернетку відповіді мені на перевірку."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Кожен робочий простір цього проєкту робить checkout усіх них поруч, в одній гілці."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Усі сперечаються, чи це узагальнюється. Саме ця суперечка свідчить, що рівня досягнуто."
 
@@ -13934,6 +13943,9 @@ msgstr "Лише запрошені люди"
 msgid "Only people who opted in appear here."
 msgstr "Тут показано лише тих, хто погодився на участь."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Підтримується лише в проєктах з одним репозиторієм"
+
 msgid "Only the author can change a comment"
 msgstr "Лише автор може змінити коментар"
 
@@ -14334,9 +14346,6 @@ msgstr "Відкрити PR #{0}"
 
 msgid "Open Preview"
 msgstr "Відкрити попередній перегляд"
-
-msgid "Open project"
-msgstr "Відкрити проєкт"
 
 msgid "Open Project"
 msgstr "Відкрити проєкт"
@@ -18086,6 +18095,9 @@ msgstr "Виберіть діапазон..."
 
 msgid "Select repositories"
 msgstr "Виберіть репозиторії"
+
+msgid "Select repositories to add"
+msgstr "Виберіть репозиторії для додавання"
 
 msgid "Select run"
 msgstr "Вибрати запуск"

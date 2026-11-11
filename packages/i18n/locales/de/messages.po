@@ -1369,6 +1369,9 @@ msgstr "{received} von {total}"
 msgid "{remaining} tokens left"
 msgstr "Noch {remaining} Tokens frei"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# Repository} other {# Repositories}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Änderungen an # Datei rückgängig gemacht.} other {Änderungen an # Dateien rückgängig gemacht.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "In diesem Tab läuft noch ein Prozess"
 
 msgid "A process is still running in this terminal"
 msgstr "In diesem Terminal läuft noch ein Prozess"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Ein Projekt enthält ein oder mehrere Repositories. Jeder Arbeitsbereich checkt sie alle nebeneinander aus."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Ein Prompt, ein paar Auslöser und ein Arbeitsbereich pro Ausführung"
@@ -8243,6 +8249,9 @@ msgstr "Jeden Mittwoch um 9 Uhr die diese Woche gemergten PRs durchsehen und die
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Jeden Werktag um 9 Uhr neue GitHub-Issues lesen, Labels vergeben und eine erste Antwort für mein Review entwerfen."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Jeder Arbeitsbereich dieses Projekts checkt sie alle nebeneinander auf einem Branch aus."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Alle streiten darüber, ob sich das verallgemeinern lässt. Genau dieser Streit ist das Zeichen, dass die Stufe erreicht wurde."
 
@@ -13940,6 +13949,9 @@ msgstr "Nur eingeladene Personen"
 msgid "Only people who opted in appear here."
 msgstr "Hier erscheinen nur Personen, die sich dafür entschieden haben."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Nur in Projekten mit einem einzigen Repository unterstützt"
+
 msgid "Only the author can change a comment"
 msgstr "Nur die verfassende Person kann einen Kommentar ändern"
 
@@ -14340,9 +14352,6 @@ msgstr "PR #{0} öffnen"
 
 msgid "Open Preview"
 msgstr "Vorschau öffnen"
-
-msgid "Open project"
-msgstr "Projekt öffnen"
 
 msgid "Open Project"
 msgstr "Projekt öffnen"
@@ -18092,6 +18101,9 @@ msgstr "Bereich wählen..."
 
 msgid "Select repositories"
 msgstr "Repositories auswählen"
+
+msgid "Select repositories to add"
+msgstr "Hinzuzufügende Repositories auswählen"
 
 msgid "Select run"
 msgstr "Ausführung auswählen"

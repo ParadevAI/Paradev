@@ -1369,6 +1369,9 @@ msgstr "{received} van {total}"
 msgid "{remaining} tokens left"
 msgstr "Nog {remaining} tokens over"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# repository} other {# repositories}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Wijzigingen in # bestand ongedaan gemaakt.} other {Wijzigingen in # bestanden ongedaan gemaakt.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "Er draait nog een proces in dit tabblad"
 
 msgid "A process is still running in this terminal"
 msgstr "Er draait nog een proces in deze terminal"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Een project bevat een of meer repositories. Elke werkruimte checkt ze allemaal naast elkaar uit."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Een prompt, een paar triggers en een werkruimte per run"
@@ -8243,6 +8249,9 @@ msgstr "Elke woensdag om 9 uur: bekijk de gemergede PR's van deze week en werk d
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Elke werkdag om 9 uur: lees nieuwe GitHub-issues, plaats labels en stel een eerste antwoord op voor mijn review."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Elke werkruimte van dit project checkt ze allemaal naast elkaar uit, op één branch."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Iedereen discussieert over de vraag of dit generaliseert. Die discussie is het teken dat het niveau is bereikt."
 
@@ -13940,6 +13949,9 @@ msgstr "Alleen uitgenodigde personen"
 msgid "Only people who opted in appear here."
 msgstr "Alleen mensen die zich hebben aangemeld verschijnen hier."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Alleen ondersteund in projecten met één repository"
+
 msgid "Only the author can change a comment"
 msgstr "Alleen de auteur kan een reactie wijzigen"
 
@@ -14340,9 +14352,6 @@ msgstr "PR #{0} openen"
 
 msgid "Open Preview"
 msgstr "Preview openen"
-
-msgid "Open project"
-msgstr "Project openen"
 
 msgid "Open Project"
 msgstr "Project openen"
@@ -18092,6 +18101,9 @@ msgstr "Bereik kiezen..."
 
 msgid "Select repositories"
 msgstr "Repositories selecteren"
+
+msgid "Select repositories to add"
+msgstr "Selecteer repositories om toe te voegen"
 
 msgid "Select run"
 msgstr "Run selecteren"

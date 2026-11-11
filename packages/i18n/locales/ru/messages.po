@@ -1369,6 +1369,9 @@ msgstr "{received} из {total}"
 msgid "{remaining} tokens left"
 msgstr "Осталось токенов: {remaining}"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# репозиторий} few {# репозитория} many {# репозиториев} other {# репозитория}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Изменения в # файле отменены.} few {Изменения в # файлах отменены.} many {Изменения в # файлах отменены.} other {Изменения в # файла отменены.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "В этой вкладке ещё работает процесс"
 
 msgid "A process is still running in this terminal"
 msgstr "В этом терминале ещё работает процесс"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Проект содержит один или несколько репозиториев. Каждая рабочая область делает checkout их всех рядом друг с другом."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Промпт, несколько триггеров и рабочая область для каждого запуска"
@@ -8243,6 +8249,9 @@ msgstr "Каждую среду в 9:00 просматривай объедин�
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Каждый будний день в 9:00 читай новые задачи GitHub, расставляй метки и готовь первый черновик ответа мне на проверку."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Каждая рабочая область этого проекта делает checkout их всех рядом друг с другом в одной ветке."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Все спорят, обобщается ли это. Сам спор — признак того, что уровень достигнут."
 
@@ -13940,6 +13949,9 @@ msgstr "Только приглашённые"
 msgid "Only people who opted in appear here."
 msgstr "Здесь показаны только те, кто согласился участвовать."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Поддерживается только в проектах с одним репозиторием"
+
 msgid "Only the author can change a comment"
 msgstr "Изменить комментарий может только автор"
 
@@ -14340,9 +14352,6 @@ msgstr "Открыть PR #{0}"
 
 msgid "Open Preview"
 msgstr "Открыть предпросмотр"
-
-msgid "Open project"
-msgstr "Открыть проект"
 
 msgid "Open Project"
 msgstr "Открыть проект"
@@ -18092,6 +18101,9 @@ msgstr "Выберите диапазон..."
 
 msgid "Select repositories"
 msgstr "Выбрать репозитории"
+
+msgid "Select repositories to add"
+msgstr "Выберите репозитории для добавления"
 
 msgid "Select run"
 msgstr "Выбрать запуск"

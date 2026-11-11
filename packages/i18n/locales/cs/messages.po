@@ -1369,6 +1369,9 @@ msgstr "{received} z {total}"
 msgid "{remaining} tokens left"
 msgstr "Zbývající tokeny: {remaining}"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# repozitář} few {# repozitáře} many {# repozitáře} other {# repozitářů}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "V této kartě pořád běží proces"
 
 msgid "A process is still running in this terminal"
 msgstr "V tomto terminálu pořád běží proces"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Projekt obsahuje jeden nebo více repozitářů. Každý pracovní prostor má checkout všech z nich vedle sebe."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Prompt, pár spouštěčů a pracovní prostor pro každý běh"
@@ -8243,6 +8249,9 @@ msgstr "Každou středu v 9:00 projdi sloučené PR za tento týden a aktualizuj
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Každý všední den v 9:00 přečti nové GitHub issues, přiřaď štítky a připrav první odpověď ke kontrole."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Každý pracovní prostor tohoto projektu má checkout všech z nich vedle sebe, v jedné větvi."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Všichni se dohadují, jestli se to dá zobecnit. Právě ten spor je známkou toho, že úroveň byla dosažena."
 
@@ -13940,6 +13949,9 @@ msgstr "Jen pozvaní lidé"
 msgid "Only people who opted in appear here."
 msgstr "Objevují se tu jen lidé, kteří se sami přihlásili."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Podporováno jen v projektech s jedním repozitářem"
+
 msgid "Only the author can change a comment"
 msgstr "Komentář může upravit jen jeho autor"
 
@@ -14340,9 +14352,6 @@ msgstr "Otevřít PR #{0}"
 
 msgid "Open Preview"
 msgstr "Otevřít náhled"
-
-msgid "Open project"
-msgstr "Otevřít projekt"
 
 msgid "Open Project"
 msgstr "Otevřít projekt"
@@ -18092,6 +18101,9 @@ msgstr "Vyberte rozsah..."
 
 msgid "Select repositories"
 msgstr "Vybrat repozitáře"
+
+msgid "Select repositories to add"
+msgstr "Vyberte repozitáře k přidání"
 
 msgid "Select run"
 msgstr "Vybrat běh"

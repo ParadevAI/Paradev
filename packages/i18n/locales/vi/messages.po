@@ -1369,6 +1369,9 @@ msgstr "{received} trên {total}"
 msgid "{remaining} tokens left"
 msgstr "Còn {remaining} token"
 
+msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgstr "{repositoryCount, plural, one {# repository} other {# repository}}"
+
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Đã hoàn tác thay đổi ở # tệp.} other {Đã hoàn tác thay đổi ở # tệp.}}"
 
@@ -1877,6 +1880,9 @@ msgstr "Vẫn còn một tiến trình đang chạy trong tab này"
 
 msgid "A process is still running in this terminal"
 msgstr "Vẫn còn một tiến trình đang chạy trong terminal này"
+
+msgid "A project holds one or more repositories. Every workspace checks out all of them, side by side."
+msgstr "Một dự án chứa một hoặc nhiều repository. Mỗi workspace checkout tất cả chúng, đặt cạnh nhau."
 
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Một prompt, vài trigger và một workspace cho mỗi lượt chạy"
@@ -8243,6 +8249,9 @@ msgstr "Mỗi thứ Tư lúc 9h sáng, xem lại các PR đã merge trong tuần
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Mỗi ngày trong tuần lúc 9h sáng, đọc issue GitHub mới, gán nhãn và soạn câu trả lời đầu tiên để tôi xem lại."
 
+msgid "Every workspace of this project checks out all of them, side by side, on one branch."
+msgstr "Mỗi workspace của dự án này checkout tất cả chúng, đặt cạnh nhau, trên một nhánh."
+
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Ai cũng tranh cãi liệu điều này có khái quát được không. Chính cuộc tranh cãi đó là dấu hiệu mức này đã đạt được."
 
@@ -13940,6 +13949,9 @@ msgstr "Chỉ những người được mời"
 msgid "Only people who opted in appear here."
 msgstr "Chỉ những người đã chọn tham gia mới xuất hiện ở đây."
 
+msgid "Only supported in projects with a single repository"
+msgstr "Chỉ hỗ trợ trong dự án có một repository"
+
 msgid "Only the author can change a comment"
 msgstr "Chỉ tác giả mới có thể sửa bình luận"
 
@@ -14340,9 +14352,6 @@ msgstr "Mở PR #{0}"
 
 msgid "Open Preview"
 msgstr "Mở bản xem trước"
-
-msgid "Open project"
-msgstr "Mở dự án"
 
 msgid "Open Project"
 msgstr "Mở dự án"
@@ -18092,6 +18101,9 @@ msgstr "Chọn khoảng..."
 
 msgid "Select repositories"
 msgstr "Chọn repository"
+
+msgid "Select repositories to add"
+msgstr "Chọn repository để thêm"
 
 msgid "Select run"
 msgstr "Chọn lần chạy"
