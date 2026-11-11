@@ -135,7 +135,11 @@ beforeEach(() => {
 		tokenRequests.push(new URLSearchParams(String(init?.body)));
 		const current = response;
 		if (!current) throw new Error("no token-endpoint response configured");
-		return new Response(JSON.stringify(current.body), {
+		const body =
+			typeof current.body === "string"
+				? current.body
+				: JSON.stringify(current.body);
+		return new Response(body, {
 			status: current.status,
 			headers: { "content-type": "application/json" },
 		});
@@ -217,6 +221,28 @@ describe("a token endpoint that is merely down", () => {
 			ConnectorUnavailableError,
 		);
 		// Someone else's outage must not cost the user their connection.
+		expect(updates).toHaveLength(0);
+	});
+
+	test("a refusal that is not a dead grant keeps the connection", async () => {
+		response = {
+			ok: false,
+			status: 429,
+			body: { error: "temporarily_unavailable" },
+		};
+
+		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
+			ConnectorUnavailableError,
+		);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("a gateway error page is unavailable, not a parse failure", async () => {
+		response = { ok: false, status: 403, body: "<html>Forbidden</html>" };
+
+		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
+			ConnectorUnavailableError,
+		);
 		expect(updates).toHaveLength(0);
 	});
 

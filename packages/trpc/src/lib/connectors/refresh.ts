@@ -18,6 +18,11 @@ import { connectorMethod, requireConnector, resolveEndpoints } from "./index";
 const DEFAULT_EXPIRY_BUFFER_SECONDS = 60;
 const RACE_SETTLE_MS = 1000;
 export const NEEDS_REAUTH = "needs_reauth";
+const DEAD_GRANT_ERRORS: ReadonlySet<string> = new Set([
+	"invalid_grant",
+	"invalid_client",
+	"unauthorized_client",
+]);
 
 export class UnrefreshableConnectionError extends Error {
 	constructor(connector: string) {
@@ -29,7 +34,8 @@ export class UnrefreshableConnectionError extends Error {
 }
 
 /**
- * The token endpoint was unreachable or answered 5xx. The connection is not
+ * The token endpoint was unreachable, answered 5xx, or refused the refresh for
+ * a reason other than a dead grant. The connection is not
  * known to be bad, so it must not be disconnected or reported as needing
  * reauthorization — the caller is expected to surface this as a bad gateway.
  */
@@ -185,14 +191,33 @@ async function refresh(
 			`${response.status} ${response.statusText}`,
 		);
 	}
-	const payload = (await response.json()) as Record<string, unknown>;
+	const payload = (await response.json().catch(() => ({}))) as Record<
+		string,
+		unknown
+	>;
 	if (!response.ok || typeof payload.access_token !== "string") {
+		const oauthError =
+			typeof payload.error === "string" ? payload.error : undefined;
+		// Only these prove the grant or its client is gone. A 429, a WAF page, or
+		// any other 4xx says nothing about the refresh token.
+		if (!oauthError || !DEAD_GRANT_ERRORS.has(oauthError)) {
+			throw new ConnectorUnavailableError(
+				current.connector,
+				`${response.status} ${oauthError ?? response.statusText}`,
+			);
+		}
+
 		// Rotating refresh tokens are single-use: when another process redeemed
 		// ours first, the rejection means we lost the race, not that the grant died.
 		const winner = await racedRefresh(current, raceSettleMs);
 		if (winner) return winner;
 
-		if (endpoints.issuer && payload.error === "invalid_client")
+		console.warn(`[connectors/${current.connector}] refresh rejected`, {
+			connectionId: current.id,
+			status: response.status,
+			oauthError,
+		});
+		if (endpoints.issuer && oauthError === "invalid_client")
 			await forgetClient(
 				endpoints.issuer,
 				redirectUriFor(current.connector),
