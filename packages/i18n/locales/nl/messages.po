@@ -16672,14 +16672,8 @@ msgstr "Resident geheugen dat Paradev en de gemonitorde terminalprocesbomen gebr
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Linkerrand verslepen"
-
 msgid "Resize panel"
 msgstr "Paneelgrootte wijzigen"
-
-msgid "Resize right edge"
-msgstr "Rechterrand verslepen"
 
 msgid "Resolve"
 msgstr "Oplossen"

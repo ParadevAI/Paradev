@@ -16672,14 +16672,8 @@ msgstr "Paradev與受監控的終端處理程序樹佔用的常駐記憶體。�
 msgid "Resizable"
 msgstr "可調整大小"
 
-msgid "Resize left edge"
-msgstr "調整左邊緣"
-
 msgid "Resize panel"
 msgstr "調整面板大小"
-
-msgid "Resize right edge"
-msgstr "調整右邊緣"
 
 msgid "Resolve"
 msgstr "解決"

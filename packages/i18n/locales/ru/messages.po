@@ -16672,14 +16672,8 @@ msgstr "Резидентная память, занятая Paradev и отсл�
 msgid "Resizable"
 msgstr "Изменяемый размер"
 
-msgid "Resize left edge"
-msgstr "Изменить размер по левому краю"
-
 msgid "Resize panel"
 msgstr "Изменить размер панели"
-
-msgid "Resize right edge"
-msgstr "Изменить размер по правому краю"
 
 msgid "Resolve"
 msgstr "Решить"

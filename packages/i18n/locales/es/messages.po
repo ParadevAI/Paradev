@@ -16672,14 +16672,8 @@ msgstr "Memoria residente que usan Paradev y los árboles de procesos de termina
 msgid "Resizable"
 msgstr "Redimensionable"
 
-msgid "Resize left edge"
-msgstr "Redimensionar el borde izquierdo"
-
 msgid "Resize panel"
 msgstr "Cambiar tamaño del panel"
-
-msgid "Resize right edge"
-msgstr "Redimensionar el borde derecho"
 
 msgid "Resolve"
 msgstr "Resolver"

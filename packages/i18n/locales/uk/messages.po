@@ -16666,14 +16666,8 @@ msgstr "Резидентна пам'ять, яку використовують 
 msgid "Resizable"
 msgstr "Змінний розмір"
 
-msgid "Resize left edge"
-msgstr "Змінити розмір за лівим краєм"
-
 msgid "Resize panel"
 msgstr "Змінити розмір панелі"
-
-msgid "Resize right edge"
-msgstr "Змінити розмір за правим краєм"
 
 msgid "Resolve"
 msgstr "Вирішити"

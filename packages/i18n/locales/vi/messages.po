@@ -16672,14 +16672,8 @@ msgstr "Bộ nhớ thường trú mà Paradev và các cây tiến trình termin
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Đổi kích thước cạnh trái"
-
 msgid "Resize panel"
 msgstr "Đổi kích thước bảng"
-
-msgid "Resize right edge"
-msgstr "Đổi kích thước cạnh phải"
 
 msgid "Resolve"
 msgstr "Giải quyết"

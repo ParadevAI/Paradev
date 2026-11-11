@@ -16672,14 +16672,8 @@ msgstr "Memori residen yang dipakai Paradev dan pohon proses terminal yang dipan
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Ubah ukuran tepi kiri"
-
 msgid "Resize panel"
 msgstr "Ubah ukuran panel"
-
-msgid "Resize right edge"
-msgstr "Ubah ukuran tepi kanan"
 
 msgid "Resolve"
 msgstr "Selesaikan"

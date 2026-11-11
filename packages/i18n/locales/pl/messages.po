@@ -16672,14 +16672,8 @@ msgstr "Pamięć rezydentna zużywana przez Paradev i monitorowane drzewa proces
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Zmień rozmiar lewej krawędzi"
-
 msgid "Resize panel"
 msgstr "Zmień rozmiar panelu"
-
-msgid "Resize right edge"
-msgstr "Zmień rozmiar prawej krawędzi"
 
 msgid "Resolve"
 msgstr "Rozwiąż"

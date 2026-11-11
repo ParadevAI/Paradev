@@ -58,12 +58,6 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
-	NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-	NEW_WORKSPACE_SCREEN_MAX_WIDTH,
-	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
-	useNewWorkspaceWidthStore,
-} from "renderer/stores/new-workspace-width";
-import {
 	environmentBranchKey,
 	NO_PROJECT_KEY,
 	useV2WorkspaceCreateDefaultsStore,
@@ -89,7 +83,6 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
-import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
 import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
@@ -325,18 +318,6 @@ export function NewWorkspaceScreen({
 	]);
 	const isSession = resolvedProject.isSession;
 	const isProjectPending = resolvedProject.isPending;
-
-	const storedComposerWidth = useNewWorkspaceWidthStore(
-		(state) => state.screenWidth,
-	);
-	const setStoredComposerWidth = useNewWorkspaceWidthStore(
-		(state) => state.setScreenWidth,
-	);
-	/** Width while a resize drag is in flight; persisted on release. */
-	const [liveComposerWidth, setLiveComposerWidth] = useState<number | null>(
-		null,
-	);
-	const composerWidth = liveComposerWidth ?? storedComposerWidth;
 
 	// One suggestion per open. resetKey only bumps on resetDraft, so ordinary
 	// modal reopens roll their own counter; the tiptap Placeholder extension
@@ -1061,22 +1042,6 @@ export function NewWorkspaceScreen({
 			<Trans>Set up project…</Trans>
 		</Button>
 	);
-	const resizeHandles = (
-		<SymmetricResizeHandles
-			currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}
-			minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
-			maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
-			onWidthChange={setLiveComposerWidth}
-			onWidthCommit={(width) => {
-				setStoredComposerWidth(width);
-				setLiveComposerWidth(null);
-			}}
-			onReset={() => {
-				setStoredComposerWidth(null);
-				setLiveComposerWidth(null);
-			}}
-		/>
-	);
 
 	if (isParadevShell) {
 		return (
@@ -1093,12 +1058,7 @@ export function NewWorkspaceScreen({
 						className="mb-6"
 						reserveSpace
 					/>
-					<div
-						className="relative flex w-full flex-col gap-2.5"
-						style={{
-							maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-						}}
-					>
+					<div className="relative flex w-full max-w-[592px] flex-col gap-2.5">
 						<AnimatePresence initial={false}>
 							{isPromptEmpty &&
 								!samplePromptsPending &&
@@ -1172,7 +1132,6 @@ export function NewWorkspaceScreen({
 								)}
 							</div>
 						</div>
-						{resizeHandles}
 					</div>
 				</div>
 			</ComposerDropZone>
@@ -1200,10 +1159,7 @@ export function NewWorkspaceScreen({
 			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
 				{/* On short windows the editor stops before the centred heading. */}
 				<div
-					className="relative flex w-full flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]"
-					style={{
-						maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-					}}
+					className="relative flex w-full max-w-[592px] flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]"
 				>
 					<AnimatePresence initial={false}>
 						{isPromptEmpty &&
@@ -1271,7 +1227,6 @@ export function NewWorkspaceScreen({
 						</div>
 						{setupButton}
 					</div>
-					{resizeHandles}
 				</div>
 			</div>
 		</ComposerDropZone>

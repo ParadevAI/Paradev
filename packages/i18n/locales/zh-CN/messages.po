@@ -16672,14 +16672,8 @@ msgstr "Paradev与受监控的终端进程树占用的常驻内存。如果持�
 msgid "Resizable"
 msgstr "可调整大小"
 
-msgid "Resize left edge"
-msgstr "调整左边缘"
-
 msgid "Resize panel"
 msgstr "调整面板大小"
-
-msgid "Resize right edge"
-msgstr "调整右边缘"
 
 msgid "Resolve"
 msgstr "解决"

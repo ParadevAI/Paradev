@@ -16672,14 +16672,8 @@ msgstr "Paradev ve izlenen terminal süreç ağaçlarının kullandığı yerle�
 msgid "Resizable"
 msgstr "Yeniden boyutlandırılabilir"
 
-msgid "Resize left edge"
-msgstr "Sol kenarı yeniden boyutlandır"
-
 msgid "Resize panel"
 msgstr "Panel boyutunu değiştir"
-
-msgid "Resize right edge"
-msgstr "Sağ kenarı yeniden boyutlandır"
 
 msgid "Resolve"
 msgstr "Çöz"

@@ -16672,14 +16672,8 @@ msgstr "Rezidentní paměť využitá Paradevem a sledovanými stromy procesů t
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Změnit velikost levého okraje"
-
 msgid "Resize panel"
 msgstr "Změnit velikost panelu"
-
-msgid "Resize right edge"
-msgstr "Změnit velikost pravého okraje"
 
 msgid "Resolve"
 msgstr "Vyřešit"

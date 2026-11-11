@@ -16672,14 +16672,8 @@ msgstr "Resident memory used by Paradev and monitored terminal process trees. If
 msgid "Resizable"
 msgstr "Resizable"
 
-msgid "Resize left edge"
-msgstr "Resize left edge"
-
 msgid "Resize panel"
 msgstr "Resize panel"
-
-msgid "Resize right edge"
-msgstr "Resize right edge"
 
 msgid "Resolve"
 msgstr "Resolve"

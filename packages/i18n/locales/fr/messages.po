@@ -16672,14 +16672,8 @@ msgstr "Mémoire résidente utilisée par Paradev et par les arborescences de pr
 msgid "Resizable"
 msgstr "Redimensionnable"
 
-msgid "Resize left edge"
-msgstr "Redimensionner le bord gauche"
-
 msgid "Resize panel"
 msgstr "Redimensionner le panneau"
-
-msgid "Resize right edge"
-msgstr "Redimensionner le bord droit"
 
 msgid "Resolve"
 msgstr "Résoudre"
