@@ -9,6 +9,14 @@ function words(value: string): string[] {
 		.filter(Boolean);
 }
 
+function variant(value: string): string {
+	return (value.toLowerCase().match(/\[[^\]]*\]/g) ?? []).join("");
+}
+
+function vendorOrDate(word: string): boolean {
+	return word === "claude" || /^\d{8}$/.test(word);
+}
+
 function same(a: string, b: string): boolean {
 	return words(a).join("-") === words(b).join("-");
 }
@@ -18,22 +26,28 @@ export function startOptionId(
 	wanted: string,
 ): string | undefined {
 	if (choices.some((choice) => choice.id === wanted)) return wanted;
-	const spelled = choices.filter(
+	const candidates = choices.filter(
+		(choice) => variant(choice.id) === variant(wanted),
+	);
+	const spelled = candidates.filter(
 		(choice) => same(choice.id, wanted) || same(choice.label, wanted),
 	);
 	if (spelled.length > 0)
 		return spelled.reduce((a, b) => (b.id.length < a.id.length ? b : a)).id;
 	const want = words(wanted);
 	if (want.length === 0) return undefined;
-	const wantSet = new Set(want);
 	const family = new Map<string, string>();
-	for (const choice of choices) {
+	for (const choice of candidates) {
 		const have = new Set([...words(choice.id), ...words(choice.label)]);
-		const label = words(choice.label);
+		const label = new Set(words(choice.label));
+		const versioned =
+			[...label].some((word) => /\d/.test(word)) &&
+			[...label].some((word) => /[a-z]/.test(word));
 		const named =
 			want.every((word) => have.has(word)) ||
-			(label.some((word) => /\d/.test(word)) &&
-				label.every((word) => wantSet.has(word)));
+			(versioned &&
+				[...label].every((word) => want.includes(word)) &&
+				want.every((word) => label.has(word) || vendorOrDate(word)));
 		if (!named) continue;
 		const model = words(choice.id).join("-");
 		const known = family.get(model);

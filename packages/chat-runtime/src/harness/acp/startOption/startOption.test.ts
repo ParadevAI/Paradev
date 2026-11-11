@@ -94,3 +94,46 @@ describe("startOptionId against claude-agent-acp 0.85 options", () => {
 		expect(startOptionId(longContext, "claude-opus-5")).toBeUndefined();
 	});
 });
+
+describe("startOptionId never takes a sibling model", () => {
+	test("a wanted id with words the label lacks picks nothing", () => {
+		const codex = [
+			{ id: "gpt-5.1-codex", label: "GPT-5.1-Codex" },
+			{ id: "gpt-5.1-codex-max", label: "GPT-5.1-Codex-Max" },
+		];
+		expect(startOptionId(codex, "gpt-5.1-codex-mini")).toBeUndefined();
+		const gemini = [
+			{ id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+			{ id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+		];
+		expect(startOptionId(gemini, "gemini-2.5-flash-lite")).toBeUndefined();
+		const opus = [{ id: "opus", label: "Opus 4.8" }];
+		expect(startOptionId(opus, "claude-opus-4-8-1")).toBeUndefined();
+	});
+
+	test("a vendor prefix and a date do not count as extra words", () => {
+		const sonnet = [{ id: "sonnet", label: "Sonnet 4.5" }];
+		expect(startOptionId(sonnet, "claude-sonnet-4-5-20250929")).toBe("sonnet");
+	});
+
+	test("a context variant only matches the same variant", () => {
+		const opus = [
+			{ id: "default", label: "Default (recommended)" },
+			{ id: "opus", label: "Opus 5.5" },
+			{ id: "claude-opus-5-5[1m]", label: "Opus 5.5 (1M context)" },
+		];
+		expect(startOptionId(opus, "claude-opus-5-5")).toBe("opus");
+		expect(startOptionId(opus, "claude-opus-5-5[1m]")).toBe(
+			"claude-opus-5-5[1m]",
+		);
+		expect(
+			startOptionId([{ id: "opus", label: "Opus 5.5" }], "claude-opus-5-5[1m]"),
+		).toBeUndefined();
+	});
+
+	test("a label with only a version names no model", () => {
+		expect(
+			startOptionId([{ id: "x", label: "5.5" }], "claude-opus-5-5"),
+		).toBeUndefined();
+	});
+});
