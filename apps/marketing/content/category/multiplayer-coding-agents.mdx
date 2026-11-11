@@ -71,6 +71,8 @@ Paradev runs the CLI agents you already pay for, so the team part is built aroun
 
 **A workspace a teammate can open and drive.** Cloud workspaces come with the Team and Ultra plans. Each one runs on its own machine and keeps working with your laptop closed. Share sets who can reach it: anyone in your organization, or only the people you invite. Full access means a teammate can open the terminals and prompt the agents, not only read the result. From a shell, `superset workspaces share add --user ann@example.com` and `--team` do the same thing, and `superset workspaces share list` shows the owner, the visibility, and who it reached.
 
+![Cloud workspaces grouped by the person who started them: two under Satya Patel, two under Kiet Ho, each row showing its repository, its pull request, and a status dot](/images/guides/cloud-workspaces-by-person.png)
+
 **An environment the team starts from.** An environment holds the repositories, the variables, and the region. Set it up once, mark it visible to the organization, and every teammate starts workspaces from the same ground. The agent in a cloud workspace never receives your keys: it sees a placeholder, and Paradev adds the sign-in to outgoing requests.
 
 **Work that starts without anybody at a keyboard.** [Automations](https://docs.paradev.com/automations) run an agent on a schedule or on an event, such as a review request, a filed issue, or a message in a channel. A run that reaches a device becomes a live workspace you or a teammate can open, review, and continue. The agent does the first pass overnight; a person picks it up in the morning, in the session where it happened.
