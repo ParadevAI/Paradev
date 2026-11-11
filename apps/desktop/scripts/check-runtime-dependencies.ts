@@ -20,7 +20,7 @@ const shipped = new Set(["electron", ...Object.keys(dependencies)]);
 const RUNTIME_LOAD =
 	/(?<!["'`])\b(?:require(?:\$\d+)?(?:\.resolve)?|\)\.resolve|import)\s*\(\s*["']([^"'./][^"']*)["']/g;
 // Bundled packages keep their JSDoc, and express's shows `require('express')`.
-const COMMENT_LINE = /^\s*(?:\*|\/\/)/;
+const COMMENT_LINE = /^\s*(?:\/\/|(?!.*\*\/)\*)/;
 
 function isInComment(source: string, index: number): boolean {
 	const lineStart = source.lastIndexOf("\n", index) + 1;
