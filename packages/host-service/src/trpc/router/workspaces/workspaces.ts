@@ -442,11 +442,11 @@ async function createRepositoryCheckouts(
 		/** Used by each repository that has this branch and no base of its own. */
 		sharedBaseBranch?: string;
 	},
-): Promise<Array<{ id: string; worktreePath: string; branch: string }>> {
-	const created: Array<{ id: string; worktreePath: string; branch: string }> =
-		[];
+): Promise<CreatedCheckout[]> {
+	const created: CreatedCheckout[] = [];
 	for (const repository of args.repositoryProjects) {
 		const worktreePath = join(args.root, basename(repository.repoPath));
+		let createdBranch = false;
 		try {
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
@@ -469,6 +469,7 @@ async function createRepositoryCheckouts(
 				worktreePath,
 				sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
 			});
+			createdBranch = !plan.usedExistingBranch;
 			await enablePushAutoSetupRemote(git, worktreePath, "[workspaces.create]");
 			if (!plan.usedExistingBranch && plan.startPoint.kind !== "head") {
 				await recordBaseBranchConfig({
@@ -479,13 +480,21 @@ async function createRepositoryCheckouts(
 				});
 			}
 		} catch (err) {
-			// ponytail: a repository that fails to check out is skipped, not
-			// rolled back with the rest; the workspace opens without it.
-			console.warn(
-				`[workspaces.create] skipped repository ${repository.repoPath}:`,
-				err,
-			);
-			continue;
+			await removeRepositoryCheckouts(ctx, [
+				...created,
+				{
+					id: null,
+					repoPath: repository.repoPath,
+					worktreePath,
+					branch: args.branch,
+					createdBranch,
+				},
+			]);
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: `Could not check out ${basename(repository.repoPath)}: ${err instanceof Error ? err.message : String(err)}`,
+				cause: err,
+			});
 		}
 		const id = randomUUID();
 		const now = Date.now();
@@ -504,9 +513,50 @@ async function createRepositoryCheckouts(
 				updatedAt: now,
 			})
 			.run();
-		created.push({ id, worktreePath, branch: args.branch });
+		created.push({
+			id,
+			repoPath: repository.repoPath,
+			worktreePath,
+			branch: args.branch,
+			createdBranch,
+		});
 	}
 	return created;
+}
+
+interface RepositoryCheckout {
+	/** Null before its row exists. */
+	id: string | null;
+	repoPath: string;
+	worktreePath: string;
+	branch: string;
+	/** The checkout created this branch, so removing the checkout deletes it. */
+	createdBranch: boolean;
+}
+
+type CreatedCheckout = RepositoryCheckout & { id: string };
+
+/** Undoes createRepositoryCheckouts: worktrees, the branches they created, and their rows. */
+async function removeRepositoryCheckouts(
+	ctx: HostServiceContext,
+	checkouts: RepositoryCheckout[],
+): Promise<void> {
+	for (const checkout of checkouts) {
+		try {
+			const git = await ctx.git(checkout.repoPath);
+			await git
+				.raw(["worktree", "remove", "--force", checkout.worktreePath])
+				.catch(() => {});
+			if (checkout.createdBranch) {
+				await git.raw(["branch", "-D", checkout.branch]).catch(() => {});
+			}
+		} catch {
+			// The repository itself is unusable; nothing in it to undo.
+		}
+		if (checkout.id) {
+			ctx.db.delete(workspaces).where(eq(workspaces.id, checkout.id)).run();
+		}
+	}
 }
 
 /**
@@ -576,25 +626,38 @@ async function createContainerWorkspace(
 		project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx),
 	);
 	mkdirSync(root, { recursive: true });
+	// Every checkout exists before the workspace does, so a failure leaves
+	// nothing behind.
+	const workspaceId = input.id ?? randomUUID();
+	const name = input.name ?? NEW_WORKSPACE_NAME;
+	let checkouts: CreatedCheckout[];
+	try {
+		checkouts = await createRepositoryCheckouts(ctx, {
+			parentId: workspaceId,
+			name,
+			branch,
+			root,
+			repositoryProjects: repositories,
+			baseBranches: input.repositoryBaseBranches,
+			sharedBaseBranch: input.baseBranch,
+		});
+	} catch (error) {
+		await rm(root, { recursive: true, force: true });
+		throw error;
+	}
 	const workspaceRow = await registerLocalWorkspace({
 		ctx,
-		id: input.id,
+		id: workspaceId,
 		projectId: project.id,
-		name: input.name ?? NEW_WORKSPACE_NAME,
+		name,
 		branch,
 		worktreePath: root,
 		taskId: input.taskId,
 		tags: input.tags,
-		rollbackWorktree: () => rm(root, { recursive: true, force: true }),
-	});
-	const checkouts = await createRepositoryCheckouts(ctx, {
-		parentId: workspaceRow.id,
-		name: workspaceRow.name,
-		branch,
-		root,
-		repositoryProjects: repositories,
-		baseBranches: input.repositoryBaseBranches,
-		sharedBaseBranch: input.baseBranch,
+		rollbackWorktree: async () => {
+			await removeRepositoryCheckouts(ctx, checkouts);
+			await rm(root, { recursive: true, force: true });
+		},
 	});
 	writeWorkspaceContextFiles(root, checkouts);
 

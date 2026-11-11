@@ -447,3 +447,31 @@ test("AI naming renames the branch in every checkout", async () => {
 		generator.mockRestore();
 	}
 });
+
+test("a repository that fails to check out undoes the whole create", async () => {
+	const { host, projectId, fixtures } = await containerScenario();
+	const [web, api] = fixtures;
+	if (!web || !api) throw new Error("missing fixture");
+	rmSync(join(api.repoPath, ".git"), { recursive: true, force: true });
+
+	await expect(
+		host.trpc.workspaces.create.mutate({
+			projectId,
+			name: "broken",
+			branch: "feature/broken",
+		}),
+	).rejects.toThrow(basename(api.repoPath));
+
+	expect(host.db.select().from(workspaces).all()).toEqual([]);
+	const worktrees = Bun.spawnSync(["git", "worktree", "list"], {
+		cwd: web.repoPath,
+	});
+	expect(worktrees.stdout.toString().trim().split("\n")).toHaveLength(1);
+	const branches = Bun.spawnSync(
+		["git", "branch", "--list", "feature/broken"],
+		{
+			cwd: web.repoPath,
+		},
+	);
+	expect(branches.stdout.toString().trim()).toBe("");
+});
