@@ -336,14 +336,11 @@ export function NewWorkspaceScreen({
 			PROMPT_PLACEHOLDERS[
 				Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length)
 			];
-		const prompt = descriptor
+		return descriptor
 			? t(descriptor)
 			: t({
 					message: "What do you want to do?",
 				});
-		return t({
-			message: `${prompt} · # to change project, host, and more`,
-		});
 	}, [resetKey, placeholderRoll, t]);
 
 	const projectId = resolvedProject.projectId;

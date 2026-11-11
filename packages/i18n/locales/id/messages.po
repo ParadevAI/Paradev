@@ -1323,9 +1323,6 @@ msgstr "{productName} meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipi
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} bernama {formerName} hingga Oktober 2026."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · # untuk mengubah proyek, host, dan lainnya"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
