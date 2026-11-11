@@ -14,7 +14,11 @@ const LOGIN_POLL_INTERVAL_MS = 3_000;
  * unfocused: the user is off in a terminal (or a browser tab) finishing the
  * sign-in for exactly as long as this query is enabled.
  */
-export function useHostUsageLogins(hostUrl: string | null, enabled: boolean) {
+export function useHostUsageLogins(
+	hostUrl: string | null,
+	enabled: boolean,
+	{ poll = true }: { poll?: boolean } = {},
+) {
 	return useQuery({
 		queryKey: ["host-usage-logins", hostUrl],
 		enabled: !!hostUrl && enabled,
@@ -22,7 +26,7 @@ export function useHostUsageLogins(hostUrl: string | null, enabled: boolean) {
 			if (!hostUrl) return null;
 			return getHostServiceClientByUrl(hostUrl).usage.logins.query();
 		},
-		refetchInterval: enabled ? LOGIN_POLL_INTERVAL_MS : false,
+		refetchInterval: enabled && poll ? LOGIN_POLL_INTERVAL_MS : false,
 		refetchIntervalInBackground: true,
 		gcTime: 0,
 	});

@@ -1,1 +1,1 @@
-export { runProcess, spawnLoginProcess } from "./run-process";
+export { type RunResult, runProcess } from "./run-process";

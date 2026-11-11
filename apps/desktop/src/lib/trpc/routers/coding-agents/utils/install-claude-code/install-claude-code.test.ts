@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { AgentInstallEvent } from "../download-verified";
+import type { AgentInstallEvent } from "../agent-install-event";
 import { CLAUDE_RELEASES_URL, installClaudeCode } from "./install-claude-code";
 
 const BINARY = new TextEncoder().encode("pretend claude binary");
@@ -45,8 +45,7 @@ function fakeReleases(
 }
 
 function run(fetch: ReturnType<typeof fakeReleases>, signed = true) {
-	const installs: Array<{ binary: string; version: string; bytes: string }> =
-		[];
+	const installs: Array<{ binary: string; args: string[]; bytes: string }> = [];
 	const events: AgentInstallEvent[] = [];
 	const result = installClaudeCode({
 		fetch,
@@ -54,10 +53,10 @@ function run(fetch: ReturnType<typeof fakeReleases>, signed = true) {
 		installedPath: "/home/u/.local/bin/claude",
 		workRoot: workRoot(),
 		verifySignature: async () => signed,
-		runInstall: async (binary, version) => {
+		runInstall: async (binary, args) => {
 			installs.push({
 				binary,
-				version,
+				args,
 				bytes: fs.readFileSync(binary, "utf8"),
 			});
 		},
@@ -76,7 +75,8 @@ describe("installClaudeCode", () => {
 			path: "/home/u/.local/bin/claude",
 		});
 		expect(installs).toHaveLength(1);
-		expect(installs[0]?.version).toBe("9.9.9");
+		// No target, as install.sh: a pinned version would stop its channel updates.
+		expect(installs[0]?.args).toEqual(["install"]);
 		expect(installs[0]?.bytes).toBe("pretend claude binary");
 		expect(events.map((event) => event.stage)).toContain("verifying");
 		expect(fs.existsSync(installs[0]?.binary ?? "")).toBe(false);

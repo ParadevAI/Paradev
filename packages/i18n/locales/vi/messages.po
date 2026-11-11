@@ -1162,6 +1162,9 @@ msgstr "{monthlyPrice} mỗi người dùng/tháng. Di động, tự động hó
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} quá cũ để dùng chat"
+
 msgid "{name} accounts"
 msgstr "Tài khoản {name}"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} đã tham gia lại."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
@@ -4285,6 +4291,12 @@ msgstr "Khởi chạy chat"
 msgid "Chat name"
 msgstr "Tên cuộc trò chuyện"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Chat cần phiên bản {minVersion} trở lên. Paradev có thể cập nhật giúp bạn."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Chat cần phiên bản {minVersion} trở lên. Hãy cập nhật {name} của bạn, rồi bấm Thử lại."
+
 msgid "Chat session not found"
 msgstr "Không tìm thấy phiên chat"
 
@@ -6275,16 +6287,13 @@ msgstr "Không thể đăng bình luận"
 msgid "Couldn't post reply"
 msgstr "Không thể đăng trả lời"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Không thể kết nối với {vendor}. Hãy kiểm tra kết nối internet rồi thử lại."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Không kết nối được tới cloud cho {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Không thể kết nối với GitHub. Hãy kiểm tra kết nối internet rồi thử lại."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "Không thể kết nối máy chủ tải xuống. Hãy kiểm tra kết nối internet rồi thử lại."
 
 msgid "Couldn't reach the model provider"
 msgstr "Không kết nối được với nhà cung cấp mô hình"
@@ -6371,8 +6380,8 @@ msgstr "Không thể gửi cho agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Không gửi được tin nhắn. Tin nhắn đã được trả lại ô soạn thảo."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "Không thể thiết lập {name} trên máy Mac này."
+msgid "Couldn't set up {name} on this computer."
+msgstr "Không thể thiết lập {name} trên máy tính này."
 
 msgid "Couldn't stage changes"
 msgstr "Không thể stage các thay đổi"
@@ -6424,9 +6433,6 @@ msgstr "Không thể thử chuyển lại"
 
 msgid "Couldn't undo the file changes."
 msgstr "Không thể hoàn tác thay đổi tệp."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Không thể giải nén hoặc lưu GitHub CLI trên máy Mac này."
 
 msgid "Couldn't unstage changes"
 msgstr "Không thể bỏ stage các thay đổi"
@@ -7360,9 +7366,6 @@ msgstr "Đọc chính tả không khả dụng trên thiết bị này"
 msgid "Dictation is not available right now"
 msgstr "Đọc chính tả hiện không khả dụng"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Trang có hiện mã không? Dán vào đây"
-
 msgid "Didn't hear back"
 msgstr "Không có phản hồi"
 
@@ -7695,9 +7698,6 @@ msgstr "Đang tải {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Tải xuống từ Apple cần có Apple ID. Quá trình cài đặt có thể cần khoảng 20 GB dung lượng trống."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Đang tải GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Đang tải xuống..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Hoàn tất review"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Hãy hoàn tất đăng nhập trong trình duyệt. Mục này tự cập nhật."
 
 msgid "Finished"
 msgstr "Đã xong"
@@ -10592,9 +10589,6 @@ msgstr "Đã cài đặt · đăng nhập bằng tài khoản Claude"
 
 msgid "Installed by your organization"
 msgstr "Do tổ chức của bạn cài"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Bạn đã cài bằng cách khác, như Homebrew? Nhấn Kiểm tra lại."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Đã cài bằng cách khác? Nhấn Kiểm tra lại."
@@ -14397,9 +14391,6 @@ msgstr "Hãy mở không gian làm việc mới để xem từng cuộc trò chu
 msgid "Open the original workspace"
 msgstr "Mở không gian làm việc ban đầu"
 
-msgid "Open the page again"
-msgstr "Mở lại trang"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Mở khung tài nguyên trong bảng lệnh"
 
@@ -14451,9 +14442,6 @@ msgstr "Đang mở trong giao diện chat…"
 msgid "Opening pages"
 msgstr "Mở trang"
 
-msgid "Opening the sign-in page…"
-msgstr "Đang mở trang đăng nhập…"
-
 msgid "Operator"
 msgstr "Người vận hành"
 
@@ -14480,9 +14468,6 @@ msgstr "Không bắt buộc. Giúp chúng tôi biết kênh nào hiệu quả."
 
 msgid "Options"
 msgstr "Tùy chọn"
-
-msgid "Or sign in from a terminal:"
-msgstr "Hoặc đăng nhập từ terminal:"
 
 msgid "Orange"
 msgstr "Cam"
@@ -14896,9 +14881,6 @@ msgstr "Paradev khởi đầu là một dự án hackathon vào tháng 11 năm 2
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev vẫn chưa tìm thấy {name}."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev vẫn không tìm thấy GitHub CLI."
 
 msgid "Paradev Teams"
 msgstr "Nhóm Paradev"
@@ -18625,6 +18607,9 @@ msgstr "Đăng nhập một lần. Paradev giữ kết nối."
 msgid "Sign in to {0}"
 msgstr "Đăng nhập vào {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Đăng nhập vào {name} bên dưới. Trình duyệt sẽ mở để hoàn tất."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Đăng nhập để thay đổi plugin của tổ chức."
 
@@ -18689,9 +18674,6 @@ msgstr "Đăng ký bằng GitHub"
 
 msgid "Sign up with Google"
 msgstr "Đăng ký bằng Google"
-
-msgid "Sign-in code"
-msgstr "Mã đăng nhập"
 
 msgid "Sign-in didn't finish"
 msgstr "Đăng nhập chưa hoàn tất"
@@ -23335,4 +23317,3 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
-

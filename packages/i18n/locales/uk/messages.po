@@ -1156,6 +1156,9 @@ msgstr "{monthlyPrice} за користувача на місяць. Мобіл
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваших автоматизацій з помилкою під час останнього запуску: {myFailedCount}"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} занадто стара версія для чату"
+
 msgid "{name} accounts"
 msgstr "Облікові записи {name}"
 
@@ -1472,6 +1475,9 @@ msgstr "{user} знову приєднався(-лася)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} зараз обмежує завантаження. Зачекайте хвилину й спробуйте ще раз."
 
 msgid "{waiting} Waiting"
 msgstr "Очікують: {waiting}"
@@ -4279,6 +4285,12 @@ msgstr "Запуск у чаті"
 msgid "Chat name"
 msgstr "Назва чату"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Для чату потрібна версія {minVersion} або новіша. Paradev може оновити її за вас."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Для чату потрібна версія {minVersion} або новіша. Оновіть {name}, а потім натисніть «Спробувати ще раз»."
+
 msgid "Chat session not found"
 msgstr "Сеанс чату не знайдено"
 
@@ -6269,16 +6281,13 @@ msgstr "Не вдалося опублікувати коментар"
 msgid "Couldn't post reply"
 msgstr "Не вдалося опублікувати відповідь"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Не вдалося під’єднатися до {vendor}. Перевірте підключення до інтернету й спробуйте ще раз."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Не вдалося зв'язатися з хмарою для {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Не вдалося під’єднатися до GitHub. Перевірте підключення до інтернету й спробуйте ще раз."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "Не вдалося зв’язатися із сервером завантаження. Перевірте підключення до інтернету та спробуйте знову."
 
 msgid "Couldn't reach the model provider"
 msgstr "Не вдалося зв'язатися з провайдером моделі"
@@ -6365,8 +6374,8 @@ msgstr "Не вдалося надіслати агенту"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Не вдалося надіслати повідомлення. Його повернуто в поле введення."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "Не вдалося налаштувати {name} на цьому Mac."
+msgid "Couldn't set up {name} on this computer."
+msgstr "Не вдалося налаштувати {name} на цьому комп’ютері."
 
 msgid "Couldn't stage changes"
 msgstr "Не вдалося проіндексувати зміни"
@@ -6418,9 +6427,6 @@ msgstr "Не вдалося повторити перенесення"
 
 msgid "Couldn't undo the file changes."
 msgstr "Не вдалося скасувати зміни у файлах."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Не вдалося розпакувати або зберегти GitHub CLI на цьому Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Не вдалося зняти зміни з індексу"
@@ -7354,9 +7360,6 @@ msgstr "Диктування недоступне на цьому пристро
 msgid "Dictation is not available right now"
 msgstr "Диктування зараз недоступне"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Сторінка показала код? Вставте його сюди"
-
 msgid "Didn't hear back"
 msgstr "Відповіді не надійшло"
 
@@ -7689,9 +7692,6 @@ msgstr "Завантаження {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Для завантаження з сайту Apple потрібен Apple ID. Для встановлення може знадобитися близько 20 ГБ вільного місця."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Завантаження GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Завантаження..."
@@ -9082,9 +9082,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Завершити рев'ю"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Завершіть вхід у браузері. Це оновиться само."
 
 msgid "Finished"
 msgstr "Завершено"
@@ -10586,9 +10583,6 @@ msgstr "Встановлено · увійдіть з обліковим зап�
 
 msgid "Installed by your organization"
 msgstr "Встановлено вашою організацією"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Встановили іншим способом, наприклад через Homebrew? Натисніть «Перевірити знову»."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Встановили іншим способом? Натисніть «Перевірити знову»."
@@ -14391,9 +14385,6 @@ msgstr "Відкрийте новий робочий простір, щоб по
 msgid "Open the original workspace"
 msgstr "Відкрити початковий робочий простір"
 
-msgid "Open the page again"
-msgstr "Відкрити сторінку знову"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Відкрити перегляд використання ресурсів у палітрі команд"
 
@@ -14445,9 +14436,6 @@ msgstr "Відкриття в інтерфейсі чату…"
 msgid "Opening pages"
 msgstr "Відкриття сторінок"
 
-msgid "Opening the sign-in page…"
-msgstr "Відкриваємо сторінку входу…"
-
 msgid "Operator"
 msgstr "Оператор"
 
@@ -14474,9 +14462,6 @@ msgstr "Необов'язково. Допомагає нам зрозуміти,
 
 msgid "Options"
 msgstr "Параметри"
-
-msgid "Or sign in from a terminal:"
-msgstr "Або увійдіть із термінала:"
 
 msgid "Orange"
 msgstr "Помаранчевий"
@@ -14890,9 +14875,6 @@ msgstr "Paradev почався як хакатонний проєкт у лис�
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev досі не знаходить {name}."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev досі не знаходить GitHub CLI."
 
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
@@ -18619,6 +18601,9 @@ msgstr "Увійдіть один раз. Paradev збереже підключ�
 msgid "Sign in to {0}"
 msgstr "Увійдіть у {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Увійдіть у {name} нижче. Щоб завершити, відкриється браузер."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Увійдіть, щоб змінити плагіни організації."
 
@@ -18683,9 +18668,6 @@ msgstr "Зареєструватися через GitHub"
 
 msgid "Sign up with Google"
 msgstr "Зареєструватися через Google"
-
-msgid "Sign-in code"
-msgstr "Код входу"
 
 msgid "Sign-in didn't finish"
 msgstr "Вхід не завершено"
@@ -23329,4 +23311,3 @@ msgstr "Зменшити"
 
 msgid "zsh"
 msgstr "zsh"
-

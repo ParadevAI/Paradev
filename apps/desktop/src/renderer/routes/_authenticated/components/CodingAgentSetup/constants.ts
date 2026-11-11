@@ -17,11 +17,6 @@ export const CODING_AGENT_MANUAL_INSTALL_URLS: Record<CodingAgentId, string> = {
 	codex: "https://github.com/openai/codex/releases/latest",
 };
 
-export const CODING_AGENT_LOGIN_ARGS: Record<CodingAgentId, string> = {
-	claude: "auth login",
-	codex: "login --device-auth",
-};
-
 export function isCodingAgentId(value: unknown): value is CodingAgentId {
 	return value === "claude" || value === "codex";
 }

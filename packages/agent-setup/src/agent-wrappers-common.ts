@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { quoteSingleShell } from "@superset/shared/agent-prompt-launch";
+import { wrapperBinDirCasePattern } from "./agent-binary";
 import { SUPERSET_MANAGED_BINARIES } from "./agent-setup-targets";
 import { ARTIFACT_GUARD_SCRIPT_NAME } from "./artifact-guard-hook";
 import { NOTIFY_SCRIPT_NAME } from "./notify-hook";
@@ -125,7 +127,7 @@ function buildRealBinaryResolver(): string {
     [ -z "$dir" ] && continue
     dir="\${dir%/}"
     case "$dir" in
-      "${getBinDir()}"|"$HOME"/.paradev/bin|"$HOME"/.paradev-*/bin|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
+      ${wrapperBinDirCasePattern()}) continue ;;
     esac
     if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
       printf "%s\\n" "$dir/$name"
@@ -244,7 +246,7 @@ fi
 
 function buildFallbackBinaryBlock(fallbackBinary: string | undefined): string {
 	if (!fallbackBinary) return "";
-	const quoted = `'${fallbackBinary.replaceAll("'", `'"'"'`)}'`;
+	const quoted = quoteSingleShell(fallbackBinary);
 	return `if [ -z "$REAL_BIN" ] && [ -x ${quoted} ] && [ ! -d ${quoted} ]; then
   REAL_BIN=${quoted}
 fi

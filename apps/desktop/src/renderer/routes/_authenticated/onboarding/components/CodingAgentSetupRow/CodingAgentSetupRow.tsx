@@ -8,6 +8,7 @@ import {
 	type CodingAgentId,
 	CodingAgentSetup,
 	type CodingAgentSetupStep,
+	useAgentSignInState,
 } from "renderer/routes/_authenticated/components/CodingAgentSetup";
 import { SetupRow } from "../SetupRow";
 
@@ -19,12 +20,13 @@ export function CodingAgentSetupRow({ agent }: CodingAgentSetupRowProps) {
 	const { t } = useLingui();
 	const [step, setStep] = useState<CodingAgentSetupStep | null>(null);
 	const { data: status } = electronTrpc.codingAgents.status.useQuery(
-		{ agent, signIn: true },
+		{ agent },
 		{ refetchOnWindowFocus: "always" },
 	);
 	const installed = status?.installed === true;
-	const signedIn = installed && status?.signedIn === true;
-	const account = status?.account;
+	const signIn = useAgentSignInState(agent, installed);
+	const signedIn = installed && signIn.signedIn === true;
+	const account = signIn.account;
 
 	const signedOutDetail =
 		agent === "claude"

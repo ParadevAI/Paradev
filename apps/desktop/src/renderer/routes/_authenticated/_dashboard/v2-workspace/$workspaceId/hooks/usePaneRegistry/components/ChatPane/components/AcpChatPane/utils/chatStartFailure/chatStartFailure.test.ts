@@ -27,7 +27,7 @@ function cardFor(input: Parameters<typeof chatStartFailure>[0]) {
 		agent: missingCodingAgent({
 			agentId: "claude",
 			failed: failure !== null,
-			installed: false,
+			usable: false,
 			...LOCAL,
 		}),
 	};

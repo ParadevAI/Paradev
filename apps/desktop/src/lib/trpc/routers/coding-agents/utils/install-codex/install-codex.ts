@@ -1,15 +1,17 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { quoteSingleShell } from "@superset/shared/agent-prompt-launch";
 import {
-	AgentInstallError,
-	type AgentInstallEvent,
 	downloadVerified,
 	type Fetcher,
 	fetchOk,
+	InstallError,
 	parseIntegrity,
-	toFailedEvent,
-} from "../download-verified";
+} from "../../../utils/download-verified";
+import { type AgentInstallEvent, toFailedEvent } from "../agent-install-event";
+
+const STAGING_PREFIX = ".staging-";
 
 export const CODEX_REGISTRY_URL = "https://registry.npmjs.org/@openai/codex";
 const TARBALL_ORIGIN = "https://registry.npmjs.org";
@@ -20,7 +22,7 @@ export interface InstallCodexOptions {
 	rootDir: string;
 	/** The launcher the app and terminals run. */
 	launcherPath: string;
-	arch?: string;
+	arch: "arm64" | "x64";
 	verifySignature: (binaryPath: string) => Promise<boolean>;
 	extractTarball: (tarballPath: string, destDir: string) => Promise<void>;
 	readVersion: (binaryPath: string) => Promise<string | null>;
@@ -28,15 +30,17 @@ export interface InstallCodexOptions {
 	signal?: AbortSignal;
 }
 
-function codexTarget(arch: string): { npmSuffix: string; triple: string } {
+function codexTarget(arch: "arm64" | "x64"): {
+	npmSuffix: string;
+	triple: string;
+} {
 	return arch === "arm64"
 		? { npmSuffix: "darwin-arm64", triple: "aarch64-apple-darwin" }
 		: { npmSuffix: "darwin-x64", triple: "x86_64-apple-darwin" };
 }
 
 export function codexLauncherScript(binaryPath: string): string {
-	const quoted = `'${binaryPath.replaceAll("'", `'"'"'`)}'`;
-	return `#!/bin/sh\nexec ${quoted} "$@"\n`;
+	return `#!/bin/sh\nexec ${quoteSingleShell(binaryPath)} "$@"\n`;
 }
 
 async function readJson(
@@ -44,11 +48,10 @@ async function readJson(
 	url: string,
 	signal?: AbortSignal,
 ): Promise<Record<string, unknown>> {
-	const body = await (await fetchOk(fetcher, url, signal))
+	const body = await (await fetchOk(fetcher, url, { signal }))
 		.json()
 		.catch(() => null);
-	if (!body || typeof body !== "object")
-		throw new AgentInstallError("download");
+	if (!body || typeof body !== "object") throw new InstallError("download");
 	return body as Record<string, unknown>;
 }
 
@@ -61,9 +64,13 @@ export async function installCodex(
 	options: InstallCodexOptions,
 ): Promise<AgentInstallEvent> {
 	const emit = (event: AgentInstallEvent) => options.onProgress?.(event);
-	const { npmSuffix, triple } = codexTarget(options.arch ?? process.arch);
-	const stagingDir = path.join(options.rootDir, `.staging-${randomUUID()}`);
+	const { npmSuffix, triple } = codexTarget(options.arch);
+	const stagingDir = path.join(
+		options.rootDir,
+		`${STAGING_PREFIX}${randomUUID()}`,
+	);
 	try {
+		await removeStaleStaging(options.rootDir);
 		const latest = await readJson(
 			options.fetch,
 			`${CODEX_REGISTRY_URL}/latest`,
@@ -71,7 +78,7 @@ export async function installCodex(
 		);
 		const version = latest.version;
 		if (typeof version !== "string" || !/^\d+\.\d+\.\d+/.test(version)) {
-			throw new AgentInstallError("download");
+			throw new InstallError("download");
 		}
 		const platformPackage = await readJson(
 			options.fetch,
@@ -88,7 +95,7 @@ export async function installCodex(
 			typeof tarball !== "string" ||
 			!tarball.startsWith(`${TARBALL_ORIGIN}/`)
 		) {
-			throw new AgentInstallError("checksum");
+			throw new InstallError("checksum");
 		}
 
 		await fs.mkdir(stagingDir, { recursive: true });
@@ -107,11 +114,11 @@ export async function installCodex(
 		const unpacked = path.join(stagingDir, "package");
 		await fs.mkdir(unpacked);
 		await options.extractTarball(tarballPath, unpacked).catch(() => {
-			throw new AgentInstallError("install");
+			throw new InstallError("install");
 		});
 		const relativeBinary = path.join("vendor", triple, "bin", "codex");
 		if (!(await options.verifySignature(path.join(unpacked, relativeBinary)))) {
-			throw new AgentInstallError("signature");
+			throw new InstallError("signature");
 		}
 
 		emit({ stage: "installing" });
@@ -127,19 +134,15 @@ export async function installCodex(
 		await fs.rename(stagedLauncher, options.launcherPath);
 
 		const installedVersion = await options.readVersion(options.launcherPath);
-		if (!installedVersion) throw new AgentInstallError("install");
+		if (!installedVersion) throw new InstallError("install");
 		await removeOtherReleases(options.rootDir, version);
-		const done: AgentInstallEvent = {
+		return {
 			stage: "done",
 			version: installedVersion,
 			path: options.launcherPath,
 		};
-		emit(done);
-		return done;
 	} catch (error) {
-		const failed = toFailedEvent(error);
-		emit(failed);
-		return failed;
+		return toFailedEvent(error);
 	} finally {
 		await fs.rm(stagingDir, { recursive: true, force: true }).catch(() => {});
 	}
@@ -153,6 +156,23 @@ async function removeOtherReleases(
 	await Promise.all(
 		entries
 			.filter((entry) => entry !== keep && !entry.startsWith("."))
+			.map((entry) =>
+				fs
+					.rm(path.join(rootDir, entry), { recursive: true, force: true })
+					.catch(() => {}),
+			),
+	);
+}
+
+/**
+ * Unpacked downloads (150-520 MB) an interrupted install left behind. Only
+ * safe while no install runs: the router allows one Codex install at a time.
+ */
+export async function removeStaleStaging(rootDir: string): Promise<void> {
+	const entries = await fs.readdir(rootDir).catch(() => []);
+	await Promise.all(
+		entries
+			.filter((entry) => entry.startsWith(STAGING_PREFIX))
 			.map((entry) =>
 				fs
 					.rm(path.join(rootDir, entry), { recursive: true, force: true })

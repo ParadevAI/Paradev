@@ -7,8 +7,8 @@ const LOCAL = {
 };
 
 describe("missingCodingAgent", () => {
-	test("offers the install when the lookup finds no binary", () => {
-		const missing = { failed: true, installed: false, ...LOCAL };
+	test("offers the install when the lookup finds no binary new enough for chat", () => {
+		const missing = { failed: true, usable: false, ...LOCAL };
 		expect(missingCodingAgent({ agentId: "claude", ...missing })).toBe(
 			"claude",
 		);
@@ -16,12 +16,12 @@ describe("missingCodingAgent", () => {
 	});
 
 	test("keeps the plain error when the binary is there or not yet looked up", () => {
-		for (const installed of [true, undefined]) {
+		for (const usable of [true, undefined]) {
 			expect(
 				missingCodingAgent({
 					agentId: "claude",
 					failed: true,
-					installed,
+					usable,
 					...LOCAL,
 				}),
 			).toBeNull();
@@ -29,7 +29,7 @@ describe("missingCodingAgent", () => {
 	});
 
 	test("offers nothing for a chat that did not fail, another host, or another agent", () => {
-		const base = { agentId: "claude", failed: true, installed: false };
+		const base = { agentId: "claude", failed: true, usable: false };
 		expect(missingCodingAgent({ ...base, ...LOCAL, failed: false })).toBeNull();
 		expect(
 			missingCodingAgent({

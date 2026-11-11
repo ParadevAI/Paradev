@@ -1162,6 +1162,9 @@ msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} 版本太旧，无法用于聊天"
+
 msgid "{name} accounts"
 msgstr "{name} 账号"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} 已重新加入。"
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} 当前正在限制下载。请稍等片刻后重试。"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
@@ -4285,6 +4291,12 @@ msgstr "聊天启动"
 msgid "Chat name"
 msgstr "聊天名称"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "聊天需要 {minVersion} 或更高版本。Paradev 可以为你更新。"
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "聊天需要 {minVersion} 或更高版本。请更新你的 {name}，然后点击“重试”。"
+
 msgid "Chat session not found"
 msgstr "未找到聊天会话"
 
@@ -6275,16 +6287,13 @@ msgstr "无法发布评论"
 msgid "Couldn't post reply"
 msgstr "无法发布回复"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "无法连接到 {vendor}。请检查网络连接后重试。"
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "无法为{0}连接云端：{1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "无法连接到 GitHub。请检查网络连接后重试。"
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "无法连接下载服务器。请检查网络连接后重试。"
 
 msgid "Couldn't reach the model provider"
 msgstr "无法连接到模型提供商"
@@ -6371,8 +6380,8 @@ msgstr "无法发送给智能体"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "无法发送你的消息。消息已放回输入框。"
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "无法在这台 Mac 上设置 {name}。"
+msgid "Couldn't set up {name} on this computer."
+msgstr "无法在这台电脑上设置 {name}。"
 
 msgid "Couldn't stage changes"
 msgstr "无法暂存更改"
@@ -6424,9 +6433,6 @@ msgstr "无法重试移动"
 
 msgid "Couldn't undo the file changes."
 msgstr "无法撤销文件更改。"
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "无法在这台 Mac 上解压或保存 GitHub CLI。"
 
 msgid "Couldn't unstage changes"
 msgstr "无法取消暂存更改"
@@ -7360,9 +7366,6 @@ msgstr "此设备不支持语音输入"
 msgid "Dictation is not available right now"
 msgstr "语音输入暂时不可用"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "页面显示了代码？请粘贴到这里"
-
 msgid "Didn't hear back"
 msgstr "未收到响应"
 
@@ -7695,9 +7698,6 @@ msgstr "正在下载 {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "从 Apple 下载需要 Apple ID。安装可能需要约 20 GB 可用空间。"
-
-msgid "Downloading GitHub CLI…"
-msgstr "正在下载 GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "正在下载..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "完成审查"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "请在浏览器中完成登录。此处会自动更新。"
 
 msgid "Finished"
 msgstr "已完成"
@@ -10592,9 +10589,6 @@ msgstr "已安装 · 使用你的 Claude 账号登录"
 
 msgid "Installed by your organization"
 msgstr "由你的组织安装"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "用其他方式（如 Homebrew）安装的？请点击“重新检查”。"
 
 msgid "Installed it another way? Click Check again."
 msgstr "已通过其他方式安装？请点击重新检查。"
@@ -14397,9 +14391,6 @@ msgstr "打开新工作区可查看每个聊天。未移动的聊天仍在原工
 msgid "Open the original workspace"
 msgstr "打开原工作区"
 
-msgid "Open the page again"
-msgstr "再次打开页面"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "在命令面板中打开资源用量视图"
 
@@ -14451,9 +14442,6 @@ msgstr "正在聊天界面中打开…"
 msgid "Opening pages"
 msgstr "打开页面"
 
-msgid "Opening the sign-in page…"
-msgstr "正在打开登录页面…"
-
 msgid "Operator"
 msgstr "操作员"
 
@@ -14480,9 +14468,6 @@ msgstr "可选。帮助我们了解哪些渠道有效。"
 
 msgid "Options"
 msgstr "选项"
-
-msgid "Or sign in from a terminal:"
-msgstr "或在终端中登录："
 
 msgid "Orange"
 msgstr "橙色"
@@ -14896,9 +14881,6 @@ msgstr "Paradev起初是2025年11月的一个黑客松项目，一个用来管�
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev 仍然找不到 {name}。"
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev 仍然找不到 GitHub CLI。"
 
 msgid "Paradev Teams"
 msgstr "Paradev 团队"
@@ -18625,6 +18607,9 @@ msgstr "登录一次，Paradev 会保持连接。"
 msgid "Sign in to {0}"
 msgstr "登录{0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "请在下方登录 {name}。浏览器会打开以完成登录。"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "登录后才能更改组织的插件。"
 
@@ -18689,9 +18674,6 @@ msgstr "使用GitHub注册"
 
 msgid "Sign up with Google"
 msgstr "使用Google注册"
-
-msgid "Sign-in code"
-msgstr "登录代码"
 
 msgid "Sign-in didn't finish"
 msgstr "登录未完成"
@@ -23335,4 +23317,3 @@ msgstr "缩小"
 
 msgid "zsh"
 msgstr "zsh"
-

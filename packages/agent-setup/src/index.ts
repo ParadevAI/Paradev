@@ -75,6 +75,14 @@ export {
 
 export { getCommandShellArgs, getShellArgs, getShellEnv };
 
+export {
+	type AgentBinary,
+	isExecutableFile,
+	isWrapperBinDir,
+	meetsMinVersion,
+	parseAgentVersion,
+	resolveAgentBinary,
+} from "./agent-binary";
 export { getWrapperPath } from "./agent-wrappers-common";
 export {
 	getAgentSetupTemplatesDir,

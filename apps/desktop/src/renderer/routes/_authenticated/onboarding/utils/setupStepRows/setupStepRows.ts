@@ -21,9 +21,10 @@ export interface SetupStepStatus {
 }
 
 /**
- * Each row shows only when that tool is missing. The Git row installs Apple's
- * Command Line Tools and Paradev installs agents itself only on a Mac, so
- * those rows are macOS only; elsewhere the project step says Git is missing.
+ * Each row shows only when that tool is missing. One coding agent is enough,
+ * so the agent rows show only when neither is installed. The Git row installs
+ * Apple's Command Line Tools and Paradev installs agents itself only on a Mac,
+ * so those rows are macOS only; elsewhere the project step says Git is missing.
  */
 export function setupStepRows({
 	git,
@@ -32,11 +33,15 @@ export function setupStepRows({
 	codex,
 	platform,
 }: SetupStepStatus): SetupStepRows {
+	const noAgent =
+		platform === "darwin" &&
+		claude?.installed === false &&
+		codex?.installed === false;
 	return {
 		git: platform === "darwin" && git?.installed === false,
 		gitHub: gh !== undefined && !(gh.installed && gh.authenticated),
-		claude: platform === "darwin" && claude?.installed === false,
-		codex: platform === "darwin" && codex?.installed === false,
+		claude: noAgent,
+		codex: noAgent,
 	};
 }
 

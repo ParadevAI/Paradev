@@ -58,4 +58,34 @@ describe("AgentMissingCard", () => {
 		expect(screen.queryByRole("button", { name: "Install" })).toBeNull();
 		expect(screen.queryByText("Details")).toBeNull();
 	});
+
+	test("an install too old for chat offers an update, or Try again when it is the user's own", () => {
+		const outdated = { version: "2.0.1", minVersion: "2.1.226" };
+		render(
+			<AgentMissingCard
+				agent="claude"
+				outdated={{ ...outdated, ownInstall: false }}
+				otherAgents={[]}
+				onUseAgent={() => {}}
+				onRetry={() => {}}
+			/>,
+		);
+		expect(
+			screen.getByText("Claude Code 2.0.1 is too old for chat"),
+		).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Update" })).toBeTruthy();
+		cleanup();
+
+		render(
+			<AgentMissingCard
+				agent="claude"
+				outdated={{ ...outdated, ownInstall: true }}
+				otherAgents={[]}
+				onUseAgent={() => {}}
+				onRetry={() => {}}
+			/>,
+		);
+		expect(screen.queryByRole("button", { name: "Update" })).toBeNull();
+		expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+	});
 });

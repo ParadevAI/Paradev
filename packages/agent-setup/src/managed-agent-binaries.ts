@@ -9,7 +9,12 @@ export type ManagedCodingAgent = "claude" | "codex";
  */
 export function managedAgentBinaryPath(agent: ManagedCodingAgent): string {
 	return agent === "claude"
-		? path.join(resolveUserHomeDir(), ".local", "bin", "claude")
+		? path.join(
+				resolveUserHomeDir(),
+				".local",
+				"bin",
+				process.platform === "win32" ? "claude.exe" : "claude",
+			)
 		: path.join(resolveAppHomeDir(), "agents", "bin", "codex");
 }
 

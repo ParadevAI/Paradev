@@ -5,7 +5,6 @@ import {
 	reduceMany,
 } from "@superset/chat/core";
 import type { Envelope, Item, SessionState } from "@superset/chat/protocol";
-import { agentCliMissingMessage } from "@superset/host-service/acp-catalogue";
 import { startFailure } from "./startFailure";
 
 let seq = 0;
@@ -32,7 +31,7 @@ const item = (value: Record<string, unknown>) =>
 	} as Envelope["event"]);
 
 const prompt = [{ type: "text" as const, text: "Explain this repository" }];
-const missing = `${agentCliMissingMessage("claude")} Install claude 2.1.226 or newer and make sure it is on your PATH. Upgrade with: npm i -g @anthropic-ai/claude-code@latest`;
+const missing = `claude was not found, so this chat cannot start. Install claude 2.1.226 or newer and make sure it is on your PATH. Upgrade with: npm i -g @anthropic-ai/claude-code@latest`;
 
 describe("startFailure", () => {
 	it("reads the missing agent from a chat the host still reports as live", () => {

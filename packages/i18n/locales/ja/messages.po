@@ -1162,6 +1162,9 @@ msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オート�
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} はチャットには古すぎます"
+
 msgid "{name} accounts"
 msgstr "{name} のアカウント"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} が再参加しました。"
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} が現在ダウンロードを制限しています。少し待ってから、もう一度お試しください。"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}件待機中"
@@ -4285,6 +4291,12 @@ msgstr "チャット起動"
 msgid "Chat name"
 msgstr "チャット名"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "チャットには {minVersion} 以降が必要です。Paradev が更新できます。"
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "チャットには {minVersion} 以降が必要です。{name} を更新してから、［再試行］をクリックしてください。"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -6275,16 +6287,13 @@ msgstr "コメントを投稿できませんでした"
 msgid "Couldn't post reply"
 msgstr "返信を投稿できませんでした"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor} に接続できませんでした。インターネット接続を確認して、もう一度お試しください。"
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0}のクラウドに接続できませんでした: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "GitHubに接続できませんでした。インターネット接続を確認して、もう一度お試しください。"
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "ダウンロードサーバーに接続できませんでした。インターネット接続を確認して、もう一度お試しください。"
 
 msgid "Couldn't reach the model provider"
 msgstr "モデルのプロバイダーに接続できませんでした"
@@ -6371,8 +6380,8 @@ msgstr "エージェントに送信できませんでした"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "メッセージを送信できませんでした。入力欄に戻しました。"
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "この Mac で {name} を設定できませんでした。"
+msgid "Couldn't set up {name} on this computer."
+msgstr "このコンピュータで {name} を設定できませんでした。"
 
 msgid "Couldn't stage changes"
 msgstr "変更をステージできませんでした"
@@ -6424,9 +6433,6 @@ msgstr "移動を再試行できませんでした"
 
 msgid "Couldn't undo the file changes."
 msgstr "ファイルの変更を取り消せませんでした。"
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "このMacでGitHub CLIを展開または保存できませんでした。"
 
 msgid "Couldn't unstage changes"
 msgstr "変更をステージ解除できませんでした"
@@ -7360,9 +7366,6 @@ msgstr "このデバイスでは音声入力を利用できません"
 msgid "Dictation is not available right now"
 msgstr "現在、音声入力は利用できません"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "ページにコードが表示されましたか？ ここに貼り付けてください"
-
 msgid "Didn't hear back"
 msgstr "応答がありません"
 
@@ -7695,9 +7698,6 @@ msgstr "{name} をダウンロード中…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "AppleからのダウンロードにはApple IDが必要です。インストールには約20 GBの空き容量が必要になる場合があります。"
-
-msgid "Downloading GitHub CLI…"
-msgstr "GitHub CLI をダウンロード中…"
 
 msgid "Downloading..."
 msgstr "ダウンロード中..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "レビューを完了"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "ブラウザでサインインを完了してください。この表示は自動で更新されます。"
 
 msgid "Finished"
 msgstr "完了"
@@ -10592,9 +10589,6 @@ msgstr "インストール済み · Claude アカウントでサインイン"
 
 msgid "Installed by your organization"
 msgstr "組織がインストール済み"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Homebrewなど別の方法でインストールしましたか？「再確認」をクリックしてください。"
 
 msgid "Installed it another way? Click Check again."
 msgstr "別の方法でインストールしましたか？ 再確認をクリックしてください。"
@@ -14397,9 +14391,6 @@ msgstr "新しいワークスペースを開くと、各チャットを確認で
 msgid "Open the original workspace"
 msgstr "元のワークスペースを開く"
 
-msgid "Open the page again"
-msgstr "ページをもう一度開く"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "コマンドパレットでリソース使用状況ビューを開く"
 
@@ -14451,9 +14442,6 @@ msgstr "チャット画面で開いています…"
 msgid "Opening pages"
 msgstr "ページを開く"
 
-msgid "Opening the sign-in page…"
-msgstr "サインインページを開いています…"
-
 msgid "Operator"
 msgstr "オペレーター"
 
@@ -14480,9 +14468,6 @@ msgstr "任意。効果的な施策を知るのに役立ちます。"
 
 msgid "Options"
 msgstr "オプション"
-
-msgid "Or sign in from a terminal:"
-msgstr "またはターミナルからサインイン:"
 
 msgid "Orange"
 msgstr "オレンジ"
@@ -14896,9 +14881,6 @@ msgstr "Paradevは2025年11月、ハッカソンのプロジェクトとして�
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev はまだ {name} を見つけられません。"
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "ParadevはまだGitHub CLIを見つけられません。"
 
 msgid "Paradev Teams"
 msgstr "Paradev チーム"
@@ -18625,6 +18607,9 @@ msgstr "サインインは一度だけ。接続はParadevが保ちます。"
 msgid "Sign in to {0}"
 msgstr "{0}にサインイン"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "下で {name} にサインインしてください。完了するためにブラウザが開きます。"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "組織のプラグインを変更するにはサインインしてください。"
 
@@ -18689,9 +18674,6 @@ msgstr "GitHubでサインアップ"
 
 msgid "Sign up with Google"
 msgstr "Googleでサインアップ"
-
-msgid "Sign-in code"
-msgstr "サインインコード"
 
 msgid "Sign-in didn't finish"
 msgstr "サインインが完了しませんでした"
@@ -23335,4 +23317,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-

@@ -1162,6 +1162,9 @@ msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, önceli
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} sohbet için çok eski"
+
 msgid "{name} accounts"
 msgstr "{name} hesapları"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} yeniden katıldı."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} şu anda indirmeleri sınırlıyor. Bir dakika bekleyip yeniden deneyin."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} bekliyor"
@@ -4285,6 +4291,12 @@ msgstr "Sohbet başlatma"
 msgid "Chat name"
 msgstr "Sohbet adı"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Sohbet için {minVersion} veya daha yeni bir sürüm gerekir. Paradev sizin için güncelleyebilir."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Sohbet için {minVersion} veya daha yeni bir sürüm gerekir. {name} sürümünüzü güncelleyip Yeniden dene'ye tıklayın."
+
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
 
@@ -6275,16 +6287,13 @@ msgstr "Yorum gönderilemedi"
 msgid "Couldn't post reply"
 msgstr "Yanıt gönderilemedi"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor} sunucusuna ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "{0} için buluta erişilemedi: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "GitHub'a ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "İndirme sunucusuna ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin."
 
 msgid "Couldn't reach the model provider"
 msgstr "Model sağlayıcısına ulaşılamadı"
@@ -6371,8 +6380,8 @@ msgstr "Ajana gönderilemedi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Mesajınız gönderilemedi. Yazma alanına geri kondu."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "{name} bu Mac'te ayarlanamadı."
+msgid "Couldn't set up {name} on this computer."
+msgstr "{name} bu bilgisayarda ayarlanamadı."
 
 msgid "Couldn't stage changes"
 msgstr "Değişiklikler hazırlanamadı"
@@ -6424,9 +6433,6 @@ msgstr "Taşıma yeniden denenemedi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Dosya değişiklikleri geri alınamadı."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "GitHub CLI bu Mac'te açılamadı veya kaydedilemedi."
 
 msgid "Couldn't unstage changes"
 msgstr "Değişiklikler hazırlıktan çıkarılamadı"
@@ -7360,9 +7366,6 @@ msgstr "Bu cihazda sesle yazma kullanılamıyor"
 msgid "Dictation is not available right now"
 msgstr "Sesle yazma şu anda kullanılamıyor"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Sayfa bir kod gösterdi mi? Buraya yapıştırın"
-
 msgid "Didn't hear back"
 msgstr "Yanıt alınamadı"
 
@@ -7695,9 +7698,6 @@ msgstr "{name} indiriliyor…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Apple'dan indirmek için Apple Kimliği gerekir. Yükleme yaklaşık 20 GB boş alan gerektirebilir."
-
-msgid "Downloading GitHub CLI…"
-msgstr "GitHub CLI indiriliyor…"
 
 msgid "Downloading..."
 msgstr "İndiriliyor..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "İncelemeyi bitir"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Tarayıcınızda oturum açmayı tamamlayın. Bu kendiliğinden güncellenir."
 
 msgid "Finished"
 msgstr "Tamamlandı"
@@ -10592,9 +10589,6 @@ msgstr "Kurulu · Claude hesabınızla oturum açın"
 
 msgid "Installed by your organization"
 msgstr "Kuruluşunuz tarafından yüklendi"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Homebrew gibi başka bir yolla mı yüklediniz? Yeniden denetle'ye tıklayın."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Başka bir yolla mı kurdunuz? Yeniden denetle'ye tıklayın."
@@ -14397,9 +14391,6 @@ msgstr "Her sohbeti görmek için yeni çalışma alanını açın. Taşınmayan
 msgid "Open the original workspace"
 msgstr "Orijinal çalışma alanını aç"
 
-msgid "Open the page again"
-msgstr "Sayfayı yeniden aç"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Komut paletinde kaynak kullanımı görünümünü aç"
 
@@ -14451,9 +14442,6 @@ msgstr "Sohbet arayüzünde açılıyor…"
 msgid "Opening pages"
 msgstr "Sayfaları açma"
 
-msgid "Opening the sign-in page…"
-msgstr "Oturum açma sayfası açılıyor…"
-
 msgid "Operator"
 msgstr "Operatör"
 
@@ -14480,9 +14468,6 @@ msgstr "İsteğe bağlı. Neyin işe yaradığını anlamamıza yardımcı olur.
 
 msgid "Options"
 msgstr "Seçenekler"
-
-msgid "Or sign in from a terminal:"
-msgstr "Ya da bir terminalden oturum açın:"
 
 msgid "Orange"
 msgstr "Turuncu"
@@ -14896,9 +14881,6 @@ msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev hâlâ {name} bulamıyor."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev hâlâ GitHub CLI'ı bulamıyor."
 
 msgid "Paradev Teams"
 msgstr "Paradev Takımlar"
@@ -18625,6 +18607,9 @@ msgstr "Bir kez oturum açın. Paradev bağlantıyı korur."
 msgid "Sign in to {0}"
 msgstr "{0} kuruluşunda oturum açın"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Aşağıdan {name} hesabınızla oturum açın. Tamamlamak için tarayıcınız açılır."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
 
@@ -18689,9 +18674,6 @@ msgstr "GitHub ile kaydol"
 
 msgid "Sign up with Google"
 msgstr "Google ile kaydol"
-
-msgid "Sign-in code"
-msgstr "Oturum açma kodu"
 
 msgid "Sign-in didn't finish"
 msgstr "Giriş tamamlanmadı"
@@ -23335,4 +23317,3 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
-

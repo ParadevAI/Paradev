@@ -1,187 +1,119 @@
-import { accessSync, constants, statSync } from "node:fs";
+import { parseAgentVersion } from "@superset/agent-setup/agent-binary";
 import {
 	type ManagedCodingAgent,
 	managedAgentBinaryPath,
 	managedCodexRootDir,
 } from "@superset/agent-setup/managed-agent-binaries";
-import { getBinDir } from "@superset/agent-setup/paths";
 import { observable } from "@trpc/server/observable";
 import { net } from "electron";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
+import { isSignedByTeam, TEAM_IDS } from "../utils/code-signature";
+import { macArch } from "../utils/mac-arch";
+import { createSingleInstall } from "../utils/single-install";
 import { getProcessEnvWithShellEnv } from "../workspaces/utils/shell-env";
-import {
-	type AgentSignInEvent,
-	type AgentSignInHandle,
-	runAgentSignIn,
-} from "./utils/agent-sign-in";
-import {
-	ANTHROPIC_TEAM_ID,
-	isSignedByTeam,
-	OPENAI_TEAM_ID,
-} from "./utils/code-signature";
+import type { AgentInstallEvent } from "./utils/agent-install-event";
 import {
 	type CodingAgentStatus,
 	detectCodingAgent,
-	parseAgentVersion,
 } from "./utils/detect-coding-agent";
-import type { AgentInstallEvent } from "./utils/download-verified";
 import { installClaudeCode } from "./utils/install-claude-code";
-import { installCodex } from "./utils/install-codex";
-import { runProcess, spawnLoginProcess } from "./utils/run-process";
+import { installCodex, removeStaleStaging } from "./utils/install-codex";
+import { runProcess } from "./utils/run-process";
 
 const agentInput = z.object({ agent: z.enum(["claude", "codex"]) });
 
-function isExecutable(filePath: string): boolean {
-	try {
-		if (!statSync(filePath).isFile()) return false;
-		accessSync(filePath, constants.X_OK);
-		return true;
-	} catch {
-		return false;
-	}
-}
-
 async function readVersion(binaryPath: string): Promise<string | null> {
-	const env = await getProcessEnvWithShellEnv();
 	const result = await runProcess(binaryPath, ["--version"], {
-		env,
+		env: await getProcessEnvWithShellEnv(),
 		timeoutMs: 30_000,
 	}).catch(() => null);
 	return result?.code === 0 ? parseAgentVersion(result.stdout) : null;
 }
 
-async function detect(
-	agent: ManagedCodingAgent,
-	signIn: boolean,
-): Promise<CodingAgentStatus> {
+async function detect(agent: ManagedCodingAgent): Promise<CodingAgentStatus> {
 	const env = await getProcessEnvWithShellEnv();
-	return detectCodingAgent(
-		agent,
-		{ signIn },
-		{
-			userPath: async () => env.PATH ?? "",
-			wrapperDirs: [getBinDir()],
-			managedPath: managedAgentBinaryPath(agent),
-			isExecutable,
-			run: (command, args) =>
-				runProcess(command, args, { env, timeoutMs: 15_000 }),
-		},
-	);
+	return detectCodingAgent(agent, {
+		userPath: async () => env.PATH ?? "",
+		run: (command, args) =>
+			runProcess(command, args, { env, timeoutMs: 15_000 }),
+	});
 }
 
-function install(
+async function install(
 	agent: ManagedCodingAgent,
-	options: {
-		signal: AbortSignal;
-		onProgress: (event: AgentInstallEvent) => void;
-	},
+	emit: (event: AgentInstallEvent) => void,
+	signal: AbortSignal,
 ): Promise<AgentInstallEvent> {
+	if (process.platform !== "darwin") {
+		return { stage: "failed", reason: "unsupported" };
+	}
 	const fetch = (url: string, init?: RequestInit) => net.fetch(url, init);
+	const arch = await macArch();
 	if (agent === "claude") {
 		return installClaudeCode({
 			fetch,
+			arch,
 			installedPath: managedAgentBinaryPath("claude"),
 			verifySignature: (binaryPath) =>
-				isSignedByTeam(binaryPath, ANTHROPIC_TEAM_ID),
-			runInstall: async (binaryPath, version) => {
-				const env = await getProcessEnvWithShellEnv();
-				const result = await runProcess(binaryPath, ["install", version], {
-					env,
+				isSignedByTeam(binaryPath, TEAM_IDS.anthropic),
+			runInstall: async (binaryPath, args) => {
+				const result = await runProcess(binaryPath, args, {
+					env: await getProcessEnvWithShellEnv(),
 					timeoutMs: 5 * 60_000,
+					signal,
 				});
 				if (result.code !== 0) throw new Error("claude install failed");
 			},
 			readVersion,
-			...options,
+			onProgress: emit,
+			signal,
 		});
 	}
 	return installCodex({
 		fetch,
+		arch,
 		rootDir: managedCodexRootDir(),
 		launcherPath: managedAgentBinaryPath("codex"),
-		verifySignature: (binaryPath) => isSignedByTeam(binaryPath, OPENAI_TEAM_ID),
+		verifySignature: (binaryPath) =>
+			isSignedByTeam(binaryPath, TEAM_IDS.openai),
 		extractTarball: async (tarballPath, destDir) => {
 			const result = await runProcess(
 				"/usr/bin/tar",
 				["-xzf", tarballPath, "--strip-components=1", "-C", destDir],
-				{ env: { PATH: "/usr/bin:/bin" }, timeoutMs: 5 * 60_000 },
+				{ env: { PATH: "/usr/bin:/bin" }, timeoutMs: 5 * 60_000, signal },
 			);
 			if (result.code !== 0) throw new Error("tar failed");
 		},
 		readVersion,
-		...options,
+		onProgress: emit,
+		signal,
 	});
 }
 
-const signIns = new Map<ManagedCodingAgent, AgentSignInHandle>();
+const subscribeToInstall = createSingleInstall<AgentInstallEvent>();
 
 export const createCodingAgentsRouter = () => {
+	// No install runs yet at startup, so a download a quit app left is stale.
+	void removeStaleStaging(managedCodexRootDir());
+
 	return router({
 		status: publicProcedure
-			.input(agentInput.extend({ signIn: z.boolean().optional() }))
-			.query(({ input }) => detect(input.agent, input.signIn ?? false)),
+			.input(agentInput)
+			.query(({ input }) => detect(input.agent)),
 		install: publicProcedure.input(agentInput).subscription(({ input }) => {
-			return observable<AgentInstallEvent>((emit) => {
-				if (process.platform !== "darwin") {
-					emit.next({ stage: "failed", reason: "unsupported" });
-					emit.complete();
-					return () => {};
-				}
-				const controller = new AbortController();
-				void install(input.agent, {
-					signal: controller.signal,
-					onProgress: (event) => {
-						if (event.stage === "done" || event.stage === "failed") return;
-						if (!controller.signal.aborted) emit.next(event);
+			return observable<AgentInstallEvent>((emit) =>
+				subscribeToInstall(
+					input.agent,
+					(emitProgress, signal) => install(input.agent, emitProgress, signal),
+					(event) => {
+						emit.next(event);
+						if (event.stage === "done" || event.stage === "failed") {
+							emit.complete();
+						}
 					},
-				}).then((event) => {
-					if (controller.signal.aborted) return;
-					emit.next(event);
-					emit.complete();
-				});
-				return () => controller.abort();
-			});
+				),
+			);
 		}),
-		signIn: publicProcedure.input(agentInput).subscription(({ input }) => {
-			return observable<AgentSignInEvent>((emit) => {
-				let handle: AgentSignInHandle | null = null;
-				let stopped = false;
-				void (async () => {
-					const status = await detect(input.agent, false);
-					const env = await getProcessEnvWithShellEnv();
-					if (stopped) return;
-					if (!status.path) {
-						emit.next({ type: "failed", reason: "exited" });
-						emit.complete();
-						return;
-					}
-					const binaryPath = status.path;
-					signIns.get(input.agent)?.stop();
-					handle = runAgentSignIn({
-						agent: input.agent,
-						spawn: (args) => spawnLoginProcess(binaryPath, args, env),
-						onEvent: (event) => {
-							if (stopped) return;
-							emit.next(event);
-							if (event.type !== "url") emit.complete();
-						},
-					});
-					signIns.set(input.agent, handle);
-				})();
-				return () => {
-					stopped = true;
-					handle?.stop();
-					if (handle && signIns.get(input.agent) === handle) {
-						signIns.delete(input.agent);
-					}
-				};
-			});
-		}),
-		submitSignInCode: publicProcedure
-			.input(agentInput.extend({ code: z.string().min(1).max(4096) }))
-			.mutation(({ input }) => {
-				signIns.get(input.agent)?.submitCode(input.code);
-			}),
 	});
 };

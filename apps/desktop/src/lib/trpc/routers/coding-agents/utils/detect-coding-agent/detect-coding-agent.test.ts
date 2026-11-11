@@ -1,88 +1,44 @@
 import { describe, expect, test } from "bun:test";
-import {
-	type DetectCodingAgentDeps,
-	detectCodingAgent,
-} from "./detect-coding-agent";
+import type { AgentBinary } from "@superset/agent-setup/agent-binary";
+import { cliFloor } from "@superset/host-service/acp-catalogue";
+import { detectCodingAgent } from "./detect-coding-agent";
 
-function deps(
-	executables: string[],
-	run: DetectCodingAgentDeps["run"] = async () => ({
-		code: 0,
-		stdout: "2.1.322 (Claude Code)\n",
-	}),
-): DetectCodingAgentDeps & { calls: string[][] } {
+const CLAUDE_FLOOR = cliFloor("claude-acp").minVersion;
+
+function deps(binary: AgentBinary | null, versionOutput: string) {
 	const calls: string[][] = [];
 	return {
 		calls,
-		userPath: async () => "/home/u/.paradev/bin:/opt/homebrew/bin:/usr/bin",
-		wrapperDirs: ["/home/u/.paradev/bin"],
-		managedPath: "/home/u/.local/bin/claude",
-		isExecutable: (file) => executables.includes(file),
-		run: async (command, args) => {
+		userPath: async () => "/opt/homebrew/bin:/usr/bin",
+		resolve: () => binary,
+		run: async (command: string, args: string[]) => {
 			calls.push([command, ...args]);
-			return run(command, args);
+			return { code: 0, stdout: versionOutput };
 		},
 	};
 }
 
 describe("detectCodingAgent", () => {
-	test("an install on the user's PATH wins over the app's copy", async () => {
-		const status = await detectCodingAgent(
-			"claude",
-			{ signIn: false },
-			deps(["/opt/homebrew/bin/claude", "/home/u/.local/bin/claude"]),
-		);
-		expect(status).toMatchObject({
+	test("is usable only at the version host-service needs for chat", async () => {
+		const found = { path: "/opt/homebrew/bin/claude", source: "path" } as const;
+		expect(
+			await detectCodingAgent("claude", deps(found, "2.1.322 (Claude Code)\n")),
+		).toMatchObject({ installed: true, version: "2.1.322", usable: true });
+		expect(
+			await detectCodingAgent("claude", deps(found, "1.0.0 (Claude Code)\n")),
+		).toMatchObject({
 			installed: true,
-			source: "path",
-			path: "/opt/homebrew/bin/claude",
-			version: "2.1.322",
+			usable: false,
+			minVersion: CLAUDE_FLOOR,
 		});
 	});
 
-	test("skips the wrapper dir, then finds the app's own copy", async () => {
-		const status = await detectCodingAgent(
-			"claude",
-			{ signIn: false },
-			deps(["/home/u/.paradev/bin/claude", "/home/u/.local/bin/claude"]),
-		);
-		expect(status.source).toBe("paradev");
-		expect(status.path).toBe("/home/u/.local/bin/claude");
-	});
-
 	test("runs nothing when the agent is missing", async () => {
-		const d = deps([]);
-		const status = await detectCodingAgent("codex", { signIn: true }, d);
-		expect(status.installed).toBe(false);
+		const d = deps(null, "");
+		expect(await detectCodingAgent("codex", d)).toMatchObject({
+			installed: false,
+			usable: false,
+		});
 		expect(d.calls).toEqual([]);
-	});
-
-	test("reads Claude Code's sign-in only when asked", async () => {
-		const d = deps(["/usr/bin/claude"], async (_command, args) =>
-			args[0] === "auth"
-				? {
-						code: 0,
-						stdout: JSON.stringify({ loggedIn: true, email: "a@b.co" }),
-					}
-				: { code: 0, stdout: "2.1.322" },
-		);
-		expect(
-			await detectCodingAgent("claude", { signIn: false }, d),
-		).toMatchObject({ signedIn: null });
-		expect(d.calls.some((call) => call.includes("auth"))).toBe(false);
-		expect(
-			await detectCodingAgent("claude", { signIn: true }, d),
-		).toMatchObject({ signedIn: true, account: "a@b.co" });
-	});
-
-	test("reads a non-zero codex login status as signed out", async () => {
-		const d = deps(["/usr/bin/codex"], async (_command, args) =>
-			args[0] === "login"
-				? { code: 1, stdout: "Not logged in" }
-				: { code: 0, stdout: "codex-cli 0.167.0" },
-		);
-		expect(await detectCodingAgent("codex", { signIn: true }, d)).toMatchObject(
-			{ installed: true, version: "0.167.0", signedIn: false },
-		);
 	});
 });

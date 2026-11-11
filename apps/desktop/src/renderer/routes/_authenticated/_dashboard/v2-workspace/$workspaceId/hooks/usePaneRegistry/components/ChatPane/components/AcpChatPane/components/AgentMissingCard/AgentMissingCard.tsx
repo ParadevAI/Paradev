@@ -21,6 +21,8 @@ interface AgentMissingCardProps {
 	detail?: string | undefined;
 	/** Installed elsewhere, from Settings say, while this chat waited. */
 	installed?: boolean;
+	/** Installed, but older than chat needs. */
+	outdated?: { version: string; minVersion: string; ownInstall: boolean };
 	otherAgents: Array<{ presetId: string; label: string }>;
 	onUseAgent: (presetId: string) => void;
 	onRetry: () => void;
@@ -31,6 +33,7 @@ export function AgentMissingCard({
 	agent,
 	detail,
 	installed = false,
+	outdated,
 	otherAgents,
 	onUseAgent,
 	onRetry,
@@ -40,6 +43,8 @@ export function AgentMissingCard({
 		"missing" | "installing" | "installed" | null
 	>(null);
 	const phase = picked ?? (installed ? "installed" : "missing");
+	const version = outdated?.version;
+	const minVersion = outdated?.minVersion;
 
 	return (
 		<div className="flex w-full justify-center px-4 pt-2 pb-4">
@@ -52,6 +57,10 @@ export function AgentMissingCard({
 						<p className="font-medium text-foreground text-sm">
 							{phase === "installed" ? (
 								<Trans>{name} is installed</Trans>
+							) : outdated ? (
+								<Trans>
+									{name} {version} is too old for chat
+								</Trans>
 							) : (
 								<Trans>{name} isn't installed yet</Trans>
 							)}
@@ -59,6 +68,16 @@ export function AgentMissingCard({
 						<p className="mt-1 text-muted-foreground text-xs">
 							{phase === "installed" ? (
 								<Trans>Try again to start this chat.</Trans>
+							) : outdated?.ownInstall ? (
+								<Trans>
+									Chat needs {minVersion} or newer. Update your {name},
+									then click Try again.
+								</Trans>
+							) : outdated ? (
+								<Trans>
+									Chat needs {minVersion} or newer. Paradev can update
+									it for you.
+								</Trans>
 							) : (
 								<Trans>
 									This chat needs {name}. Paradev can install it for you. It
@@ -103,9 +122,9 @@ export function AgentMissingCard({
 								</DropdownMenuContent>
 							</DropdownMenu>
 						)}
-						{phase === "missing" ? (
+						{phase === "missing" && !outdated?.ownInstall ? (
 							<Button size="sm" onClick={() => setPhase("installing")}>
-								<Trans>Install</Trans>
+								{outdated ? <Trans>Update</Trans> : <Trans>Install</Trans>}
 							</Button>
 						) : (
 							<Button size="sm" onClick={onRetry}>

@@ -1162,6 +1162,9 @@ msgstr "{monthlyPrice} za użytkownika/mies. Aplikacja mobilna, automatyzacje, p
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} jest za stary dla czatu"
+
 msgid "{name} accounts"
 msgstr "Konta {name}"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} ponownie dołączył(a)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} ogranicza teraz pobieranie. Odczekaj minutę i spróbuj ponownie."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} oczekuje"
@@ -4285,6 +4291,12 @@ msgstr "Uruchomienie czatu"
 msgid "Chat name"
 msgstr "Nazwa czatu"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Czat wymaga wersji {minVersion} lub nowszej. Paradev może ją zaktualizować za Ciebie."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Czat wymaga wersji {minVersion} lub nowszej. Zaktualizuj {name}, a potem kliknij Spróbuj ponownie."
+
 msgid "Chat session not found"
 msgstr "Nie znaleziono sesji czatu"
 
@@ -6275,16 +6287,13 @@ msgstr "Nie udało się opublikować komentarza"
 msgid "Couldn't post reply"
 msgstr "Nie udało się opublikować odpowiedzi"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Nie można połączyć się z {vendor}. Sprawdź połączenie z internetem i spróbuj ponownie."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Nie udało się połączyć z chmurą dla {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Nie można połączyć się z GitHub. Sprawdź połączenie z internetem i spróbuj ponownie."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "Nie udało się połączyć z serwerem pobierania. Sprawdź połączenie z internetem i spróbuj ponownie."
 
 msgid "Couldn't reach the model provider"
 msgstr "Nie udało się połączyć z dostawcą modelu"
@@ -6371,8 +6380,8 @@ msgstr "Nie udało się wysłać do agenta"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Nie udało się wysłać wiadomości. Wróciła do pola wpisywania."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "Nie udało się skonfigurować {name} na tym Macu."
+msgid "Couldn't set up {name} on this computer."
+msgstr "Nie udało się skonfigurować {name} na tym komputerze."
 
 msgid "Couldn't stage changes"
 msgstr "Nie udało się dodać zmian do indeksu"
@@ -6424,9 +6433,6 @@ msgstr "Nie udało się ponowić przeniesienia"
 
 msgid "Couldn't undo the file changes."
 msgstr "Nie udało się cofnąć zmian w plikach."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Nie można rozpakować ani zapisać GitHub CLI na tym Macu."
 
 msgid "Couldn't unstage changes"
 msgstr "Nie udało się usunąć zmian z indeksu"
@@ -7360,9 +7366,6 @@ msgstr "Dyktowanie jest niedostępne na tym urządzeniu"
 msgid "Dictation is not available right now"
 msgstr "Dyktowanie jest teraz niedostępne"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Strona pokazała kod? Wklej go tutaj"
-
 msgid "Didn't hear back"
 msgstr "Brak odpowiedzi"
 
@@ -7695,9 +7698,6 @@ msgstr "Pobieranie {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Pobieranie od Apple wymaga Apple ID. Instalacja może potrzebować około 20 GB wolnego miejsca."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Pobieram GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Pobieranie..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Zakończ przegląd"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Dokończ logowanie w przeglądarce. To odświeży się samo."
 
 msgid "Finished"
 msgstr "Zakończono"
@@ -10592,9 +10589,6 @@ msgstr "Zainstalowano · zaloguj się kontem Claude"
 
 msgid "Installed by your organization"
 msgstr "Zainstalowana przez Twoją organizację"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Zainstalowano w inny sposób, np. przez Homebrew? Kliknij Sprawdź ponownie."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Zainstalowano w inny sposób? Kliknij Sprawdź ponownie."
@@ -14397,9 +14391,6 @@ msgstr "Otwórz nowy obszar roboczy, aby zobaczyć każdy czat. Czat, który nie
 msgid "Open the original workspace"
 msgstr "Otwórz pierwotny obszar roboczy"
 
-msgid "Open the page again"
-msgstr "Otwórz stronę ponownie"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Otwórz widok zużycia zasobów w palecie poleceń"
 
@@ -14451,9 +14442,6 @@ msgstr "Otwieranie w interfejsie czatu…"
 msgid "Opening pages"
 msgstr "Otwieranie stron"
 
-msgid "Opening the sign-in page…"
-msgstr "Otwieranie strony logowania…"
-
 msgid "Operator"
 msgstr "Operator"
 
@@ -14480,9 +14468,6 @@ msgstr "Opcjonalne. Pomaga nam ustalić, co działa."
 
 msgid "Options"
 msgstr "Opcje"
-
-msgid "Or sign in from a terminal:"
-msgstr "Albo zaloguj się w terminalu:"
 
 msgid "Orange"
 msgstr "Pomarańczowy"
@@ -14896,9 +14881,6 @@ msgstr "Paradev zaczął się jako projekt hackathonowy w listopadzie 2025. Był
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev nadal nie może znaleźć {name}."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev nadal nie może znaleźć GitHub CLI."
 
 msgid "Paradev Teams"
 msgstr "Paradev Zespoły"
@@ -18625,6 +18607,9 @@ msgstr "Zaloguj się raz. Paradev utrzymuje połączenie."
 msgid "Sign in to {0}"
 msgstr "Zaloguj się do {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Zaloguj się poniżej do {name}. Aby dokończyć, otworzy się przeglądarka."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Zaloguj się, aby zmienić wtyczki organizacji."
 
@@ -18689,9 +18674,6 @@ msgstr "Zarejestruj się przez GitHub"
 
 msgid "Sign up with Google"
 msgstr "Zarejestruj się przez Google"
-
-msgid "Sign-in code"
-msgstr "Kod logowania"
 
 msgid "Sign-in didn't finish"
 msgstr "Logowanie nie zostało ukończone"
@@ -23335,4 +23317,3 @@ msgstr "Pomniejsz"
 
 msgid "zsh"
 msgstr "zsh"
-

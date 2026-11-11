@@ -1162,6 +1162,9 @@ msgstr "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} of your automations failed their last run"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} is too old for chat"
+
 msgid "{name} accounts"
 msgstr "{name} accounts"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} rejoined."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} is limiting downloads right now. Wait a minute and try again."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} Waiting"
@@ -4285,6 +4291,12 @@ msgstr "Chat Launch"
 msgid "Chat name"
 msgstr "Chat name"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Chat needs {minVersion} or newer. Paradev can update it for you."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+
 msgid "Chat session not found"
 msgstr "Chat session not found"
 
@@ -6275,16 +6287,13 @@ msgstr "Couldn't post comment"
 msgid "Couldn't post reply"
 msgstr "Couldn't post reply"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Couldn't reach {vendor}. Check your internet connection and try again."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Couldn't reach cloud for {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Couldn't reach GitHub. Check your internet connection and try again."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "Couldn't reach the download server. Check your internet connection and try again."
 
 msgid "Couldn't reach the model provider"
 msgstr "Couldn't reach the model provider"
@@ -6371,8 +6380,8 @@ msgstr "Couldn't send to agent"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Couldn't send your message. It's back in the composer."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "Couldn't set up {name} on this Mac."
+msgid "Couldn't set up {name} on this computer."
+msgstr "Couldn't set up {name} on this computer."
 
 msgid "Couldn't stage changes"
 msgstr "Couldn't stage changes"
@@ -6424,9 +6433,6 @@ msgstr "Couldn't try the move again"
 
 msgid "Couldn't undo the file changes."
 msgstr "Couldn't undo the file changes."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Couldn't unpack or save GitHub CLI on this Mac."
 
 msgid "Couldn't unstage changes"
 msgstr "Couldn't unstage changes"
@@ -7360,9 +7366,6 @@ msgstr "Dictation is not available on this device"
 msgid "Dictation is not available right now"
 msgstr "Dictation is not available right now"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Did the page show a code? Paste it here"
-
 msgid "Didn't hear back"
 msgstr "Didn't hear back"
 
@@ -7695,9 +7698,6 @@ msgstr "Downloading {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Downloading GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Downloading..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Finish review"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Finish signing in in your browser. This updates on its own."
 
 msgid "Finished"
 msgstr "Finished"
@@ -10592,9 +10589,6 @@ msgstr "Installed · sign in with your Claude account"
 
 msgid "Installed by your organization"
 msgstr "Installed by your organization"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Installed it another way, like Homebrew? Click Check again."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Installed it another way? Click Check again."
@@ -14397,9 +14391,6 @@ msgstr "Open the new workspace to see each chat. A chat that didn't move is stil
 msgid "Open the original workspace"
 msgstr "Open the original workspace"
 
-msgid "Open the page again"
-msgstr "Open the page again"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Open the resource usage view in the command palette"
 
@@ -14451,9 +14442,6 @@ msgstr "Opening in Chat Interface…"
 msgid "Opening pages"
 msgstr "Opening pages"
 
-msgid "Opening the sign-in page…"
-msgstr "Opening the sign-in page…"
-
 msgid "Operator"
 msgstr "Operator"
 
@@ -14480,9 +14468,6 @@ msgstr "Optional. Helps us learn what works."
 
 msgid "Options"
 msgstr "Options"
-
-msgid "Or sign in from a terminal:"
-msgstr "Or sign in from a terminal:"
 
 msgid "Orange"
 msgstr "Orange"
@@ -14896,9 +14881,6 @@ msgstr "Paradev started as a hackathon project in November 2025. It was a simple
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev still can't find {name}."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev still can't find GitHub CLI."
 
 msgid "Paradev Teams"
 msgstr "Paradev Teams"
@@ -18625,6 +18607,9 @@ msgstr "Sign in once. Paradev keeps the connection."
 msgid "Sign in to {0}"
 msgstr "Sign in to {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Sign in to {name} below. Your browser opens to finish."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Sign in to change your organization's plugins."
 
@@ -18689,9 +18674,6 @@ msgstr "Sign up with GitHub"
 
 msgid "Sign up with Google"
 msgstr "Sign up with Google"
-
-msgid "Sign-in code"
-msgstr "Sign-in code"
 
 msgid "Sign-in didn't finish"
 msgstr "Sign-in didn't finish"
@@ -23335,4 +23317,3 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
-

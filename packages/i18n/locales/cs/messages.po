@@ -1162,6 +1162,9 @@ msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prio
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} je pro chat příliš starý"
+
 msgid "{name} accounts"
 msgstr "Účty {name}"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} se znovu připojil(a)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} teď omezuje stahování. Počkejte minutu a zkuste to znovu."
 
 msgid "{waiting} Waiting"
 msgstr "Čeká: {waiting}"
@@ -4285,6 +4291,12 @@ msgstr "Spuštění chatu"
 msgid "Chat name"
 msgstr "Název chatu"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Chat potřebuje verzi {minVersion} nebo novější. Paradev ji může aktualizovat za vás."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Chat potřebuje verzi {minVersion} nebo novější. Aktualizujte {name} a pak klikněte na Zkusit znovu."
+
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
 
@@ -6275,16 +6287,13 @@ msgstr "Komentář se nepodařilo odeslat"
 msgid "Couldn't post reply"
 msgstr "Nepodařilo se odeslat odpověď"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Nepodařilo se spojit s {vendor}. Zkontrolujte připojení k internetu a zkuste to znovu."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Nepodařilo se spojit s cloudem pro {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Nepodařilo se spojit s GitHubem. Zkontrolujte připojení k internetu a zkuste to znovu."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "Nepodařilo se spojit se serverem pro stahování. Zkontrolujte připojení k internetu a zkuste to znovu."
 
 msgid "Couldn't reach the model provider"
 msgstr "Nepodařilo se spojit s poskytovatelem modelu"
@@ -6371,8 +6380,8 @@ msgstr "Nepodařilo se odeslat agentovi"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Zprávu se nepodařilo odeslat. Je zpět v poli pro psaní."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "{name} se na tomto Macu nepodařilo nastavit."
+msgid "Couldn't set up {name} on this computer."
+msgstr "{name} se na tomto počítači nepodařilo nastavit."
 
 msgid "Couldn't stage changes"
 msgstr "Nepodařilo se připravit změny"
@@ -6424,9 +6433,6 @@ msgstr "Přesun se nepodařilo zkusit znovu"
 
 msgid "Couldn't undo the file changes."
 msgstr "Změny souborů se nepodařilo vrátit."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "GitHub CLI se na tomto Macu nepodařilo rozbalit ani uložit."
 
 msgid "Couldn't unstage changes"
 msgstr "Nepodařilo se zrušit přípravu změn"
@@ -7360,9 +7366,6 @@ msgstr "Diktování není na tomto zařízení dostupné"
 msgid "Dictation is not available right now"
 msgstr "Diktování teď není dostupné"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Ukázala stránka kód? Vložte ho sem"
-
 msgid "Didn't hear back"
 msgstr "Bez odpovědi"
 
@@ -7695,9 +7698,6 @@ msgstr "Stahuji {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Stažení od Applu vyžaduje Apple ID. Instalace může potřebovat asi 20 GB volného místa."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Stahuji GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Stahuji..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Dokončit revizi"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Dokončete přihlášení v prohlížeči. Aktualizuje se to samo."
 
 msgid "Finished"
 msgstr "Dokončeno"
@@ -10592,9 +10589,6 @@ msgstr "Nainstalováno · přihlaste se účtem Claude"
 
 msgid "Installed by your organization"
 msgstr "Nainstalováno vaší organizací"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Nainstalovali jste ho jinak, třeba přes Homebrew? Klikněte na Zkontrolovat znovu."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Nainstalovali jste ho jinak? Klikněte na Zkontrolovat znovu."
@@ -14397,9 +14391,6 @@ msgstr "Otevřete nový pracovní prostor a uvidíte jednotlivé chaty. Chat, kt
 msgid "Open the original workspace"
 msgstr "Otevřít původní pracovní prostor"
 
-msgid "Open the page again"
-msgstr "Znovu otevřít stránku"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Otevřít v paletě příkazů přehled využití prostředků"
 
@@ -14451,9 +14442,6 @@ msgstr "Otevírání v rozhraní chatu…"
 msgid "Opening pages"
 msgstr "Otevírání stránek"
 
-msgid "Opening the sign-in page…"
-msgstr "Otevírám přihlašovací stránku…"
-
 msgid "Operator"
 msgstr "Operátor"
 
@@ -14480,9 +14468,6 @@ msgstr "Nepovinné. Pomůže nám zjistit, co funguje."
 
 msgid "Options"
 msgstr "Možnosti"
-
-msgid "Or sign in from a terminal:"
-msgstr "Nebo se přihlaste z terminálu:"
 
 msgid "Orange"
 msgstr "Oranžová"
@@ -14896,9 +14881,6 @@ msgstr "Paradev vznikl jako projekt na hackathonu v listopadu 2025. Byla to jedn
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev stále nemůže najít {name}."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev stále nemůže najít GitHub CLI."
 
 msgid "Paradev Teams"
 msgstr "Týmy Paradev"
@@ -18625,6 +18607,9 @@ msgstr "Přihlaste se jednou. Paradev udržuje připojení."
 msgid "Sign in to {0}"
 msgstr "Přihlaste se do {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Níže se přihlaste do {name}. K dokončení se otevře prohlížeč."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Pro změnu pluginů organizace se přihlaste."
 
@@ -18689,9 +18674,6 @@ msgstr "Zaregistrovat se přes GitHub"
 
 msgid "Sign up with Google"
 msgstr "Zaregistrovat se přes Google"
-
-msgid "Sign-in code"
-msgstr "Přihlašovací kód"
 
 msgid "Sign-in didn't finish"
 msgstr "Přihlášení se nedokončilo"
@@ -23335,4 +23317,3 @@ msgstr "Oddálit"
 
 msgid "zsh"
 msgstr "zsh"
-

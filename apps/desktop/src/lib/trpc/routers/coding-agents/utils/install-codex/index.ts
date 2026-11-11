@@ -3,4 +3,5 @@ export {
 	codexLauncherScript,
 	type InstallCodexOptions,
 	installCodex,
+	removeStaleStaging,
 } from "./install-codex";

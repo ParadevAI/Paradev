@@ -8,3 +8,4 @@ export {
 	type CodingAgentId,
 	isCodingAgentId,
 } from "./constants";
+export { useAgentSignInState } from "./hooks/useAgentSignInState";

@@ -64,6 +64,24 @@ function run(fetch: ReturnType<typeof fakeRegistry>, signed = true) {
 }
 
 describe("installCodex", () => {
+	test("removes a download an interrupted install left behind", async () => {
+		const root = tempDir();
+		const rootDir = path.join(root, "agents", "codex");
+		const stale = path.join(rootDir, ".staging-interrupted");
+		fs.mkdirSync(stale, { recursive: true });
+		fs.writeFileSync(path.join(stale, "codex.tgz"), "half a tarball");
+		await installCodex({
+			fetch: fakeRegistry(),
+			arch: "arm64",
+			rootDir,
+			launcherPath: path.join(root, "agents", "bin", "codex"),
+			verifySignature: async () => true,
+			extractTarball: fakeExtract,
+			readVersion: async () => "9.9.9",
+		});
+		expect(fs.existsSync(stale)).toBe(false);
+	});
+
 	test("puts the release in place behind a launcher and drops older ones", async () => {
 		const { result, rootDir, launcherPath } = run(fakeRegistry());
 		expect(await result).toEqual({

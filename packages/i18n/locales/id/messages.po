@@ -1162,6 +1162,9 @@ msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan priori
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} terlalu lama untuk chat"
+
 msgid "{name} accounts"
 msgstr "Akun {name}"
 
@@ -1478,6 +1481,9 @@ msgstr "{user} bergabung kembali."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} Menunggu"
@@ -4285,6 +4291,12 @@ msgstr "Peluncuran Chat"
 msgid "Chat name"
 msgstr "Nama obrolan"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Chat memerlukan {minVersion} atau yang lebih baru. Paradev dapat memperbaruinya untuk Anda."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Chat memerlukan {minVersion} atau yang lebih baru. Perbarui {name} Anda, lalu klik Coba lagi."
+
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
 
@@ -6275,16 +6287,13 @@ msgstr "Tidak dapat memposting komentar"
 msgid "Couldn't post reply"
 msgstr "Tidak bisa mengirim balasan"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Tidak dapat menjangkau {vendor}. Periksa koneksi internet Anda, lalu coba lagi."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Tidak bisa menjangkau cloud untuk {0}: {1}"
-
-msgid "Couldn't reach GitHub. Check your internet connection and try again."
-msgstr "Tidak dapat menjangkau GitHub. Periksa koneksi internet Anda, lalu coba lagi."
-
-msgid "Couldn't reach the download server. Check your internet connection and try again."
-msgstr "Tidak dapat menjangkau server unduhan. Periksa koneksi internet Anda lalu coba lagi."
 
 msgid "Couldn't reach the model provider"
 msgstr "Tidak dapat menghubungi penyedia model"
@@ -6371,8 +6380,8 @@ msgstr "Tidak bisa mengirim ke agen"
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Pesan Anda tidak dapat dikirim. Pesan sudah kembali di kolom penulisan."
 
-msgid "Couldn't set up {name} on this Mac."
-msgstr "Tidak dapat mengatur {name} di Mac ini."
+msgid "Couldn't set up {name} on this computer."
+msgstr "Tidak dapat mengatur {name} di komputer ini."
 
 msgid "Couldn't stage changes"
 msgstr "Tidak bisa men-stage perubahan"
@@ -6424,9 +6433,6 @@ msgstr "Tidak dapat mencoba memindahkan lagi"
 
 msgid "Couldn't undo the file changes."
 msgstr "Perubahan file tidak bisa dibatalkan."
-
-msgid "Couldn't unpack or save GitHub CLI on this Mac."
-msgstr "Tidak dapat mengekstrak atau menyimpan GitHub CLI di Mac ini."
 
 msgid "Couldn't unstage changes"
 msgstr "Tidak bisa meng-unstage perubahan"
@@ -7360,9 +7366,6 @@ msgstr "Dikte tidak tersedia di perangkat ini"
 msgid "Dictation is not available right now"
 msgstr "Dikte sedang tidak tersedia"
 
-msgid "Did the page show a code? Paste it here"
-msgstr "Halaman menampilkan kode? Tempelkan di sini"
-
 msgid "Didn't hear back"
 msgstr "Tidak ada respons"
 
@@ -7695,9 +7698,6 @@ msgstr "Mengunduh {name}…"
 
 msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
 msgstr "Mengunduh dari Apple memerlukan Apple ID. Pemasangan dapat memerlukan sekitar 20 GB ruang kosong."
-
-msgid "Downloading GitHub CLI…"
-msgstr "Mengunduh GitHub CLI…"
 
 msgid "Downloading..."
 msgstr "Mengunduh..."
@@ -9088,9 +9088,6 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Selesaikan review"
-
-msgid "Finish signing in in your browser. This updates on its own."
-msgstr "Selesaikan masuk di browser Anda. Ini akan diperbarui dengan sendirinya."
 
 msgid "Finished"
 msgstr "Selesai"
@@ -10592,9 +10589,6 @@ msgstr "Terpasang · masuk dengan akun Claude Anda"
 
 msgid "Installed by your organization"
 msgstr "Dipasang oleh organisasi Anda"
-
-msgid "Installed it another way, like Homebrew? Click Check again."
-msgstr "Memasang dengan cara lain, seperti Homebrew? Klik Periksa lagi."
 
 msgid "Installed it another way? Click Check again."
 msgstr "Sudah memasangnya dengan cara lain? Klik Periksa lagi."
@@ -14397,9 +14391,6 @@ msgstr "Buka workspace baru untuk melihat setiap chat. Chat yang tidak dipindahk
 msgid "Open the original workspace"
 msgstr "Buka workspace asli"
 
-msgid "Open the page again"
-msgstr "Buka halaman lagi"
-
 msgid "Open the resource usage view in the command palette"
 msgstr "Buka tampilan penggunaan sumber daya di command palette"
 
@@ -14451,9 +14442,6 @@ msgstr "Membuka di antarmuka chat…"
 msgid "Opening pages"
 msgstr "Membuka halaman"
 
-msgid "Opening the sign-in page…"
-msgstr "Membuka halaman masuk…"
-
 msgid "Operator"
 msgstr "Operator"
 
@@ -14480,9 +14468,6 @@ msgstr "Opsional. Membantu kami mengetahui apa yang berhasil."
 
 msgid "Options"
 msgstr "Opsi"
-
-msgid "Or sign in from a terminal:"
-msgstr "Atau masuk dari terminal:"
 
 msgid "Orange"
 msgstr "Oranye"
@@ -14896,9 +14881,6 @@ msgstr "Paradev bermula sebagai proyek hackathon pada November 2025. Waktu itu s
 
 msgid "Paradev still can't find {name}."
 msgstr "Paradev masih tidak dapat menemukan {name}."
-
-msgid "Paradev still can't find GitHub CLI."
-msgstr "Paradev masih tidak dapat menemukan GitHub CLI."
 
 msgid "Paradev Teams"
 msgstr "Tim Paradev"
@@ -18625,6 +18607,9 @@ msgstr "Masuk sekali. Paradev menjaga koneksinya."
 msgid "Sign in to {0}"
 msgstr "Masuk ke {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Masuk ke {name} di bawah. Browser Anda akan terbuka untuk menyelesaikannya."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Masuk untuk mengubah plugin organisasi Anda."
 
@@ -18689,9 +18674,6 @@ msgstr "Daftar dengan GitHub"
 
 msgid "Sign up with Google"
 msgstr "Daftar dengan Google"
-
-msgid "Sign-in code"
-msgstr "Kode masuk"
 
 msgid "Sign-in didn't finish"
 msgstr "Proses masuk tidak selesai"
@@ -23335,4 +23317,3 @@ msgstr "Perkecil"
 
 msgid "zsh"
 msgstr "zsh"
-

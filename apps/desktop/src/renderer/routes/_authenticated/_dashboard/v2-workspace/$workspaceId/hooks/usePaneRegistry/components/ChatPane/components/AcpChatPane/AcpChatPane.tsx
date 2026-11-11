@@ -747,7 +747,7 @@ export function AcpChatPane({
 	const missingNow = missingCodingAgent({
 		agentId: agent?.id,
 		failed: installFailure !== null,
-		installed: agentStatus.data?.installed,
+		usable: agentStatus.data?.usable,
 		hostUrl,
 		localHostUrl,
 	});
@@ -919,7 +919,16 @@ export function AcpChatPane({
 							<AgentMissingCard
 								agent={missingAgent}
 								detail={installFailure.detail}
-								installed={agentStatus.data?.installed === true}
+								installed={agentStatus.data?.usable === true}
+								outdated={
+									agentStatus.data?.installed && agentStatus.data.version
+										? {
+												version: agentStatus.data.version,
+												minVersion: agentStatus.data.minVersion,
+												ownInstall: agentStatus.data.source === "path",
+											}
+										: undefined
+								}
 								otherAgents={(agentSwitch?.agents ?? []).filter(
 									(other) => other.presetId !== agent?.id,
 								)}
