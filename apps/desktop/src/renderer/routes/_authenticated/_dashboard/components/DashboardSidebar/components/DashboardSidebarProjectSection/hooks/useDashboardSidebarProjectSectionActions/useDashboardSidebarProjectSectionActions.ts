@@ -44,6 +44,10 @@ export function useDashboardSidebarProjectSectionActions({
 			[],
 		[hostProjects, project.id],
 	);
+	// A container has no folder of its own and no repository to list worktrees of.
+	const isContainer =
+		hostProjects.find((item) => item.projectKey === project.id)?.kind ===
+		"container";
 	const servingHostId = useMemo(() => {
 		if (machineId && projectHostIds.includes(machineId)) return machineId;
 		return projectHostIds[0] ?? null;
@@ -309,7 +313,7 @@ export function useDashboardSidebarProjectSectionActions({
 		cancelRename,
 		confirmImportWorktrees,
 		deleteSection,
-		handleImportWorktrees,
+		handleImportWorktrees: isContainer ? null : handleImportWorktrees,
 		hideProject,
 		isDeleteDialogOpen,
 		leaveProjectIfActive,
@@ -318,7 +322,7 @@ export function useDashboardSidebarProjectSectionActions({
 		setIsDeleteDialogOpen,
 		handleNewSection,
 		handleNewWorkspace,
-		handleOpenInFinder,
+		handleOpenInFinder: isContainer ? null : handleOpenInFinder,
 		handleOpenSettings,
 		importableWorktrees,
 		isImportingWorktrees,

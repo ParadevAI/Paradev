@@ -27,8 +27,9 @@ interface DashboardSidebarProjectContextMenuProps {
 	/** A `cloud-repo` stand-in has no checkout, settings or name of its own. */
 	kind?: DashboardSidebarProject["kind"];
 	onCreateSection: () => void;
-	onImportWorktrees: () => void;
-	onOpenInFinder: () => void;
+	/** Null when the project has no folder or worktrees of its own. */
+	onImportWorktrees: (() => void) | null;
+	onOpenInFinder: (() => void) | null;
 	onOpenSettings: () => void;
 	onHide: () => void;
 	/** Null when the user cannot delete (not an organization owner). */
@@ -63,10 +64,12 @@ export function DashboardSidebarProjectContextMenu({
 							<Trans>Rename</Trans>
 						</ContextMenuItem>
 						<ContextMenuSeparator />
-						<ContextMenuItem onSelect={onOpenInFinder}>
-							<LuFolderOpen className="size-4 mr-2" />
-							<Trans>Open in Finder</Trans>
-						</ContextMenuItem>
+						{onOpenInFinder ? (
+							<ContextMenuItem onSelect={onOpenInFinder}>
+								<LuFolderOpen className="size-4 mr-2" />
+								<Trans>Open in Finder</Trans>
+							</ContextMenuItem>
+						) : null}
 						<ContextMenuItem onSelect={onOpenSettings}>
 							<LuSettings className="size-4 mr-2" />
 							<Trans>Project Settings</Trans>
@@ -93,10 +96,12 @@ export function DashboardSidebarProjectContextMenu({
 								</ContextMenuSubContent>
 							</ContextMenuSub>
 						) : null}
-						<ContextMenuItem onSelect={onImportWorktrees}>
-							<LuFolderInput className="size-4 mr-2" />
-							<Trans>Import untracked worktrees</Trans>
-						</ContextMenuItem>
+						{onImportWorktrees ? (
+							<ContextMenuItem onSelect={onImportWorktrees}>
+								<LuFolderInput className="size-4 mr-2" />
+								<Trans>Import untracked worktrees</Trans>
+							</ContextMenuItem>
+						) : null}
 						<ContextMenuSeparator />
 					</>
 				)}
