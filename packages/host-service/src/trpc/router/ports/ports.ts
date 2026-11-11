@@ -1,7 +1,8 @@
 import type { DetectedPort } from "@superset/port-scanner";
 import { z } from "zod";
 import { portManager } from "../../../ports/port-manager";
-import { getLabelsForWorkspace } from "../../../ports/static-ports";
+import { getLabelsForWorkspaces } from "../../../ports/static-ports";
+import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
 import { protectedProcedure, router } from "../../index";
 
 export interface EnrichedPort extends DetectedPort {
@@ -29,20 +30,25 @@ export const portsRouter = router({
 					return null;
 				}
 			};
-			const labelsByWorkspace = new Map<
-				string,
-				ReturnType<typeof getLabelsForWorkspace>
-			>();
+			// A multi-repo workspace also takes each checkout's labels.
+			const labelsFor = (workspaceId: string) =>
+				getLabelsForWorkspaces(resolve, [
+					workspaceId,
+					...listRepositoryWorkspaces(ctx.db, workspaceId).map(
+						(checkout) => checkout.id,
+					),
+				]);
+			const labelsByWorkspace = new Map<string, Map<number, string>>();
 			return portManager
 				.getAllPorts()
 				.filter((port) => requestedWorkspaceIds.has(port.workspaceId))
 				.map((port) => {
 					let labels = labelsByWorkspace.get(port.workspaceId);
-					if (!labelsByWorkspace.has(port.workspaceId)) {
-						labels = getLabelsForWorkspace(resolve, port.workspaceId);
+					if (!labels) {
+						labels = labelsFor(port.workspaceId);
 						labelsByWorkspace.set(port.workspaceId, labels);
 					}
-					return { ...port, label: labels?.get(port.port) ?? null };
+					return { ...port, label: labels.get(port.port) ?? null };
 				});
 		}),
 
