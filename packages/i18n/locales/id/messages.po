@@ -2466,8 +2466,8 @@ msgstr "Agen hanya melihat placeholder. Paradev menambahkan login Anda ke permin
 msgid "Agents that run while you're away"
 msgstr "Agen yang berjalan saat Anda pergi"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Agen memilah issue, menyusun changelog, dan memperbarui dependensi sendiri. Anda tinggal meninjau PR."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Agen memilah issue, menyusun changelog, dan memperbarui dependensi sendiri."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agen memakai akun ini saat memanggil tool Linear."

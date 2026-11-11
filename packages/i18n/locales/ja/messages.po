@@ -2466,8 +2466,8 @@ msgstr "エージェントに見えるのはプレースホルダーだけです
 msgid "Agents that run while you're away"
 msgstr "離席中も動き続けるエージェント"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "エージェントが issue の仕分け、changelog の下書き、依存関係の更新を自動で行います。あなたは PR をレビューするだけです。"
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "エージェントが issue の仕分け、changelog の下書き、依存関係の更新を自動で行います。"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "エージェントは、Linearのツールを呼び出すときにこのアカウントを使います。"

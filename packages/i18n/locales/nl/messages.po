@@ -2466,8 +2466,8 @@ msgstr "Agents zien alleen een placeholder. Paradev voegt je aanmelding toe aan 
 msgid "Agents that run while you're away"
 msgstr "Agents die doorwerken als je weg bent"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Agents sorteren issues, schrijven changelogs en werken dependencies bij, helemaal zelf. Jij reviewt de PR's."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Agents sorteren issues, schrijven changelogs en werken dependencies bij, helemaal zelf."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."

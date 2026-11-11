@@ -2466,8 +2466,8 @@ msgstr "智能体只看到占位符。Paradev 会把你的登录凭据添加到�
 msgid "Agents that run while you're away"
 msgstr "你离开时也在运行的智能体"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "智能体自动分拣 issue、起草 changelog、升级依赖。你只需审查 PR。"
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "智能体自动分拣 issue、起草 changelog、升级依赖。"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "智能体调用 Linear 工具时会使用此账号。"

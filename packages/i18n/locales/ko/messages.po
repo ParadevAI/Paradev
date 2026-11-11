@@ -2466,8 +2466,8 @@ msgstr "에이전트에는 자리 표시자만 보입니다. Paradev가 나가�
 msgid "Agents that run while you're away"
 msgstr "자리를 비운 동안에도 실행되는 에이전트"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "에이전트가 이슈 분류, changelog 초안 작성, 의존성 업데이트를 알아서 합니다. 당신은 PR만 리뷰하면 됩니다."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "에이전트가 이슈 분류, changelog 초안 작성, 의존성 업데이트를 알아서 합니다."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "에이전트는 Linear 도구를 호출할 때 이 계정을 사용합니다."

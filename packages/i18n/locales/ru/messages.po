@@ -2466,8 +2466,8 @@ msgstr "Агенты видят только заглушку. Paradev доба�
 msgid "Agents that run while you're away"
 msgstr "Агенты, которые работают, пока вас нет"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Агенты сами разбирают issues, пишут черновики changelog и обновляют зависимости. Вам остаётся проверить PR."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Агенты сами разбирают issues, пишут черновики changelog и обновляют зависимости."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенты используют этот аккаунт, когда вызывают инструменты Linear."
