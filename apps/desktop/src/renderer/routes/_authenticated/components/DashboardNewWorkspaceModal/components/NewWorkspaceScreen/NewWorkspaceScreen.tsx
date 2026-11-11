@@ -1131,7 +1131,6 @@ export function NewWorkspaceScreen({
 							layout="inline"
 							allowEmptySubmit
 							autoFocus
-							className="w-full"
 							draft={{
 								segments: draft.promptDraft,
 								attachments: draft.promptAttachments,
@@ -1187,7 +1186,7 @@ export function NewWorkspaceScreen({
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}
 			/>
-			<div className="pointer-events-none absolute inset-x-0 top-[40%] flex -translate-y-1/2 flex-col items-center gap-8 [@media(max-height:640px)]:hidden">
+			<div className="pointer-events-none absolute inset-x-0 top-[45%] flex -translate-y-1/2 flex-col items-center gap-8 [@media(max-height:640px)]:hidden">
 				<SupersetIcon className="h-10 w-auto text-muted-foreground/70" />
 				<h1 className="text-center text-3xl font-medium text-foreground/90">
 					<Trans>What should we build next?</Trans>
@@ -1199,8 +1198,9 @@ export function NewWorkspaceScreen({
 				/>
 			</div>
 			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
+				{/* The editor stops growing before it reaches the heading at 45%. */}
 				<div
-					className="relative flex w-full flex-col"
+					className="relative flex w-full flex-col [--prompt-input-max-height:max(4.5rem,calc(55vh-16rem))]"
 					style={{
 						maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
 					}}
@@ -1232,7 +1232,6 @@ export function NewWorkspaceScreen({
 					<AgentComposer
 						allowEmptySubmit
 						autoFocus
-						className="w-full"
 						draft={{
 							segments: draft.promptDraft,
 							attachments: draft.promptAttachments,
