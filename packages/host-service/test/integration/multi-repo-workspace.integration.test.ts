@@ -256,6 +256,22 @@ test("file search finds files deep inside every checkout", async () => {
 	]);
 });
 
+test("file search by project looks inside each repository", async () => {
+	const { host, projectId, repoPaths } = await containerScenario();
+	const api = repoPaths[1];
+	if (!api) throw new Error("missing repository");
+	writeFileSync(join(api, "project-target.ts"), "export {};\n");
+
+	const { matches } = await host.trpc.filesystem.searchFiles.query({
+		projectId,
+		query: "project-target",
+	});
+
+	expect(matches.map((match) => match.relativePath)).toEqual([
+		`${basename(api)}/project-target.ts`,
+	]);
+});
+
 test("restoring a deleted container workspace brings back every checkout", async () => {
 	const { host, workspace, checkouts } = await containerWorkspace();
 	const root = dirname(checkouts[0]?.worktreePath ?? "");

@@ -1,6 +1,7 @@
 import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import {
+	basename,
 	dirname,
 	isAbsolute,
 	join,
@@ -12,7 +13,12 @@ import type { FsSearchMatch } from "@superset/workspace-fs/core";
 import { WorkspaceFsPathError } from "@superset/workspace-fs/host";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
+import { getLocalProject } from "../../../projects/local-project-store";
+import {
+	isContainerProject,
+	listRepositoryProjects,
+	listRepositoryWorkspaces,
+} from "../../../projects/multi-repo";
 import {
 	ProjectNotFoundError,
 	WorkspaceNotFoundError,
@@ -151,23 +157,67 @@ async function searchCheckouts(
 	ctx: HostServiceContext,
 	workspaceId: string,
 	checkouts: Array<{ id: string }>,
-	input: { query: string; includeHidden?: boolean; limit?: number },
+	input: SearchInput,
 ): Promise<{ matches: FsSearchMatch[] }> {
 	const root = ctx.runtime.filesystem.resolveWorkspaceRoot(workspaceId);
-	const results = await Promise.all(
-		checkouts.map((checkout) =>
-			withFsErrorTranslation(() =>
-				getFilesystemService(ctx, checkout.id).searchFiles(input),
-			),
-		),
+	return searchRepositories(
+		checkouts.map((checkout) => ({
+			service: getFilesystemService(ctx, checkout.id),
+			relativePathOf: (match: FsSearchMatch) =>
+				relative(root, match.absolutePath),
+		})),
+		input,
 	);
-	const matches = results
-		.flatMap((result) => result.matches)
-		.map((match) => ({
-			...match,
-			relativePath: relative(root, match.absolutePath),
-		}))
-		.sort((a, b) => b.score - a.score);
+}
+
+/** A multi-repo project searches its repositories, as a new workspace lays them out. */
+async function searchRepositoryProjects(
+	ctx: HostServiceContext,
+	projectId: string,
+	input: SearchInput,
+): Promise<{ matches: FsSearchMatch[] }> {
+	return searchRepositories(
+		listRepositoryProjects(ctx.db, projectId).flatMap((repository) => {
+			const service = getProjectFilesystemService(ctx, repository.id);
+			if (!service) return [];
+			const folder = basename(repository.repoPath);
+			return [
+				{
+					service,
+					relativePathOf: (match: FsSearchMatch) =>
+						join(folder, match.relativePath),
+				},
+			];
+		}),
+		input,
+	);
+}
+
+type SearchInput = { query: string; includeHidden?: boolean; limit?: number };
+
+async function searchRepositories(
+	sources: Array<{
+		service: {
+			searchFiles: (
+				input: SearchInput,
+			) => Promise<{ matches: FsSearchMatch[] }>;
+		};
+		relativePathOf: (match: FsSearchMatch) => string;
+	}>,
+	input: SearchInput,
+): Promise<{ matches: FsSearchMatch[] }> {
+	const results = await Promise.all(
+		sources.map(async (source) => {
+			const { matches } = await withFsErrorTranslation(() =>
+				source.service.searchFiles(input),
+			);
+			return matches.map((match) => ({
+				...match,
+				relativePath: source.relativePathOf(match),
+			}));
+		}),
+	);
+	const matches = results.flat().sort((a, b) => b.score - a.score);
 	return {
 		matches:
 			input.limit === undefined ? matches : matches.slice(0, input.limit),
@@ -601,6 +651,12 @@ export const filesystemRouter = router({
 				: [];
 			if (workspaceId && checkouts.length > 0) {
 				return await searchCheckouts(ctx, workspaceId, checkouts, {
+					...serviceInput,
+					query: trimmedQuery,
+				});
+			}
+			if (projectId && isContainerProject(getLocalProject(ctx.db, projectId))) {
+				return await searchRepositoryProjects(ctx, projectId, {
 					...serviceInput,
 					query: trimmedQuery,
 				});
