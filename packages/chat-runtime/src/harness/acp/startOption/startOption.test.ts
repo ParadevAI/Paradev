@@ -57,6 +57,12 @@ describe("startOptionId against claude-agent-acp 0.85 options", () => {
 		expect(startOptionId(acp, "claude-haiku-4-5")).toBe("haiku");
 	});
 
+	test("a pinned Fable id finds the alias that lists its version", () => {
+		const fable = [...acp, { id: "fable", label: "Fable 5.2" }];
+		expect(startOptionId(fable, "claude-fable-5-2")).toBe("fable");
+		expect(startOptionId(fable, "claude-fable-5-1")).toBe("claude-fable-5-1");
+	});
+
 	test("pinned ids the agent lists keep their exact option", () => {
 		expect(startOptionId(acp, "claude-opus-5")).toBe("claude-opus-5");
 		expect(startOptionId(acp, "claude-opus-4-8")).toBe("claude-opus-4-8");
