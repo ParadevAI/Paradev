@@ -866,7 +866,7 @@ export function WorkspaceActivityMenu({
 								<span className="h-3.5 w-px shrink-0 bg-border" />
 								{pendingLayer ? (
 									<span className="flex size-3.5 shrink-0 items-center justify-center">
-										<AsciiSpinner className="text-xs leading-none" />
+										<AsciiSpinner className="text-base leading-none" />
 									</span>
 								) : (
 									<PRIcon

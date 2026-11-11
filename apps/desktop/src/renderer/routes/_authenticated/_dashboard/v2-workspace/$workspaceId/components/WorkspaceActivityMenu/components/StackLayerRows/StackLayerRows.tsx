@@ -38,7 +38,7 @@ export function StackLayerRows({
 					>
 						{pendingNumber === layer.number ? (
 							<span className="flex size-3 items-center justify-center">
-								<AsciiSpinner className="text-[10px] leading-none" />
+								<AsciiSpinner className="text-sm leading-none" />
 							</span>
 						) : (
 							<PullRequestStateGlyph

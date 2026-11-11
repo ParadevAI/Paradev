@@ -201,7 +201,7 @@ export function PRStatusGroup({
 		<>
 			{pendingLayer ? (
 				<span className="flex size-4 items-center justify-center">
-					<AsciiSpinner className="text-sm leading-none" />
+					<AsciiSpinner className="text-base leading-none" />
 				</span>
 			) : (
 				<PRIcon state={linkState} className="size-4" />
