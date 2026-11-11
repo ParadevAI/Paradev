@@ -13,16 +13,16 @@ import {
 	forgetClient,
 	redirectUriFor,
 } from "./client-identity";
-import { connectorMethod, requireConnector, resolveEndpoints } from "./index";
+import {
+	connectorMethod,
+	type ResolvedEndpoints,
+	requireConnector,
+	resolveEndpoints,
+} from "./index";
 
 const DEFAULT_EXPIRY_BUFFER_SECONDS = 60;
 const RACE_SETTLE_MS = 1000;
 export const NEEDS_REAUTH = "needs_reauth";
-const DEAD_GRANT_ERRORS: ReadonlySet<string> = new Set([
-	"invalid_grant",
-	"invalid_client",
-	"unauthorized_client",
-]);
 
 export class UnrefreshableConnectionError extends Error {
 	constructor(connector: string) {
@@ -34,8 +34,8 @@ export class UnrefreshableConnectionError extends Error {
 }
 
 /**
- * The token endpoint was unreachable, answered 5xx, or refused the refresh for
- * a reason other than a dead grant. The connection is not
+ * The token endpoint was unreachable, answered 5xx or 429, or sent a body that
+ * is not JSON. The connection is not
  * known to be bad, so it must not be disconnected or reported as needing
  * reauthorization — the caller is expected to surface this as a bad gateway.
  */
@@ -118,8 +118,8 @@ export async function ensureFreshConnection(
  * party on the other side of the internet, and holding a pooled connection
  * across that call means one slow identity provider drains the pool for every
  * unrelated query in the process. Mutual exclusion comes from the in-flight map
- * above within a process, and from the compare-and-swap below across them: a
- * refresh that loses the race writes nothing and adopts the winner's row.
+ * above within a process, and from the compare-and-swap in `store` across them:
+ * a refresh that loses the race adopts whichever row `reconcile` finds live.
  */
 async function refresh(
 	row: SelectConnection,
@@ -153,8 +153,77 @@ async function refresh(
 		await markNeedsReauth(current.id, current.accessToken);
 		throw new UnrefreshableConnectionError(current.connector);
 	});
-	const { clientId, clientSecret } = endpoints;
+	const redemption = await redeem(current, endpoints, refreshToken);
+	if (redemption.kind === "rejected") {
+		// Rotating refresh tokens are single-use: when another process redeemed
+		// ours first, the rejection means we lost the race, not that the grant died.
+		const winner = await racedRefresh(current, raceSettleMs);
+		if (winner) return winner;
 
+		if (endpoints.issuer && redemption.oauthError === "invalid_client")
+			await forgetClient(
+				endpoints.issuer,
+				redirectUriFor(current.connector),
+				endpoints.clientId,
+			);
+		await markNeedsReauth(current.id, current.accessToken);
+		throw new UnrefreshableConnectionError(current.connector);
+	}
+
+	const updated = await store(current, redemption.tokens, refreshToken);
+	if (updated) return updated;
+
+	// Zero rows means another process refreshed between our read and our write.
+	const winner = await readConnection(current.id);
+	if (!winner) return current;
+	return await reconcile(winner, endpoints, redemption.tokens, refreshToken);
+}
+
+/**
+ * Both processes redeemed the same refresh token and both succeeded. That
+ * happens when the server keeps a redeemed token valid until its successor is
+ * used, as workers-oauth-provider (behind mcp.notion.com) does. Only the later
+ * redemption's token is then live, and the winner may have stored the earlier
+ * one, which the next refresh would find revoked. Redeeming the winner's token
+ * tells which of the two the server still honours.
+ */
+async function reconcile(
+	winner: SelectConnection,
+	endpoints: ResolvedEndpoints,
+	ours: IssuedTokens,
+	ourRedeemedToken: string,
+): Promise<SelectConnection> {
+	const winnerToken = await decryptOptional(winner.refreshToken);
+	if (!winnerToken) return winner;
+
+	let check: Redemption;
+	try {
+		check = await redeem(winner, endpoints, winnerToken);
+	} catch (error) {
+		if (error instanceof ConnectorUnavailableError) return winner;
+		throw error;
+	}
+	const kept =
+		check.kind === "issued"
+			? await store(winner, check.tokens, winnerToken)
+			: check.oauthError === "invalid_grant"
+				? await store(winner, ours, ourRedeemedToken)
+				: undefined;
+	return kept ?? (await readConnection(winner.id)) ?? winner;
+}
+
+type IssuedTokens = Record<string, unknown> & { access_token: string };
+
+type Redemption =
+	| { kind: "issued"; tokens: IssuedTokens }
+	| { kind: "rejected"; oauthError: string | undefined };
+
+async function redeem(
+	connection: SelectConnection,
+	endpoints: ResolvedEndpoints,
+	refreshToken: string,
+): Promise<Redemption> {
+	const { clientId, clientSecret } = endpoints;
 	const body = new URLSearchParams({
 		grant_type: "refresh_token",
 		refresh_token: refreshToken,
@@ -175,11 +244,11 @@ async function refresh(
 		response = await credentialFetch(
 			endpoints.tokenEndpoint,
 			{ method: "POST", headers, body },
-			`Connector "${current.connector}" refresh`,
+			`Connector "${connection.connector}" refresh`,
 		);
 	} catch (error) {
 		throw new ConnectorUnavailableError(
-			current.connector,
+			connection.connector,
 			error instanceof Error ? error.message : String(error),
 		);
 	}
@@ -187,55 +256,48 @@ async function refresh(
 	// expired would disconnect a good connection over someone else's outage.
 	if (response.status >= 500) {
 		throw new ConnectorUnavailableError(
-			current.connector,
+			connection.connector,
 			`${response.status} ${response.statusText}`,
 		);
 	}
-	const payload = (await response.json().catch(() => ({}))) as Record<
+	const payload = (await response.json().catch(() => null)) as Record<
 		string,
 		unknown
-	>;
-	if (!response.ok || typeof payload.access_token !== "string") {
-		const oauthError =
-			typeof payload.error === "string" ? payload.error : undefined;
-		// Only these prove the grant or its client is gone. A 429, a WAF page, or
-		// any other 4xx says nothing about the refresh token.
-		if (!oauthError || !DEAD_GRANT_ERRORS.has(oauthError)) {
-			throw new ConnectorUnavailableError(
-				current.connector,
-				`${response.status} ${oauthError ?? response.statusText}`,
-			);
-		}
+	> | null;
+	if (payload && response.ok && typeof payload.access_token === "string")
+		return { kind: "issued", tokens: payload as IssuedTokens };
 
-		// Rotating refresh tokens are single-use: when another process redeemed
-		// ours first, the rejection means we lost the race, not that the grant died.
-		const winner = await racedRefresh(current, raceSettleMs);
-		if (winner) return winner;
-
-		console.warn(`[connectors/${current.connector}] refresh rejected`, {
-			connectionId: current.id,
-			status: response.status,
-			oauthError,
-		});
-		if (endpoints.issuer && oauthError === "invalid_client")
-			await forgetClient(
-				endpoints.issuer,
-				redirectUriFor(current.connector),
-				clientId,
-			);
-		await markNeedsReauth(current.id, current.accessToken);
-		throw new UnrefreshableConnectionError(current.connector);
+	const oauthError =
+		typeof payload?.error === "string" ? payload.error : undefined;
+	console.warn(`[connectors/${connection.connector}] refresh refused`, {
+		connectionId: connection.id,
+		status: response.status,
+		oauthError,
+	});
+	// A rate limit or a gateway's HTML page says nothing about the grant.
+	if (response.status === 429 || !payload) {
+		throw new ConnectorUnavailableError(
+			connection.connector,
+			`${response.status} ${response.statusText}`,
+		);
 	}
+	return { kind: "rejected", oauthError };
+}
 
-	const expiresIn = payload.expires_in;
+async function store(
+	base: SelectConnection,
+	tokens: IssuedTokens,
+	redeemedToken: string,
+): Promise<SelectConnection | undefined> {
+	const expiresIn = tokens.expires_in;
 	const [updated] = await db
 		.update(connections)
 		.set({
-			accessToken: await encryptSecret(payload.access_token),
+			accessToken: await encryptSecret(tokens.access_token),
 			refreshToken:
-				typeof payload.refresh_token === "string"
-					? await encryptSecret(payload.refresh_token)
-					: await encryptOptional(refreshToken),
+				typeof tokens.refresh_token === "string"
+					? await encryptSecret(tokens.refresh_token)
+					: await encryptOptional(redeemedToken),
 			tokenExpiresAt:
 				typeof expiresIn === "number"
 					? new Date(Date.now() + expiresIn * 1000)
@@ -245,23 +307,19 @@ async function refresh(
 		})
 		.where(
 			and(
-				eq(connections.id, current.id),
+				eq(connections.id, base.id),
 				// A racing loser may have marked this generation before we wrote it.
 				or(
 					isNull(connections.disconnectedAt),
 					eq(connections.disconnectReason, NEEDS_REAUTH),
 				),
-				current.tokenExpiresAt
-					? eq(connections.tokenExpiresAt, current.tokenExpiresAt)
+				base.tokenExpiresAt
+					? eq(connections.tokenExpiresAt, base.tokenExpiresAt)
 					: isNull(connections.tokenExpiresAt),
 			),
 		)
 		.returning();
-	if (updated) return updated;
-
-	// Zero rows means another process refreshed between our read and our write.
-	// Its tokens are the live ones; ours are already superseded.
-	return (await readConnection(current.id)) ?? current;
+	return updated;
 }
 
 async function racedRefresh(
