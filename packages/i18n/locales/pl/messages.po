@@ -2411,8 +2411,8 @@ msgstr "Agenci widzą tylko symbol zastępczy. Paradev dodaje Twoje logowanie do
 msgid "Agents that run while you're away"
 msgstr "Agenci, którzy działają, gdy Cię nie ma"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Agenci sami sortują zgłoszenia, piszą changelogi i aktualizują zależności. Ty tylko przeglądasz PR-y."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Agenci sami sortują zgłoszenia, piszą changelogi i aktualizują zależności."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agenci używają tego konta, gdy wywołują narzędzia Linear."

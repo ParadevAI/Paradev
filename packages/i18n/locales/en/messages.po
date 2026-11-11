@@ -2411,8 +2411,8 @@ msgstr "Agents see a placeholder. Paradev adds your sign-in to outgoing requests
 msgid "Agents that run while you're away"
 msgstr "Agents that run while you're away"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Agents triage issues, draft changelogs, and bump dependencies on their own."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents use this account when they call Linear tools."

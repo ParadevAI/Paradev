@@ -2411,8 +2411,8 @@ msgstr "Agenti vidí jen zástupný údaj. Paradev přidá vaše přihlášení 
 msgid "Agents that run while you're away"
 msgstr "Agenti, kteří běží, když jste pryč"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Agenti sami třídí issues, píší changelogy a aktualizují závislosti. Vy jen kontrolujete PR."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Agenti sami třídí issues, píší changelogy a aktualizují závislosti."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agenti používají tento účet, když volají nástroje Linear."

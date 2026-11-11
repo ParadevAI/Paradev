@@ -2411,8 +2411,8 @@ msgstr "代理程式只會看到預留位置。Paradev 會把你的登入憑證�
 msgid "Agents that run while you're away"
 msgstr "你離開時也在執行的代理程式"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "代理程式自動分類 issue、起草 changelog、升級相依套件。你只需審查 PR。"
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "代理程式自動分類 issue、起草 changelog、升級相依套件。"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "代理程式呼叫 Linear 工具時會使用此帳號。"
