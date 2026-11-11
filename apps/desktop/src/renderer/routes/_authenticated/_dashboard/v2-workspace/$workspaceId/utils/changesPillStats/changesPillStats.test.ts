@@ -38,4 +38,12 @@ describe("changesPillStats", () => {
 		});
 		expect(stats).toEqual({ fileCount: 1, additions: 2, deletions: 0 });
 	});
+
+	it("counts the same path in two checkouts once per checkout", () => {
+		const stats = changesPillStats([
+			{ againstBase: [], staged: [], unstaged: [file("README.md", 3, 1)] },
+			{ againstBase: [], staged: [], unstaged: [file("README.md", 2, 0)] },
+		] as never);
+		expect(stats).toEqual({ fileCount: 2, additions: 5, deletions: 1 });
+	});
 });
