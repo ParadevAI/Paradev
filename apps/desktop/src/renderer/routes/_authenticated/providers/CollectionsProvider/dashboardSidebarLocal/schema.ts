@@ -259,6 +259,11 @@ export const workspaceLocalStateSchema = z.object({
 	// v2 workspace page drains this once on first open (see
 	// useRunPendingChatHandoff) and clears it before running.
 	pendingChatHandoff: pendingChatHandoffSchema.nullable().default(null),
+	// Multi-repo workspaces only; the filters are keyed by checkout workspace id.
+	activeRepositoryId: z.string().nullable().default(null),
+	repositoryChangesFilters: z
+		.record(z.string(), changesFilterSchema)
+		.default({}),
 });
 
 // Defaults for fields heal can synthesize. Identity fields (workspaceId,
@@ -292,6 +297,8 @@ const WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS = {
 	}>,
 	pendingCreationPresetIds: [] as string[],
 	pendingChatHandoff: null as PendingChatHandoff | null,
+	activeRepositoryId: null as string | null,
+	repositoryChangesFilters: {} as Record<string, ChangesFilter>,
 };
 
 /**
@@ -614,6 +621,12 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		pendingChatHandoff:
 			r.pendingChatHandoff ??
 			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.pendingChatHandoff,
+		activeRepositoryId:
+			r.activeRepositoryId ??
+			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.activeRepositoryId,
+		repositoryChangesFilters:
+			r.repositoryChangesFilters ??
+			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.repositoryChangesFilters,
 		sidebarState: {
 			...SIDEBAR_STATE_DEFAULTS,
 			...sidebar,

@@ -42,7 +42,7 @@ import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/C
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
 import {
-	useActiveRepositoryStore,
+	useSelectRepository,
 	useWorkspaceRepositories,
 } from "../../../../state/activeRepositoryStore";
 import type { DiffPaneData, PaneViewerData } from "../../../../types";
@@ -166,7 +166,7 @@ export function DiffPane({
 			new Map(repositories.map((repository) => [repository.id, repository])),
 		[repositories],
 	);
-	const selectRepository = useActiveRepositoryStore((state) => state.select);
+	const selectRepository = useSelectRepository();
 	const repositoryChangesets = useRepositoryChangesets(repositoryIds);
 	const pickedRepositoryIds = useDiffRepositoryFilterStore(
 		(state) => state.byWorkspace[groupId],

@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { LuGitCompareArrows } from "react-icons/lu";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import {
-	useActiveRepositoryStore,
+	useSelectRepository,
 	useWorkspaceRepositories,
 } from "../../../../state/activeRepositoryStore";
 import type { SidebarTabDefinition } from "../../types";
@@ -32,7 +32,7 @@ export function useChangesTab(
 
 	const groupId = useWorkspace().workspace.id;
 	const repositories = useWorkspaceRepositories(groupId);
-	const selectRepository = useActiveRepositoryStore((state) => state.select);
+	const selectRepository = useSelectRepository();
 	const [counts, setCounts] = useState<Record<string, number>>({});
 	const handleCountChange = useCallback(
 		(repositoryId: string, count: number) =>

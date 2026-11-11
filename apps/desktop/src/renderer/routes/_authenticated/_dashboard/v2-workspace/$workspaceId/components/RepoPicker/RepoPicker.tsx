@@ -6,8 +6,8 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { LuCheck, LuChevronDown, LuFolderGit2 } from "react-icons/lu";
 import {
-	useActiveRepositoryStore,
 	useActiveRepositoryWorkspaceId,
+	useSelectRepository,
 	useWorkspaceRepositories,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/activeRepositoryStore";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
@@ -15,7 +15,7 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-works
 export function RepoPicker() {
 	const workspaceId = useWorkspace().workspace.id;
 	const activeId = useActiveRepositoryWorkspaceId(workspaceId);
-	const select = useActiveRepositoryStore((state) => state.select);
+	const select = useSelectRepository();
 	const repositories = useWorkspaceRepositories(workspaceId);
 	const current = repositories.find((repository) => repository.id === activeId);
 	if (repositories.length < 2 || !current) return null;

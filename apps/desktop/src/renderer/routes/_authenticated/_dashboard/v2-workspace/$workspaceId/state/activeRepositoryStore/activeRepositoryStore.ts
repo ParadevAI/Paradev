@@ -1,24 +1,9 @@
 import { workspaceTrpc } from "@superset/workspace-client";
-import { create } from "zustand";
-
-interface ActiveRepositoryState {
-	byWorkspace: Record<string, string>;
-	select: (workspaceId: string, repositoryWorkspaceId: string) => void;
-}
-
-// ponytail: in-memory only; the pick resets to the first repository on reload.
-export const useActiveRepositoryStore = create<ActiveRepositoryState>()(
-	(set) => ({
-		byWorkspace: {},
-		select: (workspaceId, repositoryWorkspaceId) =>
-			set((state) => ({
-				byWorkspace: {
-					...state.byWorkspace,
-					[workspaceId]: repositoryWorkspaceId,
-				},
-			})),
-	}),
-);
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
+import { useCallback } from "react";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import type { WorkspaceLocalStateRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 
 export function useWorkspaceRepositories(workspaceId: string) {
 	// A host older than workspace.repositories errors here; the workspace
@@ -31,15 +16,44 @@ export function useWorkspaceRepositories(workspaceId: string) {
 	);
 }
 
+export function useWorkspaceLocalStateRow(
+	workspaceId: string,
+): WorkspaceLocalStateRow | undefined {
+	const collections = useCollections();
+	const { data: rows = [] } = useLiveQuery(
+		(query) =>
+			query
+				.from({ state: collections.v2WorkspaceLocalState })
+				.where(({ state }) => eq(state.workspaceId, workspaceId)),
+		[collections, workspaceId],
+	);
+	return rows[0];
+}
+
 /** The workspace id the git and file panes read: the picked repository's checkout. */
 export function useActiveRepositoryWorkspaceId(workspaceId: string): string {
 	const repositories = useWorkspaceRepositories(workspaceId);
-	const picked = useActiveRepositoryStore(
-		(state) => state.byWorkspace[workspaceId],
-	);
+	const picked = useWorkspaceLocalStateRow(workspaceId)?.activeRepositoryId;
 	return (
 		repositories.find((repository) => repository.id === picked)?.id ??
 		repositories[0]?.id ??
 		workspaceId
+	);
+}
+
+export function useSelectRepository(): (
+	workspaceId: string,
+	repositoryWorkspaceId: string,
+) => void {
+	const collections = useCollections();
+	return useCallback(
+		(workspaceId, repositoryWorkspaceId) => {
+			const row = collections.v2WorkspaceLocalState.get(workspaceId);
+			if (!row || row.activeRepositoryId === repositoryWorkspaceId) return;
+			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+				draft.activeRepositoryId = repositoryWorkspaceId;
+			});
+		},
+		[collections],
 	);
 }
