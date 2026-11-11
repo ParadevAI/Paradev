@@ -49,7 +49,6 @@ export async function createCloudWorkspace(args: {
 		["--pr", options.pr],
 		["--task", options.task],
 		["--skip-branch-prefix", options.skipBranchPrefix || undefined],
-		["--tag", options.tag?.length ? options.tag : undefined],
 		["--command", options.command],
 	] as const) {
 		if (value !== undefined) {
@@ -115,6 +114,7 @@ export async function createCloudWorkspace(args: {
 			...(options.effort ? { effort: options.effort } : {}),
 			...(options.machineSize ? { machineSize: options.machineSize } : {}),
 			...(attachmentFileIds.length > 0 ? { attachmentFileIds } : {}),
+			...(options.tag?.length ? { tags: options.tag } : {}),
 		})
 		.catch(rethrowWithLocationHint);
 

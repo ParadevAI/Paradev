@@ -1174,19 +1174,20 @@ describe("continuationTarget", () => {
 		const db = createTestDb();
 		seedClaude(db);
 		const launch = { workspaceId, agent: "claude", prompt: "go" };
-
-		expect(
-			chatLaunchTarget(db, { ...launch, surface: "chat", mode: "plan" }),
-		).toEqual({
+		const claudeChat = {
 			harness: "claude-acp",
 			label: "Claude",
 			agentConfigId: "00000000-0000-0000-0000-00000000000a",
 			attachments: [],
-		});
-		expect(chatLaunchTarget(db, launch)).toBeNull();
+		};
+
+		expect(
+			chatLaunchTarget(db, { ...launch, surface: "chat", mode: "plan" }),
+		).toEqual(claudeChat);
 		expect(
 			chatLaunchTarget(db, { ...launch, surface: "chat", effort: "high" }),
-		).toBeNull();
+		).toEqual(claudeChat);
+		expect(chatLaunchTarget(db, launch)).toBeNull();
 	});
 
 	it("chats as a custom agent that runs the claude or codex CLI", () => {

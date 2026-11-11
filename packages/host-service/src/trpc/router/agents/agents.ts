@@ -673,7 +673,6 @@ export function chatLaunchTarget(
 } | null {
 	if (
 		input.surface !== "chat" ||
-		input.effort ||
 		input.resumeSessionId ||
 		input.forkSessionId
 	) {
