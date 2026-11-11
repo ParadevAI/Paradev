@@ -1,7 +1,15 @@
+import { TabVisibilityContext } from "@superset/panes";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import {
+	memo,
+	startTransition,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type { HostShapedWorkspace } from "renderer/hooks/host-workspaces/useHostWorkspaces";
 import {
 	type CloudWorkspaceRow,
@@ -9,10 +17,21 @@ import {
 } from "renderer/hooks/useCloudWorkspaces";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import {
+	ScreenActiveContext,
+	ScreenShownContext,
+	useIsScreenActive,
+} from "renderer/lib/screen-active";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WorkspaceNotFoundState } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceNotFoundState";
 import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
+import {
+	type KeptWorkspace as KeptWorkspaceEntry,
+	keptWorkspaceClassName,
+	keptWorkspacesStore,
+} from "renderer/routes/_authenticated/_dashboard/stores/keptWorkspacesStore";
+import { setPressedWorkspaceId } from "renderer/routes/_authenticated/_dashboard/stores/pressedWorkspaceStore";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -28,20 +47,104 @@ import { useRemoteHostStatus } from "../hooks/useRemoteHostStatus";
 import { useWorkspaceMissVerdict } from "../hooks/useWorkspaceMissVerdict";
 import { WorkspaceProvider } from "../providers/WorkspaceProvider";
 import { StoredCloudChat } from "./components/StoredCloudChat";
+import { V2WorkspacePage } from "./page";
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/v2-workspace/$workspaceId",
 )({
-	remountDeps: ({ params }) => ({ workspaceId: params.workspaceId }),
 	component: V2WorkspaceLayout,
 });
 
 function V2WorkspaceLayout() {
-	// Owned by this segment, so the param is available by definition. This used
-	// to live on the parent route, which had to match its own child to recover
-	// the id and then render an empty shell for the "no id" case that route
-	// could always reach and this one cannot.
 	const { workspaceId } = Route.useParams();
+	const [kept, setKept] = useState(keptWorkspacesStore.get);
+	// Trees kept from before this route mounted come back one per idle period:
+	// all at once stalls the first paint. Later prewarms mount right away.
+	const [pendingIds, setPendingIds] = useState(
+		() =>
+			new Set(
+				keptWorkspacesStore
+					.get()
+					.map((entry) => entry.id)
+					.filter((id) => id !== workspaceId),
+			),
+	);
+	const { workspaces: hostWorkspaces, isReady } = useHostWorkspaces();
+	useEffect(() => {
+		if (!isReady) return;
+		const known = new Set(hostWorkspaces.map((workspace) => workspace.id));
+		keptWorkspacesStore.prewarmRecent((id) => known.has(id));
+	}, [isReady, hostWorkspaces]);
+	useEffect(
+		() =>
+			keptWorkspacesStore.subscribe(() =>
+				startTransition(() => setKept(keptWorkspacesStore.get())),
+			),
+		[],
+	);
+	useEffect(() => {
+		keptWorkspacesStore.visit(workspaceId);
+		setPressedWorkspaceId(null);
+		setPendingIds((ids) => {
+			if (!ids.has(workspaceId)) return ids;
+			const next = new Set(ids);
+			next.delete(workspaceId);
+			return next;
+		});
+	}, [workspaceId]);
+	const nextToMount = kept.find((entry) => pendingIds.has(entry.id))?.id;
+	useEffect(() => {
+		if (!nextToMount) return;
+		const handle = requestIdleCallback(
+			() =>
+				startTransition(() =>
+					setPendingIds((ids) => {
+						const next = new Set(ids);
+						next.delete(nextToMount);
+						return next;
+					}),
+				),
+			{ timeout: 1_000 },
+		);
+		return () => cancelIdleCallback(handle);
+	}, [nextToMount]);
+
+	const rendered: KeptWorkspaceEntry[] = kept.filter(
+		(entry) => entry.id === workspaceId || !pendingIds.has(entry.id),
+	);
+	if (!rendered.some((entry) => entry.id === workspaceId)) {
+		rendered.push({ id: workspaceId, usedAt: Date.now(), shown: true });
+	}
+	return rendered.map((entry) => {
+		const isActive = entry.id === workspaceId;
+		return (
+			<div
+				key={entry.id}
+				ref={(element) => keptWorkspacesStore.register(entry.id, element)}
+				inert={!isActive}
+				className={keptWorkspaceClassName(isActive)}
+			>
+				<ScreenActiveContext.Provider value={isActive}>
+					<ScreenShownContext.Provider value={isActive || entry.shown}>
+						<TabVisibilityContext.Provider value={isActive || !entry.shown}>
+							<KeptWorkspace workspaceId={entry.id} />
+						</TabVisibilityContext.Provider>
+					</ScreenShownContext.Provider>
+				</ScreenActiveContext.Provider>
+			</div>
+		);
+	});
+}
+
+const KeptWorkspace = memo(function KeptWorkspace({
+	workspaceId,
+}: {
+	workspaceId: string;
+}) {
+	return <WorkspaceRouteBody workspaceId={workspaceId} />;
+});
+
+function WorkspaceRouteBody({ workspaceId }: { workspaceId: string }) {
 	const collections = useCollections();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const pendingTransaction = useWorkspaceTransactionsStore((state) =>
@@ -53,7 +156,9 @@ function V2WorkspaceLayout() {
 	const isCreatePending = pendingTransaction?.type === "insert";
 
 	const { toggleShowPresetsBar } = useV2UserPreferences();
+	const isScreenActive = useIsScreenActive();
 	electronTrpc.menu.subscribe.useSubscription(undefined, {
+		enabled: isScreenActive,
 		onData: (event) => {
 			if (event.type === "toggle-presets-bar") {
 				toggleShowPresetsBar();
@@ -118,15 +223,20 @@ function V2WorkspaceLayout() {
 	const setCloudInSidebar = useCloudSidebarStore((state) => state.setInSidebar);
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
-		if (!workspace || lastEnsuredWorkspaceIdRef.current === workspace.id)
+		if (
+			!isScreenActive ||
+			!workspace ||
+			lastEnsuredWorkspaceIdRef.current === workspace.id
+		)
 			return;
 		lastEnsuredWorkspaceIdRef.current = workspace.id;
 		ensureWorkspaceInSidebar(workspace.id, workspace.projectId);
-	}, [ensureWorkspaceInSidebar, workspace]);
+	}, [ensureWorkspaceInSidebar, workspace, isScreenActive]);
 
 	const lastShownCloudWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
 		if (
+			!isScreenActive ||
 			!workspace ||
 			!cloudWorkspace ||
 			lastShownCloudWorkspaceIdRef.current === cloudWorkspace.id
@@ -134,7 +244,7 @@ function V2WorkspaceLayout() {
 			return;
 		lastShownCloudWorkspaceIdRef.current = cloudWorkspace.id;
 		setCloudInSidebar(cloudWorkspace.organizationId, cloudWorkspace.id, true);
-	}, [setCloudInSidebar, workspace, cloudWorkspace]);
+	}, [setCloudInSidebar, workspace, cloudWorkspace, isScreenActive]);
 
 	// Sandboxes ship with the app's own host-service build, so the remote
 	// version gate has nothing to check and no host row to check it against.
@@ -155,6 +265,13 @@ function V2WorkspaceLayout() {
 		},
 		cache.refetchAll,
 	);
+	const isGone =
+		!workspace &&
+		!cloudWorkspace &&
+		(missConfirmed || Boolean(archivedCloudWorkspace?.deletedAt));
+	useEffect(() => {
+		if (isGone && !isScreenActive) keptWorkspacesStore.forget(workspaceId);
+	}, [isGone, isScreenActive, workspaceId]);
 
 	// A `ready` row only means the box has started booting. Its address request
 	// is batched with the wake, which waits for host-service to answer.
@@ -251,7 +368,7 @@ function V2WorkspaceLayout() {
 
 	return (
 		<WorkspaceProvider workspace={workspace}>
-			<Outlet />
+			<V2WorkspacePage />
 		</WorkspaceProvider>
 	);
 }

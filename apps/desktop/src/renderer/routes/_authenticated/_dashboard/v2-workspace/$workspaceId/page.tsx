@@ -2,7 +2,7 @@ import { Workspace } from "@superset/panes";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
@@ -12,6 +12,7 @@ import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
@@ -110,6 +111,8 @@ import { findVisiblePullRequestNumber } from "./utils/openPullRequestPaneInStore
 import { openSubagentPaneInStore } from "./utils/openSubagentPaneInStore";
 import type { V2WorkspaceUrlOpenTarget } from "./utils/openUrlInV2Workspace";
 
+const NO_SEARCH: WorkspaceSearch = {};
+
 const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 
 const defaultRightPaneAreaWidth = (containerWidth: number) =>
@@ -156,15 +159,16 @@ export const Route = createFileRoute(
 	}),
 });
 
-function V2WorkspacePage() {
+export function V2WorkspacePage() {
 	const { workspace } = useWorkspace();
 	const pendingCloudChat = usePendingCloudChat(workspace.id);
+	const isScreenActive = useIsScreenActive();
 	const workspaceStatusQuery = workspaceTrpc.workspace.get.useQuery(
 		{ id: workspace.id },
 		{
 			enabled: !pendingCloudChat,
 			staleTime: 0,
-			refetchOnWindowFocus: true,
+			refetchOnWindowFocus: isScreenActive,
 		},
 	);
 
@@ -189,6 +193,8 @@ function V2WorkspacePage() {
 }
 
 function V2WorkspaceContent() {
+	const isScreenActive = useIsScreenActive();
+	const search = useSearch({ from: Route.id, shouldThrow: false }) ?? NO_SEARCH;
 	const {
 		sessionId,
 		terminalId,
@@ -200,7 +206,7 @@ function V2WorkspaceContent() {
 		openUrl,
 		openUrlTarget,
 		openUrlRequestId,
-	} = Route.useSearch();
+	} = isScreenActive ? search : NO_SEARCH;
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
 	const navigate = Route.useNavigate();
@@ -705,7 +711,7 @@ function V2WorkspaceContent() {
 									key={workspaceId}
 									{...titleBarTabBarProps(titleBarMainSlot, {
 										paneArea: "center",
-										inert: rightPaneMode === "expanded",
+										inert: rightPaneMode === "expanded" || !isScreenActive,
 									})}
 									appearance={isParadevShell ? "cards" : "default"}
 									isFocused={!isRightAreaFocused}
