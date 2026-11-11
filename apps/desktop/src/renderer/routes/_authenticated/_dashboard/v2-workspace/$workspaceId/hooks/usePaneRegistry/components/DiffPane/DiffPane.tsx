@@ -27,7 +27,6 @@ import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
 import {
@@ -62,6 +61,7 @@ import { useViewedFiles } from "../../../useViewedFiles";
 import { useElementWidth } from "../../hooks/useElementWidth";
 import { AgentCommentComposer } from "../AgentCommentComposer";
 import { BinaryDiffPreview } from "./components/BinaryDiffPreview";
+import { BinaryPreviewRefresh } from "./components/BinaryPreviewRefresh";
 import { CommentThread } from "./components/CommentThread";
 import { DeferredDiffPlaceholder } from "./components/DeferredDiffPlaceholder";
 import { DiffHeaderMetadata } from "./components/DiffHeaderMetadata";
@@ -287,25 +287,6 @@ export function DiffPane({
 	const writeFile = workspaceTrpc.filesystem.writeFile.useMutation();
 	const utils = workspaceTrpc.useUtils();
 	const { trpcClient } = useWorkspaceClient();
-	// Binary previews of the index or HEAD side don't change their query key
-	// when git state moves, so refetch them on git events. Scope to the
-	// reported paths when we have them so an unrelated edit doesn't refetch
-	// every preview on screen. The working-tree side follows the shared
-	// document store's fs watch and needs nothing here.
-	useWorkspaceEvent(
-		"git:changed",
-		workspaceId,
-		({ paths }) => {
-			if (!paths) {
-				void utils.git.readDiffSideFile.invalidate({ workspaceId });
-				return;
-			}
-			for (const path of paths) {
-				void utils.git.readDiffSideFile.invalidate({ workspaceId, path });
-			}
-		},
-		!!worktreePath,
-	);
 	const [editingSet, setEditingSet] = useState<ReadonlySet<string>>(new Set());
 	const [dirtyItemIds, setDirtyItemIds] = useState<ReadonlySet<string>>(
 		new Set(),
@@ -1037,6 +1018,12 @@ export function DiffPane({
 			className="relative flex h-full min-h-0 w-full min-w-0"
 		>
 			{repositoryChangesets.sources}
+			{worktreePath && <BinaryPreviewRefresh workspaceId={workspaceId} />}
+			{repositoryIds.map((id) =>
+				id === workspaceId ? null : (
+					<BinaryPreviewRefresh key={id} workspaceId={id} />
+				),
+			)}
 			{titleSlot &&
 				createPortal(
 					<DiffPaneScope
