@@ -1731,7 +1731,14 @@ describe("AcpAdapter", () => {
 		const approval = itemsOf(events).find(
 			(item) => item.kind === "approval_request",
 		);
-		expect(approval?.form?.fields[1]?.answerFor).toBe("delivery");
+		expect(approval).toMatchObject({
+			form: {
+				fields: [
+					{ id: "delivery" },
+					{ id: "delivery_note", answerFor: "delivery" },
+				],
+			},
+		});
 		adapter.respondToApproval(approval?.id ?? "", {
 			type: "form",
 			values: { delivery_note: "Pickup" },
