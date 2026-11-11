@@ -12269,6 +12269,9 @@ msgstr "이 워크스페이스를 컴퓨터로 옮길까요?"
 msgid "Move this workspace to the cloud?"
 msgstr "이 워크스페이스를 클라우드로 옮길까요?"
 
+msgid "Move to"
+msgstr "옮길 위치"
+
 msgid "Move to a computer"
 msgstr "컴퓨터로 옮기기"
 
@@ -12489,6 +12492,9 @@ msgstr "새 채팅"
 
 msgid "New Chat"
 msgstr "새 채팅"
+
+msgid "New cloud workspace"
+msgstr "새 클라우드 워크스페이스"
 
 msgid "New environment"
 msgstr "새 환경"

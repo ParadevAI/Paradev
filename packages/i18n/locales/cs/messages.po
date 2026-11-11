@@ -12269,6 +12269,9 @@ msgstr "Přesunout tento pracovní prostor na počítač?"
 msgid "Move this workspace to the cloud?"
 msgstr "Přesunout tento pracovní prostor do cloudu?"
 
+msgid "Move to"
+msgstr "Přesunout do"
+
 msgid "Move to a computer"
 msgstr "Přesunout na počítač"
 
@@ -12489,6 +12492,9 @@ msgstr "Nový chat"
 
 msgid "New Chat"
 msgstr "Nový chat"
+
+msgid "New cloud workspace"
+msgstr "Nový cloudový pracovní prostor"
 
 msgid "New environment"
 msgstr "Nové prostředí"

@@ -12269,6 +12269,9 @@ msgstr "Bu çalışma alanı bir bilgisayara taşınsın mı?"
 msgid "Move this workspace to the cloud?"
 msgstr "Bu çalışma alanı buluta taşınsın mı?"
 
+msgid "Move to"
+msgstr "Taşı"
+
 msgid "Move to a computer"
 msgstr "Bir bilgisayara taşı"
 
@@ -12489,6 +12492,9 @@ msgstr "Yeni sohbet"
 
 msgid "New Chat"
 msgstr "Yeni sohbet"
+
+msgid "New cloud workspace"
+msgstr "Yeni bulut çalışma alanı"
 
 msgid "New environment"
 msgstr "Yeni ortam"

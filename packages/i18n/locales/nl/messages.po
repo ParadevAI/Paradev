@@ -12269,6 +12269,9 @@ msgstr "Deze werkruimte naar een computer verplaatsen?"
 msgid "Move this workspace to the cloud?"
 msgstr "Deze werkruimte naar de cloud verplaatsen?"
 
+msgid "Move to"
+msgstr "Verplaatsen naar"
+
 msgid "Move to a computer"
 msgstr "Naar een computer verplaatsen"
 
@@ -12489,6 +12492,9 @@ msgstr "Nieuwe chat"
 
 msgid "New Chat"
 msgstr "Nieuwe chat"
+
+msgid "New cloud workspace"
+msgstr "Nieuwe cloudwerkruimte"
 
 msgid "New environment"
 msgstr "Nieuwe omgeving"

@@ -12269,6 +12269,9 @@ msgstr "Перенести эту рабочую область на компь�
 msgid "Move this workspace to the cloud?"
 msgstr "Перенести эту рабочую область в облако?"
 
+msgid "Move to"
+msgstr "Перенести"
+
 msgid "Move to a computer"
 msgstr "Перенести на компьютер"
 
@@ -12489,6 +12492,9 @@ msgstr "Новый чат"
 
 msgid "New Chat"
 msgstr "Новый чат"
+
+msgid "New cloud workspace"
+msgstr "Новая облачная рабочая область"
 
 msgid "New environment"
 msgstr "Новое окружение"

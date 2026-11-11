@@ -12269,6 +12269,9 @@ msgstr "Pindahkan workspace ini ke komputer?"
 msgid "Move this workspace to the cloud?"
 msgstr "Pindahkan workspace ini ke cloud?"
 
+msgid "Move to"
+msgstr "Pindahkan ke"
+
 msgid "Move to a computer"
 msgstr "Pindahkan ke komputer"
 
@@ -12489,6 +12492,9 @@ msgstr "Obrolan baru"
 
 msgid "New Chat"
 msgstr "Chat Baru"
+
+msgid "New cloud workspace"
+msgstr "Workspace cloud baru"
 
 msgid "New environment"
 msgstr "Environment baru"

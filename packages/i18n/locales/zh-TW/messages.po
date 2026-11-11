@@ -12269,6 +12269,9 @@ msgstr "要將此工作區移至一台電腦嗎？"
 msgid "Move this workspace to the cloud?"
 msgstr "要將此工作區移至雲端嗎？"
 
+msgid "Move to"
+msgstr "移至"
+
 msgid "Move to a computer"
 msgstr "移至一台電腦"
 
@@ -12489,6 +12492,9 @@ msgstr "新聊天"
 
 msgid "New Chat"
 msgstr "新建聊天"
+
+msgid "New cloud workspace"
+msgstr "新建雲端工作區"
 
 msgid "New environment"
 msgstr "新增環境"

@@ -18,15 +18,14 @@ import {
 	LuArrowUp,
 	LuBellOff,
 	LuClipboard,
-	LuCloudUpload,
 	LuCopy,
 	LuEye,
 	LuEyeOff,
 	LuFolderOpen,
 	LuFolderPlus,
+	LuFolderSymlink,
 	LuGitBranch,
 	LuHash,
-	LuLaptop,
 	LuLink,
 	LuPencil,
 	LuPin,
@@ -46,6 +45,10 @@ import type {
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
+import {
+	type MoveDestinationPick,
+	MoveToDestinationItems,
+} from "./components/MoveToDestinationItems";
 import { MoveToGroupItems } from "./components/MoveToGroupItems";
 
 interface DashboardSidebarWorkspaceContextMenuProps {
@@ -125,7 +128,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	const showDeleteShortcut =
 		showDeleteHotkey && deleteHotkeyText !== "Unassigned";
 	const canJoinGroup = projectId !== null || isSessionWorkspace;
-	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
+	const [moveOpen, setMoveOpen] = useState<MoveDestinationPick | null>(null);
 	const handleCloseAllPorts = () => {
 		if (isKillingPorts) return;
 		void killPorts(ports);
@@ -227,7 +230,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 							</ContextMenuItem>
 							<ContextMenuSub>
 								<ContextMenuSubTrigger>
-									<LuArrowRightLeft className="size-4 mr-2" />
+									<LuFolderSymlink className="size-4 mr-2" />
 									<Trans>Move to group</Trans>
 								</ContextMenuSubTrigger>
 								<ContextMenuSubContent>
@@ -252,28 +255,19 @@ export function DashboardSidebarWorkspaceContextMenu({
 					{move && (
 						<>
 							<ContextMenuSeparator />
-							{move.directions.map((direction) => (
-								<ContextMenuItem
-									key={direction}
-									onSelect={() => runAfterClose(() => setMoveOpen(direction))}
-								>
-									{direction === "to-cloud" ? (
-										<>
-											<LuCloudUpload className="size-4 mr-2" />
-											<Trans>Move to cloud</Trans>
-										</>
-									) : (
-										<>
-											<LuLaptop className="size-4 mr-2" />
-											{isLocalWorkspace ? (
-												<Trans>Move to another computer</Trans>
-											) : (
-												<Trans>Move to a computer</Trans>
-											)}
-										</>
-									)}
-								</ContextMenuItem>
-							))}
+							<ContextMenuSub>
+								<ContextMenuSubTrigger>
+									<LuArrowRightLeft className="size-4 mr-2" />
+									<Trans>Move to</Trans>
+								</ContextMenuSubTrigger>
+								<ContextMenuSubContent>
+									<MoveToDestinationItems
+										directions={move.directions}
+										fromHostId={move.workspace.hostId}
+										onPick={(pick) => runAfterClose(() => setMoveOpen(pick))}
+									/>
+								</ContextMenuSubContent>
+							</ContextMenuSub>
 						</>
 					)}
 					<ContextMenuSeparator />
@@ -318,7 +312,8 @@ export function DashboardSidebarWorkspaceContextMenu({
 			</ContextMenu>
 			{move && moveOpen && (
 				<MoveWorkspaceDialog
-					direction={moveOpen}
+					direction={moveOpen.direction}
+					destinationHostId={moveOpen.hostId}
 					workspace={move.workspace}
 					open
 					onOpenChange={(open) => {
