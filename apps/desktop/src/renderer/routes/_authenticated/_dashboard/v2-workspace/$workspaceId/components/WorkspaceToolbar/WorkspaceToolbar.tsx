@@ -2,6 +2,7 @@ import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/co
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import type { useV2WorkspaceRun } from "../../hooks/useV2WorkspaceRun";
+import { RepositoryRunItems } from "../RepositoryRunItems";
 import { WorkspaceMoreMenu } from "../WorkspaceMoreMenu";
 
 interface WorkspaceToolbarProps {
@@ -28,6 +29,18 @@ export function WorkspaceToolbar({
 				isRunning={run.isRunning}
 				isRunPending={run.isPending}
 				canForceStop={run.canForceStop}
+				hasRunCommand={run.hasRunCommand}
+				repositoryRunItems={
+					run.repositoryRuns.length > 0 ? (
+						<RepositoryRunItems
+							repositoryRuns={run.repositoryRuns}
+							onRunAll={run.runAll}
+							onStopAll={run.stopWorkspaceRun}
+							onStart={run.startRepositoryRun}
+							onStop={run.stopRepositoryRun}
+						/>
+					) : undefined
+				}
 				onToggleRun={run.toggleWorkspaceRun}
 				onForceStopRun={run.forceStopWorkspaceRun}
 			/>

@@ -17393,6 +17393,9 @@ msgstr "Draai agents volgens schema of als er iets gebeurt."
 msgid "Run agents side by side"
 msgstr "Draai agents naast elkaar"
 
+msgid "Run all"
+msgstr "Alles uitvoeren"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Draai een leger"
@@ -17489,6 +17492,9 @@ msgstr "Draai je agents vanaf de desktop, elke terminal of je telefoon."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Draai je codeeragents in de cloud."
+
+msgid "Run: {repositoryName}"
+msgstr "Run: {repositoryName}"
 
 msgid "Run."
 msgstr "Voer uit."
@@ -18370,6 +18376,9 @@ msgstr "Project instellen…"
 
 msgid "Set Run"
 msgstr "Run instellen"
+
+msgid "Set run script"
+msgstr "Run-script instellen"
 
 msgid "Set this project"
 msgstr "Dit project instellen"
@@ -19571,6 +19580,9 @@ msgstr "{label} stoppen"
 
 msgid "Stop {name}"
 msgstr "{name} stoppen"
+
+msgid "Stop all"
+msgstr "Alles stoppen"
 
 msgid "Stop dictation"
 msgstr "Dicteren stoppen"

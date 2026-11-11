@@ -17393,6 +17393,9 @@ msgstr "Jalankan agen sesuai jadwal atau saat sesuatu terjadi."
 msgid "Run agents side by side"
 msgstr "Jalankan agen berdampingan"
 
+msgid "Run all"
+msgstr "Jalankan semua"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Jalankan Pasukan"
@@ -17489,6 +17492,9 @@ msgstr "Jalankan agen Anda dari desktop, terminal mana pun, atau ponsel Anda."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Jalankan agen coding Anda di cloud."
+
+msgid "Run: {repositoryName}"
+msgstr "Run: {repositoryName}"
 
 msgid "Run."
 msgstr "Jalankan."
@@ -18370,6 +18376,9 @@ msgstr "Tetapkan proyek…"
 
 msgid "Set Run"
 msgstr "Setel Run"
+
+msgid "Set run script"
+msgstr "Setel skrip run"
 
 msgid "Set this project"
 msgstr "Tetapkan proyek ini"
@@ -19571,6 +19580,9 @@ msgstr "Hentikan {label}"
 
 msgid "Stop {name}"
 msgstr "Hentikan {name}"
+
+msgid "Stop all"
+msgstr "Hentikan semua"
 
 msgid "Stop dictation"
 msgstr "Hentikan dikte"

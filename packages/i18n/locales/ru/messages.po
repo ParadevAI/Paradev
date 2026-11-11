@@ -17393,6 +17393,9 @@ msgstr "Запускайте агентов по расписанию или к�
 msgid "Run agents side by side"
 msgstr "Запускайте агентов бок о бок"
 
+msgid "Run all"
+msgstr "Запустить все"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Запустите армию"
@@ -17489,6 +17492,9 @@ msgstr "Запускайте агентов с десктопа, из любог
 
 msgid "Run your coding agents in the cloud."
 msgstr "Запускайте своих агентов для кода в облаке."
+
+msgid "Run: {repositoryName}"
+msgstr "Запуск: {repositoryName}"
 
 msgid "Run."
 msgstr "Запустите."
@@ -18370,6 +18376,9 @@ msgstr "Назначить проект…"
 
 msgid "Set Run"
 msgstr "Задать запуск"
+
+msgid "Set run script"
+msgstr "Задать скрипт запуска"
 
 msgid "Set this project"
 msgstr "Назначить этот проект"
@@ -19571,6 +19580,9 @@ msgstr "Остановить {label}"
 
 msgid "Stop {name}"
 msgstr "Остановить {name}"
+
+msgid "Stop all"
+msgstr "Остановить все"
 
 msgid "Stop dictation"
 msgstr "Остановить диктовку"

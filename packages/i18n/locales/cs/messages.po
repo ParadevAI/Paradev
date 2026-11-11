@@ -17393,6 +17393,9 @@ msgstr "Spouštějte agenty podle plánu nebo když se něco stane."
 msgid "Run agents side by side"
 msgstr "Spouštějte agenty vedle sebe"
 
+msgid "Run all"
+msgstr "Spustit vše"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Spusťte armádu"
@@ -17489,6 +17492,9 @@ msgstr "Spouštějte své agenty z desktopu, libovolného terminálu nebo telefo
 
 msgid "Run your coding agents in the cloud."
 msgstr "Spouštějte své programovací agenty v cloudu."
+
+msgid "Run: {repositoryName}"
+msgstr "Spuštění: {repositoryName}"
 
 msgid "Run."
 msgstr "Spusťte."
@@ -18370,6 +18376,9 @@ msgstr "Nastavit projekt…"
 
 msgid "Set Run"
 msgstr "Nastavit spuštění"
+
+msgid "Set run script"
+msgstr "Nastavit spouštěcí skript"
 
 msgid "Set this project"
 msgstr "Nastavit tento projekt"
@@ -19571,6 +19580,9 @@ msgstr "Zastavit {label}"
 
 msgid "Stop {name}"
 msgstr "Zastavit {name}"
+
+msgid "Stop all"
+msgstr "Zastavit vše"
 
 msgid "Stop dictation"
 msgstr "Zastavit diktování"

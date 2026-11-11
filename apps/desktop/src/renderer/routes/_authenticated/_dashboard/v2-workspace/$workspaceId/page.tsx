@@ -34,6 +34,7 @@ import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
 import { HostConnectionPill } from "./components/HostConnectionPill";
+import { RepositoryRunItems } from "./components/RepositoryRunItems";
 import { RightPaneArea } from "./components/RightPaneArea";
 import { MIN_RIGHT_PANE_AREA_WIDTH } from "./components/RightPaneArea/constants";
 import {
@@ -598,6 +599,18 @@ function V2WorkspaceContent() {
 			isRunning={workspaceRun.isRunning}
 			isPending={workspaceRun.isPending}
 			canForceStop={workspaceRun.canForceStop}
+			hasRunCommand={workspaceRun.hasRunCommand}
+			repositoryRunItems={
+				workspaceRun.repositoryRuns.length > 0 ? (
+					<RepositoryRunItems
+						repositoryRuns={workspaceRun.repositoryRuns}
+						onRunAll={workspaceRun.runAll}
+						onStopAll={workspaceRun.stopWorkspaceRun}
+						onStart={workspaceRun.startRepositoryRun}
+						onStop={workspaceRun.stopRepositoryRun}
+					/>
+				) : undefined
+			}
 			onToggle={workspaceRun.toggleWorkspaceRun}
 			onForceStop={workspaceRun.forceStopWorkspaceRun}
 		/>

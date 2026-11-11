@@ -17393,6 +17393,9 @@ msgstr "일정에 따라 또는 어떤 일이 생겼을 때 에이전트를 실�
 msgid "Run agents side by side"
 msgstr "에이전트를 나란히 실행"
 
+msgid "Run all"
+msgstr "모두 실행"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "코딩 에이전트 군단을"
@@ -17489,6 +17492,9 @@ msgstr "데스크톱, 어떤 터미널, 또는 휴대폰에서 에이전트를 �
 
 msgid "Run your coding agents in the cloud."
 msgstr "코딩 에이전트를 클라우드에서 실행하세요."
+
+msgid "Run: {repositoryName}"
+msgstr "실행: {repositoryName}"
 
 msgid "Run."
 msgstr "실행."
@@ -18370,6 +18376,9 @@ msgstr "프로젝트 설정…"
 
 msgid "Set Run"
 msgstr "실행 설정"
+
+msgid "Set run script"
+msgstr "실행 스크립트 설정"
 
 msgid "Set this project"
 msgstr "이 프로젝트로 설정"
@@ -19571,6 +19580,9 @@ msgstr "{label} 중지"
 
 msgid "Stop {name}"
 msgstr "{name} 중지"
+
+msgid "Stop all"
+msgstr "모두 중지"
 
 msgid "Stop dictation"
 msgstr "받아쓰기 중지"

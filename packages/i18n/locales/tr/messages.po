@@ -17393,6 +17393,9 @@ msgstr "Ajanları bir zamanlamayla veya bir şey olduğunda çalıştırın."
 msgid "Run agents side by side"
 msgstr "Ajanları yan yana çalıştırın"
 
+msgid "Run all"
+msgstr "Tümünü çalıştır"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Kodlama ajanlarından"
@@ -17489,6 +17492,9 @@ msgstr "Ajanlarınızı masaüstünden, herhangi bir terminalden veya telefonunu
 
 msgid "Run your coding agents in the cloud."
 msgstr "Kodlama ajanlarınızı bulutta çalıştırın."
+
+msgid "Run: {repositoryName}"
+msgstr "Çalıştırma: {repositoryName}"
 
 msgid "Run."
 msgstr "Çalıştırın."
@@ -18370,6 +18376,9 @@ msgstr "Projeyi ayarla…"
 
 msgid "Set Run"
 msgstr "Çalıştırmayı ayarla"
+
+msgid "Set run script"
+msgstr "Çalıştırma betiğini ayarla"
 
 msgid "Set this project"
 msgstr "Bu projeyi ayarla"
@@ -19571,6 +19580,9 @@ msgstr "{label} öğesini durdur"
 
 msgid "Stop {name}"
 msgstr "{name} öğesini durdur"
+
+msgid "Stop all"
+msgstr "Tümünü durdur"
 
 msgid "Stop dictation"
 msgstr "Sesle yazmayı durdur"

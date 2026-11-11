@@ -1211,6 +1211,7 @@ export function usePaneRegistry({
 			linkedStores,
 			workspaceId,
 			repoWorkspaceId,
+			fileWorkspaceId,
 			startNewShell,
 			forkIntoOtherSurface,
 			closeChatWithUndo,

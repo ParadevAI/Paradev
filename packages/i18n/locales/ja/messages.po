@@ -17393,6 +17393,9 @@ msgstr "スケジュールで、または何かが起きたときにエージェ
 msgid "Run agents side by side"
 msgstr "エージェントを並べて実行"
 
+msgid "Run all"
+msgstr "すべて実行"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "エージェント軍団で"
@@ -17489,6 +17492,9 @@ msgstr "デスクトップ、任意のターミナル、スマートフォンか
 
 msgid "Run your coding agents in the cloud."
 msgstr "コーディングエージェントをクラウドで実行。"
+
+msgid "Run: {repositoryName}"
+msgstr "実行: {repositoryName}"
 
 msgid "Run."
 msgstr "実行。"
@@ -18370,6 +18376,9 @@ msgstr "プロジェクトを設定…"
 
 msgid "Set Run"
 msgstr "実行を設定"
+
+msgid "Set run script"
+msgstr "実行スクリプトを設定"
 
 msgid "Set this project"
 msgstr "このプロジェクトに設定"
@@ -19571,6 +19580,9 @@ msgstr "{label} を停止"
 
 msgid "Stop {name}"
 msgstr "{name} を停止"
+
+msgid "Stop all"
+msgstr "すべて停止"
 
 msgid "Stop dictation"
 msgstr "音声入力を停止"

@@ -17393,6 +17393,9 @@ msgstr "Ejecuta agentes según un horario o cuando pasa algo."
 msgid "Run agents side by side"
 msgstr "Ejecuta agentes en paralelo"
 
+msgid "Run all"
+msgstr "Ejecutar todo"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Ejecuta un ejército de"
@@ -17489,6 +17492,9 @@ msgstr "Ejecuta tus agentes desde el escritorio, cualquier terminal o tu móvil.
 
 msgid "Run your coding agents in the cloud."
 msgstr "Ejecuta tus agentes de programación en la nube."
+
+msgid "Run: {repositoryName}"
+msgstr "Ejecución: {repositoryName}"
 
 msgid "Run."
 msgstr "Ejecuta."
@@ -18370,6 +18376,9 @@ msgstr "Asignar proyecto…"
 
 msgid "Set Run"
 msgstr "Definir comando"
+
+msgid "Set run script"
+msgstr "Definir script de ejecución"
 
 msgid "Set this project"
 msgstr "Asignar este proyecto"
@@ -19571,6 +19580,9 @@ msgstr "Detener {label}"
 
 msgid "Stop {name}"
 msgstr "Detener {name}"
+
+msgid "Stop all"
+msgstr "Detener todo"
 
 msgid "Stop dictation"
 msgstr "Detener el dictado"

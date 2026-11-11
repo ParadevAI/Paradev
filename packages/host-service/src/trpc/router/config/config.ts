@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import {
 	getDefaultTerminal,
 	parseProjectConfig,
@@ -8,6 +8,7 @@ import { resolveProjectConfigDirName } from "@superset/shared/project-config/dir
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getLocalProject } from "../../../projects/local-project-store";
+import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
 import {
 	getProjectConfigPath,
 	hasProjectConfig,
@@ -278,4 +279,36 @@ export const configRouter = router({
 				...(terminal.cwd && { cwd: terminal.cwd }),
 			};
 		}),
+
+	/** Each checkout's run script in a multi-repo workspace, run in that checkout. */
+	getRepositoryRunDefinitions: protectedProcedure
+		.input(z.object({ workspaceId: z.string() }))
+		.query(({ ctx, input }) =>
+			listRepositoryWorkspaces(ctx.db, input.workspaceId).map((checkout) => {
+				const project = checkout.projectId
+					? getLocalProject(ctx.db, checkout.projectId)
+					: undefined;
+				const config = project?.repoPath
+					? loadProjectConfig({
+							repoPath: project.repoPath,
+							projectId: project.id,
+						})
+					: null;
+				const terminal =
+					config?.kind === "ok" ? getDefaultTerminal(config.resolved) : null;
+				return terminal
+					? {
+							repositoryId: checkout.id,
+							projectId: checkout.projectId,
+							commands: terminal.commands,
+							cwd: resolve(checkout.worktreePath, terminal.cwd ?? "."),
+						}
+					: {
+							repositoryId: checkout.id,
+							projectId: checkout.projectId,
+							commands: null,
+							cwd: null,
+						};
+			}),
+		),
 });

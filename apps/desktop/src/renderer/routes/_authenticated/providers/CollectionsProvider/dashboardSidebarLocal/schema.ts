@@ -169,6 +169,8 @@ export const workspaceRunTerminalStateSchema = z.object({
 	command: z.string(),
 	definitionSource: z.enum(["project-config", "terminal-preset"]),
 	definitionId: z.string().optional(),
+	/** The checkout this run belongs to, in a multi-repo workspace. */
+	repositoryId: z.string().optional(),
 	startedAt: z.number(),
 	stoppedAt: z.number().optional(),
 	exitCode: z.number().optional(),

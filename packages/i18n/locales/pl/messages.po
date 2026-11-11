@@ -17393,6 +17393,9 @@ msgstr "Uruchamiaj agentów według harmonogramu lub gdy coś się wydarzy."
 msgid "Run agents side by side"
 msgstr "Uruchamiaj agentów obok siebie"
 
+msgid "Run all"
+msgstr "Uruchom wszystko"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Uruchom armię"
@@ -17489,6 +17492,9 @@ msgstr "Uruchamiaj agentów z komputera, dowolnego terminala lub telefonu."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Uruchamiaj swoich agentów kodujących w chmurze."
+
+msgid "Run: {repositoryName}"
+msgstr "Uruchomienie: {repositoryName}"
 
 msgid "Run."
 msgstr "Uruchom."
@@ -18370,6 +18376,9 @@ msgstr "Ustaw projekt…"
 
 msgid "Set Run"
 msgstr "Ustaw uruchamianie"
+
+msgid "Set run script"
+msgstr "Ustaw skrypt uruchamiania"
 
 msgid "Set this project"
 msgstr "Ustaw ten projekt"
@@ -19571,6 +19580,9 @@ msgstr "Zatrzymaj {label}"
 
 msgid "Stop {name}"
 msgstr "Zatrzymaj {name}"
+
+msgid "Stop all"
+msgstr "Zatrzymaj wszystko"
 
 msgid "Stop dictation"
 msgstr "Zatrzymaj dyktowanie"

@@ -276,3 +276,34 @@ test("restoring a deleted container workspace brings back every checkout", async
 	}
 	expect(existsSync(join(root, "AGENTS.md"))).toBe(true);
 });
+
+test("each checkout reports its own run script, for the Run menu", async () => {
+	const { host, projectId, workspace, checkouts } = await containerWorkspace();
+	const [webProject, apiProject] = await host.trpc.project.repositories.query({
+		projectId,
+	});
+	if (!webProject || !apiProject) throw new Error("missing repositories");
+	await host.trpc.config.updateConfig.mutate({
+		projectId: apiProject.id,
+		run: ["bun server.ts"],
+	});
+
+	const definitions = await host.trpc.config.getRepositoryRunDefinitions.query({
+		workspaceId: workspace.id,
+	});
+
+	expect(definitions).toEqual([
+		{
+			repositoryId: checkouts[0]?.id ?? "",
+			projectId: webProject.id,
+			commands: null,
+			cwd: null,
+		},
+		{
+			repositoryId: checkouts[1]?.id ?? "",
+			projectId: apiProject.id,
+			commands: ["bun server.ts"],
+			cwd: checkouts[1]?.worktreePath ?? "",
+		},
+	]);
+});

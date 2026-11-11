@@ -17393,6 +17393,9 @@ msgstr "按计划或在发生某件事时运行智能体。"
 msgid "Run agents side by side"
 msgstr "并排运行智能体"
 
+msgid "Run all"
+msgstr "全部运行"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "调动一支"
@@ -17489,6 +17492,9 @@ msgstr "在桌面端、任意终端或手机上运行你的智能体。"
 
 msgid "Run your coding agents in the cloud."
 msgstr "在云端运行你的编程智能体。"
+
+msgid "Run: {repositoryName}"
+msgstr "运行：{repositoryName}"
 
 msgid "Run."
 msgstr "运行。"
@@ -18370,6 +18376,9 @@ msgstr "设置项目…"
 
 msgid "Set Run"
 msgstr "设置运行命令"
+
+msgid "Set run script"
+msgstr "设置运行脚本"
 
 msgid "Set this project"
 msgstr "设为此项目"
@@ -19571,6 +19580,9 @@ msgstr "停止 {label}"
 
 msgid "Stop {name}"
 msgstr "停止 {name}"
+
+msgid "Stop all"
+msgstr "全部停止"
 
 msgid "Stop dictation"
 msgstr "停止语音输入"

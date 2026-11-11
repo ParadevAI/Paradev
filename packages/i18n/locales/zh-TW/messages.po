@@ -17393,6 +17393,9 @@ msgstr "依排程或在發生某件事時執行代理程式。"
 msgid "Run agents side by side"
 msgstr "並排執行代理程式"
 
+msgid "Run all"
+msgstr "全部執行"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "調動一支"
@@ -17489,6 +17492,9 @@ msgstr "在桌面、任何終端機或手機上執行你的 agent。"
 
 msgid "Run your coding agents in the cloud."
 msgstr "在雲端執行你的程式設計代理程式。"
+
+msgid "Run: {repositoryName}"
+msgstr "執行：{repositoryName}"
 
 msgid "Run."
 msgstr "執行。"
@@ -18370,6 +18376,9 @@ msgstr "設定專案…"
 
 msgid "Set Run"
 msgstr "設定執行命令"
+
+msgid "Set run script"
+msgstr "設定執行指令碼"
 
 msgid "Set this project"
 msgstr "設為此專案"
@@ -19571,6 +19580,9 @@ msgstr "停止 {label}"
 
 msgid "Stop {name}"
 msgstr "停止 {name}"
+
+msgid "Stop all"
+msgstr "全部停止"
 
 msgid "Stop dictation"
 msgstr "停止語音輸入"

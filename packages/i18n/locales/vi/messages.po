@@ -17393,6 +17393,9 @@ msgstr "Chạy agent theo lịch hoặc khi có sự kiện xảy ra."
 msgid "Run agents side by side"
 msgstr "Chạy các agent cạnh nhau"
 
+msgid "Run all"
+msgstr "Chạy tất cả"
+
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Chạy cả một đội quân"
@@ -17489,6 +17492,9 @@ msgstr "Chạy agent của bạn từ desktop, bất kỳ terminal nào, hoặc 
 
 msgid "Run your coding agents in the cloud."
 msgstr "Chạy agent lập trình của bạn trên đám mây."
+
+msgid "Run: {repositoryName}"
+msgstr "Chạy: {repositoryName}"
 
 msgid "Run."
 msgstr "Chạy."
@@ -18370,6 +18376,9 @@ msgstr "Đặt dự án…"
 
 msgid "Set Run"
 msgstr "Đặt lệnh chạy"
+
+msgid "Set run script"
+msgstr "Đặt script chạy"
 
 msgid "Set this project"
 msgstr "Đặt dự án này"
@@ -19571,6 +19580,9 @@ msgstr "Dừng {label}"
 
 msgid "Stop {name}"
 msgstr "Dừng {name}"
+
+msgid "Stop all"
+msgstr "Dừng tất cả"
 
 msgid "Stop dictation"
 msgstr "Dừng đọc chính tả"
