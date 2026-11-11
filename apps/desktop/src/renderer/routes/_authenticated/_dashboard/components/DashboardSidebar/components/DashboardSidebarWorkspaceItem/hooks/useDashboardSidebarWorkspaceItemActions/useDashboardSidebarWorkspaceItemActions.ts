@@ -20,6 +20,7 @@ import {
 	useSidebarWorkspaceStatus,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarWorkspaceStatusProvider";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
+import { useIsWorkspaceShownActive } from "renderer/routes/_authenticated/_dashboard/stores/pressedWorkspaceStore";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { applyFolderTagChange } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
@@ -94,7 +95,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 
 	// A boolean selector, so a navigation re-renders only the rows whose
 	// active state flips, not every row in the sidebar.
-	const isActive = useRouterState({
+	const isRouteActive = useRouterState({
 		select: (state) => {
 			const path = `/v2-workspace/${workspaceId}`;
 			// While a navigation loads, the page on screen is still the
@@ -105,6 +106,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 			return pathname === path || pathname.startsWith(`${path}/`);
 		},
 	});
+	const isActive = useIsWorkspaceShownActive(workspaceId, isRouteActive);
 
 	const handleClick = () => {
 		if (isRenaming) return;
