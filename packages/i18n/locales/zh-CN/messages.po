@@ -1279,6 +1279,9 @@ msgstr "{total}项检查中有{pending}项运行中"
 msgid "{percent} used"
 msgstr "已使用 {percent}"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {已选 # 个基础分支} other {已选 # 个基础分支}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · 加入于{joined}"
 
@@ -1369,8 +1372,8 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "剩余 {remaining} 个 token"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {#个仓库} other {#个仓库}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# 个仓库} other {全部 # 个仓库}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
@@ -1386,6 +1389,9 @@ msgstr "人类{share}%"
 
 msgid "{shown} of {total}"
 msgstr "{shown}/{total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# 个仓库} other {# 个仓库}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "返回主聊天"
 
 msgid "Back to pages"
 msgstr "返回页面"
+
+msgid "Back to repositories"
+msgstr "返回仓库列表"
 
 msgid "Back to the leaderboard"
 msgstr "返回排行榜"
@@ -7010,6 +7019,9 @@ msgstr "新工作区的默认基础分支。可在创建时为各工作区单独
 msgid "Default branch"
 msgstr "默认分支"
 
+msgid "Default branches"
+msgstr "默认分支"
+
 msgid "Default effort"
 msgstr "默认推理强度"
 
@@ -7872,6 +7884,9 @@ msgstr "每条各占一个新标签页"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "每天早上8点，查看昨天失败的CI运行，诊断最常见的失败原因，并提一个修复PR。"
+
+msgid "Each repository branches from its base branch."
+msgstr "每个仓库都从各自的基础分支创建分支。"
 
 msgid "Each run makes its own"
 msgstr "每次运行都新建一个"

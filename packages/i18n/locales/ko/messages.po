@@ -1279,6 +1279,9 @@ msgstr "검사 {total}개 중 {pending}개 실행 중"
 msgid "{percent} used"
 msgstr "{percent} 사용됨"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {기준 브랜치 #개 선택됨} other {기준 브랜치 #개 선택됨}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · {joined} 가입"
 
@@ -1369,8 +1372,8 @@ msgstr "{total} 중 {received}"
 msgid "{remaining} tokens left"
 msgstr "{remaining} 토큰 남음"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {리포지토리 #개} other {리포지토리 #개}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {리포지토리 #개} other {모든 리포지토리 (#개)}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
@@ -1386,6 +1389,9 @@ msgstr "사람 {share}%"
 
 msgid "{shown} of {total}"
 msgstr "{total}개 중 {shown}개"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {리포지토리 #개} other {리포지토리 #개}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "기본 채팅으로 돌아가기"
 
 msgid "Back to pages"
 msgstr "페이지로 돌아가기"
+
+msgid "Back to repositories"
+msgstr "리포지토리 목록으로 돌아가기"
 
 msgid "Back to the leaderboard"
 msgstr "리더보드로 돌아가기"
@@ -7010,6 +7019,9 @@ msgstr "새 작업 공간의 기본 기준 브랜치입니다. 생성 시 작업
 msgid "Default branch"
 msgstr "기본 브랜치"
 
+msgid "Default branches"
+msgstr "기본 브랜치"
+
 msgid "Default effort"
 msgstr "기본 강도"
 
@@ -7872,6 +7884,9 @@ msgstr "각각 새 탭에서"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "매일 오전 8시에 어제 실패한 CI 실행을 살펴보고, 가장 흔한 실패 원인을 진단해 수정 PR을 엽니다."
+
+msgid "Each repository branches from its base branch."
+msgstr "각 리포지토리는 자신의 기준 브랜치에서 분기합니다."
 
 msgid "Each run makes its own"
 msgstr "실행마다 새로 만듭니다"

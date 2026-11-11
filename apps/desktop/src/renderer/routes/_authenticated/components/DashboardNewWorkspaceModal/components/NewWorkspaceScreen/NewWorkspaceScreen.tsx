@@ -77,6 +77,7 @@ import { CheckoutPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/com
 import { CompareBaseBranchPicker } from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
 import { ProjectPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/ProjectPickerPill";
 import { PromptHistoryCommand } from "../DashboardNewWorkspaceForm/PromptGroup/components/PromptHistoryCommand";
+import { RepositoryBranchesPicker } from "../DashboardNewWorkspaceForm/PromptGroup/components/RepositoryBranchesPicker";
 import { useBranchPickerController } from "../DashboardNewWorkspaceForm/PromptGroup/hooks/useBranchPickerController";
 import { useSubmitWorkspace } from "../DashboardNewWorkspaceForm/PromptGroup/hooks/useSubmitWorkspace";
 import {
@@ -483,6 +484,7 @@ export function NewWorkspaceScreen({
 			updateDraft({
 				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
 				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
+				repositoryBaseBranches: {},
 			});
 		}
 	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
@@ -1150,10 +1152,21 @@ export function NewWorkspaceScreen({
 						onSelectCheckout={() => {}}
 						localUnavailableReason={singleRepositoryOnly}
 					/>
-					<CompareBaseBranchPicker
-						{...pickerProps}
-						disabledReason={singleRepositoryOnly}
-					/>
+					{projectId && (
+						<RepositoryBranchesPicker
+							projectId={projectId}
+							hostId={hostId}
+							baseBranches={draft.repositoryBaseBranches}
+							onBaseBranchChange={(repositoryId, branch) =>
+								updateDraft({
+									repositoryBaseBranches: {
+										...draft.repositoryBaseBranches,
+										[repositoryId]: branch,
+									},
+								})
+							}
+						/>
+					)}
 				</>
 			) : (
 				<>

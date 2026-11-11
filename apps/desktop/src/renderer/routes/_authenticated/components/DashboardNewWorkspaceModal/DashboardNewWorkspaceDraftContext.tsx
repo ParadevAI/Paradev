@@ -57,6 +57,7 @@ export function useDashboardNewWorkspaceDraft() {
 			promptDraft: store.promptDraft,
 			baseBranch: store.baseBranch,
 			baseBranchSource: store.baseBranchSource,
+			repositoryBaseBranches: store.repositoryBaseBranches,
 			workspaceName: store.workspaceName,
 			workspaceNameEdited: store.workspaceNameEdited,
 			branchName: store.branchName,

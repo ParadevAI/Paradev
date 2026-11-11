@@ -1279,6 +1279,9 @@ msgstr "{total}件中{pending}件のチェックが実行中"
 msgid "{percent} used"
 msgstr "{percent} 使用済み"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {#個のベースブランチを選択済み} other {#個のベースブランチを選択済み}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · {joined}に参加"
 
@@ -1369,8 +1372,8 @@ msgstr "{received}/{total}"
 msgid "{remaining} tokens left"
 msgstr "残り {remaining} トークン"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {#個のリポジトリ} other {#個のリポジトリ}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {#個のリポジトリ} other {すべてのリポジトリ (#)}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
@@ -1386,6 +1389,9 @@ msgstr "人間{share}%"
 
 msgid "{shown} of {total}"
 msgstr "{total}件中{shown}件"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {#個のリポジトリ} other {#個のリポジトリ}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "メインのチャットに戻る"
 
 msgid "Back to pages"
 msgstr "ページ"
+
+msgid "Back to repositories"
+msgstr "リポジトリ一覧に戻る"
 
 msgid "Back to the leaderboard"
 msgstr "リーダーボードに戻る"
@@ -7010,6 +7019,9 @@ msgstr "新しいワークスペースの既定のベース。作成時に個別
 msgid "Default branch"
 msgstr "デフォルトブランチ"
 
+msgid "Default branches"
+msgstr "デフォルトブランチ"
+
 msgid "Default effort"
 msgstr "デフォルトのエフォート"
 
@@ -7872,6 +7884,9 @@ msgstr "それぞれ新しいタブで"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "毎朝午前8時に、前日の失敗したCI実行を確認し、最も多い失敗原因を診断して修正PRを作成する。"
+
+msgid "Each repository branches from its base branch."
+msgstr "各リポジトリはそれぞれのベースブランチから分岐します。"
 
 msgid "Each run makes its own"
 msgstr "実行ごとに新しく作成します"

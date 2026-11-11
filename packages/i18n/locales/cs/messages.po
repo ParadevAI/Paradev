@@ -1279,6 +1279,9 @@ msgstr "Běží {pending} z {total} kontrol"
 msgid "{percent} used"
 msgstr "Využito {percent}"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {Vybrána # základní větev} few {Vybrány # základní větve} many {Vybráno # základní větve} other {Vybráno # základních větví}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Připojeno {joined}"
 
@@ -1369,8 +1372,8 @@ msgstr "{received} z {total}"
 msgid "{remaining} tokens left"
 msgstr "Zbývající tokeny: {remaining}"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {# repozitář} few {# repozitáře} many {# repozitáře} other {# repozitářů}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# repozitář} few {Všechny # repozitáře} many {Všech # repozitáře} other {Všech # repozitářů}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
@@ -1386,6 +1389,9 @@ msgstr "{share} % člověk"
 
 msgid "{shown} of {total}"
 msgstr "{shown} z {total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# repozitář} few {# repozitáře} many {# repozitáře} other {# repozitářů}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "Zpět na hlavní chat"
 
 msgid "Back to pages"
 msgstr "Zpět na stránky"
+
+msgid "Back to repositories"
+msgstr "Zpět na repozitáře"
 
 msgid "Back to the leaderboard"
 msgstr "Zpět na žebříček"
@@ -7010,6 +7019,9 @@ msgstr "Výchozí základ nových pracovních prostorů. Lze jej změnit při vy
 msgid "Default branch"
 msgstr "Výchozí větev"
 
+msgid "Default branches"
+msgstr "Výchozí větve"
+
 msgid "Default effort"
 msgstr "Výchozí úsilí"
 
@@ -7872,6 +7884,9 @@ msgstr "Každý ve vlastní nové kartě"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Každé ráno v 8:00 se podívej na včerejší neúspěšné běhy CI, urči nejčastější příčinu selhání a otevři PR s opravou."
+
+msgid "Each repository branches from its base branch."
+msgstr "Každý repozitář vychází ze své základní větve."
 
 msgid "Each run makes its own"
 msgstr "Každé spuštění si vytvoří vlastní"

@@ -1279,6 +1279,9 @@ msgstr "{pending} z {total} kontroli w toku"
 msgid "{percent} used"
 msgstr "Wykorzystano {percent}"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {Wybrano # gałąź bazową} few {Wybrano # gałęzie bazowe} many {Wybrano # gałęzi bazowych} other {Wybrano # gałęzi bazowej}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · dołączono {joined}"
 
@@ -1369,8 +1372,8 @@ msgstr "{received} z {total}"
 msgid "{remaining} tokens left"
 msgstr "Pozostałe tokeny: {remaining}"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {# repozytorium} few {# repozytoria} many {# repozytoriów} other {# repozytorium}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# repozytorium} few {Wszystkie # repozytoria} many {Wszystkie # repozytoriów} other {Wszystkie # repozytorium}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Cofnięto zmiany w # pliku.} few {Cofnięto zmiany w # plikach.} many {Cofnięto zmiany w # plikach.} other {Cofnięto zmiany w # pliku.}}"
@@ -1386,6 +1389,9 @@ msgstr "{share}% człowiek"
 
 msgid "{shown} of {total}"
 msgstr "{shown} z {total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# repozytorium} few {# repozytoria} many {# repozytoriów} other {# repozytorium}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "Wróć do głównego czatu"
 
 msgid "Back to pages"
 msgstr "Wróć do stron"
+
+msgid "Back to repositories"
+msgstr "Wróć do repozytoriów"
 
 msgid "Back to the leaderboard"
 msgstr "Wróć do rankingu"
@@ -7010,6 +7019,9 @@ msgstr "Domyślna baza nowych obszarów roboczych. Można zmienić ją osobno po
 msgid "Default branch"
 msgstr "Domyślna gałąź"
 
+msgid "Default branches"
+msgstr "Domyślne gałęzie"
+
 msgid "Default effort"
 msgstr "Domyślny wysiłek"
 
@@ -7872,6 +7884,9 @@ msgstr "Każde we własnej nowej karcie"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Każdego ranka o 8:00 sprawdź wczorajsze nieudane uruchomienia CI, zdiagnozuj najczęstszą przyczynę i otwórz PR z poprawką."
+
+msgid "Each repository branches from its base branch."
+msgstr "Każde repozytorium odgałęzia się od swojej gałęzi bazowej."
 
 msgid "Each run makes its own"
 msgstr "Każde uruchomienie tworzy własny"

@@ -1279,6 +1279,9 @@ msgstr "{pending} de {total} verificações em execução"
 msgid "{percent} used"
 msgstr "{percent} usado"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {# branch base escolhida} other {# branches base escolhidas}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Entrou em {joined}"
 
@@ -1369,8 +1372,8 @@ msgstr "{received} de {total}"
 msgid "{remaining} tokens left"
 msgstr "Restam {remaining} tokens"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {# repositório} other {# repositórios}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# repositório} other {Todos os # repositórios}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {As alterações em # arquivo foram desfeitas.} other {As alterações em # arquivos foram desfeitas.}}"
@@ -1386,6 +1389,9 @@ msgstr "{share}% humano"
 
 msgid "{shown} of {total}"
 msgstr "{shown} de {total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# repositório} other {# repositórios}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "Voltar ao chat principal"
 
 msgid "Back to pages"
 msgstr "Voltar para as páginas"
+
+msgid "Back to repositories"
+msgstr "Voltar aos repositórios"
 
 msgid "Back to the leaderboard"
 msgstr "Voltar ao ranking"
@@ -7010,6 +7019,9 @@ msgstr "Base padrão para novos espaços de trabalho. Pode ser alterada individu
 msgid "Default branch"
 msgstr "Branch padrão"
 
+msgid "Default branches"
+msgstr "Branches padrão"
+
 msgid "Default effort"
 msgstr "Esforço padrão"
 
@@ -7872,6 +7884,9 @@ msgstr "Cada um em sua própria aba"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Toda manhã às 8h, veja as execuções de CI que falharam ontem, diagnostique a falha mais comum e abra um PR com a correção."
+
+msgid "Each repository branches from its base branch."
+msgstr "Cada repositório parte da sua branch base."
 
 msgid "Each run makes its own"
 msgstr "Cada execução cria a sua"

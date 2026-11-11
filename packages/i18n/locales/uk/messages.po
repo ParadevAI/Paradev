@@ -1273,6 +1273,9 @@ msgstr "Виконується {pending} з {total} перевірок"
 msgid "{percent} used"
 msgstr "Використано {percent}"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {Вибрано # базову гілку} few {Вибрано # базові гілки} many {Вибрано # базових гілок} other {Вибрано # базової гілки}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · дата приєднання: {joined}"
 
@@ -1363,8 +1366,8 @@ msgstr "{received} з {total}"
 msgid "{remaining} tokens left"
 msgstr "Залишилося токенів: {remaining}"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {# репозиторій} few {# репозиторії} many {# репозиторіїв} other {# репозиторію}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# репозиторій} few {Усі # репозиторії} many {Усі # репозиторіїв} other {Усі # репозиторію}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Скасовано зміни в # файлі.} few {Скасовано зміни в # файлах.} many {Скасовано зміни в # файлах.} other {Скасовано зміни в # файла.}}"
@@ -1380,6 +1383,9 @@ msgstr "людина: {share}%"
 
 msgid "{shown} of {total}"
 msgstr "{shown} з {total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# репозиторій} few {# репозиторії} many {# репозиторіїв} other {# репозиторію}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3565,6 +3571,9 @@ msgstr "Повернутися до основного чату"
 
 msgid "Back to pages"
 msgstr "Назад до сторінок"
+
+msgid "Back to repositories"
+msgstr "Назад до репозиторіїв"
 
 msgid "Back to the leaderboard"
 msgstr "Назад до таблиці лідерів"
@@ -7004,6 +7013,9 @@ msgstr "Базова гілка за замовчуванням для нови�
 msgid "Default branch"
 msgstr "Гілка за замовчуванням"
 
+msgid "Default branches"
+msgstr "Гілки за замовчуванням"
+
 msgid "Default effort"
 msgstr "Рівень зусиль за замовчуванням"
 
@@ -7866,6 +7878,9 @@ msgstr "Кожне у власній новій вкладці"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Щоранку о 8:00 переглядай учорашні невдалі запуски CI, визначай найпоширенішу причину збою та відкривай PR з виправленням."
+
+msgid "Each repository branches from its base branch."
+msgstr "Кожен репозиторій відгалужується від своєї базової гілки."
 
 msgid "Each run makes its own"
 msgstr "Кожен запуск створює свій"

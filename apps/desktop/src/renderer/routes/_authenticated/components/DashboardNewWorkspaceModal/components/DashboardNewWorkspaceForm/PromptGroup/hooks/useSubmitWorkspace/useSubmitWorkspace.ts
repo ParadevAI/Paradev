@@ -375,6 +375,10 @@ export function useSubmitWorkspace(
 									: undefined,
 							pr: isPrCheckout ? linkedPR?.prNumber : undefined,
 							baseBranch: draft.baseBranch ?? undefined,
+							repositoryBaseBranches:
+								Object.keys(draft.repositoryBaseBranches).length > 0
+									? draft.repositoryBaseBranches
+									: undefined,
 							taskId: linkedTaskId,
 							agents,
 							namingPrompt: isPrCheckout ? undefined : namingPrompt,

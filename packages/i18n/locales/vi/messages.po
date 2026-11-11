@@ -1279,6 +1279,9 @@ msgstr "{pending}/{total} check đang chạy"
 msgid "{percent} used"
 msgstr "Đã dùng {percent}"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {Đã chọn # nhánh gốc} other {Đã chọn # nhánh gốc}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Tham gia {joined}"
 
@@ -1369,8 +1372,8 @@ msgstr "{received} trên {total}"
 msgid "{remaining} tokens left"
 msgstr "Còn {remaining} token"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {# repository} other {# repository}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# repository} other {Tất cả # repository}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Đã hoàn tác thay đổi ở # tệp.} other {Đã hoàn tác thay đổi ở # tệp.}}"
@@ -1386,6 +1389,9 @@ msgstr "{share}% con người"
 
 msgid "{shown} of {total}"
 msgstr "{shown} trong {total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# repository} other {# repository}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "Quay lại cuộc trò chuyện chính"
 
 msgid "Back to pages"
 msgstr "Quay lại danh sách trang"
+
+msgid "Back to repositories"
+msgstr "Quay lại danh sách repository"
 
 msgid "Back to the leaderboard"
 msgstr "Quay lại bảng xếp hạng"
@@ -7010,6 +7019,9 @@ msgstr "Nhánh cơ sở mặc định cho không gian làm việc mới. Có th�
 msgid "Default branch"
 msgstr "Nhánh mặc định"
 
+msgid "Default branches"
+msgstr "Nhánh mặc định"
+
 msgid "Default effort"
 msgstr "Mức nỗ lực mặc định"
 
@@ -7872,6 +7884,9 @@ msgstr "Mỗi lệnh một tab mới"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Mỗi sáng lúc 8h, xem các lần chạy CI thất bại hôm qua, chẩn đoán lỗi phổ biến nhất và mở một PR sửa lỗi."
+
+msgid "Each repository branches from its base branch."
+msgstr "Mỗi repository tách nhánh từ nhánh gốc của nó."
 
 msgid "Each run makes its own"
 msgstr "Mỗi lần chạy tạo riêng"

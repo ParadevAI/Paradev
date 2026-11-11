@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { getBranchLoadFailure } from "../../utils/getBranchLoadFailure";
+import { getBranchLoadFailure } from "./utils/getBranchLoadFailure";
 
 const ACTION_CLASS =
 	"shrink-0 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:no-underline disabled:opacity-60";

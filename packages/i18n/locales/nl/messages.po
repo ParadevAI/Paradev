@@ -1279,6 +1279,9 @@ msgstr "{pending} van {total} checks bezig"
 msgid "{percent} used"
 msgstr "{percent} gebruikt"
 
+msgid "{pickedCount, plural, one {# base branch picked} other {# base branches picked}}"
+msgstr "{pickedCount, plural, one {# basisbranch gekozen} other {# basisbranches gekozen}}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Lid sinds {joined}"
 
@@ -1369,8 +1372,8 @@ msgstr "{received} van {total}"
 msgid "{remaining} tokens left"
 msgstr "Nog {remaining} tokens over"
 
-msgid "{repositoryCount, plural, one {# repository} other {# repositories}}"
-msgstr "{repositoryCount, plural, one {# repository} other {# repositories}}"
+msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
+msgstr "{repositoryCount, plural, one {# repository} other {Alle # repositories}}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Wijzigingen in # bestand ongedaan gemaakt.} other {Wijzigingen in # bestanden ongedaan gemaakt.}}"
@@ -1386,6 +1389,9 @@ msgstr "{share}% mens"
 
 msgid "{shown} of {total}"
 msgstr "{shown} van {total}"
+
+msgid "{shownCount, plural, one {# repository} other {# repositories}}"
+msgstr "{shownCount, plural, one {# repository} other {# repositories}}"
 
 #. placeholder {0}: formatUsd(shownUsd)
 #. placeholder {1}: formatTokens(shownTokens)
@@ -3571,6 +3577,9 @@ msgstr "Terug naar de hoofdchat"
 
 msgid "Back to pages"
 msgstr "Terug naar pagina's"
+
+msgid "Back to repositories"
+msgstr "Terug naar repositories"
 
 msgid "Back to the leaderboard"
 msgstr "Terug naar de ranglijst"
@@ -7010,6 +7019,9 @@ msgstr "Standaardbasis voor nieuwe werkruimten. Per werkruimte te wijzigen bij h
 msgid "Default branch"
 msgstr "Standaardbranch"
 
+msgid "Default branches"
+msgstr "Standaardbranches"
+
 msgid "Default effort"
 msgstr "Standaard-effort"
 
@@ -7872,6 +7884,9 @@ msgstr "Elk in een eigen nieuw tabblad"
 
 msgid "Each morning at 8am, look at yesterday's failed CI runs, diagnose the most common failure, and open a fix PR."
 msgstr "Elke ochtend om 8 uur: bekijk de mislukte CI-runs van gisteren, diagnosticeer de meest voorkomende fout en open een fix-PR."
+
+msgid "Each repository branches from its base branch."
+msgstr "Elke repository vertakt vanaf zijn basisbranch."
 
 msgid "Each run makes its own"
 msgstr "Elke run maakt een eigen"

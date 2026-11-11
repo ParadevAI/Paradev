@@ -80,6 +80,7 @@ import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
 import { useRepositoryChangesets } from "./hooks/useRepositoryChangesets";
+import { useDiffRepositoryFilterStore } from "./stores/diffRepositoryFilterStore";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
 	isDiffContentStale,
@@ -91,6 +92,7 @@ import {
 	diffPaneActionsSlotId,
 	diffPaneTitleSlotId,
 } from "./utils/headerSlots";
+import { shownRepositoryIds } from "./utils/shownRepositoryIds";
 import {
 	findItemIdForDiff,
 	pruneTooLargeMarks,
@@ -166,6 +168,16 @@ export function DiffPane({
 	);
 	const selectRepository = useActiveRepositoryStore((state) => state.select);
 	const repositoryChangesets = useRepositoryChangesets(repositoryIds);
+	const pickedRepositoryIds = useDiffRepositoryFilterStore(
+		(state) => state.byWorkspace[groupId],
+	);
+	const setPickedRepositoryIds = useDiffRepositoryFilterStore(
+		(state) => state.setRepositories,
+	);
+	const shownRepositories = useMemo(
+		() => shownRepositoryIds(repositoryIds, pickedRepositoryIds),
+		[repositoryIds, pickedRepositoryIds],
+	);
 
 	const sidebarRef = useSidebarDiffRef(workspaceId);
 	const filter = data.filter;
@@ -199,9 +211,21 @@ export function DiffPane({
 		workspaceId,
 		ref,
 	});
-	const changesetFiles = isMultiRepo
-		? repositoryChangesets.files
-		: ownChangeset.files;
+	const changesetFiles = useMemo(
+		() =>
+			isMultiRepo
+				? repositoryChangesets.files.filter(
+						(file) =>
+							!file.workspaceId || shownRepositories.has(file.workspaceId),
+					)
+				: ownChangeset.files,
+		[
+			isMultiRepo,
+			repositoryChangesets.files,
+			shownRepositories,
+			ownChangeset.files,
+		],
+	);
 	const isLoading = isMultiRepo
 		? repositoryChangesets.isLoading
 		: ownChangeset.isLoading;
@@ -601,16 +625,22 @@ export function DiffPane({
 	// several sections counts once, its working-tree entry winning.
 	const totals = useMemo(
 		() =>
-			changesPillStats({
-				againstBase: files.filter(
-					(file) =>
-						file.source.kind === "against-base" ||
-						file.source.kind === "commit",
-				),
-				staged: files.filter((file) => file.source.kind === "staged"),
-				unstaged: files.filter((file) => file.source.kind === "unstaged"),
-			}),
-		[files],
+			changesPillStats(
+				Object.values(
+					Object.groupBy(files, (file) => file.workspaceId ?? workspaceId),
+				).map((checkoutFiles = []) => ({
+					againstBase: checkoutFiles.filter(
+						(file) =>
+							file.source.kind === "against-base" ||
+							file.source.kind === "commit",
+					),
+					staged: checkoutFiles.filter((file) => file.source.kind === "staged"),
+					unstaged: checkoutFiles.filter(
+						(file) => file.source.kind === "unstaged",
+					),
+				})),
+			),
+		[files, workspaceId],
 	);
 	const clearFilter = useCallback(() => {
 		updateData({ ...dataRef.current, filter: undefined } as PaneViewerData);
@@ -1014,7 +1044,15 @@ export function DiffPane({
 						deletions={totals.deletions}
 						filter={filter}
 						onClearFilter={clearFilter}
-						repositoryCount={isMultiRepo ? repositories.length : undefined}
+						repositoryFilter={
+							isMultiRepo
+								? {
+										repositories,
+										shown: shownRepositories,
+										onChange: (ids) => setPickedRepositoryIds(groupId, ids),
+									}
+								: undefined
+						}
 					/>,
 					titleSlot,
 				)}

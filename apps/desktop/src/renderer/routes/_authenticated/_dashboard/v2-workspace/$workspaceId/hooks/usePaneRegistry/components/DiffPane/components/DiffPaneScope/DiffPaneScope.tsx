@@ -1,9 +1,10 @@
-import { Plural, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { ChangesScopeControl } from "../../../../../../components/ChangesScopeControl";
 import type { DiffPaneFilter } from "../../../../../../types";
 import { useChangesScope } from "../../../../../useChangesScope";
+import { RepositoryFilter } from "./components/RepositoryFilter";
 
 interface DiffPaneScopeProps {
 	workspaceId: string;
@@ -12,7 +13,7 @@ interface DiffPaneScopeProps {
 	filter?: DiffPaneFilter | undefined;
 	onClearFilter: () => void;
 	/** Set when the pane shows several repositories; each keeps its own scope. */
-	repositoryCount?: number;
+	repositoryFilter?: React.ComponentProps<typeof RepositoryFilter>;
 }
 
 /** The Changes pane header's left side: which diff it shows, and its totals. */
@@ -22,7 +23,7 @@ export function DiffPaneScope({
 	deletions,
 	filter,
 	onClearFilter,
-	repositoryCount,
+	repositoryFilter,
 }: DiffPaneScopeProps) {
 	const { t } = useLingui();
 	const scope = useChangesScope(workspaceId);
@@ -30,14 +31,8 @@ export function DiffPaneScope({
 	const clearLabel = t({ message: "Show all changes" });
 	return (
 		<div className="flex min-w-0 items-center gap-1 text-xs">
-			{repositoryCount !== undefined ? (
-				<span className="truncate text-muted-foreground">
-					<Plural
-						value={repositoryCount}
-						one="# repository"
-						other="# repositories"
-					/>
-				</span>
+			{repositoryFilter ? (
+				<RepositoryFilter {...repositoryFilter} />
 			) : (
 				status &&
 				!filter?.range && (

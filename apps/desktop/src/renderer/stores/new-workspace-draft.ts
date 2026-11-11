@@ -39,6 +39,8 @@ export interface NewWorkspaceDraft {
 	promptDraft: ComposerDraftSegment[];
 	baseBranch: string | null;
 	baseBranchSource: BaseBranchSource | null;
+	/** Multi-repo projects: picked base branches by repository id. */
+	repositoryBaseBranches: Record<string, string>;
 	workspaceName: string;
 	workspaceNameEdited: boolean;
 	branchName: string;
@@ -70,6 +72,7 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		promptDraft: [],
 		baseBranch: null,
 		baseBranchSource: null,
+		repositoryBaseBranches: {},
 		workspaceName: "",
 		workspaceNameEdited: false,
 		branchName: "",
@@ -103,6 +106,7 @@ export const useNewWorkspaceDraftStore = create<NewWorkspaceDraftState>(
 				isSession: true,
 				baseBranch: null,
 				baseBranchSource: null,
+				repositoryBaseBranches: {},
 			}),
 		resetDraft: () =>
 			set((state) => ({
