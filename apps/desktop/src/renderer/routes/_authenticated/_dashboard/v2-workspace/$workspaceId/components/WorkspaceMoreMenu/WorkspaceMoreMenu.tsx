@@ -71,7 +71,10 @@ export function WorkspaceMoreMenu({
 	const runHotkey = useHotkeyDisplay("RUN_WORKSPACE_COMMAND").text;
 	const label = t({ message: "More actions" });
 	const { workspace } = useWorkspace();
-	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
+	const moveDirections = useWorkspaceMoveDirections(
+		workspace.hostId,
+		workspace.projectId,
+	);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const actionPendingRef = useRef(false);
 	const openAfterClose = (action: () => void) => {

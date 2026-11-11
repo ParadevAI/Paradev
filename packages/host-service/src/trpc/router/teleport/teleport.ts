@@ -7,6 +7,7 @@ import type { ChatRuntime } from "@superset/chat-runtime";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
 import { createGitEnvResolver } from "../../../runtime/git";
 import {
 	downloadBundle,
@@ -168,6 +169,12 @@ export const teleportRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			if (listRepositoryWorkspaces(ctx.db, input.workspaceId).length > 0) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "A multi-repo workspace cannot be moved yet",
+				});
+			}
 			const chat = requireChatRuntime(ctx);
 			const chatSync = ctx.runtime.chatSync;
 			if (!chatSync) {

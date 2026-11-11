@@ -77,7 +77,10 @@ export function DashboardSidebarWorkspaceItem({
 	const environmentItem = isCloudWorkspace ? (
 		<ManageEnvironmentItem workspaceId={id} />
 	) : undefined;
-	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
+	const moveDirections = useWorkspaceMoveDirections(
+		workspace.hostId,
+		projectId,
+	);
 	const move =
 		moveDirections.length > 0
 			? {

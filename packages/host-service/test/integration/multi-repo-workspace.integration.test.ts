@@ -352,3 +352,11 @@ test("renaming the branch in one checkout renames it in every checkout", async (
 		.get();
 	expect(container?.branch).toBe("feature/renamed");
 });
+
+test("moving a multi-repo workspace is refused with a clear reason", async () => {
+	const { host, workspace } = await containerWorkspace();
+
+	await expect(
+		host.trpc.teleport.prepareWorkspace.mutate({ workspaceId: workspace.id }),
+	).rejects.toThrow("A multi-repo workspace cannot be moved yet");
+});
