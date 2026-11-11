@@ -1323,9 +1323,6 @@ msgstr "{productName} haalde een seedronde van 11,5 miljoen dollar op onder leid
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} heette tot oktober 2026 {formerName}."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · # om project, host en meer te wijzigen"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR's}}"
 

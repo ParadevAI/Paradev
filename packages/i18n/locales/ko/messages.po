@@ -1323,9 +1323,6 @@ msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}의 이름은 2026년 10월까지 {formerName}였습니다."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · #으로 프로젝트, 호스트 등 변경"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 

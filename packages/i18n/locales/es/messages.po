@@ -1323,9 +1323,6 @@ msgstr "{productName} levantó una ronda semilla de 11,5 millones de dólares li
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se llamaba {formerName} hasta octubre de 2026."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · # para cambiar de proyecto, de host y más"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 

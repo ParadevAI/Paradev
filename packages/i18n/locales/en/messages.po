@@ -1323,9 +1323,6 @@ msgstr "{productName} raised an $11.5M seed round led by Union Square Ventures, 
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} was called {formerName} until October 2026."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · # to change project, host, and more"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
