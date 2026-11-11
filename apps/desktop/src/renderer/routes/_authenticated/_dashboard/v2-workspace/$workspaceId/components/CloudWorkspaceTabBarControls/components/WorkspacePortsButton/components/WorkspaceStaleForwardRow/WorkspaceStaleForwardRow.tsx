@@ -5,11 +5,13 @@ import { usePortOpener } from "renderer/routes/_authenticated/_dashboard/compone
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import type { PortForward } from "shared/types";
 
-interface ShareStaleForwardRowProps {
+interface WorkspaceStaleForwardRowProps {
 	forward: PortForward;
 }
 
-export function ShareStaleForwardRow({ forward }: ShareStaleForwardRowProps) {
+export function WorkspaceStaleForwardRow({
+	forward,
+}: WorkspaceStaleForwardRowProps) {
 	const { t } = useLingui();
 	const { openExternal } = usePortOpener();
 	const localPort = forward.localPort;
