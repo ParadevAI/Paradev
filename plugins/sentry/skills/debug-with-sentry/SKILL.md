@@ -2,7 +2,7 @@
 name: debug-with-sentry
 description: Root-cause a production error with Sentry's evidence before touching code — pull the issue, read the stack trace and breadcrumbs, and separate the crash from its trigger. Use when the user pastes a Sentry link or issue ID, reports a production error, or asks why something is crashing for users.
 argument-hint: the Sentry issue URL, short ID, or a description of the error
-allowed-tools: mcp__sentry__get_sentry_resource, mcp__sentry__search_issues, mcp__sentry__search_errors, mcp__sentry__analyze_issue_with_seer, mcp__sentry__search_sentry_tools, mcp__sentry__execute_sentry_tool
+allowed-tools: mcp__sentry__get_sentry_resource, mcp__sentry__search_issues, mcp__sentry__search_errors, mcp__sentry__analyze_issue_with_seer, mcp__sentry__get_event_stacktrace, mcp__sentry__get_issue_breadcrumbs, mcp__sentry__get_issue_tag_values, mcp__sentry__find_releases
 ---
 
 # Root-cause with the evidence, not the guess
@@ -21,10 +21,10 @@ stack trace, they are two bugs.
 
 ## 2. Read the stack trace like a diff
 
-Stack traces, breadcrumbs, tag values and releases are catalog tools: find
-them with `search_sentry_tools`, then call `execute_sentry_tool` with `name`
-set to `get_event_stacktrace`, `get_issue_breadcrumbs`, `get_issue_tag_values`
-or `find_releases`.
+Stack traces, breadcrumbs, tag values and releases have their own tools: call
+`get_event_stacktrace`, `get_issue_breadcrumbs`, `get_issue_tag_values` or
+`find_releases`. Older Sentry MCP versions reach these through
+`execute_sentry_tool`.
 
 Fetch the newest event's stack trace. The top frame is where it *crashed*, not
 where it *broke* — walk down until you leave library code and hit the first
