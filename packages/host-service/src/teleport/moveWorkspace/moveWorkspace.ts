@@ -82,11 +82,16 @@ async function carryOut(
 		heartbeat: (id) =>
 			api.workspaceMove.heartbeat.mutate({ workspaceMoveId: id }),
 		work: async (signal) => {
+			const environment =
+				destination.kind === "cloud"
+					? await api.environment.get.query({ id: destination.environmentId })
+					: null;
 			const prepared = await deps.prepare(input.workspaceId);
 			const chatSessionIds = prepared.chats.map((chat) => chat.chatSessionId);
 			leaving.push(...chatSessionIds);
 			signal.throwIfAborted();
 			if (destination.kind === "cloud") {
+				assertEnvironmentOpens(environment, prepared.repositoryFullName);
 				const created = await api.cloudWorkspace.create.mutate({
 					organizationId,
 					environmentId: destination.environmentId,
@@ -160,6 +165,21 @@ async function carryOut(
 			console.warn(`[workspace-move] chat move ${moveId} failed`, error),
 		);
 	}
+}
+
+function assertEnvironmentOpens(
+	environment: { repositories: { fullName: string }[] } | null,
+	repositoryFullName: string,
+): void {
+	const repository = repositoryFullName.toLowerCase();
+	if (
+		environment?.repositories.some(
+			(repo) => repo.fullName.toLowerCase() === repository,
+		)
+	) {
+		return;
+	}
+	throw new Error(`That cloud environment does not open ${repositoryFullName}`);
 }
 
 async function findProject(host: DestinationHost, repositoryFullName: string) {
