@@ -20,6 +20,11 @@ import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
 import {
+	createTerminalSessionInternal,
+	isLiveTerminalSession,
+	renameTerminalSession,
+} from "../../terminal/terminal";
+import {
 	chatLaunchTarget,
 	runAgentInWorkspace,
 } from "../../trpc/router/agents/agents";
@@ -171,31 +176,75 @@ function readTail(path: string): string {
 	}
 }
 
+export interface StartHookPlan {
+	/** `[setup]`, detached; stops at its first failure. */
+	setup: string | null;
+	/** The default terminal, which the Run button starts. */
+	run: PhaseCommand | null;
+}
+
 /**
  * Cloud boot: `[setup]`, then the default terminal, as two separate steps.
  * Exported for tests.
  */
-export function startHookCommands(identity: SandboxIdentity): string[] {
+export function startHookPlan(identity: SandboxIdentity): StartHookPlan {
 	const root = identity.worktreePath;
 	const config = loadProjectConfig({
 		repoPath: root,
 		projectId: identity.workspaceId,
 	});
-	if (!config) return [];
-	if (config.kind === "invalid") return [invalidConfigCommand(config)];
+	if (!config) return { setup: null, run: null };
+	if (config.kind === "invalid")
+		return { setup: invalidConfigCommand(config), run: null };
+	const setup = chainPhases([config.resolved.setup], root);
 	const terminal = getDefaultTerminal(config.resolved);
-	const inDirectory = (step: PhaseCommand) => {
-		const dir = step.cwd ? resolve(root, step.cwd) : root;
-		return dir !== root && existsSync(dir)
-			? `(cd ${shellSingleQuote(dir)} && ${step.command})`
-			: step.command;
+	const setupDir = setup?.cwd ? resolve(root, setup.cwd) : root;
+	return {
+		setup:
+			setup && setupDir !== root && existsSync(setupDir)
+				? `(cd ${shellSingleQuote(setupDir)} && ${setup.command})`
+				: (setup?.command ?? null),
+		run: terminal ? chainPhases([terminal], root) : null,
 	};
-	return [
-		chainPhases([config.resolved.setup], root),
-		terminal ? chainPhases([terminal], root) : null,
-	]
-		.filter((step): step is PhaseCommand => step !== null)
-		.map(inDirectory);
+}
+
+let runTerminalId: string | null = null;
+
+/** The terminal the start hook started the default terminal in, for `sandbox.status`. */
+export function getStartHookRunTerminalId(): string | null {
+	return runTerminalId;
+}
+
+/**
+ * The default terminal runs in a terminal session, not beside setup: the
+ * port scanner only sees processes under a session, and the desktop adopts
+ * this session as the running workspace run instead of starting a second one.
+ */
+async function startRunTerminal(
+	ctx: Pick<HostServiceContext, "db" | "eventBus">,
+	identity: SandboxIdentity,
+	run: PhaseCommand,
+): Promise<{ terminalId: string; pid: number | null } | { error: string }> {
+	// A forced re-run keeps the server it already started.
+	if (runTerminalId && isLiveTerminalSession(runTerminalId))
+		return { terminalId: runTerminalId, pid: null };
+	const terminalId = crypto.randomUUID();
+	const result = await createTerminalSessionInternal({
+		terminalId,
+		workspaceId: identity.workspaceId,
+		db: ctx.db,
+		eventBus: ctx.eventBus,
+		initialCommand: run.command,
+		...(run.cwd && { cwd: run.cwd }),
+	});
+	if ("error" in result) return { error: result.error };
+	renameTerminalSession({
+		terminalId,
+		customTitle: "Workspace Run",
+		db: ctx.db,
+	});
+	runTerminalId = terminalId;
+	return { terminalId, pid: result.pty.pid };
 }
 
 /**
@@ -207,27 +256,52 @@ export function startHookCommands(identity: SandboxIdentity): string[] {
  * directory the boot runner clears.
  */
 export async function runSandboxStartHook(
+	ctx: Pick<HostServiceContext, "db" | "eventBus">,
 	identity: SandboxIdentity,
 	options: { force?: boolean } = {},
 ): Promise<StartHookOutcome> {
 	// `force` re-runs setup after an archive hook raced an undo on this boot.
 	if (!options.force && existsSync(START_HOOK_MARKER))
 		return { started: false, reason: "already-started" };
-	const commands = startHookCommands(identity);
-	if (commands.length === 0) return { started: false, reason: "no-hook" };
+	const plan = startHookPlan(identity);
+	const startRun = async () => {
+		if (!plan.run) return null;
+		const started = await startRunTerminal(ctx, identity, plan.run);
+		if ("error" in started)
+			console.warn(`[sandbox] run terminal not started: ${started.error}`);
+		return started;
+	};
+
+	if (!plan.setup) {
+		const started = await startRun();
+		if (!started || !plan.run) return { started: false, reason: "no-hook" };
+		if ("error" in started) {
+			return {
+				started: false,
+				reason: "failed",
+				command: plan.run.command,
+				log: started.error,
+			};
+		}
+		writeFileSync(START_HOOK_MARKER, `${started.pid ?? ""}\n`);
+		console.log(
+			`[sandbox] start hook running in terminal ${started.terminalId}: ${plan.run.command}`,
+		);
+		return {
+			started: true,
+			pid: started.pid ?? 0,
+			command: plan.run.command,
+		};
+	}
+
+	const command = plan.setup;
 	const log = openSync(START_HOOK_LOG, "a");
-	const command = commands.join("; ");
-	// Setup stops at its first failure; the terminal still starts after it.
-	const child = spawn(
-		"bash",
-		["-lc", commands.map((one) => `{ ${one}; }`).join("\n")],
-		{
-			cwd: identity.worktreePath,
-			env: buildStartHookEnv(process.env, getManagedEnv()),
-			stdio: ["ignore", log, log],
-			detached: true,
-		},
-	);
+	const child = spawn("bash", ["-lc", command], {
+		cwd: identity.worktreePath,
+		env: buildStartHookEnv(process.env, getManagedEnv()),
+		stdio: ["ignore", log, log],
+		detached: true,
+	});
 	child.unref();
 	const pid = child.pid ?? 0;
 	startHookState = { state: "running", command, pid, since: Date.now() };
@@ -239,6 +313,8 @@ export async function runSandboxStartHook(
 			since: Date.now(),
 			log: readTail(START_HOOK_LOG),
 		};
+		// Setup stops at its first failure; the terminal still starts after it.
+		void startRun();
 	});
 
 	// A command that daemonizes (tmux new-session -d) also exits at once, so

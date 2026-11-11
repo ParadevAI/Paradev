@@ -7,7 +7,7 @@ import {
 	withoutPendingLaunchReport,
 	withPendingLaunchReport,
 } from "./launchMarker";
-import { type SandboxIdentity, startHookCommands } from "./sandbox-self-seed";
+import { type SandboxIdentity, startHookPlan } from "./sandbox-self-seed";
 
 const claim = "claude 2026-05-01T00:00:00.000Z\n";
 const report = {
@@ -33,7 +33,7 @@ describe("launch marker recovery", () => {
 	});
 });
 
-describe("startHookCommands", () => {
+describe("startHookPlan", () => {
 	let root: string;
 	let previousRunMode: string | undefined;
 
@@ -50,10 +50,10 @@ describe("startHookCommands", () => {
 		else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
 	});
 
-	function commandsFor(toml: string) {
+	function planFor(toml: string) {
 		mkdirSync(join(root, ".superset"), { recursive: true });
 		writeFileSync(join(root, ".superset", "config.toml"), toml, "utf-8");
-		return startHookCommands({
+		return startHookPlan({
 			worktreePath: root,
 			workspaceId: "ws-1",
 		} as SandboxIdentity);
@@ -61,17 +61,31 @@ describe("startHookCommands", () => {
 
 	test("runs the cloud setup, then the default terminal", () => {
 		expect(
-			commandsFor(
+			planFor(
 				'[setup]\nrun = "local-setup"\n[setup.cloud]\nrun = "cloud-setup"\n[terminals.dev]\nrun = "bun dev"\ndefault = true\n',
 			),
-		).toEqual(["cloud-setup", "bun dev"]);
+		).toEqual({ setup: "cloud-setup", run: { command: "bun dev" } });
 	});
 
-	test("stops setup at its first failure but still starts the terminal", () => {
+	test("chains setup so it stops at its first failure", () => {
 		expect(
-			commandsFor(
+			planFor(
 				'[setup.cloud]\nrun = ["false", "touch ready"]\n[terminals.dev]\nrun = "bun dev"\ndefault = true\n',
 			),
-		).toEqual(["false && touch ready", "bun dev"]);
+		).toEqual({
+			setup: "false && touch ready",
+			run: { command: "bun dev" },
+		});
+	});
+
+	test("keeps the default terminal's cwd for its terminal session", () => {
+		expect(
+			planFor(
+				'[terminals.web]\nrun = "npm run dev"\ncwd = "apps/web"\ndefault = true\n',
+			),
+		).toEqual({
+			setup: null,
+			run: { command: "npm run dev", cwd: "apps/web" },
+		});
 	});
 });

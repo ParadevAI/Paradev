@@ -4,6 +4,7 @@ export {
 	runSandboxArchiveHook,
 } from "./sandbox-archive-hook";
 export {
+	getStartHookRunTerminalId,
 	getStartHookState,
 	launchSandboxAgentOnce,
 	readSandboxIdentity,

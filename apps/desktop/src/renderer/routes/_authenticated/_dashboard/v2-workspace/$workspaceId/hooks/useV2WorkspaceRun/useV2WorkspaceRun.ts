@@ -7,8 +7,9 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -22,6 +23,7 @@ import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
 const CTRL_C_INPUT = "\u0003";
+const BOOT_RUN_POLL_MS = 10_000;
 const TERMINAL_GONE_ERROR_MESSAGES = [
 	"Terminal session not found",
 	"Terminal session has exited",
@@ -123,6 +125,29 @@ export function useV2WorkspaceRun({
 			{ enabled: projectId !== null },
 		);
 
+	const hostTarget = useWorkspaceHostTarget(workspaceId);
+	const isSandbox =
+		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
+	// A cloud box starts the project's run terminal on boot, once setup ends.
+	// Hosts that predate `runTerminalId` never report one, so polling stops.
+	const { data: sandboxStatus } = workspaceTrpc.sandbox.status.useQuery(
+		undefined,
+		{
+			enabled: isSandbox && Boolean(configRunDefinition),
+			refetchInterval: (query) =>
+				query.state.data?.runTerminalId === null ? BOOT_RUN_POLL_MS : false,
+		},
+	);
+	const bootRunTerminalId = sandboxStatus?.runTerminalId ?? null;
+	const { data: liveSessions } = workspaceTrpc.terminal.list.useQuery(
+		{ workspaceId },
+		{ enabled: bootRunTerminalId !== null },
+	);
+	// The cached list can predate the boot terminal.
+	useEffect(() => {
+		if (bootRunTerminalId) void utils.terminal.list.invalidate({ workspaceId });
+	}, [bootRunTerminalId, utils, workspaceId]);
+
 	const resolvedMatchedPresets = useMemo(
 		() =>
 			matchedPresets.map((preset) => ({
@@ -167,6 +192,37 @@ export function useV2WorkspaceRun({
 		[collections.v2WorkspaceLocalState, workspaceId],
 	);
 
+	const isBootRunLive =
+		bootRunTerminalId !== null &&
+		(liveSessions?.sessions.some(
+			(session) => session.terminalId === bootRunTerminalId,
+		) ??
+			false);
+	const bootRunCommand = buildTerminalCommand(configRunDefinition?.commands);
+	useEffect(() => {
+		if (!isBootRunLive || !bootRunTerminalId || !projectId) return;
+		if (workspaceRunTerminals[bootRunTerminalId]) return;
+		updateWorkspaceRunTerminals((states) => {
+			states[bootRunTerminalId] ??= {
+				terminalId: bootRunTerminalId,
+				workspaceId,
+				state: "running",
+				command: bootRunCommand ?? "",
+				definitionSource: "project-config",
+				definitionId: projectId,
+				startedAt: Date.now(),
+			};
+		});
+	}, [
+		bootRunCommand,
+		bootRunTerminalId,
+		isBootRunLive,
+		projectId,
+		updateWorkspaceRunTerminals,
+		workspaceId,
+		workspaceRunTerminals,
+	]);
+
 	const startWorkspaceRun = useCallback(async () => {
 		if (isStartingRef.current) return;
 		const command = buildTerminalCommand(definition?.commands);
@@ -192,6 +248,19 @@ export function useV2WorkspaceRun({
 			// workspaceRunTerminals. Snapshot before launch so the new terminal
 			// we're about to create doesn't itself match.
 			const priorRunTerminalIds = new Set(Object.keys(workspaceRunTerminals));
+			// Ctrl-C can leave a server holding its port; the new run replaces
+			// these terminals in the pane, so nothing else would end them.
+			const { sessions } = await utils.terminal.list.fetch({ workspaceId });
+			await Promise.allSettled(
+				sessions
+					.filter((session) => priorRunTerminalIds.has(session.terminalId))
+					.map((session) =>
+						killSessionMutation.mutateAsync({
+							terminalId: session.terminalId,
+							workspaceId,
+						}),
+					),
+			);
 
 			const terminalId = await launcher.create({
 				command,
@@ -260,10 +329,12 @@ export function useV2WorkspaceRun({
 		}
 	}, [
 		definition,
+		killSessionMutation,
 		launcher,
 		store,
 		t,
 		updateWorkspaceRunTerminals,
+		utils,
 		workspaceId,
 		workspaceRunTerminals,
 	]);
