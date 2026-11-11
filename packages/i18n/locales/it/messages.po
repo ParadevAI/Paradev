@@ -229,6 +229,10 @@ msgstr "{0, plural, one {# progetto selezionato.} other {# progetti selezionati.
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# progetto} other {# progetti}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, one {# pull request} other {# pull request}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -896,6 +900,9 @@ msgstr "{count, plural, one {# passaggio} other {# passaggi}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree in questo repository non ha un workspace. Verrà importato come workspace.} other {# worktree in questo repository non hanno un workspace. Verranno importati come workspace.}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, one {Aggiungere # pull request alla coda di unione?} other {Aggiungere # pull request alla coda di unione?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {ha aggiunto un commit} other {ha aggiunto # commit}}"
 
@@ -931,6 +938,9 @@ msgstr "{count, plural, one {recuperata # pagina} other {recuperate # pagine}}"
 
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Importa # worktree} other {Importa # worktree}}"
+
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, one {Unire # pull request?} other {Unire # pull request?}}"
 
 msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
 msgstr "{count, plural, one {# automazione spostata in {group}} other {# automazioni spostate in {group}}}"
@@ -982,6 +992,9 @@ msgstr "{credit} di credito verrà scalato dalle prossime fatture."
 
 msgid "{current} of {total}"
 msgstr "{current} di {total}"
+
+msgid "{current} of {total}+"
+msgstr "{current} di {total}+"
 
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} di {totalBranches}"
@@ -1316,6 +1329,9 @@ msgstr "{prompt} · # per cambiare progetto, host e altro"
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · verso {base}"
+
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# messaggio in attesa nella coda} other {# messaggi in attesa nella coda}}"
 
@@ -1498,6 +1514,30 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} è stata unita e questo branch contiene ancora i suoi commit."
+
+msgid "#{number} has changes requested."
+msgstr "Su #{number} sono state richieste modifiche."
+
+msgid "#{number} has conflicts."
+msgstr "#{number} ha conflitti."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} è chiusa senza essere stata unita."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} non è pronta per l'unione."
+
+msgid "#{number} is still a draft."
+msgstr "#{number} è ancora una bozza."
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} è in attesa di un controllo o di una regola obbligatoria."
+
+msgid "#{number} needs a review."
+msgstr "#{number} ha bisogno di una revisione."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -1944,6 +1984,9 @@ msgstr "Account in attesa di eliminazione"
 msgid "Account usage"
 msgstr "Utilizzo dell’account"
 
+msgid "Account usage: {percent} used"
+msgstr "Utilizzo dell'account: {percent} utilizzato"
+
 msgid "Achievements"
 msgstr "Riconoscimenti"
 
@@ -2017,6 +2060,9 @@ msgstr "Aggiungi prima {repositoryName} come progetto su {computer}"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Aggiungi prima {repositoryName} come progetto su questo computer"
+
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "Aggiungere #{prNumber} alla coda di unione?"
 
 msgid "Add a comment…"
 msgstr "Aggiungi un commento…"
@@ -2169,6 +2215,9 @@ msgstr "Aggiungi script"
 msgid "Add setup commands, one per line..."
 msgstr "Aggiungi i comandi di setup, uno per riga..."
 
+msgid "Add stack to merge queue"
+msgstr "Aggiungi lo stack alla coda di unione"
+
 msgid "Add tag…"
 msgstr "Aggiungi tag…"
 
@@ -2205,8 +2254,14 @@ msgstr "Aggiungi al dizionario"
 msgid "Add to favorites"
 msgstr "Aggiungi ai preferiti"
 
+msgid "Add to merge queue"
+msgstr "Aggiungi alla coda di unione"
+
 msgid "Add to project"
 msgstr "Aggiungi a un progetto"
+
+msgid "Add to queue"
+msgstr "Metti in coda"
 
 msgid "Add to sidebar"
 msgstr "Aggiungi alla barra laterale"
@@ -2244,9 +2299,15 @@ msgstr "Aggiunti solo quando si avvia con un prompt, es. <0>--</0>, <1>--prompt<
 msgid "Added to agent input"
 msgstr "Aggiunto all'input dell'agente"
 
+msgid "Added to merge queue"
+msgstr "Aggiunta alla coda di unione"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Per aggiungere persone a {organizationName} serve un piano a pagamento. Il piano della tua organizzazione è gestito dal suo proprietario su {0}."
+
+msgid "Adding to queue…"
+msgstr "Aggiunta alla coda…"
 
 msgid "Adding..."
 msgstr "Aggiunta in corso..."
@@ -2350,9 +2411,6 @@ msgstr "Esecuzione dell’agente non riuscita"
 msgid "Agent self-verification"
 msgstr "Auto-verifica degli agenti"
 
-msgid "agent session ID"
-msgstr "ID della sessione dell'agente"
-
 msgid "Agent session started"
 msgstr "Sessione dell'agente avviata"
 
@@ -2381,6 +2439,9 @@ msgstr "Gli agenti completano i ticket di routine senza interventi a metà task.
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Gli agenti nei tuoi workspace cloud potranno usare <0>--host</0> per eseguire comandi su questo host. L'host deve essere raggiungibile tramite il relay."
 
+msgid "Agents in your pocket"
+msgstr "I tuoi agenti in tasca"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Gli agenti continuano a lavorare nel cloud. Riapri lo spazio di lavoro da desktop, iPhone o iPad."
 
@@ -2408,8 +2469,8 @@ msgstr "Gli agenti vedono solo un segnaposto. Paradev aggiunge il tuo accesso al
 msgid "Agents that run while you're away"
 msgstr "Agenti che lavorano mentre sei via"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Gli agenti smistano le issue, scrivono i changelog e aggiornano le dipendenze da soli. Tu revisioni le PR."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Gli agenti smistano le issue, scrivono i changelog e aggiornano le dipendenze da soli."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Gli agenti usano questo account quando chiamano gli strumenti di Linear."
@@ -3443,6 +3504,9 @@ msgstr "Torna alle integrazioni"
 msgid "Back to Linear"
 msgstr "Torna a Linear"
 
+msgid "Back to main chat"
+msgstr "Torna alla chat principale"
+
 msgid "Back to pages"
 msgstr "Torna alle pagine"
 
@@ -3518,6 +3582,9 @@ msgstr "Prima"
 msgid "Behavior"
 msgstr "Comportamento"
 
+msgid "Behind base"
+msgstr "Indietro rispetto alla base"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Indietro di ? commit rispetto a main, serve un rebase"
 
@@ -3568,6 +3635,10 @@ msgstr "Bloccare i contenuti in qualsiasi pagina"
 
 msgid "blocked"
 msgstr "bloccata"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "Bloccata"
 
 msgid "Blocked by Branch Rules"
 msgstr "Bloccata dalle regole del branch"
@@ -4200,8 +4271,8 @@ msgstr "La chat è in fase di rifacimento"
 msgid "Chat Launch"
 msgstr "Avvio in chat"
 
-msgid "Chat mode"
-msgstr "Modalità chat"
+msgid "Chat name"
+msgstr "Nome della chat"
 
 msgid "Chat session not found"
 msgstr "Sessione di chat non trovata"
@@ -4260,6 +4331,10 @@ msgstr "Controlla la tua casella di posta"
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "Verifica in corso"
+
 msgid "Checking agents…"
 msgstr "Verifica degli agenti…"
 
@@ -4311,6 +4386,9 @@ msgstr "Controlli completati"
 
 msgid "Checks failed"
 msgstr "Controlli falliti"
+
+msgid "Checks failing"
+msgstr "Controlli non superati"
 
 msgid "Checks passed"
 msgstr "Controlli superati"
@@ -4516,9 +4594,6 @@ msgstr "CLI e SDK"
 
 msgid "CLI docs"
 msgstr "Documentazione CLI"
-
-msgid "CLI mode"
-msgstr "Modalità CLI"
 
 msgid "CLI reference"
 msgstr "Riferimento CLI"
@@ -5141,6 +5216,10 @@ msgstr "Chiedi conferma prima di uscire"
 msgid "Confirm switch"
 msgstr "Conferma cambio"
 
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "Conflitti"
+
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Conflitti con {0}"
@@ -5496,14 +5575,8 @@ msgstr "Copiato"
 msgid "Copied {0}"
 msgstr "Copiato {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} copiato"
-
 msgid "Copied Link"
 msgstr "Link copiato"
-
-msgid "Copied terminal ID"
-msgstr "ID del terminale copiato"
 
 msgid "Copied to clipboard."
 msgstr "Copiato negli appunti."
@@ -5570,9 +5643,6 @@ msgstr "Copia il nome del file"
 
 msgid "Copy ID"
 msgstr "Copia l'ID"
-
-msgid "Copy IDs"
-msgstr "Copia gli ID"
 
 msgid "Copy image"
 msgstr "Copia immagine"
@@ -6063,6 +6133,9 @@ msgstr "Impossibile copiare l’immagine"
 msgid "Couldn't copy the screenshot"
 msgstr "Impossibile copiare lo screenshot"
 
+msgid "Couldn't create stack"
+msgstr "Impossibile creare lo stack"
+
 msgid "Couldn't create the channel"
 msgstr "Impossibile creare il canale"
 
@@ -6143,6 +6216,9 @@ msgstr "Impossibile contrassegnare come pronta per la revisione"
 msgid "Couldn't merge pull request"
 msgstr "Impossibile unire la pull request"
 
+msgid "Couldn't merge stack"
+msgstr "Impossibile unire lo stack"
+
 msgid "Couldn't move {name}"
 msgstr "Impossibile spostare {name}"
 
@@ -6192,6 +6268,9 @@ msgstr "Impossibile leggere il contesto di questo terminale."
 
 msgid "Couldn't read usage history from this host."
 msgstr "Impossibile leggere la cronologia di utilizzo da questo host."
+
+msgid "Couldn't remove from the merge queue"
+msgstr "Impossibile rimuovere dalla coda di unione"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Impossibile rimuovere l'accesso locale"
@@ -6299,6 +6378,9 @@ msgstr "Impossibile interrompere l'attività in background"
 msgid "Couldn't stop the chat"
 msgstr "Non è stato possibile arrestare la chat"
 
+msgid "Couldn't switch to #{number}"
+msgstr "Impossibile passare a #{number}"
+
 msgid "Couldn't take a screenshot"
 msgstr "Impossibile acquisire lo screenshot"
 
@@ -6355,9 +6437,6 @@ msgstr "Crea un ambiente cloud"
 
 msgid "Create a Dev"
 msgstr "Crea un Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Crea un fork nativo del provider con lo stesso contesto della conversazione. La sessione originale resta invariata."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Crea una nuova chiave API per integrazioni esterne come Claude Desktop o Claude Code."
@@ -6455,6 +6534,9 @@ msgstr "Crea progetto…"
 
 msgid "Create pull request"
 msgstr "Crea la pull request"
+
+msgid "Create stack"
+msgstr "Crea stack"
 
 msgid "Create task"
 msgstr "Crea il task"
@@ -8021,6 +8103,9 @@ msgstr "Ogni minuto"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Tutti gli obiettivi stanno facendo la loro parte per il gradino successivo. Misurato sugli ultimi 30 giorni."
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "Ogni pull request aperta fino a #{prNumber} entra in ordine nella coda di unione di {base}. GitHub le unisce quando arriva il loro turno e i loro controlli passano."
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "Ogni piano a pagamento include Paradev Mobile, automazioni e supporto prioritario. I piani con workspace cloud danno al team un unico pool condiviso di GB-ore."
 
@@ -8927,11 +9012,17 @@ msgstr "Cerca nel visualizzatore di file"
 msgid "Find in page"
 msgstr "Trova nella pagina"
 
+msgid "Find in Page"
+msgstr "Trova nella pagina"
+
 msgid "Find in Terminal"
 msgstr "Cerca nel terminale"
 
 msgid "Find in this chat"
 msgstr "Cerca in questa chat"
+
+msgid "Find is not available for this page"
+msgstr "La ricerca non è disponibile per questa pagina"
 
 msgid "Find people and Devs"
 msgstr "Trova persone e Dev"
@@ -9185,11 +9276,11 @@ msgstr "Argomenti di fork"
 msgid "Fork conversation"
 msgstr "Dirama conversazione"
 
-msgid "Fork session"
-msgstr "Biforca sessione"
+msgid "Fork into Chat"
+msgstr "Crea un fork nella chat"
 
-msgid "Fork session…"
-msgstr "Biforca sessione…"
+msgid "Fork into CLI"
+msgstr "Crea un fork nella CLI"
 
 msgid "Form controls and field composition"
 msgstr "Controlli dei form e composizione dei campi"
@@ -9456,6 +9547,9 @@ msgstr "L'installazione della GitHub App è stata annullata."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App installata con successo!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub non può unire questo stack in un solo passaggio qui."
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub collegato, ma la sincronizzazione iniziale non è partita. Prova a ricollegarlo."
 
@@ -9468,8 +9562,14 @@ msgstr "Installazione GitHub non trovata"
 msgid "GitHub integration"
 msgstr "Integrazione GitHub"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub sta ancora unendo. Si aggiornerà al termine."
+
 msgid "GitHub issues"
 msgstr "Issue GitHub"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "GitHub la unisce quando arriva il suo turno e i suoi controlli passano."
 
 msgid "GitHub rate limit reached"
 msgstr "Limite di richieste GitHub raggiunto"
@@ -9482,6 +9582,12 @@ msgstr "Repository GitHub con un file di marketplace di plugin. Superset sincron
 
 msgid "GitHub sign-in needed"
 msgstr "Accesso a GitHub necessario"
+
+msgid "GitHub stack created"
+msgstr "Stack GitHub creato"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "Gli stack di GitHub non sono attivi per questo repository."
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "La sincronizzazione di GitHub richiede il piano Pro."
@@ -9690,6 +9796,9 @@ msgstr "\"{0}\" nascosto dalla barra laterale"
 
 msgid "Hidden folders"
 msgstr "Cartelle nascoste"
+
+msgid "Hidden from the sidebar"
+msgstr "Nascosto dalla barra laterale"
 
 msgid "Hidden until you join"
 msgstr "Nascosta finché non partecipi"
@@ -10217,6 +10326,12 @@ msgstr "In revisione"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "Nell'app desktop di {appName}, apri Impostazioni → Accesso remoto e attiva “Consenti l'accesso remoto a questo dispositivo tramite relay”."
 
+msgid "In the merge queue"
+msgstr "Nella coda di unione"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "Nella coda di unione. GitHub la unisce quando arriva il suo turno."
+
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Nell'app desktop di Paradev, apri <0>Impostazioni → Aspetto → Tema</0>."
 
@@ -10624,6 +10739,9 @@ msgstr "Potrebbe essere in stop"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Potrebbe essere stata eliminata oppure appartiene a un'altra organizzazione."
+
+msgid "It must join again and pass its checks to merge."
+msgstr "Per essere unita deve rientrare in coda e superare i controlli."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Bastano pochi minuti. Usi Conductor Cloud? Inizia dalla <0>guida al cloud</0>."
@@ -11053,6 +11171,9 @@ msgstr "Lascia il canale"
 
 msgid "Leave comment mode"
 msgstr "Esci dalla modalità commento"
+
+msgid "Leave it empty to go back to the default name."
+msgstr "Lascia vuoto per tornare al nome predefinito."
 
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Lascialo vuoto per tornare al nome indicato dal terminale."
@@ -11836,6 +11957,9 @@ msgstr "Unisci"
 msgid "Merge #{0}?"
 msgstr "Unire #{0}?"
 
+msgid "Merge #{prNumber}?"
+msgstr "Unire #{prNumber}?"
+
 msgid "Merge commit"
 msgstr "Commit di merge"
 
@@ -11852,11 +11976,20 @@ msgstr "Unisci la pull request"
 msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
 msgstr "Unisci le pull request senza uscire da Paradev, più una serie di correzioni e rifiniture alla chat."
 
+msgid "Merge stack"
+msgstr "Unisci lo stack"
+
 msgid "Merge status"
 msgstr "Stato del merge"
 
+msgid "Merge status pending"
+msgstr "Stato di unione in attesa"
+
 msgid "Merge status unknown"
 msgstr "Stato del merge sconosciuto"
+
+msgid "Mergeable with failing checks"
+msgstr "Unibile con controlli non superati"
 
 msgid "Merged"
 msgstr "Unita"
@@ -11877,6 +12010,9 @@ msgstr "Merge della PR in corso..."
 
 msgid "Merging pull request"
 msgstr "Merge della pull request in corso"
+
+msgid "Merging stack…"
+msgstr "Unione dello stack…"
 
 msgid "Merging…"
 msgstr "Unione in corso…"
@@ -12347,6 +12483,9 @@ msgstr "Nuovo browser"
 
 msgid "new challengers"
 msgstr "nuovi sfidanti"
+
+msgid "New chat"
+msgstr "Nuova chat"
 
 msgid "New Chat"
 msgstr "Nuova chat"
@@ -13901,9 +14040,6 @@ msgstr "Apri nel browser"
 msgid "Open in Changes pane"
 msgstr "Apri nel pannello Modifiche"
 
-msgid "Open in Chat Interface"
-msgstr "Apri nell’interfaccia chat"
-
 msgid "Open in ChatGPT"
 msgstr "Apri in ChatGPT"
 
@@ -13978,9 +14114,6 @@ msgstr "Apri in una scheda"
 
 msgid "Open in Tasks"
 msgstr "Apri in Attività"
-
-msgid "Open in Terminal Chat"
-msgstr "Apri nella chat del terminale"
 
 msgid "Open in…"
 msgstr "Apri in…"
@@ -14073,9 +14206,6 @@ msgstr "Apri recenti"
 
 msgid "Open roles"
 msgstr "Posizioni aperte"
-
-msgid "Open session in"
-msgstr "Apri sessione in"
 
 msgid "Open settings"
 msgstr "Apri le impostazioni"
@@ -15090,6 +15220,9 @@ msgstr "Pubblica la risposta"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position} di {size} · verso {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} · {1}"
@@ -15475,10 +15608,6 @@ msgstr "Proprietà"
 msgid "Provide either id or slug"
 msgstr "Fornisci un id oppure uno slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Provider: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Il provisioning non è riuscito e la sandbox è stata smontata. Non è in esecuzione nulla e questo workspace non può essere aperto. Creane uno nuovo per riprovare."
 
@@ -15542,6 +15671,9 @@ msgstr "Azioni sulla pull request"
 msgid "Pull request detail tabs"
 msgstr "Schede del dettaglio della pull request"
 
+msgid "Pull request merged"
+msgstr "Pull request unita"
+
 msgid "Pull request not found"
 msgstr "Pull request non trovata"
 
@@ -15556,6 +15688,9 @@ msgstr "Pull request"
 
 msgid "Pull Requests"
 msgstr "Pull request"
+
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "Le pull request sopra resteranno aperte e GitHub ne cambierà la destinazione."
 
 msgid "Pull requests, comments and pushes from Superset are made as you."
 msgstr "Le pull request, i commenti e i push da Superset sono fatti a tuo nome."
@@ -15619,6 +15754,9 @@ msgstr "Coda in pausa per il limite di utilizzo"
 msgid "Queue paused when Paradev closed"
 msgstr "Coda in pausa alla chiusura di Paradev"
 
+msgid "Queue stack"
+msgstr "Metti in coda lo stack"
+
 msgid "Queue work for agents"
 msgstr "Metti in coda il lavoro per gli agenti"
 
@@ -15627,6 +15765,9 @@ msgstr "In coda; ⌘↩ per interrompere e inviare nel turno in corso"
 
 msgid "Queued"
 msgstr "In coda"
+
+msgid "Queued · {position}"
+msgstr "In coda · {position}"
 
 msgid "Queued messages"
 msgstr "Messaggi in coda"
@@ -15864,6 +16005,10 @@ msgstr "Pronto in"
 msgid "Ready on every machine you sign into and in every cloud workspace."
 msgstr "Pronto su ogni macchina dove accedi e in ogni workspace cloud."
 
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "Pronta per l'unione"
+
 msgid "Ready to Merge"
 msgstr "Pronta per il merge"
 
@@ -15893,6 +16038,9 @@ msgstr "Attività recente"
 
 msgid "Recent apps"
 msgstr "App recenti"
+
+msgid "Recent chats"
+msgstr "Chat recenti"
 
 msgid "Recent invoices"
 msgstr "Fatture recenti"
@@ -16128,6 +16276,9 @@ msgstr "Rimuovere {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Rimuovere {repo}? Tutti i plugin sincronizzati da questo repository vengono rimossi dalla tua organizzazione e da ogni membro che li ha installati."
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "Rimuovere #{prNumber} dalla coda di merge?"
+
 msgid "Remove attachment"
 msgstr "Rimuovi allegato"
 
@@ -16142,6 +16293,9 @@ msgstr "Rimuovi dai preferiti"
 
 msgid "Remove from group"
 msgstr "Rimuovi dal gruppo"
+
+msgid "Remove from queue"
+msgstr "Rimuovi dalla coda"
 
 msgid "Remove from Queue"
 msgstr "Rimuovi dalla coda"
@@ -16224,6 +16378,9 @@ msgstr "{name} rimosso"
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel} rimosso."
 
+msgid "Removed from the merge queue"
+msgstr "Rimossa dalla coda di unione"
+
 msgid "Removes this agent from this device only."
 msgstr "Rimuove questo agente solo da questo dispositivo."
 
@@ -16244,6 +16401,9 @@ msgstr "Rinomina account"
 
 msgid "Rename branch"
 msgstr "Rinomina il branch"
+
+msgid "Rename chat"
+msgstr "Rinomina la chat"
 
 msgid "Rename failed"
 msgstr "Rinomina non riuscita"
@@ -16569,6 +16729,9 @@ msgstr "Risorse"
 
 msgid "Response"
 msgstr "Risposta"
+
+msgid "Restack"
+msgstr "Restack"
 
 msgid "Restart"
 msgstr "Riavvia"
@@ -17019,6 +17182,9 @@ msgstr "Esegui ora"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Esegui secondo una pianificazione o con eventi, su richiesta, metti in pausa, riprendi e leggi i log."
 
+msgid "Run on any machine"
+msgstr "Su qualsiasi macchina"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Esegui agenti di coding in parallelo su funzioni, fix e refactor. Ognuno lavora sul proprio branch, in locale o nel cloud."
 
@@ -17117,6 +17283,9 @@ msgstr "Eseguito quando viene creato uno spazio di lavoro."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Eseguito quando viene eliminato uno spazio di lavoro."
+
+msgid "Runs while you sleep"
+msgstr "Lavora mentre dormi"
 
 msgid "Same session"
 msgstr "Stessa sessione"
@@ -17301,6 +17470,9 @@ msgstr "Cerca uno sviluppatore"
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Cerca nel contenuto dei file e in tutti i tuoi workspace insieme."
 
+msgid "Search all chats…"
+msgstr "Cerca in tutte le chat…"
+
 msgid "Search all emoji"
 msgstr "Cerca tutte le emoji"
 
@@ -17439,6 +17611,9 @@ msgstr "Cerca nei task…"
 msgid "Search text in the active chat"
 msgstr "Cerca testo nella chat attiva"
 
+msgid "Search text in the active page"
+msgstr "Cerca testo nella pagina attiva"
+
 msgid "Search text in the active terminal"
 msgstr "Cerca testo nel terminale attivo"
 
@@ -17560,6 +17735,9 @@ msgstr "Vedi questo gate nella scheda di valutazione"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Guarda cosa è cambiato, dai un feedback e unisci il lavoro quando è pronto."
+
+msgid "See what it can do"
+msgstr "Scopri cosa può fare"
 
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Scopri cosa stiamo costruendo ora, cosa arriverà dopo e dove è diretto Paradev."
@@ -17732,6 +17910,9 @@ msgstr "Azioni sui workspace selezionati"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Selezionare del testo in un terminale lo copia subito negli appunti, senza gli spazi finali"
+
+msgid "Self-hosted"
+msgstr "Self-hosted"
 
 msgid "Send"
 msgstr "Invia"
@@ -18186,6 +18367,9 @@ msgstr "Mostra menu del link"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Mostrami le ultime 10 esecuzioni della mia automazione di triage su Linear"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Mostrami cosa sa fare la CLI di Paradev. Esegui `superset --help` e `superset schema` per vedere i suoi comandi, poi prova alcuni comandi di sola lettura sul mio account: `superset workspaces list`, `superset tasks list`, `superset automations list` e `superset hosts list`. Riassumi cosa hai trovato e suggerisci tre modi in cui potrei usare o automatizzare la CLI nel mio flusso di lavoro. Non creare, modificare o eliminare nulla."
+
 msgid "Show more"
 msgstr "Mostra altro"
 
@@ -18236,6 +18420,9 @@ msgstr "Mostra la scheda successiva nella barra laterale destra senza spostare i
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Mostra la scheda precedente nella barra laterale destra senza spostare il focus"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Mostra il pulsante della barra laterale con i link a Mobile, Cloud, la CLI e Self-hosted."
 
 msgid "Show the triggering payload"
 msgstr "Mostra il payload che ha attivato questa esecuzione"
@@ -18788,6 +18975,28 @@ msgstr "SSO/SAML"
 
 msgid "Stability improvements"
 msgstr "Miglioramenti di stabilità"
+
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "Stack #{stackNumber} · PR {position} di {size} · verso {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "Stack #{stackNumber} · verso {base}"
+
+msgid "Stack added to merge queue"
+msgstr "Stack aggiunto alla coda di unione"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "Impossibile caricare i dettagli dello stack. Aggiorna prima di unire."
+
+msgid "Stack merged"
+msgstr "Stack unito"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "Stack unito"
+
+msgid "Stack needs attention"
+msgstr "Lo stack richiede attenzione"
 
 msgid "Stacked"
 msgstr "Impilato"
@@ -19608,9 +19817,6 @@ msgstr "Dimensione del font del terminale"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Dimensione del carattere del terminale quando un terminale ha il focus, zoom della pagina in un riquadro browser, altrimenti l'intera app"
 
-msgid "terminal ID"
-msgstr "ID del terminale"
-
 msgid "Terminal input"
 msgstr "Input del terminale"
 
@@ -19630,9 +19836,6 @@ msgid "Terminal session killed"
 msgstr "Sessione del terminale terminata"
 
 msgid "Terminal sessions"
-msgstr "Sessioni del terminale"
-
-msgid "Terminal Sessions"
 msgstr "Sessioni del terminale"
 
 msgid "Terminal theme color-palette preview"
@@ -20111,6 +20314,12 @@ msgstr "Il certificato del sito è scaduto"
 msgid "The site's certificate is invalid"
 msgstr "Il certificato del sito non è valido"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "Lo stack è cambiato nel frattempo. Controllalo e riprova."
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "Anche le pull request impilate sopra escono dalla coda. Ciascuna deve rientrare e superare i controlli."
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Il punto di partenza da cui si avvia un workspace cloud — un'immagine base, o una sandbox che hai configurato e vuoi forkare."
 
@@ -20173,6 +20382,9 @@ msgstr "Theme Preview Card"
 
 msgid "Themes"
 msgstr "Temi"
+
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Sono collegate tramite il branch di base, quindi ciascuna viene unita in quella sottostante. Uno stack GitHub le unisce in un solo passaggio."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Questi comandi vengono eseguiti automaticamente quando viene creato un workspace. <0>Leggi la documentazione<1/></0>"
@@ -20577,6 +20789,15 @@ msgstr "Questa vista ha riscontrato un errore"
 msgid "This week"
 msgstr "Questa settimana"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "Tutte le pull request aperte fino a #{prNumber} verranno unite in modo atomico in {base} con un merge commit."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "Tutte le pull request aperte fino a #{prNumber} verranno unite in modo atomico in {base} con rebase."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "Tutte le pull request aperte fino a #{prNumber} verranno unite in modo atomico in {base} con squash."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "Questo cambierà l'URL pubblico della tua organizzazione. Assicurati di aggiornare eventuali segnalibri o link condivisi."
 
@@ -20586,6 +20807,15 @@ msgstr "Questo eliminerà <0>{0}</0> e rimuoverà tutti i suoi membri. L'operazi
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Questo terminerà tutte le sessioni in esecuzione e riavvierà il daemon del terminale. L'app riavvierà i terminali con un daemon nuovo."
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber} verrà unita in {base} con un merge commit."
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "#{prNumber} verrà unita in {base} con rebase."
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "#{prNumber} verrà unita in {base} con squash."
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "La routine verrà eliminata definitivamente e le esecuzioni future verranno interrotte."
@@ -21006,6 +21236,9 @@ msgstr "Tunnel stabilito"
 
 msgid "Turn Fast mode on or off"
 msgstr "Attiva o disattiva la modalità veloce"
+
+msgid "Turn it back on in Settings → General."
+msgstr "Puoi riattivarlo in Impostazioni → Generali."
 
 msgid "Turn off"
 msgstr "Disattiva"
@@ -21562,6 +21795,12 @@ msgstr "Usa l’accesso manuale"
 msgid "Use more browser features: {features}"
 msgstr "Usare altre funzioni del browser: {features}"
 
+msgid "Use Paradev anywhere"
+msgstr "Usa Paradev ovunque"
+
+msgid "Use Paradev anywhere button"
+msgstr "Pulsante \"Usa Paradev ovunque\""
+
 msgid "Use Paradev on mobile"
 msgstr "Usa Paradev sul cellulare"
 
@@ -21750,6 +21989,9 @@ msgstr "Visualizza a grandezza intera"
 msgid "View in GitHub"
 msgstr "Vedi in GitHub"
 
+msgid "View instead"
+msgstr "Visualizza invece"
+
 msgid "View log"
 msgstr "Vedi il log"
 
@@ -21786,8 +22028,18 @@ msgstr "Visualizza le note di rilascio"
 msgid "View releases on GitHub"
 msgstr "Vedi le release su GitHub"
 
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "Mostra lo stack {stackNumber}, pull request {position} di {size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "Mostra lo stack, pull request {position} di {size}"
+
 msgid "View usage"
 msgstr "Vedi utilizzo"
+
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "Visualizzata"
 
 msgid "Violence or harassment"
 msgstr "Violenza o molestie"

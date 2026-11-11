@@ -48,15 +48,14 @@ import {
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
-import { SymmetricResizeHandles } from "renderer/routes/_authenticated/components/SymmetricResizeHandles";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import {
-	NEW_WORKSPACE_SCREEN_MAX_WIDTH,
-	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
+	CHAT_MAX_WIDTH,
+	CHAT_MIN_WIDTH,
+	useChatWidthStore,
 	useLiveChatWidthStore,
-	useNewWorkspaceWidthStore,
-} from "renderer/stores/new-workspace-width";
+} from "renderer/stores/chat-width";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
@@ -69,6 +68,7 @@ import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { SymmetricResizeHandles } from "./components/SymmetricResizeHandles";
 import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
@@ -268,9 +268,7 @@ export const Composer = memo(function Composer({
 	);
 	const rootRef = useRef<HTMLDivElement>(null);
 	const footerTier = useFooterTier(rootRef);
-	const setChatWidth = useNewWorkspaceWidthStore(
-		(state) => state.setScreenWidth,
-	);
+	const setChatWidth = useChatWidthStore((state) => state.setWidth);
 	const setLiveChatWidth = useLiveChatWidthStore((state) => state.setWidth);
 	const composerId = useId();
 	useEffect(() => {
@@ -636,8 +634,8 @@ export const Composer = memo(function Composer({
 			)}
 			<div className={cn(CHAT_COLUMN_CLASSNAME, "relative")}>
 				<SymmetricResizeHandles
-					minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
-					maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
+					minWidth={CHAT_MIN_WIDTH}
+					maxWidth={CHAT_MAX_WIDTH}
 					onWidthChange={setLiveChatWidth}
 					onWidthCommit={(width) => {
 						setChatWidth(width);

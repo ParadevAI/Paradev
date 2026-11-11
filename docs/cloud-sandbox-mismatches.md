@@ -24,6 +24,13 @@ linking it. Failed reports stay in the launch marker for retry on restart, witho
 agent. **Open:** a process crash between session creation and writing the report can still lose the
 session link. Changes in this path require a published host-service/sandbox bundle.
 
+**A box asks the API as its own credential, not as a signed-in person.** Host-service on a
+machine someone owns calls `chatHistory.syncEnabled` with the person's session. A box calls it with
+the sandbox credential, and the sandbox scope refuses any procedure missing from
+`SANDBOX_ALLOWED_PROCEDURES`. `syncEnabled` was missing, so every box logged `[chat-sync] could not
+ask whether to sync` every 5 minutes and stored no chats. We added it to the list. Any new procedure
+host-service calls on a box must go in that list too.
+
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.
 A cloud workspace is created, named (by the API's namer) and listed by the

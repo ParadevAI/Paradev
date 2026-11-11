@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { useHotkey } from "renderer/hotkeys";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { rowElement } from "../../utils/rowElement";
 import { toolTitleText } from "../../utils/toolTitle";
 import {
@@ -234,8 +235,9 @@ export function useTranscriptFind({
 		inputRef.current?.select();
 	}, [isOpen]);
 
+	const findEnabled = usePaneHotkeyEnabled(isActive);
 	useHotkey("FIND_IN_CHAT", show, {
-		enabled: isActive,
+		enabled: findEnabled,
 		preventDefault: true,
 		ignoreEventWhen: insideForeignFindScope,
 	});

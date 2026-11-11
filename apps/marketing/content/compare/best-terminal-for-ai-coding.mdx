@@ -1,11 +1,12 @@
 ---
 title: "Best Terminal for AI Coding Agents in 2026"
-description: "Compare the best terminals for AI coding workflows, including Paradev, Warp, iTerm2, Ghostty, kitty, Alacritty, and WezTerm."
+description: "Compare the best terminals for AI coding workflows, including Paradev, Warp, Rex, iTerm2, Ghostty, kitty, Alacritty, and WezTerm."
 date: 2026-03-20
-lastUpdated: 2026-11-05
+lastUpdated: 2026-11-10
 type: "roundup"
 competitors:
   - warp
+  - rex
   - iterm2
   - ghostty
   - kitty
@@ -17,6 +18,8 @@ keywords:
   - ai coding terminal
   - terminal for claude code
   - terminal for codex
+  - rex terminal multiplexer
+  - superlogical rex
   - warp alternative
 ---
 
@@ -53,6 +56,7 @@ This article is published by Paradev. The recommendations describe workflow fit;
 |---|---|---|---|---|
 | **Paradev** | Organizing, reviewing, and returning to CLI-agent tasks | Bring your own agents, plus a chat interface | Git worktrees for new local branch-based workspaces | Not a classic SSH-first or shell-first terminal emulator |
 | **Warp** | One app for terminal + built-in AI | Built-in agents plus third-party CLI agents | Partially - agent support without automatic worktree isolation per task | More opinionated workflow and cloud-connected AI features |
+| **Rex** | A long-lived multiplexer with agent status built in | None built in; ships a skill that lets agents drive the app | No - pair with Git worktrees | In invite-only beta, macOS client only |
 | **iTerm2** | macOS power users who want a mature terminal | None built in | No - use manual Git worktrees or tmux | Great terminal, no agent orchestration layer |
 | **Ghostty** | Fast, modern, native-feeling daily driver | None built in | No - pair with Git worktrees or zellij/tmux | Focused on terminal quality, not AI workflow management |
 | **kitty** | Keyboard-heavy automation and scripting | None built in | No - pair with manual Git discipline | Powerful, but more DIY |
@@ -101,6 +105,22 @@ Warp is the strongest all-in-one option if you want built-in agents inside a pol
 Warp is the right fit if you want AI features without assembling your own stack. It is less opinionated about per-task worktrees than Paradev, which matters once multiple agents work against the same repository.
 
 For the direct comparison, see [Paradev vs Warp](/compare/superset-vs-warp).
+
+### Rex
+
+Rex is the first product from Superlogical, the company Mitchell Hashimoto, creator of Ghostty, started in 2026. It is a multiplexer built around long-lived sessions: a server keeps a session running whether or not a client is attached, windows hold tabs, and blocks hold the terminals. Configuration is Lua in a single `init.lua`, with key modes, custom actions, and event scripts.
+
+Two things make it relevant to agent work. `rex skill setup` installs an agent skill for Claude Code, Codex, OpenCode, and Pi, so an agent can open tabs, split panes, and read a terminal's screen. And Rex implements the Program Status Protocol (OSC 7501), so a running program reports idle, working, waiting, finished, or failed, and the tab and Dock show it. Remote access runs over Tailscale, built into the server.
+
+As of November 10, 2026 it is invite-only: a mailing-list sign-up, then downloads behind a Discord login, with a macOS client and a Linux or FreeBSD server. Superlogical says Rex "is and will always be free" and names no license for it.
+
+Best for:
+
+- a multiplexer as the product, not an app around it
+- Lua configuration and scripted key modes
+- machines you own, reached over a tailnet
+
+See [Paradev vs Rex](/compare/superset-vs-rex).
 
 ### iTerm2
 

@@ -10,16 +10,17 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import {
+	useChatWidthStore,
 	useLiveChatWidthStore,
-	useNewWorkspaceWidthStore,
-} from "renderer/stores/new-workspace-width";
+} from "renderer/stores/chat-width";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { openChatHistory } from "../../utils/chatHistoryOpen";
+import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
-import { openChatHistory } from "./utils/chatHistoryOpen";
 import {
 	pendingChatPrompts,
 	prependChatPrompts,
@@ -42,9 +43,7 @@ export function ChatPane({
 }) {
 	const data = ctx.pane.data as ChatPaneData;
 	const liveChatWidth = useLiveChatWidthStore((state) => state.width);
-	const savedChatWidth = useNewWorkspaceWidthStore(
-		(state) => state.screenWidth,
-	);
+	const savedChatWidth = useChatWidthStore((state) => state.width);
 	const chatWidth = liveChatWidth ?? savedChatWidth;
 	const chatWidthStyle =
 		chatWidth === null
@@ -210,22 +209,15 @@ export function ChatPane({
 						],
 					})
 				}
-				onOpenForkedChat={({ sessionId, terminalId }) => {
-					const { agent, chatModelId, chatEffortId, chatModeId, chatTitle } =
-						latest.current;
+				onOpenForkedChat={(fork) => {
 					ctx.store.getState().addTab({
 						panes: [
 							{
 								kind: "chat-v3",
-								data: {
-									terminalId,
-									sessionId,
-									...(agent ? { agent: { id: agent.id } } : {}),
-									...(chatModelId ? { chatModelId } : {}),
-									...(chatEffortId ? { chatEffortId } : {}),
-									...(chatModeId ? { chatModeId } : {}),
-									...(chatTitle ? { chatTitle } : {}),
-								} satisfies ChatPaneData,
+								...(ctx.pane.titleOverride
+									? { titleOverride: ctx.pane.titleOverride }
+									: {}),
+								data: forkedChatPaneData(latest.current, fork),
 							},
 						],
 					});

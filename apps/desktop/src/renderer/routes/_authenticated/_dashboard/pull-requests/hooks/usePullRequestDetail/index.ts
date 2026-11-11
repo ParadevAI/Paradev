@@ -7,6 +7,7 @@ export {
 	type PullRequestDetailCommit,
 	type PullRequestDetailCommitAuthor,
 	type PullRequestMergeability,
+	type PullRequestMergeQueue,
 	pullRequestDetailQueryKey,
 	pullRequestDetailQueryOptions,
 	useInvalidatePullRequestDetail,

@@ -31,6 +31,7 @@ import {
 	type ConnectionState,
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRevealInFinder";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -527,8 +528,9 @@ export function TerminalPane({
 		{ enabled: ctx.isActive },
 	);
 
+	const findEnabled = usePaneHotkeyEnabled(ctx.isActive);
 	useHotkey("FIND_IN_TERMINAL", () => setIsSearchOpen((prev) => !prev), {
-		enabled: ctx.isActive,
+		enabled: findEnabled,
 		preventDefault: true,
 	});
 

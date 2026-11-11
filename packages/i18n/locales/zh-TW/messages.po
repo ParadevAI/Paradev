@@ -229,6 +229,10 @@ msgstr "{0, plural, one {已選擇#個專案。} other {已選擇#個專案。}}
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# 個專案} other {# 個專案}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, other {# 個拉取請求}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -896,6 +900,9 @@ msgstr "{count, plural, other {# 個步驟}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {此儲存庫中有#個worktree沒有對應的工作區，將被匯入為工作區。} other {此儲存庫中有#個worktree沒有對應的工作區，將被匯入為工作區。}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, other {將 # 個拉取請求加入合併佇列?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {新增了#個提交} other {新增了#個提交}}"
 
@@ -931,6 +938,9 @@ msgstr "{count, plural, one {擷取了 # 個頁面} other {擷取了 # 個頁面
 
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {匯入#個worktree} other {匯入#個worktree}}"
+
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, other {合併 # 個拉取請求?}}"
 
 msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
 msgstr "{count, plural, one {已將 # 個自動化移動到 {group}} other {已將 # 個自動化移動到 {group}}}"
@@ -982,6 +992,9 @@ msgstr "{credit} 的抵扣額將用於後續帳單。"
 
 msgid "{current} of {total}"
 msgstr "第 {current} 項，共 {total} 項"
+
+msgid "{current} of {total}+"
+msgstr "第 {current} 項，共 {total}+ 項"
 
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage}/{totalBranches}"
@@ -1316,6 +1329,9 @@ msgstr "{prompt} · 輸入 # 變更專案、主機等"
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 個 PR}}"
 
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · 目標 {base}"
+
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {佇列中有 # 則訊息等待} other {佇列中有 # 則訊息等待}}"
 
@@ -1498,6 +1514,30 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} 已合併，但此分支仍帶有它的提交。"
+
+msgid "#{number} has changes requested."
+msgstr "#{number} 被要求修改。"
+
+msgid "#{number} has conflicts."
+msgstr "#{number} 有衝突。"
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} 已關閉且未合併。"
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} 尚未準備好合併。"
+
+msgid "#{number} is still a draft."
+msgstr "#{number} 仍是草稿。"
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} 正在等待必要的檢查或規則。"
+
+msgid "#{number} needs a review."
+msgstr "#{number} 需要審查。"
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -1944,6 +1984,9 @@ msgstr "帳戶待刪除"
 msgid "Account usage"
 msgstr "帳戶用量"
 
+msgid "Account usage: {percent} used"
+msgstr "帳戶用量：已使用 {percent}"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2017,6 +2060,9 @@ msgstr "請先在 {computer} 上將 {repositoryName} 新增為專案"
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "請先將 {repositoryName} 新增為此電腦上的專案"
+
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "將 #{prNumber} 加入合併佇列?"
 
 msgid "Add a comment…"
 msgstr "新增留言…"
@@ -2169,6 +2215,9 @@ msgstr "新增指令碼"
 msgid "Add setup commands, one per line..."
 msgstr "新增設定命令，每行一條..."
 
+msgid "Add stack to merge queue"
+msgstr "將堆疊加入合併佇列"
+
 msgid "Add tag…"
 msgstr "新增標籤…"
 
@@ -2205,8 +2254,14 @@ msgstr "新增到詞典"
 msgid "Add to favorites"
 msgstr "加入最愛"
 
+msgid "Add to merge queue"
+msgstr "加入合併佇列"
+
 msgid "Add to project"
 msgstr "新增至專案"
+
+msgid "Add to queue"
+msgstr "加入佇列"
 
 msgid "Add to sidebar"
 msgstr "新增到側邊欄"
@@ -2244,9 +2299,15 @@ msgstr "僅在帶提示詞啟動時新增，例如<0>--</0>、<1>--prompt</1>、
 msgid "Added to agent input"
 msgstr "已加入代理程式輸入框"
 
+msgid "Added to merge queue"
+msgstr "已加入合併佇列"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "將成員加入 {organizationName} 需要付費方案。你組織的方案由其擁有者在 {0} 管理。"
+
+msgid "Adding to queue…"
+msgstr "正在加入佇列…"
 
 msgid "Adding..."
 msgstr "正在新增..."
@@ -2350,9 +2411,6 @@ msgstr "代理程式執行失敗"
 msgid "Agent self-verification"
 msgstr "代理程式自我驗證"
 
-msgid "agent session ID"
-msgstr "代理程式會話ID"
-
 msgid "Agent session started"
 msgstr "代理程式會話已開始"
 
@@ -2381,6 +2439,9 @@ msgstr "代理程式無需中途干預即可完成常規工單。"
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "之後，你的雲端工作區中的代理程式就能使用 <0>--host</0> 參數在此主機上執行指令。此主機必須能透過中繼存取。"
 
+msgid "Agents in your pocket"
+msgstr "代理程式隨身帶"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "代理程式會在雲端持續工作。可在桌面版、iPhone 或 iPad 上重新開啟工作區。"
 
@@ -2408,8 +2469,8 @@ msgstr "代理程式只會看到預留位置。Paradev 會把你的登入憑證�
 msgid "Agents that run while you're away"
 msgstr "你離開時也在執行的代理程式"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "代理程式自動分類 issue、起草 changelog、升級相依套件。你只需審查 PR。"
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "代理程式自動分類 issue、起草 changelog、升級相依套件。"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "代理程式呼叫 Linear 工具時會使用此帳號。"
@@ -3443,6 +3504,9 @@ msgstr "返回整合"
 msgid "Back to Linear"
 msgstr "返回Linear"
 
+msgid "Back to main chat"
+msgstr "返回主聊天"
+
 msgid "Back to pages"
 msgstr "返回頁面"
 
@@ -3518,6 +3582,9 @@ msgstr "變更前"
 msgid "Behavior"
 msgstr "行為"
 
+msgid "Behind base"
+msgstr "落後於基礎分支"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "落後main ?個提交，需要變基"
 
@@ -3568,6 +3635,10 @@ msgstr "封鎖任何網頁上的內容"
 
 msgid "blocked"
 msgstr "已阻止"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "已封鎖"
 
 msgid "Blocked by Branch Rules"
 msgstr "被分支規則阻止"
@@ -4200,8 +4271,8 @@ msgstr "聊天功能正在重做"
 msgid "Chat Launch"
 msgstr "聊天啟動"
 
-msgid "Chat mode"
-msgstr "聊天模式"
+msgid "Chat name"
+msgstr "聊天名稱"
 
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
@@ -4260,6 +4331,10 @@ msgstr "查收你的信箱"
 msgid "Checkbox · Radio · Switch"
 msgstr "核取方塊 · 單選框 · 開關"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "檢查中"
+
 msgid "Checking agents…"
 msgstr "正在檢查代理程式…"
 
@@ -4310,6 +4385,9 @@ msgid "Checks completed"
 msgstr "檢查完成"
 
 msgid "Checks failed"
+msgstr "檢查失敗"
+
+msgid "Checks failing"
 msgstr "檢查失敗"
 
 msgid "Checks passed"
@@ -4516,9 +4594,6 @@ msgstr "CLI與SDK"
 
 msgid "CLI docs"
 msgstr "CLI文件"
-
-msgid "CLI mode"
-msgstr "CLI模式"
 
 msgid "CLI reference"
 msgstr "CLI 參考文件"
@@ -5141,6 +5216,10 @@ msgstr "退出前確認"
 msgid "Confirm switch"
 msgstr "確認切換"
 
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "衝突"
+
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "與 {0} 衝突"
@@ -5496,14 +5575,8 @@ msgstr "已複製"
 msgid "Copied {0}"
 msgstr "已複製{0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "已複製{copiedLabel}"
-
 msgid "Copied Link"
 msgstr "已複製連結"
-
-msgid "Copied terminal ID"
-msgstr "已複製終端ID"
 
 msgid "Copied to clipboard."
 msgstr "已複製到剪貼簿。"
@@ -5569,9 +5642,6 @@ msgid "Copy file name"
 msgstr "複製檔名"
 
 msgid "Copy ID"
-msgstr "複製ID"
-
-msgid "Copy IDs"
 msgstr "複製ID"
 
 msgid "Copy image"
@@ -6063,6 +6133,9 @@ msgstr "無法複製圖片"
 msgid "Couldn't copy the screenshot"
 msgstr "無法複製螢幕截圖"
 
+msgid "Couldn't create stack"
+msgstr "無法建立堆疊"
+
 msgid "Couldn't create the channel"
 msgstr "無法建立頻道"
 
@@ -6143,6 +6216,9 @@ msgstr "無法標記為可供審查"
 msgid "Couldn't merge pull request"
 msgstr "無法合併拉取請求"
 
+msgid "Couldn't merge stack"
+msgstr "無法合併堆疊"
+
 msgid "Couldn't move {name}"
 msgstr "無法移動 {name}"
 
@@ -6192,6 +6268,9 @@ msgstr "無法讀取這個終端的上下文。"
 
 msgid "Couldn't read usage history from this host."
 msgstr "無法從此主機讀取用量歷史。"
+
+msgid "Couldn't remove from the merge queue"
+msgstr "無法移出合併佇列"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "無法移除本地登入"
@@ -6299,6 +6378,9 @@ msgstr "無法停止背景工作"
 msgid "Couldn't stop the chat"
 msgstr "無法停止聊天"
 
+msgid "Couldn't switch to #{number}"
+msgstr "無法切換到 #{number}"
+
 msgid "Couldn't take a screenshot"
 msgstr "無法擷取螢幕畫面"
 
@@ -6355,9 +6437,6 @@ msgstr "建立雲端環境"
 
 msgid "Create a Dev"
 msgstr "建立 Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "在供應商端建立具有相同對話上下文的原生分支。原本的會話維持不變。"
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "為Claude Desktop或Claude Code等外部整合建立新的API金鑰。"
@@ -6455,6 +6534,9 @@ msgstr "建立專案…"
 
 msgid "Create pull request"
 msgstr "建立拉取請求"
+
+msgid "Create stack"
+msgstr "建立堆疊"
 
 msgid "Create task"
 msgstr "建立任務"
@@ -8021,6 +8103,9 @@ msgstr "每分鐘"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "所有目標都在為下一階發力。以最近 30 天計算。"
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "直到 #{prNumber} 的所有開啟中的拉取請求會依序加入 {base} 的合併佇列。輪到它們且檢查通過時，GitHub 會合併它們。"
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "每個付費方案都包含 Paradev Mobile、自動化和優先支援。附雲端工作區的方案會為團隊提供一個共用的 GB 小時額度池。"
 
@@ -8927,11 +9012,17 @@ msgstr "在檔案檢視器中查詢"
 msgid "Find in page"
 msgstr "在頁面中查詢"
 
+msgid "Find in Page"
+msgstr "在頁面中查詢"
+
 msgid "Find in Terminal"
 msgstr "在終端中查詢"
 
 msgid "Find in this chat"
 msgstr "在此聊天中查詢"
+
+msgid "Find is not available for this page"
+msgstr "此頁面無法使用查詢"
 
 msgid "Find people and Devs"
 msgstr "尋找成員和 Dev"
@@ -9185,11 +9276,11 @@ msgstr "分支參數"
 msgid "Fork conversation"
 msgstr "分岔對話"
 
-msgid "Fork session"
-msgstr "分支會話"
+msgid "Fork into Chat"
+msgstr "分叉到聊天"
 
-msgid "Fork session…"
-msgstr "分支會話…"
+msgid "Fork into CLI"
+msgstr "分叉到 CLI"
 
 msgid "Form controls and field composition"
 msgstr "表單控制項與欄位組合"
@@ -9456,6 +9547,9 @@ msgstr "GitHub App安裝已取消。"
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App安裝成功！"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub 無法在這裡一次合併此堆疊。"
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub已連線，但初始同步未能啟動。請嘗試重新連線。"
 
@@ -9468,8 +9562,14 @@ msgstr "未找到GitHub安裝"
 msgid "GitHub integration"
 msgstr "GitHub整合"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub 仍在合併。完成後此處會更新。"
+
 msgid "GitHub issues"
 msgstr "GitHub議題"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "輪到它且檢查通過時，GitHub 會合併它。"
 
 msgid "GitHub rate limit reached"
 msgstr "已達到 GitHub 速率限制"
@@ -9482,6 +9582,12 @@ msgstr "包含外掛市集檔案的 GitHub 儲存庫。Superset 會將其中的�
 
 msgid "GitHub sign-in needed"
 msgstr "需要登入 GitHub"
+
+msgid "GitHub stack created"
+msgstr "已建立 GitHub 堆疊"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "此存放庫未開啟 GitHub 堆疊。"
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "GitHub同步需要Pro方案。"
@@ -9690,6 +9796,9 @@ msgstr "已從側邊欄隱藏「{0}」"
 
 msgid "Hidden folders"
 msgstr "已隱藏的資料夾"
+
+msgid "Hidden from the sidebar"
+msgstr "已從側邊欄隱藏"
 
 msgid "Hidden until you join"
 msgstr "加入後才會顯示"
@@ -10217,6 +10326,12 @@ msgstr "審查中"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "在{appName}桌面應用程式中開啟「設定 → 遠端存取」，開啟「允許遠端工作區通過中繼存取此裝置」。"
 
+msgid "In the merge queue"
+msgstr "在合併佇列中"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "在合併佇列中。輪到它時 GitHub 會合併它。"
+
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "在Paradev桌面應用程式中開啟<0>設定 → 外觀 → 主題</0>。"
 
@@ -10624,6 +10739,9 @@ msgstr "裝置可能處於睡眠狀態"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "它可能已被刪除，或屬於另一個組織。"
+
+msgid "It must join again and pass its checks to merge."
+msgstr "要合併，它必須重新加入佇列並通過檢查。"
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "只需幾分鐘。在用 Conductor Cloud？請先看<0>雲端指南</0>。"
@@ -11053,6 +11171,9 @@ msgstr "離開頻道"
 
 msgid "Leave comment mode"
 msgstr "退出評論模式"
+
+msgid "Leave it empty to go back to the default name."
+msgstr "留空則恢復為預設名稱。"
 
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "留空即可恢復終端回報的名稱。"
@@ -11836,6 +11957,9 @@ msgstr "合併"
 msgid "Merge #{0}?"
 msgstr "合併#{0}？"
 
+msgid "Merge #{prNumber}?"
+msgstr "合併 #{prNumber}？"
+
 msgid "Merge commit"
 msgstr "合併提交"
 
@@ -11852,11 +11976,20 @@ msgstr "合併拉取請求"
 msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
 msgstr "不離開Paradev就能合併拉取請求，另有一輪聊天修復與打磨。"
 
+msgid "Merge stack"
+msgstr "合併堆疊"
+
 msgid "Merge status"
 msgstr "合併狀態"
 
+msgid "Merge status pending"
+msgstr "合併狀態待定"
+
 msgid "Merge status unknown"
 msgstr "合併狀態不明"
+
+msgid "Mergeable with failing checks"
+msgstr "可合併，但檢查失敗"
 
 msgid "Merged"
 msgstr "已合併"
@@ -11877,6 +12010,9 @@ msgstr "正在合併PR..."
 
 msgid "Merging pull request"
 msgstr "正在合併拉取請求"
+
+msgid "Merging stack…"
+msgstr "正在合併堆疊…"
 
 msgid "Merging…"
 msgstr "正在合併…"
@@ -12347,6 +12483,9 @@ msgstr "新建瀏覽器"
 
 msgid "new challengers"
 msgstr "換對手"
+
+msgid "New chat"
+msgstr "新聊天"
 
 msgid "New Chat"
 msgstr "新建聊天"
@@ -13901,9 +14040,6 @@ msgstr "在瀏覽器中開啟"
 msgid "Open in Changes pane"
 msgstr "在「改動」面板中開啟"
 
-msgid "Open in Chat Interface"
-msgstr "在聊天介面中開啟"
-
 msgid "Open in ChatGPT"
 msgstr "在ChatGPT中開啟"
 
@@ -13978,9 +14114,6 @@ msgstr "在分頁中開啟"
 
 msgid "Open in Tasks"
 msgstr "在任務中開啟"
-
-msgid "Open in Terminal Chat"
-msgstr "在終端聊天中開啟"
 
 msgid "Open in…"
 msgstr "開啟方式…"
@@ -14073,9 +14206,6 @@ msgstr "開啟最近使用"
 
 msgid "Open roles"
 msgstr "空缺職位"
-
-msgid "Open session in"
-msgstr "會話開啟於"
 
 msgid "Open settings"
 msgstr "開啟設定"
@@ -15090,6 +15220,9 @@ msgstr "發表回覆"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position}/{size} · 目標 {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
 msgid "PR #{0} · {1}"
@@ -15475,10 +15608,6 @@ msgstr "屬性"
 msgid "Provide either id or slug"
 msgstr "請提供id或slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "供應商：{0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "預配失敗，沙箱已被銷燬。目前沒有任何處理程序在執行，此工作區也無法開啟。請新建一個再試。"
 
@@ -15542,6 +15671,9 @@ msgstr "拉取請求操作"
 msgid "Pull request detail tabs"
 msgstr "拉取請求詳細資料分頁"
 
+msgid "Pull request merged"
+msgstr "拉取請求已合併"
+
 msgid "Pull request not found"
 msgstr "找不到拉取請求"
 
@@ -15556,6 +15688,9 @@ msgstr "拉取請求"
 
 msgid "Pull Requests"
 msgstr "拉取請求"
+
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "其上的拉取請求將保持開啟，GitHub 會變更它們的目標分支。"
 
 msgid "Pull requests, comments and pushes from Superset are made as you."
 msgstr "來自 Superset 的拉取請求、留言和推送以你的身分進行。"
@@ -15619,6 +15754,9 @@ msgstr "佇列因使用上限已暫停"
 msgid "Queue paused when Paradev closed"
 msgstr "Paradev 關閉時佇列已暫停"
 
+msgid "Queue stack"
+msgstr "將堆疊加入佇列"
+
 msgid "Queue work for agents"
 msgstr "為代理程式排隊安排工作"
 
@@ -15627,6 +15765,9 @@ msgstr "加入佇列；按⌘↩引導目前回合"
 
 msgid "Queued"
 msgstr "排隊中"
+
+msgid "Queued · {position}"
+msgstr "排隊中 · {position}"
 
 msgid "Queued messages"
 msgstr "佇列中的訊息"
@@ -15864,6 +16005,10 @@ msgstr "已就緒"
 msgid "Ready on every machine you sign into and in every cloud workspace."
 msgstr "在你登入的每台裝置上和每個雲端工作區中都已就緒。"
 
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "可以合併"
+
 msgid "Ready to Merge"
 msgstr "可以合併"
 
@@ -15893,6 +16038,9 @@ msgstr "最近動態"
 
 msgid "Recent apps"
 msgstr "最近使用的 App"
+
+msgid "Recent chats"
+msgstr "最近的聊天"
 
 msgid "Recent invoices"
 msgstr "最近的帳單"
@@ -16128,6 +16276,9 @@ msgstr "移除 {name}？"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "要移除 {repo} 嗎？從中同步的所有外掛都會從你的組織以及所有已安裝的成員那裡移除。"
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "將 #{prNumber} 移出合併佇列？"
+
 msgid "Remove attachment"
 msgstr "移除附件"
 
@@ -16142,6 +16293,9 @@ msgstr "從最愛移除"
 
 msgid "Remove from group"
 msgstr "移出群組"
+
+msgid "Remove from queue"
+msgstr "移出佇列"
 
 msgid "Remove from Queue"
 msgstr "移出佇列"
@@ -16224,6 +16378,9 @@ msgstr "已移除 {name}"
 msgid "Removed {removedLabel}."
 msgstr "已移除{removedLabel}。"
 
+msgid "Removed from the merge queue"
+msgstr "已移出合併佇列"
+
 msgid "Removes this agent from this device only."
 msgstr "僅從此裝置上移除該代理程式。"
 
@@ -16244,6 +16401,9 @@ msgstr "重新命名帳號"
 
 msgid "Rename branch"
 msgstr "重新命名分支"
+
+msgid "Rename chat"
+msgstr "重新命名聊天"
 
 msgid "Rename failed"
 msgstr "重新命名失敗"
@@ -16569,6 +16729,9 @@ msgstr "資源"
 
 msgid "Response"
 msgstr "響應"
+
+msgid "Restack"
+msgstr "重建堆疊"
 
 msgid "Restart"
 msgstr "重啟"
@@ -17019,6 +17182,9 @@ msgstr "立即執行"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "依計劃或事件執行、隨需執行、暫停、恢復並查看日誌。"
 
+msgid "Run on any machine"
+msgstr "在任何機器上執行"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "在新功能、修復和重構上並行執行程式碼代理程式。每個代理程式都在自己的分支上工作，本機或雲端皆可。"
 
@@ -17117,6 +17283,9 @@ msgstr "建立新工作區時執行。"
 
 msgid "Runs when a workspace is deleted."
 msgstr "刪除工作區時執行。"
+
+msgid "Runs while you sleep"
+msgstr "你睡覺時也在執行"
 
 msgid "Same session"
 msgstr "同一會話"
@@ -17301,6 +17470,9 @@ msgstr "搜尋開發者"
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "一次搜尋所有檔案內容和所有工作區。"
 
+msgid "Search all chats…"
+msgstr "搜尋所有聊天…"
+
 msgid "Search all emoji"
 msgstr "搜尋所有表情符號"
 
@@ -17439,6 +17611,9 @@ msgstr "搜尋任務…"
 msgid "Search text in the active chat"
 msgstr "在目前聊天中搜尋文字"
 
+msgid "Search text in the active page"
+msgstr "在目前頁面中搜尋文字"
+
 msgid "Search text in the active terminal"
 msgstr "在目前終端中搜尋文字"
 
@@ -17560,6 +17735,9 @@ msgstr "在評分表中檢視這道關卡"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "檢視改動、給出回饋，就緒後合併成果。"
+
+msgid "See what it can do"
+msgstr "看看它能做什麼"
 
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "瞭解我們正在打造什麼、接下來會推出什麼，以及 Paradev 的發展方向。"
@@ -17732,6 +17910,9 @@ msgstr "選中工作區的操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "在終端中選取文字後立即複製到剪貼簿，並移除結尾空白"
+
+msgid "Self-hosted"
+msgstr "自行託管"
 
 msgid "Send"
 msgstr "傳送"
@@ -18186,6 +18367,9 @@ msgstr "顯示連結選單"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "給我看看Linear分類自動化最近10次執行"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "向我展示 Paradev CLI 能做什麼。執行 `superset --help` 和 `superset schema` 查看它的指令，然後在我的帳號上試幾個唯讀指令：`superset workspaces list`、`superset tasks list`、`superset automations list` 和 `superset hosts list`。總結你的發現，並建議三種在我的工作流程中使用 CLI 或用它撰寫指令碼的方式。不要建立、修改或刪除任何內容。"
+
 msgid "Show more"
 msgstr "顯示更多"
 
@@ -18236,6 +18420,9 @@ msgstr "顯示右側邊欄中的下一個分頁，不移動焦點"
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "顯示右側邊欄中的上一個分頁，不移動焦點"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "在側邊欄顯示連結到行動裝置、雲端、CLI 和自行託管的按鈕。"
 
 msgid "Show the triggering payload"
 msgstr "顯示觸發酬載"
@@ -18788,6 +18975,28 @@ msgstr "SSO/SAML"
 
 msgid "Stability improvements"
 msgstr "穩定性改進"
+
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "堆疊 #{stackNumber} · PR {position}/{size} · 目標 {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "堆疊 #{stackNumber} · 目標 {base}"
+
+msgid "Stack added to merge queue"
+msgstr "堆疊已加入合併佇列"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "無法載入堆疊詳細資料。請在合併前重新整理。"
+
+msgid "Stack merged"
+msgstr "堆疊已合併"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "堆疊已合併"
+
+msgid "Stack needs attention"
+msgstr "堆疊需要處理"
 
 msgid "Stacked"
 msgstr "堆疊"
@@ -19608,9 +19817,6 @@ msgstr "終端字型大小"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "終端取得焦點時調整終端字型大小，瀏覽器窗格中調整頁面縮放，其他情況下縮放整個應用程式"
 
-msgid "terminal ID"
-msgstr "終端ID"
-
 msgid "Terminal input"
 msgstr "終端輸入"
 
@@ -19630,9 +19836,6 @@ msgid "Terminal session killed"
 msgstr "終端會話已終止"
 
 msgid "Terminal sessions"
-msgstr "終端會話"
-
-msgid "Terminal Sessions"
 msgstr "終端會話"
 
 msgid "Terminal theme color-palette preview"
@@ -20111,6 +20314,12 @@ msgstr "該站點的證書已過期"
 msgid "The site's certificate is invalid"
 msgstr "該站點的證書無效"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "開啟期間堆疊已變更。請檢查後重試。"
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "它上面的堆疊拉取請求也會離開佇列。每一個都必須重新加入並通過檢查。"
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "雲端工作區啟動的起點 — 一個基礎映像檔，或你已設定好、想要分叉的沙箱。"
 
@@ -20173,6 +20382,9 @@ msgstr "主題預覽卡片"
 
 msgid "Themes"
 msgstr "主題"
+
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "它們透過基礎分支相連，因此每一個都會合併到它下面的那一個。GitHub 堆疊可一步合併全部。"
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "建立工作區時會自動執行這些命令。<0>閱讀文件<1/></0>"
@@ -20577,6 +20789,15 @@ msgstr "此檢視出錯了"
 msgid "This week"
 msgstr "本週"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "這會使用合併提交將截至 #{prNumber} 的所有開啟的拉取請求以不可分割的方式合併到 {base}。"
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "這會使用變基將截至 #{prNumber} 的所有開啟的拉取請求以不可分割的方式合併到 {base}。"
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "這會使用壓縮將截至 #{prNumber} 的所有開啟的拉取請求以不可分割的方式合併到 {base}。"
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "這會更改組織的公開URL。請記得更新書籤和已分享的連結。"
 
@@ -20586,6 +20807,15 @@ msgstr "這將刪除<0>{0}</0>並移除其所有成員。此操作無法復原�
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "這將終止所有執行中的會話並重啟終端守護程式。應用會用全新的守護程式重啟終端。"
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "這會使用合併提交將 #{prNumber} 合併到 {base}。"
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "這會使用變基將 #{prNumber} 合併到 {base}。"
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "這會使用壓縮將 #{prNumber} 合併到 {base}。"
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "這將永久刪除該例行任務，並停止之後的執行。"
@@ -21006,6 +21236,9 @@ msgstr "通道已建立"
 
 msgid "Turn Fast mode on or off"
 msgstr "開啟或關閉快速模式"
+
+msgid "Turn it back on in Settings → General."
+msgstr "可在「設定 → 通用」中重新開啟。"
 
 msgid "Turn off"
 msgstr "關閉"
@@ -21562,6 +21795,12 @@ msgstr "使用手動登入"
 msgid "Use more browser features: {features}"
 msgstr "使用更多瀏覽器功能：{features}"
 
+msgid "Use Paradev anywhere"
+msgstr "隨處使用 Paradev"
+
+msgid "Use Paradev anywhere button"
+msgstr "「隨處使用 Paradev」按鈕"
+
 msgid "Use Paradev on mobile"
 msgstr "在手機上使用 Paradev"
 
@@ -21750,6 +21989,9 @@ msgstr "檢視原圖"
 msgid "View in GitHub"
 msgstr "在GitHub中檢視"
 
+msgid "View instead"
+msgstr "改為檢視"
+
 msgid "View log"
 msgstr "檢視日誌"
 
@@ -21786,8 +22028,18 @@ msgstr "查看版本說明"
 msgid "View releases on GitHub"
 msgstr "在GitHub上檢視釋出"
 
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "檢視堆疊 {stackNumber}，拉取請求 {position}/{size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "檢視堆疊，拉取請求 {position}/{size}"
+
 msgid "View usage"
 msgstr "檢視用量"
+
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "正在檢視"
 
 msgid "Violence or harassment"
 msgstr "暴力或騷擾"

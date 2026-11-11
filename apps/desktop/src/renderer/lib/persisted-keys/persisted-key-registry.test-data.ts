@@ -85,7 +85,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
 	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
-	["src/renderer/stores/new-workspace-width.ts", ["new-workspace-width"]],
 	[
 		"src/renderer/stores/workspace-sidebar-state.ts",
 		["workspace-sidebar-store"],
@@ -156,6 +155,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
 	["src/renderer/stores/chat-turn-snapshots.ts", ["chat-turn-snapshots"]],
+	["src/renderer/stores/chat-width.ts", ["chat-width"]],
 	[
 		"src/renderer/routes/_authenticated/settings/usage/utils/usageLastSection/usageLastSection.ts",
 		["usage-last-section-v1"],
