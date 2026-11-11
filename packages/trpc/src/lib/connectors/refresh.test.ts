@@ -337,7 +337,7 @@ describe("a token endpoint that is merely down", () => {
 	});
 
 	test("a JSON body that is not an object is unavailable", async () => {
-		response = { ok: false, status: 400, body: "\"Bad Request\"" };
+		response = { ok: false, status: 400, body: '"Bad Request"' };
 
 		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
 			ConnectorUnavailableError,
