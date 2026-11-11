@@ -2439,6 +2439,9 @@ msgstr "Los agentes completan tickets rutinarios sin intervención a mitad de la
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Los agentes de tus espacios de trabajo en la nube podrán usar <0>--host</0> para ejecutar comandos en este host. El host debe estar accesible a través del relay."
 
+msgid "Agents in your pocket"
+msgstr "Tus agentes en el bolsillo"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Los agentes siguen trabajando en la nube. Vuelve a abrir el espacio de trabajo desde el escritorio, el iPhone o el iPad."
 
@@ -9793,6 +9796,9 @@ msgstr "\"{0}\" oculto de la barra lateral"
 
 msgid "Hidden folders"
 msgstr "Carpetas ocultas"
+
+msgid "Hidden from the sidebar"
+msgstr "Oculto de la barra lateral"
 
 msgid "Hidden until you join"
 msgstr "Oculto hasta que te unas"
@@ -17170,6 +17176,9 @@ msgstr "Ejecutar ahora"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Ejecuta según una programación o con eventos, bajo demanda, pausa, reanuda y lee los registros."
 
+msgid "Run on any machine"
+msgstr "En cualquier máquina"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Ejecuta agentes de código en paralelo en funciones, correcciones y refactorizaciones. Cada uno trabaja en su propia rama, en local o en la nube."
 
@@ -17268,6 +17277,9 @@ msgstr "Se ejecuta al crear un espacio de trabajo."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Se ejecuta al eliminar un espacio de trabajo."
+
+msgid "Runs while you sleep"
+msgstr "Funciona mientras duermes"
 
 msgid "Same session"
 msgstr "Misma sesión"
@@ -17718,6 +17730,9 @@ msgstr "Ver esta meta en el cuadro de resultados"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Mira qué cambió, da tu opinión y fusiona el trabajo cuando esté listo."
 
+msgid "See what it can do"
+msgstr "Mira lo que puede hacer"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Descubre qué estamos construyendo ahora, qué viene después y hacia dónde se dirige Paradev."
 
@@ -17889,6 +17904,9 @@ msgstr "Acciones de los espacios de trabajo seleccionados"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Seleccionar texto en un terminal lo copia de inmediato al portapapeles, sin los espacios finales"
+
+msgid "Self-hosted"
+msgstr "Autoalojado"
 
 msgid "Send"
 msgstr "Enviar"
@@ -18343,6 +18361,9 @@ msgstr "Mostrar menú del enlace"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Muéstrame las últimas 10 ejecuciones de mi automatización de triaje de Linear"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Muéstrame lo que puede hacer la CLI de Paradev. Ejecuta `superset --help` y `superset schema` para ver sus comandos y luego prueba algunos de solo lectura en mi cuenta: `superset workspaces list`, `superset tasks list`, `superset automations list` y `superset hosts list`. Resume lo que encontraste y sugiere tres formas en que podría usar o automatizar la CLI en mi flujo de trabajo. No crees, cambies ni elimines nada."
+
 msgid "Show more"
 msgstr "Mostrar más"
 
@@ -18393,6 +18414,9 @@ msgstr "Mostrar la pestaña siguiente de la barra lateral derecha sin mover el f
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Mostrar la pestaña anterior de la barra lateral derecha sin mover el foco"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Muestra el botón de la barra lateral con enlaces a Móvil, Nube, la CLI y Autoalojado."
 
 msgid "Show the triggering payload"
 msgstr "Mostrar la carga útil desencadenante"
@@ -21207,6 +21231,9 @@ msgstr "Túnel establecido"
 msgid "Turn Fast mode on or off"
 msgstr "Activar o desactivar el modo rápido"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Puedes volver a activarlo en Configuración → General."
+
 msgid "Turn off"
 msgstr "Desactivar"
 
@@ -21761,6 +21788,12 @@ msgstr "Usar inicio de sesión manual"
 
 msgid "Use more browser features: {features}"
 msgstr "Usar más funciones del navegador: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Usa Paradev en cualquier lugar"
+
+msgid "Use Paradev anywhere button"
+msgstr "Botón \"Usa Paradev en cualquier lugar\""
 
 msgid "Use Paradev on mobile"
 msgstr "Usa Paradev en el móvil"

@@ -350,7 +350,6 @@ export const FULL_WIDTH_SECTION_PATHS: readonly string[] =
 	);
 
 export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
-	const mobileEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH);
 	const pluginsFlag = useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS);
 	const pluginsEnabled = env.NODE_ENV === "development" || pluginsFlag === true;
 	const isAdmin = useIsOrganizationAdmin() === true;
@@ -373,7 +372,6 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 				const platformItems = group.items.filter(
 					(item) =>
 						(!item.macOnly || isMac) &&
-						(item.section !== "mobile" || mobileEnabled === true) &&
 						(item.section !== "plugins" || pluginsEnabled) &&
 						(!item.adminOnly || isAdmin) &&
 						allowedSections.has(item.section),

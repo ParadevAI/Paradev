@@ -2439,6 +2439,9 @@ msgstr "Agents complete routine tickets with no mid-task intervention."
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 
+msgid "Agents in your pocket"
+msgstr "Agents in your pocket"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 
@@ -9793,6 +9796,9 @@ msgstr "Hid \"{0}\" from the sidebar"
 
 msgid "Hidden folders"
 msgstr "Hidden folders"
+
+msgid "Hidden from the sidebar"
+msgstr "Hidden from the sidebar"
 
 msgid "Hidden until you join"
 msgstr "Hidden until you join"
@@ -17170,6 +17176,9 @@ msgstr "Run now"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 
+msgid "Run on any machine"
+msgstr "Run on any machine"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 
@@ -17268,6 +17277,9 @@ msgstr "Runs when a new workspace is created."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Runs when a workspace is deleted."
+
+msgid "Runs while you sleep"
+msgstr "Runs while you sleep"
 
 msgid "Same session"
 msgstr "Same session"
@@ -17718,6 +17730,9 @@ msgstr "See this gate on the scorecard"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "See what changed, give feedback, and merge the work when it's ready."
 
+msgid "See what it can do"
+msgstr "See what it can do"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "See what we're building now, what's coming next, and where Paradev is headed."
 
@@ -17889,6 +17904,9 @@ msgstr "Selected workspace actions"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
+
+msgid "Self-hosted"
+msgstr "Self-hosted"
 
 msgid "Send"
 msgstr "Send"
@@ -18343,6 +18361,9 @@ msgstr "Show link menu"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Show me the last 10 runs of my Linear triage automation"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+
 msgid "Show more"
 msgstr "Show more"
 
@@ -18393,6 +18414,9 @@ msgstr "Show the next tab in the right sidebar without moving focus"
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Show the previous tab in the right sidebar without moving focus"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 
 msgid "Show the triggering payload"
 msgstr "Show the triggering payload"
@@ -21207,6 +21231,9 @@ msgstr "Tunnel established"
 msgid "Turn Fast mode on or off"
 msgstr "Turn Fast mode on or off"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Turn it back on in Settings → General."
+
 msgid "Turn off"
 msgstr "Turn off"
 
@@ -21761,6 +21788,12 @@ msgstr "Use manual sign-in"
 
 msgid "Use more browser features: {features}"
 msgstr "Use more browser features: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Use Paradev anywhere"
+
+msgid "Use Paradev anywhere button"
+msgstr "Use Paradev anywhere button"
 
 msgid "Use Paradev on mobile"
 msgstr "Use Paradev on mobile"

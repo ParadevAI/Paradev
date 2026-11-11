@@ -2439,6 +2439,9 @@ msgstr "Agents voltooien routinetickets zonder tussentijds ingrijpen."
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Agents in je cloudwerkruimtes kunnen dan met <0>--host</0> opdrachten op deze host uitvoeren. De host moet bereikbaar zijn via de relay."
 
+msgid "Agents in your pocket"
+msgstr "Agents in je broekzak"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Agents blijven werken in de cloud. Open de werkruimte opnieuw op desktop, iPhone of iPad."
 
@@ -9793,6 +9796,9 @@ msgstr "\"{0}\" uit de zijbalk verborgen"
 
 msgid "Hidden folders"
 msgstr "Verborgen mappen"
+
+msgid "Hidden from the sidebar"
+msgstr "Verborgen in de zijbalk"
 
 msgid "Hidden until you join"
 msgstr "Verborgen tot je meedoet"
@@ -17170,6 +17176,9 @@ msgstr "Nu uitvoeren"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Draai volgens schema of bij gebeurtenissen, op aanvraag, pauzeer, hervat en lees logs."
 
+msgid "Run on any machine"
+msgstr "Op elke machine"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Draai parallelle coding agents op features, fixes en refactors. Elke agent werkt op een eigen branch, lokaal of in de cloud."
 
@@ -17268,6 +17277,9 @@ msgstr "Wordt uitgevoerd bij het aanmaken van een werkruimte."
 
 msgid "Runs when a workspace is deleted."
 msgstr "Wordt uitgevoerd bij het verwijderen van een werkruimte."
+
+msgid "Runs while you sleep"
+msgstr "Draait terwijl je slaapt"
 
 msgid "Same session"
 msgstr "Dezelfde sessie"
@@ -17718,6 +17730,9 @@ msgstr "Bekijk deze drempel op de scorekaart"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Zie wat er veranderd is, geef feedback en merge het werk als het klaar is."
 
+msgid "See what it can do"
+msgstr "Bekijk wat het kan"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Bekijk wat we nu bouwen, wat er hierna komt en waar Paradev naartoe gaat."
 
@@ -17889,6 +17904,9 @@ msgstr "Acties voor geselecteerde werkruimtes"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Tekst selecteren in een terminal kopieert die meteen naar het klembord, zonder witruimte aan het einde"
+
+msgid "Self-hosted"
+msgstr "Zelf gehost"
 
 msgid "Send"
 msgstr "Versturen"
@@ -18343,6 +18361,9 @@ msgstr "Linkmenu tonen"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Laat de laatste 10 runs zien van mijn Linear-triage-automatisering"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Laat me zien wat de Paradev-CLI kan. Voer `superset --help` en `superset schema` uit om de commando's te zien en probeer daarna een paar alleen-lezen commando's op mijn account: `superset workspaces list`, `superset tasks list`, `superset automations list` en `superset hosts list`. Vat samen wat je hebt gevonden en stel drie manieren voor waarop ik de CLI in mijn workflow kan gebruiken of scripten. Maak, wijzig of verwijder niets."
+
 msgid "Show more"
 msgstr "Meer tonen"
 
@@ -18393,6 +18414,9 @@ msgstr "Het volgende tabblad in de rechterzijbalk tonen zonder de focus te verpl
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Het vorige tabblad in de rechterzijbalk tonen zonder de focus te verplaatsen"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Toon de zijbalkknop met links naar Mobiel, Cloud, de CLI en Zelf gehost."
 
 msgid "Show the triggering payload"
 msgstr "Activerende payload tonen"
@@ -21207,6 +21231,9 @@ msgstr "Tunnel opgezet"
 msgid "Turn Fast mode on or off"
 msgstr "Snelle modus in- of uitschakelen"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Je kunt het weer aanzetten via Instellingen → Algemeen."
+
 msgid "Turn off"
 msgstr "Uitzetten"
 
@@ -21761,6 +21788,12 @@ msgstr "Handmatig inloggen gebruiken"
 
 msgid "Use more browser features: {features}"
 msgstr "Meer browserfuncties gebruiken: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Gebruik Paradev overal"
+
+msgid "Use Paradev anywhere button"
+msgstr "Knop \"Gebruik Paradev overal\""
 
 msgid "Use Paradev on mobile"
 msgstr "Gebruik Paradev op je mobiel"

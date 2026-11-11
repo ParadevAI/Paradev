@@ -2439,6 +2439,9 @@ msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완�
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "이후 클라우드 워크스페이스의 에이전트가 <0>--host</0>를 사용해 이 호스트에서 명령을 실행할 수 있습니다. 호스트는 릴레이를 통해 접근할 수 있어야 합니다."
 
+msgid "Agents in your pocket"
+msgstr "주머니 속 에이전트"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱, iPhone, iPad에서 워크스페이스를 다시 열 수 있습니다."
 
@@ -9793,6 +9796,9 @@ msgstr "\"{0}\"을(를) 사이드바에서 숨겼습니다"
 
 msgid "Hidden folders"
 msgstr "숨긴 폴더"
+
+msgid "Hidden from the sidebar"
+msgstr "사이드바에서 숨겼습니다"
 
 msgid "Hidden until you join"
 msgstr "참여 전까지 숨김"
@@ -17170,6 +17176,9 @@ msgstr "지금 실행"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "일정이나 이벤트로 실행, 필요할 때 실행, 일시 중지, 재개, 로그 확인."
 
+msgid "Run on any machine"
+msgstr "어떤 머신에서든 실행"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "기능, 수정, 리팩터링에 코딩 에이전트를 병렬로 실행하세요. 각 에이전트는 로컬이나 클라우드에서 자체 브랜치로 작업합니다."
 
@@ -17268,6 +17277,9 @@ msgstr "새 작업 공간을 만들 때 실행됩니다."
 
 msgid "Runs when a workspace is deleted."
 msgstr "작업 공간을 삭제할 때 실행됩니다."
+
+msgid "Runs while you sleep"
+msgstr "잠든 사이에도 실행"
 
 msgid "Same session"
 msgstr "같은 세션"
@@ -17718,6 +17730,9 @@ msgstr "성적표에서 이 관문 보기"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "무엇이 바뀌었는지 보고, 피드백을 주고, 준비되면 머지하세요."
 
+msgid "See what it can do"
+msgstr "무엇을 할 수 있는지 보기"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "지금 만들고 있는 것, 다음에 나올 것, 그리고 Paradev가 향하는 방향을 확인하세요."
 
@@ -17889,6 +17904,9 @@ msgstr "선택한 워크스페이스 작업"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "터미널에서 텍스트를 선택하면 끝의 공백이 제거된 상태로 즉시 클립보드에 복사됩니다"
+
+msgid "Self-hosted"
+msgstr "셀프 호스팅"
 
 msgid "Send"
 msgstr "보내기"
@@ -18343,6 +18361,9 @@ msgstr "링크 메뉴 표시"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "내 Linear 분류 자동화의 최근 실행 10건을 보여 줘"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Paradev CLI로 무엇을 할 수 있는지 보여 주세요. `superset --help`와 `superset schema`를 실행해 명령을 확인한 다음, 내 계정에서 읽기 전용 명령 몇 가지를 실행해 보세요: `superset workspaces list`, `superset tasks list`, `superset automations list`, `superset hosts list`. 알게 된 내용을 요약하고 내 워크플로에서 CLI를 사용하거나 스크립트로 활용할 수 있는 방법 세 가지를 제안해 주세요. 아무것도 만들거나 바꾸거나 삭제하지 마세요."
+
 msgid "Show more"
 msgstr "더 보기"
 
@@ -18393,6 +18414,9 @@ msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 다음 탭 표�
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 이전 탭 표시"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "모바일, 클라우드, CLI, 셀프 호스팅으로 연결되는 사이드바 버튼을 표시합니다."
 
 msgid "Show the triggering payload"
 msgstr "트리거 페이로드 표시"
@@ -21207,6 +21231,9 @@ msgstr "터널 연결됨"
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
 
+msgid "Turn it back on in Settings → General."
+msgstr "설정 → 일반에서 다시 켤 수 있습니다."
+
 msgid "Turn off"
 msgstr "끄기"
 
@@ -21761,6 +21788,12 @@ msgstr "수동 로그인 사용"
 
 msgid "Use more browser features: {features}"
 msgstr "추가 브라우저 기능 사용: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "어디서나 Paradev 사용하기"
+
+msgid "Use Paradev anywhere button"
+msgstr "\"어디서나 Paradev 사용하기\" 버튼"
 
 msgid "Use Paradev on mobile"
 msgstr "모바일에서 Paradev 사용하기"

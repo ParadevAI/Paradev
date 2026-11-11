@@ -2433,6 +2433,9 @@ msgstr "Агенти виконують рутинні тікети без вт�
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Агенти у ваших хмарних робочих просторах зможуть за допомогою <0>--host</0> запускати команди на цьому хості. Хост має бути доступним через релей."
 
+msgid "Agents in your pocket"
+msgstr "Агенти в кишені"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."
 
@@ -9787,6 +9790,9 @@ msgstr "«{0}» приховано з бічної панелі"
 
 msgid "Hidden folders"
 msgstr "Приховані папки"
+
+msgid "Hidden from the sidebar"
+msgstr "Приховано з бічної панелі"
 
 msgid "Hidden until you join"
 msgstr "Приховано, доки ви не приєднаєтеся"
@@ -17164,6 +17170,9 @@ msgstr "Запустити зараз"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Запуск за розкладом або за подіями, запуск на вимогу, пауза, відновлення й читання логів."
 
+msgid "Run on any machine"
+msgstr "На будь-якій машині"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Запускайте паралельних агентів для нових функцій, виправлень і рефакторингу. Кожен працює у власній гілці, локально або в хмарі."
 
@@ -17262,6 +17271,9 @@ msgstr "Виконується під час створення нового р�
 
 msgid "Runs when a workspace is deleted."
 msgstr "Виконується під час видалення робочого простору."
+
+msgid "Runs while you sleep"
+msgstr "Працює, поки ви спите"
 
 msgid "Same session"
 msgstr "Той самий сеанс"
@@ -17712,6 +17724,9 @@ msgstr "Переглянути цей поріг у таблиці оцінок"
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Подивіться, що змінилося, залиште відгук і злийте роботу, коли вона буде готова."
 
+msgid "See what it can do"
+msgstr "Подивіться, що він уміє"
+
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Подивіться, що ми створюємо зараз, що буде далі й куди рухається Paradev."
 
@@ -17883,6 +17898,9 @@ msgstr "Дії з вибраними робочими просторами"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Виділений у терміналі текст одразу копіюється в буфер обміну, без пробілів у кінці"
+
+msgid "Self-hosted"
+msgstr "Власний хостинг"
 
 msgid "Send"
 msgstr "Надіслати"
@@ -18337,6 +18355,9 @@ msgstr "Показати меню посилання"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Покажи останні 10 запусків моєї автоматизації сортування Linear"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Покажи, що вміє Paradev CLI. Запусти `superset --help` і `superset schema`, щоб побачити команди, потім спробуй кілька команд лише для читання в моєму обліковому записі: `superset workspaces list`, `superset tasks list`, `superset automations list` і `superset hosts list`. Коротко опиши результати й запропонуй три способи використовувати CLI або писати з ним скрипти в моїй роботі. Нічого не створюй, не змінюй і не видаляй."
+
 msgid "Show more"
 msgstr "Показати більше"
 
@@ -18387,6 +18408,9 @@ msgstr "Показати наступну вкладку правої бічно
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Показати попередню вкладку правої бічної панелі, не переміщуючи фокус"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Показувати на бічній панелі кнопку з посиланнями на «Мобільні», «Хмара», CLI і «Власний хостинг»."
 
 msgid "Show the triggering payload"
 msgstr "Показати payload тригера"
@@ -21201,6 +21225,9 @@ msgstr "Тунель встановлено"
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
 
+msgid "Turn it back on in Settings → General."
+msgstr "Його можна знову ввімкнути в розділі «Налаштування → Загальні»."
+
 msgid "Turn off"
 msgstr "Вимкнути"
 
@@ -21755,6 +21782,12 @@ msgstr "Використати ручний вхід"
 
 msgid "Use more browser features: {features}"
 msgstr "Використовувати більше можливостей браузера: {features}"
+
+msgid "Use Paradev anywhere"
+msgstr "Використовуйте Paradev будь-де"
+
+msgid "Use Paradev anywhere button"
+msgstr "Кнопка «Використовуйте Paradev будь-де»"
 
 msgid "Use Paradev on mobile"
 msgstr "Використовуйте Paradev на мобільних пристроях"
