@@ -93,6 +93,7 @@ import { useWorkspacePaneOpeners } from "./hooks/useWorkspacePaneOpeners";
 import { useWorkspaceRightPane } from "./hooks/useWorkspaceRightPane";
 import { RightPaneLinkTargetProvider } from "./providers/RightPaneLinkTargetProvider";
 import { WorkspaceGitStatusProvider } from "./providers/WorkspaceGitStatusProvider";
+import { useActiveRepositoryWorkspaceId } from "./state/activeRepositoryStore";
 import { FileDocumentStoreProvider } from "./state/fileDocumentStore";
 import type {
 	ConsumeSearch,
@@ -203,6 +204,7 @@ function V2WorkspaceContent() {
 	} = Route.useSearch();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
+	const repoWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
 	const navigate = Route.useNavigate();
 	const titleBarMainSlot = useTitleBarMainSlot();
 	const isParadevShell = useParadevShell();
@@ -648,7 +650,7 @@ function V2WorkspaceContent() {
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
 			<WorkspaceAgentEffects store={store} rightStore={rightStore} />
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
-				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
+				<WorkspaceGitStatusProvider workspaceId={repoWorkspaceId}>
 					<WorkspaceSplitLayout
 						mode={rightPaneMode}
 						activeAreaRef={activeAreaRef}
@@ -679,7 +681,7 @@ function V2WorkspaceContent() {
 								</>
 							) : (
 								<WorkspaceSidebar
-									workspaceId={workspaceId}
+									workspaceId={repoWorkspaceId}
 									runButton={workspaceRunButton}
 									onSelectFile={openFilePaneFromTreeClick}
 									onSelectDiffFile={openDiffPane}

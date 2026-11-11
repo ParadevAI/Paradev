@@ -5,7 +5,10 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { memo, useCallback, useDeferredValue, useMemo, useState } from "react";
 import { ChangesListHeader } from "renderer/routes/_authenticated/_dashboard/components/ChangesListHeader";
 import { ChangesSearchInput } from "renderer/routes/_authenticated/_dashboard/components/ChangesSearchInput";
-import { useFoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
+import {
+	type FoldSignal,
+	useFoldSignal,
+} from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
 import { filterChangedFiles } from "renderer/routes/_authenticated/_dashboard/utils/filterChangedFiles";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type {
@@ -48,6 +51,8 @@ interface ChangesTabContentProps {
 	onRenameBranch: (newName: string) => void;
 	canRenameBranch: boolean;
 	compact?: boolean;
+	/** Search and fold owned by a parent list that shows several of these. */
+	shared?: { query: string; foldSignal: FoldSignal };
 }
 
 export const ChangesTabContent = memo(function ChangesTabContent({
@@ -72,15 +77,21 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	onRenameBranch,
 	canRenameBranch,
 	compact = false,
+	shared,
 }: ChangesTabContentProps) {
-	const { foldSignal, collapsed: foldCollapsed, toggleFold } = useFoldSignal();
+	const {
+		foldSignal: ownFoldSignal,
+		collapsed: foldCollapsed,
+		toggleFold,
+	} = useFoldSignal();
+	const foldSignal = shared?.foldSignal ?? ownFoldSignal;
 
 	// Search is view-local and deliberately not persisted: reopening the tab
 	// starts from the full list. Filtering runs on the deferred query so the
 	// tree view's path resets don't run on every keystroke.
 	const [searchOpen, setSearchOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const deferredQuery = useDeferredValue(searchQuery);
+	const deferredQuery = useDeferredValue(shared?.query ?? searchQuery);
 	const toggleSearch = useCallback(() => {
 		setSearchOpen((open) => !open);
 		setSearchQuery("");
@@ -119,7 +130,7 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			{compact ? (
+			{shared && compact ? null : compact ? (
 				<ChangesListHeader
 					query={searchQuery}
 					onQueryChange={setSearchQuery}
@@ -158,9 +169,10 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 							currentBranchName={status.data.currentBranch.name}
 							canRenameBranch={canRenameBranch}
 							onRenameBranch={onRenameBranch}
+							showUtilities={!shared}
 						/>
 					</div>
-					{searchOpen && (
+					{searchOpen && !shared && (
 						<ChangesSearchInput
 							query={searchQuery}
 							onQueryChange={setSearchQuery}

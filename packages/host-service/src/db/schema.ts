@@ -87,6 +87,13 @@ export const projects = sqliteTable(
 	"projects",
 	{
 		id: text().primaryKey(),
+		// "container" holds repositories and has no repo of its own (repoPath is "").
+		kind: text()
+			.$type<"repository" | "container">()
+			.notNull()
+			.default("repository"),
+		// Set on a repository of a container project; such rows are hidden.
+		parentProjectId: text("parent_project_id"),
 		repoPath: text("repo_path").notNull(),
 		repoProvider: text("repo_provider"),
 		repoOwner: text("repo_owner"),
@@ -238,6 +245,8 @@ export const workspaces = sqliteTable(
 			onDelete: "cascade",
 		}),
 		worktreePath: text("worktree_path").notNull(),
+		// Set on a repository checkout of a container workspace; such rows are hidden.
+		parentWorkspaceId: text("parent_workspace_id"),
 		branch: text().notNull(),
 		headSha: text("head_sha"),
 		upstreamOwner: text("upstream_owner"),

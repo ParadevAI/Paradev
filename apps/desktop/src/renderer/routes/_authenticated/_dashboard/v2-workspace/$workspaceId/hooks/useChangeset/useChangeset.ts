@@ -8,6 +8,8 @@ import type { ChangesetFile, DiffRef } from "./types";
 interface UseChangesetArgs {
 	workspaceId: string;
 	ref: DiffRef;
+	/** Tags each file with workspaceId, for views that mix repositories. */
+	tagWorkspace?: boolean;
 }
 
 interface UseChangesetResult {
@@ -20,6 +22,7 @@ interface UseChangesetResult {
 export function useChangeset({
 	workspaceId,
 	ref,
+	tagWorkspace = false,
 }: UseChangesetArgs): UseChangesetResult {
 	const gitStatus = useWorkspaceGitStatus();
 	const commitQuery = workspaceTrpc.git.getCommitFiles.useQuery(
@@ -36,7 +39,7 @@ export function useChangeset({
 		},
 	);
 
-	const files = useMemo<ChangesetFile[]>(() => {
+	const untaggedFiles = useMemo<ChangesetFile[]>(() => {
 		if (ref.kind === "commit") {
 			return (commitQuery.data?.files ?? []).map((file) => ({
 				path: file.path,
@@ -58,6 +61,13 @@ export function useChangeset({
 
 		return buildChangesetFiles(status, ref);
 	}, [ref, gitStatus.data, commitQuery.data?.files]);
+	const files = useMemo(
+		() =>
+			tagWorkspace
+				? untaggedFiles.map((file) => ({ ...file, workspaceId }))
+				: untaggedFiles,
+		[untaggedFiles, tagWorkspace, workspaceId],
+	);
 
 	const activeQuery = ref.kind === "commit" ? commitQuery : gitStatus;
 

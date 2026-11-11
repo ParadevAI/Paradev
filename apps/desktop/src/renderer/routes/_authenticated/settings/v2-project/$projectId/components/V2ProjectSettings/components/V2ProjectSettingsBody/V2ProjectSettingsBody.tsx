@@ -18,6 +18,7 @@ import { BranchPrefixSection } from "../BranchPrefixSection";
 import { IconUploadField } from "../IconUploadField";
 import { NameSection } from "../NameSection";
 import { NamingInstructionsSection } from "../NamingInstructionsSection";
+import { RepositoriesSection } from "../RepositoriesSection";
 import { RepositorySection } from "../RepositorySection";
 import { SparseCheckoutSection } from "../SparseCheckoutSection";
 import { WorktreeLocationSection } from "../WorktreeLocationSection";
@@ -72,6 +73,7 @@ export function V2ProjectSettingsBody({
 	});
 	// Accent color follows the same per-host precedence as the icon.
 	const projectColor = hostProject ? hostProject.color : project.color;
+	const isContainer = hostProject?.kind === "container";
 	const canRename = Boolean(
 		targetHostUrl && targetHostId && project.hostIds.includes(targetHostId),
 	);
@@ -114,14 +116,29 @@ export function V2ProjectSettingsBody({
 							onRenamed={() => onHostProjectChanged()}
 						/>
 					</SettingsRow>
-					<SettingsRow
-						label={t({
-							message: "Repository",
-						})}
-						htmlFor="project-repo"
-					>
-						<RepositorySection repoUrl={project.repoUrl} />
-					</SettingsRow>
+					{isContainer ? (
+						<SettingsRow
+							label={t({ message: "Repositories" })}
+							hint={t({
+								message:
+									"Every workspace of this project checks out all of them, side by side, on one branch.",
+							})}
+						>
+							<RepositoriesSection
+								projectId={projectId}
+								hostUrl={targetHostUrl}
+							/>
+						</SettingsRow>
+					) : (
+						<SettingsRow
+							label={t({
+								message: "Repository",
+							})}
+							htmlFor="project-repo"
+						>
+							<RepositorySection repoUrl={project.repoUrl} />
+						</SettingsRow>
+					)}
 					<SettingsRow
 						label={t({ message: "Icon" })}
 						hint={t({
@@ -195,13 +212,15 @@ export function V2ProjectSettingsBody({
 							"Where the repository and new worktrees live on this host.",
 					})}
 				>
-					<SettingsRow
-						label={t({
-							message: "Location",
-						})}
-					>
-						{locationSection}
-					</SettingsRow>
+					{!isContainer && (
+						<SettingsRow
+							label={t({
+								message: "Location",
+							})}
+						>
+							{locationSection}
+						</SettingsRow>
+					)}
 					<SettingsRow
 						label={t({
 							message: "Worktrees",
@@ -222,7 +241,7 @@ export function V2ProjectSettingsBody({
 							onChanged={() => onHostProjectChanged()}
 						/>
 					</SettingsRow>
-					{targetHostUrl && hostProject && (
+					{targetHostUrl && hostProject && !isContainer && (
 						<div className="pt-4">
 							<div className="mb-3">
 								<Label
@@ -256,7 +275,7 @@ export function V2ProjectSettingsBody({
 					)}
 				</SettingsSection>
 
-				{targetHostUrl && (
+				{targetHostUrl && !isContainer && (
 					<SettingsSection
 						title={
 							usesConfigToml

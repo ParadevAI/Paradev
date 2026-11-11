@@ -8,6 +8,7 @@ export interface NewProjectResult {
 type ActiveModal =
 	| { kind: "none" }
 	| { kind: "new-project" }
+	| { kind: "local-project" }
 	| { kind: "empty-project" }
 	| { kind: "template-gallery" };
 
@@ -21,6 +22,7 @@ interface AddRepositoryModalState {
 	 * one global add-project modal can be active at a time.
 	 */
 	openNewProject: () => Promise<NewProjectResult | null>;
+	openLocalProject: () => Promise<NewProjectResult | null>;
 	openEmptyProject: () => Promise<NewProjectResult | null>;
 	openTemplateGallery: () => Promise<NewProjectResult | null>;
 	resolveNewProject: (result: NewProjectResult | null) => void;
@@ -41,6 +43,13 @@ export const useAddRepositoryModalStore = create<AddRepositoryModalState>()(
 				return new Promise<NewProjectResult | null>((resolve) => {
 					pendingResolve = resolve;
 					set({ active: { kind: "new-project" } });
+				});
+			},
+			openLocalProject: () => {
+				pendingResolve?.(null);
+				return new Promise<NewProjectResult | null>((resolve) => {
+					pendingResolve = resolve;
+					set({ active: { kind: "local-project" } });
 				});
 			},
 			openEmptyProject: () => {
@@ -78,6 +87,8 @@ export const useAddRepositoryModalActive = () =>
 	useAddRepositoryModalStore((state) => state.active);
 export const useOpenNewProjectModal = () =>
 	useAddRepositoryModalStore((state) => state.openNewProject);
+export const useOpenLocalProjectModal = () =>
+	useAddRepositoryModalStore((state) => state.openLocalProject);
 export const useOpenEmptyProjectModal = () =>
 	useAddRepositoryModalStore((state) => state.openEmptyProject);
 export const useOpenTemplateGalleryModal = () =>

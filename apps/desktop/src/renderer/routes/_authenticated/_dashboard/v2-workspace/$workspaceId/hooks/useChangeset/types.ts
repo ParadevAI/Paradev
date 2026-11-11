@@ -19,4 +19,6 @@ export interface ChangesetFile {
 	deletions: number | null;
 	isBinary?: boolean;
 	source: DiffFileSource;
+	/** The repository checkout the file is in. Set only in multi-repo views. */
+	workspaceId?: string;
 }

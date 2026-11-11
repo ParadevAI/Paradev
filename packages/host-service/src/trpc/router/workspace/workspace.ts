@@ -1,10 +1,11 @@
 import { basename } from "node:path";
 import { workspaceTagsInputSchema } from "@superset/shared/workspace-tags";
 import { TRPCError } from "@trpc/server";
-import { eq, isNotNull, isNull } from "drizzle-orm";
+import { and, eq, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
 import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
+import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
 import { isMissingPath } from "../../../runtime/path-state";
 import {
 	getWorkspaceTags,
@@ -38,11 +39,7 @@ export const workspaceRouter = router({
 			};
 		}),
 
-	/**
-	 * The repositories a workspace holds, primary first. A workspace holds one
-	 * repository, at its root, until multi-repo workspaces land; the shape is
-	 * the one they will return.
-	 */
+	/** A container workspace's checkouts in the order their repositories were added; a single-repo workspace is its own. */
 	repositories: protectedProcedure
 		.input(z.object({ workspaceId: z.string() }))
 		.query(({ ctx, input }) => {
@@ -55,17 +52,18 @@ export const workspaceRouter = router({
 					message: "Workspace not found",
 				});
 			}
-			const project = workspace.projectId
-				? getProjectIncludingDeleted(ctx.db, workspace.projectId)
-				: undefined;
-			return [
-				{
-					id: workspace.id,
-					path: ".",
-					name: basename(project?.repoPath ?? workspace.worktreePath),
-					primary: true,
-				},
-			];
+			const children = listRepositoryWorkspaces(ctx.db, workspace.id);
+			return (children.length > 0 ? children : [workspace]).map((row) => {
+				const project = row.projectId
+					? getProjectIncludingDeleted(ctx.db, row.projectId)
+					: undefined;
+				return {
+					id: row.id,
+					name: basename(project?.repoPath || row.worktreePath),
+					branch: row.branch,
+					worktreePath: row.worktreePath,
+				};
+			});
 		}),
 
 	/**
@@ -90,6 +88,7 @@ export const workspaceRouter = router({
 				? ctx.db
 						.select()
 						.from(workspaces)
+						.where(isNull(workspaces.parentWorkspaceId))
 						.all()
 						.filter(
 							(row) => !row.projectId || !deletedProjectIds.has(row.projectId),
@@ -97,7 +96,12 @@ export const workspaceRouter = router({
 				: ctx.db
 						.select()
 						.from(workspaces)
-						.where(isNull(workspaces.archivedAt))
+						.where(
+							and(
+								isNull(workspaces.archivedAt),
+								isNull(workspaces.parentWorkspaceId),
+							),
+						)
 						.all();
 			const projectNameById = new Map(
 				ctx.db

@@ -32,6 +32,8 @@ interface ChangesToolbarProps {
 	currentBranchName: string;
 	canRenameBranch: boolean;
 	onRenameBranch: (newName: string) => void;
+	/** False leaves search, view mode and fold to a parent list. */
+	showUtilities?: boolean;
 }
 
 /**
@@ -59,6 +61,7 @@ export function ChangesToolbar({
 	currentBranchName,
 	canRenameBranch,
 	onRenameBranch,
+	showUtilities = true,
 }: ChangesToolbarProps) {
 	const { t } = useLingui();
 	const label = collapsed
@@ -84,41 +87,43 @@ export function ChangesToolbar({
 				canRenameBranch={canRenameBranch}
 				onRenameBranch={onRenameBranch}
 			/>
-			<div className="ml-auto flex shrink-0 items-center gap-0.5">
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className={cn(
-								"size-7 text-muted-foreground hover:text-foreground",
-								searchOpen && "bg-accent text-foreground",
-							)}
-							onClick={onToggleSearch}
-							aria-label={searchLabel}
-							aria-pressed={searchOpen}
-						>
-							<Search className="size-3.5" />
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent side="bottom">{searchLabel}</TooltipContent>
-				</Tooltip>
-				<ViewModeToggle viewMode={viewMode} onChange={onViewModeChange} />
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="size-7 text-muted-foreground hover:text-foreground"
-							onClick={onToggleFold}
-							aria-label={label}
-						>
-							<Icon className="size-3.5" />
-						</Button>
-					</TooltipTrigger>
-					<TooltipContent side="bottom">{label}</TooltipContent>
-				</Tooltip>
-			</div>
+			{showUtilities && (
+				<div className="ml-auto flex shrink-0 items-center gap-0.5">
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								className={cn(
+									"size-7 text-muted-foreground hover:text-foreground",
+									searchOpen && "bg-accent text-foreground",
+								)}
+								onClick={onToggleSearch}
+								aria-label={searchLabel}
+								aria-pressed={searchOpen}
+							>
+								<Search className="size-3.5" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">{searchLabel}</TooltipContent>
+					</Tooltip>
+					<ViewModeToggle viewMode={viewMode} onChange={onViewModeChange} />
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="size-7 text-muted-foreground hover:text-foreground"
+								onClick={onToggleFold}
+								aria-label={label}
+							>
+								<Icon className="size-3.5" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">{label}</TooltipContent>
+					</Tooltip>
+				</div>
+			)}
 		</div>
 	);
 }

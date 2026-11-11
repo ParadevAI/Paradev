@@ -59,6 +59,7 @@ import { getV2NotificationSourcesForPane } from "renderer/stores/v2-notification
 import type { StoreApi } from "zustand/vanilla";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
+import { useActiveRepositoryWorkspaceId } from "../../state/activeRepositoryStore";
 import {
 	getDocument,
 	useSharedFileDocument,
@@ -206,6 +207,7 @@ export function usePaneRegistry({
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
+	const repoWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
 	const closeChatWithUndo = useUndoableChatClose({
 		workspaceId,
 		store,
@@ -334,7 +336,7 @@ export function usePaneRegistry({
 								isActive={ctx.isActive}
 								pinned={Boolean(ctx.pane.pinned)}
 								showDirty={ctx.store !== rightStore}
-								workspaceId={workspaceId}
+								workspaceId={repoWorkspaceId}
 							/>
 						);
 					},
@@ -343,13 +345,13 @@ export function usePaneRegistry({
 						return (
 							<FileViewLayout
 								context={ctx}
-								workspaceId={workspaceId}
+								workspaceId={repoWorkspaceId}
 								showTree={inRightPane}
 								onSearch={onSearch}
 							>
 								<FilePane
 									context={ctx}
-									workspaceId={workspaceId}
+									workspaceId={repoWorkspaceId}
 									inRightPane={inRightPane}
 								/>
 							</FileViewLayout>
@@ -358,7 +360,7 @@ export function usePaneRegistry({
 					renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
 						<FilePaneHeaderExtras
 							context={ctx}
-							workspaceId={workspaceId}
+							workspaceId={repoWorkspaceId}
 							inRightPane={ctx.store === rightStore}
 						/>
 					),
@@ -366,7 +368,7 @@ export function usePaneRegistry({
 						ctx.actions.pin(),
 					onBeforeClose: (pane) => {
 						const data = pane.data as FilePaneData;
-						const doc = getDocument(workspaceId, data.filePath);
+						const doc = getDocument(repoWorkspaceId, data.filePath);
 						if (!doc?.dirty) return true;
 						const name = getFileName(data.filePath);
 						return new Promise<boolean>((resolve) => {
@@ -384,7 +386,7 @@ export function usePaneRegistry({
 											message: "Save",
 										}),
 										onClick: async () => {
-											const doc = getDocument(workspaceId, data.filePath);
+											const doc = getDocument(repoWorkspaceId, data.filePath);
 											if (!doc) {
 												resolve(true);
 												return;
@@ -410,7 +412,7 @@ export function usePaneRegistry({
 										}),
 										variant: "secondary",
 										onClick: async () => {
-											const doc = getDocument(workspaceId, data.filePath);
+											const doc = getDocument(repoWorkspaceId, data.filePath);
 											if (doc) await doc.reload();
 											resolve(true);
 										},
@@ -453,7 +455,7 @@ export function usePaneRegistry({
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
 						<DiffPane
 							context={ctx}
-							workspaceId={workspaceId}
+							workspaceId={repoWorkspaceId}
 							onOpenFile={onOpenFile}
 							onCreateNewAgentSession={createNewAgentSession}
 						/>
@@ -876,7 +878,7 @@ export function usePaneRegistry({
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
 						<FilesTreePane
 							context={ctx}
-							workspaceId={workspaceId}
+							workspaceId={repoWorkspaceId}
 							onSearch={onSearch}
 						/>
 					),
@@ -885,7 +887,7 @@ export function usePaneRegistry({
 					getIcon: () => <Files className="size-3.5" />,
 					getTitle: () => t({ message: "Files changed" }),
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
-						<ChangesListPane context={ctx} workspaceId={workspaceId} />
+						<ChangesListPane context={ctx} workspaceId={repoWorkspaceId} />
 					),
 				},
 				review: {
@@ -1180,6 +1182,7 @@ export function usePaneRegistry({
 			store,
 			linkedStores,
 			workspaceId,
+			repoWorkspaceId,
 			startNewShell,
 			forkIntoOtherSurface,
 			closeChatWithUndo,

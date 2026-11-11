@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
 import {
 	projects,
 	tagFolderSettings,
@@ -71,6 +71,19 @@ export async function softDeleteProject(
 				updatedAt: deletedAt,
 			})
 			.where(eq(projects.id, projectId))
+			.run();
+		tx.update(projects)
+			.set({
+				deletedAt,
+				deletedByUserId: ctx.userId ?? null,
+				updatedAt: deletedAt,
+			})
+			.where(
+				and(
+					eq(projects.parentProjectId, projectId),
+					isNull(projects.deletedAt),
+				),
+			)
 			.run();
 		if (live.length > 0)
 			tx.update(workspaces)
@@ -164,7 +177,15 @@ export function restoreProject(
 	ctx.db
 		.update(projects)
 		.set({ deletedAt: null, deletedByUserId: null, updatedAt: Date.now() })
-		.where(eq(projects.id, projectId))
+		.where(
+			or(
+				eq(projects.id, projectId),
+				and(
+					eq(projects.parentProjectId, projectId),
+					eq(projects.deletedAt, project.deletedAt),
+				),
+			),
+		)
 		.run();
 	const restored = getProjectIncludingDeleted(ctx.db, projectId);
 	if (restored) emitProjectChanged(ctx.eventBus, "created", restored);
@@ -176,7 +197,7 @@ export function listDeletedProjects(ctx: Pick<ProjectDeletionContext, "db">) {
 	return ctx.db
 		.select()
 		.from(projects)
-		.where(isNotNull(projects.deletedAt))
+		.where(and(isNotNull(projects.deletedAt), isNull(projects.parentProjectId)))
 		.all()
 		.map((row) => ({
 			id: row.id,

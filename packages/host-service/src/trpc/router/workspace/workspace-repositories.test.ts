@@ -44,7 +44,12 @@ describe("workspace.repositories", () => {
 		const caller = setup({ repoPath: "/tmp/acme" });
 
 		expect(await caller.repositories({ workspaceId: "ws-1" })).toEqual([
-			{ id: "ws-1", path: ".", name: "acme", primary: true },
+			{
+				id: "ws-1",
+				name: "acme",
+				branch: "feature-x",
+				worktreePath: "/tmp/worktrees/feature-x",
+			},
 		]);
 	});
 

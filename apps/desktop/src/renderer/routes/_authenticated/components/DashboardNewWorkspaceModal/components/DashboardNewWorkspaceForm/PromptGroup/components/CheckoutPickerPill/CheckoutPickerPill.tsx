@@ -21,6 +21,8 @@ interface CheckoutPickerPillProps {
 	onSelectCheckout: (checkout: WorkspaceCheckout) => void;
 	/** A linked PR always gets its own worktree; the pill shows why it is fixed. */
 	disabled?: boolean;
+	/** Set when Local is not possible for this project; shown in place of its description. */
+	localUnavailableReason?: string;
 }
 
 /**
@@ -32,6 +34,7 @@ export function CheckoutPickerPill({
 	checkout,
 	onSelectCheckout,
 	disabled = false,
+	localUnavailableReason,
 }: CheckoutPickerPillProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
@@ -81,6 +84,7 @@ export function CheckoutPickerPill({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onSelect={() => onSelectCheckout("local")}
+					disabled={localUnavailableReason !== undefined}
 					className="items-start gap-2"
 				>
 					<CgLaptop className="mt-0.5 size-4 shrink-0" />
@@ -89,9 +93,11 @@ export function CheckoutPickerPill({
 							<Trans>Local</Trans>
 						</span>
 						<span className="text-xs text-muted-foreground">
-							<Trans>
-								The project's checkout as it is: files and branch are shared
-							</Trans>
+							{localUnavailableReason ?? (
+								<Trans>
+									The project's checkout as it is: files and branch are shared
+								</Trans>
+							)}
 						</span>
 					</span>
 					{checkout === "local" && (

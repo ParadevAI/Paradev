@@ -38,7 +38,7 @@ export function FileViewTree({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<RepoPicker workspaceId={workspaceId} />
+			<RepoPicker />
 			<div className="min-h-0 flex-1">
 				<FilesTab
 					variant="fileView"

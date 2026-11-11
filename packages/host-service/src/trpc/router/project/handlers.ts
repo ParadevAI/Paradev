@@ -1,10 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
+import { basename } from "node:path";
 import { TRPCError } from "@trpc/server";
+import { and, eq, isNull } from "drizzle-orm";
+import { projects, workspaces } from "../../../db/schema";
 import {
+	emitProjectChanged,
 	getLiveProjectAtPath,
+	getLocalProject,
 	getProjectAtPathIncludingDeleted,
 } from "../../../projects/local-project-store";
+import { isContainerProject } from "../../../projects/multi-repo";
 import { restoreProject } from "../../../projects/project-deletion";
 import type { HostServiceContext } from "../../../types";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
@@ -193,4 +199,123 @@ export async function createFromTemplate(
 		resolved,
 		cleanupRepoPathOnFailure: true,
 	});
+}
+
+async function resolveRepositoryForContainer(
+	ctx: HostServiceContext,
+	containerId: string | null,
+	repoPath: string,
+): Promise<ResolvedRepo> {
+	const resolved = await adoptLocalRepo(repoPath);
+	const owner = getLiveProjectAtPath(ctx.db, resolved.repoPath);
+	if (owner) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message:
+				owner.parentProjectId === containerId
+					? "This repository is already part of the project"
+					: `${basename(resolved.repoPath)} already belongs to another project`,
+		});
+	}
+	return resolved;
+}
+
+function insertRepositoryRow(
+	ctx: HostServiceContext,
+	containerId: string,
+	resolved: ResolvedRepo,
+): string {
+	const id = randomUUID();
+	ctx.db
+		.insert(projects)
+		.values({
+			id,
+			parentProjectId: containerId,
+			repoPath: resolved.repoPath,
+			repoProvider: resolved.parsed ? "github" : null,
+			repoOwner: resolved.parsed?.owner ?? null,
+			repoName: resolved.parsed?.name ?? null,
+			repoUrl: resolved.parsed?.url ?? null,
+			remoteName: resolved.remoteName,
+			name: basename(resolved.repoPath),
+			updatedAt: Date.now(),
+		})
+		.run();
+	return id;
+}
+
+/** A project that holds repositories and has none of its own. */
+export async function createContainerProject(
+	ctx: HostServiceContext,
+	args: { name: string; repoPaths: string[] },
+): Promise<{ projectId: string }> {
+	const name = args.name.trim();
+	if (!name) {
+		throw new TRPCError({ code: "BAD_REQUEST", message: "Name the project" });
+	}
+	const resolved: ResolvedRepo[] = [];
+	for (const repoPath of args.repoPaths) {
+		const repo = await resolveRepositoryForContainer(ctx, null, repoPath);
+		if (!resolved.some((other) => other.repoPath === repo.repoPath)) {
+			resolved.push(repo);
+		}
+	}
+	const projectId = randomUUID();
+	ctx.db
+		.insert(projects)
+		.values({
+			id: projectId,
+			kind: "container",
+			repoPath: "",
+			name,
+			updatedAt: Date.now(),
+		})
+		.run();
+	for (const repo of resolved) insertRepositoryRow(ctx, projectId, repo);
+	const row = getLocalProject(ctx.db, projectId);
+	if (row) emitProjectChanged(ctx.eventBus, "created", row);
+	return { projectId };
+}
+
+export async function addProjectRepository(
+	ctx: HostServiceContext,
+	args: { projectId: string; repoPath: string },
+): Promise<{ projectId: string; repoPath: string }> {
+	const container = getLocalProject(ctx.db, args.projectId);
+	if (!isContainerProject(container)) {
+		throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
+	}
+	const resolved = await resolveRepositoryForContainer(
+		ctx,
+		args.projectId,
+		args.repoPath,
+	);
+	return {
+		projectId: insertRepositoryRow(ctx, args.projectId, resolved),
+		repoPath: resolved.repoPath,
+	};
+}
+
+export function removeProjectRepository(
+	ctx: HostServiceContext,
+	args: { projectId: string; repositoryProjectId: string },
+): void {
+	const repo = getLocalProject(ctx.db, args.repositoryProjectId);
+	if (!repo || repo.parentProjectId !== args.projectId) {
+		throw new TRPCError({ code: "NOT_FOUND", message: "Repository not found" });
+	}
+	const inUse = ctx.db
+		.select({ id: workspaces.id })
+		.from(workspaces)
+		.where(
+			and(eq(workspaces.projectId, repo.id), isNull(workspaces.archivedAt)),
+		)
+		.get();
+	if (inUse) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: "Delete the workspaces that use this repository first",
+		});
+	}
+	ctx.db.delete(projects).where(eq(projects.id, repo.id)).run();
 }

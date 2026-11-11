@@ -4,22 +4,20 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
-import { workspaceTrpc } from "@superset/workspace-client";
 import { LuCheck, LuChevronDown, LuFolderGit2 } from "react-icons/lu";
+import {
+	useActiveRepositoryStore,
+	useActiveRepositoryWorkspaceId,
+	useWorkspaceRepositories,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/activeRepositoryStore";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 
-interface RepoPickerProps {
-	workspaceId: string;
-}
-
-export function RepoPicker({ workspaceId }: RepoPickerProps) {
-	// A host older than workspace.repositories errors here, which hides the
-	// picker the same way a single repository does.
-	const repositoriesQuery = workspaceTrpc.workspace.repositories.useQuery(
-		{ workspaceId },
-		{ retry: false, staleTime: 30_000 },
-	);
-	const repositories = repositoriesQuery.data ?? [];
-	const current = repositories.find((repository) => repository.primary);
+export function RepoPicker() {
+	const workspaceId = useWorkspace().workspace.id;
+	const activeId = useActiveRepositoryWorkspaceId(workspaceId);
+	const select = useActiveRepositoryStore((state) => state.select);
+	const repositories = useWorkspaceRepositories(workspaceId);
+	const current = repositories.find((repository) => repository.id === activeId);
 	if (repositories.length < 2 || !current) return null;
 	return (
 		<div className="px-2 pt-2">
@@ -41,9 +39,15 @@ export function RepoPicker({ workspaceId }: RepoPickerProps) {
 					className="w-(--radix-dropdown-menu-trigger-width)"
 				>
 					{repositories.map((repository) => (
-						<DropdownMenuItem key={repository.id}>
+						<DropdownMenuItem
+							key={repository.id}
+							onSelect={() => select(workspaceId, repository.id)}
+						>
 							<LuFolderGit2 className="text-muted-foreground" />
 							<span className="flex-1 truncate">{repository.name}</span>
+							<span className="max-w-32 truncate text-xs text-muted-foreground">
+								{repository.branch}
+							</span>
 							{repository.id === current.id && <LuCheck />}
 						</DropdownMenuItem>
 					))}

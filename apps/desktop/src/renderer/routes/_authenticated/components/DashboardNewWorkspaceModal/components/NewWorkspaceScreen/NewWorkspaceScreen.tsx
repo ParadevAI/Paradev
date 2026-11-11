@@ -361,6 +361,13 @@ export function NewWorkspaceScreen({
 		(project) => project.id === projectId,
 	);
 	const needsSetup = !isCloudHost && selectedProject?.needsSetup === true;
+	// A container project has no checkout of its own to work in locally.
+	const isContainerProject = hostProjects.some(
+		(project) => project.id === projectId && project.kind === "container",
+	);
+	const singleRepositoryOnly = t({
+		message: "Only supported in projects with a single repository",
+	});
 
 	// ── Cloud environment ────────────────────────────────────────────
 	const environmentsQuery = cloudTrpc.environment.list.useQuery(
@@ -1136,7 +1143,19 @@ export function NewWorkspaceScreen({
 				</>
 			) : isCloudHost ? (
 				<CompareBaseBranchPicker {...pickerProps} />
-			) : isSession ? null : (
+			) : isSession ? null : isContainerProject ? (
+				<>
+					<CheckoutPickerPill
+						checkout="worktree"
+						onSelectCheckout={() => {}}
+						localUnavailableReason={singleRepositoryOnly}
+					/>
+					<CompareBaseBranchPicker
+						{...pickerProps}
+						disabledReason={singleRepositoryOnly}
+					/>
+				</>
+			) : (
 				<>
 					<CheckoutPickerPill
 						checkout={draft.checkout}

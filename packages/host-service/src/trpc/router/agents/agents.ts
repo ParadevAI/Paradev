@@ -31,6 +31,7 @@ import { z } from "zod";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
+import { isContainerWorkspace } from "../../../projects/multi-repo";
 import {
 	createTerminalSessionInternal,
 	sendAgentMessage,
@@ -879,14 +880,18 @@ export async function runAgentInWorkspace(
 	// folder in the launching agent's own trust store so its first
 	// interactive boot skips the trust dialog. Worktree workspaces inherit
 	// trust from the main checkout and need nothing.
-	if (workspace.projectId === null) {
+	const rootPath = workspace.worktreePath;
+	if (
+		workspace.projectId === null ||
+		isContainerWorkspace(ctx.db, workspace.id)
+	) {
 		const config = resolveHostAgentConfig(ctx.db, input.agent);
 		if (config) {
-			await seedAgentFolderTrust(ctx.db, workspace.worktreePath, config);
+			await seedAgentFolderTrust(ctx.db, rootPath, config);
 		}
 	}
 	return (
-		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
+		launchChatAgent(ctx, input, rootPath, launch.terminalId) ??
 		runTerminalAgent(ctx, input, launch.terminalId)
 	);
 }

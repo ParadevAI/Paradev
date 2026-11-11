@@ -78,6 +78,7 @@ export function emitProjectChanged(
 	rowOrId: HostProjectRow | string,
 	tagSettings?: TagSettingSnapshot[],
 ): void {
+	if (typeof rowOrId !== "string" && rowOrId.parentProjectId) return;
 	const deleted = eventType === "deleted";
 	eventBus.broadcastProjectChanged({
 		projectId: typeof rowOrId === "string" ? rowOrId : rowOrId.id,

@@ -19,6 +19,10 @@ import {
 	updateLocalProject,
 } from "../../../projects/local-project-store";
 import {
+	isContainerProject,
+	listRepositoryProjects,
+} from "../../../projects/multi-repo";
+import {
 	listDeletedProjects,
 	purgeDeletedProject,
 	readDeletionImpact,
@@ -51,10 +55,13 @@ import {
 import { normalizeWorktreePath } from "../workspace-creation/shared/worktree-list";
 import { normalizeWorktreeBaseDir } from "../workspace-creation/shared/worktree-paths";
 import {
+	addProjectRepository,
+	createContainerProject,
 	createFromClone,
 	createFromEmpty,
 	createFromImportLocal,
 	createFromTemplate,
+	removeProjectRepository,
 } from "./handlers";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import { getGitHubRemotes } from "./utils/git-remote";
@@ -108,7 +115,7 @@ export const projectRouter = router({
 		return ctx.db
 			.select()
 			.from(projects)
-			.where(isNull(projects.deletedAt))
+			.where(and(isNull(projects.deletedAt), isNull(projects.parentProjectId)))
 			.all()
 			.map((row) => ({
 				id: row.id,
@@ -117,6 +124,7 @@ export const projectRouter = router({
 				tagSettings: tagSettingsByProject.get(row.id) ?? [],
 				// Empty until the backfill sweep fills it; folder name is the
 				// honest fallback (same rule as toProjectSnapshot).
+				kind: row.kind,
 				name: row.name || basename(row.repoPath),
 				repoPath: row.repoPath,
 				repoOwner: row.repoOwner,
@@ -229,9 +237,11 @@ export const projectRouter = router({
 			return {
 				id: row.id,
 				// Same fallback rule as project.list / toProjectSnapshot.
+				kind: row.kind,
 				name: row.name || basename(row.repoPath),
 				repoPath: row.repoPath,
-				repoPathExists: await projectDirExists(row.repoPath),
+				repoPathExists:
+					isContainerProject(row) || (await projectDirExists(row.repoPath)),
 				repoOwner: row.repoOwner,
 				repoName: row.repoName,
 				repoUrl: row.repoUrl,
@@ -245,6 +255,49 @@ export const projectRouter = router({
 				namingInstructions: row.namingInstructions,
 			};
 		}),
+
+	/** A container project's repositories in the order they were added; a single-repo project is its own. */
+	repositories: protectedProcedure
+		.input(z.object({ projectId: z.string().uuid() }))
+		.query(({ ctx, input }) => {
+			const row = getLocalProject(ctx.db, input.projectId);
+			if (!row) return [];
+			const repos = isContainerProject(row)
+				? listRepositoryProjects(ctx.db, row.id)
+				: [row];
+			return repos.map((repo) => ({
+				id: repo.id,
+				name: basename(repo.repoPath),
+				repoPath: repo.repoPath,
+			}));
+		}),
+
+	createContainer: machineOnlyProcedure
+		.input(
+			z.object({
+				name: z.string().min(1),
+				repoPaths: z.array(z.string().min(1)).min(1),
+			}),
+		)
+		.mutation(({ ctx, input }) => createContainerProject(ctx, input)),
+
+	addRepository: machineOnlyProcedure
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				repoPath: z.string().min(1),
+			}),
+		)
+		.mutation(({ ctx, input }) => addProjectRepository(ctx, input)),
+
+	removeRepository: machineOnlyProcedure
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				repositoryProjectId: z.string().uuid(),
+			}),
+		)
+		.mutation(({ ctx, input }) => removeProjectRepository(ctx, input)),
 
 	/**
 	 * Set (or clear) this project's custom icon. Local-first: the icon is a

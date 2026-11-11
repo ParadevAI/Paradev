@@ -1,21 +1,10 @@
 import { workspaceTrpc } from "@superset/workspace-client";
-import { eq } from "@tanstack/db";
-import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useChangesFilter } from "../../state/repositoryChangesFilterStore";
 import type { DiffRef } from "../useChangeset/types";
 
 export function useSidebarDiffRef(workspaceId: string): DiffRef {
-	const collections = useCollections();
-	const { data: rows = [] } = useLiveQuery(
-		(query) =>
-			query
-				.from({ state: collections.v2WorkspaceLocalState })
-				.where(({ state }) => eq(state.workspaceId, workspaceId)),
-		[collections, workspaceId],
-	);
-	const sidebarState = rows[0]?.sidebarState;
-	const filter = sidebarState?.changesFilter ?? { kind: "all" };
+	const filter = useChangesFilter(workspaceId);
 
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
 		{ workspaceId },

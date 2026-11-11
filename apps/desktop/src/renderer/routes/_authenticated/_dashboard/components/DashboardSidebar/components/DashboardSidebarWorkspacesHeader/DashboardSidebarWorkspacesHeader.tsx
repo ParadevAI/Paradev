@@ -2,30 +2,16 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
-import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-import {
-	VscFolderOpened,
-	VscGithubAlt,
-	VscLayout,
-	VscNewFolder,
-} from "react-icons/vsc";
-import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWorkspace";
-import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
+import { VscFolderOpened, VscNewFolder } from "react-icons/vsc";
+import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
 import type {
 	SidebarProjectHostFilter,
 	SidebarProjectSortMode,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
-import {
-	useOpenEmptyProjectModal,
-	useOpenNewProjectModal,
-	useOpenTemplateGalleryModal,
-} from "renderer/stores/add-repository-modal";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { DashboardSidebarSectionHeader } from "../DashboardSidebarSectionHeader";
 import { DashboardSidebarProjectsFilterInput } from "./components/DashboardSidebarProjectsFilterInput";
@@ -79,51 +65,6 @@ export function DashboardSidebarWorkspacesHeader({
 		}
 		wasSectionCollapsedRef.current = isSectionCollapsed;
 	}, [isSectionCollapsed, onFilterQueryChange, setIsFilterExpanded]);
-	const openEmptyProject = useOpenEmptyProjectModal();
-	const openNewWorkspace = useOpenNewWorkspaceForLocalProject();
-	const openNewProject = useOpenNewProjectModal();
-	const openTemplateGallery = useOpenTemplateGalleryModal();
-	const navigate = useNavigate();
-	const folderImport = useFolderFirstImport({
-		onError: (message) => {
-			toast.error(
-				t({
-					message: `Import failed: ${message}`,
-				}),
-			);
-		},
-		onMultipleProjects: ({ candidates }) => {
-			toast.error(
-				t({
-					message: "Import failed",
-				}),
-				{
-					description: t({
-						message: `Multiple projects use this repository (${candidates.length}). Choose the project in settings to set it up on this device.`,
-					}),
-					action: {
-						label: t({
-							message: "Open Projects",
-						}),
-						onClick: () => navigate({ to: "/settings/projects" }),
-					},
-				},
-			);
-		},
-	});
-
-	const handleImportFolder = async () => {
-		const result = await folderImport.start();
-		if (result) {
-			openNewWorkspace(result.projectId);
-			toast.success(
-				t({
-					message: "Project imported and selected.",
-				}),
-			);
-		}
-	};
-
 	return (
 		<DashboardSidebarSectionHeader
 			label={t({
@@ -175,22 +116,7 @@ export function DashboardSidebarWorkspacesHeader({
 					onClick={(event) => event.stopPropagation()}
 					onKeyDown={(event) => event.stopPropagation()}
 				>
-					<DropdownMenuItem onSelect={handleImportFolder}>
-						<VscFolderOpened className="size-4" />
-						<Trans>Open project</Trans>
-					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => openNewProject()}>
-						<VscGithubAlt className="size-4" />
-						<Trans>Clone from URL</Trans>
-					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => openEmptyProject()}>
-						<VscNewFolder className="size-4" />
-						<Trans>Create new project</Trans>
-					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => openTemplateGallery()}>
-						<VscLayout className="size-4" />
-						<Trans>Start from a template</Trans>
-					</DropdownMenuItem>
+					<AddProjectMenuItems />
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</DashboardSidebarSectionHeader>

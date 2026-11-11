@@ -5,10 +5,12 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useCallback } from "react";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
-import { useSidebarDiffRef } from "../useSidebarDiffRef";
+import {
+	useChangesFilter,
+	useSetChangesFilter,
+} from "../../state/repositoryChangesFilterStore";
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
@@ -27,35 +29,20 @@ export interface ChangesScope {
 /**
  * Which diff the Changes list and pane show (the commit filter and the base
  * branch), shared by the sidebar's Changes tab and the Changes pane header.
- * useSidebarDiffRef's live query re-renders on any sidebarState change, so
- * the plain collection read of the filter stays fresh.
+ * A checkout without a local state row keeps its filter in memory.
  */
 export function useChangesScope(workspaceId: string): ChangesScope {
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
-	const collections = useCollections();
 	const utils = workspaceTrpc.useUtils();
-	useSidebarDiffRef(workspaceId);
-	const localState = collections.v2WorkspaceLocalState.get(workspaceId);
-	const filter: ChangesFilter = localState?.sidebarState?.changesFilter ?? {
-		kind: "all",
-	};
+	const filter = useChangesFilter(workspaceId);
+	const setFilter = useSetChangesFilter(workspaceId);
 
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
 		{ workspaceId },
 		{ staleTime: Number.POSITIVE_INFINITY },
 	);
 	const baseBranch = baseBranchQuery.data?.baseBranch ?? null;
-
-	const setFilter = useCallback(
-		(next: ChangesFilter) => {
-			if (!collections.v2WorkspaceLocalState.get(workspaceId)) return;
-			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-				draft.sidebarState.changesFilter = next;
-			});
-		},
-		[collections, workspaceId],
-	);
 
 	const setBaseBranchMutation = workspaceTrpc.git.setBaseBranch.useMutation({
 		onSuccess: () => {

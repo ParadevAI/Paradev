@@ -9,6 +9,7 @@ import {
 	useCloseAddRepositoryModal,
 	useResolveNewProjectModal,
 } from "renderer/stores/add-repository-modal";
+import { NewLocalProjectModal } from "./components/NewLocalProjectModal";
 import { NewProjectModal } from "./components/NewProjectModal";
 
 export function AddRepositoryModals() {
@@ -29,6 +30,13 @@ export function AddRepositoryModals() {
 		<>
 			<EmptyProjectModal
 				open={active.kind === "empty-project"}
+				onOpenChange={(open) => {
+					if (!open) close();
+				}}
+				onSuccess={handleProjectCreated}
+			/>
+			<NewLocalProjectModal
+				open={active.kind === "local-project"}
 				onOpenChange={(open) => {
 					if (!open) close();
 				}}

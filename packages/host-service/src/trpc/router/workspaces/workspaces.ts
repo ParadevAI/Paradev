@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { rm } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
 import {
 	deriveWorkspaceBranchFromPrompt,
 	generateFriendlyBranchName,
@@ -13,6 +14,11 @@ import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { workspaces } from "../../../db/schema";
 import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
+import {
+	isContainerProject,
+	listRepositoryProjects,
+	writeWorkspaceContextFiles,
+} from "../../../projects/multi-repo";
 import { createGitEnvResolver } from "../../../runtime/git";
 import { getGitAuthorName } from "../../../runtime/git/identity";
 import { resolveRef } from "../../../runtime/git/refs";
@@ -414,6 +420,212 @@ async function planBranchSource(
 	return { branch, startPoint, usedExistingBranch: false };
 }
 
+/**
+ * Check out each repository of a container project inside its workspace
+ * folder, all on one branch. Each gets a hidden workspace row of its own so
+ * the per-repository git, PR, and teardown code works on it unchanged.
+ */
+async function createRepositoryCheckouts(
+	ctx: HostServiceContext,
+	args: {
+		parentId: string;
+		name: string;
+		branch: string;
+		root: string;
+		repositoryProjects: ReturnType<typeof listRepositoryProjects>;
+	},
+): Promise<Array<{ id: string; worktreePath: string; branch: string }>> {
+	const created: Array<{ id: string; worktreePath: string; branch: string }> =
+		[];
+	for (const repository of args.repositoryProjects) {
+		const worktreePath = join(args.root, basename(repository.repoPath));
+		try {
+			const git = await ctx.git(repository.repoPath);
+			await git.raw(["worktree", "prune"]).catch(() => {});
+			const plan = await planBranchSource(
+				git,
+				args.branch,
+				undefined,
+				createWorkerBaseRefFetcher(ctx, repository.repoPath),
+			);
+			await addBranchWorktree({
+				git,
+				plan,
+				worktreePath,
+				sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
+			});
+			await enablePushAutoSetupRemote(git, worktreePath, "[workspaces.create]");
+		} catch (err) {
+			// ponytail: a repository that fails to check out is skipped, not
+			// rolled back with the rest; the workspace opens without it.
+			console.warn(
+				`[workspaces.create] skipped repository ${repository.repoPath}:`,
+				err,
+			);
+			continue;
+		}
+		const id = randomUUID();
+		const now = Date.now();
+		ctx.db
+			.insert(workspaces)
+			.values({
+				id,
+				projectId: repository.id,
+				parentWorkspaceId: args.parentId,
+				worktreePath,
+				branch: args.branch,
+				name: args.name,
+				type: "worktree",
+				createdByUserId: ctx.userId ?? null,
+				createdAt: now,
+				updatedAt: now,
+			})
+			.run();
+		created.push({ id, worktreePath, branch: args.branch });
+	}
+	return created;
+}
+
+/**
+ * A container project's workspace: one folder that holds a checkout of every
+ * repository, all on one new branch. The folder itself is not a repository.
+ */
+async function createContainerWorkspace(
+	ctx: HostServiceContext,
+	input: z.infer<typeof createInputSchema>,
+	project: ReturnType<typeof requireLocalProject>,
+) {
+	const repositories = listRepositoryProjects(ctx.db, project.id);
+	if (repositories.length === 0) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Add a repository to this project first",
+		});
+	}
+	// ponytail: only new-branch worktree workspaces; `checkout` is ignored, and
+	// PR and adopt creates wait for the UX of those flows to settle.
+	if (input.pr !== undefined || input.worktreePath !== undefined) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "This project can only create new-branch workspaces for now",
+		});
+	}
+	const existing = input.id ? getLocalWorkspace(ctx.db, input.id) : undefined;
+	if (existing) {
+		return {
+			workspace: toCloudShape(existing, ctx.organizationId),
+			terminals: [],
+			agents: [],
+			alreadyExists: true,
+			txid: null,
+		};
+	}
+
+	const composerPrompt =
+		input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
+	const typedBranch = input.branch?.trim();
+	const candidate =
+		typedBranch ||
+		(input.name ? sanitizeBranchCandidate(input.name) : "") ||
+		`${promptBranchSlug(composerPrompt) ?? generateFriendlyBranchName()}-${(input.id ?? randomUUID()).slice(0, 8)}`;
+	const prefix =
+		typedBranch || input.skipBranchPrefix
+			? null
+			: await resolveProjectBranchPrefix({
+					ctx,
+					project,
+					getAuthorName: createOffLoopAuthorNameGetter(
+						repositories[0]?.repoPath ?? "",
+					),
+					existingBranches: [],
+				});
+	const branch = prefix ? `${prefix}/${candidate}` : candidate;
+	const root = safeResolveWorktreePath(
+		getProjectWorktreesFolder(ctx, project),
+		branch,
+		project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx),
+	);
+	mkdirSync(root, { recursive: true });
+	const workspaceRow = await registerLocalWorkspace({
+		ctx,
+		id: input.id,
+		projectId: project.id,
+		name: input.name ?? NEW_WORKSPACE_NAME,
+		branch,
+		worktreePath: root,
+		taskId: input.taskId,
+		tags: input.tags,
+		rollbackWorktree: () => rm(root, { recursive: true, force: true }),
+	});
+	const checkouts = await createRepositoryCheckouts(ctx, {
+		parentId: workspaceRow.id,
+		name: workspaceRow.name,
+		branch,
+		root,
+		repositoryProjects: repositories,
+	});
+	writeWorkspaceContextFiles(root, checkouts);
+
+	if (composerPrompt && input.name === undefined) {
+		setWorkspaceNamingState(ctx.db, workspaceRow.id, {
+			prompt: composerPrompt,
+			attempts: 0,
+			branch: null,
+			agent: input.agents?.[0]?.agent ?? input.namingAgent ?? null,
+		});
+		scheduleWorkspaceNaming(ctx, workspaceRow.id);
+	}
+
+	const terminals: Array<{ terminalId: string; label?: string }> = [];
+	const agents = await dispatchSugarAgents(
+		ctx,
+		workspaceRow.id,
+		input.agents ?? [],
+	);
+	if (input.runSetup !== false) {
+		for (const checkout of checkouts) {
+			const setup = await startSetupTerminalIfPresent({
+				ctx,
+				workspaceId: workspaceRow.id,
+				repositoryWorkspaceId: checkout.id,
+			});
+			if (setup.warning) {
+				console.warn(`[workspaces.create] setup warning: ${setup.warning}`);
+			}
+			if (setup.terminal) {
+				terminals.push({
+					terminalId: setup.terminal.id,
+					label: setup.terminal.label,
+				});
+			}
+		}
+	}
+	if (input.command) {
+		const command = await startCommandTerminal({
+			ctx,
+			workspaceId: workspaceRow.id,
+			command: input.command,
+		});
+		if (command.terminal) {
+			terminals.push({
+				terminalId: command.terminal.id,
+				label: command.terminal.label,
+			});
+		}
+	}
+
+	const latest = getLocalWorkspace(ctx.db, workspaceRow.id);
+	return {
+		workspace: latest
+			? { ...workspaceRow, ...toCloudShape(latest, ctx.organizationId) }
+			: workspaceRow,
+		terminals,
+		agents,
+		alreadyExists: false,
+		txid: extractCreateTxid(workspaceRow),
+	};
+}
+
 // Adopt any worktree git knows about, no matter where it lives —
 // tools other than Superset can also `git worktree add`, and their
 // worktrees are valid adoption targets.
@@ -680,6 +892,9 @@ export const workspacesRouter = router({
 			}
 
 			const localProject = requireLocalProject(ctx, input.projectId);
+			if (isContainerProject(localProject)) {
+				return createContainerWorkspace(ctx, input, localProject);
+			}
 			const repoPath = requireProjectRepoPath(localProject);
 
 			if (input.id && input.checkout !== "local") {
@@ -1458,7 +1673,8 @@ export const workspacesRouter = router({
 			for (const launch of input.agents ?? []) {
 				validateAgentLaunchOptions(ctx.db, launch);
 			}
-			requireProjectRepoPath(requireLocalProject(ctx, input.projectId));
+			const project = requireLocalProject(ctx, input.projectId);
+			if (!isContainerProject(project)) requireProjectRepoPath(project);
 
 			void createWorkspacesCaller(ctx)
 				.create(input)

@@ -14,6 +14,8 @@ export interface HostTagSetting {
 export interface HostProjectRow {
 	id: string;
 	name: string;
+	/** "container" holds repositories and has no folder of its own; repoPath is "". */
+	kind?: "repository" | "container";
 	repoPath: string;
 	repoOwner: string | null;
 	repoName: string | null;
@@ -39,6 +41,7 @@ export interface HostProjectItem {
 	projectKey: string;
 	id: string;
 	name: string;
+	kind?: "repository" | "container";
 	/** Present when some host serves the project. */
 	repoPath?: string;
 	repoOwner: string | null;
@@ -154,6 +157,7 @@ export function normalizeHostProjectRow(
 	return {
 		id: row.id,
 		name: row.name || row.repoPath.split(/[\\/]/).pop() || row.id,
+		kind: row.kind,
 		repoPath: row.repoPath,
 		repoOwner: row.repoOwner ?? null,
 		repoName: row.repoName ?? null,
@@ -301,6 +305,7 @@ export function mergeHostProjects({
 				byKey.set(key, {
 					projectKey: key,
 					id: row.id,
+					kind: row.kind,
 					name: row.name,
 					repoPath: row.repoPath,
 					repoOwner: row.repoOwner,

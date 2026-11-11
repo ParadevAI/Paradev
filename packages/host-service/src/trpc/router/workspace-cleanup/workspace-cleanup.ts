@@ -1,10 +1,15 @@
-import { rm } from "node:fs/promises";
+import { rm, rmdir } from "node:fs/promises";
+import { join } from "node:path";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
 import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { invalidateLabelCache } from "../../../ports/static-ports";
+import {
+	isContainerProject,
+	listRepositoryWorkspaces,
+} from "../../../projects/multi-repo";
 import { isMissingPath } from "../../../runtime/path-state";
 import { coercePullRequestState } from "../../../runtime/pull-requests/utils/pull-request-mappers";
 import { trackConfigResolved } from "../../../runtime/setup/track-config-resolved";
@@ -18,6 +23,7 @@ import type { HostServiceContext } from "../../../types";
 import type { GitTaskEnv } from "../../../workers/tasks/git";
 import {
 	archiveLocalWorkspace,
+	getLocalWorkspace,
 	trackWorkspaceDeleted,
 	unarchiveLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
@@ -264,7 +270,23 @@ export async function destroyWorkspace(
 	}
 	destroysInFlight.add(input.workspaceId);
 	try {
-		return await runDestroy(ctx, input);
+		const repositories = listRepositoryWorkspaces(ctx.db, input.workspaceId);
+		const root = getLocalWorkspace(ctx.db, input.workspaceId)?.worktreePath;
+		// Each checkout is destroyed like a workspace of its own, so a dirty one
+		// stops the delete before the container goes.
+		for (const repository of repositories) {
+			await runDestroy(ctx, { ...input, workspaceId: repository.id });
+		}
+		const result = await runDestroy(ctx, input);
+		if (repositories.length > 0 && root) {
+			for (const file of ["AGENTS.md", "CLAUDE.md"]) {
+				await rm(join(root, file), { force: true });
+			}
+			await rmdir(root).catch((err) =>
+				console.warn(`[workspace-cleanup] left  on disk:`, err),
+			);
+		}
+		return result;
 	} finally {
 		destroysInFlight.delete(input.workspaceId);
 	}
@@ -279,8 +301,12 @@ async function runDestroy(
 
 	// `isLocalCheckoutWorkspace` already loads workspace + project rows from
 	// sqlite; thread them through to avoid duplicate sync queries downstream.
-	const { local, project, sharesProjectCheckout } =
-		await isLocalCheckoutWorkspace(ctx, input.workspaceId);
+	const checkout = await isLocalCheckoutWorkspace(ctx, input.workspaceId);
+	const { local, sharesProjectCheckout } = checkout;
+	// A container's folder is not a repository: no git, no teardown.
+	const project = isContainerProject(checkout.project)
+		? undefined
+		: checkout.project;
 
 	// ─── Step 0: Archive (the commit point) ────────────────────────
 	// FIRST, before any slow work (git preflight, teardown script): the

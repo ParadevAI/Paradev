@@ -1,9 +1,12 @@
+import { basename, resolve as resolvePath } from "node:path";
 import { eq } from "drizzle-orm";
 import { projects, workspaces } from "../../../../db/schema";
+import { listRepositoryWorkspaces } from "../../../../projects/multi-repo";
 import {
 	chainPhases,
 	invalidConfigCommand,
 	loadProjectConfig,
+	shellSingleQuote,
 } from "../../../../runtime/setup/config";
 import { trackConfigResolved } from "../../../../runtime/setup/track-config-resolved";
 import { createTerminalSessionInternal } from "../../../../terminal/terminal";
@@ -13,6 +16,8 @@ import type { TerminalDescriptor } from "./types";
 interface StartSetupTerminalArgs {
 	ctx: HostServiceContext;
 	workspaceId: string;
+	/** A repository of a multi-repo workspace whose setup to run. */
+	repositoryWorkspaceId?: string;
 	/**
 	 * Appended to the resolved setup command with ` && `, so it runs in the
 	 * setup terminal only after setup succeeds. Ignored when no setup command
@@ -51,7 +56,7 @@ export async function startSetupTerminalIfPresent(
 		})
 		.from(workspaces)
 		.innerJoin(projects, eq(projects.id, workspaces.projectId))
-		.where(eq(workspaces.id, args.workspaceId))
+		.where(eq(workspaces.id, args.repositoryWorkspaceId ?? args.workspaceId))
 		.get();
 
 	if (!row || !row.worktreePath || !row.repoPath) {
@@ -76,9 +81,18 @@ export async function startSetupTerminalIfPresent(
 		return { terminal: null, warning: null, chained: false };
 	}
 
-	const initialCommand = args.chainCommand
-		? `${resolved.initialCommand} && ${args.chainCommand}`
+	const multiRepo =
+		args.repositoryWorkspaceId !== undefined ||
+		listRepositoryWorkspaces(args.ctx.db, args.workspaceId).length > 0;
+	const setupCwd = resolved.cwd
+		? resolvePath(row.worktreePath, resolved.cwd)
+		: row.worktreePath;
+	const setupCommand = multiRepo
+		? `(cd ${shellSingleQuote(setupCwd)} && ${resolved.initialCommand})`
 		: resolved.initialCommand;
+	const initialCommand = args.chainCommand
+		? `${setupCommand} && ${args.chainCommand}`
+		: setupCommand;
 
 	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
@@ -87,7 +101,7 @@ export async function startSetupTerminalIfPresent(
 		db: args.ctx.db,
 		eventBus: args.ctx.eventBus,
 		initialCommand,
-		...(resolved.cwd && { cwd: resolved.cwd }),
+		...(!multiRepo && resolved.cwd && { cwd: resolved.cwd }),
 	});
 	if ("error" in result) {
 		return {
@@ -101,7 +115,9 @@ export async function startSetupTerminalIfPresent(
 		terminal: {
 			id: terminalId,
 			role: "setup",
-			label: "Workspace Setup",
+			label: args.repositoryWorkspaceId
+				? `Setup: ${basename(row.repoPath)}`
+				: "Workspace Setup",
 		},
 		warning: null,
 		chained: Boolean(args.chainCommand),

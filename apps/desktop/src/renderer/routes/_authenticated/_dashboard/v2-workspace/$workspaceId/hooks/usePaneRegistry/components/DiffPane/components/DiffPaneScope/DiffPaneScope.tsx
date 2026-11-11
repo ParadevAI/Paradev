@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { Plural, useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { ChangesScopeControl } from "../../../../../../components/ChangesScopeControl";
@@ -11,6 +11,8 @@ interface DiffPaneScopeProps {
 	deletions: number;
 	filter?: DiffPaneFilter | undefined;
 	onClearFilter: () => void;
+	/** Set when the pane shows several repositories; each keeps its own scope. */
+	repositoryCount?: number;
 }
 
 /** The Changes pane header's left side: which diff it shows, and its totals. */
@@ -20,6 +22,7 @@ export function DiffPaneScope({
 	deletions,
 	filter,
 	onClearFilter,
+	repositoryCount,
 }: DiffPaneScopeProps) {
 	const { t } = useLingui();
 	const scope = useChangesScope(workspaceId);
@@ -27,27 +30,38 @@ export function DiffPaneScope({
 	const clearLabel = t({ message: "Show all changes" });
 	return (
 		<div className="flex min-w-0 items-center gap-1 text-xs">
-			{status && !filter?.range && (
-				<ChangesScopeControl
-					filter={scope.filter}
-					onFilterChange={scope.setFilter}
-					commits={scope.commits.data?.commits ?? []}
-					uncommittedCount={status.staged.length + status.unstaged.length}
-					baseBranch={scope.baseBranch ?? status.defaultBranch.name}
-					branches={scope.branches.data?.branches ?? []}
-					// Picking the repo default clears the override (null) instead of
-					// pinning it, so the workspace follows a later default change.
-					onBaseBranchChange={(branchName) =>
-						scope.setBaseBranch(
-							branchName === status.defaultBranch.name ? null : branchName,
-						)
-					}
-					currentBranchName={status.currentBranch.name}
-					canRenameBranch={scope.canRenameBranch}
-					onRenameBranch={scope.renameBranch}
-					baseClassName="hidden @min-[420px]/pane-header:flex"
-					commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
-				/>
+			{repositoryCount !== undefined ? (
+				<span className="truncate text-muted-foreground">
+					<Plural
+						value={repositoryCount}
+						one="# repository"
+						other="# repositories"
+					/>
+				</span>
+			) : (
+				status &&
+				!filter?.range && (
+					<ChangesScopeControl
+						filter={scope.filter}
+						onFilterChange={scope.setFilter}
+						commits={scope.commits.data?.commits ?? []}
+						uncommittedCount={status.staged.length + status.unstaged.length}
+						baseBranch={scope.baseBranch ?? status.defaultBranch.name}
+						branches={scope.branches.data?.branches ?? []}
+						// Picking the repo default clears the override (null) instead of
+						// pinning it, so the workspace follows a later default change.
+						onBaseBranchChange={(branchName) =>
+							scope.setBaseBranch(
+								branchName === status.defaultBranch.name ? null : branchName,
+							)
+						}
+						currentBranchName={status.currentBranch.name}
+						canRenameBranch={scope.canRenameBranch}
+						onRenameBranch={scope.renameBranch}
+						baseClassName="hidden @min-[420px]/pane-header:flex"
+						commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
+					/>
+				)
 			)}
 			{filter && (
 				<span className="flex min-w-0 shrink-0 items-center gap-0.5 rounded-md bg-accent py-0.5 pr-0.5 pl-1.5 text-[11px] text-accent-foreground">

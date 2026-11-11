@@ -532,6 +532,7 @@ function emitWorkspaceChanged(
 	eventType: "created" | "updated",
 	row: HostWorkspaceRow,
 ): void {
+	if (row.parentWorkspaceId) return;
 	ctx.eventBus.broadcastWorkspaceChanged({
 		workspaceId: row.id,
 		eventType,

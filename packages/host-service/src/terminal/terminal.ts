@@ -3076,7 +3076,9 @@ async function createTerminalSessionUnlocked({
 		rootPath = project.repoPath;
 	}
 
-	const cwd = resolveTerminalCwd(cwdOverride, workspace.worktreePath);
+	const cwd = cwdOverride
+		? resolveTerminalCwd(cwdOverride, workspace.worktreePath)
+		: workspace.worktreePath;
 	// Adoption overrides these with the PTY's live dims below: the session's
 	// belief must match the kernel's, or the reanchor repaint logic misjudges
 	// whether a client resize will deliver a real SIGWINCH.

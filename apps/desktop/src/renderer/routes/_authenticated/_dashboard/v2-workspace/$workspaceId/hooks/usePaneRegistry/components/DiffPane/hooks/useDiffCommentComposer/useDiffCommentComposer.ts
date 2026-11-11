@@ -54,6 +54,8 @@ interface UseDiffCommentComposerArgs {
 	 *  `useDiffCodeViewItems`, which itself consumes this hook's annotation
 	 *  output — passing a stable accessor breaks the dependency cycle. */
 	getFile: (itemId: string) => ChangesetFile | undefined;
+	/** The path an agent started in the workspace folder reads the file at. */
+	getPromptPath?: (file: ChangesetFile) => string;
 	onCreateNewAgentSession?: (
 		input: CreateNewAgentSessionInput,
 	) => Promise<{ terminalId: string } | null>;
@@ -88,6 +90,7 @@ export function useDiffCommentComposer({
 	workspaceId,
 	codeViewRef,
 	getFile,
+	getPromptPath,
 	onCreateNewAgentSession,
 }: UseDiffCommentComposerArgs): UseDiffCommentComposerResult {
 	const { t } = useLingui();
@@ -163,7 +166,7 @@ export function useDiffCommentComposer({
 			const text = formatAgentPromptWithFileContext({
 				comment: input.comment,
 				file: {
-					path: file.path,
+					path: getPromptPath?.(file) ?? file.path,
 					startLine: submitted.range.start,
 					endLine: submitted.range.end,
 					side: rangeSide(submitted.range.side, submitted.range.endSide),
@@ -206,6 +209,7 @@ export function useDiffCommentComposer({
 		[
 			composer,
 			getFile,
+			getPromptPath,
 			workspaceId,
 			sendToTerminalAgent,
 			clearIfStillCurrent,

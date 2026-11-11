@@ -25,6 +25,7 @@ import { hashString } from "renderer/routes/_authenticated/_dashboard/utils/hash
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
+	getChangesetFileWorkspaceId,
 } from "../../../../../useChangeset";
 import { createGetDiffInput } from "../../utils/createGetDiffInput";
 import { isGeneratedDiffFile } from "../../utils/diffLoadingGuards";
@@ -77,6 +78,11 @@ interface PatchGroupMember {
 	file: ChangesetFile;
 	itemId: string;
 }
+
+const NO_ANNOTATIONS: ReadonlyMap<
+	string,
+	DiffLineAnnotation<DiffAnnotationMetadata>[]
+> = new Map();
 
 /** How many per-file `getDiff` calls the fallback runs at once. */
 const FALLBACK_CONCURRENCY = 6;
@@ -156,6 +162,7 @@ function memberSignature(members: PatchGroupMember[]): string {
 
 function groupKeyFor(input: DiffPatchScope): string {
 	return [
+		input.workspaceId,
 		input.category,
 		input.baseBranch ?? "",
 		input.commitHash ?? "",
@@ -466,12 +473,17 @@ export function useDiffCodeViewItems({
 		for (const file of files) {
 			const itemId = getDiffItemId(file);
 			const collapsed = collapsedSet.has(getChangesetFileKey(file));
+			// Review threads come from the pane checkout's pull request.
+			const fileAnnotations =
+				getChangesetFileWorkspaceId(file, workspaceId) === workspaceId
+					? annotationsByPath
+					: NO_ANNOTATIONS;
 			const editing = editingSet.has(getChangesetFileKey(file));
 
 			if (file.isBinary) {
 				nextItems.push(
 					buildPlaceholderItem(
-						annotationsByPath,
+						fileAnnotations,
 						file,
 						getPlaceholderFile(itemId, file.path),
 						itemId,
@@ -506,7 +518,7 @@ export function useDiffCodeViewItems({
 						: groupReason;
 				nextItems.push(
 					buildPlaceholderItem(
-						annotationsByPath,
+						fileAnnotations,
 						file,
 						getPlaceholderFile(itemId, file.path),
 						itemId,
@@ -520,7 +532,7 @@ export function useDiffCodeViewItems({
 				continue;
 			}
 
-			const baseAnnotations = getAnnotationsForFile(annotationsByPath, file);
+			const baseAnnotations = getAnnotationsForFile(fileAnnotations, file);
 			const extra = extraAnnotationsByItemId?.get(itemId);
 			const annotations =
 				baseAnnotations && extra
@@ -559,6 +571,7 @@ export function useDiffCodeViewItems({
 		requestedItemIds,
 		annotationsByPath,
 		collapsedSet,
+		workspaceId,
 		editingSet,
 		extraAnnotationsByItemId,
 	]);
@@ -612,9 +625,10 @@ function buildPlaceholderItem(
 }
 
 function createGetDiffPatchInput(
-	workspaceId: string,
+	fallbackWorkspaceId: string,
 	file: ChangesetFile,
 ): DiffPatchScope {
+	const workspaceId = getChangesetFileWorkspaceId(file, fallbackWorkspaceId);
 	const { source } = file;
 	if (source.kind === "against-base") {
 		return {

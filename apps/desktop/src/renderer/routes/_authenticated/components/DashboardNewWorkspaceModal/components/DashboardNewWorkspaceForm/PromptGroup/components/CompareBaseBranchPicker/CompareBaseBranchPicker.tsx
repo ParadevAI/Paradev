@@ -8,6 +8,7 @@ import {
 } from "@superset/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@superset/ui/tabs";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useEffect, useState } from "react";
 import { GoGitBranch, GoGlobe } from "react-icons/go";
 import { HiCheck } from "react-icons/hi2";
@@ -55,6 +56,8 @@ interface CompareBaseBranchPickerProps {
 	// worktree, and fresh-create. Worktree rows must carry their path so stale
 	// branch labels do not make the server create a new managed worktree.
 	onOpenWorkspace: (target: OpenWorkspaceTarget) => void;
+	/** Set when a base branch cannot be picked for this project; shown as a tooltip. */
+	disabledReason?: string;
 }
 
 export function CompareBaseBranchPicker({
@@ -77,6 +80,7 @@ export function CompareBaseBranchPicker({
 	onLoadMore,
 	onSelectCompareBaseBranch,
 	onOpenWorkspace,
+	disabledReason,
 }: CompareBaseBranchPickerProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
@@ -110,6 +114,29 @@ export function CompareBaseBranchPicker({
 		observer.observe(sentinel);
 		return () => observer.disconnect();
 	}, [open, hasNextPage, isFetchingNextPage, sentinel, onLoadMore]);
+
+	if (disabledReason) {
+		return (
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<span className="inline-flex max-w-full">
+						<FormPickerTrigger disabled className="max-w-full">
+							<GoGitBranch
+								className={
+									isParadevShell ? "size-3.5 shrink-0" : "size-3 shrink-0"
+								}
+							/>
+							<span className="truncate">
+								<Trans>Default branch</Trans>
+							</span>
+							<PickerChevron />
+						</FormPickerTrigger>
+					</span>
+				</TooltipTrigger>
+				<TooltipContent>{disabledReason}</TooltipContent>
+			</Tooltip>
+		);
+	}
 
 	if (isHostOffline) {
 		return (
