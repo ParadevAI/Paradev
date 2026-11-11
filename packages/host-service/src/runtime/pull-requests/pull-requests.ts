@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
+import { and, eq, inArray, isNull, notInArray, or } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	projects,
@@ -387,6 +387,7 @@ export class PullRequestRuntimeManager {
 		const rows = this.db
 			.select({
 				workspaceId: workspaces.id,
+				parentWorkspaceId: workspaces.parentWorkspaceId,
 				pullRequestUrl: pullRequests.url,
 				pullRequestNumber: pullRequests.prNumber,
 				pullRequestTitle: pullRequests.title,
@@ -400,33 +401,60 @@ export class PullRequestRuntimeManager {
 			})
 			.from(workspaces)
 			.leftJoin(pullRequests, eq(workspaces.pullRequestId, pullRequests.id))
-			.where(inArray(workspaces.id, workspaceIds))
+			.where(
+				or(
+					inArray(workspaces.id, workspaceIds),
+					inArray(workspaces.parentWorkspaceId, workspaceIds),
+				),
+			)
 			.all();
 
-		return rows.map((row) => ({
-			workspaceId: row.workspaceId,
-			pullRequest:
+		// A multi-repo workspace has no pull request of its own: it shows the
+		// first one any of its checkouts has.
+		const requested = new Set(workspaceIds);
+		const checkoutRows = new Map<string, (typeof rows)[number]>();
+		for (const row of rows) {
+			if (
+				row.parentWorkspaceId &&
+				!requested.has(row.workspaceId) &&
 				row.pullRequestUrl &&
-				row.pullRequestNumber !== null &&
-				row.pullRequestNumber !== undefined
-					? {
-							url: row.pullRequestUrl,
-							number: row.pullRequestNumber,
-							title: row.pullRequestTitle ?? "",
-							state: coercePullRequestState(row.pullRequestState),
-							reviewDecision: coerceReviewDecision(
-								row.pullRequestReviewDecision,
-							),
-							checksStatus: coerceChecksStatus(row.pullRequestChecksStatus),
-							checks: parseChecksJson(row.pullRequestChecksJson),
-							mergedAt: row.pullRequestMergedAt ?? null,
-						}
-					: null,
-			error: row.pullRequestError ?? null,
-			lastFetchedAt: row.pullRequestLastFetchedAt
-				? new Date(row.pullRequestLastFetchedAt).toISOString()
-				: null,
-		}));
+				!checkoutRows.has(row.parentWorkspaceId)
+			) {
+				checkoutRows.set(row.parentWorkspaceId, row);
+			}
+		}
+
+		return rows
+			.filter((row) => requested.has(row.workspaceId))
+			.map((own) => {
+				const row = own.pullRequestUrl
+					? own
+					: (checkoutRows.get(own.workspaceId) ?? own);
+				return {
+					workspaceId: own.workspaceId,
+					pullRequest:
+						row.pullRequestUrl &&
+						row.pullRequestNumber !== null &&
+						row.pullRequestNumber !== undefined
+							? {
+									url: row.pullRequestUrl,
+									number: row.pullRequestNumber,
+									title: row.pullRequestTitle ?? "",
+									state: coercePullRequestState(row.pullRequestState),
+									reviewDecision: coerceReviewDecision(
+										row.pullRequestReviewDecision,
+									),
+									checksStatus: coerceChecksStatus(row.pullRequestChecksStatus),
+									checks: parseChecksJson(row.pullRequestChecksJson),
+									mergedAt: row.pullRequestMergedAt ?? null,
+								}
+							: null,
+					error: row.pullRequestError ?? null,
+					lastFetchedAt: row.pullRequestLastFetchedAt
+						? new Date(row.pullRequestLastFetchedAt).toISOString()
+						: null,
+				};
+			});
 	}
 
 	/**

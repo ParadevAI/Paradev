@@ -148,18 +148,20 @@ test("the pull request lookup for a container workspace reports a checkout's pul
 });
 
 test("each checkout reports its own sync state, for the ship actions", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
+	const { host, checkouts } = await containerWorkspace();
 	writeFileSync(join(checkouts[0]?.worktreePath ?? "", "dirty.txt"), "wip");
 
-	const repositories = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(repositories[0]).toMatchObject({ sync: { hasUncommitted: true } });
-	expect(repositories[1]).toMatchObject({ sync: { hasUncommitted: false } });
+	const [first, second] = await Promise.all(
+		checkouts.map((checkout) =>
+			host.trpc.git.getBranchSyncStatus.query({ workspaceId: checkout.id }),
+		),
+	);
+	expect(first).toMatchObject({ hasUncommitted: true });
+	expect(second).toMatchObject({ hasUncommitted: false });
 });
 
 test("each checkout reports its own pull request, for the Review tab", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
+	const { host, checkouts } = await containerWorkspace();
 	const checkout = host.db
 		.select()
 		.from(workspaces)
@@ -177,9 +179,11 @@ test("each checkout reports its own pull request, for the Review tab", async () 
 		.where(eq(workspaces.id, checkout?.id ?? ""))
 		.run();
 
-	const repositories = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(repositories[0]).toMatchObject({ pullRequest: null });
-	expect(repositories[1]).toMatchObject({ pullRequest: { number: 7 } });
+	const [first, second] = await Promise.all(
+		checkouts.map((checkout) =>
+			host.trpc.git.getPullRequest.query({ workspaceId: checkout.id }),
+		),
+	);
+	expect(first).toBeNull();
+	expect(second).toMatchObject({ number: 7 });
 });
