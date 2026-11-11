@@ -2,6 +2,7 @@ import type { RendererContext } from "@superset/panes";
 import { useCallback } from "react";
 import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
 import { useReviewTab } from "../../../../components/WorkspaceSidebar/hooks/useReviewTab";
+import { useActiveRepositoryWorkspaceId } from "../../../../state/activeRepositoryStore";
 import type {
 	CommentPaneData,
 	DiffFocusSide,
@@ -61,9 +62,14 @@ export function ReviewPane({ context, workspaceId }: ReviewPaneProps) {
 		[store, paneId],
 	);
 
-	const onOpenInDiff = useReviewCommentNavigation(workspaceId, handleOpenDiff);
+	// A multi-repo workspace reviews the picked repository's pull request.
+	const reviewWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
+	const onOpenInDiff = useReviewCommentNavigation(
+		reviewWorkspaceId,
+		handleOpenDiff,
+	);
 	const reviewTab = useReviewTab({
-		workspaceId,
+		workspaceId: reviewWorkspaceId,
 		onOpenComment: handleOpenComment,
 		onOpenPullRequest: handleOpenPullRequest,
 		onOpenInDiff,

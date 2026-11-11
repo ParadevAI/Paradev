@@ -11,6 +11,7 @@ import {
 	computeChecksRollup,
 } from "../../../../utils/computeChecksStatus";
 import { normalizeThreadsToComments } from "../../../CommentsSection/utils/normalizeThreadsToComments";
+import { RepoPicker } from "../../../RepoPicker";
 import type { SidebarTabDefinition } from "../../types";
 import { ReviewTabContent } from "./components/ReviewTabContent";
 import type { NormalizedComment, NormalizedPR } from "./types";
@@ -71,25 +72,30 @@ export function useReviewTab({
 	).length;
 
 	const content = (
-		<ReviewTabContent
-			workspaceId={workspaceId}
-			pullRequest={target}
-			commentsUnavailable={
-				needsGithubConnection(threadsQuery.error)
-					? "needs-github"
-					: threadsQuery.isError || threadsQuery.data?.fetchFailed
-						? "failed"
-						: null
-			}
-			pr={pr}
-			comments={comments}
-			isLoading={prQuery.isLoading}
-			isError={prQuery.isError}
-			isCommentsLoading={threadsQuery.isLoading}
-			onOpenComment={onOpenComment}
-			onOpenPullRequest={onOpenPullRequest}
-			onOpenInDiff={onOpenInDiff}
-		/>
+		<div className="flex h-full min-h-0 flex-col">
+			<RepoPicker />
+			<div className="min-h-0 flex-1">
+				<ReviewTabContent
+					workspaceId={workspaceId}
+					pullRequest={target}
+					commentsUnavailable={
+						needsGithubConnection(threadsQuery.error)
+							? "needs-github"
+							: threadsQuery.isError || threadsQuery.data?.fetchFailed
+								? "failed"
+								: null
+					}
+					pr={pr}
+					comments={comments}
+					isLoading={prQuery.isLoading}
+					isError={prQuery.isError}
+					isCommentsLoading={threadsQuery.isLoading}
+					onOpenComment={onOpenComment}
+					onOpenPullRequest={onOpenPullRequest}
+					onOpenInDiff={onOpenInDiff}
+				/>
+			</div>
+		</div>
 	);
 
 	return {

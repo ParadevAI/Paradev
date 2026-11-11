@@ -1,5 +1,6 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useSettings } from "renderer/stores/settings";
+import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import type { DiffFocusSide, DiffPaneFilter } from "../../types";
 import { getChangesetFileKey } from "../useChangeset";
 
@@ -16,6 +17,9 @@ export function useReviewCommentNavigation(
 	workspaceId: string,
 	onSelectDiffFile?: OpenReviewDiff,
 ) {
+	// A checkout of a multi-repo workspace tags its diff entries with its id.
+	const checkoutId =
+		useWorkspace().workspace.id === workspaceId ? undefined : workspaceId;
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
 		{ workspaceId },
 		{ staleTime: Number.POSITIVE_INFINITY },
@@ -37,6 +41,7 @@ export function useReviewCommentNavigation(
 				const changeKey = baseBranchQuery.isSuccess
 					? getChangesetFileKey({
 							path,
+							workspaceId: checkoutId,
 							status: "modified",
 							additions: 0,
 							deletions: 0,

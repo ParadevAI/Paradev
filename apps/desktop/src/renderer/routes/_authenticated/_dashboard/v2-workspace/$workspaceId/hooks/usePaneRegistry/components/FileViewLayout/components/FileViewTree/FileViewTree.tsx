@@ -1,10 +1,10 @@
 import type { RendererContext } from "@superset/panes";
 import { useCallback } from "react";
+import { RepoPicker } from "../../../../../../components/RepoPicker";
 import { FilesTab } from "../../../../../../components/WorkspaceSidebar/components/FilesTab";
 import { useWorkspaceGitStatus } from "../../../../../../providers/WorkspaceGitStatusProvider";
 import type { FilePaneData, PaneViewerData } from "../../../../../../types";
 import { openFileFromTree } from "../../../../../../utils/openFileFromTree";
-import { RepoPicker } from "./components/RepoPicker";
 
 interface FileViewTreeProps {
 	context: RendererContext<PaneViewerData>;
