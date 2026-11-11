@@ -2028,19 +2028,11 @@ export class AcpAdapter implements HarnessAdapter {
 		const model = this.applyStartSelection("model", wanted.modelId);
 		const { effortId } = wanted;
 		// The effort levels on offer belong to the model, so they are only known once it is set.
-		const effort = model
-			.then((modelId) =>
-				effortId && (modelId || !wanted.modelId)
-					? this.applyStartSelection("thought_level", effortId)
-					: undefined,
-			)
-			.then((taken) => {
-				if (effortId && !taken)
-					console.warn(
-						`[acp] the agent did not take reasoning effort "${effortId}"; it runs at its default`,
-					);
-				return taken;
-			});
+		const effort = model.then((modelId) =>
+			effortId && (modelId || !wanted.modelId)
+				? this.applyStartSelection("thought_level", effortId)
+				: undefined,
+		);
 		this.trackSelection(effort);
 		// Fast mode also belongs to the model. It waits for effort too: a refused
 		// setting rolls back every option to before it was sent.
@@ -2096,7 +2088,7 @@ export class AcpAdapter implements HarnessAdapter {
 			...(startOptions.fast ? { fast: startOptions.fast } : {}),
 			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
 		};
-		const configured =
+		const configured: Promise<ChatSelections> =
 			this.configOptions.length > 0
 				? this.applyConfigSelections(wanted)
 				: Object.keys(wanted).length > 0
@@ -2122,12 +2114,16 @@ export class AcpAdapter implements HarnessAdapter {
 				taken ? modeId : undefined,
 			);
 		}
-		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) =>
+		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+			if (wanted.effortId && !taken.effortId)
+				console.warn(
+					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
+				);
 			this.settleStartSelections({
 				...taken,
 				...(takenMode ? { modeId: takenMode } : {}),
-			}),
-		);
+			});
+		});
 	}
 
 	/** The start model, effort and mode the agent took. */
