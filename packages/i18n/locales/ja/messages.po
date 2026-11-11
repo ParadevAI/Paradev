@@ -12145,12 +12145,6 @@ msgstr "このワークスペースをクラウドに移動しますか？"
 msgid "Move to"
 msgstr "移動先"
 
-msgid "Move to a computer"
-msgstr "コンピューターに移動"
-
-msgid "Move to another computer"
-msgstr "別のコンピューターに移動"
-
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
 

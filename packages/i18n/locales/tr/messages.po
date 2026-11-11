@@ -12145,12 +12145,6 @@ msgstr "Bu çalışma alanı buluta taşınsın mı?"
 msgid "Move to"
 msgstr "Taşı"
 
-msgid "Move to a computer"
-msgstr "Bir bilgisayara taşı"
-
-msgid "Move to another computer"
-msgstr "Başka bir bilgisayara taşı"
-
 msgid "Move to background"
 msgstr "Arka plana taşı"
 

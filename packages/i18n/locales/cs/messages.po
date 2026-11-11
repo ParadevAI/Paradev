@@ -12145,12 +12145,6 @@ msgstr "Přesunout tento pracovní prostor do cloudu?"
 msgid "Move to"
 msgstr "Přesunout do"
 
-msgid "Move to a computer"
-msgstr "Přesunout na počítač"
-
-msgid "Move to another computer"
-msgstr "Přesunout na jiný počítač"
-
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
 

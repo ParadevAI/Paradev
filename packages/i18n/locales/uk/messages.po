@@ -12139,12 +12139,6 @@ msgstr "Перемістити цей робочий простір у хмар�
 msgid "Move to"
 msgstr "Перемістити"
 
-msgid "Move to a computer"
-msgstr "Перемістити на комп’ютер"
-
-msgid "Move to another computer"
-msgstr "Перемістити на інший комп’ютер"
-
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
 

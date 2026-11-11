@@ -36,6 +36,10 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import {
+	type MoveDestinationPick,
+	MoveToDestinationItems,
+} from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
 import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import type {
@@ -45,10 +49,6 @@ import type {
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
-import {
-	type MoveDestinationPick,
-	MoveToDestinationItems,
-} from "./components/MoveToDestinationItems";
 import { MoveToGroupItems } from "./components/MoveToGroupItems";
 
 interface DashboardSidebarWorkspaceContextMenuProps {
@@ -262,6 +262,8 @@ export function DashboardSidebarWorkspaceContextMenu({
 								</ContextMenuSubTrigger>
 								<ContextMenuSubContent>
 									<MoveToDestinationItems
+										item={ContextMenuItem}
+										iconClassName="mr-2"
 										directions={move.directions}
 										fromHostId={move.workspace.hostId}
 										onPick={(pick) => runAfterClose(() => setMoveOpen(pick))}

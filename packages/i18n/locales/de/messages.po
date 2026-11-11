@@ -12145,12 +12145,6 @@ msgstr "Diesen Arbeitsbereich in die Cloud verschieben?"
 msgid "Move to"
 msgstr "Verschieben nach"
 
-msgid "Move to a computer"
-msgstr "Auf einen Computer verschieben"
-
-msgid "Move to another computer"
-msgstr "Auf einen anderen Computer verschieben"
-
 msgid "Move to background"
 msgstr "In den Hintergrund"
 

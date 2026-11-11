@@ -12145,12 +12145,6 @@ msgstr "Pindahkan workspace ini ke cloud?"
 msgid "Move to"
 msgstr "Pindahkan ke"
 
-msgid "Move to a computer"
-msgstr "Pindahkan ke komputer"
-
-msgid "Move to another computer"
-msgstr "Pindahkan ke komputer lain"
-
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
 

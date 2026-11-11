@@ -12145,12 +12145,6 @@ msgstr "Spostare questo workspace nel cloud?"
 msgid "Move to"
 msgstr "Sposta su"
 
-msgid "Move to a computer"
-msgstr "Sposta su un computer"
-
-msgid "Move to another computer"
-msgstr "Sposta su un altro computer"
-
 msgid "Move to background"
 msgstr "Sposta in background"
 
