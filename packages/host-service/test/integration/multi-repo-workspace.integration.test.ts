@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { eq } from "drizzle-orm";
 import { workspaces } from "../../src/db/schema";
@@ -220,4 +220,22 @@ test("each repository branches from the base branch picked for it", async () => 
 	expect(
 		(await api?.git.raw(["config", "branch.feature/both.base"]))?.trim(),
 	).toBe("release");
+});
+
+test("file search finds files deep inside every checkout", async () => {
+	const { host, workspace, checkouts } = await containerWorkspace();
+	const api = checkouts[1];
+	if (!api) throw new Error("missing checkout");
+	const deepDir = join(api.worktreePath, "a/b/c/d/e/f/g/h/i");
+	mkdirSync(deepDir, { recursive: true });
+	writeFileSync(join(deepDir, "deep-target.ts"), "export {};\n");
+
+	const { matches } = await host.trpc.filesystem.searchFiles.query({
+		workspaceId: workspace.id,
+		query: "deep-target",
+	});
+
+	expect(matches.map((match) => match.relativePath)).toEqual([
+		`${basename(api.worktreePath)}/a/b/c/d/e/f/g/h/i/deep-target.ts`,
+	]);
 });

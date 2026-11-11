@@ -1,9 +1,18 @@
 import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
-import { dirname, isAbsolute, join, normalize, resolve } from "node:path";
+import {
+	dirname,
+	isAbsolute,
+	join,
+	normalize,
+	relative,
+	resolve,
+} from "node:path";
+import type { FsSearchMatch } from "@superset/workspace-fs/core";
 import { WorkspaceFsPathError } from "@superset/workspace-fs/host";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
 import {
 	ProjectNotFoundError,
 	WorkspaceNotFoundError,
@@ -132,6 +141,37 @@ function getProjectFilesystemService(
 		}
 		throw error;
 	}
+}
+
+/**
+ * A container root holds no `.git`, so its own index stops at a shallow depth
+ * and gets no watcher patches: search each checkout and rank the results together.
+ */
+async function searchCheckouts(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	checkouts: Array<{ id: string }>,
+	input: { query: string; includeHidden?: boolean; limit?: number },
+): Promise<{ matches: FsSearchMatch[] }> {
+	const root = ctx.runtime.filesystem.resolveWorkspaceRoot(workspaceId);
+	const results = await Promise.all(
+		checkouts.map((checkout) =>
+			withFsErrorTranslation(() =>
+				getFilesystemService(ctx, checkout.id).searchFiles(input),
+			),
+		),
+	);
+	const matches = results
+		.flatMap((result) => result.matches)
+		.map((match) => ({
+			...match,
+			relativePath: relative(root, match.absolutePath),
+		}))
+		.sort((a, b) => b.score - a.score);
+	return {
+		matches:
+			input.limit === undefined ? matches : matches.slice(0, input.limit),
+	};
 }
 
 const writeFileContentSchema = z.union([
@@ -556,6 +596,15 @@ export const filesystemRouter = router({
 			}
 
 			const { workspaceId, projectId, ...serviceInput } = input;
+			const checkouts = workspaceId
+				? listRepositoryWorkspaces(ctx.db, workspaceId)
+				: [];
+			if (workspaceId && checkouts.length > 0) {
+				return await searchCheckouts(ctx, workspaceId, checkouts, {
+					...serviceInput,
+					query: trimmedQuery,
+				});
+			}
 			const service = workspaceId
 				? getFilesystemService(ctx, workspaceId)
 				: getProjectFilesystemService(ctx, projectId as string);
