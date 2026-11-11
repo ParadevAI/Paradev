@@ -10746,6 +10746,9 @@ msgstr "Może być uśpiony"
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mogła zostać usunięta lub należy do innej organizacji."
 
+msgid "It must join again and pass its checks to merge."
+msgstr "Aby go scalić, musi ponownie dołączyć i przejść kontrole."
+
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "To zajmuje kilka minut. Korzystasz z Conductor Cloud? Zacznij od <0>przewodnika po chmurze</0>."
 
@@ -16283,6 +16286,9 @@ msgstr "Usunąć {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Usunąć {repo}? Wszystkie zsynchronizowane z niego wtyczki zostaną usunięte z Twojej organizacji i u każdego członka, który je zainstalował."
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "Usunąć #{prNumber} z kolejki scalania?"
+
 msgid "Remove attachment"
 msgstr "Usuń załącznik"
 
@@ -20302,6 +20308,9 @@ msgstr "Certyfikat witryny jest nieprawidłowy"
 
 msgid "The stack changed while this was open. Check it and try again."
 msgstr "Stos zmienił się w międzyczasie. Sprawdź go i spróbuj ponownie."
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "Ułożone nad nim pull requesty też opuszczą kolejkę. Każdy musi dołączyć ponownie i przejść kontrole."
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Punkt startowy, z którego uruchamia się obszar roboczy w chmurze — obraz bazowy albo sandbox, który skonfigurowałeś i chcesz sforkować."

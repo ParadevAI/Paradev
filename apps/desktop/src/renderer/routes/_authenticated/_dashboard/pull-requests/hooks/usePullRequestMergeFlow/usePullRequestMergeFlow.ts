@@ -65,7 +65,11 @@ export interface PullRequestMergeFlow {
 	request: (method: MergeMethod) => void;
 	cancel: () => void;
 	run: () => void;
+	/** Asks first: leaving the queue also takes the stacked layers above out. */
 	dequeue: () => void;
+	confirmsDequeue: boolean;
+	cancelDequeue: () => void;
+	runDequeue: () => void;
 	createStack: () => void;
 }
 
@@ -97,6 +101,7 @@ export function usePullRequestMergeFlow({
 		select: (detail) => detail.mergeQueue ?? null,
 	});
 	const [confirm, setConfirm] = useState<{ method: MergeMethod } | null>(null);
+	const [confirmsDequeue, setConfirmsDequeue] = useState(false);
 
 	const stack = stackQuery.stack;
 	const assessment = useMemo(
@@ -272,7 +277,13 @@ export function usePullRequestMergeFlow({
 			setConfirm(null);
 			merge.mutate(confirm.method);
 		},
-		dequeue: () => leaveQueue.mutate(),
+		dequeue: () => setConfirmsDequeue(true),
+		confirmsDequeue,
+		cancelDequeue: () => setConfirmsDequeue(false),
+		runDequeue: () => {
+			setConfirmsDequeue(false);
+			leaveQueue.mutate();
+		},
 		createStack: () => create.mutate(),
 	};
 }

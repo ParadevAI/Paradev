@@ -10746,6 +10746,9 @@ msgstr "Hij staat mogelijk in sluimerstand"
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Mogelijk is die verwijderd, of hoort die bij een andere organisatie."
 
+msgid "It must join again and pass its checks to merge."
+msgstr "Om te mergen moet hij opnieuw aansluiten en zijn checks doorstaan."
+
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Het duurt een paar minuten. Gebruik je Conductor Cloud? Begin met de <0>cloudgids</0>."
 
@@ -16283,6 +16286,9 @@ msgstr "{name} verwijderen?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo} verwijderen? Alle plugins die eruit zijn gesynchroniseerd, worden uit je organisatie en bij elk lid dat ze heeft geïnstalleerd verwijderd."
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "#{prNumber} uit de merge-wachtrij verwijderen?"
+
 msgid "Remove attachment"
 msgstr "Bijlage verwijderen"
 
@@ -20302,6 +20308,9 @@ msgstr "Het certificaat van de site is ongeldig"
 
 msgid "The stack changed while this was open. Check it and try again."
 msgstr "De stack is intussen veranderd. Controleer hem en probeer het opnieuw."
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "De gestapelde pull requests erboven verlaten de wachtrij ook. Elk moet opnieuw aansluiten en zijn checks doorstaan."
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Het startpunt waarvandaan een cloudwerkruimte opstart — een base image, of een sandbox die je hebt geconfigureerd en wilt forken."

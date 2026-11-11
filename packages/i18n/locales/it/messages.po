@@ -10746,6 +10746,9 @@ msgstr "Potrebbe essere in stop"
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Potrebbe essere stata eliminata oppure appartiene a un'altra organizzazione."
 
+msgid "It must join again and pass its checks to merge."
+msgstr "Per essere unita deve rientrare in coda e superare i controlli."
+
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Bastano pochi minuti. Usi Conductor Cloud? Inizia dalla <0>guida al cloud</0>."
 
@@ -16283,6 +16286,9 @@ msgstr "Rimuovere {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Rimuovere {repo}? Tutti i plugin sincronizzati da questo repository vengono rimossi dalla tua organizzazione e da ogni membro che li ha installati."
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "Rimuovere #{prNumber} dalla coda di merge?"
+
 msgid "Remove attachment"
 msgstr "Rimuovi allegato"
 
@@ -20302,6 +20308,9 @@ msgstr "Il certificato del sito non è valido"
 
 msgid "The stack changed while this was open. Check it and try again."
 msgstr "Lo stack è cambiato nel frattempo. Controllalo e riprova."
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "Anche le pull request impilate sopra escono dalla coda. Ciascuna deve rientrare e superare i controlli."
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Il punto di partenza da cui si avvia un workspace cloud — un'immagine base, o una sandbox che hai configurato e vuoi forkare."

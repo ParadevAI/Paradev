@@ -10746,6 +10746,9 @@ msgstr "裝置可能處於睡眠狀態"
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "它可能已被刪除，或屬於另一個組織。"
 
+msgid "It must join again and pass its checks to merge."
+msgstr "要合併，它必須重新加入佇列並通過檢查。"
+
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "只需幾分鐘。在用 Conductor Cloud？請先看<0>雲端指南</0>。"
 
@@ -16283,6 +16286,9 @@ msgstr "移除 {name}？"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "要移除 {repo} 嗎？從中同步的所有外掛都會從你的組織以及所有已安裝的成員那裡移除。"
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "將 #{prNumber} 移出合併佇列？"
+
 msgid "Remove attachment"
 msgstr "移除附件"
 
@@ -20302,6 +20308,9 @@ msgstr "該站點的證書無效"
 
 msgid "The stack changed while this was open. Check it and try again."
 msgstr "開啟期間堆疊已變更。請檢查後重試。"
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "它上面的堆疊拉取請求也會離開佇列。每一個都必須重新加入並通過檢查。"
 
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "雲端工作區啟動的起點 — 一個基礎映像檔，或你已設定好、想要分叉的沙箱。"

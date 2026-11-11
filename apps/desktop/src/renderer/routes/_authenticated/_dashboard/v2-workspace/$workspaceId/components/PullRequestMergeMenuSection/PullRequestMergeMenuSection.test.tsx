@@ -39,6 +39,9 @@ function flowOf(
 		cancel: mock(),
 		run: mock(),
 		dequeue: mock(),
+		confirmsDequeue: false,
+		cancelDequeue: mock(),
+		runDequeue: mock(),
 		createStack: mock(),
 		...overrides,
 	};
