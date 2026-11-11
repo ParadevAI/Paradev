@@ -4,7 +4,11 @@ import { beginWorkspaceMove, type WorkspaceMoveDeps } from "./moveWorkspace";
 
 type Call = [string, unknown];
 
-function fakes(options: { fetchFails?: boolean; createdAfterPolls?: number }) {
+function fakes(options: {
+	fetchFails?: boolean;
+	createdAfterPolls?: number;
+	environmentRepository?: string;
+}) {
 	const calls: Call[] = [];
 	const record =
 		<T>(name: string, answer: (input: never) => T) =>
@@ -24,6 +28,15 @@ function fakes(options: { fetchFails?: boolean; createdAfterPolls?: number }) {
 				})),
 			},
 			abandon: { mutate: record("abandon", () => ({ ok: true })) },
+		},
+		environment: {
+			get: {
+				query: record("environmentGet", () => ({
+					repositories: [
+						{ fullName: options.environmentRepository ?? "Acme/App" },
+					],
+				})),
+			},
 		},
 		cloudWorkspace: {
 			create: {
@@ -166,8 +179,8 @@ describe("beginWorkspaceMove", () => {
 		});
 		await done;
 
-		expect(names()).toEqual(["begin", "cloudCreate"]);
-		expect(calls[1]?.[1]).toMatchObject({
+		expect(names()).toEqual(["begin", "environmentGet", "cloudCreate"]);
+		expect(calls[2]?.[1]).toMatchObject({
 			organizationId: "org-1",
 			environmentId: "env-1",
 			branch: "superset/teleport-1",
@@ -190,6 +203,23 @@ describe("beginWorkspaceMove", () => {
 			workspaceMoveId: "move-1",
 			error: "fetch failed",
 		});
+		expect(released).toEqual([["chat-1", "chat-2"]]);
+	});
+
+	test("refuses a cloud environment that opens another repository", async () => {
+		const { deps, names, released } = fakes({
+			environmentRepository: "acme/other",
+		});
+		const { done } = await beginWorkspaceMove(deps, {
+			workspaceId: "ws-1",
+			name: "Feature",
+			destination: { kind: "cloud", environmentId: "env-1" },
+		});
+
+		await expect(done).rejects.toThrow(
+			"That cloud environment does not open acme/app",
+		);
+		expect(names()).toEqual(["begin", "environmentGet", "abandon"]);
 		expect(released).toEqual([["chat-1", "chat-2"]]);
 	});
 });
