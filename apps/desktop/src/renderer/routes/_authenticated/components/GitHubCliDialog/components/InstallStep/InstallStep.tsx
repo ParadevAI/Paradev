@@ -11,16 +11,19 @@ const GH_CLI_RELEASES_URL = "https://github.com/cli/cli/releases/latest";
 
 interface InstallStepProps {
 	onInstalled: () => void;
+	onCancelled: () => void;
 	onRetry: () => void;
 	onCheckAgain: () => Promise<boolean>;
 }
 
 export function InstallStep({
 	onInstalled,
+	onCancelled,
 	onRetry,
 	onCheckAgain,
 }: InstallStepProps) {
-	const install = useToolInstallState(onInstalled);
+	const install = useToolInstallState({ onInstalled, onCancelled });
+	const cancel = electronTrpc.system.cancelGhCliInstall.useMutation();
 	electronTrpc.system.installGhCli.useSubscription(undefined, {
 		onData: install.onData,
 		onError: install.onError,
@@ -39,6 +42,7 @@ export function InstallStep({
 			}}
 			onRetry={onRetry}
 			onCheckAgain={onCheckAgain}
+			onCancel={() => cancel.mutate()}
 		/>
 	);
 }

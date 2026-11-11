@@ -6,6 +6,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	GitHubCliDialog,
 	type GitHubCliDialogStart,
+	useGhCliInstalling,
 } from "renderer/routes/_authenticated/components/GitHubCliDialog";
 import { SettingsRow } from "../../../components/SettingsRow";
 
@@ -23,6 +24,7 @@ export function GitHubCliRow() {
 	const brew = electronTrpc.system.detectBrew.useQuery(undefined, {
 		enabled: !isMac,
 	});
+	const installing = useGhCliInstalling();
 	const installed = status.data?.installed === true;
 	const ready = installed && status.data?.authenticated === true;
 
@@ -40,6 +42,8 @@ export function GitHubCliRow() {
 			hint={
 				status.isPending ? (
 					<Skeleton className="h-3 w-40" />
+				) : installing && !installed ? (
+					t`Installing…`
 				) : ready ? (
 					t`Signed in · clones private repos and opens pull requests`
 				) : installed ? (

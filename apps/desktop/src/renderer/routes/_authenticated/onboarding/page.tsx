@@ -4,6 +4,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	GitHubCliDialog,
 	type GitHubCliDialogStart,
+	useGhCliInstalling,
 } from "renderer/routes/_authenticated/components/GitHubCliDialog";
 import { GitHubSetupRow } from "./components/GitHubSetupRow";
 import { GitSetupRow } from "./components/GitSetupRow";
@@ -58,6 +59,7 @@ function SetupStepPage() {
 		}
 	}, [gitStatus?.installed, setUpGhGitCredentials.mutate]);
 
+	const ghInstalling = useGhCliInstalling();
 	const installGh = () => {
 		if (isMac || brewStatus?.installed === true) {
 			setGhDialogStart("install");
@@ -72,6 +74,7 @@ function SetupStepPage() {
 			{rows.gitHub && (
 				<GitHubSetupRow
 					gh={ghStatus}
+					installing={ghInstalling}
 					onInstall={installGh}
 					onSignIn={() => setGhDialogStart("auth")}
 				/>

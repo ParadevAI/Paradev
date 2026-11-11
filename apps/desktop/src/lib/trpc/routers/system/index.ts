@@ -5,17 +5,23 @@ import {
 	getToolsBinDir,
 	withAppToolsOnPath,
 } from "@superset/agent-setup/paths";
+import {
+	COMMAND_LINE_TOOLS_INSTALLER_PATH,
+	detectGit,
+} from "@superset/shared/detect-git";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import { net } from "electron";
 import { publicProcedure, router } from "../..";
 import { macArch } from "../utils/mac-arch";
-import { createSingleInstall } from "../utils/single-install";
+import {
+	createSingleInstall,
+	installSubscription,
+} from "../utils/single-install";
 import {
 	execWithShellEnv,
 	getProcessEnvWithShellEnv,
 } from "../workspaces/utils/shell-env";
-import { COMMAND_LINE_TOOLS_INSTALLER_PATH, detectGit } from "./detect-git";
 import {
 	createGhCliDeps,
 	finishPendingGhGitSetup,
@@ -181,7 +187,11 @@ async function installGh(
 	});
 }
 
-const subscribeToInstall = createSingleInstall<GhInstallEvent>();
+type GhInstallUpdate = GhInstallEvent | { stage: "cancelled" };
+
+const ghInstalls = createSingleInstall<GhInstallUpdate>({
+	cancelled: { stage: "cancelled" },
+});
 
 export const createSystemRouter = () => {
 	return router({
@@ -200,15 +210,21 @@ export const createSystemRouter = () => {
 		installCommandLineTools: publicProcedure.mutation(
 			installCommandLineToolsOnMac,
 		),
-		installGhCli: publicProcedure.subscription(() => {
-			return observable<GhInstallEvent>((emit) =>
-				subscribeToInstall("gh", installGh, (event) => {
-					emit.next(event);
-					if (event.stage === "done" || event.stage === "failed") {
-						emit.complete();
-					}
-				}),
-			);
+		installGhCli: publicProcedure.subscription(() =>
+			installSubscription<GhInstallUpdate>((listener) =>
+				ghInstalls.join("gh", installGh, listener),
+			),
+		),
+		ghCliInstallProgress: publicProcedure.subscription(() =>
+			installSubscription<GhInstallUpdate>(
+				(listener) => ghInstalls.watch("gh", listener),
+				{
+					endAtLast: false,
+				},
+			),
+		),
+		cancelGhCliInstall: publicProcedure.mutation(() => {
+			ghInstalls.cancel("gh");
 		}),
 		setUpGhGitCredentials: publicProcedure.mutation(setUpGhGitCredentials),
 		ghAuthLogin: publicProcedure.subscription(() => {

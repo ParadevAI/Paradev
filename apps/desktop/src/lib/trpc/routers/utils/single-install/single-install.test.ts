@@ -9,9 +9,11 @@ function deferred() {
 	return { promise, resolve };
 }
 
+const settle = () => new Promise((r) => setTimeout(r, 0));
+
 describe("createSingleInstall", () => {
 	test("a second caller joins the running install instead of starting another", async () => {
-		const subscribe = createSingleInstall<string>();
+		const installs = createSingleInstall({ cancelled: "cancelled" });
 		const gate = deferred();
 		let starts = 0;
 		const start = async (emit: (event: string) => void) => {
@@ -22,43 +24,88 @@ describe("createSingleInstall", () => {
 		};
 		const first: string[] = [];
 		const second: string[] = [];
-		subscribe("gh", start, (event) => first.push(event));
-		await Promise.resolve();
-		await Promise.resolve();
-		subscribe("gh", start, (event) => second.push(event));
+		installs.join("gh", start, (event) => first.push(event));
+		await settle();
+		installs.join("gh", start, (event) => second.push(event));
 		gate.resolve();
-		await new Promise((r) => setTimeout(r, 0));
+		await settle();
 
 		expect(starts).toBe(1);
 		expect(first).toEqual(["downloading", "done"]);
 		expect(second).toEqual(["downloading", "done"]);
 	});
 
-	test("cancels only when every caller has left, and a later caller waits for it to stop", async () => {
-		const subscribe = createSingleInstall<string>();
+	test("keeps installing after every screen leaves, and a screen that opens later sees it", async () => {
+		const installs = createSingleInstall({ cancelled: "cancelled" });
+		const gate = deferred();
+		let aborted = false;
+		const leave = installs.join(
+			"codex",
+			async (emit, signal) => {
+				signal.addEventListener("abort", () => {
+					aborted = true;
+				});
+				emit("downloading");
+				await gate.promise;
+				return "done";
+			},
+			() => {},
+		);
+		await settle();
+		leave();
+		expect(aborted).toBe(false);
+
+		const later: string[] = [];
+		installs.watch("codex", (event) => later.push(event));
+		gate.resolve();
+		await settle();
+		expect(later).toEqual(["downloading", "done"]);
+	});
+
+	test("a screen watching before any install starts nothing, then sees the install another screen starts", async () => {
+		const installs = createSingleInstall({ cancelled: "cancelled" });
+		const events: string[] = [];
+		installs.watch("claude", (event) => events.push(event));
+		await settle();
+		expect(events).toEqual([]);
+
+		installs.join(
+			"claude",
+			async (emit) => {
+				emit("downloading");
+				return "done";
+			},
+			() => {},
+		);
+		await settle();
+		expect(events).toEqual(["downloading", "done"]);
+	});
+
+	test("cancel stops the install, tells every screen, and a later install waits for it to stop", async () => {
+		const installs = createSingleInstall({ cancelled: "cancelled" });
 		const gate = deferred();
 		const order: string[] = [];
 		let aborted = false;
-		const slow = async (
-			_emit: (event: string) => void,
-			signal: AbortSignal,
-		) => {
-			signal.addEventListener("abort", () => {
-				aborted = true;
-			});
-			await gate.promise;
-			order.push("first stopped");
-			return "failed";
-		};
-		const leaveA = subscribe("codex", slow, () => {});
-		const leaveB = subscribe("codex", slow, () => {});
-		await Promise.resolve();
-		leaveA();
-		expect(aborted).toBe(false);
-		leaveB();
+		const events: string[] = [];
+		installs.join(
+			"codex",
+			async (emit, signal) => {
+				signal.addEventListener("abort", () => {
+					aborted = true;
+				});
+				emit("downloading");
+				await gate.promise;
+				order.push("first stopped");
+				return "failed";
+			},
+			(event) => events.push(event),
+		);
+		await settle();
+		installs.cancel("codex");
 		expect(aborted).toBe(true);
+		expect(events).toEqual(["downloading", "cancelled"]);
 
-		subscribe(
+		installs.join(
 			"codex",
 			async () => {
 				order.push("second started");
@@ -66,10 +113,11 @@ describe("createSingleInstall", () => {
 			},
 			() => {},
 		);
-		await new Promise((r) => setTimeout(r, 0));
+		await settle();
 		expect(order).toEqual([]);
 		gate.resolve();
-		await new Promise((r) => setTimeout(r, 0));
+		await settle();
 		expect(order).toEqual(["first stopped", "second started"]);
+		expect(events).toEqual(["downloading", "cancelled"]);
 	});
 });

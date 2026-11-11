@@ -21,6 +21,8 @@ interface ToolInstallProgressProps {
 	onRetry: () => void;
 	/** Resolves true when the tool is now installed, e.g. by the user. */
 	onCheckAgain: () => Promise<boolean>;
+	/** Stops the install. Leaving the screen does not. */
+	onCancel: () => void;
 }
 
 /** An install's progress, or why it failed with a way to do it by hand. */
@@ -31,6 +33,7 @@ export function ToolInstallProgress({
 	manualInstall,
 	onRetry,
 	onCheckAgain,
+	onCancel,
 }: ToolInstallProgressProps) {
 	const { t } = useLingui();
 	const [checking, setChecking] = useState(false);
@@ -112,11 +115,16 @@ export function ToolInstallProgress({
 			<div className="flex items-center gap-2.5 text-sm text-muted-foreground">
 				<Spinner className="size-3.5 shrink-0" />
 				<span>{label}</span>
-				{fraction !== null && (
-					<span className="ml-auto tabular-nums">
-						{formatPercent(fraction, { maximumFractionDigits: 0 })}
-					</span>
-				)}
+				<span className="ml-auto flex items-center gap-2">
+					{fraction !== null && (
+						<span className="tabular-nums">
+							{formatPercent(fraction, { maximumFractionDigits: 0 })}
+						</span>
+					)}
+					<Button type="button" size="sm" variant="ghost" onClick={onCancel}>
+						<Trans>Cancel</Trans>
+					</Button>
+				</span>
 			</div>
 			<Progress
 				value={

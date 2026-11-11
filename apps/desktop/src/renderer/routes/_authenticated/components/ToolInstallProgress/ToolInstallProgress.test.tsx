@@ -26,6 +26,7 @@ function renderFailed(
 			manualInstall={{ label: "Download from GitHub", url: ZIP }}
 			onRetry={props.onRetry ?? (() => {})}
 			onCheckAgain={props.onCheckAgain ?? (async () => false)}
+			onCancel={() => {}}
 		/>,
 	);
 }
@@ -68,5 +69,22 @@ describe("ToolInstallProgress", () => {
 			).toBeTruthy(),
 		);
 		expect(onCheckAgain).toHaveBeenCalledTimes(1);
+	});
+
+	test("Cancel during an install stops it", () => {
+		const onCancel = mock(() => {});
+		render(
+			<ToolInstallProgress
+				state={{ stage: "downloading", fraction: 0.4, receivedBytes: 40 }}
+				name="Codex"
+				vendor="OpenAI"
+				manualInstall={{ label: "Install it yourself", url: ZIP }}
+				onRetry={() => {}}
+				onCheckAgain={async () => false}
+				onCancel={onCancel}
+			/>,
+		);
+		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+		expect(onCancel).toHaveBeenCalledTimes(1);
 	});
 });

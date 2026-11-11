@@ -145,3 +145,18 @@ function setOrDelete(key: string, value: string | undefined): void {
 	if (value === undefined) delete process.env[key];
 	else process.env[key] = value;
 }
+
+describe("readGitIdentity without Command Line Tools", () => {
+	test("never runs git, so macOS shows no install dialog", async () => {
+		let gitRuns = 0;
+		const info = await readGitIdentity(stubGhEnv(), {
+			canRunGit: async () => false,
+			readAuthorName: async () => {
+				gitRuns++;
+				return "Ada";
+			},
+		});
+		expect(gitRuns).toBe(0);
+		expect(info.authorName).toBeNull();
+	});
+});

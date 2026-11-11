@@ -7,8 +7,8 @@ import {
 	resolveAppHomeDir,
 	withAppToolsOnPath,
 } from "@superset/agent-setup/paths";
+import { detectGit } from "@superset/shared/detect-git";
 import { getProcessEnvWithShellEnv } from "../../../workspaces/utils/shell-env";
-import { detectGit } from "../../detect-git";
 import { type ResolvedGh, resolveGh } from "../resolve-gh";
 import {
 	finishPendingGitSetup,

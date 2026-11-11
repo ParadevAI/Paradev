@@ -5,12 +5,15 @@ import { SetupRow } from "../SetupRow";
 
 interface GitHubSetupRowProps {
 	gh: { installed: boolean; authenticated: boolean } | undefined;
+	/** An install is running, maybe started on another screen. */
+	installing: boolean;
 	onInstall: () => void;
 	onSignIn: () => void;
 }
 
 export function GitHubSetupRow({
 	gh,
+	installing,
 	onInstall,
 	onSignIn,
 }: GitHubSetupRowProps) {
@@ -25,11 +28,13 @@ export function GitHubSetupRow({
 			detail={
 				!gh
 					? t`Checking…`
-					: ready
-						? t`Signed in · clones private repos and opens pull requests`
-						: installed
-							? t`Not signed in · needed for private repos and pull requests`
-							: t`Not installed · needed for private repos and pull requests`
+					: installing && !installed
+						? t`Installing…`
+						: ready
+							? t`Signed in · clones private repos and opens pull requests`
+							: installed
+								? t`Not signed in · needed for private repos and pull requests`
+								: t`Not installed · needed for private repos and pull requests`
 			}
 			done={ready}
 			actions={

@@ -4,6 +4,10 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./detect-git": {
+			"types": "./src/detect-git/index.ts",
+			"default": "./src/detect-git/index.ts"
+		},
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
 			"default": "./src/agent-routines.ts"

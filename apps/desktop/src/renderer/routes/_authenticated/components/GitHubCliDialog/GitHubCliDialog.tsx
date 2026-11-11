@@ -100,6 +100,7 @@ export function GitHubCliDialog({
 					<InstallStep
 						key={attempt}
 						onInstalled={() => void recheck("auth")}
+						onCancelled={() => onOpenChange(false)}
 						onRetry={() => retry("install")}
 						onCheckAgain={checkInstalled}
 					/>

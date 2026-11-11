@@ -18,6 +18,7 @@ export type ToolInstallEvent =
 	| { stage: "verifying" }
 	| { stage: "installing"; untimed?: boolean }
 	| { stage: "done" }
+	| { stage: "cancelled" }
 	| {
 			stage: "failed";
 			reason: ToolInstallFailure;
@@ -37,8 +38,16 @@ export type ToolInstallState =
 
 const INSTALL_STALL_TIMEOUT_MS = 60_000;
 
+export function isInstallRunning(event: ToolInstallEvent): boolean {
+	return (
+		event.stage === "downloading" ||
+		event.stage === "verifying" ||
+		event.stage === "installing"
+	);
+}
+
 export function nextToolInstallState(
-	event: Exclude<ToolInstallEvent, { stage: "done" }>,
+	event: Exclude<ToolInstallEvent, { stage: "done" } | { stage: "cancelled" }>,
 ): ToolInstallState {
 	switch (event.stage) {
 		case "downloading":
@@ -66,10 +75,16 @@ export function nextToolInstallState(
  * The state of one install subscription, failed as "stalled" after a minute
  * with no progress, except during a step that prints none (brew).
  */
-export function useToolInstallState(
-	onInstalled: () => void,
-	timeoutMs: number = INSTALL_STALL_TIMEOUT_MS,
-) {
+export function useToolInstallState({
+	onInstalled,
+	onCancelled,
+	timeoutMs = INSTALL_STALL_TIMEOUT_MS,
+}: {
+	onInstalled: () => void;
+	/** Someone pressed Cancel, here or on another screen. */
+	onCancelled: () => void;
+	timeoutMs?: number;
+}) {
 	const [state, setState] = useState<ToolInstallState>({ stage: "starting" });
 
 	useStallTimeout({
@@ -86,6 +101,7 @@ export function useToolInstallState(
 		state,
 		onData: (event: ToolInstallEvent) => {
 			if (event.stage === "done") onInstalled();
+			else if (event.stage === "cancelled") onCancelled();
 			else setState(nextToolInstallState(event));
 		},
 		onError: () =>
