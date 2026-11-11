@@ -80,8 +80,13 @@ Grant a balance with `balances.create` (feature `box_gb_minutes`). Do not discou
 - **Do not convert an existing paying subscription to a trial,** and do not add a 100% coupon to
   one. Stripe records the MRR drop as churn. To give a paying customer free months, ask the user
   first; an invoice credit (credit note or customer balance) keeps MRR and churn true.
-- **Do not add a coupon to a subscription that already exists.** Stripe MRR does not recalculate,
-  so the subscription stays counted at full price.
+- **Do not add, remove, or swap a coupon on a subscription that already exists.** Stripe MRR
+  records a coupon removal as a price increase and does not record a coupon addition at all, so
+  a swap leaves a $0 subscription counted at full price. On 10 November 2026 this put $395 of
+  free subscriptions into MRR and, once they became trials, about $2.1k into churn.
+- **Do not try to repair Stripe MRR or churn history by changing subscriptions.** The history
+  is append-only; every change adds new entries. Only Stripe support can recompute it. Send them
+  the subscription IDs instead.
 
 ## Known Autumn issues
 
