@@ -38,6 +38,7 @@ import {
 	CHAT_SCROLLER_GUTTER_CLASSNAME,
 } from "../../constants";
 import type { ChatForkTarget } from "../../types";
+import { PinnedPrompt } from "./components/PinnedPrompt";
 import { TranscriptFindBar } from "./components/TranscriptFindBar";
 import { TranscriptRowItem } from "./components/TranscriptRowItem";
 import { useCarriedReaderPosition } from "./hooks/useCarriedReaderPosition";
@@ -52,6 +53,7 @@ import { useNestedItems } from "./providers/NestedItemsProvider";
 import { useTranscriptPlugins } from "./providers/TranscriptPluginsProvider";
 import { copySourceText } from "./utils/copySourceText";
 import { galleryImages } from "./utils/galleryImages";
+import { lastPrompt } from "./utils/lastPrompt";
 import { replyFooters } from "./utils/replyFooters";
 import { subagentLines } from "./utils/subagentLines";
 import {
@@ -264,6 +266,8 @@ export function Transcript({
 	}, [rows, entryOverrides]);
 
 	const gallery = useMemo(() => galleryImages(rows), [rows]);
+	const harness = snapshot.session?.harness;
+	const prompt = useMemo(() => lastPrompt(rows, harness), [rows, harness]);
 	const availableCommands = snapshot.session?.availableCommands;
 	const commands = useMemo(
 		() => new Map(availableCommands?.map((command) => [command.name, command])),
@@ -331,6 +335,7 @@ export function Transcript({
 			find.currentRowKey,
 			revealRowKey,
 			carriedRowKey,
+			prompt?.key ?? null,
 		],
 		observeRow,
 		find: {
@@ -390,7 +395,8 @@ export function Transcript({
 						seenRowKeys.has(row.key) ||
 						row.key === find.currentRowKey ||
 						row.key === revealRowKey ||
-						row.key === carriedRowKey
+						row.key === carriedRowKey ||
+						row.key === prompt?.key
 					}
 					row={row}
 					registerRow={transcriptWindow.registerRow}
@@ -402,6 +408,14 @@ export function Transcript({
 	return (
 		<MessageScroller.Root className="relative flex min-h-0 min-w-0 flex-1 flex-col">
 			<ChatImageGalleryProvider images={gallery}>
+				{/* The find bar takes the same corner, and aligns its hits to the same edge. */}
+				{!find.isOpen && (
+					<PinnedPrompt
+						messageId={prompt?.messageId ?? null}
+						text={prompt?.text ?? ""}
+						viewport={viewport}
+					/>
+				)}
 				<TranscriptFindBar
 					currentIndex={find.currentIndex}
 					inputRef={find.inputRef}
