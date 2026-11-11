@@ -46,6 +46,7 @@ import {
 } from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
 import { seedSandboxAgents } from "./utils/seedSandboxAgents";
+import { terminalFallbackMode } from "./utils/terminalFallbackMode";
 
 /**
  * Makes a sandbox describe its own workspace, instead of being described from
@@ -405,7 +406,7 @@ export async function launchSandboxAgentOnce(
 						prompt,
 						model,
 						effort,
-						mode,
+						mode: chatTarget ? terminalFallbackMode(agent, mode) : mode,
 						...(attachmentIds?.length ? { attachmentIds } : {}),
 					},
 					launchedAs,
