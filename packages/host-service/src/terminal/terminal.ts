@@ -41,6 +41,7 @@ import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
 import { getProjectIncludingDeleted } from "../projects/local-project-store.ts";
+import { repositoryRootPathFor } from "../projects/multi-repo.ts";
 import {
 	getPathState,
 	inaccessiblePathMessage,
@@ -3072,13 +3073,15 @@ async function createTerminalSessionUnlocked({
 	const project = workspace.projectId
 		? getProjectIncludingDeleted(db, workspace.projectId)
 		: undefined;
-	if (project?.repoPath) {
-		rootPath = project.repoPath;
-	}
-
 	const cwd = cwdOverride
 		? resolveTerminalCwd(cwdOverride, workspace.worktreePath)
 		: workspace.worktreePath;
+	if (project?.repoPath) {
+		rootPath = project.repoPath;
+	} else {
+		// A multi-repo workspace: the repository whose checkout holds the cwd.
+		rootPath = repositoryRootPathFor(db, workspaceId, cwd);
+	}
 	// Adoption overrides these with the PTY's live dims below: the session's
 	// belief must match the kernel's, or the reanchor repaint logic misjudges
 	// whether a client resize will deliver a real SIGWINCH.

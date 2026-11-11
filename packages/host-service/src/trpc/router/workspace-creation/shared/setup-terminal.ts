@@ -88,7 +88,7 @@ export async function startSetupTerminalIfPresent(
 		? resolvePath(row.worktreePath, resolved.cwd)
 		: row.worktreePath;
 	const setupCommand = multiRepo
-		? `(cd ${shellSingleQuote(setupCwd)} && ${resolved.initialCommand})`
+		? `(cd ${shellSingleQuote(setupCwd)} && export SUPERSET_ROOT_PATH=${shellSingleQuote(row.repoPath)} && ${resolved.initialCommand})`
 		: resolved.initialCommand;
 	const initialCommand = args.chainCommand
 		? `${setupCommand} && ${args.chainCommand}`

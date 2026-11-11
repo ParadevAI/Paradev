@@ -9,6 +9,7 @@ import {
 import { basename, dirname, join } from "node:path";
 import { eq, isNull } from "drizzle-orm";
 import { workspaces } from "../../src/db/schema";
+import { repositoryRootPathFor } from "../../src/projects/multi-repo";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
 import { createGitFixture } from "../helpers/git-fixture";
@@ -359,4 +360,18 @@ test("moving a multi-repo workspace is refused with a clear reason", async () =>
 	await expect(
 		host.trpc.teleport.prepareWorkspace.mutate({ workspaceId: workspace.id }),
 	).rejects.toThrow("A multi-repo workspace cannot be moved yet");
+});
+
+test("a terminal inside a checkout gets that repository's main checkout as its root path", async () => {
+	const { host, workspace, checkouts, repoPaths } = await containerWorkspace();
+	const root = dirname(checkouts[0]?.worktreePath ?? "");
+
+	expect(
+		repositoryRootPathFor(
+			host.db,
+			workspace.id,
+			join(checkouts[1]?.worktreePath ?? "", "src"),
+		),
+	).toBe(repoPaths[1] ?? "missing");
+	expect(repositoryRootPathFor(host.db, workspace.id, root)).toBe("");
 });

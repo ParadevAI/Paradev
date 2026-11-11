@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, isAbsolute, join, relative } from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { projects, workspaces } from "../db/schema";
@@ -42,6 +42,33 @@ export function listRepositoryWorkspaces(
 
 export function isContainerWorkspace(db: HostDb, workspaceId: string) {
 	return listRepositoryWorkspaces(db, workspaceId).length > 0;
+}
+
+/**
+ * The main checkout of the repository whose checkout holds `path`, or "" when
+ * no checkout of this multi-repo workspace holds it.
+ */
+export function repositoryRootPathFor(
+	db: HostDb,
+	workspaceId: string,
+	path: string,
+): string {
+	let holder: { worktreePath: string; projectId: string | null } | undefined;
+	for (const checkout of listRepositoryWorkspaces(db, workspaceId)) {
+		const inside = relative(checkout.worktreePath, path);
+		if (inside.startsWith("..") || isAbsolute(inside)) continue;
+		if (!holder || checkout.worktreePath.length > holder.worktreePath.length) {
+			holder = checkout;
+		}
+	}
+	if (!holder?.projectId) return "";
+	return (
+		db
+			.select({ repoPath: projects.repoPath })
+			.from(projects)
+			.where(eq(projects.id, holder.projectId))
+			.get()?.repoPath ?? ""
+	);
 }
 
 /** Tells agents started in a container workspace where each repository is. */
