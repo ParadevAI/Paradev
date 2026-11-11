@@ -21,6 +21,7 @@ import {
 	loadPageShareRole,
 	pageAccess,
 } from "./access";
+import { writePageManifest } from "./storage";
 
 async function loadSharedPage(
 	ctx: Parameters<typeof requireActiveOrgMembership>[0] & {
@@ -96,6 +97,7 @@ export const pageSharingRouter = {
 				sharedByUserId: userId,
 				role: input.role,
 			});
+			await writePageManifest(page.id);
 			return { added };
 		}),
 
@@ -103,12 +105,12 @@ export const pageSharingRouter = {
 		.input(removeShareSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
-			return {
-				removed: await removeShare(
-					{ kind: "page", id: page.id },
-					input.grantee,
-				),
-			};
+			const removed = await removeShare(
+				{ kind: "page", id: page.id },
+				input.grantee,
+			);
+			await writePageManifest(page.id);
+			return { removed };
 		}),
 
 	setRole: personProcedure

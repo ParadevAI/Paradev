@@ -48,6 +48,7 @@ interface Pinned {
 	name: string;
 	image: string | null;
 	organizationIds: string[];
+	teamIds?: readonly string[];
 	author: boolean;
 	writable: boolean;
 	window: number;
@@ -67,6 +68,7 @@ interface PresenceClaims {
 	name: string;
 	image: string | null;
 	organizationIds: string[];
+	teamIds: string[];
 	guest: boolean;
 }
 
@@ -167,6 +169,7 @@ export class PageHub extends Server<RealtimeEnv> {
 				: readable(manifest, {
 						userId: pinned.userId,
 						organizationIds: [...pinned.organizationIds],
+						teamIds: pinned.teamIds ?? [],
 					});
 			if (!allowed) {
 				this.revoke(connection);
@@ -208,6 +211,7 @@ export class PageHub extends Server<RealtimeEnv> {
 			name: string;
 			image: string | null;
 			organizationIds: string[];
+			teamIds?: string[];
 			nonce: string;
 			presence?: boolean;
 			guest?: boolean;
@@ -225,6 +229,7 @@ export class PageHub extends Server<RealtimeEnv> {
 				name: claims.name,
 				image: claims.image,
 				organizationIds: claims.organizationIds,
+				teamIds: claims.teamIds ?? [],
 				guest: claims.guest === true,
 			});
 			return;
@@ -251,6 +256,7 @@ export class PageHub extends Server<RealtimeEnv> {
 		const viewer = {
 			userId: claims.userId,
 			organizationIds: claims.organizationIds,
+			teamIds: claims.teamIds ?? [],
 		};
 		if (!manifest || !readable(manifest, viewer)) {
 			connection.close(4403, "forbidden");
@@ -262,6 +268,7 @@ export class PageHub extends Server<RealtimeEnv> {
 			name: claims.name,
 			image: claims.image,
 			organizationIds: claims.organizationIds,
+			teamIds: viewer.teamIds,
 			author: manifest.createdByUserId === claims.userId,
 			writable: writableFor(manifest, viewer),
 			window: 0,
@@ -317,6 +324,7 @@ export class PageHub extends Server<RealtimeEnv> {
 				name: claims.name,
 				image: claims.image,
 				organizationIds: claims.organizationIds,
+				teamIds: claims.teamIds,
 				author: false,
 				writable: false,
 				window: 0,
@@ -574,6 +582,7 @@ export class PageHub extends Server<RealtimeEnv> {
 			name: current.name,
 			image: current.image,
 			organizationIds: [...current.organizationIds],
+			teamIds: current.teamIds,
 			author: current.author,
 			writable: current.writable,
 			scoped: current.scoped,

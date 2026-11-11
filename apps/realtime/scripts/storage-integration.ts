@@ -28,6 +28,9 @@ const PRIVATE_PAGE = "cccccccc-3333-4333-8333-cccccccccccc";
 const PUBLIC_PAGE = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee";
 const GUEST = "f0f0f0f0-6666-4666-8666-f0f0f0f0f0f0";
 const SHARED_ONLY_WRITER = "66666666-6666-4666-8666-666666666666";
+const SHARED_WITH_PAGE = "abababab-7777-4777-8777-abababababab";
+const TEAMMATE = "77777777-7777-4777-8777-777777777777";
+const TEAM = "88888888-8888-4888-8888-888888888888";
 
 let failures = 0;
 const check = (name: string, ok: boolean, detail?: unknown) => {
@@ -107,8 +110,9 @@ async function main() {
 		organizationIds: string[],
 		name = "Ada",
 		image: string | null = null,
+		teamIds: string[] = [],
 	) =>
-		new SignJWT({ organizationIds, name, image })
+		new SignJWT({ organizationIds, teamIds, name, image })
 			.setProtectedHeader({ alg: "RS256", kid: "test-key" })
 			.setIssuer(issuer)
 			.setAudience(issuer)
@@ -1278,6 +1282,101 @@ async function main() {
 		limited = closed?.code === 4429 && closed.reason === "Too many requests";
 	}
 	check("guest presence is rate-limited per client", limited);
+
+	console.log("\nshared viewers of a just_me page");
+	const sharedManifest = (sharedUserIds: string[], sharedTeamIds: string[]) =>
+		manifest(SHARED_WITH_PAGE, {
+			visibility: "just_me",
+			organizationId: ORG,
+			createdByUserId: AUTHOR,
+			sharedUserIds,
+			sharedTeamIds,
+		});
+	seed(SHARED_WITH_PAGE, sharedManifest([MEMBER], [TEAM]));
+	const teammateJwt = await mint(TEAMMATE, [ORG], "Linus", null, [TEAM]);
+	const strangerJwt = await mint(crypto.randomUUID(), [ORG], "Ken");
+	const sharedOrigin = `http://${SHARED_WITH_PAGE}.frame.usercontent.localhost:9999`;
+
+	const directTicket = await ticket(SHARED_WITH_PAGE, memberJwt);
+	check(
+		"issues a ticket to a member the page is shared with",
+		directTicket.status === 200 && Boolean(directTicket.body?.ticket),
+		directTicket,
+	);
+	const strangerTicket = await ticket(SHARED_WITH_PAGE, strangerJwt);
+	check(
+		"still refuses a member it is not shared with",
+		strangerTicket.status === 403,
+		strangerTicket,
+	);
+
+	const shareeRecords = await fetch(
+		`${base}/v2/page/${SHARED_WITH_PAGE}/storage/records`,
+		{ headers: { authorization: `Bearer ${memberJwt}` } },
+	);
+	check(
+		"the readback route lets a shared member read",
+		shareeRecords.status === 200,
+		shareeRecords.status,
+	);
+
+	const sharedPresence = enter(SHARED_WITH_PAGE, `?token=${memberJwt}`);
+	check(
+		"presence lets a shared member in",
+		Boolean(
+			await sharedPresence.waitFor(
+				(m) => m.type === "presence" && Array.isArray(m.viewers),
+			),
+		),
+		sharedPresence.inbox,
+	);
+
+	const teamTicket = await ticket(SHARED_WITH_PAGE, teammateJwt);
+	const teamOpen = await open(String(teamTicket.url), sharedOrigin).catch(
+		(error) => (error as Error).message,
+	);
+	check(
+		"a team share opens the storage socket",
+		typeof teamOpen !== "string" &&
+			(teamOpen.first as { type?: string }).type === "hello",
+		teamOpen,
+	);
+	if (typeof teamOpen !== "string") {
+		const teamClosed = new Promise<string>((resolve) => {
+			teamOpen.socket.addEventListener("close", (event) =>
+				resolve(`${event.code}`),
+			);
+			setTimeout(() => resolve("still open"), 3000);
+		});
+		const nudgeShared = () =>
+			fetch(`${base}/v2/page/${SHARED_WITH_PAGE}/storage/manifest-changed`, {
+				method: "POST",
+				headers: { authorization: `Bearer ${SECRET}` },
+			});
+		await rpc(teamOpen.socket, { op: "get", key: "k" }, "shared-0");
+		await nudgeShared();
+		const stillThere = await rpc(
+			teamOpen.socket,
+			{ op: "get", key: "k" },
+			"shared-1",
+		).catch((error) => (error as Error).message);
+		check(
+			"a nudge that keeps the share keeps the team member connected",
+			typeof stillThere !== "string" && stillThere.ok === true,
+			stillThere,
+		);
+
+		seed(SHARED_WITH_PAGE, sharedManifest([], []));
+		await nudgeShared();
+		check(
+			"removing the share revokes the live storage socket",
+			(await teamClosed) === "4403",
+		);
+		check(
+			"removing the share closes the shared member's presence",
+			(await sharedPresence.waitClosed())?.code === 4403,
+		);
+	}
 
 	shutdown();
 

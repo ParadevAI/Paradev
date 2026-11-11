@@ -45,6 +45,19 @@ describe("parsePageManifest", () => {
 		});
 	});
 
+	test("keeps who the page is shared with", () => {
+		const manifest = parsePageManifest(
+			JSON.stringify({
+				...base,
+				versions: {},
+				sharedUserIds: ["u1"],
+				sharedTeamIds: ["t1"],
+			}),
+		);
+		expect(manifest?.sharedUserIds).toEqual(["u1"]);
+		expect(manifest?.sharedTeamIds).toEqual(["t1"]);
+	});
+
 	test("rejects malformed assets", () => {
 		for (const assets of [null, "x", { "a.png": { key: 1 } }]) {
 			expect(

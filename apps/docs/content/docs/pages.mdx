@@ -130,7 +130,7 @@ superset pages storage <page-id-or-slug>
 superset pages storage <page-id-or-slug> --key votes
 ```
 
-The first command lists each key and how many people stored a value under it. With `--key`, it prints each person's value and when they last changed it. With `--scope private`, you see only your own value. Add `--scope` to pick `slot`, `private` or `shared`. Add `--json` for the raw records. On a `just_me` page only the creator can read storage. On an `org` or `everyone` page, members of the page's organization can read it, even when the page is public.
+The first command lists each key and how many people stored a value under it. With `--key`, it prints each person's value and when they last changed it. With `--scope private`, you see only your own value. Add `--scope` to pick `slot`, `private` or `shared`. Add `--json` for the raw records. On a `just_me` page, the creator and the people and teams it is shared with can read storage. On an `org` or `everyone` page, members of the page's organization can read it, even when the page is public.
 
 You can also write storage as yourself, for example to refresh data from an automation without a new publish. Both `--set` and `--remove` need `--key`, and `--set` takes a JSON value:
 
@@ -139,7 +139,7 @@ superset pages storage <page-id-or-slug> --key data --scope shared --set '{"deal
 superset pages storage <page-id-or-slug> --key data --scope shared --remove
 ```
 
-On `org` and `everyone` pages, only signed-in members of the page's organization can read or write storage. On a `just_me` page, only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage.
+On `org` and `everyone` pages, only signed-in members of the page's organization can read or write storage. On a `just_me` page, only the creator and the people and teams it is shared with can, whatever role the share gives. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage.
 
 ## Show Live Data from Your Tools
 

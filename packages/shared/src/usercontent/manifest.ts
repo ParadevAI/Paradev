@@ -25,10 +25,16 @@ export interface PageManifest {
 	visibility: PageVisibility;
 	organizationId?: string;
 	createdByUserId?: string | null;
+	/** Who a `just_me` page is shared with; team ids match the JWT's `teamIds`. */
+	sharedUserIds?: string[];
+	sharedTeamIds?: string[];
 	sharedVersion: number | null;
 	latestVersion: number | null;
 	versions: Record<string, PageManifestVersion>;
 }
+
+const isStringArray = (value: unknown): value is string[] =>
+	Array.isArray(value) && value.every((item) => typeof item === "string");
 
 function isVersionNumber(value: unknown): value is number | null {
 	return value === null || (Number.isInteger(value) && (value as number) > 0);
@@ -104,6 +110,12 @@ export function parsePageManifest(text: string): PageManifest | null {
 		versions,
 		...(organizationId !== undefined ? { organizationId } : {}),
 		...(createdByUserId !== undefined ? { createdByUserId } : {}),
+		...(isStringArray(candidate.sharedUserIds)
+			? { sharedUserIds: candidate.sharedUserIds }
+			: {}),
+		...(isStringArray(candidate.sharedTeamIds)
+			? { sharedTeamIds: candidate.sharedTeamIds }
+			: {}),
 	};
 }
 
