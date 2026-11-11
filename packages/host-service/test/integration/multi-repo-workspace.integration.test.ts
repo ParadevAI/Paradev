@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, spyOn, test } from "bun:test";
 import {
 	existsSync,
 	mkdirSync,
@@ -10,6 +10,7 @@ import { basename, dirname, join } from "node:path";
 import { eq, isNull } from "drizzle-orm";
 import { workspaces } from "../../src/db/schema";
 import { repositoryRootPathFor } from "../../src/projects/multi-repo";
+import * as naming from "../../src/trpc/router/workspace-creation/utils/ai-workspace-names";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
 import { createGitFixture } from "../helpers/git-fixture";
@@ -406,4 +407,43 @@ test("a local-checkout workspace is refused for a multi-repo project", async () 
 	await expect(
 		host.trpc.workspaces.create.mutate({ projectId, checkout: "local" }),
 	).rejects.toThrow("A multi-repo project has no single checkout");
+});
+
+test("AI naming renames the branch in every checkout", async () => {
+	const generator = spyOn(
+		naming,
+		"generateWorkspaceNamesFromPrompt",
+	).mockResolvedValue({ title: "Fix login", branchName: "repair-auth" });
+	try {
+		const { host, projectId } = await containerScenario();
+		const { workspace } = await host.trpc.workspaces.create.mutate({
+			projectId,
+			namingPrompt: "Fix the login bug",
+		});
+		const containerRow = () =>
+			host.db
+				.select()
+				.from(workspaces)
+				.where(eq(workspaces.id, workspace.id))
+				.get();
+		for (let i = 0; i < 200 && containerRow()?.name !== "Fix login"; i++) {
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
+
+		const branch = containerRow()?.branch ?? "";
+		expect(containerRow()?.name).toBe("Fix login");
+		expect(branch).toContain("repair-auth");
+		const checkouts = await host.trpc.workspace.repositories.query({
+			workspaceId: workspace.id,
+		});
+		for (const checkout of checkouts) {
+			const head = Bun.spawnSync(["git", "branch", "--show-current"], {
+				cwd: checkout.worktreePath,
+			});
+			expect(head.stdout.toString().trim()).toBe(branch);
+			expect(checkout.branch).toBe(branch);
+		}
+	} finally {
+		generator.mockRestore();
+	}
 });

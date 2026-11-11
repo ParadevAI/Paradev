@@ -602,7 +602,7 @@ async function createContainerWorkspace(
 		setWorkspaceNamingState(ctx.db, workspaceRow.id, {
 			prompt: composerPrompt,
 			attempts: 0,
-			branch: null,
+			branch: typedBranch || input.name ? null : branch,
 			agent: input.agents?.[0]?.agent ?? input.namingAgent ?? null,
 		});
 		scheduleWorkspaceNaming(ctx, workspaceRow.id);

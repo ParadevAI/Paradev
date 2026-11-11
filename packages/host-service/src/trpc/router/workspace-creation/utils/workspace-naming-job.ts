@@ -1,5 +1,9 @@
 import { deriveWorkspaceTitleFromPrompt } from "@superset/shared/workspace-launch";
 import { getProjectIncludingDeleted } from "../../../../projects/local-project-store";
+import {
+	isContainerProject,
+	listRepositoryWorkspaces,
+} from "../../../../projects/multi-repo";
 import { createGitEnvResolver } from "../../../../runtime/git/git";
 import type { HostServiceContext } from "../../../../types";
 import { getHostWorkerPool } from "../../../../workers/host-worker-pool";
@@ -187,12 +191,21 @@ export function scheduleWorkspaceNaming(
 		const oldBranch = current.naming.branch;
 		const branchStillAutomatic =
 			!!project && !!oldBranch && current.row.branch === oldBranch;
+		const checkouts = project ? namingCheckouts(ctx, current.row, project) : [];
 		// A failed probe (git lock, hung index) says nothing about the branch,
 		// so the attempt counts as failed and the next turn tries again.
 		const canRenameBranch =
-			branchStillAutomatic && names?.branchName
-				? await namingGitOps
-						.canRenameAutomaticBranch(ctx, current.row.worktreePath, oldBranch)
+			branchStillAutomatic && names?.branchName && checkouts.length > 0
+				? await Promise.all(
+						checkouts.map((checkout) =>
+							namingGitOps.canRenameAutomaticBranch(
+								ctx,
+								checkout.worktreePath,
+								oldBranch,
+							),
+						),
+					)
+						.then((renamable) => renamable.every(Boolean))
 						.catch((error) => {
 							console.warn("[workspace-title] branch probe failed", error);
 							return null;
@@ -223,8 +236,7 @@ export function scheduleWorkspaceNaming(
 			try {
 				await renameAutomaticBranch(ctx, {
 					workspaceId,
-					worktreePath: current.row.worktreePath,
-					repoPath: project.repoPath,
+					checkouts,
 					oldBranch,
 					branchName: decision.branchName,
 					title: decision.title,
@@ -244,12 +256,42 @@ export function scheduleWorkspaceNaming(
 	});
 }
 
+interface NamingCheckout {
+	id: string;
+	worktreePath: string;
+	repoPath: string;
+}
+
+/** The checkouts that carry the workspace's branch: each repository's in a multi-repo workspace. */
+function namingCheckouts(
+	ctx: HostServiceContext,
+	row: { id: string; worktreePath: string },
+	project: { kind: string; repoPath: string },
+): NamingCheckout[] {
+	if (!isContainerProject(project)) {
+		return [
+			{
+				id: row.id,
+				worktreePath: row.worktreePath,
+				repoPath: project.repoPath,
+			},
+		];
+	}
+	return listRepositoryWorkspaces(ctx.db, row.id).flatMap((checkout) => {
+		const repoPath = checkout.projectId
+			? getProjectIncludingDeleted(ctx.db, checkout.projectId)?.repoPath
+			: undefined;
+		return repoPath
+			? [{ id: checkout.id, worktreePath: checkout.worktreePath, repoPath }]
+			: [];
+	});
+}
+
 async function renameAutomaticBranch(
 	ctx: HostServiceContext,
 	input: {
 		workspaceId: string;
-		worktreePath: string;
-		repoPath: string;
+		checkouts: NamingCheckout[];
 		oldBranch: string;
 		branchName: string;
 		title: string;
@@ -264,7 +306,13 @@ async function renameAutomaticBranch(
 		branchPrefix: slash > 0 ? oldBranch.slice(0, slash) : undefined,
 		oldBranchName: oldBranch,
 	});
-	const branches = await listBranchNames(ctx, input.repoPath);
+	const branches = (
+		await Promise.all(
+			input.checkouts.map((checkout) =>
+				listBranchNames(ctx, checkout.repoPath),
+			),
+		)
+	).flat();
 	if (!isCurrent()) return;
 	const target = deduplicateBranchName(
 		prefixedCandidate,
@@ -272,8 +320,31 @@ async function renameAutomaticBranch(
 	);
 	await commitWorkspaceTitleJob(ctx.db, workspaceId, async () => {
 		if (!isCurrent() || !pendingNaming(ctx, workspaceId)) return;
-		await namingGitOps.renameBranch(ctx, input.worktreePath, oldBranch, target);
-		gitStatusStore.recordChange(workspaceId, undefined);
+		const renamed: NamingCheckout[] = [];
+		try {
+			for (const checkout of input.checkouts) {
+				await namingGitOps.renameBranch(
+					ctx,
+					checkout.worktreePath,
+					oldBranch,
+					target,
+				);
+				renamed.push(checkout);
+			}
+		} catch (error) {
+			for (const checkout of renamed) {
+				await namingGitOps
+					.renameBranch(ctx, checkout.worktreePath, target, oldBranch)
+					.catch(() => {});
+			}
+			throw error;
+		}
+		for (const checkout of input.checkouts) {
+			gitStatusStore.recordChange(checkout.id, undefined);
+			if (checkout.id !== workspaceId) {
+				updateLocalWorkspace(ctx, checkout.id, { branch: target });
+			}
+		}
 		updateLocalWorkspace(ctx, workspaceId, {
 			name: input.title,
 			branch: target,
