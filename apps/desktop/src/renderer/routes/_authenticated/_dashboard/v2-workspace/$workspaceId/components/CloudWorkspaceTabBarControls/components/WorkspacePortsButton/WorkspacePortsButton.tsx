@@ -6,6 +6,7 @@ import { cn } from "@superset/ui/utils";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { useExplicitForwards } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { PortsCountIcon } from "renderer/routes/_authenticated/_dashboard/components/PortsCountIcon";
+import { usePortsDisplayMode } from "renderer/stores/inline-workspace-ports";
 import { portForwardId } from "shared/types";
 import { WorkspacePortRow } from "./components/WorkspacePortRow";
 import { WorkspaceStaleForwardRow } from "./components/WorkspaceStaleForwardRow";
@@ -31,6 +32,11 @@ export function WorkspacePortsButton({
 	const stale = useExplicitForwards(workspaceId).filter(
 		(forward) => !detected.has(forward.id),
 	);
+	const totalPortCount = ports.length;
+	// The topbar layout's org-wide ports pill already lists this workspace.
+	const portsDisplayMode = usePortsDisplayMode();
+
+	if (portsDisplayMode === "topbar") return null;
 
 	return (
 		<Popover>
@@ -39,13 +45,13 @@ export function WorkspacePortsButton({
 					<PopoverTrigger asChild>
 						<button
 							type="button"
-							aria-label={t({ message: "Ports" })}
+							aria-label={t({ message: `Ports: ${totalPortCount} live` })}
 							className={cn(
 								"no-drag data-[state=open]:bg-fill-hover data-[state=open]:text-foreground",
 								HEADER_ICON_BUTTON_CLASS,
 							)}
 						>
-							<PortsCountIcon count={ports.length} />
+							<PortsCountIcon count={totalPortCount} />
 						</button>
 					</PopoverTrigger>
 				</TooltipTrigger>

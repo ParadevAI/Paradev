@@ -30,6 +30,9 @@ import { devtools, persist } from "zustand/middleware";
  *        `DashboardSidebarExpandedWorkspaceRow`).
  *      - topbar: `PortsDropdown`.
  *
+ * `WorkspacePortsButton` (the cloud workspace tab bar's ports entry) stays
+ * whichever layout wins; drop only its topbar-mode early return.
+ *
  * Both layouts read port data from the single `DashboardSidebarPortsProvider`
  * mounted in the dashboard layout.
  */
