@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
+import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
 import { createGitEnvResolver } from "../../../runtime/git";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
@@ -383,19 +384,33 @@ export const gitRouter = router({
 						workspaceId !== undefined;
 						workspaceId = queue.shift()
 					) {
-						try {
-							const snapshot = await runStatusSnapshot(ctx, {
-								workspaceId,
-								priority: "background",
-							});
-							workspaces.push({
-								workspaceId,
-								...sumSnapshotDiffStats(snapshot),
-							});
-						} catch {
-							// Missing worktree, wedged repo, etc. — omit the row rather
-							// than failing the whole batch.
+						// A multi-repo workspace's stats are the sum of its checkouts'.
+						const checkoutIds = listRepositoryWorkspaces(
+							ctx.db,
+							workspaceId,
+						).map((checkout) => checkout.id);
+						const totals = { additions: 0, deletions: 0, fileCount: 0 };
+						let counted = false;
+						for (const checkoutId of checkoutIds.length > 0
+							? checkoutIds
+							: [workspaceId]) {
+							try {
+								const stats = sumSnapshotDiffStats(
+									await runStatusSnapshot(ctx, {
+										workspaceId: checkoutId,
+										priority: "background",
+									}),
+								);
+								totals.additions += stats.additions;
+								totals.deletions += stats.deletions;
+								totals.fileCount += stats.fileCount;
+								counted = true;
+							} catch {
+								// Missing worktree, wedged repo, etc. — omit it rather
+								// than failing the whole batch.
+							}
 						}
+						if (counted) workspaces.push({ workspaceId, ...totals });
 					}
 				},
 			);

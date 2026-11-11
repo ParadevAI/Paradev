@@ -307,3 +307,18 @@ test("each checkout reports its own run script, for the Run menu", async () => {
 		},
 	]);
 });
+
+test("the container's diff stats sum every checkout, for the Workspaces board", async () => {
+	const { host, workspace, checkouts } = await containerWorkspace();
+	writeFileSync(join(checkouts[0]?.worktreePath ?? "", "a.txt"), "one\n");
+	writeFileSync(join(checkouts[1]?.worktreePath ?? "", "b.txt"), "one\ntwo\n");
+
+	const { workspaces: stats } =
+		await host.trpc.git.getDiffStatsByWorkspaces.query({
+			workspaceIds: [workspace.id],
+		});
+
+	expect(stats).toEqual([
+		{ workspaceId: workspace.id, additions: 3, deletions: 0, fileCount: 2 },
+	]);
+});
