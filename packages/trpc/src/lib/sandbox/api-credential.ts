@@ -31,6 +31,7 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"chatHistory.completeTranscriptUpload",
 	"chatHistory.createTranscriptUpload",
 	"chatHistory.push",
+	"chatHistory.syncEnabled",
 	"cloudWorkspace.access",
 	"cloudWorkspace.available",
 	"cloudWorkspace.create",
