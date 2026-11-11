@@ -379,6 +379,33 @@ export class PullRequestRuntimeManager {
 		this.unsubscribeFromWorkspaceEvents = null;
 	}
 
+	/**
+	 * The workspaces that hold each id's git state: a multi-repo workspace's
+	 * checkouts, or the workspace itself.
+	 */
+	private checkoutsByWorkspace(workspaceIds: string[]): Map<string, string[]> {
+		const children = this.db
+			.select({
+				id: workspaces.id,
+				parentWorkspaceId: workspaces.parentWorkspaceId,
+			})
+			.from(workspaces)
+			.where(inArray(workspaces.parentWorkspaceId, workspaceIds))
+			.all();
+		const result = new Map<string, string[]>();
+		for (const child of children) {
+			if (!child.parentWorkspaceId) continue;
+			result.set(child.parentWorkspaceId, [
+				...(result.get(child.parentWorkspaceId) ?? []),
+				child.id,
+			]);
+		}
+		for (const workspaceId of workspaceIds) {
+			if (!result.has(workspaceId)) result.set(workspaceId, [workspaceId]);
+		}
+		return result;
+	}
+
 	async getPullRequestsByWorkspaces(
 		workspaceIds: string[],
 	): Promise<PullRequestWorkspaceSnapshot[]> {
@@ -476,6 +503,7 @@ export class PullRequestRuntimeManager {
 	): Promise<WorkspacePullRequestHistory[]> {
 		if (workspaceIds.length === 0) return [];
 
+		const checkouts = this.checkoutsByWorkspace(workspaceIds);
 		const rows = this.db
 			.select({
 				workspaceId: workspacePullRequests.workspaceId,
@@ -504,7 +532,12 @@ export class PullRequestRuntimeManager {
 				workspaces,
 				eq(workspacePullRequests.workspaceId, workspaces.id),
 			)
-			.where(inArray(workspacePullRequests.workspaceId, workspaceIds))
+			.where(
+				inArray(
+					workspacePullRequests.workspaceId,
+					[...checkouts.values()].flat(),
+				),
+			)
 			.all();
 
 		const byWorkspace = new Map<string, WorkspacePullRequestHistoryEntry[]>();
@@ -531,7 +564,9 @@ export class PullRequestRuntimeManager {
 		}
 
 		return workspaceIds.map((workspaceId) => {
-			const entries = byWorkspace.get(workspaceId) ?? [];
+			const entries = (checkouts.get(workspaceId) ?? []).flatMap(
+				(checkoutId) => byWorkspace.get(checkoutId) ?? [],
+			);
 			entries.sort((a, b) => {
 				if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
 				return b.linkedAt - a.linkedAt;
@@ -546,7 +581,12 @@ export class PullRequestRuntimeManager {
 		const rows = this.db
 			.select()
 			.from(workspaces)
-			.where(inArray(workspaces.id, workspaceIds))
+			.where(
+				inArray(
+					workspaces.id,
+					[...this.checkoutsByWorkspace(workspaceIds).values()].flat(),
+				),
+			)
 			.all();
 
 		// Session workspaces (null projectId) have no remote to sync; archived
@@ -602,6 +642,14 @@ export class PullRequestRuntimeManager {
 	// refresh sweep from re-linking it while its branch still matches; a
 	// different PR on the branch (or an explicit re-link) still links.
 	unlinkWorkspacePullRequest(workspaceId: string): void {
+		for (const checkoutId of this.checkoutsByWorkspace([workspaceId]).get(
+			workspaceId,
+		) ?? []) {
+			this.unlinkOwnPullRequest(checkoutId);
+		}
+	}
+
+	private unlinkOwnPullRequest(workspaceId: string): void {
 		const workspace = this.db
 			.select({ pullRequestId: workspaces.pullRequestId })
 			.from(workspaces)

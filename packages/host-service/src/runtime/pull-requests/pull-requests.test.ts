@@ -57,6 +57,7 @@ function seedWorkspace(
 		upstreamBranch?: string | null;
 		pullRequestId?: string | null;
 		worktreePath?: string;
+		parentWorkspaceId?: string;
 	},
 ) {
 	db.insert(schema.workspaces)
@@ -71,6 +72,7 @@ function seedWorkspace(
 			upstreamRepo: w.upstreamRepo ?? null,
 			upstreamBranch: w.upstreamBranch ?? null,
 			pullRequestId: w.pullRequestId ?? null,
+			parentWorkspaceId: w.parentWorkspaceId ?? null,
 		})
 		.run();
 }
@@ -2657,5 +2659,78 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		);
 		expect(manager.getGithubStatus()?.reason).toBe("auth");
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+	});
+});
+
+describe("PullRequestRuntimeManager multi-repo workspace", () => {
+	function seedContainer(db: HostDb) {
+		seedProject(db);
+		seedWorkspace(db, { id: "container", branch: "feature" });
+		for (const [id, prNumber] of [
+			["web", 201],
+			["api", 202],
+		] as const) {
+			seedPullRequest(db, {
+				id: `pr-${id}`,
+				prNumber,
+				headBranch: "feature",
+				headSha: `sha-${id}`,
+			});
+			seedWorkspace(db, {
+				id,
+				branch: "feature",
+				parentWorkspaceId: "container",
+				pullRequestId: `pr-${id}`,
+			});
+			db.insert(schema.workspacePullRequests)
+				.values({ workspaceId: id, pullRequestId: `pr-${id}`, linkedAt: 1 })
+				.run();
+		}
+	}
+
+	test("the container's history lists every checkout's pull request", async () => {
+		const db = createRealDb();
+		seedContainer(db);
+		const [history] = await createManager(db).getPullRequestHistoryByWorkspaces(
+			["container"],
+		);
+
+		expect(history?.workspaceId).toBe("container");
+		expect(history?.pullRequests.map((pr) => pr.number).sort()).toEqual([
+			201, 202,
+		]);
+	});
+
+	test("removing the container's link removes every checkout's link", () => {
+		const db = createRealDb();
+		seedContainer(db);
+
+		createManager(db).unlinkWorkspacePullRequest("container");
+
+		expect(getWorkspace(db, "web")?.pullRequestId).toBeNull();
+		expect(getWorkspace(db, "api")?.pullRequestId).toBeNull();
+		expect(getWorkspace(db, "api")?.suppressedPullRequestId).toBe("pr-api");
+	});
+
+	test("refreshing the container re-reads every checkout, not its folder", async () => {
+		const db = createRealDb();
+		seedContainer(db);
+		const read: string[] = [];
+		const manager = createManager(db, {
+			execGh: routeGh({}),
+			readWorkspaceRefs: async (worktreePath) => {
+				read.push(worktreePath);
+				return { branch: "feature", headSha: null, upstream: null };
+			},
+		});
+
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["container"]),
+		);
+
+		expect(read.sort()).toEqual([
+			"/repo/.worktrees/api",
+			"/repo/.worktrees/web",
+		]);
 	});
 });
