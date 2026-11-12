@@ -29,6 +29,12 @@ The web adapter probes marketing with a one-second bound before leaving auth. St
 
 Store requests abort at 1.5 seconds; PostHog's awaited `captureImmediate` path times out at two seconds without automatic retry. Bind returns `submitted`, `skipped` or `unavailable`; submitted is not proof of project-side ingestion. GETDEL gives at-most-once dispatch, not an outbox: a crash/network failure can lose a join. No uncertain external event is replayed automatically.
 
+## Marketing and docs consent boundary
+
+Marketing and docs use the existing project's shared native opt-out cookie. Before docs initializes, a consent-only marketing iframe checks legacy origin-local declines. That check is supported only over the same scheme on the same hostname or within the same known company root (`paradev.com` or `superset.sh`). Other configurations return unavailable without loading the iframe: docs skips initialization for that page and does not save a fabricated preference. An iframe on another site cannot reliably read the visitor's top-level storage partition. Same-site default/no-choice and accepted visitors still track without clicking Accept.
+
+This PR does not move either site or transfer preferences between `superset.sh` and `paradev.com`. Current-origin legacy declines are migrated, but a decline stored only on the other registrable domain is not accessible here. Cross-domain brand-cutover consent transfer was absent before this change and is not supplied by the acquisition bridge or the docs iframe. Do not represent this PR as solving that migration.
+
 ## Activation
 
 Deploy marketing and web together. Existing KV URL/token must select the **same Redis database/namespace**, with GETDEL and Lua EVAL. Existing PostHog settings must select the same project, and configured marketing/web origins must be correct. No new environment variable, production schema migration or desktop release is introduced. Web before marketing's health route falls back to ordinary auth. HTTPS is required in production.

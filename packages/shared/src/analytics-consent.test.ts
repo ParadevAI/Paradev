@@ -113,12 +113,56 @@ test("consent-only response reads legacy storage without initializing SDK or lin
 	expect(writes).toEqual([]);
 });
 
+test("cross-site consent checks stay unavailable without reading partitioned storage", async () => {
+	for (const [docs, marketing] of [
+		["https://docs.superset.sh", "https://paradev.com"],
+		["https://docs.paradev.com", "https://superset.sh"],
+		["https://docs.paradev.com", "https://paradev.com.attacker.test"],
+		["https://docs.preview.test", "https://marketing.preview.test"],
+		["https://docs.paradev.com", "http://paradev.com"],
+		["https://docs.paradev.com", "not-an-origin"],
+	] as const) {
+		install("window", { location: { origin: docs } });
+		expect(await readMarketingAnalyticsOptOut(marketing, 0)).toBeNull();
+	}
+	expect(writes).toEqual([]);
+});
+
+for (const [docs, marketing] of [
+	["https://docs.paradev.com", "https://paradev.com"],
+	["https://docs.superset.sh", "https://superset.sh"],
+	["http://localhost:3004", "http://localhost:3002"],
+	["https://preview.example.com", "https://preview.example.com"],
+] as const) {
+	test(`same-site consent check remains available: ${docs}`, async () => {
+		let receive = (_event: unknown) => {};
+		const source = {};
+		install("window", {
+			location: { origin: docs },
+			addEventListener: (_: string, fn: typeof receive) => (receive = fn),
+			removeEventListener: () => {},
+		});
+		install("document", {
+			createElement: () => ({ contentWindow: source, remove: () => {} }),
+			body: { append: () => {} },
+		});
+		const result = readMarketingAnalyticsOptOut(marketing);
+		receive({
+			origin: marketing,
+			source,
+			data: { type: "superset:analytics-opt-out", optedOut: false },
+		});
+		expect(await result).toBe(false);
+	});
+}
+
 test("docs trusts only exact iframe origin and source, not URL flags/messages", async () => {
 	let receive = (_event: unknown) => {};
 	let removed = false;
 	const source = {};
 	const frame = { contentWindow: source, remove: () => (removed = true) };
 	install("window", {
+		location: { origin: "https://docs.paradev.com" },
 		addEventListener: (_: string, fn: typeof receive) => (receive = fn),
 		removeEventListener: () => {},
 	});
@@ -142,6 +186,7 @@ test("docs trusts only exact iframe origin and source, not URL flags/messages", 
 
 test("unavailable legacy-origin check suppresses only the current docs init", async () => {
 	install("window", {
+		location: { origin: "https://docs.paradev.com" },
 		addEventListener: () => {},
 		removeEventListener: () => {},
 	});

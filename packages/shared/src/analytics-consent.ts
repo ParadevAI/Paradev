@@ -1,4 +1,5 @@
 import { hasAnalyticsOptOut } from "./acquisition-bridge/browser";
+import { OWN_ROOT_DOMAINS } from "./own-domains";
 
 export const ANALYTICS_CONSENT_KEY = "superset-analytics-consent";
 export const ANALYTICS_CONSENT_PATH = "/api/analytics/consent";
@@ -23,10 +24,40 @@ export function migrateAnalyticsOptOut(
 	return optedOut;
 }
 
+function canReadUnpartitionedMarketingConsent(
+	marketingOrigin: string,
+): boolean {
+	try {
+		const marketing = new URL(marketingOrigin);
+		const current = new URL(window.location.origin);
+		if (
+			!["http:", "https:"].includes(marketing.protocol) ||
+			marketing.protocol !== current.protocol
+		) {
+			return false;
+		}
+		return (
+			marketing.hostname === current.hostname ||
+			OWN_ROOT_DOMAINS.some(
+				(root) =>
+					(marketing.hostname === root ||
+						marketing.hostname.endsWith(`.${root}`)) &&
+					(current.hostname === root || current.hostname.endsWith(`.${root}`)),
+			)
+		);
+	} catch {
+		return false;
+	}
+}
+
 export function readMarketingAnalyticsOptOut(
 	marketingOrigin: string,
 	timeoutMs = 1500,
 ): Promise<boolean | null> {
+	// A cross-site iframe can return false from a different storage partition.
+	if (!canReadUnpartitionedMarketingConsent(marketingOrigin)) {
+		return Promise.resolve(null);
+	}
 	return new Promise((resolve) => {
 		const frame = document.createElement("iframe");
 		frame.hidden = true;
