@@ -26,6 +26,24 @@ jobs:
     environment: preview
 
     steps:
+      - name: Validate Paradev project preview configuration
+        if: contains(github.event.pull_request.labels.*.name, 'paradev-project-preview')
+        env:
+          DOMAIN_PREVIEW: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') }}
+          VERCEL_PARADEV_API_PROJECT_ID: ${{ vars.VERCEL_PARADEV_API_PROJECT_ID }}
+          VERCEL_PARADEV_WEB_PROJECT_ID: ${{ vars.VERCEL_PARADEV_WEB_PROJECT_ID }}
+        run: |
+          if [ "$DOMAIN_PREVIEW" != "true" ]; then
+            echo "::error::paradev-project-preview requires the domain-preview PR label for browser API and OAuth hosts."
+            exit 1
+          fi
+          for name in VERCEL_PARADEV_API_PROJECT_ID VERCEL_PARADEV_WEB_PROJECT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::paradev-project-preview requires the GitHub repository variable $name."
+              exit 1
+            fi
+          done
+
       - name: Create Neon branch
         id: create-branch
         uses: neondatabase/create-branch-action@fb620d43d4c565abaf088b848a4e28e5c4ea4d9c # 6.3.1
@@ -143,7 +161,7 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ contains(github.event.pull_request.labels.*.name, 'paradev-project-preview') && vars.VERCEL_PARADEV_API_PROJECT_ID || secrets.VERCEL_API_PROJECT_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ env.DATABASE_URL_UNPOOLED }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -380,7 +398,7 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ contains(github.event.pull_request.labels.*.name, 'paradev-project-preview') && vars.VERCEL_PARADEV_WEB_PROJECT_ID || secrets.VERCEL_WEB_PROJECT_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ env.DATABASE_URL_UNPOOLED }}
           NEXT_PUBLIC_API_URL: https://${{ env.BROWSER_API_ALIAS }}
