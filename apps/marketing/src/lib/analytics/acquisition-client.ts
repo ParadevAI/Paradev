@@ -13,11 +13,13 @@ const landingTouch =
 				referrer: document.referrer,
 			});
 let pending: Promise<string | null> | null = null;
+let pendingOptedOut = false;
 let lastIntentAt = 0;
 export function acquisitionOptedOut(posthogKey: string): boolean {
 	return hasAnalyticsOptOut(ANALYTICS_CONSENT_KEY, posthogKey);
 }
 export function syncAcquisition(optedOut: boolean): Promise<string | null> {
+	pendingOptedOut = optedOut;
 	const intentAt = Math.max(Date.now(), lastIntentAt + 1);
 	lastIntentAt = intentAt;
 	pending = (pending ?? Promise.resolve(null))
@@ -48,6 +50,12 @@ export function syncAcquisition(optedOut: boolean): Promise<string | null> {
 			}
 		});
 	return pending;
+}
+export function prepareAcquisitionNavigation(
+	posthogKey: string,
+): Promise<unknown> {
+	if (acquisitionOptedOut(posthogKey)) return Promise.resolve();
+	return pending && !pendingOptedOut ? pending : syncAcquisition(false);
 }
 export async function syncPosthogAcquisition(posthog: PostHog): Promise<void> {
 	const optedOut = () =>

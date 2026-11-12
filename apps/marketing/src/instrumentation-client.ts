@@ -7,8 +7,10 @@ import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 import { env } from "@/env";
 import {
 	acquisitionOptedOut,
+	prepareAcquisitionNavigation,
 	syncAcquisition,
 } from "@/lib/analytics/acquisition-client";
+import { installAcquisitionNavigation } from "@/lib/analytics/acquisition-navigation";
 import { declineAnalytics } from "@/lib/analytics/decline";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
@@ -23,6 +25,10 @@ type SentryClient = typeof import("@sentry/nextjs");
 
 let sentryClient: SentryClient | null = null;
 let started = false;
+
+installAcquisitionNavigation(env.NEXT_PUBLIC_WEB_URL, () =>
+	prepareAcquisitionNavigation(env.NEXT_PUBLIC_POSTHOG_KEY),
+);
 
 async function initPosthog() {
 	migrateAnalyticsOptOut(ANALYTICS_CONSENT_KEY, env.NEXT_PUBLIC_POSTHOG_KEY);
