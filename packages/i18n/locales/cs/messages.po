@@ -1162,6 +1162,9 @@ msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prio
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} je pro chat příliš starý"
+
 msgid "{name} accounts"
 msgstr "Účty {name}"
 
@@ -1185,6 +1188,9 @@ msgstr "{name} je vestavěný a nelze jej odebrat"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} je vestavěný a nelze jej nahradit"
 
+msgid "{name} is installed"
+msgstr "{name} je nainstalovaný"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} není přidán"
@@ -1194,6 +1200,9 @@ msgstr "{name} zůstává beze změny. Pokud pracoval agent, mohl být zastaven.
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} zůstává beze změny. Pokud pracoval agent, byl zastaven."
+
+msgid "{name} isn't installed yet"
+msgstr "{name} zatím není nainstalovaný"
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
@@ -1404,6 +1413,9 @@ msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agent
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
+
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} zatím nejsou nastavené. Můžete je nastavit později v Nastavení."
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
@@ -4277,6 +4289,12 @@ msgstr "Spuštění chatu"
 msgid "Chat name"
 msgstr "Název chatu"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "Chat potřebuje verzi {minVersion} nebo novější. Paradev ji může aktualizovat za vás."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "Chat potřebuje verzi {minVersion} nebo novější. Aktualizujte {name} a pak klikněte na Zkusit znovu."
+
 msgid "Chat session not found"
 msgstr "Relace chatu nenalezena"
 
@@ -4285,6 +4303,9 @@ msgstr "Plochy chatu: zprávy, uvažování, návrhy"
 
 msgid "Chats"
 msgstr "Chaty"
+
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "Chaty a úlohy potřebují {agents}. Můžete ho nainstalovat později v Nastavení → Agenti, nebo až spustíte první chat."
 
 msgid "Check again"
 msgstr "Zkontrolovat znovu"
@@ -10513,6 +10534,9 @@ msgstr "Nainstalovat GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Nainstalovat GitHub CLI"
 
+msgid "Install it yourself"
+msgstr "Nainstalovat ručně"
+
 msgid "Install on your iPhone"
 msgstr "Nainstalujte na iPhone"
 
@@ -10540,12 +10564,24 @@ msgstr "Instalujte, autorizujte a omezujte MCP servery napříč všemi pracovn�
 msgid "Install."
 msgstr "Nainstalujte."
 
+msgid "Installation"
+msgstr "Instalace"
+
 msgid "Installed"
 msgstr "Nainstalováno"
 
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "Nainstalováno"
+
+msgid "Installed · {version}"
+msgstr "Nainstalováno · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "Nainstalováno · přihlaste se účtem ChatGPT"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "Nainstalováno · přihlaste se účtem Claude"
 
 msgid "Installed by your organization"
 msgstr "Nainstalováno vaší organizací"
@@ -10568,6 +10604,9 @@ msgstr "Instaluji..."
 
 msgid "Installing…"
 msgstr "Instaluji…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "Instaluji… Na vašem Macu se nic jiného nezmění."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Nainstaluje Paradev na počítač dostupný přes ssh, přihlásí Paradev k vašemu účtu a udržuje Paradev spuštěný jako službu."
@@ -13469,8 +13508,14 @@ msgstr "Není v kanálu"
 msgid "Not included"
 msgstr "Není zahrnuto"
 
+msgid "Not installed"
+msgstr "Nenainstalováno"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "Nenainstalováno · potřeba pro soukromé repozitáře a pull requesty"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "Nenainstalováno · spouští vaše chaty a úlohy"
 
 msgid "Not loaded"
 msgstr "Nenačteno"
@@ -13507,6 +13552,9 @@ msgstr "Na {hostName} není nastaveno"
 
 msgid "Not set up on this host"
 msgstr "Na tomto hostu není nastaveno"
+
+msgid "not signed in"
+msgstr "nepřihlášeno"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "Nepřihlášeno · potřeba pro soukromé repozitáře a pull requesty"
@@ -14840,8 +14888,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev využívá {0} systémové RAM"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev používá Git a GitHub CLI ke klonování repozitářů a otevírání pull requestů. Můžete to udělat i později."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev je používá ke klonování repozitářů, otevírání pull requestů a spouštění vašich úloh. Můžete to udělat i později."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev vs. alternativy"
@@ -18157,9 +18205,6 @@ msgstr "Nastavit host přes SSH"
 msgid "Set up an automation"
 msgstr "Nastavte automatizaci"
 
-msgid "Set up Git and GitHub"
-msgstr "Nastavit Git a GitHub"
-
 msgid "Set up once"
 msgstr "Nastavte jednou"
 
@@ -18174,6 +18219,9 @@ msgstr "Připravit tento projekt pro Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Nastavte si organizaci a můžete začít"
+
+msgid "Set up your tools"
+msgstr "Nastavte si nástroje"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Když nainstalovaný plugin vrátíte na Dostupné, všem zůstane jejich kopie; pak ji mohou odebrat. Nedostupné ho odebere."
@@ -18555,6 +18603,9 @@ msgstr "Přihlaste se jednou. Paradev udržuje připojení."
 msgid "Sign in to {0}"
 msgstr "Přihlaste se do {0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "Níže se přihlaste do {name}. K dokončení se otevře prohlížeč."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Pro změnu pluginů organizace se přihlaste."
 
@@ -18644,8 +18695,20 @@ msgstr "Dokončení registrace"
 msgid "Sign-up steps"
 msgstr "Kroky registrace"
 
+msgid "signed in"
+msgstr "přihlášeno"
+
+msgid "Signed in"
+msgstr "Přihlášeno"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "Přihlášeno · klonuje soukromé repozitáře a otevírá pull requesty"
+
+msgid "signed in as {account}"
+msgstr "přihlášeno jako {account}"
+
+msgid "Signed in as {account}"
+msgstr "Přihlášeno jako {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Přihlášeni jako <0>{userName}</0>"
@@ -18754,6 +18817,12 @@ msgstr "Prozatím Git přeskočit?"
 
 msgid "Skip GitHub for now?"
 msgstr "Prozatím GitHub přeskočit?"
+
+msgid "Skip setup for now?"
+msgstr "Zatím přeskočit nastavení?"
+
+msgid "Skip the coding agent for now?"
+msgstr "Zatím přeskočit programovacího agenta?"
 
 msgid "Skipped"
 msgstr "Přeskočeno"
@@ -20567,6 +20636,9 @@ msgstr "Tento chat je dlouhý, proto se zobrazuje jen jeho nejnovější část.
 msgid "This chat may have been removed or you may not have access."
 msgstr "Tento chat mohl být odstraněn, nebo k němu nemáte přístup."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "Tento chat potřebuje {name}. Paradev ho může nainstalovat za vás. Trvá to asi minutu a na vašem Macu se nic jiného nezmění."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Tento chat se zastavil, protože konverzace pokračovala v terminálu."
 
@@ -21303,6 +21375,9 @@ msgstr "Zkuste jiný hledaný výraz nebo jiné místo."
 msgid "Try again"
 msgstr "Zkusit znovu"
 
+msgid "Try again to start this chat."
+msgstr "Zkuste to znovu a spusťte tento chat."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Zkuste to znovu nebo restartujte službu hostitele z nabídky Paradev v systémové liště."
 
@@ -21851,6 +21926,9 @@ msgstr "Použít „{0}“"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Použijte cestu relativní k pracovnímu prostoru nebo absolutní složku."
+
+msgid "Use another agent"
+msgstr "Použít jiného agenta"
 
 msgid "Use another port"
 msgstr "Použít jiný port"
@@ -23137,6 +23215,9 @@ msgstr "Vaše organizace dosáhla limitu využití cloudu. Tento pracovní prost
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."
+
+msgid "your own install"
+msgstr "vaše vlastní instalace"
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."

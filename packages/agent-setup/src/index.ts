@@ -75,6 +75,14 @@ export {
 
 export { getCommandShellArgs, getShellArgs, getShellEnv };
 
+export {
+	type AgentBinary,
+	isExecutableFile,
+	isWrapperBinDir,
+	meetsMinVersion,
+	parseAgentVersion,
+	resolveAgentBinary,
+} from "./agent-binary";
 export { getWrapperPath } from "./agent-wrappers-common";
 export {
 	getAgentSetupTemplatesDir,
@@ -101,6 +109,11 @@ export {
 	readInstalledVersions,
 	writeInstalledPlugins,
 } from "./installed-plugins";
+export {
+	isManagedCodingAgent,
+	type ManagedCodingAgent,
+	managedAgentBinaryPath,
+} from "./managed-agent-binaries";
 export {
 	hashMcpServerValue,
 	readExternallyConfiguredMcpServers,

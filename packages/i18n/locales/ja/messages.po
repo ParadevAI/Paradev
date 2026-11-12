@@ -1162,6 +1162,9 @@ msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オート�
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} はチャットには古すぎます"
+
 msgid "{name} accounts"
 msgstr "{name} のアカウント"
 
@@ -1185,6 +1188,9 @@ msgstr "{name} は組み込みのため削除できません"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} は組み込みのため置き換えられません"
 
+msgid "{name} is installed"
+msgstr "{name} はインストール済みです"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} は追加されていません"
@@ -1194,6 +1200,9 @@ msgstr "{name} は変更されていません。エージェントが作業中�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} は変更されていません。エージェントが作業中だった場合は、停止されました。"
+
+msgid "{name} isn't installed yet"
+msgstr "{name} はまだインストールされていません"
 
 msgid "{name} plugin"
 msgstr "{name} プラグイン"
@@ -1404,6 +1413,9 @@ msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
+
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} はまだ設定されていません。あとで設定から設定できます。"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
@@ -4277,6 +4289,12 @@ msgstr "チャット起動"
 msgid "Chat name"
 msgstr "チャット名"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "チャットには {minVersion} 以降が必要です。Paradev が更新できます。"
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "チャットには {minVersion} 以降が必要です。{name} を更新してから、［再試行］をクリックしてください。"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -4285,6 +4303,9 @@ msgstr "チャットの構成要素: メッセージ、推論、提案"
 
 msgid "Chats"
 msgstr "チャット"
+
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "チャットとタスクには {agents} が必要です。あとで 設定 → エージェント から、または最初のチャットを始めるときにインストールできます。"
 
 msgid "Check again"
 msgstr "再確認"
@@ -10513,6 +10534,9 @@ msgstr "GitHub Appをインストール"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI をインストール"
 
+msgid "Install it yourself"
+msgstr "自分でインストール"
+
 msgid "Install on your iPhone"
 msgstr "iPhoneにインストール"
 
@@ -10540,12 +10564,24 @@ msgstr "すべてのワークスペースにまたがるMCPサーバーのイン
 msgid "Install."
 msgstr "インストール。"
 
+msgid "Installation"
+msgstr "インストール"
+
 msgid "Installed"
 msgstr "インストール済み"
 
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "インストール済み"
+
+msgid "Installed · {version}"
+msgstr "インストール済み · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "インストール済み · ChatGPT アカウントでサインイン"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "インストール済み · Claude アカウントでサインイン"
 
 msgid "Installed by your organization"
 msgstr "組織がインストール済み"
@@ -10568,6 +10604,9 @@ msgstr "インストール中..."
 
 msgid "Installing…"
 msgstr "インストール中…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "インストール中… Mac のほかの部分は変わりません。"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh で接続できるマシンに Paradev をインストールし、Paradev をあなたのアカウントにサインインさせ、サービスとして実行し続けます。"
@@ -13469,8 +13508,14 @@ msgstr "チャンネル外"
 msgid "Not included"
 msgstr "含まれない"
 
+msgid "Not installed"
+msgstr "未インストール"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "未インストール · プライベートリポジトリとプルリクエストに必要です"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "未インストール · チャットとタスクを実行します"
 
 msgid "Not loaded"
 msgstr "未読み込み"
@@ -13507,6 +13552,9 @@ msgstr "{hostName}ではセットアップされていません"
 
 msgid "Not set up on this host"
 msgstr "このホストではセットアップされていません"
+
+msgid "not signed in"
+msgstr "未サインイン"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "未サインイン · プライベートリポジトリとプルリクエストに必要です"
@@ -14840,8 +14888,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "ParadevはシステムRAMの{0}を使用中"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "ParadevはGitとGitHub CLIを使ってリポジトリをクローンし、プルリクエストを作成します。これは後で行うこともできます。"
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev はこれらを使って、リポジトリのクローン、プルリクエストの作成、タスクの実行を行います。あとで設定することもできます。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradevと他ツールの比較"
@@ -18157,9 +18205,6 @@ msgstr "SSH でホストを設定"
 msgid "Set up an automation"
 msgstr "自動化を設定する"
 
-msgid "Set up Git and GitHub"
-msgstr "GitとGitHubを設定"
-
 msgid "Set up once"
 msgstr "一度設定するだけ"
 
@@ -18174,6 +18219,9 @@ msgstr "このプロジェクトをParadev向けにセットアップ"
 
 msgid "Set up your organization to get started"
 msgstr "組織をセットアップして始めましょう"
+
+msgid "Set up your tools"
+msgstr "ツールを設定"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "インストール済みのプラグインを「利用可能」に戻しても、全員のコピーは残り、各自で削除できるようになります。「利用不可」にすると削除されます。"
@@ -18555,6 +18603,9 @@ msgstr "サインインは一度だけ。接続はParadevが保ちます。"
 msgid "Sign in to {0}"
 msgstr "{0}にサインイン"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "下で {name} にサインインしてください。完了するためにブラウザが開きます。"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "組織のプラグインを変更するにはサインインしてください。"
 
@@ -18644,8 +18695,20 @@ msgstr "登録完了率"
 msgid "Sign-up steps"
 msgstr "登録ステップ数"
 
+msgid "signed in"
+msgstr "サインイン済み"
+
+msgid "Signed in"
+msgstr "サインイン済み"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "サインイン済み · プライベートリポジトリのクローンとプルリクエストの作成に使用します"
+
+msgid "signed in as {account}"
+msgstr "{account} としてサインイン済み"
+
+msgid "Signed in as {account}"
+msgstr "{account} としてサインイン済み"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>としてサインイン中"
@@ -18754,6 +18817,12 @@ msgstr "Gitをスキップしますか？"
 
 msgid "Skip GitHub for now?"
 msgstr "GitHub の接続をスキップしますか？"
+
+msgid "Skip setup for now?"
+msgstr "今は設定をスキップしますか？"
+
+msgid "Skip the coding agent for now?"
+msgstr "今はコーディングエージェントをスキップしますか？"
 
 msgid "Skipped"
 msgstr "スキップ"
@@ -20567,6 +20636,9 @@ msgstr "このチャットは長いため、最新の部分だけを表示して
 msgid "This chat may have been removed or you may not have access."
 msgstr "このチャットは削除されたか、アクセス権がない可能性があります。"
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "このチャットには {name} が必要です。Paradev がインストールできます。約 1 分で終わり、Mac のほかの部分は変わりません。"
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "会話がターミナルで続行されたため、このチャットは停止しました。"
 
@@ -21303,6 +21375,9 @@ msgstr "別の検索語や別の場所を試してください。"
 msgid "Try again"
 msgstr "再試行"
 
+msgid "Try again to start this chat."
+msgstr "もう一度試してこのチャットを開始してください。"
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "もう一度試すか、Paradev のトレイメニューからホストサービスを再起動してください。"
 
@@ -21851,6 +21926,9 @@ msgstr "「{0}」を使用"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "ワークスペースからの相対パスか絶対パスのフォルダを指定します。"
+
+msgid "Use another agent"
+msgstr "別のエージェントを使う"
 
 msgid "Use another port"
 msgstr "別のポートを使用"
@@ -23137,6 +23215,9 @@ msgstr "組織がクラウドの利用上限に達しました。上限を引き
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "あなた自身のアカウントです。組織の連携は Paradev がそのツールにアクセスするためのもので、あなたのアカウントを接続すると、Paradev があなたのために行った作業があなたの名前で表示されます。"
+
+msgid "your own install"
+msgstr "自分でインストールしたもの"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"

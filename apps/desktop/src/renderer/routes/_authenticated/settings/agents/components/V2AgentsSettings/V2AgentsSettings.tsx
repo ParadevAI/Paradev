@@ -26,12 +26,14 @@ import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unav
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useScrollReset } from "renderer/routes/_authenticated/settings/hooks/useScrollReset";
+import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { AgentDetail } from "./components/AgentDetail";
 import { AgentsSettingsSidebar } from "./components/AgentsSettingsSidebar";
 import {
 	type CreateCustomAgentInput,
 	NewCustomAgentDetail,
 } from "./components/NewCustomAgentDetail";
+import { agentNamedBy } from "./utils/agentNamedBy";
 
 const KNOWN_PRESETS: HostAgentPreset[] = HOST_AGENT_PRESETS.map((preset) => ({
 	...preset,
@@ -303,6 +305,8 @@ export function V2AgentsSettings({
 		isCreating ? "new" : selectedAgentId,
 	);
 	const consumedInitialAgentIdRef = useRef<string | null>(null);
+	const searchQuery = useSettingsSearchQuery();
+	const consumedSearchRef = useRef<string | null>(null);
 
 	// Auto-select first agent when none selected, and clear selection when the
 	// selected agent disappears. If `initialAgentId` is provided, prefer
@@ -323,9 +327,17 @@ export function V2AgentsSettings({
 				return;
 			}
 		}
+		if (searchQuery && consumedSearchRef.current !== searchQuery) {
+			consumedSearchRef.current = searchQuery;
+			const named = agentNamedBy(configs, searchQuery);
+			if (named) {
+				setSelectedAgentId(named.id);
+				return;
+			}
+		}
 		const stillExists = configs.some((c) => c.id === selectedAgentId);
 		if (!stillExists) setSelectedAgentId(configs[0].id);
-	}, [configs, selectedAgentId, initialAgentId]);
+	}, [configs, selectedAgentId, initialAgentId, searchQuery]);
 
 	const selectedAgent = configs.find((c) => c.id === selectedAgentId) ?? null;
 

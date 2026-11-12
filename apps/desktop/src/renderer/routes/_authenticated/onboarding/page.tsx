@@ -6,6 +6,7 @@ import {
 	type GitHubCliDialogStart,
 	useGhCliInstalling,
 } from "renderer/routes/_authenticated/components/GitHubCliDialog";
+import { CodingAgentSetupRow } from "./components/CodingAgentSetupRow";
 import { GitHubSetupRow } from "./components/GitHubSetupRow";
 import { GitSetupRow } from "./components/GitSetupRow";
 import { useCommandLineToolsInstall } from "./hooks/useCommandLineToolsInstall";
@@ -79,6 +80,8 @@ function SetupStepPage() {
 					onSignIn={() => setGhDialogStart("auth")}
 				/>
 			)}
+			{rows.claude && <CodingAgentSetupRow agent="claude" />}
+			{rows.codex && <CodingAgentSetupRow agent="codex" />}
 			<GitHubCliDialog
 				open={ghDialogStart !== null}
 				startWith={ghDialogStart ?? "auth"}

@@ -1162,6 +1162,9 @@ msgstr "每位使用者每月 {monthlyPrice}。行動裝置、自動化、優先
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}個自動化上次執行失敗"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version} 版本太舊，無法用於聊天"
+
 msgid "{name} accounts"
 msgstr "{name} 帳號"
 
@@ -1185,6 +1188,9 @@ msgstr "{name} 是內建的，無法移除"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name} 是內建的，無法取代"
 
+msgid "{name} is installed"
+msgstr "{name} 已安裝"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未新增"
@@ -1194,6 +1200,9 @@ msgstr "{name} 未變更。如果代理程式正在工作，它可能已被停�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} 未變更。如果代理程式正在工作，它已被停止。"
+
+msgid "{name} isn't installed yet"
+msgstr "{name} 尚未安裝"
 
 msgid "{name} plugin"
 msgstr "{name} 外掛程式"
@@ -1404,6 +1413,9 @@ msgstr "{threshold, plural, other {已合併 # 個智慧代理 PR}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中斷"
+
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools} 尚未設定。你可以稍後在設定中設定。"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#項檢查全部通過} other {#項檢查全部通過}}"
@@ -4277,6 +4289,12 @@ msgstr "聊天啟動"
 msgid "Chat name"
 msgstr "聊天名稱"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "聊天需要 {minVersion} 或更新版本。Paradev 可以為你更新。"
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "聊天需要 {minVersion} 或更新版本。請更新你的 {name}，然後按一下「再試一次」。"
+
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
 
@@ -4285,6 +4303,9 @@ msgstr "聊天介面：訊息、推理、建議"
 
 msgid "Chats"
 msgstr "聊天"
+
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "聊天和任務需要 {agents}。你可以稍後在 設定 → 代理程式 中安裝，或在開始第一個聊天時安裝。"
 
 msgid "Check again"
 msgstr "重新檢查"
@@ -10513,6 +10534,9 @@ msgstr "安裝GitHub App"
 msgid "Install GitHub CLI"
 msgstr "安裝 GitHub CLI"
 
+msgid "Install it yourself"
+msgstr "自行安裝"
+
 msgid "Install on your iPhone"
 msgstr "在 iPhone 上安裝"
 
@@ -10540,12 +10564,24 @@ msgstr "在一處為所有工作區安裝、授權並劃定MCP伺服器的權限
 msgid "Install."
 msgstr "安裝。"
 
+msgid "Installation"
+msgstr "安裝"
+
 msgid "Installed"
 msgstr "已安裝"
 
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "已安裝"
+
+msgid "Installed · {version}"
+msgstr "已安裝 · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "已安裝 · 使用你的 ChatGPT 帳號登入"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "已安裝 · 使用你的 Claude 帳號登入"
 
 msgid "Installed by your organization"
 msgstr "由你的組織安裝"
@@ -10568,6 +10604,9 @@ msgstr "正在安裝..."
 
 msgid "Installing…"
 msgstr "正在安裝…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "正在安裝… Mac 上的其他內容不會改變。"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "在可透過 ssh 連線的機器上安裝 Paradev，將 Paradev 登入你的帳戶，並讓它以服務形式持續執行。"
@@ -13469,8 +13508,14 @@ msgstr "不在頻道中"
 msgid "Not included"
 msgstr "不包含"
 
+msgid "Not installed"
+msgstr "未安裝"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "未安裝 · 私人儲存庫和拉取請求需要它"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "未安裝 · 用於執行你的聊天和任務"
 
 msgid "Not loaded"
 msgstr "未載入"
@@ -13507,6 +13552,9 @@ msgstr "尚未在{hostName}上設定"
 
 msgid "Not set up on this host"
 msgstr "尚未在此主機上配置"
+
+msgid "not signed in"
+msgstr "未登入"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "未登入 · 私人儲存庫和拉取請求需要它"
@@ -14840,8 +14888,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev佔用了系統RAM的{0}"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev 使用 Git 和 GitHub CLI 複製儲存庫並開啟拉取要求。你也可以稍後再做。"
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev 用這些工具複製儲存庫、建立拉取請求並執行你的任務。你也可以稍後再設定。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev與同類方案對比"
@@ -18157,9 +18205,6 @@ msgstr "透過 SSH 設定主機"
 msgid "Set up an automation"
 msgstr "設定自動化"
 
-msgid "Set up Git and GitHub"
-msgstr "設定 Git 和 GitHub"
-
 msgid "Set up once"
 msgstr "只需設定一次"
 
@@ -18174,6 +18219,9 @@ msgstr "為Paradev配置這個專案"
 
 msgid "Set up your organization to get started"
 msgstr "設定你的組織即可開始"
+
+msgid "Set up your tools"
+msgstr "設定你的工具"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "把已安裝的外掛改回「可用」後，每個人的副本仍會保留，之後可以自行移除。改為「不可用」會將其移除。"
@@ -18555,6 +18603,9 @@ msgstr "登入一次，Paradev 會保持連線。"
 msgid "Sign in to {0}"
 msgstr "登入{0}"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "請在下方登入 {name}。瀏覽器會開啟以完成登入。"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "登入後才能變更組織的外掛。"
 
@@ -18644,8 +18695,20 @@ msgstr "註冊完成率"
 msgid "Sign-up steps"
 msgstr "註冊步驟"
 
+msgid "signed in"
+msgstr "已登入"
+
+msgid "Signed in"
+msgstr "已登入"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "已登入 · 用於克隆私人儲存庫和建立拉取請求"
+
+msgid "signed in as {account}"
+msgstr "已登入為 {account}"
+
+msgid "Signed in as {account}"
+msgstr "已登入為 {account}"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登入為<0>{userName}</0>"
@@ -18754,6 +18817,12 @@ msgstr "暫時略過 Git？"
 
 msgid "Skip GitHub for now?"
 msgstr "暫時略過 GitHub？"
+
+msgid "Skip setup for now?"
+msgstr "暫時略過設定？"
+
+msgid "Skip the coding agent for now?"
+msgstr "暫時略過程式設計代理程式？"
 
 msgid "Skipped"
 msgstr "已跳過"
@@ -20567,6 +20636,9 @@ msgstr "此聊天較長，因此只顯示最新部分。工作區啟動後會完
 msgid "This chat may have been removed or you may not have access."
 msgstr "此聊天可能已被移除，或你沒有存取權限。"
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "此聊天需要 {name}。Paradev 可以為你安裝，大約需要一分鐘，Mac 上的其他內容不會改變。"
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "由於對話已在終端機中繼續，此聊天已停止。"
 
@@ -21303,6 +21375,9 @@ msgstr "試試其他搜尋詞或其他位置。"
 msgid "Try again"
 msgstr "重試"
 
+msgid "Try again to start this chat."
+msgstr "請重試以開始此聊天。"
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "請重試，或從 Paradev 系統匣選單重新啟動主機服務。"
 
@@ -21851,6 +21926,9 @@ msgstr "使用「{0}」"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "使用相對於工作區的路徑或絕對路徑資料夾。"
+
+msgid "Use another agent"
+msgstr "使用其他代理程式"
 
 msgid "Use another port"
 msgstr "使用其他埠"
@@ -23137,6 +23215,9 @@ msgstr "你的組織已達到雲端用量上限。除非提高上限，此工作
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結你自己的帳戶後，Paradev 為你完成的工作會以你的名義顯示。"
+
+msgid "your own install"
+msgstr "你自己安裝的版本"
 
 msgid "Your Paradev download is starting."
 msgstr "您的 Paradev 下載即將開始。"

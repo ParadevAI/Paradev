@@ -4,6 +4,8 @@ import type { SetupStepRows } from "../../utils/setupStepRows";
 const SetupStepRowsContext = createContext<SetupStepRows>({
 	git: false,
 	gitHub: false,
+	claude: false,
+	codex: false,
 });
 
 export function SetupStepRowsProvider({

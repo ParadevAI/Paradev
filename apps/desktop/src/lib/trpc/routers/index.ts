@@ -7,6 +7,7 @@ import { createAutoUpdateRouter } from "./auto-update";
 import { createBrowserRouter } from "./browser/browser";
 import { createBrowserHistoryRouter } from "./browser-history";
 import { createChangesRouter } from "./changes";
+import { createCodingAgentsRouter } from "./coding-agents";
 import { createConfigRouter } from "./config";
 import { createDeviceRouter } from "./device";
 import { createDictationRouter } from "./dictation";
@@ -52,6 +53,7 @@ export const createAppRouter = (getWindow: () => BrowserWindow | null) => {
 		viewerGithub: createViewerGithubRouter(),
 		terminal: createTerminalRouter(),
 		changes: createChangesRouter(),
+		codingAgents: createCodingAgentsRouter(),
 		filesystem: createFilesystemRouter(),
 		notifications: createNotificationsRouter(getWindow),
 		paneLayout: createPaneLayoutRouter(),

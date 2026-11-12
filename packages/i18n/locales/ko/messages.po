@@ -1162,6 +1162,9 @@ msgstr "사용자당 월 {monthlyPrice}. 모바일, 자동화, 우선 지원."
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "내 자동화 {myFailedCount}개가 마지막 실행에 실패했습니다"
 
+msgid "{name} {version} is too old for chat"
+msgstr "{name} {version}은(는) 채팅에 사용하기에 너무 오래되었습니다"
+
 msgid "{name} accounts"
 msgstr "{name} 계정"
 
@@ -1185,6 +1188,9 @@ msgstr "{name}은(는) 기본 제공이라 제거할 수 없습니다"
 msgid "serverError.plugins.marketplaceReserved"
 msgstr "{name}은(는) 기본 제공이라 교체할 수 없습니다"
 
+msgid "{name} is installed"
+msgstr "{name}이(가) 설치되었습니다"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name}이(가) 추가되지 않았습니다"
@@ -1194,6 +1200,9 @@ msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중이었다면 중지되었습니다."
+
+msgid "{name} isn't installed yet"
+msgstr "{name}이(가) 아직 설치되지 않았습니다"
 
 msgid "{name} plugin"
 msgstr "{name} 플러그인"
@@ -1404,6 +1413,9 @@ msgstr "{threshold, plural, other {에이전트 PR # 건 머지}}"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} 중단됨"
+
+msgid "{tools} aren't set up yet. You can set them up later in Settings."
+msgstr "{tools}이(가) 아직 설정되지 않았습니다. 나중에 설정에서 설정할 수 있습니다."
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
@@ -4277,6 +4289,12 @@ msgstr "채팅 실행"
 msgid "Chat name"
 msgstr "채팅 이름"
 
+msgid "Chat needs {minVersion} or newer. Paradev can update it for you."
+msgstr "채팅에는 {minVersion} 이상이 필요합니다. Paradev가 대신 업데이트할 수 있습니다."
+
+msgid "Chat needs {minVersion} or newer. Update your {name}, then click Try again."
+msgstr "채팅에는 {minVersion} 이상이 필요합니다. {name}을(를) 업데이트한 다음 다시 시도를 클릭하세요."
+
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
 
@@ -4285,6 +4303,9 @@ msgstr "채팅 화면: 메시지, 추론, 제안"
 
 msgid "Chats"
 msgstr "채팅"
+
+msgid "Chats and tasks need {agents}. You can install it later in Settings → Agents, or when you start your first chat."
+msgstr "채팅과 작업에는 {agents}이(가) 필요합니다. 나중에 설정 → 에이전트에서 설치하거나 첫 채팅을 시작할 때 설치할 수 있습니다."
 
 msgid "Check again"
 msgstr "다시 확인"
@@ -10513,6 +10534,9 @@ msgstr "GitHub App 설치"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI 설치"
 
+msgid "Install it yourself"
+msgstr "직접 설치"
+
 msgid "Install on your iPhone"
 msgstr "iPhone에 설치"
 
@@ -10540,12 +10564,24 @@ msgstr "모든 워크스페이스의 MCP 서버를 한곳에서 설치하고, �
 msgid "Install."
 msgstr "설치."
 
+msgid "Installation"
+msgstr "설치"
+
 msgid "Installed"
 msgstr "설치됨"
 
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "설치됨"
+
+msgid "Installed · {version}"
+msgstr "설치됨 · {version}"
+
+msgid "Installed · sign in with your ChatGPT account"
+msgstr "설치됨 · ChatGPT 계정으로 로그인하세요"
+
+msgid "Installed · sign in with your Claude account"
+msgstr "설치됨 · Claude 계정으로 로그인하세요"
 
 msgid "Installed by your organization"
 msgstr "조직에서 설치함"
@@ -10568,6 +10604,9 @@ msgstr "설치 중..."
 
 msgid "Installing…"
 msgstr "설치 중…"
+
+msgid "Installing… Nothing else on your Mac changes."
+msgstr "설치 중… Mac의 다른 부분은 바뀌지 않습니다."
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh로 접속할 수 있는 머신에 Paradev를 설치하고, Paradev를 내 계정으로 로그인시킨 뒤 서비스로 계속 실행합니다."
@@ -13469,8 +13508,14 @@ msgstr "채널에 없음"
 msgid "Not included"
 msgstr "미포함"
 
+msgid "Not installed"
+msgstr "설치되지 않음"
+
 msgid "Not installed · needed for private repos and pull requests"
 msgstr "설치되지 않음 · 비공개 저장소와 풀 리퀘스트에 필요합니다"
+
+msgid "Not installed · runs your chats and tasks"
+msgstr "설치되지 않음 · 채팅과 작업을 실행합니다"
 
 msgid "Not loaded"
 msgstr "로드 안 됨"
@@ -13507,6 +13552,9 @@ msgstr "{hostName}에 설정되지 않음"
 
 msgid "Not set up on this host"
 msgstr "이 호스트에 설정되지 않음"
+
+msgid "not signed in"
+msgstr "로그인 안 됨"
 
 msgid "Not signed in · needed for private repos and pull requests"
 msgstr "로그인되지 않음 · 비공개 저장소와 풀 리퀘스트에 필요합니다"
@@ -14840,8 +14888,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev가 시스템 RAM의 {0}을(를) 사용합니다"
 
-msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev는 Git과 GitHub CLI로 리포지토리를 복제하고 풀 리퀘스트를 엽니다. 나중에 해도 됩니다."
+msgid "Paradev uses these to clone repos, open pull requests and run your tasks. You can also do this later."
+msgstr "Paradev는 이 도구들로 저장소를 복제하고, 풀 리퀘스트를 열고, 작업을 실행합니다. 나중에 해도 됩니다."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev와 대안 비교"
@@ -18157,9 +18205,6 @@ msgstr "SSH로 호스트 설정"
 msgid "Set up an automation"
 msgstr "자동화 설정하기"
 
-msgid "Set up Git and GitHub"
-msgstr "Git 및 GitHub 설정"
-
 msgid "Set up once"
 msgstr "한 번만 설정"
 
@@ -18174,6 +18219,9 @@ msgstr "이 프로젝트를 Paradev에 맞게 설정하기"
 
 msgid "Set up your organization to get started"
 msgstr "조직을 설정하고 시작하세요"
+
+msgid "Set up your tools"
+msgstr "도구 설정"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "설치된 플러그인을 다시 사용 가능으로 바꾸면 모두의 사본은 그대로 남고, 이후 각자 제거할 수 있습니다. 사용 불가로 바꾸면 제거됩니다."
@@ -18555,6 +18603,9 @@ msgstr "한 번만 로그인하세요. 연결은 Paradev가 유지합니다."
 msgid "Sign in to {0}"
 msgstr "{0}에 로그인"
 
+msgid "Sign in to {name} below. Your browser opens to finish."
+msgstr "아래에서 {name}에 로그인하세요. 완료하려면 브라우저가 열립니다."
+
 msgid "Sign in to change your organization's plugins."
 msgstr "조직 플러그인을 변경하려면 로그인하세요."
 
@@ -18644,8 +18695,20 @@ msgstr "가입 완료율"
 msgid "Sign-up steps"
 msgstr "가입 단계"
 
+msgid "signed in"
+msgstr "로그인됨"
+
+msgid "Signed in"
+msgstr "로그인됨"
+
 msgid "Signed in · clones private repos and opens pull requests"
 msgstr "로그인됨 · 비공개 저장소를 클론하고 풀 리퀘스트를 엽니다"
+
+msgid "signed in as {account}"
+msgstr "{account}(으)로 로그인됨"
+
+msgid "Signed in as {account}"
+msgstr "{account}(으)로 로그인됨"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>(으)로 로그인됨"
@@ -18754,6 +18817,12 @@ msgstr "Git을 지금은 건너뛸까요?"
 
 msgid "Skip GitHub for now?"
 msgstr "지금은 GitHub를 건너뛸까요?"
+
+msgid "Skip setup for now?"
+msgstr "지금은 설정을 건너뛸까요?"
+
+msgid "Skip the coding agent for now?"
+msgstr "지금은 코딩 에이전트를 건너뛸까요?"
 
 msgid "Skipped"
 msgstr "건너뜀"
@@ -20567,6 +20636,9 @@ msgstr "이 채팅은 길어서 최신 부분만 표시합니다. 워크스페�
 msgid "This chat may have been removed or you may not have access."
 msgstr "이 채팅은 삭제되었거나 접근 권한이 없을 수 있습니다."
 
+msgid "This chat needs {name}. Paradev can install it for you. It takes about a minute, and nothing else on your Mac changes."
+msgstr "이 채팅에는 {name}이(가) 필요합니다. Paradev가 대신 설치할 수 있습니다. 1분 정도 걸리며 Mac의 다른 부분은 바뀌지 않습니다."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "대화가 터미널에서 계속되어 이 채팅이 중지되었습니다."
 
@@ -21303,6 +21375,9 @@ msgstr "다른 검색어를 쓰거나 다른 위치를 선택해 보세요."
 msgid "Try again"
 msgstr "다시 시도"
 
+msgid "Try again to start this chat."
+msgstr "다시 시도해 이 채팅을 시작하세요."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "다시 시도하거나 Paradev 트레이 메뉴에서 호스트 서비스를 다시 시작해 주세요."
 
@@ -21851,6 +21926,9 @@ msgstr "“{0}” 사용"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "워크스페이스 기준 상대 경로나 절대 경로 폴더를 사용하세요."
+
+msgid "Use another agent"
+msgstr "다른 에이전트 사용"
 
 msgid "Use another port"
 msgstr "다른 포트 사용"
@@ -23137,6 +23215,9 @@ msgstr "조직이 클라우드 사용 한도에 도달했습니다. 한도를 �
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
+
+msgid "your own install"
+msgstr "직접 설치한 버전"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."

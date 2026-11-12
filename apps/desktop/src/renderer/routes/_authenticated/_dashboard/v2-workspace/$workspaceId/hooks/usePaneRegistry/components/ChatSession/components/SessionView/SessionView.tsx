@@ -52,6 +52,7 @@ import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
 import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
 import { railMessages } from "../../utils/railMessages";
+import { type StartFailure, startFailure } from "../../utils/startFailure";
 import {
 	type AgentChoice,
 	type AgentSwitcher,
@@ -124,6 +125,7 @@ export function SessionView({
 	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
+	onStartFailed,
 	openDiff,
 	openFile,
 	openPage,
@@ -154,6 +156,8 @@ export function SessionView({
 	onPendingPromptsSent: () => void;
 	onLaunchPromptDelivered?: () => void;
 	onSessionState?: (session: SessionState | null) => void;
+	/** The agent failed to start, before it answered anything. */
+	onStartFailed?: (failure: StartFailure | null) => void;
 	/** The mode the user picked, so a resumed session can start in it again. */
 	onModeChange?: (modeId: string) => void;
 	onSwitchAccount?: SwitchAccount;
@@ -281,6 +285,14 @@ export function SessionView({
 	useEffect(() => {
 		onSessionState?.(sessionState ?? null);
 	}, [sessionState, onSessionState]);
+
+	const failedStart = useMemo(
+		() => (onStartFailed ? startFailure(session.snapshot, outbox) : null),
+		[onStartFailed, session.snapshot, outbox],
+	);
+	useEffect(() => {
+		onStartFailed?.(failedStart);
+	}, [failedStart, onStartFailed]);
 
 	const runningTurnId = useMemo(
 		() => findRunningTurnId(session.snapshot.turns),

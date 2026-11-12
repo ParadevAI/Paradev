@@ -32,6 +32,7 @@ import { joinArgs, parseArgs } from "renderer/lib/argv";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
+import { isCodingAgentId } from "renderer/routes/_authenticated/components/CodingAgentSetup";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	AgentDetailHeader,
@@ -39,6 +40,7 @@ import {
 	Section,
 } from "../AgentFormControls";
 import { AgentIconPicker } from "../AgentIconPicker";
+import { AgentInstallRow } from "./components/AgentInstallRow";
 
 interface AgentDetailProps {
 	config: HostAgentConfig;
@@ -279,6 +281,11 @@ export function AgentDetail({
 			/>
 
 			<div className="space-y-6">
+				{isCodingAgentId(config.presetId) && (
+					<Section title={t({ message: "Installation" })}>
+						<AgentInstallRow agent={config.presetId} />
+					</Section>
+				)}
 				<Section
 					title={t({
 						message: "Label",

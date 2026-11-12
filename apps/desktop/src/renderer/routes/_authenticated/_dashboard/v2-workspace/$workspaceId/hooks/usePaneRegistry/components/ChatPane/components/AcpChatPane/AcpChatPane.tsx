@@ -18,6 +18,12 @@ import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceIn
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { electronTrpc } from "renderer/lib/electron-trpc";
+import {
+	isCodingAgentId,
+	useAgentInstallRunning,
+} from "renderer/routes/_authenticated/components/CodingAgentSetup";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import { StoredChatTranscript } from "../../../../../../components/StoredChatTranscript";
@@ -30,6 +36,7 @@ import {
 	freshStartMode,
 	readSavedChatMode,
 } from "../../../../utils/savedChatMode";
+import { PendingPromptsView } from "../../../ChatSession/components/PendingPromptsView";
 import { SessionView } from "../../../ChatSession/components/SessionView";
 import { useSessionClient } from "../../../ChatSession/hooks/useSessionClient";
 import type {
@@ -42,15 +49,20 @@ import type {
 	ChatForkTarget,
 } from "../../../ChatSession/types";
 import { carryReaderPosition } from "../../../ChatSession/utils/carriedReaderPosition";
+import type { StartFailure } from "../../../ChatSession/utils/startFailure";
 import { useForkChat } from "../../hooks/useForkChat";
 import { AcpRecovery } from "./components/AcpRecovery";
+import { AgentMissingCard } from "./components/AgentMissingCard";
 import { DraftChat } from "./components/DraftChat";
 import { MoveProgress } from "./components/MoveProgress";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
 import { useStoredChatSnapshot } from "./hooks/useStoredChatSnapshot";
+import { chatStartFailure } from "./utils/chatStartFailure";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
+import { loadUnsentPrompts } from "./utils/loadUnsentPrompts";
+import { missingCodingAgent } from "./utils/missingCodingAgent";
 import {
 	type SessionInfo,
 	sessionInfoFromState,
@@ -154,6 +166,7 @@ export function AcpChatPane({
 	const storedSnapshot = useStoredChatSnapshot(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
+	const { activeHostUrl: localHostUrl } = useLocalHostService();
 	const hostInfo = useHostServiceInfo(hostUrl);
 	const { data: agentConfigs } = useV2AgentConfigs(hostUrl);
 	const agentLabel = agentConfigs?.find(
@@ -161,6 +174,10 @@ export function AcpChatPane({
 	)?.label;
 	const harness = acpHarnessForPreset(agent?.id);
 	const [failure, setFailure] = useState<string | null>(null);
+	const [startFailed, setStartFailed] = useState<{
+		sessionId: string;
+		failure: StartFailure;
+	} | null>(null);
 	const [switchingAccount, setSwitchingAccount] = useState(false);
 	const [transferredFrom, setTransferredFrom] = useState<string | null>(null);
 	const {
@@ -504,14 +521,57 @@ export function AcpChatPane({
 	);
 	const recoveries = useRef(0);
 	if (stored?.live && !sessionDead) recoveries.current = 0;
+	// A chat whose agent never ran has nothing to resume, so the next session
+	// is sent what the user asked this one. Once: the prompts then wait in the pane.
+	const carriedFrom = useRef(new Set<string>());
+	const waiting = useRef(pendingPrompts);
+	waiting.current = pendingPrompts;
+	const carryUnsentPrompts = useCallback(
+		async (from: string, prompts?: UserContent[][]) => {
+			if (agentSessionId || carriedFrom.current.has(from)) return;
+			carriedFrom.current.add(from);
+			const unsent =
+				prompts ??
+				(await loadUnsentPrompts(wiring.transport, from).catch(() => []));
+			// A pane opened again carries them again; the earlier copies still wait.
+			const queued = new Set(waiting.current.map((p) => JSON.stringify(p)));
+			const fresh = unsent.filter((p) => !queued.has(JSON.stringify(p)));
+			if (fresh.length > 0 && mounted.current) onRestoreQueuedPrompts(fresh);
+		},
+		[agentSessionId, wiring.transport, onRestoreQueuedPrompts],
+	);
 	const recover = useCallback(() => {
 		if (!harness || !sessionId || recoveryInFlight.current) return;
 		recoveryInFlight.current = true;
 		void wiring.transport
 			.closeSession({ sessionId })
 			.catch(() => undefined)
+			.then(() => carryUnsentPrompts(sessionId))
 			.then(() => start(harness, agentSessionId, true));
-	}, [harness, agentSessionId, sessionId, start, wiring.transport]);
+	}, [
+		harness,
+		agentSessionId,
+		sessionId,
+		start,
+		wiring.transport,
+		carryUnsentPrompts,
+	]);
+	const startAgain = useCallback(
+		async (prompts: UserContent[][]) => {
+			if (!harness || !sessionId) return;
+			const previous = sessionId;
+			await carryUnsentPrompts(previous, prompts);
+			setStartFailed(null);
+			attaching.current = false;
+			const started = await start(harness);
+			if (started) {
+				void wiring.transport
+					.closeSession({ sessionId: previous })
+					.catch(() => undefined);
+			}
+		},
+		[harness, sessionId, carryUnsentPrompts, start, wiring.transport],
+	);
 	const switchAccount = useCallback(
 		async (setAccount: () => Promise<unknown>) => {
 			if (!harness || !sessionId || recoveryInFlight.current) return;
@@ -648,6 +708,80 @@ export function AcpChatPane({
 		recover();
 	}, [recover]);
 
+	const onStartFailed = useCallback(
+		(failure: StartFailure | null) => {
+			if (!sessionId || !mounted.current) return;
+			setStartFailed((current) =>
+				failure
+					? { sessionId, failure }
+					: current?.sessionId === sessionId
+						? null
+						: current,
+			);
+		},
+		[sessionId],
+	);
+
+	const liveStartFailure =
+		startFailed?.sessionId === sessionId ? startFailed.failure : null;
+	const chatFailure = chatStartFailure({
+		canChat: Boolean(harness),
+		sessionId,
+		hasClient: Boolean(client),
+		recovering,
+		liveStartFailure,
+		sessionDead,
+		sessionStopped,
+		createFailure: failure,
+		storedError: stored?.lastError,
+		stored,
+	});
+	// A chat the user carried on in a terminal is not waiting for an install.
+	const installFailure =
+		chatFailure?.path === "stopped" && continuedInTerminal ? null : chatFailure;
+	const installable = isCodingAgentId(agent?.id) ? agent.id : null;
+	const onThisMachine = Boolean(localHostUrl) && hostUrl === localHostUrl;
+	const agentStatus = electronTrpc.codingAgents.status.useQuery(
+		{ agent: installable ?? "claude" },
+		{
+			enabled: installFailure !== null && installable !== null && onThisMachine,
+		},
+	);
+	const missingNow = missingCodingAgent({
+		agentId: agent?.id,
+		failed: installFailure !== null,
+		usable: agentStatus.data?.usable,
+		hostUrl,
+		localHostUrl,
+	});
+	// The card stays once shown, so an install from Settings turns it into Try again.
+	const failureKey = sessionId ?? terminalId;
+	const [missingIn, setMissingIn] = useState<string | null>(null);
+	useEffect(() => {
+		if (missingNow) setMissingIn(failureKey);
+	}, [missingNow, failureKey]);
+	const missingAgent =
+		installFailure && (missingNow || missingIn === failureKey)
+			? (missingNow ?? installable)
+			: null;
+	const installRunning = useAgentInstallRunning(installable ?? "claude", {
+		enabled: missingAgent !== null,
+	});
+	const lookingUpAgent =
+		installFailure !== null &&
+		installable !== null &&
+		onThisMachine &&
+		agentStatus.isPending;
+	const { data: stoppedPrompts } = useQuery({
+		enabled:
+			missingAgent !== null &&
+			installFailure?.path === "stopped" &&
+			sessionId !== null &&
+			!agentSessionId,
+		queryKey: ["acp-chat-unsent-prompts", sessionId],
+		queryFn: () => loadUnsentPrompts(wiring.transport, sessionId as string),
+	});
+
 	const draftKey = `chat-v3-draft:${draftId ?? terminalId}`;
 
 	const editMessage = useCallback(
@@ -758,6 +892,75 @@ export function AcpChatPane({
 		);
 	}
 
+	if (installFailure && (missingAgent || lookingUpAgent)) {
+		const carried =
+			installFailure.path === "live"
+				? installFailure.failure.prompts
+				: installFailure.path === "stopped"
+					? (stoppedPrompts ?? [])
+					: [];
+		const queued = new Set(pendingPrompts.map((p) => JSON.stringify(p)));
+		const shownPrompts = [
+			...carried.filter((p) => !queued.has(JSON.stringify(p))),
+			...pendingPrompts,
+		];
+		const retry =
+			installFailure.path === "live"
+				? () => void startAgain(installFailure.failure.prompts)
+				: installFailure.path === "stopped"
+					? retryRecovery
+					: startFresh;
+		return (
+			<DraftChat
+				draftKey={draftKey}
+				getOpenFilePaths={getOpenFilePaths}
+				isActive={isActive}
+				onOpenHistory={onOpenHistory}
+				onQueue={onQueuePrompt}
+				queued={pendingPrompts}
+				transcript={
+					<div className="flex min-h-0 flex-1 flex-col">
+						<PendingPromptsView prompts={shownPrompts} />
+						{missingAgent && (
+							<AgentMissingCard
+								agent={missingAgent}
+								detail={installFailure.detail}
+								installed={agentStatus.data?.usable === true}
+								installRunning={installRunning}
+								outdated={
+									agentStatus.data?.installed && agentStatus.data.version
+										? {
+												version: agentStatus.data.version,
+												minVersion: agentStatus.data.minVersion,
+												ownInstall: agentStatus.data.source === "path",
+											}
+										: undefined
+								}
+								otherAgents={(agentSwitch?.agents ?? []).filter(
+									(other) => other.presetId !== agent?.id,
+								)}
+								onUseAgent={(presetId) =>
+									onSwitchAgent?.({
+										presetId,
+										label:
+											agentSwitch?.agents.find(
+												(other) => other.presetId === presetId,
+											)?.label ?? presetId,
+										model: null,
+										modeId: undefined,
+										handoffPrompt: null,
+									})
+								}
+								onRetry={retry}
+							/>
+						)}
+					</div>
+				}
+				workspaceId={workspaceId}
+			/>
+		);
+	}
+
 	const lost = failure !== null && stored === null;
 	if (
 		harness &&
@@ -859,6 +1062,7 @@ export function AcpChatPane({
 				if (!mounted.current) return;
 				onSessionInfo(sessionInfoFromState(state, agent?.sessionId));
 			}}
+			onStartFailed={onStartFailed}
 			pendingPrompts={pendingPrompts}
 			terminalId={terminalId}
 			workspaceId={workspaceId}

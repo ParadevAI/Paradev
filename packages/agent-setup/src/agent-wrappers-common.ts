@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { quoteSingleShell } from "@superset/shared/agent-prompt-launch";
+import { wrapperBinDirCasePattern } from "./agent-binary";
 import { SUPERSET_MANAGED_BINARIES } from "./agent-setup-targets";
 import { ARTIFACT_GUARD_SCRIPT_NAME } from "./artifact-guard-hook";
 import { NOTIFY_SCRIPT_NAME } from "./notify-hook";
@@ -125,7 +127,7 @@ function buildRealBinaryResolver(): string {
     [ -z "$dir" ] && continue
     dir="\${dir%/}"
     case "$dir" in
-      "${getBinDir()}"|"$HOME"/.paradev/bin|"$HOME"/.paradev-*/bin|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
+      ${wrapperBinDirCasePattern()}) continue ;;
     esac
     if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
       printf "%s\\n" "$dir/$name"
@@ -201,6 +203,8 @@ export interface BuildWrapperScriptOptions {
 	 */
 	agentId?: string;
 	beforeLaunch?: string;
+	/** Used only when PATH has no such binary, so the user's own install wins. */
+	fallbackBinary?: string;
 }
 
 /**
@@ -240,6 +244,15 @@ fi
 `;
 }
 
+function buildFallbackBinaryBlock(fallbackBinary: string | undefined): string {
+	if (!fallbackBinary) return "";
+	const quoted = quoteSingleShell(fallbackBinary);
+	return `if [ -z "$REAL_BIN" ] && [ -x ${quoted} ] && [ ! -d ${quoted} ]; then
+  REAL_BIN=${quoted}
+fi
+`;
+}
+
 export function buildWrapperScript(
 	binaryName: string,
 	execLine: string,
@@ -261,7 +274,7 @@ ${WRAPPER_MARKER}
 
 ${buildRealBinaryResolver()}
 REAL_BIN="$(find_real_binary "${binaryName}")"
-if [ -z "$REAL_BIN" ]; then
+${buildFallbackBinaryBlock(options.fallbackBinary)}if [ -z "$REAL_BIN" ]; then
   echo "${getMissingBinaryMessage(binaryName)}" >&2
   exit 127
 fi

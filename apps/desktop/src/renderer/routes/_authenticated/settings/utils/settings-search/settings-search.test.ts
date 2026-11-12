@@ -174,3 +174,23 @@ describe("settings search - GitHub CLI", () => {
 		}
 	});
 });
+
+describe("settings search - coding agent install", () => {
+	it.each([
+		"claude",
+		"codex",
+		"install claude",
+		"sign in",
+	])('"%s" finds the agent install rows in Agents', (query) => {
+		expect(getIds(searchSettings(query))).toContain(
+			SETTING_ITEM_ID.AGENTS_INSTALL,
+		);
+		expect(
+			getVisibleItemsForSection({
+				section: "agents",
+				searchQuery: query,
+				isV2: true,
+			}),
+		).toContain(SETTING_ITEM_ID.AGENTS_INSTALL);
+	});
+});
