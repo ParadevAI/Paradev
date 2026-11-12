@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { MachineSize } from "@superset/shared/billing";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -9,7 +10,6 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
-import { keepMoveAlive } from "@superset/shared/move-book";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 

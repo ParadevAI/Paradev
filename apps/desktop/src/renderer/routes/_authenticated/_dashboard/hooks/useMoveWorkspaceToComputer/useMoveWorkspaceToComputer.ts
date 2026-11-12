@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
@@ -15,7 +16,6 @@ import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/reque
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
-import { keepMoveAlive } from "@superset/shared/move-book";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
