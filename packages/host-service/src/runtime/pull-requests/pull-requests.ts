@@ -14,6 +14,7 @@ import {
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
 import { getLocalProject } from "../../projects/local-project-store";
+import { isContainerProject } from "../../projects/multi-repo";
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
 import { type GitFactory, resolveDefaultBranchName } from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
@@ -921,6 +922,14 @@ export class PullRequestRuntimeManager {
 	private async syncWorkspaceRow(
 		workspace: typeof workspaces.$inferSelect,
 	): Promise<string | null> {
+		// A multi-repo workspace's folder is not a repository: git there reads
+		// whatever repository encloses it. Its checkouts carry the refs.
+		if (
+			workspace.projectId &&
+			isContainerProject(getLocalProject(this.db, workspace.projectId))
+		) {
+			return null;
+		}
 		// A worktree deleted outside the app is a routine lifecycle state, not
 		// an error to retry: skip the git spawn entirely until the directory is
 		// back on disk (external restore, workspace repair).
