@@ -41,6 +41,21 @@ describe("questionPages", () => {
 		expect(isPageAnswered(page, { delivery_note1: " " })).toBe(false);
 	});
 
+	it("attaches a delayed note to its own question without replacing an earlier note", () => {
+		const pages = questionPages([
+			choice("1"),
+			choice("2"),
+			{ ...text("first_note"), answerFor: "1" },
+			{ ...text("second_note"), answerFor: "2" },
+			{ ...text("duplicate"), answerFor: "1" },
+		]);
+		expect(pages.map(({ field, other }) => [field.id, other?.id])).toEqual([
+			["1", "first_note"],
+			["2", "second_note"],
+			["duplicate", undefined],
+		]);
+	});
+
 	it("keeps a generic text field on its own page", () => {
 		const pages = questionPages([choice("priority"), text("notes")]);
 		expect(pages.map((page) => [page.field.id, page.other?.id])).toEqual([
