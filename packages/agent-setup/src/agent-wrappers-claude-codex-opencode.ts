@@ -316,6 +316,17 @@ export function getOpenCodeTuiPluginContent(notifyPath: string): string {
 export function createClaudeWrapper(): void {
 	const script = buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
 		agentId: "claude",
+		nonSessionSubcommands: [
+			"auth",
+			"setup-token",
+			"doctor",
+			"install",
+			"update",
+			"upgrade",
+			"mcp",
+			"plugin",
+			"plugins",
+		],
 		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",
 			"default-claude-config-dir",
@@ -335,6 +346,15 @@ export function createCodexWrapper(): void {
 		buildCodexWrapperExecLine(notifyPath),
 		{
 			agentId: "codex",
+			nonSessionSubcommands: [
+				"login",
+				"logout",
+				"doctor",
+				"update",
+				"mcp",
+				"plugin",
+				"completion",
+			],
 			beforeLaunch: buildDefaultAccountResolver(
 				"CODEX_HOME",
 				"default-codex-home",
