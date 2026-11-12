@@ -255,7 +255,7 @@ describe("probeIdentity", () => {
 			"tools/call",
 			"[DELETE]",
 		]);
-		expect(calls[2]?.params?.name).toBe("execute_sentry_tool");
+		expect(calls[2]?.params?.name).toBe("whoami");
 		expect(calls[1]?.protocolHeader).toBe("2025-06-18");
 		expect(calls[2]?.protocolHeader).toBe("2025-06-18");
 		expect(identity.account).toEqual({ id: "42", label: "h@tegon.ai" });
