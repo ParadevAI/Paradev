@@ -76,3 +76,23 @@ describe("pullRequestNumbersByProject", () => {
 		]);
 	});
 });
+
+describe("rows of a multi-repo project", () => {
+	test("ask each repository for its details and take back only its own", () => {
+		const api = { ...row("orbit", 1), repositoryProjectId: "api" };
+		const shared = { ...row("orbit", 1), repositoryProjectId: "shared" };
+		expect(pullRequestNumbersByProject([api, shared])).toEqual([
+			{ projectId: "api", prNumbers: [1] },
+			{ projectId: "shared", prNumbers: [1] },
+		]);
+		const next = applyPullRequestRowDetails({ pullRequests: [api, shared] }, [
+			{ projectId: "shared", prNumber: 1, ...ciDetails },
+		]);
+		expect(next.pullRequests[0]).toEqual(api);
+		expect(next.pullRequests[1]).toEqual({
+			...shared,
+			...ciDetails,
+			detailsPending: false,
+		});
+	});
+});

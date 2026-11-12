@@ -9218,6 +9218,10 @@ msgstr "尋找成員和 Dev"
 msgid "Finder"
 msgstr "Finder"
 
+#. placeholder {0}: linkedPR.prNumber
+msgid "Finding PR #{0}…"
+msgstr "正在尋找 PR #{0}…"
+
 msgid "Finish review"
 msgstr "完成審查"
 
@@ -12054,6 +12058,9 @@ msgstr "沿用現有模式"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "讓快速鍵匹配鍵盤上的標籤（例如⌘Z始終觸發標有「Z」的按鍵——在QWERTZ上是物理KeyY）。關閉後，快速鍵錨定在物理按鍵位置，忽略目前輸入源。"
+
+msgid "matched"
+msgstr "已配對"
 
 msgid "Max"
 msgstr "最大"
@@ -15240,6 +15247,10 @@ msgstr "電話號碼"
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "在主題網格中選擇{name}即可應用。"
 
+#. placeholder {0}: pullRequests[active.id]?.prNumber
+msgid "Pick a branch to start from instead of PR #{0}."
+msgstr "選擇一個分支作為起點，以取代 PR #{0}。"
+
 msgid "Pick a different element"
 msgstr "選擇其他元素"
 
@@ -15484,6 +15495,10 @@ msgstr "PR #{0}（{1}）"
 #. placeholder {0}: created.number
 msgid "PR #{0} created"
 msgstr "已建立PR #{0}"
+
+#. placeholder {0}: linkedPR.prNumber
+msgid "PR #{0} is not in any repository of this project"
+msgstr "PR #{0} 不在此專案的任何儲存庫中"
 
 msgid "PR #{prNumber}"
 msgstr "PR #{prNumber}"

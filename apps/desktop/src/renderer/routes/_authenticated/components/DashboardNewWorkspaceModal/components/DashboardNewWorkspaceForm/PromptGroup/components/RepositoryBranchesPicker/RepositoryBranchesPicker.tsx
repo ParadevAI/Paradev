@@ -9,6 +9,7 @@ import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "renderer/routes/_authenticated/components/FormPickerTrigger";
+import type { RepositoryPullRequest } from "renderer/stores/new-workspace-draft";
 import { PickerChevron } from "../../../components/PickerChevron";
 import { RepositoryBranchList } from "./components/RepositoryBranchList";
 import { RepositoryRow } from "./components/RepositoryRow";
@@ -19,6 +20,8 @@ interface RepositoryBranchesPickerProps {
 	hostId: string | null;
 	/** Picked base branches by repository id; the rest use their default branch. */
 	baseBranches: Record<string, string>;
+	/** Repositories that start from a PR; picking a branch for one replaces its PR. */
+	pullRequests: Record<string, RepositoryPullRequest>;
 	onBaseBranchChange: (repositoryId: string, branch: string) => void;
 }
 
@@ -30,6 +33,7 @@ export function RepositoryBranchesPicker({
 	projectId,
 	hostId,
 	baseBranches,
+	pullRequests,
 	onBaseBranchChange,
 }: RepositoryBranchesPickerProps) {
 	const { t } = useLingui();
@@ -41,6 +45,9 @@ export function RepositoryBranchesPicker({
 	const active = repositories.find((repository) => repository.id === activeId);
 	const pickedCount = repositories.filter(
 		(repository) => baseBranches[repository.id],
+	).length;
+	const pullRequestCount = repositories.filter(
+		(repository) => pullRequests[repository.id],
 	).length;
 
 	const handleOpenChange = (nextOpen: boolean) => {
@@ -66,7 +73,9 @@ export function RepositoryBranchesPicker({
 						className={isParadevShell ? "size-3.5 shrink-0" : "size-3 shrink-0"}
 					/>
 					<span className="truncate">
-						{pickedCount === 0 ? (
+						{pullRequestCount > 0 ? (
+							<Plural value={pullRequestCount} one="# PR" other="# PRs" />
+						) : pickedCount === 0 ? (
 							<Trans>Default branches</Trans>
 						) : (
 							<Plural
@@ -103,6 +112,14 @@ export function RepositoryBranchesPicker({
 								{active.name}
 							</span>
 						</div>
+						{pullRequests[active.id] && (
+							<div className="border-b px-3 py-2 text-[11px] text-muted-foreground">
+								<Trans>
+									Pick a branch to start from instead of PR #
+									{pullRequests[active.id]?.prNumber}.
+								</Trans>
+							</div>
+						)}
 						<RepositoryBranchList
 							repositoryId={active.id}
 							hostId={hostId}
@@ -131,6 +148,7 @@ export function RepositoryBranchesPicker({
 									repository={repository}
 									hostId={hostId}
 									selectedBranch={baseBranches[repository.id]}
+									pullRequest={pullRequests[repository.id]}
 									onOpen={() => setActiveId(repository.id)}
 								/>
 							))}

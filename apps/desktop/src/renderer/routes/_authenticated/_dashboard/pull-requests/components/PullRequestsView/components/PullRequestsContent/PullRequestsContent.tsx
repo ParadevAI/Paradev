@@ -34,6 +34,7 @@ interface PullRequestsContentProps {
 	mergedOnly: boolean;
 	selectedPrNumber: number | null;
 	selectedPrProjectId: string | null;
+	selectedPrRepo: string | null;
 	repoSlugByProjectId: Map<string, string>;
 }
 
@@ -63,6 +64,7 @@ export function PullRequestsContent({
 	mergedOnly,
 	selectedPrNumber,
 	selectedPrProjectId,
+	selectedPrRepo,
 	repoSlugByProjectId,
 }: PullRequestsContentProps) {
 	const navigate = useNavigate();
@@ -122,7 +124,8 @@ export function PullRequestsContent({
 	const selectedIndex = pullRequests.findIndex(
 		(pr) =>
 			pr.prNumber === selectedPrNumber &&
-			(selectedPrProjectId == null || pr.projectId === selectedPrProjectId),
+			(selectedPrProjectId == null || pr.projectId === selectedPrProjectId) &&
+			isSelectedRepo(pr.url, selectedPrRepo),
 	);
 	const neighborUrls =
 		selectedIndex < 0
@@ -265,9 +268,14 @@ export function PullRequestsContent({
 							const isSelected =
 								selectedPrNumber === pr.prNumber &&
 								(selectedPrProjectId != null
-									? selectedPrProjectId === pr.projectId
+									? selectedPrProjectId === pr.projectId &&
+										isSelectedRepo(pr.url, selectedPrRepo)
 									: firstMatchingPrIndex === index);
-							const repoSlug = repoSlugByProjectId.get(pr.projectId);
+							const projectSlug = repoSlugByProjectId.get(pr.projectId);
+							const repoSlug =
+								pr.repositoryName && projectSlug
+									? `${projectSlug} › ${pr.repositoryName}`
+									: projectSlug;
 							return (
 								<PullRequestRow
 									key={rowKey}
@@ -289,5 +297,13 @@ export function PullRequestsContent({
 				)}
 			</div>
 		</div>
+	);
+}
+
+function isSelectedRepo(url: string, selectedRepo: string | null): boolean {
+	return (
+		selectedRepo == null ||
+		pullRequestRefFromUrl(url)?.repoFullName.toLowerCase() ===
+			selectedRepo.toLowerCase()
 	);
 }

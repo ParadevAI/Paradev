@@ -373,6 +373,7 @@ export function PullRequestCodeTab({
 	const linkedWorkspaceQueryKey = [
 		"pull-request-linked-workspace",
 		projectId,
+		repoFullName,
 		hostUrl,
 		prNumber,
 	];
@@ -385,6 +386,7 @@ export function PullRequestCodeTab({
 			return client.pullRequests.getLinkedWorkspace.query({
 				projectId,
 				prNumber,
+				repoFullName: repoFullName ?? undefined,
 			});
 		},
 		staleTime: 30_000,
@@ -452,6 +454,7 @@ export function PullRequestCodeTab({
 					id: crypto.randomUUID(),
 					projectId,
 					pr: prNumber,
+					prRepository: repoFullName ?? undefined,
 					agents: [{ agent: input.target.configId, prompt: text }],
 				},
 			});

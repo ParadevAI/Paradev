@@ -9218,6 +9218,10 @@ msgstr "Mensen en Devs zoeken"
 msgid "Finder"
 msgstr "Finder"
 
+#. placeholder {0}: linkedPR.prNumber
+msgid "Finding PR #{0}…"
+msgstr "PR #{0} zoeken…"
+
 msgid "Finish review"
 msgstr "Review afronden"
 
@@ -12054,6 +12058,9 @@ msgstr "Volg bestaande patronen"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Koppel sneltoetsen aan de opschriften op je toetsenbord (bijv. ⌘Z werkt altijd op de toets met \"Z\" — fysiek KeyY op QWERTZ). Staat dit uit, dan zijn sneltoetsen aan fysieke toetsposities gekoppeld en negeren ze de huidige invoerbron."
+
+msgid "matched"
+msgstr "gekoppeld"
 
 msgid "Max"
 msgstr "Max"
@@ -15240,6 +15247,10 @@ msgstr "Telefoonnummer"
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Kies {name} in het themaraster om het toe te passen."
 
+#. placeholder {0}: pullRequests[active.id]?.prNumber
+msgid "Pick a branch to start from instead of PR #{0}."
+msgstr "Kies een branch om vanaf te starten in plaats van PR #{0}."
+
 msgid "Pick a different element"
 msgstr "Kies een ander element"
 
@@ -15484,6 +15495,10 @@ msgstr "PR #{0} ({1})"
 #. placeholder {0}: created.number
 msgid "PR #{0} created"
 msgstr "PR #{0} aangemaakt"
+
+#. placeholder {0}: linkedPR.prNumber
+msgid "PR #{0} is not in any repository of this project"
+msgstr "PR #{0} staat in geen enkele repository van dit project"
 
 msgid "PR #{prNumber}"
 msgstr "PR #{prNumber}"

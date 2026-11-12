@@ -9212,6 +9212,10 @@ msgstr "Знайти людей і Devs"
 msgid "Finder"
 msgstr "Finder"
 
+#. placeholder {0}: linkedPR.prNumber
+msgid "Finding PR #{0}…"
+msgstr "Пошук PR #{0}…"
+
 msgid "Finish review"
 msgstr "Завершити рев'ю"
 
@@ -12048,6 +12052,9 @@ msgstr "Дотримуватися наявних патернів"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Зіставляти комбінації клавіш із позначками на клавіатурі (наприклад, ⌘Z завжди спрацьовує на клавіші з позначкою «Z» — фізична KeyY на QWERTZ). Якщо вимкнено, комбінації прив'язані до фізичного розташування клавіш і не враховують поточне джерело введення."
+
+msgid "matched"
+msgstr "збіг"
 
 msgid "Max"
 msgstr "Макс."
@@ -15234,6 +15241,10 @@ msgstr "Номер телефону"
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Виберіть {name} у сітці тем, щоб застосувати її."
 
+#. placeholder {0}: pullRequests[active.id]?.prNumber
+msgid "Pick a branch to start from instead of PR #{0}."
+msgstr "Виберіть гілку, з якої почати замість PR #{0}."
+
 msgid "Pick a different element"
 msgstr "Вибрати інший елемент"
 
@@ -15478,6 +15489,10 @@ msgstr "PR #{0} ({1})"
 #. placeholder {0}: created.number
 msgid "PR #{0} created"
 msgstr "PR #{0} створено"
+
+#. placeholder {0}: linkedPR.prNumber
+msgid "PR #{0} is not in any repository of this project"
+msgstr "PR #{0} немає в жодному репозиторії цього проєкту"
 
 msgid "PR #{prNumber}"
 msgstr "PR #{prNumber}"

@@ -59,12 +59,17 @@ export function useGitHubMentionProviders(
 				),
 			select: (ctx) => ctx.insertChip(linkedIssueChip(issue, isDark)),
 		});
-		const prEntry = (pr: LinkedPR): ComposerMentionEntry => {
+		const prEntry = (
+			pr: LinkedPR,
+			repositoryName?: string,
+		): ComposerMentionEntry => {
 			const Icon = PULL_REQUEST_ICON[prState(pr)];
 			return {
 				id: pr.url,
 				label: `#${pr.prNumber}`,
-				description: pr.title,
+				description: repositoryName
+					? `${repositoryName} · ${pr.title}`
+					: pr.title,
 				icon: (
 					<Icon
 						className={cn("size-4", PULL_REQUEST_COLOR[prState(pr)])}
@@ -147,12 +152,15 @@ export function useGitHubMentionProviders(
 						return pullRequests
 							.filter((pr) => !ref || pr.prNumber === ref.number)
 							.map((pr) =>
-								prEntry({
-									prNumber: pr.prNumber,
-									title: pr.title,
-									url: pr.url,
-									state: normalizePrState(pr.state, pr.isDraft),
-								}),
+								prEntry(
+									{
+										prNumber: pr.prNumber,
+										title: pr.title,
+										url: pr.url,
+										state: normalizePrState(pr.state, pr.isDraft),
+									},
+									pr.repositoryName,
+								),
 							);
 					},
 				},

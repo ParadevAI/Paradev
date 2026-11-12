@@ -65,3 +65,12 @@ test("an explicit repository cannot inherit actions from unknown project metadat
 		}),
 	).toEqual({ projectId: null, repoFullName: "owner/repo" });
 });
+test("a multi-repo project keeps the PRs of its repositories", () => {
+	expect(
+		resolvePullRequestTarget({
+			projectId: "orbit",
+			repoFullName: "owner/api",
+			projects: [{ id: "orbit", kind: "container" }],
+		}),
+	).toEqual({ projectId: "orbit", repoFullName: "owner/api" });
+});

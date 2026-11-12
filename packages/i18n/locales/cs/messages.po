@@ -9218,6 +9218,10 @@ msgstr "Najít lidi a Devy"
 msgid "Finder"
 msgstr "Finder"
 
+#. placeholder {0}: linkedPR.prNumber
+msgid "Finding PR #{0}…"
+msgstr "Hledá se PR #{0}…"
+
 msgid "Finish review"
 msgstr "Dokončit revizi"
 
@@ -12054,6 +12058,9 @@ msgstr "Dodrž stávající vzory"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Přiřadit zkratky k popiskům na vaší klávesnici (např. ⌘Z se vždy spustí na klávese označené „Z“ — fyzicky KeyY na QWERTZ). Když je vypnuto, zkratky se vážou k fyzickým pozicím kláves a ignorují aktuální vstupní zdroj."
+
+msgid "matched"
+msgstr "shoda"
 
 msgid "Max"
 msgstr "Max"
@@ -15240,6 +15247,10 @@ msgstr "Telefonní číslo"
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Vyberte {name} z mřížky motivů a použijte ho."
 
+#. placeholder {0}: pullRequests[active.id]?.prNumber
+msgid "Pick a branch to start from instead of PR #{0}."
+msgstr "Vyberte větev, ze které se začne místo PR #{0}."
+
 msgid "Pick a different element"
 msgstr "Vybrat jiný prvek"
 
@@ -15484,6 +15495,10 @@ msgstr "PR #{0} ({1})"
 #. placeholder {0}: created.number
 msgid "PR #{0} created"
 msgstr "PR #{0} vytvořen"
+
+#. placeholder {0}: linkedPR.prNumber
+msgid "PR #{0} is not in any repository of this project"
+msgstr "PR #{0} není v žádném repozitáři tohoto projektu"
 
 msgid "PR #{prNumber}"
 msgstr "PR #{prNumber}"

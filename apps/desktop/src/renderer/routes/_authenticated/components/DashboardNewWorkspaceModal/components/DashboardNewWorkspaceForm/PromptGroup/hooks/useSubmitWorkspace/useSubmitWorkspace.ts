@@ -282,7 +282,18 @@ export function useSubmitWorkspace(
 				return false;
 			}
 
-			const isPrCheckout = linkedPR !== null;
+			// Multi-repo: the PR picked first names the branch, so it goes first.
+			const repositoryPullRequests =
+				draft.repositoryPullRequestsFor === null
+					? null
+					: Object.entries(draft.repositoryPullRequests)
+							.sort(([, a], [, b]) => Number(a.matched) - Number(b.matched))
+							.map(
+								([repositoryId, pr]) => [repositoryId, pr.prNumber] as const,
+							);
+			const isPrCheckout = repositoryPullRequests
+				? repositoryPullRequests.length > 0
+				: linkedPR !== null;
 			// A PR always needs its own worktree; otherwise the picker decides.
 			const isLocalCheckout = !isPrCheckout && draft.checkout === "local";
 
@@ -373,7 +384,14 @@ export function useSubmitWorkspace(
 								draft.branchNameFromProvider
 									? true
 									: undefined,
-							pr: isPrCheckout ? linkedPR?.prNumber : undefined,
+							pr:
+								isPrCheckout && !repositoryPullRequests
+									? linkedPR?.prNumber
+									: undefined,
+							repositoryPullRequests:
+								repositoryPullRequests && repositoryPullRequests.length > 0
+									? Object.fromEntries(repositoryPullRequests)
+									: undefined,
 							baseBranch: draft.baseBranch ?? undefined,
 							repositoryBaseBranches:
 								Object.keys(draft.repositoryBaseBranches).length > 0

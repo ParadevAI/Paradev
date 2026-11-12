@@ -99,6 +99,7 @@ import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
+import { useRepositoryPullRequests } from "./hooks/useRepositoryPullRequests";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
 import {
@@ -451,6 +452,36 @@ export function NewWorkspaceScreen({
 	);
 	useLinkedIssueNaming(linkedIssues);
 
+	const repositoryPullRequests = useRepositoryPullRequests({
+		projectId,
+		hostId,
+		linkedPR,
+		enabled: isContainerProject,
+	});
+	const linkedPRUrl = isContainerProject ? (linkedPR?.url ?? null) : null;
+	useEffect(() => {
+		if (linkedPRUrl === null) {
+			if (draft.repositoryPullRequestsFor !== null) {
+				updateDraft({
+					repositoryPullRequests: {},
+					repositoryPullRequestsFor: null,
+				});
+			}
+			return;
+		}
+		if (draft.repositoryPullRequestsFor === linkedPRUrl) return;
+		if (!repositoryPullRequests.data) return;
+		updateDraft({
+			repositoryPullRequests: repositoryPullRequests.data,
+			repositoryPullRequestsFor: linkedPRUrl,
+		});
+	}, [
+		linkedPRUrl,
+		draft.repositoryPullRequestsFor,
+		repositoryPullRequests.data,
+		updateDraft,
+	]);
+
 	// Reset baseBranch when what it branches from changes, defaulting to the
 	// user's last branch there — the draft store is global, so a stale branch
 	// from another repository would otherwise ride into the create. On the
@@ -485,6 +516,8 @@ export function NewWorkspaceScreen({
 				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
 				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
 				repositoryBaseBranches: {},
+				repositoryPullRequests: {},
+				repositoryPullRequestsFor: null,
 			});
 		}
 	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
@@ -1131,7 +1164,7 @@ export function NewWorkspaceScreen({
 					}
 				/>
 			)}
-			{linkedPR ? (
+			{linkedPR && !isContainerProject ? (
 				<>
 					<CheckoutPickerPill
 						checkout="worktree"
@@ -1157,15 +1190,33 @@ export function NewWorkspaceScreen({
 							projectId={projectId}
 							hostId={hostId}
 							baseBranches={draft.repositoryBaseBranches}
-							onBaseBranchChange={(repositoryId, branch) =>
+							pullRequests={draft.repositoryPullRequests}
+							onBaseBranchChange={(repositoryId, branch) => {
+								const { [repositoryId]: _replaced, ...pullRequests } =
+									draft.repositoryPullRequests;
 								updateDraft({
 									repositoryBaseBranches: {
 										...draft.repositoryBaseBranches,
 										[repositoryId]: branch,
 									},
-								})
-							}
+									repositoryPullRequests: pullRequests,
+								});
+							}}
 						/>
+					)}
+					{linkedPR && draft.repositoryPullRequestsFor !== linkedPR.url && (
+						<span className="flex items-center gap-1 text-xs text-muted-foreground">
+							<LuGitPullRequest className="size-3 shrink-0" />
+							{repositoryPullRequests.isPending ||
+							repositoryPullRequests.isFetching ? (
+								<Trans>Finding PR #{linkedPR.prNumber}…</Trans>
+							) : (
+								<Trans>
+									PR #{linkedPR.prNumber} is not in any repository of this
+									project
+								</Trans>
+							)}
+						</span>
 					)}
 				</>
 			) : (

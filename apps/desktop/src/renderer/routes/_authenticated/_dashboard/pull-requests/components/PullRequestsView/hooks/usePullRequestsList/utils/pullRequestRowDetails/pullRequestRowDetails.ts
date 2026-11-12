@@ -1,6 +1,12 @@
 interface PullRequestRowKey {
 	projectId: string;
 	prNumber: number;
+	/** The repository of a multi-repo project, which serves its details. */
+	repositoryProjectId?: string;
+}
+
+function sourceProjectId(row: PullRequestRowKey): string {
+	return row.repositoryProjectId ?? row.projectId;
 }
 
 type PullRequestRowDetailField =
@@ -23,7 +29,7 @@ type PullRequestRowDetails<TRow extends PullRequestRow> = Pick<
 
 /** PR numbers repeat across repositories, so a row is its project plus its number. */
 export function pullRequestRowKey(row: PullRequestRowKey): string {
-	return `${row.projectId}:${row.prNumber}`;
+	return `${sourceProjectId(row)}:${row.prNumber}`;
 }
 
 function mergeRowDetails<
@@ -87,9 +93,9 @@ export function pullRequestNumbersByProject(
 ): { projectId: string; prNumbers: number[] }[] {
 	const numbersByProject = new Map<string, number[]>();
 	for (const row of rows) {
-		const numbers = numbersByProject.get(row.projectId) ?? [];
+		const numbers = numbersByProject.get(sourceProjectId(row)) ?? [];
 		numbers.push(row.prNumber);
-		numbersByProject.set(row.projectId, numbers);
+		numbersByProject.set(sourceProjectId(row), numbers);
 	}
 	return [...numbersByProject].map(([projectId, prNumbers]) => ({
 		projectId,

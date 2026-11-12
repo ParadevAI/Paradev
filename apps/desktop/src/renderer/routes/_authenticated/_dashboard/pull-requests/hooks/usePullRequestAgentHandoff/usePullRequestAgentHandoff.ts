@@ -11,6 +11,7 @@ export interface PullRequestHandoffTarget {
 	hostId: string;
 	hostUrl: string;
 	prNumber: number;
+	repoFullName: string | null;
 }
 
 /**
@@ -31,6 +32,7 @@ export function usePullRequestAgentHandoff(
 		"pullRequests",
 		"linkedWorkspace",
 		target?.projectId,
+		target?.repoFullName,
 		target?.hostUrl,
 		target?.prNumber,
 	];
@@ -43,6 +45,7 @@ export function usePullRequestAgentHandoff(
 			).pullRequests.getLinkedWorkspace.query({
 				projectId: target.projectId,
 				prNumber: target.prNumber,
+				repoFullName: target.repoFullName ?? undefined,
 			});
 		},
 		staleTime: 30_000,
@@ -77,6 +80,7 @@ export function usePullRequestAgentHandoff(
 					id: crypto.randomUUID(),
 					projectId: target.projectId,
 					pr: target.prNumber,
+					prRepository: target.repoFullName ?? undefined,
 					agents: [{ agent: agent.id, prompt }],
 				},
 			});

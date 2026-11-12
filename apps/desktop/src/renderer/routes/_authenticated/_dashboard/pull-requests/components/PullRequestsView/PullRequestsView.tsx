@@ -351,6 +351,7 @@ export function PullRequestsView({
 					mergedOnly={mergedOnly}
 					selectedPrNumber={selectedPrNumber}
 					selectedPrProjectId={selectedPrProjectId}
+					selectedPrRepo={selectedPrRepo}
 					repoSlugByProjectId={repoSlugByProjectId}
 				/>
 			</div>

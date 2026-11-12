@@ -171,7 +171,13 @@ export function PullRequestActions({
 	const invalidatePullRequestQueries = useInvalidatePullRequestDetail(target);
 	const handoff = usePullRequestAgentHandoff(
 		projectId && hostId && hostUrl && prNumber !== null
-			? { projectId, hostId, hostUrl, prNumber }
+			? {
+					projectId,
+					hostId,
+					hostUrl,
+					prNumber,
+					repoFullName: target?.repoFullName ?? null,
+				}
 			: null,
 	);
 	const setDraft = usePullRequestDraftMutation(

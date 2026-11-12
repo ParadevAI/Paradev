@@ -3,6 +3,8 @@ export interface PullRequestProject {
 	projectKey?: string;
 	repoOwner?: string | null;
 	repoName?: string | null;
+	/** A multi-repo project has no repository of its own; its PRs name one of its repositories. */
+	kind?: "repository" | "container";
 }
 
 export function resolvePullRequestTarget({
@@ -24,7 +26,8 @@ export function resolvePullRequestTarget({
 			: null;
 	const repository = repoFullName ?? projectRepo;
 	const matches =
-		!!projectRepo && projectRepo.toLowerCase() === repository?.toLowerCase();
+		project?.kind === "container" ||
+		(!!projectRepo && projectRepo.toLowerCase() === repository?.toLowerCase());
 	return {
 		repoFullName: repository,
 		projectId: project && (!repoFullName || matches) ? projectId : null,

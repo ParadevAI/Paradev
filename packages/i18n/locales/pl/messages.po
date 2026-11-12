@@ -9218,6 +9218,10 @@ msgstr "Znajdź osoby i Devy"
 msgid "Finder"
 msgstr "Finder"
 
+#. placeholder {0}: linkedPR.prNumber
+msgid "Finding PR #{0}…"
+msgstr "Wyszukiwanie PR #{0}…"
+
 msgid "Finish review"
 msgstr "Zakończ przegląd"
 
@@ -12054,6 +12058,9 @@ msgstr "Zachowaj istniejące wzorce"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Dopasuj skróty do oznaczeń na klawiaturze (np. ⌘Z zawsze zadziała na klawiszu opisanym „Z” — fizycznie KeyY na QWERTZ). Gdy wyłączone, skróty są przypisane do pozycji fizycznych klawiszy i ignorują bieżące źródło wprowadzania."
+
+msgid "matched"
+msgstr "dopasowano"
 
 msgid "Max"
 msgstr "Maks."
@@ -15240,6 +15247,10 @@ msgstr "Numer telefonu"
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Wybierz {name} z siatki motywów, aby go zastosować."
 
+#. placeholder {0}: pullRequests[active.id]?.prNumber
+msgid "Pick a branch to start from instead of PR #{0}."
+msgstr "Wybierz gałąź, od której zacząć zamiast PR #{0}."
+
 msgid "Pick a different element"
 msgstr "Wybierz inny element"
 
@@ -15484,6 +15495,10 @@ msgstr "PR #{0} ({1})"
 #. placeholder {0}: created.number
 msgid "PR #{0} created"
 msgstr "Utworzono PR #{0}"
+
+#. placeholder {0}: linkedPR.prNumber
+msgid "PR #{0} is not in any repository of this project"
+msgstr "PR #{0} nie należy do żadnego repozytorium tego projektu"
 
 msgid "PR #{prNumber}"
 msgstr "PR #{prNumber}"

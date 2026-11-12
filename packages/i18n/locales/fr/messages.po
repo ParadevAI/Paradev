@@ -9218,6 +9218,10 @@ msgstr "Trouver des personnes et des Devs"
 msgid "Finder"
 msgstr "Finder"
 
+#. placeholder {0}: linkedPR.prNumber
+msgid "Finding PR #{0}…"
+msgstr "Recherche de la PR #{0}…"
+
 msgid "Finish review"
 msgstr "Terminer la revue"
 
@@ -12054,6 +12058,9 @@ msgstr "Suivre les modèles existants"
 
 msgid "Match shortcuts to the labels on your keyboard (e.g. ⌘Z always fires on the key labeled \"Z\" — physical KeyY on QWERTZ). When off, shortcuts are anchored to physical key positions and ignore the current input source."
 msgstr "Faire correspondre les raccourcis aux libellés de votre clavier (par ex. ⌘Z se déclenche toujours sur la touche marquée « Z » — physiquement KeyY sur un clavier QWERTZ). Lorsque cette option est désactivée, les raccourcis sont liés aux positions physiques des touches et ignorent la source de saisie actuelle."
+
+msgid "matched"
+msgstr "correspond"
 
 msgid "Max"
 msgstr "Max"
@@ -15240,6 +15247,10 @@ msgstr "Numéro de téléphone"
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Choisissez {name} dans la grille des thèmes pour l'appliquer."
 
+#. placeholder {0}: pullRequests[active.id]?.prNumber
+msgid "Pick a branch to start from instead of PR #{0}."
+msgstr "Choisissez une branche de départ à la place de la PR #{0}."
+
 msgid "Pick a different element"
 msgstr "Choisir un autre élément"
 
@@ -15484,6 +15495,10 @@ msgstr "PR #{0} ({1})"
 #. placeholder {0}: created.number
 msgid "PR #{0} created"
 msgstr "PR #{0} créée"
+
+#. placeholder {0}: linkedPR.prNumber
+msgid "PR #{0} is not in any repository of this project"
+msgstr "La PR #{0} n'est dans aucun dépôt de ce projet"
 
 msgid "PR #{prNumber}"
 msgstr "PR #{prNumber}"
