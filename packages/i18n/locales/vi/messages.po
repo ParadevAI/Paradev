@@ -4325,6 +4325,9 @@ msgstr "Kiểm tra kết nối hoặc thử mở lại."
 msgid "Check your inbox"
 msgstr "Kiểm tra hộp thư"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Kiểm tra, thay đổi và dọn dẹp feature flag"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 

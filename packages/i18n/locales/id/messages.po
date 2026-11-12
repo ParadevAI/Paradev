@@ -4325,6 +4325,9 @@ msgstr "Periksa koneksi Anda atau coba buka lagi."
 msgid "Check your inbox"
 msgstr "Periksa kotak masuk Anda"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Periksa, ubah, dan bersihkan feature flag"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 

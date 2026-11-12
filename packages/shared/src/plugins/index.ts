@@ -506,6 +506,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "launchdarkly",
+		version: "1.0.0",
+		description: "Ship, target, and clean up feature flags",
+		interface: { displayName: "LaunchDarkly", category: "Developer tools" },
+		mcpServers: {
+			launchdarkly: { type: "http", url: "https://mcp.launchdarkly.com/mcp" },
+		},
+	},
+	{
 		name: "peec",
 		version: "1.0.0",
 		description: "Track your brand in AI search",

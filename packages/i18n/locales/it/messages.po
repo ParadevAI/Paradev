@@ -4325,6 +4325,9 @@ msgstr "Controlla la connessione o prova ad aprirla di nuovo."
 msgid "Check your inbox"
 msgstr "Controlla la tua casella di posta"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Controlla, modifica e ripulisci i feature flag"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 

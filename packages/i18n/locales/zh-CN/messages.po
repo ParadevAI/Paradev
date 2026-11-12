@@ -4325,6 +4325,9 @@ msgstr "请检查网络连接，或重新打开一次。"
 msgid "Check your inbox"
 msgstr "查收你的邮箱"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "检查、更改和清理功能开关"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "复选框 · 单选框 · 开关"
 

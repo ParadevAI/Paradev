@@ -4319,6 +4319,9 @@ msgstr "Перевірте з'єднання або спробуйте відк�
 msgid "Check your inbox"
 msgstr "Перевірте поштову скриньку"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Перевірка, зміна й прибирання прапорців функцій"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Прапорець · Радіокнопка · Перемикач"
 

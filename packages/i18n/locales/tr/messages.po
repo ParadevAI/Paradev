@@ -4325,6 +4325,9 @@ msgstr "Bağlantınızı kontrol edin veya yeniden açmayı deneyin."
 msgid "Check your inbox"
 msgstr "Gelen kutunuzu kontrol edin"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Özellik bayraklarını kontrol edin, değiştirin ve temizleyin"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Onay kutusu · Radyo · Anahtar"
 

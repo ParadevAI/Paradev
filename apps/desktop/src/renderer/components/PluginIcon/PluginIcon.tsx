@@ -33,6 +33,7 @@ import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
 import { AutumnIcon } from "./components/AutumnIcon";
 import { FirecrawlIcon } from "./components/FirecrawlIcon";
 import { InngestIcon } from "./components/InngestIcon";
+import { LaunchDarklyIcon } from "./components/LaunchDarklyIcon";
 import { PeecIcon } from "./components/PeecIcon";
 import { ResendIcon } from "./components/ResendIcon";
 import { SazabiIcon } from "./components/SazabiIcon";
@@ -74,6 +75,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	peec: { icon: PeecIcon },
 	sentry: { icon: SiSentry },
 	posthog: { icon: SiPosthog },
+	launchdarkly: { icon: LaunchDarklyIcon },
 	resend: { icon: ResendIcon },
 	sazabi: { icon: SazabiIcon, color: "#FF0027" },
 	linear: { icon: SiLinear },

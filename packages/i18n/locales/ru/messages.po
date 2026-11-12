@@ -4325,6 +4325,9 @@ msgstr "Проверьте соединение или попробуйте от
 msgid "Check your inbox"
 msgstr "Проверьте почту"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Проверка, изменение и очистка флагов функций"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Чекбокс · радио · переключатель"
 
