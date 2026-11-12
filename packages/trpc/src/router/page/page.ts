@@ -87,7 +87,11 @@ import {
 	setSharedVersionSchema,
 	updatePageSchema,
 } from "./schema";
-import { resolveSharedVersion, servedVersion } from "./shared-version";
+import {
+	isPubliclyServed,
+	resolveSharedVersion,
+	servedVersion,
+} from "./shared-version";
 import { pageSharingRouter } from "./sharing";
 import {
 	deletePageObjects,
@@ -249,6 +253,22 @@ async function latestVersionNumber(pageId: string): Promise<number | null> {
 		.orderBy(desc(pageVersions.version))
 		.limit(1);
 	return row?.version ?? null;
+}
+
+async function loadPublicPage(
+	slug: string,
+): Promise<{ page: SelectPage; version: number } | null> {
+	const [page] = await db
+		.select()
+		.from(pages)
+		.where(eq(pages.slug, slug))
+		.limit(1);
+	if (!page || !isPubliclyServed(page)) return null;
+	const version = servedVersion(
+		page.sharedVersion,
+		await latestVersionNumber(page.id),
+	);
+	return version === null ? null : { page, version };
 }
 
 async function wipePageStorage(pageId: string): Promise<void> {
@@ -1288,19 +1308,9 @@ export const pageRouter = {
 	publicView: publicProcedure
 		.input(publicPageSchema)
 		.query(async ({ input }) => {
-			const [page] = await db
-				.select()
-				.from(pages)
-				.where(eq(pages.slug, input.slug))
-				.limit(1);
-			if (!page || page.visibility !== "everyone") return null;
-			if (page.takenDownAt) return null;
-
-			const version = servedVersion(
-				page.sharedVersion,
-				await latestVersionNumber(page.id),
-			);
-			if (version === null) return null;
+			const found = await loadPublicPage(input.slug);
+			if (!found) return null;
+			const { page, version } = found;
 
 			const baseUrl = env.USERCONTENT_URL;
 			const captured = await objectExists(
@@ -1318,6 +1328,53 @@ export const pageRouter = {
 				thumbnailUrl: captured
 					? pageThumbnailUrl({ baseUrl, pageId: page.id, version })
 					: null,
+			};
+		}),
+
+	publicPull: publicProcedure
+		.input(publicPageSchema)
+		.query(async ({ input }) => {
+			const found = await loadPublicPage(input.slug);
+			if (!found) return null;
+			const { page, version } = found;
+
+			const [row] = await db
+				.select()
+				.from(pageVersions)
+				.where(
+					and(
+						eq(pageVersions.pageId, page.id),
+						eq(pageVersions.version, version),
+					),
+				)
+				.limit(1);
+			if (!row) return null;
+
+			let downloadUrl: string;
+			try {
+				downloadUrl = await presignedGetUrl(row.storageKey);
+			} catch (error) {
+				console.error("[pages] presign failed", {
+					pageId: page.id,
+					version,
+					error,
+				});
+				throw userError({
+					code: "NOT_FOUND",
+					message: "Page content is not available",
+					i18nKey: "serverError.page.pageContentIsNotAvailable",
+				});
+			}
+
+			return {
+				id: page.id,
+				slug: page.slug,
+				title: page.title,
+				version: row.version,
+				contentType: row.contentType,
+				sizeBytes: row.sizeBytes,
+				sha256: row.sha256,
+				downloadUrl,
 			};
 		}),
 } satisfies TRPCRouterRecord;
