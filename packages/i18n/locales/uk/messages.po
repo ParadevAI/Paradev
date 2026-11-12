@@ -879,6 +879,9 @@ msgstr "{count, plural, one {# коментар, нові відповіді} fe
 msgid "{count, plural, one {# comment} other {# comments}}"
 msgstr "{count, plural, one {# коментар} few {# коментарі} many {# коментарів} other {# коментаря}}"
 
+msgid "{count, plural, one {# empty project hidden} other {# empty projects hidden}}"
+msgstr "{count, plural, one {Приховано # порожній проєкт} few {Приховано # порожні проєкти} many {Приховано # порожніх проєктів} other {Приховано # порожнього проєкту}}"
+
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
 
@@ -9812,6 +9815,9 @@ msgstr "Приховати подробиці"
 msgid "Hide emails"
 msgstr "Приховати адреси електронної пошти"
 
+msgid "Hide empty projects"
+msgstr "Приховувати порожні проєкти"
+
 msgid "Hide file tree"
 msgstr "Приховати дерево файлів"
 
@@ -18256,6 +18262,9 @@ msgstr "Показувати мікрофон у полі введення ча�
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Показувати кнопку «Використання» на бічній панелі головного екрана під «Пул-реквестами»"
 
+msgid "Show all"
+msgstr "Показати все"
+
 msgid "Show all {count}"
 msgstr "Показати всі ({count})"
 
@@ -18303,6 +18312,12 @@ msgstr "Показати панель diff"
 
 msgid "Show emails"
 msgstr "Показати електронні адреси"
+
+msgid "Show empty projects"
+msgstr "Показати порожні проєкти"
+
+msgid "Show empty projects to rearrange the sidebar"
+msgstr "Покажіть порожні проєкти, щоб змінити розташування в бічній панелі"
 
 msgid "Show everyone who opened this page"
 msgstr "Показати всіх, хто відкривав цю сторінку"

@@ -49,6 +49,7 @@ import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarCh
 import { DashboardSidebarDevsSection } from "./components/DashboardSidebarDevsSection";
 import { DashboardSidebarGithubNotice } from "./components/DashboardSidebarGithubNotice";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
+import { DashboardSidebarHiddenEmptyProjects } from "./components/DashboardSidebarHiddenEmptyProjects";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
 import { DashboardSidebarHoverCardOverlay } from "./components/DashboardSidebarHoverCardOverlay";
 import { DashboardSidebarPinnedSection } from "./components/DashboardSidebarPinnedSection";
@@ -65,6 +66,7 @@ import {
 } from "./hooks/useBlockedDragNotice";
 import { useDashboardSidebarData } from "./hooks/useDashboardSidebarData";
 import { useDashboardSidebarShortcuts } from "./hooks/useDashboardSidebarShortcuts";
+import { useHideEmptySidebarProjects } from "./hooks/useHideEmptySidebarProjects";
 import { useMigrateLegacySidebarFolders } from "./hooks/useMigrateLegacySidebarFolders";
 import { useDashboardSidebarDnd } from "./hooks/useSidebarDnd";
 import { DashboardSidebarActionsProvider } from "./providers/DashboardSidebarActionsProvider";
@@ -84,6 +86,7 @@ import {
 	filterDashboardSidebarProjectsByHost,
 	matchesHostFilter,
 } from "./utils/filterDashboardSidebarProjectsByHost";
+import { filterEmptyDashboardSidebarProjects } from "./utils/filterEmptyDashboardSidebarProjects";
 import { getProjectChildrenWorkspaces } from "./utils/projectChildren";
 import { sortDashboardSidebarProjects } from "./utils/sortDashboardSidebarProjects";
 
@@ -118,6 +121,15 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 		isDragging,
 	} = useSortable({ id: project.id, disabled: isDragDisabled });
 	const isDraggingProject = activeType === "project";
+	// On the handle, not the wrapper: rows inside can stay draggable while
+	// the project itself is inert.
+	const dragHandleAttributes = useMemo(
+		() => ({
+			...attributes,
+			...getBlockedDragProps(isDragDisabled, "project"),
+		}),
+		[attributes, isDragDisabled],
+	);
 
 	// useSortable re-renders this wrapper on every pointer move of any drag in
 	// the sidebar's DndContext; the project section subtree is expensive, so
@@ -132,7 +144,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				onWorkspaceHover={onWorkspaceHover}
 				onToggleCollapse={onToggleCollapse}
 				dragHandleListeners={listeners}
-				dragHandleAttributes={attributes}
+				dragHandleAttributes={dragHandleAttributes}
 			/>
 		),
 		[
@@ -143,7 +155,7 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 			onWorkspaceHover,
 			onToggleCollapse,
 			listeners,
-			attributes,
+			dragHandleAttributes,
 		],
 	);
 
@@ -155,7 +167,6 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				transition,
 				opacity: isDragging ? 0.5 : undefined,
 			}}
-			{...getBlockedDragProps(isDragDisabled)}
 		>
 			{section}
 		</div>
@@ -174,6 +185,8 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		groups,
 		hiddenProjects,
 		pinnedWorkspaces,
+		isPlacementReady,
+		unsettledProjectIds,
 		sessionWorkspaces,
 		sessionChildren,
 		githubStatus,
@@ -255,9 +268,33 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 				: sortDashboardSidebarProjects(orderedGroups, sortMode),
 		[sortMode, orderedGroups],
 	);
+	const [hideEmptyProjects, setHideEmptyProjects] =
+		useHideEmptySidebarProjects();
+	const showEmptyProjects = useCallback(
+		() => setHideEmptyProjects(false),
+		[setHideEmptyProjects],
+	);
+	const { projects: occupiedGroups, hiddenCount: hiddenEmptyProjectCount } =
+		useMemo(
+			() =>
+				hideEmptyProjects
+					? filterEmptyDashboardSidebarProjects(sortedGroups, {
+							pinnedWorkspaces,
+							unsettledProjectIds: unsettledProjectIds,
+							isReady: isPlacementReady,
+						})
+					: { projects: sortedGroups, hiddenCount: 0 },
+			[
+				hideEmptyProjects,
+				sortedGroups,
+				pinnedWorkspaces,
+				unsettledProjectIds,
+				isPlacementReady,
+			],
+		);
 	const hostFilteredGroups = useMemo(
-		() => filterDashboardSidebarProjectsByHost(sortedGroups, hostFilter),
-		[sortedGroups, hostFilter],
+		() => filterDashboardSidebarProjectsByHost(occupiedGroups, hostFilter),
+		[occupiedGroups, hostFilter],
 	);
 	const displayedPinnedWorkspaces = useMemo(
 		() =>
@@ -289,17 +326,23 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	const trimmedFilterQuery = projectFilterQuery.trim();
 	const isFilterActive = trimmedFilterQuery !== "" || hostFilter !== "all";
 	// The sort modes only reorder rows inside a project, so the project list
-	// is still the manual order and stays draggable; only a filter, which
-	// hides projects outright, makes a project drop unsafe to commit.
-	const isProjectDragDisabled = isFilterActive;
+	// is still the manual order and stays draggable; only a filter or hidden
+	// empty projects, which leave projects out, make a project drop unsafe.
+	const isProjectDragDisabled = isFilterActive || hiddenEmptyProjectCount > 0;
 	const isChildDragDisabled = sortMode !== "manual" || isFilterActive;
 	useBlockedDragNotice({
 		reason: isFilterActive ? "filter" : sortMode !== "manual" ? "sort" : null,
+		projectReason: isFilterActive
+			? "filter"
+			: hiddenEmptyProjectCount > 0
+				? "emptyProjects"
+				: null,
 		onSwitchToManualOrder: () => setSidebarProjectSortMode("manual"),
 		onClearFilter: () => {
 			setProjectFilterQuery("");
 			setSidebarProjectHostFilter("all");
 		},
+		onShowEmptyProjects: showEmptyProjects,
 	});
 
 	// Sorted but unfiltered, so ⌘1–⌘9 targets stay put while typing a query.
@@ -511,6 +554,8 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 							onHostFilterChange={setSidebarProjectHostFilter}
 							filterQuery={projectFilterQuery}
 							onFilterQueryChange={setProjectFilterQuery}
+							hideEmptyProjects={hideEmptyProjects}
+							onHideEmptyProjectsChange={setHideEmptyProjects}
 						/>
 					</DashboardSidebarBulkActions>
 				</div>
@@ -534,10 +579,16 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 				</SortableContext>
 			)}
 			{!isCollapsed && !workspacesListCollapsed && (
-				<DashboardSidebarHiddenProjects
-					projects={hiddenProjects}
-					onShow={showHiddenProject}
-				/>
+				<>
+					<DashboardSidebarHiddenEmptyProjects
+						count={hiddenEmptyProjectCount}
+						onShow={showEmptyProjects}
+					/>
+					<DashboardSidebarHiddenProjects
+						projects={hiddenProjects}
+						onShow={showHiddenProject}
+					/>
+				</>
 			)}
 			{!isCollapsed && isFilterActive && displayedGroups.length === 0 && (
 				<div className="select-text cursor-text px-4 py-2 text-xs text-muted-foreground">
