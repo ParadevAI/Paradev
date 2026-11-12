@@ -10,6 +10,16 @@ export function teleportProviderFor(harness: string): TeleportProvider | null {
 	);
 }
 
+/** The provider that can move this terminal agent's sessions, or null when none can. */
+export function teleportProviderForAgent(
+	agentId: string,
+): TeleportProvider | null {
+	return (
+		PROVIDERS.find((provider) => provider.terminalAgents.includes(agentId)) ??
+		null
+	);
+}
+
 export {
 	type BundleManifest,
 	isPlainSessionId,

@@ -5,6 +5,7 @@
 import {
 	type BundleManifest,
 	teleportProviderFor,
+	teleportProviderForAgent,
 } from "../../teleport/providers/index.ts";
 import {
 	type HarnessTranscript,
@@ -33,10 +34,9 @@ export const harnessSessionFileTask = defineWorkerTask<
 	handler: async ({ ref }) => locateHarnessSessionFile(ref),
 });
 
-/** Puts a moved chat's session files where its agent looks, paths rewritten. */
+/** Puts a moved session's files where its agent looks, paths rewritten. */
 export const harnessPlaceSessionTask = defineWorkerTask<
-	{
-		harness: string;
+	({ harness: string } | { terminalAgent: string }) & {
 		manifest: BundleManifest;
 		worktreePath: string;
 		env: HarnessEnv;
@@ -45,10 +45,20 @@ export const harnessPlaceSessionTask = defineWorkerTask<
 	void
 >({
 	type: "harness/placeSession",
-	handler: async ({ harness, ...input }) => {
-		const provider = teleportProviderFor(harness);
-		if (!provider) throw new Error(`No teleport provider for ${harness}`);
-		await provider.place(input);
+	handler: async (input) => {
+		const owner =
+			"terminalAgent" in input ? input.terminalAgent : input.harness;
+		const provider =
+			"terminalAgent" in input
+				? teleportProviderForAgent(input.terminalAgent)
+				: teleportProviderFor(input.harness);
+		if (!provider) throw new Error(`No teleport provider for ${owner}`);
+		await provider.place({
+			manifest: input.manifest,
+			worktreePath: input.worktreePath,
+			env: input.env,
+			stageDir: input.stageDir,
+		});
 	},
 });
 
