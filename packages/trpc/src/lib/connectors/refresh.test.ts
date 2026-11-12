@@ -283,6 +283,28 @@ describe("a refresh race the server let both sides win", () => {
 		]);
 	});
 
+	test("carries a reconciliation's tokens forward when its store loses", async () => {
+		grant = { previous: "refresh", current: "rotated-0" };
+		const redeemOursFirst = globalThis.fetch;
+		let first = true;
+		globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+			const response = await redeemOursFirst(input, init);
+			if (first) {
+				first = false;
+				grant = { previous: "a", current: "d" };
+			}
+			return response;
+		}) as typeof fetch;
+		reads = [connection(), winnerRow("a"), winnerRow("d")];
+		swaps = [false, false];
+
+		await ensureFreshConnection(connection());
+		expect(grant.current).toBe("rotated-2");
+		expect(written).toEqual([
+			expect.objectContaining({ refreshToken: "rotated-2" }),
+		]);
+	});
+
 	test("rotates the winner's token when it is the live one", async () => {
 		grant = { previous: "refresh", current: "rotated-0" };
 		const redeemOursFirst = globalThis.fetch;

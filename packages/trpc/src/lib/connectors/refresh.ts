@@ -195,17 +195,19 @@ async function reconcile(
 		if (error instanceof ConnectorUnavailableError) return winner;
 		throw error;
 	}
-	const kept =
+	const [held, heldRedeemedToken] =
 		check.kind === "issued"
-			? await store(winner, check.tokens, winnerToken)
-			: check.oauthError === "invalid_grant"
-				? await store(winner, ours, ourRedeemedToken)
-				: undefined;
+			? [check.tokens, winnerToken]
+			: [ours, ourRedeemedToken];
+	const kept =
+		check.kind === "issued" || check.oauthError === "invalid_grant"
+			? await store(winner, held, heldRedeemedToken)
+			: undefined;
 	if (kept) return kept;
 
 	const latest = await readConnection(winner.id);
 	if (!latest || latest.refreshToken === winner.refreshToken) return winner;
-	return await reconcile(latest, endpoints, ours, ourRedeemedToken);
+	return await reconcile(latest, endpoints, held, heldRedeemedToken);
 }
 
 type IssuedTokens = Record<string, unknown> & { access_token: string };
