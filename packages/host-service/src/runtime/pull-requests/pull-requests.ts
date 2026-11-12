@@ -28,6 +28,8 @@ import {
 	fetchOpenPullRequestsFromGh,
 	fetchPullRequestByHead,
 	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumber,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecks,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueState,
@@ -266,6 +268,14 @@ export class PullRequestRuntimeManager {
 		string,
 		{
 			promise: Promise<GitHubPullRequestNode[]>;
+			fetchedAt: number;
+			consecutiveFailures: number;
+		}
+	>();
+	private readonly pullRequestNumberCache = new Map<
+		string,
+		{
+			promise: Promise<GitHubPullRequestNode | null>;
 			fetchedAt: number;
 			consecutiveFailures: number;
 		}
@@ -987,6 +997,13 @@ export class PullRequestRuntimeManager {
 
 		const { failedKeys, matched: keyToPullRequest } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
+		await this.refreshPastPullRequests(
+			projectId,
+			repo,
+			projectWorkspaces.map((workspace) => workspace.id),
+			new Set([...keyToPullRequest.values()].map((match) => match.id)),
+			options,
+		);
 
 		for (const workspace of projectWorkspaces) {
 			const key = this.effectiveUpstreamKey(workspace, repo);
@@ -1544,6 +1561,104 @@ export class PullRequestRuntimeManager {
 						}),
 					{ probe: options.bypassCache === true },
 				),
+		);
+	}
+
+	// A head lookup only reaches the PR on a workspace's current branch. PRs it
+	// linked before (another stack layer, an earlier branch) are fetched by
+	// number until GitHub reports them closed or merged.
+	private async refreshPastPullRequests(
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+		workspaceIds: string[],
+		refreshedRowIds: ReadonlySet<string>,
+		options: { bypassCache?: boolean } = {},
+	): Promise<void> {
+		const rows = this.db
+			.selectDistinct({ id: pullRequests.id })
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.where(
+				and(
+					inArray(workspacePullRequests.workspaceId, workspaceIds),
+					eq(pullRequests.repoProvider, repo.provider),
+					eq(pullRequests.repoOwner, repo.owner),
+					eq(pullRequests.repoName, repo.name),
+					inArray(pullRequests.state, ["open", "draft", "queued"]),
+				),
+			)
+			.all()
+			.filter((row) => !refreshedRowIds.has(row.id));
+
+		await Promise.all(
+			rows.map(async ({ id }) => {
+				const existing = this.findPullRequestRowById(id);
+				if (!existing) return;
+				const context = {
+					projectId,
+					owner: repo.owner,
+					name: repo.name,
+					prNumber: existing.prNumber,
+				};
+				try {
+					const node = await this.cachedGitHubFetch(
+						this.pullRequestNumberCache,
+						`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${existing.prNumber}`,
+						options,
+						() =>
+							this.fetchFromGitHub(
+								"PR number lookup",
+								context,
+								() =>
+									fetchPullRequestByNumberFromGh(
+										this.execGh,
+										repo,
+										existing.prNumber,
+									),
+								async () =>
+									fetchPullRequestByNumber(
+										await this.github(),
+										repo,
+										existing.prNumber,
+									),
+								{ probe: options.bypassCache === true },
+							),
+					);
+					if (!node || node.number !== existing.prNumber) return;
+					const now = Date.now();
+					this.upsertPullRequestRow({
+						existing,
+						projectId: existing.projectId,
+						prNumber: node.number,
+						repo,
+						url: node.url,
+						title: node.title,
+						state: mapPullRequestState(
+							node.state,
+							node.isDraft,
+							coercePullRequestState(existing.state) === "queued",
+						),
+						isDraft: node.isDraft,
+						headBranch: node.headRefName,
+						headSha: node.headRefOid,
+						mergedAt: node.mergedAt,
+						reviewDecision: coerceReviewDecision(existing.reviewDecision),
+						checksStatus: coerceChecksStatus(existing.checksStatus),
+						checksJson: existing.checksJson,
+						lastFetchedAt: now,
+						error: null,
+						now,
+					});
+				} catch (error) {
+					console.warn(
+						"[host-service:pull-request-runtime] Failed to fetch past PR by number",
+						{ ...context, error },
+					);
+				}
+			}),
 		);
 	}
 

@@ -1998,6 +1998,68 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		);
 	});
 
+	test("a past PR closed after the workspace moved on shows as closed", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "branch-a",
+			headSha: "sha-branch-a",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "branch-a",
+		});
+		const prsByBranch = new Map([["branch-a", 101]]);
+		const closed = new Set<number>();
+		const serveHistory = historyExecGh(prsByBranch);
+		const numberLookups: number[] = [];
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				const byNumber = args
+					.find((arg) =>
+						arg.startsWith(`repos/${REPO.owner}/${REPO.name}/pulls/`),
+					)
+					?.match(/\/pulls\/(\d+)$/);
+				if (byNumber?.[1]) {
+					const prNumber = Number(byNumber[1]);
+					numberLookups.push(prNumber);
+					return makePrNode({
+						number: prNumber,
+						headRef: "branch-a",
+						headSha: "sha-branch-a",
+						state: closed.has(prNumber) ? "closed" : "open",
+					});
+				}
+				return serveHistory(args);
+			},
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		db.update(workspaces)
+			.set({
+				branch: "branch-b",
+				headSha: "sha-branch-b",
+				upstreamBranch: "branch-b",
+			})
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		prsByBranch.set("branch-b", 102);
+		prsByBranch.delete("branch-a");
+		closed.add(101);
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const history = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history[0]?.pullRequests.map((pr) => [pr.number, pr.state])).toEqual(
+			[
+				[102, "open"],
+				[101, "closed"],
+			],
+		);
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		expect(numberLookups).toEqual([101]);
+	});
+
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
 		const db = createRealDb();
 		seedProject(db);
