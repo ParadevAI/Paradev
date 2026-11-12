@@ -518,6 +518,7 @@ export function NewWorkspaceScreen({
 				repositoryBaseBranches: {},
 				repositoryPullRequests: {},
 				repositoryPullRequestsFor: null,
+				repositoryWorktrees: {},
 			});
 		}
 	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
@@ -1191,15 +1192,33 @@ export function NewWorkspaceScreen({
 							hostId={hostId}
 							baseBranches={draft.repositoryBaseBranches}
 							pullRequests={draft.repositoryPullRequests}
+							worktrees={draft.repositoryWorktrees}
 							onBaseBranchChange={(repositoryId, branch) => {
 								const { [repositoryId]: _replaced, ...pullRequests } =
 									draft.repositoryPullRequests;
+								const { [repositoryId]: _moved, ...worktrees } =
+									draft.repositoryWorktrees;
 								updateDraft({
 									repositoryBaseBranches: {
 										...draft.repositoryBaseBranches,
 										[repositoryId]: branch,
 									},
 									repositoryPullRequests: pullRequests,
+									repositoryWorktrees: worktrees,
+								});
+							}}
+							onWorktreeChange={(repositoryId, worktree) => {
+								const { [repositoryId]: _replaced, ...pullRequests } =
+									draft.repositoryPullRequests;
+								const { [repositoryId]: _base, ...baseBranches } =
+									draft.repositoryBaseBranches;
+								updateDraft({
+									repositoryBaseBranches: baseBranches,
+									repositoryPullRequests: pullRequests,
+									repositoryWorktrees: {
+										...draft.repositoryWorktrees,
+										[repositoryId]: worktree,
+									},
 								});
 							}}
 						/>

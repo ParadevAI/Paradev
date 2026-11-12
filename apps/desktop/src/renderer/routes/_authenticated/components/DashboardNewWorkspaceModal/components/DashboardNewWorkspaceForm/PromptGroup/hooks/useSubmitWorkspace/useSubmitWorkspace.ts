@@ -287,6 +287,9 @@ export function useSubmitWorkspace(
 				draft.repositoryPullRequestsFor === null
 					? null
 					: Object.entries(draft.repositoryPullRequests)
+							.filter(
+								([repositoryId]) => !draft.repositoryWorktrees[repositoryId],
+							)
 							.sort(([, a], [, b]) => Number(a.matched) - Number(b.matched))
 							.map(
 								([repositoryId, pr]) => [repositoryId, pr.prNumber] as const,
@@ -396,6 +399,17 @@ export function useSubmitWorkspace(
 							repositoryBaseBranches:
 								Object.keys(draft.repositoryBaseBranches).length > 0
 									? draft.repositoryBaseBranches
+									: undefined,
+							repositoryWorktrees:
+								Object.keys(draft.repositoryWorktrees).length > 0
+									? Object.fromEntries(
+											Object.entries(draft.repositoryWorktrees).map(
+												([repositoryId, worktree]) => [
+													repositoryId,
+													worktree.path,
+												],
+											),
+										)
 									: undefined,
 							taskId: linkedTaskId,
 							agents,

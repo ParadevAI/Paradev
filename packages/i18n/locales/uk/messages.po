@@ -1509,6 +1509,9 @@ msgstr "{workspaceName}: хост недоступний"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: не вдалося виконати очищення"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# наявний worktree} few {# наявні worktree} many {# наявних worktree} other {# наявного worktree}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} за користувача в разі річної оплати"
 
@@ -8345,8 +8348,14 @@ msgstr "Шлях до наявного репозиторію"
 msgid "Existing repo path on {hostName}"
 msgstr "Шлях до наявного репозиторію на {hostName}"
 
+msgid "existing worktree"
+msgstr "наявний worktree"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Наявні worktree за старим шляхом втратять прив'язку. Їх можна повторно імпортувати через імпорт worktree."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Наявні worktree, переносяться в робочий простір"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21048,6 +21057,9 @@ msgstr "Цей попередній перегляд завеликий для �
 
 msgid "This profile is busy right now"
 msgstr "Цей профіль зараз зайнятий"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Цей проєкт ще не має робочих просторів на цьому комп'ютері"
 
 msgid "This project is no longer available on your devices."
 msgstr "Цей проєкт більше недоступний на ваших пристроях."

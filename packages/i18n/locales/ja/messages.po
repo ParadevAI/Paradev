@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: ホストが利用できません"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: ティアダウンに失敗しました"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {既存のワークツリー#件} other {既存のワークツリー#件}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "年払いで1ユーザーあたり{yearlyTotal}"
 
@@ -8351,8 +8354,14 @@ msgstr "既存リポジトリのパス"
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName}上の既存リポジトリのパス"
 
+msgid "existing worktree"
+msgstr "既存のワークツリー"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "旧パス配下の既存ワークツリーは孤立します。ワークツリーフローから再インポートできます。"
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "既存のワークツリー（ワークスペースに移動されます）"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "このプレビューは大きすぎて表示できません。"
 
 msgid "This profile is busy right now"
 msgstr "このプロフィールは現在混み合っています"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "このプロジェクトには、このマシン上のワークスペースがまだありません"
 
 msgid "This project is no longer available on your devices."
 msgstr "このプロジェクトはお使いのデバイスでは利用できなくなりました。"

@@ -60,6 +60,7 @@ export function useDashboardNewWorkspaceDraft() {
 			repositoryBaseBranches: store.repositoryBaseBranches,
 			repositoryPullRequests: store.repositoryPullRequests,
 			repositoryPullRequestsFor: store.repositoryPullRequestsFor,
+			repositoryWorktrees: store.repositoryWorktrees,
 			workspaceName: store.workspaceName,
 			workspaceNameEdited: store.workspaceNameEdited,
 			branchName: store.branchName,

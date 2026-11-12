@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: host kullanılamıyor"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: kapatma başarısız"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# mevcut worktree} other {# mevcut worktree}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "Kullanıcı başına {yearlyTotal}, yıllık faturalandırılır"
 
@@ -8351,8 +8354,14 @@ msgstr "Mevcut depo yolu"
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName} üzerindeki mevcut depo yolu"
 
+msgid "existing worktree"
+msgstr "mevcut worktree"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Eski yolun altındaki mevcut worktree'ler sahipsiz kalacak. Bunları worktree akışından yeniden içe aktarabilirsiniz."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Mevcut worktree'ler, çalışma alanına taşınır"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "Bu önizleme gösterilemeyecek kadar büyük."
 
 msgid "This profile is busy right now"
 msgstr "Bu profil şu anda yoğun"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Bu projenin bu makinede henüz çalışma alanı yok"
 
 msgid "This project is no longer available on your devices."
 msgstr "Bu proje artık cihazlarınızda kullanılamıyor."

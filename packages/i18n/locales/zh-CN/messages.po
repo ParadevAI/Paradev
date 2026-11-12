@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}：主机不可用"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}：清理失败"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {#个已有worktree} other {#个已有worktree}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "每用户{yearlyTotal}，按年计费"
 
@@ -8351,8 +8354,14 @@ msgstr "已有仓库路径"
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName}上的已有仓库路径"
 
+msgid "existing worktree"
+msgstr "已有worktree"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "旧路径下已有的worktree将被孤立。你可以通过worktree流程重新导入它们。"
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "已有worktree，将移入工作区"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "此预览过大，无法显示。"
 
 msgid "This profile is busy right now"
 msgstr "此个人主页当前繁忙"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "此项目在本设备上还没有工作区"
 
 msgid "This project is no longer available on your devices."
 msgstr "这个项目在你的设备上已不可用。"

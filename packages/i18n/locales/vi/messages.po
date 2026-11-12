@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: host không khả dụng"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown thất bại"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree có sẵn} other {# worktree có sẵn}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} mỗi người, thanh toán theo năm"
 
@@ -8351,8 +8354,14 @@ msgstr "Đường dẫn repo có sẵn"
 msgid "Existing repo path on {hostName}"
 msgstr "Đường dẫn repo có sẵn trên {hostName}"
 
+msgid "existing worktree"
+msgstr "worktree có sẵn"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Các worktree hiện có dưới đường dẫn cũ sẽ bị bỏ rơi. Bạn có thể nhập lại chúng từ luồng worktree."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Worktree có sẵn, được chuyển vào workspace"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "Bản xem trước này quá lớn để hiển thị."
 
 msgid "This profile is busy right now"
 msgstr "Hồ sơ này hiện đang quá tải"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Dự án này chưa có workspace nào trên máy này"
 
 msgid "This project is no longer available on your devices."
 msgstr "Dự án này không còn khả dụng trên các thiết bị của bạn."

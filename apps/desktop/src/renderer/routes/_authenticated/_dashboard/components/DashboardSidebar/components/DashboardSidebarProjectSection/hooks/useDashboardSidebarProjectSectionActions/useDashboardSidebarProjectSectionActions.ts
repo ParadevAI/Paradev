@@ -129,19 +129,35 @@ export function useDashboardSidebarProjectSectionActions({
 			});
 	};
 
+	// A multi-repo project has no folder; its workspace folders sit side by side in one.
+	const containerWorkspacesFolder = (hostId: string) => {
+		const root = hostWorkspaces.find(
+			(workspace) =>
+				workspace.projectId === project.id &&
+				workspace.hostId === hostId &&
+				workspace.worktreePath,
+		)?.worktreePath;
+		return root?.replace(/[\\/][^\\/]+[\\/]?$/, "") || undefined;
+	};
+
 	const handleOpenInFinder = async () => {
 		const hostProject = hostProjects.find(
 			(item) => item.projectKey === project.id,
 		);
-		const localRepoPath =
+		const localRepoPath = !(
 			machineId && hostProject?.hostIds.includes(machineId)
-				? hostProject.repoPath
-				: undefined;
+		)
+			? undefined
+			: isContainer
+				? containerWorkspacesFolder(machineId)
+				: hostProject.repoPath;
 		if (!localRepoPath) {
 			toast.error(
-				t({
-					message: "Project folder is not on this machine",
-				}),
+				isContainer
+					? t({ message: "This project has no workspaces on this machine yet" })
+					: t({
+							message: "Project folder is not on this machine",
+						}),
 			);
 			return;
 		}
@@ -322,7 +338,7 @@ export function useDashboardSidebarProjectSectionActions({
 		setIsDeleteDialogOpen,
 		handleNewSection,
 		handleNewWorkspace,
-		handleOpenInFinder: isContainer ? null : handleOpenInFinder,
+		handleOpenInFinder,
 		handleOpenSettings,
 		importableWorktrees,
 		isImportingWorktrees,

@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: el host no está disponible"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: falló la limpieza"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree existente} other {# worktrees existentes}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} por usuario, facturación anual"
 
@@ -8351,8 +8354,14 @@ msgstr "Ruta del repo existente"
 msgid "Existing repo path on {hostName}"
 msgstr "Ruta del repo existente en {hostName}"
 
+msgid "existing worktree"
+msgstr "worktree existente"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Los worktrees que haya bajo la ruta anterior quedarán huérfanos. Puedes volver a importarlos desde el flujo de worktrees."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Worktrees existentes, se mueven al espacio de trabajo"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "Esta vista previa es demasiado grande para mostrarse."
 
 msgid "This profile is busy right now"
 msgstr "Este perfil está saturado ahora mismo"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Este proyecto aún no tiene espacios de trabajo en este equipo"
 
 msgid "This project is no longer available on your devices."
 msgstr "Este proyecto ya no está disponible en tus dispositivos."

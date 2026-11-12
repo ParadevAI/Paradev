@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: host není dostupný"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown selhal"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# existující worktree} few {# existující worktree} many {# existujícího worktree} other {# existujících worktree}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} na uživatele, účtováno ročně"
 
@@ -8351,8 +8354,14 @@ msgstr "Cesta k existujícímu repozitáři"
 msgid "Existing repo path on {hostName}"
 msgstr "Cesta k existujícímu repozitáři na {hostName}"
 
+msgid "existing worktree"
+msgstr "existující worktree"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Stávající worktree pod původní cestou osiří. Můžete je znovu naimportovat přes import worktree."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Existující worktree, přesunou se do pracovního prostoru"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "Tento náhled je příliš velký na zobrazení."
 
 msgid "This profile is busy right now"
 msgstr "Tento profil je právě přetížený"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Tento projekt zatím nemá na tomto počítači žádné pracovní prostory"
 
 msgid "This project is no longer available on your devices."
 msgstr "Tento projekt už na vašich zařízeních není dostupný."

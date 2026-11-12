@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: host tidak tersedia"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown gagal"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# worktree yang ada} other {# worktree yang ada}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per pengguna, ditagih tahunan"
 
@@ -8351,8 +8354,14 @@ msgstr "Path repo yang sudah ada"
 msgid "Existing repo path on {hostName}"
 msgstr "Path repo yang sudah ada di {hostName}"
 
+msgid "existing worktree"
+msgstr "worktree yang ada"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Worktree yang ada di bawah path lama akan menjadi yatim. Anda bisa mengimpornya lagi lewat alur worktree."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Worktree yang ada, dipindahkan ke workspace"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "Pratinjau ini terlalu besar untuk ditampilkan."
 
 msgid "This profile is busy right now"
 msgstr "Profil ini sedang sibuk"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Proyek ini belum memiliki workspace di mesin ini"
 
 msgid "This project is no longer available on your devices."
 msgstr "Proyek ini sudah tidak tersedia di perangkat Anda."

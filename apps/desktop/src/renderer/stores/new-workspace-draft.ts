@@ -30,6 +30,12 @@ export type RepositoryPullRequest = LinkedPR & {
 	matched: boolean;
 };
 
+/** A multi-repo repository that starts from one of its existing worktrees. */
+export interface RepositoryWorktree {
+	path: string;
+	branch: string;
+}
+
 export type BaseBranchSource = "local" | "remote-tracking";
 
 /** Worktree: its own checkout and branch. Local: the project's checkout as is. */
@@ -51,6 +57,8 @@ export interface NewWorkspaceDraft {
 	repositoryPullRequests: Record<string, RepositoryPullRequest>;
 	/** The linked PR `repositoryPullRequests` was found for. */
 	repositoryPullRequestsFor: string | null;
+	/** Multi-repo projects: the existing worktree each repository moves in, by repository id. */
+	repositoryWorktrees: Record<string, RepositoryWorktree>;
 	workspaceName: string;
 	workspaceNameEdited: boolean;
 	branchName: string;
@@ -85,6 +93,7 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		repositoryBaseBranches: {},
 		repositoryPullRequests: {},
 		repositoryPullRequestsFor: null,
+		repositoryWorktrees: {},
 		workspaceName: "",
 		workspaceNameEdited: false,
 		branchName: "",
@@ -121,6 +130,7 @@ export const useNewWorkspaceDraftStore = create<NewWorkspaceDraftState>(
 				repositoryBaseBranches: {},
 				repositoryPullRequests: {},
 				repositoryPullRequestsFor: null,
+				repositoryWorktrees: {},
 			}),
 		resetDraft: () =>
 			set((state) => ({

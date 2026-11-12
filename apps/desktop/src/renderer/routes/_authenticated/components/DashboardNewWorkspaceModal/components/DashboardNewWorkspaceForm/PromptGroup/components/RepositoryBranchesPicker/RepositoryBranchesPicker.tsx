@@ -9,10 +9,14 @@ import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
 } from "renderer/routes/_authenticated/components/FormPickerTrigger";
-import type { RepositoryPullRequest } from "renderer/stores/new-workspace-draft";
+import type {
+	RepositoryPullRequest,
+	RepositoryWorktree,
+} from "renderer/stores/new-workspace-draft";
 import { PickerChevron } from "../../../components/PickerChevron";
 import { RepositoryBranchList } from "./components/RepositoryBranchList";
 import { RepositoryRow } from "./components/RepositoryRow";
+import { RepositoryWorktreeList } from "./components/RepositoryWorktreeList";
 import { useProjectRepositories } from "./hooks/useProjectRepositories";
 
 interface RepositoryBranchesPickerProps {
@@ -22,7 +26,13 @@ interface RepositoryBranchesPickerProps {
 	baseBranches: Record<string, string>;
 	/** Repositories that start from a PR; picking a branch for one replaces its PR. */
 	pullRequests: Record<string, RepositoryPullRequest>;
+	/** Repositories that move in an existing worktree instead of branching. */
+	worktrees: Record<string, RepositoryWorktree>;
 	onBaseBranchChange: (repositoryId: string, branch: string) => void;
+	onWorktreeChange: (
+		repositoryId: string,
+		worktree: RepositoryWorktree,
+	) => void;
 }
 
 /**
@@ -34,7 +44,9 @@ export function RepositoryBranchesPicker({
 	hostId,
 	baseBranches,
 	pullRequests,
+	worktrees,
 	onBaseBranchChange,
+	onWorktreeChange,
 }: RepositoryBranchesPickerProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
@@ -48,6 +60,9 @@ export function RepositoryBranchesPicker({
 	).length;
 	const pullRequestCount = repositories.filter(
 		(repository) => pullRequests[repository.id],
+	).length;
+	const worktreeCount = repositories.filter(
+		(repository) => worktrees[repository.id],
 	).length;
 
 	const handleOpenChange = (nextOpen: boolean) => {
@@ -75,6 +90,12 @@ export function RepositoryBranchesPicker({
 					<span className="truncate">
 						{pullRequestCount > 0 ? (
 							<Plural value={pullRequestCount} one="# PR" other="# PRs" />
+						) : worktreeCount > 0 ? (
+							<Plural
+								value={worktreeCount}
+								one="# existing worktree"
+								other="# existing worktrees"
+							/>
 						) : pickedCount === 0 ? (
 							<Trans>Default branches</Trans>
 						) : (
@@ -120,10 +141,21 @@ export function RepositoryBranchesPicker({
 								</Trans>
 							</div>
 						)}
+						<RepositoryWorktreeList
+							repositoryId={active.id}
+							hostId={hostId}
+							selectedPath={worktrees[active.id]?.path ?? null}
+							onSelect={(worktree) => {
+								onWorktreeChange(active.id, worktree);
+								showRepositories();
+							}}
+						/>
 						<RepositoryBranchList
 							repositoryId={active.id}
 							hostId={hostId}
-							selectedBranch={baseBranches[active.id] ?? null}
+							selectedBranch={
+								worktrees[active.id] ? null : (baseBranches[active.id] ?? null)
+							}
 							onSelect={(branch) => {
 								onBaseBranchChange(active.id, branch);
 								showRepositories();
@@ -149,6 +181,7 @@ export function RepositoryBranchesPicker({
 									hostId={hostId}
 									selectedBranch={baseBranches[repository.id]}
 									pullRequest={pullRequests[repository.id]}
+									worktree={worktrees[repository.id]}
 									onOpen={() => setActiveId(repository.id)}
 								/>
 							))}

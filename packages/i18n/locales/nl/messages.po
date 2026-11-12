@@ -1515,6 +1515,9 @@ msgstr "{workspaceName}: host is niet beschikbaar"
 msgid "{workspaceName}: teardown failed"
 msgstr "{workspaceName}: teardown mislukt"
 
+msgid "{worktreeCount, plural, one {# existing worktree} other {# existing worktrees}}"
+msgstr "{worktreeCount, plural, one {# bestaande worktree} other {# bestaande worktrees}}"
+
 msgid "{yearlyTotal} per user, billed yearly"
 msgstr "{yearlyTotal} per gebruiker, jaarlijks gefactureerd"
 
@@ -8351,8 +8354,14 @@ msgstr "Pad van bestaande repo"
 msgid "Existing repo path on {hostName}"
 msgstr "Pad van bestaande repo op {hostName}"
 
+msgid "existing worktree"
+msgstr "bestaande worktree"
+
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Bestaande worktrees onder het oude pad raken los. Je kunt ze opnieuw importeren via de worktree-flow."
+
+msgid "Existing worktrees, moved into the workspace"
+msgstr "Bestaande worktrees, verplaatst naar de werkruimte"
 
 #. placeholder {0}: content.exitCode
 msgid "exit {0}"
@@ -21054,6 +21063,9 @@ msgstr "Dit voorbeeld is te groot om weer te geven."
 
 msgid "This profile is busy right now"
 msgstr "Dit profiel is momenteel druk bezet"
+
+msgid "This project has no workspaces on this machine yet"
+msgstr "Dit project heeft nog geen werkruimtes op deze machine"
 
 msgid "This project is no longer available on your devices."
 msgstr "Dit project is niet meer beschikbaar op je apparaten."
