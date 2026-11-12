@@ -4622,9 +4622,6 @@ msgstr "Nhấp vào nút “↑ update” để xem xác nhận trước khi c�
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Nhấp để sao chép ID phiên (resume bằng `claude --resume <id>`)."
 
-msgid "Click to open the pull request"
-msgstr "Nhấp để mở pull request"
-
 msgid "Click two commits to define the range."
 msgstr "Nhấp vào hai commit để xác định khoảng."
 
@@ -15225,11 +15222,6 @@ msgstr "PR"
 
 msgid "PR {position} of {size} · targets {base}"
 msgstr "PR {position}/{size} · vào {base}"
-
-#. placeholder {0}: pullRequest.number
-#. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} · {1}"
-msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
