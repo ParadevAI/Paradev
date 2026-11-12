@@ -10903,9 +10903,6 @@ msgstr "保留 {planLabel}"
 msgid "Keep {planName}"
 msgstr "保留 {planName}"
 
-msgid "Keep awake while agents work"
-msgstr "智能体工作时保持唤醒"
-
 msgid "Keep current version"
 msgstr "保留当前版本"
 
@@ -10918,8 +10915,8 @@ msgstr "继续编辑"
 msgid "Keep paused"
 msgstr "保持暂停"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "智能体工作时保持此电脑唤醒。显示器仍可关闭。"
+msgid "Keep this computer awake while agents work"
+msgstr "智能体工作时保持此电脑唤醒"
 
 msgid "Keep typing an email to invite"
 msgstr "继续输入邮箱以邀请"
@@ -20066,6 +20063,9 @@ msgstr "差异仍是最新的，只是评论没能加载。"
 
 msgid "The dispatcher appears"
 msgstr "调度员出现"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "显示器仍可关闭。使用电池供电且电量低于 10% 时，将应用正常的睡眠设置。"
 
 msgid "The endpoint must use https."
 msgstr "端点必须使用 https。"

@@ -77,7 +77,9 @@ export function PowerSection({
 				<div>
 					<Label htmlFor={id} className="text-sm font-normal">
 						<HighlightText
-							text={t({ message: "Keep awake while agents work" })}
+							text={t({
+								message: "Keep this computer awake while agents work",
+							})}
 							query={searchQuery}
 						/>
 					</Label>
@@ -86,8 +88,8 @@ export function PowerSection({
 						className="mt-1 text-xs text-muted-foreground"
 					>
 						<Trans>
-							Keep this computer awake while agents work. The display can still
-							turn off.
+							The display can still turn off. On battery power, normal sleep
+							settings apply below 10%.
 						</Trans>
 					</p>
 				</div>

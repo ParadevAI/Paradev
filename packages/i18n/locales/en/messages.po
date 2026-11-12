@@ -10903,9 +10903,6 @@ msgstr "Keep {planLabel}"
 msgid "Keep {planName}"
 msgstr "Keep {planName}"
 
-msgid "Keep awake while agents work"
-msgstr "Keep awake while agents work"
-
 msgid "Keep current version"
 msgstr "Keep current version"
 
@@ -10918,8 +10915,8 @@ msgstr "Keep editing"
 msgid "Keep paused"
 msgstr "Keep paused"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "Keep this computer awake while agents work. The display can still turn off."
+msgid "Keep this computer awake while agents work"
+msgstr "Keep this computer awake while agents work"
 
 msgid "Keep typing an email to invite"
 msgstr "Keep typing an email to invite"
@@ -20066,6 +20063,9 @@ msgstr "The diff is still up to date. Only comments failed to load."
 
 msgid "The dispatcher appears"
 msgstr "The dispatcher appears"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "The display can still turn off. On battery power, normal sleep settings apply below 10%."
 
 msgid "The endpoint must use https."
 msgstr "The endpoint must use https."

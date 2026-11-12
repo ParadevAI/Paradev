@@ -10903,9 +10903,6 @@ msgstr "Ponechat {planLabel}"
 msgid "Keep {planName}"
 msgstr "Ponechat {planName}"
 
-msgid "Keep awake while agents work"
-msgstr "Zabránit uspání během práce agentů"
-
 msgid "Keep current version"
 msgstr "Ponechat aktuální verzi"
 
@@ -10918,8 +10915,8 @@ msgstr "Pokračovat v úpravách"
 msgid "Keep paused"
 msgstr "Ponechat pozastavené"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "Zabrání uspání tohoto počítače během práce agentů. Displej se může nadále vypínat."
+msgid "Keep this computer awake while agents work"
+msgstr "Zabránit uspání tohoto počítače během práce agentů"
 
 msgid "Keep typing an email to invite"
 msgstr "Pokračujte v psaní e-mailu pro pozvání"
@@ -20066,6 +20063,9 @@ msgstr "Rozdíly jsou stále aktuální. Nenačetly se jen komentáře."
 
 msgid "The dispatcher appears"
 msgstr "Nastupuje dispečer"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Displej se může nadále vypínat. Při napájení z baterie se při poklesu pod 10 % použije běžné nastavení uspání."
 
 msgid "The endpoint must use https."
 msgstr "Koncový bod musí používat https."

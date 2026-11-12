@@ -10903,9 +10903,6 @@ msgstr "Zachowaj {planLabel}"
 msgid "Keep {planName}"
 msgstr "Zachowaj {planName}"
 
-msgid "Keep awake while agents work"
-msgstr "Zapobiegaj uśpieniu podczas pracy agentów"
-
 msgid "Keep current version"
 msgstr "Zachowaj obecną wersję"
 
@@ -10918,8 +10915,8 @@ msgstr "Kontynuuj edycję"
 msgid "Keep paused"
 msgstr "Pozostaw wstrzymane"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "Zapobiega uśpieniu tego komputera podczas pracy agentów. Ekran nadal może się wyłączać."
+msgid "Keep this computer awake while agents work"
+msgstr "Zapobiegaj uśpieniu tego komputera podczas pracy agentów"
 
 msgid "Keep typing an email to invite"
 msgstr "Wpisuj dalej adres e-mail, aby zaprosić"
@@ -20066,6 +20063,9 @@ msgstr "Różnice są nadal aktualne. Nie udało się wczytać tylko komentarzy.
 
 msgid "The dispatcher appears"
 msgstr "Pojawia się dyspozytor"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Ekran nadal może się wyłączać. Przy zasilaniu z baterii poniżej 10% obowiązują standardowe ustawienia uśpienia."
 
 msgid "The endpoint must use https."
 msgstr "Punkt końcowy musi używać https."

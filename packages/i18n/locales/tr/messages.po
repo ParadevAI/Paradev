@@ -10903,9 +10903,6 @@ msgstr "{planLabel} planını koru"
 msgid "Keep {planName}"
 msgstr "{planName} planını koru"
 
-msgid "Keep awake while agents work"
-msgstr "Ajanlar çalışırken uykuya geçme"
-
 msgid "Keep current version"
 msgstr "Mevcut sürümü koru"
 
@@ -10918,8 +10915,8 @@ msgstr "Düzenlemeye devam et"
 msgid "Keep paused"
 msgstr "Duraklatılmış kalsın"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "Ajanlar çalışırken bu bilgisayarın uykuya geçmesini önler. Ekran yine de kapanabilir."
+msgid "Keep this computer awake while agents work"
+msgstr "Ajanlar çalışırken bu bilgisayarı uyanık tut"
 
 msgid "Keep typing an email to invite"
 msgstr "Davet etmek için e-postayı yazmaya devam edin"
@@ -20066,6 +20063,9 @@ msgstr "Fark hâlâ güncel. Yalnızca yorumlar yüklenemedi."
 
 msgid "The dispatcher appears"
 msgstr "Dağıtıcı ortaya çıkar"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Ekran yine de kapanabilir. Pil gücüyle çalışırken şarj %10'un altına düştüğünde normal uyku ayarları uygulanır."
 
 msgid "The endpoint must use https."
 msgstr "Uç nokta https kullanmalıdır."

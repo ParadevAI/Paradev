@@ -10903,9 +10903,6 @@ msgstr "Mantieni {planLabel}"
 msgid "Keep {planName}"
 msgstr "Mantieni {planName}"
 
-msgid "Keep awake while agents work"
-msgstr "Impedisci la sospensione mentre gli agenti lavorano"
-
 msgid "Keep current version"
 msgstr "Mantieni la versione attuale"
 
@@ -10918,8 +10915,8 @@ msgstr "Continua a modificare"
 msgid "Keep paused"
 msgstr "Lascia in pausa"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "Mantiene attivo questo computer mentre gli agenti lavorano. Lo schermo può comunque spegnersi."
+msgid "Keep this computer awake while agents work"
+msgstr "Mantieni attivo questo computer mentre gli agenti lavorano"
 
 msgid "Keep typing an email to invite"
 msgstr "Continua a digitare un’email per invitare"
@@ -20066,6 +20063,9 @@ msgstr "Il diff è comunque aggiornato. Solo i commenti non sono stati caricati.
 
 msgid "The dispatcher appears"
 msgstr "Compare il dispatcher"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Lo schermo può comunque spegnersi. Quando il computer è alimentato a batteria e la carica è inferiore al 10%, si applicano le normali impostazioni di sospensione."
 
 msgid "The endpoint must use https."
 msgstr "L'endpoint deve usare https."

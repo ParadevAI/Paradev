@@ -10903,9 +10903,6 @@ msgstr "{planLabel} を維持"
 msgid "Keep {planName}"
 msgstr "{planName} を維持"
 
-msgid "Keep awake while agents work"
-msgstr "エージェントの動作中はスリープを防ぐ"
-
 msgid "Keep current version"
 msgstr "現在のバージョンを維持"
 
@@ -10918,8 +10915,8 @@ msgstr "編集を続ける"
 msgid "Keep paused"
 msgstr "一時停止のままにする"
 
-msgid "Keep this computer awake while agents work. The display can still turn off."
-msgstr "エージェントの動作中はこのコンピューターのスリープを防ぎます。ディスプレイはオフにできます。"
+msgid "Keep this computer awake while agents work"
+msgstr "エージェントの動作中はこのコンピューターのスリープを防ぐ"
 
 msgid "Keep typing an email to invite"
 msgstr "招待するにはメールアドレスを入力し続けてください"
@@ -20066,6 +20063,9 @@ msgstr "差分は最新です。コメントの読み込みだけが失敗しま
 
 msgid "The dispatcher appears"
 msgstr "ディスパッチャーの登場"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "ディスプレイはオフにできます。バッテリー駆動中に残量が10%を下回ると、通常のスリープ設定が適用されます。"
 
 msgid "The endpoint must use https."
 msgstr "エンドポイントは https を使用する必要があります。"
