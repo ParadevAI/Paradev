@@ -3,7 +3,7 @@ import {
 	normalizeProjectFilters,
 	serializeProjectFilters,
 } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
-import { normalizeAuthorFilters } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeAuthorFilter";
+import { normalizeGithubLogins } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeGithubLogins";
 import {
 	normalizePullRequestReviewFilter,
 	type PullRequestReviewFilter,
@@ -15,6 +15,7 @@ interface PullRequestsFilterState {
 	search: string;
 	projectFilters: string[];
 	authorFilter: string | null;
+	reviewerFilter: string | null;
 	reviewFilter: PullRequestReviewFilter | null;
 	includeClosed: boolean;
 	/** Narrows further to merged-only — independent of includeClosed, which
@@ -23,6 +24,7 @@ interface PullRequestsFilterState {
 	setSearch: (search: string) => void;
 	setProjectFilters: (projectFilters: string[]) => void;
 	setAuthorFilter: (authorFilter: string | null) => void;
+	setReviewerFilter: (reviewerFilter: string | null) => void;
 	setReviewFilter: (reviewFilter: PullRequestReviewFilter | null) => void;
 	setIncludeClosed: (includeClosed: boolean) => void;
 	setMergedOnly: (mergedOnly: boolean) => void;
@@ -32,6 +34,7 @@ type PersistedPullRequestsFilterState = Pick<
 	PullRequestsFilterState,
 	| "projectFilters"
 	| "authorFilter"
+	| "reviewerFilter"
 	| "reviewFilter"
 	| "includeClosed"
 	| "mergedOnly"
@@ -50,7 +53,8 @@ export function migratePullRequestsFilterState(
 		projectFilters: normalizeProjectFilters(
 			state.projectFilters ?? (legacyProject ? [legacyProject] : []),
 		),
-		authorFilter: normalizeAuthorFilters(state.authorFilter),
+		authorFilter: normalizeGithubLogins(state.authorFilter),
+		reviewerFilter: normalizeGithubLogins(state.reviewerFilter),
 		reviewFilter: normalizePullRequestReviewFilter(state.reviewFilter),
 		includeClosed: state.includeClosed === true,
 		mergedOnly: state.mergedOnly === true,
@@ -63,6 +67,7 @@ export const usePullRequestsFilterStore = create<PullRequestsFilterState>()(
 			search: "",
 			projectFilters: [],
 			authorFilter: null,
+			reviewerFilter: null,
 			reviewFilter: null,
 			includeClosed: false,
 			mergedOnly: false,
@@ -77,7 +82,9 @@ export const usePullRequestsFilterStore = create<PullRequestsFilterState>()(
 						: { projectFilters: next };
 				}),
 			setAuthorFilter: (authorFilter) =>
-				set({ authorFilter: normalizeAuthorFilters(authorFilter) }),
+				set({ authorFilter: normalizeGithubLogins(authorFilter) }),
+			setReviewerFilter: (reviewerFilter) =>
+				set({ reviewerFilter: normalizeGithubLogins(reviewerFilter) }),
 			setReviewFilter: (reviewFilter) =>
 				set({
 					reviewFilter: normalizePullRequestReviewFilter(reviewFilter),
@@ -87,11 +94,12 @@ export const usePullRequestsFilterStore = create<PullRequestsFilterState>()(
 		}),
 		{
 			name: "pull-requests-filter-state",
-			version: 7,
+			version: 8,
 			migrate: migratePullRequestsFilterState,
 			partialize: (state) => ({
 				projectFilters: state.projectFilters,
 				authorFilter: state.authorFilter,
+				reviewerFilter: state.reviewerFilter,
 				reviewFilter: state.reviewFilter,
 				includeClosed: state.includeClosed,
 				mergedOnly: state.mergedOnly,
@@ -104,6 +112,7 @@ interface PullRequestsFilters {
 	search: string;
 	projectFilters: string[];
 	authorFilter: string | null;
+	reviewerFilter: string | null;
 	reviewFilter: PullRequestReviewFilter | null;
 	includeClosed: boolean;
 	mergedOnly: boolean;
@@ -117,6 +126,7 @@ export function pullRequestsSearchFromFilters(
 	const projects = serializeProjectFilters(filters.projectFilters);
 	if (projects) search.projects = projects;
 	if (filters.authorFilter) search.author = filters.authorFilter;
+	if (filters.reviewerFilter) search.reviewer = filters.reviewerFilter;
 	if (filters.reviewFilter) search.review = filters.reviewFilter;
 	if (filters.mergedOnly) search.state = "merged";
 	else if (filters.includeClosed) search.state = "all";

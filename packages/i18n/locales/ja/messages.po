@@ -2904,6 +2904,9 @@ msgstr "すべての宛先"
 msgid "Any review"
 msgstr "すべてのレビュー"
 
+msgid "Any reviewer"
+msgstr "すべてのレビュアー"
+
 msgid "any sender"
 msgstr "すべての送信者"
 
@@ -13187,6 +13190,9 @@ msgstr "レビュアーの割り当てなし"
 msgid "No reviewers assigned yet."
 msgstr "レビュアーはまだ割り当てられていません。"
 
+msgid "No reviewers found."
+msgstr "レビュアーが見つかりません。"
+
 msgid "No reviews"
 msgstr "レビューなし"
 
@@ -17008,6 +17014,12 @@ msgstr "がレビューしました"
 msgid "Reviewed by you"
 msgstr "自分がレビュー済み"
 
+msgid "Reviewer"
+msgstr "レビュアー"
+
+msgid "Reviewer: {label}"
+msgstr "レビュアー: {label}"
+
 msgid "Reviewers"
 msgstr "レビュアー"
 
@@ -17586,6 +17598,9 @@ msgstr "リポジトリを検索..."
 
 msgid "Search results"
 msgstr "検索結果"
+
+msgid "Search reviewers…"
+msgstr "レビュアーを検索…"
 
 msgid "Search settings..."
 msgstr "設定を検索..."

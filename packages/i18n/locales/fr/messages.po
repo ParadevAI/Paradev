@@ -2904,6 +2904,9 @@ msgstr "tout destinataire"
 msgid "Any review"
 msgstr "Toute revue"
 
+msgid "Any reviewer"
+msgstr "N'importe quel relecteur"
+
 msgid "any sender"
 msgstr "tout expéditeur"
 
@@ -13187,6 +13190,9 @@ msgstr "Aucun relecteur assigné"
 msgid "No reviewers assigned yet."
 msgstr "Aucun relecteur assigné pour l'instant."
 
+msgid "No reviewers found."
+msgstr "Aucun relecteur trouvé."
+
 msgid "No reviews"
 msgstr "Aucune revue"
 
@@ -17008,6 +17014,12 @@ msgstr "a relu"
 msgid "Reviewed by you"
 msgstr "Revues par vous"
 
+msgid "Reviewer"
+msgstr "Relecteur"
+
+msgid "Reviewer: {label}"
+msgstr "Relecteur : {label}"
+
 msgid "Reviewers"
 msgstr "Relecteurs"
 
@@ -17586,6 +17598,9 @@ msgstr "Rechercher des dépôts..."
 
 msgid "Search results"
 msgstr "Résultats de recherche"
+
+msgid "Search reviewers…"
+msgstr "Rechercher des relecteurs…"
 
 msgid "Search settings..."
 msgstr "Rechercher dans les paramètres..."

@@ -2904,6 +2904,9 @@ msgstr "любой получатель"
 msgid "Any review"
 msgstr "Любое ревью"
 
+msgid "Any reviewer"
+msgstr "Любой рецензент"
+
 msgid "any sender"
 msgstr "любой отправитель"
 
@@ -13187,6 +13190,9 @@ msgstr "Ревьюеры не назначены"
 msgid "No reviewers assigned yet."
 msgstr "Ревьюеры пока не назначены."
 
+msgid "No reviewers found."
+msgstr "Рецензенты не найдены."
+
 msgid "No reviews"
 msgstr "Без ревью"
 
@@ -17008,6 +17014,12 @@ msgstr "провёл(а) ревью"
 msgid "Reviewed by you"
 msgstr "Проверено вами"
 
+msgid "Reviewer"
+msgstr "Рецензент"
+
+msgid "Reviewer: {label}"
+msgstr "Рецензент: {label}"
+
 msgid "Reviewers"
 msgstr "Ревьюеры"
 
@@ -17586,6 +17598,9 @@ msgstr "Поиск репозиториев..."
 
 msgid "Search results"
 msgstr "Результаты поиска"
+
+msgid "Search reviewers…"
+msgstr "Поиск рецензентов…"
 
 msgid "Search settings..."
 msgstr "Поиск по настройкам..."

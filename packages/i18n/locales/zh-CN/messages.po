@@ -2904,6 +2904,9 @@ msgstr "任意收件人"
 msgid "Any review"
 msgstr "任意审查"
 
+msgid "Any reviewer"
+msgstr "任何审查者"
+
 msgid "any sender"
 msgstr "任意发件人"
 
@@ -13187,6 +13190,9 @@ msgstr "未指派审查者"
 msgid "No reviewers assigned yet."
 msgstr "还没有指派审查者。"
 
+msgid "No reviewers found."
+msgstr "未找到审查者。"
+
 msgid "No reviews"
 msgstr "没有审查"
 
@@ -17008,6 +17014,12 @@ msgstr "进行了评审"
 msgid "Reviewed by you"
 msgstr "你已审查"
 
+msgid "Reviewer"
+msgstr "审查者"
+
+msgid "Reviewer: {label}"
+msgstr "审查者：{label}"
+
 msgid "Reviewers"
 msgstr "审查者"
 
@@ -17586,6 +17598,9 @@ msgstr "搜索仓库..."
 
 msgid "Search results"
 msgstr "搜索结果"
+
+msgid "Search reviewers…"
+msgstr "搜索审查者…"
 
 msgid "Search settings..."
 msgstr "搜索设置..."
