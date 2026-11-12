@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { hasAnalyticsOptOut } from "./browser";
 import {
 	AcquisitionBridge,
 	type AcquisitionKV,
@@ -75,6 +76,7 @@ export type BridgeHttpOptions = {
 	marketingOrigin: string;
 	webOrigin: string;
 	consentKey: string;
+	posthogKey: string;
 	marketingAvailable?: () => Promise<boolean>;
 };
 export function createBridgeHttp(options: BridgeHttpOptions) {
@@ -106,7 +108,7 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 				const target = `${web}/api/acquisition/receive`;
 				if (!TOKEN.test(attempt))
 					return json({ error: "Invalid attempt" }, 400);
-				const script = `let sent=false;const form=document.forms[0];function send(ticket){if(sent)return;sent=true;form.elements.ticket.value=ticket;form.submit()}setTimeout(()=>send(''),5000);let choice='unknown';try{const v=localStorage.getItem(${literal(options.consentKey)});if(v==='accepted'||v==='declined')choice=v}catch{}fetch('/api/acquisition/issue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempt:${literal(attempt)},choice}),signal:AbortSignal.timeout(4000)}).then(r=>r.ok?r.json():null).then(r=>send(r?.ticket??'')).catch(()=>send(''));`;
+				const script = `let sent=false;const form=document.forms[0];function send(ticket){if(sent)return;sent=true;form.elements.ticket.value=ticket;form.submit()}setTimeout(()=>send(''),5000);const optedOut=(${hasAnalyticsOptOut.toString()})(${literal(options.consentKey)},${literal(options.posthogKey)});fetch('/api/acquisition/issue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempt:${literal(attempt)},optedOut}),signal:AbortSignal.timeout(4000)}).then(r=>r.ok?r.json():null).then(r=>send(r?.ticket??'')).catch(()=>send(''));`;
 				return scriptPage(script, target);
 			}
 			if (request.method !== "POST" || !hasExactOrigin(request, marketing))
@@ -119,32 +121,22 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 					unknown
 				>;
 				const credential = readBridgeCookie(request, "lineage");
+				const optedOut = input.optedOut !== false;
 				if (action === "lineage") {
-					const choice =
-						input.choice === "accepted"
-							? "accepted"
-							: input.choice === "declined"
-								? "declined"
-								: "unknown";
-					const result =
-						choice === "unknown"
-							? await bridge.revokeLineage(credential)
-							: await bridge.updateLineage(credential, choice, input.touch);
+					const result = optedOut
+						? await bridge.revokeLineage(credential)
+						: await bridge.updateLineage(credential, "enabled", input.touch);
 					return json(
-						{
-							anonymousId:
-								choice === "accepted" ? (result?.anonymousId ?? null) : null,
-						},
+						{ anonymousId: optedOut ? null : (result?.anonymousId ?? null) },
 						200,
 						result?.setCookie,
 					);
 				}
 				if (action === "issue") {
-					if (input.choice !== "accepted")
-						await bridge.revokeLineage(credential);
+					if (optedOut) await bridge.revokeLineage(credential);
 					const result = await bridge.issue(
 						input.attempt,
-						input.choice === "accepted" ? credential : null,
+						optedOut ? null : credential,
 					);
 					return result
 						? json(result)
@@ -224,8 +216,8 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 				];
 				try {
 					const result = await bridge.receive(ticket, attempt);
-					if (result.choice !== "invalid") returnTo = result.returnTo;
-					if (result.choice === "invalid" && attempt) {
+					if (result.state !== "invalid") returnTo = result.returnTo;
+					if (result.state === "invalid" && attempt) {
 						const record = await options.kv.getdel<{
 							returnTo: string;
 							expiresAt: number;
@@ -233,7 +225,7 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 						if (record && record.expiresAt > Date.now())
 							returnTo = validateReturnTo(record.returnTo) ?? returnTo;
 					}
-					if (result.choice !== "invalid") cookies.push(...result.setCookies);
+					if (result.state !== "invalid") cookies.push(...result.setCookies);
 				} catch {}
 				const target = new URL(returnTo, web);
 				target.searchParams.set("_acq", "1");

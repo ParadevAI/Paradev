@@ -3,13 +3,13 @@ import {
 	type AcquisitionTouch,
 	CAMPAIGN_KEYS,
 	CLICK_KEYS,
-	type ConsentChoice,
 	isNonDirectTouch,
 	sanitizeTouchSnapshot,
 	type TouchOptions,
+	type TrackingState,
 } from "./touch";
 
-export type { AcquisitionTouch, ConsentChoice, TouchSnapshot } from "./touch";
+export type { AcquisitionTouch, TouchSnapshot, TrackingState } from "./touch";
 
 export const BRIDGE_TTL = {
 	lineage: 90 * 24 * 60 * 60,
@@ -40,10 +40,10 @@ export interface AcquisitionKV {
 
 type Lineage = {
 	id: string;
-	choice: "accepted" | "declined";
+	state: "enabled" | "disabled";
 	first: AcquisitionTouch | null;
 	latestNonDirect: AcquisitionTouch | null;
-	consentVersion: number;
+	generation: number;
 	revision: number;
 	expiresAt: number;
 	eventUuid: string;
@@ -51,11 +51,11 @@ type Lineage = {
 };
 type Attempt = { returnTo: string; expiresAt: number };
 type Grant =
-	| { choice: "accepted"; credential: string; consentVersion: number }
-	| { choice: "declined" | "unknown" };
+	| { state: "enabled"; credential: string; generation: number }
+	| { state: "disabled" | "unavailable" };
 type Ticket = { attempt: string; grant: Grant; expiresAt: number };
 type Pending = {
-	grant: Extract<Grant, { choice: "accepted" }>;
+	grant: Extract<Grant, { state: "enabled" }>;
 	expiresAt: number;
 };
 export type LineageResult = {
@@ -64,7 +64,7 @@ export type LineageResult = {
 	setCookie: string;
 };
 export type ReceiveResult = {
-	choice: "accepted" | "declined" | "unknown" | "invalid";
+	state: "enabled" | "disabled" | "unavailable" | "invalid";
 	returnTo: string;
 	pendingToken: string | null;
 	setCookies: string[];
@@ -218,14 +218,14 @@ export class AcquisitionBridge {
 	}
 
 	async mintLineage(
-		choice: ConsentChoice,
+		state: TrackingState,
 		snapshot?: unknown,
 	): Promise<LineageResult | null> {
-		if (choice !== "accepted" && choice !== "declined") return null;
+		if (state !== "enabled" && state !== "disabled") return null;
 		const credential = token();
 		const now = this.now();
 		const clean =
-			choice === "accepted"
+			state === "enabled"
 				? sanitizeTouchSnapshot(snapshot, this.options)
 				: null;
 		const touch = clean
@@ -233,10 +233,10 @@ export class AcquisitionBridge {
 			: null;
 		const record: Lineage = {
 			id: `acq_${randomBytes(16).toString("hex")}`,
-			choice,
+			state,
 			first: touch,
 			latestNonDirect: touch && isNonDirectTouch(touch) ? touch : null,
-			consentVersion: 1,
+			generation: 1,
 			revision: 1,
 			expiresAt: now + BRIDGE_TTL.lineage * 1000,
 			eventUuid: randomUUID(),
@@ -246,23 +246,23 @@ export class AcquisitionBridge {
 		});
 		return {
 			credential,
-			anonymousId: choice === "accepted" ? record.id : null,
+			anonymousId: state === "enabled" ? record.id : null,
 			setCookie: bridgeCookie("lineage", credential, BRIDGE_TTL.lineage),
 		};
 	}
 
 	async updateLineage(
 		credential: unknown,
-		choice: ConsentChoice,
+		state: TrackingState,
 		snapshot?: unknown,
 	): Promise<LineageResult | null> {
-		if (choice !== "accepted" && choice !== "declined") return null;
+		if (state !== "enabled" && state !== "disabled") return null;
 		for (let retry = 0; retry < 4; retry++) {
 			const old = await this.lineage(credential);
-			if (!old) return this.mintLineage(choice, snapshot);
+			if (!old) return this.mintLineage(state, snapshot);
 			const now = this.now();
 			const clean =
-				choice === "accepted"
+				state === "enabled"
 					? sanitizeTouchSnapshot(snapshot, this.options)
 					: null;
 			const touch = clean
@@ -270,21 +270,21 @@ export class AcquisitionBridge {
 				: null;
 			const next: Lineage = {
 				...old,
-				choice,
-				...(old.choice === "declined" && choice === "accepted"
+				state,
+				...(old.state === "disabled" && state === "enabled"
 					? { id: `acq_${randomBytes(16).toString("hex")}`, ownerId: undefined }
 					: {}),
-				first: choice === "accepted" ? (old.first ?? touch) : null,
+				first: state === "enabled" ? (old.first ?? touch) : null,
 				latestNonDirect:
-					choice === "accepted"
+					state === "enabled"
 						? touch && isNonDirectTouch(touch)
 							? touch
 							: old.latestNonDirect
 						: null,
-				consentVersion: old.consentVersion + (old.choice !== choice ? 1 : 0),
+				generation: old.generation + (old.state !== state ? 1 : 0),
 				revision: old.revision + 1,
 				eventUuid:
-					old.choice !== choice ||
+					old.state !== state ||
 					(touch && (!old.first || isNonDirectTouch(touch)))
 						? randomUUID()
 						: old.eventUuid,
@@ -299,7 +299,7 @@ export class AcquisitionBridge {
 			) {
 				return {
 					credential: credential as string,
-					anonymousId: choice === "accepted" ? next.id : null,
+					anonymousId: state === "enabled" ? next.id : null,
 					setCookie: bridgeCookie(
 						"lineage",
 						credential as string,
@@ -313,7 +313,7 @@ export class AcquisitionBridge {
 
 	async revokeLineage(credential: unknown): Promise<LineageResult | null> {
 		if (!(await this.lineage(credential))) return null;
-		return this.updateLineage(credential, "declined");
+		return this.updateLineage(credential, "disabled");
 	}
 
 	async begin(
@@ -345,13 +345,13 @@ export class AcquisitionBridge {
 		if (!this.alive(record)) return null;
 		const lineage = await this.lineage(marketingCredential);
 		const grant: Grant =
-			lineage?.choice === "accepted"
+			lineage?.state === "enabled"
 				? {
-						choice: "accepted",
+						state: "enabled",
 						credential: marketingCredential as string,
-						consentVersion: lineage.consentVersion,
+						generation: lineage.generation,
 					}
-				: { choice: lineage?.choice === "declined" ? "declined" : "unknown" };
+				: { state: lineage?.state === "disabled" ? "disabled" : "unavailable" };
 		const ticket = token();
 		await this.kv.set(
 			key("ticket", ticket),
@@ -370,7 +370,7 @@ export class AcquisitionBridge {
 		attemptCookie: unknown,
 	): Promise<ReceiveResult> {
 		const invalid: ReceiveResult = {
-			choice: "invalid",
+			state: "invalid",
 			returnTo: "/sign-in",
 			pendingToken: null,
 			setCookies: [bridgeCookie("pending", "", 0)],
@@ -399,7 +399,7 @@ export class AcquisitionBridge {
 		)
 			return invalid;
 		const result: ReceiveResult = {
-			choice: received.grant.choice,
+			state: received.grant.state,
 			returnTo: attempt.returnTo,
 			pendingToken: null,
 			setCookies: [
@@ -407,7 +407,7 @@ export class AcquisitionBridge {
 				bridgeCookie("pending", "", 0),
 			],
 		};
-		if (received.grant.choice === "accepted") {
+		if (received.grant.state === "enabled") {
 			const pending = token();
 			await this.kv.set(
 				key("pending", pending),
@@ -439,21 +439,21 @@ export class AcquisitionBridge {
 		)
 			return null;
 		const pending = await this.kv.getdel<Pending>(key("pending", pendingToken));
-		if (!this.alive(pending) || !pending || pending.grant.choice !== "accepted")
+		if (!this.alive(pending) || !pending || pending.grant.state !== "enabled")
 			return null;
 		const lineage = await this.lineage(pending.grant.credential);
 		if (
 			!lineage ||
-			lineage.choice !== "accepted" ||
-			lineage.consentVersion !== pending.grant.consentVersion
+			lineage.state !== "enabled" ||
+			lineage.generation !== pending.grant.generation
 		)
 			return null;
 		for (let retry = 0; retry < 4; retry++) {
 			const current = await this.lineage(pending.grant.credential);
 			if (
 				!current ||
-				current.choice !== "accepted" ||
-				current.consentVersion !== pending.grant.consentVersion ||
+				current.state !== "enabled" ||
+				current.generation !== pending.grant.generation ||
 				(current.ownerId && current.ownerId !== trustedUserId)
 			)
 				return null;

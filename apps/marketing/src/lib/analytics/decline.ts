@@ -1,4 +1,5 @@
 import type { PostHog } from "posthog-js";
+import { syncAcquisition } from "./acquisition-client";
 
 /**
  * Marketing and app cookies are isolated across registrable domains.
@@ -14,4 +15,5 @@ export function declineAnalytics(
 		posthog.reset(true);
 	}
 	posthog.opt_out_capturing();
+	void syncAcquisition(true);
 }

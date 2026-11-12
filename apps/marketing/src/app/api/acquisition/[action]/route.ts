@@ -14,6 +14,7 @@ async function handle(
 		webOrigin: env.NEXT_PUBLIC_WEB_URL,
 		marketingOrigin: new URL(request.url).origin,
 		consentKey: ANALYTICS_CONSENT_KEY,
+		posthogKey: env.NEXT_PUBLIC_POSTHOG_KEY,
 	});
 	return http.marketing(request, (await params).action);
 }

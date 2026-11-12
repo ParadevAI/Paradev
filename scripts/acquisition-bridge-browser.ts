@@ -15,9 +15,11 @@ class FixtureStore implements AcquisitionKV {
 			: null;
 	}
 	async getdel<T>(key: string): Promise<T | null> {
-		const value = await this.get<T>(key);
+		const record = this.records.get(key);
 		this.records.delete(key);
-		return value;
+		return record && record.expires > Date.now()
+			? (structuredClone(record.value) as T)
+			: null;
 	}
 	async set(key: string, value: unknown, options: { ex?: number } = {}) {
 		this.records.set(key, {
@@ -43,14 +45,23 @@ const http = createBridgeHttp({
 	marketingOrigin: marketing,
 	webOrigin: web,
 	consentKey: "superset-analytics-consent",
+	posthogKey: "phc_fixture",
 });
 const events: IdentifyEvent[] = [];
 const built = await Bun.build({
-	entrypoints: ["apps/marketing/src/lib/analytics/acquisition-client.ts"],
+	entrypoints: [
+		"apps/marketing/src/lib/analytics/acquisition-client.ts",
+		"apps/marketing/src/lib/analytics/decline.ts",
+	],
 	target: "browser",
 });
 if (!built.success) throw new Error(String(built.logs));
-const script = await built.outputs[0]?.text();
+const script = await built.outputs
+	.find((output) => output.path.endsWith("acquisition-client.js"))
+	?.text();
+const declineScript = await built.outputs
+	.find((output) => output.path.endsWith("decline.js"))
+	?.text();
 const page = (html: string) =>
 	new Response(html, {
 		headers: { "Content-Type": "text/html", "Cache-Control": "no-store" },
@@ -62,6 +73,10 @@ Bun.serve({
 		const url = new URL(request.url);
 		if (url.pathname.startsWith("/api/acquisition/"))
 			return http.marketing(request, url.pathname.split("/").pop() ?? "");
+		if (url.pathname === "/decline.js")
+			return new Response(declineScript, {
+				headers: { "Content-Type": "application/javascript" },
+			});
 		if (url.pathname === "/client.js")
 			return new Response(script, {
 				headers: { "Content-Type": "application/javascript" },
@@ -80,7 +95,7 @@ Bun.serve({
 				errorsWhileComputingFlags: false,
 			});
 		return page(
-			`<html><body><script src="/sdk.js"></script><script type="module">const choice=new URL(location.href).searchParams.get('choice');if(choice)localStorage.setItem('superset-analytics-consent',choice);const client=await import('/client.js');const id=await client.syncAcquisition();posthog.init('phc_fixture',{api_host:location.origin+'/ingest',persistence:'cookie',person_profiles:'always',capture_pageview:false,capture_pageleave:false,autocapture:false,disable_session_recording:true,advanced_disable_feature_flags:true,...(id?{bootstrap:{distinctID:id,isIdentifiedID:false}}:{})});posthog.capture('fixture_marketing_touch');window.fixture={id:posthog.get_distinct_id(),state:posthog.get_property('$user_state'),choice:client.acquisitionConsent()};document.body.dataset.ready='yes';</script><a id="signup" href="${web}/sign-up">Fixture signup</a><a id="desktop" href="${web}/auth/desktop/success?desktop_state=fixture-state&desktop_protocol=superset&desktop_local_callback=http%3A%2F%2F127.0.0.1%3A4567%2Fauth%2Fcallback">Fixture desktop continuation</a></body></html>`,
+			`<html><body><script src="/sdk.js"></script><script type="module">const choice=new URL(location.href).searchParams.get('choice');if(choice)localStorage.setItem('superset-analytics-consent',choice);const client=await import('/client.js');const id=await client.syncAcquisition(client.acquisitionOptedOut('phc_fixture'));posthog.init('phc_fixture',{api_host:location.origin+'/ingest',persistence:'cookie',person_profiles:'always',capture_pageview:false,capture_pageleave:false,autocapture:false,disable_session_recording:true,advanced_disable_feature_flags:true,...(id?{bootstrap:{distinctID:id,isIdentifiedID:false}}:{})});if(client.acquisitionOptedOut('phc_fixture'))posthog.opt_out_capturing();posthog.capture('fixture_marketing_touch');window.client=client;window.decline=(await import('/decline.js')).declineAnalytics;window.fixture={id:posthog.get_distinct_id(),state:posthog.get_property('$user_state'),optedOut:client.acquisitionOptedOut('phc_fixture')};document.body.dataset.ready='yes';</script><a id="signup" href="${web}/sign-up">Fixture signup</a><a id="desktop" href="${web}/auth/desktop/success?desktop_state=fixture-state&desktop_protocol=superset&desktop_local_callback=http%3A%2F%2F127.0.0.1%3A4567%2Fauth%2Fcallback">Fixture desktop continuation</a></body></html>`,
 		);
 	},
 });

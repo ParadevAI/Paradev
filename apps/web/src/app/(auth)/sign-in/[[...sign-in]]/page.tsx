@@ -14,6 +14,10 @@ import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { env } from "@/env";
+import {
+	clearGithubAuthReturn,
+	markGithubAuthReturn,
+} from "@/lib/github-auth-return";
 import { resolveCallbackUrl } from "../../utils/resolveCallbackUrl";
 
 const LAST_USED_METHOD_KEY = "superset-last-auth-method";
@@ -105,12 +109,14 @@ export default function SignInPage() {
 		rememberLastUsedMethod("github");
 
 		try {
+			markGithubAuthReturn();
 			const { error } = await authClient.signIn.social({
 				provider: "github",
 				callbackURL,
 			});
 			if (error) throw error;
 		} catch (err) {
+			clearGithubAuthReturn();
 			console.error("Sign in failed:", err);
 			setError(
 				t({

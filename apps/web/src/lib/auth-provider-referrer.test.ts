@@ -24,8 +24,6 @@ describe("isAuthProviderHost", () => {
 		"accounts.google.co.jp",
 		"https://accounts.google.ca/",
 		"accounts.youtube.com",
-		"github.com",
-		"https://github.com/",
 		"appleid.apple.com",
 	])("%s is an auth provider", (value) => {
 		expect(isAuthProviderHost(value)).toBe(true);
@@ -37,6 +35,8 @@ describe("isAuthProviderHost", () => {
 		"https://superset.sh/",
 		"superset.sh",
 		"docs.github.com",
+		"github.com",
+		"https://github.com/",
 		"news.ycombinator.com",
 		undefined,
 		null,
@@ -89,6 +89,7 @@ describe("stripAuthProviderReferrer", () => {
 				},
 				{ ...setOnce },
 			),
+			true,
 		);
 		expect(result?.$set_once).toEqual(setOnce);
 		expect(result?.properties.$referring_domain).toBe("$direct");
@@ -139,6 +140,27 @@ describe("stripAuthProviderReferrer", () => {
 		expect(result?.$set_once).toBeUndefined();
 	});
 
+	test("genuine GitHub web arrival stays attributed unless the browser initiated GitHub OAuth", () => {
+		const props = {
+			$referrer: "https://github.com/ParadevAI/Paradev",
+			$referring_domain: "github.com",
+			$current_url: "https://app.superset.sh/",
+		};
+		expect(
+			stripAuthProviderReferrer(event({ ...props }))?.properties
+				.$referring_domain,
+		).toBe("github.com");
+		const setOnce = {
+			$initial_referrer: "https://github.com/",
+			$initial_referring_domain: "github.com",
+		};
+		const result = stripAuthProviderReferrer(
+			event({ ...props }, setOnce),
+			true,
+		);
+		expect(result?.properties.$referring_domain).toBe("$direct");
+		expect(result?.$set_once?.$initial_referring_domain).toBe("$direct");
+	});
 	test("passes a dropped event through", () => {
 		expect(stripAuthProviderReferrer(null)).toBeNull();
 	});

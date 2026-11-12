@@ -2,7 +2,7 @@ import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 
 import { env } from "@/env";
 import {
-	acquisitionConsent,
+	acquisitionOptedOut,
 	syncAcquisition,
 } from "@/lib/analytics/acquisition-client";
 import { declineAnalytics } from "@/lib/analytics/decline";
@@ -23,11 +23,11 @@ let started = false;
 async function initPosthog() {
 	const [{ default: posthog }, anonymousId] = await Promise.all([
 		import("posthog-js"),
-		syncAcquisition(),
+		syncAcquisition(acquisitionOptedOut(env.NEXT_PUBLIC_POSTHOG_KEY)),
 	]);
 
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
-		...(anonymousId && acquisitionConsent() === "accepted"
+		...(anonymousId && !acquisitionOptedOut(env.NEXT_PUBLIC_POSTHOG_KEY)
 			? { bootstrap: { distinctID: anonymousId, isIdentifiedID: false } }
 			: {}),
 		api_host: "/ingest",

@@ -5,7 +5,6 @@ const DIRECT = "$direct";
 const AUTH_PROVIDER_HOSTS = [
 	/^accounts\.google\.[a-z.]+$/,
 	/^accounts\.youtube\.com$/,
-	/^(www\.)?github\.com$/,
 	/^appleid\.apple\.com$/,
 ];
 
@@ -44,12 +43,17 @@ function urlHost(value: unknown): string | null {
 function replaceAuthProviderReferrer(
 	props: Record<string, unknown> | undefined,
 	keys: ReadonlyArray<readonly [string, string]>,
+	githubAuthReturn: boolean,
 ): void {
 	if (!props) return;
 	for (const [referrerKey, domainKey] of keys) {
 		if (
 			isAuthProviderHost(props[domainKey]) ||
-			isAuthProviderHost(props[referrerKey])
+			isAuthProviderHost(props[referrerKey]) ||
+			(githubAuthReturn &&
+				[props[domainKey], props[referrerKey]].some((value) =>
+					/^(www\.)?github\.com$/.test(hostOf(value) ?? ""),
+				))
 		) {
 			props[referrerKey] = DIRECT;
 			props[domainKey] = DIRECT;
@@ -58,16 +62,28 @@ function replaceAuthProviderReferrer(
 }
 
 /**
- * The web app is where OAuth providers send people back, so a provider host
- * as referrer is the sign-in round trip, not where the visitor came from.
- * PostHog derives the person's first-touch properties from these fields.
- * The acquisition bridge records marketing first touch separately.
+ * GitHub hosts acquisition links as well as OAuth. Strip it only on a known
+ * auth return; a provider hostname alone cannot distinguish those journeys.
+ * The acquisition transport never collects referrers from the auth roundtrip.
  */
 export function stripAuthProviderReferrer(
 	event: CaptureResult | null,
+	githubAuthReturn = false,
 ): CaptureResult | null {
 	if (!event) return event;
 	const currentHost = urlHost(event.properties?.$current_url);
+	const isGithubReturn =
+		githubAuthReturn ||
+		(() => {
+			try {
+				return (
+					new URL(String(event.properties?.$current_url)).pathname ===
+					"/auth/desktop/success"
+				);
+			} catch {
+				return false;
+			}
+		})();
 	const firstTouchHost = urlHost(
 		event.$set_once?.$initial_current_url ??
 			event.properties?.$initial_current_url,
@@ -75,8 +91,9 @@ export function stripAuthProviderReferrer(
 	const firstTouchIsHere =
 		firstTouchHost === null || firstTouchHost === currentHost;
 	for (const props of [event.properties, event.$set_once]) {
-		replaceAuthProviderReferrer(props, CURRENT_REFERRER_KEYS);
-		if (firstTouchIsHere) replaceAuthProviderReferrer(props, FIRST_TOUCH_KEYS);
+		replaceAuthProviderReferrer(props, CURRENT_REFERRER_KEYS, isGithubReturn);
+		if (firstTouchIsHere)
+			replaceAuthProviderReferrer(props, FIRST_TOUCH_KEYS, isGithubReturn);
 	}
 	return event;
 }

@@ -5,10 +5,7 @@ import { Button } from "@superset/ui/button";
 import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-	acceptAcquisition,
-	syncAcquisition,
-} from "@/lib/analytics/acquisition-client";
+import { syncPosthogAcquisition } from "@/lib/analytics/acquisition-client";
 import { declineAnalytics } from "@/lib/analytics/decline";
 import { withPosthog } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
@@ -34,7 +31,8 @@ export function CookieConsent() {
 		}
 		setShowBanner(false);
 		withPosthog((posthog) => {
-			void acceptAcquisition(posthog);
+			posthog.opt_in_capturing();
+			void syncPosthogAcquisition(posthog);
 		});
 	};
 
@@ -42,7 +40,6 @@ export function CookieConsent() {
 		try {
 			localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
 		} catch {}
-		void syncAcquisition("declined");
 		withPosthog(declineAnalytics);
 		setShowBanner(false);
 	};

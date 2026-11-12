@@ -13,7 +13,7 @@ class Store implements AcquisitionKV {
 		return structuredClone(this.data.get(key) ?? null) as T | null;
 	}
 	async getdel<T>(key: string) {
-		const value = await this.get<T>(key);
+		const value = structuredClone(this.data.get(key) ?? null) as T | null;
 		this.data.delete(key);
 		return value;
 	}
@@ -80,6 +80,7 @@ test("an unavailable marketing release bypasses the roundtrip without changing a
 		marketingOrigin: "https://paradev.com",
 		webOrigin: "https://app.superset.sh",
 		consentKey: "test-consent",
+		posthogKey: "phc_fixture",
 		marketingAvailable: async () => false,
 	});
 	const response = await http.web(
@@ -107,6 +108,7 @@ function setup() {
 		marketingOrigin: marketing,
 		webOrigin: web,
 		consentKey: "test-consent",
+		posthogKey: "phc_fixture",
 	});
 	function post(origin: string, action: string, input: unknown, cookie = "") {
 		return new Request(`${origin}/api/acquisition/${action}`, {
@@ -119,10 +121,10 @@ function setup() {
 			body: JSON.stringify(input),
 		});
 	}
-	async function journey(returnTo = "/sign-up", choice = "accepted") {
+	async function journey(returnTo = "/sign-up", optedOut: unknown = false) {
 		const lineage = await http.marketing(
 			post(marketing, "lineage", {
-				choice,
+				optedOut,
 				touch: {
 					landing_pathname: "/conductor",
 					utm_source: "google",
@@ -145,7 +147,7 @@ function setup() {
 		).searchParams.get("attempt");
 		const attemptCookie = cookiePair(begin, "__Host-acq_attempt");
 		const issue = await http.marketing(
-			post(marketing, "issue", { attempt, choice }, marketingCookie),
+			post(marketing, "issue", { attempt, optedOut }, marketingCookie),
 			"issue",
 		);
 		const { ticket } = await issue.json();
@@ -227,10 +229,10 @@ for (const returnTo of [
 		expect(events).toHaveLength(1);
 	});
 }
-test("HTTP consent unknown/declined and revocation after ticket mint never identify", async () => {
-	for (const choice of ["unknown", "declined"]) {
+test("HTTP explicit opt-out, unreadable state and revocation suppress custom capture", async () => {
+	for (const optedOut of [true, null]) {
 		const { http, post, journey } = setup();
-		const result = await journey("/sign-up", choice);
+		const result = await journey("/sign-up", optedOut);
 		const events: unknown[] = [];
 		await http.bind(
 			post(web, "bind", {}, result.pendingCookie),
@@ -244,7 +246,7 @@ test("HTTP consent unknown/declined and revocation after ticket mint never ident
 	const { http, post, journey } = setup();
 	const result = await journey();
 	await http.marketing(
-		post(marketing, "lineage", { choice: "declined" }, result.marketingCookie),
+		post(marketing, "lineage", { optedOut: true }, result.marketingCookie),
 		"lineage",
 	);
 	const events: unknown[] = [];
@@ -257,6 +259,81 @@ test("HTTP consent unknown/declined and revocation after ticket mint never ident
 	);
 	expect(events).toHaveLength(0);
 });
+for (const priorSource of [false, true]) {
+	test(`GitHub OAuth transport cannot invent/replace acquisition; prior source=${priorSource}`, async () => {
+		const { http, post } = setup();
+		const lineage = priorSource
+			? await http.marketing(
+					post(marketing, "lineage", {
+						optedOut: false,
+						touch: { landing_pathname: "/", referrer_host: "github.com" },
+					}),
+					"lineage",
+				)
+			: null;
+		const marketingCookie = lineage
+			? cookiePair(lineage, "__Host-acq_lineage")
+			: "";
+		const begin = await http.web(
+			new Request(
+				`${web}/api/acquisition/begin?returnTo=%2Fauth%2Fdesktop%2Fsuccess`,
+			),
+			"begin",
+		);
+		const attempt = new URL(
+			required(begin.headers.get("Location")),
+		).searchParams.get("attempt");
+		const issueRequest = post(
+			marketing,
+			"issue",
+			{
+				attempt,
+				optedOut: false,
+				touch: { landing_pathname: "/", referrer_host: "github.com" },
+			},
+			marketingCookie,
+		);
+		issueRequest.headers.set(
+			"Referer",
+			"https://github.com/login/oauth/authorize",
+		);
+		const issued = await http.marketing(issueRequest, "issue");
+		const { ticket } = await issued.json();
+		const receive = await http.web(
+			new Request(`${web}/api/acquisition/receive`, {
+				method: "POST",
+				headers: { Origin: marketing },
+				body: new URLSearchParams({ ticket }),
+			}),
+			"receive",
+		);
+		const final = await http.web(
+			new Request(`${web}/api/acquisition/finalize`, {
+				headers: {
+					Cookie: `${cookiePair(begin, "__Host-acq_attempt")}; ${cookiePair(receive, "__Host-acq_staged")}`,
+				},
+			}),
+			"finalize",
+		);
+		const events: IdentifyEvent[] = [];
+		await http.bind(
+			post(web, "bind", {}, cookiePair(final, "__Host-acq_pending")),
+			"user",
+			async (e) => {
+				events.push(e);
+			},
+		);
+		expect(events).toHaveLength(priorSource ? 1 : 0);
+		if (priorSource) {
+			expect(
+				events[0]?.properties.$set_once.acquisition_first_referrer_host,
+			).toBe("github.com");
+			expect(
+				events[0]?.properties.$set.acquisition_latest_non_direct_referrer_host,
+			).toBe("github.com");
+		}
+	});
+}
 test("foreign origins cannot mint, stage, or bind and oversized input is rejected", async () => {
 	const { http } = setup();
 	for (const [origin, action] of [
@@ -288,7 +365,7 @@ test("foreign-browser staging cannot import another browser's lineage", async ()
 	const { kv, http } = setup();
 	const bridge = new AcquisitionBridge(kv);
 	const lineage = required(
-		await bridge.mintLineage("accepted", {
+		await bridge.mintLineage("enabled", {
 			landing_pathname: "/",
 		}),
 	);

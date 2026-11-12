@@ -1,22 +1,25 @@
-import {
-	type ConsentChoice,
-	collectTouchSnapshot,
-	type TouchOptions,
-} from "./touch";
-
 export * from "./touch";
 
-export function collectBrowserTouch(
-	choice: ConsentChoice,
-	options: TouchOptions = {},
-) {
-	if (choice !== "accepted") return null;
+// The transport has no SDK. These are the pinned SDK's default opt-out stores/key.
+export function hasAnalyticsOptOut(
+	consentKey: string,
+	posthogKey: string,
+): boolean {
 	try {
-		return collectTouchSnapshot(
-			{ href: window.location.href, referrer: document.referrer },
-			options,
+		if (localStorage.getItem(consentKey) === "declined") return true;
+		const key = `__ph_opt_in_out_${posthogKey}`;
+		const local = localStorage.getItem(key);
+		const cookie = document.cookie
+			.split(";")
+			.map((p) => p.trim())
+			.find((p) => p.startsWith(`${key}=`))
+			?.slice(key.length + 1);
+		const value = local ?? (cookie ? decodeURIComponent(cookie) : null);
+		return (
+			value !== null &&
+			["0", "false", "no", "off"].includes(value.toLowerCase())
 		);
 	} catch {
-		return null;
+		return true;
 	}
 }

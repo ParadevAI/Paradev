@@ -61,7 +61,7 @@ try {
 		"fixture-only",
 	);
 	const bridge = new AcquisitionBridge(kv);
-	const lineage = await bridge.mintLineage("accepted", {
+	const lineage = await bridge.mintLineage("enabled", {
 		landing_pathname: "/conductor",
 		utm_source: "google",
 	});
@@ -75,11 +75,11 @@ try {
 		return bridge.receive(issued.ticket, begin.attempt);
 	}
 	await Promise.all([
-		bridge.updateLineage(lineage.credential, "accepted", {
+		bridge.updateLineage(lineage.credential, "enabled", {
 			landing_pathname: "/pricing",
 			utm_source: "twitter",
 		}),
-		bridge.updateLineage(lineage.credential, "accepted", {
+		bridge.updateLineage(lineage.credential, "enabled", {
 			landing_pathname: "/direct",
 		}),
 	]);
@@ -104,7 +104,7 @@ try {
 	const grant = await pending();
 	await bridge.revokeLineage(lineage.credential);
 	assert.equal(await bridge.bind(grant.pendingToken, event.distinctId), null);
-	const renewed = await bridge.updateLineage(lineage.credential, "accepted", {
+	const renewed = await bridge.updateLineage(lineage.credential, "enabled", {
 		landing_pathname: "/new",
 	});
 	assert(renewed);

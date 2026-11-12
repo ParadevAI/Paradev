@@ -1,6 +1,6 @@
 import {
-	type ConsentChoice,
 	collectTouchSnapshot,
+	hasAnalyticsOptOut,
 } from "@superset/shared/acquisition-bridge/browser";
 import type { PostHog } from "posthog-js";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
@@ -13,17 +13,10 @@ const landingTouch =
 				referrer: document.referrer,
 			});
 let pending: Promise<string | null> | null = null;
-export function acquisitionConsent(): ConsentChoice {
-	try {
-		const value = localStorage.getItem(ANALYTICS_CONSENT_KEY);
-		return value === "accepted" || value === "declined" ? value : "unknown";
-	} catch {
-		return "unknown";
-	}
+export function acquisitionOptedOut(posthogKey: string): boolean {
+	return hasAnalyticsOptOut(ANALYTICS_CONSENT_KEY, posthogKey);
 }
-export function syncAcquisition(
-	choice = acquisitionConsent(),
-): Promise<string | null> {
+export function syncAcquisition(optedOut: boolean): Promise<string | null> {
 	pending = (pending ?? Promise.resolve(null))
 		.catch(() => null)
 		.then(async () => {
@@ -32,8 +25,8 @@ export function syncAcquisition(
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						choice,
-						...(choice === "accepted" ? { touch: landingTouch } : {}),
+						optedOut,
+						...(!optedOut ? { touch: landingTouch } : {}),
 					}),
 					keepalive: true,
 					signal: AbortSignal.timeout(2500),
@@ -41,7 +34,7 @@ export function syncAcquisition(
 				const value = response.ok
 					? ((await response.json()) as { anonymousId?: unknown }).anonymousId
 					: null;
-				return choice === "accepted" &&
+				return !optedOut &&
 					typeof value === "string" &&
 					/^acq_[a-f0-9]{32}$/.test(value)
 					? value
@@ -52,11 +45,13 @@ export function syncAcquisition(
 		});
 	return pending;
 }
-export async function acceptAcquisition(posthog: PostHog): Promise<void> {
-	const anonymousId = await syncAcquisition("accepted");
-	if (acquisitionConsent() === "accepted") posthog.opt_in_capturing();
+export async function syncPosthogAcquisition(posthog: PostHog): Promise<void> {
+	const optedOut = () =>
+		posthog.has_opted_out_capturing() ||
+		acquisitionOptedOut(posthog.config.token);
+	const anonymousId = await syncAcquisition(optedOut());
 	if (
-		acquisitionConsent() !== "accepted" ||
+		optedOut() ||
 		!anonymousId ||
 		posthog.get_property("$user_state") === "identified"
 	)
@@ -70,6 +65,4 @@ export async function acceptAcquisition(posthog: PostHog): Promise<void> {
 			domain: window.location.hostname,
 		});
 	}
-	posthog.opt_in_capturing();
-	posthog.capture("$pageview");
 }

@@ -9,6 +9,10 @@ import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { env } from "@/env";
+import {
+	clearGithubAuthReturn,
+	markGithubAuthReturn,
+} from "@/lib/github-auth-return";
 import { resolveCallbackUrl } from "../../utils/resolveCallbackUrl";
 
 export default function SignUpPage() {
@@ -50,12 +54,14 @@ export default function SignUpPage() {
 		setError(null);
 
 		try {
+			markGithubAuthReturn();
 			const { error } = await authClient.signIn.social({
 				provider: "github",
 				callbackURL,
 			});
 			if (error) throw error;
 		} catch (err) {
+			clearGithubAuthReturn();
 			console.error("Sign up failed:", err);
 			setError(
 				t({

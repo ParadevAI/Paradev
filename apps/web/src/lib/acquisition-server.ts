@@ -9,6 +9,7 @@ export const acquisitionHttp = createBridgeHttp({
 	marketingOrigin: env.NEXT_PUBLIC_MARKETING_URL,
 	webOrigin: env.NEXT_PUBLIC_WEB_URL,
 	consentKey: "superset-analytics-consent",
+	posthogKey: env.NEXT_PUBLIC_POSTHOG_KEY,
 	marketingAvailable: async () => {
 		try {
 			return (

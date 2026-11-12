@@ -23,7 +23,7 @@ export type TouchSnapshot = Partial<
 	referrer_host?: string;
 };
 export type AcquisitionTouch = TouchSnapshot & { timestamp: string };
-export type ConsentChoice = "accepted" | "declined" | "unknown";
+export type TrackingState = "enabled" | "disabled";
 export type TouchOptions = { internalOrigins?: readonly string[] };
 
 function safePath(value: unknown): value is string {
@@ -46,7 +46,6 @@ function externalHost(
 		"paradev.com",
 		"superset.sh",
 		"accounts.google.com",
-		"github.com",
 		...(options.internalOrigins ?? []).flatMap((origin) => {
 			try {
 				return [new URL(origin).hostname];
