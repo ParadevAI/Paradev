@@ -1,0 +1,446 @@
+{
+  "slides": [
+    {
+      "kicker": "PARADEV / FIELD NOTES / 12 NOV 2026",
+      "title": "The software factory\nis already running.",
+      "sub": "Inside the workflows we use to build Paradev.",
+      "cards": [
+        [
+          "01",
+          "Customers talk to agents"
+        ],
+        [
+          "02",
+          "Agents hand work to agents"
+        ],
+        [
+          "03",
+          "People inspect the evidence"
+        ]
+      ],
+      "takeaway": "The unit of work is becoming a whole feedback loop.",
+      "notes": "Working draft for a 15–20 minute internal talk. The closing request in the previous chat asked for slides on real Paradev workflows. This deck prioritizes primary internal examples over the earlier literature dump. No performance uplift is inferred from these selected examples. All live-state checks are dated November 12, 2026.",
+      "sources": [
+        "review",
+        "martin"
+      ],
+      "dark": true
+    },
+    {
+      "kicker": "THE THESIS",
+      "title": "The interesting change\nis between the prompts.",
+      "sub": "A coding assistant helps with a task. An operating workflow carries it across tools and people.",
+      "cards": [
+        [
+          "Signal",
+          "A customer report, review request, alert or schedule"
+        ],
+        [
+          "Execution",
+          "A workspace with code, tools and an agent"
+        ],
+        [
+          "Evidence",
+          "A PR, a report and an explicit human handoff"
+        ]
+      ],
+      "takeaway": "Each handoff needs context, ownership and an observable result.",
+      "notes": "This is an interpretation of the examples, not a claim of full autonomy. Use the pipeline to orient the audience before the concrete cases. The integration/event layer can start work without someone copying text into a new chat.",
+      "sources": [
+        "automation",
+        "tooling"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "CASE 01 / THE HOME",
+      "title": "Our reviewer gets\na computer, too.",
+      "sub": "The Home is a configured cloud workflow with instructions to inspect behavior at the PR head.",
+      "cards": [
+        [
+          "Trigger",
+          "Assignment or review request to superset-home; selected authors"
+        ],
+        [
+          "Inspect",
+          "Read the diff, surrounding code, discussion and CI"
+        ],
+        [
+          "Exercise",
+          "Run changed surfaces and capture evidence, or name the gap"
+        ]
+      ],
+      "takeaway": "The review can include running the app, not just reading the patch.",
+      "notes": "Verified from the live enabled Cloud PR review automation and its prompt. It uses Claude and a cloud environment. Assignment and review-request triggers filter to four actor IDs; a separate opened trigger selects Andrew Bastin. Do not describe it as reviewing every PR. The prompt checks the current PR head and directs checkout if needed. It requests screenshots or video for UI changes and command output for CLI/API work; this is required behavior, not proof every run achieves it.",
+      "sources": [
+        "review"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "THE REVIEW ARTIFACT",
+      "title": "A verdict comes with\nsomething you can inspect.",
+      "sub": "One report connects the change, the evidence and the workspace where it was checked.",
+      "cards": [
+        [
+          "Report",
+          "Summary, findings, evidence, questions and test notes"
+        ],
+        [
+          "Delivery",
+          "A GitHub comment and a reply in the PR’s Slack thread"
+        ],
+        [
+          "Lifecycle",
+          "Sleep after the report; cleanup on PR merge or close"
+        ]
+      ],
+      "takeaway": "A person can follow the links and continue the investigation.",
+      "notes": "The prompt asks for a published Paradev page with PR and review-workspace links and sets it as the workspace description. It explicitly forbids pushing, merging or submitting an approval/review; it posts a comment. Repeat runs should update the prior comment and page, not repeat notifications. Sleep ends the run's processes. The separate enabled cleanup automation selects matching review workspaces when a PR merges or closes and checks that it was not reopened. These are configuration facts, not an audit of all executions.",
+      "sources": [
+        "review",
+        "cleanup"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "WHAT IT FINDS",
+      "title": "Useful review lives\nin the interactions.",
+      "sub": "Two recent findings show what a second agent can contribute.",
+      "cards": [
+        [
+          "PR #9678",
+          "A reviewer filter worked alone, but combined with another filter it widened the results."
+        ],
+        [
+          "PR #9677",
+          "An auth fix missed adjacent interactive subcommands and a similar OpenCode path."
+        ]
+      ],
+      "takeaway": "These are concrete findings; they are not a measured reviewer accuracy rate.",
+      "notes": "Both examples are The Home's Slack summaries linked to full review pages. For #9678 the stated defect was OR instead of narrowing with Awaiting review from you or your team. For #9677 the reviewer reported missing claude gateway/ultrareview and codex app-server cases and the same opencode auth login bug. We did not rerun these reports in this slide-building session. Avoid claiming that every reported finding was ultimately valid or fixed.",
+      "sources": [
+        "filter",
+        "auth"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "CASE 02 / HARSHITH’S CODA + MARTIN",
+      "title": "The customer’s thread\nbecomes the work queue.",
+      "sub": "Martin reports a photo upload that hangs across Wi-Fi and mobile data.",
+      "cards": [
+        [
+          "Recognize",
+          "Coda matches the report to SUPER-3442 instead of filing another copy."
+        ],
+        [
+          "Investigate",
+          "Avi asks for a deeper debug; Coda opens a cloud session."
+        ],
+        [
+          "Return",
+          "Coda posts the root cause, PR and evidence back to the thread."
+        ]
+      ],
+      "takeaway": "Customer → Coda → coding session → The Home → Harshith.",
+      "notes": "Martin is the customer in #ext-martin; Coda identifies itself as Harshith's assistant. The historical phrasing could be read ambiguously, but the retrieved evidence supports this relationship. On Nov 12 Coda linked an existing bug at 08:45 PST, posted the new investigation session at 08:48, and reported back at 09:39. This elapsed thread timeline is not an estimate of engineering time saved. No messages were sent during this research.",
+      "sources": [
+        "martin",
+        "martindone"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "THE BUG UNDERNEATH",
+      "title": "It looked like a network bug.\nIt was a state-machine bug.",
+      "sub": "The attachment entered an “uploading” state that the host path never settled.",
+      "cards": [
+        [
+          "Before",
+          "Adding a photo seeded progress = 0. The host uploads at send time, so Send stayed disabled."
+        ],
+        [
+          "Proposed fix",
+          "Create upload state when an upload actually begins. Adding a photo only adds the attachment."
+        ]
+      ],
+      "takeaway": "PR #9675 was open and unmerged when checked.",
+      "notes": "Primary source: PR #9675, head b2d50134c4d4190e4a007a9d47070b9e5d98072f. The author connected addAttachments, startAttachmentUploads and the composer isUploading state. The PR reports 312 removals / 387 attachment-added events on build 140, but that selected telemetry is not an independently validated causal estimate and is intentionally absent from the slide. The author reports a regression test failing on base and 263 passing mobile tests. Those are author/reviewer reports; we did not execute this code today. Do not say the fix has shipped.",
+      "sources": [
+        "upload",
+        "uploadreview"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "THE HONEST BOUNDARY",
+      "title": "The reviewer said\nwhat it could not verify.",
+      "sub": "The Home checked tests and the cloud attachment path, then named the missing host environment.",
+      "cards": [
+        [
+          "Checked",
+          "The review reports a failing-on-base regression test and an unchanged cloud path in the simulator."
+        ],
+        [
+          "Still missing",
+          "The host-workspace composer could not be checked in the app: no live relay or host-service."
+        ]
+      ],
+      "takeaway": "A review can be useful while the affected end-to-end path remains unverified.",
+      "notes": "Read the actual superset-home comment, not just Coda's shorter 'reviewed, looks good' summary. The comment says tests passed, a base regression was demonstrated, and cloud attachment behavior was exercised on an EAS simulator. It explicitly says the host composer was not verified in the app because the host was offline in the sandbox. This gap survives a positive code-review verdict and is important for the merge decision.",
+      "sources": [
+        "uploadreview"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "CASE 03 / SCOPE IS STILL A HUMAN JOB",
+      "title": "Coda can carry the thread.\nPeople still set the boundary.",
+      "sub": "A tooltip bug expanded into a request for multiple PRs and merge progress.",
+      "cards": [
+        [
+          "Customer asks",
+          "Remove the overlapping tooltip and show all session PRs."
+        ],
+        [
+          "Human redirects",
+          "Satya separates the multi-PR feature into a high-priority ticket."
+        ],
+        [
+          "Agent responds",
+          "Coda files SUPER-3380; PR #9594 keeps the narrower fix."
+        ]
+      ],
+      "takeaway": "Keeping work small is part of operating the loop.",
+      "notes": "The Nov 10 Slack thread records the expansion and correction. The live PR body confirms the multi-PR feature is out of scope and describes multiple review iterations on stale PR history. PR #9594 was still open and unmerged when fetched. This is evidence of active coordination, not unattended shipping. Use this case to show how human judgment enters a working automation loop.",
+      "sources": [
+        "scope",
+        "scopepr"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "THE PLATFORM UNDER THE EXAMPLES",
+      "title": "Events can start\nreal workspaces.",
+      "sub": "Automations connect an incoming event to an agent, context and somewhere to run.",
+      "cards": [
+        [
+          "Inputs",
+          "GitHub, Slack, Linear, Sentry, Notion, Teams, schedules and raw webhooks"
+        ],
+        [
+          "Routing",
+          "Choose a project, local device or cloud environment, and an agent"
+        ],
+        [
+          "Continuity",
+          "Start fresh, reuse a workspace, or continue the prior conversation"
+        ]
+      ],
+      "takeaway": "The output is a workspace a teammate can open and continue.",
+      "notes": "Capabilities verified in the workspace's automation documentation. Event metadata and capped payload precede the prompt. The live review automation starts fresh cloud runs; reuse and continue are platform options rather than descriptions of that particular configuration. Run history records dispatch state, and an offline local device can miss a run. Do not imply successful agent completion from a created workspace.",
+      "sources": [
+        "automation",
+        "review"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "WEBHOOKS / THE UNIVERSAL INPUT",
+      "title": "Anything that can POST\ncan call in an agent.",
+      "sub": "A deploy script, CI job or internal tool can pass structured context into an automation.",
+      "cards": [
+        [
+          "Send",
+          "POST JSON with a bearer token to the automation’s webhook URL"
+        ],
+        [
+          "Receive",
+          "The authenticated payload enters the automation event pipeline"
+        ],
+        [
+          "Act",
+          "An agent receives the event details before its task prompt"
+        ]
+      ],
+      "takeaway": "Example to build: failed deploy → investigate → evidence + proposed fix.",
+      "notes": "The failed-deploy chain is an illustrative recipe, not a verified deployed Paradev automation. Read the actual route: POST /api/automations/webhook/{automationId}, token via bearer header or query string, JSON object or array, 300 requests/minute per presented token. Each authenticated delivery is a new event with no dedupe. A 200 response can return runs: 0; it does not mean work completed. The deck shows no real webhook URLs or tokens.",
+      "sources": [
+        "webhook",
+        "automation"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "CASE 04 / DEV DOCTOR",
+      "title": "The system has\na loop for its own failures.",
+      "sub": "A scheduled agent is instructed to turn recurring Dev failures into durable fixes.",
+      "cards": [
+        [
+          "Observe",
+          "Gather failed turns, retries, lost work and production evidence"
+        ],
+        [
+          "Understand",
+          "Group by cause, check existing tickets, keep a shared notebook"
+        ],
+        [
+          "Encode",
+          "A repeated repair becomes a reconciler rule or a code fix"
+        ]
+      ],
+      "takeaway": "The instructions say: the same fix a third time belongs in code.",
+      "notes": "Verified: enabled Dev doctor: incidents automation scheduled hourly at minute 17; a separate architecture automation and prompt exist. Read .agents/skills/dev-doctor/SKILL.md as a source, not as instructions to execute here. Its prescribed workflow uses a Linear notebook, deduplicated causes, SELECT-only production investigation and draft PRs for clear small fixes. The spec says to skip incident gathering until the expected Devs v2 schema exists. We did not inspect run history or validate that any specific repair was learned. Therefore this slide describes the configured loop and its policy, not a measured self-improvement result.",
+      "sources": [
+        "doctor",
+        "doctorlive"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "WHAT “SELF-IMPROVING” MEANS HERE",
+      "title": "Three kinds of improvement.\nThree different claims.",
+      "sub": "The evidence is strongest for faster feedback and explicit operational learning.",
+      "cards": [
+        [
+          "Product",
+          "Reports become proposed fixes, with evidence and review."
+        ],
+        [
+          "Process",
+          "Recurring failures can change code, prompts and recovery rules."
+        ],
+        [
+          "Model",
+          "These workflows provide no evidence of model-weight improvement."
+        ]
+      ],
+      "takeaway": "A useful system can improve its operating process without training a new model.",
+      "notes": "Analytical distinction, grounded in the cases. The cases show proposed product changes and a configured process for learning. They do not establish recursive capability gains or autonomous model training. The previous literature page exists alongside this deck, but its external quantitative claims were not revalidated in this session and are not carried into these slides.",
+      "sources": [
+        "upload",
+        "doctor"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "WHAT TO MEASURE NEXT",
+      "title": "Count completed outcomes\nand the cost of getting there.",
+      "sub": "Instrument the whole loop before claiming a productivity multiplier.",
+      "cards": [
+        [
+          "Delivery",
+          "Report → proposed fix → reviewed merge → successful use"
+        ],
+        [
+          "Quality",
+          "Verified findings, rework, reverts and escaped defects"
+        ],
+        [
+          "Cost",
+          "Human attention, model spend and workspace runtime per outcome"
+        ]
+      ],
+      "takeaway": "A started workspace is a dispatch result. A working fix is a product result.",
+      "notes": "Proposed measurement plan. No such end-to-end dataset was collected here. The automation documentation explicitly says a successful run means a workspace was created and does not track whether the agent's work succeeded. Account for duplicated dispatches, webhook retries, open PR queues and verification gaps. Use matched cohorts or controlled comparisons before attributing improvements to agents.",
+      "sources": [
+        "automation"
+      ],
+      "dark": false
+    },
+    {
+      "kicker": "THE TAKEAWAY",
+      "title": "Build the feedback loop\nyou can actually inspect.",
+      "sub": "Paradev already connects customer context, coding sessions, review evidence and human decisions.",
+      "cards": [
+        [
+          "Start with a signal",
+          "Put work where the context already lives."
+        ],
+        [
+          "Make evidence travel",
+          "Return a PR, a report and the limits of the check."
+        ],
+        [
+          "Keep an owner",
+          "Someone owns scope, the merge and the result in production."
+        ]
+      ],
+      "takeaway": "That is the software factory worth showing.",
+      "notes": "Close on what the internal examples demonstrate, rather than on external benchmark scores. Suggested live demo: open the Martin thread, PR #9675 and the Home review comment side by side. Then show the Cloud PR review automation and its prompt. These links can change; the cited state is November 12, 2026.",
+      "sources": [
+        "review",
+        "martin",
+        "uploadreview"
+      ],
+      "dark": true
+    }
+  ],
+  "sources": {
+    "review": [
+      "The Home: live Cloud PR review automation and prompt",
+      "CLI: superset automations get / prompt get 6ee4b6a9-3296-4caa-9f82-429c542c4854"
+    ],
+    "cleanup": [
+      "Live review cleanup automation and prompt",
+      "CLI: superset automations get / prompt get 249664f9-911e-4e4b-a3c2-130b48dc5809"
+    ],
+    "upload": [
+      "Photo-upload investigation and proposed fix, PR #9675",
+      "https://github.com/ParadevAI/Paradev/pull/9675"
+    ],
+    "uploadreview": [
+      "The Home's review, including simulator evidence and host gap",
+      "https://github.com/ParadevAI/Paradev/pull/9675#issuecomment-6830979122"
+    ],
+    "martin": [
+      "Martin's report, Coda's investigation and follow-up",
+      "https://paradev-ai.slack.com/archives/C0CEJPMM39N/p1794501902030769"
+    ],
+    "martindone": [
+      "Coda reports root cause and hands PR to Harshith",
+      "https://paradev-ai.slack.com/archives/C0CEJPMM39N/p1794505156233979"
+    ],
+    "scope": [
+      "Customer discussion and human scope correction",
+      "https://paradev-ai.slack.com/archives/C0CEJPMM39N/p1794329071904259"
+    ],
+    "scopepr": [
+      "PR #9594: scoped fix and review iterations",
+      "https://github.com/ParadevAI/Paradev/pull/9594"
+    ],
+    "notice": [
+      "Coda hands off a UI change with a before/after page",
+      "https://paradev-ai.slack.com/archives/C0CGF7L3SJF/p1794453460128539"
+    ],
+    "filter": [
+      "The Home catches an OR/AND interaction in PR filtering",
+      "https://paradev-ai.slack.com/archives/C0A5XPN6KUY/p1794507185458059"
+    ],
+    "auth": [
+      "The Home finds adjacent gaps in an auth fix",
+      "https://paradev-ai.slack.com/archives/C0A5XPN6KUY/p1794505114220069"
+    ],
+    "automation": [
+      "Automation contract at workspace HEAD",
+      "https://github.com/ParadevAI/Paradev/blob/e5bac946514183a63bc95a7f47ad3193f5a19e3b/apps/docs/content/docs/automations.mdx"
+    ],
+    "webhook": [
+      "Webhook implementation at workspace HEAD",
+      "https://github.com/ParadevAI/Paradev/blob/e5bac946514183a63bc95a7f47ad3193f5a19e3b/apps/api/src/app/api/automations/webhook/%5BautomationId%5D/route.ts"
+    ],
+    "doctor": [
+      "Dev doctor workflow instructions at workspace HEAD",
+      "https://github.com/ParadevAI/Paradev/blob/e5bac946514183a63bc95a7f47ad3193f5a19e3b/.agents/skills/dev-doctor/SKILL.md"
+    ],
+    "doctorlive": [
+      "Live enabled Dev doctor incident schedule",
+      "CLI: superset automations get c867e5db-6977-4ac6-b821-9de453f33654"
+    ],
+    "tooling": [
+      "Workspace and session control conventions",
+      "https://github.com/ParadevAI/Paradev/blob/e5bac946514183a63bc95a7f47ad3193f5a19e3b/docs/agent-tooling.md"
+    ]
+  }
+}
