@@ -5970,6 +5970,70 @@ describe("AcpAdapter config options", () => {
 
 		await adapter.dispose();
 	});
+
+	const approvePlan = async (optionId: string) => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [MODEL_OPTION, EFFORT_OPTION];
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			effortId: "low",
+		});
+		await flush();
+		adapter.prompt([{ type: "text", text: "plan it" }]);
+		await flush();
+		agent.requestPermissionWith(
+			{
+				toolCall: { toolCallId: "tc-plan", title: "Ready to code?" },
+				options: [
+					{
+						optionId: "exit-plan-clear-auto",
+						name: "Yes, clear context (12% used) and use auto mode",
+						kind: "allow_always",
+					},
+					{
+						optionId: "exit-plan-auto",
+						name: "Yes, and use auto mode",
+						kind: "allow_always",
+					},
+					{ optionId: "plan", name: "No, keep planning", kind: "reject_once" },
+				],
+			},
+			9401,
+		);
+		await flush();
+		const approval = itemsOf(events).find(
+			(item) => item.kind === "approval_request",
+		);
+		const before = agent.sent.length;
+		adapter.respondToApproval(approval?.id ?? "", {
+			type: "option",
+			optionId,
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "config_option_update",
+			configOptions: [MODEL_OPTION, EFFORT_OPTION],
+		});
+		await flush();
+		const configured = agent.sent
+			.slice(before)
+			.filter((f) => f.method === "session/set_config_option")
+			.map((f) => f.params);
+		await adapter.dispose();
+		return configured;
+	};
+
+	it("puts the model and effort back after a plan approval clears the context", async () => {
+		expect(await approvePlan("exit-plan-clear-auto")).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "effort", value: "low" },
+		]);
+	});
+
+	it("leaves the model alone when a plan approval keeps the context", async () => {
+		expect(await approvePlan("exit-plan-auto")).toEqual([]);
+	});
 });
 
 describe("AcpAdapter attachments", () => {
