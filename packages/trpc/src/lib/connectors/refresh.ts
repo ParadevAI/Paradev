@@ -279,6 +279,10 @@ async function redeem(
 		connectionId: connection.id,
 		status: response.status,
 		oauthError,
+		description:
+			typeof payload?.error_description === "string"
+				? payload.error_description.slice(0, 200)
+				: undefined,
 	});
 	// A rate limit or a gateway's HTML page says nothing about the grant.
 	if (response.status === 429 || !payload) {
