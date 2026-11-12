@@ -33,6 +33,7 @@ export function PowerSection({
 	const queryClient = useQueryClient();
 	const info = useHostServiceInfo(hostUrl, isOnline);
 	const supported = info.data?.keepAwakeSupported === true;
+	const capabilityFailed = info.isError && info.data === undefined;
 	const queryKey = ["host-power-settings", hostUrl];
 	const power = useQuery({
 		queryKey,
@@ -61,9 +62,10 @@ export function PowerSection({
 		},
 	});
 	if (
-		!supported ||
-		(power.error instanceof TRPCClientError &&
-			power.error.data?.code === "NOT_FOUND")
+		!capabilityFailed &&
+		(!supported ||
+			(power.error instanceof TRPCClientError &&
+				power.error.data?.code === "NOT_FOUND"))
 	) {
 		return null;
 	}
@@ -73,47 +75,52 @@ export function PowerSection({
 			<h3 className="text-sm font-medium">
 				<HighlightText text={t({ message: "Power" })} query={searchQuery} />
 			</h3>
-			<div className="flex items-start justify-between gap-6">
-				<div>
-					<Label htmlFor={id} className="text-sm font-normal">
-						<HighlightText
-							text={t({
-								message: "Keep this computer awake while agents work",
-							})}
-							query={searchQuery}
-						/>
-					</Label>
-					<p
-						id={`${id}-description`}
-						className="mt-1 text-xs text-muted-foreground"
-					>
-						<Trans>
-							The display can still turn off. On battery power, normal sleep
-							settings apply below 10%.
-						</Trans>
-					</p>
+			{supported && (
+				<div className="flex items-start justify-between gap-6">
+					<div>
+						<Label htmlFor={id} className="text-sm font-normal">
+							<HighlightText
+								text={t({
+									message: "Keep this computer awake while agents work",
+								})}
+								query={searchQuery}
+							/>
+						</Label>
+						<p
+							id={`${id}-description`}
+							className="mt-1 text-xs text-muted-foreground"
+						>
+							<Trans>
+								The display can still turn off. On battery power, normal sleep
+								settings apply below 10%.
+							</Trans>
+						</p>
+					</div>
+					<Switch
+						id={id}
+						aria-describedby={`${id}-description`}
+						checked={power.data?.enabled ?? false}
+						disabled={
+							!canEdit ||
+							!isOnline ||
+							!power.data?.supported ||
+							power.isFetching ||
+							update.isPending
+						}
+						onCheckedChange={(enabled) => update.mutate(enabled)}
+					/>
 				</div>
-				<Switch
-					id={id}
-					aria-describedby={`${id}-description`}
-					checked={power.data?.enabled ?? false}
-					disabled={
-						!canEdit ||
-						!isOnline ||
-						!power.data?.supported ||
-						power.isFetching ||
-						update.isPending
-					}
-					onCheckedChange={(enabled) => update.mutate(enabled)}
-				/>
-			</div>
-			{power.isError && (
+			)}
+			{(capabilityFailed || power.isError) && (
 				<div className="flex items-center gap-2 text-xs text-muted-foreground">
 					<Trans>Could not load power settings.</Trans>
 					<Button
 						variant="ghost"
 						size="sm"
-						onClick={() => void power.refetch()}
+						disabled={capabilityFailed ? info.isFetching : power.isFetching}
+						onClick={() =>
+							void (capabilityFailed ? info.refetch() : power.refetch())
+						}
 					>
 						<Trans>Try again</Trans>
 					</Button>
