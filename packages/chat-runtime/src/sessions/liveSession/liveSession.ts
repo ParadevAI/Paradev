@@ -370,6 +370,7 @@ export class LiveSession {
 			this.injectInto(running, {
 				item,
 				content: sent,
+				typed: content,
 				turnId: this.mintId(),
 				seq,
 				snapshotWorktree,
@@ -1193,7 +1194,12 @@ export class LiveSession {
 	}
 
 	private deliverNextQueued(): void {
-		if (this.queuePaused || this.inFlight()) return;
+		// An injection that is still resolving is earlier than anything queued
+		// behind it. Today the injection always settles first, so this only makes
+		// the ordering explicit instead of leaving it to scheduling.
+		if (this.queuePaused || this.inFlight() || this.pendingSteers.length > 0) {
+			return;
+		}
 		const next = this.queue.shift();
 		if (!next) return;
 		this.deliver(next);
