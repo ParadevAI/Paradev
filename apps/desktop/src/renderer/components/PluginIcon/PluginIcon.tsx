@@ -30,6 +30,7 @@ import neonIconUrl from "renderer/assets/icons/neon-icon.png";
 import slackIconUrl from "renderer/assets/icons/slack-icon.svg";
 import stripeIconUrl from "renderer/assets/icons/stripe-icon.svg";
 import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
+import { AhrefsIcon } from "./components/AhrefsIcon";
 import { AutumnIcon } from "./components/AutumnIcon";
 import { FirecrawlIcon } from "./components/FirecrawlIcon";
 import { InngestIcon } from "./components/InngestIcon";
@@ -65,6 +66,7 @@ const IMAGE_ICONS: Record<string, string> = {
 };
 
 const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
+	ahrefs: { icon: AhrefsIcon, color: "#FF8D00" },
 	autumn: { icon: AutumnIcon },
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },

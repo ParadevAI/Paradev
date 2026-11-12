@@ -1,0 +1,18 @@
+---
+title: Ahrefs
+description: Research backlinks, organic keywords, rankings, site audits, and brand visibility in AI search with Ahrefs
+---
+
+Research backlinks, organic keywords, rankings, site audits, and brand visibility in AI search with Ahrefs.
+
+## MCP Server
+
+Tools come from Ahrefs' own MCP server at `https://api.ahrefs.com/mcp/mcp`. Paradev proxies each call and adds your credentials. Ahrefs decides which tools the server offers, so see [Ahrefs' tool categories](https://docs.ahrefs.com/mcp/docs/tool-categories) for the current list. The server needs an Ahrefs Lite plan or higher, and calls use your workspace's API units.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Ahrefs in your browser, select a workspace, and approve access. Paradev registers itself with Ahrefs when you connect, so there is no app to set up first. Ahrefs issues no refresh token, so reconnect when the access token expires. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.
