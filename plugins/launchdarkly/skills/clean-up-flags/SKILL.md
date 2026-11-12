@@ -24,12 +24,12 @@ per environment answer the only question that matters for the code change: which
 variation does every user get today?
 
 - **Launched**: everyone gets the same variation everywhere. Keep that branch.
-- **Inactive or never requested**: no recent evaluations, which is not proof
-  that nothing calls it; a rarely run path can still need it. Keep the
-  variation it serves today, and delete the code path only once step 4 shows
-  nothing reaches it.
-- **Anything else** (rules, rollouts, targets still active): not a cleanup
-  candidate. Say so and stop.
+- **Inactive or never requested, serving one variation everywhere**: no recent
+  evaluations, which is not proof that nothing calls it; a rarely run path can
+  still need it. Keep that variation, and delete the code path only once step 4
+  shows nothing reaches it.
+- **Anything else** (rules, rollouts or targets that serve different
+  variations, whatever the status): not a cleanup candidate. Say so and stop.
 
 ## 3. Check readiness
 

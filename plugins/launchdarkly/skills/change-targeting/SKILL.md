@@ -32,8 +32,9 @@ link; a person approves it in LaunchDarkly, not you. Check the outcome with
 
 ## 4. Make the smallest change with the right tool
 
-- Targeting on or off: `toggle-flag`. Off serves everyone the off variation.
-  On applies the existing targets and rules, and everyone they miss gets the
+- Targeting on or off: `toggle-flag`. Off serves everyone the off variation;
+  if the flag has none set, each SDK serves its code fallback, which can differ
+  between services, so warn the user before turning it off. On applies the existing targets and rules, and everyone they miss gets the
   default rule's variation, so check that variation in step 2 first.
 - Specific users or contexts: `update-flag-targeting`.
 - Rules and clauses: `update-targeting-rules`. Load the
@@ -41,9 +42,9 @@ link; a person approves it in LaunchDarkly, not you. Check the outcome with
   covers whether the flag's evaluation context can match the rule.
 - Percentage of everyone: `update-rollout`.
 - A production release with metrics to watch: `start-guarded-rollout`, after
-  loading the `feature-flags/launchdarkly-guarded-rollout` guide. It rolls back
-  on a regression only when automatic rollback is on; otherwise a regression
-  raises an alert and the rollout continues. Say which one the user is getting.
+  loading the `feature-flags/launchdarkly-guarded-rollout` guide. Automatic
+  rollback is set per metric. Before starting, tell the user which metrics roll
+  back on a regression and which only raise an alert for someone to act on.
 
 ## 5. Verify and report
 
