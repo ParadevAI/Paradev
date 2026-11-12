@@ -2266,6 +2266,9 @@ msgstr "Thêm vào thanh bên"
 msgid "Add to workspace"
 msgstr "Thêm vào workspace"
 
+msgid "Add variable"
+msgstr "Thêm biến"
+
 msgid "Add what it does"
 msgstr "Thêm việc nó làm"
 
@@ -16357,6 +16360,9 @@ msgstr "gỡ liên kết PR"
 msgid "Remove trigger"
 msgstr "Xóa trình kích hoạt"
 
+msgid "Remove variable"
+msgstr "Xóa biến"
+
 msgid "Remove workspace"
 msgstr "Gỡ workspace"
 
@@ -18105,6 +18111,9 @@ msgstr "Thiết lập dự án này cho Paradev"
 
 msgid "Set up your organization to get started"
 msgstr "Thiết lập tổ chức của bạn để bắt đầu"
+
+msgid "Set when this agent launches, e.g. <0>CLAUDE_CONFIG_DIR</0> to use another Claude login."
+msgstr "Được đặt khi tác tử này khởi chạy, ví dụ <0>CLAUDE_CONFIG_DIR</0> để dùng một đăng nhập Claude khác."
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Đặt lại một plugin đã cài thành Khả dụng thì mọi người vẫn giữ bản của mình; sau đó họ có thể gỡ. Không khả dụng sẽ gỡ nó."
@@ -21870,6 +21879,12 @@ msgstr "user@host, ssh://user@host:2222 hoặc một bí danh trong cấu hình 
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId không khớp với dự án của workspace"
+
+msgid "Variable name"
+msgstr "Tên biến"
+
+msgid "Variable value"
+msgstr "Giá trị biến"
 
 msgid "Variables"
 msgstr "Biến"

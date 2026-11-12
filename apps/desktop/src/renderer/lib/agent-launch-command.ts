@@ -25,7 +25,7 @@ interface LinkedPresetLaunch {
 	commands: string[];
 }
 
-function areEnvMapsEqual(
+export function areEnvMapsEqual(
 	left: Record<string, string>,
 	right: Record<string, string>,
 ): boolean {
