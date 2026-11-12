@@ -129,8 +129,8 @@ const MUSE_RATES: Record<string, ModelRate> = {
 	"muse-spark": { inputPerM: 1.25, outputPerM: 4.25, cacheReadPerM: 0.15 },
 };
 
-/** Multi-model harnesses (opencode, pi, omp, copilot, fx, devin, hermes) route
- * to many upstream providers — match against every table we know.
+/** Multi-model harnesses (opencode, pi, omp, copilot, fx, devin, hermes,
+ * grok-bot) route to many upstream providers — match against every table we know.
  * Harness-reported costs, when present, take precedence over these rates. */
 const MULTI_AGENT_RATES: Record<string, ModelRate> = {
 	...CLAUDE_RATES,
@@ -154,6 +154,7 @@ const RATES_BY_AGENT: Record<UsageAgent, Record<string, ModelRate>> = {
 	// price; they take the cheapest fallback, marked approximate.
 	devin: MULTI_AGENT_RATES,
 	hermes: MULTI_AGENT_RATES,
+	"grok-bot": MULTI_AGENT_RATES,
 };
 
 const cheapestByAgent = new Map<UsageAgent, ModelRate>();
