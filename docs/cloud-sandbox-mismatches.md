@@ -280,6 +280,26 @@ unarchive from a signed-in client. Resizing the box's own workspace
 (`workspaces update --machine-size`) restarts it, which ends the agent that
 asked, usually before the answer comes back; resize it last, as with archive.
 
+**A box could create a workspace but not label or read it. Fixed (2026-11-12).**
+On a laptop the CLI calls any procedure the person can. In a box,
+`workspaces get` and `workspaces update --add-label` / `--remove-label` /
+`--task` failed with "A cloud workspace cannot call cloudWorkspace.get", because
+`get`, `addLabel`, `removeLabel`, `linkTask` and `unlinkTask` were missing from
+`SANDBOX_ALLOWED_PROCEDURES`. An agent that created a batch of review
+workspaces could not file them under one label. We added those, plus
+`taskLabel.list` (the label picker's options), `cloudWorkspace.pullRequests`
+and `attachment.createUpload` (`workspaces create --attachment`). Each reaches
+only the workspaces `cloudWorkspace.list` already shows the box. Sharing,
+visibility, `unarchive`, `restart` and `activity` stay out: they change or
+show who can see a workspace, or restart a box. `get` returns presigned URLs
+for a workspace's attachments, so a box can read files attached to any
+workspace its creator can see. Labels and tags are different things: a
+label is the organization's and everyone sees it; a tag is the caller's own
+sidebar folder, and a box files it as its creator. `workspaces create --tag`
+works for the cloud from CLI builds that include #9638. A box gets it only
+from the next sandbox release, which builds the box's CLI from the checkout
+it runs on; boxes released before that still refuse `--tag`.
+
 **pdev signs in to its router with the box's credential.** On a laptop pdev
 gets a token from `superset auth mcp-headers`, which a box refuses because it
 holds no token. The firewall adds the same `x-superset-sandbox-credential` to
