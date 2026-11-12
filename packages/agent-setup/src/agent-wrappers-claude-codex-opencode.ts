@@ -326,6 +326,16 @@ export function createClaudeWrapper(): void {
 			"mcp",
 			"plugin",
 			"plugins",
+			"auto-mode",
+			"gateway",
+			"import",
+			"purge",
+			"ultrareview",
+			"logs",
+			"rm",
+			"stop",
+			"kill",
+			"respawn",
 		],
 		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",
@@ -354,6 +364,13 @@ export function createCodexWrapper(): void {
 				"mcp",
 				"plugin",
 				"completion",
+				"app-server",
+				"exec-server",
+				"remote-control",
+				"sandbox",
+				"debug",
+				"features",
+				"apply",
 			],
 			beforeLaunch: buildDefaultAccountResolver(
 				"CODEX_HOME",
@@ -442,7 +459,23 @@ export function createOpenCodeWrapper(): void {
 	const script = buildWrapperScript(
 		"opencode",
 		`export OPENCODE_CONFIG_DIR="${getOpenCodeConfigDir()}"\nexec "$REAL_BIN" "$@"`,
-		{ agentId: "opencode" },
+		{
+			agentId: "opencode",
+			nonSessionSubcommands: [
+				"auth",
+				"upgrade",
+				"uninstall",
+				"models",
+				"stats",
+				"export",
+				"import",
+				"mcp",
+				"debug",
+				"serve",
+				"web",
+				"acp",
+			],
+		},
 	);
 	createWrapper("opencode", script);
 }
