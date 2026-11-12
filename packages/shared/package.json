@@ -4,6 +4,10 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./acquisition-bridge/*": {
+			"types": "./src/acquisition-bridge/*.ts",
+			"default": "./src/acquisition-bridge/*.ts"
+		},
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
 			"default": "./src/agent-routines.ts"

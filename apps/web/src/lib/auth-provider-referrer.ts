@@ -61,8 +61,7 @@ function replaceAuthProviderReferrer(
  * The web app is where OAuth providers send people back, so a provider host
  * as referrer is the sign-in round trip, not where the visitor came from.
  * PostHog derives the person's first-touch properties from these fields.
- * A first touch recorded on another host (the marketing site shares the
- * cookie) is a real arrival, so it is kept.
+ * The acquisition bridge records marketing first touch separately.
  */
 export function stripAuthProviderReferrer(
 	event: CaptureResult | null,

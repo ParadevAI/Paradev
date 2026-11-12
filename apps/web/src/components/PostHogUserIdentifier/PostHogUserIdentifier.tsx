@@ -29,6 +29,10 @@ export function PostHogUserIdentifier() {
 		}
 
 		if (user) {
+			void fetch("/api/acquisition/bind", {
+				method: "POST",
+				signal: AbortSignal.timeout(5000),
+			}).catch(() => {});
 			posthog.identify(user.id, {
 				email: user.email,
 				name: user.name,

@@ -5,7 +5,10 @@ import { Button } from "@superset/ui/button";
 import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
+import {
+	acceptAcquisition,
+	syncAcquisition,
+} from "@/lib/analytics/acquisition-client";
 import { declineAnalytics } from "@/lib/analytics/decline";
 import { withPosthog } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
@@ -14,20 +17,32 @@ export function CookieConsent() {
 	const [showBanner, setShowBanner] = useState(false);
 
 	useEffect(() => {
-		const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
+		let consent: string | null = null;
+		try {
+			consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
+		} catch {}
 		if (consent === null) {
 			setShowBanner(true);
 		}
 	}, []);
 
 	const handleAccept = () => {
-		localStorage.setItem(ANALYTICS_CONSENT_KEY, "accepted");
+		try {
+			localStorage.setItem(ANALYTICS_CONSENT_KEY, "accepted");
+		} catch {
+			return;
+		}
 		setShowBanner(false);
-		withPosthog((posthog) => posthog.opt_in_capturing());
+		withPosthog((posthog) => {
+			void acceptAcquisition(posthog);
+		});
 	};
 
 	const handleOptOut = () => {
-		localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
+		try {
+			localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
+		} catch {}
+		void syncAcquisition("declined");
 		withPosthog(declineAnalytics);
 		setShowBanner(false);
 	};

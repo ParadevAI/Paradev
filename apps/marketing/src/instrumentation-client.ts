@@ -1,6 +1,10 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 
 import { env } from "@/env";
+import {
+	acquisitionConsent,
+	syncAcquisition,
+} from "@/lib/analytics/acquisition-client";
 import { declineAnalytics } from "@/lib/analytics/decline";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
@@ -17,9 +21,15 @@ let sentryClient: SentryClient | null = null;
 let started = false;
 
 async function initPosthog() {
-	const { default: posthog } = await import("posthog-js");
+	const [{ default: posthog }, anonymousId] = await Promise.all([
+		import("posthog-js"),
+		syncAcquisition(),
+	]);
 
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
+		...(anonymousId && acquisitionConsent() === "accepted"
+			? { bootstrap: { distinctID: anonymousId, isIdentifiedID: false } }
+			: {}),
 		api_host: "/ingest",
 		ui_host: "https://us.posthog.com",
 		defaults: "2025-11-30",

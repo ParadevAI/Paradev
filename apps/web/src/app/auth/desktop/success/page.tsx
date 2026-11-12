@@ -4,6 +4,8 @@ import { db } from "@superset/db/client";
 import { sessions } from "@superset/db/schema/auth";
 import { BRAND } from "@superset/shared/brand";
 import { headers } from "next/headers";
+import { env } from "@/env";
+import { acquisitionHttp, captureAcquisition } from "@/lib/acquisition-server";
 import { initServerI18n } from "@/lib/i18n-server";
 import { DesktopAuthCard } from "./components/DesktopAuthCard";
 import { DesktopRedirect } from "./components/DesktopRedirect";
@@ -65,6 +67,12 @@ export default async function DesktopSuccessPage({
 	) {
 		return signInFailed;
 	}
+
+	await acquisitionHttp.bindForUser(
+		new Request(env.NEXT_PUBLIC_WEB_URL, { headers: await headers() }),
+		session.user.id,
+		captureAcquisition,
+	);
 
 	// Desktop and web need independent sessions with separate activeOrganizationId
 	const headersObj = await headers();

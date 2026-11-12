@@ -4,14 +4,22 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { authClient } from "@superset/auth/client";
 import { Button } from "@superset/ui/button";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { env } from "@/env";
+import { resolveCallbackUrl } from "../../utils/resolveCallbackUrl";
 
 export default function SignUpPage() {
 	"use no memo";
 	const { t } = useLingui();
+	const searchParams = useSearchParams();
+	const callbackURL = resolveCallbackUrl({
+		redirect: searchParams.get("redirect"),
+		webUrl: env.NEXT_PUBLIC_WEB_URL,
+		trustedOrigins: [env.NEXT_PUBLIC_API_URL],
+	});
 	const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
 	const [isLoadingGithub, setIsLoadingGithub] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -23,7 +31,7 @@ export default function SignUpPage() {
 		try {
 			const { error } = await authClient.signIn.social({
 				provider: "google",
-				callbackURL: env.NEXT_PUBLIC_WEB_URL,
+				callbackURL,
 			});
 			if (error) throw error;
 		} catch (err) {
@@ -44,7 +52,7 @@ export default function SignUpPage() {
 		try {
 			const { error } = await authClient.signIn.social({
 				provider: "github",
-				callbackURL: env.NEXT_PUBLIC_WEB_URL,
+				callbackURL,
 			});
 			if (error) throw error;
 		} catch (err) {
@@ -127,7 +135,7 @@ export default function SignUpPage() {
 					<Trans>
 						Already have an account?{" "}
 						<Link
-							href="/sign-in"
+							href={`/sign-in?${searchParams.toString()}`}
 							className="hover:text-primary underline underline-offset-4"
 						>
 							Sign in

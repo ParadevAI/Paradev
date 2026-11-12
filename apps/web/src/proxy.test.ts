@@ -117,11 +117,24 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 });
 
 describe("proxy: signed-in visits to auth pages", () => {
+	it("bridges first-party acquisition before the existing signed-in redirect", async () => {
+		const response = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2Fsettings",
+			{ auth: "Bearer valid-token" },
+		);
+		const target = new URL(
+			response.headers.get("location") ?? "https://invalid.test",
+		);
+		expect(target.pathname).toBe("/api/acquisition/begin");
+		expect(target.searchParams.get("returnTo")).toBe(
+			"/sign-in?redirect=%2Fsettings",
+		);
+	});
 	const signedIn = { auth: "Bearer valid-token" };
 
 	it("follows a same-origin redirect param instead of dropping it", async () => {
 		const res = await callProxy(
-			"https://app.superset.sh/sign-in?redirect=%2Fsettings%3Ftab%3Dbilling",
+			"https://app.superset.sh/sign-in?_acq=1&redirect=%2Fsettings%3Ftab%3Dbilling",
 			signedIn,
 		);
 
@@ -133,7 +146,7 @@ describe("proxy: signed-in visits to auth pages", () => {
 
 	it("ignores a redirect param that points at another origin", async () => {
 		const res = await callProxy(
-			"https://app.superset.sh/sign-in?redirect=%2F%2Fevil.example",
+			"https://app.superset.sh/sign-in?_acq=1&redirect=%2F%2Fevil.example",
 			signedIn,
 		);
 
@@ -142,7 +155,7 @@ describe("proxy: signed-in visits to auth pages", () => {
 
 	it("ignores a redirect that a tab turns into another origin", async () => {
 		const res = await callProxy(
-			"https://app.superset.sh/sign-in?redirect=%2F%09%2Fevil.example",
+			"https://app.superset.sh/sign-in?_acq=1&redirect=%2F%09%2Fevil.example",
 			signedIn,
 		);
 

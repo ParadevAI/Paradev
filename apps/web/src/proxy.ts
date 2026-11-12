@@ -2,6 +2,7 @@ import { auth } from "@superset/auth/server";
 import { isStaffEmail } from "@superset/shared/constants";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import { acquisitionEntry } from "./lib/acquisition-entry";
 
 import {
 	isAuthPageRoute,
@@ -16,6 +17,9 @@ export default async function proxy(req: NextRequest) {
 	});
 
 	const pathname = req.nextUrl.pathname;
+	const acquisition =
+		req.method === "GET" ? acquisitionEntry(req.nextUrl, req.headers) : null;
+	if (acquisition) return NextResponse.redirect(acquisition);
 
 	// API routes must never redirect to /sign-in: clients (CLI, host-service,
 	// remote relay) parse the response body as JSON, so a 307 with a text/plain

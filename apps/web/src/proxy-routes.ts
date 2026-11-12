@@ -1,6 +1,7 @@
 const authPageRoutes = ["/sign-in", "/sign-up"] as const;
 
 const otherPublicRoutes = [
+	"/api/acquisition",
 	"/auth/desktop",
 	"/api/auth/desktop",
 	"/accept-invitation",
