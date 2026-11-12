@@ -147,23 +147,22 @@ describe("when the manifest cannot be written", () => {
 		expect(rows.map((row) => row.teamId)).toEqual([TEAM]);
 	});
 
-	test("an added share is taken back out", async () => {
+	test("a failed add leaves the sharee out of the manifest, and a retry lets them in", async () => {
+		const add = () =>
+			owner.page.sharing.add({
+				id: PAGE,
+				grantees: [{ kind: "user", userId: SHAREE }],
+			});
 		failPuts = true;
 		try {
-			await expect(
-				owner.page.sharing.add({
-					id: PAGE,
-					grantees: [{ kind: "user", userId: SHAREE }],
-				}),
-			).rejects.toThrow("r2 down");
+			await expect(add()).rejects.toThrow("r2 down");
 		} finally {
 			failPuts = false;
 		}
-		const rows = await db
-			.select({ userId: pageShares.userId })
-			.from(pageShares)
-			.where(eq(pageShares.pageId, PAGE));
-		expect(rows.some((row) => row.userId === SHAREE)).toBe(false);
+		expect(manifest()?.sharedUserIds).toEqual([]);
+		expect((await add()).added).toEqual([]);
+		expect(manifest()?.sharedUserIds).toEqual([SHAREE]);
+		await db.delete(pageShares).where(eq(pageShares.userId, SHAREE));
 	});
 });
 

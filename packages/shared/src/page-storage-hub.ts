@@ -37,6 +37,7 @@ export function pageStorageSocketPath(pageId: string): string {
 }
 
 export const PAGE_MANIFESTS_JOB_PATH = "/api/pages/jobs/manifests";
+export const PAGE_MANIFESTS_JOB_MAX_PAGES = 100;
 
 export interface PageManifestsJob {
 	pageIds: string[];

@@ -98,14 +98,7 @@ export const pageSharingRouter = {
 				sharedByUserId: userId,
 				role: input.role,
 			});
-			try {
-				await writePageManifest(page.id);
-			} catch (error) {
-				for (const grantee of added) {
-					await removeShare({ kind: "page", id: page.id }, grantee);
-				}
-				throw error;
-			}
+			await writePageManifest(page.id);
 			return { added };
 		}),
 
