@@ -22995,6 +22995,9 @@ msgstr "你的 GitHub 链接来自登录所用的账号，因此显示为已验�
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "上次付款失败。请更新支付方式以继续使用 Pro。"
 
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "由于该账户已达到用量或支出上限，模型提供商停止了此请求。请等待上限重置、在提供商处提高上限，或在用量设置中切换到其他账户。"
+
 msgid "Your name"
 msgstr "你的姓名"
 

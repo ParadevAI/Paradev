@@ -22995,6 +22995,9 @@ msgstr "Liên kết GitHub của bạn lấy từ tài khoản bạn đã đăng
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "Lần thanh toán gần nhất không thành công. Hãy cập nhật phương thức thanh toán để giữ Pro."
 
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "Nhà cung cấp mô hình đã dừng yêu cầu này vì tài khoản đã đạt giới hạn sử dụng hoặc chi tiêu. Hãy chờ giới hạn được đặt lại, tăng giới hạn với nhà cung cấp, hoặc chuyển sang tài khoản khác trong Cài đặt sử dụng."
+
 msgid "Your name"
 msgstr "Tên của bạn"
 
