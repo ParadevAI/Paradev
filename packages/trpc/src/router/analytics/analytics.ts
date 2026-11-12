@@ -1,3 +1,4 @@
+import { isTestAccountEmail } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
@@ -14,6 +15,7 @@ export const analyticsRouter = {
 			}),
 		)
 		.mutation(({ ctx, input }) => {
+			if (isTestAccountEmail(ctx.session.user.email)) return { ok: true };
 			const augmented = ctx.session.session as typeof ctx.session.session & {
 				plan?: string | null;
 			};

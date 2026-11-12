@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@superset/auth/client";
+import { isTestAccountEmail } from "@superset/shared/constants";
 import posthog from "posthog-js";
 import { useEffect } from "react";
 import { registerBaseProperties } from "@/lib/posthog-client";
@@ -26,6 +27,11 @@ export function PostHogUserIdentifier() {
 			// ones every event needs.
 			posthog.reset();
 			registerBaseProperties();
+		}
+
+		if (user && isTestAccountEmail(user.email)) {
+			posthog.opt_out_capturing();
+			return;
 		}
 
 		if (user) {

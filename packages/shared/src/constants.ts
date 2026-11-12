@@ -90,6 +90,14 @@ export function isStaffEmail(email: string): boolean {
 	return STAFF_EMAIL_DOMAINS.some((domain) => email.endsWith(domain));
 }
 
+// Accounts that scripted production walkthroughs sign up and delete.
+export const TEST_ACCOUNT_EMAIL_DOMAINS = ["e2e.paradev.com"];
+
+export function isTestAccountEmail(email: string): boolean {
+	const domain = email.slice(email.lastIndexOf("@") + 1).toLowerCase();
+	return email.includes("@") && TEST_ACCOUNT_EMAIL_DOMAINS.includes(domain);
+}
+
 export const OPEN_ROLES = [
 	{
 		title: "Founding Engineer",
