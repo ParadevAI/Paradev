@@ -173,9 +173,11 @@ test("direct first visit stays first without claiming a marketing source", async
 		await service.bind((await pending(minted.credential)).pendingToken, "user"),
 	);
 	expect(event.properties.$set).toEqual({});
-	expect(event.properties.$set_once).toEqual({
+	expect(event.properties.$set_once).toMatchObject({
 		acquisition_first_landing_pathname: "/start",
 		acquisition_first_timestamp: "2026-11-12T00:00:00.000Z",
+		acquisition_first_utm_source: "",
+		acquisition_first_referrer_host: "",
 	});
 });
 test("server ignores forged IDs and client timestamps; only credential updates an existing lineage", async () => {
@@ -616,6 +618,53 @@ test("encoded and punctuation paths retain validated campaign fields without ret
 	expect(
 		sanitizeTouchSnapshot({ landing_pathname: 42, utm_source: "google" }),
 	).toBeNull();
+});
+
+test("server entry touches do not advance browser intent time when its clock is behind", async () => {
+	const { service, touch, pending, kv } = setup();
+	const lineage = required(await service.mintLineage("enabled", touch(), 100));
+	const attempt = await service.begin("/sign-up", touch("?utm_source=github"));
+	const issued = required(
+		await service.issue(attempt.attempt, lineage.credential),
+	);
+	const received = await service.receive(issued.ticket, attempt.attempt);
+	expect(
+		(
+			await kv.get<{ intentAt: number }>(
+				`acquisition-bridge:lineage:${lineage.credential}`,
+			)
+		)?.intentAt,
+	).toBe(100);
+	expect(await service.revokeLineage(lineage.credential, 101)).not.toBeNull();
+	expect(await service.bind(received.pendingToken, "user")).toBeNull();
+	expect((await pending(lineage.credential)).state).toBe("disabled");
+});
+
+test("set_once retains the entire original direct snapshot across fresh tagged lineages", async () => {
+	const { service, touch, pending, advance } = setup();
+	const direct = required(await service.mintLineage("enabled", touch()));
+	const first = required(
+		await service.bind((await pending(direct.credential)).pendingToken, "user"),
+	);
+	advance(10);
+	const tagged = required(
+		await service.mintLineage("enabled", touch("?utm_source=google&gclid=new")),
+	);
+	const later = required(
+		await service.bind((await pending(tagged.credential)).pendingToken, "user"),
+	);
+	const person: Record<string, string> = {};
+	for (const event of [first, later]) {
+		for (const [key, value] of Object.entries(event.properties.$set_once))
+			if (!Object.hasOwn(person, key)) person[key] = value;
+	}
+	expect(Object.keys(first.properties.$set_once).sort()).toEqual(
+		Object.keys(later.properties.$set_once).sort(),
+	);
+	expect(person).toEqual(first.properties.$set_once);
+	expect(person.acquisition_first_utm_source).toBe("");
+	expect(person.acquisition_first_gclid).toBe("");
+	expect(person.acquisition_first_timestamp).toBe("2026-11-12T00:00:00.000Z");
 });
 
 function required<T>(value: T): NonNullable<T> {

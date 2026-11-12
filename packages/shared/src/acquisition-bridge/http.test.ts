@@ -61,11 +61,14 @@ test("a store outage during finalize preserves desktop auth state from the bound
 		throw new Error("offline");
 	};
 	const response = await http.web(
-		new Request("https://app.superset.sh/api/acquisition/finalize", {
-			headers: {
-				Cookie: `${cookiePair(begin, "__Host-acq_attempt")}; ${cookiePair(begin, "__Host-acq_return")}`,
+		new Request(
+			`https://app.superset.sh/api/acquisition/finalize?attempt=${new URL(required(begin.headers.get("Location"))).searchParams.get("attempt")}`,
+			{
+				headers: {
+					Cookie: `${cookiePair(begin, "__Host-acq_attempt")}; ${cookiePair(begin, "__Host-acq_return")}`,
+				},
 			},
-		}),
+		),
 		"finalize",
 	);
 	const target = new URL(
@@ -99,7 +102,7 @@ const cookiePair = (response: Response, name: string) =>
 	response.headers
 		.getSetCookie()
 		.reverse()
-		.find((c) => c.startsWith(`${name}=`))
+		.find((c) => c.startsWith(`${name}=`) || c.startsWith(`${name}_`))
 		?.split(";")[0] ?? "";
 function setup() {
 	const kv = new Store();
@@ -152,7 +155,7 @@ function setup() {
 		);
 		const { ticket } = await issue.json();
 		const receive = await http.web(
-			new Request(`${web}/api/acquisition/receive`, {
+			new Request(`${web}/api/acquisition/receive?attempt=${attempt}`, {
 				method: "POST",
 				headers: { Origin: marketing },
 				body: new URLSearchParams({ ticket }),
@@ -300,7 +303,7 @@ for (const priorSource of [false, true]) {
 		const issued = await http.marketing(issueRequest, "issue");
 		const { ticket } = await issued.json();
 		const receive = await http.web(
-			new Request(`${web}/api/acquisition/receive`, {
+			new Request(`${web}/api/acquisition/receive?attempt=${attempt}`, {
 				method: "POST",
 				headers: { Origin: marketing },
 				body: new URLSearchParams({ ticket }),
@@ -308,7 +311,7 @@ for (const priorSource of [false, true]) {
 			"receive",
 		);
 		const final = await http.web(
-			new Request(`${web}/api/acquisition/finalize`, {
+			new Request(required(receive.headers.get("Location")), {
 				headers: {
 					Cookie: `${cookiePair(begin, "__Host-acq_attempt")}; ${cookiePair(receive, "__Host-acq_staged")}`,
 				},
@@ -375,14 +378,15 @@ test("foreign-browser staging cannot import another browser's lineage", async ()
 		await bridge.issue(first.attempt, lineage.credential),
 	).ticket;
 	const result = await http.web(
-		new Request(`${web}/api/acquisition/finalize`, {
+		new Request(`${web}/api/acquisition/finalize?attempt=${first.attempt}`, {
 			headers: {
-				Cookie: `__Host-acq_attempt=${second.attempt}; __Host-acq_staged=${ticket}`,
+				Cookie: `__Host-acq_attempt_${second.attempt}=${second.attempt}; __Host-acq_staged_${first.attempt}=${ticket}`,
 			},
 		}),
 		"finalize",
 	);
-	expect(cookiePair(result, "__Host-acq_pending")).toBe("__Host-acq_pending=");
+	expect(cookiePair(result, "__Host-acq_pending")).toBe("");
+	expect(result.headers.getSetCookie()).toEqual([]);
 	expect(new URL(required(result.headers.get("Location"))).pathname).toBe(
 		"/sign-in",
 	);
@@ -394,8 +398,10 @@ test("missing transport ticket and store outages continue auth without a new red
 		"/auth/desktop/success?desktop_state=preserved",
 	);
 	const result = await http.web(
-		new Request(`${web}/api/acquisition/finalize`, {
-			headers: { Cookie: `__Host-acq_attempt=${attempt.attempt}` },
+		new Request(`${web}/api/acquisition/finalize?attempt=${attempt.attempt}`, {
+			headers: {
+				Cookie: `__Host-acq_attempt_${attempt.attempt}=${attempt.attempt}`,
+			},
 		}),
 		"finalize",
 	);
@@ -469,6 +475,7 @@ for (const optedOut of [false, true]) {
 		);
 		expect(begin.headers.get("Referrer-Policy")).toBe("no-referrer");
 		const location = new URL(required(begin.headers.get("Location")));
+		const attempt = location.searchParams.get("attempt");
 		expect(location.searchParams.has("referrer")).toBe(false);
 		const issued = await http.marketing(
 			post(marketing, "issue", {
@@ -479,7 +486,7 @@ for (const optedOut of [false, true]) {
 		);
 		const { ticket } = await issued.json();
 		const receive = await http.web(
-			new Request(`${web}/api/acquisition/receive`, {
+			new Request(`${web}/api/acquisition/receive?attempt=${attempt}`, {
 				method: "POST",
 				headers: { Origin: marketing },
 				body: new URLSearchParams({ ticket }),
@@ -487,7 +494,7 @@ for (const optedOut of [false, true]) {
 			"receive",
 		);
 		const final = await http.web(
-			new Request(`${web}/api/acquisition/finalize`, {
+			new Request(required(receive.headers.get("Location")), {
 				headers: {
 					Cookie: `${cookiePair(begin, "__Host-acq_attempt")}; ${cookiePair(receive, "__Host-acq_staged")}`,
 				},
@@ -515,6 +522,96 @@ for (const optedOut of [false, true]) {
 		expect(JSON.stringify(events)).not.toContain("secret");
 	});
 }
+
+test("concurrent desktop and signup continuations retain their own cookies, state and attempts", async () => {
+	const { http, post, kv } = setup();
+	const jar = new Map<string, string>();
+	const apply = (response: Response) => {
+		for (const cookie of response.headers.getSetCookie()) {
+			const pair = required(cookie.split(";")[0]);
+			const index = pair.indexOf("=");
+			if (cookie.includes("Max-Age=0")) jar.delete(pair.slice(0, index));
+			else jar.set(pair.slice(0, index), pair);
+		}
+	};
+	const paths = [
+		"/auth/desktop/success?desktop_state=original&desktop_protocol=superset",
+		"/sign-up?redirect=%2Fworkspace",
+	];
+	const journeys = [];
+	for (const returnTo of paths) {
+		const begin = await http.web(
+			new Request(
+				`${web}/api/acquisition/begin?returnTo=${encodeURIComponent(returnTo)}`,
+			),
+			"begin",
+		);
+		apply(begin);
+		const attempt = required(
+			new URL(required(begin.headers.get("Location"))).searchParams.get(
+				"attempt",
+			),
+		);
+		const issued = await http.marketing(
+			post(marketing, "issue", { attempt, optedOut: false }),
+			"issue",
+		);
+		const { ticket } = await issued.json();
+		const staged = await http.web(
+			new Request(`${web}/api/acquisition/receive?attempt=${attempt}`, {
+				method: "POST",
+				headers: { Origin: marketing },
+				body: new URLSearchParams({ ticket }),
+			}),
+			"receive",
+		);
+		apply(staged);
+		journeys.push({ attempt, returnTo, staged, ticket });
+	}
+	const signup = required(journeys[1]);
+	const desktop = required(journeys[0]);
+	const mismatch = await http.web(
+		new Request(required(signup.staged.headers.get("Location")), {
+			headers: {
+				Cookie: [
+					...jar.values(),
+					`__Host-acq_staged_${signup.attempt}=${desktop.ticket}`,
+				]
+					.filter(
+						(p) =>
+							!p.startsWith(
+								`__Host-acq_staged_${signup.attempt}=${signup.ticket}`,
+							),
+					)
+					.join("; "),
+			},
+		}),
+		"finalize",
+	);
+	expect(
+		await kv.get(`acquisition-bridge:attempt:${signup.attempt}`),
+	).not.toBeNull();
+	expect(
+		mismatch.headers
+			.getSetCookie()
+			.some((c) => c.startsWith(`__Host-acq_attempt_${signup.attempt}=`)),
+	).toBe(false);
+	for (const journey of journeys) {
+		const final = await http.web(
+			new Request(required(journey.staged.headers.get("Location")), {
+				headers: { Cookie: [...jar.values()].join("; ") },
+			}),
+			"finalize",
+		);
+		apply(final);
+		const target = new URL(required(final.headers.get("Location")));
+		target.searchParams.delete("_acq");
+		expect(target.pathname + target.search).toBe(journey.returnTo);
+		expect(
+			await kv.get(`acquisition-bridge:attempt:${journey.attempt}`),
+		).toBeNull();
+	}
+});
 
 function required<T>(value: T): NonNullable<T> {
 	if (value === null || value === undefined)

@@ -1,4 +1,5 @@
 import type { CaptureResult } from "posthog-js";
+import { cleanGithubAuthReturnUrl } from "./github-auth-return";
 
 const DIRECT = "$direct";
 
@@ -66,34 +67,45 @@ function replaceAuthProviderReferrer(
  * auth return; a provider hostname alone cannot distinguish those journeys.
  * The acquisition transport never collects referrers from the auth roundtrip.
  */
+function isDesktopReturn(value: unknown): boolean {
+	try {
+		return new URL(String(value)).pathname === "/auth/desktop/success";
+	} catch {
+		return false;
+	}
+}
+
 export function stripAuthProviderReferrer(
 	event: CaptureResult | null,
-	githubAuthReturn = false,
+	githubAuthReturn?: string,
 ): CaptureResult | null {
 	if (!event) return event;
 	const currentHost = urlHost(event.properties?.$current_url);
 	const isGithubReturn =
-		githubAuthReturn ||
-		(() => {
-			try {
-				return (
-					new URL(String(event.properties?.$current_url)).pathname ===
-					"/auth/desktop/success"
-				);
-			} catch {
-				return false;
-			}
-		})();
-	const firstTouchHost = urlHost(
+		!!githubAuthReturn || isDesktopReturn(event.properties?.$current_url);
+	const firstTouchUrl =
 		event.$set_once?.$initial_current_url ??
-			event.properties?.$initial_current_url,
-	);
+		event.properties?.$initial_current_url;
+	const firstTouchHost = urlHost(firstTouchUrl);
 	const firstTouchIsHere =
 		firstTouchHost === null || firstTouchHost === currentHost;
+	const firstTouchIsGithubReturn =
+		(!!githubAuthReturn && firstTouchUrl === githubAuthReturn) ||
+		isDesktopReturn(firstTouchUrl);
 	for (const props of [event.properties, event.$set_once]) {
 		replaceAuthProviderReferrer(props, CURRENT_REFERRER_KEYS, isGithubReturn);
 		if (firstTouchIsHere)
-			replaceAuthProviderReferrer(props, FIRST_TOUCH_KEYS, isGithubReturn);
+			replaceAuthProviderReferrer(
+				props,
+				FIRST_TOUCH_KEYS,
+				firstTouchIsGithubReturn,
+			);
+		if (props && githubAuthReturn) {
+			for (const key of ["$current_url", "$initial_current_url"]) {
+				if (typeof props[key] === "string")
+					props[key] = cleanGithubAuthReturnUrl(props[key]);
+			}
+		}
 	}
 	return event;
 }

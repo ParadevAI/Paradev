@@ -75,7 +75,7 @@ if (import.meta.main) {
 			headers: { "Content-Type": "text/html", "Cache-Control": "no-store" },
 		});
 	Bun.serve({
-		hostname: "0.0.0.0",
+		hostname: "localhost",
 		port: 41331,
 		async fetch(request) {
 			const url = new URL(request.url);
@@ -108,7 +108,7 @@ if (import.meta.main) {
 		},
 	});
 	Bun.serve({
-		hostname: "0.0.0.0",
+		hostname: "127.0.0.1",
 		port: 41332,
 		async fetch(request) {
 			const url = new URL(request.url);

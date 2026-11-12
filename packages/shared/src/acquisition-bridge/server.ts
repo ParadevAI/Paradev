@@ -171,14 +171,19 @@ function properties(
 	touch: AcquisitionTouch | null,
 	prefix: string,
 ): Record<string, string> {
-	return touch
-		? Object.fromEntries(
-				Object.entries(touch).map(([name, value]) => [
-					`${prefix}${name}`,
-					value,
-				]),
-			)
-		: {};
+	if (!touch) return {};
+	return Object.fromEntries(
+		[
+			...CAMPAIGN_KEYS,
+			...CLICK_KEYS,
+			"referrer_host",
+			"landing_pathname",
+			"timestamp",
+		].map((name) => [
+			`${prefix}${name}`,
+			touch[name as keyof AcquisitionTouch] ?? "",
+		]),
+	);
 }
 
 function latestProperties(
@@ -271,7 +276,6 @@ export class AcquisitionBridge {
 			(!Number.isSafeInteger(intentAt) || intentAt < 0)
 		)
 			return null;
-		let orderedAt = intentAt;
 		for (let retry = 0; retry < 4; retry++) {
 			const old = await this.lineage(credential);
 			if (
@@ -279,9 +283,9 @@ export class AcquisitionBridge {
 				old?.generation !== expectedGeneration
 			)
 				return null;
-			if (!old) return this.mintLineage(state, snapshot, orderedAt);
-			orderedAt ??= Math.max(this.now(), (old.intentAt ?? 0) + 1);
-			if (orderedAt <= (old.intentAt ?? 0)) return null;
+			if (!old) return this.mintLineage(state, snapshot, intentAt);
+			if (intentAt !== undefined && intentAt <= (old.intentAt ?? -1))
+				return null;
 			const now = this.now();
 			const clean =
 				state === "enabled"
@@ -305,7 +309,7 @@ export class AcquisitionBridge {
 						: null,
 				generation: old.generation + (old.state !== state ? 1 : 0),
 				revision: old.revision + 1,
-				intentAt: orderedAt,
+				intentAt: intentAt ?? old.intentAt,
 				eventUuid:
 					old.state !== state ||
 					(touch && (!old.first || isNonDirectTouch(touch)))

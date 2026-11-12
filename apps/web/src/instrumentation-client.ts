@@ -8,7 +8,10 @@ import posthog from "posthog-js";
 
 import { env } from "@/env";
 import { stripAuthProviderReferrer } from "@/lib/auth-provider-referrer";
-import { consumeGithubAuthReturn } from "@/lib/github-auth-return";
+import {
+	cleanGithubAuthReturnUrl,
+	consumeGithubAuthReturn,
+} from "@/lib/github-auth-return";
 import { registerBaseProperties } from "@/lib/posthog-client";
 
 const githubAuthReturn = consumeGithubAuthReturn();
@@ -27,6 +30,13 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	persistence_name: POSTHOG_COOKIE_NAME,
 	before_send: (event) => stripAuthProviderReferrer(event, githubAuthReturn),
 });
+
+if (githubAuthReturn)
+	history.replaceState(
+		history.state,
+		"",
+		cleanGithubAuthReturnUrl(location.href),
+	);
 
 registerBaseProperties();
 

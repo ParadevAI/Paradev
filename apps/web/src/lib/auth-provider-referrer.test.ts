@@ -89,7 +89,7 @@ describe("stripAuthProviderReferrer", () => {
 				},
 				{ ...setOnce },
 			),
-			true,
+			"https://app.superset.sh/?_github_auth_return=fixture",
 		);
 		expect(result?.$set_once).toEqual(setOnce);
 		expect(result?.properties.$referring_domain).toBe("$direct");
@@ -153,13 +153,39 @@ describe("stripAuthProviderReferrer", () => {
 		const setOnce = {
 			$initial_referrer: "https://github.com/",
 			$initial_referring_domain: "github.com",
+			$initial_current_url:
+				"https://app.superset.sh/?_github_auth_return=fixture",
 		};
 		const result = stripAuthProviderReferrer(
 			event({ ...props }, setOnce),
-			true,
+			"https://app.superset.sh/?_github_auth_return=fixture",
 		);
 		expect(result?.properties.$referring_domain).toBe("$direct");
 		expect(result?.$set_once?.$initial_referring_domain).toBe("$direct");
+	});
+	test("preserves a genuine earlier same-host GitHub first touch after OAuth", () => {
+		const initial = {
+			$initial_referrer: "https://github.com/ParadevAI/Paradev",
+			$initial_referring_domain: "github.com",
+			$initial_current_url: "https://app.superset.sh/sign-up",
+		};
+		const callback = "https://app.superset.sh/?_github_auth_return=nonce";
+		const result = stripAuthProviderReferrer(
+			event(
+				{
+					$current_url: callback,
+					$referrer: "https://github.com/",
+					$referring_domain: "github.com",
+					...initial,
+				},
+				{ ...initial },
+			),
+			callback,
+		);
+		expect(result?.$set_once).toEqual(initial);
+		expect(result?.properties.$initial_referring_domain).toBe("github.com");
+		expect(result?.properties.$referring_domain).toBe("$direct");
+		expect(result?.properties.$current_url).toBe("https://app.superset.sh/");
 	});
 	test("passes a dropped event through", () => {
 		expect(stripAuthProviderReferrer(null)).toBeNull();

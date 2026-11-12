@@ -17,12 +17,23 @@ const HEADERS = {
 	"Referrer-Policy": "no-referrer",
 	"X-Content-Type-Options": "nosniff",
 };
-const STAGED_COOKIE = "__Host-acq_staged";
-const RETURN_COOKIE = "__Host-acq_return";
-const returnCookie = (value: string) =>
-	`${RETURN_COOKIE}=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${value ? 120 : 0}`;
-const stagedCookie = (value: string) =>
-	`${STAGED_COOKIE}=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${value ? 120 : 0}`;
+type JourneyCookie = "attempt" | "return" | "staged";
+const journeyName = (kind: JourneyCookie, attempt: string) =>
+	`__Host-acq_${kind}_${attempt}`;
+const journeyCookie = (kind: JourneyCookie, attempt: string, value: string) =>
+	`${journeyName(kind, attempt)}=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${value ? 120 : 0}`;
+function readJourneyCookie(
+	request: Request,
+	kind: JourneyCookie,
+	attempt: string,
+) {
+	const prefix = `${journeyName(kind, attempt)}=`;
+	const values = (request.headers.get("cookie") ?? "")
+		.split(";")
+		.map((p) => p.trim())
+		.filter((p) => p.startsWith(prefix));
+	return values.length === 1 ? values[0]?.slice(prefix.length) : undefined;
+}
 const json = (body: unknown, status = 200, cookie?: string) =>
 	new Response(JSON.stringify(body), {
 		status,
@@ -106,7 +117,7 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 				return json({ ok: true });
 			if (action === "visit" && request.method === "GET") {
 				const attempt = new URL(request.url).searchParams.get("attempt") ?? "";
-				const target = `${web}/api/acquisition/receive`;
+				const target = `${web}/api/acquisition/receive?attempt=${attempt}`;
 				if (!TOKEN.test(attempt))
 					return json({ error: "Invalid attempt" }, 400);
 				const script = `let sent=false;const form=document.forms[0];function send(ticket){if(sent)return;sent=true;form.elements.ticket.value=ticket;form.submit()}setTimeout(()=>send(''),5000);const optedOut=(${hasAnalyticsOptOut.toString()})(${literal(options.consentKey)},${literal(options.posthogKey)});fetch('/api/acquisition/issue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempt:${literal(attempt)},optedOut}),signal:AbortSignal.timeout(4000)}).then(r=>r.ok?r.json():null).then(r=>send(r?.ticket??'')).catch(()=>send(''));`;
@@ -190,8 +201,8 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 					const target = new URL("/api/acquisition/visit", marketing);
 					target.searchParams.set("attempt", result.attempt);
 					return redirect(target, [
-						result.setCookie,
-						returnCookie(encodedReturn),
+						journeyCookie("attempt", result.attempt, result.attempt),
+						journeyCookie("return", result.attempt, encodedReturn),
 						bridgeCookie("pending", "", 0),
 					]);
 				} catch {
@@ -201,44 +212,41 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 			if (action === "receive" && request.method === "POST") {
 				if (!hasExactOrigin(request, marketing))
 					return json({ error: "Forbidden" }, 403);
+				const attempt = url.searchParams.get("attempt") ?? "";
+				if (!TOKEN.test(attempt))
+					return json({ error: "Invalid attempt" }, 400);
 				try {
 					const fields = new URLSearchParams(await body(request));
 					const ticket = fields.get("ticket") ?? "";
-					return redirect(new URL("/api/acquisition/finalize", web), [
-						stagedCookie(TOKEN.test(ticket) ? ticket : ""),
+					const target = new URL("/api/acquisition/finalize", web);
+					target.searchParams.set("attempt", attempt);
+					return redirect(target, [
+						journeyCookie("staged", attempt, TOKEN.test(ticket) ? ticket : ""),
 					]);
 				} catch {
 					return json({ error: "Invalid request" }, 400);
 				}
 			}
 			if (action === "finalize" && request.method === "GET") {
-				const ticket = (request.headers.get("cookie") ?? "")
-					.split(";")
-					.map((p) => p.trim())
-					.find((p) => p.startsWith(`${STAGED_COOKIE}=`))
-					?.slice(STAGED_COOKIE.length + 1);
-				const attempt = readBridgeCookie(request, "attempt");
-				const savedReturn = (request.headers.get("cookie") ?? "")
-					.split(";")
-					.map((p) => p.trim())
-					.find((p) => p.startsWith(`${RETURN_COOKIE}=`))
-					?.slice(RETURN_COOKIE.length + 1);
+				const attempt = url.searchParams.get("attempt") ?? "";
+				if (
+					!TOKEN.test(attempt) ||
+					readJourneyCookie(request, "attempt", attempt) !== attempt
+				)
+					return redirect(new URL("/sign-in?_acq=1", web));
+				const ticket = readJourneyCookie(request, "staged", attempt);
+				const savedReturn = readJourneyCookie(request, "return", attempt);
 				let returnTo =
 					savedReturn && savedReturn.length <= 3500
 						? (validateReturnTo(
 								Buffer.from(savedReturn, "base64url").toString(),
 							) ?? "/sign-in")
 						: "/sign-in";
-				const cookies = [
-					stagedCookie(""),
-					returnCookie(""),
-					bridgeCookie("attempt", "", 0),
-					bridgeCookie("pending", "", 0),
-				];
+				const cookies = [journeyCookie("staged", attempt, "")];
 				try {
 					const result = await bridge.receive(ticket, attempt);
 					if (result.state !== "invalid") returnTo = result.returnTo;
-					if (result.state === "invalid" && attempt) {
+					if (result.state === "invalid" && !ticket) {
 						const record = await options.kv.getdel<{
 							returnTo: string;
 							expiresAt: number;
@@ -246,6 +254,11 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 						if (record && record.expiresAt > Date.now())
 							returnTo = validateReturnTo(record.returnTo) ?? returnTo;
 					}
+					if (!ticket || result.state !== "invalid")
+						cookies.push(
+							journeyCookie("attempt", attempt, ""),
+							journeyCookie("return", attempt, ""),
+						);
 					if (result.state !== "invalid") cookies.push(...result.setCookies);
 				} catch {}
 				const target = new URL(returnTo, web);

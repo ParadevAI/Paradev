@@ -109,10 +109,10 @@ export default function SignInPage() {
 		rememberLastUsedMethod("github");
 
 		try {
-			markGithubAuthReturn();
+			const githubCallbackURL = markGithubAuthReturn(callbackURL);
 			const { error } = await authClient.signIn.social({
 				provider: "github",
-				callbackURL,
+				callbackURL: githubCallbackURL,
 			});
 			if (error) throw error;
 		} catch (err) {
