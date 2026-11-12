@@ -855,8 +855,8 @@ msgstr "{0}項檢查中已完成{completed}項"
 msgid "{completed} of {total} completed"
 msgstr "已完成 {completed}/{total} 項"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName}（離線）"
+msgid "{computerName} is offline"
+msgstr "{computerName} 已離線"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle}字型大小"
@@ -10788,8 +10788,14 @@ msgstr "同步完成後，其外掛會顯示出來。"
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的變更）會推送到一個新分支。{computerName} 上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "它的工作（包括未提交的變更）會推送到一個新分支。所選電腦上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的變更）會推送到一個新分支。這台電腦上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重啟之前，其工作區和終端都不可用，請使用Paradev托盤選單 > 主機服務 > 重啟。"
@@ -12269,11 +12275,17 @@ msgstr "遷移雲端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主要分頁與右側邊欄之間移動焦點，若側邊欄已關閉則將其開啟"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "要將此工作區移至 {computerName} 嗎？"
+
 msgid "Move this workspace to a computer?"
 msgstr "要將此工作區移至一台電腦嗎？"
 
 msgid "Move this workspace to the cloud?"
 msgstr "要將此工作區移至雲端嗎？"
+
+msgid "Move this workspace to this computer?"
+msgstr "要將此工作區移至這台電腦嗎？"
 
 msgid "Move to"
 msgstr "移至"
@@ -19919,6 +19931,9 @@ msgstr "那台電腦"
 msgid "That computer can't be reached"
 msgstr "無法連線到那台電腦"
 
+msgid "That computer is offline"
+msgstr "那台電腦已離線"
+
 msgid "That endpoint could not be resolved."
 msgstr "無法解析該端點。"
 
@@ -20533,6 +20548,9 @@ msgstr "此電腦"
 
 msgid "This computer"
 msgstr "此電腦"
+
+msgid "This computer is offline"
+msgstr "這台電腦已離線"
 
 msgid "This computer's host is not running"
 msgstr "此電腦的主機服務未執行"

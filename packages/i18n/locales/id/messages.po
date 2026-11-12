@@ -855,8 +855,8 @@ msgstr "{completed} dari {0} check selesai"
 msgid "{completed} of {total} completed"
 msgstr "{completed} dari {total} selesai"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
+msgid "{computerName} is offline"
+msgstr "{computerName} sedang offline"
 
 msgid "{configTitle} font size"
 msgstr "Ukuran font {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Plugin-pluginnya muncul setelah sinkronisasi selesai."
 msgid "Its replies go with it."
 msgstr "Balasannya ikut terhapus."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di {computerName} dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di komputer yang Anda pilih dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di komputer ini dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Workspace dan terminalnya tidak tersedia sampai layanan ini dimulai ulang. Pakai menu tray Paradev > Host Service > Restart."
@@ -12269,11 +12275,17 @@ msgstr "Pindahkan pekerjaan cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Pindahkan workspace ini ke {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Pindahkan workspace ini ke komputer?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Pindahkan workspace ini ke cloud?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Pindahkan workspace ini ke komputer ini?"
 
 msgid "Move to"
 msgstr "Pindahkan ke"
@@ -19919,6 +19931,9 @@ msgstr "komputer itu"
 msgid "That computer can't be reached"
 msgstr "Komputer itu tidak dapat dijangkau"
 
+msgid "That computer is offline"
+msgstr "Komputer itu sedang offline"
+
 msgid "That endpoint could not be resolved."
 msgstr "Endpoint itu tidak dapat ditemukan."
 
@@ -20533,6 +20548,9 @@ msgstr "komputer ini"
 
 msgid "This computer"
 msgstr "Komputer ini"
+
+msgid "This computer is offline"
+msgstr "Komputer ini sedang offline"
 
 msgid "This computer's host is not running"
 msgstr "Host komputer ini tidak berjalan"

@@ -849,8 +849,8 @@ msgstr "Завершено {completed} з {0} перевірок"
 msgid "{completed} of {total} completed"
 msgstr "Завершено {completed} з {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (не в мережі)"
+msgid "{computerName} is offline"
+msgstr "{computerName} не в мережі"
 
 msgid "{configTitle} font size"
 msgstr "Розмір шрифту: {configTitle}"
@@ -10782,8 +10782,14 @@ msgstr "Його плагіни з'являться, коли синхроніз
 msgid "Its replies go with it."
 msgstr "Відповіді на нього буде видалено разом із ним."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на {computerName} починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на вибраному комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на цьому комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Його робочі простори й термінали недоступні, доки він не перезапуститься. Скористайтеся меню Paradev у треї > Host Service > Перезапустити."
@@ -12263,11 +12269,17 @@ msgstr "Перенесіть роботу з хмари"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Переміщувати фокус між основними вкладками та правою бічною панеллю і відкривати панель, якщо вона закрита"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Перемістити цей робочий простір на {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Перемістити цей робочий простір на комп’ютер?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Перемістити цей робочий простір у хмару?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Перемістити цей робочий простір на цей комп’ютер?"
 
 msgid "Move to"
 msgstr "Перемістити"
@@ -19913,6 +19925,9 @@ msgstr "цьому комп'ютері"
 msgid "That computer can't be reached"
 msgstr "Цей комп’ютер недоступний"
 
+msgid "That computer is offline"
+msgstr "Той комп’ютер не в мережі"
+
 msgid "That endpoint could not be resolved."
 msgstr "Не вдалося знайти адресу цього ендпоінта."
 
@@ -20527,6 +20542,9 @@ msgstr "цей комп’ютер"
 
 msgid "This computer"
 msgstr "Цей комп’ютер"
+
+msgid "This computer is offline"
+msgstr "Цей комп’ютер не в мережі"
 
 msgid "This computer's host is not running"
 msgstr "Хост цього комп'ютера не запущено"

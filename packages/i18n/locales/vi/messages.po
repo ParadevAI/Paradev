@@ -855,8 +855,8 @@ msgstr "{completed} trong {0} check đã xong"
 msgid "{completed} of {total} completed"
 msgstr "Đã hoàn thành {completed}/{total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (ngoại tuyến)"
+msgid "{computerName} is offline"
+msgstr "{computerName} đang ngoại tuyến"
 
 msgid "{configTitle} font size"
 msgstr "Cỡ chữ {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Plugin của nó sẽ hiện khi đồng bộ xong."
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên {computerName} bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính bạn chọn bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính này bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại. Dùng menu khay Paradev > Host Service > Restart."
@@ -12269,11 +12275,17 @@ msgstr "Chuyển công việc trên cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Di chuyển tiêu điểm giữa các tab chính và thanh bên phải, và mở thanh bên nếu đang đóng"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Chuyển không gian làm việc này sang {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Chuyển không gian làm việc này sang một máy tính?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Chuyển không gian làm việc này lên cloud?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Chuyển không gian làm việc này sang máy tính này?"
 
 msgid "Move to"
 msgstr "Chuyển sang"
@@ -19919,6 +19931,9 @@ msgstr "máy tính đó"
 msgid "That computer can't be reached"
 msgstr "Không thể kết nối tới máy tính đó"
 
+msgid "That computer is offline"
+msgstr "Máy tính đó đang ngoại tuyến"
+
 msgid "That endpoint could not be resolved."
 msgstr "Không thể phân giải endpoint đó."
 
@@ -20533,6 +20548,9 @@ msgstr "máy tính này"
 
 msgid "This computer"
 msgstr "Máy tính này"
+
+msgid "This computer is offline"
+msgstr "Máy tính này đang ngoại tuyến"
 
 msgid "This computer's host is not running"
 msgstr "Máy chủ của máy tính này không chạy"

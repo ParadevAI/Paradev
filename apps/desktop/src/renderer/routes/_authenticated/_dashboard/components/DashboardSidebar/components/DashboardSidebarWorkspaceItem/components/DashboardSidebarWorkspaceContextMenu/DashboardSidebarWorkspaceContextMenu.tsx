@@ -314,8 +314,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 			</ContextMenu>
 			{move && moveOpen && (
 				<MoveWorkspaceDialog
-					direction={moveOpen.direction}
-					destinationHostId={moveOpen.hostId}
+					pick={moveOpen}
 					workspace={move.workspace}
 					open
 					onOpenChange={(open) => {

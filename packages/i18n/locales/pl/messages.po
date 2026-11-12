@@ -855,8 +855,8 @@ msgstr "{completed} z {0} kontroli ukończonych"
 msgid "{completed} of {total} completed"
 msgstr "Ukończono {completed} z {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
+msgid "{computerName} is offline"
+msgstr "{computerName} jest offline"
 
 msgid "{configTitle} font size"
 msgstr "Rozmiar czcionki: {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Jego wtyczki pojawią się po zakończeniu synchronizacji."
 msgid "Its replies go with it."
 msgstr "Odpowiedzi też zostaną usunięte."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na {computerName} startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany. Pracujący agenci najpierw się zatrzymują. Terminale i pozostałe czaty zostają tam, gdzie są."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na wybranym komputerze startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany. Pracujący agenci najpierw się zatrzymują. Terminale i pozostałe czaty zostają tam, gdzie są."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na tym komputerze startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany. Pracujący agenci najpierw się zatrzymują. Terminale i pozostałe czaty zostają tam, gdzie są."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Jej obszary robocze i terminale są niedostępne do czasu restartu. Użyj menu zasobnika Paradev > Usługa hosta > Uruchom ponownie."
@@ -12269,11 +12275,17 @@ msgstr "Przenieś pracę z chmury"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Przenieś fokus między głównymi kartami a prawym paskiem bocznym i otwórz pasek, jeśli jest zamknięty"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Przenieść ten obszar roboczy na {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Przenieść ten obszar roboczy na komputer?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Przenieść ten obszar roboczy do chmury?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Przenieść ten obszar roboczy na ten komputer?"
 
 msgid "Move to"
 msgstr "Przenieś do"
@@ -19919,6 +19931,9 @@ msgstr "tym komputerze"
 msgid "That computer can't be reached"
 msgstr "Nie można połączyć się z tym komputerem"
 
+msgid "That computer is offline"
+msgstr "Tamten komputer jest offline"
+
 msgid "That endpoint could not be resolved."
 msgstr "Nie udało się rozpoznać tego punktu końcowego."
 
@@ -20533,6 +20548,9 @@ msgstr "ten komputer"
 
 msgid "This computer"
 msgstr "Ten komputer"
+
+msgid "This computer is offline"
+msgstr "Ten komputer jest offline"
 
 msgid "This computer's host is not running"
 msgstr "Host tego komputera nie działa"

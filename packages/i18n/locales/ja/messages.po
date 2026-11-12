@@ -855,8 +855,8 @@ msgstr "{0}件中{completed}件のチェックが完了"
 msgid "{completed} of {total} completed"
 msgstr "{total} 件中 {completed} 件完了"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName}（オフライン）"
+msgid "{computerName} is offline"
+msgstr "{computerName} はオフラインです"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle}のフォントサイズ"
@@ -10788,8 +10788,14 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。{computerName} 上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。選んだコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。このコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません。Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
@@ -12269,11 +12275,17 @@ msgstr "クラウドの作業を移行"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "このワークスペースを {computerName} に移動しますか？"
+
 msgid "Move this workspace to a computer?"
 msgstr "このワークスペースをコンピューターに移動しますか？"
 
 msgid "Move this workspace to the cloud?"
 msgstr "このワークスペースをクラウドに移動しますか？"
+
+msgid "Move this workspace to this computer?"
+msgstr "このワークスペースをこのコンピューターに移動しますか？"
 
 msgid "Move to"
 msgstr "移動先"
@@ -19919,6 +19931,9 @@ msgstr "そのコンピューター"
 msgid "That computer can't be reached"
 msgstr "そのコンピューターに接続できません"
 
+msgid "That computer is offline"
+msgstr "そのコンピューターはオフラインです"
+
 msgid "That endpoint could not be resolved."
 msgstr "そのエンドポイントを解決できませんでした。"
 
@@ -20533,6 +20548,9 @@ msgstr "このコンピューター"
 
 msgid "This computer"
 msgstr "このコンピューター"
+
+msgid "This computer is offline"
+msgstr "このコンピューターはオフラインです"
 
 msgid "This computer's host is not running"
 msgstr "このコンピューターのホストが実行されていません"

@@ -855,8 +855,8 @@ msgstr "{completed} de {0} comprobaciones completadas"
 msgid "{completed} of {total} completed"
 msgstr "{completed} de {total} completados"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (sin conexión)"
+msgid "{computerName} is offline"
+msgstr "{computerName} está sin conexión"
 
 msgid "{configTitle} font size"
 msgstr "Tamaño de fuente de {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Sus plugins aparecen cuando termina la sincronización."
 msgid "Its replies go with it."
 msgstr "Sus respuestas también se eliminan."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Su trabajo, incluidos los cambios sin confirmar, se sube a una rama nueva. Un espacio de trabajo en {computerName} empieza desde esa rama, y cada chat de Claude continúa allí. Los agentes que estén trabajando se detienen primero. Las terminales y los demás chats se quedan donde están."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Su trabajo, incluidos los cambios sin confirmar, se sube a una rama nueva. Un espacio de trabajo en el equipo que elijas empieza desde esa rama, y cada chat de Claude continúa allí. Los agentes que estén trabajando se detienen primero. Las terminales y los demás chats se quedan donde están."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Su trabajo, incluidos los cambios sin confirmar, se sube a una rama nueva. Un espacio de trabajo en este equipo empieza desde esa rama, y cada chat de Claude continúa allí. Los agentes que estén trabajando se detienen primero. Las terminales y los demás chats se quedan donde están."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Sus espacios de trabajo y terminales no estarán disponibles hasta que se reinicie: usa el menú de la bandeja de Paradev > Host Service > Reiniciar."
@@ -12269,11 +12275,17 @@ msgstr "Mueve el trabajo en la nube"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Mover el foco entre las pestañas principales y la barra lateral derecha, y abrir la barra lateral si está cerrada"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "¿Mover este espacio de trabajo a {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "¿Mover este espacio de trabajo a un equipo?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "¿Mover este espacio de trabajo a la nube?"
+
+msgid "Move this workspace to this computer?"
+msgstr "¿Mover este espacio de trabajo a este equipo?"
 
 msgid "Move to"
 msgstr "Mover a"
@@ -19919,6 +19931,9 @@ msgstr "ese ordenador"
 msgid "That computer can't be reached"
 msgstr "No se puede acceder a ese equipo"
 
+msgid "That computer is offline"
+msgstr "Ese equipo está sin conexión"
+
 msgid "That endpoint could not be resolved."
 msgstr "No se pudo resolver ese endpoint."
 
@@ -20533,6 +20548,9 @@ msgstr "este equipo"
 
 msgid "This computer"
 msgstr "Este equipo"
+
+msgid "This computer is offline"
+msgstr "Este equipo está sin conexión"
 
 msgid "This computer's host is not running"
 msgstr "El host de este equipo no se está ejecutando"

@@ -171,8 +171,7 @@ export function WorkspaceMoreMenu({
 			</DropdownMenu>
 			{moveOpen && (
 				<MoveWorkspaceDialog
-					direction={moveOpen.direction}
-					destinationHostId={moveOpen.hostId}
+					pick={moveOpen}
 					workspace={{
 						id: workspaceId,
 						hostId: workspace.hostId,

@@ -5,10 +5,9 @@ import { LuCloudUpload, LuLaptop } from "react-icons/lu";
 import { useMoveDestinationComputers } from "renderer/routes/_authenticated/_dashboard/hooks/useMoveDestinationComputers";
 import type { WorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 
-export type MoveDestinationPick = {
-	direction: WorkspaceMoveDirection;
-	hostId?: string;
-};
+export type MoveDestinationPick =
+	| { direction: "to-cloud" }
+	| { direction: "to-computer"; hostId: string };
 
 /** `ContextMenuItem` or `DropdownMenuItem`. */
 type MenuItem = ComponentType<{

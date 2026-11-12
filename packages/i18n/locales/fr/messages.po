@@ -855,8 +855,8 @@ msgstr "{completed} vérifications sur {0} terminées"
 msgid "{completed} of {total} completed"
 msgstr "{completed} sur {total} terminés"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (hors ligne)"
+msgid "{computerName} is offline"
+msgstr "{computerName} est hors ligne"
 
 msgid "{configTitle} font size"
 msgstr "Taille de police de {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Ses plugins apparaissent à la fin de la synchronisation."
 msgid "Its replies go with it."
 msgstr "Ses réponses seront aussi supprimées."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur {computerName} démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur l’ordinateur choisi démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur cet ordinateur démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Ses espaces de travail et terminaux sont indisponibles jusqu'à son redémarrage. Utilisez le menu de la barre d'état Paradev > Service hôte > Redémarrer."
@@ -12269,11 +12275,17 @@ msgstr "Transférer le travail cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Déplacer le focus entre les onglets principaux et la barre latérale droite, et ouvrir la barre latérale si elle est fermée"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Déplacer cet espace de travail vers {computerName} ?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Déplacer cet espace de travail vers un ordinateur ?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Déplacer cet espace de travail vers le cloud ?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Déplacer cet espace de travail vers cet ordinateur ?"
 
 msgid "Move to"
 msgstr "Déplacer vers"
@@ -19919,6 +19931,9 @@ msgstr "cet ordinateur"
 msgid "That computer can't be reached"
 msgstr "Cet ordinateur est injoignable"
 
+msgid "That computer is offline"
+msgstr "Cet ordinateur est hors ligne"
+
 msgid "That endpoint could not be resolved."
 msgstr "Ce point de terminaison n'a pas pu être résolu."
 
@@ -20533,6 +20548,9 @@ msgstr "cet ordinateur"
 
 msgid "This computer"
 msgstr "Cet ordinateur"
+
+msgid "This computer is offline"
+msgstr "Cet ordinateur est hors ligne"
 
 msgid "This computer's host is not running"
 msgstr "L'hôte de cet ordinateur ne fonctionne pas"

@@ -855,8 +855,8 @@ msgstr "Dokončeno {completed} z {0} kontrol"
 msgid "{completed} of {total} completed"
 msgstr "Dokončeno {completed} z {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
+msgid "{computerName} is offline"
+msgstr "{computerName} je offline"
 
 msgid "{configTitle} font size"
 msgstr "Velikost písma: {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Jeho pluginy se objeví po dokončení synchronizace."
 msgid "Its replies go with it."
 msgstr "Smažou se i odpovědi."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na {computerName} začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na vybraném počítači začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na tomto počítači začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Její pracovní prostory a terminály nebudou dostupné, dokud se nerestartuje. Použijte nabídku Paradev na liště > Host Service > Restart."
@@ -12269,11 +12275,17 @@ msgstr "Přesuňte práci z cloudu"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a otevřít panel, pokud je zavřený"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Přesunout tento pracovní prostor na {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Přesunout tento pracovní prostor na počítač?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Přesunout tento pracovní prostor do cloudu?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Přesunout tento pracovní prostor na tento počítač?"
 
 msgid "Move to"
 msgstr "Přesunout do"
@@ -19919,6 +19931,9 @@ msgstr "ten počítač"
 msgid "That computer can't be reached"
 msgstr "Tento počítač není dostupný"
 
+msgid "That computer is offline"
+msgstr "Ten počítač je offline"
+
 msgid "That endpoint could not be resolved."
 msgstr "Tento koncový bod se nepodařilo přeložit."
 
@@ -20533,6 +20548,9 @@ msgstr "tento počítač"
 
 msgid "This computer"
 msgstr "Tento počítač"
+
+msgid "This computer is offline"
+msgstr "Tento počítač je offline"
 
 msgid "This computer's host is not running"
 msgstr "Hostitel tohoto počítače neběží"

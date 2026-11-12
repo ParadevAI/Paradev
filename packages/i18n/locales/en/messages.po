@@ -855,8 +855,8 @@ msgstr "{completed} of {0} checks complete"
 msgid "{completed} of {total} completed"
 msgstr "{completed} of {total} completed"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
+msgid "{computerName} is offline"
+msgstr "{computerName} is offline"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle} font size"
@@ -10788,8 +10788,14 @@ msgstr "Its plugins appear when the sync finishes."
 msgid "Its replies go with it."
 msgstr "Its replies go with it."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
@@ -12269,11 +12275,17 @@ msgstr "Move cloud work"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Move this workspace to {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Move this workspace to a computer?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Move this workspace to the cloud?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Move this workspace to this computer?"
 
 msgid "Move to"
 msgstr "Move to"
@@ -19919,6 +19931,9 @@ msgstr "that computer"
 msgid "That computer can't be reached"
 msgstr "That computer can't be reached"
 
+msgid "That computer is offline"
+msgstr "That computer is offline"
+
 msgid "That endpoint could not be resolved."
 msgstr "That endpoint could not be resolved."
 
@@ -20533,6 +20548,9 @@ msgstr "this computer"
 
 msgid "This computer"
 msgstr "This computer"
+
+msgid "This computer is offline"
+msgstr "This computer is offline"
 
 msgid "This computer's host is not running"
 msgstr "This computer's host is not running"

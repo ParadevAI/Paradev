@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueryClient } from "@tanstack/react-query";
@@ -96,9 +97,7 @@ export function useWorkspaceMove(
 					? t({
 							message: `Update Paradev on ${sourceName} to move its workspaces from this phone.`,
 						})
-					: error instanceof Error
-						? error.message
-						: undefined,
+					: errorMessage(error, t({ message: "Unknown error" })),
 			);
 		}
 	};
@@ -114,17 +113,18 @@ export function useWorkspaceMove(
 			{ text: confirmText, onPress: onConfirm },
 		]);
 
-	const moveToComputer = (computer: MoveComputer) =>
+	const moveToComputer = (computer: MoveComputer) => {
+		const computerName = computer.name;
 		confirm(
-			t({ message: "Move this workspace to a computer?" }),
+			t({ message: `Move this workspace to ${computerName}?` }),
 			t({
-				message:
-					"Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are.",
+				message: `Its work, including uncommitted changes, is pushed to a new branch. A workspace on ${computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are.`,
 			}),
 			t({ message: "Move" }),
 			() =>
 				void send({ kind: "computer", hostId: computer.hostId }, computer.name),
 		);
+	};
 
 	const repositoryOfWorkspace = async (url: string) => {
 		const projects = await queryClient.fetchQuery({

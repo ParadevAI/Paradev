@@ -855,8 +855,8 @@ msgstr "{0} kontrolden {completed} tanesi tamamlandı"
 msgid "{completed} of {total} completed"
 msgstr "{total} adımdan {completed} tanesi tamamlandı"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (çevrimdışı)"
+msgid "{computerName} is offline"
+msgstr "{computerName} çevrimdışı"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle} yazı tipi boyutu"
@@ -10788,8 +10788,14 @@ msgstr "Eklentileri eşitleme bitince görünür."
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. {computerName} üzerindeki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Seçtiğiniz bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Bu bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz. Paradev tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
@@ -12269,11 +12275,17 @@ msgstr "Bulut işinizi taşıyın"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Odağı ana sekmeler ile sağ kenar çubuğu arasında taşı ve kapalıysa kenar çubuğunu aç"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Bu çalışma alanı {computerName} bilgisayarına taşınsın mı?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Bu çalışma alanı bir bilgisayara taşınsın mı?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Bu çalışma alanı buluta taşınsın mı?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Bu çalışma alanı bu bilgisayara taşınsın mı?"
 
 msgid "Move to"
 msgstr "Taşı"
@@ -19919,6 +19931,9 @@ msgstr "o bilgisayar"
 msgid "That computer can't be reached"
 msgstr "Bu bilgisayara ulaşılamıyor"
 
+msgid "That computer is offline"
+msgstr "O bilgisayar çevrimdışı"
+
 msgid "That endpoint could not be resolved."
 msgstr "Bu uç nokta çözümlenemedi."
 
@@ -20533,6 +20548,9 @@ msgstr "bu bilgisayar"
 
 msgid "This computer"
 msgstr "Bu bilgisayar"
+
+msgid "This computer is offline"
+msgstr "Bu bilgisayar çevrimdışı"
 
 msgid "This computer's host is not running"
 msgstr "Bu bilgisayarın host hizmeti çalışmıyor"

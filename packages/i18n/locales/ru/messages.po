@@ -855,8 +855,8 @@ msgstr "{completed} из {0} проверок завершено"
 msgid "{completed} of {total} completed"
 msgstr "Завершено {completed} из {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (не в сети)"
+msgid "{computerName} is offline"
+msgstr "{computerName} не в сети"
 
 msgid "{configTitle} font size"
 msgstr "Размер шрифта: {configTitle}"
@@ -10788,8 +10788,14 @@ msgstr "Его плагины появятся после завершения �
 msgid "Its replies go with it."
 msgstr "Ответы тоже будут удалены."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Его работа, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на {computerName} начинается с этой ветки, и каждый чат Claude продолжается там. Работающие агенты сначала останавливаются. Терминалы и другие чаты остаются на месте."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Его работа, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на выбранном компьютере начинается с этой ветки, и каждый чат Claude продолжается там. Работающие агенты сначала останавливаются. Терминалы и другие чаты остаются на месте."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Его работа, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на этом компьютере начинается с этой ветки, и каждый чат Claude продолжается там. Работающие агенты сначала останавливаются. Терминалы и другие чаты остаются на месте."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Её рабочие области и терминалы недоступны до перезапуска. Откройте меню Paradev в трее > Host Service > Restart."
@@ -12269,11 +12275,17 @@ msgstr "Перенесите работу из облака"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Перемещать фокус между основными вкладками и правой боковой панелью и открывать панель, если она закрыта"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Перенести эту рабочую область на {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Перенести эту рабочую область на компьютер?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Перенести эту рабочую область в облако?"
+
+msgid "Move this workspace to this computer?"
+msgstr "Перенести эту рабочую область на этот компьютер?"
 
 msgid "Move to"
 msgstr "Перенести"
@@ -19919,6 +19931,9 @@ msgstr "этом компьютере"
 msgid "That computer can't be reached"
 msgstr "Этот компьютер недоступен"
 
+msgid "That computer is offline"
+msgstr "Тот компьютер не в сети"
+
 msgid "That endpoint could not be resolved."
 msgstr "Не удалось разрешить эту конечную точку."
 
@@ -20533,6 +20548,9 @@ msgstr "этот компьютер"
 
 msgid "This computer"
 msgstr "Этот компьютер"
+
+msgid "This computer is offline"
+msgstr "Этот компьютер не в сети"
 
 msgid "This computer's host is not running"
 msgstr "Хост этого компьютера не запущен"
