@@ -20233,6 +20233,9 @@ msgstr "The moved workspace shows on Home when it is ready."
 msgid "The name of your organization or team"
 msgstr "The name of your organization or team"
 
+msgid "The name shows in the sidebar."
+msgstr "The name shows in the sidebar."
+
 msgid "The network connection changed"
 msgstr "The network connection changed"
 

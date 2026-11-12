@@ -20233,6 +20233,9 @@ msgstr "移动后的工作区准备好后会显示在主页上。"
 msgid "The name of your organization or team"
 msgstr "你的组织或团队的名称"
 
+msgid "The name shows in the sidebar."
+msgstr "此名称显示在侧边栏中。"
+
 msgid "The network connection changed"
 msgstr "网络连接已变更"
 

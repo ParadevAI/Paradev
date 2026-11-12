@@ -20233,6 +20233,9 @@ msgstr "Không gian làm việc đã chuyển sẽ hiện ở Trang chủ khi s�
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
 
+msgid "The name shows in the sidebar."
+msgstr "Tên này hiển thị trên thanh bên."
+
 msgid "The network connection changed"
 msgstr "Kết nối mạng đã thay đổi"
 

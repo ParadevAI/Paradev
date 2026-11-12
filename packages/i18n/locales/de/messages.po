@@ -20233,6 +20233,9 @@ msgstr "Der verschobene Workspace erscheint auf der Startseite, sobald er bereit
 msgid "The name of your organization or team"
 msgstr "Der Name deiner Organisation oder deines Teams"
 
+msgid "The name shows in the sidebar."
+msgstr "Der Name wird in der Seitenleiste angezeigt."
+
 msgid "The network connection changed"
 msgstr "Die Netzwerkverbindung hat sich geändert"
 

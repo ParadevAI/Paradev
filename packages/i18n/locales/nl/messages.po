@@ -20233,6 +20233,9 @@ msgstr "De verplaatste werkruimte verschijnt op Start zodra hij klaar is."
 msgid "The name of your organization or team"
 msgstr "De naam van je organisatie of team"
 
+msgid "The name shows in the sidebar."
+msgstr "De naam staat in de zijbalk."
+
 msgid "The network connection changed"
 msgstr "De netwerkverbinding is gewijzigd"
 

@@ -46,7 +46,6 @@ for (const { kind, isLocalWorkspace, isCloudWorkspace } of KINDS) {
 							onTogglePin={noop}
 							onCreateSection={noop}
 							onMoveToSection={noop}
-							onOpenInFinder={noop}
 							onCopyPath={noop}
 							onCopyBranchName={noop}
 							onCopyWorkspaceId={noop}

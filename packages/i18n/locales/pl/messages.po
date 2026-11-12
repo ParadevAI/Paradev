@@ -20233,6 +20233,9 @@ msgstr "Przeniesiony obszar roboczy pojawi się na ekranie głównym, gdy będzi
 msgid "The name of your organization or team"
 msgstr "Nazwa organizacji lub zespołu"
 
+msgid "The name shows in the sidebar."
+msgstr "Nazwa jest widoczna na pasku bocznym."
+
 msgid "The network connection changed"
 msgstr "Połączenie sieciowe się zmieniło"
 

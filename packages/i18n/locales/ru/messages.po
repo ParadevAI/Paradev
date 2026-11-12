@@ -20233,6 +20233,9 @@ msgstr "Перемещённое рабочее пространство поя�
 msgid "The name of your organization or team"
 msgstr "Название организации или команды"
 
+msgid "The name shows in the sidebar."
+msgstr "Это имя отображается на боковой панели."
+
 msgid "The network connection changed"
 msgstr "Сетевое соединение изменилось"
 

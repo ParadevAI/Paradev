@@ -20233,6 +20233,9 @@ msgstr "L'espace de travail déplacé apparaîtra dans Accueil dès qu'il sera p
 msgid "The name of your organization or team"
 msgstr "Le nom de votre organisation ou équipe"
 
+msgid "The name shows in the sidebar."
+msgstr "Le nom s’affiche dans la barre latérale."
+
 msgid "The network connection changed"
 msgstr "La connexion réseau a changé"
 

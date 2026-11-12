@@ -37,6 +37,7 @@ import {
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/RenameDialog";
 import type { CreateNewAgentSession } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useAgentSessionLauncher";
 import type { TerminalLauncher } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2TerminalLauncher";
 import type {
@@ -48,7 +49,6 @@ import type { SurfaceForkSource } from "../../../../hooks/useSurfaceFork";
 import { useSurfaceForkSource } from "../../../../hooks/useSurfaceForkSource";
 import { AccountUsageMenuSection } from "../../../AccountUsageMenuSection";
 import { ForkMenuItems } from "../../../ForkMenuItems";
-import { RenameDialog } from "../../../RenameDialog";
 import { StopHeaderEvents } from "../../../StopHeaderEvents";
 import { UsageWarningDot } from "../../../UsageWarningDot";
 import { TerminalPaneIcon } from "../TerminalPaneIcon";

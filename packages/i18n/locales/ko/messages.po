@@ -20233,6 +20233,9 @@ msgstr "이동한 워크스페이스는 준비되면 홈에 표시됩니다."
 msgid "The name of your organization or team"
 msgstr "조직 또는 팀의 이름"
 
+msgid "The name shows in the sidebar."
+msgstr "이 이름은 사이드바에 표시됩니다."
+
 msgid "The network connection changed"
 msgstr "네트워크 연결이 바뀌었습니다"
 

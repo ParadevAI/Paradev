@@ -92,7 +92,6 @@ export function DashboardSidebarWorkspaceItem({
 		handleCopyWorkspaceId,
 		handleCreateSection,
 		handleMoveToSection,
-		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleRemovePullRequest,
 		handleTogglePin,
@@ -288,7 +287,6 @@ export function DashboardSidebarWorkspaceItem({
 							onCreateSection={handleCreateSection}
 							showDeleteHotkey={isActive}
 							onMoveToSection={handleMoveToSection}
-							onOpenInFinder={handleOpenInFinder}
 							onCopyPath={handleCopyPath}
 							onCopyBranchName={handleCopyBranchName}
 							onCopyWorkspaceId={handleCopyWorkspaceId}
@@ -378,7 +376,6 @@ export function DashboardSidebarWorkspaceItem({
 						isCloudWorkspace={isCloudWorkspace}
 						isPinned={workspace.isPinned}
 						onTogglePin={handleTogglePin}
-						onOpenInFinder={handleOpenInFinder}
 						showDeleteHotkey={isActive}
 						onCopyPath={handleCopyPath}
 						onCopyBranchName={handleCopyBranchName}

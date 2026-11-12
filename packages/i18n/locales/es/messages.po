@@ -20233,6 +20233,9 @@ msgstr "El espacio de trabajo movido aparecerá en Inicio cuando esté listo."
 msgid "The name of your organization or team"
 msgstr "El nombre de la organización o equipo"
 
+msgid "The name shows in the sidebar."
+msgstr "El nombre aparece en la barra lateral."
+
 msgid "The network connection changed"
 msgstr "Cambió la conexión de red"
 

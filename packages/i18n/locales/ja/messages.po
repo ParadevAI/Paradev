@@ -20233,6 +20233,9 @@ msgstr "移動したワークスペースは、準備ができるとホームに
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
 
+msgid "The name shows in the sidebar."
+msgstr "この名前はサイドバーに表示されます。"
+
 msgid "The network connection changed"
 msgstr "ネットワーク接続が変更されました"
 

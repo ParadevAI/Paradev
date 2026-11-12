@@ -22,7 +22,6 @@ export function WorkspaceToolbar({
 	return (
 		<>
 			<WorkspaceMoreMenu
-				workspaceId={workspace.id}
 				projectId={workspace.projectId}
 				runDefinition={run.definition}
 				isRunning={run.isRunning}

@@ -20233,6 +20233,9 @@ msgstr "Taşınan çalışma alanı hazır olduğunda Ana Sayfa'da görünür."
 msgid "The name of your organization or team"
 msgstr "Kuruluşunuzun veya takımınızın adı"
 
+msgid "The name shows in the sidebar."
+msgstr "Ad kenar çubuğunda görünür."
+
 msgid "The network connection changed"
 msgstr "Ağ bağlantısı değişti"
 

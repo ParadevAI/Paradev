@@ -20233,6 +20233,9 @@ msgstr "Lo spazio di lavoro spostato apparirà nella Home quando sarà pronto."
 msgid "The name of your organization or team"
 msgstr "Il nome della tua organizzazione o del tuo team"
 
+msgid "The name shows in the sidebar."
+msgstr "Il nome compare nella barra laterale."
+
 msgid "The network connection changed"
 msgstr "La connessione di rete è cambiata"
 

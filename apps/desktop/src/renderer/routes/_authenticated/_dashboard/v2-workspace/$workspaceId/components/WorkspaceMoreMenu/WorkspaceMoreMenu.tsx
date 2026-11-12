@@ -3,40 +3,25 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuShortcut,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import {
-	ArrowRightLeft,
-	Ellipsis,
-	Play,
-	Settings,
-	Square,
-	X,
-} from "lucide-react";
+import { Ellipsis, Play, Settings, Square, X } from "lucide-react";
 import { useState } from "react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
-import {
-	type MoveDestinationPick,
-	MoveToDestinationItems,
-} from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
+import type { MoveDestinationPick } from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
 import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
+import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/RenameDialog";
+import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
-import { useWorkspaceOpenIn } from "../../hooks/useWorkspaceOpenIn";
-import { useWorkspaceOpenInTarget } from "../../hooks/useWorkspaceOpenInTarget";
-import { WorkspaceOpenInItems } from "./components/WorkspaceOpenInItems";
+import { WorkspaceMoreMenuItems } from "./components/WorkspaceMoreMenuItems";
 
 interface WorkspaceMoreMenuProps {
-	workspaceId: string;
 	projectId: string | null;
 	runDefinition: WorkspaceRunDefinition | null;
 	isRunning: boolean;
@@ -47,7 +32,6 @@ interface WorkspaceMoreMenuProps {
 }
 
 export function WorkspaceMoreMenu({
-	workspaceId,
 	projectId,
 	runDefinition,
 	isRunning,
@@ -57,19 +41,68 @@ export function WorkspaceMoreMenu({
 	onForceStopRun,
 }: WorkspaceMoreMenuProps) {
 	const { t } = useLingui();
-	const openInTarget = useWorkspaceOpenInTarget(workspaceId);
-	const openIn = useWorkspaceOpenIn({
-		worktreePath: openInTarget?.worktreePath ?? null,
-		projectId,
-	});
 	const configureRun = useConfigureWorkspaceRun(projectId, runDefinition);
 	const runHotkey = useHotkeyDisplay("RUN_WORKSPACE_COMMAND").text;
 	const hasRunCommand = (runDefinition?.commands ?? []).length > 0;
 	const label = t({ message: "More actions" });
 	const { workspace } = useWorkspace();
+	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
 	const [moveOpen, setMoveOpen] = useState<MoveDestinationPick | null>(null);
+	const [rename, setRename] = useState<{ cloud: boolean } | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
+
+	const runItems = (
+		<>
+			<DropdownMenuItem
+				disabled={isRunPending}
+				onClick={() => {
+					if (!hasRunCommand && !isRunning) {
+						configureRun();
+						return;
+					}
+					void onToggleRun();
+				}}
+			>
+				{isRunning ? (
+					<Square className="size-4" />
+				) : hasRunCommand ? (
+					<Play className="size-4" />
+				) : (
+					<Settings className="size-4" />
+				)}
+				{isRunning ? (
+					<Trans>Stop</Trans>
+				) : hasRunCommand ? (
+					<Trans>Run</Trans>
+				) : (
+					<Trans>Set Run</Trans>
+				)}
+				{(isRunning || hasRunCommand) && runHotkey !== "Unassigned" && (
+					<DropdownMenuShortcut>{runHotkey}</DropdownMenuShortcut>
+				)}
+			</DropdownMenuItem>
+			{canForceStop && (
+				<DropdownMenuItem
+					onClick={() => void onForceStopRun()}
+					className="text-destructive focus:text-destructive"
+				>
+					<X className="size-4 text-destructive" />
+					<Trans>Force Stop</Trans>
+				</DropdownMenuItem>
+			)}
+			{(isRunning || hasRunCommand) && (
+				<DropdownMenuItem onClick={configureRun}>
+					<Settings className="size-4" />
+					{runDefinition?.source === "terminal-preset" ? (
+						<Trans>Edit Run Script</Trans>
+					) : (
+						<Trans>Configure</Trans>
+					)}
+				</DropdownMenuItem>
+			)}
+		</>
+	);
 
 	return (
 		<>
@@ -91,89 +124,36 @@ export function WorkspaceMoreMenu({
 				<DropdownMenuContent
 					align="end"
 					className="min-w-56"
-					onCloseAutoFocus={
-						moveDirections.length > 0 ? onCloseAutoFocus : undefined
-					}
+					onCloseAutoFocus={onCloseAutoFocus}
 				>
-					{openInTarget && (
-						<>
-							<WorkspaceOpenInItems openIn={openIn} />
-							<DropdownMenuSeparator />
-						</>
-					)}
-					<DropdownMenuItem
-						disabled={isRunPending}
-						onClick={() => {
-							if (!hasRunCommand && !isRunning) {
-								configureRun();
-								return;
-							}
-							void onToggleRun();
-						}}
-					>
-						{isRunning ? (
-							<Square className="size-4" />
-						) : hasRunCommand ? (
-							<Play className="size-4" />
-						) : (
-							<Settings className="size-4" />
-						)}
-						{isRunning ? (
-							<Trans>Stop</Trans>
-						) : hasRunCommand ? (
-							<Trans>Run</Trans>
-						) : (
-							<Trans>Set Run</Trans>
-						)}
-						{(isRunning || hasRunCommand) && runHotkey !== "Unassigned" && (
-							<DropdownMenuShortcut>{runHotkey}</DropdownMenuShortcut>
-						)}
-					</DropdownMenuItem>
-					{canForceStop && (
-						<DropdownMenuItem
-							onClick={() => void onForceStopRun()}
-							className="text-destructive focus:text-destructive"
-						>
-							<X className="size-4 text-destructive" />
-							<Trans>Force Stop</Trans>
-						</DropdownMenuItem>
-					)}
-					{(isRunning || hasRunCommand) && (
-						<DropdownMenuItem onClick={configureRun}>
-							<Settings className="size-4" />
-							{runDefinition?.source === "terminal-preset" ? (
-								<Trans>Edit Run Script</Trans>
-							) : (
-								<Trans>Configure</Trans>
-							)}
-						</DropdownMenuItem>
-					)}
-					{moveDirections.length > 0 && (
-						<>
-							<DropdownMenuSeparator />
-							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>
-									<ArrowRightLeft className="size-4" />
-									<Trans>Move to</Trans>
-								</DropdownMenuSubTrigger>
-								<DropdownMenuSubContent>
-									<MoveToDestinationItems
-										item={DropdownMenuItem}
-										directions={moveDirections}
-										fromHostId={workspace.hostId}
-										onPick={(pick) => runAfterClose(() => setMoveOpen(pick))}
-									/>
-								</DropdownMenuSubContent>
-							</DropdownMenuSub>
-						</>
-					)}
+					<WorkspaceMoreMenuItems
+						workspace={workspace}
+						runItems={runItems}
+						moveDirections={moveDirections}
+						onPickMove={(pick) => runAfterClose(() => setMoveOpen(pick))}
+						onRename={(target) => runAfterClose(() => setRename(target))}
+					/>
 				</DropdownMenuContent>
 			</DropdownMenu>
+			{rename && (
+				<RenameDialog
+					name={workspace.name}
+					title={t({ message: "Rename workspace" })}
+					description={t({ message: "The name shows in the sidebar." })}
+					inputLabel={t({ message: "Workspace name" })}
+					onClose={() => setRename(null)}
+					onSubmit={(name) => {
+						const trimmed = name.trim();
+						if (!trimmed) return;
+						workspaceActions.renameWorkspace(workspace.id, trimmed, rename);
+					}}
+				/>
+			)}
 			{moveOpen && (
 				<MoveWorkspaceDialog
 					pick={moveOpen}
 					workspace={{
-						id: workspaceId,
+						id: workspace.id,
 						hostId: workspace.hostId,
 						projectId: workspace.projectId,
 						name: workspace.name,

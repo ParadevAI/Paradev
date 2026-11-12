@@ -20233,6 +20233,9 @@ msgstr "Přesunutý pracovní prostor se zobrazí na Domů, až bude připraven.
 msgid "The name of your organization or team"
 msgstr "Název vaší organizace nebo týmu"
 
+msgid "The name shows in the sidebar."
+msgstr "Název se zobrazuje v postranním panelu."
+
 msgid "The network connection changed"
 msgstr "Síťové připojení se změnilo"
 

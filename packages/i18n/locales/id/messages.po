@@ -20233,6 +20233,9 @@ msgstr "Workspace yang dipindahkan akan muncul di Beranda saat siap."
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
 
+msgid "The name shows in the sidebar."
+msgstr "Nama ini ditampilkan di bilah samping."
+
 msgid "The network connection changed"
 msgstr "Koneksi jaringan berubah"
 
