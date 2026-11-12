@@ -1,0 +1,1 @@
+export { SolarCheckCircleIcon } from "./SolarCheckCircleIcon";

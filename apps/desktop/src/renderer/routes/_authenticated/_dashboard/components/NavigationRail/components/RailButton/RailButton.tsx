@@ -17,6 +17,8 @@ export function railButtonClass(isActive: boolean) {
 interface RailButtonProps {
 	label: string;
 	icon: ComponentType<{ className?: string; strokeWidth?: number }>;
+	/** A filled glyph (Phosphor, Codicons) keeps its own shape; the rail's stroke would thicken it. */
+	isIconFilled?: boolean;
 	isActive?: boolean;
 	onClick: () => void;
 	badge?: ReactNode;
@@ -25,6 +27,7 @@ interface RailButtonProps {
 export function RailButton({
 	label,
 	icon: Icon,
+	isIconFilled = false,
 	isActive = false,
 	onClick,
 	badge,
@@ -41,7 +44,9 @@ export function RailButton({
 				>
 					<Icon
 						className={RAIL_ICON_CLASS}
-						strokeWidth={RAIL_ICON_STROKE_WIDTH}
+						// Omitted, not undefined: react-icons would then drop the glyph's
+						// own stroke-width="0" and SVG would draw a 1-unit outline.
+						{...(isIconFilled ? {} : { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
 					/>
 					{badge}
 				</button>
