@@ -5,7 +5,7 @@ import {
 	createRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { fn } from "storybook/test";
+import { fn, userEvent, within } from "storybook/test";
 import { TurnFailureActionsProvider } from "../../../../../../../../providers/TurnFailureActionsProvider";
 import { TurnFailureCard } from "./TurnFailureCard";
 
@@ -49,6 +49,13 @@ export const SpendLimit: Story = {
 			message:
 				'API Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"You have reached your specified workspace API usage limits. You will regain access on 2026-12-01 at 00:00 UTC."}}',
 		},
+	},
+};
+
+export const SpendLimitDetails: Story = {
+	args: SpendLimit.args,
+	play: async ({ canvasElement }) => {
+		await userEvent.click(within(canvasElement).getByText("Show details"));
 	},
 };
 

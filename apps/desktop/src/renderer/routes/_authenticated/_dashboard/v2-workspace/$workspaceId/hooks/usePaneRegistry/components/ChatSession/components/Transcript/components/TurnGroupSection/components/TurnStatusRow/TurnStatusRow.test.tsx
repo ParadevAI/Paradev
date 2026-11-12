@@ -146,6 +146,7 @@ test("a spend limit the host did not classify is a limit notice, not a red failu
 				continueTask: () => {},
 				dismissed: new Set(),
 				setDismissed: () => {},
+				changeModel: () => {},
 			}}
 		>
 			<TurnStatusRow
@@ -166,7 +167,12 @@ test("a spend limit the host did not classify is a limit notice, not a red failu
 	expect(card?.getAttribute("role")).toBe("status");
 	expect(card?.textContent).toContain("Usage limit reached");
 	expect(card?.className).not.toContain("destructive");
-	expect(view.queryByText("Change model")).toBeNull();
+	for (const action of ["Usage settings", "Change model", "Continue"]) {
+		expect(view.getByText(action)).toBeTruthy();
+	}
+	expect(card?.textContent).not.toContain("workspace API usage limits");
+	fireEvent.click(view.getByText("Show details"));
+	expect(card?.textContent).toContain("workspace API usage limits");
 });
 
 function authCard(actions: Partial<TurnFailureActions>) {

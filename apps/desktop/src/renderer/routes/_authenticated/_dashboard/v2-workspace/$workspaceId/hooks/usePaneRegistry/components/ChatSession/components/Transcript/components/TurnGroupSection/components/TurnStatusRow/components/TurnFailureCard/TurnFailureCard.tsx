@@ -71,7 +71,8 @@ export function TurnFailureCard({
 	const kind = isUsageLimitMessage(error?.message ?? "")
 		? "usage_limit"
 		: (error?.kind ?? "unknown");
-	const tone = TONES[kind === "usage_limit" ? "limit" : "failure"];
+	const limit = kind === "usage_limit";
+	const tone = TONES[limit ? "limit" : "failure"];
 	const manualSignIn = kind === "auth" && actions?.manualSignIn === true;
 	const title = i18n._(
 		manualSignIn ? MANUAL_SIGN_IN_TITLE : FAILURE_TITLES[kind],
@@ -172,13 +173,11 @@ export function TurnFailureCard({
 					expanded: signingIn,
 					onClick: () => setSigningIn((open) => !open),
 				},
-				usage_settings: router
-					? {
-							label: <Trans>Usage settings</Trans>,
-							disabled: false,
-							onClick: () => void router.navigate({ to: "/settings/usage" }),
-						}
-					: null,
+				usage_settings: {
+					label: <Trans>Usage settings</Trans>,
+					disabled: false,
+					onClick: () => void router?.navigate({ to: "/settings/usage" }),
+				},
 				agent_settings: recovery.openAgentSettings
 					? {
 							label: <Trans>Agent settings</Trans>,
@@ -209,6 +208,25 @@ export function TurnFailureCard({
 			)
 		: [];
 
+	const copyError = (
+		<CopyErrorButton
+			text={[title, error?.message, error?.detail].filter(Boolean).join("\n\n")}
+		/>
+	);
+	const offeredButtons = offered.map((button, index) => (
+		<Button
+			aria-expanded={button.expanded}
+			className={index === 0 ? tone.primary : undefined}
+			disabled={button.disabled}
+			key={button.action}
+			onClick={button.onClick}
+			size="xs"
+			variant="outline"
+		>
+			{button.label}
+		</Button>
+	));
+
 	return (
 		<div
 			className={cn(
@@ -216,15 +234,27 @@ export function TurnFailureCard({
 				tone.card,
 			)}
 			data-turn-failure={kind}
-			role={kind === "usage_limit" ? "status" : "alert"}
+			role={limit ? "status" : "alert"}
 		>
-			<tone.Icon className={cn("mt-0.5 size-4 shrink-0", tone.icon)} />
+			{limit ? (
+				<span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-warning/15 text-warning">
+					<Gauge className="size-3.5" />
+				</span>
+			) : (
+				<tone.Icon className={cn("mt-0.5 size-4 shrink-0", tone.icon)} />
+			)}
 			<div className="flex min-w-0 flex-1 flex-col gap-1.5">
-				<div className={cn("font-medium text-sm leading-5", tone.title)}>
+				<div
+					className={cn(
+						"font-medium text-sm",
+						limit ? "leading-6" : "leading-5",
+						tone.title,
+					)}
+				>
 					{title}
 				</div>
-				{kind === "usage_limit" && (
-					<p className="text-muted-foreground">
+				{limit && (
+					<p className="text-muted-foreground leading-5">
 						<Trans>
 							Your model provider stopped this request because the account
 							reached its usage or spend limit. Wait for the limit to reset,
@@ -233,11 +263,12 @@ export function TurnFailureCard({
 						</Trans>
 					</p>
 				)}
-				{text && (
+				{text && (!limit || expanded) && (
 					<p
 						className={cn(
 							"wrap-anywhere whitespace-pre-wrap font-mono text-[12px] text-foreground/70 leading-5",
 							expanded ? "max-h-60 overflow-y-auto" : "line-clamp-3",
+							limit && "order-last rounded-md bg-muted/50 px-2 py-1.5",
 						)}
 						id={detailsId}
 						ref={textRef}
@@ -245,6 +276,9 @@ export function TurnFailureCard({
 					>
 						{text}
 					</p>
+				)}
+				{limit && expanded && (
+					<div className="-ml-2 order-last">{copyError}</div>
 				)}
 				{manualSignIn && (
 					<p className="text-muted-foreground">
@@ -263,8 +297,14 @@ export function TurnFailureCard({
 						<Trans>Couldn't start a new chat.</Trans>
 					</p>
 				)}
-				<div className="-ml-2 flex flex-wrap items-center gap-1">
-					{(clamped || expanded) && (
+				<div
+					className={cn(
+						"flex flex-wrap items-center gap-1",
+						limit ? "mt-0.5" : "-ml-2",
+					)}
+				>
+					{limit && offeredButtons}
+					{(limit ? Boolean(text) : clamped || expanded) && (
 						<Button
 							aria-controls={detailsId}
 							aria-expanded={expanded}
@@ -282,24 +322,8 @@ export function TurnFailureCard({
 							)}
 						</Button>
 					)}
-					<CopyErrorButton
-						text={[title, error?.message, error?.detail]
-							.filter(Boolean)
-							.join("\n\n")}
-					/>
-					{offered.map((button, index) => (
-						<Button
-							aria-expanded={button.expanded}
-							className={index === 0 ? tone.primary : undefined}
-							disabled={button.disabled}
-							key={button.action}
-							onClick={button.onClick}
-							size="xs"
-							variant="outline"
-						>
-							{button.label}
-						</Button>
-					))}
+					{!limit && copyError}
+					{!limit && offeredButtons}
 				</div>
 			</div>
 			{actions && (

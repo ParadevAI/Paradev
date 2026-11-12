@@ -38,7 +38,7 @@ export const FAILURE_ACTIONS: Record<
 	model_unavailable: ["change_model", "continue"],
 	context_too_long: ["new_chat", "continue"],
 	refused: ["continue", "change_model"],
-	usage_limit: ["usage_settings", "continue"],
+	usage_limit: ["usage_settings", "change_model", "continue"],
 	session_lost: ["new_chat"],
 	host_stopped: ["continue"],
 	unknown: ["continue", "change_model"],
