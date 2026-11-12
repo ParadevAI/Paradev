@@ -202,7 +202,7 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 					<PowerSection
 						key={hostId}
 						hostUrl={hostUrl}
-						isOnline={hostIsOnline}
+						isOnline={hostUrl !== null}
 						canEdit={isOwner}
 					/>
 				)}

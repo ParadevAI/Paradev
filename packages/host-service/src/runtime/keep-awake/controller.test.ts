@@ -183,6 +183,23 @@ test("a delayed power read cannot start a helper after disabling", async () => {
 	expect(state.timers.size).toBe(0);
 });
 
+test("a delayed terminal check cannot acquire a lease after work ends", async () => {
+	let resolve: (value: boolean) => void = () => {};
+	const state = setup({
+		enabled: true,
+		confirmWork: () =>
+			new Promise((done) => {
+				resolve = done;
+			}),
+	});
+	await settle();
+	state.setWork(false);
+	resolve(true);
+	await settle();
+	expect(state.startLease).not.toHaveBeenCalled();
+	expect(state.timers.size).toBe(0);
+});
+
 test("rapid disable and re-enable waits for a fresh probe", async () => {
 	let resolve: (value: boolean) => void = () => {};
 	const read = mock(() => Promise.resolve(true));
