@@ -57,6 +57,7 @@ import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import { enqueuePageManifestRewrite } from "./lib/page-manifests-job";
 import {
 	convertPendingShares,
+	pagesSharedWithTeam,
 	removeInvitationShares,
 	removeMemberShares,
 } from "./lib/pending-shares";
@@ -76,6 +77,7 @@ import {
 import { previewNextInvoice } from "./utils/invoice-preview";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
+const pagesOfDeletedTeams = new Map<string, string[]>();
 
 const userOptions = {
 	additionalFields: {
@@ -623,6 +625,9 @@ export const auth = betterAuth({
 						});
 					}
 
+					// The FK cascade drops these share rows, so afterDeleteTeam can no longer find them.
+					pagesOfDeletedTeams.set(team.id, await pagesSharedWithTeam(team.id));
+
 					// Linear-style: deleting a team would otherwise orphan any
 					// members who were only in this team. Re-home them into the
 					// next-oldest team in the org before the FK cascade fires.
@@ -672,6 +677,12 @@ export const auth = betterAuth({
 							})),
 						)
 						.onConflictDoNothing();
+				},
+
+				afterDeleteTeam: async ({ team }) => {
+					const pageIds = pagesOfDeletedTeams.get(team.id) ?? [];
+					pagesOfDeletedTeams.delete(team.id);
+					await enqueuePageManifestRewrite(pageIds);
 				},
 
 				beforeDeleteOrganization: async ({ organization }) => {
@@ -1278,6 +1289,7 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
+export { teamIdsFor };
 
 /**
  * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT
@@ -1292,6 +1304,8 @@ export type User = typeof auth.$Infer.Session.user;
 export async function mintUserJwt(args: {
 	userId: string;
 	organizationIds: string[];
+	/** Looked up from `organizationIds` when omitted. */
+	teamIds?: string[];
 	scope?: string;
 	runId?: string;
 	/** Token lifetime in seconds. Default 300 (5 minutes). */
@@ -1304,7 +1318,8 @@ export async function mintUserJwt(args: {
 			payload: {
 				sub: args.userId,
 				organizationIds: args.organizationIds,
-				teamIds: await teamIdsFor(args.userId, args.organizationIds),
+				teamIds:
+					args.teamIds ?? (await teamIdsFor(args.userId, args.organizationIds)),
 				scope: args.scope,
 				runId: args.runId,
 				exp,

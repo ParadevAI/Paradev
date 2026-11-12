@@ -113,3 +113,11 @@ export async function removeInvitationShares(invitationId: string) {
 		.where(eq(cloudWorkspaceShares.invitationId, invitationId));
 	await db.delete(pageShares).where(eq(pageShares.invitationId, invitationId));
 }
+
+export async function pagesSharedWithTeam(teamId: string): Promise<string[]> {
+	const rows = await db
+		.selectDistinct({ pageId: pageShares.pageId })
+		.from(pageShares)
+		.where(eq(pageShares.teamId, teamId));
+	return rows.map((row) => row.pageId);
+}

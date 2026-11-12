@@ -10,7 +10,11 @@ import {
 	users,
 } from "@superset/db/schema";
 import { eq, inArray } from "drizzle-orm";
-import { convertPendingShares, removeMemberShares } from "./pending-shares";
+import {
+	convertPendingShares,
+	pagesSharedWithTeam,
+	removeMemberShares,
+} from "./pending-shares";
 import { teamIdsFor } from "./team-ids";
 
 const ORG = crypto.randomUUID();
@@ -105,6 +109,16 @@ describe("share changes made outside the sharing router", () => {
 			.from(pageShares)
 			.where(eq(pageShares.pageId, PAGE));
 		expect(row?.userId).toBe(MEMBER);
+	});
+});
+
+describe("pagesSharedWithTeam", () => {
+	test("lists the pages a team's shares are on, which a team delete cascades away", async () => {
+		await db
+			.insert(pageShares)
+			.values({ pageId: PAGE, teamId: TEAM, sharedByUserId: OWNER });
+		expect(await pagesSharedWithTeam(TEAM)).toEqual([PAGE]);
+		expect(await pagesSharedWithTeam(OTHER_TEAM)).toEqual([]);
 	});
 });
 
