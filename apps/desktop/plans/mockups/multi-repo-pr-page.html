@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Pull requests × multi-repo projects</title>
+<style>
+  :root {
+    --bg: #141414; --side: #181818; --panel: #1c1c1c; --raised: #232323;
+    --border: #2a2a2a; --text: #e6e6e6; --muted: #8a8a8a; --dim: #5f5f5f;
+    --accent: #2b2b2b; --green: #3fb950; --red: #f85149; --purple: #a371f7;
+    --ring: #3d6fd8; --note: #d29922;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0c0c0c; color: var(--text);
+    font: 13px/1.4 Inter, ui-sans-serif, system-ui, sans-serif; }
+  .switcher { display: flex; gap: 8px; padding: 16px 24px; align-items: center; flex-wrap: wrap; }
+  .switcher button { background: var(--raised); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px; font: inherit; cursor: pointer; }
+  .switcher button.on { border-color: #e6e6e6; }
+  .switcher .hint { color: var(--muted); margin-left: 8px; }
+  .caption { padding: 0 24px 14px; color: var(--muted); max-width: 1100px; }
+  .caption b { color: var(--text); }
+  .frames { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 24px 32px; }
+  .frame-title { color: var(--muted); font-size: 12px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .app { position: relative; display: flex; height: 560px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .side { width: 140px; background: var(--side); border-right: 1px solid var(--border); padding: 10px 8px; flex-shrink: 0; }
+  .side .item { display: flex; gap: 8px; align-items: center; padding: 5px 8px; border-radius: 6px; color: #cfcfcf; }
+  .side .item.on { background: var(--accent); }
+  .side .sec { color: var(--dim); font-size: 10px; letter-spacing: .08em; margin: 14px 8px 6px; font-weight: 600; }
+  .ico { width: 13px; height: 13px; border: 1.5px solid currentColor; border-radius: 3px; opacity: .7; flex-shrink: 0; }
+  .list { width: 300px; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .topbar { padding: 10px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+  .search { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 6px 9px; color: var(--dim); }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: #cfcfcf; display: inline-flex; gap: 5px; align-items: center; }
+  .pill .chev { color: var(--dim); }
+  .rows { padding: 6px; display: flex; flex-direction: column; gap: 1px; }
+  .group { color: var(--dim); font-size: 10px; letter-spacing: .06em; font-weight: 600; padding: 8px 8px 3px; text-transform: uppercase; }
+  .row { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 8px; }
+  .row.sel { background: var(--accent); }
+  .row.dup { outline: 1px dashed var(--note); outline-offset: -1px; }
+  .pr-ico { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--green); flex-shrink: 0; }
+  .row .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .row .title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .meta { white-space: nowrap; overflow: hidden; display: flex; gap: 7px; align-items: center; color: #8d8d8d; font-size: 10px; }
+  .avatar { width: 15px; height: 15px; border-radius: 50%; background: #3a4a6b; font-size: 8px; display: grid; place-items: center; color: #dfe7ff; }
+  .slug { color: #9a9a9a; }
+  .slug .proj { color: #c9c9c9; font-weight: 600; }
+  .row .right { text-align: right; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+  .plus { color: var(--green); } .minus { color: var(--red); }
+  .check { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-right: 5px; }
+  .detail { flex: 1; min-width: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .detail h2 { margin: 0; font-size: 17px; font-weight: 600; }
+  .detail .sub { color: var(--muted); font-size: 12px; display: flex; white-space: nowrap; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .state { background: #1f3b26; color: #7ee28f; border-radius: 999px; padding: 1px 8px; font-size: 11px; }
+  .branch { font-family: ui-monospace, monospace; font-size: 11px; background: var(--raised); padding: 1px 6px; border-radius: 4px; color: #cfcfcf; }
+  .actions { display: flex; gap: 8px; }
+  .btn { border: 1px solid var(--border); background: var(--raised); color: var(--text); border-radius: 6px; padding: 5px 10px; font-size: 12px; }
+  .btn.primary { background: #e6e6e6; color: #111; border-color: #e6e6e6; font-weight: 500; }
+  .btn.hot { box-shadow: 0 0 0 2px var(--ring); }
+  .body-lines div { height: 8px; background: #222; border-radius: 4px; margin: 8px 0; }
+  .shade { position: absolute; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; }
+  .modal { width: 560px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  .modal.small { width: 360px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .modal h3 { margin: 0; font-size: 14px; font-weight: 600; }
+  .modal .muted { color: var(--muted); font-size: 12px; }
+  .choice { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+  .choice.on { border-color: #e6e6e6; background: var(--raised); }
+  .radio { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--muted); margin-top: 2px; flex-shrink: 0; }
+  .choice.on .radio { border: 4px solid #e6e6e6; }
+  .choice .name { font-weight: 600; } .choice .desc { color: var(--muted); font-size: 11px; }
+  .modal-end { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  .prompt { padding: 14px 16px 10px; }
+  .prompt .chips { display: flex; gap: 6px; margin-bottom: 8px; }
+  .chip { display: inline-flex; gap: 6px; align-items: center; background: var(--raised); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; font-size: 11px; }
+  .prompt .ph { color: var(--dim); min-height: 40px; }
+  .bar { display: flex; gap: 6px; align-items: center; padding: 8px 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .pop { margin: 0 12px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+  .pop .r { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-top: 1px solid var(--border); }
+  .pop .r:first-child { border-top: 0; }
+  .pop .repo { width: 92px; font-weight: 600; }
+  .pop .val { flex: 1; display: flex; gap: 6px; align-items: center; font-size: 12px; }
+  .tag { font-size: 10px; border-radius: 4px; padding: 1px 5px; }
+  .tag.picked { background: #2a2140; color: #c6b0ff; }
+  .tag.matched { background: #3b2f12; color: #f0c560; }
+  .x { color: var(--dim); font-size: 11px; }
+  .callout { position: absolute; background: var(--note); color: #111; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; }
+  .empty { margin: 8px; padding: 10px; border: 1px dashed var(--border); border-radius: 8px; color: var(--dim); font-size: 11px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="switcher">
+  <button data-v="today">Today</button>
+  <button data-v="a" class="on">A · list per project</button>
+  <button data-v="b">B · list once, then ask</button>
+  <button data-v="c">C · leave page as is</button>
+  <span class="hint">orbit-gh = multi-repo project (web, api, shared). orbit-api = the api repo also added on its own.</span>
+</div>
+
+<p class="caption" data-cap="today"><b>Today.</b> The multi-repo project orbit-gh isn't searched, so orbit-shared's PR is missing. Start workspace only knows the standalone orbit-api project, so the new workspace holds the api repo alone.</p>
+<p class="caption" data-cap="a"><b>A.</b> orbit-gh joins the project filter. Its repos' PRs show labelled <i>orbit-gh › api</i>. Because api is also its own project, its PR shows twice (dashed). Start workspace uses the project of the row you clicked, so the orbit-gh row opens a multi-repo workspace with matching PRs filled in.</p>
+<p class="caption" data-cap="b"><b>B.</b> Each PR is listed once, labelled by repo. Start workspace asks which project to use, but only when the repo belongs to more than one; shared's PR (only in orbit-gh) skips the question.</p>
+<p class="caption" data-cap="c"><b>C.</b> The page doesn't change. To start orbit-gh from a PR, open New workspace on orbit-gh and search for the PR in the prompt; the picker then looks like A's.</p>
+
+<div class="frames">
+  <div>
+    <p class="frame-title">1 · Pull requests page</p>
+    <div class="app">
+      <aside class="side">
+        <div class="item"><span class="ico"></span>New Workspace</div>
+        <div class="item"><span class="ico"></span>Workspaces</div>
+        <div class="item"><span class="ico"></span>Tasks</div>
+        <div class="item on"><span class="ico"></span>Pull requests</div>
+        <div class="sec">PROJECTS</div>
+        <div class="item">orbit-gh</div>
+        <div class="item">orbit-api</div>
+      </aside>
+      <section class="list">
+        <div class="topbar">
+          <div class="search">Search pull requests…</div>
+          <div class="filters">
+            <span class="pill" data-show="today b c">Projects: All <span class="chev">▾</span></span>
+            <span class="pill" data-show="a">Projects: orbit-gh, orbit-api <span class="chev">▾</span></span>
+            <span class="pill">Author <span class="chev">▾</span></span>
+            <span class="pill">Open <span class="chev">▾</span></span>
+          </div>
+        </div>
+        <div class="rows">
+          <!-- today / C -->
+          <div data-show="today c">
+            <div class="row sel">
+              <span class="pr-ico"></span>
+              <div class="main"><span class="title">Add todo tags endpoint</span>
+                <div class="meta"><span class="avatar">A</span><span class="slug">AndrewBastin/paradev-mr-orbit-api</span><span>#1</span><span>·</span><span>add-todo-tags</span></div></div>
+              <div class="right"><span><span class="check"></span>2h</span><span><span class="plus">+42</span> <span class="minus">-3</span></span></div>
+            </div>
+            <div class="empty">orbit-shared #1 "Todo tag types" isn't listed: orbit-gh's repositories aren't searched.</div>
+          </div>
+          <!-- A -->
+          <div data-show="a">
+            <div class="group">orbit-gh</div>
+            <div class="row sel">
+              <span class="pr-ico"></span>
+              <div class="main"><span class="title">Add todo tags endpoint</span>
+                <div class="meta"><span class="avatar">A</span><span class="slug"><span class="proj">orbit-gh</span> › api</span><span>#1</span><span>·</span><span>add-todo-tags</span></div></div>
+              <div class="right"><span><span class="check"></span>2h</span><span><span class="plus">+42</span> <span class="minus">-3</span></span></div>
+            </div>
+            <div class="row">
+              <span class="pr-ico"></span>
+              <div class="main"><span class="title">Todo tag types</span>
+                <div class="meta"><span class="avatar">A</span><span class="slug"><span class="proj">orbit-gh</span> › shared</span><span>#1</span><span>·</span><span>add-todo-tags</span></div></div>
+              <div class="right"><span><span class="check"></span>2h</span><span><span class="plus">+18</span> <span class="minus">-0</span></span></div>
+            </div>
+            <div class="group">orbit-api</div>
+            <div class="row dup">
+              <span class="pr-ico"></span>
+              <div class="main"><span class="title">Add todo tags endpoint</span>
+                <div class="meta"><span class="avatar">A</span><span class="slug"><span class="proj">orbit-api</span></span><span>#1</span><span class="tag matched">same PR as above</span></div></div>
+              <div class="right"><span><span class="check"></span>2h</span><span><span class="plus">+42</span> <span class="minus">-3</span></span></div>
+            </div>
+          </div>
+          <!-- B -->
+          <div data-show="b">
+            <div class="row sel">
+              <span class="pr-ico"></span>
+              <div class="main"><span class="title">Add todo tags endpoint</span>
+                <div class="meta"><span class="avatar">A</span><span class="slug">paradev-mr-orbit-api</span><span>#1</span><span>·</span><span>add-todo-tags</span></div></div>
+              <div class="right"><span><span class="check"></span>2h</span><span><span class="plus">+42</span> <span class="minus">-3</span></span></div>
+            </div>
+            <div class="row">
+              <span class="pr-ico"></span>
+              <div class="main"><span class="title">Todo tag types</span>
+                <div class="meta"><span class="avatar">A</span><span class="slug">paradev-mr-orbit-shared</span><span>#1</span><span>·</span><span>add-todo-tags</span></div></div>
+              <div class="right"><span><span class="check"></span>2h</span><span><span class="plus">+18</span> <span class="minus">-0</span></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="detail">
+        <h2>Add todo tags endpoint <span style="color:var(--muted);font-weight:400">#1</span></h2>
+        <div class="sub"><span class="state">Open</span><span class="branch">add-todo-tags</span>→<span class="branch">main</span>
+          <span data-show="today b c">paradev-mr-orbit-api</span><span data-show="a">orbit-gh › api</span></div>
+        <div class="actions"><span class="btn primary hot">Start workspace</span><span class="btn">Open on GitHub</span></div>
+        <div class="body-lines"><div style="width:90%"></div><div style="width:75%"></div><div style="width:82%"></div><div style="width:40%"></div></div>
+      </section>
+    </div>
+  </div>
+
+  <div>
+    <p class="frame-title" data-show="today a b">2 · After clicking Start workspace</p>
+    <p class="frame-title" data-show="c">2 · New workspace on orbit-gh, PR found by search</p>
+    <div class="app">
+      <aside class="side">
+        <div class="item"><span class="ico"></span>New Workspace</div>
+        <div class="item"><span class="ico"></span>Workspaces</div>
+        <div class="item"><span class="ico"></span>Tasks</div>
+        <div class="item on"><span class="ico"></span>Pull requests</div>
+        <div class="sec">PROJECTS</div>
+        <div class="item">orbit-gh</div>
+        <div class="item">orbit-api</div>
+      </aside>
+      <section class="detail" style="opacity:.35"><h2>Add todo tags endpoint</h2><div class="body-lines"><div style="width:90%"></div><div style="width:75%"></div></div></section>
+      <div class="shade">
+        <!-- B: question first -->
+        <div class="modal small" data-show="b">
+          <h3>Start in which project?</h3>
+          <div class="muted">paradev-mr-orbit-api belongs to two projects.</div>
+          <div class="choice"><span class="radio"></span><div><div class="name">orbit-api</div><div class="desc">This repository only</div></div></div>
+          <div class="choice on"><span class="radio"></span><div><div class="name">orbit-gh</div><div class="desc">Multi-repo: web, api, shared. Matching PRs in the other repos are filled in.</div></div></div>
+          <div class="modal-end"><span class="btn">Cancel</span><span class="btn primary">Continue</span></div>
+        </div>
+        <!-- Today: single-repo create -->
+        <div class="modal" data-show="today">
+          <div class="prompt"><div class="chips"><span class="chip"><span class="pr-ico" style="width:9px;height:9px"></span>PR #1 Add todo tags endpoint</span></div><div class="ph">What should the agent do?</div></div>
+          <div class="bar"><span class="pill">orbit-api <span class="chev">▾</span></span><span class="pill">Worktree</span><span class="muted" style="font-size:11px">based off PR #1</span></div>
+          <div class="pop"><div class="r"><span class="x">Only the api repo. orbit-web and orbit-shared aren't in this workspace.</span></div></div>
+        </div>
+        <!-- A / C: multi-repo create -->
+        <div class="modal" data-show="a c">
+          <div class="prompt"><div class="chips"><span class="chip"><span class="pr-ico" style="width:9px;height:9px"></span>PR #1 Add todo tags endpoint</span></div><div class="ph">What should the agent do?</div></div>
+          <div class="bar"><span class="pill">orbit-gh <span class="chev">▾</span></span><span class="pill">Worktree</span><span class="pill">3 repositories <span class="chev">▾</span></span></div>
+          <div class="pop">
+            <div class="r"><span class="repo">api</span><span class="val"><span class="pr-ico" style="width:9px;height:9px"></span>PR #1 · add-todo-tags <span class="tag picked">picked</span></span></div>
+            <div class="r"><span class="repo">shared</span><span class="val"><span class="pr-ico" style="width:9px;height:9px"></span>PR #1 · add-todo-tags <span class="tag matched">matched</span></span><span class="x">use main instead</span></div>
+            <div class="r"><span class="repo">web</span><span class="val"><span class="branch">main</span> → new branch add-todo-tags</span><span class="x">change</span></div>
+          </div>
+        </div>
+        <div class="modal" data-show="b" style="display:none"></div>
+      </div>
+    </div>
+    <p class="caption" data-show="b" style="padding:8px 0 0">After Continue, the same new-workspace screen as A opens.</p>
+  </div>
+</div>
+
+<script>
+  const views = ["today", "a", "b", "c"];
+  function show(v) {
+    document.querySelectorAll(".switcher button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
+    document.querySelectorAll("[data-cap]").forEach((el) => (el.hidden = el.dataset.cap !== v));
+    document.querySelectorAll("[data-show]").forEach((el) => (el.hidden = !el.dataset.show.split(" ").includes(v)));
+  }
+  document.querySelectorAll(".switcher button").forEach((b) => b.addEventListener("click", () => show(b.dataset.v)));
+  show(new URLSearchParams(location.search).get("v") ?? "a");
+</script>
+</body>
+</html>
