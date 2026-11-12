@@ -32,7 +32,9 @@ link; a person approves it in LaunchDarkly, not you. Check the outcome with
 
 ## 4. Make the smallest change with the right tool
 
-- On or off for everyone: `toggle-flag`.
+- Targeting on or off: `toggle-flag`. Off serves everyone the off variation.
+  On applies the existing targets and rules, and everyone they miss gets the
+  default rule's variation, so check that variation in step 2 first.
 - Specific users or contexts: `update-flag-targeting`.
 - Rules and clauses: `update-targeting-rules`. Load the
   `feature-flags/launchdarkly-flag-targeting` guide with `load-skill` first; it
@@ -40,7 +42,8 @@ link; a person approves it in LaunchDarkly, not you. Check the outcome with
 - Percentage of everyone: `update-rollout`.
 - A production release with metrics to watch: `start-guarded-rollout`, after
   loading the `feature-flags/launchdarkly-guarded-rollout` guide. It rolls back
-  on a regression by itself.
+  on a regression only when automatic rollback is on; otherwise a regression
+  raises an alert and the rollout continues. Say which one the user is getting.
 
 ## 5. Verify and report
 

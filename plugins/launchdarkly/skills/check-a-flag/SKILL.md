@@ -27,7 +27,9 @@ the default rule. Prerequisites can turn the flag off for everyone regardless
 of its own rules.
 
 For "why does this customer see X", find their context with `search-contexts`
-and walk it through the rules. Name the rule that matched.
+and walk it through the prerequisites first: if a prerequisite does not serve
+its required variation to this context, the context gets the off variation
+whatever the rules say. Then walk the rules and name the one that matched.
 
 ## 3. Check whether it is still evaluated
 
