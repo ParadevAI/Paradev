@@ -1194,10 +1194,10 @@
 					"scopes": ["apiv3-mcp"],
 					"identity": {
 						"account": {
-							"id": "$.scope"
+							"id": "$.token_type"
 						},
 						"user": {
-							"id": "$.scope"
+							"id": "$.token_type"
 						}
 					},
 					"bind": {
