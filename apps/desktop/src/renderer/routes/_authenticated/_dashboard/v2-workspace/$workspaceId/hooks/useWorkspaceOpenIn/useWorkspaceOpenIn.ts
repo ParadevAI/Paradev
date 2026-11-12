@@ -25,9 +25,11 @@ export function useWorkspaceOpenIn({
 	const { t } = useLingui();
 	const activeTheme = useThemeStore((state) => state.activeTheme);
 
-	const { app: persistedApp, setApp: persistDefaultApp } =
-		useV2ProjectDefaultApp(projectId ?? undefined);
-	const resolvedApp: ExternalApp = persistedApp ?? "finder";
+	const {
+		resolvedApp,
+		isResolving,
+		setApp: persistDefaultApp,
+	} = useV2ProjectDefaultApp(projectId ?? undefined);
 
 	const openInApp = electronTrpc.external.openInApp.useMutation({
 		onSuccess: (_data, variables) => {
@@ -61,12 +63,12 @@ export function useWorkspaceOpenIn({
 	);
 	const openInDisplay = useHotkeyDisplay("OPEN_IN_APP");
 	const copyPathDisplay = useHotkeyDisplay("COPY_PATH");
-	const isLoading = openInApp.isPending || copyPath.isPending;
+	const isLoading = isResolving || openInApp.isPending || copyPath.isPending;
 
 	const openInDefaultApp = useCallback(() => {
-		if (!worktreePath || openInApp.isPending || copyPath.isPending) return;
+		if (!worktreePath || isLoading) return;
 		openInApp.mutate({ path: worktreePath, app: resolvedApp });
-	}, [worktreePath, resolvedApp, openInApp, copyPath.isPending]);
+	}, [worktreePath, isLoading, resolvedApp, openInApp]);
 
 	const openInOtherApp = useCallback(
 		(appId: ExternalApp) => {
