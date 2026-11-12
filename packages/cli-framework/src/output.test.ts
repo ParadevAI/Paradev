@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 
 import { formatOutput, table } from "./output";
 
@@ -14,6 +14,8 @@ const OSC8 = new RegExp(`${ESC}\\]8;;[^${BEL}]*${BEL}`, "g");
 
 const originalIsTTY = process.stdout.isTTY;
 
+const originalTerm = process.env.TERM;
+
 function setTTY(value: boolean | undefined): void {
 	Object.defineProperty(process.stdout, "isTTY", {
 		value,
@@ -21,7 +23,11 @@ function setTTY(value: boolean | undefined): void {
 	});
 }
 
-afterEach(() => setTTY(originalIsTTY));
+afterEach(() => {
+	setTTY(originalIsTTY);
+	if (originalTerm === undefined) delete process.env.TERM;
+	else process.env.TERM = originalTerm;
+});
 
 describe("formatOutput", () => {
 	const raw = { raw: "#!/bin/sh\necho hi\n" };
@@ -56,6 +62,18 @@ describe("formatOutput", () => {
 });
 
 describe("table", () => {
+	beforeEach(() => {
+		process.env.TERM = "xterm-256color";
+	});
+
+	test("prints a plain URL on a dumb terminal", () => {
+		setTTY(true);
+		process.env.TERM = "dumb";
+		const out = table(ROWS, COLUMNS, undefined, CAPS);
+		expect(out).toContain(URL);
+		expect(out).not.toContain("\x1b]8;;");
+	});
+
 	test("truncates a cell wider than its cap", () => {
 		setTTY(false);
 		const out = table(
