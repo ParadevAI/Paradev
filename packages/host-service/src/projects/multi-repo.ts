@@ -22,6 +22,36 @@ export function listRepositoryProjects(db: HostDb, projectId: string) {
 		.sort((a, b) => a.createdAt - b.createdAt);
 }
 
+export interface RepositoryOwner {
+	projectId: string;
+	repositoryName: string;
+}
+
+/** Each multi-repo project id becomes its repositories' ids; other ids stay. */
+export function expandRepositoryProjectIds(db: HostDb, projectIds: string[]) {
+	const ownerByRepositoryId = new Map<string, RepositoryOwner>();
+	const expanded: string[] = [];
+	for (const projectId of projectIds) {
+		const project = db
+			.select({ kind: projects.kind })
+			.from(projects)
+			.where(eq(projects.id, projectId))
+			.get();
+		if (!isContainerProject(project)) {
+			expanded.push(projectId);
+			continue;
+		}
+		for (const repository of listRepositoryProjects(db, projectId)) {
+			expanded.push(repository.id);
+			ownerByRepositoryId.set(repository.id, {
+				projectId,
+				repositoryName: basename(repository.repoPath),
+			});
+		}
+	}
+	return { projectIds: expanded, ownerByRepositoryId };
+}
+
 export function listRepositoryWorkspaces(
 	db: HostDb,
 	workspaceId: string,

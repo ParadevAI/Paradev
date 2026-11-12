@@ -79,6 +79,7 @@ import {
 	requireLocalProject,
 	requireProjectRepoPath,
 } from "../workspace-creation/shared/local-project";
+import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
 import { requireIndependentWorktree } from "../workspace-creation/shared/require-independent-worktree";
 import { startSetupTerminalIfPresent } from "../workspace-creation/shared/setup-terminal";
 import {
@@ -135,10 +136,17 @@ const createInputSchema = z
 		// format the provider autolinks.
 		skipBranchPrefix: z.boolean().optional(),
 		pr: z.number().int().positive().optional(),
+		// Multi-repo projects: `owner/name` of the repository that holds `pr`.
+		prRepository: z.string().min(1).optional(),
 		baseBranch: z.string().min(1).optional(),
 		// Multi-repo projects: the base branch of each repository, by its project id.
 		// A repository left out branches from its default branch.
 		repositoryBaseBranches: z.record(z.string(), z.string().min(1)).optional(),
+		// Multi-repo projects: the PR each repository starts from, by its project id.
+		// The first one names the branch every other repository is created on.
+		repositoryPullRequests: z
+			.record(z.string(), z.number().int().positive())
+			.optional(),
 		taskId: z.string().uuid().optional(),
 		agents: z.array(agentLaunchSchema).optional(),
 		// Desktop "Wait for workspace setup before starting agents" setting,
@@ -439,6 +447,7 @@ async function createRepositoryCheckouts(
 		root: string;
 		repositoryProjects: ReturnType<typeof listRepositoryProjects>;
 		baseBranches?: Record<string, string>;
+		pullRequests?: Record<string, PrMetadata>;
 		/** Used by each repository that has this branch and no base of its own. */
 		sharedBaseBranch?: string;
 	},
@@ -446,10 +455,52 @@ async function createRepositoryCheckouts(
 	const created: CreatedCheckout[] = [];
 	for (const repository of args.repositoryProjects) {
 		const worktreePath = join(args.root, basename(repository.repoPath));
+		const pr = args.pullRequests?.[repository.id];
+		const branch = pr ? derivePrLocalBranchName(pr) : args.branch;
 		let createdBranch = false;
 		try {
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
+			if (pr) {
+				const materialized = await materializePrBranch({
+					git,
+					branch,
+					remoteName: repository.remoteName ?? "origin",
+					pr,
+				});
+				if (materialized.warning) {
+					console.warn(`[workspaces.create] ${materialized.warning}`);
+				}
+				createdBranch = materialized.createdBranch;
+				await addWorktreeWithSparseCheckout({
+					git,
+					worktreeArgs: [worktreePath, branch],
+					worktreePath,
+					sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
+					logPrefix: "[workspaces.create]",
+				});
+				await enablePushAutoSetupRemote(
+					git,
+					worktreePath,
+					"[workspaces.create]",
+				);
+				if (pr.baseRefName) {
+					await recordBaseBranchConfig({
+						git,
+						worktreePath,
+						branch,
+						baseBranch: pr.baseRefName,
+					});
+				}
+				created.push(
+					insertRepositoryCheckout(ctx, args, repository, {
+						worktreePath,
+						branch,
+						createdBranch,
+					}),
+				);
+				continue;
+			}
 			const sharedBase = args.sharedBaseBranch?.trim();
 			const baseBranch =
 				args.baseBranches?.[repository.id] ??
@@ -486,7 +537,7 @@ async function createRepositoryCheckouts(
 					id: null,
 					repoPath: repository.repoPath,
 					worktreePath,
-					branch: args.branch,
+					branch,
 					createdBranch,
 				},
 			]);
@@ -496,32 +547,84 @@ async function createRepositoryCheckouts(
 				cause: err,
 			});
 		}
-		const id = randomUUID();
-		const now = Date.now();
-		ctx.db
-			.insert(workspaces)
-			.values({
-				id,
-				projectId: repository.id,
-				parentWorkspaceId: args.parentId,
+		created.push(
+			insertRepositoryCheckout(ctx, args, repository, {
 				worktreePath,
-				branch: args.branch,
-				name: args.name,
-				type: "worktree",
-				createdByUserId: ctx.userId ?? null,
-				createdAt: now,
-				updatedAt: now,
-			})
-			.run();
-		created.push({
-			id,
-			repoPath: repository.repoPath,
-			worktreePath,
-			branch: args.branch,
-			createdBranch,
-		});
+				branch,
+				createdBranch,
+			}),
+		);
 	}
 	return created;
+}
+
+function insertRepositoryCheckout(
+	ctx: HostServiceContext,
+	args: { parentId: string; name: string },
+	repository: ReturnType<typeof listRepositoryProjects>[number],
+	checkout: { worktreePath: string; branch: string; createdBranch: boolean },
+): CreatedCheckout {
+	const id = randomUUID();
+	const now = Date.now();
+	ctx.db
+		.insert(workspaces)
+		.values({
+			id,
+			projectId: repository.id,
+			parentWorkspaceId: args.parentId,
+			worktreePath: checkout.worktreePath,
+			branch: checkout.branch,
+			name: args.name,
+			type: "worktree",
+			createdByUserId: ctx.userId ?? null,
+			createdAt: now,
+			updatedAt: now,
+		})
+		.run();
+	return { id, repoPath: repository.repoPath, ...checkout };
+}
+
+async function findRepositoryByGithubName(
+	ctx: HostServiceContext,
+	repositories: ReturnType<typeof listRepositoryProjects>,
+	fullName: string | undefined,
+): Promise<string | undefined> {
+	if (!fullName) return undefined;
+	for (const repository of repositories) {
+		const repo = await resolveGithubRepo(ctx, repository.id).catch(() => null);
+		if (
+			repo &&
+			`${repo.owner}/${repo.name}`.toLowerCase() === fullName.toLowerCase()
+		) {
+			return repository.id;
+		}
+	}
+	return undefined;
+}
+
+/** Each repository's PR, read before any checkout so a bad one changes nothing. */
+async function fetchRepositoryPullRequests(
+	ctx: HostServiceContext,
+	repositories: ReturnType<typeof listRepositoryProjects>,
+	requested: Record<string, number>,
+): Promise<{ order: string[]; byRepository: Record<string, PrMetadata> }> {
+	const order = Object.keys(requested);
+	const byRepository: Record<string, PrMetadata> = {};
+	for (const repositoryId of order) {
+		const repository = repositories.find((repo) => repo.id === repositoryId);
+		if (!repository) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `Repository ${repositoryId} is not part of this project`,
+			});
+		}
+		byRepository[repositoryId] = await fetchPrMetadata({
+			cwd: repository.repoPath,
+			prNumber: requested[repositoryId] as number,
+			execGh: ctx.execGh,
+		});
+	}
+	return { order, byRepository };
 }
 
 interface RepositoryCheckout {
@@ -582,12 +685,21 @@ async function createContainerWorkspace(
 				"A multi-repo project has no single checkout to work in; create a worktree workspace instead",
 		});
 	}
-	// ponytail: only new-branch worktree workspaces; PR and adopt creates wait
-	// for the UX of those flows to settle.
-	if (input.pr !== undefined || input.worktreePath !== undefined) {
+	if (input.worktreePath !== undefined) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
-			message: "This project can only create new-branch workspaces for now",
+			message: "A multi-repo workspace cannot adopt an existing worktree",
+		});
+	}
+	const prRepositoryId =
+		input.pr === undefined
+			? undefined
+			: await findRepositoryByGithubName(ctx, repositories, input.prRepository);
+	if (input.pr !== undefined && !prRepositoryId) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"Could not tell which repository of this project the PR belongs to",
 		});
 	}
 	const existing = input.id ? getLocalWorkspace(ctx.db, input.id) : undefined;
@@ -601,9 +713,18 @@ async function createContainerWorkspace(
 		};
 	}
 
+	const pullRequests = await fetchRepositoryPullRequests(
+		ctx,
+		repositories,
+		prRepositoryId && input.pr !== undefined
+			? { [prRepositoryId]: input.pr, ...input.repositoryPullRequests }
+			: (input.repositoryPullRequests ?? {}),
+	);
+	const firstPr = pullRequests.byRepository[pullRequests.order[0] ?? ""];
 	const composerPrompt =
 		input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
-	const typedBranch = input.branch?.trim();
+	const typedBranch =
+		input.branch?.trim() || (firstPr ? derivePrLocalBranchName(firstPr) : "");
 	const candidate =
 		typedBranch ||
 		(input.name ? sanitizeBranchCandidate(input.name) : "") ||
@@ -620,6 +741,23 @@ async function createContainerWorkspace(
 					existingBranches: [],
 				});
 	const branch = prefix ? `${prefix}/${candidate}` : candidate;
+	// The PR's branch is already checked out in this workspace: open it again.
+	const existingForPr = firstPr
+		? findExistingWorkspaceByBranch(ctx, project.id, branch)
+		: null;
+	if (existingForPr) {
+		return {
+			workspace: existingForPr,
+			terminals: [],
+			agents: await dispatchSugarAgents(
+				ctx,
+				existingForPr.id,
+				input.agents ?? [],
+			),
+			alreadyExists: true,
+			txid: null,
+		};
+	}
 	const root = safeResolveWorktreePath(
 		getProjectWorktreesFolder(ctx, project),
 		branch,
@@ -629,7 +767,7 @@ async function createContainerWorkspace(
 	// Every checkout exists before the workspace does, so a failure leaves
 	// nothing behind.
 	const workspaceId = input.id ?? randomUUID();
-	const name = input.name ?? NEW_WORKSPACE_NAME;
+	const name = input.name ?? firstPr?.title ?? NEW_WORKSPACE_NAME;
 	let checkouts: CreatedCheckout[];
 	try {
 		checkouts = await createRepositoryCheckouts(ctx, {
@@ -639,6 +777,7 @@ async function createContainerWorkspace(
 			root,
 			repositoryProjects: repositories,
 			baseBranches: input.repositoryBaseBranches,
+			pullRequests: pullRequests.byRepository,
 			sharedBaseBranch: input.baseBranch,
 		});
 	} catch (error) {
@@ -661,7 +800,7 @@ async function createContainerWorkspace(
 	});
 	writeWorkspaceContextFiles(root, checkouts);
 
-	if (composerPrompt && input.name === undefined) {
+	if (composerPrompt && input.name === undefined && !firstPr) {
 		setWorkspaceNamingState(ctx.db, workspaceRow.id, {
 			prompt: composerPrompt,
 			attempts: 0,

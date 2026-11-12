@@ -8,6 +8,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { eq, isNull } from "drizzle-orm";
+import { simpleGit } from "simple-git";
 import { workspaces } from "../../src/db/schema";
 import { repositoryRootPathFor } from "../../src/projects/multi-repo";
 import * as naming from "../../src/trpc/router/workspace-creation/utils/ai-workspace-names";
@@ -23,9 +24,12 @@ afterEach(async () => {
 	dispose = undefined;
 });
 
-async function containerScenario() {
+async function containerScenario(
+	hostOptions: Partial<Parameters<typeof createTestHost>[0]> = {},
+) {
 	const host = await createTestHost({
 		apiOverrides: cloudFlows.workspaceCreateOk(),
+		...hostOptions,
 	});
 	const web = await createGitFixture();
 	const api = await createGitFixture();
@@ -490,4 +494,86 @@ test("a repository that fails to check out undoes the whole create", async () =>
 		},
 	);
 	expect(branches.stdout.toString().trim()).toBe("");
+});
+
+test("each repository with a PR starts from it, and the others branch on the PR's branch", async () => {
+	let prHeadOid = "";
+	let apiRepoPath = "";
+	const { host, projectId, fixtures } = await containerScenario({
+		execGh: async (args, options?: unknown) => {
+			const cwd = (options as { cwd?: string } | undefined)?.cwd;
+			if (args[0] === "pr" && args[1] === "view" && cwd === apiRepoPath) {
+				return {
+					number: 7,
+					url: "https://github.com/o/api/pull/7",
+					title: "Add todo tags",
+					headRefName: "add-todo-tags",
+					headRefOid: prHeadOid,
+					baseRefName: "main",
+					headRepositoryOwner: { login: "o" },
+					headRepository: { name: "api" },
+					isCrossRepository: false,
+					state: "OPEN",
+				};
+			}
+			throw new Error(`unexpected gh call: ${args.join(" ")}`);
+		},
+	});
+	const [web, api] = fixtures;
+	if (!web || !api) throw new Error("expected two repositories");
+	apiRepoPath = api.repoPath;
+	const remote = `${api.repoPath}-origin.git`;
+	await simpleGit().raw(["init", "--bare", "--initial-branch=main", remote]);
+	const previousDispose = dispose;
+	dispose = async () => {
+		await previousDispose?.();
+		rmSync(remote, { recursive: true, force: true });
+	};
+	await api.git.addRemote("origin", remote);
+	await api.git.push("origin", "main", ["--set-upstream"]);
+	await api.git.checkoutLocalBranch("add-todo-tags");
+	await api.commit("tags endpoint", { "tags.ts": "tags\n" });
+	prHeadOid = (await api.git.revparse(["HEAD"])).trim();
+	await api.git.push("origin", "add-todo-tags");
+	await api.git.checkout("main");
+	await api.git.deleteLocalBranch("add-todo-tags", true);
+	const repositories = await host.trpc.project.repositories.query({
+		projectId,
+	});
+	const apiRepository = repositories.find(
+		(repository) => repository.repoPath === api.repoPath,
+	);
+	if (!apiRepository) throw new Error("expected the api repository");
+
+	const { workspace } = await host.trpc.workspaces.create.mutate({
+		projectId,
+		repositoryPullRequests: { [apiRepository.id]: 7 },
+	});
+
+	expect(workspace.branch).toBe("add-todo-tags");
+	expect(workspace.name).toBe("Add todo tags");
+	const checkouts = host.db
+		.select()
+		.from(workspaces)
+		.where(eq(workspaces.parentWorkspaceId, workspace.id))
+		.all();
+	const headOf = async (repoPath: string) => {
+		const checkout = checkouts.find(
+			(row) => basename(row.worktreePath) === basename(repoPath),
+		);
+		if (!checkout) throw new Error(`no checkout of ${repoPath}`);
+		const git = simpleGit(checkout.worktreePath);
+		return {
+			oid: (await git.revparse(["HEAD"])).trim(),
+			branch: (await git.revparse(["--abbrev-ref", "HEAD"])).trim(),
+		};
+	};
+	expect(await headOf(api.repoPath)).toEqual({
+		oid: prHeadOid,
+		branch: "add-todo-tags",
+	});
+	expect(await headOf(web.repoPath)).toEqual({
+		oid: (await web.git.revparse(["main"])).trim(),
+		branch: "add-todo-tags",
+	});
 });
