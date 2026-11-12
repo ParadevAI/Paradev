@@ -86,8 +86,10 @@ and their own `GOOGLE_CONNECTIONS_CLIENT_ID`. Final vendor registrations for
 connector readiness from working sign-in or change registrations during these
 restricted tests. `PLUGIN_CLIENT_METADATA_BASE_URL` remains its production value.
 
-Use a fresh, isolated browser profile for PostHog checks and do not visit live
-Paradev sites in it. Web analytics uses a shared persistence name and
+Use a fresh, isolated browser profile for the explicit PostHog test journey:
+visit `paradev.com`, then open `app.stage.paradev.com` and sign in with the
+designated test account. Keep ordinary browsing out of this profile. Web
+analytics uses a shared persistence name and
 `cross_subdomain_cookie: true`, so its cookies can span `paradev.com` even though
 auth cookies are stage-scoped. These deployments use the **production** PostHog
 key/host: check the intended project, stage event URL/host, and designated test
