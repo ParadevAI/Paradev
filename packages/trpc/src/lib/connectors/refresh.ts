@@ -153,7 +153,7 @@ async function refresh(
 		await markNeedsReauth(current.id, current.accessToken);
 		throw new UnrefreshableConnectionError(current.connector);
 	});
-	const redemption = await redeem(current, endpoints, refreshToken);
+	const redemption = await redeem(current, endpoints, refreshToken, "refresh");
 	if (redemption.kind === "rejected") {
 		// Rotating refresh tokens are single-use: when another process redeemed
 		// ours first, the rejection means we lost the race, not that the grant died.
@@ -190,7 +190,7 @@ async function reconcile(
 
 	let check: Redemption;
 	try {
-		check = await redeem(winner, endpoints, winnerToken);
+		check = await redeem(winner, endpoints, winnerToken, "reconcile check");
 	} catch (error) {
 		if (error instanceof ConnectorUnavailableError) return winner;
 		throw error;
@@ -220,6 +220,7 @@ async function redeem(
 	connection: SelectConnection,
 	endpoints: ResolvedEndpoints,
 	refreshToken: string,
+	attempt: "refresh" | "reconcile check",
 ): Promise<Redemption> {
 	const { clientId, clientSecret } = endpoints;
 	const body = new URLSearchParams({
@@ -268,7 +269,7 @@ async function redeem(
 
 	const oauthError =
 		typeof payload?.error === "string" ? payload.error : undefined;
-	console.warn(`[connectors/${connection.connector}] refresh refused`, {
+	console.warn(`[connectors/${connection.connector}] ${attempt} refused`, {
 		connectionId: connection.id,
 		status: response.status,
 		oauthError,

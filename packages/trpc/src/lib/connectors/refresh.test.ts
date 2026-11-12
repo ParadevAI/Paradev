@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as crypto from "../../router/plugins/crypto";
@@ -269,6 +269,22 @@ describe("a refresh race the server let both sides win", () => {
 		expect(written).toEqual([
 			expect.objectContaining({ refreshToken: "rotated-1" }),
 		]);
+	});
+
+	test("logs the check that finds ours live apart from a refused refresh", async () => {
+		grant = { previous: "refresh", current: "winner" };
+		reads = [connection(), winnerRow("winner")];
+		swaps = [false];
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+
+		try {
+			await ensureFreshConnection(connection());
+			expect(warn.mock.calls.map(([message]) => message)).toEqual([
+				`[connectors/${CONNECTOR}] reconcile check refused`,
+			]);
+		} finally {
+			warn.mockRestore();
+		}
 	});
 
 	test("checks again when a third process stores before our reconciliation", async () => {
