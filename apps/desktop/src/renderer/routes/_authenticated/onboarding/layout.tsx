@@ -64,8 +64,7 @@ const modeRedirect = <Redirect to="/onboarding/mode" replace />;
 
 function OnboardingFlowLayout() {
 	const { data: session, isPending } = authClient.useSession();
-	const { data: platform, isPending: isPendingPlatform } =
-		electronTrpc.window.getPlatform.useQuery();
+	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const location = useLocation();
 	const navigate = useNavigate();
