@@ -7672,6 +7672,9 @@ msgstr "подготовил 3 ответа поддержки"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Перетащите <0>Paradev</0> в папку <1>Программы</1>"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "Перетаскивайте проекты для изменения порядка в ручной сортировке"
+
 msgid "Drag to reorder"
 msgstr "Перетащите, чтобы изменить порядок"
 
@@ -12346,6 +12349,9 @@ msgstr "Загадочный станочник"
 msgid "Name"
 msgstr "Название"
 
+msgid "Name A–Z"
+msgstr "Название А–Я"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Название и slug для URL. Оба можно изменить позже."
 
@@ -12357,6 +12363,9 @@ msgstr "Имя не разрешено"
 
 msgid "Name updated!"
 msgstr "Имя обновлено!"
+
+msgid "Name Z–A"
+msgstr "Название Я–А"
 
 msgid "Name, email, or team"
 msgstr "Имя, email или команда"
@@ -15553,6 +15562,9 @@ msgstr "Хост проекта недоступен. Сейчас переим�
 
 msgid "Projects"
 msgstr "Проекты"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "Проекты: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "Промпт"
@@ -18837,6 +18849,9 @@ msgstr "Сортировать по"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Сортировать по {label}, сейчас {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "Сортировать проекты и рабочие области"
 
 msgid "Sort workspaces"
 msgstr "Сортировать рабочие области"

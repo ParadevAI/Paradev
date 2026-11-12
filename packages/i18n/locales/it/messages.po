@@ -7672,6 +7672,9 @@ msgstr "preparate 3 risposte di supporto"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Trascina <0>Paradev</0> nella cartella <1>Applicazioni</1>"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "Trascina i progetti per riordinarli in Ordine manuale"
+
 msgid "Drag to reorder"
 msgstr "Trascina per riordinare"
 
@@ -12346,6 +12349,9 @@ msgstr "Macchinista Misterioso"
 msgid "Name"
 msgstr "Nome"
 
+msgid "Name A–Z"
+msgstr "Nome A–Z"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Nome e uno slug adatto agli URL. Entrambi possono essere modificati in seguito."
 
@@ -12357,6 +12363,9 @@ msgstr "Nome non risolto"
 
 msgid "Name updated!"
 msgstr "Nome aggiornato!"
+
+msgid "Name Z–A"
+msgstr "Nome Z–A"
 
 msgid "Name, email, or team"
 msgstr "Nome, email o team"
@@ -15553,6 +15562,9 @@ msgstr "L'host del progetto non è raggiungibile. Non è possibile rinominare or
 
 msgid "Projects"
 msgstr "Progetti"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "Progetti: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "Prompt"
@@ -18837,6 +18849,9 @@ msgstr "Ordina per"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Ordina per {label}, attualmente {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "Ordina progetti e workspace"
 
 msgid "Sort workspaces"
 msgstr "Ordina i workspace"

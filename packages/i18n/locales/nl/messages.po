@@ -7672,6 +7672,9 @@ msgstr "3 supportantwoorden opgesteld"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Sleep <0>Paradev</0> naar je map <1>Programma's</1>"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "Sleep projecten om ze te herordenen in Handmatige volgorde"
+
 msgid "Drag to reorder"
 msgstr "Sleep om te herordenen"
 
@@ -12346,6 +12349,9 @@ msgstr "Mysterieuze Machinist"
 msgid "Name"
 msgstr "Naam"
 
+msgid "Name A–Z"
+msgstr "Naam A–Z"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Een naam en een URL-vriendelijke slug. Beide zijn later te wijzigen."
 
@@ -12357,6 +12363,9 @@ msgstr "Naam niet omgezet"
 
 msgid "Name updated!"
 msgstr "Naam bijgewerkt!"
+
+msgid "Name Z–A"
+msgstr "Naam Z–A"
 
 msgid "Name, email, or team"
 msgstr "Naam, e-mail of team"
@@ -15553,6 +15562,9 @@ msgstr "De host van het project is onbereikbaar. Naam kan nu niet worden gewijzi
 
 msgid "Projects"
 msgstr "Projecten"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "Projecten: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "Prompt"
@@ -18837,6 +18849,9 @@ msgstr "Sorteren op"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Sorteren op {label}, nu {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "Projecten en werkruimtes sorteren"
 
 msgid "Sort workspaces"
 msgstr "Werkruimtes sorteren"

@@ -7672,6 +7672,9 @@ msgstr "przygotował 3 odpowiedzi wsparcia"
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Przeciągnij <0>Paradev</0> do folderu <1>Aplikacje</1>"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "Przeciągaj projekty, aby zmienić kolejność w trybie ręcznym"
+
 msgid "Drag to reorder"
 msgstr "Przeciągnij, aby zmienić kolejność"
 
@@ -12346,6 +12349,9 @@ msgstr "Tajemniczy Tokarz"
 msgid "Name"
 msgstr "Nazwa"
 
+msgid "Name A–Z"
+msgstr "Nazwa A–Z"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Nazwa i slug przyjazny adresom URL. Oba można później zmienić."
 
@@ -12357,6 +12363,9 @@ msgstr "Nie rozwiązano nazwy"
 
 msgid "Name updated!"
 msgstr "Nazwa zaktualizowana!"
+
+msgid "Name Z–A"
+msgstr "Nazwa Z–A"
 
 msgid "Name, email, or team"
 msgstr "Imię, e-mail lub zespół"
@@ -15553,6 +15562,9 @@ msgstr "Host projektu jest nieosiągalny. Nie można teraz zmienić nazwy"
 
 msgid "Projects"
 msgstr "Projekty"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "Projekty: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "Prompt"
@@ -18837,6 +18849,9 @@ msgstr "Sortuj według"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Sortuj wg {label}, obecnie {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "Sortuj projekty i obszary robocze"
 
 msgid "Sort workspaces"
 msgstr "Sortuj obszary robocze"

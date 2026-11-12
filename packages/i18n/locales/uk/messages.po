@@ -7666,6 +7666,9 @@ msgstr "підготував чернетки 3 відповідей для пі
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Перетягніть <0>Paradev</0> у папку <1>Програми</1>"
 
+msgid "Drag projects to reorder in Manual order"
+msgstr "Перетягуйте проєкти, щоб змінити їхній порядок у режимі «Ручний порядок»"
+
 msgid "Drag to reorder"
 msgstr "Перетягніть, щоб змінити порядок"
 
@@ -12340,6 +12343,9 @@ msgstr "Таємничий верстатник"
 msgid "Name"
 msgstr "Назва"
 
+msgid "Name A–Z"
+msgstr "Назва А–Я"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Назва й slug для URL. Обидва можна змінити пізніше."
 
@@ -12351,6 +12357,9 @@ msgstr "Не вдалося розпізнати ім'я"
 
 msgid "Name updated!"
 msgstr "Ім'я оновлено!"
+
+msgid "Name Z–A"
+msgstr "Назва Я–А"
 
 msgid "Name, email, or team"
 msgstr "Ім'я, ел. пошта або команда"
@@ -15547,6 +15556,9 @@ msgstr "Хост проєкту недоступний. Зараз неможл�
 
 msgid "Projects"
 msgstr "Проєкти"
+
+msgid "Projects: {projectOrderLabel}"
+msgstr "Проєкти: {projectOrderLabel}"
 
 msgid "Prompt"
 msgstr "Промпт"
@@ -18831,6 +18843,9 @@ msgstr "Сортувати за"
 
 msgid "Sort by {label}, currently {sortLabel}"
 msgstr "Сортувати за: {label}, зараз {sortLabel}"
+
+msgid "Sort projects and workspaces"
+msgstr "Сортувати проєкти та робочі простори"
 
 msgid "Sort workspaces"
 msgstr "Сортувати робочі простори"
