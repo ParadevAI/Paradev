@@ -1795,6 +1795,9 @@ msgstr "Инструкции облачной автоматизации мог�
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Облачное рабочее пространство не может вызвать {path}. Сделайте это в клиенте, где вы вошли в систему."
 
+msgid "A computer"
+msgstr "Компьютер"
+
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Удаление {workspaceName} уже выполняется."
 
@@ -2840,6 +2843,9 @@ msgstr "Анонимный сборщик"
 
 msgid "Another AI assistant"
 msgstr "Другой ИИ-ассистент"
+
+msgid "Another computer"
+msgstr "Другой компьютер"
 
 msgid "another device"
 msgstr "другое устройство"
@@ -10782,9 +10788,6 @@ msgstr "Его плагины появятся после завершения �
 msgid "Its replies go with it."
 msgstr "Ответы тоже будут удалены."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
-msgstr "Его работа, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на выбранном компьютере начинается с этой ветки, и каждый чат Claude продолжается там, в том числе Claude в терминале. Работающие агенты сначала останавливаются. Другие терминалы и чаты остаются на месте."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Её рабочие области и терминалы недоступны до перезапуска. Откройте меню Paradev в трее > Host Service > Restart."
 
@@ -12263,23 +12266,8 @@ msgstr "Перенесите работу из облака"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Перемещать фокус между основными вкладками и правой боковой панелью и открывать панель, если она закрыта"
 
-msgid "Move this workspace to a computer?"
-msgstr "Перенести эту рабочую область на компьютер?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Перенести эту рабочую область в облако?"
-
-msgid "Move to a computer"
-msgstr "Перенести на компьютер"
-
-msgid "Move to another computer"
-msgstr "Перенести на другой компьютер"
-
 msgid "Move to background"
 msgstr "Перевести в фон"
-
-msgid "Move to cloud"
-msgstr "Перенести в облако"
 
 msgid "Move to group"
 msgstr "Переместить в группу"
@@ -23091,9 +23079,6 @@ msgstr "Ваши проекты и рабочие пространства из 
 
 msgid "Your version: {currentVersion}"
 msgstr "Ваша версия: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
-msgstr "Ваша работа, включая незакоммиченные изменения, отправляется в новую ветку на удалённом репозитории. Облачная рабочая область запускается из этой ветки в выбранном вами окружении, и каждый чат с Claude продолжается там, в том числе Claude в терминале. Работающие агенты сначала останавливаются. Другие терминалы и чаты остаются здесь."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Вход по коду устройства для Codex включает администратор вашего рабочего пространства."

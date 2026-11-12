@@ -1795,6 +1795,9 @@ msgstr "A cloud automation's instructions can be at most {max} characters"
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "A cloud workspace cannot call {path}. Run this from a client you are signed into."
 
+msgid "A computer"
+msgstr "A computer"
+
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "A delete is already in progress for {workspaceName}."
 
@@ -2840,6 +2843,9 @@ msgstr "Anonymous Assembler"
 
 msgid "Another AI assistant"
 msgstr "Another AI assistant"
+
+msgid "Another computer"
+msgstr "Another computer"
 
 msgid "another device"
 msgstr "another device"
@@ -10782,9 +10788,6 @@ msgstr "Its plugins appear when the sync finishes."
 msgid "Its replies go with it."
 msgstr "Its replies go with it."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
-msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 
@@ -12263,23 +12266,8 @@ msgstr "Move cloud work"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 
-msgid "Move this workspace to a computer?"
-msgstr "Move this workspace to a computer?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Move this workspace to the cloud?"
-
-msgid "Move to a computer"
-msgstr "Move to a computer"
-
-msgid "Move to another computer"
-msgstr "Move to another computer"
-
 msgid "Move to background"
 msgstr "Move to background"
-
-msgid "Move to cloud"
-msgstr "Move to cloud"
 
 msgid "Move to group"
 msgstr "Move to group"
@@ -23091,9 +23079,6 @@ msgstr "Your v1 projects and workspaces are moving to the new Paradev. They appe
 
 msgid "Your version: {currentVersion}"
 msgstr "Your version: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
-msgstr "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Your workspace admin turns on device code sign-in for Codex."

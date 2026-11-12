@@ -1795,6 +1795,9 @@ msgstr "クラウドオートメーションの指示は最大 {max} 文字ま�
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "クラウドワークスペースからは {path} を呼び出せません。サインイン済みのクライアントから実行してください。"
 
+msgid "A computer"
+msgstr "コンピューター"
+
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}の削除はすでに進行中です。"
 
@@ -2840,6 +2843,9 @@ msgstr "匿名の組立工"
 
 msgid "Another AI assistant"
 msgstr "その他の AI アシスタント"
+
+msgid "Another computer"
+msgstr "別のコンピューター"
 
 msgid "another device"
 msgstr "別のデバイス"
@@ -10782,9 +10788,6 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
-msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。選んだコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。ターミナル内の Claude も同様です。作業中のエージェントは先に停止します。その他のターミナルとチャットはそのまま残ります。"
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません。Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
 
@@ -12263,23 +12266,8 @@ msgstr "クラウドの作業を移行"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
 
-msgid "Move this workspace to a computer?"
-msgstr "このワークスペースをコンピューターに移動しますか？"
-
-msgid "Move this workspace to the cloud?"
-msgstr "このワークスペースをクラウドに移動しますか？"
-
-msgid "Move to a computer"
-msgstr "コンピューターに移動"
-
-msgid "Move to another computer"
-msgstr "別のコンピューターに移動"
-
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
-
-msgid "Move to cloud"
-msgstr "クラウドに移動"
 
 msgid "Move to group"
 msgstr "グループへ移動"
@@ -23091,9 +23079,6 @@ msgstr "v1 のプロジェクトとワークスペースを新しい Paradev に
 
 msgid "Your version: {currentVersion}"
 msgstr "現在のバージョン: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
-msgstr "コミットされていない変更を含む作業は、リモートの新しいブランチにプッシュされます。選択した環境でそのブランチからクラウドワークスペースが起動し、Claude の各チャットはそこで続きます。ターミナル内の Claude も同様です。作業中のエージェントは先に停止します。その他のターミナルとチャットはここに残ります。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex のデバイスコードによるサインインは、ワークスペースの管理者が有効にします。"

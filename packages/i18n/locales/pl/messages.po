@@ -1795,6 +1795,9 @@ msgstr "Instrukcje automatyzacji w chmurze mogą mieć maksymalnie {max} znaków
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Workspace w chmurze nie może wywołać {path}. Zrób to z klienta, do którego jesteś zalogowany."
 
+msgid "A computer"
+msgstr "Komputer"
+
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Usuwanie {workspaceName} jest już w toku."
 
@@ -2840,6 +2843,9 @@ msgstr "Anonimowy Monter"
 
 msgid "Another AI assistant"
 msgstr "Inny asystent AI"
+
+msgid "Another computer"
+msgstr "Inny komputer"
 
 msgid "another device"
 msgstr "inne urządzenie"
@@ -10782,9 +10788,6 @@ msgstr "Jego wtyczki pojawią się po zakończeniu synchronizacji."
 msgid "Its replies go with it."
 msgstr "Odpowiedzi też zostaną usunięte."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
-msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na wybranym komputerze startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany, także Claude w terminalu. Pracujący agenci najpierw się zatrzymują. Pozostałe terminale i czaty zostają tam, gdzie są."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Jej obszary robocze i terminale są niedostępne do czasu restartu. Użyj menu zasobnika Paradev > Usługa hosta > Uruchom ponownie."
 
@@ -12263,23 +12266,8 @@ msgstr "Przenieś pracę z chmury"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Przenieś fokus między głównymi kartami a prawym paskiem bocznym i otwórz pasek, jeśli jest zamknięty"
 
-msgid "Move this workspace to a computer?"
-msgstr "Przenieść ten obszar roboczy na komputer?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Przenieść ten obszar roboczy do chmury?"
-
-msgid "Move to a computer"
-msgstr "Przenieś na komputer"
-
-msgid "Move to another computer"
-msgstr "Przenieś na inny komputer"
-
 msgid "Move to background"
 msgstr "Przenieś w tło"
-
-msgid "Move to cloud"
-msgstr "Przenieś do chmury"
 
 msgid "Move to group"
 msgstr "Przenieś do grupy"
@@ -23091,9 +23079,6 @@ msgstr "Twoje projekty i obszary robocze z v1 są przenoszone do nowego Paradev.
 
 msgid "Your version: {currentVersion}"
 msgstr "Twoja wersja: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
-msgstr "Twoja praca, w tym niezatwierdzone zmiany, zostanie wypchnięta do nowej gałęzi w repozytorium zdalnym. Obszar roboczy w chmurze uruchomi się z tej gałęzi w wybranym środowisku, a każdy czat z Claude będzie tam kontynuowany, także Claude w terminalu. Pracujący agenci najpierw się zatrzymają. Pozostałe terminale i czaty zostaną tutaj."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Logowanie kodem urządzenia dla Codex włącza administrator Twojego obszaru roboczego."

@@ -1789,6 +1789,9 @@ msgstr "Інструкції хмарної автоматизації можу�
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Хмарний робочий простір не може викликати {path}. Зробіть це в клієнті, де ви ввійшли."
 
+msgid "A computer"
+msgstr "Комп’ютер"
+
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Видалення {workspaceName} уже триває."
 
@@ -2834,6 +2837,9 @@ msgstr "Анонімний асемблер"
 
 msgid "Another AI assistant"
 msgstr "Інший ШІ-асистент"
+
+msgid "Another computer"
+msgstr "Інший комп’ютер"
 
 msgid "another device"
 msgstr "інший пристрій"
@@ -10776,9 +10782,6 @@ msgstr "Його плагіни з'являться, коли синхроніз
 msgid "Its replies go with it."
 msgstr "Відповіді на нього буде видалено разом із ним."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
-msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на вибраному комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там, зокрема Claude у терміналі. Агенти, що працюють, спершу зупиняються. Інші термінали та чати залишаються на місці."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Його робочі простори й термінали недоступні, доки він не перезапуститься. Скористайтеся меню Paradev у треї > Host Service > Перезапустити."
 
@@ -12257,23 +12260,8 @@ msgstr "Перенесіть роботу з хмари"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Переміщувати фокус між основними вкладками та правою бічною панеллю і відкривати панель, якщо вона закрита"
 
-msgid "Move this workspace to a computer?"
-msgstr "Перемістити цей робочий простір на комп’ютер?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Перемістити цей робочий простір у хмару?"
-
-msgid "Move to a computer"
-msgstr "Перемістити на комп’ютер"
-
-msgid "Move to another computer"
-msgstr "Перемістити на інший комп’ютер"
-
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
-
-msgid "Move to cloud"
-msgstr "Перемістити в хмару"
 
 msgid "Move to group"
 msgstr "Перемістити до групи"
@@ -23085,9 +23073,6 @@ msgstr "Ваші проєкти й робочі простори з v1 пере�
 
 msgid "Your version: {currentVersion}"
 msgstr "Ваша версія: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
-msgstr "Ваша робота, включно з незакомітованими змінами, надсилається до нової гілки у віддаленому репозиторії. Хмарний робочий простір запускається з цієї гілки у вибраному вами середовищі, і кожен чат із Claude продовжується там, зокрема Claude у терміналі. Агенти, що працюють, спочатку зупиняться. Інші термінали та чати залишаться тут."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Адміністратор вашого робочого простору вмикає вхід за кодом пристрою для Codex."
