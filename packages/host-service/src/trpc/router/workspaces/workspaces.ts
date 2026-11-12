@@ -799,6 +799,14 @@ async function createContainerWorkspace(
 		},
 	});
 	writeWorkspaceContextFiles(root, checkouts);
+	if (firstPr) {
+		// Link the PRs now, not at the next sweep, so ship rows don't offer "Create PR".
+		void ctx.runtime.pullRequests
+			.refreshPullRequestsByWorkspaces([workspaceRow.id])
+			.catch((error) => {
+				console.warn("[workspaces.create] PR link refresh failed", error);
+			});
+	}
 
 	if (composerPrompt && input.name === undefined && !firstPr) {
 		setWorkspaceNamingState(ctx.db, workspaceRow.id, {
