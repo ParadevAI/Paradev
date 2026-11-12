@@ -39,7 +39,9 @@ you used.
 
 `run_select_query` runs read-only `SELECT` statements. Always:
 
-- Bound time on the partition or sort key column.
+- Bound time on the partition or sort key column. For an all-time question,
+  or a table with no time column, aggregate rather than invent a window, and
+  say the query is unbounded.
 - Add `LIMIT` to exploratory queries; aggregate rather than pulling rows.
 - Sample first (`LIMIT 10`) when unsure what a column holds.
 - Use ClickHouse functions (`toStartOfHour`, `countIf`, `uniq`, `quantile`)

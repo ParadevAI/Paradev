@@ -35,13 +35,15 @@ when the service is running.
 
 `list_clickpipes` lists the service's ingestion pipes. For each, `get_clickpipe`
 gives its state and source. A pipe that is stopped, failed or paused explains
-"the data stopped" faster than any query. To confirm, check the newest row in
-the pipe's destination table with the `query-clickhouse` skill.
+"the data stopped" faster than any query. A running pipe is not proof that it
+is keeping up, so check the newest row in the pipe's destination table with the
+`query-clickhouse` skill. Report errors only when `get_clickpipe` shows them; if
+you could not check freshness, say ingestion is unverified rather than healthy.
 
 ## 5. Report
 
-One line per service: state, last good backup, pipes running out of total, and
-anything that needs action, with the reason. "All healthy" names what was
+One line per service: state, last good backup, pipes running out of total, the
+newest ingested row, and anything that needs action, with the reason. "All healthy" names what was
 checked.
 
 ## Anti-patterns
