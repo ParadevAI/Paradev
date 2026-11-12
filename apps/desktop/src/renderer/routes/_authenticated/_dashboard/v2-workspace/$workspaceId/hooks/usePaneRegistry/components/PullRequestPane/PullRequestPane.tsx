@@ -77,7 +77,14 @@ export function PullRequestPane({
 		refreshDetail();
 		syncWorkspacePullRequests
 			.mutateAsync({ workspaceIds: [workspace.id] })
-			.then(() => workspaceUtils.pullRequests.historyByWorkspaces.invalidate())
+			.then(() =>
+				Promise.all([
+					workspaceUtils.pullRequests.historyByWorkspaces.invalidate(),
+					workspaceUtils.git.getPullRequest.invalidate({
+						workspaceId: workspace.id,
+					}),
+				]),
+			)
 			.catch((error: unknown) => {
 				console.warn("Failed to sync workspace pull requests", error);
 			});
@@ -182,7 +189,7 @@ export function PullRequestPane({
 						flow={flow}
 						showStartWorkspace={false}
 						onRefresh={refresh}
-						isRefreshing={isRefreshing}
+						isRefreshing={isRefreshing || syncWorkspacePullRequests.isPending}
 					/>
 				</div>
 			</div>

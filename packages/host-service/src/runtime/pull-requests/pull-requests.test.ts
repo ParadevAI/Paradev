@@ -2060,6 +2060,44 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		expect(numberLookups).toEqual([101]);
 	});
 
+	test("a past PR that left the merge queue but is still open shows as open", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-old",
+			prNumber: 101,
+			headBranch: "branch-a",
+			headSha: "sha-branch-a",
+			state: "queued",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "branch-b",
+			headSha: "sha-branch-b",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "branch-b",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "pr-old", linkedAt: 1 })
+			.run();
+		const serveHistory = historyExecGh(new Map());
+		const manager = createManager(db, {
+			execGh: async (args) =>
+				args.includes(`repos/${REPO.owner}/${REPO.name}/pulls/101`)
+					? makePrNode({
+							number: 101,
+							headRef: "branch-a",
+							headSha: "sha-branch-a",
+						})
+					: serveHistory(args),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getPrById(db, "pr-old")?.state).toBe("open");
+	});
+
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
 		const db = createRealDb();
 		seedProject(db);
