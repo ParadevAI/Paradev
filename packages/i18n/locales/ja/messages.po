@@ -2076,6 +2076,9 @@ msgstr "フィルターを追加"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "プロジェクト設定でライフサイクルの実行スクリプトを追加するか、ターミナルスクリプトをワークスペース実行に指定してください。"
 
+msgid "Add a note"
+msgstr "補足を追加"
+
 msgid "Add a project to see GitHub issues."
 msgstr "プロジェクトを追加するとGitHub issueが表示されます。"
 
@@ -22677,6 +22680,9 @@ msgstr "返信を入力…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "よく質問される部分のドキュメントを書く…"
+
+msgid "Write my own answer"
+msgstr "自分の回答を書く"
 
 msgid "Write once. Runs in every agent."
 msgstr "一度書けば、すべてのエージェントで動きます。"

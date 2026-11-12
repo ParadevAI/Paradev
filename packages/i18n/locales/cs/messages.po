@@ -2076,6 +2076,9 @@ msgstr "Přidat filtr"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Přidejte lifecycle run skript v nastavení projektu, nebo označte terminálový skript jako spuštění pracovního prostoru."
 
+msgid "Add a note"
+msgstr "Přidat poznámku"
+
 msgid "Add a project to see GitHub issues."
 msgstr "Přidejte projekt a uvidíte GitHub issues."
 
@@ -22677,6 +22680,9 @@ msgstr "Napište odpověď…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "Napiš dokumentaci k části, na kterou se všichni ptají…"
+
+msgid "Write my own answer"
+msgstr "Napsat vlastní odpověď"
 
 msgid "Write once. Runs in every agent."
 msgstr "Napište jednou. Běží v každém agentovi."

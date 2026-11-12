@@ -2076,6 +2076,9 @@ msgstr "필터 추가"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "프로젝트 설정에서 라이프사이클 실행 스크립트를 추가하거나, 터미널 스크립트를 워크스페이스 실행으로 지정하세요."
 
+msgid "Add a note"
+msgstr "메모 추가"
+
 msgid "Add a project to see GitHub issues."
 msgstr "GitHub 이슈를 보려면 프로젝트를 추가하세요."
 
@@ -22677,6 +22680,9 @@ msgstr "답글 작성…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "모두가 궁금해하는 부분에 문서 작성…"
+
+msgid "Write my own answer"
+msgstr "직접 답하기"
 
 msgid "Write once. Runs in every agent."
 msgstr "한 번 작성하면 모든 에이전트에서 실행됩니다."

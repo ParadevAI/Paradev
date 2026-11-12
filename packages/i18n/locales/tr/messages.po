@@ -2076,6 +2076,9 @@ msgstr "Filtre ekle"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Proje Ayarları'nda bir yaşam döngüsü çalıştırma betiği ekleyin veya bir terminal betiğini çalışma alanı çalıştırması olarak işaretleyin."
 
+msgid "Add a note"
+msgstr "Not ekle"
+
 msgid "Add a project to see GitHub issues."
 msgstr "GitHub issue'larını görmek için bir proje ekleyin."
 
@@ -22677,6 +22680,9 @@ msgstr "Bir yanıt yazın…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "Herkesin sorduğu bölüm için belge yaz…"
+
+msgid "Write my own answer"
+msgstr "Kendi yanıtımı yaz"
 
 msgid "Write once. Runs in every agent."
 msgstr "Bir kez yazın. Her ajanda çalışır."

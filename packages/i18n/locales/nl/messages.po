@@ -2076,6 +2076,9 @@ msgstr "Filter toevoegen"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Voeg een lifecycle-runscript toe in de projectinstellingen of markeer een terminalscript als de run van de werkruimte."
 
+msgid "Add a note"
+msgstr "Een opmerking toevoegen"
+
 msgid "Add a project to see GitHub issues."
 msgstr "Voeg een project toe om GitHub-issues te zien."
 
@@ -22677,6 +22680,9 @@ msgstr "Schrijf een antwoord…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "Schrijf docs voor het onderdeel waar iedereen naar vraagt…"
+
+msgid "Write my own answer"
+msgstr "Zelf een antwoord schrijven"
 
 msgid "Write once. Runs in every agent."
 msgstr "Eén keer schrijven. Draait in elke agent."
