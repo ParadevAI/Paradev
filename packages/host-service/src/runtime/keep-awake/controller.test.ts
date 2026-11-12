@@ -1,4 +1,5 @@
 import { expect, mock, test } from "bun:test";
+import { spawnSync } from "node:child_process";
 import { createKeepAwakeController } from "./controller";
 
 type Options = Parameters<typeof createKeepAwakeController>[0];
@@ -141,6 +142,54 @@ test("renewal replaces the lease only when it is due", async () => {
 	expect(state.startLease).toHaveBeenCalledTimes(2);
 	expect(state.leases[0]?.running).toBe(false);
 	expect(state.leases[1]?.running).toBe(true);
+});
+
+test("the default renewal clock is unaffected by a backward wall-clock adjustment", () => {
+	const result = spawnSync(
+		process.execPath,
+		[
+			"--no-env-file",
+			"--eval",
+			`
+				import { createKeepAwakeController } from "./controller.ts";
+				let wall = 1_000_000;
+				let elapsed = 0;
+				let starts = 0;
+				const timers = new Set();
+				Date.now = () => wall;
+				Object.defineProperty(performance, "now", { value: () => elapsed });
+				const controller = createKeepAwakeController({
+					supported: true,
+					enabled: true,
+					hasWork: () => true,
+					readPower: async () => true,
+					confirmWork: async () => true,
+					startLease: () => {
+						starts += 1;
+						return { isRunning: () => true, stop() {} };
+					},
+					subscribe: () => () => {},
+					schedule: (callback) => {
+						timers.add(callback);
+						return () => timers.delete(callback);
+					},
+				});
+				for (let index = 0; index < 8; index++) await Promise.resolve();
+				wall -= 3_600_000;
+				elapsed += 60_000;
+				for (const callback of [...timers]) {
+					timers.delete(callback);
+					callback();
+				}
+				for (let index = 0; index < 8; index++) await Promise.resolve();
+				controller.stop();
+				console.log(starts);
+			`,
+		],
+		{ cwd: import.meta.dir, encoding: "utf8" },
+	);
+	expect(result.status).toBe(0);
+	expect(result.stdout.trim()).toBe("2");
 });
 
 test("a helper that exits early is replaced on the next poll", async () => {

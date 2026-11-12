@@ -29,7 +29,7 @@ export function createKeepAwakeController(
 ): KeepAwakeController {
 	const {
 		supported,
-		now = Date.now,
+		now = () => performance.now(),
 		pollMs = 30_000,
 		renewMs = 60_000,
 		onError = (error) => console.warn("[keep-awake] check failed", error),
