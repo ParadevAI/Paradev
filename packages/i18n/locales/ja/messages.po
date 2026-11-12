@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "変更"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "ワークスペースが起動すると変更が読み込まれます"
+
 msgid "Changes open target"
 msgstr "変更ビューの開き先"
 
@@ -7337,6 +7340,9 @@ msgstr "差分変更の概要"
 msgid "diff in new tab"
 msgstr "新しいタブで差分"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "ワークスペースが起動すると差分が開きます"
+
 msgid "Digital Product Designer"
 msgstr "デジタルプロダクトデザイナー"
 
@@ -8889,6 +8895,9 @@ msgstr "ファイルが見つかりません"
 msgid "File open mode"
 msgstr "ファイルの開き方"
 
+msgid "File opens when the workspace wakes up"
+msgstr "ワークスペースが起動するとファイルが開きます"
+
 msgid "File viewer"
 msgstr "ファイルビューア"
 
@@ -8906,6 +8915,9 @@ msgstr "ファイルとエディター"
 
 msgid "Files changed"
 msgstr "変更されたファイル"
+
+msgid "Files load when the workspace wakes up"
+msgstr "ワークスペースが起動するとファイルが読み込まれます"
 
 msgid "files to exclude (glob)"
 msgstr "除外するファイル（glob）"
@@ -16967,6 +16979,9 @@ msgstr "レビューが却下されました"
 msgid "Review each failure before deciding whether to continue."
 msgstr "続行するか判断する前に、各失敗を確認してください。"
 
+msgid "Review loads when the workspace wakes up"
+msgstr "ワークスペースが起動するとレビューが読み込まれます"
+
 msgid "Review message"
 msgstr "レビューのメッセージ"
 
@@ -18621,6 +18636,9 @@ msgstr "アップデートをシミュレート: 準備完了"
 msgid "Simulator"
 msgstr "シミュレータ"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "ワークスペースが起動するとシミュレータを開始します"
+
 msgid "Since 2025"
 msgstr "2025年から"
 
@@ -19835,6 +19853,9 @@ msgstr "ターミナルセッションを終了しました"
 
 msgid "Terminal sessions"
 msgstr "ターミナルセッション"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "ワークスペースが起動するとターミナルを開始します"
 
 msgid "Terminal theme color-palette preview"
 msgstr "ターミナルテーマのカラーパレットプレビュー"

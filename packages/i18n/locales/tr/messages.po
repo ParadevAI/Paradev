@@ -4211,6 +4211,9 @@ msgstr "Değişiklik günlüğü"
 msgid "Changes"
 msgstr "Değişiklikler"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Değişiklikler, çalışma alanı uyandığında yüklenir"
+
 msgid "Changes open target"
 msgstr "Değişiklikleri açma hedefi"
 
@@ -7337,6 +7340,9 @@ msgstr "Fark değişikliklerine genel bakış"
 msgid "diff in new tab"
 msgstr "yeni sekmede fark"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Fark, çalışma alanı uyandığında açılır"
+
 msgid "Digital Product Designer"
 msgstr "Dijital Ürün Tasarımcısı"
 
@@ -8889,6 +8895,9 @@ msgstr "Dosya bulunamadı"
 msgid "File open mode"
 msgstr "Dosya açma modu"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Dosya, çalışma alanı uyandığında açılır"
+
 msgid "File viewer"
 msgstr "Dosya görüntüleyici"
 
@@ -8906,6 +8915,9 @@ msgstr "Dosyalar ve Düzenleyici"
 
 msgid "Files changed"
 msgstr "Değişen dosyalar"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Dosyalar, çalışma alanı uyandığında yüklenir"
 
 msgid "files to exclude (glob)"
 msgstr "hariç tutulacak dosyalar (glob)"
@@ -16967,6 +16979,9 @@ msgstr "İnceleme yok sayıldı"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Devam edip etmemeye karar vermeden önce her hatayı inceleyin."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "İnceleme, çalışma alanı uyandığında yüklenir"
+
 msgid "Review message"
 msgstr "İnceleme mesajı"
 
@@ -18621,6 +18636,9 @@ msgstr "Güncellemeyi simüle et: hazır"
 msgid "Simulator"
 msgstr "Simülatör"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Simülatör, çalışma alanı uyandığında başlar"
+
 msgid "Since 2025"
 msgstr "2025'ten beri"
 
@@ -19835,6 +19853,9 @@ msgstr "Terminal oturumu sonlandırıldı"
 
 msgid "Terminal sessions"
 msgstr "Terminal oturumları"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal, çalışma alanı uyandığında başlar"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Terminal teması renk paleti önizlemesi"

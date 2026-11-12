@@ -4211,6 +4211,9 @@ msgstr "변경 로그"
 msgid "Changes"
 msgstr "변경"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 변경 사항을 불러옵니다"
+
 msgid "Changes open target"
 msgstr "변경 사항 열기 대상"
 
@@ -7337,6 +7340,9 @@ msgstr "차이 변경 개요"
 msgid "diff in new tab"
 msgstr "새 탭에서 차이"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 차이를 엽니다"
+
 msgid "Digital Product Designer"
 msgstr "디지털 제품 디자이너"
 
@@ -8889,6 +8895,9 @@ msgstr "파일을 찾을 수 없습니다"
 msgid "File open mode"
 msgstr "파일 열기 방식"
 
+msgid "File opens when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 파일을 엽니다"
+
 msgid "File viewer"
 msgstr "파일 뷰어"
 
@@ -8906,6 +8915,9 @@ msgstr "파일 및 편집기"
 
 msgid "Files changed"
 msgstr "변경된 파일"
+
+msgid "Files load when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 파일을 불러옵니다"
 
 msgid "files to exclude (glob)"
 msgstr "제외할 파일(glob)"
@@ -16967,6 +16979,9 @@ msgstr "리뷰 무시됨"
 msgid "Review each failure before deciding whether to continue."
 msgstr "계속할지 결정하기 전에 각 실패를 확인하세요."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 검토를 불러옵니다"
+
 msgid "Review message"
 msgstr "리뷰 메시지"
 
@@ -18621,6 +18636,9 @@ msgstr "업데이트 시뮬레이션: 준비 완료"
 msgid "Simulator"
 msgstr "시뮬레이터"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 시뮬레이터를 시작합니다"
+
 msgid "Since 2025"
 msgstr "2025년부터"
 
@@ -19835,6 +19853,9 @@ msgstr "터미널 세션을 종료했습니다"
 
 msgid "Terminal sessions"
 msgstr "터미널 세션"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 터미널을 시작합니다"
 
 msgid "Terminal theme color-palette preview"
 msgstr "터미널 테마 색상 팔레트 미리 보기"

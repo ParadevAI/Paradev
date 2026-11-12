@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Zmiany"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Zmiany wczytają się, gdy obszar roboczy się wybudzi"
+
 msgid "Changes open target"
 msgstr "Cel otwierania zmian"
 
@@ -7337,6 +7340,9 @@ msgstr "Przegląd zmian diff"
 msgid "diff in new tab"
 msgstr "różnice w nowej karcie"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Różnice otworzą się, gdy obszar roboczy się wybudzi"
+
 msgid "Digital Product Designer"
 msgstr "Projektant produktów cyfrowych"
 
@@ -8889,6 +8895,9 @@ msgstr "Nie znaleziono pliku"
 msgid "File open mode"
 msgstr "Tryb otwierania plików"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Plik otworzy się, gdy obszar roboczy się wybudzi"
+
 msgid "File viewer"
 msgstr "Podgląd pliku"
 
@@ -8906,6 +8915,9 @@ msgstr "Pliki i edytor"
 
 msgid "Files changed"
 msgstr "Zmienione pliki"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Pliki wczytają się, gdy obszar roboczy się wybudzi"
 
 msgid "files to exclude (glob)"
 msgstr "pliki do wykluczenia (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Przegląd odrzucony"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Przejrzyj każdy błąd, zanim zdecydujesz o kontynuacji."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Przegląd wczyta się, gdy obszar roboczy się wybudzi"
+
 msgid "Review message"
 msgstr "Wiadomość przeglądu"
 
@@ -18621,6 +18636,9 @@ msgstr "Symuluj aktualizację: gotowa"
 msgid "Simulator"
 msgstr "Symulator"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Symulator uruchomi się, gdy obszar roboczy się wybudzi"
+
 msgid "Since 2025"
 msgstr "Od 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Sesja terminala zabita"
 
 msgid "Terminal sessions"
 msgstr "Sesje terminala"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal uruchomi się, gdy obszar roboczy się wybudzi"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Podgląd palety kolorów motywu terminala"

@@ -4205,6 +4205,9 @@ msgstr "Журнал змін"
 msgid "Changes"
 msgstr "Зміни"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Зміни завантажаться, коли робочий простір прокинеться"
+
 msgid "Changes open target"
 msgstr "Де відкривати зміни"
 
@@ -7331,6 +7334,9 @@ msgstr "Огляд змін у diff"
 msgid "diff in new tab"
 msgstr "diff у новій вкладці"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff відкриється, коли робочий простір прокинеться"
+
 msgid "Digital Product Designer"
 msgstr "Дизайнер цифрових продуктів"
 
@@ -8883,6 +8889,9 @@ msgstr "Файл не знайдено"
 msgid "File open mode"
 msgstr "Режим відкриття файлів"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Файл відкриється, коли робочий простір прокинеться"
+
 msgid "File viewer"
 msgstr "Переглядач файлів"
 
@@ -8900,6 +8909,9 @@ msgstr "Файли та редактор"
 
 msgid "Files changed"
 msgstr "Змінені файли"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Файли завантажаться, коли робочий простір прокинеться"
 
 msgid "files to exclude (glob)"
 msgstr "файли для виключення (glob)"
@@ -16961,6 +16973,9 @@ msgstr "Рев'ю відхилено"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Перегляньте кожну помилку, перш ніж вирішувати, чи продовжувати."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Перевірка завантажиться, коли робочий простір прокинеться"
+
 msgid "Review message"
 msgstr "Повідомлення рев'ю"
 
@@ -18615,6 +18630,9 @@ msgstr "Імітувати оновлення: готово"
 msgid "Simulator"
 msgstr "Симулятор"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Симулятор запуститься, коли робочий простір прокинеться"
+
 msgid "Since 2025"
 msgstr "З 2025 року"
 
@@ -19829,6 +19847,9 @@ msgstr "Сеанс термінала завершено"
 
 msgid "Terminal sessions"
 msgstr "Сеанси термінала"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Термінал запуститься, коли робочий простір прокинеться"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Попередній перегляд палітри кольорів теми термінала"

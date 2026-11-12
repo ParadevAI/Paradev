@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Изменения"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Изменения загрузятся, когда рабочая область проснётся"
+
 msgid "Changes open target"
 msgstr "Куда открывать изменения"
 
@@ -7337,6 +7340,9 @@ msgstr "Обзор изменений diff"
 msgid "diff in new tab"
 msgstr "diff в новой вкладке"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff откроется, когда рабочая область проснётся"
+
 msgid "Digital Product Designer"
 msgstr "Дизайнер цифровых продуктов"
 
@@ -8889,6 +8895,9 @@ msgstr "Файл не найден"
 msgid "File open mode"
 msgstr "Режим открытия файлов"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Файл откроется, когда рабочая область проснётся"
+
 msgid "File viewer"
 msgstr "Просмотрщик файлов"
 
@@ -8906,6 +8915,9 @@ msgstr "Файлы и редактор"
 
 msgid "Files changed"
 msgstr "Изменённые файлы"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Файлы загрузятся, когда рабочая область проснётся"
 
 msgid "files to exclude (glob)"
 msgstr "исключаемые файлы (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Ревью отклонено"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Просмотрите каждую ошибку, прежде чем решать, продолжать ли."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Ревью загрузится, когда рабочая область проснётся"
+
 msgid "Review message"
 msgstr "Сообщение ревью"
 
@@ -18621,6 +18636,9 @@ msgstr "Симуляция обновления: готово"
 msgid "Simulator"
 msgstr "Симулятор"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Симулятор запустится, когда рабочая область проснётся"
+
 msgid "Since 2025"
 msgstr "С 2025 года"
 
@@ -19835,6 +19853,9 @@ msgstr "Сессия терминала завершена"
 
 msgid "Terminal sessions"
 msgstr "Сессии терминала"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Терминал запустится, когда рабочая область проснётся"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Предпросмотр цветовой палитры темы терминала"

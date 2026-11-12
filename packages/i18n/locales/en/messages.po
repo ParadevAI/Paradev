@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Changes"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Changes load when the workspace wakes up"
+
 msgid "Changes open target"
 msgstr "Changes open target"
 
@@ -7337,6 +7340,9 @@ msgstr "Diff change overview"
 msgid "diff in new tab"
 msgstr "diff in new tab"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff opens when the workspace wakes up"
+
 msgid "Digital Product Designer"
 msgstr "Digital Product Designer"
 
@@ -8889,6 +8895,9 @@ msgstr "File not found"
 msgid "File open mode"
 msgstr "File open mode"
 
+msgid "File opens when the workspace wakes up"
+msgstr "File opens when the workspace wakes up"
+
 msgid "File viewer"
 msgstr "File viewer"
 
@@ -8906,6 +8915,9 @@ msgstr "Files & Editor"
 
 msgid "Files changed"
 msgstr "Files changed"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Files load when the workspace wakes up"
 
 msgid "files to exclude (glob)"
 msgstr "files to exclude (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Review Dismissed"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Review each failure before deciding whether to continue."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Review loads when the workspace wakes up"
+
 msgid "Review message"
 msgstr "Review message"
 
@@ -18621,6 +18636,9 @@ msgstr "Simulate update: ready"
 msgid "Simulator"
 msgstr "Simulator"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Simulator starts when the workspace wakes up"
+
 msgid "Since 2025"
 msgstr "Since 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Terminal session killed"
 
 msgid "Terminal sessions"
 msgstr "Terminal sessions"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal starts when the workspace wakes up"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Terminal theme color-palette preview"
