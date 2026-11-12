@@ -855,8 +855,8 @@ msgstr "{completed} of {0} checks complete"
 msgid "{completed} of {total} completed"
 msgstr "{completed} of {total} completed"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
+msgid "{computerName} is offline"
+msgstr "{computerName} is offline"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle} font size"
@@ -5207,6 +5207,9 @@ msgstr "Configure workspace run command"
 msgid "Configured for {agent}"
 msgstr "Configured for {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Confirm before moving a workspace"
+
 msgid "Confirm before quitting"
 msgstr "Confirm before quitting"
 
@@ -8252,6 +8255,9 @@ msgstr "Explain how this repository works…"
 msgid "Explain to me how this repository works"
 msgstr "Explain to me how this repository works"
 
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Explain what a move does before a workspace moves to another computer"
+
 msgid "Explore"
 msgstr "Explore"
 
@@ -10779,8 +10785,14 @@ msgstr "Its plugins appear when the sync finishes."
 msgid "Its replies go with it."
 msgstr "Its replies go with it."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
@@ -12260,17 +12272,20 @@ msgstr "Move cloud work"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Move this workspace to {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Move this workspace to a computer?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Move this workspace to the cloud?"
 
-msgid "Move to a computer"
-msgstr "Move to a computer"
+msgid "Move this workspace to this computer?"
+msgstr "Move this workspace to this computer?"
 
-msgid "Move to another computer"
-msgstr "Move to another computer"
+msgid "Move to"
+msgstr "Move to"
 
 msgid "Move to background"
 msgstr "Move to background"
@@ -12486,6 +12501,9 @@ msgstr "New chat"
 
 msgid "New Chat"
 msgstr "New Chat"
+
+msgid "New cloud workspace"
+msgstr "New cloud workspace"
 
 msgid "New environment"
 msgstr "New environment"
@@ -12774,6 +12792,9 @@ msgstr "No Chrome, Brave, Arc, or other Chromium browsers were found."
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
+
+msgid "No cloud environment opens {repository}."
+msgstr "No cloud environment opens {repository}."
 
 msgid "No cloud workspaces"
 msgstr "No cloud workspaces"
@@ -15034,6 +15055,9 @@ msgstr "Pick a workspace"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
+
+msgid "Pick an environment"
+msgstr "Pick an environment"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
@@ -19893,8 +19917,14 @@ msgstr "That account is no longer connected — choose another."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "That agent session has no conversation to open yet. It was started but never prompted."
 
+msgid "that computer"
+msgstr "that computer"
+
 msgid "That computer can't be reached"
 msgstr "That computer can't be reached"
+
+msgid "That computer is offline"
+msgstr "That computer is offline"
 
 msgid "That endpoint could not be resolved."
 msgstr "That endpoint could not be resolved."
@@ -20189,8 +20219,14 @@ msgstr "The move timed out."
 msgid "The move was cancelled."
 msgstr "The move was cancelled."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "The moved workspace shows on Home when it is ready."
+
 msgid "The name of your organization or team"
 msgstr "The name of your organization or team"
+
+msgid "The name shows in the sidebar."
+msgstr "The name shows in the sidebar."
 
 msgid "The network connection changed"
 msgstr "The network connection changed"
@@ -20507,6 +20543,9 @@ msgstr "this computer"
 
 msgid "This computer"
 msgstr "This computer"
+
+msgid "This computer is offline"
+msgstr "This computer is offline"
 
 msgid "This computer's host is not running"
 msgstr "This computer's host is not running"
@@ -20874,6 +20913,9 @@ msgstr "This workspace's host is offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "This workspace's project is not on GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Thorough reasoning effort"
@@ -21622,6 +21664,9 @@ msgstr "Update naming instructions"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Update naming instructions for {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Update Paradev on {sourceName} to move its workspaces from this phone."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."

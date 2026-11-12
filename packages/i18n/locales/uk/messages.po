@@ -849,8 +849,8 @@ msgstr "Завершено {completed} з {0} перевірок"
 msgid "{completed} of {total} completed"
 msgstr "Завершено {completed} з {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (не в мережі)"
+msgid "{computerName} is offline"
+msgstr "{computerName} не в мережі"
 
 msgid "{configTitle} font size"
 msgstr "Розмір шрифту: {configTitle}"
@@ -5201,6 +5201,9 @@ msgstr "Налаштувати команду запуску робочого п
 msgid "Configured for {agent}"
 msgstr "Налаштовано для {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Підтверджувати перед переміщенням робочого простору"
+
 msgid "Confirm before quitting"
 msgstr "Підтверджувати перед виходом"
 
@@ -8246,6 +8249,9 @@ msgstr "Поясни, як працює цей репозиторій…"
 msgid "Explain to me how this repository works"
 msgstr "Поясни мені, як працює цей репозиторій"
 
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Пояснювати, що робить переміщення, перш ніж робочий простір перейде на інший комп’ютер"
+
 msgid "Explore"
 msgstr "Огляд"
 
@@ -10773,8 +10779,14 @@ msgstr "Його плагіни з'являться, коли синхроніз
 msgid "Its replies go with it."
 msgstr "Відповіді на нього буде видалено разом із ним."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на {computerName} починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на вибраному комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на цьому комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Його робочі простори й термінали недоступні, доки він не перезапуститься. Скористайтеся меню Paradev у треї > Host Service > Перезапустити."
@@ -12254,17 +12266,20 @@ msgstr "Перенесіть роботу з хмари"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Переміщувати фокус між основними вкладками та правою бічною панеллю і відкривати панель, якщо вона закрита"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Перемістити цей робочий простір на {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Перемістити цей робочий простір на комп’ютер?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Перемістити цей робочий простір у хмару?"
 
-msgid "Move to a computer"
-msgstr "Перемістити на комп’ютер"
+msgid "Move this workspace to this computer?"
+msgstr "Перемістити цей робочий простір на цей комп’ютер?"
 
-msgid "Move to another computer"
-msgstr "Перемістити на інший комп’ютер"
+msgid "Move to"
+msgstr "Перемістити"
 
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
@@ -12480,6 +12495,9 @@ msgstr "Новий чат"
 
 msgid "New Chat"
 msgstr "Новий чат"
+
+msgid "New cloud workspace"
+msgstr "Новий хмарний робочий простір"
 
 msgid "New environment"
 msgstr "Нове середовище"
@@ -12768,6 +12786,9 @@ msgstr "Не знайдено Chrome, Brave, Arc чи інших браузер�
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "На цій машині ще не знайдено використання Claude або Codex. Приєднайтеся зараз, і ви з'явитеся тут, щойно скористаєтеся агентом."
+
+msgid "No cloud environment opens {repository}."
+msgstr "Жодне хмарне середовище не відкриває {repository}."
 
 msgid "No cloud workspaces"
 msgstr "Немає хмарних робочих просторів"
@@ -15028,6 +15049,9 @@ msgstr "Виберіть робочий простір"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Виберіть робочий простір, агент якого чекає на ваше введення, завершив роботу після вашого останнього перегляду або ще працює"
+
+msgid "Pick an environment"
+msgstr "Виберіть середовище"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Виберіть значок і колір або завантажте власне зображення. За замовчуванням використовується аватар пов'язаного власника GitHub."
@@ -19887,8 +19911,14 @@ msgstr "Цей обліковий запис більше не підключе�
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити. Його запустили, але так і не надіслали промпт."
 
+msgid "that computer"
+msgstr "цьому комп'ютері"
+
 msgid "That computer can't be reached"
 msgstr "Цей комп’ютер недоступний"
+
+msgid "That computer is offline"
+msgstr "Той комп’ютер не в мережі"
 
 msgid "That endpoint could not be resolved."
 msgstr "Не вдалося знайти адресу цього ендпоінта."
@@ -20183,8 +20213,14 @@ msgstr "Час очікування переміщення минув."
 msgid "The move was cancelled."
 msgstr "Перенесення скасовано."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Переміщений робочий простір з'явиться на головній, коли буде готовий."
+
 msgid "The name of your organization or team"
 msgstr "Назва вашої організації чи команди"
+
+msgid "The name shows in the sidebar."
+msgstr "Ця назва показується на бічній панелі."
 
 msgid "The network connection changed"
 msgstr "Мережеве з'єднання змінилося"
@@ -20501,6 +20537,9 @@ msgstr "цей комп’ютер"
 
 msgid "This computer"
 msgstr "Цей комп’ютер"
+
+msgid "This computer is offline"
+msgstr "Цей комп’ютер не в мережі"
 
 msgid "This computer's host is not running"
 msgstr "Хост цього комп'ютера не запущено"
@@ -20868,6 +20907,9 @@ msgstr "Хост цього робочого простору офлайн"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "На хості цього робочого простору працює старіша служба хоста, ніж підтримує цей застосунок. Оновіть її, щоб під'єднатися знову; робочий простір і його файли не змінено."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Проєкт цього робочого простору не на GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Ретельні міркування"
@@ -21616,6 +21658,9 @@ msgstr "Оновити інструкції з іменування"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Оновити інструкції з іменування для {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Оновіть Paradev на {sourceName}, щоб переміщувати його робочі простори з цього телефона."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Оновіть Paradev на тому пристрої. Оновлення із застосунку потребують підтримуваної окремої інсталяції та випущеної версії застосунку."

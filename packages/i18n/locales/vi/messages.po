@@ -855,8 +855,8 @@ msgstr "{completed} trong {0} check đã xong"
 msgid "{completed} of {total} completed"
 msgstr "Đã hoàn thành {completed}/{total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (ngoại tuyến)"
+msgid "{computerName} is offline"
+msgstr "{computerName} đang ngoại tuyến"
 
 msgid "{configTitle} font size"
 msgstr "Cỡ chữ {configTitle}"
@@ -5207,6 +5207,9 @@ msgstr "Cấu hình lệnh chạy của workspace"
 msgid "Configured for {agent}"
 msgstr "Đã cấu hình cho {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Xác nhận trước khi chuyển không gian làm việc"
+
 msgid "Confirm before quitting"
 msgstr "Xác nhận trước khi thoát"
 
@@ -8252,6 +8255,9 @@ msgstr "Giải thích repository này hoạt động thế nào…"
 msgid "Explain to me how this repository works"
 msgstr "Giải thích cho tôi repository này hoạt động thế nào"
 
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Giải thích việc chuyển sẽ làm gì trước khi chuyển không gian làm việc sang máy tính khác"
+
 msgid "Explore"
 msgstr "Khám phá"
 
@@ -10779,8 +10785,14 @@ msgstr "Plugin của nó sẽ hiện khi đồng bộ xong."
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên {computerName} bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính bạn chọn bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính này bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại. Dùng menu khay Paradev > Host Service > Restart."
@@ -12260,17 +12272,20 @@ msgstr "Chuyển công việc trên cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Di chuyển tiêu điểm giữa các tab chính và thanh bên phải, và mở thanh bên nếu đang đóng"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Chuyển không gian làm việc này sang {computerName}?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Chuyển không gian làm việc này sang một máy tính?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Chuyển không gian làm việc này lên cloud?"
 
-msgid "Move to a computer"
-msgstr "Chuyển sang một máy tính"
+msgid "Move this workspace to this computer?"
+msgstr "Chuyển không gian làm việc này sang máy tính này?"
 
-msgid "Move to another computer"
-msgstr "Chuyển sang máy tính khác"
+msgid "Move to"
+msgstr "Chuyển sang"
 
 msgid "Move to background"
 msgstr "Chuyển sang chạy nền"
@@ -12486,6 +12501,9 @@ msgstr "Cuộc trò chuyện mới"
 
 msgid "New Chat"
 msgstr "Chat mới"
+
+msgid "New cloud workspace"
+msgstr "Workspace cloud mới"
 
 msgid "New environment"
 msgstr "Environment mới"
@@ -12774,6 +12792,9 @@ msgstr "Không tìm thấy Chrome, Brave, Arc hay trình duyệt Chromium nào k
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Chưa tìm thấy mức sử dụng Claude hay Codex nào trên máy này. Hãy tham gia ngay và bạn sẽ xuất hiện khi đã dùng một agent."
+
+msgid "No cloud environment opens {repository}."
+msgstr "Không có môi trường đám mây nào mở {repository}."
 
 msgid "No cloud workspaces"
 msgstr "Không có workspace đám mây"
@@ -15034,6 +15055,9 @@ msgstr "Chọn một workspace"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Chọn workspace có agent đang chờ bạn nhập, đã hoàn tất kể từ lần cuối bạn xem, hoặc vẫn đang chạy"
+
+msgid "Pick an environment"
+msgstr "Chọn một môi trường"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Chọn biểu tượng và màu, hoặc tải ảnh riêng lên. Mặc định dùng ảnh đại diện của chủ sở hữu GitHub đã liên kết."
@@ -19893,8 +19917,14 @@ msgstr "Tài khoản đó không còn được kết nối — hãy chọn tài 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở. Nó đã khởi động nhưng chưa từng nhận yêu cầu."
 
+msgid "that computer"
+msgstr "máy tính đó"
+
 msgid "That computer can't be reached"
 msgstr "Không thể kết nối tới máy tính đó"
+
+msgid "That computer is offline"
+msgstr "Máy tính đó đang ngoại tuyến"
 
 msgid "That endpoint could not be resolved."
 msgstr "Không thể phân giải endpoint đó."
@@ -20189,8 +20219,14 @@ msgstr "Việc chuyển đã hết thời gian chờ."
 msgid "The move was cancelled."
 msgstr "Đã hủy việc chuyển."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Không gian làm việc đã chuyển sẽ hiện ở Trang chủ khi sẵn sàng."
+
 msgid "The name of your organization or team"
 msgstr "Tên tổ chức hoặc nhóm của bạn"
+
+msgid "The name shows in the sidebar."
+msgstr "Tên này hiển thị trên thanh bên."
 
 msgid "The network connection changed"
 msgstr "Kết nối mạng đã thay đổi"
@@ -20507,6 +20543,9 @@ msgstr "máy tính này"
 
 msgid "This computer"
 msgstr "Máy tính này"
+
+msgid "This computer is offline"
+msgstr "Máy tính này đang ngoại tuyến"
 
 msgid "This computer's host is not running"
 msgstr "Máy chủ của máy tính này không chạy"
@@ -20874,6 +20913,9 @@ msgstr "Host của workspace này đang ngoại tuyến"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Máy chủ của workspace này chạy dịch vụ máy chủ cũ hơn mức ứng dụng hỗ trợ. Hãy cập nhật để kết nối lại; workspace và các tệp không bị ảnh hưởng."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Dự án của không gian làm việc này không có trên GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Mức suy luận kỹ lưỡng"
@@ -21622,6 +21664,9 @@ msgstr "Cập nhật quy tắc đặt tên"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Cập nhật quy tắc đặt tên cho {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Cập nhật Paradev trên {sourceName} để chuyển các không gian làm việc của nó từ điện thoại này."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Cập nhật Paradev trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."

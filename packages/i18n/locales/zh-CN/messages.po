@@ -855,8 +855,8 @@ msgstr "{0}项检查中已完成{completed}项"
 msgid "{completed} of {total} completed"
 msgstr "已完成 {completed}/{total} 项"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName}（离线）"
+msgid "{computerName} is offline"
+msgstr "{computerName} 已离线"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle}字号"
@@ -5207,6 +5207,9 @@ msgstr "配置工作区运行命令"
 msgid "Configured for {agent}"
 msgstr "已为 {agent} 配置"
 
+msgid "Confirm before moving a workspace"
+msgstr "移动工作区前确认"
+
 msgid "Confirm before quitting"
 msgstr "退出前确认"
 
@@ -8252,6 +8255,9 @@ msgstr "讲讲这个仓库是怎么运作的…"
 msgid "Explain to me how this repository works"
 msgstr "讲讲这个仓库是怎么运作的"
 
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "在将工作区移至另一台电脑前，说明移动会带来什么影响"
+
 msgid "Explore"
 msgstr "探索"
 
@@ -10779,8 +10785,14 @@ msgstr "同步完成后，其插件会显示出来。"
 msgid "Its replies go with it."
 msgstr "其回复也会一并删除。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的更改）会推送到一个新分支。{computerName} 上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "它的工作（包括未提交的更改）会推送到一个新分支。所选电脑上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的更改）会推送到一个新分支。这台电脑上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重启之前，其工作区和终端都不可用，请使用Paradev托盘菜单 > 主机服务 > 重启。"
@@ -12260,17 +12272,20 @@ msgstr "迁移云端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关闭则将其打开"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "将此工作区移至 {computerName}？"
+
 msgid "Move this workspace to a computer?"
 msgstr "将此工作区移至一台电脑？"
 
 msgid "Move this workspace to the cloud?"
 msgstr "将此工作区移至云端？"
 
-msgid "Move to a computer"
-msgstr "移至一台电脑"
+msgid "Move this workspace to this computer?"
+msgstr "将此工作区移至这台电脑？"
 
-msgid "Move to another computer"
-msgstr "移至另一台电脑"
+msgid "Move to"
+msgstr "移至"
 
 msgid "Move to background"
 msgstr "移到后台"
@@ -12486,6 +12501,9 @@ msgstr "新聊天"
 
 msgid "New Chat"
 msgstr "新建聊天"
+
+msgid "New cloud workspace"
+msgstr "新建云端工作区"
 
 msgid "New environment"
 msgstr "新建环境"
@@ -12774,6 +12792,9 @@ msgstr "未找到Chrome、Brave、Arc或其他Chromium浏览器。"
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "这台机器上还没有发现Claude或Codex的用量。现在加入，用过智能体后你就会出现在榜单上。"
+
+msgid "No cloud environment opens {repository}."
+msgstr "没有云环境打开 {repository}。"
 
 msgid "No cloud workspaces"
 msgstr "没有云工作区"
@@ -15034,6 +15055,9 @@ msgstr "选择一个工作区"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "选择一个工作区：其智能体正在等待你的输入、自你上次查看后已完成，或仍在运行"
+
+msgid "Pick an environment"
+msgstr "选择环境"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "选择图标和颜色，或上传自定义图片。默认使用关联的GitHub所有者头像。"
@@ -19893,8 +19917,14 @@ msgstr "该账号已断开连接，请选择其他账号。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "该智能体会话还没有可打开的对话。它已启动但从未收到指令。"
 
+msgid "that computer"
+msgstr "那台电脑"
+
 msgid "That computer can't be reached"
 msgstr "无法连接到那台电脑"
+
+msgid "That computer is offline"
+msgstr "那台电脑已离线"
 
 msgid "That endpoint could not be resolved."
 msgstr "无法解析该端点。"
@@ -20189,8 +20219,14 @@ msgstr "移动超时。"
 msgid "The move was cancelled."
 msgstr "移动已取消。"
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "移动后的工作区准备好后会显示在主页上。"
+
 msgid "The name of your organization or team"
 msgstr "你的组织或团队的名称"
+
+msgid "The name shows in the sidebar."
+msgstr "此名称显示在侧边栏中。"
 
 msgid "The network connection changed"
 msgstr "网络连接已变更"
@@ -20507,6 +20543,9 @@ msgstr "此电脑"
 
 msgid "This computer"
 msgstr "此电脑"
+
+msgid "This computer is offline"
+msgstr "这台电脑已离线"
 
 msgid "This computer's host is not running"
 msgstr "此电脑的主机服务未运行"
@@ -20874,6 +20913,9 @@ msgstr "此工作区的主机已离线"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "此工作区的主机运行的主机服务版本低于此应用支持的版本。更新后即可重新连接；工作区及其文件不受影响。"
+
+msgid "This workspace's project is not on GitHub."
+msgstr "此工作区的项目不在 GitHub 上。"
 
 msgid "Thorough reasoning effort"
 msgstr "深入的推理投入"
@@ -21622,6 +21664,9 @@ msgstr "更新命名规则"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名规则"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "请在 {sourceName} 上更新 Paradev，才能从这部手机移动它的工作区。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "请在该设备上更新 Paradev。应用内更新需要受支持的独立安装和已发布的应用版本。"

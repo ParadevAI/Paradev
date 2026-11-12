@@ -4,15 +4,23 @@ import { promisify } from "node:util";
 import { sessionSelections } from "@superset/chat/core";
 import type { DurableEvent } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { getHostId } from "@superset/shared/host-info";
 import { TRPCError } from "@trpc/server";
+import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { projects, workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
 import {
 	downloadBundle,
 	uploadBundle,
 	withStage,
 } from "../../../teleport/bundle";
+import {
+	beginWorkspaceMove,
+	createRelayHostClient,
+} from "../../../teleport/moveWorkspace";
 import {
 	type BundleManifest,
 	teleportProviderFor,
@@ -26,7 +34,12 @@ import {
 	harnessPlaceSessionTask,
 	harnessSessionFileTask,
 } from "../../../workers/tasks/harness";
-import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
+import {
+	createCallerFactory,
+	machineOnlyProcedure,
+	protectedProcedure,
+	router,
+} from "../../index";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { requireChatRuntime } from "../sessions/session-service";
@@ -35,6 +48,7 @@ import {
 	requireLocalProject,
 	requireProjectRepoPath,
 } from "../workspace-creation/shared/local-project";
+import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
 
 const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
@@ -90,6 +104,30 @@ function busyError() {
 		code: "PRECONDITION_FAILED",
 		message: "Wait for the agent to finish, or stop it, before moving",
 	});
+}
+
+/** The remote a workspace's work is pushed to when it moves, and its GitHub repository. */
+async function resolveSnapshotTarget(
+	ctx: Parameters<typeof resolveWorktreePath>[0],
+	workspaceId: string,
+) {
+	const worktreePath = resolveWorktreePath(ctx, workspaceId);
+	const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+	const target = await getHostWorkerPool()
+		.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
+		.catch((error: unknown) => {
+			rethrowEnvironmentalGitError(error);
+			throw error;
+		});
+	const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
+	const repository = repositories[0];
+	if (!target || !repository || repositories.some((repo) => !repo)) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: "Moving a workspace needs a GitHub repository",
+		});
+	}
+	return { worktreePath, gitEnv, target, repository };
 }
 
 /** The bundle's manifest with the chat's mode and model, which its history does not carry. */
@@ -195,24 +233,10 @@ export const teleportRouter = router({
 				);
 			if (busy().length > 0 && !input.stopIfBusy) throw busyError();
 
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const env = resolveDefaultAccountTerminalEnv(ctx.db);
 			const pool = getHostWorkerPool();
-			const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
-			const target = await pool
-				.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
-				.catch((error: unknown) => {
-					rethrowEnvironmentalGitError(error);
-					throw error;
-				});
-			const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
-			const repository = repositories[0];
-			if (!target || !repository || repositories.some((repo) => !repo)) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Moving a workspace needs a GitHub repository",
-				});
-			}
+			const { worktreePath, gitEnv, target, repository } =
+				await resolveSnapshotTarget(ctx, input.workspaceId);
 
 			for (const { sessionId } of busy()) {
 				await stopRunningTurn(chat, sessionId);
@@ -317,6 +341,115 @@ export const teleportRouter = router({
 			};
 		}),
 
+	/**
+	 * Moves a workspace on this computer to the cloud or to another of the
+	 * person's computers, and carries the move out here, so the client that
+	 * asked (a phone, say) need not stay open. Answers once the move is
+	 * recorded; `workspaceMove.latest` follows it from there.
+	 */
+	moveWorkspace: machineOnlyProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				/** What the destination workspace is called; defaults to this one's name. */
+				name: z.string().min(1).max(200).optional(),
+				destination: z.discriminatedUnion("kind", [
+					z.object({
+						kind: z.literal("cloud"),
+						environmentId: z.string().uuid(),
+						machineSize: z.enum(MACHINE_SIZES).optional(),
+					}),
+					z.object({
+						kind: z.literal("computer"),
+						hostId: z.string().min(1).max(200),
+					}),
+				]),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			const fromHostId = getHostId();
+			const { destination } = input;
+			if (
+				destination.kind === "computer" &&
+				destination.hostId === fromHostId
+			) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "The workspace is already on this computer",
+				});
+			}
+			const auth = ctx.apiAuth;
+			if (destination.kind === "computer" && !auth) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "This computer cannot reach your other computers",
+				});
+			}
+			if (movesInFlight.has(input.workspaceId)) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "This workspace is already moving",
+				});
+			}
+			movesInFlight.add(input.workspaceId);
+			const teleport = createTeleportCaller(ctx);
+			try {
+				const { workspaceMoveId, done } = await beginWorkspaceMove(
+					{
+						api: ctx.api,
+						organizationId: ctx.organizationId,
+						fromHostId,
+						repositoryOf: async (workspaceId) => {
+							const { repository } = await resolveSnapshotTarget(
+								ctx,
+								workspaceId,
+							);
+							return `${repository.owner}/${repository.name}`;
+						},
+						prepare: (workspaceId) =>
+							teleport.prepareWorkspace({ workspaceId, stopIfBusy: true }),
+						releaseChats: async (chatSessionIds) => {
+							if (chatSessionIds.length === 0) return;
+							await teleport.releaseChats({ chatSessionIds });
+						},
+						destinationHost: async (hostId) => {
+							const endpoint = await ctx.api.host.relayEndpoint.query();
+							if (!endpoint?.url || !auth) {
+								throw new Error("This computer cannot reach the relay");
+							}
+							return createRelayHostClient({
+								relayUrl: endpoint.url,
+								organizationId: ctx.organizationId,
+								hostId,
+								auth,
+							});
+						},
+					},
+					{
+						workspaceId: input.workspaceId,
+						name: input.name ?? (workspace.name || workspace.branch),
+						destination,
+					},
+				);
+				void done
+					.catch(() => {})
+					.finally(() => movesInFlight.delete(input.workspaceId));
+				return { workspaceMoveId };
+			} catch (error) {
+				movesInFlight.delete(input.workspaceId);
+				throw error;
+			}
+		}),
+
 	/** The move of these chats failed or was abandoned: they stay here and stop being pushed for it. */
 	releaseChats: protectedProcedure
 		.input(
@@ -359,6 +492,25 @@ export const teleportRouter = router({
 				},
 			});
 			return { ok: true };
+		}),
+
+	/** The project here whose live GitHub remote is `repositoryFullName`, for a workspace moving in. */
+	findProject: machineOnlyProcedure
+		.input(z.object({ repositoryFullName: z.string().min(3).max(300) }))
+		.query(async ({ ctx, input }) => {
+			const wanted = input.repositoryFullName.toLowerCase();
+			const rows = ctx.db
+				.select({ id: projects.id })
+				.from(projects)
+				.where(isNull(projects.deletedAt))
+				.all();
+			for (const { id } of rows) {
+				const repo = await resolveGithubRepo(ctx, id).catch(() => null);
+				if (repo && `${repo.owner}/${repo.name}`.toLowerCase() === wanted) {
+					return { projectId: id };
+				}
+			}
+			return { projectId: null };
 		}),
 
 	/** Makes a branch another host pushed available to create a worktree from. */
@@ -505,3 +657,9 @@ export const teleportRouter = router({
 			};
 		}),
 });
+
+/** Workspaces whose move this host is carrying out. */
+const movesInFlight = new Set<string>();
+
+// Declared after the router; the procedures dereference it only at request time.
+const createTeleportCaller = createCallerFactory(teleportRouter);

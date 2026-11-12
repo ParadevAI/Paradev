@@ -1,4 +1,4 @@
-import { MOVE_STOPPED_ANSWERING } from "@superset/shared/move-book";
+import { MOVE_STOPPED_ANSWERING } from "../protocol";
 
 export const MOVE_HEARTBEAT_MS = 60_000;
 

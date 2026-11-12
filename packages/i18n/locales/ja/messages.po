@@ -855,8 +855,8 @@ msgstr "{0}件中{completed}件のチェックが完了"
 msgid "{completed} of {total} completed"
 msgstr "{total} 件中 {completed} 件完了"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName}（オフライン）"
+msgid "{computerName} is offline"
+msgstr "{computerName} はオフラインです"
 
 msgid "{configTitle} font size"
 msgstr "{configTitle}のフォントサイズ"
@@ -5207,6 +5207,9 @@ msgstr "ワークスペースの実行コマンドを設定"
 msgid "Configured for {agent}"
 msgstr "{agent} 用に設定済み"
 
+msgid "Confirm before moving a workspace"
+msgstr "ワークスペースを移動する前に確認"
+
 msgid "Confirm before quitting"
 msgstr "終了前に確認"
 
@@ -8252,6 +8255,9 @@ msgstr "このリポジトリの仕組みを説明…"
 msgid "Explain to me how this repository works"
 msgstr "このリポジトリの仕組みを教えて"
 
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "ワークスペースを別のコンピューターに移動する前に、移動による影響を説明します"
+
 msgid "Explore"
 msgstr "探す"
 
@@ -10779,8 +10785,14 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。{computerName} 上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。選んだコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。このコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません。Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
@@ -12260,17 +12272,20 @@ msgstr "クラウドの作業を移行"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "このワークスペースを {computerName} に移動しますか？"
+
 msgid "Move this workspace to a computer?"
 msgstr "このワークスペースをコンピューターに移動しますか？"
 
 msgid "Move this workspace to the cloud?"
 msgstr "このワークスペースをクラウドに移動しますか？"
 
-msgid "Move to a computer"
-msgstr "コンピューターに移動"
+msgid "Move this workspace to this computer?"
+msgstr "このワークスペースをこのコンピューターに移動しますか？"
 
-msgid "Move to another computer"
-msgstr "別のコンピューターに移動"
+msgid "Move to"
+msgstr "移動先"
 
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
@@ -12486,6 +12501,9 @@ msgstr "新しいチャット"
 
 msgid "New Chat"
 msgstr "新規チャット"
+
+msgid "New cloud workspace"
+msgstr "新しいクラウドワークスペース"
 
 msgid "New environment"
 msgstr "新しい環境"
@@ -12774,6 +12792,9 @@ msgstr "Chrome、Brave、ArcなどのChromiumブラウザが見つかりませ�
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "このマシンでClaudeやCodexの使用がまだ見つかりません。今参加すれば、エージェントを使い始めた時点で表示されます。"
+
+msgid "No cloud environment opens {repository}."
+msgstr "{repository} を開くクラウド環境がありません。"
 
 msgid "No cloud workspaces"
 msgstr "クラウドワークスペースはありません"
@@ -15034,6 +15055,9 @@ msgstr "ワークスペースを選択"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "エージェントがあなたの入力を待っている、前回確認してから完了した、またはまだ実行中のワークスペースを選択します"
+
+msgid "Pick an environment"
+msgstr "環境を選択"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "アイコンと色を選ぶか、独自の画像をアップロードします。既定ではリンクされたGitHubオーナーのアバターになります。"
@@ -19893,8 +19917,14 @@ msgstr "このアカウントは接続されていません。別のアカウン
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "このエージェントセッションにはまだ開ける会話がありません。開始されましたが、一度も指示を受けていません。"
 
+msgid "that computer"
+msgstr "そのコンピューター"
+
 msgid "That computer can't be reached"
 msgstr "そのコンピューターに接続できません"
+
+msgid "That computer is offline"
+msgstr "そのコンピューターはオフラインです"
 
 msgid "That endpoint could not be resolved."
 msgstr "そのエンドポイントを解決できませんでした。"
@@ -20189,8 +20219,14 @@ msgstr "移動がタイムアウトしました。"
 msgid "The move was cancelled."
 msgstr "移動はキャンセルされました。"
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "移動したワークスペースは、準備ができるとホームに表示されます。"
+
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
+
+msgid "The name shows in the sidebar."
+msgstr "この名前はサイドバーに表示されます。"
 
 msgid "The network connection changed"
 msgstr "ネットワーク接続が変更されました"
@@ -20507,6 +20543,9 @@ msgstr "このコンピューター"
 
 msgid "This computer"
 msgstr "このコンピューター"
+
+msgid "This computer is offline"
+msgstr "このコンピューターはオフラインです"
 
 msgid "This computer's host is not running"
 msgstr "このコンピューターのホストが実行されていません"
@@ -20874,6 +20913,9 @@ msgstr "このワークスペースのホストはオフラインです"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "このワークスペースのホストは、このアプリが対応するより古いホストサービスを実行しています。更新して再接続してください。ワークスペースとファイルはそのまま残ります。"
+
+msgid "This workspace's project is not on GitHub."
+msgstr "このワークスペースのプロジェクトは GitHub にありません。"
 
 msgid "Thorough reasoning effort"
 msgstr "徹底的な推論"
@@ -21622,6 +21664,9 @@ msgstr "命名指示を更新"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "{0}の命名指示を更新"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "このスマートフォンからワークスペースを移動するには、{sourceName} の Paradev を更新してください。"
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "そのデバイスで Paradev を更新してください。アプリ内からの更新には、対応するスタンドアロンインストールとリリース済みのアプリバージョンが必要です。"

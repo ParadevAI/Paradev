@@ -27,6 +27,7 @@ import type {
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import { WorkspaceRowMenu } from "./components/WorkspaceRowMenu";
+import { useWorkspaceMove } from "./hooks/useWorkspaceMove";
 import { useWorkspaceRowActions } from "./hooks/useWorkspaceRowActions";
 
 // PR state replaces the host icon in the icon slot — same treatment as
@@ -71,6 +72,7 @@ export function WorkspaceRow({
 		isUnread,
 		toggleUnread,
 	} = useWorkspaceRowActions(workspace, cache, sessions, cloudStatus, onCopied);
+	const move = useWorkspaceMove(workspace, cache, cloudStatus !== undefined);
 	// A manual mark reads as `review` — desktop's rollup ranks it lowest, so
 	// any live status the sessions are reporting keeps the slot.
 	const rowAttention = attention ?? (isUnread ? "review" : null);
@@ -96,6 +98,7 @@ export function WorkspaceRow({
 			onDelete={deleteWorkspace}
 			onCopyId={copyId}
 			onShare={shareWorkspace}
+			move={move}
 		>
 			{/* Default press behavior on purpose: the system context-menu lift
 			    owns the hold animation, and custom press feedback fights it. */}

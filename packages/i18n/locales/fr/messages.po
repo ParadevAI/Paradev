@@ -855,8 +855,8 @@ msgstr "{completed} vérifications sur {0} terminées"
 msgid "{completed} of {total} completed"
 msgstr "{completed} sur {total} terminés"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (hors ligne)"
+msgid "{computerName} is offline"
+msgstr "{computerName} est hors ligne"
 
 msgid "{configTitle} font size"
 msgstr "Taille de police de {configTitle}"
@@ -5207,6 +5207,9 @@ msgstr "Configurer la commande d'exécution de l'espace de travail"
 msgid "Configured for {agent}"
 msgstr "Configuré pour {agent}"
 
+msgid "Confirm before moving a workspace"
+msgstr "Confirmer avant de déplacer un espace de travail"
+
 msgid "Confirm before quitting"
 msgstr "Confirmer avant de quitter"
 
@@ -8252,6 +8255,9 @@ msgstr "Explique le fonctionnement de ce dépôt…"
 msgid "Explain to me how this repository works"
 msgstr "M'expliquer le fonctionnement de ce dépôt"
 
+msgid "Explain what a move does before a workspace moves to another computer"
+msgstr "Expliquer l'effet du déplacement avant de déplacer un espace de travail vers un autre ordinateur"
+
 msgid "Explore"
 msgstr "Explorer"
 
@@ -10779,8 +10785,14 @@ msgstr "Ses plugins apparaissent à la fin de la synchronisation."
 msgid "Its replies go with it."
 msgstr "Ses réponses seront aussi supprimées."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur {computerName} démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur l’ordinateur choisi démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on this computer starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur cet ordinateur démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Ses espaces de travail et terminaux sont indisponibles jusqu'à son redémarrage. Utilisez le menu de la barre d'état Paradev > Service hôte > Redémarrer."
@@ -12260,17 +12272,20 @@ msgstr "Transférer le travail cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Déplacer le focus entre les onglets principaux et la barre latérale droite, et ouvrir la barre latérale si elle est fermée"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Déplacer cet espace de travail vers {computerName} ?"
+
 msgid "Move this workspace to a computer?"
 msgstr "Déplacer cet espace de travail vers un ordinateur ?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Déplacer cet espace de travail vers le cloud ?"
 
-msgid "Move to a computer"
-msgstr "Déplacer vers un ordinateur"
+msgid "Move this workspace to this computer?"
+msgstr "Déplacer cet espace de travail vers cet ordinateur ?"
 
-msgid "Move to another computer"
-msgstr "Déplacer vers un autre ordinateur"
+msgid "Move to"
+msgstr "Déplacer vers"
 
 msgid "Move to background"
 msgstr "Passer en arrière-plan"
@@ -12486,6 +12501,9 @@ msgstr "Nouvelle discussion"
 
 msgid "New Chat"
 msgstr "Nouveau chat"
+
+msgid "New cloud workspace"
+msgstr "Nouvel espace de travail cloud"
 
 msgid "New environment"
 msgstr "Nouvel environnement"
@@ -12774,6 +12792,9 @@ msgstr "Aucun navigateur Chrome, Brave, Arc ou autre navigateur Chromium n'a ét
 
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Aucune utilisation de Claude ou Codex trouvée sur cette machine pour l'instant. Rejoignez maintenant et vous apparaîtrez dès que vous aurez utilisé un agent."
+
+msgid "No cloud environment opens {repository}."
+msgstr "Aucun environnement cloud n'ouvre {repository}."
 
 msgid "No cloud workspaces"
 msgstr "Aucun espace de travail cloud"
@@ -15034,6 +15055,9 @@ msgstr "Choisissez un espace de travail"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Choisissez un espace de travail dont l'agent attend votre saisie, a terminé depuis votre dernier passage ou est toujours en cours"
+
+msgid "Pick an environment"
+msgstr "Choisir un environnement"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Choisissez une icône et une couleur, ou envoyez une image personnalisée. Par défaut, l'avatar du propriétaire GitHub lié."
@@ -19893,8 +19917,14 @@ msgstr "Ce compte n'est plus connecté — choisissez-en un autre."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Cette session d'agent n'a pas encore de conversation à ouvrir : elle a démarré mais n'a jamais reçu de requête."
 
+msgid "that computer"
+msgstr "cet ordinateur"
+
 msgid "That computer can't be reached"
 msgstr "Cet ordinateur est injoignable"
+
+msgid "That computer is offline"
+msgstr "Cet ordinateur est hors ligne"
 
 msgid "That endpoint could not be resolved."
 msgstr "Ce point de terminaison n'a pas pu être résolu."
@@ -20189,8 +20219,14 @@ msgstr "Le déplacement a expiré."
 msgid "The move was cancelled."
 msgstr "Le déplacement a été annulé."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "L'espace de travail déplacé apparaîtra dans Accueil dès qu'il sera prêt."
+
 msgid "The name of your organization or team"
 msgstr "Le nom de votre organisation ou équipe"
+
+msgid "The name shows in the sidebar."
+msgstr "Le nom s’affiche dans la barre latérale."
 
 msgid "The network connection changed"
 msgstr "La connexion réseau a changé"
@@ -20507,6 +20543,9 @@ msgstr "cet ordinateur"
 
 msgid "This computer"
 msgstr "Cet ordinateur"
+
+msgid "This computer is offline"
+msgstr "Cet ordinateur est hors ligne"
 
 msgid "This computer's host is not running"
 msgstr "L'hôte de cet ordinateur ne fonctionne pas"
@@ -20874,6 +20913,9 @@ msgstr "L'hôte de cet espace de travail est hors ligne"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "L'hôte de cet espace de travail exécute un service d'hôte plus ancien que ce que cette application prend en charge. Mettez-le à jour pour vous reconnecter ; l'espace de travail et ses fichiers sont intacts."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Le projet de cet espace de travail n'est pas sur GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Effort de raisonnement approfondi"
@@ -21622,6 +21664,9 @@ msgstr "Mettre à jour les instructions de nommage"
 #. placeholder {0}: selectedProject.name
 msgid "Update naming instructions for {0}"
 msgstr "Mettre à jour les instructions de nommage pour {0}"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Mettez à jour Paradev sur {sourceName} pour déplacer ses espaces de travail depuis ce téléphone."
 
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Mettez à jour Paradev sur cet appareil. Les mises à jour depuis l’application nécessitent une installation autonome compatible et une version publiée de l’application."
