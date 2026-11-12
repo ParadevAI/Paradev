@@ -2,6 +2,7 @@ import { db } from "@superset/db/client";
 import {
 	cloudWorkspaceShares,
 	cloudWorkspaces,
+	invitations,
 	pageShares,
 	pages,
 } from "@superset/db/schema";
@@ -27,6 +28,16 @@ export async function convertPendingShares({
 	userId: string;
 	email: string;
 }) {
+	const converted = await db
+		.selectDistinct({ pageId: pageShares.pageId })
+		.from(pageShares)
+		.innerJoin(invitations, eq(invitations.id, pageShares.invitationId))
+		.where(
+			and(
+				eq(invitations.organizationId, organizationId),
+				sql`lower(${invitations.email}) = lower(${email})`,
+			),
+		);
 	for (const { table, resource } of SHARE_TABLES) {
 		const shares = sql.identifier(table);
 		const resourceColumn = sql.identifier(resource);
@@ -52,6 +63,7 @@ export async function convertPendingShares({
 			where id in (select id from pending where not redundant)
 		`);
 	}
+	return converted.map((row) => row.pageId);
 }
 
 /** Without this, a member who rejoins would quietly get their old shares back. */
@@ -76,7 +88,7 @@ export async function removeMemberShares({
 				),
 			),
 		);
-	await db
+	const removed = await db
 		.delete(pageShares)
 		.where(
 			and(
@@ -89,7 +101,9 @@ export async function removeMemberShares({
 						.where(eq(pages.organizationId, organizationId)),
 				),
 			),
-		);
+		)
+		.returning({ pageId: pageShares.pageId });
+	return [...new Set(removed.map((row) => row.pageId))];
 }
 
 /** A cancelled or declined invitation leaves nothing to convert; its shares go with it. */

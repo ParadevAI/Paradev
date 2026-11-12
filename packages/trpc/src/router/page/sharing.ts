@@ -1,11 +1,12 @@
 import { db } from "@superset/db/client";
-import { pages, users } from "@superset/db/schema";
+import { pageShares, pages, users } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import {
 	addPageSharesSchema,
 	addShares,
 	listGrantees,
+	matchesGrantee,
 	removeShare,
 	removeShareSchema,
 	setPageShareRole,
@@ -97,7 +98,14 @@ export const pageSharingRouter = {
 				sharedByUserId: userId,
 				role: input.role,
 			});
-			await writePageManifest(page.id);
+			try {
+				await writePageManifest(page.id);
+			} catch (error) {
+				for (const grantee of added) {
+					await removeShare({ kind: "page", id: page.id }, grantee);
+				}
+				throw error;
+			}
 			return { added };
 		}),
 
@@ -105,11 +113,27 @@ export const pageSharingRouter = {
 		.input(removeShareSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
+			const rows = await db
+				.select()
+				.from(pageShares)
+				.where(
+					and(
+						eq(pageShares.pageId, page.id),
+						matchesGrantee(pageShares, input.grantee),
+					),
+				);
 			const removed = await removeShare(
 				{ kind: "page", id: page.id },
 				input.grantee,
 			);
-			await writePageManifest(page.id);
+			try {
+				await writePageManifest(page.id);
+			} catch (error) {
+				if (rows.length > 0) {
+					await db.insert(pageShares).values(rows).onConflictDoNothing();
+				}
+				throw error;
+			}
 			return { removed };
 		}),
 

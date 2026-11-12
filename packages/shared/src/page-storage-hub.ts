@@ -35,3 +35,9 @@ export function pageStorageTicketPath(pageId: string): string {
 export function pageStorageSocketPath(pageId: string): string {
 	return `/v2/page/${encodeURIComponent(pageId)}/storage/socket`;
 }
+
+export const PAGE_MANIFESTS_JOB_PATH = "/api/pages/jobs/manifests";
+
+export interface PageManifestsJob {
+	pageIds: string[];
+}

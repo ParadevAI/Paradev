@@ -1,8 +1,10 @@
 import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
 
 const objectStore = new Map<string, string>();
+let failPuts = false;
 mock.module("../../lib/r2", () => ({
 	putObject: async ({ key, body }: { key: string; body: string }) => {
+		if (failPuts) throw new Error("r2 down");
 		objectStore.set(key, body);
 	},
 	deleteObjects: async (keys: string[]) => {
@@ -21,13 +23,14 @@ mock.module("../../lib/r2", () => ({
 }));
 
 const { db, dbWs } = await import("@superset/db/client");
-const { members, organizations, pages, teamMembers, teams, users } =
+const { members, organizations, pageShares, pages, teamMembers, teams, users } =
 	await import("@superset/db/schema");
 const { parsePageManifest, pageManifestKey } = await import(
 	"@superset/shared/usercontent"
 );
 const { eq, inArray } = await import("drizzle-orm");
 const { pageRouter } = await import("./page");
+const { rewritePageManifests } = await import("./manifests-job");
 const { createCallerFactory, createTRPCContext, createTRPCRouter } =
 	await import("../../trpc");
 
@@ -121,5 +124,58 @@ describe("page.sharing and the manifest the realtime hub reads", () => {
 		});
 		expect(manifest()?.sharedUserIds).toEqual([]);
 		expect(manifest()?.sharedTeamIds).toEqual([TEAM]);
+	});
+});
+
+describe("when the manifest cannot be written", () => {
+	test("a removed share is put back, so the database never says less than the hub enforces", async () => {
+		failPuts = true;
+		try {
+			await expect(
+				owner.page.sharing.remove({
+					id: PAGE,
+					grantee: { kind: "team", teamId: TEAM },
+				}),
+			).rejects.toThrow("r2 down");
+		} finally {
+			failPuts = false;
+		}
+		const rows = await db
+			.select({ teamId: pageShares.teamId })
+			.from(pageShares)
+			.where(eq(pageShares.pageId, PAGE));
+		expect(rows.map((row) => row.teamId)).toEqual([TEAM]);
+	});
+
+	test("an added share is taken back out", async () => {
+		failPuts = true;
+		try {
+			await expect(
+				owner.page.sharing.add({
+					id: PAGE,
+					grantees: [{ kind: "user", userId: SHAREE }],
+				}),
+			).rejects.toThrow("r2 down");
+		} finally {
+			failPuts = false;
+		}
+		const rows = await db
+			.select({ userId: pageShares.userId })
+			.from(pageShares)
+			.where(eq(pageShares.pageId, PAGE));
+		expect(rows.some((row) => row.userId === SHAREE)).toBe(false);
+	});
+});
+
+describe("the manifests job", () => {
+	test("rewrites a page whose share was deleted outside the router", async () => {
+		await db
+			.insert(pageShares)
+			.values({ pageId: PAGE, userId: SHAREE, sharedByUserId: OWNER });
+		await rewritePageManifests([PAGE]);
+		expect(manifest()?.sharedUserIds).toEqual([SHAREE]);
+		await db.delete(pageShares).where(eq(pageShares.userId, SHAREE));
+		await rewritePageManifests([PAGE]);
+		expect(manifest()?.sharedUserIds).toEqual([]);
 	});
 });
