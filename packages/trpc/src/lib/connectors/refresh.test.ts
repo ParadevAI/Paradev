@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as crypto from "../../router/plugins/crypto";
@@ -13,6 +13,8 @@ let rows: Array<Record<string, unknown>> = [];
 let stored: Record<string, unknown> | null = null;
 let reads: Array<Record<string, unknown> | null> = [];
 let updates: Array<Record<string, unknown>> = [];
+let swaps: boolean[] = [];
+let written: Array<Record<string, unknown>> = [];
 let response: { status: number; ok: boolean; body: unknown } | null = null;
 let fetchError: Error | null = null;
 let tokenRequests: URLSearchParams[] = [];
@@ -42,7 +44,11 @@ const selectChain = {
 // answers a real promise carrying that method rather than a hand-rolled
 // thenable.
 const updateResult = Object.assign(Promise.resolve(undefined), {
-	returning: () => Promise.resolve([stored]),
+	returning: () => {
+		if (swaps.shift() === false) return Promise.resolve([]);
+		written.push(updates.at(-1) ?? {});
+		return Promise.resolve([stored]);
+	},
 });
 
 const updateChain = {
@@ -122,6 +128,8 @@ afterAll(() => {
 
 beforeEach(() => {
 	updates = [];
+	swaps = [];
+	written = [];
 	limits = [];
 	rows = [];
 	reads = [];
@@ -135,7 +143,11 @@ beforeEach(() => {
 		tokenRequests.push(new URLSearchParams(String(init?.body)));
 		const current = response;
 		if (!current) throw new Error("no token-endpoint response configured");
-		return new Response(JSON.stringify(current.body), {
+		const body =
+			typeof current.body === "string"
+				? current.body
+				: JSON.stringify(current.body);
+		return new Response(body, {
 			status: current.status,
 			headers: { "content-type": "application/json" },
 		});
@@ -158,6 +170,15 @@ describe("a connection that cannot be refreshed", () => {
 
 	test("a rejected refresh token is recorded the same way", async () => {
 		response = { ok: false, status: 400, body: { error: "invalid_grant" } };
+
+		await expect(
+			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
+		).rejects.toBeInstanceOf(UnrefreshableConnectionError);
+		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
+	});
+
+	test("a provider's own dead-token code is recorded the same way", async () => {
+		response = { ok: true, status: 200, body: { error: "bad_refresh_token" } };
 
 		await expect(
 			ensureFreshConnection(connection(), { raceSettleMs: 0 }),
@@ -209,6 +230,120 @@ describe("two processes refreshing a rotating refresh token at once", () => {
 	});
 });
 
+describe("a refresh race the server let both sides win", () => {
+	let grant: { current: string; previous: string | null };
+	let issued = 0;
+
+	beforeEach(() => {
+		issued = 0;
+		globalThis.fetch = (async (_input: string | URL, init?: RequestInit) => {
+			const sent = new URLSearchParams(String(init?.body));
+			tokenRequests.push(sent);
+			const token = sent.get("refresh_token");
+			if (token !== grant.current && token !== grant.previous)
+				return Response.json({ error: "invalid_grant" }, { status: 400 });
+			issued += 1;
+			grant = { previous: token, current: `rotated-${issued}` };
+			return Response.json({
+				access_token: `access-${issued}`,
+				refresh_token: grant.current,
+				expires_in: 28800,
+			});
+		}) as typeof fetch;
+	});
+
+	const winnerRow = (refreshToken: string) =>
+		connection({
+			accessToken: "winner-access",
+			refreshToken,
+			tokenExpiresAt: new Date(Date.now() + 28_800_000),
+		});
+
+	test("keeps our tokens when the winner stored the one the server superseded", async () => {
+		grant = { previous: "refresh", current: "winner" };
+		reads = [connection(), winnerRow("winner")];
+		swaps = [false];
+
+		await ensureFreshConnection(connection());
+		expect(grant.current).toBe("rotated-1");
+		expect(written).toEqual([
+			expect.objectContaining({ refreshToken: "rotated-1" }),
+		]);
+	});
+
+	test("logs the check that finds ours live apart from a refused refresh", async () => {
+		grant = { previous: "refresh", current: "winner" };
+		reads = [connection(), winnerRow("winner")];
+		swaps = [false];
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+
+		try {
+			await ensureFreshConnection(connection());
+			expect(warn.mock.calls.map(([message]) => message)).toEqual([
+				`[connectors/${CONNECTOR}] reconcile check refused`,
+			]);
+		} finally {
+			warn.mockRestore();
+		}
+	});
+
+	test("checks again when a third process stores before our reconciliation", async () => {
+		grant = { previous: "refresh", current: "b" };
+		reads = [connection(), winnerRow("a"), winnerRow("b")];
+		swaps = [false, false];
+
+		await ensureFreshConnection(connection());
+		expect(grant.current).toBe("rotated-1");
+		expect(written).toEqual([
+			expect.objectContaining({ refreshToken: "rotated-1" }),
+		]);
+	});
+
+	test("carries a reconciliation's tokens forward when its store loses", async () => {
+		grant = { previous: "refresh", current: "rotated-0" };
+		const redeemOursFirst = globalThis.fetch;
+		let first = true;
+		globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+			const response = await redeemOursFirst(input, init);
+			if (first) {
+				first = false;
+				grant = { previous: "a", current: "d" };
+			}
+			return response;
+		}) as typeof fetch;
+		reads = [connection(), winnerRow("a"), winnerRow("d")];
+		swaps = [false, false];
+
+		await ensureFreshConnection(connection());
+		expect(grant.current).toBe("rotated-2");
+		expect(written).toEqual([
+			expect.objectContaining({ refreshToken: "rotated-2" }),
+		]);
+	});
+
+	test("rotates the winner's token when it is the live one", async () => {
+		grant = { previous: "refresh", current: "rotated-0" };
+		const redeemOursFirst = globalThis.fetch;
+		let first = true;
+		globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+			const response = await redeemOursFirst(input, init);
+			if (first) {
+				first = false;
+				grant = { previous: "refresh", current: "winner" };
+			}
+			return response;
+		}) as typeof fetch;
+		reads = [connection(), winnerRow("winner")];
+		swaps = [false];
+
+		await ensureFreshConnection(connection());
+		expect(grant.previous).toBe("winner");
+		expect(written).toEqual([
+			expect.objectContaining({ refreshToken: grant.current }),
+		]);
+	});
+});
+
 describe("a token endpoint that is merely down", () => {
 	test("does not disconnect the connection", async () => {
 		response = { ok: false, status: 503, body: {} };
@@ -217,6 +352,37 @@ describe("a token endpoint that is merely down", () => {
 			ConnectorUnavailableError,
 		);
 		// Someone else's outage must not cost the user their connection.
+		expect(updates).toHaveLength(0);
+	});
+
+	test("a rate limit keeps the connection", async () => {
+		response = {
+			ok: false,
+			status: 429,
+			body: { error: "temporarily_unavailable" },
+		};
+
+		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
+			ConnectorUnavailableError,
+		);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("a JSON body that is not an object is unavailable", async () => {
+		response = { ok: false, status: 400, body: '"Bad Request"' };
+
+		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
+			ConnectorUnavailableError,
+		);
+		expect(updates).toHaveLength(0);
+	});
+
+	test("a gateway error page is unavailable, not a parse failure", async () => {
+		response = { ok: false, status: 403, body: "<html>Forbidden</html>" };
+
+		await expect(ensureFreshConnection(connection())).rejects.toBeInstanceOf(
+			ConnectorUnavailableError,
+		);
 		expect(updates).toHaveLength(0);
 	});
 
