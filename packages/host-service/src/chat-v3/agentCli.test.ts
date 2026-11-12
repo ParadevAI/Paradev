@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { cliFloor } from "./acpCatalogue";
 import { agentCliUnsupported } from "./agentCli";
 
 describe("agentCliUnsupported", () => {
@@ -33,5 +34,13 @@ describe("agentCliUnsupported", () => {
 				found: "1.0.0",
 			}),
 		).not.toContain("Upgrade with");
+	});
+});
+
+describe("claude install hint", () => {
+	it("does not need npm", () => {
+		const { upgrade } = cliFloor("claude-acp");
+		expect(upgrade).toBeDefined();
+		expect(upgrade).not.toContain("npm");
 	});
 });

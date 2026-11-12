@@ -26,7 +26,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		minVersion: "2.1.226",
 		adapter: "@agentclientprotocol/claude-agent-acp",
 		executableEnv: "CLAUDE_CODE_EXECUTABLE",
-		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
+		upgrade: "curl -fsSL https://claude.ai/install.sh | bash",
 		fullAccessModeId: "bypassPermissions",
 		forkAtMessage: true,
 		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286.",
