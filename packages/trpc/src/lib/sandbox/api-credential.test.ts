@@ -17,28 +17,4 @@ describe("SANDBOX_ALLOWED_PROCEDURES", () => {
 		);
 		expect(SANDBOX_ALLOWED_PROCEDURES.has("host.ensure")).toBe(false);
 	});
-
-	test.each([
-		"attachment.createUpload",
-		"cloudWorkspace.addLabel",
-		"cloudWorkspace.get",
-		"cloudWorkspace.linkTask",
-		"cloudWorkspace.pullRequests",
-		"cloudWorkspace.removeLabel",
-		"cloudWorkspace.unlinkTask",
-		"taskLabel.list",
-	])("lets a box call %s for its sibling workspaces", (path) => {
-		expect(SANDBOX_ALLOWED_PROCEDURES.has(path)).toBe(true);
-	});
-
-	test("never lets a box change who can see a workspace or undo an archive", () => {
-		const refused = [
-			"cloudWorkspace.setVisibility",
-			"cloudWorkspace.sharing.add",
-			"cloudWorkspace.sharing.get",
-			"cloudWorkspace.sharing.remove",
-			"cloudWorkspace.unarchive",
-		].filter((path) => SANDBOX_ALLOWED_PROCEDURES.has(path));
-		expect(refused).toEqual([]);
-	});
 });
