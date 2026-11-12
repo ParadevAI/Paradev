@@ -16,6 +16,14 @@ import {
 	DEFAULT_BACKOFF_INITIAL_MS,
 	DEFAULT_BACKOFF_MAX_MS,
 } from "../../client";
+import { newerThan } from "../../client/chatSession/utils/newerThan";
+import {
+	cachedSnapshot,
+	cacheSnapshot,
+	forgetSnapshot,
+	primeSnapshot,
+	takePrimedSnapshot,
+} from "../../client/chatSession/utils/snapshotCache";
 import type { OutboxEntry, SessionSnapshot } from "../../core";
 import {
 	emptySnapshot,
@@ -35,15 +43,6 @@ import type {
 	UserContent,
 	UserMessage,
 } from "../../protocol/items";
-
-import { newerThan } from "./utils/newerThan";
-import {
-	cachedSnapshot,
-	cacheSnapshot,
-	forgetSnapshot,
-	primeSnapshot,
-	takePrimedSnapshot,
-} from "./utils/snapshotCache";
 
 export type FrameScheduler = (flush: () => void) => () => void;
 
