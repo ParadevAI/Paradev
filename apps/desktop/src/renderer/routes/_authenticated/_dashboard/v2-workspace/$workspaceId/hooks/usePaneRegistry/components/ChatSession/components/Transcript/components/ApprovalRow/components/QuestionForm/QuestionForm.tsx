@@ -186,7 +186,8 @@ export function QuestionForm({
 		setValues((current) => {
 			const next = { ...current, [field.id]: value };
 			if (unpick) delete next[field.id];
-			if (other) delete next[other.id];
+			if (other && (unpick || current[field.id] === undefined))
+				delete next[other.id];
 			return next;
 		});
 		if (!other && !unpick && !last) goTo(index + 1);
