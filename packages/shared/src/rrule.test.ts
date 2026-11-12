@@ -393,23 +393,19 @@ describe("recurrence timezone math", () => {
 			count: 12,
 		});
 
-		expect(
-			runs.map((run) =>
-				formatDateTimeInTimezone(run, "America/New_York", { locale: "en-US" }),
-			),
-		).toEqual([
-			"Oct 29, 2026, 8:00 PM EDT",
-			"Oct 29, 2026, 9:00 PM EDT",
-			"Oct 29, 2026, 10:00 PM EDT",
-			"Oct 29, 2026, 11:00 PM EDT",
-			"Oct 30, 2026, 12:00 AM EDT",
-			"Oct 30, 2026, 1:00 AM EDT",
-			"Oct 30, 2026, 2:00 AM EDT",
-			"Oct 30, 2026, 3:00 AM EDT",
-			"Oct 30, 2026, 4:00 AM EDT",
-			"Oct 30, 2026, 5:00 AM EDT",
-			"Oct 30, 2026, 6:00 AM EDT",
-			"Oct 30, 2026, 8:00 PM EDT",
+		expect(runs.map((run) => run.toISOString())).toEqual([
+			"2026-10-30T00:00:10.000Z",
+			"2026-10-30T01:00:10.000Z",
+			"2026-10-30T02:00:10.000Z",
+			"2026-10-30T03:00:10.000Z",
+			"2026-10-30T04:00:10.000Z",
+			"2026-10-30T05:00:10.000Z",
+			"2026-10-30T06:00:10.000Z",
+			"2026-10-30T07:00:10.000Z",
+			"2026-10-30T08:00:10.000Z",
+			"2026-10-30T09:00:10.000Z",
+			"2026-10-30T10:00:10.000Z",
+			"2026-10-31T00:00:10.000Z",
 		]);
 	});
 
