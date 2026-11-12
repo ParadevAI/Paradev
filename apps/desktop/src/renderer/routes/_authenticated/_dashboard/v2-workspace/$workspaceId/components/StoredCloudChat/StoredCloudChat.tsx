@@ -1,14 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import type { AppRouter } from "@superset/host-service/trpc";
-import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	keepPreviousData,
-	QueryClient,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { TRPCClientError } from "@trpc/client";
-import { observable } from "@trpc/server/observable";
 import { type ReactNode, useEffect } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider";
@@ -27,21 +22,6 @@ const PANE_CHROME_PX = 118;
 const PREFETCHED_CHATS = 5;
 const STALE_MS = 60_000;
 const NO_PROMPTS: never[] = [];
-
-/** Transcript rows call workspace hooks, which need a client even with no box to reach. */
-const noHostClient = workspaceTrpc.createClient({
-	links: [
-		() => () =>
-			observable((observer) =>
-				observer.error(
-					new TRPCClientError<AppRouter>("The workspace has no host yet"),
-				),
-			),
-	],
-});
-const noHostQueryClient = new QueryClient({
-	defaultOptions: { queries: { retry: false } },
-});
 
 /**
  * A cloud workspace's newest chat as the database holds it, while the
@@ -106,16 +86,11 @@ export function StoredCloudChat({
 					})
 				}
 			/>
-			<workspaceTrpc.Provider
-				client={noHostClient}
-				queryClient={noHostQueryClient}
-			>
-				<StoredChatTranscript
-					chatId={chatId}
-					pending={NO_PROMPTS}
-					snapshot={stored.data}
-				/>
-			</workspaceTrpc.Provider>
+			<StoredChatTranscript
+				chatId={chatId}
+				pending={NO_PROMPTS}
+				snapshot={stored.data}
+			/>
 			<div className="h-6" />
 		</div>
 	);

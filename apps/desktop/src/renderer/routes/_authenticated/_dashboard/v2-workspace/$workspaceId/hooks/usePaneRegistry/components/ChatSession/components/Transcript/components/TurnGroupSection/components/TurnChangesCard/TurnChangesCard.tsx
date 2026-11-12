@@ -3,7 +3,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
 import { ChevronDown, FileDiff, Undo2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
@@ -49,12 +48,8 @@ export function TurnChangesCard({
 	turnId: string;
 }) {
 	const { t } = useLingui();
-	const { openDiff, openFile, turnChanges, workspaceId } = useChatPaneActions();
-	const workspaceQuery = workspaceTrpc.workspace.get.useQuery(
-		{ id: workspaceId ?? "" },
-		{ enabled: Boolean(workspaceId) },
-	);
-	const worktreePath = workspaceQuery.data?.worktreePath;
+	const { openDiff, openFile, turnChanges, worktreePath } =
+		useChatPaneActions();
 	const { changes, reload } = useTurnChanges(turnId, {
 		anchorItemIds: toolCallIds,
 	});
