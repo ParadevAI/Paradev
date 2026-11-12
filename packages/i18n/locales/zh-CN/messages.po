@@ -2201,6 +2201,9 @@ msgstr "添加文件、应用等"
 msgid "Add files, apps, and more (@)"
 msgstr "添加文件、应用等（@）"
 
+msgid "Add from local"
+msgstr "从本地添加"
+
 msgid "Add GitHub organization"
 msgstr "添加 GitHub 组织"
 
@@ -4747,11 +4750,17 @@ msgstr "克隆仓库"
 msgid "Clone from URL"
 msgstr "从URL克隆"
 
+msgid "Clone into"
+msgstr "克隆到"
+
 msgid "clone the repository"
 msgstr "克隆仓库"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "克隆仓库，或导入主机上已有的文件夹。"
+
+msgid "cloned on create"
+msgstr "创建时克隆"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "选择团队"
 
 msgid "Select terminal script directory"
 msgstr "选择终端脚本目录"
+
+msgid "Select where to clone"
+msgstr "选择克隆位置"
 
 msgid "Select worktree location"
 msgstr "选择worktree位置"

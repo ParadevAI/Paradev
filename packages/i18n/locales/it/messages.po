@@ -2201,6 +2201,9 @@ msgstr "Aggiungi file, app e altro"
 msgid "Add files, apps, and more (@)"
 msgstr "Aggiungi file, app e altro (@)"
 
+msgid "Add from local"
+msgstr "Aggiungi da locale"
+
 msgid "Add GitHub organization"
 msgstr "Aggiungi organizzazione GitHub"
 
@@ -4747,11 +4750,17 @@ msgstr "Clona un repository"
 msgid "Clone from URL"
 msgstr "Clona da URL"
 
+msgid "Clone into"
+msgstr "Clona in"
+
 msgid "clone the repository"
 msgstr "clonare il repository"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Clona il repository oppure importa una cartella esistente sull'host."
+
+msgid "cloned on create"
+msgstr "clonato alla creazione"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "Seleziona i team"
 
 msgid "Select terminal script directory"
 msgstr "Seleziona la directory dello script del terminale"
+
+msgid "Select where to clone"
+msgstr "Seleziona dove clonare"
 
 msgid "Select worktree location"
 msgstr "Seleziona la posizione dei worktree"

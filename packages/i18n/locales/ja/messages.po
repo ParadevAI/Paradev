@@ -2201,6 +2201,9 @@ msgstr "ファイルやアプリなどを追加"
 msgid "Add files, apps, and more (@)"
 msgstr "ファイルやアプリなどを追加(@)"
 
+msgid "Add from local"
+msgstr "ローカルから追加"
+
 msgid "Add GitHub organization"
 msgstr "GitHub 組織を追加"
 
@@ -4747,11 +4750,17 @@ msgstr "リポジトリをクローン"
 msgid "Clone from URL"
 msgstr "URLからクローン"
 
+msgid "Clone into"
+msgstr "クローン先"
+
 msgid "clone the repository"
 msgstr "リポジトリをクローンする"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "リポジトリをクローンするか、ホスト上の既存フォルダをインポートします。"
+
+msgid "cloned on create"
+msgstr "作成時にクローン"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "チームを選択"
 
 msgid "Select terminal script directory"
 msgstr "ターミナルスクリプトのディレクトリを選択"
+
+msgid "Select where to clone"
+msgstr "クローン先を選択"
 
 msgid "Select worktree location"
 msgstr "ワークツリーの場所を選択"

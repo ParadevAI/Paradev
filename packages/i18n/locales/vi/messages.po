@@ -2201,6 +2201,9 @@ msgstr "Thêm tệp, ứng dụng và hơn thế"
 msgid "Add files, apps, and more (@)"
 msgstr "Thêm tệp, ứng dụng và hơn thế (@)"
 
+msgid "Add from local"
+msgstr "Thêm từ máy"
+
 msgid "Add GitHub organization"
 msgstr "Thêm tổ chức GitHub"
 
@@ -4747,11 +4750,17 @@ msgstr "Clone một repository"
 msgid "Clone from URL"
 msgstr "Clone từ URL"
 
+msgid "Clone into"
+msgstr "Sao chép vào"
+
 msgid "clone the repository"
 msgstr "clone repository"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Clone repository, hoặc nhập một thư mục có sẵn trên host."
+
+msgid "cloned on create"
+msgstr "sao chép khi tạo"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "Chọn nhóm"
 
 msgid "Select terminal script directory"
 msgstr "Chọn thư mục cho script terminal"
+
+msgid "Select where to clone"
+msgstr "Chọn nơi sao chép"
 
 msgid "Select worktree location"
 msgstr "Chọn vị trí worktree"

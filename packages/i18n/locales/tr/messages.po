@@ -2201,6 +2201,9 @@ msgstr "Dosya, uygulama ve daha fazlasını ekleyin"
 msgid "Add files, apps, and more (@)"
 msgstr "Dosya, uygulama ve daha fazlasını ekleyin (@)"
 
+msgid "Add from local"
+msgstr "Yerelden ekle"
+
 msgid "Add GitHub organization"
 msgstr "GitHub organizasyonu ekle"
 
@@ -4747,11 +4750,17 @@ msgstr "Bir depoyu klonla"
 msgid "Clone from URL"
 msgstr "URL'den klonla"
 
+msgid "Clone into"
+msgstr "Şuraya klonla"
+
 msgid "clone the repository"
 msgstr "depoyu klonlama"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Depoyu klonlayın veya host'taki mevcut bir klasörü içe aktarın."
+
+msgid "cloned on create"
+msgstr "oluşturulurken klonlanır"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "Takımları seç"
 
 msgid "Select terminal script directory"
 msgstr "Terminal betiği dizinini seçin"
+
+msgid "Select where to clone"
+msgstr "Klonlanacak yeri seç"
 
 msgid "Select worktree location"
 msgstr "Worktree konumunu seçin"

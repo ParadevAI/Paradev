@@ -2201,6 +2201,9 @@ msgstr "Tambah file, aplikasi, dan lainnya"
 msgid "Add files, apps, and more (@)"
 msgstr "Tambah file, aplikasi, dan lainnya (@)"
 
+msgid "Add from local"
+msgstr "Tambah dari lokal"
+
 msgid "Add GitHub organization"
 msgstr "Tambahkan organisasi GitHub"
 
@@ -4747,11 +4750,17 @@ msgstr "Clone sebuah repositori"
 msgid "Clone from URL"
 msgstr "Clone dari URL"
 
+msgid "Clone into"
+msgstr "Klon ke"
+
 msgid "clone the repository"
 msgstr "meng-clone repositori"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Clone repositorinya, atau impor folder yang sudah ada di host."
+
+msgid "cloned on create"
+msgstr "dikloning saat dibuat"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "Pilih tim"
 
 msgid "Select terminal script directory"
 msgstr "Pilih direktori skrip terminal"
+
+msgid "Select where to clone"
+msgstr "Pilih lokasi klon"
 
 msgid "Select worktree location"
 msgstr "Pilih lokasi worktree"

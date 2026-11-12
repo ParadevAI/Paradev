@@ -2201,6 +2201,9 @@ msgstr "파일, 앱 등 추가"
 msgid "Add files, apps, and more (@)"
 msgstr "파일, 앱 등 추가 (@)"
 
+msgid "Add from local"
+msgstr "로컬에서 추가"
+
 msgid "Add GitHub organization"
 msgstr "GitHub 조직 추가"
 
@@ -4747,11 +4750,17 @@ msgstr "리포지토리 클론"
 msgid "Clone from URL"
 msgstr "URL에서 클론"
 
+msgid "Clone into"
+msgstr "클론 위치"
+
 msgid "clone the repository"
 msgstr "리포지토리를 클론할"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "리포지토리를 클론하거나 호스트에 있는 기존 폴더를 가져옵니다."
+
+msgid "cloned on create"
+msgstr "생성 시 클론됨"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18215,6 +18224,9 @@ msgstr "팀 선택"
 
 msgid "Select terminal script directory"
 msgstr "터미널 스크립트 디렉터리 선택"
+
+msgid "Select where to clone"
+msgstr "클론할 위치 선택"
 
 msgid "Select worktree location"
 msgstr "worktree 위치 선택"
