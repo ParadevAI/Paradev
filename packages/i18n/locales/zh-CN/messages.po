@@ -8258,6 +8258,9 @@ msgstr "探索"
 msgid "Explore Pages"
 msgstr "了解页面"
 
+msgid "Explore tables and run read-only queries"
+msgstr "浏览表并运行只读查询"
+
 msgid "Explored"
 msgstr "已探索"
 

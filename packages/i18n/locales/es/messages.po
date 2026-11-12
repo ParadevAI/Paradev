@@ -8258,6 +8258,9 @@ msgstr "Explorar"
 msgid "Explore Pages"
 msgstr "Explorar Páginas"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Explora tablas y ejecuta consultas de solo lectura"
+
 msgid "Explored"
 msgstr "Explorado"
 

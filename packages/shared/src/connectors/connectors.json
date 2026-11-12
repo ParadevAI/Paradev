@@ -821,6 +821,39 @@
 				}
 			]
 		},
+		"clickhouse_mcp": {
+			"displayName": "ClickHouse Cloud",
+			"icon": "clickhouse",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.clickhouse.cloud/mcp",
+					"scopes": ["mcp:access", "openid", "profile", "email"],
+					"identity": {
+						"mcp": "https://mcp.clickhouse.cloud/mcp",
+						"tool": "get_organizations",
+						"arguments": {},
+						"account": {
+							"id": "$.result[0].id",
+							"label": "$.result[0].name"
+						},
+						"user": {
+							"id": "$.result[0].id",
+							"label": "$.result[0].name"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"posthog_mcp": {
 			"displayName": "PostHog",
 			"icon": "posthog",

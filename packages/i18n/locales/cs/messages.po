@@ -8258,6 +8258,9 @@ msgstr "Prozkoumat"
 msgid "Explore Pages"
 msgstr "Prozkoumat Stránky"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Prozkoumávejte tabulky a spouštějte dotazy jen pro čtení"
+
 msgid "Explored"
 msgstr "Prozkoumáno"
 

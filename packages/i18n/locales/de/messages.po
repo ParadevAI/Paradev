@@ -8258,6 +8258,9 @@ msgstr "Entdecken"
 msgid "Explore Pages"
 msgstr "Seiten entdecken"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Tabellen erkunden und schreibgeschützte Abfragen ausführen"
+
 msgid "Explored"
 msgstr "Erkundet"
 

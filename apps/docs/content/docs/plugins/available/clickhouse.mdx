@@ -1,0 +1,30 @@
+---
+title: ClickHouse Cloud
+description: "Query ClickHouse Cloud from your agent: explore databases and tables, run read-only SELECT queries, and check services, backups, ClickPipes and cost"
+---
+
+Query ClickHouse Cloud from your agent: explore databases and tables, run read-only `SELECT` queries, and check services, backups, ClickPipes and cost.
+
+## Skills
+
+| Skill | What it does |
+|:------|:-------------|
+| `query-clickhouse` | Finds the right service and table, reads the schema, and writes a bounded query on the sort and partition keys, showing the SQL with the answer |
+| `check-service-health` | Checks that a service is running, that backups are taken and kept, and that ClickPipes are ingesting |
+| `review-cloud-cost` | Breaks down spend by service and day from the billing records, finds what changed, and recommends changes tied to the data |
+
+Skills are named `clickhouse-<skill>`. In Claude Code they appear as `superset:clickhouse-<skill>`.
+
+## MCP Server
+
+Tools come from ClickHouse Cloud's remote MCP server at `https://mcp.clickhouse.cloud/mcp`. Paradev proxies each call and adds your credentials. Queries are read-only: `run_select_query` runs `SELECT` statements only. See [ClickHouse's remote MCP docs](https://clickhouse.com/docs/use-cases/AI/MCP/remote_mcp).
+
+MCP is turned on per service. Open the service in the ClickHouse Cloud console, click **Connect**, choose **Connect with MCP** and turn it on. That needs the `control-plane:service:manage-mcp` permission.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to ClickHouse Cloud in your browser. Paradev registers itself with ClickHouse when you connect, so there is no app to set up first. The agent gets the same access as your SQL console. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

@@ -8252,6 +8252,9 @@ msgstr "Огляд"
 msgid "Explore Pages"
 msgstr "Переглянути сторінки"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Огляд таблиць і виконання запитів лише на читання"
+
 msgid "Explored"
 msgstr "Досліджено"
 

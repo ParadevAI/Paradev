@@ -1063,6 +1063,57 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"clickhouse": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "clickhouse",
+		"version": "1.0.0",
+		"description": "Query ClickHouse Cloud from your agent: explore databases and tables, run read-only SELECT queries, and check services, backups, ClickPipes and cost.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"clickhouse",
+			"clickhouse-cloud",
+			"sql",
+			"analytics",
+			"database",
+			"olap"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "ClickHouse Cloud",
+					"category": "Data & APIs",
+					"icon": "clickhouse"
+				},
+				"connector": {
+					"slug": "clickhouse_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.clickhouse.cloud/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "check-service-health",
+				"description": "Check a ClickHouse Cloud service's operational state — is it running, are backups being taken and kept, and are ClickPipes ingesting without errors — and report what needs attention. Use when the user asks whether a ClickHouse service is healthy, why data stopped arriving, whether backups are in place, or for a pre-change or on-call check of their ClickHouse setup."
+			},
+			{
+				"name": "query-clickhouse",
+				"description": "Answer a data question from ClickHouse Cloud with a query you can defend — find the right service, database and table, read the schema before writing SQL, filter on the sort and partition keys, and show the query with the answer. Use when the user asks a question about data stored in ClickHouse, how many or how much of something, a trend over time, or wants to explore what tables and columns exist."
+			},
+			{
+				"name": "review-cloud-cost",
+				"description": "Explain ClickHouse Cloud spend from the billing data — total and daily cost by service and kind, what changed and when, and which change to make — without guessing at prices. Use when the user asks what ClickHouse costs, why the bill went up, which service is the most expensive, or how to cut ClickHouse Cloud spend."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

@@ -8258,6 +8258,9 @@ msgstr "Ontdekken"
 msgid "Explore Pages"
 msgstr "Ontdek Pagina's"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Verken tabellen en voer alleen-lezen query's uit"
+
 msgid "Explored"
 msgstr "Verkend"
 

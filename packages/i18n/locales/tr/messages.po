@@ -8258,6 +8258,9 @@ msgstr "Keşfet"
 msgid "Explore Pages"
 msgstr "Sayfaları keşfet"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Tabloları keşfedin ve salt okunur sorgular çalıştırın"
+
 msgid "Explored"
 msgstr "İncelendi"
 

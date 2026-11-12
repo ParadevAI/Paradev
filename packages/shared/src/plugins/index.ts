@@ -417,6 +417,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "clickhouse",
+		version: "1.0.0",
+		description: "Explore and query ClickHouse Cloud",
+		interface: { displayName: "ClickHouse Cloud", category: "Data & APIs" },
+		mcpServers: {
+			clickhouse: { type: "http", url: "https://mcp.clickhouse.cloud/mcp" },
+		},
+	},
+	{
 		name: "exa",
 		version: "1.0.1",
 		description: "Search the web, companies, and people",
