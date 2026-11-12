@@ -2,13 +2,13 @@ import { watch } from "chokidar";
 import { createIgnoreMatcher } from "./ignore-matcher";
 import type { NativeWatchBackend, NativeWatchEvent } from "./types";
 
-const EVENT_TYPES = {
-	add: "create",
-	addDir: "create",
-	change: "update",
-	unlink: "delete",
-	unlinkDir: "delete",
-} as const satisfies Record<string, NativeWatchEvent["type"]>;
+const EVENTS = {
+	add: { type: "create" },
+	addDir: { type: "create", isDirectory: true },
+	change: { type: "update" },
+	unlink: { type: "delete" },
+	unlinkDir: { type: "delete", isDirectory: true },
+} as const satisfies Record<string, Omit<NativeWatchEvent, "path">>;
 
 /**
  * Watches through Node's own `fs.watch`, so every event is delivered by libuv
@@ -29,9 +29,9 @@ export const chokidarWatchBackend: NativeWatchBackend = {
 			ignored: (candidate, stats) => isIgnored(candidate, stats?.isDirectory()),
 		});
 
-		for (const [chokidarEvent, type] of Object.entries(EVENT_TYPES)) {
-			watcher.on(chokidarEvent as keyof typeof EVENT_TYPES, (eventPath) => {
-				onEvents([{ type, path: eventPath }]);
+		for (const [chokidarEvent, event] of Object.entries(EVENTS)) {
+			watcher.on(chokidarEvent as keyof typeof EVENTS, (eventPath) => {
+				onEvents([{ ...event, path: eventPath }]);
 			});
 		}
 		watcher.on("error", onError);
