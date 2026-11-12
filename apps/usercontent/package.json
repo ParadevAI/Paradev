@@ -11,7 +11,7 @@
 	"dependencies": {
 		"@sentry/cloudflare": "10.68.0",
 		"@superset/shared": "workspace:*",
-		"hono": "4.13.11",
+		"hono": "4.13.16",
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
