@@ -1468,6 +1468,9 @@ msgstr "{user} ist wieder beigetreten."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} begrenzt gerade die Downloads. Warte eine Minute und versuche es erneut."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} ausstehend"
 
@@ -3014,6 +3017,9 @@ msgstr "Darstellung"
 msgid "Apple logo"
 msgstr "Apple-Logo"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Laut Apple sind die Tools installiert, aber Paradev findet Git nicht."
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Apples Installationsprogramm wurde geschlossen, bevor Git installiert war."
 
@@ -4341,6 +4347,9 @@ msgstr "Agenten werden geprüft…"
 msgid "Checking environments…"
 msgstr "Umgebungen werden geprüft…"
 
+msgid "Checking GitHub CLI…"
+msgstr "GitHub CLI wird geprüft…"
+
 msgid "Checking host…"
 msgstr "Host wird geprüft…"
 
@@ -4352,6 +4361,9 @@ msgstr "Zum Auschecken eines PR wird ein Projekt benötigt"
 
 msgid "Checking pull requests in {what}"
 msgstr "Pull Requests in {what} werden geprüft"
+
+msgid "Checking the download…"
+msgstr "Download wird geprüft…"
 
 msgid "Checking workspaces"
 msgstr "Arbeitsbereiche werden geprüft"
@@ -4971,6 +4983,9 @@ msgstr "Kombiniert Zeichenfolgen wie => und !==."
 msgid "Come build it with us."
 msgstr "Bau es mit uns."
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "Ist in Apples Command Line Tools enthalten."
+
 msgid "Comes with you"
 msgstr "Kommt mit"
 
@@ -5371,6 +5386,9 @@ msgstr "Verbunden mit"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "Verbunden mit {connectedOrgName}"
+
+msgid "Connected to GitHub"
+msgstr "Mit GitHub verbunden"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Mit GitHub verbunden als {accountLogin}"
@@ -6249,6 +6267,9 @@ msgstr "Kommentar konnte nicht gepostet werden"
 msgid "Couldn't post reply"
 msgstr "Antwort konnte nicht gesendet werden"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor} ist nicht erreichbar. Prüfe deine Internetverbindung und versuche es erneut."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
@@ -6338,6 +6359,9 @@ msgstr "Senden an den Agenten fehlgeschlagen"
 
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Deine Nachricht konnte nicht gesendet werden. Sie ist wieder im Eingabefeld."
+
+msgid "Couldn't set up {name} on this computer."
+msgstr "{name} konnte auf diesem Computer nicht eingerichtet werden."
 
 msgid "Couldn't stage changes"
 msgstr "Änderungen konnten nicht gestaged werden"
@@ -7613,6 +7637,12 @@ msgstr "Für Mac herunterladen"
 msgid "Download for macOS"
 msgstr "Für macOS herunterladen"
 
+msgid "Download from Apple"
+msgstr "Von Apple herunterladen"
+
+msgid "Download from GitHub"
+msgstr "Von GitHub herunterladen"
+
 msgid "Download image"
 msgstr "Bild herunterladen"
 
@@ -7642,6 +7672,12 @@ msgstr "geladen"
 
 msgid "Downloading"
 msgstr "Wird heruntergeladen"
+
+msgid "Downloading {name}…"
+msgstr "{name} wird heruntergeladen…"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "Für den Download von Apple brauchst du eine Apple-ID. Die Installation kann etwa 20 GB freien Speicher benötigen."
 
 msgid "Downloading..."
 msgstr "Wird heruntergeladen..."
@@ -9502,6 +9538,9 @@ msgstr "iPhone- und iPad-App holen"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Erhält eine Einladung zu {organizationName}"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "Anmeldecode wird von GitHub abgerufen…"
+
 msgid "Getting the computer ready"
 msgstr "Der Computer wird vorbereitet"
 
@@ -9535,6 +9574,9 @@ msgstr "Git kann erst ausgeführt werden, wenn du die Xcode-Lizenz akzeptierst. 
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "Git ist auf diesem Mac noch nicht installiert. Installiere die Command Line Tools von Apple und versuche es dann erneut."
 
+msgid "Git still isn't installed."
+msgstr "Git ist noch nicht installiert."
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Von Git ignorierte Dateien in der Cloud, etwa .env. Kopiere sie heraus"
 
@@ -9549,6 +9591,9 @@ msgstr "GitHub-App erfolgreich installiert!"
 
 msgid "GitHub cannot merge this stack in one step here."
 msgstr "GitHub kann diesen Stack hier nicht in einem Schritt zusammenführen."
+
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub verbunden, aber die erste Synchronisierung konnte nicht starten. Bitte verbinde es erneut."
@@ -10498,12 +10543,18 @@ msgstr "MCP-Server an einem Ort installieren, autorisieren und über alle Arbeit
 msgid "Install."
 msgstr "Installieren."
 
+msgid "Installed"
+msgstr "Installiert"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "Installiert"
 
 msgid "Installed by your organization"
 msgstr "Von Ihrer Organisation installiert"
+
+msgid "Installed it another way? Click Check again."
+msgstr "Auf andere Weise installiert? Klicke auf Erneut prüfen."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Installiert auf {appAccountLogin}"
@@ -10517,6 +10568,9 @@ msgstr "Installiert über"
 
 msgid "Installing..."
 msgstr "Wird installiert..."
+
+msgid "Installing…"
+msgstr "Wird installiert…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Installiert Paradev auf einem Rechner, den du per ssh erreichst, meldet Paradev bei deinem Konto an und hält Paradev als Dienst am Laufen."
@@ -13421,8 +13475,8 @@ msgstr "Nicht im Kanal"
 msgid "Not included"
 msgstr "Nicht enthalten"
 
-msgid "Not installed"
-msgstr "Nicht installiert"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "Nicht installiert · nötig für private Repositorys und Pull Requests"
 
 msgid "Not loaded"
 msgstr "Nicht geladen"
@@ -13460,8 +13514,8 @@ msgstr "Auf {hostName} nicht eingerichtet"
 msgid "Not set up on this host"
 msgstr "Auf diesem Host nicht eingerichtet"
 
-msgid "Not signed in"
-msgstr "Nicht angemeldet"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "Nicht angemeldet · nötig für private Repositorys und Pull Requests"
 
 msgid "not sorted"
 msgstr "nicht sortiert"
@@ -14011,6 +14065,12 @@ msgstr "Aus Ordner öffnen"
 
 msgid "Open full screen"
 msgstr "Im Vollbild öffnen"
+
+msgid "Open GitHub"
+msgstr "GitHub öffnen"
+
+msgid "Open GitHub and enter this code."
+msgstr "Öffne GitHub und gib diesen Code ein."
 
 msgid "Open host"
 msgstr "Host öffnen"
@@ -14626,6 +14686,9 @@ msgstr "Paradev App"
 msgid "Paradev Automations"
 msgstr "Paradev-Automatisierungen"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev kann {name} nur auf einem Mac installieren. Installiere es selbst und klicke dann auf Erneut prüfen."
+
 msgid "Paradev CLI"
 msgstr "Paradev-CLI"
 
@@ -14770,6 +14833,9 @@ msgstr "Paradev läuft lokal auf den Rechnern deiner Entwickler. Wir speichern w
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev begann im November 2025 als Hackathon-Projekt. Es war eine simple Desktop-App zum Verwalten von Worktrees."
 
+msgid "Paradev still can't find {name}."
+msgstr "Paradev findet {name} immer noch nicht."
+
 msgid "Paradev Teams"
 msgstr "Paradev-Teams"
 
@@ -14780,8 +14846,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev nutzt {0} des System-RAM"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev nutzt die GitHub CLI, um Repositorys zu klonen und Pull Requests zu öffnen. Du kannst das auch später erledigen."
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev nutzt Git und GitHub CLI, um Repos zu klonen und Pull Requests zu öffnen. Du kannst das auch später erledigen."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev im Vergleich"
@@ -18106,6 +18172,9 @@ msgstr "Host über SSH einrichten"
 msgid "Set up an automation"
 msgstr "Automatisierung einrichten"
 
+msgid "Set up Git and GitHub"
+msgstr "Git und GitHub einrichten"
+
 msgid "Set up once"
 msgstr "Einmal einrichten"
 
@@ -18569,6 +18638,9 @@ msgstr "Mit Google registrieren"
 msgid "Sign-in didn't finish"
 msgstr "Die Anmeldung wurde nicht abgeschlossen"
 
+msgid "Sign-in didn't finish."
+msgstr "Die Anmeldung wurde nicht abgeschlossen."
+
 msgid "Sign-in expired"
 msgstr "Anmeldung abgelaufen"
 
@@ -18586,6 +18658,9 @@ msgstr "Registrierungsabschluss"
 
 msgid "Sign-up steps"
 msgstr "Registrierungsschritte"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "Angemeldet · klont private Repositorys und öffnet Pull Requests"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Angemeldet als <0>{userName}</0>"
@@ -18688,6 +18763,12 @@ msgstr "Alle überspringen"
 
 msgid "Skip for now"
 msgstr "Vorerst überspringen"
+
+msgid "Skip Git for now?"
+msgstr "Git vorerst überspringen?"
+
+msgid "Skip GitHub for now?"
+msgstr "GitHub vorerst überspringen?"
 
 msgid "Skipped"
 msgstr "Übersprungen"
@@ -20055,6 +20136,15 @@ msgstr "Der Diff ist weiterhin aktuell. Nur die Kommentare konnten nicht geladen
 msgid "The dispatcher appears"
 msgstr "Der Disponent tritt auf"
 
+msgid "The download didn't finish. Try again."
+msgstr "Der Download wurde nicht abgeschlossen. Versuche es erneut."
+
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Der Download ist nicht von {vendor} signiert, daher hat Paradev ihn nicht installiert."
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "Der Download sah fehlerhaft aus, daher hat Paradev ihn nicht installiert. Versuche es erneut."
+
 msgid "The endpoint must use https."
 msgstr "Der Endpunkt muss https verwenden."
 
@@ -20142,6 +20232,9 @@ msgstr "Der Mensch liest jede Zeile, bevor sie gemergt wird."
 
 msgid "The image upload expired — attach it again"
 msgstr "Der Bild-Upload ist abgelaufen — erneut anhängen"
+
+msgid "The install stopped responding."
+msgstr "Die Installation reagiert nicht mehr."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Die Stellenbeschreibung verschiebt sich. Entwickler sind nicht länger Tipper mit Geschmack, sondern Disponenten mit Geschmack: Arbeit zerlegen, an Flotten verteilen, Konflikte zwischen Agenten schlichten, die beide dasselbe Modul angefasst haben."
@@ -20389,6 +20482,9 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "Themes"
 
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Es ist nicht genug Speicherplatz frei, um {name} zu installieren. Gib etwas Speicherplatz frei und versuche es erneut."
+
 msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 msgstr "Diese sind über den Basis-Branch verknüpft, daher wird jeder in den darunterliegenden gemergt. Ein GitHub-Stack mergt sie in einem Schritt."
 
@@ -20581,6 +20677,9 @@ msgstr "Diese Einladung wurde bereits angenommen."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Dieser Einladungslink ist ungültig oder abgelaufen."
+
+msgid "This is taking longer than expected."
+msgstr "Das dauert länger als erwartet."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "Das dauert länger als sonst. Die Sandbox lädt womöglich noch ihr Image. Das läuft weiter, egal ob dieses Fenster offen ist oder nicht."
@@ -22091,6 +22190,9 @@ msgstr "Warte auf Freigabe. Lass diesen Dialog geöffnet."
 msgid "Waiting for Checks"
 msgstr "Wartet auf Prüfungen"
 
+msgid "Waiting for GitHub…"
+msgstr "Warte auf GitHub…"
+
 msgid "Waiting for it to connect…"
 msgstr "Warten auf die Verbindung…"
 
@@ -22845,11 +22947,17 @@ msgstr "Du kannst es 30 Tage lang unter Einstellungen → Projekte wiederherstel
 msgid "You can see how we work before you talk to us."
 msgstr "Du kannst sehen, wie wir arbeiten, bevor du mit uns sprichst."
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "Öffentliche Repositorys kannst du weiterhin klonen. Private Repositorys und Pull Requests brauchen eine Verbindung zu GitHub. Du kannst sie später unter Einstellungen → Git & Worktrees herstellen."
+
 msgid "You can view this page but not change it"
 msgstr "Du kannst diese Seite ansehen, aber nicht ändern"
 
 msgid "You can view this page but not comment on it"
 msgstr "Du kannst diese Seite ansehen, aber nicht kommentieren"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Du kannst erst ein Projekt hinzufügen, wenn Git installiert ist. Die nächsten Schritte bieten es dir erneut an."
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

@@ -1,0 +1,126 @@
+import { execFile, spawn } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { promisify } from "node:util";
+import {
+	getToolsBinDir,
+	resolveAppHomeDir,
+	withAppToolsOnPath,
+} from "@superset/agent-setup/paths";
+import { detectGit } from "@superset/shared/detect-git";
+import { getProcessEnvWithShellEnv } from "../../../workspaces/utils/shell-env";
+import { type ResolvedGh, resolveGh } from "../resolve-gh";
+import {
+	finishPendingGitSetup,
+	type GhAuthLoginDeps,
+	setUpGitCredentials,
+} from "./gh-auth-login";
+
+const execFileAsync = promisify(execFile);
+
+function pendingMarkerPath(): string {
+	return path.join(resolveAppHomeDir(), "gh-setup-git-pending");
+}
+
+async function toolEnv(): Promise<Record<string, string>> {
+	return withAppToolsOnPath(await getProcessEnvWithShellEnv());
+}
+
+export async function resolveInstalledGh(): Promise<ResolvedGh | null> {
+	const env = await toolEnv();
+	return resolveGh({
+		appGhPath: path.join(getToolsBinDir(), "gh"),
+		runVersion: async (command) =>
+			(
+				await execFileAsync(command, ["--version"], {
+					env,
+					timeout: 5000,
+				})
+			).stdout,
+	});
+}
+
+async function ghCommand(): Promise<string> {
+	return (await resolveInstalledGh())?.command ?? "gh";
+}
+
+export function createGhCliDeps(): GhAuthLoginDeps {
+	return {
+		hasUsableGit: async () => {
+			const env = await toolEnv();
+			const git = await detectGit({
+				platform: process.platform,
+				run: async (command, args) =>
+					(await execFileAsync(command, args, { env, timeout: 5000 })).stdout,
+				fileExists: fs.existsSync,
+			});
+			return git.installed;
+		},
+		toolEnv,
+		gitShimDir: async () => {
+			const dir = path.join(resolveAppHomeDir(), "gh-git-shim");
+			await fs.promises.mkdir(dir, { recursive: true });
+			const shim = path.join(dir, "git");
+			await fs.promises.writeFile(shim, "#!/bin/sh\nexit 1\n");
+			await fs.promises.chmod(shim, 0o755);
+			return dir;
+		},
+		runGh: async (args) => {
+			await execFileAsync(await ghCommand(), args, {
+				env: await toolEnv(),
+				timeout: 15_000,
+			});
+		},
+		spawnGh: async (args, env) => {
+			const child = spawn(await ghCommand(), args, {
+				env,
+				stdio: ["ignore", "pipe", "pipe"],
+			});
+			const listeners: Array<(chunk: string) => void> = [];
+			const forward = (data: Buffer) => {
+				for (const listener of listeners) listener(data.toString("utf8"));
+			};
+			child.stdout?.on("data", forward);
+			child.stderr?.on("data", forward);
+			const exited = new Promise<number | null>((resolve) => {
+				child.on("error", () => resolve(null));
+				child.on("close", (code) => resolve(code));
+			});
+			return {
+				onOutput: (listener) => listeners.push(listener),
+				exited,
+				kill: () => child.kill(),
+			};
+		},
+		isGitSetupPending: async () => fs.existsSync(pendingMarkerPath()),
+		setGitSetupPending: async (pending) => {
+			const marker = pendingMarkerPath();
+			if (pending) {
+				await fs.promises.mkdir(path.dirname(marker), { recursive: true });
+				await fs.promises.writeFile(marker, "");
+			} else {
+				await fs.promises.rm(marker, { force: true });
+			}
+		},
+	};
+}
+
+function singleFlight(run: () => Promise<boolean>): () => Promise<boolean> {
+	let inFlight: Promise<boolean> | null = null;
+	return () => {
+		inFlight ??= run()
+			.catch(() => false)
+			.finally(() => {
+				inFlight = null;
+			});
+		return inFlight;
+	};
+}
+
+export const finishPendingGhGitSetup = singleFlight(() =>
+	finishPendingGitSetup(createGhCliDeps()),
+);
+
+export const setUpGhGitCredentials = singleFlight(() =>
+	setUpGitCredentials(createGhCliDeps()),
+);

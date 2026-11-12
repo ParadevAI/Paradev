@@ -2,8 +2,10 @@
 // the git/readGitIdentity worker task can bundle this module.
 
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { promisify } from "node:util";
+import { detectGit } from "@superset/shared/detect-git";
 import type { SimpleGit } from "simple-git";
 import { createUserSimpleGit } from "./simple-git";
 
@@ -47,9 +49,32 @@ export async function getGitHubUsernameViaGh(
 }
 
 /**
+ * False on a Mac without Command Line Tools, where running /usr/bin/git opens
+ * Apple's install dialog.
+ */
+export async function gitCanRun(
+	shellEnv: Record<string, string>,
+): Promise<boolean> {
+	const git = await detectGit({
+		platform: process.platform,
+		run: async (command, args) =>
+			(
+				await execFileAsync(command, args, {
+					encoding: "utf8",
+					timeout: 5_000,
+					env: shellEnv,
+				})
+			).stdout,
+		fileExists: existsSync,
+	});
+	return git.installed;
+}
+
+/**
  * Git identity used to preview `author`/`github` branch prefixes in settings.
- * `shellEnv` is only for the `gh` spawn; the git config read keeps the
- * process env — simple-git rejects env containing GIT_EDITOR as unsafe.
+ * `shellEnv` is only for the `gh` and detection spawns; the git config read
+ * keeps the process env — simple-git rejects env containing GIT_EDITOR as
+ * unsafe.
  *
  * The config read is anchored at the home directory rather than left to
  * simple-git's default of the process working directory: this runs in a
@@ -60,10 +85,17 @@ export async function getGitHubUsernameViaGh(
  */
 export async function readGitIdentity(
 	shellEnv: Record<string, string>,
+	{
+		canRunGit = gitCanRun,
+		readAuthorName = () => getGitAuthorName(createUserSimpleGit(homedir())),
+	}: {
+		canRunGit?: (shellEnv: Record<string, string>) => Promise<boolean>;
+		readAuthorName?: () => Promise<string | null>;
+	} = {},
 ): Promise<ResolvedGitInfo> {
 	const [githubUsername, authorName] = await Promise.all([
 		getGitHubUsernameViaGh(shellEnv),
-		getGitAuthorName(createUserSimpleGit(homedir())),
+		canRunGit(shellEnv).then((ok) => (ok ? readAuthorName() : null)),
 	]);
 	return { githubUsername, authorName };
 }

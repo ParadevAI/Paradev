@@ -1468,6 +1468,9 @@ msgstr "{user} đã tham gia lại."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
 
@@ -3014,6 +3017,9 @@ msgstr "Giao diện"
 msgid "Apple logo"
 msgstr "Biểu trưng Apple"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple cho biết các công cụ đã được cài đặt, nhưng Paradev không tìm thấy Git."
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Trình cài đặt của Apple đã đóng trước khi Git được cài."
 
@@ -4341,6 +4347,9 @@ msgstr "Đang kiểm tra agent…"
 msgid "Checking environments…"
 msgstr "Đang kiểm tra môi trường…"
 
+msgid "Checking GitHub CLI…"
+msgstr "Đang kiểm tra GitHub CLI…"
+
 msgid "Checking host…"
 msgstr "Đang kiểm tra host…"
 
@@ -4352,6 +4361,9 @@ msgstr "Checkout một PR cần có dự án"
 
 msgid "Checking pull requests in {what}"
 msgstr "Đang kiểm tra pull request trong {what}"
+
+msgid "Checking the download…"
+msgstr "Đang kiểm tra tệp tải về…"
 
 msgid "Checking workspaces"
 msgstr "Đang kiểm tra workspace"
@@ -4971,6 +4983,9 @@ msgstr "Ghép các chuỗi như => và !==."
 msgid "Come build it with us."
 msgstr "Hãy cùng chúng tôi tạo ra nó."
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "Đi kèm với Command Line Tools của Apple."
+
 msgid "Comes with you"
 msgstr "Mang theo được"
 
@@ -5371,6 +5386,9 @@ msgstr "Đã kết nối tới"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "Đã kết nối với {connectedOrgName}"
+
+msgid "Connected to GitHub"
+msgstr "Đã kết nối với GitHub"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Đã kết nối GitHub với tên {accountLogin}"
@@ -6249,6 +6267,9 @@ msgstr "Không thể đăng bình luận"
 msgid "Couldn't post reply"
 msgstr "Không thể đăng trả lời"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Không thể kết nối với {vendor}. Hãy kiểm tra kết nối internet rồi thử lại."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
@@ -6338,6 +6359,9 @@ msgstr "Không thể gửi cho agent"
 
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Không gửi được tin nhắn. Tin nhắn đã được trả lại ô soạn thảo."
+
+msgid "Couldn't set up {name} on this computer."
+msgstr "Không thể thiết lập {name} trên máy tính này."
 
 msgid "Couldn't stage changes"
 msgstr "Không thể stage các thay đổi"
@@ -7613,6 +7637,12 @@ msgstr "Tải cho Mac"
 msgid "Download for macOS"
 msgstr "Tải cho macOS"
 
+msgid "Download from Apple"
+msgstr "Tải xuống từ Apple"
+
+msgid "Download from GitHub"
+msgstr "Tải xuống từ GitHub"
+
 msgid "Download image"
 msgstr "Tải ảnh xuống"
 
@@ -7642,6 +7672,12 @@ msgstr "đã tải"
 
 msgid "Downloading"
 msgstr "Đang tải xuống"
+
+msgid "Downloading {name}…"
+msgstr "Đang tải {name}…"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "Tải xuống từ Apple cần có Apple ID. Quá trình cài đặt có thể cần khoảng 20 GB dung lượng trống."
 
 msgid "Downloading..."
 msgstr "Đang tải xuống..."
@@ -9502,6 +9538,9 @@ msgstr "Tải ứng dụng cho iPhone và iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Sẽ nhận lời mời tham gia {organizationName}"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "Đang lấy mã đăng nhập từ GitHub…"
+
 msgid "Getting the computer ready"
 msgstr "Đang chuẩn bị máy tính"
 
@@ -9535,6 +9574,9 @@ msgstr "Git chỉ chạy được sau khi bạn chấp nhận giấy phép Xcode
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "Git chưa được cài trên máy Mac này. Hãy cài Command Line Tools của Apple rồi thử lại."
 
+msgid "Git still isn't installed."
+msgstr "Git vẫn chưa được cài đặt."
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Các tệp bị Git bỏ qua trên Cloud, như .env. Hãy sao chép chúng ra"
 
@@ -9549,6 +9591,9 @@ msgstr "Đã cài GitHub App thành công!"
 
 msgid "GitHub cannot merge this stack in one step here."
 msgstr "GitHub không thể merge stack này trong một bước ở đây."
+
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "Đã kết nối GitHub, nhưng lần đồng bộ đầu tiên không khởi động được. Vui lòng thử kết nối lại."
@@ -10498,12 +10543,18 @@ msgstr "Cài đặt, ủy quyền và giới hạn phạm vi server MCP trên m�
 msgid "Install."
 msgstr "Cài đặt."
 
+msgid "Installed"
+msgstr "Đã cài đặt"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "Đã cài"
 
 msgid "Installed by your organization"
 msgstr "Do tổ chức của bạn cài"
+
+msgid "Installed it another way? Click Check again."
+msgstr "Đã cài bằng cách khác? Nhấn Kiểm tra lại."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Đã cài trên {appAccountLogin}"
@@ -10517,6 +10568,9 @@ msgstr "Cài đặt qua"
 
 msgid "Installing..."
 msgstr "Đang cài đặt..."
+
+msgid "Installing…"
+msgstr "Đang cài đặt…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Cài Paradev lên một máy bạn truy cập được bằng ssh, đăng nhập Paradev vào tài khoản của bạn và giữ Paradev chạy như một dịch vụ."
@@ -13421,8 +13475,8 @@ msgstr "Không ở trong kênh"
 msgid "Not included"
 msgstr "Không có"
 
-msgid "Not installed"
-msgstr "Chưa cài đặt"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "Chưa cài đặt · cần cho kho mã riêng tư và pull request"
 
 msgid "Not loaded"
 msgstr "Chưa tải"
@@ -13460,8 +13514,8 @@ msgstr "Chưa thiết lập trên {hostName}"
 msgid "Not set up on this host"
 msgstr "Chưa thiết lập trên host này"
 
-msgid "Not signed in"
-msgstr "Chưa đăng nhập"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "Chưa đăng nhập · cần cho kho mã riêng tư và pull request"
 
 msgid "not sorted"
 msgstr "chưa sắp xếp"
@@ -14011,6 +14065,12 @@ msgstr "Mở từ thư mục"
 
 msgid "Open full screen"
 msgstr "Mở toàn màn hình"
+
+msgid "Open GitHub"
+msgstr "Mở GitHub"
+
+msgid "Open GitHub and enter this code."
+msgstr "Mở GitHub và nhập mã này."
 
 msgid "Open host"
 msgstr "Mở host"
@@ -14626,6 +14686,9 @@ msgstr "Ứng dụng Paradev"
 msgid "Paradev Automations"
 msgstr "Tự động hóa Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev chỉ cài được {name} trên máy Mac. Hãy tự cài đặt rồi nhấn Kiểm tra lại."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14770,6 +14833,9 @@ msgstr "Paradev chạy cục bộ trên máy của lập trình viên. Chúng t�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev khởi đầu là một dự án hackathon vào tháng 11 năm 2025. Đó là một ứng dụng máy tính đơn giản để quản lý worktree."
 
+msgid "Paradev still can't find {name}."
+msgstr "Paradev vẫn chưa tìm thấy {name}."
+
 msgid "Paradev Teams"
 msgstr "Nhóm Paradev"
 
@@ -14780,8 +14846,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev dùng {0} RAM hệ thống"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev dùng GitHub CLI để sao chép kho mã và mở pull request. Bạn cũng có thể làm việc này sau."
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev dùng Git và GitHub CLI để sao chép kho mã và mở pull request. Bạn cũng có thể làm việc này sau."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev và các lựa chọn khác"
@@ -18106,6 +18172,9 @@ msgstr "Thiết lập host qua SSH"
 msgid "Set up an automation"
 msgstr "Thiết lập tự động hóa"
 
+msgid "Set up Git and GitHub"
+msgstr "Thiết lập Git và GitHub"
+
 msgid "Set up once"
 msgstr "Thiết lập một lần"
 
@@ -18569,6 +18638,9 @@ msgstr "Đăng ký bằng Google"
 msgid "Sign-in didn't finish"
 msgstr "Đăng nhập chưa hoàn tất"
 
+msgid "Sign-in didn't finish."
+msgstr "Đăng nhập chưa hoàn tất."
+
 msgid "Sign-in expired"
 msgstr "Đăng nhập đã hết hạn"
 
@@ -18586,6 +18658,9 @@ msgstr "Tỷ lệ hoàn tất đăng ký"
 
 msgid "Sign-up steps"
 msgstr "Số bước đăng ký"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "Đã đăng nhập · sao chép kho mã riêng tư và mở pull request"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Đang đăng nhập với <0>{userName}</0>"
@@ -18688,6 +18763,12 @@ msgstr "Bỏ qua tất cả"
 
 msgid "Skip for now"
 msgstr "Bỏ qua bây giờ"
+
+msgid "Skip Git for now?"
+msgstr "Tạm bỏ qua Git?"
+
+msgid "Skip GitHub for now?"
+msgstr "Bỏ qua GitHub lúc này?"
 
 msgid "Skipped"
 msgstr "Đã bỏ qua"
@@ -20055,6 +20136,15 @@ msgstr "Diff vẫn là mới nhất. Chỉ có bình luận không tải đượ
 msgid "The dispatcher appears"
 msgstr "Người điều phối xuất hiện"
 
+msgid "The download didn't finish. Try again."
+msgstr "Quá trình tải xuống chưa hoàn tất. Hãy thử lại."
+
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Tệp tải về không được {vendor} ký, nên Paradev không cài đặt."
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "Tệp tải xuống có vẻ không đúng nên Paradev đã không cài đặt. Hãy thử lại."
+
 msgid "The endpoint must use https."
 msgstr "Endpoint phải dùng https."
 
@@ -20142,6 +20232,9 @@ msgstr "Con người đọc từng dòng trước khi merge."
 
 msgid "The image upload expired — attach it again"
 msgstr "Lượt tải lên hình ảnh đã hết hạn — hãy đính kèm lại"
+
+msgid "The install stopped responding."
+msgstr "Quá trình cài đặt đã ngừng phản hồi."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Mô tả công việc thay đổi. Kỹ sư thôi làm thợ gõ phím có gu và trở thành người điều phối có gu: chia nhỏ công việc, phân về các đội agent, phân xử xung đột giữa những agent cùng chạm vào một module."
@@ -20389,6 +20482,9 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "Chủ đề"
 
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Không đủ dung lượng ổ đĩa trống để cài đặt {name}. Hãy giải phóng bớt dung lượng rồi thử lại."
+
 msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 msgstr "Chúng được liên kết qua nhánh gốc, nên mỗi cái được merge vào cái bên dưới nó. Stack của GitHub merge tất cả trong một bước."
 
@@ -20581,6 +20677,9 @@ msgstr "Lời mời này đã được chấp nhận."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Liên kết mời này không hợp lệ hoặc đã hết hạn."
+
+msgid "This is taking longer than expected."
+msgstr "Việc này mất nhiều thời gian hơn dự kiến."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "Việc này lâu hơn bình thường. Sandbox có thể vẫn đang tải image. Nó tiếp tục chạy dù cửa sổ này có mở hay không."
@@ -22091,6 +22190,9 @@ msgstr "Đang chờ phê duyệt. Hãy giữ hộp thoại này mở."
 msgid "Waiting for Checks"
 msgstr "Đang chờ check"
 
+msgid "Waiting for GitHub…"
+msgstr "Đang chờ GitHub…"
+
 msgid "Waiting for it to connect…"
 msgstr "Đang chờ kết nối…"
 
@@ -22845,11 +22947,17 @@ msgstr "Bạn có thể khôi phục trong Cài đặt → Dự án trong 30 ng�
 msgid "You can see how we work before you talk to us."
 msgstr "Bạn có thể xem cách chúng tôi làm việc trước khi trò chuyện với chúng tôi."
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "Bạn vẫn có thể sao chép kho mã công khai. Kho mã riêng tư và pull request cần kết nối GitHub. Bạn có thể kết nối sau trong Cài đặt → Git & Worktree."
+
 msgid "You can view this page but not change it"
 msgstr "Bạn có thể xem trang này nhưng không thể thay đổi"
 
 msgid "You can view this page but not comment on it"
 msgstr "Bạn có thể xem trang này nhưng không thể bình luận"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Bạn chưa thể thêm dự án cho đến khi cài đặt Git. Các màn hình tiếp theo sẽ đề xuất lại."
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

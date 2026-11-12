@@ -1468,6 +1468,9 @@ msgstr "{user} yeniden katıldı."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} şu anda indirmeleri sınırlıyor. Bir dakika bekleyip yeniden deneyin."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} bekliyor"
 
@@ -3014,6 +3017,9 @@ msgstr "Görünüm"
 msgid "Apple logo"
 msgstr "Apple logosu"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple araçların yüklü olduğunu söylüyor ancak Paradev Git'i bulamıyor."
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Apple'ın yükleyicisi Git yüklenmeden kapandı."
 
@@ -4341,6 +4347,9 @@ msgstr "Ajanlar denetleniyor…"
 msgid "Checking environments…"
 msgstr "Ortamlar kontrol ediliyor…"
 
+msgid "Checking GitHub CLI…"
+msgstr "GitHub CLI kontrol ediliyor…"
+
 msgid "Checking host…"
 msgstr "Host denetleniyor…"
 
@@ -4352,6 +4361,9 @@ msgstr "Bir PR'ı checkout etmek proje gerektirir"
 
 msgid "Checking pull requests in {what}"
 msgstr "{what} içindeki pull request'ler kontrol ediliyor"
+
+msgid "Checking the download…"
+msgstr "İndirme doğrulanıyor…"
 
 msgid "Checking workspaces"
 msgstr "Çalışma alanları kontrol ediliyor"
@@ -4971,6 +4983,9 @@ msgstr "=> ve !== gibi dizileri birleştirir."
 msgid "Come build it with us."
 msgstr "Gelin birlikte geliştirelim."
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "Apple'ın Command Line Tools paketiyle gelir."
+
 msgid "Comes with you"
 msgstr "Sizinle gelir"
 
@@ -5371,6 +5386,9 @@ msgstr "Şuna bağlı"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "{connectedOrgName} kuruluşuna bağlı"
+
+msgid "Connected to GitHub"
+msgstr "GitHub'a bağlandı"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "GitHub'a {accountLogin} olarak bağlı"
@@ -6249,6 +6267,9 @@ msgstr "Yorum gönderilemedi"
 msgid "Couldn't post reply"
 msgstr "Yanıt gönderilemedi"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "{vendor} sunucusuna ulaşılamadı. İnternet bağlantınızı denetleyip yeniden deneyin."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
@@ -6338,6 +6359,9 @@ msgstr "Ajana gönderilemedi"
 
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Mesajınız gönderilemedi. Yazma alanına geri kondu."
+
+msgid "Couldn't set up {name} on this computer."
+msgstr "{name} bu bilgisayarda ayarlanamadı."
 
 msgid "Couldn't stage changes"
 msgstr "Değişiklikler hazırlanamadı"
@@ -7613,6 +7637,12 @@ msgstr "Mac için indir"
 msgid "Download for macOS"
 msgstr "macOS için indir"
 
+msgid "Download from Apple"
+msgstr "Apple'dan indir"
+
+msgid "Download from GitHub"
+msgstr "GitHub'dan indir"
+
 msgid "Download image"
 msgstr "Görseli indir"
 
@@ -7642,6 +7672,12 @@ msgstr "indirildi"
 
 msgid "Downloading"
 msgstr "İndiriliyor"
+
+msgid "Downloading {name}…"
+msgstr "{name} indiriliyor…"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "Apple'dan indirmek için Apple Kimliği gerekir. Yükleme yaklaşık 20 GB boş alan gerektirebilir."
 
 msgid "Downloading..."
 msgstr "İndiriliyor..."
@@ -9502,6 +9538,9 @@ msgstr "iPhone ve iPad uygulamasını edinin"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "GitHub'dan oturum açma kodu alınıyor…"
+
 msgid "Getting the computer ready"
 msgstr "Bilgisayar hazırlanıyor"
 
@@ -9535,6 +9574,9 @@ msgstr "Xcode lisansını kabul edene kadar Git çalışamaz. Terminal'de sudo x
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "Git bu Mac'te henüz yüklü değil. Apple'ın Command Line Tools paketini yükleyin, ardından tekrar deneyin."
 
+msgid "Git still isn't installed."
+msgstr "Git hâlâ yüklü değil."
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Buluttaki Git tarafından yok sayılan dosyalar, örneğin .env. Bunları dışarı kopyalayın"
 
@@ -9549,6 +9591,9 @@ msgstr "GitHub App başarıyla kuruldu!"
 
 msgid "GitHub cannot merge this stack in one step here."
 msgstr "GitHub bu yığını burada tek adımda birleştiremiyor."
+
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub bağlandı, ancak ilk eşitleme başlatılamadı. Lütfen yeniden bağlanmayı deneyin."
@@ -10498,12 +10543,18 @@ msgstr "MCP sunucularını tek bir yerden, merkezi OAuth ile tüm çalışma ala
 msgid "Install."
 msgstr "Kurun."
 
+msgid "Installed"
+msgstr "Yüklendi"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "Yüklü"
 
 msgid "Installed by your organization"
 msgstr "Kuruluşunuz tarafından yüklendi"
+
+msgid "Installed it another way? Click Check again."
+msgstr "Başka bir yolla mı kurdunuz? Yeniden denetle'ye tıklayın."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "{appAccountLogin} üzerinde kurulu"
@@ -10517,6 +10568,9 @@ msgstr "Kurulum yolu"
 
 msgid "Installing..."
 msgstr "Kuruluyor..."
+
+msgid "Installing…"
+msgstr "Kuruluyor…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "ssh ile erişebildiğin bir makineye Paradev'i kurar, Paradev'de hesabınla oturum açar ve Paradev'i bir hizmet olarak çalışır durumda tutar."
@@ -13421,8 +13475,8 @@ msgstr "Kanalda değil"
 msgid "Not included"
 msgstr "Dahil değil"
 
-msgid "Not installed"
-msgstr "Yüklü değil"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "Kurulu değil · özel depolar ve pull request'ler için gerekli"
 
 msgid "Not loaded"
 msgstr "Yüklenmedi"
@@ -13460,8 +13514,8 @@ msgstr "{hostName} üzerinde kurulu değil"
 msgid "Not set up on this host"
 msgstr "Bu host'ta kurulu değil"
 
-msgid "Not signed in"
-msgstr "Oturum açılmadı"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "Oturum açılmadı · özel depolar ve pull request'ler için gerekli"
 
 msgid "not sorted"
 msgstr "sıralanmamış"
@@ -14011,6 +14065,12 @@ msgstr "Klasörden aç"
 
 msgid "Open full screen"
 msgstr "Tam ekranda aç"
+
+msgid "Open GitHub"
+msgstr "GitHub'ı aç"
+
+msgid "Open GitHub and enter this code."
+msgstr "GitHub'ı açın ve bu kodu girin."
 
 msgid "Open host"
 msgstr "Host'u aç"
@@ -14626,6 +14686,9 @@ msgstr "Paradev uygulaması"
 msgid "Paradev Automations"
 msgstr "Paradev Otomasyonlar"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev {name} uygulamasını yalnızca Mac'te kurabilir. Kendiniz kurun, ardından Yeniden denetle'ye tıklayın."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14770,6 +14833,9 @@ msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. K
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
 
+msgid "Paradev still can't find {name}."
+msgstr "Paradev hâlâ {name} bulamıyor."
+
 msgid "Paradev Teams"
 msgstr "Paradev Takımlar"
 
@@ -14780,8 +14846,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev sistem RAM'inin {0} kadarını kullanıyor"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev, depoları klonlamak ve pull request açmak için GitHub CLI'yi kullanır. Bunu daha sonra da yapabilirsin."
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev, depoları klonlamak ve pull request açmak için Git ve GitHub CLI kullanır. Bunu daha sonra da yapabilirsiniz."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev ve alternatifleri"
@@ -18106,6 +18172,9 @@ msgstr "SSH ile host kur"
 msgid "Set up an automation"
 msgstr "Bir otomasyon kur"
 
+msgid "Set up Git and GitHub"
+msgstr "Git ve GitHub'ı kurun"
+
 msgid "Set up once"
 msgstr "Bir kez kurun"
 
@@ -18569,6 +18638,9 @@ msgstr "Google ile kaydol"
 msgid "Sign-in didn't finish"
 msgstr "Giriş tamamlanmadı"
 
+msgid "Sign-in didn't finish."
+msgstr "Oturum açma tamamlanmadı."
+
 msgid "Sign-in expired"
 msgstr "Oturum süresi doldu"
 
@@ -18586,6 +18658,9 @@ msgstr "Kayıt tamamlama"
 
 msgid "Sign-up steps"
 msgstr "Kayıt adımları"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "Oturum açıldı · özel depoları klonlar ve pull request açar"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"
@@ -18688,6 +18763,12 @@ msgstr "Tümünü atla"
 
 msgid "Skip for now"
 msgstr "Şimdilik atla"
+
+msgid "Skip Git for now?"
+msgstr "Git şimdilik atlansın mı?"
+
+msgid "Skip GitHub for now?"
+msgstr "GitHub şimdilik atlansın mı?"
 
 msgid "Skipped"
 msgstr "Atlandı"
@@ -20055,6 +20136,15 @@ msgstr "Fark hâlâ güncel. Yalnızca yorumlar yüklenemedi."
 msgid "The dispatcher appears"
 msgstr "Dağıtıcı ortaya çıkar"
 
+msgid "The download didn't finish. Try again."
+msgstr "İndirme tamamlanmadı. Yeniden deneyin."
+
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "İndirilen dosya {vendor} tarafından imzalanmamış, bu yüzden Paradev onu kurmadı."
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "İndirilen dosya hatalı göründüğü için Paradev onu yüklemedi. Yeniden deneyin."
+
 msgid "The endpoint must use https."
 msgstr "Uç nokta https kullanmalıdır."
 
@@ -20142,6 +20232,9 @@ msgstr "İnsan, birleştirilmeden önce her satırı okur."
 
 msgid "The image upload expired — attach it again"
 msgstr "Görsel yüklemesinin süresi doldu — yeniden ekleyin"
+
+msgid "The install stopped responding."
+msgstr "Yükleme yanıt vermiyor."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "İş tanımı değişir. Mühendisler zevk sahibi daktilocular olmayı bırakıp zevk sahibi dağıtıcılar olur: işi parçalara ayırır, filolara yönlendirir ve aynı modüle dokunan iki ajan arasındaki çakışmalara hakemlik eder."
@@ -20389,6 +20482,9 @@ msgstr "Tema önizleme kartı"
 msgid "Themes"
 msgstr "Temalar"
 
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "{name} kurmak için yeterli boş disk alanı yok. Biraz yer açıp yeniden deneyin."
+
 msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 msgstr "Bunlar temel dal üzerinden bağlı, bu yüzden her biri altındakine birleştirilir. Bir GitHub stack'i hepsini tek adımda birleştirir."
 
@@ -20581,6 +20677,9 @@ msgstr "Bu davet zaten kabul edilmiş."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Bu davet bağlantısı geçersiz veya süresi dolmuş."
+
+msgid "This is taking longer than expected."
+msgstr "Bu, beklenenden uzun sürüyor."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "Bu normalden uzun sürüyor. Sandbox hâlâ imajını çekiyor olabilir. Bu pencere açık olsa da olmasa da devam eder."
@@ -22091,6 +22190,9 @@ msgstr "Onay bekleniyor. Bu pencereyi açık tutun."
 msgid "Waiting for Checks"
 msgstr "Kontroller bekleniyor"
 
+msgid "Waiting for GitHub…"
+msgstr "GitHub bekleniyor…"
+
 msgid "Waiting for it to connect…"
 msgstr "Bağlanması bekleniyor…"
 
@@ -22845,11 +22947,17 @@ msgstr "30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin
 msgid "You can see how we work before you talk to us."
 msgstr "Bizimle konuşmadan önce nasıl çalıştığımızı görebilirsiniz."
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "Herkese açık depoları yine de klonlayabilirsiniz. Özel depolar ve pull request'ler için GitHub bağlantısı gerekir. Daha sonra Ayarlar → Git ve worktree'ler bölümünden bağlayabilirsiniz."
+
 msgid "You can view this page but not change it"
 msgstr "Bu sayfayı görüntüleyebilirsiniz ancak değiştiremezsiniz"
 
 msgid "You can view this page but not comment on it"
 msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Git yüklenene kadar proje ekleyemezsiniz. Sonraki ekranlar bunu yeniden sunacak."
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

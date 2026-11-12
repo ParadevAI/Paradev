@@ -1468,6 +1468,9 @@ msgstr "{user} bergabung kembali."
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
+
 msgid "{waiting} Waiting"
 msgstr "{waiting} Menunggu"
 
@@ -3014,6 +3017,9 @@ msgstr "Tampilan"
 msgid "Apple logo"
 msgstr "Logo Apple"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple menyatakan alat sudah terpasang, tetapi Paradev tidak dapat menemukan Git."
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Penginstal Apple tertutup sebelum Git terpasang."
 
@@ -4341,6 +4347,9 @@ msgstr "Memeriksa agen…"
 msgid "Checking environments…"
 msgstr "Memeriksa environment…"
 
+msgid "Checking GitHub CLI…"
+msgstr "Memeriksa GitHub CLI…"
+
 msgid "Checking host…"
 msgstr "Memeriksa host…"
 
@@ -4352,6 +4361,9 @@ msgstr "Checkout PR memerlukan sebuah proyek"
 
 msgid "Checking pull requests in {what}"
 msgstr "Memeriksa pull request di {what}"
+
+msgid "Checking the download…"
+msgstr "Memeriksa unduhan…"
 
 msgid "Checking workspaces"
 msgstr "Memeriksa workspace"
@@ -4971,6 +4983,9 @@ msgstr "Gabungkan urutan seperti => dan !==."
 msgid "Come build it with us."
 msgstr "Mari bangun bersama kami."
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "Disertakan dalam Command Line Tools dari Apple."
+
 msgid "Comes with you"
 msgstr "Ikut pindah"
 
@@ -5371,6 +5386,9 @@ msgstr "Terhubung ke"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "Terhubung ke {connectedOrgName}"
+
+msgid "Connected to GitHub"
+msgstr "Terhubung ke GitHub"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Terhubung ke GitHub sebagai {accountLogin}"
@@ -6249,6 +6267,9 @@ msgstr "Tidak dapat memposting komentar"
 msgid "Couldn't post reply"
 msgstr "Tidak bisa mengirim balasan"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "Tidak dapat menjangkau {vendor}. Periksa koneksi internet Anda, lalu coba lagi."
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
@@ -6338,6 +6359,9 @@ msgstr "Tidak bisa mengirim ke agen"
 
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "Pesan Anda tidak dapat dikirim. Pesan sudah kembali di kolom penulisan."
+
+msgid "Couldn't set up {name} on this computer."
+msgstr "Tidak dapat mengatur {name} di komputer ini."
 
 msgid "Couldn't stage changes"
 msgstr "Tidak bisa men-stage perubahan"
@@ -7613,6 +7637,12 @@ msgstr "Unduh untuk Mac"
 msgid "Download for macOS"
 msgstr "Unduh untuk macOS"
 
+msgid "Download from Apple"
+msgstr "Unduh dari Apple"
+
+msgid "Download from GitHub"
+msgstr "Unduh dari GitHub"
+
 msgid "Download image"
 msgstr "Unduh gambar"
 
@@ -7642,6 +7672,12 @@ msgstr "terunduh"
 
 msgid "Downloading"
 msgstr "Mengunduh"
+
+msgid "Downloading {name}…"
+msgstr "Mengunduh {name}…"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "Mengunduh dari Apple memerlukan Apple ID. Pemasangan dapat memerlukan sekitar 20 GB ruang kosong."
 
 msgid "Downloading..."
 msgstr "Mengunduh..."
@@ -9502,6 +9538,9 @@ msgstr "Dapatkan aplikasi iPhone dan iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "Mendapatkan kode masuk dari GitHub…"
+
 msgid "Getting the computer ready"
 msgstr "Menyiapkan komputer"
 
@@ -9535,6 +9574,9 @@ msgstr "Git tidak dapat berjalan sampai Anda menerima lisensi Xcode. Jalankan su
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "Git belum terpasang di Mac ini. Pasang Command Line Tools dari Apple, lalu coba lagi."
 
+msgid "Git still isn't installed."
+msgstr "Git masih belum terpasang."
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "File yang diabaikan Git di Cloud, seperti .env. Salin keluar"
 
@@ -9549,6 +9591,9 @@ msgstr "GitHub App berhasil dipasang!"
 
 msgid "GitHub cannot merge this stack in one step here."
 msgstr "GitHub tidak bisa me-merge stack ini dalam satu langkah di sini."
+
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub terhubung, tapi sinkronisasi awal gagal dimulai. Silakan coba hubungkan ulang."
@@ -10498,12 +10543,18 @@ msgstr "Pasang, otorisasi, dan atur cakupan server MCP di semua workspace Anda d
 msgid "Install."
 msgstr "Instal."
 
+msgid "Installed"
+msgstr "Terpasang"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "Terpasang"
 
 msgid "Installed by your organization"
 msgstr "Dipasang oleh organisasi Anda"
+
+msgid "Installed it another way? Click Check again."
+msgstr "Sudah memasangnya dengan cara lain? Klik Periksa lagi."
 
 msgid "Installed on {appAccountLogin}"
 msgstr "Terpasang di {appAccountLogin}"
@@ -10517,6 +10568,9 @@ msgstr "Diinstal melalui"
 
 msgid "Installing..."
 msgstr "Memasang..."
+
+msgid "Installing…"
+msgstr "Memasang…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "Memasang Paradev di mesin yang bisa Anda jangkau dengan ssh, menghubungkan Paradev ke akun Anda, dan menjaga Paradev tetap berjalan sebagai layanan."
@@ -13421,8 +13475,8 @@ msgstr "Tidak di kanal"
 msgid "Not included"
 msgstr "Tidak termasuk"
 
-msgid "Not installed"
-msgstr "Belum terpasang"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "Belum terpasang · diperlukan untuk repositori pribadi dan pull request"
 
 msgid "Not loaded"
 msgstr "Belum dimuat"
@@ -13460,8 +13514,8 @@ msgstr "Belum disiapkan di {hostName}"
 msgid "Not set up on this host"
 msgstr "Belum disiapkan di host ini"
 
-msgid "Not signed in"
-msgstr "Belum masuk"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "Belum masuk · diperlukan untuk repositori pribadi dan pull request"
 
 msgid "not sorted"
 msgstr "tidak diurutkan"
@@ -14011,6 +14065,12 @@ msgstr "Buka dari folder"
 
 msgid "Open full screen"
 msgstr "Buka layar penuh"
+
+msgid "Open GitHub"
+msgstr "Buka GitHub"
+
+msgid "Open GitHub and enter this code."
+msgstr "Buka GitHub lalu masukkan kode ini."
 
 msgid "Open host"
 msgstr "Buka host"
@@ -14626,6 +14686,9 @@ msgstr "Aplikasi Paradev"
 msgid "Paradev Automations"
 msgstr "Otomatisasi Paradev"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev hanya bisa memasang {name} di Mac. Pasang sendiri, lalu klik Periksa lagi."
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14770,6 +14833,9 @@ msgstr "Paradev berjalan lokal di mesin developer Anda. Kami tidak menyimpan kod
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev bermula sebagai proyek hackathon pada November 2025. Waktu itu sekadar aplikasi desktop untuk mengelola worktree."
 
+msgid "Paradev still can't find {name}."
+msgstr "Paradev masih tidak dapat menemukan {name}."
+
 msgid "Paradev Teams"
 msgstr "Tim Paradev"
 
@@ -14780,8 +14846,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev memakai {0} dari RAM sistem"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev menggunakan GitHub CLI untuk mengklon repositori dan membuka pull request. Anda juga bisa melakukannya nanti."
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev menggunakan Git dan GitHub CLI untuk mengkloning repo dan membuka pull request. Anda juga dapat melakukannya nanti."
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev vs Alternatifnya"
@@ -18106,6 +18172,9 @@ msgstr "Siapkan host lewat SSH"
 msgid "Set up an automation"
 msgstr "Siapkan otomatisasi"
 
+msgid "Set up Git and GitHub"
+msgstr "Siapkan Git dan GitHub"
+
 msgid "Set up once"
 msgstr "Atur sekali"
 
@@ -18569,6 +18638,9 @@ msgstr "Daftar dengan Google"
 msgid "Sign-in didn't finish"
 msgstr "Proses masuk tidak selesai"
 
+msgid "Sign-in didn't finish."
+msgstr "Proses masuk tidak selesai."
+
 msgid "Sign-in expired"
 msgstr "Sesi masuk kedaluwarsa"
 
@@ -18586,6 +18658,9 @@ msgstr "Penyelesaian pendaftaran"
 
 msgid "Sign-up steps"
 msgstr "Langkah pendaftaran"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "Sudah masuk · mengklon repositori pribadi dan membuka pull request"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Masuk sebagai <0>{userName}</0>"
@@ -18688,6 +18763,12 @@ msgstr "Lewati Semua"
 
 msgid "Skip for now"
 msgstr "Lewati dulu"
+
+msgid "Skip Git for now?"
+msgstr "Lewati Git untuk sekarang?"
+
+msgid "Skip GitHub for now?"
+msgstr "Lewati GitHub untuk sekarang?"
 
 msgid "Skipped"
 msgstr "Dilewati"
@@ -20055,6 +20136,15 @@ msgstr "Diff-nya tetap terbaru. Hanya komentarnya yang gagal dimuat."
 msgid "The dispatcher appears"
 msgstr "Munculnya sang pengatur"
 
+msgid "The download didn't finish. Try again."
+msgstr "Unduhan tidak selesai. Coba lagi."
+
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "Unduhan tidak ditandatangani oleh {vendor}, jadi Paradev tidak memasangnya."
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "Unduhan tampak tidak benar, jadi Paradev tidak memasangnya. Coba lagi."
+
 msgid "The endpoint must use https."
 msgstr "Endpoint harus menggunakan https."
 
@@ -20142,6 +20232,9 @@ msgstr "Manusia membaca tiap baris sebelum di-merge."
 
 msgid "The image upload expired — attach it again"
 msgstr "Unggahan gambar kedaluwarsa — lampirkan lagi"
+
+msgid "The install stopped responding."
+msgstr "Pemasangan berhenti merespons."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Deskripsi pekerjaannya bergeser. Engineer berhenti menjadi juru ketik berselera dan menjadi pengatur lalu lintas berselera: memecah pekerjaan, mengarahkannya ke armada agen, menengahi konflik antara agen yang sama-sama menyentuh modul yang sama."
@@ -20389,6 +20482,9 @@ msgstr "Theme Preview Card"
 msgid "Themes"
 msgstr "Tema"
 
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "Ruang disk tidak cukup untuk memasang {name}. Kosongkan sebagian ruang, lalu coba lagi."
+
 msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 msgstr "Ini terhubung melalui branch dasar, jadi masing-masing di-merge ke yang di bawahnya. Stack GitHub me-merge semuanya dalam satu langkah."
 
@@ -20581,6 +20677,9 @@ msgstr "Undangan ini sudah diterima."
 
 msgid "This invitation link is invalid or has expired."
 msgstr "Tautan undangan ini tidak valid atau sudah kedaluwarsa."
+
+msgid "This is taking longer than expected."
+msgstr "Ini memakan waktu lebih lama dari yang diperkirakan."
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "Ini lebih lama dari biasanya. Sandbox-nya mungkin masih menarik image-nya. Prosesnya tetap jalan baik jendela ini terbuka atau tidak."
@@ -22091,6 +22190,9 @@ msgstr "Menunggu persetujuan. Biarkan dialog ini tetap terbuka."
 msgid "Waiting for Checks"
 msgstr "Menunggu Check"
 
+msgid "Waiting for GitHub…"
+msgstr "Menunggu GitHub…"
+
 msgid "Waiting for it to connect…"
 msgstr "Menunggu terhubung…"
 
@@ -22845,11 +22947,17 @@ msgstr "Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari. Fold
 msgid "You can see how we work before you talk to us."
 msgstr "Anda bisa melihat cara kami bekerja sebelum berbicara dengan kami."
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "Anda tetap bisa mengklon repositori publik. Repositori pribadi dan pull request memerlukan GitHub yang terhubung. Anda bisa menghubungkannya nanti di Pengaturan → Git & Worktree."
+
 msgid "You can view this page but not change it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat mengubahnya"
 
 msgid "You can view this page but not comment on it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "Anda tidak dapat menambahkan proyek sampai Git terpasang. Layar berikutnya akan menawarkannya lagi."
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

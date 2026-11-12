@@ -5,6 +5,7 @@ import {
 	mkdirSync,
 	readFileSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -24,8 +25,10 @@ const TEST_ROOT = path.join(
 const TEST_BIN_DIR = path.join(TEST_ROOT, "bin");
 const TEST_ZSH_DIR = path.join(TEST_ROOT, "zsh");
 const TEST_BASH_DIR = path.join(TEST_ROOT, "bash");
+const TEST_TOOLS_BIN_DIR = path.join(TEST_ROOT, "tools", "bin");
 const TEST_PATHS: ShellWrapperPaths = {
 	BIN_DIR: TEST_BIN_DIR,
+	TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 	ZSH_DIR: TEST_ZSH_DIR,
 	BASH_DIR: TEST_BASH_DIR,
 };
@@ -190,6 +193,7 @@ fi
 
 		createZshWrapper({
 			BIN_DIR: integrationBinDir,
+			TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			ZSH_DIR: integrationZshDir,
 			BASH_DIR: integrationBashDir,
 		});
@@ -331,6 +335,7 @@ echo system
 
 		const fallbackPaths: ShellWrapperPaths = {
 			BIN_DIR: missingBinDir,
+			TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			ZSH_DIR: TEST_ZSH_DIR,
 			BASH_DIR: TEST_BASH_DIR,
 		};
@@ -346,6 +351,48 @@ echo system
 			},
 		}).trim();
 		expect(output).toBe("system");
+	});
+
+	it("puts the app's tools after the user's PATH, so a user's gh wins", () => {
+		const root = path.join(TEST_ROOT, "tools-dir-last");
+		const userBin = path.join(root, "user-bin");
+		const paths: ShellWrapperPaths = {
+			BIN_DIR: path.join(root, "bin"),
+			TOOLS_BIN_DIR: path.join(root, "tools", "bin"),
+			ZSH_DIR: TEST_ZSH_DIR,
+			BASH_DIR: TEST_BASH_DIR,
+		};
+		for (const [dir, name] of [
+			[userBin, "user"],
+			[paths.TOOLS_BIN_DIR, "app"],
+		] as const) {
+			mkdirSync(dir, { recursive: true });
+			writeFileSync(path.join(dir, "gh"), `#!/bin/sh\necho ${name}\n`);
+			chmodSync(path.join(dir, "gh"), 0o755);
+		}
+		// The system dirs a runner ships can hold a real gh (GitHub's runners
+		// have /usr/bin/gh), so the PATH under test holds only the shells.
+		const systemBin = path.join(root, "system-bin");
+		mkdirSync(systemBin, { recursive: true });
+		const bash = execFileSync("/bin/sh", ["-c", "command -v bash"], {
+			encoding: "utf-8",
+		}).trim();
+		for (const [name, target] of [
+			["bash", bash],
+			["sh", "/bin/sh"],
+		] as const) {
+			rmSync(path.join(systemBin, name), { force: true });
+			symlinkSync(target, path.join(systemBin, name));
+		}
+		createBashWrapper(paths);
+		const run = (pathValue: string) =>
+			execFileSync(bash, getCommandShellArgs("/bin/bash", "gh", paths), {
+				encoding: "utf-8",
+				env: { ...process.env, HOME: root, PATH: pathValue },
+			}).trim();
+
+		expect(run(`${userBin}:${systemBin}`)).toBe("user");
+		expect(run(systemBin)).toBe("app");
 	});
 
 	it("falls back to system binaries when wrapper exists but is not executable", () => {
@@ -378,6 +425,7 @@ echo wrapper
 
 		const fallbackPaths: ShellWrapperPaths = {
 			BIN_DIR: wrapperBinDir,
+			TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			ZSH_DIR: TEST_ZSH_DIR,
 			BASH_DIR: TEST_BASH_DIR,
 		};
@@ -454,6 +502,7 @@ precmd_functions+=(_mise_hook_precmd)
 
 		createZshWrapper({
 			BIN_DIR: integrationBinDir,
+			TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			ZSH_DIR: integrationZshDir,
 			BASH_DIR: integrationBashDir,
 		});
@@ -509,6 +558,7 @@ precmd_functions+=(_mise_hook_precmd)
 
 		createZshWrapper({
 			BIN_DIR: integrationBinDir,
+			TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			ZSH_DIR: integrationZshDir,
 			BASH_DIR: integrationBashDir,
 		});
@@ -551,6 +601,7 @@ typeset -gr -a precmd_functions
 
 		createZshWrapper({
 			BIN_DIR: integrationBinDir,
+			TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			ZSH_DIR: integrationZshDir,
 			BASH_DIR: integrationBashDir,
 		});
@@ -574,6 +625,7 @@ typeset -gr -a precmd_functions
 		const systemBinDir = path.join(integrationRoot, "system-bin");
 		const specialPaths: ShellWrapperPaths = {
 			BIN_DIR: path.join(integrationRoot, "bin"),
+			TOOLS_BIN_DIR: path.join(integrationRoot, "tools", "bin"),
 			ZSH_DIR: path.join(integrationRoot, "zsh"),
 			BASH_DIR: path.join(integrationRoot, "bash"),
 		};
@@ -744,6 +796,7 @@ export SUPERSET_WORKSPACE_PATH="/wrong/path"
 
 			createZshWrapper({
 				BIN_DIR: integrationBinDir,
+				TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 				ZSH_DIR: integrationZshDir,
 				BASH_DIR: integrationBashDir,
 			});
@@ -791,6 +844,7 @@ export SUPERSET_WORKSPACE_PATH="/wrong/path"
 
 			createZshWrapper({
 				BIN_DIR: integrationBinDir,
+				TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 				ZSH_DIR: integrationZshDir,
 				BASH_DIR: integrationBashDir,
 			});
@@ -850,6 +904,7 @@ export SUPERSET_WORKSPACE_PATH="/wrong/path"
 			const args = getShellArgs("/opt/homebrew/bin/fish", {
 				...TEST_PATHS,
 				BIN_DIR: fishPath,
+				TOOLS_BIN_DIR: TEST_TOOLS_BIN_DIR,
 			});
 
 			expect(args[0]).toBe("-l");

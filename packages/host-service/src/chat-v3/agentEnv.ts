@@ -1,5 +1,8 @@
-import { delimiter } from "node:path";
-import { getBinDir } from "@superset/agent-setup";
+import {
+	getBinDir,
+	getToolsBinDir,
+	withPathDirs,
+} from "@superset/agent-setup/paths";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { workspaces } from "../db/schema";
@@ -29,16 +32,9 @@ function workspacePaths(
 	};
 }
 
-function withSupersetBinFirst(
-	env: Record<string, string>,
-): Record<string, string> {
-	const binDir = getBinDir();
-	const key =
-		Object.keys(env).find((name) => name.toUpperCase() === "PATH") ?? "PATH";
-	const entries = (env[key] ?? "")
-		.split(delimiter)
-		.filter((entry) => entry && entry !== binDir);
-	return { ...env, [key]: [binDir, ...entries].join(delimiter) };
+/** Paradev's wrappers first; tools the app installed last, so the user's own win. */
+function withAppPathDirs(env: Record<string, string>): Record<string, string> {
+	return withPathDirs(env, { first: [getBinDir()], last: [getToolsBinDir()] });
 }
 
 function withoutAmbientKeys(
@@ -103,7 +99,7 @@ export async function buildChatAgentEnv(options: {
 		options.agentConfigId,
 		options.presetId,
 	);
-	return withSupersetBinFirst({
+	return withAppPathDirs({
 		...withoutReplacedKeys(
 			withoutAmbientKeys({
 				...buildHostLaunchEnv({

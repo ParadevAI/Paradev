@@ -25,6 +25,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { GitHubCliRow } from "../GitHubCliRow";
 import { UserWorktreeLocationSection } from "./components/UserWorktreeLocationSection";
 
 interface GitSettingsProps {
@@ -36,6 +37,10 @@ export function GitSettings({ visibleItems }: GitSettingsProps) {
 	const searchQuery = useSettingsSearchQuery();
 	const showDeleteLocalBranch = isItemVisible(
 		SETTING_ITEM_ID.GIT_DELETE_LOCAL_BRANCH,
+		visibleItems,
+	);
+	const showGitHubCli = isItemVisible(
+		SETTING_ITEM_ID.GIT_GITHUB_CLI,
 		visibleItems,
 	);
 	const showBranchPrefix = isItemVisible(
@@ -138,6 +143,7 @@ export function GitSettings({ visibleItems }: GitSettingsProps) {
 			</div>
 
 			<div className="space-y-6">
+				{showGitHubCli && <GitHubCliRow />}
 				{showDeleteLocalBranch && (
 					<div className="flex items-center justify-between">
 						<div className="space-y-0.5">

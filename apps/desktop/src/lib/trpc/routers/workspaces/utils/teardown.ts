@@ -47,6 +47,7 @@ export async function runTeardown({
 		const appHomeDir = resolveAppHomeDir();
 		const shellWrapperPaths = {
 			BIN_DIR: join(appHomeDir, "bin"),
+			TOOLS_BIN_DIR: join(appHomeDir, "tools", "bin"),
 			ZSH_DIR: join(appHomeDir, "zsh"),
 			BASH_DIR: join(appHomeDir, "bash"),
 		};

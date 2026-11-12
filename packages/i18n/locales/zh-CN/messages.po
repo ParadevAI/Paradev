@@ -1468,6 +1468,9 @@ msgstr "{user} 已重新加入。"
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
+msgid "{vendor} is limiting downloads right now. Wait a minute and try again."
+msgstr "{vendor} 当前正在限制下载。请稍等片刻后重试。"
+
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
 
@@ -3014,6 +3017,9 @@ msgstr "外观"
 msgid "Apple logo"
 msgstr "Apple 标志"
 
+msgid "Apple says the tools are installed, but Paradev can't find Git."
+msgstr "Apple 显示工具已安装，但 Paradev 找不到 Git。"
+
 msgid "Apple's installer closed before Git was installed."
 msgstr "Git 安装完成前，Apple 安装器已关闭。"
 
@@ -4341,6 +4347,9 @@ msgstr "正在检查智能体…"
 msgid "Checking environments…"
 msgstr "正在检查环境…"
 
+msgid "Checking GitHub CLI…"
+msgstr "正在检查 GitHub CLI…"
+
 msgid "Checking host…"
 msgstr "正在检查主机…"
 
@@ -4352,6 +4361,9 @@ msgstr "检出PR需要一个项目"
 
 msgid "Checking pull requests in {what}"
 msgstr "正在检查 {what} 的拉取请求"
+
+msgid "Checking the download…"
+msgstr "正在校验下载…"
 
 msgid "Checking workspaces"
 msgstr "正在检查工作区"
@@ -4971,6 +4983,9 @@ msgstr "合并显示=>和!==等序列。"
 msgid "Come build it with us."
 msgstr "来和我们一起构建吧。"
 
+msgid "Comes with Apple's Command Line Tools."
+msgstr "随 Apple 的 Command Line Tools 一起提供。"
+
 msgid "Comes with you"
 msgstr "可以带走"
 
@@ -5371,6 +5386,9 @@ msgstr "已连接到"
 
 msgid "Connected to {connectedOrgName}"
 msgstr "已连接到{connectedOrgName}"
+
+msgid "Connected to GitHub"
+msgstr "已连接到 GitHub"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "已以 {accountLogin} 身份连接 GitHub"
@@ -6249,6 +6267,9 @@ msgstr "无法发布评论"
 msgid "Couldn't post reply"
 msgstr "无法发布回复"
 
+msgid "Couldn't reach {vendor}. Check your internet connection and try again."
+msgstr "无法连接到 {vendor}。请检查网络连接后重试。"
+
 #. placeholder {0}: first.url
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
@@ -6338,6 +6359,9 @@ msgstr "无法发送给智能体"
 
 msgid "Couldn't send your message. It's back in the composer."
 msgstr "无法发送你的消息。消息已放回输入框。"
+
+msgid "Couldn't set up {name} on this computer."
+msgstr "无法在这台电脑上设置 {name}。"
 
 msgid "Couldn't stage changes"
 msgstr "无法暂存更改"
@@ -7613,6 +7637,12 @@ msgstr "下载Mac版"
 msgid "Download for macOS"
 msgstr "下载macOS版"
 
+msgid "Download from Apple"
+msgstr "从 Apple 下载"
+
+msgid "Download from GitHub"
+msgstr "从 GitHub 下载"
+
 msgid "Download image"
 msgstr "下载图片"
 
@@ -7642,6 +7672,12 @@ msgstr "已下载"
 
 msgid "Downloading"
 msgstr "下载中"
+
+msgid "Downloading {name}…"
+msgstr "正在下载 {name}…"
+
+msgid "Downloading from Apple needs an Apple ID. The install can need about 20 GB of free space."
+msgstr "从 Apple 下载需要 Apple ID。安装可能需要约 20 GB 可用空间。"
 
 msgid "Downloading..."
 msgstr "正在下载..."
@@ -9502,6 +9538,9 @@ msgstr "获取 iPhone 和 iPad 应用"
 msgid "Gets an invite to join {organizationName}"
 msgstr "将收到加入 {organizationName} 的邀请"
 
+msgid "Getting a sign-in code from GitHub…"
+msgstr "正在从 GitHub 获取登录代码…"
+
 msgid "Getting the computer ready"
 msgstr "正在准备计算机"
 
@@ -9535,6 +9574,9 @@ msgstr "接受 Xcode 许可协议后才能运行 Git。请在终端中运行 sud
 msgid "Git isn't installed on this Mac yet. Install Apple's Command Line Tools, then try again."
 msgstr "此 Mac 尚未安装 Git。请安装 Apple 的 Command Line Tools，然后重试。"
 
+msgid "Git still isn't installed."
+msgstr "Git 仍未安装。"
+
 msgid "Git-ignored files in Cloud, like .env. Copy them out"
 msgstr "Cloud 中被 Git 忽略的文件，例如 .env。请把它们复制出来"
 
@@ -9549,6 +9591,9 @@ msgstr "GitHub App安装成功！"
 
 msgid "GitHub cannot merge this stack in one step here."
 msgstr "GitHub 无法在这里一步合并此堆栈。"
+
+msgid "GitHub CLI"
+msgstr "GitHub CLI"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub已连接，但初始同步未能启动。请尝试重新连接。"
@@ -10498,12 +10543,18 @@ msgstr "在一处为所有工作区安装、授权并划定MCP服务器的权限
 msgid "Install."
 msgstr "安装。"
 
+msgid "Installed"
+msgstr "已安装"
+
 msgctxt "plugin access"
 msgid "Installed"
 msgstr "已安装"
 
 msgid "Installed by your organization"
 msgstr "由你的组织安装"
+
+msgid "Installed it another way? Click Check again."
+msgstr "已通过其他方式安装？请点击重新检查。"
 
 msgid "Installed on {appAccountLogin}"
 msgstr "已安装在 {appAccountLogin}"
@@ -10517,6 +10568,9 @@ msgstr "安装方式"
 
 msgid "Installing..."
 msgstr "正在安装..."
+
+msgid "Installing…"
+msgstr "正在安装…"
 
 msgid "Installs Paradev on a machine you can reach with ssh, signs Paradev in to your account, and keeps it running as a service."
 msgstr "在可通过 ssh 访问的机器上安装 Paradev，将 Paradev 登录到你的账户，并让它作为服务持续运行。"
@@ -13421,8 +13475,8 @@ msgstr "不在频道中"
 msgid "Not included"
 msgstr "不包含"
 
-msgid "Not installed"
-msgstr "未安装"
+msgid "Not installed · needed for private repos and pull requests"
+msgstr "未安装 · 私有仓库和拉取请求需要它"
 
 msgid "Not loaded"
 msgstr "未加载"
@@ -13460,8 +13514,8 @@ msgstr "尚未在{hostName}上设置"
 msgid "Not set up on this host"
 msgstr "尚未在此主机上配置"
 
-msgid "Not signed in"
-msgstr "未登录"
+msgid "Not signed in · needed for private repos and pull requests"
+msgstr "未登录 · 私有仓库和拉取请求需要它"
 
 msgid "not sorted"
 msgstr "未排序"
@@ -14011,6 +14065,12 @@ msgstr "从文件夹打开"
 
 msgid "Open full screen"
 msgstr "全屏打开"
+
+msgid "Open GitHub"
+msgstr "打开 GitHub"
+
+msgid "Open GitHub and enter this code."
+msgstr "打开 GitHub 并输入此代码。"
 
 msgid "Open host"
 msgstr "打开主机"
@@ -14626,6 +14686,9 @@ msgstr "Paradev应用"
 msgid "Paradev Automations"
 msgstr "Paradev 自动化"
 
+msgid "Paradev can install {name} on a Mac only. Install it yourself, then click Check again."
+msgstr "Paradev 只能在 Mac 上安装 {name}。请自行安装，然后点击重新检查。"
+
 msgid "Paradev CLI"
 msgstr "Paradev CLI"
 
@@ -14770,6 +14833,9 @@ msgstr "Paradev在你的开发者机器上本地运行。我们不存储你的�
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev起初是2025年11月的一个黑客松项目，一个用来管理worktree的简单桌面应用。"
 
+msgid "Paradev still can't find {name}."
+msgstr "Paradev 仍然找不到 {name}。"
+
 msgid "Paradev Teams"
 msgstr "Paradev 团队"
 
@@ -14780,8 +14846,8 @@ msgstr "Paradev UI"
 msgid "Paradev uses {0} of system RAM"
 msgstr "Paradev占用了系统RAM的{0}"
 
-msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
-msgstr "Paradev 使用 GitHub CLI 克隆仓库并创建拉取请求。你也可以稍后再设置。"
+msgid "Paradev uses Git and the GitHub CLI to clone repos and open pull requests. You can also do this later."
+msgstr "Paradev 使用 Git 和 GitHub CLI 克隆仓库并创建拉取请求。你也可以稍后再做。"
 
 msgid "Paradev vs the Alternatives"
 msgstr "Paradev与同类方案对比"
@@ -18106,6 +18172,9 @@ msgstr "通过 SSH 设置主机"
 msgid "Set up an automation"
 msgstr "设置自动化"
 
+msgid "Set up Git and GitHub"
+msgstr "设置 Git 和 GitHub"
+
 msgid "Set up once"
 msgstr "只需设置一次"
 
@@ -18569,6 +18638,9 @@ msgstr "使用Google注册"
 msgid "Sign-in didn't finish"
 msgstr "登录未完成"
 
+msgid "Sign-in didn't finish."
+msgstr "登录未完成。"
+
 msgid "Sign-in expired"
 msgstr "登录已过期"
 
@@ -18586,6 +18658,9 @@ msgstr "注册完成率"
 
 msgid "Sign-up steps"
 msgstr "注册步骤"
+
+msgid "Signed in · clones private repos and opens pull requests"
+msgstr "已登录 · 用于克隆私有仓库和创建拉取请求"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登录为<0>{userName}</0>"
@@ -18688,6 +18763,12 @@ msgstr "全部跳过"
 
 msgid "Skip for now"
 msgstr "暂时跳过"
+
+msgid "Skip Git for now?"
+msgstr "暂时跳过 Git？"
+
+msgid "Skip GitHub for now?"
+msgstr "暂时跳过 GitHub？"
 
 msgid "Skipped"
 msgstr "已跳过"
@@ -20055,6 +20136,15 @@ msgstr "差异仍是最新的，只是评论没能加载。"
 msgid "The dispatcher appears"
 msgstr "调度员出现"
 
+msgid "The download didn't finish. Try again."
+msgstr "下载未完成。请重试。"
+
+msgid "The download isn't signed by {vendor}, so Paradev didn't install it."
+msgstr "下载内容未经 {vendor} 签名，因此 Paradev 没有安装。"
+
+msgid "The download looked wrong, so Paradev didn't install it. Try again."
+msgstr "下载内容看起来不对，因此 Paradev 没有安装它。请重试。"
+
 msgid "The endpoint must use https."
 msgstr "端点必须使用 https。"
 
@@ -20142,6 +20232,9 @@ msgstr "合并前人类会逐行阅读。"
 
 msgid "The image upload expired — attach it again"
 msgstr "图片上传已过期 — 请重新附加"
+
+msgid "The install stopped responding."
+msgstr "安装已停止响应。"
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "岗位描述变了。工程师不再是有品味的打字员，而成了有品味的调度员：拆解工作、分派给智能体集群、在两个改了同一个模块的智能体之间做裁决。"
@@ -20389,6 +20482,9 @@ msgstr "主题预览卡片"
 msgid "Themes"
 msgstr "主题"
 
+msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
+msgstr "磁盘空间不足，无法安装 {name}。请释放一些空间后重试。"
+
 msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 msgstr "它们通过基础分支相连，因此每一个都会合并到它下面的那一个。GitHub 堆栈可一步合并全部。"
 
@@ -20581,6 +20677,9 @@ msgstr "这个邀请已被接受。"
 
 msgid "This invitation link is invalid or has expired."
 msgstr "这个邀请链接无效或已过期。"
+
+msgid "This is taking longer than expected."
+msgstr "所需时间比预期更长。"
 
 msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
 msgstr "这比平时耗时更久。沙箱可能仍在拉取镜像。无论此窗口是否打开，它都会继续。"
@@ -22091,6 +22190,9 @@ msgstr "正在等待批准。请保持此对话框打开。"
 msgid "Waiting for Checks"
 msgstr "等待检查"
 
+msgid "Waiting for GitHub…"
+msgstr "正在等待 GitHub…"
+
 msgid "Waiting for it to connect…"
 msgstr "正在等待连接…"
 
@@ -22845,11 +22947,17 @@ msgstr "你可以在 30 天内从“设置 → 项目”恢复它。仓库文件
 msgid "You can see how we work before you talk to us."
 msgstr "在与我们交流之前，你就能看到我们是如何工作的。"
 
+msgid "You can still clone public repos. Private repos and pull requests need GitHub connected. You can connect it later in Settings → Git & Worktrees."
+msgstr "你仍然可以克隆公开仓库。私有仓库和拉取请求需要连接 GitHub。你可以稍后在“设置 → Git与worktree”中连接。"
+
 msgid "You can view this page but not change it"
 msgstr "你可以查看此页面，但不能更改"
 
 msgid "You can view this page but not comment on it"
 msgstr "你可以查看此页面，但不能评论"
+
+msgid "You can't add a project until Git is installed. The next screens will offer it again."
+msgstr "安装 Git 之前无法添加项目。接下来的页面会再次提供安装。"
 
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."

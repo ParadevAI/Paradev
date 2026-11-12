@@ -53,6 +53,31 @@ export function getBinDir(): string {
 	return path.join(resolveAppHomeDir(), "bin");
 }
 
+/** Tools the app installs for the user (gh). Last on PATH, so the user's own install wins. */
+export function getToolsBinDir(): string {
+	return path.join(resolveAppHomeDir(), "tools", "bin");
+}
+
+/** `first` dirs go to the front of PATH and `last` dirs to the end, each once. */
+export function withPathDirs(
+	env: Record<string, string>,
+	{ first = [], last = [] }: { first?: string[]; last?: string[] },
+): Record<string, string> {
+	const key =
+		Object.keys(env).find((name) => name.toUpperCase() === "PATH") ?? "PATH";
+	const placed = new Set([...first, ...last]);
+	const rest = (env[key] ?? "")
+		.split(path.delimiter)
+		.filter((entry) => entry && !placed.has(entry));
+	return { ...env, [key]: [...first, ...rest, ...last].join(path.delimiter) };
+}
+
+export function withAppToolsOnPath(
+	env: Record<string, string>,
+): Record<string, string> {
+	return withPathDirs(env, { last: [getToolsBinDir()] });
+}
+
 export function getHooksDir(): string {
 	return path.join(resolveAppHomeDir(), "hooks");
 }
