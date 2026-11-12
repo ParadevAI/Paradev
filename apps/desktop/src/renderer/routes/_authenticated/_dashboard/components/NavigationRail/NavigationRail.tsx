@@ -4,12 +4,12 @@ import {
 	Cable,
 	GitPullRequest,
 	Hash,
-	House,
 	SquareCheckBig,
 	StickyNote,
 	TimerReset,
 } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
+import { TbSmartHome } from "react-icons/tb";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { env } from "renderer/env.renderer";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
@@ -42,7 +42,7 @@ export function NavigationRail() {
 		>
 			<RailButton
 				label={t({ message: "Home" })}
-				icon={House}
+				icon={TbSmartHome}
 				isActive={navigation.isHomeOpen}
 				onClick={navigation.openHome}
 			/>

@@ -1,7 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 
 export const RAIL_ICON_CLASS = "size-[18px]";
 export const RAIL_ICON_STROKE_WIDTH = 1.75;
@@ -17,7 +16,7 @@ export function railButtonClass(isActive: boolean) {
 
 interface RailButtonProps {
 	label: string;
-	icon: LucideIcon;
+	icon: ComponentType<{ className?: string; strokeWidth?: number }>;
 	isActive?: boolean;
 	onClick: () => void;
 	badge?: ReactNode;
