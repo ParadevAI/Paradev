@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
 			installUrl.searchParams.set("state", state);
 			installUrl.searchParams.set(
 				"redirect_url",
-				`${env.NEXT_PUBLIC_API_URL}/api/github/callback`,
+				`${getBrowserApiUrl(env)}/api/github/callback`,
 			);
 			return installUrl.toString();
 		},

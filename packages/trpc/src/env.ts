@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
+		BROWSER_API_URL: z.string().url().optional(),
 		NODE_ENV: z
 			.enum(["development", "production", "test"])
 			.default("development"),

@@ -11,6 +11,7 @@ import { credentialFetch } from "../../router/plugins/manifest";
 import {
 	ForgottenClientError,
 	forgetClient,
+	issuedGrantRedirectUris,
 	redirectUriFor,
 } from "./client-identity";
 import { connectorMethod, requireConnector, resolveEndpoints } from "./index";
@@ -195,7 +196,7 @@ async function refresh(
 		if (endpoints.issuer && payload.error === "invalid_client")
 			await forgetClient(
 				endpoints.issuer,
-				redirectUriFor(current.connector),
+				issuedGrantRedirectUris(current.connector),
 				clientId,
 			);
 		await markNeedsReauth(current.id, current.accessToken);

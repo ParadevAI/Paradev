@@ -1,3 +1,5 @@
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
+
 export function resolveCallbackUrl({
 	redirect,
 	webUrl,
@@ -14,6 +16,8 @@ export function resolveCallbackUrl({
 	} catch {
 		return webUrl;
 	}
-	const allowed = [webUrl, ...trustedOrigins].map((u) => new URL(u).origin);
+	const allowed = withOwnDomainTwins([webUrl, ...trustedOrigins]).map(
+		(u) => new URL(u).origin,
+	);
 	return allowed.includes(url.origin) ? url.href : webUrl;
 }
