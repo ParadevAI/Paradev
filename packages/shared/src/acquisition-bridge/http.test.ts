@@ -415,6 +415,107 @@ test("missing transport ticket and store outages continue auth without a new red
 	expect(fallback.headers.get("Location")).toBe(`${web}/sign-up?_acq=1`);
 });
 
+test("transport script escapes less-than characters in configuration literals", async () => {
+	const http = createBridgeHttp({
+		kv: new Store(),
+		marketingOrigin: marketing,
+		webOrigin: web,
+		consentKey: "</script><script>bad()</script>",
+		posthogKey: "phc_fixture",
+	});
+	const response = await http.marketing(
+		new Request(`${marketing}/api/acquisition/visit?attempt=${"a".repeat(64)}`),
+		"visit",
+	);
+	const html = await response.text();
+	expect(html).not.toContain("</script><script>bad()");
+	expect(html).toContain("\\u003c/script>");
+});
+
+test("HTTP carries client intent ordering through a delayed enable after opt-out", async () => {
+	const { http, post, journey } = setup();
+	const original = await journey();
+	await http.marketing(
+		post(
+			marketing,
+			"lineage",
+			{ optedOut: true, intentAt: Date.now() + 2 },
+			original.marketingCookie,
+		),
+		"lineage",
+	);
+	const late = await http.marketing(
+		post(
+			marketing,
+			"lineage",
+			{ optedOut: false, intentAt: 1 },
+			original.marketingCookie,
+		),
+		"lineage",
+	);
+	expect((await late.json()).anonymousId).toBeNull();
+});
+
+for (const optedOut of [false, true]) {
+	test(`GitHub direct web entry survives redirect without exporting referrer paths; optedOut=${optedOut}`, async () => {
+		const { http, post } = setup();
+		const begin = await http.web(
+			new Request(`${web}/api/acquisition/begin?returnTo=%2Fsign-up`, {
+				headers: {
+					Referer: "https://github.com/ParadevAI/Paradev/issues/1?secret=drop",
+				},
+			}),
+			"begin",
+		);
+		expect(begin.headers.get("Referrer-Policy")).toBe("no-referrer");
+		const location = new URL(required(begin.headers.get("Location")));
+		expect(location.searchParams.has("referrer")).toBe(false);
+		const issued = await http.marketing(
+			post(marketing, "issue", {
+				attempt: location.searchParams.get("attempt"),
+				optedOut,
+			}),
+			"issue",
+		);
+		const { ticket } = await issued.json();
+		const receive = await http.web(
+			new Request(`${web}/api/acquisition/receive`, {
+				method: "POST",
+				headers: { Origin: marketing },
+				body: new URLSearchParams({ ticket }),
+			}),
+			"receive",
+		);
+		const final = await http.web(
+			new Request(`${web}/api/acquisition/finalize`, {
+				headers: {
+					Cookie: `${cookiePair(begin, "__Host-acq_attempt")}; ${cookiePair(receive, "__Host-acq_staged")}`,
+				},
+			}),
+			"finalize",
+		);
+		const events: IdentifyEvent[] = [];
+		await http.bind(
+			post(web, "bind", {}, cookiePair(final, "__Host-acq_pending")),
+			"user",
+			async (event) => {
+				events.push(event);
+			},
+		);
+		expect(events).toHaveLength(optedOut ? 0 : 1);
+		if (!optedOut) {
+			expect(
+				events[0]?.properties.$set_once.acquisition_first_referrer_host,
+			).toBe("github.com");
+			expect(
+				events[0]?.properties.$set.acquisition_latest_non_direct_referrer_host,
+			).toBe("github.com");
+			expect(cookiePair(issued, "__Host-acq_lineage")).not.toBe("");
+		}
+		expect(JSON.stringify(events)).not.toContain("secret");
+	});
+}
+
 function required<T>(value: T): NonNullable<T> {
 	if (value === null || value === undefined)
 		throw new Error("Missing fixture value");

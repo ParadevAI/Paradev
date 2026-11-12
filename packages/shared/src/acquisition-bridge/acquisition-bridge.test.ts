@@ -481,9 +481,9 @@ describe("browser-safe boundaries", () => {
 			}),
 		).toEqual({ landing_pathname: "/" });
 		expect(collectTouchSnapshot({ href: "not-a-url" })).toBeNull();
-		expect(
-			sanitizeTouchSnapshot({ landing_pathname: "/?secret=1" }),
-		).toBeNull();
+		expect(sanitizeTouchSnapshot({ landing_pathname: "/?secret=1" })).toEqual({
+			landing_pathname: "/",
+		});
 	});
 	test("own domains, configured origins and auth providers aren't marketing referrers", () => {
 		for (const host of [
@@ -576,6 +576,45 @@ test("HTTP helpers enforce exact Origin and one well-formed credential cookie", 
 			}),
 			"lineage",
 		),
+	).toBeNull();
+});
+
+test("late enable intent cannot override a later revoke, even after CAS retry", async () => {
+	const { service, kv, touch, pending } = setup();
+	const minted = required(await service.mintLineage("enabled", touch(), 1));
+	const originalEval = kv.eval.bind(kv);
+	let delayed = true;
+	kv.eval = async (script, keys, args) => {
+		if (delayed) {
+			delayed = false;
+			await service.revokeLineage(minted.credential, 3);
+		}
+		return originalEval(script, keys, args);
+	};
+	expect(
+		await service.updateLineage(minted.credential, "enabled", touch(), 2),
+	).toBeNull();
+	expect((await pending(minted.credential)).state).toBe("disabled");
+	expect(
+		await service.updateLineage(minted.credential, "enabled", touch(), 2),
+	).toBeNull();
+	const resumed = required(
+		await service.updateLineage(minted.credential, "enabled", touch(), 4),
+	);
+	expect(resumed.anonymousId).not.toBe(minted.anonymousId);
+	expect((await pending(minted.credential)).state).toBe("enabled");
+});
+
+test("encoded and punctuation paths retain validated campaign fields without retaining unsafe paths", () => {
+	for (const path of ["/blog/%C3%BCber", "/a+b", "/a,b", "/a@b", "/a:b"]) {
+		expect(
+			collectTouchSnapshot({
+				href: `https://paradev.com${path}?utm_source=google&gclid=abc&secret=discard`,
+			}),
+		).toEqual({ landing_pathname: "/", utm_source: "google", gclid: "abc" });
+	}
+	expect(
+		sanitizeTouchSnapshot({ landing_pathname: 42, utm_source: "google" }),
 	).toBeNull();
 });
 

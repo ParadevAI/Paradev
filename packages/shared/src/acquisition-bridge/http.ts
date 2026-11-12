@@ -9,6 +9,7 @@ import {
 	readBridgeCookie,
 	validateReturnTo,
 } from "./server";
+import { collectTouchSnapshot } from "./touch";
 
 const TOKEN = /^[a-f0-9]{64}$/;
 const HEADERS = {
@@ -70,7 +71,7 @@ function scriptPage(script: string, formAction: string) {
 	);
 }
 const literal = (value: string) =>
-	JSON.stringify(value).replaceAll("<", "\u003c");
+	JSON.stringify(value).replaceAll("<", "\\u003c");
 export type BridgeHttpOptions = {
 	kv: AcquisitionKV;
 	marketingOrigin: string;
@@ -123,9 +124,16 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 				const credential = readBridgeCookie(request, "lineage");
 				const optedOut = input.optedOut !== false;
 				if (action === "lineage") {
+					const intentAt =
+						typeof input.intentAt === "number" ? input.intentAt : undefined;
 					const result = optedOut
-						? await bridge.revokeLineage(credential)
-						: await bridge.updateLineage(credential, "enabled", input.touch);
+						? await bridge.revokeLineage(credential, intentAt)
+						: await bridge.updateLineage(
+								credential,
+								"enabled",
+								input.touch,
+								intentAt,
+							);
 					return json(
 						{ anonymousId: optedOut ? null : (result?.anonymousId ?? null) },
 						200,
@@ -137,9 +145,10 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 					const result = await bridge.issue(
 						input.attempt,
 						optedOut ? null : credential,
+						!optedOut,
 					);
 					return result
-						? json(result)
+						? json({ ticket: result.ticket }, 200, result.setCookie)
 						: json({ error: "Expired attempt" }, 400);
 				}
 				return json({ error: "Not found" }, 404);
@@ -165,7 +174,19 @@ export function createBridgeHttp(options: BridgeHttpOptions) {
 						!(await options.marketingAvailable())
 					)
 						return redirect(fallback, [bridgeCookie("pending", "", 0)]);
-					const result = await bridge.begin(returnTo);
+					const entry = new URL(returnTo, web);
+					const result = await bridge.begin(
+						returnTo,
+						entry.pathname === "/sign-in" || entry.pathname === "/sign-up"
+							? collectTouchSnapshot(
+									{
+										href: entry.href,
+										referrer: request.headers.get("referer") ?? undefined,
+									},
+									{ internalOrigins: [marketing, web] },
+								)
+							: undefined,
+					);
 					const target = new URL("/api/acquisition/visit", marketing);
 					target.searchParams.set("attempt", result.attempt);
 					return redirect(target, [

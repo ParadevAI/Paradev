@@ -1,6 +1,14 @@
 import type { PostHog } from "posthog-js";
 import { syncAcquisition } from "./acquisition-client";
 
+export function declineMarketingAnalytics(
+	schedule: (callback: (posthog: PostHog) => void) => void,
+	revoke: () => Promise<unknown> = () => syncAcquisition(true),
+): void {
+	void revoke();
+	schedule(declineAnalytics);
+}
+
 /**
  * Marketing and app cookies are isolated across registrable domains.
  * A visitor who declined gets a fresh anonymous id, so
@@ -15,5 +23,4 @@ export function declineAnalytics(
 		posthog.reset(true);
 	}
 	posthog.opt_out_capturing();
-	void syncAcquisition(true);
 }

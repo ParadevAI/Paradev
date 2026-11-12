@@ -13,10 +13,13 @@ const landingTouch =
 				referrer: document.referrer,
 			});
 let pending: Promise<string | null> | null = null;
+let lastIntentAt = 0;
 export function acquisitionOptedOut(posthogKey: string): boolean {
 	return hasAnalyticsOptOut(ANALYTICS_CONSENT_KEY, posthogKey);
 }
 export function syncAcquisition(optedOut: boolean): Promise<string | null> {
+	const intentAt = Math.max(Date.now(), lastIntentAt + 1);
+	lastIntentAt = intentAt;
 	pending = (pending ?? Promise.resolve(null))
 		.catch(() => null)
 		.then(async () => {
@@ -26,6 +29,7 @@ export function syncAcquisition(optedOut: boolean): Promise<string | null> {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						optedOut,
+						intentAt,
 						...(!optedOut ? { touch: landingTouch } : {}),
 					}),
 					keepalive: true,

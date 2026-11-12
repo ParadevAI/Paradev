@@ -45,11 +45,16 @@ type Lineage = {
 	latestNonDirect: AcquisitionTouch | null;
 	generation: number;
 	revision: number;
+	intentAt?: number;
 	expiresAt: number;
 	eventUuid: string;
 	ownerId?: string;
 };
-type Attempt = { returnTo: string; expiresAt: number };
+type Attempt = {
+	returnTo: string;
+	expiresAt: number;
+	touch?: AcquisitionTouch | null;
+};
 type Grant =
 	| { state: "enabled"; credential: string; generation: number }
 	| { state: "disabled" | "unavailable" };
@@ -84,7 +89,7 @@ const TOKEN = /^[a-f0-9]{64}$/;
 const token = () => randomBytes(32).toString("hex");
 const key = (kind: string, id: string) => `acquisition-bridge:${kind}:${id}`;
 
-// Revision CAS prevents concurrent visits from replacing first touch or undoing a revoke.
+// Redis checks the revision atomically; retries must also check intent ordering.
 export const LINEAGE_CAS_SCRIPT = `local old = redis.call('GET', KEYS[1])
 if not old or cjson.decode(old).revision ~= tonumber(ARGV[1]) then return 0 end
 redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
@@ -220,6 +225,7 @@ export class AcquisitionBridge {
 	async mintLineage(
 		state: TrackingState,
 		snapshot?: unknown,
+		intentAt?: number,
 	): Promise<LineageResult | null> {
 		if (state !== "enabled" && state !== "disabled") return null;
 		const credential = token();
@@ -238,6 +244,7 @@ export class AcquisitionBridge {
 			latestNonDirect: touch && isNonDirectTouch(touch) ? touch : null,
 			generation: 1,
 			revision: 1,
+			intentAt,
 			expiresAt: now + BRIDGE_TTL.lineage * 1000,
 			eventUuid: randomUUID(),
 		};
@@ -255,11 +262,26 @@ export class AcquisitionBridge {
 		credential: unknown,
 		state: TrackingState,
 		snapshot?: unknown,
+		intentAt?: number,
+		expectedGeneration?: number,
 	): Promise<LineageResult | null> {
 		if (state !== "enabled" && state !== "disabled") return null;
+		if (
+			intentAt !== undefined &&
+			(!Number.isSafeInteger(intentAt) || intentAt < 0)
+		)
+			return null;
+		let orderedAt = intentAt;
 		for (let retry = 0; retry < 4; retry++) {
 			const old = await this.lineage(credential);
-			if (!old) return this.mintLineage(state, snapshot);
+			if (
+				expectedGeneration !== undefined &&
+				old?.generation !== expectedGeneration
+			)
+				return null;
+			if (!old) return this.mintLineage(state, snapshot, orderedAt);
+			orderedAt ??= Math.max(this.now(), (old.intentAt ?? 0) + 1);
+			if (orderedAt <= (old.intentAt ?? 0)) return null;
 			const now = this.now();
 			const clean =
 				state === "enabled"
@@ -283,6 +305,7 @@ export class AcquisitionBridge {
 						: null,
 				generation: old.generation + (old.state !== state ? 1 : 0),
 				revision: old.revision + 1,
+				intentAt: orderedAt,
 				eventUuid:
 					old.state !== state ||
 					(touch && (!old.first || isNonDirectTouch(touch)))
@@ -311,21 +334,30 @@ export class AcquisitionBridge {
 		throw new Error("Concurrent acquisition lineage update");
 	}
 
-	async revokeLineage(credential: unknown): Promise<LineageResult | null> {
+	async revokeLineage(
+		credential: unknown,
+		intentAt?: number,
+	): Promise<LineageResult | null> {
 		if (!(await this.lineage(credential))) return null;
-		return this.updateLineage(credential, "disabled");
+		return this.updateLineage(credential, "disabled", undefined, intentAt);
 	}
 
 	async begin(
 		returnTo: string,
+		snapshot?: unknown,
 	): Promise<{ attempt: string; setCookie: string }> {
 		const validated = validateReturnTo(returnTo);
 		if (!validated) throw new Error("Invalid acquisition return path");
 		const attempt = token();
+		const clean = sanitizeTouchSnapshot(snapshot, this.options);
 		await this.kv.set(
 			key("attempt", attempt),
 			{
 				returnTo: validated,
+				touch:
+					clean && isNonDirectTouch(clean)
+						? { ...clean, timestamp: new Date(this.now()).toISOString() }
+						: null,
 				expiresAt: this.now() + BRIDGE_TTL.attempt * 1000,
 			} satisfies Attempt,
 			{ ex: BRIDGE_TTL.attempt },
@@ -339,11 +371,31 @@ export class AcquisitionBridge {
 	async issue(
 		attempt: unknown,
 		marketingCredential: unknown,
-	): Promise<{ ticket: string } | null> {
+		collectEntry = true,
+	): Promise<{ ticket: string; setCookie?: string } | null> {
 		if (typeof attempt !== "string" || !TOKEN.test(attempt)) return null;
 		const record = await this.kv.get<Attempt>(key("attempt", attempt));
 		if (!this.alive(record)) return null;
-		const lineage = await this.lineage(marketingCredential);
+		let lineage = await this.lineage(marketingCredential);
+		let setCookie: string | undefined;
+		if (
+			collectEntry &&
+			record?.touch &&
+			(!lineage || lineage.state === "enabled")
+		) {
+			const result = await this.updateLineage(
+				marketingCredential,
+				"enabled",
+				record.touch,
+				undefined,
+				lineage?.generation,
+			);
+			if (result) {
+				marketingCredential = result.credential;
+				setCookie = result.setCookie;
+				lineage = await this.lineage(marketingCredential);
+			}
+		}
 		const grant: Grant =
 			lineage?.state === "enabled"
 				? {
@@ -362,7 +414,7 @@ export class AcquisitionBridge {
 			} satisfies Ticket,
 			{ ex: BRIDGE_TTL.ticket },
 		);
-		return { ticket };
+		return { ticket, ...(setCookie ? { setCookie } : {}) };
 	}
 
 	async receive(

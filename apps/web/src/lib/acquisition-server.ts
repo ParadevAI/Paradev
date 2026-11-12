@@ -31,6 +31,5 @@ const analytics = new PostHog(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	fetchRetryCount: 0,
 });
 export async function captureAcquisition(event: IdentifyEvent): Promise<void> {
-	analytics.capture(event);
-	await analytics.flush();
+	await analytics.captureImmediate(event);
 }

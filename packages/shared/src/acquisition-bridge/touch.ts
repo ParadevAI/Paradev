@@ -65,8 +65,12 @@ export function sanitizeTouchSnapshot(
 ): TouchSnapshot | null {
 	if (!input || typeof input !== "object" || Array.isArray(input)) return null;
 	const raw = input as Record<string, unknown>;
-	if (!safePath(raw.landing_pathname)) return null;
-	const touch: TouchSnapshot = { landing_pathname: raw.landing_pathname };
+	if (typeof raw.landing_pathname !== "string") return null;
+	const touch: TouchSnapshot = {
+		landing_pathname: safePath(raw.landing_pathname)
+			? raw.landing_pathname
+			: "/",
+	};
 	for (const key of CAMPAIGN_KEYS) {
 		const value = raw[key];
 		if (

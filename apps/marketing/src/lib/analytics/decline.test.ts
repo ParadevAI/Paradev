@@ -1,6 +1,19 @@
 import { describe, expect, test } from "bun:test";
 
-import { declineAnalytics } from "./decline";
+import { declineAnalytics, declineMarketingAnalytics } from "./decline";
+
+test("revokes the bridge before the SDK callback is initialized", () => {
+	const calls: string[] = [];
+	declineMarketingAnalytics(
+		() => {
+			calls.push("queued SDK");
+		},
+		async () => {
+			calls.push("revoke");
+		},
+	);
+	expect(calls).toEqual(["revoke", "queued SDK"]);
+});
 
 function fakePosthog(userState: string | undefined) {
 	const calls: string[] = [];
