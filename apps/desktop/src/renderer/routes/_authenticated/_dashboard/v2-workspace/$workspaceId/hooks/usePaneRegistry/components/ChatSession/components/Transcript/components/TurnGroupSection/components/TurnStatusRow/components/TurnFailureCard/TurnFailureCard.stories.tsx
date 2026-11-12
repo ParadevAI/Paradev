@@ -1,10 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import {
-	createMemoryHistory,
-	createRootRoute,
-	createRouter,
-	RouterProvider,
-} from "@tanstack/react-router";
 import { fn, userEvent, within } from "storybook/test";
 import { TurnFailureActionsProvider } from "../../../../../../../../providers/TurnFailureActionsProvider";
 import { TurnFailureCard } from "./TurnFailureCard";
@@ -22,18 +16,9 @@ const meta = {
 					setDismissed: fn(),
 				}}
 			>
-				<RouterProvider
-					router={createRouter({
-						history: createMemoryHistory(),
-						routeTree: createRootRoute({
-							component: () => (
-								<div className="w-[40rem]">
-									<Story />
-								</div>
-							),
-						}),
-					})}
-				/>
+				<div className="w-[40rem]">
+					<Story />
+				</div>
 			</TurnFailureActionsProvider>
 		),
 	],
