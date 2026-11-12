@@ -133,6 +133,14 @@ export const turnErrorSchema = z.looseObject({
 });
 export type TurnError = z.infer<typeof turnErrorSchema>;
 
+const USAGE_LIMIT_MESSAGE =
+	/(?:usage|spend|spending|monthly|weekly|daily) limits? (?:reached|exceeded)|(?:reached|hit) your (?:[\w'-]+ ){0,4}(?:usage|spend|spending) limits?|hit your (?:usage )?limit|(?:quota|credits?) (?:exceeded|exhausted|depleted)|exceeded your current quota|insufficient[_ ](?:quota|credits)|credit balance is too low/i;
+
+/** Providers word a usage or spend refusal many ways; adapters often see only that text. */
+export function isUsageLimitMessage(message: string): boolean {
+	return USAGE_LIMIT_MESSAGE.test(message);
+}
+
 export const turnSchema = z.looseObject({
 	id: z.string().min(1),
 	status: z.enum(["running", "completed", "failed", "interrupted"]),

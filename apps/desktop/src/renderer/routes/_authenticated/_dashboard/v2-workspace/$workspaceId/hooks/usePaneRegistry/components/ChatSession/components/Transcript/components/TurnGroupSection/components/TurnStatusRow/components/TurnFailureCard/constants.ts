@@ -7,6 +7,7 @@ export type FailureAction =
 	| "change_model"
 	| "sign_in"
 	| "agent_settings"
+	| "usage_settings"
 	| "new_chat";
 
 export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
@@ -19,7 +20,7 @@ export const FAILURE_TITLES: Record<TurnFailureKind, MessageDescriptor> = {
 		message: "This conversation is too long for the model",
 	}),
 	refused: msg({ message: "The model declined to continue" }),
-	usage_limit: msg({ message: "Stopped by the usage limit" }),
+	usage_limit: msg({ message: "Usage limit reached" }),
 	session_lost: msg({ message: "The agent lost this conversation" }),
 	host_stopped: msg({ message: "Paused when Paradev closed" }),
 	unknown: msg({ message: "Task interrupted" }),
@@ -37,7 +38,7 @@ export const FAILURE_ACTIONS: Record<
 	model_unavailable: ["change_model", "continue"],
 	context_too_long: ["new_chat", "continue"],
 	refused: ["continue", "change_model"],
-	usage_limit: [],
+	usage_limit: ["usage_settings", "continue"],
 	session_lost: ["new_chat"],
 	host_stopped: ["continue"],
 	unknown: ["continue", "change_model"],

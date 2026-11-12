@@ -22995,6 +22995,9 @@ msgstr "Odkaz na GitHub pochází z účtu, kterým jste se přihlásili, proto 
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "Poslední platba se nezdařila. Aktualizujte způsob platby, abyste si Pro zachovali."
 
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings. Then continue."
+msgstr "Poskytovatel modelu zastavil tento požadavek, protože účet dosáhl limitu využití nebo útraty. Počkejte na obnovení limitu, navyšte ho u poskytovatele nebo v Nastavení využití přepněte na jiný účet. Potom pokračujte."
+
 msgid "Your name"
 msgstr "Vaše jméno"
 

@@ -138,6 +138,37 @@ test("a turn the usage limit stopped is one quiet line, not a failure card", () 
 	expect(view.queryByText("Copy error")).toBeNull();
 });
 
+test("a spend limit the host did not classify is a limit notice, not a red failure", () => {
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{
+					message:
+						"You have reached your specified workspace API usage limits.",
+					kind: "unknown",
+				}}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+	const card = view.container.querySelector(
+		'[data-turn-failure="usage_limit"]',
+	);
+	expect(card?.getAttribute("role")).toBe("status");
+	expect(card?.textContent).toContain("Usage limit reached");
+	expect(card?.className).not.toContain("destructive");
+	expect(view.queryByText("Change model")).toBeNull();
+});
+
 function authCard(actions: Partial<TurnFailureActions>) {
 	return render(
 		<TurnFailureActionsProvider

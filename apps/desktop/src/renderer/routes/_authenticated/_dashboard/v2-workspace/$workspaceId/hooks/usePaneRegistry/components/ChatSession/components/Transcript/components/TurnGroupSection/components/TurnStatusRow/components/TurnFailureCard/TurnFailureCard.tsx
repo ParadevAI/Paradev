@@ -1,8 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { TurnError } from "@superset/chat/protocol";
+import { isUsageLimitMessage, type TurnError } from "@superset/chat/protocol";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
-import { ChevronRight, CircleAlert, X } from "lucide-react";
+import { useRouter } from "@tanstack/react-router";
+import { ChevronRight, CircleAlert, Gauge, X } from "lucide-react";
 import {
 	type ReactNode,
 	useEffect,
@@ -31,8 +32,29 @@ type ActionButton = {
 	expanded?: boolean;
 };
 
-const PRIMARY_CLASS =
-	"border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50";
+const TONES = {
+	failure: {
+		Icon: CircleAlert,
+		card: "border-destructive/25 bg-destructive/[0.04]",
+		icon: "text-destructive",
+		collapsedIcon: "text-destructive/70",
+		title: "text-destructive",
+		primary:
+			"border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50",
+		dismiss:
+			"text-destructive/60 hover:bg-destructive/10 hover:text-destructive",
+	},
+	limit: {
+		Icon: Gauge,
+		card: "border-warning/30 bg-warning/[0.04]",
+		icon: "text-warning",
+		collapsedIcon: "text-warning/80",
+		title: "text-foreground",
+		primary:
+			"border-warning/40 text-warning hover:bg-warning/10 hover:text-warning",
+		dismiss: "text-muted-foreground hover:bg-accent hover:text-foreground",
+	},
+};
 
 export function TurnFailureCard({
 	error,
@@ -45,7 +67,11 @@ export function TurnFailureCard({
 }) {
 	const { i18n, t } = useLingui();
 	const actions = useTurnFailureActions();
-	const kind = error?.kind ?? "unknown";
+	const router = useRouter({ warn: false });
+	const kind = isUsageLimitMessage(error?.message ?? "")
+		? "usage_limit"
+		: (error?.kind ?? "unknown");
+	const tone = TONES[kind === "usage_limit" ? "limit" : "failure"];
 	const manualSignIn = kind === "auth" && actions?.manualSignIn === true;
 	const title = i18n._(
 		manualSignIn ? MANUAL_SIGN_IN_TITLE : FAILURE_TITLES[kind],
@@ -84,7 +110,7 @@ export function TurnFailureCard({
 				onClick={() => actions.setDismissed(turnId, false)}
 				type="button"
 			>
-				<CircleAlert className="size-3.5 shrink-0 text-destructive/70" />
+				<tone.Icon className={cn("size-3.5 shrink-0", tone.collapsedIcon)} />
 				<span className="shrink-0 font-medium">{title}</span>
 				{error?.message && (
 					<span className="min-w-0 truncate">{error.message}</span>
@@ -146,6 +172,13 @@ export function TurnFailureCard({
 					expanded: signingIn,
 					onClick: () => setSigningIn((open) => !open),
 				},
+				usage_settings: router
+					? {
+							label: <Trans>Usage settings</Trans>,
+							disabled: false,
+							onClick: () => void router.navigate({ to: "/settings/usage" }),
+						}
+					: null,
 				agent_settings: recovery.openAgentSettings
 					? {
 							label: <Trans>Agent settings</Trans>,
@@ -178,15 +211,28 @@ export function TurnFailureCard({
 
 	return (
 		<div
-			className="relative flex w-full max-w-[36rem] gap-2.5 rounded-lg border border-destructive/25 bg-destructive/[0.04] py-2.5 pr-9 pl-3 font-sans text-xs"
+			className={cn(
+				"relative flex w-full max-w-[36rem] gap-2.5 rounded-lg border py-2.5 pr-9 pl-3 font-sans text-xs",
+				tone.card,
+			)}
 			data-turn-failure={kind}
-			role="alert"
+			role={kind === "usage_limit" ? "status" : "alert"}
 		>
-			<CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+			<tone.Icon className={cn("mt-0.5 size-4 shrink-0", tone.icon)} />
 			<div className="flex min-w-0 flex-1 flex-col gap-1.5">
-				<div className="font-medium text-destructive text-sm leading-5">
+				<div className={cn("font-medium text-sm leading-5", tone.title)}>
 					{title}
 				</div>
+				{kind === "usage_limit" && (
+					<p className="text-muted-foreground">
+						<Trans>
+							Your model provider stopped this request because the account
+							reached its usage or spend limit. Wait for the limit to reset,
+							raise it with your provider, or switch to another account in Usage
+							settings. Then continue.
+						</Trans>
+					</p>
+				)}
 				{text && (
 					<p
 						className={cn(
@@ -244,7 +290,7 @@ export function TurnFailureCard({
 					{offered.map((button, index) => (
 						<Button
 							aria-expanded={button.expanded}
-							className={index === 0 ? PRIMARY_CLASS : undefined}
+							className={index === 0 ? tone.primary : undefined}
 							disabled={button.disabled}
 							key={button.action}
 							onClick={button.onClick}
@@ -259,7 +305,10 @@ export function TurnFailureCard({
 			{actions && (
 				<button
 					aria-label={t({ message: "Dismiss error" })}
-					className="absolute top-2 right-2 rounded p-1 text-destructive/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
+					className={cn(
+						"absolute top-2 right-2 rounded p-1 transition-colors",
+						tone.dismiss,
+					)}
 					onClick={() => actions.setDismissed(turnId, true)}
 					type="button"
 				>
