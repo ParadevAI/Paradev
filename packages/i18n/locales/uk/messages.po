@@ -1194,6 +1194,7 @@ msgstr "{name} без змін. Якщо агент працював, його �
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} без змін. Якщо агент працював, його зупинено."
+
 msgid "{name} isn't installed yet"
 msgstr "{name} ще не встановлено"
 
@@ -1409,9 +1410,6 @@ msgstr "{toolName}: перервано"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} ще не налаштовано. Їх можна налаштувати пізніше в Налаштуваннях."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {Переміщено {done} з # чату} few {Переміщено {done} з # чатів} many {Переміщено {done} з # чатів} other {Переміщено {done} з # чату}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, =1 {Перевірку пройдено} one {Пройдено всі перевірки: #} few {Пройдено всі перевірки: #} many {Пройдено всі перевірки: #} other {Пройдено всі перевірки: #}}"
@@ -9623,8 +9621,6 @@ msgstr "Інтеграція з GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub ще зливає. Це оновиться, коли він закінчить."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub зараз обмежує завантаження. Зачекайте хвилину й спробуйте ще раз."
 
 msgid "GitHub issues"
 msgstr "GitHub issues"

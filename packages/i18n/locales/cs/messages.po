@@ -1200,6 +1200,7 @@ msgstr "{name} zůstává beze změny. Pokud pracoval agent, mohl být zastaven.
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} zůstává beze změny. Pokud pracoval agent, byl zastaven."
+
 msgid "{name} isn't installed yet"
 msgstr "{name} zatím není nainstalovaný"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName} přerušeno"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} zatím nejsou nastavené. Můžete je nastavit později v Nastavení."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {Přesunuto {done} z # chatu} few {Přesunuto {done} z # chatů} many {Přesunuto {done} z # chatu} other {Přesunuto {done} z # chatů}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Kontrola prošla} few {Všechny # kontroly prošly} many {Všech # kontroly prošlo} other {Všech # kontrol prošlo}}"
@@ -9629,8 +9627,6 @@ msgstr "Integrace s GitHubem"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub stále slučuje. Po dokončení se to aktualizuje."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub teď omezuje stahování. Počkejte minutu a zkuste to znovu."
 
 msgid "GitHub issues"
 msgstr "GitHub issues"

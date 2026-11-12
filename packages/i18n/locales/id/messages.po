@@ -1200,6 +1200,7 @@ msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu mungki
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu telah dihentikan."
+
 msgid "{name} isn't installed yet"
 msgstr "{name} belum terpasang"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName} dihentikan"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} belum diatur. Anda bisa mengaturnya nanti di Pengaturan."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {{done} dari # obrolan dipindahkan}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Semua # check lulus} other {Semua # check lulus}}"
@@ -9629,8 +9627,6 @@ msgstr "Integrasi GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub masih me-merge. Ini akan diperbarui setelah selesai."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub sedang membatasi unduhan. Tunggu sebentar, lalu coba lagi."
 
 msgid "GitHub issues"
 msgstr "Issue GitHub"

@@ -1200,6 +1200,7 @@ msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중이었다면 중지되었습니다."
+
 msgid "{name} isn't installed yet"
 msgstr "{name}이(가) 아직 설치되지 않았습니다"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName} 중단됨"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools}이(가) 아직 설정되지 않았습니다. 나중에 설정에서 설정할 수 있습니다."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {채팅 #개 중 {done}개를 옮겼습니다}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#개 검사를 모두 통과했습니다} other {#개 검사를 모두 통과했습니다}}"
@@ -9629,8 +9627,6 @@ msgstr "GitHub 연동"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub가 아직 머지 중입니다. 끝나면 업데이트됩니다."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub가 지금 다운로드를 제한하고 있습니다. 잠시 후 다시 시도하세요."
 
 msgid "GitHub issues"
 msgstr "GitHub 이슈"

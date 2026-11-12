@@ -1200,6 +1200,7 @@ msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó có thể 
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó đã bị dừng."
+
 msgid "{name} isn't installed yet"
 msgstr "{name} chưa được cài đặt"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName} bị gián đoạn"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} chưa được thiết lập. Bạn có thể thiết lập sau trong Cài đặt."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {Đã chuyển {done}/# cuộc trò chuyện}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Cả # check đều đạt} other {Cả # check đều đạt}}"
@@ -9629,8 +9627,6 @@ msgstr "Tích hợp GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub vẫn đang merge. Mục này sẽ cập nhật khi xong."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub đang giới hạn lượt tải xuống. Hãy chờ một phút rồi thử lại."
 
 msgid "GitHub issues"
 msgstr "Issue GitHub"

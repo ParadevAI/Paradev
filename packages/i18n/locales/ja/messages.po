@@ -1200,6 +1200,7 @@ msgstr "{name} は変更されていません。エージェントが作業中�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} は変更されていません。エージェントが作業中だった場合は、停止されました。"
+
 msgid "{name} isn't installed yet"
 msgstr "{name} はまだインストールされていません"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName}が中断されました"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} はまだ設定されていません。あとで設定から設定できます。"
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {#件中{done}件のチャットを移動しました}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
@@ -9629,8 +9627,6 @@ msgstr "GitHub連携"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub がまだマージしています。完了すると更新されます。"
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHubが現在ダウンロードを制限しています。少し待ってから、もう一度お試しください。"
 
 msgid "GitHub issues"
 msgstr "GitHub issue"

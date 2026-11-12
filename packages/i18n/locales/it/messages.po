@@ -1200,6 +1200,7 @@ msgstr "{name} non è cambiato. Se un agente stava lavorando, potrebbe essere st
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} non è cambiato. Se un agente stava lavorando, è stato interrotto."
+
 msgid "{name} isn't installed yet"
 msgstr "{name} non è ancora installato"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName} interrotto"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} non sono ancora configurati. Puoi configurarli più tardi in Impostazioni."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {{done} di # chat spostata} other {{done} di # chat spostate}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {Il controllo è passato} other {Tutti i # controlli sono passati}}"
@@ -9629,8 +9627,6 @@ msgstr "Integrazione GitHub"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub sta ancora unendo. Si aggiornerà al termine."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub sta limitando i download in questo momento. Attendi un minuto e riprova."
 
 msgid "GitHub issues"
 msgstr "Issue GitHub"

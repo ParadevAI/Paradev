@@ -1200,6 +1200,7 @@ msgstr "{name} is ongewijzigd. Als een agent aan het werk was, is die mogelijk g
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} is ongewijzigd. Als een agent aan het werk was, is die gestopt."
+
 msgid "{name} isn't installed yet"
 msgstr "{name} is nog niet geïnstalleerd"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName} onderbroken"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} zijn nog niet ingesteld. Je kunt ze later instellen in Instellingen."
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {{done} van # chat verplaatst} other {{done} van # chats verplaatst}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {De check is geslaagd} other {Alle # checks geslaagd}}"
@@ -9629,8 +9627,6 @@ msgstr "GitHub-integratie"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub is nog aan het mergen. Dit wordt bijgewerkt zodra het klaar is."
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub beperkt op dit moment downloads. Wacht een minuut en probeer het opnieuw."
 
 msgid "GitHub issues"
 msgstr "GitHub-issues"

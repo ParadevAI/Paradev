@@ -1200,6 +1200,7 @@ msgstr "{name} 未變更。如果代理程式正在工作，它可能已被停�
 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} 未變更。如果代理程式正在工作，它已被停止。"
+
 msgid "{name} isn't installed yet"
 msgstr "{name} 尚未安裝"
 
@@ -1415,9 +1416,6 @@ msgstr "{toolName}已中斷"
 
 msgid "{tools} aren't set up yet. You can set them up later in Settings."
 msgstr "{tools} 尚未設定。你可以稍後在設定中設定。"
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, other {已移動 {done}/# 個聊天}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#項檢查全部通過} other {#項檢查全部通過}}"
@@ -9629,8 +9627,6 @@ msgstr "GitHub整合"
 
 msgid "GitHub is still merging. This updates when it finishes."
 msgstr "GitHub 仍在合併。完成後此處會更新。"
-msgid "GitHub is limiting downloads right now. Wait a minute and try again."
-msgstr "GitHub 目前正在限制下載。請稍候片刻再試一次。"
 
 msgid "GitHub issues"
 msgstr "GitHub議題"
