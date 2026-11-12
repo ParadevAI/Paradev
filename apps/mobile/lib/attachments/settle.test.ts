@@ -5,10 +5,12 @@ import { waitForSettledUploads } from "./settle";
 const KEY = "workspace:test";
 
 const attach = (...ids: string[]) => {
-	useComposerDraftsStore.getState().addAttachments(
+	const store = useComposerDraftsStore.getState();
+	store.addAttachments(
 		KEY,
 		ids.map((id) => ({ id, type: "file" as const, uri: `file:///${id}` })),
 	);
+	for (const id of ids) store.beginUpload(KEY, id);
 };
 
 beforeEach(() => {
