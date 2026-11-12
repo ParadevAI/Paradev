@@ -15,8 +15,10 @@ is, whether it moved for a real reason, and what changed.
 Find it with `search_datadog_monitors` (`id:<id>` or `title:<name>`) and read
 its query, threshold, evaluation window and the groups that are alerting. A
 title like "API errors high" can measure a rate, a count, or one host. For an
-incident, `get_datadog_incident` with the timeline gives severity, what
-responders already tried and the linked monitors.
+incident, `get_datadog_incident` with `include_timeline: true` gives severity,
+the linked monitors, and the timeline's comments and status changes, which show
+what responders already tried. If the timeline is empty, say so rather than
+guessing.
 
 ## 2. Confirm the signal
 

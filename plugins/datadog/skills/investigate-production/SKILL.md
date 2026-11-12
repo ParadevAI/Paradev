@@ -34,10 +34,10 @@ Counts come from aggregates, not from scrolling samples:
 
 - Errors by kind or route: `analyze_datadog_logs` (SQL over the logs table) or
   an aggregate in `execute_code`.
-- Latency and error rate by endpoint: `aggregate_spans` grouped by
-  `resource_name`, with `P95` over `@duration`.
-- Request totals and ratios: the `trace.*` metrics, because indexed spans are a
-  sample kept by retention filters.
+- Latency by endpoint: `aggregate_spans` grouped by `resource_name`, with `P95`
+  over `@duration`.
+- Request totals, error rates and other ratios: the `trace.*` metrics, because
+  indexed spans are a sample kept by retention filters.
 
 Pick the one or two error shapes that carry the volume, and check when each
 started.
