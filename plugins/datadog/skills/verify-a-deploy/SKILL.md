@@ -31,7 +31,9 @@ For the service as a whole, compare before and after:
 
 - Error rate and request count by `resource_name`, from the `trace.*` metrics
   (`get_datadog_metric`). Indexed spans are a sample kept by retention filters,
-  so a span count can show an error rate the service does not have.
+  so a span count can show an error rate the service does not have. A service
+  that samples in its OpenTelemetry SDK feeds these metrics only the sample:
+  compare rates rather than raw counts, and say so in the verdict.
 - P95 latency on the endpoints the change touched.
 - New error kinds that did not exist before the deploy.
 - Monitors on the service now alerting (`search_datadog_monitors`).
