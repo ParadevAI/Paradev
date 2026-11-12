@@ -97,7 +97,7 @@
 		"@happy-dom/global-registrator": "20.0.2",
 		"@headless-tree/core": "1.6.3",
 		"@headless-tree/react": "1.6.3",
-		"@hono/node-server": "2.0.10",
+		"@hono/node-server": "2.1.6",
 		"@hookform/resolvers": "5.2.2",
 		"@lezer/highlight": "1.2.3",
 		"@lingui/babel-plugin-lingui-macro": "6.12.0",
