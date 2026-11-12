@@ -1,10 +1,12 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { migrateAnalyticsOptOut } from "@superset/shared/analytics-consent";
 import { Button } from "@superset/ui/button";
 import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { env } from "@/env";
 import { syncPosthogAcquisition } from "@/lib/analytics/acquisition-client";
 import { declineMarketingAnalytics } from "@/lib/analytics/decline";
 import { withPosthog } from "@/lib/analytics/lazy";
@@ -40,6 +42,11 @@ export function CookieConsent() {
 		try {
 			localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
 		} catch {}
+		migrateAnalyticsOptOut(
+			ANALYTICS_CONSENT_KEY,
+			env.NEXT_PUBLIC_POSTHOG_KEY,
+			true,
+		);
 		declineMarketingAnalytics(withPosthog);
 		setShowBanner(false);
 	};

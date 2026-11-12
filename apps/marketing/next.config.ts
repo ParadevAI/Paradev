@@ -223,7 +223,7 @@ const config: NextConfig = {
 				],
 			},
 			{
-				source: "/(.*)",
+				source: "/((?!api/analytics/consent$).*)",
 				headers: [
 					{ key: "Content-Security-Policy", value: contentSecurityPolicy },
 					{ key: "X-Content-Type-Options", value: "nosniff" },

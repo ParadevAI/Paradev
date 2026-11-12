@@ -4,6 +4,10 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./analytics-consent": {
+			"types": "./src/analytics-consent.ts",
+			"default": "./src/analytics-consent.ts"
+		},
 		"./acquisition-bridge/*": {
 			"types": "./src/acquisition-bridge/*.ts",
 			"default": "./src/acquisition-bridge/*.ts"

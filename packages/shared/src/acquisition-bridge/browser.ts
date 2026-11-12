@@ -14,10 +14,10 @@ export function hasAnalyticsOptOut(
 			.map((p) => p.trim())
 			.find((p) => p.startsWith(`${key}=`))
 			?.slice(key.length + 1);
-		const value = local ?? (cookie ? decodeURIComponent(cookie) : null);
-		return (
-			value !== null &&
-			["0", "false", "no", "off"].includes(value.toLowerCase())
+		return [local, cookie ? decodeURIComponent(cookie) : null].some(
+			(value) =>
+				value !== null &&
+				["0", "false", "no", "off"].includes(value.toLowerCase()),
 		);
 	} catch {
 		return true;

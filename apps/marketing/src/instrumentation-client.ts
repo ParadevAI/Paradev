@@ -1,3 +1,7 @@
+import {
+	migrateAnalyticsOptOut,
+	POSTHOG_CONSENT_CONFIG,
+} from "@superset/shared/analytics-consent";
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 
 import { env } from "@/env";
@@ -21,34 +25,41 @@ let sentryClient: SentryClient | null = null;
 let started = false;
 
 async function initPosthog() {
-	const [{ default: posthog }, anonymousId] = await Promise.all([
+	migrateAnalyticsOptOut(ANALYTICS_CONSENT_KEY, env.NEXT_PUBLIC_POSTHOG_KEY);
+	const [{ default: posthogModule }, anonymousId] = await Promise.all([
 		import("posthog-js"),
 		syncAcquisition(acquisitionOptedOut(env.NEXT_PUBLIC_POSTHOG_KEY)),
 	]);
 
-	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
-		...(anonymousId && !acquisitionOptedOut(env.NEXT_PUBLIC_POSTHOG_KEY)
-			? { bootstrap: { distinctID: anonymousId, isIdentifiedID: false } }
-			: {}),
-		api_host: "/ingest",
-		ui_host: "https://us.posthog.com",
-		defaults: "2025-11-30",
-		capture_pageview: "history_change",
-		capture_pageleave: true,
-		capture_exceptions: true,
-		debug: false,
-		cross_subdomain_cookie: true,
-		person_profiles: "always",
-		persistence: "cookie",
-		persistence_name: POSTHOG_COOKIE_NAME,
-		disable_session_recording: true,
-		loaded: (posthog) => {
-			const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
-			if (consent === "declined") {
-				declineAnalytics(posthog);
-			}
+	const posthog = posthogModule.init(
+		env.NEXT_PUBLIC_POSTHOG_KEY,
+		{
+			...POSTHOG_CONSENT_CONFIG,
+			...(anonymousId && !acquisitionOptedOut(env.NEXT_PUBLIC_POSTHOG_KEY)
+				? { bootstrap: { distinctID: anonymousId, isIdentifiedID: false } }
+				: {}),
+			api_host: "/ingest",
+			ui_host: "https://us.posthog.com",
+			defaults: "2025-11-30",
+			capture_pageview: "history_change",
+			capture_pageleave: true,
+			capture_exceptions: true,
+			debug: false,
+			cross_subdomain_cookie: true,
+			person_profiles: "always",
+			persistence: "cookie",
+			persistence_name: POSTHOG_COOKIE_NAME,
+			disable_session_recording: true,
+			loaded: (posthog) => {
+				const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
+				if (consent === "declined") {
+					declineAnalytics(posthog);
+				}
+			},
 		},
-	});
+		"marketing",
+	);
+	if (!posthog) return;
 
 	posthog.register({
 		app_name: "marketing",
