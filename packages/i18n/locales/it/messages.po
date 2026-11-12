@@ -22995,8 +22995,8 @@ msgstr "Il tuo link GitHub proviene dall'account con cui hai effettuato l'access
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "L'ultimo pagamento non è andato a buon fine. Aggiorna il metodo di pagamento per mantenere Pro."
 
-msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings. Then continue."
-msgstr "Il tuo provider di modelli ha interrotto questa richiesta perché l'account ha raggiunto il limite di utilizzo o di spesa. Attendi il ripristino del limite, aumentalo presso il tuo provider o passa a un altro account nelle Impostazioni di utilizzo. Poi continua."
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "Il tuo provider di modelli ha interrotto questa richiesta perché l'account ha raggiunto il limite di utilizzo o di spesa. Attendi il ripristino del limite, aumentalo presso il tuo provider o passa a un altro account nelle Impostazioni di utilizzo."
 
 msgid "Your name"
 msgstr "Il tuo nome"

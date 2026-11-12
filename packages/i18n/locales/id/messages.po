@@ -22995,8 +22995,8 @@ msgstr "Tautan GitHub Anda berasal dari akun yang Anda gunakan untuk masuk, jadi
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "Pembayaran terakhir Anda gagal. Perbarui metode pembayaran untuk mempertahankan Pro."
 
-msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings. Then continue."
-msgstr "Penyedia model menghentikan permintaan ini karena akun telah mencapai batas penggunaan atau pengeluaran. Tunggu hingga batas direset, naikkan batas di penyedia Anda, atau beralih ke akun lain di Pengaturan penggunaan. Lalu lanjutkan."
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "Penyedia model menghentikan permintaan ini karena akun telah mencapai batas penggunaan atau pengeluaran. Tunggu hingga batas direset, naikkan batas di penyedia Anda, atau beralih ke akun lain di Pengaturan penggunaan."
 
 msgid "Your name"
 msgstr "Nama Anda"

@@ -3,7 +3,7 @@ import { isUsageLimitMessage, type TurnError } from "@superset/chat/protocol";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import { useRouter } from "@tanstack/react-router";
-import { ChevronRight, CircleAlert, Gauge, X } from "lucide-react";
+import { ChevronRight, Gauge, X } from "lucide-react";
 import {
 	type ReactNode,
 	useEffect,
@@ -21,6 +21,7 @@ import {
 	type FailureAction,
 	MANUAL_SIGN_IN_ACTIONS,
 	MANUAL_SIGN_IN_TITLE,
+	TONES,
 } from "./constants";
 
 type Running = "continue" | "restart" | "new_chat";
@@ -30,30 +31,6 @@ type ActionButton = {
 	onClick: () => void;
 	disabled: boolean;
 	expanded?: boolean;
-};
-
-const TONES = {
-	failure: {
-		Icon: CircleAlert,
-		card: "border-destructive/25 bg-destructive/[0.04]",
-		icon: "text-destructive",
-		collapsedIcon: "text-destructive/70",
-		title: "text-destructive",
-		primary:
-			"border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50",
-		dismiss:
-			"text-destructive/60 hover:bg-destructive/10 hover:text-destructive",
-	},
-	limit: {
-		Icon: Gauge,
-		card: "border-warning/30 bg-warning/[0.04]",
-		icon: "text-warning",
-		collapsedIcon: "text-warning/80",
-		title: "text-foreground",
-		primary:
-			"border-warning/40 text-warning hover:bg-warning/10 hover:text-warning",
-		dismiss: "text-muted-foreground hover:bg-accent hover:text-foreground",
-	},
 };
 
 export function TurnFailureCard({
@@ -68,9 +45,11 @@ export function TurnFailureCard({
 	const { i18n, t } = useLingui();
 	const actions = useTurnFailureActions();
 	const router = useRouter({ warn: false });
-	const kind = isUsageLimitMessage(error?.message ?? "")
-		? "usage_limit"
-		: (error?.kind ?? "unknown");
+	const hostKind = error?.kind ?? "unknown";
+	const kind =
+		hostKind === "unknown" && isUsageLimitMessage(error?.message ?? "")
+			? "usage_limit"
+			: hostKind;
 	const limit = kind === "usage_limit";
 	const tone = TONES[limit ? "limit" : "failure"];
 	const manualSignIn = kind === "auth" && actions?.manualSignIn === true;
@@ -259,7 +238,7 @@ export function TurnFailureCard({
 							Your model provider stopped this request because the account
 							reached its usage or spend limit. Wait for the limit to reset,
 							raise it with your provider, or switch to another account in Usage
-							settings. Then continue.
+							settings.
 						</Trans>
 					</p>
 				)}

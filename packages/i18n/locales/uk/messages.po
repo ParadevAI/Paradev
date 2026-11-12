@@ -22989,8 +22989,8 @@ msgstr "Ваше посилання на GitHub походить з обліко
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "Ваш останній платіж не вдався. Оновіть спосіб оплати, щоб зберегти Pro."
 
-msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings. Then continue."
-msgstr "Постачальник моделі зупинив цей запит, бо обліковий запис досяг ліміту використання або витрат. Дочекайтеся скидання ліміту, збільште його в постачальника або перейдіть на інший обліковий запис у налаштуваннях використання. Потім продовжте."
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "Постачальник моделі зупинив цей запит, бо обліковий запис досяг ліміту використання або витрат. Дочекайтеся скидання ліміту, збільште його в постачальника або перейдіть на інший обліковий запис у налаштуваннях використання."
 
 msgid "Your name"
 msgstr "Ваше ім'я"

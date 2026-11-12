@@ -15,6 +15,7 @@ test("usage and spend refusals read as a usage limit; rate limits and other erro
 	}
 	for (const message of [
 		"Rate limit exceeded. Try again in 20s.",
+		"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.",
 		"acp agent exited (code 1)",
 		"prompt is too long",
 	]) {

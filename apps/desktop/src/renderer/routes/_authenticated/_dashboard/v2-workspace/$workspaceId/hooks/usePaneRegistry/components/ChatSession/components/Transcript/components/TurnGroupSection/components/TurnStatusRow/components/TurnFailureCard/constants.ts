@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import type { TurnFailureKind } from "@superset/chat/protocol";
+import { CircleAlert, Gauge } from "lucide-react";
 
 export type FailureAction =
 	| "continue"
@@ -51,3 +52,27 @@ export const MANUAL_SIGN_IN_ACTIONS: readonly FailureAction[] = [
 	"continue",
 	"agent_settings",
 ];
+
+export const TONES = {
+	failure: {
+		Icon: CircleAlert,
+		card: "border-destructive/25 bg-destructive/[0.04]",
+		icon: "text-destructive",
+		collapsedIcon: "text-destructive/70",
+		title: "text-destructive",
+		primary:
+			"border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50",
+		dismiss:
+			"text-destructive/60 hover:bg-destructive/10 hover:text-destructive",
+	},
+	limit: {
+		Icon: Gauge,
+		card: "border-warning/30 bg-warning/[0.04]",
+		icon: "text-warning",
+		collapsedIcon: "text-warning/80",
+		title: "text-foreground",
+		primary:
+			"border-warning/40 text-warning hover:bg-warning/10 hover:text-warning",
+		dismiss: "text-muted-foreground hover:bg-accent hover:text-foreground",
+	},
+};
