@@ -978,6 +978,35 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a join the agent refuses keeps the hidden parts it was sent with", async () => {
+		const { runtime, sessionId } = startSession({
+			...HELD_THEN_QUICK,
+			steer: false,
+			steerDelayMs: 5,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		runtime.commands.prompt({
+			commandId: randomUUID(),
+			sessionId,
+			clientId: "client-joined",
+			content: [
+				{ type: "text", text: "visible" },
+				{ type: "text", text: "hidden context", hidden: true },
+			],
+			join: { expectedTurnId: "t1" },
+		});
+
+		await waitFor(() => runtime.sessions.get(sessionId)?.queuedCount === 1);
+		const queued = runtime.commands.getQueue({ sessionId }).prompts[0];
+		expect(queued?.content.map((part) => part.text)).toEqual(["visible"]);
+		expect(queued?.fullContent.map((part) => part.text)).toEqual([
+			"visible",
+			"hidden context",
+		]);
+		await runtime.dispose();
+	});
+
 	test("a prompt steered at a turn that is no longer running is queued, not steered", async () => {
 		const { runtime, sessionId } = startSession({
 			...GATED_THEN_QUICK,
