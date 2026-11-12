@@ -12,8 +12,9 @@ env:
   VERCEL_CLI_VERSION: 50.22.1
   PR_NUMBER: ${{ github.event.pull_request.number }}
   API_ALIAS: api-pr-${{ github.event.pull_request.number }}-superset.vercel.app
-  WEB_ALIAS: web-pr-${{ github.event.pull_request.number }}-superset.vercel.app
-  MARKETING_ALIAS: marketing-pr-${{ github.event.pull_request.number }}-superset.vercel.app
+  BROWSER_API_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('api.pr-{0}.paradev.com', github.event.pull_request.number) || format('api-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
+  WEB_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('app.pr-{0}.paradev.com', github.event.pull_request.number) || format('web-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
+  MARKETING_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || format('marketing-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
   ADMIN_ALIAS: admin-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   DOCS_ALIAS: docs-pr-${{ github.event.pull_request.number }}-superset.vercel.app
 
@@ -160,11 +161,12 @@ jobs:
           AGENT_SESSION_SECRET: ${{ secrets.AGENT_SESSION_SECRET }}
           CLOUDFLARE_BROWSER_RENDERING_TOKEN: ${{ secrets.CLOUDFLARE_BROWSER_RENDERING_TOKEN }}
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          BROWSER_API_URL: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('https://api.pr-{0}.paradev.com', github.event.pull_request.number) || secrets.BROWSER_API_URL }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -243,6 +245,7 @@ jobs:
             --env AGENT_SESSION_SECRET=$AGENT_SESSION_SECRET \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
             --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
@@ -306,6 +309,9 @@ jobs:
             --env SERVER_OPENAI_API_KEY=$SERVER_OPENAI_API_KEY \
             --env GH_APP_SLUG=$GH_APP_SLUG)
           vercel alias $VERCEL_URL ${{ env.API_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+          if [ "${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') }}" = "true" ]; then
+            vercel alias $VERCEL_URL ${{ env.BROWSER_API_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+          fi
           echo "vercel_url=$VERCEL_URL" >> $GITHUB_OUTPUT
 
       - name: Save API success status
@@ -377,7 +383,8 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ env.DATABASE_URL_UNPOOLED }}
-          NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          NEXT_PUBLIC_API_URL: https://${{ env.BROWSER_API_ALIAS }}
+          BROWSER_API_URL: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('https://api.pr-{0}.paradev.com', github.event.pull_request.number) || secrets.BROWSER_API_URL }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
@@ -389,7 +396,7 @@ jobs:
           MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_WEB: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_WEB }}
@@ -417,6 +424,7 @@ jobs:
             --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
             --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
@@ -518,7 +526,7 @@ jobs:
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_MARKETING: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_MARKETING }}

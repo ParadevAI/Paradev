@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 
 /**
@@ -5,5 +6,5 @@ import { env } from "@/env";
  * callback, which starts it, and the identity callback, which finishes it —
  * the redirect URI and scopes have to match on both legs.
  */
-export const IDENTITY_REDIRECT_URI = `${env.NEXT_PUBLIC_API_URL}/api/integrations/microsoft-teams/identity/callback`;
+export const IDENTITY_REDIRECT_URI = `${getBrowserApiUrl(env)}/api/integrations/microsoft-teams/identity/callback`;
 export const IDENTITY_SCOPES = "openid profile email";

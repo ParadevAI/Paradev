@@ -1,7 +1,10 @@
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { db } from "@superset/db/client";
+import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
 import * as crypto from "../../router/plugins/crypto";
+import { redirectUriFor } from "./client-identity";
 import * as discovery from "./discovery";
 
 // A refresh is a token-endpoint call plus what gets written back. A real
@@ -21,14 +24,29 @@ let tokenRequests: URLSearchParams[] = [];
 let oauthClients: Array<Record<string, unknown>> = [];
 
 let limits: number[] = [];
+let clientQueryParams: unknown[] = [];
+let deletedClientParams: unknown[] = [];
+const dialect = new PgDialect();
 
 // `refresh` re-reads one row by id; the lookups read two to detect a second.
 // The stored dynamic clients are read whole, ordered, with no limit.
 const selectChain = {
 	from: () => selectChain,
-	where: () => selectChain,
+	where: (condition: SQL) => {
+		clientQueryParams = dialect.sqlToQuery(condition).params;
+		return selectChain;
+	},
 	orderBy: () =>
-		Object.assign(Promise.resolve(oauthClients), { limit: selectChain.limit }),
+		Object.assign(
+			Promise.resolve(
+				oauthClients.filter(
+					(row) =>
+						clientQueryParams.includes(row.issuer) &&
+						clientQueryParams.includes(row.redirectUri),
+				),
+			),
+			{ limit: selectChain.limit },
+		),
 	limit: (n: number) => {
 		limits.push(n);
 		if (rows.length) return Promise.resolve(rows.slice(0, n));
@@ -59,7 +77,16 @@ const updateChain = {
 	where: () => updateResult,
 };
 
-stub(db, { select: () => selectChain, update: () => updateChain });
+stub(db, {
+	select: () => selectChain,
+	update: () => updateChain,
+	delete: () => ({
+		where: (condition: SQL) => {
+			deletedClientParams = dialect.sqlToQuery(condition).params;
+			return Promise.resolve();
+		},
+	}),
+});
 
 const ISSUER = "https://api.useautumn.com/api/auth";
 stub(discovery, {
@@ -128,6 +155,7 @@ afterAll(() => {
 
 beforeEach(() => {
 	updates = [];
+	deletedClientParams = [];
 	swaps = [];
 	written = [];
 	limits = [];
@@ -440,6 +468,7 @@ describe("a dynamic client's connection", () => {
 		connection({ connector: "autumn_mcp", ...overrides });
 	const oauthClient = (clientId: string, scopes: string[] | null) => ({
 		issuer: ISSUER,
+		redirectUri: redirectUriFor("autumn_mcp"),
 		clientId,
 		clientSecret: `${clientId}-secret`,
 		clientSecretExpiresAt: null,
@@ -472,6 +501,62 @@ describe("a dynamic client's connection", () => {
 
 		await ensureFreshConnection(autumn({ oauthClientId: null }));
 		expect(tokenRequests[0]?.get("client_id")).toBe("legacy-client");
+	});
+
+	test.each([
+		["https://api.paradev.com", "https://api.superset.sh", "legacy-client"],
+		["https://api.superset.sh", "https://api.paradev.com", "legacy-client"],
+		["https://api.paradev.com", "https://api.superset.sh", null],
+		["https://api.superset.sh", "https://api.paradev.com", null],
+	] as const)("refreshes from %s using the original registration on %s (client %s)", async (browserUrl, registrationUrl, issuedTo) => {
+		const previousBrowserUrl = process.env.BROWSER_API_URL;
+		process.env.BROWSER_API_URL = browserUrl;
+		try {
+			const original = {
+				...oauthClient("legacy-client", null),
+				redirectUri: `${registrationUrl}/api/connectors/callback/autumn_mcp`,
+			};
+			oauthClients = [
+				{
+					...original,
+					issuer: "https://other-issuer.test",
+					clientSecret: "wrong-issuer",
+				},
+				{
+					...original,
+					redirectUri: `${registrationUrl}/api/connectors/callback/another_connector`,
+					clientSecret: "wrong-connector",
+				},
+				original,
+			];
+			stored = autumn({ oauthClientId: issuedTo });
+			await ensureFreshConnection(autumn({ oauthClientId: issuedTo }));
+			expect(tokenRequests[0]?.get("client_id")).toBe("legacy-client");
+			expect(tokenRequests[0]?.get("client_secret")).toBe(
+				"legacy-client-secret",
+			);
+			expect(
+				updates.some((update) => update.disconnectReason === NEEDS_REAUTH),
+			).toBe(false);
+
+			updates = [];
+			response = { ok: false, status: 400, body: { error: "invalid_client" } };
+			await expect(
+				ensureFreshConnection(autumn({ oauthClientId: issuedTo }), {
+					raceSettleMs: 0,
+				}),
+			).rejects.toBeInstanceOf(UnrefreshableConnectionError);
+			expect(deletedClientParams).toContain(ISSUER);
+			expect(deletedClientParams).toContain(original.redirectUri);
+			expect(deletedClientParams).toContain("legacy-client");
+			expect(deletedClientParams).not.toContain("https://other-issuer.test");
+			expect(deletedClientParams).not.toContain(
+				`${registrationUrl}/api/connectors/callback/another_connector`,
+			);
+		} finally {
+			if (previousBrowserUrl === undefined) delete process.env.BROWSER_API_URL;
+			else process.env.BROWSER_API_URL = previousBrowserUrl;
+		}
 	});
 
 	test("whose client was forgotten needs reauthorization", async () => {

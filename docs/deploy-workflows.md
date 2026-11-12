@@ -40,3 +40,30 @@ page. That is cosmetic.
 Dispatching a workflow within a second of `gh workflow enable` produced a run stuck "queued" with
 zero jobs. It could not be cancelled, force-cancelled or deleted. Wait about 20 seconds after
 enabling before you dispatch.
+
+## Previews with shared browser cookies
+
+Add the `domain-preview` PR label before pushing an update to deploy these
+isolated browser hosts:
+
+- `pr-<number>.paradev.com`: marketing
+- `app.pr-<number>.paradev.com`: web
+- `api.pr-<number>.paradev.com`: browser API and OAuth callbacks
+
+Auth cookies use `pr-<number>.paradev.com`. The API keeps its original
+`api-pr-<number>-superset.vercel.app` identity and alias; `BROWSER_API_URL`
+selects the owned browser host. The web build calls that browser host.
+Other previews retain their existing settings. These builds use the preview
+database branch and preview credentials, not production configuration.
+
+Register the exact browser callback with the provider before testing OAuth.
+Custom domains fix cookie scope; they do not remove provider allowlists.
+An OAuth proxy or a fixed staging callback is a separate requirement for
+sign-in on arbitrary PRs without registering each callback. Do not use
+`Domain=vercel.app`: it is a public suffix and browsers reject that cookie.
+
+Use a separate browser profile for analytics tests: PostHog's existing cookie
+name is shared across `paradev.com`. Confirm the Preview PostHog project receives
+the events. Keep the label until the PR closes so cleanup removes the three
+owned-domain aliases. Remove temporary provider callback registrations after
+the test.

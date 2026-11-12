@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
 			);
 			consentUrl.searchParams.set(
 				"redirect_uri",
-				`${env.NEXT_PUBLIC_API_URL}/api/integrations/microsoft-teams/callback`,
+				`${getBrowserApiUrl(env)}/api/integrations/microsoft-teams/callback`,
 			);
 			consentUrl.searchParams.set("state", state);
 			return consentUrl.toString();

@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { env } from "@/env";
-import { resolveCallbackUrl } from "./utils/resolveCallbackUrl";
+import { resolveCallbackUrl } from "../../utils/resolveCallbackUrl";
 
 const LAST_USED_METHOD_KEY = "superset-last-auth-method";
 const ERROR_CODE = /^[A-Za-z0-9_-]{1,64}$/;

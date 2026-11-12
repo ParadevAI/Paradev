@@ -1,8 +1,10 @@
 import { db } from "@superset/db/client";
 import { pluginOauthClients } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import type { ConnectorMethod } from "@superset/shared/connectors";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { and, asc, eq } from "drizzle-orm";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { decryptOptional, encryptOptional } from "../../router/plugins/crypto";
 import { credentialFetch } from "../../router/plugins/manifest";
@@ -35,7 +37,17 @@ export function clientMetadataUrl(connectorSlug: string): string {
 }
 
 export function redirectUriFor(connectorSlug: string): string {
-	return `${env.NEXT_PUBLIC_API_URL}/api/connectors/callback/${connectorSlug}`;
+	return `${getBrowserApiUrl(env)}/api/connectors/callback/${connectorSlug}`;
+}
+
+export function issuedGrantRedirectUris(
+	connectorSlug: string,
+	redirectUri = redirectUriFor(connectorSlug),
+): string[] {
+	return withOwnDomainTwins([
+		redirectUri,
+		`${env.NEXT_PUBLIC_API_URL}/api/connectors/callback/${connectorSlug}`,
+	]);
 }
 
 function pickAuthMethod(
@@ -79,7 +91,7 @@ function unexpired(row: StoredClientRow): boolean {
 
 async function storedClient(
 	issuer: string,
-	redirectUri: string,
+	redirectUri: string | string[],
 	pick: { clientId: string } | { coveringScopes: string[] } | { legacy: true },
 ): Promise<ClientIdentity | null> {
 	const rows = await db
@@ -88,7 +100,9 @@ async function storedClient(
 		.where(
 			and(
 				eq(pluginOauthClients.issuer, issuer),
-				eq(pluginOauthClients.redirectUri, redirectUri),
+				Array.isArray(redirectUri)
+					? inArray(pluginOauthClients.redirectUri, redirectUri)
+					: eq(pluginOauthClients.redirectUri, redirectUri),
 			),
 		)
 		.orderBy(asc(pluginOauthClients.createdAt));
@@ -245,9 +259,13 @@ export async function resolveClientIdentity(
 	const issuedTo = "issuedTo" in client ? client.issuedTo : null;
 	if (issuedTo === metadataUrl) return { clientId: metadataUrl };
 	if (issuedTo) {
-		const bound = await storedClient(server.issuer, redirectUri, {
-			clientId: issuedTo,
-		});
+		const bound = await storedClient(
+			server.issuer,
+			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			{
+				clientId: issuedTo,
+			},
+		);
 		if (!bound) throw new ForgottenClientError(server.issuer, issuedTo);
 		return bound;
 	}
@@ -262,9 +280,13 @@ export async function resolveClientIdentity(
 	const scopes = method.scopes ?? [];
 	if (!("newGrant" in client)) {
 		// Registering here would hand the grant a client its tokens were never issued to.
-		const legacy = await storedClient(server.issuer, redirectUri, {
-			legacy: true,
-		});
+		const legacy = await storedClient(
+			server.issuer,
+			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			{
+				legacy: true,
+			},
+		);
 		if (!legacy) throw new ForgottenClientError(server.issuer, "(unrecorded)");
 		return legacy;
 	}
@@ -287,7 +309,7 @@ export async function resolveClientIdentity(
 
 export async function forgetClient(
 	issuer: string,
-	redirectUri: string,
+	redirectUri: string | string[],
 	clientId: string,
 ): Promise<void> {
 	await db
@@ -295,7 +317,9 @@ export async function forgetClient(
 		.where(
 			and(
 				eq(pluginOauthClients.issuer, issuer),
-				eq(pluginOauthClients.redirectUri, redirectUri),
+				Array.isArray(redirectUri)
+					? inArray(pluginOauthClients.redirectUri, redirectUri)
+					: eq(pluginOauthClients.redirectUri, redirectUri),
 				eq(pluginOauthClients.clientId, clientId),
 			),
 		);
