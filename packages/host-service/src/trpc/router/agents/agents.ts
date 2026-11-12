@@ -15,6 +15,7 @@ import {
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
+	agentCommandText,
 	buildArgvCommand,
 	buildPromptCommandString,
 	envOverlayPrefix,
@@ -87,26 +88,24 @@ export function buildAgentCommandString(
 	const forkArgv = options.forkSessionId
 		? buildForkArgv(config.forkArgs, options.forkSessionId)
 		: [];
-	const baseArgv = [
-		config.command,
-		...config.args,
-		...modelArgs,
-		...resumeArgv,
-		...forkArgv,
-	];
+	const baseArgv = [...modelArgs, ...resumeArgv, ...forkArgv];
+	const withCommand = (argv: string[]) =>
+		[agentCommandText(config.command, config.args), buildArgvCommand(argv)]
+			.filter(Boolean)
+			.join(" ");
 
 	if (prompt === "") {
-		return buildArgvCommand(baseArgv);
+		return withCommand(baseArgv);
 	}
 
 	if (config.promptTransport === "argv") {
 		// Plain quoted positional, not the shared "$(cat <<…)" form: the command
 		// is typed into the user's configured shell, and fish has no heredocs.
-		return buildArgvCommand([...baseArgv, ...config.promptArgs, prompt]);
+		return withCommand([...baseArgv, ...config.promptArgs, prompt]);
 	}
 
 	return buildPromptCommandString({
-		command: buildArgvCommand([...baseArgv, ...config.promptArgs]),
+		command: withCommand([...baseArgv, ...config.promptArgs]),
 		transport: "stdin",
 		prompt,
 		randomId,
@@ -674,7 +673,6 @@ export function chatLaunchTarget(
 } | null {
 	if (
 		input.surface !== "chat" ||
-		input.effort ||
 		input.resumeSessionId ||
 		input.forkSessionId
 	) {

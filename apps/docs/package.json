@@ -12,8 +12,8 @@
 		"postinstall": "fumadocs-mdx"
 	},
 	"dependencies": {
-		"@lingui/core": "6.8.0",
-		"@lingui/react": "6.8.0",
+		"@lingui/core": "6.12.0",
+		"@lingui/react": "6.12.0",
 		"@modelcontextprotocol/sdk": "1.32.0",
 		"@radix-ui/react-collapsible": "1.1.12",
 		"@radix-ui/react-scroll-area": "1.2.10",

@@ -3,7 +3,6 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { useOverflowFade } from "../../../hooks/use-overflow-fade";
 import { cn } from "../../../lib/utils";
-import "../fade-edge.css";
 
 interface OverflowFadeTextProps extends ComponentPropsWithoutRef<"span"> {
 	/**

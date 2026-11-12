@@ -77,14 +77,14 @@ function toCloneError(err: unknown, gitMissingMessage: string): CloneError {
 	if (raw.includes("Permission denied (publickey)")) {
 		return {
 			message:
-				"SSH authentication failed — sign in to GitHub CLI and use the HTTPS URL instead.",
+				"SSH authentication failed. Sign in to GitHub CLI and use the HTTPS URL instead.",
 			needsGhAuth: true,
 		};
 	}
 	if (GH_AUTH_FAILURE_PATTERNS.some((pattern) => raw.includes(pattern))) {
 		return {
 			message:
-				"Couldn't access this repository — if it's private, sign in to GitHub CLI first.",
+				"Couldn't access this repository. If it's private, sign in to GitHub CLI first.",
 			needsGhAuth: true,
 		};
 	}

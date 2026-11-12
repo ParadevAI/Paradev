@@ -20,7 +20,7 @@ export interface CloudSidebarWorkspaceInput {
 	createdAt: Date;
 	updatedAt: Date;
 	agentStatusAt: Date | null;
-	createdBy: { userId: string } | null;
+	createdBy: { userId: string; name: string; image: string | null } | null;
 	status?: "provisioning" | "ready" | "failed" | "deleted";
 }
 
@@ -163,6 +163,7 @@ export function buildCloudSidebarWorkspaces({
 			isPinned: false,
 			pendingTransaction: null,
 			isMine: userId !== null && workspace.createdBy?.userId === userId,
+			creator: workspace.createdBy,
 			sandboxStatus:
 				workspace.status === "provisioning" || workspace.status === "failed"
 					? workspace.status

@@ -214,6 +214,81 @@ describe("ClaudeAdapter", () => {
 		expect(lastStatus(await untilStatus(harness.iterator))).toBe("running");
 	});
 
+	test("an approval carries the reason Claude Code gives for asking", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		void harness.options()?.canUseTool?.(
+			"Bash",
+			{ command: "rm -rf build" },
+			{
+				signal: new AbortController().signal,
+				toolUseID: "tool-1",
+				requestId: "request-1",
+				decisionReason: "Deletes files",
+			},
+		);
+		const raised = await untilStatus(harness.iterator);
+		const approval = raised.find((event) => event.kind === "item");
+		expect(approval?.kind === "item" && approval.item).toMatchObject({
+			kind: "approval_request",
+			reason: "Deletes files",
+		});
+	});
+
+	test("AskUserQuestion asks as a form and answers the tool with the picks", async () => {
+		const harness = createHarness();
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		await nextTurn(harness.iterator);
+
+		const input = {
+			questions: [
+				{
+					question: "Which database?",
+					header: "Database",
+					multiSelect: false,
+					options: [
+						{ label: "Postgres", description: "Relational" },
+						{ label: "SQLite", description: "Embedded" },
+					],
+				},
+			],
+		};
+		const result = harness.options()?.canUseTool?.("AskUserQuestion", input, {
+			signal: new AbortController().signal,
+			toolUseID: "tool-1",
+			requestId: "request-1",
+			decisionReason: "Asks the user",
+		});
+		const raised = await untilStatus(harness.iterator);
+		const approval = raised.find((event) => event.kind === "item");
+		const item = approval?.kind === "item" ? approval.item : undefined;
+		expect(item).toMatchObject({
+			kind: "approval_request",
+			title: "Which database?",
+			form: {
+				message: "Which database?",
+				fields: [
+					{ id: "question_0", title: "Database", input: "single" },
+					{ id: "question_0_custom", input: "text" },
+				],
+			},
+		});
+		expect(item && "reason" in item).toBe(false);
+
+		harness.adapter.respondToApproval(item?.id ?? "", {
+			type: "form",
+			values: { question_0: "Postgres" },
+		});
+		expect(await result).toEqual({
+			behavior: "allow",
+			updatedInput: { ...input, answers: { "Which database?": "Postgres" } },
+		});
+	});
+
 	test("an approval its turn left open does not hold the next turn awaiting input", async () => {
 		const harness = createHarness();
 		const ask = (toolUseID: string) =>

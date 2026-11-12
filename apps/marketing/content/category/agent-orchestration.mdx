@@ -2,7 +2,7 @@
 title: "AI Agent Orchestration for Software Development"
 description: "What agent orchestration means for coding: the primitives (isolation, sessions, review, scheduling, programmatic control), the patterns, and when you actually need it."
 date: 2026-08-17
-lastUpdated: 2026-09-23
+lastUpdated: 2026-11-10
 keywords:
   - agent orchestration
   - ai agent orchestration
@@ -11,6 +11,8 @@ keywords:
   - multi agent development
   - agent automation
   - mcp agent control
+  - cloud coding agents
+  - multiplayer coding agents
 ---
 
 Agent orchestration is everything around the coding agents: where they run, how they stay alive, who watches them, and how their output gets reviewed and merged. The agents write the code. Orchestration decides where, when, and under what supervision they run.
@@ -34,7 +36,7 @@ A local machine must remain awake for its agents to keep executing. To continue 
 
 ## The primitives
 
-Homegrown or product, orchestration setups end up with the same six pieces.
+Homegrown or product, orchestration setups end up with the same seven pieces.
 
 ### Isolated workspaces
 
@@ -59,6 +61,12 @@ Per-task diffs, reviewed centrally, merged or discarded independently. Orchestra
 Recurring prompts on a schedule: nightly dependency bumps, morning triage of new issues, a weekly dead-code sweep. Scheduled runs are where agent work compounds, because they happen whether or not anyone remembered to ask.
 
 ![A team's scheduled agent automations: daily standup digests, Linear ticket grooming, CRM syncs, each running an agent prompt on a schedule in its own workspace](/changelog/automations.png)
+
+### A machine that is not your laptop
+
+Persistence keeps an agent alive when the app closes. It does nothing when the machine sleeps, loses its network, or goes into a bag. Orchestration at any real size needs somewhere else to run: a second machine you own, a server in your own cloud account, or a hosted sandbox per workspace.
+
+Paradev covers the three: Remote Access for a macOS or Linux machine you add, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) for a Linux server in your own account, and [cloud workspaces](/cloud) on the Team and Ultra plans, where each workspace gets its own cloud machine and keeps working with your laptop closed. Your agent sign-ins and GitHub access are not copied into the sandbox: the agent sees a placeholder, and Paradev adds your sign-in to outgoing requests. The variables and secrets you set on the environment are delivered to the sandbox as you configured them.
 
 ### Programmatic control
 
@@ -91,6 +99,18 @@ For a first scheduled task, use the [maintenance-check walkthrough](/blog/schedu
 **Agent drives agents.** A coordinating agent (a chat session, a CI job, another product) uses an orchestrator's MCP server to spawn workers, watch them, and gather results. This is the pattern behind most "agent swarm" demos, minus the demo.
 
 **Race and pick.** Launch two or three agents on the same task with different approaches or different models, keep the best diff, discard the rest. Cheap insurance on tasks where approach matters more than effort.
+
+## Orchestration with more than one person
+
+Everything above describes one person dispatching agents. Teams hit a second problem: two people, each with agents, working the same repository without a way to see each other's work in flight. The pull request arrives too late to prevent the overlap.
+
+Three answers are in use in 2026:
+
+- **Share the output.** Branches, pull requests, and issue trackers, as always. Nothing new to buy, and nothing stops two agents from spending an afternoon on the same file.
+- **Share the context and let agents talk.** Cursor rebuilt Projects for multiplayer on November 10, 2026: members of a Project share a task board and a context store, and each member's coordinator agent can message a teammate's.
+- **Share the running workspace.** In Paradev, a cloud workspace is visible to your organization or to the people you invite, and full access lets a teammate open its terminals and prompt the agents that are already running. [Automations](https://docs.paradev.com/automations) produce workspaces a teammate can pick up, and [Pages](https://docs.paradev.com/pages) give the team a place to comment on what an agent produced.
+
+The trade-offs are covered in [multiplayer coding agents](/multiplayer-coding-agents).
 
 ## Two schools of orchestration
 

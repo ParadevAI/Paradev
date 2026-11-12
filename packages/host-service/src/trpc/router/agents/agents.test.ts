@@ -70,7 +70,7 @@ describe("buildAgentCommandString", () => {
 			buildAgentCommandString(argvConfig, "do the thing", [], {
 				randomId: RANDOM_ID,
 			}),
-		).toBe("'claude' '--dangerously-skip-permissions' 'do the thing'");
+		).toBe("claude --dangerously-skip-permissions 'do the thing'");
 	});
 
 	it("inserts model args between base args and the prompt (argv transport)", () => {
@@ -84,7 +84,7 @@ describe("buildAgentCommandString", () => {
 				},
 			),
 		).toBe(
-			"'claude' '--dangerously-skip-permissions' '--model' 'sonnet' 'do the thing'",
+			"claude --dangerously-skip-permissions --model sonnet 'do the thing'",
 		);
 	});
 
@@ -98,9 +98,7 @@ describe("buildAgentCommandString", () => {
 					randomId: RANDOM_ID,
 				},
 			),
-		).toBe(
-			`'amp' '--model' 'sonnet' <<'${DELIMITER}'\ndo the thing\n${DELIMITER}`,
-		);
+		).toBe(`amp --model sonnet <<'${DELIMITER}'\ndo the thing\n${DELIMITER}`);
 	});
 
 	it("shell-quotes hostile model and prompt values", () => {
@@ -114,7 +112,7 @@ describe("buildAgentCommandString", () => {
 				},
 			),
 		).toBe(
-			"'claude' '--dangerously-skip-permissions' '--model' 'x'\\''; rm -rf /' 'p'\\''; rm -rf /'",
+			"claude --dangerously-skip-permissions --model 'x'\\''; rm -rf /' 'p'\\''; rm -rf /'",
 		);
 	});
 
@@ -122,17 +120,17 @@ describe("buildAgentCommandString", () => {
 		const config = { ...argvConfig, promptArgs: ["-p"] };
 		expect(
 			buildAgentCommandString(config, "p", [], { randomId: RANDOM_ID }),
-		).toBe("'claude' '--dangerously-skip-permissions' '-p' 'p'");
+		).toBe("claude --dangerously-skip-permissions -p p");
 	});
 
 	it("drops promptArgs and the prompt payload when the prompt sanitizes to empty", () => {
 		const config = { ...argvConfig, promptArgs: ["-p"] };
 		expect(
 			buildAgentCommandString(config, "\x1b\x07", [], { randomId: RANDOM_ID }),
-		).toBe("'claude' '--dangerously-skip-permissions'");
+		).toBe("claude --dangerously-skip-permissions");
 		expect(
 			buildAgentCommandString(stdinConfig, "", [], { randomId: RANDOM_ID }),
-		).toBe("'amp'");
+		).toBe("amp");
 	});
 
 	it("splices resumeArgs and the session id after the base args (promptless resume)", () => {
@@ -141,7 +139,7 @@ describe("buildAgentCommandString", () => {
 				resumeSessionId: "abc-123",
 				randomId: RANDOM_ID,
 			}),
-		).toBe("'claude' '--dangerously-skip-permissions' '--resume' 'abc-123'");
+		).toBe("claude --dangerously-skip-permissions --resume abc-123");
 	});
 
 	it("keeps the prompt after the resume args (argv transport)", () => {
@@ -151,7 +149,7 @@ describe("buildAgentCommandString", () => {
 				randomId: RANDOM_ID,
 			}),
 		).toBe(
-			"'claude' '--dangerously-skip-permissions' '--model' 'sonnet' '--resume' 'abc-123' 'keep going'",
+			"claude --dangerously-skip-permissions --model sonnet --resume abc-123 'keep going'",
 		);
 	});
 
@@ -162,7 +160,7 @@ describe("buildAgentCommandString", () => {
 				randomId: RANDOM_ID,
 			}),
 		).toBe(
-			`'amp' 'threads' 'continue' 'T-42' <<'${DELIMITER}'\nkeep going\n${DELIMITER}`,
+			`amp threads continue T-42 <<'${DELIMITER}'\nkeep going\n${DELIMITER}`,
 		);
 	});
 
@@ -172,9 +170,7 @@ describe("buildAgentCommandString", () => {
 				resumeSessionId: "x'; rm -rf /\x1b",
 				randomId: RANDOM_ID,
 			}),
-		).toBe(
-			"'claude' '--dangerously-skip-permissions' '--resume' 'x'\\''; rm -rf /'",
-		);
+		).toBe("claude --dangerously-skip-permissions --resume 'x'\\''; rm -rf /'");
 	});
 
 	it("uses placeholder-based native fork args", () => {
@@ -184,7 +180,7 @@ describe("buildAgentCommandString", () => {
 				randomId: RANDOM_ID,
 			}),
 		).toBe(
-			"'claude' '--dangerously-skip-permissions' '--resume' 'abc-123' '--fork-session'",
+			"claude --dangerously-skip-permissions --resume abc-123 --fork-session",
 		);
 	});
 
@@ -195,9 +191,25 @@ describe("buildAgentCommandString", () => {
 				forkSessionId: "thread-42",
 				randomId: RANDOM_ID,
 			}),
-		).toBe(
-			"'codex' '--dangerously-skip-permissions' 'fork' 'thread-42' 'continue'",
-		);
+		).toBe("codex --dangerously-skip-permissions fork thread-42 continue");
+	});
+
+	it("runs a command stored as shell code as written", () => {
+		const config = {
+			...argvConfig,
+			command: "ccr code | tee log",
+			args: [],
+		};
+		expect(
+			buildAgentCommandString(config, "do it", [], { randomId: RANDOM_ID }),
+		).toBe("ccr code | tee log 'do it'");
+		expect(
+			buildAgentCommandString(
+				{ ...config, command: "/opt/My Agent/claude" },
+				"",
+				[],
+			),
+		).toBe("'/opt/My Agent/claude'");
 	});
 });
 
@@ -305,7 +317,7 @@ describe("buildTerminalAgentLaunch", () => {
 		});
 		expect(launch.label).toBe("Claude");
 		expect(launch.fullCommand).toBe(
-			"FOO='bar' 'claude' '--dangerously-skip-permissions' 'do the thing'",
+			"FOO='bar' claude --dangerously-skip-permissions 'do the thing'",
 		);
 	});
 
@@ -319,7 +331,7 @@ describe("buildTerminalAgentLaunch", () => {
 			resumeSessionId: "abc-123",
 		});
 		expect(launch.fullCommand).toBe(
-			"FOO='bar' 'claude' '--dangerously-skip-permissions' '--resume' 'abc-123'",
+			"FOO='bar' claude --dangerously-skip-permissions --resume abc-123",
 		);
 	});
 
@@ -333,7 +345,7 @@ describe("buildTerminalAgentLaunch", () => {
 			forkSessionId: "session-source",
 		});
 		expect(launch.fullCommand).toContain(
-			"'--resume' 'session-source' '--fork-session'",
+			"--resume session-source --fork-session",
 		);
 	});
 
@@ -498,7 +510,7 @@ describe("buildTerminalAgentLaunch", () => {
 		});
 
 		expect(launch.fullCommand).toBe(
-			"'omp' '--model' '@plan' '--thinking' 'high' '--plan-yolo' 'do the thing'",
+			"omp --model @plan --thinking high --plan-yolo 'do the thing'",
 		);
 	});
 
@@ -593,7 +605,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			prompt: "hi",
 		});
 		expect(launch.fullCommand).toBe(
-			`CLAUDE_CONFIG_DIR='${existingDir}' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' 'claude' 'hi'`,
+			`CLAUDE_CONFIG_DIR='${existingDir}' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' claude hi`,
 		);
 	});
 
@@ -610,7 +622,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 		// twin still carries the host default so the wrapper can re-resolve a
 		// later account switch without overriding the user-pinned value.
 		expect(launch.fullCommand).toBe(
-			`CLAUDE_CONFIG_DIR='/pinned/profile' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' 'claude' 'hi'`,
+			`CLAUDE_CONFIG_DIR='/pinned/profile' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' claude hi`,
 		);
 	});
 
@@ -623,7 +635,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			agent: "claude",
 			prompt: "hi",
 		});
-		expect(launch.fullCommand).toBe("'claude' 'hi'");
+		expect(launch.fullCommand).toBe("claude hi");
 	});
 
 	it("does not leak provider account env into other presets", () => {
@@ -648,7 +660,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			agent: "amp",
 			prompt: "hi",
 		});
-		expect(launch.fullCommand).toBe("'amp' 'hi'");
+		expect(launch.fullCommand).toBe("amp hi");
 	});
 
 	it("clearing the default (null) restores the system login", () => {
@@ -661,7 +673,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			agent: "claude",
 			prompt: "hi",
 		});
-		expect(launch.fullCommand).toBe("'claude' 'hi'");
+		expect(launch.fullCommand).toBe("claude hi");
 	});
 });
 
@@ -1162,19 +1174,20 @@ describe("continuationTarget", () => {
 		const db = createTestDb();
 		seedClaude(db);
 		const launch = { workspaceId, agent: "claude", prompt: "go" };
-
-		expect(
-			chatLaunchTarget(db, { ...launch, surface: "chat", mode: "plan" }),
-		).toEqual({
+		const claudeChat = {
 			harness: "claude-acp",
 			label: "Claude",
 			agentConfigId: "00000000-0000-0000-0000-00000000000a",
 			attachments: [],
-		});
-		expect(chatLaunchTarget(db, launch)).toBeNull();
+		};
+
+		expect(
+			chatLaunchTarget(db, { ...launch, surface: "chat", mode: "plan" }),
+		).toEqual(claudeChat);
 		expect(
 			chatLaunchTarget(db, { ...launch, surface: "chat", effort: "high" }),
-		).toBeNull();
+		).toEqual(claudeChat);
+		expect(chatLaunchTarget(db, launch)).toBeNull();
 	});
 
 	it("chats as a custom agent that runs the claude or codex CLI", () => {

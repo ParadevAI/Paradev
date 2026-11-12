@@ -2,7 +2,7 @@ import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { formatNumber } from "@superset/i18n/format";
 import { FileDiff } from "lucide-react";
-import { DiffStatText } from "../../../../../../../../../../components/DiffStatText";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { useTurnChanges } from "../../../../../../hooks/useTurnChanges";
 import { useChatPaneActions } from "../../../../../../providers/ChatPaneActionsProvider";
 import { reviewFilter, rootPlace } from "../../../../../../utils/filePlace";

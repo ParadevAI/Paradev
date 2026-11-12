@@ -45,6 +45,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
+	BEHAVIOR_PARADEV_ANYWHERE: "behavior-paradev-anywhere",
 	USAGE_IN_SIDEBAR: "usage-in-sidebar",
 	BEHAVIOR_OPEN_LINKS_IN_APP: "behavior-open-links-in-app",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
@@ -207,6 +208,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
 	// The agent composers that offer dictation are v2-only.
 	[SETTING_ITEM_ID.BEHAVIOR_DICTATION]: "v2",
+	[SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE]: "v2",
 	// The home sidebar (DashboardSidebar) only renders for v2 users.
 	[SETTING_ITEM_ID.USAGE_IN_SIDEBAR]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP]: "v1",
@@ -985,6 +987,25 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"transcribe",
 			"chat",
 			"composer",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE,
+		section: "behavior",
+		title: "Use Paradev anywhere button",
+		description:
+			"Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted",
+		keywords: [
+			"use paradev anywhere",
+			"sidebar",
+			"button",
+			"hide",
+			"show",
+			"mobile",
+			"cloud",
+			"cli",
+			"self-hosted",
+			"devices",
 		],
 	},
 	{
@@ -2219,13 +2240,11 @@ export function getVisibleMatchCountBySection(
 	query: string,
 	isV2: boolean,
 	cloudWorkspaces: boolean,
-	mobileEnabled = false,
 	pluginsVisible = false,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, isV2, cloudWorkspaces) &&
-			(item.section !== "mobile" || mobileEnabled) &&
 			(item.section !== "plugins" || pluginsVisible),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};

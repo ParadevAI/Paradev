@@ -7,10 +7,8 @@ import { X } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import {
-	describeMoveError,
-	MOVE_CANCELLED,
-} from "renderer/routes/_authenticated/_dashboard/utils/describeMoveError";
+import { useWorkspaceMoveProgressStore } from "renderer/routes/_authenticated/_dashboard/stores/workspaceMoveProgressStore";
+import { MOVE_CANCELLED } from "renderer/routes/_authenticated/_dashboard/utils/describeMoveError";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 
 const POLL_MS = 2_000;
@@ -19,7 +17,7 @@ const IN_FLIGHT = new Set(["pending", "moving"]);
 /**
  * Where this workspace's newest move stands: on the workspace it left, that it
  * moved and where to; on the one it moved to, how many chats are still on
- * their way. Each moved chat's own pane shows its progress and retry.
+ * their way. Each moved chat's own pane shows its progress, failure and retry.
  */
 export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 	const { t } = useLingui();
@@ -29,7 +27,7 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 		useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
 	const utils = cloudTrpc.useUtils();
 	const { data: move } = cloudTrpc.workspaceMove.latest.useQuery(
-		{ workspaceId },
+		{ workspaceId, anyone: true },
 		{
 			enabled: movesEnabled,
 			refetchInterval: (query) =>
@@ -46,53 +44,42 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 				description: errorMessage(error, t({ message: "Unknown error" })),
 			}),
 	});
+	const trackedHere = useWorkspaceMoveProgressStore((state) =>
+		Object.values(state.moves).some(
+			(progress) => move !== undefined && progress.workspaceMoveId === move?.id,
+		),
+	);
 	if (!move || move.id === dismissed) return null;
 
 	const inFlight = IN_FLIGHT.has(move.status);
 	const destination = move.toWorkspaceId;
-	const isSource = move.fromWorkspaceId === workspaceId;
+	const isMine = move.isMine !== false;
+	if (move.fromWorkspaceId !== workspaceId) return null;
+	if (inFlight && isMine && trackedHere) return null;
+	if (!inFlight && !destination) return null;
+	if (move.status === "failed" && move.chats.ready === 0) return null;
+	const cancellable = isMine && move.status === "pending" && !destination;
+	const cancel = () =>
+		abandon.mutate({ workspaceMoveId: move.id, error: MOVE_CANCELLED });
 	const stayed = move.chats.total - move.chats.ready;
-	const cancellable =
-		isSource && move.status === "pending" && !move.toWorkspaceId;
-	const failure =
-		move.status === "failed" ? describeMoveError(move.error) : null;
-	let label: ReactNode = null;
-	if (failure) {
-		label = isSource ? (
-			<Trans>This workspace couldn't move. It is unchanged.</Trans>
+	let label: ReactNode;
+	if (inFlight) {
+		label = isMine ? (
+			<Trans>Moving this workspace…</Trans>
 		) : (
-			<Trans>The move into this workspace failed.</Trans>
+			<Trans>Someone is moving this workspace…</Trans>
 		);
-	} else if (isSource) {
-		if (inFlight) {
-			label = <Trans>Moving this workspace…</Trans>;
-		} else if (move.status === "ready") {
-			label = <Trans>This workspace moved</Trans>;
-		} else if (move.status === "partial") {
-			label = (
-				<Plural
-					value={stayed}
-					one="This workspace moved. # chat stayed here."
-					other="This workspace moved. # chats stayed here."
-				/>
-			);
-		}
-	} else if (inFlight) {
-		label =
-			move.chats.total > 0 ? (
-				<Plural
-					value={move.chats.total - move.chats.ready - move.chats.failed}
-					one="Moving # chat here…"
-					other="Moving # chats here…"
-				/>
-			) : (
-				<Trans>Moving this workspace here…</Trans>
-			);
-	} else if (move.status === "partial") {
-		const { ready, total } = move.chats;
-		label = t({ message: `${ready} of ${total} chats moved here` });
+	} else if (stayed === 0) {
+		label = <Trans>This workspace moved</Trans>;
+	} else {
+		label = (
+			<Plural
+				value={move.chats.total - move.chats.ready}
+				one="This workspace moved. Its # chat stayed here."
+				other="This workspace moved. Its # chats stayed here."
+			/>
+		);
 	}
-	if (!label) return null;
 
 	return (
 		<div className="pointer-events-none absolute inset-x-0 top-20 z-20 flex justify-center px-4">
@@ -100,33 +87,18 @@ export function WorkspaceMoveBanner({ workspaceId }: { workspaceId: string }) {
 				aria-live="polite"
 				className="pointer-events-auto flex max-w-full items-center gap-2.5 rounded-full border border-border bg-popover py-1.5 pr-1.5 pl-3 text-sm text-popover-foreground shadow-lg"
 			>
-				<span
-					className="truncate font-medium"
-					title={failure ? (failure.details ?? failure.reason) : undefined}
-				>
-					{label}
-					{failure ? (
-						<span className="ml-1.5 font-normal text-muted-foreground">
-							{failure.reason}
-						</span>
-					) : null}
-				</span>
+				<span className="truncate font-medium">{label}</span>
 				{cancellable ? (
 					<button
 						type="button"
 						disabled={abandon.isPending}
-						onClick={() =>
-							abandon.mutate({
-								workspaceMoveId: move.id,
-								error: MOVE_CANCELLED,
-							})
-						}
+						onClick={cancel}
 						className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 font-medium hover:bg-accent/70 disabled:opacity-50"
 					>
 						<Trans>Cancel move</Trans>
 					</button>
 				) : null}
-				{isSource && !inFlight && destination ? (
+				{!inFlight && destination ? (
 					<button
 						type="button"
 						onClick={() => void navigateToV2Workspace(destination, navigate)}

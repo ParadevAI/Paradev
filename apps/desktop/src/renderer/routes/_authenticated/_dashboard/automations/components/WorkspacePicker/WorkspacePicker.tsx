@@ -175,7 +175,7 @@ export function WorkspacePicker({
 											<Trans>Workspace not found</Trans>
 										</span>
 										<span className="truncate text-[10px] text-amber-500/70">
-											<Trans>deleted or unavailable — pick another</Trans>
+											<Trans>deleted or unavailable, pick another</Trans>
 										</span>
 									</span>
 									<HiCheck className="ml-auto size-4" />
@@ -192,7 +192,7 @@ export function WorkspacePicker({
 									<span className="flex min-w-0 flex-col">
 										<span className="truncate">{selected.name}</span>
 										<span className="truncate text-[10px] text-amber-500/70">
-											<Trans>on {offScopeHostName} — won't run here</Trans>
+											<Trans>on {offScopeHostName}, won't run here</Trans>
 										</span>
 									</span>
 									<HiCheck className="ml-auto size-4" />

@@ -44,13 +44,22 @@ export interface TerminalLinkActionDeps {
 	rightPane?: RightPaneLinkTarget | null;
 }
 
-export function terminalPullRequestLinkAction(
+/**
+ * A bare pull request URL keeps its shortcuts (shift-click → system browser,
+ * unbound plain click → PR pane); a plain click the user bound in URL links
+ * follows that binding, as it does for every other URL.
+ */
+export function terminalUrlLinkAction(
 	event: ModifierEvent,
 	url: string,
+	getUrlAction: (event: ModifierEvent, url: string) => LinkAction | null,
 ): LinkAction | null {
-	if (event.metaKey || event.ctrlKey) return null;
-	if (!pullRequestRefFromBareUrl(url)) return null;
-	return event.shiftKey ? "external" : "pane";
+	const isBarePullRequest =
+		!event.metaKey && !event.ctrlKey && pullRequestRefFromBareUrl(url) !== null;
+	if (isBarePullRequest && event.shiftKey) return "external";
+	const chosen = getUrlAction(event, url);
+	if (chosen !== null) return chosen;
+	return isBarePullRequest ? "pane" : null;
 }
 
 /**

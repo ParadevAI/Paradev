@@ -2,6 +2,8 @@ import { afterEach, expect, mock, test } from "bun:test";
 import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { ChatPaneActionsProvider } from "../../../../../../providers/ChatPaneActionsProvider";
 import {
 	type TurnFailureActions,
 	TurnFailureActionsProvider,
@@ -136,6 +138,43 @@ test("a turn the usage limit stopped is one quiet line, not a failure card", () 
 	expect(view.queryByText("Copy error")).toBeNull();
 });
 
+test("a spend limit the host did not classify is a limit notice, not a red failure", () => {
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+				changeModel: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{
+					message:
+						"You have reached your specified workspace API usage limits.",
+					kind: "unknown",
+				}}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+	const card = view.container.querySelector(
+		'[data-turn-failure="usage_limit"]',
+	);
+	expect(card?.getAttribute("role")).toBe("status");
+	expect(card?.textContent).toContain("Usage limit reached");
+	expect(card?.className).not.toContain("destructive");
+	for (const action of ["Usage settings", "Change model", "Continue"]) {
+		expect(view.getByText(action)).toBeTruthy();
+	}
+	expect(card?.textContent).not.toContain("workspace API usage limits");
+	fireEvent.click(view.getByText("Show details"));
+	expect(card?.textContent).toContain("workspace API usage limits");
+});
+
 function authCard(actions: Partial<TurnFailureActions>) {
 	return render(
 		<TurnFailureActionsProvider
@@ -222,4 +261,34 @@ test("an older paused turn offers no Resume", () => {
 		/>,
 	);
 	expect(view.container.textContent).toBe("Paused when Paradev closed");
+});
+
+test("a cloud workspace shows no paused row", () => {
+	const view = render(
+		<SandboxAccessContext.Provider
+			value={{
+				targets: [
+					{
+						workspaceId: "w1",
+						organizationId: "o1",
+						url: "https://box",
+						desktopUrl: "https://box/desktop",
+					},
+				],
+				isReady: true,
+				agentCredentialsChangedWorkspaceId: null,
+				usageRefusal: null,
+			}}
+		>
+			<ChatPaneActionsProvider workspaceId="w1">
+				<TurnStatusRow
+					error={{ message: "Paradev closed", kind: "host_stopped" }}
+					latest
+					status="interrupted"
+					turnId="t1"
+				/>
+			</ChatPaneActionsProvider>
+		</SandboxAccessContext.Provider>,
+	);
+	expect(view.container.textContent).toBe("");
 });

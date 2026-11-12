@@ -9,26 +9,12 @@ export function fileListLayout({
 	open,
 }: {
 	containerWidth: number | null;
-	/** The person's choice from the Files button; null until they use it. */
-	open: boolean | null;
+	/** The person's choice from the Files button, kept in user preferences. */
+	open: boolean;
 }): FileListLayout {
 	if (containerWidth === null) return "hidden";
-	if (fitsDocked(containerWidth)) return open === false ? "hidden" : "docked";
-	return open === true ? "overlay" : "hidden";
-}
-
-/**
- * The Files button's next choice. Only a narrow pane stores `true`, so showing
- * the list in a wide pane doesn't pop an overlay once the pane narrows.
- */
-export function toggledFileListOpen(state: {
-	containerWidth: number | null;
-	open: boolean | null;
-}): boolean | null {
-	const fits =
-		state.containerWidth !== null && fitsDocked(state.containerWidth);
-	if (fileListLayout(state) === "hidden") return fits ? null : true;
-	return fits ? false : null;
+	if (!open) return "hidden";
+	return fitsDocked(containerWidth) ? "docked" : "overlay";
 }
 
 function fitsDocked(containerWidth: number): boolean {

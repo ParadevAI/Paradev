@@ -6,19 +6,30 @@ import {
 	useWorkspaceMoveProgressStore,
 	type WorkspaceMoveProgressStage,
 } from "../../stores/workspaceMoveProgressStore";
+import { MOVE_CANCELLED } from "../describeMoveError";
 
 const POLL_MS = 2_000;
 /** Longer than a stuck move takes to fail on its own. */
 const GIVE_UP_MS = 15 * 60 * 1000;
 const MAX_MISSED_READS = 5;
 const SUCCESS_LINGER_MS = 5_000;
+/** Long enough to reach the toast's Open from wherever the person went. */
+const OPEN_LINGER_MS = 12_000;
 
 export interface WorkspaceMoveProgressHandle {
 	/** Aborts when the person cancels the move from the toast. */
 	signal: AbortSignal;
 	setStage: (stage: "saving" | "creating") => void;
-	/** Follows the move's chats into this workspace until the move ends. */
-	follow: (toWorkspaceId: string) => void;
+	/** Links the toast to the control plane's move, so a cancel elsewhere ends it. */
+	begun: (workspaceMoveId: string) => void;
+	/**
+	 * Follows the move's chats into this workspace until the move ends. A
+	 * person still looking at the old workspace then lands in the new one.
+	 */
+	follow: (
+		toWorkspaceId: string,
+		destination: { open: () => void; stayed: string[] },
+	) => void;
 	fail: (message: string) => void;
 }
 
@@ -26,6 +37,8 @@ export interface WorkspaceMoveProgressHandle {
 export function startWorkspaceMoveProgress(args: {
 	name: string;
 	destination: string;
+	toCloud: boolean;
+	sourceWorkspaceId: string;
 	retry?: () => void;
 }): WorkspaceMoveProgressHandle {
 	const id = `workspace-move-${crypto.randomUUID()}`;
@@ -39,8 +52,12 @@ export function startWorkspaceMoveProgress(args: {
 	const { retry } = args;
 	useWorkspaceMoveProgressStore.getState().start({
 		id,
+		workspaceMoveId: null,
 		name: args.name,
 		destination: args.destination,
+		toCloud: args.toCloud,
+		stayed: [],
+		open: null,
 		stage: "saving",
 		chats: null,
 		error: null,
@@ -61,9 +78,18 @@ export function startWorkspaceMoveProgress(args: {
 		duration: Number.POSITIVE_INFINITY,
 	});
 
-	const finish = (stage: WorkspaceMoveProgressStage) => {
-		if (stage !== "ready") return;
-		setTimeout(dismiss, SUCCESS_LINGER_MS);
+	const stillViewingSource = () =>
+		window.location.hash.includes(`/v2-workspace/${args.sourceWorkspaceId}`);
+	const finish = (stage: WorkspaceMoveProgressStage, land: () => void) => {
+		if (stage === "failed") return;
+		const landed = stillViewingSource();
+		if (landed) {
+			land();
+			update(id, { open: null });
+		}
+		if (stage === "ready") {
+			setTimeout(dismiss, landed ? SUCCESS_LINGER_MS : OPEN_LINGER_MS);
+		}
 	};
 
 	return {
@@ -72,9 +98,14 @@ export function startWorkspaceMoveProgress(args: {
 			if (current()?.stage === "cancelled") return;
 			update(id, { stage });
 		},
+		begun: (workspaceMoveId) => update(id, { workspaceMoveId }),
 		fail: (message) => {
 			const move = current();
 			if (!move || move.stage === "cancelled") return;
+			if (message === MOVE_CANCELLED) {
+				update(id, { stage: "cancelled", cancel: null });
+				return;
+			}
 			update(id, {
 				stage: "failed",
 				error: message,
@@ -82,8 +113,17 @@ export function startWorkspaceMoveProgress(args: {
 				cancel: null,
 			});
 		},
-		follow: (toWorkspaceId) => {
-			update(id, { stage: "moving-chats", cancel: null });
+		follow: (toWorkspaceId, destination) => {
+			const open = () => {
+				destination.open();
+				dismiss();
+			};
+			update(id, {
+				stage: "moving-chats",
+				cancel: null,
+				open,
+				stayed: destination.stayed,
+			});
 			const startedAt = Date.now();
 			let missed = 0;
 			const poll = async () => {
@@ -111,7 +151,7 @@ export function startWorkspaceMoveProgress(args: {
 							: {}),
 					});
 					if (ended) {
-						finish(ended);
+						finish(ended, destination.open);
 						return;
 					}
 				} else {

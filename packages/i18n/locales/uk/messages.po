@@ -42,8 +42,8 @@ msgstr "«{0}» буде позначено на GitHub як закритий. �
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
 #. placeholder {2}: mergeMethodLabels[pendingAction.method]
-msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet — this overrides them. This can't be undone from here."
-msgstr "«{0}» буде злито в {1} через {2}. Перевірки ще не пройдено — ця дія їх обійде. Звідси це не можна скасувати."
+msgid "\"{0}\" will be merged into {1} via {2}. Checks haven't passed yet, so this overrides them. This can't be undone from here."
+msgstr "«{0}» буде злито в {1} через {2}. Перевірки ще не пройдено, ця дія їх обійде. Звідси це не можна скасувати."
 
 #. placeholder {0}: data.title
 #. placeholder {1}: data.base.ref
@@ -51,11 +51,11 @@ msgstr "«{0}» буде злито в {1} через {2}. Перевірки щ
 msgid "\"{0}\" will be merged into {1} via {2}. This can't be undone from here."
 msgstr "«{0}» буде злито в {1} через {2}. Звідси це не можна скасувати."
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached"
-msgstr "«{name}» має розмір {size} — файли понад {limit} прикріпити не можна"
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached"
+msgstr "«{name}» має розмір {size}. Файли понад {limit} прикріпити не можна"
 
-msgid "\"{name}\" is {size} — files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
-msgstr "«{name}» має розмір {size} — до цього робочого простору не можна прикріпити файли понад {limit}. Якщо файл є на машині робочого простору, вкажіть замість цього його шлях."
+msgid "\"{name}\" is {size}. Files over {limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead."
+msgstr "«{name}» має розмір {size}. До цього робочого простору не можна прикріпити файли понад {limit}. Якщо файл є на машині робочого простору, вкажіть замість цього його шлях."
 
 msgid "\"{name}\" is a folder. Attach the files inside it instead."
 msgstr "«{name}» — це папка. Прикріпіть файли з неї."
@@ -96,13 +96,17 @@ msgstr "(ви)"
 msgid "[prompt]"
 msgstr "[промпт]"
 
-#. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — hide details} other {# active ports — hide details}}"
-msgstr "{0, plural, one {# активний порт — сховати деталі} few {# активні порти — сховати деталі} many {# активних портів — сховати деталі} other {# активного порту — сховати деталі}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
+msgstr "{0, plural, one {Переміщено {done} з # чату} few {Переміщено {done} з # чатів} many {Переміщено {done} з # чатів} other {Переміщено {done} з # чату}}"
 
 #. placeholder {0}: ports.length
-msgid "{0, plural, one {# active port — show details} other {# active ports — show details}}"
-msgstr "{0, plural, one {# активний порт — показати деталі} few {# активні порти — показати деталі} many {# активних портів — показати деталі} other {# активного порту — показати деталі}}"
+msgid "{0, plural, one {# active port: hide details} other {# active ports: hide details}}"
+msgstr "{0, plural, one {# активний порт: сховати деталі} few {# активні порти: сховати деталі} many {# активних портів: сховати деталі} other {# активного порту: сховати деталі}}"
+
+#. placeholder {0}: ports.length
+msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
+msgstr "{0, plural, one {# активний порт: показати деталі} few {# активні порти: показати деталі} many {# активних портів: показати деталі} other {# активного порту: показати деталі}}"
 
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
@@ -131,10 +135,6 @@ msgstr "{0, plural, one {Закрито # чат} few {Закрито # чати
 #. placeholder {0}: chats?.failed ?? 0
 msgid "{0, plural, one {# chat could not move. Open it to try again.} other {# chats could not move. Open them to try again.}}"
 msgstr "{0, plural, one {# чат не вдалося перемістити. Відкрийте його, щоб спробувати ще раз.} few {# чати не вдалося перемістити. Відкрийте їх, щоб спробувати ще раз.} many {# чатів не вдалося перемістити. Відкрийте їх, щоб спробувати ще раз.} other {# чату не вдалося перемістити. Відкрийте їх, щоб спробувати ще раз.}}"
-
-#. placeholder {0}: skipped.length
-msgid "{0, plural, one {# chat stayed in the old workspace} other {# chats stayed in the old workspace}}"
-msgstr "{0, plural, one {# чат залишився в старому робочому просторі} few {# чати залишилися в старому робочому просторі} many {# чатів залишилися в старому робочому просторі} other {# чату залишилося в старому робочому просторі}}"
 
 #. placeholder {0}: comments.length
 msgid "{0, plural, one {# comment attached} other {# comments attached}}"
@@ -223,6 +223,10 @@ msgstr "{0, plural, one {Вибрано # проєкт.} few {Вибрано # �
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, one {# пул-реквест} few {# пул-реквести} many {# пул-реквестів} other {# пул-реквесту}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -246,12 +250,12 @@ msgid "{0, plural, one {# result} other {# results}}"
 msgstr "{0, plural, one {# результат} few {# результати} many {# результатів} other {# результату}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — hide details} other {# running agents — hide details}}"
-msgstr "{0, plural, one {# запущений агент — сховати деталі} few {# запущені агенти — сховати деталі} many {# запущених агентів — сховати деталі} other {# запущеного агента — сховати деталі}}"
+msgid "{0, plural, one {# running agent: hide details} other {# running agents: hide details}}"
+msgstr "{0, plural, one {# запущений агент: сховати деталі} few {# запущені агенти: сховати деталі} many {# запущених агентів: сховати деталі} other {# запущеного агента: сховати деталі}}"
 
 #. placeholder {0}: agents.length
-msgid "{0, plural, one {# running agent — show details} other {# running agents — show details}}"
-msgstr "{0, plural, one {# запущений агент — показати деталі} few {# запущені агенти — показати деталі} many {# запущених агентів — показати деталі} other {# запущеного агента — показати деталі}}"
+msgid "{0, plural, one {# running agent: show details} other {# running agents: show details}}"
+msgstr "{0, plural, one {# запущений агент: показати деталі} few {# запущені агенти: показати деталі} many {# запущених агентів: показати деталі} other {# запущеного агента: показати деталі}}"
 
 #. placeholder {0}: aliveCount ?? 0
 msgid "{0, plural, one {# session running} other {# sessions running}}"
@@ -283,8 +287,8 @@ msgid "{0, plural, one {# workspace} other {# workspaces}}"
 msgstr "{0, plural, one {# робочий простір} few {# робочі простори} many {# робочих просторів} other {# робочого простору}}"
 
 #. placeholder {0}: shown?.count ?? 0
-msgid "{0, plural, one {A running agent still uses the previous account — the switch only reaches new launches.} other {# running agents still use the previous account — the switch only reaches new launches.}}"
-msgstr "{0, plural, =1 {Запущений агент досі використовує попередній обліковий запис — перемикання діє лише для нових запусків.} one {# запущений агент досі використовує попередній обліковий запис — перемикання діє лише для нових запусків.} few {# запущені агенти досі використовують попередній обліковий запис — перемикання діє лише для нових запусків.} many {# запущених агентів досі використовують попередній обліковий запис — перемикання діє лише для нових запусків.} other {# запущеного агента досі використовує попередній обліковий запис — перемикання діє лише для нових запусків.}}"
+msgid "{0, plural, one {A running agent still uses the previous account. The switch only reaches new launches.} other {# running agents still use the previous account. The switch only reaches new launches.}}"
+msgstr "{0, plural, =1 {Запущений агент досі використовує попередній обліковий запис. Перемикання діє лише для нових запусків.} one {# запущений агент досі використовує попередній обліковий запис. Перемикання діє лише для нових запусків.} few {# запущені агенти досі використовують попередній обліковий запис. Перемикання діє лише для нових запусків.} many {# запущених агентів досі використовують попередній обліковий запис. Перемикання діє лише для нових запусків.} other {# запущеного агента досі використовує попередній обліковий запис. Перемикання діє лише для нових запусків.}}"
 
 #. placeholder {0}: targets.length
 msgid "{0, plural, one {Archived # automation} other {Archived # automations}}"
@@ -356,9 +360,9 @@ msgstr "{0, plural, one {issue з Linear} few {issues з Linear} many {issues з
 msgid "{0, plural, one {Move # selected workspace to a group} other {Move # selected workspaces to a group}}"
 msgstr "{0, plural, one {Перемістити # вибраний робочий простір у групу} few {Перемістити # вибрані робочі простори в групу} many {Перемістити # вибраних робочих просторів у групу} other {Перемістити # вибраного робочого простору в групу}}"
 
-#. placeholder {0}: move.chats.total - move.chats.ready - move.chats.failed
-msgid "{0, plural, one {Moving # chat here…} other {Moving # chats here…}}"
-msgstr "{0, plural, one {Сюди переміщується # чат…} few {Сюди переміщуються # чати…} many {Сюди переміщуються # чатів…} other {Сюди переміщуються # чату…}}"
+#. placeholder {0}: chats.total
+msgid "{0, plural, one {Moving its chat…} other {Moving its chats…}}"
+msgstr "{0, plural, one {Переміщення чату…} few {Переміщення чатів…} many {Переміщення чатів…} other {Переміщення чатів…}}"
 
 #. placeholder {0}: cleanup.automations
 msgid "{0, plural, one {Paused # automation.} other {Paused # automations.}}"
@@ -390,6 +394,10 @@ msgstr "{0, plural, one {Показати ще # рядок} few {Показат
 msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {# наявний worktree буде імпортовано в Paradev як робочий простір. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} few {# наявні worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} many {# наявних worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.} other {# наявного worktree буде імпортовано в Paradev як робочі простори. Кожен worktree на диску відстежуватиметься й з'явиться на бічній панелі. Файли не буде змінено.}}"
 
+#. placeholder {0}: move.chats.total - move.chats.ready
+msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
+msgstr "{0, plural, one {Цей робочий простір переміщено. Його # чат залишився тут.} few {Цей робочий простір переміщено. Його # чати залишилися тут.} many {Цей робочий простір переміщено. Його # чатів залишилися тут.} other {Цей робочий простір переміщено. Його # чату залишилося тут.}}"
+
 #. placeholder {0}: resolved.length
 msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
 msgstr "{0, plural, one {Показати # вирішений коментар} few {Показати # вирішені коментарі} many {Показати # вирішених коментарів} other {Показати # вирішеного коментаря}}"
@@ -402,14 +410,6 @@ msgstr "{0, plural, one {Відстежує коментарі на # сторі
 #. placeholder {1}: formatDayLabel(lastDay)
 msgid "{0} – {1} · API-rate estimate from local session logs"
 msgstr "{0} – {1} · оцінка за тарифами API з локальних логів сеансів"
-
-#. placeholder {0}: workspace.hostName
-msgid "{0} — device offline"
-msgstr "{0} — пристрій не в мережі"
-
-#. placeholder {0}: error.message
-msgid "{0} — try the Paradev tray menu > Host Service > Restart."
-msgstr "{0} — спробуйте меню Paradev у системному треї > Host Service > Restart."
 
 #. placeholder {0}: window.label
 #. placeholder {1}: formatPercent(window.usedPercent / 100)
@@ -538,8 +538,8 @@ msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} налаштовано на цьому комп'ютері, але не у вашому обліковому записі"
 
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
-msgid "{0} more — refine your search"
-msgstr "Ще {0} — уточніть пошук"
+msgid "{0} more. Refine your search"
+msgstr "Ще {0}. Уточніть пошук"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: pages.length
@@ -588,6 +588,10 @@ msgstr "Вибрано: {0}"
 #. placeholder {0}: result.killedCount
 msgid "{0} sessions terminated"
 msgstr "Завершено сеансів: {0}"
+
+#. placeholder {0}: move.name
+msgid "{0} stays where it was. If an agent was working, it may have been stopped."
+msgstr "{0} залишається там, де був. Якщо агент працював, його могло бути зупинено."
 
 #. placeholder {0}: result.killedCount
 #. placeholder {1}: result.remainingCount
@@ -648,6 +652,14 @@ msgstr "{0} перемагає за шкодою (ходів: {1})"
 #. placeholder {1}: took ? `, ${took}` : ""
 msgid "{0}, {outcome}{1}"
 msgstr "{0}, {outcome}{1}"
+
+#. placeholder {0}: workspace.hostName
+msgid "{0}: device offline"
+msgstr "{0}: пристрій не в мережі"
+
+#. placeholder {0}: error.message.replace(/[.\s]+$/, "")
+msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
+msgstr "{0}. Спробуйте меню Paradev у системному треї > Host Service > Restart."
 
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
@@ -846,11 +858,14 @@ msgstr "Розмір шрифту: {configTitle}"
 msgid "{connectorName} account"
 msgstr "Обліковий запис {connectorName}"
 
-msgid "{cookieCount} cookies — forget this site"
-msgstr "Файлів cookie: {cookieCount} — забути цей сайт"
+msgid "{cookieCount} cookies · Forget this site"
+msgstr "Файлів cookie: {cookieCount} · забути цей сайт"
 
 msgid "{count, plural, one {# automation} other {# automations}}"
 msgstr "{count, plural, one {# автоматизація} few {# автоматизації} many {# автоматизацій} other {# автоматизації}}"
+
+msgid "{count, plural, one {# chat stayed in the old workspace.} other {# chats stayed in the old workspace.}}"
+msgstr "{count, plural, one {# чат залишився в старому робочому просторі.} few {# чати залишилися в старому робочому просторі.} many {# чатів залишилися в старому робочому просторі.} other {# чату залишилося в старому робочому просторі.}}"
 
 msgid "{count, plural, one {# Check Failed} other {# Checks Failed}}"
 msgstr "{count, plural, one {Не пройдено # перевірку} few {Не пройдено # перевірки} many {Не пройдено # перевірок} other {Не пройдено # перевірки}}"
@@ -878,6 +893,9 @@ msgstr "{count, plural, one {# крок} few {# кроки} many {# кроків
 
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree у цьому репозиторії не має робочого простору. Його буде імпортовано як робочий простір.} few {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} many {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} other {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.}}"
+
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, one {Додати # пул-реквест до черги злиття?} few {Додати # пул-реквести до черги злиття?} many {Додати # пул-реквестів до черги злиття?} other {Додати # пул-реквесту до черги злиття?}}"
 
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, =1 {додав(-ла) коміт} one {додав(-ла) # коміт} few {додав(-ла) # коміти} many {додав(-ла) # комітів} other {додав(-ла) # коміту}}"
@@ -915,6 +933,9 @@ msgstr "{count, plural, one {отримано # сторінку} few {отри�
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Імпортувати # worktree} few {Імпортувати # worktree} many {Імпортувати # worktree} other {Імпортувати # worktree}}"
 
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, one {Злити # пул-реквест?} few {Злити # пул-реквести?} many {Злити # пул-реквестів?} other {Злити # пул-реквесту?}}"
+
 msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
 msgstr "{count, plural, one {# автоматизацію переміщено до {group}} few {# автоматизації переміщено до {group}} many {# автоматизацій переміщено до {group}} other {# автоматизації переміщено до {group}}}"
 
@@ -945,8 +966,8 @@ msgstr "{count, plural, one {використано # інструмент} few 
 msgid "{count} files are over {limit} and were not added"
 msgstr "Файли понад {limit} не додано: {count}"
 
-msgid "{count} files attached — a message carries at most {max}"
-msgstr "Прикріплено файлів: {count} — в одному повідомленні не більше {max}"
+msgid "{count} files attached. A message carries at most {max}"
+msgstr "Прикріплено файлів: {count}. В одному повідомленні не більше {max}"
 
 msgid "{count} GitHub stars"
 msgstr "Зірок на GitHub: {count}"
@@ -965,6 +986,9 @@ msgstr "{credit} кредиту піде на оплату наступних р
 
 msgid "{current} of {total}"
 msgstr "{current} з {total}"
+
+msgid "{current} of {total}+"
+msgstr "{current} з {total}+"
 
 msgid "{currentPage} of {totalBranches}"
 msgstr "{currentPage} з {totalBranches}"
@@ -996,9 +1020,6 @@ msgstr "{duration, plural, one {Думав # секунду} few {Думав # �
 #. js-lingui-explicit-id
 msgid "serverError.page.entryPathHeldByAnotherOrganization"
 msgstr "{entryPath} у цьому робочому просторі вже опубліковано як сторінку в іншій організації. Перемістіть файл або опублікуйте його з ідентифікатором тієї сторінки."
-
-msgid "{failed, plural, one {# chat couldn't move to the computer} other {# chats couldn't move to the computer}}"
-msgstr "{failed, plural, one {# чат не вдалося перенести на комп’ютер} few {# чати не вдалося перенести на комп’ютер} many {# чатів не вдалося перенести на комп’ютер} other {# чату не вдалося перенести на комп’ютер}}"
 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# не пройдено} few {# не пройдено} many {# не пройдено} other {# не пройдено}}"
@@ -1162,6 +1183,12 @@ msgstr "{name} вбудовано, тому його не можна замін�
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} не додано"
 
+msgid "{name} is unchanged. If an agent was working, it may have been stopped."
+msgstr "{name} без змін. Якщо агент працював, його могло бути зупинено."
+
+msgid "{name} is unchanged. If an agent was working, it was stopped."
+msgstr "{name} без змін. Якщо агент працював, його зупинено."
+
 msgid "{name} plugin"
 msgstr "Плагін {name}"
 
@@ -1290,11 +1317,11 @@ msgstr "{productName} залучив $11,5 млн у seed-раунді на чо
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "До жовтня 2026 року {productName} мав назву {formerName}."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · # — змінити проєкт, хост тощо"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
+
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · у {base}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# повідомлення чекає в черзі} few {# повідомлення чекають у черзі} many {# повідомлень чекають у черзі} other {# повідомлення чекає в черзі}}"
@@ -1304,9 +1331,6 @@ msgstr "{rate} за ГБ-год. Використовуються після м�
 
 msgid "{readPercent}% read"
 msgstr "прочитано {readPercent}%"
-
-msgid "{ready} of {total} chats moved here"
-msgstr "Сюди переміщено {ready} з {total} чатів"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.ambiguousPlugin"
@@ -1351,9 +1375,6 @@ msgstr "{starCount} зірок, і це не межа"
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущено # автоматизацію} few {Запущено # автоматизації} many {Запущено # автоматизацій} other {Запущено # автоматизації}}"
 
-msgid "{stayed, plural, one {This workspace moved. # chat stayed here.} other {This workspace moved. # chats stayed here.}}"
-msgstr "{stayed, plural, one {Цей робочий простір переміщено. # чат залишився тут.} few {Цей робочий простір переміщено. # чати залишилися тут.} many {Цей робочий простір переміщено. # чатів залишилися тут.} other {Цей робочий простір переміщено. # чату залишилося тут.}}"
-
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {Працює # субагент} few {Працюють # субагенти} many {Працює # субагентів} other {Працює # субагента}}"
 
@@ -1377,9 +1398,6 @@ msgstr "{threshold, plural, one {Злито # агентський PR} few {Зл
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
-
-msgid "{total, plural, one {{done} of # chat moved} other {{done} of # chats moved}}"
-msgstr "{total, plural, one {Переміщено {done} з # чату} few {Переміщено {done} з # чатів} many {Переміщено {done} з # чатів} other {Переміщено {done} з # чату}}"
 
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, =1 {Перевірку пройдено} one {Пройдено всі перевірки: #} few {Пройдено всі перевірки: #} many {Пройдено всі перевірки: #} other {Пройдено всі перевірки: #}}"
@@ -1490,6 +1508,30 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "PR буде злито в {2}, і тут це не можна скасувати."
+
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber} злито, але ця гілка досі містить його коміти."
+
+msgid "#{number} has changes requested."
+msgstr "У #{number} запитано зміни."
+
+msgid "#{number} has conflicts."
+msgstr "У #{number} є конфлікти."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number} закрито без злиття."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number} ще не готовий до злиття."
+
+msgid "#{number} is still a draft."
+msgstr "#{number} досі чернетка."
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number} чекає на обов'язкову перевірку або правило."
+
+msgid "#{number} needs a review."
+msgstr "#{number} потребує рев'ю."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -1613,8 +1655,8 @@ msgstr "Seed-раунд на $11,5 млн на чолі з Union Square Ventures
 msgid "1"
 msgstr "1"
 
-msgid "1 cookie — forget this site"
-msgstr "1 файл cookie — забути цей сайт"
+msgid "1 cookie · Forget this site"
+msgstr "1 файл cookie · забути цей сайт"
 
 msgid "1 file is over {limit} and was not added"
 msgstr "1 файл більший за {limit} і не був доданий"
@@ -1936,6 +1978,9 @@ msgstr "Обліковий запис очікує на видалення"
 msgid "Account usage"
 msgstr "Використання облікового запису"
 
+msgid "Account usage: {percent} used"
+msgstr "Використання облікового запису: використано {percent}"
+
 msgid "Achievements"
 msgstr "Досягнення"
 
@@ -2009,6 +2054,9 @@ msgstr "Спершу додайте {repositoryName} як проєкт на ко
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "Спочатку додайте {repositoryName} як проєкт на цьому комп'ютері"
+
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "Додати #{prNumber} до черги злиття?"
 
 msgid "Add a comment…"
 msgstr "Додайте коментар…"
@@ -2161,6 +2209,9 @@ msgstr "Додати скрипт"
 msgid "Add setup commands, one per line..."
 msgstr "Додайте команди налаштування, по одній у рядку..."
 
+msgid "Add stack to merge queue"
+msgstr "Додати стек до черги злиття"
+
 msgid "Add tag…"
 msgstr "Додати тег…"
 
@@ -2197,8 +2248,14 @@ msgstr "Додати до словника"
 msgid "Add to favorites"
 msgstr "Додати до вибраного"
 
+msgid "Add to merge queue"
+msgstr "Додати до черги злиття"
+
 msgid "Add to project"
 msgstr "Додати до проєкту"
+
+msgid "Add to queue"
+msgstr "У чергу"
 
 msgid "Add to sidebar"
 msgstr "Додати на бічну панель"
@@ -2230,15 +2287,21 @@ msgstr "Додано {bought} ГБ-год."
 msgid "Added 1 file to {where}"
 msgstr "У {where} додано 1 файл"
 
-msgid "Added only when launching with a prompt — e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
-msgstr "Додаються лише під час запуску з промптом — наприклад, <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgid "Added only when launching with a prompt, e.g. <0>--</0>, <1>--prompt</1>, <2>-i</2>."
+msgstr "Додаються лише під час запуску з промптом, наприклад, <0>--</0>, <1>--prompt</1>, <2>-i</2>."
 
 msgid "Added to agent input"
 msgstr "Додано в поле введення агента"
 
+msgid "Added to merge queue"
+msgstr "Додано до черги злиття"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Щоб додавати людей до {organizationName}, потрібен платний тариф. Тарифом вашої організації керує її власник на {0}."
+
+msgid "Adding to queue…"
+msgstr "Додавання до черги…"
 
 msgid "Adding..."
 msgstr "Додавання..."
@@ -2291,8 +2354,8 @@ msgstr "Агент"
 msgid "Agent commands"
 msgstr "Команди агентів"
 
-msgid "Agent Complete — {workspaceName}"
-msgstr "Агент завершив роботу — {workspaceName}"
+msgid "Agent Complete · {workspaceName}"
+msgstr "Агент завершив роботу · {workspaceName}"
 
 msgid "Agent Configs"
 msgstr "Конфігурації агентів"
@@ -2342,9 +2405,6 @@ msgstr "Запуск агента завершився помилкою"
 msgid "Agent self-verification"
 msgstr "Самоперевірка агента"
 
-msgid "agent session ID"
-msgstr "ID сеансу агента"
-
 msgid "Agent session started"
 msgstr "Сеанс агента запущено"
 
@@ -2373,6 +2433,9 @@ msgstr "Агенти виконують рутинні тікети без вт�
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "Агенти у ваших хмарних робочих просторах зможуть за допомогою <0>--host</0> запускати команди на цьому хості. Хост має бути доступним через релей."
 
+msgid "Agents in your pocket"
+msgstr "Агенти в кишені"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."
 
@@ -2400,8 +2463,8 @@ msgstr "Агенти бачать лише заглушку. Paradev додає 
 msgid "Agents that run while you're away"
 msgstr "Агенти, що працюють, поки вас немає"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "Агенти самі сортують issues, пишуть чернетки changelog і оновлюють залежності. Вам лишається переглянути PR."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "Агенти самі сортують issues, пишуть чернетки changelog і оновлюють залежності."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенти використовують цей обліковий запис, коли викликають інструменти Linear."
@@ -2493,8 +2556,8 @@ msgid "All commits"
 msgstr "Усі коміти"
 
 #. placeholder {0}: members.length
-msgid "All data will be permanently deleted for all {0} members — this cannot be undone."
-msgstr "Усі дані всіх учасників ({0}) буде остаточно видалено — це не можна скасувати."
+msgid "All data will be permanently deleted for all {0} members. This cannot be undone."
+msgstr "Усі дані всіх учасників ({0}) буде остаточно видалено. Це не можна скасувати."
 
 msgid "All downloads"
 msgstr "Усі варіанти завантаження"
@@ -2529,8 +2592,8 @@ msgstr "Усі нові повідомлення"
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "Усі цілі досягнуто. Найвищий щабель, далі нікуди."
 
-msgid "All of the organization's data will be permanently deleted — this cannot be undone."
-msgstr "Усі дані організації буде остаточно видалено — це не можна скасувати."
+msgid "All of the organization's data will be permanently deleted. This cannot be undone."
+msgstr "Усі дані організації буде остаточно видалено. Це не можна скасувати."
 
 msgid "All of this project's worktrees are already tracked"
 msgstr "Усі worktree цього проєкту вже відстежуються"
@@ -3389,8 +3452,8 @@ msgstr "Avi Peltz, Satya Patel і Kiet Ho на YC Demo Day"
 msgid "Awaiting {0}"
 msgstr "Очікує: {0}"
 
-msgid "Awaiting Response — {workspaceName}"
-msgstr "Очікує відповіді — {workspaceName}"
+msgid "Awaiting Response · {workspaceName}"
+msgstr "Очікує відповіді · {workspaceName}"
 
 msgid "Awaiting review from you"
 msgstr "Очікує вашого рев'ю"
@@ -3437,6 +3500,9 @@ msgstr "Назад до інтеграцій"
 
 msgid "Back to Linear"
 msgstr "Назад до Linear"
+
+msgid "Back to main chat"
+msgstr "Повернутися до основного чату"
 
 msgid "Back to pages"
 msgstr "Назад до сторінок"
@@ -3513,6 +3579,9 @@ msgstr "До"
 msgid "Behavior"
 msgstr "Поведінка"
 
+msgid "Behind base"
+msgstr "Відстає від бази"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "Відстає від main на ? комітів, потрібен ребейз"
 
@@ -3543,14 +3612,14 @@ msgstr "Система оплати не дозволила запустити �
 msgid "Binary"
 msgstr "Двійковий"
 
-msgid "Binary file — cannot display"
-msgstr "Двійковий файл — неможливо показати"
-
 msgid "Binary file changed"
 msgstr "Двійковий файл змінено"
 
 msgid "Binary file hidden"
 msgstr "Двійковий файл приховано"
+
+msgid "Binary file. Cannot display"
+msgstr "Двійковий файл. Неможливо показати"
 
 msgid "Bio"
 msgstr "Про себе"
@@ -3563,6 +3632,10 @@ msgstr "Блокувати вміст на будь-якій сторінці"
 
 msgid "blocked"
 msgstr "заблоковано"
+
+msgctxt "pull request status"
+msgid "Blocked"
+msgstr "Заблоковано"
 
 msgid "Blocked by Branch Rules"
 msgstr "Заблоковано правилами гілки"
@@ -3999,10 +4072,13 @@ msgstr "Скасовано"
 msgid "Cancelled the invite for {name}"
 msgstr "Запрошення для {name} скасовано"
 
-#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(cancelAt)
 msgid "Cancels {0} — downgrades to Free at the end of the billing period."
 msgstr "Буде скасовано {0} — наприкінці оплаченого періоду тариф зміниться на Free."
+
+#. placeholder {0}: format(new Date(cancelAt), "MMMM d, yyyy")
+msgid "Cancels {0}, then downgrades to Free at the end of the billing period."
+msgstr "Буде скасовано {0}, наприкінці оплаченого періоду тариф зміниться на Free."
 
 msgid "Cannot {action}: no active organization is selected. Select an organization or sign in again."
 msgstr "Не вдається {action}: не вибрано активну організацію. Виберіть організацію або увійдіть знову."
@@ -4192,8 +4268,8 @@ msgstr "Чат зараз переробляють"
 msgid "Chat Launch"
 msgstr "Запуск у чаті"
 
-msgid "Chat mode"
-msgstr "Режим чату"
+msgid "Chat name"
+msgstr "Назва чату"
 
 msgid "Chat session not found"
 msgstr "Сеанс чату не знайдено"
@@ -4252,6 +4328,10 @@ msgstr "Перевірте поштову скриньку"
 msgid "Checkbox · Radio · Switch"
 msgstr "Прапорець · Радіокнопка · Перемикач"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "Перевіряється"
+
 msgid "Checking agents…"
 msgstr "Перевірка агентів…"
 
@@ -4309,6 +4389,9 @@ msgstr "Перевірки завершено"
 
 msgid "Checks failed"
 msgstr "Перевірки не пройдено"
+
+msgid "Checks failing"
+msgstr "Перевірки не проходять"
 
 msgid "Checks passed"
 msgstr "Перевірки пройдено"
@@ -4491,8 +4574,8 @@ msgstr "Скиньте фільтр, щоб змінити порядок у б�
 msgid "Clear workspace selection"
 msgstr "Скасувати вибір робочого простору"
 
-msgid "Cleared {succeededLabels} — could not clear {failedLabels}"
-msgstr "Очищено: {succeededLabels} — не вдалося очистити: {failedLabels}"
+msgid "Cleared {succeededLabels}. Could not clear {failedLabels}"
+msgstr "Очищено: {succeededLabels}. Не вдалося очистити: {failedLabels}"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "Рівень Operator досягнуто у вікні Run 01"
@@ -4514,9 +4597,6 @@ msgstr "CLI і SDK"
 
 msgid "CLI docs"
 msgstr "Документація CLI"
-
-msgid "CLI mode"
-msgstr "Режим CLI"
 
 msgid "CLI reference"
 msgstr "Довідник CLI"
@@ -4795,8 +4875,8 @@ msgstr "Використання хмари"
 msgid "Cloud workspace"
 msgstr "Хмарний робочий простір"
 
-msgid "Cloud workspace — connecting"
-msgstr "Хмарний робочий простір — підключення"
+msgid "Cloud workspace: connecting"
+msgstr "Хмарний робочий простір: підключення"
 
 msgid "Cloud workspaces"
 msgstr "Хмарні робочі простори"
@@ -5141,6 +5221,10 @@ msgstr "Підтверджувати перед виходом"
 
 msgid "Confirm switch"
 msgstr "Підтвердити перемикання"
+
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "Конфлікти"
 
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
@@ -5490,8 +5574,8 @@ msgstr "Перетворення на чернетку…"
 msgid "cookies and site data"
 msgstr "файли cookie та дані сайтів"
 
-msgid "Cookies and site data — signs you out of most sites"
-msgstr "Файли cookie та дані сайтів — ви вийдете з більшості сайтів"
+msgid "Cookies and site data (signs you out of most sites)"
+msgstr "Файли cookie та дані сайтів (ви вийдете з більшості сайтів)"
 
 msgid "Copied"
 msgstr "Скопійовано"
@@ -5500,14 +5584,8 @@ msgstr "Скопійовано"
 msgid "Copied {0}"
 msgstr "Скопійовано {0}"
 
-msgid "Copied {copiedLabel}"
-msgstr "Скопійовано {copiedLabel}"
-
 msgid "Copied Link"
 msgstr "Посилання скопійовано"
-
-msgid "Copied terminal ID"
-msgstr "ID термінала скопійовано"
 
 msgid "Copied to clipboard."
 msgstr "Скопійовано в буфер обміну."
@@ -5573,9 +5651,6 @@ msgid "Copy file name"
 msgstr "Копіювати назву файлу"
 
 msgid "Copy ID"
-msgstr "Копіювати ID"
-
-msgid "Copy IDs"
 msgstr "Копіювати ID"
 
 msgid "Copy image"
@@ -5678,8 +5753,8 @@ msgstr "Копіювати ID робочого простору"
 msgid "Copy your browsing history and logins from another browser into Paradev. Your original browser isn't changed."
 msgstr "Скопіюйте історію перегляду й дані входу з іншого браузера в Paradev. Ваш початковий браузер не зміниться."
 
-msgid "Copy your key now — you won't be able to see it again."
-msgstr "Скопіюйте ключ зараз — потім ви не зможете його побачити."
+msgid "Copy your key now. You won't be able to see it again."
+msgstr "Скопіюйте ключ зараз. Потім ви не зможете його побачити."
 
 msgid "Copying the conversation"
 msgstr "Копіювання розмови"
@@ -6043,8 +6118,8 @@ msgstr "Не вдалося перевірити перенесення"
 msgid "Couldn't check what removing this member affects"
 msgstr "Не вдалося перевірити, на що вплине видалення цього учасника"
 
-msgid "Couldn't confirm star status — check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
-msgstr "Не вдалося підтвердити статус зірки — перевірте, що GitHub CLI (`gh`) встановлено, вхід у нього виконано і є з'єднання з мережею"
+msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
+msgstr "Не вдалося підтвердити статус зірки. Перевірте, що GitHub CLI (`gh`) встановлено, вхід у нього виконано і є з'єднання з мережею"
 
 msgid "Couldn't connect (error {status}). Please try again."
 msgstr "Не вдалося підключитися (помилка {status}). Спробуйте ще раз."
@@ -6066,6 +6141,9 @@ msgstr "Не вдалося скопіювати зображення"
 
 msgid "Couldn't copy the screenshot"
 msgstr "Не вдалося скопіювати знімок екрана"
+
+msgid "Couldn't create stack"
+msgstr "Не вдалося створити стек"
 
 msgid "Couldn't create the channel"
 msgstr "Не вдалося створити канал"
@@ -6117,8 +6195,8 @@ msgstr "Не вдалося завантажити автоматизацію: {
 msgid "Couldn't load automations"
 msgstr "Не вдалося завантажити автоматизації"
 
-msgid "Couldn't load contributors — type a username instead."
-msgstr "Не вдалося завантажити контриб'юторів — введіть ім'я користувача."
+msgid "Couldn't load contributors. Type a username instead."
+msgstr "Не вдалося завантажити контриб'юторів. Введіть ім'я користувача."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Не вдалося завантажити попередні повідомлення. Повторити"
@@ -6146,6 +6224,9 @@ msgstr "Не вдалося позначити як готовий до рев'�
 
 msgid "Couldn't merge pull request"
 msgstr "Не вдалося злити пул-реквест"
+
+msgid "Couldn't merge stack"
+msgstr "Не вдалося злити стек"
 
 msgid "Couldn't move {name}"
 msgstr "Не вдалося перемістити {name}"
@@ -6188,8 +6269,8 @@ msgstr "Не вдалося зв'язатися з хмарою для {0}: {1}"
 msgid "Couldn't reach the model provider"
 msgstr "Не вдалося зв'язатися з провайдером моделі"
 
-msgid "Couldn't reach this cloud workspace. It may still be waking up — try again."
-msgstr "Не вдалося зв'язатися з цим хмарним робочим простором. Можливо, він ще запускається — спробуйте ще раз."
+msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
+msgstr "Не вдалося зв'язатися з цим хмарним робочим простором. Можливо, він ще запускається. Спробуйте ще раз."
 
 msgid "Couldn't reach workspace"
 msgstr "Не вдалося зв'язатися з робочим простором"
@@ -6199,6 +6280,9 @@ msgstr "Не вдалося прочитати контекст цього те�
 
 msgid "Couldn't read usage history from this host."
 msgstr "Не вдалося прочитати історію використання з цього хоста."
+
+msgid "Couldn't remove from the merge queue"
+msgstr "Не вдалося прибрати з черги злиття"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не вдалося видалити локальні дані входу"
@@ -6222,12 +6306,6 @@ msgstr "Не вдалося відновити «{workspaceName}»"
 msgid "Couldn't save"
 msgstr "Не вдалося зберегти"
 
-msgid "Couldn't save — edit or click away to retry"
-msgstr "Не вдалося зберегти — змініть текст або клацніть поза полем, щоб повторити"
-
-msgid "Couldn't save — retrying…"
-msgstr "Не вдалося зберегти — повторна спроба…"
-
 msgid "Couldn't save edits"
 msgstr "Не вдалося зберегти зміни"
 
@@ -6242,6 +6320,12 @@ msgstr "Не вдалося зберегти рутину"
 
 msgid "Couldn't save your choice. Try again."
 msgstr "Не вдалося зберегти вибір. Спробуйте ще раз."
+
+msgid "Couldn't save. Edit or click away to retry"
+msgstr "Не вдалося зберегти. Змініть текст або клацніть поза полем, щоб повторити"
+
+msgid "Couldn't save. Retrying…"
+msgstr "Не вдалося зберегти. Повторна спроба…"
 
 msgid "Couldn't search your chats"
 msgstr "Не вдалося виконати пошук у чатах"
@@ -6309,6 +6393,9 @@ msgstr "Не вдалося зупинити фонове завдання"
 msgid "Couldn't stop the chat"
 msgstr "Не вдалося зупинити чат"
 
+msgid "Couldn't switch to #{number}"
+msgstr "Не вдалося перемкнутися на #{number}"
+
 msgid "Couldn't take a screenshot"
 msgstr "Не вдалося зробити знімок екрана"
 
@@ -6365,9 +6452,6 @@ msgstr "Створити хмарне середовище"
 
 msgid "Create a Dev"
 msgstr "Створити Dev"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "Створює нативний форк на боці провайдера з тим самим контекстом розмови. Початковий сеанс залишається без змін."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Створіть новий ключ API для зовнішніх інтеграцій, як-от Claude Desktop або Claude Code."
@@ -6465,6 +6549,9 @@ msgstr "Створити проєкт…"
 
 msgid "Create pull request"
 msgstr "Створити пул-реквест"
+
+msgid "Create stack"
+msgstr "Створити стек"
 
 msgid "Create task"
 msgstr "Створити завдання"
@@ -7050,8 +7137,8 @@ msgstr "Видалено: {deletedBy}, {deletedWhen} · {deviceNames}"
 msgid "Deleted group \"{group}\""
 msgstr "Групу «{group}» видалено"
 
-msgid "deleted or unavailable — pick another"
-msgstr "видалено або недоступно — виберіть інше"
+msgid "deleted or unavailable, pick another"
+msgstr "видалено або недоступно, виберіть інше"
 
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "Видалені проєкти можна відновити протягом 30 днів разом із робочими просторами, які було видалено разом із ними. Після цього їх буде видалено остаточно; папка репозиторію та worktree з незакоміченими змінами залишаться на диску."
@@ -7145,14 +7232,14 @@ msgstr "Дизайн"
 msgid "Design a complex system on a whiteboard."
 msgstr "Спроєктуйте складну систему на дошці."
 
-msgid "Design mode — click any element in the page to send it to an agent"
-msgstr "Режим дизайну — клацніть будь-який елемент сторінки, щоб надіслати його агенту"
-
-msgid "Design mode — click any element in the page to send it to an agent."
-msgstr "Режим дизайну — клацніть будь-який елемент сторінки, щоб надіслати його агенту."
-
 msgid "Design mode failed"
 msgstr "Помилка режиму дизайну"
+
+msgid "Design mode: click any element in the page to send it to an agent"
+msgstr "Режим дизайну: клацніть будь-який елемент сторінки, щоб надіслати його агенту"
+
+msgid "Design mode: click any element in the page to send it to an agent."
+msgstr "Режим дизайну: клацніть будь-який елемент сторінки, щоб надіслати його агенту."
 
 msgid "Design review"
 msgstr "Дизайн-рев'ю"
@@ -7844,8 +7931,8 @@ msgstr "Рівень зусиль"
 msgid "Electron/tRPC-coupled, so referenced rather than rendered. Badge = import sites today; high counts are promotion candidates for packages/ui"
 msgstr "Залежать від Electron/tRPC, тому лише згадані, а не відрендерені. Бейдж = кількість місць імпорту зараз; великі значення є кандидатами на перенесення в packages/ui"
 
-msgid "Element captured — describe the change, or press esc to pick again."
-msgstr "Елемент захоплено — опишіть зміну або натисніть esc, щоб вибрати інший."
+msgid "Element captured. Describe the change, or press esc to pick again."
+msgstr "Елемент захоплено. Опишіть зміну або натисніть esc, щоб вибрати інший."
 
 msgid "Element captured. Describe the change."
 msgstr "Елемент захоплено. Опишіть зміну."
@@ -8043,6 +8130,9 @@ msgstr "Щохвилини"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "Кожна мета робить свій внесок у наступну сходинку. Виміряно за останні 30 днів."
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "Усі відкриті пул-реквести до #{prNumber} по черзі потраплять до черги злиття для {base}. GitHub зіллє їх, коли настане їхня черга і пройдуть перевірки."
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "Кожен платний тариф містить Paradev Mobile, автоматизації та пріоритетну підтримку. Тарифи з хмарними робочими просторами дають вашій команді спільний пул ГБ-годин."
 
@@ -8096,6 +8186,9 @@ msgstr "Усе з Ultra"
 
 msgid "Everything in Ultra plus custom cloud GB-hours, SSO & SAML, SCIM provisioning, IP restrictions, audit logs, a custom SLA, dedicated support, and custom contracts. Pricing is tailored to your organization. Get in touch and we'll scope something that fits."
 msgstr "Усе з Ultra, а також індивідуальні хмарні ГБ-години, SSO і SAML, надання доступу через SCIM, обмеження за IP, журнали аудиту, індивідуальний SLA, виділена підтримка та індивідуальні договори. Ціну підбираємо під вашу організацію. Зв'яжіться з нами, і ми підберемо відповідний варіант."
+
+msgid "Everything moved."
+msgstr "Усе переміщено."
 
 msgid "Everything we built on top of the primitives — Paradev originals, the"
 msgstr "Усе, що ми збудували поверх примітивів — власні компоненти Paradev, а також"
@@ -8946,11 +9039,17 @@ msgstr "Знайти в переглядачі файлів"
 msgid "Find in page"
 msgstr "Знайти на сторінці"
 
+msgid "Find in Page"
+msgstr "Знайти на сторінці"
+
 msgid "Find in Terminal"
 msgstr "Знайти в терміналі"
 
 msgid "Find in this chat"
 msgstr "Знайти в цьому чаті"
+
+msgid "Find is not available for this page"
+msgstr "Пошук недоступний для цієї сторінки"
 
 msgid "Find people and Devs"
 msgstr "Знайти людей і Devs"
@@ -8969,6 +9068,9 @@ msgstr "Завершено · не прочитано"
 
 msgid "finished · worked for 7s"
 msgstr "завершив · працював 7 с"
+
+msgid "Finishing the move…"
+msgstr "Завершення переміщення…"
 
 msgid "Fit"
 msgstr "За розміром"
@@ -9201,11 +9303,11 @@ msgstr "Аргументи форка"
 msgid "Fork conversation"
 msgstr "Форкнути розмову"
 
-msgid "Fork session"
-msgstr "Створити форк сеансу"
+msgid "Fork into Chat"
+msgstr "Відгалузити в чат"
 
-msgid "Fork session…"
-msgstr "Створити форк сеансу…"
+msgid "Fork into CLI"
+msgstr "Відгалузити в CLI"
 
 msgid "Form controls and field composition"
 msgstr "Елементи форм і компонування полів"
@@ -9292,14 +9394,17 @@ msgstr "За знімками worktree до і після цього ходу. �
 msgid "From snapshots of the worktree before and after this turn. Another chat worked here at the same time, so this list has only the files this chat edited with its file tools. Other changes are listed apart."
 msgstr "За знімками worktree до і після цього ходу. Одночасно тут працював інший чат, тому в цьому списку лише файли, які цей чат змінив своїми інструментами для файлів. Інші зміни показано окремо."
 
-msgid "Front matter hidden — switch to Markdown to edit it"
-msgstr "Front matter приховано — перейдіть у Markdown, щоб його редагувати"
+msgid "Front matter hidden. Switch to Markdown to edit it"
+msgstr "Front matter приховано. Перейдіть у Markdown, щоб його редагувати"
 
-msgid "Front matter hidden — switch to the Markdown view to edit it"
-msgstr "Front matter приховано — перейдіть у режим Markdown, щоб його редагувати"
+msgid "Front matter hidden. Switch to the Markdown view to edit it"
+msgstr "Front matter приховано. Перейдіть у режим Markdown, щоб його редагувати"
 
 msgid "Full access"
 msgstr "Повний доступ"
+
+msgid "Full access skips most approvals, but the agent still asks before some risky actions."
+msgstr "Повний доступ пропускає більшість підтверджень, але агент усе одно запитує перед деякими ризикованими діями."
 
 msgid "Full changelog →"
 msgstr "Повний журнал змін →"
@@ -9475,6 +9580,9 @@ msgstr "Встановлення GitHub App скасовано."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App успішно встановлено!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub не може злити цей стек тут за один крок."
+
 msgid "GitHub CLI"
 msgstr "GitHub CLI"
 
@@ -9490,8 +9598,14 @@ msgstr "Встановлення GitHub не знайдено"
 msgid "GitHub integration"
 msgstr "Інтеграція з GitHub"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub ще зливає. Це оновиться, коли він закінчить."
+
 msgid "GitHub issues"
 msgstr "GitHub issues"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "GitHub зіллє його, коли настане його черга і пройдуть перевірки."
 
 msgid "GitHub rate limit reached"
 msgstr "Досягнуто ліміту запитів GitHub"
@@ -9504,6 +9618,12 @@ msgstr "Репозиторії GitHub із файлом маркетплейсу
 
 msgid "GitHub sign-in needed"
 msgstr "Потрібно увійти в GitHub"
+
+msgid "GitHub stack created"
+msgstr "Стек GitHub створено"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "Стеки GitHub не ввімкнені для цього репозиторію."
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "Для синхронізації з GitHub потрібен тариф Pro."
@@ -9712,6 +9832,9 @@ msgstr "«{0}» приховано з бічної панелі"
 
 msgid "Hidden folders"
 msgstr "Приховані папки"
+
+msgid "Hidden from the sidebar"
+msgstr "Приховано з бічної панелі"
 
 msgid "Hidden until you join"
 msgstr "Приховано, доки ви не приєднаєтеся"
@@ -10239,6 +10362,12 @@ msgstr "На рев'ю"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "У десктопному застосунку {appName} відкрийте «Налаштування → Віддалений доступ» і ввімкніть «Дозволити віддалений доступ до цього пристрою через релей»."
 
+msgid "In the merge queue"
+msgstr "У черзі злиття"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "У черзі злиття. GitHub зіллє його, коли настане його черга."
+
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "У десктопному застосунку Paradev відкрийте <0>Налаштування → Вигляд → Тема</0>."
 
@@ -10656,6 +10785,9 @@ msgstr "Можливо, він у режимі сну"
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "Можливо, його видалено або він належить іншій організації."
 
+msgid "It must join again and pass its checks to merge."
+msgstr "Щоб його злити, він має знову стати в чергу й пройти перевірки."
+
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Це займе кілька хвилин. Користуєтеся Conductor Cloud? Почніть із <0>посібника для хмари</0>."
 
@@ -10677,6 +10809,9 @@ msgstr "Елемент"
 msgid "Iterate."
 msgstr "Доопрацьовуйте."
 
+msgid "Its chats didn't move and are still in the original workspace. Open the new workspace to see why and try again."
+msgstr "Його чати не переміщено, вони залишилися в початковому робочому просторі. Відкрийте новий робочий простір, щоб дізнатися причину, і спробуйте ще раз."
+
 msgid "Its comments and history go with it."
 msgstr "Його коментарі та історію буде видалено разом із ним."
 
@@ -10695,8 +10830,8 @@ msgstr "Відповіді на нього буде видалено разом 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на вибраному комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
 
-msgid "Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart."
-msgstr "Його робочі простори й термінали недоступні, доки він не перезапуститься — скористайтеся меню Paradev у треї > Host Service > Перезапустити."
+msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
+msgstr "Його робочі простори й термінали недоступні, доки він не перезапуститься. Скористайтеся меню Paradev у треї > Host Service > Перезапустити."
 
 msgid "Its workspaces and their worktrees are removed from disk now instead of after 30 days. The repository folder and worktrees with uncommitted changes are kept."
 msgstr "Його робочі простори та їхні worktree буде видалено з диска зараз, а не через 30 днів. Папку репозиторію й worktree з незакоміченими змінами буде збережено."
@@ -10831,11 +10966,11 @@ msgstr "Чекати далі"
 msgid "Keep working"
 msgstr "Продовжити роботу"
 
-msgid "Kept the new file — it changed after it was created"
-msgstr "Новий файл збережено — він змінився після створення"
+msgid "Kept the new file because it changed after it was created"
+msgstr "Новий файл збережено, він змінився після створення"
 
-msgid "Kept the new folder — it is no longer empty"
-msgstr "Нову папку збережено — вона вже не порожня"
+msgid "Kept the new folder because it is no longer empty"
+msgstr "Нову папку збережено, вона вже не порожня"
 
 msgid "Key dates"
 msgstr "Ключові дати"
@@ -11081,6 +11216,9 @@ msgstr "Вийти з каналу"
 
 msgid "Leave comment mode"
 msgstr "Вийти з режиму коментування"
+
+msgid "Leave it empty to go back to the default name."
+msgstr "Залиште порожнім, щоб повернути типову назву."
 
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "Залиште порожнім, щоб повернути назву, яку повідомляє термінал."
@@ -11593,8 +11731,8 @@ msgstr "Зробити всі панелі однакового розміру"
 msgid "Make default"
 msgstr "Зробити основним"
 
-msgid "Make default — launch new terminals and agents on this account."
-msgstr "Зробити основним — запускати нові термінали й агентів із цим обліковим записом."
+msgid "Make default: launch new terminals and agents on this account."
+msgstr "Зробити основним: запускати нові термінали й агентів із цим обліковим записом."
 
 msgid "Make public"
 msgstr "Зробити публічним"
@@ -11744,8 +11882,8 @@ msgstr "Стиль Markdown"
 msgid "Marked as viewed"
 msgstr "Позначено як переглянуте"
 
-msgid "Marked ready, but couldn't refresh PR state — try again in a moment"
-msgstr "Позначено як готовий, але не вдалося оновити стан PR — спробуйте ще раз за мить"
+msgid "Marked ready, but couldn't refresh PR state. Try again in a moment"
+msgstr "Позначено як готовий, але не вдалося оновити стан PR. Спробуйте ще раз за мить"
 
 msgid "Marketplace"
 msgstr "Маркетплейс"
@@ -11864,6 +12002,9 @@ msgstr "Злити"
 msgid "Merge #{0}?"
 msgstr "Злити #{0}?"
 
+msgid "Merge #{prNumber}?"
+msgstr "Злити #{prNumber}?"
+
 msgid "Merge commit"
 msgstr "Коміт злиття"
 
@@ -11880,11 +12021,20 @@ msgstr "Злити пул-реквест"
 msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
 msgstr "Зливайте пул-реквести, не виходячи з Paradev, а також низка виправлень і покращень чату."
 
+msgid "Merge stack"
+msgstr "Злити стек"
+
 msgid "Merge status"
 msgstr "Стан злиття"
 
+msgid "Merge status pending"
+msgstr "Статус злиття ще визначається"
+
 msgid "Merge status unknown"
 msgstr "Стан злиття невідомий"
+
+msgid "Mergeable with failing checks"
+msgstr "Можна злити, але перевірки не пройдено"
 
 msgid "Merged"
 msgstr "Злито"
@@ -11897,14 +12047,17 @@ msgstr "Злито"
 msgid "Merged by {0}"
 msgstr "Злито користувачем {0}"
 
-msgid "Merged, but couldn't refresh PR state — try again in a moment"
-msgstr "Злито, але не вдалося оновити стан PR — спробуйте ще раз за мить"
+msgid "Merged, but couldn't refresh PR state. Try again in a moment"
+msgstr "Злито, але не вдалося оновити стан PR. Спробуйте ще раз за мить"
 
 msgid "Merging PR..."
 msgstr "Зливаємо PR..."
 
 msgid "Merging pull request"
 msgstr "Злиття пул-реквесту"
+
+msgid "Merging stack…"
+msgstr "Злиття стека…"
 
 msgid "Merging…"
 msgstr "Злиття…"
@@ -12200,9 +12353,6 @@ msgstr "Переміщення {name}: {destination}"
 msgid "Moving this chat here"
 msgstr "Перенесення цього чату сюди"
 
-msgid "Moving this workspace here…"
-msgstr "Цей робочий простір переміщується сюди…"
-
 msgid "Moving this workspace…"
 msgstr "Цей робочий простір переміщується…"
 
@@ -12338,9 +12488,6 @@ msgstr "Мережу змінено"
 msgid "Never"
 msgstr "Ніколи"
 
-msgid "Never asks before acting"
-msgstr "Ніколи не питає перед дією"
-
 msgctxt "changed file badge"
 msgid "new"
 msgstr "новий"
@@ -12381,6 +12528,9 @@ msgstr "Новий браузер"
 
 msgid "new challengers"
 msgstr "нові претенденти"
+
+msgid "New chat"
+msgstr "Новий чат"
 
 msgid "New Chat"
 msgstr "Новий чат"
@@ -12564,8 +12714,8 @@ msgid "No"
 msgstr "Ні"
 
 #. placeholder {0}: AGENT_LABELS[agent]
-msgid "No {0} logins on this host — sign in and usage appears here."
-msgstr "На цьому хості немає входів у {0} — увійдіть, і тут з'являться дані про використання."
+msgid "No {0} logins on this host. Sign in and usage appears here."
+msgstr "На цьому хості немає входів у {0}. Увійдіть, і тут з'являться дані про використання."
 
 msgid "No access to this host"
 msgstr "Немає доступу до цього хоста"
@@ -13510,8 +13660,8 @@ msgstr "Старіші"
 msgid "On"
 msgstr "Увімкнено"
 
-msgid "on {offScopeHostName} — won't run here"
-msgstr "на {offScopeHostName} — тут не запуститься"
+msgid "on {offScopeHostName}, won't run here"
+msgstr "на {offScopeHostName}, тут не запуститься"
 
 msgid "On a date"
 msgstr "У певну дату"
@@ -13941,9 +14091,6 @@ msgstr "Відкрити в браузері"
 msgid "Open in Changes pane"
 msgstr "Відкрити на панелі «Зміни»"
 
-msgid "Open in Chat Interface"
-msgstr "Відкрити в інтерфейсі чату"
-
 msgid "Open in ChatGPT"
 msgstr "Відкрити в ChatGPT"
 
@@ -14018,9 +14165,6 @@ msgstr "Відкрити у вкладці"
 
 msgid "Open in Tasks"
 msgstr "Відкрити в розділі «Завдання»"
-
-msgid "Open in Terminal Chat"
-msgstr "Відкрити в чаті терміналу"
 
 msgid "Open in…"
 msgstr "Відкрити в…"
@@ -14114,9 +14258,6 @@ msgstr "Відкрити нещодавні"
 msgid "Open roles"
 msgstr "Вакансії"
 
-msgid "Open session in"
-msgstr "Відкрити сеанс у"
-
 msgid "Open settings"
 msgstr "Відкрити налаштування"
 
@@ -14185,6 +14326,9 @@ msgstr "Відкрити глобальну палітру команд"
 
 msgid "Open the new workspace modal"
 msgstr "Відкрити вікно нового робочого простору"
+
+msgid "Open the new workspace to see each chat. A chat that didn't move is still in the original workspace."
+msgstr "Відкрийте новий робочий простір, щоб побачити кожен чат. Чат, який не переміщено, залишився в початковому робочому просторі."
 
 msgid "Open the original workspace"
 msgstr "Відкрити початковий робочий простір"
@@ -14416,8 +14560,8 @@ msgid "Overwrite file"
 msgstr "Перезаписати файл"
 
 #. placeholder {0}: ownerName ?? t({ message: "a teammate", })
-msgid "Owned by {0} — only they can edit this automation."
-msgstr "Власник: {0} — лише власник може редагувати цю автоматизацію."
+msgid "Owned by {0}. Only they can edit this automation."
+msgstr "Власник: {0}. Лише власник може редагувати цю автоматизацію."
 
 msgid "Owner"
 msgstr "Власник"
@@ -15106,9 +15250,6 @@ msgstr "Популярні моделі"
 msgid "Ports"
 msgstr "Порти"
 
-msgid "Ports — {totalPortCount} live"
-msgstr "Порти — активних: {totalPortCount}"
-
 msgid "Ports in top bar dropdown"
 msgstr "Порти у спадному меню верхньої панелі"
 
@@ -15117,6 +15258,9 @@ msgstr "Порти на віддалених хостах"
 
 msgid "Ports on this computer"
 msgstr "Порти на цьому комп’ютері"
+
+msgid "Ports: {totalPortCount} live"
+msgstr "Активних портів: {totalPortCount}"
 
 msgid "Possible on good days. Supervision cost still grows too fast."
 msgstr "Можливо в хороші дні. Витрати на нагляд досі зростають надто швидко."
@@ -15133,10 +15277,13 @@ msgstr "Надіслати відповідь"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position} з {size} · у {base}"
+
 #. placeholder {0}: pullRequest.number
 #. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} — {1}"
-msgstr "PR #{0} — {1}"
+msgid "PR #{0} · {1}"
+msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -15327,11 +15474,11 @@ msgstr "Політика конфіденційності"
 msgid "Private"
 msgstr "Приватний"
 
-msgid "Private — only specific people"
-msgstr "Приватний — лише певні люди"
-
 msgid "Private by default.<0/>You're in control."
 msgstr "Приватно за замовчуванням.<0/>Контроль за вами."
+
+msgid "Private: only specific people"
+msgstr "Приватний: лише певні люди"
 
 msgid "Pro"
 msgstr "Pro"
@@ -15431,8 +15578,8 @@ msgstr "Проєкт не позначено як довірений у Codex"
 msgid "Project on another device"
 msgstr "Проєкт на іншому пристрої"
 
-msgid "Project ready — open it from the sidebar."
-msgstr "Проєкт готовий — відкрийте його з бічної панелі."
+msgid "Project ready. Open it from the sidebar."
+msgstr "Проєкт готовий. Відкрийте його з бічної панелі."
 
 #. placeholder {0}: result.repoPath
 msgid "Project relocated to {0}"
@@ -15458,11 +15605,11 @@ msgstr "Пошук у всьому проєкті"
 msgid "Project: {0}"
 msgstr "Проєкт: {0}"
 
-msgid "Project's host is unreachable — cannot import worktrees right now"
-msgstr "Хост проєкту недоступний — зараз неможливо імпортувати worktree"
+msgid "Project's host is unreachable. Cannot import worktrees right now"
+msgstr "Хост проєкту недоступний. Зараз неможливо імпортувати worktree"
 
-msgid "Project's host is unreachable — cannot rename right now"
-msgstr "Хост проєкту недоступний — зараз неможливо перейменувати"
+msgid "Project's host is unreachable. Cannot rename right now"
+msgstr "Хост проєкту недоступний. Зараз неможливо перейменувати"
 
 msgid "Projects"
 msgstr "Проєкти"
@@ -15497,8 +15644,8 @@ msgstr "Попередній перегляд промпту"
 msgid "Prompt restored"
 msgstr "Промпт відновлено"
 
-msgid "Prompt submitted — thanks!"
-msgstr "Промпт надіслано — дякуємо!"
+msgid "Prompt submitted. Thanks!"
+msgstr "Промпт надіслано. Дякуємо!"
 
 msgid "Prompt transport"
 msgstr "Передавання промпту"
@@ -15518,12 +15665,8 @@ msgstr "Властивості"
 msgid "Provide either id or slug"
 msgstr "Укажіть id або slug"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "Постачальник: {0}"
-
-msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened — create a new one to try again."
-msgstr "Розгортання не вдалося, і пісочницю видалено. Нічого не запущено, і цей робочий простір не можна відкрити — створіть новий, щоб спробувати знову."
+msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
+msgstr "Розгортання не вдалося, і пісочницю видалено. Нічого не запущено, і цей робочий простір не можна відкрити. Створіть новий, щоб спробувати знову."
 
 msgid "PRs a week"
 msgstr "PR на тиждень"
@@ -15531,11 +15674,11 @@ msgstr "PR на тиждень"
 msgid "Public"
 msgstr "Публічний"
 
-msgid "Public — anyone in <0>{organizationName}</0>"
-msgstr "Публічний — будь-хто в <0>{organizationName}</0>"
-
 msgid "Public leaderboard"
 msgstr "Публічна таблиця лідерів"
+
+msgid "Public: anyone in <0>{organizationName}</0>"
+msgstr "Публічний: будь-хто в <0>{organizationName}</0>"
 
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "Опублікуйте знову, і посилання не зміниться. Попередні версії зберігаються в історії."
@@ -15585,6 +15728,9 @@ msgstr "Дії з пул-реквестом"
 msgid "Pull request detail tabs"
 msgstr "Вкладки відомостей про пул-реквест"
 
+msgid "Pull request merged"
+msgstr "Пул-реквест злито"
+
 msgid "Pull request not found"
 msgstr "Пул-реквест не знайдено"
 
@@ -15599,6 +15745,9 @@ msgstr "Пул-реквести"
 
 msgid "Pull Requests"
 msgstr "Пул-реквести"
+
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "Пул-реквести над ним залишаться відкритими, і GitHub змінить їхню цільову гілку."
 
 msgid "Pull requests, comments and pushes from Superset are made as you."
 msgstr "Пул-реквести, коментарі й пуші із Superset створюються від вашого імені."
@@ -15662,6 +15811,9 @@ msgstr "Чергу призупинено через ліміт використ
 msgid "Queue paused when Paradev closed"
 msgstr "Чергу призупинено, коли Paradev закрився"
 
+msgid "Queue stack"
+msgstr "Стек у чергу"
+
 msgid "Queue work for agents"
 msgstr "Ставте роботу для агентів у чергу"
 
@@ -15670,6 +15822,9 @@ msgstr "У чергу; ⌘↩, щоб скерувати поточний хід
 
 msgid "Queued"
 msgstr "У черзі"
+
+msgid "Queued · {position}"
+msgstr "У черзі · {position}"
 
 msgid "Queued messages"
 msgstr "Повідомлення в черзі"
@@ -15747,6 +15902,9 @@ msgstr "Рейтинг за"
 
 msgid "Rank your agent usage against other engineers. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Порівнюйте використання агентів з іншими інженерами. Лише кількість токенів і назви моделей, без назв репозиторіїв, шляхів до файлів і промптів."
+
+msgid "Rarely asks before acting"
+msgstr "Рідко запитує перед дією"
 
 msgid "Rate {appName}"
 msgstr "Оцінити {appName}"
@@ -15904,6 +16062,10 @@ msgstr "Готово в"
 msgid "Ready on every machine you sign into and in every cloud workspace."
 msgstr "Готово на кожному комп'ютері, де ви входите, і в кожному хмарному робочому просторі."
 
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "Готово до злиття"
+
 msgid "Ready to Merge"
 msgstr "Готово до злиття"
 
@@ -15933,6 +16095,9 @@ msgstr "Нещодавня активність"
 
 msgid "Recent apps"
 msgstr "Нещодавні застосунки"
+
+msgid "Recent chats"
+msgstr "Нещодавні чати"
 
 msgid "Recent invoices"
 msgstr "Нещодавні рахунки"
@@ -16048,8 +16213,8 @@ msgstr "Згенерувати знову"
 msgid "Region"
 msgstr "Регіон"
 
-msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere — status and notifications stop for this agent, including inside Paradev."
-msgstr "Реєструє хуки життєвого циклу в глобальній конфігурації цього агента, щоб Paradev міг показувати статус і надсилати сповіщення. Якщо це вимкнути, записи Paradev буде видалено всюди — статус і сповіщення для цього агента припиняться, зокрема й усередині Paradev."
+msgid "Registers lifecycle hooks in this agent's global config so Paradev can show status and send notifications. Turning this off removes Paradev's entries everywhere. Status and notifications stop for this agent, including inside Paradev."
+msgstr "Реєструє хуки життєвого циклу в глобальній конфігурації цього агента, щоб Paradev міг показувати статус і надсилати сповіщення. Якщо це вимкнути, записи Paradev буде видалено всюди. Статус і сповіщення для цього агента припиняться, зокрема й усередині Paradev."
 
 msgid "Reinstall {name}"
 msgstr "Перевстановити {name}"
@@ -16136,14 +16301,14 @@ msgstr "Віддалений доступ"
 msgid "Remote Access may be off"
 msgstr "Віддалений доступ, можливо, вимкнено"
 
-msgid "Remote MCP server — connects over HTTP"
-msgstr "Віддалений MCP-сервер — підключається через HTTP"
+msgid "Remote MCP server, connects over HTTP"
+msgstr "Віддалений MCP-сервер, підключається через HTTP"
 
 msgid "Remote workspace"
 msgstr "Віддалений робочий простір"
 
-msgid "Remote workspace — device offline"
-msgstr "Віддалений робочий простір — пристрій офлайн"
+msgid "Remote workspace: device offline"
+msgstr "Віддалений робочий простір: пристрій офлайн"
 
 msgid "Remove"
 msgstr "Видалити"
@@ -16168,6 +16333,9 @@ msgstr "Видалити {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Прибрати {repo}? Усі плагіни, синхронізовані з нього, буде видалено з вашої організації та в усіх учасників, у яких їх встановлено."
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "Прибрати #{prNumber} з черги злиття?"
+
 msgid "Remove attachment"
 msgstr "Прибрати вкладення"
 
@@ -16182,6 +16350,9 @@ msgstr "Прибрати з вибраного"
 
 msgid "Remove from group"
 msgstr "Прибрати з групи"
+
+msgid "Remove from queue"
+msgstr "Прибрати з черги"
 
 msgid "Remove from Queue"
 msgstr "Прибрати з черги"
@@ -16264,6 +16435,9 @@ msgstr "{name} видалено"
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel} видалено."
 
+msgid "Removed from the merge queue"
+msgstr "Прибрано з черги злиття"
+
 msgid "Removes this agent from this device only."
 msgstr "Видаляє цього агента лише з цього пристрою."
 
@@ -16284,6 +16458,9 @@ msgstr "Перейменувати обліковий запис"
 
 msgid "Rename branch"
 msgstr "Перейменувати гілку"
+
+msgid "Rename chat"
+msgstr "Перейменувати чат"
 
 msgid "Rename failed"
 msgstr "Не вдалося перейменувати"
@@ -16558,14 +16735,8 @@ msgstr "Резидентна пам'ять, яку використовують 
 msgid "Resizable"
 msgstr "Змінний розмір"
 
-msgid "Resize left edge"
-msgstr "Змінити розмір за лівим краєм"
-
 msgid "Resize panel"
 msgstr "Змінити розмір панелі"
-
-msgid "Resize right edge"
-msgstr "Змінити розмір за правим краєм"
 
 msgid "Resolve"
 msgstr "Вирішити"
@@ -16609,6 +16780,9 @@ msgstr "Ресурси"
 
 msgid "Response"
 msgstr "Відповідь"
+
+msgid "Restack"
+msgstr "Ребейз стека"
 
 msgid "Restart"
 msgstr "Перезапустити"
@@ -17059,6 +17233,9 @@ msgstr "Запустити зараз"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "Запуск за розкладом або за подіями, запуск на вимогу, пауза, відновлення й читання логів."
 
+msgid "Run on any machine"
+msgstr "На будь-якій машині"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "Запускайте паралельних агентів для нових функцій, виправлень і рефакторингу. Кожен працює у власній гілці, локально або в хмарі."
 
@@ -17158,6 +17335,9 @@ msgstr "Виконується під час створення нового р�
 msgid "Runs when a workspace is deleted."
 msgstr "Виконується під час видалення робочого простору."
 
+msgid "Runs while you sleep"
+msgstr "Працює, поки ви спите"
+
 msgid "Same session"
 msgstr "Той самий сеанс"
 
@@ -17239,6 +17419,9 @@ msgstr "Збережено в «Завантаження»"
 
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
+
+msgid "Saving its work and its chats…"
+msgstr "Збереження його роботи й чатів…"
 
 msgid "Saving..."
 msgstr "Збереження..."
@@ -17337,6 +17520,9 @@ msgstr "Знайти розробника"
 
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "Шукайте у вмісті файлів і в усіх своїх робочих просторах одночасно."
+
+msgid "Search all chats…"
+msgstr "Шукати в усіх чатах…"
 
 msgid "Search all emoji"
 msgstr "Шукати серед усіх емодзі"
@@ -17476,6 +17662,9 @@ msgstr "Пошук завдань…"
 msgid "Search text in the active chat"
 msgstr "Шукати текст в активному чаті"
 
+msgid "Search text in the active page"
+msgstr "Шукати текст на активній сторінці"
+
 msgid "Search text in the active terminal"
 msgstr "Шукати текст в активному терміналі"
 
@@ -17597,6 +17786,9 @@ msgstr "Переглянути цей поріг у таблиці оцінок"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Подивіться, що змінилося, залиште відгук і злийте роботу, коли вона буде готова."
+
+msgid "See what it can do"
+msgstr "Подивіться, що він уміє"
 
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "Подивіться, що ми створюємо зараз, що буде далі й куди рухається Paradev."
@@ -17769,6 +17961,9 @@ msgstr "Дії з вибраними робочими просторами"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Виділений у терміналі текст одразу копіюється в буфер обміну, без пробілів у кінці"
+
+msgid "Self-hosted"
+msgstr "Власний хостинг"
 
 msgid "Send"
 msgstr "Надіслати"
@@ -17982,6 +18177,9 @@ msgstr "Налаштування збережено"
 
 msgid "Setting up in the background..."
 msgstr "Налаштування у фоні..."
+
+msgid "Setting up the new workspace…"
+msgstr "Налаштування нового робочого простору…"
 
 msgid "Settings"
 msgstr "Налаштування"
@@ -18223,6 +18421,9 @@ msgstr "Показати меню посилання"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "Покажи останні 10 запусків моєї автоматизації сортування Linear"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Покажи, що вміє Paradev CLI. Запусти `superset --help` і `superset schema`, щоб побачити команди, потім спробуй кілька команд лише для читання в моєму обліковому записі: `superset workspaces list`, `superset tasks list`, `superset automations list` і `superset hosts list`. Коротко опиши результати й запропонуй три способи використовувати CLI або писати з ним скрипти в моїй роботі. Нічого не створюй, не змінюй і не видаляй."
+
 msgid "Show more"
 msgstr "Показати більше"
 
@@ -18273,6 +18474,9 @@ msgstr "Показати наступну вкладку правої бічно
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "Показати попередню вкладку правої бічної панелі, не переміщуючи фокус"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "Показувати на бічній панелі кнопку з посиланнями на «Мобільні», «Хмара», CLI і «Власний хостинг»."
 
 msgid "Show the triggering payload"
 msgstr "Показати payload тригера"
@@ -18419,8 +18623,8 @@ msgstr "Вхід не завершено."
 msgid "Sign-in expired"
 msgstr "Термін дії входу минув"
 
-msgid "Sign-in expired — run"
-msgstr "Термін дії входу минув — виконайте"
+msgid "Sign-in expired. Run"
+msgstr "Термін дії входу минув. Виконайте"
 
 msgid "Sign-in failed"
 msgstr "Не вдалося увійти"
@@ -18667,6 +18871,9 @@ msgstr "Хтось"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Хтось інший уже опублікував {entryPath} з цього робочого простору. Опублікуйте з явним ідентифікатором сторінки, щоб додати версію до його сторінки, або перемістіть файл."
 
+msgid "Someone is moving this workspace…"
+msgstr "Хтось переміщує цей робочий простір…"
+
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Команда Paradev перевірить цю сторінку. Ми зв'яжемося з вами, лише якщо нам знадобиться щось іще."
 
@@ -18835,6 +19042,28 @@ msgstr "SSO/SAML"
 msgid "Stability improvements"
 msgstr "Покращення стабільності"
 
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "Стек #{stackNumber} · PR {position} з {size} · у {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "Стек #{stackNumber} · у {base}"
+
+msgid "Stack added to merge queue"
+msgstr "Стек додано до черги злиття"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "Не вдалося завантажити дані стека. Оновіть перед злиттям."
+
+msgid "Stack merged"
+msgstr "Стек злито"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "Стек злито"
+
+msgid "Stack needs attention"
+msgstr "Стек потребує уваги"
+
 msgid "Stacked"
 msgstr "Стосом"
 
@@ -18880,8 +19109,8 @@ msgstr "Поставити зірку Paradev на GitHub"
 msgid "Starred"
 msgstr "Зірку поставлено"
 
-msgid "Starred — thank you!"
-msgstr "Зірку поставлено — дякуємо!"
+msgid "Starred. Thank you!"
+msgstr "Зірку поставлено. Дякуємо!"
 
 msgid "Starring…"
 msgstr "Ставимо зірку…"
@@ -19001,6 +19230,9 @@ msgstr "Запуск хмарного робочого простору"
 msgid "Starting the agent…"
 msgstr "Запускаємо агента…"
 
+msgid "Starting the cloud workspace…"
+msgstr "Запуск хмарного робочого простору…"
+
 msgid "Starting the simulator…"
 msgstr "Запускаємо симулятор…"
 
@@ -19066,6 +19298,9 @@ msgstr "Крок 2 з 2"
 
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "Кроки 3 і 4 повторюються, доки сторінка не стане такою, як треба."
+
+msgid "Still asks in Full access mode"
+msgstr "Запитує навіть у режимі «Повний доступ»"
 
 msgid "Still can't reach the host."
 msgstr "Хост досі недоступний."
@@ -19648,9 +19883,6 @@ msgstr "Розмір шрифту термінала"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "Розмір шрифту термінала, коли термінал у фокусі; масштаб сторінки на панелі браузера; в інших випадках — увесь застосунок"
 
-msgid "terminal ID"
-msgstr "ID термінала"
-
 msgid "Terminal input"
 msgstr "Введення в термінал"
 
@@ -19670,9 +19902,6 @@ msgid "Terminal session killed"
 msgstr "Сеанс термінала завершено"
 
 msgid "Terminal sessions"
-msgstr "Сеанси термінала"
-
-msgid "Terminal Sessions"
 msgstr "Сеанси термінала"
 
 msgid "Terminal theme color-palette preview"
@@ -19729,8 +19958,8 @@ msgstr "Термін дії посилання для входу в {plugin} м�
 msgid "That account is no longer connected — choose another."
 msgstr "Цей обліковий запис більше не підключено — виберіть інший."
 
-msgid "That agent session has no conversation to open yet — it was started but never prompted."
-msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити, — його запустили, але так і не надіслали промпт."
+msgid "That agent session has no conversation to open yet. It was started but never prompted."
+msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити. Його запустили, але так і не надіслали промпт."
 
 msgid "That computer can't be reached"
 msgstr "Цей комп’ютер недоступний"
@@ -19802,8 +20031,8 @@ msgstr "Агент перестав відповідати"
 msgid "The agent stopped while resuming the conversation."
 msgstr "Агент зупинився під час відновлення розмови."
 
-msgid "The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings."
-msgstr "Агента, якого вибрано для цієї автоматизації, більше немає на його хості — можливо, агентів хоста скинули або видалили. Виберіть агента знову в налаштуваннях автоматизації."
+msgid "The agent this automation was set to run no longer exists on its host. The host's agents may have been reset or removed. Re-select an agent in the automation's settings."
+msgstr "Агента, якого вибрано для цієї автоматизації, більше немає на його хості. Можливо, агентів хоста скинули або видалили. Виберіть агента знову в налаштуваннях автоматизації."
 
 msgid "The agent uses its skills and tools. The issue lands in Linear."
 msgstr "Агент використовує свої навички й інструменти. Issue з'являється в Linear."
@@ -19834,6 +20063,9 @@ msgstr "Чат залишиться без змін. Файли, які будь
 
 msgid "the cloud"
 msgstr "хмара"
+
+msgid "The cloud workspace is not running. Start it, then try again."
+msgstr "Хмарний робочий простір не запущено. Запустіть його й спробуйте ще раз."
 
 msgid "The cloud workspace should have started but didn't answer in time. The next run tries again."
 msgstr "Хмарний робочий простір мав запуститися, але не відповів вчасно. Наступний запуск спробує знову."
@@ -19877,8 +20109,8 @@ msgstr "Пристрій, на якому розміщено цей проєкт
 msgid "The device was offline when this run started. It may have been asleep or shut down."
 msgstr "Пристрій був офлайн, коли почався цей запуск. Можливо, він був у режимі сну або вимкнений."
 
-msgid "The diff is still up to date — only comments failed to load."
-msgstr "Diff досі актуальний — не вдалося завантажити лише коментарі."
+msgid "The diff is still up to date. Only comments failed to load."
+msgstr "Diff досі актуальний. Не вдалося завантажити лише коментарі."
 
 msgid "The dispatcher appears"
 msgstr "З'являється диспетчер"
@@ -20013,8 +20245,8 @@ msgstr "Локальна служба хоста недоступна для {or
 msgid "The local host service isn't responding. Restarting it usually clears this; if it keeps happening, restart Paradev."
 msgstr "Локальна служба хоста не відповідає. Зазвичай це виправляє перезапуск служби; якщо проблема повторюється, перезапустіть Paradev."
 
-msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost."
-msgstr "Локальна служба хоста не працює, тож ніщо на цьому пристрої не може обслуговувати робочий простір. Перезапуск знову під'єднає ваші термінали й файли — нічого на диску не буде втрачено."
+msgid "The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files. Nothing on disk is lost."
+msgstr "Локальна служба хоста не працює, тож ніщо на цьому пристрої не може обслуговувати робочий простір. Перезапуск знову під'єднає ваші термінали й файли. Нічого на диску не буде втрачено."
 
 msgid "The local host service just came up. Reconnecting to it now."
 msgstr "Локальна служба хоста щойно запустилася. Під'єднуємося до неї."
@@ -20025,14 +20257,14 @@ msgstr "Більшість злитих PR від агентів потребу�
 msgid "The model declined to continue"
 msgstr "Модель відмовилася продовжувати"
 
-msgid "The move into this workspace failed."
-msgstr "Перенесення в цей робочий простір не вдалося."
-
 msgid "The move service couldn't be reached."
 msgstr "Сервіс перенесення недоступний."
 
 msgid "The move stopped responding, so it was ended."
 msgstr "Перенесення перестало відповідати, тому його завершено."
+
+msgid "The move timed out."
+msgstr "Час очікування переміщення минув."
 
 msgid "The move was cancelled."
 msgstr "Перенесення скасовано."
@@ -20048,6 +20280,9 @@ msgstr "Робочий простір з відкритим кодом для Cl
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Робочий простір з відкритим кодом для Claude Code, Codex, OpenCode і будь-якого кодинг-агента. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
+
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgstr "Інша сторона переміщення використовує старішу версію. Перезапустіть хмарний робочий простір або оновіть хост комп'ютера, а потім спробуйте ще раз."
 
 msgid "The overnight shift"
 msgstr "Нічна зміна"
@@ -20157,6 +20392,12 @@ msgstr "Термін дії сертифіката сайту минув"
 msgid "The site's certificate is invalid"
 msgstr "Сертифікат сайту недійсний"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "Стек змінився, поки це було відкрито. Перевірте його і спробуйте ще раз."
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "Пул-реквести стека над ним теж залишать чергу. Кожен має знову стати в чергу й пройти перевірки."
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "Початкова точка, з якої завантажується хмарний робочий простір. Змінні, задані тут, потрапляють у кожну пісочницю, запущену з неї."
 
@@ -20183,6 +20424,9 @@ msgstr "Оновлення також зможе:"
 
 msgid "The very beginning"
 msgstr "Самісінький початок"
+
+msgid "The workspace couldn't be reached. Check that it is running, then try again."
+msgstr "Не вдалося підключитися до робочого простору. Перевірте, що він запущений, і спробуйте ще раз."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "Робочий простір ще не готовий. Спробуйте ще раз."
@@ -20220,6 +20464,9 @@ msgstr "Теми"
 msgid "There isn't enough free disk space to install {name}. Free up some space and try again."
 msgstr "Недостатньо вільного місця на диску, щоб установити {name}. Звільніть місце й спробуйте ще раз."
 
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "Вони пов'язані базовою гілкою, тож кожен зливається в той, що нижче. Стек GitHub зливає їх за один крок."
+
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "Ці команди виконуються автоматично під час створення робочого простору. <0>Читати документацію<1/></0>"
 
@@ -20228,9 +20475,6 @@ msgstr "У цих папках досі є ваші файли, але вони 
 
 msgid "These ports are still in use"
 msgstr "Ці порти досі використовуються"
-
-msgid "They are still in the original workspace. Open each one to try again."
-msgstr "Вони досі в початковому робочому просторі. Відкрийте кожен, щоб спробувати знову."
 
 msgid "They run on the subscriptions and keys you already have."
 msgstr "Вони працюють на підписках і ключах, які у вас уже є."
@@ -20323,11 +20567,11 @@ msgstr "Цей чат зупинено, бо розмова продовжила
 msgid "This chat was stopped."
 msgstr "Цей чат зупинено."
 
-msgid "This closes every terminal session — in this workspace and any others — and can't be undone. If they're only briefly stuck, waiting usually brings them back."
-msgstr "Це закриє всі сеанси термінала — у цьому робочому просторі й усіх інших — і цю дію неможливо скасувати. Якщо вони лише ненадовго зависли, зазвичай достатньо зачекати."
-
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Це закриє всі сеанси термінала вашої організації{runningCountSuffix} і запустить новий демон."
+
+msgid "This closes every terminal session, in this workspace and any others, and can't be undone. If they're only briefly stuck, waiting usually brings them back."
+msgstr "Це закриє всі сеанси термінала, у цьому робочому просторі й усіх інших, і цю дію неможливо скасувати. Якщо вони лише ненадовго зависли, зазвичай достатньо зачекати."
 
 msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
 msgstr "Це закриє вибрані робочі простори та їхні термінали. Файли й гілки проєкту залишаться без змін."
@@ -20416,17 +20660,14 @@ msgstr "Це посилання-запрошення недійсне, або т
 msgid "This is taking longer than expected."
 msgstr "Це триває довше, ніж очікувалося."
 
-msgid "This is taking longer than usual. The chat below is its last saved copy; it opens for real once the workspace starts."
-msgstr "Це триває довше, ніж зазвичай. Нижче — остання збережена копія чату; по-справжньому він відкриється, коли робочий простір запуститься."
+msgid "This is taking longer than usual. The sandbox may still be pulling its image. It keeps going whether this window is open or not."
+msgstr "Це триває довше, ніж зазвичай. Можливо, пісочниця ще завантажує свій образ. Процес триває незалежно від того, чи відкрите це вікно."
 
-msgid "This is taking longer than usual. The sandbox may still be pulling its image — it keeps going whether this window is open or not."
-msgstr "Це триває довше, ніж зазвичай. Можливо, пісочниця ще завантажує свій образ — процес триває незалежно від того, чи відкрите це вікно."
+msgid "This is taking longer than usual. The session may already be ready. Reloading can pick it up."
+msgstr "Це триває довше, ніж зазвичай. Можливо, сеанс уже готовий. Перезавантаження може його підхопити."
 
-msgid "This is taking longer than usual. The session may already be ready — reloading can pick it up."
-msgstr "Це триває довше, ніж зазвичай. Можливо, сеанс уже готовий — перезавантаження може його підхопити."
-
-msgid "This is taking longer than usual. The workspace may already be ready — reloading can pick it up."
-msgstr "Це триває довше, ніж зазвичай. Можливо, робочий простір уже готовий — перезавантаження може його підхопити."
+msgid "This is taking longer than usual. The workspace may already be ready. Reloading can pick it up."
+msgstr "Це триває довше, ніж зазвичай. Можливо, робочий простір уже готовий. Перезавантаження може його підхопити."
 
 msgid "This is the very beginning of the {name} channel."
 msgstr "Звідси починається канал {name}."
@@ -20632,6 +20873,15 @@ msgstr "У цьому вигляді сталася помилка"
 msgid "This week"
 msgstr "Цього тижня"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "Усі відкриті пул-реквести до #{prNumber} буде атомарно злито в {base} за допомогою коміту злиття."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "Усі відкриті пул-реквести до #{prNumber} буде атомарно злито в {base} за допомогою ребейзу."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "Усі відкриті пул-реквести до #{prNumber} буде атомарно злито в {base} за допомогою squash."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "Це змінить публічну URL-адресу вашої організації. Не забудьте оновити закладки та посилання, якими ви ділилися."
 
@@ -20641,6 +20891,15 @@ msgstr "Це видалить команду <0>{0}</0> і прибере всі
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "Це примусово завершить усі активні сеанси й перезапустить демон терміналів. Застосунок перезапустить термінали з новим демоном."
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber} буде злито в {base} за допомогою коміту злиття."
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "#{prNumber} буде злито в {base} за допомогою ребейзу."
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "#{prNumber} буде злито в {base} за допомогою squash."
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "Це назавжди видалить рутину й зупинить майбутні запуски."
@@ -20680,9 +20939,6 @@ msgstr "Це зніме з індексу та відкотить усі про�
 
 msgid "This workspace"
 msgstr "Цей робочий простір"
-
-msgid "This workspace couldn't move. It is unchanged."
-msgstr "Не вдалося перенести цей робочий простір. Він не змінився."
 
 msgid "This workspace has no project to branch from"
 msgstr "У цього робочого простору немає проєкту, від якого можна створити гілку"
@@ -21064,6 +21320,9 @@ msgstr "Тунель встановлено"
 
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
+
+msgid "Turn it back on in Settings → General."
+msgstr "Його можна знову ввімкнути в розділі «Налаштування → Загальні»."
 
 msgid "Turn off"
 msgstr "Вимкнути"
@@ -21620,6 +21879,12 @@ msgstr "Використати ручний вхід"
 msgid "Use more browser features: {features}"
 msgstr "Використовувати більше можливостей браузера: {features}"
 
+msgid "Use Paradev anywhere"
+msgstr "Використовуйте Paradev будь-де"
+
+msgid "Use Paradev anywhere button"
+msgstr "Кнопка «Використовуйте Paradev будь-де»"
+
 msgid "Use Paradev on mobile"
 msgstr "Використовуйте Paradev на мобільних пристроях"
 
@@ -21662,8 +21927,8 @@ msgstr "Використовується в URL та API."
 msgid "Used to clone a previous session without changing it. Put <0>{sessionId}</0> where the source id belongs, or leave empty if the agent cannot fork sessions."
 msgstr "Використовується, щоб клонувати попередній сеанс, не змінюючи його. Вставте <0>{sessionId}</0> туди, де має бути id джерела, або залиште порожнім, якщо агент не вміє форкати сеанси."
 
-msgid "Used to restore a previous session — the session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
-msgstr "Використовується для відновлення попереднього сеансу — id сеансу додається після цих аргументів, наприклад <0>--resume</0>. Залиште порожнім, якщо агент не вміє відновлювати сеанс за id."
+msgid "Used to restore a previous session. The session id is appended after these, e.g. <0>--resume</0>. Leave empty if the agent can't resume by id."
+msgstr "Використовується для відновлення попереднього сеансу. Id сеансу додається після цих аргументів, наприклад <0>--resume</0>. Залиште порожнім, якщо агент не вміє відновлювати сеанс за id."
 
 msgid "Used when your system is in dark mode."
 msgstr "Використовується, коли система в темному режимі."
@@ -21808,6 +22073,9 @@ msgstr "Переглянути в повному розмірі"
 msgid "View in GitHub"
 msgstr "Переглянути в GitHub"
 
+msgid "View instead"
+msgstr "Просто переглянути"
+
 msgid "View log"
 msgstr "Переглянути лог"
 
@@ -21844,8 +22112,18 @@ msgstr "Переглянути нотатки до релізу"
 msgid "View releases on GitHub"
 msgstr "Переглянути релізи на GitHub"
 
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "Переглянути стек {stackNumber}, пул-реквест {position} з {size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "Переглянути стек, пул-реквест {position} з {size}"
+
 msgid "View usage"
 msgstr "Переглянути використання"
+
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "Відкрито"
 
 msgid "Violence or harassment"
 msgstr "Насильство або цькування"
@@ -21908,9 +22186,6 @@ msgstr "Очікування першого повідомлення субаг�
 
 msgid "Waiting for your input"
 msgstr "Чекає на вашу відповідь"
-
-msgid "Waking the workspace…"
-msgstr "Пробудження робочого простору…"
 
 msgid "Waking up workspace"
 msgstr "Пробудження робочого простору"
@@ -22821,6 +23096,9 @@ msgstr "Ваше посилання на GitHub походить з обліко
 
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "Ваш останній платіж не вдався. Оновіть спосіб оплати, щоб зберегти Pro."
+
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "Постачальник моделі зупинив цей запит, бо обліковий запис досяг ліміту використання або витрат. Дочекайтеся скидання ліміту, збільште його в постачальника або перейдіть на інший обліковий запис у налаштуваннях використання."
 
 msgid "Your name"
 msgstr "Ваше ім'я"

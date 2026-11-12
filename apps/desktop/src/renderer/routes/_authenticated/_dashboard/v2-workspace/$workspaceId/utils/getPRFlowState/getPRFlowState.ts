@@ -133,7 +133,7 @@ export function selectStatusBadge(state: PRFlowState): string | null {
 		case "busy":
 			return "Agent working…";
 		case "error":
-			return "Failed to refresh — retry";
+			return "Failed to refresh. Retry";
 	}
 }
 

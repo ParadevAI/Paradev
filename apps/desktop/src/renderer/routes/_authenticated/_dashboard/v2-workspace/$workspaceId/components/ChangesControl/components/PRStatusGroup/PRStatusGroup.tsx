@@ -3,7 +3,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
@@ -14,6 +13,7 @@ import {
 } from "@superset/ui/hover-card";
 import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
+import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo, useRef, useState } from "react";
 import { LuArrowUpRight } from "react-icons/lu";
 import {
@@ -29,16 +29,25 @@ import {
 	type OpenPullRequestPane,
 	openPullRequestLink,
 } from "renderer/lib/github/openPullRequestLink";
+import { PullRequestMergeFlowDialog } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMergeFlowDialog";
+import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
+import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useStackRestack";
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { computeChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
+import {
+	useOpenStackLayer,
+	usePendingStackLayer,
+} from "../../../../hooks/useOpenStackLayer";
 import { usePullRequestActions } from "../../../../hooks/usePullRequestActions";
 import { useShipActions } from "../../../../hooks/useShipActions";
 import type { PRFlowState } from "../../../../utils/getPRFlowState";
 import { CommitForm } from "../../../CommitForm";
-import { MergeMethodMenuItems } from "../../../MergeMethodMenuItems";
 import { PRStatusIndicators } from "../../../PRStatusIndicators";
+import { PullRequestMergeMenuSection } from "../../../PullRequestMergeMenuSection";
 import { PRDetailCard } from "./components/PRDetailCard";
 
 interface PRStatusGroupProps {
@@ -56,6 +65,7 @@ interface PRStatusGroupProps {
 	onToggleChanges: () => void;
 	/** Opens the PR's summary pane in the workspace (the menu's "Open pull request"). */
 	onOpenPullRequest: OpenPullRequestPane;
+	viewingPullRequestNumber?: number | null;
 }
 
 /**
@@ -77,9 +87,10 @@ export function PRStatusGroup({
 	toggleLabel,
 	onToggleChanges,
 	onOpenPullRequest,
+	viewingPullRequestNumber = null,
 }: PRStatusGroupProps) {
 	const { t } = useLingui();
-	const { workspace } = useWorkspace();
+	const { workspace, hostUrl } = useWorkspace();
 	const organizationId = useActiveOrganizationId();
 	const linkPolicy = usePullRequestLinkPolicy();
 	const isSession = workspace.type === "session";
@@ -98,6 +109,38 @@ export function PRStatusGroup({
 			}
 		: null;
 	const prActions = usePullRequestActions({ workspaceId, target, onRefresh });
+	const refreshWorkspacePullRequest =
+		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
+	const flow = usePullRequestMergeFlow({
+		target,
+		onMerged: async () => {
+			try {
+				await refreshWorkspacePullRequest.mutateAsync({
+					workspaceIds: [workspaceId],
+				});
+			} catch (error) {
+				console.warn("Failed to refresh PR state after merge", error);
+			}
+			onRefresh?.();
+		},
+	});
+	const restack = useStackRestack(
+		pr && workspace.projectId
+			? {
+					projectId: workspace.projectId,
+					hostId: workspace.hostId,
+					hostUrl,
+					prNumber: pr.number,
+				}
+			: null,
+		flow.stack,
+	);
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
+		onSwitched: onRefresh,
+		layers: flow.stack?.layers,
+	});
+	const pendingLayer =
+		usePendingStackLayer(workspaceId, pr?.number ?? null)?.layer ?? null;
 
 	const sync = state.kind === "pr-exists" ? state.sync : null;
 	const canCommit = sync?.hasUncommitted === true;
@@ -139,8 +182,16 @@ export function PRStatusGroup({
 	// Queued PRs are still actively running checks, so keep CI/review indicators.
 	const showIndicators = pr.state === "open" || pr.state === "queued";
 
+	const stack =
+		flow.stack && pendingLayer
+			? { ...flow.stack, currentPosition: pendingLayer.position }
+			: flow.stack;
+	const isQueued = pr.state === "queued" || flow.queued !== null;
+	const isMerging = prActions.isMerging || flow.isMerging;
+
 	const isBusy =
-		prActions.isMerging ||
+		isMerging ||
+		flow.isDequeuing ||
 		prActions.isMarkingReady ||
 		shipActions.isCommitting ||
 		shipActions.isPushing;
@@ -148,7 +199,13 @@ export function PRStatusGroup({
 
 	const badgeContent = (
 		<>
-			<PRIcon state={linkState} className="size-4" />
+			{pendingLayer ? (
+				<span className="flex size-4 items-center justify-center">
+					<AsciiSpinner className="text-base leading-none" />
+				</span>
+			) : (
+				<PRIcon state={linkState} className="size-4" />
+			)}
 			{/* The number brightens while pressed — the state tint alone moves
 			    the fill too little to read as a toggle. */}
 			<span
@@ -157,9 +214,11 @@ export function PRStatusGroup({
 					isChangesOpen ? "text-foreground" : "text-muted-foreground",
 				)}
 			>
-				#{pr.number}
+				#{pendingLayer?.number ?? pr.number}
 			</span>
-			{showIndicators && <PRStatusIndicators checks={checks} />}
+			{!pendingLayer && showIndicators && (
+				<PRStatusIndicators checks={checks} />
+			)}
 		</>
 	);
 	const badgeClass = cn(
@@ -205,6 +264,21 @@ export function PRStatusGroup({
 						</HoverCardContent>
 					</HoverCard>
 
+					{stack ? (
+						<>
+							<div className={cn("h-full w-px", tint.divider)} />
+							<PullRequestStackPopover
+								stack={stack}
+								flow={flow}
+								restack={restack}
+								appearance="segment"
+								className={tint.hover}
+								workspaceNumber={pendingLayer?.number ?? pr.number}
+								viewingNumber={viewingPullRequestNumber}
+								onSelectLayer={openStackLayer}
+							/>
+						</>
+					) : null}
 					<div className={cn("h-full w-px", tint.divider)} />
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
@@ -217,7 +291,7 @@ export function PRStatusGroup({
 								)}
 								disabled={isBusy}
 								aria-label={
-									prActions.isMerging
+									isMerging
 										? t({
 												message: "Merging pull request",
 											})
@@ -235,7 +309,7 @@ export function PRStatusGroup({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent
 							align="end"
-							className="w-44"
+							className={stack ? "w-64" : "w-44"}
 							onCloseAutoFocus={(event) => {
 								if (!commitRequestedRef.current) return;
 								commitRequestedRef.current = false;
@@ -281,20 +355,14 @@ export function PRStatusGroup({
 									<DropdownMenuSeparator />
 								</>
 							)}
-							{canMerge && (
+							{(canMerge || isQueued) && (
 								<>
-									<DropdownMenuLabel
-										className={cn(
-											"font-normal text-muted-foreground",
-											"text-xs",
-										)}
-									>
-										<Trans>Merge</Trans>
-									</DropdownMenuLabel>
-									<MergeMethodMenuItems
+									<PullRequestMergeMenuSection
 										target={target}
-										isMerging={prActions.isMerging}
-										onMerge={prActions.merge}
+										flow={flow}
+										isQueued={isQueued}
+										isMergingAlone={prActions.isMerging}
+										onMergeAlone={prActions.merge}
 										className="text-xs"
 										iconClassName="size-3.5"
 									/>
@@ -324,6 +392,7 @@ export function PRStatusGroup({
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
+					<PullRequestMergeFlowDialog flow={flow} prNumber={pr.number} />
 				</div>
 			</PopoverAnchor>
 			<PopoverContent align="end" sideOffset={8} className="w-80 p-3">

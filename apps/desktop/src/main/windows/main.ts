@@ -407,7 +407,7 @@ export async function createPlatformWindow({
 	const workspaceName = isDev ? resolveDevWorkspaceName() : undefined;
 	const displayName = getProductDisplayName();
 	const windowTitle = workspaceName
-		? `${displayName} — ${workspaceName}`
+		? `${displayName} · ${workspaceName}`
 		: displayName;
 
 	const window = createWindow({

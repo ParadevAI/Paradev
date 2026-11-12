@@ -133,7 +133,11 @@ mock.module("electron", () => ({
 			loadURL: mock(),
 			on: mock(),
 		})),
-		{ getFocusedWindow: mock(() => null), getAllWindows: mock(() => []) },
+		{
+			getFocusedWindow: mock(() => null),
+			getAllWindows: mock(() => []),
+			fromWebContents: mock(() => null),
+		},
 	),
 	WebContentsView: mock(() => ({
 		webContents: {

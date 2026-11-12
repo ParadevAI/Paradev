@@ -70,6 +70,7 @@ function workspace(
 		taskId: null,
 		pendingTransaction: null,
 		isMine: null,
+		creator: null,
 		sandboxStatus: null,
 	};
 }

@@ -9,6 +9,8 @@ interface DeadKey {
  * the writer.
  */
 export const DEAD_KEYS: DeadKey[] = [
+	// New workspace composer width; the resize handles were removed
+	{ key: "new-workspace-width", match: "exact" },
 	// Device-local Chat setting; moved to the account (user_settings.experimental_chat)
 	{ key: "acp-chat", match: "exact" },
 	// The task page's inline agent picker; Start work opens New Workspace instead

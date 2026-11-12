@@ -52,7 +52,7 @@ export function SubmitPromptDialog({
 			});
 			toast.success(
 				t({
-					message: "Prompt submitted — thanks!",
+					message: "Prompt submitted. Thanks!",
 				}),
 			);
 			handleOpenChange(false);

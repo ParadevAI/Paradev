@@ -250,4 +250,43 @@ describe("MoveBook", () => {
 			error: "gone",
 		});
 	});
+
+	it("lists the moves still waiting for a computer, oldest first, per person", () => {
+		const { ok } = newBook();
+		const parent = begin(ok);
+		const toLaptop = (sessionId: string, createdBy = "user-1") => ({
+			...chat(sessionId),
+			createdBy,
+			toHostId: "laptop-host",
+		});
+		const [first, second] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "laptop-2",
+			branch: "move/1",
+			chats: [toLaptop("a"), toLaptop("b"), toLaptop("c", "user-2")],
+		}).moves;
+		ok({ op: "claim", id: first?.id ?? "" });
+		ok({ op: "finish", id: first?.id ?? "" });
+		expect(
+			ok({ op: "waitingOnHost", toHostId: "laptop-host", createdBy: "user-1" })
+				.ids,
+		).toEqual([second?.id ?? ""]);
+	});
+
+	it("shows the newest move to anyone when asked without a person", () => {
+		const { ok } = newBook();
+		const parent = begin(ok);
+		expect(
+			ok({
+				op: "latestWorkspaceMove",
+				workspaceId: "laptop",
+				createdBy: "user-2",
+			}).move,
+		).toBeNull();
+		expect(
+			ok({ op: "latestWorkspaceMove", workspaceId: "laptop", createdBy: null })
+				.move?.id,
+		).toBe(parent.id);
+	});
 });

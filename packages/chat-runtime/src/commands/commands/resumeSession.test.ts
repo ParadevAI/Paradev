@@ -287,7 +287,50 @@ describe("resuming chats after a restart", () => {
 		);
 		expect(reattach("agent-forked").sessionId).not.toBe(resumed.sessionId);
 		expect(reattach("agent-1")).toEqual(resumed);
-		expect(reattach("agent-1").sessionId).not.toBe(resumed.sessionId);
+		await runtime.dispose();
+	});
+
+	test("a stopped chat resumed twice leaves one open chat on its agent session", async () => {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const original = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		await waitFor(
+			() => runtime.live.get(original.sessionId)?.state.status === "idle",
+		);
+		await runtime.live.dispose(original.sessionId);
+
+		const resumed = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			resume: { harnessSessionId: "agent-1" },
+		});
+		await waitFor(
+			() => runtime.live.get(resumed.sessionId)?.state.status === "idle",
+		);
+		const again = runtime.commands.resumeSession({
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			harnessSessionId: "agent-1",
+			cwd: "/tmp/workspace",
+			prompts: [],
+			pausedPrompts: [],
+			replacesSessionId: original.sessionId,
+		});
+
+		expect(again).toEqual(resumed);
+		expect(started).toHaveLength(2);
+		expect(
+			runtime.sessions
+				.listByScope("workspace-1")
+				.filter((row) => row.closedAt === null)
+				.map((row) => row.sessionId),
+		).toEqual([resumed.sessionId]);
 		await runtime.dispose();
 	});
 });

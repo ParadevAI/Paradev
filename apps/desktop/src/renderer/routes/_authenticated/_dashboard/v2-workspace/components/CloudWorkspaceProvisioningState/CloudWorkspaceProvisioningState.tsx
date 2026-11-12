@@ -68,8 +68,8 @@ export function CloudWorkspaceProvisioningState({
 						<p className="select-text cursor-text text-[12px] leading-relaxed text-muted-foreground">
 							<Trans>
 								This is taking longer than usual. The sandbox may still be
-								pulling its image — it keeps going whether this window is open
-								or not.
+								pulling its image. It keeps going whether this window is open or
+								not.
 							</Trans>
 						</p>
 					</div>
@@ -122,7 +122,7 @@ function CloudWorkspaceFailedState({
 					<p className="select-text cursor-text text-[12px] leading-relaxed text-destructive/90">
 						<Trans>
 							Provisioning failed and the sandbox was torn down. Nothing is
-							running, and this workspace can't be opened — create a new one to
+							running, and this workspace can't be opened. Create a new one to
 							try again.
 						</Trans>
 					</p>
