@@ -17545,6 +17545,9 @@ msgstr "Поиск в Linear"
 msgid "Search Linear…"
 msgstr "Поиск в Linear…"
 
+msgid "Search logs, metrics, and traces"
+msgstr "Поиск по логам, метрикам и трассировкам"
+
 msgid "Search MCP servers…"
 msgstr "Поиск серверов MCP…"
 

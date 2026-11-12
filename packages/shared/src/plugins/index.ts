@@ -380,6 +380,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		featured: true,
 	},
 	{
+		name: "datadog",
+		version: "1.0.0",
+		description: "Investigate logs, metrics, and traces",
+		interface: { displayName: "Datadog", category: "Developer tools" },
+		mcpServers: {
+			datadog: { type: "http", url: "https://mcp.datadoghq.com/v1/mcp" },
+		},
+	},
+	{
 		name: "figma",
 		version: "1.0.0",
 		description: "Bring designs into your workflow",

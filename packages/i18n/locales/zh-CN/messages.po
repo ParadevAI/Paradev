@@ -17545,6 +17545,9 @@ msgstr "搜索Linear"
 msgid "Search Linear…"
 msgstr "搜索Linear…"
 
+msgid "Search logs, metrics, and traces"
+msgstr "搜索日志、指标和链路追踪"
+
 msgid "Search MCP servers…"
 msgstr "搜索MCP服务器…"
 

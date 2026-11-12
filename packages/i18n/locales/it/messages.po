@@ -17545,6 +17545,9 @@ msgstr "Cerca in Linear"
 msgid "Search Linear…"
 msgstr "Cerca in Linear…"
 
+msgid "Search logs, metrics, and traces"
+msgstr "Cerca in log, metriche e trace"
+
 msgid "Search MCP servers…"
 msgstr "Cerca server MCP…"
 

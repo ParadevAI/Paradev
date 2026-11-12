@@ -1,6 +1,7 @@
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
 import {
+	SiDatadog,
 	SiLinear,
 	SiNotion,
 	SiPosthog,
@@ -31,6 +32,7 @@ export const IMAGE_ICONS: Record<string, string> = {
 
 export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	autumn: { icon: AutumnIcon },
+	datadog: { icon: SiDatadog, color: "#632CA6" },
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
 	inngest: { icon: InngestIcon },

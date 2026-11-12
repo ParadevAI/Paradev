@@ -17545,6 +17545,9 @@ msgstr "Hledat v Linearu"
 msgid "Search Linear…"
 msgstr "Hledat v Linearu…"
 
+msgid "Search logs, metrics, and traces"
+msgstr "Prohledávejte logy, metriky a trasy"
+
 msgid "Search MCP servers…"
 msgstr "Hledat MCP servery…"
 
