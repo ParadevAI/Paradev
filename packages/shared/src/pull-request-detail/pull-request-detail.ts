@@ -341,19 +341,45 @@ export interface PullRequestAppGatedQuery {
 	} | null;
 }
 
-function isOnlyForbidden(error: unknown): error is { data?: unknown } {
+const CHECKS_PATH = ["repository", "pullRequest", "statusCheckRollup"];
+
+function refusedOnlyUnder(
+	error: unknown,
+	under: readonly string[],
+): { data: unknown } | null {
 	if (typeof error !== "object" || error === null || !("errors" in error)) {
-		return false;
+		return null;
 	}
-	const { errors } = error as { errors: unknown };
-	return (
+	const { errors, data } = error as { errors: unknown; data?: unknown };
+	const refused =
 		Array.isArray(errors) &&
 		errors.length > 0 &&
-		errors.every((entry) => entry?.type === "FORBIDDEN")
-	);
+		errors.every(
+			(entry) =>
+				entry?.type === "FORBIDDEN" &&
+				Array.isArray(entry.path) &&
+				under.every((key, index) => entry.path[index] === key),
+		);
+	return refused ? { data } : null;
 }
 
-/** What GitHub let this token read of the gated fields; the rest falls back to "none". */
+async function readAllowingRefusals<T>(
+	client: PullRequestDetailClient,
+	query: string,
+	queryVariables: Record<string, unknown>,
+	under: readonly string[],
+	onRefused: (error: unknown) => void,
+): Promise<T> {
+	try {
+		return await client.graphql<T>(query, queryVariables);
+	} catch (error) {
+		const refused = refusedOnlyUnder(error, under);
+		if (!refused?.data) throw error;
+		onRefused(error);
+		return refused.data as T;
+	}
+}
+
 async function readAppGatedFields(
 	client: PullRequestDetailClient,
 	input: PullRequestDetailInput,
@@ -366,14 +392,15 @@ async function readAppGatedFields(
 		);
 		return appGatedFields(data);
 	} catch (error) {
-		if (!isOnlyForbidden(error)) throw error;
+		const refused = refusedOnlyUnder(error, ["repository"]);
+		if (!refused) throw error;
 		onRefused(error);
-		return appGatedFields(error.data as PullRequestAppGatedQuery | undefined);
+		return appGatedFields(refused.data as PullRequestAppGatedQuery | null);
 	}
 }
 
 function appGatedFields(
-	read: PullRequestAppGatedQuery | undefined,
+	read: PullRequestAppGatedQuery | null | undefined,
 ): PullRequestAppGatedFields {
 	const repository = read?.repository;
 	return {
@@ -571,24 +598,23 @@ export async function readPullRequestDetail(
 	input: PullRequestDetailInput,
 	options: {
 		activity?: boolean;
-		/** GitHub refused some App-gated fields; the read goes on without them. */
 		onRefused?: (error: unknown) => void;
 	} = {},
 ): Promise<PullRequestDetailRead> {
 	const activity = options.activity ?? false;
+	const onRefused = options.onRefused ?? (() => {});
 	const requestedReviewers = client.requestedReviewers(input);
 	// Awaited below; this only stops an unhandled rejection when the read
 	// above fails first.
 	requestedReviewers.catch(() => {});
-	const gatedRead = readAppGatedFields(
-		client,
-		input,
-		options.onRefused ?? (() => {}),
-	);
+	const gatedRead = readAppGatedFields(client, input, onRefused);
 	gatedRead.catch(() => {});
-	const data = await client.graphql<PullRequestDetailQuery>(
+	const data = await readAllowingRefusals<PullRequestDetailQuery>(
+		client,
 		PULL_REQUEST_DETAIL_QUERY,
 		{ ...variables(input), activity },
+		CHECKS_PATH,
+		onRefused,
 	);
 	const core = data.repository?.pullRequest;
 	if (!core) {
@@ -624,7 +650,7 @@ export async function readPullRequestDetail(
 			pr.statusCheckRollup?.contexts?.pageInfo,
 			async (cursor) =>
 				(
-					await client.graphql<{
+					await readAllowingRefusals<{
 						repository: {
 							pullRequest: {
 								statusCheckRollup: {
@@ -632,7 +658,13 @@ export async function readPullRequestDetail(
 								} | null;
 							} | null;
 						} | null;
-					}>(CHECK_CONTEXTS_PAGE_QUERY, variables(input, cursor))
+					}>(
+						client,
+						CHECK_CONTEXTS_PAGE_QUERY,
+						variables(input, cursor),
+						CHECKS_PATH,
+						onRefused,
+					)
 				).repository?.pullRequest?.statusCheckRollup?.contexts,
 		),
 		requestedReviewers,

@@ -31,12 +31,23 @@ async function onGithub<T>(
 
 const warnedRefusals = new Set<string>();
 
-function warnRefusedOnce(error: unknown) {
+function warnRefusedOnce(repoFullName: string, error: unknown) {
 	const errors = (error as { errors?: { path?: unknown[] }[] }).errors ?? [];
-	const paths = errors.map((entry) => entry.path?.join(".") ?? "?").join(", ");
+	const paths = [
+		...new Set(
+			errors.map(
+				(entry) =>
+					entry?.path
+						?.map((key) => (typeof key === "number" ? "*" : key))
+						.join(".") ?? "?",
+			),
+		),
+	].join(", ");
 	if (warnedRefusals.has(paths)) return;
 	warnedRefusals.add(paths);
-	console.warn(`[github.getPullRequestDetail] GitHub refused: ${paths}`);
+	console.warn(
+		`[github.getPullRequestDetail] GitHub refused ${paths} on ${repoFullName}`,
+	);
 }
 
 /**
@@ -51,7 +62,10 @@ export const pullRequestProcedures = {
 		.query(async ({ ctx, input }): Promise<PullRequestDetailRead> => {
 			const pr = await asViewer(ctx.session.user.id, input);
 			return onGithub(`Failed to read pull request #${pr.number}`, () =>
-				pr.detail({ activity: input.activity, onRefused: warnRefusedOnce }),
+				pr.detail({
+					activity: input.activity,
+					onRefused: (error) => warnRefusedOnce(input.repoFullName, error),
+				}),
 			);
 		}),
 

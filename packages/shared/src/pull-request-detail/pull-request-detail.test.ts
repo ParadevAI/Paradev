@@ -14,7 +14,7 @@ type PullRequestFixture = NonNullable<
 > &
 	PullRequestAppGatedFields;
 
-const isAppGatedRead = (query: string) => query.includes("isMergeQueueEnabled");
+const isAppGatedRead = (query: string) => query.includes("adminMerge:");
 
 function appGatedRead(
 	pr: PullRequestAppGatedFields = pullRequest().repository.pullRequest,
@@ -246,6 +246,100 @@ describe("readPullRequestDetail", () => {
 			requiresThreadResolution: true,
 			queueEnabled: false,
 		});
+	});
+
+	test("status checks the GitHub App may not read are dropped instead of failing the read", async () => {
+		const page = pullRequest({
+			reviewThreads: {
+				pageInfo: { hasNextPage: false, endCursor: null },
+				nodes: [],
+			},
+		});
+		const contexts = page.repository.pullRequest.statusCheckRollup?.contexts;
+		const refused = Object.assign(new Error("Resource not accessible"), {
+			errors: [
+				{
+					type: "FORBIDDEN",
+					path: [
+						"repository",
+						"pullRequest",
+						"statusCheckRollup",
+						"contexts",
+						"nodes",
+						1,
+					],
+				},
+			],
+			data: {
+				repository: {
+					...page.repository,
+					pullRequest: {
+						...page.repository.pullRequest,
+						statusCheckRollup: {
+							contexts: contexts && {
+								...contexts,
+								nodes: [contexts.nodes[0], null],
+							},
+						},
+					},
+				},
+			},
+		});
+		const refusals: unknown[] = [];
+		const detail = await readPullRequestDetail(
+			{
+				graphql: async <T>(query: string) => {
+					if (isAppGatedRead(query)) return appGatedRead() as T;
+					throw refused;
+				},
+				requestedReviewers: async () => ({ users: [], teams: [] }),
+			},
+			input,
+			{ onRefused: (error) => refusals.push(error) },
+		);
+		expect(refusals).toEqual([refused]);
+		expect(detail.checks.map((check) => check.name)).toEqual([
+			"CI / Typecheck",
+		]);
+	});
+
+	test("a refusal outside the checks, or next to another error, still fails the read", async () => {
+		const failures = [
+			{
+				errors: [
+					{ type: "FORBIDDEN", path: ["repository", "pullRequest", "title"] },
+				],
+			},
+			{
+				errors: [
+					{
+						type: "FORBIDDEN",
+						path: ["repository", "pullRequest", "statusCheckRollup"],
+					},
+					{ type: "RATE_LIMITED", path: ["repository"] },
+				],
+			},
+		];
+		for (const failure of failures) {
+			const error = Object.assign(new Error("GitHub refused"), {
+				...failure,
+				data: pullRequest(),
+			});
+			const refusals: unknown[] = [];
+			const read = readPullRequestDetail(
+				{
+					graphql: async <T>(query: string) => {
+						if (isAppGatedRead(query)) return appGatedRead() as T;
+						throw error;
+					},
+					requestedReviewers: async () => ({ users: [], teams: [] }),
+				},
+				input,
+				{ onRefused: (refusal) => refusals.push(refusal) },
+			);
+			await expect(read).rejects.toBe(error);
+			expect(refusals).toEqual([]);
+		}
 	});
 
 	test("requested reviewers are asked for alongside the main read, not after it", async () => {
