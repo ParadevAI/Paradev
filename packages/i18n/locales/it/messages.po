@@ -2904,6 +2904,9 @@ msgstr "qualsiasi destinatario"
 msgid "Any review"
 msgstr "Qualsiasi revisione"
 
+msgid "Any reviewer"
+msgstr "Qualsiasi revisore"
+
 msgid "any sender"
 msgstr "qualsiasi mittente"
 
@@ -13187,6 +13190,9 @@ msgstr "Nessun revisore assegnato"
 msgid "No reviewers assigned yet."
 msgstr "Ancora nessun revisore assegnato."
 
+msgid "No reviewers found."
+msgstr "Nessun revisore trovato."
+
 msgid "No reviews"
 msgstr "Nessuna revisione"
 
@@ -17008,6 +17014,12 @@ msgstr "ha revisionato"
 msgid "Reviewed by you"
 msgstr "Revisionate da te"
 
+msgid "Reviewer"
+msgstr "Revisore"
+
+msgid "Reviewer: {label}"
+msgstr "Revisore: {label}"
+
 msgid "Reviewers"
 msgstr "Revisori"
 
@@ -17586,6 +17598,9 @@ msgstr "Cerca repository..."
 
 msgid "Search results"
 msgstr "Risultati della ricerca"
+
+msgid "Search reviewers…"
+msgstr "Cerca revisori…"
 
 msgid "Search settings..."
 msgstr "Cerca nelle impostazioni..."

@@ -2904,6 +2904,9 @@ msgstr "penerima mana pun"
 msgid "Any review"
 msgstr "Review apa pun"
 
+msgid "Any reviewer"
+msgstr "Semua reviewer"
+
 msgid "any sender"
 msgstr "pengirim mana pun"
 
@@ -13187,6 +13190,9 @@ msgstr "Tidak Ada Reviewer yang Ditugaskan"
 msgid "No reviewers assigned yet."
 msgstr "Belum ada reviewer yang ditugaskan."
 
+msgid "No reviewers found."
+msgstr "Tidak ada reviewer ditemukan."
+
 msgid "No reviews"
 msgstr "Tanpa review"
 
@@ -17008,6 +17014,12 @@ msgstr "mengulas"
 msgid "Reviewed by you"
 msgstr "Sudah Anda review"
 
+msgid "Reviewer"
+msgstr "Reviewer"
+
+msgid "Reviewer: {label}"
+msgstr "Reviewer: {label}"
+
 msgid "Reviewers"
 msgstr "Reviewer"
 
@@ -17586,6 +17598,9 @@ msgstr "Cari repositori..."
 
 msgid "Search results"
 msgstr "Hasil pencarian"
+
+msgid "Search reviewers…"
+msgstr "Cari reviewer…"
 
 msgid "Search settings..."
 msgstr "Cari pengaturan..."

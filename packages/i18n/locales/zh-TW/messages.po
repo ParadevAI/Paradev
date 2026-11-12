@@ -2904,6 +2904,9 @@ msgstr "任意收件人"
 msgid "Any review"
 msgstr "任意審查"
 
+msgid "Any reviewer"
+msgstr "任何審查者"
+
 msgid "any sender"
 msgstr "任意發件人"
 
@@ -13187,6 +13190,9 @@ msgstr "未指派審查者"
 msgid "No reviewers assigned yet."
 msgstr "還沒有指派審查者。"
 
+msgid "No reviewers found."
+msgstr "未找到審查者。"
+
 msgid "No reviews"
 msgstr "沒有審查"
 
@@ -17008,6 +17014,12 @@ msgstr "已審查"
 msgid "Reviewed by you"
 msgstr "你已審查"
 
+msgid "Reviewer"
+msgstr "審查者"
+
+msgid "Reviewer: {label}"
+msgstr "審查者：{label}"
+
 msgid "Reviewers"
 msgstr "審查者"
 
@@ -17586,6 +17598,9 @@ msgstr "搜尋儲存庫..."
 
 msgid "Search results"
 msgstr "搜尋結果"
+
+msgid "Search reviewers…"
+msgstr "搜尋審查者…"
 
 msgid "Search settings..."
 msgstr "搜尋設定..."

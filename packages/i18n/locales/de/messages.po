@@ -2904,6 +2904,9 @@ msgstr "beliebiger Empfänger"
 msgid "Any review"
 msgstr "Beliebiges Review"
 
+msgid "Any reviewer"
+msgstr "Alle Reviewer"
+
 msgid "any sender"
 msgstr "beliebiger Absender"
 
@@ -13187,6 +13190,9 @@ msgstr "Keine Reviewer zugewiesen"
 msgid "No reviewers assigned yet."
 msgstr "Noch keine Reviewer zugewiesen."
 
+msgid "No reviewers found."
+msgstr "Keine Reviewer gefunden."
+
 msgid "No reviews"
 msgstr "Keine Reviews"
 
@@ -17008,6 +17014,12 @@ msgstr "hat reviewt"
 msgid "Reviewed by you"
 msgstr "Von dir gereviewt"
 
+msgid "Reviewer"
+msgstr "Reviewer"
+
+msgid "Reviewer: {label}"
+msgstr "Reviewer: {label}"
+
 msgid "Reviewers"
 msgstr "Reviewer"
 
@@ -17586,6 +17598,9 @@ msgstr "Repositories suchen..."
 
 msgid "Search results"
 msgstr "Suchergebnisse"
+
+msgid "Search reviewers…"
+msgstr "Reviewer suchen…"
 
 msgid "Search settings..."
 msgstr "Einstellungen durchsuchen..."

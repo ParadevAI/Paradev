@@ -2904,6 +2904,9 @@ msgstr "người nhận bất kỳ"
 msgid "Any review"
 msgstr "Review bất kỳ"
 
+msgid "Any reviewer"
+msgstr "Tất cả người review"
+
 msgid "any sender"
 msgstr "người gửi bất kỳ"
 
@@ -13187,6 +13190,9 @@ msgstr "Chưa gán người review"
 msgid "No reviewers assigned yet."
 msgstr "Chưa gán người review nào."
 
+msgid "No reviewers found."
+msgstr "Không tìm thấy người review nào."
+
 msgid "No reviews"
 msgstr "Chưa có review"
 
@@ -17008,6 +17014,12 @@ msgstr "đã review"
 msgid "Reviewed by you"
 msgstr "Bạn đã review"
 
+msgid "Reviewer"
+msgstr "Người review"
+
+msgid "Reviewer: {label}"
+msgstr "Người review: {label}"
+
 msgid "Reviewers"
 msgstr "Người review"
 
@@ -17586,6 +17598,9 @@ msgstr "Tìm repository..."
 
 msgid "Search results"
 msgstr "Kết quả tìm kiếm"
+
+msgid "Search reviewers…"
+msgstr "Tìm người review…"
 
 msgid "Search settings..."
 msgstr "Tìm trong cài đặt..."

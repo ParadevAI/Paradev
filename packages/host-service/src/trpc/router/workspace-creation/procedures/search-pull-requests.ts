@@ -71,14 +71,14 @@ export interface PullRequestsPage {
 	checksDeferred?: true;
 }
 
-const githubAuthorSchema = z
+const githubLoginSchema = z
 	.string()
 	.trim()
 	.regex(
 		/^@?(?!.*--)[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?(?:\[bot\])?$/i,
-		"Author must be a valid GitHub username",
+		"Must be a valid GitHub username",
 	)
-	.transform((author) => author.replace(/^@/, ""));
+	.transform((login) => login.replace(/^@/, ""));
 
 const pullRequestReviewFilterSchema = z.enum([
 	"none",
@@ -140,7 +140,14 @@ const searchPullRequestsInputSchema = githubSearchInputSchema
 		author: z
 			.string()
 			.transform((value) => value.split(","))
-			.pipe(z.array(githubAuthorSchema).min(1).max(20))
+			.pipe(z.array(githubLoginSchema).min(1).max(20))
+			.optional(),
+		// Repeated `review-requested:` qualifiers OR on GitHub, the same way
+		// repeated `author:` does, so several logins widen the result set.
+		reviewer: z
+			.string()
+			.transform((value) => value.split(","))
+			.pipe(z.array(githubLoginSchema).min(1).max(20))
 			.optional(),
 		review: pullRequestReviewFilterSchema.optional(),
 		// mergedOnly always wins over includeClosed — see the qualifiers
@@ -148,14 +155,17 @@ const searchPullRequestsInputSchema = githubSearchInputSchema
 		// (or omitted); passing mergedOnly with includeClosed: false is
 		// pointless but not actively wrong.
 		mergedOnly: z.boolean().optional(),
-		// Mutually exclusive with author/review — see VIEWER_RELATIONSHIP_QUALIFIERS.
+		// Mutually exclusive with author/reviewer/review — see VIEWER_RELATIONSHIP_QUALIFIERS.
 		viewerRelationship: viewerRelationshipSchema.optional(),
 		deferChecks: z.boolean().optional(),
 	})
 	.refine(
-		(input) => !input.viewerRelationship || (!input.author && !input.review),
+		(input) =>
+			!input.viewerRelationship ||
+			(!input.author && !input.reviewer && !input.review),
 		{
-			message: "viewerRelationship cannot be combined with author or review",
+			message:
+				"viewerRelationship cannot be combined with author, reviewer or review",
 			path: ["viewerRelationship"],
 		},
 	);
@@ -292,7 +302,7 @@ async function ghDirectLookup(
 
 const ghViewerSchema = z.object({ login: z.string() });
 
-async function ghIsViewerTeamMember(
+async function ghIsTeamMember(
 	execGh: ExecGh,
 	repo: ResolvedGithubRepo,
 	teamSlug: string,
@@ -311,6 +321,36 @@ async function ghIsViewerTeamMember(
 		// 404 (not a member) or no org read access — fail safe as no match.
 		return false;
 	}
+}
+
+/**
+ * Mirrors the `review-requested:<login>` qualifier for a direct-looked-up
+ * PR: a request made to the login itself, or one routed through a team the
+ * login belongs to.
+ */
+async function ghMatchesReviewerRequest(
+	execGh: ExecGh,
+	repo: ResolvedGithubRepo,
+	review: GhDirectLookupReview,
+	reviewers: string[] | undefined,
+): Promise<boolean> {
+	if (!reviewers) return true;
+	const wanted = new Set(reviewers.map((reviewer) => reviewer.toLowerCase()));
+	if (
+		review.requests.some(
+			(request) => request.login && wanted.has(request.login.toLowerCase()),
+		)
+	) {
+		return true;
+	}
+	for (const request of review.requests) {
+		const teamSlug = request.login ? null : (request.slug ?? request.name);
+		if (!teamSlug) continue;
+		for (const reviewer of reviewers) {
+			if (await ghIsTeamMember(execGh, repo, teamSlug, reviewer)) return true;
+		}
+	}
+	return false;
 }
 
 async function ghDirectLookupMatchesReviewFilter(
@@ -344,7 +384,7 @@ async function ghDirectLookupMatchesReviewFilter(
 	for (const request of review.requests) {
 		const teamSlug = request.login ? null : (request.slug ?? request.name);
 		if (!teamSlug) continue;
-		if (await ghIsViewerTeamMember(execGh, repo, teamSlug, viewerLogin)) {
+		if (await ghIsTeamMember(execGh, repo, teamSlug, viewerLogin)) {
 			return true;
 		}
 	}
@@ -396,6 +436,7 @@ async function ghDirectLookupRow(
 	target: ProjectRepo,
 	prNumber: number,
 	author: string[] | undefined,
+	reviewer: string[] | undefined,
 	reviewFilter: PullRequestReviewFilter | undefined,
 	mergedOnly: boolean | undefined,
 	viewerRelationship: ViewerRelationship | undefined,
@@ -407,6 +448,11 @@ async function ghDirectLookupRow(
 	);
 	if (mergedOnly && pullRequest.state !== "merged") return null;
 	if (!matchesAuthor(pullRequest.authorLogin, author)) return null;
+	if (
+		!(await ghMatchesReviewerRequest(execGh, target.repo, review, reviewer))
+	) {
+		return null;
+	}
 	if (
 		reviewFilter &&
 		!(await ghDirectLookupMatchesReviewFilter(
@@ -436,7 +482,7 @@ async function ghDirectLookupRow(
 type OctokitPullRequest =
 	RestEndpointMethodTypes["pulls"]["get"]["response"]["data"];
 
-async function octokitIsViewerTeamMember(
+async function octokitIsTeamMember(
 	octokit: Octokit,
 	org: string,
 	teamSlug: string,
@@ -453,6 +499,32 @@ async function octokitIsViewerTeamMember(
 		// 404 (not a member) or no org read access — fail safe as no match.
 		return false;
 	}
+}
+
+/** The REST counterpart of {@link ghMatchesReviewerRequest}. */
+async function octokitMatchesReviewerRequest(
+	octokit: Octokit,
+	repo: ResolvedGithubRepo,
+	pr: OctokitPullRequest,
+	reviewers: string[] | undefined,
+): Promise<boolean> {
+	if (!reviewers) return true;
+	const wanted = new Set(reviewers.map((reviewer) => reviewer.toLowerCase()));
+	if (
+		(pr.requested_reviewers ?? []).some((requested) =>
+			wanted.has(requested.login.toLowerCase()),
+		)
+	) {
+		return true;
+	}
+	for (const team of pr.requested_teams ?? []) {
+		for (const reviewer of reviewers) {
+			if (await octokitIsTeamMember(octokit, repo.owner, team.slug, reviewer)) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 async function octokitDirectLookupMatchesReviewFilter(
@@ -502,12 +574,7 @@ async function octokitDirectLookupMatchesReviewFilter(
 	if (viewerRequested) return true;
 	for (const team of pr.requested_teams ?? []) {
 		if (
-			await octokitIsViewerTeamMember(
-				octokit,
-				repo.owner,
-				team.slug,
-				viewer.login,
-			)
+			await octokitIsTeamMember(octokit, repo.owner, team.slug, viewer.login)
 		) {
 			return true;
 		}
@@ -554,6 +621,7 @@ async function octokitDirectLookupRow(
 	target: ProjectRepo,
 	prNumber: number,
 	author: string[] | undefined,
+	reviewer: string[] | undefined,
 	reviewFilter: PullRequestReviewFilter | undefined,
 	mergedOnly: boolean | undefined,
 	viewerRelationship: ViewerRelationship | undefined,
@@ -576,6 +644,9 @@ async function octokitDirectLookupRow(
 	const state = normalizePullRequestState(pr.state, pr.merged_at);
 	if (mergedOnly && state !== "merged") return null;
 	if (!matchesAuthor(pr.user?.login ?? null, author)) return null;
+	if (!(await octokitMatchesReviewerRequest(octokit, repo, pr, reviewer))) {
+		return null;
+	}
 	if (
 		reviewFilter &&
 		!(await octokitDirectLookupMatchesReviewFilter(
@@ -844,6 +915,9 @@ export const searchPullRequests = protectedProcedure
 		const effectiveQuery = [
 			normalizedTargets[0]?.normalized.query ?? "",
 			input.author?.map((author) => `author:${author}`).join(" ") ?? "",
+			input.reviewer
+				?.map((reviewer) => `review-requested:${reviewer}`)
+				.join(" ") ?? "",
 			input.review ? REVIEW_QUERY_BY_FILTER[input.review] : "",
 			input.viewerRelationship
 				? VIEWER_RELATIONSHIP_QUALIFIERS[input.viewerRelationship]
@@ -870,6 +944,7 @@ export const searchPullRequests = protectedProcedure
 						single,
 						lookupNumber,
 						input.author,
+						input.reviewer,
 						input.review,
 						input.mergedOnly,
 						input.viewerRelationship,
@@ -891,6 +966,7 @@ export const searchPullRequests = protectedProcedure
 							target,
 							lookupNumber,
 							input.author,
+							input.reviewer,
 							input.review,
 							input.mergedOnly,
 							input.viewerRelationship,
@@ -972,6 +1048,7 @@ export const searchPullRequests = protectedProcedure
 						single,
 						lookupNumber,
 						input.author,
+						input.reviewer,
 						input.review,
 						input.mergedOnly,
 						input.viewerRelationship,
@@ -991,6 +1068,7 @@ export const searchPullRequests = protectedProcedure
 							target,
 							lookupNumber,
 							input.author,
+							input.reviewer,
 							input.review,
 							input.mergedOnly,
 							input.viewerRelationship,

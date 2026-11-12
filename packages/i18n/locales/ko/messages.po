@@ -2904,6 +2904,9 @@ msgstr "모든 수신자"
 msgid "Any review"
 msgstr "모든 리뷰"
 
+msgid "Any reviewer"
+msgstr "모든 리뷰어"
+
 msgid "any sender"
 msgstr "모든 발신자"
 
@@ -13187,6 +13190,9 @@ msgstr "지정된 리뷰어 없음"
 msgid "No reviewers assigned yet."
 msgstr "아직 지정된 리뷰어가 없습니다."
 
+msgid "No reviewers found."
+msgstr "리뷰어를 찾을 수 없습니다."
+
 msgid "No reviews"
 msgstr "리뷰 없음"
 
@@ -17008,6 +17014,12 @@ msgstr "리뷰함"
 msgid "Reviewed by you"
 msgstr "내가 리뷰함"
 
+msgid "Reviewer"
+msgstr "리뷰어"
+
+msgid "Reviewer: {label}"
+msgstr "리뷰어: {label}"
+
 msgid "Reviewers"
 msgstr "리뷰어"
 
@@ -17586,6 +17598,9 @@ msgstr "리포지토리 검색..."
 
 msgid "Search results"
 msgstr "검색 결과"
+
+msgid "Search reviewers…"
+msgstr "리뷰어 검색…"
 
 msgid "Search settings..."
 msgstr "설정 검색..."

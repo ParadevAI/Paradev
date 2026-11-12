@@ -2904,6 +2904,9 @@ msgstr "elke ontvanger"
 msgid "Any review"
 msgstr "Elke review"
 
+msgid "Any reviewer"
+msgstr "Alle reviewers"
+
 msgid "any sender"
 msgstr "elke afzender"
 
@@ -13187,6 +13190,9 @@ msgstr "Geen reviewers toegewezen"
 msgid "No reviewers assigned yet."
 msgstr "Nog geen reviewers toegewezen."
 
+msgid "No reviewers found."
+msgstr "Geen reviewers gevonden."
+
 msgid "No reviews"
 msgstr "Geen reviews"
 
@@ -17008,6 +17014,12 @@ msgstr "heeft gereviewd"
 msgid "Reviewed by you"
 msgstr "Door jou gereviewd"
 
+msgid "Reviewer"
+msgstr "Reviewer"
+
+msgid "Reviewer: {label}"
+msgstr "Reviewer: {label}"
+
 msgid "Reviewers"
 msgstr "Reviewers"
 
@@ -17586,6 +17598,9 @@ msgstr "Repositories zoeken..."
 
 msgid "Search results"
 msgstr "Zoekresultaten"
+
+msgid "Search reviewers…"
+msgstr "Reviewers zoeken…"
 
 msgid "Search settings..."
 msgstr "Instellingen zoeken..."

@@ -2904,6 +2904,9 @@ msgstr "jakýkoli příjemce"
 msgid "Any review"
 msgstr "Jakákoli revize"
 
+msgid "Any reviewer"
+msgstr "Libovolný recenzent"
+
 msgid "any sender"
 msgstr "jakýkoli odesílatel"
 
@@ -13187,6 +13190,9 @@ msgstr "Nepřiřazeni žádní recenzenti"
 msgid "No reviewers assigned yet."
 msgstr "Zatím nejsou přiřazeni žádní recenzenti."
 
+msgid "No reviewers found."
+msgstr "Nenalezeni žádní recenzenti."
+
 msgid "No reviews"
 msgstr "Žádné revize"
 
@@ -17008,6 +17014,12 @@ msgstr "zrevidoval(a)"
 msgid "Reviewed by you"
 msgstr "S vaší revizí"
 
+msgid "Reviewer"
+msgstr "Recenzent"
+
+msgid "Reviewer: {label}"
+msgstr "Recenzent: {label}"
+
 msgid "Reviewers"
 msgstr "Recenzenti"
 
@@ -17586,6 +17598,9 @@ msgstr "Hledat repozitáře..."
 
 msgid "Search results"
 msgstr "Výsledky hledání"
+
+msgid "Search reviewers…"
+msgstr "Hledat recenzenty…"
 
 msgid "Search settings..."
 msgstr "Hledat v nastavení..."

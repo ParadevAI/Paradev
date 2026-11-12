@@ -2904,6 +2904,9 @@ msgstr "dowolny odbiorca"
 msgid "Any review"
 msgstr "Dowolny przegląd"
 
+msgid "Any reviewer"
+msgstr "Dowolny recenzent"
+
 msgid "any sender"
 msgstr "dowolny nadawca"
 
@@ -13187,6 +13190,9 @@ msgstr "Nie przypisano recenzentów"
 msgid "No reviewers assigned yet."
 msgstr "Nie przypisano jeszcze recenzentów."
 
+msgid "No reviewers found."
+msgstr "Nie znaleziono recenzentów."
+
 msgid "No reviews"
 msgstr "Brak przeglądów"
 
@@ -17008,6 +17014,12 @@ msgstr "zrecenzował(a)"
 msgid "Reviewed by you"
 msgstr "Przejrzane przez Ciebie"
 
+msgid "Reviewer"
+msgstr "Recenzent"
+
+msgid "Reviewer: {label}"
+msgstr "Recenzent: {label}"
+
 msgid "Reviewers"
 msgstr "Recenzenci"
 
@@ -17586,6 +17598,9 @@ msgstr "Szukaj repozytoriów..."
 
 msgid "Search results"
 msgstr "Wyniki wyszukiwania"
+
+msgid "Search reviewers…"
+msgstr "Szukaj recenzentów…"
 
 msgid "Search settings..."
 msgstr "Szukaj w ustawieniach..."
