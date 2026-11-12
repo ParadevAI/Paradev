@@ -1,7 +1,7 @@
 import { describe, expect, it, jest, spyOn } from "bun:test";
 import { spawn } from "node:child_process";
 import type { ChatSelections } from "@superset/chat/core";
-import type { Item } from "@superset/chat/protocol";
+import type { Decision, Item } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, wrapHiddenText } from "@superset/chat/protocol";
 import type { AdapterEvent, ResolveAttachment } from "../types";
 import {
@@ -5971,7 +5971,24 @@ describe("AcpAdapter config options", () => {
 		await adapter.dispose();
 	});
 
-	const approvePlan = async (optionId: string) => {
+	const PLAN_OPTIONS = [
+		{
+			optionId: "exit-plan-clear-auto",
+			name: "Yes, clear context (12% used) and use auto mode",
+			kind: "allow_always",
+		},
+		{
+			optionId: "exit-plan-auto",
+			name: "Yes, and use auto mode",
+			kind: "allow_always",
+		},
+		{ optionId: "plan", name: "No, keep planning", kind: "reject_once" },
+	];
+
+	const approvePlan = async (
+		decision: Decision,
+		reported: { model: string; effort: string },
+	) => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
 		agent.newSessionConfigOptions = [MODEL_OPTION, EFFORT_OPTION];
@@ -5986,19 +6003,7 @@ describe("AcpAdapter config options", () => {
 		agent.requestPermissionWith(
 			{
 				toolCall: { toolCallId: "tc-plan", title: "Ready to code?" },
-				options: [
-					{
-						optionId: "exit-plan-clear-auto",
-						name: "Yes, clear context (12% used) and use auto mode",
-						kind: "allow_always",
-					},
-					{
-						optionId: "exit-plan-auto",
-						name: "Yes, and use auto mode",
-						kind: "allow_always",
-					},
-					{ optionId: "plan", name: "No, keep planning", kind: "reject_once" },
-				],
+				options: PLAN_OPTIONS,
 			},
 			9401,
 		);
@@ -6007,32 +6012,71 @@ describe("AcpAdapter config options", () => {
 			(item) => item.kind === "approval_request",
 		);
 		const before = agent.sent.length;
-		adapter.respondToApproval(approval?.id ?? "", {
-			type: "option",
-			optionId,
+		adapter.respondToApproval(approval?.id ?? "", decision);
+		agent.notify("sess-1", {
+			sessionUpdate: "config_option_update",
+			configOptions: [
+				{ ...MODEL_OPTION, currentValue: reported.model },
+				{ ...EFFORT_OPTION, currentValue: reported.effort },
+			],
 		});
+		await flush();
+		const configured = () =>
+			agent.sent
+				.slice(before)
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params);
+		return { adapter, agent, configured };
+	};
+
+	it("puts the model and effort back after a plan approval clears the context", async () => {
+		const { adapter, configured } = await approvePlan(
+			{ type: "option", optionId: "exit-plan-clear-auto" },
+			{ model: "opus", effort: "high" },
+		);
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "effort", value: "low" },
+		]);
+		await adapter.dispose();
+	});
+
+	it("treats a plain accept of a plan as the clear-context option it selects", async () => {
+		const { adapter, configured } = await approvePlan(
+			{ type: "accept" },
+			{ model: "opus", effort: "high" },
+		);
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "effort", value: "low" },
+		]);
+		await adapter.dispose();
+	});
+
+	it("leaves the model alone when a plan approval keeps the context", async () => {
+		const { adapter, configured } = await approvePlan(
+			{ type: "option", optionId: "exit-plan-auto" },
+			{ model: "opus", effort: "high" },
+		);
+		expect(configured()).toEqual([]);
+		await adapter.dispose();
+	});
+
+	it("keeps a model the user picks after the context reset", async () => {
+		const { adapter, agent, configured } = await approvePlan(
+			{ type: "option", optionId: "exit-plan-clear-auto" },
+			{ model: "sonnet", effort: "low" },
+		);
+		adapter.setConfigOption("model", "opus");
 		agent.notify("sess-1", {
 			sessionUpdate: "config_option_update",
 			configOptions: [MODEL_OPTION, EFFORT_OPTION],
 		});
 		await flush();
-		const configured = agent.sent
-			.slice(before)
-			.filter((f) => f.method === "session/set_config_option")
-			.map((f) => f.params);
-		await adapter.dispose();
-		return configured;
-	};
-
-	it("puts the model and effort back after a plan approval clears the context", async () => {
-		expect(await approvePlan("exit-plan-clear-auto")).toEqual([
-			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
-			{ sessionId: "sess-1", configId: "effort", value: "low" },
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "opus" },
 		]);
-	});
-
-	it("leaves the model alone when a plan approval keeps the context", async () => {
-		expect(await approvePlan("exit-plan-auto")).toEqual([]);
+		await adapter.dispose();
 	});
 });
 

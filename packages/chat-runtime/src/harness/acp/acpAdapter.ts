@@ -203,7 +203,7 @@ export type AcpImageStoreContext = {
 
 const STARTUP_TIMEOUT_MS = 120_000;
 const START_OPTIONS_GRACE_MS = 1_000;
-// claude-agent-acp starts a fresh context for these plan approvals, on its default model and effort.
+// claude-agent-acp reports model "default" for the fresh context these plan approvals start, whatever it runs.
 const CONTEXT_RESET_OPTION = /^exit-plan-clear-/;
 const REQUEST_TIMEOUT_MS = 30_000;
 const STDERR_TAIL_CHARS = 4000;
@@ -712,6 +712,10 @@ export class AcpAdapter implements HarnessAdapter {
 		const sessionId = this.sessionId;
 		if (!client || !sessionId) return Promise.resolve(false);
 		const previous = this.configOptions;
+		const changed = previous.find((option) => option.id === configId);
+		const category = changed && selectionCategoryOf(changed);
+		if (category === "model" || category === "thought_level")
+			this.picksBeforeContextReset = null;
 		const previousModeId =
 			configId === this.modeConfigId ? this.modeId : undefined;
 		this.configOptions = previous.map((option) =>
@@ -1251,6 +1255,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private failTurn(turnId: string, error: TurnError): void {
 		this.endCompactions();
 		this.customAnswer = null;
+		this.picksBeforeContextReset = null;
 		this.main.flush();
 		this.cancelPendingApprovals(turnId);
 		this.emitTurn({
