@@ -672,3 +672,58 @@ test("a worktree that already belongs to a workspace cannot be moved in", async 
 		}),
 	).rejects.toThrow("already belongs to a workspace");
 });
+
+test("a multi-repo project can clone its repositories when it is created", async () => {
+	const host = await createTestHost({
+		apiOverrides: cloudFlows.workspaceCreateOk(),
+	});
+	const local = await createGitFixture();
+	const remote = await createGitFixture();
+	const cloneParentDir = `${local.repoPath}-clones`;
+	dispose = async () => {
+		await host.dispose();
+		rmSync(cloneParentDir, { recursive: true, force: true });
+		local.dispose();
+		remote.dispose();
+	};
+
+	const { projectId } = await host.trpc.project.createContainer.mutate({
+		name: "mixed",
+		repoPaths: [local.repoPath],
+		cloneUrls: [remote.repoPath],
+		cloneParentDir,
+	});
+
+	expect(
+		(await host.trpc.project.repositories.query({ projectId })).map(
+			(repository) => repository.repoPath,
+		),
+	).toEqual([local.repoPath, join(cloneParentDir, basename(remote.repoPath))]);
+});
+
+test("a failed clone leaves no project and no cloned folders", async () => {
+	const host = await createTestHost({
+		apiOverrides: cloudFlows.workspaceCreateOk(),
+	});
+	const remote = await createGitFixture();
+	const cloneParentDir = `${remote.repoPath}-clones`;
+	dispose = async () => {
+		await host.dispose();
+		rmSync(cloneParentDir, { recursive: true, force: true });
+		remote.dispose();
+	};
+
+	await expect(
+		host.trpc.project.createContainer.mutate({
+			name: "broken",
+			repoPaths: [],
+			cloneUrls: [remote.repoPath, `${remote.repoPath}-missing`],
+			cloneParentDir,
+		}),
+	).rejects.toThrow();
+
+	expect(await host.trpc.project.list.query()).toEqual([]);
+	expect(existsSync(join(cloneParentDir, basename(remote.repoPath)))).toBe(
+		false,
+	);
+});

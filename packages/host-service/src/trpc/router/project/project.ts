@@ -278,10 +278,14 @@ export const projectRouter = router({
 		.input(
 			z.object({
 				name: z.string().min(1),
-				repoPaths: z.array(z.string().min(1)).min(1),
+				repoPaths: z.array(z.string().min(1)),
+				cloneUrls: z.array(z.string().min(1)).optional(),
+				cloneParentDir: z.string().min(1).optional(),
 			}),
 		)
-		.mutation(({ ctx, input }) => createContainerProject(ctx, input)),
+		.mutation(({ ctx, input, signal }) =>
+			createContainerProject(ctx, { ...input, signal }),
+		),
 
 	addRepository: machineOnlyProcedure
 		.input(

@@ -247,11 +247,31 @@ function insertRepositoryRow(
 /** A project that holds repositories and has none of its own. */
 export async function createContainerProject(
 	ctx: HostServiceContext,
-	args: { name: string; repoPaths: string[] },
+	args: {
+		name: string;
+		repoPaths: string[];
+		/** Cloned into `cloneParentDir` before the project exists; removed if it fails. */
+		cloneUrls?: string[];
+		cloneParentDir?: string;
+		signal?: AbortSignal;
+	},
 ): Promise<{ projectId: string }> {
 	const name = args.name.trim();
 	if (!name) {
 		throw new TRPCError({ code: "BAD_REQUEST", message: "Name the project" });
+	}
+	const cloneUrls = args.cloneUrls ?? [];
+	if (args.repoPaths.length + cloneUrls.length === 0) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Add a repository to the project",
+		});
+	}
+	if (cloneUrls.length > 0 && !args.cloneParentDir?.trim()) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Pick a folder to clone the repositories into",
+		});
 	}
 	const resolved: ResolvedRepo[] = [];
 	for (const repoPath of args.repoPaths) {
@@ -259,6 +279,26 @@ export async function createContainerProject(
 		if (!resolved.some((other) => other.repoPath === repo.repoPath)) {
 			resolved.push(repo);
 		}
+	}
+	const cloned: string[] = [];
+	try {
+		for (const url of cloneUrls) {
+			const repo = await classifyGitFailure(
+				cloneRepoInto(
+					url,
+					args.cloneParentDir as string,
+					ctx.credentials,
+					args.signal,
+				),
+			);
+			cloned.push(repo.repoPath);
+			resolved.push(repo);
+		}
+	} catch (error) {
+		for (const path of cloned) {
+			await rm(path, { recursive: true, force: true });
+		}
+		throw error;
 	}
 	const projectId = randomUUID();
 	ctx.db
