@@ -4622,9 +4622,6 @@ msgstr "Klicke auf „↑ update“, um die Bestätigung vor dem Update anzuzeig
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klicken, um die Session-ID zu kopieren (fortsetzen mit `claude --resume <id>`)."
 
-msgid "Click to open the pull request"
-msgstr "Klicken, um den Pull Request zu öffnen"
-
 msgid "Click two commits to define the range."
 msgstr "Klicke zwei Commits an, um den Bereich festzulegen."
 
@@ -15225,11 +15222,6 @@ msgstr "PR"
 
 msgid "PR {position} of {size} · targets {base}"
 msgstr "PR {position} von {size} · Ziel {base}"
-
-#. placeholder {0}: pullRequest.number
-#. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} · {1}"
-msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state

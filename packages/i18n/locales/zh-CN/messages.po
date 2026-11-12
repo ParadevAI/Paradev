@@ -4622,9 +4622,6 @@ msgstr "点击“↑ update”按钮查看更新前的确认提示"
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "点击复制会话ID（使用`claude --resume <id>`恢复）。"
 
-msgid "Click to open the pull request"
-msgstr "点击打开拉取请求"
-
 msgid "Click two commits to define the range."
 msgstr "点击两个提交以确定范围。"
 
@@ -15225,11 +15222,6 @@ msgstr "PR"
 
 msgid "PR {position} of {size} · targets {base}"
 msgstr "PR {position}/{size} · 目标 {base}"
-
-#. placeholder {0}: pullRequest.number
-#. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} · {1}"
-msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
