@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Modifiche"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Le modifiche si caricano quando il workspace si riattiva"
+
 msgid "Changes open target"
 msgstr "Destinazione di apertura delle modifiche"
 
@@ -7337,6 +7340,9 @@ msgstr "Panoramica delle modifiche del diff"
 msgid "diff in new tab"
 msgstr "diff in una nuova scheda"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Il diff si apre quando il workspace si riattiva"
+
 msgid "Digital Product Designer"
 msgstr "Designer di prodotti digitali"
 
@@ -8889,6 +8895,9 @@ msgstr "File non trovato"
 msgid "File open mode"
 msgstr "Modalità di apertura dei file"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Il file si apre quando il workspace si riattiva"
+
 msgid "File viewer"
 msgstr "Visualizzatore di file"
 
@@ -8906,6 +8915,9 @@ msgstr "File ed editor"
 
 msgid "Files changed"
 msgstr "File modificati"
+
+msgid "Files load when the workspace wakes up"
+msgstr "I file si caricano quando il workspace si riattiva"
 
 msgid "files to exclude (glob)"
 msgstr "file da escludere (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Revisione respinta"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Esamina ogni errore prima di decidere se continuare."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "La revisione si carica quando il workspace si riattiva"
+
 msgid "Review message"
 msgstr "Messaggio della revisione"
 
@@ -18621,6 +18636,9 @@ msgstr "Simula aggiornamento: pronto"
 msgid "Simulator"
 msgstr "Simulatore"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Il simulatore si avvia quando il workspace si riattiva"
+
 msgid "Since 2025"
 msgstr "Dal 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Sessione del terminale terminata"
 
 msgid "Terminal sessions"
 msgstr "Sessioni del terminale"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Il terminale si avvia quando il workspace si riattiva"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Anteprima della palette di colori del tema del terminale"

@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Perubahan"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Perubahan dimuat saat workspace bangun"
+
 msgid "Changes open target"
 msgstr "Tempat membuka perubahan"
 
@@ -7337,6 +7340,9 @@ msgstr "Ringkasan perubahan diff"
 msgid "diff in new tab"
 msgstr "diff di tab baru"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff terbuka saat workspace bangun"
+
 msgid "Digital Product Designer"
 msgstr "Desainer Produk Digital"
 
@@ -8889,6 +8895,9 @@ msgstr "File tidak ditemukan"
 msgid "File open mode"
 msgstr "Mode buka file"
 
+msgid "File opens when the workspace wakes up"
+msgstr "File terbuka saat workspace bangun"
+
 msgid "File viewer"
 msgstr "Penampil file"
 
@@ -8906,6 +8915,9 @@ msgstr "File & Editor"
 
 msgid "Files changed"
 msgstr "File yang berubah"
+
+msgid "Files load when the workspace wakes up"
+msgstr "File dimuat saat workspace bangun"
 
 msgid "files to exclude (glob)"
 msgstr "file yang dikecualikan (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Review Diabaikan"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Tinjau tiap kegagalan sebelum memutuskan untuk melanjutkan."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Tinjauan dimuat saat workspace bangun"
+
 msgid "Review message"
 msgstr "Pesan review"
 
@@ -18621,6 +18636,9 @@ msgstr "Simulasikan pembaruan: siap"
 msgid "Simulator"
 msgstr "Simulator"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Simulator dimulai saat workspace bangun"
+
 msgid "Since 2025"
 msgstr "Sejak 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Sesi terminal dimatikan"
 
 msgid "Terminal sessions"
 msgstr "Sesi terminal"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal dimulai saat workspace bangun"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Pratinjau palet warna tema terminal"

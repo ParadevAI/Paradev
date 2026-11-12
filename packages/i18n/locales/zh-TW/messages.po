@@ -4211,6 +4211,9 @@ msgstr "更新日誌"
 msgid "Changes"
 msgstr "更改"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "工作區喚醒後將載入更改"
+
 msgid "Changes open target"
 msgstr "變更檢視開啟位置"
 
@@ -7337,6 +7340,9 @@ msgstr "差異變更概覽"
 msgid "diff in new tab"
 msgstr "在新分頁看差異"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "工作區喚醒後將開啟差異"
+
 msgid "Digital Product Designer"
 msgstr "數位產品設計師"
 
@@ -8889,6 +8895,9 @@ msgstr "未找到檔案"
 msgid "File open mode"
 msgstr "檔案開啟方式"
 
+msgid "File opens when the workspace wakes up"
+msgstr "工作區喚醒後將開啟檔案"
+
 msgid "File viewer"
 msgstr "檔案檢視器"
 
@@ -8906,6 +8915,9 @@ msgstr "檔案與編輯器"
 
 msgid "Files changed"
 msgstr "更改的檔案"
+
+msgid "Files load when the workspace wakes up"
+msgstr "工作區喚醒後將載入檔案"
 
 msgid "files to exclude (glob)"
 msgstr "排除的檔案（glob）"
@@ -16967,6 +16979,9 @@ msgstr "審查已忽略"
 msgid "Review each failure before deciding whether to continue."
 msgstr "在決定是否繼續之前，請逐個檢視失敗原因。"
 
+msgid "Review loads when the workspace wakes up"
+msgstr "工作區喚醒後將載入審查"
+
 msgid "Review message"
 msgstr "審查留言"
 
@@ -18621,6 +18636,9 @@ msgstr "模擬更新：就緒"
 msgid "Simulator"
 msgstr "模擬器"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "工作區喚醒後將啟動模擬器"
+
 msgid "Since 2025"
 msgstr "自2025年起"
 
@@ -19835,6 +19853,9 @@ msgstr "終端會話已終止"
 
 msgid "Terminal sessions"
 msgstr "終端會話"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "工作區喚醒後將啟動終端"
 
 msgid "Terminal theme color-palette preview"
 msgstr "終端主題配色預覽"
