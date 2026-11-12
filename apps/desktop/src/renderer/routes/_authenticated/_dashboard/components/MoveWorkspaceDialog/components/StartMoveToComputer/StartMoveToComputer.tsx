@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMoveDestinationComputers } from "../../../../hooks/useMoveDestinationComputers";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
 import { useStartMoveToComputer } from "../../hooks/useStartMoveToComputer";
@@ -20,8 +20,10 @@ export function StartMoveToComputer({
 	onOpenChange,
 }: StartMoveToComputerProps) {
 	const startMove = useStartMoveToComputer(workspace);
-	const destination = useMoveDestinationComputers(workspace.hostId).find(
-		(computer) => computer.hostId === hostId && computer.online,
+	const computers = useMoveDestinationComputers(workspace.hostId);
+	// Decided once: a dialog on screen waits for a click, even if the computer comes online.
+	const [destination] = useState(() =>
+		computers.find((computer) => computer.hostId === hostId && computer.online),
 	);
 	const started = useRef(false);
 
@@ -38,7 +40,7 @@ export function StartMoveToComputer({
 			open
 			onOpenChange={onOpenChange}
 			workspace={workspace}
-			initialHostId={hostId}
+			hostId={hostId}
 		/>
 	);
 }
