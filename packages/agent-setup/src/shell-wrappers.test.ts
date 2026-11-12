@@ -5,6 +5,7 @@ import {
 	mkdirSync,
 	readFileSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -369,15 +370,29 @@ echo system
 			writeFileSync(path.join(dir, "gh"), `#!/bin/sh\necho ${name}\n`);
 			chmodSync(path.join(dir, "gh"), 0o755);
 		}
+		// The system dirs a runner ships can hold a real gh (GitHub's runners
+		// have /usr/bin/gh), so the PATH under test holds only the shells.
+		const systemBin = path.join(root, "system-bin");
+		mkdirSync(systemBin, { recursive: true });
+		const bash = execFileSync("/bin/sh", ["-c", "command -v bash"], {
+			encoding: "utf-8",
+		}).trim();
+		for (const [name, target] of [
+			["bash", bash],
+			["sh", "/bin/sh"],
+		] as const) {
+			rmSync(path.join(systemBin, name), { force: true });
+			symlinkSync(target, path.join(systemBin, name));
+		}
 		createBashWrapper(paths);
 		const run = (pathValue: string) =>
-			execFileSync("bash", getCommandShellArgs("/bin/bash", "gh", paths), {
+			execFileSync(bash, getCommandShellArgs("/bin/bash", "gh", paths), {
 				encoding: "utf-8",
 				env: { ...process.env, HOME: root, PATH: pathValue },
 			}).trim();
 
-		expect(run(`${userBin}:/usr/bin:/bin`)).toBe("user");
-		expect(run("/usr/bin:/bin")).toBe("app");
+		expect(run(`${userBin}:${systemBin}`)).toBe("user");
+		expect(run(systemBin)).toBe("app");
 	});
 
 	it("falls back to system binaries when wrapper exists but is not executable", () => {
