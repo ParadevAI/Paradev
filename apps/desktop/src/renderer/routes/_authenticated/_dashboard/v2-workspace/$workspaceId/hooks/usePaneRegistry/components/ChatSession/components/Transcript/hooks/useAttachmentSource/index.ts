@@ -1,1 +1,4 @@
-export { useAttachmentSource } from "./useAttachmentSource";
+export {
+	type HostAttachmentRead,
+	useAttachmentSource,
+} from "./useAttachmentSource";

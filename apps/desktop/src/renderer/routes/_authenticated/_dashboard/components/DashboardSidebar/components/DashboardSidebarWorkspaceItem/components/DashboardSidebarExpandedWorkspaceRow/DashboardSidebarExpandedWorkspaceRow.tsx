@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { AvatarStack } from "@superset/ui/atoms/AvatarStack";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
@@ -104,6 +105,8 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			branch,
 			pullRequest,
 			pendingTransaction,
+			isMine,
+			creator,
 		} = workspace;
 		const isPending = pendingTransaction?.type === "insert";
 		const localRef = useRef<HTMLDivElement>(null);
@@ -298,7 +301,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								)}
 							/>
 						) : (
-							<>
+							<div className="flex min-w-0 items-center">
 								<WorkspaceNameMarquee
 									name={name || branch}
 									prefix={
@@ -311,7 +314,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									}
 									forceActive={isFocused}
 									className={cn(
-										"text-[13px] leading-tight transition-colors",
+										"min-w-0 text-[13px] leading-tight transition-colors",
 										isActive || isSelected
 											? "text-foreground"
 											: "text-foreground/80",
@@ -322,7 +325,20 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 										<Trans>, selected</Trans>
 									</span>
 								)}
-							</>
+								{creator && isMine === false && (
+									<AvatarStack
+										people={[
+											{
+												id: creator.userId,
+												name: creator.name,
+												image: creator.image,
+											},
+										]}
+										size={16}
+										className="ml-1.5"
+									/>
+								)}
+							</div>
 						)}
 
 						<div className="col-start-2 row-start-1 flex h-5 shrink-0 items-center gap-2">

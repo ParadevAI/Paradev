@@ -69,6 +69,16 @@ test("sends --base-branch as the branch the cloud workspace starts from", async 
 	expect(calls.createInput).toMatchObject({ branch: "main" });
 });
 
+test("sends --tag to the cloud", async () => {
+	const { api, calls } = recordingApi();
+	await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: { tag: ["fleet", "migration"] },
+	});
+	expect(calls.createInput).toMatchObject({ tags: ["fleet", "migration"] });
+});
+
 test("returns the cloud workspace's desktop and web links", async () => {
 	const { api } = recordingApi();
 	const result = await createCloudWorkspace({

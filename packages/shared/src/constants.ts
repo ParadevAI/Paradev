@@ -147,14 +147,6 @@ export const V2_NEW_USER_V2_DEFAULT_START = "2026-07-09T17:00:00.000Z";
 
 export const FEATURE_FLAGS = {
 	/**
-	 * The public Superset Mobile launch. Off, unloaded, or unreachable all mean
-	 * "not launched": the marketing site hides /mobile from navigation and the
-	 * sitemap and disables indexing. Evaluated per site, not per
-	 * visitor, so keep it a plain on/off flag — a percentage rollout would
-	 * hash the site's single distinct id to one side.
-	 */
-	MOBILE_LAUNCH: "mobile-launch",
-	/**
 	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one
 	 * exists; this gates only where people are led to write one.
@@ -168,6 +160,14 @@ export const FEATURE_FLAGS = {
 	 * a change in PostHog applies on the next start.
 	 */
 	PARADEV_SHELL: "paradev-shell",
+	/**
+	 * Kill switch for stacked pull requests on the desktop: the stack read and
+	 * chip, stack merge, merge queue actions, and switching a workspace between
+	 * layers. On for everyone. Unloaded or offline means on, and so does a
+	 * disabled or deleted flag: to turn it off, keep the flag enabled and set
+	 * its rollout to 0%. Plain Merge works either way.
+	 */
+	STACKED_PULL_REQUESTS: "stacked-pull-requests",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**

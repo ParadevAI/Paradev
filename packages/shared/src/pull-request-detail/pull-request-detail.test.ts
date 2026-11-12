@@ -41,6 +41,7 @@ function pullRequest(
 				viewerCanMergeAsAdmin: false,
 				mergedBy: null,
 				mergeQueueEntry: null,
+				isMergeQueueEnabled: true,
 				baseRef: {
 					branchProtectionRule: {
 						requiredApprovingReviewCount: 2,
@@ -135,6 +136,7 @@ describe("readPullRequestDetail", () => {
 			requiresThreadResolution: true,
 			allowedMergeMethods: ["squash", "rebase"],
 			defaultMergeMethod: "rebase",
+			queueEnabled: true,
 		});
 		expect(
 			detail.checks.map((check) => [check.name, check.conclusion]),

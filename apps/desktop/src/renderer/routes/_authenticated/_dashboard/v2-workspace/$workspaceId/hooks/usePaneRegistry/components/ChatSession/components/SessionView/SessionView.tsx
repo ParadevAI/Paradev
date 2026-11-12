@@ -27,6 +27,7 @@ import { MessageScroller } from "@superset/chat-ui/MessageScroller";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
+import { workspaceTrpc } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
@@ -312,6 +313,9 @@ export function SessionView({
 		}),
 		[client, workspaceId],
 	);
+	const worktreePath = workspaceTrpc.workspace.get.useQuery({
+		id: workspaceId,
+	}).data?.worktreePath;
 	const sessionUsage = useMemo(
 		() => latestSessionUsage(session.snapshot.turns),
 		[session.snapshot.turns],
@@ -662,6 +666,7 @@ export function SessionView({
 			openLink={openLink}
 			getOpenFilePaths={getOpenFilePaths}
 			workspaceId={workspaceId}
+			worktreePath={worktreePath}
 		>
 			<ComposerDropZone
 				className="flex h-full min-h-0 w-full min-w-0 flex-col"

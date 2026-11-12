@@ -2088,7 +2088,7 @@ export class AcpAdapter implements HarnessAdapter {
 			...(startOptions.fast ? { fast: startOptions.fast } : {}),
 			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
 		};
-		const configured =
+		const configured: Promise<ChatSelections> =
 			this.configOptions.length > 0
 				? this.applyConfigSelections(wanted)
 				: Object.keys(wanted).length > 0
@@ -2114,12 +2114,16 @@ export class AcpAdapter implements HarnessAdapter {
 				taken ? modeId : undefined,
 			);
 		}
-		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) =>
+		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+			if (wanted.effortId && !taken.effortId)
+				console.warn(
+					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
+				);
 			this.settleStartSelections({
 				...taken,
 				...(takenMode ? { modeId: takenMode } : {}),
-			}),
-		);
+			});
+		});
 	}
 
 	/** The start model, effort and mode the agent took. */

@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from "bun:test";
+import { describe, expect, it, jest, spyOn } from "bun:test";
 import { spawn } from "node:child_process";
 import type { ChatSelections } from "@superset/chat/core";
 import type { Item } from "@superset/chat/protocol";
@@ -5934,6 +5934,26 @@ describe("AcpAdapter config options", () => {
 		).toEqual({ sessionId: "sess-1", configId: "model", value: "sonnet" });
 		expect(await adapter.startSelections()).toEqual({ modelId: "sonnet" });
 
+		await adapter.dispose();
+	});
+
+	it("warns when the agent lists no options in time to take the start effort", async () => {
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{ effortId: "high" },
+			{ startOptionsGraceMs: 1 },
+		);
+
+		expect(await adapter.startSelections()).toEqual({});
+		expect(warn).toHaveBeenCalledWith(
+			'[acp] the agent did not take reasoning effort "high"; it runs at its default',
+		);
+
+		warn.mockRestore();
 		await adapter.dispose();
 	});
 

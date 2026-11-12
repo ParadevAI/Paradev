@@ -229,6 +229,10 @@ msgstr "{0, plural, one {프로젝트 #개를 선택했습니다.} other {프로
 msgid "{0, plural, one {# project} other {# projects}}"
 msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 
+#. placeholder {0}: stack.layers.length
+msgid "{0, plural, one {# pull request} other {# pull requests}}"
+msgstr "{0, plural, other {풀 리퀘스트 #개}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -896,6 +900,9 @@ msgstr "{count, plural, other {#단계}}"
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.} other {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.}}"
 
+msgid "{count, plural, one {Add # pull request to the merge queue?} other {Add # pull requests to the merge queue?}}"
+msgstr "{count, plural, other {풀 리퀘스트 #개를 머지 대기열에 추가할까요?}}"
+
 msgid "{count, plural, one {added a commit} other {added # commits}}"
 msgstr "{count, plural, one {커밋 #개 추가함} other {커밋 #개 추가함}}"
 
@@ -931,6 +938,9 @@ msgstr "{count, plural, one {페이지 #개 가져옴} other {페이지 #개 가
 
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {worktree #개 가져오기} other {worktree #개 가져오기}}"
+
+msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
+msgstr "{count, plural, other {풀 리퀘스트 #개를 머지할까요?}}"
 
 msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
 msgstr "{count, plural, one {자동화 #개를 {group}(으)로 이동했습니다} other {자동화 #개를 {group}(으)로 이동했습니다}}"
@@ -1313,11 +1323,11 @@ msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}의 이름은 2026년 10월까지 {formerName}였습니다."
 
-msgid "{prompt} · # to change project, host, and more"
-msgstr "{prompt} · #으로 프로젝트, 호스트 등 변경"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
+
+msgid "{pullRequests} · targets {base}"
+msgstr "{pullRequests} · 대상 {base}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {대기열에서 대기 중인 메시지 #개} other {대기열에서 대기 중인 메시지 #개}}"
@@ -1501,6 +1511,30 @@ msgid "#{0} {1}\n"
 msgstr "#{0} {1}\n"
 "\n"
 "This merges into {2} and cannot be undone here."
+
+msgid "#{mergedNumber} merged, and this branch still carries its commits."
+msgstr "#{mergedNumber}이(가) 머지되었지만 이 브랜치에 아직 그 커밋이 남아 있습니다."
+
+msgid "#{number} has changes requested."
+msgstr "#{number}에 변경 요청이 있습니다."
+
+msgid "#{number} has conflicts."
+msgstr "#{number}에 충돌이 있습니다."
+
+msgid "#{number} is closed without being merged."
+msgstr "#{number}이(가) 머지되지 않고 닫혔습니다."
+
+msgid "#{number} is not ready to merge."
+msgstr "#{number}은(는) 아직 머지할 준비가 되지 않았습니다."
+
+msgid "#{number} is still a draft."
+msgstr "#{number}은(는) 아직 초안입니다."
+
+msgid "#{number} is waiting on a required check or rule."
+msgstr "#{number}이(가) 필수 검사나 규칙을 기다리고 있습니다."
+
+msgid "#{number} needs a review."
+msgstr "#{number}에 리뷰가 필요합니다."
 
 msgid "#engineering"
 msgstr "#engineering"
@@ -1947,6 +1981,9 @@ msgstr "삭제 예정 계정"
 msgid "Account usage"
 msgstr "계정 사용량"
 
+msgid "Account usage: {percent} used"
+msgstr "계정 사용량: {percent} 사용"
+
 msgid "Achievements"
 msgstr "업적"
 
@@ -2020,6 +2057,9 @@ msgstr "먼저 {computer}에 {repositoryName}을(를) 프로젝트로 추가하�
 
 msgid "Add {repositoryName} as a project on this computer first"
 msgstr "먼저 {repositoryName}을(를) 이 컴퓨터의 프로젝트로 추가하세요"
+
+msgid "Add #{prNumber} to the merge queue?"
+msgstr "#{prNumber}을(를) 머지 대기열에 추가할까요?"
 
 msgid "Add a comment…"
 msgstr "댓글 추가…"
@@ -2172,6 +2212,9 @@ msgstr "스크립트 추가"
 msgid "Add setup commands, one per line..."
 msgstr "설정 명령을 한 줄에 하나씩 추가하세요..."
 
+msgid "Add stack to merge queue"
+msgstr "스택을 머지 대기열에 추가"
+
 msgid "Add tag…"
 msgstr "태그 추가…"
 
@@ -2208,8 +2251,14 @@ msgstr "사전에 추가"
 msgid "Add to favorites"
 msgstr "즐겨찾기에 추가"
 
+msgid "Add to merge queue"
+msgstr "머지 대기열에 추가"
+
 msgid "Add to project"
 msgstr "프로젝트에 추가"
+
+msgid "Add to queue"
+msgstr "대기열에 추가"
 
 msgid "Add to sidebar"
 msgstr "사이드바에 추가"
@@ -2247,9 +2296,15 @@ msgstr "프롬프트와 함께 실행할 때만 추가됩니다, 예: <0>--</0>,
 msgid "Added to agent input"
 msgstr "에이전트 입력란에 추가됨"
 
+msgid "Added to merge queue"
+msgstr "머지 대기열에 추가했습니다"
+
 #. placeholder {0}: COMPANY.DOMAIN
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName}에 사람을 추가하려면 유료 플랜이 필요합니다. 조직의 플랜은 소유자가 {0}에서 관리합니다."
+
+msgid "Adding to queue…"
+msgstr "대기열에 추가 중…"
 
 msgid "Adding..."
 msgstr "추가 중..."
@@ -2353,9 +2408,6 @@ msgstr "에이전트 실행 실패"
 msgid "Agent self-verification"
 msgstr "에이전트 자체 검증"
 
-msgid "agent session ID"
-msgstr "에이전트 세션 ID"
-
 msgid "Agent session started"
 msgstr "에이전트 세션을 시작했습니다"
 
@@ -2384,6 +2436,9 @@ msgstr "에이전트가 작업 중간 개입 없이 일상적인 티켓을 완�
 msgid "Agents in your cloud workspaces can then use <0>--host</0> to run commands on this host. The host must be reachable through the relay."
 msgstr "이후 클라우드 워크스페이스의 에이전트가 <0>--host</0>를 사용해 이 호스트에서 명령을 실행할 수 있습니다. 호스트는 릴레이를 통해 접근할 수 있어야 합니다."
 
+msgid "Agents in your pocket"
+msgstr "주머니 속 에이전트"
+
 msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
 msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱, iPhone, iPad에서 워크스페이스를 다시 열 수 있습니다."
 
@@ -2411,8 +2466,8 @@ msgstr "에이전트에는 자리 표시자만 보입니다. Paradev가 나가�
 msgid "Agents that run while you're away"
 msgstr "자리를 비운 동안에도 실행되는 에이전트"
 
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs."
-msgstr "에이전트가 이슈 분류, changelog 초안 작성, 의존성 업데이트를 알아서 합니다. 당신은 PR만 리뷰하면 됩니다."
+msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
+msgstr "에이전트가 이슈 분류, changelog 초안 작성, 의존성 업데이트를 알아서 합니다."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "에이전트는 Linear 도구를 호출할 때 이 계정을 사용합니다."
@@ -2848,6 +2903,9 @@ msgstr "모든 수신자"
 
 msgid "Any review"
 msgstr "모든 리뷰"
+
+msgid "Any reviewer"
+msgstr "모든 리뷰어"
 
 msgid "any sender"
 msgstr "모든 발신자"
@@ -3446,6 +3504,9 @@ msgstr "연동으로 돌아가기"
 msgid "Back to Linear"
 msgstr "Linear로 돌아가기"
 
+msgid "Back to main chat"
+msgstr "기본 채팅으로 돌아가기"
+
 msgid "Back to pages"
 msgstr "페이지로 돌아가기"
 
@@ -3521,6 +3582,9 @@ msgstr "변경 전"
 msgid "Behavior"
 msgstr "동작 방식"
 
+msgid "Behind base"
+msgstr "베이스보다 뒤처짐"
+
 msgid "Behind main by ? commits, needs rebase"
 msgstr "main보다 커밋 ?개 뒤처짐, 리베이스 필요"
 
@@ -3570,6 +3634,10 @@ msgid "Block content on any page"
 msgstr "모든 페이지에서 콘텐츠 차단"
 
 msgid "blocked"
+msgstr "차단됨"
+
+msgctxt "pull request status"
+msgid "Blocked"
 msgstr "차단됨"
 
 msgid "Blocked by Branch Rules"
@@ -4203,8 +4271,8 @@ msgstr "채팅을 개편하는 중입니다"
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
-msgid "Chat mode"
-msgstr "채팅 모드"
+msgid "Chat name"
+msgstr "채팅 이름"
 
 msgid "Chat session not found"
 msgstr "채팅 세션을 찾을 수 없습니다"
@@ -4263,6 +4331,10 @@ msgstr "받은편지함을 확인하세요"
 msgid "Checkbox · Radio · Switch"
 msgstr "체크박스 · 라디오 · 스위치"
 
+msgctxt "pull request status"
+msgid "Checking"
+msgstr "확인 중"
+
 msgid "Checking agents…"
 msgstr "에이전트 확인하는 중…"
 
@@ -4313,6 +4385,9 @@ msgid "Checks completed"
 msgstr "검사 완료"
 
 msgid "Checks failed"
+msgstr "검사 실패"
+
+msgid "Checks failing"
 msgstr "검사 실패"
 
 msgid "Checks passed"
@@ -4519,9 +4594,6 @@ msgstr "CLI 및 SDK"
 
 msgid "CLI docs"
 msgstr "CLI 문서"
-
-msgid "CLI mode"
-msgstr "CLI 모드"
 
 msgid "CLI reference"
 msgstr "CLI 레퍼런스"
@@ -5141,6 +5213,10 @@ msgstr "종료 전 확인"
 msgid "Confirm switch"
 msgstr "변경 확인"
 
+msgctxt "pull request status"
+msgid "Conflicts"
+msgstr "충돌"
+
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "{0}과(와) 충돌"
@@ -5496,14 +5572,8 @@ msgstr "복사됨"
 msgid "Copied {0}"
 msgstr "{0} 복사됨"
 
-msgid "Copied {copiedLabel}"
-msgstr "{copiedLabel} 복사됨"
-
 msgid "Copied Link"
 msgstr "링크 복사됨"
-
-msgid "Copied terminal ID"
-msgstr "터미널 ID 복사됨"
 
 msgid "Copied to clipboard."
 msgstr "클립보드에 복사했습니다."
@@ -5569,9 +5639,6 @@ msgid "Copy file name"
 msgstr "파일 이름 복사"
 
 msgid "Copy ID"
-msgstr "ID 복사"
-
-msgid "Copy IDs"
 msgstr "ID 복사"
 
 msgid "Copy image"
@@ -6063,6 +6130,9 @@ msgstr "이미지를 복사하지 못했습니다"
 msgid "Couldn't copy the screenshot"
 msgstr "스크린샷을 복사하지 못했습니다"
 
+msgid "Couldn't create stack"
+msgstr "스택을 만들지 못했습니다"
+
 msgid "Couldn't create the channel"
 msgstr "채널을 만들 수 없습니다"
 
@@ -6143,6 +6213,9 @@ msgstr "리뷰 준비 완료로 표시할 수 없습니다"
 msgid "Couldn't merge pull request"
 msgstr "풀 리퀘스트를 머지하지 못했습니다"
 
+msgid "Couldn't merge stack"
+msgstr "스택을 머지하지 못했습니다"
+
 msgid "Couldn't move {name}"
 msgstr "{name}을(를) 옮기지 못했습니다"
 
@@ -6192,6 +6265,9 @@ msgstr "이 터미널의 컨텍스트를 읽을 수 없습니다."
 
 msgid "Couldn't read usage history from this host."
 msgstr "이 호스트에서 사용량 기록을 읽지 못했습니다."
+
+msgid "Couldn't remove from the merge queue"
+msgstr "머지 대기열에서 빼지 못했습니다"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "로컬 로그인 정보를 제거하지 못했습니다"
@@ -6299,6 +6375,9 @@ msgstr "백그라운드 작업을 중지할 수 없습니다"
 msgid "Couldn't stop the chat"
 msgstr "채팅을 중지할 수 없습니다"
 
+msgid "Couldn't switch to #{number}"
+msgstr "#{number}(으)로 전환하지 못했습니다"
+
 msgid "Couldn't take a screenshot"
 msgstr "스크린샷을 찍지 못했습니다"
 
@@ -6355,9 +6434,6 @@ msgstr "클라우드 환경 만들기"
 
 msgid "Create a Dev"
 msgstr "Dev 만들기"
-
-msgid "Create a native provider fork with the same conversation context. The original session stays unchanged."
-msgstr "같은 대화 컨텍스트로 제공자의 네이티브 포크를 만듭니다. 원래 세션은 그대로 유지됩니다."
 
 msgid "Create a new API key for external integrations like Claude Desktop or Claude Code."
 msgstr "Claude Desktop이나 Claude Code 같은 외부 연동에 사용할 새 API 키를 만듭니다."
@@ -6455,6 +6531,9 @@ msgstr "프로젝트 만들기…"
 
 msgid "Create pull request"
 msgstr "풀 리퀘스트 만들기"
+
+msgid "Create stack"
+msgstr "스택 만들기"
 
 msgid "Create task"
 msgstr "작업 만들기"
@@ -8021,6 +8100,9 @@ msgstr "1분마다"
 msgid "Every objective is carrying its weight for the next rung. Measured over the trailing 30 days."
 msgstr "모든 목표가 다음 단계를 향해 제 몫을 하고 있습니다. 최근 30일 기준입니다."
 
+msgid "Every open pull request through #{prNumber} joins the merge queue for {base}, in order. GitHub merges them when their turn comes and their checks pass."
+msgstr "#{prNumber}까지 열린 모든 풀 리퀘스트가 순서대로 {base}의 머지 대기열에 들어갑니다. 차례가 되고 검사를 통과하면 GitHub가 머지합니다."
+
 msgid "Every paid plan includes Paradev Mobile, automations, and priority support. Plans with cloud workspaces give your team one shared pool of GB-hours."
 msgstr "모든 유료 플랜에는 Paradev Mobile, 자동화, 우선 지원이 포함됩니다. 클라우드 워크스페이스가 있는 플랜은 팀이 함께 쓰는 GB 시간 풀을 제공합니다."
 
@@ -9191,11 +9273,11 @@ msgstr "포크 인자"
 msgid "Fork conversation"
 msgstr "대화 분기"
 
-msgid "Fork session"
-msgstr "세션 포크"
+msgid "Fork into Chat"
+msgstr "채팅으로 포크"
 
-msgid "Fork session…"
-msgstr "세션 포크…"
+msgid "Fork into CLI"
+msgstr "CLI로 포크"
 
 msgid "Form controls and field composition"
 msgstr "폼 컨트롤과 필드 구성"
@@ -9462,6 +9544,9 @@ msgstr "GitHub App 설치가 취소되었습니다."
 msgid "GitHub App installed successfully!"
 msgstr "GitHub App을 설치했습니다!"
 
+msgid "GitHub cannot merge this stack in one step here."
+msgstr "GitHub가 여기서는 이 스택을 한 번에 머지할 수 없습니다."
+
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub는 연결되었지만 초기 동기화를 시작하지 못했습니다. 다시 연결해 보세요."
 
@@ -9474,8 +9559,14 @@ msgstr "GitHub 설치를 찾을 수 없습니다"
 msgid "GitHub integration"
 msgstr "GitHub 연동"
 
+msgid "GitHub is still merging. This updates when it finishes."
+msgstr "GitHub가 아직 머지 중입니다. 끝나면 업데이트됩니다."
+
 msgid "GitHub issues"
 msgstr "GitHub 이슈"
+
+msgid "GitHub merges it when its turn comes and its checks pass."
+msgstr "차례가 되고 검사를 통과하면 GitHub가 머지합니다."
 
 msgid "GitHub rate limit reached"
 msgstr "GitHub 요청 한도에 도달했습니다"
@@ -9488,6 +9579,12 @@ msgstr "플러그인 마켓플레이스 파일이 있는 GitHub 리포지토리�
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub 로그인이 필요합니다"
+
+msgid "GitHub stack created"
+msgstr "GitHub 스택을 만들었습니다"
+
+msgid "GitHub stacks are not turned on for this repository."
+msgstr "이 저장소에서는 GitHub 스택이 켜져 있지 않습니다."
 
 msgid "GitHub sync requires the Pro plan."
 msgstr "GitHub 동기화에는 Pro 플랜이 필요합니다."
@@ -9696,6 +9793,9 @@ msgstr "\"{0}\"을(를) 사이드바에서 숨겼습니다"
 
 msgid "Hidden folders"
 msgstr "숨긴 폴더"
+
+msgid "Hidden from the sidebar"
+msgstr "사이드바에서 숨겼습니다"
 
 msgid "Hidden until you join"
 msgstr "참여 전까지 숨김"
@@ -10223,6 +10323,12 @@ msgstr "리뷰 중"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "{appName} 데스크톱 앱에서 설정 → 원격 액세스을 열고 “릴레이를 통해 이 기기에 원격 액세스 허용”을 켜세요."
 
+msgid "In the merge queue"
+msgstr "머지 대기열에 있음"
+
+msgid "In the merge queue. GitHub merges it when its turn comes."
+msgstr "머지 대기열에 있습니다. 차례가 되면 GitHub가 머지합니다."
+
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Paradev 데스크톱 앱에서 <0>설정 → 모양 → 테마</0>를 여세요."
 
@@ -10630,6 +10736,9 @@ msgstr "절전 모드일 수 있습니다"
 
 msgid "It may have been deleted, or it belongs to another organization."
 msgstr "삭제되었거나 다른 조직에 속한 페이지일 수 있습니다."
+
+msgid "It must join again and pass its checks to merge."
+msgstr "머지하려면 다시 대기열에 넣고 체크를 통과해야 합니다."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "몇 분이면 됩니다. Conductor Cloud를 사용 중이라면 <0>클라우드 가이드</0>부터 시작하세요."
@@ -11059,6 +11168,9 @@ msgstr "채널 나가기"
 
 msgid "Leave comment mode"
 msgstr "댓글 모드 나가기"
+
+msgid "Leave it empty to go back to the default name."
+msgstr "비워 두면 기본 이름으로 돌아갑니다."
 
 msgid "Leave it empty to go back to the name the terminal reports."
 msgstr "비워 두면 터미널이 보고하는 이름으로 돌아갑니다."
@@ -11842,6 +11954,9 @@ msgstr "머지"
 msgid "Merge #{0}?"
 msgstr "#{0}을(를) 머지할까요?"
 
+msgid "Merge #{prNumber}?"
+msgstr "#{prNumber}을(를) 머지할까요?"
+
 msgid "Merge commit"
 msgstr "머지 커밋"
 
@@ -11858,11 +11973,20 @@ msgstr "풀 리퀘스트 머지"
 msgid "Merge pull requests without leaving Paradev, plus a round of chat fixes and polish."
 msgstr "Paradev를 벗어나지 않고 풀 리퀘스트를 머지하세요. 채팅 수정과 다듬기도 함께 들어갑니다."
 
+msgid "Merge stack"
+msgstr "스택 머지"
+
 msgid "Merge status"
 msgstr "머지 상태"
 
+msgid "Merge status pending"
+msgstr "머지 상태 확인 중"
+
 msgid "Merge status unknown"
 msgstr "머지 상태 알 수 없음"
+
+msgid "Mergeable with failing checks"
+msgstr "실패한 검사가 있지만 머지 가능"
 
 msgid "Merged"
 msgstr "머지됨"
@@ -11883,6 +12007,9 @@ msgstr "PR을 머지하는 중..."
 
 msgid "Merging pull request"
 msgstr "풀 리퀘스트 머지 중"
+
+msgid "Merging stack…"
+msgstr "스택 머지 중…"
 
 msgid "Merging…"
 msgstr "머지 중…"
@@ -12353,6 +12480,9 @@ msgstr "새 브라우저"
 
 msgid "new challengers"
 msgstr "새 도전자"
+
+msgid "New chat"
+msgstr "새 채팅"
 
 msgid "New Chat"
 msgstr "새 채팅"
@@ -13056,6 +13186,9 @@ msgstr "지정된 리뷰어 없음"
 
 msgid "No reviewers assigned yet."
 msgstr "아직 지정된 리뷰어가 없습니다."
+
+msgid "No reviewers found."
+msgstr "리뷰어를 찾을 수 없습니다."
 
 msgid "No reviews"
 msgstr "리뷰 없음"
@@ -13907,9 +14040,6 @@ msgstr "브라우저에서 열기"
 msgid "Open in Changes pane"
 msgstr "변경 사항 패널에서 열기"
 
-msgid "Open in Chat Interface"
-msgstr "채팅 인터페이스에서 열기"
-
 msgid "Open in ChatGPT"
 msgstr "ChatGPT에서 열기"
 
@@ -13984,9 +14114,6 @@ msgstr "탭에서 열기"
 
 msgid "Open in Tasks"
 msgstr "작업에서 열기"
-
-msgid "Open in Terminal Chat"
-msgstr "터미널 채팅에서 열기"
 
 msgid "Open in…"
 msgstr "다음으로 열기…"
@@ -14079,9 +14206,6 @@ msgstr "최근 항목 열기"
 
 msgid "Open roles"
 msgstr "채용 공고"
-
-msgid "Open session in"
-msgstr "세션 열기 위치"
 
 msgid "Open settings"
 msgstr "설정 열기"
@@ -15096,6 +15220,9 @@ msgstr "답글 게시"
 msgid "PR"
 msgstr "PR"
 
+msgid "PR {position} of {size} · targets {base}"
+msgstr "PR {position}/{size} · 대상 {base}"
+
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
 msgid "PR #{0} ({1})"
@@ -15476,10 +15603,6 @@ msgstr "속성"
 msgid "Provide either id or slug"
 msgstr "id 또는 슬러그 중 하나를 제공하세요"
 
-#. placeholder {0}: sourceConfig?.label ?? binding.agentId
-msgid "Provider: {0}"
-msgstr "제공자: {0}"
-
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "프로비저닝에 실패해 샌드박스가 정리되었습니다. 실행 중인 것은 없으며 이 워크스페이스는 열 수 없습니다. 다시 시도하려면 새로 만드세요."
 
@@ -15543,6 +15666,9 @@ msgstr "풀 리퀘스트 작업"
 msgid "Pull request detail tabs"
 msgstr "풀 리퀘스트 상세 탭"
 
+msgid "Pull request merged"
+msgstr "풀 리퀘스트를 머지했습니다"
+
 msgid "Pull request not found"
 msgstr "풀 리퀘스트를 찾을 수 없습니다"
 
@@ -15557,6 +15683,9 @@ msgstr "풀 리퀘스트"
 
 msgid "Pull Requests"
 msgstr "풀 리퀘스트"
+
+msgid "Pull requests above it will remain open and GitHub will retarget them."
+msgstr "위에 있는 풀 리퀘스트는 열린 상태로 유지되고 GitHub가 대상 브랜치를 변경합니다."
 
 msgid "Pull requests, comments and pushes from Superset are made as you."
 msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시는 본인 계정으로 처리됩니다."
@@ -15620,6 +15749,9 @@ msgstr "사용량 한도로 대기열이 일시 중지되었습니다"
 msgid "Queue paused when Paradev closed"
 msgstr "Paradev가 종료되어 대기열이 일시 중지되었습니다"
 
+msgid "Queue stack"
+msgstr "스택 대기열에 추가"
+
 msgid "Queue work for agents"
 msgstr "에이전트 작업 대기열에 추가"
 
@@ -15628,6 +15760,9 @@ msgstr "대기열에 추가; ⌘↩로 진행 중인 턴 방향 전환"
 
 msgid "Queued"
 msgstr "대기열"
+
+msgid "Queued · {position}"
+msgstr "대기열 · {position}"
 
 msgid "Queued messages"
 msgstr "대기 중인 메시지"
@@ -15865,6 +16000,10 @@ msgstr "준비 완료"
 msgid "Ready on every machine you sign into and in every cloud workspace."
 msgstr "로그인하는 모든 머신과 모든 클라우드 워크스페이스에서 바로 쓸 수 있습니다."
 
+msgctxt "stack verdict"
+msgid "Ready to merge"
+msgstr "머지 준비됨"
+
 msgid "Ready to Merge"
 msgstr "머지 준비됨"
 
@@ -15894,6 +16033,9 @@ msgstr "최근 활동"
 
 msgid "Recent apps"
 msgstr "최근 앱"
+
+msgid "Recent chats"
+msgstr "최근 채팅"
 
 msgid "Recent invoices"
 msgstr "최근 청구서"
@@ -16129,6 +16271,9 @@ msgstr "{name}을(를) 제거할까요?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo}을(를) 제거할까요? 여기서 동기화된 모든 플러그인이 조직과 설치한 모든 구성원에게서 제거됩니다."
 
+msgid "Remove #{prNumber} from the merge queue?"
+msgstr "#{prNumber}을(를) 머지 대기열에서 제거할까요?"
+
 msgid "Remove attachment"
 msgstr "첨부 파일 제거"
 
@@ -16143,6 +16288,9 @@ msgstr "즐겨찾기에서 제거"
 
 msgid "Remove from group"
 msgstr "그룹에서 제거"
+
+msgid "Remove from queue"
+msgstr "대기열에서 빼기"
 
 msgid "Remove from Queue"
 msgstr "대기열에서 제거"
@@ -16225,6 +16373,9 @@ msgstr "{name}을(를) 제거했습니다"
 msgid "Removed {removedLabel}."
 msgstr "{removedLabel}을(를) 제거했습니다."
 
+msgid "Removed from the merge queue"
+msgstr "머지 대기열에서 뺐습니다"
+
 msgid "Removes this agent from this device only."
 msgstr "이 기기에서만 이 에이전트를 제거합니다."
 
@@ -16245,6 +16396,9 @@ msgstr "계정 이름 변경"
 
 msgid "Rename branch"
 msgstr "브랜치 이름 변경"
+
+msgid "Rename chat"
+msgstr "채팅 이름 변경"
 
 msgid "Rename failed"
 msgstr "이름 변경 실패"
@@ -16519,14 +16673,8 @@ msgstr "Paradev와 모니터링 중인 터미널 프로세스 트리가 사용�
 msgid "Resizable"
 msgstr "크기 조절 가능"
 
-msgid "Resize left edge"
-msgstr "왼쪽 가장자리 크기 조절"
-
 msgid "Resize panel"
 msgstr "패널 크기 조정"
-
-msgid "Resize right edge"
-msgstr "오른쪽 가장자리 크기 조절"
 
 msgid "Resolve"
 msgstr "해결"
@@ -16570,6 +16718,9 @@ msgstr "리소스"
 
 msgid "Response"
 msgstr "응답"
+
+msgid "Restack"
+msgstr "리스택"
 
 msgid "Restart"
 msgstr "다시 시작"
@@ -16855,6 +17006,12 @@ msgstr "리뷰함"
 msgid "Reviewed by you"
 msgstr "내가 리뷰함"
 
+msgid "Reviewer"
+msgstr "리뷰어"
+
+msgid "Reviewer: {label}"
+msgstr "리뷰어: {label}"
+
 msgid "Reviewers"
 msgstr "리뷰어"
 
@@ -17020,6 +17177,9 @@ msgstr "지금 실행"
 msgid "Run on a schedule or on events, run on demand, pause, resume, and read logs."
 msgstr "일정이나 이벤트로 실행, 필요할 때 실행, 일시 중지, 재개, 로그 확인."
 
+msgid "Run on any machine"
+msgstr "어떤 머신에서든 실행"
+
 msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 msgstr "기능, 수정, 리팩터링에 코딩 에이전트를 병렬로 실행하세요. 각 에이전트는 로컬이나 클라우드에서 자체 브랜치로 작업합니다."
 
@@ -17118,6 +17278,9 @@ msgstr "새 작업 공간을 만들 때 실행됩니다."
 
 msgid "Runs when a workspace is deleted."
 msgstr "작업 공간을 삭제할 때 실행됩니다."
+
+msgid "Runs while you sleep"
+msgstr "잠든 사이에도 실행"
 
 msgid "Same session"
 msgstr "같은 세션"
@@ -17302,6 +17465,9 @@ msgstr "개발자 검색"
 msgid "Search across file contents and across all your workspaces at once."
 msgstr "파일 내용과 모든 워크스페이스를 한 번에 검색하세요."
 
+msgid "Search all chats…"
+msgstr "모든 채팅 검색…"
+
 msgid "Search all emoji"
 msgstr "모든 이모지 검색"
 
@@ -17424,6 +17590,9 @@ msgstr "리포지토리 검색..."
 
 msgid "Search results"
 msgstr "검색 결과"
+
+msgid "Search reviewers…"
+msgstr "리뷰어 검색…"
 
 msgid "Search settings..."
 msgstr "설정 검색..."
@@ -17564,6 +17733,9 @@ msgstr "성적표에서 이 관문 보기"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "무엇이 바뀌었는지 보고, 피드백을 주고, 준비되면 머지하세요."
+
+msgid "See what it can do"
+msgstr "무엇을 할 수 있는지 보기"
 
 msgid "See what we're building now, what's coming next, and where Paradev is headed."
 msgstr "지금 만들고 있는 것, 다음에 나올 것, 그리고 Paradev가 향하는 방향을 확인하세요."
@@ -17736,6 +17908,9 @@ msgstr "선택한 워크스페이스 작업"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "터미널에서 텍스트를 선택하면 끝의 공백이 제거된 상태로 즉시 클립보드에 복사됩니다"
+
+msgid "Self-hosted"
+msgstr "셀프 호스팅"
 
 msgid "Send"
 msgstr "보내기"
@@ -18190,6 +18365,9 @@ msgstr "링크 메뉴 표시"
 msgid "Show me the last 10 runs of my Linear triage automation"
 msgstr "내 Linear 분류 자동화의 최근 실행 10건을 보여 줘"
 
+msgid "Show me what the Paradev CLI can do. Run `superset --help` and `superset schema` to see its commands, then try a few read-only ones on my account: `superset workspaces list`, `superset tasks list`, `superset automations list` and `superset hosts list`. Summarize what you found and suggest three ways I could use or script the CLI in my workflow. Do not create, change or delete anything."
+msgstr "Paradev CLI로 무엇을 할 수 있는지 보여 주세요. `superset --help`와 `superset schema`를 실행해 명령을 확인한 다음, 내 계정에서 읽기 전용 명령 몇 가지를 실행해 보세요: `superset workspaces list`, `superset tasks list`, `superset automations list`, `superset hosts list`. 알게 된 내용을 요약하고 내 워크플로에서 CLI를 사용하거나 스크립트로 활용할 수 있는 방법 세 가지를 제안해 주세요. 아무것도 만들거나 바꾸거나 삭제하지 마세요."
+
 msgid "Show more"
 msgstr "더 보기"
 
@@ -18240,6 +18418,9 @@ msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 다음 탭 표�
 
 msgid "Show the previous tab in the right sidebar without moving focus"
 msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 이전 탭 표시"
+
+msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+msgstr "모바일, 클라우드, CLI, 셀프 호스팅으로 연결되는 사이드바 버튼을 표시합니다."
 
 msgid "Show the triggering payload"
 msgstr "트리거 페이로드 표시"
@@ -18792,6 +18973,28 @@ msgstr "SSO/SAML"
 
 msgid "Stability improvements"
 msgstr "안정성 개선"
+
+msgid "Stack #{stackNumber} · PR {position} of {size} · targets {base}"
+msgstr "스택 #{stackNumber} · PR {position}/{size} · 대상 {base}"
+
+msgid "Stack #{stackNumber} · targets {base}"
+msgstr "스택 #{stackNumber} · 대상 {base}"
+
+msgid "Stack added to merge queue"
+msgstr "스택을 머지 대기열에 추가했습니다"
+
+msgid "Stack details could not be loaded. Refresh before merging."
+msgstr "스택 세부 정보를 불러오지 못했습니다. 머지하기 전에 새로 고치세요."
+
+msgid "Stack merged"
+msgstr "스택을 머지했습니다"
+
+msgctxt "stack verdict"
+msgid "Stack merged"
+msgstr "스택 머지됨"
+
+msgid "Stack needs attention"
+msgstr "스택에 확인이 필요합니다"
 
 msgid "Stacked"
 msgstr "스택"
@@ -19612,9 +19815,6 @@ msgstr "터미널 글꼴 크기"
 msgid "Terminal font size when a terminal is focused, page zoom in a browser pane, otherwise the whole app"
 msgstr "터미널에 포커스가 있으면 터미널 글꼴 크기, 브라우저 패널에서는 페이지 확대/축소, 그 외에는 앱 전체"
 
-msgid "terminal ID"
-msgstr "터미널 ID"
-
 msgid "Terminal input"
 msgstr "터미널 입력"
 
@@ -19634,9 +19834,6 @@ msgid "Terminal session killed"
 msgstr "터미널 세션을 종료했습니다"
 
 msgid "Terminal sessions"
-msgstr "터미널 세션"
-
-msgid "Terminal Sessions"
 msgstr "터미널 세션"
 
 msgid "Terminal theme color-palette preview"
@@ -20115,6 +20312,12 @@ msgstr "사이트의 인증서가 만료되었습니다"
 msgid "The site's certificate is invalid"
 msgstr "사이트의 인증서가 올바르지 않습니다"
 
+msgid "The stack changed while this was open. Check it and try again."
+msgstr "열려 있는 동안 스택이 바뀌었습니다. 확인한 뒤 다시 시도하세요."
+
+msgid "The stacked pull requests above it leave the queue too. Each must join again and pass its checks."
+msgstr "그 위에 쌓인 풀 리퀘스트도 대기열에서 빠집니다. 각각 다시 대기열에 넣고 체크를 통과해야 합니다."
+
 msgid "The starting point a cloud workspace boots from. Variables set here reach every sandbox started from it."
 msgstr "클라우드 워크스페이스가 부팅되는 시작점입니다 — 베이스 이미지이거나, 직접 구성해 두고 포크하려는 샌드박스입니다."
 
@@ -20177,6 +20380,9 @@ msgstr "테마 미리 보기 카드"
 
 msgid "Themes"
 msgstr "테마"
+
+msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
+msgstr "베이스 브랜치로 연결되어 있어 각각 바로 아래 항목에 머지됩니다. GitHub 스택은 한 번에 모두 머지합니다."
 
 msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
 msgstr "워크스페이스를 만들 때 이 명령이 자동으로 실행됩니다. <0>문서 보기<1/></0>"
@@ -20581,6 +20787,15 @@ msgstr "이 화면에서 오류가 발생했습니다"
 msgid "This week"
 msgstr "이번 주"
 
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 머지 커밋으로 {base}에 원자적으로 머지합니다."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using rebase."
+msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 리베이스으로 {base}에 원자적으로 머지합니다."
+
+msgid "This will atomically merge every open pull request through #{prNumber} into {base} using squash."
+msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 스쿼시으로 {base}에 원자적으로 머지합니다."
+
 msgid "This will change your organization's public URL. Make sure to update any bookmarks or shared links."
 msgstr "조직의 공개 URL이 바뀝니다. 북마크나 공유한 링크도 함께 업데이트하세요."
 
@@ -20590,6 +20805,15 @@ msgstr "<0>{0}</0>을(를) 삭제하고 모든 멤버를 제거합니다. 되돌
 
 msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
 msgstr "실행 중인 모든 세션을 종료하고 터미널 데몬을 다시 시작합니다. 앱은 새 데몬으로 터미널을 다시 시작합니다."
+
+msgid "This will merge #{prNumber} into {base} using a merge commit."
+msgstr "#{prNumber}을(를) 머지 커밋 방식으로 {base}에 머지합니다."
+
+msgid "This will merge #{prNumber} into {base} using rebase."
+msgstr "#{prNumber}을(를) 리베이스 방식으로 {base}에 머지합니다."
+
+msgid "This will merge #{prNumber} into {base} using squash."
+msgstr "#{prNumber}을(를) 스쿼시 방식으로 {base}에 머지합니다."
 
 msgid "This will permanently delete the routine and stop future runs."
 msgstr "루틴이 영구적으로 삭제되고 이후 실행이 중지됩니다."
@@ -21010,6 +21234,9 @@ msgstr "터널 연결됨"
 
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
+
+msgid "Turn it back on in Settings → General."
+msgstr "설정 → 일반에서 다시 켤 수 있습니다."
 
 msgid "Turn off"
 msgstr "끄기"
@@ -21566,6 +21793,12 @@ msgstr "수동 로그인 사용"
 msgid "Use more browser features: {features}"
 msgstr "추가 브라우저 기능 사용: {features}"
 
+msgid "Use Paradev anywhere"
+msgstr "어디서나 Paradev 사용하기"
+
+msgid "Use Paradev anywhere button"
+msgstr "\"어디서나 Paradev 사용하기\" 버튼"
+
 msgid "Use Paradev on mobile"
 msgstr "모바일에서 Paradev 사용하기"
 
@@ -21754,6 +21987,9 @@ msgstr "전체 크기로 보기"
 msgid "View in GitHub"
 msgstr "GitHub에서 보기"
 
+msgid "View instead"
+msgstr "대신 보기"
+
 msgid "View log"
 msgstr "로그 보기"
 
@@ -21790,8 +22026,18 @@ msgstr "릴리스 노트 보기"
 msgid "View releases on GitHub"
 msgstr "GitHub에서 릴리스 보기"
 
+msgid "View stack {stackNumber}, pull request {position} of {size}"
+msgstr "스택 {stackNumber} 보기, 풀 리퀘스트 {position}/{size}"
+
+msgid "View stack, pull request {position} of {size}"
+msgstr "스택 보기, 풀 리퀘스트 {position}/{size}"
+
 msgid "View usage"
 msgstr "사용량 보기"
+
+msgctxt "stack layer"
+msgid "Viewing"
+msgstr "보는 중"
 
 msgid "Violence or harassment"
 msgstr "폭력 또는 괴롭힘"
@@ -22755,6 +23001,9 @@ msgstr "GitHub 링크는 로그인에 사용한 계정에서 가져오므로 확
 
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "최근 결제에 실패했습니다. Pro를 유지하려면 결제 수단을 업데이트하세요."
+
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "계정이 사용량 또는 지출 한도에 도달하여 모델 제공업체가 이 요청을 중지했습니다. 한도가 재설정될 때까지 기다리거나, 제공업체에서 한도를 높이거나, 사용량 설정에서 다른 계정으로 전환하세요."
 
 msgid "Your name"
 msgstr "이름"

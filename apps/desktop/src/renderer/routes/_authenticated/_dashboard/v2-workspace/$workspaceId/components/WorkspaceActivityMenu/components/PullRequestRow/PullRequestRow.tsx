@@ -1,4 +1,5 @@
 import type { MouseEvent, ReactNode } from "react";
+import { PullRequestStackPosition } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPosition";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
 import { PRStatusIndicators } from "../../../PRStatusIndicators";
 import {
@@ -20,10 +21,12 @@ export type PullRequestEntry = {
 
 export function PullRequestRow({
 	pullRequest,
+	stack = null,
 	menu,
 	onOpen,
 }: {
 	pullRequest: PullRequestEntry;
+	stack?: { position: number; size: number } | null;
 	menu?: ReactNode;
 	onOpen: (pullRequest: PullRequestEntry, event: MouseEvent) => void;
 }) {
@@ -41,6 +44,14 @@ export function PullRequestRow({
 						<span className="shrink-0 text-muted-foreground tabular-nums">
 							#{pullRequest.number}
 						</span>
+						{stack ? (
+							<span className="flex shrink-0 items-center gap-0.5 text-[11px] text-muted-foreground">
+								<PullRequestStackPosition
+									position={stack.position}
+									size={stack.size}
+								/>
+							</span>
+						) : null}
 						<span className="min-w-0 truncate text-foreground">
 							{pullRequest.title}
 						</span>

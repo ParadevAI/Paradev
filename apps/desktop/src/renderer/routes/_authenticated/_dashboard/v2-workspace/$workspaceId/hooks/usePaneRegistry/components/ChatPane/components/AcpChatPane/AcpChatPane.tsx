@@ -22,11 +22,9 @@ import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnres
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import { StoredChatTranscript } from "../../../../../../components/StoredChatTranscript";
 import type { OpenFile } from "../../../../../../types";
-import {
-	ignoreChatTerminal,
-	isChatSessionReopened,
-} from "../../../../../../utils/closedChatSessions";
+import { isChatSessionReopened } from "../../../../../../utils/closedChatSessions";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
+import { useForkChatSession } from "../../../../hooks/useForkChatSession";
 import {
 	forgetSavedChatMode,
 	freshStartMode,
@@ -152,6 +150,7 @@ export function AcpChatPane({
 	const { t } = useLingui();
 	const snapshotWorktree = useChatTurnSnapshotsEnabled();
 	const { client, wiring } = useSessionClient(sessionId);
+	const forkChatSession = useForkChatSession(workspaceId);
 	const storedSnapshot = useStoredChatSnapshot(sessionId);
 	const { forkToWorktree, canForkToWorktree } = useForkChat(workspaceId);
 	const { hostUrl } = useWorkspaceClient();
@@ -309,36 +308,17 @@ export function AcpChatPane({
 	// point — so where it was clicked from makes no difference to the branch.
 	const forkHere = useCallback(() => {
 		if (!sessionId) return;
-		const terminalId = crypto.randomUUID();
-		ignoreChatTerminal(terminalId);
-		void wiring.transport
-			.forkSession({
-				commandId: crypto.randomUUID(),
-				sessionId,
-				workspaceId,
-				terminalId,
-			})
-			.then((forked) => {
-				if (forked) {
-					if (!mounted.current || !onOpenForkedChat) {
-						void wiring.transport
-							.closeSession({ sessionId: forked.sessionId })
-							.catch(() => undefined);
-						return;
-					}
-					onOpenForkedChat({ sessionId: forked.sessionId, terminalId });
-					return;
-				}
-				// The adapter declines rather than sending a `session/fork` an
-				// agent would reject, and a button that does nothing is worse
-				// than one that says why.
-				toast.error(t({ message: "This agent can't branch a conversation" }));
-			})
-			.catch((error: unknown) => {
-				console.error("[acp-chat] fork failed", error);
-				toast.error(t({ message: "Couldn't branch the conversation" }));
-			});
-	}, [wiring.transport, sessionId, workspaceId, onOpenForkedChat, t]);
+		void forkChatSession(sessionId).then((forked) => {
+			if (!forked) return;
+			if (!mounted.current || !onOpenForkedChat) {
+				void wiring.transport
+					.closeSession({ sessionId: forked.sessionId })
+					.catch(() => undefined);
+				return;
+			}
+			onOpenForkedChat(forked);
+		});
+	}, [forkChatSession, wiring.transport, sessionId, onOpenForkedChat]);
 
 	// A worktree of its own cannot resume this session — the agent keys its
 	// sessions to a project directory — so that branch is a fresh chat handed
