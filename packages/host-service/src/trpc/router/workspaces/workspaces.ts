@@ -79,6 +79,7 @@ import {
 	requireLocalProject,
 	requireProjectRepoPath,
 } from "../workspace-creation/shared/local-project";
+import { moveWorktree } from "../workspace-creation/shared/move-worktree";
 import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
 import { requireIndependentWorktree } from "../workspace-creation/shared/require-independent-worktree";
 import { startSetupTerminalIfPresent } from "../workspace-creation/shared/setup-terminal";
@@ -480,7 +481,7 @@ async function createRepositoryCheckouts(
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
 			if (adopted) {
-				await git.raw(["worktree", "move", adopted.path, worktreePath]);
+				await moveWorktree(git, adopted.path, worktreePath);
 				movedFrom = adopted.path;
 				created.push(
 					insertRepositoryCheckout(ctx, args, repository, {
@@ -751,10 +752,10 @@ async function removeRepositoryCheckouts(
 	for (const checkout of checkouts) {
 		try {
 			const git = await ctx.git(checkout.repoPath);
-			const undo = checkout.movedFrom
-				? ["worktree", "move", checkout.worktreePath, checkout.movedFrom]
-				: ["worktree", "remove", "--force", checkout.worktreePath];
-			await git.raw(undo).catch(() => {});
+			await (checkout.movedFrom
+				? moveWorktree(git, checkout.worktreePath, checkout.movedFrom)
+				: git.raw(["worktree", "remove", "--force", checkout.worktreePath])
+			).catch(() => {});
 			if (checkout.createdBranch) {
 				await git.raw(["branch", "-D", checkout.branch]).catch(() => {});
 			}
