@@ -580,3 +580,95 @@ test("each repository with a PR starts from it, and the others branch on the PR'
 		branch: "add-todo-tags",
 	});
 });
+
+function addOutsideWorktree(repoPath: string, branch: string): string {
+	const path = `${repoPath}-${branch.replaceAll("/", "-")}`;
+	const added = Bun.spawnSync(["git", "worktree", "add", "-b", branch, path], {
+		cwd: repoPath,
+	});
+	if (added.exitCode !== 0) throw new Error(added.stderr.toString());
+	return path;
+}
+
+test("an existing worktree moves into the workspace, and the others branch on its branch", async () => {
+	const { host, projectId, fixtures } = await containerScenario();
+	const [web, api] = fixtures;
+	if (!web || !api) throw new Error("missing fixture");
+	const outside = addOutsideWorktree(api.repoPath, "feature/started");
+	const [, apiProject] = await host.trpc.project.repositories.query({
+		projectId,
+	});
+
+	const { workspace } = await host.trpc.workspaces.create.mutate({
+		projectId,
+		repositoryWorktrees: { [apiProject?.id ?? ""]: outside },
+	});
+
+	const checkouts = await host.trpc.workspace.repositories.query({
+		workspaceId: workspace.id,
+	});
+	const root = dirname(checkouts[0]?.worktreePath ?? "");
+	expect(
+		checkouts.map(({ worktreePath, branch }) => ({ worktreePath, branch })),
+	).toEqual([
+		{
+			worktreePath: join(root, basename(web.repoPath)),
+			branch: "feature/started",
+		},
+		{
+			worktreePath: join(root, basename(api.repoPath)),
+			branch: "feature/started",
+		},
+	]);
+	expect(existsSync(outside)).toBe(false);
+	const { worktrees } =
+		await host.trpc.workspaceCreation.listProjectWorktrees.query({
+			projectId: apiProject?.id ?? "",
+		});
+	expect(
+		worktrees.find((worktree) => worktree.branch === "feature/started")
+			?.hasWorkspace,
+	).toBe(true);
+});
+
+test("a failed create moves an adopted worktree back", async () => {
+	const { host, projectId, fixtures } = await containerScenario();
+	const [web, api] = fixtures;
+	if (!web || !api) throw new Error("missing fixture");
+	const outside = addOutsideWorktree(web.repoPath, "feature/kept");
+	const [webProject] = await host.trpc.project.repositories.query({
+		projectId,
+	});
+	rmSync(join(api.repoPath, ".git"), { recursive: true, force: true });
+
+	await expect(
+		host.trpc.workspaces.create.mutate({
+			projectId,
+			repositoryWorktrees: { [webProject?.id ?? ""]: outside },
+		}),
+	).rejects.toThrow(basename(api.repoPath));
+
+	expect(existsSync(join(outside, ".git"))).toBe(true);
+	const branch = Bun.spawnSync(["git", "branch", "--show-current"], {
+		cwd: outside,
+	});
+	expect(branch.stdout.toString().trim()).toBe("feature/kept");
+	rmSync(outside, { recursive: true, force: true });
+});
+
+test("a worktree that already belongs to a workspace cannot be moved in", async () => {
+	const { host, projectId, checkouts } = await containerWorkspace();
+	const [, apiCheckout] = checkouts;
+	const [, apiProject] = await host.trpc.project.repositories.query({
+		projectId,
+	});
+
+	await expect(
+		host.trpc.workspaces.create.mutate({
+			projectId,
+			repositoryWorktrees: {
+				[apiProject?.id ?? ""]: apiCheckout?.worktreePath ?? "",
+			},
+		}),
+	).rejects.toThrow("already belongs to a workspace");
+});

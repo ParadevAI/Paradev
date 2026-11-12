@@ -87,7 +87,14 @@ import {
 	parseSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
 import type { GitClient } from "../workspace-creation/shared/types";
-import { normalizeWorktreePath } from "../workspace-creation/shared/worktree-list";
+import {
+	listGitWorktrees,
+	normalizeWorktreePath,
+} from "../workspace-creation/shared/worktree-list";
+import {
+	findWorktreeOwner,
+	findWorktreeOwners,
+} from "../workspace-creation/shared/worktree-owners";
 import { safeResolveWorktreePath } from "../workspace-creation/shared/worktree-paths";
 import {
 	applyAiWorkspaceRename,
@@ -147,6 +154,10 @@ const createInputSchema = z
 		repositoryPullRequests: z
 			.record(z.string(), z.number().int().positive())
 			.optional(),
+		// Multi-repo projects: an existing worktree to move into the workspace,
+		// by repository project id. It keeps its branch; with no PR or typed
+		// branch, the first one names the branch of the other repositories.
+		repositoryWorktrees: z.record(z.string(), z.string().min(1)).optional(),
 		taskId: z.string().uuid().optional(),
 		agents: z.array(agentLaunchSchema).optional(),
 		// Desktop "Wait for workspace setup before starting agents" setting,
@@ -448,6 +459,7 @@ async function createRepositoryCheckouts(
 		repositoryProjects: ReturnType<typeof listRepositoryProjects>;
 		baseBranches?: Record<string, string>;
 		pullRequests?: Record<string, PrMetadata>;
+		worktrees?: Record<string, AdoptableWorktree>;
 		/** Used by each repository that has this branch and no base of its own. */
 		sharedBaseBranch?: string;
 	},
@@ -456,11 +468,30 @@ async function createRepositoryCheckouts(
 	for (const repository of args.repositoryProjects) {
 		const worktreePath = join(args.root, basename(repository.repoPath));
 		const pr = args.pullRequests?.[repository.id];
-		const branch = pr ? derivePrLocalBranchName(pr) : args.branch;
+		const adopted = args.worktrees?.[repository.id];
+		const branch = adopted
+			? adopted.branch
+			: pr
+				? derivePrLocalBranchName(pr)
+				: args.branch;
 		let createdBranch = false;
+		let movedFrom: string | undefined;
 		try {
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
+			if (adopted) {
+				await git.raw(["worktree", "move", adopted.path, worktreePath]);
+				movedFrom = adopted.path;
+				created.push(
+					insertRepositoryCheckout(ctx, args, repository, {
+						worktreePath,
+						branch,
+						createdBranch,
+						movedFrom,
+					}),
+				);
+				continue;
+			}
 			if (pr) {
 				const materialized = await materializePrBranch({
 					git,
@@ -539,6 +570,7 @@ async function createRepositoryCheckouts(
 					worktreePath,
 					branch,
 					createdBranch,
+					movedFrom,
 				},
 			]);
 			throw new TRPCError({
@@ -562,7 +594,12 @@ function insertRepositoryCheckout(
 	ctx: HostServiceContext,
 	args: { parentId: string; name: string },
 	repository: ReturnType<typeof listRepositoryProjects>[number],
-	checkout: { worktreePath: string; branch: string; createdBranch: boolean },
+	checkout: {
+		worktreePath: string;
+		branch: string;
+		createdBranch: boolean;
+		movedFrom?: string;
+	},
 ): CreatedCheckout {
 	const id = randomUUID();
 	const now = Date.now();
@@ -627,6 +664,71 @@ async function fetchRepositoryPullRequests(
 	return { order, byRepository };
 }
 
+interface AdoptableWorktree {
+	path: string;
+	branch: string;
+}
+
+/** Each existing worktree to move in, checked before any checkout so a bad one changes nothing. */
+async function resolveRepositoryWorktrees(
+	ctx: HostServiceContext,
+	repositories: ReturnType<typeof listRepositoryProjects>,
+	requested: Record<string, string>,
+	pullRequestRepositoryIds: string[],
+): Promise<{
+	order: string[];
+	byRepository: Record<string, AdoptableWorktree>;
+}> {
+	const order = Object.keys(requested);
+	const byRepository: Record<string, AdoptableWorktree> = {};
+	for (const repositoryId of order) {
+		const repository = repositories.find((repo) => repo.id === repositoryId);
+		if (!repository) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `Repository ${repositoryId} is not part of this project`,
+			});
+		}
+		const name = basename(repository.repoPath);
+		if (pullRequestRepositoryIds.includes(repositoryId)) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `${name} cannot start from both a PR and an existing worktree`,
+			});
+		}
+		const path = normalizeWorktreePath(requested[repositoryId] as string);
+		const record = (
+			await listGitWorktrees(await ctx.git(repository.repoPath))
+		).find((worktree) => normalizeWorktreePath(worktree.path) === path);
+		if (
+			!record?.branch ||
+			record.bare ||
+			record.prunable ||
+			path === normalizeWorktreePath(repository.repoPath)
+		) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `${path} is not a worktree of ${name} that can be moved`,
+			});
+		}
+		if (record.locked) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `The worktree at ${path} is locked`,
+			});
+		}
+		const owners = findWorktreeOwners(ctx.db, repository.repoPath);
+		if (findWorktreeOwner(owners, { path, branch: record.branch })) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `The worktree at ${path} already belongs to a workspace`,
+			});
+		}
+		byRepository[repositoryId] = { path: record.path, branch: record.branch };
+	}
+	return { order, byRepository };
+}
+
 interface RepositoryCheckout {
 	/** Null before its row exists. */
 	id: string | null;
@@ -635,6 +737,8 @@ interface RepositoryCheckout {
 	branch: string;
 	/** The checkout created this branch, so removing the checkout deletes it. */
 	createdBranch: boolean;
+	/** An adopted worktree's original path; undoing moves it back there. */
+	movedFrom?: string;
 }
 
 type CreatedCheckout = RepositoryCheckout & { id: string };
@@ -647,9 +751,10 @@ async function removeRepositoryCheckouts(
 	for (const checkout of checkouts) {
 		try {
 			const git = await ctx.git(checkout.repoPath);
-			await git
-				.raw(["worktree", "remove", "--force", checkout.worktreePath])
-				.catch(() => {});
+			const undo = checkout.movedFrom
+				? ["worktree", "move", checkout.worktreePath, checkout.movedFrom]
+				: ["worktree", "remove", "--force", checkout.worktreePath];
+			await git.raw(undo).catch(() => {});
 			if (checkout.createdBranch) {
 				await git.raw(["branch", "-D", checkout.branch]).catch(() => {});
 			}
@@ -721,10 +826,19 @@ async function createContainerWorkspace(
 			: (input.repositoryPullRequests ?? {}),
 	);
 	const firstPr = pullRequests.byRepository[pullRequests.order[0] ?? ""];
+	const adopted = await resolveRepositoryWorktrees(
+		ctx,
+		repositories,
+		input.repositoryWorktrees ?? {},
+		pullRequests.order,
+	);
+	const firstAdopted = adopted.byRepository[adopted.order[0] ?? ""];
 	const composerPrompt =
 		input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
 	const typedBranch =
-		input.branch?.trim() || (firstPr ? derivePrLocalBranchName(firstPr) : "");
+		input.branch?.trim() ||
+		(firstPr ? derivePrLocalBranchName(firstPr) : "") ||
+		(firstAdopted?.branch ?? "");
 	const candidate =
 		typedBranch ||
 		(input.name ? sanitizeBranchCandidate(input.name) : "") ||
@@ -778,6 +892,7 @@ async function createContainerWorkspace(
 			repositoryProjects: repositories,
 			baseBranches: input.repositoryBaseBranches,
 			pullRequests: pullRequests.byRepository,
+			worktrees: adopted.byRepository,
 			sharedBaseBranch: input.baseBranch,
 		});
 	} catch (error) {
