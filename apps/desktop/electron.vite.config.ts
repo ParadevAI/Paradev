@@ -121,6 +121,7 @@ export default defineConfig({
 
 		build: {
 			sourcemap: true,
+			externalizeDeps: false,
 			rollupOptions: {
 				input: {
 					index: resolve("src/main/index.ts"),
@@ -170,6 +171,7 @@ export default defineConfig({
 
 		build: {
 			outDir: resolve(devPath, "preload"),
+			externalizeDeps: false,
 			rollupOptions: {
 				input: {
 					index: resolve("src/preload/index.ts"),
