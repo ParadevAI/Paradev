@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type PullRequestAppGatedFields,
+	type PullRequestAppGatedQuery,
 	type PullRequestDetailQuery,
 	PullRequestReadError,
 	readPullRequestDetail,
@@ -14,6 +15,19 @@ type PullRequestFixture = NonNullable<
 	PullRequestAppGatedFields;
 
 const isAppGatedRead = (query: string) => query.includes("isMergeQueueEnabled");
+
+function appGatedRead(
+	pr: PullRequestAppGatedFields = pullRequest().repository.pullRequest,
+): PullRequestAppGatedQuery {
+	return {
+		repository: {
+			adminMerge: { viewerCanMergeAsAdmin: pr.viewerCanMergeAsAdmin },
+			queueEntry: { mergeQueueEntry: pr.mergeQueueEntry },
+			queueEnabled: { isMergeQueueEnabled: pr.isMergeQueueEnabled },
+			protection: { baseRef: pr.baseRef },
+		},
+	};
+}
 
 function pullRequest(overrides: Partial<PullRequestFixture> = {}): {
 	repository: Omit<
@@ -102,9 +116,8 @@ describe("readPullRequestDetail", () => {
 					query: string,
 					variables: Record<string, unknown>,
 				) => {
-					if (!isAppGatedRead(query)) {
-						queries.push(String(variables.cursor ?? "first"));
-					}
+					if (isAppGatedRead(query)) return appGatedRead() as T;
+					queries.push(String(variables.cursor ?? "first"));
 					if (variables.cursor === "c1") {
 						return {
 							repository: {
@@ -195,11 +208,22 @@ describe("readPullRequestDetail", () => {
 		expect(error.code).toBe("NOT_FOUND");
 	});
 
-	test("fields the GitHub App may not read fall back instead of failing the read", async () => {
+	test("fields the GitHub App may not read fall back, one by one, instead of failing the read", async () => {
 		const refused = Object.assign(new Error("Resource not accessible"), {
-			errors: [{ type: "FORBIDDEN", path: ["repository", "pullRequest"] }],
-			data: { repository: { pullRequest: null } },
+			errors: [
+				{
+					type: "FORBIDDEN",
+					path: ["repository", "queueEnabled", "isMergeQueueEnabled"],
+				},
+			],
+			data: {
+				repository: {
+					...appGatedRead().repository,
+					queueEnabled: null,
+				},
+			},
 		});
+		const refusals: unknown[] = [];
 		const detail = await readPullRequestDetail(
 			{
 				graphql: async <T>(query: string) => {
@@ -214,14 +238,14 @@ describe("readPullRequestDetail", () => {
 				requestedReviewers: async () => ({ users: [], teams: [] }),
 			},
 			input,
+			{ onRefused: (error) => refusals.push(error) },
 		);
+		expect(refusals).toEqual([refused]);
 		expect(detail.mergeability).toMatchObject({
-			requiredApprovals: 0,
-			requiresThreadResolution: false,
-			queue: null,
+			requiredApprovals: 2,
+			requiresThreadResolution: true,
 			queueEnabled: false,
 		});
-		expect(detail.capabilities.merge).toBe(true);
 	});
 
 	test("requested reviewers are asked for alongside the main read, not after it", async () => {
@@ -231,7 +255,7 @@ describe("readPullRequestDetail", () => {
 			{
 				graphql: <T>(query: string) =>
 					isAppGatedRead(query)
-						? Promise.resolve(pullRequest() as T)
+						? Promise.resolve(appGatedRead() as T)
 						: new Promise<T>((resolve) => {
 								releaseRead = () =>
 									resolve(

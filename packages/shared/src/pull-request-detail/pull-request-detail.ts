@@ -186,13 +186,14 @@ query($owner: String!, $name: String!, $number: Int!, $activity: Boolean = false
 
 // A GitHub App user token without the App's Administration and Merge queues
 // permissions is refused these fields, and GitHub then fails the whole query.
+// One alias per field: a refused non-null field nulls only its own alias.
 const APP_GATED_FIELDS_QUERY = `
 query($owner: String!, $name: String!, $number: Int!) {
 	repository(owner: $owner, name: $name) {
-		pullRequest(number: $number) {
-			viewerCanMergeAsAdmin
-			mergeQueueEntry { position state }
-			isMergeQueueEnabled
+		adminMerge: pullRequest(number: $number) { viewerCanMergeAsAdmin }
+		queueEntry: pullRequest(number: $number) { mergeQueueEntry { position state } }
+		queueEnabled: pullRequest(number: $number) { isMergeQueueEnabled }
+		protection: pullRequest(number: $number) {
 			baseRef {
 				branchProtectionRule {
 					requiredApprovingReviewCount
@@ -325,8 +326,19 @@ export interface PullRequestAppGatedFields {
 	} | null;
 }
 
-interface PullRequestAppGatedQuery {
-	repository: { pullRequest: PullRequestAppGatedFields | null } | null;
+export interface PullRequestAppGatedQuery {
+	repository: {
+		adminMerge?: Pick<
+			PullRequestAppGatedFields,
+			"viewerCanMergeAsAdmin"
+		> | null;
+		queueEntry?: Pick<PullRequestAppGatedFields, "mergeQueueEntry"> | null;
+		queueEnabled?: Pick<
+			PullRequestAppGatedFields,
+			"isMergeQueueEnabled"
+		> | null;
+		protection?: Pick<PullRequestAppGatedFields, "baseRef"> | null;
+	} | null;
 }
 
 function isOnlyForbidden(error: unknown): error is { data?: unknown } {
@@ -345,30 +357,31 @@ function isOnlyForbidden(error: unknown): error is { data?: unknown } {
 async function readAppGatedFields(
 	client: PullRequestDetailClient,
 	input: PullRequestDetailInput,
+	onRefused: (error: unknown) => void,
 ): Promise<PullRequestAppGatedFields> {
 	try {
 		const data = await client.graphql<PullRequestAppGatedQuery>(
 			APP_GATED_FIELDS_QUERY,
 			variables(input),
 		);
-		return appGatedFields(data.repository?.pullRequest);
+		return appGatedFields(data);
 	} catch (error) {
 		if (!isOnlyForbidden(error)) throw error;
-		return appGatedFields(
-			(error.data as PullRequestAppGatedQuery | undefined)?.repository
-				?.pullRequest,
-		);
+		onRefused(error);
+		return appGatedFields(error.data as PullRequestAppGatedQuery | undefined);
 	}
 }
 
 function appGatedFields(
-	read: Partial<PullRequestAppGatedFields> | null | undefined,
+	read: PullRequestAppGatedQuery | undefined,
 ): PullRequestAppGatedFields {
+	const repository = read?.repository;
 	return {
-		viewerCanMergeAsAdmin: read?.viewerCanMergeAsAdmin ?? false,
-		mergeQueueEntry: read?.mergeQueueEntry ?? null,
-		isMergeQueueEnabled: read?.isMergeQueueEnabled ?? false,
-		baseRef: read?.baseRef ?? null,
+		viewerCanMergeAsAdmin:
+			repository?.adminMerge?.viewerCanMergeAsAdmin ?? false,
+		mergeQueueEntry: repository?.queueEntry?.mergeQueueEntry ?? null,
+		isMergeQueueEnabled: repository?.queueEnabled?.isMergeQueueEnabled ?? false,
+		baseRef: repository?.protection?.baseRef ?? null,
 	};
 }
 
@@ -556,14 +569,22 @@ function variables(input: PullRequestDetailInput, cursor?: string) {
 export async function readPullRequestDetail(
 	client: PullRequestDetailClient,
 	input: PullRequestDetailInput,
-	options: { activity?: boolean } = {},
+	options: {
+		activity?: boolean;
+		/** GitHub refused some App-gated fields; the read goes on without them. */
+		onRefused?: (error: unknown) => void;
+	} = {},
 ): Promise<PullRequestDetailRead> {
 	const activity = options.activity ?? false;
 	const requestedReviewers = client.requestedReviewers(input);
 	// Awaited below; this only stops an unhandled rejection when the read
 	// above fails first.
 	requestedReviewers.catch(() => {});
-	const gatedRead = readAppGatedFields(client, input);
+	const gatedRead = readAppGatedFields(
+		client,
+		input,
+		options.onRefused ?? (() => {}),
+	);
 	gatedRead.catch(() => {});
 	const data = await client.graphql<PullRequestDetailQuery>(
 		PULL_REQUEST_DETAIL_QUERY,
