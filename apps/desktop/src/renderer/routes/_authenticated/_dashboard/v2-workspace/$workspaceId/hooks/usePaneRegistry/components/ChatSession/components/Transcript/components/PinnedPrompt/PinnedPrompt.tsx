@@ -7,15 +7,18 @@ import { useScrolledPast } from "./hooks/useScrolledPast";
 
 /** It repeats a message already in the transcript, so it is hidden from readers and the pointer. */
 export function PinnedPrompt({
+	droppedByWindow,
 	messageId,
 	text,
 	viewport,
 }: {
+	/** The transcript window no longer renders the row, so it is above the fold. */
+	droppedByWindow: boolean;
 	messageId: string | null;
 	text: string;
 	viewport: HTMLElement | null;
 }) {
-	const scrolledPast = useScrolledPast(viewport, messageId);
+	const scrolledPast = useScrolledPast(viewport, messageId, droppedByWindow);
 	if (!scrolledPast) return null;
 	return (
 		<div
