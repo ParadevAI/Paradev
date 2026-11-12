@@ -22,6 +22,7 @@ import { HostHeader } from "./components/HostHeader";
 import { HostServiceSection } from "./components/HostServiceSection";
 import type { MemberRowData } from "./components/MembersTable";
 import { MembersTable } from "./components/MembersTable";
+import { PowerSection } from "./components/PowerSection";
 import { WorktreeLocationSection } from "./components/WorktreeLocationSection";
 import { useHostLastSeenAt } from "./hooks/useHostLastSeenAt";
 
@@ -196,6 +197,15 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 					isOnline={hostIsOnline || !isRemoteTarget}
 					canEdit={isOwner}
 				/>
+
+				{hostId === machineId && (
+					<PowerSection
+						key={hostId}
+						hostUrl={hostUrl}
+						isOnline={hostIsOnline}
+						canEdit={isOwner}
+					/>
+				)}
 
 				{hostId === machineId && (
 					<section className="space-y-3">

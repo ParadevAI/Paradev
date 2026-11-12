@@ -5880,6 +5880,9 @@ msgstr "Pläne konnten nicht geladen werden."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "Plugins konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut."
 
+msgid "Could not load power settings."
+msgstr "Die Energieeinstellungen konnten nicht geladen werden."
+
 msgid "Could not load presets from the host"
 msgstr "Presets konnten nicht vom Host geladen werden"
 
@@ -10900,6 +10903,9 @@ msgstr "{planLabel} behalten"
 msgid "Keep {planName}"
 msgstr "{planName} behalten"
 
+msgid "Keep awake while agents work"
+msgstr "Ruhezustand verhindern, während Agenten arbeiten"
+
 msgid "Keep current version"
 msgstr "Aktuelle Version behalten"
 
@@ -10911,6 +10917,9 @@ msgstr "Weiter bearbeiten"
 
 msgid "Keep paused"
 msgstr "Pausiert lassen"
+
+msgid "Keep this computer awake while agents work. The display can still turn off."
+msgstr "Verhindert den Ruhezustand dieses Computers, während Agenten arbeiten. Der Bildschirm kann sich weiterhin ausschalten."
 
 msgid "Keep typing an email to invite"
 msgstr "Gib weiter eine E-Mail-Adresse ein, um einzuladen"
@@ -15219,6 +15228,9 @@ msgstr "Kommentar posten"
 
 msgid "Post reply"
 msgstr "Antwort posten"
+
+msgid "Power"
+msgstr "Energie"
 
 msgid "PR"
 msgstr "PR"

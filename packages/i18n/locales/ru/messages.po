@@ -5880,6 +5880,9 @@ msgstr "Не удалось загрузить тарифы."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "Не удалось загрузить плагины. Проверьте подключение и попробуйте снова."
 
+msgid "Could not load power settings."
+msgstr "Не удалось загрузить настройки питания."
+
 msgid "Could not load presets from the host"
 msgstr "Не удалось загрузить пресеты с хоста"
 
@@ -10900,6 +10903,9 @@ msgstr "Оставить {planLabel}"
 msgid "Keep {planName}"
 msgstr "Оставить {planName}"
 
+msgid "Keep awake while agents work"
+msgstr "Не переходить в сон, пока агенты работают"
+
 msgid "Keep current version"
 msgstr "Оставить текущую версию"
 
@@ -10911,6 +10917,9 @@ msgstr "Продолжить редактирование"
 
 msgid "Keep paused"
 msgstr "Оставить на паузе"
+
+msgid "Keep this computer awake while agents work. The display can still turn off."
+msgstr "Не позволяет этому компьютеру переходить в спящий режим, пока агенты работают. Экран при этом может выключаться."
 
 msgid "Keep typing an email to invite"
 msgstr "Продолжайте вводить email, чтобы пригласить"
@@ -15219,6 +15228,9 @@ msgstr "Отправить комментарий"
 
 msgid "Post reply"
 msgstr "Отправить ответ"
+
+msgid "Power"
+msgstr "Питание"
 
 msgid "PR"
 msgstr "PR"
