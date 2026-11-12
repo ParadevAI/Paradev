@@ -1,9 +1,12 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { CommandLineToolsInstallPhase } from "../../hooks/useCommandLineToolsInstall";
 import { GitSetupRow } from "./GitSetupRow";
 
-afterEach(cleanup);
+afterEach(() => {
+	cleanup();
+	mock.restore();
+});
 
 const MISSING = { installed: false, needsCommandLineTools: true, error: null };
 
@@ -21,8 +24,7 @@ function renderRow(phase: CommandLineToolsInstallPhase, stillMissing = false) {
 
 describe("GitSetupRow", () => {
 	test("each failure gives a message, Try again, Check again and Apple's download page", () => {
-		const open = mock((_url?: string | URL) => null);
-		window.open = open as unknown as typeof window.open;
+		const open = spyOn(window, "open").mockReturnValue(null);
 		const cases: Array<[CommandLineToolsInstallPhase, string]> = [
 			[
 				{ kind: "closed" },

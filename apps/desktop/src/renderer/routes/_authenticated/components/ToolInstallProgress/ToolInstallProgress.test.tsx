@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
 import {
 	cleanup,
 	fireEvent,
@@ -9,7 +9,10 @@ import {
 import type { ToolInstallFailure } from "./hooks/useToolInstallState";
 import { ToolInstallProgress } from "./ToolInstallProgress";
 
-afterEach(cleanup);
+afterEach(() => {
+	cleanup();
+	mock.restore();
+});
 
 const ZIP =
 	"https://github.com/cli/cli/releases/download/v2.103.3/gh_2.103.3_macOS_arm64.zip";
@@ -33,8 +36,7 @@ function renderFailed(
 
 describe("ToolInstallProgress", () => {
 	test("each failure has a plain message, Try again and the manual download", () => {
-		const open = mock((_url?: string | URL) => null);
-		window.open = open as unknown as typeof window.open;
+		const open = spyOn(window, "open").mockReturnValue(null);
 		const cases: Array<[ToolInstallFailure, RegExp]> = [
 			["offline", /Couldn't reach GitHub/],
 			["rate-limited", /GitHub is limiting downloads/],
