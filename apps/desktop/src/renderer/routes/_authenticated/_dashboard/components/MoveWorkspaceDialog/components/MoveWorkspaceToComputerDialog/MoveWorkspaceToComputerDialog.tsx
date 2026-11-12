@@ -93,12 +93,13 @@ export function MoveWorkspaceToComputerDialog({
 			onBegun: progress.begun,
 			signal: progress.signal,
 		})
-			.then(({ toWorkspaceId, stayed }) =>
+			.then(({ toWorkspaceId, stayed, terminalsStayed }) => {
 				progress.follow(toWorkspaceId, {
 					stayed,
 					open: () => void navigateToV2Workspace(toWorkspaceId, navigate),
-				}),
-			)
+				});
+				void terminalsStayed.then(progress.alsoStayed);
+			})
 			.catch((error: unknown) =>
 				progress.fail(
 					isMissingProcedureError(error)
@@ -122,8 +123,9 @@ export function MoveWorkspaceToComputerDialog({
 						<Trans>
 							Its work, including uncommitted changes, is pushed to a new
 							branch. A workspace on the computer you pick starts from that
-							branch, and each Claude chat continues there. Agents that are
-							working stop first. Terminals and other chats stay where they are.
+							branch, and each Claude chat continues there, also Claude in a
+							terminal. Agents that are working stop first. Other terminals and
+							chats stay where they are.
 						</Trans>
 					</AlertDialogDescription>
 				</AlertDialogHeader>

@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Usuń mimo to} few {Usuń # mimo to}
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {scalono # PR agenta} few {scalono # PR agenta} many {scalono # PR agenta} other {scalono # PR agenta}}"
 
+msgid "{title} (terminal)"
+msgstr "{title} (terminal)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} przerwane"
 
@@ -10779,8 +10782,8 @@ msgstr "Jego wtyczki pojawią się po zakończeniu synchronizacji."
 msgid "Its replies go with it."
 msgstr "Odpowiedzi też zostaną usunięte."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na wybranym komputerze startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany. Pracujący agenci najpierw się zatrzymują. Terminale i pozostałe czaty zostają tam, gdzie są."
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na wybranym komputerze startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany, także Claude w terminalu. Pracujący agenci najpierw się zatrzymują. Pozostałe terminale i czaty zostają tam, gdzie są."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Jej obszary robocze i terminale są niedostępne do czasu restartu. Użyj menu zasobnika Paradev > Usługa hosta > Uruchom ponownie."
@@ -23089,8 +23092,8 @@ msgstr "Twoje projekty i obszary robocze z v1 są przenoszone do nowego Paradev.
 msgid "Your version: {currentVersion}"
 msgstr "Twoja wersja: {currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Twoja praca, w tym niezatwierdzone zmiany, zostanie wypchnięta do nowej gałęzi w repozytorium zdalnym. Obszar roboczy w chmurze uruchomi się z tej gałęzi w wybranym środowisku, a każdy czat z Claude będzie tam kontynuowany. Pracujący agenci najpierw się zatrzymają. Terminale i pozostałe czaty zostaną tutaj."
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "Twoja praca, w tym niezatwierdzone zmiany, zostanie wypchnięta do nowej gałęzi w repozytorium zdalnym. Obszar roboczy w chmurze uruchomi się z tej gałęzi w wybranym środowisku, a każdy czat z Claude będzie tam kontynuowany, także Claude w terminalu. Pracujący agenci najpierw się zatrzymają. Pozostałe terminale i czaty zostaną tutaj."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Logowanie kodem urządzenia dla Codex włącza administrator Twojego obszaru roboczego."

@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Tetap hapus} other {Tetap hapus #}}"
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 
+msgid "{title} (terminal)"
+msgstr "{title} (terminal)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
 
@@ -10779,8 +10782,8 @@ msgstr "Plugin-pluginnya muncul setelah sinkronisasi selesai."
 msgid "Its replies go with it."
 msgstr "Balasannya ikut terhapus."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di komputer yang Anda pilih dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di komputer yang Anda pilih dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana, termasuk Claude di terminal. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Workspace dan terminalnya tidak tersedia sampai layanan ini dimulai ulang. Pakai menu tray Paradev > Host Service > Restart."
@@ -23089,8 +23092,8 @@ msgstr "Proyek dan workspace v1 Anda sedang dipindahkan ke Paradev yang baru. Se
 msgid "Your version: {currentVersion}"
 msgstr "Versi Anda: {currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di sini."
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan setiap chat Claude berlanjut di sana, termasuk Claude di terminal. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di sini."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Admin workspace Anda mengaktifkan masuk dengan kode perangkat untuk Codex."

@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {仍然刪除} other {仍然刪除#�
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {已合併 # 個智慧代理 PR}}"
 
+msgid "{title} (terminal)"
+msgstr "{title}（終端機）"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中斷"
 
@@ -10779,8 +10782,8 @@ msgstr "同步完成後，其外掛會顯示出來。"
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "它的工作（包括未提交的變更）會推送到一個新分支。所選電腦上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "它的工作（包括未提交的變更）會推送到一個新分支。所選電腦上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續，終端機中的 Claude 也一樣。正在工作的代理程式會先停止。其他終端機和聊天保持不變。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重啟之前，其工作區和終端都不可用，請使用Paradev托盤選單 > 主機服務 > 重啟。"
@@ -23089,8 +23092,8 @@ msgstr "你的 v1 專案和工作區正在移轉到新版 Paradev。每一項準
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "你的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，每個 Claude 聊天都將在那裡繼續。正在工作的代理程式會先停止。終端和其他聊天會留在這裡。"
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "你的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，每個 Claude 聊天都將在那裡繼續，終端機中的 Claude 也一樣。正在工作的代理程式會先停止。其他終端和聊天會留在這裡。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的裝置碼登入由你的工作區管理員開啟。"

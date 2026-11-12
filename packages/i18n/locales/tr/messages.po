@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Yine de sil} other {Yine de # tanesi
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'ı birleştirildi}}"
 
+msgid "{title} (terminal)"
+msgstr "{title} (terminal)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
 
@@ -10779,8 +10782,8 @@ msgstr "Eklentileri eşitleme bitince görünür."
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Seçtiğiniz bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. Seçtiğiniz bilgisayardaki çalışma alanı bu branch'ten başlar ve her Claude sohbeti, terminaldeki Claude da dahil, orada devam eder. Çalışan ajanlar önce durur. Diğer terminaller ve sohbetler oldukları yerde kalır."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz. Paradev tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
@@ -23089,8 +23092,8 @@ msgstr "v1 projeleriniz ve çalışma alanlarınız yeni Paradev'e aktarılıyor
 msgid "Your version: {currentVersion}"
 msgstr "Sürümünüz: {currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Commit edilmemiş değişiklikler dahil çalışmanız uzak depoda yeni bir dala gönderilir. Seçtiğiniz ortamda bu daldan bir bulut çalışma alanı başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler burada kalır."
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "Commit edilmemiş değişiklikler dahil çalışmanız uzak depoda yeni bir dala gönderilir. Seçtiğiniz ortamda bu daldan bir bulut çalışma alanı başlar ve her Claude sohbeti, terminaldeki Claude da dahil, orada devam eder. Çalışan ajanlar önce durur. Diğer terminaller ve sohbetler burada kalır."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex için cihaz koduyla girişi çalışma alanı yöneticiniz açar."

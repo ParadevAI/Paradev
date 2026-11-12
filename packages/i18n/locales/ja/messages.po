@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {それでも削除} other {それで
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 
+msgid "{title} (terminal)"
+msgstr "{title}（ターミナル）"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
 
@@ -10779,8 +10782,8 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。選んだコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。選んだコンピューター上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。ターミナル内の Claude も同様です。作業中のエージェントは先に停止します。その他のターミナルとチャットはそのまま残ります。"
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません。Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
@@ -23089,8 +23092,8 @@ msgstr "v1 のプロジェクトとワークスペースを新しい Paradev に
 msgid "Your version: {currentVersion}"
 msgstr "現在のバージョン: {currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "コミットされていない変更を含む作業は、リモートの新しいブランチにプッシュされます。選択した環境でそのブランチからクラウドワークスペースが起動し、Claude の各チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはここに残ります。"
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "コミットされていない変更を含む作業は、リモートの新しいブランチにプッシュされます。選択した環境でそのブランチからクラウドワークスペースが起動し、Claude の各チャットはそこで続きます。ターミナル内の Claude も同様です。作業中のエージェントは先に停止します。その他のターミナルとチャットはここに残ります。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex のデバイスコードによるサインインは、ワークスペースの管理者が有効にします。"

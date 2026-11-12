@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Přesto smazat} few {Přesto smazat 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agenta} many {sloučeno # PR agenta} other {sloučeno # PR agenta}}"
 
+msgid "{title} (terminal)"
+msgstr "{title} (terminál)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
 
@@ -10779,8 +10782,8 @@ msgstr "Jeho pluginy se objeví po dokončení synchronizace."
 msgid "Its replies go with it."
 msgstr "Smažou se i odpovědi."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na vybraném počítači začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na vybraném počítači začne z této větve a každý chat Claude tam bude pokračovat, i Claude v terminálu. Agenti, kteří pracují, se nejdřív zastaví. Ostatní terminály a chaty zůstanou, kde jsou."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Její pracovní prostory a terminály nebudou dostupné, dokud se nerestartuje. Použijte nabídku Paradev na liště > Host Service > Restart."
@@ -23089,8 +23092,8 @@ msgstr "Vaše projekty a pracovní prostory z v1 se přenášejí do nového Par
 msgid "Your version: {currentVersion}"
 msgstr "Vaše verze: {currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Vaše práce, včetně nepotvrzených změn, se odešle do nové větve ve vzdáleném repozitáři. Z této větve se v prostředí, které vyberete, spustí cloudový pracovní prostor a každý chat s Claude tam bude pokračovat. Agenti, kteří pracují, se nejprve zastaví. Terminály a ostatní chaty zůstanou zde."
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "Vaše práce, včetně nepotvrzených změn, se odešle do nové větve ve vzdáleném repozitáři. Z této větve se v prostředí, které vyberete, spustí cloudový pracovní prostor a každý chat s Claude tam bude pokračovat, i Claude v terminálu. Agenti, kteří pracují, se nejprve zastaví. Ostatní terminály a chaty zůstanou zde."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Přihlášení kódem zařízení pro Codex zapíná správce vašeho pracovního prostoru."

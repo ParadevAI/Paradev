@@ -15,8 +15,13 @@ import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/reque
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
+import {
+	handOffTerminals,
+	type MovingTerminal,
+} from "../../utils/handOffTerminals";
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
+import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
@@ -30,7 +35,8 @@ export type MoveDestination = { hostId: string; name: string | null };
  * on a computer: its work comes over on one branch, and each of its chats
  * moves on its own. The control plane records the moves; this desktop
  * carries them out, since the control plane cannot reach a computer's
- * host-service to bring a chat in. Returns the chats that could not move.
+ * host-service to bring a chat in. Its terminal agents start again there
+ * too. Returns the chats that could not move, and later the terminals.
  */
 export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { t } = useLingui();
@@ -99,10 +105,11 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				});
 			onBegun?.(workspaceMoveId);
 			const target = getHostServiceClientByUrl(destinationUrl);
-			const leaving: { source: HostServiceClient | null; chats: string[] } = {
-				source: null,
-				chats: [],
-			};
+			const leaving: {
+				source: HostServiceClient | null;
+				chats: string[];
+				terminals: string[];
+			} = { source: null, chats: [], terminals: [] };
 			const { prepared, project, created, moves, skipped } =
 				await keepMoveAlive({
 					workspaceMoveId,
@@ -124,6 +131,9 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 							stopIfBusy: true,
 						});
 						leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
+						leaving.terminals = (prepared.terminals ?? []).map(
+							(terminal) => terminal.terminalId,
+						);
 						const project = requireProject(prepared.repositoryFullName);
 						moveSignal.throwIfAborted();
 
@@ -171,6 +181,11 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 					if (leaving.source) {
 						await releaseSourceChats(leaving.source, leaving.chats);
+						await releaseSourceTerminals(
+							leaving.source,
+							workspace.id,
+							leaving.terminals,
+						);
 					}
 					throw error;
 				});
@@ -207,12 +222,36 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					);
 				}
 			})();
+			const terminalName = (title: string) =>
+				t({ message: `${title} (terminal)` });
+			// A host older than terminal moves returns neither list.
+			const terminals: MovingTerminal[] = prepared.terminals ?? [];
+			const terminalsStayed = leaving.source
+				? handOffTerminals({
+						terminals,
+						source: leaving.source,
+						sourceWorkspaceId: workspace.id,
+						toWorkspaceId: created.workspaceId,
+						connect: async () => target,
+						resolveUrls: (fileIds) =>
+							cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
+					})
+				: Promise.resolve([]);
 			return {
 				toWorkspaceId: created.workspaceId,
 				stayed: [
 					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
-				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
+				]
+					.map((chat) => chat.title ?? t({ message: "Untitled chat" }))
+					.concat(
+						(prepared.skippedTerminals ?? [])
+							.filter((terminal) => terminal.reason !== "not_started")
+							.map((terminal) => terminalName(terminal.title)),
+					),
+				terminalsStayed: terminalsStayed.then((titles) =>
+					titles.map(terminalName),
+				),
 			};
 		},
 		[

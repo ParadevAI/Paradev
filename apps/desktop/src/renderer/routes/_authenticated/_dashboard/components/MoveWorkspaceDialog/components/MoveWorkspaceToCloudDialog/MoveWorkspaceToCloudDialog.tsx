@@ -110,12 +110,13 @@ export function MoveWorkspaceToCloudDialog({
 			onBegun: progress.begun,
 			signal: progress.signal,
 		})
-			.then(({ toWorkspaceId, stayed }) =>
+			.then(({ toWorkspaceId, stayed, terminalsStayed }) => {
 				progress.follow(toWorkspaceId, {
 					stayed,
 					open: () => void navigateToV2Workspace(toWorkspaceId, navigate),
-				}),
-			)
+				});
+				void terminalsStayed.then(progress.alsoStayed);
+			})
 			.catch((error: unknown) =>
 				progress.fail(
 					isMissingProcedureError(error)
@@ -141,8 +142,8 @@ export function MoveWorkspaceToCloudDialog({
 								Your work, including uncommitted changes, is pushed to a new
 								branch on the remote. A cloud workspace starts from that branch
 								in the environment you pick, and each Claude chat continues
-								there. Agents that are working stop first. Terminals and other
-								chats stay here.
+								there, also Claude in a terminal. Agents that are working stop
+								first. Other terminals and chats stay here.
 							</Trans>
 						</DialogDescription>
 					</DialogHeader>

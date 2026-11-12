@@ -7,18 +7,29 @@ import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
+import {
+	handOffTerminals,
+	type MovingTerminal,
+} from "../../utils/handOffTerminals";
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
+import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToCloudStage = "saving" | "starting";
 
+/** How long moved terminals wait for the new cloud box to answer. */
+const BOX_CONNECT_ATTEMPTS = 120;
+const BOX_CONNECT_RETRY_MS = 5_000;
+
 /**
  * Moves a workspace on this computer into a new cloud workspace: its work
- * goes to one branch, and each of its chats moves on its own. Returns the
- * chats that could not move and stayed here.
+ * goes to one branch, and each of its chats moves on its own. Its terminal
+ * agents start again in the new workspace once its box answers. Returns the
+ * chats that could not move and stayed here, and later the terminals.
  */
 export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const { t } = useLingui();
@@ -74,7 +85,10 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				});
 			onBegun?.(workspaceMoveId);
 			const source = getHostServiceClientByUrl(activeHostUrl);
-			const leaving: { chats: string[] } = { chats: [] };
+			const leaving: { chats: string[]; terminals: string[] } = {
+				chats: [],
+				terminals: [],
+			};
 			const { prepared, created } = await keepMoveAlive({
 				workspaceMoveId,
 				signal,
@@ -89,6 +103,9 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 						stopIfBusy: true,
 					});
 					leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
+					leaving.terminals = (prepared.terminals ?? []).map(
+						(terminal) => terminal.terminalId,
+					);
 					assertEnvironmentOpens(prepared.repositoryFullName);
 					moveSignal.throwIfAborted();
 					onStage("starting");
@@ -108,6 +125,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			}).catch(async (error: unknown) => {
 				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 				await releaseSourceChats(source, leaving.chats);
+				await releaseSourceTerminals(source, workspace.id, leaving.terminals);
 				throw error;
 			});
 			const refused = new Set(
@@ -137,12 +155,39 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				rows ? [created, ...rows] : [created],
 			);
 			void utils.cloudWorkspace.list.invalidate();
+			const terminalName = (title: string) =>
+				t({ message: `${title} (terminal)` });
+			// A host older than terminal moves returns neither list.
+			const terminals: MovingTerminal[] = prepared.terminals ?? [];
+			const terminalsStayed = handOffTerminals({
+				terminals,
+				source,
+				sourceWorkspaceId: workspace.id,
+				toWorkspaceId: created.id,
+				connect: async () =>
+					getHostServiceClientByUrl(
+						(await requestSandboxAccess(created.id, true)).url,
+					),
+				resolveUrls: (fileIds) =>
+					cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
+				attempts: BOX_CONNECT_ATTEMPTS,
+				retryDelayMs: BOX_CONNECT_RETRY_MS,
+			});
 			return {
 				toWorkspaceId: created.id,
 				stayed: [
 					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
-				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
+				]
+					.map((chat) => chat.title ?? t({ message: "Untitled chat" }))
+					.concat(
+						(prepared.skippedTerminals ?? [])
+							.filter((terminal) => terminal.reason !== "not_started")
+							.map((terminal) => terminalName(terminal.title)),
+					),
+				terminalsStayed: terminalsStayed.then((titles) =>
+					titles.map(terminalName),
+				),
 			};
 		},
 		[

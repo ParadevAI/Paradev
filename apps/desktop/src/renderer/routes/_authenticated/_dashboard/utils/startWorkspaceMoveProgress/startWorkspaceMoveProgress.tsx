@@ -30,6 +30,8 @@ export interface WorkspaceMoveProgressHandle {
 		toWorkspaceId: string,
 		destination: { open: () => void; stayed: string[] },
 	) => void;
+	/** Names more of what stayed behind, while the toast still shows. */
+	alsoStayed: (names: readonly string[]) => void;
 	fail: (message: string) => void;
 }
 
@@ -99,6 +101,11 @@ export function startWorkspaceMoveProgress(args: {
 			update(id, { stage });
 		},
 		begun: (workspaceMoveId) => update(id, { workspaceMoveId }),
+		alsoStayed: (names) => {
+			const move = current();
+			if (!move || names.length === 0) return;
+			update(id, { stayed: [...move.stayed, ...names] });
+		},
 		fail: (message) => {
 			const move = current();
 			if (!move || move.stage === "cancelled") return;

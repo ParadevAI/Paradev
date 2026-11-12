@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Vẫn xóa} other {Vẫn xóa #}}"
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {đã hợp nhất # PR của tác nhân}}"
 
+msgid "{title} (terminal)"
+msgstr "{title} (terminal)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} bị gián đoạn"
 
@@ -10779,8 +10782,8 @@ msgstr "Plugin của nó sẽ hiện khi đồng bộ xong."
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính bạn chọn bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay where they are."
+msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên máy tính bạn chọn bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó, kể cả Claude trong terminal. Các agent đang làm việc sẽ dừng trước. Các terminal và cuộc trò chuyện khác vẫn ở nguyên chỗ."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại. Dùng menu khay Paradev > Host Service > Restart."
@@ -23089,8 +23092,8 @@ msgstr "Các dự án và workspace v1 của bạn đang được chuyển sang 
 msgid "Your version: {currentVersion}"
 msgstr "Phiên bản của bạn: {currentVersion}"
 
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Công việc của bạn, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới trên remote. Một không gian làm việc đám mây khởi động từ nhánh đó trong môi trường bạn chọn, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các tác tử đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở đây."
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there, also Claude in a terminal. Agents that are working stop first. Other terminals and chats stay here."
+msgstr "Công việc của bạn, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới trên remote. Một không gian làm việc đám mây khởi động từ nhánh đó trong môi trường bạn chọn, và mỗi cuộc trò chuyện Claude tiếp tục ở đó, kể cả Claude trong terminal. Các tác tử đang làm việc sẽ dừng trước. Các terminal và cuộc trò chuyện khác vẫn ở đây."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Quản trị viên không gian làm việc của bạn bật đăng nhập bằng mã thiết bị cho Codex."
