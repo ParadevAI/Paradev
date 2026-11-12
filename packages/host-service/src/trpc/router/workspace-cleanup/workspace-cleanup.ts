@@ -304,7 +304,7 @@ export async function destroyWorkspace(
 				await rm(join(root, file), { force: true });
 			}
 			await rmdir(root).catch((err) =>
-				console.warn(`[workspace-cleanup] left  on disk:`, err),
+				console.warn(`[workspace-cleanup] left ${root} on disk:`, err),
 			);
 		}
 		return result;
@@ -414,6 +414,7 @@ async function runDestroy(
 			project,
 			sharesProjectCheckout,
 			warnings,
+			isContainer: isContainerProject(checkout.project),
 		});
 		// Telemetry at the true commit: a failed destroy un-archives below and
 		// must not count, and a retried destroy must count exactly once.
@@ -503,10 +504,11 @@ async function runDestroyPhases(
 		project,
 		sharesProjectCheckout,
 		warnings,
+		isContainer,
 	}: Pick<
 		Awaited<ReturnType<typeof isLocalCheckoutWorkspace>>,
 		"local" | "project" | "sharesProjectCheckout"
-	> & { warnings: string[] },
+	> & { warnings: string[]; isContainer: boolean },
 ) {
 	// ─── Step 3: Local cleanup ─────────────────────────────────────
 	// 3a. PTYs
@@ -567,7 +569,7 @@ async function runDestroyPhases(
 				}
 			}
 		}
-	} else if (local && !project) {
+	} else if (local && !project && !isContainer) {
 		worktreeRemoved = isMissingPath(local.worktreePath, {
 			followSymlinks: false,
 		});

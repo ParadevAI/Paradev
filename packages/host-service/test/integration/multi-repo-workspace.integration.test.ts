@@ -89,7 +89,10 @@ test("a container workspace holds a checkout of every repository and removes the
 		workspace.id,
 	]);
 
-	await trpc.workspaceCleanup.destroy.mutate({ workspaceId: workspace.id });
+	const destroyed = await trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	expect(destroyed.warnings).toEqual([]);
 	expect(existsSync(root)).toBe(false);
 });
 
