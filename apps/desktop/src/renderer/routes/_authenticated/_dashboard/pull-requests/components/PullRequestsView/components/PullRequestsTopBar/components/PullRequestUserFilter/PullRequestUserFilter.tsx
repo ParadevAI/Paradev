@@ -264,7 +264,11 @@ export function PullRequestUserFilter({
 							!error &&
 							filtered.length === 0 &&
 							!showCustomOption &&
-							(!singleTarget ||
+							// A search that matches nobody and is not a valid login to
+							// filter by still needs to say so, even in a repo that has
+							// contributors — otherwise the list just goes blank.
+							(!!search ||
+								!singleTarget ||
 								(contributors && contributors.length === 0)) && (
 								<CommandEmpty>
 									{search ? (

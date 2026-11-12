@@ -168,6 +168,17 @@ const searchPullRequestsInputSchema = githubSearchInputSchema
 				"viewerRelationship cannot be combined with author, reviewer or review",
 			path: ["viewerRelationship"],
 		},
+	)
+	// `team-review-requested` compiles to `review-requested:@me`, the same
+	// qualifier `reviewer` emits. GitHub ORs repeated qualifiers, so the pair
+	// would widen the result set rather than intersect it.
+	.refine(
+		(input) => !input.reviewer || input.review !== "team-review-requested",
+		{
+			message:
+				"reviewer cannot be combined with the team-review-requested review filter",
+			path: ["reviewer"],
+		},
 	);
 
 function emptyPullRequestsPage(page: number): PullRequestsPage {

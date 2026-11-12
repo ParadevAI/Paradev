@@ -258,18 +258,37 @@ export function PullRequestsView({
 		navigateTo(buildSearch({ author: nextAuthor }));
 	};
 
+	// Both of these compile to a `review-requested:` qualifier, and GitHub ORs
+	// repeated qualifiers — asking for two at once widens the results instead
+	// of narrowing them, so picking either one drops the other.
 	const handleReviewerFilterChange = (nextReviewer: string | null) => {
 		cancelPendingSearchNavigation();
+		const clearsReview =
+			!!nextReviewer && reviewFilter === "team-review-requested";
 		storeSetReviewerFilter(nextReviewer);
-		navigateTo(buildSearch({ reviewer: nextReviewer }));
+		if (clearsReview) storeSetReviewFilter(null);
+		navigateTo(
+			buildSearch({
+				reviewer: nextReviewer,
+				...(clearsReview ? { review: null } : {}),
+			}),
+		);
 	};
 
 	const handleReviewFilterChange = (
 		nextReview: PullRequestReviewFilter | null,
 	) => {
 		cancelPendingSearchNavigation();
+		const clearsReviewer =
+			nextReview === "team-review-requested" && !!reviewerFilter;
 		storeSetReviewFilter(nextReview);
-		navigateTo(buildSearch({ review: nextReview }));
+		if (clearsReviewer) storeSetReviewerFilter(null);
+		navigateTo(
+			buildSearch({
+				review: nextReview,
+				...(clearsReviewer ? { reviewer: null } : {}),
+			}),
+		);
 	};
 
 	const list = usePullRequestsList({

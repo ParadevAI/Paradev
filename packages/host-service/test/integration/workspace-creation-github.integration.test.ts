@@ -488,6 +488,33 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 		);
 	});
 
+	test("searchPullRequests refuses a reviewer plus the team-review-requested filter", async () => {
+		// Both compile to `review-requested:`, and repeated qualifiers OR on
+		// GitHub — the pair would widen the results instead of intersecting.
+		await expect(
+			host.trpc.workspaceCreation.searchPullRequests.query({
+				projectId,
+				reviewer: "bob",
+				review: "team-review-requested",
+			}),
+		).rejects.toThrow(
+			"reviewer cannot be combined with the team-review-requested review filter",
+		);
+	});
+
+	test("searchPullRequests allows a reviewer alongside the other review filters", async () => {
+		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
+			projectId,
+			query: "find me",
+			reviewer: "dave",
+			review: "approved",
+		});
+		expect(result.pullRequests).toEqual([]);
+		const searchArgs = calls[0].args as { q: string };
+		expect(searchArgs.q).toContain("review-requested:dave");
+		expect(searchArgs.q).toContain("review:approved");
+	});
+
 	test("searchPullRequests filters search results to PRs only", async () => {
 		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
 			projectId,
