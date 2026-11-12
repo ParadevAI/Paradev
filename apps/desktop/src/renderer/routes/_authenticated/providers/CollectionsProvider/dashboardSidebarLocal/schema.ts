@@ -517,8 +517,6 @@ export const v2UserPreferencesSchema = z.object({
 	rightSidebarWidth: z.number().default(340),
 	rightPaneAreaWidth: z.number().optional(),
 	changesFileListWidth: z.number().optional(),
-	// The Changes pane's file list. A pane too narrow to dock it keeps it
-	// pinned over the diff rather than hiding it.
 	changesFileListOpen: z.boolean().default(true),
 	deleteLocalBranch: z.boolean().default(false),
 	showPresetsBar: z.boolean().default(true),

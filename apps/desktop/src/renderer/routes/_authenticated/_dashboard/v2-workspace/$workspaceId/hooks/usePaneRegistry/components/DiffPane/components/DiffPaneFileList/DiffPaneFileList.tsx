@@ -99,7 +99,7 @@ export function DiffPaneFileList({
 		return (
 			<aside
 				aria-label={t({ message: "Files" })}
-				className="absolute inset-y-0 right-0 z-30 border-l border-border bg-background shadow-lg outline-none"
+				className="absolute inset-y-0 right-0 z-30 border-l border-border bg-background shadow-lg"
 				style={{
 					width: Math.min(OVERLAY_WIDTH, containerWidth - OVERLAY_GUTTER),
 				}}
