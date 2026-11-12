@@ -1,0 +1,1 @@
+export { adoptTerminalPanes } from "./adoptTerminalPanes";
