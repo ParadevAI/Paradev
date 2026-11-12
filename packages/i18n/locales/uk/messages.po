@@ -4744,17 +4744,11 @@ msgstr "Клонувати репозиторій"
 msgid "Clone from URL"
 msgstr "Клонувати за URL"
 
-msgid "Clone into"
-msgstr "Клонувати в"
-
 msgid "clone the repository"
 msgstr "клонувати репозиторій"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Клонуйте репозиторій або імпортуйте наявну папку на хості."
-
-msgid "cloned on create"
-msgstr "клонується під час створення"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18218,9 +18212,6 @@ msgstr "Виберіть команди"
 
 msgid "Select terminal script directory"
 msgstr "Виберіть папку скрипта термінала"
-
-msgid "Select where to clone"
-msgstr "Виберіть, куди клонувати"
 
 msgid "Select worktree location"
 msgstr "Виберіть розташування worktree"

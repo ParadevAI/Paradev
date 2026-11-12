@@ -13,13 +13,7 @@ import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
-import {
-	LuFolderGit2,
-	LuFolderOpen,
-	LuGithub,
-	LuLoaderCircle,
-	LuX,
-} from "react-icons/lu";
+import { LuFolderGit2, LuGithub, LuLoaderCircle, LuX } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getBaseName } from "renderer/lib/pathBasename";
@@ -48,7 +42,6 @@ export function NewLocalProjectModal({
 	const [repoPaths, setRepoPaths] = useState<string[]>([]);
 	const [clones, setClones] = useState<CloneSource[]>([]);
 	const [typedName, setTypedName] = useState<string | null>(null);
-	const [typedCloneDir, setTypedCloneDir] = useState<string | null>(null);
 	const [working, setWorking] = useState(false);
 	const name =
 		typedName ??
@@ -56,16 +49,15 @@ export function NewLocalProjectModal({
 			repoPaths,
 			clones.map((clone) => clone.url),
 		);
-	const cloneDir =
-		typedCloneDir ??
-		(homeDir ? `${homeDir}/.paradev/projects/${name.trim() || "project"}` : "");
+	const cloneDir = homeDir
+		? `${homeDir}/.paradev/projects/${name.trim() || "project"}`
+		: "";
 	const repositoryCount = repoPaths.length + clones.length;
 
 	const reset = () => {
 		setRepoPaths([]);
 		setClones([]);
 		setTypedName(null);
-		setTypedCloneDir(null);
 		setWorking(false);
 	};
 
@@ -75,18 +67,6 @@ export function NewLocalProjectModal({
 				? current.filter((clone) => clone.url !== source.url)
 				: [...current, source],
 		);
-
-	const browseCloneDir = async () => {
-		try {
-			const picked = await selectDirectory.mutateAsync({
-				title: t({ message: "Select where to clone" }),
-				defaultPath: cloneDir || undefined,
-			});
-			if (!picked.canceled && picked.path) setTypedCloneDir(picked.path);
-		} catch (err) {
-			toast.error(errorMessage(err));
-		}
-	};
 
 	const handleOpenChange = (next: boolean) => {
 		if (!next) reset();
@@ -205,9 +185,6 @@ export function NewLocalProjectModal({
 								<span className="min-w-0 flex-1 truncate" title={clone.url}>
 									{clone.label}
 								</span>
-								<span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground">
-									<Trans>cloned on create</Trans>
-								</span>
 								<Button
 									type="button"
 									variant="ghost"
@@ -229,34 +206,6 @@ export function NewLocalProjectModal({
 							onToggleClone={toggleClone}
 						/>
 					</div>
-
-					{clones.length > 0 && (
-						<div className="flex flex-col gap-1.5">
-							<Label htmlFor="local-project-clone-dir" className="text-xs">
-								<Trans>Clone into</Trans>
-							</Label>
-							<div className="flex gap-1.5">
-								<Input
-									id="local-project-clone-dir"
-									value={cloneDir}
-									onChange={(event) => setTypedCloneDir(event.target.value)}
-									disabled={working}
-									className="flex-1 font-mono text-xs"
-								/>
-								<Button
-									type="button"
-									variant="outline"
-									size="icon"
-									className="shrink-0"
-									onClick={() => void browseCloneDir()}
-									disabled={working || selectDirectory.isPending}
-									aria-label={t({ message: "Browse for directory" })}
-								>
-									<LuFolderOpen className="size-4" />
-								</Button>
-							</div>
-						</div>
-					)}
 				</div>
 
 				<DialogFooter>
@@ -269,7 +218,12 @@ export function NewLocalProjectModal({
 					</Button>
 					<Button
 						onClick={() => void create()}
-						disabled={working || repositoryCount === 0 || !name.trim()}
+						disabled={
+							working ||
+							repositoryCount === 0 ||
+							!name.trim() ||
+							(clones.length > 0 && !cloneDir)
+						}
 					>
 						{working ? (
 							<>

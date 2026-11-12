@@ -4750,17 +4750,11 @@ msgstr "Clonar un repositorio"
 msgid "Clone from URL"
 msgstr "Clonar desde una URL"
 
-msgid "Clone into"
-msgstr "Clonar en"
-
 msgid "clone the repository"
 msgstr "clonar el repositorio"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Clona el repositorio o importa una carpeta existente del host."
-
-msgid "cloned on create"
-msgstr "se clona al crear"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18224,9 +18218,6 @@ msgstr "Seleccionar equipos"
 
 msgid "Select terminal script directory"
 msgstr "Seleccionar el directorio del script de terminal"
-
-msgid "Select where to clone"
-msgstr "Selecciona dónde clonar"
 
 msgid "Select worktree location"
 msgstr "Seleccionar la ubicación del worktree"

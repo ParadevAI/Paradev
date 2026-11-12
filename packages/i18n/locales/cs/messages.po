@@ -4750,17 +4750,11 @@ msgstr "Naklonovat repozitář"
 msgid "Clone from URL"
 msgstr "Naklonovat z URL"
 
-msgid "Clone into"
-msgstr "Klonovat do"
-
 msgid "clone the repository"
 msgstr "naklonovat repozitář"
 
 msgid "Clone the repository, or import an existing folder on the host."
 msgstr "Naklonujte repozitář nebo naimportujte existující složku na hostu."
-
-msgid "cloned on create"
-msgstr "naklonuje se při vytvoření"
 
 #. placeholder {0}: result.repoPath
 msgid "Cloned to {0}"
@@ -18224,9 +18218,6 @@ msgstr "Vyberte týmy"
 
 msgid "Select terminal script directory"
 msgstr "Vyberte adresář terminálového skriptu"
-
-msgid "Select where to clone"
-msgstr "Vyberte, kam klonovat"
 
 msgid "Select worktree location"
 msgstr "Vyberte umístění worktree"
