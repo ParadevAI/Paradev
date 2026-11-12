@@ -179,14 +179,6 @@ async function refresh(
 	return await reconcile(winner, endpoints, redemption.tokens, refreshToken);
 }
 
-/**
- * Both processes redeemed the same refresh token and both succeeded. That
- * happens when the server keeps a redeemed token valid until its successor is
- * used, as workers-oauth-provider (behind mcp.notion.com) does. Only the later
- * redemption's token is then live, and the winner may have stored the earlier
- * one, which the next refresh would find revoked. Redeeming the winner's token
- * tells which of the two the server still honours.
- */
 async function reconcile(
 	winner: SelectConnection,
 	endpoints: ResolvedEndpoints,
@@ -211,7 +203,6 @@ async function reconcile(
 				: undefined;
 	if (kept) return kept;
 
-	// A third process stored first; its token may be the superseded one too.
 	const latest = await readConnection(winner.id);
 	if (!latest || latest.refreshToken === winner.refreshToken) return winner;
 	return await reconcile(latest, endpoints, ours, ourRedeemedToken);
@@ -284,7 +275,6 @@ async function redeem(
 				? payload.error_description.slice(0, 200)
 				: undefined,
 	});
-	// A rate limit or a gateway's HTML page says nothing about the grant.
 	if (response.status === 429 || !payload) {
 		throw new ConnectorUnavailableError(
 			connection.connector,

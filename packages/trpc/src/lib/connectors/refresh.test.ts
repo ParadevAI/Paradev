@@ -178,7 +178,6 @@ describe("a connection that cannot be refreshed", () => {
 	});
 
 	test("a provider's own dead-token code is recorded the same way", async () => {
-		// GitHub answers 200 with an error body instead of a 4xx.
 		response = { ok: true, status: 200, body: { error: "bad_refresh_token" } };
 
 		await expect(
@@ -232,8 +231,6 @@ describe("two processes refreshing a rotating refresh token at once", () => {
 });
 
 describe("a refresh race the server let both sides win", () => {
-	// mcp.notion.com runs workers-oauth-provider: a redeemed refresh token stays
-	// valid until its successor is used, and each redemption rotates `current`.
 	let grant: { current: string; previous: string | null };
 	let issued = 0;
 
@@ -263,7 +260,6 @@ describe("a refresh race the server let both sides win", () => {
 		});
 
 	test("keeps our tokens when the winner stored the one the server superseded", async () => {
-		// Another process redeemed `refresh` and stored `winner`; we redeem it after.
 		grant = { previous: "refresh", current: "winner" };
 		reads = [connection(), winnerRow("winner")];
 		swaps = [false];
@@ -276,7 +272,6 @@ describe("a refresh race the server let both sides win", () => {
 	});
 
 	test("checks again when a third process stores before our reconciliation", async () => {
-		// A stored `a`, B redeemed after it, and we redeem last: only ours is live.
 		grant = { previous: "refresh", current: "b" };
 		reads = [connection(), winnerRow("a"), winnerRow("b")];
 		swaps = [false, false];
@@ -289,7 +284,6 @@ describe("a refresh race the server let both sides win", () => {
 	});
 
 	test("rotates the winner's token when it is the live one", async () => {
-		// Our redemption landed first; the winner's came later and is current.
 		grant = { previous: "refresh", current: "rotated-0" };
 		const redeemOursFirst = globalThis.fetch;
 		let first = true;
