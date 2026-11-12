@@ -15722,6 +15722,9 @@ msgstr "Naplánujte opakující se práci podle rozvrhu nebo události. Agenti b
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Dotazy na grafy, kohorty a experimenty"
+
 msgid "Query events and feature flags"
 msgstr "Dotazy na události a feature flagy"
 

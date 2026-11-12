@@ -15716,6 +15716,9 @@ msgstr "Запускайте регулярну роботу за розклад
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Запитувати графіки, когорти й експерименти"
+
 msgid "Query events and feature flags"
 msgstr "Запитувати події й фіче-флаги"
 

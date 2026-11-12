@@ -15722,6 +15722,9 @@ msgstr "Programa el trabajo recurrente según un horario o un evento. Los agente
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Consultar gráficos, cohortes y experimentos"
+
 msgid "Query events and feature flags"
 msgstr "Consultar eventos y feature flags"
 

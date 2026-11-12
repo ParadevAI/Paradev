@@ -15722,6 +15722,9 @@ msgstr "Đặt công việc lặp lại theo lịch hoặc sự kiện. Agent t�
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Truy vấn biểu đồ, cohort và thử nghiệm"
+
 msgid "Query events and feature flags"
 msgstr "Truy vấn event và feature flag"
 

@@ -1,0 +1,1 @@
+export { AmplitudeIcon } from "./AmplitudeIcon";

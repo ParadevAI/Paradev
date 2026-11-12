@@ -15722,6 +15722,9 @@ msgstr "Coloque o trabalho recorrente em um agendamento ou evento. Os agentes ro
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Consultar gráficos, coortes e experimentos"
+
 msgid "Query events and feature flags"
 msgstr "Consultar eventos e feature flags"
 

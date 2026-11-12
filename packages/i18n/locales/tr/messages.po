@@ -15722,6 +15722,9 @@ msgstr "Tekrarlayan işleri bir zamanlamaya veya olaya bağlayın. Ajanlar kendi
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Grafikleri, kohortları ve deneyleri sorgulayın"
+
 msgid "Query events and feature flags"
 msgstr "Olayları ve özellik bayraklarını sorgulayın"
 

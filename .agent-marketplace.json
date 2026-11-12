@@ -246,6 +246,26 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "amplitude",
+			"description": "Ask Amplitude about your product: query charts, events, and users, and manage dashboards, cohorts, experiments, and feature flags.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/amplitude",
+			"version": "1.0.0"
+		},
+		{
+			"name": "amplitude-eu",
+			"description": "Ask Amplitude about your product in the EU data center: query charts, events, and users, and manage dashboards, cohorts, experiments, and feature flags.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/amplitude-eu",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

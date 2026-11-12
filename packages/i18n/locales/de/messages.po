@@ -15722,6 +15722,9 @@ msgstr "Plane wiederkehrende Arbeit nach einem Zeitplan oder löse sie durch ein
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Charts, Kohorten und Experimente abfragen"
+
 msgid "Query events and feature flags"
 msgstr "Events und Feature-Flags abfragen"
 

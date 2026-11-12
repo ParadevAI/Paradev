@@ -400,6 +400,69 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "or_7499a251", label: "Tegon" });
 	});
 
+	for (const [slug, mcpUrl] of [
+		["amplitude_mcp", "https://mcp.amplitude.com/mcp"],
+		["amplitude_eu_mcp", "https://mcp.eu.amplitude.com/mcp"],
+	] as const) {
+		test(`${slug} reads the organization and user from get_amplitude_context`, async () => {
+			const context = {
+				user: { id: "h@tegon.ai", email: "h@tegon.ai", fullName: "Hana" },
+				org: { id: "100012345", name: "Tegon", plan: "growth" },
+				projects: [{ appId: "123456", appName: "Tegon Prod" }],
+			};
+			const calls: {
+				url: string;
+				method?: string;
+				name?: string;
+				auth: string | null;
+			}[] = [];
+			globalThis.fetch = (async (url: string, init: RequestInit) => {
+				const body = init.body
+					? (JSON.parse(String(init.body)) as {
+							id?: number;
+							method?: string;
+							params?: { name?: string };
+						})
+					: {};
+				calls.push({
+					url,
+					method: body.method,
+					name: body.params?.name,
+					auth: new Headers(init.headers).get("Authorization"),
+				});
+				if (init.method === "DELETE")
+					return new Response(null, { status: 204 });
+				if (body.id === undefined) return new Response(null, { status: 202 });
+				const result =
+					body.method === "tools/call"
+						? { content: [{ type: "text", text: JSON.stringify(context) }] }
+						: { protocolVersion: "2025-06-18" };
+				return new Response(
+					JSON.stringify({ jsonrpc: "2.0", id: body.id, result }),
+					{
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					},
+				);
+			}) as unknown as typeof fetch;
+
+			const identity = await probeIdentity(
+				slug,
+				connectorMethod(requireConnector(slug)),
+				"amplitude-test",
+			);
+
+			expect(calls[2]).toEqual({
+				url: mcpUrl,
+				method: "tools/call",
+				name: "get_amplitude_context",
+				auth: "Bearer amplitude-test",
+			});
+			expect(identity.account).toEqual({ id: "100012345", label: "Tegon" });
+			expect(identity.user).toEqual({ id: "h@tegon.ai", label: "h@tegon.ai" });
+		});
+	}
+
 	test("posthog_mcp asks the authorization server's userinfo endpoint", async () => {
 		const calls = respond({ sub: "user_01", email: "h@tegon.ai" });
 

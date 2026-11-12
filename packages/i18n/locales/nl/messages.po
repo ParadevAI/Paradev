@@ -15722,6 +15722,9 @@ msgstr "Zet terugkerend werk op een schema of laat het starten door een gebeurte
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Bevraag grafieken, cohorten en experimenten"
+
 msgid "Query events and feature flags"
 msgstr "Bevraag events en feature flags"
 

@@ -15722,6 +15722,9 @@ msgstr "將重複性工作排入排程，或設定為由事件觸發。代理程
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "查詢圖表、群組和實驗"
+
 msgid "Query events and feature flags"
 msgstr "查詢事件和功能開關"
 

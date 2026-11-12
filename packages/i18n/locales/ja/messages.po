@@ -15722,6 +15722,9 @@ msgstr "繰り返しの作業をスケジュールやイベントで実行しま
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "チャート、コホート、実験を照会"
+
 msgid "Query events and feature flags"
 msgstr "イベントとフィーチャーフラグを照会"
 

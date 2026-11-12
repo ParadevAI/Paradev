@@ -5,6 +5,7 @@
 		"github",
 		"sentry",
 		"stripe",
+		"amplitude",
 		"peec",
 		"supabase",
 		"firecrawl",

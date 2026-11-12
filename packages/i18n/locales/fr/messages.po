@@ -15722,6 +15722,9 @@ msgstr "Planifiez le travail récurrent selon un horaire ou un événement. Les 
 msgid "px"
 msgstr "px"
 
+msgid "Query charts, cohorts, and experiments"
+msgstr "Interroger les graphiques, les cohortes et les expériences"
+
 msgid "Query events and feature flags"
 msgstr "Interroger les événements et les feature flags"
 

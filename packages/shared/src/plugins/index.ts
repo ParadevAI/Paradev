@@ -506,6 +506,28 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "amplitude",
+		version: "1.0.0",
+		description: "Query charts, events, experiments, and feature flags",
+		interface: { displayName: "Amplitude", category: "Data & APIs" },
+		mcpServers: {
+			amplitude: { type: "http", url: "https://mcp.amplitude.com/mcp" },
+		},
+	},
+	{
+		name: "amplitude-eu",
+		version: "1.0.0",
+		description:
+			"Query charts, events, experiments, and feature flags in Amplitude's EU data center",
+		interface: { displayName: "Amplitude EU", category: "Data & APIs" },
+		mcpServers: {
+			"amplitude-eu": {
+				type: "http",
+				url: "https://mcp.eu.amplitude.com/mcp",
+			},
+		},
+	},
+	{
 		name: "peec",
 		version: "1.0.0",
 		description: "Track your brand in AI search",
