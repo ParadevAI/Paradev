@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	type PullRequestAppGatedFields,
 	type PullRequestDetailQuery,
 	PullRequestReadError,
 	readPullRequestDetail,
@@ -7,13 +8,19 @@ import {
 
 const input = { owner: "acme", repo: "widgets", pullNumber: 7 };
 
-function pullRequest(
-	overrides: Partial<
-		NonNullable<
-			NonNullable<PullRequestDetailQuery["repository"]>["pullRequest"]
-		>
-	> = {},
-): PullRequestDetailQuery {
+type PullRequestFixture = NonNullable<
+	NonNullable<PullRequestDetailQuery["repository"]>["pullRequest"]
+> &
+	PullRequestAppGatedFields;
+
+const isAppGatedRead = (query: string) => query.includes("isMergeQueueEnabled");
+
+function pullRequest(overrides: Partial<PullRequestFixture> = {}): {
+	repository: Omit<
+		NonNullable<PullRequestDetailQuery["repository"]>,
+		"pullRequest"
+	> & { pullRequest: PullRequestFixture };
+} {
 	return {
 		repository: {
 			squashMergeAllowed: true,
@@ -92,10 +99,12 @@ describe("readPullRequestDetail", () => {
 		const detail = await readPullRequestDetail(
 			{
 				graphql: async <T>(
-					_query: string,
+					query: string,
 					variables: Record<string, unknown>,
 				) => {
-					queries.push(String(variables.cursor ?? "first"));
+					if (!isAppGatedRead(query)) {
+						queries.push(String(variables.cursor ?? "first"));
+					}
 					if (variables.cursor === "c1") {
 						return {
 							repository: {
@@ -186,23 +195,54 @@ describe("readPullRequestDetail", () => {
 		expect(error.code).toBe("NOT_FOUND");
 	});
 
+	test("fields the GitHub App may not read fall back instead of failing the read", async () => {
+		const refused = Object.assign(new Error("Resource not accessible"), {
+			errors: [{ type: "FORBIDDEN", path: ["repository", "pullRequest"] }],
+			data: { repository: { pullRequest: null } },
+		});
+		const detail = await readPullRequestDetail(
+			{
+				graphql: async <T>(query: string) => {
+					if (isAppGatedRead(query)) throw refused;
+					return pullRequest({
+						reviewThreads: {
+							pageInfo: { hasNextPage: false, endCursor: null },
+							nodes: [],
+						},
+					}) as T;
+				},
+				requestedReviewers: async () => ({ users: [], teams: [] }),
+			},
+			input,
+		);
+		expect(detail.mergeability).toMatchObject({
+			requiredApprovals: 0,
+			requiresThreadResolution: false,
+			queue: null,
+			queueEnabled: false,
+		});
+		expect(detail.capabilities.merge).toBe(true);
+	});
+
 	test("requested reviewers are asked for alongside the main read, not after it", async () => {
 		let releaseRead = () => {};
 		let reviewersAsked = false;
 		const read = readPullRequestDetail(
 			{
-				graphql: <T>() =>
-					new Promise<T>((resolve) => {
-						releaseRead = () =>
-							resolve(
-								pullRequest({
-									reviewThreads: {
-										pageInfo: { hasNextPage: false, endCursor: null },
-										nodes: [],
-									},
-								}) as T,
-							);
-					}),
+				graphql: <T>(query: string) =>
+					isAppGatedRead(query)
+						? Promise.resolve(pullRequest() as T)
+						: new Promise<T>((resolve) => {
+								releaseRead = () =>
+									resolve(
+										pullRequest({
+											reviewThreads: {
+												pageInfo: { hasNextPage: false, endCursor: null },
+												nodes: [],
+											},
+										}) as T,
+									);
+							}),
 				requestedReviewers: async () => {
 					reviewersAsked = true;
 					return { users: [], teams: [] };
@@ -218,11 +258,8 @@ describe("readPullRequestDetail", () => {
 	test("activity is read only when asked for, with reviews folded into the conversation", async () => {
 		const asked: unknown[] = [];
 		const client = {
-			graphql: async <T>(
-				_query: string,
-				variables: Record<string, unknown>,
-			) => {
-				asked.push(variables.activity);
+			graphql: async <T>(query: string, variables: Record<string, unknown>) => {
+				if (!isAppGatedRead(query)) asked.push(variables.activity);
 				return pullRequest({
 					reviewThreads: {
 						pageInfo: { hasNextPage: false, endCursor: null },

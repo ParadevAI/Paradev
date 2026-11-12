@@ -135,16 +135,8 @@ query($owner: String!, $name: String!, $number: Int!, $activity: Boolean = false
 			id number title body url baseRefName state isDraft merged mergedAt
 			additions deletions changedFiles
 			mergeable mergeStateStatus reviewDecision
-			viewerCanUpdate viewerCanMergeAsAdmin
+			viewerCanUpdate
 			mergedBy { login avatarUrl }
-			mergeQueueEntry { position state }
-			isMergeQueueEnabled
-			baseRef {
-				branchProtectionRule {
-					requiredApprovingReviewCount
-					requiresConversationResolution
-				}
-			}
 			latestOpinionatedReviews(first: 20) {
 				nodes { state author { login avatarUrl } }
 			}
@@ -186,6 +178,25 @@ query($owner: String!, $name: String!, $number: Int!, $activity: Boolean = false
 							isRequired(pullRequestNumber: $number)
 						}
 					}
+				}
+			}
+		}
+	}
+}`;
+
+// A GitHub App user token without the App's Administration and Merge queues
+// permissions is refused these fields, and GitHub then fails the whole query.
+const APP_GATED_FIELDS_QUERY = `
+query($owner: String!, $name: String!, $number: Int!) {
+	repository(owner: $owner, name: $name) {
+		pullRequest(number: $number) {
+			viewerCanMergeAsAdmin
+			mergeQueueEntry { position state }
+			isMergeQueueEnabled
+			baseRef {
+				branchProtectionRule {
+					requiredApprovingReviewCount
+					requiresConversationResolution
 				}
 			}
 		}
@@ -302,6 +313,65 @@ interface ActivityFields {
 	}>;
 }
 
+export interface PullRequestAppGatedFields {
+	viewerCanMergeAsAdmin: boolean;
+	mergeQueueEntry: { position: number | null; state: string } | null;
+	isMergeQueueEnabled?: boolean;
+	baseRef: {
+		branchProtectionRule: {
+			requiredApprovingReviewCount: number | null;
+			requiresConversationResolution: boolean | null;
+		} | null;
+	} | null;
+}
+
+interface PullRequestAppGatedQuery {
+	repository: { pullRequest: PullRequestAppGatedFields | null } | null;
+}
+
+function isOnlyForbidden(error: unknown): error is { data?: unknown } {
+	if (typeof error !== "object" || error === null || !("errors" in error)) {
+		return false;
+	}
+	const { errors } = error as { errors: unknown };
+	return (
+		Array.isArray(errors) &&
+		errors.length > 0 &&
+		errors.every((entry) => entry?.type === "FORBIDDEN")
+	);
+}
+
+/** What GitHub let this token read of the gated fields; the rest falls back to "none". */
+async function readAppGatedFields(
+	client: PullRequestDetailClient,
+	input: PullRequestDetailInput,
+): Promise<PullRequestAppGatedFields> {
+	try {
+		const data = await client.graphql<PullRequestAppGatedQuery>(
+			APP_GATED_FIELDS_QUERY,
+			variables(input),
+		);
+		return appGatedFields(data.repository?.pullRequest);
+	} catch (error) {
+		if (!isOnlyForbidden(error)) throw error;
+		return appGatedFields(
+			(error.data as PullRequestAppGatedQuery | undefined)?.repository
+				?.pullRequest,
+		);
+	}
+}
+
+function appGatedFields(
+	read: Partial<PullRequestAppGatedFields> | null | undefined,
+): PullRequestAppGatedFields {
+	return {
+		viewerCanMergeAsAdmin: read?.viewerCanMergeAsAdmin ?? false,
+		mergeQueueEntry: read?.mergeQueueEntry ?? null,
+		isMergeQueueEnabled: read?.isMergeQueueEnabled ?? false,
+		baseRef: read?.baseRef ?? null,
+	};
+}
+
 export interface PullRequestDetailQuery {
 	repository: {
 		squashMergeAllowed: boolean;
@@ -327,16 +397,7 @@ export interface PullRequestDetailQuery {
 					mergeStateStatus: string;
 					reviewDecision: string | null;
 					viewerCanUpdate: boolean;
-					viewerCanMergeAsAdmin: boolean;
 					mergedBy: { login: string; avatarUrl: string | null } | null;
-					mergeQueueEntry: { position: number | null; state: string } | null;
-					isMergeQueueEnabled?: boolean;
-					baseRef: {
-						branchProtectionRule: {
-							requiredApprovingReviewCount: number | null;
-							requiresConversationResolution: boolean | null;
-						} | null;
-					} | null;
 					latestOpinionatedReviews: {
 						nodes: ({
 							state: string;
@@ -502,17 +563,20 @@ export async function readPullRequestDetail(
 	// Awaited below; this only stops an unhandled rejection when the read
 	// above fails first.
 	requestedReviewers.catch(() => {});
+	const gatedRead = readAppGatedFields(client, input);
+	gatedRead.catch(() => {});
 	const data = await client.graphql<PullRequestDetailQuery>(
 		PULL_REQUEST_DETAIL_QUERY,
 		{ ...variables(input), activity },
 	);
-	const pr = data.repository?.pullRequest;
-	if (!pr) {
+	const core = data.repository?.pullRequest;
+	if (!core) {
 		throw new PullRequestReadError(
 			"NOT_FOUND",
 			`Pull request #${input.pullNumber} not found.`,
 		);
 	}
+	const pr = { ...core, ...(await gatedRead) };
 
 	// Both connections page at 100; anything past the first page must be
 	// fetched before grading, or a failing check or open thread there is
