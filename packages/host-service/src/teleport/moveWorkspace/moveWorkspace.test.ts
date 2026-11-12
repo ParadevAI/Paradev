@@ -8,6 +8,7 @@ function fakes(options: {
 	fetchFails?: boolean;
 	createdAfterPolls?: number;
 	environmentRepository?: string;
+	destinationProject?: "found" | "none" | "old-host";
 }) {
 	const calls: Call[] = [];
 	const record =
@@ -62,14 +63,20 @@ function fakes(options: {
 		},
 	} as unknown as ApiClient;
 	const host = {
-		project: {
-			list: {
-				query: record("projectList", () => [
-					{ id: "project-1", repoOwner: "Acme", repoName: "App" },
-				]),
-			},
-		},
 		teleport: {
+			findProject: {
+				query: record("findProject", () => {
+					if (options.destinationProject === "old-host") {
+						throw new Error(
+							'No procedure found on path "teleport.findProject"',
+						);
+					}
+					return {
+						projectId:
+							options.destinationProject === "none" ? null : "project-1",
+					};
+				}),
+			},
 			fetchBranch: {
 				mutate: record("fetchBranch", () => {
 					if (options.fetchFails) throw new Error("fetch failed");
@@ -106,9 +113,9 @@ function fakes(options: {
 		api,
 		organizationId: "org-1",
 		fromHostId: "this-host",
+		repositoryOf: async () => "acme/app",
 		prepare: async () => ({
 			branch: "superset/teleport-1",
-			repositoryFullName: "acme/app",
 			chats: [{ chatSessionId: "chat-1" }, { chatSessionId: "chat-2" }],
 		}),
 		releaseChats: async (ids) => {
@@ -138,6 +145,10 @@ describe("beginWorkspaceMove", () => {
 
 		expect(workspaceMoveId).toBe("move-1");
 		expect(calls[0]).toEqual([
+			"findProject",
+			{ repositoryFullName: "acme/app" },
+		]);
+		expect(calls[1]).toEqual([
 			"begin",
 			{
 				fromWorkspaceId: "ws-1",
@@ -146,8 +157,8 @@ describe("beginWorkspaceMove", () => {
 			},
 		]);
 		expect(names()).toEqual([
+			"findProject",
 			"begin",
-			"projectList",
 			"fetchBranch",
 			"createEnqueued",
 			"get",
@@ -179,7 +190,7 @@ describe("beginWorkspaceMove", () => {
 		});
 		await done;
 
-		expect(names()).toEqual(["begin", "environmentGet", "cloudCreate"]);
+		expect(names()).toEqual(["environmentGet", "begin", "cloudCreate"]);
 		expect(calls[2]?.[1]).toMatchObject({
 			organizationId: "org-1",
 			environmentId: "env-1",
@@ -189,7 +200,7 @@ describe("beginWorkspaceMove", () => {
 		expect(released).toEqual([["chat-2"]]);
 	});
 
-	test("a failure before the destination exists abandons the move and releases every chat", async () => {
+	test("a failure after the move starts abandons it and releases every chat", async () => {
 		const { deps, calls, names, released } = fakes({ fetchFails: true });
 		const { done } = await beginWorkspaceMove(deps, {
 			workspaceId: "ws-1",
@@ -198,7 +209,7 @@ describe("beginWorkspaceMove", () => {
 		});
 
 		await expect(done).rejects.toThrow("fetch failed");
-		expect(names()).toEqual(["begin", "projectList", "fetchBranch", "abandon"]);
+		expect(names()).toEqual(["findProject", "begin", "fetchBranch", "abandon"]);
 		expect(calls.at(-1)?.[1]).toEqual({
 			workspaceMoveId: "move-1",
 			error: "fetch failed",
@@ -206,20 +217,48 @@ describe("beginWorkspaceMove", () => {
 		expect(released).toEqual([["chat-1", "chat-2"]]);
 	});
 
-	test("refuses a cloud environment that opens another repository", async () => {
-		const { deps, names, released } = fakes({
-			environmentRepository: "acme/other",
-		});
-		const { done } = await beginWorkspaceMove(deps, {
-			workspaceId: "ws-1",
-			name: "Feature",
-			destination: { kind: "cloud", environmentId: "env-1" },
-		});
+	describe("refuses before anything changes", () => {
+		const refusals = [
+			{
+				name: "a cloud environment for another repository",
+				options: { environmentRepository: "acme/other" },
+				destination: { kind: "cloud", environmentId: "env-1" },
+				message: "That cloud environment does not open acme/app",
+			},
+			{
+				name: "a computer without the project",
+				options: { destinationProject: "none" },
+				destination: { kind: "computer", hostId: "other-host" },
+				message: "Add acme/app as a project on that computer first",
+			},
+			{
+				name: "a computer on a release without the lookup",
+				options: { destinationProject: "old-host" },
+				destination: { kind: "computer", hostId: "other-host" },
+				message: "Update Paradev on that computer to move workspaces to it",
+			},
+		] as const;
+		for (const refusal of refusals) {
+			test(refusal.name, async () => {
+				const { deps, names, released } = fakes(refusal.options);
+				const prepared: string[] = [];
+				const prepare = deps.prepare;
+				deps.prepare = (workspaceId) => {
+					prepared.push(workspaceId);
+					return prepare(workspaceId);
+				};
 
-		await expect(done).rejects.toThrow(
-			"That cloud environment does not open acme/app",
-		);
-		expect(names()).toEqual(["begin", "environmentGet", "abandon"]);
-		expect(released).toEqual([["chat-1", "chat-2"]]);
+				await expect(
+					beginWorkspaceMove(deps, {
+						workspaceId: "ws-1",
+						name: "Feature",
+						destination: refusal.destination,
+					}),
+				).rejects.toThrow(refusal.message);
+				expect(names()).not.toContain("begin");
+				expect(prepared).toEqual([]);
+				expect(released).toEqual([]);
+			});
+		}
 	});
 });

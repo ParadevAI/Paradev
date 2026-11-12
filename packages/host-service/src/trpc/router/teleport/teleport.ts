@@ -8,9 +8,9 @@ import { MACHINE_SIZES } from "@superset/shared/billing";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { getHostId } from "@superset/shared/host-info";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { workspaces } from "../../../db/schema";
+import { projects, workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
 import {
 	downloadBundle,
@@ -48,6 +48,7 @@ import {
 	requireLocalProject,
 	requireProjectRepoPath,
 } from "../workspace-creation/shared/local-project";
+import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
 
 const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
@@ -103,6 +104,30 @@ function busyError() {
 		code: "PRECONDITION_FAILED",
 		message: "Wait for the agent to finish, or stop it, before moving",
 	});
+}
+
+/** The remote a workspace's work is pushed to when it moves, and its GitHub repository. */
+async function resolveSnapshotTarget(
+	ctx: Parameters<typeof resolveWorktreePath>[0],
+	workspaceId: string,
+) {
+	const worktreePath = resolveWorktreePath(ctx, workspaceId);
+	const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+	const target = await getHostWorkerPool()
+		.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
+		.catch((error: unknown) => {
+			rethrowEnvironmentalGitError(error);
+			throw error;
+		});
+	const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
+	const repository = repositories[0];
+	if (!target || !repository || repositories.some((repo) => !repo)) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: "Moving a workspace needs a GitHub repository",
+		});
+	}
+	return { worktreePath, gitEnv, target, repository };
 }
 
 /** The bundle's manifest with the chat's mode and model, which its history does not carry. */
@@ -208,24 +233,10 @@ export const teleportRouter = router({
 				);
 			if (busy().length > 0 && !input.stopIfBusy) throw busyError();
 
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const env = resolveDefaultAccountTerminalEnv(ctx.db);
 			const pool = getHostWorkerPool();
-			const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
-			const target = await pool
-				.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
-				.catch((error: unknown) => {
-					rethrowEnvironmentalGitError(error);
-					throw error;
-				});
-			const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
-			const repository = repositories[0];
-			if (!target || !repository || repositories.some((repo) => !repo)) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Moving a workspace needs a GitHub repository",
-				});
-			}
+			const { worktreePath, gitEnv, target, repository } =
+				await resolveSnapshotTarget(ctx, input.workspaceId);
 
 			for (const { sessionId } of busy()) {
 				await stopRunningTurn(chat, sessionId);
@@ -397,6 +408,13 @@ export const teleportRouter = router({
 						api: ctx.api,
 						organizationId: ctx.organizationId,
 						fromHostId,
+						repositoryOf: async (workspaceId) => {
+							const { repository } = await resolveSnapshotTarget(
+								ctx,
+								workspaceId,
+							);
+							return `${repository.owner}/${repository.name}`;
+						},
 						prepare: (workspaceId) =>
 							teleport.prepareWorkspace({ workspaceId, stopIfBusy: true }),
 						releaseChats: async (chatSessionIds) => {
@@ -474,6 +492,25 @@ export const teleportRouter = router({
 				},
 			});
 			return { ok: true };
+		}),
+
+	/** The project here whose live GitHub remote is `repositoryFullName`, for a workspace moving in. */
+	findProject: machineOnlyProcedure
+		.input(z.object({ repositoryFullName: z.string().min(3).max(300) }))
+		.query(async ({ ctx, input }) => {
+			const wanted = input.repositoryFullName.toLowerCase();
+			const rows = ctx.db
+				.select({ id: projects.id })
+				.from(projects)
+				.where(isNull(projects.deletedAt))
+				.all();
+			for (const { id } of rows) {
+				const repo = await resolveGithubRepo(ctx, id).catch(() => null);
+				if (repo && `${repo.owner}/${repo.name}`.toLowerCase() === wanted) {
+					return { projectId: id };
+				}
+			}
+			return { projectId: null };
 		}),
 
 	/** Makes a branch another host pushed available to create a worktree from. */
