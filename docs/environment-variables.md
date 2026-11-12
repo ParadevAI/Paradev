@@ -116,9 +116,10 @@ account-link URLs. OAuth token exchanges must send that same redirect URI.
 server job/callback origin. `PLUGIN_CLIENT_METADATA_BASE_URL` still controls
 where providers fetch connector client metadata.
 
-The API and web deploy workflows pass the optional setting through. No secret
-or local `.env` change is needed until a separate browser-origin deployment is
-explicitly provisioned. The web client's public API URL remains its own
+The API and web preview workflows pass the optional setting through. Production
+workflow wiring is deferred to the separate-deployment change, so this preparation
+does not trigger infrastructure redeploys through workflow path filters. No secret
+or local `.env` change is needed for the existing stack. The web client's public API URL remains its own
 `NEXT_PUBLIC_API_URL`; `BROWSER_API_URL` is not bundled into browser code.
 
 OAuth/OIDC discovery keeps the explicit canonical issuer but advertises protocol
