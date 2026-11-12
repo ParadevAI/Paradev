@@ -335,7 +335,6 @@ export function Transcript({
 			find.currentRowKey,
 			revealRowKey,
 			carriedRowKey,
-			prompt?.key ?? null,
 		],
 		observeRow,
 		find: {
@@ -345,6 +344,11 @@ export function Transcript({
 		},
 	});
 	const { holdRevealUntilScrollEnds } = transcriptWindow;
+	const promptIndex = prompt
+		? rows.findIndex((row) => row.key === prompt.key)
+		: -1;
+	const promptDroppedByWindow =
+		promptIndex !== -1 && promptIndex < transcriptWindow.startIndex;
 
 	useEffect(() => {
 		if (revealMessageId === null) return;
@@ -411,6 +415,7 @@ export function Transcript({
 				{/* The find bar takes the same corner, and aligns its hits to the same edge. */}
 				{!find.isOpen && (
 					<PinnedPrompt
+						droppedByWindow={promptDroppedByWindow}
 						messageId={prompt?.messageId ?? null}
 						text={prompt?.text ?? ""}
 						viewport={viewport}
