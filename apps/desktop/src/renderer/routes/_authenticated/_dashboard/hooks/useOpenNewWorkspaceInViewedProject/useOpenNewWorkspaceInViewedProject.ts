@@ -1,7 +1,7 @@
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
-import { useMatchRoute } from "@tanstack/react-router";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { cloudRepoProjectId } from "renderer/lib/github/cloudRepoProjectId";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
