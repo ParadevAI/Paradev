@@ -703,7 +703,9 @@ function V2WorkspaceContent() {
 						onResizingChange={onSidebarResizeDragging}
 						onLayoutFrame={relayoutBrowserPanes}
 						keepMounted={isRightPaneAreaEnabled}
-						sidePanelClassName={isParadevShell ? "border-l-0" : undefined}
+						sidePanelClassName={
+							isParadevShell ? "border-l-0 pl-1.5" : undefined
+						}
 						side={
 							isRightPaneAreaEnabled ? (
 								<>
@@ -727,7 +729,14 @@ function V2WorkspaceContent() {
 						}
 					>
 						<div
-							className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+							className={cn(
+								"relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+								isParadevShell &&
+									"rounded-r-[10px] border border-border bg-background",
+								isParadevShell &&
+									isWorkspaceSidebarCollapsed &&
+									"rounded-l-[10px]",
+							)}
 							data-workspace-id={workspaceId}
 							data-pane-area="center"
 						>
@@ -741,8 +750,7 @@ function V2WorkspaceContent() {
 										inert: rightPaneMode === "expanded",
 									})}
 									appearance={isParadevShell ? "cards" : "default"}
-									className={isParadevShell ? "bg-shell-frame" : undefined}
-									joinsLeft={isParadevShell && !isWorkspaceSidebarCollapsed}
+									flush={isParadevShell}
 									isFocused={!isRightAreaFocused}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}

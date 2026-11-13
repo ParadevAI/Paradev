@@ -131,8 +131,8 @@ export type PaneAppearance = "default" | "cards";
 
 export interface WorkspaceProps<TData> {
 	appearance?: PaneAppearance;
-	/** With `cards`, panes on the left edge keep square left corners, to continue a surface beside the workspace. */
-	joinsLeft?: boolean;
+	/** With `cards`, panes sit edge to edge with a hairline between them, for a host that draws one card around the whole area. */
+	flush?: boolean;
 	/**
 	 * Defaults to true. False when another workspace in the same window has
 	 * keyboard focus: the active tab and pane header then look inactive.

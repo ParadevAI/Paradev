@@ -1,6 +1,6 @@
 export {
 	PaneAppearanceContext,
-	PaneJoinsLeftContext,
+	PaneFlushContext,
 	usePaneAppearance,
-	usePaneJoinsLeft,
+	usePaneFlush,
 } from "./usePaneAppearance";

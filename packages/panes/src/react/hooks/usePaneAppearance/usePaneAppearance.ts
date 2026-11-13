@@ -7,8 +7,8 @@ export function usePaneAppearance(): PaneAppearance {
 	return useContext(PaneAppearanceContext);
 }
 
-export const PaneJoinsLeftContext = createContext(false);
+export const PaneFlushContext = createContext(false);
 
-export function usePaneJoinsLeft(): boolean {
-	return useContext(PaneJoinsLeftContext);
+export function usePaneFlush(): boolean {
+	return useContext(PaneFlushContext);
 }

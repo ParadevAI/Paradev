@@ -6,7 +6,7 @@ import { isPaneInLinkedStore } from "../../../core/transfer";
 import type { Pane, Tab as TabType } from "../../../types";
 import {
 	PaneAppearanceContext,
-	PaneJoinsLeftContext,
+	PaneFlushContext,
 } from "../../hooks/usePaneAppearance";
 import { PaneAreaFocusedContext } from "../../hooks/usePaneAreaFocused";
 import { PaneAsideRenderContext } from "../../hooks/usePaneAside";
@@ -24,7 +24,7 @@ const NO_KEPT_TABS: readonly KeptTabEntry[] = [];
 
 export function Workspace<TData>({
 	appearance = "default",
-	joinsLeft = false,
+	flush = false,
 	isFocused = true,
 	store,
 	registry,
@@ -203,7 +203,7 @@ export function Workspace<TData>({
 
 	return (
 		<PaneAppearanceContext.Provider value={appearance}>
-			<PaneJoinsLeftContext.Provider value={joinsLeft}>
+			<PaneFlushContext.Provider value={flush}>
 				<PaneAreaFocusedContext.Provider value={isFocused}>
 					<PaneAsideRenderContext.Provider value={renderPaneAside}>
 						<div
@@ -260,7 +260,7 @@ export function Workspace<TData>({
 						</div>
 					</PaneAsideRenderContext.Provider>
 				</PaneAreaFocusedContext.Provider>
-			</PaneJoinsLeftContext.Provider>
+			</PaneFlushContext.Provider>
 		</PaneAppearanceContext.Provider>
 	);
 }

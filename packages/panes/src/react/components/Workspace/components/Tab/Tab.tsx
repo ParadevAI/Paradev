@@ -14,7 +14,10 @@ import type {
 } from "../../../../../types";
 import { useIsTabVisible } from "../../../../hooks/useIsTabVisible";
 import { useNewPaneIds } from "../../../../hooks/useNewPaneIds";
-import { usePaneAppearance } from "../../../../hooks/usePaneAppearance";
+import {
+	usePaneAppearance,
+	usePaneFlush,
+} from "../../../../hooks/usePaneAppearance";
 import {
 	PaneAsideTargetContext,
 	topRightPaneId,
@@ -82,6 +85,7 @@ function SplitView<TData>({
 }) {
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const isCards = usePaneAppearance() === "cards";
+	const flush = usePaneFlush();
 	const activeHandlePointerRef = useRef<{
 		pointerId: number;
 		downAt: number;
@@ -153,11 +157,13 @@ function SplitView<TData>({
 				// The active pane draws a 2px border on either side of the 1px
 				// divider. Cover that full visual border with the sash hit area.
 				hitAreaSize="large"
-				// As cards, the gap between two panes is the sash.
+				// As cards, the gap between two panes is the sash; flush, a hairline is.
 				className={
-					isCards
-						? "w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
-						: undefined
+					!isCards
+						? undefined
+						: flush
+							? "w-px bg-border data-[panel-group-direction=vertical]:h-px data-[resize-handle-state=drag]:bg-foreground/40 data-[resize-handle-state=hover]:bg-foreground/30"
+							: "w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
 				}
 				style={{ zIndex: RESIZE_HANDLE_BASE_Z_INDEX - path.length }}
 				onPointerDownCapture={(event) => {
