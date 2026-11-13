@@ -17,6 +17,13 @@ const downloadRateLimit =
 			})
 		: null;
 
+export function limitAllows(result: {
+	success: boolean;
+	reason?: string;
+}): boolean {
+	return result.success && result.reason !== "timeout";
+}
+
 async function withinDownloadLimit(key: string): Promise<boolean> {
 	if (!downloadRateLimit) {
 		if (env.NODE_ENV !== "production") return true;
@@ -24,7 +31,7 @@ async function withinDownloadLimit(key: string): Promise<boolean> {
 		return false;
 	}
 	try {
-		return (await downloadRateLimit.limit(key)).success;
+		return limitAllows(await downloadRateLimit.limit(key));
 	} catch (error) {
 		console.error("[page/public-download] rate limiter unavailable:", error);
 		return false;
