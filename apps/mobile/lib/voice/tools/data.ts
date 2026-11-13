@@ -400,13 +400,24 @@ export function createVoiceData({
 		},
 
 		async findPage(query) {
-			const result = await withTimeout(
-				apiClient.page.listPaginated.query({ limit: PAGE_SEARCH_LIMIT }),
+			const q = query.trim().toLowerCase();
+			// The newest batch alone misses an older page, so search the rest too.
+			const [newest, searched] = await withTimeout(
+				Promise.all([
+					apiClient.page.listPaginated.query({ limit: PAGE_SEARCH_LIMIT }),
+					q
+						? apiClient.page.listPaginated.query({
+								limit: PAGE_SEARCH_LIMIT,
+								search: q.slice(0, 200),
+							})
+						: null,
+				]),
 				HOST_TIMEOUT_MS,
 				"Pages",
 			);
-			const pages = result.items.map(toVoicePage);
-			const q = query.trim().toLowerCase();
+			const pages = [...newest.items, ...(searched?.items ?? [])].map(
+				toVoicePage,
+			);
 			const listed =
 				pages.find((page) => page.id === query || page.slug === query) ??
 				pages.find((page) => page.title.toLowerCase() === q) ??

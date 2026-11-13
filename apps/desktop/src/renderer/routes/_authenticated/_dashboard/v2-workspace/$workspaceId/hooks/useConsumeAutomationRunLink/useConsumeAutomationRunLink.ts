@@ -50,7 +50,7 @@ export function useConsumeAutomationRunLink({
 			const result = await transport.getSession({ sessionId });
 			if (result.session?.scopeId !== workspaceId) return null;
 			const sessions = result.live
-				? await transport.listSessions({ workspaceId })
+				? await transport.listSessions({ workspaceId, limit: 200 })
 				: [];
 			return chatSessionTarget({ result, sessions, sessionId, workspaceId });
 		},

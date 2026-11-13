@@ -26,10 +26,7 @@ import {
 	type RecentlyViewedEntry,
 	useRecentlyViewed,
 } from "./hooks/useRecentlyViewed";
-import {
-	joinTasksWithStatuses,
-	TASK_LOOKUP_LIMIT,
-} from "./utils/joinTasksWithStatuses";
+import { useRecentTasks } from "./hooks/useRecentTasks";
 
 function WorkspaceRow({
 	entry,
@@ -284,15 +281,7 @@ export function HistoryDropdown() {
 		[automations],
 	);
 
-	const { data: taskPage } = cloudTrpc.task.listPage.useQuery({
-		limit: TASK_LOOKUP_LIMIT,
-	});
-	const { data: taskStatuses = [] } =
-		cloudTrpc.task.statuses.list.useQuery(undefined);
-	const taskData = useMemo(
-		() => joinTasksWithStatuses(taskPage?.items ?? [], taskStatuses),
-		[taskPage, taskStatuses],
-	);
+	const taskData = useRecentTasks(recentEntries);
 
 	const filteredEntries = recentEntries.filter((entry) => {
 		if (entry.type === "workspace") {
