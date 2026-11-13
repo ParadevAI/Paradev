@@ -27,7 +27,10 @@ export {
 	PULL_REQUEST_LINKS,
 	usePullRequestLinkPolicy,
 } from "./policies/pullRequestLinkPolicy";
-export { useChangesSidebarFilePolicy } from "./policies/useChangesSidebarFilePolicy";
+export {
+	type ChangesSidebarFilePolicy,
+	useChangesSidebarFilePolicy,
+} from "./policies/useChangesSidebarFilePolicy";
 export { useInlineFilePolicy } from "./policies/useInlineFilePolicy";
 export { usePagePolicy } from "./policies/usePagePolicy";
 export { useSidebarFilePolicy } from "./policies/useSidebarFilePolicy";

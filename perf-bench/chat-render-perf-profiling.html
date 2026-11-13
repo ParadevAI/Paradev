@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Desktop chat rendering: production profile per commit</title>
+		<style>
+			main { max-width: 68rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+			.lede { color: var(--sp-muted); max-width: var(--sp-measure); }
+			section { margin-top: 2.75rem; }
+			.wrap { overflow-x: auto; }
+			table { font-variant-numeric: tabular-nums; }
+			td.n, th.n { text-align: right; white-space: nowrap; }
+			tr.bad td { font-weight: 600; }
+			.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+			.verdict div { border-top: 2px solid var(--sp-border); padding-top: .6rem; }
+			.verdict b { display: block; font-size: 1.6rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+			.verdict span { color: var(--sp-muted); font-size: .9em; }
+			.chart { margin-top: 1rem; }
+			.legend { display: flex; gap: 1.25rem; font-size: .85em; color: var(--sp-muted); margin-bottom: .75rem; }
+			.legend i { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px; margin-right: .35rem; vertical-align: -1px; }
+			.group { display: grid; grid-template-columns: 10.5rem 1fr; gap: .2rem .75rem; align-items: center; margin-bottom: .9rem; }
+			.group .label { font-size: .85em; line-height: 1.25; }
+			.group .label small { display: block; color: var(--sp-muted); }
+			.bars { display: grid; gap: 2px; }
+			.bar { display: flex; align-items: center; gap: .4rem; font-size: .75em; color: var(--sp-muted); font-variant-numeric: tabular-nums; }
+			.bar span.fill { height: .7rem; border-radius: 0 4px 4px 0; }
+			.s1 { background: var(--sp-chart-1, #3b6fd8); }
+			.s2 { background: var(--sp-chart-2, #d9822b); }
+			.s3 { background: var(--sp-chart-3, #2f9e6e); }
+			pre { font-size: .8em; }
+			.muted { color: var(--sp-muted); }
+		</style>
+	</head>
+	<body class="auto">
+		<main>
+			<h1>Desktop chat rendering: production profile per commit</h1>
+			<p class="lede">
+				Follow-up to <a href="https://app.superset.sh/page/canary-chat-rendering-perf-suspect-commits-foewo6">the suspect-commit list</a>.
+				I built the chat renderer in production mode at five commits, streamed the same long chat into each
+				build in headless Chrome, and measured React commits, render time, long tasks and dropped frames.
+				Result: <strong>#9339 (cloud chat history sync) is the regression, and only in cloud workspaces.</strong>
+				#9582 (React Compiler + Vite 8) makes production rendering faster, not slower. A small change to SessionView
+				fixes the regression. I did not open a PR.
+			</p>
+
+			<div class="verdict">
+				<div><b>+84%</b><span>React render time per streaming update in a cloud chat after #9339 (6.8 → 12.5 ms). Local chats: no change.</span></div>
+				<div><b>−34%</b><span>Render time after #9582 (React Compiler), in both local and cloud chats. It is not the regression.</span></div>
+				<div><b>82 → 4</b><span>Frames over 33 ms during 300 updates at HEAD, cloud chat, 4× CPU throttle, before → after the proposed fix.</span></div>
+			</div>
+
+			<section>
+				<h2>Render time per streaming update</h2>
+				<p class="muted">React Profiler <code>actualDuration</code> summed over the run, divided by the 300 text deltas. Median of 3 runs, no CPU throttle. Lower is better.</p>
+				<div class="chart" role="img" aria-label="Render ms per update by commit; numbers are in the table below">
+					<div class="legend"><span><i class="s1"></i>Local workspace</span><span><i class="s2"></i>Cloud workspace</span><span><i class="s3"></i>Cloud + proposed fix</span></div>
+					<div id="bars"></div>
+				</div>
+			</section>
+
+			<section>
+				<h2>Numbers per commit</h2>
+				<p class="muted">1,662 items (250 finished turns), then one new turn streams 300 text deltas, one every 33 ms. Deltas are coalesced per animation frame by <code>useChatSession</code>, as in the app. Median of 3 runs per cell.</p>
+				<div class="wrap">
+					<table>
+						<thead>
+							<tr><th>Commit</th><th>Mode</th><th class="n">Render ms / update</th><th class="n">Commit p95 ms</th><th class="n">Commits / update</th><th class="n">Script ms (run)</th><th class="n">Long tasks</th></tr>
+						</thead>
+						<tbody id="rows"></tbody>
+					</table>
+				</div>
+
+				<h3>With 4× CPU throttling</h3>
+				<p class="muted">Same run with <code>Emulation.setCPUThrottlingRate(4)</code>, standing in for a busy laptop. Median of 2 runs. At this speed long tasks and dropped frames show up, which they do not on the 8-core sandbox.</p>
+				<div class="wrap">
+					<table>
+						<thead>
+							<tr><th>Commit</th><th>Mode</th><th class="n">Render ms / update</th><th class="n">Commit p95 ms</th><th class="n">Long tasks (ms)</th><th class="n">LoAF blocking ms</th><th class="n">Frames &gt; 33 ms</th></tr>
+						</thead>
+						<tbody id="throttled"></tbody>
+					</table>
+				</div>
+				<p>
+					Before the compiler (C), a throttled cloud chat spent 26 s of a 37 s run in long tasks and dropped almost every frame.
+					Part of what canary users felt as "slower" may be cloud chats in general. The compiler brought that down, but the cloud
+					cost from #9339 is still there at HEAD: about twice the local cost, with 82 frames over 33 ms.
+				</p>
+			</section>
+
+			<section>
+				<h2>Why: the stored history defeats the timeline memo</h2>
+				<p>
+					A text delta only changes <code>snapshot.liveStreams</code>. <code>items</code> and <code>turns</code> keep their
+					identity, so <code>useTimeline</code>, <code>useChildrenByParent</code> and everything after them normally skip
+					the work. In a cloud workspace, <code>useStoredChatSnapshot</code> keeps returning the stored chat after the box
+					connects. Then <code>withStoredHistory(storedSnapshot, session.snapshot)</code> runs on every snapshot change and
+					returns <em>new</em> <code>items</code> and <code>turns</code> Maps each time, even when nothing durable changed.
+					So each animation frame re-derives the whole chat:
+				</p>
+				<ul>
+					<li><code>deriveTimeline</code>, <code>deriveChildrenByParent</code>, <code>railMessages</code>, <code>promptHistory</code> and <code>editableMessageIds</code> over all 1,662 items: session component self time 12 → 204 ms.</li>
+					<li><code>transcriptRows</code> + <code>replyFooters</code> and the row-keyed effects in <code>Transcript</code>: self time 70 → 378 ms.</li>
+					<li><code>editableMessageIds</code> returns a new Set, so the <code>ChatPaneActions</code> context value changes on every frame. Every mounted <code>ChatInlineCode</code>, <code>UserMessageRow</code> and <code>TurnChangesCard</code> re-renders: about 9,200 + 600 + 600 extra renders over 150 updates.</li>
+				</ul>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>HEAD, 150 updates (unminified build, fiber walk)</th><th class="n">Component renders</th><th class="n">Transcript self ms</th><th class="n">Session self ms</th><th class="n">ChatInlineCode renders</th></tr></thead>
+						<tbody>
+							<tr><td>Local</td><td class="n">27,544</td><td class="n">70</td><td class="n">12</td><td class="n">149</td></tr>
+							<tr class="bad"><td>Cloud</td><td class="n">40,418</td><td class="n">378</td><td class="n">204</td><td class="n">9,370</td></tr>
+							<tr><td>Cloud + fix</td><td class="n">27,597</td><td class="n">61</td><td class="n">13</td><td class="n">148</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="muted">A finished chat that a cloud box serves in full hits this case every time: the live chat starts at the stored chat's first item, so the merge always rebuilds the Maps.</p>
+			</section>
+
+			<section>
+				<h2>Proposed fix</h2>
+				<p>
+					Merge again only when the live <code>items</code>, <code>turns</code>, <code>cursor</code> or <code>session</code>
+					change, and take <code>liveStreams</code> from the live snapshot each render. Text deltas then keep the merged Maps,
+					and every memo downstream holds. <code>withStoredHistory</code> itself does not change.
+				</p>
+<pre><code>// SessionView/hooks/useStoredHistory/useStoredHistory.ts
+export function useStoredHistory(
+	stored: SessionSnapshot | null | undefined,
+	live: SessionSnapshot,
+): SessionSnapshot {
+	const { items, turns, cursor, session } = live;
+	const merged = useMemo(
+		() =&gt;
+			stored
+				? withStoredHistory(stored, { ...emptySnapshot(), items, turns, cursor, session })
+				: null,
+		[stored, items, turns, cursor, session],
+	);
+	return useMemo(() =&gt; {
+		if (!merged || merged.items === items) return live;
+		return { ...merged, liveStreams: live.liveStreams, pendingReset: live.pendingReset };
+	}, [merged, items, live]);
+}
+
+// SessionView.tsx
+-	const shownSnapshot = useMemo(
+-		() =&gt;
+-			storedSnapshot
+-				? withStoredHistory(storedSnapshot, session.snapshot)
+-				: session.snapshot,
+-		[storedSnapshot, session.snapshot],
+-	);
++	const shownSnapshot = useStoredHistory(storedSnapshot, session.snapshot);</code></pre>
+				<p>
+					<strong>Equivalence:</strong> in the bench I ran the fixed hook next to the current code for 154 renders: seed, the
+					"host sent nothing yet" branch, durable item and turn events, and 150 deltas. <code>items</code>,
+					<code>turns</code>, <code>liveStreams</code> and <code>session</code> matched entry for entry each time, with 0
+					mismatches. One small difference: before the host sends anything, the result now carries the live
+					<code>pendingReset</code> and <code>liveStreams</code> instead of the stored ones. Nothing in the chat UI reads
+					those two fields from the shown snapshot.
+				</p>
+				<p>
+					<strong>Effect:</strong> cloud drops to local cost at both B (12.5 → 6.8 ms/update) and HEAD (8.3 → 4.5 ms/update),
+					and the throttled run goes from 82 to 4 frames over 33 ms. If the fix lands, add a test that streams a delta and checks that
+					<code>shownSnapshot.items</code> keeps its identity.
+				</p>
+				<p class="muted">
+					Optional extra hardening: <code>editableMessageIds</code> could go through <code>useStableList</code>/a stable Set, so a
+					real durable event does not re-render every <code>ChatInlineCode</code> through the context either. That is not needed
+					to close this regression.
+				</p>
+			</section>
+
+			<section>
+				<h2>Other findings</h2>
+				<ul>
+					<li><strong>#9582 is clean in production.</strong> Render time is −34% (local 6.9 → 4.6, cloud 13.0 → 8.5 ms/update), script time −37%, and throttled long tasks go from 55 to 1 (local). Vite 8 builds of this entry also take half the time (27 s vs 55 s).</li>
+					<li><strong>About 6.5 React commits per streaming update, at every commit.</strong> Most come from an anonymous library component plus <code>usePacedText</code>'s per-frame reveal. They are cheap (mean 0.7 ms), not a regression, and a possible follow-up. Cloud runs before the fix show fewer commits per update (4.0) only because heavy frames absorb the small ones.</li>
+					<li>No long tasks without throttling on any commit. The sandbox is faster than a typical laptop, so read the throttled table for what users feel.</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Method and limits</h2>
+				<ul>
+					<li><strong>Commits:</strong> A <code>b7e21ed0</code> (before #9339) · B <code>361ee967</code> (#9339) · C <code>bdd0a5be</code> (before #9582) · D <code>71e664ff</code> (#9582) · E <code>963279d1</code> (HEAD of this branch). One git worktree per commit, each with its own <code>bun install</code>.</li>
+					<li><strong>Build:</strong> each commit's own <code>electron.vite.config.ts</code> renderer config (its plugins, Babel/compiler, Tailwind), with <code>vite build</code> in production mode. Only the entry changes, and <code>react-dom/client</code> is aliased to <code>react-dom/profiling</code> so <code>&lt;Profiler&gt;</code> reports. The compiler output is in D and E only (134 <code>memo_cache_sentinel</code> sites vs 0).</li>
+					<li><strong>Harness:</strong> real <code>useChatSession</code> with a fake <code>SessionClient</code> (outline seed + delta envelopes), SessionView's streaming derivations, and the real <code>Transcript</code> with its providers. Cloud mode passes the stored snapshot the way <code>useStoredChatSnapshot</code> does.</li>
+					<li><strong>Not measured:</strong> the composer, header, sidebar and the rest of the Electron app; Electron's own Chromium (this used headless Chrome 157); a real cloud box. Below #9623, <code>TurnChangesCard</code>'s <code>workspace.get</code> query fails at once against an unreachable local port (once per card, not per update).</li>
+					<li>Harness and raw results live in <code>perf-bench/</code> in workspace <code>canary-chat-perf-profiling</code> (not committed).</li>
+				</ul>
+			</section>
+		</main>
+		<script>
+			const data = {
+				A: { name: "A · b7e21ed0", note: "before #9339", local: 6.89, cloud: 6.79 },
+				B: { name: "B · 361ee967", note: "#9339 history sync", local: 6.65, cloud: 12.51, fix: 6.84 },
+				C: { name: "C · bdd0a5be", note: "before #9582", local: 6.95, cloud: 13.04 },
+				D: { name: "D · 71e664ff", note: "#9582 compiler + Vite 8", local: 4.56, cloud: 8.48 },
+				E: { name: "E · 963279d1", note: "HEAD", local: 4.51, cloud: 8.26, fix: 4.55 },
+			};
+			const max = 14;
+			const bars = document.getElementById("bars");
+			for (const row of Object.values(data)) {
+				const group = document.createElement("div");
+				group.className = "group";
+				const label = document.createElement("div");
+				label.className = "label";
+				label.innerHTML = `${row.name}<small>${row.note}</small>`;
+				const stack = document.createElement("div");
+				stack.className = "bars";
+				for (const [key, cls, title] of [["local", "s1", "Local"], ["cloud", "s2", "Cloud"], ["fix", "s3", "Cloud + fix"]]) {
+					if (row[key] === undefined) continue;
+					const bar = document.createElement("div");
+					bar.className = "bar";
+					bar.title = `${row.name}, ${title}: ${row[key].toFixed(2)} ms per update`;
+					bar.innerHTML = `<span class="fill ${cls}" style="width:${(row[key] / max) * 100}%"></span>${row[key].toFixed(1)}`;
+					stack.append(bar);
+				}
+				group.append(label, stack);
+				bars.append(group);
+			}
+			const table = [
+				["A", "local", 6.89, 4.3, 6.46, 4690, 0], ["A", "cloud", 6.79, 4.3, 6.55, 4651, 0],
+				["B", "local", 6.65, 4.2, 6.57, 4591, 0], ["B", "cloud", 12.51, 11.7, 4.01, 7347, 0, true], ["B", "cloud + fix", 6.84, 4.4, 6.56, 4672, 0],
+				["C", "local", 6.95, 4.4, 6.51, 4733, 0], ["C", "cloud", 13.04, 12.4, 4.05, 7592, 0, true],
+				["D", "local", 4.56, 2.1, 6.55, 2974, 0], ["D", "cloud", 8.48, 6.0, 6.54, 4441, 0, true],
+				["E", "local", 4.51, 2.0, 6.55, 2861, 0], ["E", "cloud", 8.26, 5.7, 6.54, 4351, 0, true], ["E", "cloud + fix", 4.55, 2.1, 6.56, 2939, 0],
+			];
+			document.getElementById("rows").innerHTML = table
+				.map(([c, m, r, p, cpu, s, lt, bad]) => `<tr class="${bad ? "bad" : ""}"><td>${data[c].name}</td><td>${m}</td><td class="n">${r.toFixed(2)}</td><td class="n">${p.toFixed(1)}</td><td class="n">${cpu.toFixed(2)}</td><td class="n">${s.toLocaleString("en")}</td><td class="n">${lt}</td></tr>`)
+				.join("");
+			const throttled = [
+				["C", "local", 23.46, 21.9, "56 (3,074)", 834, 301], ["C", "cloud", 46.31, 52.1, "302 (26,349)", 12001, 310, true],
+				["D", "local", 15.43, 9.2, "1 (105)", 60, 6], ["D", "cloud", 28.39, 29.0, "4 (254)", 128, 100, true],
+				["E", "local", 15.61, 9.0, "1 (103)", 58, 6], ["E", "cloud", 27.35, 27.0, "4 (267)", 106, 83, true], ["E", "cloud + fix", 15.67, 9.5, "1 (100)", 55, 4],
+			];
+			document.getElementById("throttled").innerHTML = throttled
+				.map(([c, m, r, p, lt, loaf, f, bad]) => `<tr class="${bad ? "bad" : ""}"><td>${data[c].name}</td><td>${m}</td><td class="n">${r.toFixed(2)}</td><td class="n">${p.toFixed(1)}</td><td class="n">${lt}</td><td class="n">${loaf.toLocaleString("en")}</td><td class="n">${f}</td></tr>`)
+				.join("");
+		</script>
+	</body>
+</html>

@@ -32,8 +32,8 @@ import {
 } from "lucide-react";
 import { memo, useState } from "react";
 import {
+	type ChangesSidebarFilePolicy,
 	modifierLabel,
-	useChangesSidebarFilePolicy,
 } from "renderer/lib/clickPolicy";
 import { splitPath } from "renderer/lib/splitPath";
 import { ChangedFileRow } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileRow";
@@ -59,6 +59,8 @@ interface FileRowProps {
 	onSelect?: (path: string, openInNewTab?: boolean, changeKey?: string) => void;
 	onOpenFile?: (absolutePath: string, openInNewTab?: boolean) => void;
 	onOpenInEditor?: (path: string) => void;
+	/** Shared by every row of a list, which reads the user's click settings once. */
+	policy: ChangesSidebarFilePolicy;
 }
 
 export const FileRow = memo(function FileRow({
@@ -70,6 +72,7 @@ export const FileRow = memo(function FileRow({
 	onSelect,
 	onOpenFile,
 	onOpenInEditor,
+	policy,
 }: FileRowProps) {
 	const { t } = useLingui();
 	const basename = splitPath(file.path).name;
@@ -82,6 +85,11 @@ export const FileRow = memo(function FileRow({
 	const canUnstage = file.source.kind === "staged";
 	const canDiscard = canStage;
 	const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+	const [discardDialogMounted, setDiscardDialogMounted] = useState(false);
+	const openDiscardConfirm = () => {
+		setDiscardDialogMounted(true);
+		setShowDiscardConfirm(true);
+	};
 	const isDeleteAction = file.status === "untracked" || file.status === "added";
 	const utils = workspaceTrpc.useUtils();
 	const discardMutation = workspaceTrpc.git.discardChanges.useMutation({
@@ -106,7 +114,6 @@ export const FileRow = memo(function FileRow({
 	};
 	const { stageFile, unstageFile } = useStagingMutations(workspaceId);
 
-	const policy = useChangesSidebarFilePolicy();
 	const diffNewTabTier = policy.tierForIntent("diffNewTab");
 	const fileTier = policy.tierForIntent("file");
 	const externalTier = policy.tierForIntent("external");
@@ -146,7 +153,7 @@ export const FileRow = memo(function FileRow({
 								className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-destructive"
 								onClick={(e) => {
 									e.stopPropagation();
-									setShowDiscardConfirm(true);
+									openDiscardConfirm();
 								}}
 							>
 								<Undo2 className="size-3.5" />
@@ -330,10 +337,7 @@ export const FileRow = memo(function FileRow({
 					</ContextMenuItem>
 				)}
 				{canDiscard && (
-					<ContextMenuItem
-						variant="destructive"
-						onSelect={() => setShowDiscardConfirm(true)}
-					>
+					<ContextMenuItem variant="destructive" onSelect={openDiscardConfirm}>
 						{isDeleteAction ? <Trash2 /> : <Undo2 />}
 						{isDeleteAction
 							? t({ message: "Delete" })
@@ -343,40 +347,42 @@ export const FileRow = memo(function FileRow({
 					</ContextMenuItem>
 				)}
 			</ContextMenuContent>
-			<DiscardConfirmDialog
-				open={showDiscardConfirm}
-				onOpenChange={setShowDiscardConfirm}
-				title={
-					isDeleteAction
-						? t({
-								message: `Delete "${basename}"?`,
-							})
-						: t({
-								message: `Discard changes to "${basename}"?`,
-							})
-				}
-				description={
-					isDeleteAction
-						? t({
-								message:
-									"This will permanently delete this file. This action cannot be undone.",
-							})
-						: t({
-								message:
-									"This will revert all changes to this file. This action cannot be undone.",
-							})
-				}
-				confirmLabel={
-					isDeleteAction
-						? t({
-								message: "Delete",
-							})
-						: t({
-								message: "Discard",
-							})
-				}
-				onConfirm={confirmDiscard}
-			/>
+			{discardDialogMounted && (
+				<DiscardConfirmDialog
+					open={showDiscardConfirm}
+					onOpenChange={setShowDiscardConfirm}
+					title={
+						isDeleteAction
+							? t({
+									message: `Delete "${basename}"?`,
+								})
+							: t({
+									message: `Discard changes to "${basename}"?`,
+								})
+					}
+					description={
+						isDeleteAction
+							? t({
+									message:
+										"This will permanently delete this file. This action cannot be undone.",
+								})
+							: t({
+									message:
+										"This will revert all changes to this file. This action cannot be undone.",
+								})
+					}
+					confirmLabel={
+						isDeleteAction
+							? t({
+									message: "Delete",
+								})
+							: t({
+									message: "Discard",
+								})
+					}
+					onConfirm={confirmDiscard}
+				/>
+			)}
 		</ContextMenu>
 	);
 });

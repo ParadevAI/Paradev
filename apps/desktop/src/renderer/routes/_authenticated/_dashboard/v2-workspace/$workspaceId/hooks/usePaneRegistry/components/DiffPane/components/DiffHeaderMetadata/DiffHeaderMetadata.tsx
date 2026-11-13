@@ -7,7 +7,7 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { LuCheck, LuCopy, LuExternalLink, LuUndo2, LuX } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import { useSidebarFilePolicy } from "renderer/lib/clickPolicy";
+import type { ClickPolicy } from "renderer/lib/clickPolicy";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
 import type { ChangesetFile } from "../../../../../useChangeset";
 import { useDiffHeaderHover } from "../../hooks/useDiffHeaderHover";
@@ -27,6 +27,8 @@ interface DiffHeaderMetadataProps {
 	isSaving: boolean;
 	onSaveEditing?: () => void;
 	onCancelEditing?: () => void;
+	/** Read once by the pane rather than once per file header. */
+	policy: ClickPolicy;
 }
 
 export function DiffHeaderMetadata({
@@ -43,12 +45,12 @@ export function DiffHeaderMetadata({
 	isSaving,
 	onSaveEditing,
 	onCancelEditing,
+	policy,
 }: DiffHeaderMetadataProps) {
 	const { t } = useLingui();
 	const actionsRef = useRef<HTMLDivElement>(null);
 	const headerHovered = useDiffHeaderHover(actionsRef);
 	const { copyToClipboard, copied } = useCopyToClipboard();
-	const policy = useSidebarFilePolicy();
 
 	const handleToggleViewed = useCallback(() => {
 		const next = !viewed;
