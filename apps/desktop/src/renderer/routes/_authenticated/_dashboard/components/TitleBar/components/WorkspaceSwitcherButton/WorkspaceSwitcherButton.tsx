@@ -1,10 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useMatchRoute } from "@tanstack/react-router";
 import { openWorkspaceList } from "renderer/commandPalette";
 import { HotkeyLabel } from "renderer/hotkeys";
-import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { WorkspacesIcon } from "./components/WorkspacesIcon";
 import {
 	useWaitingWorkspaceBucket,
@@ -19,15 +17,7 @@ const WAITING_DOT_CLASS: Record<WaitingWorkspaceBucket, string> = {
 /** Opens the workspace switcher. Its dot shows when another sidebar workspace waits on the user. */
 export function WorkspaceSwitcherButton() {
 	const { t } = useLingui();
-	const matchRoute = useMatchRoute();
-	const { workspaces } = useHostWorkspaces();
 	const waiting = useWaitingWorkspaceBucket();
-	const match = matchRoute({ to: "/v2-workspace/$workspaceId", fuzzy: true });
-	const workspace =
-		match !== false
-			? workspaces.find((candidate) => candidate.id === match.workspaceId)
-			: undefined;
-	if (!workspace) return null;
 
 	return (
 		<Tooltip delayDuration={300}>
