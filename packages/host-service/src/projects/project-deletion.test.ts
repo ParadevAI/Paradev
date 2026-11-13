@@ -242,7 +242,7 @@ describe("interrupted-delete reconciler", () => {
 	test("never deletes uncommitted files", async () => {
 		const { ctx, addWorkspace, workspace } = setup();
 		const dirty = strand(addWorkspace, "dirty");
-		cleanupGitOps.readWorktreeState = async () =>
+		cleanupGitOps.readWorktreeStateUnattended = async () =>
 			({ hasChanges: true }) as never;
 		await runArchivedWorkspaceReconcile(ctx);
 		expect(existsSync(dirty)).toBe(true);
@@ -252,7 +252,7 @@ describe("interrupted-delete reconciler", () => {
 	test("finishes a clean interrupted delete", async () => {
 		const { ctx, addWorkspace, workspace } = setup();
 		const stranded = strand(addWorkspace, "stranded");
-		cleanupGitOps.readWorktreeState = async () =>
+		cleanupGitOps.readWorktreeStateUnattended = async () =>
 			({ hasChanges: false }) as never;
 		await runArchivedWorkspaceReconcile(ctx);
 		expect(existsSync(stranded)).toBe(false);
@@ -269,7 +269,7 @@ describe("interrupted-delete reconciler", () => {
 			archivedAt: Date.now() + 1_000,
 			archiveReason: "deleted",
 		});
-		cleanupGitOps.readWorktreeState = async () =>
+		cleanupGitOps.readWorktreeStateUnattended = async () =>
 			({ hasChanges: false }) as never;
 		await runArchivedWorkspaceReconcile(ctx);
 		expect(gitCalls).toEqual([]);
@@ -331,6 +331,22 @@ describe("delete permanently", () => {
 		expect(project()).toBeUndefined();
 		expect(gitCalls).toEqual([["worktree", "remove", live, "force=false"]]);
 		expect(existsSync(repoPath)).toBe(true);
+	});
+
+	test("a worktree whose removal fails does not stop the others", async () => {
+		const { ctx, addWorkspace, project } = setup();
+		const stuck = addWorkspace("stuck");
+		const other = addWorkspace("other");
+		const removeAndRecord = cleanupGitOps.removeWorktree;
+		cleanupGitOps.removeWorktree = async (input) => {
+			if (input.worktreePath === stuck) throw new Error("timed out");
+			return removeAndRecord(input);
+		};
+		await softDeleteProject(ctx, PROJECT_ID);
+		expect(await purgeDeletedProject(ctx, PROJECT_ID)).toBe(true);
+		expect(project()).toBeUndefined();
+		expect(existsSync(stuck)).toBe(true);
+		expect(existsSync(other)).toBe(false);
 	});
 
 	test("refuses a project that was never deleted", async () => {

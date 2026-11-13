@@ -22,6 +22,9 @@ export interface DestroyWorkspaceInput {
 	/** Consent to abandon the teardown script — only the teardown-failed
 	 * retry sets this. */
 	skipTeardown?: boolean;
+	/** Only for this machine's host: the relay gives up on a request after
+	 * about a minute, and a long dirty check can outlast that. */
+	longPreflight?: boolean;
 }
 
 export interface DestroyWorkspaceSuccess {
@@ -84,6 +87,7 @@ export async function destroyWorkspaceAtHost(
 			deleteBranch: input.deleteBranch ?? false,
 			force: input.force ?? false,
 			skipTeardown: input.skipTeardown ?? false,
+			longPreflight: input.longPreflight ?? false,
 		});
 	} catch (error) {
 		throw normalizeDestroyWorkspaceError(error);
@@ -163,10 +167,10 @@ export function useDestroyWorkspace(workspaceId: string): UseDestroyWorkspace {
 			}
 			return destroyWorkspaceAtHost(
 				{ workspaceId, hostUrl, hostStatus },
-				input,
+				{ ...input, longPreflight: hostUrl === activeHostUrl },
 			);
 		},
-		[hostUrl, hostStatus, isSandbox, utils, workspaceId],
+		[activeHostUrl, hostUrl, hostStatus, isSandbox, utils, workspaceId],
 	);
 
 	const inspect = useCallback(async (): Promise<DestroyWorkspacePreview> => {

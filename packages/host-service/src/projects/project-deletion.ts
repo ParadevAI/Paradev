@@ -243,22 +243,32 @@ async function purgeProject(
 	if (worktrees.length > 0) {
 		try {
 			const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, project.repoPath);
-			for (const row of worktrees) {
-				const { stillRegistered, removeError } =
-					await cleanupGitOps.removeWorktree({
-						repoPath: project.repoPath,
-						worktreePath: row.worktreePath,
-						gitEnv,
-						force: false,
-					});
-				if (stillRegistered) {
-					console.warn("[project-deletion] left worktree on disk", {
-						projectId: project.id,
-						worktreePath: row.worktreePath,
-						removeError,
-					});
-				}
-			}
+			await Promise.all(
+				worktrees.map(async (row) => {
+					try {
+						const { stillRegistered, removeError } =
+							await cleanupGitOps.removeWorktree({
+								repoPath: project.repoPath,
+								worktreePath: row.worktreePath,
+								gitEnv,
+								force: false,
+							});
+						if (stillRegistered) {
+							console.warn("[project-deletion] left worktree on disk", {
+								projectId: project.id,
+								worktreePath: row.worktreePath,
+								removeError,
+							});
+						}
+					} catch (err) {
+						console.warn("[project-deletion] left worktree on disk", {
+							projectId: project.id,
+							worktreePath: row.worktreePath,
+							err,
+						});
+					}
+				}),
+			);
 		} catch (err) {
 			console.warn("[project-deletion] left worktrees on disk", {
 				projectId: project.id,

@@ -72,6 +72,7 @@ export async function runArchivedWorkspaceReconcile(
 				// uncommitted files block the delete and un-archive the row.
 				force: false,
 				teardownMode: "best-effort",
+				longPreflight: true,
 			});
 			resumed++;
 		} catch (err) {

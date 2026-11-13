@@ -33,6 +33,36 @@ export function isIndeterminateGitTaskFailure(err: unknown): boolean {
 	return err instanceof WorkerTaskError && err.name === "WorkerTaskError";
 }
 
+/** The delete dialog waits on this read. */
+export const INSPECT_WORKTREE_STATE_TIMEOUT_MS = 15_000;
+
+/** Runs after the row is archived, so nobody waits on it. */
+export const DESTROY_WORKTREE_STATE_TIMEOUT_MS = 10 * 60_000;
+
+/** A timeout kills git mid-delete, so this only stops a hung removal. */
+export const WORKTREE_REMOVE_TIMEOUT_MS = 30 * 60_000;
+
+/** Long delete tasks must not take every shared worker slot from status and diff reads. */
+export const MAX_CONCURRENT_LONG_DELETE_TASKS = 2;
+
+let activeLongDeleteTasks = 0;
+const queuedLongDeleteTasks: Array<() => void> = [];
+
+async function withLongDeleteTaskSlot<T>(run: () => Promise<T>): Promise<T> {
+	if (activeLongDeleteTasks < MAX_CONCURRENT_LONG_DELETE_TASKS) {
+		activeLongDeleteTasks++;
+	} else {
+		await new Promise<void>((resolve) => queuedLongDeleteTasks.push(resolve));
+	}
+	try {
+		return await run();
+	} finally {
+		const next = queuedLongDeleteTasks.shift();
+		if (next) next();
+		else activeLongDeleteTasks--;
+	}
+}
+
 export const cleanupGitOps = {
 	/** Same failure surface as `ctx.git(repoPath)` — a throw here maps to the
 	 * saga's "failed to open project repo" handling. */
@@ -49,12 +79,21 @@ export const cleanupGitOps = {
 			gitEnv: GitTaskEnv;
 			ignoreInitialCommit?: boolean;
 		},
-		signal?: AbortSignal,
+		options: { timeoutMs: number; signal?: AbortSignal },
 	): Promise<{ hasChanges: boolean; hasUnpushedCommits: boolean }> {
-		return getHostWorkerPool().run(gitWorktreeStateTask, input, {
-			timeoutMs: 15_000,
-			signal,
-		});
+		return getHostWorkerPool().run(gitWorktreeStateTask, input, options);
+	},
+
+	/** For a caller that does not wait on the answer (no dialog, no relay). */
+	readWorktreeStateUnattended(input: {
+		worktreePath: string;
+		gitEnv: GitTaskEnv;
+	}): Promise<{ hasChanges: boolean; hasUnpushedCommits: boolean }> {
+		return withLongDeleteTaskSlot(() =>
+			getHostWorkerPool().run(gitWorktreeStateTask, input, {
+				timeoutMs: DESTROY_WORKTREE_STATE_TIMEOUT_MS,
+			}),
+		);
 	},
 
 	removeWorktree(input: {
@@ -63,12 +102,11 @@ export const cleanupGitOps = {
 		gitEnv: GitTaskEnv;
 		force?: boolean;
 	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
-		// Generous timeout: removal recursively deletes the worktree
-		// directory, which can take a while for large trees (node_modules
-		// etc.).
-		return getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
-			timeoutMs: 120_000,
-		});
+		return withLongDeleteTaskSlot(() =>
+			getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
+				timeoutMs: WORKTREE_REMOVE_TIMEOUT_MS,
+			}),
+		);
 	},
 
 	deleteLocalBranch(input: {
