@@ -39,7 +39,11 @@ import {
 	type StopState,
 	stopTerminalsForMove,
 } from "./terminal-sessions";
-import { pushSnapshots, resolveSnapshotTargets } from "./utils/snapshots";
+import {
+	deleteSnapshots,
+	pushSnapshots,
+	resolveSnapshotTargets,
+} from "./utils/snapshots";
 
 const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
@@ -349,6 +353,7 @@ export const teleportRouter = router({
 						resumeError,
 					),
 				);
+				if (snapshots.length > 0) await deleteSnapshots(targets, branch);
 				throw error;
 			}
 

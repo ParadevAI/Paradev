@@ -4,7 +4,12 @@ import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { simpleGit } from "simple-git";
-import { pushSnapshots, type RunTask, type SnapshotTarget } from "./snapshots";
+import {
+	assertDistinctRepositories,
+	pushSnapshots,
+	type RunTask,
+	type SnapshotTarget,
+} from "./snapshots";
 
 const root = mkdtempSync(join(tmpdir(), "teleport-snapshots-"));
 afterAll(() => rmSync(root, { recursive: true, force: true }));
@@ -40,11 +45,7 @@ async function checkout(name: string): Promise<SnapshotTarget> {
 
 const remoteHas = async (name: string, branch: string) =>
 	(
-		await simpleGit(join(root, `${name}.git`)).raw([
-			"branch",
-			"--list",
-			branch,
-		])
+		await simpleGit(join(root, `${name}.git`)).raw(["branch", "--list", branch])
 	).trim() !== "";
 
 describe("pushSnapshots", () => {
@@ -68,5 +69,47 @@ describe("pushSnapshots", () => {
 			pushSnapshots([web, broken], "superset/teleport-b", run),
 		).rejects.toThrow(/Could not push api2/);
 		expect(await remoteHas("web2", "superset/teleport-b")).toBe(false);
+	});
+});
+
+describe("pushSnapshots rollback", () => {
+	it("deletes the branch even from a remote whose push was reported as failed", async () => {
+		const web = await checkout("web3");
+		const api = await checkout("api3");
+		const landedThenFailed: RunTask = async (def, input) => {
+			const result = await def.handler(input);
+			if (
+				def.type === "git/pushSnapshot" &&
+				(input as { worktreePath: string }).worktreePath === api.worktreePath
+			) {
+				throw new Error("connection dropped");
+			}
+			return result;
+		};
+
+		await expect(
+			pushSnapshots([web, api], "superset/teleport-c", landedThenFailed),
+		).rejects.toThrow(/Could not push api3/);
+		expect(await remoteHas("web3", "superset/teleport-c")).toBe(false);
+		expect(await remoteHas("api3", "superset/teleport-c")).toBe(false);
+	});
+});
+
+describe("assertDistinctRepositories", () => {
+	it("refuses two checkouts of one GitHub repository, in any case", () => {
+		const target = (name: string, repositoryFullName: string) =>
+			({ name, repositoryFullName }) as SnapshotTarget;
+		expect(() =>
+			assertDistinctRepositories([
+				target("web", "acme/web"),
+				target("web-copy", "Acme/Web"),
+			]),
+		).toThrow(/web and web-copy are both Acme\/Web/);
+		expect(() =>
+			assertDistinctRepositories([
+				target("web", "acme/web"),
+				target("api", "acme/api"),
+			]),
+		).not.toThrow();
 	});
 });

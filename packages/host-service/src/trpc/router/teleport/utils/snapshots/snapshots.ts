@@ -65,7 +65,7 @@ export async function resolveSnapshotTargets(
 					remoteName: checkout.repository?.remoteName ?? null,
 				}));
 	const resolveEnv = createGitEnvResolver(ctx.credentials);
-	return Promise.all(
+	const targets = await Promise.all(
 		entries.map(async (entry) => {
 			const gitEnv = {
 				...(await resolveEnv(entry.path)),
@@ -100,9 +100,53 @@ export async function resolveSnapshotTargets(
 			};
 		}),
 	);
+	assertDistinctRepositories(targets);
+	return targets;
 }
 
-/** Pushes every checkout to `branch`; all or nothing, so a failure deletes the branches already pushed. */
+/** Two folders cloned from one GitHub repository would race for the same branch on the same remote. */
+export function assertDistinctRepositories(targets: SnapshotTarget[]) {
+	const seen = new Map<string, string>();
+	for (const target of targets) {
+		const key = target.repositoryFullName.toLowerCase();
+		const other = seen.get(key);
+		if (other !== undefined) {
+			throw new TRPCError({
+				code: "PRECONDITION_FAILED",
+				message: `${other} and ${target.name} are both ${target.repositoryFullName}; a workspace with two checkouts of one GitHub repository cannot be moved`,
+			});
+		}
+		seen.set(key, target.name);
+	}
+}
+
+/** Best effort: a delete that fails is logged, since the branch then stays on the remote. */
+export async function deleteSnapshots(
+	targets: SnapshotTarget[],
+	branch: string,
+	run: RunTask = poolRun,
+) {
+	const results = await Promise.allSettled(
+		targets.map((target) =>
+			run(gitDeleteSnapshotTask, {
+				worktreePath: target.worktreePath,
+				remote: target.remote,
+				branch,
+				gitEnv: target.gitEnv,
+			}),
+		),
+	);
+	results.forEach((result, index) => {
+		if (result.status === "rejected") {
+			console.warn(
+				`[teleport] could not delete ${branch} from ${targets[index]?.name || "the remote"}`,
+				result.reason,
+			);
+		}
+	});
+}
+
+/** Pushes every checkout to `branch`; all or nothing, so a failure deletes the branch everywhere. */
 export async function pushSnapshots(
 	targets: SnapshotTarget[],
 	branch: string,
@@ -133,24 +177,29 @@ export async function pushSnapshots(
 				.value.commit,
 		}));
 	}
-	await Promise.allSettled(
-		targets.map((target, index) =>
-			results[index]?.status === "fulfilled"
-				? run(gitDeleteSnapshotTask, {
-						worktreePath: target.worktreePath,
-						remote: target.remote,
-						branch,
-						gitEnv: target.gitEnv,
-					})
-				: Promise.resolve(),
-		),
-	);
+	// A push reported as failed (a timeout, a dropped connection) can still have landed.
+	await deleteSnapshots(targets, branch, run);
 	const error = (results[failedAt] as PromiseRejectedResult).reason;
-	rethrowEnvironmentalGitError(error);
-	if (targets.length === 1) throw error;
+	if (targets.length === 1) {
+		rethrowEnvironmentalGitError(error);
+		throw error;
+	}
+	const name = targets[failedAt]?.name;
+	try {
+		rethrowEnvironmentalGitError(error);
+	} catch (classified) {
+		if (classified instanceof TRPCError) {
+			throw new TRPCError({
+				code: classified.code,
+				message: `${name}: ${classified.message}`,
+				cause: classified.cause ?? error,
+			});
+		}
+		throw classified;
+	}
 	throw new TRPCError({
 		code: "INTERNAL_SERVER_ERROR",
-		message: `Could not push ${targets[failedAt]?.name}: ${error instanceof Error ? error.message : String(error)}`,
+		message: `Could not push ${name}: ${error instanceof Error ? error.message : String(error)}`,
 		cause: error,
 	});
 }

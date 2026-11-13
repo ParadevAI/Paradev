@@ -58,7 +58,7 @@ export default command({
 				message:
 					value === null || value === undefined
 						? ""
-						: Array.isArray(value)
+						: options.field === "checkouts" && Array.isArray(value)
 							? formatCheckouts(value, 0)
 							: String(value),
 			};
