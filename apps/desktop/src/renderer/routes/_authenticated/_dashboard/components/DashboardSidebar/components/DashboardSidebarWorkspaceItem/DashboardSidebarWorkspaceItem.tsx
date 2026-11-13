@@ -48,6 +48,11 @@ interface DashboardSidebarWorkspaceItemProps {
 	pinnedContext?: { projectName: string | null; projectIconUrl: string | null };
 }
 
+/**
+ * A workspace in the sidebar: the collapsed rail's icon button or the full
+ * row, wrapped in the context menus and hover card they share. Reads the
+ * workspace's live status once here and hands it to whichever it renders.
+ */
 export function DashboardSidebarWorkspaceItem({
 	workspace,
 	onHoverCardOpen,
@@ -85,7 +90,8 @@ export function DashboardSidebarWorkspaceItem({
 					workspace: { id, hostId: workspace.hostId, projectId, name },
 				}
 			: undefined;
-	const { status: workspaceStatus } = useSidebarWorkspaceStatus(id);
+	const { status: workspaceStatus, needsAttention } =
+		useSidebarWorkspaceStatus(id);
 	const {
 		cancelRename,
 		pendingName,
@@ -334,6 +340,7 @@ export function DashboardSidebarWorkspaceItem({
 			<DashboardSidebarExpandedWorkspaceRow
 				workspace={displayWorkspace}
 				isActive={isActive}
+				needsAttention={needsAttention}
 				isRenaming={isRenaming}
 				renameValue={renameValue}
 				shortcutLabel={shortcutLabel}

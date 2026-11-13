@@ -37,11 +37,14 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
+import { emphasizeWorkspaceRowName } from "./utils/emphasizeWorkspaceRowName";
 
 interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
 	workspace: DashboardSidebarWorkspace;
 	isActive: boolean;
+	/** Unread, or an agent waiting on an answer. Emphasizes the name. */
+	needsAttention?: boolean;
 	isRenaming: boolean;
 	renameValue: string;
 	shortcutLabel?: string;
@@ -64,6 +67,11 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	onCancelRename: () => void;
 }
 
+/**
+ * One sidebar row, in all three places a workspace appears: inside a project,
+ * in the Pinned section, and as a top-level session. A row that needs
+ * attention carries it in the name's weight as well as the lead dot.
+ */
 export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 	HTMLDivElement,
 	DashboardSidebarExpandedWorkspaceRowProps
@@ -72,6 +80,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		{
 			workspace,
 			isActive,
+			needsAttention = false,
 			isRenaming,
 			renameValue,
 			shortcutLabel,
@@ -148,6 +157,12 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 				: sandboxStatus === "provisioning"
 					? t({ message: "Creating the sandbox" })
 					: null;
+		const isEmphasized = emphasizeWorkspaceRowName({
+			needsAttention,
+			isActive,
+			isSelected,
+			isCreatePending: isPending,
+		});
 		const leadIndicator = (
 			<DashboardSidebarWorkspaceLeadIndicator
 				workspaceStatus={workspaceStatus}
@@ -315,9 +330,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									forceActive={isFocused}
 									className={cn(
 										"min-w-0 text-[13px] leading-tight transition-colors",
-										isActive || isSelected
+										isActive || isSelected || isEmphasized
 											? "text-foreground"
 											: "text-foreground/80",
+										isEmphasized ? "font-semibold" : "font-normal",
 									)}
 								/>
 								{isSelected && (

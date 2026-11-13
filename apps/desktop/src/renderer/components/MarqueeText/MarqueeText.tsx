@@ -36,6 +36,11 @@ interface MarqueeTextProps {
 	forceActive?: boolean;
 }
 
+/**
+ * Single-line text that slides its overflow into view while hovered or
+ * focused, and fades its trailing edge while it is parked, so a truncated
+ * name can still be read in place.
+ */
 export function MarqueeText({
 	children,
 	title,
@@ -59,9 +64,13 @@ export function MarqueeText({
 		if (!title) return;
 		measureOverflow();
 		const container = containerRef.current;
+		const text = textRef.current;
 		if (!container || typeof ResizeObserver === "undefined") return;
 		const observer = new ResizeObserver(measureOverflow);
 		observer.observe(container);
+		// The text resizes without the container doing so when its own styling
+		// changes — a name turning bold is wider in the same row.
+		if (text) observer.observe(text);
 		return () => observer.disconnect();
 	}, [title, measureOverflow]);
 

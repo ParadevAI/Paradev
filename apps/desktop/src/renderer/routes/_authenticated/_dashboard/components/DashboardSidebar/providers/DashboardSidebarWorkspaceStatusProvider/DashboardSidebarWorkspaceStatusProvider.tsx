@@ -37,6 +37,13 @@ export interface SidebarWorkspaceStatusEntry {
 	status: ActivePaneStatus | null;
 	/** Manual unread mark, or any terminal in review/failed. */
 	isUnread: boolean;
+	/**
+	 * Unread, or an agent waiting on an answer. A superset of the dock badge's
+	 * count (`useV2AttentionWorkspaceCount`), which reads cached bindings and
+	 * so cannot see a host-reported status; the row follows its own dot
+	 * instead of the badge where the two disagree.
+	 */
+	needsAttention: boolean;
 	/** `terminalId → host agent binding` (source rows for mark-seen). */
 	bindings: ReadonlyMap<string, TerminalAgentBinding>;
 	/** `terminalId → derived agent status` (drives the agents chip). */
@@ -50,6 +57,7 @@ export interface SidebarWorkspaceStatusEntry {
 const EMPTY_ENTRY: SidebarWorkspaceStatusEntry = {
 	status: null,
 	isUnread: false,
+	needsAttention: false,
 	bindings: new Map(),
 	statuses: new Map(),
 	diffStats: null,
@@ -162,6 +170,7 @@ function entriesEqual(
 	return (
 		left.status === right.status &&
 		left.isUnread === right.isUnread &&
+		left.needsAttention === right.needsAttention &&
 		left.reportedAt === right.reportedAt &&
 		(left.diffStats === right.diffStats ||
 			(left.diffStats !== null &&
@@ -378,17 +387,20 @@ export function DashboardSidebarWorkspaceStatusProvider({
 				(workspaceSeenAt[target.workspaceId] ?? 0) >= report.at
 					? null
 					: (report?.status ?? null);
+			const status = getHighestPriorityStatus([
+				hasManualUnread ? "review" : undefined,
+				reported ?? undefined,
+				...statuses.values(),
+			]);
+			const isUnread =
+				hasManualUnread ||
+				hasAttentionTerminal ||
+				reported === "review" ||
+				reported === "failed";
 			const candidate: SidebarWorkspaceStatusEntry = {
-				status: getHighestPriorityStatus([
-					hasManualUnread ? "review" : undefined,
-					reported ?? undefined,
-					...statuses.values(),
-				]),
-				isUnread:
-					hasManualUnread ||
-					hasAttentionTerminal ||
-					reported === "review" ||
-					reported === "failed",
+				status,
+				isUnread,
+				needsAttention: isUnread || status === "permission",
 				bindings,
 				statuses,
 				diffStats:
