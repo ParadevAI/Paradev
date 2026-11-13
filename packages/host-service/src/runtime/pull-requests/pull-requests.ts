@@ -319,6 +319,7 @@ export class PullRequestRuntimeManager {
 	private missingWorktreeProbeTimer: ReturnType<typeof setInterval> | null =
 		null;
 	private readonly linkListeners = new Set<() => void>();
+	private stopped = false;
 
 	constructor(options: PullRequestRuntimeManagerOptions) {
 		this.db = options.db;
@@ -343,6 +344,7 @@ export class PullRequestRuntimeManager {
 			this.unsubscribeFromGitWatcher
 		)
 			return;
+		this.stopped = false;
 
 		// One initial sweep so checkouts that existed before this manager
 		// started have correct branch/sha/upstream rows even if no `.git/`
@@ -395,6 +397,7 @@ export class PullRequestRuntimeManager {
 	}
 
 	stop() {
+		this.stopped = true;
 		this.conditionalGh.clear();
 		if (this.safetyNetTimer) clearInterval(this.safetyNetTimer);
 		if (this.repositoryRefreshTimer) clearInterval(this.repositoryRefreshTimer);
@@ -410,6 +413,19 @@ export class PullRequestRuntimeManager {
 		this.missingWorktrees.clear();
 		this.unsubscribeFromGitWatcher = null;
 		this.unsubscribeFromWorkspaceEvents = null;
+	}
+
+	/** Settles once the syncs and refreshes running at `stop()` are done. */
+	async drain(): Promise<void> {
+		while (
+			this.checkoutSyncState.size > 0 ||
+			this.inFlightRepositories.size > 0
+		) {
+			await Promise.allSettled([
+				...[...this.checkoutSyncState.values()].map((state) => state.running),
+				...this.inFlightRepositories.values(),
+			]);
+		}
 	}
 
 	/** Checkout rows of these workspaces with their repository's name, by workspace. */
@@ -883,6 +899,7 @@ export class PullRequestRuntimeManager {
 		// and one rerun is queued, regardless of how many events fire. A bypass
 		// request sticks to the rerun so the user's refresh is never served
 		// from cache by a sync that happened to be in flight.
+		if (this.stopped) return Promise.resolve();
 		const key = checkoutKey(workspaceId, repositoryId);
 		const existing = this.checkoutSyncState.get(key);
 		if (existing) {
@@ -904,7 +921,10 @@ export class PullRequestRuntimeManager {
 						bypassCache,
 					});
 					bypassCache = this.checkoutSyncState.get(key)?.bypassCache ?? false;
-				} while (this.checkoutSyncState.get(key)?.rerunPending);
+				} while (
+					!this.stopped &&
+					this.checkoutSyncState.get(key)?.rerunPending
+				);
 			} finally {
 				this.checkoutSyncState.delete(key);
 			}
@@ -983,6 +1003,7 @@ export class PullRequestRuntimeManager {
 		// One checkout moved, so only its own ref can have gained or lost a PR.
 		// Refreshing the whole repository here was the runtime's biggest GitHub
 		// amplifier: every commit by any agent re-fetched every linked PR.
+		if (this.stopped) return;
 		if (changed || options.bypassCache) {
 			await this.refreshRepository(repositoryId, {
 				...options,
@@ -1058,6 +1079,7 @@ export class PullRequestRuntimeManager {
 			}
 			return true;
 		} catch (error) {
+			if (this.stopped) return false;
 			console.warn(
 				"[host-service:pull-request-runtime] Failed to sync checkout branch",
 				{
@@ -1133,6 +1155,7 @@ export class PullRequestRuntimeManager {
 	): Promise<void> {
 		// A scoped refresh and a full one are different work; only identical
 		// requests share an in-flight promise.
+		if (this.stopped) return;
 		const inFlightKey = options.checkoutKeys
 			? `${repositoryId}\0${[...options.checkoutKeys].sort().join(",")}`
 			: repositoryId;
@@ -1144,6 +1167,7 @@ export class PullRequestRuntimeManager {
 
 		const refreshPromise = this.performRepositoryRefresh(repositoryId, options)
 			.catch((error) => {
+				if (this.stopped) return;
 				console.warn(
 					"[host-service:pull-request-runtime] Repository refresh failed",
 					{ repositoryId, error },

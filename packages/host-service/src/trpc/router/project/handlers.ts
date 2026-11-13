@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, isNull, ne, sql } from "drizzle-orm";
 import {
 	projects,
 	pullRequests,
@@ -26,7 +26,10 @@ import {
 	repositoryName,
 } from "../../../projects/repositories";
 import type { HostServiceContext } from "../../../types";
-import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
+import {
+	emitLocalWorkspaceUpdated,
+	updateLocalWorkspace,
+} from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
@@ -517,6 +520,17 @@ export function setPrimaryRepository(
 		.set({ primaryRepositoryId: args.repositoryId })
 		.where(eq(projects.id, args.projectId))
 		.run();
+	const live = ctx.db
+		.select()
+		.from(workspaces)
+		.where(
+			and(
+				eq(workspaces.projectId, args.projectId),
+				isNull(workspaces.archivedAt),
+			),
+		)
+		.all();
+	for (const row of live) emitLocalWorkspaceUpdated(ctx, row);
 	touchProject(ctx, args.projectId);
 	return snapshotOf(ctx, args.projectId);
 }
@@ -563,19 +577,17 @@ export async function relocateRepository(
 		})
 		.where(eq(repositories.id, repository.id))
 		.run();
-	// A local workspace is the repository's own checkout: it moves with it.
+	// Only a workspace that is the repository's own folder moves with it; a
+	// root of several checkouts (a box one too) keeps its folder.
 	for (const row of listLiveLocalWorkspaces(ctx, args.projectId)) {
-		const checksOut = ctx.db
-			.select({ id: workspaceRepositories.repositoryId })
+		if (row.worktreePath !== repository.repoPath) continue;
+		const checkouts = ctx.db
+			.select({ repositoryId: workspaceRepositories.repositoryId })
 			.from(workspaceRepositories)
-			.where(
-				and(
-					eq(workspaceRepositories.workspaceId, row.id),
-					eq(workspaceRepositories.repositoryId, repository.id),
-				),
-			)
-			.get();
-		if (!checksOut || row.worktreePath === resolved.repoPath) continue;
+			.where(eq(workspaceRepositories.workspaceId, row.id))
+			.all();
+		if (checkouts.length !== 1 || checkouts[0]?.repositoryId !== repository.id)
+			continue;
 		updateLocalWorkspace(ctx, row.id, { worktreePath: resolved.repoPath });
 	}
 	touchProject(ctx, args.projectId);

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
@@ -651,6 +651,19 @@ async function removeRepositoryCheckouts(
 	await rm(root, { recursive: true, force: true });
 }
 
+/** Removes `path` and its parents up to `top` while they are empty. */
+function removeEmptyFolders(path: string, top: string | undefined): void {
+	if (!top) return;
+	for (let dir = path; ; dir = dirname(dir)) {
+		try {
+			rmdirSync(dir);
+		} catch (err) {
+			if ((err as NodeJS.ErrnoException).code !== "ENOENT") return;
+		}
+		if (dir === top || dirname(dir) === dir) return;
+	}
+}
+
 /**
  * Check out each repository at `<root>/<name>`: from its PR, by moving an
  * adopted worktree in, or on `branch` from its base. Undoes everything it
@@ -948,43 +961,49 @@ async function createMultiRepoCheckoutsAndRow(
 			message: `A folder already exists at ${root}`,
 		});
 	}
-	mkdirSync(root, { recursive: true });
-	const checkouts = await createRepositoryCheckouts(ctx, {
-		branch,
-		root,
-		repositories,
-		requests,
-		pullRequests,
-		adopted,
-	});
+	const firstCreatedFolder = mkdirSync(root, { recursive: true });
+	let workspaceRow: CloudWorkspace;
 	try {
-		writeWorkspaceContextFiles(
+		const checkouts = await createRepositoryCheckouts(ctx, {
+			branch,
 			root,
-			checkouts.map((checkout) => ({
-				name: checkout.repository.name,
-				path: checkout.worktreePath,
+			repositories,
+			requests,
+			pullRequests,
+			adopted,
+		});
+		try {
+			writeWorkspaceContextFiles(
+				root,
+				checkouts.map((checkout) => ({
+					name: checkout.repository.name,
+					path: checkout.worktreePath,
+					branch: checkout.branch,
+				})),
+			);
+		} catch (err) {
+			await removeRepositoryCheckouts(ctx, root, checkouts);
+			throw err;
+		}
+		workspaceRow = await registerLocalWorkspace({
+			ctx,
+			id: input.id,
+			projectId: project.id,
+			name: input.name ?? firstPr?.title ?? NEW_WORKSPACE_NAME,
+			branch,
+			worktreePath: root,
+			taskId: input.taskId,
+			tags: input.tags,
+			checkouts: checkouts.map((checkout) => ({
+				repositoryId: checkout.repository.id,
 				branch: checkout.branch,
 			})),
-		);
+			rollbackWorktree: () => removeRepositoryCheckouts(ctx, root, checkouts),
+		});
 	} catch (err) {
-		await removeRepositoryCheckouts(ctx, root, checkouts);
+		removeEmptyFolders(root, firstCreatedFolder);
 		throw err;
 	}
-	const workspaceRow = await registerLocalWorkspace({
-		ctx,
-		id: input.id,
-		projectId: project.id,
-		name: input.name ?? firstPr?.title ?? NEW_WORKSPACE_NAME,
-		branch,
-		worktreePath: root,
-		taskId: input.taskId,
-		tags: input.tags,
-		checkouts: checkouts.map((checkout) => ({
-			repositoryId: checkout.repository.id,
-			branch: checkout.branch,
-		})),
-		rollbackWorktree: () => removeRepositoryCheckouts(ctx, root, checkouts),
-	});
 	if (firstPr) {
 		// Link the PRs now, not at the next sweep, so ship rows don't offer "Create PR".
 		void ctx.runtime.pullRequests

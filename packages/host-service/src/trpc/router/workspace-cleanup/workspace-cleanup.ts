@@ -603,14 +603,26 @@ async function runDestroyPhases(
 	} else if (local && project) {
 		const multiRepo = checkouts.length > 1;
 		for (const checkout of checkouts) {
-			removedCheckouts.push(
-				await removeCheckoutWorktree(ctx, {
-					project,
-					checkout,
-					label: multiRepo ? checkout.repository.name : null,
-					warnings,
-				}),
-			);
+			try {
+				removedCheckouts.push(
+					await removeCheckoutWorktree(ctx, {
+						project,
+						checkout,
+						label: multiRepo ? checkout.repository.name : null,
+						warnings,
+					}),
+				);
+			} catch (err) {
+				const removed = removedCheckouts
+					.filter((r) => r.removed)
+					.map((r) => r.checkout.repository.name);
+				if (!(err instanceof TRPCError) || removed.length === 0) throw err;
+				throw new TRPCError({
+					code: err.code,
+					message: `${err.message}. Already removed: ${removed.join(", ")}`,
+					cause: err,
+				});
+			}
 		}
 		worktreeRemoved = removedCheckouts.every((removed) => removed.removed);
 		if (multiRepo) {

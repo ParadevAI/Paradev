@@ -527,9 +527,10 @@ superset org members list -s satya
 
 ### projects
 
-A project is a repository checked out on a host. Projects are host-owned:
-each host serves the projects set up on that machine; there is no org-wide
-listing. Workspaces branch off a host's checkout.
+A project is one or more repositories checked out on a host. Projects are
+host-owned: each host serves the projects set up on that machine; there is no
+org-wide listing. Workspaces branch off a host's checkouts. One repository is
+the **primary**: its Paradev config is the one workspaces run.
 
 <Command
 	name="superset projects list"
@@ -538,52 +539,130 @@ listing. Workspaces branch off a host's checkout.
 		{ flag: "--local", description: "List projects on this machine (the default)." },
 	]}
 	output={`Array<{
-  id: string;
   name: string;
-  repo: string;
-  path: string;
+  repos: string;
+  id: string;
+  repositories: Repository[];
 }>`}
-	humanColumns={["NAME", "REPO", "PATH", "ID"]}
+	humanColumns={["NAME", "REPOSITORIES", "ID"]}
 	quiet="project IDs"
 >
 List projects on a host. Defaults to this machine; pass `--host <id>` for
-another host.
+another host. `repos` lists the repository names, with `*` after the primary.
 </Command>
 
 <Command
 	name="superset projects create"
 	options={[
 		{ flag: "--name <name>", required: true, description: "Display name for the project." },
+		{ flag: "--repo <pathOrUrl>", required: true, description: "A repository: a local path on the target host, or a Git URL to clone into `--parent-dir`. Repeatable; the first is the primary." },
+		{ flag: "--parent-dir <path>", description: "Directory cloned repositories land in. Required when a `--repo` is a URL; refused otherwise." },
 		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`; one is required." },
 		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`; one is required." },
-		{ flag: "--clone <url>", description: "Clone from a Git URL. Mutually exclusive with `--import`." },
-		{ flag: "--parent-dir <path>", description: "Parent directory the cloned repo lands in. Required with `--clone`." },
-		{ flag: "--import <path>", description: "Existing repo path on the target host. Mutually exclusive with `--clone`." },
 	]}
 	output={`{
-  projectId: string;
-  repoPath: string;
+  id: string;
+  name: string;
+  primaryRepositoryId: string;
+  repositories: Repository[];
   created: boolean;
 }`}
 >
-Create a project on a host. Two modes:
+Create a project of one or more repositories on a host. Each `--repo` is either a
+local path, used where it is, or a Git URL (`https://…` or `git@host:…`), which the
+host clones into `<parent-dir>/<derived-name>/`. Each repository's folder name must be
+unique in the project: it names the repository's checkout folder in a workspace of
+several repositories.
 
-- **Clone**: pass `--clone <url>` and `--parent-dir`. The host clones the
-  repo into `<parent-dir>/<derived-name>/`.
-- **Import**: pass `--import <path>` to register a repo that already exists
-  on disk.
+Importing one local folder that already is a project returns that project with
+`created: false`.
 
-Either way, the project has no workspaces yet. Create one with
+The project has no workspaces yet. Create one with
 `superset ws create --project <id> --name local --checkout local --local` (the
-repo's checkout as it is) or `--branch <name>` (its own worktree).
-
-`create` always creates a new cloud project, even if your org already has
-one for the same Git URL. Use [`projects setup`](#superset-projects-setup-id)
-when adopting an existing project on a fresh machine.
+repo's checkout as it is, one-repository projects only) or `--branch <name>` (its
+own worktrees).
 
 ```bash
-superset projects create --name "my-app" --local --clone https://github.com/org/my-app.git --parent-dir ~/code
-superset projects create --name "my-app" --local --import ~/code/my-app
+superset projects create --name "my-app" --local --repo ~/code/my-app
+superset projects create --name "my-app" --local --repo https://github.com/org/my-app.git --parent-dir ~/code
+superset projects create --name "shop" --local --repo ~/code/web --repo ~/code/api
+```
+</Command>
+
+<Command
+	name="superset projects repos add <repo>"
+	args={[
+		{ name: "repo", required: true, description: "Local path on the host, or a Git URL to clone." },
+	]}
+	options={[
+		{ flag: "--project <id>", required: true, description: "Project ID." },
+		{ flag: "--parent-dir <path>", description: "Directory a cloned URL lands in. Required for a URL." },
+		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`; one is required." },
+		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`; one is required." },
+	]}
+	output={`Project`}
+>
+Add a repository to a project. Existing workspaces do not get a checkout of it;
+new workspaces do.
+
+```bash
+superset projects repos add ~/code/docs --project prj_… --local
+```
+</Command>
+
+<Command
+	name="superset projects repos remove <repository>"
+	args={[
+		{ name: "repository", required: true, description: "Repository name or ID." },
+	]}
+	options={[
+		{ flag: "--project <id>", required: true, description: "Project ID." },
+		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`; one is required." },
+		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`; one is required." },
+	]}
+	output={`Project`}
+>
+Remove a repository from a project. Its files stay on disk. The host refuses to
+remove the primary, the last repository, or one a workspace (archived ones included)
+checks out.
+</Command>
+
+<Command
+	name="superset projects repos primary <repository>"
+	args={[
+		{ name: "repository", required: true, description: "Repository name or ID." },
+	]}
+	options={[
+		{ flag: "--project <id>", required: true, description: "Project ID." },
+		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`; one is required." },
+		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`; one is required." },
+	]}
+	output={`Project`}
+>
+Make a repository the project's primary. Its `.paradev` config is the one
+workspaces run from then on.
+</Command>
+
+<Command
+	name="superset projects repos relocate <repository>"
+	args={[
+		{ name: "repository", required: true, description: "Repository name or ID." },
+	]}
+	options={[
+		{ flag: "--project <id>", required: true, description: "Project ID." },
+		{ flag: "--path <dir>", required: true, description: "The folder the repository is in now." },
+		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`; one is required." },
+		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`; one is required." },
+	]}
+	output={`Project`}
+>
+Point a repository at the folder it now lives in on the host, after you moved it.
+A repository with a GitHub remote only accepts a folder with the same remote. Its
+name stays the same, so the checkout folders of existing workspaces do not change. A
+workspace on the repository's own checkout (`--checkout local`) moves with it.
+
+```bash
+superset projects repos relocate api --project prj_… --path ~/src/api --local
 ```
 </Command>
 
@@ -791,9 +870,9 @@ project id when the host does not know the project's name.
 		{ flag: "--name <name>", description: "Workspace name. Required when `--project` is set; optional for sessions." },
 		{ flag: "--checkout <local|worktree>", description: "Use the shared project checkout or a separate worktree (default). Requires `--project`." },
 		{ flag: "--branch <branch>", description: "Workspace branch. On a host, required unless `--pr`, `--task`, or `--checkout local` is set. Not accepted for a cloud workspace, which always works on a new branch of its own; use `--base-branch`." },
-		{ flag: "--pr <number>", description: "Pull request number. Checks out the verified PR head." },
+		{ flag: "--pr <number>", description: "Pull request to check out (the verified PR head). `<n>` on a project of one repository; `<repository>=<n>` otherwise, where `<repository>` is a repository name or ID. Repeatable, once per repository." },
 		{ flag: "--task <id>", description: "Task ID to link. When `--branch` is omitted, the task's provider branch name (e.g. Linear's) is used verbatim." },
-		{ flag: "--base-branch <branch>", description: "On a host, the branch to fork from when `--branch` does not exist (default: the project default branch). For a cloud workspace, the branch its new branch is cut from (default: the repository's default branch)." },
+		{ flag: "--base-branch <branch>", description: "On a host, the branch to fork from when `--branch` does not exist (default: the repository default branch): `<branch>` on a project of one repository, `<repository>=<branch>` otherwise. Repeatable, once per repository. For a cloud workspace, one branch its new branch is cut from (default: the repository's default branch)." },
 		{ flag: "--skip-branch-prefix", description: "Use `--branch` exactly as given instead of namespacing it under the project branch prefix." },
 		{ flag: "--host <id>", description: "Target host machineId, or `cloud`. Mutually exclusive with `--local`. Without either, creates in the cloud if your account has cloud workspaces, else on this machine." },
 		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`." },
@@ -815,6 +894,12 @@ exclusive). If you pass `--agent`, you must also pass `--prompt`. `--command`
 runs a one-off shell command in the workspace directory and is independent of
 `--agent`/`--prompt`. Pass either or both. `--model` and `--effort` require
 `--agent`; see the [agent effort levels](#agent-effort-levels) below.
+
+On a project of several repositories, the workspace folder holds one checkout per
+repository at `<workspace>/<repository name>`, all on the same branch. `--pr` and
+`--base-branch` then name their repository: `--pr api=123` starts `api` from the PR and
+the other repositories on a new branch of the same name, and `--base-branch web=release`
+picks the branch `web` starts from. `--checkout local` is for one-repository projects only.
 
 `--checkout local` shares the project's existing files, git index, and checked-out branch.
 It does not switch branches or run setup. Do not combine it with `--branch`, `--pr`,
@@ -848,6 +933,9 @@ superset workspaces create \
   --name "review-pr-123" \
   --pr 123 \
   --local
+
+# A project of several repositories: name the repository the PR belongs to
+superset workspaces create --project prj_… --name "review-api-pr" --pr api=123 --local
 
 # Project-less session with an agent
 superset workspaces create --session --local --agent claude --prompt "…"
@@ -1139,6 +1227,7 @@ machine unless `--host` names another.
 	name="superset worktrees list"
 	options={[
 		{ flag: "--project <projectId>", description: "Project ID. Required." },
+		{ flag: "--repository <nameOrId>", description: "Repository whose worktrees to list, by name or ID. Default: the primary." },
 		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
 		{ flag: "--local", description: "This machine (the default)." },
 	]}
@@ -1158,7 +1247,8 @@ superset worktrees list --project prj_…
 	name="superset worktrees open"
 	options={[
 		{ flag: "--project <projectId>", description: "Project ID. Required." },
-		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path`, `--branch` or `--all`. Must be absolute on another host." },
+		{ flag: "--repository <nameOrId>", description: "Repository the worktree belongs to, by name or ID. Default: the primary." },
+		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path`, `--branch` or `--all`. Must be absolute on another host. On a project of several repositories, the worktree moves into the new workspace folder." },
 		{ flag: "--branch <name>", description: "Branch checked out in the worktree." },
 		{ flag: "--all", description: "Every worktree that is not the main checkout and has no workspace." },
 		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
@@ -1167,13 +1257,14 @@ superset worktrees list --project prj_…
 	]}
 	output={`{ workspace: Workspace; worktree: { branch: string; path: string }; alreadyExists: boolean; url: string; webUrl: string }`}
 >
-Open one existing worktree as a workspace. The worktree keeps its folder, branch, and
-files. If a workspace already tracks it, the command returns that workspace with
+Open one existing worktree as a workspace. The worktree keeps its branch and files, and
+its folder on a project of one repository; on a project of several, it moves to
+`<workspace>/<repository name>`. If a workspace already tracks it, the command returns that workspace with
 `alreadyExists: true` and changes nothing, so it is safe to re-run. The project's main
 checkout is not a worktree; use `superset workspaces create --checkout local` for it.
 
 To open every untracked worktree, for example after a machine registers as a new host,
-pass `--all` (run `superset projects setup` for the project there first). It returns
+pass `--all` (the project must be on that host first; see [`projects create`](#superset-projects-create)). It returns
 `{ opened, alreadyExisted, failed }`. If a worktree fails, the others still open, and the
 command exits non-zero with the same object as its `--json` output. `superset worktrees
 list` shows what `--all` will open: the rows with `isMain: false` and `hasWorkspace: false`.
@@ -1181,6 +1272,7 @@ list` shows what `--all` will open: the rows with `isMain: false` and `hasWorksp
 ```bash
 superset worktrees open --project prj_… --branch fix/login-bug
 superset worktrees open --project prj_… --all
+superset worktrees open --project prj_… --repository api --branch fix/rate-limit
 ```
 </Command>
 

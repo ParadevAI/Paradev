@@ -1,173 +1,92 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
+import { workspaceRepositories, workspaces } from "../src/db/schema";
 import { PullRequestRuntimeManager } from "../src/runtime/pull-requests/pull-requests";
+import { createTestDb } from "../src/trpc/router/pull-requests/shared/test-db";
+import { seedProject, seedWorkspace } from "./helpers/seed";
+
+function setup(revparseHead: () => Promise<string>) {
+	const db = createTestDb();
+	const worktreePath = "/tmp/pr-sync-worktree";
+	const project = seedProject({ db }, { repoPath: "/tmp/pr-sync-repo" });
+	seedWorkspace(
+		{ db },
+		{
+			projectId: project.id,
+			worktreePath,
+			branch: "stale-branch",
+			headSha: "stale-sha",
+		},
+	);
+	const git = mock(async () => ({
+		raw: mock(async (args: string[]) => {
+			if (args[0] === "symbolic-ref") return "feature/unborn\n";
+			throw new Error(`Unexpected raw args: ${args.join(" ")}`);
+		}),
+		revparse: mock(async (args: string[]) => {
+			if (args[0] === "HEAD") return revparseHead();
+			throw new Error(`Unexpected revparse args: ${args.join(" ")}`);
+		}),
+	}));
+	const manager = new PullRequestRuntimeManager({
+		db,
+		git: git as never,
+		github: async () => ({}) as never,
+		gitWatcher: { onChanged: () => () => {} } as never,
+		// Fixture paths are fabricated; open the missing-dir gate.
+		worktreeExists: () => true,
+	});
+	const refreshRepository = mock(async () => undefined);
+	(
+		manager as unknown as { refreshRepository: typeof refreshRepository }
+	).refreshRepository = refreshRepository;
+	const sweep = () =>
+		(
+			manager as unknown as { syncWorkspaceBranches: () => Promise<void> }
+		).syncWorkspaceBranches();
+	return { db, git, worktreePath, project, refreshRepository, sweep };
+}
 
 describe("PullRequestRuntimeManager branch sync", () => {
 	test("persists unborn branches even when HEAD has no commit", async () => {
-		const workspace = {
-			id: "ws-1",
-			projectId: "project-1",
-			worktreePath: "/tmp/unborn-worktree",
-			branch: "stale-branch",
-			headSha: "stale-sha",
-			pullRequestId: null,
-			createdAt: Date.now(),
-		};
+		const { db, git, worktreePath, project, refreshRepository, sweep } = setup(
+			async () => {
+				throw new Error("fatal: ambiguous argument 'HEAD'");
+			},
+		);
 
-		const runMock = mock(() => undefined);
-		const whereMock = mock(() => ({ run: runMock }));
-		const setMock = mock(() => ({ where: whereMock }));
-		const updateMock = mock(() => ({ set: setMock }));
-		const allMock = mock(() => [workspace]);
-		const db = {
-			select: mock(() => ({
-				from: mock(() => ({
-					all: allMock,
-				})),
-			})),
-			update: updateMock,
-		};
+		await sweep();
 
-		const git = mock(async () => ({
-			raw: mock(async (args: string[]) => {
-				if (
-					args[0] === "symbolic-ref" &&
-					args[1] === "--short" &&
-					args[2] === "HEAD"
-				) {
-					return "feature/unborn\n";
-				}
-				throw new Error(`Unexpected raw args: ${args.join(" ")}`);
-			}),
-			revparse: mock(async (args: string[]) => {
-				if (args[0] === "HEAD") {
-					throw new Error("fatal: ambiguous argument 'HEAD'");
-				}
-				throw new Error(`Unexpected revparse args: ${args.join(" ")}`);
-			}),
-		}));
-
-		const manager = new PullRequestRuntimeManager({
-			db: db as never,
-			git: git as never,
-			github: async () => ({}) as never,
-			gitWatcher: { onChanged: () => () => {} } as never,
-			// Fixture worktree paths are fabricated; open the missing-dir gate
-			// so the sync path under test reaches the mocked git factory.
-			worktreeExists: () => true,
-		});
-		const refreshProjectMock = mock(async () => undefined);
-		(
-			manager as unknown as { refreshProject: typeof refreshProjectMock }
-		).refreshProject = refreshProjectMock;
-
-		// The sweep now routes through enqueueWorkspaceSync → syncOneWorkspace,
-		// which re-reads each workspace via `select().from().where().get()`.
-		// Bypass the drizzle .where() chain (awkward to mock) by feeding the
-		// known row directly; syncWorkspaceRow still runs the production logic.
-		(
-			manager as unknown as {
-				syncOneWorkspace: (id: string) => Promise<void>;
-			}
-		).syncOneWorkspace = async () => {
-			const projectId = await (
-				manager as unknown as {
-					syncWorkspaceRow: (w: typeof workspace) => Promise<string | null>;
-				}
-			).syncWorkspaceRow(workspace);
-			if (projectId) await refreshProjectMock(projectId);
-		};
-
-		await (
-			manager as unknown as { syncWorkspaceBranches: () => Promise<void> }
-		).syncWorkspaceBranches();
-
-		expect(git).toHaveBeenCalledWith("/tmp/unborn-worktree");
-		expect(setMock).toHaveBeenCalledWith({
+		expect(git.mock.calls[0]?.[0]).toBe(worktreePath);
+		expect(db.select().from(workspaceRepositories).get()).toMatchObject({
 			branch: "feature/unborn",
 			headSha: null,
 			upstreamOwner: null,
 			upstreamRepo: null,
 			upstreamBranch: null,
 			pullRequestId: null,
-			updatedAt: expect.any(Number),
 		});
-		expect(refreshProjectMock).toHaveBeenCalledWith("project-1");
+		expect(db.select().from(workspaces).get()?.branch).toBe("feature/unborn");
+		expect(refreshRepository.mock.calls[0]?.[0]).toBe(project.repositoryId);
 	});
 
 	test("logs and skips unexpected HEAD lookup failures", async () => {
-		const workspace = {
-			id: "ws-2",
-			projectId: "project-2",
-			worktreePath: "/tmp/broken-worktree",
-			branch: "stale-branch",
-			headSha: "stale-sha",
-			pullRequestId: null,
-			createdAt: Date.now(),
-		};
-
-		const runMock = mock(() => undefined);
-		const whereMock = mock(() => ({ run: runMock }));
-		const setMock = mock(() => ({ where: whereMock }));
-		const updateMock = mock(() => ({ set: setMock }));
-		const allMock = mock(() => [workspace]);
-		const db = {
-			select: mock(() => ({
-				from: mock(() => ({
-					all: allMock,
-				})),
-			})),
-			update: updateMock,
-		};
-
-		const git = mock(async () => ({
-			raw: mock(async () => "feature/broken\n"),
-			revparse: mock(async (args: string[]) => {
-				if (args[0] === "HEAD") {
-					throw new Error("fatal: permission denied");
-				}
-				throw new Error(`Unexpected revparse args: ${args.join(" ")}`);
-			}),
-		}));
-
-		const manager = new PullRequestRuntimeManager({
-			db: db as never,
-			git: git as never,
-			github: async () => ({}) as never,
-			gitWatcher: { onChanged: () => () => {} } as never,
-			// Fixture worktree paths are fabricated; open the missing-dir gate
-			// so the sync path under test reaches the mocked git factory.
-			worktreeExists: () => true,
+		const { db, refreshRepository, sweep } = setup(async () => {
+			throw new Error("fatal: permission denied");
 		});
-		const refreshProjectMock = mock(async () => undefined);
-		(
-			manager as unknown as { refreshProject: typeof refreshProjectMock }
-		).refreshProject = refreshProjectMock;
-
-		// The sweep now routes through enqueueWorkspaceSync → syncOneWorkspace,
-		// which re-reads each workspace via `select().from().where().get()`.
-		// Bypass the drizzle .where() chain (awkward to mock) by feeding the
-		// known row directly; syncWorkspaceRow still runs the production logic.
-		(
-			manager as unknown as {
-				syncOneWorkspace: (id: string) => Promise<void>;
-			}
-		).syncOneWorkspace = async () => {
-			const projectId = await (
-				manager as unknown as {
-					syncWorkspaceRow: (w: typeof workspace) => Promise<string | null>;
-				}
-			).syncWorkspaceRow(workspace);
-			if (projectId) await refreshProjectMock(projectId);
-		};
 		const warnSpy = spyOn(console, "warn").mockImplementation(() => {});
+		try {
+			await sweep();
 
-		await (
-			manager as unknown as { syncWorkspaceBranches: () => Promise<void> }
-		).syncWorkspaceBranches();
-
-		expect(setMock).not.toHaveBeenCalled();
-		expect(refreshProjectMock).not.toHaveBeenCalled();
-		// Pin to the sync-failure path so an unrelated console.warn can't pass.
-		expect(warnSpy.mock.calls[0]?.[0]).toContain("Failed to sync workspace");
+			expect(db.select().from(workspaceRepositories).get()).toMatchObject({
+				branch: "stale-branch",
+				headSha: "stale-sha",
+			});
+			expect(refreshRepository).not.toHaveBeenCalled();
+			expect(warnSpy.mock.calls[0]?.[0]).toContain(
+				"Failed to sync checkout branch",
+			);
+		} finally {
+			warnSpy.mockRestore();
+		}
 	});
 });

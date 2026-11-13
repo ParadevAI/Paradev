@@ -34,9 +34,11 @@ describe("buildCheckouts", () => {
 		expect(() =>
 			buildCheckouts({ repositories: [api, web], pr: ["api=1", "api=2"] }),
 		).toThrow(/given twice/);
-		expect(() => buildCheckouts({ repositories: [api], pr: ["x"] })).toThrow(
-			/not a pull request number/,
-		);
+		for (const pr of ["x", "12abc", "1e3", "0"]) {
+			expect(() => buildCheckouts({ repositories: [api], pr: [pr] })).toThrow(
+				/not a pull request number/,
+			);
+		}
 	});
 
 	test("with one repository, a prefix that names no repository is part of the branch", () => {

@@ -75,8 +75,8 @@ export function buildCheckouts(args: {
 		args.pr ?? [],
 		args.repositories,
 	)) {
-		const pr = Number(value);
-		if (!Number.isInteger(pr) || pr <= 0) {
+		const pr = /^\d+$/.test(value) ? Number(value) : 0;
+		if (pr <= 0) {
 			throw new CLIError(`--pr ${value}: not a pull request number`);
 		}
 		checkouts[repository.id] = { ...checkouts[repository.id], pr };

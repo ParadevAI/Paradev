@@ -98,6 +98,23 @@ import { gitWorkspaceRefsTask } from "./workers/tasks/git";
 import { disposeUsageWorkerPool } from "./workers/usage-worker-pool";
 import { disposeWorkspaceTitleJobs } from "./workspaces/workspace-title-jobs";
 
+// A sync still in flight would hit the disposed worker pool and closed db.
+const PULL_REQUEST_DRAIN_DEADLINE_MS = 2_000;
+
+async function raceDeadline(work: Promise<void>, ms: number): Promise<void> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	try {
+		await Promise.race([
+			work,
+			new Promise<void>((resolve) => {
+				timer = setTimeout(resolve, ms);
+			}),
+		]);
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
 export interface CreateAppOptions {
 	config: {
 		organizationId: string;
@@ -639,6 +656,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		// open SQLite handle for the rest of the process lifetime.
 		try {
 			pullRequestRuntime.stop();
+			await raceDeadline(
+				pullRequestRuntime.drain(),
+				PULL_REQUEST_DRAIN_DEADLINE_MS,
+			);
 		} catch (err) {
 			console.warn("[host-service] pullRequestRuntime.stop failed:", err);
 		}

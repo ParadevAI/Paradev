@@ -198,19 +198,43 @@ describe("project repositories", () => {
 	});
 
 	it("moves the primary mark, and relocates a repository keeping its name", async () => {
-		const { caller } = setup();
+		const { caller, db, events } = setup();
 		const project = await caller.create({
 			name: "Acme",
 			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
 		});
 		const api = project.repositories.find((r) => r.name === "api");
 		if (!api) throw new Error("no api repository");
+		const own = seedWorkspace(
+			{ db },
+			{
+				projectId: project.id,
+				worktreePath: api.path,
+				branch: "main",
+				type: "local",
+				repositoryIds: [api.id],
+			},
+		);
+		const boxRoot = join(root, "box");
+		const box = seedWorkspace(
+			{ db },
+			{
+				projectId: project.id,
+				worktreePath: boxRoot,
+				branch: "main",
+				type: "local",
+			},
+		);
 
+		events.length = 0;
 		const switched = await caller.setPrimaryRepository({
 			projectId: project.id,
 			repositoryId: api.id,
 		});
 		expect(switched.primaryRepositoryId).toBe(api.id);
+		expect(
+			events.filter((e) => e === "broadcastWorkspaceChanged:updated"),
+		).toHaveLength(2);
 
 		const moved = await gitRepo("api-moved");
 		const relocated = await caller.relocateRepository({
@@ -222,6 +246,14 @@ describe("project repositories", () => {
 			name: "api",
 			path: moved,
 		});
+		const pathOf = (id: string) =>
+			db
+				.select({ path: schema.workspaces.worktreePath })
+				.from(schema.workspaces)
+				.where(eq(schema.workspaces.id, id))
+				.get()?.path;
+		expect(pathOf(own.id)).toBe(moved);
+		expect(pathOf(box.id)).toBe(boxRoot);
 	});
 
 	it("sets sparse checkout paths per repository", async () => {

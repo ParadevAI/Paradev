@@ -547,6 +547,14 @@ export function touchLocalWorkspaceActivity(
 	return true;
 }
 
+/** Broadcast a row whose checkouts changed without a write to the row itself. */
+export function emitLocalWorkspaceUpdated(
+	ctx: Pick<WorkspaceStoreContext, "db" | "eventBus">,
+	row: HostWorkspaceRow,
+): void {
+	emitWorkspaceChanged(ctx, "updated", row);
+}
+
 function emitWorkspaceChanged(
 	ctx: Pick<WorkspaceStoreContext, "db" | "eventBus">,
 	eventType: "created" | "updated",

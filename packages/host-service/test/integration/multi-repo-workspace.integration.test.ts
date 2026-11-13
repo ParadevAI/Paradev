@@ -1,4 +1,4 @@
-import { afterEach, expect, spyOn, test } from "bun:test";
+import { afterAll, afterEach, beforeAll, expect, spyOn, test } from "bun:test";
 import {
 	existsSync,
 	mkdirSync,
@@ -14,15 +14,34 @@ import { simpleGit } from "simple-git";
 import { workspaceRepositories, workspaces } from "../../src/db/schema";
 import { getTomlConfigPath } from "../../src/runtime/setup/project-config-toml";
 import * as terminal from "../../src/terminal/terminal";
+import { cleanupGitOps } from "../../src/trpc/router/workspace-cleanup/git-ops";
 import * as addBranchWorktreeModule from "../../src/trpc/router/workspace-creation/shared/add-branch-worktree";
 import * as naming from "../../src/trpc/router/workspace-creation/utils/ai-workspace-names";
 import * as titleJobs from "../../src/workspaces/workspace-title-jobs";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
-import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
+import {
+	copyGitFixture,
+	createGitFixture,
+	type GitFixture,
+} from "../helpers/git-fixture";
 import { seedProject, seedRepository } from "../helpers/seed";
 
 let dispose: (() => Promise<void>) | undefined;
+let templates: { web: GitFixture; api: GitFixture };
+
+beforeAll(async () => {
+	const [web, api] = await Promise.all([
+		createGitFixture(),
+		createGitFixture(),
+	]);
+	templates = { web, api };
+});
+
+afterAll(() => {
+	templates.web.dispose();
+	templates.api.dispose();
+});
 
 afterEach(async () => {
 	await dispose?.();
@@ -34,11 +53,14 @@ type ExecGh = NonNullable<Parameters<typeof createTestHost>[0]>["execGh"];
 /** A project of `web` (primary) and `api`, each its own real repository. */
 async function multiRepoScenario(options: { execGh?: ExecGh } = {}) {
 	const host = await createTestHost({
-		apiOverrides: cloudFlows.workspaceCreateOk(),
+		apiOverrides: {
+			...cloudFlows.workspaceCreateOk(),
+			"v2Workspace.trackCreated.mutate": () => ({}),
+		},
 		...(options.execGh ? { execGh: options.execGh } : {}),
 	});
-	const web = await createGitFixture();
-	const api = await createGitFixture();
+	const web = copyGitFixture(templates.web);
+	const api = copyGitFixture(templates.api);
 	const worktreeBaseDir = mkdtempSync(join(tmpdir(), "multi-repo-worktrees-"));
 	const cleanup: string[] = [worktreeBaseDir];
 	dispose = async () => {
@@ -101,9 +123,12 @@ const worktreeCount = (repoPath: string) =>
 
 test("a one-repository workspace's folder is its checkout", async () => {
 	const host = await createTestHost({
-		apiOverrides: cloudFlows.workspaceCreateOk(),
+		apiOverrides: {
+			...cloudFlows.workspaceCreateOk(),
+			"v2Workspace.trackCreated.mutate": () => ({}),
+		},
 	});
-	const repo = await createGitFixture();
+	const repo = copyGitFixture(templates.web);
 	dispose = async () => {
 		await host.dispose();
 		repo.dispose();
@@ -215,6 +240,29 @@ test("a dirty checkout blocks the delete and is named, before any checkout is re
 		id: workspace.id,
 	});
 	expect(row.archivedAt).toBeNull();
+});
+
+test("a delete that fails on one checkout names the checkouts already removed", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const realRemove = cleanupGitOps.removeWorktree;
+	const remove = spyOn(cleanupGitOps, "removeWorktree").mockImplementation(
+		async (args) =>
+			args.worktreePath.endsWith("/web")
+				? { stillRegistered: true, removeError: "locked" }
+				: realRemove(args),
+	);
+	try {
+		await expect(
+			scenario.host.trpc.workspaceCleanup.destroy.mutate({
+				workspaceId: workspace.id,
+			}),
+		).rejects.toThrow(
+			/^web: Failed to remove worktree .*: locked\. Already removed: api$/,
+		);
+	} finally {
+		remove.mockRestore();
+	}
 });
 
 test("files an agent left in the root warn and block the delete; a forced delete removes the root", async () => {
@@ -469,11 +517,7 @@ test("a failed create leaves nothing behind: no row, worktree, branch or root, a
 	);
 	expect(await headOf(outside)).toMatchObject({ branch: "feature/kept" });
 	expect(worktreeCount(scenario.api.repoPath)).toBe(2);
-	expect(
-		readdirSync(scenario.worktreeBaseDir, { recursive: true }).filter((entry) =>
-			String(entry).endsWith("kept"),
-		),
-	).toEqual([]);
+	expect(readdirSync(scenario.worktreeBaseDir)).toEqual([]);
 });
 
 test("when an adopted worktree cannot move back, the failed create keeps the root and the adopted files", async () => {
@@ -581,10 +625,13 @@ test("setup runs once in the workspace root, from the current primary repository
 
 test("a workspace with no checkout of a new primary repository reads only that repository's config", async () => {
 	const host = await createTestHost({
-		apiOverrides: cloudFlows.workspaceCreateOk(),
+		apiOverrides: {
+			...cloudFlows.workspaceCreateOk(),
+			"v2Workspace.trackCreated.mutate": () => ({}),
+		},
 	});
-	const web = await createGitFixture();
-	const api = await createGitFixture();
+	const web = copyGitFixture(templates.web);
+	const api = copyGitFixture(templates.api);
 	let root = "";
 	dispose = async () => {
 		await host.dispose();

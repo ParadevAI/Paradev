@@ -108,17 +108,21 @@ commands take as `PROJECT_ID`:
 superset projects list
 ```
 
-If your repo isn't there yet, register it on this machine. Clone from a
-Git URL or import an existing checkout:
+If your repo isn't there yet, register it on this machine. Each `--repo` is an
+existing checkout or a Git URL to clone; repeat it for a project of several
+repositories (the first is the primary):
 
 ```bash
+# Register an existing local checkout
+superset projects create --name "my-app" --local --repo ~/code/my-app
+
 # Clone from a URL
 superset projects create --name "my-app" --local \
-  --clone https://github.com/org/my-app.git \
+  --repo https://github.com/org/my-app.git \
   --parent-dir ~/code
 
-# Or register an existing local checkout
-superset projects create --name "my-app" --local --import ~/code/my-app
+# Several repositories in one project
+superset projects create --name "shop" --local --repo ~/code/web --repo ~/code/api
 ```
 
 If the project already exists in your org but isn't on this machine,

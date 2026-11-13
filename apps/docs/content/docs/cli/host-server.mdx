@@ -147,25 +147,25 @@ superset projects list
 #### First machine: `projects create`
 
 If the project doesn't exist yet, clone a remote repo or import an
-existing local one:
+existing local one. Repeat `--repo` for a project of several repositories:
 
 ```bash
 # Clone from a Git URL
 superset projects create \
   --name "My Project" \
   --local \
-  --clone https://github.com/org/repo.git \
+  --repo https://github.com/org/repo.git \
   --parent-dir ~/code
 
 # Or import a repo that's already on disk
 superset projects create \
   --name "My Project" \
   --local \
-  --import ~/code/existing-repo
+  --repo ~/code/existing-repo
 ```
 
-The host server clones (or registers) the repo, creates the cloud project
-record, and ensures the main workspace.
+The host server clones (or registers) each repository. The project has no
+workspaces yet.
 
 #### Subsequent machines: `projects setup <id>`
 

@@ -1,5 +1,8 @@
 import { describe, expect, mock, test } from "bun:test";
+import { workspaceRepositories } from "../src/db/schema";
 import { PullRequestRuntimeManager } from "../src/runtime/pull-requests/pull-requests";
+import { createTestDb } from "../src/trpc/router/pull-requests/shared/test-db";
+import { seedProject, seedWorkspace } from "./helpers/seed";
 
 /**
  * Pins the cost of the **safety-net sweep** that runs every
@@ -17,24 +20,6 @@ import { PullRequestRuntimeManager } from "../src/runtime/pull-requests/pull-req
 interface RawCallLog {
 	worktreePath: string;
 	args: string[];
-}
-
-function buildWorkspace(index: number) {
-	return {
-		id: `ws-${index}`,
-		projectId: `project-${index}`,
-		worktreePath: `/tmp/worktree-${index}`,
-		// Match what the git mock will return so syncWorkspaceBranches treats
-		// every workspace as unchanged. This is the realistic steady-state:
-		// nothing changed, but we still pay full git-subprocess cost per tick.
-		branch: "main",
-		headSha: "deadbeef",
-		upstreamOwner: "acme",
-		upstreamRepo: "repo",
-		upstreamBranch: "main",
-		pullRequestId: null,
-		createdAt: Date.now(),
-	};
 }
 
 function buildGitMock(rawCalls: RawCallLog[], worktreePath: string) {
@@ -78,25 +63,27 @@ function buildGitMock(rawCalls: RawCallLog[], worktreePath: string) {
 }
 
 async function runSync(workspaceCount: number) {
-	const workspaces = Array.from({ length: workspaceCount }, (_, i) =>
-		buildWorkspace(i),
-	);
+	const db = createTestDb();
+	for (let i = 0; i < workspaceCount; i++) {
+		const project = seedProject({ db }, { repoPath: `/tmp/repo-${i}` });
+		// Match what the git mock returns so the sweep sees every checkout as
+		// unchanged: the steady state still pays full git cost per tick.
+		seedWorkspace(
+			{ db },
+			{
+				projectId: project.id,
+				worktreePath: `/tmp/worktree-${i}`,
+				branch: "main",
+				headSha: "deadbeef",
+				upstreamOwner: "acme",
+				upstreamRepo: "repo",
+				upstreamBranch: "main",
+			},
+		);
+	}
+	const before = db.select().from(workspaceRepositories).all();
 
 	const rawCalls: RawCallLog[] = [];
-
-	const workspacesById = new Map(workspaces.map((w) => [w.id, w]));
-	const db = {
-		select: mock(() => ({
-			from: mock(() => ({
-				all: mock(() => workspaces),
-			})),
-		})),
-		// syncWorkspaceBranches only writes when state changed; nothing should change here.
-		update: mock(() => {
-			throw new Error("update should not be called when state is unchanged");
-		}),
-	};
-
 	const gitFactoryCalls: string[] = [];
 	const git = mock(async (worktreePath: string) => {
 		gitFactoryCalls.push(worktreePath);
@@ -104,7 +91,7 @@ async function runSync(workspaceCount: number) {
 	});
 
 	const manager = new PullRequestRuntimeManager({
-		db: db as never,
+		db,
 		git: git as never,
 		github: async () => ({}) as never,
 		gitWatcher: { onChanged: () => () => {} } as never,
@@ -112,39 +99,17 @@ async function runSync(workspaceCount: number) {
 		// so the scaling assertions still count real git-factory calls.
 		worktreeExists: () => true,
 	});
-
-	// `syncWorkspaceBranches` calls `refreshProject` only for changed projects;
-	// stub it to a no-op so the test focuses purely on per-workspace git cost.
+	const refreshRepository = mock(async () => undefined);
 	(
-		manager as unknown as {
-			refreshProject: () => Promise<void>;
-		}
-	).refreshProject = mock(async () => undefined);
-
-	// The sweep now routes through enqueueWorkspaceSync → syncOneWorkspace,
-	// which re-reads each workspace via `select().from().where().get()`.
-	// Bypass the drizzle .where() chain (awkward to mock) by feeding rows
-	// from our local map; syncWorkspaceRow still drives the real git work.
-	(
-		manager as unknown as {
-			syncOneWorkspace: (id: string) => Promise<void>;
-		}
-	).syncOneWorkspace = async (id: string) => {
-		const workspace = workspacesById.get(id);
-		if (!workspace) return;
-		await (
-			manager as unknown as {
-				syncWorkspaceRow: (
-					w: ReturnType<typeof buildWorkspace>,
-				) => Promise<string | null>;
-			}
-		).syncWorkspaceRow(workspace);
-	};
+		manager as unknown as { refreshRepository: typeof refreshRepository }
+	).refreshRepository = refreshRepository;
 
 	await (
 		manager as unknown as { syncWorkspaceBranches: () => Promise<void> }
 	).syncWorkspaceBranches();
 
+	expect(db.select().from(workspaceRepositories).all()).toEqual(before);
+	expect(refreshRepository).not.toHaveBeenCalled();
 	return { rawCalls, gitFactoryCalls };
 }
 
