@@ -141,6 +141,15 @@ test("other failures with no answer from GitHub stay INTERNAL_SERVER_ERROR", () 
 			response: { status: 500, data: "Server Error" },
 		}),
 	).toBe("INTERNAL_SERVER_ERROR");
+	expect(
+		githubErrorCode({
+			name: "HttpError",
+			status: 502,
+			message: "upstream connection refused",
+			request: {},
+			response: { status: 502, data: "upstream connection refused" },
+		}),
+	).toBe("INTERNAL_SERVER_ERROR");
 });
 
 test("threads come back with the conversation, minus empty comments", async () => {

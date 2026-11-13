@@ -308,8 +308,14 @@ export function githubErrorCode(error: unknown): GithubErrorCode {
 		if (types.has("FORBIDDEN")) return "FORBIDDEN";
 		return "BAD_REQUEST";
 	}
-	// Octokit reports a request that never reached GitHub as status 500.
-	if (isGitHubUnreachableError(error)) return "SERVICE_UNAVAILABLE";
+	// Octokit reports a request that never reached GitHub as status 500 with no
+	// `response`; with a response, the message is GitHub's body, not transport.
+	if (
+		(error as { response?: unknown }).response === undefined &&
+		isGitHubUnreachableError(error)
+	) {
+		return "SERVICE_UNAVAILABLE";
+	}
 	switch (status) {
 		// 405 not mergeable (conflicts/draft), 409 head branch moved on.
 		case 405:
