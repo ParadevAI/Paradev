@@ -291,12 +291,26 @@ export async function deriveSandboxCredentials(
 			"base64",
 		);
 		allow["github.com"] = rule({ Authorization: `Basic ${basic}` });
-		allow["api.github.com"] = rule({
-			Authorization: `Bearer ${inputs.githubToken}`,
-		});
-		allow["uploads.github.com"] = rule({
-			Authorization: `Bearer ${inputs.githubToken}`,
-		});
+		// The API and attachment uploads take the installation token only in place
+		// of the placeholder gh sends; a token the workspace supplies itself, such
+		// as a person's PAT in GH_TOKEN for one command, passes through untouched,
+		// so it can upload attachments and reach repositories outside the
+		// installation.
+		const bearer = `Bearer ${inputs.githubToken}`;
+		const placeholderSwap = () => [
+			...swap(
+				"Authorization",
+				`token ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+				bearer,
+			),
+			...swap(
+				"Authorization",
+				`Bearer ${SANDBOX_CREDENTIAL_PLACEHOLDER}`,
+				bearer,
+			),
+		];
+		allow["api.github.com"] = placeholderSwap();
+		allow["uploads.github.com"] = placeholderSwap();
 		// gh refuses to call without a token in hand; the value never matters.
 		managedEnv.GH_TOKEN = SANDBOX_CREDENTIAL_PLACEHOLDER;
 	}
