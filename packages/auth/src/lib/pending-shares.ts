@@ -92,21 +92,6 @@ export async function removeMemberShares({
 		);
 }
 
-/** better-auth's leave route deletes the member without running `afterRemoveMember`. */
-export async function removeLeaverShares(member: {
-	userId: string;
-	organizationId: string;
-}) {
-	try {
-		await removeMemberShares(member);
-	} catch (error) {
-		console.error(
-			`[organization/leave] Failed to remove shares for ${member.userId}:`,
-			error,
-		);
-	}
-}
-
 /** A cancelled or declined invitation leaves nothing to convert; its shares go with it. */
 export async function removeInvitationShares(invitationId: string) {
 	await db

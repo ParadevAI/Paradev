@@ -8,7 +8,6 @@ import type { sessions } from "@superset/db/schema/auth";
 import * as authSchema from "@superset/db/schema/auth";
 import { seedDefaultStatuses } from "@superset/db/seed-default-statuses";
 import { MemberAddedBillingEmail } from "@superset/email/emails/billing/member-added";
-import { MemberRemovedBillingEmail } from "@superset/email/emails/billing/member-removed";
 import { OrganizationInvitationEmail } from "@superset/email/emails/team/invitation";
 import { MemberAddedEmail } from "@superset/email/emails/team/member-added";
 import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
@@ -48,6 +47,8 @@ import {
 	setAutumnSeats,
 	withAutumnBilling,
 } from "./lib/billing";
+import { syncSeatsAfterRemoval } from "./lib/billing/seat-removal";
+import { seatRemovalDeps } from "./lib/billing/seat-removal-deps";
 import {
 	NOTIFY_SLACK_URL,
 	notifySubscriptionCanceled,
@@ -56,10 +57,11 @@ import {
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
+import { afterMemberLeft, type LeftMember } from "./lib/member-left";
+import { memberLeftDeps } from "./lib/member-left-deps";
 import {
 	convertPendingShares,
 	removeInvitationShares,
-	removeLeaverShares,
 	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
@@ -186,9 +188,7 @@ export const auth = betterAuth({
 			if (ctx.path === "/organization/leave") {
 				const left = ctx.context.returned;
 				if (isAPIError(left) || !left) return;
-				await removeLeaverShares(
-					left as { userId: string; organizationId: string },
-				);
+				await afterMemberLeft(left as LeftMember, memberLeftDeps());
 				return;
 			}
 
@@ -950,107 +950,14 @@ export const auth = betterAuth({
 						}),
 					});
 
-					const subscription = await db.query.subscriptions.findFirst({
-						where: and(
-							eq(subscriptions.referenceId, organization.id),
-							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
-						),
-					});
-
-					if (!subscription?.stripeSubscriptionId) return;
-					if (subscription.plan === "enterprise") return;
-					const quantity = Math.max(
-						1,
-						await countBillableSeats(organization.id),
+					await syncSeatsAfterRemoval(
+						{
+							organization,
+							member: user,
+							removedByName: "A team admin",
+						},
+						seatRemovalDeps(),
 					);
-
-					const stripeSub = await stripeClient.subscriptions.retrieve(
-						subscription.stripeSubscriptionId,
-					);
-					const seat = seatItem(stripeSub);
-					const itemId = seat?.id;
-
-					const seatsOwnedByAutumn =
-						billingUsesAutumn &&
-						(await setAutumnSeats(organization.id, quantity));
-					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
-					if (!seatsOwnedByAutumn && itemId) {
-						await stripeClient.subscriptions.update(
-							subscription.stripeSubscriptionId,
-							{
-								items: [{ id: itemId, quantity }],
-								proration_behavior: "create_prorations",
-							},
-						);
-					}
-
-					const recipients = await getOrganizationBillingRecipients(
-						organization.id,
-					);
-					const pricePerSeat = seat?.price?.unit_amount ?? 0;
-					const currency = seat?.price?.currency ?? "usd";
-					const newMonthlyTotal = formatPrice(
-						pricePerSeat * quantity,
-						currency,
-					);
-					// unit_amount is per billing period: on an annual price the total
-					// above is yearly, and calling it monthly understates it 12x.
-					const billingInterval =
-						seat?.price?.recurring?.interval === "year"
-							? ("yearly" as const)
-							: ("monthly" as const);
-
-					const customerId =
-						typeof stripeSub.customer === "string"
-							? stripeSub.customer
-							: stripeSub.customer.id;
-					const preview = itemId
-						? await previewNextInvoice(
-								customerId,
-								subscription.stripeSubscriptionId,
-								itemId,
-								"credit",
-							)
-						: null;
-
-					await resend.batch.send(
-						recipients.map((recipient) => ({
-							from: NOREPLY_FROM,
-							to: recipient.email,
-							subject: `Billing update: Member removed from ${organization.name}`,
-							react: MemberRemovedBillingEmail({
-								recipientName: recipient.name,
-								prorationAmount: preview?.prorationAmount ?? null,
-								nextInvoiceTotal: preview?.nextInvoiceTotal ?? null,
-								organizationName: organization.name,
-								removedMemberName: user.name ?? "Former member",
-								removedMemberEmail: user.email,
-								removedByName: "A team admin",
-								newSeatCount: quantity,
-								newMonthlyTotal,
-								billingInterval,
-							}),
-						})),
-					);
-
-					try {
-						await qstash.publishJSON({
-							url: NOTIFY_SLACK_URL,
-							body: {
-								eventType: "seat_removed",
-								stripeSubscriptionId: subscription.stripeSubscriptionId,
-								memberName: user.name ?? "Former member",
-								previousSeats: quantity + 1,
-								newSeats: quantity,
-							},
-							retries: 3,
-						});
-					} catch (error) {
-						console.error(
-							"[org/after-remove-member] Failed to queue Slack notification:",
-							error,
-						);
-					}
 				},
 
 				afterCancelInvitation: async ({ invitation }) => {
