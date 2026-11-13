@@ -150,6 +150,7 @@ describe("start hook run terminal", () => {
 			workspaceRoot: root,
 			worktreePath: root,
 			workspaceId: "ws-1",
+			repositories: [] as SandboxIdentity["repositories"],
 		} as SandboxIdentity;
 	}
 

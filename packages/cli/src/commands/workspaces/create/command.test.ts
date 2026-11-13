@@ -121,6 +121,14 @@ describe("workspaces create", () => {
 		expect(sessionInput).toBeUndefined();
 	});
 
+	test("refuses a <repository>= --base-branch for a cloud workspace", async () => {
+		cloudAvailable = true;
+		await expect(
+			invoke({ local: false, baseBranch: ["api=release"] }),
+		).rejects.toThrow(/not <repository>=<branch>/);
+		expect(createInput).toBeUndefined();
+	});
+
 	test("creates a session only with explicit --session", async () => {
 		await invoke({ project: undefined, branch: undefined, session: true });
 		expect(sessionInput).toMatchObject({ name: "agent-effort" });

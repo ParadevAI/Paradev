@@ -303,6 +303,9 @@ export async function destroyWorkspace(
 	}
 }
 
+/** Some checkouts are already gone: the workspace stays archived, and a retry finishes the delete. */
+class PartialRemovalError extends TRPCError {}
+
 async function runDestroy(
 	ctx: HostServiceContext,
 	input: DestroyWorkspaceInput,
@@ -414,7 +417,9 @@ async function runDestroy(
 		if (marked && local) trackWorkspaceDeleted(ctx, local);
 		return result;
 	} catch (err) {
-		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
+		if (marked && !(err instanceof PartialRemovalError)) {
+			unarchiveLocalWorkspace(ctx, input.workspaceId);
+		}
 		throw err;
 	}
 }
@@ -627,7 +632,7 @@ async function runDestroyPhases(
 					.filter((r) => r.removed)
 					.map((r) => r.checkout.repository.name);
 				if (!(err instanceof TRPCError) || removed.length === 0) throw err;
-				throw new TRPCError({
+				throw new PartialRemovalError({
 					code: err.code,
 					message: `${err.message.replace(/\.$/, "")}. Already removed: ${removed.join(", ")}`,
 					cause: err,

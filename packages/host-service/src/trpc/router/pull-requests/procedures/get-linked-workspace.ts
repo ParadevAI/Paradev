@@ -32,19 +32,41 @@ export const getLinkedWorkspace = protectedProcedure
 		const repositoryIds = listProjectRepositories(ctx.db, input.projectId)
 			.map((repository) => repository.id)
 			.filter((id) => !input.repositoryId || id === input.repositoryId);
-		const rows = (
-			await Promise.all(
-				repositoryIds.map((repositoryId) =>
-					findRepositoryPullRequestRows(ctx, repositoryId, input),
-				),
-			)
-		).flat();
+		const perRepository = await Promise.all(
+			repositoryIds.map((repositoryId) =>
+				findRepositoryPullRequestRows(ctx, repositoryId, input),
+			),
+		);
+		const rows = perRepository.flat();
+		const none = { workspaceId: null, repositoryId: null };
+		if (
+			!input.repositoryId &&
+			!input.repoFullName &&
+			isAmbiguous(perRepository)
+		) {
+			return none;
+		}
 		const [linked] = findLinkedCheckouts(
 			ctx.db,
 			rows.map((row) => row.id),
 		);
-		return linked ?? { workspaceId: null, repositoryId: null };
+		return linked ?? none;
 	});
+
+/** Repositories of one project reuse PR numbers: with no repository named, a number two of them have is no answer. */
+function isAmbiguous(perRepository: LinkedPullRequestRow[][]): boolean {
+	const distinct = new Set(
+		perRepository
+			.filter((rows) => rows.length > 0)
+			.map((rows) =>
+				rows
+					.map((row) => row.id)
+					.sort()
+					.join(","),
+			),
+	);
+	return distinct.size > 1;
+}
 
 async function findRepositoryPullRequestRows(
 	ctx: HostServiceContext,
@@ -66,6 +88,7 @@ async function findRepositoryPullRequestRows(
 			ctx.db,
 			repositoryId,
 			input.prNumber,
+			input.repoFullName,
 		);
 	}
 }

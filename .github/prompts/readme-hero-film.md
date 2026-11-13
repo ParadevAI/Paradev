@@ -44,7 +44,7 @@ short version:
 2. **After boot** silence the agent notify-hook debug echoes (dev mode prints
    `[notify-hook] …` lines into TUI panes; the file is rewritten on every app launch):
    insert `DEBUG_HOOKS_ENABLED="0"` in `paradev-dev-data/hooks/notify.sh`. Revert after.
-3. Stage demo org over CDP: host-service `project.create` (importLocal of /tmp demo repos
+3. Stage demo org over CDP: host-service `project.create` (`repositories: [{ kind: "local", path }]` for /tmp demo repos
    with bare-clone remotes), swap `v2SidebarProjects` placements, `workspaces.create` with
    `agents:[…]` for real sessions, `apiTrpcClient.automation.create` for demo automations.
 4. Size the window with `window.resizeTo(1280, 800)` (2x DPR gives 2560x1600 sources).

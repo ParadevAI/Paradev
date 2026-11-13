@@ -2,10 +2,11 @@ import { boolean, CLIError, string } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import {
-	primaryRepository,
+	findPrimaryRepository,
+	findRepository,
+	getHostProject,
 	resolveHostFilter,
 	resolveHostTarget,
-	resolveRepository,
 } from "../../../lib/host-target";
 import { workspaceLinks } from "../../../lib/open-url";
 import {
@@ -67,23 +68,15 @@ export default command({
 			api: ctx.api,
 		});
 
+		const project = await getHostProject(target.client, options.project);
 		const repository = options.repository
-			? await resolveRepository(
-					target.client,
-					options.project,
-					options.repository,
-				)
-			: await primaryRepository(target.client, options.project);
-		if (options.all) {
-			const project = await target.client.project.get.query({
-				projectId: options.project,
-			});
-			if ((project?.repositories?.length ?? 0) > 1) {
-				throw new CLIError(
-					"--all is not available on a project of several repositories",
-					"Each worktree is moved into a new workspace folder. Open them one at a time with --path or --branch",
-				);
-			}
+			? findRepository(project, options.repository)
+			: findPrimaryRepository(project);
+		if (options.all && (project.repositories?.length ?? 0) > 1) {
+			throw new CLIError(
+				"--all is not available on a project of several repositories",
+				"Each worktree is moved into a new workspace folder. Open them one at a time with --path or --branch",
+			);
 		}
 		const worktrees = await listProjectWorktrees(
 			target.client,

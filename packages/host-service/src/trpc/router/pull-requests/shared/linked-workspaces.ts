@@ -59,7 +59,9 @@ export function findPullRequestRowsByRepository(
 	db: HostDb,
 	repositoryId: string,
 	prNumber: number,
+	repoFullName?: string,
 ): LinkedPullRequestRow[] {
+	const [owner, name] = repoFullName?.toLowerCase().split("/") ?? [];
 	return db
 		.select(linkedPullRequestColumns)
 		.from(pullRequests)
@@ -67,6 +69,12 @@ export function findPullRequestRowsByRepository(
 			and(
 				eq(pullRequests.repositoryId, repositoryId),
 				eq(pullRequests.prNumber, prNumber),
+				repoFullName
+					? and(
+							eq(sql`lower(${pullRequests.repoOwner})`, owner ?? ""),
+							eq(sql`lower(${pullRequests.repoName})`, name ?? ""),
+						)
+					: undefined,
 			),
 		)
 		.all();
@@ -109,16 +117,4 @@ export function findLinkedCheckouts(
 			desc(workspaces.createdAt),
 		)
 		.all();
-}
-
-/** {@link findLinkedCheckouts} by workspace, each workspace once. */
-export function findLinkedWorkspaceIds(
-	db: HostDb,
-	pullRequestIds: string[],
-): string[] {
-	return [
-		...new Set(
-			findLinkedCheckouts(db, pullRequestIds).map((c) => c.workspaceId),
-		),
-	];
 }

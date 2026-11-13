@@ -20896,6 +20896,9 @@ msgstr "Bu dizin mevcut değil. Terminal betiği çalışma alanı köküne geri
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağlayıcı bunu doğrulanmış olarak onaylamadı. Daha önce kullandığınız yöntemle oturum açın."
 
+msgid "This environment does not open the same repositories as this workspace. Pick an environment with exactly its repositories."
+msgstr "Bu ortam, bu çalışma alanıyla aynı depoları açmıyor. Tam olarak onun depolarına sahip bir ortam seçin."
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
 

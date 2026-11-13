@@ -8,7 +8,7 @@ export function register(server: McpServer): void {
 		name: "projects_list",
 		annotations: { readOnlyHint: true },
 		description:
-			"List projects set up on a host. A project is a checked-out repo; projects are host-owned — use hosts_list first to get the hostId. Use this to find a project's id before creating a workspace or scheduling an automation.",
+			"List projects set up on a host. A project is one or more repositories checked out on that host (`repositories` lists them; `isPrimary` marks the one whose config the workspace uses); projects are host-owned — use hosts_list first to get the hostId. Use this to find a project's id before creating a workspace or scheduling an automation.",
 		inputSchema: {
 			hostId: z
 				.string()

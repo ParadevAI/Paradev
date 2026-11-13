@@ -1,6 +1,12 @@
 import { Database } from "bun:sqlite";
 import { describe, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import {
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
@@ -10,7 +16,11 @@ import type { HostDb } from "../../db";
 import * as schema from "../../db/schema";
 import { listProjectRepositories } from "../../projects/repositories";
 import { resolveCheckout } from "../../workspaces/checkouts";
-import { runSandboxSelfSeed, type SandboxIdentity } from "./sandbox-self-seed";
+import {
+	runSandboxSelfSeed,
+	runSandboxStartHook,
+	type SandboxIdentity,
+} from "./sandbox-self-seed";
 
 const MIGRATIONS_FOLDER = resolve(import.meta.dir, "../../../drizzle");
 const WORKSPACE_ID = "11111111-1111-4111-8111-111111111111";
@@ -81,6 +91,33 @@ describe("sandbox self-seed", () => {
 		expect(agents).toContain(`| web | ${join(root, "web")} | feat |`);
 		expect(agents).toContain(`| api | ${join(root, "api")} | feat |`);
 		rmSync(root, { recursive: true, force: true });
+	});
+
+	test("a box seeded before its clones exist gets the root files once the checkouts are in", async () => {
+		const db = createDb();
+		const parent = mkdtempSync(join(tmpdir(), "seed-root-"));
+		const root = join(parent, "workspace");
+		const seed = identity(["web", "api"], root);
+
+		runSandboxSelfSeed(db, seed, agentDir());
+		for (const path of ["web", "api"])
+			mkdirSync(join(root, path), { recursive: true });
+		writeFileSync(join(root, "web", "AGENTS.md"), "web rules\n");
+		await runSandboxStartHook(
+			{ db } as Parameters<typeof runSandboxStartHook>[0],
+			seed,
+			{
+				files: {
+					marker: join(parent, "start-hook.pid"),
+					log: join(parent, "start-hook.log"),
+					runTerminal: join(parent, "start-hook-run-terminal"),
+				},
+			},
+		);
+
+		const agents = readFileSync(join(root, "AGENTS.md"), "utf8");
+		expect(agents).toContain(`- web: ${join(root, "web", "AGENTS.md")}`);
+		rmSync(parent, { recursive: true, force: true });
 	});
 
 	test("a lone repository at the root is the workspace folder, named after the repo", () => {

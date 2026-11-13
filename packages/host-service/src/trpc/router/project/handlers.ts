@@ -228,7 +228,13 @@ const RESERVED_NAMES = new Set(
 	WORKSPACE_ROOT_ENTRIES.map((entry) => entry.toLowerCase()),
 );
 
-function requireUnreservedName(name: string): void {
+function requireUsableName(name: string): void {
+	if (name === "" || name === "." || name === ".." || /[/\\\0]/.test(name)) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `invalid_name: "${name}" cannot be the folder name of a repository`,
+		});
+	}
 	if (!RESERVED_NAMES.has(name.toLowerCase())) return;
 	throw new TRPCError({
 		code: "BAD_REQUEST",
@@ -380,7 +386,7 @@ function insertProject(
 		paths.add(resolved.repoPath);
 	}
 	const names = sources.map(({ resolved }) => nameOf(resolved));
-	for (const name of names) requireUnreservedName(name);
+	for (const name of names) requireUsableName(name);
 	requireUniqueNames(names);
 
 	const projectId = randomUUID();
@@ -435,7 +441,7 @@ export async function addRepository(
 					})
 				: repositoryTakenError(resolved.repoPath);
 		}
-		requireUnreservedName(nameOf(resolved));
+		requireUsableName(nameOf(resolved));
 		requireUniqueNames([
 			...listProjectRepositories(ctx.db, args.projectId).map((r) => r.name),
 			nameOf(resolved),

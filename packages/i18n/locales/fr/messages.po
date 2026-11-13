@@ -20896,6 +20896,9 @@ msgstr "Ce répertoire n'existe pas. Le script de terminal se rabattra sur la ra
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Cet e-mail est déjà enregistré avec une autre méthode de connexion et le fournisseur ne l'a pas confirmé comme vérifié. Connectez-vous avec la méthode utilisée précédemment."
 
+msgid "This environment does not open the same repositories as this workspace. Pick an environment with exactly its repositories."
+msgstr "Cet environnement n'ouvre pas les mêmes dépôts que cet espace de travail. Choisissez un environnement avec exactement ses dépôts."
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Cet environnement n'a aucun dépôt. Créez un environnement avec des dépôts dans les Paramètres, puis lancez l'espace de travail à partir de celui-ci"
 

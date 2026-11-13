@@ -57,7 +57,7 @@ export interface VoiceEnvironment {
 export interface VoiceMachine {
 	hostId: string;
 	name: string;
-	projects: Array<{ id: string; name: string }>;
+	projects: Array<{ id: string; name: string; repositoryCount: number }>;
 }
 
 export interface VoiceTask {
@@ -111,7 +111,7 @@ export interface VoiceData {
 	}): Promise<{ id: string; name: string }>;
 	/** Machines that answer right now, each with its projects. */
 	listMachines(): Promise<VoiceMachine[]>;
-	/** No worktree: a scratch folder, or the project's own checkout. */
+	/** A scratch folder, the project's own checkout, or worktrees for a project of several repositories. */
 	createMachineWorkspace(input: {
 		machine: VoiceMachine;
 		projectId: string | null;

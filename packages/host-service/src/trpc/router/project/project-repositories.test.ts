@@ -135,6 +135,33 @@ describe("project repositories", () => {
 		});
 	});
 
+	it("refuses a repository whose name would leave the workspace folder", async () => {
+		const { caller } = setup();
+		const escaping = await gitRepo("escaping");
+		await createUserSimpleGit(escaping).addRemote(
+			"origin",
+			"https://github.com/x/..",
+		);
+
+		await expect(
+			caller.create({ name: "Solo", repositories: [local(escaping)] }),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("invalid_name"),
+		});
+
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web"))],
+		});
+		await expect(
+			caller.addRepository({ projectId: project.id, source: local(escaping) }),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("invalid_name"),
+		});
+	});
+
 	it("removes every repository it created when one source fails", async () => {
 		const { caller, db } = setup();
 		const parentDir = mkdtempSync(join(root, "parent-"));

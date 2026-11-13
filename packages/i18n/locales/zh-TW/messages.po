@@ -20896,6 +20896,9 @@ msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其確認為已驗證。請使用你先前使用的方式登入。"
 
+msgid "This environment does not open the same repositories as this workspace. Pick an environment with exactly its repositories."
+msgstr "此環境開啟的儲存庫與此工作區不同。請選擇一個儲存庫與其完全相同的環境。"
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"
 

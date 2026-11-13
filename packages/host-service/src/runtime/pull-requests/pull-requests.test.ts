@@ -2957,3 +2957,44 @@ describe("PullRequestRuntimeManager stop and drain", () => {
 		expect(ghCalls).toBe(0);
 	});
 });
+
+test("history lists a PR under the workspace's checkout of its GitHub repository, whichever project refreshed it last", async () => {
+	const db = createRealDb();
+	seedProject(db);
+	db.insert(schema.projects)
+		.values({ id: "other-project", primaryRepositoryId: "other-repo" })
+		.run();
+	db.insert(schema.repositories)
+		.values({
+			id: "other-repo",
+			projectId: "other-project",
+			name: REPO.name,
+			repoPath: "/other",
+			provider: "github",
+			owner: REPO.owner,
+			repoName: REPO.name,
+		})
+		.run();
+	seedPullRequest(db, {
+		id: "pr-7",
+		prNumber: 7,
+		headBranch: "feature",
+		headSha: "sha",
+		repositoryId: "other-repo",
+	});
+	seedWorkspace(db, { id: "ws", branch: "feature", pullRequestId: "pr-7" });
+	db.insert(schema.workspacePullRequests)
+		.values({ workspaceId: "ws", pullRequestId: "pr-7", linkedAt: 1 })
+		.run();
+
+	const [history] = await createManager(db).getPullRequestHistoryByWorkspaces([
+		"ws",
+	]);
+
+	expect(
+		history?.checkouts.map((c) => [
+			c.repositoryId,
+			c.pullRequests.map((pr) => [pr.number, pr.isCurrent]),
+		]),
+	).toEqual([[REPO_ID, [[7, true]]]]);
+});

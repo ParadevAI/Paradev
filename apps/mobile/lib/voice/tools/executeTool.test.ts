@@ -116,8 +116,8 @@ function fakeData(overrides: Partial<VoiceData> = {}): VoiceData & {
 				hostId: "host-1",
 				name: "satyas-mbp",
 				projects: [
-					{ id: "proj-1", name: "superset" },
-					{ id: "proj-2", name: "docs" },
+					{ id: "proj-1", name: "superset", repositoryCount: 1 },
+					{ id: "proj-2", name: "docs", repositoryCount: 1 },
 				],
 			},
 		],

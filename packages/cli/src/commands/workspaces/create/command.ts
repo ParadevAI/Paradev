@@ -98,6 +98,12 @@ export default command({
 					"Its environment's repositories start from their defaults; pass one branch for the primary",
 				);
 			}
+			if (options.baseBranch?.[0]?.includes("=")) {
+				throw new CLIError(
+					"A cloud workspace takes --base-branch <branch>, not <repository>=<branch>",
+					"The branch is for the environment's primary repository; the others start from their defaults",
+				);
+			}
 			return await createCloudWorkspace({
 				api: ctx.api,
 				organizationId,

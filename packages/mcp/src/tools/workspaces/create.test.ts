@@ -103,9 +103,9 @@ test("sends pr and baseBranch as the primary repository's checkout, and the lega
 		baseBranch: "main",
 	});
 });
-test("puts the PR on the repository named by `repository`", async () => {
+test("puts the PR on the repository named by `repository`, in any case", async () => {
 	hostProject = multiRepoProject;
-	await definition.handler({ ...worktree, pr: 3, repository: "docs" }, {});
+	await definition.handler({ ...worktree, pr: 3, repository: "Docs" }, {});
 	expect(request?.input).toMatchObject({
 		checkouts: { "repo-docs": { pr: 3 } },
 	});

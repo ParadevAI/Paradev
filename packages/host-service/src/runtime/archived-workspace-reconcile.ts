@@ -102,16 +102,26 @@ export function isSameWorkspace(
 	const checkouts = listWorkspaceCheckouts(ctx.db, row);
 	if (checkouts.length === 0) return isSameWorktree(row);
 	const present = checkouts.filter((checkout) => existsSync(checkout.path));
-	return (
-		present.length > 0 &&
-		present.every((checkout) =>
-			isSameWorktree({
-				worktreePath: checkout.path,
-				branch: checkout.row.branch,
-				archivedAt: row.archivedAt,
-			}),
-		)
+	if (present.length === 0) return isOlderThanDelete(row);
+	return present.every((checkout) =>
+		isSameWorktree({
+			worktreePath: checkout.path,
+			branch: checkout.row.branch,
+			archivedAt: row.archivedAt,
+		}),
 	);
+}
+
+function isOlderThanDelete(row: {
+	worktreePath: string;
+	archivedAt: number | null;
+}): boolean {
+	try {
+		const createdAt = statSync(row.worktreePath).birthtimeMs;
+		return row.archivedAt === null || createdAt <= row.archivedAt;
+	} catch {
+		return false;
+	}
 }
 
 function isSameWorktree(row: {
@@ -120,8 +130,7 @@ function isSameWorktree(row: {
 	archivedAt: number | null;
 }): boolean {
 	try {
-		const createdAt = statSync(row.worktreePath).birthtimeMs;
-		if (row.archivedAt !== null && createdAt > row.archivedAt) return false;
+		if (!isOlderThanDelete(row)) return false;
 		return readCheckedOutBranch(row.worktreePath) === row.branch;
 	} catch {
 		return false;

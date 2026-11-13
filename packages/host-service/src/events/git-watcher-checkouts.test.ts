@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { seedProject, seedWorkspace } from "../../test/helpers/seed";
+import { workspaceRepositories } from "../db/schema";
 import { createTestDb } from "../trpc/router/pull-requests/shared/test-db";
 import { type GitChangedEvent, GitWatcher } from "./git-watcher";
 
@@ -86,4 +87,66 @@ test("a two-checkout workspace attaches a watch per checkout, each event naming 
 	expect(
 		events.map((event) => `${event.workspaceId}:${event.repositoryId}`).sort(),
 	).toEqual(repositoryIds.map((id) => `ws:${id}`));
+});
+
+test("a rescan moves the watch when a checkout's folder changes", async () => {
+	const root = mkdtempSync(join(tmpdir(), "git-watch-checkouts-"));
+	execFileSync("git", ["init", "-q", root]);
+	for (const name of ["api", "web"]) {
+		mkdirSync(join(root, name));
+		execFileSync("git", ["init", "-q", join(root, name)]);
+	}
+	const db = createTestDb();
+	const project = seedProject(
+		{ db },
+		{
+			repoPath: "/src/api",
+			repoName: "api",
+			repositories: [{ repoPath: "/src/web", repoName: "web" }],
+		},
+	);
+	const [apiId, webId] = project.repositoryIds as [string, string];
+	seedWorkspace(
+		{ db },
+		{
+			id: "ws",
+			projectId: project.id,
+			worktreePath: root,
+			branch: "b",
+			repositoryIds: [apiId],
+		},
+	);
+	const filesystem = {
+		getServiceForRootPath: () => ({
+			watchPath: () => ({
+				[Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+			}),
+		}),
+		refreshWatcherIgnores: async () => false,
+		isWatchAttachBackingOff: () => false,
+	};
+	const watcher = new GitWatcher(
+		db,
+		filesystem as unknown as ConstructorParameters<typeof GitWatcher>[1],
+	);
+	cleanups.push(() => {
+		watcher.close();
+		rmSync(root, { recursive: true, force: true });
+	});
+	const internals = watcher as unknown as Internals & {
+		rescan(): Promise<void>;
+	};
+	const watchedPaths = () =>
+		[...internals.watched.values()].map((entry) => entry.worktreePath).sort();
+
+	watcher.watchWorkspace("ws");
+	await waitFor(() => internals.watched.size === 1);
+	expect(watchedPaths()).toEqual([root]);
+
+	db.insert(workspaceRepositories)
+		.values({ workspaceId: "ws", repositoryId: webId, branch: "b" })
+		.run();
+	await internals.rescan();
+
+	expect(watchedPaths()).toEqual([join(root, "api"), join(root, "web")]);
 });

@@ -342,6 +342,7 @@ export async function runSandboxStartHook(
 ): Promise<StartHookOutcome> {
 	const files = options.files ?? START_HOOK_FILES;
 	const starter = options.starter ?? sessionRunTerminalStarter(ctx, identity);
+	syncRootContextFiles(ctx.db, identity);
 	// `force` re-runs setup after an archive hook raced an undo on this boot.
 	if (!options.force && existsSync(files.marker))
 		return { started: false, reason: "already-started" };
@@ -521,6 +522,7 @@ export async function launchSandboxAgentOnce(
 		console.warn("[sandbox] launching without a managed environment push");
 	if (!checkedOut)
 		console.warn("[sandbox] launching before the checkout reported ready");
+	syncRootContextFiles(ctx.db, identity);
 	// Claimed before the launch, not after: a restart while the first launch
 	// is still setting up its terminal would otherwise start a second one.
 	// A failed launch gives the claim back so the next start retries.
@@ -787,7 +789,13 @@ export function runSandboxSelfSeed(
 				.run();
 		}
 	});
-	if (several) syncWorkspaceContextFiles(db, identity.workspaceId);
+	syncRootContextFiles(db, identity);
+}
+
+/** Seeding runs before the boot runner clones, so the root files are written again once the checkouts are in. */
+function syncRootContextFiles(db: HostDb, identity: SandboxIdentity): void {
+	if (identity.repositories.length > 1)
+		syncWorkspaceContextFiles(db, identity.workspaceId);
 }
 
 function insertProject(

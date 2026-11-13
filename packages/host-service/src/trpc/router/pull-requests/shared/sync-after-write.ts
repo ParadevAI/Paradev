@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { pullRequests } from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
 import {
-	findLinkedWorkspaceIds,
+	findLinkedCheckouts,
 	findPullRequestRows,
 	type LinkedPullRequestRow,
 	type RepoIdentity,
@@ -26,7 +26,7 @@ interface SyncPullRequestAfterWriteInput {
  * the write implies first, so it is right even when the refresh cannot
  * fetch (no upstream to look up, a `gh` timeout, no linked workspace); the
  * refresh then fills in checks, reviews and GitHub's own timestamps for the
- * workspaces linked to this PR, through the per-workspace sync queue.
+ * checkouts linked to this PR, through the per-checkout sync queue.
  *
  * Never throws: GitHub already applied the change, so nothing here may
  * surface as a failed action. The sweep heals whatever a failure skipped.
@@ -42,14 +42,13 @@ export async function syncPullRequestAfterWrite(
 		if (rows.length === 0) return;
 		for (const row of rows) recordWrittenState(ctx.db, row, input.action);
 
-		workspaceIds = findLinkedWorkspaceIds(
+		const checkouts = findLinkedCheckouts(
 			ctx.db,
 			rows.map((row) => row.id),
 		);
-		if (workspaceIds.length === 0) return;
-		await ctx.runtime.pullRequests.refreshPullRequestsByWorkspaces(
-			workspaceIds,
-		);
+		workspaceIds = [...new Set(checkouts.map((c) => c.workspaceId))];
+		if (checkouts.length === 0) return;
+		await ctx.runtime.pullRequests.refreshPullRequestsByCheckouts(checkouts);
 	} catch (error) {
 		console.warn(
 			`[pull-requests:${input.action}] GitHub applied the change but the host-side sync failed`,

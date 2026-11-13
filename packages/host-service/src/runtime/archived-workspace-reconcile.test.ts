@@ -80,6 +80,14 @@ describe("isSameWorkspace on a multi-repo workspace", () => {
 		rmSync(root, { recursive: true, force: true });
 	});
 
+	test("resumes when only the root is left, so the root is removed too", () => {
+		const { db, root, row } = setUp();
+
+		expect(isSameWorkspace({ db }, row)).toBe(true);
+		expect(isSameWorkspace({ db }, { ...row, archivedAt: 1 })).toBe(false);
+		rmSync(root, { recursive: true, force: true });
+	});
+
 	test("leaves it alone when a checkout is on another branch", () => {
 		const { db, root, row } = setUp();
 		fakeCheckout(join(root, "web"), "feat");

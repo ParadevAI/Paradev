@@ -20896,6 +20896,9 @@ msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있으며, 제공자가 이를 인증된 것으로 확인하지 않았습니다. 이전에 사용한 방법으로 로그인하세요."
 
+msgid "This environment does not open the same repositories as this workspace. Pick an environment with exactly its repositories."
+msgstr "이 환경은 이 워크스페이스와 같은 저장소를 열지 않습니다. 정확히 같은 저장소를 가진 환경을 선택하세요."
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 있는 환경을 만든 다음 그 환경에서 워크스페이스를 시작하세요"
 

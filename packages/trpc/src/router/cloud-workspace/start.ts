@@ -12,7 +12,6 @@ import {
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_START_TRANSACTION } from "@superset/shared/constants";
-import { TRPCError } from "@trpc/server";
 import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
@@ -219,9 +218,10 @@ async function start(args: StartCloudWorkspaceInput) {
 			args.move.repositories,
 		);
 		if (mismatch) {
-			throw new TRPCError({
+			throw userError({
 				code: "PRECONDITION_FAILED",
 				message: `repository_set_mismatch: ${mismatch}`,
+				i18nKey: "serverError.cloudWorkspace.repositorySetMismatch",
 			});
 		}
 	}

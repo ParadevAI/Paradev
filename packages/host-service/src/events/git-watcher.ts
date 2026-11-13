@@ -750,7 +750,10 @@ export class GitWatcher {
 				if (!wanted.has(key)) this.stopCheckout(key);
 			}
 			for (const target of targets) {
-				if (this.watched.has(target.key)) continue;
+				const watchedPath = this.watched.get(target.key)?.worktreePath;
+				if (watchedPath === target.path) continue;
+				// The checkout moved (a repository was added or removed).
+				if (watchedPath !== undefined) this.stopCheckout(target.key);
 				await this.attachWatcher(target);
 			}
 		}

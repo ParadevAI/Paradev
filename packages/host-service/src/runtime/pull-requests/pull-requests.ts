@@ -106,6 +106,12 @@ type RepoProvider = "github";
 
 type CheckoutRow = typeof workspaceRepositories.$inferSelect;
 
+type CheckoutWithRepository = CheckoutRow & {
+	repositoryName: string;
+	/** Lower-case GitHub `owner/name`; null without a GitHub remote. */
+	fullName: string | null;
+};
+
 function checkoutKey(workspaceId: string, repositoryId: string): string {
 	return `${workspaceId}\0${repositoryId}`;
 }
@@ -432,14 +438,16 @@ export class PullRequestRuntimeManager {
 	/** Checkout rows of these workspaces with their repository's name, by workspace. */
 	private checkoutRowsByWorkspace(
 		workspaceIds: string[],
-	): Map<string, (CheckoutRow & { repositoryName: string })[]> {
-		const byWorkspace = new Map<
-			string,
-			(CheckoutRow & { repositoryName: string })[]
-		>();
+	): Map<string, CheckoutWithRepository[]> {
+		const byWorkspace = new Map<string, CheckoutWithRepository[]>();
 		if (workspaceIds.length === 0) return byWorkspace;
 		const rows = this.db
-			.select({ row: workspaceRepositories, repositoryName: repositories.name })
+			.select({
+				row: workspaceRepositories,
+				repositoryName: repositories.name,
+				owner: repositories.owner,
+				repoName: repositories.repoName,
+			})
 			.from(workspaceRepositories)
 			.innerJoin(
 				repositories,
@@ -447,9 +455,14 @@ export class PullRequestRuntimeManager {
 			)
 			.where(inArray(workspaceRepositories.workspaceId, workspaceIds))
 			.all();
-		for (const { row, repositoryName } of rows) {
+		for (const { row, repositoryName, owner, repoName } of rows) {
 			const list = byWorkspace.get(row.workspaceId) ?? [];
-			list.push({ ...row, repositoryName });
+			list.push({
+				...row,
+				repositoryName,
+				fullName:
+					owner && repoName ? `${owner}/${repoName}`.toLowerCase() : null,
+			});
 			byWorkspace.set(row.workspaceId, list);
 		}
 		for (const list of byWorkspace.values()) {
@@ -579,9 +592,24 @@ export class PullRequestRuntimeManager {
 			}
 		}
 
+		// One row per GitHub PR, stamped by whichever repository refreshed it
+		// last, maybe of another project: the workspace's checkout of that
+		// GitHub repository is where it belongs.
+		const checkoutOf = (row: (typeof rows)[number]) => {
+			const fullName = `${row.repoOwner}/${row.repoName}`.toLowerCase();
+			const matching = (checkouts.get(row.workspaceId) ?? []).filter(
+				(checkout) => checkout.fullName === fullName,
+			);
+			return (
+				matching.find((checkout) => checkout.repositoryId === row.repositoryId)
+					?.repositoryId ??
+				matching[0]?.repositoryId ??
+				row.repositoryId
+			);
+		};
 		const byCheckout = new Map<string, WorkspacePullRequestHistoryEntry[]>();
 		for (const row of rows) {
-			const key = checkoutKey(row.workspaceId, row.repositoryId);
+			const key = checkoutKey(row.workspaceId, checkoutOf(row));
 			const entry: WorkspacePullRequestHistoryEntry = {
 				repoOwner: row.repoOwner,
 				repoName: row.repoName,
@@ -608,11 +636,10 @@ export class PullRequestRuntimeManager {
 				(checkout) => checkout.repositoryId,
 			);
 			for (const row of rows) {
-				if (
-					row.workspaceId === workspaceId &&
-					!repositoryIds.includes(row.repositoryId)
-				) {
-					repositoryIds.push(row.repositoryId);
+				if (row.workspaceId !== workspaceId) continue;
+				const repositoryId = checkoutOf(row);
+				if (!repositoryIds.includes(repositoryId)) {
+					repositoryIds.push(repositoryId);
 				}
 			}
 			return {
@@ -652,6 +679,40 @@ export class PullRequestRuntimeManager {
 			active.map((workspace) =>
 				this.enqueueWorkspaceSync(workspace.id, { bypassCache: true }),
 			),
+		);
+	}
+
+	/** As `refreshPullRequestsByWorkspaces`, for these checkouts only. */
+	async refreshPullRequestsByCheckouts(
+		checkouts: { workspaceId: string; repositoryId: string }[],
+	): Promise<void> {
+		if (checkouts.length === 0) return;
+		const active = new Set(
+			this.db
+				.select()
+				.from(workspaces)
+				.where(
+					inArray(
+						workspaces.id,
+						checkouts.map((checkout) => checkout.workspaceId),
+					),
+				)
+				.all()
+				.filter((row) => row.archivedAt == null && row.projectId != null)
+				.map((row) => row.id),
+		);
+		await Promise.all(
+			checkouts
+				.filter((checkout) => active.has(checkout.workspaceId))
+				.map((checkout) =>
+					this.enqueueCheckoutSync(
+						checkout.workspaceId,
+						checkout.repositoryId,
+						{
+							bypassCache: true,
+						},
+					),
+				),
 		);
 	}
 

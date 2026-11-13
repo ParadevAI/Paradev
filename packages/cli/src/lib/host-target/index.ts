@@ -11,4 +11,10 @@ export {
 	type ResolvedHostTarget,
 	resolveHostTarget,
 } from "./resolveHostTarget";
-export { primaryRepository, resolveRepository } from "./resolveRepository";
+export {
+	findPrimaryRepository,
+	findRepository,
+	getHostProject,
+	primaryRepository,
+	resolveRepository,
+} from "./resolveRepository";

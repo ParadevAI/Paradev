@@ -18,6 +18,7 @@ import { flattenPullRequestHistory } from "@/lib/host-service/pullRequestHistory
 import { ensureSandboxAccess } from "@/lib/sandbox-access";
 import { apiClient } from "@/lib/trpc/client";
 import { htmlToText } from "./htmlToText";
+import { machineWorkspaceRequest } from "./machineWorkspaceRequest";
 import {
 	type VoiceData,
 	VoiceDataError,
@@ -524,7 +525,12 @@ export function createVoiceData({
 					return {
 						hostId: host.machineId,
 						name: host.name,
-						projects: projects.map((row) => ({ id: row.id, name: row.name })),
+						projects: projects.map((row) => ({
+							id: row.id,
+							name: row.name,
+							// Hosts older than multi-repo projects list no repositories.
+							repositoryCount: row.repositories?.length ?? 1,
+						})),
 					};
 				}),
 			);
@@ -535,13 +541,17 @@ export function createVoiceData({
 			const client = getHostServiceClientByUrl(
 				hostServiceUrl(organizationId, machine.hostId),
 			);
-			const agents = [{ agent, prompt }];
-			const created = projectId
-				? client.workspaces.createLocal.mutate({ projectId, agents })
-				: client.workspaces.createSession.mutate({
-						agents,
-						namingPrompt: prompt,
-					});
+			const request = machineWorkspaceRequest(
+				machine.projects.find((row) => row.id === projectId) ?? null,
+				prompt,
+				agent,
+			);
+			const created =
+				request.procedure === "createSession"
+					? client.workspaces.createSession.mutate(request.input)
+					: request.procedure === "create"
+						? client.workspaces.create.mutate(request.input)
+						: client.workspaces.createLocal.mutate(request.input);
 			const result: {
 				workspace: { id: string; name: string; branch: string | null };
 				agents: Array<{ ok: true; sessionId: string } | { ok: false }>;

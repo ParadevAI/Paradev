@@ -287,6 +287,7 @@ describe("cloudWorkspace.create", () => {
 		).rejects.toMatchObject({
 			code: "PRECONDITION_FAILED",
 			message: "repository_set_mismatch: only in the environment: acme/api",
+			cause: { i18nKey: "serverError.cloudWorkspace.repositorySetMismatch" },
 		});
 	});
 });

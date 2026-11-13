@@ -75,7 +75,10 @@ async function createHarness(
 		github: async () => octokit,
 		runtime: {
 			pullRequests: {
-				refreshPullRequestsByWorkspaces: async (ids: string[]) => {
+				refreshPullRequestsByCheckouts: async (
+					checkouts: { workspaceId: string }[],
+				) => {
+					const ids = checkouts.map((checkout) => checkout.workspaceId);
 					refreshCalls.push(ids);
 					if (options.refresh) await options.refresh(ids);
 				},

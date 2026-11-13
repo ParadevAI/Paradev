@@ -1,4 +1,5 @@
 import { afterAll, afterEach, describe, expect, spyOn, test } from "bun:test";
+import { repositories, workspaceRepositories } from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
 import {
 	pullRequestContentCacheKey,
@@ -9,29 +10,36 @@ import { syncPullRequestAfterWrite } from "./sync-after-write";
 import {
 	createTestDb,
 	PR_NUMBER,
+	PROJECT_ID,
 	REPO,
+	REPOSITORY_ID,
 	readPullRequestRow,
 	seedDuplicateCasingRow,
 	seedLinkedPullRequest,
 	UNLINKED_PR_NUMBER,
 } from "./test-db";
 
+type Checkout = { workspaceId: string; repositoryId: string };
+
 function createContext(
 	db: HostServiceContext["db"],
-	refreshPullRequestsByWorkspaces: (ids: string[]) => Promise<void>,
+	refreshPullRequestsByCheckouts: (checkouts: Checkout[]) => Promise<void>,
 ): Pick<HostServiceContext, "db" | "runtime"> {
 	return {
 		db,
-		runtime: { pullRequests: { refreshPullRequestsByWorkspaces } },
+		runtime: { pullRequests: { refreshPullRequestsByCheckouts } },
 	} as unknown as Pick<HostServiceContext, "db" | "runtime">;
 }
 
+/** `refreshed` holds the workspaces of each refresh, `checkouts` the checkouts. */
 function recordingContext(db: HostServiceContext["db"]) {
 	const refreshed: string[][] = [];
-	const ctx = createContext(db, async (ids) => {
-		refreshed.push(ids);
+	const checkouts: Checkout[][] = [];
+	const ctx = createContext(db, async (linked) => {
+		checkouts.push(linked);
+		refreshed.push(linked.map((checkout) => checkout.workspaceId));
 	});
-	return { ctx, refreshed };
+	return { ctx, refreshed, checkouts };
 }
 
 describe("syncPullRequestAfterWrite", () => {
@@ -146,6 +154,40 @@ describe("syncPullRequestAfterWrite", () => {
 			state: "merged",
 		});
 		expect(refreshed).toEqual([["ws-dup", "ws-newer", "ws-older"]]);
+	});
+
+	test("refreshes only the checkout linked to the PR, not the workspace's other checkouts", async () => {
+		const db = createTestDb();
+		seedLinkedPullRequest(db);
+		db.insert(repositories)
+			.values({
+				id: "repository-2",
+				projectId: PROJECT_ID,
+				name: "api",
+				repoPath: "/tmp/api",
+			})
+			.run();
+		db.insert(workspaceRepositories)
+			.values({
+				workspaceId: "ws-newer",
+				repositoryId: "repository-2",
+				branch: "feature/42",
+			})
+			.run();
+		const { ctx, checkouts } = recordingContext(db);
+
+		await syncPullRequestAfterWrite(ctx, {
+			repo: REPO,
+			prNumber: PR_NUMBER,
+			action: "merge",
+		});
+
+		expect(checkouts).toEqual([
+			[
+				{ workspaceId: "ws-newer", repositoryId: REPOSITORY_ID },
+				{ workspaceId: "ws-older", repositoryId: REPOSITORY_ID },
+			],
+		]);
 	});
 
 	test("writes the row but skips the refresh when no live workspace is linked", async () => {

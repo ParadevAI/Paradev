@@ -292,7 +292,9 @@ export async function checkoutsFor(
 	}
 	const wanted = input.repository ?? project.primaryRepositoryId;
 	const repository = project.repositories.find(
-		(candidate) => candidate.id === wanted || candidate.name === wanted,
+		(candidate) =>
+			candidate.id === wanted ||
+			candidate.name.toLowerCase() === wanted?.toLowerCase(),
 	);
 	if (!repository) {
 		throw new Error(

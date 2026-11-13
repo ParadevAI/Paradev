@@ -7,13 +7,17 @@ let createInput: Record<string, unknown> | undefined;
 let createdPaths: unknown[] = [];
 let alreadyExists = false;
 let failingPath: string | undefined;
+let projectReads = 0;
 
 withLocalHostService("org-1", {
-	"project.get": () => ({
-		id: "project-1",
-		name: "project",
-		repositories: [{ id: "repo-1", name: "repo", isPrimary: true }],
-	}),
+	"project.get": () => {
+		projectReads++;
+		return {
+			id: "project-1",
+			name: "project",
+			repositories: [{ id: "repo-1", name: "repo", isPrimary: true }],
+		};
+	},
 	"workspaceCreation.listProjectWorktrees": () => ({
 		worktrees: [
 			{
@@ -77,6 +81,7 @@ afterEach(() => {
 	createdPaths = [];
 	alreadyExists = false;
 	failingPath = undefined;
+	projectReads = 0;
 });
 
 describe("worktrees open: arguments", () => {
@@ -168,6 +173,7 @@ describe("worktrees open --all", () => {
 			failed: [],
 		});
 		expect(result.message).toStartWith("Opened 2 of 2 worktrees");
+		expect(projectReads).toBe(1);
 	});
 
 	test("keeps going past a failure and fails with every result as data", async () => {

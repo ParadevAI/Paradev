@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-	findLinkedWorkspaceIds,
-	findPullRequestRows,
-} from "./linked-workspaces";
+import { findLinkedCheckouts, findPullRequestRows } from "./linked-workspaces";
 import {
 	createTestDb,
 	PR_NUMBER,
@@ -53,21 +50,18 @@ describe("findPullRequestRows", () => {
 	});
 });
 
-describe("findLinkedWorkspaceIds", () => {
+describe("findLinkedCheckouts", () => {
 	test("returns live linked workspaces, most recent activity first", () => {
 		const db = createTestDb();
 		seedLinkedPullRequest(db);
-		expect(findLinkedWorkspaceIds(db, ["pr-42"])).toEqual([
-			"ws-newer",
-			"ws-older",
-		]);
+		expect(workspacesOf(db, ["pr-42"])).toEqual(["ws-newer", "ws-older"]);
 	});
 
 	test("spans every row it is given", () => {
 		const db = createTestDb();
 		seedLinkedPullRequest(db);
 		seedDuplicateCasingRow(db);
-		expect(findLinkedWorkspaceIds(db, ["pr-42", "pr-42-dup"])).toEqual([
+		expect(workspacesOf(db, ["pr-42", "pr-42-dup"])).toEqual([
 			"ws-dup",
 			"ws-newer",
 			"ws-older",
@@ -77,7 +71,11 @@ describe("findLinkedWorkspaceIds", () => {
 	test("is empty when nothing links to the rows", () => {
 		const db = createTestDb();
 		seedLinkedPullRequest(db);
-		expect(findLinkedWorkspaceIds(db, ["pr-43"])).toEqual([]);
-		expect(findLinkedWorkspaceIds(db, [])).toEqual([]);
+		expect(workspacesOf(db, ["pr-43"])).toEqual([]);
+		expect(workspacesOf(db, [])).toEqual([]);
 	});
 });
+
+function workspacesOf(db: ReturnType<typeof createTestDb>, ids: string[]) {
+	return findLinkedCheckouts(db, ids).map((checkout) => checkout.workspaceId);
+}

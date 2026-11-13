@@ -408,6 +408,13 @@ export const serverErrorMessages: Record<
 					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
 			}),
 		),
+	"serverError.cloudWorkspace.repositorySetMismatch": () =>
+		i18n._(
+			msg({
+				message:
+					"This environment does not open the same repositories as this workspace. Pick an environment with exactly its repositories.",
+			}),
+		),
 	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>
 		i18n._(
 			msg({

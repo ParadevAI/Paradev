@@ -304,7 +304,7 @@ test("a dirty checkout blocks the delete and is named, before any checkout is re
 	expect(row.archivedAt).toBeNull();
 });
 
-test("a delete that fails on one checkout names the checkouts already removed", async () => {
+test("a delete that fails on one checkout names the checkouts already removed, stays archived, and a retry finishes it", async () => {
 	const scenario = await multiRepoScenario();
 	const workspace = await createBoth(scenario);
 	const realRemove = cleanupGitOps.removeWorktree;
@@ -325,6 +325,16 @@ test("a delete that fails on one checkout names the checkouts already removed", 
 	} finally {
 		remove.mockRestore();
 	}
+	const row = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(row.archivedAt).not.toBeNull();
+
+	const retried = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	expect(retried).toMatchObject({ worktreeRemoved: true });
+	expect(existsSync(workspace.worktreePath)).toBe(false);
 });
 
 test("files an agent left in the root warn and block the delete; a forced delete removes the root", async () => {
