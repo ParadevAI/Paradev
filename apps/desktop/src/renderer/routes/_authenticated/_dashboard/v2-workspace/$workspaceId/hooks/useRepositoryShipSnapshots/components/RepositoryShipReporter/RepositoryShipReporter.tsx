@@ -27,6 +27,8 @@ export interface RepositoryShipSnapshot {
 interface RepositoryShipReporterProps {
 	workspaceId: string;
 	repositoryId: string;
+	/** False stops the pull request and commit polling; changed-file stats stay live. */
+	enabled: boolean;
 	onChange: (repositoryId: string, snapshot: RepositoryShipSnapshot) => void;
 }
 
@@ -34,13 +36,17 @@ interface RepositoryShipReporterProps {
 export function RepositoryShipReporter({
 	workspaceId,
 	repositoryId,
+	enabled,
 	onChange,
 }: RepositoryShipReporterProps) {
 	const status = useCheckoutGitStatus(repositoryId);
-	const { flowState } = usePRFlowState(workspaceId, repositoryId);
+	const { flowState } = usePRFlowState(workspaceId, repositoryId, {
+		enabled,
+	});
 	const { hasCommitsAhead } = useShipActions({
 		workspaceId,
 		repositoryId,
+		enabled,
 		onRefresh: () => {},
 		isPrFormOpen: false,
 		onCommitted: () => {},

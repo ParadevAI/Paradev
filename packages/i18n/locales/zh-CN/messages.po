@@ -6104,6 +6104,9 @@ msgstr "无法移除仓库"
 msgid "Could not remove the repository"
 msgstr "无法移除仓库"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "无法重命名 {repository} 中的分支：{reason}"
+
 msgid "Could not rename the session"
 msgstr "无法重命名会话"
 
@@ -12801,6 +12804,9 @@ msgstr "新建工作区（{shortcutText}）"
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作区"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "新工作区将不再检出它。文件夹仍保留在磁盘上的 {repositoryPath}。"
+
 msgid "Newer than this app"
 msgstr "比此应用新"
 
@@ -16543,6 +16549,9 @@ msgstr "移除 {name}？"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "移除 {repo}？从中同步的所有插件都会从你的组织以及所有已安装的成员那里移除。"
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "要从项目中移除 {repositoryName} 吗？"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "将 #{prNumber} 移出合并队列？"
 
@@ -16705,6 +16714,9 @@ msgstr "重命名工作区"
 
 msgid "Rename..."
 msgstr "重命名..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "已在 {renamed} 中重命名分支，但 {repository} 中未能重命名：{reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "正在将分支重命名为{newName}..."

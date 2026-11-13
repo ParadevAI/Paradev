@@ -6104,6 +6104,9 @@ msgstr "Không thể gỡ repository"
 msgid "Could not remove the repository"
 msgstr "Không thể gỡ repository"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "Không thể đổi tên nhánh trong {repository}: {reason}"
+
 msgid "Could not rename the session"
 msgstr "Không thể đổi tên phiên"
 
@@ -12801,6 +12804,9 @@ msgstr "Workspace mới ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Workspace mới trong {name}"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Các workspace mới sẽ không checkout nó nữa. Thư mục vẫn nằm trên ổ đĩa tại {repositoryPath}."
+
 msgid "Newer than this app"
 msgstr "Mới hơn ứng dụng này"
 
@@ -16543,6 +16549,9 @@ msgstr "Gỡ {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Gỡ {repo}? Mọi plugin được đồng bộ từ đó sẽ bị gỡ khỏi tổ chức của bạn và khỏi mọi thành viên đã cài."
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "Xóa {repositoryName} khỏi dự án?"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "Xóa #{prNumber} khỏi hàng đợi merge?"
 
@@ -16705,6 +16714,9 @@ msgstr "Đổi tên workspace"
 
 msgid "Rename..."
 msgstr "Đổi tên..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "Đã đổi tên nhánh trong {renamed}, nhưng không đổi được trong {repository}: {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "Đang đổi tên nhánh thành {newName}..."

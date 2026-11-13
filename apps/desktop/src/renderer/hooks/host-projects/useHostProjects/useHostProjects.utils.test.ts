@@ -77,6 +77,15 @@ describe("getPrimaryRepository", () => {
 	test("returns the primary, not the first by name", () => {
 		expect(getPrimaryRepository(snapshot())?.id).toBe("web");
 	});
+
+	test("returns undefined for a row from an older host", () => {
+		expect(
+			getPrimaryRepository({
+				primaryRepositoryId: undefined,
+				repositories: undefined,
+			} as unknown as Parameters<typeof getPrimaryRepository>[0]),
+		).toBeUndefined();
+	});
 });
 
 describe("isHostProjectRow", () => {
@@ -89,6 +98,30 @@ describe("isHostProjectRow", () => {
 });
 
 describe("applyProjectChangedEvent", () => {
+	test("ignores a snapshot from an older host without repositories", () => {
+		const existing = toHostProjectRow(snapshot());
+		const oldShape = {
+			...snapshot({ id: "old" }),
+			repositories: undefined,
+			primaryRepositoryId: undefined,
+		} as unknown as ProjectSnapshotPayload;
+		const rows = [existing];
+		expect(
+			applyProjectChangedEvent(
+				rows,
+				{ eventType: "created", project: oldShape },
+				"old",
+			),
+		).toBe(rows);
+		expect(
+			applyProjectChangedEvent(
+				undefined,
+				{ eventType: "created", project: oldShape },
+				"old",
+			),
+		).toBeUndefined();
+	});
+
 	test("replaces the repositories and keeps tag settings a snapshot omits", () => {
 		const existing = toHostProjectRow(snapshot({ tagSettings }));
 		const next = applyProjectChangedEvent(

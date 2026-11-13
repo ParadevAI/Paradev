@@ -6104,6 +6104,9 @@ msgstr "Could not remove repository"
 msgid "Could not remove the repository"
 msgstr "Could not remove the repository"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "Could not rename the branch in {repository}: {reason}"
+
 msgid "Could not rename the session"
 msgstr "Could not rename the session"
 
@@ -12801,6 +12804,9 @@ msgstr "New Workspace ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "New workspace in {name}"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+
 msgid "Newer than this app"
 msgstr "Newer than this app"
 
@@ -16543,6 +16549,9 @@ msgstr "Remove {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "Remove {repositoryName} from the project?"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "Remove #{prNumber} from the merge queue?"
 
@@ -16705,6 +16714,9 @@ msgstr "Rename workspace"
 
 msgid "Rename..."
 msgstr "Rename..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "Renamed the branch in {renamed}, but not in {repository}: {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "Renaming branch to {newName}..."

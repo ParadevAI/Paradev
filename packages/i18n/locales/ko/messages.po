@@ -6104,6 +6104,9 @@ msgstr "리포지토리를 제거할 수 없습니다"
 msgid "Could not remove the repository"
 msgstr "리포지토리를 제거할 수 없습니다"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "{repository}의 브랜치 이름을 바꿀 수 없습니다: {reason}"
+
 msgid "Could not rename the session"
 msgstr "세션 이름을 변경할 수 없습니다"
 
@@ -12801,6 +12804,9 @@ msgstr "새 워크스페이스 ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name}에 새 워크스페이스"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "새 워크스페이스에서 더 이상 체크아웃하지 않습니다. 폴더는 {repositoryPath}에 그대로 남습니다."
+
 msgid "Newer than this app"
 msgstr "이 앱보다 최신"
 
@@ -16543,6 +16549,9 @@ msgstr "{name}을(를) 제거할까요?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo}을(를) 제거할까요? 여기서 동기화된 모든 플러그인이 조직과 설치한 모든 구성원에게서 제거됩니다."
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "{repositoryName}을(를) 프로젝트에서 제거할까요?"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "#{prNumber}을(를) 머지 대기열에서 제거할까요?"
 
@@ -16705,6 +16714,9 @@ msgstr "워크스페이스 이름 변경"
 
 msgid "Rename..."
 msgstr "이름 변경..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "{renamed}에서는 브랜치 이름을 바꿨지만 {repository}에서는 바꾸지 못했습니다: {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "브랜치 이름을 {newName}(으)로 변경하는 중..."

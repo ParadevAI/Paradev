@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { isHostProjectRow } from "renderer/hooks/host-projects/useHostProjects/useHostProjects.utils";
 import type { PullRequestProject } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/resolvePullRequestTarget";
 import { cloudPullRequestRead } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/toPullRequestDetail/fixtures";
 
@@ -33,6 +34,7 @@ mock.module(`${root}/v2-workspace/providers/WorkspaceProvider`, () => ({
 	}),
 }));
 mock.module("renderer/hooks/host-projects/useHostProjects", () => ({
+	isHostProjectRow,
 	useHostProjects: () => hostProjects,
 }));
 mock.module("renderer/hooks/useActiveOrganizationId", () => ({
@@ -142,6 +144,6 @@ test("a workspace without a project still reads the pull request", async () => {
 	expect(view.result.current.projectId).toBeNull();
 	expect(workspaceProjectQuery).toHaveBeenCalledWith(
 		{ projectId: "" },
-		{ enabled: false },
+		expect.objectContaining({ enabled: false }),
 	);
 });

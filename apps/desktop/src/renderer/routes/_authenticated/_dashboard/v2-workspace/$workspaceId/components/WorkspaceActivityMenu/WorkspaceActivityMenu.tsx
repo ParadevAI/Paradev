@@ -150,21 +150,10 @@ export function WorkspaceActivityMenu({
 	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const isMultiRepo = checkouts.length > 1;
-	const repositoryId = checkouts[0]?.repositoryId;
+	const repositoryId = (
+		checkouts.find((checkout) => checkout.isPrimary) ?? checkouts[0]
+	)?.repositoryId;
 	const gitStatus = useCheckoutGitStatus(repositoryId);
-	const repositoryShip = useRepositoryShipSnapshots(
-		workspaceId,
-		isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],
-	);
-	const singleRepoStats = useMemo(
-		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
-		[gitStatus.data],
-	);
-	const changesStats = isMultiRepo ? repositoryShip.totals : singleRepoStats;
-	const triggerChangesStats =
-		paneAreaStyle && changesStats && changesStats.fileCount > 0
-			? changesStats
-			: null;
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
@@ -190,6 +179,21 @@ export function WorkspaceActivityMenu({
 	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
 	const open = docked || floating;
+	// The trigger needs only the changed-file totals; the menu rows need the PRs.
+	const repositoryShip = useRepositoryShipSnapshots(
+		workspaceId,
+		isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],
+		{ enabled: open },
+	);
+	const singleRepoStats = useMemo(
+		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
+		[gitStatus.data],
+	);
+	const changesStats = isMultiRepo ? repositoryShip.totals : singleRepoStats;
+	const triggerChangesStats =
+		paneAreaStyle && changesStats && changesStats.fileCount > 0
+			? changesStats
+			: null;
 	const [dockedMounted, setDockedMounted] = useState(docked);
 	if (docked && !dockedMounted) setDockedMounted(true);
 	useEffect(() => {

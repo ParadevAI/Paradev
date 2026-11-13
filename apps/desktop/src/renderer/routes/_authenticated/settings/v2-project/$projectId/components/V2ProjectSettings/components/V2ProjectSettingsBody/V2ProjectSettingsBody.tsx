@@ -71,18 +71,21 @@ export function V2ProjectSettingsBody({
 	// writes to — falling back to the merged fan-out value only while it loads
 	// (same rule as Name). Custom icon wins; else the GitHub owner avatar.
 	const projectIcon = hostProject ? hostProject.icon : project.icon;
-	// Repositories are per host too: the targeted host's row wins.
 	const repositorySource = hostProject ?? project;
-	const repositories = repositorySource.repositories;
 	const primary = getPrimaryRepository(repositorySource);
-	const isMultiRepo = repositories.length > 1;
+	const isMultiRepo = repositorySource.repositories.length > 1;
+	// Repository ids and paths differ between hosts, so a multi-repo project
+	// lists only the targeted host's own rows.
+	const repositories =
+		hostProject?.repositories ?? (isMultiRepo ? [] : project.repositories);
 	const iconUrl = resolveProjectIconUrl({
 		icon: projectIcon,
 		primaryRepositoryId: repositorySource.primaryRepositoryId,
-		repositories,
+		repositories: repositorySource.repositories,
 	});
 	// Accent color follows the same per-host precedence as the icon.
 	const projectColor = hostProject ? hostProject.color : project.color;
+	const hostName = targetHostName;
 	const renderLocation = (
 		repository: HostRepository | null,
 		repositoryName?: string,
@@ -147,14 +150,20 @@ export function V2ProjectSettingsBody({
 									"Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository.",
 							})}
 						>
-							<RepositoriesSection
-								projectId={projectId}
-								repositories={repositories}
-								hostUrl={targetHostUrl}
-								hostName={targetHostName}
-								isRemoteTarget={isRemoteTarget}
-								onChanged={() => onHostProjectChanged()}
-							/>
+							{hostProject ? (
+								<RepositoriesSection
+									projectId={projectId}
+									repositories={repositories}
+									hostUrl={targetHostUrl}
+									hostName={targetHostName}
+									isRemoteTarget={isRemoteTarget}
+									onChanged={() => onHostProjectChanged()}
+								/>
+							) : (
+								<span className="text-sm text-muted-foreground">
+									<Trans>Not set up on {hostName}</Trans>
+								</span>
+							)}
 						</SettingsRow>
 					) : (
 						<SettingsRow
@@ -251,7 +260,7 @@ export function V2ProjectSettingsBody({
 							"Where the repository and new worktrees live on this host.",
 					})}
 				>
-					{isMultiRepo ? (
+					{isMultiRepo && hostProject ? (
 						repositories.map((repository) => (
 							<SettingsRow key={repository.id} label={repository.name}>
 								{renderLocation(repository, repository.name)}

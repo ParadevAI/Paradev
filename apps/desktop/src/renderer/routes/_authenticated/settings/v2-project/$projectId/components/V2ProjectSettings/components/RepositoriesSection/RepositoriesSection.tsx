@@ -1,5 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@superset/ui/alert-dialog";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import {
@@ -11,6 +21,7 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { HiEllipsisVertical } from "react-icons/hi2";
 import { LuFolderGit2 } from "react-icons/lu";
 import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
@@ -37,6 +48,11 @@ export function RepositoriesSection({
 }: RepositoriesSectionProps) {
 	const { t } = useLingui();
 	const primary = repositories.find((repository) => repository.isPrimary);
+	const [pendingRemoval, setPendingRemoval] = useState<HostRepository | null>(
+		null,
+	);
+	const repositoryName = pendingRemoval?.name ?? "";
+	const repositoryPath = pendingRemoval?.path ?? "";
 
 	const makePrimary = useMutation({
 		mutationFn: async (repositoryId: string) => {
@@ -60,7 +76,10 @@ export function RepositoriesSection({
 				repositoryId,
 			});
 		},
-		onSuccess: () => onChanged(),
+		onSuccess: () => {
+			setPendingRemoval(null);
+			onChanged();
+		},
 		onError: (err) =>
 			toast.error(t({ message: "Could not remove the repository" }), {
 				description: hostRefusalReason(errorMessage(err)),
@@ -128,7 +147,7 @@ export function RepositoriesSection({
 							<DropdownMenuItem
 								disabled={repository.isPrimary}
 								className="text-destructive focus:text-destructive"
-								onSelect={() => remove.mutate(repository.id)}
+								onSelect={() => setPendingRemoval(repository)}
 							>
 								<Trans>Remove from project</Trans>
 							</DropdownMenuItem>
@@ -144,6 +163,41 @@ export function RepositoriesSection({
 				isRemoteTarget={isRemoteTarget}
 				onChanged={onChanged}
 			/>
+			<AlertDialog
+				open={pendingRemoval !== null}
+				onOpenChange={(open) => {
+					if (!open && !remove.isPending) setPendingRemoval(null);
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							<Trans>Remove {repositoryName} from the project?</Trans>
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							<Trans>
+								New workspaces stop checking it out. The folder stays on disk at{" "}
+								{repositoryPath}.
+							</Trans>
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={remove.isPending}>
+							<Trans>Cancel</Trans>
+						</AlertDialogCancel>
+						<AlertDialogAction
+							disabled={remove.isPending}
+							variant="destructive"
+							onClick={(e) => {
+								e.preventDefault();
+								if (pendingRemoval) remove.mutate(pendingRemoval.id);
+							}}
+						>
+							<Trans>Remove</Trans>
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

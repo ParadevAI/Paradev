@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { formatList } from "@superset/i18n/format";
 import { Button } from "@superset/ui/button";
 import {
 	Dialog,
@@ -88,21 +89,45 @@ export function RenameBranchDialog({
 			return;
 		}
 		const client = getHostServiceClientByUrl(workspaceHostUrl);
+		const renamedNames: string[] = [];
+		let failedName: string | undefined;
 		const renamePromise = (async () => {
 			for (const repositoryId of targets.repositoryIds) {
-				await client.git.renameBranch.mutate({
-					workspaceId,
-					repositoryId,
-					oldName: currentBranchName,
-					newName: trimmed,
-				});
+				const name = checkouts?.find(
+					(checkout) => checkout.repositoryId === repositoryId,
+				)?.name;
+				try {
+					await client.git.renameBranch.mutate({
+						workspaceId,
+						repositoryId,
+						oldName: currentBranchName,
+						newName: trimmed,
+					});
+				} catch (err) {
+					failedName = name;
+					throw err;
+				}
+				if (name) renamedNames.push(name);
 			}
 		})();
 
 		toast.promise(renamePromise, {
 			loading: `Renaming branch to ${trimmed}...`,
 			success: `Branch renamed to ${trimmed}`,
-			error: (err) => errorMessage(err, "Failed to rename branch"),
+			error: (err) => {
+				const reason = errorMessage(err, "Failed to rename branch");
+				if (targets.repositoryIds.length < 2 || !failedName) return reason;
+				const repository = failedName;
+				if (renamedNames.length === 0) {
+					return t({
+						message: `Could not rename the branch in ${repository}: ${reason}`,
+					});
+				}
+				const renamed = formatList(renamedNames);
+				return t({
+					message: `Renamed the branch in ${renamed}, but not in ${repository}: ${reason}`,
+				});
+			},
 		});
 
 		setIsSubmitting(true);

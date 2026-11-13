@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useMemo, useRef } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	isHostProjectRow,
+	useHostProjects,
+} from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
@@ -100,7 +103,8 @@ export function V2ProjectSettings({
 		queryFn: async () => {
 			if (!targetHostUrl) return null;
 			const client = getHostServiceClientByUrl(targetHostUrl);
-			return client.project.get.query({ projectId });
+			const row = await client.project.get.query({ projectId });
+			return row && isHostProjectRow(row) ? row : null;
 		},
 	});
 	// External renames land on the merged fan-out item via project:changed;

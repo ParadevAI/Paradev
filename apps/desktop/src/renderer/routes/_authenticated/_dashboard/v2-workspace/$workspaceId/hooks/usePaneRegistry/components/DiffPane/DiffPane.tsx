@@ -152,10 +152,12 @@ export function DiffPane({
 		: "hidden";
 
 	// A multi-repo workspace shows every checkout's changes, each file tagged
-	// with its repository; an untagged file is in the first checkout.
+	// with its repository; an untagged file is in the primary checkout.
 	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const isMultiRepo = checkouts.length > 1;
-	const primaryRepositoryId = checkouts[0]?.repositoryId;
+	const primaryRepositoryId = (
+		checkouts.find((checkout) => checkout.isPrimary) ?? checkouts[0]
+	)?.repositoryId;
 	const repositoryIds = useMemo(
 		() =>
 			isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],

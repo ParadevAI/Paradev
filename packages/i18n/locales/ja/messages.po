@@ -6104,6 +6104,9 @@ msgstr "リポジトリを削除できませんでした"
 msgid "Could not remove the repository"
 msgstr "リポジトリを削除できませんでした"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "{repository} のブランチ名を変更できませんでした: {reason}"
+
 msgid "Could not rename the session"
 msgstr "セッションの名前を変更できませんでした"
 
@@ -12801,6 +12804,9 @@ msgstr "新規ワークスペース({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name} に新規ワークスペース"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "新しいワークスペースではチェックアウトされなくなります。フォルダは {repositoryPath} にそのまま残ります。"
+
 msgid "Newer than this app"
 msgstr "このアプリより新しい"
 
@@ -16543,6 +16549,9 @@ msgstr "{name} を削除しますか?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo} を削除しますか？このリポジトリから同期されたプラグインはすべて、組織からも、インストール済みのすべてのメンバーからも削除されます。"
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "{repositoryName} をプロジェクトから削除しますか？"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "#{prNumber} をマージキューから外しますか?"
 
@@ -16705,6 +16714,9 @@ msgstr "ワークスペースの名前を変更"
 
 msgid "Rename..."
 msgstr "名前を変更..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "{renamed} のブランチ名は変更しましたが、{repository} では変更できませんでした: {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "ブランチ名を{newName}に変更中..."

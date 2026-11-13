@@ -6104,6 +6104,9 @@ msgstr "Depo kaldırılamadı"
 msgid "Could not remove the repository"
 msgstr "Depo kaldırılamadı"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "{repository} içindeki branch yeniden adlandırılamadı: {reason}"
+
 msgid "Could not rename the session"
 msgstr "Oturum yeniden adlandırılamadı"
 
@@ -12801,6 +12804,9 @@ msgstr "Yeni çalışma alanı ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name} içinde yeni çalışma alanı"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Yeni çalışma alanları artık bunu checkout etmez. Klasör diskte {repositoryPath} konumunda kalır."
+
 msgid "Newer than this app"
 msgstr "Bu uygulamadan daha yeni"
 
@@ -16543,6 +16549,9 @@ msgstr "{name} kaldırılsın mı?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "{repo} kaldırılsın mı? Ondan eşitlenen tüm eklentiler kuruluşunuzdan ve onları yüklemiş her üyeden kaldırılır."
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "{repositoryName} projeden kaldırılsın mı?"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "#{prNumber} birleştirme kuyruğundan çıkarılsın mı?"
 
@@ -16705,6 +16714,9 @@ msgstr "Çalışma alanını yeniden adlandır"
 
 msgid "Rename..."
 msgstr "Yeniden adlandır..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "Branch {renamed} içinde yeniden adlandırıldı, ancak {repository} içinde adlandırılamadı: {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "Dal {newName} olarak yeniden adlandırılıyor..."

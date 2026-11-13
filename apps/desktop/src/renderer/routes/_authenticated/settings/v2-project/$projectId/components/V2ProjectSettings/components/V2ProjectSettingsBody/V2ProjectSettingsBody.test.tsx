@@ -180,4 +180,13 @@ describe("V2ProjectSettingsBody with several repositories", () => {
 		});
 		expect(view.getAllByText("Folder is missing").length).toBeGreaterThan(0);
 	});
+
+	test("lists no other host's repositories when the targeted host has none", () => {
+		const view = renderBody({
+			project: { ...project, repositories: [api, app] },
+			hostProject: null,
+		});
+		expect(view.getAllByText("Not set up on This device").length).toBe(2);
+		expect(view.queryByText("/repos/api")).toBe(null);
+	});
 });

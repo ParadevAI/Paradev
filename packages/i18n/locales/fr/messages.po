@@ -6104,6 +6104,9 @@ msgstr "Impossible de supprimer le dépôt"
 msgid "Could not remove the repository"
 msgstr "Impossible de supprimer le dépôt"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "Impossible de renommer la branche dans {repository} : {reason}"
+
 msgid "Could not rename the session"
 msgstr "Impossible de renommer la session"
 
@@ -12801,6 +12804,9 @@ msgstr "Nouvel espace de travail ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nouvel espace de travail dans {name}"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Les nouveaux espaces de travail ne le récupèrent plus. Le dossier reste sur le disque dans {repositoryPath}."
+
 msgid "Newer than this app"
 msgstr "Plus récent que cette application"
 
@@ -16543,6 +16549,9 @@ msgstr "Retirer {name} ?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Supprimer {repo} ? Tous les plugins synchronisés depuis ce dépôt sont retirés de votre organisation et de chaque membre qui les a installés."
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "Retirer {repositoryName} du projet ?"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "Retirer #{prNumber} de la file de fusion ?"
 
@@ -16705,6 +16714,9 @@ msgstr "Renommer l'espace de travail"
 
 msgid "Rename..."
 msgstr "Renommer..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "Branche renommée dans {renamed}, mais pas dans {repository} : {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "Renommage de la branche en {newName}..."

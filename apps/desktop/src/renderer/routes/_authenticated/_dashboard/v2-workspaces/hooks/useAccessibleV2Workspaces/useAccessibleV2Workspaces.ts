@@ -431,7 +431,7 @@ export function useAccessibleV2Workspaces(
 			if (!data) continue;
 			for (const row of data.workspaces) {
 				const pr = workspaceRowPullRequest(
-					row.checkouts,
+					row.checkouts ?? [],
 					primaryRepositoryIdByWorkspaceId.get(row.workspaceId) ?? null,
 				)?.pullRequest;
 				if (!pr) continue;
@@ -500,7 +500,10 @@ export function useAccessibleV2Workspaces(
 		const entries: [string, V2WorkspaceDiffStats][] = [];
 		for (const query of diffStatsQueries) {
 			for (const row of query.data?.workspaces ?? []) {
-				entries.push([row.workspaceId, sumCheckoutDiffStats(row.checkouts)]);
+				entries.push([
+					row.workspaceId,
+					sumCheckoutDiffStats(row.checkouts ?? []),
+				]);
 			}
 		}
 		return entries;

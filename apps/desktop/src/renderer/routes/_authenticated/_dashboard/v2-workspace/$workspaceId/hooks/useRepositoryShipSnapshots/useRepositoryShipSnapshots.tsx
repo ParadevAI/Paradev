@@ -20,6 +20,7 @@ interface UseRepositoryShipSnapshotsResult {
 export function useRepositoryShipSnapshots(
 	workspaceId: string,
 	repositoryIds: string[],
+	{ enabled = true }: { enabled?: boolean } = {},
 ): UseRepositoryShipSnapshotsResult {
 	const [byId, setById] = useState<Record<string, RepositoryShipSnapshot>>({});
 	const handleChange = useCallback(
@@ -49,6 +50,7 @@ export function useRepositoryShipSnapshots(
 			key={id}
 			workspaceId={workspaceId}
 			repositoryId={id}
+			enabled={enabled}
 			onChange={handleChange}
 		/>
 	));

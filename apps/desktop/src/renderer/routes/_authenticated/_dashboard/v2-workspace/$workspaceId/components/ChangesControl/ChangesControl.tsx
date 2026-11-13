@@ -52,7 +52,9 @@ export const ChangesControl = memo(function ChangesControl({
 	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const isMultiRepo = checkouts.length > 1;
-	const repositoryId = checkouts[0]?.repositoryId;
+	const repositoryId = (
+		checkouts.find((checkout) => checkout.isPrimary) ?? checkouts[0]
+	)?.repositoryId;
 	const status = useCheckoutGitStatus(repositoryId);
 	const { flowState, onRetry } = usePRFlowState(workspaceId, repositoryId, {
 		enabled: checkoutsLoaded && !isMultiRepo,

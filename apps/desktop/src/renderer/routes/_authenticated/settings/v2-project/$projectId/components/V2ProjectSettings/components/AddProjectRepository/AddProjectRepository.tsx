@@ -53,7 +53,8 @@ export function AddProjectRepository({
 				});
 			}
 		},
-		onSuccess: () => onChanged(),
+		// Sources are added one by one, so a failure can follow some that landed.
+		onSettled: () => onChanged(),
 		onError: (err) =>
 			toast.error(t({ message: "Could not add the repository" }), {
 				description: errorMessage(err),

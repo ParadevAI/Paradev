@@ -26,14 +26,16 @@ export function resolveProjectIconUrl(
 ): string | null {
 	if (project.icon === PROJECT_ICON_NONE) return null;
 	if (project.icon) return project.icon;
-	const owner =
-		"repositories" in project
-			? (
-					project.repositories.find(
-						(r) => r.id === project.primaryRepositoryId,
-					) ?? project.repositories[0]
-				)?.owner
-			: project.repoOwner;
+	let owner: string | null | undefined;
+	if ("repositories" in project) {
+		const repositories = project.repositories ?? [];
+		owner = (
+			repositories.find((r) => r.id === project.primaryRepositoryId) ??
+			repositories[0]
+		)?.owner;
+	} else {
+		owner = project.repoOwner;
+	}
 	if (owner) {
 		return `https://github.com/${owner}.png?size=64`;
 	}

@@ -4,10 +4,10 @@ import { buildCheckoutsInput } from "./buildCheckoutsInput";
 const emptyDraft = {
 	checkout: "worktree" as const,
 	baseBranch: null,
-	repositoryBaseBranches: {},
-	repositoryPullRequests: {},
-	repositoryPullRequestsFor: null,
-	repositoryWorktrees: {},
+	checkoutBaseBranches: {},
+	checkoutPullRequests: {},
+	checkoutPullRequestsFor: null,
+	checkoutWorktrees: {},
 };
 
 const linkedPR = {
@@ -49,14 +49,14 @@ describe("buildCheckoutsInput", () => {
 			draft: {
 				...emptyDraft,
 				checkout: "local",
-				repositoryBaseBranches: { api: "main", web: "ignored" },
-				repositoryPullRequests: {
+				checkoutBaseBranches: { api: "main", web: "ignored" },
+				checkoutPullRequests: {
 					shared: { ...linkedPR, prNumber: 4, headRefName: "t", matched: true },
 					web: { ...linkedPR, headRefName: "t", matched: false },
 					docs: { ...linkedPR, prNumber: 9, headRefName: "t", matched: true },
 				},
-				repositoryPullRequestsFor: linkedPR.url,
-				repositoryWorktrees: { docs: { path: "/wt/docs", branch: "x" } },
+				checkoutPullRequestsFor: linkedPR.url,
+				checkoutWorktrees: { docs: { path: "/wt/docs", branch: "x" } },
 			},
 			linkedPR,
 			primaryRepositoryId: "api",

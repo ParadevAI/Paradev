@@ -21,6 +21,16 @@ describe("resolveProjectIconUrl", () => {
 		expect(resolveProjectIconUrl({ icon: null, repoOwner: null })).toBeNull();
 	});
 
+	test("does not throw for a host row without repositories", () => {
+		expect(
+			resolveProjectIconUrl({
+				icon: null,
+				primaryRepositoryId: "x",
+				repositories: undefined,
+			} as unknown as Parameters<typeof resolveProjectIconUrl>[0]),
+		).toBeNull();
+	});
+
 	test("the 'none' sentinel suppresses the GitHub avatar fallback", () => {
 		expect(
 			resolveProjectIconUrl({ icon: "none", repoOwner: "acme" }),

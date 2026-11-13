@@ -52,13 +52,13 @@ export interface NewWorkspaceDraft {
 	baseBranch: string | null;
 	baseBranchSource: BaseBranchSource | null;
 	/** Multi-repo projects: picked base branches by repository id. */
-	repositoryBaseBranches: Record<string, string>;
+	checkoutBaseBranches: Record<string, string>;
 	/** Multi-repo projects: the PR each repository starts from, by repository id. */
-	repositoryPullRequests: Record<string, RepositoryPullRequest>;
-	/** The linked PR `repositoryPullRequests` was found for. */
-	repositoryPullRequestsFor: string | null;
+	checkoutPullRequests: Record<string, RepositoryPullRequest>;
+	/** The linked PR `checkoutPullRequests` was found for. */
+	checkoutPullRequestsFor: string | null;
 	/** Multi-repo projects: the existing worktree each repository moves in, by repository id. */
-	repositoryWorktrees: Record<string, RepositoryWorktree>;
+	checkoutWorktrees: Record<string, RepositoryWorktree>;
 	workspaceName: string;
 	workspaceNameEdited: boolean;
 	branchName: string;
@@ -90,10 +90,10 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		promptDraft: [],
 		baseBranch: null,
 		baseBranchSource: null,
-		repositoryBaseBranches: {},
-		repositoryPullRequests: {},
-		repositoryPullRequestsFor: null,
-		repositoryWorktrees: {},
+		checkoutBaseBranches: {},
+		checkoutPullRequests: {},
+		checkoutPullRequestsFor: null,
+		checkoutWorktrees: {},
 		workspaceName: "",
 		workspaceNameEdited: false,
 		branchName: "",
@@ -127,10 +127,10 @@ export const useNewWorkspaceDraftStore = create<NewWorkspaceDraftState>(
 				isSession: true,
 				baseBranch: null,
 				baseBranchSource: null,
-				repositoryBaseBranches: {},
-				repositoryPullRequests: {},
-				repositoryPullRequestsFor: null,
-				repositoryWorktrees: {},
+				checkoutBaseBranches: {},
+				checkoutPullRequests: {},
+				checkoutPullRequestsFor: null,
+				checkoutWorktrees: {},
 			}),
 		resetDraft: () =>
 			set((state) => ({

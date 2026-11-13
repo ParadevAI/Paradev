@@ -466,7 +466,7 @@ export function NewWorkspaceScreen({
 	);
 	useLinkedIssueNaming(linkedIssues);
 
-	const repositoryPullRequests = useRepositoryPullRequests({
+	const checkoutPullRequests = useRepositoryPullRequests({
 		projectId,
 		hostId,
 		linkedPR,
@@ -475,24 +475,24 @@ export function NewWorkspaceScreen({
 	const linkedPRUrl = isMultiRepoProject ? (linkedPR?.url ?? null) : null;
 	useEffect(() => {
 		if (linkedPRUrl === null) {
-			if (draft.repositoryPullRequestsFor !== null) {
+			if (draft.checkoutPullRequestsFor !== null) {
 				updateDraft({
-					repositoryPullRequests: {},
-					repositoryPullRequestsFor: null,
+					checkoutPullRequests: {},
+					checkoutPullRequestsFor: null,
 				});
 			}
 			return;
 		}
-		if (draft.repositoryPullRequestsFor === linkedPRUrl) return;
-		if (!repositoryPullRequests.data) return;
+		if (draft.checkoutPullRequestsFor === linkedPRUrl) return;
+		if (!checkoutPullRequests.data) return;
 		updateDraft({
-			repositoryPullRequests: repositoryPullRequests.data,
-			repositoryPullRequestsFor: linkedPRUrl,
+			checkoutPullRequests: checkoutPullRequests.data,
+			checkoutPullRequestsFor: linkedPRUrl,
 		});
 	}, [
 		linkedPRUrl,
-		draft.repositoryPullRequestsFor,
-		repositoryPullRequests.data,
+		draft.checkoutPullRequestsFor,
+		checkoutPullRequests.data,
 		updateDraft,
 	]);
 
@@ -529,10 +529,10 @@ export function NewWorkspaceScreen({
 			updateDraft({
 				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
 				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
-				repositoryBaseBranches: {},
-				repositoryPullRequests: {},
-				repositoryPullRequestsFor: null,
-				repositoryWorktrees: {},
+				checkoutBaseBranches: {},
+				checkoutPullRequests: {},
+				checkoutPullRequestsFor: null,
+				checkoutWorktrees: {},
 			});
 		}
 	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
@@ -1210,46 +1210,46 @@ export function NewWorkspaceScreen({
 							projectId={projectId}
 							repositories={projectRepositories}
 							hostId={hostId}
-							baseBranches={draft.repositoryBaseBranches}
-							pullRequests={draft.repositoryPullRequests}
-							worktrees={draft.repositoryWorktrees}
+							baseBranches={draft.checkoutBaseBranches}
+							pullRequests={draft.checkoutPullRequests}
+							worktrees={draft.checkoutWorktrees}
 							onBaseBranchChange={(repositoryId, branch) => {
 								const { [repositoryId]: _replaced, ...pullRequests } =
-									draft.repositoryPullRequests;
+									draft.checkoutPullRequests;
 								const { [repositoryId]: _moved, ...worktrees } =
-									draft.repositoryWorktrees;
+									draft.checkoutWorktrees;
 								updateDraft({
-									repositoryBaseBranches: {
-										...draft.repositoryBaseBranches,
+									checkoutBaseBranches: {
+										...draft.checkoutBaseBranches,
 										[repositoryId]: branch,
 									},
-									repositoryPullRequests: pullRequests,
-									repositoryWorktrees: worktrees,
+									checkoutPullRequests: pullRequests,
+									checkoutWorktrees: worktrees,
 								});
 							}}
 							onWorktreeChange={(repositoryId, worktree) => {
 								const { [repositoryId]: _replaced, ...pullRequests } =
-									draft.repositoryPullRequests;
+									draft.checkoutPullRequests;
 								const { [repositoryId]: _base, ...baseBranches } =
-									draft.repositoryBaseBranches;
+									draft.checkoutBaseBranches;
 								updateDraft({
-									repositoryBaseBranches: baseBranches,
-									repositoryPullRequests: pullRequests,
-									repositoryWorktrees: {
-										...draft.repositoryWorktrees,
+									checkoutBaseBranches: baseBranches,
+									checkoutPullRequests: pullRequests,
+									checkoutWorktrees: {
+										...draft.checkoutWorktrees,
 										[repositoryId]: worktree,
 									},
 								});
 							}}
 						/>
 					)}
-					{linkedPR && draft.repositoryPullRequestsFor !== linkedPR.url && (
+					{linkedPR && draft.checkoutPullRequestsFor !== linkedPR.url && (
 						<span className="flex items-center gap-1 text-xs text-muted-foreground">
 							<LuGitPullRequest className="size-3 shrink-0" />
-							{repositoryPullRequests.isPending ||
-							repositoryPullRequests.isFetching ? (
+							{checkoutPullRequests.isPending ||
+							checkoutPullRequests.isFetching ? (
 								<Trans>Finding PR #{linkedPR.prNumber}…</Trans>
-							) : repositoryPullRequests.isError ? (
+							) : checkoutPullRequests.isError ? (
 								<Trans>Could not load this pull request.</Trans>
 							) : (
 								<Trans>

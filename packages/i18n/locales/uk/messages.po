@@ -6098,6 +6098,9 @@ msgstr "Не вдалося прибрати репозиторій"
 msgid "Could not remove the repository"
 msgstr "Не вдалося прибрати репозиторій"
 
+msgid "Could not rename the branch in {repository}: {reason}"
+msgstr "Не вдалося перейменувати гілку в {repository}: {reason}"
+
 msgid "Could not rename the session"
 msgstr "Не вдалося перейменувати сеанс"
 
@@ -12795,6 +12798,9 @@ msgstr "Новий робочий простір ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Новий робочий простір у {name}"
 
+msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Нові робочі простори більше не будуть його отримувати. Тека залишиться на диску в {repositoryPath}."
+
 msgid "Newer than this app"
 msgstr "Новіша за цей застосунок"
 
@@ -16537,6 +16543,9 @@ msgstr "Видалити {name}?"
 msgid "Remove {repo}? Every plugin synced from it is removed from your organization and from every member who has it installed."
 msgstr "Прибрати {repo}? Усі плагіни, синхронізовані з нього, буде видалено з вашої організації та в усіх учасників, у яких їх встановлено."
 
+msgid "Remove {repositoryName} from the project?"
+msgstr "Вилучити {repositoryName} з проєкту?"
+
 msgid "Remove #{prNumber} from the merge queue?"
 msgstr "Прибрати #{prNumber} з черги злиття?"
 
@@ -16699,6 +16708,9 @@ msgstr "Перейменувати робочий простір"
 
 msgid "Rename..."
 msgstr "Перейменувати..."
+
+msgid "Renamed the branch in {renamed}, but not in {repository}: {reason}"
+msgstr "Гілку перейменовано в {renamed}, але не в {repository}: {reason}"
 
 msgid "Renaming branch to {newName}..."
 msgstr "Перейменування гілки на {newName}..."

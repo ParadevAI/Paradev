@@ -15,6 +15,7 @@ import {
 	type HostProjectItem,
 	type HostProjectRow,
 	type HostProjectRowsResult,
+	isHostProjectRow,
 	loadHostProjectsSnapshot,
 	mergeHostProjects,
 	removeFromHostProjectsSnapshot,
@@ -29,6 +30,7 @@ export {
 	type HostProjectRow,
 	type HostProjectRowsResult,
 	type HostRepository,
+	isHostProjectRow,
 } from "./useHostProjects.utils";
 
 const PROJECTS_FALLBACK_REFETCH_INTERVAL_MS = 30_000;
@@ -118,9 +120,9 @@ export function useHostProjects(): UseHostProjectsResult {
 			retry: 1,
 			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
 				const client = getHostServiceClientByUrl(hostUrl);
-				const rows = (await client.project.list.query()).map((snapshot) =>
-					toHostProjectRow(snapshot),
-				);
+				const rows = (await client.project.list.query())
+					.map((snapshot) => toHostProjectRow(snapshot))
+					.filter(isHostProjectRow);
 				saveHostProjectsSnapshot(target.organizationId, target.machineId, rows);
 				return rows;
 			}),

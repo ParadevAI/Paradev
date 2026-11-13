@@ -22,10 +22,10 @@ type CheckoutsDraft = Pick<
 	NewWorkspaceDraft,
 	| "checkout"
 	| "baseBranch"
-	| "repositoryBaseBranches"
-	| "repositoryPullRequests"
-	| "repositoryPullRequestsFor"
-	| "repositoryWorktrees"
+	| "checkoutBaseBranches"
+	| "checkoutPullRequests"
+	| "checkoutPullRequestsFor"
+	| "checkoutWorktrees"
 >;
 
 /** The checkout fields of a `workspaces.create` input, keyed by repository id. */
@@ -62,11 +62,11 @@ export function buildCheckoutsInput({
 	}
 
 	const isResolved =
-		linkedPR !== null && draft.repositoryPullRequestsFor === linkedPR.url;
+		linkedPR !== null && draft.checkoutPullRequestsFor === linkedPR.url;
 	if (isResolved) {
 		// The PR picked first names the branch, so it goes first.
-		const pullRequests = Object.entries(draft.repositoryPullRequests)
-			.filter(([repositoryId]) => !draft.repositoryWorktrees[repositoryId])
+		const pullRequests = Object.entries(draft.checkoutPullRequests)
+			.filter(([repositoryId]) => !draft.checkoutWorktrees[repositoryId])
 			.sort(([, a], [, b]) => Number(a.matched) - Number(b.matched));
 		for (const [repositoryId, repositoryPullRequest] of pullRequests) {
 			setCheckout(repositoryId, { pr: repositoryPullRequest.prNumber });
@@ -76,15 +76,15 @@ export function buildCheckoutsInput({
 		pullRequest = pullRequestInput(linkedPR);
 	}
 	for (const [repositoryId, baseBranch] of Object.entries(
-		draft.repositoryBaseBranches,
+		draft.checkoutBaseBranches,
 	)) {
-		if (checkouts[repositoryId] || draft.repositoryWorktrees[repositoryId]) {
+		if (checkouts[repositoryId] || draft.checkoutWorktrees[repositoryId]) {
 			continue;
 		}
 		setCheckout(repositoryId, { baseBranch });
 	}
 	for (const [repositoryId, worktree] of Object.entries(
-		draft.repositoryWorktrees,
+		draft.checkoutWorktrees,
 	)) {
 		setCheckout(repositoryId, { worktreePath: worktree.path });
 	}

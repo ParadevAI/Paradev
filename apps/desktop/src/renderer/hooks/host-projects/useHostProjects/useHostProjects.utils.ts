@@ -63,10 +63,11 @@ export function getPrimaryRepository(project: {
 	primaryRepositoryId: string;
 	repositories: HostRepository[];
 }): HostRepository | undefined {
+	const repositories = project.repositories ?? [];
 	return (
-		project.repositories.find(
+		repositories.find(
 			(repository) => repository.id === project.primaryRepositoryId,
-		) ?? project.repositories[0]
+		) ?? repositories[0]
 	);
 }
 
@@ -173,7 +174,7 @@ export function toHostProjectRow(
 	};
 }
 
-/** Snapshots written before projects had repositories are dropped, not migrated. */
+/** Rows from older hosts, and snapshots saved before projects had repositories, are dropped. */
 export function isHostProjectRow(value: unknown): value is HostProjectRow {
 	if (typeof value !== "object" || value === null) return false;
 	const row = value as Partial<HostProjectRow>;
@@ -276,6 +277,7 @@ export function applyProjectChangedEvent(
 	// Old hosts publish settings on project snapshots. New hosts may retain
 	// the field as a compatibility adapter; omission keeps the last value.
 	const nextRow = toHostProjectRow(snapshot, existing?.tagSettings);
+	if (!isHostProjectRow(nextRow)) return rows;
 	if (!rows) return [nextRow];
 	return existing
 		? rows.map((row) => (row.id === nextRow.id ? nextRow : row))

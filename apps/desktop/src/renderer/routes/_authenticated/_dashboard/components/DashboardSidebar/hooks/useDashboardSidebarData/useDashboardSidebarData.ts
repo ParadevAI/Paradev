@@ -672,7 +672,7 @@ export function useDashboardSidebarData() {
 			for (const row of data.workspaces) {
 				const workspace = hostWorkspacesById.get(row.workspaceId);
 				const shown = workspaceRowPullRequest(
-					row.checkouts,
+					row.checkouts ?? [],
 					workspace ? primaryCheckoutRepositoryId(workspace) : null,
 				);
 				rows.push({
