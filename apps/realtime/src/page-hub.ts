@@ -87,7 +87,10 @@ export interface PageViewer {
 export interface ViewerAccess {
 	found: boolean;
 	access: UserAccess;
+	generation: number;
 }
+
+const SETTLE_ATTEMPTS = 3;
 
 function seenVersions(manifest: PageManifest): SeenVersions {
 	return {
@@ -195,37 +198,57 @@ export class PageHub extends Server<RealtimeEnv> {
 		);
 	}
 
-	/** Refuses when the API cannot answer. */
-	async accessFor(viewer: PageViewer): Promise<ViewerAccess> {
+	private async lookup(viewer: PageViewer | "guest"): Promise<{
+		manifest: PageManifest | null;
+		access: UserAccess;
+		generation: number;
+	}> {
 		this.schema();
+		const generation = this.access.generation;
 		const [manifest, checked] = await Promise.all([
 			this.readManifest(),
-			this.access.check([viewer.userId]).catch((error: unknown) => {
-				console.warn("[page-hub] access check failed:", error);
-				return null;
-			}),
+			this.access
+				.check(viewer === "guest" ? [] : [viewer.userId])
+				.catch((error: unknown) => {
+					console.warn("[page-hub] access check failed:", error);
+					return null;
+				}),
 		]);
-		if (!manifest) return { found: false, access: REFUSED };
-		const access = checked?.users.get(viewer.userId);
+		if (!manifest || !checked) return { manifest, access: REFUSED, generation };
+		if (viewer === "guest") {
+			const read = checked.guests && manifest.organizationId !== undefined;
+			return {
+				manifest,
+				access: { read, write: false, author: false },
+				generation,
+			};
+		}
+		const access = checked.users.get(viewer.userId);
 		return {
-			found: true,
+			manifest,
 			access:
 				access && this.inOrganization(manifest, viewer.organizationIds)
 					? access
 					: REFUSED,
+			generation,
 		};
 	}
 
-	private async guestsAllowed(): Promise<boolean> {
-		this.schema();
-		const [manifest, checked] = await Promise.all([
-			this.readManifest(),
-			this.access.check([]).catch((error: unknown) => {
-				console.warn("[page-hub] access check failed:", error);
-				return null;
-			}),
-		]);
-		return Boolean(manifest?.organizationId && checked?.guests);
+	/** Refuses when the API cannot answer. */
+	async accessFor(viewer: PageViewer): Promise<ViewerAccess> {
+		const { manifest, access, generation } = await this.lookup(viewer);
+		return { found: manifest !== null, access, generation };
+	}
+
+	/** For a socket about to be pinned: a nudge during the lookup means ask again. */
+	private async settledLookup(
+		viewer: PageViewer | "guest",
+	): Promise<{ manifest: PageManifest | null; access: UserAccess }> {
+		for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt++) {
+			const { manifest, access, generation } = await this.lookup(viewer);
+			if (this.access.isCurrent(generation)) return { manifest, access };
+		}
+		return { manifest: null, access: REFUSED };
 	}
 
 	async manifestChanged(): Promise<void> {
@@ -254,6 +277,7 @@ export class PageHub extends Server<RealtimeEnv> {
 				console.warn("[page-hub] access re-check failed:", error);
 				return null;
 			});
+		if (checked && !this.access.isCurrent(checked.generation)) return;
 		for (const connection of connections) {
 			const pinned = connection.state;
 			if (!pinned) continue;
@@ -342,7 +366,7 @@ export class PageHub extends Server<RealtimeEnv> {
 			return;
 		}
 
-		const { access } = await this.accessFor({
+		const { access } = await this.settledLookup({
 			userId: claims.userId,
 			organizationIds: claims.organizationIds,
 		});
@@ -397,15 +421,14 @@ export class PageHub extends Server<RealtimeEnv> {
 			this.connectingGuests++;
 		}
 		try {
-			const allowed = claims.guest
-				? await this.guestsAllowed()
-				: (await this.accessFor(claims)).access.read;
-			const manifest = await this.readManifest();
-			if (!allowed || !manifest) {
+			const viewerKey = await this.viewerKeyFor(claims.userId);
+			const { manifest, access } = await this.settledLookup(
+				claims.guest ? "guest" : claims,
+			);
+			if (!access.read || !manifest) {
 				connection.close(4403, "forbidden");
 				return;
 			}
-			const viewerKey = await this.viewerKeyFor(claims.userId);
 			connection.setState({
 				userId: claims.userId,
 				name: claims.name,

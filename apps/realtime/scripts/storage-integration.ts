@@ -40,6 +40,7 @@ const fakeShares = new Map<string, Set<string>>();
 const fakeOrganizations = new Map<string, string[]>();
 const failingPages = new Set<string>();
 const accessCalls: { pageId: string; userIds: string[] }[] = [];
+let heldAnswers: Promise<void> | null = null;
 
 function fakeAccess(pageId: string, userIds: string[]) {
 	const page = fakePages.get(pageId);
@@ -153,6 +154,7 @@ async function main() {
 					return new Response("down", { status: 500 });
 				}
 				const answer = fakeAccess(pageId, userIds);
+				if (heldAnswers) await heldAnswers;
 				return answer
 					? Response.json(answer)
 					: new Response("not found", { status: 404 });
@@ -1459,6 +1461,48 @@ async function main() {
 			afterRemoval,
 		);
 	}
+
+	console.log("\na nudge during a lookup");
+	fakeShares.set(SHARED_WITH_PAGE, new Set([MEMBER]));
+	await nudgeShared();
+	const raceTicket = await ticket(SHARED_WITH_PAGE, memberJwt);
+	await nudgeShared();
+	let release = () => {};
+	heldAnswers = new Promise<void>((resolve) => {
+		release = resolve;
+	});
+	const beforeConnect = callsFor(SHARED_WITH_PAGE);
+	const racing = open(String(raceTicket.url), sharedOrigin).catch(
+		(error) => (error as Error).message,
+	);
+	for (
+		let n = 0;
+		n < 100 && callsFor(SHARED_WITH_PAGE) === beforeConnect;
+		n++
+	) {
+		await Bun.sleep(20);
+	}
+	fakeShares.set(SHARED_WITH_PAGE, new Set());
+	const connectAsked = callsFor(SHARED_WITH_PAGE);
+	const racingNudge = nudgeShared();
+	for (let n = 0; n < 100 && callsFor(SHARED_WITH_PAGE) === connectAsked; n++) {
+		await Bun.sleep(20);
+	}
+	heldAnswers = null;
+	release();
+	await racingNudge;
+	const raced = await racing;
+	check(
+		"a yes that lands after a nudge does not open the socket",
+		typeof raced === "string" && raced.includes("4403"),
+		raced,
+	);
+	const afterRace = await ticket(SHARED_WITH_PAGE, memberJwt);
+	check(
+		"and is not cached for the next request",
+		afterRace.status === 403,
+		afterRace,
+	);
 
 	console.log("\nfail closed when the API cannot answer");
 	const authorShared = await ticket(SHARED_WITH_PAGE, authorJwt);

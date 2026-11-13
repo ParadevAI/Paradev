@@ -137,3 +137,43 @@ test("asks in chunks the API accepts", async () => {
 	expect(asked.map((chunk) => chunk.length)).toEqual([MAX_ACCESS_ASK, 1]);
 	expect(result.users.get(`u${MAX_ACCESS_ASK}`)).toEqual(reader);
 });
+
+describe("while an ask is in flight", () => {
+	const held = () => {
+		let release: () => void = () => {};
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		cache = new PageAccessCache(
+			sqlite(new Database(":memory:")),
+			async (userIds) => {
+				asked.push(userIds);
+				await gate;
+				return answer(userIds);
+			},
+			() => now,
+		);
+		cache.ensureSchema();
+		return release;
+	};
+
+	test("a clear keeps the stale answer out of the cache and marks it stale", async () => {
+		const release = held();
+		const pending = cache.check(["ana"]);
+		cache.clear();
+		release();
+		const result = await pending;
+		expect(cache.isCurrent(result.generation)).toBe(false);
+		await cache.check(["ana"]);
+		expect(asked).toEqual([["ana"], ["ana"]]);
+	});
+
+	test("concurrent checks for the same people share one ask", async () => {
+		const release = held();
+		const both = Promise.all([cache.check(["ana"]), cache.check(["ana"])]);
+		release();
+		const [first, second] = await both;
+		expect(asked).toEqual([["ana"]]);
+		expect(second.users.get("ana")).toEqual(first.users.get("ana"));
+	});
+});
