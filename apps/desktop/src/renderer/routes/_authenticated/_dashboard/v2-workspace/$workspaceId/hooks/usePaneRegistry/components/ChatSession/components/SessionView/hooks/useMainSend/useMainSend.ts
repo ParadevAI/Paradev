@@ -1,3 +1,4 @@
+import type { PromptDelivery } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	Decision,
@@ -15,6 +16,7 @@ export function useMainSend({
 	onUserPrompt,
 	respondToApproval,
 	runningTurnId,
+	sendIntoRunningTurn,
 	sendPrompt,
 }: {
 	approvals: readonly ApprovalRequest[];
@@ -27,9 +29,11 @@ export function useMainSend({
 		decision: Decision,
 	) => Promise<unknown>;
 	runningTurnId: string | null;
+	/** Enter hands the message to the running turn instead of queueing it. */
+	sendIntoRunningTurn: boolean;
 	sendPrompt: (
 		content: UserContent[],
-		options: { expectedTurnId: string } | undefined,
+		delivery: PromptDelivery | undefined,
 		draft: ComposerDraft,
 	) => unknown;
 }) {
@@ -56,14 +60,17 @@ export function useMainSend({
 			for (const approval of pending) {
 				void respondToApproval(approval.id, { type: "cancel" });
 			}
-			const steerTurn = steer || pending.length > 0;
-			return sendPrompt(
-				content,
-				steerTurn && runningTurnId
-					? { expectedTurnId: runningTurnId }
-					: undefined,
-				draft,
-			);
+			const turn = runningTurnId
+				? { expectedTurnId: runningTurnId }
+				: undefined;
+			const delivery: PromptDelivery | undefined = !turn
+				? undefined
+				: steer || pending.length > 0
+					? { steer: turn }
+					: sendIntoRunningTurn
+						? { join: turn }
+						: undefined;
+			return sendPrompt(content, delivery, draft);
 		},
 		[
 			holdPrompt,
@@ -72,6 +79,7 @@ export function useMainSend({
 			onAnswerFailed,
 			onUserPrompt,
 			respondToApproval,
+			sendIntoRunningTurn,
 			sendPrompt,
 			runningTurnId,
 		],

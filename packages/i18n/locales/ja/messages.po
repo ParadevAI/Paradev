@@ -10444,6 +10444,9 @@ msgstr "このホストのターミナルで実行してください。"
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "Apple のウインドウで「インストール」をクリックしてください。数分かかります。完了するとこのページが更新されます。"
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "チャットでは、Enter がメッセージを実行中のターンに渡し、エージェントは準備ができたときに読みます。受け取れないエージェントはメッセージをキューに残し、⌘↩ は引き続きターンを中断します。"
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "わずか数か月で、Wix、DoorDash、Netflixといった企業を含め<0>数万人のエンジニア</0>がParadevを主要なIDEとして使っています。"
 
@@ -18141,6 +18144,9 @@ msgstr "{organizationName}への招待を送ります。48時間で失効しま�
 msgid "Send email and debug delivery"
 msgstr "メールを送信し、配信の問題を調査"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "実行中のターンに送信。⌘↩で中断"
+
 msgid "Send Invitation"
 msgstr "招待を送信"
 
@@ -18179,6 +18185,9 @@ msgstr "チャットに送る"
 
 msgid "Send to chat ({draftCount})"
 msgstr "チャットに送る({draftCount})"
+
+msgid "Send while the agent works"
+msgstr "エージェントの作業中も送信する"
 
 msgid "Sending"
 msgstr "送信中"

@@ -10444,6 +10444,9 @@ msgstr "v terminálu na tomto hostu."
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "V okně od Applu klikněte na Instalovat. Trvá to pár minut a tato stránka se po dokončení aktualizuje."
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "V chatu Enter předá zprávu běžícímu tahu a agent si ji přečte, až bude připravený. Agent, který ji nedokáže přijmout, ji nechá ve frontě a ⌘↩ tah stále přeruší."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Za pouhých pár měsíců používají Paradev jako hlavní IDE <0>desítky tisíc inženýrů</0>, ve firmách jako Wix, DoorDash nebo Netflix."
 
@@ -18141,6 +18144,9 @@ msgstr "Pošlete pozvánku do {organizationName}. Platnost vyprší za 48 hodin.
 msgid "Send email and debug delivery"
 msgstr "Odesílání e-mailů a ladění doručování"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "Odeslat do běžícího tahu; ⌘↩ ho přeruší"
+
 msgid "Send Invitation"
 msgstr "Odeslat pozvánku"
 
@@ -18179,6 +18185,9 @@ msgstr "Odeslat do chatu"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Odeslat do chatu ({draftCount})"
+
+msgid "Send while the agent works"
+msgstr "Odesílat, když agent pracuje"
 
 msgid "Sending"
 msgstr "Odesílám"

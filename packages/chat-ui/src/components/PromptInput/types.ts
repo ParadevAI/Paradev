@@ -177,6 +177,8 @@ export type PromptInputProps = {
 	commands: PromptInputCommand[];
 	// "background": a turn runs but offers no Stop; Enter queues, ⌘↩ steers.
 	status?: "ready" | "streaming" | "background";
+	/** Enter hands the message to the running turn instead of queueing it. */
+	sendsIntoRunningTurn?: boolean;
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;

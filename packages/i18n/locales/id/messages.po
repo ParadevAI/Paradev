@@ -10444,6 +10444,9 @@ msgstr "di terminal pada host ini."
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "Di jendela Apple, klik Instal. Prosesnya beberapa menit, dan halaman ini diperbarui setelah selesai."
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "Di chat, Enter memberikan pesan ke giliran yang berjalan dan agen membacanya saat siap. Agen yang tidak bisa menerimanya akan menyimpan pesan di antrean, dan ⌘↩ tetap menginterupsi giliran."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Hanya dalam beberapa bulan, <0>puluhan ribu engineer</0> memakai Paradev sebagai IDE utama mereka, di perusahaan seperti Wix, DoorDash, dan Netflix."
 
@@ -18141,6 +18144,9 @@ msgstr "Kirim undangan untuk bergabung ke {organizationName}. Kedaluwarsa dalam 
 msgid "Send email and debug delivery"
 msgstr "Kirim email dan debug pengiriman"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "Kirim ke giliran yang berjalan; ⌘↩ untuk menginterupsinya"
+
 msgid "Send Invitation"
 msgstr "Kirim Undangan"
 
@@ -18179,6 +18185,9 @@ msgstr "Kirim ke chat"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Kirim ke chat ({draftCount})"
+
+msgid "Send while the agent works"
+msgstr "Kirim saat agen bekerja"
 
 msgid "Sending"
 msgstr "Mengirim"

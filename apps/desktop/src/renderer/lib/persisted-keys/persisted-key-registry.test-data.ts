@@ -248,6 +248,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["lastSelectedDiffCommentPlacement"],
 	],
 	[
+		"src/renderer/hooks/useSendIntoRunningTurn/useSendIntoRunningTurn.ts",
+		["sendIntoRunningTurn"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker/hooks/useAgentSessionTarget/useAgentSessionTarget.ts",
 		["lastSelectedDiffCommentNewAgentConfigId"],
 	],

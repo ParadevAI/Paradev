@@ -10444,6 +10444,9 @@ msgstr "（在此主機的終端中）。"
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "在 Apple 的視窗中按一下「安裝」。需要幾分鐘，完成後此頁面會自動更新。"
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "在聊天中，Enter 會把訊息交給目前回合，代理準備好時再讀取。無法接收的代理會把訊息留在佇列中，⌘↩ 仍會中斷回合。"
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "短短幾個月，<0>數萬名工程師</0>把Paradev當作主力IDE，他們來自Wix、DoorDash、Netflix這樣的公司。"
 
@@ -18141,6 +18144,9 @@ msgstr "傳送加入{organizationName}的邀請。48小時後過期。"
 msgid "Send email and debug delivery"
 msgstr "傳送郵件並排查投遞問題"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "傳送到目前回合；按⌘↩中斷"
+
 msgid "Send Invitation"
 msgstr "傳送邀請"
 
@@ -18179,6 +18185,9 @@ msgstr "傳送到聊天"
 
 msgid "Send to chat ({draftCount})"
 msgstr "傳送到聊天（{draftCount}）"
+
+msgid "Send while the agent works"
+msgstr "代理工作時直接傳送"
 
 msgid "Sending"
 msgstr "正在傳送"

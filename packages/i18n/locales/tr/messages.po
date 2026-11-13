@@ -10444,6 +10444,9 @@ msgstr "komutunu çalıştırın."
 msgid "In Apple's window, click Install. It takes a few minutes, and this page updates when it's done."
 msgstr "Apple'ın penceresinde Yükle'ye tıklayın. Birkaç dakika sürer ve bittiğinde bu sayfa güncellenir."
 
+msgid "In chat, Enter gives the message to the running turn and the agent reads it when it is ready. An agent that cannot take one keeps it in the queue, and ⌘↩ still interrupts the turn."
+msgstr "Sohbette Enter mesajı çalışan tura verir ve aracı hazır olduğunda okur. Mesajı alamayan bir aracı onu kuyrukta tutar; ⌘↩ turu yine de keser."
+
 msgid "In just a few months, <0>tens of thousands of engineers</0> run Paradev as their primary IDE, at companies like Wix, DoorDash, and Netflix."
 msgstr "Yalnızca birkaç ayda <0>on binlerce mühendis</0> Paradev'i birincil IDE'si olarak kullanmaya başladı; Wix, DoorDash ve Netflix gibi şirketlerde."
 
@@ -18141,6 +18144,9 @@ msgstr "{organizationName} kuruluşuna katılmak için davet gönderin. 48 saat 
 msgid "Send email and debug delivery"
 msgstr "E-posta gönderin ve teslimatta hata ayıklayın"
 
+msgid "Send into the running turn; ⌘↩ to interrupt it"
+msgstr "Çalışan tura gönder; kesmek için ⌘↩"
+
 msgid "Send Invitation"
 msgstr "Davet gönder"
 
@@ -18179,6 +18185,9 @@ msgstr "Sohbete gönder"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Sohbete gönder ({draftCount})"
+
+msgid "Send while the agent works"
+msgstr "Aracı çalışırken gönder"
 
 msgid "Sending"
 msgstr "Gönderiliyor"

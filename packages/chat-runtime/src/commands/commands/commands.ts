@@ -799,6 +799,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					.require(parsed.sessionId)
 					.prompt(parsed.content, parsed.clientId, {
 						steerTurnId: parsed.steer?.expectedTurnId,
+						joinTurnId: parsed.join?.expectedTurnId,
 						snapshotWorktree: parsed.snapshotWorktree === true,
 					}),
 			);
