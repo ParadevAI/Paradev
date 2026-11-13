@@ -30,7 +30,11 @@ import {
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
+import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../db";
+import { workspaces } from "../../../../db/schema";
+import { resolveHostAgentConfig } from "../../../../terminal-agents/agent-config";
+import { listWorkspaceCheckouts } from "../../../../workspaces/checkouts";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
 type TrustFamily = "claude" | "codex" | "agy";
@@ -257,4 +261,30 @@ export async function seedAgentFolderTrust(
 			err,
 		);
 	}
+}
+
+/**
+ * Session folders and multi-repo roots are not inside a trusted repository,
+ * so the agent about to launch there gets them pre-trusted. A worktree of a
+ * single repository inherits trust from the main checkout.
+ */
+export async function seedWorkspaceFolderTrust(
+	db: HostDb,
+	workspaceId: string,
+	agent: string,
+): Promise<void> {
+	const workspace = db
+		.select()
+		.from(workspaces)
+		.where(eq(workspaces.id, workspaceId))
+		.get();
+	if (
+		!workspace ||
+		(workspace.projectId !== null &&
+			listWorkspaceCheckouts(db, workspace).length < 2)
+	) {
+		return;
+	}
+	const config = resolveHostAgentConfig(db, agent);
+	if (config) await seedAgentFolderTrust(db, workspace.worktreePath, config);
 }

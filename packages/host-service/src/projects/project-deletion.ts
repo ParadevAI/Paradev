@@ -304,10 +304,18 @@ async function purgeProject(
 		}
 		// A multi-repo root holds only the checkouts; a non-empty one stays.
 		if (checkouts.length > 1) {
-			removeWorkspaceContextFiles(
-				row.worktreePath,
-				checkouts.map((checkout) => checkout.path),
-			);
+			try {
+				removeWorkspaceContextFiles(
+					row.worktreePath,
+					checkouts.map((checkout) => checkout.path),
+				);
+			} catch (err) {
+				console.warn("[project-deletion] left workspace files on disk", {
+					projectId: project.id,
+					root: row.worktreePath,
+					err,
+				});
+			}
 			await rmdir(row.worktreePath).catch(() => {});
 		}
 	}

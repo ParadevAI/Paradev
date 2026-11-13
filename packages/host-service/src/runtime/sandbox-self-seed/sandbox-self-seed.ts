@@ -35,6 +35,7 @@ import {
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
 import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
+import { syncWorkspaceContextFiles } from "../../trpc/router/workspace-creation/shared/workspace-context-files";
 import type { HostServiceContext } from "../../types";
 import {
 	getManagedEnv,
@@ -786,6 +787,7 @@ export function runSandboxSelfSeed(
 				.run();
 		}
 	});
+	if (several) syncWorkspaceContextFiles(db, identity.workspaceId);
 }
 
 function insertProject(

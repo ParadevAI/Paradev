@@ -1,8 +1,6 @@
 import { CLIError } from "@superset/cli-framework";
-import {
-	type HostServiceClient,
-	requireRepositories,
-} from "../../../../../lib/host-target";
+import { requireRepositories } from "./requireRepositories";
+import type { HostServiceClient } from "./resolveHostTarget";
 
 /** A repository of the project, named by its name (any case) or id. */
 export async function resolveRepository(

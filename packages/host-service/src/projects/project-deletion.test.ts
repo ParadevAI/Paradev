@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { afterAll, afterEach, describe, expect, test } from "bun:test";
+import { afterAll, afterEach, describe, expect, spyOn, test } from "bun:test";
 import {
 	existsSync,
 	mkdirSync,
@@ -333,8 +333,7 @@ describe("purge", () => {
 });
 
 describe("delete permanently", () => {
-	test("removes every checkout of a multi-repo workspace, then its root", async () => {
-		const { ctx, db, gitCalls, repoPath } = setup();
+	function addMultiRepoWorkspace({ db, repoPath }: ReturnType<typeof setup>) {
 		const apiRepo = `${repoPath}-api`;
 		mkdirSync(apiRepo);
 		const api = seedRepository({ db }, PROJECT_ID, {
@@ -361,19 +360,41 @@ describe("delete permanently", () => {
 				})
 				.run();
 		}
-		mkdirSync(join(root, "api"));
-		mkdirSync(join(root, primary?.name ?? ""));
+		const checkouts = [join(root, "api"), join(root, primary?.name ?? "")];
+		for (const checkout of checkouts) mkdirSync(checkout);
+		return { root, apiRepo, checkouts };
+	}
+
+	test("removes every checkout of a multi-repo workspace, then its root", async () => {
+		const state = setup();
+		const { ctx, gitCalls } = state;
+		const { root, apiRepo, checkouts } = addMultiRepoWorkspace(state);
 		writeFileSync(join(root, "AGENTS.md"), "# Workspace\n");
 		writeFileSync(join(root, "CLAUDE.md"), "@AGENTS.md\n");
 
 		await softDeleteProject(ctx, PROJECT_ID);
 		expect(await purgeDeletedProject(ctx, PROJECT_ID)).toBe(true);
 
-		expect(gitCalls.map((call) => call[2]).sort()).toEqual(
-			[join(root, "api"), join(root, primary?.name ?? "")].sort(),
-		);
+		expect(gitCalls.map((call) => call[2]).sort()).toEqual(checkouts.sort());
 		expect(existsSync(root)).toBe(false);
 		expect(existsSync(apiRepo)).toBe(true);
+	});
+
+	test("a root file it cannot remove leaves the root but still purges", async () => {
+		const state = setup();
+		const { ctx, project } = state;
+		const { root } = addMultiRepoWorkspace(state);
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		mkdirSync(join(root, "AGENTS.md", "notes"), { recursive: true });
+
+		await softDeleteProject(ctx, PROJECT_ID);
+		expect(await purgeDeletedProject(ctx, PROJECT_ID)).toBe(true);
+
+		expect(project()).toBeUndefined();
+		expect(existsSync(join(root, "AGENTS.md", "notes"))).toBe(true);
+		expect(warn).toHaveBeenCalled();
+		rmSync(root, { recursive: true, force: true });
+		warn.mockRestore();
 	});
 
 	test("purges a deleted project right away", async () => {

@@ -4,7 +4,7 @@ import {
 	requireHostTarget,
 	resolveHostTarget,
 } from "../../../../lib/host-target";
-import { repositorySource } from "../../create/utils/repositorySource";
+import { repositorySource } from "../../utils/repositorySource";
 
 export default command({
 	description:

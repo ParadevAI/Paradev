@@ -179,6 +179,7 @@ export function removeWorkspaceContextFiles(
 	syncConfigLinks(root, undefined, checkoutPaths);
 	for (const folder of WORKSPACE_SKILL_FOLDERS) {
 		const skills = join(root, folder, "skills");
+		if (!isRealFolderPath(root, skills)) continue;
 		try {
 			for (const name of listRealFolder(skills) ?? []) {
 				const link = join(skills, name);
@@ -271,9 +272,9 @@ function syncSkillLinks(
 	}
 
 	const skills = join(root, folder, "skills");
-	if (isPresent(skills) && listRealFolder(skills) === null) {
+	if (!isRealFolderPath(root, skills)) {
 		console.warn(
-			`[workspace-context-files] skipped skill links: ${skills} is not a folder`,
+			`[workspace-context-files] skipped skill links: ${folder}/skills in ${root} is not a folder`,
 		);
 		return;
 	}
@@ -323,6 +324,14 @@ function syncConfigLinks(
 		const target = primary ? join(primary.path, path) : undefined;
 		const wanted = target !== undefined && isEntryOfType(target, type);
 		try {
+			if (!isRealFolderPath(root, folder)) {
+				if (wanted) {
+					console.warn(
+						`[workspace-context-files] skipped ${path}: ${relative(root, folder)} in ${root} is not a folder`,
+					);
+				}
+				continue;
+			}
 			if (isPresent(link)) {
 				if (!isLinkIntoCheckouts(link, checkoutPaths)) {
 					if (wanted) {
@@ -412,14 +421,41 @@ function listRealFolder(path: string): string[] | null {
 	}
 }
 
+/** True when each folder from the root down to `folder` is a real folder or missing. */
+function isRealFolderPath(root: string, folder: string): boolean {
+	let current = root;
+	for (const part of relative(root, folder).split(sep)) {
+		if (part === "") continue;
+		current = join(current, part);
+		try {
+			if (!lstatSync(current).isDirectory()) return false;
+		} catch (err) {
+			return (err as NodeJS.ErrnoException).code === "ENOENT";
+		}
+	}
+	return true;
+}
+
 function removeIfEmpty(path: string): void {
 	if (listRealFolder(path)?.length === 0) rmdirSync(path);
 }
 
 function writeIfChanged(path: string, content: string): void {
 	try {
-		if (readFileSync(path, "utf8") === content) return;
-	} catch {}
+		const stats = lstatSync(path);
+		if (stats.isSymbolicLink()) {
+			unlinkSync(path);
+		} else if (!stats.isFile()) {
+			console.warn(
+				`[workspace-context-files] skipped ${path}: it is not a regular file`,
+			);
+			return;
+		} else if (readFileSync(path, "utf8") === content) {
+			return;
+		}
+	} catch (err) {
+		if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+	}
 	writeFileSync(path, content);
 }
 

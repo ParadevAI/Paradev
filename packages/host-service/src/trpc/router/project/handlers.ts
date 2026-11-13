@@ -31,7 +31,10 @@ import {
 	updateLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
-import { syncWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
+import {
+	syncWorkspaceContextFiles,
+	WORKSPACE_ROOT_ENTRIES,
+} from "../workspace-creation/shared/workspace-context-files";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
 	adoptLocalRepo,
@@ -221,6 +224,18 @@ function requireUniqueNames(names: string[]): void {
 	}
 }
 
+const RESERVED_NAMES = new Set(
+	WORKSPACE_ROOT_ENTRIES.map((entry) => entry.toLowerCase()),
+);
+
+function requireUnreservedName(name: string): void {
+	if (!RESERVED_NAMES.has(name.toLowerCase())) return;
+	throw new TRPCError({
+		code: "BAD_REQUEST",
+		message: `reserved_name: a repository cannot be named "${name}", the workspace folder uses that name for its own files`,
+	});
+}
+
 function repositoryValues(projectId: string, resolved: ResolvedRepo) {
 	const now = Date.now();
 	return {
@@ -364,7 +379,9 @@ function insertProject(
 		}
 		paths.add(resolved.repoPath);
 	}
-	requireUniqueNames(sources.map(({ resolved }) => nameOf(resolved)));
+	const names = sources.map(({ resolved }) => nameOf(resolved));
+	for (const name of names) requireUnreservedName(name);
+	requireUniqueNames(names);
 
 	const projectId = randomUUID();
 	const rows = sources.map(({ resolved }) =>
@@ -418,6 +435,7 @@ export async function addRepository(
 					})
 				: repositoryTakenError(resolved.repoPath);
 		}
+		requireUnreservedName(nameOf(resolved));
 		requireUniqueNames([
 			...listProjectRepositories(ctx.db, args.projectId).map((r) => r.name),
 			nameOf(resolved),

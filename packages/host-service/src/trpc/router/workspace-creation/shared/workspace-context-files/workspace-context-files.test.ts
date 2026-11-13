@@ -286,3 +286,41 @@ test("removing takes the config links and the folders made for them", () => {
 	expect(existsSync(join(root, ".cursor"))).toBe(false);
 	expect(existsSync(join(web.path, ".cursor", "rules"))).toBe(true);
 });
+
+test("a root CLAUDE.md that links into a checkout is replaced, not written through", () => {
+	const web = checkout("web", true);
+	const api = checkout("api");
+	writeFileSync(join(web.path, "CLAUDE.md"), "web rules");
+	symlinkSync(join(web.path, "CLAUDE.md"), join(root, "CLAUDE.md"));
+
+	writeWorkspaceContextFiles(root, [api, web]);
+
+	expect(readFileSync(join(web.path, "CLAUDE.md"), "utf8")).toBe("web rules");
+	expect(lstatSync(join(root, "CLAUDE.md")).isFile()).toBe(true);
+	expect(readFileSync(join(root, "CLAUDE.md"), "utf8")).toBe("@AGENTS.md\n");
+});
+
+test("nothing is written or removed through a root agent folder that is a symlink", () => {
+	const web = checkout("web", true);
+	const api = checkout("api");
+	addSkill(web, ".claude", "deploy");
+	addFile(web, ".claude/settings.json");
+	const outside = join(root, "home-claude");
+	mkdirSync(join(outside, "skills"), { recursive: true });
+	symlinkSync(
+		join(web.path, ".claude", "skills", "deploy"),
+		join(outside, "skills", "mine"),
+	);
+	symlinkSync(outside, join(root, ".claude"));
+	const paths = [api.path, web.path];
+
+	writeWorkspaceContextFiles(root, [api, web]);
+	removeWorkspaceContextFiles(root, paths);
+
+	expect(lstatSync(join(root, ".claude")).isSymbolicLink()).toBe(true);
+	expect(existsSync(join(outside, "skills", "deploy"))).toBe(false);
+	expect(existsSync(join(outside, "settings.json"))).toBe(false);
+	expect(lstatSync(join(outside, "skills", "mine")).isSymbolicLink()).toBe(
+		true,
+	);
+});

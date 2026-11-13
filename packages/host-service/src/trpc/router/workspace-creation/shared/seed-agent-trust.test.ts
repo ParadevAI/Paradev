@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
 	chmodSync,
@@ -12,12 +13,18 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject, seedWorkspace } from "../../../../../test/helpers/seed";
+import type { HostDb } from "../../../../db";
+import * as schema from "../../../../db/schema";
 import {
 	resolveTrustFamily,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
 	seedCodexFolderTrust,
+	seedWorkspaceFolderTrust,
 } from "./seed-agent-trust";
 
 let dir: string;
@@ -290,5 +297,63 @@ describe("seedCodexFolderTrust", () => {
 			'model = "gpt-5"\n\n[projects."/tmp/session-link"]\ntrust_level = "trusted"\n',
 		);
 		expect(readdirSync(codexHome)).toEqual(["config.toml"]);
+	});
+});
+
+describe("seedWorkspaceFolderTrust", () => {
+	function setup() {
+		const db = drizzle(new Database(":memory:"), {
+			schema,
+		}) as unknown as HostDb;
+		migrate(db as never, {
+			migrationsFolder: resolve(import.meta.dir, "../../../../../drizzle"),
+		});
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "claude-test",
+				presetId: "claude",
+				label: "Claude",
+				command: "claude",
+				promptTransport: "argv",
+				envJson: JSON.stringify({ CLAUDE_CONFIG_DIR: dir }),
+				displayOrder: 0,
+			})
+			.run();
+		const trusted = () => {
+			try {
+				const state = JSON.parse(
+					readFileSync(join(dir, ".claude.json"), "utf-8"),
+				);
+				return Object.keys(state.projects);
+			} catch {
+				return [];
+			}
+		};
+		return { db, trusted };
+	}
+
+	test("trusts a multi-repo root, not a worktree of one repository", async () => {
+		const { db, trusted } = setup();
+		const single = seedProject({ db }, { repoPath: join(dir, "solo") });
+		const multi = seedProject(
+			{ db },
+			{
+				repoPath: join(dir, "web"),
+				repositories: [{ repoPath: join(dir, "api") }],
+			},
+		);
+		const worktree = seedWorkspace(
+			{ db },
+			{ projectId: single.id, worktreePath: join(dir, "wt"), branch: "a" },
+		);
+		const root = seedWorkspace(
+			{ db },
+			{ projectId: multi.id, worktreePath: join(dir, "root"), branch: "b" },
+		);
+
+		await seedWorkspaceFolderTrust(db, worktree.id, "claude-test");
+		expect(trusted()).toEqual([]);
+		await seedWorkspaceFolderTrust(db, root.id, "claude-test");
+		expect(trusted()).toEqual([join(dir, "root")]);
 	});
 });

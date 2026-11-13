@@ -1,12 +1,13 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
-import { resolveHostFilter, resolveHostTarget } from "../../../lib/host-target";
-import { workspaceLinks } from "../../../lib/open-url";
 import {
 	primaryRepository,
+	resolveHostFilter,
+	resolveHostTarget,
 	resolveRepository,
-} from "../../projects/repos/utils/resolveRepository";
+} from "../../../lib/host-target";
+import { workspaceLinks } from "../../../lib/open-url";
 import {
 	listProjectWorktrees,
 	normalizeWorktreePath,

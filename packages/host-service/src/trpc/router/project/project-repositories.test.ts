@@ -112,6 +112,29 @@ describe("project repositories", () => {
 		});
 	});
 
+	it("refuses a repository named like a file the workspace folder keeps", async () => {
+		const { caller } = setup();
+		const claude = await gitRepo(".Claude");
+
+		await expect(
+			caller.create({ name: "Solo", repositories: [local(claude)] }),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("reserved_name"),
+		});
+
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web"))],
+		});
+		await expect(
+			caller.addRepository({ projectId: project.id, source: local(claude) }),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("reserved_name"),
+		});
+	});
+
 	it("removes every repository it created when one source fails", async () => {
 		const { caller, db } = setup();
 		const parentDir = mkdtempSync(join(root, "parent-"));

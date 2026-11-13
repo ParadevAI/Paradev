@@ -1,7 +1,7 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { requireHostTarget, resolveHostTarget } from "../../../lib/host-target";
-import { repositorySource } from "./utils/repositorySource";
+import { repositorySource } from "../utils/repositorySource";
 
 export default command({
 	description: "Create a project of one or more repositories on a host",

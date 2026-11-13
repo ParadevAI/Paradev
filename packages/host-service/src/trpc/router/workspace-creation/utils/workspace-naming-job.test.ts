@@ -1,5 +1,16 @@
-import { describe, expect, test } from "bun:test";
-import { decideNaming } from "./workspace-naming-job";
+import { Database } from "bun:sqlite";
+import { afterAll, describe, expect, test } from "bun:test";
+import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject } from "../../../../../test/helpers/seed";
+import type { HostDb } from "../../../../db";
+import * as schema from "../../../../db/schema";
+import { createUserSimpleGit } from "../../../../runtime/git/simple-git";
+import type { HostServiceContext } from "../../../../types";
+import { decideNaming, projectGithubRepo } from "./workspace-naming-job";
 
 const names = { title: "Fix login", branchName: "fix-login" };
 const base = {
@@ -70,5 +81,35 @@ describe("decideNaming", () => {
 			pending: false,
 			gaveUp: true,
 		});
+	});
+});
+
+describe("projectGithubRepo", () => {
+	const root = mkdtempSync(join(tmpdir(), "naming-repo-"));
+	afterAll(() => rmSync(root, { recursive: true, force: true }));
+
+	test("reads the primary repository of a multi-repo project", async () => {
+		const web = join(root, "web");
+		mkdirSync(web);
+		const git = createUserSimpleGit(web);
+		await git.init();
+		await git.addRemote("origin", "https://github.com/acme/web.git");
+		const db = drizzle(new Database(":memory:"), {
+			schema,
+		}) as unknown as HostDb;
+		migrate(db as never, {
+			migrationsFolder: resolve(import.meta.dir, "../../../../../drizzle"),
+		});
+		const project = seedProject(
+			{ db },
+			{ repoPath: web, repositories: [{ repoPath: join(root, "api") }] },
+		);
+
+		expect(
+			await projectGithubRepo({ db } as unknown as HostServiceContext, {
+				id: project.id,
+				primaryRepositoryId: project.repositoryId,
+			}),
+		).toEqual({ owner: "acme", name: "web" });
 	});
 });

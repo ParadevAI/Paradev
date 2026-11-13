@@ -3,8 +3,8 @@ import { command } from "../../../../lib/command";
 import {
 	requireHostTarget,
 	resolveHostTarget,
+	resolveRepository,
 } from "../../../../lib/host-target";
-import { resolveRepository } from "../utils/resolveRepository";
 
 export default command({
 	description: "Point a repository at the folder it now lives in on the host",

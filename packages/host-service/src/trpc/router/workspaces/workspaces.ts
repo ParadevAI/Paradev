@@ -92,6 +92,7 @@ import {
 	resolveGithubRepo,
 } from "../workspace-creation/shared/project-helpers";
 import { requireIndependentWorktree } from "../workspace-creation/shared/require-independent-worktree";
+import { seedWorkspaceFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { startSetupTerminalIfPresent } from "../workspace-creation/shared/setup-terminal";
 import {
 	addWorktreeWithSparseCheckout,
@@ -1407,6 +1408,9 @@ async function finishCreate(
 				"[workspaces.create] wait-for-setup chain unavailable, dispatching agent in parallel:",
 				err,
 			);
+		}
+		if (chainAgent) {
+			await seedWorkspaceFolderTrust(ctx.db, workspaceRow.id, soleLaunch.agent);
 		}
 	}
 

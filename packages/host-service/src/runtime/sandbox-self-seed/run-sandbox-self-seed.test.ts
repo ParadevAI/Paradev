@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite";
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
@@ -23,11 +23,11 @@ function createDb(): HostDb {
 	return db;
 }
 
-function identity(paths: string[]): SandboxIdentity {
+function identity(paths: string[], root = "/workspace"): SandboxIdentity {
 	return {
 		workspaceId: WORKSPACE_ID,
-		workspaceRoot: "/workspace",
-		worktreePath: paths[0] === "." ? "/workspace" : `/workspace/${paths[0]}`,
+		workspaceRoot: root,
+		worktreePath: paths[0] === "." ? root : `${root}/${paths[0]}`,
 		workspaceName: "workspace",
 		projectName: "project",
 		branch: "feat",
@@ -68,6 +68,19 @@ describe("sandbox self-seed", () => {
 		expect(resolveCheckout(db, WORKSPACE_ID, web?.id).path).toBe(
 			"/workspace/web",
 		);
+	});
+
+	test("a box of several repositories gets the root AGENTS.md at once", () => {
+		const db = createDb();
+		const root = mkdtempSync(join(tmpdir(), "seed-root-"));
+		for (const path of ["web", "api"]) mkdirSync(join(root, path));
+
+		runSandboxSelfSeed(db, identity(["web", "api"], root), agentDir());
+
+		const agents = readFileSync(join(root, "AGENTS.md"), "utf8");
+		expect(agents).toContain(`| web | ${join(root, "web")} | feat |`);
+		expect(agents).toContain(`| api | ${join(root, "api")} | feat |`);
+		rmSync(root, { recursive: true, force: true });
 	});
 
 	test("a lone repository at the root is the workspace folder, named after the repo", () => {

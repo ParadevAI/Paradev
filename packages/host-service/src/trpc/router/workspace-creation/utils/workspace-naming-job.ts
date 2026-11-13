@@ -91,13 +91,13 @@ export function decideNaming(input: {
 	};
 }
 
-/** The project's live GitHub remote, for resolving bare `#123`; null when it has none. */
-async function projectGithubRepo(
+/** The primary repository's live GitHub remote, for resolving bare `#123`; null when it has none. */
+export async function projectGithubRepo(
 	ctx: HostServiceContext,
-	projectId: string | undefined,
+	project: { id: string; primaryRepositoryId: string } | undefined,
 ): Promise<{ owner: string; name: string } | null> {
-	if (!projectId) return null;
-	return resolveGithubRepo(ctx, projectId).then(
+	if (!project) return null;
+	return resolveGithubRepo(ctx, project.id, project.primaryRepositoryId).then(
 		(repo) => ({ owner: repo.owner, name: repo.name }),
 		() => null,
 	);
@@ -179,10 +179,7 @@ export function scheduleWorkspaceNaming(
 		const links = agent
 			? await resolveNamingLinks(
 					ctx,
-					findGitHubReferences(
-						prompt,
-						await projectGithubRepo(ctx, project?.id),
-					),
+					findGitHubReferences(prompt, await projectGithubRepo(ctx, project)),
 				)
 			: undefined;
 		if (!isCurrent()) return;

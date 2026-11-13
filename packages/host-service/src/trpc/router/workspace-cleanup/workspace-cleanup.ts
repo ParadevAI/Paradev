@@ -751,7 +751,12 @@ async function removeWorkspaceRoot(
 		}
 		return;
 	}
-	removeWorkspaceContextFiles(root, checkoutPaths);
+	try {
+		removeWorkspaceContextFiles(root, checkoutPaths);
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		warnings.push(`Left the workspace files in ${root}: ${message}`);
+	}
 	await rmdir(root).catch((err) => {
 		if (isMissingPath(root, { followSymlinks: false })) return;
 		const message = err instanceof Error ? err.message : String(err);

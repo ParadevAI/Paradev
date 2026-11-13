@@ -1,8 +1,11 @@
 import { boolean, CLIError, string, table } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
-import { resolveHostFilter, resolveHostTarget } from "../../../lib/host-target";
-import { resolveRepository } from "../../projects/repos/utils/resolveRepository";
+import {
+	resolveHostFilter,
+	resolveHostTarget,
+	resolveRepository,
+} from "../../../lib/host-target";
 import { listProjectWorktrees } from "../projectWorktrees";
 
 export default command({
