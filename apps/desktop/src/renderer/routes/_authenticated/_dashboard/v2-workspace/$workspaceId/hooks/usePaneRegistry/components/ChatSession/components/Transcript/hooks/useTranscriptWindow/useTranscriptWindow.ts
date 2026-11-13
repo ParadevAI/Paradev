@@ -210,11 +210,13 @@ export function useTranscriptWindow({
 				if (previous) resizeObserverRef.current?.unobserve(previous);
 				if (!element) {
 					elements.current.delete(rowKey);
-					rowRefs.current.delete(rowKey);
+					if (rowRefs.current.get(rowKey) === ref)
+						rowRefs.current.delete(rowKey);
 					return;
 				}
 				element.dataset.windowRowKey = rowKey;
 				elements.current.set(rowKey, element);
+				rowRefs.current.set(rowKey, ref);
 				resizeObserverRef.current?.observe(element);
 			};
 			rowRefs.current.set(rowKey, ref);

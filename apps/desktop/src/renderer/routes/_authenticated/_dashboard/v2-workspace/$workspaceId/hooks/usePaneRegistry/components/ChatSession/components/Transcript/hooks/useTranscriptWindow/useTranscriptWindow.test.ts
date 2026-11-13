@@ -284,3 +284,13 @@ test("holds reveals while a jump scrolls, then resumes when the scroll ends", ()
 		observers.restore();
 	}
 });
+
+test("a row detached and attached again keeps its ref", () => {
+	const { result } = renderWindow({ rows: rows(3) });
+	const element = document.createElement("div");
+	const ref = result.current.rowRef("row-1");
+	ref(element);
+	ref(null);
+	ref(element);
+	expect(result.current.rowRef("row-1")).toBe(ref);
+});

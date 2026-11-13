@@ -53,6 +53,7 @@ import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceMoveBanner } from "./components/WorkspaceMoveBanner";
+import { WorkspaceSessionEffects } from "./components/WorkspaceSessionEffects";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
 import {
 	type PaneArea,
@@ -60,9 +61,7 @@ import {
 } from "./components/WorkspaceSplitLayout";
 import { WorkspaceToolbar } from "./components/WorkspaceToolbar";
 import { useAgentSessionLauncher } from "./hooks/useAgentSessionLauncher";
-import { useAutoAdoptBackgroundSessions } from "./hooks/useAutoAdoptBackgroundSessions";
 import { useCloseRightPaneAreaWhenEmpty } from "./hooks/useCloseRightPaneAreaWhenEmpty";
-import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
 import { useConsumeSubagentLink } from "./hooks/useConsumeSubagentLink";
 import { useCreatePendingMigratedTerminals } from "./hooks/useCreatePendingMigratedTerminals";
@@ -81,7 +80,6 @@ import { useRightSidebarHotkeys } from "./hooks/useRightSidebarHotkeys";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
-import { useSyncChatSessionTabs } from "./hooks/useSyncChatSessionTabs";
 import { useTabCloseGuard } from "./hooks/useTabCloseGuard";
 import { useV2PresetExecution } from "./hooks/useV2PresetExecution";
 import { useV2TerminalLauncher } from "./hooks/useV2TerminalLauncher";
@@ -314,16 +312,6 @@ function V2WorkspaceContent() {
 		matchedPresets,
 		resolvePresetCommands,
 	});
-	useConsumeAutomationRunLink({
-		store,
-		linkedStores: linkedPaneStores,
-		isLayoutReady: isLayoutReady && isRightLayoutReady,
-		workspaceId,
-		sessionId,
-		terminalId,
-		focusRequestId,
-		consumeSearch,
-	});
 	const subagentLink = useMemo(
 		() =>
 			parseSubagentSearch({
@@ -347,18 +335,6 @@ function V2WorkspaceContent() {
 		isLayoutReady,
 		executePreset,
 		resolvePresetCommands,
-	});
-	useAutoAdoptBackgroundSessions({
-		store,
-		linkedStores: linkedPaneStores,
-		workspaceId,
-		isLayoutReady: isLayoutReady && isRightLayoutReady,
-	});
-	useSyncChatSessionTabs({
-		store,
-		linkedStores: linkedPaneStores,
-		workspaceId,
-		isLayoutReady: isLayoutReady && isRightLayoutReady,
 	});
 	useConsumeOpenUrlRequest({
 		viewer: viewerTarget,
@@ -647,6 +623,16 @@ function V2WorkspaceContent() {
 	return (
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
 			<WorkspaceAgentEffects store={store} rightStore={rightStore} />
+			<WorkspaceSessionEffects
+				store={store}
+				linkedStores={linkedPaneStores}
+				workspaceId={workspaceId}
+				isLayoutReady={isLayoutReady && isRightLayoutReady}
+				sessionId={sessionId}
+				terminalId={terminalId}
+				focusRequestId={focusRequestId}
+				consumeSearch={consumeSearch}
+			/>
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
 				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 					<WorkspaceSplitLayout
