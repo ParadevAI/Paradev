@@ -99,7 +99,8 @@ import { disposeUsageWorkerPool } from "./workers/usage-worker-pool";
 import { disposeWorkspaceTitleJobs } from "./workspaces/workspace-title-jobs";
 
 // A sync still in flight would hit the disposed worker pool and closed db.
-const PULL_REQUEST_DRAIN_DEADLINE_MS = 2_000;
+// The desktop kills the host 2 s into dispose; leave the later steps time.
+const PULL_REQUEST_DRAIN_DEADLINE_MS = 500;
 
 async function raceDeadline(work: Promise<void>, ms: number): Promise<void> {
 	let timer: ReturnType<typeof setTimeout> | undefined;
