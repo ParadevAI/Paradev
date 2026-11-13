@@ -23,6 +23,8 @@ export interface WorkspaceRefsSnapshot {
 	branch: string | null;
 	headSha: string | null;
 	upstream: WorkspaceUpstream | null;
+	/** Epoch ms the checkout moved onto `branch`; see branchSinceFromReflog. */
+	branchSince?: number | null;
 }
 
 async function getCurrentBranchName(git: SimpleGit): Promise<string | null> {
@@ -148,22 +150,23 @@ export async function readWorkspaceRefs(
 
 	const headSha = await getHeadSha(git);
 	const upstream = await resolveWorkspaceUpstream(git, branch);
-	return { branch, headSha, upstream };
+	const branchSince = await readBranchSince(git, branch);
+	return { branch, headSha, upstream, branchSince };
 }
 
 const REFLOG_ENTRY = /^HEAD@\{(\d+)\}(?:\t(.*))?$/;
 
 /**
  * When this checkout moved onto `branch`, from its HEAD reflog (newest
- * first): the last `checkout: moving from … to <branch>`, else the oldest
- * entry, which is when the checkout was cloned or added. Null when the
- * reflog is empty.
+ * first): the last checkout onto it from another branch, else the checkout's
+ * creation (clone, first commit, worktree add) if the reflog still holds it.
+ * Null when neither is there, e.g. after reflog expiry.
  */
 export function branchSinceFromReflog(
 	reflog: string,
 	branch: string,
 ): number | null {
-	let oldest: number | null = null;
+	let oldest: { at: number; subject: string } | null = null;
 	for (const line of reflog.split("\n")) {
 		const match = REFLOG_ENTRY.exec(line);
 		if (!match) continue;
@@ -171,13 +174,19 @@ export function branchSinceFromReflog(
 		const at = Number(seconds) * 1000;
 		if (
 			subject.startsWith("checkout: moving from ") &&
-			subject.endsWith(` to ${branch}`)
+			subject.endsWith(` to ${branch}`) &&
+			subject !== `checkout: moving from ${branch} to ${branch}`
 		) {
 			return at;
 		}
-		oldest = at;
+		oldest = { at, subject };
 	}
-	return oldest;
+	if (!oldest) return null;
+	const isCreation =
+		oldest.subject === "" ||
+		oldest.subject.startsWith("clone: ") ||
+		oldest.subject.startsWith("commit (initial): ");
+	return isCreation ? oldest.at : null;
 }
 
 export async function readBranchSince(
@@ -187,6 +196,7 @@ export async function readBranchSince(
 	const reflog = await tryRaw(git, [
 		"log",
 		"--walk-reflogs",
+		"--max-count=1000",
 		"--date=unix",
 		"--format=%gd%x09%gs",
 		"HEAD",

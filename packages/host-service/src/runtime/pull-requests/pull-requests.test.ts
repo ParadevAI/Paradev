@@ -1978,6 +1978,70 @@ describe("earlier use of a branch name", () => {
 		);
 	});
 
+	test("keeps a PR linked while open in history after the workspace moves to another branch", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-feature",
+			prNumber: 700,
+			headBranch: "feature",
+			headSha: "feature-sha",
+			state: "merged",
+			mergedAt: Date.parse("2026-11-01T00:00:00Z"),
+		});
+		seedReleaseWorkspace(db, { headSha: "workspace-sha" });
+		db.update(schema.workspaces)
+			.set({ branchSince: Date.parse("2026-11-10T00:00:00Z") })
+			.run();
+		db.insert(schema.workspacePullRequests)
+			.values({
+				workspaceId: "ws-release",
+				pullRequestId: "pr-feature",
+				linkedAt: Date.parse("2026-10-20T00:00:00Z"),
+			})
+			.run();
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
+
+		expect(await historyNumbers(manager)).toEqual([700]);
+	});
+
+	test("takes the cutoff from each sync's reflog read, so leaving the branch and coming back resets it", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws-release",
+			branch: "release",
+			headSha: "workspace-sha",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "release",
+			createdAt: Date.parse("2025-01-01T00:00:00Z"),
+			branchSince: Date.parse("2025-01-01T00:00:00Z"),
+		});
+		const returnedToRelease = Date.parse("2026-11-13T09:00:00Z");
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
+			readWorkspaceRefs: async () => ({
+				branch: "release",
+				headSha: "workspace-sha",
+				upstream: { owner: REPO.owner, name: REPO.name, branch: "release" },
+				branchSince: returnedToRelease,
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
+
+		const workspace = getWorkspace(db, "ws-release");
+		expect(workspace?.branchSince).toBe(returnedToRelease);
+		expect(workspace?.pullRequestId).toBeNull();
+	});
+
 	test("drops an older merged PR from history while a new PR on the branch is open", async () => {
 		const db = createRealDb();
 		seedProject(db);

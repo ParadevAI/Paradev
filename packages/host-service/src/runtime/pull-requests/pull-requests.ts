@@ -56,7 +56,6 @@ import {
 	type ReviewDecision,
 } from "./utils/pull-request-mappers";
 import {
-	readBranchSince,
 	readWorkspaceRefs,
 	type WorkspaceRefsSnapshot,
 } from "./utils/workspace-refs";
@@ -754,7 +753,7 @@ export class PullRequestRuntimeManager {
 
 	private forgetEarlierBranchUseLinks(
 		projectWorkspaces: (typeof workspaces.$inferSelect)[],
-		rejectedPullRequestIds: Map<string, string>,
+		rejectedMatches: Map<string, MatchedPullRequest>,
 	): void {
 		if (projectWorkspaces.length === 0) return;
 		const byId = new Map(projectWorkspaces.map((w) => [w.id, w]));
@@ -762,6 +761,7 @@ export class PullRequestRuntimeManager {
 			.select({
 				workspaceId: workspacePullRequests.workspaceId,
 				pullRequestId: workspacePullRequests.pullRequestId,
+				linkedAt: workspacePullRequests.linkedAt,
 				state: pullRequests.state,
 				mergedAt: pullRequests.mergedAt,
 				headSha: pullRequests.headSha,
@@ -785,13 +785,21 @@ export class PullRequestRuntimeManager {
 			.filter((row) => {
 				const workspace = byId.get(row.workspaceId);
 				if (!workspace) return false;
+				// A PR linked while it was still open stays in history.
+				const rejected = rejectedMatches.get(row.workspaceId);
+				if (rejected?.id === row.pullRequestId) {
+					return (
+						rejected.closedAt !== null && rejected.closedAt <= row.linkedAt
+					);
+				}
 				return (
-					rejectedPullRequestIds.get(row.workspaceId) === row.pullRequestId ||
-					(row.state === "merged" &&
-						isEarlierUseOfBranch(
-							{ isOpen: false, closedAt: row.mergedAt, headSha: row.headSha },
-							workspace,
-						))
+					row.state === "merged" &&
+					row.mergedAt !== null &&
+					row.mergedAt <= row.linkedAt &&
+					isEarlierUseOfBranch(
+						{ isOpen: false, closedAt: row.mergedAt, headSha: row.headSha },
+						workspace,
+					)
 				);
 			});
 		if (stale.length === 0) return;
@@ -939,9 +947,8 @@ export class PullRequestRuntimeManager {
 		}
 		this.noteWorktreePresent(workspace.id);
 		try {
-			const { branch, headSha, upstream } = await this.readWorkspaceRefs(
-				workspace.worktreePath,
-			);
+			const refs = await this.readWorkspaceRefs(workspace.worktreePath);
+			const { branch, headSha, upstream } = refs;
 			if (!branch) return null;
 
 			const upstreamOwner = upstream?.owner ?? null;
@@ -953,12 +960,8 @@ export class PullRequestRuntimeManager {
 					? workspace.pullRequestId
 					: null;
 			const branchSince =
-				branch === workspace.branch && workspace.branchSince !== null
-					? workspace.branchSince
-					: ((await this.readWorkspaceBranchSince(
-							workspace.worktreePath,
-							branch,
-						)) ?? (branch === workspace.branch ? null : Date.now()));
+				refs.branchSince ??
+				(branch === workspace.branch ? workspace.branchSince : Date.now());
 
 			if (
 				branch === workspace.branch &&
@@ -1001,17 +1004,6 @@ export class PullRequestRuntimeManager {
 					error,
 				},
 			);
-			return null;
-		}
-	}
-
-	private async readWorkspaceBranchSince(
-		worktreePath: string,
-		branch: string,
-	): Promise<number | null> {
-		try {
-			return await readBranchSince(await this.git(worktreePath), branch);
-		} catch {
 			return null;
 		}
 	}
@@ -1144,7 +1136,7 @@ export class PullRequestRuntimeManager {
 
 		const { failedKeys, matched: keyToPullRequest } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
-		const rejectedPullRequestIds = new Map<string, string>();
+		const rejectedMatches = new Map<string, MatchedPullRequest>();
 
 		for (const workspace of projectWorkspaces) {
 			const key = this.effectiveUpstreamKey(workspace, repo);
@@ -1186,9 +1178,7 @@ export class PullRequestRuntimeManager {
 			}
 			const isEarlierBranchUse =
 				!!rawMatch && isEarlierUseOfBranch(rawMatch, workspace);
-			if (isEarlierBranchUse) {
-				rejectedPullRequestIds.set(workspace.id, rawMatch.id);
-			}
+			if (isEarlierBranchUse) rejectedMatches.set(workspace.id, rawMatch);
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
 				rawMatch?.id === workspace.suppressedPullRequestId ||
@@ -1222,7 +1212,7 @@ export class PullRequestRuntimeManager {
 					.run();
 			}
 		}
-		this.forgetEarlierBranchUseLinks(projectWorkspaces, rejectedPullRequestIds);
+		this.forgetEarlierBranchUseLinks(projectWorkspaces, rejectedMatches);
 	}
 
 	private async getProjectRepository(
