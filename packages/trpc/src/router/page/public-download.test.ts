@@ -1,5 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { PUBLIC_DOWNLOAD_SECONDS, publicDownloadUrl } from "./public-download";
+import {
+	limitAllows,
+	PUBLIC_DOWNLOAD_SECONDS,
+	publicDownloadUrl,
+} from "./public-download";
 
 const presign = async (key: string, seconds: number) =>
 	`https://r2.test/${key}?expires=${seconds}`;
@@ -43,5 +47,13 @@ describe("publicDownloadUrl", () => {
 				},
 			}),
 		).toBeNull();
+	});
+});
+
+describe("limitAllows", () => {
+	it("refuses when the limiter timed out, which it reports as a success", () => {
+		expect(limitAllows({ success: true, reason: "timeout" })).toBe(false);
+		expect(limitAllows({ success: true })).toBe(true);
+		expect(limitAllows({ success: false })).toBe(false);
 	});
 });
