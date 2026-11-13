@@ -17,6 +17,7 @@ const EVENT_TYPES = {
  */
 export const chokidarWatchBackend: NativeWatchBackend = {
 	name: "chokidar",
+	watchesEachPath: true,
 	subscribe({ rootPath, ignore, onEvents, onError }) {
 		const isIgnored = createIgnoreMatcher(rootPath, ignore);
 		const watcher = watch(rootPath, {
