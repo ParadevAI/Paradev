@@ -1,0 +1,2 @@
+ALTER TABLE "cloud_workspace_repositories" ADD COLUMN "base_branch" text;--> statement-breakpoint
+ALTER TABLE "cloud_workspace_repositories" ADD COLUMN "base_branch_required" boolean DEFAULT false NOT NULL;
