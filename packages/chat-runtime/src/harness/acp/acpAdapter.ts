@@ -472,6 +472,8 @@ export class AcpAdapter implements HarnessAdapter {
 	private quietReplay = false;
 	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
+	/** The session could not open signed out; each prompt fails with this until a restart. */
+	private signedOut: TurnError | null = null;
 	private disposed = false;
 	private dead = false;
 	private stderrTail = "";
@@ -537,6 +539,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
+		if (this.signedOut) {
+			this.failSignedOutTurn(this.signedOut);
+			return;
+		}
 		if (!this.client || !this.sessionId) {
 			this.queuedPrompts.push(content);
 			return;
@@ -1115,6 +1121,15 @@ export class AcpAdapter implements HarnessAdapter {
 			const queued = this.queuedPrompts.splice(0, this.queuedPrompts.length);
 			for (const content of queued) await this.runTurn(content);
 		} catch (error) {
+			const failure = this.turnError(error);
+			if (failure.kind === "auth") {
+				this.signedOut = failure;
+				this.emitSession({ status: this.statusAfterApprovals() });
+				if (this.queuedPrompts.splice(0).length > 0) {
+					this.failSignedOutTurn(failure);
+				}
+				return;
+			}
 			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
 			this.dead = true;
 			this.emitSession({ status: "dead" });
@@ -1241,6 +1256,16 @@ export class AcpAdapter implements HarnessAdapter {
 			turnId,
 			limit ? { ...failure, kind: "usage_limit" } : failure,
 		);
+	}
+
+	private failSignedOutTurn(failure: TurnError): void {
+		const turnId = this.mintId();
+		this.emitTurn({
+			id: turnId,
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		});
+		this.failTurn(turnId, failure);
 	}
 
 	private failTurn(turnId: string, error: TurnError): void {

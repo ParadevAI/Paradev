@@ -34,6 +34,7 @@ export interface WokenCloudWorkspace {
 /** Resumes or extends the sandbox and records its current address. */
 export async function wakeCloudWorkspace(
 	row: CloudWorkspaceRow,
+	options: { adoptSignIns?: boolean } = {},
 ): Promise<WokenCloudWorkspace> {
 	try {
 		return await Sentry.startSpan(
@@ -44,7 +45,7 @@ export async function wakeCloudWorkspace(
 				attributes: { "cloud_workspace.id": row.id },
 			},
 			async (span) => {
-				const { booted, rebooted, ...woken } = await wake(row);
+				const { booted, rebooted, ...woken } = await wake(row, options);
 				span.setAttributes({
 					"cloud_workspace.resumed": booted,
 					[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE]: rebooted,
@@ -57,8 +58,13 @@ export async function wakeCloudWorkspace(
 	}
 }
 
+/**
+ * `adoptSignIns` marks the box's sign-ins current without a boot: the caller
+ * restarts the one agent that needs them, and the others keep theirs.
+ */
 async function wake(
 	row: CloudWorkspaceRow,
+	{ adoptSignIns = false }: { adoptSignIns?: boolean },
 ): Promise<WokenCloudWorkspace & { booted: boolean; rebooted: boolean }> {
 	const { claim, agentCredentialDigest } = await Sentry.startSpan(
 		{ name: "claim", op: "sandbox" },
@@ -108,7 +114,9 @@ async function wake(
 	}
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
-		...(booted ? { bootAgentCredentialDigest: agentCredentialDigest } : {}),
+		...(booted || adoptSignIns
+			? { bootAgentCredentialDigest: agentCredentialDigest }
+			: {}),
 	};
 	if (Object.keys(set).length > 0) {
 		await db
@@ -122,6 +130,7 @@ async function wake(
 		rebooted,
 		agentCredentialsChanged:
 			!booted &&
+			!adoptSignIns &&
 			row.bootAgentCredentialDigest !== null &&
 			row.bootAgentCredentialDigest !== agentCredentialDigest,
 	};

@@ -3903,9 +3903,6 @@ msgstr "Disertakan bersama aplikasi Paradev di perangkat ini."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Disertakan bersama aplikasi Paradev di perangkat ini. Diperbarui bersama aplikasi."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Paket Business"
 
@@ -4657,9 +4654,6 @@ msgstr "Klik sebuah elemen."
 
 msgid "Click any element to send it to an agent."
 msgstr "Klik elemen apa pun untuk mengirimnya ke agen."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Klik Authorize di claude.ai. Anthropic lalu menampilkan kode. Tempel di sini."
 
 msgid "Click here if not redirected"
 msgstr "Klik di sini kalau tidak dialihkan"
@@ -10211,6 +10205,9 @@ msgstr "Saya memulai jalan pagi dengan sebuah ide dan mengakhirinya dengan sebua
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Saya peringkat #{rank} di papan peringkat {company} dengan {tokens} token penggunaan agen."
 
+msgid "I've signed in"
+msgstr "Saya sudah masuk"
+
 msgid "Icon"
 msgstr "Ikon"
 
@@ -14082,12 +14079,6 @@ msgstr "Buka ChatGPT untuk masuk"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Buka sesi Claude Code, Codex, OpenCode, dan Pi sebagai obrolan"
 
-msgid "Open claude.ai again"
-msgstr "Buka claude.ai lagi"
-
-msgid "Open claude.ai to sign in"
-msgstr "Buka claude.ai untuk masuk"
-
 msgid "Open Command Palette"
 msgstr "Buka Command Palette"
 
@@ -14984,9 +14975,6 @@ msgstr "Tempel tautan"
 
 msgid "Paste an API key instead"
 msgstr "Tempel kunci API saja"
-
-msgid "Paste the code"
-msgstr "Tempel kodenya"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Tempel ini ke Paradev CLI:"
@@ -17363,6 +17351,9 @@ msgstr "Jalankan perintah ini?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Jalankan ini di terminal, lalu lanjutkan:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Jalankan ini di terminal, lalu tempel token yang ditampilkannya:"
 
 msgid "Run workspace command"
 msgstr "Jalankan perintah workspace"
@@ -22040,9 +22031,6 @@ msgstr "Memakai transkripsi suara dan fitur push-to-talk."
 
 msgid "Use your ChatGPT plan."
 msgstr "Gunakan paket ChatGPT Anda."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Gunakan paket Claude Pro atau Max Anda."
 
 msgid "Used"
 msgstr "Terpakai"

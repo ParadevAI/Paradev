@@ -10,26 +10,23 @@ import {
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
 import { Spinner } from "@superset/ui/spinner";
-import { ToggleGroup, ToggleGroupItem } from "@superset/ui/toggle-group";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CopyButton } from "../../../../../../../../../../components/CopyButton";
 import type {
 	AgentSignIn,
 	DeviceCode,
-	SignedInAccount,
 } from "../../../../../../../../../../providers/TurnFailureActionsProvider";
 import { SignInProgress } from "./components/SignInProgress";
-import { CHATGPT_SECURITY_SETTINGS } from "./constants";
+import { CHATGPT_SECURITY_SETTINGS, SETUP_TOKEN_COMMAND } from "./constants";
 
 type Step =
 	| { name: "start" }
-	| { name: "paste_code" }
 	| { name: "device_code"; code: DeviceCode }
 	| { name: "api_key" }
 	| { name: "signing_in" }
-	| { name: "restarting"; account: SignedInAccount }
-	| { name: "restart_failed"; account: SignedInAccount };
+	| { name: "restarting" }
+	| { name: "restart_failed" };
 
 const BUSY_STEPS: ReadonlySet<Step["name"]> = new Set([
 	"signing_in",
@@ -51,7 +48,6 @@ export function AgentSignInDialog({
 	const [step, setStep] = useState<Step>({ name: "start" });
 	const [value, setValue] = useState("");
 	const [error, setError] = useState<string | null>(null);
-	const [plan, setPlan] = useState<"personal" | "business">("personal");
 	const [opening, setOpening] = useState(false);
 	const attempt = useRef(0);
 	const pending = useRef<AbortController | null>(null);
@@ -90,8 +86,8 @@ export function AgentSignInDialog({
 		setStep(next);
 	};
 
-	const restart = async (account: SignedInAccount, current: number) => {
-		setStep({ name: "restarting", account });
+	const restart = async (current: number) => {
+		setStep({ name: "restarting" });
 		let restarted = false;
 		try {
 			restarted = await restartAndContinue();
@@ -100,48 +96,41 @@ export function AgentSignInDialog({
 		}
 		if (current !== attempt.current) return;
 		if (restarted) onOpenChange(false);
-		else setStep({ name: "restart_failed", account });
+		else setStep({ name: "restart_failed" });
 	};
 
-	const save = async (submit: () => Promise<SignedInAccount>, back: Step) => {
+	const save = async (submit: () => Promise<void>, back: Step) => {
 		const current = ++attempt.current;
 		setError(null);
 		setStep({ name: "signing_in" });
-		let account: SignedInAccount;
 		try {
-			account = await submit();
+			await submit();
 		} catch (cause) {
 			if (current !== attempt.current) return;
 			setStep(back);
 			setError(reason(cause));
 			return;
 		}
-		await restart(account, current);
+		await restart(current);
 	};
 
-	const begin = async () => {
+	const startDeviceCode = async () => {
+		if (signIn.mode !== "device") return;
 		abandon();
 		const current = attempt.current;
 		setError(null);
 		setOpening(true);
 		try {
-			if (signIn.agent === "claude") {
-				const { url } = await signIn.startOauth();
-				if (current !== attempt.current) return;
-				signIn.openUrl(url);
-				setStep({ name: "paste_code" });
-				return;
-			}
-			const code = await signIn.startDeviceCode(plan);
+			const code = await signIn.startDeviceCode();
 			if (current !== attempt.current) return;
 			signIn.openUrl(code.verificationUrl);
 			go({ name: "device_code", code });
 			const controller = new AbortController();
 			pending.current = controller;
-			const account = await signIn.waitForDeviceCode(code, controller.signal);
+			await signIn.waitForDeviceCode(code, controller.signal);
 			if (current !== attempt.current) return;
 			pending.current = null;
-			await restart(account, current);
+			await restart(current);
 		} catch (cause) {
 			if (current !== attempt.current) return;
 			pending.current = null;
@@ -157,10 +146,15 @@ export function AgentSignInDialog({
 		go({ name: "start" });
 	};
 
+	const command =
+		signIn.mode === "command"
+			? signIn.command
+			: signIn.mode === "token"
+				? SETUP_TOKEN_COMMAND
+				: null;
 	const trimmed = value.trim();
 	const describedByStep =
 		step.name === "start" ||
-		step.name === "paste_code" ||
 		step.name === "device_code" ||
 		step.name === "api_key";
 
@@ -184,19 +178,15 @@ export function AgentSignInDialog({
 					</DialogTitle>
 					{step.name === "start" && (
 						<DialogDescription>
-							{signIn.agent === "claude" ? (
-								<Trans>Use your Claude Pro or Max plan.</Trans>
+							{signIn.mode === "command" ? (
+								<Trans>Run this in a terminal, then continue:</Trans>
+							) : signIn.mode === "token" ? (
+								<Trans>
+									Run this in a terminal, then paste the token it prints:
+								</Trans>
 							) : (
 								<Trans>Use your ChatGPT plan.</Trans>
 							)}
-						</DialogDescription>
-					)}
-					{step.name === "paste_code" && (
-						<DialogDescription>
-							<Trans>
-								Click Authorize on claude.ai. Anthropic then shows a code. Paste
-								it here.
-							</Trans>
 						</DialogDescription>
 					)}
 					{step.name === "device_code" && (
@@ -206,7 +196,7 @@ export function AgentSignInDialog({
 					)}
 					{step.name === "api_key" && (
 						<DialogDescription>
-							{signIn.agent === "claude" ? (
+							{signIn.mode === "token" ? (
 								<Trans>An Anthropic API key.</Trans>
 							) : (
 								<Trans>An OpenAI API key.</Trans>
@@ -215,38 +205,47 @@ export function AgentSignInDialog({
 					)}
 				</DialogHeader>
 
-				{step.name === "start" && (
+				{step.name === "start" && command && (
+					<div className="flex min-w-0 items-center gap-1 rounded-md border bg-muted/40 py-1 pr-1 pl-2.5 font-mono text-[13px]">
+						<code className="min-w-0 flex-1 select-all wrap-anywhere">
+							{command}
+						</code>
+						<CopyButton label={t({ message: "Copy command" })} text={command} />
+					</div>
+				)}
+
+				{step.name === "start" && signIn.mode === "token" && (
+					<form
+						className="flex flex-col gap-2"
+						id="agent-sign-in-form"
+						onSubmit={(event) => {
+							event.preventDefault();
+							if (!trimmed) return;
+							void save(() => signIn.saveToken(trimmed), { name: "start" });
+						}}
+					>
+						<Input
+							aria-label={t({ message: "Token" })}
+							autoComplete="off"
+							autoFocus
+							className="font-mono"
+							onChange={(event) => setValue(event.target.value)}
+							placeholder="sk-ant-oat01-…"
+							type="password"
+							value={value}
+						/>
+					</form>
+				)}
+
+				{step.name === "start" && signIn.mode === "device" && (
 					<div className="flex flex-col gap-3">
-						{signIn.agent === "codex" && (
-							<ToggleGroup
-								className="w-full"
-								onValueChange={(next) => {
-									if (next === "personal" || next === "business") setPlan(next);
-								}}
-								type="single"
-								value={plan}
-								variant="outline"
-							>
-								<ToggleGroupItem className="flex-1" value="personal">
-									<Trans>Personal</Trans>
-								</ToggleGroupItem>
-								<ToggleGroupItem className="flex-1" value="business">
-									<Trans>Business</Trans>
-								</ToggleGroupItem>
-							</ToggleGroup>
-						)}
 						<Button
 							className="w-full gap-1.5"
 							disabled={opening}
-							onClick={() => void begin()}
+							onClick={() => void startDeviceCode()}
 						>
 							{opening ? (
 								<Spinner />
-							) : signIn.agent === "claude" ? (
-								<>
-									<Trans>Open claude.ai to sign in</Trans>
-									<ArrowUpRight className="size-4" />
-								</>
 							) : (
 								<>
 									<Trans>Open ChatGPT to sign in</Trans>
@@ -254,54 +253,20 @@ export function AgentSignInDialog({
 								</>
 							)}
 						</Button>
-						{signIn.agent === "codex" && plan === "personal" && (
-							<p className="text-muted-foreground text-xs">
-								<Trans>
-									First time? Turn on device code sign-in in{" "}
-									<button
-										className="underline underline-offset-4 hover:text-foreground"
-										onClick={() => signIn.openUrl(CHATGPT_SECURITY_SETTINGS)}
-										type="button"
-									>
-										ChatGPT settings
-									</button>
-									.
-								</Trans>
-							</p>
-						)}
+						<p className="text-muted-foreground text-xs">
+							<Trans>
+								First time? Turn on device code sign-in in{" "}
+								<button
+									className="underline underline-offset-4 hover:text-foreground"
+									onClick={() => signIn.openUrl(CHATGPT_SECURITY_SETTINGS)}
+									type="button"
+								>
+									ChatGPT settings
+								</button>
+								.
+							</Trans>
+						</p>
 					</div>
-				)}
-
-				{step.name === "paste_code" && (
-					<form
-						className="flex flex-col gap-2"
-						id="agent-sign-in-form"
-						onSubmit={(event) => {
-							event.preventDefault();
-							if (signIn.agent !== "claude" || !trimmed) return;
-							void save(() => signIn.finishOauth(trimmed), {
-								name: "paste_code",
-							});
-						}}
-					>
-						<Input
-							aria-label={t({ message: "Code" })}
-							autoFocus
-							className="font-mono"
-							onChange={(event) => setValue(event.target.value)}
-							placeholder={t({ message: "Paste the code" })}
-							value={value}
-						/>
-						<button
-							className="flex items-center gap-1.5 self-start text-muted-foreground text-xs underline underline-offset-4 hover:text-foreground disabled:opacity-50"
-							disabled={opening}
-							onClick={() => void begin()}
-							type="button"
-						>
-							<Trans>Open claude.ai again</Trans>
-							{opening && <Spinner className="size-3" />}
-						</button>
-					</form>
 				)}
 
 				{step.name === "device_code" && (
@@ -322,7 +287,7 @@ export function AgentSignInDialog({
 					</div>
 				)}
 
-				{step.name === "api_key" && (
+				{step.name === "api_key" && signIn.mode !== "command" && (
 					<form
 						className="flex flex-col gap-2"
 						id="agent-sign-in-form"
@@ -338,7 +303,7 @@ export function AgentSignInDialog({
 							autoFocus
 							className="font-mono"
 							onChange={(event) => setValue(event.target.value)}
-							placeholder={signIn.agent === "claude" ? "sk-ant-…" : "sk-proj-…"}
+							placeholder={signIn.mode === "token" ? "sk-ant-…" : "sk-proj-…"}
 							type="password"
 							value={value}
 						/>
@@ -384,18 +349,19 @@ export function AgentSignInDialog({
 				{!busy && (
 					<DialogFooter className="items-center sm:justify-between">
 						<div className="text-xs">
-							{step.name === "start" && (
+							{step.name === "start" && signIn.mode !== "command" && (
 								<button
 									className="text-muted-foreground underline underline-offset-4 hover:text-foreground"
-									onClick={() => go({ name: "api_key" })}
+									onClick={() => {
+										abandon();
+										go({ name: "api_key" });
+									}}
 									type="button"
 								>
 									<Trans>Paste an API key instead</Trans>
 								</button>
 							)}
-							{(step.name === "paste_code" ||
-								step.name === "api_key" ||
-								step.name === "device_code") && (
+							{(step.name === "api_key" || step.name === "device_code") && (
 								<button
 									className="text-muted-foreground underline underline-offset-4 hover:text-foreground"
 									onClick={back}
@@ -406,7 +372,17 @@ export function AgentSignInDialog({
 							)}
 						</div>
 						<div className="flex gap-2">
-							{step.name === "paste_code" && (
+							{(step.name === "start" || step.name === "device_code") && (
+								<Button onClick={() => onOpenChange(false)} variant="ghost">
+									<Trans>Cancel</Trans>
+								</Button>
+							)}
+							{step.name === "start" && signIn.mode === "command" && (
+								<Button onClick={() => void restart(++attempt.current)}>
+									<Trans>I've signed in</Trans>
+								</Button>
+							)}
+							{step.name === "start" && signIn.mode === "token" && (
 								<Button
 									disabled={!trimmed}
 									form="agent-sign-in-form"
@@ -425,22 +401,14 @@ export function AgentSignInDialog({
 								</Button>
 							)}
 							{step.name === "restart_failed" && (
-								<Button
-									onClick={() => void restart(step.account, ++attempt.current)}
-								>
-									<Trans>Try again</Trans>
-								</Button>
-							)}
-							{(step.name === "start" ||
-								step.name === "device_code" ||
-								step.name === "restart_failed") && (
-								<Button onClick={() => onOpenChange(false)} variant="ghost">
-									{step.name === "restart_failed" ? (
+								<>
+									<Button onClick={() => onOpenChange(false)} variant="ghost">
 										<Trans>Close</Trans>
-									) : (
-										<Trans>Cancel</Trans>
-									)}
-								</Button>
+									</Button>
+									<Button onClick={() => void restart(++attempt.current)}>
+										<Trans>Try again</Trans>
+									</Button>
+								</>
 							)}
 						</div>
 					</DialogFooter>

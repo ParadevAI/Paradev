@@ -639,6 +639,19 @@ export const cloudWorkspaceRouter = {
 			};
 		}),
 
+	/**
+	 * Hands the creator's current sign-ins to a running box in place: the
+	 * firewall rules, login files and managed environment, without a restart.
+	 * Agents started before it keep the sign-in they started with.
+	 */
+	applySignIns: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: true };
+		}),
+
 	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */
 	forwards: personProcedure
 		.input(z.object({ id: z.string().uuid() }))

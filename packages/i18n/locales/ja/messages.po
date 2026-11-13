@@ -3903,9 +3903,6 @@ msgstr "このデバイスのParadevアプリに同梱されています。"
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "このデバイスのParadevアプリに同梱されています。アプリと一緒に更新されます。"
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Business プラン"
 
@@ -4657,9 +4654,6 @@ msgstr "要素をクリックします。"
 
 msgid "Click any element to send it to an agent."
 msgstr "要素をクリックすると、エージェントに送られます。"
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "claude.aiで「Authorize」をクリックしてください。Anthropicがコードを表示します。ここに貼り付けてください。"
 
 msgid "Click here if not redirected"
 msgstr "リダイレクトされない場合はこちらをクリック"
@@ -10211,6 +10205,9 @@ msgstr "朝の散歩をアイデアとともに始め、プルリクエストと
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "{company}のリーダーボードで、エージェント使用量{tokens}トークン、{rank}位です。"
 
+msgid "I've signed in"
+msgstr "サインインしました"
+
 msgid "Icon"
 msgstr "アイコン"
 
@@ -14082,12 +14079,6 @@ msgstr "ChatGPTを開いてサインイン"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code、Codex、OpenCode、Pi のセッションをチャットとして開く"
 
-msgid "Open claude.ai again"
-msgstr "claude.aiをもう一度開く"
-
-msgid "Open claude.ai to sign in"
-msgstr "claude.aiを開いてサインイン"
-
 msgid "Open Command Palette"
 msgstr "コマンドパレットを開く"
 
@@ -14984,9 +14975,6 @@ msgstr "リンクを貼り付け"
 
 msgid "Paste an API key instead"
 msgstr "代わりにAPIキーを貼り付ける"
-
-msgid "Paste the code"
-msgstr "コードを貼り付け"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "これをParadev CLIに貼り付けてください:"
@@ -17363,6 +17351,9 @@ msgstr "このコマンドを実行しますか？"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "ターミナルでこれを実行してから続行してください:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "これをターミナルで実行し、表示されたトークンを貼り付けてください："
 
 msgid "Run workspace command"
 msgstr "ワークスペースのコマンドを実行"
@@ -22040,9 +22031,6 @@ msgstr "音声文字起こしとプッシュトゥトーク機能を使用しま
 
 msgid "Use your ChatGPT plan."
 msgstr "ChatGPTのプランを使用します。"
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Claude ProまたはMaxのプランを使用します。"
 
 msgid "Used"
 msgstr "使用済み"

@@ -3903,9 +3903,6 @@ msgstr "Bundled with the Paradev app on this device."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Bundled with the Paradev app on this device. Updates with the app."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Business plan"
 
@@ -4657,9 +4654,6 @@ msgstr "Click an element."
 
 msgid "Click any element to send it to an agent."
 msgstr "Click any element to send it to an agent."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
 
 msgid "Click here if not redirected"
 msgstr "Click here if not redirected"
@@ -10211,6 +10205,9 @@ msgstr "I start my morning walks with an idea, and end with a pull request."
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 
+msgid "I've signed in"
+msgstr "I've signed in"
+
 msgid "Icon"
 msgstr "Icon"
 
@@ -14082,12 +14079,6 @@ msgstr "Open ChatGPT to sign in"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 
-msgid "Open claude.ai again"
-msgstr "Open claude.ai again"
-
-msgid "Open claude.ai to sign in"
-msgstr "Open claude.ai to sign in"
-
 msgid "Open Command Palette"
 msgstr "Open Command Palette"
 
@@ -14984,9 +14975,6 @@ msgstr "Paste a link"
 
 msgid "Paste an API key instead"
 msgstr "Paste an API key instead"
-
-msgid "Paste the code"
-msgstr "Paste the code"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Paste this into Paradev CLI:"
@@ -17363,6 +17351,9 @@ msgstr "Run this command?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Run this in a terminal, then continue:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Run this in a terminal, then paste the token it prints:"
 
 msgid "Run workspace command"
 msgstr "Run workspace command"
@@ -22040,9 +22031,6 @@ msgstr "Use voice transcription and push-to-talk features."
 
 msgid "Use your ChatGPT plan."
 msgstr "Use your ChatGPT plan."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Use your Claude Pro or Max plan."
 
 msgid "Used"
 msgstr "Used"

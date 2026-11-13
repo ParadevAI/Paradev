@@ -3903,9 +3903,6 @@ msgstr "Đi kèm với ứng dụng Paradev trên thiết bị này."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Đi kèm với ứng dụng Paradev trên thiết bị này. Cập nhật cùng với ứng dụng."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Gói Business"
 
@@ -4657,9 +4654,6 @@ msgstr "Nhấp vào một phần tử."
 
 msgid "Click any element to send it to an agent."
 msgstr "Nhấp vào bất kỳ phần tử nào để gửi cho agent."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Nhấn Authorize trên claude.ai. Anthropic sẽ hiển thị một mã. Dán mã vào đây."
 
 msgid "Click here if not redirected"
 msgstr "Nhấp vào đây nếu không được chuyển hướng"
@@ -10211,6 +10205,9 @@ msgstr "Tôi bắt đầu buổi đi bộ sáng với một ý tưởng và kế
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Tôi đang xếp hạng #{rank} trên bảng xếp hạng {company} với {tokens} token dùng agent."
 
+msgid "I've signed in"
+msgstr "Tôi đã đăng nhập"
+
 msgid "Icon"
 msgstr "Biểu tượng"
 
@@ -14082,12 +14079,6 @@ msgstr "Mở ChatGPT để đăng nhập"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Mở phiên Claude Code, Codex, OpenCode và Pi dưới dạng trò chuyện"
 
-msgid "Open claude.ai again"
-msgstr "Mở lại claude.ai"
-
-msgid "Open claude.ai to sign in"
-msgstr "Mở claude.ai để đăng nhập"
-
 msgid "Open Command Palette"
 msgstr "Mở bảng lệnh"
 
@@ -14984,9 +14975,6 @@ msgstr "Dán liên kết"
 
 msgid "Paste an API key instead"
 msgstr "Dán khóa API thay thế"
-
-msgid "Paste the code"
-msgstr "Dán mã"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Dán mã này vào Paradev CLI:"
@@ -17363,6 +17351,9 @@ msgstr "Chạy lệnh này?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Hãy chạy lệnh này trong terminal rồi tiếp tục:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Chạy lệnh này trong terminal, rồi dán mã token mà nó in ra:"
 
 msgid "Run workspace command"
 msgstr "Chạy lệnh của workspace"
@@ -22040,9 +22031,6 @@ msgstr "Dùng tính năng chuyển giọng nói thành văn bản và nhấn đ�
 
 msgid "Use your ChatGPT plan."
 msgstr "Dùng gói ChatGPT của bạn."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Dùng gói Claude Pro hoặc Max của bạn."
 
 msgid "Used"
 msgstr "Đã dùng"

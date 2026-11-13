@@ -3903,9 +3903,6 @@ msgstr "이 기기의 Paradev 앱에 포함되어 있습니다."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "이 기기의 Paradev 앱에 포함되어 있으며 앱과 함께 업데이트됩니다."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Business 플랜"
 
@@ -4657,9 +4654,6 @@ msgstr "요소를 클릭하세요."
 
 msgid "Click any element to send it to an agent."
 msgstr "요소를 클릭하면 에이전트에게 전달됩니다."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "claude.ai에서 Authorize를 클릭하세요. 그러면 Anthropic이 코드를 보여 줍니다. 여기에 붙여 넣으세요."
 
 msgid "Click here if not redirected"
 msgstr "이동하지 않으면 여기를 클릭하세요"
@@ -10211,6 +10205,9 @@ msgstr "아이디어 하나로 아침 산책을 시작하고, 풀 리퀘스트 �
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "에이전트 사용량 {tokens} 토큰으로 {company} 리더보드 {rank}위입니다."
 
+msgid "I've signed in"
+msgstr "로그인했습니다"
+
 msgid "Icon"
 msgstr "아이콘"
 
@@ -14082,12 +14079,6 @@ msgstr "ChatGPT를 열어 로그인"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code, Codex, OpenCode 및 Pi 세션을 채팅으로 열기"
 
-msgid "Open claude.ai again"
-msgstr "claude.ai 다시 열기"
-
-msgid "Open claude.ai to sign in"
-msgstr "claude.ai를 열어 로그인"
-
 msgid "Open Command Palette"
 msgstr "명령 팔레트 열기"
 
@@ -14984,9 +14975,6 @@ msgstr "링크 붙여넣기"
 
 msgid "Paste an API key instead"
 msgstr "대신 API 키 붙여 넣기"
-
-msgid "Paste the code"
-msgstr "코드 붙여 넣기"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Paradev CLI에 붙여 넣으세요:"
@@ -17363,6 +17351,9 @@ msgstr "이 명령을 실행할까요?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "터미널에서 이 명령을 실행한 후 계속하세요:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "터미널에서 이 명령을 실행한 다음 출력된 토큰을 붙여 넣으세요:"
 
 msgid "Run workspace command"
 msgstr "워크스페이스 명령 실행"
@@ -22040,9 +22031,6 @@ msgstr "음성 받아쓰기와 푸시 투 토크 기능을 사용합니다."
 
 msgid "Use your ChatGPT plan."
 msgstr "ChatGPT 요금제를 사용합니다."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Claude Pro 또는 Max 요금제를 사용합니다."
 
 msgid "Used"
 msgstr "사용됨"
