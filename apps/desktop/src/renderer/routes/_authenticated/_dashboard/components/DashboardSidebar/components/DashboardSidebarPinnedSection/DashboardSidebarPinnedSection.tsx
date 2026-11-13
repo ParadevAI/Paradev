@@ -3,8 +3,9 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useLingui } from "@lingui/react/macro";
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import {
 	dropZoneId,
