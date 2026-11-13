@@ -10,6 +10,8 @@ const retained = [
 	"/oauth",
 	"/cli/auth",
 	"/auth/desktop",
+	"/auth/integration-connect",
+	"/integrations/sentry",
 	"/.well-known",
 	"/mcp",
 	"/accept-invitation",

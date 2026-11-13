@@ -236,3 +236,37 @@ Coordinator-observed evidence, from before this preparation commit:
 
 This evidence does not validate this commit on live final hosts or authorize
 removing the reverse redirect, assigning final aliases, or enabling rollout.
+
+### Sentry legacy connect fallback
+
+Sentry's public integration has one fixed callback,
+`https://api.superset.sh/api/integrations/sentry/callback`. Until a separately
+reviewed provider change, final and stage API Sentry connect requests must reach
+that legacy host before OAuth state is created. This preparation changes no
+provider registration, environment setting, or live routing.
+
+An explicit Sentry connect request on `https://api.paradev.com` or
+`https://api.stage.paradev.com` now follows this sequence:
+
+1. Validate the explicit `organizationId` UUID, then return a no-store 307 to
+   `https://app.superset.sh/auth/integration-connect?provider=sentry&organizationId=...`.
+   No new-host membership lookup, OAuth state, or state cookie is created.
+2. The legacy-web continuation accepts only Sentry and one valid organization
+   UUID. It reads the existing legacy auth session. Without a session, it sends
+   the browser to the existing legacy sign-in page with a **relative** continuation
+   containing the same provider and organization ID.
+3. After sign-in, redirect to the fixed old API Sentry connect route with the
+   explicit organization ID. `requireOrgMember` remains the authorization check
+   there before the original OAuth flow runs. Active organization selection is
+   never used to choose the target, and no session/token is forwarded.
+
+`/auth/integration-connect`, `/integrations/sentry`, and sign-in/up continuations
+into either route remain on legacy even at 100% domain rollout. Old, local, and
+preview Sentry starts retain their original behavior. Other providers are
+unchanged. This is a handoff for an explicit user connect action, not an automatic
+installation or authorization grant. The user may need to sign in on legacy.
+
+Local tests cover the redirect/sign-in/resume sequence and routing exclusions;
+no real Sentry consent, installation, callback or connection write was performed.
+Final-host/provider integration verification still needs separately authorized
+access and a designated test organization.
