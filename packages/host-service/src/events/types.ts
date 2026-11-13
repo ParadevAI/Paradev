@@ -91,6 +91,35 @@ export interface PortChangedMessage {
  * Structural (not the drizzle inferred type) so workspace-client consumers
  * don't couple to the host's schema module.
  */
+export interface RepositorySnapshot {
+	id: string;
+	projectId: string;
+	isPrimary: boolean;
+	/** The folder its checkout gets in a multi-repo workspace. */
+	name: string;
+	/** The main checkout on this machine. */
+	path: string;
+	provider: "github" | null;
+	owner: string | null;
+	repoName: string | null;
+	url: string | null;
+	remoteName: string | null;
+	sparseCheckoutPaths: string[];
+	pathState: "ok" | "missing" | "inaccessible";
+}
+
+export interface CheckoutSnapshot {
+	repositoryId: string;
+	name: string;
+	isPrimary: boolean;
+	/** The workspace folder when there is one checkout, else `<workspace folder>/<name>`. */
+	path: string;
+	branch: string;
+	headSha: string | null;
+	upstream: { owner: string; repo: string; branch: string } | null;
+	pullRequestId: string | null;
+}
+
 export interface WorkspaceSnapshot {
 	id: string;
 	/** Null for project-less "session" workspaces. */
@@ -98,7 +127,10 @@ export interface WorkspaceSnapshot {
 	name: string;
 	branch: string;
 	type: "local" | "worktree" | "session";
+	/** The workspace folder. */
 	worktreePath: string;
+	/** One per repository, sorted by name; empty for a session workspace. */
+	checkouts: CheckoutSnapshot[];
 	taskId: string | null;
 	createdByUserId: string | null;
 	createdAt: number;
@@ -167,10 +199,9 @@ export interface TagFoldersChangedMessage {
 export interface ProjectSnapshot {
 	id: string;
 	name: string;
-	repoPath: string;
-	repoOwner: string | null;
-	repoName: string | null;
-	repoUrl: string | null;
+	primaryRepositoryId: string;
+	/** Sorted by name; the primary is marked, not moved. */
+	repositories: RepositorySnapshot[];
 	worktreeBaseDir: string | null;
 	/** Custom icon data-URI, or null to fall back to the GitHub avatar. */
 	icon: string | null;

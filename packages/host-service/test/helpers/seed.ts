@@ -1,8 +1,12 @@
 import { randomUUID } from "node:crypto";
+import { basename } from "node:path";
+import { eq } from "drizzle-orm";
 import {
 	projects,
 	pullRequests,
+	repositories,
 	terminalSessions,
+	workspaceRepositories,
 	workspaces,
 } from "../../src/db/schema";
 import type { TestHost } from "./createTestHost";
@@ -20,36 +24,77 @@ import type { TestHost } from "./createTestHost";
  *     `.run()` semantics)
  */
 
-export interface SeedProjectOptions {
+type SeedHost = Pick<TestHost, "db">;
+
+export interface SeedRepositoryOptions {
 	id?: string;
 	repoPath: string;
+	/** Defaults to `repoName`, else the folder name. */
+	name?: string;
 	repoOwner?: string;
 	repoName?: string;
 	repoUrl?: string;
 	repoProvider?: string;
 	remoteName?: string;
-	worktreeBaseDir?: string | null;
 }
 
-export function seedProject(
-	host: TestHost,
-	options: SeedProjectOptions,
+export interface SeedProjectOptions extends SeedRepositoryOptions {
+	/** Extra repositories beside the primary one described by the top-level fields. */
+	repositories?: SeedRepositoryOptions[];
+	worktreeBaseDir?: string | null;
+	/** The project's name; the primary repository's is `repositoryName`. */
+	name?: string;
+	repositoryName?: string;
+}
+
+export function seedRepository(
+	host: SeedHost,
+	projectId: string,
+	options: SeedRepositoryOptions,
 ): { id: string } {
 	const id = options.id ?? randomUUID();
+	host.db
+		.insert(repositories)
+		.values({
+			id,
+			projectId,
+			name: options.name ?? options.repoName ?? basename(options.repoPath),
+			repoPath: options.repoPath,
+			provider: options.repoProvider,
+			owner: options.repoOwner,
+			repoName: options.repoName,
+			url: options.repoUrl,
+			remoteName: options.remoteName,
+		})
+		.run();
+	return { id };
+}
+
+/** A project whose primary repository is the one the top-level fields describe. */
+export function seedProject(
+	host: SeedHost,
+	options: SeedProjectOptions & { id?: string; primaryRepositoryId?: string },
+): { id: string; repositoryId: string; repositoryIds: string[] } {
+	const id = options.id ?? randomUUID();
+	const repositoryId = options.primaryRepositoryId ?? randomUUID();
 	host.db
 		.insert(projects)
 		.values({
 			id,
-			repoPath: options.repoPath,
-			repoOwner: options.repoOwner,
-			repoName: options.repoName,
-			repoUrl: options.repoUrl,
-			repoProvider: options.repoProvider,
-			remoteName: options.remoteName,
+			primaryRepositoryId: repositoryId,
+			name: options.name ?? "",
 			worktreeBaseDir: options.worktreeBaseDir,
 		})
 		.run();
-	return { id };
+	seedRepository(host, id, {
+		...options,
+		id: repositoryId,
+		name: options.repositoryName,
+	});
+	const extra = (options.repositories ?? []).map(
+		(repository) => seedRepository(host, id, repository).id,
+	);
+	return { id, repositoryId, repositoryIds: [repositoryId, ...extra] };
 }
 
 export interface SeedWorkspaceOptions {
@@ -59,6 +104,8 @@ export interface SeedWorkspaceOptions {
 	branch: string;
 	name?: string;
 	type?: "local" | "worktree";
+	/** The repositories it checks out; defaults to every repository of the project. */
+	repositoryIds?: string[];
 	headSha?: string | null;
 	upstreamOwner?: string | null;
 	upstreamRepo?: string | null;
@@ -67,7 +114,7 @@ export interface SeedWorkspaceOptions {
 }
 
 export function seedWorkspace(
-	host: TestHost,
+	host: SeedHost,
 	options: SeedWorkspaceOptions,
 ): { id: string } {
 	const id = options.id ?? randomUUID();
@@ -80,13 +127,31 @@ export function seedWorkspace(
 			branch: options.branch,
 			name: options.name ?? options.branch,
 			type: options.type ?? "worktree",
-			headSha: options.headSha,
-			upstreamOwner: options.upstreamOwner,
-			upstreamRepo: options.upstreamRepo,
-			upstreamBranch: options.upstreamBranch,
-			pullRequestId: options.pullRequestId,
 		})
 		.run();
+	const repositoryIds =
+		options.repositoryIds ??
+		host.db
+			.select({ id: repositories.id })
+			.from(repositories)
+			.where(eq(repositories.projectId, options.projectId))
+			.all()
+			.map((row) => row.id);
+	for (const repositoryId of repositoryIds) {
+		host.db
+			.insert(workspaceRepositories)
+			.values({
+				workspaceId: id,
+				repositoryId,
+				branch: options.branch,
+				headSha: options.headSha,
+				upstreamOwner: options.upstreamOwner,
+				upstreamRepo: options.upstreamRepo,
+				upstreamBranch: options.upstreamBranch,
+				pullRequestId: options.pullRequestId,
+			})
+			.run();
+	}
 	return { id };
 }
 
@@ -97,7 +162,7 @@ export interface SeedTerminalSessionOptions {
 }
 
 export function seedTerminalSession(
-	host: TestHost,
+	host: SeedHost,
 	options: SeedTerminalSessionOptions,
 ): { id: string } {
 	const id = options.id ?? randomUUID();
@@ -114,7 +179,7 @@ export function seedTerminalSession(
 
 export interface SeedPullRequestOptions {
 	id?: string;
-	projectId: string;
+	repositoryId: string;
 	repoOwner?: string;
 	repoName?: string;
 	repoProvider?: string;
@@ -131,7 +196,7 @@ export interface SeedPullRequestOptions {
 }
 
 export function seedPullRequest(
-	host: TestHost,
+	host: SeedHost,
 	options: SeedPullRequestOptions,
 ): { id: string } {
 	const id = options.id ?? randomUUID();
@@ -139,7 +204,7 @@ export function seedPullRequest(
 		.insert(pullRequests)
 		.values({
 			id,
-			projectId: options.projectId,
+			repositoryId: options.repositoryId,
 			repoProvider: options.repoProvider ?? "github",
 			repoOwner: options.repoOwner ?? "octocat",
 			repoName: options.repoName ?? "hello",

@@ -87,19 +87,9 @@ export const projects = sqliteTable(
 	"projects",
 	{
 		id: text().primaryKey(),
-		// "container" holds repositories and has no repo of its own (repoPath is "").
-		kind: text()
-			.$type<"repository" | "container">()
-			.notNull()
-			.default("repository"),
-		// Set on a repository of a container project; such rows are hidden.
-		parentProjectId: text("parent_project_id"),
-		repoPath: text("repo_path").notNull(),
-		repoProvider: text("repo_provider"),
-		repoOwner: text("repo_owner"),
-		repoName: text("repo_name"),
-		repoUrl: text("repo_url"),
-		remoteName: text("remote_name"),
+		// No foreign key: repositories reference projects, and SQLite cannot
+		// create the cycle. Write paths keep it pointing at a live repository.
+		primaryRepositoryId: text("primary_repository_id").notNull(),
 		worktreeBaseDir: text("worktree_base_dir"),
 		// Per-project branch-prefix override. A null `branchPrefixMode` means
 		// "fall back to the host-wide default" in `host_settings`.
@@ -110,10 +100,6 @@ export const projects = sqliteTable(
 		icon: text("icon"),
 		// Accent color as a `#rrggbb` hex. Null means the default (no accent).
 		color: text("color"),
-		// JSON array of repo-relative folders to cone-mode sparse-checkout into
-		// new worktrees. Null (the default) means a full checkout. Read through
-		// `parseSparseCheckoutPaths` — the encoding is not part of the API.
-		sparseCheckoutPaths: text("sparse_checkout_paths"),
 		// Free-text instructions injected into AI workspace/branch naming for
 		// this project (e.g. "include the Linear ticket id in the branch name").
 		// Null means the default naming behavior.
@@ -132,7 +118,45 @@ export const projects = sqliteTable(
 			.notNull()
 			.$defaultFn(() => Date.now()),
 	},
-	(table) => [index("projects_repo_path_idx").on(table.repoPath)],
+);
+
+/**
+ * A git repository of a project. Every project has at least one; a single-repo
+ * project is a project with one. In a workspace with several, each one's
+ * checkout is the folder `<workspace>/<name>`, so `name` never changes.
+ */
+export const repositories = sqliteTable(
+	"repositories",
+	{
+		id: text().primaryKey(),
+		projectId: text("project_id")
+			.notNull()
+			.references(() => projects.id, { onDelete: "cascade" }),
+		name: text().notNull(),
+		repoPath: text("repo_path").notNull(),
+		provider: text(),
+		owner: text(),
+		repoName: text("repo_name"),
+		url: text(),
+		remoteName: text("remote_name"),
+		// JSON array of repo-relative folders to cone-mode sparse-checkout into
+		// new worktrees. Null means a full checkout. Read through
+		// `parseSparseCheckoutPaths` — the encoding is not part of the API.
+		sparseCheckoutPaths: text("sparse_checkout_paths"),
+		createdAt: integer("created_at")
+			.notNull()
+			.$defaultFn(() => Date.now()),
+		updatedAt: integer("updated_at")
+			.notNull()
+			.$defaultFn(() => Date.now()),
+	},
+	(table) => [
+		uniqueIndex("repositories_project_name_unique").on(
+			table.projectId,
+			table.name,
+		),
+		index("repositories_repo_path_idx").on(table.repoPath),
+	],
 );
 
 /**
@@ -156,9 +180,9 @@ export const pullRequests = sqliteTable(
 	"pull_requests",
 	{
 		id: text().primaryKey(),
-		projectId: text("project_id")
+		repositoryId: text("repository_id")
 			.notNull()
-			.references(() => projects.id, { onDelete: "cascade" }),
+			.references(() => repositories.id, { onDelete: "cascade" }),
 		repoProvider: text("repo_provider").notNull(),
 		repoOwner: text("repo_owner").notNull(),
 		repoName: text("repo_name").notNull(),
@@ -186,7 +210,7 @@ export const pullRequests = sqliteTable(
 			.$defaultFn(() => Date.now()),
 	},
 	(table) => [
-		index("pull_requests_project_id_idx").on(table.projectId),
+		index("pull_requests_repository_id_idx").on(table.repositoryId),
 		index("pull_requests_repo_branch_idx").on(
 			table.repoProvider,
 			table.repoOwner,
@@ -244,23 +268,12 @@ export const workspaces = sqliteTable(
 		projectId: text("project_id").references(() => projects.id, {
 			onDelete: "cascade",
 		}),
+		// The workspace folder. With one repository it is that repository's
+		// checkout; with several, each checkout is `<worktree_path>/<name>`.
 		worktreePath: text("worktree_path").notNull(),
-		// Set on a repository checkout of a container workspace; such rows are hidden.
-		parentWorkspaceId: text("parent_workspace_id"),
+		// The branch name the workspace was created with. A checkout started
+		// from a PR or an adopted worktree can be on another branch.
 		branch: text().notNull(),
-		headSha: text("head_sha"),
-		upstreamOwner: text("upstream_owner"),
-		upstreamRepo: text("upstream_repo"),
-		upstreamBranch: text("upstream_branch"),
-		pullRequestId: text("pull_request_id").references(() => pullRequests.id, {
-			onDelete: "set null",
-		}),
-		// Set when the user removes the PR link; the refresh sweep must not
-		// re-link this specific PR. A different PR on the branch still links.
-		suppressedPullRequestId: text("suppressed_pull_request_id").references(
-			() => pullRequests.id,
-			{ onDelete: "set null" },
-		),
 		// Empty string means "not yet backfilled from cloud" — the startup
 		// backfill sweep targets these rows.
 		name: text().notNull().default(""),
@@ -296,12 +309,45 @@ export const workspaces = sqliteTable(
 	(table) => [
 		index("workspaces_project_id_idx").on(table.projectId),
 		index("workspaces_archived_at_idx").on(table.archivedAt),
-		index("workspaces_upstream_ref_idx").on(
+	],
+);
+
+/** One row per repository a workspace checks out; a single-repo workspace has one. */
+export const workspaceRepositories = sqliteTable(
+	"workspace_repositories",
+	{
+		workspaceId: text("workspace_id")
+			.notNull()
+			.references(() => workspaces.id, { onDelete: "cascade" }),
+		repositoryId: text("repository_id")
+			.notNull()
+			.references(() => repositories.id, { onDelete: "restrict" }),
+		branch: text().notNull(),
+		headSha: text("head_sha"),
+		upstreamOwner: text("upstream_owner"),
+		upstreamRepo: text("upstream_repo"),
+		upstreamBranch: text("upstream_branch"),
+		pullRequestId: text("pull_request_id").references(() => pullRequests.id, {
+			onDelete: "set null",
+		}),
+		// Set when the user removes the PR link; the refresh sweep must not
+		// re-link this specific PR. A different PR on the branch still links.
+		suppressedPullRequestId: text("suppressed_pull_request_id").references(
+			() => pullRequests.id,
+			{ onDelete: "set null" },
+		),
+	},
+	(table) => [
+		primaryKey({ columns: [table.workspaceId, table.repositoryId] }),
+		index("workspace_repositories_repository_id_idx").on(table.repositoryId),
+		index("workspace_repositories_pull_request_id_idx").on(
+			table.pullRequestId,
+		),
+		index("workspace_repositories_upstream_ref_idx").on(
 			table.upstreamOwner,
 			table.upstreamRepo,
 			table.upstreamBranch,
 		),
-		index("workspaces_pull_request_id_idx").on(table.pullRequestId),
 	],
 );
 
