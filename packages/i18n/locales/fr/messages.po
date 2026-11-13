@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {# automatisation lancée} other {# automatisation
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# sous-agent en cours} other {# sous-agents en cours}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {L'agent ne peut pas arrêter uniquement cette réponse. L'arrêter arrête aussi le sous-agent qui tourne encore en arrière-plan.} other {L'agent ne peut pas arrêter uniquement cette réponse. L'arrêter arrête aussi les # sous-agents qui tournent encore en arrière-plan.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {# espace de travail créé, {failCount} en échec} other {# espaces de travail créés, {failCount} en échec}}"
 
@@ -11055,6 +11058,9 @@ msgstr "Continuer à modifier"
 msgid "Keep paused"
 msgstr "Laisser en pause"
 
+msgid "Keep running"
+msgstr "Laisser tourner"
+
 msgid "Keep typing an email to invite"
 msgstr "Continuez à saisir un e-mail pour inviter"
 
@@ -19503,6 +19509,9 @@ msgstr "Arrêter {label}"
 msgid "Stop {name}"
 msgstr "Arrêter {name}"
 
+msgid "Stop all"
+msgstr "Tout arrêter"
+
 msgid "Stop dictation"
 msgstr "Arrêter la dictée"
 
@@ -19521,6 +19530,9 @@ msgstr "Arrêter l'agent et envoyer maintenant"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Arrêtez l'agent avant de modifier un message"
+
+msgid "Stop this response?"
+msgstr "Arrêter cette réponse ?"
 
 msgid "Stop watching"
 msgstr "Arrêter la surveillance"

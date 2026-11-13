@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SessionClient } from "@superset/chat/client";
 import {
+	cancelStopsBackgroundSubagents,
 	deriveQueuedPrompts,
 	runningTurnId as findRunningTurnId,
 	latestSessionUsage,
@@ -74,6 +75,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { StopWithSubagentsDialog } from "./components/StopWithSubagentsDialog";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -546,13 +548,33 @@ export function SessionView({
 		],
 	);
 	const awaitingBackground = sessionState?.awaitingBackground === true;
-	const onCancelTurn = useMemo(
+	const stopTurn = useMemo(
 		() =>
 			loaded && runningTurnId && !awaitingBackground && !held
 				? () => void cancelTurn(runningTurnId, { pauseQueue: true })
 				: null,
 		[loaded, runningTurnId, awaitingBackground, cancelTurn, held],
 	);
+	const runningSubagents = cancelStopsBackgroundSubagents(harness)
+		? (sessionState?.backgroundTasks ?? []).filter(
+				(task) => task.kind === "subagent",
+			).length
+		: 0;
+	const [confirmingStop, setConfirmingStop] = useState(false);
+	const onCancelTurn = useMemo(
+		() =>
+			stopTurn && runningSubagents > 0
+				? () => setConfirmingStop(true)
+				: stopTurn,
+		[stopTurn, runningSubagents],
+	);
+	useEffect(() => {
+		if (!stopTurn || runningSubagents === 0) setConfirmingStop(false);
+	}, [stopTurn, runningSubagents]);
+	const confirmStop = useCallback(() => {
+		setConfirmingStop(false);
+		stopTurn?.();
+	}, [stopTurn]);
 	const promptQueue = useMemo(
 		() => ({
 			prompts: queuedPrompts,
@@ -806,6 +828,12 @@ export function SessionView({
 					onOpenFind={focusedSubagentId ? undefined : openFind}
 					usageLimited={!held && usageLimit !== undefined}
 					workspaceId={workspaceId}
+				/>
+				<StopWithSubagentsDialog
+					subagentCount={runningSubagents}
+					open={confirmingStop}
+					onOpenChange={setConfirmingStop}
+					onConfirm={confirmStop}
 				/>
 			</ComposerDropZone>
 		</ChatPaneActionsProvider>

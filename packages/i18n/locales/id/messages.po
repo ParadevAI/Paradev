@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {# otomatisasi dimulai} other {# otomatisasi dimul
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# subagen berjalan}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {Agen tidak bisa menghentikan respons ini saja. Menghentikannya juga menghentikan subagen yang masih berjalan di latar belakang.} other {Agen tidak bisa menghentikan respons ini saja. Menghentikannya juga menghentikan # subagen yang masih berjalan di latar belakang.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Membuat # workspace, {failCount} gagal} other {Membuat # workspace, {failCount} gagal}}"
 
@@ -11055,6 +11058,9 @@ msgstr "Lanjutkan mengedit"
 msgid "Keep paused"
 msgstr "Biarkan dijeda"
 
+msgid "Keep running"
+msgstr "Biarkan berjalan"
+
 msgid "Keep typing an email to invite"
 msgstr "Terus ketik email untuk mengundang"
 
@@ -19503,6 +19509,9 @@ msgstr "Hentikan {label}"
 msgid "Stop {name}"
 msgstr "Hentikan {name}"
 
+msgid "Stop all"
+msgstr "Hentikan semua"
+
 msgid "Stop dictation"
 msgstr "Hentikan dikte"
 
@@ -19521,6 +19530,9 @@ msgstr "Hentikan agen dan kirim sekarang"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Hentikan agen sebelum mengedit pesan"
+
+msgid "Stop this response?"
+msgstr "Hentikan respons ini?"
 
 msgid "Stop watching"
 msgstr "Berhenti memantau"

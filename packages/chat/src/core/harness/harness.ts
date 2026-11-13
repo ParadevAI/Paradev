@@ -82,3 +82,23 @@ export function presetForAcpHarness(harness: string): string | undefined {
 export function presetForAnyHarness(harness: string): string | undefined {
 	return presetForAcpHarness(harness) ?? LEGACY_PRESET_BY_HARNESS[harness];
 }
+
+/**
+ * Decision note: Stop asks first while a background subagent runs on these harnesses.
+ *
+ * claude-agent-acp 0.85.0 answers `session/cancel` by interrupting the whole Claude
+ * session and finishing every native subagent as cancelled. ACP has no request that
+ * stops only the main turn. Since a prompt sent during a background wait starts a
+ * new turn instead of queueing, Stop on that turn is a common path, and it silently
+ * killed the subagent (seen in the desktop app on 2026-11-13). Remove a harness from
+ * this list once its agent can cancel a turn without its background subagents.
+ */
+const CANCEL_STOPS_BACKGROUND_SUBAGENTS: ReadonlySet<string> = new Set([
+	"claude-acp",
+]);
+
+export function cancelStopsBackgroundSubagents(
+	harness: string | null | undefined,
+): boolean {
+	return harness ? CANCEL_STOPS_BACKGROUND_SUBAGENTS.has(harness) : false;
+}

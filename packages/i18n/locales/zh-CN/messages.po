@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个�
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 个子智能体运行中}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {智能体无法只停止此回复。停止后，仍在后台运行的子智能体也会一起停止。} other {智能体无法只停止此回复。停止后，仍在后台运行的 # 个子智能体也会一起停止。}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {已创建#个工作区，{failCount}个失败} other {已创建#个工作区，{failCount}个失败}}"
 
@@ -11055,6 +11058,9 @@ msgstr "继续编辑"
 msgid "Keep paused"
 msgstr "保持暂停"
 
+msgid "Keep running"
+msgstr "继续运行"
+
 msgid "Keep typing an email to invite"
 msgstr "继续输入邮箱以邀请"
 
@@ -19503,6 +19509,9 @@ msgstr "停止 {label}"
 msgid "Stop {name}"
 msgstr "停止 {name}"
 
+msgid "Stop all"
+msgstr "全部停止"
+
 msgid "Stop dictation"
 msgstr "停止语音输入"
 
@@ -19521,6 +19530,9 @@ msgstr "停止智能体并立即发送"
 
 msgid "Stop the agent before you edit a message"
 msgstr "编辑消息前请先停止智能体"
+
+msgid "Stop this response?"
+msgstr "停止此回复？"
 
 msgid "Stop watching"
 msgstr "停止关注"
