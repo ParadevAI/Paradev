@@ -45,6 +45,7 @@ mise.toml
 
 # Temporary files
 .tmp/
+packages/host-service/undefined/
 
 # Turbo
 .turbo
