@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "streamdown/styles.css";
 @import "../../../../packages/ui/src/motion.css";
+@import "../../../../packages/ui/src/components/overflow-fade/fade-edge.css";
 
 @custom-variant dark (&:is(.dark *));
 

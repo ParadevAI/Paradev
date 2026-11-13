@@ -1,0 +1,1 @@
+export { ResizeMachineConfirmContent } from "./ResizeMachineConfirmContent";

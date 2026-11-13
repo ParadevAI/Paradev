@@ -18,6 +18,7 @@ import {
 	LuBellOff,
 	LuClipboard,
 	LuCopy,
+	LuCpu,
 	LuEye,
 	LuEyeOff,
 	LuFolderOpen,
@@ -34,6 +35,7 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
 import { WorkspaceMoveMenu } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMoveMenu";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import type {
@@ -77,6 +79,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onRemoveFromSidebar?: () => void;
 	onRename?: () => void;
 	onDelete?: () => void;
+	environmentItem?: React.ReactNode;
 	onToggleUnread: () => void;
 	onClearStatus: () => void;
 	onRemovePullRequest: () => void;
@@ -106,6 +109,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	onRemoveFromSidebar,
 	onRename,
 	onDelete,
+	environmentItem,
 	onToggleUnread,
 	onClearStatus,
 	onRemovePullRequest,
@@ -244,6 +248,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 						)}
 					</>
 				)}
+				{environmentItem}
 				{move && (
 					<>
 						<ContextMenuSeparator />
@@ -252,6 +257,24 @@ export function DashboardSidebarWorkspaceContextMenu({
 							workspace={move.workspace}
 							directions={move.directions}
 						/>
+					</>
+				)}
+				{isCloudWorkspace && (
+					<>
+						<ContextMenuSeparator />
+						<ContextMenuSub>
+							<ContextMenuSubTrigger>
+								<LuCpu className="size-4 mr-2" />
+								<Trans>Machine size</Trans>
+							</ContextMenuSubTrigger>
+							<ContextMenuSubContent className="min-w-64">
+								<MachineSizeMenuItems
+									workspaceId={workspaceId}
+									menu="context"
+									runAfterClose={runAfterClose}
+								/>
+							</ContextMenuSubContent>
+						</ContextMenuSub>
 					</>
 				)}
 				<ContextMenuSeparator />

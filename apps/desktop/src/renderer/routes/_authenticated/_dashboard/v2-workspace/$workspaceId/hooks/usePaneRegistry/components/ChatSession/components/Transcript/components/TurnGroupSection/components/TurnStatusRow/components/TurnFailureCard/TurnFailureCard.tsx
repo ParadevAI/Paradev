@@ -1,8 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { TurnError } from "@superset/chat/protocol";
+import { isUsageLimitMessage, type TurnError } from "@superset/chat/protocol";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
-import { ChevronRight, CircleAlert, X } from "lucide-react";
+import { useRouter } from "@tanstack/react-router";
+import { ChevronRight, Gauge, X } from "lucide-react";
 import {
 	type ReactNode,
 	useEffect,
@@ -12,6 +13,7 @@ import {
 	useState,
 } from "react";
 import { useTurnFailureActions } from "../../../../../../../../providers/TurnFailureActionsProvider";
+import { AgentSignInDialog } from "./components/AgentSignInDialog";
 import { CopyErrorButton } from "./components/CopyErrorButton";
 import { SignInCommand } from "./components/SignInCommand";
 import {
@@ -20,6 +22,7 @@ import {
 	type FailureAction,
 	MANUAL_SIGN_IN_ACTIONS,
 	MANUAL_SIGN_IN_TITLE,
+	TONES,
 } from "./constants";
 
 type Running = "continue" | "restart" | "new_chat";
@@ -30,9 +33,6 @@ type ActionButton = {
 	disabled: boolean;
 	expanded?: boolean;
 };
-
-const PRIMARY_CLASS =
-	"border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50";
 
 export function TurnFailureCard({
 	error,
@@ -45,7 +45,14 @@ export function TurnFailureCard({
 }) {
 	const { i18n, t } = useLingui();
 	const actions = useTurnFailureActions();
-	const kind = error?.kind ?? "unknown";
+	const router = useRouter({ warn: false });
+	const hostKind = error?.kind ?? "unknown";
+	const kind =
+		hostKind === "unknown" && isUsageLimitMessage(error?.message ?? "")
+			? "usage_limit"
+			: hostKind;
+	const limit = kind === "usage_limit";
+	const tone = TONES[limit ? "limit" : "failure"];
 	const manualSignIn = kind === "auth" && actions?.manualSignIn === true;
 	const title = i18n._(
 		manualSignIn ? MANUAL_SIGN_IN_TITLE : FAILURE_TITLES[kind],
@@ -54,6 +61,7 @@ export function TurnFailureCard({
 	const [expanded, setExpanded] = useState(false);
 	const [clamped, setClamped] = useState(false);
 	const [signingIn, setSigningIn] = useState(false);
+	const [signInOpen, setSignInOpen] = useState(false);
 	const [running, setRunning] = useState<Running | null>(null);
 	const [newChatFailed, setNewChatFailed] = useState(false);
 	const textRef = useRef<HTMLParagraphElement>(null);
@@ -84,7 +92,7 @@ export function TurnFailureCard({
 				onClick={() => actions.setDismissed(turnId, false)}
 				type="button"
 			>
-				<CircleAlert className="size-3.5 shrink-0 text-destructive/70" />
+				<tone.Icon className={cn("size-3.5 shrink-0", tone.collapsedIcon)} />
 				<span className="shrink-0 font-medium">{title}</span>
 				{error?.message && (
 					<span className="min-w-0 truncate">{error.message}</span>
@@ -114,6 +122,9 @@ export function TurnFailureCard({
 		});
 	};
 	const restart = kind === "auth" ? recovery?.restartAndContinue : undefined;
+	const agentSignIn =
+		restart && !manualSignIn ? recovery?.agentSignIn : undefined;
+	const label = agentSignIn?.label;
 	const changeModel = recovery?.changeModel;
 	const newChat = recovery?.startNewChat;
 	const buttons: Record<FailureAction, ActionButton | null> | null = recovery
@@ -140,11 +151,22 @@ export function TurnFailureCard({
 							onClick: changeModel,
 						}
 					: null,
-				sign_in: {
-					label: <Trans>Sign in</Trans>,
+				sign_in: label
+					? {
+							label: <Trans>Sign in to {label}</Trans>,
+							disabled: false,
+							onClick: () => setSignInOpen(true),
+						}
+					: {
+							label: <Trans>Sign in</Trans>,
+							disabled: false,
+							expanded: signingIn,
+							onClick: () => setSigningIn((open) => !open),
+						},
+				usage_settings: {
+					label: <Trans>Usage settings</Trans>,
 					disabled: false,
-					expanded: signingIn,
-					onClick: () => setSigningIn((open) => !open),
+					onClick: () => void router?.navigate({ to: "/settings/usage" }),
 				},
 				agent_settings: recovery.openAgentSettings
 					? {
@@ -176,22 +198,67 @@ export function TurnFailureCard({
 			)
 		: [];
 
+	const copyError = (
+		<CopyErrorButton
+			text={[title, error?.message, error?.detail].filter(Boolean).join("\n\n")}
+		/>
+	);
+	const offeredButtons = offered.map((button, index) => (
+		<Button
+			aria-expanded={button.expanded}
+			className={index === 0 ? tone.primary : undefined}
+			disabled={button.disabled}
+			key={button.action}
+			onClick={button.onClick}
+			size="xs"
+			variant="outline"
+		>
+			{button.label}
+		</Button>
+	));
+
 	return (
 		<div
-			className="relative flex w-full max-w-[36rem] gap-2.5 rounded-lg border border-destructive/25 bg-destructive/[0.04] py-2.5 pr-9 pl-3 font-sans text-xs"
+			className={cn(
+				"relative flex w-full max-w-[36rem] gap-2.5 rounded-lg border py-2.5 pr-9 pl-3 font-sans text-xs",
+				tone.card,
+			)}
 			data-turn-failure={kind}
-			role="alert"
+			role={limit ? "status" : "alert"}
 		>
-			<CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+			{limit ? (
+				<span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-warning/15 text-warning">
+					<Gauge className="size-3.5" />
+				</span>
+			) : (
+				<tone.Icon className={cn("mt-0.5 size-4 shrink-0", tone.icon)} />
+			)}
 			<div className="flex min-w-0 flex-1 flex-col gap-1.5">
-				<div className="font-medium text-destructive text-sm leading-5">
+				<div
+					className={cn(
+						"font-medium text-sm",
+						limit ? "leading-6" : "leading-5",
+						tone.title,
+					)}
+				>
 					{title}
 				</div>
-				{text && (
+				{limit && (
+					<p className="text-muted-foreground leading-5">
+						<Trans>
+							Your model provider stopped this request because the account
+							reached its usage or spend limit. Wait for the limit to reset,
+							raise it with your provider, or switch to another account in Usage
+							settings.
+						</Trans>
+					</p>
+				)}
+				{text && (!limit || expanded) && (
 					<p
 						className={cn(
 							"wrap-anywhere whitespace-pre-wrap font-mono text-[12px] text-foreground/70 leading-5",
 							expanded ? "max-h-60 overflow-y-auto" : "line-clamp-3",
+							limit && "order-last rounded-md bg-muted/50 px-2 py-1.5",
 						)}
 						id={detailsId}
 						ref={textRef}
@@ -199,6 +266,9 @@ export function TurnFailureCard({
 					>
 						{text}
 					</p>
+				)}
+				{limit && expanded && (
+					<div className="-ml-2 order-last">{copyError}</div>
 				)}
 				{manualSignIn && (
 					<p className="text-muted-foreground">
@@ -217,8 +287,14 @@ export function TurnFailureCard({
 						<Trans>Couldn't start a new chat.</Trans>
 					</p>
 				)}
-				<div className="-ml-2 flex flex-wrap items-center gap-1">
-					{(clamped || expanded) && (
+				<div
+					className={cn(
+						"flex flex-wrap items-center gap-1",
+						limit ? "mt-0.5" : "-ml-2",
+					)}
+				>
+					{limit && offeredButtons}
+					{(limit ? Boolean(text) : clamped || expanded) && (
 						<Button
 							aria-controls={detailsId}
 							aria-expanded={expanded}
@@ -236,30 +312,25 @@ export function TurnFailureCard({
 							)}
 						</Button>
 					)}
-					<CopyErrorButton
-						text={[title, error?.message, error?.detail]
-							.filter(Boolean)
-							.join("\n\n")}
-					/>
-					{offered.map((button, index) => (
-						<Button
-							aria-expanded={button.expanded}
-							className={index === 0 ? PRIMARY_CLASS : undefined}
-							disabled={button.disabled}
-							key={button.action}
-							onClick={button.onClick}
-							size="xs"
-							variant="outline"
-						>
-							{button.label}
-						</Button>
-					))}
+					{!limit && copyError}
+					{!limit && offeredButtons}
 				</div>
 			</div>
+			{agentSignIn && restart && (
+				<AgentSignInDialog
+					onOpenChange={setSignInOpen}
+					open={signInOpen}
+					restartAndContinue={restart}
+					signIn={agentSignIn}
+				/>
+			)}
 			{actions && (
 				<button
 					aria-label={t({ message: "Dismiss error" })}
-					className="absolute top-2 right-2 rounded p-1 text-destructive/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
+					className={cn(
+						"absolute top-2 right-2 rounded p-1 transition-colors",
+						tone.dismiss,
+					)}
 					onClick={() => actions.setDismissed(turnId, true)}
 					type="button"
 				>

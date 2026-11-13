@@ -26,6 +26,7 @@ export interface V2UserPreferencesApi {
 	setRightSidebarWidth: (next: number) => void;
 	setRightPaneAreaWidth: (next: number) => void;
 	setChangesFileListWidth: (next: number) => void;
+	setChangesFileListOpen: (next: boolean) => void;
 	setDeleteLocalBranch: (next: boolean) => void;
 	setShowPresetsBar: (next: boolean | ((prev: boolean) => boolean)) => void;
 	toggleShowPresetsBar: () => void;
@@ -205,6 +206,25 @@ export function useV2UserPreferences(): V2UserPreferencesApi {
 			}
 			collections.v2UserPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
 				draft.changesFileListWidth = next;
+			});
+		},
+		[collections],
+	);
+
+	const setChangesFileListOpen = useCallback(
+		(next: boolean) => {
+			const existing = collections.v2UserPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
+			if (!existing) {
+				collections.v2UserPreferences.insert({
+					...DEFAULT_V2_USER_PREFERENCES,
+					changesFileListOpen: next,
+				});
+				return;
+			}
+			collections.v2UserPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
+				draft.changesFileListOpen = next;
 			});
 		},
 		[collections],
@@ -390,6 +410,7 @@ export function useV2UserPreferences(): V2UserPreferencesApi {
 		setRightSidebarWidth,
 		setRightPaneAreaWidth,
 		setChangesFileListWidth,
+		setChangesFileListOpen,
 		setDeleteLocalBranch,
 		setShowPresetsBar,
 		toggleShowPresetsBar,

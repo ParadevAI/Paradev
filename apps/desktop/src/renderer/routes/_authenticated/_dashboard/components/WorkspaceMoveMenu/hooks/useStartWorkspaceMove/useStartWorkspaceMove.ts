@@ -2,9 +2,6 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { useNavigate } from "@tanstack/react-router";
-import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
-import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
-import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
 import { useMoveWorkspaceToCloud } from "../../../../hooks/useMoveWorkspaceToCloud";
 import { useMoveWorkspaceToComputer } from "../../../../hooks/useMoveWorkspaceToComputer";
 import type { MovableWorkspace } from "../../../../hooks/useWorkspaceMoveDirections";
@@ -22,25 +19,14 @@ type MoveResult = {
 
 /**
  * Starts a move as soon as its destination is picked. Progress, cancel and
- * retry live in the move toast.
+ * retry live in the move toast. A cloud move takes its machine size from the
+ * environment.
  */
 export function useStartWorkspaceMove(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const moveWorkspaceToCloud = useMoveWorkspaceToCloud(workspace);
 	const moveWorkspaceToComputer = useMoveWorkspaceToComputer(workspace);
-	const cloudChoices = useV2WorkspaceCreateDefaultsStore(
-		(state) => state.cloudChoices,
-	);
-	const machineSizeOptions = useMachineSizeOptions();
-	const { machineSize } = resolveCloudChoices({
-		environments: [],
-		projectId: workspace.projectId,
-		repositoryFullName: null,
-		choices: cloudChoices,
-		offeredSizes: machineSizeOptions.options.map((option) => option.size),
-		defaultSize: machineSizeOptions.defaultSize,
-	});
 
 	const follow = (
 		progress: WorkspaceMoveProgressHandle,
@@ -75,7 +61,6 @@ export function useStartWorkspaceMove(workspace: MovableWorkspace) {
 			});
 			void moveWorkspaceToCloud({
 				environment,
-				machineSize,
 				onStage: (stage) =>
 					progress.setStage(stage === "saving" ? "saving" : "creating"),
 				onBegun: progress.begun,

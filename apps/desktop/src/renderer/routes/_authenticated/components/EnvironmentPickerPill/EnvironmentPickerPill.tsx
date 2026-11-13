@@ -17,6 +17,7 @@ import {
 	HiChevronUpDown,
 	HiMiniPlus,
 	HiOutlineCog6Tooth,
+	HiOutlinePencilSquare,
 } from "react-icons/hi2";
 import { LuContainer } from "react-icons/lu";
 import {
@@ -27,10 +28,16 @@ import {
 export interface EnvironmentOption {
 	id: string;
 	name: string;
+	repositories?: ReadonlyArray<{ fullName: string }> | null;
 }
 
+const repositoryNames = (environment: EnvironmentOption) =>
+	(environment.repositories ?? [])
+		.map((repository) => repository.fullName)
+		.join(", ");
+
 const searchValue = (environment: EnvironmentOption) =>
-	`${environment.name} ${environment.id}`;
+	`${environment.name} ${repositoryNames(environment)} ${environment.id}`;
 
 interface EnvironmentPickerPillProps {
 	selectedEnvironment: EnvironmentOption | undefined;
@@ -40,6 +47,7 @@ interface EnvironmentPickerPillProps {
 	onSelectEnvironment: (environmentId: string) => void;
 	onCreateEnvironment: () => void;
 	onManageEnvironments: () => void;
+	onEditEnvironment?: (environmentId: string) => void;
 	isLoading?: boolean;
 	triggerClassName?: string;
 }
@@ -52,12 +60,14 @@ export function EnvironmentPickerPill({
 	onSelectEnvironment,
 	onCreateEnvironment,
 	onManageEnvironments,
+	onEditEnvironment,
 	isLoading = false,
 	triggerClassName,
 }: EnvironmentPickerPillProps) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
+	const selectedName = selectedEnvironment?.name;
 	const needsSetup = !isLoading && linked.length === 0 && other.length === 0;
 	const showNoneLinked =
 		!!projectName &&
@@ -76,8 +86,15 @@ export function EnvironmentPickerPill({
 			value={searchValue(environment)}
 			onSelect={() => pick(environment.id)}
 		>
-			<LuContainer className="size-4 text-muted-foreground" />
-			<span className="flex-1 truncate">{environment.name}</span>
+			<LuContainer className="size-4 shrink-0 self-start text-muted-foreground" />
+			<span className="flex min-w-0 flex-1 flex-col">
+				<span className="truncate">{environment.name}</span>
+				{repositoryNames(environment) && (
+					<span className="truncate text-xs text-muted-foreground">
+						{repositoryNames(environment)}
+					</span>
+				)}
+			</span>
 			{environment.id === selectedEnvironment?.id && (
 				<HiCheck className="size-4 shrink-0" />
 			)}
@@ -163,6 +180,20 @@ export function EnvironmentPickerPill({
 								<HiMiniPlus className="size-4" />
 								<Trans>Create environment</Trans>
 							</CommandItem>
+							{selectedEnvironment && onEditEnvironment && (
+								<CommandItem
+									forceMount
+									onSelect={() => {
+										setOpen(false);
+										onEditEnvironment(selectedEnvironment.id);
+									}}
+								>
+									<HiOutlinePencilSquare className="size-4" />
+									<span className="truncate">
+										<Trans>Edit {selectedName}</Trans>
+									</span>
+								</CommandItem>
+							)}
 							<CommandItem
 								forceMount
 								onSelect={() => {

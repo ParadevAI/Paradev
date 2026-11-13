@@ -563,6 +563,11 @@ msgstr "검사 {1}개 중 {0}개 실패"
 msgid "{0} of {1} checks running"
 msgstr "검사 {1}개 중 {0}개 실행 중"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "총 {totalCount}개 중 {0}개"
@@ -984,6 +989,9 @@ msgstr "{count}개의 호스트가 이 앱보다 오래된 호스트 서비스�
 msgid "{count} selected"
 msgstr "{count}개 선택됨"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "변수 {count}개를 저장할 수 없습니다. 강조 표시된 행을 확인하세요"
+
 msgid "{count}/day"
 msgstr "하루 {count}개"
 
@@ -1131,6 +1139,9 @@ msgstr "{lines, plural, other {#줄}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (이 기기)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (요금제에 포함되지 않음)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -1885,6 +1896,9 @@ msgstr "루틴에는 일정이나 지켜볼 대상이 필요합니다."
 msgid "A run for this automation is already in progress."
 msgstr "이 자동화의 실행이 이미 진행 중입니다."
 
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "실행 중인 머신은 다시 시작됩니다. 파일과 커밋하지 않은 변경 사항은 유지됩니다. 프로젝트의 시작 서비스와 에이전트 세션은 다시 시작되며, 터미널에서 실행 중인 그 밖의 작업은 중지됩니다."
+
 msgid "A selection of integrations curated by our team."
 msgstr "저희 팀이 엄선한 연동 모음입니다."
 
@@ -2115,6 +2129,9 @@ msgstr "에이전트를 추가할"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "클라우드 워크스페이스를 만들기 전에 설정에서 환경을 추가하세요"
 
+msgid "Add Another"
+msgstr "하나 더 추가"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "다른 계정을 연결하거나 더 이상 쓰지 않는 계정을 해제하세요."
 
@@ -2141,6 +2158,9 @@ msgstr "설명 추가"
 
 msgid "Add description..."
 msgstr "설명 추가..."
+
+msgid "Add Environment Variable"
+msgstr "환경 변수 추가"
 
 msgid "Add extension"
 msgstr "확장 프로그램 추가"
@@ -2178,6 +2198,9 @@ msgstr "더 추가…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "사이드바 메뉴에서 하나 추가해 시작하세요."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "환경 변수를 하나 이상 추가하세요. .env 파일을 끌어다 놓을 수도 있습니다."
 
 msgid "Add people"
 msgstr "사람 추가"
@@ -2290,8 +2313,17 @@ msgstr "{added} 추가됨"
 msgid "Added {added} files to {where}"
 msgstr "{where}에 파일 {added}개를 추가했습니다"
 
+msgid "Added {addedOn}"
+msgstr "{addedOn}에 추가됨"
+
 msgid "Added {bought} GB-hours."
 msgstr "{bought} GB 시간을 추가했습니다."
+
+msgid "Added {count} environment variables"
+msgstr "환경 변수 {count}개 추가됨"
+
+msgid "Added {key}"
+msgstr "{key} 추가됨"
 
 msgid "Added 1 file to {where}"
 msgstr "{where}에 파일 1개를 추가했습니다"
@@ -2787,8 +2819,14 @@ msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습�
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
 
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "에이전트가 클라우드 워크스페이스에서 이 환경을 설정합니다(약 20분 이상). 의존성을 설치하고 설정 구성을 작성하며 필요한 시크릿을 요청합니다. 언제든 중단하거나 워크스페이스에서 직접 이어받아 설정을 마칠 수 있습니다."
+
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "에이전트가 함수와 파일 전체를 작성하는 동안 사람이 모든 단계를 지켜보고 모든 명령을 승인합니다. 에이전트 하나에 사람 하나. 더 빠르지만 여전히 순차적입니다."
+
+msgid "An Anthropic API key."
+msgstr "Anthropic API 키."
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "자동화는 내가 만든 클라우드 워크스페이스만 사용할 수 있습니다"
@@ -2801,6 +2839,9 @@ msgstr "오류가 발생했습니다"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "에이전트가 메인 체크아웃을 건드리지 않고 실행되는 격리된 git worktree입니다."
+
+msgid "An OpenAI API key."
+msgstr "OpenAI API 키."
 
 msgid "An unknown error occurred"
 msgstr "알 수 없는 오류가 발생했습니다"
@@ -2912,6 +2953,9 @@ msgstr "모든 수신자"
 
 msgid "Any review"
 msgstr "모든 리뷰"
+
+msgid "Any reviewer"
+msgstr "모든 리뷰어"
 
 msgid "any sender"
 msgstr "모든 발신자"
@@ -3876,6 +3920,9 @@ msgstr "이 기기의 Paradev 앱에 포함되어 있습니다."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "이 기기의 Paradev 앱에 포함되어 있으며 앱과 함께 업데이트됩니다."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business 플랜"
 
@@ -4155,6 +4202,9 @@ msgstr "아이콘 변경"
 msgid "Change location"
 msgstr "위치 변경"
 
+msgid "Change machine size"
+msgstr "머신 크기 변경"
+
 msgid "Change model"
 msgstr "모델 변경"
 
@@ -4196,6 +4246,9 @@ msgstr "상태 변경 (현재: {0})"
 msgid "Change to {0}"
 msgstr "{0}(으)로 변경"
 
+msgid "Change to {pendingName}"
+msgstr "{pendingName}(으)로 변경"
+
 msgid "Change to Annual"
 msgstr "연간으로 변경"
 
@@ -4217,6 +4270,9 @@ msgstr "변경 로그"
 msgid "Changes"
 msgstr "변경"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 변경 사항을 불러옵니다"
+
 msgid "Changes open target"
 msgstr "변경 사항 열기 대상"
 
@@ -4228,6 +4284,9 @@ msgstr "변경 요청됨"
 
 msgid "Changes saved"
 msgstr "변경 사항이 저장되었습니다"
+
+msgid "Changing to {label}…"
+msgstr "{label}(으)로 변경하는 중…"
 
 msgid "Changing..."
 msgstr "변경하는 중..."
@@ -4359,6 +4418,9 @@ msgstr "PR을 체크아웃하려면 프로젝트가 필요합니다"
 msgid "Checking pull requests in {what}"
 msgstr "{what}의 풀 리퀘스트 확인 중"
 
+msgid "Checking with the provider."
+msgstr "제공업체에서 확인하는 중입니다."
+
 msgid "Checking workspaces"
 msgstr "워크스페이스 확인 중"
 
@@ -4383,6 +4445,9 @@ msgstr "체크포인트 · 툴팁 리팩터링 전"
 #. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
 msgid "Checkpoint saved {0}"
 msgstr "체크포인트 저장됨 {0}"
+
+msgid "Checkpoint saved to {name}"
+msgstr "{name}에 체크포인트를 저장했습니다"
 
 msgid "Checks"
 msgstr "검사"
@@ -4619,17 +4684,20 @@ msgstr "요소를 클릭하세요."
 msgid "Click any element to send it to an agent."
 msgstr "요소를 클릭하면 에이전트에게 전달됩니다."
 
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "claude.ai에서 Authorize를 클릭하세요. 그러면 Anthropic이 코드를 보여 줍니다. 여기에 붙여 넣으세요."
+
 msgid "Click here if not redirected"
 msgstr "이동하지 않으면 여기를 클릭하세요"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "“↑ update” 버튼을 클릭하면 업데이트 전 확인 창이 표시됩니다"
 
+msgid "Click to copy"
+msgstr "클릭하여 복사"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "클릭하면 세션 ID를 복사합니다(`claude --resume <id>`로 이어서 진행)."
-
-msgid "Click to open the pull request"
-msgstr "클릭하여 풀 리퀘스트 열기"
 
 msgid "Click two commits to define the range."
 msgstr "커밋 두 개를 클릭해 범위를 지정하세요."
@@ -4880,6 +4948,12 @@ msgstr "클라우드 워크스페이스"
 
 msgid "Cloud workspace: connecting"
 msgstr "클라우드 워크스페이스: 연결 중"
+
+msgid "Cloud workspace: out of memory"
+msgstr "클라우드 워크스페이스: 메모리 부족"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "클라우드 워크스페이스: 부하 높음"
 
 msgid "Cloud workspaces"
 msgstr "클라우드 워크스페이스"
@@ -5822,6 +5896,9 @@ msgstr "링크를 복사할 수 없습니다"
 msgid "Could not create cloud workspace"
 msgstr "클라우드 워크스페이스를 만들 수 없습니다"
 
+msgid "Could not create environment"
+msgstr "환경을 만들 수 없습니다"
+
 msgid "Could not create project"
 msgstr "프로젝트를 만들 수 없습니다"
 
@@ -6102,6 +6179,10 @@ msgstr "대화를 분기할 수 없습니다"
 
 msgid "Couldn't cancel the move"
 msgstr "옮기기를 취소하지 못했습니다"
+
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "머신 크기를 변경하지 못했습니다: {0}"
 
 msgid "Couldn't change the routine"
 msgstr "루틴을 변경할 수 없습니다"
@@ -6426,8 +6507,16 @@ msgstr "에이전트의 파일 편집을 기준으로 집계합니다. 셸 명�
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPU 코어"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU 부족"
 
 msgid "Create"
 msgstr "만들기"
@@ -7346,6 +7435,9 @@ msgstr "차이 변경 개요"
 msgid "diff in new tab"
 msgstr "새 탭에서 차이"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 차이를 엽니다"
+
 msgid "Digital Product Designer"
 msgstr "디지털 제품 디자이너"
 
@@ -7409,6 +7501,9 @@ msgstr "변경 사항을 버릴까요?"
 
 msgid "Discard recording"
 msgstr "녹음 버리기"
+
+msgid "Discard unsaved changes?"
+msgstr "저장하지 않은 변경 사항을 버릴까요?"
 
 msgid "Discarded"
 msgstr "버렸습니다"
@@ -7815,6 +7910,9 @@ msgstr "{name} ×{tier} 획득"
 msgid "Edit"
 msgstr "편집"
 
+msgid "Edit {selectedName}"
+msgstr "{selectedName} 편집"
+
 msgid "Edit Channel Name"
 msgstr "채널 이름 편집"
 
@@ -7827,8 +7925,8 @@ msgstr "설명 편집"
 msgid "Edit Description"
 msgstr "설명 편집"
 
-msgid "Edit environment"
-msgstr "환경 편집"
+msgid "Edit Environment Variable"
+msgstr "환경 변수 편집"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "파일은 묻지 않고 편집하고 명령 전에는 확인"
@@ -8019,6 +8117,12 @@ msgstr "정수 입력"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "{minHours}에서 {maxHours} GB 시간 사이의 정수를 입력하세요."
 
+msgid "Enter new value"
+msgstr "새 값 입력"
+
+msgid "Enter this code on the page we opened:"
+msgstr "열린 페이지에 이 코드를 입력하세요:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI가 요청하면 이 코드를 입력하세요:"
 
@@ -8048,6 +8152,9 @@ msgstr "환경 설정, 불안정한 테스트, 자격 증명 연결처럼 2025�
 
 msgid "Environment Variables"
 msgstr "환경 변수"
+
+msgid "Environment's size"
+msgstr "환경 크기"
 
 msgid "Environments"
 msgstr "환경"
@@ -8480,6 +8587,9 @@ msgstr "계정을 삭제하지 못했습니다"
 msgid "Failed to delete automation"
 msgstr "자동화를 삭제하지 못했습니다"
 
+msgid "Failed to delete environment variable"
+msgstr "환경 변수를 삭제하지 못했습니다"
+
 msgid "Failed to delete host"
 msgstr "호스트를 삭제하지 못했습니다"
 
@@ -8598,6 +8708,9 @@ msgstr "답글을 게시하지 못했습니다"
 msgid "Failed to push branch"
 msgstr "브랜치를 푸시하지 못했습니다"
 
+msgid "Failed to read file."
+msgstr "파일을 읽지 못했습니다."
+
 msgid "Failed to record page version"
 msgstr "페이지 버전을 기록하지 못했습니다"
 
@@ -8691,6 +8804,9 @@ msgstr "워크스페이스 명령을 실행하지 못했습니다"
 msgid "Failed to save"
 msgstr "저장하지 못했습니다"
 
+msgid "Failed to save environment variables"
+msgstr "환경 변수를 저장하지 못했습니다"
+
 msgid "Failed to save installation. Please try again."
 msgstr "설치를 저장하지 못했습니다. 다시 시도해 주세요."
 
@@ -8756,6 +8872,9 @@ msgstr "아바타를 업데이트하지 못했습니다"
 
 msgid "Failed to update branch prefix"
 msgstr "브랜치 접두사를 업데이트하지 못했습니다"
+
+msgid "Failed to update environment variable"
+msgstr "환경 변수를 업데이트하지 못했습니다"
 
 msgid "Failed to update hooks"
 msgstr "훅을 업데이트하지 못했습니다"
@@ -8898,6 +9017,12 @@ msgstr "파일을 찾을 수 없습니다"
 msgid "File open mode"
 msgstr "파일 열기 방식"
 
+msgid "File opens when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 파일을 엽니다"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "파일이 너무 큽니다. 최대 크기는 256KB입니다."
+
 msgid "File viewer"
 msgstr "파일 뷰어"
 
@@ -8915,6 +9040,9 @@ msgstr "파일 및 편집기"
 
 msgid "Files changed"
 msgstr "변경된 파일"
+
+msgid "Files load when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 파일을 불러옵니다"
 
 msgid "files to exclude (glob)"
 msgstr "제외할 파일(glob)"
@@ -9050,6 +9178,9 @@ msgstr "완료 · 7초 작업"
 
 msgid "Finishing the move…"
 msgstr "이동을 마무리하는 중…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "처음이신가요? <0>ChatGPT 설정</0>에서 기기 코드 로그인을 켜세요."
 
 msgid "Fit"
 msgstr "맞춤"
@@ -10192,6 +10323,9 @@ msgstr "타인 사칭"
 msgid "Import"
 msgstr "가져오기"
 
+msgid "Import .env"
+msgstr ".env 가져오기"
+
 msgid "import a folder"
 msgstr "폴더를 가져올"
 
@@ -10930,6 +11064,9 @@ msgstr "새 파일을 유지했습니다, 생성 후 내용이 바뀌었습니�
 msgid "Kept the new folder because it is no longer empty"
 msgstr "새 폴더를 유지했습니다, 더 이상 비어 있지 않습니다"
 
+msgid "Key"
+msgstr "키"
+
 msgid "Key dates"
 msgstr "주요 일정"
 
@@ -11074,6 +11211,9 @@ msgstr "마지막 확인: {lastSeen}"
 
 msgid "Last updated"
 msgstr "최종 업데이트"
+
+msgid "Last Updated"
+msgstr "마지막 업데이트"
 
 msgid "Last updated on {date}"
 msgstr "마지막 업데이트: {date}"
@@ -11665,9 +11805,6 @@ msgstr "머신 리소스"
 msgid "Machine size"
 msgstr "머신 크기"
 
-msgid "Machine size: {label}"
-msgstr "머신 크기: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "머신에 묶이지 않는 클라우드 워크스페이스를 몇 초 만에 띄우고 팀원과 공유할 수 있습니다."
 
@@ -11724,6 +11861,9 @@ msgstr "계정 관리…"
 
 msgid "Manage billing"
 msgstr "결제 관리"
+
+msgid "Manage environment"
+msgstr "환경 관리"
 
 msgid "Manage environments"
 msgstr "환경 관리"
@@ -11943,6 +12083,10 @@ msgstr "메모리"
 
 msgid "Memory share"
 msgstr "메모리 점유율"
+
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "메모리 부족 상태"
 
 msgid "Mention."
 msgstr "멘션."
@@ -12337,6 +12481,10 @@ msgstr "수수께끼의 기계공"
 msgid "Name"
 msgstr "이름"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "이름"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "이름과 URL에 쓰기 좋은 슬러그를 정하세요. 둘 다 나중에 바꿀 수 있습니다."
 
@@ -12687,6 +12835,9 @@ msgstr "활성 워크스페이스 없음"
 msgid "No agent"
 msgstr "에이전트 없음"
 
+msgid "No agent is available to set up the environment"
+msgstr "환경을 설정할 수 있는 에이전트가 없습니다"
+
 msgid "No agent is configured on this host"
 msgstr "이 호스트에 구성된 에이전트가 없습니다"
 
@@ -12834,6 +12985,9 @@ msgstr "아직 다운로드가 없습니다"
 
 msgid "No emoji found"
 msgstr "이모지를 찾을 수 없음"
+
+msgid "No environment variables yet"
+msgstr "아직 환경 변수가 없습니다"
 
 msgid "No environments available"
 msgstr "사용 가능한 환경 없음"
@@ -12990,6 +13144,9 @@ msgstr "일치하는 풀 리퀘스트가 없습니다"
 
 msgid "No matching tasks"
 msgstr "일치하는 작업이 없습니다"
+
+msgid "No matching variables"
+msgstr "일치하는 변수가 없습니다"
 
 msgid "No MCP servers found"
 msgstr "MCP 서버를 찾을 수 없음"
@@ -13178,6 +13335,9 @@ msgstr "지정된 리뷰어 없음"
 msgid "No reviewers assigned yet."
 msgstr "아직 지정된 리뷰어가 없습니다."
 
+msgid "No reviewers found."
+msgstr "리뷰어를 찾을 수 없습니다."
+
 msgid "No reviews"
 msgstr "리뷰 없음"
 
@@ -13295,8 +13455,8 @@ msgstr "이 기기에서 v1 프로젝트를 찾을 수 없습니다."
 msgid "No v1 terminal scripts found."
 msgstr "v1 터미널 스크립트를 찾을 수 없습니다."
 
-msgid "No variables set yet."
-msgstr "아직 설정된 변수가 없습니다."
+msgid "No valid environment variables found in file"
+msgstr "파일에서 유효한 환경 변수를 찾지 못했습니다"
 
 msgid "No versions yet"
 msgstr "아직 버전이 없습니다"
@@ -13693,6 +13853,9 @@ msgstr "하나의 플러그인. 모든 코딩 에이전트."
 msgid "One step left"
 msgstr "한 단계 남았습니다"
 
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "변수 하나를 저장할 수 없습니다. 강조 표시된 행을 확인하세요"
+
 msgid "online"
 msgstr "온라인"
 
@@ -13943,8 +14106,17 @@ msgstr "ChatGPT 관리자 설정 열기"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT 설정 열기"
 
+msgid "Open ChatGPT to sign in"
+msgstr "ChatGPT를 열어 로그인"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code, Codex, OpenCode 및 Pi 세션을 채팅으로 열기"
+
+msgid "Open claude.ai again"
+msgstr "claude.ai 다시 열기"
+
+msgid "Open claude.ai to sign in"
+msgstr "claude.ai를 열어 로그인"
 
 msgid "Open Command Palette"
 msgstr "명령 팔레트 열기"
@@ -14348,6 +14520,9 @@ msgstr "선택 사항입니다. 무엇이 효과적인지 파악하는 데 도�
 msgid "Options"
 msgstr "옵션"
 
+msgid "or paste .env contents in Key input"
+msgstr "또는 .env 내용을 키 입력란에 붙여 넣기"
+
 msgid "Orange"
 msgstr "주황"
 
@@ -14377,6 +14552,9 @@ msgstr "조직 {id}"
 
 msgid "Organization created successfully!"
 msgstr "조직을 만들었습니다!"
+
+msgid "Organization default ({defaultName})"
+msgstr "조직 기본값 ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "조직을 삭제했습니다"
@@ -14453,6 +14631,18 @@ msgstr "투자자"
 
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "2026년 8월 기준, 우리 팀과 가까이 지켜보는 팀들을 바탕으로 한 판단입니다. F3은 대부분 열렸고, F4는 대부분 닫혀 있습니다. 그 간극이 곧 해야 할 일입니다."
+
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "메모리 부족"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "메모리 부족: 머신이 곧 응답하지 않을 수 있습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "메모리 부족: 머신이 계속 실행되도록 {0}({1} GB)을(를) 중지했습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
 
 msgid "Out of scope"
 msgstr "범위를 벗어남"
@@ -14834,6 +15024,12 @@ msgstr "붙여넣기"
 msgid "Paste a link"
 msgstr "링크 붙여넣기"
 
+msgid "Paste an API key instead"
+msgstr "대신 API 키 붙여 넣기"
+
+msgid "Paste the code"
+msgstr "코드 붙여 넣기"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Paradev CLI에 붙여 넣으세요:"
 
@@ -15038,8 +15234,8 @@ msgstr "{hostName}에서 새 프로젝트 폴더를 선택하세요."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "{hostName}에서 프로젝트 worktree 폴더를 선택하세요."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "체크아웃할 리포지토리를 고르세요. 이 컴퓨터의 에이전트가 무엇을 설치할지 파악해 클라우드에서 실행되게 합니다."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "체크아웃할 저장소를 선택하세요. 클라우드 워크스페이스의 에이전트가 설치할 항목을 파악하고 실행되도록 합니다."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}에서 worktree 폴더를 선택하세요."
@@ -15143,6 +15339,9 @@ msgstr "조직을 선택해 주세요"
 msgid "Please try again, or restart Paradev on that device."
 msgstr "다시 시도하거나 해당 기기에서 Paradev를 다시 시작해 주세요."
 
+msgid "Please upload a valid .env file."
+msgstr "유효한 .env 파일을 업로드하세요."
+
 msgid "Plugin"
 msgstr "플러그인"
 
@@ -15210,11 +15409,6 @@ msgstr "PR"
 
 msgid "PR {position} of {size} · targets {base}"
 msgstr "PR {position}/{size} · 대상 {base}"
-
-#. placeholder {0}: pullRequest.number
-#. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} · {1}"
-msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -16669,6 +16863,9 @@ msgstr "크기 조절 가능"
 msgid "Resize panel"
 msgstr "패널 크기 조정"
 
+msgid "Resize to {suggestedName}"
+msgstr "{suggestedName}(으)로 변경"
+
 msgid "Resolve"
 msgstr "해결"
 
@@ -16766,8 +16963,14 @@ msgstr "호스트 서비스 {restartedOrgCount}개를 재시작했습니다"
 msgid "Restarted 1 host service"
 msgstr "호스트 서비스 1개를 재시작했습니다"
 
+msgid "Restarted at {label}"
+msgstr "{label}(으)로 다시 시작했습니다"
+
 msgid "Restarting"
 msgstr "다시 시작 중"
+
+msgid "Restarting {label}…"
+msgstr "{label} 다시 시작하는 중…"
 
 msgid "Restarting {what}"
 msgstr "{what} 다시 시작 중"
@@ -16960,6 +17163,9 @@ msgstr "리뷰 무시됨"
 msgid "Review each failure before deciding whether to continue."
 msgstr "계속할지 결정하기 전에 각 실패를 확인하세요."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 검토를 불러옵니다"
+
 msgid "Review message"
 msgstr "리뷰 메시지"
 
@@ -16998,6 +17204,12 @@ msgstr "리뷰함"
 
 msgid "Reviewed by you"
 msgstr "내가 리뷰함"
+
+msgid "Reviewer"
+msgstr "리뷰어"
+
+msgid "Reviewer: {label}"
+msgstr "리뷰어: {label}"
 
 msgid "Reviewers"
 msgstr "리뷰어"
@@ -17293,8 +17505,14 @@ msgstr "저장"
 msgid "Save & create workspace"
 msgstr "저장 후 워크스페이스 만들기"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "{name}에 체크포인트를 저장할까요?"
+
 msgid "Save All"
 msgstr "모두 저장"
+
+msgid "Save and continue"
+msgstr "저장하고 계속"
 
 msgid "Save as environment"
 msgstr "환경으로 저장"
@@ -17304,6 +17522,9 @@ msgstr "뷰로 저장"
 
 msgid "Save Changes"
 msgstr "변경사항 저장"
+
+msgid "Save checkpoint"
+msgstr "체크포인트 저장"
 
 msgid "Save edits"
 msgstr "편집 저장"
@@ -17345,8 +17566,20 @@ msgstr "저장됨"
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\"을(를) 환경으로 저장했습니다"
 
+msgid "Saved {name}"
+msgstr "{name} 저장됨"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name}을(를) 저장했지만 설정용 워크스페이스를 시작할 수 없습니다: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "다운로드 폴더에 저장했습니다"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "설치된 모든 것을 포함해 이 워크스페이스의 현재 상태를 저장합니다. {name}에서 만드는 새 워크스페이스는 이 체크포인트에서 시작합니다. 저장하는 동안 워크스페이스가 잠시 멈춥니다."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "{name}에 체크포인트 저장 중..."
 
 msgid "Saving as an environment..."
 msgstr "환경으로 저장하는 중..."
@@ -17578,6 +17811,9 @@ msgstr "리포지토리 검색..."
 msgid "Search results"
 msgstr "검색 결과"
 
+msgid "Search reviewers…"
+msgstr "리뷰어 검색…"
+
 msgid "Search settings..."
 msgstr "설정 검색..."
 
@@ -17779,9 +18015,6 @@ msgstr "에이전트 선택"
 msgid "Select an editor from the dropdown"
 msgstr "드롭다운에서 편집기를 선택하세요"
 
-msgid "Select an environment"
-msgstr "환경을 선택하세요"
-
 msgid "Select an organization"
 msgstr "조직을 선택하세요"
 
@@ -17962,6 +18195,12 @@ msgstr "보내는 중…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "터미널 컨텍스트 {0}자(약 {1} 토큰)를 {2}에 보냅니다."
 
+msgid "Sensitive"
+msgstr "민감"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "민감한 값은 암호화되며 저장 후에는 표시할 수 없습니다."
+
 msgid "Sent"
 msgstr "보낸 날짜"
 
@@ -18037,9 +18276,6 @@ msgstr "세션"
 msgid "Sessions · top {0} by cost"
 msgstr "세션 · 비용 상위 {0}개"
 
-msgid "Set"
-msgstr "설정됨"
-
 msgid "Set a notification schedule"
 msgstr "알림 일정 설정"
 
@@ -18081,6 +18317,9 @@ msgstr "SSH로 호스트 설정"
 
 msgid "Set up an automation"
 msgstr "자동화 설정하기"
+
+msgid "Set up Environment"
+msgstr "환경 설정"
 
 msgid "Set up once"
 msgstr "한 번만 설정"
@@ -18477,6 +18716,9 @@ msgstr "한 번만 로그인하세요. 연결은 Paradev가 유지합니다."
 msgid "Sign in to {0}"
 msgstr "{0}에 로그인"
 
+msgid "Sign in to {label}"
+msgstr "{label}에 로그인"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "조직 플러그인을 변경하려면 로그인하세요."
 
@@ -18572,6 +18814,9 @@ msgstr "ChatGPT에 로그인됨"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "{connectedAs}(으)로 ChatGPT에 로그인됨"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "로그인했지만 {label}이(가) 다시 시작되지 않았습니다."
+
 msgid "Signed out"
 msgstr "로그아웃됨"
 
@@ -18580,6 +18825,9 @@ msgstr "로그인한 사이트"
 
 msgid "Signing in..."
 msgstr "로그인하는 중..."
+
+msgid "Signing in…"
+msgstr "로그인하는 중…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "가입이 잘 됩니다. 환영 화면이 열리고 콘솔에 오류가 없습니다."
@@ -18604,6 +18852,9 @@ msgstr "업데이트 시뮬레이션: 준비 완료"
 
 msgid "Simulator"
 msgstr "시뮬레이터"
+
+msgid "Simulator starts when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 시뮬레이터를 시작합니다"
 
 msgid "Since 2025"
 msgstr "2025년부터"
@@ -18632,9 +18883,6 @@ msgstr "공장 자율성의 여섯 단계"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "공장 자율성의 여섯 단계, 그 사이의 관문, 그리고 2026년에 어디까지 갈지에 대한 전망입니다. 나중에 채점할 수 있도록 지금 적어 둡니다."
 
-msgid "size"
-msgstr "크기"
-
 msgid "Size"
 msgstr "크기"
 
@@ -18658,6 +18906,9 @@ msgstr "피부색"
 
 msgid "Skip"
 msgstr "건너뛰기"
+
+msgid "Skip & save"
+msgstr "건너뛰고 저장"
 
 msgid "Skip All"
 msgstr "모두 건너뛰기"
@@ -19059,6 +19310,9 @@ msgstr "새 채팅 시작"
 msgid "Start a session"
 msgstr "세션 시작"
 
+msgid "Start agent"
+msgstr "에이전트 시작"
+
 msgid "Start agents on events or a schedule"
 msgstr "이벤트나 일정으로 에이전트 시작"
 
@@ -19174,6 +19428,9 @@ msgstr "{date} 시작"
 msgid "Starts a fresh session in this workspace"
 msgstr "이 워크스페이스에서 새 세션을 시작합니다"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "다음에 깨어날 때 {label}(으)로 시작합니다"
+
 msgid "State"
 msgstr "상태"
 
@@ -19277,6 +19534,11 @@ msgstr "중지됨"
 msgid "Stopped"
 msgstr "중지됨"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "메모리를 확보하려고 {0}({1} GB)을(를) 중지했습니다"
+
 msgid "Stopped by the usage limit"
 msgstr "사용량 한도로 중단됨"
 
@@ -19355,6 +19617,10 @@ msgstr "성공!"
 msgid "Successful runs <0>· 7d</0>"
 msgstr "성공한 실행 <0>· 7일</0>"
 
+msgid "Suggested"
+msgstr "추천"
+
+msgctxt "machine size"
 msgid "Suggested"
 msgstr "추천"
 
@@ -19820,6 +20086,9 @@ msgstr "터미널 세션을 종료했습니다"
 msgid "Terminal sessions"
 msgstr "터미널 세션"
 
+msgid "Terminal starts when the workspace wakes up"
+msgstr "워크스페이스가 깨어나면 터미널을 시작합니다"
+
 msgid "Terminal theme color-palette preview"
 msgstr "터미널 테마 색상 팔레트 미리 보기"
 
@@ -19967,6 +20236,9 @@ msgstr "자동화 소유자가 더 이상 이 조직에서 클라우드 워크�
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "최고의 에이전트는 바뀝니다.<0/>워크플로는 그럴 필요 없습니다."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "머신이 {wanted} vCPU가 아닌 {actual} vCPU로 시작되었습니다. 다시 시작해 보세요."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
@@ -21195,6 +21467,9 @@ msgstr "다른 검색어를 쓰거나 다른 위치를 선택해 보세요."
 msgid "Try again"
 msgstr "다시 시도"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "다시 시도하거나, 이 창을 닫고 채팅에서 계속을 누르세요."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "다시 시도하거나 Paradev 트레이 메뉴에서 호스트 서비스를 다시 시작해 주세요."
 
@@ -21254,6 +21529,10 @@ msgstr "양손"
 
 msgid "Type"
 msgstr "타입"
+
+msgctxt "sort order"
+msgid "Type"
+msgstr "유형"
 
 msgid "Type @linear in any prompt."
 msgstr "어떤 프롬프트에서든 @linear를 입력하세요."
@@ -21628,6 +21907,9 @@ msgstr "두 컴퓨터의 호스트 서비스를 업데이트한 후 다시 시�
 msgid "Update the host service on this device and try again."
 msgstr "이 기기의 호스트 서비스를 업데이트한 후 다시 시도하세요."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "<0>{key}</0>의 값 업데이트"
+
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
 
@@ -21643,6 +21925,9 @@ msgstr "{0} 업데이트됨"
 
 msgid "Updated {date}"
 msgstr "{date} 업데이트"
+
+msgid "Updated {key}"
+msgstr "{key} 업데이트됨"
 
 msgid "Updated {updatedRelative}"
 msgstr "{updatedRelative} 업데이트됨"
@@ -21816,6 +22101,12 @@ msgstr "Paradev API를 호출할 때 사용하세요."
 msgid "Use voice transcription and push-to-talk features."
 msgstr "음성 받아쓰기와 푸시 투 토크 기능을 사용합니다."
 
+msgid "Use your ChatGPT plan."
+msgstr "ChatGPT 요금제를 사용합니다."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Claude Pro 또는 Max 요금제를 사용합니다."
+
 msgid "Used"
 msgstr "사용됨"
 
@@ -21861,6 +22152,9 @@ msgstr "user@host, ssh://user@host:2222 또는 ssh 설정 별칭"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId가 워크스페이스의 프로젝트와 일치하지 않습니다"
+
+msgid "Value"
+msgstr "값"
 
 msgid "Variables"
 msgstr "변수"
@@ -22053,6 +22347,10 @@ msgstr "VS Code"
 msgid "Wait for workspace setup before starting agents"
 msgstr "에이전트를 시작하기 전에 워크스페이스 설정 기다리기"
 
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "지난 1분 중 {0}% 동안 CPU 대기"
+
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
@@ -22063,6 +22361,9 @@ msgstr "활동 데이터 대기 중"
 
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "승인을 기다리는 중입니다. 이 대화 상자를 열어 두세요."
+
+msgid "Waiting for approval…"
+msgstr "승인을 기다리는 중…"
 
 msgid "Waiting for Checks"
 msgstr "검사 대기 중"
@@ -22120,6 +22421,9 @@ msgstr "길 찾기와 정보 펼침"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "우리는 공개적으로 만듭니다. 대화하기 전에 우리가 일하는 방식을 확인하세요."
+
+msgid "We check it with the provider before we save it."
+msgstr "저장하기 전에 제공업체에서 확인합니다."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "{amountDue}을(를) 청구하지 못했습니다. 이 플랜을 유지하려면 결제 수단을 업데이트하세요."
@@ -22855,6 +23159,9 @@ msgstr "이 터미널에 접근할 권한이 없습니다."
 msgid "You don't have permission to remove this member"
 msgstr "이 멤버를 제거할 권한이 없습니다"
 
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "저장하지 않은 환경 변수가 있습니다. 정말 닫을까요?"
+
 msgid "You install and connect once per account."
 msgstr "설치와 연결은 계정당 한 번만 하면 됩니다."
 
@@ -22958,6 +23265,9 @@ msgstr "내 변경 내용"
 msgid "Your changes will be lost if you don't save them."
 msgstr "저장하지 않으면 변경 사항이 사라집니다."
 
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "채팅 기록은 유지됩니다. 에이전트만 다시 시작됩니다."
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "클라우드 워크스페이스가 더 이상 이 호스트에 접근할 수 없습니다."
 
@@ -22985,6 +23295,9 @@ msgstr "GitHub 링크는 로그인에 사용한 계정에서 가져오므로 확
 
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "최근 결제에 실패했습니다. Pro를 유지하려면 결제 수단을 업데이트하세요."
+
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "계정이 사용량 또는 지출 한도에 도달하여 모델 제공업체가 이 요청을 중지했습니다. 한도가 재설정될 때까지 기다리거나, 제공업체에서 한도를 높이거나, 사용량 설정에서 다른 계정으로 전환하세요."
 
 msgid "Your name"
 msgstr "이름"

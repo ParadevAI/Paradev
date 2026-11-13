@@ -1,7 +1,4 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
 import { AvatarStack } from "@superset/ui/atoms/AvatarStack";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
@@ -26,13 +23,13 @@ import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
+import { useBoxPressure } from "renderer/stores/box-pressure";
 import { useInlineWorkspacePortsEnabled } from "renderer/stores/inline-workspace-ports";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 import type { ActivePaneStatus } from "shared/tabs-types";
 import type {
 	DashboardSidebarWorkspace,
 	DashboardSidebarWorkspaceIndentation,
-	DashboardSidebarWorkspacePullRequest,
 } from "../../../../types";
 import { DashboardSidebarWorkspaceQueuedBadge } from "../DashboardSidebarWorkspaceQueuedBadge";
 import { DashboardSidebarOpenCloudHostGlyph } from "./components/DashboardSidebarOpenCloudHostGlyph";
@@ -41,28 +38,6 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
-
-const PR_STATE_LABEL: Record<
-	DashboardSidebarWorkspacePullRequest["state"],
-	MessageDescriptor
-> = {
-	open: msg({
-		message: "Open",
-		context: "status",
-	}),
-	merged: msg({
-		message: "Merged",
-	}),
-	closed: msg({
-		message: "Closed",
-	}),
-	draft: msg({
-		message: "Draft",
-	}),
-	queued: msg({
-		message: "Queued",
-	}),
-};
 
 interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
@@ -157,6 +132,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 
 		const creationStatusText = isPending ? t({ message: "Creating…" }) : null;
 		const isCloudWorkspace = hostType === "cloud";
+		const boxPressure = useBoxPressure(isCloudWorkspace ? workspace.id : null);
 		const closeLabel = isCloudWorkspace
 			? t({ message: "Archive workspace" })
 			: t({ message: "Delete workspace" });
@@ -237,64 +213,37 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<HiCheck className="size-3.5" />
 						</span>
 					) : showsPullRequest && pullRequest ? (
-						<Tooltip delayDuration={500}>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={(event) => {
-										event.stopPropagation();
-										// Lands in the workspace with its PR pane open, rather
-										// than on GitHub; the pane keeps the GitHub link.
-										openPullRequestLink(
-											pullRequest.url,
-											linkPolicy.getAction(event),
-											(ref, placement) => {
-												usePullRequestPaneIntent.getState().request({
-													workspaceId: workspace.id,
-													...ref,
-													placement,
-												});
-												void navigateToV2Workspace(workspace.id, navigate);
-											},
-										);
-									}}
-									onKeyDown={(event) => {
-										if (event.key === "Enter" || event.key === " ") {
-											event.stopPropagation();
-										}
-									}}
-									aria-label={t({
-										message: `Open pull request #${pullRequest.number}`,
-									})}
-									className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
-								>
-									{leadIndicator}
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="right" sideOffset={8}>
-								<p className="text-xs font-medium">
-									<Trans>
-										PR #{pullRequest.number} ·{" "}
-										{i18n._(PR_STATE_LABEL[pullRequest.state])}
-									</Trans>
-								</p>
-								{(sandboxLabel ??
-									(workspaceStatus && getStatusTooltip(workspaceStatus))) && (
-									<p className="text-xs text-muted-foreground">
-										{sandboxLabel ??
-											(workspaceStatus
-												? getStatusTooltip(workspaceStatus)
-												: null)}
-									</p>
-								)}
-								<p className="text-xs text-muted-foreground">
-									<Trans>Click to open the pull request</Trans>
-								</p>
-								<p className="text-xs text-muted-foreground">
-									{linkPolicy.hint}
-								</p>
-							</TooltipContent>
-						</Tooltip>
+						<button
+							type="button"
+							onClick={(event) => {
+								event.stopPropagation();
+								// Lands in the workspace with its PR pane open, rather
+								// than on GitHub; the pane keeps the GitHub link.
+								openPullRequestLink(
+									pullRequest.url,
+									linkPolicy.getAction(event),
+									(ref, placement) => {
+										usePullRequestPaneIntent.getState().request({
+											workspaceId: workspace.id,
+											...ref,
+											placement,
+										});
+										void navigateToV2Workspace(workspace.id, navigate);
+									},
+								);
+							}}
+							onKeyDown={(event) => {
+								if (event.key === "Enter" || event.key === " ") {
+									event.stopPropagation();
+								}
+							}}
+							aria-label={t({
+								message: `Open pull request #${pullRequest.number}`,
+							})}
+							className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
+						>
+							{leadIndicator}
+						</button>
 					) : sandboxLabel || (workspaceStatus && !isPending) ? (
 						<Tooltip delayDuration={500}>
 							<TooltipTrigger asChild>
@@ -422,6 +371,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 										<DashboardSidebarWorkspaceHostGlyph
 											hostType={hostType}
 											hostIsOnline={hostIsOnline}
+											pressure={boxPressure?.level ?? null}
 										/>
 									)}
 								</span>

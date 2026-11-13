@@ -557,6 +557,11 @@ msgstr "Не пройдено {0} з {1} перевірок"
 msgid "{0} of {1} checks running"
 msgstr "Виконується {0} з {1} перевірок"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} з {1} ГБ"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0} з {totalCount}"
@@ -978,6 +983,9 @@ msgstr "Хостів зі старішою службою хоста, ніж у 
 msgid "{count} selected"
 msgstr "Вибрано: {count}"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "Не можна зберегти змінні ({count}). Див. виділені рядки"
+
 msgid "{count}/day"
 msgstr "{count}/день"
 
@@ -1125,6 +1133,9 @@ msgstr "{lines, plural, one {# рядок} few {# рядки} many {# рядкі
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (цей пристрій)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (немає у вашому тарифі)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -1879,6 +1890,9 @@ msgstr "Для рутини потрібен розклад або щось, з�
 msgid "A run for this automation is already in progress."
 msgstr "Запуск цієї автоматизації вже триває."
 
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "Запущена машина перезапуститься. Файли й незакомічені зміни збережуться. Стартові сервіси проєкту й сесії агентів запустяться знову; усе інше, що працює в терміналі, зупиниться."
+
 msgid "A selection of integrations curated by our team."
 msgstr "Добірка інтеграцій від нашої команди."
 
@@ -2109,6 +2123,9 @@ msgstr "додати агента"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "Перш ніж створювати хмарний робочий простір, додайте середовище в налаштуваннях"
 
+msgid "Add Another"
+msgstr "Додати ще"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Додайте ще один обліковий запис або від'єднайте той, яким більше не користуєтеся."
 
@@ -2135,6 +2152,9 @@ msgstr "Додати опис"
 
 msgid "Add description..."
 msgstr "Додайте опис..."
+
+msgid "Add Environment Variable"
+msgstr "Додати змінну середовища"
 
 msgid "Add extension"
 msgstr "Додати розширення"
@@ -2172,6 +2192,9 @@ msgstr "Додати ще…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Додайте агента з меню на бічній панелі, щоб почати."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "Додайте одну або кілька змінних середовища. Можна також перетягнути файл .env."
 
 msgid "Add people"
 msgstr "Додати людей"
@@ -2284,8 +2307,17 @@ msgstr "Додано {added}"
 msgid "Added {added} files to {where}"
 msgstr "У {where} додано файлів: {added}"
 
+msgid "Added {addedOn}"
+msgstr "Додано {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "Додано {bought} ГБ-год."
+
+msgid "Added {count} environment variables"
+msgstr "Додано змінних середовища: {count}"
+
+msgid "Added {key}"
+msgstr "{key} додано"
 
 msgid "Added 1 file to {where}"
 msgstr "У {where} додано 1 файл"
@@ -2781,8 +2813,14 @@ msgstr "Завжди знайте, якому агенту ви потрібні
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
 
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "Агент налаштує це середовище в хмарному робочому просторі (близько 20 хвилин або довше): встановить залежності, запише конфігурацію й попросить потрібні секрети. Його можна перервати будь-коли або продовжити роботу в робочому просторі й завершити налаштування самостійно."
+
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Агент пише цілі функції й файли, а людина стежить за кожним кроком і схвалює кожну команду. Один агент, одна людина. Швидше, але все ще послідовно."
+
+msgid "An Anthropic API key."
+msgstr "Ключ API Anthropic."
 
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Автоматизація може використовувати лише хмарний робочий простір, який створили ви"
@@ -2795,6 +2833,9 @@ msgstr "Сталася помилка"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "Ізольований git worktree, де агент працює, не зачіпаючи вашу основну робочу копію."
+
+msgid "An OpenAI API key."
+msgstr "Ключ API OpenAI."
 
 msgid "An unknown error occurred"
 msgstr "Сталася невідома помилка"
@@ -2906,6 +2947,9 @@ msgstr "будь-який одержувач"
 
 msgid "Any review"
 msgstr "Будь-яке рев'ю"
+
+msgid "Any reviewer"
+msgstr "Будь-який рецензент"
 
 msgid "any sender"
 msgstr "будь-який відправник"
@@ -3870,6 +3914,9 @@ msgstr "Входить до застосунку Paradev на цьому при�
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Входить до застосунку Paradev на цьому пристрої. Оновлюється разом із застосунком."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Тариф Business"
 
@@ -4149,6 +4196,9 @@ msgstr "Змінити значок"
 msgid "Change location"
 msgstr "Змінити розташування"
 
+msgid "Change machine size"
+msgstr "Змінити розмір машини"
+
 msgid "Change model"
 msgstr "Змінити модель"
 
@@ -4190,6 +4240,9 @@ msgstr "Змінити статус «{0}»"
 msgid "Change to {0}"
 msgstr "Змінити на {0}"
 
+msgid "Change to {pendingName}"
+msgstr "Перейти на {pendingName}"
+
 msgid "Change to Annual"
 msgstr "Перейти на річну оплату"
 
@@ -4211,6 +4264,9 @@ msgstr "Журнал змін"
 msgid "Changes"
 msgstr "Зміни"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Зміни завантажаться, коли робочий простір прокинеться"
+
 msgid "Changes open target"
 msgstr "Де відкривати зміни"
 
@@ -4222,6 +4278,9 @@ msgstr "Запитано зміни"
 
 msgid "Changes saved"
 msgstr "Зміни збережено"
+
+msgid "Changing to {label}…"
+msgstr "Перехід на {label}…"
 
 msgid "Changing..."
 msgstr "Зміна..."
@@ -4353,6 +4412,9 @@ msgstr "Щоб переключитися на PR, потрібен проєкт
 msgid "Checking pull requests in {what}"
 msgstr "Перевірка пул-реквестів у {what}"
 
+msgid "Checking with the provider."
+msgstr "Перевірка в постачальника."
+
 msgid "Checking workspaces"
 msgstr "Перевірка робочих просторів"
 
@@ -4377,6 +4439,9 @@ msgstr "Контрольна точка · до рефакторингу під�
 #. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
 msgid "Checkpoint saved {0}"
 msgstr "Контрольну точку збережено {0}"
+
+msgid "Checkpoint saved to {name}"
+msgstr "Контрольну точку збережено в {name}"
 
 msgid "Checks"
 msgstr "Перевірки"
@@ -4613,17 +4678,20 @@ msgstr "Натисніть елемент."
 msgid "Click any element to send it to an agent."
 msgstr "Натисніть будь-який елемент, щоб надіслати його агенту."
 
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "Натисніть Authorize на claude.ai. Потім Anthropic покаже код. Вставте його сюди."
+
 msgid "Click here if not redirected"
 msgstr "Натисніть тут, якщо переспрямування не відбулося"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Натисніть «↑ update», щоб побачити підтвердження перед оновленням"
 
+msgid "Click to copy"
+msgstr "Натисніть, щоб скопіювати"
+
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Натисніть, щоб скопіювати ID сеансу (відновлення: `claude --resume <id>`)."
-
-msgid "Click to open the pull request"
-msgstr "Натисніть, щоб відкрити пул-реквест"
 
 msgid "Click two commits to define the range."
 msgstr "Натисніть два коміти, щоб задати діапазон."
@@ -4874,6 +4942,12 @@ msgstr "Хмарний робочий простір"
 
 msgid "Cloud workspace: connecting"
 msgstr "Хмарний робочий простір: підключення"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Хмарний робочий простір: бракує пам'яті"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Хмарний робочий простір: високе навантаження"
 
 msgid "Cloud workspaces"
 msgstr "Хмарні робочі простори"
@@ -5816,6 +5890,9 @@ msgstr "Не вдалося скопіювати посилання"
 msgid "Could not create cloud workspace"
 msgstr "Не вдалося створити хмарний робочий простір"
 
+msgid "Could not create environment"
+msgstr "Не вдалося створити середовище"
+
 msgid "Could not create project"
 msgstr "Не вдалося створити проєкт"
 
@@ -6096,6 +6173,10 @@ msgstr "Не вдалося створити гілку розмови"
 
 msgid "Couldn't cancel the move"
 msgstr "Не вдалося скасувати перенесення"
+
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Не вдалося змінити розмір машини: {0}"
 
 msgid "Couldn't change the routine"
 msgstr "Не вдалося змінити рутину"
@@ -6420,8 +6501,16 @@ msgstr "Пораховано за змінами файлів, які вніс �
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "Ядра CPU"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "Упирається в CPU"
 
 msgid "Create"
 msgstr "Створити"
@@ -7340,6 +7429,9 @@ msgstr "Огляд змін у diff"
 msgid "diff in new tab"
 msgstr "diff у новій вкладці"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff відкриється, коли робочий простір прокинеться"
+
 msgid "Digital Product Designer"
 msgstr "Дизайнер цифрових продуктів"
 
@@ -7403,6 +7495,9 @@ msgstr "Відкинути зміни?"
 
 msgid "Discard recording"
 msgstr "Відкинути запис"
+
+msgid "Discard unsaved changes?"
+msgstr "Скасувати незбережені зміни?"
 
 msgid "Discarded"
 msgstr "Відкинуто"
@@ -7809,6 +7904,9 @@ msgstr "Отримано: {name} ×{tier}"
 msgid "Edit"
 msgstr "Редагувати"
 
+msgid "Edit {selectedName}"
+msgstr "Редагувати {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "Змінити назву каналу"
 
@@ -7821,8 +7919,8 @@ msgstr "Редагувати опис"
 msgid "Edit Description"
 msgstr "Редагувати опис"
 
-msgid "Edit environment"
-msgstr "Редагувати середовище"
+msgid "Edit Environment Variable"
+msgstr "Редагувати змінну середовища"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Редагувати файли без запиту; питати перед командами"
@@ -8013,6 +8111,12 @@ msgstr "Введіть ціле число"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Введіть ціле число від {minHours} до {maxHours} ГБ-годин."
 
+msgid "Enter new value"
+msgstr "Введіть нове значення"
+
+msgid "Enter this code on the page we opened:"
+msgstr "Введіть цей код на сторінці, яку ми відкрили:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Введіть цей код, коли OpenAI попросить:"
 
@@ -8042,6 +8146,9 @@ msgstr "Налаштування середовища, нестабільні т
 
 msgid "Environment Variables"
 msgstr "Змінні середовища"
+
+msgid "Environment's size"
+msgstr "Розмір середовища"
 
 msgid "Environments"
 msgstr "Середовища"
@@ -8474,6 +8581,9 @@ msgstr "Не вдалося видалити обліковий запис"
 msgid "Failed to delete automation"
 msgstr "Не вдалося видалити автоматизацію"
 
+msgid "Failed to delete environment variable"
+msgstr "Не вдалося видалити змінну середовища"
+
 msgid "Failed to delete host"
 msgstr "Не вдалося видалити хост"
 
@@ -8592,6 +8702,9 @@ msgstr "Не вдалося надіслати відповідь"
 msgid "Failed to push branch"
 msgstr "Не вдалося запушити гілку"
 
+msgid "Failed to read file."
+msgstr "Не вдалося прочитати файл."
+
 msgid "Failed to record page version"
 msgstr "Не вдалося записати версію сторінки"
 
@@ -8685,6 +8798,9 @@ msgstr "Не вдалося виконати команду робочого п�
 msgid "Failed to save"
 msgstr "Не вдалося зберегти"
 
+msgid "Failed to save environment variables"
+msgstr "Не вдалося зберегти змінні середовища"
+
 msgid "Failed to save installation. Please try again."
 msgstr "Не вдалося зберегти встановлення. Спробуйте ще раз."
 
@@ -8750,6 +8866,9 @@ msgstr "Не вдалося оновити аватар"
 
 msgid "Failed to update branch prefix"
 msgstr "Не вдалося оновити префікс гілки"
+
+msgid "Failed to update environment variable"
+msgstr "Не вдалося оновити змінну середовища"
 
 msgid "Failed to update hooks"
 msgstr "Не вдалося оновити хуки"
@@ -8892,6 +9011,12 @@ msgstr "Файл не знайдено"
 msgid "File open mode"
 msgstr "Режим відкриття файлів"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Файл відкриється, коли робочий простір прокинеться"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "Файл завеликий. Максимальний розмір — 256 КБ."
+
 msgid "File viewer"
 msgstr "Переглядач файлів"
 
@@ -8909,6 +9034,9 @@ msgstr "Файли та редактор"
 
 msgid "Files changed"
 msgstr "Змінені файли"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Файли завантажаться, коли робочий простір прокинеться"
 
 msgid "files to exclude (glob)"
 msgstr "файли для виключення (glob)"
@@ -9044,6 +9172,9 @@ msgstr "завершив · працював 7 с"
 
 msgid "Finishing the move…"
 msgstr "Завершення переміщення…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "Уперше? Увімкніть вхід за кодом пристрою в <0>налаштуваннях ChatGPT</0>."
 
 msgid "Fit"
 msgstr "За розміром"
@@ -10186,6 +10317,9 @@ msgstr "Видає себе за іншу особу"
 msgid "Import"
 msgstr "Імпортувати"
 
+msgid "Import .env"
+msgstr "Імпортувати .env"
+
 msgid "import a folder"
 msgstr "імпортувати папку"
 
@@ -10924,6 +11058,9 @@ msgstr "Новий файл збережено, він змінився післ
 msgid "Kept the new folder because it is no longer empty"
 msgstr "Нову папку збережено, вона вже не порожня"
 
+msgid "Key"
+msgstr "Ключ"
+
 msgid "Key dates"
 msgstr "Ключові дати"
 
@@ -11067,6 +11204,9 @@ msgid "Last seen {lastSeen}"
 msgstr "Востаннє в мережі {lastSeen}"
 
 msgid "Last updated"
+msgstr "Останнє оновлення"
+
+msgid "Last Updated"
 msgstr "Останнє оновлення"
 
 msgid "Last updated on {date}"
@@ -11659,9 +11799,6 @@ msgstr "Ресурси машини"
 msgid "Machine size"
 msgstr "Розмір машини"
 
-msgid "Machine size: {label}"
-msgstr "Розмір машини: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Хмарні робочі простори без прив'язки до машини, які запускаються за секунди й якими можна ділитися з колегами."
 
@@ -11718,6 +11855,9 @@ msgstr "Керувати обліковими записами…"
 
 msgid "Manage billing"
 msgstr "Керувати оплатою"
+
+msgid "Manage environment"
+msgstr "Керувати середовищем"
 
 msgid "Manage environments"
 msgstr "Керувати середовищами"
@@ -11937,6 +12077,10 @@ msgstr "Пам'ять"
 
 msgid "Memory share"
 msgstr "Частка пам'яті"
+
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Упирається в пам'ять"
 
 msgid "Mention."
 msgstr "Згадайте."
@@ -12331,6 +12475,10 @@ msgstr "Таємничий верстатник"
 msgid "Name"
 msgstr "Назва"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "Назва"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Назва й slug для URL. Обидва можна змінити пізніше."
 
@@ -12681,6 +12829,9 @@ msgstr "Немає активних робочих просторів"
 msgid "No agent"
 msgstr "Без агента"
 
+msgid "No agent is available to set up the environment"
+msgstr "Немає агента, який може налаштувати середовище"
+
 msgid "No agent is configured on this host"
 msgstr "На цьому хості не налаштовано жодного агента"
 
@@ -12828,6 +12979,9 @@ msgstr "Завантажень ще немає"
 
 msgid "No emoji found"
 msgstr "Емодзі не знайдено"
+
+msgid "No environment variables yet"
+msgstr "Змінних середовища ще немає"
 
 msgid "No environments available"
 msgstr "Немає доступних середовищ"
@@ -12984,6 +13138,9 @@ msgstr "Немає відповідних пул-реквестів"
 
 msgid "No matching tasks"
 msgstr "Немає відповідних завдань"
+
+msgid "No matching variables"
+msgstr "Немає відповідних змінних"
 
 msgid "No MCP servers found"
 msgstr "MCP-серверів не знайдено"
@@ -13172,6 +13329,9 @@ msgstr "Рев'юерів не призначено"
 msgid "No reviewers assigned yet."
 msgstr "Рев'юерів ще не призначено."
 
+msgid "No reviewers found."
+msgstr "Рецензентів не знайдено."
+
 msgid "No reviews"
 msgstr "Немає рев'ю"
 
@@ -13289,8 +13449,8 @@ msgstr "На цьому пристрої не знайдено проєктів 
 msgid "No v1 terminal scripts found."
 msgstr "Скриптів термінала v1 не знайдено."
 
-msgid "No variables set yet."
-msgstr "Змінних ще не задано."
+msgid "No valid environment variables found in file"
+msgstr "У файлі не знайдено коректних змінних середовища"
 
 msgid "No versions yet"
 msgstr "Версій ще немає"
@@ -13687,6 +13847,9 @@ msgstr "Один плагін. Кожен кодинг-агент."
 msgid "One step left"
 msgstr "Залишився один крок"
 
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "Одну змінну не можна зберегти. Див. виділений рядок"
+
 msgid "online"
 msgstr "онлайн"
 
@@ -13937,8 +14100,17 @@ msgstr "Відкрити налаштування адміністратора C
 msgid "Open ChatGPT settings"
 msgstr "Відкрити налаштування ChatGPT"
 
+msgid "Open ChatGPT to sign in"
+msgstr "Відкрити ChatGPT для входу"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Відкривати сеанси Claude Code, Codex, OpenCode і Pi як чати"
+
+msgid "Open claude.ai again"
+msgstr "Знову відкрити claude.ai"
+
+msgid "Open claude.ai to sign in"
+msgstr "Відкрити claude.ai для входу"
 
 msgid "Open Command Palette"
 msgstr "Відкрити палітру команд"
@@ -14342,6 +14514,9 @@ msgstr "Необов'язково. Допомагає нам зрозуміти,
 msgid "Options"
 msgstr "Параметри"
 
+msgid "or paste .env contents in Key input"
+msgstr "або вставте вміст .env у поле «Ключ»"
+
 msgid "Orange"
 msgstr "Помаранчевий"
 
@@ -14371,6 +14546,9 @@ msgstr "Організація {id}"
 
 msgid "Organization created successfully!"
 msgstr "Організацію успішно створено!"
+
+msgid "Organization default ({defaultName})"
+msgstr "Типове для організації ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Організацію видалено"
@@ -14447,6 +14625,18 @@ msgstr "Наші інвестори"
 
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Наша оцінка станом на серпень 2026 року на основі нашої команди й команд, за якими ми уважно стежимо. F3 здебільшого відкритий. F4 здебільшого закритий. Цей розрив і є наша робота."
+
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Бракує пам'яті"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Бракує пам'яті: машина ось-ось перестане відповідати. У {sizeName} {memoryGb} ГБ."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Бракує пам'яті: машина зупинила {0} ({1} ГБ), щоб і далі працювати. У {sizeName} {memoryGb} ГБ."
 
 msgid "Out of scope"
 msgstr "Поза скоупом"
@@ -14828,6 +15018,12 @@ msgstr "Вставити"
 msgid "Paste a link"
 msgstr "Вставте посилання"
 
+msgid "Paste an API key instead"
+msgstr "Натомість вставити ключ API"
+
+msgid "Paste the code"
+msgstr "Вставте код"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Вставте це в Paradev CLI:"
 
@@ -15032,8 +15228,8 @@ msgstr "Виберіть нову папку проєкту на {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Виберіть папку worktree проєкту на {hostName}."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "Виберіть репозиторії, які воно клонує. Агент на цьому комп'ютері з'ясує, що встановити, і запустить усе в хмарі."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "Виберіть репозиторії для завантаження. Агент у хмарному робочому просторі визначить, що встановити, і запустить середовище."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Виберіть папку worktree на {hostName}."
@@ -15137,6 +15333,9 @@ msgstr "Виберіть організацію"
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Спробуйте ще раз або перезапустіть Paradev на тому пристрої."
 
+msgid "Please upload a valid .env file."
+msgstr "Завантажте коректний файл .env."
+
 msgid "Plugin"
 msgstr "Плагін"
 
@@ -15204,11 +15403,6 @@ msgstr "PR"
 
 msgid "PR {position} of {size} · targets {base}"
 msgstr "PR {position} з {size} · у {base}"
-
-#. placeholder {0}: pullRequest.number
-#. placeholder {1}: i18n._(PR_STATE_LABEL[pullRequest.state])
-msgid "PR #{0} · {1}"
-msgstr "PR #{0} · {1}"
 
 #. placeholder {0}: workspace.pr.prNumber
 #. placeholder {1}: workspace.pr.state
@@ -16663,6 +16857,9 @@ msgstr "Змінний розмір"
 msgid "Resize panel"
 msgstr "Змінити розмір панелі"
 
+msgid "Resize to {suggestedName}"
+msgstr "Перейти на {suggestedName}"
+
 msgid "Resolve"
 msgstr "Вирішити"
 
@@ -16760,8 +16957,14 @@ msgstr "Служби хоста перезапущено: {restartedOrgCount}"
 msgid "Restarted 1 host service"
 msgstr "Перезапущено 1 службу хоста"
 
+msgid "Restarted at {label}"
+msgstr "Перезапущено з розміром {label}"
+
 msgid "Restarting"
 msgstr "Перезапуск"
+
+msgid "Restarting {label}…"
+msgstr "Перезапуск {label}…"
 
 msgid "Restarting {what}"
 msgstr "Перезапуск: {what}"
@@ -16954,6 +17157,9 @@ msgstr "Рев'ю відхилено"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Перегляньте кожну помилку, перш ніж вирішувати, чи продовжувати."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Перевірка завантажиться, коли робочий простір прокинеться"
+
 msgid "Review message"
 msgstr "Повідомлення рев'ю"
 
@@ -16992,6 +17198,12 @@ msgstr "провів(-ла) рев'ю"
 
 msgid "Reviewed by you"
 msgstr "Перевірено вами"
+
+msgid "Reviewer"
+msgstr "Рецензент"
+
+msgid "Reviewer: {label}"
+msgstr "Рецензент: {label}"
 
 msgid "Reviewers"
 msgstr "Рев'ювери"
@@ -17287,8 +17499,14 @@ msgstr "Зберегти"
 msgid "Save & create workspace"
 msgstr "Зберегти й створити робочий простір"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Зберегти контрольну точку в {name}?"
+
 msgid "Save All"
 msgstr "Зберегти все"
+
+msgid "Save and continue"
+msgstr "Зберегти й продовжити"
 
 msgid "Save as environment"
 msgstr "Зберегти як середовище"
@@ -17298,6 +17516,9 @@ msgstr "Зберегти як подання"
 
 msgid "Save Changes"
 msgstr "Зберегти зміни"
+
+msgid "Save checkpoint"
+msgstr "Зберегти контрольну точку"
 
 msgid "Save edits"
 msgstr "Зберегти правки"
@@ -17339,8 +17560,20 @@ msgstr "Збережено"
 msgid "Saved \"{0}\" as an environment"
 msgstr "«{0}» збережено як середовище"
 
+msgid "Saved {name}"
+msgstr "{name} збережено"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name} збережено, але не вдалося запустити робочий простір для налаштування: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "Збережено в «Завантаження»"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Зберігає цей робочий простір у поточному стані з усім, що в ньому встановлено. Нові робочі простори з {name} починатимуться з цієї контрольної точки. Під час збереження робочий простір ненадовго зупиниться."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Збереження контрольної точки в {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
@@ -17572,6 +17805,9 @@ msgstr "Пошук репозиторіїв..."
 msgid "Search results"
 msgstr "Результати пошуку"
 
+msgid "Search reviewers…"
+msgstr "Пошук рецензентів…"
+
 msgid "Search settings..."
 msgstr "Пошук..."
 
@@ -17773,9 +18009,6 @@ msgstr "Виберіть агента"
 msgid "Select an editor from the dropdown"
 msgstr "Виберіть редактор зі списку"
 
-msgid "Select an environment"
-msgstr "Виберіть середовище"
-
 msgid "Select an organization"
 msgstr "Виберіть організацію"
 
@@ -17956,6 +18189,12 @@ msgstr "Надсилання…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Надсилає агенту {2} контекст термінала: символів — {0}, токенів — приблизно {1}."
 
+msgid "Sensitive"
+msgstr "Конфіденційно"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "Конфіденційні значення шифруються, і після збереження їх не можна показати."
+
 msgid "Sent"
 msgstr "Надіслано"
 
@@ -18031,9 +18270,6 @@ msgstr "Сеанси"
 msgid "Sessions · top {0} by cost"
 msgstr "Сеанси · топ-{0} за вартістю"
 
-msgid "Set"
-msgstr "Задано"
-
 msgid "Set a notification schedule"
 msgstr "Задати розклад сповіщень"
 
@@ -18075,6 +18311,9 @@ msgstr "Налаштувати хост через SSH"
 
 msgid "Set up an automation"
 msgstr "Налаштуйте автоматизацію"
+
+msgid "Set up Environment"
+msgstr "Налаштувати середовище"
 
 msgid "Set up once"
 msgstr "Налаштуйте один раз"
@@ -18471,6 +18710,9 @@ msgstr "Увійдіть один раз. Paradev збереже підключ�
 msgid "Sign in to {0}"
 msgstr "Увійдіть у {0}"
 
+msgid "Sign in to {label}"
+msgstr "Увійти в {label}"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Увійдіть, щоб змінити плагіни організації."
 
@@ -18566,6 +18808,9 @@ msgstr "Вхід у ChatGPT виконано"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "Виконано вхід у ChatGPT як {connectedAs}"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "Вхід виконано, але {label} не перезапустився."
+
 msgid "Signed out"
 msgstr "Ви вийшли"
 
@@ -18574,6 +18819,9 @@ msgstr "Сайти з виконаним входом"
 
 msgid "Signing in..."
 msgstr "Вхід..."
+
+msgid "Signing in…"
+msgstr "Виконується вхід…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Реєстрація працює. Екран привітання завантажується, у консолі немає помилок."
@@ -18598,6 +18846,9 @@ msgstr "Імітувати оновлення: готово"
 
 msgid "Simulator"
 msgstr "Симулятор"
+
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Симулятор запуститься, коли робочий простір прокинеться"
 
 msgid "Since 2025"
 msgstr "З 2025 року"
@@ -18626,9 +18877,6 @@ msgstr "Шість рівнів автономності фабрики"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Шість рівнів автономності фабрики, пороги між ними та наш прогноз того, як далеко ми просунемося у 2026 році. Записуємо зараз, щоб пізніше ви могли нас оцінити."
 
-msgid "size"
-msgstr "Розмір"
-
 msgid "Size"
 msgstr "Розмір"
 
@@ -18652,6 +18900,9 @@ msgstr "Тон шкіри"
 
 msgid "Skip"
 msgstr "Пропустити"
+
+msgid "Skip & save"
+msgstr "Пропустити й зберегти"
 
 msgid "Skip All"
 msgstr "Пропустити все"
@@ -19053,6 +19304,9 @@ msgstr "Почати новий чат"
 msgid "Start a session"
 msgstr "Почати сеанс"
 
+msgid "Start agent"
+msgstr "Запустити агента"
+
 msgid "Start agents on events or a schedule"
 msgstr "Запускайте агентів за подіями або за розкладом"
 
@@ -19168,6 +19422,9 @@ msgstr "початок {date}"
 msgid "Starts a fresh session in this workspace"
 msgstr "Починає новий сеанс у цьому робочому просторі"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Запуститься з розміром {label} під час наступного пробудження"
+
 msgid "State"
 msgstr "Стан"
 
@@ -19271,6 +19528,11 @@ msgstr "зупинено"
 msgid "Stopped"
 msgstr "Зупинено"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "Зупинено {0} ({1} ГБ), щоб звільнити пам'ять"
+
 msgid "Stopped by the usage limit"
 msgstr "Зупинено через ліміт використання"
 
@@ -19351,6 +19613,10 @@ msgstr "Успішні запуски <0>· 7 дн.</0>"
 
 msgid "Suggested"
 msgstr "Рекомендовані"
+
+msgctxt "machine size"
+msgid "Suggested"
+msgstr "Рекомендовано"
 
 msgid "Suggestions"
 msgstr "Підказки"
@@ -19814,6 +20080,9 @@ msgstr "Сеанс термінала завершено"
 msgid "Terminal sessions"
 msgstr "Сеанси термінала"
 
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Термінал запуститься, коли робочий простір прокинеться"
+
 msgid "Terminal theme color-palette preview"
 msgstr "Попередній перегляд палітри кольорів теми термінала"
 
@@ -19961,6 +20230,9 @@ msgstr "Власник автоматизації більше не може в�
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "Найкращий агент зміниться.<0/>Ваш робочий процес — ні."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "Машина запустилася з {actual} vCPU замість {wanted}. Перезапустіть її, щоб спробувати знову."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Тепер кнопка помітніша. Я перевірив її у вашій панелі."
@@ -21189,6 +21461,9 @@ msgstr "Спробуйте інший пошуковий запит або ін�
 msgid "Try again"
 msgstr "Спробувати знову"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "Спробуйте ще раз або закрийте вікно й натисніть «Продовжити» в чаті."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Спробуйте ще раз або перезапустіть службу хоста з меню Paradev у системному треї."
 
@@ -21246,6 +21521,10 @@ msgstr "Вимкнено, бо його файли змінилися"
 msgid "Two Hands"
 msgstr "Дві руки"
 
+msgid "Type"
+msgstr "Тип"
+
+msgctxt "sort order"
 msgid "Type"
 msgstr "Тип"
 
@@ -21622,6 +21901,9 @@ msgstr "Оновіть хост-службу на обох комп’ютера
 msgid "Update the host service on this device and try again."
 msgstr "Оновіть хост-службу на цьому пристрої та спробуйте ще раз."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "Оновіть значення <0>{key}</0>"
+
 msgid "Update this host to message subagents"
 msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам"
 
@@ -21637,6 +21919,9 @@ msgstr "Оновлено {0}"
 
 msgid "Updated {date}"
 msgstr "Оновлено {date}"
+
+msgid "Updated {key}"
+msgstr "{key} оновлено"
 
 msgid "Updated {updatedRelative}"
 msgstr "Оновлено {updatedRelative}"
@@ -21810,6 +22095,12 @@ msgstr "Використовуйте це під час викликів API Par
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Використовуйте голосове розшифрування та функцію «натисни й говори»."
 
+msgid "Use your ChatGPT plan."
+msgstr "Використовуйте свій план ChatGPT."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Використовуйте свій план Claude Pro або Max."
+
 msgid "Used"
 msgstr "Використано"
 
@@ -21855,6 +22146,9 @@ msgstr "user@host, ssh://user@host:2222 або аліас із конфігур�
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId не відповідає проєкту робочого простору"
+
+msgid "Value"
+msgstr "Значення"
 
 msgid "Variables"
 msgstr "Змінні"
@@ -22047,6 +22341,10 @@ msgstr "VS Code"
 msgid "Wait for workspace setup before starting agents"
 msgstr "Чекати на налаштування робочого простору перед запуском агентів"
 
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "Очікування CPU {0}% останньої хвилини"
+
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
@@ -22057,6 +22355,9 @@ msgstr "Очікування даних про активність"
 
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Очікування схвалення. Не закривайте це вікно."
+
+msgid "Waiting for approval…"
+msgstr "Очікування підтвердження…"
 
 msgid "Waiting for Checks"
 msgstr "Очікування перевірок"
@@ -22114,6 +22415,9 @@ msgstr "Навігація та розкриття"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "Ми розробляємо відкрито, тож ви можете побачити, як ми працюємо, ще до розмови з нами."
+
+msgid "We check it with the provider before we save it."
+msgstr "Ми перевіримо його в постачальника перед збереженням."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "Не вдалося списати {amountDue}. Оновіть спосіб оплати, щоб зберегти цей тариф."
@@ -22849,6 +23153,9 @@ msgstr "У вас немає доступу до цього термінала."
 msgid "You don't have permission to remove this member"
 msgstr "У вас немає дозволу видалити цього учасника"
 
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "У вас є незбережені змінні середовища. Справді закрити?"
+
 msgid "You install and connect once per account."
 msgstr "Встановлення й підключення виконуються один раз для кожного облікового запису."
 
@@ -22952,6 +23259,9 @@ msgstr "Ваші зміни"
 msgid "Your changes will be lost if you don't save them."
 msgstr "Якщо не зберегти зміни, їх буде втрачено."
 
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "Історія чату збережеться. Перезапуститься лише агент."
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Ваші хмарні робочі простори більше не матимуть доступу до цього хоста."
 
@@ -22979,6 +23289,9 @@ msgstr "Ваше посилання на GitHub походить з обліко
 
 msgid "Your last payment failed. Update your payment method to keep Pro."
 msgstr "Ваш останній платіж не вдався. Оновіть спосіб оплати, щоб зберегти Pro."
+
+msgid "Your model provider stopped this request because the account reached its usage or spend limit. Wait for the limit to reset, raise it with your provider, or switch to another account in Usage settings."
+msgstr "Постачальник моделі зупинив цей запит, бо обліковий запис досяг ліміту використання або витрат. Дочекайтеся скидання ліміту, збільште його в постачальника або перейдіть на інший обліковий запис у налаштуваннях використання."
 
 msgid "Your name"
 msgstr "Ваше ім'я"

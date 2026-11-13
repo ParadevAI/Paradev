@@ -58,7 +58,7 @@ export function FinishReviewSheet() {
 	const workspaceId = id ?? "";
 
 	const { workspace, host } = useWorkspaceHost(workspaceId || null);
-	const { terminalsByWorkspace } = useHostTerminals(host);
+	const { terminalsByWorkspace } = useHostTerminals(host, workspaceId);
 	const comments = useDraftCommentsStore(
 		(state) => state.commentsByWorkspace[workspaceId] ?? NO_COMMENTS,
 	);

@@ -2,6 +2,7 @@ import { LinearClient } from "@linear/sdk";
 import { db } from "@superset/db/client";
 import { organizations } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import {
 	connectorMethod,
 	requireConnector,
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
 			grant_type: "authorization_code",
 			client_id: env.LINEAR_CLIENT_ID,
 			client_secret: env.LINEAR_CLIENT_SECRET,
-			redirect_uri: `${env.NEXT_PUBLIC_API_URL}/api/integrations/linear/callback`,
+			redirect_uri: `${getBrowserApiUrl(env)}/api/integrations/linear/callback`,
 			code: params.code,
 		}),
 	});

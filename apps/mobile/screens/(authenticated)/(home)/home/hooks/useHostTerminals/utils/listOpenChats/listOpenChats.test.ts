@@ -72,4 +72,24 @@ describe("listOpenChats", () => {
 		});
 		expect(chats.map((chat) => chat.sessionId)).toEqual(["running"]);
 	});
+
+	test("asks for one workspace's chats when given a workspace", async () => {
+		const asked: unknown[] = [];
+		const chats = await listOpenChats(
+			{
+				listSessions: async (input) => {
+					asked.push(input);
+					return [row("quiet-workspace-chat", "idle", false)];
+				},
+				getSession: async () => {
+					throw new Error("not asked when the host reports live");
+				},
+			},
+			"workspace-1",
+		);
+		expect(asked).toEqual([{ limit: 200, workspaceId: "workspace-1" }]);
+		expect(chats.map((chat) => chat.sessionId)).toEqual([
+			"quiet-workspace-chat",
+		]);
+	});
 });
