@@ -116,11 +116,12 @@ export function TitleBar() {
 					>
 						<NavigationControls />
 						<SidebarToggle />
-						{isOnWorkspace ? (
-							<WorkspaceSwitcherButton />
-						) : (
-							isListPanelCollapsed && <NewWorkspaceButton />
-						)}
+						{isListPanelCollapsed &&
+							(isOnWorkspace ? (
+								<WorkspaceSwitcherButton />
+							) : (
+								<NewWorkspaceButton />
+							))}
 						<PortsDropdown align="start" />
 						<OfflineBadge />
 					</ZoomStable>
