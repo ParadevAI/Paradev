@@ -184,7 +184,7 @@ describe("project repositories", () => {
 			caller.removeRepository({ projectId: project.id, repositoryId: api.id }),
 		).rejects.toMatchObject({
 			code: "PRECONDITION_FAILED",
-			message: expect.stringContaining("1 archived"),
+			message: expect.stringMatching(/is checked out by ".+" \(1 archived\)/),
 		});
 
 		db.delete(schema.workspaces).run();

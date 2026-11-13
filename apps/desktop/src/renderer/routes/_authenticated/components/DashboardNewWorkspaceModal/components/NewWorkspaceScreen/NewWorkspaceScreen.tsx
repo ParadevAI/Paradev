@@ -1249,6 +1249,8 @@ export function NewWorkspaceScreen({
 							{repositoryPullRequests.isPending ||
 							repositoryPullRequests.isFetching ? (
 								<Trans>Finding PR #{linkedPR.prNumber}…</Trans>
+							) : repositoryPullRequests.isError ? (
+								<Trans>Could not load this pull request.</Trans>
 							) : (
 								<Trans>
 									PR #{linkedPR.prNumber} is not in any repository of this

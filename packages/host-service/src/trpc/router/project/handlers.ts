@@ -465,9 +465,14 @@ export function removeRepository(
 		.all();
 	if (users.length > 0) {
 		const archived = users.filter((u) => u.archivedAt !== null).length;
+		const shown = users.slice(0, 3).map((u) => `"${u.name}"`);
+		const more =
+			users.length > shown.length
+				? ` and ${users.length - shown.length} more`
+				: "";
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
-			message: `repository_in_use: ${users.length} workspace(s) check out ${repository.name}${
+			message: `repository_in_use: ${repository.name} is checked out by ${shown.join(", ")}${more}${
 				archived > 0 ? ` (${archived} archived)` : ""
 			}; delete them first`,
 		});
