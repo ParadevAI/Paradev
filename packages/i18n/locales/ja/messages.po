@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {それでも削除} other {それで
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 
+msgid "{title} (copy)"
+msgstr "{title}（コピー）"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
 
@@ -5849,6 +5852,9 @@ msgstr "{names} をダウンロードできませんでした。"
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "テンプレートをダウンロードできませんでした。インターネット接続を確認して、もう一度お試しください。"
 
+msgid "Could not duplicate this page"
+msgstr "このページを複製できませんでした"
+
 msgid "Could not forget {domain}"
 msgstr "{domain}を削除できませんでした"
 
@@ -7722,6 +7728,9 @@ msgstr "ドロップダウン、コンテキスト、アプリケーションメ
 
 msgid "Due today"
 msgstr "本日のお支払い"
+
+msgid "Duplicate"
+msgstr "複製"
 
 msgid "Duration"
 msgstr "所要時間"
@@ -14553,6 +14562,9 @@ msgstr "ページの内容を利用できません"
 
 msgid "Page deleted"
 msgstr "ページを削除しました"
+
+msgid "Page duplicated"
+msgstr "ページを複製しました"
 
 msgid "Page has no versions"
 msgstr "ページにバージョンがありません"

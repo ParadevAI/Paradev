@@ -30,6 +30,7 @@ interface PageHeaderData {
 	onRename: (title: string) => Promise<void>;
 	onRefresh: () => void;
 	onDelete: () => Promise<void>;
+	onDuplicate: (title: string) => Promise<{ id: string; slug: string } | null>;
 	sharing: PageHeaderSharing;
 	/** False for readers who may only view. The server enforces it either way. */
 	canComment: boolean;
@@ -57,6 +58,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 	const setSharedVersion = cloudTrpc.page.setSharedVersion.useMutation();
 	const updatePage = cloudTrpc.page.update.useMutation();
 	const deletePage = cloudTrpc.page.delete.useMutation();
+	const duplicatePage = cloudTrpc.page.duplicate.useMutation();
 	const { setFavorite } = usePageFavorites();
 
 	const share = useShareDirectory();
@@ -182,6 +184,13 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 			if (!pageId) return;
 			await deletePage.mutateAsync({ id: pageId });
 			setFavorite(pageId, false);
+		},
+		onDuplicate: async (title) => {
+			if (!pageId) return null;
+			const copy = await duplicatePage.mutateAsync({ id: pageId, title });
+			void utils.page.listPaginated.invalidate();
+			void utils.page.counts.invalidate();
+			return copy;
 		},
 		sharing,
 		canComment: access.data?.canComment ?? true,

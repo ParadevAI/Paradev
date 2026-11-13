@@ -44,6 +44,7 @@ export function PageHeaderBar({
 	);
 	const updatePage = useMutation(trpc.page.update.mutationOptions());
 	const deletePage = useMutation(trpc.page.delete.mutationOptions());
+	const duplicatePage = useMutation(trpc.page.duplicate.mutationOptions());
 	const sharing = usePageSharing(page.id);
 
 	return (
@@ -84,6 +85,10 @@ export function PageHeaderBar({
 			onDelete={async () => {
 				await deletePage.mutateAsync({ id: page.id });
 				router.replace("/");
+			}}
+			onDuplicate={async (title) => {
+				const copy = await duplicatePage.mutateAsync({ id: page.id, title });
+				router.push(`/page/${copy.slug}`);
 			}}
 		/>
 	);

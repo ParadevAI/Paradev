@@ -60,6 +60,7 @@ export interface PageHeaderActions {
 	onSetVisibility: (visibility: PageVisibility) => Promise<void>;
 	onSetSharedVersion: (version: number | null) => Promise<void>;
 	onDelete: () => Promise<void>;
+	onDuplicate: (title: string) => Promise<void>;
 	onRename: (title: string) => Promise<void>;
 	onRefresh: () => void;
 	onPreviewVersion: (version: number | null) => void;

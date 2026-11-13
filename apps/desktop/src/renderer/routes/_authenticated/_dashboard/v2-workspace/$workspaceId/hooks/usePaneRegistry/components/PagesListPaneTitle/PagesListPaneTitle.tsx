@@ -8,12 +8,14 @@ interface PagesListPaneTitleProps {
 	page: PagePaneData;
 	pageUiId: string;
 	onBack: () => void;
+	onOpenPage: (page: PagePaneData) => void;
 }
 
 export function PagesListPaneTitle({
 	page,
 	pageUiId,
 	onBack,
+	onOpenPage,
 }: PagesListPaneTitleProps) {
 	const { t } = useLingui();
 	return (
@@ -33,7 +35,12 @@ export function PagesListPaneTitle({
 					<Trans>Back to pages</Trans>
 				</TooltipContent>
 			</Tooltip>
-			<PagePaneTitle data={page} paneId={pageUiId} onClose={onBack} />
+			<PagePaneTitle
+				data={page}
+				paneId={pageUiId}
+				onClose={onBack}
+				onOpenPage={onOpenPage}
+			/>
 		</span>
 	);
 }

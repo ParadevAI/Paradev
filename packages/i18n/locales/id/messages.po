@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Tetap hapus} other {Tetap hapus #}}"
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {# PR agen digabungkan}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (salinan)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
 
@@ -5849,6 +5852,9 @@ msgstr "Tidak dapat mengunduh {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Tidak dapat mengunduh template. Periksa koneksi internet Anda, lalu coba lagi."
 
+msgid "Could not duplicate this page"
+msgstr "Tidak dapat menduplikasi halaman ini"
+
 msgid "Could not forget {domain}"
 msgstr "Tidak bisa melupakan {domain}"
 
@@ -7722,6 +7728,9 @@ msgstr "Menu dropdown, konteks, dan aplikasi"
 
 msgid "Due today"
 msgstr "Jatuh tempo hari ini"
+
+msgid "Duplicate"
+msgstr "Duplikat"
 
 msgid "Duration"
 msgstr "Durasi"
@@ -14553,6 +14562,9 @@ msgstr "Konten halaman tidak tersedia"
 
 msgid "Page deleted"
 msgstr "Halaman dihapus"
+
+msgid "Page duplicated"
+msgstr "Halaman diduplikasi"
 
 msgid "Page has no versions"
 msgstr "Halaman tidak punya versi"

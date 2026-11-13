@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Delete anyway} other {Delete # anywa
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (copy)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrupted"
 
@@ -5849,6 +5852,9 @@ msgstr "Could not download {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Could not download the template. Check your internet connection and try again."
 
+msgid "Could not duplicate this page"
+msgstr "Could not duplicate this page"
+
 msgid "Could not forget {domain}"
 msgstr "Could not forget {domain}"
 
@@ -7722,6 +7728,9 @@ msgstr "Dropdown, context, and application menus"
 
 msgid "Due today"
 msgstr "Due today"
+
+msgid "Duplicate"
+msgstr "Duplicate"
 
 msgid "Duration"
 msgstr "Duration"
@@ -14553,6 +14562,9 @@ msgstr "Page content is not available"
 
 msgid "Page deleted"
 msgstr "Page deleted"
+
+msgid "Page duplicated"
+msgstr "Page duplicated"
 
 msgid "Page has no versions"
 msgstr "Page has no versions"

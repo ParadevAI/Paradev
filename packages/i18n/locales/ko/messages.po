@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {그래도 #개 삭제} other {그래
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {에이전트 PR # 건 머지}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (사본)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} 중단됨"
 
@@ -5849,6 +5852,9 @@ msgstr "{names}을(를) 다운로드할 수 없습니다."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "템플릿을 다운로드할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요."
 
+msgid "Could not duplicate this page"
+msgstr "이 페이지를 복제할 수 없습니다"
+
 msgid "Could not forget {domain}"
 msgstr "{domain}을(를) 잊지 못했습니다"
 
@@ -7722,6 +7728,9 @@ msgstr "드롭다운, 컨텍스트, 애플리케이션 메뉴"
 
 msgid "Due today"
 msgstr "오늘 결제 금액"
+
+msgid "Duplicate"
+msgstr "복제"
 
 msgid "Duration"
 msgstr "소요 시간"
@@ -14553,6 +14562,9 @@ msgstr "페이지 내용을 사용할 수 없습니다"
 
 msgid "Page deleted"
 msgstr "페이지를 삭제했습니다"
+
+msgid "Page duplicated"
+msgstr "페이지를 복제했습니다"
 
 msgid "Page has no versions"
 msgstr "페이지에 버전이 없습니다"

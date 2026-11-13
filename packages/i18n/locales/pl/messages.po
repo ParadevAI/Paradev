@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Usuń mimo to} few {Usuń # mimo to}
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {scalono # PR agenta} few {scalono # PR agenta} many {scalono # PR agenta} other {scalono # PR agenta}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (kopia)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} przerwane"
 
@@ -5849,6 +5852,9 @@ msgstr "Nie udało się pobrać: {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Nie można pobrać szablonu. Sprawdź połączenie z internetem i spróbuj ponownie."
 
+msgid "Could not duplicate this page"
+msgstr "Nie udało się zduplikować tej strony"
+
 msgid "Could not forget {domain}"
 msgstr "Nie udało się zapomnieć {domain}"
 
@@ -7722,6 +7728,9 @@ msgstr "Menu rozwijane, kontekstowe i aplikacji"
 
 msgid "Due today"
 msgstr "Do zapłaty dziś"
+
+msgid "Duplicate"
+msgstr "Duplikuj"
 
 msgid "Duration"
 msgstr "Czas trwania"
@@ -14553,6 +14562,9 @@ msgstr "Treść strony jest niedostępna"
 
 msgid "Page deleted"
 msgstr "Strona usunięta"
+
+msgid "Page duplicated"
+msgstr "Zduplikowano stronę"
 
 msgid "Page has no versions"
 msgstr "Strona nie ma wersji"

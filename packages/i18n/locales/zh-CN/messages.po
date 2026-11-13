@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {仍然删除} other {仍然删除#�
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 
+msgid "{title} (copy)"
+msgstr "{title}（副本）"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
 
@@ -5849,6 +5852,9 @@ msgstr "无法下载 {names}。"
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "无法下载模板。请检查网络连接后重试。"
 
+msgid "Could not duplicate this page"
+msgstr "无法复制此页面"
+
 msgid "Could not forget {domain}"
 msgstr "无法忘记{domain}"
 
@@ -7722,6 +7728,9 @@ msgstr "下拉菜单、右键菜单和应用菜单"
 
 msgid "Due today"
 msgstr "今日应付"
+
+msgid "Duplicate"
+msgstr "复制"
 
 msgid "Duration"
 msgstr "耗时"
@@ -14553,6 +14562,9 @@ msgstr "页面内容不可用"
 
 msgid "Page deleted"
 msgstr "页面已删除"
+
+msgid "Page duplicated"
+msgstr "页面已复制"
 
 msgid "Page has no versions"
 msgstr "页面没有任何版本"

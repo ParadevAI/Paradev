@@ -1402,6 +1402,9 @@ msgstr "{teardownFailureCount, plural, one {Přesto smazat} few {Přesto smazat 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {sloučen # PR agenta} few {sloučeny # PR agenta} many {sloučeno # PR agenta} other {sloučeno # PR agenta}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (kopie)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} přerušeno"
 
@@ -5849,6 +5852,9 @@ msgstr "Nepodařilo se stáhnout {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Šablonu se nepodařilo stáhnout. Zkontrolujte připojení k internetu a zkuste to znovu."
 
+msgid "Could not duplicate this page"
+msgstr "Tuto stránku se nepodařilo duplikovat"
+
 msgid "Could not forget {domain}"
 msgstr "Nepodařilo se zapomenout {domain}"
 
@@ -7722,6 +7728,9 @@ msgstr "Rozbalovací, kontextové a aplikační nabídky"
 
 msgid "Due today"
 msgstr "K úhradě dnes"
+
+msgid "Duplicate"
+msgstr "Duplikovat"
 
 msgid "Duration"
 msgstr "Trvání"
@@ -14553,6 +14562,9 @@ msgstr "Obsah stránky není dostupný"
 
 msgid "Page deleted"
 msgstr "Stránka smazána"
+
+msgid "Page duplicated"
+msgstr "Stránka duplikována"
 
 msgid "Page has no versions"
 msgstr "Stránka nemá žádné verze"

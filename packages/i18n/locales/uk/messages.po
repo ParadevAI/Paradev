@@ -1396,6 +1396,9 @@ msgstr "{teardownFailureCount, plural, =1 {Усе одно видалити} one
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {Злито # агентський PR} few {Злито # агентські PR} many {Злито # агентських PR} other {Злито # агентського PR}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (копія)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
 
@@ -5843,6 +5846,9 @@ msgstr "Не вдалося завантажити: {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Не вдалося завантажити шаблон. Перевірте підключення до інтернету й спробуйте ще раз."
 
+msgid "Could not duplicate this page"
+msgstr "Не вдалося дублювати цю сторінку"
+
 msgid "Could not forget {domain}"
 msgstr "Не вдалося забути {domain}"
 
@@ -7716,6 +7722,9 @@ msgstr "Спадні та контекстні меню, меню застосу
 
 msgid "Due today"
 msgstr "Сьогодні до сплати"
+
+msgid "Duplicate"
+msgstr "Дублювати"
 
 msgid "Duration"
 msgstr "Тривалість"
@@ -14547,6 +14556,9 @@ msgstr "Вміст сторінки недоступний"
 
 msgid "Page deleted"
 msgstr "Сторінку видалено"
+
+msgid "Page duplicated"
+msgstr "Сторінку дубльовано"
 
 msgid "Page has no versions"
 msgstr "Сторінка не має версій"

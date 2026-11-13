@@ -151,6 +151,13 @@ export function PagesList({
 		},
 	});
 
+	const duplicatePage = cloudTrpc.page.duplicate.useMutation({
+		onSettled: () => {
+			void utils.page.listPaginated.invalidate();
+			void utils.page.counts.invalidate();
+		},
+	});
+
 	const tabLabels: Record<PageScope, string> = {
 		all: t({ message: "All" }),
 		pinned: t({ message: "Pinned" }),
@@ -295,6 +302,10 @@ export function PagesList({
 								message: "Page deleted",
 							}),
 						);
+					}}
+					onDuplicate={async (pageId, title) => {
+						await duplicatePage.mutateAsync({ id: pageId, title });
+						toast.success(t({ message: "Page duplicated" }));
 					}}
 				/>
 
