@@ -230,7 +230,6 @@ export function AgentSignInDialog({
 							autoFocus
 							className="font-mono"
 							onChange={(event) => setValue(event.target.value)}
-							placeholder="sk-ant-oat01-…"
 							type="password"
 							value={value}
 						/>
