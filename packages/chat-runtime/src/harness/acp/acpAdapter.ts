@@ -455,6 +455,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private reportedCostUsd: number | undefined;
 	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
 	private awaitingBackground = false;
+	private readonly releasedTurns = new Set<string>();
 	/** The v2 config option that stands in for v1's session mode, once seen. */
 	private modeConfigId: string | null = null;
 	private modeId: string | undefined;
@@ -547,7 +548,24 @@ export class AcpAdapter implements HarnessAdapter {
 			this.queuedPrompts.push(content);
 			return;
 		}
+		if (this.turnOnlyAwaitsBackground()) this.releaseBackgroundHold();
 		void this.runTurn(content);
+	}
+
+	turnOnlyAwaitsBackground(): boolean {
+		return this.awaitingBackground && this.pendingApprovals.size === 0;
+	}
+
+	/**
+	 * claude-agent-acp settles a turn held for background subagents once the
+	 * next prompt starts, so the held turn ends here and its late reply is dropped.
+	 */
+	private releaseBackgroundHold(): void {
+		const held = this.currentTurn;
+		if (held?.status !== "running") return;
+		this.releasedTurns.add(held.id);
+		this.main.flush();
+		this.emitTurn({ ...held, status: "completed", completedAtMs: this.now() });
 	}
 
 	canSteer(): boolean {
@@ -1162,6 +1180,7 @@ export class AcpAdapter implements HarnessAdapter {
 				sessionId: this.sessionId,
 				prompt: await this.toAcpPrompt(content),
 			});
+			if (this.releasedTurns.delete(turnId)) return;
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (
 				v2 &&
@@ -1174,6 +1193,7 @@ export class AcpAdapter implements HarnessAdapter {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			this.finishTurn(turnId, parsed?.stopReason, parsed?.usage);
 		} catch (error) {
+			if (this.releasedTurns.delete(turnId)) return;
 			this.endCompactions();
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;

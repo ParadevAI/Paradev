@@ -19,6 +19,7 @@ export type FakeHarnessScript = {
 	turns: ScriptedEvent[][];
 	steer?: boolean;
 	steerDelayMs?: number;
+	releasesBackgroundHold?: boolean;
 	steerableSubagents?: string[];
 	backgroundableSubagents?: string[];
 };
@@ -71,6 +72,7 @@ export class FakeHarness implements HarnessAdapter {
 	>();
 	private tail: Promise<void> = Promise.resolve();
 	private currentTurn: Turn | null = null;
+	private awaitingBackground = false;
 	private canceled = false;
 	private nextTurnIndex = 0;
 	private disposed = false;
@@ -86,10 +88,27 @@ export class FakeHarness implements HarnessAdapter {
 
 	prompt(content: UserContent[]): void {
 		this.prompted.push(content);
+		const held = this.currentTurn;
+		if (held && this.turnOnlyAwaitsBackground()) {
+			this.emit({
+				kind: "turn",
+				turn: { ...held, status: "completed", completedAtMs: Date.now() },
+			});
+			this.emit({ kind: "session", session: { awaitingBackground: false } });
+		}
 		const turn = this.script.turns[this.nextTurnIndex];
 		if (!turn) throw new Error("fake harness script exhausted");
 		this.nextTurnIndex += 1;
 		this.enqueue(turn);
+	}
+
+	turnOnlyAwaitsBackground(): boolean {
+		return (
+			this.script.releasesBackgroundHold === true &&
+			this.awaitingBackground &&
+			this.currentTurn?.status === "running" &&
+			this.pendingApprovals.size === 0
+		);
 	}
 
 	canSteer(): boolean {
@@ -220,6 +239,12 @@ export class FakeHarness implements HarnessAdapter {
 
 	protected emit(event: AdapterEvent): void {
 		if (event.kind === "turn") this.currentTurn = event.turn;
+		if (
+			event.kind === "session" &&
+			event.session.awaitingBackground !== undefined
+		) {
+			this.awaitingBackground = event.session.awaitingBackground;
+		}
 		if (event.kind === "item" && event.item.kind === "tool_call") {
 			const running = asRunningToolCall(event);
 			if (running) {

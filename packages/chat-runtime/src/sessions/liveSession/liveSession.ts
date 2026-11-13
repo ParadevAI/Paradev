@@ -463,7 +463,7 @@ export class LiveSession {
 			this.queuePaused = false;
 			this.emitSession({ queuePaused: false });
 		}
-		if (this.currentTurn?.status === "running") {
+		if (this.turnHoldsPrompts()) {
 			this.steerTarget = steered.item.id;
 			this.options.adapter.cancelTurn();
 		} else if (this.inFlight()) {
@@ -493,7 +493,7 @@ export class LiveSession {
 		this.clearResumeTimer();
 		this.queuePaused = false;
 		this.emitSession({ queuePaused: false, usageLimit: undefined });
-		if (this.currentTurn?.status !== "running" && !this.inFlight()) {
+		if (!this.turnHoldsPrompts() && !this.inFlight()) {
 			this.deliverNextQueued();
 		}
 	}
@@ -790,6 +790,9 @@ export class LiveSession {
 				}
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
+				if (event.session.awaitingBackground && !this.turnHoldsPrompts()) {
+					this.deliverNextQueued();
+				}
 				return;
 			case "delta":
 				this.options.publish({
@@ -883,7 +886,7 @@ export class LiveSession {
 		if (status === "dead") return;
 		onReleased?.();
 		const ready = held.map((content) => this.queuedPrompt(content));
-		const idle = this.currentTurn?.status !== "running" && !this.inFlight();
+		const idle = !this.turnHoldsPrompts() && !this.inFlight();
 		const first = idle && this.queuePaused ? ready.shift() : undefined;
 		this.queue.unshift(...ready);
 		if (first) this.deliver(first);
@@ -973,7 +976,7 @@ export class LiveSession {
 				if (this.capturing !== prompt) return;
 				this.capturing = null;
 				if (this.stopped) return;
-				if (this.currentTurn?.status === "running") {
+				if (this.turnHoldsPrompts()) {
 					this.requeueFirst(prompt);
 					return;
 				}
@@ -1042,7 +1045,7 @@ export class LiveSession {
 
 	private steerableTurn(expectedTurnId?: string): Turn | null {
 		const turn = this.currentTurn;
-		if (turn?.status !== "running" || this.inFlight()) return null;
+		if (!turn || !this.turnHoldsPrompts() || this.inFlight()) return null;
 		if (expectedTurnId && expectedTurnId !== turn.id) return null;
 		return this.options.adapter.canSteer?.() ? turn : null;
 	}
@@ -1072,7 +1075,7 @@ export class LiveSession {
 			if (index === -1) return;
 			this.pendingSteers.splice(index, 1);
 			if (!taken) this.fallBack(prompt, selected);
-			if (this.currentTurn?.status !== "running" && !this.inFlight()) {
+			if (!this.turnHoldsPrompts() && !this.inFlight()) {
 				this.deliverNextQueued();
 			}
 		});
@@ -1224,9 +1227,16 @@ export class LiveSession {
 		);
 	}
 
+	private turnHoldsPrompts(): boolean {
+		return (
+			this.currentTurn?.status === "running" &&
+			this.options.adapter.turnOnlyAwaitsBackground?.() !== true
+		);
+	}
+
 	private isBusy(): boolean {
 		return (
-			this.currentTurn?.status === "running" ||
+			this.turnHoldsPrompts() ||
 			this.hasPendingWork() ||
 			this.pendingSteers.length > 0 ||
 			this.heldUntilStarted.length > 0

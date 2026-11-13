@@ -291,6 +291,11 @@ class FakeAcpAgent {
 		}
 	}
 
+	releaseOldestPrompt(stopReason: string): void {
+		const id = this.heldPrompts.shift();
+		if (id !== undefined) this.respond(id, { stopReason });
+	}
+
 	failHeldPrompts(code: number, message: string): void {
 		for (const id of this.heldPrompts.splice(0)) {
 			this.deliver({ jsonrpc: "2.0", id, error: { code, message } });
@@ -587,6 +592,10 @@ function itemsOf(events: AdapterEvent[]) {
 		.filter((e) => e.kind === "item")
 		.map((e) => (e.kind === "item" ? e.item : null))
 		.filter((item) => item !== null);
+}
+
+function turnsOf(events: AdapterEvent[]) {
+	return events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
 }
 
 function sessionsOf(events: AdapterEvent[]) {
@@ -3609,6 +3618,62 @@ describe("AcpAdapter on protocol v2", () => {
 			.at(-1);
 		expect(held?.awaitingBackground).toBe(false);
 		expect(sessionsOf(events).at(-1)?.status).toBe("running");
+		await adapter.dispose();
+	});
+
+	it("a prompt during a background-only hold ends the held turn and starts the next", async () => {
+		const agent = new FakeAcpAgent();
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "spawn a helper" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Helper",
+			task: "Help",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 10,
+			size: 100,
+			cost: { amount: 0.01, currency: "USD" },
+		});
+		await flush();
+		expect(adapter.turnOnlyAwaitsBackground()).toBe(true);
+		const [held] = turnsOf(events);
+
+		adapter.prompt([{ type: "text", text: "next question" }]);
+		await flush();
+
+		expect(agent.sent.map((f) => f.method)).not.toContain("_session/steering");
+		expect(
+			agent.sent.filter((f) => f.method === "session/prompt"),
+		).toHaveLength(2);
+		const next = turnsOf(events).at(-1);
+		expect(next).toMatchObject({ status: "running" });
+		expect(next?.id).not.toBe(held?.id);
+		expect(
+			turnsOf(events).find(
+				(turn) => turn.id === held?.id && turn.status === "completed",
+			),
+		).toBeDefined();
+
+		agent.releaseOldestPrompt("end_turn");
+		await flush();
+		expect(turnsOf(events).at(-1)).toMatchObject({
+			id: next?.id,
+			status: "running",
+		});
+
+		agent.releasePrompts("end_turn");
+		await flush();
+		expect(turnsOf(events).at(-1)).toMatchObject({
+			id: next?.id,
+			status: "completed",
+		});
 		await adapter.dispose();
 	});
 

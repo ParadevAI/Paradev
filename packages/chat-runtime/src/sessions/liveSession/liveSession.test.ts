@@ -8,7 +8,7 @@ import {
 import type { DurableEnvelope, UserMessage } from "@superset/chat/protocol";
 import { isDurableEnvelope, wrapHiddenText } from "@superset/chat/protocol";
 import type { ChatCheckpoints } from "../../checkpoints";
-import type { FakeHarnessScript } from "../../harness/fake";
+import type { FakeHarnessScript, ScriptedEvent } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
 import {
 	agentMessage,
@@ -773,6 +773,108 @@ describe("LiveSession", () => {
 		expect(second.queued).toBe(false);
 		const snapshot = snapshotOf(runtime, sessionId);
 		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t1");
+		await runtime.dispose();
+	});
+
+	const NEXT_TURN: ScriptedEvent[] = [
+		{ kind: "turn", turn: turn("t2") },
+		{
+			kind: "turn",
+			turn: turn("t2", { status: "completed", completedAtMs: 4 }),
+		},
+		{ kind: "session", session: { status: "idle" } },
+	];
+
+	const RELEASABLE_HOLD: FakeHarnessScript = {
+		steer: true,
+		releasesBackgroundHold: true,
+		turns: [
+			[
+				{ kind: "turn", turn: turn("t1") },
+				{
+					kind: "session",
+					session: { status: "idle", awaitingBackground: true },
+				},
+			],
+			NEXT_TURN,
+		],
+	};
+
+	async function waitForHold(runtime: ChatRuntime, sessionId: string) {
+		await waitFor(
+			() => runtime.live.require(sessionId).state.awaitingBackground === true,
+		);
+	}
+
+	test("a prompt sent while the turn only waits on background work starts the next turn", async () => {
+		const { runtime, sessionId, adapters } =
+			startSessionWithAdapters(RELEASABLE_HOLD);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForHold(runtime, sessionId);
+
+		const second = sendPrompt(runtime, sessionId, "second");
+
+		expect(second.queued).toBe(false);
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).turns.get("t2")?.status === "completed",
+		);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.turns.get("t1")?.status).toBe("completed");
+		expect(snapshot.items.get(second.itemId)?.turnId).toBe("t2");
+		expect(adapters[0]?.steered).toEqual([]);
+		await runtime.dispose();
+	});
+
+	test("a steer sent while the turn only waits on background work starts the next turn", async () => {
+		const { runtime, sessionId, adapters } =
+			startSessionWithAdapters(RELEASABLE_HOLD);
+		sendPrompt(runtime, sessionId, "first");
+		await waitForHold(runtime, sessionId);
+
+		const second = sendPrompt(runtime, sessionId, "second", {
+			steer: { expectedTurnId: "t1" },
+		});
+
+		expect(second.queued).toBe(false);
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId ===
+				"t2",
+		);
+		expect(adapters[0]?.steered).toEqual([]);
+		await runtime.dispose();
+	});
+
+	test("a prompt queued while the agent worked starts once the turn only waits on background work", async () => {
+		const { runtime, sessionId } = startSession({
+			steer: true,
+			releasesBackgroundHold: true,
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+					{
+						kind: "session",
+						session: { status: "idle", awaitingBackground: true },
+					},
+				],
+				NEXT_TURN,
+			],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		expect(second.queued).toBe(true);
+
+		answerApproval(runtime, sessionId);
+
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId ===
+				"t2",
+		);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
 		await runtime.dispose();
 	});
 

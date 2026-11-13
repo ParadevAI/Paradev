@@ -46,6 +46,8 @@ export interface HarnessAdapter {
 	prompt(content: UserContent[]): void;
 	cancelTurn(): void;
 	canSteer?(): boolean;
+	/** The running turn only waits on background work, so a prompt ends it and starts the next turn. */
+	turnOnlyAwaitsBackground?(): boolean;
 	/** Resolves false when the agent did not accept the prompt, so the caller queues it. */
 	steer?(content: UserContent[]): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): void;
