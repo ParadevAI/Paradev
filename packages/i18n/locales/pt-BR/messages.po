@@ -563,6 +563,11 @@ msgstr "{0} de {1} verificações falharam"
 msgid "{0} of {1} checks running"
 msgstr "{0} de {1} verificações em execução"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} de {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0} de {totalCount}"
@@ -1884,6 +1889,9 @@ msgstr "Uma rotina precisa de uma agenda ou de algo para observar."
 
 msgid "A run for this automation is already in progress."
 msgstr "Já há uma execução desta automação em andamento."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "Uma máquina em execução reinicia. Os arquivos e as alterações não confirmadas são mantidos. Os serviços de inicialização do projeto e as sessões de agente voltam a rodar; todo o resto em execução em um terminal para."
 
 msgid "A selection of integrations curated by our team."
 msgstr "Uma seleção de integrações escolhidas pelo nosso time."
@@ -4185,6 +4193,9 @@ msgstr "Alterar ícone"
 msgid "Change location"
 msgstr "Alterar local"
 
+msgid "Change machine size"
+msgstr "Alterar tamanho da máquina"
+
 msgid "Change model"
 msgstr "Trocar modelo"
 
@@ -4226,6 +4237,9 @@ msgstr "Alterar status (atual: {0})"
 msgid "Change to {0}"
 msgstr "Alterar para {0}"
 
+msgid "Change to {pendingName}"
+msgstr "Alterar para {pendingName}"
+
 msgid "Change to Annual"
 msgstr "Mudar para anual"
 
@@ -4261,6 +4275,9 @@ msgstr "Alterações solicitadas"
 
 msgid "Changes saved"
 msgstr "Alterações salvas"
+
+msgid "Changing to {label}…"
+msgstr "Alterando para {label}…"
 
 msgid "Changing..."
 msgstr "Alterando..."
@@ -4922,6 +4939,12 @@ msgstr "Área de trabalho na nuvem"
 
 msgid "Cloud workspace: connecting"
 msgstr "Área de trabalho na nuvem: conectando"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Área de trabalho na nuvem: sem memória"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Área de trabalho na nuvem: carga alta"
 
 msgid "Cloud workspaces"
 msgstr "Áreas de trabalho na nuvem"
@@ -6148,6 +6171,10 @@ msgstr "Não foi possível ramificar a conversa"
 msgid "Couldn't cancel the move"
 msgstr "Não foi possível cancelar a movimentação"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Não foi possível alterar o tamanho da máquina: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "Não foi possível alterar a rotina"
 
@@ -6471,8 +6498,16 @@ msgstr "Contado a partir das edições de arquivos do agente. Alterações feita
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "Núcleos de CPU"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "Limitada pela CPU"
 
 msgid "Create"
 msgstr "Criar"
@@ -12043,6 +12078,10 @@ msgstr "Memória"
 msgid "Memory share"
 msgstr "Participação na memória"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Limitada pela memória"
+
 msgid "Mention."
 msgstr "Mencione."
 
@@ -14602,6 +14641,18 @@ msgstr "Nossos investidores"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Nossa leitura em agosto de 2026, com base no nosso time e nos times que acompanhamos de perto. O F3 está quase todo aberto. O F4 está quase todo fechado. Essa distância é o trabalho."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Sem memória"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Sem memória: a máquina está quase parando de responder. {sizeName} tem {memoryGb} GB."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Sem memória: a máquina parou {0} ({1} GB) para continuar funcionando. {sizeName} tem {memoryGb} GB."
+
 msgid "Out of scope"
 msgstr "Fora do escopo"
 
@@ -16821,6 +16872,9 @@ msgstr "Resizable"
 msgid "Resize panel"
 msgstr "Redimensionar painel"
 
+msgid "Resize to {suggestedName}"
+msgstr "Alterar para {suggestedName}"
+
 msgid "Resolve"
 msgstr "Resolver"
 
@@ -16917,6 +16971,9 @@ msgstr "{restartedOrgCount} serviços de host reiniciados"
 
 msgid "Restarted 1 host service"
 msgstr "1 serviço de host reiniciado"
+
+msgid "Restarted at {label}"
+msgstr "Reiniciada em {label}"
 
 msgid "Restarting"
 msgstr "Reiniciando"
@@ -19380,6 +19437,9 @@ msgstr "começa em {date}"
 msgid "Starts a fresh session in this workspace"
 msgstr "Inicia uma sessão nova nesta área de trabalho"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Inicia em {label} na próxima vez que acordar"
+
 msgid "State"
 msgstr "Estado"
 
@@ -19483,6 +19543,11 @@ msgstr "parado"
 msgid "Stopped"
 msgstr "Parado"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "{0} ({1} GB) parado para liberar memória"
+
 msgid "Stopped by the usage limit"
 msgstr "Interrompido pelo limite de uso"
 
@@ -19563,6 +19628,10 @@ msgstr "Execuções bem-sucedidas <0>· 7d</0>"
 
 msgid "Suggested"
 msgstr "Sugestões"
+
+msgctxt "machine size"
+msgid "Suggested"
+msgstr "Sugerido"
 
 msgid "Suggestions"
 msgstr "Sugestões"
@@ -20176,6 +20245,9 @@ msgstr "O proprietário da automação não pode mais usar áreas de trabalho na
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "O melhor agente vai mudar.<0/>Seu fluxo de trabalho, não."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "A máquina voltou com {actual} vCPU em vez de {wanted}. Reinicie para tentar novamente."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "O botão agora se destaca. Conferi no seu painel."
@@ -22283,6 +22355,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "Esperar o setup da área de trabalho antes de iniciar os agentes"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "Aguardando a CPU em {0}% do último minuto"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b
