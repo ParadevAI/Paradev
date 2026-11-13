@@ -72,7 +72,7 @@ export function pullRequestOnGithub(
 
 	return {
 		detail: (
-			options: { activity?: boolean } = {},
+			options: Parameters<typeof readPullRequestDetail>[2] = {},
 		): Promise<PullRequestDetailRead> =>
 			readPullRequestDetail(
 				{
