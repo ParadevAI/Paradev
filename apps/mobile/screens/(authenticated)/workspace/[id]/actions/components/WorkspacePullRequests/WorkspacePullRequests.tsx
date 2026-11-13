@@ -46,6 +46,9 @@ export function WorkspacePullRequests({
 							{pullRequest.title}{" "}
 							<Text className="text-muted-foreground text-[15px]">
 								#{pullRequest.prNumber}
+								{pullRequest.checkoutName
+									? ` · ${pullRequest.checkoutName}`
+									: null}
 							</Text>
 						</Text>
 						<Icon

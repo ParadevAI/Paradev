@@ -60,6 +60,7 @@ export function BranchPickerScreen() {
 	const params = useLocalSearchParams<{
 		projectId?: string;
 		machineId?: string;
+		repositoryId?: string;
 	}>();
 	const baseBranch = useNewSessionPreferencesStore((state) => state.baseBranch);
 	const setBaseBranch = useNewSessionPreferencesStore(
@@ -78,6 +79,7 @@ export function BranchPickerScreen() {
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
 	const projectId = params.projectId || null;
+	const repositoryId = params.repositoryId || null;
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
 	const cloudRepositoryId = useCloudCreateSelection().repository?.id ?? null;
@@ -89,6 +91,7 @@ export function BranchPickerScreen() {
 			"branches",
 			hostUrl,
 			projectId,
+			repositoryId,
 			cloudRepositoryId,
 			trimmedQuery,
 		],
@@ -117,6 +120,7 @@ export function BranchPickerScreen() {
 				hostUrl,
 			).workspaceCreation.searchBranches.query({
 				projectId,
+				repositoryId: repositoryId ?? undefined,
 				query: trimmedQuery || undefined,
 				limit: 50,
 				refresh: trimmedQuery === "",

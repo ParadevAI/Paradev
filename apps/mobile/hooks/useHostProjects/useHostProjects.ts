@@ -11,31 +11,32 @@ export interface HostProjectItem {
 	id: string;
 	name: string;
 	iconUrl: string | null;
+	primaryRepositoryId: string;
+	/** The primary repository's GitHub owner and name. */
 	repoOwner: string | null;
 	repoName: string | null;
 }
 
 const PROJECTS_REFETCH_INTERVAL_MS = 30_000;
 
-/**
- * Normalize a project.list row from any host version — hosts on
- * pre-local-first builds don't serve `name`, so fall back to the folder
- * basename (both path separators), matching the desktop rule.
- */
-export function toHostProjectItem(
-	row: Partial<HostProjectRow> & { id: string; repoPath: string },
-): HostProjectItem {
-	const repoOwner = row.repoOwner ?? null;
+export function toHostProjectItem(row: HostProjectRow): HostProjectItem {
+	// A host that predates repositories serves neither field.
+	const primary =
+		(row.repositories ?? []).find(
+			(repository) => repository.id === row.primaryRepositoryId,
+		) ?? null;
+	const repoOwner = primary?.owner ?? null;
 	// Custom local-first icon wins; fall back to the GitHub owner avatar.
 	const iconUrl =
 		row.icon ??
 		(repoOwner ? `https://github.com/${repoOwner}.png?size=64` : null);
 	return {
 		id: row.id,
-		name: row.name || row.repoPath.split(/[\\/]/).pop() || row.id,
+		name: row.name || row.id,
 		iconUrl,
+		primaryRepositoryId: row.primaryRepositoryId,
 		repoOwner,
-		repoName: row.repoName ?? null,
+		repoName: primary?.repoName ?? null,
 	};
 }
 

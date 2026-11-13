@@ -87,6 +87,7 @@ function describeSession(session: VoiceSessionRow, now: number) {
 
 function describePullRequest(pr: VoicePullRequest) {
 	return {
+		repository: pr.repository,
 		number: pr.number,
 		title: pr.title,
 		state: pr.state,

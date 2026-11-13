@@ -52,6 +52,7 @@ import {
 	AnimatedCellContainer,
 	CellTransitionsContext,
 } from "./components/AnimatedCellContainer";
+import { CheckoutHeaderRow } from "./components/CheckoutHeaderRow";
 import { CommentCardRow } from "./components/CommentCardRow";
 import { ExpanderRow } from "./components/ExpanderRow";
 import { FileHeaderRow } from "./components/FileHeaderRow";
@@ -235,7 +236,8 @@ export function FilesChangedScreen() {
 					changeset.hostUrl as string,
 				).git.getDiff.query({
 					workspaceId: workspaceId as string,
-					path: file.path,
+					repositoryId: file.repositoryId ?? undefined,
+					path: file.gitPath,
 					category: file.source,
 				});
 				const oldContents = expandTabs(pair.oldFile.contents ?? "");
@@ -433,7 +435,7 @@ export function FilesChangedScreen() {
 						getHostServiceClientByUrl(changeset.hostUrl as string)
 							.filesystem.deletePath.mutate({
 								workspaceId: workspace.id,
-								absolutePath: `${workspace.worktreePath}/${file.path}`,
+								absolutePath: `${file.checkoutPath}/${file.gitPath}`,
 							})
 							.then(() => changeset.refetch())
 							.catch((cause: unknown) => {
@@ -461,9 +463,15 @@ export function FilesChangedScreen() {
 				workspace_id: workspaceId,
 				extension: file.path.split(".").pop()?.toLowerCase() ?? null,
 			});
-			router.push(
-				`/(authenticated)/workspace/${workspaceId}/file?path=${encodeURIComponent(file.path)}&source=${file.source}`,
-			);
+			router.push({
+				pathname: "/workspace/[id]/file",
+				params: {
+					id: workspaceId ?? "",
+					path: file.gitPath,
+					source: file.source,
+					...(file.repositoryId ? { repositoryId: file.repositoryId } : {}),
+				},
+			});
 		},
 		[router, workspaceId],
 	);
@@ -544,6 +552,15 @@ export function FilesChangedScreen() {
 							onAddComment={addFileComment}
 							onDelete={deleteFile}
 							onToggleViewed={onToggleViewed}
+						/>
+					);
+				case "checkout":
+					return (
+						<CheckoutHeaderRow
+							name={item.name}
+							additions={item.additions}
+							deletions={item.deletions}
+							fileCount={item.fileCount}
 						/>
 					);
 				case "segment":

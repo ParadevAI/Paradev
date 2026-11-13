@@ -97,6 +97,7 @@ export function NewChatWidget({
 			"branches",
 			selectedTarget?.hostUrl ?? null,
 			selectedTarget?.projectId ?? null,
+			selectedTarget?.primaryRepositoryId ?? null,
 			cloudRepository?.id ?? null,
 			"",
 		],
@@ -118,6 +119,7 @@ export function NewChatWidget({
 				selectedTarget.hostUrl,
 			).workspaceCreation.searchBranches.query({
 				projectId: selectedTarget.projectId,
+				repositoryId: selectedTarget.primaryRepositoryId ?? undefined,
 				limit: 50,
 				refresh: true,
 			});
@@ -404,6 +406,7 @@ export function NewChatWidget({
 						params: {
 							projectId: selectedTarget.projectId,
 							machineId: selectedTarget.machineId,
+							repositoryId: selectedTarget.primaryRepositoryId ?? "",
 						},
 					});
 				}

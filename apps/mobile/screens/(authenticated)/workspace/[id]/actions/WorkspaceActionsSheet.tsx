@@ -16,6 +16,7 @@ import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
+import { WorkspaceCheckouts } from "./components/WorkspaceCheckouts";
 import { WorkspacePages } from "./components/WorkspacePages";
 import { WorkspacePullRequests } from "./components/WorkspacePullRequests";
 
@@ -210,6 +211,11 @@ export function WorkspaceActionsSheet() {
 						isLast
 					/>
 				) : null}
+
+				<WorkspaceCheckouts
+					checkouts={workspace?.checkouts ?? []}
+					changes={changeset.checkouts}
+				/>
 
 				<WorkspacePullRequests workspaceId={id ?? null} />
 

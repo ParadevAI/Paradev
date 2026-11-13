@@ -85,6 +85,7 @@ function fakeData(overrides: Partial<VoiceData> = {}): VoiceData & {
 		},
 		listPullRequests: async () => [
 			{
+				repository: "acme/app",
 				number: 8102,
 				title: "refactor(auth)",
 				state: "open",

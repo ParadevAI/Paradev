@@ -23,7 +23,12 @@ export function CommitsSheet() {
 	const workspaceId = id ?? null;
 
 	const { commits, hostUrl } = useWorkspaceCommits(workspaceId);
-	const { baseBranch } = useWorkspaceChangeset(workspaceId);
+	const { checkouts } = useWorkspaceChangeset(workspaceId);
+	const baseBranches = new Set(
+		checkouts.map((checkout) => checkout.baseBranch),
+	);
+	const baseBranch =
+		baseBranches.size === 1 ? ([...baseBranches][0] ?? null) : null;
 
 	useEffect(() => {
 		posthog.capture("commits_viewed", { workspace_id: workspaceId });
@@ -35,7 +40,12 @@ export function CommitsSheet() {
 	);
 	const statQueries = useQueries({
 		queries: statTargets.map((commit) => ({
-			queryKey: ["workspace-commit-files", workspaceId, commit.hash] as const,
+			queryKey: [
+				"workspace-commit-files",
+				workspaceId,
+				commit.repositoryId,
+				commit.hash,
+			] as const,
 			staleTime: Number.POSITIVE_INFINITY,
 			retry: 1,
 			networkMode: "always" as const,
@@ -44,6 +54,7 @@ export function CommitsSheet() {
 					hostUrl as string,
 				).git.getCommitFiles.query({
 					workspaceId: workspaceId as string,
+					repositoryId: commit.repositoryId ?? undefined,
 					commitHash: commit.hash,
 				});
 				let additions = 0;
@@ -56,11 +67,11 @@ export function CommitsSheet() {
 			},
 		})),
 	});
-	const statsByHash = useMemo(() => {
+	const statsByKey = useMemo(() => {
 		const map = new Map<string, { additions: number; deletions: number }>();
 		statTargets.forEach((commit, index) => {
 			const data = statQueries[index]?.data;
-			if (data) map.set(commit.hash, data);
+			if (data) map.set(commit.key, data);
 		});
 		return map;
 	}, [statTargets, statQueries]);
@@ -109,11 +120,11 @@ export function CommitsSheet() {
 			<FlatList
 				className="bg-background flex-1"
 				data={commits}
-				keyExtractor={(commit) => commit.hash}
+				keyExtractor={(commit) => commit.key}
 				contentInsetAdjustmentBehavior="automatic"
 				contentContainerClassName="px-4 pb-8 pt-1"
 				renderItem={({ item: commit, index }) => {
-					const stats = statsByHash.get(commit.hash);
+					const stats = statsByKey.get(commit.key);
 					return (
 						<TimelineRow
 							first={index === 0}
@@ -124,6 +135,16 @@ export function CommitsSheet() {
 									{commit.message}
 								</Text>
 								<View className="mt-1 flex-row items-center gap-1.5">
+									{commit.checkoutName ? (
+										<>
+											<Text className="font-medium text-[13px]">
+												{commit.checkoutName}
+											</Text>
+											<Text className="text-muted-foreground text-[13px]">
+												·
+											</Text>
+										</>
+									) : null}
 									<AuthorAvatar
 										name={commit.author}
 										email={commit.authorEmail}

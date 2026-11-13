@@ -1,24 +1,34 @@
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import {
-	type GitStatusSnapshot,
+	type CheckoutTarget,
+	checkoutTargets,
+	rootCheckoutTarget,
+} from "@/lib/host-service/checkouts";
+import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import {
+	buildChangeset,
+	type ChangesetCheckout,
+	type ChangesetFile,
+} from "./utils/buildChangeset";
 
-export type ChangesetSource = "against-base" | "staged" | "unstaged";
-
-type StatusFile = GitStatusSnapshot["againstBase"][number];
-
-export interface ChangesetFile extends StatusFile {
-	source: ChangesetSource;
-}
+export type {
+	ChangesetCheckout,
+	ChangesetFile,
+	ChangesetSource,
+} from "./utils/buildChangeset";
 
 export interface WorkspaceChangesetResult {
 	files: ChangesetFile[];
+	/** One per checkout; the files are also in `files`. */
+	checkouts: ChangesetCheckout[];
 	additions: number;
 	deletions: number;
+	/** The primary checkout's branches. */
 	currentBranch: string | null;
 	baseBranch: string | null;
 	hostUrl: string | null;
@@ -35,71 +45,94 @@ export function getWorkspaceChangesetQueryKey(workspaceId: string | null) {
 }
 
 /**
- * The workspace's working-tree changeset: one row per path (last write wins
- * across against-base → staged → unstaged, matching useVisibleDiffStats so
- * totals agree with the home diff chip), tagged with the source category
- * that `git.getDiff` expects.
+ * The workspace's working-tree changeset, one `git.getStatus` per checkout,
+ * each file tagged with the source category and repository that
+ * `git.getDiff` expects.
  */
 export function useWorkspaceChangeset(
 	workspaceId: string | null,
 ): WorkspaceChangesetResult {
-	const { host } = useWorkspaceHost(workspaceId);
+	const { workspace, host } = useWorkspaceHost(workspaceId);
+	const queryClient = useQueryClient();
 	const hostUrl =
 		host?.isOnline === true
 			? hostServiceUrl(host.organizationId, host.machineId)
 			: null;
 
-	const query = useQuery({
-		queryKey: getWorkspaceChangesetQueryKey(workspaceId),
-		enabled: hostUrl !== null && workspaceId !== null,
-		staleTime: CHANGESET_STALE_MS,
-		refetchInterval: CHANGESET_REFETCH_MS,
-		retry: 1,
-		networkMode: "always" as const,
-		queryFn: () => {
-			if (!hostUrl || !workspaceId) throw new Error("Host is not resolved");
-			return getHostServiceClientByUrl(hostUrl).git.getStatus.query({
-				workspaceId,
-				priority: "foreground",
-			});
-		},
-	});
+	// Keyed by value: the row is a new object on every workspace list poll,
+	// and a new target list would rebuild every file row.
+	// A cloud sandbox is addressed before it serves its row; ask its folder.
+	const targetsKey = JSON.stringify(
+		workspace
+			? checkoutTargets(workspace)
+			: hostUrl
+				? [rootCheckoutTarget("")]
+				: [],
+	);
+	const targets = useMemo(
+		(): CheckoutTarget[] => JSON.parse(targetsKey),
+		[targetsKey],
+	);
 
-	const { files, additions, deletions } = useMemo(() => {
-		const status = query.data;
-		const byPath = new Map<string, ChangesetFile>();
-		if (status) {
-			const groups: Array<[ChangesetSource, StatusFile[]]> = [
-				["against-base", status.againstBase],
-				["staged", status.staged],
-				["unstaged", status.unstaged],
-			];
-			for (const [source, groupFiles] of groups) {
-				for (const file of groupFiles) {
-					byPath.set(file.path, { ...file, source });
-				}
-			}
-		}
-		const rows = [...byPath.values()].sort((a, b) =>
-			a.path.localeCompare(b.path),
-		);
-		let added = 0;
-		let deleted = 0;
-		for (const file of rows) {
-			added += file.additions ?? 0;
-			deleted += file.deletions ?? 0;
-		}
-		return { files: rows, additions: added, deletions: deleted };
-	}, [query.data]);
+	const queries = useQueries({
+		queries: targets.map((target) => ({
+			queryKey: [
+				...getWorkspaceChangesetQueryKey(workspaceId),
+				target.repositoryId,
+			] as const,
+			enabled: hostUrl !== null && workspaceId !== null,
+			staleTime: CHANGESET_STALE_MS,
+			refetchInterval: CHANGESET_REFETCH_MS,
+			retry: 1,
+			networkMode: "always" as const,
+			queryFn: () => {
+				if (!hostUrl || !workspaceId) throw new Error("Host is not resolved");
+				return getHostServiceClientByUrl(hostUrl).git.getStatus.query({
+					workspaceId,
+					repositoryId: target.repositoryId ?? undefined,
+					priority: "foreground",
+				});
+			},
+		})),
+	});
+	const dataVersion = queries.map((query) => query.dataUpdatedAt).join(",");
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: dataVersion changes when any checkout's status lands.
+	const changeset = useMemo(
+		() =>
+			buildChangeset(
+				targets.map((target, index) => ({
+					target,
+					status: queries[index]?.data,
+				})),
+			),
+		[targets, dataVersion],
+	);
+
+	const refetch = useCallback(
+		() =>
+			queryClient.refetchQueries({
+				queryKey: getWorkspaceChangesetQueryKey(workspaceId),
+			}),
+		[queryClient, workspaceId],
+	);
+
+	const primary =
+		changeset.checkouts.find((checkout) => checkout.isPrimary) ??
+		changeset.checkouts[0];
 
 	return {
-		files,
-		additions,
-		deletions,
-		currentBranch: query.data?.currentBranch?.name ?? null,
-		baseBranch: query.data?.defaultBranch?.name ?? null,
+		files: changeset.files,
+		checkouts: changeset.checkouts,
+		additions: changeset.additions,
+		deletions: changeset.deletions,
+		currentBranch: primary?.currentBranch ?? null,
+		baseBranch: primary?.baseBranch ?? null,
 		hostUrl,
-		isReady: hostUrl === null || query.isSuccess || query.isError,
-		refetch: query.refetch,
+		isReady:
+			hostUrl === null ||
+			(targets.length > 0 &&
+				queries.every((query) => query.isSuccess || query.isError)),
+		refetch,
 	};
 }

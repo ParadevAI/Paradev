@@ -32,6 +32,8 @@ export interface VoiceSessionRow {
 }
 
 export interface VoicePullRequest {
+	/** `owner/name`; a workspace of several repositories has PRs in each. */
+	repository: string;
 	number: number;
 	title: string;
 	state: "open" | "draft" | "merged" | "closed" | "queued";

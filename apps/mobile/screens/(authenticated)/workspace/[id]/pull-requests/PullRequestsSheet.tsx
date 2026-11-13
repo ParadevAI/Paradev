@@ -77,6 +77,11 @@ export function PullRequestsSheet() {
 								strokeWidth={1.75}
 							/>
 							<Text className="flex-1 text-[15px]" numberOfLines={2}>
+								{pullRequest.checkoutName ? (
+									<Text className="text-muted-foreground text-[15px]">
+										{pullRequest.checkoutName}{" "}
+									</Text>
+								) : null}
 								#{pullRequest.prNumber} {pullRequest.title}
 							</Text>
 							<RowDiffstat

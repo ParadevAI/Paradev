@@ -46,6 +46,7 @@ export function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
 		updatedAt: cloud.updatedAt,
 		lastActivityAt: (cloud.agentStatusAt ?? cloud.createdAt).getTime(),
 		worktreePath: "",
+		checkouts: [],
 		worktreeExists: true,
 		projectName: null,
 		archivedAt: null,

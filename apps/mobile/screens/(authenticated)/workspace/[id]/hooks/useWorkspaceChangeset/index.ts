@@ -1,4 +1,5 @@
 export {
+	type ChangesetCheckout,
 	type ChangesetFile,
 	type ChangesetSource,
 	getWorkspaceChangesetQueryKey,

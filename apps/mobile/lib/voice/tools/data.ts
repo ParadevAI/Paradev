@@ -14,6 +14,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { flattenPullRequestHistory } from "@/lib/host-service/pullRequestHistory";
 import { ensureSandboxAccess } from "@/lib/sandbox-access";
 import { apiClient } from "@/lib/trpc/client";
 import { htmlToText } from "./htmlToText";
@@ -375,10 +376,11 @@ export function createVoiceData({
 				HOST_TIMEOUT_MS,
 				workspace.name,
 			);
-			const rows = result.workspaces[0]?.pullRequests ?? [];
+			const rows = flattenPullRequestHistory(result.workspaces[0], []);
 			return rows.map(
 				(row): VoicePullRequest => ({
-					number: row.number,
+					repository: `${row.repoOwner}/${row.repoName}`,
+					number: row.prNumber,
 					title: row.title,
 					state: row.state,
 					url: row.url,

@@ -18,6 +18,8 @@ export interface NewChatTarget {
 	/** A machine's project, or a project a cloud sandbox can be created for. */
 	kind: "host" | "cloud";
 	projectId: string | null;
+	/** The repository whose branch a new workspace starts from; null without a project. */
+	primaryRepositoryId: string | null;
 	projectName: string;
 	projectIconUrl: string | null;
 	/** `CLOUD_TARGET_ID` for cloud targets — a sentinel, not a machine. */
@@ -99,6 +101,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 				projectId: null,
 				projectName: t({ message: "No project" }),
 				projectIconUrl: null,
+				primaryRepositoryId: null,
 				machineId: host.machineId,
 				hostName: host.name,
 				hostUrl: host.hostUrl,
@@ -111,6 +114,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 					projectId: project.id,
 					projectName: project.name,
 					projectIconUrl: project.iconUrl,
+					primaryRepositoryId: project.primaryRepositoryId,
 					machineId: host.machineId,
 					hostName: host.name,
 					hostUrl: host.hostUrl,
@@ -126,6 +130,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 				projectId: CLOUD_TARGET_ID,
 				projectName: "Cloud",
 				projectIconUrl: null,
+				primaryRepositoryId: null,
 				machineId: CLOUD_TARGET_ID,
 				hostName: "Cloud",
 				hostUrl: "",

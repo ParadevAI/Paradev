@@ -21,12 +21,14 @@ import { languageForPath } from "../utils/languageForPath";
 
 export function FileViewerScreen() {
 	const { t } = useLingui();
-	const { id, path, source } = useLocalSearchParams<{
+	const { id, path, source, repositoryId } = useLocalSearchParams<{
 		id: string;
+		/** Relative to the checkout of `repositoryId`. */
 		path: string;
 		source?: string;
+		repositoryId?: string;
 	}>();
-	const { host } = useWorkspaceHost(id ?? null);
+	const { workspace, host } = useWorkspaceHost(id ?? null);
 	const hostUrl =
 		host?.isOnline === true
 			? hostServiceUrl(host.organizationId, host.machineId)
@@ -38,7 +40,13 @@ export function FileViewerScreen() {
 	const query = useQuery({
 		// Distinct from the files-changed screen's diff-row cache: same procedure,
 		// different cached shape (raw file pair vs computed rows).
-		queryKey: ["workspace-file-contents", id ?? null, category, path] as const,
+		queryKey: [
+			"workspace-file-contents",
+			id ?? null,
+			repositoryId ?? null,
+			category,
+			path,
+		] as const,
 		enabled: hostUrl !== null && !!id && !!path,
 		staleTime: 15_000,
 		retry: 1,
@@ -46,6 +54,7 @@ export function FileViewerScreen() {
 		queryFn: () =>
 			getHostServiceClientByUrl(hostUrl as string).git.getDiff.query({
 				workspaceId: id as string,
+				repositoryId: repositoryId || undefined,
 				path: path as string,
 				category,
 			}),
@@ -53,9 +62,18 @@ export function FileViewerScreen() {
 
 	const contents = query.data?.newFile.contents ?? "";
 	const fileName = path?.split("/").pop() ?? t({ message: "File" });
-	const directory = path?.includes("/")
+	const checkoutName =
+		workspace?.checkouts && workspace.checkouts.length > 1
+			? (workspace.checkouts.find(
+					(checkout) => checkout.repositoryId === repositoryId,
+				)?.name ?? null)
+			: null;
+	const checkoutDirectory = path?.includes("/")
 		? path.slice(0, path.lastIndexOf("/"))
 		: null;
+	const directory =
+		[checkoutName, checkoutDirectory].filter(Boolean).join("/") || null;
+	const relativePath = checkoutName ? `${checkoutName}/${path}` : (path ?? "");
 
 	return (
 		<>
@@ -84,7 +102,7 @@ export function FileViewerScreen() {
 					>
 						<Stack.Toolbar.MenuAction
 							icon="doc.on.doc"
-							onPress={() => void Clipboard.setStringAsync(path ?? "")}
+							onPress={() => void Clipboard.setStringAsync(relativePath)}
 						>
 							{t({
 								message: "Copy relative path",

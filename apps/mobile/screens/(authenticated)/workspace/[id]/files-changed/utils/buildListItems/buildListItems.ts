@@ -26,6 +26,14 @@ export type ListItem =
 			expanded: boolean;
 			viewed: boolean;
 	  }
+	| {
+			kind: "checkout";
+			key: string;
+			name: string;
+			additions: number;
+			deletions: number;
+			fileCount: number;
+	  }
 	| { kind: "segment"; key: string; path: string; segment: HunkSegment }
 	| { kind: "expander"; key: string; path: string; row: ExpanderDiffRow }
 	| { kind: "truncated"; key: string; hiddenCount: number }

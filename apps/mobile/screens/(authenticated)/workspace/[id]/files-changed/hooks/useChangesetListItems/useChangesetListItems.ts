@@ -7,6 +7,10 @@ import {
 	type ListItem,
 	sameArrayShallow,
 } from "../../utils/buildListItems";
+import {
+	type CheckoutHeader,
+	checkoutHeaders,
+} from "../../utils/checkoutHeaders";
 import type { FileDiffData } from "../../utils/computeFileDiff";
 import { DIFF_LINE_HEIGHT, NOTE_ROW_HEIGHT } from "../../utils/diffMetrics";
 
@@ -25,6 +29,11 @@ interface HeaderCacheEntry {
 	file: ChangesetFile;
 	expanded: boolean;
 	viewed: boolean;
+	item: ListItem;
+}
+
+interface CheckoutCacheEntry {
+	signature: string;
 	item: ListItem;
 }
 
@@ -65,6 +74,7 @@ export function useChangesetListItems(args: {
 	const cacheRef = useRef(new Map<string, CacheEntry>());
 	const headerCacheRef = useRef(new Map<string, HeaderCacheEntry>());
 	const noteCacheRef = useRef(new Map<string, NoteCacheEntry>());
+	const checkoutCacheRef = useRef(new Map<string, CheckoutCacheEntry>());
 	const commentCacheRef = useRef(new Map<string, CommentCacheEntry>());
 
 	const commentsByPath = useMemo(() => {
@@ -81,6 +91,7 @@ export function useChangesetListItems(args: {
 		const cache = cacheRef.current;
 		const headerCache = headerCacheRef.current;
 		const noteCache = noteCacheRef.current;
+		const checkoutCache = checkoutCacheRef.current;
 		const commentCache = commentCacheRef.current;
 		const items: ListItem[] = [];
 		const stickyHeaderIndices: number[] = [];
@@ -131,8 +142,26 @@ export function useChangesetListItems(args: {
 			return item;
 		};
 
+		const headers = checkoutHeaders(files);
+		const liveCheckouts = new Set<string>();
+		const checkoutItem = (header: CheckoutHeader): ListItem => {
+			liveCheckouts.add(header.name);
+			const signature = `${header.additions}:${header.deletions}:${header.fileCount}`;
+			const cached = checkoutCache.get(header.name);
+			if (cached && cached.signature === signature) return cached.item;
+			const item: ListItem = {
+				kind: "checkout",
+				key: `checkout:${header.name}`,
+				...header,
+			};
+			checkoutCache.set(header.name, { signature, item });
+			return item;
+		};
+
 		for (const file of files) {
 			livePaths.add(file.path);
+			const header = headers.get(file.path);
+			if (header) items.push(checkoutItem(header));
 			const expanded = isExpanded(file);
 			stickyHeaderIndices.push(items.length);
 
@@ -222,6 +251,9 @@ export function useChangesetListItems(args: {
 		}
 		for (const path of noteCache.keys()) {
 			if (!livePaths.has(path)) noteCache.delete(path);
+		}
+		for (const name of checkoutCache.keys()) {
+			if (!liveCheckouts.has(name)) checkoutCache.delete(name);
 		}
 		const liveCommentIds = new Set(comments.map((comment) => comment.id));
 		for (const id of commentCache.keys()) {
