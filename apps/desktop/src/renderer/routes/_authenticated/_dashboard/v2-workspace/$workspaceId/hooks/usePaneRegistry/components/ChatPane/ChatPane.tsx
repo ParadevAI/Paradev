@@ -235,6 +235,14 @@ export function ChatPane({
 						...(pendingPrompt ? { pendingPrompt } : {}),
 					})
 				}
+				keepReplacement={(replaced, replacement) => {
+					const shown = ctx.store.getState().getPane(paneId)?.pane.data as
+						| ChatPaneData
+						| undefined;
+					if (shown?.sessionId !== replaced) return false;
+					ctx.actions.updateData({ ...shown, sessionId: replacement });
+					return true;
+				}}
 				onOpenDiff={openDiff}
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}

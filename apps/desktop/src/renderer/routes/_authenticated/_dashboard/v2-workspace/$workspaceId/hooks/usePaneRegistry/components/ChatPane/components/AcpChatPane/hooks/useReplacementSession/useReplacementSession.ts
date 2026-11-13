@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/**
- * The session a recovering chat moves to. One left behind at unmount stays live
- * on the pane's terminal and is adopted as a new tab once that pane closes.
- */
-export function useReplacementSession(close: (sessionId: string) => void): {
+/** The session a recovering chat moves to. One still held at unmount goes to `leave`. */
+export function useReplacementSession(leave: (sessionId: string) => void): {
 	replacement: string | null;
 	hold: (sessionId: string) => void;
 	release: () => void;
 } {
 	const [replacement, setReplacement] = useState<string | null>(null);
 	const held = useRef<string | null>(null);
-	const latestClose = useRef(close);
-	latestClose.current = close;
+	const latestLeave = useRef(leave);
+	latestLeave.current = leave;
 
 	const hold = useCallback((sessionId: string) => {
 		held.current = sessionId;
@@ -25,7 +22,7 @@ export function useReplacementSession(close: (sessionId: string) => void): {
 
 	useEffect(
 		() => () => {
-			if (held.current) latestClose.current(held.current);
+			if (held.current) latestLeave.current(held.current);
 		},
 		[],
 	);
