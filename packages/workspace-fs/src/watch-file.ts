@@ -1,4 +1,4 @@
-import { type FSWatcher, watch } from "node:fs";
+import { type FSWatcher, type Stats, watch } from "node:fs";
 import { stat } from "node:fs/promises";
 import {
 	clearInterval,
@@ -10,6 +10,9 @@ import type { FsWatchEvent } from "./types";
 
 const DEBOUNCE_MS = 75;
 const RECREATION_POLL_MS = 2_000;
+
+const fileSignature = (stats: Stats) =>
+	`${stats.ino}:${stats.mtimeMs}:${stats.ctimeMs}:${stats.size}`;
 
 export interface WatchSingleFileOptions {
 	debounceMs?: number;
@@ -44,10 +47,13 @@ export function watchSingleFile(
 	let watchedIno: bigint | number | null = null;
 	/** mtime last observed while the path is a directory (poll dedupe). */
 	let dirMtimeMs: number | null = null;
+	let fileSig: string | null = null;
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 	let pollTimer: ReturnType<typeof setInterval> | null = null;
 	let settling = false;
 	let settleQueued = false;
+	/** A watch event arrived that no settle has handled yet. */
+	let watchEventPending = false;
 
 	const emit = (kind: "create" | "update" | "delete", isDirectory: boolean) => {
 		onEvent({ kind, absolutePath, isDirectory });
@@ -76,11 +82,11 @@ export function watchSingleFile(
 	const installWatcher = (ino: bigint | number): boolean => {
 		closeWatcher();
 		try {
-			const installed = watch(absolutePath, () => scheduleSettle());
+			const installed = watch(absolutePath, onWatchEvent);
 			installed.on("error", () => {
 				// A dead watch must not be mistaken for a live same-inode one.
 				if (watcher === installed) closeWatcher();
-				scheduleSettle();
+				onWatchEvent();
 			});
 			watcher = installed;
 			watchedIno = ino;
@@ -90,6 +96,11 @@ export function watchSingleFile(
 			watchedIno = null;
 			return false;
 		}
+	};
+
+	const onWatchEvent = () => {
+		watchEventPending = true;
+		scheduleSettle();
 	};
 
 	const scheduleSettle = () => {
@@ -111,6 +122,8 @@ export function watchSingleFile(
 			return;
 		}
 		settling = true;
+		const fromWatch = watchEventPending;
+		watchEventPending = false;
 		try {
 			const stats = await stat(absolutePath).catch(() => null);
 			if (disposed) return;
@@ -124,6 +137,7 @@ export function watchSingleFile(
 					// deaf. Poll instead until the path is a plain file again.
 					// Emit only on transition or mtime change; a poll tick with
 					// nothing new must stay silent or consumers reload forever.
+					fileSig = null;
 					closeWatcher();
 					startPolling();
 					if (!existed) {
@@ -136,6 +150,9 @@ export function watchSingleFile(
 					return;
 				}
 				dirMtimeMs = null;
+				const sig = fileSignature(stats);
+				const changed = sig !== fileSig;
+				fileSig = sig;
 				stopPolling();
 				// Re-install only when the inode behind the path changed (atomic
 				// save replaced it — the old watch follows the dead inode). A
@@ -147,10 +164,13 @@ export function watchSingleFile(
 						startPolling();
 					}
 				}
-				emit(existed ? "update" : "create", false);
+				// Coarse-timestamp filesystems (HFS+) can leave the signature
+				// unchanged across a real write, so only poll ticks dedupe.
+				if (changed || fromWatch) emit(existed ? "update" : "create", false);
 			} else {
 				const existed = exists;
 				exists = false;
+				fileSig = null;
 				closeWatcher();
 				startPolling();
 				if (existed) {
@@ -172,6 +192,7 @@ export function watchSingleFile(
 		const stats = await stat(absolutePath).catch(() => null);
 		if (disposed) return;
 		exists = stats !== null;
+		if (stats?.isFile()) fileSig = fileSignature(stats);
 		if (!stats || !installWatcher(stats.ino)) {
 			startPolling();
 		}
