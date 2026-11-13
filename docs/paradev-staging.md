@@ -96,10 +96,16 @@ PostHog project. Discard the profile after testing.
 
 ## Inert domain cutover preparation
 
-Production `DOMAIN_MOVE_ENABLED` build/runtime passthrough is deliberately
-absent. Adding it to `deploy-production.yml` is required before rollout; that
-watched path can redeploy relay, realtime and agent-worker. Do not weaken those
+Production API build/runtime passthrough reads the optional
+`DOMAIN_MOVE_ENABLED` secret. Production web passthrough remains absent so the
+desktop rollout can precede existing web users. Changing this workflow's
+watched path can redeploy relay, realtime and agent-worker; do not weaken those
 filters. Building final artifacts does not activate routing or assign domains.
+
+The production API job waits for legacy web to deploy successfully, so the
+web continuation accepts all allowlisted providers before API handoffs use it.
+Wait for that production run to succeed before preparing and assigning updated
+final artifacts as well.
 
 The manual workflow now accepts `mode`, a fixed choice defaulting to `stage`.
 Stage retains the table and ownership checks above. `prepare-final` builds the
@@ -129,8 +135,8 @@ The optional server setting `DOMAIN_MOVE_ENABLED` must be exactly `true` before
 any domain-move flag lookup, PostHog client import by the routing hook, or rollout
 cookie creation. Missing, empty, `false`, and other values retain the existing
 response. API/web preview jobs pass the optional setting from
-`secrets.DOMAIN_MOVE_ENABLED`; production passthrough remains a required separate
-activation change. This preparation creates or changes no secret. The
+`secrets.DOMAIN_MOVE_ENABLED`; production passes it only to the legacy API.
+Merging the wiring creates or changes no secret. The
 isolated stage/final workflow explicitly keeps the setting `false`.
 
 Once explicitly enabled, eligible requests evaluate the shared PostHog flag
@@ -232,36 +238,60 @@ Coordinator-observed evidence, from before this preparation commit:
 This evidence does not validate this commit on live final hosts or authorize
 removing the reverse redirect, assigning final aliases, or enabling rollout.
 
-### Sentry legacy connect fallback
+### Legacy integration connect fallback
 
 Sentry's public integration has one fixed callback,
-`https://api.superset.sh/api/integrations/sentry/callback`. Until a separately
-reviewed provider change, final and stage API Sentry connect requests must reach
-that legacy host before OAuth state is created. This preparation changes no
-provider registration, environment setting, or live routing.
+`https://api.superset.sh/api/integrations/sentry/callback`. A real final-host
+Notion start on 2026-11-13 also failed with "Missing or invalid redirect_uri".
+Teams requires tenant-wide admin consent and its final callback is unverified.
+Keep all three providers on legacy until their registrations are reviewed.
+Final and stage starts reach legacy before OAuth state is created; no provider
+registration or authorization grant changes.
 
-An explicit Sentry connect request on `https://api.paradev.com` or
+An explicit Sentry, Notion or Microsoft Teams connect request on `https://api.paradev.com` or
 `https://api.stage.paradev.com` now follows this sequence:
 
 1. Validate the explicit `organizationId` UUID, then return a no-store 307 to
-   `https://app.superset.sh/auth/integration-connect?provider=sentry&organizationId=...`.
+   `https://app.superset.sh/auth/integration-connect?provider=<allowlisted-provider>&organizationId=...`.
    No new-host membership lookup, OAuth state, or state cookie is created.
-2. The legacy-web continuation accepts only Sentry and one valid organization
+2. The legacy-web continuation accepts only those three providers and one valid organization
    UUID. It reads the existing legacy auth session. Without a session, it sends
    the browser to the existing legacy sign-in page with a **relative** continuation
    containing the same provider and organization ID.
-3. After sign-in, redirect to the fixed old API Sentry connect route with the
+3. After sign-in, redirect to the fixed old API provider connect route with the
    explicit organization ID. `requireOrgMember` remains the authorization check
    there before the original OAuth flow runs. Active organization selection is
    never used to choose the target, and no session/token is forwarded.
 
-`/auth/integration-connect`, `/integrations/sentry`, and sign-in/up continuations
+`/auth/integration-connect`, `/integrations/sentry`, `/integrations/notion`,
+`/integrations/microsoft-teams`, and sign-in/up continuations
 into either route remain on legacy even at 100% domain rollout. Old, local, and
-preview Sentry starts retain their original behavior. Other providers are
+preview starts retain their original behavior. Other providers are
 unchanged. This is a handoff for an explicit user connect action, not an automatic
 installation or authorization grant. The user may need to sign in on legacy.
 
 Local tests cover the redirect/sign-in/resume sequence and routing exclusions;
-no real Sentry consent, installation, callback or connection write was performed.
+no real provider consent, installation, callback or connection write was performed.
 Final-host/provider integration verification still needs separately authorized
 access and a designated test organization.
+
+### Gradual rollout controls
+
+Move marketing first using the production-only `MARKETING_WEB_URL` override
+described in [environment variables](environment-variables.md#marketing-destination-override).
+Changing the shared `NEXT_PUBLIC_WEB_URL` secret would also move legacy auth and
+billing returns; leave that shared value unchanged.
+
+The production `web-domain-move` flag is initially inactive with a 0% condition.
+After final integrations and marketing acceptance, set the legacy API's optional
+`DOMAIN_MOVE_ENABLED` secret to `true` and deploy while the flag stays inactive.
+Verify excluded requests retain the old flow and final hosts do not reverse
+redirect. Test an explicit functional browser UUID before a small percentage
+rollout. Ordinary legacy web pages remain unchanged because their deployment
+does not pass the opt-in. Broader existing-web activation is a later change.
+
+Disable the flag first to roll back desktop starts. Restore the marketing
+override and redeploy marketing to roll back its links. Keep both stacks and
+all old callbacks available for in-flight requests; no database rollback is
+needed. Record deployment IDs, source SHA, cohort and observed results before
+each traffic increase.

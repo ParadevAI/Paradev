@@ -1,4 +1,4 @@
 export {
 	continueLegacyIntegrationConnect,
-	withLegacySentryConnect,
+	withLegacyIntegrationConnect,
 } from "./legacy-integration-connect";

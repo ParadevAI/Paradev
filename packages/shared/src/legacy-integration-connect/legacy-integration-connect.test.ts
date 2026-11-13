@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 import { withDomainMove } from "../domain-move";
 import {
 	continueLegacyIntegrationConnect,
-	withLegacySentryConnect,
+	withLegacyIntegrationConnect,
 } from "./legacy-integration-connect";
 
 const orgId = "803f13a4-49b9-4664-826f-4090c750b0bc";
@@ -20,7 +20,13 @@ const location = (response: Response) => {
 	return response.headers.get("location") ?? "";
 };
 
-test("final and stage hand off before OAuth, sign in on legacy, then authorize the explicit org with rollout at 100%", async () => {
+test.each([
+	"sentry",
+	"notion",
+	"microsoft-teams",
+])("%s hands off before OAuth, signs in on legacy, then authorizes the explicit org with rollout at 100%", async (provider) => {
+	const connectPath = `/api/integrations/${provider}/connect?organizationId=${orgId}`;
+	const continuationPath = `/auth/integration-connect?provider=${provider}&organizationId=${orgId}`;
 	for (const origin of [
 		"https://api.paradev.com",
 		"https://api.stage.paradev.com",
@@ -35,7 +41,7 @@ test("final and stage hand off before OAuth, sign in on legacy, then authorize t
 					},
 				}),
 		);
-		const moved = await withLegacySentryConnect(
+		const moved = await withLegacyIntegrationConnect(
 			request(`${origin}${connectPath}`),
 			beginOAuth,
 		);
@@ -79,7 +85,7 @@ test("final and stage hand off before OAuth, sign in on legacy, then authorize t
 			expect(new URL(oldApi).searchParams.get("organizationId")).toBe(orgId);
 			return beginOAuth();
 		});
-		const authorized = await withLegacySentryConnect(
+		const authorized = await withLegacyIntegrationConnect(
 			request(oldApi),
 			memberCheck,
 		);
@@ -93,7 +99,7 @@ test("final and stage hand off before OAuth, sign in on legacy, then authorize t
 		expect(
 			await withDomainMove({
 				request: request(
-					"https://app.superset.sh/integrations/sentry?error=not_configured",
+					`https://app.superset.sh/integrations/${provider}?error=not_configured`,
 				),
 				enabled: "true",
 				surface: "web",
@@ -109,7 +115,7 @@ test("handoff only carries the explicit org and provider, never credentials, sta
 	const credentials =
 		"&token=do-not-forward&state=do-not-forward&redirect=https://evil.test";
 	const originalFlow = mock(async () => new Response("should not start"));
-	const response = await withLegacySentryConnect(
+	const response = await withLegacyIntegrationConnect(
 		request(`https://api.paradev.com${connectPath}${credentials}`, {
 			headers: {
 				authorization: "Bearer do-not-forward",
@@ -140,7 +146,7 @@ test("invalid or ambiguous organization input fails before session reads or OAut
 	]) {
 		const startOAuth = mock(async () => new Response("OAuth"));
 		const isSignedIn = mock(async () => true);
-		const api = await withLegacySentryConnect(
+		const api = await withLegacyIntegrationConnect(
 			request(
 				`https://api.paradev.com/api/integrations/sentry/connect?${query}`,
 			),
@@ -162,7 +168,7 @@ test("invalid or ambiguous organization input fails before session reads or OAut
 	}
 });
 
-test("continuation accepts only one allowlisted Sentry provider", async () => {
+test("continuation accepts only one allowlisted provider", async () => {
 	for (const query of [
 		"",
 		"provider=",
@@ -212,7 +218,7 @@ test("continuation rejects foreign hosts and spoofed forwarded hosts before read
 		);
 		expect(response.status).toBe(404);
 		const oauth = mock(async () => new Response("OAuth"));
-		const moved = await withLegacySentryConnect(
+		const moved = await withLegacyIntegrationConnect(
 			request(`https://api.paradev.com${connectPath}`, {
 				headers: { [header]: "evil.test" },
 			}),
@@ -237,7 +243,7 @@ test("legacy, local, preview, foreign sources and unrelated provider starts keep
 		const original = new Response("legacy", { status: 403 });
 		const fallback = mock(async () => original);
 		expect(
-			await withLegacySentryConnect(
+			await withLegacyIntegrationConnect(
 				request(url, { headers: { "x-forwarded-host": "api.paradev.com" } }),
 				fallback,
 			),
@@ -252,7 +258,7 @@ test("new routes do not start OAuth or read sessions for non-GET requests", asyn
 		const session = mock(async () => true);
 		expect(
 			(
-				await withLegacySentryConnect(
+				await withLegacyIntegrationConnect(
 					request(`https://api.paradev.com${connectPath}`, { method }),
 					oauth,
 				)
