@@ -52,10 +52,11 @@ export function LinkTaskFrame({ workspaceId }: LinkTaskFrameProps) {
 
 	const { data: taskPage } =
 		cloudTrpc.task.listPage.useQuery(TASK_PICKER_INPUT);
-	const { data: searchedPage } = cloudTrpc.task.listPage.useQuery(
-		{ ...TASK_PICKER_INPUT, search: deferredQuery },
-		{ enabled: deferredQuery !== "", placeholderData: keepPreviousData },
-	);
+	const { data: searchedPage, isFetching: isSearching } =
+		cloudTrpc.task.listPage.useQuery(
+			{ ...TASK_PICKER_INPUT, search: deferredQuery },
+			{ enabled: deferredQuery !== "", placeholderData: keepPreviousData },
+		);
 
 	const tasks = useMemo(
 		() =>
@@ -141,7 +142,11 @@ export function LinkTaskFrame({ workspaceId }: LinkTaskFrameProps) {
 	return (
 		<CommandList className="max-h-[400px]">
 			<CommandEmpty>
-				<Trans>No tasks found.</Trans>
+				{deferredQuery && isSearching ? (
+					<Trans>Loading…</Trans>
+				) : (
+					<Trans>No tasks found.</Trans>
+				)}
 			</CommandEmpty>
 			{filtered.length > 0 && (
 				<CommandGroup
