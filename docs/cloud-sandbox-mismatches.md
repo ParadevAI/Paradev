@@ -31,6 +31,11 @@ the sandbox credential, and the sandbox scope refuses any procedure missing from
 ask whether to sync` every 5 minutes and stored no chats. We added it to the list. Any new procedure
 host-service calls on a box must go in that list too.
 
+Automation reads were allowed while updates were blocked by the same list. Cloud workspaces now
+allow `automation.update`, `setPrompt`, `setGroup`, and `setEnabled`, so the CLI can edit automation
+settings, prompts, groups, and enabled state. Existing organization and automation permission checks
+still apply. This is an API change; existing boxes do not need a new host-service bundle.
+
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.
 A cloud workspace is created, named (by the API's namer) and listed by the
