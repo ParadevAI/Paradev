@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useDefaultCloudAgent } from "renderer/routes/_authenticated/hooks/useDefaultCloudAgent";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 
@@ -11,6 +12,7 @@ export function useStartSetupAgent() {
 	const collections = useCollections();
 	const utils = cloudTrpc.useUtils();
 	const create = cloudTrpc.cloudWorkspace.create.useMutation();
+	const agent = useDefaultCloudAgent();
 
 	const start = useCallback(
 		async ({
@@ -22,12 +24,17 @@ export function useStartSetupAgent() {
 			environment: { id: string; name: string };
 			prompt: string;
 		}) => {
+			if (!agent) {
+				throw new Error(
+					t({ message: "No agent is available to set up the environment" }),
+				);
+			}
 			const { initialLaunch, ...created } = await create.mutateAsync({
 				organizationId,
 				environmentId: environment.id,
 				name: t({ message: `Set up ${environment.name}` }),
 				prompt,
-				agent: "claude",
+				agent,
 				agentTerminalId: crypto.randomUUID(),
 			});
 			seedPendingCloudChat({
@@ -49,7 +56,7 @@ export function useStartSetupAgent() {
 			});
 			void utils.cloudWorkspace.list.invalidate();
 		},
-		[create, t, collections, utils, navigate],
+		[create, agent, t, collections, utils, navigate],
 	);
 
 	return { start, isPending: create.isPending };

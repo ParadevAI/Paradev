@@ -28,6 +28,8 @@ interface Overrides {
 	cloudPrompt?: (typed: string) => string;
 	/** Sends the cloud prompt alone: no linked context, attachments or typed names, and the draft stays. */
 	ignoreDraft?: boolean;
+	/** Starts the cloud agent with this one instead of the selected agent. */
+	cloudAgent?: WorkspaceCreateAgent;
 }
 
 /**
@@ -172,8 +174,11 @@ export function useSubmitWorkspace(
 					const userPrompt = overrides?.cloudPrompt?.(prompt) ?? prompt;
 					const cloudLinkedPR = ignoreDraft ? null : linkedPR;
 					const cloudLinkedIssues = ignoreDraft ? [] : linkedIssues;
+					const cloudAgent = overrides?.cloudAgent ?? selectedAgent;
+					// Model, effort and mode belong to the selected agent.
+					const isSelectedAgent = cloudAgent === selectedAgent;
 					const wantCloudAgent =
-						selectedAgent !== "none" &&
+						cloudAgent !== "none" &&
 						(!!userPrompt.trim() ||
 							cloudLinkedPR !== null ||
 							cloudLinkedIssues.length > 0);
@@ -207,10 +212,14 @@ export function useSubmitWorkspace(
 							: {}),
 						...(wantCloudAgent
 							? {
-									agent: selectedAgent,
-									model: selectedModel ?? undefined,
-									effort: selectedEffort ?? undefined,
-									mode: selectedMode ?? undefined,
+									agent: cloudAgent,
+									...(isSelectedAgent
+										? {
+												model: selectedModel ?? undefined,
+												effort: selectedEffort ?? undefined,
+												mode: selectedMode ?? undefined,
+											}
+										: {}),
 									agentTerminalId: crypto.randomUUID(),
 								}
 							: {}),
@@ -222,8 +231,8 @@ export function useSubmitWorkspace(
 							workspaceId: created.id,
 							launch: initialLaunch,
 							prompt: userPrompt.trim(),
-							modelId: selectedModel,
-							modeId: selectedMode,
+							modelId: isSelectedAgent ? selectedModel : null,
+							modeId: isSelectedAgent ? selectedMode : null,
 						});
 					}
 					if (ignoreDraft) closeModal();

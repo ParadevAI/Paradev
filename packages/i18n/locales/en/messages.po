@@ -12781,6 +12781,9 @@ msgstr "No active workspaces"
 msgid "No agent"
 msgstr "No agent"
 
+msgid "No agent is available to set up the environment"
+msgstr "No agent is available to set up the environment"
+
 msgid "No agent is configured on this host"
 msgstr "No agent is configured on this host"
 

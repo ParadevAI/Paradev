@@ -12781,6 +12781,9 @@ msgstr "Aucun espace de travail actif"
 msgid "No agent"
 msgstr "Aucun agent"
 
+msgid "No agent is available to set up the environment"
+msgstr "Aucun agent n’est disponible pour configurer l’environnement"
+
 msgid "No agent is configured on this host"
 msgstr "Aucun agent n'est configuré sur cet hôte"
 

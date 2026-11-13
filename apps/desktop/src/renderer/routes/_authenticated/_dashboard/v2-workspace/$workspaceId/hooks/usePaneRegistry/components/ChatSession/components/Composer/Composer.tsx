@@ -50,7 +50,6 @@ import { useFooterTier } from "renderer/routes/_authenticated/components/AgentCo
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { ENVIRONMENT_SETUP_PROMPT } from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
@@ -609,17 +608,12 @@ export const Composer = memo(function Composer({
 		[availableCommands, blocked, runTyped, send, t, target],
 	);
 
-	const insertSetupPrompt = useCallback(() => {
+	const insertSetupPrompt = useCallback((prompt: string) => {
 		const input = promptInputRef.current;
 		if (!input) return;
 		input.restoreDraft({
 			segments: [
-				{
-					type: "text",
-					text: input.isEmpty()
-						? ENVIRONMENT_SETUP_PROMPT
-						: `\n\n${ENVIRONMENT_SETUP_PROMPT}`,
-				},
+				{ type: "text", text: input.isEmpty() ? prompt : `\n\n${prompt}` },
 			],
 			attachments: [],
 		});

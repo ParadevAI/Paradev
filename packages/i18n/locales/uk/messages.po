@@ -12775,6 +12775,9 @@ msgstr "Немає активних робочих просторів"
 msgid "No agent"
 msgstr "Без агента"
 
+msgid "No agent is available to set up the environment"
+msgstr "Немає агента, який може налаштувати середовище"
+
 msgid "No agent is configured on this host"
 msgstr "На цьому хості не налаштовано жодного агента"
 

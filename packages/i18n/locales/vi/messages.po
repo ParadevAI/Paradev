@@ -12781,6 +12781,9 @@ msgstr "Không có workspace đang hoạt động"
 msgid "No agent"
 msgstr "Không có agent"
 
+msgid "No agent is available to set up the environment"
+msgstr "Không có agent nào để thiết lập environment"
+
 msgid "No agent is configured on this host"
 msgstr "Không có tác nhân nào được cấu hình trên máy chủ này"
 

@@ -32,6 +32,7 @@ import {
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
 import {
 	assertEnvironmentCapacity,
@@ -613,6 +614,14 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
+			// A shared environment's size sets the bill for everyone who boots on it.
+			if (
+				input.machineSize !== undefined &&
+				current.scope === "organization" &&
+				current.createdByUserId !== ctx.principal.userId
+			) {
+				await verifyOrgAdmin(ctx.principal.userId, current.organizationId);
+			}
 			await assertMachineSizeOffered(current.organizationId, input.machineSize);
 
 			// A golden was built for its repositories and set up by its primary.

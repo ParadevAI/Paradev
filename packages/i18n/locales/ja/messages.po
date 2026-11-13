@@ -12781,6 +12781,9 @@ msgstr "アクティブなワークスペースはありません"
 msgid "No agent"
 msgstr "エージェントなし"
 
+msgid "No agent is available to set up the environment"
+msgstr "環境をセットアップできるエージェントがありません"
+
 msgid "No agent is configured on this host"
 msgstr "このホストにはエージェントが設定されていません"
 

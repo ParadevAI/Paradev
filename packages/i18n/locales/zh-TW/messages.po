@@ -12781,6 +12781,9 @@ msgstr "沒有作用中的工作區"
 msgid "No agent"
 msgstr "無代理程式"
 
+msgid "No agent is available to set up the environment"
+msgstr "沒有可用來設定環境的代理程式"
+
 msgid "No agent is configured on this host"
 msgstr "此主機上未設定任何代理程式"
 

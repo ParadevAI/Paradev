@@ -53,7 +53,7 @@ import { draftLinkedContext } from "renderer/routes/_authenticated/components/Ag
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
 import { SetUpEnvironmentButton } from "renderer/routes/_authenticated/components/SetUpEnvironmentButton";
-import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
+import { useDefaultCloudAgent } from "renderer/routes/_authenticated/hooks/useDefaultCloudAgent";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
@@ -106,6 +106,10 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
+import {
+	type PendingEnvironmentSetup,
+	planEnvironmentSetup,
+} from "./utils/planEnvironmentSetup";
 import { resolveLaunchHost } from "./utils/resolveLaunchHost";
 import {
 	type LaunchProjectPick,
@@ -146,7 +150,6 @@ export function NewWorkspaceScreen({
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
 		closeModal,
-		closeAndResetDraft,
 		draft,
 		updateDraft,
 		selectProject,
@@ -366,7 +369,6 @@ export function NewWorkspaceScreen({
 		selectedProject?.githubOwner && selectedProject.githubRepoName
 			? `${selectedProject.githubOwner}/${selectedProject.githubRepoName}`
 			: null;
-	const machineSizeOptions = useMachineSizeOptions();
 	const cloudProjectId = isSession ? null : projectId;
 	const cloudChoiceKey = cloudProjectId ?? NO_PROJECT_KEY;
 	const cloudSelection = useMemo(
@@ -376,29 +378,21 @@ export function NewWorkspaceScreen({
 				projectId: cloudProjectId,
 				repositoryFullName: projectRepositoryFullName,
 				choices: cloudChoices,
-				offeredSizes: machineSizeOptions.options.map((option) => option.size),
-				defaultSize: machineSizeOptions.defaultSize,
 			}),
 		[
 			environmentsQuery.data,
 			cloudProjectId,
 			projectRepositoryFullName,
 			cloudChoices,
-			machineSizeOptions,
 		],
 	);
 	const resolvedEnvironment = cloudSelection.environment ?? undefined;
 	const isCloudTargetLoading =
-		environmentsQuery.isLoading || github.isLoading || isProjectPending;
+		environmentsQuery.isLoading || github.isLoading || !areProjectsReady;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 	const [dialogSendsDraft, setDialogSendsDraft] = useState(false);
-	const [pendingSetupEnvironmentId, setPendingSetupEnvironmentId] = useState<
-		string | null
-	>(null);
-	const awaitingSetup =
-		isCloudHost &&
-		pendingSetupEnvironmentId !== null &&
-		resolvedEnvironment?.id === pendingSetupEnvironmentId;
+	const [pendingSetup, setPendingSetup] =
+		useState<PendingEnvironmentSetup | null>(null);
 	const needsEnvironment =
 		isCloudHost &&
 		cloudEnabled !== false &&
@@ -410,6 +404,16 @@ export function NewWorkspaceScreen({
 		: undefined;
 	const { createEnvironment, isCreating: isCreatingProjectEnvironment } =
 		useCreateProjectEnvironment(activeOrganizationId);
+	const setupPlan = isCloudHost
+		? planEnvironmentSetup({
+				pending: pendingSetup,
+				choiceKey: cloudChoiceKey,
+				selectedEnvironmentId: resolvedEnvironment?.id ?? null,
+				needsEnvironment,
+				repository: projectRepository,
+			})
+		: null;
+	const defaultCloudAgent = useDefaultCloudAgent();
 	const cloudRepository = useMemo(() => {
 		if (!isCloudHost) return null;
 		const primary = resolvedEnvironment?.repositories?.[0];
@@ -866,24 +870,34 @@ export function NewWorkspaceScreen({
 			cloudPrompt: (typed: string, environmentUrl: string) => string;
 			ignoreDraft: boolean;
 		}) => {
-			if (setupInFlightRef.current) return;
+			if (!setupPlan || setupInFlightRef.current) return;
+			if (setupPlan.kind === "dialog") {
+				setDialogSendsDraft(!ignoreDraft);
+				setIsCreatingEnvironment(true);
+				return;
+			}
+			const agent =
+				selectedAgent !== "none" ? selectedAgent : defaultCloudAgent;
+			if (!agent) {
+				toast.error(
+					t({ message: "No agent is available to set up the environment" }),
+				);
+				return;
+			}
 			setupInFlightRef.current = true;
 			try {
-				let environmentId = awaitingSetup ? pendingSetupEnvironmentId : null;
-				if (!environmentId) {
-					if (!projectRepository) {
-						setDialogSendsDraft(!ignoreDraft);
-						setIsCreatingEnvironment(true);
-						return;
-					}
+				let environmentId: string | null =
+					setupPlan.kind === "reuse" ? setupPlan.environmentId : null;
+				if (setupPlan.kind === "create") {
 					environmentId = await createEnvironment({
-						repository: projectRepository,
+						repository: setupPlan.repository,
 						projectId: cloudProjectId,
 					});
 					if (!environmentId) return;
 					setCloudChoice(cloudChoiceKey, { environmentId });
-					setPendingSetupEnvironmentId(environmentId);
+					setPendingSetup({ choiceKey: cloudChoiceKey, environmentId });
 				}
+				if (!environmentId) return;
 				const environmentUrl = new URL(
 					`/environments/${environmentId}`,
 					env.NEXT_PUBLIC_WEB_URL,
@@ -891,9 +905,10 @@ export function NewWorkspaceScreen({
 				const started = await createWorkspace({
 					cloudEnvironmentId: environmentId,
 					cloudPrompt: (typed) => cloudPrompt(typed, environmentUrl),
+					cloudAgent: agent,
 					ignoreDraft,
 				});
-				if (started) setPendingSetupEnvironmentId(null);
+				if (started) setPendingSetup(null);
 			} catch (error) {
 				toast.error(
 					errorMessage(error, t({ message: "Could not create environment" })),
@@ -903,9 +918,9 @@ export function NewWorkspaceScreen({
 			}
 		},
 		[
-			awaitingSetup,
-			pendingSetupEnvironmentId,
-			projectRepository,
+			setupPlan,
+			selectedAgent,
+			defaultCloudAgent,
 			createEnvironment,
 			cloudProjectId,
 			setCloudChoice,
@@ -932,7 +947,7 @@ export function NewWorkspaceScreen({
 			}
 			return;
 		}
-		if (needsEnvironment || awaitingSetup) {
+		if (setupPlan) {
 			void runEnvironmentSetup({
 				cloudPrompt: withEnvironmentSetupSkill,
 				ignoreDraft: false,
@@ -944,8 +959,7 @@ export function NewWorkspaceScreen({
 		activeHostUrl,
 		createWorkspace,
 		isStarting,
-		needsEnvironment,
-		awaitingSetup,
+		setupPlan,
 		runEnvironmentSetup,
 		hostId,
 		handleGoToSetup,
@@ -1019,11 +1033,12 @@ export function NewWorkspaceScreen({
 			tier={samplePromptTier}
 		/>
 	);
-	const setUpEnvironmentButton = (needsEnvironment || awaitingSetup) && (
+	const setUpEnvironmentButton = setupPlan && (
 		<SetUpEnvironmentButton
 			onClick={() =>
 				void runEnvironmentSetup({
-					cloudPrompt: () => ENVIRONMENT_SETUP_PROMPT,
+					cloudPrompt: (_typed, environmentUrl) =>
+						withEnvironmentSetupSkill(ENVIRONMENT_SETUP_PROMPT, environmentUrl),
 					ignoreDraft: true,
 				})
 			}
@@ -1072,7 +1087,7 @@ export function NewWorkspaceScreen({
 						setIsCreatingEnvironment(open);
 						if (!open) setDialogSendsDraft(false);
 					}}
-					onStarted={dialogSendsDraft ? closeAndResetDraft : closeModal}
+					onStarted={closeModal}
 					setupPrompt={
 						dialogSendsDraft && !isPromptEmpty
 							? (environmentUrl) =>

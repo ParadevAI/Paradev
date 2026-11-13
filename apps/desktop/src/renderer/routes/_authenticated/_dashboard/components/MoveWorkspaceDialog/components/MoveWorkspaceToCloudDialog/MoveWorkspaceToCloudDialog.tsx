@@ -18,7 +18,6 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
-import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import {
 	NO_PROJECT_KEY,
@@ -60,7 +59,6 @@ export function MoveWorkspaceToCloudDialog({
 		{ organizationId: organizationId ?? "" },
 		{ enabled: open && !!organizationId },
 	);
-	const machineSizeOptions = useMachineSizeOptions();
 	const cloudChoices = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.cloudChoices,
 	);
@@ -75,16 +73,8 @@ export function MoveWorkspaceToCloudDialog({
 				projectId,
 				repositoryFullName,
 				choices: cloudChoices,
-				offeredSizes: machineSizeOptions.options.map((option) => option.size),
-				defaultSize: machineSizeOptions.defaultSize,
 			}),
-		[
-			environmentsQuery.data,
-			projectId,
-			repositoryFullName,
-			cloudChoices,
-			machineSizeOptions,
-		],
+		[environmentsQuery.data, projectId, repositoryFullName, cloudChoices],
 	);
 	const environment = selection.environment;
 

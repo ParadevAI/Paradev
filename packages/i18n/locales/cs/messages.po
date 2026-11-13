@@ -12781,6 +12781,9 @@ msgstr "Žádné aktivní pracovní prostory"
 msgid "No agent"
 msgstr "Žádný agent"
 
+msgid "No agent is available to set up the environment"
+msgstr "K nastavení prostředí není k dispozici žádný agent"
+
 msgid "No agent is configured on this host"
 msgstr "Na tomto hostiteli není nakonfigurován žádný agent"
 

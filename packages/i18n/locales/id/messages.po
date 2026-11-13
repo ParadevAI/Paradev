@@ -12781,6 +12781,9 @@ msgstr "Tidak ada workspace aktif"
 msgid "No agent"
 msgstr "Tanpa agen"
 
+msgid "No agent is available to set up the environment"
+msgstr "Tidak ada agen yang tersedia untuk menyiapkan environment"
+
 msgid "No agent is configured on this host"
 msgstr "Tidak ada agen yang dikonfigurasi di host ini"
 

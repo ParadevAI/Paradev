@@ -12781,6 +12781,9 @@ msgstr "활성 워크스페이스 없음"
 msgid "No agent"
 msgstr "에이전트 없음"
 
+msgid "No agent is available to set up the environment"
+msgstr "환경을 설정할 수 있는 에이전트가 없습니다"
+
 msgid "No agent is configured on this host"
 msgstr "이 호스트에 구성된 에이전트가 없습니다"
 

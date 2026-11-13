@@ -12781,6 +12781,9 @@ msgstr "Etkin çalışma alanı yok"
 msgid "No agent"
 msgstr "Ajan yok"
 
+msgid "No agent is available to set up the environment"
+msgstr "Ortamı kurmak için kullanılabilir ajan yok"
+
 msgid "No agent is configured on this host"
 msgstr "Bu ana makinede yapılandırılmış bir ajan yok"
 

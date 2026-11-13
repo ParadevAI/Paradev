@@ -12781,6 +12781,9 @@ msgstr "没有活动的工作区"
 msgid "No agent"
 msgstr "无智能体"
 
+msgid "No agent is available to set up the environment"
+msgstr "没有可用于设置环境的代理"
+
 msgid "No agent is configured on this host"
 msgstr "此主机上未配置任何智能体"
 
