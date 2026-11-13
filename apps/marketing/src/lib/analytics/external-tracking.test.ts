@@ -1,9 +1,18 @@
 import { afterEach, expect, mock, test } from "bun:test";
 
 import { createConsentAwareTrackingFetch } from "./external-tracking";
+import { EXTERNAL_TRACKING_ID } from "./external-tracking-client";
 
 const globals = globalThis as { window?: unknown };
 const endpoint = "https://backend.leadconnectorhq.com/external-tracking/events";
+const page = JSON.stringify({
+	type: "external_script_page_view",
+	trackingId: EXTERNAL_TRACKING_ID,
+	sessionId: "session-1",
+	contactId: "contact-1",
+	userId: "user-1",
+	properties: { deviceType: "mobile", unexpected: "private data" },
+});
 
 afterEach(() => {
 	delete globals.window;
@@ -16,48 +25,85 @@ function fixture(choice: string | null = null) {
 		localStorage: { getItem: () => storage.choice },
 	};
 	const transport = mock(async () => new Response("{}"));
+	const initialize = mock(() => {});
 	return {
 		storage,
 		transport,
-		fetch: createConsentAwareTrackingFetch(transport),
+		initialize,
+		fetch: createConsentAwareTrackingFetch(transport, undefined, initialize),
 	};
 }
 
-test("default and accepted visits send the original request unchanged", async () => {
+test("initializes the app adapter from a vendor page event without forwarding it", async () => {
 	for (const choice of [null, "accepted"]) {
-		const { fetch, transport } = fixture(choice);
-		const init = { method: "POST", body: "pageview", keepalive: true };
-		await fetch(endpoint, init);
-		expect(transport).toHaveBeenCalledWith(endpoint, init);
+		const { fetch, transport, initialize } = fixture(choice);
+		expect((await fetch(endpoint, { method: "POST", body: page })).status).toBe(
+			204,
+		);
+		expect(initialize).toHaveBeenCalledWith({
+			sessionId: "session-1",
+			contactId: "contact-1",
+			userId: "user-1",
+			deviceType: "mobile",
+		});
+		expect(transport).not.toHaveBeenCalled();
 	}
 });
 
-test("checks the current choice for queued, form and unload requests", async () => {
-	const { fetch, transport, storage } = fixture();
-	await fetch(endpoint);
-	storage.choice = "declined";
-	for (const input of [endpoint, new URL(endpoint), new Request(endpoint)]) {
-		const response = await fetch(input, { method: "POST", keepalive: true });
+test("drops automatic forms, files, timing events and unknown payloads", async () => {
+	const { fetch, transport, initialize } = fixture();
+	const multipart = new FormData();
+	multipart.append(
+		"event",
+		JSON.stringify({ type: "external_form_submission" }),
+	);
+	multipart.append("password", "must-not-leave");
+	multipart.append("file", new Blob(["private attachment"]), "private.txt");
+	for (const body of [
+		JSON.stringify({
+			type: "external_form_submission",
+			formData: { password: "secret" },
+		}),
+		JSON.stringify({ type: "external_page_time_spent" }),
+		multipart,
+		"unknown payload",
+	]) {
+		const response = await fetch(endpoint, {
+			method: "POST",
+			body,
+			keepalive: true,
+		});
 		expect(response.status).toBe(204);
-		expect(response.ok).toBe(true);
 	}
-	expect(transport).toHaveBeenCalledTimes(1);
+	expect(transport).not.toHaveBeenCalled();
+	expect(initialize).not.toHaveBeenCalled();
 });
 
-test("does not block app requests or other vendor endpoints after decline", async () => {
+test("checks current consent before initializing from Request or URL inputs", async () => {
+	const { fetch, transport, storage, initialize } = fixture();
+	await fetch(new Request(endpoint, { method: "POST", body: page }));
+	expect(initialize).toHaveBeenCalledTimes(1);
+	storage.choice = "declined";
+	await fetch(new URL(endpoint), { method: "POST", body: page });
+	expect(initialize).toHaveBeenCalledTimes(1);
+	expect(transport).not.toHaveBeenCalled();
+});
+
+test("does not intercept app requests or other vendor endpoints", async () => {
 	const { fetch, transport } = fixture("declined");
 	for (const url of [
 		"/api/subscribe",
 		"https://backend.leadconnectorhq.com/other",
 		"https://other.example/external-tracking/events",
 	]) {
-		await fetch(url);
+		const init = { method: "POST", body: "original body" };
+		await fetch(url, init);
+		expect(transport).toHaveBeenLastCalledWith(url, init);
 	}
-	expect(transport).toHaveBeenCalledTimes(3);
 });
 
-test("blocks tracking when the saved preference is unavailable", async () => {
-	const { fetch, transport } = fixture();
+test("blocks initialization when stored consent cannot be read", async () => {
+	const { fetch, transport, initialize } = fixture();
 	globals.window = {
 		location: { href: "https://paradev.com/" },
 		localStorage: {
@@ -69,8 +115,11 @@ test("blocks tracking when the saved preference is unavailable", async () => {
 	const warn = console.warn;
 	console.warn = () => {};
 	try {
-		expect((await fetch(endpoint)).status).toBe(204);
+		expect((await fetch(endpoint, { method: "POST", body: page })).status).toBe(
+			204,
+		);
 		expect(transport).not.toHaveBeenCalled();
+		expect(initialize).not.toHaveBeenCalled();
 	} finally {
 		console.warn = warn;
 	}

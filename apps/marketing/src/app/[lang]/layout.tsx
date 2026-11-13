@@ -188,7 +188,9 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
-				<ExternalTracking />
+				<Suspense fallback={null}>
+					<ExternalTracking />
+				</Suspense>
 			</body>
 		</html>
 	);
