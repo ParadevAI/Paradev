@@ -127,16 +127,12 @@ export function useV2WorkspaceRun({
 	const hostTarget = useWorkspaceHostTarget(workspaceId);
 	const isSandbox =
 		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
-	// A cloud box starts the project's run terminal on boot, once setup ends.
-	// Read once on open so the button shows Stop; Run reads it again.
 	const isBootRunHost = isSandbox && Boolean(configRunDefinition);
 	const { data: sandboxStatus } = workspaceTrpc.sandbox.status.useQuery(
 		undefined,
 		{ enabled: isBootRunHost },
 	);
 	const bootRunTerminalId = sandboxStatus?.runTerminalId ?? null;
-	// A default terminal that daemonizes (`tmux new-session -d`) leaves an idle
-	// shell, which Stop could not stop; only a running command is adopted.
 	const { data: bootRunProcess } =
 		workspaceTrpc.terminal.hasRunningProcess.useQuery(
 			{ terminalId: bootRunTerminalId ?? "", workspaceId },
@@ -213,7 +209,6 @@ export function useV2WorkspaceRun({
 		adoptBootRun(bootRunTerminalId);
 	}, [adoptBootRun, bootRunTerminalId, isBootRunLive, workspaceRunTerminals]);
 
-	/** The boot run terminal, when it is live and running its command now. */
 	const findLiveBootRun = useCallback(async (): Promise<string | null> => {
 		if (!isBootRunHost) return null;
 		try {
@@ -288,8 +283,6 @@ export function useV2WorkspaceRun({
 			// workspaceRunTerminals. Snapshot before launch so the new terminal
 			// we're about to create doesn't itself match.
 			const priorRunTerminalIds = new Set(Object.keys(workspaceRunTerminals));
-			// Ctrl-C can leave a server holding its port; the new run replaces
-			// these terminals in the pane, so nothing else would end them.
 			try {
 				const { sessions } = await utils.terminal.list.fetch(
 					{ workspaceId },

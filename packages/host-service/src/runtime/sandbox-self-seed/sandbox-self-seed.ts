@@ -177,9 +177,7 @@ function readTail(path: string): string {
 }
 
 export interface StartHookPlan {
-	/** `[setup]`, detached; stops at its first failure. */
 	setup: string | null;
-	/** The default terminal, which the Run button starts. */
 	run: PhaseCommand | null;
 }
 
@@ -213,7 +211,6 @@ const START_HOOK_RUN_TERMINAL = join(
 	"start-hook-run-terminal",
 );
 
-/** Where the hook keeps its state; tests point these at a temp directory. */
 export interface StartHookFiles {
 	marker: string;
 	log: string;
@@ -241,11 +238,6 @@ function readRunTerminalId(files: StartHookFiles): string | null {
 	}
 }
 
-/**
- * The terminal the start hook started the default terminal in, for
- * `sandbox.status`, while it is still live. On disk, so a host-service
- * restart still reports it once startup re-attaches it.
- */
 export function getStartHookRunTerminalId(
 	files: StartHookFiles = START_HOOK_FILES,
 ): string | null {
@@ -253,18 +245,11 @@ export function getStartHookRunTerminalId(
 	return terminalId && isLiveTerminalSession(terminalId) ? terminalId : null;
 }
 
-/**
- * The default terminal runs in a terminal session, not beside setup: the
- * port scanner only sees processes under a session, and the desktop adopts
- * this session as the running workspace run instead of starting a second one.
- */
 function sessionRunTerminalStarter(
 	ctx: Pick<HostServiceContext, "db" | "eventBus">,
 	identity: SandboxIdentity,
 ): RunTerminalStarter {
 	return {
-		// After a host-service restart only the daemon still holds the session;
-		// adopting it makes it live here again, for Run and the port scanner.
 		isLive: (terminalId) =>
 			isAgentTerminalAlive({
 				terminalId,
@@ -290,7 +275,6 @@ function sessionRunTerminalStarter(
 
 let runTerminalInFlight: Promise<StartedRun | { error: string }> | null = null;
 
-/** The setup exit handler and the restart resume can both ask at once. */
 function startRunTerminal(
 	starter: RunTerminalStarter,
 	files: StartHookFiles,
@@ -309,7 +293,6 @@ async function startRunTerminalOnce(
 	files: StartHookFiles,
 	run: PhaseCommand,
 ): Promise<StartedRun | { error: string }> {
-	// A forced re-run keeps the server it already started.
 	const existing = readRunTerminalId(files);
 	if (existing && (await starter.isLive(existing)))
 		return { terminalId: existing, pid: null };
@@ -400,7 +383,6 @@ export async function runSandboxStartHook(
 			since: Date.now(),
 			log: readTail(files.log),
 		};
-		// Setup stops at its first failure; the terminal still starts after it.
 		startRun().catch((error) => {
 			console.error("[sandbox] run terminal not started", error);
 		});
@@ -432,11 +414,6 @@ export async function runSandboxStartHook(
 	return { started: true, pid, command };
 }
 
-/**
- * A host-service restart loses the setup child's exit handler and the run
- * terminal's in-memory session. On startup, re-attach the recorded run
- * terminal, or start it once the setup the marker names has exited.
- */
 export async function resumeSandboxStartHookRun(
 	ctx: Pick<HostServiceContext, "db" | "eventBus">,
 	identity: SandboxIdentity,
