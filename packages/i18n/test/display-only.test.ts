@@ -60,13 +60,7 @@ describe("errorMessage() stays display-only", () => {
 						offenders.push(`${dir}/${file}:${line} ${name}`);
 					}
 				}
-			}
-			// Alias tracking: `const x = errorMessage(...)` later string-matched.
-			const glob2 = new Bun.Glob("**/*.{ts,tsx}");
-			for await (const file of glob2.scan({ cwd: join(REPO_ROOT, dir) })) {
-				if (file.includes(".test.") || file.includes(".stories.")) continue;
-				const source = await Bun.file(join(REPO_ROOT, dir, file)).text();
-				if (!source.includes("errorMessage(")) continue;
+				// Also catch string matching on a variable assigned from errorMessage().
 				const aliases = [
 					...source.matchAll(
 						/(?:const|let)\s+(\w+)\s*=\s*\n?\s*errorMessage\(/g,
