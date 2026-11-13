@@ -1,0 +1,1 @@
+export { WorkspacesIcon } from "./WorkspacesIcon";

@@ -1,24 +1,35 @@
 import { useLingui } from "@lingui/react/macro";
-import { HEADER_ICON_STROKE_WIDTH } from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { useMatchRoute } from "@tanstack/react-router";
-import { ChevronsUpDown, Layers } from "lucide-react";
 import { openWorkspaceList } from "renderer/commandPalette";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
+import { WorkspacesIcon } from "./components/WorkspacesIcon";
+import {
+	useWaitingWorkspaceBucket,
+	type WaitingWorkspaceBucket,
+} from "./hooks/useWaitingWorkspaceBucket";
 
-/** The viewed workspace's name on the selected-tab pill; it opens the workspace list, which starts with New workspace. */
+const WAITING_DOT_CLASS: Record<WaitingWorkspaceBucket, string> = {
+	needsInput: "bg-amber-400",
+	completed: "bg-green-500",
+};
+
+/** Opens the workspace switcher. Its dot shows when another sidebar workspace waits on the user. */
 export function WorkspaceSwitcherButton() {
 	const { t } = useLingui();
 	const matchRoute = useMatchRoute();
 	const { workspaces } = useHostWorkspaces();
+	const waiting = useWaitingWorkspaceBucket();
 	const match = matchRoute({ to: "/v2-workspace/$workspaceId", fuzzy: true });
 	const workspace =
 		match !== false
 			? workspaces.find((candidate) => candidate.id === match.workspaceId)
 			: undefined;
 	if (!workspace) return null;
+	const name = getV2WorkspaceDisplayName(workspace);
 
 	return (
 		<Tooltip delayDuration={300}>
@@ -26,27 +37,30 @@ export function WorkspaceSwitcherButton() {
 				<button
 					type="button"
 					aria-haspopup="dialog"
+					aria-label={t({ message: "Switch workspace" })}
 					onClick={() => openWorkspaceList({ via: "pill" })}
-					className="no-drag group/switcher mx-1.5 flex h-7 min-w-0 max-w-40 items-center gap-2 rounded-full bg-[var(--tab-selected)] pr-2 pl-2.5 font-medium text-[13px] text-foreground shadow-[var(--tab-selected-shadow)] transition-colors hover:bg-[var(--tab-switcher-hover)]"
+					className="no-drag relative mx-1.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-[var(--tab-selected)] text-foreground shadow-[var(--tab-selected-shadow)] transition-colors hover:bg-[var(--tab-switcher-hover)]"
 				>
-					<Layers
-						className="size-4 shrink-0 text-muted-foreground transition-colors group-hover/switcher:text-foreground"
-						strokeWidth={HEADER_ICON_STROKE_WIDTH}
-					/>
-					<span className="truncate">
-						{getV2WorkspaceDisplayName(workspace)}
-					</span>
-					<ChevronsUpDown
-						className="size-3.5 shrink-0 text-muted-foreground transition-colors group-hover/switcher:text-foreground"
-						strokeWidth={HEADER_ICON_STROKE_WIDTH}
-					/>
+					<WorkspacesIcon className="size-4" />
+					{waiting ? (
+						<span
+							aria-hidden="true"
+							className={cn(
+								"-top-0.5 -right-0.5 absolute size-2 rounded-full ring-2 ring-shell-frame",
+								WAITING_DOT_CLASS[waiting],
+							)}
+						/>
+					) : null}
 				</button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">
-				<HotkeyLabel
-					label={t({ message: "Switch workspace" })}
-					id="OPEN_WORKSPACE_LIST"
-				/>
+				<div className="flex flex-col gap-0.5">
+					<span className="font-medium">{name}</span>
+					<HotkeyLabel
+						label={t({ message: "Switch workspace" })}
+						id="OPEN_WORKSPACE_LIST"
+					/>
+				</div>
 			</TooltipContent>
 		</Tooltip>
 	);
