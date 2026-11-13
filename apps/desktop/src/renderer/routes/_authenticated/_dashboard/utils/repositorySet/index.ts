@@ -1,4 +1,5 @@
 export {
+	checkoutRepositoryFullNames,
 	holdsExactRepositorySet,
 	isSameRepositorySet,
 	repositoryFullNames,

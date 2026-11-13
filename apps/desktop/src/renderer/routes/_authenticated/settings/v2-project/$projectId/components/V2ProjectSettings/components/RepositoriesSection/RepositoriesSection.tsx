@@ -26,7 +26,7 @@ import { HiEllipsisVertical } from "react-icons/hi2";
 import { LuFolderGit2 } from "react-icons/lu";
 import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { hostRefusalReason } from "../../utils/hostRefusalReason";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { AddProjectRepository } from "../AddProjectRepository";
 
 interface RepositoriesSectionProps {

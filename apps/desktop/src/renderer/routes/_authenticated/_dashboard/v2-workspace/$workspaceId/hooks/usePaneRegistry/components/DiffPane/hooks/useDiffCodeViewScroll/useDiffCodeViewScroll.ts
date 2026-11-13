@@ -26,6 +26,8 @@ interface UseDiffCodeViewScrollOptions {
 	setCollapsed: (path: string, value: boolean) => void;
 	scrollStateKey: string;
 	initialScrollState?: { scrollTop: number; updatedAt: number };
+	/** A target without `repositoryId` has its path from the workspace folder. */
+	rootPathOf?: (file: ChangesetFile) => string;
 }
 
 interface UseDiffCodeViewScrollResult {
@@ -56,6 +58,7 @@ export function useDiffCodeViewScroll({
 	setCollapsed,
 	scrollStateKey,
 	initialScrollState,
+	rootPathOf,
 }: UseDiffCodeViewScrollOptions): UseDiffCodeViewScrollResult {
 	// Identifies the click/focus request currently being tracked, and whether
 	// it's still "sticky" — i.e. whether we should keep re-asserting
@@ -83,9 +86,13 @@ export function useDiffCodeViewScroll({
 		let firstPathMatch: string | undefined;
 		for (const item of items) {
 			const file = fileByItemId.get(item.id);
-			if (file?.path !== data.path) continue;
+			if (!file) continue;
+			if (!data.repositoryId && rootPathOf?.(file) === data.path) {
+				return item.id;
+			}
+			if (file.path !== data.path) continue;
 			if (
-				!data.repositoryId ||
+				data.repositoryId &&
 				getChangesetFileRepositoryId(file, undefined) === data.repositoryId
 			) {
 				return item.id;
@@ -93,7 +100,14 @@ export function useDiffCodeViewScroll({
 			firstPathMatch ??= item.id;
 		}
 		return firstPathMatch;
-	}, [data.changeKey, data.path, data.repositoryId, items, fileByItemId]);
+	}, [
+		data.changeKey,
+		data.path,
+		data.repositoryId,
+		items,
+		fileByItemId,
+		rootPathOf,
+	]);
 
 	useEffect(() => {
 		const scrollKey = [

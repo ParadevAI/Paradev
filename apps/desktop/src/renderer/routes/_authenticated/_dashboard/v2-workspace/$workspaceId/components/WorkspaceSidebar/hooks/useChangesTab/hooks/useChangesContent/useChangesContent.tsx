@@ -44,7 +44,6 @@ interface CheckoutChangesContentParams extends ChangesContentParams {
 	worktreePath: string | undefined;
 	/** Tags files with repositoryId, for a list that shows several checkouts. */
 	tagRepository: boolean;
-	/** Set when the list shows several checkouts. */
 	repositoryName?: string;
 }
 

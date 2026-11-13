@@ -4,7 +4,9 @@ import { useCallback } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { useChangesTab } from "../../../../../../components/WorkspaceSidebar/hooks/useChangesTab";
+import { useWorkspaceCheckouts } from "../../../../../../state/activeRepositoryStore";
 import type { DiffPaneData, PaneViewerData } from "../../../../../../types";
+import { rootFilePath } from "../../../../../../utils/rootFilePath";
 import { useHeldWhileTabHidden } from "../../hooks/useHeldWhileTabHidden";
 import {
 	FILE_LIST_MIN_WIDTH,
@@ -38,6 +40,7 @@ export function DiffPaneFileList({
 	const { preferences, setChangesFileListWidth } = useV2UserPreferences();
 	const width = preferences.changesFileListWidth ?? DEFAULT_WIDTH;
 	const maxWidth = Math.min(MAX_WIDTH, containerWidth - MIN_DIFF_WIDTH);
+	const checkouts = useWorkspaceCheckouts(workspaceId);
 
 	const handleSelectFile = useCallback(
 		(
@@ -74,13 +77,17 @@ export function DiffPaneFileList({
 					focusSide: undefined,
 					focusTick: Date.now(),
 					filter:
-						data.filter && (data.filter.paths?.includes(path) ?? true)
+						data.filter &&
+						(data.filter.paths?.includes(
+							rootFilePath(checkouts, repositoryId, path),
+						) ??
+							true)
 							? data.filter
 							: undefined,
 				} as DiffPaneData);
 			}
 		},
-		[store, actions, data],
+		[store, actions, data, checkouts],
 	);
 
 	const changesTab = useChangesTab({

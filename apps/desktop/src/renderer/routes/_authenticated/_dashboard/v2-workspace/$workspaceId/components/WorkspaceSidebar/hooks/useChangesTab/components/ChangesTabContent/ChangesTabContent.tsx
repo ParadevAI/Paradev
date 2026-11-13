@@ -24,7 +24,6 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 interface ChangesTabContentProps {
 	workspaceId: string;
 	repositoryId: string | undefined;
-	/** Set when the list shows several checkouts. */
 	repositoryName?: string;
 	status: {
 		data: RouterOutputs["git"]["getStatus"] | undefined;

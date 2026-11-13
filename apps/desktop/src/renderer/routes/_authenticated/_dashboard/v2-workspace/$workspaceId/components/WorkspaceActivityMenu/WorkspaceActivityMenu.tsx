@@ -156,6 +156,7 @@ export function WorkspaceActivityMenu({
 	const gitStatus = useCheckoutGitStatus(repositoryId);
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
+	const [shipRepositoryId, setShipRepositoryId] = useState<string | null>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const anchorNode = useActivityPanelStore(
 		(state) => state.anchorNodes[workspaceId],
@@ -559,6 +560,7 @@ export function WorkspaceActivityMenu({
 		}
 		setComposing(false);
 		setShipView(null);
+		setShipRepositoryId(null);
 	};
 
 	const onTriggerClick = () => {
@@ -768,6 +770,8 @@ export function WorkspaceActivityMenu({
 									repositories={checkouts}
 									snapshots={repositoryShip.byId}
 									onOpenPullRequest={onOpenPullRequest}
+									activeRepositoryId={shipRepositoryId}
+									onActiveRepositoryIdChange={setShipRepositoryId}
 								/>
 							</section>
 						) : (
@@ -975,6 +979,11 @@ export function WorkspaceActivityMenu({
 					sideOffset={0}
 					className="w-80 border-0 bg-transparent p-0 shadow-none duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[state=closed]:duration-150 data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)] data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
 					onEscapeKeyDown={(event) => {
+						if (shipRepositoryId) {
+							event.preventDefault();
+							setShipRepositoryId(null);
+							return;
+						}
 						if (shipView || composing) event.preventDefault();
 					}}
 					onInteractOutside={(event) => {

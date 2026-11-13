@@ -18563,6 +18563,9 @@ msgstr "매주 출시합니다"
 msgid "Ship It"
 msgstr "출시"
 
+msgid "Ship repositories"
+msgstr "리포지토리 보내기"
+
 msgid "Short walkthroughs"
 msgstr "짧은 둘러보기"
 

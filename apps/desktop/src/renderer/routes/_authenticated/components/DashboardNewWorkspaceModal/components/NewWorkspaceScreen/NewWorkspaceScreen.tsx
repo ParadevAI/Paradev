@@ -378,6 +378,13 @@ export function NewWorkspaceScreen({
 		: findHostProjectRow(hostProjectResults, hostId, projectId);
 	const projectRepositories = selectedHostProject?.repositories ?? [];
 	const isMultiRepoProject = projectRepositories.length > 1;
+	const projectRepositoryIdsKey = projectRepositories
+		.map((repository) => repository.id)
+		.join("\n");
+	const projectRepositoryIds = useMemo(
+		() => (projectRepositoryIdsKey ? projectRepositoryIdsKey.split("\n") : []),
+		[projectRepositoryIdsKey],
+	);
 	const primaryRepositoryId = selectedHostProject
 		? (getPrimaryRepository(selectedHostProject)?.id ?? null)
 		: null;
@@ -846,7 +853,11 @@ export function NewWorkspaceScreen({
 		resolvedEnvironment?.id ?? null,
 		hostId,
 		isSession,
-		{ primaryRepositoryId, isMultiRepo: isMultiRepoProject },
+		{
+			primaryRepositoryId,
+			isMultiRepo: isMultiRepoProject,
+			repositoryIds: projectRepositoryIds,
+		},
 	);
 
 	const submitBlocker = useMemo<string | null>(() => {

@@ -20,8 +20,8 @@ import { RemotePathPicker } from "renderer/components/RemotePathPicker";
 import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { ClickablePath } from "../../../../../../components/ClickablePath";
-import { hostRefusalReason } from "../../utils/hostRefusalReason";
 
 interface ProjectLocationSectionProps {
 	projectId: string;

@@ -18563,6 +18563,9 @@ msgstr "Релизы каждую неделю"
 msgid "Ship It"
 msgstr "Выпущено"
 
+msgid "Ship repositories"
+msgstr "Отправить репозитории"
+
 msgid "Short walkthroughs"
 msgstr "Короткие обзоры"
 

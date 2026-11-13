@@ -7,6 +7,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { LuChevronDown, LuFolderGit2 } from "react-icons/lu";
+import { toggledRepositoryIds } from "./utils/toggledRepositoryIds";
 
 interface RepositoryFilterProps {
 	repositories: Array<{ repositoryId: string; name: string }>;
@@ -28,14 +29,8 @@ export function RepositoryFilter({
 			? repositories.find((repository) => shown.has(repository.repositoryId))
 			: undefined;
 
-	const toggle = (repositoryId: string) => {
-		const next = showsAll
-			? [repositoryId]
-			: shown.has(repositoryId)
-				? [...shown].filter((id) => id !== repositoryId)
-				: [...shown, repositoryId];
-		onChange(next.length === repositories.length ? [] : next);
-	};
+	const toggle = (repositoryId: string) =>
+		onChange(toggledRepositoryIds(repositoryCount, shown, repositoryId));
 
 	return (
 		<DropdownMenu>

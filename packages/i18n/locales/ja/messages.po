@@ -18563,6 +18563,9 @@ msgstr "毎週リリース"
 msgid "Ship It"
 msgstr "出荷"
 
+msgid "Ship repositories"
+msgstr "リポジトリをシップ"
+
 msgid "Short walkthroughs"
 msgstr "短い解説動画"
 

@@ -18557,6 +18557,9 @@ msgstr "Релізи щотижня"
 msgid "Ship It"
 msgstr "Випускаємо"
 
+msgid "Ship repositories"
+msgstr "Відправити репозиторії"
+
 msgid "Short walkthroughs"
 msgstr "Короткі огляди"
 

@@ -54,9 +54,15 @@ export function useSubmitWorkspace(
 	{
 		primaryRepositoryId,
 		isMultiRepo,
-	}: { primaryRepositoryId: string | null; isMultiRepo: boolean } = {
+		repositoryIds,
+	}: {
+		primaryRepositoryId: string | null;
+		isMultiRepo: boolean;
+		repositoryIds: readonly string[];
+	} = {
 		primaryRepositoryId: null,
 		isMultiRepo: false,
+		repositoryIds: [],
 	},
 ) {
 	const { t } = useLingui();
@@ -298,6 +304,7 @@ export function useSubmitWorkspace(
 				linkedPR,
 				primaryRepositoryId,
 				isMultiRepo,
+				repositoryIds,
 			});
 			const { isPrCheckout } = checkoutsInput;
 			const isLocalCheckout = checkoutsInput.checkout === "local";
@@ -468,6 +475,7 @@ export function useSubmitWorkspace(
 			cloudEnvironmentId,
 			primaryRepositoryId,
 			isMultiRepo,
+			repositoryIds,
 		],
 	);
 

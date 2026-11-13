@@ -11,8 +11,8 @@ import {
 	computeChecksRollup,
 } from "../../../../utils/computeChecksStatus";
 import { normalizeThreadsToComments } from "../../../CommentsSection/utils/normalizeThreadsToComments";
-import { RepoPicker } from "../../../RepoPicker";
 import type { SidebarTabDefinition } from "../../types";
+import { RepoPicker } from "./components/RepoPicker";
 import { ReviewTabContent } from "./components/ReviewTabContent";
 import type { NormalizedComment, NormalizedPR } from "./types";
 

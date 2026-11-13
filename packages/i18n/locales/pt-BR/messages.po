@@ -18563,6 +18563,9 @@ msgstr "Entregar toda semana"
 msgid "Ship It"
 msgstr "Entregue"
 
+msgid "Ship repositories"
+msgstr "Enviar repositórios"
+
 msgid "Short walkthroughs"
 msgstr "Tutoriais curtos"
 

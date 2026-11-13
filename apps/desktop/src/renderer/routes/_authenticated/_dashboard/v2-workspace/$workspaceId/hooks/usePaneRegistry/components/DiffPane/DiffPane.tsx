@@ -86,6 +86,7 @@ import {
 	isDiffContentTooLarge,
 } from "./utils/diffLoadingGuards";
 import { fileListLayout } from "./utils/fileListLayout";
+import { filesInPathFilter } from "./utils/filesInPathFilter";
 import { getCharacterOffsetAtPoint } from "./utils/getCharacterOffsetAtPoint";
 import {
 	diffPaneActionsSlotId,
@@ -218,9 +219,11 @@ export function DiffPane({
 				workspaceId,
 				paneId: context.pane.id,
 				viewId: "diff",
-				resourceId: isMultiRepo ? "repositories" : JSON.stringify(ref),
+				resourceId: isMultiRepo
+					? JSON.stringify({ repositories: [...shownRepositories].sort(), ref })
+					: JSON.stringify(ref),
 			}),
-		[isMultiRepo, workspaceId, context.pane.id, ref],
+		[isMultiRepo, shownRepositories, workspaceId, context.pane.id, ref],
 	);
 	const initialScrollState = useMemo(
 		() => getPaneScrollState(scrollStateKey),
@@ -249,14 +252,22 @@ export function DiffPane({
 	const isLoading = isMultiRepo
 		? repositoryChangesets.isLoading
 		: ownChangeset.isLoading;
-	const currentFiles = useMemo(() => {
-		if (!filter?.paths) return changesetFiles;
-		const paths = new Set(filter.paths);
-		return changesetFiles.filter(
-			(file) =>
-				paths.has(file.path) || (file.oldPath && paths.has(file.oldPath)),
-		);
-	}, [changesetFiles, filter]);
+	const rootPathOf = useCallback(
+		(file: ChangesetFile, path: string) =>
+			rootFilePath(
+				checkouts,
+				getChangesetFileRepositoryId(file, primaryRepositoryId),
+				path,
+			),
+		[checkouts, primaryRepositoryId],
+	);
+	const currentFiles = useMemo(
+		() =>
+			filter?.paths
+				? filesInPathFilter(changesetFiles, filter.paths, rootPathOf)
+				: changesetFiles,
+		[changesetFiles, filter, rootPathOf],
+	);
 	// Every git change re-lays out the diff; a hidden tab catches up when shown.
 	const files = useHeldWhileTabHidden(currentFiles);
 	const isTabVisible = useIsTabVisible();
@@ -309,9 +320,8 @@ export function DiffPane({
 		[checkouts, getFileRepositoryId, onOpenFile],
 	);
 	const getWorkspaceFolderPath = useCallback(
-		(file: ChangesetFile) =>
-			rootFilePath(checkouts, getFileRepositoryId(file), file.path),
-		[checkouts, getFileRepositoryId],
+		(file: ChangesetFile) => rootPathOf(file, file.path),
+		[rootPathOf],
 	);
 	const writeFile = workspaceTrpc.filesystem.writeFile.useMutation();
 	const utils = workspaceTrpc.useUtils();
@@ -601,6 +611,7 @@ export function DiffPane({
 		setCollapsed,
 		scrollStateKey,
 		initialScrollState,
+		rootPathOf: getWorkspaceFolderPath,
 	});
 
 	const commentNav = useDiffCommentNavigation({

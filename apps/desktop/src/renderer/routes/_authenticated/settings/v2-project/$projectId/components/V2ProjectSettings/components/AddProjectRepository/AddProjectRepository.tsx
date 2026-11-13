@@ -6,11 +6,11 @@ import { useState } from "react";
 import { RemotePathPicker } from "renderer/components/RemotePathPicker";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import {
 	AddRepositoryMenu,
 	type CloneSource,
 } from "renderer/routes/_authenticated/components/AddRepositoryMenu";
-import { hostRefusalReason } from "../../utils/hostRefusalReason";
 import { cloneParentDir } from "./utils/cloneParentDir";
 
 type RepositorySource =
@@ -55,7 +55,18 @@ export function AddProjectRepository({
 			}
 		},
 		// Sources are added one by one, so a failure can follow some that landed.
-		onSettled: () => onChanged(),
+		// A per-call onSettled runs only for the latest call, so the clone marks clear here.
+		onSettled: (_data, _error, sources) => {
+			const urls = new Set(
+				sources.flatMap((source) =>
+					source.kind === "clone" ? [source.url] : [],
+				),
+			);
+			if (urls.size > 0) {
+				setCloning((current) => current.filter((url) => !urls.has(url)));
+			}
+			onChanged();
+		},
 		onError: (err) =>
 			toast.error(t({ message: "Could not add the repository" }), {
 				description: hostRefusalReason(errorMessage(err)),
@@ -82,10 +93,7 @@ export function AddProjectRepository({
 	const addClone = (source: CloneSource) => {
 		if (cloning.includes(source.url)) return;
 		setCloning((urls) => [...urls, source.url]);
-		add.mutate([{ kind: "clone", url: source.url }], {
-			onSettled: () =>
-				setCloning((urls) => urls.filter((url) => url !== source.url)),
-		});
+		add.mutate([{ kind: "clone", url: source.url }]);
 	};
 
 	return (

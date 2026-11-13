@@ -32,3 +32,25 @@ export function holdsExactRepositorySet(
 		isSameRepositorySet(repositoryFullNames(repositories), names)
 	);
 }
+
+/** The GitHub `owner/name` of each checkout's repository; null when one has none. */
+export function checkoutRepositoryFullNames(
+	checkouts: readonly { repositoryId: string }[],
+	repositories: readonly {
+		id: string;
+		owner: string | null;
+		repoName: string | null;
+	}[],
+): string[] | null {
+	if (checkouts.length === 0) return null;
+	const byId = new Map(
+		repositories.map((repository) => [repository.id, repository]),
+	);
+	const names: string[] = [];
+	for (const checkout of checkouts) {
+		const repository = byId.get(checkout.repositoryId);
+		if (!repository?.owner || !repository.repoName) return null;
+		names.push(`${repository.owner}/${repository.repoName}`);
+	}
+	return names;
+}

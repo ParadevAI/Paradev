@@ -43,6 +43,7 @@ export function WorkspaceMoveMenu({
 						<SubContent>
 							<MoveToCloudItems
 								menu={menu}
+								workspaceId={workspace.id}
 								projectId={workspace.projectId}
 								onSelectEnvironment={startMove.toCloud}
 							/>

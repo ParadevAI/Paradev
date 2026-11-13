@@ -17,7 +17,6 @@ interface ChangesFileListProps {
 	isFiltered?: boolean;
 	workspaceId: string;
 	repositoryId: string | undefined;
-	/** Set when the list shows several checkouts. */
 	repositoryName?: string;
 	isLoading?: boolean;
 	viewMode: ChangesViewMode;
@@ -136,7 +135,6 @@ export const ChangesFileList = memo(function ChangesFileList({
 								? {
 										kind: key as "unstaged" | "staged",
 										workspaceId,
-										repositoryId,
 									}
 								: undefined
 						}

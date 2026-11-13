@@ -18563,6 +18563,9 @@ msgstr "Vydáváme každý týden"
 msgid "Ship It"
 msgstr "Dodáno"
 
+msgid "Ship repositories"
+msgstr "Odeslat repozitáře"
+
 msgid "Short walkthroughs"
 msgstr "Krátké návody"
 

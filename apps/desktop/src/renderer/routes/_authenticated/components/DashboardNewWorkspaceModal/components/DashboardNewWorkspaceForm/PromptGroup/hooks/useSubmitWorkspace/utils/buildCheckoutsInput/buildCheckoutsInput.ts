@@ -34,15 +34,20 @@ export function buildCheckoutsInput({
 	linkedPR,
 	primaryRepositoryId,
 	isMultiRepo,
+	repositoryIds,
 }: {
 	draft: CheckoutsDraft;
 	linkedPR: LinkedPR | null;
 	primaryRepositoryId: string | null;
 	isMultiRepo: boolean;
+	/** The project's repositories now; a draft can still hold picks for one removed since. */
+	repositoryIds: readonly string[];
 }): CheckoutsInput {
 	const checkouts: Record<string, CheckoutInput> = {};
 	let pullRequest: CheckoutsInput["pullRequest"];
+	const known = new Set(repositoryIds);
 	const setCheckout = (repositoryId: string, checkout: CheckoutInput) => {
+		if (isMultiRepo && !known.has(repositoryId)) return;
 		checkouts[repositoryId] = { ...checkouts[repositoryId], ...checkout };
 	};
 
@@ -61,10 +66,14 @@ export function buildCheckoutsInput({
 		return withCheckouts(linkedPR !== null, checkouts, pullRequest);
 	}
 
-	const isResolved =
-		linkedPR !== null && draft.checkoutPullRequestsFor === linkedPR.url;
-	if (isResolved) {
-		const pullRequests = Object.entries(draft.checkoutPullRequests).filter(
+	const resolvedPullRequests =
+		linkedPR !== null && draft.checkoutPullRequestsFor === linkedPR.url
+			? Object.entries(draft.checkoutPullRequests).filter(([repositoryId]) =>
+					known.has(repositoryId),
+				)
+			: [];
+	if (linkedPR && resolvedPullRequests.length > 0) {
+		const pullRequests = resolvedPullRequests.filter(
 			([repositoryId]) => !draft.checkoutWorktrees[repositoryId],
 		);
 		for (const [repositoryId, repositoryPullRequest] of pullRequests) {

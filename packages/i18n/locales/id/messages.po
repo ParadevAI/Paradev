@@ -18563,6 +18563,9 @@ msgstr "Rilis setiap minggu"
 msgid "Ship It"
 msgstr "Rilis"
 
+msgid "Ship repositories"
+msgstr "Kirim repositori"
+
 msgid "Short walkthroughs"
 msgstr "Panduan singkat"
 

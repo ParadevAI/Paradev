@@ -18563,6 +18563,9 @@ msgstr "Jede Woche ausliefern"
 msgid "Ship It"
 msgstr "Ausgeliefert"
 
+msgid "Ship repositories"
+msgstr "Repositories shippen"
+
 msgid "Short walkthroughs"
 msgstr "Kurze Walkthroughs"
 

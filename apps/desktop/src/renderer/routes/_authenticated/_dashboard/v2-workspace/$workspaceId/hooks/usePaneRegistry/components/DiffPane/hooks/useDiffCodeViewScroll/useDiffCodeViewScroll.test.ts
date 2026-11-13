@@ -88,4 +88,35 @@ describe("useDiffCodeViewScroll", () => {
 
 		expect(result.current.targetItemId).toBe(webItem);
 	});
+
+	test("a chat turn's path from the workspace folder scrolls to the file in its checkout", () => {
+		const codeViewRef = {
+			current: {
+				scrollTo: () => {},
+				getInstance: () => ({ getTopForItem: () => 0 }),
+			} as unknown as CodeViewHandle<DiffAnnotationMetadata, undefined>,
+		};
+		const apiItem = "diff:api|unstaged:a.ts";
+		const webItem = "diff:web|unstaged:a.ts";
+		const { result } = renderHook(() =>
+			useDiffCodeViewScroll({
+				codeViewRef,
+				data: { path: "web/a.ts", collapsedFiles: [] },
+				fileByItemId: new Map([
+					[apiItem, { ...file, repositoryId: "api" }],
+					[webItem, { ...file, repositoryId: "web" }],
+				]),
+				items: [
+					{ id: apiItem, type: "diff" },
+					{ id: webItem, type: "diff" },
+				] as unknown as CodeViewItem<DiffAnnotationMetadata>[],
+				collapsedSet: new Set(),
+				setCollapsed: () => {},
+				scrollStateKey: "pane-1",
+				rootPathOf: (changed) => `${changed.repositoryId}/${changed.path}`,
+			}),
+		);
+
+		expect(result.current.targetItemId).toBe(webItem);
+	});
 });

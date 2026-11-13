@@ -25,8 +25,7 @@ type SectionKind = "unstaged" | "staged";
 
 interface ChangesSectionProps {
 	sectionKey: V2ChangesSectionKey;
-	repositoryId?: string;
-	/** Set when the list shows several checkouts. */
+	repositoryId: string | undefined;
 	repositoryName?: string;
 	title: string;
 	count: number;
@@ -36,7 +35,6 @@ interface ChangesSectionProps {
 	stagingActions?: {
 		kind: SectionKind;
 		workspaceId: string;
-		repositoryId: string | undefined;
 	};
 	children: ReactNode;
 }
@@ -75,10 +73,10 @@ export function ChangesSection({
 	const invalidate = () => {
 		if (!stagingActions) return;
 		void utils.git.getStatus.invalidate(
-			checkoutInput(stagingActions.workspaceId, stagingActions.repositoryId),
+			checkoutInput(stagingActions.workspaceId, repositoryId),
 		);
 		void utils.git.getDiff.invalidate(
-			checkoutInput(stagingActions.workspaceId, stagingActions.repositoryId),
+			checkoutInput(stagingActions.workspaceId, repositoryId),
 		);
 	};
 
@@ -137,7 +135,7 @@ export function ChangesSection({
 
 	const runDiscardAll = () => {
 		if (!stagingActions) return;
-		const { kind, workspaceId, repositoryId } = stagingActions;
+		const { kind, workspaceId } = stagingActions;
 		const scope = checkoutInput(workspaceId, repositoryId);
 		if (kind === "unstaged") {
 			discardAllUnstaged.mutate(scope);
@@ -148,7 +146,7 @@ export function ChangesSection({
 
 	const runStagingToggle = () => {
 		if (!stagingActions) return;
-		const { kind, workspaceId, repositoryId } = stagingActions;
+		const { kind, workspaceId } = stagingActions;
 		const scope = checkoutInput(workspaceId, repositoryId);
 		if (kind === "unstaged") {
 			stageAll.mutate(scope);

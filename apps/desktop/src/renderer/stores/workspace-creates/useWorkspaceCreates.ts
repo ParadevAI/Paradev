@@ -15,6 +15,7 @@ import {
 	type HostServiceClient,
 } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type {
@@ -446,8 +447,9 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 					};
 				})
 				.catch<SubmitOutcome>((error: unknown) => {
-					const message =
-						error instanceof Error ? error.message : String(error);
+					const message = hostRefusalReason(
+						error instanceof Error ? error.message : String(error),
+					);
 					hostWorkspacesCache.removeWorkspace(args.hostId, workspaceId);
 					deleteWorkspaceLocalState(workspaceId);
 					recordFailure(message);

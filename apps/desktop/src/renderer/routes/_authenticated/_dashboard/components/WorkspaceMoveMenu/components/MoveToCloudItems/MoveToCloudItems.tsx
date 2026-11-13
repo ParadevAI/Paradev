@@ -2,15 +2,15 @@ import { Trans } from "@lingui/react/macro";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { useNavigate } from "@tanstack/react-router";
 import { LuContainer, LuRefreshCw, LuSettings } from "react-icons/lu";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { repositoryFullNames as fullNamesOf } from "../../../../utils/repositorySet";
+import { useWorkspaceRepositoryFullNames } from "../../../../hooks/useWorkspaceRepositoryFullNames";
 import { MOVE_MENU_PRIMITIVES, type MoveMenuKind } from "../../constants";
 import { splitEnvironmentsByRepositorySet } from "./utils/splitEnvironmentsByRepositorySet";
 
 interface MoveToCloudItemsProps {
 	menu: MoveMenuKind;
+	workspaceId: string;
 	projectId: string | null;
 	onSelectEnvironment: (environment: {
 		id: string;
@@ -21,21 +21,17 @@ interface MoveToCloudItemsProps {
 /** Only environments that open exactly the workspace's repositories: a move refuses any other. */
 export function MoveToCloudItems({
 	menu,
+	workspaceId,
 	projectId,
 	onSelectEnvironment,
 }: MoveToCloudItemsProps) {
 	const { Item, Separator, iconClassName } = MOVE_MENU_PRIMITIVES[menu];
 	const navigate = useNavigate();
 	const organizationId = useActiveOrganizationId();
-	const { projects } = useHostProjects();
-	const project = projects.find(
-		(row) => row.projectKey === projectId || row.id === projectId,
+	const repositoryFullNames = useWorkspaceRepositoryFullNames(
+		workspaceId,
+		projectId,
 	);
-	const names = project ? fullNamesOf(project.repositories) : [];
-	const repositoryFullNames =
-		project && names.length > 0 && names.length === project.repositories.length
-			? names
-			: null;
 	const environmentsQuery = cloudTrpc.environment.list.useQuery(
 		{ organizationId: organizationId ?? "" },
 		{ enabled: !!organizationId && repositoryFullNames !== null },

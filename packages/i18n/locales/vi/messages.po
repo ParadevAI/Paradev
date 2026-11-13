@@ -18563,6 +18563,9 @@ msgstr "Phát hành mỗi tuần"
 msgid "Ship It"
 msgstr "Đã giao"
 
+msgid "Ship repositories"
+msgstr "Gửi các repository"
+
 msgid "Short walkthroughs"
 msgstr "Hướng dẫn ngắn"
 

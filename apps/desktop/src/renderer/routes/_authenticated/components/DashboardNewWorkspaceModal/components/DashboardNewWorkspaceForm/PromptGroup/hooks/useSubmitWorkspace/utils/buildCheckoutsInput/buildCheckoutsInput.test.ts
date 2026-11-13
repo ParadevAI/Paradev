@@ -25,6 +25,7 @@ describe("buildCheckoutsInput", () => {
 				linkedPR,
 				primaryRepositoryId: "repo",
 				isMultiRepo: false,
+				repositoryIds: ["repo"],
 			}),
 		).toEqual({
 			checkout: "worktree",
@@ -40,6 +41,7 @@ describe("buildCheckoutsInput", () => {
 				linkedPR: null,
 				primaryRepositoryId: "repo",
 				isMultiRepo: false,
+				repositoryIds: ["repo"],
 			}),
 		).toEqual({ checkout: "local", isPrCheckout: false });
 	});
@@ -67,6 +69,7 @@ describe("buildCheckoutsInput", () => {
 				linkedPR,
 				primaryRepositoryId: "api",
 				isMultiRepo: true,
+				repositoryIds: ["api", "web", "shared", "docs"],
 			}),
 		).toEqual({
 			checkout: "worktree",
@@ -95,6 +98,7 @@ describe("buildCheckoutsInput", () => {
 			linkedPR,
 			primaryRepositoryId: "api",
 			isMultiRepo: true,
+			repositoryIds: ["api", "web", "shared", "docs"],
 		});
 		expect(result.pullRequest).toBeUndefined();
 		expect(result.checkouts).toEqual({
@@ -110,10 +114,36 @@ describe("buildCheckoutsInput", () => {
 				linkedPR,
 				primaryRepositoryId: "api",
 				isMultiRepo: true,
+				repositoryIds: ["api", "web", "shared", "docs"],
 			}),
 		).toEqual({
 			checkout: "worktree",
 			isPrCheckout: true,
+			pullRequest: { repository: "o/web", number: 7 },
+		});
+	});
+
+	test("several repositories: picks for a repository removed since are dropped", () => {
+		expect(
+			buildCheckoutsInput({
+				draft: {
+					...emptyDraft,
+					checkoutBaseBranches: { api: "main", removed: "dev" },
+					checkoutPullRequests: {
+						removed: { ...linkedPR, headRefName: "t", matched: true },
+					},
+					checkoutPullRequestsFor: linkedPR.url,
+					checkoutWorktrees: { gone: { path: "/wt/gone", branch: "x" } },
+				},
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+				repositoryIds: ["api", "web"],
+			}),
+		).toEqual({
+			checkout: "worktree",
+			isPrCheckout: true,
+			checkouts: { api: { baseBranch: "main" } },
 			pullRequest: { repository: "o/web", number: 7 },
 		});
 	});

@@ -18563,6 +18563,9 @@ msgstr "Her hafta yayınlıyoruz"
 msgid "Ship It"
 msgstr "Teslim edildi"
 
+msgid "Ship repositories"
+msgstr "Depoları gönder"
+
 msgid "Short walkthroughs"
 msgstr "Kısa anlatımlar"
 

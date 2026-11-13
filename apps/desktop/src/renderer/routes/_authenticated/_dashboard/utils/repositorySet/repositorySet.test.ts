@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import {
+	checkoutRepositoryFullNames,
 	holdsExactRepositorySet,
 	isSameRepositorySet,
 	repositoryFullNames,
@@ -29,4 +30,25 @@ test("holdsExactRepositorySet refuses a project with an extra local-only reposit
 	const localOnly = { owner: null, repoName: null };
 	expect(holdsExactRepositorySet([web], ["O/web"])).toBe(true);
 	expect(holdsExactRepositorySet([web, localOnly], ["o/web"])).toBe(false);
+});
+
+test("checkoutRepositoryFullNames names the workspace's checkouts, not the project's repositories", () => {
+	const repositories = [
+		{ id: "r-api", owner: "o", repoName: "api" },
+		{ id: "r-web", owner: "o", repoName: "web" },
+		{ id: "r-added-later", owner: "o", repoName: "docs" },
+	];
+	expect(
+		checkoutRepositoryFullNames(
+			[{ repositoryId: "r-api" }, { repositoryId: "r-web" }],
+			repositories,
+		),
+	).toEqual(["o/api", "o/web"]);
+	expect(
+		checkoutRepositoryFullNames(
+			[{ repositoryId: "r-api" }, { repositoryId: "r-local" }],
+			[...repositories, { id: "r-local", owner: null, repoName: null }],
+		),
+	).toBeNull();
+	expect(checkoutRepositoryFullNames([], repositories)).toBeNull();
 });

@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useMemo } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { useCallback } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -18,11 +17,9 @@ import {
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
-import {
-	isSameRepositorySet,
-	repositoryFullNames,
-} from "../../utils/repositorySet";
+import { isSameRepositorySet } from "../../utils/repositorySet";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
+import { useWorkspaceRepositoryFullNames } from "../useWorkspaceRepositoryFullNames";
 
 export type MoveToCloudStage = "saving" | "starting";
 
@@ -42,15 +39,9 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const collections = useCollections();
 	const utils = cloudTrpc.useUtils();
 	const { activeHostUrl } = useLocalHostService();
-	const { projects } = useHostProjects();
-	const sourceProject = projects.find(
-		(row) =>
-			row.projectKey === workspace.projectId || row.id === workspace.projectId,
-	);
-	const sourceRepositories = useMemo(
-		() =>
-			sourceProject ? repositoryFullNames(sourceProject.repositories) : null,
-		[sourceProject],
+	const sourceRepositories = useWorkspaceRepositoryFullNames(
+		workspace.id,
+		workspace.projectId,
 	);
 
 	return useCallback(

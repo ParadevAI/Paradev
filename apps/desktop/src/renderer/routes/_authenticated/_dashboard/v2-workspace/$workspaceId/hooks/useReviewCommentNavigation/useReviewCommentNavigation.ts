@@ -23,13 +23,19 @@ export function useReviewCommentNavigation(
 	repositoryId: string | undefined,
 	onSelectDiffFile?: OpenReviewDiff,
 ) {
+	const isMultiRepo = useWorkspaceCheckouts(workspaceId).length > 1;
 	// A multi-repo diff tags each entry with its repository.
-	const tag =
-		useWorkspaceCheckouts(workspaceId).length > 1 ? repositoryId : undefined;
+	const tag = isMultiRepo ? repositoryId : undefined;
 	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
 		checkoutInput(workspaceId, repositoryId),
-		{ enabled: checkoutsLoaded, staleTime: Number.POSITIVE_INFINITY },
+		{
+			enabled:
+				checkoutsLoaded &&
+				onSelectDiffFile !== undefined &&
+				(!isMultiRepo || repositoryId !== undefined),
+			staleTime: Number.POSITIVE_INFINITY,
+		},
 	);
 	return onSelectDiffFile
 		? (

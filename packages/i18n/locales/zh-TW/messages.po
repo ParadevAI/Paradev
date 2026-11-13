@@ -18563,6 +18563,9 @@ msgstr "每週發布"
 msgid "Ship It"
 msgstr "交付"
 
+msgid "Ship repositories"
+msgstr "發佈儲存庫"
+
 msgid "Short walkthroughs"
 msgstr "簡短演示"
 

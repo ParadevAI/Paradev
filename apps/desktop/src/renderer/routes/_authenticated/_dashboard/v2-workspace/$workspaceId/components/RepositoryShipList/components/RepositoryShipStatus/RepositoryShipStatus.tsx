@@ -5,7 +5,6 @@ interface RepositoryShipStatusProps {
 	snapshot: RepositoryShipSnapshot | undefined;
 }
 
-/** One line on where a repository stands on its way to a pull request. */
 export function RepositoryShipStatus({ snapshot }: RepositoryShipStatusProps) {
 	if (!snapshot || snapshot.step === "loading") return <Trans>Loading…</Trans>;
 	const { step, stats, sync, pr, flowState } = snapshot;

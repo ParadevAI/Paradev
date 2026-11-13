@@ -18563,6 +18563,9 @@ msgstr "Elke week opleveren"
 msgid "Ship It"
 msgstr "Geleverd"
 
+msgid "Ship repositories"
+msgstr "Repository's shippen"
+
 msgid "Short walkthroughs"
 msgstr "Korte rondleidingen"
 

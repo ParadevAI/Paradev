@@ -10,27 +10,29 @@ interface RepositoryShipListProps {
 	repositories: Array<{ repositoryId: string; name: string }>;
 	snapshots: Record<string, RepositoryShipSnapshot>;
 	onOpenPullRequest: OpenPullRequestPane;
+	/** Held by the popover, so its Escape goes back to the list and does not close it. */
+	activeRepositoryId: string | null;
+	onActiveRepositoryIdChange: (repositoryId: string | null) => void;
 }
 
-/**
- * Every repository of a multi-repo workspace with its next ship step. A row
- * slides that repository's details in over the list.
- */
 export function RepositoryShipList({
 	workspaceId,
 	repositories,
 	snapshots,
 	onOpenPullRequest,
+	activeRepositoryId,
+	onActiveRepositoryIdChange,
 }: RepositoryShipListProps) {
-	const [activeId, setActiveId] = useState<string | null>(null);
+	const [shownId, setShownId] = useState(activeRepositoryId);
 	const [cameBack, setCameBack] = useState(false);
+	if (shownId !== activeRepositoryId) {
+		setShownId(activeRepositoryId);
+		setCameBack(activeRepositoryId === null);
+	}
 	const active = repositories.find(
-		(repository) => repository.repositoryId === activeId,
+		(repository) => repository.repositoryId === activeRepositoryId,
 	);
-	const showRepositories = () => {
-		setActiveId(null);
-		setCameBack(true);
-	};
+	const showRepositories = () => onActiveRepositoryIdChange(null);
 
 	if (active) {
 		return (
@@ -69,7 +71,7 @@ export function RepositoryShipList({
 					workspaceId={workspaceId}
 					repository={repository}
 					snapshot={snapshots[repository.repositoryId]}
-					onOpen={() => setActiveId(repository.repositoryId)}
+					onOpen={() => onActiveRepositoryIdChange(repository.repositoryId)}
 					onOpenPullRequest={onOpenPullRequest}
 				/>
 			))}

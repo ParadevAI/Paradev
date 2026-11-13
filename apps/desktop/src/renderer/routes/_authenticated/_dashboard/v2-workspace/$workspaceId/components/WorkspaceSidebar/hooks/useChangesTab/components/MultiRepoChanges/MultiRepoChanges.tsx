@@ -10,7 +10,6 @@ interface MultiRepoChangesProps extends Omit<ChangesContentParams, "shared"> {
 	checkouts: WorkspaceCheckout[];
 }
 
-/** Each checkout's changes in its own section, under one search and fold. */
 export function MultiRepoChanges({
 	checkouts,
 	...params

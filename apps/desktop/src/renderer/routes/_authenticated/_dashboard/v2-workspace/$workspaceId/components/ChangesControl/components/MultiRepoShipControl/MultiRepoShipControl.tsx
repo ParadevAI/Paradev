@@ -1,7 +1,8 @@
-import { Plural, Trans } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
 import { GitCompareArrows } from "lucide-react";
+import { useState } from "react";
 import { LuFolderGit2 } from "react-icons/lu";
 import {
 	VscChevronDown,
@@ -22,10 +23,6 @@ interface MultiRepoShipControlProps {
 	onOpenPullRequest: OpenPullRequestPane;
 }
 
-/**
- * The tab-bar Changes control for a multi-repo workspace: the stats of every
- * checkout, and a ship menu with one row per repository.
- */
 export function MultiRepoShipControl({
 	workspaceId,
 	repositories,
@@ -34,6 +31,10 @@ export function MultiRepoShipControl({
 	onToggleChanges,
 	onOpenPullRequest,
 }: MultiRepoShipControlProps) {
+	const { t } = useLingui();
+	const [activeRepositoryId, setActiveRepositoryId] = useState<string | null>(
+		null,
+	);
 	const { byId, totals, pendingCount, pullRequestCount, sources } =
 		useRepositoryShipSnapshots(
 			workspaceId,
@@ -59,10 +60,15 @@ export function MultiRepoShipControl({
 						<ChangesStats stats={totals} />
 					</button>
 				)}
-				<Popover>
+				<Popover
+					onOpenChange={(open) => {
+						if (!open) setActiveRepositoryId(null);
+					}}
+				>
 					<PopoverTrigger asChild>
 						<button
 							type="button"
+							aria-label={t({ message: "Ship repositories" })}
 							className="flex items-center gap-1.5 px-2 text-xs font-medium outline-none transition-colors hover:bg-accent/60 data-[state=open]:bg-accent/60"
 						>
 							{pendingCount > 0 ? (
@@ -88,12 +94,19 @@ export function MultiRepoShipControl({
 						align="end"
 						sideOffset={8}
 						className="w-[400px] overflow-hidden p-0"
+						onEscapeKeyDown={(event) => {
+							if (!activeRepositoryId) return;
+							event.preventDefault();
+							setActiveRepositoryId(null);
+						}}
 					>
 						<RepositoryShipList
 							workspaceId={workspaceId}
 							repositories={repositories}
 							snapshots={byId}
 							onOpenPullRequest={onOpenPullRequest}
+							activeRepositoryId={activeRepositoryId}
+							onActiveRepositoryIdChange={setActiveRepositoryId}
 						/>
 					</PopoverContent>
 				</Popover>
