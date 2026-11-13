@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Wijzigingen"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Wijzigingen laden zodra de werkruimte gewekt is"
+
 msgid "Changes open target"
 msgstr "Openingsdoel voor wijzigingen"
 
@@ -7337,6 +7340,9 @@ msgstr "Overzicht van diff-wijzigingen"
 msgid "diff in new tab"
 msgstr "diff in nieuw tabblad"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff opent zodra de werkruimte gewekt is"
+
 msgid "Digital Product Designer"
 msgstr "Ontwerper van digitale producten"
 
@@ -8889,6 +8895,9 @@ msgstr "Bestand niet gevonden"
 msgid "File open mode"
 msgstr "Openmodus voor bestanden"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Bestand opent zodra de werkruimte gewekt is"
+
 msgid "File viewer"
 msgstr "Bestandsviewer"
 
@@ -8906,6 +8915,9 @@ msgstr "Bestanden en editor"
 
 msgid "Files changed"
 msgstr "Gewijzigde bestanden"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Bestanden laden zodra de werkruimte gewekt is"
 
 msgid "files to exclude (glob)"
 msgstr "uit te sluiten bestanden (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Review afgewezen"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Bekijk elke fout voordat je besluit door te gaan."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Beoordeling laadt zodra de werkruimte gewekt is"
+
 msgid "Review message"
 msgstr "Reviewbericht"
 
@@ -18621,6 +18636,9 @@ msgstr "Update simuleren: gereed"
 msgid "Simulator"
 msgstr "Simulator"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Simulator start zodra de werkruimte gewekt is"
+
 msgid "Since 2025"
 msgstr "Sinds 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Terminalsessie beëindigd"
 
 msgid "Terminal sessions"
 msgstr "Terminalsessies"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal start zodra de werkruimte gewekt is"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Preview van het kleurenpalet van het terminalthema"

@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Změny"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Změny se načtou, až se pracovní prostor probudí"
+
 msgid "Changes open target"
 msgstr "Cíl otevření změn"
 
@@ -7337,6 +7340,9 @@ msgstr "Přehled změn diff"
 msgid "diff in new tab"
 msgstr "rozdíl na nové kartě"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff se otevře, až se pracovní prostor probudí"
+
 msgid "Digital Product Designer"
 msgstr "Designér digitálních produktů"
 
@@ -8889,6 +8895,9 @@ msgstr "Soubor nenalezen"
 msgid "File open mode"
 msgstr "Režim otevírání souborů"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Soubor se otevře, až se pracovní prostor probudí"
+
 msgid "File viewer"
 msgstr "Prohlížeč souborů"
 
@@ -8906,6 +8915,9 @@ msgstr "Soubory a editor"
 
 msgid "Files changed"
 msgstr "Změněné soubory"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Soubory se načtou, až se pracovní prostor probudí"
 
 msgid "files to exclude (glob)"
 msgstr "soubory k vyloučení (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Revize zamítnuta"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Než se rozhodnete pokračovat, projděte si každé selhání."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Kontrola se načte, až se pracovní prostor probudí"
+
 msgid "Review message"
 msgstr "Zpráva k revizi"
 
@@ -18621,6 +18636,9 @@ msgstr "Simulovat aktualizaci: připraveno"
 msgid "Simulator"
 msgstr "Simulátor"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Simulátor se spustí, až se pracovní prostor probudí"
+
 msgid "Since 2025"
 msgstr "Od roku 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Relace terminálu ukončena"
 
 msgid "Terminal sessions"
 msgstr "Relace terminálu"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminál se spustí, až se pracovní prostor probudí"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Náhled barevné palety motivu terminálu"

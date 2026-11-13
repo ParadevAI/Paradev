@@ -4211,6 +4211,9 @@ msgstr "Registro de cambios"
 msgid "Changes"
 msgstr "Cambios"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Los cambios se cargan cuando se active el espacio de trabajo"
+
 msgid "Changes open target"
 msgstr "Destino al abrir cambios"
 
@@ -7337,6 +7340,9 @@ msgstr "Resumen de cambios del diff"
 msgid "diff in new tab"
 msgstr "diff en pestaña nueva"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "El diff se abre cuando se active el espacio de trabajo"
+
 msgid "Digital Product Designer"
 msgstr "Diseñador de productos digitales"
 
@@ -8889,6 +8895,9 @@ msgstr "Archivo no encontrado"
 msgid "File open mode"
 msgstr "Modo de apertura de archivos"
 
+msgid "File opens when the workspace wakes up"
+msgstr "El archivo se abre cuando se active el espacio de trabajo"
+
 msgid "File viewer"
 msgstr "Visor de archivos"
 
@@ -8906,6 +8915,9 @@ msgstr "Archivos y editor"
 
 msgid "Files changed"
 msgstr "Archivos modificados"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Los archivos se cargan cuando se active el espacio de trabajo"
 
 msgid "files to exclude (glob)"
 msgstr "archivos que excluir (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Revisión descartada"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Revisa cada fallo antes de decidir si continuar."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "La revisión se carga cuando se active el espacio de trabajo"
+
 msgid "Review message"
 msgstr "Mensaje de revisión"
 
@@ -18621,6 +18636,9 @@ msgstr "Simular actualización: lista"
 msgid "Simulator"
 msgstr "Simulador"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "El simulador se inicia cuando se active el espacio de trabajo"
+
 msgid "Since 2025"
 msgstr "Desde 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Sesión de terminal terminada"
 
 msgid "Terminal sessions"
 msgstr "Sesiones de terminal"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "La terminal se inicia cuando se active el espacio de trabajo"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Vista previa de la paleta de colores del tema de la terminal"

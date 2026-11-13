@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Thay đổi"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Thay đổi sẽ tải khi workspace thức dậy"
+
 msgid "Changes open target"
 msgstr "Vị trí mở thay đổi"
 
@@ -7337,6 +7340,9 @@ msgstr "Tổng quan thay đổi diff"
 msgid "diff in new tab"
 msgstr "diff ở tab mới"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff sẽ mở khi workspace thức dậy"
+
 msgid "Digital Product Designer"
 msgstr "Nhà thiết kế sản phẩm số"
 
@@ -8889,6 +8895,9 @@ msgstr "Không tìm thấy tệp"
 msgid "File open mode"
 msgstr "Chế độ mở tệp"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Tệp sẽ mở khi workspace thức dậy"
+
 msgid "File viewer"
 msgstr "Trình xem tệp"
 
@@ -8906,6 +8915,9 @@ msgstr "Tệp và trình soạn thảo"
 
 msgid "Files changed"
 msgstr "Tệp đã thay đổi"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Các tệp sẽ tải khi workspace thức dậy"
 
 msgid "files to exclude (glob)"
 msgstr "tệp cần loại trừ (glob)"
@@ -16967,6 +16979,9 @@ msgstr "Review đã bị bỏ qua"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Xem lại từng lỗi trước khi quyết định có tiếp tục hay không."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Bản xem lại sẽ tải khi workspace thức dậy"
+
 msgid "Review message"
 msgstr "Nội dung review"
 
@@ -18621,6 +18636,9 @@ msgstr "Mô phỏng cập nhật: sẵn sàng"
 msgid "Simulator"
 msgstr "Trình mô phỏng"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Trình mô phỏng sẽ khởi động khi workspace thức dậy"
+
 msgid "Since 2025"
 msgstr "Từ 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Đã kết thúc phiên terminal"
 
 msgid "Terminal sessions"
 msgstr "Phiên terminal"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal sẽ khởi động khi workspace thức dậy"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Xem trước bảng màu của theme terminal"

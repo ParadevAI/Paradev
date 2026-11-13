@@ -4211,6 +4211,9 @@ msgstr "Changelog"
 msgid "Changes"
 msgstr "Änderungen"
 
+msgid "Changes load when the workspace wakes up"
+msgstr "Änderungen werden geladen, sobald der Arbeitsbereich aufgewacht ist"
+
 msgid "Changes open target"
 msgstr "Öffnungsziel für Änderungen"
 
@@ -7337,6 +7340,9 @@ msgstr "Übersicht der Diff-Änderungen"
 msgid "diff in new tab"
 msgstr "Diff in neuem Tab"
 
+msgid "Diff opens when the workspace wakes up"
+msgstr "Diff wird geöffnet, sobald der Arbeitsbereich aufgewacht ist"
+
 msgid "Digital Product Designer"
 msgstr "Designer für digitale Produkte"
 
@@ -8889,6 +8895,9 @@ msgstr "Datei nicht gefunden"
 msgid "File open mode"
 msgstr "Öffnungsmodus für Dateien"
 
+msgid "File opens when the workspace wakes up"
+msgstr "Datei wird geöffnet, sobald der Arbeitsbereich aufgewacht ist"
+
 msgid "File viewer"
 msgstr "Dateibetrachter"
 
@@ -8906,6 +8915,9 @@ msgstr "Dateien & Editor"
 
 msgid "Files changed"
 msgstr "Geänderte Dateien"
+
+msgid "Files load when the workspace wakes up"
+msgstr "Dateien werden geladen, sobald der Arbeitsbereich aufgewacht ist"
 
 msgid "files to exclude (glob)"
 msgstr "Auszuschließende Dateien (Glob)"
@@ -16967,6 +16979,9 @@ msgstr "Review verworfen"
 msgid "Review each failure before deciding whether to continue."
 msgstr "Sieh dir jeden Fehler an, bevor du entscheidest, ob du fortfährst."
 
+msgid "Review loads when the workspace wakes up"
+msgstr "Review wird geladen, sobald der Arbeitsbereich aufgewacht ist"
+
 msgid "Review message"
 msgstr "Review-Nachricht"
 
@@ -18621,6 +18636,9 @@ msgstr "Update simulieren: bereit"
 msgid "Simulator"
 msgstr "Simulator"
 
+msgid "Simulator starts when the workspace wakes up"
+msgstr "Simulator startet, sobald der Arbeitsbereich aufgewacht ist"
+
 msgid "Since 2025"
 msgstr "Seit 2025"
 
@@ -19835,6 +19853,9 @@ msgstr "Terminal-Sitzung beendet"
 
 msgid "Terminal sessions"
 msgstr "Terminal-Sitzungen"
+
+msgid "Terminal starts when the workspace wakes up"
+msgstr "Terminal startet, sobald der Arbeitsbereich aufgewacht ist"
 
 msgid "Terminal theme color-palette preview"
 msgstr "Vorschau der Farbpalette eines Terminal-Themes"
