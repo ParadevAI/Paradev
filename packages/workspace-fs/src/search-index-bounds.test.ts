@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "bun:test";
+import { afterEach, describe, expect, it, spyOn } from "bun:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -7,7 +7,9 @@ import {
 	collectSearchIndexEntries,
 	getSearchIndex,
 	invalidateAllSearchIndexes,
+	MAX_DIRECTORY_PATCH_EVENTS,
 	patchSearchIndexesForRoot,
+	SearchIndexBuildAborted,
 } from "./search";
 
 const roots: string[] = [];
@@ -148,6 +150,66 @@ describe("directory patch events", () => {
 		});
 		expect(index.map((entry) => entry.name).sort()).toEqual(["a.ts", "b.ts"]);
 	});
+
+	it("patches up to the directory event limit and rebuilds past it", async () => {
+		const root = await makeRepoRoot();
+		await fs.writeFile(path.join(root, "a.ts"), "x");
+		await getSearchIndex({ rootPath: root, includeHidden: false });
+		await fs.writeFile(path.join(root, "late.ts"), "x");
+		const deleteDirectories = (count: number) =>
+			Array.from({ length: count }, (_, i) => ({
+				kind: "delete" as const,
+				absolutePath: path.join(root, `gone${i}`),
+				isDirectory: true,
+			}));
+		const names = async () =>
+			(await getSearchIndex({ rootPath: root, includeHidden: false }))
+				.map((entry) => entry.name)
+				.sort();
+
+		patchSearchIndexesForRoot(
+			root,
+			deleteDirectories(MAX_DIRECTORY_PATCH_EVENTS),
+		);
+		expect(await names()).toEqual(["a.ts"]);
+
+		patchSearchIndexesForRoot(
+			root,
+			deleteDirectories(MAX_DIRECTORY_PATCH_EVENTS + 1),
+		);
+		expect(await names()).toEqual(["a.ts", "late.ts"]);
+	});
+
+	for (const source of [".hidden", "build"]) {
+		it(`rebuilds when ${source} is renamed into a searchable directory`, async () => {
+			const root = await makeRepoRoot();
+			await fs.mkdir(path.join(root, source));
+			await fs.writeFile(path.join(root, source, "found.ts"), "x");
+			const before = await getSearchIndex({
+				rootPath: root,
+				includeHidden: false,
+			});
+			expect(before).toHaveLength(0);
+
+			await fs.rename(path.join(root, source), path.join(root, "visible"));
+			patchSearchIndexesForRoot(root, [
+				{
+					kind: "rename",
+					oldAbsolutePath: path.join(root, source),
+					absolutePath: path.join(root, "visible"),
+					isDirectory: true,
+				},
+			]);
+
+			const after = await getSearchIndex({
+				rootPath: root,
+				includeHidden: false,
+			});
+			expect(after.map((entry) => entry.relativePath)).toEqual([
+				"visible/found.ts",
+			]);
+		});
+	}
 });
 
 describe("build cancellation", () => {
@@ -166,6 +228,54 @@ describe("build cancellation", () => {
 		}
 		return root;
 	}
+
+	it("concurrent callers share one restarted build after an abort", async () => {
+		const root = await makeRepoRoot();
+		await fs.writeFile(path.join(root, "a.ts"), "x");
+		const stat = spyOn(fs, "stat");
+		const builds = () =>
+			stat.mock.calls.filter((call) => String(call[0]).endsWith(".git")).length;
+		try {
+			const callers = [0, 1, 2].map(() =>
+				getSearchIndex({ rootPath: root, includeHidden: false }),
+			);
+			expect(builds()).toBe(1);
+			patchSearchIndexesForRoot(root, [
+				{
+					kind: "create",
+					absolutePath: path.join(root, "b.ts"),
+					isDirectory: false,
+				},
+			]);
+
+			for (const items of await Promise.all(callers)) {
+				expect(items.map((entry) => entry.name)).toEqual(["a.ts"]);
+			}
+			expect(builds()).toBe(2);
+		} finally {
+			stat.mockRestore();
+		}
+	});
+
+	it("stops collecting with SearchIndexBuildAborted once the signal aborts", async () => {
+		const abort = new AbortController();
+		let yielded = 0;
+		async function* walk() {
+			for (const entry of ["a.ts", "b.ts", "c.ts", "d.ts"]) {
+				yielded++;
+				if (yielded === 3) abort.abort();
+				yield entry;
+			}
+		}
+
+		await expect(
+			collectSearchIndexEntries(walk(), "/root", {
+				maxEntries: 10,
+				signal: abort.signal,
+			}),
+		).rejects.toBeInstanceOf(SearchIndexBuildAborted);
+		expect(yielded).toBe(3);
+	});
 
 	it("returns an index to the caller when its build is aborted mid-walk", async () => {
 		const root = await makeBigRepo(6000);
@@ -268,6 +378,41 @@ describe("index entry cap", () => {
 			{ kind: "create", absolutePath: at("new.ts"), isDirectory: false },
 		]);
 		expect(names()).toEqual(["a.ts", "new.ts", "renamed.ts"]);
+	});
+	it("a directory rename at the cap keeps every moved entry", () => {
+		const root = "/root";
+		const itemsByPath = new Map(
+			["before/a.ts", "before/n/b.ts", "before/n/c.ts", "keep.ts"].map(
+				(rel) => {
+					const abs = path.join(root, rel);
+					return [
+						abs,
+						{
+							absolutePath: abs,
+							relativePath: rel,
+							name: path.basename(rel),
+							description: path.dirname(rel),
+						},
+					];
+				},
+			),
+		);
+
+		applySearchPatchEvents(
+			{ itemsByPath, rootPath: root, includeHidden: false, maxEntries: 4 },
+			[
+				{
+					kind: "rename",
+					oldAbsolutePath: path.join(root, "before"),
+					absolutePath: path.join(root, "after"),
+					isDirectory: true,
+				},
+			],
+		);
+
+		expect([...itemsByPath.values()].map((e) => e.relativePath).sort()).toEqual(
+			["after/a.ts", "after/n/b.ts", "after/n/c.ts", "keep.ts"],
+		);
 	});
 });
 
