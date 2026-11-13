@@ -8264,6 +8264,9 @@ msgstr "Odkrywaj"
 msgid "Explore Pages"
 msgstr "Poznaj Strony"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Przeglądaj tabele i uruchamiaj zapytania tylko do odczytu"
+
 msgid "Explored"
 msgstr "Przejrzano"
 

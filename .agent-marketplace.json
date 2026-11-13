@@ -256,6 +256,16 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "clickhouse",
+			"description": "Query ClickHouse Cloud from your agent: explore databases and tables, run read-only SELECT queries, and check services, backups, ClickPipes and cost.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/clickhouse",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

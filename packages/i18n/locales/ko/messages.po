@@ -8264,6 +8264,9 @@ msgstr "살펴보기"
 msgid "Explore Pages"
 msgstr "페이지 살펴보기"
 
+msgid "Explore tables and run read-only queries"
+msgstr "테이블 탐색 및 읽기 전용 쿼리 실행"
+
 msgid "Explored"
 msgstr "탐색 완료"
 

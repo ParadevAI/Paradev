@@ -8264,6 +8264,9 @@ msgstr "Jelajahi"
 msgid "Explore Pages"
 msgstr "Jelajahi Halaman"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Jelajahi tabel dan jalankan kueri hanya-baca"
+
 msgid "Explored"
 msgstr "Sudah dijelajahi"
 

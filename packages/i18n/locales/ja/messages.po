@@ -8264,6 +8264,9 @@ msgstr "探す"
 msgid "Explore Pages"
 msgstr "ページを見る"
 
+msgid "Explore tables and run read-only queries"
+msgstr "テーブルを探索し、読み取り専用クエリを実行"
+
 msgid "Explored"
 msgstr "探索済み"
 

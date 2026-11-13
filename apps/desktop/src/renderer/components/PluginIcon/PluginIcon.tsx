@@ -5,6 +5,7 @@ import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
 import { LuBookOpen, LuDrama, LuPuzzle } from "react-icons/lu";
 import {
+	SiClickhouse,
 	SiGooglechrome,
 	SiGoogledocs,
 	SiGooglesheets,
@@ -80,6 +81,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	sazabi: { icon: SazabiIcon, color: "#FF0027" },
 	linear: { icon: SiLinear },
 	supabase: { icon: SiSupabase, color: "#3ECF8E" },
+	clickhouse: { icon: SiClickhouse },
 	context7: { icon: LuBookOpen },
 	playwright: { icon: LuDrama, color: "#2EAD33" },
 	"chrome-devtools": { icon: SiGooglechrome, color: "#4285F4" },

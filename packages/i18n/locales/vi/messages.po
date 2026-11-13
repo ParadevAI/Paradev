@@ -8264,6 +8264,9 @@ msgstr "Khám phá"
 msgid "Explore Pages"
 msgstr "Khám phá Trang"
 
+msgid "Explore tables and run read-only queries"
+msgstr "Khám phá bảng và chạy truy vấn chỉ đọc"
+
 msgid "Explored"
 msgstr "Đã tìm hiểu"
 
