@@ -26,6 +26,7 @@ import {
 	APIError,
 	createAuthMiddleware,
 	getSessionFromCtx,
+	isAPIError,
 } from "better-auth/api";
 import {
 	bearer,
@@ -58,6 +59,7 @@ import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import {
 	convertPendingShares,
 	removeInvitationShares,
+	removeLeaverShares,
 	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
@@ -180,18 +182,27 @@ export const auth = betterAuth({
 				});
 			}
 		}),
-		// Remember the switch on the user, not just on the session that made it.
-		// `sessions.active_organization_id` dies with its session, and the next
-		// session would fall back to the newest membership — which is how people
-		// ended up in an organization they never chose. Better-auth has no
-		// set-active hook, so the route is the choke point; every client reaches
-		// it through `organization.setActive`.
-		//
-		// `ctx.context.returned` rather than `newSession`: the dispatcher hands
-		// after-hooks a shallow copy of the context, so the `setNewSession` the
-		// endpoint called is not visible here. `returned` is the organization
-		// the route settled on, or null when the active organization is cleared.
 		after: createAuthMiddleware(async (ctx) => {
+			if (ctx.path === "/organization/leave") {
+				const left = ctx.context.returned;
+				if (isAPIError(left) || !left) return;
+				await removeLeaverShares(
+					left as { userId: string; organizationId: string },
+				);
+				return;
+			}
+
+			// Remember the switch on the user, not just on the session that made it.
+			// `sessions.active_organization_id` dies with its session, and the next
+			// session would fall back to the newest membership — which is how people
+			// ended up in an organization they never chose. Better-auth has no
+			// set-active hook, so the route is the choke point; every client reaches
+			// it through `organization.setActive`.
+			//
+			// `ctx.context.returned` rather than `newSession`: the dispatcher hands
+			// after-hooks a shallow copy of the context, so the `setNewSession` the
+			// endpoint called is not visible here. `returned` is the organization
+			// the route settled on, or null when the active organization is cleared.
 			if (ctx.path !== "/organization/set-active") return;
 			const returned = ctx.context.returned;
 			if (returned instanceof APIError) return;
