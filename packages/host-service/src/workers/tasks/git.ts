@@ -26,7 +26,10 @@ import {
 } from "../../runtime/pull-requests/utils/workspace-refs.ts";
 import type { ChangedFile } from "../../trpc/router/git/types.ts";
 import type { BaseRefFetchTarget } from "../../trpc/router/git/utils/base-ref-freshness.ts";
-import { buildDiffPatch } from "../../trpc/router/git/utils/diff-patch.ts";
+import {
+	buildDiffPatch,
+	type DiffPatch,
+} from "../../trpc/router/git/utils/diff-patch.ts";
 import {
 	type DiffSide,
 	diffSideObjectSpec,
@@ -184,12 +187,13 @@ export const gitDiffPatchTask = defineWorkerTask<
 		category: DiffCategory;
 		paths?: string[];
 		untrackedPaths?: string[];
+		ignoreWhitespace?: boolean;
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
 		gitEnv: GitTaskEnv;
 	},
-	{ patch: string }
+	DiffPatch
 >({
 	type: "git/getDiffPatch",
 	handler: async ({
@@ -197,6 +201,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		category,
 		paths,
 		untrackedPaths,
+		ignoreWhitespace,
 		baseBranch,
 		commitHash,
 		fromHash,
@@ -208,15 +213,15 @@ export const gitDiffPatchTask = defineWorkerTask<
 			commitHash,
 			fromHash,
 		});
-		const patch = await buildDiffPatch({
+		return buildDiffPatch({
 			cwd: worktreePath,
 			env: gitEnv,
 			category,
 			refs,
 			paths,
 			untrackedPaths,
+			ignoreWhitespace,
 		});
-		return { patch };
 	},
 });
 

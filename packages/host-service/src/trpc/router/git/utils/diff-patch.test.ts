@@ -30,6 +30,12 @@ function lines(count: number, marker: string): string {
 	return `${Array.from({ length: count }, (_, i) => `${marker} line ${i}`).join("\n")}\n`;
 }
 
+async function buildPatchText(
+	request: Parameters<typeof buildDiffPatch>[0],
+): Promise<string> {
+	return (await buildDiffPatch(request)).patch;
+}
+
 describe("buildDiffPatch", () => {
 	let repo: string;
 	let git: SimpleGit;
@@ -59,8 +65,8 @@ describe("buildDiffPatch", () => {
 			category: "unstaged" as const,
 			refs: {},
 		};
-		const full = await buildDiffPatch(request);
-		const bounded = await buildDiffPatch({
+		const full = await buildPatchText(request);
+		const bounded = await buildPatchText({
 			...request,
 			maxBytes: Math.floor(full.length / 2),
 		});
@@ -89,12 +95,12 @@ describe("buildDiffPatch", () => {
 			category: "unstaged" as const,
 			refs: {},
 		};
-		const full = await buildDiffPatch(request);
+		const full = await buildPatchText(request);
 		// Every byte here is ASCII, so a string offset is a byte offset: this
 		// is exactly where the third file's section begins.
 		const thirdSection = full.lastIndexOf("\ndiff --git ") + 1;
 
-		const bounded = await buildDiffPatch({
+		const bounded = await buildPatchText({
 			...request,
 			maxBytes: thirdSection,
 		});
@@ -113,7 +119,7 @@ describe("buildDiffPatch", () => {
 		await writeFile(join(repo, "tracked.txt"), "one\nTWO\nthree\n");
 		await writeFile(join(repo, "huge.log"), lines(200_000, "noise"));
 
-		const patch = await buildDiffPatch({
+		const { patch, truncated } = await buildDiffPatch({
 			cwd: repo,
 			env: ENV,
 			category: "unstaged",
@@ -122,6 +128,7 @@ describe("buildDiffPatch", () => {
 			maxBytes: 64 * 1024,
 		});
 
+		expect(truncated).toBe(true);
 		expect(patch).toContain("diff --git a/tracked.txt b/tracked.txt");
 		expect(patch).toContain("+TWO");
 		expect(patch).not.toContain("huge.log");
@@ -142,8 +149,12 @@ describe("buildDiffPatch", () => {
 			refs: {},
 			untrackedPaths: ["fresh.txt"],
 		};
-		const patch = await buildDiffPatch({ ...request, maxBytes: 1024 * 1024 });
-		expect(patch).toBe(await buildDiffPatch(request));
+		const { patch, truncated } = await buildDiffPatch({
+			...request,
+			maxBytes: 1024 * 1024,
+		});
+		expect(truncated).toBe(false);
+		expect(patch).toBe(await buildPatchText(request));
 		// The cut only ever applies to a diff that was stopped mid-stream: a
 		// patch that fit keeps its last file section, which is the one an
 		// over-eager cut would take.
@@ -189,7 +200,7 @@ describe("buildDiffPatch header shape", () => {
 		await writeFile(join(repo, "tracked.txt"), "one\nTWO\nthree\n");
 		await writeFile(join(repo, "fresh.txt"), "brand new\n");
 
-		const unstaged = await buildDiffPatch({
+		const unstaged = await buildPatchText({
 			...request("unstaged"),
 			untrackedPaths: ["fresh.txt"],
 		});
@@ -197,7 +208,7 @@ describe("buildDiffPatch header shape", () => {
 		expect(unstaged).toContain("diff --git a/fresh.txt b/fresh.txt");
 
 		await git.add(["tracked.txt"]);
-		const staged = await buildDiffPatch(request("staged"));
+		const staged = await buildPatchText(request("staged"));
 		expect(staged).toContain("diff --git a/tracked.txt b/tracked.txt");
 	});
 
@@ -205,7 +216,7 @@ describe("buildDiffPatch header shape", () => {
 		await git.raw(["config", "diff.noprefix", "true"]);
 		await writeFile(join(repo, "tracked.txt"), "one\nTWO\nthree\n");
 
-		const patch = await buildDiffPatch(request("unstaged"));
+		const patch = await buildPatchText(request("unstaged"));
 		expect(patch).toContain("diff --git a/tracked.txt b/tracked.txt");
 	});
 
@@ -214,7 +225,7 @@ describe("buildDiffPatch header shape", () => {
 		await git.raw(["config", "diff.dstPrefix", "dst/"]);
 		await writeFile(join(repo, "tracked.txt"), "one\nTWO\nthree\n");
 
-		const patch = await buildDiffPatch(request("unstaged"));
+		const patch = await buildPatchText(request("unstaged"));
 		expect(patch).toContain("diff --git a/tracked.txt b/tracked.txt");
 	});
 
@@ -228,7 +239,7 @@ describe("buildDiffPatch header shape", () => {
 		await git.commit("add café");
 		await writeFile(join(repo, "café.txt"), "hola\nadios\n");
 
-		const patch = await buildDiffPatch(request("unstaged"));
+		const patch = await buildPatchText(request("unstaged"));
 		expect(patch).toContain("diff --git a/café.txt b/café.txt");
 	});
 });
