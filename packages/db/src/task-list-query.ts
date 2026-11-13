@@ -178,6 +178,7 @@ export function buildTaskListConditions(
 	if (filters.search) {
 		const pattern = `%${escapeLikePattern(filters.search)}%`;
 		const searchCondition = or(
+			ilike(tasks.slug, pattern),
 			ilike(tasks.title, pattern),
 			ilike(tasks.description, pattern),
 		);

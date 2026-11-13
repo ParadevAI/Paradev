@@ -61,11 +61,12 @@ describe("buildTaskListConditions", () => {
 		expect(params).toEqual([ORG, "///"]);
 	});
 
-	test("escapes LIKE wildcards in search and matches title or description", () => {
+	test("escapes LIKE wildcards in search and matches slug, title or description", () => {
 		const { sql, params } = render(
 			buildTaskListConditions({ organizationId: ORG, search: "50%_off" }),
 		);
 		expect(params).toContain("%50\\%\\_off%");
+		expect(sql.toLowerCase()).toContain("slug");
 		expect(sql.toLowerCase()).toContain("title");
 		expect(sql.toLowerCase()).toContain("description");
 	});
