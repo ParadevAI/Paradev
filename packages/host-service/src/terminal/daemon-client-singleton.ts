@@ -65,6 +65,19 @@ async function ptyDaemonSocketPath(): Promise<string> {
 export async function getDaemonClient(): Promise<DaemonClient> {
 	if (cached?.isConnected) return cached;
 	if (connecting) return connecting;
+	const attempt: Promise<DaemonClient> = connectDaemonClient()
+		.then((client) => {
+			if (connecting === attempt) cached = client;
+			return client;
+		})
+		.finally(() => {
+			if (connecting === attempt) connecting = null;
+		});
+	connecting = attempt;
+	return attempt;
+}
+
+async function connectDaemonClient(): Promise<DaemonClient> {
 	const sockPath = await ptyDaemonSocketPath();
 	const client = new DaemonClient({ socketPath: sockPath });
 	client.onDisconnect((err) => {
@@ -84,21 +97,13 @@ export async function getDaemonClient(): Promise<DaemonClient> {
 			}
 		}
 	});
-	connecting = client
-		.connect()
-		.then(() => {
-			cached = client;
-			return client;
-		})
-		.catch(async (error) => {
-			// Failed connect — clean up the partially initialized client.
-			await client.dispose().catch(() => {});
-			throw error;
-		})
-		.finally(() => {
-			connecting = null;
-		});
-	return connecting;
+	try {
+		await client.connect();
+	} catch (error) {
+		await client.dispose().catch(() => {});
+		throw error;
+	}
+	return client;
 }
 
 /** For tests / shutdown only. */
