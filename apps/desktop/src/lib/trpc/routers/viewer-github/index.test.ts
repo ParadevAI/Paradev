@@ -70,7 +70,7 @@ describe("viewer GitHub on this machine", () => {
 		expect(tokensUsed).toEqual(["local-token"]);
 	});
 
-	test("a request that never reaches GitHub is a bad gateway, not a bug", async () => {
+	test("losing the connection to GitHub is unavailability, not a bug", async () => {
 		const { call } = caller("local-token", {
 			graphql: (async () => {
 				throw Object.assign(new Error("Connect Timeout Error"), {
@@ -85,7 +85,7 @@ describe("viewer GitHub on this machine", () => {
 		});
 		await expect(
 			call.getPullRequestStack({ repoFullName: "acme/widgets", number: 7 }),
-		).rejects.toMatchObject({ code: "BAD_GATEWAY" });
+		).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
 	});
 
 	test("a server error that GitHub answers with stays an internal error", async () => {

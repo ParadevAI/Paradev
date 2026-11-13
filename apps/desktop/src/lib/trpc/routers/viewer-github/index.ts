@@ -83,7 +83,7 @@ export function createViewerGithubRouter(
 		} catch (error) {
 			throw new TRPCError({
 				code: isGitHubUnreachableError(error)
-					? "BAD_GATEWAY"
+					? "SERVICE_UNAVAILABLE"
 					: githubErrorCode(error),
 				message:
 					error instanceof Error && error.message ? error.message : fallback,
