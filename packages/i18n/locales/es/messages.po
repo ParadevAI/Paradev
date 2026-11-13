@@ -1123,9 +1123,6 @@ msgstr "{label} vuelve a quedar sin configurar. Nada cambia dentro de tus espaci
 msgid "{label} is set to manual"
 msgstr "{label} usa inicio de sesión manual"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} se está reiniciando con este inicio de sesión."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Tasa de registros completados"
 
 msgid "Sign-up steps"
 msgstr "Pasos de registro"
-
-msgid "Signed in"
-msgstr "Sesión iniciada"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Sesión iniciada como <0>{userName}</0>"

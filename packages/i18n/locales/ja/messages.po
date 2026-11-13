@@ -1123,9 +1123,6 @@ msgstr "{label} は未設定の状態に戻ります。ワークスペース内�
 msgid "{label} is set to manual"
 msgstr "{label} を手動サインインに設定しました"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label}をこのサインインで再起動しています。"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "登録完了率"
 
 msgid "Sign-up steps"
 msgstr "登録ステップ数"
-
-msgid "Signed in"
-msgstr "サインインしました"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>としてサインイン中"

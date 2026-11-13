@@ -1123,9 +1123,6 @@ msgstr "{label} kembali menjadi belum diatur. Tidak ada yang berubah di dalam wo
 msgid "{label} is set to manual"
 msgstr "{label} kini memakai login manual"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} dimulai ulang dengan login ini."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Penyelesaian pendaftaran"
 
 msgid "Sign-up steps"
 msgstr "Langkah pendaftaran"
-
-msgid "Signed in"
-msgstr "Berhasil masuk"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Masuk sebagai <0>{userName}</0>"

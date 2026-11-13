@@ -11,7 +11,7 @@ import {
 import { Input } from "@superset/ui/input";
 import { Spinner } from "@superset/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@superset/ui/toggle-group";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CopyButton } from "../../../../../../../../../../components/CopyButton";
 import type {
@@ -20,7 +20,7 @@ import type {
 	SignedInAccount,
 } from "../../../../../../../../../../providers/TurnFailureActionsProvider";
 import { SignInProgress } from "./components/SignInProgress";
-import { CHATGPT_SECURITY_SETTINGS, CLOSE_AFTER_DONE_MS } from "./constants";
+import { CHATGPT_SECURITY_SETTINGS } from "./constants";
 
 type Step =
 	| { name: "start" }
@@ -29,13 +29,11 @@ type Step =
 	| { name: "api_key" }
 	| { name: "signing_in" }
 	| { name: "restarting"; account: SignedInAccount }
-	| { name: "restart_failed"; account: SignedInAccount }
-	| { name: "done"; account: SignedInAccount };
+	| { name: "restart_failed"; account: SignedInAccount };
 
 const BUSY_STEPS: ReadonlySet<Step["name"]> = new Set([
 	"signing_in",
 	"restarting",
-	"done",
 ]);
 
 export function AgentSignInDialog({
@@ -68,26 +66,18 @@ export function AgentSignInDialog({
 	};
 
 	useEffect(() => {
-		if (!open) return;
+		if (!open) {
+			attempt.current += 1;
+			pending.current?.abort();
+			setOpening(false);
+			return;
+		}
 		setStep({ name: "start" });
 		setValue("");
 		setError(null);
 	}, [open]);
 
-	useEffect(() => {
-		if (open) return;
-		attempt.current += 1;
-		pending.current?.abort();
-		pending.current = null;
-	}, [open]);
-
 	useEffect(() => () => pending.current?.abort(), []);
-
-	useEffect(() => {
-		if (step.name !== "done") return;
-		const timer = setTimeout(() => onOpenChange(false), CLOSE_AFTER_DONE_MS);
-		return () => clearTimeout(timer);
-	}, [step.name, onOpenChange]);
 
 	const reason = (cause: unknown) =>
 		cause instanceof Error
@@ -109,11 +99,8 @@ export function AgentSignInDialog({
 			restarted = false;
 		}
 		if (current !== attempt.current) return;
-		setStep(
-			restarted
-				? { name: "done", account }
-				: { name: "restart_failed", account },
-		);
+		if (restarted) onOpenChange(false);
+		else setStep({ name: "restart_failed", account });
 	};
 
 	const save = async (submit: () => Promise<SignedInAccount>, back: Step) => {
@@ -179,6 +166,7 @@ export function AgentSignInDialog({
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				if (!next && busy) return;
@@ -371,26 +359,6 @@ export function AgentSignInDialog({
 						<SignInProgress title={<Trans>Restarting {label}…</Trans>}>
 							<Trans>Your chat history stays. Only the agent restarts.</Trans>
 						</SignInProgress>
-					)}
-
-					{step.name === "done" && (
-						<div className="flex flex-col items-center gap-2 py-4 text-center">
-							<span className="flex size-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
-								<Check className="size-5" />
-							</span>
-							<p className="font-medium">
-								<Trans>Signed in</Trans>
-							</p>
-							<p className="text-muted-foreground text-sm">
-								{step.account.accountLabel ? (
-									<>
-										{step.account.accountLabel}
-										<br />
-									</>
-								) : null}
-								<Trans>{label} is starting again with this sign-in.</Trans>
-							</p>
-						</div>
 					)}
 
 					{step.name === "restart_failed" && (

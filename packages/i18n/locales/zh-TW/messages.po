@@ -1123,9 +1123,6 @@ msgstr "{label} 將恢復為未設定。工作區內不會有任何變化：你�
 msgid "{label} is set to manual"
 msgstr "{label} 已設為手動登入"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "正在使用此登入重新啟動 {label}。"
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "註冊完成率"
 
 msgid "Sign-up steps"
 msgstr "註冊步驟"
-
-msgid "Signed in"
-msgstr "已登入"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登入為<0>{userName}</0>"

@@ -1123,9 +1123,6 @@ msgstr "{label} torna a non essere configurato. Negli spazi di lavoro non cambia
 msgid "{label} is set to manual"
 msgstr "{label} ora usa l’accesso manuale"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} si sta riavviando con questo accesso."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Tasso di registrazioni completate"
 
 msgid "Sign-up steps"
 msgstr "Passaggi di registrazione"
-
-msgid "Signed in"
-msgstr "Accesso effettuato"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Hai effettuato l'accesso come <0>{userName}</0>"

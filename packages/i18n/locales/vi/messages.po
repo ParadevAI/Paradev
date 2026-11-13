@@ -1123,9 +1123,6 @@ msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có g
 msgid "{label} is set to manual"
 msgstr "{label} đã chuyển sang đăng nhập thủ công"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} đang khởi động lại với lần đăng nhập này."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Tỷ lệ hoàn tất đăng ký"
 
 msgid "Sign-up steps"
 msgstr "Số bước đăng ký"
-
-msgid "Signed in"
-msgstr "Đã đăng nhập"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Đang đăng nhập với <0>{userName}</0>"

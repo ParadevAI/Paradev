@@ -1117,9 +1117,6 @@ msgstr "{label} знову стане неналаштованим. У робо�
 msgid "{label} is set to manual"
 msgstr "Для {label} увімкнено ручний вхід"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} перезапускається з цим входом."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18753,9 +18750,6 @@ msgstr "Частка завершених реєстрацій"
 
 msgid "Sign-up steps"
 msgstr "Кроки реєстрації"
-
-msgid "Signed in"
-msgstr "Вхід виконано"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ви ввійшли як <0>{userName}</0>"

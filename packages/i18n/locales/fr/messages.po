@@ -1123,9 +1123,6 @@ msgstr "{label} redevient non configuré. Rien ne change dans vos espaces de tra
 msgid "{label} is set to manual"
 msgstr "{label} est en connexion manuelle"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} redémarre avec cette connexion."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Taux d'inscriptions finalisées"
 
 msgid "Sign-up steps"
 msgstr "Étapes d'inscription"
-
-msgid "Signed in"
-msgstr "Connecté"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Connecté en tant que <0>{userName}</0>"

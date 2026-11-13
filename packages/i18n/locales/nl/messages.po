@@ -1123,9 +1123,6 @@ msgstr "{label} is daarna weer niet ingesteld. In je werkruimtes verandert niets
 msgid "{label} is set to manual"
 msgstr "{label} gebruikt nu handmatig inloggen"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} start opnieuw met deze aanmelding."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Voltooiingsgraad aanmeldingen"
 
 msgid "Sign-up steps"
 msgstr "Aanmeldstappen"
-
-msgid "Signed in"
-msgstr "Ingelogd"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ingelogd als <0>{userName}</0>"

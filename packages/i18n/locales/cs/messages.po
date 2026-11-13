@@ -1123,9 +1123,6 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} se znovu spouští s tímto přihlášením."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Dokončení registrace"
 
 msgid "Sign-up steps"
 msgstr "Kroky registrace"
-
-msgid "Signed in"
-msgstr "Přihlášeno"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Přihlášeni jako <0>{userName}</0>"

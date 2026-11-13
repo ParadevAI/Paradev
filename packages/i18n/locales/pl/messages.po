@@ -1123,9 +1123,6 @@ msgstr "{label} wraca do stanu nieskonfigurowanego. W obszarach roboczych nic si
 msgid "{label} is set to manual"
 msgstr "{label} używa teraz logowania ręcznego"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} uruchamia się ponownie z tym logowaniem."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Odsetek ukończonych rejestracji"
 
 msgid "Sign-up steps"
 msgstr "Kroki rejestracji"
-
-msgid "Signed in"
-msgstr "Zalogowano"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Zalogowano jako <0>{userName}</0>"

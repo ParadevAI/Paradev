@@ -1123,9 +1123,6 @@ msgstr "{label} yeniden ayarlanmamış duruma döner. Çalışma alanlarınızda
 msgid "{label} is set to manual"
 msgstr "{label} artık manuel oturum açma kullanıyor"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} bu oturum açmayla yeniden başlatılıyor."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Kayıt tamamlama"
 
 msgid "Sign-up steps"
 msgstr "Kayıt adımları"
-
-msgid "Signed in"
-msgstr "Oturum açıldı"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"

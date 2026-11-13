@@ -1123,9 +1123,6 @@ msgstr "{label} снова станет ненастроенным. В рабо�
 msgid "{label} is set to manual"
 msgstr "Для {label} включён ручной вход"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} перезапускается с этим входом."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Доля завершённых регистраций"
 
 msgid "Sign-up steps"
 msgstr "Шаги регистрации"
-
-msgid "Signed in"
-msgstr "Вход выполнен"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Вы вошли как <0>{userName}</0>"

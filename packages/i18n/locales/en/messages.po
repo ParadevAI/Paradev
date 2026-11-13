@@ -1123,9 +1123,6 @@ msgstr "{label} goes back to not set up. Nothing changes inside your workspaces:
 msgid "{label} is set to manual"
 msgstr "{label} is set to manual"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} is starting again with this sign-in."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Sign-up completion"
 
 msgid "Sign-up steps"
 msgstr "Sign-up steps"
-
-msgid "Signed in"
-msgstr "Signed in"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Signed in as <0>{userName}</0>"

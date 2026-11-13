@@ -1123,9 +1123,6 @@ msgstr "{label} ist danach wieder nicht eingerichtet. In deinen Arbeitsbereichen
 msgid "{label} is set to manual"
 msgstr "{label} nutzt jetzt die manuelle Anmeldung"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} wird mit dieser Anmeldung neu gestartet."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Registrierungsabschluss"
 
 msgid "Sign-up steps"
 msgstr "Registrierungsschritte"
-
-msgid "Signed in"
-msgstr "Angemeldet"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Angemeldet als <0>{userName}</0>"

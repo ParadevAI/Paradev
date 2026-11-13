@@ -1123,9 +1123,6 @@ msgstr "O {label} volta a ficar sem configuração. Nada muda nas suas áreas de
 msgid "{label} is set to manual"
 msgstr "{label} agora usa login manual"
 
-msgid "{label} is starting again with this sign-in."
-msgstr "{label} está reiniciando com este login."
-
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -18759,9 +18756,6 @@ msgstr "Taxa de cadastros concluídos"
 
 msgid "Sign-up steps"
 msgstr "Etapas de cadastro"
-
-msgid "Signed in"
-msgstr "Conectado"
 
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Conectado como <0>{userName}</0>"

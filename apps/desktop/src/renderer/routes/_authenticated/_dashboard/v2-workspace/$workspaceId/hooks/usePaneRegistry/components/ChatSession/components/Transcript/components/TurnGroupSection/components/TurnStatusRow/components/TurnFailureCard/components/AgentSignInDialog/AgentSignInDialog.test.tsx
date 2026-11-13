@@ -62,7 +62,7 @@ test("a sign-in cannot be closed mid-way, and a saved one still restarts the age
 
 	await act(async () => finish.resolve(account));
 	expect(restartAndContinue).toHaveBeenCalledTimes(1);
-	expect(view.getByText("Signed in")).toBeTruthy();
+	expect(onOpenChange).toHaveBeenCalledWith(false);
 });
 
 test("a restart that throws keeps the sign-in and offers to restart again", async () => {
@@ -82,10 +82,8 @@ test("a restart that throws keeps the sign-in and offers to restart again", asyn
 	expect(view.queryByLabelText("Code")).toBeNull();
 });
 
-test("going back from a Codex device code stops waiting for its approval", async () => {
-	const signals: AbortSignal[] = [];
-	const restartAndContinue = mock(async () => true);
-	const signIn: AgentSignIn = {
+function codex(signals: AbortSignal[]): AgentSignIn {
+	return {
 		agent: "codex",
 		label: "Codex",
 		openUrl: () => {},
@@ -99,6 +97,12 @@ test("going back from a Codex device code stops waiting for its approval", async
 		},
 		saveApiKey: async () => account,
 	};
+}
+
+test("going back from a Codex device code stops waiting for its approval", async () => {
+	const signals: AbortSignal[] = [];
+	const restartAndContinue = mock(async () => true);
+	const signIn = codex(signals);
 	const view = render(
 		<AgentSignInDialog
 			onOpenChange={() => {}}
@@ -116,4 +120,24 @@ test("going back from a Codex device code stops waiting for its approval", async
 	expect(signals[0]?.aborted).toBe(true);
 	expect(view.getByText("Open ChatGPT to sign in")).toBeTruthy();
 	expect(restartAndContinue).not.toHaveBeenCalled();
+});
+
+test("a dialog closed while waiting for a Codex approval opens ready to start again", async () => {
+	const signals: AbortSignal[] = [];
+	const props = {
+		onOpenChange: () => {},
+		restartAndContinue: async () => true,
+		signIn: codex(signals),
+	};
+	const view = render(<AgentSignInDialog {...props} open />);
+	await act(async () => {
+		fireEvent.click(view.getByText("Open ChatGPT to sign in"));
+	});
+	expect(view.getByText("K7QM-4XPD")).toBeTruthy();
+
+	view.rerender(<AgentSignInDialog {...props} open={false} />);
+	expect(signals[0]?.aborted).toBe(true);
+	view.rerender(<AgentSignInDialog {...props} open />);
+	const start = view.getByText("Open ChatGPT to sign in").closest("button");
+	expect(start?.disabled).toBe(false);
 });
