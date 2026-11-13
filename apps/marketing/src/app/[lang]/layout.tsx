@@ -187,6 +187,12 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
+				<Script
+					id="paradev-external-tracking"
+					src="https://x.paradev.com/js/external-tracking.js"
+					data-tracking-id="tk_7cd75fb5e34042539263f0d7e1a98b57"
+					strategy="afterInteractive"
+				/>
 			</body>
 		</html>
 	);
