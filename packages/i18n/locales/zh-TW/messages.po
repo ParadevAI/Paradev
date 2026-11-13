@@ -2784,6 +2784,9 @@ msgstr "代理程式能端到端完成跨檔案改動。"
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "代理程式寫出完整的函式和檔案，人類盯著每一步、批准每一條命令。一個代理程式，一個人。更快，但仍是序列。"
 
+msgid "An Anthropic API key."
+msgstr "Anthropic API 金鑰。"
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "自動化只能使用你建立的雲端工作區"
 
@@ -2795,6 +2798,9 @@ msgstr "發生錯誤"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "一個隔離的git worktree，代理程式在其中執行，不會動到你的主檢出。"
+
+msgid "An OpenAI API key."
+msgstr "OpenAI API 金鑰。"
 
 msgid "An unknown error occurred"
 msgstr "發生未知錯誤"
@@ -3870,6 +3876,9 @@ msgstr "隨此裝置上的 Paradev 應用程式一起提供。"
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "隨此裝置上的 Paradev 應用程式一起提供，並隨應用程式一起更新。"
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business 方案"
 
@@ -4356,6 +4365,9 @@ msgstr "檢出PR需要一個專案"
 msgid "Checking pull requests in {what}"
 msgstr "正在檢查 {what} 的拉取請求"
 
+msgid "Checking with the provider."
+msgstr "正在向供應商驗證。"
+
 msgid "Checking workspaces"
 msgstr "正在檢查工作區"
 
@@ -4615,6 +4627,9 @@ msgstr "點擊一個元素。"
 
 msgid "Click any element to send it to an agent."
 msgstr "點擊任意元素，即可傳送給代理程式。"
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "在 claude.ai 上點擊 Authorize。Anthropic 接著會顯示一組代碼。請貼到這裡。"
 
 msgid "Click here if not redirected"
 msgstr "如果沒有自動跳轉，請點選這裡"
@@ -5534,6 +5549,9 @@ msgstr "使用Google繼續"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "繼續代理程式工作階段需要已釘選的工作區"
+
+msgid "Continuing your chat…"
+msgstr "正在繼續你的聊天…"
 
 msgid "Continuing…"
 msgstr "正在繼續…"
@@ -8016,6 +8034,9 @@ msgstr "輸入整數"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "請輸入 {minHours} 到 {maxHours} 之間的整數 GB 小時。"
 
+msgid "Enter this code on the page we opened:"
+msgstr "在我們開啟的頁面上輸入此代碼："
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI 要求時輸入此代碼："
 
@@ -9053,6 +9074,9 @@ msgstr "已完成 · 用時7秒"
 
 msgid "Finishing the move…"
 msgstr "正在完成移動…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "第一次使用？請在 <0>ChatGPT 設定</0>中開啟裝置代碼登入。"
 
 msgid "Fit"
 msgstr "符合視窗"
@@ -13967,8 +13991,17 @@ msgstr "開啟 ChatGPT 管理員設定"
 msgid "Open ChatGPT settings"
 msgstr "開啟 ChatGPT 設定"
 
+msgid "Open ChatGPT to sign in"
+msgstr "開啟 ChatGPT 登入"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "以聊天形式開啟 Claude Code、Codex、OpenCode 和 Pi 工作階段"
+
+msgid "Open claude.ai again"
+msgstr "重新開啟 claude.ai"
+
+msgid "Open claude.ai to sign in"
+msgstr "開啟 claude.ai 登入"
 
 msgid "Open Command Palette"
 msgstr "開啟命令面板"
@@ -14857,6 +14890,12 @@ msgstr "貼上"
 
 msgid "Paste a link"
 msgstr "貼上連結"
+
+msgid "Paste an API key instead"
+msgstr "改為貼上 API 金鑰"
+
+msgid "Paste the code"
+msgstr "貼上代碼"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "把它貼上到Paradev CLI："
@@ -16788,6 +16827,9 @@ msgstr "已重啟1個主機服務"
 msgid "Restarting"
 msgstr "重新啟動中"
 
+msgid "Restarting {label}…"
+msgstr "正在重新啟動 {label}…"
+
 msgid "Restarting {what}"
 msgstr "正在重新啟動 {what}"
 
@@ -17323,6 +17365,9 @@ msgstr "儲存並建立工作區"
 
 msgid "Save All"
 msgstr "全部儲存"
+
+msgid "Save and continue"
+msgstr "儲存並繼續"
 
 msgid "Save as environment"
 msgstr "儲存為環境"
@@ -18505,8 +18550,12 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "登入一次，Paradev 會保持連線。"
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
+#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "登入{0}"
+
+msgid "Sign in to {label}"
+msgstr "登入 {label}"
 
 msgid "Sign in to change your organization's plugins."
 msgstr "登入後才能變更組織的外掛。"
@@ -18594,6 +18643,9 @@ msgstr "註冊完成率"
 msgid "Sign-up steps"
 msgstr "註冊步驟"
 
+msgid "Signed in"
+msgstr "已登入"
+
 msgid "Signed in as <0>{userName}</0>"
 msgstr "已登入為<0>{userName}</0>"
 
@@ -18603,6 +18655,9 @@ msgstr "已登入 ChatGPT"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "已以 {connectedAs} 身分登入 ChatGPT"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "已登入，但 {label} 未能重新啟動。"
+
 msgid "Signed out"
 msgstr "已登出"
 
@@ -18611,6 +18666,9 @@ msgstr "已登入的站點"
 
 msgid "Signing in..."
 msgstr "正在登入..."
+
+msgid "Signing in…"
+msgstr "正在登入…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "註冊正常。歡迎畫面已載入，主控台沒有錯誤。"
@@ -21232,6 +21290,9 @@ msgstr "試試其他搜尋詞或其他位置。"
 msgid "Try again"
 msgstr "重試"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "請再試一次，或關閉此視窗並在聊天中按「繼續」。"
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "請重試，或從 Paradev 系統匣選單重新啟動主機服務。"
 
@@ -21853,6 +21914,12 @@ msgstr "呼叫Paradev API時使用。"
 msgid "Use voice transcription and push-to-talk features."
 msgstr "使用語音轉寫和按住說話功能。"
 
+msgid "Use your ChatGPT plan."
+msgstr "使用你的 ChatGPT 方案。"
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "使用你的 Claude Pro 或 Max 方案。"
+
 msgid "Used"
 msgstr "已使用"
 
@@ -22101,6 +22168,9 @@ msgstr "正在等待活動資料"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "正在等待核准。請保持此對話方塊開啟。"
 
+msgid "Waiting for approval…"
+msgstr "正在等待核准…"
+
 msgid "Waiting for Checks"
 msgstr "等待檢查"
 
@@ -22157,6 +22227,9 @@ msgstr "導航定位與內容展開"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "我們公開開發，在和我們交談之前，你就能看到我們如何工作。"
+
+msgid "We check it with the provider before we save it."
+msgstr "儲存前我們會向供應商驗證。"
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "我們無法扣取{amountDue}。請更新支付方式以保留此方案。"
@@ -22994,6 +23067,9 @@ msgstr "你的變更"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "如果不儲存，你的更改將會丟失。"
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "你的聊天記錄會保留。只有代理程式會重新啟動。"
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "你的雲端工作區將無法再存取此主機。"

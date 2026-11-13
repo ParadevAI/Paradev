@@ -1,5 +1,32 @@
 import { createContext, useContext } from "react";
 
+export type SignedInAccount = { accountLabel: string | null };
+
+export type DeviceCode = { userCode: string; verificationUrl: string };
+
+type SharedSignIn = {
+	label: string;
+	saveApiKey: (value: string) => Promise<SignedInAccount>;
+	openUrl: (url: string) => void;
+};
+
+/** Signs the cloud workspace's agent in for its creator, without leaving the chat. */
+export type AgentSignIn = SharedSignIn &
+	(
+		| {
+				agent: "claude";
+				/** Returns the claude.ai page that shows the code to paste back. */
+				startOauth: () => Promise<{ url: string }>;
+				finishOauth: (code: string) => Promise<SignedInAccount>;
+		  }
+		| {
+				agent: "codex";
+				startDeviceCode: (plan: "personal" | "business") => Promise<DeviceCode>;
+				/** Resolves once the person approves the code on OpenAI's page. */
+				waitForDeviceCode: () => Promise<SignedInAccount>;
+		  }
+	);
+
 export type TurnFailureActions = {
 	/** A turn is running, a prompt is on its way, or the chat is resuming. */
 	blocked: boolean;
@@ -12,6 +39,8 @@ export type TurnFailureActions = {
 	startNewChat?: () => Promise<boolean>;
 	/** The person's own script signs this agent in, so a sign-in prompt has nothing to offer. */
 	manualSignIn?: boolean;
+	/** Set in the viewer's own cloud workspace, where the chat can sign the agent in. */
+	agentSignIn?: AgentSignIn;
 	/** Opens Settings › Agents, where manual mode is turned off. */
 	openAgentSettings?: () => void;
 	dismissed: ReadonlySet<string>;

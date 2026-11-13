@@ -2784,6 +2784,9 @@ msgstr "Bir ajan, çok dosyalı değişiklikleri baştan sona tamamlar."
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Bir ajan tüm fonksiyonları ve dosyaları yazarken bir insan her adımı izler ve her komutu onaylar. Bir ajan, bir insan. Daha hızlı, ama hâlâ sıralı."
 
+msgid "An Anthropic API key."
+msgstr "Bir Anthropic API anahtarı."
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Bir otomasyon yalnızca sizin oluşturduğunuz bir bulut çalışma alanını kullanabilir"
 
@@ -2795,6 +2798,9 @@ msgstr "Bir hata oluştu"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "Ajanın, ana checkout'unuza dokunmadan çalıştığı yalıtılmış bir git worktree'si."
+
+msgid "An OpenAI API key."
+msgstr "Bir OpenAI API anahtarı."
 
 msgid "An unknown error occurred"
 msgstr "Bilinmeyen bir hata oluştu"
@@ -3870,6 +3876,9 @@ msgstr "Bu cihazdaki Paradev uygulamasıyla birlikte gelir."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Bu cihazdaki Paradev uygulamasıyla birlikte gelir. Uygulamayla birlikte güncellenir."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business planı"
 
@@ -4356,6 +4365,9 @@ msgstr "Bir PR'ı checkout etmek proje gerektirir"
 msgid "Checking pull requests in {what}"
 msgstr "{what} içindeki pull request'ler kontrol ediliyor"
 
+msgid "Checking with the provider."
+msgstr "Sağlayıcıyla kontrol ediliyor."
+
 msgid "Checking workspaces"
 msgstr "Çalışma alanları kontrol ediliyor"
 
@@ -4615,6 +4627,9 @@ msgstr "Bir öğeye tıklayın."
 
 msgid "Click any element to send it to an agent."
 msgstr "Herhangi bir öğeye tıklayıp bir ajana gönderin."
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "claude.ai'de Authorize'a tıklayın. Anthropic ardından bir kod gösterir. Buraya yapıştırın."
 
 msgid "Click here if not redirected"
 msgstr "Yönlendirilmediyseniz buraya tıklayın"
@@ -5534,6 +5549,9 @@ msgstr "Google ile devam et"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Bir aracı oturumunu sürdürmek için sabitlenmiş bir çalışma alanı gerekir"
+
+msgid "Continuing your chat…"
+msgstr "Sohbetiniz sürdürülüyor…"
 
 msgid "Continuing…"
 msgstr "Devam ediliyor…"
@@ -8016,6 +8034,9 @@ msgstr "Bir tam sayı girin"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "{minHours} ile {maxHours} GB-saat arasında tam sayı girin."
 
+msgid "Enter this code on the page we opened:"
+msgstr "Bu kodu açtığımız sayfaya girin:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI istediğinde bu kodu girin:"
 
@@ -9053,6 +9074,9 @@ msgstr "bitti · 7 sn çalıştı"
 
 msgid "Finishing the move…"
 msgstr "Taşıma tamamlanıyor…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "İlk kez mi? <0>ChatGPT ayarlarında</0> cihaz koduyla oturum açmayı etkinleştirin."
 
 msgid "Fit"
 msgstr "Sığdır"
@@ -13967,8 +13991,17 @@ msgstr "ChatGPT yönetici ayarlarını aç"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT ayarlarını aç"
 
+msgid "Open ChatGPT to sign in"
+msgstr "Oturum açmak için ChatGPT'yi aç"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code, Codex, OpenCode ve Pi oturumlarını sohbet olarak aç"
+
+msgid "Open claude.ai again"
+msgstr "claude.ai'yi yeniden aç"
+
+msgid "Open claude.ai to sign in"
+msgstr "Oturum açmak için claude.ai'yi aç"
 
 msgid "Open Command Palette"
 msgstr "Komut paletini aç"
@@ -14857,6 +14890,12 @@ msgstr "Yapıştır"
 
 msgid "Paste a link"
 msgstr "Bağlantı yapıştır"
+
+msgid "Paste an API key instead"
+msgstr "Bunun yerine bir API anahtarı yapıştır"
+
+msgid "Paste the code"
+msgstr "Kodu yapıştırın"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Bunu Paradev CLI'ye yapıştırın:"
@@ -16788,6 +16827,9 @@ msgstr "1 host hizmeti yeniden başlatıldı"
 msgid "Restarting"
 msgstr "Yeniden başlatılıyor"
 
+msgid "Restarting {label}…"
+msgstr "{label} yeniden başlatılıyor…"
+
 msgid "Restarting {what}"
 msgstr "{what} yeniden başlatılıyor"
 
@@ -17323,6 +17365,9 @@ msgstr "Kaydet ve çalışma alanı oluştur"
 
 msgid "Save All"
 msgstr "Tümünü kaydet"
+
+msgid "Save and continue"
+msgstr "Kaydet ve devam et"
 
 msgid "Save as environment"
 msgstr "Ortam olarak kaydet"
@@ -18505,8 +18550,12 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "Bir kez oturum açın. Paradev bağlantıyı korur."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
+#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "{0} kuruluşunda oturum açın"
+
+msgid "Sign in to {label}"
+msgstr "{label} ile oturum aç"
 
 msgid "Sign in to change your organization's plugins."
 msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
@@ -18594,6 +18643,9 @@ msgstr "Kayıt tamamlama"
 msgid "Sign-up steps"
 msgstr "Kayıt adımları"
 
+msgid "Signed in"
+msgstr "Oturum açıldı"
+
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0> olarak oturum açıldı"
 
@@ -18603,6 +18655,9 @@ msgstr "ChatGPT'ye giriş yapıldı"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "ChatGPT'ye {connectedAs} olarak giriş yapıldı"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "Oturum açıldı ancak {label} yeniden başlamadı."
+
 msgid "Signed out"
 msgstr "Oturum kapatıldı"
 
@@ -18611,6 +18666,9 @@ msgstr "Oturum açılmış siteler"
 
 msgid "Signing in..."
 msgstr "Oturum açılıyor..."
+
+msgid "Signing in…"
+msgstr "Oturum açılıyor…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Kayıt çalışıyor. Hoş geldiniz ekranı yükleniyor ve konsol temiz."
@@ -21232,6 +21290,9 @@ msgstr "Farklı bir arama terimi veya başka bir yer deneyin."
 msgid "Try again"
 msgstr "Yeniden dene"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "Tekrar deneyin ya da bunu kapatıp sohbette Devam'a basın."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Tekrar deneyin veya sistem tepsisindeki Paradev menüsünden ana makine hizmetini yeniden başlatın."
 
@@ -21853,6 +21914,12 @@ msgstr "Paradev API'yi çağırırken bunu kullanın."
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Sesli yazıya dökme ve bas-konuş özelliklerini kullanın."
 
+msgid "Use your ChatGPT plan."
+msgstr "ChatGPT planınızı kullanın."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Claude Pro veya Max planınızı kullanın."
+
 msgid "Used"
 msgstr "Kullanılan"
 
@@ -22101,6 +22168,9 @@ msgstr "Etkinlik verileri bekleniyor"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Onay bekleniyor. Bu pencereyi açık tutun."
 
+msgid "Waiting for approval…"
+msgstr "Onay bekleniyor…"
+
 msgid "Waiting for Checks"
 msgstr "Kontroller bekleniyor"
 
@@ -22157,6 +22227,9 @@ msgstr "Yönlendirme ve açma-kapama"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "Açıkta geliştiriyoruz; bizimle konuşmadan önce nasıl çalıştığımızı görebilirsiniz."
+
+msgid "We check it with the provider before we save it."
+msgstr "Kaydetmeden önce sağlayıcıyla kontrol ediyoruz."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "{amountDue} tutarını tahsil edemedik. Bu planı sürdürmek için ödeme yönteminizi güncelleyin."
@@ -22994,6 +23067,9 @@ msgstr "Değişiklikleriniz"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Kaydetmezseniz değişiklikleriniz kaybolur."
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "Sohbet geçmişiniz korunur. Yalnızca ajan yeniden başlar."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Bulut çalışma alanlarınız artık bu host'a erişemeyecek."

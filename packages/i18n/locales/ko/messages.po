@@ -2784,6 +2784,9 @@ msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "에이전트가 함수와 파일 전체를 작성하는 동안 사람이 모든 단계를 지켜보고 모든 명령을 승인합니다. 에이전트 하나에 사람 하나. 더 빠르지만 여전히 순차적입니다."
 
+msgid "An Anthropic API key."
+msgstr "Anthropic API 키."
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "자동화는 내가 만든 클라우드 워크스페이스만 사용할 수 있습니다"
 
@@ -2795,6 +2798,9 @@ msgstr "오류가 발생했습니다"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "에이전트가 메인 체크아웃을 건드리지 않고 실행되는 격리된 git worktree입니다."
+
+msgid "An OpenAI API key."
+msgstr "OpenAI API 키."
 
 msgid "An unknown error occurred"
 msgstr "알 수 없는 오류가 발생했습니다"
@@ -3870,6 +3876,9 @@ msgstr "이 기기의 Paradev 앱에 포함되어 있습니다."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "이 기기의 Paradev 앱에 포함되어 있으며 앱과 함께 업데이트됩니다."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business 플랜"
 
@@ -4356,6 +4365,9 @@ msgstr "PR을 체크아웃하려면 프로젝트가 필요합니다"
 msgid "Checking pull requests in {what}"
 msgstr "{what}의 풀 리퀘스트 확인 중"
 
+msgid "Checking with the provider."
+msgstr "제공업체에서 확인하는 중입니다."
+
 msgid "Checking workspaces"
 msgstr "워크스페이스 확인 중"
 
@@ -4615,6 +4627,9 @@ msgstr "요소를 클릭하세요."
 
 msgid "Click any element to send it to an agent."
 msgstr "요소를 클릭하면 에이전트에게 전달됩니다."
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "claude.ai에서 Authorize를 클릭하세요. 그러면 Anthropic이 코드를 보여 줍니다. 여기에 붙여 넣으세요."
 
 msgid "Click here if not redirected"
 msgstr "이동하지 않으면 여기를 클릭하세요"
@@ -5534,6 +5549,9 @@ msgstr "Google로 계속하기"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "에이전트 세션을 계속하려면 고정된 워크스페이스가 필요합니다"
+
+msgid "Continuing your chat…"
+msgstr "채팅을 이어 가는 중…"
 
 msgid "Continuing…"
 msgstr "계속하는 중…"
@@ -8016,6 +8034,9 @@ msgstr "정수 입력"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "{minHours}에서 {maxHours} GB 시간 사이의 정수를 입력하세요."
 
+msgid "Enter this code on the page we opened:"
+msgstr "열린 페이지에 이 코드를 입력하세요:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI가 요청하면 이 코드를 입력하세요:"
 
@@ -9053,6 +9074,9 @@ msgstr "완료 · 7초 작업"
 
 msgid "Finishing the move…"
 msgstr "이동을 마무리하는 중…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "처음이신가요? <0>ChatGPT 설정</0>에서 기기 코드 로그인을 켜세요."
 
 msgid "Fit"
 msgstr "맞춤"
@@ -13967,8 +13991,17 @@ msgstr "ChatGPT 관리자 설정 열기"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT 설정 열기"
 
+msgid "Open ChatGPT to sign in"
+msgstr "ChatGPT를 열어 로그인"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code, Codex, OpenCode 및 Pi 세션을 채팅으로 열기"
+
+msgid "Open claude.ai again"
+msgstr "claude.ai 다시 열기"
+
+msgid "Open claude.ai to sign in"
+msgstr "claude.ai를 열어 로그인"
 
 msgid "Open Command Palette"
 msgstr "명령 팔레트 열기"
@@ -14857,6 +14890,12 @@ msgstr "붙여넣기"
 
 msgid "Paste a link"
 msgstr "링크 붙여넣기"
+
+msgid "Paste an API key instead"
+msgstr "대신 API 키 붙여 넣기"
+
+msgid "Paste the code"
+msgstr "코드 붙여 넣기"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Paradev CLI에 붙여 넣으세요:"
@@ -16788,6 +16827,9 @@ msgstr "호스트 서비스 1개를 재시작했습니다"
 msgid "Restarting"
 msgstr "다시 시작 중"
 
+msgid "Restarting {label}…"
+msgstr "{label} 다시 시작하는 중…"
+
 msgid "Restarting {what}"
 msgstr "{what} 다시 시작 중"
 
@@ -17323,6 +17365,9 @@ msgstr "저장 후 워크스페이스 만들기"
 
 msgid "Save All"
 msgstr "모두 저장"
+
+msgid "Save and continue"
+msgstr "저장하고 계속"
 
 msgid "Save as environment"
 msgstr "환경으로 저장"
@@ -18505,8 +18550,12 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "한 번만 로그인하세요. 연결은 Paradev가 유지합니다."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
+#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "{0}에 로그인"
+
+msgid "Sign in to {label}"
+msgstr "{label}에 로그인"
 
 msgid "Sign in to change your organization's plugins."
 msgstr "조직 플러그인을 변경하려면 로그인하세요."
@@ -18594,6 +18643,9 @@ msgstr "가입 완료율"
 msgid "Sign-up steps"
 msgstr "가입 단계"
 
+msgid "Signed in"
+msgstr "로그인됨"
+
 msgid "Signed in as <0>{userName}</0>"
 msgstr "<0>{userName}</0>(으)로 로그인됨"
 
@@ -18603,6 +18655,9 @@ msgstr "ChatGPT에 로그인됨"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "{connectedAs}(으)로 ChatGPT에 로그인됨"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "로그인했지만 {label}이(가) 다시 시작되지 않았습니다."
+
 msgid "Signed out"
 msgstr "로그아웃됨"
 
@@ -18611,6 +18666,9 @@ msgstr "로그인한 사이트"
 
 msgid "Signing in..."
 msgstr "로그인하는 중..."
+
+msgid "Signing in…"
+msgstr "로그인하는 중…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "가입이 잘 됩니다. 환영 화면이 열리고 콘솔에 오류가 없습니다."
@@ -21232,6 +21290,9 @@ msgstr "다른 검색어를 쓰거나 다른 위치를 선택해 보세요."
 msgid "Try again"
 msgstr "다시 시도"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "다시 시도하거나, 이 창을 닫고 채팅에서 계속을 누르세요."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "다시 시도하거나 Paradev 트레이 메뉴에서 호스트 서비스를 다시 시작해 주세요."
 
@@ -21853,6 +21914,12 @@ msgstr "Paradev API를 호출할 때 사용하세요."
 msgid "Use voice transcription and push-to-talk features."
 msgstr "음성 받아쓰기와 푸시 투 토크 기능을 사용합니다."
 
+msgid "Use your ChatGPT plan."
+msgstr "ChatGPT 요금제를 사용합니다."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Claude Pro 또는 Max 요금제를 사용합니다."
+
 msgid "Used"
 msgstr "사용됨"
 
@@ -22101,6 +22168,9 @@ msgstr "활동 데이터 대기 중"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "승인을 기다리는 중입니다. 이 대화 상자를 열어 두세요."
 
+msgid "Waiting for approval…"
+msgstr "승인을 기다리는 중…"
+
 msgid "Waiting for Checks"
 msgstr "검사 대기 중"
 
@@ -22157,6 +22227,9 @@ msgstr "길 찾기와 정보 펼침"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "우리는 공개적으로 만듭니다. 대화하기 전에 우리가 일하는 방식을 확인하세요."
+
+msgid "We check it with the provider before we save it."
+msgstr "저장하기 전에 제공업체에서 확인합니다."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "{amountDue}을(를) 청구하지 못했습니다. 이 플랜을 유지하려면 결제 수단을 업데이트하세요."
@@ -22994,6 +23067,9 @@ msgstr "내 변경 내용"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "저장하지 않으면 변경 사항이 사라집니다."
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "채팅 기록은 유지됩니다. 에이전트만 다시 시작됩니다."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "클라우드 워크스페이스가 더 이상 이 호스트에 접근할 수 없습니다."

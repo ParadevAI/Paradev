@@ -2778,6 +2778,9 @@ msgstr "Агент повністю виконує зміни в кількох 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Агент пише цілі функції й файли, а людина стежить за кожним кроком і схвалює кожну команду. Один агент, одна людина. Швидше, але все ще послідовно."
 
+msgid "An Anthropic API key."
+msgstr "Ключ API Anthropic."
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Автоматизація може використовувати лише хмарний робочий простір, який створили ви"
 
@@ -2789,6 +2792,9 @@ msgstr "Сталася помилка"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "Ізольований git worktree, де агент працює, не зачіпаючи вашу основну робочу копію."
+
+msgid "An OpenAI API key."
+msgstr "Ключ API OpenAI."
 
 msgid "An unknown error occurred"
 msgstr "Сталася невідома помилка"
@@ -3864,6 +3870,9 @@ msgstr "Входить до застосунку Paradev на цьому при�
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Входить до застосунку Paradev на цьому пристрої. Оновлюється разом із застосунком."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Тариф Business"
 
@@ -4350,6 +4359,9 @@ msgstr "Щоб переключитися на PR, потрібен проєкт
 msgid "Checking pull requests in {what}"
 msgstr "Перевірка пул-реквестів у {what}"
 
+msgid "Checking with the provider."
+msgstr "Перевірка в постачальника."
+
 msgid "Checking workspaces"
 msgstr "Перевірка робочих просторів"
 
@@ -4609,6 +4621,9 @@ msgstr "Натисніть елемент."
 
 msgid "Click any element to send it to an agent."
 msgstr "Натисніть будь-який елемент, щоб надіслати його агенту."
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "Натисніть Authorize на claude.ai. Потім Anthropic покаже код. Вставте його сюди."
 
 msgid "Click here if not redirected"
 msgstr "Натисніть тут, якщо переспрямування не відбулося"
@@ -5528,6 +5543,9 @@ msgstr "Продовжити через Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Щоб продовжити сеанс агента, потрібен закріплений робочий простір"
+
+msgid "Continuing your chat…"
+msgstr "Продовжуємо ваш чат…"
 
 msgid "Continuing…"
 msgstr "Продовження…"
@@ -8010,6 +8028,9 @@ msgstr "Введіть ціле число"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Введіть ціле число від {minHours} до {maxHours} ГБ-годин."
 
+msgid "Enter this code on the page we opened:"
+msgstr "Введіть цей код на сторінці, яку ми відкрили:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Введіть цей код, коли OpenAI попросить:"
 
@@ -9047,6 +9068,9 @@ msgstr "завершив · працював 7 с"
 
 msgid "Finishing the move…"
 msgstr "Завершення переміщення…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "Уперше? Увімкніть вхід за кодом пристрою в <0>налаштуваннях ChatGPT</0>."
 
 msgid "Fit"
 msgstr "За розміром"
@@ -13961,8 +13985,17 @@ msgstr "Відкрити налаштування адміністратора C
 msgid "Open ChatGPT settings"
 msgstr "Відкрити налаштування ChatGPT"
 
+msgid "Open ChatGPT to sign in"
+msgstr "Відкрити ChatGPT для входу"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Відкривати сеанси Claude Code, Codex, OpenCode і Pi як чати"
+
+msgid "Open claude.ai again"
+msgstr "Знову відкрити claude.ai"
+
+msgid "Open claude.ai to sign in"
+msgstr "Відкрити claude.ai для входу"
 
 msgid "Open Command Palette"
 msgstr "Відкрити палітру команд"
@@ -14851,6 +14884,12 @@ msgstr "Вставити"
 
 msgid "Paste a link"
 msgstr "Вставте посилання"
+
+msgid "Paste an API key instead"
+msgstr "Натомість вставити ключ API"
+
+msgid "Paste the code"
+msgstr "Вставте код"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Вставте це в Paradev CLI:"
@@ -16782,6 +16821,9 @@ msgstr "Перезапущено 1 службу хоста"
 msgid "Restarting"
 msgstr "Перезапуск"
 
+msgid "Restarting {label}…"
+msgstr "Перезапуск {label}…"
+
 msgid "Restarting {what}"
 msgstr "Перезапуск: {what}"
 
@@ -17317,6 +17359,9 @@ msgstr "Зберегти й створити робочий простір"
 
 msgid "Save All"
 msgstr "Зберегти все"
+
+msgid "Save and continue"
+msgstr "Зберегти й продовжити"
 
 msgid "Save as environment"
 msgstr "Зберегти як середовище"
@@ -18499,8 +18544,12 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "Увійдіть один раз. Paradev збереже підключення."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
+#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "Увійдіть у {0}"
+
+msgid "Sign in to {label}"
+msgstr "Увійти в {label}"
 
 msgid "Sign in to change your organization's plugins."
 msgstr "Увійдіть, щоб змінити плагіни організації."
@@ -18588,6 +18637,9 @@ msgstr "Частка завершених реєстрацій"
 msgid "Sign-up steps"
 msgstr "Кроки реєстрації"
 
+msgid "Signed in"
+msgstr "Вхід виконано"
+
 msgid "Signed in as <0>{userName}</0>"
 msgstr "Ви ввійшли як <0>{userName}</0>"
 
@@ -18597,6 +18649,9 @@ msgstr "Вхід у ChatGPT виконано"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "Виконано вхід у ChatGPT як {connectedAs}"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "Вхід виконано, але {label} не перезапустився."
+
 msgid "Signed out"
 msgstr "Ви вийшли"
 
@@ -18605,6 +18660,9 @@ msgstr "Сайти з виконаним входом"
 
 msgid "Signing in..."
 msgstr "Вхід..."
+
+msgid "Signing in…"
+msgstr "Виконується вхід…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Реєстрація працює. Екран привітання завантажується, у консолі немає помилок."
@@ -21226,6 +21284,9 @@ msgstr "Спробуйте інший пошуковий запит або ін�
 msgid "Try again"
 msgstr "Спробувати знову"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "Спробуйте ще раз або закрийте вікно й натисніть «Продовжити» в чаті."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Спробуйте ще раз або перезапустіть службу хоста з меню Paradev у системному треї."
 
@@ -21847,6 +21908,12 @@ msgstr "Використовуйте це під час викликів API Par
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Використовуйте голосове розшифрування та функцію «натисни й говори»."
 
+msgid "Use your ChatGPT plan."
+msgstr "Використовуйте свій план ChatGPT."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Використовуйте свій план Claude Pro або Max."
+
 msgid "Used"
 msgstr "Використано"
 
@@ -22095,6 +22162,9 @@ msgstr "Очікування даних про активність"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Очікування схвалення. Не закривайте це вікно."
 
+msgid "Waiting for approval…"
+msgstr "Очікування підтвердження…"
+
 msgid "Waiting for Checks"
 msgstr "Очікування перевірок"
 
@@ -22151,6 +22221,9 @@ msgstr "Навігація та розкриття"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "Ми розробляємо відкрито, тож ви можете побачити, як ми працюємо, ще до розмови з нами."
+
+msgid "We check it with the provider before we save it."
+msgstr "Ми перевіримо його в постачальника перед збереженням."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "Не вдалося списати {amountDue}. Оновіть спосіб оплати, щоб зберегти цей тариф."
@@ -22988,6 +23061,9 @@ msgstr "Ваші зміни"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Якщо не зберегти зміни, їх буде втрачено."
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "Історія чату збережеться. Перезапуститься лише агент."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Ваші хмарні робочі простори більше не матимуть доступу до цього хоста."
