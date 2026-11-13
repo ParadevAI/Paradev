@@ -1,3 +1,7 @@
+import type {
+	BoxPressure,
+	BoxPressureMessage,
+} from "@superset/shared/box-pressure";
 import {
 	ORG_PRESENCE_PING,
 	ORG_PRESENCE_PONG,
@@ -13,6 +17,11 @@ import type {
 } from "@superset/shared/realtime";
 import { type Connection, type ConnectionContext, Server } from "partyserver";
 import type { RealtimeEnv } from "./types";
+import {
+	applyBoxPressure,
+	type BoxPressureMap,
+	sweepBoxPressure,
+} from "./utils/box-pressure";
 import { SWEEP_MS, sweepSilent } from "./utils/presence";
 
 // A burst of writes is one message: kinds accumulate for this long, then one
@@ -20,6 +29,7 @@ import { SWEEP_MS, sweepSilent } from "./utils/presence";
 const COALESCE_MS = 500;
 const PENDING_KEY = "pendingKinds";
 const PENDING_UPDATES_KEY = "pendingUpdates";
+const BOX_PRESSURE_KEY = "boxPressure";
 
 export const ORG_USER_HEADER = "x-superset-user-id";
 
@@ -34,8 +44,9 @@ interface OrgWindow {
 /**
  * One object per organization. Holds every subscribed window's socket
  * (hibernating, so idle subscribers cost nothing) and fans out invalidation
- * nudges the API sends after its writes. It stores nothing but what is
- * waiting on the next broadcast; the data itself stays in Postgres.
+ * nudges the API sends after its writes. Besides what is waiting on the next
+ * broadcast, it keeps one live map: the cloud boxes under pressure, which no
+ * one needs once they recover or stop, so it never reaches Postgres.
  */
 export class OrgHub extends Server<RealtimeEnv> {
 	static options = { hibernate: true };
@@ -53,6 +64,7 @@ export class OrgHub extends Server<RealtimeEnv> {
 		connection: Connection<OrgWindow>,
 		ctx: ConnectionContext,
 	): Promise<void> {
+		await this.sendBoxPressureSnapshot(connection);
 		const userId = ctx.request.headers.get(ORG_USER_HEADER);
 		if (!userId) return;
 		connection.setState({
@@ -128,6 +140,23 @@ export class OrgHub extends Server<RealtimeEnv> {
 		await this.scheduleAlarm(Date.now() + COALESCE_MS);
 	}
 
+	async reportBoxPressure(
+		workspaceId: string,
+		pressure: BoxPressure | null,
+	): Promise<void> {
+		const { map, changed } = applyBoxPressure(
+			await this.readBoxPressure(),
+			workspaceId,
+			pressure,
+		);
+		await this.ctx.storage.put(BOX_PRESSURE_KEY, map);
+		if (pressure)
+			await this.scheduleAlarm(
+				sweepBoxPressure(map, Date.now()).nextExpiryAt ?? Date.now(),
+			);
+		if (changed) this.broadcastBoxPressure({ [workspaceId]: pressure }, false);
+	}
+
 	async subscriberCount(): Promise<number> {
 		let count = 0;
 		for (const _ of this.getConnections()) count++;
@@ -139,6 +168,55 @@ export class OrgHub extends Server<RealtimeEnv> {
 	async onAlarm(): Promise<void> {
 		await this.flushNudges();
 		await this.sweepSilentWindows();
+		await this.sweepBoxPressure();
+	}
+
+	// ── Box pressure ──────────────────────────────────────────────────
+
+	private async readBoxPressure(): Promise<BoxPressureMap> {
+		return (await this.ctx.storage.get<BoxPressureMap>(BOX_PRESSURE_KEY)) ?? {};
+	}
+
+	private async sendBoxPressureSnapshot(
+		connection: Connection<OrgWindow>,
+	): Promise<void> {
+		const { map } = sweepBoxPressure(await this.readBoxPressure(), Date.now());
+		const message: BoxPressureMessage = {
+			type: "box-pressure",
+			snapshot: true,
+			workspaces: map,
+		};
+		try {
+			connection.send(JSON.stringify(message));
+		} catch {}
+	}
+
+	private broadcastBoxPressure(
+		workspaces: BoxPressureMessage["workspaces"],
+		snapshot: boolean,
+	): void {
+		const message: BoxPressureMessage = {
+			type: "box-pressure",
+			snapshot,
+			workspaces,
+		};
+		this.broadcast(JSON.stringify(message));
+	}
+
+	private async sweepBoxPressure(): Promise<void> {
+		const now = Date.now();
+		const { map, expired, nextExpiryAt } = sweepBoxPressure(
+			await this.readBoxPressure(),
+			now,
+		);
+		if (expired.length > 0) {
+			await this.ctx.storage.put(BOX_PRESSURE_KEY, map);
+			this.broadcastBoxPressure(
+				Object.fromEntries(expired.map((workspaceId) => [workspaceId, null])),
+				false,
+			);
+		}
+		if (nextExpiryAt !== null) await this.scheduleAlarm(nextExpiryAt);
 	}
 
 	/** Closes reporting windows that stopped pinging, so presence does not go stale. */

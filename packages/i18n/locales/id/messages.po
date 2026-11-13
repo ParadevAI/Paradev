@@ -563,6 +563,11 @@ msgstr "{0} dari {1} check gagal"
 msgid "{0} of {1} checks running"
 msgstr "{0} dari {1} check berjalan"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} dari {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0} dari {totalCount}"
@@ -1878,6 +1883,9 @@ msgstr "Rutinitas memerlukan jadwal atau sesuatu untuk dipantau."
 
 msgid "A run for this automation is already in progress."
 msgstr "Sebuah run untuk otomatisasi ini sedang berjalan."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "Mesin yang sedang berjalan akan dimulai ulang. File dan perubahan yang belum di-commit tetap disimpan. Layanan awal proyek dan sesi agen berjalan lagi; hal lain yang berjalan di terminal akan berhenti."
 
 msgid "A selection of integrations curated by our team."
 msgstr "Pilihan integrasi yang dikurasi tim kami."
@@ -4149,6 +4157,9 @@ msgstr "Ubah ikon"
 msgid "Change location"
 msgstr "Ubah lokasi"
 
+msgid "Change machine size"
+msgstr "Ubah ukuran mesin"
+
 msgid "Change model"
 msgstr "Ganti model"
 
@@ -4190,6 +4201,9 @@ msgstr "Ubah status (saat ini: {0})"
 msgid "Change to {0}"
 msgstr "Ubah menjadi {0}"
 
+msgid "Change to {pendingName}"
+msgstr "Ubah ke {pendingName}"
+
 msgid "Change to Annual"
 msgstr "Ubah ke Tahunan"
 
@@ -4225,6 +4239,9 @@ msgstr "Perubahan Diminta"
 
 msgid "Changes saved"
 msgstr "Perubahan disimpan"
+
+msgid "Changing to {label}…"
+msgstr "Mengubah ke {label}…"
 
 msgid "Changing..."
 msgstr "Mengubah..."
@@ -4874,6 +4891,12 @@ msgstr "Workspace cloud"
 
 msgid "Cloud workspace: connecting"
 msgstr "Workspace cloud: menghubungkan"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Workspace cloud: kehabisan memori"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Workspace cloud: beban tinggi"
 
 msgid "Cloud workspaces"
 msgstr "Workspace cloud"
@@ -6097,6 +6120,10 @@ msgstr "Tidak dapat mencabangkan percakapan"
 msgid "Couldn't cancel the move"
 msgstr "Tidak dapat membatalkan pemindahan"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Tidak dapat mengubah ukuran mesin: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "Tidak dapat mengubah rutinitas"
 
@@ -6420,8 +6447,16 @@ msgstr "Dihitung dari edit file oleh agen. Perubahan lewat perintah shell, alat 
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "Inti CPU"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "Terbatas CPU"
 
 msgid "Create"
 msgstr "Buat"
@@ -11950,6 +11985,10 @@ msgstr "Memori"
 msgid "Memory share"
 msgstr "Porsi memori"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Terbatas memori"
+
 msgid "Mention."
 msgstr "Sebut."
 
@@ -14478,6 +14517,18 @@ msgstr "Investor kami"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Pembacaan kami per Agustus 2026, berdasarkan tim kami sendiri dan tim yang kami amati dari dekat. F3 sebagian besar terbuka. F4 sebagian besar tertutup. Jarak itulah pekerjaannya."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Kehabisan memori"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Kehabisan memori: mesin hampir tidak merespons. {sizeName} memiliki {memoryGb} GB."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Kehabisan memori: mesin menghentikan {0} ({1} GB) agar tetap berjalan. {sizeName} memiliki {memoryGb} GB."
+
 msgid "Out of scope"
 msgstr "Di luar cakupan"
 
@@ -16688,6 +16739,9 @@ msgstr "Resizable"
 msgid "Resize panel"
 msgstr "Ubah ukuran panel"
 
+msgid "Resize to {suggestedName}"
+msgstr "Ubah ke {suggestedName}"
+
 msgid "Resolve"
 msgstr "Selesaikan"
 
@@ -16784,6 +16838,9 @@ msgstr "Memulai ulang {restartedOrgCount} layanan host"
 
 msgid "Restarted 1 host service"
 msgstr "Memulai ulang 1 layanan host"
+
+msgid "Restarted at {label}"
+msgstr "Dimulai ulang sebagai {label}"
 
 msgid "Restarting"
 msgstr "Memulai ulang"
@@ -19208,6 +19265,9 @@ msgstr "mulai {date}"
 msgid "Starts a fresh session in this workspace"
 msgstr "Memulai sesi baru di workspace ini"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Akan dimulai sebagai {label} saat aktif kembali"
+
 msgid "State"
 msgstr "Status"
 
@@ -19311,6 +19371,11 @@ msgstr "berhenti"
 msgid "Stopped"
 msgstr "Dihentikan"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "{0} ({1} GB) dihentikan untuk mengosongkan memori"
+
 msgid "Stopped by the usage limit"
 msgstr "Dihentikan oleh batas penggunaan"
 
@@ -19389,6 +19454,10 @@ msgstr "Berhasil!"
 msgid "Successful runs <0>· 7d</0>"
 msgstr "Eksekusi berhasil <0>· 7h</0>"
 
+msgid "Suggested"
+msgstr "Disarankan"
+
+msgctxt "machine size"
 msgid "Suggested"
 msgstr "Disarankan"
 
@@ -20004,6 +20073,9 @@ msgstr "Pemilik otomatisasi ini tidak bisa lagi menggunakan workspace cloud di o
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "Agen terbaik akan berganti.<0/>Alur kerja Anda tidak perlu."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "Mesin aktif kembali dengan {actual} vCPU, bukan {wanted}. Mulai ulang untuk mencoba lagi."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
@@ -22089,6 +22161,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "Tunggu setup workspace sebelum menjalankan agen"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "Menunggu CPU {0}% dari menit terakhir"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b

@@ -1,5 +1,6 @@
 import { isCloudUsageRefusal } from "@superset/shared/billing";
 import {
+	type QueryClient,
 	type UseQueryResult,
 	useQueries,
 	useQuery,
@@ -60,6 +61,21 @@ export function sandboxWakeQueryKey(workspaceId: string | undefined) {
 
 function sandboxAccessQueryKey(workspaceId: string) {
 	return ["cloud-workspace", "access", workspaceId] as const;
+}
+
+/** After a restart, which can resume the box on a new domain: fetch a fresh ticket and address. */
+export function refreshSandboxAccess(
+	queryClient: QueryClient,
+	workspaceId: string,
+): Promise<void> {
+	return Promise.all([
+		queryClient.invalidateQueries({
+			queryKey: sandboxAccessQueryKey(workspaceId),
+		}),
+		queryClient.invalidateQueries({
+			queryKey: sandboxWakeQueryKey(workspaceId),
+		}),
+	]).then(() => undefined);
 }
 
 // Module-level so useQueries keeps the combined result stable across renders:

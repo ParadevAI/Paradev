@@ -370,6 +370,10 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./box-pressure": {
+			"types": "./src/box-pressure.ts",
+			"default": "./src/box-pressure.ts"
+		},
 		"./workspace-launch": {
 			"types": "./src/workspace-launch/index.ts",
 			"default": "./src/workspace-launch/index.ts"

@@ -1,3 +1,4 @@
+import type { BoxPressure } from "@superset/shared/box-pressure";
 import {
 	type RealtimeNudgeKind,
 	type RealtimeUpdate,
@@ -36,6 +37,36 @@ export function nudge(
 			.catch((error) => {
 				console.warn(
 					`[realtime] nudge ${kind} failed:`,
+					error instanceof Error ? error.message : error,
+				);
+			}),
+	);
+}
+
+/** Hands one box's pressure to its organization's hub, which keeps the live map. Never awaited by the caller. */
+export function publishBoxPressure(
+	organizationId: string,
+	workspaceId: string,
+	pressure: BoxPressure | null,
+): void {
+	waitUntil(
+		fetch(`${env.REALTIME_URL}/v2/box-pressure`, {
+			method: "POST",
+			headers: {
+				authorization: `Bearer ${env.REALTIME_NUDGE_SECRET}`,
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({ organizationId, workspaceId, pressure }),
+			signal: AbortSignal.timeout(5_000),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					console.warn(`[realtime] box pressure rejected: ${response.status}`);
+				}
+			})
+			.catch((error) => {
+				console.warn(
+					"[realtime] box pressure failed:",
 					error instanceof Error ? error.message : error,
 				);
 			}),

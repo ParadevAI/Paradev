@@ -20,6 +20,7 @@ import {
 	LuClipboard,
 	LuCloudUpload,
 	LuCopy,
+	LuCpu,
 	LuEye,
 	LuEyeOff,
 	LuFolderOpen,
@@ -37,6 +38,7 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
 import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import type {
@@ -274,6 +276,23 @@ export function DashboardSidebarWorkspaceContextMenu({
 									)}
 								</ContextMenuItem>
 							))}
+						</>
+					)}
+					{isCloudWorkspace && (
+						<>
+							<ContextMenuSeparator />
+							<ContextMenuSub>
+								<ContextMenuSubTrigger>
+									<LuCpu className="size-4 mr-2" />
+									<Trans>Machine size</Trans>
+								</ContextMenuSubTrigger>
+								<ContextMenuSubContent className="min-w-64">
+									<MachineSizeMenuItems
+										workspaceId={workspaceId}
+										menu="context"
+									/>
+								</ContextMenuSubContent>
+							</ContextMenuSub>
 						</>
 					)}
 					<ContextMenuSeparator />

@@ -563,6 +563,11 @@ msgstr "{0} trong {1} check thất bại"
 msgid "{0} of {1} checks running"
 msgstr "{0} trong {1} check đang chạy"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0} trong {totalCount}"
@@ -1878,6 +1883,9 @@ msgstr "Một quy trình cần có lịch hoặc thứ gì đó để theo dõi.
 
 msgid "A run for this automation is already in progress."
 msgstr "Một lần chạy của tự động hóa này đang diễn ra."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "Máy đang chạy sẽ khởi động lại. Tệp và các thay đổi chưa commit được giữ nguyên. Các dịch vụ khởi động của dự án và phiên agent sẽ chạy lại; mọi thứ khác đang chạy trong terminal sẽ dừng."
 
 msgid "A selection of integrations curated by our team."
 msgstr "Một số tích hợp do đội ngũ của chúng tôi tuyển chọn."
@@ -4149,6 +4157,9 @@ msgstr "Đổi biểu tượng"
 msgid "Change location"
 msgstr "Đổi vị trí"
 
+msgid "Change machine size"
+msgstr "Đổi kích thước máy"
+
 msgid "Change model"
 msgstr "Đổi mô hình"
 
@@ -4190,6 +4201,9 @@ msgstr "Đổi trạng thái (hiện tại: {0})"
 msgid "Change to {0}"
 msgstr "Đổi thành {0}"
 
+msgid "Change to {pendingName}"
+msgstr "Đổi sang {pendingName}"
+
 msgid "Change to Annual"
 msgstr "Chuyển sang theo năm"
 
@@ -4225,6 +4239,9 @@ msgstr "Yêu cầu thay đổi"
 
 msgid "Changes saved"
 msgstr "Đã lưu thay đổi"
+
+msgid "Changing to {label}…"
+msgstr "Đang đổi sang {label}…"
 
 msgid "Changing..."
 msgstr "Đang chuyển..."
@@ -4874,6 +4891,12 @@ msgstr "Workspace cloud"
 
 msgid "Cloud workspace: connecting"
 msgstr "Workspace cloud: đang kết nối"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Workspace cloud: hết bộ nhớ"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Workspace cloud: tải cao"
 
 msgid "Cloud workspaces"
 msgstr "Không gian làm việc đám mây"
@@ -6097,6 +6120,10 @@ msgstr "Không thể tạo nhánh hội thoại"
 msgid "Couldn't cancel the move"
 msgstr "Không thể hủy việc chuyển"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Không thể đổi kích thước máy: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "Không thể thay đổi quy trình"
 
@@ -6420,8 +6447,16 @@ msgstr "Được đếm từ các lần sửa tệp của agent. Thay đổi qua
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "Nhân CPU"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "Bị giới hạn CPU"
 
 msgid "Create"
 msgstr "Tạo"
@@ -11950,6 +11985,10 @@ msgstr "Bộ nhớ"
 msgid "Memory share"
 msgstr "Tỷ lệ bộ nhớ"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Bị giới hạn bộ nhớ"
+
 msgid "Mention."
 msgstr "Nhắc đến."
 
@@ -14478,6 +14517,18 @@ msgstr "Nhà đầu tư của chúng tôi"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Nhận định của chúng tôi tính đến tháng 8 năm 2026, dựa trên đội của chính chúng tôi và những đội chúng tôi theo dõi sát. F3 phần lớn đã mở. F4 phần lớn còn đóng. Khoảng cách đó chính là phần việc phải làm."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Hết bộ nhớ"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Hết bộ nhớ: máy sắp ngừng phản hồi. {sizeName} có {memoryGb} GB."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Hết bộ nhớ: máy đã dừng {0} ({1} GB) để tiếp tục chạy. {sizeName} có {memoryGb} GB."
+
 msgid "Out of scope"
 msgstr "Ngoài phạm vi"
 
@@ -16688,6 +16739,9 @@ msgstr "Resizable"
 msgid "Resize panel"
 msgstr "Đổi kích thước bảng"
 
+msgid "Resize to {suggestedName}"
+msgstr "Đổi sang {suggestedName}"
+
 msgid "Resolve"
 msgstr "Giải quyết"
 
@@ -16784,6 +16838,9 @@ msgstr "Đã khởi động lại {restartedOrgCount} dịch vụ host"
 
 msgid "Restarted 1 host service"
 msgstr "Đã khởi động lại 1 dịch vụ host"
+
+msgid "Restarted at {label}"
+msgstr "Đã khởi động lại với {label}"
 
 msgid "Restarting"
 msgstr "Đang khởi động lại"
@@ -19208,6 +19265,9 @@ msgstr "bắt đầu {date}"
 msgid "Starts a fresh session in this workspace"
 msgstr "Bắt đầu một phiên mới trong workspace này"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Sẽ khởi động với {label} ở lần đánh thức tiếp theo"
+
 msgid "State"
 msgstr "Trạng thái"
 
@@ -19311,6 +19371,11 @@ msgstr "đã dừng"
 msgid "Stopped"
 msgstr "Đã dừng"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "Đã dừng {0} ({1} GB) để giải phóng bộ nhớ"
+
 msgid "Stopped by the usage limit"
 msgstr "Đã dừng do giới hạn sử dụng"
 
@@ -19391,6 +19456,10 @@ msgstr "Lần chạy thành công <0>· 7 ngày</0>"
 
 msgid "Suggested"
 msgstr "Gợi ý"
+
+msgctxt "machine size"
+msgid "Suggested"
+msgstr "Đề xuất"
 
 msgid "Suggestions"
 msgstr "Gợi ý"
@@ -20004,6 +20073,9 @@ msgstr "Chủ sở hữu của tự động hóa không còn dùng được work
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "Agent tốt nhất sẽ thay đổi.<0/>Quy trình của bạn thì không."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "Máy khởi động lại với {actual} vCPU thay vì {wanted}. Hãy khởi động lại để thử lần nữa."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạn."
@@ -22089,6 +22161,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "Chờ setup workspace xong rồi mới khởi động agent"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "Chờ CPU {0}% trong phút vừa qua"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b

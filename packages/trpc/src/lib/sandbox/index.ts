@@ -15,6 +15,10 @@ export {
 	rerunBoxStartHook,
 	runBoxArchiveHook,
 } from "./box-hooks";
+export {
+	type ReportSandboxBoxPressureOutcome,
+	reportSandboxBoxPressure,
+} from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {

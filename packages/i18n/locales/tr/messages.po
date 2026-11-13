@@ -563,6 +563,11 @@ msgstr "{1} kontrolden {0} tanesi başarısız oldu"
 msgid "{0} of {1} checks running"
 msgstr "{1} kontrolden {0} tanesi çalışıyor"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{totalCount} içinden {0}"
@@ -1878,6 +1883,9 @@ msgstr "Bir rutinin bir zamanlamaya ya da izleyeceği bir şeye ihtiyacı var."
 
 msgid "A run for this automation is already in progress."
 msgstr "Bu otomasyon için bir çalıştırma zaten sürüyor."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "Çalışan bir makine yeniden başlar. Dosyalar ve commit edilmemiş değişiklikler korunur. Projenin başlangıç servisleri ve ajan oturumları yeniden başlar; terminalde çalışan diğer her şey durur."
 
 msgid "A selection of integrations curated by our team."
 msgstr "Ekibimizin seçtiği entegrasyonlardan bir derleme."
@@ -4149,6 +4157,9 @@ msgstr "Simgeyi değiştir"
 msgid "Change location"
 msgstr "Konumu değiştir"
 
+msgid "Change machine size"
+msgstr "Makine boyutunu değiştir"
+
 msgid "Change model"
 msgstr "Modeli değiştir"
 
@@ -4190,6 +4201,9 @@ msgstr "Durumu değiştir (şu an: {0})"
 msgid "Change to {0}"
 msgstr "{0} rolüne değiştir"
 
+msgid "Change to {pendingName}"
+msgstr "{pendingName} boyutuna geç"
+
 msgid "Change to Annual"
 msgstr "Yıllığa geç"
 
@@ -4225,6 +4239,9 @@ msgstr "Değişiklik istendi"
 
 msgid "Changes saved"
 msgstr "Değişiklikler kaydedildi"
+
+msgid "Changing to {label}…"
+msgstr "{label} boyutuna geçiliyor…"
 
 msgid "Changing..."
 msgstr "Değiştiriliyor..."
@@ -4874,6 +4891,12 @@ msgstr "Bulut çalışma alanı"
 
 msgid "Cloud workspace: connecting"
 msgstr "Bulut çalışma alanı: bağlanılıyor"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Bulut çalışma alanı: bellek yetersiz"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Bulut çalışma alanı: yoğun yük"
 
 msgid "Cloud workspaces"
 msgstr "Bulut çalışma alanları"
@@ -6097,6 +6120,10 @@ msgstr "Konuşma çatallanamadı"
 msgid "Couldn't cancel the move"
 msgstr "Taşıma iptal edilemedi"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Makine boyutu değiştirilemedi: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "Rutin değiştirilemedi"
 
@@ -6420,8 +6447,16 @@ msgstr "Ajanın dosya düzenlemelerinden sayıldı. Kabuk komutları, notebook v
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPU çekirdeği"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU sınırında"
 
 msgid "Create"
 msgstr "Oluştur"
@@ -11950,6 +11985,10 @@ msgstr "Bellek"
 msgid "Memory share"
 msgstr "Bellek payı"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Bellek sınırında"
+
 msgid "Mention."
 msgstr "Anın."
 
@@ -14478,6 +14517,18 @@ msgstr "Yatırımcılarımız"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Ağustos 2026 itibarıyla kendi ekibimize ve yakından izlediğimiz takımlara dayanan okumamız. F3 büyük ölçüde açık. F4 büyük ölçüde kapalı. İşin kendisi bu boşlukta."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Bellek yetersiz"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Bellek yetersiz: makine yanıt vermemek üzere. {sizeName} boyutunda {memoryGb} GB bellek var."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Bellek yetersiz: makine çalışmaya devam etmek için {0} ({1} GB) işlemini durdurdu. {sizeName} boyutunda {memoryGb} GB bellek var."
+
 msgid "Out of scope"
 msgstr "Kapsam dışı"
 
@@ -16688,6 +16739,9 @@ msgstr "Yeniden boyutlandırılabilir"
 msgid "Resize panel"
 msgstr "Panel boyutunu değiştir"
 
+msgid "Resize to {suggestedName}"
+msgstr "{suggestedName} boyutuna geç"
+
 msgid "Resolve"
 msgstr "Çöz"
 
@@ -16784,6 +16838,9 @@ msgstr "{restartedOrgCount} host hizmeti yeniden başlatıldı"
 
 msgid "Restarted 1 host service"
 msgstr "1 host hizmeti yeniden başlatıldı"
+
+msgid "Restarted at {label}"
+msgstr "{label} boyutunda yeniden başlatıldı"
 
 msgid "Restarting"
 msgstr "Yeniden başlatılıyor"
@@ -19208,6 +19265,9 @@ msgstr "{date} tarihinde başlıyor"
 msgid "Starts a fresh session in this workspace"
 msgstr "Bu çalışma alanında yeni bir oturum başlatır"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Bir sonraki uyanışında {label} boyutunda başlayacak"
+
 msgid "State"
 msgstr "Durum"
 
@@ -19311,6 +19371,11 @@ msgstr "durduruldu"
 msgid "Stopped"
 msgstr "Durduruldu"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "Bellek boşaltmak için {0} ({1} GB) durduruldu"
+
 msgid "Stopped by the usage limit"
 msgstr "Kullanım sınırı nedeniyle durduruldu"
 
@@ -19389,6 +19454,10 @@ msgstr "Başarılı!"
 msgid "Successful runs <0>· 7d</0>"
 msgstr "Başarılı çalıştırmalar <0>· 7g</0>"
 
+msgid "Suggested"
+msgstr "Önerilen"
+
+msgctxt "machine size"
 msgid "Suggested"
 msgstr "Önerilen"
 
@@ -20004,6 +20073,9 @@ msgstr "Otomasyonun sahibi artık bu kuruluşta bulut çalışma alanlarını ku
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "En iyi ajan değişecek.<0/>İş akışınız değişmemeli."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "Makine {wanted} yerine {actual} vCPU ile açıldı. Yeniden denemek için yeniden başlatın."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
@@ -22089,6 +22161,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "Ajanları başlatmadan önce çalışma alanı kurulumunu bekle"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "Son dakikanın %{0} kadarı CPU beklemekle geçti"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b
