@@ -14,11 +14,6 @@ import {
 	type PageStorageWriteRequest,
 	parsePageStorageScope,
 } from "@superset/shared/page-storage";
-import {
-	guestReadable,
-	readable,
-	writableFor,
-} from "@superset/shared/page-storage-access";
 import type {
 	PageStorageHubRequest,
 	PageStorageHubResponse,
@@ -32,6 +27,12 @@ import {
 } from "@superset/shared/usercontent";
 import { type Connection, type ConnectionContext, Server } from "partyserver";
 import type { RealtimeEnv } from "./types";
+import {
+	type AccessAnswer,
+	PageAccessCache,
+	parseAccessAnswer,
+	type UserAccess,
+} from "./utils/pageAccess";
 import {
 	broadcastPresence,
 	type PresenceReceiver,
@@ -76,6 +77,20 @@ const CALLS_PER_WINDOW = 60;
 const WINDOW_MS = 10_000;
 const MANIFEST_TTL_MS = 60_000;
 const NO_VIEWER = "\u0000";
+const REFUSED: UserAccess = { read: false, write: false, author: false };
+
+export interface PageViewer {
+	userId: string;
+	organizationIds: readonly string[];
+}
+
+export interface ViewerAccess {
+	found: boolean;
+	access: UserAccess;
+	generation: number;
+}
+
+const SETTLE_ATTEMPTS = 3;
 
 function seenVersions(manifest: PageManifest): SeenVersions {
 	return {
@@ -93,11 +108,15 @@ export class PageHub extends Server<RealtimeEnv> {
 	private connectingGuests = 0;
 	private writeWindows = new Map<string, { window: number; calls: number }>();
 	private records: PageStorageRecords;
+	private access: PageAccessCache;
 
 	constructor(ctx: DurableObjectState, env: RealtimeEnv) {
 		super(ctx, env);
 		this.records = new PageStorageRecords(ctx.storage.sql, (fn) =>
 			ctx.storage.transactionSync(fn),
+		);
+		this.access = new PageAccessCache(ctx.storage.sql, (userIds) =>
+			this.askAccess(userIds),
 		);
 		ctx.setWebSocketAutoResponse(
 			new WebSocketRequestResponsePair("ping", "pong"),
@@ -107,6 +126,7 @@ export class PageHub extends Server<RealtimeEnv> {
 	private schema(): void {
 		if (this.ready) return;
 		this.records.ensureSchema();
+		this.access.ensureSchema();
 		this.ctx.storage.sql.exec(
 			`CREATE TABLE IF NOT EXISTS spent_nonces (
 				nonce TEXT PRIMARY KEY,
@@ -148,8 +168,92 @@ export class PageHub extends Server<RealtimeEnv> {
 		return this.manifest;
 	}
 
+	private async askAccess(userIds: string[]): Promise<AccessAnswer | null> {
+		const response = await fetch(
+			`${this.env.NEXT_PUBLIC_API_URL}/api/pages/access`,
+			{
+				method: "POST",
+				headers: {
+					authorization: `Bearer ${this.env.NUDGE_SECRET}`,
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({ pageId: this.name, userIds }),
+				signal: AbortSignal.timeout(5_000),
+			},
+		);
+		if (response.status === 404) return null;
+		if (!response.ok) throw new Error(`access lookup: ${response.status}`);
+		const answer = parseAccessAnswer(await response.json());
+		if (!answer) throw new Error("access lookup: malformed");
+		return answer;
+	}
+
+	private inOrganization(
+		manifest: PageManifest,
+		organizationIds: readonly string[],
+	): boolean {
+		return (
+			manifest.organizationId !== undefined &&
+			organizationIds.includes(manifest.organizationId)
+		);
+	}
+
+	private async lookup(viewer: PageViewer | "guest"): Promise<{
+		manifest: PageManifest | null;
+		access: UserAccess;
+		generation: number;
+	}> {
+		this.schema();
+		const generation = this.access.generation;
+		const [manifest, checked] = await Promise.all([
+			this.readManifest(),
+			this.access
+				.check(viewer === "guest" ? [] : [viewer.userId])
+				.catch((error: unknown) => {
+					console.warn("[page-hub] access check failed:", error);
+					return null;
+				}),
+		]);
+		if (!manifest || !checked) return { manifest, access: REFUSED, generation };
+		if (viewer === "guest") {
+			const read = checked.guests && manifest.organizationId !== undefined;
+			return {
+				manifest,
+				access: { read, write: false, author: false },
+				generation,
+			};
+		}
+		const access = checked.users.get(viewer.userId);
+		return {
+			manifest,
+			access:
+				access && this.inOrganization(manifest, viewer.organizationIds)
+					? access
+					: REFUSED,
+			generation,
+		};
+	}
+
+	/** Refuses when the API cannot answer. */
+	async accessFor(viewer: PageViewer): Promise<ViewerAccess> {
+		const { manifest, access, generation } = await this.lookup(viewer);
+		return { found: manifest !== null, access, generation };
+	}
+
+	/** For a socket about to be pinned: a nudge during the lookup means ask again. */
+	private async settledLookup(
+		viewer: PageViewer | "guest",
+	): Promise<{ manifest: PageManifest | null; access: UserAccess }> {
+		for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt++) {
+			const { manifest, access, generation } = await this.lookup(viewer);
+			if (this.access.isCurrent(generation)) return { manifest, access };
+		}
+		return { manifest: null, access: REFUSED };
+	}
+
 	async manifestChanged(): Promise<void> {
 		this.schema();
+		this.access.clear();
 		const manifest = await this.readManifest(true);
 		if (!manifest) {
 			this.records.clearAll();
@@ -159,15 +263,30 @@ export class PageHub extends Server<RealtimeEnv> {
 			this.announce();
 			return;
 		}
-		for (const connection of this.getConnections<Pinned>()) {
+		const connections = [...this.getConnections<Pinned>()];
+		if (connections.length === 0) return;
+		const checked = await this.access
+			.check(
+				connections.flatMap((connection) =>
+					connection.state && !connection.state.guest
+						? [connection.state.userId]
+						: [],
+				),
+			)
+			.catch((error: unknown) => {
+				console.warn("[page-hub] access re-check failed:", error);
+				return null;
+			});
+		if (checked && !this.access.isCurrent(checked.generation)) return;
+		for (const connection of connections) {
 			const pinned = connection.state;
 			if (!pinned) continue;
-			const allowed = pinned.guest
-				? guestReadable(manifest)
-				: readable(manifest, {
-						userId: pinned.userId,
-						organizationIds: [...pinned.organizationIds],
-					});
+			const allowed =
+				checked !== null &&
+				(pinned.guest
+					? checked.guests
+					: checked.users.get(pinned.userId)?.read === true &&
+						this.inOrganization(manifest, pinned.organizationIds));
 			if (!allowed) {
 				this.revoke(connection);
 			} else if (
@@ -247,12 +366,11 @@ export class PageHub extends Server<RealtimeEnv> {
 			return;
 		}
 
-		const manifest = await this.readManifest();
-		const viewer = {
+		const { access } = await this.settledLookup({
 			userId: claims.userId,
 			organizationIds: claims.organizationIds,
-		};
-		if (!manifest || !readable(manifest, viewer)) {
+		});
+		if (!access.read) {
 			connection.close(4403, "forbidden");
 			return;
 		}
@@ -262,8 +380,8 @@ export class PageHub extends Server<RealtimeEnv> {
 			name: claims.name,
 			image: claims.image,
 			organizationIds: claims.organizationIds,
-			author: manifest.createdByUserId === claims.userId,
-			writable: writableFor(manifest, viewer),
+			author: access.author,
+			writable: access.write,
 			window: 0,
 			calls: 0,
 		};
@@ -303,15 +421,14 @@ export class PageHub extends Server<RealtimeEnv> {
 			this.connectingGuests++;
 		}
 		try {
-			const manifest = await this.readManifest();
-			const allowed =
-				manifest &&
-				(claims.guest ? guestReadable(manifest) : readable(manifest, claims));
-			if (!allowed) {
+			const viewerKey = await this.viewerKeyFor(claims.userId);
+			const { manifest, access } = await this.settledLookup(
+				claims.guest ? "guest" : claims,
+			);
+			if (!access.read || !manifest) {
 				connection.close(4403, "forbidden");
 				return;
 			}
-			const viewerKey = await this.viewerKeyFor(claims.userId);
 			connection.setState({
 				userId: claims.userId,
 				name: claims.name,

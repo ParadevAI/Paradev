@@ -2,6 +2,7 @@ import { db } from "@superset/db/client";
 import { pages, users } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { notifyPageHub } from "../../lib/page-store";
 import {
 	addPageSharesSchema,
 	addShares,
@@ -96,6 +97,7 @@ export const pageSharingRouter = {
 				sharedByUserId: userId,
 				role: input.role,
 			});
+			notifyPageHub(page.id);
 			return { added };
 		}),
 
@@ -103,20 +105,24 @@ export const pageSharingRouter = {
 		.input(removeShareSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
-			return {
-				removed: await removeShare(
-					{ kind: "page", id: page.id },
-					input.grantee,
-				),
-			};
+			const removed = await removeShare(
+				{ kind: "page", id: page.id },
+				input.grantee,
+			);
+			notifyPageHub(page.id);
+			return { removed };
 		}),
 
 	setRole: personProcedure
 		.input(setShareRoleSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
-			return {
-				updated: await setPageShareRole(page.id, input.grantee, input.role),
-			};
+			const updated = await setPageShareRole(
+				page.id,
+				input.grantee,
+				input.role,
+			);
+			notifyPageHub(page.id);
+			return { updated };
 		}),
 } satisfies TRPCRouterRecord;
