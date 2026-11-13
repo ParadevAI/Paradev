@@ -231,7 +231,15 @@ async function provision(
 			providerSandboxId,
 		});
 		nudge(row.organizationId, "cloud_workspaces");
-		if (failed) {
+		const ownsRow =
+			failed ||
+			(
+				await db.query.cloudWorkspaces.findFirst({
+					where: eq(cloudWorkspaces.id, row.id),
+					columns: { providerSandboxId: true },
+				})
+			)?.providerSandboxId === providerSandboxId;
+		if (ownsRow) {
 			await failChatMovesTo(
 				row.id,
 				"The cloud workspace could not start",

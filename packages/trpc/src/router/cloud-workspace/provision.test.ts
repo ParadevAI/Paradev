@@ -25,6 +25,7 @@ const dialect = new PgDialect();
 let row: Row;
 let whileTheBoxIsMade: () => void;
 let boxFails: boolean;
+let whileTheBoxSettles: () => void;
 let teardowns: string[];
 let moveOps: string[];
 
@@ -71,7 +72,10 @@ stub(sandbox, {
 			hostTarget: `https://${name}.example`,
 		};
 	},
-	settleSandbox: async () => ({}),
+	settleSandbox: async () => {
+		whileTheBoxSettles();
+		return {};
+	},
 	recordBootSpans: () => {},
 	deleteSandbox: async (id: string) => {
 		teardowns.push(`delete:${id}`);
@@ -109,6 +113,7 @@ beforeEach(() => {
 	};
 	whileTheBoxIsMade = () => {};
 	boxFails = false;
+	whileTheBoxSettles = () => {};
 	teardowns = [];
 	moveOps = [];
 });
@@ -136,6 +141,18 @@ test("an older job whose box fails after a restore does not fail the restored wo
 
 test("a job whose box fails fails the chat moves into its workspace", async () => {
 	boxFails = true;
+
+	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
+
+	expect(row.status).toBe("failed");
+	expect(moveOps).toEqual(["failInto"]);
+});
+
+test("a job whose box fails after another actor failed the workspace still fails the chat moves into it", async () => {
+	whileTheBoxSettles = () => {
+		row = { ...row, status: "failed" };
+		throw new Error("host-service never answered");
+	};
 
 	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
 
