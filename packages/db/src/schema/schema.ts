@@ -824,6 +824,8 @@ export const environments = pgTable(
 			{ onDelete: "set null" },
 		),
 		scope: environmentScope().notNull().default("organization"),
+		/** The size a workspace boots at when its create names none; null means the organization's default. */
+		machineSize: text("machine_size"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),

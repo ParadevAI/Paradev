@@ -1352,6 +1352,13 @@
       "when": 1794194624056,
       "tag": "0192_chat_storage",
       "breakpoints": true
+    },
+    {
+      "idx": 193,
+      "version": "7",
+      "when": 1794541805805,
+      "tag": "0193_environment_machine_size",
+      "breakpoints": true
     }
   ]
 }
