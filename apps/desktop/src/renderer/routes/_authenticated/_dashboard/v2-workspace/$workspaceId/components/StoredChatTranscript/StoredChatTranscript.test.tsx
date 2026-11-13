@@ -78,6 +78,16 @@ const snapshot = reduceMany(
 			},
 		},
 		{
+			type: "item",
+			turnId: "t1",
+			item: {
+				id: "a1",
+				kind: "agent_message",
+				startedAtMs: 3,
+				text: "Opened [the fix](https://github.com/acme/app/pull/12).",
+			},
+		},
+		{
 			type: "turn",
 			turn: { id: "t1", status: "completed", startedAtMs: 1, completedAtMs: 3 },
 		},
@@ -123,4 +133,5 @@ test("a cloud workspace's stored chat renders while its box wakes, with no works
 	expect(view.getByText("Edited 1 file")).toBeTruthy();
 	expect(view.getByTitle("shot.png")).toBeTruthy();
 	expect(view.getByTitle("pasted.png")).toBeTruthy();
+	expect(view.getByText("the fix")).toBeTruthy();
 });
