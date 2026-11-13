@@ -1,9 +1,7 @@
 # Paradev staging with production state
 
-`.github/workflows/deploy-paradev-staging.yml` is manual-only. Review and merge it
-with its parent changes (PR #9687) before a separately approved dispatch from
+`.github/workflows/deploy-paradev-staging.yml` is manual-only and runs from
 `main`. It does nothing on PRs or pushes, and rejects other refs and repositories.
-Do not dispatch it as part of preparing or reviewing this change.
 
 The job reads the GitHub `production` environment secrets only inside Actions.
 Never fetch those secrets locally. It retains the production API/web build
@@ -98,13 +96,10 @@ PostHog project. Discard the profile after testing.
 
 ## Inert domain cutover preparation
 
-Keep the cutover change local or in an **unmerged draft** until explicit approval.
 Production `DOMAIN_MOVE_ENABLED` build/runtime passthrough is deliberately
-absent from this prep change. Adding it to `deploy-production.yml` is required
-before rollout and needs separate approval: that watched path can redeploy
-relay, realtime and agent-worker. Do not weaken those filters. Preparation,
-merge, production wiring, final routing and rollout activation are separate
-approvals. PR #9661 is not part of this change.
+absent. Adding it to `deploy-production.yml` is required before rollout; that
+watched path can redeploy relay, realtime and agent-worker. Do not weaken those
+filters. Building final artifacts does not activate routing or assign domains.
 
 The manual workflow now accepts `mode`, a fixed choice defaulting to `stage`.
 Stage retains the table and ownership checks above. `prepare-final` builds the

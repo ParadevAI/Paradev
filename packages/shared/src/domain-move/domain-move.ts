@@ -47,6 +47,8 @@ function safePage(url: URL, depth = 0): boolean {
 	if (ambiguous(path) || retainedPath(path)) return false;
 	if (!["/sign-in", "/sign-up"].some((route) => matches(path, route)))
 		return true;
+	if (["client_id", "sig"].some((key) => url.searchParams.has(key)))
+		return false;
 	for (const value of url.searchParams.getAll("redirect")) {
 		let continuation = value;
 		try {

@@ -197,6 +197,40 @@ describe("domain move policy", () => {
 });
 
 describe("domain move evaluation", () => {
+	test("OAuth-provider sign-in and sign-up stay on legacy without flag lookup at full rollout", async () => {
+		const lookup = mock(async () => true);
+		for (const page of ["/sign-in", "/sign-up"]) {
+			for (const query of [
+				"client_id=cli-client&sig=signed-request",
+				"client_id=cli-client",
+				"sig=signed-request",
+				"client_id=",
+				"sig=",
+				"%63lient_id=cli-client&redirect=%2Fdashboard",
+			]) {
+				for (const path of [
+					`${page}?${query}`,
+					`/sign-in?redirect=${encodeURIComponent(`${page}?${query}`)}`,
+				]) {
+					const original = new Response("legacy OAuth login");
+					const response = await withDomainMove({
+						request: web(path),
+						surface: "web",
+						enabled: "true",
+						lookup,
+						fallback: async () => original,
+					});
+					expect(response).toBe(original);
+					expect(response.headers.get("set-cookie")).toBeNull();
+				}
+			}
+			expect(domainMoveTarget(web(page), "web")?.hostname).toBe(
+				"app.paradev.com",
+			);
+		}
+		expect(lookup).not.toHaveBeenCalled();
+	});
+
 	test("off is byte-equivalent, with no lookup or cookie even if flag would be true", async () => {
 		const lookup = mock(async () => true);
 		for (const enabled of [undefined, "", "false", "TRUE", "1"]) {
