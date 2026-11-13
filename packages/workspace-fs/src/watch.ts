@@ -665,7 +665,7 @@ export class FsWatcherManager {
 		// Subscribe to the resolved real path so kernel paths come back in a
 		// consistent form; we map them back to `state.absolutePath` in
 		// `normalizeEvents`. Mirrors VS Code's parcelWatcher.ts:364.
-		state.subscription = await this.backend.subscribe({
+		const subscription = await this.backend.subscribe({
 			rootPath: realPath,
 			ignore,
 			generation,
@@ -680,6 +680,11 @@ export class FsWatcherManager {
 				this.queueNativeEvents(state, events);
 			},
 		});
+		if (state.controller.signal.aborted) {
+			await unsubscribeQuietly(subscription);
+			state.controller.signal.throwIfAborted();
+		}
+		state.subscription = subscription;
 	}
 
 	private queueNativeEvents(
@@ -874,6 +879,7 @@ export class FsWatcherManager {
 		try {
 			await this.attachNativeSubscription(state);
 		} catch (error) {
+			if (state.controller.signal.aborted) return false;
 			// The root is now unwatched; a transient failure must not leave it
 			// that way silently. Reuse the root-recovery poll, which re-attaches,
 			// verifies liveness, and emits a root create so consumers refetch.
