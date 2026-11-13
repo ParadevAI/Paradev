@@ -402,15 +402,18 @@ export class ClaudeTranslator {
 	}
 
 	private result(envelope: Json): AdapterEvent[] {
-		if (!this.turnId) return [];
-
 		const interruptReason = this.interruptReason;
 		if (interruptReason !== null) {
 			this.interruptReason = null;
 			this.settledBlocks.clear();
 			this.streamingBlocks.clear();
-			return [...this.interrupt(interruptReason), this.sessionIdle()];
+			return [
+				...this.ensureTurn(),
+				...this.interrupt(interruptReason),
+				this.sessionIdle(),
+			];
 		}
+		if (!this.turnId) return [];
 
 		const completedAtMs = this.now();
 		const isError = envelope.is_error === true;

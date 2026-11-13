@@ -183,13 +183,18 @@ export class CodexAdapter implements HarnessAdapter {
 	}
 
 	cancelTurn(): void {
-		if (!this.client || !this.threadId) return;
 		const turn = this.currentTurn;
-		if (turn?.status === "running") {
+		if (this.client && this.threadId && turn?.status === "running") {
 			this.interrupt(turn.id);
 			return;
 		}
-		if (this.pendingTurnStart) this.cancelRequested = true;
+		if (
+			this.pendingTurnStart ||
+			this.resolvingPrompt ||
+			this.queuedInput.length > 0
+		) {
+			this.cancelRequested = true;
+		}
 	}
 
 	private interrupt(turnId: string): void {
