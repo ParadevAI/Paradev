@@ -12,6 +12,8 @@ const retained = [
 	"/auth/desktop",
 	"/auth/integration-connect",
 	"/integrations/sentry",
+	"/integrations/notion",
+	"/integrations/microsoft-teams",
 	"/.well-known",
 	"/mcp",
 	"/accept-invitation",

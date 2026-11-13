@@ -3,8 +3,8 @@ import { z } from "zod";
 const LEGACY_WEB = "https://app.superset.sh";
 const LEGACY_API = "https://api.superset.sh";
 const CONTINUATION_PATH = "/auth/integration-connect";
-const SENTRY_CONNECT_PATH = "/api/integrations/sentry/connect";
-const SENTRY_FALLBACK_ORIGINS = new Set([
+const PROVIDERS = ["sentry", "notion", "microsoft-teams"] as const;
+const FALLBACK_ORIGINS = new Set([
 	"https://api.paradev.com",
 	"https://api.stage.paradev.com",
 ]);
@@ -41,15 +41,15 @@ function invalid(status: number): Response {
 	});
 }
 
-export async function withLegacySentryConnect(
+export async function withLegacyIntegrationConnect(
 	request: Request,
 	fallback: () => Promise<Response>,
 ): Promise<Response> {
 	const url = new URL(request.url);
-	if (
-		!SENTRY_FALLBACK_ORIGINS.has(url.origin) ||
-		url.pathname !== SENTRY_CONNECT_PATH
-	) {
+	const provider = PROVIDERS.find(
+		(value) => url.pathname === `/api/integrations/${value}/connect`,
+	);
+	if (!FALLBACK_ORIGINS.has(url.origin) || !provider) {
 		return fallback();
 	}
 	if (!exactHost(request, url)) return invalid(400);
@@ -57,7 +57,7 @@ export async function withLegacySentryConnect(
 	const orgId = organizationId(url);
 	if (!orgId) return invalid(400);
 	const target = new URL(CONTINUATION_PATH, LEGACY_WEB);
-	target.searchParams.set("provider", "sentry");
+	target.searchParams.set("provider", provider);
 	target.searchParams.set("organizationId", orgId);
 	return redirect(target);
 }
@@ -75,12 +75,12 @@ export async function continueLegacyIntegrationConnect(
 		return invalid(404);
 	if (request.method !== "GET") return invalid(405);
 	const providers = url.searchParams.getAll("provider");
+	const provider = PROVIDERS.find((value) => providers[0] === value);
 	const orgId = organizationId(url);
-	if (providers.length !== 1 || providers[0] !== "sentry" || !orgId)
-		return invalid(400);
+	if (providers.length !== 1 || !provider || !orgId) return invalid(400);
 	if (!(await isSignedIn())) {
 		const continuation = new URL(CONTINUATION_PATH, LEGACY_WEB);
-		continuation.searchParams.set("provider", "sentry");
+		continuation.searchParams.set("provider", provider);
 		continuation.searchParams.set("organizationId", orgId);
 		const signIn = new URL("/sign-in", LEGACY_WEB);
 		signIn.searchParams.set(
@@ -89,7 +89,7 @@ export async function continueLegacyIntegrationConnect(
 		);
 		return redirect(signIn);
 	}
-	const target = new URL(SENTRY_CONNECT_PATH, LEGACY_API);
+	const target = new URL(`/api/integrations/${provider}/connect`, LEGACY_API);
 	target.searchParams.set("organizationId", orgId);
 	return redirect(target);
 }
