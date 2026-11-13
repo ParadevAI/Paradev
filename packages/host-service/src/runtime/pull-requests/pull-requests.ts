@@ -205,6 +205,28 @@ function deriveCheckoutPullRequestUpstream(
 	return { owner, name, branch: pr.headRefName };
 }
 
+interface MatchedPullRequest {
+	id: string;
+	isOpen: boolean;
+	/** Epoch ms; null while open or when GitHub sent no usable time. */
+	closedAt: number | null;
+	headSha: string;
+}
+
+// A branch name outlives its PRs: a PR that closed before the workspace
+// existed is not its work unless the workspace sits on the PR's head.
+function isEarlierUseOfBranch(
+	pullRequest: Pick<MatchedPullRequest, "isOpen" | "closedAt" | "headSha">,
+	workspace: Pick<typeof workspaces.$inferSelect, "createdAt" | "headSha">,
+): boolean {
+	if (pullRequest.isOpen || pullRequest.closedAt === null) return false;
+	if (pullRequest.closedAt >= workspace.createdAt) return false;
+	return (
+		pullRequest.headSha.toLowerCase() !==
+		workspace.headSha?.trim().toLowerCase()
+	);
+}
+
 interface ProjectRefreshOptions {
 	bypassCache?: boolean;
 	/** Limit fetching and relinking to these workspaces; absent = whole project. */
@@ -724,6 +746,60 @@ export class PullRequestRuntimeManager {
 		for (const listener of this.linkListeners) listener();
 	}
 
+	private forgetEarlierBranchUseLinks(
+		workspace: typeof workspaces.$inferSelect,
+		rejectedPullRequestId: string | null,
+	): void {
+		const staleIds = this.db
+			.select({
+				pullRequestId: workspacePullRequests.pullRequestId,
+				state: pullRequests.state,
+				mergedAt: pullRequests.mergedAt,
+				headSha: pullRequests.headSha,
+			})
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.innerJoin(
+				workspaces,
+				eq(workspacePullRequests.workspaceId, workspaces.id),
+			)
+			.where(
+				and(
+					eq(workspacePullRequests.workspaceId, workspace.id),
+					isNull(workspaces.archivedAt),
+				),
+			)
+			.all()
+			.filter(
+				(row) =>
+					row.pullRequestId === rejectedPullRequestId ||
+					(row.state === "merged" &&
+						isEarlierUseOfBranch(
+							{
+								isOpen: false,
+								closedAt: row.mergedAt,
+								headSha: row.headSha,
+							},
+							workspace,
+						)),
+			)
+			.map((row) => row.pullRequestId);
+		if (staleIds.length === 0) return;
+		this.db
+			.delete(workspacePullRequests)
+			.where(
+				and(
+					eq(workspacePullRequests.workspaceId, workspace.id),
+					inArray(workspacePullRequests.pullRequestId, staleIds),
+				),
+			)
+			.run();
+		for (const listener of this.linkListeners) listener();
+	}
+
 	onPullRequestLinked(listener: () => void): () => void {
 		this.linkListeners.add(listener);
 		return () => this.linkListeners.delete(listener);
@@ -1078,9 +1154,17 @@ export class PullRequestRuntimeManager {
 			if (this.tracksBaseDefaultBranch(workspace, repo)) {
 				this.forgetPastPromotionLinks(workspace.id, projectId, repo);
 			}
+			const isEarlierBranchUse =
+				!!rawMatch && isEarlierUseOfBranch(rawMatch, workspace);
+			this.forgetEarlierBranchUseLinks(
+				workspace,
+				isEarlierBranchUse ? rawMatch.id : null,
+			);
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId || isPastPromotion
+				rawMatch?.id === workspace.suppressedPullRequestId ||
+				isPastPromotion ||
+				isEarlierBranchUse
 					? undefined
 					: rawMatch;
 			if (match) {
@@ -1623,10 +1707,10 @@ export class PullRequestRuntimeManager {
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<{
-		matched: Map<string, { id: string; isOpen: boolean }>;
+		matched: Map<string, MatchedPullRequest>;
 		failedKeys: Set<string>;
 	}> {
-		const matched = new Map<string, { id: string; isOpen: boolean }>();
+		const matched = new Map<string, MatchedPullRequest>();
 		const failedKeys = new Set<string>();
 		if (wantedRefs.size === 0) return { matched, failedKeys };
 
@@ -1761,7 +1845,12 @@ export class PullRequestRuntimeManager {
 				now,
 			});
 
-			matched.set(key, { id: rowId, isOpen: node.state === "OPEN" });
+			matched.set(key, {
+				id: rowId,
+				isOpen: node.state === "OPEN",
+				closedAt: node.closedAt ?? node.mergedAt,
+				headSha: node.headRefOid,
+			});
 		}
 
 		return { matched, failedKeys };

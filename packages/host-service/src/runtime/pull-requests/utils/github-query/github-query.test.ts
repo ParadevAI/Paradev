@@ -72,6 +72,7 @@ describe("GitHub pull request REST queries", () => {
 			headRepository: { name: "superset" },
 			updatedAt: "2026-05-08T12:00:00Z",
 			mergedAt: null,
+			closedAt: null,
 		});
 		expect(calls).toEqual([
 			{
