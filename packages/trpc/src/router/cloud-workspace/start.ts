@@ -135,6 +135,7 @@ export interface StartCloudWorkspaceInput {
 	/**
 	 * Bases by repository id, recorded per checkout. A missing one falls back
 	 * to the default branch; a repository not named here keeps the default.
+	 * `branch`, when given, wins over the primary's entry here.
 	 */
 	repositoryBaseBranches?: Record<string, string>;
 	/**
@@ -164,6 +165,7 @@ export function recordedBaseBranches(args: {
 }): Record<string, RecordedBase> {
 	const bases: Record<string, RecordedBase> = {};
 	for (const repository of args.repositories) {
+		if (args.branch && repository.id === args.primaryRepositoryId) continue;
 		const base = args.repositoryBaseBranches?.[repository.id];
 		if (base) bases[repository.id] = { branch: base, required: false };
 	}

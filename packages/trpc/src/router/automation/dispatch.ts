@@ -7,9 +7,11 @@ import {
 	githubRepositories,
 	type SelectAutomation,
 	v2Hosts,
+	v2Projects,
 	v2UsersHosts,
 } from "@superset/db/schema";
 import { CLOUD_AGENT_PROMPT_MAX_LENGTH } from "@superset/shared/cloud-agent-launch";
+import { parseGitHubRemote } from "@superset/shared/github-remote";
 import {
 	buildHostRoutingKey,
 	CLOUD_HOST_ID,
@@ -537,7 +539,12 @@ async function recordUndispatched(
 }
 
 /** A PR by its GitHub `owner/name`; the host finds which project repository it is. */
-export type PullRequestToCheckOut = { repository: string; number: number };
+export type PullRequestToCheckOut = {
+	repository: string;
+	number: number;
+	/** The PR is in the project's `repoCloneUrl` repository. */
+	inPrimaryRepository: boolean;
+};
 
 /**
  * The pull request a run should be checked out on, or null to branch fresh.
@@ -561,12 +568,49 @@ async function pullRequestToCheckOut(
 		.where(eq(githubRepositories.repoId, event.repositoryId))
 		.limit(1);
 	if (!repository) return null;
-	return { repository: repository.fullName, number: pullRequest.number };
+
+	const [project] = await db
+		.select({ repoCloneUrl: v2Projects.repoCloneUrl })
+		.from(v2Projects)
+		.where(eq(v2Projects.id, projectId))
+		.limit(1);
+	return {
+		repository: repository.fullName,
+		number: pullRequest.number,
+		inPrimaryRepository: isSameGitHubRepository(
+			project?.repoCloneUrl ?? null,
+			repository.fullName,
+		),
+	};
+}
+
+export function isSameGitHubRepository(
+	cloneUrl: string | null,
+	fullName: string,
+): boolean {
+	const parsed = cloneUrl ? parseGitHubRemote(cloneUrl) : null;
+	if (!parsed) return false;
+	// GitHub slugs are case-insensitive.
+	return (
+		`${parsed.owner}/${parsed.name}`.toLowerCase() === fullName.toLowerCase()
+	);
 }
 
 export type CreateTarget =
 	| { branch: string }
-	| { pullRequest: PullRequestToCheckOut };
+	| {
+			pullRequest: { repository: string; number: number };
+			/** Released hosts read only `pr` and strip `pullRequest`. */
+			pr?: number;
+	  };
+
+function pullRequestTarget(pullRequest: PullRequestToCheckOut): CreateTarget {
+	const { repository, number } = pullRequest;
+	return {
+		pullRequest: { repository, number },
+		...(pullRequest.inPrimaryRepository ? { pr: number } : {}),
+	};
+}
 
 /**
  * Creates on the PR when there is one, else on `branch`. When the host refuses
@@ -585,7 +629,7 @@ export async function createOnPullRequestOrBranch<T>(
 		try {
 			// The host fetches the PR's verified head and reuses the workspace
 			// already on that branch, so repeated events on one PR share it.
-			return await create({ pullRequest: args.pullRequest });
+			return await create(pullRequestTarget(args.pullRequest));
 		} catch (err) {
 			// Fall back only when the host itself answered and refused: a
 			// missing or expired `gh auth login`, or `repository_not_in_project`

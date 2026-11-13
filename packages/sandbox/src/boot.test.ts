@@ -100,21 +100,19 @@ describe("superset-boot", () => {
 			].join("\n"),
 		);
 
-		function checkoutOne(path: string, require: "0" | "1", base: string) {
+		function checkoutOne(
+			path: string,
+			require: "0" | "1",
+			base: string,
+			url = `file://${dir}/remote.git`,
+		) {
 			const workspace = join(dir, "workspace");
 			const checkouts = join(dir, "checkouts");
 			mkdirSync(workspace, { recursive: true });
 			mkdirSync(checkouts, { recursive: true });
 			const run = spawnSync(
 				"bash",
-				[
-					harness,
-					`file://${dir}/remote.git`,
-					"superset/work",
-					path,
-					require,
-					base,
-				],
+				[harness, url, "superset/work", path, require, base],
 				{
 					env: {
 						...gitEnv,
@@ -124,10 +122,12 @@ describe("superset-boot", () => {
 					},
 				},
 			);
+			const stamps = readFileSync(join(dir, "stamps"), "utf8").trim();
 			return {
 				status: run.status,
 				marker: existsSync(join(checkouts, path)),
 				onMain: existsSync(join(workspace, path, "on-main")),
+				lastStamp: stamps.split("\n").at(-1)?.split(" ")[0],
 			};
 		}
 
@@ -138,6 +138,7 @@ describe("superset-boot", () => {
 				status: 1,
 				marker: false,
 				onMain: false,
+				lastStamp: "checkout.base.missing",
 			});
 		});
 
@@ -146,6 +147,18 @@ describe("superset-boot", () => {
 				status: 0,
 				marker: true,
 				onMain: true,
+				lastStamp: "checkout.cloned",
+			});
+		});
+
+		test("a remote that cannot be reached logs a clone failure, not a missing base", () => {
+			expect(
+				checkoutOne("unreachable", "1", "main", `file://${dir}/absent.git`),
+			).toEqual({
+				status: 1,
+				marker: false,
+				onMain: false,
+				lastStamp: "checkout.clone.failed",
 			});
 		});
 	});

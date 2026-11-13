@@ -258,17 +258,23 @@ checkout_one() {
 	local tmp
 	tmp="$(mktemp -d "${SUPERSET_WORKSPACE_DIR}/.clone.XXXXXX")"
 	chown "$SUPERSET_USER:$SUPERSET_USER" "$tmp"
-	if as_user git clone -q --depth 1 --single-branch --branch "$base" "$url" "$tmp" \
-		|| { if [ "$require" = 1 ]; then stamp "checkout.base.missing ${path} ${base}"; false; else
-			find "$tmp" -mindepth 1 -delete; as_user git clone -q --depth 1 "$url" "$tmp"; fi; }; then
-		as_user git -C "$tmp" checkout -q -B "$branch"
-		install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$ws"
-		find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' -exec rm -rf {} +
-		( shopt -s dotglob nullglob; for entry in "$tmp"/*; do [ "${entry##*/}" = ".git" ] || mv "$entry" "$ws"/; done )
-		mv "$tmp/.git" "$ws/.git"; rmdir "$tmp"
-		touch "$marker"; stamp "checkout.cloned ${path} ${url}"; return 0
+	if ! as_user git clone -q --depth 1 --single-branch --branch "$base" "$url" "$tmp"; then
+		local probe=0
+		as_user git ls-remote -q --exit-code "$url" "refs/heads/${base}" "refs/tags/${base}" >/dev/null || probe=$?
+		# ls-remote exits 2 only when the remote answered without the ref.
+		if [ "$probe" != 2 ]; then rm -rf "$tmp"; stamp "checkout.clone.failed ${path} ${url}"; return 1; fi
+		if [ "$require" = 1 ]; then rm -rf "$tmp"; stamp "checkout.base.missing ${path} ${base}"; return 1; fi
+		find "$tmp" -mindepth 1 -delete
+		if ! as_user git clone -q --depth 1 "$url" "$tmp"; then
+			rm -rf "$tmp"; stamp "checkout.clone.failed ${path} ${url}"; return 1
+		fi
 	fi
-	rm -rf "$tmp"; stamp "checkout.clone.failed ${path}"; return 1
+	as_user git -C "$tmp" checkout -q -B "$branch"
+	install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$ws"
+	find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' -exec rm -rf {} +
+	( shopt -s dotglob nullglob; for entry in "$tmp"/*; do [ "${entry##*/}" = ".git" ] || mv "$entry" "$ws"/; done )
+	mv "$tmp/.git" "$ws/.git"; rmdir "$tmp"
+	touch "$marker"; stamp "checkout.cloned ${path} ${url}"; return 0
 }
 checkout() {
 	exec >> "${SUPERSET_LOG_DIR}/checkout.log" 2>&1

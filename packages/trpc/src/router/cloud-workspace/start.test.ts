@@ -26,6 +26,16 @@ describe("recordedBaseBranches", () => {
 		).toEqual({ "r-api": { branch: "feature", required: false } });
 	});
 
+	test("`branch` wins over the primary's entry, so the primary records no other base", () => {
+		expect(
+			recordedBaseBranches({
+				...BASE,
+				repositoryBaseBranches: { "r-web": "other", "r-api": "feature" },
+				move: undefined,
+			}),
+		).toEqual({ "r-api": { branch: "feature", required: false } });
+	});
+
 	test("a move from an older client requires its branch on the primary only", () => {
 		expect(recordedBaseBranches({ ...BASE, move: {} })).toEqual({
 			"r-web": MOVED,

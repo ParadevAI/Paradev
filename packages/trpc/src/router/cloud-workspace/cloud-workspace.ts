@@ -426,7 +426,11 @@ export const cloudWorkspaceRouter = {
 						 * `repository_set_mismatch: …`), and `branch` is the base of
 						 * every repository instead of the primary only.
 						 */
-						repositories: z.array(z.string().min(1).max(300)).min(1).optional(),
+						repositories: z
+							.array(z.string().min(1).max(300))
+							.min(1)
+							.max(20)
+							.optional(),
 					})
 					.optional(),
 			}),

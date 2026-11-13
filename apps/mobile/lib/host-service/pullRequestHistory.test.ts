@@ -78,4 +78,15 @@ describe("flattenPullRequestHistory", () => {
 			["web", 2, false],
 		]);
 	});
+
+	test("a host that predates checkouts files its flat list under the primary", () => {
+		const legacy = {
+			workspaceId: "ws",
+			pullRequests: [entry("web", 4, true, 1)],
+		} as unknown as WorkspacePullRequestHistory;
+		const rows = flattenPullRequestHistory(legacy, checkouts);
+		expect(rows.map((row) => [row.repositoryId, row.prNumber])).toEqual([
+			["r-web", 4],
+		]);
+	});
 });
