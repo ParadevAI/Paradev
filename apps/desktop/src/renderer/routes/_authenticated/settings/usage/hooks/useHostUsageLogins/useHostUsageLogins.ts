@@ -13,10 +13,17 @@ const LOGIN_POLL_INTERVAL_MS = 3_000;
  * the new profile lands on disk. The poll keeps running while the window is
  * unfocused: the user is off in a terminal (or a browser tab) finishing the
  * sign-in for exactly as long as this query is enabled.
+ *
+ * Each `opening` of the dialog polls its own query, so its first result is
+ * never one cached by an earlier opening.
  */
-export function useHostUsageLogins(hostUrl: string | null, enabled: boolean) {
+export function useHostUsageLogins(
+	hostUrl: string | null,
+	enabled: boolean,
+	opening = 0,
+) {
 	return useQuery({
-		queryKey: ["host-usage-logins", hostUrl],
+		queryKey: ["host-usage-logins", hostUrl, opening],
 		enabled: !!hostUrl && enabled,
 		queryFn: () => {
 			if (!hostUrl) return null;

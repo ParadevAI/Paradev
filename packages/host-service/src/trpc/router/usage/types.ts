@@ -99,5 +99,8 @@ export interface UsageAccount {
 	selection: string | null;
 	/** Whether newly launched agents use this account (host-wide default). */
 	isDefault: boolean;
+	/** Whether Paradev created this profile dir, so Remove can delete it.
+	 * Decorated per query; hosts older than this field leave it out. */
+	createdByParadev?: boolean;
 	fetchedAt: Date;
 }

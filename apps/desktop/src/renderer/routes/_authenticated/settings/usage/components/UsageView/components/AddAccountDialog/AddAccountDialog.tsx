@@ -34,6 +34,11 @@ import {
 } from "../../utils/findCompletedLogin";
 import { switchSignInCommand } from "../../utils/switchSignInCommand";
 import type { ManagedAgent } from "../../utils/visibleQuotaAgents";
+import {
+	isProfileHomeTaken,
+	profileHome,
+	slugifyProfileName,
+} from "./utils/profileName";
 
 type Agent = ManagedAgent;
 
@@ -50,15 +55,6 @@ export interface SwitchSignInTarget {
 	selection: string | null;
 	/** Display name for the dialog copy ("~/.claude-2", an email, …). */
 	label: string;
-}
-
-function slugify(name: string): string {
-	return (
-		name
-			.toLowerCase()
-			.replace(/[^a-z0-9-]+/g, "-")
-			.replace(/^-+|-+$/g, "") || "work"
-	);
 }
 
 interface AddAccountDialogProps {
@@ -104,22 +100,42 @@ export function AddAccountDialog({
 	const agent = switchTarget?.agent ?? addAgent;
 	const billingId = useId();
 	const nameId = useId();
-	const [name, setName] = useState("work");
+	const nameErrorId = useId();
+	const [name, setName] = useState("");
 	const [credentialKind, setCredentialKind] =
 		useState<AccountCredentialKind>("subscription");
 	const [copied, setCopied] = useState(false);
 	const [found, setFound] = useState<FoundLogin | null>(null);
 	const baselineRef = useRef<UsageLogins | null>(null);
-	const slug = slugify(name);
+	const slug = slugifyProfileName(name);
+	const profileDir = `~/.${agent}-${slug}`;
 
-	const loginsQuery = useHostUsageLogins(hostUrl, open && !found);
+	// Each opening polls its own logins query, so a result cached by an
+	// earlier opening never becomes this one's baseline.
+	const [opening, setOpening] = useState(0);
+	const [wasOpen, setWasOpen] = useState(open);
+	if (open !== wasOpen) {
+		setWasOpen(open);
+		if (open) setOpening((count) => count + 1);
+	}
+	const loginsQuery = useHostUsageLogins(hostUrl, open && !found, opening);
 	const setDefault = useSetDefaultUsageAccount(hostUrl);
+	const homeTaken =
+		!switchTarget &&
+		!!loginsQuery.data &&
+		isProfileHomeTaken(loginsQuery.data, agent, slug);
+	const nameUnusable = !switchTarget && name.trim() !== "" && slug === "";
+	// A new profile's command waits for this opening's logins, so it is never
+	// offered for a home that is already signed in.
+	const canSignIn =
+		!!switchTarget || (!!loginsQuery.data && slug !== "" && !homeTaken);
 
 	// The first poll result after opening is the baseline; anything beyond it
 	// is the sign-in we are waiting for.
 	useEffect(() => {
 		if (!open) {
 			baselineRef.current = null;
+			setName("");
 			setFound(null);
 			setCopied(false);
 			setTerminalAttempt(0);
@@ -135,6 +151,12 @@ export function AddAccountDialog({
 			return;
 		}
 		if (found || (terminalAttempt > 0 && !commandSucceeded)) return;
+		if (!switchTarget && !isProfileHomeTaken(logins, agent, slug)) {
+			// Nothing is signed in at the new profile's dir yet, so a login
+			// that lands there from now on is the one being added.
+			baselineRef.current = logins;
+			return;
+		}
 
 		const provisionProfile = (selection: string) => {
 			// Shares the default account's skills, plugins, MCP servers, and
@@ -149,7 +171,7 @@ export function AddAccountDialog({
 
 		const selection = switchTarget
 			? switchTarget.selection
-			: `${logins.homeDir}/.${agent}-${slug}`;
+			: profileHome(logins.homeDir, agent, slug);
 		const fresh = findCompletedLogin({
 			agent,
 			credentialKind: switchTarget?.credentialKind ?? credentialKind,
@@ -157,6 +179,7 @@ export function AddAccountDialog({
 			baseline: baselineRef.current,
 			current: logins,
 			commandSucceeded,
+			newProfile: !switchTarget,
 		});
 		if (fresh) {
 			setFound(fresh);
@@ -179,7 +202,9 @@ export function AddAccountDialog({
 
 	const command = switchTarget
 		? switchSignInCommand(switchTarget)
-		: addAccountCommand(agent, slug, credentialKind);
+		: slug
+			? addAccountCommand(agent, slug, credentialKind)
+			: "";
 	// Codex's API login takes the key at a terminal prompt; every other flow
 	// finishes in the browser.
 	const promptsForKey =
@@ -357,8 +382,26 @@ export function AddAccountDialog({
 										onChange={(event) => setName(event.target.value)}
 										className="h-9 min-w-0 flex-1 text-sm"
 										placeholder="work"
+										aria-invalid={homeTaken || nameUnusable || undefined}
+										aria-describedby={
+											homeTaken || nameUnusable ? nameErrorId : undefined
+										}
 									/>
 								</div>
+								{(homeTaken || nameUnusable) && (
+									<p
+										id={nameErrorId}
+										className="-mt-2 pl-26 text-xs text-destructive"
+									>
+										{homeTaken ? (
+											<Trans>
+												{profileDir} already exists. Choose another name.
+											</Trans>
+										) : (
+											<Trans>Use letters A–Z, digits, or hyphens.</Trans>
+										)}
+									</p>
+								)}
 								<div className="flex items-center gap-2">
 									<span className="w-24 shrink-0 text-sm text-muted-foreground">
 										<Trans>Billing</Trans>
@@ -397,7 +440,7 @@ export function AddAccountDialog({
 							</div>
 						)}
 
-						{!canRunLocally && commandDetails}
+						{!canRunLocally && canSignIn && commandDetails}
 
 						{canRunLocally && open && terminalAttempt > 0 && (
 							<div className="min-w-0 overflow-hidden rounded-lg border">
@@ -432,7 +475,7 @@ export function AddAccountDialog({
 							</div>
 						)}
 						{terminalAttempt === 0 &&
-							(!canRunLocally || loginsQuery.isError) &&
+							((!canRunLocally && canSignIn) || loginsQuery.isError) &&
 							loginStatus}
 						<div className="flex items-center justify-end gap-3 pt-1">
 							<div className="flex shrink-0 items-center gap-2">
@@ -471,7 +514,7 @@ export function AddAccountDialog({
 								{canRunLocally && !terminalRunning && (
 									<Button
 										size="sm"
-										disabled={!loginsQuery.data}
+										disabled={!loginsQuery.data || !canSignIn}
 										onClick={() => {
 											setCommandSucceeded(false);
 											setTerminalRunning(true);
