@@ -397,6 +397,22 @@ test("pullRequest for a repository outside the project is NOT_FOUND", async () =
 	});
 });
 
+test("pullRequest and checkouts naming two PRs for one repository is BAD_REQUEST", async () => {
+	const scenario = await multiRepoScenario();
+	await scenario.api.git.addRemote("github", "https://github.com/o/api.git");
+
+	await expect(
+		scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			checkouts: { [scenario.apiId]: { pr: 8 } },
+			pullRequest: { repository: "o/api", number: 7 },
+		}),
+	).rejects.toMatchObject({
+		data: { code: "BAD_REQUEST" },
+		message: expect.stringContaining("two different PRs"),
+	});
+});
+
 function addOutsideWorktree(repoPath: string, branch: string): string {
 	const path = `${repoPath}-${branch.replaceAll("/", "-")}`;
 	const added = Bun.spawnSync(["git", "worktree", "add", "-b", branch, path], {

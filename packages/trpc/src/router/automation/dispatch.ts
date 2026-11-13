@@ -7,11 +7,9 @@ import {
 	githubRepositories,
 	type SelectAutomation,
 	v2Hosts,
-	v2Projects,
 	v2UsersHosts,
 } from "@superset/db/schema";
 import { CLOUD_AGENT_PROMPT_MAX_LENGTH } from "@superset/shared/cloud-agent-launch";
-import { parseGitHubRemote } from "@superset/shared/github-remote";
 import {
 	buildHostRoutingKey,
 	CLOUD_HOST_ID,
@@ -538,35 +536,24 @@ async function recordUndispatched(
 	return row;
 }
 
+/** A PR by its GitHub `owner/name`; the host finds which project repository it is. */
+export type PullRequestToCheckOut = { repository: string; number: number };
+
 /**
  * The pull request a run should be checked out on, or null to branch fresh.
  *
- * Only when the automation's project really is the event's repository: a
- * trigger watching one repo can dispatch into a project pointed at another,
- * and PR numbers are per-repository, so an unchecked number would check out
- * an unrelated pull request.
- *
- * `pr` has been on `workspaces.create` since 0.1.0, well under the host floor,
- * so there is no version to gate on.
+ * PR numbers are per-repository, so the PR goes with its repository's name.
+ * Only the host knows the project's repositories, so the host decides whether
+ * the PR belongs to this project.
  */
 async function pullRequestToCheckOut(
 	event: { provider: string; repositoryId: string | null; payload: unknown },
 	projectId: string | null,
-): Promise<number | null> {
+): Promise<PullRequestToCheckOut | null> {
 	// A session automation has no project, and so no repository to check out in.
 	if (projectId === null || event.repositoryId === null) return null;
 	const pullRequest = nonForkPullRequest(event);
 	if (!pullRequest) return null;
-
-	const [project] = await db
-		.select({ repoCloneUrl: v2Projects.repoCloneUrl })
-		.from(v2Projects)
-		.where(eq(v2Projects.id, projectId))
-		.limit(1);
-	const parsed = project?.repoCloneUrl
-		? parseGitHubRemote(project.repoCloneUrl)
-		: null;
-	if (!parsed) return null;
 
 	const [repository] = await db
 		.select({ fullName: githubRepositories.fullName })
@@ -574,12 +561,47 @@ async function pullRequestToCheckOut(
 		.where(eq(githubRepositories.repoId, event.repositoryId))
 		.limit(1);
 	if (!repository) return null;
+	return { repository: repository.fullName, number: pullRequest.number };
+}
 
-	// GitHub slugs are case-insensitive, on both sides of the comparison.
-	return repository.fullName.toLowerCase() ===
-		`${parsed.owner}/${parsed.name}`.toLowerCase()
-		? pullRequest.number
-		: null;
+export type CreateTarget =
+	| { branch: string }
+	| { pullRequest: PullRequestToCheckOut };
+
+/**
+ * Creates on the PR when there is one, else on `branch`. When the host refuses
+ * the PR, creates on `branch`: the agent still works from the PR that its
+ * prompt names.
+ */
+export async function createOnPullRequestOrBranch<T>(
+	create: (target: CreateTarget) => Promise<T>,
+	args: {
+		pullRequest: PullRequestToCheckOut | null;
+		branch: string;
+		automationId: string;
+	},
+): Promise<T> {
+	if (args.pullRequest !== null) {
+		try {
+			// The host fetches the PR's verified head and reuses the workspace
+			// already on that branch, so repeated events on one PR share it.
+			return await create({ pullRequest: args.pullRequest });
+		} catch (err) {
+			// Fall back only when the host itself answered and refused: a
+			// missing or expired `gh auth login`, or `repository_not_in_project`
+			// for a trigger on a repository the project does not hold. A
+			// timeout or transport failure is not a RelayDispatchError and
+			// leaves the workspace's existence unknown: branching fresh there
+			// would orphan a PR workspace the host may have finished creating.
+			// Rethrow, so the retry meets the host's own per-PR dedupe instead.
+			if (!(err instanceof RelayDispatchError)) throw err;
+			console.warn(
+				`[automations] ${args.pullRequest.repository}#${args.pullRequest.number} checkout refused for ${args.automationId}; branching fresh:`,
+				describeError(err, "pr checkout"),
+			);
+		}
+	}
+	return create({ branch: args.branch });
 }
 
 async function createWorkspaceOnHost(args: {
@@ -590,7 +612,7 @@ async function createWorkspaceOnHost(args: {
 	automation: DispatchableAutomation;
 	runId: string;
 	/** The event's pull request, checked out instead of a fresh branch. */
-	pullRequest: number | null;
+	pullRequest: PullRequestToCheckOut | null;
 }): Promise<{ workspaceId: string }> {
 	// Session automation: no project, no branch. The host allocates a managed
 	// folder under ~/.paradev/sessions and dedupes the name per run.
@@ -631,75 +653,37 @@ async function createWorkspaceOnHost(args: {
 	// the closure below.
 	const projectId = args.projectId;
 
-	const create = (target: { branch: string } | { pr: number }) =>
-		relayMutation<
-			{
-				projectId: string;
-				name: string;
-				branch?: string;
-				pr?: number;
-				tags?: string[];
-			},
-			{
-				workspace: {
-					id: string;
-					projectId: string;
-					name: string;
-					branch: string;
-				};
-				terminals: Array<{ terminalId: string; label?: string }>;
-				agents: Array<unknown>;
-				alreadyExists: boolean;
-			}
-		>(
-			{
-				relayUrl: args.relayUrl,
-				hostId: args.hostId,
-				jwt: args.jwt,
-				// Workspace creation does git clone + worktree setup — bigger repos
-				// can comfortably take >25s. Give it real room.
-				timeoutMs: 90_000,
-			},
-			"workspaces.create",
-			{
-				projectId,
-				name: workspaceName,
-				...target,
-				// An older host's create schema simply strips the unknown key.
-				...(args.automation.tags.length > 0
-					? { tags: args.automation.tags }
-					: {}),
-			},
-		);
-
-	if (args.pullRequest !== null) {
-		try {
-			// The host fetches the PR's verified head and reuses the workspace
-			// already on that branch, so repeated events on one PR share it.
-			const result = await create({ pr: args.pullRequest });
-			return { workspaceId: result.workspace.id };
-		} catch (err) {
-			// Fall back only when the host itself answered and refused, which
-			// is what a missing or expired `gh auth login` looks like. A
-			// timeout or transport failure is not a RelayDispatchError and
-			// leaves the workspace's existence unknown: branching fresh there
-			// would orphan a PR workspace the host may have finished creating
-			// and run the automation against the wrong target. Rethrow, so the
-			// retry meets the host's own per-PR dedupe instead.
-			if (!(err instanceof RelayDispatchError)) throw err;
-			// Resolving a PR shells out to `gh`, which runs on the user's own
-			// `gh auth login` and may be missing or expired on this host. A PR
-			// we cannot check out must not turn a run that would otherwise have
-			// worked into a failure: branch fresh instead, and let the agent
-			// work from the PR its prompt already names.
-			console.warn(
-				`[automations] PR #${args.pullRequest} checkout failed for ${args.automation.id}; branching fresh:`,
-				describeError(err, "pr checkout"),
-			);
-		}
-	}
-
-	const result = await create({ branch: branchName });
+	const result = await createOnPullRequestOrBranch(
+		(target) =>
+			relayMutation<
+				{ projectId: string; name: string; tags?: string[] } & CreateTarget,
+				{ workspace: { id: string } }
+			>(
+				{
+					relayUrl: args.relayUrl,
+					hostId: args.hostId,
+					jwt: args.jwt,
+					// Workspace creation does git clone + worktree setup — bigger
+					// repos can comfortably take >25s. Give it real room.
+					timeoutMs: 90_000,
+				},
+				"workspaces.create",
+				{
+					projectId,
+					name: workspaceName,
+					...target,
+					// An older host's create schema simply strips the unknown key.
+					...(args.automation.tags.length > 0
+						? { tags: args.automation.tags }
+						: {}),
+				},
+			),
+		{
+			pullRequest: args.pullRequest,
+			branch: branchName,
+			automationId: args.automation.id,
+		},
+	);
 	return { workspaceId: result.workspace.id };
 }
 
