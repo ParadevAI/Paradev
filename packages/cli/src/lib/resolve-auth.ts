@@ -16,7 +16,13 @@ import {
 
 export const NOT_LOGGED_IN = "Not logged in";
 
-export type AuthSource = "override" | "host" | "config" | "oauth" | "sandbox";
+export type AuthSource =
+	| "override"
+	| "host"
+	| "config"
+	| "oauth"
+	| "sandbox"
+	| "signed_out";
 
 export type ResolvedAuth = {
 	config: SupersetConfig;
@@ -27,7 +33,10 @@ export type ResolvedAuth = {
 
 export async function resolveAuth(
 	apiKeyOption: string | undefined,
-	{ useHostToken = true }: { useHostToken?: boolean } = {},
+	{
+		useHostToken = true,
+		allowSignedOut = false,
+	}: { useHostToken?: boolean; allowSignedOut?: boolean } = {},
 ): Promise<ResolvedAuth> {
 	let config = readConfig();
 
@@ -69,6 +78,9 @@ export async function resolveAuth(
 		// person. Nothing to send from here, and nothing to refresh.
 		bearer = "";
 		authSource = "sandbox";
+	} else if (allowSignedOut) {
+		bearer = "";
+		authSource = "signed_out";
 	} else {
 		throw new CLIError(
 			NOT_LOGGED_IN,

@@ -4,7 +4,7 @@ import { pageRefFromArg } from "../pageRef";
 
 export default command({
 	description: "Show a page",
-	args: [positional("page").required().desc("Page id or slug")],
+	args: [positional("page").required().desc("Page id, slug or link")],
 	run: async ({ ctx, args }) => ({
 		data: await ctx.api.page.get.query(pageRefFromArg(args.page as string)),
 	}),

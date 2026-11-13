@@ -64,6 +64,12 @@ describe("resolveAuth", () => {
 		await expect(resolveAuth(undefined)).rejects.toThrow(/Not logged in/);
 	});
 
+	it("goes on with no credential for a command that runs signed out", async () => {
+		const result = await resolveAuth(undefined, { allowSignedOut: true });
+		expect(result.bearer).toBe("");
+		expect(result.authSource).toBe("signed_out");
+	});
+
 	it("uses an override api key with 'override' source", async () => {
 		const result = await resolveAuth("sk_live_override");
 		expect(result.bearer).toBe("sk_live_override");
