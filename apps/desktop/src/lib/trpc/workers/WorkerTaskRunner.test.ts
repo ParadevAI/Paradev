@@ -262,4 +262,34 @@ describe("WorkerTaskRunner failure handling", () => {
 		expect(workers[0]?.terminated).toBe(true);
 		await runner.dispose();
 	});
+
+	test("a pre-aborted queued task does not strand the task behind it", async () => {
+		const runner = new WorkerTaskRunner({
+			workerScriptPath: "/mock/worker.js",
+			concurrency: 1,
+			createWorker,
+		});
+
+		const first = runner.runTask("status", { id: "first" });
+		const aborted = runner.runTask(
+			"status",
+			{ id: "aborted" },
+			{ signal: AbortSignal.abort() },
+		);
+		let third: unknown = "pending";
+		void runner.runTask("status", { id: "third" }).then(
+			(result) => {
+				third = result;
+			},
+			(error) => {
+				third = error;
+			},
+		);
+
+		await first;
+		await expect(aborted).rejects.toThrow();
+		await flushMicrotasks(10);
+		expect(third).toEqual({ workerId: 1 });
+		await runner.dispose();
+	});
 });
