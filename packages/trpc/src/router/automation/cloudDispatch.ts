@@ -263,11 +263,12 @@ async function reachablePin(
 		return null;
 	}
 	if (row.status === "provisioning") {
-		if (Date.now() - row.createdAt.getTime() > STRANDED_PROVISIONING_MS) {
+		if (Date.now() - row.updatedAt.getTime() > STRANDED_PROVISIONING_MS) {
 			await transitionCloudWorkspace({
 				id: row.id,
 				from: ["provisioning"],
 				to: "failed",
+				providerSandboxId: row.providerSandboxId,
 			});
 			return null;
 		}
