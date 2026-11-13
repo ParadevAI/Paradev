@@ -28,15 +28,17 @@ interface SwitchSignInLogin {
  */
 export function switchSignInCommand(login: SwitchSignInLogin): string {
 	if (login.credentialKind === "api_key") {
-		// The system-default Codex home is wherever the CLI resolves it; the
-		// default Claude dir is never API-billed (discovery excludes ~/.claude).
+		// The system-default Codex home is the ambient one a Paradev terminal
+		// preserves next to the selected account it injects as CODEX_HOME, and
+		// wherever the CLI resolves it in any other shell. The default Claude
+		// dir is never API-billed (discovery excludes ~/.claude).
 		const dir =
 			login.selection !== null
 				? quoteShellToken(login.selection)
 				: login.agent === "claude"
 					? '"$HOME/.claude"'
 					: // biome-ignore lint/suspicious/noTemplateCurlyInString: shell parameter expansion, resolved by the user's shell
-						'"${CODEX_HOME:-$HOME/.codex}"';
+						'"${SUPERSET_AMBIENT_CODEX_HOME:-${CODEX_HOME:-$HOME/.codex}}"';
 		return apiBillingLoginCommand(login.agent, dir);
 	}
 	if (login.agent === "claude") {
