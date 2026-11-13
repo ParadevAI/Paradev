@@ -984,6 +984,9 @@ msgstr "{count} 台主机运行的主机服务比此应用旧"
 msgid "{count} selected"
 msgstr "已选择 {count} 个"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "有 {count} 个变量无法保存。请查看高亮的行"
+
 msgid "{count}/day"
 msgstr "{count}/天"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, other {# 行}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（此设备）"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize}（不在你的套餐中）"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "添加智能体"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "创建云端工作区前，请先在设置中添加一个环境"
 
+msgid "Add Another"
+msgstr "再添加一个"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "连接其他账号，或断开不再使用的账号。"
 
@@ -2135,6 +2144,9 @@ msgstr "添加描述"
 
 msgid "Add description..."
 msgstr "添加描述..."
+
+msgid "Add Environment Variable"
+msgstr "添加环境变量"
 
 msgid "Add extension"
 msgstr "添加扩展程序"
@@ -2172,6 +2184,9 @@ msgstr "添加更多…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "从侧边栏菜单中添加一个即可开始。"
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "添加一个或多个环境变量。也可以拖放 .env 文件。"
 
 msgid "Add people"
 msgstr "添加人员"
@@ -2284,8 +2299,17 @@ msgstr "已添加 {added}"
 msgid "Added {added} files to {where}"
 msgstr "已向{where}添加{added}个文件"
 
+msgid "Added {addedOn}"
+msgstr "添加于 {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "已添加 {bought} GB 小时。"
+
+msgid "Added {count} environment variables"
+msgstr "已添加 {count} 个环境变量"
+
+msgid "Added {key}"
+msgstr "已添加 {key}"
 
 msgid "Added 1 file to {where}"
 msgstr "已向{where}添加1个文件"
@@ -2780,6 +2804,9 @@ msgstr "随时知道哪个智能体需要你，通知可直接跳转到被阻塞
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "智能体能端到端完成跨文件改动。"
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "代理会在云工作区中设置此环境（约 20 分钟或更久）：安装依赖、编写设置配置，并询问所需的密钥。你可以随时中断，或在工作区中接手并自行完成设置。"
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "智能体写出完整的函数和文件，人类盯着每一步、批准每一条命令。一个智能体，一个人。更快，但仍是串行。"
@@ -4381,6 +4408,9 @@ msgstr "检查点 · tooltip重构之前"
 msgid "Checkpoint saved {0}"
 msgstr "检查点已保存 {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "已将检查点保存到 {name}"
+
 msgid "Checks"
 msgstr "检查"
 
@@ -4621,6 +4651,9 @@ msgstr "如果没有自动跳转，请点击这里"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "点击“↑ update”按钮查看更新前的确认提示"
+
+msgid "Click to copy"
+msgstr "点击复制"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "点击复制会话ID（使用`claude --resume <id>`恢复）。"
@@ -5815,6 +5848,9 @@ msgstr "无法复制链接"
 
 msgid "Could not create cloud workspace"
 msgstr "无法创建云端工作区"
+
+msgid "Could not create environment"
+msgstr "无法创建环境"
 
 msgid "Could not create project"
 msgstr "无法创建项目"
@@ -7407,6 +7443,9 @@ msgstr "放弃更改？"
 msgid "Discard recording"
 msgstr "放弃录音"
 
+msgid "Discard unsaved changes?"
+msgstr "放弃未保存的更改？"
+
 msgid "Discarded"
 msgstr "已放弃"
 
@@ -7812,6 +7851,9 @@ msgstr "已获得「{name}」×{tier}"
 msgid "Edit"
 msgstr "编辑"
 
+msgid "Edit {selectedName}"
+msgstr "编辑 {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "编辑频道名称"
 
@@ -7824,8 +7866,8 @@ msgstr "编辑描述"
 msgid "Edit Description"
 msgstr "编辑描述"
 
-msgid "Edit environment"
-msgstr "编辑环境"
+msgid "Edit Environment Variable"
+msgstr "编辑环境变量"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "无需询问即可编辑文件；运行命令前询问"
@@ -8016,6 +8058,9 @@ msgstr "输入整数"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "请输入 {minHours} 到 {maxHours} 之间的整数 GB 小时。"
 
+msgid "Enter new value"
+msgstr "输入新值"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI 要求时输入此代码："
 
@@ -8045,6 +8090,9 @@ msgstr "环境搭建、不稳定的测试、凭据串联，这些在2025年让�
 
 msgid "Environment Variables"
 msgstr "环境变量"
+
+msgid "Environment's size"
+msgstr "环境的规格"
 
 msgid "Environments"
 msgstr "环境"
@@ -8477,6 +8525,9 @@ msgstr "删除账户失败"
 msgid "Failed to delete automation"
 msgstr "无法删除自动化"
 
+msgid "Failed to delete environment variable"
+msgstr "无法删除环境变量"
+
 msgid "Failed to delete host"
 msgstr "删除主机失败"
 
@@ -8595,6 +8646,9 @@ msgstr "回复发送失败"
 msgid "Failed to push branch"
 msgstr "推送分支失败"
 
+msgid "Failed to read file."
+msgstr "无法读取文件。"
+
 msgid "Failed to record page version"
 msgstr "记录页面版本失败"
 
@@ -8688,6 +8742,9 @@ msgstr "运行工作区命令失败"
 msgid "Failed to save"
 msgstr "保存失败"
 
+msgid "Failed to save environment variables"
+msgstr "无法保存环境变量"
+
 msgid "Failed to save installation. Please try again."
 msgstr "保存安装信息失败。请重试。"
 
@@ -8753,6 +8810,9 @@ msgstr "更新头像失败"
 
 msgid "Failed to update branch prefix"
 msgstr "更新分支前缀失败"
+
+msgid "Failed to update environment variable"
+msgstr "无法更新环境变量"
 
 msgid "Failed to update hooks"
 msgstr "更新钩子失败"
@@ -8897,6 +8957,9 @@ msgstr "文件打开方式"
 
 msgid "File opens when the workspace wakes up"
 msgstr "工作区唤醒后将打开文件"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "文件过大。最大为 256 KB。"
 
 msgid "File viewer"
 msgstr "文件查看器"
@@ -10195,6 +10258,9 @@ msgstr "冒充他人"
 msgid "Import"
 msgstr "导入"
 
+msgid "Import .env"
+msgstr "导入 .env"
+
 msgid "import a folder"
 msgstr "导入文件夹"
 
@@ -10936,6 +11002,9 @@ msgstr "已保留新文件，它在创建后发生了更改"
 msgid "Kept the new folder because it is no longer empty"
 msgstr "已保留新文件夹，它已不再为空"
 
+msgid "Key"
+msgstr "键"
+
 msgid "Key dates"
 msgstr "关键日期"
 
@@ -11080,6 +11149,9 @@ msgstr "上次在线：{lastSeen}"
 
 msgid "Last updated"
 msgstr "最后更新"
+
+msgid "Last Updated"
+msgstr "最近更新"
 
 msgid "Last updated on {date}"
 msgstr "最后更新于{date}"
@@ -11671,9 +11743,6 @@ msgstr "机器资源"
 msgid "Machine size"
 msgstr "机器规格"
 
-msgid "Machine size: {label}"
-msgstr "机器规格：{label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "不绑定机器的云端工作区，几秒即可启动，还能分享给队友。"
 
@@ -11730,6 +11799,9 @@ msgstr "管理账号…"
 
 msgid "Manage billing"
 msgstr "管理账单"
+
+msgid "Manage environment"
+msgstr "管理环境"
 
 msgid "Manage environments"
 msgstr "管理环境"
@@ -12358,6 +12430,10 @@ msgstr "神秘机械师"
 msgid "Name"
 msgstr "名称"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "名称"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "名称和一个URL友好的slug。两者稍后都可以更改。"
 
@@ -12708,6 +12784,9 @@ msgstr "没有活动的工作区"
 msgid "No agent"
 msgstr "无智能体"
 
+msgid "No agent is available to set up the environment"
+msgstr "没有可用于设置环境的代理"
+
 msgid "No agent is configured on this host"
 msgstr "此主机上未配置任何智能体"
 
@@ -12855,6 +12934,9 @@ msgstr "暂无下载"
 
 msgid "No emoji found"
 msgstr "未找到表情"
+
+msgid "No environment variables yet"
+msgstr "还没有环境变量"
 
 msgid "No environments available"
 msgstr "没有可用的环境"
@@ -13011,6 +13093,9 @@ msgstr "没有匹配的拉取请求"
 
 msgid "No matching tasks"
 msgstr "没有匹配的任务"
+
+msgid "No matching variables"
+msgstr "没有匹配的变量"
 
 msgid "No MCP servers found"
 msgstr "未找到MCP服务器"
@@ -13319,8 +13404,8 @@ msgstr "此设备上未找到 v1 项目。"
 msgid "No v1 terminal scripts found."
 msgstr "未找到 v1 终端脚本。"
 
-msgid "No variables set yet."
-msgstr "尚未设置变量。"
+msgid "No valid environment variables found in file"
+msgstr "文件中未找到有效的环境变量"
 
 msgid "No versions yet"
 msgstr "还没有版本"
@@ -13716,6 +13801,9 @@ msgstr "一个插件，所有编码智能体。"
 
 msgid "One step left"
 msgstr "还差一步"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "有一个变量无法保存。请查看高亮的行"
 
 msgid "online"
 msgstr "在线"
@@ -14372,6 +14460,9 @@ msgstr "可选。帮助我们了解哪些渠道有效。"
 msgid "Options"
 msgstr "选项"
 
+msgid "or paste .env contents in Key input"
+msgstr "或将 .env 内容粘贴到键输入框"
+
 msgid "Orange"
 msgstr "橙色"
 
@@ -14401,6 +14492,9 @@ msgstr "组织{id}"
 
 msgid "Organization created successfully!"
 msgstr "组织创建成功！"
+
+msgid "Organization default ({defaultName})"
+msgstr "组织默认（{defaultName}）"
 
 msgid "Organization deleted"
 msgstr "组织已删除"
@@ -15062,8 +15156,8 @@ msgstr "在{hostName}上选择新的项目文件夹。"
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "在{hostName}上选择项目的worktree文件夹。"
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "选择它要检出的仓库。这台机器上的智能体会弄清需要安装什么,并让它在云端运行起来。"
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "选择要检出的仓库。云工作区中的代理会确定需要安装的内容并让它运行起来。"
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "在{hostName}上选择worktree文件夹。"
@@ -15166,6 +15260,9 @@ msgstr "请选择一个组织"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "请重试，或在该设备上重启 Paradev。"
+
+msgid "Please upload a valid .env file."
+msgstr "请上传有效的 .env 文件。"
 
 msgid "Plugin"
 msgstr "插件"
@@ -17321,6 +17418,9 @@ msgstr "保存"
 msgid "Save & create workspace"
 msgstr "保存并创建工作区"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "将检查点保存到 {name}？"
+
 msgid "Save All"
 msgstr "全部保存"
 
@@ -17332,6 +17432,9 @@ msgstr "另存为视图"
 
 msgid "Save Changes"
 msgstr "保存更改"
+
+msgid "Save checkpoint"
+msgstr "保存检查点"
 
 msgid "Save edits"
 msgstr "保存编辑"
@@ -17373,8 +17476,20 @@ msgstr "已保存"
 msgid "Saved \"{0}\" as an environment"
 msgstr "已将“{0}”保存为环境"
 
+msgid "Saved {name}"
+msgstr "已保存 {name}"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "已保存 {name}，但其设置工作区无法启动：{reason}"
+
 msgid "Saved to Downloads"
 msgstr "已保存到“下载”文件夹"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "按当前状态保存此工作区，包括其中安装的所有内容。从 {name} 新建的工作区将从此检查点开始。保存期间工作区会短暂停止。"
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "正在将检查点保存到 {name}..."
 
 msgid "Saving as an environment..."
 msgstr "正在保存为环境..."
@@ -17810,9 +17925,6 @@ msgstr "选择智能体"
 msgid "Select an editor from the dropdown"
 msgstr "从下拉菜单中选择编辑器"
 
-msgid "Select an environment"
-msgstr "选择一个环境"
-
 msgid "Select an organization"
 msgstr "选择一个组织"
 
@@ -17993,6 +18105,12 @@ msgstr "正在发送…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "将向 {2} 发送 {0} 个字符的终端上下文（约 {1} 个 token）。"
 
+msgid "Sensitive"
+msgstr "敏感"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "敏感值会加密，保存后无法再显示。"
+
 msgid "Sent"
 msgstr "发送时间"
 
@@ -18068,9 +18186,6 @@ msgstr "会话"
 msgid "Sessions · top {0} by cost"
 msgstr "会话 · 按费用排名前{0}"
 
-msgid "Set"
-msgstr "已设置"
-
 msgid "Set a notification schedule"
 msgstr "设置通知时间表"
 
@@ -18112,6 +18227,9 @@ msgstr "通过 SSH 设置主机"
 
 msgid "Set up an automation"
 msgstr "设置自动化"
+
+msgid "Set up Environment"
+msgstr "设置环境"
 
 msgid "Set up once"
 msgstr "只需设置一次"
@@ -18666,9 +18784,6 @@ msgstr "工厂自主的六个等级"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "工厂自主的六个等级、等级之间的关卡，以及我们对2026年能走多远的预测。现在写下来，方便你以后给我们打分。"
 
-msgid "size"
-msgstr "规格"
-
 msgid "Size"
 msgstr "大小"
 
@@ -18692,6 +18807,9 @@ msgstr "肤色"
 
 msgid "Skip"
 msgstr "跳过"
+
+msgid "Skip & save"
+msgstr "跳过并保存"
 
 msgid "Skip All"
 msgstr "全部跳过"
@@ -19092,6 +19210,9 @@ msgstr "开始新的聊天"
 
 msgid "Start a session"
 msgstr "开始一个会话"
+
+msgid "Start agent"
+msgstr "启动代理"
 
 msgid "Start agents on events or a schedule"
 msgstr "按事件或计划启动智能体"
@@ -21292,6 +21413,10 @@ msgstr "双手齐开"
 msgid "Type"
 msgstr "类型"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "类型"
+
 msgid "Type @linear in any prompt."
 msgstr "在任何提示词中输入 @linear。"
 
@@ -21665,6 +21790,9 @@ msgstr "请更新两台电脑上的主机服务，然后重试。"
 msgid "Update the host service on this device and try again."
 msgstr "请更新此设备上的主机服务，然后重试。"
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "更新 <0>{key}</0> 的值"
+
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"
 
@@ -21680,6 +21808,9 @@ msgstr "更新于{0}"
 
 msgid "Updated {date}"
 msgstr "更新于{date}"
+
+msgid "Updated {key}"
+msgstr "已更新 {key}"
 
 msgid "Updated {updatedRelative}"
 msgstr "更新于{updatedRelative}"
@@ -21898,6 +22029,9 @@ msgstr "user@host、ssh://user@host:2222 或 ssh 配置中的别名"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId与该工作区的项目不匹配"
+
+msgid "Value"
+msgstr "值"
 
 msgid "Variables"
 msgstr "变量"
@@ -22891,6 +23025,9 @@ msgstr "你没有此终端的访问权限。"
 
 msgid "You don't have permission to remove this member"
 msgstr "你没有移除该成员的权限"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "你有未保存的环境变量。确定要关闭吗？"
 
 msgid "You install and connect once per account."
 msgstr "每个账号只需安装和连接一次。"

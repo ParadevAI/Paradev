@@ -984,6 +984,9 @@ msgstr "{count} 台主機執行的主機服務比此應用程式舊"
 msgid "{count} selected"
 msgstr "已選取 {count} 個"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "有 {count} 個變數無法儲存。請查看醒目標示的列"
+
 msgid "{count}/day"
 msgstr "{count}/天"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, other {# 行}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（此裝置）"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize}（不在你的方案中）"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "新增代理程式"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "建立雲端工作區前，請先在設定中新增環境"
 
+msgid "Add Another"
+msgstr "再新增一個"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "連接其他帳號，或中斷不再使用的帳號。"
 
@@ -2135,6 +2144,9 @@ msgstr "新增說明"
 
 msgid "Add description..."
 msgstr "新增描述..."
+
+msgid "Add Environment Variable"
+msgstr "新增環境變數"
 
 msgid "Add extension"
 msgstr "新增擴充功能"
@@ -2172,6 +2184,9 @@ msgstr "新增更多…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "從側邊欄選單中新增一個即可開始。"
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "新增一個或多個環境變數。也可以拖放 .env 檔案。"
 
 msgid "Add people"
 msgstr "新增人員"
@@ -2284,8 +2299,17 @@ msgstr "已新增 {added}"
 msgid "Added {added} files to {where}"
 msgstr "已向{where}新增{added}個檔案"
 
+msgid "Added {addedOn}"
+msgstr "新增於 {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "已新增 {bought} GB 小時。"
+
+msgid "Added {count} environment variables"
+msgstr "已新增 {count} 個環境變數"
+
+msgid "Added {key}"
+msgstr "已新增 {key}"
 
 msgid "Added 1 file to {where}"
 msgstr "已向{where}新增1個檔案"
@@ -2780,6 +2804,9 @@ msgstr "隨時知道哪個代理程式需要你，通知可直接跳轉到被阻
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "代理程式能端到端完成跨檔案改動。"
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "代理程式會在雲端工作區中設定此環境（約 20 分鐘或更久）：安裝相依套件、撰寫設定組態，並詢問所需的密鑰。你可以隨時中斷，或在工作區中接手並自行完成設定。"
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "代理程式寫出完整的函式和檔案，人類盯著每一步、批准每一條命令。一個代理程式，一個人。更快，但仍是序列。"
@@ -4381,6 +4408,9 @@ msgstr "檢查點 · tooltip重構之前"
 msgid "Checkpoint saved {0}"
 msgstr "檢查點已儲存 {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "已將檢查點儲存到 {name}"
+
 msgid "Checks"
 msgstr "檢查"
 
@@ -4621,6 +4651,9 @@ msgstr "如果沒有自動跳轉，請點選這裡"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "點擊「↑ update」按鈕查看更新前的確認提示"
+
+msgid "Click to copy"
+msgstr "點擊複製"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "點選複製會話ID（使用`claude --resume <id>`恢復）。"
@@ -5815,6 +5848,9 @@ msgstr "無法複製連結"
 
 msgid "Could not create cloud workspace"
 msgstr "無法建立雲端工作區"
+
+msgid "Could not create environment"
+msgstr "無法建立環境"
 
 msgid "Could not create project"
 msgstr "無法建立專案"
@@ -7407,6 +7443,9 @@ msgstr "放棄更改？"
 msgid "Discard recording"
 msgstr "放棄錄音"
 
+msgid "Discard unsaved changes?"
+msgstr "捨棄未儲存的變更？"
+
 msgid "Discarded"
 msgstr "已放棄"
 
@@ -7812,6 +7851,9 @@ msgstr "已獲得「{name}」×{tier}"
 msgid "Edit"
 msgstr "編輯"
 
+msgid "Edit {selectedName}"
+msgstr "編輯 {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "編輯頻道名稱"
 
@@ -7824,8 +7866,8 @@ msgstr "編輯說明"
 msgid "Edit Description"
 msgstr "編輯說明"
 
-msgid "Edit environment"
-msgstr "編輯環境"
+msgid "Edit Environment Variable"
+msgstr "編輯環境變數"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "無需詢問即可編輯檔案；執行指令前詢問"
@@ -8016,6 +8058,9 @@ msgstr "輸入整數"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "請輸入 {minHours} 到 {maxHours} 之間的整數 GB 小時。"
 
+msgid "Enter new value"
+msgstr "輸入新值"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI 要求時輸入此代碼："
 
@@ -8045,6 +8090,9 @@ msgstr "環境搭建、不穩定的測試、憑證串聯，這些在2025年讓�
 
 msgid "Environment Variables"
 msgstr "環境變數"
+
+msgid "Environment's size"
+msgstr "環境的規格"
 
 msgid "Environments"
 msgstr "環境"
@@ -8477,6 +8525,9 @@ msgstr "刪除帳戶失敗"
 msgid "Failed to delete automation"
 msgstr "無法刪除自動化"
 
+msgid "Failed to delete environment variable"
+msgstr "無法刪除環境變數"
+
 msgid "Failed to delete host"
 msgstr "刪除主機失敗"
 
@@ -8595,6 +8646,9 @@ msgstr "回覆張貼失敗"
 msgid "Failed to push branch"
 msgstr "推送分支失敗"
 
+msgid "Failed to read file."
+msgstr "無法讀取檔案。"
+
 msgid "Failed to record page version"
 msgstr "記錄頁面版本失敗"
 
@@ -8688,6 +8742,9 @@ msgstr "執行工作區命令失敗"
 msgid "Failed to save"
 msgstr "儲存失敗"
 
+msgid "Failed to save environment variables"
+msgstr "無法儲存環境變數"
+
 msgid "Failed to save installation. Please try again."
 msgstr "儲存安裝資訊失敗。請重試。"
 
@@ -8753,6 +8810,9 @@ msgstr "更新頭像失敗"
 
 msgid "Failed to update branch prefix"
 msgstr "更新分支字首失敗"
+
+msgid "Failed to update environment variable"
+msgstr "無法更新環境變數"
 
 msgid "Failed to update hooks"
 msgstr "更新鉤子失敗"
@@ -8897,6 +8957,9 @@ msgstr "檔案開啟方式"
 
 msgid "File opens when the workspace wakes up"
 msgstr "工作區喚醒後將開啟檔案"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "檔案過大。上限為 256 KB。"
 
 msgid "File viewer"
 msgstr "檔案檢視器"
@@ -10195,6 +10258,9 @@ msgstr "冒充他人"
 msgid "Import"
 msgstr "匯入"
 
+msgid "Import .env"
+msgstr "匯入 .env"
+
 msgid "import a folder"
 msgstr "匯入資料夾"
 
@@ -10936,6 +11002,9 @@ msgstr "已保留新檔案，它在建立後發生了更改"
 msgid "Kept the new folder because it is no longer empty"
 msgstr "已保留新資料夾，它已不再為空"
 
+msgid "Key"
+msgstr "鍵"
+
 msgid "Key dates"
 msgstr "關鍵日期"
 
@@ -11080,6 +11149,9 @@ msgstr "上次上線：{lastSeen}"
 
 msgid "Last updated"
 msgstr "最後更新"
+
+msgid "Last Updated"
+msgstr "最近更新"
 
 msgid "Last updated on {date}"
 msgstr "最後更新於{date}"
@@ -11671,9 +11743,6 @@ msgstr "機器資源"
 msgid "Machine size"
 msgstr "機器規格"
 
-msgid "Machine size: {label}"
-msgstr "機器規格：{label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "不繫結機器的雲端工作區，幾秒即可啟動，還能分享給隊友。"
 
@@ -11730,6 +11799,9 @@ msgstr "管理帳號…"
 
 msgid "Manage billing"
 msgstr "管理帳單"
+
+msgid "Manage environment"
+msgstr "管理環境"
 
 msgid "Manage environments"
 msgstr "管理環境"
@@ -12358,6 +12430,10 @@ msgstr "神秘機械師"
 msgid "Name"
 msgstr "名稱"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "名稱"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "名稱和一個URL友好的slug。兩者稍後都可以更改。"
 
@@ -12708,6 +12784,9 @@ msgstr "沒有作用中的工作區"
 msgid "No agent"
 msgstr "無代理程式"
 
+msgid "No agent is available to set up the environment"
+msgstr "沒有可用來設定環境的代理程式"
+
 msgid "No agent is configured on this host"
 msgstr "此主機上未設定任何代理程式"
 
@@ -12855,6 +12934,9 @@ msgstr "暫無下載"
 
 msgid "No emoji found"
 msgstr "未找到表情"
+
+msgid "No environment variables yet"
+msgstr "尚無環境變數"
 
 msgid "No environments available"
 msgstr "沒有可用的環境"
@@ -13011,6 +13093,9 @@ msgstr "沒有符合的拉取請求"
 
 msgid "No matching tasks"
 msgstr "沒有符合的任務"
+
+msgid "No matching variables"
+msgstr "沒有符合的變數"
 
 msgid "No MCP servers found"
 msgstr "找不到MCP伺服器"
@@ -13319,8 +13404,8 @@ msgstr "此裝置上找不到 v1 專案。"
 msgid "No v1 terminal scripts found."
 msgstr "找不到 v1 終端機指令碼。"
 
-msgid "No variables set yet."
-msgstr "尚未設定變數。"
+msgid "No valid environment variables found in file"
+msgstr "檔案中找不到有效的環境變數"
 
 msgid "No versions yet"
 msgstr "還沒有版本"
@@ -13716,6 +13801,9 @@ msgstr "一個外掛，所有程式碼代理程式。"
 
 msgid "One step left"
 msgstr "還差一步"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "有一個變數無法儲存。請查看醒目標示的列"
 
 msgid "online"
 msgstr "線上"
@@ -14372,6 +14460,9 @@ msgstr "選填。幫助我們了解哪些管道有效。"
 msgid "Options"
 msgstr "選項"
 
+msgid "or paste .env contents in Key input"
+msgstr "或將 .env 內容貼到鍵輸入欄"
+
 msgid "Orange"
 msgstr "橙色"
 
@@ -14401,6 +14492,9 @@ msgstr "組織{id}"
 
 msgid "Organization created successfully!"
 msgstr "組織建立成功！"
+
+msgid "Organization default ({defaultName})"
+msgstr "組織預設（{defaultName}）"
 
 msgid "Organization deleted"
 msgstr "組織已刪除"
@@ -15062,8 +15156,8 @@ msgstr "在{hostName}上選擇新的專案資料夾。"
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "在{hostName}上選擇專案的worktree資料夾。"
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "選擇它要檢出的儲存庫。這台機器上的代理程式會判斷需要安裝什麼,並讓它在雲端執行。"
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "選擇要簽出的儲存庫。雲端工作區中的代理程式會判斷需要安裝的內容並讓它執行起來。"
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "在{hostName}上選擇worktree資料夾。"
@@ -15166,6 +15260,9 @@ msgstr "請選擇一個組織"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "請重試，或在該裝置上重新啟動 Paradev。"
+
+msgid "Please upload a valid .env file."
+msgstr "請上傳有效的 .env 檔案。"
 
 msgid "Plugin"
 msgstr "外掛"
@@ -17321,6 +17418,9 @@ msgstr "儲存"
 msgid "Save & create workspace"
 msgstr "儲存並建立工作區"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "要將檢查點儲存到 {name} 嗎？"
+
 msgid "Save All"
 msgstr "全部儲存"
 
@@ -17332,6 +17432,9 @@ msgstr "另存為檢視"
 
 msgid "Save Changes"
 msgstr "儲存變更"
+
+msgid "Save checkpoint"
+msgstr "儲存檢查點"
 
 msgid "Save edits"
 msgstr "儲存編輯"
@@ -17373,8 +17476,20 @@ msgstr "已儲存"
 msgid "Saved \"{0}\" as an environment"
 msgstr "已將「{0}」儲存為環境"
 
+msgid "Saved {name}"
+msgstr "已儲存 {name}"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "已儲存 {name}，但其設定工作區無法啟動：{reason}"
+
 msgid "Saved to Downloads"
 msgstr "已儲存到「下載」資料夾"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "以目前狀態儲存此工作區，包括其中安裝的所有內容。從 {name} 建立的新工作區將從此檢查點開始。儲存期間工作區會短暫停止。"
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "正在將檢查點儲存到 {name}..."
 
 msgid "Saving as an environment..."
 msgstr "正在儲存為環境..."
@@ -17810,9 +17925,6 @@ msgstr "選擇代理程式"
 msgid "Select an editor from the dropdown"
 msgstr "從下拉選單中選擇編輯器"
 
-msgid "Select an environment"
-msgstr "選擇一個環境"
-
 msgid "Select an organization"
 msgstr "選擇一個組織"
 
@@ -17993,6 +18105,12 @@ msgstr "正在傳送…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "將向 {2} 傳送 {0} 個字元的終端上下文（約 {1} 個 token）。"
 
+msgid "Sensitive"
+msgstr "敏感"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "敏感值會加密，儲存後無法再顯示。"
+
 msgid "Sent"
 msgstr "傳送時間"
 
@@ -18068,9 +18186,6 @@ msgstr "會話"
 msgid "Sessions · top {0} by cost"
 msgstr "會話 · 按費用排名前{0}"
 
-msgid "Set"
-msgstr "已設定"
-
 msgid "Set a notification schedule"
 msgstr "設定通知時間表"
 
@@ -18112,6 +18227,9 @@ msgstr "透過 SSH 設定主機"
 
 msgid "Set up an automation"
 msgstr "設定自動化"
+
+msgid "Set up Environment"
+msgstr "設定環境"
 
 msgid "Set up once"
 msgstr "只需設定一次"
@@ -18666,9 +18784,6 @@ msgstr "工廠自主的六個等級"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "工廠自主的六個等級、等級之間的關卡，以及我們對2026年能走多遠的預測。現在寫下來，方便你以後給我們打分。"
 
-msgid "size"
-msgstr "規格"
-
 msgid "Size"
 msgstr "大小"
 
@@ -18692,6 +18807,9 @@ msgstr "膚色"
 
 msgid "Skip"
 msgstr "跳過"
+
+msgid "Skip & save"
+msgstr "略過並儲存"
 
 msgid "Skip All"
 msgstr "全部跳過"
@@ -19092,6 +19210,9 @@ msgstr "開始新的聊天"
 
 msgid "Start a session"
 msgstr "開始一個會話"
+
+msgid "Start agent"
+msgstr "啟動代理程式"
 
 msgid "Start agents on events or a schedule"
 msgstr "依事件或計劃啟動代理程式"
@@ -21292,6 +21413,10 @@ msgstr "雙手齊開"
 msgid "Type"
 msgstr "型別"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "類型"
+
 msgid "Type @linear in any prompt."
 msgstr "在任何提示詞中輸入 @linear。"
 
@@ -21665,6 +21790,9 @@ msgstr "請更新兩台電腦上的主機服務，然後再試一次。"
 msgid "Update the host service on this device and try again."
 msgstr "請更新此裝置上的主機服務，然後再試一次。"
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "更新 <0>{key}</0> 的值"
+
 msgid "Update this host to message subagents"
 msgstr "請更新此主機以傳送訊息給子代理程式"
 
@@ -21680,6 +21808,9 @@ msgstr "更新於{0}"
 
 msgid "Updated {date}"
 msgstr "更新於{date}"
+
+msgid "Updated {key}"
+msgstr "已更新 {key}"
 
 msgid "Updated {updatedRelative}"
 msgstr "更新於{updatedRelative}"
@@ -21898,6 +22029,9 @@ msgstr "user@host、ssh://user@host:2222 或 ssh 設定中的別名"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId與該工作區的專案不匹配"
+
+msgid "Value"
+msgstr "值"
 
 msgid "Variables"
 msgstr "變數"
@@ -22891,6 +23025,9 @@ msgstr "你沒有此終端的存取權限。"
 
 msgid "You don't have permission to remove this member"
 msgstr "你沒有移除該成員的權限"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "你有未儲存的環境變數。確定要關閉嗎？"
 
 msgid "You install and connect once per account."
 msgstr "每個帳號只需安裝和連接一次。"

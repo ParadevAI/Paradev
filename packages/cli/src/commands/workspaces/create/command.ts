@@ -19,7 +19,7 @@ export default command({
 		machineSize: string()
 			.enum(...MACHINE_SIZES)
 			.desc(
-				"Machine size of a cloud workspace: `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB; the default) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where your plan includes them",
+				"Machine size of a cloud workspace: `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where your plan includes them. Omitted: the environment's size, else your organization's default",
 			),
 		project: string().desc(
 			"Project ID, for a workspace on a host. Required with --local or --host unless --session",

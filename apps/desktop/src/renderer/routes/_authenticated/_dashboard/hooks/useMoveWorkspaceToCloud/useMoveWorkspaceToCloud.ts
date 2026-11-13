@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import type { MachineSize } from "@superset/shared/billing";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -39,13 +38,11 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	return useCallback(
 		async ({
 			environment,
-			machineSize,
 			onStage,
 			onBegun,
 			signal,
 		}: {
 			environment: { id: string; repositoryFullName: string | null };
-			machineSize: MachineSize;
 			onStage: (stage: MoveToCloudStage) => void;
 			onBegun?: (workspaceMoveId: string) => void;
 			signal?: AbortSignal;
@@ -95,7 +92,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
 						organizationId,
 						environmentId: environment.id,
-						machineSize,
 						name: workspace.name,
 						branch: prepared.branch,
 						move: {

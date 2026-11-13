@@ -80,6 +80,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onRemoveFromSidebar?: () => void;
 	onRename?: () => void;
 	onDelete?: () => void;
+	environmentItem?: React.ReactNode;
 	onToggleUnread: () => void;
 	onClearStatus: () => void;
 	onRemovePullRequest: () => void;
@@ -109,6 +110,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	onRemoveFromSidebar,
 	onRename,
 	onDelete,
+	environmentItem,
 	onToggleUnread,
 	onClearStatus,
 	onRemovePullRequest,
@@ -249,6 +251,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 							)}
 						</>
 					)}
+					{environmentItem}
 					{move && (
 						<>
 							<ContextMenuSeparator />

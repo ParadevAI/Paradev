@@ -62,6 +62,7 @@ import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { EnvironmentSetupNotice } from "./components/EnvironmentSetupNotice";
 import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
@@ -607,6 +608,17 @@ export const Composer = memo(function Composer({
 		[availableCommands, blocked, runTyped, send, t, target],
 	);
 
+	const insertSetupPrompt = useCallback((prompt: string) => {
+		const input = promptInputRef.current;
+		if (!input) return;
+		input.restoreDraft({
+			segments: [
+				{ type: "text", text: input.isEmpty() ? prompt : `\n\n${prompt}` },
+			],
+			attachments: [],
+		});
+	}, []);
+
 	return (
 		<div
 			ref={rootRef}
@@ -621,6 +633,13 @@ export const Composer = memo(function Composer({
 					className={CHAT_COLUMN_CLASSNAME}
 					terminalId={terminalId}
 					workspaceId={workspaceId}
+				/>
+			)}
+			{!target && (
+				<EnvironmentSetupNotice
+					className={CHAT_COLUMN_CLASSNAME}
+					workspaceId={workspaceId}
+					onSetUp={insertSetupPrompt}
 				/>
 			)}
 			<AgentComposer

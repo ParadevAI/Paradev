@@ -402,7 +402,7 @@ export const cloudWorkspaceRouter = {
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
-				/** A size the organization offers (see `machineSizes`); omitted = its default. */
+				/** A size the organization offers (see `machineSizes`); omitted = the environment's size, else the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
 				/** The caller's own tags, as `setTags` files them. */
 				tags: workspaceTagsInputSchema.optional(),

@@ -978,6 +978,9 @@ msgstr "Хостів зі старішою службою хоста, ніж у 
 msgid "{count} selected"
 msgstr "Вибрано: {count}"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "Не можна зберегти змінні ({count}). Див. виділені рядки"
+
 msgid "{count}/day"
 msgstr "{count}/день"
 
@@ -1125,6 +1128,9 @@ msgstr "{lines, plural, one {# рядок} few {# рядки} many {# рядкі
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (цей пристрій)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (немає у вашому тарифі)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2103,6 +2109,9 @@ msgstr "додати агента"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "Перш ніж створювати хмарний робочий простір, додайте середовище в налаштуваннях"
 
+msgid "Add Another"
+msgstr "Додати ще"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Додайте ще один обліковий запис або від'єднайте той, яким більше не користуєтеся."
 
@@ -2129,6 +2138,9 @@ msgstr "Додати опис"
 
 msgid "Add description..."
 msgstr "Додайте опис..."
+
+msgid "Add Environment Variable"
+msgstr "Додати змінну середовища"
 
 msgid "Add extension"
 msgstr "Додати розширення"
@@ -2166,6 +2178,9 @@ msgstr "Додати ще…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Додайте агента з меню на бічній панелі, щоб почати."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "Додайте одну або кілька змінних середовища. Можна також перетягнути файл .env."
 
 msgid "Add people"
 msgstr "Додати людей"
@@ -2278,8 +2293,17 @@ msgstr "Додано {added}"
 msgid "Added {added} files to {where}"
 msgstr "У {where} додано файлів: {added}"
 
+msgid "Added {addedOn}"
+msgstr "Додано {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "Додано {bought} ГБ-год."
+
+msgid "Added {count} environment variables"
+msgstr "Додано змінних середовища: {count}"
+
+msgid "Added {key}"
+msgstr "{key} додано"
 
 msgid "Added 1 file to {where}"
 msgstr "У {where} додано 1 файл"
@@ -2774,6 +2798,9 @@ msgstr "Завжди знайте, якому агенту ви потрібні
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "Агент налаштує це середовище в хмарному робочому просторі (близько 20 хвилин або довше): встановить залежності, запише конфігурацію й попросить потрібні секрети. Його можна перервати будь-коли або продовжити роботу в робочому просторі й завершити налаштування самостійно."
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Агент пише цілі функції й файли, а людина стежить за кожним кроком і схвалює кожну команду. Один агент, одна людина. Швидше, але все ще послідовно."
@@ -4375,6 +4402,9 @@ msgstr "Контрольна точка · до рефакторингу під�
 msgid "Checkpoint saved {0}"
 msgstr "Контрольну точку збережено {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Контрольну точку збережено в {name}"
+
 msgid "Checks"
 msgstr "Перевірки"
 
@@ -4615,6 +4645,9 @@ msgstr "Натисніть тут, якщо переспрямування не 
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Натисніть «↑ update», щоб побачити підтвердження перед оновленням"
+
+msgid "Click to copy"
+msgstr "Натисніть, щоб скопіювати"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Натисніть, щоб скопіювати ID сеансу (відновлення: `claude --resume <id>`)."
@@ -5809,6 +5842,9 @@ msgstr "Не вдалося скопіювати посилання"
 
 msgid "Could not create cloud workspace"
 msgstr "Не вдалося створити хмарний робочий простір"
+
+msgid "Could not create environment"
+msgstr "Не вдалося створити середовище"
 
 msgid "Could not create project"
 msgstr "Не вдалося створити проєкт"
@@ -7401,6 +7437,9 @@ msgstr "Відкинути зміни?"
 msgid "Discard recording"
 msgstr "Відкинути запис"
 
+msgid "Discard unsaved changes?"
+msgstr "Скасувати незбережені зміни?"
+
 msgid "Discarded"
 msgstr "Відкинуто"
 
@@ -7806,6 +7845,9 @@ msgstr "Отримано: {name} ×{tier}"
 msgid "Edit"
 msgstr "Редагувати"
 
+msgid "Edit {selectedName}"
+msgstr "Редагувати {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "Змінити назву каналу"
 
@@ -7818,8 +7860,8 @@ msgstr "Редагувати опис"
 msgid "Edit Description"
 msgstr "Редагувати опис"
 
-msgid "Edit environment"
-msgstr "Редагувати середовище"
+msgid "Edit Environment Variable"
+msgstr "Редагувати змінну середовища"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Редагувати файли без запиту; питати перед командами"
@@ -8010,6 +8052,9 @@ msgstr "Введіть ціле число"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Введіть ціле число від {minHours} до {maxHours} ГБ-годин."
 
+msgid "Enter new value"
+msgstr "Введіть нове значення"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Введіть цей код, коли OpenAI попросить:"
 
@@ -8039,6 +8084,9 @@ msgstr "Налаштування середовища, нестабільні т
 
 msgid "Environment Variables"
 msgstr "Змінні середовища"
+
+msgid "Environment's size"
+msgstr "Розмір середовища"
 
 msgid "Environments"
 msgstr "Середовища"
@@ -8471,6 +8519,9 @@ msgstr "Не вдалося видалити обліковий запис"
 msgid "Failed to delete automation"
 msgstr "Не вдалося видалити автоматизацію"
 
+msgid "Failed to delete environment variable"
+msgstr "Не вдалося видалити змінну середовища"
+
 msgid "Failed to delete host"
 msgstr "Не вдалося видалити хост"
 
@@ -8589,6 +8640,9 @@ msgstr "Не вдалося надіслати відповідь"
 msgid "Failed to push branch"
 msgstr "Не вдалося запушити гілку"
 
+msgid "Failed to read file."
+msgstr "Не вдалося прочитати файл."
+
 msgid "Failed to record page version"
 msgstr "Не вдалося записати версію сторінки"
 
@@ -8682,6 +8736,9 @@ msgstr "Не вдалося виконати команду робочого п�
 msgid "Failed to save"
 msgstr "Не вдалося зберегти"
 
+msgid "Failed to save environment variables"
+msgstr "Не вдалося зберегти змінні середовища"
+
 msgid "Failed to save installation. Please try again."
 msgstr "Не вдалося зберегти встановлення. Спробуйте ще раз."
 
@@ -8747,6 +8804,9 @@ msgstr "Не вдалося оновити аватар"
 
 msgid "Failed to update branch prefix"
 msgstr "Не вдалося оновити префікс гілки"
+
+msgid "Failed to update environment variable"
+msgstr "Не вдалося оновити змінну середовища"
 
 msgid "Failed to update hooks"
 msgstr "Не вдалося оновити хуки"
@@ -8891,6 +8951,9 @@ msgstr "Режим відкриття файлів"
 
 msgid "File opens when the workspace wakes up"
 msgstr "Файл відкриється, коли робочий простір прокинеться"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "Файл завеликий. Максимальний розмір — 256 КБ."
 
 msgid "File viewer"
 msgstr "Переглядач файлів"
@@ -10189,6 +10252,9 @@ msgstr "Видає себе за іншу особу"
 msgid "Import"
 msgstr "Імпортувати"
 
+msgid "Import .env"
+msgstr "Імпортувати .env"
+
 msgid "import a folder"
 msgstr "імпортувати папку"
 
@@ -10930,6 +10996,9 @@ msgstr "Новий файл збережено, він змінився післ
 msgid "Kept the new folder because it is no longer empty"
 msgstr "Нову папку збережено, вона вже не порожня"
 
+msgid "Key"
+msgstr "Ключ"
+
 msgid "Key dates"
 msgstr "Ключові дати"
 
@@ -11073,6 +11142,9 @@ msgid "Last seen {lastSeen}"
 msgstr "Востаннє в мережі {lastSeen}"
 
 msgid "Last updated"
+msgstr "Останнє оновлення"
+
+msgid "Last Updated"
 msgstr "Останнє оновлення"
 
 msgid "Last updated on {date}"
@@ -11665,9 +11737,6 @@ msgstr "Ресурси машини"
 msgid "Machine size"
 msgstr "Розмір машини"
 
-msgid "Machine size: {label}"
-msgstr "Розмір машини: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Хмарні робочі простори без прив'язки до машини, які запускаються за секунди й якими можна ділитися з колегами."
 
@@ -11724,6 +11793,9 @@ msgstr "Керувати обліковими записами…"
 
 msgid "Manage billing"
 msgstr "Керувати оплатою"
+
+msgid "Manage environment"
+msgstr "Керувати середовищем"
 
 msgid "Manage environments"
 msgstr "Керувати середовищами"
@@ -12352,6 +12424,10 @@ msgstr "Таємничий верстатник"
 msgid "Name"
 msgstr "Назва"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "Назва"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Назва й slug для URL. Обидва можна змінити пізніше."
 
@@ -12702,6 +12778,9 @@ msgstr "Немає активних робочих просторів"
 msgid "No agent"
 msgstr "Без агента"
 
+msgid "No agent is available to set up the environment"
+msgstr "Немає агента, який може налаштувати середовище"
+
 msgid "No agent is configured on this host"
 msgstr "На цьому хості не налаштовано жодного агента"
 
@@ -12849,6 +12928,9 @@ msgstr "Завантажень ще немає"
 
 msgid "No emoji found"
 msgstr "Емодзі не знайдено"
+
+msgid "No environment variables yet"
+msgstr "Змінних середовища ще немає"
 
 msgid "No environments available"
 msgstr "Немає доступних середовищ"
@@ -13005,6 +13087,9 @@ msgstr "Немає відповідних пул-реквестів"
 
 msgid "No matching tasks"
 msgstr "Немає відповідних завдань"
+
+msgid "No matching variables"
+msgstr "Немає відповідних змінних"
 
 msgid "No MCP servers found"
 msgstr "MCP-серверів не знайдено"
@@ -13313,8 +13398,8 @@ msgstr "На цьому пристрої не знайдено проєктів 
 msgid "No v1 terminal scripts found."
 msgstr "Скриптів термінала v1 не знайдено."
 
-msgid "No variables set yet."
-msgstr "Змінних ще не задано."
+msgid "No valid environment variables found in file"
+msgstr "У файлі не знайдено коректних змінних середовища"
 
 msgid "No versions yet"
 msgstr "Версій ще немає"
@@ -13710,6 +13795,9 @@ msgstr "Один плагін. Кожен кодинг-агент."
 
 msgid "One step left"
 msgstr "Залишився один крок"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "Одну змінну не можна зберегти. Див. виділений рядок"
 
 msgid "online"
 msgstr "онлайн"
@@ -14366,6 +14454,9 @@ msgstr "Необов'язково. Допомагає нам зрозуміти,
 msgid "Options"
 msgstr "Параметри"
 
+msgid "or paste .env contents in Key input"
+msgstr "або вставте вміст .env у поле «Ключ»"
+
 msgid "Orange"
 msgstr "Помаранчевий"
 
@@ -14395,6 +14486,9 @@ msgstr "Організація {id}"
 
 msgid "Organization created successfully!"
 msgstr "Організацію успішно створено!"
+
+msgid "Organization default ({defaultName})"
+msgstr "Типове для організації ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Організацію видалено"
@@ -15056,8 +15150,8 @@ msgstr "Виберіть нову папку проєкту на {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Виберіть папку worktree проєкту на {hostName}."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "Виберіть репозиторії, які воно клонує. Агент на цьому комп'ютері з'ясує, що встановити, і запустить усе в хмарі."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "Виберіть репозиторії для завантаження. Агент у хмарному робочому просторі визначить, що встановити, і запустить середовище."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Виберіть папку worktree на {hostName}."
@@ -15160,6 +15254,9 @@ msgstr "Виберіть організацію"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Спробуйте ще раз або перезапустіть Paradev на тому пристрої."
+
+msgid "Please upload a valid .env file."
+msgstr "Завантажте коректний файл .env."
 
 msgid "Plugin"
 msgstr "Плагін"
@@ -17315,6 +17412,9 @@ msgstr "Зберегти"
 msgid "Save & create workspace"
 msgstr "Зберегти й створити робочий простір"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Зберегти контрольну точку в {name}?"
+
 msgid "Save All"
 msgstr "Зберегти все"
 
@@ -17326,6 +17426,9 @@ msgstr "Зберегти як подання"
 
 msgid "Save Changes"
 msgstr "Зберегти зміни"
+
+msgid "Save checkpoint"
+msgstr "Зберегти контрольну точку"
 
 msgid "Save edits"
 msgstr "Зберегти правки"
@@ -17367,8 +17470,20 @@ msgstr "Збережено"
 msgid "Saved \"{0}\" as an environment"
 msgstr "«{0}» збережено як середовище"
 
+msgid "Saved {name}"
+msgstr "{name} збережено"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name} збережено, але не вдалося запустити робочий простір для налаштування: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "Збережено в «Завантаження»"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Зберігає цей робочий простір у поточному стані з усім, що в ньому встановлено. Нові робочі простори з {name} починатимуться з цієї контрольної точки. Під час збереження робочий простір ненадовго зупиниться."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Збереження контрольної точки в {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
@@ -17804,9 +17919,6 @@ msgstr "Виберіть агента"
 msgid "Select an editor from the dropdown"
 msgstr "Виберіть редактор зі списку"
 
-msgid "Select an environment"
-msgstr "Виберіть середовище"
-
 msgid "Select an organization"
 msgstr "Виберіть організацію"
 
@@ -17987,6 +18099,12 @@ msgstr "Надсилання…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Надсилає агенту {2} контекст термінала: символів — {0}, токенів — приблизно {1}."
 
+msgid "Sensitive"
+msgstr "Конфіденційно"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "Конфіденційні значення шифруються, і після збереження їх не можна показати."
+
 msgid "Sent"
 msgstr "Надіслано"
 
@@ -18062,9 +18180,6 @@ msgstr "Сеанси"
 msgid "Sessions · top {0} by cost"
 msgstr "Сеанси · топ-{0} за вартістю"
 
-msgid "Set"
-msgstr "Задано"
-
 msgid "Set a notification schedule"
 msgstr "Задати розклад сповіщень"
 
@@ -18106,6 +18221,9 @@ msgstr "Налаштувати хост через SSH"
 
 msgid "Set up an automation"
 msgstr "Налаштуйте автоматизацію"
+
+msgid "Set up Environment"
+msgstr "Налаштувати середовище"
 
 msgid "Set up once"
 msgstr "Налаштуйте один раз"
@@ -18660,9 +18778,6 @@ msgstr "Шість рівнів автономності фабрики"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Шість рівнів автономності фабрики, пороги між ними та наш прогноз того, як далеко ми просунемося у 2026 році. Записуємо зараз, щоб пізніше ви могли нас оцінити."
 
-msgid "size"
-msgstr "Розмір"
-
 msgid "Size"
 msgstr "Розмір"
 
@@ -18686,6 +18801,9 @@ msgstr "Тон шкіри"
 
 msgid "Skip"
 msgstr "Пропустити"
+
+msgid "Skip & save"
+msgstr "Пропустити й зберегти"
 
 msgid "Skip All"
 msgstr "Пропустити все"
@@ -19086,6 +19204,9 @@ msgstr "Почати новий чат"
 
 msgid "Start a session"
 msgstr "Почати сеанс"
+
+msgid "Start agent"
+msgstr "Запустити агента"
 
 msgid "Start agents on events or a schedule"
 msgstr "Запускайте агентів за подіями або за розкладом"
@@ -21286,6 +21407,10 @@ msgstr "Дві руки"
 msgid "Type"
 msgstr "Тип"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "Тип"
+
 msgid "Type @linear in any prompt."
 msgstr "Введіть @linear у будь-якому промпті."
 
@@ -21659,6 +21784,9 @@ msgstr "Оновіть хост-службу на обох комп’ютера
 msgid "Update the host service on this device and try again."
 msgstr "Оновіть хост-службу на цьому пристрої та спробуйте ще раз."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "Оновіть значення <0>{key}</0>"
+
 msgid "Update this host to message subagents"
 msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам"
 
@@ -21674,6 +21802,9 @@ msgstr "Оновлено {0}"
 
 msgid "Updated {date}"
 msgstr "Оновлено {date}"
+
+msgid "Updated {key}"
+msgstr "{key} оновлено"
 
 msgid "Updated {updatedRelative}"
 msgstr "Оновлено {updatedRelative}"
@@ -21892,6 +22023,9 @@ msgstr "user@host, ssh://user@host:2222 або аліас із конфігур�
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId не відповідає проєкту робочого простору"
+
+msgid "Value"
+msgstr "Значення"
 
 msgid "Variables"
 msgstr "Змінні"
@@ -22885,6 +23019,9 @@ msgstr "У вас немає доступу до цього термінала."
 
 msgid "You don't have permission to remove this member"
 msgstr "У вас немає дозволу видалити цього учасника"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "У вас є незбережені змінні середовища. Справді закрити?"
 
 msgid "You install and connect once per account."
 msgstr "Встановлення й підключення виконуються один раз для кожного облікового запису."

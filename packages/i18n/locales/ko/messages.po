@@ -984,6 +984,9 @@ msgstr "{count}개의 호스트가 이 앱보다 오래된 호스트 서비스�
 msgid "{count} selected"
 msgstr "{count}개 선택됨"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "변수 {count}개를 저장할 수 없습니다. 강조 표시된 행을 확인하세요"
+
 msgid "{count}/day"
 msgstr "하루 {count}개"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, other {#줄}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (이 기기)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (요금제에 포함되지 않음)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "에이전트를 추가할"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "클라우드 워크스페이스를 만들기 전에 설정에서 환경을 추가하세요"
 
+msgid "Add Another"
+msgstr "하나 더 추가"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "다른 계정을 연결하거나 더 이상 쓰지 않는 계정을 해제하세요."
 
@@ -2135,6 +2144,9 @@ msgstr "설명 추가"
 
 msgid "Add description..."
 msgstr "설명 추가..."
+
+msgid "Add Environment Variable"
+msgstr "환경 변수 추가"
 
 msgid "Add extension"
 msgstr "확장 프로그램 추가"
@@ -2172,6 +2184,9 @@ msgstr "더 추가…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "사이드바 메뉴에서 하나 추가해 시작하세요."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "환경 변수를 하나 이상 추가하세요. .env 파일을 끌어다 놓을 수도 있습니다."
 
 msgid "Add people"
 msgstr "사람 추가"
@@ -2284,8 +2299,17 @@ msgstr "{added} 추가됨"
 msgid "Added {added} files to {where}"
 msgstr "{where}에 파일 {added}개를 추가했습니다"
 
+msgid "Added {addedOn}"
+msgstr "{addedOn}에 추가됨"
+
 msgid "Added {bought} GB-hours."
 msgstr "{bought} GB 시간을 추가했습니다."
+
+msgid "Added {count} environment variables"
+msgstr "환경 변수 {count}개 추가됨"
+
+msgid "Added {key}"
+msgstr "{key} 추가됨"
 
 msgid "Added 1 file to {where}"
 msgstr "{where}에 파일 1개를 추가했습니다"
@@ -2780,6 +2804,9 @@ msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습�
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "에이전트가 클라우드 워크스페이스에서 이 환경을 설정합니다(약 20분 이상). 의존성을 설치하고 설정 구성을 작성하며 필요한 시크릿을 요청합니다. 언제든 중단하거나 워크스페이스에서 직접 이어받아 설정을 마칠 수 있습니다."
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "에이전트가 함수와 파일 전체를 작성하는 동안 사람이 모든 단계를 지켜보고 모든 명령을 승인합니다. 에이전트 하나에 사람 하나. 더 빠르지만 여전히 순차적입니다."
@@ -4381,6 +4408,9 @@ msgstr "체크포인트 · 툴팁 리팩터링 전"
 msgid "Checkpoint saved {0}"
 msgstr "체크포인트 저장됨 {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "{name}에 체크포인트를 저장했습니다"
+
 msgid "Checks"
 msgstr "검사"
 
@@ -4621,6 +4651,9 @@ msgstr "이동하지 않으면 여기를 클릭하세요"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "“↑ update” 버튼을 클릭하면 업데이트 전 확인 창이 표시됩니다"
+
+msgid "Click to copy"
+msgstr "클릭하여 복사"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "클릭하면 세션 ID를 복사합니다(`claude --resume <id>`로 이어서 진행)."
@@ -5815,6 +5848,9 @@ msgstr "링크를 복사할 수 없습니다"
 
 msgid "Could not create cloud workspace"
 msgstr "클라우드 워크스페이스를 만들 수 없습니다"
+
+msgid "Could not create environment"
+msgstr "환경을 만들 수 없습니다"
 
 msgid "Could not create project"
 msgstr "프로젝트를 만들 수 없습니다"
@@ -7407,6 +7443,9 @@ msgstr "변경 사항을 버릴까요?"
 msgid "Discard recording"
 msgstr "녹음 버리기"
 
+msgid "Discard unsaved changes?"
+msgstr "저장하지 않은 변경 사항을 버릴까요?"
+
 msgid "Discarded"
 msgstr "버렸습니다"
 
@@ -7812,6 +7851,9 @@ msgstr "{name} ×{tier} 획득"
 msgid "Edit"
 msgstr "편집"
 
+msgid "Edit {selectedName}"
+msgstr "{selectedName} 편집"
+
 msgid "Edit Channel Name"
 msgstr "채널 이름 편집"
 
@@ -7824,8 +7866,8 @@ msgstr "설명 편집"
 msgid "Edit Description"
 msgstr "설명 편집"
 
-msgid "Edit environment"
-msgstr "환경 편집"
+msgid "Edit Environment Variable"
+msgstr "환경 변수 편집"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "파일은 묻지 않고 편집하고 명령 전에는 확인"
@@ -8016,6 +8058,9 @@ msgstr "정수 입력"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "{minHours}에서 {maxHours} GB 시간 사이의 정수를 입력하세요."
 
+msgid "Enter new value"
+msgstr "새 값 입력"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI가 요청하면 이 코드를 입력하세요:"
 
@@ -8045,6 +8090,9 @@ msgstr "환경 설정, 불안정한 테스트, 자격 증명 연결처럼 2025�
 
 msgid "Environment Variables"
 msgstr "환경 변수"
+
+msgid "Environment's size"
+msgstr "환경 크기"
 
 msgid "Environments"
 msgstr "환경"
@@ -8477,6 +8525,9 @@ msgstr "계정을 삭제하지 못했습니다"
 msgid "Failed to delete automation"
 msgstr "자동화를 삭제하지 못했습니다"
 
+msgid "Failed to delete environment variable"
+msgstr "환경 변수를 삭제하지 못했습니다"
+
 msgid "Failed to delete host"
 msgstr "호스트를 삭제하지 못했습니다"
 
@@ -8595,6 +8646,9 @@ msgstr "답글을 게시하지 못했습니다"
 msgid "Failed to push branch"
 msgstr "브랜치를 푸시하지 못했습니다"
 
+msgid "Failed to read file."
+msgstr "파일을 읽지 못했습니다."
+
 msgid "Failed to record page version"
 msgstr "페이지 버전을 기록하지 못했습니다"
 
@@ -8688,6 +8742,9 @@ msgstr "워크스페이스 명령을 실행하지 못했습니다"
 msgid "Failed to save"
 msgstr "저장하지 못했습니다"
 
+msgid "Failed to save environment variables"
+msgstr "환경 변수를 저장하지 못했습니다"
+
 msgid "Failed to save installation. Please try again."
 msgstr "설치를 저장하지 못했습니다. 다시 시도해 주세요."
 
@@ -8753,6 +8810,9 @@ msgstr "아바타를 업데이트하지 못했습니다"
 
 msgid "Failed to update branch prefix"
 msgstr "브랜치 접두사를 업데이트하지 못했습니다"
+
+msgid "Failed to update environment variable"
+msgstr "환경 변수를 업데이트하지 못했습니다"
 
 msgid "Failed to update hooks"
 msgstr "훅을 업데이트하지 못했습니다"
@@ -8897,6 +8957,9 @@ msgstr "파일 열기 방식"
 
 msgid "File opens when the workspace wakes up"
 msgstr "워크스페이스가 깨어나면 파일을 엽니다"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "파일이 너무 큽니다. 최대 크기는 256KB입니다."
 
 msgid "File viewer"
 msgstr "파일 뷰어"
@@ -10195,6 +10258,9 @@ msgstr "타인 사칭"
 msgid "Import"
 msgstr "가져오기"
 
+msgid "Import .env"
+msgstr ".env 가져오기"
+
 msgid "import a folder"
 msgstr "폴더를 가져올"
 
@@ -10936,6 +11002,9 @@ msgstr "새 파일을 유지했습니다, 생성 후 내용이 바뀌었습니�
 msgid "Kept the new folder because it is no longer empty"
 msgstr "새 폴더를 유지했습니다, 더 이상 비어 있지 않습니다"
 
+msgid "Key"
+msgstr "키"
+
 msgid "Key dates"
 msgstr "주요 일정"
 
@@ -11080,6 +11149,9 @@ msgstr "마지막 확인: {lastSeen}"
 
 msgid "Last updated"
 msgstr "최종 업데이트"
+
+msgid "Last Updated"
+msgstr "마지막 업데이트"
 
 msgid "Last updated on {date}"
 msgstr "마지막 업데이트: {date}"
@@ -11671,9 +11743,6 @@ msgstr "머신 리소스"
 msgid "Machine size"
 msgstr "머신 크기"
 
-msgid "Machine size: {label}"
-msgstr "머신 크기: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "머신에 묶이지 않는 클라우드 워크스페이스를 몇 초 만에 띄우고 팀원과 공유할 수 있습니다."
 
@@ -11730,6 +11799,9 @@ msgstr "계정 관리…"
 
 msgid "Manage billing"
 msgstr "결제 관리"
+
+msgid "Manage environment"
+msgstr "환경 관리"
 
 msgid "Manage environments"
 msgstr "환경 관리"
@@ -12358,6 +12430,10 @@ msgstr "수수께끼의 기계공"
 msgid "Name"
 msgstr "이름"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "이름"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "이름과 URL에 쓰기 좋은 슬러그를 정하세요. 둘 다 나중에 바꿀 수 있습니다."
 
@@ -12708,6 +12784,9 @@ msgstr "활성 워크스페이스 없음"
 msgid "No agent"
 msgstr "에이전트 없음"
 
+msgid "No agent is available to set up the environment"
+msgstr "환경을 설정할 수 있는 에이전트가 없습니다"
+
 msgid "No agent is configured on this host"
 msgstr "이 호스트에 구성된 에이전트가 없습니다"
 
@@ -12855,6 +12934,9 @@ msgstr "아직 다운로드가 없습니다"
 
 msgid "No emoji found"
 msgstr "이모지를 찾을 수 없음"
+
+msgid "No environment variables yet"
+msgstr "아직 환경 변수가 없습니다"
 
 msgid "No environments available"
 msgstr "사용 가능한 환경 없음"
@@ -13011,6 +13093,9 @@ msgstr "일치하는 풀 리퀘스트가 없습니다"
 
 msgid "No matching tasks"
 msgstr "일치하는 작업이 없습니다"
+
+msgid "No matching variables"
+msgstr "일치하는 변수가 없습니다"
 
 msgid "No MCP servers found"
 msgstr "MCP 서버를 찾을 수 없음"
@@ -13319,8 +13404,8 @@ msgstr "이 기기에서 v1 프로젝트를 찾을 수 없습니다."
 msgid "No v1 terminal scripts found."
 msgstr "v1 터미널 스크립트를 찾을 수 없습니다."
 
-msgid "No variables set yet."
-msgstr "아직 설정된 변수가 없습니다."
+msgid "No valid environment variables found in file"
+msgstr "파일에서 유효한 환경 변수를 찾지 못했습니다"
 
 msgid "No versions yet"
 msgstr "아직 버전이 없습니다"
@@ -13716,6 +13801,9 @@ msgstr "하나의 플러그인. 모든 코딩 에이전트."
 
 msgid "One step left"
 msgstr "한 단계 남았습니다"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "변수 하나를 저장할 수 없습니다. 강조 표시된 행을 확인하세요"
 
 msgid "online"
 msgstr "온라인"
@@ -14372,6 +14460,9 @@ msgstr "선택 사항입니다. 무엇이 효과적인지 파악하는 데 도�
 msgid "Options"
 msgstr "옵션"
 
+msgid "or paste .env contents in Key input"
+msgstr "또는 .env 내용을 키 입력란에 붙여 넣기"
+
 msgid "Orange"
 msgstr "주황"
 
@@ -14401,6 +14492,9 @@ msgstr "조직 {id}"
 
 msgid "Organization created successfully!"
 msgstr "조직을 만들었습니다!"
+
+msgid "Organization default ({defaultName})"
+msgstr "조직 기본값 ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "조직을 삭제했습니다"
@@ -15062,8 +15156,8 @@ msgstr "{hostName}에서 새 프로젝트 폴더를 선택하세요."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "{hostName}에서 프로젝트 worktree 폴더를 선택하세요."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "체크아웃할 리포지토리를 고르세요. 이 컴퓨터의 에이전트가 무엇을 설치할지 파악해 클라우드에서 실행되게 합니다."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "체크아웃할 저장소를 선택하세요. 클라우드 워크스페이스의 에이전트가 설치할 항목을 파악하고 실행되도록 합니다."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}에서 worktree 폴더를 선택하세요."
@@ -15166,6 +15260,9 @@ msgstr "조직을 선택해 주세요"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "다시 시도하거나 해당 기기에서 Paradev를 다시 시작해 주세요."
+
+msgid "Please upload a valid .env file."
+msgstr "유효한 .env 파일을 업로드하세요."
 
 msgid "Plugin"
 msgstr "플러그인"
@@ -17321,6 +17418,9 @@ msgstr "저장"
 msgid "Save & create workspace"
 msgstr "저장 후 워크스페이스 만들기"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "{name}에 체크포인트를 저장할까요?"
+
 msgid "Save All"
 msgstr "모두 저장"
 
@@ -17332,6 +17432,9 @@ msgstr "뷰로 저장"
 
 msgid "Save Changes"
 msgstr "변경사항 저장"
+
+msgid "Save checkpoint"
+msgstr "체크포인트 저장"
 
 msgid "Save edits"
 msgstr "편집 저장"
@@ -17373,8 +17476,20 @@ msgstr "저장됨"
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\"을(를) 환경으로 저장했습니다"
 
+msgid "Saved {name}"
+msgstr "{name} 저장됨"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name}을(를) 저장했지만 설정용 워크스페이스를 시작할 수 없습니다: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "다운로드 폴더에 저장했습니다"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "설치된 모든 것을 포함해 이 워크스페이스의 현재 상태를 저장합니다. {name}에서 만드는 새 워크스페이스는 이 체크포인트에서 시작합니다. 저장하는 동안 워크스페이스가 잠시 멈춥니다."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "{name}에 체크포인트 저장 중..."
 
 msgid "Saving as an environment..."
 msgstr "환경으로 저장하는 중..."
@@ -17810,9 +17925,6 @@ msgstr "에이전트 선택"
 msgid "Select an editor from the dropdown"
 msgstr "드롭다운에서 편집기를 선택하세요"
 
-msgid "Select an environment"
-msgstr "환경을 선택하세요"
-
 msgid "Select an organization"
 msgstr "조직을 선택하세요"
 
@@ -17993,6 +18105,12 @@ msgstr "보내는 중…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "터미널 컨텍스트 {0}자(약 {1} 토큰)를 {2}에 보냅니다."
 
+msgid "Sensitive"
+msgstr "민감"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "민감한 값은 암호화되며 저장 후에는 표시할 수 없습니다."
+
 msgid "Sent"
 msgstr "보낸 날짜"
 
@@ -18068,9 +18186,6 @@ msgstr "세션"
 msgid "Sessions · top {0} by cost"
 msgstr "세션 · 비용 상위 {0}개"
 
-msgid "Set"
-msgstr "설정됨"
-
 msgid "Set a notification schedule"
 msgstr "알림 일정 설정"
 
@@ -18112,6 +18227,9 @@ msgstr "SSH로 호스트 설정"
 
 msgid "Set up an automation"
 msgstr "자동화 설정하기"
+
+msgid "Set up Environment"
+msgstr "환경 설정"
 
 msgid "Set up once"
 msgstr "한 번만 설정"
@@ -18666,9 +18784,6 @@ msgstr "공장 자율성의 여섯 단계"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "공장 자율성의 여섯 단계, 그 사이의 관문, 그리고 2026년에 어디까지 갈지에 대한 전망입니다. 나중에 채점할 수 있도록 지금 적어 둡니다."
 
-msgid "size"
-msgstr "크기"
-
 msgid "Size"
 msgstr "크기"
 
@@ -18692,6 +18807,9 @@ msgstr "피부색"
 
 msgid "Skip"
 msgstr "건너뛰기"
+
+msgid "Skip & save"
+msgstr "건너뛰고 저장"
 
 msgid "Skip All"
 msgstr "모두 건너뛰기"
@@ -19092,6 +19210,9 @@ msgstr "새 채팅 시작"
 
 msgid "Start a session"
 msgstr "세션 시작"
+
+msgid "Start agent"
+msgstr "에이전트 시작"
 
 msgid "Start agents on events or a schedule"
 msgstr "이벤트나 일정으로 에이전트 시작"
@@ -21292,6 +21413,10 @@ msgstr "양손"
 msgid "Type"
 msgstr "타입"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "유형"
+
 msgid "Type @linear in any prompt."
 msgstr "어떤 프롬프트에서든 @linear를 입력하세요."
 
@@ -21665,6 +21790,9 @@ msgstr "두 컴퓨터의 호스트 서비스를 업데이트한 후 다시 시�
 msgid "Update the host service on this device and try again."
 msgstr "이 기기의 호스트 서비스를 업데이트한 후 다시 시도하세요."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "<0>{key}</0>의 값 업데이트"
+
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
 
@@ -21680,6 +21808,9 @@ msgstr "{0} 업데이트됨"
 
 msgid "Updated {date}"
 msgstr "{date} 업데이트"
+
+msgid "Updated {key}"
+msgstr "{key} 업데이트됨"
 
 msgid "Updated {updatedRelative}"
 msgstr "{updatedRelative} 업데이트됨"
@@ -21898,6 +22029,9 @@ msgstr "user@host, ssh://user@host:2222 또는 ssh 설정 별칭"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId가 워크스페이스의 프로젝트와 일치하지 않습니다"
+
+msgid "Value"
+msgstr "값"
 
 msgid "Variables"
 msgstr "변수"
@@ -22891,6 +23025,9 @@ msgstr "이 터미널에 접근할 권한이 없습니다."
 
 msgid "You don't have permission to remove this member"
 msgstr "이 멤버를 제거할 권한이 없습니다"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "저장하지 않은 환경 변수가 있습니다. 정말 닫을까요?"
 
 msgid "You install and connect once per account."
 msgstr "설치와 연결은 계정당 한 번만 하면 됩니다."

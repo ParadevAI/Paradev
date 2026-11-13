@@ -984,6 +984,9 @@ msgstr "{count} hosts draaien een oudere hostservice dan deze app"
 msgid "{count} selected"
 msgstr "{count} geselecteerd"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "{count} variabelen kunnen niet worden opgeslagen. Zie de gemarkeerde rijen"
+
 msgid "{count}/day"
 msgstr "{count}/dag"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, one {# regel} other {# regels}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (dit apparaat)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (niet in je abonnement)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "een agent toevoegen"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "Voeg een omgeving toe in Instellingen voordat je een cloudwerkruimte aanmaakt"
 
+msgid "Add Another"
+msgstr "Nog een toevoegen"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Verbind nog een account, of verbreek er een die je niet meer gebruikt."
 
@@ -2135,6 +2144,9 @@ msgstr "Beschrijving toevoegen"
 
 msgid "Add description..."
 msgstr "Beschrijving toevoegen..."
+
+msgid "Add Environment Variable"
+msgstr "Omgevingsvariabele toevoegen"
 
 msgid "Add extension"
 msgstr "Extensie toevoegen"
@@ -2172,6 +2184,9 @@ msgstr "Meer toevoegen…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Voeg er een toe via het menu in de zijbalk om te beginnen."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "Voeg een of meer omgevingsvariabelen toe. Je kunt ook een .env-bestand hierheen slepen."
 
 msgid "Add people"
 msgstr "Personen toevoegen"
@@ -2284,8 +2299,17 @@ msgstr "{added} toegevoegd"
 msgid "Added {added} files to {where}"
 msgstr "{added} bestanden toegevoegd aan {where}"
 
+msgid "Added {addedOn}"
+msgstr "Toegevoegd op {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "{bought} GB-uren toegevoegd."
+
+msgid "Added {count} environment variables"
+msgstr "{count} omgevingsvariabelen toegevoegd"
+
+msgid "Added {key}"
+msgstr "{key} toegevoegd"
 
 msgid "Added 1 file to {where}"
 msgstr "1 bestand toegevoegd aan {where}"
@@ -2780,6 +2804,9 @@ msgstr "Weet altijd welke agent jou nodig heeft, met meldingen die rechtstreeks 
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Een agent voltooit wijzigingen over meerdere bestanden van begin tot eind."
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "Een agent richt deze omgeving in een cloudworkspace in (ongeveer 20 minuten of langer): hij installeert afhankelijkheden, schrijft de setupconfiguratie en vraagt om benodigde secrets. Onderbreek hem op elk moment, of neem het over in de workspace om de installatie zelf af te ronden."
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Een agent schrijft hele functies en bestanden terwijl een mens elke stap volgt en elk commando goedkeurt. Eén agent, één mens. Sneller, maar nog steeds serieel."
@@ -4381,6 +4408,9 @@ msgstr "Checkpoint · voor de tooltip-refactor"
 msgid "Checkpoint saved {0}"
 msgstr "Checkpoint opgeslagen {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Checkpoint opgeslagen in {name}"
+
 msgid "Checks"
 msgstr "Checks"
 
@@ -4621,6 +4651,9 @@ msgstr "Klik hier als je niet wordt doorgestuurd"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik op ‘↑ update’ om de bevestiging vóór de update te bekijken"
+
+msgid "Click to copy"
+msgstr "Klik om te kopiëren"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik om de sessie-ID te kopiëren (hervatten met `claude --resume <id>`)."
@@ -5815,6 +5848,9 @@ msgstr "Kan de link niet kopiëren"
 
 msgid "Could not create cloud workspace"
 msgstr "Kan cloudwerkruimte niet aanmaken"
+
+msgid "Could not create environment"
+msgstr "Kan omgeving niet maken"
 
 msgid "Could not create project"
 msgstr "Kan project niet aanmaken"
@@ -7407,6 +7443,9 @@ msgstr "Wijzigingen verwerpen?"
 msgid "Discard recording"
 msgstr "Opname verwerpen"
 
+msgid "Discard unsaved changes?"
+msgstr "Niet-opgeslagen wijzigingen verwijderen?"
+
 msgid "Discarded"
 msgstr "Verworpen"
 
@@ -7812,6 +7851,9 @@ msgstr "{name} ×{tier} behaald"
 msgid "Edit"
 msgstr "Bewerken"
 
+msgid "Edit {selectedName}"
+msgstr "{selectedName} bewerken"
+
 msgid "Edit Channel Name"
 msgstr "Kanaalnaam bewerken"
 
@@ -7824,8 +7866,8 @@ msgstr "Beschrijving bewerken"
 msgid "Edit Description"
 msgstr "Beschrijving bewerken"
 
-msgid "Edit environment"
-msgstr "Omgeving bewerken"
+msgid "Edit Environment Variable"
+msgstr "Omgevingsvariabele bewerken"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Bestanden bewerken zonder te vragen; vragen vóór commando's"
@@ -8016,6 +8058,9 @@ msgstr "Voer een geheel getal in"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Voer een heel getal in van {minHours} tot {maxHours} GB-uren."
 
+msgid "Enter new value"
+msgstr "Nieuwe waarde invoeren"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Voer deze code in wanneer OpenAI erom vraagt:"
 
@@ -8045,6 +8090,9 @@ msgstr "Omgevingsopzet, flaky tests en credential-geknutsel — de saaie faalvor
 
 msgid "Environment Variables"
 msgstr "Omgevingsvariabelen"
+
+msgid "Environment's size"
+msgstr "Grootte van de omgeving"
 
 msgid "Environments"
 msgstr "Omgevingen"
@@ -8477,6 +8525,9 @@ msgstr "Verwijderen van account mislukt"
 msgid "Failed to delete automation"
 msgstr "Automatisering verwijderen mislukt"
 
+msgid "Failed to delete environment variable"
+msgstr "Kan omgevingsvariabele niet verwijderen"
+
 msgid "Failed to delete host"
 msgstr "Host verwijderen mislukt"
 
@@ -8595,6 +8646,9 @@ msgstr "Antwoord plaatsen mislukt"
 msgid "Failed to push branch"
 msgstr "Pushen van branch mislukt"
 
+msgid "Failed to read file."
+msgstr "Kan bestand niet lezen."
+
 msgid "Failed to record page version"
 msgstr "Vastleggen van paginaversie mislukt"
 
@@ -8688,6 +8742,9 @@ msgstr "Uitvoeren van werkruimtecommando mislukt"
 msgid "Failed to save"
 msgstr "Opslaan mislukt"
 
+msgid "Failed to save environment variables"
+msgstr "Kan omgevingsvariabelen niet opslaan"
+
 msgid "Failed to save installation. Please try again."
 msgstr "Opslaan van de installatie mislukt. Probeer het opnieuw."
 
@@ -8753,6 +8810,9 @@ msgstr "Bijwerken van avatar mislukt"
 
 msgid "Failed to update branch prefix"
 msgstr "Bijwerken van branchprefix mislukt"
+
+msgid "Failed to update environment variable"
+msgstr "Kan omgevingsvariabele niet bijwerken"
 
 msgid "Failed to update hooks"
 msgstr "Bijwerken van hooks mislukt"
@@ -8897,6 +8957,9 @@ msgstr "Openmodus voor bestanden"
 
 msgid "File opens when the workspace wakes up"
 msgstr "Bestand opent zodra de werkruimte gewekt is"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "Bestand te groot. Maximaal 256 KB."
 
 msgid "File viewer"
 msgstr "Bestandsviewer"
@@ -10195,6 +10258,9 @@ msgstr "Doet zich voor als iemand anders"
 msgid "Import"
 msgstr "Importeren"
 
+msgid "Import .env"
+msgstr ".env importeren"
+
 msgid "import a folder"
 msgstr "een map importeren"
 
@@ -10936,6 +11002,9 @@ msgstr "Nieuw bestand behouden, het is na het aanmaken gewijzigd"
 msgid "Kept the new folder because it is no longer empty"
 msgstr "Nieuwe map behouden, die is niet meer leeg"
 
+msgid "Key"
+msgstr "Sleutel"
+
 msgid "Key dates"
 msgstr "Belangrijke datums"
 
@@ -11079,6 +11148,9 @@ msgid "Last seen {lastSeen}"
 msgstr "Laatst gezien: {lastSeen}"
 
 msgid "Last updated"
+msgstr "Laatst bijgewerkt"
+
+msgid "Last Updated"
 msgstr "Laatst bijgewerkt"
 
 msgid "Last updated on {date}"
@@ -11671,9 +11743,6 @@ msgstr "Machineresources"
 msgid "Machine size"
 msgstr "Machinegrootte"
 
-msgid "Machine size: {label}"
-msgstr "Machinegrootte: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Machine-onafhankelijke cloudwerkruimtes die in seconden opstarten en met teamgenoten te delen zijn."
 
@@ -11730,6 +11799,9 @@ msgstr "Accounts beheren…"
 
 msgid "Manage billing"
 msgstr "Facturering beheren"
+
+msgid "Manage environment"
+msgstr "Omgeving beheren"
 
 msgid "Manage environments"
 msgstr "Omgevingen beheren"
@@ -12358,6 +12430,10 @@ msgstr "Mysterieuze Machinist"
 msgid "Name"
 msgstr "Naam"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "Naam"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Een naam en een URL-vriendelijke slug. Beide zijn later te wijzigen."
 
@@ -12708,6 +12784,9 @@ msgstr "Geen actieve werkruimtes"
 msgid "No agent"
 msgstr "Geen agent"
 
+msgid "No agent is available to set up the environment"
+msgstr "Er is geen agent beschikbaar om de omgeving in te richten"
+
 msgid "No agent is configured on this host"
 msgstr "Er is geen agent geconfigureerd op deze host"
 
@@ -12855,6 +12934,9 @@ msgstr "Nog geen downloads"
 
 msgid "No emoji found"
 msgstr "Geen emoji gevonden"
+
+msgid "No environment variables yet"
+msgstr "Nog geen omgevingsvariabelen"
 
 msgid "No environments available"
 msgstr "Geen omgevingen beschikbaar"
@@ -13011,6 +13093,9 @@ msgstr "Geen overeenkomende pull requests"
 
 msgid "No matching tasks"
 msgstr "Geen overeenkomende taken"
+
+msgid "No matching variables"
+msgstr "Geen overeenkomende variabelen"
 
 msgid "No MCP servers found"
 msgstr "Geen MCP-servers gevonden"
@@ -13319,8 +13404,8 @@ msgstr "Geen v1-projecten op dit apparaat gevonden."
 msgid "No v1 terminal scripts found."
 msgstr "Geen v1-terminalscripts gevonden."
 
-msgid "No variables set yet."
-msgstr "Nog geen variabelen ingesteld."
+msgid "No valid environment variables found in file"
+msgstr "Geen geldige omgevingsvariabelen gevonden in bestand"
 
 msgid "No versions yet"
 msgstr "Nog geen versies"
@@ -13716,6 +13801,9 @@ msgstr "Eén plugin. Elke coding-agent."
 
 msgid "One step left"
 msgstr "Nog één stap"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "Eén variabele kan niet worden opgeslagen. Zie de gemarkeerde rij"
 
 msgid "online"
 msgstr "online"
@@ -14372,6 +14460,9 @@ msgstr "Optioneel. Helpt ons te zien wat werkt."
 msgid "Options"
 msgstr "Opties"
 
+msgid "or paste .env contents in Key input"
+msgstr "of plak de inhoud van een .env in het veld Sleutel"
+
 msgid "Orange"
 msgstr "Oranje"
 
@@ -14401,6 +14492,9 @@ msgstr "Organisatie {id}"
 
 msgid "Organization created successfully!"
 msgstr "Organisatie aangemaakt!"
+
+msgid "Organization default ({defaultName})"
+msgstr "Standaard van de organisatie ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organisatie verwijderd"
@@ -15062,8 +15156,8 @@ msgstr "Kies de nieuwe projectmap op {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Kies de worktree-map van het project op {hostName}."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "Kies de repositories die ze ophaalt. Een agent op deze machine zoekt uit wat er geïnstalleerd moet worden en laat het in de cloud draaien."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "Kies de repositories die worden uitgecheckt. Een agent in een cloudworkspace zoekt uit wat er geïnstalleerd moet worden en zorgt dat het draait."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Kies de worktree-map op {hostName}."
@@ -15166,6 +15260,9 @@ msgstr "Kies een organisatie"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Probeer het opnieuw of herstart Paradev op dat apparaat."
+
+msgid "Please upload a valid .env file."
+msgstr "Upload een geldig .env-bestand."
 
 msgid "Plugin"
 msgstr "Plugin"
@@ -17321,6 +17418,9 @@ msgstr "Opslaan"
 msgid "Save & create workspace"
 msgstr "Opslaan en werkruimte aanmaken"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Checkpoint opslaan in {name}?"
+
 msgid "Save All"
 msgstr "Alles opslaan"
 
@@ -17332,6 +17432,9 @@ msgstr "Opslaan als weergave"
 
 msgid "Save Changes"
 msgstr "Wijzigingen opslaan"
+
+msgid "Save checkpoint"
+msgstr "Checkpoint opslaan"
 
 msgid "Save edits"
 msgstr "Bewerkingen opslaan"
@@ -17373,8 +17476,20 @@ msgstr "Opgeslagen"
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" opgeslagen als omgeving"
 
+msgid "Saved {name}"
+msgstr "{name} opgeslagen"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name} opgeslagen, maar de setup-workspace kon niet starten: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "Opgeslagen in Downloads"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Slaat deze workspace op zoals hij nu is, met alles wat erin is geïnstalleerd. Nieuwe workspaces uit {name} starten vanaf dit checkpoint. De workspace stopt even tijdens het opslaan."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Checkpoint opslaan in {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Opslaan als omgeving..."
@@ -17810,9 +17925,6 @@ msgstr "Kies een agent"
 msgid "Select an editor from the dropdown"
 msgstr "Kies een editor in het dropdownmenu"
 
-msgid "Select an environment"
-msgstr "Selecteer een omgeving"
-
 msgid "Select an organization"
 msgstr "Kies een organisatie"
 
@@ -17993,6 +18105,12 @@ msgstr "Versturen…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Stuurt {0} tekens terminalcontext (ongeveer {1} tokens) naar {2}."
 
+msgid "Sensitive"
+msgstr "Gevoelig"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "Gevoelige waarden worden versleuteld en kunnen na het opslaan niet meer worden getoond."
+
 msgid "Sent"
 msgstr "Verstuurd"
 
@@ -18068,9 +18186,6 @@ msgstr "Sessies"
 msgid "Sessions · top {0} by cost"
 msgstr "Sessies · top {0} op kosten"
 
-msgid "Set"
-msgstr "Ingesteld"
-
 msgid "Set a notification schedule"
 msgstr "Meldingsschema instellen"
 
@@ -18112,6 +18227,9 @@ msgstr "Host instellen via SSH"
 
 msgid "Set up an automation"
 msgstr "Stel een automatisering in"
+
+msgid "Set up Environment"
+msgstr "Omgeving instellen"
 
 msgid "Set up once"
 msgstr "Eén keer instellen"
@@ -18666,9 +18784,6 @@ msgstr "Zes niveaus van fabrieksautonomie"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Zes niveaus van fabrieksautonomie, de drempels ertussen, en onze voorspelling van hoe ver 2026 ons brengt. Nu opgeschreven zodat je ons later kunt beoordelen."
 
-msgid "size"
-msgstr "Grootte"
-
 msgid "Size"
 msgstr "Grootte"
 
@@ -18692,6 +18807,9 @@ msgstr "Huidskleur"
 
 msgid "Skip"
 msgstr "Overslaan"
+
+msgid "Skip & save"
+msgstr "Overslaan en opslaan"
 
 msgid "Skip All"
 msgstr "Alles overslaan"
@@ -19092,6 +19210,9 @@ msgstr "Nieuwe chat starten"
 
 msgid "Start a session"
 msgstr "Sessie starten"
+
+msgid "Start agent"
+msgstr "Agent starten"
 
 msgid "Start agents on events or a schedule"
 msgstr "Start agents bij gebeurtenissen of volgens schema"
@@ -21292,6 +21413,10 @@ msgstr "Twee handen"
 msgid "Type"
 msgstr "Type"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "Type"
+
 msgid "Type @linear in any prompt."
 msgstr "Typ @linear in elke prompt."
 
@@ -21665,6 +21790,9 @@ msgstr "Werk de hostservice op beide computers bij en probeer het opnieuw."
 msgid "Update the host service on this device and try again."
 msgstr "Werk de hostservice op dit apparaat bij en probeer het opnieuw."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "Werk de waarde van <0>{key}</0> bij"
+
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
 
@@ -21680,6 +21808,9 @@ msgstr "Bijgewerkt {0}"
 
 msgid "Updated {date}"
 msgstr "Bijgewerkt {date}"
+
+msgid "Updated {key}"
+msgstr "{key} bijgewerkt"
 
 msgid "Updated {updatedRelative}"
 msgstr "Bijgewerkt {updatedRelative}"
@@ -21898,6 +22029,9 @@ msgstr "gebruiker@host, ssh://gebruiker@host:2222 of een alias uit je ssh-config
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId komt niet overeen met het project van de werkruimte"
+
+msgid "Value"
+msgstr "Waarde"
 
 msgid "Variables"
 msgstr "Variabelen"
@@ -22891,6 +23025,9 @@ msgstr "Je hebt geen toegang tot deze terminal."
 
 msgid "You don't have permission to remove this member"
 msgstr "Je hebt geen rechten om dit lid te verwijderen"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "Je hebt niet-opgeslagen omgevingsvariabelen. Weet je zeker dat je wilt sluiten?"
 
 msgid "You install and connect once per account."
 msgstr "Je installeert en verbindt één keer per account."
