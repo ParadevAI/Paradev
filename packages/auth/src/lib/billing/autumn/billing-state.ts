@@ -3,6 +3,7 @@ import {
 	type MachineSize,
 	PLAN_METADATA,
 	type PlanTier,
+	seatLimitFrom,
 } from "@superset/shared/billing";
 import { type CloudUsage, cloudUsageFromBalances } from "./cloud-usage";
 import type { getAutumnCustomer } from "./customer";
@@ -44,6 +45,7 @@ export interface OrganizationBilling {
 	planTier: string;
 	gatedMachineSizes: MachineSize[];
 	environmentLimit: EnvironmentLimit;
+	seatLimit: number | null;
 }
 
 type AutumnCustomer = Awaited<ReturnType<typeof getAutumnCustomer>>;
@@ -67,7 +69,7 @@ export function billingFromCustomer(
 	customer: Pick<
 		AutumnCustomer,
 		"flags" | "subscriptions" | "invoices" | "balances" | "billingControls"
-	>,
+	> & { metadata?: Record<string, unknown> | null },
 	now: number,
 	seatInterval: string | null = null,
 ): OrganizationBilling {
@@ -145,5 +147,8 @@ export function billingFromCustomer(
 		environmentLimit:
 			environmentLimitFromBalances(customer.balances) ??
 			(tier === "free" ? 0 : null),
+		seatLimit: paid
+			? (seatLimitFrom(customer.metadata) ?? seatLimitFrom(paid.plan?.metadata))
+			: null,
 	};
 }

@@ -28,6 +28,7 @@ const FREE: OrganizationBilling = {
 	planTier: "free",
 	gatedMachineSizes: [],
 	environmentLimit: 0,
+	seatLimit: null,
 };
 
 const FAIL_OPEN: OrganizationBilling = {
@@ -46,6 +47,7 @@ const FAIL_OPEN: OrganizationBilling = {
 	planTier: "pro",
 	gatedMachineSizes: [],
 	environmentLimit: null,
+	seatLimit: null,
 };
 
 const memory = new Map<
@@ -65,6 +67,7 @@ async function readShared(key: string): Promise<OrganizationBilling | null> {
 	try {
 		const value = await billingRedis.get<OrganizationBilling>(key);
 		if (!value) return value;
+		if (value.seatLimit === undefined && value.tier !== "free") return null;
 		return {
 			...value,
 			planTier: value.planTier ?? value.tier,
@@ -143,7 +146,11 @@ export async function organizationBilling(
 			error,
 		);
 		const fallback = lastKnown
-			? { ...lastKnown, gatedMachineSizes: [], environmentLimit: null }
+			? {
+					...lastKnown,
+					gatedMachineSizes: [],
+					environmentLimit: null,
+				}
 			: FAIL_OPEN;
 		memory.set(organizationId, {
 			value: fallback,
@@ -169,6 +176,13 @@ export async function organizationEnvironmentLimitFromAutumn(
 	organizationId: string,
 ): Promise<EnvironmentLimit> {
 	return (await organizationBilling(organizationId)).environmentLimit ?? null;
+}
+
+/** Members a paid organization may hold, or null when the cap is unknown. */
+export async function organizationSeatLimitFromAutumn(
+	organizationId: string,
+): Promise<number | null> {
+	return (await organizationBilling(organizationId)).seatLimit ?? null;
 }
 
 export async function invalidateOrganizationBilling(
