@@ -31,7 +31,7 @@ run_json() {
   out=$(mktemp) || { echo null; return; }
   err=$(mktemp) || { rm -f "$out"; echo null; return; }
   if superset "$@" --json >"$out" 2>"$err"; then
-    if [ ! -s "$out" ]; then
+    if [ ! -s "$out" ] || jq -e -s 'length == 0' "$out" >/dev/null 2>&1; then
       echo "no output from: superset $*" >&2
       echo null
     elif ! jq -c '.' "$out" 2>/dev/null; then
