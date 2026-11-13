@@ -530,7 +530,7 @@ export class GitWatcher {
 					// actually shrank; after a swap, force one broad status refresh
 					// to cover anything written during the swap gap.
 					const swapped = await this.filesystem
-						.refreshWatcherIgnores(this.targetFor(key).workspaceId)
+						.refreshWatcherIgnores(this.targetFor(key).path)
 						.catch((error) => {
 							console.error("[git-watcher] watcher ignore refresh failed", {
 								key,
@@ -879,9 +879,8 @@ export class GitWatcher {
 		let iterator: AsyncIterator<{ events: FsWatchEvent[] }> | null = null;
 
 		try {
-			const service = this.filesystem.getServiceForWorkspace(
-				target.workspaceId,
-			);
+			// Each checkout is its own watch root: a root watch prunes nested repositories.
+			const service = this.filesystem.getServiceForRootPath(worktreePath);
 			const stream = service.watchPath({
 				absolutePath: worktreePath,
 			});

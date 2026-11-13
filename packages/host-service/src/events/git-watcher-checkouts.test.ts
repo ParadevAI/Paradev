@@ -46,8 +46,10 @@ test("a two-checkout workspace attaches a watch per checkout, each event naming 
 	);
 	const watchedPaths: string[] = [];
 	const filesystem = {
-		getServiceForWorkspace: () => ({
+		getServiceForRootPath: (rootPath: string) => ({
 			watchPath: ({ absolutePath }: { absolutePath: string }) => {
+				// As the real service: it only watches its own root.
+				if (absolutePath !== rootPath) throw new Error("not the service root");
 				watchedPaths.push(absolutePath);
 				return {
 					[Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),

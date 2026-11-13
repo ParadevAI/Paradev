@@ -113,15 +113,13 @@ export class WorkspaceFilesystemManager {
 	}
 
 	/**
-	 * Swap the workspace's native subscription onto a freshly derived ignore
+	 * Swap a watch root's native subscription onto a freshly derived ignore
 	 * set. Required after a directory is UN-ignored — the attach-time prune
 	 * would otherwise suppress its events until restart. Returns whether the
 	 * subscription was actually swapped.
 	 */
-	async refreshWatcherIgnores(workspaceId: string): Promise<boolean> {
-		return await this.watcherManager.refreshIgnores(
-			this.resolveWorkspaceRoot(workspaceId),
-		);
+	async refreshWatcherIgnores(rootPath: string): Promise<boolean> {
+		return await this.watcherManager.refreshIgnores(rootPath);
 	}
 
 	getServiceForRootPath(rootPath: string): FsHostService {

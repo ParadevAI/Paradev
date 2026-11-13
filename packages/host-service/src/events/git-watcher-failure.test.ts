@@ -79,7 +79,7 @@ for (const failure of ["reject", "end", "subscribe", "git"] as const) {
 		let failSubscribe = failure === "subscribe";
 		let backingOff = false;
 		const filesystem = {
-			getServiceForWorkspace: () => ({
+			getServiceForRootPath: () => ({
 				watchPath: () => {
 					if (failSubscribe) throw new Error("subscription failed");
 					const stream = new Stream();
