@@ -99,6 +99,9 @@ msgstr "(nessun output)"
 msgid "(you)"
 msgstr "(tu)"
 
+msgid "[command]"
+msgstr "[comando]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6227,6 +6230,9 @@ msgstr "Impossibile spostare il sottoagente in background"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossibile assegnare automaticamente un nome a \"{name}\""
+
+msgid "Couldn't open a terminal"
+msgstr "Impossibile aprire un terminale"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Impossibile aprire nell’interfaccia chat"
@@ -17136,6 +17142,9 @@ msgstr "Esegui oltre 10 agenti di programmazione in parallelo sul tuo computer"
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Esegui più di 10 agenti di programmazione in parallelo sulla tua macchina."
+
+msgid "Run a command in a new terminal"
+msgstr "Esegui un comando in un nuovo terminale"
 
 msgid "Run again"
 msgstr "Esegui di nuovo"

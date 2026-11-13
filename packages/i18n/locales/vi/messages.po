@@ -99,6 +99,9 @@ msgstr "(không có đầu ra)"
 msgid "(you)"
 msgstr "(bạn)"
 
+msgid "[command]"
+msgstr "[lệnh]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6227,6 +6230,9 @@ msgstr "Không thể chuyển agent con sang chạy nền"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
+
+msgid "Couldn't open a terminal"
+msgstr "Không thể mở terminal"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Không thể mở trong giao diện chat"
@@ -17136,6 +17142,9 @@ msgstr "Chạy song song hơn 10 tác tử lập trình trên máy của bạn"
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Chạy hơn 10 agent lập trình song song trên máy của bạn."
+
+msgid "Run a command in a new terminal"
+msgstr "Chạy lệnh trong terminal mới"
 
 msgid "Run again"
 msgstr "Chạy lại"

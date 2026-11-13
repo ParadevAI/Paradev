@@ -99,6 +99,9 @@ msgstr "(brak wyniku)"
 msgid "(you)"
 msgstr "(Ty)"
 
+msgid "[command]"
+msgstr "[polecenie]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6227,6 +6230,9 @@ msgstr "Nie udało się przenieść subagenta w tło"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nie udało się automatycznie nazwać „{name}”"
+
+msgid "Couldn't open a terminal"
+msgstr "Nie udało się otworzyć terminala"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Nie udało się otworzyć w interfejsie czatu"
@@ -17136,6 +17142,9 @@ msgstr "Uruchamiaj ponad 10 agentów programistycznych równolegle na swoim komp
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Uruchom 10+ równoległych agentów kodujących na swojej maszynie."
+
+msgid "Run a command in a new terminal"
+msgstr "Uruchom polecenie w nowym terminalu"
 
 msgid "Run again"
 msgstr "Uruchom ponownie"

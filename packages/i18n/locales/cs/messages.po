@@ -99,6 +99,9 @@ msgstr "(žádný výstup)"
 msgid "(you)"
 msgstr "(vy)"
 
+msgid "[command]"
+msgstr "[příkaz]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6227,6 +6230,9 @@ msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
+
+msgid "Couldn't open a terminal"
+msgstr "Terminál se nepodařilo otevřít"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Nepodařilo se otevřít v rozhraní chatu"
@@ -17136,6 +17142,9 @@ msgstr "Spouštějte na svém počítači více než 10 programovacích agentů 
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Spusťte na svém stroji 10+ paralelních programovacích agentů."
+
+msgid "Run a command in a new terminal"
+msgstr "Spustit příkaz v novém terminálu"
 
 msgid "Run again"
 msgstr "Spustit znovu"

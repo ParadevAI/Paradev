@@ -51,6 +51,7 @@ export type UseAppCommandsOptions = {
 	onOpenFind?: () => void;
 	openStatus?: () => void;
 	openMcp?: (composer: ComposerActionContext) => void;
+	onRunInTerminal?: (command: string) => void;
 	/** Writing to a subagent: only commands about the message itself apply. */
 	toSubagent: boolean;
 };
@@ -72,6 +73,7 @@ export function useAppCommands({
 	onOpenFind,
 	openStatus,
 	openMcp,
+	onRunInTerminal,
 	toSubagent,
 }: UseAppCommandsOptions): {
 	commands: PromptInputCommand[];
@@ -159,6 +161,7 @@ export function useAppCommands({
 			...(onOpenHistory ? { openHistory: leaveComposer(onOpenHistory) } : {}),
 			...(onOpenFind ? { openFind: leaveComposer(onOpenFind) } : {}),
 			...(openStatus ? { openStatus: leaveComposer(openStatus) } : {}),
+			...(onRunInTerminal ? { runInTerminal: onRunInTerminal } : {}),
 			createAutomation: (prompt: string) => {
 				void createAutomation({
 					prompt,
@@ -192,6 +195,7 @@ export function useAppCommands({
 		onNewChat,
 		onOpenFind,
 		onOpenHistory,
+		onRunInTerminal,
 		onSetConfigOption,
 		onSetMode,
 		openMcp,

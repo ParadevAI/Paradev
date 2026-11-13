@@ -45,6 +45,7 @@ describe("APP_COMMANDS", () => {
 				openStatus: NOOP,
 				openFind: NOOP,
 				createAutomation: NOOP,
+				runInTerminal: NOOP,
 			}),
 		).toEqual([
 			"new",
@@ -58,6 +59,7 @@ describe("APP_COMMANDS", () => {
 			"find",
 			"attach",
 			"automation",
+			"terminal",
 		]);
 		const inPlan = { plan: { active: true, enter: NOOP, leave: NOOP } };
 		expect(availableNames(inPlan)).toEqual(["plan", "default", "attach"]);
@@ -85,5 +87,16 @@ describe("APP_COMMANDS", () => {
 		expect(command("new").run(context, "please", COMPOSER)).toBe("bad-args");
 		expect(command("automation").run(context, "", COMPOSER)).toBe("bad-args");
 		expect(command("fast").run(context, "faster", COMPOSER)).toBe("bad-args");
+	});
+
+	test("hands /terminal its whole command line, or none for a bare shell", () => {
+		const runInTerminal = mock((_command: string) => {});
+		const context: AppCommandContext = { runInTerminal };
+		expect(
+			command("terminal").run(context, "bun run dev --port 3000", COMPOSER),
+		).toBe("done");
+		expect(runInTerminal).toHaveBeenLastCalledWith("bun run dev --port 3000");
+		expect(command("terminal").run(context, "", COMPOSER)).toBe("done");
+		expect(runInTerminal).toHaveBeenLastCalledWith("");
 	});
 });

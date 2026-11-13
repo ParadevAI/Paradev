@@ -132,6 +132,7 @@ export function SessionView({
 	onOpenHistory,
 	terminalId,
 	onNewChat,
+	onRunInTerminal,
 	workspaceId,
 }: {
 	client: SessionClient;
@@ -193,6 +194,7 @@ export function SessionView({
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	onNewChat?: () => void;
+	onRunInTerminal?: (command: string) => void;
 }) {
 	const { t } = useLingui();
 	const snapshotWorktree = useChatTurnSnapshotsEnabled();
@@ -798,6 +800,7 @@ export function SessionView({
 					terminalId={terminalId}
 					agentLabel={agentLabel}
 					onNewChat={onNewChat}
+					onRunInTerminal={onRunInTerminal}
 					onFork={onFork ? forkWithTranscript : undefined}
 					canForkToWorktree={canForkToWorktree}
 					onOpenFind={focusedSubagentId ? undefined : openFind}

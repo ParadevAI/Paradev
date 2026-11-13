@@ -99,6 +99,9 @@ msgstr "(aucune sortie)"
 msgid "(you)"
 msgstr "(vous)"
 
+msgid "[command]"
+msgstr "[commande]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6227,6 +6230,9 @@ msgstr "Impossible de passer le sous-agent en arrière-plan"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossible de nommer « {name} » automatiquement"
+
+msgid "Couldn't open a terminal"
+msgstr "Impossible d’ouvrir un terminal"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Impossible d’ouvrir dans l’interface de chat"
@@ -17136,6 +17142,9 @@ msgstr "Exécutez plus de 10 agents de programmation en parallèle sur votre mac
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Exécutez plus de 10 agents de code en parallèle sur votre machine."
+
+msgid "Run a command in a new terminal"
+msgstr "Exécuter une commande dans un nouveau terminal"
 
 msgid "Run again"
 msgstr "Relancer"

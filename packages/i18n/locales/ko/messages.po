@@ -99,6 +99,9 @@ msgstr "(출력 없음)"
 msgid "(you)"
 msgstr "(나)"
 
+msgid "[command]"
+msgstr "[명령어]"
+
 msgid "[prompt]"
 msgstr "[프롬프트]"
 
@@ -6227,6 +6230,9 @@ msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
+
+msgid "Couldn't open a terminal"
+msgstr "터미널을 열 수 없습니다"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "채팅 인터페이스에서 열 수 없습니다"
@@ -17136,6 +17142,9 @@ msgstr "기기에서 10개 이상의 코딩 에이전트를 병렬로 실행"
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "내 머신에서 10개 이상의 코딩 에이전트를 병렬로 실행합니다."
+
+msgid "Run a command in a new terminal"
+msgstr "새 터미널에서 명령어 실행"
 
 msgid "Run again"
 msgstr "다시 실행"

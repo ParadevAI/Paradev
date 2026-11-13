@@ -99,6 +99,9 @@ msgstr "（出力なし）"
 msgid "(you)"
 msgstr "（自分）"
 
+msgid "[command]"
+msgstr "[コマンド]"
+
 msgid "[prompt]"
 msgstr "[プロンプト]"
 
@@ -6227,6 +6230,9 @@ msgstr "サブエージェントをバックグラウンドに移動できませ
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
+
+msgid "Couldn't open a terminal"
+msgstr "ターミナルを開けませんでした"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "チャット画面で開けませんでした"
@@ -17136,6 +17142,9 @@ msgstr "端末上で10以上のコーディングエージェントを並列実�
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "手元のマシンで10以上のコーディングエージェントを並列実行できます。"
+
+msgid "Run a command in a new terminal"
+msgstr "新しいターミナルでコマンドを実行"
 
 msgid "Run again"
 msgstr "再実行"

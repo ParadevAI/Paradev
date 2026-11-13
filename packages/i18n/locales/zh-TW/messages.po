@@ -99,6 +99,9 @@ msgstr "（無輸出）"
 msgid "(you)"
 msgstr "（你）"
 
+msgid "[command]"
+msgstr "[指令]"
+
 msgid "[prompt]"
 msgstr "[提示詞]"
 
@@ -6227,6 +6230,9 @@ msgstr "無法將子代理程式移到背景"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "無法自動命名「{name}」"
+
+msgid "Couldn't open a terminal"
+msgstr "無法開啟終端機"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "無法在聊天介面中開啟"
@@ -17136,6 +17142,9 @@ msgstr "在您的設備上並行運行 10 多個編程代理"
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "在你的機器上並行執行10個以上的編碼代理程式。"
+
+msgid "Run a command in a new terminal"
+msgstr "在新終端機中執行指令"
 
 msgid "Run again"
 msgstr "重新執行"

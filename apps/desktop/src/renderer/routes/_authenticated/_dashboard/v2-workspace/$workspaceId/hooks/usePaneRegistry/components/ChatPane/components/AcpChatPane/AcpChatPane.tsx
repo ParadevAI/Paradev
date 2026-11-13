@@ -95,6 +95,7 @@ export function AcpChatPane({
 	getOpenFilePaths,
 	onOpenHistory,
 	onNewChat,
+	onRunInTerminal,
 	onModeChange,
 	onSessionCreated,
 	onSwitchAgent,
@@ -139,6 +140,7 @@ export function AcpChatPane({
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
 	onNewChat?: (label: string | undefined) => void;
+	onRunInTerminal?: (command: string) => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
@@ -855,6 +857,7 @@ export function AcpChatPane({
 			getOpenFilePaths={getOpenFilePaths}
 			onOpenHistory={onOpenHistory}
 			onNewChat={newChat}
+			onRunInTerminal={onRunInTerminal}
 			onSessionState={(state) => {
 				if (!mounted.current) return;
 				onSessionInfo(sessionInfoFromState(state, agent?.sessionId));
