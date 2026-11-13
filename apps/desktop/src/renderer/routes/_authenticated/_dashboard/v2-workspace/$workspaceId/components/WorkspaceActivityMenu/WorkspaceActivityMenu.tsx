@@ -822,118 +822,138 @@ export function WorkspaceActivityMenu({
 		</div>
 	);
 
+	const secondSegment =
+		changes && currentPr && currentPrState ? (
+			<>
+				<span className={ACTIVITY_SEGMENT_CLASS}>
+					{pendingLayer ? (
+						<span className="flex size-3.5 shrink-0 items-center justify-center">
+							<AsciiSpinner className="text-base leading-none" />
+						</span>
+					) : (
+						<PRIcon state={currentPrState} className="size-3.5 shrink-0" />
+					)}
+					<span className="tabular-nums">
+						#{pendingLayer?.number ?? currentPr.number}
+					</span>
+					{mergeFlow.stack ? (
+						<PullRequestStackPosition
+							position={
+								pendingLayer?.position ?? mergeFlow.stack.currentPosition
+							}
+							size={mergeFlow.stack.layers.length}
+						/>
+					) : null}
+					{!pendingLayer && currentPrChecks && showsChecks(currentPrState) && (
+						<PRStatusIndicators checks={currentPrChecks} />
+					)}
+				</span>
+			</>
+		) : (
+			triggerChangesStats && (
+				<>
+					<span className={ACTIVITY_SEGMENT_CLASS}>
+						<GitCompareArrows className="size-3.5 shrink-0" />
+						<span className="flex items-center gap-1">
+							<ChangesStats stats={triggerChangesStats} />
+						</span>
+					</span>
+				</>
+			)
+		);
+
 	return (
 		<Popover open={floating} onOpenChange={setFloating}>
 			<PopoverAnchor
 				virtualRef={{ current: anchorNode ?? triggerRef.current }}
 			/>
-			<Tooltip disableHoverableContent>
-				<TooltipTrigger asChild>
-					<button
-						ref={triggerRef}
-						type="button"
-						onClick={onTriggerClick}
-						aria-label={
-							changes && currentPr
-								? t({
-										message: `Workspace activity, pull request #${currentPr.number}`,
-									})
-								: t({ message: "Workspace activity" })
-						}
-						aria-expanded={open}
-						aria-controls={open ? panelId : undefined}
-						aria-describedby={hasNew ? newPageStatusId : undefined}
-						className={cn(
-							"no-drag relative flex h-7 shrink-0 items-center rounded-full p-0.5 font-medium text-xs transition-colors",
-							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-							floating
-								? "bg-[var(--tab-capsule)] text-foreground"
-								: "text-muted-foreground hover:bg-[var(--tab-capsule)] hover:text-foreground",
-						)}
-					>
-						<span className={ACTIVITY_SEGMENT_CLASS}>
-							<ListTree className="size-3.5 shrink-0" />
-							{runningCount > 0 ? (
-								<>
-									<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
-									<span className="tabular-nums">{runningCount}</span>
-								</>
-							) : (
-								!paneAreaStyle &&
-								workspace.length > 0 && (
-									<span className="tabular-nums">{workspace.length}</span>
-								)
+			<div className="no-drag flex h-7 shrink-0 items-center font-medium text-xs">
+				<Tooltip disableHoverableContent>
+					<TooltipTrigger asChild>
+						<button
+							ref={triggerRef}
+							type="button"
+							onClick={onTriggerClick}
+							aria-label={
+								changes && currentPr
+									? t({
+											message: `Workspace activity, pull request #${currentPr.number}`,
+										})
+									: t({ message: "Workspace activity" })
+							}
+							aria-expanded={open}
+							aria-controls={open ? panelId : undefined}
+							aria-describedby={hasNew ? newPageStatusId : undefined}
+							className={cn(
+								"relative flex h-7 shrink-0 items-center rounded-full p-0.5 transition-colors",
+								"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+								floating
+									? "bg-[var(--tab-capsule)] text-foreground"
+									: "text-muted-foreground hover:bg-[var(--tab-capsule)] hover:text-foreground",
 							)}
-						</span>
-						{changes && currentPr && currentPrState ? (
-							<>
-								<span className={ACTIVITY_DIVIDER_CLASS} />
-								<span className={ACTIVITY_SEGMENT_CLASS}>
-									{pendingLayer ? (
-										<span className="flex size-3.5 shrink-0 items-center justify-center">
-											<AsciiSpinner className="text-base leading-none" />
-										</span>
-									) : (
-										<PRIcon
-											state={currentPrState}
-											className="size-3.5 shrink-0"
-										/>
-									)}
-									<span className="tabular-nums">
-										#{pendingLayer?.number ?? currentPr.number}
-									</span>
-									{mergeFlow.stack ? (
-										<PullRequestStackPosition
-											position={
-												pendingLayer?.position ??
-												mergeFlow.stack.currentPosition
-											}
-											size={mergeFlow.stack.layers.length}
-										/>
-									) : null}
-									{!pendingLayer &&
-										currentPrChecks &&
-										showsChecks(currentPrState) && (
-											<PRStatusIndicators checks={currentPrChecks} />
-										)}
-								</span>
-							</>
-						) : (
-							triggerChangesStats && (
+						>
+							<span className={ACTIVITY_SEGMENT_CLASS}>
+								<ListTree className="size-3.5 shrink-0" />
+								{runningCount > 0 ? (
+									<>
+										<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+										<span className="tabular-nums">{runningCount}</span>
+									</>
+								) : (
+									!paneAreaStyle &&
+									workspace.length > 0 && (
+										<span className="tabular-nums">{workspace.length}</span>
+									)
+								)}
+							</span>
+							{hasNew && (
 								<>
-									<span className={ACTIVITY_DIVIDER_CLASS} />
-									<span className={ACTIVITY_SEGMENT_CLASS}>
-										<GitCompareArrows className="size-3.5 shrink-0" />
-										<span className="flex items-center gap-1">
-											<ChangesStats stats={triggerChangesStats} />
-										</span>
+									<span
+										aria-hidden="true"
+										className="absolute top-1 right-1 size-2 rounded-full bg-blue-500"
+									/>
+									<span id={newPageStatusId} className="sr-only">
+										<Trans context="badge on a page published since the menu was last opened">
+											New
+										</Trans>
 									</span>
 								</>
-							)
+							)}
+						</button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
+						{open ? (
+							<Trans>Hide workspace activity</Trans>
+						) : (
+							<Trans>Show workspace activity</Trans>
 						)}
-						{hasNew && (
-							<>
-								<span
-									aria-hidden="true"
-									className="absolute top-1 right-1 size-2 rounded-full bg-blue-500"
-								/>
-								<span id={newPageStatusId} className="sr-only">
-									<Trans context="badge on a page published since the menu was last opened">
-										New
-									</Trans>
-								</span>
-							</>
+					</TooltipContent>
+				</Tooltip>
+				{secondSegment ? (
+					<>
+						<span className={ACTIVITY_DIVIDER_CLASS} />
+						{changes ? (
+							<button
+								type="button"
+								onClick={changes.onToggle}
+								aria-label={t({ message: "Changes" })}
+								aria-pressed={changes.isOpen}
+								className={cn(
+									"flex h-7 shrink-0 items-center rounded-full p-0.5 transition-colors",
+									"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+									changes.isOpen
+										? "bg-[var(--tab-capsule)] text-foreground"
+										: "text-muted-foreground hover:bg-[var(--tab-capsule)] hover:text-foreground",
+								)}
+							>
+								{secondSegment}
+							</button>
+						) : (
+							<span className="text-muted-foreground">{secondSegment}</span>
 						)}
-					</button>
-				</TooltipTrigger>
-				<TooltipContent side="bottom">
-					{open ? (
-						<Trans>Hide workspace activity</Trans>
-					) : (
-						<Trans>Show workspace activity</Trans>
-					)}
-				</TooltipContent>
-			</Tooltip>
+					</>
+				) : null}
+			</div>
 			<PopoverContent
 				align="end"
 				sideOffset={0}
