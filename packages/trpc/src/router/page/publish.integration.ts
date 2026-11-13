@@ -35,6 +35,10 @@ mock.module("../../lib/r2", () => ({
 		if (body === undefined) throw new Error(`NoSuchKey: ${sourceKey}`);
 		objectStore.set(key, body);
 	},
+	listObjects: async (prefix: string) =>
+		[...objectStore.keys()]
+			.filter((key) => key.startsWith(prefix))
+			.map((key) => ({ key, lastModified: undefined })),
 	deleteObjects: async (keys: string[]) => {
 		for (const key of keys) objectStore.delete(key);
 	},
@@ -654,5 +658,46 @@ describe("page rows", () => {
 			.from(pages)
 			.where(eq(pages.organizationId, ORG));
 		expect(new Set(all.map((r) => r.slug)).size).toBe(all.length);
+	});
+});
+
+describe("duplicate", () => {
+	test("copies the served version and its assets into a private page that outlives the original", async () => {
+		const original = await caller.page.create({ title: "Original" });
+		const asset = await upload("body { color: red }", {
+			contentType: "text/css",
+		});
+		await db.insert(attachments).values({
+			fileId: asset.id,
+			parentKind: "page",
+			parentId: original.id,
+			path: "site.css",
+		});
+		await publish({ pageId: original.id, body: "<h1>shared</h1>" });
+		await publish({ pageId: original.id, body: "<h1>draft</h1>" });
+		await caller.page.setSharedVersion({ id: original.id, version: 1 });
+
+		const copy = await caller.page.duplicate({
+			id: original.id,
+			title: "Original (copy)",
+		});
+		expect(copy.id).not.toBe(original.id);
+		expect(copy.title).toBe("Original (copy)");
+		expect(copy.visibility).toBe("just_me");
+
+		await caller.page.delete({ id: original.id });
+
+		const [version] = await db
+			.select()
+			.from(pageVersions)
+			.where(eq(pageVersions.pageId, copy.id));
+		expect(version?.version).toBe(1);
+		expect(objectStore.get(version?.storageKey ?? "")).toBe("<h1>shared</h1>");
+		const carried = await db
+			.select({ fileId: attachments.fileId, path: attachments.path })
+			.from(attachments)
+			.where(eq(attachments.parentId, version?.id ?? ""));
+		expect(carried).toEqual([{ fileId: asset.id, path: "site.css" }]);
+		expect(objectStore.has(fileOriginalKey(asset.id))).toBe(true);
 	});
 });

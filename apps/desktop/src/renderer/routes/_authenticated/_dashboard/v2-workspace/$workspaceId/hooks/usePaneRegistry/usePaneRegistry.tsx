@@ -909,6 +909,9 @@ export function usePaneRegistry({
 								page={page}
 								pageUiId={pagesListPageUiId(ctx.pane.id, page)}
 								onBack={() => ctx.actions.updateData({ kind: "pages-list" })}
+								onOpenPage={(next) =>
+									ctx.actions.updateData({ kind: "pages-list", page: next })
+								}
 							/>
 						);
 					},
@@ -1127,6 +1130,7 @@ export function usePaneRegistry({
 							data={ctx.pane.data as PagePaneData}
 							paneId={ctx.pane.id}
 							onClose={() => ctx.actions.close()}
+							onOpenPage={(page) => openPagePaneInStore(ctx.store, page, "tab")}
 						/>
 					),
 					renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (

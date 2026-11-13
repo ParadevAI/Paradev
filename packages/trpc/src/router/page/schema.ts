@@ -206,6 +206,11 @@ export const deletePageSchema = z.object({
 	onlyIfEmpty: z.boolean().optional(),
 });
 
+export const duplicatePageSchema = z.object({
+	id: pageFields.id,
+	title: pageFields.title.optional(),
+});
+
 export const reportPageSchema = z.object({
 	slug: pageFields.slug,
 	reason: z.enum(pageReportReasonValues),

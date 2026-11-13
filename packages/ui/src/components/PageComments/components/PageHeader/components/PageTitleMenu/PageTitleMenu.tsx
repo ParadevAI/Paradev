@@ -1,8 +1,10 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import {
 	ChevronDown,
+	Copy,
 	FileText,
 	History,
 	Pencil,
@@ -25,6 +27,7 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "../../../../../ui/dropdown-menu";
+import { toast } from "../../../../../ui/sonner";
 import { useFramePointerDown } from "../../../../hooks/useFramePointerDown";
 import { relativeTime } from "../../../../utils/relativeTime";
 import type { PageHeaderPage, PageHeaderVersion } from "../../types";
@@ -39,6 +42,7 @@ interface PageTitleMenuProps {
 	onOpenChange: (open: boolean) => void;
 	onShare: () => void;
 	onDelete: () => void;
+	onDuplicate: (title: string) => Promise<void>;
 	onRename: () => void;
 	onRefresh: () => void;
 	onPreviewVersion: (version: number) => void;
@@ -54,6 +58,7 @@ export function PageTitleMenu({
 	onOpenChange,
 	onShare,
 	onDelete,
+	onDuplicate,
 	onRename,
 	onRefresh,
 	onPreviewVersion,
@@ -72,6 +77,17 @@ export function PageTitleMenu({
 		event.preventDefault();
 		onOpenChange(false);
 		action();
+	};
+
+	const duplicate = async () => {
+		const title = page.title;
+		try {
+			await onDuplicate(t({ message: `${title} (copy)` }).slice(0, 200));
+		} catch (error) {
+			toast.error(
+				errorMessage(error, t({ message: "Could not duplicate this page" })),
+			);
+		}
 	};
 
 	return (
@@ -125,6 +141,14 @@ export function PageTitleMenu({
 				<DropdownMenuItem className={itemClass} onSelect={run(onShare)}>
 					<Share2 className={iconClass} />
 					<Trans>Share</Trans>
+				</DropdownMenuItem>
+
+				<DropdownMenuItem
+					className={itemClass}
+					onSelect={run(() => void duplicate())}
+				>
+					<Copy className={iconClass} />
+					<Trans>Duplicate</Trans>
 				</DropdownMenuItem>
 
 				<DropdownMenuSub>
