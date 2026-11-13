@@ -5,7 +5,6 @@ import { useMatchRoute } from "@tanstack/react-router";
 import { openWorkspaceList } from "renderer/commandPalette";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
 import { WorkspacesIcon } from "./components/WorkspacesIcon";
 import {
 	useWaitingWorkspaceBucket,
@@ -29,7 +28,6 @@ export function WorkspaceSwitcherButton() {
 			? workspaces.find((candidate) => candidate.id === match.workspaceId)
 			: undefined;
 	if (!workspace) return null;
-	const name = getV2WorkspaceDisplayName(workspace);
 
 	return (
 		<Tooltip delayDuration={300}>
@@ -54,13 +52,10 @@ export function WorkspaceSwitcherButton() {
 				</button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">
-				<div className="flex flex-col gap-0.5">
-					<span className="font-medium">{name}</span>
-					<HotkeyLabel
-						label={t({ message: "Switch workspace" })}
-						id="OPEN_WORKSPACE_LIST"
-					/>
-				</div>
+				<HotkeyLabel
+					label={t({ message: "Switch workspace" })}
+					id="OPEN_WORKSPACE_LIST"
+				/>
 			</TooltipContent>
 		</Tooltip>
 	);
