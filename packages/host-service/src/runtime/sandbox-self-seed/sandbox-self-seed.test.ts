@@ -137,7 +137,7 @@ describe("start hook run terminal", () => {
 	function fakeStarter(live: string[] = []) {
 		const started: string[] = [];
 		const starter: RunTerminalStarter = {
-			isLive: (terminalId) => live.includes(terminalId),
+			isLive: async (terminalId) => live.includes(terminalId),
 			start: async (run) => {
 				started.push(run.command);
 				return { terminalId: `term-${started.length}`, pid: 4242 };
@@ -184,6 +184,34 @@ describe("start hook run terminal", () => {
 		writeFileSync(files.marker, `${exitedSetup}\n`);
 		const { starter, started } = fakeStarter();
 		await resumeSandboxStartHookRun(ctx, identity, { files, starter });
+		expect(started).toEqual(["bun dev"]);
+	});
+
+	test("after a restart, re-attaches the recorded run terminal", async () => {
+		const identity = identityWith(
+			'[terminals.dev]\nrun = "bun dev"\ndefault = true\n',
+		);
+		writeFileSync(files.runTerminal, "term-live\n");
+		const checked: string[] = [];
+		const { starter, started } = fakeStarter();
+		starter.isLive = async (terminalId) => {
+			checked.push(terminalId);
+			return true;
+		};
+		await resumeSandboxStartHookRun(ctx, identity, { files, starter });
+		expect(checked).toEqual(["term-live"]);
+		expect(started).toEqual([]);
+	});
+
+	test("two callers at once start one run terminal", async () => {
+		const identity = identityWith(
+			'[terminals.dev]\nrun = "bun dev"\ndefault = true\n',
+		);
+		const { starter, started } = fakeStarter();
+		await Promise.all([
+			runSandboxStartHook(ctx, identity, { force: true, files, starter }),
+			runSandboxStartHook(ctx, identity, { force: true, files, starter }),
+		]);
 		expect(started).toEqual(["bun dev"]);
 	});
 });

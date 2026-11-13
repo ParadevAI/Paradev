@@ -21,6 +21,7 @@ import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
 import {
 	createTerminalSessionInternal,
+	isAgentTerminalAlive,
 	isLiveTerminalSession,
 } from "../../terminal/terminal";
 import {
@@ -229,7 +230,7 @@ type StartedRun = { terminalId: string; pid: number | null };
 
 export interface RunTerminalStarter {
 	start(run: PhaseCommand): Promise<StartedRun | { error: string }>;
-	isLive(terminalId: string): boolean;
+	isLive(terminalId: string): Promise<boolean>;
 }
 
 function readRunTerminalId(files: StartHookFiles): string | null {
@@ -242,12 +243,14 @@ function readRunTerminalId(files: StartHookFiles): string | null {
 
 /**
  * The terminal the start hook started the default terminal in, for
- * `sandbox.status`. On disk, so a host-service restart still reports it.
+ * `sandbox.status`, while it is still live. On disk, so a host-service
+ * restart still reports it once startup re-attaches it.
  */
 export function getStartHookRunTerminalId(
 	files: StartHookFiles = START_HOOK_FILES,
 ): string | null {
-	return readRunTerminalId(files);
+	const terminalId = readRunTerminalId(files);
+	return terminalId && isLiveTerminalSession(terminalId) ? terminalId : null;
 }
 
 /**
@@ -260,7 +263,15 @@ function sessionRunTerminalStarter(
 	identity: SandboxIdentity,
 ): RunTerminalStarter {
 	return {
-		isLive: isLiveTerminalSession,
+		// After a host-service restart only the daemon still holds the session;
+		// adopting it makes it live here again, for Run and the port scanner.
+		isLive: (terminalId) =>
+			isAgentTerminalAlive({
+				terminalId,
+				workspaceId: identity.workspaceId,
+				db: ctx.db,
+				eventBus: ctx.eventBus,
+			}),
 		start: async (run) => {
 			const terminalId = crypto.randomUUID();
 			const result = await createTerminalSessionInternal({
@@ -277,14 +288,30 @@ function sessionRunTerminalStarter(
 	};
 }
 
-async function startRunTerminal(
+let runTerminalInFlight: Promise<StartedRun | { error: string }> | null = null;
+
+/** The setup exit handler and the restart resume can both ask at once. */
+function startRunTerminal(
+	starter: RunTerminalStarter,
+	files: StartHookFiles,
+	run: PhaseCommand,
+): Promise<StartedRun | { error: string }> {
+	runTerminalInFlight ??= startRunTerminalOnce(starter, files, run).finally(
+		() => {
+			runTerminalInFlight = null;
+		},
+	);
+	return runTerminalInFlight;
+}
+
+async function startRunTerminalOnce(
 	starter: RunTerminalStarter,
 	files: StartHookFiles,
 	run: PhaseCommand,
 ): Promise<StartedRun | { error: string }> {
 	// A forced re-run keeps the server it already started.
 	const existing = readRunTerminalId(files);
-	if (existing && starter.isLive(existing))
+	if (existing && (await starter.isLive(existing)))
 		return { terminalId: existing, pid: null };
 	const started = await starter.start(run);
 	if ("error" in started) {
@@ -374,7 +401,9 @@ export async function runSandboxStartHook(
 			log: readTail(files.log),
 		};
 		// Setup stops at its first failure; the terminal still starts after it.
-		void startRun();
+		startRun().catch((error) => {
+			console.error("[sandbox] run terminal not started", error);
+		});
 	});
 
 	// A command that daemonizes (tmux new-session -d) also exits at once, so
@@ -404,9 +433,9 @@ export async function runSandboxStartHook(
 }
 
 /**
- * A host-service restart loses the setup child's exit handler, so the run
- * terminal would never start. On startup, start it once the setup the marker
- * names has exited.
+ * A host-service restart loses the setup child's exit handler and the run
+ * terminal's in-memory session. On startup, re-attach the recorded run
+ * terminal, or start it once the setup the marker names has exited.
  */
 export async function resumeSandboxStartHookRun(
 	ctx: Pick<HostServiceContext, "db" | "eventBus">,
@@ -414,18 +443,20 @@ export async function resumeSandboxStartHookRun(
 	options: { files?: StartHookFiles; starter?: RunTerminalStarter } = {},
 ): Promise<void> {
 	const files = options.files ?? START_HOOK_FILES;
-	if (!existsSync(files.marker) || readRunTerminalId(files)) return;
+	const starter = options.starter ?? sessionRunTerminalStarter(ctx, identity);
+	const recorded = readRunTerminalId(files);
+	if (recorded) {
+		await starter.isLive(recorded);
+		return;
+	}
+	if (!existsSync(files.marker)) return;
 	const plan = startHookPlan(identity);
 	if (!plan.run) return;
 	const setupPid = Number.parseInt(readFileSync(files.marker, "utf8"), 10);
 	while (setupPid > 0 && isProcessAlive(setupPid)) {
 		await new Promise((resolve) => setTimeout(resolve, SETUP_EXIT_POLL_MS));
 	}
-	await startRunTerminal(
-		options.starter ?? sessionRunTerminalStarter(ctx, identity),
-		files,
-		plan.run,
-	);
+	await startRunTerminal(starter, files, plan.run);
 }
 
 /**

@@ -711,8 +711,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			isAuthenticated: true,
 			browserBridge: config.browserBridge,
 		} as HostServiceContext;
-		await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
-		if (sandboxIdentity) await resumeSandboxStartHookRun(ctx, sandboxIdentity);
+		try {
+			await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		} finally {
+			if (sandboxIdentity)
+				await resumeSandboxStartHookRun(ctx, sandboxIdentity);
+		}
 	};
 
 	return {

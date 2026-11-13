@@ -23,8 +23,6 @@ import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
 const CTRL_C_INPUT = "\u0003";
-const BOOT_RUN_POLL_MS = 10_000;
-const BOOT_RUN_GRACE_MS = 30_000;
 const TERMINAL_GONE_ERROR_MESSAGES = [
 	"Terminal session not found",
 	"Terminal session has exited",
@@ -130,23 +128,11 @@ export function useV2WorkspaceRun({
 	const isSandbox =
 		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
 	// A cloud box starts the project's run terminal on boot, once setup ends.
-	// Polling stops when it appears, once setup has been over for a while, or
-	// on a host that predates `runTerminalId`.
+	// Read once on open so the button shows Stop; Run reads it again.
+	const isBootRunHost = isSandbox && Boolean(configRunDefinition);
 	const { data: sandboxStatus } = workspaceTrpc.sandbox.status.useQuery(
 		undefined,
-		{
-			enabled: isSandbox && Boolean(configRunDefinition),
-			refetchInterval: (query) => {
-				const status = query.state.data;
-				if (status?.runTerminalId !== null) return false;
-				const setup = status.startHook;
-				const awaitingRun =
-					setup.state === "running" ||
-					(setup.state === "exited" &&
-						Date.now() - setup.since < BOOT_RUN_GRACE_MS);
-				return awaitingRun ? BOOT_RUN_POLL_MS : false;
-			},
-		},
+		{ enabled: isBootRunHost },
 	);
 	const bootRunTerminalId = sandboxStatus?.runTerminalId ?? null;
 	// A default terminal that daemonizes (`tmux new-session -d`) leaves an idle
@@ -201,31 +187,72 @@ export function useV2WorkspaceRun({
 		[collections.v2WorkspaceLocalState, workspaceId],
 	);
 
-	const isBootRunLive = bootRunProcess?.running === true;
 	const bootRunCommand = buildTerminalCommand(configRunDefinition?.commands);
+	const adoptBootRun = useCallback(
+		(terminalId: string) => {
+			if (!projectId) return;
+			updateWorkspaceRunTerminals((states) => {
+				states[terminalId] ??= {
+					terminalId,
+					workspaceId,
+					state: "running",
+					command: bootRunCommand ?? "",
+					definitionSource: "project-config",
+					definitionId: projectId,
+					startedAt: Date.now(),
+				};
+			});
+		},
+		[bootRunCommand, projectId, updateWorkspaceRunTerminals, workspaceId],
+	);
+
+	const isBootRunLive = bootRunProcess?.running === true;
 	useEffect(() => {
-		if (!isBootRunLive || !bootRunTerminalId || !projectId) return;
+		if (!isBootRunLive || !bootRunTerminalId) return;
 		if (workspaceRunTerminals[bootRunTerminalId]) return;
-		updateWorkspaceRunTerminals((states) => {
-			states[bootRunTerminalId] ??= {
-				terminalId: bootRunTerminalId,
-				workspaceId,
-				state: "running",
-				command: bootRunCommand ?? "",
-				definitionSource: "project-config",
-				definitionId: projectId,
-				startedAt: Date.now(),
-			};
-		});
-	}, [
-		bootRunCommand,
-		bootRunTerminalId,
-		isBootRunLive,
-		projectId,
-		updateWorkspaceRunTerminals,
-		workspaceId,
-		workspaceRunTerminals,
-	]);
+		adoptBootRun(bootRunTerminalId);
+	}, [adoptBootRun, bootRunTerminalId, isBootRunLive, workspaceRunTerminals]);
+
+	/** The boot run terminal, when it is live and running its command now. */
+	const findLiveBootRun = useCallback(async (): Promise<string | null> => {
+		if (!isBootRunHost) return null;
+		try {
+			const status = await utils.sandbox.status.fetch(undefined, {
+				staleTime: 0,
+			});
+			const terminalId = status.runTerminalId;
+			if (!terminalId || workspaceRunTerminals[terminalId]) return null;
+			const { running } = await utils.terminal.hasRunningProcess.fetch(
+				{ terminalId, workspaceId },
+				{ staleTime: 0 },
+			);
+			return running ? terminalId : null;
+		} catch (error) {
+			console.warn("[workspace-run] could not read the boot run", error);
+			return null;
+		}
+	}, [isBootRunHost, utils, workspaceId, workspaceRunTerminals]);
+
+	const focusTerminalPane = useCallback(
+		(terminalId: string) => {
+			const state = store.getState();
+			for (const tab of state.tabs) {
+				for (const [paneId, pane] of Object.entries(tab.panes)) {
+					if (pane.kind !== "terminal") continue;
+					if ((pane.data as TerminalPaneData).terminalId !== terminalId)
+						continue;
+					state.setActivePane({ tabId: tab.id, paneId });
+					state.setActiveTab(tab.id);
+					return;
+				}
+			}
+			state.addTab({
+				id: crypto.randomUUID(),
+				panes: [makeTerminalPane(terminalId, crypto.randomUUID())],
+			});
+		},
+		[store],
+	);
 
 	const startWorkspaceRun = useCallback(async () => {
 		if (isStartingRef.current) return;
@@ -248,6 +275,15 @@ export function useV2WorkspaceRun({
 		isStartingRef.current = true;
 		setIsPending(true);
 		try {
+			if (definition.source === "project-config") {
+				const bootRunId = await findLiveBootRun();
+				if (bootRunId) {
+					adoptBootRun(bootRunId);
+					focusTerminalPane(bootRunId);
+					return;
+				}
+			}
+
 			// A terminal pane is a "workspace run" pane iff its terminalId is in
 			// workspaceRunTerminals. Snapshot before launch so the new terminal
 			// we're about to create doesn't itself match.
@@ -255,7 +291,10 @@ export function useV2WorkspaceRun({
 			// Ctrl-C can leave a server holding its port; the new run replaces
 			// these terminals in the pane, so nothing else would end them.
 			try {
-				const { sessions } = await utils.terminal.list.fetch({ workspaceId });
+				const { sessions } = await utils.terminal.list.fetch(
+					{ workspaceId },
+					{ staleTime: 0 },
+				);
 				await Promise.allSettled(
 					sessions
 						.filter((session) => priorRunTerminalIds.has(session.terminalId))
@@ -339,7 +378,10 @@ export function useV2WorkspaceRun({
 			setIsPending(false);
 		}
 	}, [
+		adoptBootRun,
 		definition,
+		findLiveBootRun,
+		focusTerminalPane,
 		killSessionMutation,
 		launcher,
 		store,

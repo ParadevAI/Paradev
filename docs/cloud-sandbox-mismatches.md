@@ -535,10 +535,12 @@ under a terminal session, never saw its ports, so nothing forwarded them, and
 the desktop's Run started a second copy (`next dev` then fails with "Another
 next dev server is already running"). `runSandboxStartHook` now starts the
 default terminal in a terminal session once setup ends, records its id under
-`/run/superset` so a host-service restart still reports it (and starts it if
-the restart lost setup's exit), `sandbox.status` reports it as
-`runTerminalId`, and the desktop adopts it as the running workspace run
-(SUPER-3421).
+`/run/superset`, and on startup re-attaches that session (or starts it, if the
+restart lost setup's exit). `sandbox.status` reports it as `runTerminalId`
+while it is live. The desktop reads it when the workspace opens and again when
+Run is pressed, and adopts a running one instead of starting a second copy
+(SUPER-3421). There is no push for it, so a workspace open while setup ends
+shows Run until it is pressed.
 
 **Archive ran no teardown.** Locally, deleting a workspace runs the repository's
 teardown before the worktree goes. A cloud archive only stopped the box and
