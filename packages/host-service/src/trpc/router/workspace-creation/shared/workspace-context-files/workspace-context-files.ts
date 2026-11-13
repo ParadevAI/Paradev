@@ -1,13 +1,62 @@
-import { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import {
+	existsSync,
+	lstatSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	readlinkSync,
+	rmdirSync,
+	statSync,
+	symlinkSync,
+	unlinkSync,
+	writeFileSync,
+} from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { eq } from "drizzle-orm";
+import type { HostDb } from "../../../../../db";
+import { projects, workspaces } from "../../../../../db/schema";
+import { listWorkspaceCheckouts } from "../../../../../workspaces/checkouts";
 
 export const WORKSPACE_CONTEXT_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 
-/** Tells agents started in a multi-repo workspace where each repository is. */
+/** Each agent folder whose `skills/` the root links per repository. */
+export const WORKSPACE_SKILL_FOLDERS = [".agents", ".claude"] as const;
+
+const INSTRUCTION_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
+
+export interface ContextCheckout {
+	name: string;
+	path: string;
+	branch: string;
+	isPrimary: boolean;
+}
+
+/**
+ * Tells agents started in a multi-repo workspace where each repository is,
+ * and links each repository's skills into the root, where agents look.
+ */
 export function writeWorkspaceContextFiles(
 	root: string,
-	checkouts: Array<{ name: string; path: string; branch: string }>,
+	checkouts: ContextCheckout[],
 ): void {
+	writeIfChanged(join(root, "AGENTS.md"), renderAgentsFile(checkouts));
+	writeIfChanged(join(root, "CLAUDE.md"), "@AGENTS.md\n");
+	const ordered = [...checkouts].sort(
+		(a, b) => Number(b.isPrimary) - Number(a.isPrimary),
+	);
+	for (const folder of WORKSPACE_SKILL_FOLDERS) {
+		try {
+			syncSkillLinks(root, folder, ordered);
+		} catch (err) {
+			console.warn(
+				`[workspace-context-files] could not link ${folder}/skills in ${root}`,
+				err,
+			);
+		}
+	}
+}
+
+function renderAgentsFile(checkouts: ContextCheckout[]): string {
 	const lines = [
 		"# Workspace",
 		"",
@@ -22,7 +71,246 @@ export function writeWorkspaceContextFiles(
 				`| ${checkout.name} | ${checkout.path} | ${checkout.branch} |`,
 		),
 		"",
+		"## Repository instructions",
+		"",
+		"The instruction files of the repositories are not loaded for you. Before you",
+		"work in a repository, read the files listed for it. Folders inside a",
+		"repository can have their own AGENTS.md or CLAUDE.md: read those before you",
+		"work in that folder.",
+		"",
+		...checkouts.map((checkout) => {
+			const files = INSTRUCTION_FILES.filter((file) =>
+				existsSync(join(checkout.path, file)),
+			).map((file) => join(checkout.path, file));
+			return `- ${checkout.name}: ${files.length > 0 ? files.join(", ") : "no AGENTS.md or CLAUDE.md at its root"}`;
+		}),
+		"",
 	];
-	writeFileSync(join(root, "AGENTS.md"), lines.join("\n"));
-	writeFileSync(join(root, "CLAUDE.md"), "@AGENTS.md\n");
+	return lines.join("\n");
+}
+
+/** Rewrites the context files of a live multi-repo workspace from its checkouts. */
+export function syncWorkspaceContextFiles(
+	db: HostDb,
+	workspaceId: string,
+): void {
+	try {
+		const workspace = db
+			.select()
+			.from(workspaces)
+			.where(eq(workspaces.id, workspaceId))
+			.get();
+		if (!workspace?.projectId || workspace.archivedAt !== null) return;
+		const checkouts = listWorkspaceCheckouts(db, workspace);
+		if (checkouts.length < 2 || !existsSync(workspace.worktreePath)) return;
+		const project = db
+			.select({ primaryRepositoryId: projects.primaryRepositoryId })
+			.from(projects)
+			.where(eq(projects.id, workspace.projectId))
+			.get();
+		writeWorkspaceContextFiles(
+			workspace.worktreePath,
+			checkouts.map((checkout) => ({
+				name: checkout.repository.name,
+				path: checkout.path,
+				branch: checkout.row.branch,
+				isPrimary: checkout.repository.id === project?.primaryRepositoryId,
+			})),
+		);
+	} catch (err) {
+		console.warn("[workspace-context-files] could not update", {
+			workspaceId,
+			err,
+		});
+	}
+}
+
+/** Removes the generated files and skill links, and their folders once empty. */
+export function removeWorkspaceContextFiles(
+	root: string,
+	checkoutPaths: string[],
+): void {
+	for (const file of WORKSPACE_CONTEXT_FILES) {
+		removeFile(join(root, file));
+	}
+	for (const folder of WORKSPACE_SKILL_FOLDERS) {
+		const skills = join(root, folder, "skills");
+		try {
+			for (const name of listRealFolder(skills) ?? []) {
+				const link = join(skills, name);
+				if (isLinkIntoCheckouts(link, checkoutPaths)) unlinkSync(link);
+			}
+			removeIfEmpty(skills);
+			removeIfEmpty(join(root, folder));
+		} catch (err) {
+			console.warn(
+				`[workspace-context-files] could not remove ${folder}/skills links in ${root}`,
+				err,
+			);
+		}
+	}
+}
+
+/**
+ * What a user or agent put in the root's agent folders, as root-relative
+ * paths; the host's own skill links are not listed.
+ */
+export function listSkillFolderLeftovers(
+	root: string,
+	checkoutPaths: string[],
+): string[] {
+	const leftovers: string[] = [];
+	for (const folder of WORKSPACE_SKILL_FOLDERS) {
+		const path = join(root, folder);
+		if (!isPresent(path)) continue;
+		const entries = listRealFolder(path);
+		if (!entries) {
+			leftovers.push(folder);
+			continue;
+		}
+		for (const entry of entries) {
+			if (entry !== "skills") {
+				leftovers.push(`${folder}/${entry}`);
+				continue;
+			}
+			const skills = join(path, "skills");
+			const names = listRealFolder(skills);
+			if (!names) {
+				leftovers.push(`${folder}/skills`);
+				continue;
+			}
+			for (const name of names) {
+				if (!isLinkIntoCheckouts(join(skills, name), checkoutPaths)) {
+					leftovers.push(`${folder}/skills/${name}`);
+				}
+			}
+		}
+	}
+	return leftovers;
+}
+
+function syncSkillLinks(
+	root: string,
+	folder: (typeof WORKSPACE_SKILL_FOLDERS)[number],
+	checkouts: ContextCheckout[],
+): void {
+	const wanted = new Map<string, string>();
+	const ownerOf = new Map<string, string>();
+	for (const checkout of checkouts) {
+		const source = join(checkout.path, folder, "skills");
+		for (const name of listSkillNames(source)) {
+			const owner = ownerOf.get(name);
+			if (owner !== undefined) {
+				console.warn(
+					`[workspace-context-files] skipped ${folder}/skills/${name} of ${checkout.name}: ${owner} has a skill of that name`,
+				);
+				continue;
+			}
+			ownerOf.set(name, checkout.name);
+			wanted.set(name, join(source, name));
+		}
+	}
+
+	const skills = join(root, folder, "skills");
+	if (isPresent(skills) && listRealFolder(skills) === null) {
+		console.warn(
+			`[workspace-context-files] skipped skill links: ${skills} is not a folder`,
+		);
+		return;
+	}
+	const checkoutPaths = checkouts.map((checkout) => checkout.path);
+	for (const name of listRealFolder(skills) ?? []) {
+		const link = join(skills, name);
+		const target = wanted.get(name);
+		if (!isLinkIntoCheckouts(link, checkoutPaths)) {
+			if (target !== undefined) {
+				console.warn(
+					`[workspace-context-files] skipped ${folder}/skills/${name}: a file the host did not make is there`,
+				);
+				wanted.delete(name);
+			}
+			continue;
+		}
+		if (target !== undefined && linkTarget(link) === target) {
+			wanted.delete(name);
+			continue;
+		}
+		unlinkSync(link);
+	}
+
+	if (wanted.size > 0) {
+		mkdirSync(skills, { recursive: true });
+		for (const [name, target] of wanted) {
+			symlinkSync(relative(skills, target), join(skills, name), "dir");
+		}
+	}
+	removeIfEmpty(skills);
+	removeIfEmpty(join(root, folder));
+}
+
+function listSkillNames(source: string): string[] {
+	try {
+		return readdirSync(source).filter((name) => {
+			if (name.startsWith(".")) return false;
+			try {
+				return statSync(join(source, name)).isDirectory();
+			} catch {
+				return false;
+			}
+		});
+	} catch {
+		return [];
+	}
+}
+
+function linkTarget(link: string): string {
+	return resolve(dirname(link), readlinkSync(link));
+}
+
+function isLinkIntoCheckouts(link: string, checkoutPaths: string[]): boolean {
+	try {
+		if (!lstatSync(link).isSymbolicLink()) return false;
+		const target = linkTarget(link);
+		return checkoutPaths.some((path) => target.startsWith(path + sep));
+	} catch {
+		return false;
+	}
+}
+
+function isPresent(path: string): boolean {
+	try {
+		lstatSync(path);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/** Entries of a real folder; null for a missing path, a file or a symlink. */
+function listRealFolder(path: string): string[] | null {
+	try {
+		if (!lstatSync(path).isDirectory()) return null;
+		return readdirSync(path);
+	} catch {
+		return null;
+	}
+}
+
+function removeIfEmpty(path: string): void {
+	if (listRealFolder(path)?.length === 0) rmdirSync(path);
+}
+
+function writeIfChanged(path: string, content: string): void {
+	try {
+		if (readFileSync(path, "utf8") === content) return;
+	} catch {}
+	writeFileSync(path, content);
+}
+
+function removeFile(path: string): void {
+	try {
+		unlinkSync(path);
+	} catch (err) {
+		if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+	}
 }

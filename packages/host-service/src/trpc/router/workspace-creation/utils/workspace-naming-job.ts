@@ -29,6 +29,7 @@ import {
 	gitStatusStore,
 } from "../../git/utils/git-status-store";
 import { resolveGithubRepo } from "../shared/project-helpers";
+import { syncWorkspaceContextFiles } from "../shared/workspace-context-files";
 import {
 	canNameWithAgent,
 	type GeneratedWorkspaceNames,
@@ -360,6 +361,7 @@ async function renameAutomaticBranch(
 			branch: target,
 			autoNaming: input.state,
 		});
+		syncWorkspaceContextFiles(ctx.db, workspaceId);
 	});
 }
 

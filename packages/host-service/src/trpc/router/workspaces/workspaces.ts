@@ -98,7 +98,10 @@ import {
 	parseSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
 import type { GitClient } from "../workspace-creation/shared/types";
-import { writeWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
+import {
+	syncWorkspaceContextFiles,
+	writeWorkspaceContextFiles,
+} from "../workspace-creation/shared/workspace-context-files";
 import {
 	listGitWorktrees,
 	normalizeWorktreePath,
@@ -1004,6 +1007,7 @@ async function createMultiRepoCheckoutsAndRow(
 					name: checkout.repository.name,
 					path: checkout.worktreePath,
 					branch: checkout.branch,
+					isPrimary: checkout.repository.id === primary?.id,
 				})),
 			);
 		} catch (err) {
@@ -1246,18 +1250,9 @@ async function restoreArchivedWorkspace(
 				}
 				throw err;
 			}
-			if (multiRepo) {
-				writeWorkspaceContextFiles(
-					row.worktreePath,
-					checkouts.map((checkout) => ({
-						name: checkout.repository.name,
-						path: checkout.path,
-						branch: checkout.row.branch,
-					})),
-				);
-			}
 		}
 		unarchiveLocalWorkspace(ctx, workspaceId);
+		syncWorkspaceContextFiles(ctx.db, workspaceId);
 		if (recreated.length > 0) {
 			try {
 				const { warning } = await startSetupTerminalIfPresent({

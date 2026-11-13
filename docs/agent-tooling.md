@@ -34,6 +34,18 @@ Everything else links to those:
 Agents other than Claude Code should read the relevant `.agents/skills/*/SKILL.md` when its
 description matches the task.
 
+## Multi-repo workspace roots
+
+An agent started in the root of a workspace with several repositories loads only the root's
+files, not those of the repositories. The host writes the root's `AGENTS.md` (and a `CLAUDE.md`
+that is `@AGENTS.md`): it lists each checkout and names the `AGENTS.md`/`CLAUDE.md` that checkout
+has, for the agent to read before it works there. It also links each skill in
+`<repo>/.agents/skills/` and `<repo>/.claude/skills/` at `<root>/.agents/skills/<name>` and
+`<root>/.claude/skills/<name>`. On a name clash the primary repository's skill wins. The host
+never replaces a file it did not make, and it rewrites all of this when a branch changes or the
+workspace is restored (`workspace-creation/shared/workspace-context-files/`). Repository
+settings and MCP config are not linked.
+
 ## UFO
 
 Install with `curl -fsSL https://ufo.ai/ufo | sh` and complete `ufo login` in a

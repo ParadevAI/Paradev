@@ -25,6 +25,7 @@ import { gitCeilingEnv } from "../../../../runtime/git/ceiling";
 import { resolveHostAgentConfig } from "../../../../terminal-agents/agent-config";
 import type { HostServiceContext } from "../../../../types";
 import { updateLocalWorkspace } from "../../../../workspaces/local-workspace-store";
+import { syncWorkspaceContextFiles } from "../shared/workspace-context-files";
 import { listBranchNames } from "./list-branch-names";
 import { deduplicateBranchName } from "./sanitize-branch";
 
@@ -606,6 +607,7 @@ export async function applyGeneratedWorkspaceNames(
 					)
 					.run();
 			}
+			syncWorkspaceContextFiles(ctx.db, workspaceId);
 		}
 	}
 

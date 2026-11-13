@@ -14,6 +14,7 @@ import {
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
+import { syncWorkspaceContextFiles } from "../../trpc/router/workspace-creation/shared/workspace-context-files";
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
 import {
 	type Checkout,
@@ -1076,6 +1077,9 @@ export class PullRequestRuntimeManager {
 					.set({ branch, updatedAt: Date.now() })
 					.where(eq(workspaces.id, workspace.id))
 					.run();
+			}
+			if (branch !== row.branch || headSha !== row.headSha) {
+				syncWorkspaceContextFiles(this.db, workspace.id);
 			}
 			return true;
 		} catch (error) {

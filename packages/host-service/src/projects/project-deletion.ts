@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
-import { rm, rmdir } from "node:fs/promises";
-import { join } from "node:path";
+import { rmdir } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import {
@@ -15,7 +14,7 @@ import { runTeardown } from "../runtime/teardown";
 import { disposeSessionsByWorkspaceId } from "../terminal/terminal";
 import { cleanupGitOps } from "../trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../trpc/router/workspace-cleanup/is-local-checkout-workspace";
-import { WORKSPACE_CONTEXT_FILES } from "../trpc/router/workspace-creation/shared/workspace-context-files/workspace-context-files";
+import { removeWorkspaceContextFiles } from "../trpc/router/workspace-creation/shared/workspace-context-files";
 import type { HostServiceContext } from "../types";
 import { listWorkspaceCheckouts } from "../workspaces/checkouts";
 import {
@@ -305,9 +304,10 @@ async function purgeProject(
 		}
 		// A multi-repo root holds only the checkouts; a non-empty one stays.
 		if (checkouts.length > 1) {
-			for (const file of WORKSPACE_CONTEXT_FILES) {
-				await rm(join(row.worktreePath, file), { force: true });
-			}
+			removeWorkspaceContextFiles(
+				row.worktreePath,
+				checkouts.map((checkout) => checkout.path),
+			);
 			await rmdir(row.worktreePath).catch(() => {});
 		}
 	}

@@ -43,6 +43,7 @@ import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
 import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
+import { syncWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
 import type {
 	ChangedFile,
 	CheckConclusionState,
@@ -709,6 +710,7 @@ export const gitRouter = router({
 					)
 					.run();
 				followSharedCheckoutBranch(ctx.db, input.workspaceId);
+				syncWorkspaceContextFiles(ctx.db, input.workspaceId);
 				emitWorkspaceUpdated(ctx, input.workspaceId);
 			}
 			invalidateStatus(checkout.statusKey);
@@ -770,6 +772,7 @@ export const gitRouter = router({
 				);
 			} else {
 				followSharedCheckoutBranch(ctx.db, input.workspaceId);
+				syncWorkspaceContextFiles(ctx.db, input.workspaceId);
 				emitWorkspaceUpdated(ctx, input.workspaceId);
 			}
 			invalidateStatus(checkout.statusKey);

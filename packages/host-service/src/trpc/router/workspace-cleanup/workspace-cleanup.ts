@@ -1,5 +1,5 @@
 import { readdir, rm, rmdir } from "node:fs/promises";
-import { join, relative, sep } from "node:path";
+import { relative, sep } from "node:path";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
 import { inArray, isNull } from "drizzle-orm";
@@ -32,7 +32,12 @@ import type {
 import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
-import { WORKSPACE_CONTEXT_FILES } from "../workspace-creation/shared/workspace-context-files";
+import {
+	listSkillFolderLeftovers,
+	removeWorkspaceContextFiles,
+	WORKSPACE_CONTEXT_FILES,
+	WORKSPACE_SKILL_FOLDERS,
+} from "../workspace-creation/shared/workspace-context-files";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
 import {
@@ -479,6 +484,7 @@ async function rootLeftovers({
 	if (!local || checkouts.length < 2) return [];
 	const owned = new Set<string>([
 		...WORKSPACE_CONTEXT_FILES,
+		...WORKSPACE_SKILL_FOLDERS,
 		...checkouts.map(
 			(checkout) =>
 				relative(local.worktreePath, checkout.path).split(sep)[0] ?? "",
@@ -486,7 +492,13 @@ async function rootLeftovers({
 	]);
 	try {
 		const entries = await readdir(local.worktreePath);
-		return entries.filter((name) => !owned.has(name)).sort();
+		return [
+			...entries.filter((name) => !owned.has(name)),
+			...listSkillFolderLeftovers(
+				local.worktreePath,
+				checkouts.map((checkout) => checkout.path),
+			),
+		].sort();
 	} catch {
 		return [];
 	}
@@ -628,6 +640,7 @@ async function runDestroyPhases(
 		if (multiRepo) {
 			await removeWorkspaceRoot(ctx, {
 				root: local.worktreePath,
+				checkoutPaths: checkouts.map((checkout) => checkout.path),
 				project,
 				recursive: input.force && worktreeRemoved,
 				warnings,
@@ -714,11 +727,13 @@ async function removeWorkspaceRoot(
 	ctx: HostServiceContext,
 	{
 		root,
+		checkoutPaths,
 		project,
 		recursive,
 		warnings,
 	}: {
 		root: string;
+		checkoutPaths: string[];
 		project: NonNullable<LocalCheckoutWorkspaceResult["project"]>;
 		recursive: boolean;
 		warnings: string[];
@@ -738,9 +753,7 @@ async function removeWorkspaceRoot(
 		}
 		return;
 	}
-	for (const file of WORKSPACE_CONTEXT_FILES) {
-		await rm(join(root, file), { force: true });
-	}
+	removeWorkspaceContextFiles(root, checkoutPaths);
 	await rmdir(root).catch((err) => {
 		if (isMissingPath(root, { followSymlinks: false })) return;
 		const message = err instanceof Error ? err.message : String(err);

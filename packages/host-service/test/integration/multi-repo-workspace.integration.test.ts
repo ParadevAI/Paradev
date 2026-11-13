@@ -228,6 +228,35 @@ test("deleting a multi-repo workspace removes every worktree and the root", asyn
 	}
 });
 
+test("the root links each repository's skills and points at its instructions; delete removes them", async () => {
+	const scenario = await multiRepoScenario();
+	mkdirSync(join(scenario.api.repoPath, ".claude", "skills", "migrate"), {
+		recursive: true,
+	});
+	await scenario.api.commit("instructions and a skill", {
+		"AGENTS.md": "api rules\n",
+		".claude/skills/migrate/SKILL.md": "# migrate\n",
+	});
+	const workspace = await createBoth(scenario);
+	const root = workspace.worktreePath;
+
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+		`- api: ${join(root, "api", "AGENTS.md")}\n`,
+	);
+	expect(
+		readFileSync(
+			join(root, ".claude", "skills", "migrate", "SKILL.md"),
+			"utf8",
+		),
+	).toBe("# migrate\n");
+
+	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
+	expect(existsSync(root)).toBe(false);
+});
+
 test("a dirty checkout blocks the delete and is named, before any checkout is removed", async () => {
 	const scenario = await multiRepoScenario();
 	const workspace = await createBoth(scenario);
@@ -287,7 +316,7 @@ test("files an agent left in the root warn and block the delete; a forced delete
 			workspaceId: workspace.id,
 		}),
 	).rejects.toThrow(
-		"Workspace folder has files outside the repositories: .claude",
+		"Workspace folder has files outside the repositories: .claude/settings.local.json",
 	);
 	expect(existsSync(join(root, "api"))).toBe(true);
 
@@ -877,7 +906,7 @@ test("a moved branch under a remote not named origin is checked out, not branche
 	expect((await headOf(apiCheckout?.path ?? "")).oid).toStartWith(moved);
 });
 
-test("a branch rename or checkout in one checkout broadcasts the workspace", async () => {
+test("a branch rename or checkout in one checkout broadcasts the workspace and updates its AGENTS.md", async () => {
 	const scenario = await multiRepoScenario();
 	const workspace = await createBoth(scenario);
 	await scenario.api.git.branch(["other"]);
@@ -888,6 +917,9 @@ test("a branch rename or checkout in one checkout broadcasts the workspace", asy
 			(checkout) => checkout.repositoryId === scenario.apiId,
 		)?.branch;
 	};
+	const apiPath = join(workspace.worktreePath, "api");
+	const agentsFile = () =>
+		readFileSync(join(workspace.worktreePath, "AGENTS.md"), "utf8");
 	try {
 		await scenario.host.trpc.git.renameBranch.mutate({
 			workspaceId: workspace.id,
@@ -896,6 +928,7 @@ test("a branch rename or checkout in one checkout broadcasts the workspace", asy
 			newName: "feature/renamed",
 		});
 		expect(apiBranch()).toBe("feature/renamed");
+		expect(agentsFile()).toContain(`| api | ${apiPath} | feature/renamed |`);
 
 		await scenario.host.trpc.git.checkoutBranch.mutate({
 			workspaceId: workspace.id,
@@ -903,6 +936,7 @@ test("a branch rename or checkout in one checkout broadcasts the workspace", asy
 			branch: "other",
 		});
 		expect(apiBranch()).toBe("other");
+		expect(agentsFile()).toContain(`| api | ${apiPath} | other |`);
 	} finally {
 		broadcast.mockRestore();
 	}
