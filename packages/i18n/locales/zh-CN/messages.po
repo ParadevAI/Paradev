@@ -1349,14 +1349,14 @@ msgstr "{productName} 完成了 1150 万美元的种子轮融资，由 Union Squ
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} 在 2026 年 10 月之前名为 {formerName}。"
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# 个待拉取的提交} other {# 个待拉取的提交}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 个 PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · 目标 {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# 个待拉取的提交} other {# 个待拉取的提交}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# 个未推送的提交} other {# 个未推送的提交}}"
@@ -14581,9 +14581,6 @@ msgstr "正在聊天界面中打开…"
 msgid "Opening pages"
 msgstr "打开页面"
 
-msgid "Opens different repositories than this workspace"
-msgstr "打开的仓库与此工作区不同"
-
 msgid "Operator"
 msgstr "操作员"
 
@@ -16564,11 +16561,11 @@ msgstr "从收藏中移除"
 msgid "Remove from group"
 msgstr "移出分组"
 
-msgid "Remove from queue"
-msgstr "移出队列"
-
 msgid "Remove from project"
 msgstr "从项目中移除"
+
+msgid "Remove from queue"
+msgstr "移出队列"
 
 msgid "Remove from Queue"
 msgstr "移出队列"

@@ -1349,14 +1349,14 @@ msgstr "{productName} hat eine Seed-Finanzierungsrunde über 11,5 Mio. US-Dollar
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} hieß bis Oktober 2026 {formerName}."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# Commit zum Pullen} other {# Commits zum Pullen}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · Ziel {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# Commit zum Pullen} other {# Commits zum Pullen}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# Commit nicht gepusht} other {# Commits nicht gepusht}}"
@@ -14581,9 +14581,6 @@ msgstr "Wird in der Chat-Oberfläche geöffnet…"
 msgid "Opening pages"
 msgstr "Seiten öffnen"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Öffnet andere Repositories als dieser Arbeitsbereich"
-
 msgid "Operator"
 msgstr "Operator"
 
@@ -16564,11 +16561,11 @@ msgstr "Aus Favoriten entfernen"
 msgid "Remove from group"
 msgstr "Aus Gruppe entfernen"
 
-msgid "Remove from queue"
-msgstr "Aus der Warteschlange entfernen"
-
 msgid "Remove from project"
 msgstr "Aus Projekt entfernen"
+
+msgid "Remove from queue"
+msgstr "Aus der Warteschlange entfernen"
 
 msgid "Remove from Queue"
 msgstr "Aus Warteschlange entfernen"

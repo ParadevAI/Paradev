@@ -1349,14 +1349,14 @@ msgstr "{productName} привлёк 11,5 млн долларов в посев�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "До октября 2026 года {productName} назывался {formerName}."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# коммит для пула} few {# коммита для пула} many {# коммитов для пула} other {# коммита для пула}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · в {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# коммит для пула} few {# коммита для пула} many {# коммитов для пула} other {# коммита для пула}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# незапушенный коммит} few {# незапушенных коммита} many {# незапушенных коммитов} other {# незапушенного коммита}}"
@@ -14581,9 +14581,6 @@ msgstr "Открытие в интерфейсе чата…"
 msgid "Opening pages"
 msgstr "Открытие страниц"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Открывает не те репозитории, что в этой рабочей области"
-
 msgid "Operator"
 msgstr "Оператор"
 
@@ -16564,11 +16561,11 @@ msgstr "Удалить из избранного"
 msgid "Remove from group"
 msgstr "Убрать из группы"
 
-msgid "Remove from queue"
-msgstr "Убрать из очереди"
-
 msgid "Remove from project"
 msgstr "Удалить из проекта"
+
+msgid "Remove from queue"
+msgstr "Убрать из очереди"
 
 msgid "Remove from Queue"
 msgstr "Убрать из очереди"

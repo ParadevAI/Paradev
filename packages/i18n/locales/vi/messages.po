@@ -1349,14 +1349,14 @@ msgstr "{productName} đã gọi được vòng hạt giống 11,5 triệu USD d
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} có tên là {formerName} cho đến tháng 10 năm 2026."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit cần pull} other {# commit cần pull}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · vào {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit cần pull} other {# commit cần pull}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# commit chưa push} other {# commit chưa push}}"
@@ -14581,9 +14581,6 @@ msgstr "Đang mở trong giao diện chat…"
 msgid "Opening pages"
 msgstr "Mở trang"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Mở các repository khác với workspace này"
-
 msgid "Operator"
 msgstr "Người vận hành"
 
@@ -16564,11 +16561,11 @@ msgstr "Xóa khỏi mục yêu thích"
 msgid "Remove from group"
 msgstr "Xóa khỏi nhóm"
 
-msgid "Remove from queue"
-msgstr "Gỡ khỏi hàng đợi"
-
 msgid "Remove from project"
 msgstr "Gỡ khỏi dự án"
+
+msgid "Remove from queue"
+msgstr "Gỡ khỏi hàng đợi"
 
 msgid "Remove from Queue"
 msgstr "Bỏ khỏi hàng đợi"

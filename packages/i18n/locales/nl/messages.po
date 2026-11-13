@@ -1349,14 +1349,14 @@ msgstr "{productName} haalde een seedronde van 11,5 miljoen dollar op onder leid
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} heette tot oktober 2026 {formerName}."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit om te pullen} other {# commits om te pullen}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR's}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · naar {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit om te pullen} other {# commits om te pullen}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# commit niet gepusht} other {# commits niet gepusht}}"
@@ -14581,9 +14581,6 @@ msgstr "Openen in chatinterface…"
 msgid "Opening pages"
 msgstr "Pagina's openen"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Opent andere repository's dan deze werkruimte"
-
 msgid "Operator"
 msgstr "Operator"
 
@@ -16564,11 +16561,11 @@ msgstr "Verwijderen uit favorieten"
 msgid "Remove from group"
 msgstr "Uit groep verwijderen"
 
-msgid "Remove from queue"
-msgstr "Uit wachtrij halen"
-
 msgid "Remove from project"
 msgstr "Uit project verwijderen"
+
+msgid "Remove from queue"
+msgstr "Uit wachtrij halen"
 
 msgid "Remove from Queue"
 msgstr "Uit wachtrij halen"

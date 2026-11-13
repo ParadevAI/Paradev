@@ -1349,14 +1349,14 @@ msgstr "{productName} pozyskał 11,5 mln USD w rundzie seed prowadzonej przez Un
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} nazywał się {formerName} do października 2026 roku."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit do pobrania} few {# commity do pobrania} many {# commitów do pobrania} other {# commita do pobrania}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR-y} many {# PR-ów} other {# PR-a}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · do {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit do pobrania} few {# commity do pobrania} many {# commitów do pobrania} other {# commita do pobrania}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# niewypchnięty commit} few {# niewypchnięte commity} many {# niewypchniętych commitów} other {# niewypchniętego commita}}"
@@ -14581,9 +14581,6 @@ msgstr "Otwieranie w interfejsie czatu…"
 msgid "Opening pages"
 msgstr "Otwieranie stron"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Otwiera inne repozytoria niż ten obszar roboczy"
-
 msgid "Operator"
 msgstr "Operator"
 
@@ -16564,11 +16561,11 @@ msgstr "Usuń z ulubionych"
 msgid "Remove from group"
 msgstr "Usuń z grupy"
 
-msgid "Remove from queue"
-msgstr "Usuń z kolejki"
-
 msgid "Remove from project"
 msgstr "Usuń z projektu"
+
+msgid "Remove from queue"
+msgstr "Usuń z kolejki"
 
 msgid "Remove from Queue"
 msgstr "Usuń z kolejki"

@@ -1349,14 +1349,14 @@ msgstr "{productName} は、Union Square Ventures がリードし、Y Combinator
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} は 2026 年 10 月まで {formerName} という名前でした。"
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {プルするコミット: #件} other {プルするコミット: #件}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {# 件の PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · {base} 向け"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {プルするコミット: #件} other {プルするコミット: #件}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {未プッシュのコミット: #件} other {未プッシュのコミット: #件}}"
@@ -14581,9 +14581,6 @@ msgstr "チャット画面で開いています…"
 msgid "Opening pages"
 msgstr "ページを開く"
 
-msgid "Opens different repositories than this workspace"
-msgstr "このワークスペースとは異なるリポジトリを開きます"
-
 msgid "Operator"
 msgstr "オペレーター"
 
@@ -16564,11 +16561,11 @@ msgstr "お気に入りから削除"
 msgid "Remove from group"
 msgstr "グループから外す"
 
-msgid "Remove from queue"
-msgstr "キューから外す"
-
 msgid "Remove from project"
 msgstr "プロジェクトから外す"
+
+msgid "Remove from queue"
+msgstr "キューから外す"
 
 msgid "Remove from Queue"
 msgstr "キューから削除"

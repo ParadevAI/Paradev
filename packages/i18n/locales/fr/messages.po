@@ -1349,14 +1349,14 @@ msgstr "{productName} a levé un tour de table d’amorçage de 11,5 millions de
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} s'appelait {formerName} jusqu'en octobre 2026."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit à récupérer} other {# commits à récupérer}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · cible {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit à récupérer} other {# commits à récupérer}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# commit non poussé} other {# commits non poussés}}"
@@ -14581,9 +14581,6 @@ msgstr "Ouverture dans l’interface de chat…"
 msgid "Opening pages"
 msgstr "Ouverture des pages"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Ouvre d'autres dépôts que cet espace de travail"
-
 msgid "Operator"
 msgstr "Opérateur"
 
@@ -16564,11 +16561,11 @@ msgstr "Retirer des favoris"
 msgid "Remove from group"
 msgstr "Retirer du groupe"
 
-msgid "Remove from queue"
-msgstr "Retirer de la file"
-
 msgid "Remove from project"
 msgstr "Retirer du projet"
+
+msgid "Remove from queue"
+msgstr "Retirer de la file"
 
 msgid "Remove from Queue"
 msgstr "Retirer de la file"

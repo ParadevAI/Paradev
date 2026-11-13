@@ -1349,14 +1349,14 @@ msgstr "{productName} 팀은 Union Square Ventures가 리드하고 Y Combinator�
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}의 이름은 2026년 10월까지 {formerName}였습니다."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {풀할 커밋 #개} other {풀할 커밋 #개}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, other {PR #개}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · 대상 {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {풀할 커밋 #개} other {풀할 커밋 #개}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {푸시하지 않은 커밋 #개} other {푸시하지 않은 커밋 #개}}"
@@ -14581,9 +14581,6 @@ msgstr "채팅 인터페이스에서 여는 중…"
 msgid "Opening pages"
 msgstr "페이지 열기"
 
-msgid "Opens different repositories than this workspace"
-msgstr "이 워크스페이스와 다른 리포지토리를 엽니다"
-
 msgid "Operator"
 msgstr "작업자"
 
@@ -16564,11 +16561,11 @@ msgstr "즐겨찾기에서 제거"
 msgid "Remove from group"
 msgstr "그룹에서 제거"
 
-msgid "Remove from queue"
-msgstr "대기열에서 빼기"
-
 msgid "Remove from project"
 msgstr "프로젝트에서 제거"
+
+msgid "Remove from queue"
+msgstr "대기열에서 빼기"
 
 msgid "Remove from Queue"
 msgstr "대기열에서 제거"

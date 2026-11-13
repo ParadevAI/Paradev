@@ -1349,14 +1349,14 @@ msgstr "{productName} ha raccolto un round seed da 11,5 milioni di dollari guida
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} si chiamava {formerName} fino a ottobre 2026."
 
+msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
+msgstr "{pullCount, plural, one {# commit da scaricare} other {# commit da scaricare}}"
+
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · verso {base}"
-
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit da scaricare} other {# commit da scaricare}}"
 
 msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
 msgstr "{pushCount, plural, one {# commit non inviato} other {# commit non inviati}}"
@@ -14581,9 +14581,6 @@ msgstr "Apertura nell’interfaccia chat…"
 msgid "Opening pages"
 msgstr "Apertura delle pagine"
 
-msgid "Opens different repositories than this workspace"
-msgstr "Apre repository diversi da quelli di questo workspace"
-
 msgid "Operator"
 msgstr "Operatore"
 
@@ -16564,11 +16561,11 @@ msgstr "Rimuovi dai preferiti"
 msgid "Remove from group"
 msgstr "Rimuovi dal gruppo"
 
-msgid "Remove from queue"
-msgstr "Rimuovi dalla coda"
-
 msgid "Remove from project"
 msgstr "Rimuovi dal progetto"
+
+msgid "Remove from queue"
+msgstr "Rimuovi dalla coda"
 
 msgid "Remove from Queue"
 msgstr "Rimuovi dalla coda"
