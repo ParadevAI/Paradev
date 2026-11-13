@@ -6,7 +6,8 @@ interface MemberRemovedBillingEmailProps {
 	organizationName: string;
 	removedMemberName: string;
 	removedMemberEmail: string;
-	removedByName: string;
+	/** Null when the member left on their own. */
+	removedByName: string | null;
 	newSeatCount: number;
 	newMonthlyTotal: string;
 	billingInterval?: "monthly" | "yearly";
@@ -34,16 +35,29 @@ export function MemberRemovedBillingEmail({
 
 	return (
 		<EmailLayout
-			preview={`Billing update: ${removedMemberName} was removed from ${organizationName}`}
+			preview={
+				removedByName === null
+					? `Billing update: ${removedMemberName} left ${organizationName}`
+					: `Billing update: ${removedMemberName} was removed from ${organizationName}`
+			}
 		>
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
-				{removedByName} removed <strong>{removedMemberName}</strong> (
-				{removedMemberEmail}) from <strong>{organizationName}</strong>. Your
-				subscription has been updated:
+				{removedByName === null ? (
+					<>
+						<strong>{removedMemberName}</strong> ({removedMemberEmail}) left{" "}
+						<strong>{organizationName}</strong>.
+					</>
+				) : (
+					<>
+						{removedByName} removed <strong>{removedMemberName}</strong> (
+						{removedMemberEmail}) from <strong>{organizationName}</strong>.
+					</>
+				)}{" "}
+				Your subscription has been updated:
 			</Text>
 
 			<Hr className="border-border my-4" />

@@ -16,7 +16,7 @@ import {
 	verifications,
 } from "@superset/db/schema/auth";
 import {
-	cleanupRemovedMember,
+	completedMemberRemovalEffects,
 	findMemberRemovalEffects,
 	findOrgMembership,
 } from "@superset/db/utils";
@@ -633,6 +633,11 @@ export const organizationRouter = {
 				});
 			}
 
+			const planned = await findMemberRemovalEffects({
+				userId: input.userId,
+				organizationId: input.organizationId,
+			});
+
 			await ctx.auth.api.removeMember({
 				body: {
 					organizationId: input.organizationId,
@@ -641,10 +646,10 @@ export const organizationRouter = {
 				headers: ctx.headers,
 			});
 
-			const cleanup = await cleanupRemovedMember({
-				userId: input.userId,
-				organizationId: input.organizationId,
-			});
+			const cleanup = await completedMemberRemovalEffects(
+				input.organizationId,
+				planned,
+			);
 
 			return { success: true, cleanup: countEffects(cleanup) };
 		}),
@@ -692,6 +697,11 @@ export const organizationRouter = {
 				});
 			}
 
+			const planned = await findMemberRemovalEffects({
+				userId: ctx.session.user.id,
+				organizationId: input.organizationId,
+			});
+
 			const leaveResult = await ctx.auth.api.leaveOrganization({
 				body: { organizationId: input.organizationId },
 				headers: ctx.headers,
@@ -705,10 +715,10 @@ export const organizationRouter = {
 				});
 			}
 
-			const cleanup = await cleanupRemovedMember({
-				userId: ctx.session.user.id,
-				organizationId: input.organizationId,
-			});
+			const cleanup = await completedMemberRemovalEffects(
+				input.organizationId,
+				planned,
+			);
 
 			const otherMembership = await db.query.members.findFirst({
 				where: and(

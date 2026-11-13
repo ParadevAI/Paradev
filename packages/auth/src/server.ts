@@ -8,10 +8,8 @@ import type { sessions } from "@superset/db/schema/auth";
 import * as authSchema from "@superset/db/schema/auth";
 import { seedDefaultStatuses } from "@superset/db/seed-default-statuses";
 import { MemberAddedBillingEmail } from "@superset/email/emails/billing/member-added";
-import { MemberRemovedBillingEmail } from "@superset/email/emails/billing/member-removed";
 import { OrganizationInvitationEmail } from "@superset/email/emails/team/invitation";
 import { MemberAddedEmail } from "@superset/email/emails/team/member-added";
-import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
 import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
@@ -26,6 +24,7 @@ import {
 	APIError,
 	createAuthMiddleware,
 	getSessionFromCtx,
+	isAPIError,
 } from "better-auth/api";
 import {
 	bearer,
@@ -56,9 +55,13 @@ import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import {
+	afterMemberDeparted,
+	departedMemberFrom,
+} from "./lib/member-departure";
+import { memberDepartureDeps } from "./lib/member-departure-deps";
+import {
 	convertPendingShares,
 	removeInvitationShares,
-	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
 import { resend } from "./lib/resend";
@@ -180,21 +183,31 @@ export const auth = betterAuth({
 				});
 			}
 		}),
-		// Remember the switch on the user, not just on the session that made it.
-		// `sessions.active_organization_id` dies with its session, and the next
-		// session would fall back to the newest membership — which is how people
-		// ended up in an organization they never chose. Better-auth has no
-		// set-active hook, so the route is the choke point; every client reaches
-		// it through `organization.setActive`.
-		//
-		// `ctx.context.returned` rather than `newSession`: the dispatcher hands
-		// after-hooks a shallow copy of the context, so the `setNewSession` the
-		// endpoint called is not visible here. `returned` is the organization
-		// the route settled on, or null when the active organization is cleared.
 		after: createAuthMiddleware(async (ctx) => {
+			if (ctx.path === "/organization/leave") {
+				const member = departedMemberFrom(ctx.context.returned);
+				if (!member) return;
+				await afterMemberDeparted(
+					member,
+					memberDepartureDeps({ how: { kind: "left" } }),
+				);
+				return;
+			}
+
+			// Remember the switch on the user, not just on the session that made it.
+			// `sessions.active_organization_id` dies with its session, and the next
+			// session would fall back to the newest membership — which is how people
+			// ended up in an organization they never chose. Better-auth has no
+			// set-active hook, so the route is the choke point; every client reaches
+			// it through `organization.setActive`.
+			//
+			// `ctx.context.returned` rather than `newSession`: the dispatcher hands
+			// after-hooks a shallow copy of the context, so the `setNewSession` the
+			// endpoint called is not visible here. `returned` is the organization
+			// the route settled on, or null when the active organization is cleared.
 			if (ctx.path !== "/organization/set-active") return;
 			const returned = ctx.context.returned;
-			if (returned instanceof APIError) return;
+			if (isAPIError(returned)) return;
 
 			const organizationId =
 				returned && typeof returned === "object" && "id" in returned
@@ -916,130 +929,13 @@ export const auth = betterAuth({
 				},
 
 				afterRemoveMember: async ({ user, organization }) => {
-					try {
-						await removeMemberShares({
-							organizationId: organization.id,
-							userId: user.id,
-						});
-					} catch (error) {
-						console.error(
-							"[org/after-remove-member] Failed to remove shares:",
-							error,
-						);
-					}
-
-					await resend.emails.send({
-						from: NOREPLY_FROM,
-						to: user.email,
-						subject: `You've been removed from ${organization.name}`,
-						react: MemberRemovedEmail({
-							memberName: user.name,
-							organizationName: organization.name,
-							removedByName: "A team admin",
+					await afterMemberDeparted(
+						{ userId: user.id, organizationId: organization.id },
+						memberDepartureDeps({
+							how: { kind: "removed", by: "A team admin" },
+							departure: { organization, user },
 						}),
-					});
-
-					const subscription = await db.query.subscriptions.findFirst({
-						where: and(
-							eq(subscriptions.referenceId, organization.id),
-							inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
-						),
-					});
-
-					if (!subscription?.stripeSubscriptionId) return;
-					if (subscription.plan === "enterprise") return;
-					const quantity = Math.max(
-						1,
-						await countBillableSeats(organization.id),
 					);
-
-					const stripeSub = await stripeClient.subscriptions.retrieve(
-						subscription.stripeSubscriptionId,
-					);
-					const seat = seatItem(stripeSub);
-					const itemId = seat?.id;
-
-					const seatsOwnedByAutumn =
-						billingUsesAutumn &&
-						(await setAutumnSeats(organization.id, quantity));
-					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
-					if (!seatsOwnedByAutumn && itemId) {
-						await stripeClient.subscriptions.update(
-							subscription.stripeSubscriptionId,
-							{
-								items: [{ id: itemId, quantity }],
-								proration_behavior: "create_prorations",
-							},
-						);
-					}
-
-					const recipients = await getOrganizationBillingRecipients(
-						organization.id,
-					);
-					const pricePerSeat = seat?.price?.unit_amount ?? 0;
-					const currency = seat?.price?.currency ?? "usd";
-					const newMonthlyTotal = formatPrice(
-						pricePerSeat * quantity,
-						currency,
-					);
-					// unit_amount is per billing period: on an annual price the total
-					// above is yearly, and calling it monthly understates it 12x.
-					const billingInterval =
-						seat?.price?.recurring?.interval === "year"
-							? ("yearly" as const)
-							: ("monthly" as const);
-
-					const customerId =
-						typeof stripeSub.customer === "string"
-							? stripeSub.customer
-							: stripeSub.customer.id;
-					const preview = itemId
-						? await previewNextInvoice(
-								customerId,
-								subscription.stripeSubscriptionId,
-								itemId,
-								"credit",
-							)
-						: null;
-
-					await resend.batch.send(
-						recipients.map((recipient) => ({
-							from: NOREPLY_FROM,
-							to: recipient.email,
-							subject: `Billing update: Member removed from ${organization.name}`,
-							react: MemberRemovedBillingEmail({
-								recipientName: recipient.name,
-								prorationAmount: preview?.prorationAmount ?? null,
-								nextInvoiceTotal: preview?.nextInvoiceTotal ?? null,
-								organizationName: organization.name,
-								removedMemberName: user.name ?? "Former member",
-								removedMemberEmail: user.email,
-								removedByName: "A team admin",
-								newSeatCount: quantity,
-								newMonthlyTotal,
-								billingInterval,
-							}),
-						})),
-					);
-
-					try {
-						await qstash.publishJSON({
-							url: NOTIFY_SLACK_URL,
-							body: {
-								eventType: "seat_removed",
-								stripeSubscriptionId: subscription.stripeSubscriptionId,
-								memberName: user.name ?? "Former member",
-								previousSeats: quantity + 1,
-								newSeats: quantity,
-							},
-							retries: 3,
-						});
-					} catch (error) {
-						console.error(
-							"[org/after-remove-member] Failed to queue Slack notification:",
-							error,
-						);
-					}
 				},
 
 				afterCancelInvitation: async ({ invitation }) => {
