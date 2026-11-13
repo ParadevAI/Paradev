@@ -11,6 +11,7 @@ export const env = createEnv({
 	},
 
 	server: {
+		DOMAIN_MOVE_ENABLED: z.string().optional(),
 		DATABASE_URL: z.string().url(),
 		DATABASE_URL_UNPOOLED: z.string().url(),
 		BETTER_AUTH_SECRET: z.string(),
