@@ -12,6 +12,14 @@ let sessionInput: Record<string, unknown> | undefined;
 let cloudAvailable = false;
 
 withLocalHostService("org-1", {
+	"project.get": () => ({
+		id: "project-1",
+		name: "orbit",
+		repositories: [
+			{ id: "r-api", name: "api", isPrimary: true },
+			{ id: "r-web", name: "web", isPrimary: false },
+		],
+	}),
 	"workspaces.createLocal": (input) => {
 		createProcedure = "createLocal";
 		if (localCreateError) throw localCreateError;
@@ -47,7 +55,8 @@ function invoke(
 		branch?: string | undefined;
 		model?: string;
 		checkout?: string;
-		pr?: number;
+		pr?: string[];
+		baseBranch?: string[];
 		machineSize?: MachineSize;
 	} = {},
 ) {
@@ -239,7 +248,7 @@ describe("workspaces create", () => {
 
 	test("rejects --pr alongside --checkout local", async () => {
 		await expect(
-			invoke({ checkout: "local", branch: undefined, pr: 12 }),
+			invoke({ checkout: "local", branch: undefined, pr: ["12"] }),
 		).rejects.toThrow(/cannot be combined with --checkout local/);
 	});
 
@@ -265,5 +274,26 @@ describe("workspaces create", () => {
 				session: true,
 			}),
 		).rejects.toThrow(/--checkout requires --project/);
+	});
+});
+
+describe("workspaces create on a project of several repositories", () => {
+	test("sends --pr and --base-branch per repository as checkouts", async () => {
+		await invoke({
+			branch: undefined,
+			pr: ["web=12"],
+			baseBranch: ["api=release"],
+		});
+		expect(createInput).toMatchObject({
+			checkouts: { "r-web": { pr: 12 }, "r-api": { baseBranch: "release" } },
+		});
+		expect(createInput).not.toHaveProperty("pr");
+	});
+
+	test("refuses a bare --pr, naming the repositories", async () => {
+		await expect(invoke({ branch: undefined, pr: ["12"] })).rejects.toThrow(
+			/needs a repository/,
+		);
+		expect(createInput).toBeUndefined();
 	});
 });

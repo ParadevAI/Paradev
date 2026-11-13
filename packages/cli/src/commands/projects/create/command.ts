@@ -1,21 +1,22 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { requireHostTarget, resolveHostTarget } from "../../../lib/host-target";
+import { repositorySource } from "./utils/repositorySource";
 
 export default command({
-	description: "Create a project on a host",
+	description: "Create a project of one or more repositories on a host",
 	options: {
 		host: string().desc("Target host machineId (required unless --local)"),
 		local: boolean().desc("Target this machine (required unless --host)"),
 		name: string().required().desc("Project name"),
-		clone: string().desc(
-			"Git remote URL to clone (requires --parent-dir). Mutually exclusive with --import",
-		),
+		repo: string()
+			.variadic()
+			.required()
+			.desc(
+				"A repository: a local path on the target host, or a git URL to clone into --parent-dir. Repeatable; the first is the primary",
+			),
 		parentDir: string().desc(
-			"Parent directory the cloned repo lands in (required with --clone)",
-		),
-		import: string().desc(
-			"Existing local repo path on the target host. Mutually exclusive with --clone",
+			"Directory cloned repositories land in (required when a --repo is a URL)",
 		),
 	},
 	run: async ({ ctx, options }) => {
@@ -24,22 +25,18 @@ export default command({
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
 
-		if (Boolean(options.clone) === Boolean(options.import)) {
+		const repositories = options.repo.map(repositorySource);
+		const clones = repositories.some((source) => source.kind === "clone");
+		if (clones && !options.parentDir) {
 			throw new CLIError(
-				"Specify exactly one of --clone or --import",
-				"Use --clone <url> --parent-dir <path> or --import <path>",
+				"Cloning a --repo URL needs --parent-dir",
+				"Pass --parent-dir <path> for the clones",
 			);
 		}
-		if (options.clone && !options.parentDir) {
+		if (!clones && options.parentDir) {
 			throw new CLIError(
-				"--clone requires --parent-dir",
-				"Pass --parent-dir <path> alongside --clone",
-			);
-		}
-		if (options.import && options.parentDir) {
-			throw new CLIError(
-				"--parent-dir cannot be used with --import",
-				"--import takes the full repo path",
+				"--parent-dir is only used to clone a --repo URL",
+				"Local --repo paths are used where they are",
 			);
 		}
 
@@ -55,25 +52,17 @@ export default command({
 			api: ctx.api,
 		});
 
-		const mode = options.clone
-			? {
-					kind: "clone" as const,
-					parentDir: options.parentDir as string,
-					url: options.clone,
-				}
-			: {
-					kind: "importLocal" as const,
-					repoPath: options.import as string,
-				};
-
 		const result = await target.client.project.create.mutate({
 			name: options.name,
-			mode,
+			repositories,
+			...(options.parentDir ? { parentDir: options.parentDir } : {}),
 		});
 
 		return {
 			data: result,
-			message: `Created project "${options.name}" on host ${target.hostId}`,
+			message: `Created project "${result.name}" with ${result.repositories.length} repositor${
+				result.repositories.length === 1 ? "y" : "ies"
+			} on host ${target.hostId}`,
 		};
 	},
 });

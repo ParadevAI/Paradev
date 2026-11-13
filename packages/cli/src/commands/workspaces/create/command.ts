@@ -1,4 +1,4 @@
-import { boolean, CLIError, number, string } from "@superset/cli-framework";
+import { boolean, CLIError, string } from "@superset/cli-framework";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
@@ -6,6 +6,7 @@ import { resolveHostTarget } from "../../../lib/host-target";
 import { workspaceLinks } from "../../../lib/open-url";
 import { uploadAttachments } from "../../../lib/upload-attachments";
 import { createCloudWorkspace } from "./createCloudWorkspace";
+import { buildCheckouts } from "./utils/buildCheckouts";
 
 export default command({
 	description:
@@ -34,13 +35,19 @@ export default command({
 		branch: string().desc(
 			"Git branch the workspace works on, for a workspace on a host (required there unless --pr, --task, or --checkout local is set). A cloud workspace always gets a new branch of its own; use --base-branch",
 		),
-		pr: number().desc("PR number — checks out the verified PR head"),
+		pr: string()
+			.variadic()
+			.desc(
+				"PR to check out (the verified PR head). `<n>` on a project of one repository; `<repository>=<n>` otherwise. Repeatable",
+			),
 		task: string().desc(
 			"Task ID to link. When --branch is omitted, the task's provider branch name (e.g. Linear's) is used verbatim",
 		),
-		baseBranch: string().desc(
-			"Branch to start from. On a host: used when --branch does not exist (defaults to the project default). In the cloud: the branch the workspace's new branch is cut from (defaults to the repository default)",
-		),
+		baseBranch: string()
+			.variadic()
+			.desc(
+				"Branch to start from. On a host: used when --branch does not exist (defaults to the repository default); `<branch>` on a project of one repository, `<repository>=<branch>` otherwise, repeatable. In the cloud: one branch the workspace's new branch is cut from",
+			),
 		skipBranchPrefix: boolean().desc(
 			"Use --branch exactly as given instead of namespacing it under the project branch prefix",
 		),
@@ -82,10 +89,20 @@ export default command({
 			organizationId,
 		);
 		if (!defaultHostId) {
+			if ((options.baseBranch?.length ?? 0) > 1) {
+				throw new CLIError(
+					"A cloud workspace takes one --base-branch",
+					"Its environment's repositories start from their defaults; pass one branch for the primary",
+				);
+			}
 			return await createCloudWorkspace({
 				api: ctx.api,
 				organizationId,
-				options,
+				options: {
+					...options,
+					pr: options.pr?.length ? options.pr : undefined,
+					baseBranch: options.baseBranch?.[0],
+				},
 			});
 		}
 		if (options.environment) {
@@ -128,8 +145,11 @@ export default command({
 		if (isSession) {
 			for (const [flag, value] of [
 				["--branch", options.branch],
-				["--pr", options.pr],
-				["--base-branch", options.baseBranch],
+				["--pr", options.pr?.length ? options.pr : undefined],
+				[
+					"--base-branch",
+					options.baseBranch?.length ? options.baseBranch : undefined,
+				],
 				["--task", options.task],
 				["--skip-branch-prefix", options.skipBranchPrefix || undefined],
 				["--tag", options.tag?.length ? options.tag : undefined],
@@ -144,8 +164,11 @@ export default command({
 		} else if (checkout === "local") {
 			for (const [flag, value] of [
 				["--branch", options.branch],
-				["--pr", options.pr],
-				["--base-branch", options.baseBranch],
+				["--pr", options.pr?.length ? options.pr : undefined],
+				[
+					"--base-branch",
+					options.baseBranch?.length ? options.baseBranch : undefined,
+				],
 				["--skip-branch-prefix", options.skipBranchPrefix || undefined],
 			] as const) {
 				if (value !== undefined) {
@@ -156,13 +179,13 @@ export default command({
 				}
 			}
 		} else {
-			if (options.branch && options.pr) {
+			if (options.branch && options.pr?.length) {
 				throw new CLIError(
 					"Specify only one of --branch or --pr",
 					"Use --branch <name> or --pr <number>",
 				);
 			}
-			if (!options.branch && !options.pr && !options.task) {
+			if (!options.branch && !options.pr?.length && !options.task) {
 				throw new CLIError(
 					"Specify --branch, --pr, --task, or --checkout local",
 					"Use --branch <name>, --pr <number>, --task <id>, or --checkout local",
@@ -251,6 +274,16 @@ export default command({
 		if (!options.name) {
 			throw new CLIError("--name is required when --project is set");
 		}
+		const checkouts =
+			options.pr?.length || options.baseBranch?.length
+				? buildCheckouts({
+						repositories:
+							(await target.client.project.get.query({ projectId }))
+								?.repositories ?? [],
+						pr: options.pr,
+						baseBranch: options.baseBranch,
+					})
+				: undefined;
 		const create =
 			checkout === "local"
 				? target.client.workspaces.createLocal
@@ -260,9 +293,8 @@ export default command({
 			name: options.name,
 			...(checkout === "local" ? { checkout } : {}),
 			branch: options.branch,
-			pr: options.pr,
 			taskId: options.task,
-			baseBranch: options.baseBranch,
+			...(checkouts ? { checkouts } : {}),
 			skipBranchPrefix: options.skipBranchPrefix ?? undefined,
 			agents,
 			command: options.command ?? undefined,

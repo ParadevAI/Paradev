@@ -9,6 +9,11 @@ let alreadyExists = false;
 let failingPath: string | undefined;
 
 withLocalHostService("org-1", {
+	"project.get": () => ({
+		id: "project-1",
+		name: "project",
+		repositories: [{ id: "repo-1", name: "repo", isPrimary: true }],
+	}),
 	"workspaceCreation.listProjectWorktrees": () => ({
 		worktrees: [
 			{
@@ -43,8 +48,11 @@ withLocalHostService("org-1", {
 	}),
 	"workspaces.create": (input) => {
 		createInput = input;
-		createdPaths.push(input.worktreePath);
-		if (input.worktreePath === failingPath) {
+		const worktreePath = (
+			input.checkouts as Record<string, { worktreePath: string }>
+		)["repo-1"]?.worktreePath;
+		createdPaths.push(worktreePath);
+		if (worktreePath === failingPath) {
 			throw new Error("worktree is locked");
 		}
 		const branch = input.branch as string;
@@ -98,7 +106,7 @@ describe("worktrees open", () => {
 		expect(createInput).toEqual({
 			projectId: "project-1",
 			branch: "feature",
-			worktreePath: "/worktrees/feature",
+			checkouts: { "repo-1": { worktreePath: "/worktrees/feature" } },
 			runSetup: false,
 		});
 		expect(result.data).toEqual({
@@ -113,7 +121,7 @@ describe("worktrees open", () => {
 	test("finds the worktree by --branch and forwards --run-setup", async () => {
 		await invoke({ branch: "feature", runSetup: true });
 		expect(createInput).toMatchObject({
-			worktreePath: "/worktrees/feature",
+			checkouts: { "repo-1": { worktreePath: "/worktrees/feature" } },
 			runSetup: true,
 		});
 	});

@@ -22,9 +22,13 @@ export type ProjectWorktree = {
 export async function listProjectWorktrees(
 	client: WorktreeClient,
 	projectId: string,
+	repositoryId?: string,
 ): Promise<ProjectWorktree[]> {
 	const { worktrees } =
-		await client.workspaceCreation.listProjectWorktrees.query({ projectId });
+		await client.workspaceCreation.listProjectWorktrees.query({
+			projectId,
+			...(repositoryId ? { repositoryId } : {}),
+		});
 	return worktrees.map((worktree) => ({
 		branch: worktree.branch,
 		path: worktree.path,

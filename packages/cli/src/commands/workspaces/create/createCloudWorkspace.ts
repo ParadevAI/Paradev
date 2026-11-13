@@ -19,7 +19,7 @@ export interface CloudCreateOptions {
 	machineSize?: MachineSize;
 	project?: string;
 	session?: boolean;
-	pr?: number;
+	pr?: string[];
 	task?: string;
 	baseBranch?: string;
 	skipBranchPrefix?: boolean;

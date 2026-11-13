@@ -2,6 +2,7 @@ import { boolean, CLIError, string, table } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import { resolveHostFilter, resolveHostTarget } from "../../../lib/host-target";
+import { resolveRepository } from "../../projects/repos/utils/resolveRepository";
 import { listProjectWorktrees } from "../projectWorktrees";
 
 export default command({
@@ -19,6 +20,9 @@ export default command({
 		),
 	options: {
 		project: string().required().desc("Project ID"),
+		repository: string().desc(
+			"Repository whose worktrees to list, by name or ID (default: the primary)",
+		),
 		host: string().desc("Host the project is on (machineId)"),
 		local: boolean().desc("The project is on this machine (the default)"),
 	},
@@ -38,6 +42,15 @@ export default command({
 			userJwt: ctx.bearer,
 			api: ctx.api,
 		});
-		return listProjectWorktrees(target.client, options.project);
+		const repositoryId = options.repository
+			? (
+					await resolveRepository(
+						target.client,
+						options.project,
+						options.repository,
+					)
+				).id
+			: undefined;
+		return listProjectWorktrees(target.client, options.project, repositoryId);
 	},
 });

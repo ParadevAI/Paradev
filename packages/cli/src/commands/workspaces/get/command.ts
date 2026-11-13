@@ -62,7 +62,11 @@ export default command({
 		const width = Math.max(...Object.keys(detail).map((key) => key.length));
 		const message = Object.entries(detail)
 			.map(([key, value]) => {
-				const shown = value === null || value === undefined ? "—" : value;
+				const shown = Array.isArray(value)
+					? formatCheckouts(value, width + 2)
+					: value === null || value === undefined
+						? "—"
+						: value;
 				return `${key.padEnd(width)}  ${shown}`;
 			})
 			.join("\n");
@@ -142,7 +146,33 @@ async function hostDetail(
 		taskId: workspace.taskId,
 		worktreePath: workspace.worktreePath,
 		worktreeExists: workspace.worktreeExists,
+		checkouts: workspace.checkouts.map((checkout) => ({
+			repositoryId: checkout.repositoryId,
+			name: checkout.name,
+			isPrimary: checkout.isPrimary,
+			path: checkout.path,
+			branch: checkout.branch,
+			pullRequestId: checkout.pullRequestId,
+		})),
 		createdAt: workspace.createdAt,
 		...workspaceLinks(workspace.id),
 	};
+}
+
+/** One line per checkout; the primary is marked with `*`. */
+function formatCheckouts(
+	checkouts: {
+		name: string;
+		isPrimary: boolean;
+		branch: string;
+		path: string;
+	}[],
+	indent: number,
+): string {
+	return checkouts
+		.map(
+			(checkout) =>
+				`${checkout.name}${checkout.isPrimary ? "*" : ""}  ${checkout.branch}  ${checkout.path}`,
+		)
+		.join(`\n${" ".repeat(indent)}`);
 }

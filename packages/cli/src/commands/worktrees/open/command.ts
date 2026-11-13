@@ -4,6 +4,10 @@ import { command } from "../../../lib/command";
 import { resolveHostFilter, resolveHostTarget } from "../../../lib/host-target";
 import { workspaceLinks } from "../../../lib/open-url";
 import {
+	primaryRepository,
+	resolveRepository,
+} from "../../projects/repos/utils/resolveRepository";
+import {
 	listProjectWorktrees,
 	normalizeWorktreePath,
 	type ProjectWorktree,
@@ -14,6 +18,9 @@ export default command({
 		"Open an existing git worktree of a project as a workspace, on a host (default: this machine). Returns the workspace that already tracks it, if any",
 	options: {
 		project: string().required().desc("Project ID"),
+		repository: string().desc(
+			"Repository the worktree belongs to, by name or ID (default: the primary)",
+		),
 		path: string().desc(
 			"Worktree path. Specify exactly one of --path, --branch or --all",
 		),
@@ -59,15 +66,23 @@ export default command({
 			api: ctx.api,
 		});
 
+		const repository = options.repository
+			? await resolveRepository(
+					target.client,
+					options.project,
+					options.repository,
+				)
+			: await primaryRepository(target.client, options.project);
 		const worktrees = await listProjectWorktrees(
 			target.client,
 			options.project,
+			repository.id,
 		);
 		const openWorktree = (worktree: ProjectWorktree) =>
 			target.client.workspaces.create.mutate({
 				projectId: options.project,
 				branch: worktree.branch,
-				worktreePath: worktree.path,
+				checkouts: { [repository.id]: { worktreePath: worktree.path } },
 				runSetup: options.runSetup ?? false,
 			});
 

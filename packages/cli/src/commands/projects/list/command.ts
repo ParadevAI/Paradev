@@ -8,8 +8,8 @@ export default command({
 	display: (data) =>
 		table(
 			data as Record<string, unknown>[],
-			["name", "repo", "path", "id"],
-			["NAME", "REPO", "PATH", "ID"],
+			["name", "repos", "id"],
+			["NAME", "REPOSITORIES", "ID"],
 		),
 	options: {
 		host: string().desc("List projects on a specific host machineId"),
@@ -38,9 +38,12 @@ export default command({
 		return projects
 			.map((project) => ({
 				name: project.name,
-				repo: project.repoUrl ?? "-",
-				path: project.repoPath,
+				// The primary is marked with `*`.
+				repos: project.repositories
+					.map((r) => (r.isPrimary ? `${r.name}*` : r.name))
+					.join(", "),
 				id: project.id,
+				repositories: project.repositories,
 			}))
 			.sort((a, b) => a.name.localeCompare(b.name));
 	},
