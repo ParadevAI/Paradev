@@ -43,6 +43,7 @@ import {
 	packStoppedTerminal,
 	resumeStoppedTerminals,
 	type SkippedTerminal,
+	type StopState,
 	stopTerminalsForMove,
 } from "./terminal-sessions";
 
@@ -151,16 +152,19 @@ export const teleportRouter = router({
 	/**
 	 * Gets a workspace ready to continue on another host: the worktree,
 	 * uncommitted work included, goes to one new branch, and each chat's
-	 * history and its agent's session files to the cloud. Each terminal agent
-	 * that can move is stopped and its session files uploaded too. The caller
-	 * starts the other side from all of them. A chat that cannot move is
-	 * returned in `skipped` and stays here; a terminal, in `skippedTerminals`.
+	 * history and its agent's session files to the cloud. With `moveTerminals`,
+	 * each terminal agent that can move is stopped and its session files
+	 * uploaded too; a caller that does not ask never has a terminal stopped,
+	 * since it could not hand it off. The caller starts the other side from
+	 * all of them. A chat that cannot move is returned in `skipped` and stays
+	 * here; a terminal, in `skippedTerminals`.
 	 */
 	prepareWorkspace: protectedProcedure
 		.input(
 			z.object({
 				workspaceId: z.string(),
 				stopIfBusy: z.boolean().optional(),
+				moveTerminals: z.boolean().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -204,7 +208,9 @@ export const teleportRouter = router({
 						requireChat(chat, input.workspaceId, sessionId).status,
 					),
 				);
-			const terminals = listMovableTerminals(ctx, input.workspaceId);
+			const { movable: terminals, overflow } = input.moveTerminals
+				? listMovableTerminals(ctx, input.workspaceId)
+				: { movable: [], overflow: [] };
 			const anyBusy =
 				busy().length > 0 || terminals.some((terminal) => terminal.busy);
 			if (anyBusy && !input.stopIfBusy) throw busyError();
@@ -236,18 +242,24 @@ export const teleportRouter = router({
 			};
 			assertIdle();
 
-			const stoppedTerminals = await stopTerminalsForMove(
-				ctx,
-				input.workspaceId,
-				terminals,
-			);
-			const skippedTerminals: SkippedTerminal[] = [...stoppedTerminals.skipped];
+			const stopState: StopState = {
+				stopped: [],
+				skipped: overflow.map(
+					(terminal): SkippedTerminal => ({
+						terminalId: terminal.terminalId,
+						title: terminal.title,
+						reason: "too_many",
+					}),
+				),
+			};
+			const skippedTerminals = stopState.skipped;
 			const movedTerminals: MovedTerminal[] = [];
 			const branch = `superset/teleport-${randomUUID().slice(0, 8)}`;
 			const prepared: PreparedChat[] = [];
 			const followed: string[] = [];
 			let firstFailure: unknown = null;
 			try {
+				await stopTerminalsForMove(ctx, terminals, stopState);
 				await pool
 					.run(
 						gitPushSnapshotTask,
@@ -259,7 +271,7 @@ export const teleportRouter = router({
 						throw error;
 					});
 
-				for (const { terminal, sessionFile } of stoppedTerminals.stopped) {
+				for (const { terminal, sessionFile } of stopState.stopped) {
 					try {
 						movedTerminals.push(
 							await packStoppedTerminal(ctx, {
@@ -273,13 +285,16 @@ export const teleportRouter = router({
 							`[teleport] could not pack terminal ${terminal.terminalId}; it stays here`,
 							error,
 						);
-						await resumeStoppedTerminals(ctx, input.workspaceId, [
-							terminal.terminalId,
-						]);
+						const restart = await resumeStoppedTerminals(
+							ctx,
+							input.workspaceId,
+							[terminal.terminalId],
+						);
 						skippedTerminals.push({
 							terminalId: terminal.terminalId,
 							title: terminal.title,
 							reason: "failed",
+							...(restart.failed.length > 0 ? { stopped: true } : {}),
 						});
 					}
 				}
@@ -355,7 +370,12 @@ export const teleportRouter = router({
 				await resumeStoppedTerminals(
 					ctx,
 					input.workspaceId,
-					stoppedTerminals.stopped.map(({ terminal }) => terminal.terminalId),
+					stopState.stopped.map(({ terminal }) => terminal.terminalId),
+				).catch((resumeError: unknown) =>
+					console.warn(
+						"[teleport] could not restart terminals after a failed prepare",
+						resumeError,
+					),
 				);
 				throw error;
 			}
@@ -392,13 +412,14 @@ export const teleportRouter = router({
 				terminalIds: z.array(z.string().min(1)).max(200),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => ({
-			resumedTerminalIds: await resumeStoppedTerminals(
+		.mutation(async ({ ctx, input }) => {
+			const { resumed, failed } = await resumeStoppedTerminals(
 				ctx,
 				input.workspaceId,
 				input.terminalIds,
-			),
-		})),
+			);
+			return { resumedTerminalIds: resumed, failedTerminalIds: failed };
+		}),
 
 	/**
 	 * Brings in a terminal agent's session moving here from another host and

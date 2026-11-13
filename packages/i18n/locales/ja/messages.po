@@ -902,6 +902,12 @@ msgstr "{count, plural, one {#件の検索} other {#件の検索}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, other {#ステップ}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {#件のターミナルが元のワークスペースに残りました。} other {#件のターミナルが元のワークスペースに残りました。}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {#件のターミナルが停止し、再起動できませんでした。} other {#件のターミナルが停止し、再起動できませんでした。}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {このリポジトリの#件のワークツリーにワークスペースがありません。ワークスペースとしてインポートされます。} other {このリポジトリの#件のワークツリーにワークスペースがありません。ワークスペースとしてインポートされます。}}"
 
@@ -1412,9 +1418,6 @@ msgstr "{teardownFailureCount, plural, one {それでも削除} other {それで
 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
-
-msgid "{title} (terminal)"
-msgstr "{title}（ターミナル）"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
@@ -2818,6 +2821,9 @@ msgstr "どのエージェントがあなたを必要としているかが常に
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "エージェントが複数ファイルにまたがる変更を最後までやり切る。"
+
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "ここではエージェントがまだ作業中です。もう一度試すと、停止して移動します。"
 
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "エージェントがクラウドワークスペースでこの環境をセットアップします（20 分以上かかります）。依存関係のインストールやセットアップ設定の作成を行い、必要なシークレットを尋ねます。いつでも中断したり、ワークスペースで引き継いで自分でセットアップを完了したりできます。"
@@ -6278,6 +6284,9 @@ msgstr "コントリビューターを読み込めませんでした。ユーザ
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "以前のメッセージを読み込めませんでした。再試行"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "環境を読み込めませんでした。再試行"
 
 msgid "Couldn't load its activity"
 msgstr "アクティビティを読み込めませんでした"
@@ -12436,6 +12445,9 @@ msgstr "{name} を {destination} に移動しました"
 
 msgid "Moving {name} to {destination}"
 msgstr "{name} を {destination} に移動しています"
+
+msgid "Moving its terminals…"
+msgstr "ターミナルを移動しています…"
 
 msgid "Moving this chat here"
 msgstr "このチャットをここに移動しています"

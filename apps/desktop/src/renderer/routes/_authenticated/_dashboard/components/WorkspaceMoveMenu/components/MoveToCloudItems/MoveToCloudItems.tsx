@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { useNavigate } from "@tanstack/react-router";
-import { LuContainer, LuSettings } from "react-icons/lu";
+import { LuContainer, LuRefreshCw, LuSettings } from "react-icons/lu";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -49,6 +49,16 @@ export function MoveToCloudItems({
 			{repository !== null && environmentsQuery.isLoading ? (
 				<Item disabled>
 					<Trans>Loading…</Trans>
+				</Item>
+			) : environmentsQuery.isError ? (
+				<Item
+					onSelect={(event) => {
+						event.preventDefault();
+						void environmentsQuery.refetch();
+					}}
+				>
+					<LuRefreshCw className={iconClassName} />
+					<Trans>Couldn’t load environments. Try again</Trans>
 				</Item>
 			) : environments.length === 0 ? (
 				<Item disabled>

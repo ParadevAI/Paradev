@@ -24,8 +24,9 @@ export function MoveToComputerItems({
 	const { Item, iconClassName } = MOVE_MENU_PRIMITIVES[menu];
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
-	const { hosts } = useKnownHosts();
-	const { workspaces: cloudWorkspaces = [] } = useCloudWorkspaces();
+	const { hosts, settled } = useKnownHosts();
+	const { workspaces: cloudWorkspaces = [], isLoading: cloudLoading } =
+		useCloudWorkspaces();
 
 	const computers = useMemo(() => {
 		const others = hosts
@@ -48,6 +49,13 @@ export function MoveToComputerItems({
 		return [...thisComputer, ...others];
 	}, [hosts, hostId, cloudWorkspaces, machineId]);
 
+	if (!settled || cloudLoading) {
+		return (
+			<Item disabled>
+				<Trans>Loading…</Trans>
+			</Item>
+		);
+	}
 	if (computers.length === 0) {
 		return (
 			<Item disabled>

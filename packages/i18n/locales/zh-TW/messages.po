@@ -902,6 +902,12 @@ msgstr "{count, plural, one {#次搜尋} other {#次搜尋}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, other {# 個步驟}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# 個終端機留在了原工作區。} other {# 個終端機留在了原工作區。}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# 個終端機已停止，無法重新啟動。} other {# 個終端機已停止，無法重新啟動。}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {此儲存庫中有#個worktree沒有對應的工作區，將被匯入為工作區。} other {此儲存庫中有#個worktree沒有對應的工作區，將被匯入為工作區。}}"
 
@@ -1412,9 +1418,6 @@ msgstr "{teardownFailureCount, plural, one {仍然刪除} other {仍然刪除#�
 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {已合併 # 個智慧代理 PR}}"
-
-msgid "{title} (terminal)"
-msgstr "{title}（終端機）"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中斷"
@@ -2818,6 +2821,9 @@ msgstr "隨時知道哪個代理程式需要你，通知可直接跳轉到被阻
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "代理程式能端到端完成跨檔案改動。"
+
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "這裡有代理程式仍在運作。重試即可停止它並移動。"
 
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "代理程式會在雲端工作區中設定此環境（約 20 分鐘或更久）：安裝相依套件、撰寫設定組態，並詢問所需的密鑰。你可以隨時中斷，或在工作區中接手並自行完成設定。"
@@ -6278,6 +6284,9 @@ msgstr "無法載入貢獻者，請直接輸入使用者名稱。"
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "無法載入較早的訊息。重試"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "無法載入環境。重試"
 
 msgid "Couldn't load its activity"
 msgstr "無法載入其活動"
@@ -12436,6 +12445,9 @@ msgstr "已將 {name} 移至{destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "正在將 {name} 移至{destination}"
+
+msgid "Moving its terminals…"
+msgstr "正在移動其終端機…"
 
 msgid "Moving this chat here"
 msgstr "正在將此聊天移到這裡"

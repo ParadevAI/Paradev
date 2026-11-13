@@ -1,1 +1,7 @@
-export { handOffTerminals, type MovingTerminal } from "./handOffTerminals";
+export {
+	handOffTerminals,
+	type MovingTerminal,
+	mergeHandoffs,
+	skippedTerminalNames,
+	type TerminalHandoff,
+} from "./handOffTerminals";

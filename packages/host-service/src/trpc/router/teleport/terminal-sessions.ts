@@ -6,13 +6,19 @@ import {
 } from "../../../teleport/bundle";
 import { teleportProviderForAgent } from "../../../teleport/providers";
 import { disposeSessionAndWait } from "../../../terminal/terminal";
-import type { TerminalAgentBinding } from "../../../terminal-agents";
+import type {
+	TerminalAgentBinding,
+	TerminalAgentStore,
+} from "../../../terminal-agents";
 import {
 	agentLaunchEnv,
 	resolveHostAgentConfig,
 } from "../../../terminal-agents/agent-config";
 import { terminalHarnessSession } from "../../../terminal-agents/harness-session-ref";
-import { markResumeCandidateResumedInto } from "../../../terminal-agents/persistence";
+import {
+	findMoveStoppedBinding,
+	markMoveStoppedBindingResumedInto,
+} from "../../../terminal-agents/persistence";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
@@ -25,6 +31,8 @@ const MAX_MOVED_TERMINALS = 20;
 const BUSY_EVENT_TYPES = new Set(["Start", "PermissionRequest"]);
 const STOPPED_FOR_MOVE_TTL_MS = 60 * 60_000;
 const IMPORTED_TTL_MS = 10 * 60_000;
+const AGENT_START_TIMEOUT_MS = 90_000;
+const AGENT_START_POLL_MS = 500;
 
 export type MovableTerminal = {
 	terminalId: string;
@@ -48,7 +56,14 @@ export type MovedTerminal = {
 export type SkippedTerminal = {
 	terminalId: string;
 	title: string;
-	reason: "not_started" | "failed";
+	reason: "not_started" | "failed" | "too_many";
+	/** Its agent no longer runs at the source, and could not be started again. */
+	stopped?: boolean;
+};
+
+export type StopState = {
+	stopped: { terminal: MovableTerminal; sessionFile: string }[];
+	skipped: SkippedTerminal[];
 };
 
 export function movableTerminals(
@@ -70,54 +85,61 @@ export function movableTerminals(
 			busy: BUSY_EVENT_TYPES.has(binding.lastEventType),
 		});
 	}
-	return movable.slice(0, MAX_MOVED_TERMINALS);
+	return movable;
 }
 
 export function listMovableTerminals(
 	ctx: HostServiceContext,
 	workspaceId: string,
-): MovableTerminal[] {
-	return movableTerminals(
+): { movable: MovableTerminal[]; overflow: MovableTerminal[] } {
+	const all = movableTerminals(
 		ctx.terminalAgentStore.listByWorkspace(workspaceId),
 		(agent) => resolveHostAgentConfig(ctx.db, agent)?.label,
 	);
+	return {
+		movable: all.slice(0, MAX_MOVED_TERMINALS),
+		overflow: all.slice(MAX_MOVED_TERMINALS),
+	};
 }
 
-type StoppedTerminal = {
-	workspaceId: string;
-	agent: string;
-	harnessSessionId: string;
-	stoppedAt: number;
-};
-
-const stoppedForMove = new Map<string, StoppedTerminal>();
-
-function forgetStaleStops(now: number) {
-	for (const [terminalId, stopped] of stoppedForMove) {
-		if (now - stopped.stoppedAt > STOPPED_FOR_MOVE_TTL_MS) {
-			stoppedForMove.delete(terminalId);
-		}
-	}
+function reopenBinding(
+	store: Pick<TerminalAgentStore, "recordEvent">,
+	binding: TerminalAgentBinding,
+) {
+	store.recordEvent({
+		terminalId: binding.terminalId,
+		workspaceId: binding.workspaceId,
+		eventType: "Attached",
+		agentId: binding.agentId,
+		agentSessionId: binding.agentSessionId,
+		definitionId: binding.definitionId,
+		occurredAt: Date.now(),
+	});
 }
 
 /**
- * Ends each terminal's agent so its session file stops changing, and
- * returns the session files of those that stopped. A terminal whose agent
- * never wrote a session has nothing to move and keeps running.
+ * Ends each terminal's agent so its session file stops changing, adding the
+ * session files of those that stopped to `state` as it goes, so a failure on
+ * a later terminal still leaves the earlier ones to restart. A terminal whose
+ * agent never wrote a session, changed session since it was listed, or did
+ * not close keeps running.
  */
 export async function stopTerminalsForMove(
 	ctx: HostServiceContext,
-	workspaceId: string,
 	terminals: readonly MovableTerminal[],
-): Promise<{
-	stopped: { terminal: MovableTerminal; sessionFile: string }[];
-	skipped: SkippedTerminal[];
-}> {
+	state: StopState,
+): Promise<void> {
 	const pool = getHostWorkerPool();
-	const stopped: { terminal: MovableTerminal; sessionFile: string }[] = [];
-	const skipped: SkippedTerminal[] = [];
-	forgetStaleStops(Date.now());
 	for (const terminal of terminals) {
+		const current = ctx.terminalAgentStore.get(terminal.terminalId);
+		if (!current || current.agentSessionId !== terminal.harnessSessionId) {
+			state.skipped.push({
+				terminalId: terminal.terminalId,
+				title: terminal.title,
+				reason: "failed",
+			});
+			continue;
+		}
 		const bound = terminalHarnessSession(ctx.db, terminal.terminalId);
 		const sessionFile = bound
 			? await pool
@@ -131,43 +153,39 @@ export async function stopTerminalsForMove(
 					})
 			: null;
 		if (!sessionFile) {
-			skipped.push({
+			state.skipped.push({
 				terminalId: terminal.terminalId,
 				title: terminal.title,
 				reason: "not_started",
 			});
 			continue;
 		}
-		stoppedForMove.set(terminal.terminalId, {
-			workspaceId,
-			agent: terminal.agent,
-			harnessSessionId: terminal.harnessSessionId,
-			stoppedAt: Date.now(),
-		});
 		// Disposed before the kill: the exit would otherwise make it a resume candidate here.
 		ctx.terminalAgentStore.markTerminalDisposed(terminal.terminalId);
-		const disposed = await disposeSessionAndWait(
+		const closed = await disposeSessionAndWait(
 			terminal.terminalId,
 			ctx.db,
-		).catch((error: unknown) => {
-			console.warn(
-				`[teleport] could not stop terminal ${terminal.terminalId}`,
-				error,
-			);
-			return null;
-		});
-		if (!disposed?.daemonCloseSucceeded) {
-			stoppedForMove.delete(terminal.terminalId);
-			skipped.push({
+		).then(
+			(result) => result.daemonCloseSucceeded,
+			(error: unknown) => {
+				console.warn(
+					`[teleport] could not stop terminal ${terminal.terminalId}`,
+					error,
+				);
+				return false;
+			},
+		);
+		if (!closed) {
+			reopenBinding(ctx.terminalAgentStore, current);
+			state.skipped.push({
 				terminalId: terminal.terminalId,
 				title: terminal.title,
 				reason: "failed",
 			});
 			continue;
 		}
-		stopped.push({ terminal, sessionFile });
+		state.stopped.push({ terminal, sessionFile });
 	}
-	return { stopped, skipped };
 }
 
 export async function packStoppedTerminal(
@@ -205,26 +223,43 @@ export async function packStoppedTerminal(
 
 /**
  * Starts the agents of terminals stopped for a move that did not take them,
- * each in a new terminal here. Panes on the old terminal follow it.
+ * each in a new terminal here. Panes on the old terminal follow it. The
+ * stopped terminal's binding is the record: it survives a host restart, a
+ * failed launch leaves it for another try, and a launch that worked marks it
+ * resumed so a second call finds the terminal it became.
  */
 export async function resumeStoppedTerminals(
 	ctx: HostServiceContext,
 	workspaceId: string,
 	terminalIds: readonly string[],
-): Promise<string[]> {
+): Promise<{ resumed: string[]; failed: string[] }> {
 	const resumed: string[] = [];
+	const failed: string[] = [];
+	const endedSince = Date.now() - STOPPED_FOR_MOVE_TTL_MS;
 	for (const terminalId of terminalIds) {
-		const stopped = stoppedForMove.get(terminalId);
-		if (!stopped || stopped.workspaceId !== workspaceId) continue;
-		stoppedForMove.delete(terminalId);
+		const found = findMoveStoppedBinding(
+			ctx.db,
+			workspaceId,
+			terminalId,
+			endedSince,
+		);
+		if (found?.kind === "resumed") {
+			resumed.push(found.terminalId);
+			continue;
+		}
+		if (!found) {
+			failed.push(terminalId);
+			continue;
+		}
+		const { binding } = found;
 		try {
 			const result = await runAgentInWorkspace(ctx, {
 				workspaceId,
-				agent: stopped.agent,
+				agent: binding.definitionId ?? binding.agentId,
 				prompt: "",
-				resumeSessionId: stopped.harnessSessionId,
+				resumeSessionId: binding.agentSessionId,
 			});
-			markResumeCandidateResumedInto(ctx.db, terminalId, result.sessionId);
+			markMoveStoppedBindingResumedInto(ctx.db, terminalId, result.sessionId);
 			ctx.eventBus.broadcastTerminalLifecycle({
 				workspaceId,
 				terminalId,
@@ -239,9 +274,33 @@ export async function resumeStoppedTerminals(
 				`[teleport] could not resume terminal ${terminalId} after its move ended`,
 				error,
 			);
+			failed.push(terminalId);
 		}
 	}
-	return resumed;
+	return { resumed, failed };
+}
+
+/** True once the agent in `terminalId` reports something after `since`, which its launch does by itself. */
+export async function waitForAgentStart(
+	store: Pick<TerminalAgentStore, "get">,
+	terminalId: string,
+	since: number,
+	{
+		timeoutMs = AGENT_START_TIMEOUT_MS,
+		pollMs = AGENT_START_POLL_MS,
+		sleep = (ms: number) =>
+			new Promise<void>((resolve) => setTimeout(resolve, ms)),
+	}: {
+		timeoutMs?: number;
+		pollMs?: number;
+		sleep?: (ms: number) => Promise<void>;
+	} = {},
+): Promise<boolean> {
+	for (let waited = 0; waited <= timeoutMs; waited += pollMs) {
+		if ((store.get(terminalId)?.lastEventAt ?? 0) > since) return true;
+		await sleep(pollMs);
+	}
+	return false;
 }
 
 type ImportedTerminal = { terminalId: string; label: string };
@@ -250,8 +309,9 @@ const importing = new Map<string, Promise<ImportedTerminal>>();
 
 /**
  * Brings in a terminal agent's session moving here from another host and
- * starts the agent on it in a new terminal. A repeated call for the same
- * session returns the terminal the first one started.
+ * starts the agent on it in a new terminal. Returns once the agent has
+ * reported its start, so the source is only left stopped when it is running
+ * here. A repeated call for the same session returns the first terminal.
  */
 export function importTerminalSession(
 	ctx: HostServiceContext,
@@ -263,11 +323,12 @@ export function importTerminalSession(
 		harnessSessionId: string;
 		bundle: { url: string; sha256: string; byteLength: number };
 	},
+	options: Parameters<typeof waitForAgentStart>[3] = {},
 ): Promise<ImportedTerminal> {
 	const key = `${input.workspaceId}::${input.harnessSessionId}`;
 	const pending = importing.get(key);
 	if (pending) return pending;
-	const run = runImport(ctx, input);
+	const run = runImport(ctx, input, options);
 	importing.set(key, run);
 	run.then(
 		() => setTimeout(() => importing.delete(key), IMPORTED_TTL_MS).unref(),
@@ -279,6 +340,7 @@ export function importTerminalSession(
 async function runImport(
 	ctx: HostServiceContext,
 	input: Parameters<typeof importTerminalSession>[1],
+	options: Parameters<typeof waitForAgentStart>[3],
 ): Promise<ImportedTerminal> {
 	const provider = teleportProviderForAgent(input.agentId);
 	const config =
@@ -313,5 +375,27 @@ async function runImport(
 		prompt: "",
 		resumeSessionId: input.harnessSessionId,
 	});
+	const launchedAt =
+		ctx.terminalAgentStore.get(result.sessionId)?.lastEventAt ?? Date.now();
+	const started = await waitForAgentStart(
+		ctx.terminalAgentStore,
+		result.sessionId,
+		launchedAt,
+		options,
+	);
+	if (!started) {
+		ctx.terminalAgentStore.markTerminalDisposed(result.sessionId);
+		await disposeSessionAndWait(result.sessionId, ctx.db).catch(
+			(error: unknown) =>
+				console.warn(
+					`[teleport] could not remove terminal ${result.sessionId}, whose agent did not start`,
+					error,
+				),
+		);
+		throw new TRPCError({
+			code: "TIMEOUT",
+			message: "The moved terminal's agent did not start",
+		});
+	}
 	return { terminalId: result.sessionId, label: result.label };
 }

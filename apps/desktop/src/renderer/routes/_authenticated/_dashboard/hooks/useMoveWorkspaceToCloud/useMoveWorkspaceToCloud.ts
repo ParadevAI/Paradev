@@ -12,6 +12,8 @@ import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
 import {
 	handOffTerminals,
 	type MovingTerminal,
+	mergeHandoffs,
+	skippedTerminalNames,
 } from "../../utils/handOffTerminals";
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
@@ -49,11 +51,13 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	return useCallback(
 		async ({
 			environment,
+			stopIfBusy = false,
 			onStage,
 			onBegun,
 			signal,
 		}: {
 			environment: { id: string; repositoryFullName: string | null };
+			stopIfBusy?: boolean;
 			onStage: (stage: MoveToCloudStage) => void;
 			onBegun?: (workspaceMoveId: string) => void;
 			signal?: AbortSignal;
@@ -97,12 +101,20 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					moveSignal.throwIfAborted();
 					const prepared = await source.teleport.prepareWorkspace.mutate({
 						workspaceId: workspace.id,
-						stopIfBusy: true,
+						stopIfBusy,
+						moveTerminals: true,
 					});
 					leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
 					leaving.terminals = (prepared.terminals ?? []).map(
 						(terminal) => terminal.terminalId,
 					);
+					if (moveSignal.aborted) {
+						await releaseSourceTerminals(
+							source,
+							workspace.id,
+							leaving.terminals,
+						);
+					}
 					assertEnvironmentOpens(prepared.repositoryFullName);
 					moveSignal.throwIfAborted();
 					onStage("starting");
@@ -151,11 +163,10 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				rows ? [created, ...rows] : [created],
 			);
 			void utils.cloudWorkspace.list.invalidate();
-			const terminalName = (title: string) =>
-				t({ message: `${title} (terminal)` });
 			// A host older than terminal moves returns neither list.
 			const terminals: MovingTerminal[] = prepared.terminals ?? [];
-			const terminalsStayed = handOffTerminals({
+			const skippedTerminals = skippedTerminalNames(prepared.skippedTerminals);
+			const terminalHandoff = handOffTerminals({
 				terminals,
 				source,
 				sourceWorkspaceId: workspace.id,
@@ -168,22 +179,15 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
 				attempts: BOX_CONNECT_ATTEMPTS,
 				retryDelayMs: BOX_CONNECT_RETRY_MS,
-			});
+			}).then((handoff) => mergeHandoffs(skippedTerminals, handoff));
 			return {
 				toWorkspaceId: created.id,
 				stayed: [
 					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
-				]
-					.map((chat) => chat.title ?? t({ message: "Untitled chat" }))
-					.concat(
-						(prepared.skippedTerminals ?? [])
-							.filter((terminal) => terminal.reason !== "not_started")
-							.map((terminal) => terminalName(terminal.title)),
-					),
-				terminalsStayed: terminalsStayed.then((titles) =>
-					titles.map(terminalName),
-				),
+				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
+				terminalHandoff,
+				movingTerminals: terminals.length > 0,
 			};
 		},
 		[

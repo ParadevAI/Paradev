@@ -17,6 +17,7 @@ import { type BundleManifest, parseBundleManifest } from "../providers";
 const execFileAsync = promisify(execFile);
 const MANIFEST = "manifest.json";
 const MAX_EXPANDED_BYTES = 1024 * 1024 * 1024;
+export const UPLOAD_TIMEOUT_MS = 10 * 60_000;
 
 /** A scratch directory removed once `run` settles. */
 export async function withStage<T>(
@@ -64,14 +65,16 @@ async function packStage(
 	}
 }
 
-async function putBundle(
+export async function putBundle(
 	upload: { url: string; headers: Record<string, string> },
 	bytes: Buffer<ArrayBuffer>,
+	timeoutMs = UPLOAD_TIMEOUT_MS,
 ): Promise<void> {
 	const response = await fetch(upload.url, {
 		method: "PUT",
 		headers: upload.headers,
 		body: bytes,
+		signal: AbortSignal.timeout(timeoutMs),
 	});
 	if (!response.ok) {
 		throw new TRPCError({

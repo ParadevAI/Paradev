@@ -902,6 +902,12 @@ msgstr "{count, plural, one {# search} other {# searches}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, one {# step} other {# steps}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 
@@ -1412,9 +1418,6 @@ msgstr "{teardownFailureCount, plural, one {Delete anyway} other {Delete # anywa
 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
-
-msgid "{title} (terminal)"
-msgstr "{title} (terminal)"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrupted"
@@ -2818,6 +2821,9 @@ msgstr "Always know which agent needs you, with notifications that deep-link str
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "An agent completes multi-file changes end to end."
+
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "An agent here is still working. Try again to stop it and move."
 
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
@@ -6278,6 +6284,9 @@ msgstr "Couldn't load contributors. Type a username instead."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Couldn't load earlier messages. Retry"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "Couldn’t load environments. Try again"
 
 msgid "Couldn't load its activity"
 msgstr "Couldn't load its activity"
@@ -12436,6 +12445,9 @@ msgstr "Moved {name} to {destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "Moving {name} to {destination}"
+
+msgid "Moving its terminals…"
+msgstr "Moving its terminals…"
 
 msgid "Moving this chat here"
 msgstr "Moving this chat here"

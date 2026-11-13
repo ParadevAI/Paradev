@@ -896,6 +896,12 @@ msgstr "{count, plural, one {# пошук} few {# пошуки} many {# пошу
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, one {# крок} few {# кроки} many {# кроків} other {# кроку}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# термінал залишився в старому робочому просторі.} few {# термінали залишилися в старому робочому просторі.} many {# терміналів залишилися в старому робочому просторі.} other {# терміналу залишилося в старому робочому просторі.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# термінал зупинено, і його не вдалося запустити знову.} few {# термінали зупинено, і їх не вдалося запустити знову.} many {# терміналів зупинено, і їх не вдалося запустити знову.} other {# терміналу зупинено, і його не вдалося запустити знову.}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree у цьому репозиторії не має робочого простору. Його буде імпортовано як робочий простір.} few {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} many {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} other {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.}}"
 
@@ -1406,9 +1412,6 @@ msgstr "{teardownFailureCount, plural, =1 {Усе одно видалити} one
 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {Злито # агентський PR} few {Злито # агентські PR} many {Злито # агентських PR} other {Злито # агентського PR}}"
-
-msgid "{title} (terminal)"
-msgstr "{title} (термінал)"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName}: перервано"
@@ -2812,6 +2815,9 @@ msgstr "Завжди знайте, якому агенту ви потрібні
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
+
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "Тут ще працює агент. Повторіть, щоб зупинити його й перенести."
 
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "Агент налаштує це середовище в хмарному робочому просторі (близько 20 хвилин або довше): встановить залежності, запише конфігурацію й попросить потрібні секрети. Його можна перервати будь-коли або продовжити роботу в робочому просторі й завершити налаштування самостійно."
@@ -6272,6 +6278,9 @@ msgstr "Не вдалося завантажити контриб'юторів. 
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Не вдалося завантажити попередні повідомлення. Повторити"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "Не вдалося завантажити середовища. Повторити"
 
 msgid "Couldn't load its activity"
 msgstr "Не вдалося завантажити його активність"
@@ -12430,6 +12439,9 @@ msgstr "{name} переміщено: {destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "Переміщення {name}: {destination}"
+
+msgid "Moving its terminals…"
+msgstr "Перенесення терміналів…"
 
 msgid "Moving this chat here"
 msgstr "Перенесення цього чату сюди"

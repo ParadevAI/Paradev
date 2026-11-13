@@ -9,7 +9,10 @@ import * as schema from "../db/schema";
 import { terminalAgentBindings, terminalSessions } from "../db/schema";
 import {
 	claimResumeCandidateBinding,
+	findMoveStoppedBinding,
 	findResumeCandidateBinding,
+	findResumedSuccessorTerminalId,
+	markMoveStoppedBindingResumedInto,
 	markTerminalAgentBindingEnded,
 	recordTerminalAgentTranscriptPath,
 	SqliteTerminalAgentBindingPersistence,
@@ -651,5 +654,46 @@ describe("recordTerminalAgentTranscriptPath", () => {
 		expect(transcriptPathOf(db, "t-1")).toBe(
 			"/home/a/.claude/projects/x/s-1.jsonl",
 		);
+	});
+});
+
+describe("terminals stopped for a workspace move", () => {
+	const THIRTY_MINUTES = 30 * 60_000;
+
+	function stoppedTerminal(db: HostDb, endedAt: number) {
+		seedSession(db, { id: "term-1", status: "disposed", workspaceId: "ws-1" });
+		db.update(terminalAgentBindings)
+			.set({ agentSessionId: "claude-session-1" })
+			.where(eq(terminalAgentBindings.terminalId, "term-1"))
+			.run();
+		markTerminalAgentBindingEnded(db, "term-1", "disposed", endedAt);
+	}
+
+	it("reads the stop record from the database until it is too old", () => {
+		const db = createTestDb();
+		stoppedTerminal(db, 1_000_000);
+
+		const found = findMoveStoppedBinding(db, "ws-1", "term-1", 1_000_000 - 1);
+		expect(found).toMatchObject({
+			kind: "stopped",
+			binding: { terminalId: "term-1", agentSessionId: "claude-session-1" },
+		});
+		expect(
+			findMoveStoppedBinding(db, "ws-1", "term-1", 1_000_000 + THIRTY_MINUTES),
+		).toBeUndefined();
+		expect(findMoveStoppedBinding(db, "ws-2", "term-1", 0)).toBeUndefined();
+	});
+
+	it("answers a second release with the terminal the first one started", () => {
+		const db = createTestDb();
+		stoppedTerminal(db, 1_000_000);
+
+		markMoveStoppedBindingResumedInto(db, "term-1", "term-2");
+
+		expect(findMoveStoppedBinding(db, "ws-1", "term-1", 0)).toEqual({
+			kind: "resumed",
+			terminalId: "term-2",
+		});
+		expect(findResumedSuccessorTerminalId(db, "ws-1", "term-1")).toBe("term-2");
 	});
 });

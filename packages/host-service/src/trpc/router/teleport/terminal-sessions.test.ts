@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { TerminalAgentBinding } from "../../../terminal-agents";
-import { movableTerminals } from "./terminal-sessions";
+import { movableTerminals, waitForAgentStart } from "./terminal-sessions";
 
 function binding(
 	terminalId: string,
@@ -53,5 +53,36 @@ describe("movableTerminals", () => {
 				busy: true,
 			},
 		]);
+	});
+});
+
+describe("waitForAgentStart", () => {
+	const noWait = async () => {};
+
+	test("is true once the agent reports after the launch", async () => {
+		let polls = 0;
+		const store = {
+			get: () => ({ lastEventAt: polls++ < 2 ? 100 : 101 }) as never,
+		};
+
+		expect(
+			await waitForAgentStart(store, "term-1", 100, {
+				timeoutMs: 5_000,
+				pollMs: 500,
+				sleep: noWait,
+			}),
+		).toBe(true);
+	});
+
+	test("is false when the agent never reports", async () => {
+		const store = { get: () => ({ lastEventAt: 100 }) as never };
+
+		expect(
+			await waitForAgentStart(store, "term-1", 100, {
+				timeoutMs: 2_000,
+				pollMs: 500,
+				sleep: noWait,
+			}),
+		).toBe(false);
 	});
 });
