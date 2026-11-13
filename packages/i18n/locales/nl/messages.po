@@ -99,6 +99,9 @@ msgstr "(geen uitvoer)"
 msgid "(you)"
 msgstr "(jij)"
 
+msgid "[command]"
+msgstr "[opdracht]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6317,6 +6320,9 @@ msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
+
+msgid "Couldn't open a terminal"
+msgstr "Kan geen terminal openen"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Kan niet openen in chatinterface"
@@ -17320,6 +17326,9 @@ msgstr "Voer meer dan 10 programmeeragenten parallel uit op je computer"
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Draai 10+ parallelle coding agents op je machine."
+
+msgid "Run a command in a new terminal"
+msgstr "Voer een opdracht uit in een nieuwe terminal"
 
 msgid "Run again"
 msgstr "Opnieuw uitvoeren"

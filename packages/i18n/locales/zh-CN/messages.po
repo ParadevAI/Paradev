@@ -99,6 +99,9 @@ msgstr "（无输出）"
 msgid "(you)"
 msgstr "（你）"
 
+msgid "[command]"
+msgstr "[命令]"
+
 msgid "[prompt]"
 msgstr "[提示词]"
 
@@ -6317,6 +6320,9 @@ msgstr "无法将子智能体移到后台"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
+
+msgid "Couldn't open a terminal"
+msgstr "无法打开终端"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "无法在聊天界面中打开"
@@ -17320,6 +17326,9 @@ msgstr "在您的设备上并行运行 10 多个编程代理"
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "在你的机器上并行运行10个以上的编码智能体。"
+
+msgid "Run a command in a new terminal"
+msgstr "在新终端中运行命令"
 
 msgid "Run again"
 msgstr "重新运行"

@@ -99,6 +99,9 @@ msgstr "(çıktı yok)"
 msgid "(you)"
 msgstr "(siz)"
 
+msgid "[command]"
+msgstr "[komut]"
+
 msgid "[prompt]"
 msgstr "[istem]"
 
@@ -6317,6 +6320,9 @@ msgstr "Alt ajan arka plana taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
+
+msgid "Couldn't open a terminal"
+msgstr "Terminal açılamadı"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Sohbet arayüzünde açılamadı"
@@ -17320,6 +17326,9 @@ msgstr "Bilgisayarınızda 10'dan fazla kodlama ajanını paralel çalıştırı
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Makinenizde 10+ paralel kodlama ajanı çalıştırın."
+
+msgid "Run a command in a new terminal"
+msgstr "Yeni bir terminalde komut çalıştır"
 
 msgid "Run again"
 msgstr "Yeniden çalıştır"

@@ -99,6 +99,9 @@ msgstr "(tidak ada keluaran)"
 msgid "(you)"
 msgstr "(Anda)"
 
+msgid "[command]"
+msgstr "[perintah]"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6317,6 +6320,9 @@ msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
+
+msgid "Couldn't open a terminal"
+msgstr "Tidak dapat membuka terminal"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Tidak dapat membuka di antarmuka chat"
@@ -17320,6 +17326,9 @@ msgstr "Jalankan lebih dari 10 agen pemrograman secara paralel di perangkat Anda
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Jalankan 10+ agen coding paralel di mesin Anda."
+
+msgid "Run a command in a new terminal"
+msgstr "Jalankan perintah di terminal baru"
 
 msgid "Run again"
 msgstr "Jalankan lagi"
