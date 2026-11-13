@@ -22243,9 +22243,6 @@ msgstr "전체 보기"
 msgid "View All"
 msgstr "전체 보기"
 
-msgid "View all (+{moreCount} more)"
-msgstr "모두 보기 (+{moreCount}개 더)"
-
 msgid "View all members of this channel"
 msgstr "이 채널의 모든 멤버 보기"
 

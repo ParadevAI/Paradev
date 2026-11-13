@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { TimelineEntry } from "@superset/chat/core";
 import type { AgentMessage, ToolCall } from "@superset/chat/protocol";
-import { pageLinkFinder } from "../../../../utils/pageLinks";
+import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { turnPageLinks } from "./turnPageLinks";
 
 const WEB_URL = "https://app.superset.sh";

@@ -1,6 +1,5 @@
 import { useIsTabVisible } from "@superset/panes";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import {
@@ -51,7 +50,6 @@ export function PullRequestPane({
 	onOpenPage,
 	onOpenPullRequest,
 }: PullRequestPaneProps) {
-	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
 	const { workspace, hostUrl } = useWorkspace();
 	const organizationId = useActiveOrganizationId();
@@ -71,8 +69,8 @@ export function PullRequestPane({
 		url: detail.data?.url,
 	});
 
-	// Pages and "open in diff" belong to the workspace, so they exist only
-	// when this workspace's linked PR is the one on screen.
+	// "Open in diff" belongs to the workspace, so it exists only when this
+	// workspace's linked PR is the one on screen.
 	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery({
 		workspaceId: workspace.id,
 	});
@@ -81,9 +79,12 @@ export function PullRequestPane({
 		: null;
 	const isLinkedPR = linkedRef !== null && isSamePullRequest(linkedRef, data);
 	const evidence = usePullRequestEvidence(
-		workspace.id,
-		isLinkedPR && activeTab === "summary" && isTabVisible,
+		detail.data?.body,
+		activeTab === "summary" && isTabVisible,
 	);
+	const showEvidence =
+		evidence.hasLinks &&
+		(evidence.isPending || evidence.isError || evidence.pages.length > 0);
 	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
 	const onOpenInDiff = useReviewCommentNavigation(workspace.id, onOpenDiff);
 	const prUrl =
@@ -188,20 +189,18 @@ export function PullRequestPane({
 				commentTarget={commentTarget}
 				threads={activityThreads}
 				summaryAside={
-					isLinkedPR ? (
+					showEvidence ? (
 						<PullRequestEvidence
-							{...evidence}
+							pages={evidence.pages}
+							totalCount={evidence.totalCount}
+							isPending={evidence.isPending}
+							isError={evidence.isError}
+							onRetry={evidence.onRetry}
 							onOpenPage={(page) =>
 								onOpenPage({
 									pageId: page.id,
 									slug: page.slug,
 									title: page.title,
-								})
-							}
-							onViewAll={() =>
-								void navigate({
-									to: "/pages",
-									search: { workspace: workspace.id },
 								})
 							}
 						/>

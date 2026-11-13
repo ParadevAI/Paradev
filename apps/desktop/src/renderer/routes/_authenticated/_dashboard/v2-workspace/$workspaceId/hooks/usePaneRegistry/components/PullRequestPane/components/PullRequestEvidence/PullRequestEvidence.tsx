@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { Skeleton } from "@superset/ui/skeleton";
-import { ChevronRight } from "lucide-react";
 import {
 	type EvidencePage,
 	EvidencePageCard,
@@ -10,29 +9,22 @@ import {
 interface PullRequestEvidenceProps {
 	pages: EvidencePage[];
 	totalCount?: number;
-	hasMore: boolean;
 	isPending: boolean;
 	isError: boolean;
 	onRetry: () => void;
 	onOpenPage: (page: EvidencePage) => void;
-	onViewAll: () => void;
 }
 
 export function PullRequestEvidence({
 	pages,
 	totalCount,
-	hasMore,
 	isPending,
 	isError,
 	onRetry,
 	onOpenPage,
-	onViewAll,
 }: PullRequestEvidenceProps) {
 	const { t } = useLingui();
 	const { formatNumber } = useFormat();
-	const remaining =
-		totalCount === undefined ? 0 : Math.max(0, totalCount - pages.length);
-	const moreCount = formatNumber(remaining);
 
 	return (
 		<section
@@ -70,10 +62,6 @@ export function PullRequestEvidence({
 								/>
 							))}
 						</div>
-					) : !isError ? (
-						<p className="text-xs text-muted-foreground">
-							<Trans>No pages yet</Trans>
-						</p>
 					) : null}
 					{isError ? (
 						<div
@@ -89,20 +77,6 @@ export function PullRequestEvidence({
 								<Trans>Retry</Trans>
 							</button>
 						</div>
-					) : null}
-					{hasMore ? (
-						<button
-							type="button"
-							onClick={onViewAll}
-							className="flex w-fit items-center gap-1 rounded text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-						>
-							{remaining > 0 ? (
-								<Trans>View all (+{moreCount} more)</Trans>
-							) : (
-								<Trans>View all</Trans>
-							)}
-							<ChevronRight className="size-4" />
-						</button>
 					) : null}
 				</>
 			)}

@@ -21,13 +21,11 @@ const meta = {
 					? "/fixtures/thumb-notes.jpg"
 					: "/fixtures/thumb-trace.jpg",
 		})),
-		totalCount: 5,
-		hasMore: true,
+		totalCount: 3,
 		isPending: false,
 		isError: false,
 		onRetry: fn(),
 		onOpenPage: fn(),
-		onViewAll: fn(),
 	},
 } satisfies Meta<typeof PullRequestEvidence>;
 
@@ -47,9 +45,6 @@ export const NarrowRail: Story = {
 export const Loading: Story = {
 	args: { pages: [], totalCount: undefined, isPending: true },
 };
-export const Empty: Story = {
-	args: { pages: [], totalCount: 0, hasMore: false },
-};
 export const Failed: Story = {
-	args: { pages: [], totalCount: undefined, hasMore: false, isError: true },
+	args: { pages: [], totalCount: undefined, isError: true },
 };

@@ -22243,9 +22243,6 @@ msgstr "查看全部"
 msgid "View All"
 msgstr "查看全部"
 
-msgid "View all (+{moreCount} more)"
-msgstr "查看全部（另有 {moreCount} 项）"
-
 msgid "View all members of this channel"
 msgstr "查看此频道的所有成员"
 

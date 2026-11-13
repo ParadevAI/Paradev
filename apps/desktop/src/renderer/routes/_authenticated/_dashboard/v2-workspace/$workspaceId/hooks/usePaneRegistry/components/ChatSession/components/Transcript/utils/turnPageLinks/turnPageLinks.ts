@@ -5,7 +5,10 @@ import {
 	isKnownItem,
 	type ToolCall,
 } from "@superset/chat/protocol";
-import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
+import type {
+	PageLink,
+	PageLinkFinder,
+} from "../../../../../../utils/pageLinks";
 
 // Output that links more pages than this is a listing, not something the agent made.
 const MAX_PAGES_PER_TOOL_CALL = 3;

@@ -22243,9 +22243,6 @@ msgstr "Alle ansehen"
 msgid "View All"
 msgstr "Alle ansehen"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Alle anzeigen (+{moreCount} weitere)"
-
 msgid "View all members of this channel"
 msgstr "Alle Mitglieder dieses Kanals anzeigen"
 

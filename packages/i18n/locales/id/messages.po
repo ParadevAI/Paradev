@@ -22243,9 +22243,6 @@ msgstr "Lihat semua"
 msgid "View All"
 msgstr "Lihat Semua"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Lihat semua (+{moreCount} lainnya)"
-
 msgid "View all members of this channel"
 msgstr "Lihat semua anggota saluran ini"
 

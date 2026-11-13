@@ -22243,9 +22243,6 @@ msgstr "Tümünü görüntüle"
 msgid "View All"
 msgstr "Tümünü görüntüle"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Tümünü göster (+{moreCount} tane daha)"
-
 msgid "View all members of this channel"
 msgstr "Bu kanalın tüm üyelerini gör"
 

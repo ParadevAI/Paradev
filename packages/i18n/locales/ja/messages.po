@@ -22243,9 +22243,6 @@ msgstr "すべて表示"
 msgid "View All"
 msgstr "すべて表示"
 
-msgid "View all (+{moreCount} more)"
-msgstr "すべて表示（他{moreCount}件）"
-
 msgid "View all members of this channel"
 msgstr "このチャンネルのメンバーをすべて表示"
 

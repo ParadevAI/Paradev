@@ -36,31 +36,22 @@ const pages = ["Test Results", "Screenshots", "CDP Video"].map(
 );
 const defaults = {
 	pages,
-	totalCount: 5,
-	hasMore: true,
+	totalCount: 3,
 	isPending: false,
 	isError: false,
 	onRetry: () => {},
 	onOpenPage: () => {},
-	onViewAll: () => {},
 };
 
 describe("PR evidence", () => {
-	test("opens the selected page and offers the remaining pages through view all", () => {
+	test("opens the selected page and counts the linked pages", () => {
 		const onOpenPage = mock(() => {});
-		const onViewAll = mock(() => {});
 		const view = render(
-			<PullRequestEvidence
-				{...defaults}
-				onOpenPage={onOpenPage}
-				onViewAll={onViewAll}
-			/>,
+			<PullRequestEvidence {...defaults} onOpenPage={onOpenPage} />,
 		);
 		fireEvent.click(view.getByRole("button", { name: "Screenshots" }));
 		expect(onOpenPage).toHaveBeenCalledWith(pages[1]);
-		fireEvent.click(view.getByRole("button", { name: "View all (+2 more)" }));
-		expect(onViewAll).toHaveBeenCalledTimes(1);
-		expect(view.getByRole("heading").textContent).toBe("Pages5");
+		expect(view.getByRole("heading").textContent).toBe("Pages3");
 	});
 
 	test("keeps a page usable when its thumbnail fails", () => {
@@ -76,24 +67,21 @@ describe("PR evidence", () => {
 		expect(onOpenPage).toHaveBeenCalledWith(pages[0]);
 	});
 
-	test("distinguishes loading, failure with retry, and a successfully empty workspace", () => {
+	test("distinguishes loading from failure with retry", () => {
 		const onRetry = mock(() => {});
 		const view = render(
 			<PullRequestEvidence
 				{...defaults}
 				pages={[]}
 				totalCount={undefined}
-				hasMore={false}
 				isPending
 			/>,
 		);
 		expect(view.getByRole("status")).toBeTruthy();
-		expect(view.queryByText("No pages yet")).toBeNull();
 		view.rerender(
 			<PullRequestEvidence
 				{...defaults}
 				pages={[]}
-				hasMore={false}
 				totalCount={undefined}
 				isError
 				onRetry={onRetry}
@@ -102,18 +90,7 @@ describe("PR evidence", () => {
 		expect(view.getByRole("alert").textContent).toContain(
 			"Pages could not be loaded",
 		);
-		expect(view.queryByText("No pages yet")).toBeNull();
 		fireEvent.click(view.getByRole("button", { name: "Retry" }));
 		expect(onRetry).toHaveBeenCalledTimes(1);
-		view.rerender(
-			<PullRequestEvidence
-				{...defaults}
-				pages={[]}
-				totalCount={0}
-				hasMore={false}
-			/>,
-		);
-		expect(view.getByText("No pages yet")).toBeTruthy();
-		expect(view.queryByRole("button", { name: /^View all \(/ })).toBeNull();
 	});
 });

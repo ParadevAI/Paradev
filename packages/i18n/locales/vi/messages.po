@@ -22243,9 +22243,6 @@ msgstr "Xem tất cả"
 msgid "View All"
 msgstr "Xem tất cả"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Xem tất cả (+{moreCount} mục nữa)"
-
 msgid "View all members of this channel"
 msgstr "Xem tất cả thành viên của kênh"
 
