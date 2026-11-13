@@ -25,6 +25,7 @@ import {
 	usePendingWorkspaceCreatesStore,
 } from "@/screens/(authenticated)/stores/pendingWorkspaceCreatesStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
+import { buildWorkspaceCreateInput } from "./utils/buildWorkspaceCreateInput";
 
 type CreateTerminalWorkspaceArgs = PendingWorkspaceCreateInput & {
 	/** Retry from the failed state replaces instead of pushing. */
@@ -233,13 +234,14 @@ export function useCreateTerminalWorkspace() {
 					});
 					refetchCreated();
 				} else {
-					const createInput = {
+					const createInput = buildWorkspaceCreateInput({
 						id: workspaceId,
 						projectId: target.projectId,
-						baseBranch: baseBranch ?? undefined,
+						primaryRepositoryId: target.primaryRepositoryId,
+						baseBranch,
 						agents,
 						...naming,
-					};
+					});
 					try {
 						createRequested = true;
 						await client.workspaces.createEnqueued.mutate(createInput);

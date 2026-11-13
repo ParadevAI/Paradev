@@ -1,5 +1,8 @@
 import { CLIError } from "@superset/cli-framework";
-import type { HostServiceClient } from "../../../../../lib/host-target";
+import {
+	type HostServiceClient,
+	requireRepositories,
+} from "../../../../../lib/host-target";
 
 /** A repository of the project, named by its name (any case) or id. */
 export async function resolveRepository(
@@ -11,13 +14,14 @@ export async function resolveRepository(
 	if (!project) {
 		throw new CLIError(`Project ${projectId} is not on this host`);
 	}
-	const repository = project.repositories.find(
+	const repositories = requireRepositories(project);
+	const repository = repositories.find(
 		(r) => r.id === ref || r.name.toLowerCase() === ref.toLowerCase(),
 	);
 	if (!repository) {
 		throw new CLIError(
 			`Project ${project.name} has no repository "${ref}"`,
-			`Use one of: ${project.repositories.map((r) => r.name).join(", ")}`,
+			`Use one of: ${repositories.map((r) => r.name).join(", ")}`,
 		);
 	}
 	return repository;
@@ -28,9 +32,12 @@ export async function primaryRepository(
 	projectId: string,
 ) {
 	const project = await client.project.get.query({ projectId });
-	const primary = project?.repositories.find((r) => r.isPrimary);
-	if (!primary) {
+	if (!project) {
 		throw new CLIError(`Project ${projectId} is not on this host`);
+	}
+	const primary = requireRepositories(project).find((r) => r.isPrimary);
+	if (!primary) {
+		throw new CLIError(`Project ${projectId} has no primary repository`);
 	}
 	return primary;
 }

@@ -10,12 +10,14 @@ type Input = {
 	branch?: string;
 	pr?: number;
 	baseBranch?: string;
+	repository?: string;
 };
 let definition: {
 	inputSchema: z.ZodRawShape;
 	handler: (input: Input, ctx: object) => Promise<unknown>;
 };
 let request: { procedure: string; input: unknown } | undefined;
+let hostProject: unknown = null;
 mock.module("../../define-tool", () => ({
 	defineTool: (_server: unknown, value: typeof definition) => {
 		definition = value;
@@ -29,6 +31,7 @@ mock.module("../../host-service-client", () => ({
 		_kind: string,
 		input: unknown,
 	) => {
+		if (procedure === "project.get") return hostProject;
 		request = { procedure, input };
 		return {};
 	},
@@ -48,6 +51,7 @@ const input: Input = {
 };
 beforeEach(() => {
 	request = undefined;
+	hostProject = null;
 });
 test("exposes local checkout and uses a procedure older hosts cannot silently reinterpret", async () => {
 	const parsed = z.object(definition.inputSchema).parse(input) as Input;
@@ -79,5 +83,52 @@ test("rejects checkout on sessions", async () => {
 	await expect(
 		definition.handler({ ...input, projectId: undefined }, {}),
 	).rejects.toThrow("requires");
+	expect(request).toBeUndefined();
+});
+
+const worktree = { ...input, checkout: undefined };
+const multiRepoProject = {
+	primaryRepositoryId: "repo-app",
+	repositories: [
+		{ id: "repo-app", name: "app" },
+		{ id: "repo-docs", name: "docs" },
+	],
+};
+test("sends pr and baseBranch as the primary repository's checkout, and the legacy fields for released hosts", async () => {
+	hostProject = multiRepoProject;
+	await definition.handler({ ...worktree, pr: 7, baseBranch: "main" }, {});
+	expect(request?.input).toMatchObject({
+		checkouts: { "repo-app": { pr: 7, baseBranch: "main" } },
+		pr: 7,
+		baseBranch: "main",
+	});
+});
+test("puts the PR on the repository named by `repository`", async () => {
+	hostProject = multiRepoProject;
+	await definition.handler({ ...worktree, pr: 3, repository: "docs" }, {});
+	expect(request?.input).toMatchObject({
+		checkouts: { "repo-docs": { pr: 3 } },
+	});
+});
+test("rejects a repository the project does not have", async () => {
+	hostProject = multiRepoProject;
+	await expect(
+		definition.handler({ ...worktree, pr: 3, repository: "nope" }, {}),
+	).rejects.toThrow("Repositories: app, docs");
+	expect(request).toBeUndefined();
+});
+test("a host without repositories gets only the legacy fields", async () => {
+	hostProject = { id: input.projectId };
+	await definition.handler({ ...worktree, pr: 7 }, {});
+	expect(request?.input).toMatchObject({ pr: 7 });
+	expect((request?.input as { checkouts?: unknown }).checkouts).toBeUndefined();
+	await expect(
+		definition.handler({ ...worktree, pr: 7, repository: "docs" }, {}),
+	).rejects.toThrow("too old");
+});
+test("rejects branch plus pr before calling the host", async () => {
+	await expect(
+		definition.handler({ ...worktree, branch: "feature", pr: 7 }, {}),
+	).rejects.toThrow("cannot both be set");
 	expect(request).toBeUndefined();
 });

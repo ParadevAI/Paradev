@@ -47,7 +47,7 @@ export function register(server: McpServer): void {
 		name: "workspaces_create",
 		annotations: { destructiveHint: false },
 		description:
-			"Create a workspace. Without hostId it is a cloud workspace: it starts from `environment` (by id — a create without one, when several exist, fails listing the ids; its repositories are the checkouts; required when several environments have repositories), runs on Paradev's infrastructure so it keeps going when the user's laptop sleeps, and returns as soon as its row exists in status 'provisioning' — poll workspaces_list until it is 'ready'. It bills until deleted, so call workspaces_delete when the work is done. A cloud workspace takes `name`, `branch`, `machineSize` and at most one entry in `agents` (claude or codex); host-only fields are rejected. With hostId it is created on that host (see projects_list and hosts_list): use `checkout: local` to share the project checkout without switching branches, or omit checkout for an isolated worktree with a branch or PR; omit `projectId` (and `branch`/`pr`/`baseBranch`/`taskId`) for a project-less session. `agents` spawns agents once the workspace is ready (the equivalent of agents_create) and `command` runs a one-off shell command.",
+			"Create a workspace. Without hostId it is a cloud workspace: it starts from `environment` (by id — a create without one, when several exist, fails listing the ids; its repositories are the checkouts; required when several environments have repositories), runs on Paradev's infrastructure so it keeps going when the user's laptop sleeps, and returns as soon as its row exists in status 'provisioning' — poll workspaces_list until it is 'ready'. It bills until deleted, so call workspaces_delete when the work is done. A cloud workspace takes `name`, `branch`, `machineSize` and at most one entry in `agents` (claude or codex); host-only fields are rejected. With hostId it is created on that host (see projects_list and hosts_list): use `checkout: local` to share the project checkout without switching branches, or omit checkout for an isolated worktree with a branch or PR (`pr` and `baseBranch` apply to the project's primary repository, or to `repository` in a project with several); omit `projectId` (and `branch`/`pr`/`baseBranch`/`repository`/`taskId`) for a project-less session. `agents` spawns agents once the workspace is ready (the equivalent of agents_create) and `command` runs a one-off shell command.",
 		inputSchema: {
 			checkout: z
 				.enum(["worktree", "local"])
@@ -95,13 +95,20 @@ export function register(server: McpServer): void {
 				.positive()
 				.optional()
 				.describe(
-					"Pull request number — server checks out the verified PR head and derives the branch.",
+					"Pull request number in `repository` (default: the project's primary repository) — the host checks out the verified PR head and derives the branch.",
 				),
 			baseBranch: z
 				.string()
 				.optional()
 				.describe(
-					"Branch to fork from when `branch` does not exist (defaults to project default). Ignored when `pr` is set.",
+					"Branch of `repository` (default: the project's primary repository) to fork from when `branch` does not exist (defaults to that repository's default branch). Ignored when `pr` is set.",
+				),
+			repository: z
+				.string()
+				.min(1)
+				.optional()
+				.describe(
+					"Repository of the project that `pr` and `baseBranch` apply to, by id or folder name (see projects_list). Defaults to the project's primary repository.",
 				),
 			hostId: z
 				.string()
@@ -145,7 +152,12 @@ export function register(server: McpServer): void {
 			}
 			const name = input.name;
 			if (input.checkout === "local") {
-				for (const field of ["branch", "pr", "baseBranch"] as const) {
+				for (const field of [
+					"branch",
+					"pr",
+					"baseBranch",
+					"repository",
+				] as const) {
 					if (input[field] !== undefined)
 						throw new Error(`${field} cannot be combined with checkout local`);
 				}
@@ -156,6 +168,7 @@ export function register(server: McpServer): void {
 					["branch", input.branch],
 					["pr", input.pr],
 					["baseBranch", input.baseBranch],
+					["repository", input.repository],
 					["taskId", input.taskId],
 				] as const) {
 					if (value !== undefined) {
@@ -192,6 +205,24 @@ export function register(server: McpServer): void {
 					},
 				);
 			}
+			if (input.branch !== undefined && input.pr !== undefined) {
+				throw new Error("`branch` and `pr` cannot both be set");
+			}
+			const target = {
+				relayUrl: ctx.relayUrl,
+				organizationId: ctx.organizationId,
+				hostId,
+				jwt: ctx.bearerToken,
+			};
+			const projectId = input.projectId;
+			const checkouts =
+				input.checkout === "local"
+					? undefined
+					: await checkoutsFor(
+							input,
+							(): Promise<HostProject | null> =>
+								hostServiceCall(target, "project.get", "query", { projectId }),
+						);
 			return hostServiceCall<{
 				workspace: {
 					id: string;
@@ -206,12 +237,7 @@ export function register(server: McpServer): void {
 				>;
 				alreadyExists: boolean;
 			}>(
-				{
-					relayUrl: ctx.relayUrl,
-					organizationId: ctx.organizationId,
-					hostId,
-					jwt: ctx.bearerToken,
-				},
+				target,
 				input.checkout === "local"
 					? "workspaces.createLocal"
 					: "workspaces.create",
@@ -221,8 +247,10 @@ export function register(server: McpServer): void {
 					checkout: input.checkout,
 					name,
 					branch: input.branch,
+					checkouts,
+					// Released hosts read only these; current hosts strip them.
 					pr: input.pr,
-					baseBranch: input.baseBranch,
+					baseBranch: input.baseBranch || undefined,
 					taskId: input.taskId,
 					agents: input.agents,
 					command: input.command,
@@ -230,6 +258,53 @@ export function register(server: McpServer): void {
 			);
 		},
 	});
+}
+
+type HostProject = {
+	primaryRepositoryId?: string | null;
+	repositories?: Array<{ id: string; name: string }>;
+};
+
+/**
+ * The host's per-repository request for `pr` and `baseBranch`. A host
+ * without `repositories` predates them and reads the top-level fields.
+ */
+export async function checkoutsFor(
+	input: { pr?: number; baseBranch?: string; repository?: string },
+	getProject: () => Promise<HostProject | null>,
+): Promise<Record<string, { pr?: number; baseBranch?: string }> | undefined> {
+	const baseBranch = input.baseBranch || undefined;
+	if (input.pr === undefined && baseBranch === undefined) {
+		if (input.repository !== undefined) {
+			throw new Error("`repository` applies only with `pr` or `baseBranch`");
+		}
+		return undefined;
+	}
+	const project = await getProject();
+	if (!project) throw new Error("This project is not set up on that host");
+	if (!project.repositories) {
+		if (input.repository !== undefined) {
+			throw new Error(
+				"This host is too old to pick a repository; update it, or omit `repository`",
+			);
+		}
+		return undefined;
+	}
+	const wanted = input.repository ?? project.primaryRepositoryId;
+	const repository = project.repositories.find(
+		(candidate) => candidate.id === wanted || candidate.name === wanted,
+	);
+	if (!repository) {
+		throw new Error(
+			`No repository ${wanted ?? "(primary)"} in this project. Repositories: ${project.repositories.map((candidate) => candidate.name).join(", ")}`,
+		);
+	}
+	return {
+		[repository.id]: {
+			...(input.pr !== undefined ? { pr: input.pr } : {}),
+			...(baseBranch !== undefined ? { baseBranch } : {}),
+		},
+	};
 }
 
 async function createInCloud(
@@ -242,6 +317,7 @@ async function createInCloud(
 		checkout?: string;
 		pr?: number;
 		baseBranch?: string;
+		repository?: string;
 		taskId?: string;
 		command?: string;
 		agents?: Array<z.infer<typeof agentLaunchSchema>>;
@@ -253,6 +329,7 @@ async function createInCloud(
 		["checkout", input.checkout],
 		["pr", input.pr],
 		["baseBranch", input.baseBranch],
+		["repository", input.repository],
 		["taskId", input.taskId],
 		["command", input.command],
 	] as const) {

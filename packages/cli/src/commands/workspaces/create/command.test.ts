@@ -10,15 +10,17 @@ let createInput: Record<string, unknown> | undefined;
 let sessionInput: Record<string, unknown> | undefined;
 
 let cloudAvailable = false;
+const REPOSITORIES = [
+	{ id: "r-api", name: "api", isPrimary: true },
+	{ id: "r-web", name: "web", isPrimary: false },
+];
+let projectRepositories: typeof REPOSITORIES | undefined = REPOSITORIES;
 
 withLocalHostService("org-1", {
 	"project.get": () => ({
 		id: "project-1",
 		name: "orbit",
-		repositories: [
-			{ id: "r-api", name: "api", isPrimary: true },
-			{ id: "r-web", name: "web", isPrimary: false },
-		],
+		repositories: projectRepositories,
 	}),
 	"workspaces.createLocal": (input) => {
 		createProcedure = "createLocal";
@@ -84,6 +86,7 @@ function invoke(
 
 afterEach(() => {
 	cloudAvailable = false;
+	projectRepositories = REPOSITORIES;
 	createInput = undefined;
 	createProcedure = undefined;
 	localCreateError = undefined;
@@ -288,6 +291,14 @@ describe("workspaces create on a project of several repositories", () => {
 			checkouts: { "r-web": { pr: 12 }, "r-api": { baseBranch: "release" } },
 		});
 		expect(createInput).not.toHaveProperty("pr");
+	});
+
+	test("refuses --pr on a host too old to read checkouts", async () => {
+		projectRepositories = undefined;
+		await expect(invoke({ branch: undefined, pr: ["web=12"] })).rejects.toThrow(
+			"too old",
+		);
+		expect(createInput).toBeUndefined();
 	});
 
 	test("refuses a bare --pr, naming the repositories", async () => {

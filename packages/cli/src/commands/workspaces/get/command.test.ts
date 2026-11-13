@@ -162,6 +162,13 @@ describe("workspaces get", () => {
 		expect(text.message).toMatch(/^checkouts\s+—$/m);
 	});
 
+	test("shows a row from an older host that has no checkouts field", async () => {
+		const { checkouts: _, ...legacy } = WORKSPACE;
+		workspaces = [legacy];
+		const text = (await invoke({ id: WORKSPACE.id })) as { message: string };
+		expect(text.message).toMatch(/^checkouts\s+—$/m);
+	});
+
 	test("--field with a null value yields an empty message", async () => {
 		workspaces = [WORKSPACE];
 		const result = (await invoke(

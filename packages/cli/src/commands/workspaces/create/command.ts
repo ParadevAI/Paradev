@@ -2,7 +2,10 @@ import { boolean, CLIError, string } from "@superset/cli-framework";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
-import { resolveHostTarget } from "../../../lib/host-target";
+import {
+	requireRepositories,
+	resolveHostTarget,
+} from "../../../lib/host-target";
 import { workspaceLinks } from "../../../lib/open-url";
 import { uploadAttachments } from "../../../lib/upload-attachments";
 import { createCloudWorkspace } from "./createCloudWorkspace";
@@ -283,7 +286,7 @@ export default command({
 		}
 		const checkouts = project
 			? buildCheckouts({
-					repositories: project.repositories,
+					repositories: requireRepositories(project),
 					pr: options.pr,
 					baseBranch: options.baseBranch,
 				})

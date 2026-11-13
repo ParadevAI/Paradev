@@ -77,7 +77,7 @@ export default command({
 			const project = await target.client.project.get.query({
 				projectId: options.project,
 			});
-			if ((project?.repositories.length ?? 0) > 1) {
+			if ((project?.repositories?.length ?? 0) > 1) {
 				throw new CLIError(
 					"--all is not available on a project of several repositories",
 					"Each worktree is moved into a new workspace folder. Open them one at a time with --path or --branch",

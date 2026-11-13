@@ -36,15 +36,18 @@ export default command({
 		const projects = await target.client.project.list.query();
 
 		return projects
-			.map((project) => ({
-				name: project.name,
-				// The primary is marked with `*`.
-				repos: project.repositories
-					.map((r) => (r.isPrimary ? `${r.name}*` : r.name))
-					.join(", "),
-				id: project.id,
-				repositories: project.repositories,
-			}))
+			.map((project) => {
+				const repositories = project.repositories ?? [];
+				return {
+					name: project.name,
+					// The primary is marked with `*`.
+					repos: repositories
+						.map((r) => (r.isPrimary ? `${r.name}*` : r.name))
+						.join(", "),
+					id: project.id,
+					repositories,
+				};
+			})
 			.sort((a, b) => a.name.localeCompare(b.name));
 	},
 });

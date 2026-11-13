@@ -14,4 +14,19 @@ describe("repositorySource", () => {
 		});
 		expect(repositorySource("./api").kind).toBe("local");
 	});
+
+	test("an scp-style remote without a user is cloned", () => {
+		expect(repositorySource("github.com:o/web")).toEqual({
+			kind: "clone",
+			url: "github.com:o/web",
+		});
+	});
+
+	test("a colon after a slash, or a Windows drive, is a local path", () => {
+		expect(repositorySource("/srv/a:b").kind).toBe("local");
+		expect(repositorySource("./a:b").kind).toBe("local");
+		expect(repositorySource("~/a:b").kind).toBe("local");
+		expect(repositorySource("C:\\src\\api").kind).toBe("local");
+		expect(repositorySource("C:/src/api").kind).toBe("local");
+	});
 });

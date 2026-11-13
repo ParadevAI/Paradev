@@ -1,3 +1,4 @@
+export { requireRepositories } from "./requireRepositories";
 export { resolveCloudWorkspaceTarget } from "./resolveCloudWorkspaceTarget";
 export {
 	type HostFlags,

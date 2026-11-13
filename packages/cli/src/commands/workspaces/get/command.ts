@@ -154,7 +154,7 @@ async function hostDetail(
 		taskId: workspace.taskId,
 		worktreePath: workspace.worktreePath,
 		worktreeExists: workspace.worktreeExists,
-		checkouts: workspace.checkouts.map((checkout) => ({
+		checkouts: (workspace.checkouts ?? []).map((checkout) => ({
 			repositoryId: checkout.repositoryId,
 			name: checkout.name,
 			isPrimary: checkout.isPrimary,
