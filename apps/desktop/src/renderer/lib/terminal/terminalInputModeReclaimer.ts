@@ -1,5 +1,7 @@
 import {
 	createLeakedInputModeReclaimer,
+	LEAKED_MODE_DISARM,
+	type LeakableInputMode,
 	SHELL_READY_MARKER_PAYLOAD,
 	SHELL_READY_OSC_ID,
 } from "@superset/shared/leaked-input-mode-reclaim";
@@ -19,19 +21,29 @@ import type { IDisposable, Terminal } from "@xterm/xterm";
  *
  * This observes mode arming and the OSC 777 shell-ready marker via xterm parser
  * handlers (chunk-safe, exact) and feeds them to the shared reclaimer, which
- * decides what to disarm. The disarm is written back on a microtask so a TUI that
- * re-arms right after the marker (fg after ^Z, or a new TUI racing the prompt)
- * keeps its modes. The decision logic lives in the shared module so a host-side
- * surface can reuse it later.
+ * decides what to disarm. The marker queues the candidate disarm bytes between two
+ * sentinel OSCs, and the decision is made when xterm parses the opening sentinel:
+ * a TUI that re-armed in between (fg after ^Z, or a new TUI racing the prompt)
+ * has its disarm swallowed, so it keeps its modes. The decision logic lives in
+ * the shared module so a host-side surface can reuse it later.
  */
+const RECLAIM_BEGIN_PAYLOAD = "superset-reclaim-begin";
+const RECLAIM_END_PAYLOAD = "superset-reclaim-end";
+const osc = (payload: string) => `\x1b]${SHELL_READY_OSC_ID};${payload}\x07`;
+
+function decMode(param: number | number[]): LeakableInputMode | undefined {
+	const primary = typeof param === "number" ? param : param[0];
+	if (primary === 1000 || primary === 1002 || primary === 1003) return "mouse";
+	if (primary === 1004) return "focus";
+	return undefined;
+}
+
 export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 	const reclaimer = createLeakedInputModeReclaimer();
 	const parser = terminal.parser;
 	const disposables: IDisposable[] = [];
-	let scheduled = false;
-	// The deferred flush must not write into a terminal whose lifecycle ended
-	// between the marker and the microtask.
-	let disposed = false;
+	// Set while xterm parses our own disarm burst: modes re-armed since the marker.
+	let keep: Set<LeakableInputMode> | null = null;
 
 	// Kitty keyboard protocol: `CSI > flags u` push/arm, `CSI = flags ; mode u`
 	// set (0 disarms), `CSI < n u` pop/disarm. Return false so xterm still applies.
@@ -45,12 +57,14 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 		parser.registerCsiHandler({ prefix: "=", final: "u" }, (params) => {
 			const raw = params[0];
 			const flags = typeof raw === "number" ? raw : (raw?.[0] ?? 0);
+			if (flags === 0 && keep?.has("kitty")) return true;
 			reclaimer.noteArm("kitty", flags !== 0);
 			return false;
 		}),
 	);
 	disposables.push(
 		parser.registerCsiHandler({ prefix: "<", final: "u" }, () => {
+			if (keep?.has("kitty")) return true;
 			reclaimer.noteArm("kitty", false);
 			return false;
 		}),
@@ -62,12 +76,8 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 		armed: boolean,
 	): void => {
 		for (const param of params) {
-			const primary = typeof param === "number" ? param : param[0];
-			if (primary === 1000 || primary === 1002 || primary === 1003) {
-				reclaimer.noteArm("mouse", armed);
-			} else if (primary === 1004) {
-				reclaimer.noteArm("focus", armed);
-			}
+			const mode = decMode(param);
+			if (mode) reclaimer.noteArm(mode, armed);
 		}
 	};
 	disposables.push(
@@ -78,6 +88,9 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 	);
 	disposables.push(
 		parser.registerCsiHandler({ prefix: "?", final: "l" }, (params) => {
+			const kept = keep;
+			const modes = params.map(decMode);
+			if (kept && modes.some((mode) => mode && kept.has(mode))) return true;
 			applyDecMode(params, false);
 			return false;
 		}),
@@ -85,17 +98,31 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 
 	disposables.push(
 		parser.registerOscHandler(SHELL_READY_OSC_ID, (data) => {
+			if (data === RECLAIM_BEGIN_PAYLOAD) {
+				const disarm = reclaimer.collectDisarm();
+				keep = new Set(
+					(Object.keys(LEAKED_MODE_DISARM) as LeakableInputMode[]).filter(
+						(mode) => !disarm.includes(LEAKED_MODE_DISARM[mode]),
+					),
+				);
+				return true;
+			}
+			if (data === RECLAIM_END_PAYLOAD) {
+				keep = null;
+				return true;
+			}
 			// Exact match: OSC 777 is also urxvt's notification channel.
 			if (data !== SHELL_READY_MARKER_PAYLOAD) return false;
 			reclaimer.noteShellReady();
-			if (!scheduled) {
-				scheduled = true;
-				queueMicrotask(() => {
-					scheduled = false;
-					if (disposed) return;
-					const disarm = reclaimer.collectDisarm();
-					if (disarm) terminal.write(disarm);
-				});
+			const candidates = reclaimer
+				.snapshot()
+				.modes.filter(([, s]) => s.pending)
+				.map(([mode]) => LEAKED_MODE_DISARM[mode])
+				.join("");
+			if (candidates) {
+				terminal.write(
+					osc(RECLAIM_BEGIN_PAYLOAD) + candidates + osc(RECLAIM_END_PAYLOAD),
+				);
 			}
 			return false;
 		}),
@@ -103,7 +130,6 @@ export function installInputModeReclaimer(terminal: Terminal): IDisposable {
 
 	return {
 		dispose(): void {
-			disposed = true;
 			for (const d of disposables) d.dispose();
 		},
 	};
