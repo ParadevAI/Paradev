@@ -1,0 +1,1 @@
+export { getFormatShortcutTarget } from "./getFormatShortcutTarget";

@@ -8,7 +8,7 @@ import {
 import { cn } from "@superset/ui/utils";
 import { type ReactNode, useMemo, useRef, useState } from "react";
 import { FileIcon } from "renderer/lib/fileIcons";
-import { DiffStatText } from "../../../../../../../../../../components/DiffStatText";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import {
 	diffPreviewLines,
 	type PreviewLine,

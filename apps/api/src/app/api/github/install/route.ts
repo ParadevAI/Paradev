@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
@@ -6,6 +7,12 @@ import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
 export async function GET(request: Request) {
 	const member = await requireOrgMember(request);
 	if (member instanceof Response) return member;
+
+	if (member.role !== "owner" && member.role !== "admin") {
+		return Response.redirect(
+			`${env.NEXT_PUBLIC_WEB_URL}/integrations/github?error=admin_required`,
+		);
+	}
 
 	if (!(await organizationSyncsNow(member.organizationId))) {
 		return Response.redirect(
@@ -34,7 +41,7 @@ export async function GET(request: Request) {
 			installUrl.searchParams.set("state", state);
 			installUrl.searchParams.set(
 				"redirect_url",
-				`${env.NEXT_PUBLIC_API_URL}/api/github/callback`,
+				`${getBrowserApiUrl(env)}/api/github/callback`,
 			);
 			return installUrl.toString();
 		},

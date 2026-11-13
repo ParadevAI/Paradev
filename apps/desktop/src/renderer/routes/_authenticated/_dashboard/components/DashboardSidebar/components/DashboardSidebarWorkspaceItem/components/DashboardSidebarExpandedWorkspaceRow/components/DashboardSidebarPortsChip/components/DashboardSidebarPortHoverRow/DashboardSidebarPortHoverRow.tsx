@@ -1,3 +1,4 @@
+import { CloudPortForwardActions } from "renderer/routes/_authenticated/_dashboard/components/CloudPortForwardActions";
 import { DashboardSidebarPortRow } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarPortRow";
 import { useDashboardSidebarPortKill } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortKill";
 import type { DashboardSidebarPort } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortsData";
@@ -26,7 +27,14 @@ export function DashboardSidebarPortHoverRow({
 				if (isPending) return;
 				void killPort(port);
 			}}
-			actions={forward && <PortForwardBusyActions forward={forward} />}
+			actions={
+				<>
+					{forward && <PortForwardBusyActions forward={forward} />}
+					{port.hostType === "cloud" && (
+						<CloudPortForwardActions port={port} forward={forward} />
+					)}
+				</>
+			}
 		/>
 	);
 }

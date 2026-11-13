@@ -1,0 +1,1 @@
+export { GithubAttachmentImage } from "./GithubAttachmentImage";

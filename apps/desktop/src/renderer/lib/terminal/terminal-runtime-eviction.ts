@@ -1,8 +1,7 @@
 /**
  * Pure selection policy for parked-runtime LRU eviction (SUPER-1545).
  * Kept dependency-free so it can be unit-tested without pulling the
- * xterm/transport import graph into the test process. Also reused by the
- * browser pane registry for hidden-webview eviction.
+ * xterm/transport import graph into the test process.
  */
 
 interface EvictionCandidate {

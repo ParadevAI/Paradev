@@ -16,7 +16,12 @@ export default command({
 		return {
 			data: panes,
 			message: panes.length
-				? panes.map((p) => `${p.paneId}\t${p.url}\t${p.title}`).join("\n")
+				? panes
+						.map(
+							(p) =>
+								`${p.paneId}\t${p.url}\t${p.title}${p.loaded === false ? "\t(unloaded)" : ""}`,
+						)
+						.join("\n")
 				: "No browser panes open in this workspace.",
 		};
 	},

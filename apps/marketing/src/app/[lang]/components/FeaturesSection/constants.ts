@@ -45,7 +45,7 @@ export const FEATURES: Feature[] = [
 		}),
 		description: msg({
 			message:
-				"Agents triage issues, draft changelogs, and bump dependencies on their own. You review the PRs.",
+				"Agents triage issues, draft changelogs, and bump dependencies on their own.",
 		}),
 	},
 	{

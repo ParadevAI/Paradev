@@ -8,23 +8,24 @@ export function openUrlInV2Workspace({
 	store,
 	target,
 	url,
-	agent,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	target: V2WorkspaceUrlOpenTarget;
 	url: string;
-	agent?: true;
-}): void {
+}): string | null {
 	const pane = {
 		kind: "browser",
-		data: { url, ...(agent && { agent }) } satisfies BrowserPaneData,
+		data: { url } satisfies BrowserPaneData,
 	};
 	const state = store.getState();
 
 	if (target === "new-tab") {
 		state.addTab({ panes: [pane] });
-		return;
+	} else {
+		state.openPane({ pane });
 	}
-
-	state.openPane({ pane });
+	const next = store.getState();
+	return (
+		next.tabs.find((tab) => tab.id === next.activeTabId)?.activePaneId ?? null
+	);
 }

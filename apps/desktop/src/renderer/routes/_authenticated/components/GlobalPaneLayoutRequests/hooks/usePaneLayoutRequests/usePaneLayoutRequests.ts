@@ -1,12 +1,14 @@
 import type { WorkspaceState } from "@superset/panes";
-import type {
-	PaneArea,
-	PaneLayoutOp,
-	PaneLayoutOpResult,
+import {
+	allLayoutTabs,
+	type PaneArea,
+	type PaneLayoutOp,
+	type PaneLayoutOpResult,
 } from "@superset/shared/pane-layout-ops";
 import { useEffect } from "react";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import type {
 	ChatPaneData,
 	PaneViewerData,
@@ -18,6 +20,7 @@ import {
 import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
 import {
 	getV2PaneLayoutStore,
@@ -146,8 +149,6 @@ function runPaneLayoutOp(
 	forgetClosedChat(previous, workspaceId, op);
 
 	if (op.type !== "list") {
-		// Sidebar first: a non-terminal pane landing in the main area is moved to
-		// the sidebar by useRightPaneAreaLifecycle, and a later sidebar write would drop it.
 		for (const area of ["sidebar", "main"] as const) {
 			const next = outcome.areas[area];
 			if (next === previous[area]) continue;
@@ -191,6 +192,31 @@ function runPaneLayoutOp(
 	};
 }
 
+function wakeBrowser(
+	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	workspaceId: string,
+	paneId: string,
+): PaneLayoutOpResult {
+	const listed = runPaneLayoutOp(collections, workspaceId, { type: "list" });
+	const tab = allLayoutTabs(listed.layout).find((tab) =>
+		tab.panes.some((pane) => pane.id === paneId),
+	);
+	const pane = tab?.panes.find((pane) => pane.id === paneId);
+	if (!tab || !pane?.browser) {
+		throw new PaneLayoutOpError(
+			"NOT_FOUND",
+			`No browser pane ${paneId} in this workspace`,
+		);
+	}
+	browserRuntimeRegistry.openBackground(
+		paneId,
+		pane.browser.url || "about:blank",
+		workspaceId,
+		persistBrowserPaneState(collections, workspaceId, paneId),
+	);
+	return { ...listed, paneId, tabId: tab.id };
+}
+
 /** Applies pane layout ops sent by the CLI and replies with the result. */
 export function usePaneLayoutRequests() {
 	const collections = useCollections();
@@ -204,11 +230,10 @@ export function usePaneLayoutRequests() {
 						typeof electronTrpcClient.paneLayout.respond.mutate
 					>[0];
 					try {
-						const { paneId, tabId, layout } = runPaneLayoutOp(
-							collections,
-							workspaceId,
-							op,
-						);
+						const { paneId, tabId, layout } =
+							op.type === "wakeBrowser"
+								? wakeBrowser(collections, workspaceId, op.paneId)
+								: runPaneLayoutOp(collections, workspaceId, op);
 						reply = { requestId, result: { paneId, tabId, layout } };
 					} catch (error) {
 						reply = {

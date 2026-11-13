@@ -3,10 +3,9 @@ import { useEffect } from "react";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
-import type { BrowserPaneData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
 import { writeWorkspacePaneLayout } from "renderer/stores/workspace-creates/writeWorkspacePaneLayout";
-import { AGENT_BROWSER_PARTITION } from "shared/constants";
 import { openBackgroundBrowser } from "./utils/openBackgroundBrowser";
 
 interface BrowserOpenRequest {
@@ -41,32 +40,29 @@ export function useBrowserOpenRequests() {
 									[],
 								);
 							}
-							const paneId = openBackgroundBrowser({ collections, ...request });
+							const paneId = openBackgroundBrowser({
+								collections,
+								workspaceId: request.workspaceId,
+								url: request.url,
+							});
 							browserRuntimeRegistry.openBackground(
 								paneId,
 								request.url,
 								request.workspaceId,
-								(state) => {
-									if (
-										!collections.v2WorkspaceLocalState.get(request.workspaceId)
-									)
-										return;
-									collections.v2WorkspaceLocalState.update(
-										request.workspaceId,
-										(draft) => {
-											for (const tab of draft.paneLayout.tabs) {
-												const pane = tab.panes[paneId];
-												if (pane?.kind === "browser")
-													pane.data = {
-														...(pane.data as BrowserPaneData),
-														...state,
-													};
-											}
-										},
-									);
-								},
-								AGENT_BROWSER_PARTITION,
+								persistBrowserPaneState(
+									collections,
+									request.workspaceId,
+									paneId,
+								),
 							);
+							electronTrpcClient.browser.resolveOpenRequest
+								.mutate({ requestId: request.requestId, paneId })
+								.catch((err) => {
+									console.error(
+										"[useBrowserOpenRequests] resolve open failed:",
+										err,
+									);
+								});
 						} catch (err) {
 							console.error(
 								"[useBrowserOpenRequests] background open failed:",
@@ -80,7 +76,6 @@ export function useBrowserOpenRequests() {
 							openUrl: request.url,
 							openUrlTarget: request.target,
 							openUrlRequestId: request.requestId,
-							openUrlAgent: true,
 						},
 					}).catch((err) => {
 						console.error("[useBrowserOpenRequests] navigate failed:", err);

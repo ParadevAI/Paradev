@@ -1,1 +1,0 @@
-export { SymmetricResizeHandles } from "./SymmetricResizeHandles";

@@ -16,16 +16,20 @@ function renderBreadcrumb() {
 		// biome-ignore lint/a11y/useKeyWithClickEvents: stands in for the pane header
 		// biome-ignore lint/a11y/noStaticElementInteractions: stands in for the pane header
 		<div onClick={onHeaderClick}>
-			<SubagentBreadcrumb onSelect={onSelect} path={path} root="Chat" />
+			<SubagentBreadcrumb
+				onSelect={onSelect}
+				path={path}
+				root={<button type="button">Chat</button>}
+			/>
 		</div>,
 	);
 	return { view, onSelect, onHeaderClick };
 }
 
-test("selecting the root returns to the main chat", () => {
+test("the root segment is the given element and does not navigate", () => {
 	const { view, onSelect, onHeaderClick } = renderBreadcrumb();
 	fireEvent.click(view.getByRole("button", { name: "Chat" }));
-	expect(onSelect).toHaveBeenCalledWith(null);
+	expect(onSelect).not.toHaveBeenCalled();
 	expect(onHeaderClick).not.toHaveBeenCalled();
 });
 

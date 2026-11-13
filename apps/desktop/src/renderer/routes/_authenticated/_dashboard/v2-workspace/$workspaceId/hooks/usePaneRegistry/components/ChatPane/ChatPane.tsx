@@ -10,12 +10,13 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { openChatHistory } from "../../utils/chatHistoryOpen";
+import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
-import { openChatHistory } from "./utils/chatHistoryOpen";
 import {
 	pendingChatPrompts,
 	prependChatPrompts,
@@ -136,6 +137,12 @@ export function ChatPane({
 			<AcpChatPane
 				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}`}
 				agent={data.agent}
+				awaitingMove={data.awaitingMove}
+				onMoveArrived={() => {
+					const { awaitingMove: _arrived, ...rest } = latest.current;
+					latest.current = rest;
+					ctx.actions.updateData(rest);
+				}}
 				draftId={data.draftId}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={clearPendingPrompts}
@@ -191,22 +198,15 @@ export function ChatPane({
 						],
 					})
 				}
-				onOpenForkedChat={({ sessionId, terminalId }) => {
-					const { agent, chatModelId, chatEffortId, chatModeId, chatTitle } =
-						latest.current;
+				onOpenForkedChat={(fork) => {
 					ctx.store.getState().addTab({
 						panes: [
 							{
 								kind: "chat-v3",
-								data: {
-									terminalId,
-									sessionId,
-									...(agent ? { agent: { id: agent.id } } : {}),
-									...(chatModelId ? { chatModelId } : {}),
-									...(chatEffortId ? { chatEffortId } : {}),
-									...(chatModeId ? { chatModeId } : {}),
-									...(chatTitle ? { chatTitle } : {}),
-								} satisfies ChatPaneData,
+								...(ctx.pane.titleOverride
+									? { titleOverride: ctx.pane.titleOverride }
+									: {}),
+								data: forkedChatPaneData(latest.current, fork),
 							},
 						],
 					});

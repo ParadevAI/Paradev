@@ -17,10 +17,10 @@
 		"@superset/db": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/trpc": "workspace:*",
-		"@vercel/sandbox": "3.2.2",
+		"@vercel/sandbox": "4.0.0",
 		"aws4fetch": "1.0.20",
 		"drizzle-orm": "0.45.2",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",

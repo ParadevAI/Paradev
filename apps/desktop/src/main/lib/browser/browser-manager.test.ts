@@ -650,6 +650,30 @@ describe("window.open handling", () => {
 		expect(emitted).toEqual([]);
 	});
 
+	test("an opened popup is announced, so extensions can hold it as a tab", () => {
+		const wc = register("pane-popup-tab");
+		const announced: unknown[] = [];
+		const listener = ({ window }: { window: unknown }) =>
+			announced.push(window);
+		browserManager.on("popup-created", listener);
+		try {
+			const popup = { webContents: makeWc().wc, on: () => {} };
+			const nested = { webContents: makeWc().wc, on: () => {} };
+			for (const created of wc.listeners.get("did-create-window") ?? [])
+				created(popup);
+			// Google opens a consent window from inside the sign-in popup; it is
+			// a tab of its own too.
+			for (const created of popup.webContents.listeners.get(
+				"did-create-window",
+			) ?? [])
+				created(nested);
+
+			expect(announced).toEqual([popup, nested]);
+		} finally {
+			browserManager.off("popup-created", listener);
+		}
+	});
+
 	test("a disallowed scheme is denied outright, popup or not", () => {
 		const wc = register("pane-scheme");
 		const emitted: string[] = [];

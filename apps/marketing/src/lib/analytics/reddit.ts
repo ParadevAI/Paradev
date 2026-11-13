@@ -1,4 +1,4 @@
-import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
+import { hasDeclinedAnalytics } from "./consent";
 
 declare global {
 	interface Window {
@@ -12,14 +12,6 @@ function generateConversionId(): string {
 		return crypto.randomUUID();
 	}
 	return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-function hasDeclinedAnalytics(): boolean {
-	try {
-		return window.localStorage?.getItem(ANALYTICS_CONSENT_KEY) === "declined";
-	} catch {
-		return false;
-	}
 }
 
 /**

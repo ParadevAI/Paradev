@@ -32,7 +32,7 @@ export const githubIssueContributor: ContextContributor<{
 		return {
 			id: `issue:${issue.number}`,
 			kind: "github-issue",
-			label: `Issue #${issue.number} — ${issue.title}`,
+			label: `Issue #${issue.number} · ${issue.title}`,
 			content: [{ type: "text", text }],
 			meta: { url: issue.url, taskSlug: issue.slug },
 		};

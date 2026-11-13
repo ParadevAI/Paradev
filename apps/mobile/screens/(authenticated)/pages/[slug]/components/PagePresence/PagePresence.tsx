@@ -8,16 +8,25 @@ import { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { PresenceAvatars } from "./components/PresenceAvatars";
 
-export function PagePresence({ url }: { url: () => Promise<string | null> }) {
+export function PagePresence({
+	url,
+	onPublished,
+}: {
+	url: () => Promise<string | null>;
+	onPublished?: () => void;
+}) {
 	const { t } = useLingui();
 	const [viewers, setViewers] = useState<PagePresenceViewer[]>([]);
 	const urlRef = useRef(url);
 	urlRef.current = url;
+	const onPublishedRef = useRef(onPublished);
+	onPublishedRef.current = onPublished;
 
 	useEffect(() => {
 		const client = openPagePresence({
 			url: () => urlRef.current(),
 			onViewers: setViewers,
+			onPublished: () => onPublishedRef.current?.(),
 		});
 		const subscription = AppState.addEventListener("change", (state) => {
 			if (state === "active") client.wake();

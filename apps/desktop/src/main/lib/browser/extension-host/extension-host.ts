@@ -1,5 +1,5 @@
 import path from "node:path";
-import { app, BrowserWindow, session } from "electron";
+import { app, BrowserWindow, session, webContents } from "electron";
 import { ElectronChromeExtensions } from "electron-chrome-extensions";
 import { BROWSER_PARTITION } from "shared/constants";
 import { watchWindows } from "../../window-registry/window-registry";
@@ -11,6 +11,10 @@ import {
 	setTurnedOffBrowserExtensions,
 } from "./browser-extensions";
 import { enforceDeclarativeNetRequest } from "./declarative-net-request";
+import {
+	type ExtensionView,
+	serveExtensionContexts,
+} from "./extension-contexts";
 import { trackExtensionLifecycle } from "./extension-lifecycle";
 import { createExtensionState } from "./extension-state";
 import {
@@ -82,7 +86,8 @@ export function initBrowserExtensionHost(): void {
 function startExtensionHost(): void {
 	const browserSession = session.fromPartition(BROWSER_PARTITION);
 	const paneTabs = new Map<string, Electron.WebContents>();
-	const extensionWindows = new Set<BrowserWindow>();
+	/** Windows holding a single tab: extension windows, and a pane's popups. */
+	const windowTabs = new Set<BrowserWindow>();
 	let activePaneId: string | null = null;
 
 	const hostTabOf = (contents: Electron.WebContents): HostTab | null => {
@@ -90,20 +95,35 @@ function startExtensionHost(): void {
 			if (paneContents === contents) return { kind: "pane", paneId };
 		}
 		const window = BrowserWindow.fromWebContents(contents);
-		return window && extensionWindows.has(window)
-			? { kind: "window", window }
-			: null;
+		return window && windowTabs.has(window) ? { kind: "window", window } : null;
+	};
+
+	/**
+	 * A window an extension sees as one tab of its own. Chrome counts a popup
+	 * window as a tab, and an extension that does not find one cannot act on
+	 * the page it is looking at: a password manager's
+	 * `chrome.tabs.query({active: true, currentWindow: true})` answered with
+	 * the pane behind the popup, so it filled the wrong page.
+	 */
+	const addWindowTab = (window: BrowserWindow): void => {
+		if (window.webContents.session !== browserSession) return;
+		windowTabs.add(window);
+		window.once("closed", () => windowTabs.delete(window));
+		extensions.addTab(window.webContents, window);
 	};
 
 	const openWindow = (options: ExtensionWindowOptions): BrowserWindow => {
-		const window = openExtensionWindow(browserSession, options, (url) => {
-			void openTab(url).catch((error: unknown) => {
-				console.error("[extension-host] Failed to open tab:", error);
-			});
-		});
-		extensionWindows.add(window);
-		window.once("closed", () => extensionWindows.delete(window));
-		extensions.addTab(window.webContents, window);
+		const window = openExtensionWindow(
+			browserSession,
+			options,
+			(url) => {
+				void openTab(url).catch((error: unknown) => {
+					console.error("[extension-host] Failed to open tab:", error);
+				});
+			},
+			addWindowTab,
+		);
+		addWindowTab(window);
 		return window;
 	};
 
@@ -136,7 +156,42 @@ function startExtensionHost(): void {
 		return [window.webContents, window];
 	};
 
-	serveOffscreenDocuments(browserSession);
+	const offscreenDocumentOf = serveOffscreenDocuments(browserSession);
+	/** Windows the package opens for a toolbar button's popup. */
+	const actionPopups = new WeakSet<Electron.WebContents>();
+
+	/** The extension's own open pages, for `chrome.runtime.getContexts`. */
+	const extensionViews = (extensionId: string): ExtensionView[] => {
+		const prefix = `chrome-extension://${extensionId}/`;
+		const offscreen = offscreenDocumentOf(extensionId);
+		return webContents
+			.getAllWebContents()
+			.filter(
+				(contents) =>
+					!contents.isDestroyed() &&
+					contents.session === browserSession &&
+					contents.getURL().startsWith(prefix),
+			)
+			.map((contents) => {
+				const isTab =
+					[...paneTabs.values()].includes(contents) ||
+					[...windowTabs].some((window) => window.webContents === contents);
+				const window = isTab ? hostWindowOf(contents) : null;
+				return {
+					contextType:
+						contents === offscreen
+							? "OFFSCREEN_DOCUMENT"
+							: actionPopups.has(contents)
+								? "POPUP"
+								: "TAB",
+					contextId: String(contents.id),
+					url: contents.getURL(),
+					tabId: isTab ? contents.id : -1,
+					windowId: window ? window.id : -1,
+				} satisfies ExtensionView;
+			});
+	};
+	serveExtensionContexts(browserSession, extensionViews);
 
 	const extensions = new ElectronChromeExtensions({
 		session: browserSession,
@@ -160,10 +215,17 @@ function startExtensionHost(): void {
 				focused: details.focused,
 			}),
 		removeWindow: (window) => {
-			if (window instanceof BrowserWindow && extensionWindows.has(window)) {
+			if (window instanceof BrowserWindow && windowTabs.has(window)) {
 				if (!window.isDestroyed()) window.close();
 			}
 		},
+		// A window holding one tab and no toolbar is what Chrome calls a popup;
+		// extensions read the type to tell their own popout from a browser
+		// window, and `windows.getAll({windowTypes})` filters on it.
+		windowType: (window) =>
+			window instanceof BrowserWindow && windowTabs.has(window)
+				? "popup"
+				: "normal",
 		requestPermissions: confirmPermissionRequest,
 	});
 
@@ -188,10 +250,28 @@ function startExtensionHost(): void {
 	shimStorageOnLoad(browserSession, installRoot);
 
 	watchWindows((window) => extensions.addWindow(window));
+	browserManager.on("popup-created", ({ window }: { window: BrowserWindow }) =>
+		addWindowTab(window),
+	);
 	browserManager.setExtensionMenuItems((contents, params) =>
 		contents.session === browserSession
 			? extensions.getContextMenuItems(contents, params)
 			: [],
+	);
+
+	const selectPane = (paneId: string) => {
+		const contents = paneTabs.get(paneId);
+		if (!contents || contents.isDestroyed()) return;
+		activePaneId = paneId;
+		extensions.selectTab(contents);
+	};
+
+	extensions.on(
+		"browser-action-popup-created",
+		(popup: { browserWindow?: BrowserWindow }) => {
+			const contents = popup.browserWindow?.webContents;
+			if (contents) actionPopups.add(contents);
+		},
 	);
 
 	try {
@@ -199,6 +279,7 @@ function startExtensionHost(): void {
 			session: browserSession,
 			extensions,
 			tabOf: (paneId) => paneTabs.get(paneId),
+			selectPane,
 			onRemoved: (extensionId) => state.forget(extensionId),
 		});
 	} catch (error) {
@@ -228,7 +309,7 @@ function startExtensionHost(): void {
 		if (!window) return;
 		paneTabs.set(paneId, contents);
 		extensions.addTab(contents, window);
-		activePaneId = paneId;
+		activePaneId ??= paneId;
 		notifyBrowserExtensionsChanged();
 	});
 	onPaneEvent("pane-unregistered", (paneId) => {
@@ -238,12 +319,7 @@ function startExtensionHost(): void {
 		if (contents && !contents.isDestroyed()) extensions.removeTab(contents);
 		notifyBrowserExtensionsChanged();
 	});
-	onPaneEvent("pane-focused", (paneId) => {
-		const contents = paneTabs.get(paneId);
-		if (!contents || contents.isDestroyed()) return;
-		activePaneId = paneId;
-		extensions.selectTab(contents);
-	});
+	onPaneEvent("pane-focused", selectPane);
 
 	void installBrowserWebStore(browserSession, {
 		removeExtension: removeBrowserExtension,

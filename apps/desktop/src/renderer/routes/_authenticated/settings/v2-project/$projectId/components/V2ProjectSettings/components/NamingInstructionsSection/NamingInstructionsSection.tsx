@@ -185,7 +185,7 @@ export function NamingInstructionsSection({
 				)}
 				{saveStatus === "error" && (
 					<span className="select-text cursor-text text-destructive">
-						<Trans>Couldn't save — edit or click away to retry</Trans>
+						<Trans>Couldn't save. Edit or click away to retry</Trans>
 					</span>
 				)}
 			</div>

@@ -59,7 +59,7 @@ describe("ScopeChip empty list", () => {
 			options: [],
 			state: { isLoading: false, isError: true, refetch },
 		});
-		const retry = ui.getByText("Couldn't load — retry");
+		const retry = ui.getByText("Couldn't load. Retry");
 		await act(async () => {
 			retry.click();
 		});

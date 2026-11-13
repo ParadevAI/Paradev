@@ -15,3 +15,4 @@ export * from "./sessionUsage/sessionUsage";
 export * from "./subagents/subagents";
 export * from "./timeline/deriveTimeline";
 export * from "./transcript/transcript";
+export * from "./userStop/userStop";

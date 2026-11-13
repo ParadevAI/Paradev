@@ -17,6 +17,7 @@ export const createChatSessionSchema = z
 		agent: z.string().min(1),
 		prompt: z.string().default(""),
 		model: z.string().min(1).optional(),
+		effort: z.string().min(1).optional(),
 		mode: z.string().min(1).optional(),
 		resumeSessionId: z.string().min(1).optional(),
 		continueSessionId: z.string().min(1).optional(),
@@ -94,12 +95,12 @@ export function requireChatSession(
 export async function createChatSessionInWorkspace(
 	ctx: SessionContext,
 	rawInput: CreateChatSessionInput,
-	launch: { terminalId?: string } = {},
+	launch: { terminalId?: string; withoutAgentConfig?: boolean } = {},
 ): Promise<ChatSessionResult> {
 	const input = createChatSessionSchema.parse(rawInput);
 	const workspace = requireSessionWorkspace(ctx, input.workspaceId);
 	seedDefaultsIfEmpty(ctx.db);
-	const target = chatLaunchTarget(ctx.db, {
+	const resolved = chatLaunchTarget(ctx.db, {
 		workspaceId: input.workspaceId,
 		agent: input.agent,
 		prompt: input.prompt,
@@ -107,6 +108,10 @@ export async function createChatSessionInWorkspace(
 		model: input.model,
 		attachmentIds: input.attachmentIds,
 	});
+	const target =
+		resolved && launch.withoutAgentConfig
+			? { ...resolved, agentConfigId: null }
+			: resolved;
 	if (!target)
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -122,6 +127,7 @@ export async function createChatSessionInWorkspace(
 	if (
 		input.continueSessionId &&
 		!input.model &&
+		!input.effort &&
 		!input.mode &&
 		!input.attachmentIds?.length
 	) {

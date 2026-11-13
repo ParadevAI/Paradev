@@ -104,3 +104,30 @@ or the value arrives empty.
 `SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID` is an internal first-boot variable. Cloud automation dispatch sets it when it starts a workspace, and host-service sends it back with the launch report so the run is correlated without guessing which row created the box. A manual cloud launch must not set it. It is not a deployment secret: do not add it to `.env` templates, the API env schema, or deploy workflows.
 
 `SUPERSET_SANDBOX_AGENT_TERMINAL_ID` is an internal first-boot variable. The desktop's create flow chooses the id, the API passes it with the launch, and host-service starts the agent's chat or terminal under it so the desktop can open that pane by the exact id. It is not a deployment secret: do not add it to `.env` templates, the API env schema, or deploy workflows.
+
+## Browser OAuth origin
+
+`BROWSER_API_URL` is an optional server setting in API, auth, and tRPC. It falls
+back to `NEXT_PUBLIC_API_URL`, including when a deploy passes an empty secret.
+Leave it unset in the existing stack and local development. It selects auth's
+base URL, integration OAuth redirect URIs, state-cookie transport, and browser
+account-link URLs. OAuth token exchanges must send that same redirect URI.
+`NEXT_PUBLIC_API_URL` remains the JWT issuer/audience, MCP resource identity, and
+server job/callback origin. `PLUGIN_CLIENT_METADATA_BASE_URL` still controls
+where providers fetch connector client metadata.
+
+The API and web preview workflows pass the optional setting through. Production
+workflow wiring is deferred to the separate-deployment change, so this preparation
+does not trigger infrastructure redeploys through workflow path filters. No secret
+or local `.env` change is needed for the existing stack. The web client's public API URL remains its own
+`NEXT_PUBLIC_API_URL`; `BROWSER_API_URL` is not bundled into browser code.
+
+OAuth/OIDC discovery keeps the explicit canonical issuer but advertises protocol
+endpoints (authorize, token, JWKS, registration, introspection, revocation,
+userinfo, logout) on the deployment's browser base URL. With no override these
+are unchanged. The MCP resource is always `${NEXT_PUBLIC_API_URL}/mcp`, including
+root and plugin discovery, while discovery URLs can use the request host.
+Connector client metadata keeps its stable client ID and accepts callback twins
+on our own domains. Existing dynamic-client grants look up their original client
+across those callback twins, scoped to the same issuer and connector; new grants
+still select registrations for the current callback only.

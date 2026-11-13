@@ -1193,6 +1193,59 @@ async function main() {
 	);
 	for (const extra of crowd) extra.socket.close();
 
+	const hearsPublished = (viewer: ReturnType<typeof enter>) =>
+		new Promise<number | null>((resolve) => {
+			viewer.socket.addEventListener("message", (event) => {
+				if (String(event.data) === '{"type":"published"}') {
+					resolve(performance.now());
+				}
+			});
+			setTimeout(() => resolve(null), 3000);
+		});
+	const publish = async (versions: Record<string, unknown>) => {
+		seed(
+			PUBLIC_PAGE,
+			manifest(PUBLIC_PAGE, {
+				visibility: "everyone",
+				organizationId: ORG,
+				createdByUserId: AUTHOR,
+				...versions,
+			}),
+		);
+		const heard = [hearsPublished(member), hearsPublished(guest)];
+		const nudgedAt = performance.now();
+		await fetch(`${base}/v2/page/${PUBLIC_PAGE}/storage/manifest-changed`, {
+			method: "POST",
+			headers: { authorization: `Bearer ${SECRET}` },
+		});
+		return (await Promise.all(heard)).map((at) =>
+			at === null ? null : Math.round(at - nudgedAt),
+		);
+	};
+
+	const [memberHeard, guestHeard] = await publish({ latestVersion: 2 });
+	check(
+		"a new version is pushed to members and guests",
+		memberHeard !== null && guestHeard !== null,
+		{ memberHeard, guestHeard },
+	);
+	console.log(`       pushed ${memberHeard} ms after the publish nudge`);
+	const [memberPinned, guestPinned] = await publish({
+		latestVersion: 3,
+		sharedVersion: 2,
+	});
+	check(
+		"a guest is not told about a version they are not served",
+		memberPinned !== null && guestPinned === null,
+		{ memberPinned, guestPinned },
+	);
+	const [memberRewrite] = await publish({ latestVersion: 3, sharedVersion: 2 });
+	check(
+		"a manifest rewrite with no new version pushes nothing",
+		memberRewrite === null,
+		memberRewrite,
+	);
+
 	seed(
 		PUBLIC_PAGE,
 		manifest(PUBLIC_PAGE, {

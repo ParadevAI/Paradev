@@ -37,7 +37,7 @@ describe("internalTaskContributor", () => {
 			makeCtx(async () => TASK),
 		);
 		expect(section?.id).toBe(`task:${TASK.id}`);
-		expect(section?.label).toBe(`Task ${TASK.id} — ${TASK.title}`);
+		expect(section?.label).toBe(`Task ${TASK.id} · ${TASK.title}`);
 		const text = (section?.content[0] as { type: "text"; text: string }).text;
 		expect(text).toContain(`# Task ${TASK.id} — ${TASK.title}`);
 		if (TASK.description) expect(text).toContain(TASK.description);
