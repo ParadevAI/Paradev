@@ -37,7 +37,8 @@ settings, prompts, groups, and enabled state. Existing organization and automati
 still apply. Writes also check the resolved target against the relay's cloud workspace access
 policy: the creator must own the host and its owner must have enabled cloud workspace access. A
 cloud workspace cannot leave the host unspecified, since dispatch could then select a closed host.
-Prompt, group, and enabled-state updates check the existing target too. Signed-in clients keep
+Prompt, group, and enabled-state updates check the existing target too, and their writes must
+still match that target so a concurrent retarget cannot bypass the check. Signed-in clients keep
 their existing access. This is an API change; existing boxes do not need a new host-service bundle.
 
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local

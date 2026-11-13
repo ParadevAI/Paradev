@@ -878,10 +878,27 @@ export const automationRouter = {
 			);
 
 			const group = await resolveAutomationGroup(organizationId, input.group);
-			await db
+			const [updated] = await db
 				.update(automations)
 				.set({ group })
-				.where(eq(automations.id, input.id));
+				.where(
+					and(
+						eq(automations.id, input.id),
+						ctx.sandboxCaller
+							? existing.targetHostId === null
+								? isNull(automations.targetHostId)
+								: eq(automations.targetHostId, existing.targetHostId)
+							: undefined,
+					),
+				)
+				.returning({ id: automations.id });
+			if (ctx.sandboxCaller && !updated) {
+				throw userError({
+					code: "NOT_FOUND",
+					message: "Automation not found",
+					i18nKey: "serverError.automation.automationNotFound",
+				});
+			}
 
 			return { id: input.id, group };
 		}),
@@ -910,7 +927,16 @@ export const automationRouter = {
 				const [row] = await tx
 					.update(automations)
 					.set({ prompt: input.prompt })
-					.where(eq(automations.id, input.id))
+					.where(
+						and(
+							eq(automations.id, input.id),
+							ctx.sandboxCaller
+								? existing.targetHostId === null
+									? isNull(automations.targetHostId)
+									: eq(automations.targetHostId, existing.targetHostId)
+								: undefined,
+						),
+					)
 					.returning();
 
 				if (!row) {
@@ -1031,7 +1057,16 @@ export const automationRouter = {
 				const [row] = await tx
 					.update(automations)
 					.set({ enabled: input.enabled })
-					.where(eq(automations.id, input.id))
+					.where(
+						and(
+							eq(automations.id, input.id),
+							ctx.sandboxCaller
+								? existing.targetHostId === null
+									? isNull(automations.targetHostId)
+									: eq(automations.targetHostId, existing.targetHostId)
+								: undefined,
+						),
+					)
 					.returning();
 
 				if (!row) {
