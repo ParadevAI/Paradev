@@ -1,6 +1,6 @@
+import { isGitHubUnreachableError } from "@superset/shared/github-unreachable";
 import { TRPCError } from "@trpc/server";
 import type { GitCredentialProvider } from "../../../../runtime/git/types";
-import { isGitHubUnreachableError } from "../../../../runtime/pull-requests/utils/github-availability";
 import {
 	isGithubAuthError,
 	isGithubRateLimitError,

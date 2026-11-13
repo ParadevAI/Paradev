@@ -103,22 +103,36 @@ test("GitHub's answers map to the codes clients branch on", () => {
 	expect(githubErrorCode(new Error("boom"))).toBe("INTERNAL_SERVER_ERROR");
 });
 
-test("a request GitHub never answered is SERVICE_UNAVAILABLE", () => {
-	const cause = Object.assign(new Error("read ECONNRESET"), {
+function octokitTransportError(cause: Error) {
+	return { name: "HttpError", status: 500, request: {}, cause };
+}
+
+test("a request that never reached GitHub is SERVICE_UNAVAILABLE", () => {
+	const reset = Object.assign(new Error("read ECONNRESET"), {
 		code: "ECONNRESET",
 	});
 	expect(
-		githubErrorCode({
-			name: "HttpError",
-			status: 500,
-			request: {},
-			response: undefined,
-			cause,
-		}),
+		githubErrorCode(
+			octokitTransportError(new TypeError("fetch failed", { cause: reset })),
+		),
 	).toBe("SERVICE_UNAVAILABLE");
 });
 
-test("a 500 that GitHub answered stays INTERNAL_SERVER_ERROR", () => {
+test("other failures with no answer from GitHub stay INTERNAL_SERVER_ERROR", () => {
+	const proxy = Object.assign(
+		new Error("self signed certificate in certificate chain"),
+		{ code: "SELF_SIGNED_CERT_IN_CHAIN" },
+	);
+	expect(
+		githubErrorCode(
+			octokitTransportError(new TypeError("fetch failed", { cause: proxy })),
+		),
+	).toBe("INTERNAL_SERVER_ERROR");
+	expect(
+		githubErrorCode(
+			octokitTransportError(new TypeError("Invalid header value")),
+		),
+	).toBe("INTERNAL_SERVER_ERROR");
 	expect(
 		githubErrorCode({
 			name: "HttpError",
@@ -127,7 +141,6 @@ test("a 500 that GitHub answered stays INTERNAL_SERVER_ERROR", () => {
 			response: { status: 500, data: "Server Error" },
 		}),
 	).toBe("INTERNAL_SERVER_ERROR");
-	expect(githubErrorCode({ status: 500 })).toBe("INTERNAL_SERVER_ERROR");
 });
 
 test("threads come back with the conversation, minus empty comments", async () => {

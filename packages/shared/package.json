@@ -210,6 +210,10 @@
 			"types": "./src/github-attachment/index.ts",
 			"default": "./src/github-attachment/index.ts"
 		},
+		"./github-unreachable": {
+			"types": "./src/github-unreachable/index.ts",
+			"default": "./src/github-unreachable/index.ts"
+		},
 		"./pull-request-github": {
 			"types": "./src/pull-request-github/index.ts",
 			"default": "./src/pull-request-github/index.ts"

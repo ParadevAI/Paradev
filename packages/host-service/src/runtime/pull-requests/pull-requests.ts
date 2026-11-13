@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { isGitHubUnreachableError } from "@superset/shared/github-unreachable";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
 import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import type { HostDb } from "../../db";
@@ -21,7 +22,6 @@ import {
 	GitHubAvailabilityGate,
 	type GitHubAvailabilityStatus,
 	GitHubUnavailableError,
-	isGitHubUnreachableError,
 } from "./utils/github-availability";
 import {
 	fetchOpenPullRequests,
