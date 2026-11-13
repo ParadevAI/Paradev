@@ -38,6 +38,7 @@ import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarR
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
+import { getV2WorkspaceBranchSubtitle } from "./utils/getV2WorkspaceBranchSubtitle";
 
 interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
@@ -306,6 +307,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<div className="flex min-w-0 items-center">
 								<WorkspaceNameMarquee
 									name={name || branch}
+									suffix={getV2WorkspaceBranchSubtitle(workspace)}
 									prefix={
 										pinnedContext
 											? (pinnedContext.projectName ??

@@ -55,4 +55,14 @@ describe("WorkspaceNameMarquee", () => {
 		expect(marquee.textContent).toBe("local");
 		expect(marquee.title).toBe("local");
 	});
+
+	test("trails a dimmed mono suffix and titles it with the name", () => {
+		const { container } = render(
+			<WorkspaceNameMarquee name="refactor auth" suffix="feat/auth" />,
+		);
+
+		const marquee = container.firstElementChild as HTMLElement;
+		expect(marquee.querySelector(".font-mono")?.textContent).toBe("feat/auth");
+		expect(marquee.title).toBe("refactor auth · feat/auth");
+	});
 });
