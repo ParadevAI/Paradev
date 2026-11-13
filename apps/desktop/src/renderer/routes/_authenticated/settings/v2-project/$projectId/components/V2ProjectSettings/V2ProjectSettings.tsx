@@ -11,8 +11,6 @@ import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/componen
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { HostSelectOption } from "../../../../components/HostSelect";
 import { DeleteProjectSection } from "./components/DeleteProjectSection";
-import { ProjectLocationSection } from "./components/ProjectLocationSection";
-import { RepositoryProjectSettings } from "./components/RepositoryProjectSettings";
 import { V2ProjectSettingsBody } from "./components/V2ProjectSettingsBody";
 import { V2ScriptsEditor } from "./components/V2ScriptsEditor";
 import { WorkspaceConfigEditor } from "./components/WorkspaceConfigEditor";
@@ -134,30 +132,8 @@ export function V2ProjectSettings({
 		<V2ScriptsEditor hostUrl={targetHostUrl} projectId={projectId} />
 	);
 
-	// A repository of a multi-repo project is not listed on its own.
-	if (!project && hostProject?.parentProjectId && targetHostUrl) {
-		const parentProjectId = hostProject.parentProjectId;
-		return (
-			<RepositoryProjectSettings
-				projectId={projectId}
-				parentProjectId={parentProjectId}
-				parentProjectName={
-					hostProjects.find((item) => item.projectKey === parentProjectId)
-						?.name ?? null
-				}
-				name={hostProject.name}
-				repoPath={hostProject.repoPath}
-				sparseCheckoutPaths={hostProject.sparseCheckoutPaths ?? []}
-				hostUrl={targetHostUrl}
-				usesConfigToml={usesConfigToml}
-				scriptsEditor={scriptsEditor}
-				onChanged={refetchHostProject}
-			/>
-		);
-	}
-
 	if (!project) {
-		if (!isReady || hostProject === undefined) return null;
+		if (!isReady) return null;
 		return (
 			<div className="p-6 text-sm text-muted-foreground select-text cursor-text">
 				<Trans>Project not found.</Trans>
@@ -185,19 +161,6 @@ export function V2ProjectSettings({
 				});
 			}}
 			onHostProjectChanged={refetchHostProject}
-			locationSection={
-				<ProjectLocationSection
-					projectId={projectId}
-					projectName={project.name}
-					currentPath={hostProject?.repoPath ?? null}
-					isPathMissing={hostProject?.repoPathExists === false}
-					repoCloneUrl={project.repoUrl}
-					hostUrl={targetHostUrl}
-					hostName={targetHostName}
-					isRemoteTarget={isRemoteTarget}
-					onChanged={() => refetchHostProject()}
-				/>
-			}
 			usesConfigToml={usesConfigToml}
 			scriptsEditor={scriptsEditor}
 			dangerZone={

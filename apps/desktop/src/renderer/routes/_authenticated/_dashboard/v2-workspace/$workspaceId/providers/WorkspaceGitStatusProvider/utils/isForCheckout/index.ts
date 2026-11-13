@@ -1,0 +1,1 @@
+export { isForCheckout } from "./isForCheckout";

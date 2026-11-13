@@ -34,25 +34,21 @@ import {
 	getPaneScrollState,
 	savePaneScrollState,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/paneScrollStateCache";
-import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
-import { WorkspaceGitStatusProvider } from "../../../../providers/WorkspaceGitStatusProvider";
-import {
-	hasCheckouts,
-	useSelectRepository,
-	useWorkspaceRepositories,
-} from "../../../../state/activeRepositoryStore";
+import { useWorkspaceCheckouts } from "../../../../state/activeRepositoryStore";
 import type { DiffPaneData, PaneViewerData } from "../../../../types";
 import { changesPillStats } from "../../../../utils/changesPillStats";
+import { checkoutInput } from "../../../../utils/checkoutInput";
+import { rootFilePath } from "../../../../utils/rootFilePath";
 import {
 	type ChangesetFile,
 	type DiffRef,
 	getChangesetFileKey,
-	getChangesetFileWorkspaceId,
+	getChangesetFileRepositoryId,
 	useChangeset,
 } from "../../../useChangeset";
 import { useLinkedPullRequest } from "../../../useLinkedPullRequest";
@@ -156,45 +152,51 @@ export function DiffPane({
 		: "hidden";
 
 	// A multi-repo workspace shows every checkout's changes, each file tagged
-	// with its checkout; the pane's own workspaceId is then the active checkout.
-	const groupId = useWorkspace().workspace.id;
-	const repositories = useWorkspaceRepositories(groupId);
-	const isMultiRepo = hasCheckouts(groupId, repositories);
+	// with its repository; an untagged file is in the first checkout.
+	const checkouts = useWorkspaceCheckouts(workspaceId);
+	const isMultiRepo = checkouts.length > 1;
+	const primaryRepositoryId = checkouts[0]?.repositoryId;
 	const repositoryIds = useMemo(
-		() => (isMultiRepo ? repositories.map((repository) => repository.id) : []),
-		[isMultiRepo, repositories],
-	);
-	const repositoryById = useMemo(
 		() =>
-			new Map(repositories.map((repository) => [repository.id, repository])),
-		[repositories],
+			isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],
+		[isMultiRepo, checkouts],
 	);
-	const selectRepository = useSelectRepository();
-	const repositoryChangesets = useRepositoryChangesets(repositoryIds);
-	const repositoryReviewThreads = useRepositoryReviewThreads(repositoryIds);
-	const annotationsByWorkspace = useMemo(
+	const checkoutById = useMemo(
+		() =>
+			new Map(checkouts.map((checkout) => [checkout.repositoryId, checkout])),
+		[checkouts],
+	);
+	const repositoryChangesets = useRepositoryChangesets(
+		workspaceId,
+		repositoryIds,
+	);
+	const repositoryReviewThreads = useRepositoryReviewThreads(
+		workspaceId,
+		repositoryIds,
+	);
+	const annotationsByRepository = useMemo(
 		() =>
 			new Map(
-				[...repositoryReviewThreads.byWorkspace].map(([id, threads]) => [
+				[...repositoryReviewThreads.byRepositoryId].map(([id, threads]) => [
 					id,
 					threads.annotationsByPath,
 				]),
 			),
-		[repositoryReviewThreads.byWorkspace],
+		[repositoryReviewThreads.byRepositoryId],
 	);
 	const [pickedRepositoryIds, setPickedRepositoryIds] =
-		useDiffRepositoryFilter(groupId);
+		useDiffRepositoryFilter(workspaceId);
 	const shownRepositories = useMemo(
 		() => shownRepositoryIds(repositoryIds, pickedRepositoryIds),
 		[repositoryIds, pickedRepositoryIds],
 	);
 	// One repository shown: the header scopes that checkout's diff.
-	const scopeWorkspaceId =
+	const scopeRepositoryId =
 		isMultiRepo && shownRepositories.size === 1
-			? ([...shownRepositories][0] ?? workspaceId)
-			: workspaceId;
+			? ([...shownRepositories][0] ?? primaryRepositoryId)
+			: primaryRepositoryId;
 
-	const sidebarRef = useSidebarDiffRef(workspaceId);
+	const sidebarRef = useSidebarDiffRef(workspaceId, primaryRepositoryId);
 	const filter = data.filter;
 	const range = filter?.range;
 	const ref = useMemo<DiffRef>(
@@ -211,12 +213,12 @@ export function DiffPane({
 	const scrollStateKey = useMemo(
 		() =>
 			createPaneScrollStateKey({
-				workspaceId: isMultiRepo ? groupId : workspaceId,
+				workspaceId,
 				paneId: context.pane.id,
 				viewId: "diff",
 				resourceId: isMultiRepo ? "repositories" : JSON.stringify(ref),
 			}),
-		[isMultiRepo, groupId, workspaceId, context.pane.id, ref],
+		[isMultiRepo, workspaceId, context.pane.id, ref],
 	);
 	const initialScrollState = useMemo(
 		() => getPaneScrollState(scrollStateKey),
@@ -224,6 +226,7 @@ export function DiffPane({
 	);
 	const ownChangeset = useChangeset({
 		workspaceId,
+		repositoryId: primaryRepositoryId,
 		ref,
 	});
 	const changesetFiles = useMemo(
@@ -231,7 +234,7 @@ export function DiffPane({
 			isMultiRepo
 				? repositoryChangesets.files.filter(
 						(file) =>
-							!file.workspaceId || shownRepositories.has(file.workspaceId),
+							!file.repositoryId || shownRepositories.has(file.repositoryId),
 					)
 				: ownChangeset.files,
 		[
@@ -255,48 +258,58 @@ export function DiffPane({
 	// Every git change re-lays out the diff; a hidden tab catches up when shown.
 	const files = useHeldWhileTabHidden(currentFiles);
 	const isTabVisible = useIsTabVisible();
-	const { viewedSet, setViewed } = useViewedFiles(
-		isMultiRepo ? groupId : workspaceId,
-	);
+	const { viewedSet, setViewed } = useViewedFiles(workspaceId);
 	const getViewedKey = useCallback(
 		(file: ChangesetFile) =>
-			file.workspaceId ? `${file.workspaceId}|${file.path}` : file.path,
+			file.repositoryId ? `${file.repositoryId}|${file.path}` : file.path,
 		[],
 	);
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
-	const threadAnnotationsByPath = useDiffAnnotationsByPath({ workspaceId });
-	const { target: linkedPullRequest } = useLinkedPullRequest(workspaceId, {
-		enabled: false,
+	const threadAnnotationsByPath = useDiffAnnotationsByPath({
+		workspaceId,
+		repositoryId: primaryRepositoryId,
 	});
+	const { target: linkedPullRequest } = useLinkedPullRequest(
+		workspaceId,
+		primaryRepositoryId,
+		{ enabled: false },
+	);
 	const threadActions = useReviewThreadActions(linkedPullRequest);
 	const workspaceQuery = workspaceTrpc.workspace.get.useQuery({
 		id: workspaceId,
 	});
 	const worktreePath = workspaceQuery.data?.worktreePath;
-	const getFileWorktreePath = useCallback(
+	const getFileRepositoryId = useCallback(
 		(file: ChangesetFile) =>
-			file.workspaceId
-				? repositoryById.get(file.workspaceId)?.worktreePath
-				: worktreePath,
-		[repositoryById, worktreePath],
+			getChangesetFileRepositoryId(file, primaryRepositoryId),
+		[primaryRepositoryId],
 	);
-	// Opening a file in a pane reads the active checkout, so switch to the file's first.
-	const getFileOpener = useCallback(
-		(file: ChangesetFile) => (path: string, openInNewTab?: boolean) => {
-			if (file.workspaceId) selectRepository(groupId, file.workspaceId);
-			onOpenFile(path, openInNewTab);
+	const getFileWorktreePath = useCallback(
+		(file: ChangesetFile) => {
+			const repositoryId = getChangesetFileRepositoryId(
+				file,
+				primaryRepositoryId,
+			);
+			return (
+				(repositoryId ? checkoutById.get(repositoryId)?.path : undefined) ??
+				worktreePath
+			);
 		},
-		[selectRepository, groupId, onOpenFile],
+		[checkoutById, primaryRepositoryId, worktreePath],
+	);
+	// File panes take paths from the workspace folder.
+	const getFileOpener = useCallback(
+		(file: ChangesetFile) => (path: string, openInNewTab?: boolean) =>
+			onOpenFile(
+				rootFilePath(checkouts, getFileRepositoryId(file), path),
+				openInNewTab,
+			),
+		[checkouts, getFileRepositoryId, onOpenFile],
 	);
 	const getWorkspaceFolderPath = useCallback(
-		(file: ChangesetFile) => {
-			const repositoryPath = file.workspaceId
-				? repositoryById.get(file.workspaceId)?.worktreePath
-				: undefined;
-			const folder = repositoryPath?.split("/").pop();
-			return folder ? `${folder}/${file.path}` : file.path;
-		},
-		[repositoryById],
+		(file: ChangesetFile) =>
+			rootFilePath(checkouts, getFileRepositoryId(file), file.path),
+		[checkouts, getFileRepositoryId],
 	);
 	const writeFile = workspaceTrpc.filesystem.writeFile.useMutation();
 	const utils = workspaceTrpc.useUtils();
@@ -381,7 +394,7 @@ export function DiffPane({
 		clear: clearComposer,
 		submit: submitComposer,
 	} = useDiffCommentComposer({
-		workspaceId: groupId,
+		workspaceId,
 		codeViewRef,
 		getFile,
 		getPromptPath: getWorkspaceFolderPath,
@@ -394,8 +407,9 @@ export function DiffPane({
 		files,
 		collapsedSet,
 		editingSet,
+		repositoryId: primaryRepositoryId,
 		annotationsByPath: threadAnnotationsByPath,
-		annotationsByWorkspace,
+		annotationsByRepository,
 		extraAnnotationsByItemId: composerAnnotationsByItemId,
 	});
 	fileByItemIdRef.current = fileByItemId;
@@ -430,10 +444,10 @@ export function DiffPane({
 				);
 				return false;
 			}
-			const fileWorkspaceId = getChangesetFileWorkspaceId(file, workspaceId);
+			const scope = checkoutInput(workspaceId, getFileRepositoryId(file));
 			try {
 				const result = await writeFile.mutateAsync({
-					workspaceId: fileWorkspaceId,
+					workspaceId,
 					absolutePath: toAbsoluteWorkspacePath(worktreePath, file.path),
 					content: editedFile.contents,
 					encoding: "utf-8",
@@ -466,8 +480,8 @@ export function DiffPane({
 						return next;
 					});
 				}
-				void utils.git.getStatus.invalidate({ workspaceId: fileWorkspaceId });
-				void utils.git.getDiff.invalidate({ workspaceId: fileWorkspaceId });
+				void utils.git.getStatus.invalidate(scope);
+				void utils.git.getDiff.invalidate(scope);
 				return true;
 			} catch (error) {
 				toast.error(
@@ -481,7 +495,15 @@ export function DiffPane({
 				return false;
 			}
 		},
-		[getFile, getFileWorktreePath, writeFile, workspaceId, utils, t],
+		[
+			getFile,
+			getFileWorktreePath,
+			getFileRepositoryId,
+			writeFile,
+			workspaceId,
+			utils,
+			t,
+		],
 	);
 
 	// Saves for one item run in order, so an older write can't land last.
@@ -624,7 +646,7 @@ export function DiffPane({
 		() =>
 			changesPillStats(
 				Object.values(
-					Object.groupBy(files, (file) => file.workspaceId ?? workspaceId),
+					Object.groupBy(files, (file) => file.repositoryId ?? ""),
 				).map((checkoutFiles = []) => ({
 					againstBase: checkoutFiles.filter(
 						(file) =>
@@ -637,7 +659,7 @@ export function DiffPane({
 					),
 				})),
 			),
-		[files, workspaceId],
+		[files],
 	);
 	const clearFilter = useCallback(() => {
 		updateData({ ...dataRef.current, filter: undefined } as PaneViewerData);
@@ -686,7 +708,7 @@ export function DiffPane({
 				throw new Error(`${file.path} is too large to expand`);
 			}
 			const { oldFile, newFile } = await trpcClient.git.getDiff.query(
-				createGetDiffInput(workspaceId, file),
+				createGetDiffInput(workspaceId, file, primaryRepositoryId),
 			);
 			if (isDiffContentTooLarge(oldFile.contents, newFile.contents)) {
 				// Parsing this much text on the main thread is the freeze the
@@ -710,7 +732,7 @@ export function DiffPane({
 			}
 			return loaded;
 		},
-		[trpcClient, workspaceId, markTooLarge],
+		[trpcClient, workspaceId, primaryRepositoryId, markTooLarge],
 	);
 
 	const codeViewOptions = useMemo(
@@ -824,7 +846,8 @@ export function DiffPane({
 			return (
 				<DiffHeaderMetadata
 					file={file}
-					workspaceId={getChangesetFileWorkspaceId(file, workspaceId)}
+					workspaceId={workspaceId}
+					repositoryId={getFileRepositoryId(file)}
 					onSetCollapsed={(value) => setCollapsed(changeKey, value)}
 					viewed={viewedSet.has(getViewedKey(file))}
 					onSetViewed={(_path, next) => setViewed(getViewedKey(file), next)}
@@ -832,7 +855,7 @@ export function DiffPane({
 					onOpenInExternalEditor={(path) => {
 						const fileWorktreePath = getFileWorktreePath(file);
 						openInExternalEditor(
-							file.workspaceId && fileWorktreePath
+							file.repositoryId && fileWorktreePath
 								? toAbsoluteWorkspacePath(fileWorktreePath, path)
 								: path,
 						);
@@ -853,6 +876,7 @@ export function DiffPane({
 		[
 			getFile,
 			workspaceId,
+			getFileRepositoryId,
 			setCollapsed,
 			viewedSet,
 			setViewed,
@@ -940,7 +964,8 @@ export function DiffPane({
 				return (
 					<BinaryDiffPreview
 						file={file}
-						workspaceId={getChangesetFileWorkspaceId(file, workspaceId)}
+						workspaceId={workspaceId}
+						repositoryId={primaryRepositoryId}
 						worktreePath={getFileWorktreePath(file)}
 						onOpenFile={getFileOpener(file)}
 					/>
@@ -959,7 +984,7 @@ export function DiffPane({
 				if (item.type !== "diff") return null;
 				return (
 					<AgentCommentComposer
-						workspaceId={groupId}
+						workspaceId={workspaceId}
 						contextLabel={
 							m.startLine === m.endLine
 								? t({
@@ -980,8 +1005,8 @@ export function DiffPane({
 			if (m.kind !== "thread") return null;
 			const threadFile = getFile(item.id);
 			const actions =
-				(threadFile?.workspaceId &&
-					repositoryReviewThreads.byWorkspace.get(threadFile.workspaceId)
+				(threadFile?.repositoryId &&
+					repositoryReviewThreads.byRepositoryId.get(threadFile.repositoryId)
 						?.actions) ||
 				threadActions;
 			const annotationSide = "side" in annotation ? annotation.side : undefined;
@@ -1015,6 +1040,7 @@ export function DiffPane({
 		},
 		[
 			workspaceId,
+			primaryRepositoryId,
 			targetItemId,
 			data.focusLine,
 			data.focusSide,
@@ -1024,13 +1050,12 @@ export function DiffPane({
 			getFile,
 			requestDiff,
 			getFileOpener,
-			groupId,
 			commentNav.isNavFocused,
 			commentNav.navFocusTick,
 			t,
 			getFileWorktreePath,
 			threadActions,
-			repositoryReviewThreads.byWorkspace,
+			repositoryReviewThreads.byRepositoryId,
 		],
 	);
 
@@ -1042,38 +1067,38 @@ export function DiffPane({
 			{repositoryChangesets.sources}
 			{repositoryReviewThreads.sources}
 			{worktreePath && <BinaryPreviewRefresh workspaceId={workspaceId} />}
-			{repositoryIds.map((id) =>
-				id === workspaceId ? null : (
-					<BinaryPreviewRefresh key={id} workspaceId={id} />
-				),
-			)}
 			{titleSlot &&
 				createPortal(
-					<WorkspaceGitStatusProvider workspaceId={scopeWorkspaceId}>
-						<DiffPaneScope
-							workspaceId={scopeWorkspaceId}
-							additions={totals.additions}
-							deletions={totals.deletions}
-							filter={filter}
-							onClearFilter={clearFilter}
-							repositoryFilter={
-								isMultiRepo
-									? {
-											repositories,
-											shown: shownRepositories,
-											onChange: setPickedRepositoryIds,
-										}
-									: undefined
-							}
-						/>
-					</WorkspaceGitStatusProvider>,
+					<DiffPaneScope
+						workspaceId={workspaceId}
+						repositoryId={scopeRepositoryId}
+						additions={totals.additions}
+						deletions={totals.deletions}
+						filter={filter}
+						onClearFilter={clearFilter}
+						repositoryFilter={
+							isMultiRepo
+								? {
+										repositories: checkouts,
+										shown: shownRepositories,
+										onChange: setPickedRepositoryIds,
+									}
+								: undefined
+						}
+					/>,
 					titleSlot,
 				)}
 			{actionsSlot &&
 				createPortal(
 					<DiffPaneHeaderActions
 						prLink={
-							showFileList ? undefined : { workspaceId, store: context.store }
+							showFileList
+								? undefined
+								: {
+										workspaceId,
+										repositoryId: scopeRepositoryId,
+										store: context.store,
+									}
 						}
 						commentNav={commentNavProps}
 						files={

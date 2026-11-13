@@ -1,0 +1,1 @@
+export { rootFilePath } from "./rootFilePath";

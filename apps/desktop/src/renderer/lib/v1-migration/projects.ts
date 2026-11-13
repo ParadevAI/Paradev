@@ -16,13 +16,11 @@ export type ProjectFindByPathResult = Awaited<
 	ReturnType<HostServiceClient["project"]["findByPath"]["query"]>
 >;
 
-export type ProjectImportOutcome =
-	| {
-			kind: "imported";
-			v2ProjectId: string;
-			repoPath: string;
-	  }
-	| { kind: "needs-relocate"; v2ProjectId: string; message: string };
+export interface ProjectImportOutcome {
+	kind: "imported";
+	v2ProjectId: string;
+	repoPath: string;
+}
 
 export type UnmigratableRepoReason = "repo-path-missing" | "not-a-git-repo";
 
@@ -106,36 +104,24 @@ export function classifyUnmigratableRepoError(
 	return null;
 }
 
-export function isAlreadySetUpElsewhereError(err: unknown): boolean {
-	if (!(err instanceof Error)) return false;
-	return err.message.includes("Project is already set up on this device at");
-}
-
-export function extractExistingPath(message: string): string | null {
-	const match = message.match(
-		/already set up on this device at (.+?)\.\s+Remove/,
-	);
-	return match?.[1] ?? null;
-}
-
 /**
- * Import one v1 project into v2: link it onto an existing v2 project
- * candidate via `project.setup`, or create a fresh local-first project via
- * `project.create {kind:'importLocal'}`. Pure host-service calls — UI side
- * effects (sidebar, query invalidation) are the caller's job.
+ * Import one v1 project into v2. A `local-path` candidate is the v2 project
+ * the repo already belongs to on this host; otherwise a fresh local-first
+ * project of one repository is made via `project.create`. A cloud
+ * (`remote`) candidate cannot be linked any more: its name carries over to
+ * the new project. Pure host-service calls — UI side effects (sidebar,
+ * query invalidation) are the caller's job.
  */
 export async function importV1Project({
 	hostClient,
 	project,
 	findByPathResult,
 	linkToProjectId,
-	allowRelocate = false,
 }: {
 	hostClient: HostServiceClient;
 	project: V1ProjectLike;
 	findByPathResult: ProjectFindByPathResult | undefined;
 	linkToProjectId?: string;
-	allowRelocate?: boolean;
 }): Promise<ProjectImportOutcome> {
 	const candidates = findByPathResult?.candidates ?? [];
 
@@ -149,56 +135,30 @@ export async function importV1Project({
 		);
 	}
 
-	if (targetCandidate) {
-		try {
-			const result = await hostClient.project.setup.mutate({
-				projectId: targetCandidate.id,
-				// Coordinates from the candidate the host just handed us: a
-				// `remote` candidate has no local row on this host, so setup
-				// has no other way to learn the repo.
-				origin: {
-					repoCloneUrl: targetCandidate.repoCloneUrl,
-					name: targetCandidate.name,
-				},
-				mode: {
-					kind: "import",
-					repoPath: project.mainRepoPath,
-					allowRelocate,
-				},
-			});
-			await carryV1ProjectAppearance(hostClient, targetCandidate.id, project);
-			return {
-				kind: "imported",
-				v2ProjectId: targetCandidate.id,
-				repoPath: result.repoPath,
-			};
-		} catch (err) {
-			if (isAlreadySetUpElsewhereError(err) && !allowRelocate) {
-				return {
-					kind: "needs-relocate",
-					v2ProjectId: targetCandidate.id,
-					message: err instanceof Error ? err.message : String(err),
-				};
-			}
-			throw err;
-		}
+	if (targetCandidate?.source === "local-path") {
+		return {
+			kind: "imported",
+			v2ProjectId: targetCandidate.id,
+			repoPath: project.mainRepoPath,
+		};
 	}
 
 	const result = await hostClient.project.create.mutate({
-		name: project.name,
-		mode: { kind: "importLocal", repoPath: project.mainRepoPath },
+		name: targetCandidate?.name ?? project.name,
+		repositories: [{ kind: "local", path: project.mainRepoPath }],
 	});
 	// Only stamp v1 appearance onto projects this call actually created.
 	// A reused project (created === false) may carry v2 customizations the
-	// user chose after their first import — never overwrite those. Older
-	// hosts omit the field; keep their long-standing carry behavior.
-	if (result.created !== false) {
-		await carryV1ProjectAppearance(hostClient, result.projectId, project);
+	// user chose after their first import — never overwrite those.
+	if (result.created) {
+		await carryV1ProjectAppearance(hostClient, result.id, project);
 	}
 	return {
 		kind: "imported",
-		v2ProjectId: result.projectId,
-		repoPath: result.repoPath,
+		v2ProjectId: result.id,
+		repoPath:
+			result.repositories.find((r) => r.id === result.primaryRepositoryId)
+				?.path ?? project.mainRepoPath,
 	};
 }
 

@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {# file berubah di workspace ini} other {# file 
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# file berubah} other {# file berubah}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# file} other {# file}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Mengedit # file} other {Mengedit # file}}"
 
@@ -1383,6 +1386,9 @@ msgstr "Sisa {remaining} token"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# repositori} other {Semua # repositori}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName} dipindahkan ke {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Perubahan pada # file dibatalkan.} other {Perubahan pada # file dibatalkan.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Aksi"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Aksi untuk {0}"
 
@@ -2099,11 +2106,11 @@ msgstr "Tambahkan {0} ke workspace"
 msgid "Add {localizedName}?"
 msgstr "Tambahkan {localizedName}?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Tambahkan {repositoryName} sebagai proyek di {computer} terlebih dahulu"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Tambahkan {only} sebagai proyek di {computer} terlebih dahulu"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Tambahkan {repositoryName} sebagai proyek di komputer ini terlebih dahulu"
+msgid "Add {only} as a project on this computer first"
+msgstr "Tambahkan {only} sebagai proyek di komputer ini terlebih dahulu"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Tambahkan #{prNumber} ke antrean merge?"
@@ -2128,6 +2135,12 @@ msgstr "Tambahkan proyek untuk melihat issue GitHub."
 
 msgid "Add a project to see pull requests."
 msgstr "Tambahkan proyek untuk melihat pull request."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Tambahkan proyek dengan repositori persis seperti ini di {computer} terlebih dahulu: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Tambahkan proyek dengan repositori persis seperti ini di komputer ini terlebih dahulu: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Tambahkan ringkasan singkat…"
@@ -4515,9 +4528,6 @@ msgstr "Pilih petarung"
 msgid "Choose a folder"
 msgstr "Pilih folder"
 
-msgid "Choose a parent directory"
-msgstr "Pilih direktori induk"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Pilih proyek dari issue GitHub sebelum membuka sebuah issue."
 
@@ -4532,9 +4542,6 @@ msgstr "Pilih sebuah bagian."
 
 msgid "Choose agent"
 msgstr "Pilih agen"
-
-msgid "Choose an existing repo folder"
-msgstr "Pilih folder repo yang sudah ada"
 
 msgid "Choose an MCP server"
 msgstr "Pilih server MCP"
@@ -4752,13 +4759,6 @@ msgstr "Clone dari URL"
 
 msgid "clone the repository"
 msgstr "meng-clone repositori"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Clone repositorinya, atau impor folder yang sudah ada di host."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Di-clone ke {0}"
 
 msgid "Cloning…"
 msgstr "Meng-clone…"
@@ -5122,9 +5122,6 @@ msgstr "Perintah..."
 
 msgid "Commands"
 msgstr "Perintah"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Perintah yang dijalankan saat setup dan teardown repositori ini, serta dari menu Run."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Perintah yang dijalankan untuk setup workspace, teardown, dan tombol Run."
@@ -5887,6 +5884,9 @@ msgstr "Tidak dapat menambahkan agen"
 msgid "Could not add repository"
 msgstr "Tidak dapat menambahkan repositori"
 
+msgid "Could not add the repository"
+msgstr "Tidak dapat menambahkan repositori"
+
 msgid "Could not answer the agent"
 msgstr "Tidak dapat menjawab agen"
 
@@ -6017,6 +6017,9 @@ msgstr "Tidak bisa memuat pull request ini."
 msgid "Could not load your machines"
 msgstr "Tidak bisa memuat mesin Anda"
 
+msgid "Could not make it the primary repository"
+msgstr "Tidak dapat menjadikannya repositori utama"
+
 msgid "Could not mark ready"
 msgstr "Tidak bisa menandai siap"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "Tidak bisa menghapus akses"
 
 msgid "Could not remove repository"
+msgstr "Tidak dapat menghapus repositori"
+
+msgid "Could not remove the repository"
 msgstr "Tidak dapat menghapus repositori"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "Buang semua {0}"
 msgid "Discard all staged changes"
 msgstr "Buang semua perubahan yang di-stage"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Buang semua perubahan yang di-stage di {repositoryName}?"
+
 msgid "Discard all staged changes?"
 msgstr "Buang semua perubahan yang di-stage?"
 
 msgid "Discard all unstaged changes"
 msgstr "Buang semua perubahan yang belum di-stage"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Buang semua perubahan yang belum di-stage di {repositoryName}?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Buang semua perubahan yang belum di-stage?"
@@ -8147,12 +8159,6 @@ msgstr "Masukkan alamat email lengkap"
 msgid "Enter a number"
 msgstr "Masukkan angka"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Masukkan direktori induk di {hostName}"
-
-msgid "Enter a path on {hostName}"
-msgstr "Masukkan sebuah path di {hostName}"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Masukkan URL ke bilah pencarian di atas."
 
@@ -8294,11 +8300,8 @@ msgstr "Tiap Rabu jam 9 pagi, tinjau PR yang di-merge minggu ini dan perbarui do
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Tiap hari kerja jam 9 pagi, baca issue GitHub baru, terapkan label, dan susun draf balasan pertama untuk saya review."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Setiap workspace proyek multi-repo melakukan checkout repositori ini di samping yang lain."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Setiap workspace dalam proyek ini men-checkout semuanya, berdampingan, di satu branch."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Setiap workspace dari proyek ini men-checkout semuanya, berdampingan, di satu branch. Perintah setup dan run berasal dari repositori utama."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Semua orang berdebat apakah ini bisa digeneralisasi. Perdebatan itu justru tanda bahwa levelnya sudah tercapai."
@@ -8350,12 +8353,6 @@ msgstr "Semua yang Anda publikasikan dihapus, bukan disembunyikan. Anda bisa ber
 
 msgid "Executable"
 msgstr "File eksekusi"
-
-msgid "Existing repo path"
-msgstr "Path repo yang sudah ada"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Path repo yang sudah ada di {hostName}"
 
 msgid "existing worktree"
 msgstr "worktree yang ada"
@@ -9338,6 +9335,9 @@ msgstr "Fokus ke kolom pencarian di tampilan tugas"
 
 msgid "Folder"
 msgstr "Folder"
+
+msgid "Folder can't be read"
+msgstr "Folder tidak dapat dibaca"
 
 msgid "Folder is missing"
 msgstr "Folder hilang"
@@ -10425,9 +10425,6 @@ msgstr "Impor setiap proyek v1 ke v2. Proyek yang sudah diimpor ditandai sebagai
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Impor setiap skrip terminal v1 ke v2."
-
-msgid "Import existing"
-msgstr "Impor yang sudah ada"
 
 msgid "Import existing folder"
 msgstr "Impor folder yang ada"
@@ -11552,9 +11549,6 @@ msgstr "Baris {0}–{1}"
 msgid "Link"
 msgstr "Tautan"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Tautkan dulu repositori GitHub ke proyeknya agar bisa di-clone."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Memuat lagi..."
 
 msgid "Loading more…"
 msgstr "Memuat lagi…"
+
+msgid "Loading project repositories…"
+msgstr "Memuat repositori proyek…"
 
 msgid "Loading project…"
 msgstr "Memuat proyek…"
@@ -11901,6 +11898,9 @@ msgstr "Jadikan bawaan"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Jadikan bawaan: jalankan terminal dan agen baru dengan akun ini."
+
+msgid "Make primary"
+msgstr "Jadikan utama"
 
 msgid "Make public"
 msgstr "Jadikan publik"
@@ -12522,9 +12522,6 @@ msgstr "Memindahkan chat ini ke sini"
 msgid "Moving this workspace…"
 msgstr "Memindahkan workspace ini…"
 
-msgid "Multi-repo project"
-msgstr "Proyek multi-repo"
-
 msgid "Multi-select"
 msgstr "Pilih banyak"
 
@@ -12983,6 +12980,9 @@ msgstr "Tidak ada saluran"
 
 msgid "No chats found"
 msgstr "Tidak ada obrolan ditemukan"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Tidak ada checkout di workspace ini yang berada di {currentBranchName}"
 
 msgid "No checks"
 msgstr "Tidak ada check"
@@ -14581,6 +14581,9 @@ msgstr "Membuka di antarmuka chat…"
 msgid "Opening pages"
 msgstr "Membuka halaman"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Membuka repositori yang berbeda dari workspace ini"
+
 msgid "Operator"
 msgstr "Operator"
 
@@ -15079,12 +15082,6 @@ msgstr "Sesi paralel per pengembang berlipat ganda setiap tujuh bulan, melewati 
 msgid "Parameters"
 msgstr "Parameter"
 
-msgid "Parent directory"
-msgstr "Direktori induk"
-
-msgid "Parent directory on {hostName}"
-msgstr "Direktori induk di {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Sebagian catatan, sebagian taruhan. Dua entri pertama sudah terjadi. Sisanya dinyatakan cukup konkret untuk bisa dinyatakan salah."
 
@@ -15272,9 +15269,6 @@ msgstr "Pilih elemen lain (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Pilih folder di disk dan tambahkan sebagai proyek"
 
-msgid "Pick a folder…"
-msgstr "Pilih folder…"
-
 msgid "Pick a machine size"
 msgstr "Pilih ukuran mesin"
 
@@ -15284,14 +15278,11 @@ msgstr "Pilih sebuah model"
 msgid "pick a name for the board"
 msgstr "pilih nama untuk papan peringkat"
 
-msgid "Pick a parent directory"
-msgstr "Pilih direktori induk"
-
-msgid "Pick a project location"
-msgstr "Pilih lokasi proyek"
-
 msgid "Pick a reason"
 msgstr "Pilih alasan"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Pilih folder repositori di {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Pilih repositori dengan file marketplace plugin. Superset menyinkronkan plugin-pluginnya sekarang dan setiap kali Anda menyinkronkan lagi."
@@ -15802,13 +15793,8 @@ msgstr "Proyek di perangkat lain"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Proyek siap. Buka dari sidebar."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Proyek dipindahkan ke {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Proyek disiapkan di {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Proyek dipindahkan ke {newPath}"
 
 msgid "Project Settings"
 msgstr "Pengaturan Proyek"
@@ -16494,6 +16480,9 @@ msgstr "Memuat ulang akan membuang editan Anda. Menimpa akan mengganti file di d
 msgid "Relocate"
 msgstr "Pindahkan"
 
+msgid "Relocate {repositoryName}?"
+msgstr "Pindahkan {repositoryName}?"
+
 msgid "Relocate project?"
 msgstr "Pindahkan proyek?"
 
@@ -16577,6 +16566,9 @@ msgstr "Keluarkan dari grup"
 
 msgid "Remove from queue"
 msgstr "Keluarkan dari antrean"
+
+msgid "Remove from project"
+msgstr "Hapus dari proyek"
 
 msgid "Remove from Queue"
 msgstr "Keluarkan dari Antrean"
@@ -16859,9 +16851,6 @@ msgstr "Repositori dihapus"
 
 msgid "Repository root"
 msgstr "Root repositori"
-
-msgid "Repository settings"
-msgstr "Pengaturan repositori"
 
 msgid "Repository URL or path"
 msgstr "URL atau path repositori"
@@ -17432,9 +17421,6 @@ msgstr "Jalankan agen sesuai jadwal atau saat sesuatu terjadi."
 msgid "Run agents side by side"
 msgstr "Jalankan agen berdampingan"
 
-msgid "Run all"
-msgstr "Jalankan semua"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Jalankan Pasukan"
@@ -17531,9 +17517,6 @@ msgstr "Jalankan agen Anda dari desktop, terminal mana pun, atau ponsel Anda."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Jalankan agen coding Anda di cloud."
-
-msgid "Run: {repositoryName}"
-msgstr "Run: {repositoryName}"
 
 msgid "Run."
 msgstr "Jalankan."
@@ -18180,9 +18163,6 @@ msgstr "Pilih organisasi"
 msgid "Select Organization Logo"
 msgstr "Pilih Logo Organisasi"
 
-msgid "Select parent directory to clone into"
-msgstr "Pilih direktori induk untuk tujuan clone"
-
 msgid "Select people"
 msgstr "Pilih orang"
 
@@ -18416,9 +18396,6 @@ msgstr "Tetapkan proyek…"
 msgid "Set Run"
 msgstr "Setel Run"
 
-msgid "Set run script"
-msgstr "Setel skrip run"
-
 msgid "Set this project"
 msgstr "Tetapkan proyek ini"
 
@@ -18440,9 +18417,6 @@ msgstr "Siapkan lingkungan"
 
 msgid "Set up once"
 msgstr "Atur sekali"
-
-msgid "Set up project on {hostName}"
-msgstr "Siapkan proyek di {hostName}"
 
 msgid "Set up project…"
 msgstr "Siapkan proyek…"
@@ -19227,6 +19201,10 @@ msgstr "Spam atau penipuan"
 msgid "Sparse checkout"
 msgstr "Sparse checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Sparse checkout {0}"
+
 msgid "Speaking"
 msgstr "Berbicara"
 
@@ -19619,9 +19597,6 @@ msgstr "Hentikan {label}"
 
 msgid "Stop {name}"
 msgstr "Hentikan {name}"
-
-msgid "Stop all"
-msgstr "Hentikan semua"
 
 msgid "Stop dictation"
 msgstr "Hentikan dikte"
@@ -20387,9 +20362,6 @@ msgstr "Kode kedaluwarsa. Mulai lagi."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Perintah yang dijalankan Paradev untuk menyiapkan, menjalankan, dan mengarsipkan workspace proyek ini, dari config.toml repositori."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Perintah yang dijalankan Paradev untuk menyiapkan, menjalankan, dan mengarsipkan checkout repositori ini, dari config.toml-nya."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Perusahaan ini meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
@@ -20492,6 +20464,9 @@ msgstr "Rumah masa depan untuk konfigurasi agen Paradev, prompt, dan panduan pen
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Host kembali dengan {0}, bukan {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "Host membuat proyek tanpa repositori"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "Host tidak kembali dalam lima belas menit."
@@ -20923,8 +20898,8 @@ msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak m
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Lingkungan ini membuka {environmentRepository}, bukan {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Lingkungan ini membuka {environmentRepositories}, bukan {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repositori environment ini sudah tetap; promosikan workspace lagi untuk mengubahnya"
@@ -21091,6 +21066,9 @@ msgstr "Pull request ini sudah tidak tersedia."
 msgid "This pull request link is invalid."
 msgstr "Tautan pull request ini tidak valid."
 
+msgid "This pull request's repository is not known"
+msgstr "Repositori pull request ini tidak diketahui"
+
 msgid "This recording is too long to transcribe"
 msgstr "Rekaman ini terlalu panjang untuk ditranskripsi"
 
@@ -21241,6 +21219,9 @@ msgstr "Workspace ini"
 
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Workspace ini masih dimuat. Coba lagi."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace ini mungkin sudah dihapus, atau Anda sudah tidak punya akses ke sana."
@@ -22217,9 +22198,6 @@ msgstr "Gunakan akun ini"
 
 msgid "Use this folder"
 msgstr "Pakai folder ini"
-
-msgid "Use this repo"
-msgstr "Pakai repo ini"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Pakai ini untuk memperbaiki terminal yang macet atau tidak merespons."

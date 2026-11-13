@@ -14,7 +14,7 @@ const cloudError = {
 
 const findByPathMock = mock(
 	async (): Promise<{
-		candidates: { id: string; name: string }[];
+		candidates: { id: string; name: string; repositoryId?: string }[];
 		cloudErrors: (typeof cloudError)[];
 		needsGitInit?: boolean;
 	}> => ({
@@ -22,10 +22,11 @@ const findByPathMock = mock(
 		cloudErrors: [],
 	}),
 );
-const setupMock = mock(async () => ({ repoPath }));
 const createMock = mock(async () => ({
-	projectId: "created-project",
-	repoPath,
+	id: "created-project",
+	primaryRepositoryId: "repository",
+	repositories: [{ id: "repository", path: repoPath }],
+	created: true,
 }));
 const finalizeSetupMock = mock(() => undefined);
 const requestGitInitMock = mock(async () => false);
@@ -40,7 +41,6 @@ function startImport(overrides: Partial<ImportFolderFirstDeps> = {}) {
 			return {
 				project: {
 					findByPath: { query: findByPathMock },
-					setup: { mutate: setupMock },
 					create: { mutate: createMock },
 				},
 			} as unknown as FolderImportClient;
@@ -61,7 +61,6 @@ describe("importFolderFirst", () => {
 	beforeEach(() => {
 		for (const fn of [
 			findByPathMock,
-			setupMock,
 			createMock,
 			finalizeSetupMock,
 			requestGitInitMock,
@@ -89,7 +88,6 @@ describe("importFolderFirst", () => {
 			"Couldn't reach cloud for https://github.com/octocat/hello.git: cloud-down",
 		);
 		expect(createMock).not.toHaveBeenCalled();
-		expect(setupMock).not.toHaveBeenCalled();
 		expect(finalizeSetupMock).not.toHaveBeenCalled();
 	});
 
@@ -107,16 +105,15 @@ describe("importFolderFirst", () => {
 		expect(requestGitInitMock).toHaveBeenCalledWith(repoPath);
 		expect(createMock).toHaveBeenCalledWith({
 			name: "octocat",
-			mode: { kind: "importLocal", repoPath, initIfNeeded: true },
+			repositories: [{ kind: "local", path: repoPath, initIfNeeded: true }],
 		});
-		expect(finalizeSetupMock).toHaveBeenCalledWith(hostUrl, {
+		const created = {
 			projectId: "created-project",
+			repositoryId: "repository",
 			repoPath,
-		});
-		expect(result).toEqual({
-			projectId: "created-project",
-			repoPath,
-		});
+		};
+		expect(finalizeSetupMock).toHaveBeenCalledWith(hostUrl, created);
+		expect(result).toEqual(created);
 		expect(onError).not.toHaveBeenCalled();
 	});
 
@@ -136,5 +133,47 @@ describe("importFolderFirst", () => {
 		expect(createMock).not.toHaveBeenCalled();
 		expect(finalizeSetupMock).not.toHaveBeenCalled();
 		expect(onError).not.toHaveBeenCalled();
+	});
+});
+
+describe("importFolderFirst with a known folder", () => {
+	it("opens the project the folder already belongs to without creating one", async () => {
+		createMock.mockClear();
+		finalizeSetupMock.mockClear();
+		findByPathMock.mockResolvedValue({
+			candidates: [{ id: "existing", name: "octocat", repositoryId: "repo-1" }],
+			cloudErrors: [],
+		});
+
+		const result = await startImport();
+
+		expect(result).toEqual({
+			projectId: "existing",
+			repositoryId: "repo-1",
+			repoPath,
+		});
+		expect(createMock).not.toHaveBeenCalled();
+		expect(finalizeSetupMock).toHaveBeenCalledWith(hostUrl, {
+			projectId: "existing",
+			repositoryId: "repo-1",
+			repoPath,
+		});
+	});
+
+	it("creates a project of one local repository for a new folder", async () => {
+		createMock.mockClear();
+		findByPathMock.mockResolvedValue({ candidates: [], cloudErrors: [] });
+
+		const result = await startImport();
+
+		expect(createMock).toHaveBeenCalledWith({
+			name: "octocat",
+			repositories: [{ kind: "local", path: repoPath }],
+		});
+		expect(result).toEqual({
+			projectId: "created-project",
+			repositoryId: "repository",
+			repoPath,
+		});
 	});
 });

@@ -19,6 +19,8 @@ export interface DashboardSidebarWorkspacePullRequestCheck {
 }
 
 export interface DashboardSidebarWorkspacePullRequest {
+	/** The checkout the PR belongs to; absent on cloud rows. */
+	repositoryId?: string | null;
 	url: string;
 	number: number;
 	title: string;

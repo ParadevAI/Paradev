@@ -34,7 +34,6 @@ import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
 import { HostConnectionPill } from "./components/HostConnectionPill";
-import { RepositoryRunItems } from "./components/RepositoryRunItems";
 import { RightPaneArea } from "./components/RightPaneArea";
 import { MIN_RIGHT_PANE_AREA_WIDTH } from "./components/RightPaneArea/constants";
 import {
@@ -94,7 +93,6 @@ import { useWorkspacePaneOpeners } from "./hooks/useWorkspacePaneOpeners";
 import { useWorkspaceRightPane } from "./hooks/useWorkspaceRightPane";
 import { RightPaneLinkTargetProvider } from "./providers/RightPaneLinkTargetProvider";
 import { WorkspaceGitStatusProvider } from "./providers/WorkspaceGitStatusProvider";
-import { useActiveRepositoryWorkspaceId } from "./state/activeRepositoryStore";
 import { FileDocumentStoreProvider } from "./state/fileDocumentStore";
 import type {
 	ConsumeSearch,
@@ -205,7 +203,6 @@ function V2WorkspaceContent() {
 	} = Route.useSearch();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
-	const repoWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
 	const navigate = Route.useNavigate();
 	const titleBarMainSlot = useTitleBarMainSlot();
 	const isParadevShell = useParadevShell();
@@ -599,18 +596,6 @@ function V2WorkspaceContent() {
 			isRunning={workspaceRun.isRunning}
 			isPending={workspaceRun.isPending}
 			canForceStop={workspaceRun.canForceStop}
-			hasRunCommand={workspaceRun.hasRunCommand}
-			repositoryRunItems={
-				workspaceRun.repositoryRuns.length > 0 ? (
-					<RepositoryRunItems
-						repositoryRuns={workspaceRun.repositoryRuns}
-						onRunAll={workspaceRun.runAll}
-						onStopAll={workspaceRun.stopWorkspaceRun}
-						onStart={workspaceRun.startRepositoryRun}
-						onStop={workspaceRun.stopRepositoryRun}
-					/>
-				) : undefined
-			}
 			onToggle={workspaceRun.toggleWorkspaceRun}
 			onForceStop={workspaceRun.forceStopWorkspaceRun}
 		/>
@@ -663,7 +648,7 @@ function V2WorkspaceContent() {
 		<FileDocumentStoreProvider stores={fileDocumentStores}>
 			<WorkspaceAgentEffects store={store} rightStore={rightStore} />
 			<RightPaneLinkTargetProvider value={rightPaneLinkTarget}>
-				<WorkspaceGitStatusProvider workspaceId={repoWorkspaceId}>
+				<WorkspaceGitStatusProvider workspaceId={workspaceId}>
 					<WorkspaceSplitLayout
 						mode={rightPaneMode}
 						activeAreaRef={activeAreaRef}
@@ -694,7 +679,7 @@ function V2WorkspaceContent() {
 								</>
 							) : (
 								<WorkspaceSidebar
-									workspaceId={repoWorkspaceId}
+									workspaceId={workspaceId}
 									runButton={workspaceRunButton}
 									onSelectFile={openFilePaneFromTreeClick}
 									onSelectDiffFile={openDiffPane}

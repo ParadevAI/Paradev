@@ -78,7 +78,7 @@ export function useStartWorkspaceMove(workspace: MovableWorkspace) {
 
 	const toCloud = (environment: {
 		id: string;
-		repositoryFullName: string | null;
+		repositoryFullNames: string[];
 	}) => {
 		const start = (stopIfBusy: boolean) => {
 			let stopNextTime = false;

@@ -3,6 +3,8 @@ import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 
 /**
  * The pull request the host links to this workspace, from the host's own
@@ -11,13 +13,15 @@ import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboar
  */
 export function useLinkedPullRequest(
 	workspaceId: string,
+	repositoryId: string | undefined,
 	{ enabled = true }: { enabled?: boolean } = {},
 ) {
 	const organizationId = useActiveOrganizationId();
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const query = workspaceTrpc.git.getPullRequest.useQuery(
-		{ workspaceId },
+		checkoutInput(workspaceId, repositoryId),
 		{
-			enabled: !!workspaceId && enabled,
+			enabled: !!workspaceId && checkoutsLoaded && enabled,
 			refetchInterval: 10_000,
 			refetchOnWindowFocus: true,
 			staleTime: 10_000,

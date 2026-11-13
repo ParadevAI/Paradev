@@ -1,5 +1,4 @@
 import { type ReactNode, useCallback, useState } from "react";
-import { WorkspaceGitStatusProvider } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
 import type { ChangesPillStats } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/changesPillStats";
 import {
 	RepositoryShipReporter,
@@ -19,6 +18,7 @@ interface UseRepositoryShipSnapshotsResult {
 }
 
 export function useRepositoryShipSnapshots(
+	workspaceId: string,
 	repositoryIds: string[],
 ): UseRepositoryShipSnapshotsResult {
 	const [byId, setById] = useState<Record<string, RepositoryShipSnapshot>>({});
@@ -45,9 +45,12 @@ export function useRepositoryShipSnapshots(
 	);
 
 	const sources = repositoryIds.map((id) => (
-		<WorkspaceGitStatusProvider key={id} workspaceId={id}>
-			<RepositoryShipReporter repositoryId={id} onChange={handleChange} />
-		</WorkspaceGitStatusProvider>
+		<RepositoryShipReporter
+			key={id}
+			workspaceId={workspaceId}
+			repositoryId={id}
+			onChange={handleChange}
+		/>
 	));
 
 	return { byId, totals, ...summary, sources };

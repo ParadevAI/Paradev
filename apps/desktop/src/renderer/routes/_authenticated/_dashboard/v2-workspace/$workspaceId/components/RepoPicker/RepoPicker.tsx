@@ -6,19 +6,22 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { LuCheck, LuChevronDown, LuFolderGit2 } from "react-icons/lu";
 import {
-	useActiveRepositoryWorkspaceId,
+	useActiveRepositoryId,
 	useSelectRepository,
-	useWorkspaceRepositories,
+	useWorkspaceCheckouts,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/activeRepositoryStore";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 
+/** Picks which checkout a single-repository view shows; hidden with one checkout. */
 export function RepoPicker() {
 	const workspaceId = useWorkspace().workspace.id;
-	const activeId = useActiveRepositoryWorkspaceId(workspaceId);
+	const activeId = useActiveRepositoryId(workspaceId);
 	const select = useSelectRepository();
-	const repositories = useWorkspaceRepositories(workspaceId);
-	const current = repositories.find((repository) => repository.id === activeId);
-	if (repositories.length < 2 || !current) return null;
+	const checkouts = useWorkspaceCheckouts(workspaceId);
+	const current = checkouts.find(
+		(checkout) => checkout.repositoryId === activeId,
+	);
+	if (checkouts.length < 2 || !current) return null;
 	return (
 		<div className="px-2 pt-2">
 			<DropdownMenu>
@@ -38,17 +41,17 @@ export function RepoPicker() {
 					align="start"
 					className="w-(--radix-dropdown-menu-trigger-width)"
 				>
-					{repositories.map((repository) => (
+					{checkouts.map((checkout) => (
 						<DropdownMenuItem
-							key={repository.id}
-							onSelect={() => select(workspaceId, repository.id)}
+							key={checkout.repositoryId}
+							onSelect={() => select(workspaceId, checkout.repositoryId)}
 						>
 							<LuFolderGit2 className="text-muted-foreground" />
-							<span className="flex-1 truncate">{repository.name}</span>
+							<span className="flex-1 truncate">{checkout.name}</span>
 							<span className="max-w-32 truncate text-xs text-muted-foreground">
-								{repository.branch}
+								{checkout.branch}
 							</span>
-							{repository.id === current.id && <LuCheck />}
+							{checkout.repositoryId === current.repositoryId && <LuCheck />}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>

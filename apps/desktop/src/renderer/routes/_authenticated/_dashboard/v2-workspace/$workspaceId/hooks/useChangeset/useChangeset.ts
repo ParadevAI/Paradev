@@ -1,15 +1,18 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
 import type { FileStatus } from "renderer/routes/_authenticated/_dashboard/components/StatusIndicator";
-import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useCheckoutGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 import { buildChangesetFiles } from "./buildChangesetFiles";
 import type { ChangesetFile, DiffRef } from "./types";
 
 interface UseChangesetArgs {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	ref: DiffRef;
-	/** Tags each file with workspaceId, for views that mix repositories. */
-	tagWorkspace?: boolean;
+	/** Tags each file with repositoryId, for views that mix repositories. */
+	tagRepository?: boolean;
 }
 
 interface UseChangesetResult {
@@ -21,20 +24,23 @@ interface UseChangesetResult {
 
 export function useChangeset({
 	workspaceId,
+	repositoryId,
 	ref,
-	tagWorkspace = false,
+	tagRepository = false,
 }: UseChangesetArgs): UseChangesetResult {
-	const gitStatus = useWorkspaceGitStatus();
+	const gitStatus = useCheckoutGitStatus(repositoryId);
+	const scope = checkoutInput(workspaceId, repositoryId);
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const commitQuery = workspaceTrpc.git.getCommitFiles.useQuery(
 		ref.kind === "commit"
 			? {
-					workspaceId,
+					...scope,
 					commitHash: ref.commitHash,
 					fromHash: ref.fromHash,
 				}
-			: { workspaceId, commitHash: "" },
+			: { ...scope, commitHash: "" },
 		{
-			enabled: ref.kind === "commit",
+			enabled: checkoutsLoaded && ref.kind === "commit",
 			staleTime: Number.POSITIVE_INFINITY,
 		},
 	);
@@ -63,10 +69,10 @@ export function useChangeset({
 	}, [ref, gitStatus.data, commitQuery.data?.files]);
 	const files = useMemo(
 		() =>
-			tagWorkspace
-				? untaggedFiles.map((file) => ({ ...file, workspaceId }))
+			tagRepository && repositoryId
+				? untaggedFiles.map((file) => ({ ...file, repositoryId }))
 				: untaggedFiles,
-		[untaggedFiles, tagWorkspace, workspaceId],
+		[untaggedFiles, tagRepository, repositoryId],
 	);
 
 	const activeQuery = ref.kind === "commit" ? commitQuery : gitStatus;

@@ -23,7 +23,12 @@ export function ChangesListPane({
 	const selectedDiffTarget = useDiffPaneTarget(store);
 
 	const handleSelectFile = useCallback(
-		(path: string, openInNewTab?: boolean, changeKey?: string) => {
+		(
+			path: string,
+			openInNewTab?: boolean,
+			changeKey?: string,
+			repositoryId?: string,
+		) => {
 			openBesidePane(
 				store,
 				paneId,
@@ -32,6 +37,7 @@ export function ChangesListPane({
 					data: {
 						path,
 						changeKey,
+						repositoryId,
 						collapsedFiles: [],
 						focusTick: Date.now(),
 					} as DiffPaneData,

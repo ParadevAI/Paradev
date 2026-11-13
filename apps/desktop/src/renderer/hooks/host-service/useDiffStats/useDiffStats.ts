@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { sumCheckoutDiffStats } from "renderer/routes/_authenticated/_dashboard/utils/workspaceCheckoutSummaries";
 import { useWorkspaceEvent } from "../useWorkspaceEvent";
 import { useWorkspaceHostUrl } from "../useWorkspaceHostUrl";
 
@@ -13,7 +14,7 @@ export function getDiffStatsQueryKey(
 	hostUrl: string | null,
 	workspaceId: string,
 ) {
-	return ["diff-stats", hostUrl, workspaceId] as const;
+	return ["diff-stats", "checkouts", hostUrl, workspaceId] as const;
 }
 
 export function useDiffStats(
@@ -28,14 +29,15 @@ export function useDiffStats(
 		[hostUrl, workspaceId],
 	);
 
-	const { data: status } = useQuery({
+	const { data } = useQuery({
 		queryKey,
 		enabled: enabled && Boolean(workspaceId) && Boolean(hostUrl),
 		queryFn: () => {
 			if (!hostUrl) return null;
-			return getHostServiceClientByUrl(hostUrl).git.getStatus.query({
-				workspaceId,
-				priority: "background",
+			return getHostServiceClientByUrl(
+				hostUrl,
+			).git.getDiffStatsByWorkspaces.query({
+				workspaceIds: [workspaceId],
 			});
 		},
 		refetchOnWindowFocus: false,
@@ -57,22 +59,11 @@ export function useDiffStats(
 	);
 
 	return useMemo<DiffStats | null>(() => {
-		if (!status) return null;
-
-		const byPath = new Map<
-			string,
-			{ additions: number | null; deletions: number | null }
-		>();
-		for (const file of status.againstBase) byPath.set(file.path, file);
-		for (const file of status.staged) byPath.set(file.path, file);
-		for (const file of status.unstaged) byPath.set(file.path, file);
-
-		let additions = 0;
-		let deletions = 0;
-		for (const file of byPath.values()) {
-			additions += file.additions ?? 0;
-			deletions += file.deletions ?? 0;
-		}
+		const checkouts = data?.workspaces.find(
+			(row) => row.workspaceId === workspaceId,
+		)?.checkouts;
+		if (!checkouts) return null;
+		const { additions, deletions } = sumCheckoutDiffStats(checkouts);
 		return { additions, deletions };
-	}, [status]);
+	}, [data, workspaceId]);
 }

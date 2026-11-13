@@ -35,7 +35,8 @@ interface PullRequestsContentProps {
 	selectedPrNumber: number | null;
 	selectedPrProjectId: string | null;
 	selectedPrRepo: string | null;
-	repoSlugByProjectId: Map<string, string>;
+	/** GitHub `owner/name` by repository id, and the primary's by project id. */
+	repoSlugById: Map<string, string>;
 }
 
 const NEIGHBOR_PREFETCH_DELAY_MS = 500;
@@ -65,7 +66,7 @@ export function PullRequestsContent({
 	selectedPrNumber,
 	selectedPrProjectId,
 	selectedPrRepo,
-	repoSlugByProjectId,
+	repoSlugById,
 }: PullRequestsContentProps) {
 	const navigate = useNavigate();
 	const expandDetail = usePullRequestsSplitViewStore((s) => s.expandDetail);
@@ -271,11 +272,9 @@ export function PullRequestsContent({
 									? selectedPrProjectId === pr.projectId &&
 										isSelectedRepo(pr.url, selectedPrRepo)
 									: firstMatchingPrIndex === index);
-							const projectSlug = repoSlugByProjectId.get(pr.projectId);
 							const repoSlug =
-								pr.repositoryName && projectSlug
-									? `${projectSlug} › ${pr.repositoryName}`
-									: projectSlug;
+								(pr.repositoryId && repoSlugById.get(pr.repositoryId)) ||
+								repoSlugById.get(pr.projectId);
 							return (
 								<PullRequestRow
 									key={rowKey}

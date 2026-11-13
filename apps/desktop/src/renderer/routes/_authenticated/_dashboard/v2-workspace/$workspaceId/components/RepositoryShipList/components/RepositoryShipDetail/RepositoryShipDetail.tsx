@@ -18,7 +18,7 @@ import { RepositoryShipStatus } from "../RepositoryShipStatus";
 
 interface RepositoryShipDetailProps {
 	workspaceId: string;
-	repository: { id: string; name: string };
+	repository: { repositoryId: string; name: string };
 	snapshot: RepositoryShipSnapshot | undefined;
 	onBack: () => void;
 	onOpenPullRequest: OpenPullRequestPane;
@@ -40,8 +40,8 @@ export function RepositoryShipDetail({
 	const stats = snapshot?.stats ?? null;
 	const showCreatePr = step === "create-pr";
 	const actions = useShipActions({
-		workspaceId: repository.id,
-		paneWorkspaceId: workspaceId,
+		workspaceId,
+		repositoryId: repository.repositoryId,
 		onRefresh: () => {},
 		isPrFormOpen: showCreatePr,
 		onCommitted: () => {},

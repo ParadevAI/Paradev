@@ -1,0 +1,1 @@
+export { adoptsExistingWorktree } from "./adoptsExistingWorktree";

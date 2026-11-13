@@ -1,29 +1,26 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
-import {
-	hasCheckouts,
-	useWorkspaceRepositories,
-} from "../../../../../../state/activeRepositoryStore";
+import { useWorkspaceCheckouts } from "../../../../../../state/activeRepositoryStore";
+import { checkoutInput } from "../../../../../../utils/checkoutInput";
 import { checkoutForPullRequest } from "../../utils/checkoutForPullRequest";
 
 /**
- * The workspace whose linked pull request is on screen: in a multi-repo
- * workspace, the checkout that links it. Null when none links it.
+ * The repository whose checkout links the pull request on screen. Null when
+ * no checkout links it.
  */
 export function usePullRequestCheckoutId(
 	workspaceId: string,
 	pullRequest: PullRequestRef,
 ): string | null {
-	const repositories = useWorkspaceRepositories(workspaceId);
-	const ids = hasCheckouts(workspaceId, repositories)
-		? repositories.map((repository) => repository.id)
-		: [workspaceId];
+	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const linked = workspaceTrpc.useQueries((t) =>
-		ids.map((id) => t.git.getPullRequest({ workspaceId: id })),
+		checkouts.map((checkout) =>
+			t.git.getPullRequest(checkoutInput(workspaceId, checkout.repositoryId)),
+		),
 	);
 	return checkoutForPullRequest(
-		ids.map((id, index) => ({
-			id,
+		checkouts.map((checkout, index) => ({
+			id: checkout.repositoryId,
 			pullRequestUrl: linked[index]?.data?.url,
 		})),
 		pullRequest,

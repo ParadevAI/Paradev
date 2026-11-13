@@ -1,45 +1,50 @@
 import { useCallback } from "react";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
-import { useWorkspace } from "../../../providers/WorkspaceProvider";
-import { useWorkspaceLocalStateRow } from "../activeRepositoryStore";
+import {
+	useWorkspaceCheckouts,
+	useWorkspaceLocalStateRow,
+} from "../activeRepositoryStore";
 
 const ALL: ChangesFilter = { kind: "all" };
 
 /**
- * The Changes commit filter. A checkout of a multi-repo workspace has no
- * local state row, so its filter is kept on the container's row.
+ * The Changes commit filter. A workspace of several checkouts keeps one
+ * filter per repository; a single checkout keeps the sidebar's own filter.
  */
-export function useChangesFilter(workspaceId: string): ChangesFilter {
-	const containerId = useWorkspace().workspace.id;
+export function useChangesFilter(
+	workspaceId: string,
+	repositoryId: string | undefined,
+): ChangesFilter {
 	const row = useWorkspaceLocalStateRow(workspaceId);
-	const container = useWorkspaceLocalStateRow(containerId);
-	if (row) return row.sidebarState?.changesFilter ?? ALL;
-	return container?.repositoryChangesFilters?.[workspaceId] ?? ALL;
+	const perRepository = useWorkspaceCheckouts(workspaceId).length > 1;
+	if (perRepository && repositoryId) {
+		return row?.repositoryChangesFilters?.[repositoryId] ?? ALL;
+	}
+	return row?.sidebarState?.changesFilter ?? ALL;
 }
 
 export function useSetChangesFilter(
 	workspaceId: string,
+	repositoryId: string | undefined,
 ): (next: ChangesFilter) => void {
 	const collections = useCollections();
-	const containerId = useWorkspace().workspace.id;
+	const perRepository = useWorkspaceCheckouts(workspaceId).length > 1;
 	return useCallback(
 		(next: ChangesFilter) => {
 			const state = collections.v2WorkspaceLocalState;
-			if (state.get(workspaceId)) {
-				state.update(workspaceId, (draft) => {
-					draft.sidebarState.changesFilter = next;
-				});
-				return;
-			}
-			if (!state.get(containerId)) return;
-			state.update(containerId, (draft) => {
-				draft.repositoryChangesFilters = {
-					...draft.repositoryChangesFilters,
-					[workspaceId]: next,
-				};
+			if (!state.get(workspaceId)) return;
+			state.update(workspaceId, (draft) => {
+				if (perRepository && repositoryId) {
+					draft.repositoryChangesFilters = {
+						...draft.repositoryChangesFilters,
+						[repositoryId]: next,
+					};
+					return;
+				}
+				draft.sidebarState.changesFilter = next;
 			});
 		},
-		[collections, workspaceId, containerId],
+		[collections, workspaceId, repositoryId, perRepository],
 	);
 }

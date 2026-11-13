@@ -169,8 +169,6 @@ export const workspaceRunTerminalStateSchema = z.object({
 	command: z.string(),
 	definitionSource: z.enum(["project-config", "terminal-preset"]),
 	definitionId: z.string().optional(),
-	/** The checkout this run belongs to, in a multi-repo workspace. */
-	repositoryId: z.string().optional(),
 	startedAt: z.number(),
 	stoppedAt: z.number().optional(),
 	exitCode: z.number().optional(),
@@ -259,7 +257,7 @@ export const workspaceLocalStateSchema = z.object({
 	// v2 workspace page drains this once on first open (see
 	// useRunPendingChatHandoff) and clears it before running.
 	pendingChatHandoff: pendingChatHandoffSchema.nullable().default(null),
-	// Multi-repo workspaces only; the filters are keyed by checkout workspace id.
+	// Multi-repo workspaces only; the filters are keyed by repository id.
 	activeRepositoryId: z.string().nullable().default(null),
 	repositoryChangesFilters: z
 		.record(z.string(), changesFilterSchema)
@@ -724,6 +722,24 @@ export const failedWorkspaceCreateSchema = z.object({
 	error: z.string(),
 	failedAt: persistedDateSchema,
 });
+
+const LEGACY_CREATE_INPUT_KEYS = ["pr", "baseBranch", "worktreePath"] as const;
+
+// Older builds stored a single-repo create input that the current create schema
+// strips silently; retrying it would make a different workspace. Throwing makes
+// `withReadHeal` drop the row.
+export function healFailedWorkspaceCreate(raw: unknown): unknown {
+	const input =
+		raw && typeof raw === "object" && "input" in raw ? raw.input : undefined;
+	if (
+		input &&
+		typeof input === "object" &&
+		LEGACY_CREATE_INPUT_KEYS.some((key) => key in input)
+	) {
+		throw new Error("Failed workspace create uses a retired input shape");
+	}
+	return raw;
+}
 
 export type FailedWorkspaceCreateRow = z.infer<
 	typeof failedWorkspaceCreateSchema

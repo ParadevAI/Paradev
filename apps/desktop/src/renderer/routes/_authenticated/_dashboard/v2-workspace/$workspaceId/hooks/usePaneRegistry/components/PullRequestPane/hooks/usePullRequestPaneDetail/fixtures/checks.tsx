@@ -72,7 +72,10 @@ const { usePullRequestPaneDetail } = await import(
 beforeEach(() => {
 	workspaceProjectId = "sandbox-project";
 	projectQuery = {
-		data: { id: "sandbox-project", repoOwner: "owner", repoName: "repo" },
+		data: {
+			id: "sandbox-project",
+			repositories: [{ id: "repo", owner: "owner", repoName: "repo" }],
+		},
 		isPending: false,
 	};
 	hostProjects = { projects: [], isReady: false };
@@ -116,7 +119,10 @@ test("waits for the workspace project before naming the project", async () => {
 	expect(view.result.current.isResolvingProject).toBe(true);
 	expect(getPullRequestDetail).not.toHaveBeenCalled();
 	projectQuery = {
-		data: { id: "sandbox-project", repoOwner: "other", repoName: "repo" },
+		data: {
+			id: "sandbox-project",
+			repositories: [{ id: "repo", owner: "other", repoName: "repo" }],
+		},
 		isPending: false,
 	};
 	view.rerender();

@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {このワークスペースで変更された�
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {#個のファイルを変更} other {#個のファイルを変更}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {#件のファイル} other {#件のファイル}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
 
@@ -1383,6 +1386,9 @@ msgstr "残り {remaining} トークン"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {#個のリポジトリ} other {すべてのリポジトリ (#)}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName}を{newPath}に移動しました"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "アクション"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "{0}の操作"
 
@@ -2099,11 +2106,11 @@ msgstr "{0} をワークスペースに追加"
 msgid "Add {localizedName}?"
 msgstr "{localizedName} を追加しますか？"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "先に {computer} で {repositoryName} をプロジェクトとして追加してください"
+msgid "Add {only} as a project on {computer} first"
+msgstr "先に{computer}で{only}をプロジェクトとして追加してください"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "まず {repositoryName} をこのコンピューターのプロジェクトとして追加してください"
+msgid "Add {only} as a project on this computer first"
+msgstr "先にこのコンピューターで{only}をプロジェクトとして追加してください"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} をマージキューに追加しますか?"
@@ -2128,6 +2135,12 @@ msgstr "プロジェクトを追加するとGitHub issueが表示されます。
 
 msgid "Add a project to see pull requests."
 msgstr "プロジェクトを追加するとプルリクエストが表示されます。"
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "先に{computer}で、これらのリポジトリだけを含むプロジェクトを追加してください: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "先にこのコンピューターで、これらのリポジトリだけを含むプロジェクトを追加してください: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "短い概要を追加…"
@@ -4515,9 +4528,6 @@ msgstr "ファイターを選ぶ"
 msgid "Choose a folder"
 msgstr "フォルダを選択"
 
-msgid "Choose a parent directory"
-msgstr "親ディレクトリを選択"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "issueを開く前に、GitHub issueでプロジェクトを選択してください。"
 
@@ -4532,9 +4542,6 @@ msgstr "セクションを選んでください。"
 
 msgid "Choose agent"
 msgstr "エージェントを選択"
-
-msgid "Choose an existing repo folder"
-msgstr "既存のリポジトリフォルダを選択"
 
 msgid "Choose an MCP server"
 msgstr "MCPサーバーを選択"
@@ -4752,13 +4759,6 @@ msgstr "URLからクローン"
 
 msgid "clone the repository"
 msgstr "リポジトリをクローンする"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "リポジトリをクローンするか、ホスト上の既存フォルダをインポートします。"
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "{0}にクローンしました"
 
 msgid "Cloning…"
 msgstr "クローン中…"
@@ -5122,9 +5122,6 @@ msgstr "コマンド..."
 
 msgid "Commands"
 msgstr "コマンド"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "このリポジトリのセットアップ、ティアダウン、および実行メニューで使うコマンド。"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "ワークスペースのセットアップ、ティアダウン、実行ボタンで実行されるコマンド。"
@@ -5887,6 +5884,9 @@ msgstr "エージェントを追加できませんでした"
 msgid "Could not add repository"
 msgstr "リポジトリを追加できませんでした"
 
+msgid "Could not add the repository"
+msgstr "リポジトリを追加できませんでした"
+
 msgid "Could not answer the agent"
 msgstr "エージェントに応答できませんでした"
 
@@ -6017,6 +6017,9 @@ msgstr "このプルリクエストを読み込めませんでした。"
 msgid "Could not load your machines"
 msgstr "マシンを読み込めませんでした"
 
+msgid "Could not make it the primary repository"
+msgstr "メインのリポジトリにできませんでした"
+
 msgid "Could not mark ready"
 msgstr "レビュー可能にできませんでした"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "アクセスを削除できませんでした"
 
 msgid "Could not remove repository"
+msgstr "リポジトリを削除できませんでした"
+
+msgid "Could not remove the repository"
 msgstr "リポジトリを削除できませんでした"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "{0}件をすべて破棄"
 msgid "Discard all staged changes"
 msgstr "ステージ済みの変更をすべて破棄"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "{repositoryName} のステージ済みの変更をすべて破棄しますか?"
+
 msgid "Discard all staged changes?"
 msgstr "ステージ済みの変更をすべて破棄しますか?"
 
 msgid "Discard all unstaged changes"
 msgstr "未ステージの変更をすべて破棄"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "{repositoryName} の未ステージの変更をすべて破棄しますか?"
 
 msgid "Discard all unstaged changes?"
 msgstr "未ステージの変更をすべて破棄しますか?"
@@ -8147,12 +8159,6 @@ msgstr "完全なメールアドレスを入力してください"
 msgid "Enter a number"
 msgstr "数値を入力"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "{hostName}の親ディレクトリを入力してください"
-
-msgid "Enter a path on {hostName}"
-msgstr "{hostName}のパスを入力してください"
-
 msgid "Enter a URL into the search bar above."
 msgstr "上の検索バーにURLを入力してください。"
 
@@ -8294,11 +8300,8 @@ msgstr "毎週水曜午前9時に、今週マージされたPRを確認し、古
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "平日午前9時に、新しいGitHub issueを読み、ラベルを付け、レビュー用の返信を下書きする。"
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "マルチリポジトリプロジェクトの各ワークスペースは、このリポジトリを他のリポジトリと並べてチェックアウトします。"
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "このプロジェクトの各ワークスペースは、それらすべてを1つのブランチで並べてチェックアウトします。"
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "このプロジェクトの各ワークスペースは、それらすべてを1つのブランチ上に並べてチェックアウトします。セットアップと実行のコマンドはメインのリポジトリから取得します。"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "これが一般化するかどうかで議論が起きます。その議論こそ、このレベルに到達した証拠です。"
@@ -8350,12 +8353,6 @@ msgstr "公開したものはすべて削除され、非表示になるわけで
 
 msgid "Executable"
 msgstr "実行ファイル"
-
-msgid "Existing repo path"
-msgstr "既存リポジトリのパス"
-
-msgid "Existing repo path on {hostName}"
-msgstr "{hostName}上の既存リポジトリのパス"
 
 msgid "existing worktree"
 msgstr "既存のワークツリー"
@@ -9338,6 +9335,9 @@ msgstr "タスクビューの検索入力にフォーカスする"
 
 msgid "Folder"
 msgstr "フォルダ"
+
+msgid "Folder can't be read"
+msgstr "フォルダを読み取れません"
 
 msgid "Folder is missing"
 msgstr "フォルダが見つかりません"
@@ -10425,9 +10425,6 @@ msgstr "各v1プロジェクトをv2にインポートします。インポー�
 
 msgid "Import each v1 terminal script into v2."
 msgstr "各v1ターミナルスクリプトをv2にインポートします。"
-
-msgid "Import existing"
-msgstr "既存をインポート"
 
 msgid "Import existing folder"
 msgstr "既存のフォルダをインポート"
@@ -11552,9 +11549,6 @@ msgstr "{0}–{1}行目"
 msgid "Link"
 msgstr "リンク"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "クローンを有効にするには、先にプロジェクトにGitHubリポジトリをリンクしてください。"
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "さらに読み込み中..."
 
 msgid "Loading more…"
 msgstr "さらに読み込み中…"
+
+msgid "Loading project repositories…"
+msgstr "プロジェクトのリポジトリを読み込み中…"
 
 msgid "Loading project…"
 msgstr "プロジェクトを読み込み中…"
@@ -11901,6 +11898,9 @@ msgstr "デフォルトにする"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "デフォルトにする：新しいターミナルとエージェントをこのアカウントで起動します。"
+
+msgid "Make primary"
+msgstr "メインにする"
 
 msgid "Make public"
 msgstr "公開する"
@@ -12522,9 +12522,6 @@ msgstr "このチャットをここに移動しています"
 msgid "Moving this workspace…"
 msgstr "このワークスペースを移動しています…"
 
-msgid "Multi-repo project"
-msgstr "マルチリポジトリプロジェクト"
-
 msgid "Multi-select"
 msgstr "複数選択"
 
@@ -12983,6 +12980,9 @@ msgstr "チャンネルがありません"
 
 msgid "No chats found"
 msgstr "チャットが見つかりません"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "このワークスペースに {currentBranchName} 上のチェックアウトはありません"
 
 msgid "No checks"
 msgstr "チェックなし"
@@ -14581,6 +14581,9 @@ msgstr "チャット画面で開いています…"
 msgid "Opening pages"
 msgstr "ページを開く"
 
+msgid "Opens different repositories than this workspace"
+msgstr "このワークスペースとは異なるリポジトリを開きます"
+
 msgid "Operator"
 msgstr "オペレーター"
 
@@ -15079,12 +15082,6 @@ msgstr "開発者あたりの並列セッション数は7か月ごとに倍増�
 msgid "Parameters"
 msgstr "パラメータ"
 
-msgid "Parent directory"
-msgstr "親ディレクトリ"
-
-msgid "Parent directory on {hostName}"
-msgstr "{hostName}上の親ディレクトリ"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "半分は記録、半分は賭けです。最初の2項目はすでに起きています。残りは、外れたと判定できる程度に具体的に書いてあります。"
 
@@ -15272,9 +15269,6 @@ msgstr "別の要素を選ぶ (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "ディスク上のフォルダを選んでプロジェクトとして追加する"
 
-msgid "Pick a folder…"
-msgstr "フォルダを選択…"
-
 msgid "Pick a machine size"
 msgstr "マシンサイズを選ぶ"
 
@@ -15284,14 +15278,11 @@ msgstr "モデルを選択"
 msgid "pick a name for the board"
 msgstr "ボードで使う名前を入力"
 
-msgid "Pick a parent directory"
-msgstr "親ディレクトリを選択してください"
-
-msgid "Pick a project location"
-msgstr "プロジェクトの場所を選択してください"
-
 msgid "Pick a reason"
 msgstr "理由を選択"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "{hostName}のリポジトリフォルダを選択してください。"
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "プラグインのマーケットプレイスファイルを含むリポジトリを選んでください。Superset は今すぐ、そして再同期するたびにプラグインを同期します。"
@@ -15802,13 +15793,8 @@ msgstr "別のデバイスのプロジェクト"
 msgid "Project ready. Open it from the sidebar."
 msgstr "プロジェクトの準備ができました。サイドバーから開いてください。"
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "プロジェクトを{0}に移動しました"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "{0}にプロジェクトをセットアップしました"
+msgid "Project relocated to {newPath}"
+msgstr "プロジェクトを{newPath}に移動しました"
 
 msgid "Project Settings"
 msgstr "プロジェクト設定"
@@ -16494,6 +16480,9 @@ msgstr "再読み込みすると編集内容が破棄されます。上書きす
 msgid "Relocate"
 msgstr "移動"
 
+msgid "Relocate {repositoryName}?"
+msgstr "{repositoryName}を移動しますか?"
+
 msgid "Relocate project?"
 msgstr "プロジェクトを移動しますか?"
 
@@ -16577,6 +16566,9 @@ msgstr "グループから外す"
 
 msgid "Remove from queue"
 msgstr "キューから外す"
+
+msgid "Remove from project"
+msgstr "プロジェクトから外す"
 
 msgid "Remove from Queue"
 msgstr "キューから削除"
@@ -16859,9 +16851,6 @@ msgstr "リポジトリを削除しました"
 
 msgid "Repository root"
 msgstr "リポジトリのルート"
-
-msgid "Repository settings"
-msgstr "リポジトリ設定"
 
 msgid "Repository URL or path"
 msgstr "リポジトリのURLまたはパス"
@@ -17432,9 +17421,6 @@ msgstr "スケジュールで、または何かが起きたときにエージェ
 msgid "Run agents side by side"
 msgstr "エージェントを並べて実行"
 
-msgid "Run all"
-msgstr "すべて実行"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "エージェント軍団で"
@@ -17531,9 +17517,6 @@ msgstr "デスクトップ、任意のターミナル、スマートフォンか
 
 msgid "Run your coding agents in the cloud."
 msgstr "コーディングエージェントをクラウドで実行。"
-
-msgid "Run: {repositoryName}"
-msgstr "実行: {repositoryName}"
 
 msgid "Run."
 msgstr "実行。"
@@ -18180,9 +18163,6 @@ msgstr "組織を選択"
 msgid "Select Organization Logo"
 msgstr "組織のロゴを選択"
 
-msgid "Select parent directory to clone into"
-msgstr "クローン先の親ディレクトリを選択"
-
 msgid "Select people"
 msgstr "ユーザーを選択"
 
@@ -18416,9 +18396,6 @@ msgstr "プロジェクトを設定…"
 msgid "Set Run"
 msgstr "実行を設定"
 
-msgid "Set run script"
-msgstr "実行スクリプトを設定"
-
 msgid "Set this project"
 msgstr "このプロジェクトに設定"
 
@@ -18440,9 +18417,6 @@ msgstr "環境をセットアップ"
 
 msgid "Set up once"
 msgstr "一度設定するだけ"
-
-msgid "Set up project on {hostName}"
-msgstr "{hostName}でプロジェクトをセットアップ"
 
 msgid "Set up project…"
 msgstr "プロジェクトをセットアップ…"
@@ -19227,6 +19201,10 @@ msgstr "スパムまたは詐欺"
 msgid "Sparse checkout"
 msgstr "スパースチェックアウト"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "{0}のスパースチェックアウト"
+
 msgid "Speaking"
 msgstr "話し中"
 
@@ -19619,9 +19597,6 @@ msgstr "{label} を停止"
 
 msgid "Stop {name}"
 msgstr "{name} を停止"
-
-msgid "Stop all"
-msgstr "すべて停止"
 
 msgid "Stop dictation"
 msgstr "音声入力を停止"
@@ -20387,9 +20362,6 @@ msgstr "コードの有効期限が切れました。やり直してください
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "このプロジェクトのワークスペースをセットアップ、実行、アーカイブするときに Paradev が実行するコマンド（リポジトリの config.toml）。"
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Paradevがこのリポジトリのチェックアウトをセットアップ、実行、アーカイブするためのコマンド（config.tomlから読み込み）。"
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "同社は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は同社を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
@@ -20492,6 +20464,9 @@ msgstr "再利用可能なParadevエージェント設定、プロンプト、�
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "ホストは{targetVersion}ではなく{0}で復帰しました。"
+
+msgid "The host created a project with no repository"
+msgstr "ホストがリポジトリのないプロジェクトを作成しました"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "ホストが15分以内に復帰しませんでした。"
@@ -20923,8 +20898,8 @@ msgstr "このメールアドレスは別のサインイン方法で既に登録
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "この環境にはリポジトリがありません。設定でリポジトリを含む環境を作成し、その環境からワークスペースを開始してください"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "この環境は {repository} ではなく {environmentRepository} を開きます"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "この環境が開くのは{environmentRepositories}で、{workspaceRepositories}ではありません"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "この環境のリポジトリは固定されています。変更するにはワークスペースを再度昇格してください"
@@ -21091,6 +21066,9 @@ msgstr "このプルリクエストは利用できなくなりました。"
 msgid "This pull request link is invalid."
 msgstr "このプルリクエストのリンクは無効です。"
 
+msgid "This pull request's repository is not known"
+msgstr "このプルリクエストのリポジトリが不明です"
+
 msgid "This recording is too long to transcribe"
 msgstr "この録音は長すぎて文字起こしできません"
 
@@ -21241,6 +21219,9 @@ msgstr "このワークスペース"
 
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
+
+msgid "This workspace is still loading. Try again."
+msgstr "このワークスペースはまだ読み込み中です。もう一度お試しください。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "このワークスペースは削除されたか、アクセス権がなくなった可能性があります。"
@@ -22217,9 +22198,6 @@ msgstr "このアカウントを使用"
 
 msgid "Use this folder"
 msgstr "このフォルダを使用"
-
-msgid "Use this repo"
-msgstr "このリポジトリを使用"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "固まった、または応答しないターミナルの修復に使います。"

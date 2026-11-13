@@ -1,12 +1,27 @@
+interface PullRequestRepository {
+	id: string;
+	owner: string | null;
+	repoName: string | null;
+}
+
 export interface PullRequestProject {
 	id: string;
 	projectKey?: string;
-	repoOwner?: string | null;
-	repoName?: string | null;
-	/** A multi-repo project has no repository of its own; its PRs name one of its repositories. */
-	kind?: "repository" | "container";
+	primaryRepositoryId?: string;
+	repositories?: readonly PullRequestRepository[];
 }
 
+function fullNameOf(repository: PullRequestRepository): string | null {
+	return repository.owner && repository.repoName
+		? `${repository.owner}/${repository.repoName}`
+		: null;
+}
+
+/**
+ * The repository a PR link names, and the project and repository of that
+ * project that hold it. A link that names a repository the project does not
+ * hold keeps the repository but drops the project.
+ */
 export function resolvePullRequestTarget({
 	projectId,
 	repoFullName,
@@ -20,16 +35,20 @@ export function resolvePullRequestTarget({
 		(candidate) =>
 			candidate.id === projectId || candidate.projectKey === projectId,
 	);
-	const projectRepo =
-		project?.repoOwner && project.repoName
-			? `${project.repoOwner}/${project.repoName}`
-			: null;
-	const repository = repoFullName ?? projectRepo;
-	const matches =
-		project?.kind === "container" ||
-		(!!projectRepo && projectRepo.toLowerCase() === repository?.toLowerCase());
+	const repositories = project?.repositories ?? [];
+	const primary =
+		repositories.find(
+			(repository) => repository.id === project?.primaryRepositoryId,
+		) ?? repositories[0];
+	const matched = repoFullName
+		? repositories.find(
+				(repository) =>
+					fullNameOf(repository)?.toLowerCase() === repoFullName.toLowerCase(),
+			)
+		: primary;
 	return {
-		repoFullName: repository,
-		projectId: project && (!repoFullName || matches) ? projectId : null,
+		repoFullName: repoFullName ?? (primary ? fullNameOf(primary) : null),
+		projectId: project && (!repoFullName || matched) ? projectId : null,
+		repositoryId: matched?.id ?? null,
 	};
 }

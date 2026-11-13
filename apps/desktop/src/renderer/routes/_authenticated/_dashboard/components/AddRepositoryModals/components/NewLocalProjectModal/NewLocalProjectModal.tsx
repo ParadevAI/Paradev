@@ -14,14 +14,17 @@ import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { LuFolderGit2, LuGithub, LuLoaderCircle, LuX } from "react-icons/lu";
+import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getBaseName } from "renderer/lib/pathBasename";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useFinalizeProjectSetup } from "renderer/react-query/projects";
 import {
 	AddRepositoryMenu,
 	type CloneSource,
-} from "./components/AddRepositoryMenu";
+} from "renderer/routes/_authenticated/components/AddRepositoryMenu";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { buildCreateProjectInput } from "./utils/buildCreateProjectInput";
 import { defaultProjectName, parentOf } from "./utils/defaultProjectName";
 
 interface NewLocalProjectModalProps {
@@ -37,6 +40,7 @@ export function NewLocalProjectModal({
 }: NewLocalProjectModalProps) {
 	const { t } = useLingui();
 	const { activeHostUrl } = useLocalHostService();
+	const finalizeSetup = useFinalizeProjectSetup();
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
 	const [repoPaths, setRepoPaths] = useState<string[]>([]);
@@ -92,17 +96,19 @@ export function NewLocalProjectModal({
 		try {
 			const result = await getHostServiceClientByUrl(
 				activeHostUrl,
-			).project.createContainer.mutate({
-				name: name.trim(),
-				repoPaths,
-				...(clones.length > 0
-					? {
-							cloneUrls: clones.map((clone) => clone.url),
-							cloneParentDir: cloneDir,
-						}
-					: {}),
+			).project.create.mutate(
+				buildCreateProjectInput({
+					name,
+					repoPaths,
+					cloneUrls: clones.map((clone) => clone.url),
+					cloneDir,
+				}),
+			);
+			finalizeSetup(activeHostUrl, {
+				projectId: result.id,
+				repoPath: getPrimaryRepository(result)?.path ?? "",
 			});
-			onSuccess(result);
+			onSuccess({ projectId: result.id });
 			handleOpenChange(false);
 		} catch (err) {
 			toast.error(t({ message: "Could not create project" }), {

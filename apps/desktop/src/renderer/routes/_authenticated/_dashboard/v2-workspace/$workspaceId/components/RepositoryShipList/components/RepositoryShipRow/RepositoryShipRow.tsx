@@ -15,7 +15,7 @@ import { RepositoryShipStatus } from "../RepositoryShipStatus";
 
 interface RepositoryShipRowProps {
 	workspaceId: string;
-	repository: { id: string; name: string };
+	repository: { repositoryId: string; name: string };
 	snapshot: RepositoryShipSnapshot | undefined;
 	onOpen: () => void;
 	onOpenPullRequest: OpenPullRequestPane;
@@ -33,8 +33,8 @@ export function RepositoryShipRow({
 	const { t } = useLingui();
 	const linkPolicy = usePullRequestLinkPolicy();
 	const actions = useShipActions({
-		workspaceId: repository.id,
-		paneWorkspaceId: workspaceId,
+		workspaceId,
+		repositoryId: repository.repositoryId,
 		onRefresh: () => {},
 		isPrFormOpen: false,
 		onCommitted: () => {},

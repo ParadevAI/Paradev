@@ -2,8 +2,14 @@ import { describe, expect, it } from "bun:test";
 import { getPullRequestTarget } from "./getPullRequestTarget";
 
 const projects = [
-	{ projectKey: "other", repoOwner: "other", repoName: "repo" },
-	{ projectKey: "matching", repoOwner: "superset-sh", repoName: "superset" },
+	{ projectKey: "other", repositories: [{ owner: "other", repoName: "repo" }] },
+	{
+		projectKey: "matching",
+		repositories: [
+			{ owner: "superset-sh", repoName: "docs" },
+			{ owner: "superset-sh", repoName: "superset" },
+		],
+	},
 ];
 const ref = { repoFullName: "superset-sh/superset", number: 42 };
 

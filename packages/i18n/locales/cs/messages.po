@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {V tomto pracovním prostoru se změnil # soubor
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# změněný soubor} few {# změněné soubory} many {# změněného souboru} other {# změněných souborů}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Upraven # soubor} few {Upraveny # soubory} many {Upraveno # souboru} other {Upraveno # souborů}}"
 
@@ -1383,6 +1386,9 @@ msgstr "Zbývající tokeny: {remaining}"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# repozitář} few {Všechny # repozitáře} many {Všech # repozitáře} other {Všech # repozitářů}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName} přesunut do {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Akce"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Akce pro {0}"
 
@@ -2099,11 +2106,11 @@ msgstr "Přidat {0} do pracovního prostoru"
 msgid "Add {localizedName}?"
 msgstr "Přidat {localizedName}?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Nejdřív přidejte {repositoryName} jako projekt na počítači {computer}"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Nejprve přidejte {only} jako projekt na {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto počítači"
+msgid "Add {only} as a project on this computer first"
+msgstr "Nejprve přidejte {only} jako projekt na tomto počítači"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Přidat #{prNumber} do fronty slučování?"
@@ -2128,6 +2135,12 @@ msgstr "Přidejte projekt a uvidíte GitHub issues."
 
 msgid "Add a project to see pull requests."
 msgstr "Přidejte projekt a uvidíte pull requesty."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Nejprve přidejte na {computer} projekt právě s těmito repozitáři: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Nejprve přidejte na tento počítač projekt právě s těmito repozitáři: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Přidejte krátké shrnutí…"
@@ -4515,9 +4528,6 @@ msgstr "Vyberte bojovníka"
 msgid "Choose a folder"
 msgstr "Vyberte složku"
 
-msgid "Choose a parent directory"
-msgstr "Vyberte nadřazený adresář"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Než otevřete issue, vyberte projekt v sekci GitHub issues."
 
@@ -4532,9 +4542,6 @@ msgstr "Vyberte sekci."
 
 msgid "Choose agent"
 msgstr "Vyberte agenta"
-
-msgid "Choose an existing repo folder"
-msgstr "Vyberte složku s existujícím repozitářem"
 
 msgid "Choose an MCP server"
 msgstr "Vyberte MCP server"
@@ -4752,13 +4759,6 @@ msgstr "Naklonovat z URL"
 
 msgid "clone the repository"
 msgstr "naklonovat repozitář"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Naklonujte repozitář nebo naimportujte existující složku na hostu."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Naklonováno do {0}"
 
 msgid "Cloning…"
 msgstr "Klonuji…"
@@ -5122,9 +5122,6 @@ msgstr "Příkaz..."
 
 msgid "Commands"
 msgstr "Příkazy"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Příkazy spouštěné při nastavení a úklidu tohoto repozitáře a z nabídky Spustit."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Příkazy spouštěné při setupu a teardownu pracovního prostoru a tlačítkem Spustit."
@@ -5887,6 +5884,9 @@ msgstr "Agenta se nepodařilo přidat"
 msgid "Could not add repository"
 msgstr "Repozitář se nepodařilo přidat"
 
+msgid "Could not add the repository"
+msgstr "Repozitář se nepodařilo přidat"
+
 msgid "Could not answer the agent"
 msgstr "Agentovi se nepodařilo odpovědět"
 
@@ -6017,6 +6017,9 @@ msgstr "Tento pull request se nepodařilo načíst."
 msgid "Could not load your machines"
 msgstr "Nepodařilo se načíst vaše počítače"
 
+msgid "Could not make it the primary repository"
+msgstr "Repozitář se nepodařilo nastavit jako hlavní"
+
 msgid "Could not mark ready"
 msgstr "Nepodařilo se označit jako připravené"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "Přístup se nepodařilo odebrat"
 
 msgid "Could not remove repository"
+msgstr "Repozitář se nepodařilo odebrat"
+
+msgid "Could not remove the repository"
 msgstr "Repozitář se nepodařilo odebrat"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "Zahodit vše: {0}"
 msgid "Discard all staged changes"
 msgstr "Zahodit všechny připravené změny"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Zahodit všechny připravené změny v {repositoryName}?"
+
 msgid "Discard all staged changes?"
 msgstr "Zahodit všechny připravené změny?"
 
 msgid "Discard all unstaged changes"
 msgstr "Zahodit všechny nepřipravené změny"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Zahodit všechny nepřipravené změny v {repositoryName}?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Zahodit všechny nepřipravené změny?"
@@ -8147,12 +8159,6 @@ msgstr "Zadejte celou e-mailovou adresu"
 msgid "Enter a number"
 msgstr "Zadejte číslo"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Zadejte nadřazený adresář na {hostName}"
-
-msgid "Enter a path on {hostName}"
-msgstr "Zadejte cestu na {hostName}"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Zadejte URL do vyhledávacího pole nahoře."
 
@@ -8294,11 +8300,8 @@ msgstr "Každou středu v 9:00 projdi sloučené PR za tento týden a aktualizuj
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Každý všední den v 9:00 přečti nové GitHub issues, přiřaď štítky a připrav první odpověď ke kontrole."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Každý pracovní prostor projektu s více repozitáři stáhne tento repozitář vedle ostatních."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Každý pracovní prostor tohoto projektu má checkout všech z nich vedle sebe, v jedné větvi."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Každý pracovní prostor tohoto projektu má checkout všech z nich vedle sebe na jedné větvi. Příkazy pro setup a spuštění pocházejí z hlavního repozitáře."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Všichni se dohadují, jestli se to dá zobecnit. Právě ten spor je známkou toho, že úroveň byla dosažena."
@@ -8350,12 +8353,6 @@ msgstr "Všechno, co jste zveřejnili, se smaže, ne jen skryje. Můžete se poz
 
 msgid "Executable"
 msgstr "Spustitelný soubor"
-
-msgid "Existing repo path"
-msgstr "Cesta k existujícímu repozitáři"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Cesta k existujícímu repozitáři na {hostName}"
 
 msgid "existing worktree"
 msgstr "existující worktree"
@@ -9338,6 +9335,9 @@ msgstr "Zaměřit vyhledávací pole v zobrazení úkolů"
 
 msgid "Folder"
 msgstr "Složka"
+
+msgid "Folder can't be read"
+msgstr "Složku nelze přečíst"
 
 msgid "Folder is missing"
 msgstr "Složka chybí"
@@ -10425,9 +10425,6 @@ msgstr "Importujte každý projekt v1 do v2. Již importované projekty jsou ozn
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Importujte každý terminálový skript v1 do v2."
-
-msgid "Import existing"
-msgstr "Importovat existující"
 
 msgid "Import existing folder"
 msgstr "Importovat existující složku"
@@ -11552,9 +11549,6 @@ msgstr "Řádky {0}–{1}"
 msgid "Link"
 msgstr "Odkaz"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Klonování zapnete tím, že k projektu nejprve propojíte GitHub repozitář."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Načítám další..."
 
 msgid "Loading more…"
 msgstr "Načítám další…"
+
+msgid "Loading project repositories…"
+msgstr "Načítání repozitářů projektu…"
 
 msgid "Loading project…"
 msgstr "Načítám projekt…"
@@ -11901,6 +11898,9 @@ msgstr "Nastavit jako výchozí"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Nastavit jako výchozí: nové terminály a agenty spouštět na tomto účtu."
+
+msgid "Make primary"
+msgstr "Nastavit jako hlavní"
 
 msgid "Make public"
 msgstr "Zveřejnit"
@@ -12522,9 +12522,6 @@ msgstr "Tento chat se přesouvá sem"
 msgid "Moving this workspace…"
 msgstr "Přesouvá se tento pracovní prostor…"
 
-msgid "Multi-repo project"
-msgstr "Projekt s více repozitáři"
-
 msgid "Multi-select"
 msgstr "Výběr více možností"
 
@@ -12983,6 +12980,9 @@ msgstr "Žádné kanály"
 
 msgid "No chats found"
 msgstr "Nebyly nalezeny žádné chaty"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Žádný checkout v tomto pracovním prostoru není na {currentBranchName}"
 
 msgid "No checks"
 msgstr "Žádné kontroly"
@@ -14581,6 +14581,9 @@ msgstr "Otevírání v rozhraní chatu…"
 msgid "Opening pages"
 msgstr "Otevírání stránek"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Otevírá jiné repozitáře než tento pracovní prostor"
+
 msgid "Operator"
 msgstr "Operátor"
 
@@ -15079,12 +15082,6 @@ msgstr "Počet souběžných relací na vývojáře se každých sedm měsíců 
 msgid "Parameters"
 msgstr "Parametry"
 
-msgid "Parent directory"
-msgstr "Nadřazený adresář"
-
-msgid "Parent directory on {hostName}"
-msgstr "Nadřazený adresář na {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Zčásti záznam, zčásti sázka. První dvě položky se už dějí. Zbytek je popsaný dost konkrétně na to, abychom se v něm mohli mýlit."
 
@@ -15272,9 +15269,6 @@ msgstr "Vybrat jiný prvek (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Vyberte složku na disku a přidejte ji jako projekt"
 
-msgid "Pick a folder…"
-msgstr "Vyberte složku…"
-
 msgid "Pick a machine size"
 msgstr "Vyberte velikost stroje"
 
@@ -15284,14 +15278,11 @@ msgstr "Vyberte model"
 msgid "pick a name for the board"
 msgstr "zvolte jméno do žebříčku"
 
-msgid "Pick a parent directory"
-msgstr "Vyberte nadřazený adresář"
-
-msgid "Pick a project location"
-msgstr "Vyberte umístění projektu"
-
 msgid "Pick a reason"
 msgstr "Vyberte důvod"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Vyberte složku repozitáře na {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Vyberte repozitář se souborem marketplace pluginů. Superset synchronizuje jeho pluginy nyní a při každé další synchronizaci."
@@ -15802,13 +15793,8 @@ msgstr "Projekt na jiném zařízení"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Projekt je připravený. Otevřete ho v postranním panelu."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Projekt přesunut do {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Projekt nastaven v {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Projekt přesunut do {newPath}"
 
 msgid "Project Settings"
 msgstr "Nastavení projektu"
@@ -16494,6 +16480,9 @@ msgstr "Opětovné načtení zahodí vaše úpravy. Přepsání nahradí soubor 
 msgid "Relocate"
 msgstr "Přesunout"
 
+msgid "Relocate {repositoryName}?"
+msgstr "Přesunout {repositoryName}?"
+
 msgid "Relocate project?"
 msgstr "Přesunout projekt?"
 
@@ -16577,6 +16566,9 @@ msgstr "Odebrat ze skupiny"
 
 msgid "Remove from queue"
 msgstr "Odebrat z fronty"
+
+msgid "Remove from project"
+msgstr "Odebrat z projektu"
 
 msgid "Remove from Queue"
 msgstr "Odebrat z fronty"
@@ -16859,9 +16851,6 @@ msgstr "Repozitář odebrán"
 
 msgid "Repository root"
 msgstr "Kořen repozitáře"
-
-msgid "Repository settings"
-msgstr "Nastavení repozitáře"
 
 msgid "Repository URL or path"
 msgstr "URL nebo cesta repozitáře"
@@ -17432,9 +17421,6 @@ msgstr "Spouštějte agenty podle plánu nebo když se něco stane."
 msgid "Run agents side by side"
 msgstr "Spouštějte agenty vedle sebe"
 
-msgid "Run all"
-msgstr "Spustit vše"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Spusťte armádu"
@@ -17531,9 +17517,6 @@ msgstr "Spouštějte své agenty z desktopu, libovolného terminálu nebo telefo
 
 msgid "Run your coding agents in the cloud."
 msgstr "Spouštějte své programovací agenty v cloudu."
-
-msgid "Run: {repositoryName}"
-msgstr "Spuštění: {repositoryName}"
 
 msgid "Run."
 msgstr "Spusťte."
@@ -18180,9 +18163,6 @@ msgstr "Vyberte organizaci"
 msgid "Select Organization Logo"
 msgstr "Vyberte logo organizace"
 
-msgid "Select parent directory to clone into"
-msgstr "Vyberte nadřazený adresář pro naklonování"
-
 msgid "Select people"
 msgstr "Vyberte osoby"
 
@@ -18416,9 +18396,6 @@ msgstr "Nastavit projekt…"
 msgid "Set Run"
 msgstr "Nastavit spuštění"
 
-msgid "Set run script"
-msgstr "Nastavit spouštěcí skript"
-
 msgid "Set this project"
 msgstr "Nastavit tento projekt"
 
@@ -18440,9 +18417,6 @@ msgstr "Nastavit prostředí"
 
 msgid "Set up once"
 msgstr "Nastavte jednou"
-
-msgid "Set up project on {hostName}"
-msgstr "Nastavit projekt na {hostName}"
 
 msgid "Set up project…"
 msgstr "Nastavit projekt…"
@@ -19227,6 +19201,10 @@ msgstr "Spam nebo podvod"
 msgid "Sparse checkout"
 msgstr "Sparse checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Sparse checkout {0}"
+
 msgid "Speaking"
 msgstr "Mluvím"
 
@@ -19619,9 +19597,6 @@ msgstr "Zastavit {label}"
 
 msgid "Stop {name}"
 msgstr "Zastavit {name}"
-
-msgid "Stop all"
-msgstr "Zastavit vše"
 
 msgid "Stop dictation"
 msgstr "Zastavit diktování"
@@ -20387,9 +20362,6 @@ msgstr "Platnost kódu vypršela. Začněte znovu."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Příkazy, které Paradev spouští při přípravě, spuštění a archivaci pracovních prostorů tohoto projektu, ze souboru config.toml v repozitáři."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Příkazy, kterými Paradev nastavuje, spouští a archivuje checkouty tohoto repozitáře, z jeho config.toml."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Společnost získala 11,5 milionu dolarů v seed kole, které vedl fond Union Square Ventures za účasti Y Combinatoru a Paula Grahama. TechCrunch ji zařadil mezi nejvýraznější startupy YC Demo Day."
 
@@ -20492,6 +20464,9 @@ msgstr "Budoucí domov pro znovupoužitelné konfigurace agentů, prompty a prů
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Hostitel se vrátil s verzí {0}, ne {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "Host vytvořil projekt bez repozitáře"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "Hostitel se neobnovil do patnácti minut."
@@ -20923,8 +20898,8 @@ msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a po
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Toto prostředí otevírá {environmentRepository}, ne {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Toto prostředí otevírá {environmentRepositories}, ne {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Repozitáře tohoto prostředí jsou pevně dané; pro jejich změnu znovu povyšte pracovní prostor"
@@ -21091,6 +21066,9 @@ msgstr "Tento pull request už není dostupný."
 msgid "This pull request link is invalid."
 msgstr "Tento odkaz na pull request je neplatný."
 
+msgid "This pull request's repository is not known"
+msgstr "Repozitář tohoto pull requestu není známý"
+
 msgid "This recording is too long to transcribe"
 msgstr "Tato nahrávka je na přepis příliš dlouhá"
 
@@ -21241,6 +21219,9 @@ msgstr "Tento pracovní prostor"
 
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Tento pracovní prostor se ještě načítá. Zkuste to znovu."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Tento pracovní prostor mohl být odstraněn, nebo k němu už nemáte přístup."
@@ -22217,9 +22198,6 @@ msgstr "Použít tento účet"
 
 msgid "Use this folder"
 msgstr "Použít tuto složku"
-
-msgid "Use this repo"
-msgstr "Použít tento repozitář"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Použijte, když jsou terminály zaseknuté nebo nereagují."

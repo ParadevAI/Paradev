@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
@@ -18,6 +18,10 @@ import {
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
+import {
+	isSameRepositorySet,
+	repositoryFullNames,
+} from "../../utils/repositorySet";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToCloudStage = "saving" | "starting";
@@ -27,8 +31,8 @@ const BOX_CONNECT_ATTEMPTS = 120;
 const BOX_CONNECT_RETRY_MS = 5_000;
 
 /**
- * Moves a workspace on this computer into a new cloud workspace: its work
- * goes to one branch, and each of its chats moves on its own. Its terminal
+ * Moves a workspace on this computer into a new cloud workspace: every checkout
+ * goes to one shared branch, and each of its chats moves on its own. Its terminal
  * agents start again in the new workspace once its box answers. Returns the
  * chats that could not move and stayed here, and later the terminals.
  */
@@ -43,10 +47,11 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 		(row) =>
 			row.projectKey === workspace.projectId || row.id === workspace.projectId,
 	);
-	const sourceRepository =
-		sourceProject?.repoOwner && sourceProject.repoName
-			? `${sourceProject.repoOwner}/${sourceProject.repoName}`
-			: null;
+	const sourceRepositories = useMemo(
+		() =>
+			sourceProject ? repositoryFullNames(sourceProject.repositories) : null,
+		[sourceProject],
+	);
 
 	return useCallback(
 		async ({
@@ -56,7 +61,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			onBegun,
 			signal,
 		}: {
-			environment: { id: string; repositoryFullName: string | null };
+			environment: { id: string; repositoryFullNames: string[] };
 			stopIfBusy?: boolean;
 			onStage: (stage: MoveToCloudStage) => void;
 			onBegun?: (workspaceMoveId: string) => void;
@@ -66,18 +71,19 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			if (!activeHostUrl) {
 				throw new Error(t`This computer's host is not running`);
 			}
-			const assertEnvironmentOpens = (repository: string) => {
-				const environmentRepository = environment.repositoryFullName;
-				if (
-					environmentRepository &&
-					environmentRepository.toLowerCase() !== repository.toLowerCase()
-				) {
+			const assertEnvironmentOpens = (repositories: string[]) => {
+				const opens = environment.repositoryFullNames;
+				if (opens.length > 0 && !isSameRepositorySet(opens, repositories)) {
+					const environmentRepositories = opens.join(", ");
+					const workspaceRepositories = repositories.join(", ");
 					throw new Error(
-						t`This environment opens ${environmentRepository}, not ${repository}`,
+						t`This environment opens ${environmentRepositories}, not ${workspaceRepositories}`,
 					);
 				}
 			};
-			if (sourceRepository) assertEnvironmentOpens(sourceRepository);
+			if (sourceRepositories && sourceRepositories.length > 0) {
+				assertEnvironmentOpens(sourceRepositories);
+			}
 			onStage("saving");
 			const { workspaceMoveId } =
 				await cloudTrpcClient.workspaceMove.begin.mutate({
@@ -115,7 +121,9 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 							leaving.terminals,
 						);
 					}
-					assertEnvironmentOpens(prepared.repositoryFullName);
+					assertEnvironmentOpens(
+						prepared.snapshots.map((snapshot) => snapshot.repositoryFullName),
+					);
 					moveSignal.throwIfAborted();
 					onStage("starting");
 					const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
@@ -126,6 +134,9 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 						move: {
 							workspaceMoveId,
 							chatSessionIds: prepared.chats.map((chat) => chat.chatSessionId),
+							repositories: prepared.snapshots.map(
+								(snapshot) => snapshot.repositoryFullName,
+							),
 						},
 					});
 					return { prepared, created };
@@ -197,7 +208,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			workspace,
 			utils,
 			collections,
-			sourceRepository,
+			sourceRepositories,
 		],
 	);
 }

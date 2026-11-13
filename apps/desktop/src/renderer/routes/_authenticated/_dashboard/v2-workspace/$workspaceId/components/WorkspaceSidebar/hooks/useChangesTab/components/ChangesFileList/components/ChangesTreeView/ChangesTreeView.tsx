@@ -31,6 +31,7 @@ import {
 	type ChangesetFile,
 	getChangesetFileKey,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
+import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 import {
 	toAbsoluteWorkspacePath,
 	toRelativeWorkspacePath,
@@ -59,6 +60,7 @@ interface ChangesTreeViewProps {
 	/** Section the files came from; used to scope context-menu/hover Discard. */
 	sectionKind: SectionKind;
 	workspaceId: string;
+	repositoryId: string | undefined;
 	worktreePath?: string;
 	/** Absolute path of the file whose diff is currently open, if any. */
 	selectedFilePath?: string;
@@ -96,6 +98,7 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	files,
 	sectionKind,
 	workspaceId,
+	repositoryId,
 	worktreePath,
 	selectedFilePath,
 	selectedChangeKey,
@@ -227,8 +230,12 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	const utils = workspaceTrpc.useUtils();
 	const discardMutation = workspaceTrpc.git.discardChanges.useMutation({
 		onSuccess: () => {
-			void utils.git.getStatus.invalidate({ workspaceId });
-			void utils.git.getDiff.invalidate({ workspaceId });
+			void utils.git.getStatus.invalidate(
+				checkoutInput(workspaceId, repositoryId),
+			);
+			void utils.git.getDiff.invalidate(
+				checkoutInput(workspaceId, repositoryId),
+			);
 		},
 		onError: (err) => {
 			toast.error(
@@ -242,7 +249,10 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 		},
 	});
 
-	const { stageFile, unstageFile } = useStagingMutations(workspaceId);
+	const { stageFile, unstageFile } = useStagingMutations(
+		workspaceId,
+		repositoryId,
+	);
 
 	const fileMenuItems = (file: ChangesetFile) => (
 		<FileRowContextMenuItems
@@ -392,7 +402,7 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 						const target = discardTarget;
 						setDiscardTarget(null);
 						discardMutation.mutate({
-							workspaceId,
+							...checkoutInput(workspaceId, repositoryId),
 							filePath: target.path,
 						});
 					}}

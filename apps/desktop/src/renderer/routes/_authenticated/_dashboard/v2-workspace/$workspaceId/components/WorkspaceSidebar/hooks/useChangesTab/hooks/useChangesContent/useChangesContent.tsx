@@ -1,4 +1,3 @@
-import { workspaceTrpc } from "@superset/workspace-client";
 import { type ReactNode, useCallback, useMemo } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import type { FoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
@@ -8,46 +7,63 @@ import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboa
 import { useSidebarDiffRef } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useSidebarDiffRef";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { ChangesTabContent } from "../../components/ChangesTabContent";
+import { isDiffTargetForCheckout } from "./utils/isDiffTargetForCheckout";
 
 export interface SelectedDiffTarget {
-	/** Worktree-relative path of the file the diff pane last navigated to. */
+	/** Checkout-relative path of the file the diff pane last navigated to. */
 	path: string;
 	/** Disambiguates a path present in several sections (staged + unstaged). */
 	changeKey?: string;
+	/** The checkout that holds the file; absent while the pane has no checkout. */
+	repositoryId?: string;
 }
+
+export type SelectDiffFile = (
+	path: string,
+	openInNewTab?: boolean,
+	changeKey?: string,
+	repositoryId?: string,
+) => void;
 
 export interface ChangesContentParams {
 	workspaceId: string;
 	/** The diff pane's current target — echoed back as the row highlight. */
 	selectedDiffTarget?: SelectedDiffTarget;
 	/** openInNewTab=false navigates the workspace's diff pane; true opens a new diff tab. */
-	onSelectFile?: (
-		path: string,
-		openInNewTab?: boolean,
-		changeKey?: string,
-	) => void;
+	onSelectFile?: SelectDiffFile;
 	onOpenFile?: (absolutePath: string, openInNewTab?: boolean) => void;
 	/** The Changes pane's chrome: scope lives in the pane header, so the list
 	 * keeps only an always-open search and a view menu. */
 	compact?: boolean;
-	/** Tags files with workspaceId, for a list that mixes repositories. */
-	tagWorkspace?: boolean;
 	shared?: { query: string; foldSignal: FoldSignal };
 }
 
-/**
- * One checkout's Changes view. Reads git status from the nearest
- * WorkspaceGitStatusProvider, which must be for the same workspaceId.
- */
+interface CheckoutChangesContentParams extends ChangesContentParams {
+	repositoryId: string | undefined;
+	/** The checkout's folder; file paths are relative to it. */
+	worktreePath: string | undefined;
+	/** Tags files with repositoryId, for a list that shows several checkouts. */
+	tagRepository: boolean;
+	/** Set when the list shows several checkouts. */
+	repositoryName?: string;
+}
+
+/** One checkout's Changes view. */
 export function useChangesContent({
 	workspaceId,
+	repositoryId,
+	worktreePath,
 	selectedDiffTarget,
 	onSelectFile,
 	onOpenFile,
 	compact = false,
-	tagWorkspace = false,
+	tagRepository,
+	repositoryName,
 	shared,
-}: ChangesContentParams): { content: ReactNode; changedPathCount: number } {
+}: CheckoutChangesContentParams): {
+	content: ReactNode;
+	changedPathCount: number;
+} {
 	const {
 		status,
 		filter,
@@ -58,22 +74,19 @@ export function useChangesContent({
 		branches,
 		canRenameBranch,
 		renameBranch: handleRenameBranch,
-	} = useChangesScope(workspaceId);
+	} = useChangesScope(workspaceId, repositoryId);
 	const { preferences, setChangesViewMode: setViewMode } =
 		useV2UserPreferences();
 	const viewMode = preferences.changesViewMode;
 
-	const ref = useSidebarDiffRef(workspaceId);
+	const ref = useSidebarDiffRef(workspaceId, repositoryId);
 	const { files, isLoading } = useChangeset({
 		workspaceId,
+		repositoryId,
 		ref,
-		tagWorkspace,
+		tagRepository,
 	});
 
-	const workspaceQuery = workspaceTrpc.workspace.get.useQuery({
-		id: workspaceId,
-	});
-	const worktreePath = workspaceQuery.data?.worktreePath;
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 
 	const handleOpenInEditor = useCallback(
@@ -84,10 +97,23 @@ export function useChangesContent({
 		[worktreePath, openInExternalEditor],
 	);
 
+	const handleSelectFile = useMemo(
+		() =>
+			onSelectFile &&
+			((path: string, openInNewTab?: boolean, changeKey?: string) =>
+				onSelectFile(path, openInNewTab, changeKey, repositoryId)),
+		[onSelectFile, repositoryId],
+	);
+
 	// The list compares absolute paths — the contract its rows share with the
-	// Files tab — while the pane records worktree-relative targets.
+	// Files tab — while the pane records checkout-relative targets.
+	const targetsThisCheckout = isDiffTargetForCheckout({
+		targetRepositoryId: selectedDiffTarget?.repositoryId,
+		repositoryId,
+		isMultiRepo: tagRepository,
+	});
 	const selectedFilePath =
-		selectedDiffTarget && worktreePath
+		selectedDiffTarget && worktreePath && targetsThisCheckout
 			? toAbsoluteWorkspacePath(worktreePath, selectedDiffTarget.path)
 			: undefined;
 
@@ -103,6 +129,8 @@ export function useChangesContent({
 	const content = (
 		<ChangesTabContent
 			workspaceId={workspaceId}
+			repositoryId={repositoryId}
+			repositoryName={repositoryName}
 			status={status}
 			commits={commits}
 			branches={branches}
@@ -113,8 +141,10 @@ export function useChangesContent({
 			isLoading={isLoading}
 			worktreePath={worktreePath}
 			selectedFilePath={selectedFilePath}
-			selectedChangeKey={selectedDiffTarget?.changeKey}
-			onSelectFile={onSelectFile}
+			selectedChangeKey={
+				targetsThisCheckout ? selectedDiffTarget?.changeKey : undefined
+			}
+			onSelectFile={handleSelectFile}
 			onOpenFile={onOpenFile}
 			onOpenInEditor={handleOpenInEditor}
 			onFilterChange={setFilter}

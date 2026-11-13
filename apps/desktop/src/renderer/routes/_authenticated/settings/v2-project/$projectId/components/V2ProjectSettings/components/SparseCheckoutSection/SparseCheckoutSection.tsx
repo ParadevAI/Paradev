@@ -8,6 +8,9 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
 interface SparseCheckoutSectionProps {
 	projectId: string;
+	repositoryId: string;
+	/** The textarea id; a label points at it. */
+	inputId?: string;
 	hostUrl: string;
 	/** Current folders; empty means new worktrees get a full checkout. */
 	paths: string[];
@@ -38,6 +41,8 @@ function pathsEqual(a: string[], b: string[]): boolean {
 
 export function SparseCheckoutSection({
 	projectId,
+	repositoryId,
+	inputId = "project-sparse-checkout",
 	hostUrl,
 	paths,
 	onChanged,
@@ -98,6 +103,7 @@ export function SparseCheckoutSection({
 		mutationFn: (nextPaths: string[]) =>
 			getHostServiceClientByUrl(hostUrl).project.setSparseCheckoutPaths.mutate({
 				projectId,
+				repositoryId,
 				paths: nextPaths,
 			}),
 	});
@@ -236,7 +242,7 @@ export function SparseCheckoutSection({
 		<div className="space-y-1.5">
 			<Textarea
 				ref={textareaRef}
-				id="project-sparse-checkout"
+				id={inputId}
 				value={value}
 				onChange={(e) => handleChange(e.target.value)}
 				onBlur={handleBlur}

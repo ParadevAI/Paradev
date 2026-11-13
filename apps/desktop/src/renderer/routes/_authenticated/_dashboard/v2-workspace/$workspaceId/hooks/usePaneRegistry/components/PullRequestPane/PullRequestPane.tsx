@@ -23,7 +23,9 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { normalizeThreadsToComments } from "../../../../components/CommentsSection/utils/normalizeThreadsToComments";
+import { useWorkspaceCheckouts } from "../../../../state/activeRepositoryStore";
 import type { PagePaneData, PullRequestPaneData } from "../../../../types";
+import { checkoutInput } from "../../../../utils/checkoutInput";
 import { useOpenStackLayer } from "../../../useOpenStackLayer";
 import {
 	type OpenReviewDiff,
@@ -53,7 +55,6 @@ export function PullRequestPane({
 	const { workspace, hostUrl } = useWorkspace();
 	const organizationId = useActiveOrganizationId();
 	const detail = usePullRequestPaneDetail(data);
-	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
 	const isTabVisible = useIsTabVisible();
 	const target = useMemo<PullRequestTarget>(
 		() => ({
@@ -70,18 +71,27 @@ export function PullRequestPane({
 
 	// Pages and "open in diff" belong to the workspace, so they exist only
 	// when this workspace's linked PR is the one on screen.
-	const linkedWorkspaceId = usePullRequestCheckoutId(workspace.id, data);
-	const isLinkedPR = linkedWorkspaceId !== null;
-	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery({
-		workspaceId: linkedWorkspaceId ?? workspace.id,
+	const linkedRepositoryId = usePullRequestCheckoutId(workspace.id, data);
+	const isLinkedPR = linkedRepositoryId !== null;
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
+		repositoryId: linkedRepositoryId ?? undefined,
 	});
+	const checkouts = useWorkspaceCheckouts(workspace.id);
+	const workspaceRepositoryId =
+		linkedRepositoryId ??
+		(checkouts.length === 1 ? checkouts[0]?.repositoryId : undefined);
+	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery(
+		checkoutInput(workspace.id, workspaceRepositoryId),
+		{ enabled: workspaceRepositoryId !== undefined },
+	);
 	const evidence = usePullRequestEvidence(
-		linkedWorkspaceId ?? workspace.id,
+		workspace.id,
 		isLinkedPR && activeTab === "summary" && isTabVisible,
 	);
 	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
 	const onOpenInDiff = useReviewCommentNavigation(
-		linkedWorkspaceId ?? workspace.id,
+		workspace.id,
+		linkedRepositoryId ?? undefined,
 		onOpenDiff,
 	);
 	const prUrl =
@@ -126,6 +136,8 @@ export function PullRequestPane({
 					hostId: workspace.hostId,
 					hostUrl,
 					prNumber: data.number,
+					repoFullName: data.repoFullName,
+					repositoryId: isLinkedPR ? linkedRepositoryId : null,
 				}
 			: null,
 		flow.stack,

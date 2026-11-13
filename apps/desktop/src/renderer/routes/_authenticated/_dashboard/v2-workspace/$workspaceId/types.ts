@@ -56,8 +56,11 @@ export interface DiffPaneFilter {
 }
 
 export interface DiffPaneData {
+	/** Relative to the checkout of `repositoryId`. */
 	path: string;
 	changeKey?: string;
+	/** The checkout `path` is in; absent in panes saved before multi-repo workspaces. */
+	repositoryId?: string;
 	collapsedFiles: string[];
 	/** Line to scroll to within `path`. `focusTick` bumps on each navigation
 	 *  request so it can take precedence over an older cached scroll state. */

@@ -1,10 +1,9 @@
 import type { RendererContext } from "@superset/panes";
 import { useCallback } from "react";
-import { RepoPicker } from "../../../../../../components/RepoPicker";
 import { FilesTab } from "../../../../../../components/WorkspaceSidebar/components/FilesTab";
-import { useWorkspaceGitStatus } from "../../../../../../providers/WorkspaceGitStatusProvider";
 import type { FilePaneData, PaneViewerData } from "../../../../../../types";
 import { openFileFromTree } from "../../../../../../utils/openFileFromTree";
+import { useRootGitStatus } from "../../../../../useRootGitStatus";
 
 interface FileViewTreeProps {
 	context: RendererContext<PaneViewerData>;
@@ -19,7 +18,7 @@ export function FileViewTree({
 }: FileViewTreeProps) {
 	const { store } = context;
 	const paneId = context.pane.id;
-	const gitStatus = useWorkspaceGitStatus();
+	const gitStatus = useRootGitStatus(workspaceId);
 	const selectedFilePath =
 		context.pane.kind === "file"
 			? (context.pane.data as FilePaneData).filePath
@@ -38,14 +37,13 @@ export function FileViewTree({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<RepoPicker />
 			<div className="min-h-0 flex-1">
 				<FilesTab
 					variant="fileView"
 					onSelectFile={handleSelectFile}
 					selectedFilePath={selectedFilePath}
 					workspaceId={workspaceId}
-					gitStatus={gitStatus.data}
+					gitStatus={gitStatus}
 					onSearch={onSearch}
 				/>
 			</div>

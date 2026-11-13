@@ -2,18 +2,18 @@ import { describe, expect, test } from "bun:test";
 import { findRepositoryPullRequests } from "./findRepositoryPullRequests";
 
 const row = (
-	repositoryProjectId: string,
+	repositoryId: string,
 	prNumber: number,
 	headRefName: string,
 	state: "open" | "closed" = "open",
 ) => ({
 	prNumber,
-	title: `${repositoryProjectId} #${prNumber}`,
-	url: `https://github.com/o/${repositoryProjectId}/pull/${prNumber}`,
+	title: `${repositoryId} #${prNumber}`,
+	url: `https://github.com/o/${repositoryId}/pull/${prNumber}`,
 	state,
 	isDraft: false,
 	headRefName,
-	repositoryProjectId,
+	repositoryId,
 });
 
 describe("findRepositoryPullRequests", () => {

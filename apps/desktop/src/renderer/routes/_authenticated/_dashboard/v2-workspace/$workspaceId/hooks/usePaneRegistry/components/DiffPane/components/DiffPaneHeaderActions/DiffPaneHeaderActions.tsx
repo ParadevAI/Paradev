@@ -16,6 +16,7 @@ interface DiffPaneHeaderActionsProps {
 	/** Without the right pane area the top-bar PR badge toggles Changes, so the pane links the PR itself. */
 	prLink?: {
 		workspaceId: string;
+		repositoryId: string | undefined;
 		store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	};
 	commentNav: DiffViewToolbarCommentNav;
@@ -36,9 +37,7 @@ export function DiffPaneHeaderActions({
 	const { t } = useLingui();
 	return (
 		<div className="flex shrink-0 items-center gap-1">
-			{prLink && (
-				<DiffPanePRLink workspaceId={prLink.workspaceId} store={prLink.store} />
-			)}
+			{prLink && <DiffPanePRLink {...prLink} />}
 			{commentNav.total > 0 && (
 				<div className="hidden shrink-0 items-center gap-0.5 rounded-md bg-muted/50 px-1 @min-[520px]/pane-header:flex">
 					<LuMessageSquare

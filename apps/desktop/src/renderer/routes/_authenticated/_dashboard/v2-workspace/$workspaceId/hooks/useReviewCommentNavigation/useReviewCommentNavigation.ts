@@ -1,7 +1,11 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useSettings } from "renderer/stores/settings";
-import { useWorkspace } from "../../../providers/WorkspaceProvider";
+import {
+	useAreCheckoutsLoaded,
+	useWorkspaceCheckouts,
+} from "../../state/activeRepositoryStore";
 import type { DiffFocusSide, DiffPaneFilter } from "../../types";
+import { checkoutInput } from "../../utils/checkoutInput";
 import { getChangesetFileKey } from "../useChangeset";
 
 export type OpenReviewDiff = (
@@ -11,18 +15,21 @@ export type OpenReviewDiff = (
 	side?: DiffFocusSide,
 	changeKey?: string,
 	filter?: DiffPaneFilter,
+	repositoryId?: string,
 ) => void;
 
 export function useReviewCommentNavigation(
 	workspaceId: string,
+	repositoryId: string | undefined,
 	onSelectDiffFile?: OpenReviewDiff,
 ) {
-	// A checkout of a multi-repo workspace tags its diff entries with its id.
-	const checkoutId =
-		useWorkspace().workspace.id === workspaceId ? undefined : workspaceId;
+	// A multi-repo diff tags each entry with its repository.
+	const tag =
+		useWorkspaceCheckouts(workspaceId).length > 1 ? repositoryId : undefined;
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
-		{ workspaceId },
-		{ staleTime: Number.POSITIVE_INFINITY },
+		checkoutInput(workspaceId, repositoryId),
+		{ enabled: checkoutsLoaded, staleTime: Number.POSITIVE_INFINITY },
 	);
 	return onSelectDiffFile
 		? (
@@ -41,7 +48,7 @@ export function useReviewCommentNavigation(
 				const changeKey = baseBranchQuery.isSuccess
 					? getChangesetFileKey({
 							path,
-							workspaceId: checkoutId,
+							repositoryId: tag,
 							status: "modified",
 							additions: 0,
 							deletions: 0,
@@ -51,7 +58,15 @@ export function useReviewCommentNavigation(
 							},
 						})
 					: undefined;
-				onSelectDiffFile(path, openInNewTab ?? false, line, side, changeKey);
+				onSelectDiffFile(
+					path,
+					openInNewTab ?? false,
+					line,
+					side,
+					changeKey,
+					undefined,
+					repositoryId,
+				);
 			}
 		: undefined;
 }

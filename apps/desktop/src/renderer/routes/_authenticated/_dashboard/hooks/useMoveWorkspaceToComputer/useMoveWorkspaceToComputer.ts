@@ -24,6 +24,10 @@ import {
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
+import {
+	holdsExactRepositorySet,
+	repositoryFullNames,
+} from "../../utils/repositorySet";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
@@ -46,7 +50,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 		useLocalHostService();
 	const relayUrl = useRelayUrl();
 	const { workspaces: cloudWorkspaces = [] } = useCloudWorkspaces();
-	const { projects } = useHostProjects();
+	const { projects, hostResults } = useHostProjects();
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
 
@@ -79,26 +83,42 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			};
 			const destinationUrl = hostUrlOf(destination.hostId);
 			const fromCloud = cloudWorkspaces.some((row) => row.id === workspace.id);
-			const requireProject = (repositoryName: string) => {
-				const repository = repositoryName.toLowerCase();
-				const found = projects.find(
-					(row) =>
-						row.hostIds.includes(destination.hostId) &&
-						`${row.repoOwner}/${row.repoName}`.toLowerCase() === repository,
-				);
+			// The destination project holds exactly the repositories the workspace checks out.
+			const requireProject = (repositoryNames: string[]) => {
+				const found = hostResults
+					.find((result) => result.target.machineId === destination.hostId)
+					?.rows?.find((row) =>
+						holdsExactRepositorySet(row.repositories, repositoryNames),
+					);
 				if (found) return found;
 				const computer = destination.name;
+				const [only] = repositoryNames;
+				if (repositoryNames.length === 1 && only) {
+					throw new Error(
+						computer
+							? t`Add ${only} as a project on ${computer} first`
+							: t`Add ${only} as a project on this computer first`,
+					);
+				}
+				const repositories = repositoryNames.join(", ");
 				throw new Error(
 					computer
-						? t`Add ${repositoryName} as a project on ${computer} first`
-						: t`Add ${repositoryName} as a project on this computer first`,
+						? t`Add a project with exactly these repositories on ${computer} first: ${repositories}`
+						: t`Add a project with exactly these repositories on this computer first: ${repositories}`,
 				);
 			};
 			const sourceProject = projects.find(
 				(row) => row.id === workspace.projectId,
 			);
-			if (sourceProject?.repoOwner && sourceProject.repoName) {
-				requireProject(`${sourceProject.repoOwner}/${sourceProject.repoName}`);
+			const sourceRepositories = sourceProject
+				? repositoryFullNames(sourceProject.repositories)
+				: [];
+			// An early check only: the snapshots name the checkouts the workspace really has.
+			if (
+				sourceProject?.repositories.length === 1 &&
+				sourceRepositories.length === 1
+			) {
+				requireProject(sourceRepositories);
 			}
 			onStage("saving");
 			const { workspaceMoveId } =
@@ -146,7 +166,9 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 								leaving.terminals,
 							);
 						}
-						const project = requireProject(prepared.repositoryFullName);
+						const project = requireProject(
+							prepared.snapshots.map((snapshot) => snapshot.repositoryFullName),
+						);
 						moveSignal.throwIfAborted();
 
 						onStage("creating");
@@ -267,6 +289,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			relayUrl,
 			cloudWorkspaces,
 			projects,
+			hostResults,
 			submit,
 			collections,
 		],

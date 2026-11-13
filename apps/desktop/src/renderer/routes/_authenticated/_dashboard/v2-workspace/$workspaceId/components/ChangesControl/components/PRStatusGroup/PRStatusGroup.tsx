@@ -53,6 +53,7 @@ import { PRDetailCard } from "./components/PRDetailCard";
 interface PRStatusGroupProps {
 	state: PRFlowState;
 	workspaceId: string;
+	repositoryId: string | undefined;
 	onRefresh?: () => void;
 	/** Whether a Changes pane is in view — the face reads as pressed. */
 	isChangesOpen: boolean;
@@ -82,6 +83,7 @@ interface PRStatusGroupProps {
 export function PRStatusGroup({
 	state,
 	workspaceId,
+	repositoryId,
 	onRefresh,
 	isChangesOpen,
 	toggleLabel,
@@ -131,6 +133,8 @@ export function PRStatusGroup({
 					hostId: workspace.hostId,
 					hostUrl,
 					prNumber: pr.number,
+					repoFullName: `${pr.repoOwner}/${pr.repoName}`,
+					repositoryId: repositoryId ?? null,
 				}
 			: null,
 		flow.stack,
@@ -138,6 +142,7 @@ export function PRStatusGroup({
 	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
 		onSwitched: onRefresh,
 		layers: flow.stack?.layers,
+		repositoryId,
 	});
 	const pendingLayer =
 		usePendingStackLayer(workspaceId, pr?.number ?? null)?.layer ?? null;
@@ -152,6 +157,7 @@ export function PRStatusGroup({
 	const commitRequestedRef = useRef(false);
 	const shipActions = useShipActions({
 		workspaceId,
+		repositoryId,
 		onRefresh: () => onRefresh?.(),
 		isPrFormOpen: false,
 		onCommitted: () => setIsCommitFormOpen(false),

@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {# tệp đã thay đổi trong workspace này} 
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# tệp đã thay đổi} other {# tệp đã thay đổi}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# tệp} other {# tệp}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Đã sửa # tệp} other {Đã sửa # tệp}}"
 
@@ -1383,6 +1386,9 @@ msgstr "Còn {remaining} token"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# repository} other {Tất cả # repository}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "Đã chuyển {repositoryName} đến {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Đã hoàn tác thay đổi ở # tệp.} other {Đã hoàn tác thay đổi ở # tệp.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Hành động"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Hành động cho {0}"
 
@@ -2099,11 +2106,11 @@ msgstr "Thêm {0} vào workspace"
 msgid "Add {localizedName}?"
 msgstr "Thêm {localizedName}?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Hãy thêm {repositoryName} làm dự án trên {computer} trước"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Hãy thêm {only} làm dự án trên {computer} trước"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Hãy thêm {repositoryName} làm dự án trên máy tính này trước"
+msgid "Add {only} as a project on this computer first"
+msgstr "Hãy thêm {only} làm dự án trên máy tính này trước"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Thêm #{prNumber} vào hàng đợi merge?"
@@ -2128,6 +2135,12 @@ msgstr "Thêm một dự án để xem issue GitHub."
 
 msgid "Add a project to see pull requests."
 msgstr "Thêm một dự án để xem pull request."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Hãy thêm trước một dự án có đúng các repository này trên {computer}: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Hãy thêm trước một dự án có đúng các repository này trên máy tính này: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Thêm tóm tắt ngắn…"
@@ -4515,9 +4528,6 @@ msgstr "Chọn một đấu sĩ"
 msgid "Choose a folder"
 msgstr "Chọn thư mục"
 
-msgid "Choose a parent directory"
-msgstr "Chọn một thư mục cha"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Chọn một dự án trong mục Issue GitHub trước khi mở một issue."
 
@@ -4532,9 +4542,6 @@ msgstr "Chọn một mục."
 
 msgid "Choose agent"
 msgstr "Chọn agent"
-
-msgid "Choose an existing repo folder"
-msgstr "Chọn một thư mục repo có sẵn"
 
 msgid "Choose an MCP server"
 msgstr "Chọn một server MCP"
@@ -4752,13 +4759,6 @@ msgstr "Clone từ URL"
 
 msgid "clone the repository"
 msgstr "clone repository"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Clone repository, hoặc nhập một thư mục có sẵn trên host."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Đã clone vào {0}"
 
 msgid "Cloning…"
 msgstr "Đang clone…"
@@ -5122,9 +5122,6 @@ msgstr "Lệnh..."
 
 msgid "Commands"
 msgstr "Lệnh"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Các lệnh chạy khi thiết lập, dọn dẹp repository này và từ menu Chạy."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Các lệnh chạy khi thiết lập, dọn dẹp workspace và khi nhấn nút Chạy."
@@ -5887,6 +5884,9 @@ msgstr "Không thể thêm tác nhân"
 msgid "Could not add repository"
 msgstr "Không thể thêm repository"
 
+msgid "Could not add the repository"
+msgstr "Không thể thêm repository"
+
 msgid "Could not answer the agent"
 msgstr "Không thể trả lời agent"
 
@@ -6017,6 +6017,9 @@ msgstr "Không thể tải pull request này."
 msgid "Could not load your machines"
 msgstr "Không thể tải danh sách máy của bạn"
 
+msgid "Could not make it the primary repository"
+msgstr "Không thể đặt làm repository chính"
+
 msgid "Could not mark ready"
 msgstr "Không thể đánh dấu sẵn sàng"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "Không thể gỡ quyền truy cập"
 
 msgid "Could not remove repository"
+msgstr "Không thể gỡ repository"
+
+msgid "Could not remove the repository"
 msgstr "Không thể gỡ repository"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "Bỏ toàn bộ {0}"
 msgid "Discard all staged changes"
 msgstr "Bỏ toàn bộ thay đổi đã stage"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Bỏ toàn bộ thay đổi đã stage trong {repositoryName}?"
+
 msgid "Discard all staged changes?"
 msgstr "Bỏ toàn bộ thay đổi đã stage?"
 
 msgid "Discard all unstaged changes"
 msgstr "Bỏ toàn bộ thay đổi chưa stage"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Bỏ toàn bộ thay đổi chưa stage trong {repositoryName}?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Bỏ toàn bộ thay đổi chưa stage?"
@@ -8147,12 +8159,6 @@ msgstr "Nhập địa chỉ email đầy đủ"
 msgid "Enter a number"
 msgstr "Nhập một số"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Hãy nhập một thư mục cha trên {hostName}"
-
-msgid "Enter a path on {hostName}"
-msgstr "Hãy nhập một đường dẫn trên {hostName}"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Nhập một URL vào thanh tìm kiếm phía trên."
 
@@ -8294,11 +8300,8 @@ msgstr "Mỗi thứ Tư lúc 9h sáng, xem lại các PR đã merge trong tuần
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Mỗi ngày trong tuần lúc 9h sáng, đọc issue GitHub mới, gán nhãn và soạn câu trả lời đầu tiên để tôi xem lại."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Mỗi workspace của dự án nhiều repository sẽ checkout repository này cạnh các repository khác."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Mỗi workspace của dự án này checkout tất cả chúng, đặt cạnh nhau, trên một nhánh."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Mỗi workspace của dự án này checkout tất cả chúng, đặt cạnh nhau, trên một nhánh. Lệnh thiết lập và lệnh chạy lấy từ repository chính."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Ai cũng tranh cãi liệu điều này có khái quát được không. Chính cuộc tranh cãi đó là dấu hiệu mức này đã đạt được."
@@ -8350,12 +8353,6 @@ msgstr "Mọi thứ bạn đã đăng sẽ bị xóa, không phải ẩn đi. B�
 
 msgid "Executable"
 msgstr "Tệp thực thi"
-
-msgid "Existing repo path"
-msgstr "Đường dẫn repo có sẵn"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Đường dẫn repo có sẵn trên {hostName}"
 
 msgid "existing worktree"
 msgstr "worktree có sẵn"
@@ -9338,6 +9335,9 @@ msgstr "Chuyển focus tới ô tìm kiếm trong màn hình tác vụ"
 
 msgid "Folder"
 msgstr "Thư mục"
+
+msgid "Folder can't be read"
+msgstr "Không thể đọc thư mục"
 
 msgid "Folder is missing"
 msgstr "Thiếu thư mục"
@@ -10425,9 +10425,6 @@ msgstr "Nhập từng dự án v1 vào v2. Dự án đã nhập sẽ được đ
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Nhập từng tập lệnh terminal v1 vào v2."
-
-msgid "Import existing"
-msgstr "Nhập cái có sẵn"
 
 msgid "Import existing folder"
 msgstr "Nhập thư mục có sẵn"
@@ -11552,9 +11549,6 @@ msgstr "Dòng {0}–{1}"
 msgid "Link"
 msgstr "Liên kết"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Hãy liên kết một repository GitHub với dự án trước để có thể clone."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Đang tải thêm..."
 
 msgid "Loading more…"
 msgstr "Đang tải thêm…"
+
+msgid "Loading project repositories…"
+msgstr "Đang tải các repository của dự án…"
 
 msgid "Loading project…"
 msgstr "Đang tải dự án…"
@@ -11901,6 +11898,9 @@ msgstr "Đặt làm mặc định"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Đặt làm mặc định: mở terminal và agent mới trên tài khoản này."
+
+msgid "Make primary"
+msgstr "Đặt làm chính"
 
 msgid "Make public"
 msgstr "Công khai"
@@ -12522,9 +12522,6 @@ msgstr "Đang chuyển cuộc trò chuyện này đến đây"
 msgid "Moving this workspace…"
 msgstr "Đang chuyển không gian làm việc này…"
 
-msgid "Multi-repo project"
-msgstr "Dự án nhiều repository"
-
 msgid "Multi-select"
 msgstr "Chọn nhiều"
 
@@ -12983,6 +12980,9 @@ msgstr "Không có kênh nào"
 
 msgid "No chats found"
 msgstr "Không tìm thấy cuộc trò chuyện"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Không có checkout nào trong workspace này ở {currentBranchName}"
 
 msgid "No checks"
 msgstr "Không có check"
@@ -14581,6 +14581,9 @@ msgstr "Đang mở trong giao diện chat…"
 msgid "Opening pages"
 msgstr "Mở trang"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Mở các repository khác với workspace này"
+
 msgid "Operator"
 msgstr "Người vận hành"
 
@@ -15079,12 +15082,6 @@ msgstr "Số phiên song song trên mỗi nhà phát triển tăng gấp đôi s
 msgid "Parameters"
 msgstr "Tham số"
 
-msgid "Parent directory"
-msgstr "Thư mục cha"
-
-msgid "Parent directory on {hostName}"
-msgstr "Thư mục cha trên {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Một phần là ghi nhận, một phần là đặt cược. Hai mục đầu đang diễn ra. Phần còn lại được nêu đủ cụ thể để có thể sai."
 
@@ -15272,9 +15269,6 @@ msgstr "Chọn phần tử khác (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Chọn một thư mục trên ổ đĩa và thêm nó làm dự án"
 
-msgid "Pick a folder…"
-msgstr "Chọn một thư mục…"
-
 msgid "Pick a machine size"
 msgstr "Chọn kích thước máy"
 
@@ -15284,14 +15278,11 @@ msgstr "Chọn một mô hình"
 msgid "pick a name for the board"
 msgstr "chọn một tên cho bảng xếp hạng"
 
-msgid "Pick a parent directory"
-msgstr "Hãy chọn một thư mục cha"
-
-msgid "Pick a project location"
-msgstr "Hãy chọn vị trí dự án"
-
 msgid "Pick a reason"
 msgstr "Chọn lý do"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Chọn một thư mục repository trên {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Chọn một repository có tệp marketplace plugin. Superset đồng bộ plugin của nó ngay bây giờ và mỗi lần bạn đồng bộ lại."
@@ -15802,13 +15793,8 @@ msgstr "Dự án trên thiết bị khác"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Dự án đã sẵn sàng. Mở nó từ thanh bên."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Đã chuyển dự án tới {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Đã thiết lập dự án tại {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Đã chuyển dự án đến {newPath}"
 
 msgid "Project Settings"
 msgstr "Cài đặt dự án"
@@ -16494,6 +16480,9 @@ msgstr "Tải lại sẽ loại bỏ các chỉnh sửa của bạn. Ghi đè s�
 msgid "Relocate"
 msgstr "Chuyển vị trí"
 
+msgid "Relocate {repositoryName}?"
+msgstr "Chuyển vị trí {repositoryName}?"
+
 msgid "Relocate project?"
 msgstr "Chuyển vị trí dự án?"
 
@@ -16577,6 +16566,9 @@ msgstr "Xóa khỏi nhóm"
 
 msgid "Remove from queue"
 msgstr "Gỡ khỏi hàng đợi"
+
+msgid "Remove from project"
+msgstr "Gỡ khỏi dự án"
 
 msgid "Remove from Queue"
 msgstr "Bỏ khỏi hàng đợi"
@@ -16859,9 +16851,6 @@ msgstr "Đã gỡ repository"
 
 msgid "Repository root"
 msgstr "Thư mục gốc của repository"
-
-msgid "Repository settings"
-msgstr "Cài đặt repository"
 
 msgid "Repository URL or path"
 msgstr "URL hoặc đường dẫn repository"
@@ -17432,9 +17421,6 @@ msgstr "Chạy agent theo lịch hoặc khi có sự kiện xảy ra."
 msgid "Run agents side by side"
 msgstr "Chạy các agent cạnh nhau"
 
-msgid "Run all"
-msgstr "Chạy tất cả"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Chạy cả một đội quân"
@@ -17531,9 +17517,6 @@ msgstr "Chạy agent của bạn từ desktop, bất kỳ terminal nào, hoặc 
 
 msgid "Run your coding agents in the cloud."
 msgstr "Chạy agent lập trình của bạn trên đám mây."
-
-msgid "Run: {repositoryName}"
-msgstr "Chạy: {repositoryName}"
 
 msgid "Run."
 msgstr "Chạy."
@@ -18180,9 +18163,6 @@ msgstr "Chọn tổ chức"
 msgid "Select Organization Logo"
 msgstr "Chọn logo tổ chức"
 
-msgid "Select parent directory to clone into"
-msgstr "Chọn thư mục cha để clone vào"
-
 msgid "Select people"
 msgstr "Chọn người"
 
@@ -18416,9 +18396,6 @@ msgstr "Đặt dự án…"
 msgid "Set Run"
 msgstr "Đặt lệnh chạy"
 
-msgid "Set run script"
-msgstr "Đặt script chạy"
-
 msgid "Set this project"
 msgstr "Đặt dự án này"
 
@@ -18440,9 +18417,6 @@ msgstr "Thiết lập môi trường"
 
 msgid "Set up once"
 msgstr "Thiết lập một lần"
-
-msgid "Set up project on {hostName}"
-msgstr "Thiết lập dự án trên {hostName}"
 
 msgid "Set up project…"
 msgstr "Thiết lập dự án…"
@@ -19227,6 +19201,10 @@ msgstr "Thư rác hoặc lừa đảo"
 msgid "Sparse checkout"
 msgstr "Sparse checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Sparse checkout của {0}"
+
 msgid "Speaking"
 msgstr "Đang nói"
 
@@ -19619,9 +19597,6 @@ msgstr "Dừng {label}"
 
 msgid "Stop {name}"
 msgstr "Dừng {name}"
-
-msgid "Stop all"
-msgstr "Dừng tất cả"
 
 msgid "Stop dictation"
 msgstr "Dừng đọc chính tả"
@@ -20387,9 +20362,6 @@ msgstr "Mã đã hết hạn. Hãy bắt đầu lại."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Các lệnh Paradev chạy để thiết lập, chạy và lưu trữ các workspace của dự án này, từ config.toml của repository."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Các lệnh Paradev dùng để thiết lập, chạy và lưu trữ các bản checkout của repository này, lấy từ config.toml của nó."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Công ty đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn công ty là một trong những startup nổi bật tại YC Demo Day."
 
@@ -20492,6 +20464,9 @@ msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thi�
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Máy chủ đã trở lại với {0}, không phải {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "Host đã tạo một dự án không có repository"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "Máy chủ không hoạt động trở lại trong vòng mười lăm phút."
@@ -20923,8 +20898,8 @@ msgstr "Email này đã được đăng ký bằng phương thức đăng nhập
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment này không có repository nào. Hãy tạo một environment có repository trong Settings, rồi khởi động workspace từ environment đó"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Môi trường này mở {environmentRepository}, không phải {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Môi trường này mở {environmentRepositories}, không phải {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Các repository của environment này đã cố định; hãy promote lại một workspace để thay đổi"
@@ -21091,6 +21066,9 @@ msgstr "Pull request này không còn khả dụng."
 msgid "This pull request link is invalid."
 msgstr "Liên kết pull request này không hợp lệ."
 
+msgid "This pull request's repository is not known"
+msgstr "Không xác định được repository của pull request này"
+
 msgid "This recording is too long to transcribe"
 msgstr "Bản ghi âm này quá dài để chuyển thành văn bản"
 
@@ -21241,6 +21219,9 @@ msgstr "Workspace này"
 
 msgid "This workspace has no project to branch from"
 msgstr "Workspace này không có dự án để tạo nhánh"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Workspace này vẫn đang tải. Hãy thử lại."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace này có thể đã bị gỡ, hoặc bạn không còn quyền truy cập."
@@ -22217,9 +22198,6 @@ msgstr "Dùng tài khoản này"
 
 msgid "Use this folder"
 msgstr "Dùng thư mục này"
-
-msgid "Use this repo"
-msgstr "Dùng repo này"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Dùng cách này để sửa các terminal bị kẹt hoặc không phản hồi."

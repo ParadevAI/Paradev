@@ -1,7 +1,10 @@
 import { workspaceTrpc } from "@superset/workspace-client";
+import { useMemo } from "react";
+import { flattenCheckoutPullRequests } from "../../../../utils/flattenCheckoutPullRequests";
 
 const REFRESH_MS = 30_000;
 
+/** Every pull request the workspace linked, each tagged with its checkout's repository. */
 export function useWorkspacePullRequests(
 	workspaceId: string,
 	{ enabled }: { enabled: boolean },
@@ -14,5 +17,6 @@ export function useWorkspacePullRequests(
 			staleTime: 10_000,
 		},
 	);
-	return query.data?.workspaces[0]?.pullRequests ?? [];
+	const checkouts = query.data?.workspaces[0]?.checkouts;
+	return useMemo(() => flattenCheckoutPullRequests(checkouts), [checkouts]);
 }

@@ -33,6 +33,8 @@ interface FsEventsPayload {
 }
 
 export interface GitChangedPayload {
+	/** The checkout that changed; null when the event is not about one checkout. */
+	repositoryId?: string | null;
 	/**
 	 * Worktree-relative paths when the event was worktree-only. Absent for
 	 * broad state changes (`.git/` activity) — treat as "invalidate everything".
@@ -340,6 +342,7 @@ function handleMessage(state: ConnectionState, data: unknown): void {
 			});
 		} else if (message.type === "git:changed") {
 			(entry.callback as EventListener<"git:changed">)(message.workspaceId, {
+				repositoryId: message.repositoryId,
 				paths: message.paths,
 			});
 		} else if (message.type === "agent:lifecycle") {

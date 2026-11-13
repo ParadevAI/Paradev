@@ -34,8 +34,6 @@ const NARROW_LAYOUTS: Record<"tree" | "split" | "file", number[]> = {
 interface FileViewLayoutProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
-	/** The checkout the shown file is in, when it differs from the tree's. */
-	fileWorkspaceId?: string;
 	showTree: boolean;
 	onSearch?: () => void;
 	children?: ReactNode;
@@ -44,7 +42,6 @@ interface FileViewLayoutProps {
 export function FileViewLayout({
 	context,
 	workspaceId,
-	fileWorkspaceId = workspaceId,
 	showTree,
 	onSearch,
 	children,
@@ -199,7 +196,7 @@ export function FileViewLayout({
 			{filePath && (
 				<FileBreadcrumb
 					key={filePath}
-					workspaceId={fileWorkspaceId}
+					workspaceId={workspaceId}
 					filePath={filePath}
 					onOpenFile={(path) =>
 						openFileFromTree({
@@ -212,7 +209,7 @@ export function FileViewLayout({
 			)}
 			{filePath && (
 				<FileViewFloatingActions
-					workspaceId={fileWorkspaceId}
+					workspaceId={workspaceId}
 					filePath={filePath}
 					treeToggle={
 						isNarrow

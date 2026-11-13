@@ -45,6 +45,8 @@ export function PullRequestDetailContent({
 		data?: PullRequestDetail | null;
 		isLoading: boolean;
 		isResolvingProject?: boolean;
+		/** The project repository that holds the PR, when known. */
+		repositoryId?: string | null;
 		error: unknown;
 		refetch: () => unknown;
 	};
@@ -126,6 +128,7 @@ export function PullRequestDetailContent({
 							hostId={hostId}
 							prNumber={prNumber}
 							prUrl={prUrl}
+							repositoryId={detail.repositoryId ?? null}
 						/>
 					</Suspense>
 				</div>

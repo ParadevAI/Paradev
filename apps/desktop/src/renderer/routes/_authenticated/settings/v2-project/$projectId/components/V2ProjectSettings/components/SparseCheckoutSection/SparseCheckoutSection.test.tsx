@@ -8,6 +8,7 @@ test("SparseCheckoutSection opens on the host row's folders, one per line", () =
 		<QueryClientProvider client={new QueryClient()}>
 			<SparseCheckoutSection
 				projectId="project-1"
+				repositoryId="repository-1"
 				hostUrl="http://127.0.0.1:7777"
 				paths={["apps/desktop", "packages/ui"]}
 				onChanged={() => {}}

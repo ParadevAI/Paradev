@@ -5,18 +5,20 @@ import { LuContainer, LuRefreshCw, LuSettings } from "react-icons/lu";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { repositoryFullNames as fullNamesOf } from "../../../../utils/repositorySet";
 import { MOVE_MENU_PRIMITIVES, type MoveMenuKind } from "../../constants";
+import { splitEnvironmentsByRepositorySet } from "./utils/splitEnvironmentsByRepositorySet";
 
 interface MoveToCloudItemsProps {
 	menu: MoveMenuKind;
 	projectId: string | null;
 	onSelectEnvironment: (environment: {
 		id: string;
-		repositoryFullName: string | null;
+		repositoryFullNames: string[];
 	}) => void;
 }
 
-/** Only environments that open the workspace's repository: a move refuses any other. */
+/** Only environments that open exactly the workspace's repositories: a move refuses any other. */
 export function MoveToCloudItems({
 	menu,
 	projectId,
@@ -29,24 +31,23 @@ export function MoveToCloudItems({
 	const project = projects.find(
 		(row) => row.projectKey === projectId || row.id === projectId,
 	);
-	const repository =
-		project?.repoOwner && project.repoName
-			? `${project.repoOwner}/${project.repoName}`.toLowerCase()
+	const names = project ? fullNamesOf(project.repositories) : [];
+	const repositoryFullNames =
+		project && names.length > 0 && names.length === project.repositories.length
+			? names
 			: null;
 	const environmentsQuery = cloudTrpc.environment.list.useQuery(
 		{ organizationId: organizationId ?? "" },
-		{ enabled: !!organizationId && repository !== null },
+		{ enabled: !!organizationId && repositoryFullNames !== null },
 	);
-	const environments = startableCloudEnvironments(
-		environmentsQuery.data ?? [],
-	).filter(
-		(environment) =>
-			environment.repositories?.[0]?.fullName.toLowerCase() === repository,
-	);
+	const environments = splitEnvironmentsByRepositorySet({
+		environments: startableCloudEnvironments(environmentsQuery.data ?? []),
+		repositoryFullNames,
+	}).matching;
 
 	return (
 		<>
-			{repository !== null && environmentsQuery.isLoading ? (
+			{repositoryFullNames !== null && environmentsQuery.isLoading ? (
 				<Item disabled>
 					<Trans>Loading…</Trans>
 				</Item>
@@ -71,8 +72,10 @@ export function MoveToCloudItems({
 					onSelect={() =>
 						onSelectEnvironment({
 							id: environment.id,
-							repositoryFullName:
-								environment.repositories?.[0]?.fullName ?? null,
+							repositoryFullNames:
+								environment.repositories?.map(
+									(repository) => repository.fullName,
+								) ?? [],
 						})
 					}
 				>

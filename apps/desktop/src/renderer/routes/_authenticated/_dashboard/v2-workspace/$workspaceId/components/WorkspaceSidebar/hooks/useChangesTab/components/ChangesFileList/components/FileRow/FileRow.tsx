@@ -43,6 +43,7 @@ import {
 	type ChangesetFile,
 	getChangesetFileKey,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
+import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { useFileDrag } from "../../hooks/useFileDrag";
 import { useStagingMutations } from "../../hooks/useStagingMutations";
@@ -51,6 +52,7 @@ import { StageToggleButton } from "../StageToggleButton";
 interface FileRowProps {
 	file: ChangesetFile;
 	workspaceId: string;
+	repositoryId: string | undefined;
 	worktreePath?: string;
 	/** Hide the directory prefix — used when the row sits under a folder group. */
 	hideDir?: boolean;
@@ -64,6 +66,7 @@ interface FileRowProps {
 export const FileRow = memo(function FileRow({
 	file,
 	workspaceId,
+	repositoryId,
 	worktreePath,
 	hideDir,
 	isSelected,
@@ -86,8 +89,12 @@ export const FileRow = memo(function FileRow({
 	const utils = workspaceTrpc.useUtils();
 	const discardMutation = workspaceTrpc.git.discardChanges.useMutation({
 		onSuccess: () => {
-			void utils.git.getStatus.invalidate({ workspaceId });
-			void utils.git.getDiff.invalidate({ workspaceId });
+			void utils.git.getStatus.invalidate(
+				checkoutInput(workspaceId, repositoryId),
+			);
+			void utils.git.getDiff.invalidate(
+				checkoutInput(workspaceId, repositoryId),
+			);
 		},
 		onError: (err) => {
 			toast.error(
@@ -102,9 +109,15 @@ export const FileRow = memo(function FileRow({
 	});
 	const confirmDiscard = () => {
 		setShowDiscardConfirm(false);
-		discardMutation.mutate({ workspaceId, filePath: file.path });
+		discardMutation.mutate({
+			...checkoutInput(workspaceId, repositoryId),
+			filePath: file.path,
+		});
 	};
-	const { stageFile, unstageFile } = useStagingMutations(workspaceId);
+	const { stageFile, unstageFile } = useStagingMutations(
+		workspaceId,
+		repositoryId,
+	);
 
 	const policy = useChangesSidebarFilePolicy();
 	const diffNewTabTier = policy.tierForIntent("diffNewTab");

@@ -11,6 +11,7 @@ import { FileRow } from "../FileRow";
 interface ChangesFoldersViewProps {
 	files: ChangesetFile[];
 	workspaceId: string;
+	repositoryId: string | undefined;
 	worktreePath?: string;
 	/** Absolute path of the diff pane's open file — highlights its row. */
 	selectedFilePath?: string;
@@ -34,6 +35,7 @@ interface ChangesFoldersViewProps {
 export const ChangesFoldersView = memo(function ChangesFoldersView({
 	files,
 	workspaceId,
+	repositoryId,
 	worktreePath,
 	selectedFilePath,
 	selectedChangeKey,
@@ -56,6 +58,7 @@ export const ChangesFoldersView = memo(function ChangesFoldersView({
 				<FileRow
 					file={file}
 					workspaceId={workspaceId}
+					repositoryId={repositoryId}
 					worktreePath={worktreePath}
 					hideDir
 					isSelected={

@@ -1,5 +1,7 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
+import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 import {
 	type BranchSyncStatus,
 	type PullRequest as FlowPullRequest,
@@ -15,12 +17,14 @@ interface UsePRFlowStateResult {
 
 export function usePRFlowState(
 	workspaceId: string,
+	repositoryId: string | undefined,
 	{ enabled = true }: { enabled?: boolean } = {},
 ): UsePRFlowStateResult {
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const prQuery = workspaceTrpc.git.getPullRequest.useQuery(
-		{ workspaceId },
+		checkoutInput(workspaceId, repositoryId),
 		{
-			enabled: enabled && !!workspaceId,
+			enabled: enabled && checkoutsLoaded && !!workspaceId,
 			refetchInterval: 10_000,
 			refetchOnWindowFocus: true,
 			staleTime: 10_000,
@@ -28,9 +32,9 @@ export function usePRFlowState(
 	);
 
 	const syncQuery = workspaceTrpc.git.getBranchSyncStatus.useQuery(
-		{ workspaceId },
+		checkoutInput(workspaceId, repositoryId),
 		{
-			enabled: enabled && !!workspaceId,
+			enabled: enabled && checkoutsLoaded && !!workspaceId,
 			refetchInterval: 10_000,
 			refetchOnWindowFocus: true,
 			staleTime: 5_000,

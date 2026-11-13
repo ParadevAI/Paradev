@@ -1,6 +1,7 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
+import { flattenCheckoutPullRequests } from "../../utils/flattenCheckoutPullRequests";
 import { newestPullRequests } from "./utils/newestPullRequests";
 
 const PAGE_LIMIT = 4;
@@ -20,7 +21,7 @@ export function useNewTabLists(workspaceId: string) {
 	return {
 		pages: pages.data?.items.slice(0, PAGE_LIMIT) ?? [],
 		pullRequests: newestPullRequests(
-			history.data?.workspaces[0]?.pullRequests ?? [],
+			flattenCheckoutPullRequests(history.data?.workspaces[0]?.checkouts),
 		).map((pr) => ({
 			...pr,
 			ref: {

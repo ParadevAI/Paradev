@@ -15,14 +15,27 @@ export const PROJECT_ICON_NONE = "none";
  * (sidebar, settings, pickers, workspace lists) must go through it so a custom
  * icon shows everywhere, not just where it was set.
  */
-export function resolveProjectIconUrl(project: {
-	icon: string | null;
-	repoOwner: string | null;
-}): string | null {
+export function resolveProjectIconUrl(
+	project:
+		| { icon: string | null; repoOwner: string | null }
+		| {
+				icon: string | null;
+				primaryRepositoryId: string;
+				repositories: { id: string; owner: string | null }[];
+		  },
+): string | null {
 	if (project.icon === PROJECT_ICON_NONE) return null;
 	if (project.icon) return project.icon;
-	if (project.repoOwner) {
-		return `https://github.com/${project.repoOwner}.png?size=64`;
+	const owner =
+		"repositories" in project
+			? (
+					project.repositories.find(
+						(r) => r.id === project.primaryRepositoryId,
+					) ?? project.repositories[0]
+				)?.owner
+			: project.repoOwner;
+	if (owner) {
+		return `https://github.com/${owner}.png?size=64`;
 	}
 	return null;
 }

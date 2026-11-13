@@ -26,7 +26,11 @@ import { LuGitPullRequest } from "react-icons/lu";
 import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { env } from "renderer/env.renderer";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	findHostProjectRow,
+	getPrimaryRepository,
+	useHostProjects,
+} from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
@@ -223,26 +227,32 @@ export function NewWorkspaceScreen({
 	// case (Esc-cancelled drags, drops outside the window) that an enter/leave
 	// counter gets permanently stuck on.
 	// ── Projects ─────────────────────────────────────────────────────
-	const { projects: hostProjects, isReady: areProjectsReady } =
-		useHostProjects();
+	const {
+		projects: hostProjects,
+		hostResults: hostProjectResults,
+		isReady: areProjectsReady,
+	} = useHostProjects();
 	const setUpProjectIds = useSelectedHostProjectIds(hostId);
 	const projects = useMemo(
 		() =>
 			hostProjects
 				.filter((project) => Boolean(project.projectKey))
-				.map((project) => ({
-					id: project.projectKey,
-					name: project.name,
-					githubOwner: project.repoOwner,
-					githubRepoName: project.repoName,
-					iconUrl: project.repoOwner
-						? `https://github.com/${project.repoOwner}.png?size=64`
-						: null,
-					needsSetup:
-						setUpProjectIds === null
-							? null
-							: !setUpProjectIds.has(project.projectKey),
-				})),
+				.map((project) => {
+					const primary = getPrimaryRepository(project);
+					return {
+						id: project.projectKey,
+						name: project.name,
+						githubOwner: primary?.owner ?? null,
+						githubRepoName: primary?.repoName ?? null,
+						iconUrl: primary?.owner
+							? `https://github.com/${primary.owner}.png?size=64`
+							: null,
+						needsSetup:
+							setUpProjectIds === null
+								? null
+								: !setUpProjectIds.has(project.projectKey),
+					};
+				}),
 		[hostProjects, setUpProjectIds],
 	);
 
@@ -363,10 +373,14 @@ export function NewWorkspaceScreen({
 		(project) => project.id === projectId,
 	);
 	const needsSetup = !isCloudHost && selectedProject?.needsSetup === true;
-	// A container project has no checkout of its own to work in locally.
-	const isContainerProject = hostProjects.some(
-		(project) => project.id === projectId && project.kind === "container",
-	);
+	const selectedHostProject = isCloudHost
+		? undefined
+		: findHostProjectRow(hostProjectResults, hostId, projectId);
+	const projectRepositories = selectedHostProject?.repositories ?? [];
+	const isMultiRepoProject = projectRepositories.length > 1;
+	const primaryRepositoryId = selectedHostProject
+		? (getPrimaryRepository(selectedHostProject)?.id ?? null)
+		: null;
 	const singleRepositoryOnly = t({
 		message: "Only supported in projects with a single repository",
 	});
@@ -456,9 +470,9 @@ export function NewWorkspaceScreen({
 		projectId,
 		hostId,
 		linkedPR,
-		enabled: isContainerProject,
+		enabled: isMultiRepoProject,
 	});
-	const linkedPRUrl = isContainerProject ? (linkedPR?.url ?? null) : null;
+	const linkedPRUrl = isMultiRepoProject ? (linkedPR?.url ?? null) : null;
 	useEffect(() => {
 		if (linkedPRUrl === null) {
 			if (draft.repositoryPullRequestsFor !== null) {
@@ -786,6 +800,7 @@ export function NewWorkspaceScreen({
 	// ── Base branch ──────────────────────────────────────────────────
 	const { pickerProps } = useBranchPickerController({
 		projectId,
+		repositoryId: primaryRepositoryId,
 		hostId,
 		remoteHostPresence: selectedRemoteHostPresence,
 		cloudRepository,
@@ -830,6 +845,7 @@ export function NewWorkspaceScreen({
 		resolvedEnvironment?.id ?? null,
 		hostId,
 		isSession,
+		{ primaryRepositoryId, isMultiRepo: isMultiRepoProject },
 	);
 
 	const submitBlocker = useMemo<string | null>(() => {
@@ -864,8 +880,11 @@ export function NewWorkspaceScreen({
 				message: "Host service is not running",
 			});
 		}
+		if (!isSession && !primaryRepositoryId)
+			return t({ message: "Loading project repositories…" });
 		return null;
 	}, [
+		primaryRepositoryId,
 		isCloudHost,
 		cloudEnabled,
 		isProjectPending,
@@ -1165,7 +1184,7 @@ export function NewWorkspaceScreen({
 					}
 				/>
 			)}
-			{linkedPR && !isContainerProject ? (
+			{linkedPR && !isMultiRepoProject ? (
 				<>
 					<CheckoutPickerPill
 						checkout="worktree"
@@ -1179,7 +1198,7 @@ export function NewWorkspaceScreen({
 				</>
 			) : isCloudHost ? (
 				<CompareBaseBranchPicker {...pickerProps} />
-			) : isSession ? null : isContainerProject ? (
+			) : isSession ? null : isMultiRepoProject ? (
 				<>
 					<CheckoutPickerPill
 						checkout="worktree"
@@ -1189,6 +1208,7 @@ export function NewWorkspaceScreen({
 					{projectId && (
 						<RepositoryBranchesPicker
 							projectId={projectId}
+							repositories={projectRepositories}
 							hostId={hostId}
 							baseBranches={draft.repositoryBaseBranches}
 							pullRequests={draft.repositoryPullRequests}

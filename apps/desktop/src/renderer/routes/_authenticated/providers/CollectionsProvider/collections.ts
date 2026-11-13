@@ -18,6 +18,7 @@ import {
 	dashboardSidebarSectionSchema,
 	type FailedWorkspaceCreateRow,
 	failedWorkspaceCreateSchema,
+	healFailedWorkspaceCreate,
 	healV2UserPreferences,
 	healWorkspaceLocalState,
 	type V2TerminalPresetRow,
@@ -230,12 +231,15 @@ function createOrgCollections(organizationId: string): OrgCollections {
 
 	const failedWorkspaceCreates = createIndexedCollection(
 		localStorageCollectionOptions(
-			hardenLocalCollection({
-				id: `failed_workspace_creates-${organizationId}`,
-				storageKey: `failed-workspace-creates-${organizationId}`,
-				schema: failedWorkspaceCreateSchema,
-				getKey: (item: FailedWorkspaceCreateRow) => item.id,
-			}),
+			hardenLocalCollection(
+				{
+					id: `failed_workspace_creates-${organizationId}`,
+					storageKey: `failed-workspace-creates-${organizationId}`,
+					schema: failedWorkspaceCreateSchema,
+					getKey: (item: FailedWorkspaceCreateRow) => item.id,
+				},
+				healFailedWorkspaceCreate,
+			),
 		),
 	);
 

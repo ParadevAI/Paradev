@@ -4,13 +4,19 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback } from "react";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
+import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 
-export function useStagingMutations(workspaceId: string) {
+export function useStagingMutations(
+	workspaceId: string,
+	repositoryId: string | undefined,
+) {
 	const { t } = useLingui();
 	const utils = workspaceTrpc.useUtils();
 	const invalidate = () => {
-		void utils.git.getStatus.invalidate({ workspaceId });
-		void utils.git.getDiff.invalidate({ workspaceId });
+		void utils.git.getStatus.invalidate(
+			checkoutInput(workspaceId, repositoryId),
+		);
+		void utils.git.getDiff.invalidate(checkoutInput(workspaceId, repositoryId));
 	};
 	const { mutate: stage } = workspaceTrpc.git.stageFile.useMutation({
 		onSuccess: invalidate,
@@ -31,13 +37,21 @@ export function useStagingMutations(workspaceId: string) {
 
 	const stageFile = useCallback(
 		(file: ChangesetFile) =>
-			stage({ workspaceId, filePath: file.path, oldPath: file.oldPath }),
-		[stage, workspaceId],
+			stage({
+				...checkoutInput(workspaceId, repositoryId),
+				filePath: file.path,
+				oldPath: file.oldPath,
+			}),
+		[stage, workspaceId, repositoryId],
 	);
 	const unstageFile = useCallback(
 		(file: ChangesetFile) =>
-			unstage({ workspaceId, filePath: file.path, oldPath: file.oldPath }),
-		[unstage, workspaceId],
+			unstage({
+				...checkoutInput(workspaceId, repositoryId),
+				filePath: file.path,
+				oldPath: file.oldPath,
+			}),
+		[unstage, workspaceId, repositoryId],
 	);
 
 	return { stageFile, unstageFile };

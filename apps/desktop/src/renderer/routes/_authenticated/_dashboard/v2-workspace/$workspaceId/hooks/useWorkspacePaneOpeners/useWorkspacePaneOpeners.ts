@@ -56,6 +56,7 @@ export function useWorkspacePaneOpeners({
 		side?: DiffFocusSide,
 		changeKey?: string,
 		filter?: DiffPaneFilter,
+		repositoryId?: string,
 	) => void;
 	addTerminalTab: () => Promise<void>;
 	addBrowserTab: () => void;
@@ -75,6 +76,7 @@ export function useWorkspacePaneOpeners({
 			side?: DiffFocusSide,
 			changeKey?: string,
 			filter?: DiffPaneFilter,
+			repositoryId?: string,
 		) => {
 			viewer.reveal();
 			const state = viewer.store.getState();
@@ -85,6 +87,7 @@ export function useWorkspacePaneOpeners({
 				focusSide: line != null ? side : undefined,
 				focusTick: Date.now(),
 				filter,
+				repositoryId,
 			};
 			if (openInNewTab) {
 				state.addTab({

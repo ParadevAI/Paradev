@@ -12,8 +12,8 @@ const readme: ChangesetFile = {
 
 describe("getChangesetFileKey", () => {
 	it("keeps the same path in two checkouts apart", () => {
-		expect(getChangesetFileKey({ ...readme, workspaceId: "api" })).not.toBe(
-			getChangesetFileKey({ ...readme, workspaceId: "web" }),
+		expect(getChangesetFileKey({ ...readme, repositoryId: "api" })).not.toBe(
+			getChangesetFileKey({ ...readme, repositoryId: "web" }),
 		);
 	});
 

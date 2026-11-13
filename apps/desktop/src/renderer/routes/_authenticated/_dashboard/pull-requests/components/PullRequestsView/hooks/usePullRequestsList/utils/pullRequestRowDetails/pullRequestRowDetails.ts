@@ -1,12 +1,8 @@
 interface PullRequestRowKey {
 	projectId: string;
 	prNumber: number;
-	/** The repository of a multi-repo project, which serves its details. */
-	repositoryProjectId?: string;
-}
-
-function sourceProjectId(row: PullRequestRowKey): string {
-	return row.repositoryProjectId ?? row.projectId;
+	/** The project's repository holding the PR. */
+	repositoryId?: string;
 }
 
 type PullRequestRowDetailField =
@@ -27,9 +23,14 @@ type PullRequestRowDetails<TRow extends PullRequestRow> = Pick<
 	keyof PullRequestRowKey | PullRequestRowDetailField
 >;
 
-/** PR numbers repeat across repositories, so a row is its project plus its number. */
+/** PR numbers repeat across repositories, so a row is its project, repository and number. */
 export function pullRequestRowKey(row: PullRequestRowKey): string {
-	return `${sourceProjectId(row)}:${row.prNumber}`;
+	return `${row.projectId}:${row.repositoryId ?? ""}:${row.prNumber}`;
+}
+
+/** The host serves details for one-repository projects only, without the repository. */
+function projectRowKey(row: PullRequestRowKey): string {
+	return `${row.projectId}::${row.prNumber}`;
 }
 
 function mergeRowDetails<
@@ -44,10 +45,19 @@ function mergeRowDetails<
 	const detailByKey = new Map(
 		details.map((detail) => [pullRequestRowKey(detail), detail]),
 	);
+	const rowsPerProjectKey = new Map<string, number>();
+	for (const row of page.pullRequests) {
+		const key = projectRowKey(row);
+		rowsPerProjectKey.set(key, (rowsPerProjectKey.get(key) ?? 0) + 1);
+	}
 	return {
 		...page,
 		pullRequests: page.pullRequests.map((row) => {
-			const detail = detailByKey.get(pullRequestRowKey(row));
+			const detail =
+				detailByKey.get(pullRequestRowKey(row)) ??
+				(rowsPerProjectKey.get(projectRowKey(row)) === 1
+					? detailByKey.get(projectRowKey(row))
+					: undefined);
 			if (!detail) return row;
 			return {
 				...row,
@@ -90,15 +100,20 @@ export function carryOverPullRequestRowDetails<
 
 export function pullRequestNumbersByProject(
 	rows: readonly PullRequestRowKey[],
-): { projectId: string; prNumbers: number[] }[] {
-	const numbersByProject = new Map<string, number[]>();
+): { projectId: string; repositoryId?: string; prNumbers: number[] }[] {
+	const groups = new Map<
+		string,
+		{ projectId: string; repositoryId?: string; prNumbers: number[] }
+	>();
 	for (const row of rows) {
-		const numbers = numbersByProject.get(sourceProjectId(row)) ?? [];
-		numbers.push(row.prNumber);
-		numbersByProject.set(sourceProjectId(row), numbers);
+		const key = `${row.projectId}:${row.repositoryId ?? ""}`;
+		const group = groups.get(key) ?? {
+			projectId: row.projectId,
+			...(row.repositoryId ? { repositoryId: row.repositoryId } : {}),
+			prNumbers: [],
+		};
+		group.prNumbers.push(row.prNumber);
+		groups.set(key, group);
 	}
-	return [...numbersByProject].map(([projectId, prNumbers]) => ({
-		projectId,
-		prNumbers,
-	}));
+	return [...groups.values()];
 }

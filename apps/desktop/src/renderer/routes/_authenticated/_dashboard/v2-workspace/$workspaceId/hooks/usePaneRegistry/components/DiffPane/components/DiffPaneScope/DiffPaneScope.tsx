@@ -8,6 +8,8 @@ import { RepositoryFilter } from "./components/RepositoryFilter";
 
 interface DiffPaneScopeProps {
 	workspaceId: string;
+	/** The checkout whose scope the header controls. */
+	repositoryId: string | undefined;
 	additions: number;
 	deletions: number;
 	filter?: DiffPaneFilter | undefined;
@@ -19,6 +21,7 @@ interface DiffPaneScopeProps {
 /** The Changes pane header's left side: which diff it shows, and its totals. */
 export function DiffPaneScope({
 	workspaceId,
+	repositoryId,
 	additions,
 	deletions,
 	filter,
@@ -26,7 +29,7 @@ export function DiffPaneScope({
 	repositoryFilter,
 }: DiffPaneScopeProps) {
 	const { t } = useLingui();
-	const scope = useChangesScope(workspaceId);
+	const scope = useChangesScope(workspaceId, repositoryId);
 	const status = scope.status.data;
 	const clearLabel = t({ message: "Show all changes" });
 	return (

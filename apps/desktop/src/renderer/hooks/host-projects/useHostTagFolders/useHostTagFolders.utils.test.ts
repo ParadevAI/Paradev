@@ -46,11 +46,9 @@ const legacyResult = (
 	rows: [
 		{
 			id: setting("#ff0000").scope,
-			repoPath: "/tmp/project",
 			name: "Project",
-			repoOwner: null,
-			repoName: null,
-			repoUrl: null,
+			primaryRepositoryId: "repository",
+			repositories: [],
 			worktreeBaseDir: null,
 			icon: null,
 			color: null,

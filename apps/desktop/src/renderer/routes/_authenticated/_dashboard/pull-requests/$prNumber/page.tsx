@@ -79,7 +79,14 @@ function PullRequestDetailPage() {
 	const flow = usePullRequestMergeFlow({ target });
 	const restack = useStackRestack(
 		detail.projectId && hostId && hostUrl && prNumber !== null
-			? { projectId: detail.projectId, hostId, hostUrl, prNumber }
+			? {
+					projectId: detail.projectId,
+					hostId,
+					hostUrl,
+					prNumber,
+					repoFullName: detail.repoFullName,
+					repositoryId: detail.repositoryId,
+				}
 			: null,
 		flow.stack,
 	);
@@ -131,6 +138,7 @@ function PullRequestDetailPage() {
 					<PullRequestActions
 						target={target}
 						projectId={detail.projectId}
+						repositoryId={detail.repositoryId}
 						hostId={hostId}
 						hostUrl={hostUrl}
 						data={detail.data}

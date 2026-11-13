@@ -14,6 +14,8 @@ import {
 import { findPullRequestWorkspace } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/findPullRequestWorkspace";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { useWorkspaceCheckouts } from "../../state/activeRepositoryStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 import { useStackSwitchStore } from "./stores/stackSwitchStore";
 
 const LAYER_WORKSPACE_STALE_MS = 60_000;
@@ -32,6 +34,8 @@ export function useOpenStackLayer(
 		onSwitched?: () => void;
 		/** The stack's layers, so a later click finds its answers ready. */
 		layers?: readonly PullRequestStackLayer[];
+		/** The checkout the stack belongs to; a workspace of several checkouts needs it to switch. */
+		repositoryId?: string;
 	} = {},
 ): (layer: PullRequestStackLayer) => void {
 	const { t } = useLingui();
@@ -39,8 +43,12 @@ export function useOpenStackLayer(
 	const queryClient = useQueryClient();
 	const { workspace, hostUrl } = useWorkspace();
 	const projectId = workspace.projectId ?? null;
-	const { onSwitched, layers } = options;
-	const canSwitch = hostUrl !== null && workspace.type !== "session";
+	const { onSwitched, layers, repositoryId } = options;
+	const checkouts = useWorkspaceCheckouts(workspace.id);
+	const canSwitch =
+		hostUrl !== null &&
+		workspace.type !== "session" &&
+		(checkouts.length <= 1 || repositoryId !== undefined);
 
 	const layerWorkspace = useCallback(
 		(prNumber: number) =>
@@ -65,12 +73,12 @@ export function useOpenStackLayer(
 		for (const layer of openLayers) void layerWorkspace(layer.number);
 		void getHostServiceClientByUrl(hostUrl)
 			.git.fetchBranches.mutate({
-				workspaceId: workspace.id,
+				...checkoutInput(workspace.id, repositoryId),
 				branches: openLayers.map((layer) => layer.headRefName),
 				missingOnly: true,
 			})
 			.catch(() => {});
-	}, [warmKey, canSwitch, hostUrl, workspace.id, layerWorkspace]);
+	}, [warmKey, canSwitch, hostUrl, workspace.id, repositoryId, layerWorkspace]);
 
 	return useCallback(
 		(layer) => {
@@ -100,7 +108,7 @@ export function useOpenStackLayer(
 				const host = getHostServiceClientByUrl(hostUrl);
 				try {
 					await host.git.checkoutBranch.mutate({
-						workspaceId: workspace.id,
+						...checkoutInput(workspace.id, repositoryId),
 						branch: layer.headRefName,
 					});
 				} catch (error) {
@@ -118,7 +126,7 @@ export function useOpenStackLayer(
 				});
 				void host.git.fetchBranches
 					.mutate({
-						workspaceId: workspace.id,
+						...checkoutInput(workspace.id, repositoryId),
 						branches: [layer.headRefName],
 						missingOnly: false,
 					})
@@ -147,6 +155,7 @@ export function useOpenStackLayer(
 			canSwitch,
 			workspace.id,
 			hostUrl,
+			repositoryId,
 		],
 	);
 }

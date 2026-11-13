@@ -19,7 +19,7 @@ import {
 	Square,
 	X,
 } from "lucide-react";
-import { type ReactNode, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
 import { useHotkeyDisplay } from "renderer/hotkeys";
@@ -42,9 +42,6 @@ interface WorkspaceMoreMenuProps {
 	isRunning: boolean;
 	isRunPending: boolean;
 	canForceStop: boolean;
-	hasRunCommand: boolean;
-	/** The per-repository rows of a multi-repo workspace. */
-	repositoryRunItems?: ReactNode;
 	onToggleRun: () => void | Promise<void>;
 	onForceStopRun: () => void | Promise<void>;
 }
@@ -56,8 +53,6 @@ export function WorkspaceMoreMenu({
 	isRunning,
 	isRunPending,
 	canForceStop,
-	hasRunCommand,
-	repositoryRunItems,
 	onToggleRun,
 	onForceStopRun,
 }: WorkspaceMoreMenuProps) {
@@ -69,12 +64,10 @@ export function WorkspaceMoreMenu({
 	});
 	const configureRun = useConfigureWorkspaceRun(projectId, runDefinition);
 	const runHotkey = useHotkeyDisplay("RUN_WORKSPACE_COMMAND").text;
+	const hasRunCommand = (runDefinition?.commands ?? []).length > 0;
 	const label = t({ message: "More actions" });
 	const { workspace } = useWorkspace();
-	const moveDirections = useWorkspaceMoveDirections(
-		workspace.hostId,
-		workspace.projectId,
-	);
+	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const actionPendingRef = useRef(false);
 	const openAfterClose = (action: () => void) => {
@@ -127,36 +120,34 @@ export function WorkspaceMoreMenu({
 							<DropdownMenuSeparator />
 						</>
 					)}
-					{repositoryRunItems ?? (
-						<DropdownMenuItem
-							disabled={isRunPending}
-							onClick={() => {
-								if (!hasRunCommand && !isRunning) {
-									configureRun();
-									return;
-								}
-								void onToggleRun();
-							}}
-						>
-							{isRunning ? (
-								<Square className="size-4" />
-							) : hasRunCommand ? (
-								<Play className="size-4" />
-							) : (
-								<Settings className="size-4" />
-							)}
-							{isRunning ? (
-								<Trans>Stop</Trans>
-							) : hasRunCommand ? (
-								<Trans>Run</Trans>
-							) : (
-								<Trans>Set Run</Trans>
-							)}
-							{(isRunning || hasRunCommand) && runHotkey !== "Unassigned" && (
-								<DropdownMenuShortcut>{runHotkey}</DropdownMenuShortcut>
-							)}
-						</DropdownMenuItem>
-					)}
+					<DropdownMenuItem
+						disabled={isRunPending}
+						onClick={() => {
+							if (!hasRunCommand && !isRunning) {
+								configureRun();
+								return;
+							}
+							void onToggleRun();
+						}}
+					>
+						{isRunning ? (
+							<Square className="size-4" />
+						) : hasRunCommand ? (
+							<Play className="size-4" />
+						) : (
+							<Settings className="size-4" />
+						)}
+						{isRunning ? (
+							<Trans>Stop</Trans>
+						) : hasRunCommand ? (
+							<Trans>Run</Trans>
+						) : (
+							<Trans>Set Run</Trans>
+						)}
+						{(isRunning || hasRunCommand) && runHotkey !== "Unassigned" && (
+							<DropdownMenuShortcut>{runHotkey}</DropdownMenuShortcut>
+						)}
+					</DropdownMenuItem>
 					{canForceStop && (
 						<DropdownMenuItem
 							onClick={() => void onForceStopRun()}
@@ -166,7 +157,7 @@ export function WorkspaceMoreMenu({
 							<Trans>Force Stop</Trans>
 						</DropdownMenuItem>
 					)}
-					{!repositoryRunItems && (isRunning || hasRunCommand) && (
+					{(isRunning || hasRunCommand) && (
 						<DropdownMenuItem onClick={configureRun}>
 							<Settings className="size-4" />
 							{runDefinition?.source === "terminal-preset" ? (

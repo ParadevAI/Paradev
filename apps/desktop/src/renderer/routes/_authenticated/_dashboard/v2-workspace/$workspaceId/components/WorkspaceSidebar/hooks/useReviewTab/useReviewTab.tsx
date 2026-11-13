@@ -18,6 +18,7 @@ import type { NormalizedComment, NormalizedPR } from "./types";
 
 interface UseReviewTabParams {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	onOpenComment?: (comment: CommentPaneData) => void;
 	onOpenPullRequest?: OpenPullRequestPane;
 	onOpenInDiff?: (
@@ -30,12 +31,16 @@ interface UseReviewTabParams {
 
 export function useReviewTab({
 	workspaceId,
+	repositoryId,
 	onOpenComment,
 	onOpenPullRequest,
 	onOpenInDiff,
 }: UseReviewTabParams): SidebarTabDefinition {
 	const { t } = useLingui();
-	const { query: prQuery, target } = useLinkedPullRequest(workspaceId);
+	const { query: prQuery, target } = useLinkedPullRequest(
+		workspaceId,
+		repositoryId,
+	);
 	const hasPR = prQuery.isSuccess && prQuery.data != null;
 	const threadsQuery = usePullRequestThreads(target, { enabled: hasPR });
 
@@ -77,6 +82,7 @@ export function useReviewTab({
 			<div className="min-h-0 flex-1">
 				<ReviewTabContent
 					workspaceId={workspaceId}
+					repositoryId={repositoryId}
 					pullRequest={target}
 					commentsUnavailable={
 						needsGithubConnection(threadsQuery.error)

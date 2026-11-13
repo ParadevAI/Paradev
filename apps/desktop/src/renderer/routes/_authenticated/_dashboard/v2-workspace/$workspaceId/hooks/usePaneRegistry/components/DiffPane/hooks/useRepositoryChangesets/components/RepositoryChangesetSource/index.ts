@@ -1,1 +1,4 @@
-export { RepositoryChangesetSource } from "./RepositoryChangesetSource";
+export {
+	type RepositoryChangeset,
+	RepositoryChangesetSource,
+} from "./RepositoryChangesetSource";

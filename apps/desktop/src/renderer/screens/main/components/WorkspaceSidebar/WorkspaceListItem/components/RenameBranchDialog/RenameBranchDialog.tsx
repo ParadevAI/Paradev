@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import {
@@ -11,12 +12,14 @@ import {
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
+import { HostWorkspacesContext } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { resolveRenameTargets } from "./utils/resolveRenameTargets";
 
 interface RenameBranchDialogProps {
 	workspaceId: string;
@@ -33,6 +36,7 @@ export function RenameBranchDialog({
 	onOpenChange,
 	onAfterRename,
 }: RenameBranchDialogProps) {
+	const { t } = useLingui();
 	const [value, setValue] = useState(currentBranchName);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const electronUtils = electronTrpc.useUtils();
@@ -44,6 +48,12 @@ export function RenameBranchDialog({
 	const hostTarget = useWorkspaceHostTarget(workspaceId);
 	const workspaceHostUrl =
 		hostTarget.status === "ready" ? hostTarget.url : activeHostUrl;
+	const hostWorkspaces = useContext(HostWorkspacesContext);
+	const checkouts = hostWorkspaces
+		? hostWorkspaces.workspaces.find(
+				(workspace) => workspace.id === workspaceId,
+			)?.checkouts
+		: null;
 
 	useEffect(() => {
 		if (open) setValue(currentBranchName);
@@ -62,12 +72,32 @@ export function RenameBranchDialog({
 			return;
 		}
 
+		const targets = resolveRenameTargets({ checkouts, currentBranchName });
+		if (targets.kind === "unknown-workspace") {
+			toast.error(
+				t({ message: "This workspace is still loading. Try again." }),
+			);
+			return;
+		}
+		if (targets.kind === "no-match") {
+			toast.error(
+				t({
+					message: `No checkout in this workspace is on ${currentBranchName}`,
+				}),
+			);
+			return;
+		}
 		const client = getHostServiceClientByUrl(workspaceHostUrl);
-		const renamePromise = client.git.renameBranch.mutate({
-			workspaceId,
-			oldName: currentBranchName,
-			newName: trimmed,
-		});
+		const renamePromise = (async () => {
+			for (const repositoryId of targets.repositoryIds) {
+				await client.git.renameBranch.mutate({
+					workspaceId,
+					repositoryId,
+					oldName: currentBranchName,
+					newName: trimmed,
+				});
+			}
+		})();
 
 		toast.promise(renamePromise, {
 			loading: `Renaming branch to ${trimmed}...`,

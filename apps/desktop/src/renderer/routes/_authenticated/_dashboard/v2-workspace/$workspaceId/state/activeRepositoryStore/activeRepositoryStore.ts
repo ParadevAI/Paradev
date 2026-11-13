@@ -1,19 +1,36 @@
+import type { AppRouter } from "@superset/host-service";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useCallback } from "react";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { WorkspaceLocalStateRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import { areCheckoutsSettled } from "./utils/areCheckoutsSettled";
+import { pickActiveRepositoryId } from "./utils/pickActiveRepositoryId";
 
-export function useWorkspaceRepositories(workspaceId: string) {
-	// A host older than workspace.repositories errors here; the workspace
-	// then reads as its own single repository.
-	return (
-		workspaceTrpc.workspace.repositories.useQuery(
-			{ workspaceId },
-			{ retry: false, staleTime: 30_000 },
-		).data ?? []
+export type WorkspaceCheckout =
+	inferRouterOutputs<AppRouter>["workspace"]["get"]["checkouts"][number];
+
+const NO_CHECKOUTS: WorkspaceCheckout[] = [];
+
+function useWorkspaceQuery(workspaceId: string) {
+	return workspaceTrpc.workspace.get.useQuery(
+		{ id: workspaceId },
+		{ staleTime: 30_000 },
 	);
+}
+
+/** The workspace's checkouts, one per repository, sorted by name; empty until loaded. */
+export function useWorkspaceCheckouts(
+	workspaceId: string,
+): WorkspaceCheckout[] {
+	return useWorkspaceQuery(workspaceId).data?.checkouts ?? NO_CHECKOUTS;
+}
+
+/** Whether the checkouts are known (or failed to load), so a git call can name its repository. */
+export function useAreCheckoutsLoaded(workspaceId: string): boolean {
+	return areCheckoutsSettled(useWorkspaceQuery(workspaceId));
 }
 
 export function useWorkspaceLocalStateRow(
@@ -30,38 +47,26 @@ export function useWorkspaceLocalStateRow(
 	return rows[0];
 }
 
-/** The workspace id the git and file panes read: the picked repository's checkout. */
-export function useActiveRepositoryWorkspaceId(workspaceId: string): string {
-	const repositories = useWorkspaceRepositories(workspaceId);
+/** The repository the picker selected; undefined for a workspace without checkouts. */
+export function useActiveRepositoryId(workspaceId: string): string | undefined {
+	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const picked = useWorkspaceLocalStateRow(workspaceId)?.activeRepositoryId;
-	return (
-		repositories.find((repository) => repository.id === picked)?.id ??
-		repositories[0]?.id ??
-		workspaceId
-	);
+	return pickActiveRepositoryId(checkouts, picked);
 }
 
 export function useSelectRepository(): (
 	workspaceId: string,
-	repositoryWorkspaceId: string,
+	repositoryId: string,
 ) => void {
 	const collections = useCollections();
 	return useCallback(
-		(workspaceId, repositoryWorkspaceId) => {
+		(workspaceId, repositoryId) => {
 			const row = collections.v2WorkspaceLocalState.get(workspaceId);
-			if (!row || row.activeRepositoryId === repositoryWorkspaceId) return;
+			if (!row || row.activeRepositoryId === repositoryId) return;
 			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
-				draft.activeRepositoryId = repositoryWorkspaceId;
+				draft.activeRepositoryId = repositoryId;
 			});
 		},
 		[collections],
 	);
-}
-
-/** Whether the workspace is a multi-repo folder, even one holding a single checkout. */
-export function hasCheckouts(
-	workspaceId: string,
-	repositories: Array<{ id: string }>,
-): boolean {
-	return repositories.some((repository) => repository.id !== workspaceId);
 }

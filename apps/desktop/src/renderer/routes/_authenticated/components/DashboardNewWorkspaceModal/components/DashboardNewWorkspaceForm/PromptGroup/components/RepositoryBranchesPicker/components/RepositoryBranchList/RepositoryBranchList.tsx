@@ -7,6 +7,7 @@ import { BranchCommand } from "../../../BranchCommand";
 import { BranchLoadFailure } from "../../../BranchLoadFailure";
 
 interface RepositoryBranchListProps {
+	projectId: string;
 	repositoryId: string;
 	hostId: string | null;
 	selectedBranch: string | null;
@@ -14,6 +15,7 @@ interface RepositoryBranchListProps {
 }
 
 export function RepositoryBranchList({
+	projectId,
 	repositoryId,
 	hostId,
 	selectedBranch,
@@ -21,7 +23,9 @@ export function RepositoryBranchList({
 }: RepositoryBranchListProps) {
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState<BranchFilter>("all");
-	const context = useBranchContext(repositoryId, hostId, search, filter);
+	const context = useBranchContext(projectId, hostId, search, filter, {
+		repositoryId,
+	});
 	const { fetchNextPage, refetch } = context;
 	const onLoadMore = useCallback(() => {
 		void fetchNextPage();

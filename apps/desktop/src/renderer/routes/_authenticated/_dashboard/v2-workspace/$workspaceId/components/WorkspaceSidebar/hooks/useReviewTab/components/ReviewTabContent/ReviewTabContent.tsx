@@ -13,6 +13,7 @@ import { PRHeader } from "../PRHeader";
 
 interface ReviewTabContentProps {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	pullRequest: PullRequestTarget | null;
 	commentsUnavailable: CommentsUnavailable;
 	pr: NormalizedPR | null;
@@ -32,6 +33,7 @@ interface ReviewTabContentProps {
 
 export const ReviewTabContent = memo(function ReviewTabContent({
 	workspaceId,
+	repositoryId,
 	pullRequest,
 	commentsUnavailable,
 	pr,
@@ -77,6 +79,7 @@ export const ReviewTabContent = memo(function ReviewTabContent({
 
 			<ChecksSection
 				workspaceId={workspaceId}
+				repositoryId={repositoryId}
 				checks={pr.checks}
 				checksStatus={pr.checksStatus}
 				prUrl={pr.url}

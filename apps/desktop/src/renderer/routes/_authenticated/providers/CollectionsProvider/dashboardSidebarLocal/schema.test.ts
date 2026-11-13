@@ -4,6 +4,7 @@ import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
 import {
 	DEFAULT_V2_USER_PREFERENCES,
 	dashboardSidebarSectionSchema,
+	healFailedWorkspaceCreate,
 	healV2UserPreferences,
 	healWorkspaceLocalState,
 	sanitizePaneLayout,
@@ -623,5 +624,22 @@ describe("dashboardSidebarSectionSchema (Sessions scope)", () => {
 				createdAt: new Date().toISOString(),
 			}),
 		).toThrow();
+	});
+});
+
+describe("healFailedWorkspaceCreate", () => {
+	it("drops a failed create stored with the retired top-level shape and keeps the current one", () => {
+		const row = (input: Record<string, unknown>) => ({
+			id: "00000000-0000-4000-8000-000000000000",
+			hostId: "host",
+			input: { projectId: "p", ...input },
+			error: "boom",
+			failedAt: new Date().toISOString(),
+		});
+		expect(() =>
+			healFailedWorkspaceCreate(row({ worktreePath: "/w" })),
+		).toThrow();
+		const current = row({ checkouts: { r: { worktreePath: "/w" } } });
+		expect(healFailedWorkspaceCreate(current)).toBe(current);
 	});
 });

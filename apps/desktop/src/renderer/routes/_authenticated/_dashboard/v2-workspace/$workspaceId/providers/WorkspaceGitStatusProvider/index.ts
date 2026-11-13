@@ -1,4 +1,6 @@
+export type { CheckoutGitStatus } from "./types";
 export {
-	useWorkspaceGitStatus,
+	useCheckoutGitStatus,
+	useCheckoutGitStatuses,
 	WorkspaceGitStatusProvider,
 } from "./WorkspaceGitStatusProvider";

@@ -1,14 +1,20 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
+import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
 import { useChangesFilter } from "../../state/repositoryChangesFilterStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 import type { DiffRef } from "../useChangeset/types";
 
-export function useSidebarDiffRef(workspaceId: string): DiffRef {
-	const filter = useChangesFilter(workspaceId);
+export function useSidebarDiffRef(
+	workspaceId: string,
+	repositoryId: string | undefined,
+): DiffRef {
+	const filter = useChangesFilter(workspaceId, repositoryId);
 
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
-		{ workspaceId },
-		{ staleTime: Number.POSITIVE_INFINITY },
+		checkoutInput(workspaceId, repositoryId),
+		{ enabled: checkoutsLoaded, staleTime: Number.POSITIVE_INFINITY },
 	);
 	const baseBranch = baseBranchQuery.data?.baseBranch ?? null;
 

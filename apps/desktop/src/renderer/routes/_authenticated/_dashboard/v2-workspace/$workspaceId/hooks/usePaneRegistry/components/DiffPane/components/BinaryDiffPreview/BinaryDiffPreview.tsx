@@ -10,6 +10,8 @@ import { DiffSidePreview } from "./components/DiffSidePreview";
 interface BinaryDiffPreviewProps {
 	file: ChangesetFile;
 	workspaceId: string;
+	/** The checkout of an untagged file. */
+	repositoryId: string | undefined;
 	worktreePath?: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
 }
@@ -33,6 +35,7 @@ function pickBytesView(path: string): FileView | null {
 export function BinaryDiffPreview({
 	file,
 	workspaceId,
+	repositoryId,
 	worktreePath,
 	onOpenFile,
 }: BinaryDiffPreviewProps) {
@@ -107,6 +110,7 @@ export function BinaryDiffPreview({
 								side={side}
 								view={sideView}
 								workspaceId={workspaceId}
+								repositoryId={repositoryId}
 								worktreePath={worktreePath}
 							/>
 						</div>

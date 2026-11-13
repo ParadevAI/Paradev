@@ -15,12 +15,16 @@ import { draftLinkedContext } from "renderer/routes/_authenticated/components/Ag
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
-import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
+import {
+	type SubmitArgs,
+	useWorkspaceCreates,
+} from "renderer/stores/workspace-creates";
 import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
 import { resolveNames } from "./resolveNames";
+import { buildCheckoutsInput } from "./utils/buildCheckoutsInput";
 
 interface Overrides {
 	cloudEnvironmentId?: string;
@@ -47,6 +51,13 @@ export function useSubmitWorkspace(
 	cloudEnvironmentId: string | null = null,
 	hostId: string | null = null,
 	isSession = false,
+	{
+		primaryRepositoryId,
+		isMultiRepo,
+	}: { primaryRepositoryId: string | null; isMultiRepo: boolean } = {
+		primaryRepositoryId: null,
+		isMultiRepo: false,
+	},
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -282,23 +293,14 @@ export function useSubmitWorkspace(
 				return false;
 			}
 
-			// Multi-repo: the PR picked first names the branch, so it goes first.
-			const repositoryPullRequests =
-				draft.repositoryPullRequestsFor === null
-					? null
-					: Object.entries(draft.repositoryPullRequests)
-							.filter(
-								([repositoryId]) => !draft.repositoryWorktrees[repositoryId],
-							)
-							.sort(([, a], [, b]) => Number(a.matched) - Number(b.matched))
-							.map(
-								([repositoryId, pr]) => [repositoryId, pr.prNumber] as const,
-							);
-			const isPrCheckout = repositoryPullRequests
-				? repositoryPullRequests.length > 0
-				: linkedPR !== null;
-			// A PR always needs its own worktree; otherwise the picker decides.
-			const isLocalCheckout = !isPrCheckout && draft.checkout === "local";
+			const checkoutsInput = buildCheckoutsInput({
+				draft,
+				linkedPR,
+				primaryRepositoryId,
+				isMultiRepo,
+			});
+			const { isPrCheckout } = checkoutsInput;
+			const isLocalCheckout = checkoutsInput.checkout === "local";
 
 			const linkedTaskId = linkedIssues.find(
 				(issue) => issue.source === "internal" && issue.taskId,
@@ -356,7 +358,7 @@ export function useSubmitWorkspace(
 					: undefined;
 			const namingAgent = openAsChat ? selectedAgent : undefined;
 			const workspaceId = crypto.randomUUID();
-			const snapshot = isSession
+			const snapshot: SubmitArgs["snapshot"] = isSession
 				? {
 						id: workspaceId,
 						projectId: null,
@@ -387,30 +389,8 @@ export function useSubmitWorkspace(
 								draft.branchNameFromProvider
 									? true
 									: undefined,
-							pr:
-								isPrCheckout && !repositoryPullRequests
-									? linkedPR?.prNumber
-									: undefined,
-							repositoryPullRequests:
-								repositoryPullRequests && repositoryPullRequests.length > 0
-									? Object.fromEntries(repositoryPullRequests)
-									: undefined,
-							baseBranch: draft.baseBranch ?? undefined,
-							repositoryBaseBranches:
-								Object.keys(draft.repositoryBaseBranches).length > 0
-									? draft.repositoryBaseBranches
-									: undefined,
-							repositoryWorktrees:
-								Object.keys(draft.repositoryWorktrees).length > 0
-									? Object.fromEntries(
-											Object.entries(draft.repositoryWorktrees).map(
-												([repositoryId, worktree]) => [
-													repositoryId,
-													worktree.path,
-												],
-											),
-										)
-									: undefined,
+							checkouts: checkoutsInput.checkouts,
+							pullRequest: checkoutsInput.pullRequest,
 							taskId: linkedTaskId,
 							agents,
 							namingPrompt: isPrCheckout ? undefined : namingPrompt,
@@ -486,6 +466,8 @@ export function useSubmitWorkspace(
 			uploadAttachments,
 			utils,
 			cloudEnvironmentId,
+			primaryRepositoryId,
+			isMultiRepo,
 		],
 	);
 

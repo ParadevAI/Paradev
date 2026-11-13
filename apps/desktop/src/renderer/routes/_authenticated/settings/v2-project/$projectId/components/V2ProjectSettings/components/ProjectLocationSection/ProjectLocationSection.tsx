@@ -17,18 +17,17 @@ import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import { LuFolderOpen } from "react-icons/lu";
 import { RemotePathPicker } from "renderer/components/RemotePathPicker";
+import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { ClickablePath } from "../../../../../../components/ClickablePath";
-import { SetupProjectModal } from "../SetupProjectModal";
 
 interface ProjectLocationSectionProps {
 	projectId: string;
-	projectName?: string;
-	currentPath: string | null;
-	isPathMissing: boolean;
-	repoCloneUrl: string | null;
+	/** Null when the project has no row on the targeted host. */
+	repository: Pick<HostRepository, "id" | "path" | "pathState"> | null;
+	/** Set when the project has several repositories, to name the one moved. */
+	repositoryName?: string;
 	hostUrl: string | null;
 	hostName: string;
 	isRemoteTarget: boolean;
@@ -37,10 +36,8 @@ interface ProjectLocationSectionProps {
 
 export function ProjectLocationSection({
 	projectId,
-	projectName,
-	currentPath,
-	isPathMissing,
-	repoCloneUrl,
+	repository,
+	repositoryName,
 	hostUrl,
 	hostName,
 	isRemoteTarget,
@@ -48,12 +45,12 @@ export function ProjectLocationSection({
 }: ProjectLocationSectionProps) {
 	const { t } = useLingui();
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
-	const { ensureProjectInSidebar } = useDashboardSidebarState();
 
 	const [pendingPath, setPendingPath] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [setupOpen, setSetupOpen] = useState(false);
 	const [changeBrowseOpen, setChangeBrowseOpen] = useState(false);
+	const currentPath = repository?.path ?? null;
+	const isPathMissing = repository !== null && repository.pathState !== "ok";
 
 	const pickPath = async (title: string) => {
 		if (!hostUrl) {
@@ -112,7 +109,7 @@ export function ProjectLocationSection({
 	};
 
 	const handleConfirmRelocate = async () => {
-		if (!pendingPath) return;
+		if (!pendingPath || !repository) return;
 		if (!hostUrl) {
 			toast.error(
 				t({
@@ -124,16 +121,19 @@ export function ProjectLocationSection({
 		setIsSubmitting(true);
 		try {
 			const client = getHostServiceClientByUrl(hostUrl);
-			const result = await client.project.setup.mutate({
+			const result = await client.project.relocateRepository.mutate({
 				projectId,
-				mode: { kind: "import", repoPath: pendingPath, allowRelocate: true },
+				repositoryId: repository.id,
+				path: pendingPath,
 			});
+			const newPath =
+				result.repositories.find((r) => r.id === repository.id)?.path ??
+				pendingPath;
 			toast.success(
-				t({
-					message: `Project relocated to ${result.repoPath}`,
-				}),
+				repositoryName
+					? t({ message: `${repositoryName} relocated to ${newPath}` })
+					: t({ message: `Project relocated to ${newPath}` }),
 			);
-			ensureProjectInSidebar(projectId);
 			onChanged?.();
 			setPendingPath(null);
 		} catch (err) {
@@ -182,38 +182,19 @@ export function ProjectLocationSection({
 					</div>
 					{isPathMissing && (
 						<p className="text-xs text-destructive">
-							<Trans>Folder is missing</Trans>
+							{repository?.pathState === "inaccessible" ? (
+								<Trans>Folder can't be read</Trans>
+							) : (
+								<Trans>Folder is missing</Trans>
+							)}
 						</p>
 					)}
 				</div>
 			) : (
-				<div className="flex items-center gap-3">
-					<span className="text-sm text-muted-foreground">
-						<Trans>Not set up on {hostName}</Trans>
-					</span>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={() => setSetupOpen(true)}
-						disabled={!hostUrl}
-					>
-						<Trans>Set up project…</Trans>
-					</Button>
-				</div>
+				<span className="text-sm text-muted-foreground">
+					<Trans>Not set up on {hostName}</Trans>
+				</span>
 			)}
-
-			<SetupProjectModal
-				open={setupOpen}
-				onOpenChange={setSetupOpen}
-				projectId={projectId}
-				projectName={projectName}
-				hostUrl={hostUrl}
-				hostName={hostName}
-				repoCloneUrl={repoCloneUrl}
-				isRemoteTarget={isRemoteTarget}
-				onChanged={onChanged}
-			/>
 
 			<RemotePathPicker
 				open={changeBrowseOpen}
@@ -244,7 +225,11 @@ export function ProjectLocationSection({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							<Trans>Relocate project?</Trans>
+							{repositoryName ? (
+								<Trans>Relocate {repositoryName}?</Trans>
+							) : (
+								<Trans>Relocate project?</Trans>
+							)}
 						</AlertDialogTitle>
 						<AlertDialogDescription asChild>
 							<div className="space-y-3 text-sm select-text cursor-text">

@@ -3,16 +3,17 @@ import { useCallback } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
-import {
-	type ProjectSetupResult,
-	useFinalizeProjectSetup,
-} from "renderer/react-query/projects";
+import { useFinalizeProjectSetup } from "renderer/react-query/projects";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useRequestGitInitConfirm } from "renderer/stores/git-init-confirm";
-import { importFolderFirst, type MatchingProject } from "./importFolderFirst";
+import {
+	type FolderImportResult,
+	importFolderFirst,
+	type MatchingProject,
+} from "./importFolderFirst";
 
 export interface UseFolderFirstImportResult {
-	start: (repoPath?: string) => Promise<ProjectSetupResult | null>;
+	start: (repoPath?: string) => Promise<FolderImportResult | null>;
 }
 
 export function useFolderFirstImport(options?: {

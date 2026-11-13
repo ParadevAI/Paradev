@@ -4,15 +4,17 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { LuFile } from "react-icons/lu";
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
-import { useWorkspaceGitStatus } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import {
 	WORKSPACE_SIDEBAR_TABS,
 	type WorkspaceSidebarTab,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type { OpenReviewDiff } from "../../hooks/useReviewCommentNavigation";
 import { useReviewCommentNavigation } from "../../hooks/useReviewCommentNavigation";
+import { useRootGitStatus } from "../../hooks/useRootGitStatus";
+import { useActiveRepositoryId } from "../../state/activeRepositoryStore";
 import { useRowlessSidebarTabStore } from "../../state/rowlessSidebarTabStore";
-import type { CommentPaneData, DiffFocusSide } from "../../types";
+import type { CommentPaneData } from "../../types";
 import {
 	DEFAULT_WORKSPACE_SIDEBAR_TAB,
 	setWorkspaceSidebarTab,
@@ -40,13 +42,7 @@ export interface PendingReveal {
 
 interface WorkspaceSidebarProps {
 	onSelectFile: (absolutePath: string, openInNewTab?: boolean) => void;
-	onSelectDiffFile?: (
-		path: string,
-		openInNewTab?: boolean,
-		line?: number,
-		side?: DiffFocusSide,
-		changeKey?: string,
-	) => void;
+	onSelectDiffFile?: OpenReviewDiff;
 	onOpenComment?: (comment: CommentPaneData) => void;
 	/** Opens the linked PR's summary pane; the Review tab's title falls back to GitHub without it. */
 	onOpenPullRequest?: OpenPullRequestPane;
@@ -73,7 +69,8 @@ export function WorkspaceSidebar({
 	runButton,
 }: WorkspaceSidebarProps) {
 	const { t } = useLingui();
-	const gitStatus = useWorkspaceGitStatus();
+	const rootGitStatus = useRootGitStatus(workspaceId);
+	const reviewRepositoryId = useActiveRepositoryId(workspaceId);
 	const collections = useCollections();
 	const { data: [localState] = [] } = useLiveQuery(
 		(query) =>
@@ -116,18 +113,28 @@ export function WorkspaceSidebar({
 		workspaceId,
 		selectedDiffTarget,
 		onSelectFile: onSelectDiffFile
-			? (path, openInNewTab, changeKey) =>
-					onSelectDiffFile(path, openInNewTab, undefined, undefined, changeKey)
+			? (path, openInNewTab, changeKey, repositoryId) =>
+					onSelectDiffFile(
+						path,
+						openInNewTab,
+						undefined,
+						undefined,
+						changeKey,
+						undefined,
+						repositoryId,
+					)
 			: undefined,
 		onOpenFile: onSelectFile,
 	});
 
 	const onOpenInDiff = useReviewCommentNavigation(
 		workspaceId,
+		reviewRepositoryId,
 		onSelectDiffFile,
 	);
 	const reviewTab = useReviewTab({
 		workspaceId,
+		repositoryId: reviewRepositoryId,
 		onOpenComment,
 		onOpenPullRequest,
 		onOpenInDiff,
@@ -143,7 +150,7 @@ export function WorkspaceSidebar({
 				selectedFilePath={selectedFilePath}
 				pendingReveal={pendingReveal}
 				workspaceId={workspaceId}
-				gitStatus={gitStatus.data}
+				gitStatus={rootGitStatus}
 				onSearch={onSearch}
 			/>
 		),

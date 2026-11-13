@@ -1050,6 +1050,9 @@ msgstr "{fileCount, plural, one {У цьому робочому просторі
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# файл змінено} few {# файли змінено} many {# файлів змінено} other {# файлу змінено}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Змінено # файл} few {Змінено # файли} many {Змінено # файлів} other {Змінено # файлу}}"
 
@@ -1377,6 +1380,9 @@ msgstr "Залишилося токенів: {remaining}"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# репозиторій} few {Усі # репозиторії} many {Усі # репозиторіїв} other {Усі # репозиторію}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName} переміщено до {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Скасовано зміни в # файлі.} few {Скасовано зміни в # файлах.} many {Скасовано зміни в # файлах.} other {Скасовано зміни в # файла.}}"
@@ -2038,6 +2044,7 @@ msgid "Actions"
 msgstr "Дії"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Дії для {0}"
 
@@ -2093,11 +2100,11 @@ msgstr "Додати {0} до робочого простору"
 msgid "Add {localizedName}?"
 msgstr "Додати {localizedName}?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Спершу додайте {repositoryName} як проєкт на комп’ютері {computer}"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Спочатку додайте {only} як проєкт на {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Спочатку додайте {repositoryName} як проєкт на цьому комп'ютері"
+msgid "Add {only} as a project on this computer first"
+msgstr "Спочатку додайте {only} як проєкт на цьому комп’ютері"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Додати #{prNumber} до черги злиття?"
@@ -2122,6 +2129,12 @@ msgstr "Додайте проєкт, щоб бачити issues з GitHub."
 
 msgid "Add a project to see pull requests."
 msgstr "Додайте проєкт, щоб бачити пул-реквести."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Спочатку додайте на {computer} проєкт саме з цими репозиторіями: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Спочатку додайте на цей комп’ютер проєкт саме з цими репозиторіями: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Додайте короткий опис…"
@@ -4509,9 +4522,6 @@ msgstr "Виберіть бійця"
 msgid "Choose a folder"
 msgstr "Виберіть папку"
 
-msgid "Choose a parent directory"
-msgstr "Виберіть батьківську папку"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Перш ніж відкривати issue, виберіть проєкт у GitHub issues."
 
@@ -4526,9 +4536,6 @@ msgstr "Виберіть розділ."
 
 msgid "Choose agent"
 msgstr "Вибрати агента"
-
-msgid "Choose an existing repo folder"
-msgstr "Виберіть наявну папку репозиторію"
 
 msgid "Choose an MCP server"
 msgstr "Виберіть MCP-сервер"
@@ -4746,13 +4753,6 @@ msgstr "Клонувати за URL"
 
 msgid "clone the repository"
 msgstr "клонувати репозиторій"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Клонуйте репозиторій або імпортуйте наявну папку на хості."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Клоновано в {0}"
 
 msgid "Cloning…"
 msgstr "Клонування…"
@@ -5116,9 +5116,6 @@ msgstr "Команда..."
 
 msgid "Commands"
 msgstr "Команди"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Команди для налаштування й очищення цього репозиторію та для меню «Запустити»."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Команди для налаштування та очищення робочого простору і для кнопки «Запустити»."
@@ -5881,6 +5878,9 @@ msgstr "Не вдалося додати агента"
 msgid "Could not add repository"
 msgstr "Не вдалося додати репозиторій"
 
+msgid "Could not add the repository"
+msgstr "Не вдалося додати репозиторій"
+
 msgid "Could not answer the agent"
 msgstr "Не вдалося відповісти агенту"
 
@@ -6011,6 +6011,9 @@ msgstr "Не вдалося завантажити цей пул-реквест.
 msgid "Could not load your machines"
 msgstr "Не вдалося завантажити ваші комп'ютери"
 
+msgid "Could not make it the primary repository"
+msgstr "Не вдалося зробити його основним репозиторієм"
+
 msgid "Could not mark ready"
 msgstr "Не вдалося позначити як готовий"
 
@@ -6090,6 +6093,9 @@ msgid "Could not remove access"
 msgstr "Не вдалося скасувати доступ"
 
 msgid "Could not remove repository"
+msgstr "Не вдалося прибрати репозиторій"
+
+msgid "Could not remove the repository"
 msgstr "Не вдалося прибрати репозиторій"
 
 msgid "Could not rename the session"
@@ -7520,11 +7526,17 @@ msgstr "Відкинути всі {0}"
 msgid "Discard all staged changes"
 msgstr "Відкинути всі проіндексовані зміни"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Відкинути всі проіндексовані зміни в {repositoryName}?"
+
 msgid "Discard all staged changes?"
 msgstr "Відкинути всі проіндексовані зміни?"
 
 msgid "Discard all unstaged changes"
 msgstr "Відкинути всі непроіндексовані зміни"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Відкинути всі непроіндексовані зміни в {repositoryName}?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Відкинути всі непроіндексовані зміни?"
@@ -8141,12 +8153,6 @@ msgstr "Введіть повну адресу електронної пошти
 msgid "Enter a number"
 msgstr "Введіть число"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Введіть батьківську папку на {hostName}"
-
-msgid "Enter a path on {hostName}"
-msgstr "Введіть шлях на {hostName}"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Введіть URL у рядок пошуку вище."
 
@@ -8288,11 +8294,8 @@ msgstr "Щосереди о 9:00 переглядай злиті цього ти
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Кожного буднього дня о 9:00 читай нові issues у GitHub, розставляй мітки й готуй першу чернетку відповіді мені на перевірку."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Кожен робочий простір мультирепозиторного проєкту вивантажує цей репозиторій поруч з іншими."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Кожен робочий простір цього проєкту робить checkout усіх них поруч, в одній гілці."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Кожен робочий простір цього проєкту робить checkout усіх них поруч в одній гілці. Команди налаштування й запуску беруться з основного репозиторію."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Усі сперечаються, чи це узагальнюється. Саме ця суперечка свідчить, що рівня досягнуто."
@@ -8344,12 +8347,6 @@ msgstr "Усе опубліковане видаляється, а не прих
 
 msgid "Executable"
 msgstr "Виконуваний файл"
-
-msgid "Existing repo path"
-msgstr "Шлях до наявного репозиторію"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Шлях до наявного репозиторію на {hostName}"
 
 msgid "existing worktree"
 msgstr "наявний worktree"
@@ -9332,6 +9329,9 @@ msgstr "Перевести фокус на поле пошуку в розділ
 
 msgid "Folder"
 msgstr "Папка"
+
+msgid "Folder can't be read"
+msgstr "Не вдається прочитати папку"
 
 msgid "Folder is missing"
 msgstr "Папка відсутня"
@@ -10419,9 +10419,6 @@ msgstr "Імпортуйте кожен проєкт v1 у v2. Уже імпор
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Імпортуйте кожен скрипт термінала v1 у v2."
-
-msgid "Import existing"
-msgstr "Імпортувати наявний"
 
 msgid "Import existing folder"
 msgstr "Імпортувати наявну папку"
@@ -11546,9 +11543,6 @@ msgstr "Рядки {0}–{1}"
 msgid "Link"
 msgstr "Посилання"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Спершу прив'яжіть до проєкту репозиторій GitHub, щоб увімкнути клонування."
-
 msgid "Link by Stripe"
 msgstr "Link від Stripe"
 
@@ -11715,6 +11709,9 @@ msgstr "Завантажуємо ще..."
 
 msgid "Loading more…"
 msgstr "Завантажуємо ще…"
+
+msgid "Loading project repositories…"
+msgstr "Завантаження репозиторіїв проєкту…"
 
 msgid "Loading project…"
 msgstr "Завантаження проєкту…"
@@ -11895,6 +11892,9 @@ msgstr "Зробити основним"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Зробити основним: запускати нові термінали й агентів із цим обліковим записом."
+
+msgid "Make primary"
+msgstr "Зробити основним"
 
 msgid "Make public"
 msgstr "Зробити публічним"
@@ -12516,9 +12516,6 @@ msgstr "Перенесення цього чату сюди"
 msgid "Moving this workspace…"
 msgstr "Цей робочий простір переміщується…"
 
-msgid "Multi-repo project"
-msgstr "Мультирепозиторний проєкт"
-
 msgid "Multi-select"
 msgstr "Множинний вибір"
 
@@ -12977,6 +12974,9 @@ msgstr "Немає каналів"
 
 msgid "No chats found"
 msgstr "Чатів не знайдено"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Жоден чекаут у цьому робочому просторі не на {currentBranchName}"
 
 msgid "No checks"
 msgstr "Немає перевірок"
@@ -14575,6 +14575,9 @@ msgstr "Відкриття в інтерфейсі чату…"
 msgid "Opening pages"
 msgstr "Відкриття сторінок"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Відкриває інші репозиторії, ніж цей робочий простір"
+
 msgid "Operator"
 msgstr "Оператор"
 
@@ -15073,12 +15076,6 @@ msgstr "Кількість паралельних сеансів на розро
 msgid "Parameters"
 msgstr "Параметри"
 
-msgid "Parent directory"
-msgstr "Батьківська папка"
-
-msgid "Parent directory on {hostName}"
-msgstr "Батьківська папка на {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Частково хроніка, частково ставка. Перші два пункти вже відбуваються. Решту сформульовано досить конкретно, щоб у ній можна було помилитися."
 
@@ -15266,9 +15263,6 @@ msgstr "Вибрати інший елемент (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Виберіть папку на диску й додайте її як проєкт"
 
-msgid "Pick a folder…"
-msgstr "Вибрати папку…"
-
 msgid "Pick a machine size"
 msgstr "Виберіть розмір машини"
 
@@ -15278,14 +15272,11 @@ msgstr "Виберіть модель"
 msgid "pick a name for the board"
 msgstr "виберіть ім'я для рейтингу"
 
-msgid "Pick a parent directory"
-msgstr "Виберіть батьківську папку"
-
-msgid "Pick a project location"
-msgstr "Виберіть розташування проєкту"
-
 msgid "Pick a reason"
 msgstr "Виберіть причину"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Виберіть папку репозиторію на {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Виберіть репозиторій із файлом маркетплейсу плагінів. Superset синхронізує його плагіни зараз і щоразу, коли ви знову запускаєте синхронізацію."
@@ -15796,13 +15787,8 @@ msgstr "Проєкт на іншому пристрої"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Проєкт готовий. Відкрийте його з бічної панелі."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Проєкт переміщено в {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Проєкт налаштовано в {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Проєкт переміщено до {newPath}"
 
 msgid "Project Settings"
 msgstr "Налаштування проєкту"
@@ -16488,6 +16474,9 @@ msgstr "Перезавантаження відкине ваші зміни. П�
 msgid "Relocate"
 msgstr "Перемістити"
 
+msgid "Relocate {repositoryName}?"
+msgstr "Перемістити {repositoryName}?"
+
 msgid "Relocate project?"
 msgstr "Перемістити проєкт?"
 
@@ -16571,6 +16560,9 @@ msgstr "Прибрати з групи"
 
 msgid "Remove from queue"
 msgstr "Прибрати з черги"
+
+msgid "Remove from project"
+msgstr "Прибрати з проєкту"
 
 msgid "Remove from Queue"
 msgstr "Прибрати з черги"
@@ -16853,9 +16845,6 @@ msgstr "Репозиторій прибрано"
 
 msgid "Repository root"
 msgstr "Корінь репозиторію"
-
-msgid "Repository settings"
-msgstr "Налаштування репозиторію"
 
 msgid "Repository URL or path"
 msgstr "URL або шлях до репозиторію"
@@ -17426,9 +17415,6 @@ msgstr "Запускайте агентів за розкладом або ко�
 msgid "Run agents side by side"
 msgstr "Запускайте агентів пліч-о-пліч"
 
-msgid "Run all"
-msgstr "Запустити все"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Запустіть армію"
@@ -17525,9 +17511,6 @@ msgstr "Запускайте агентів із комп'ютера, будь-�
 
 msgid "Run your coding agents in the cloud."
 msgstr "Запускайте своїх кодинг-агентів у хмарі."
-
-msgid "Run: {repositoryName}"
-msgstr "Запуск: {repositoryName}"
 
 msgid "Run."
 msgstr "Запустіть."
@@ -18174,9 +18157,6 @@ msgstr "Виберіть організацію"
 msgid "Select Organization Logo"
 msgstr "Виберіть логотип організації"
 
-msgid "Select parent directory to clone into"
-msgstr "Виберіть батьківську папку для клонування"
-
 msgid "Select people"
 msgstr "Виберіть людей"
 
@@ -18410,9 +18390,6 @@ msgstr "Призначити проєкт…"
 msgid "Set Run"
 msgstr "Задати запуск"
 
-msgid "Set run script"
-msgstr "Задати скрипт запуску"
-
 msgid "Set this project"
 msgstr "Призначити цей проєкт"
 
@@ -18434,9 +18411,6 @@ msgstr "Налаштувати середовище"
 
 msgid "Set up once"
 msgstr "Налаштуйте один раз"
-
-msgid "Set up project on {hostName}"
-msgstr "Налаштувати проєкт на {hostName}"
 
 msgid "Set up project…"
 msgstr "Налаштувати проєкт…"
@@ -19221,6 +19195,10 @@ msgstr "Спам або шахрайство"
 msgid "Sparse checkout"
 msgstr "Частковий checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Частковий checkout {0}"
+
 msgid "Speaking"
 msgstr "Говорю"
 
@@ -19613,9 +19591,6 @@ msgstr "Зупинити {label}"
 
 msgid "Stop {name}"
 msgstr "Зупинити {name}"
-
-msgid "Stop all"
-msgstr "Зупинити все"
 
 msgid "Stop dictation"
 msgstr "Зупинити диктування"
@@ -20381,9 +20356,6 @@ msgstr "Термін дії коду минув. Почніть знову."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Команди з config.toml репозиторію, які Paradev виконує, щоб налаштувати, запустити й архівувати робочі простори цього проєкту."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Команди, якими Paradev налаштовує, запускає й архівує checkout'и цього репозиторію, з його config.toml."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Компанія залучила $11,5 млн у seed-раунді на чолі з Union Square Ventures за участі Y Combinator і Пола Грема. TechCrunch назвав її одним із найпомітніших стартапів YC Demo Day."
 
@@ -20486,6 +20458,9 @@ msgstr "Майбутнє місце для багаторазових конфі
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Хост повернувся з версією {0}, а не {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "Хост створив проєкт без репозиторію"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "Хост не повернувся протягом п'ятнадцяти хвилин."
@@ -20917,8 +20892,8 @@ msgstr "Цю електронну адресу вже зареєстровано
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "У цьому середовищі немає репозиторіїв. Створіть середовище з репозиторіями в налаштуваннях, а потім запустіть робочий простір із нього"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Це середовище відкриває {environmentRepository}, а не {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Це середовище відкриває {environmentRepositories}, а не {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозиторії цього середовища фіксовані; щоб змінити їх, ще раз створіть середовище з робочого простору"
@@ -21085,6 +21060,9 @@ msgstr "Цей пул-реквест більше недоступний."
 msgid "This pull request link is invalid."
 msgstr "Це посилання на пул-реквест недійсне."
 
+msgid "This pull request's repository is not known"
+msgstr "Репозиторій цього пул-реквесту невідомий"
+
 msgid "This recording is too long to transcribe"
 msgstr "Цей запис задовгий для розшифрування"
 
@@ -21235,6 +21213,9 @@ msgstr "Цей робочий простір"
 
 msgid "This workspace has no project to branch from"
 msgstr "У цього робочого простору немає проєкту, від якого можна створити гілку"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Робочий простір ще завантажується. Спробуйте знову."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Можливо, цей робочий простір видалено або ви більше не маєте до нього доступу."
@@ -22211,9 +22192,6 @@ msgstr "Використати цей обліковий запис"
 
 msgid "Use this folder"
 msgstr "Використати цю папку"
-
-msgid "Use this repo"
-msgstr "Використати цей репозиторій"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Скористайтеся цим, щоб виправити термінали, які зависли або не відповідають."

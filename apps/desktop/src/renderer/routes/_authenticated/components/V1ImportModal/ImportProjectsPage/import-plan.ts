@@ -10,8 +10,7 @@ export type ProjectImportStatus =
 	| { kind: "idle" }
 	| { kind: "running" }
 	| { kind: "imported"; v2ProjectId: string }
-	| { kind: "error"; message: string }
-	| { kind: "needs-relocate"; v2ProjectId: string; message: string };
+	| { kind: "error"; message: string };
 
 export const IDLE_IMPORT_STATUS: ProjectImportStatus = { kind: "idle" };
 
@@ -20,7 +19,7 @@ export const IDLE_IMPORT_STATUS: ProjectImportStatus = { kind: "idle" };
  * counts. Pending = importable now (or still loading its findByPath
  * probe) and not already imported/running. Errors stay pending so a
  * re-press retries them; skip decisions (multiple candidates, cloud
- * unreachable) and needs-relocate rows require a human and are excluded.
+ * unreachable) require a human and are excluded.
  */
 export function selectPendingProjects<T extends { id: string }>(
 	projects: readonly T[],
@@ -30,7 +29,6 @@ export function selectPendingProjects<T extends { id: string }>(
 	return projects.filter((project) => {
 		const state = states.get(project.id)?.kind ?? "idle";
 		if (state === "running" || state === "imported") return false;
-		if (state === "needs-relocate") return false;
 		const decision = decisions.get(project.id);
 		if (decision && decision.kind !== "import") return false;
 		return true;
@@ -40,7 +38,6 @@ export function selectPendingProjects<T extends { id: string }>(
 export type ProjectRowActionPlan =
 	| { kind: "running"; label?: string }
 	| { kind: "imported"; label: string }
-	| { kind: "confirm-relocate"; message: string; disabled: boolean }
 	| { kind: "error"; message: string; retry: "import" | "query" }
 	| { kind: "pick"; disabled: boolean }
 	| { kind: "ready"; label: "Link" | "Import"; disabled: boolean };
@@ -71,13 +68,6 @@ export function planProjectRowAction(args: {
 		serverImported,
 	} = args;
 	if (status.kind === "running") return { kind: "running" };
-	if (status.kind === "needs-relocate") {
-		return {
-			kind: "confirm-relocate",
-			message: status.message,
-			disabled: isImportingAll,
-		};
-	}
 	if (serverImported || status.kind === "imported") {
 		return { kind: "imported", label: "Linked" };
 	}

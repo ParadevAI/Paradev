@@ -1,1 +1,5 @@
-export { type SelectedDiffTarget, useChangesTab } from "./useChangesTab";
+export {
+	type SelectDiffFile,
+	type SelectedDiffTarget,
+	useChangesTab,
+} from "./useChangesTab";

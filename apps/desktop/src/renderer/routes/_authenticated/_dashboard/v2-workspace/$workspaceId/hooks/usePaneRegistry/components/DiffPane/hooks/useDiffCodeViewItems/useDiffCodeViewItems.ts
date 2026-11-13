@@ -22,10 +22,11 @@ import type {
 	GetDiffPatchInput,
 } from "renderer/lib/diffPatchQuery";
 import { hashString } from "renderer/routes/_authenticated/_dashboard/utils/hashString";
+import { checkoutInput } from "../../../../../../utils/checkoutInput";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
-	getChangesetFileWorkspaceId,
+	getChangesetFileRepositoryId,
 } from "../../../../../useChangeset";
 import { createGetDiffInput } from "../../utils/createGetDiffInput";
 import { isGeneratedDiffFile } from "../../utils/diffLoadingGuards";
@@ -43,6 +44,8 @@ import { splitPatchInput } from "./splitPatchInput";
 
 interface UseDiffCodeViewItemsOptions {
 	workspaceId: string;
+	/** The checkout of a file the changeset did not tag. */
+	repositoryId?: string;
 	/** False pauses patch fetches, also the refetch after a git change. */
 	enabled?: boolean;
 	files: ChangesetFile[];
@@ -56,8 +59,8 @@ interface UseDiffCodeViewItemsOptions {
 		string,
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	> | null;
-	/** A multi-repo workspace's threads, per checkout. */
-	annotationsByWorkspace?: ReadonlyMap<
+	/** A multi-repo workspace's threads, per repository. */
+	annotationsByRepository?: ReadonlyMap<
 		string,
 		ReadonlyMap<string, DiffLineAnnotation<DiffAnnotationMetadata>[]>
 	>;
@@ -168,6 +171,7 @@ function memberSignature(members: PatchGroupMember[]): string {
 function groupKeyFor(input: DiffPatchScope): string {
 	return [
 		input.workspaceId,
+		input.repositoryId ?? "",
 		input.category,
 		input.baseBranch ?? "",
 		input.commitHash ?? "",
@@ -177,12 +181,13 @@ function groupKeyFor(input: DiffPatchScope): string {
 
 export function useDiffCodeViewItems({
 	workspaceId,
+	repositoryId,
 	enabled = true,
 	files,
 	collapsedSet,
 	editingSet,
 	annotationsByPath,
-	annotationsByWorkspace,
+	annotationsByRepository,
 	extraAnnotationsByItemId,
 }: UseDiffCodeViewItemsOptions): UseDiffCodeViewItemsResult {
 	const { client: trpcClient } = workspaceTrpc.useUtils();
@@ -244,7 +249,7 @@ export function useDiffCodeViewItems({
 			if (isGeneratedDiffFile(file.path) && !requestedItemIds.has(itemId)) {
 				continue;
 			}
-			const input = createGetDiffPatchInput(workspaceId, file);
+			const input = createGetDiffPatchInput(workspaceId, file, repositoryId);
 			const key = groupKeyFor(input);
 			let group = groups.get(key);
 			if (!group) {
@@ -254,7 +259,7 @@ export function useDiffCodeViewItems({
 			group.members.push({ file, itemId });
 		}
 		return [...groups.values()];
-	}, [files, requestedItemIds, workspaceId]);
+	}, [files, requestedItemIds, workspaceId, repositoryId]);
 
 	// Layout effect: the queries below start fetching in their own passive
 	// effect, and the union has to hold this pane's members by then.
@@ -318,7 +323,7 @@ export function useDiffCodeViewItems({
 								const member = queue.shift();
 								if (!member) return;
 								const { oldFile, newFile } = await trpcClient.git.getDiff.query(
-									createGetDiffInput(workspaceId, member.file),
+									createGetDiffInput(workspaceId, member.file, repositoryId),
 								);
 								files.push({
 									path: member.file.path,
@@ -480,10 +485,14 @@ export function useDiffCodeViewItems({
 			const itemId = getDiffItemId(file);
 			const collapsed = collapsedSet.has(getChangesetFileKey(file));
 			// Review threads come from the pull request of the file's checkout.
-			const fileWorkspaceId = getChangesetFileWorkspaceId(file, workspaceId);
+			const fileRepositoryId = getChangesetFileRepositoryId(file, repositoryId);
 			const fileAnnotations =
-				annotationsByWorkspace?.get(fileWorkspaceId) ??
-				(fileWorkspaceId === workspaceId ? annotationsByPath : NO_ANNOTATIONS);
+				(fileRepositoryId
+					? annotationsByRepository?.get(fileRepositoryId)
+					: undefined) ??
+				(fileRepositoryId === repositoryId
+					? annotationsByPath
+					: NO_ANNOTATIONS);
 			const editing = editingSet.has(getChangesetFileKey(file));
 
 			if (file.isBinary) {
@@ -576,9 +585,9 @@ export function useDiffCodeViewItems({
 		reasonByItemId,
 		requestedItemIds,
 		annotationsByPath,
-		annotationsByWorkspace,
+		annotationsByRepository,
 		collapsedSet,
-		workspaceId,
+		repositoryId,
 		editingSet,
 		extraAnnotationsByItemId,
 	]);
@@ -632,27 +641,31 @@ function buildPlaceholderItem(
 }
 
 function createGetDiffPatchInput(
-	fallbackWorkspaceId: string,
+	workspaceId: string,
 	file: ChangesetFile,
+	fallbackRepositoryId: string | undefined,
 ): DiffPatchScope {
-	const workspaceId = getChangesetFileWorkspaceId(file, fallbackWorkspaceId);
+	const scope = checkoutInput(
+		workspaceId,
+		getChangesetFileRepositoryId(file, fallbackRepositoryId),
+	);
 	const { source } = file;
 	if (source.kind === "against-base") {
 		return {
-			workspaceId,
+			...scope,
 			category: "against-base",
 			baseBranch: source.baseBranch ?? undefined,
 		};
 	}
 	if (source.kind === "commit") {
 		return {
-			workspaceId,
+			...scope,
 			category: "commit",
 			commitHash: source.commitHash,
 			fromHash: source.fromHash,
 		};
 	}
-	return { workspaceId, category: source.kind };
+	return { ...scope, category: source.kind };
 }
 
 function getDiffItemId(file: ChangesetFile): string {

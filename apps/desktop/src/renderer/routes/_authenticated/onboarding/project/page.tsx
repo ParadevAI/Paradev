@@ -12,6 +12,7 @@ import {
 	LuLayoutTemplate,
 } from "react-icons/lu";
 import { showStarNagOnboardingToast } from "renderer/components/StarNagToast";
+import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWorkspace";
 import { track } from "renderer/lib/analytics";
@@ -260,7 +261,8 @@ function OnboardingProjectPage() {
 				try {
 					created = await hostService.project.create.mutate({
 						name: repoNameFromUrl(trimmed),
-						mode: { kind: "clone", parentDir: cloneTargetDir, url: trimmed },
+						repositories: [{ kind: "clone", url: trimmed }],
+						parentDir: cloneTargetDir,
 					});
 				} catch (err) {
 					if (isGitToolsFailure(err)) {
@@ -270,8 +272,11 @@ function OnboardingProjectPage() {
 					setCloneError(toCloneError(err, gitMissingMessage));
 					return;
 				}
-				finalizeSetup(activeHostUrl, created);
-				await finish(created.projectId);
+				finalizeSetup(activeHostUrl, {
+					projectId: created.id,
+					repoPath: getPrimaryRepository(created)?.path ?? "",
+				});
+				await finish(created.id);
 			} else {
 				let projectId: string | null;
 				try {

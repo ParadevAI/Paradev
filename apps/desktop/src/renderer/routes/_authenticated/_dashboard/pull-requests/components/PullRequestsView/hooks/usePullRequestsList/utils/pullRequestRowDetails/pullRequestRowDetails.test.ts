@@ -3,6 +3,7 @@ import {
 	applyPullRequestRowDetails,
 	carryOverPullRequestRowDetails,
 	pullRequestNumbersByProject,
+	pullRequestRowKey,
 } from "./pullRequestRowDetails";
 
 function row(projectId: string, prNumber: number) {
@@ -67,6 +68,19 @@ describe("carryOverPullRequestRowDetails", () => {
 });
 
 describe("pullRequestNumbersByProject", () => {
+	test("groups a multi-repo project's numbers per repository", () => {
+		expect(
+			pullRequestNumbersByProject([
+				{ ...row("a", 3), repositoryId: "web" },
+				{ ...row("a", 3), repositoryId: "api" },
+				{ ...row("a", 5), repositoryId: "web" },
+			]),
+		).toEqual([
+			{ projectId: "a", repositoryId: "web", prNumbers: [3, 5] },
+			{ projectId: "a", repositoryId: "api", prNumbers: [3] },
+		]);
+	});
+
 	test("groups numbers per project in row order", () => {
 		expect(
 			pullRequestNumbersByProject([row("a", 3), row("b", 9), row("a", 1)]),
@@ -78,19 +92,42 @@ describe("pullRequestNumbersByProject", () => {
 });
 
 describe("rows of a multi-repo project", () => {
-	test("ask each repository for its details and take back only its own", () => {
-		const api = { ...row("orbit", 1), repositoryProjectId: "api" };
-		const shared = { ...row("orbit", 1), repositoryProjectId: "shared" };
-		expect(pullRequestNumbersByProject([api, shared])).toEqual([
-			{ projectId: "api", prNumbers: [1] },
-			{ projectId: "shared", prNumbers: [1] },
-		]);
-		const next = applyPullRequestRowDetails({ pullRequests: [api, shared] }, [
-			{ projectId: "shared", prNumber: 1, ...ciDetails },
+	const api = { ...row("orbit", 1), repositoryId: "api" };
+	const web = { ...row("orbit", 1), repositoryId: "web" };
+
+	test("are told apart by repository", () => {
+		expect(pullRequestRowKey(api)).not.toBe(pullRequestRowKey(web));
+		const filledWeb: typeof web = {
+			...web,
+			...ciDetails,
+			detailsPending: false,
+		};
+		const next = carryOverPullRequestRowDetails({ pullRequests: [api, web] }, [
+			filledWeb,
 		]);
 		expect(next.pullRequests[0]).toEqual(api);
 		expect(next.pullRequests[1]).toEqual({
-			...shared,
+			...web,
+			...ciDetails,
+			detailsPending: true,
+			detailsCarried: true,
+		});
+	});
+
+	test("take no host detail that cannot name their repository", () => {
+		const next = applyPullRequestRowDetails({ pullRequests: [api, web] }, [
+			{ projectId: "orbit", prNumber: 1, ...ciDetails },
+		]);
+		expect(next.pullRequests).toEqual([api, web]);
+	});
+
+	test("a one-repository row takes the host's detail for its project", () => {
+		const only = { ...row("solo", 2), repositoryId: "solo-repo" };
+		const next = applyPullRequestRowDetails({ pullRequests: [only] }, [
+			{ projectId: "solo", prNumber: 2, ...ciDetails },
+		]);
+		expect(next.pullRequests[0]).toEqual({
+			...only,
 			...ciDetails,
 			detailsPending: false,
 		});

@@ -9,11 +9,14 @@ import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
+import { useAreCheckoutsLoaded } from "../../../../../../state/activeRepositoryStore";
 import type { PaneViewerData } from "../../../../../../types";
+import { checkoutInput } from "../../../../../../utils/checkoutInput";
 import { openPullRequestPaneInStore } from "../../../../../../utils/openPullRequestPaneInStore";
 
 interface DiffPanePRLinkProps {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 }
 
@@ -24,15 +27,20 @@ interface DiffPanePRLinkProps {
  * workspaces: the PR content query is project-scoped and
  * can't resolve a repo without one.
  */
-export function DiffPanePRLink({ workspaceId, store }: DiffPanePRLinkProps) {
+export function DiffPanePRLink({
+	workspaceId,
+	repositoryId,
+	store,
+}: DiffPanePRLinkProps) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	const linkPolicy = usePullRequestLinkPolicy();
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	// Same query key useDiffAnnotations polls at 10s from inside the pane, so
 	// tanstack-query dedupes this into the existing subscription.
 	const prQuery = workspaceTrpc.git.getPullRequest.useQuery(
-		{ workspaceId },
-		{ enabled: !!workspaceId, staleTime: 10_000 },
+		checkoutInput(workspaceId, repositoryId),
+		{ enabled: !!workspaceId && checkoutsLoaded, staleTime: 10_000 },
 	);
 	const pr = prQuery.data;
 	if (!pr || workspace.type === "session") return null;

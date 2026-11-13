@@ -1,13 +1,14 @@
-// A workspace has one repository, so the PR number identifies a PR even when a
-// repository rename left an older link under the previous URL.
+// Within one repository the PR number identifies a PR, even when a repository
+// rename left an older link under the previous URL.
 export function newestPullRequests<
-	T extends { number: number; linkedAt: number },
+	T extends { repositoryId: string; number: number; linkedAt: number },
 >(history: readonly T[]): T[] {
 	const newestFirst = [...history].sort((a, b) => b.linkedAt - a.linkedAt);
-	const seen = new Set<number>();
+	const seen = new Set<string>();
 	return newestFirst.filter((pr) => {
-		if (seen.has(pr.number)) return false;
-		seen.add(pr.number);
+		const key = `${pr.repositoryId}#${pr.number}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
 		return true;
 	});
 }

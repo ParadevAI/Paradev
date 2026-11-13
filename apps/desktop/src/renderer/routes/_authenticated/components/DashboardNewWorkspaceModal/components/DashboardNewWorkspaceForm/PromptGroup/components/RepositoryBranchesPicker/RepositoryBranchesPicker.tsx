@@ -4,6 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { useState } from "react";
 import { GoGitBranch } from "react-icons/go";
 import { LuChevronLeft, LuFolderGit2 } from "react-icons/lu";
+import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import {
 	FORM_PICKER_MENU_CLASS,
@@ -17,10 +18,10 @@ import { PickerChevron } from "../../../components/PickerChevron";
 import { RepositoryBranchList } from "./components/RepositoryBranchList";
 import { RepositoryRow } from "./components/RepositoryRow";
 import { RepositoryWorktreeList } from "./components/RepositoryWorktreeList";
-import { useProjectRepositories } from "./hooks/useProjectRepositories";
 
 interface RepositoryBranchesPickerProps {
 	projectId: string;
+	repositories: Pick<HostRepository, "id" | "name">[];
 	hostId: string | null;
 	/** Picked base branches by repository id; the rest use their default branch. */
 	baseBranches: Record<string, string>;
@@ -41,6 +42,7 @@ interface RepositoryBranchesPickerProps {
  */
 export function RepositoryBranchesPicker({
 	projectId,
+	repositories,
 	hostId,
 	baseBranches,
 	pullRequests,
@@ -50,7 +52,6 @@ export function RepositoryBranchesPicker({
 }: RepositoryBranchesPickerProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
-	const repositories = useProjectRepositories(projectId, hostId);
 	const [open, setOpen] = useState(false);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [cameBack, setCameBack] = useState(false);
@@ -142,6 +143,7 @@ export function RepositoryBranchesPicker({
 							</div>
 						)}
 						<RepositoryWorktreeList
+							projectId={projectId}
 							repositoryId={active.id}
 							hostId={hostId}
 							selectedPath={worktrees[active.id]?.path ?? null}
@@ -151,6 +153,7 @@ export function RepositoryBranchesPicker({
 							}}
 						/>
 						<RepositoryBranchList
+							projectId={projectId}
 							repositoryId={active.id}
 							hostId={hostId}
 							selectedBranch={
@@ -177,6 +180,7 @@ export function RepositoryBranchesPicker({
 							{repositories.map((repository) => (
 								<RepositoryRow
 									key={repository.id}
+									projectId={projectId}
 									repository={repository}
 									hostId={hostId}
 									selectedBranch={baseBranches[repository.id]}

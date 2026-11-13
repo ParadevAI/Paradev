@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	getPrimaryRepository,
+	useHostProjects,
+} from "renderer/hooks/host-projects/useHostProjects";
 import type { ProjectOption } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 
 export function useRecentProjects(): ProjectOption[] {
@@ -10,14 +13,17 @@ export function useRecentProjects(): ProjectOption[] {
 
 	return useMemo(
 		() =>
-			hostProjects.map((project) => ({
-				id: project.projectKey,
-				name: project.name,
-				githubOwner: project.repoOwner,
-				githubRepoName: project.repoName,
-				iconUrl: resolveProjectIconUrl(project),
-				needsSetup: null,
-			})),
+			hostProjects.map((project) => {
+				const primary = getPrimaryRepository(project);
+				return {
+					id: project.projectKey,
+					name: project.name,
+					githubOwner: primary?.owner ?? null,
+					githubRepoName: primary?.repoName ?? null,
+					iconUrl: resolveProjectIconUrl(project),
+					needsSetup: null,
+				};
+			}),
 		[hostProjects],
 	);
 }

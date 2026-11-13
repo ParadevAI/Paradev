@@ -40,7 +40,12 @@ export function DiffPaneFileList({
 	const maxWidth = Math.min(MAX_WIDTH, containerWidth - MIN_DIFF_WIDTH);
 
 	const handleSelectFile = useCallback(
-		(path: string, openInNewTab?: boolean, changeKey?: string) => {
+		(
+			path: string,
+			openInNewTab?: boolean,
+			changeKey?: string,
+			repositoryId?: string,
+		) => {
 			if (openInNewTab) {
 				store.getState().addTab({
 					panes: [
@@ -49,6 +54,7 @@ export function DiffPaneFileList({
 							data: {
 								path,
 								changeKey,
+								repositoryId,
 								collapsedFiles: [],
 								focusTick: Date.now(),
 							} as DiffPaneData,
@@ -60,6 +66,7 @@ export function DiffPaneFileList({
 					...data,
 					path,
 					changeKey,
+					repositoryId,
 					collapsedFiles: changeKey
 						? (data.collapsedFiles ?? []).filter((key) => key !== changeKey)
 						: (data.collapsedFiles ?? []),
@@ -79,7 +86,11 @@ export function DiffPaneFileList({
 	const changesTab = useChangesTab({
 		workspaceId,
 		selectedDiffTarget: data.path
-			? { path: data.path, changeKey: data.changeKey }
+			? {
+					path: data.path,
+					changeKey: data.changeKey,
+					repositoryId: data.repositoryId,
+				}
 			: undefined,
 		onSelectFile: handleSelectFile,
 		onOpenFile,

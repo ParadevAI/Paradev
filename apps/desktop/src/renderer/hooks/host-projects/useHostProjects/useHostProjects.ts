@@ -17,15 +17,18 @@ import {
 	type HostProjectRowsResult,
 	loadHostProjectsSnapshot,
 	mergeHostProjects,
-	normalizeHostProjectRow,
 	removeFromHostProjectsSnapshot,
 	saveHostProjectsSnapshot,
+	toHostProjectRow,
 } from "./useHostProjects.utils";
 
-export type {
-	HostProjectItem,
-	HostProjectRow,
-	HostProjectRowsResult,
+export {
+	findHostProjectRow,
+	getPrimaryRepository,
+	type HostProjectItem,
+	type HostProjectRow,
+	type HostProjectRowsResult,
+	type HostRepository,
 } from "./useHostProjects.utils";
 
 const PROJECTS_FALLBACK_REFETCH_INTERVAL_MS = 30_000;
@@ -115,13 +118,9 @@ export function useHostProjects(): UseHostProjectsResult {
 			retry: 1,
 			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
 				const client = getHostServiceClientByUrl(hostUrl);
-				// Normalize per-row: remote hosts on pre-local-first builds
-				// don't serve name/createdAt/updatedAt yet.
-				const rows = (
-					(await client.project.list.query()) as Array<
-						Partial<HostProjectRow> & { id: string; repoPath: string }
-					>
-				).map(normalizeHostProjectRow);
+				const rows = (await client.project.list.query()).map((snapshot) =>
+					toHostProjectRow(snapshot),
+				);
 				saveHostProjectsSnapshot(target.organizationId, target.machineId, rows);
 				return rows;
 			}),

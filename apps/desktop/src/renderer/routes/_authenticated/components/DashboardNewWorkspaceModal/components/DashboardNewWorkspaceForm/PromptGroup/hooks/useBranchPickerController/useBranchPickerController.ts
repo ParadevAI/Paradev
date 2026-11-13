@@ -20,6 +20,8 @@ type PickerProps = React.ComponentProps<typeof CompareBaseBranchPicker>;
 
 export interface UseBranchPickerControllerArgs {
 	projectId: string | null;
+	/** The repository whose branches are offered: a one-repository project's only one. */
+	repositoryId: string | null;
 	hostId: string | null;
 	remoteHostPresence: RemoteHostPresence | null;
 	/** Cloud only: the primary repository whose branches are offered. */
@@ -38,6 +40,7 @@ export interface UseBranchPickerControllerArgs {
 export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 	const {
 		projectId,
+		repositoryId,
 		hostId,
 		remoteHostPresence,
 		cloudRepository = null,
@@ -70,14 +73,12 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 		isFetchingNextPage,
 		hasNextPage,
 		fetchNextPage,
-	} = useBranchContext(
-		projectId,
-		hostId,
-		branchSearch,
-		branchFilter,
+	} = useBranchContext(projectId, hostId, branchSearch, branchFilter, {
 		cloudRepository,
-		remoteHostPresence !== "offline" && remoteHostPresence !== "connecting",
-	);
+		repositoryId: repositoryId ?? undefined,
+		canReachHost:
+			remoteHostPresence !== "offline" && remoteHostPresence !== "connecting",
+	});
 
 	const effectiveCompareBaseBranch = baseBranch || defaultBranch || null;
 
@@ -120,7 +121,13 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 					projectId,
 					name: workspaceName,
 					branch: branchName,
-					...(target.worktreePath ? { worktreePath: target.worktreePath } : {}),
+					...(target.worktreePath && repositoryId
+						? {
+								checkouts: {
+									[repositoryId]: { worktreePath: target.worktreePath },
+								},
+							}
+						: {}),
 				},
 			});
 			void navigate({
@@ -139,6 +146,7 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 		},
 		[
 			projectId,
+			repositoryId,
 			resolvedHostId,
 			resolveActionWorkspaceName,
 			submit,

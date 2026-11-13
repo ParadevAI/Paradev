@@ -5,7 +5,11 @@ import {
 	PROJECT_ICON_NONE,
 	resolveProjectIconUrl,
 } from "renderer/hooks/host-projects/resolveProjectIconUrl";
-import type { HostProjectItem } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	getPrimaryRepository,
+	type HostProjectItem,
+	type HostRepository,
+} from "renderer/hooks/host-projects/useHostProjects";
 import type { HostServiceClient } from "renderer/lib/host-service-client";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import {
@@ -14,10 +18,12 @@ import {
 } from "../../../../../../components/HostSelect";
 import { SettingsRow } from "../../../../../../components/SettingsRow";
 import { SettingsSection } from "../../../../../../components/SettingsSection";
+import { AddProjectRepository } from "../AddProjectRepository";
 import { BranchPrefixSection } from "../BranchPrefixSection";
 import { IconUploadField } from "../IconUploadField";
 import { NameSection } from "../NameSection";
 import { NamingInstructionsSection } from "../NamingInstructionsSection";
+import { ProjectLocationSection } from "../ProjectLocationSection";
 import { RepositoriesSection } from "../RepositoriesSection";
 import { RepositorySection } from "../RepositorySection";
 import { SparseCheckoutSection } from "../SparseCheckoutSection";
@@ -39,7 +45,6 @@ interface V2ProjectSettingsBodyProps {
 	hostOptions: HostSelectOption[];
 	onHostChange: (hostId: string) => void;
 	onHostProjectChanged: () => unknown;
-	locationSection: ReactNode;
 	scriptsEditor: ReactNode;
 	usesConfigToml: boolean;
 	dangerZone: ReactNode;
@@ -57,7 +62,6 @@ export function V2ProjectSettingsBody({
 	hostOptions,
 	onHostChange,
 	onHostProjectChanged,
-	locationSection,
 	scriptsEditor,
 	usesConfigToml,
 	dangerZone,
@@ -67,13 +71,32 @@ export function V2ProjectSettingsBody({
 	// writes to — falling back to the merged fan-out value only while it loads
 	// (same rule as Name). Custom icon wins; else the GitHub owner avatar.
 	const projectIcon = hostProject ? hostProject.icon : project.icon;
+	// Repositories are per host too: the targeted host's row wins.
+	const repositorySource = hostProject ?? project;
+	const repositories = repositorySource.repositories;
+	const primary = getPrimaryRepository(repositorySource);
+	const isMultiRepo = repositories.length > 1;
 	const iconUrl = resolveProjectIconUrl({
 		icon: projectIcon,
-		repoOwner: project.repoOwner,
+		primaryRepositoryId: repositorySource.primaryRepositoryId,
+		repositories,
 	});
 	// Accent color follows the same per-host precedence as the icon.
 	const projectColor = hostProject ? hostProject.color : project.color;
-	const isContainer = hostProject?.kind === "container";
+	const renderLocation = (
+		repository: HostRepository | null,
+		repositoryName?: string,
+	) => (
+		<ProjectLocationSection
+			projectId={projectId}
+			repository={repository}
+			repositoryName={repositoryName}
+			hostUrl={targetHostUrl}
+			hostName={targetHostName}
+			isRemoteTarget={isRemoteTarget}
+			onChanged={() => onHostProjectChanged()}
+		/>
+	);
 	const canRename = Boolean(
 		targetHostUrl && targetHostId && project.hostIds.includes(targetHostId),
 	);
@@ -116,17 +139,21 @@ export function V2ProjectSettingsBody({
 							onRenamed={() => onHostProjectChanged()}
 						/>
 					</SettingsRow>
-					{isContainer ? (
+					{isMultiRepo ? (
 						<SettingsRow
 							label={t({ message: "Repositories" })}
 							hint={t({
 								message:
-									"Every workspace of this project checks out all of them, side by side, on one branch.",
+									"Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository.",
 							})}
 						>
 							<RepositoriesSection
 								projectId={projectId}
+								repositories={repositories}
 								hostUrl={targetHostUrl}
+								hostName={targetHostName}
+								isRemoteTarget={isRemoteTarget}
+								onChanged={() => onHostProjectChanged()}
 							/>
 						</SettingsRow>
 					) : (
@@ -136,7 +163,19 @@ export function V2ProjectSettingsBody({
 							})}
 							htmlFor="project-repo"
 						>
-							<RepositorySection repoUrl={project.repoUrl} />
+							<div className="flex w-96 flex-col gap-1.5">
+								<RepositorySection repoUrl={primary?.url ?? null} />
+								{hostProject && (
+									<AddProjectRepository
+										projectId={projectId}
+										primaryPath={primary?.path}
+										hostUrl={targetHostUrl}
+										hostName={targetHostName}
+										isRemoteTarget={isRemoteTarget}
+										onChanged={() => onHostProjectChanged()}
+									/>
+								)}
+							</div>
 						</SettingsRow>
 					)}
 					<SettingsRow
@@ -212,13 +251,19 @@ export function V2ProjectSettingsBody({
 							"Where the repository and new worktrees live on this host.",
 					})}
 				>
-					{!isContainer && (
+					{isMultiRepo ? (
+						repositories.map((repository) => (
+							<SettingsRow key={repository.id} label={repository.name}>
+								{renderLocation(repository, repository.name)}
+							</SettingsRow>
+						))
+					) : (
 						<SettingsRow
 							label={t({
 								message: "Location",
 							})}
 						>
-							{locationSection}
+							{renderLocation(hostProject ? (primary ?? null) : null)}
 						</SettingsRow>
 					)}
 					<SettingsRow
@@ -241,41 +286,50 @@ export function V2ProjectSettingsBody({
 							onChanged={() => onHostProjectChanged()}
 						/>
 					</SettingsRow>
-					{targetHostUrl && hostProject && !isContainer && (
-						<div className="pt-4">
-							<div className="mb-3">
-								<Label
-									htmlFor="project-sparse-checkout"
-									className="text-sm font-medium"
-								>
-									<Trans>Sparse checkout</Trans>
-								</Label>
-								<p className="mt-0.5 text-xs text-muted-foreground">
-									<Trans>
-										Folders to check out into new worktrees, one per line,
-										relative to the repo root. Files at the root are always
-										included. Empty checks out everything.
-									</Trans>
-								</p>
-							</div>
-							<SparseCheckoutSection
-								// Remount per project AND per target host: the editor
-								// holds draft text and pending-save state, and switching
-								// either while the field is focused must not carry the
-								// draft or an in-flight save across the boundary — a
-								// project can be viewed across multiple hosts.
-								key={`${projectId}:${targetHostId}`}
-								projectId={projectId}
-								hostUrl={targetHostUrl}
-								// Hosts older than this setting omit the field entirely.
-								paths={hostProject.sparseCheckoutPaths ?? []}
-								onChanged={() => onHostProjectChanged()}
-							/>
-						</div>
-					)}
+					{targetHostUrl &&
+						hostProject &&
+						repositories.map((repository) => {
+							const inputId = isMultiRepo
+								? `project-sparse-checkout-${repository.id}`
+								: "project-sparse-checkout";
+							return (
+								<div key={repository.id} className="pt-4">
+									<div className="mb-3">
+										<Label htmlFor={inputId} className="text-sm font-medium">
+											{isMultiRepo ? (
+												<Trans>Sparse checkout of {repository.name}</Trans>
+											) : (
+												<Trans>Sparse checkout</Trans>
+											)}
+										</Label>
+										<p className="mt-0.5 text-xs text-muted-foreground">
+											<Trans>
+												Folders to check out into new worktrees, one per line,
+												relative to the repo root. Files at the root are always
+												included. Empty checks out everything.
+											</Trans>
+										</p>
+									</div>
+									<SparseCheckoutSection
+										// Remount per repository AND per target host: the editor
+										// holds draft text and pending-save state, and switching
+										// either while the field is focused must not carry the
+										// draft or an in-flight save across the boundary — a
+										// project can be viewed across multiple hosts.
+										key={`${repository.id}:${targetHostId}`}
+										projectId={projectId}
+										repositoryId={repository.id}
+										inputId={inputId}
+										hostUrl={targetHostUrl}
+										paths={repository.sparseCheckoutPaths}
+										onChanged={() => onHostProjectChanged()}
+									/>
+								</div>
+							);
+						})}
 				</SettingsSection>
 
-				{targetHostUrl && !isContainer && (
+				{targetHostUrl && (
 					<SettingsSection
 						title={
 							usesConfigToml

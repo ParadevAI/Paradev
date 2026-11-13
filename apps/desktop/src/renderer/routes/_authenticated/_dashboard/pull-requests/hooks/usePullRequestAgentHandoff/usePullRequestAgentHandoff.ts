@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
+import { pullRequestCheckoutInput } from "../../utils/pullRequestCheckoutInput";
 
 export interface PullRequestHandoffTarget {
 	projectId: string;
@@ -12,6 +13,8 @@ export interface PullRequestHandoffTarget {
 	hostUrl: string;
 	prNumber: number;
 	repoFullName: string | null;
+	/** The project's repository that holds the PR, when known. */
+	repositoryId: string | null;
 }
 
 /**
@@ -33,6 +36,7 @@ export function usePullRequestAgentHandoff(
 		"linkedWorkspace",
 		target?.projectId,
 		target?.repoFullName,
+		target?.repositoryId,
 		target?.hostUrl,
 		target?.prNumber,
 	];
@@ -45,6 +49,7 @@ export function usePullRequestAgentHandoff(
 			).pullRequests.getLinkedWorkspace.query({
 				projectId: target.projectId,
 				prNumber: target.prNumber,
+				repositoryId: target.repositoryId ?? undefined,
 				repoFullName: target.repoFullName ?? undefined,
 			});
 		},
@@ -74,13 +79,18 @@ export function usePullRequestAgentHandoff(
 				});
 				return { opened: "existing" as const };
 			}
+			const checkoutInput = pullRequestCheckoutInput(target);
+			if (!checkoutInput) {
+				throw new Error(
+					t({ message: "This pull request's repository is not known" }),
+				);
+			}
 			const { completed } = submitWorkspaceCreate({
 				hostId: target.hostId,
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId: target.projectId,
-					pr: target.prNumber,
-					prRepository: target.repoFullName ?? undefined,
+					...checkoutInput,
 					agents: [{ agent: agent.id, prompt }],
 				},
 			});

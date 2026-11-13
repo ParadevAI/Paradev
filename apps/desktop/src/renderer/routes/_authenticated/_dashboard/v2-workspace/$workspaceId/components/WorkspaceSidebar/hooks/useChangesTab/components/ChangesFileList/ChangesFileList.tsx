@@ -16,6 +16,9 @@ interface ChangesFileListProps {
 	/** True while a toolbar search query is active — flips the empty copy. */
 	isFiltered?: boolean;
 	workspaceId: string;
+	repositoryId: string | undefined;
+	/** Set when the list shows several checkouts. */
+	repositoryName?: string;
 	isLoading?: boolean;
 	viewMode: ChangesViewMode;
 	worktreePath?: string;
@@ -57,6 +60,8 @@ export const ChangesFileList = memo(function ChangesFileList({
 	files,
 	isFiltered,
 	workspaceId,
+	repositoryId,
+	repositoryName,
 	isLoading,
 	viewMode,
 	worktreePath,
@@ -114,6 +119,8 @@ export const ChangesFileList = memo(function ChangesFileList({
 					<ChangesSection
 						key={key}
 						sectionKey={key}
+						repositoryId={repositoryId}
+						repositoryName={repositoryName}
 						title={i18n._(GROUP_TITLES[key])}
 						count={groupFiles.length}
 						additions={groupFiles.reduce(
@@ -126,7 +133,11 @@ export const ChangesFileList = memo(function ChangesFileList({
 						)}
 						stagingActions={
 							hasStagingActions
-								? { kind: key as "unstaged" | "staged", workspaceId }
+								? {
+										kind: key as "unstaged" | "staged",
+										workspaceId,
+										repositoryId,
+									}
 								: undefined
 						}
 					>
@@ -135,6 +146,7 @@ export const ChangesFileList = memo(function ChangesFileList({
 								files={groupFiles}
 								sectionKind={key}
 								workspaceId={workspaceId}
+								repositoryId={repositoryId}
 								worktreePath={worktreePath}
 								selectedFilePath={selectedFilePath}
 								selectedChangeKey={selectedChangeKey}
@@ -147,6 +159,7 @@ export const ChangesFileList = memo(function ChangesFileList({
 							<ChangesFoldersView
 								files={groupFiles}
 								workspaceId={workspaceId}
+								repositoryId={repositoryId}
 								worktreePath={worktreePath}
 								selectedFilePath={selectedFilePath}
 								selectedChangeKey={selectedChangeKey}

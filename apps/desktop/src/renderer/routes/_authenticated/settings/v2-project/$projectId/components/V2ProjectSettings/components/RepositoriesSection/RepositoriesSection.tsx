@@ -1,107 +1,149 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@superset/ui/dropdown-menu";
 import { toast } from "@superset/ui/sonner";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import { LuFolderGit2, LuPlus, LuSettings, LuX } from "react-icons/lu";
-import { electronTrpc } from "renderer/lib/electron-trpc";
+import { cn } from "@superset/ui/utils";
+import { useMutation } from "@tanstack/react-query";
+import { HiEllipsisVertical } from "react-icons/hi2";
+import { LuFolderGit2 } from "react-icons/lu";
+import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { AddProjectRepository } from "../AddProjectRepository";
+import { hostRefusalReason } from "./utils/hostRefusalReason";
 
 interface RepositoriesSectionProps {
 	projectId: string;
+	repositories: HostRepository[];
 	hostUrl: string | null;
+	hostName: string;
+	isRemoteTarget: boolean;
+	onChanged: () => void;
 }
 
 export function RepositoriesSection({
 	projectId,
+	repositories,
 	hostUrl,
+	hostName,
+	isRemoteTarget,
+	onChanged,
 }: RepositoriesSectionProps) {
 	const { t } = useLingui();
-	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
-	const repositories = useQuery({
-		queryKey: ["project-repositories", hostUrl, projectId],
-		enabled: !!hostUrl,
-		queryFn: () =>
-			hostUrl
-				? getHostServiceClientByUrl(hostUrl).project.repositories.query({
-						projectId,
-					})
-				: [],
-	});
+	const primary = repositories.find((repository) => repository.isPrimary);
 
-	const add = useMutation({
-		mutationFn: async () => {
+	const makePrimary = useMutation({
+		mutationFn: async (repositoryId: string) => {
 			if (!hostUrl) return;
-			const picked = await selectDirectory.mutateAsync({
-				title: t({ message: "Select repositories to add" }),
-				multiple: true,
-			});
-			const client = getHostServiceClientByUrl(hostUrl);
-			for (const repoPath of picked.paths) {
-				await client.project.addRepository.mutate({ projectId, repoPath });
-			}
+			await getHostServiceClientByUrl(
+				hostUrl,
+			).project.setPrimaryRepository.mutate({ projectId, repositoryId });
 		},
-		onSuccess: () => repositories.refetch(),
-		onError: (err) => toast.error(errorMessage(err)),
+		onSuccess: () => onChanged(),
+		onError: (err) =>
+			toast.error(t({ message: "Could not make it the primary repository" }), {
+				description: hostRefusalReason(errorMessage(err)),
+			}),
 	});
 
 	const remove = useMutation({
-		mutationFn: (repositoryProjectId: string) =>
-			hostUrl
-				? getHostServiceClientByUrl(hostUrl).project.removeRepository.mutate({
-						projectId,
-						repositoryProjectId,
-					})
-				: Promise.resolve(),
-		onSuccess: () => repositories.refetch(),
-		onError: (err) => toast.error(errorMessage(err)),
+		mutationFn: async (repositoryId: string) => {
+			if (!hostUrl) return;
+			await getHostServiceClientByUrl(hostUrl).project.removeRepository.mutate({
+				projectId,
+				repositoryId,
+			});
+		},
+		onSuccess: () => onChanged(),
+		onError: (err) =>
+			toast.error(t({ message: "Could not remove the repository" }), {
+				description: hostRefusalReason(errorMessage(err)),
+			}),
 	});
+
+	const busy = !hostUrl || makePrimary.isPending || remove.isPending;
 
 	return (
 		<div className="flex w-96 flex-col gap-1.5">
-			{(repositories.data ?? []).map((repository) => (
+			{repositories.map((repository) => (
 				<div
 					key={repository.id}
-					className="flex h-9 items-center gap-2 rounded-md border px-3 text-sm"
+					className={cn(
+						"flex h-10 items-center gap-2 rounded-md border px-3 text-sm",
+						repository.pathState !== "ok" && "border-destructive",
+					)}
 				>
 					<LuFolderGit2 className="size-3.5 shrink-0 text-muted-foreground" />
-					<span className="min-w-0 flex-1 truncate" title={repository.repoPath}>
-						{repository.name}
-					</span>
-					<Button asChild variant="ghost" size="icon" className="size-6">
-						<Link
-							to="/settings/projects/$projectId"
-							params={{ projectId: repository.id }}
-							aria-label={t({ message: "Repository settings" })}
-						>
-							<LuSettings className="size-3.5" />
-						</Link>
-					</Button>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						className="size-6"
-						aria-label={t({ message: "Remove repository" })}
-						disabled={remove.isPending}
-						onClick={() => remove.mutate(repository.id)}
+					<span className="shrink-0">{repository.name}</span>
+					{repository.isPrimary && (
+						<Badge variant="secondary" className="shrink-0">
+							<Trans>Primary</Trans>
+						</Badge>
+					)}
+					<span
+						className={cn(
+							"min-w-0 flex-1 truncate text-xs",
+							repository.pathState === "ok"
+								? "text-muted-foreground"
+								: "text-destructive",
+						)}
+						title={repository.path}
 					>
-						<LuX className="size-3.5" />
-					</Button>
+						{repository.pathState === "missing" ? (
+							<Trans>Folder is missing</Trans>
+						) : repository.pathState === "inaccessible" ? (
+							<Trans>Folder can't be read</Trans>
+						) : (
+							repository.path
+						)}
+					</span>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon"
+								className="size-6 shrink-0"
+								disabled={busy}
+								aria-label={t({
+									message: `Actions for ${repository.name}`,
+								})}
+							>
+								<HiEllipsisVertical className="size-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem
+								disabled={repository.isPrimary}
+								onSelect={() => makePrimary.mutate(repository.id)}
+							>
+								<Trans>Make primary</Trans>
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								disabled={repository.isPrimary}
+								className="text-destructive focus:text-destructive"
+								onSelect={() => remove.mutate(repository.id)}
+							>
+								<Trans>Remove from project</Trans>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			))}
-			<Button
-				type="button"
-				variant="outline"
-				size="sm"
-				className="self-start"
-				disabled={!hostUrl || add.isPending}
-				onClick={() => add.mutate()}
-			>
-				<LuPlus className="size-3.5" />
-				<Trans>Add repository</Trans>
-			</Button>
+			<AddProjectRepository
+				projectId={projectId}
+				primaryPath={primary?.path}
+				hostUrl={hostUrl}
+				hostName={hostName}
+				isRemoteTarget={isRemoteTarget}
+				onChanged={onChanged}
+			/>
 		</div>
 	);
 }

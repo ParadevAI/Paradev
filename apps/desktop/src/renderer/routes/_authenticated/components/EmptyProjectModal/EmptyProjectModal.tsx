@@ -15,6 +15,7 @@ import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { useEffect, useState } from "react";
 import { LuFolderOpen, LuLoaderCircle } from "react-icons/lu";
+import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -133,10 +134,14 @@ export function EmptyProjectModal({
 			const client = getHostServiceClientByUrl(activeHostUrl);
 			const result = await client.project.create.mutate({
 				name: trimmedName,
-				mode: { kind: "empty", parentDir: trimmedParent },
+				repositories: [{ kind: "empty", name: trimmedName }],
+				parentDir: trimmedParent,
 			});
-			finalizeSetup(activeHostUrl, result);
-			onSuccess?.({ projectId: result.projectId });
+			finalizeSetup(activeHostUrl, {
+				projectId: result.id,
+				repoPath: getPrimaryRepository(result)?.path ?? "",
+			});
+			onSuccess?.({ projectId: result.id });
 			reset();
 			onOpenChange(false);
 		} catch (err) {

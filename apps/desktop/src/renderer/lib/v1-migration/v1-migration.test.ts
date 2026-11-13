@@ -63,16 +63,21 @@ describe("importV1Project appearance carry", () => {
 		hideImage: false,
 	};
 
-	function fakeHostClient(created: boolean | undefined) {
+	function fakeHostClient(created: boolean) {
 		const setColorCalls: unknown[] = [];
+		const createCalls: unknown[] = [];
 		const client = {
 			project: {
 				create: {
-					mutate: async () => ({
-						projectId: "p-new",
-						repoPath: "/tmp/proj",
-						created,
-					}),
+					mutate: async (input: unknown) => {
+						createCalls.push(input);
+						return {
+							id: "p-new",
+							primaryRepositoryId: "r-1",
+							repositories: [{ id: "r-1", path: "/tmp/proj" }],
+							created,
+						};
+					},
 				},
 				setColor: {
 					mutate: async (input: unknown) => {
@@ -80,14 +85,9 @@ describe("importV1Project appearance carry", () => {
 					},
 				},
 				setIcon: { mutate: async () => {} },
-				setup: {
-					mutate: async () => {
-						throw new Error("setup should not be called");
-					},
-				},
 			},
 		} as unknown as HostServiceClient;
-		return { client, setColorCalls };
+		return { client, setColorCalls, createCalls };
 	}
 
 	const emptyFindByPath = {
@@ -116,14 +116,47 @@ describe("importV1Project appearance carry", () => {
 		expect(setColorCalls).toHaveLength(1);
 	});
 
-	test("carries appearance when an older host omits the created field", async () => {
-		const { client, setColorCalls } = fakeHostClient(undefined);
-		await importV1Project({
+	test("creates a project of one local repository", async () => {
+		const { client, createCalls } = fakeHostClient(true);
+		const result = await importV1Project({
 			hostClient: client,
 			project: v1Project,
 			findByPathResult: emptyFindByPath,
 		});
-		expect(setColorCalls).toHaveLength(1);
+		expect(createCalls).toEqual([
+			{
+				name: "proj",
+				repositories: [{ kind: "local", path: "/tmp/proj" }],
+			},
+		]);
+		expect(result).toEqual({
+			kind: "imported",
+			v2ProjectId: "p-new",
+			repoPath: "/tmp/proj",
+		});
+	});
+
+	test("a local match is the project, nothing is created", async () => {
+		const { client, createCalls } = fakeHostClient(true);
+		const result = await importV1Project({
+			hostClient: client,
+			project: v1Project,
+			findByPathResult: {
+				candidates: [
+					{
+						id: "p-old",
+						repositoryId: "r-old",
+						name: "proj",
+						repoCloneUrl: null,
+						source: "local-path",
+						matchesExpected: false,
+					},
+				],
+				cloudErrors: [],
+			},
+		});
+		expect(createCalls).toHaveLength(0);
+		expect(result.v2ProjectId).toBe("p-old");
 	});
 });
 

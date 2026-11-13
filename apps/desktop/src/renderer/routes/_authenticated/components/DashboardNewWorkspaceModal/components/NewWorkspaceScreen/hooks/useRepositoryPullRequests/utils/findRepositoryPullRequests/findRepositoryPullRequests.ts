@@ -10,7 +10,7 @@ interface SearchRow {
 	state: "open" | "closed" | "merged";
 	isDraft: boolean;
 	headRefName: string | null;
-	repositoryProjectId?: string;
+	repositoryId?: string;
 }
 
 export type SearchProjectPullRequests = (
@@ -27,16 +27,16 @@ export async function findRepositoryPullRequests(
 ): Promise<Record<string, RepositoryPullRequest> | null> {
 	const { pullRequests } = await search(`#${linkedPR.prNumber}`);
 	const picked = pullRequests.find((row) => sameUrl(row.url, linkedPR.url));
-	if (!picked?.repositoryProjectId) return null;
+	if (!picked?.repositoryId) return null;
 	const headRefName = picked.headRefName ?? "";
 	const result: Record<string, RepositoryPullRequest> = {
-		[picked.repositoryProjectId]: { ...linkedPR, headRefName, matched: false },
+		[picked.repositoryId]: { ...linkedPR, headRefName, matched: false },
 	};
 	if (!headRefName) return result;
 
 	const siblings = await search(`head:${headRefName}`);
 	for (const row of siblings.pullRequests) {
-		const repositoryId = row.repositoryProjectId;
+		const repositoryId = row.repositoryId;
 		if (!repositoryId || result[repositoryId] || row.state !== "open") continue;
 		if ((row.headRefName ?? headRefName) !== headRefName) continue;
 		result[repositoryId] = {

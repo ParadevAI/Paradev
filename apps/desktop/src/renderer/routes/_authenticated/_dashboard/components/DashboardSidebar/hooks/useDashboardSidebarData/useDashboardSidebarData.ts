@@ -10,7 +10,10 @@ import {
 	useRef,
 } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	getPrimaryRepository,
+	useHostProjects,
+} from "renderer/hooks/host-projects/useHostProjects";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
@@ -25,6 +28,10 @@ import {
 	useCloudSidebarStore,
 } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { isInCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
+import {
+	primaryCheckoutRepositoryId,
+	workspaceRowPullRequest,
+} from "renderer/routes/_authenticated/_dashboard/utils/workspaceCheckoutSummaries";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { getVisibleSidebarWorkspaces } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
@@ -226,8 +233,8 @@ export function useDashboardSidebarData() {
 					{
 						id: project.projectKey,
 						name: project.name,
-						githubOwner: project.repoOwner,
-						githubRepoName: project.repoName,
+						githubOwner: getPrimaryRepository(project)?.owner ?? null,
+						githubRepoName: getPrimaryRepository(project)?.repoName ?? null,
 						iconUrl: resolveProjectIconUrl(project),
 						color: project.color,
 						createdAt: new Date(project.createdAt),
@@ -249,8 +256,8 @@ export function useDashboardSidebarData() {
 				.filter((project) => !visible.has(project.projectKey))
 				.map((project) => ({
 					id: project.projectKey,
-					githubOwner: project.repoOwner,
-					githubRepoName: project.repoName,
+					githubOwner: getPrimaryRepository(project)?.owner ?? null,
+					githubRepoName: getPrimaryRepository(project)?.repoName ?? null,
 				})),
 		];
 	}, [sidebarProjects, hostProjects]);
@@ -663,14 +670,21 @@ export function useDashboardSidebarData() {
 			const data = query.data;
 			if (!data) continue;
 			for (const row of data.workspaces) {
+				const workspace = hostWorkspacesById.get(row.workspaceId);
+				const shown = workspaceRowPullRequest(
+					row.checkouts,
+					workspace ? primaryCheckoutRepositoryId(workspace) : null,
+				);
 				rows.push({
 					workspaceId: row.workspaceId,
-					pullRequest: row.pullRequest,
+					pullRequest: shown
+						? { ...shown.pullRequest, repositoryId: shown.repositoryId }
+						: null,
 				});
 			}
 		}
 		return rows;
-	}, [pullRequestQueries]);
+	}, [pullRequestQueries, hostWorkspacesById]);
 
 	// A held host's query can stop polling (host offline) and keep its cached
 	// hold, so nothing else re-renders when the hold expires.

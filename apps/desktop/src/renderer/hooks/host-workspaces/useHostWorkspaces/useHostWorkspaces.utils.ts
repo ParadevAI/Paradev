@@ -38,8 +38,14 @@ export type HostShapedWorkspace = Omit<
  * A workspace row as served by a host (`workspace.list`) — the cloud row
  * shape plus the host-only extras.
  */
+/** One repository's checkout in a workspace. */
+export type HostWorkspaceCheckout =
+	WorkspaceSnapshotPayload["checkouts"][number];
+
 export interface HostWorkspaceRow extends HostShapedWorkspace {
 	worktreePath: string;
+	/** One per repository, sorted by name; absent from snapshots saved before checkouts. */
+	checkouts?: HostWorkspaceCheckout[];
 	worktreeExists: boolean;
 	/** Non-null = archived tombstone (only served on `includeArchived`). */
 	archivedAt?: number | null;
@@ -49,6 +55,8 @@ export interface HostWorkspaceRow extends HostShapedWorkspace {
 /** Merged item returned by useHostWorkspaces. */
 export interface HostWorkspaceItem extends HostShapedWorkspace {
 	worktreePath?: string;
+	/** One per repository, sorted by name; empty for a session workspace. */
+	checkouts: HostWorkspaceCheckout[];
 	worktreeExists?: boolean;
 	lastActivityAt: number | null;
 	/** False when the host didn't answer. */
@@ -283,6 +291,7 @@ export function applyWorkspaceChangedEvent(
 		// keep the row's last known stamp rather than wiping it.
 		lastActivityAt: snapshot.lastActivityAt ?? existing?.lastActivityAt ?? null,
 		worktreePath: snapshot.worktreePath,
+		checkouts: snapshot.checkouts,
 		// A host broadcasting created/updated just acted on the worktree;
 		// keep a known value over assuming.
 		worktreeExists: existing?.worktreeExists ?? true,
@@ -304,6 +313,7 @@ export function toHostWorkspaceItem(
 ): HostWorkspaceItem {
 	return {
 		...row,
+		checkouts: row.checkouts ?? [],
 		lastActivityAt: row.lastActivityAt ?? null,
 		hostReachable,
 	};

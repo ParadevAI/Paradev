@@ -24,6 +24,7 @@ import type {
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { adoptsExistingWorktree } from "./adoptsExistingWorktree";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
 import { recoverAgentLaunches } from "./recoverAgentLaunches";
 import { resolveChatAgentIds } from "./resolveChatAgentIds";
@@ -429,8 +430,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 						result.workspace.projectId !== null &&
 						result.alreadyExists === false
 					) {
-						const adoptsWorktree =
-							"worktreePath" in snapshot && !!snapshot.worktreePath;
+						const adoptsWorktree = adoptsExistingWorktree(snapshot);
 						const skipsSetup =
 							"runSetup" in snapshot && snapshot.runSetup === false;
 						if (!adoptsWorktree && !skipsSetup) {

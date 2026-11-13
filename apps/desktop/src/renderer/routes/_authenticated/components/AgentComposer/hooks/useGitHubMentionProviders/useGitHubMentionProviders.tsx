@@ -149,6 +149,8 @@ export function useGitHubMentionProviders(
 								includeClosed: query !== "",
 								deferChecks: true,
 							});
+						const spansRepositories =
+							new Set(pullRequests.map((pr) => pr.repositoryId)).size > 1;
 						return pullRequests
 							.filter((pr) => !ref || pr.prNumber === ref.number)
 							.map((pr) =>
@@ -159,7 +161,7 @@ export function useGitHubMentionProviders(
 										url: pr.url,
 										state: normalizePrState(pr.state, pr.isDraft),
 									},
-									pr.repositoryName,
+									spansRepositories ? pr.repositoryName : undefined,
 								),
 							);
 					},

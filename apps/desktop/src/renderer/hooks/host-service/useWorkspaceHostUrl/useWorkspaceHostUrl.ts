@@ -1,7 +1,6 @@
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { useMemo } from "react";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
-import { useRepositoryHost } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/RepositoryHostProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
@@ -37,7 +36,6 @@ export function useWorkspaceHostTarget(
 	const relayUrl = useRelayUrl();
 	const { workspaces, isReady } = useHostWorkspaces();
 	const { targets: sandboxes, isReady: sandboxesReady } = useSandboxAccess();
-	const repositoryHost = useRepositoryHost();
 
 	const match = workspaces.find((w) => w.id === workspaceId) ?? null;
 	const sandbox =
@@ -52,14 +50,6 @@ export function useWorkspaceHostTarget(
 				hostId: workspaceId,
 				url: sandbox.url,
 				desktopUrl: sandbox.desktopUrl,
-			};
-		}
-		if (!match && workspaceId && repositoryHost?.checkoutIds.has(workspaceId)) {
-			return {
-				status: "ready",
-				kind: repositoryHost.hostId === machineId ? "local" : "remote",
-				hostId: repositoryHost.hostId,
-				url: repositoryHost.hostUrl,
 			};
 		}
 		if (!match) {
@@ -93,7 +83,6 @@ export function useWorkspaceHostTarget(
 		machineId,
 		activeHostUrl,
 		relayUrl,
-		repositoryHost,
 	]);
 }
 

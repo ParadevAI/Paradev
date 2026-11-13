@@ -19,10 +19,6 @@ import type {
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { selectWorkspaceRunDefinition } from "shared/workspace-run-definition";
 import type { StoreApi } from "zustand/vanilla";
-import {
-	hasCheckouts,
-	useWorkspaceRepositories,
-} from "../../state/activeRepositoryStore";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { TerminalLauncher } from "../useV2TerminalLauncher";
 
@@ -60,18 +56,15 @@ function markStopped(
 function makeTerminalPane(
 	terminalId: string,
 	paneId: string,
-	title?: string,
 ): CreatePaneInput<PaneViewerData> {
 	return {
 		id: paneId,
 		kind: "terminal",
-		titleOverride:
-			title ??
-			i18n._(
-				msg({
-					message: "Workspace Run",
-				}),
-			),
+		titleOverride: i18n._(
+			msg({
+				message: "Workspace Run",
+			}),
+		),
 		data: { terminalId } as TerminalPaneData,
 	};
 }
@@ -83,26 +76,6 @@ function getDefinitionId(
 	return definition.source === "terminal-preset"
 		? definition.presetId
 		: definition.projectId;
-}
-
-/** One repository's run in a multi-repo workspace. */
-export interface RepositoryRun {
-	id: string;
-	name: string;
-	projectId: string | null;
-	/** Null when the repository has no run script. */
-	commands: string[] | null;
-	cwd: string | null;
-	runningState: WorkspaceRunTerminalState | null;
-}
-
-interface LaunchRunArgs {
-	command: string;
-	cwd?: string;
-	definitionSource: WorkspaceRunTerminalState["definitionSource"];
-	definitionId?: string;
-	repositoryId?: string;
-	title?: string;
 }
 
 interface UseV2WorkspaceRunArgs {
@@ -143,15 +116,12 @@ export function useV2WorkspaceRun({
 		[localWorkspaceState?.workspaceRunTerminals],
 	);
 
-	const repositories = useWorkspaceRepositories(workspaceId);
-	const isMultiRepo = hasCheckouts(workspaceId, repositories);
-
 	// Session workspaces (null projectId) have no project config; only global
 	// terminal presets can define their run.
 	const { data: configRunDefinition } =
 		workspaceTrpc.config.getWorkspaceRunDefinition.useQuery(
 			{ projectId: projectId ?? "" },
-			{ enabled: projectId !== null && !isMultiRepo },
+			{ enabled: projectId !== null },
 		);
 
 	const hostTarget = useWorkspaceHostTarget(workspaceId);
@@ -194,41 +164,12 @@ export function useV2WorkspaceRun({
 		],
 	);
 
-	const runningStates = useMemo(
+	const runningState = useMemo(
 		() =>
 			Object.values(workspaceRunTerminals)
 				.filter((state) => state.state === "running")
-				.sort((a, b) => b.startedAt - a.startedAt),
+				.sort((a, b) => b.startedAt - a.startedAt)[0] ?? null,
 		[workspaceRunTerminals],
-	);
-	const runningState = runningStates[0] ?? null;
-
-	const { data: repositoryDefinitions } =
-		workspaceTrpc.config.getRepositoryRunDefinitions.useQuery(
-			{ workspaceId },
-			{ enabled: isMultiRepo },
-		);
-	const repositoryRuns = useMemo<RepositoryRun[]>(
-		() =>
-			isMultiRepo
-				? repositories.map((repository) => {
-						const repositoryDefinition = repositoryDefinitions?.find(
-							(entry) => entry.repositoryId === repository.id,
-						);
-						return {
-							id: repository.id,
-							name: repository.name,
-							projectId: repositoryDefinition?.projectId ?? null,
-							commands: repositoryDefinition?.commands ?? null,
-							cwd: repositoryDefinition?.cwd ?? null,
-							runningState:
-								runningStates.find(
-									(state) => state.repositoryId === repository.id,
-								) ?? null,
-						};
-					})
-				: [],
-		[isMultiRepo, repositories, repositoryDefinitions, runningStates],
 	);
 
 	const updateWorkspaceRunTerminals = useCallback(
@@ -308,121 +249,6 @@ export function useV2WorkspaceRun({
 		[store],
 	);
 
-	const launchRun = useCallback(
-		async ({
-			command,
-			cwd,
-			definitionSource,
-			definitionId,
-			repositoryId,
-			title,
-		}: LaunchRunArgs) => {
-			// A terminal pane is a run pane iff its terminalId is in
-			// workspaceRunTerminals; a repository's run reuses only its own panes.
-			// Snapshot before launch so the new terminal doesn't itself match.
-			const priorRunTerminalIds = new Set(
-				Object.values(workspaceRunTerminals)
-					.filter((state) => state.repositoryId === repositoryId)
-					.map((state) => state.terminalId),
-			);
-			try {
-				const { sessions } = await utils.terminal.list.fetch(
-					{ workspaceId },
-					{ staleTime: 0 },
-				);
-				await Promise.allSettled(
-					sessions
-						.filter((session) => priorRunTerminalIds.has(session.terminalId))
-						.map((session) =>
-							killSessionMutation.mutateAsync({
-								terminalId: session.terminalId,
-								workspaceId,
-							}),
-						),
-				);
-			} catch (error) {
-				console.warn(
-					"[workspace-run] could not end earlier run terminals",
-					error,
-				);
-			}
-
-			const terminalId = await launcher.create({ command, cwd });
-			const startedAt = Date.now();
-			updateWorkspaceRunTerminals((states) => {
-				states[terminalId] = {
-					terminalId,
-					workspaceId,
-					state: "running",
-					command,
-					definitionSource,
-					definitionId,
-					startedAt,
-					...(repositoryId && { repositoryId }),
-				};
-			});
-
-			const state = store.getState();
-			let reused: { tabId: string; paneId: string } | null = null;
-			for (let i = state.tabs.length - 1; i >= 0; i--) {
-				const tab = state.tabs[i];
-				if (!tab) continue;
-				for (const [paneId, pane] of Object.entries(tab.panes)) {
-					if (pane.kind !== "terminal") continue;
-					const paneTerminalId = (pane.data as TerminalPaneData).terminalId;
-					if (paneTerminalId && priorRunTerminalIds.has(paneTerminalId)) {
-						reused = { tabId: tab.id, paneId };
-						break;
-					}
-				}
-				if (reused) break;
-			}
-
-			if (reused) {
-				const nextData: TerminalPaneData = { terminalId };
-				state.setPaneData({ paneId: reused.paneId, data: nextData });
-				state.setActivePane({
-					tabId: reused.tabId,
-					paneId: reused.paneId,
-				});
-				state.setActiveTab(reused.tabId);
-			} else {
-				const tabId = crypto.randomUUID();
-				const paneId = crypto.randomUUID();
-				const pane = makeTerminalPane(terminalId, paneId, title);
-				state.addTab({ id: tabId, panes: [pane] });
-			}
-		},
-		[
-			killSessionMutation,
-			launcher,
-			store,
-			updateWorkspaceRunTerminals,
-			utils,
-			workspaceId,
-			workspaceRunTerminals,
-		],
-	);
-
-	const reportLaunchError = useCallback(
-		(error: unknown) => {
-			toast.error(
-				t({
-					message: "Failed to run workspace command",
-				}),
-				{
-					description: errorMessage(
-						error,
-						t({
-							message: "Unknown error",
-						}),
-					),
-				},
-			);
-		},
-		[t],
-	);
-
 	const startWorkspaceRun = useCallback(async () => {
 		if (isStartingRef.current) return;
 		const command = buildTerminalCommand(definition?.commands);
@@ -453,14 +279,93 @@ export function useV2WorkspaceRun({
 				}
 			}
 
-			await launchRun({
+			// A terminal pane is a "workspace run" pane iff its terminalId is in
+			// workspaceRunTerminals. Snapshot before launch so the new terminal
+			// we're about to create doesn't itself match.
+			const priorRunTerminalIds = new Set(Object.keys(workspaceRunTerminals));
+			try {
+				const { sessions } = await utils.terminal.list.fetch(
+					{ workspaceId },
+					{ staleTime: 0 },
+				);
+				await Promise.allSettled(
+					sessions
+						.filter((session) => priorRunTerminalIds.has(session.terminalId))
+						.map((session) =>
+							killSessionMutation.mutateAsync({
+								terminalId: session.terminalId,
+								workspaceId,
+							}),
+						),
+				);
+			} catch (error) {
+				console.warn(
+					"[workspace-run] could not end earlier run terminals",
+					error,
+				);
+			}
+
+			const terminalId = await launcher.create({
 				command,
 				cwd: definition.cwd,
-				definitionSource: definition.source,
-				definitionId: getDefinitionId(definition),
 			});
+			const startedAt = Date.now();
+			updateWorkspaceRunTerminals((states) => {
+				states[terminalId] = {
+					terminalId,
+					workspaceId,
+					state: "running",
+					command,
+					definitionSource: definition.source,
+					definitionId: getDefinitionId(definition),
+					startedAt,
+				};
+			});
+
+			const state = store.getState();
+			let reused: { tabId: string; paneId: string } | null = null;
+			for (let i = state.tabs.length - 1; i >= 0; i--) {
+				const tab = state.tabs[i];
+				if (!tab) continue;
+				for (const [paneId, pane] of Object.entries(tab.panes)) {
+					if (pane.kind !== "terminal") continue;
+					const paneTerminalId = (pane.data as TerminalPaneData).terminalId;
+					if (paneTerminalId && priorRunTerminalIds.has(paneTerminalId)) {
+						reused = { tabId: tab.id, paneId };
+						break;
+					}
+				}
+				if (reused) break;
+			}
+
+			if (reused) {
+				const nextData: TerminalPaneData = { terminalId };
+				state.setPaneData({ paneId: reused.paneId, data: nextData });
+				state.setActivePane({
+					tabId: reused.tabId,
+					paneId: reused.paneId,
+				});
+				state.setActiveTab(reused.tabId);
+			} else {
+				const tabId = crypto.randomUUID();
+				const paneId = crypto.randomUUID();
+				const pane = makeTerminalPane(terminalId, paneId);
+				state.addTab({ id: tabId, panes: [pane] });
+			}
 		} catch (error) {
-			reportLaunchError(error);
+			toast.error(
+				t({
+					message: "Failed to run workspace command",
+				}),
+				{
+					description: errorMessage(
+						error,
+						t({
+							message: "Unknown error",
+						}),
+					),
+				},
+			);
 		} finally {
 			isStartingRef.current = false;
 			setIsPending(false);
@@ -470,209 +375,133 @@ export function useV2WorkspaceRun({
 		definition,
 		findLiveBootRun,
 		focusTerminalPane,
-		launchRun,
-		reportLaunchError,
+		killSessionMutation,
+		launcher,
+		store,
 		t,
+		updateWorkspaceRunTerminals,
+		utils,
+		workspaceId,
+		workspaceRunTerminals,
 	]);
 
-	const startRepositoryRuns = useCallback(
-		async (runs: RepositoryRun[]) => {
-			if (isStartingRef.current) return;
-			isStartingRef.current = true;
-			setIsPending(true);
-			try {
-				for (const run of runs) {
-					const command = buildTerminalCommand(run.commands ?? undefined);
-					if (!command || run.runningState) continue;
-					const repositoryName = run.name;
-					try {
-						await launchRun({
-							command,
-							cwd: run.cwd ?? undefined,
-							definitionSource: "project-config",
-							definitionId: run.id,
-							repositoryId: run.id,
-							title: t({ message: `Run: ${repositoryName}` }),
-						});
-					} catch (error) {
-						reportLaunchError(error);
-					}
-				}
-			} finally {
-				isStartingRef.current = false;
-				setIsPending(false);
-			}
-		},
-		[launchRun, reportLaunchError, t],
-	);
-
-	const stopRun = useCallback(
-		async (target: WorkspaceRunTerminalState) => {
-			try {
-				const stopRequestedAt = Date.now();
-				await writeInputMutation.mutateAsync({
-					terminalId: target.terminalId,
-					workspaceId,
-					data: CTRL_C_INPUT,
-				});
-				const stoppedAt = Date.now();
-				updateWorkspaceRunTerminals((states) => {
-					const state = states[target.terminalId];
-					if (!state || state.state !== "running") return;
-					state.stopRequestedAt = stopRequestedAt;
-					markStopped(state, stoppedAt, { state: "stopped-by-user" });
-				});
-			} catch (error) {
-				if (isTerminalGoneError(error)) {
-					const stoppedAt = Date.now();
-					updateWorkspaceRunTerminals((states) => {
-						const state = states[target.terminalId];
-						if (!state || state.state !== "running") return;
-						markStopped(state, stoppedAt);
-					});
-					return;
-				}
-
-				updateWorkspaceRunTerminals((states) => {
-					const state = states[target.terminalId];
-					if (!state || state.state !== "running") return;
-					delete state.stopRequestedAt;
-				});
-				toast.error(
-					t({
-						message: "Failed to stop workspace run command",
-					}),
-					{
-						description: errorMessage(
-							error,
-							t({
-								message: "Unknown error",
-							}),
-						),
-					},
-				);
-			}
-		},
-		[t, updateWorkspaceRunTerminals, workspaceId, writeInputMutation],
-	);
-
-	// A multi-repo workspace's Run covers every repository's run.
-	const stopTargets = useMemo(
-		() => (isMultiRepo ? runningStates : runningState ? [runningState] : []),
-		[isMultiRepo, runningState, runningStates],
-	);
-
 	const stopWorkspaceRun = useCallback(async () => {
-		if (stopTargets.length === 0) return;
+		if (!runningState) return;
 		setIsPending(true);
 		try {
-			await Promise.all(stopTargets.map(stopRun));
+			const stopRequestedAt = Date.now();
+			await writeInputMutation.mutateAsync({
+				terminalId: runningState.terminalId,
+				workspaceId,
+				data: CTRL_C_INPUT,
+			});
+			const stoppedAt = Date.now();
+			updateWorkspaceRunTerminals((states) => {
+				const state = states[runningState.terminalId];
+				if (!state || state.state !== "running") return;
+				state.stopRequestedAt = stopRequestedAt;
+				markStopped(state, stoppedAt, { state: "stopped-by-user" });
+			});
+		} catch (error) {
+			if (isTerminalGoneError(error)) {
+				const stoppedAt = Date.now();
+				updateWorkspaceRunTerminals((states) => {
+					const state = states[runningState.terminalId];
+					if (!state || state.state !== "running") return;
+					markStopped(state, stoppedAt);
+				});
+				return;
+			}
+
+			updateWorkspaceRunTerminals((states) => {
+				const state = states[runningState.terminalId];
+				if (!state || state.state !== "running") return;
+				delete state.stopRequestedAt;
+			});
+			toast.error(
+				t({
+					message: "Failed to stop workspace run command",
+				}),
+				{
+					description: errorMessage(
+						error,
+						t({
+							message: "Unknown error",
+						}),
+					),
+				},
+			);
 		} finally {
 			setIsPending(false);
 		}
-	}, [stopRun, stopTargets]);
-
-	const forceStopRun = useCallback(
-		async (target: WorkspaceRunTerminalState) => {
-			try {
-				await killSessionMutation.mutateAsync({
-					terminalId: target.terminalId,
-					workspaceId,
-				});
-				const stoppedAt = Date.now();
-				updateWorkspaceRunTerminals((states) => {
-					const state = states[target.terminalId];
-					if (!state) return;
-					state.stopRequestedAt ??= stoppedAt;
-					markStopped(state, stoppedAt, { state: "stopped-by-user" });
-				});
-			} catch (error) {
-				if (isTerminalGoneError(error)) {
-					const stoppedAt = Date.now();
-					updateWorkspaceRunTerminals((states) => {
-						const state = states[target.terminalId];
-						if (!state || state.state !== "running") return;
-						markStopped(state, stoppedAt);
-					});
-					return;
-				}
-
-				toast.error(
-					t({
-						message: "Failed to force stop workspace run command",
-					}),
-					{
-						description: errorMessage(
-							error,
-							t({
-								message: "Unknown error",
-							}),
-						),
-					},
-				);
-			}
-		},
-		[killSessionMutation, t, updateWorkspaceRunTerminals, workspaceId],
-	);
+	}, [
+		runningState,
+		t,
+		updateWorkspaceRunTerminals,
+		workspaceId,
+		writeInputMutation,
+	]);
 
 	const forceStopWorkspaceRun = useCallback(async () => {
-		if (stopTargets.length === 0) return;
+		if (!runningState) return;
 		setIsPending(true);
 		try {
-			await Promise.all(stopTargets.map(forceStopRun));
+			await killSessionMutation.mutateAsync({
+				terminalId: runningState.terminalId,
+				workspaceId,
+			});
+			const stoppedAt = Date.now();
+			updateWorkspaceRunTerminals((states) => {
+				const state = states[runningState.terminalId];
+				if (!state) return;
+				state.stopRequestedAt ??= stoppedAt;
+				markStopped(state, stoppedAt, { state: "stopped-by-user" });
+			});
 			await utils.terminal.list.invalidate({ workspaceId });
+		} catch (error) {
+			if (isTerminalGoneError(error)) {
+				const stoppedAt = Date.now();
+				updateWorkspaceRunTerminals((states) => {
+					const state = states[runningState.terminalId];
+					if (!state || state.state !== "running") return;
+					markStopped(state, stoppedAt);
+				});
+				await utils.terminal.list.invalidate({ workspaceId });
+				return;
+			}
+
+			toast.error(
+				t({
+					message: "Failed to force stop workspace run command",
+				}),
+				{
+					description: errorMessage(
+						error,
+						t({
+							message: "Unknown error",
+						}),
+					),
+				},
+			);
 		} finally {
 			setIsPending(false);
 		}
-	}, [forceStopRun, stopTargets, utils, workspaceId]);
+	}, [
+		killSessionMutation,
+		runningState,
+		t,
+		updateWorkspaceRunTerminals,
+		utils,
+		workspaceId,
+	]);
 
 	const toggleWorkspaceRun = useCallback(async () => {
-		if (stopTargets.length > 0) {
+		if (runningState) {
 			await stopWorkspaceRun();
 			return;
 		}
-		if (isMultiRepo) {
-			await startRepositoryRuns(repositoryRuns);
-			return;
-		}
 		await startWorkspaceRun();
-	}, [
-		isMultiRepo,
-		repositoryRuns,
-		startRepositoryRuns,
-		startWorkspaceRun,
-		stopTargets,
-		stopWorkspaceRun,
-	]);
-
-	const startRepositoryRun = useCallback(
-		(repositoryId: string) =>
-			startRepositoryRuns(
-				repositoryRuns.filter((run) => run.id === repositoryId),
-			),
-		[repositoryRuns, startRepositoryRuns],
-	);
-
-	const runAll = useCallback(
-		() => startRepositoryRuns(repositoryRuns),
-		[repositoryRuns, startRepositoryRuns],
-	);
-
-	const stopRepositoryRun = useCallback(
-		async (repositoryId: string) => {
-			const target = repositoryRuns.find(
-				(run) => run.id === repositoryId,
-			)?.runningState;
-			if (!target) return;
-			setIsPending(true);
-			try {
-				await stopRun(target);
-			} finally {
-				setIsPending(false);
-			}
-		},
-		[repositoryRuns, stopRun],
-	);
+	}, [runningState, startWorkspaceRun, stopWorkspaceRun]);
 
 	useWorkspaceEvent("terminal:lifecycle", workspaceId, (payload) => {
 		if (payload.eventType !== "exit") return;
@@ -687,20 +516,12 @@ export function useV2WorkspaceRun({
 	});
 
 	return {
-		canForceStop: stopTargets.length > 0,
+		canForceStop: Boolean(runningState),
 		definition,
 		forceStopWorkspaceRun,
 		isPending,
-		hasRunCommand: isMultiRepo
-			? repositoryRuns.some((run) => (run.commands ?? []).length > 0)
-			: (definition?.commands ?? []).length > 0,
-		isRunning: stopTargets.length > 0,
-		repositoryRuns,
-		runAll,
+		isRunning: Boolean(runningState),
 		runningState,
-		startRepositoryRun,
-		stopRepositoryRun,
-		stopWorkspaceRun,
 		toggleWorkspaceRun,
 	};
 }

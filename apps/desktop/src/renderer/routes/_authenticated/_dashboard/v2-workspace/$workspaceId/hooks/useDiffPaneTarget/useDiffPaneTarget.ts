@@ -5,9 +5,10 @@ import type { StoreApi } from "zustand/vanilla";
 import type { DiffPaneData, PaneViewerData } from "../../types";
 
 export interface DiffPaneTarget {
-	/** Worktree-relative path of the file the diff pane last navigated to. */
+	/** Checkout-relative path of the file the diff pane last navigated to. */
 	path: string;
 	changeKey?: string;
+	repositoryId?: string;
 }
 
 /**
@@ -35,6 +36,11 @@ export function useDiffPaneTarget(
 		if (active?.pane.kind !== "diff") return undefined;
 		return (active.pane.data as DiffPaneData).changeKey;
 	});
+	const activeRepositoryId = useStore(store, (state) => {
+		const active = state.getActivePane();
+		if (active?.pane.kind !== "diff") return undefined;
+		return (active.pane.data as DiffPaneData).repositoryId;
+	});
 	const hasDiffPane = useStore(store, (state) =>
 		state.tabs.some((tab) =>
 			Object.values(tab.panes).some((pane) => pane.kind === "diff"),
@@ -48,9 +54,15 @@ export function useDiffPaneTarget(
 	useEffect(() => {
 		if (activeKind !== "diff") return;
 		setTarget(
-			activePath ? { path: activePath, changeKey: activeChangeKey } : undefined,
+			activePath
+				? {
+						path: activePath,
+						changeKey: activeChangeKey,
+						repositoryId: activeRepositoryId,
+					}
+				: undefined,
 		);
-	}, [activeKind, activePath, activeChangeKey]);
+	}, [activeKind, activePath, activeChangeKey, activeRepositoryId]);
 	useEffect(() => {
 		if (!hasDiffPane) setTarget(undefined);
 	}, [hasDiffPane]);

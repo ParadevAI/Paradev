@@ -33,6 +33,7 @@ import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolba
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates/useWorkspaceCreates";
 import { usePullRequestThreads } from "../../hooks/usePullRequestThreads";
+import { pullRequestCheckoutInput } from "../../utils/pullRequestCheckoutInput";
 import {
 	type PullRequestTarget,
 	pullRequestDiffQueryKey,
@@ -53,6 +54,7 @@ interface PullRequestCodeTabProps {
 	prUrl: string;
 	hostUrl: string;
 	hostId: string | null;
+	repositoryId: string | null;
 }
 
 interface PrCommentThreadComment {
@@ -185,6 +187,7 @@ export function PullRequestCodeTab({
 	prUrl,
 	hostUrl,
 	hostId,
+	repositoryId,
 }: PullRequestCodeTabProps) {
 	const { t } = useLingui();
 	// Same file look as the v2-workspace DiffPane (edge-to-edge files, PR-row
@@ -374,6 +377,7 @@ export function PullRequestCodeTab({
 		"pull-request-linked-workspace",
 		projectId,
 		repoFullName,
+		repositoryId,
 		hostUrl,
 		prNumber,
 	];
@@ -386,6 +390,7 @@ export function PullRequestCodeTab({
 			return client.pullRequests.getLinkedWorkspace.query({
 				projectId,
 				prNumber,
+				repositoryId: repositoryId ?? undefined,
 				repoFullName: repoFullName ?? undefined,
 			});
 		},
@@ -448,13 +453,22 @@ export function PullRequestCodeTab({
 			if (!hostId || !projectId) {
 				throw new Error("No host available to create a workspace");
 			}
+			const checkoutInput = pullRequestCheckoutInput({
+				prNumber,
+				repoFullName: repoFullName ?? null,
+				repositoryId,
+			});
+			if (!checkoutInput) {
+				throw new Error(
+					t({ message: "This pull request's repository is not known" }),
+				);
+			}
 			const { completed } = submitWorkspaceCreate({
 				hostId,
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId,
-					pr: prNumber,
-					prRepository: repoFullName ?? undefined,
+					...checkoutInput,
 					agents: [{ agent: input.target.configId, prompt: text }],
 				},
 			});

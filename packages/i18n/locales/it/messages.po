@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {# file modificato in questo workspace} other {#
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# file modificato} other {# file modificati}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# file} other {# file}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Modificato # file} other {Modificati # file}}"
 
@@ -1383,6 +1386,9 @@ msgstr "{remaining} token rimanenti"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# repository} other {Tutti i # repository}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName} spostato in {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Annullate le modifiche a # file.} other {Annullate le modifiche a # file.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Azioni"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Azioni per {0}"
 
@@ -2099,11 +2106,11 @@ msgstr "Aggiungi {0} al workspace"
 msgid "Add {localizedName}?"
 msgstr "Aggiungere {localizedName}?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Aggiungi prima {repositoryName} come progetto su {computer}"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Aggiungi prima {only} come progetto su {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Aggiungi prima {repositoryName} come progetto su questo computer"
+msgid "Add {only} as a project on this computer first"
+msgstr "Aggiungi prima {only} come progetto su questo computer"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Aggiungere #{prNumber} alla coda di unione?"
@@ -2128,6 +2135,12 @@ msgstr "Aggiungi un progetto per vedere le issue GitHub."
 
 msgid "Add a project to see pull requests."
 msgstr "Aggiungi un progetto per vedere le pull request."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Aggiungi prima su {computer} un progetto con esattamente questi repository: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Aggiungi prima su questo computer un progetto con esattamente questi repository: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Aggiungi un breve riepilogo…"
@@ -4515,9 +4528,6 @@ msgstr "Scegli un combattente"
 msgid "Choose a folder"
 msgstr "Scegli una cartella"
 
-msgid "Choose a parent directory"
-msgstr "Scegli una directory padre"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Scegli un progetto in Issue GitHub prima di aprire una issue."
 
@@ -4532,9 +4542,6 @@ msgstr "Scegli una sezione."
 
 msgid "Choose agent"
 msgstr "Scegli l'agente"
-
-msgid "Choose an existing repo folder"
-msgstr "Scegli una cartella di repo esistente"
 
 msgid "Choose an MCP server"
 msgstr "Scegli un server MCP"
@@ -4752,13 +4759,6 @@ msgstr "Clona da URL"
 
 msgid "clone the repository"
 msgstr "clonare il repository"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Clona il repository oppure importa una cartella esistente sull'host."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Clonato in {0}"
 
 msgid "Cloning…"
 msgstr "Clonazione…"
@@ -5122,9 +5122,6 @@ msgstr "Comando..."
 
 msgid "Commands"
 msgstr "Comandi"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Comandi eseguiti per la configurazione e la rimozione di questo repository e dal menu Esegui."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Comandi eseguiti per il setup del workspace, il teardown e il pulsante Esegui."
@@ -5887,6 +5884,9 @@ msgstr "Impossibile aggiungere l’agente"
 msgid "Could not add repository"
 msgstr "Impossibile aggiungere il repository"
 
+msgid "Could not add the repository"
+msgstr "Impossibile aggiungere il repository"
+
 msgid "Could not answer the agent"
 msgstr "Impossibile rispondere all'agente"
 
@@ -6017,6 +6017,9 @@ msgstr "Impossibile caricare questa pull request."
 msgid "Could not load your machines"
 msgstr "Impossibile caricare le tue macchine"
 
+msgid "Could not make it the primary repository"
+msgstr "Impossibile renderlo il repository principale"
+
 msgid "Could not mark ready"
 msgstr "Impossibile segnare come pronta"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "Impossibile rimuovere l’accesso"
 
 msgid "Could not remove repository"
+msgstr "Impossibile rimuovere il repository"
+
+msgid "Could not remove the repository"
 msgstr "Impossibile rimuovere il repository"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "Scarta tutte {0}"
 msgid "Discard all staged changes"
 msgstr "Scarta tutte le modifiche in stage"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Scartare tutte le modifiche in stage in {repositoryName}?"
+
 msgid "Discard all staged changes?"
 msgstr "Scartare tutte le modifiche in stage?"
 
 msgid "Discard all unstaged changes"
 msgstr "Scarta tutte le modifiche non in stage"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Scartare tutte le modifiche non in stage in {repositoryName}?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Scartare tutte le modifiche non in stage?"
@@ -8147,12 +8159,6 @@ msgstr "Inserisci un indirizzo email completo"
 msgid "Enter a number"
 msgstr "Inserisci un numero"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Inserisci una directory padre su {hostName}"
-
-msgid "Enter a path on {hostName}"
-msgstr "Inserisci un percorso su {hostName}"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Inserisci un URL nella barra di ricerca qui sopra."
 
@@ -8294,11 +8300,8 @@ msgstr "Ogni mercoledì alle 9, rivedi le PR unite questa settimana e aggiorna l
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Ogni giorno feriale alle 9, leggi le nuove issue GitHub, applica le etichette e prepara una prima risposta da rivedere."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Ogni workspace del progetto multi-repository estrae questo repository accanto agli altri."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Ogni workspace di questo progetto li estrae tutti, uno accanto all'altro, su un unico branch."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Ogni workspace di questo progetto li estrae tutti, uno accanto all'altro, su un solo branch. I comandi di setup ed esecuzione vengono dal repository principale."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Tutti discutono se questo sia generalizzabile. Quella discussione è il segno che il livello è stato raggiunto."
@@ -8350,12 +8353,6 @@ msgstr "Tutto ciò che hai pubblicato viene eliminato, non nascosto. Puoi rientr
 
 msgid "Executable"
 msgstr "Eseguibile"
-
-msgid "Existing repo path"
-msgstr "Percorso del repo esistente"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Percorso del repo esistente su {hostName}"
 
 msgid "existing worktree"
 msgstr "worktree esistente"
@@ -9338,6 +9335,9 @@ msgstr "Attiva il campo di ricerca nella vista task"
 
 msgid "Folder"
 msgstr "Cartella"
+
+msgid "Folder can't be read"
+msgstr "Impossibile leggere la cartella"
 
 msgid "Folder is missing"
 msgstr "La cartella non esiste"
@@ -10425,9 +10425,6 @@ msgstr "Importa ogni progetto v1 in v2. I progetti già importati sono indicati 
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Importa ogni script del terminale v1 in v2."
-
-msgid "Import existing"
-msgstr "Importa esistente"
 
 msgid "Import existing folder"
 msgstr "Importa una cartella esistente"
@@ -11552,9 +11549,6 @@ msgstr "Righe {0}–{1}"
 msgid "Link"
 msgstr "Link"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Collega prima un repository GitHub al progetto per abilitare la clonazione."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Caricamento di altri..."
 
 msgid "Loading more…"
 msgstr "Caricamento di altri…"
+
+msgid "Loading project repositories…"
+msgstr "Caricamento dei repository del progetto…"
 
 msgid "Loading project…"
 msgstr "Caricamento del progetto…"
@@ -11901,6 +11898,9 @@ msgstr "Imposta come predefinito"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Imposta come predefinito: avvia i nuovi terminali e agenti su questo account."
+
+msgid "Make primary"
+msgstr "Rendi principale"
 
 msgid "Make public"
 msgstr "Rendi pubblica"
@@ -12522,9 +12522,6 @@ msgstr "Spostamento di questa chat qui"
 msgid "Moving this workspace…"
 msgstr "Spostamento di questo workspace…"
 
-msgid "Multi-repo project"
-msgstr "Progetto multi-repository"
-
 msgid "Multi-select"
 msgstr "Selezione multipla"
 
@@ -12983,6 +12980,9 @@ msgstr "Nessun canale"
 
 msgid "No chats found"
 msgstr "Nessuna chat trovata"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Nessun checkout di questo workspace è su {currentBranchName}"
 
 msgid "No checks"
 msgstr "Nessun controllo"
@@ -14581,6 +14581,9 @@ msgstr "Apertura nell’interfaccia chat…"
 msgid "Opening pages"
 msgstr "Apertura delle pagine"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Apre repository diversi da quelli di questo workspace"
+
 msgid "Operator"
 msgstr "Operatore"
 
@@ -15079,12 +15082,6 @@ msgstr "Le sessioni parallele per sviluppatore raddoppiano ogni sette mesi, supe
 msgid "Parameters"
 msgstr "Parametri"
 
-msgid "Parent directory"
-msgstr "Directory padre"
-
-msgid "Parent directory on {hostName}"
-msgstr "Directory padre su {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "In parte cronaca, in parte scommessa. Le prime due voci stanno già accadendo. Il resto è formulato in modo abbastanza concreto da poter risultare sbagliato."
 
@@ -15272,9 +15269,6 @@ msgstr "Scegli un altro elemento (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Scegli una cartella sul disco e aggiungila come progetto"
 
-msgid "Pick a folder…"
-msgstr "Scegli una cartella…"
-
 msgid "Pick a machine size"
 msgstr "Scegli una dimensione della macchina"
 
@@ -15284,14 +15278,11 @@ msgstr "Scegli un modello"
 msgid "pick a name for the board"
 msgstr "scegli un nome per la classifica"
 
-msgid "Pick a parent directory"
-msgstr "Scegli una directory padre"
-
-msgid "Pick a project location"
-msgstr "Scegli una posizione per il progetto"
-
 msgid "Pick a reason"
 msgstr "Scegli un motivo"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Scegli una cartella di repository su {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Scegli un repository con un file di marketplace di plugin. Superset sincronizza i suoi plugin ora e a ogni nuova sincronizzazione."
@@ -15802,13 +15793,8 @@ msgstr "Progetto su un altro dispositivo"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Progetto pronto. Aprilo dalla barra laterale."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Progetto spostato in {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Progetto configurato in {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Progetto spostato in {newPath}"
 
 msgid "Project Settings"
 msgstr "Impostazioni del progetto"
@@ -16494,6 +16480,9 @@ msgstr "Ricaricando verranno scartate le tue modifiche. Sovrascrivendo verrà so
 msgid "Relocate"
 msgstr "Sposta"
 
+msgid "Relocate {repositoryName}?"
+msgstr "Spostare {repositoryName}?"
+
 msgid "Relocate project?"
 msgstr "Spostare il progetto?"
 
@@ -16577,6 +16566,9 @@ msgstr "Rimuovi dal gruppo"
 
 msgid "Remove from queue"
 msgstr "Rimuovi dalla coda"
+
+msgid "Remove from project"
+msgstr "Rimuovi dal progetto"
 
 msgid "Remove from Queue"
 msgstr "Rimuovi dalla coda"
@@ -16859,9 +16851,6 @@ msgstr "Repository rimosso"
 
 msgid "Repository root"
 msgstr "Radice del repository"
-
-msgid "Repository settings"
-msgstr "Impostazioni del repository"
 
 msgid "Repository URL or path"
 msgstr "URL o percorso del repository"
@@ -17432,9 +17421,6 @@ msgstr "Esegui agenti a orario o quando succede qualcosa."
 msgid "Run agents side by side"
 msgstr "Esegui gli agenti fianco a fianco"
 
-msgid "Run all"
-msgstr "Esegui tutto"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Esegui un esercito di"
@@ -17531,9 +17517,6 @@ msgstr "Esegui i tuoi agenti dal desktop, da qualsiasi terminale o dal telefono.
 
 msgid "Run your coding agents in the cloud."
 msgstr "Esegui i tuoi agenti di programmazione nel cloud."
-
-msgid "Run: {repositoryName}"
-msgstr "Esecuzione: {repositoryName}"
 
 msgid "Run."
 msgstr "Esegui."
@@ -18180,9 +18163,6 @@ msgstr "Seleziona l'organizzazione"
 msgid "Select Organization Logo"
 msgstr "Seleziona il logo dell'organizzazione"
 
-msgid "Select parent directory to clone into"
-msgstr "Seleziona la directory padre in cui clonare"
-
 msgid "Select people"
 msgstr "Seleziona persone"
 
@@ -18416,9 +18396,6 @@ msgstr "Imposta progetto…"
 msgid "Set Run"
 msgstr "Imposta l'esecuzione"
 
-msgid "Set run script"
-msgstr "Imposta lo script di esecuzione"
-
 msgid "Set this project"
 msgstr "Imposta questo progetto"
 
@@ -18440,9 +18417,6 @@ msgstr "Configura ambiente"
 
 msgid "Set up once"
 msgstr "Configura una volta"
-
-msgid "Set up project on {hostName}"
-msgstr "Configura il progetto su {hostName}"
 
 msgid "Set up project…"
 msgstr "Configura il progetto…"
@@ -19227,6 +19201,10 @@ msgstr "Spam o truffa"
 msgid "Sparse checkout"
 msgstr "Sparse checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Sparse checkout di {0}"
+
 msgid "Speaking"
 msgstr "Sta parlando"
 
@@ -19619,9 +19597,6 @@ msgstr "Interrompi {label}"
 
 msgid "Stop {name}"
 msgstr "Interrompi {name}"
-
-msgid "Stop all"
-msgstr "Arresta tutto"
 
 msgid "Stop dictation"
 msgstr "Interrompi la dettatura"
@@ -20387,9 +20362,6 @@ msgstr "Il codice è scaduto. Ricomincia."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "I comandi che Paradev esegue per preparare, avviare e archiviare i workspace di questo progetto, dal config.toml del repository."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "I comandi con cui Paradev configura, esegue e archivia i checkout di questo repository, dal suo config.toml."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "L’azienda ha raccolto un round seed da 11,5 milioni di dollari guidato da Union Square Ventures, con Y Combinator e Paul Graham. TechCrunch l’ha indicata tra le startup più promettenti del YC Demo Day."
 
@@ -20492,6 +20464,9 @@ msgstr "La futura casa di configurazioni, prompt e guide di setup riutilizzabili
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "L'host è tornato alla {0}, non alla {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "L'host ha creato un progetto senza repository"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "L’host non è tornato disponibile entro quindici minuti."
@@ -20923,8 +20898,8 @@ msgstr "Questa email è già registrata con un altro metodo di accesso e il prov
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Questo ambiente non ha repository. Crea un ambiente con repository nelle Impostazioni, poi avvia il workspace da lì"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Questo ambiente apre {environmentRepository}, non {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Questo ambiente apre {environmentRepositories}, non {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "I repository di questo ambiente sono fissi; promuovi di nuovo un workspace per cambiarli"
@@ -21091,6 +21066,9 @@ msgstr "Questa pull request non è più disponibile."
 msgid "This pull request link is invalid."
 msgstr "Questo link alla pull request non è valido."
 
+msgid "This pull request's repository is not known"
+msgstr "Il repository di questa pull request non è noto"
+
 msgid "This recording is too long to transcribe"
 msgstr "Questa registrazione è troppo lunga da trascrivere"
 
@@ -21241,6 +21219,9 @@ msgstr "Questo workspace"
 
 msgid "This workspace has no project to branch from"
 msgstr "Questo workspace non ha un progetto da cui diramare"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Questo workspace è ancora in caricamento. Riprova."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Questo workspace potrebbe essere stato rimosso oppure non hai più accesso."
@@ -22217,9 +22198,6 @@ msgstr "Usa questo account"
 
 msgid "Use this folder"
 msgstr "Usa questa cartella"
-
-msgid "Use this repo"
-msgstr "Usa questo repo"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Usalo per sistemare i terminali bloccati o che non rispondono."

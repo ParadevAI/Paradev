@@ -8,7 +8,6 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import { ChevronDown, Play, Settings, Square, X } from "lucide-react";
-import { type ReactNode, useState } from "react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
@@ -20,9 +19,6 @@ interface V2WorkspaceRunButtonProps {
 	isRunning: boolean;
 	isPending: boolean;
 	canForceStop: boolean;
-	hasRunCommand: boolean;
-	/** The per-repository rows of a multi-repo workspace. */
-	repositoryRunItems?: ReactNode;
 	onToggle: () => void | Promise<void>;
 	onForceStop: () => void | Promise<void>;
 }
@@ -33,14 +29,12 @@ export function V2WorkspaceRunButton({
 	isRunning,
 	isPending,
 	canForceStop,
-	hasRunCommand,
-	repositoryRunItems,
 	onToggle,
 	onForceStop,
 }: V2WorkspaceRunButtonProps) {
 	const { t } = useLingui();
 	const hotkeyText = useHotkeyDisplay("RUN_WORKSPACE_COMMAND").text;
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const hasRunCommand = (definition?.commands ?? []).length > 0;
 
 	const handleConfigureClick = useConfigureWorkspaceRun(projectId, definition);
 
@@ -57,8 +51,7 @@ export function V2WorkspaceRunButton({
 				type="button"
 				onClick={() => {
 					if (!hasRunCommand && !isRunning) {
-						if (repositoryRunItems) setIsMenuOpen(true);
-						else handleConfigureClick();
+						handleConfigureClick();
 						return;
 					}
 					void onToggle();
@@ -97,7 +90,7 @@ export function V2WorkspaceRunButton({
 				)}
 			</button>
 
-			<DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
@@ -116,14 +109,9 @@ export function V2WorkspaceRunButton({
 						<ChevronDown className="size-3" />
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					align="start"
-					className={repositoryRunItems ? "w-64" : "w-44"}
-				>
-					{repositoryRunItems}
+				<DropdownMenuContent align="start" className="w-44">
 					{canForceStop && (
 						<>
-							{repositoryRunItems && <DropdownMenuSeparator />}
 							<DropdownMenuItem
 								onClick={() => void onForceStop()}
 								className="text-destructive focus:text-destructive"
@@ -131,21 +119,19 @@ export function V2WorkspaceRunButton({
 								<X className="mr-2 size-4 text-destructive" />
 								<Trans>Force Stop</Trans>
 							</DropdownMenuItem>
-							{!repositoryRunItems && <DropdownMenuSeparator />}
+							<DropdownMenuSeparator />
 						</>
 					)}
-					{!repositoryRunItems && (
-						<DropdownMenuItem onClick={handleConfigureClick}>
-							<Settings className="mr-2 size-4" />
-							{definition?.source === "terminal-preset"
-								? t({
-										message: "Edit Run Script",
-									})
-								: t({
-										message: "Configure",
-									})}
-						</DropdownMenuItem>
-					)}
+					<DropdownMenuItem onClick={handleConfigureClick}>
+						<Settings className="mr-2 size-4" />
+						{definition?.source === "terminal-preset"
+							? t({
+									message: "Edit Run Script",
+								})
+							: t({
+									message: "Configure",
+								})}
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>

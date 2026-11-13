@@ -4,18 +4,23 @@ import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
-import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import {
+	type CheckoutGitStatus,
+	useCheckoutGitStatus,
+} from "../../providers/WorkspaceGitStatusProvider";
+import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
 import {
 	useChangesFilter,
 	useSetChangesFilter,
 } from "../../state/repositoryChangesFilterStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export interface ChangesScope {
-	status: ReturnType<typeof useWorkspaceGitStatus>;
+	status: CheckoutGitStatus;
 	filter: ChangesFilter;
 	setFilter: (next: ChangesFilter) => void;
 	baseBranch: string | null;
@@ -29,27 +34,35 @@ export interface ChangesScope {
 /**
  * Which diff the Changes list and pane show (the commit filter and the base
  * branch), shared by the sidebar's Changes tab and the Changes pane header.
- * A checkout without a local state row keeps its filter in memory.
+ * Each checkout of a multi-repo workspace has its own scope.
  */
-export function useChangesScope(workspaceId: string): ChangesScope {
+export function useChangesScope(
+	workspaceId: string,
+	repositoryId: string | undefined,
+): ChangesScope {
 	const { t } = useLingui();
-	const status = useWorkspaceGitStatus();
+	const status = useCheckoutGitStatus(repositoryId);
 	const utils = workspaceTrpc.useUtils();
-	const filter = useChangesFilter(workspaceId);
-	const setFilter = useSetChangesFilter(workspaceId);
-
-	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
-		{ workspaceId },
-		{ staleTime: Number.POSITIVE_INFINITY },
+	const filter = useChangesFilter(workspaceId, repositoryId);
+	const setFilter = useSetChangesFilter(workspaceId, repositoryId);
+	const scope = useMemo(
+		() => checkoutInput(workspaceId, repositoryId),
+		[workspaceId, repositoryId],
 	);
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
+
+	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(scope, {
+		enabled: checkoutsLoaded,
+		staleTime: Number.POSITIVE_INFINITY,
+	});
 	const baseBranch = baseBranchQuery.data?.baseBranch ?? null;
 
 	const setBaseBranchMutation = workspaceTrpc.git.setBaseBranch.useMutation({
 		onSuccess: () => {
-			void utils.git.getBaseBranch.invalidate({ workspaceId });
-			void utils.git.getStatus.invalidate({ workspaceId });
-			void utils.git.listCommits.invalidate({ workspaceId });
-			void utils.git.getDiff.invalidate({ workspaceId });
+			void utils.git.getBaseBranch.invalidate(scope);
+			void utils.git.getStatus.invalidate(scope);
+			void utils.git.listCommits.invalidate(scope);
+			void utils.git.getDiff.invalidate(scope);
 		},
 		// The picker re-renders from getBaseBranch, so a rejected change
 		// silently snaps back without this.
@@ -64,24 +77,24 @@ export function useChangesScope(workspaceId: string): ChangesScope {
 
 	const setBaseBranch = useCallback(
 		(branchName: string | null) => {
-			setBaseBranchMutation.mutate({ workspaceId, baseBranch: branchName });
+			setBaseBranchMutation.mutate({ ...scope, baseBranch: branchName });
 		},
-		[setBaseBranchMutation, workspaceId],
+		[setBaseBranchMutation, scope],
 	);
 
 	const commits = workspaceTrpc.git.listCommits.useQuery(
-		{ workspaceId, baseBranch: baseBranch ?? undefined },
-		{ refetchOnWindowFocus: true },
+		{ ...scope, baseBranch: baseBranch ?? undefined },
+		{ enabled: checkoutsLoaded, refetchOnWindowFocus: true },
 	);
 
-	const branches = workspaceTrpc.git.listBranches.useQuery(
-		{ workspaceId },
-		{ refetchInterval: 30_000, refetchOnWindowFocus: true },
-	);
+	const branches = workspaceTrpc.git.listBranches.useQuery(scope, {
+		enabled: checkoutsLoaded,
+		refetchInterval: 30_000,
+		refetchOnWindowFocus: true,
+	});
 
 	const renameBranchMutation = workspaceTrpc.git.renameBranch.useMutation({
-		// A multi-repo rename changes every repository's branch.
-		onSuccess: () => utils.workspace.repositories.invalidate(),
+		onSuccess: () => utils.workspace.get.invalidate({ id: workspaceId }),
 	});
 
 	const renameBranch = useCallback(
@@ -90,7 +103,7 @@ export function useChangesScope(workspaceId: string): ChangesScope {
 			if (!currentName) return;
 			toast.promise(
 				renameBranchMutation.mutateAsync({
-					workspaceId,
+					...scope,
 					oldName: currentName,
 					newName,
 				}),
@@ -111,7 +124,7 @@ export function useChangesScope(workspaceId: string): ChangesScope {
 				},
 			);
 		},
-		[workspaceId, status.data?.currentBranch.name, renameBranchMutation, t],
+		[scope, status.data?.currentBranch.name, renameBranchMutation, t],
 	);
 
 	return {

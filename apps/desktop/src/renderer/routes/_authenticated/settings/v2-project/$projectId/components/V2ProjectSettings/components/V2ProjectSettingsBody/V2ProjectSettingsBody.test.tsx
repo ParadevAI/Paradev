@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render } from "@testing-library/react";
 import type { ComponentProps } from "react";
+import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { V2ProjectSettingsBody } from "./V2ProjectSettingsBody";
 
@@ -15,13 +16,38 @@ type BodyProps = ComponentProps<typeof V2ProjectSettingsBody>;
 
 const HOST_URL = "http://127.0.0.1:7777";
 
+function repository(
+	id: string,
+	overrides: Partial<HostRepository> = {},
+): HostRepository {
+	return {
+		id,
+		projectId: "project-1",
+		isPrimary: false,
+		name: id,
+		path: `/repos/${id}`,
+		provider: "github",
+		owner: "acme",
+		repoName: id,
+		url: `https://github.com/acme/${id}`,
+		remoteName: "origin",
+		sparseCheckoutPaths: [],
+		pathState: "ok",
+		...overrides,
+	};
+}
+
+const app = repository("app", {
+	isPrimary: true,
+	sparseCheckoutPaths: ["apps/desktop"],
+});
+
 const project: BodyProps["project"] = {
 	projectKey: "project-1",
 	id: "project-1",
 	name: "Acme",
-	repoOwner: "acme",
-	repoName: "app",
-	repoUrl: "https://github.com/acme/app",
+	primaryRepositoryId: "app",
+	repositories: [app],
 	icon: null,
 	color: null,
 	hostIds: ["host-1"],
@@ -35,12 +61,12 @@ const hostProject = {
 	name: "Acme",
 	icon: null,
 	color: null,
-	repoPath: "/repos/app",
+	primaryRepositoryId: "app",
+	repositories: [app],
 	worktreeBaseDir: null,
 	branchPrefixMode: null,
 	branchPrefixCustom: null,
 	namingInstructions: "Prefix branches with fix/ or feat/",
-	sparseCheckoutPaths: ["apps/desktop"],
 } as unknown as NonNullable<BodyProps["hostProject"]>;
 
 function renderBody(props: Partial<BodyProps> = {}) {
@@ -63,7 +89,6 @@ function renderBody(props: Partial<BodyProps> = {}) {
 					hostOptions={[]}
 					onHostChange={() => {}}
 					onHostProjectChanged={() => {}}
-					locationSection={<div data-testid="location" />}
 					scriptsEditor={<div data-testid="scripts" />}
 					usesConfigToml={false}
 					dangerZone={<div data-testid="danger" />}
@@ -110,10 +135,49 @@ describe("V2ProjectSettingsBody", () => {
 		expect(view.getByLabelText("Change project icon and color")).toBeDefined();
 	});
 
-	test("places the location, scripts and danger-zone sections it is given", () => {
+	test("places the scripts and danger-zone sections it is given", () => {
 		const view = renderBody();
-		for (const slot of ["location", "scripts", "danger"]) {
+		for (const slot of ["scripts", "danger"]) {
 			expect(view.getByTestId(slot)).toBeDefined();
 		}
+	});
+});
+
+describe("V2ProjectSettingsBody with several repositories", () => {
+	const api = repository("api", { sparseCheckoutPaths: ["src"] });
+	const multi = {
+		...hostProject,
+		repositories: [api, app],
+	} as NonNullable<BodyProps["hostProject"]>;
+
+	test("lists every repository and marks the primary", () => {
+		const view = renderBody({ hostProject: multi });
+		expect(view.getByText("Primary")).toBeDefined();
+		expect(view.getAllByText("api").length).toBeGreaterThan(0);
+		expect(view.queryByText("Repository")).toBe(null);
+	});
+
+	test("gives each repository its own sparse-checkout editor", () => {
+		const view = renderBody({ hostProject: multi });
+		expect(
+			view.container.querySelector<HTMLTextAreaElement>(
+				"#project-sparse-checkout-api",
+			)?.value,
+		).toBe("src");
+		expect(
+			view.container.querySelector<HTMLTextAreaElement>(
+				"#project-sparse-checkout-app",
+			)?.value,
+		).toBe("apps/desktop");
+	});
+
+	test("flags a repository whose folder is missing", () => {
+		const view = renderBody({
+			hostProject: {
+				...multi,
+				repositories: [{ ...api, pathState: "missing" }, app],
+			},
+		});
+		expect(view.getAllByText("Folder is missing").length).toBeGreaterThan(0);
 	});
 });

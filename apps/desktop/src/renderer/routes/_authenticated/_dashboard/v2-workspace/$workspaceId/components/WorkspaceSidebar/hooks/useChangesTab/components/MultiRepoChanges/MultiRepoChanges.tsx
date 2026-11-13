@@ -2,31 +2,18 @@ import { useMemo, useState } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { ChangesListHeader } from "renderer/routes/_authenticated/_dashboard/components/ChangesListHeader";
 import { useFoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
+import type { WorkspaceCheckout } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/activeRepositoryStore";
 import type { ChangesContentParams } from "../../hooks/useChangesContent";
 import { RepositoryChangesSection } from "./components/RepositoryChangesSection";
 
-interface Repository {
-	id: string;
-	name: string;
-	branch: string;
+interface MultiRepoChangesProps extends Omit<ChangesContentParams, "shared"> {
+	checkouts: WorkspaceCheckout[];
 }
 
-interface MultiRepoChangesProps
-	extends Omit<ChangesContentParams, "workspaceId" | "shared"> {
-	repositories: Repository[];
-	/** Opening a file in a pane needs its checkout active first. */
-	onSelectRepository: (repositoryId: string) => void;
-	onCountChange: (repositoryId: string, count: number) => void;
-}
-
+/** Each checkout's changes in its own section, under one search and fold. */
 export function MultiRepoChanges({
-	repositories,
-	onSelectRepository,
-	onCountChange,
-	selectedDiffTarget,
-	onSelectFile,
-	onOpenFile,
-	compact,
+	checkouts,
+	...params
 }: MultiRepoChangesProps) {
 	const [query, setQuery] = useState("");
 	const { foldSignal, collapsed, toggleFold } = useFoldSignal();
@@ -44,22 +31,11 @@ export function MultiRepoChanges({
 				onToggleFold={toggleFold}
 			/>
 			<div className="min-h-0 flex-1 overflow-y-auto">
-				{repositories.map((repository) => (
+				{checkouts.map((checkout) => (
 					<RepositoryChangesSection
-						key={repository.id}
-						repository={repository}
-						selectedDiffTarget={selectedDiffTarget}
-						onSelectFile={onSelectFile}
-						onOpenFile={
-							onOpenFile &&
-							((absolutePath, openInNewTab) => {
-								onSelectRepository(repository.id);
-								onOpenFile(absolutePath, openInNewTab);
-							})
-						}
-						onCountChange={onCountChange}
-						compact={compact}
-						tagWorkspace
+						key={checkout.repositoryId}
+						{...params}
+						checkout={checkout}
 						shared={shared}
 					/>
 				))}

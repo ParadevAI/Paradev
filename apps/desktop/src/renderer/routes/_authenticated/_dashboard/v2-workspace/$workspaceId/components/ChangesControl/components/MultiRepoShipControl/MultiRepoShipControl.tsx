@@ -15,7 +15,7 @@ import { RepositoryShipList } from "../../../RepositoryShipList";
 
 interface MultiRepoShipControlProps {
 	workspaceId: string;
-	repositories: Array<{ id: string; name: string }>;
+	repositories: Array<{ repositoryId: string; name: string }>;
 	isChangesOpen: boolean;
 	toggleLabel: string;
 	onToggleChanges: () => void;
@@ -35,7 +35,10 @@ export function MultiRepoShipControl({
 	onOpenPullRequest,
 }: MultiRepoShipControlProps) {
 	const { byId, totals, pendingCount, pullRequestCount, sources } =
-		useRepositoryShipSnapshots(repositories.map(({ id }) => id));
+		useRepositoryShipSnapshots(
+			workspaceId,
+			repositories.map(({ repositoryId }) => repositoryId),
+		);
 
 	return (
 		<>

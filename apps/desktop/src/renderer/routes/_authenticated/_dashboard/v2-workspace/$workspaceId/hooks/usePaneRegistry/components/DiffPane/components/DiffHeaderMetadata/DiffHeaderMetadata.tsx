@@ -9,12 +9,15 @@ import { LuCheck, LuCopy, LuExternalLink, LuUndo2, LuX } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
+import { checkoutInput } from "../../../../../../utils/checkoutInput";
 import type { ChangesetFile } from "../../../../../useChangeset";
 import { useDiffHeaderHover } from "../../hooks/useDiffHeaderHover";
 
 interface DiffHeaderMetadataProps {
 	file: ChangesetFile;
 	workspaceId: string;
+	/** The checkout that holds `file`. */
+	repositoryId: string | undefined;
 	onSetCollapsed: (value: boolean) => void;
 	viewed: boolean;
 	onSetViewed: (path: string, next: boolean) => void;
@@ -32,6 +35,7 @@ interface DiffHeaderMetadataProps {
 export function DiffHeaderMetadata({
 	file,
 	workspaceId,
+	repositoryId,
 	onSetCollapsed,
 	viewed,
 	onSetViewed,
@@ -93,8 +97,12 @@ export function DiffHeaderMetadata({
 	const utils = workspaceTrpc.useUtils();
 	const discardMutation = workspaceTrpc.git.discardChanges.useMutation({
 		onSuccess: () => {
-			void utils.git.getStatus.invalidate({ workspaceId });
-			void utils.git.getDiff.invalidate({ workspaceId });
+			void utils.git.getStatus.invalidate(
+				checkoutInput(workspaceId, repositoryId),
+			);
+			void utils.git.getDiff.invalidate(
+				checkoutInput(workspaceId, repositoryId),
+			);
 		},
 		onError: (err) => {
 			toast.error(
@@ -115,8 +123,11 @@ export function DiffHeaderMetadata({
 	}, [canDiscard]);
 	const confirmDiscard = useCallback(() => {
 		setShowDiscardConfirm(false);
-		discardMutation.mutate({ workspaceId, filePath: file.path });
-	}, [discardMutation, workspaceId, file.path]);
+		discardMutation.mutate({
+			...checkoutInput(workspaceId, repositoryId),
+			filePath: file.path,
+		});
+	}, [discardMutation, workspaceId, repositoryId, file.path]);
 	const isDeleteAction = file.status === "untracked" || file.status === "added";
 	const basename = file.path.split("/").pop() ?? file.path;
 

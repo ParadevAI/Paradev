@@ -13,20 +13,11 @@ import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { HiMiniXMark } from "react-icons/hi2";
 import { LuLink } from "react-icons/lu";
+import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { cloudRepoProjectId } from "renderer/lib/github/cloudRepoProjectId";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
-
-function projectIconUrl(project: {
-	icon: string | null;
-	repoOwner: string | null;
-}): string | null {
-	if (project.icon) return project.icon;
-	return project.repoOwner
-		? `https://github.com/${project.repoOwner}.png?size=64`
-		: null;
-}
 
 interface EnvironmentProjectLinksProps {
 	environmentId: string;
@@ -82,7 +73,7 @@ export function EnvironmentProjectLinks({
 						<ProjectThumbnail
 							className="size-3.5"
 							projectName={project.name}
-							iconUrl={projectIconUrl(project)}
+							iconUrl={resolveProjectIconUrl(project)}
 							color={project.color}
 						/>
 					)}
@@ -137,7 +128,7 @@ export function EnvironmentProjectLinks({
 										<ProjectThumbnail
 											className="size-4"
 											projectName={project.name}
-											iconUrl={projectIconUrl(project)}
+											iconUrl={resolveProjectIconUrl(project)}
 											color={project.color}
 										/>
 										<span className="flex-1 truncate">{project.name}</span>

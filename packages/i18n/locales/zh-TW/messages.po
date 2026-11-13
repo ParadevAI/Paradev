@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {此工作區中有 # 個檔案更改} other {�
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# 個檔案已變更} other {# 個檔案已變更}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {#個檔案} other {#個檔案}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {編輯了 # 個檔案} other {編輯了 # 個檔案}}"
 
@@ -1383,6 +1386,9 @@ msgstr "剩餘 {remaining} 個 token"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# 個儲存庫} other {全部 # 個儲存庫}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName}已遷移到{newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤銷 # 個檔案的更改。} other {已撤銷 # 個檔案的更改。}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "操作"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "{0}的操作"
 
@@ -2099,11 +2106,11 @@ msgstr "將{0}新增到工作區"
 msgid "Add {localizedName}?"
 msgstr "要新增「{localizedName}」嗎？"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "請先在 {computer} 上將 {repositoryName} 新增為專案"
+msgid "Add {only} as a project on {computer} first"
+msgstr "請先在{computer}上將{only}新增為專案"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "請先將 {repositoryName} 新增為此電腦上的專案"
+msgid "Add {only} as a project on this computer first"
+msgstr "請先在此電腦上將{only}新增為專案"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "將 #{prNumber} 加入合併佇列?"
@@ -2128,6 +2135,12 @@ msgstr "新增專案以檢視GitHub議題。"
 
 msgid "Add a project to see pull requests."
 msgstr "新增一個專案來檢視拉取請求。"
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "請先在{computer}上新增一個儲存庫與此完全一致的專案：{repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "請先在此電腦上新增一個儲存庫與此完全一致的專案：{repositories}"
 
 msgid "Add a short summary…"
 msgstr "新增簡短摘要…"
@@ -4515,9 +4528,6 @@ msgstr "選擇一名鬥士"
 msgid "Choose a folder"
 msgstr "選擇資料夾"
 
-msgid "Choose a parent directory"
-msgstr "選擇父目錄"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "開啟議題前，請先在GitHub議題中選擇一個專案。"
 
@@ -4532,9 +4542,6 @@ msgstr "選擇一個分區。"
 
 msgid "Choose agent"
 msgstr "選擇代理程式"
-
-msgid "Choose an existing repo folder"
-msgstr "選擇已有的儲存庫資料夾"
 
 msgid "Choose an MCP server"
 msgstr "選擇一個MCP伺服器"
@@ -4752,13 +4759,6 @@ msgstr "從URL克隆"
 
 msgid "clone the repository"
 msgstr "克隆儲存庫"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "克隆儲存庫，或匯入主機上已有的資料夾。"
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "已克隆到{0}"
 
 msgid "Cloning…"
 msgstr "正在克隆…"
@@ -5122,9 +5122,6 @@ msgstr "命令..."
 
 msgid "Commands"
 msgstr "命令"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "此儲存庫的設定、清理以及執行選單所用的命令。"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "用於工作區初始化、清理和「執行」按鈕的命令。"
@@ -5887,6 +5884,9 @@ msgstr "無法新增代理程式"
 msgid "Could not add repository"
 msgstr "無法新增儲存庫"
 
+msgid "Could not add the repository"
+msgstr "無法新增儲存庫"
+
 msgid "Could not answer the agent"
 msgstr "無法回覆代理程式"
 
@@ -6017,6 +6017,9 @@ msgstr "無法載入此拉取請求。"
 msgid "Could not load your machines"
 msgstr "無法載入你的機器"
 
+msgid "Could not make it the primary repository"
+msgstr "無法將其設為主要儲存庫"
+
 msgid "Could not mark ready"
 msgstr "無法標記為待審查"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "無法移除存取權限"
 
 msgid "Could not remove repository"
+msgstr "無法移除儲存庫"
+
+msgid "Could not remove the repository"
 msgstr "無法移除儲存庫"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "放棄所有{0}"
 msgid "Discard all staged changes"
 msgstr "放棄所有已暫存的更改"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "放棄 {repositoryName} 中所有已暫存的更改？"
+
 msgid "Discard all staged changes?"
 msgstr "放棄所有已暫存的更改？"
 
 msgid "Discard all unstaged changes"
 msgstr "放棄所有未暫存的更改"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "放棄 {repositoryName} 中所有未暫存的更改？"
 
 msgid "Discard all unstaged changes?"
 msgstr "放棄所有未暫存的更改？"
@@ -8147,12 +8159,6 @@ msgstr "請輸入完整的電子郵件地址"
 msgid "Enter a number"
 msgstr "輸入數字"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "請輸入{hostName}上的父目錄"
-
-msgid "Enter a path on {hostName}"
-msgstr "請輸入{hostName}上的路徑"
-
 msgid "Enter a URL into the search bar above."
 msgstr "在上方的搜尋欄中輸入URL。"
 
@@ -8294,11 +8300,8 @@ msgstr "每週三上午9點，回顧本週合併的PR，更新被它們改過時
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每個工作日上午9點，閱讀新的GitHub議題，打上標籤，並起草初步回覆供我審閱。"
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "多儲存庫專案的每個工作區都會把此儲存庫與其他儲存庫並排簽出。"
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "此專案的每個工作區都會在同一分支上並排簽出所有儲存庫。"
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "此專案的每個工作區都會在同一分支上並排簽出所有儲存庫。初始化和執行命令來自主要儲存庫。"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在爭論這能否推廣。這場爭論本身就說明這一級別已經達到了。"
@@ -8350,12 +8353,6 @@ msgstr "你釋出過的所有內容都會被刪除，而不是隱藏。你之後
 
 msgid "Executable"
 msgstr "執行檔"
-
-msgid "Existing repo path"
-msgstr "已有儲存庫路徑"
-
-msgid "Existing repo path on {hostName}"
-msgstr "{hostName}上的已有儲存庫路徑"
 
 msgid "existing worktree"
 msgstr "已有worktree"
@@ -9338,6 +9335,9 @@ msgstr "聚焦任務檢視中的搜尋框"
 
 msgid "Folder"
 msgstr "資料夾"
+
+msgid "Folder can't be read"
+msgstr "無法讀取資料夾"
 
 msgid "Folder is missing"
 msgstr "資料夾不存在"
@@ -10425,9 +10425,6 @@ msgstr "將每個 v1 專案匯入 v2。已匯入的專案會顯示為已匯入�
 
 msgid "Import each v1 terminal script into v2."
 msgstr "將每個 v1 終端機指令碼匯入 v2。"
-
-msgid "Import existing"
-msgstr "匯入已有"
 
 msgid "Import existing folder"
 msgstr "匯入已有資料夾"
@@ -11552,9 +11549,6 @@ msgstr "第{0}–{1}行"
 msgid "Link"
 msgstr "連結"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "請先為專案關聯GitHub儲存庫才能克隆。"
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "正在載入更多..."
 
 msgid "Loading more…"
 msgstr "正在載入更多…"
+
+msgid "Loading project repositories…"
+msgstr "正在載入專案儲存庫…"
 
 msgid "Loading project…"
 msgstr "正在載入專案…"
@@ -11901,6 +11898,9 @@ msgstr "設為預設"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "設為預設：新終端和代理程式將使用此帳戶啟動。"
+
+msgid "Make primary"
+msgstr "設為主要儲存庫"
 
 msgid "Make public"
 msgstr "公開"
@@ -12522,9 +12522,6 @@ msgstr "正在將此聊天移到這裡"
 msgid "Moving this workspace…"
 msgstr "正在移動此工作區…"
 
-msgid "Multi-repo project"
-msgstr "多儲存庫專案"
-
 msgid "Multi-select"
 msgstr "多選"
 
@@ -12983,6 +12980,9 @@ msgstr "沒有頻道"
 
 msgid "No chats found"
 msgstr "找不到聊天"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "此工作區中沒有位於 {currentBranchName} 的檢出"
 
 msgid "No checks"
 msgstr "無檢查"
@@ -14581,6 +14581,9 @@ msgstr "正在聊天介面中開啟…"
 msgid "Opening pages"
 msgstr "開啟頁面"
 
+msgid "Opens different repositories than this workspace"
+msgstr "開啟的儲存庫與此工作區不同"
+
 msgid "Operator"
 msgstr "操作員"
 
@@ -15079,12 +15082,6 @@ msgstr "每位開發者的並行工作階段數每七個月翻倍，在 2026 年
 msgid "Parameters"
 msgstr "引數"
 
-msgid "Parent directory"
-msgstr "父目錄"
-
-msgid "Parent directory on {hostName}"
-msgstr "{hostName}上的父目錄"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "一半是記錄，一半是下注。前兩條已經在發生。其餘的寫得足夠具體，足以被證明是錯的。"
 
@@ -15272,9 +15269,6 @@ msgstr "選擇其他元素（esc）"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "選擇磁碟上的資料夾並將其新增為專案"
 
-msgid "Pick a folder…"
-msgstr "選擇資料夾…"
-
 msgid "Pick a machine size"
 msgstr "選擇機器規格"
 
@@ -15284,14 +15278,11 @@ msgstr "選擇模型"
 msgid "pick a name for the board"
 msgstr "給榜單上的自己取個名字"
 
-msgid "Pick a parent directory"
-msgstr "請選擇父目錄"
-
-msgid "Pick a project location"
-msgstr "請選擇專案位置"
-
 msgid "Pick a reason"
 msgstr "選擇原因"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "在{hostName}上選擇一個儲存庫資料夾。"
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "選擇一個包含外掛市集檔案的儲存庫。Superset 會立即同步其外掛，並在你每次重新同步時再次同步。"
@@ -15802,13 +15793,8 @@ msgstr "其他裝置上的專案"
 msgid "Project ready. Open it from the sidebar."
 msgstr "專案已就緒，可從側邊欄開啟。"
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "專案已遷移到{0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "專案已設定在{0}"
+msgid "Project relocated to {newPath}"
+msgstr "專案已遷移到{newPath}"
 
 msgid "Project Settings"
 msgstr "專案設定"
@@ -16494,6 +16480,9 @@ msgstr "重新載入將捨棄你的編輯。覆寫將取代磁碟上的檔案。
 msgid "Relocate"
 msgstr "遷移"
 
+msgid "Relocate {repositoryName}?"
+msgstr "遷移{repositoryName}？"
+
 msgid "Relocate project?"
 msgstr "遷移專案？"
 
@@ -16577,6 +16566,9 @@ msgstr "移出群組"
 
 msgid "Remove from queue"
 msgstr "移出佇列"
+
+msgid "Remove from project"
+msgstr "從專案中移除"
 
 msgid "Remove from Queue"
 msgstr "移出佇列"
@@ -16859,9 +16851,6 @@ msgstr "已移除儲存庫"
 
 msgid "Repository root"
 msgstr "儲存庫根目錄"
-
-msgid "Repository settings"
-msgstr "儲存庫設定"
 
 msgid "Repository URL or path"
 msgstr "儲存庫URL或路徑"
@@ -17432,9 +17421,6 @@ msgstr "依排程或在發生某件事時執行代理程式。"
 msgid "Run agents side by side"
 msgstr "並排執行代理程式"
 
-msgid "Run all"
-msgstr "全部執行"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "調動一支"
@@ -17531,9 +17517,6 @@ msgstr "在桌面、任何終端機或手機上執行你的 agent。"
 
 msgid "Run your coding agents in the cloud."
 msgstr "在雲端執行你的程式設計代理程式。"
-
-msgid "Run: {repositoryName}"
-msgstr "執行：{repositoryName}"
 
 msgid "Run."
 msgstr "執行。"
@@ -18180,9 +18163,6 @@ msgstr "選擇組織"
 msgid "Select Organization Logo"
 msgstr "選擇組織標誌"
 
-msgid "Select parent directory to clone into"
-msgstr "選擇克隆到的父目錄"
-
 msgid "Select people"
 msgstr "選擇成員"
 
@@ -18416,9 +18396,6 @@ msgstr "設定專案…"
 msgid "Set Run"
 msgstr "設定執行命令"
 
-msgid "Set run script"
-msgstr "設定執行指令碼"
-
 msgid "Set this project"
 msgstr "設為此專案"
 
@@ -18440,9 +18417,6 @@ msgstr "設定環境"
 
 msgid "Set up once"
 msgstr "只需設定一次"
-
-msgid "Set up project on {hostName}"
-msgstr "在{hostName}上設定專案"
 
 msgid "Set up project…"
 msgstr "配置專案…"
@@ -19227,6 +19201,10 @@ msgstr "垃圾訊息或詐騙"
 msgid "Sparse checkout"
 msgstr "稀疏檢出"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "{0}的稀疏檢出"
+
 msgid "Speaking"
 msgstr "正在說話"
 
@@ -19619,9 +19597,6 @@ msgstr "停止 {label}"
 
 msgid "Stop {name}"
 msgstr "停止 {name}"
-
-msgid "Stop all"
-msgstr "全部停止"
 
 msgid "Stop dictation"
 msgstr "停止語音輸入"
@@ -20387,9 +20362,6 @@ msgstr "代碼已過期。請重新開始。"
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev 在設定、執行及封存此專案的工作區時執行的命令，來自儲存庫的 config.toml。"
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Paradev 用於設定、執行和封存此儲存庫簽出的命令，來自其 config.toml。"
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1,150 萬美元的種子輪募資，由 Union Square Ventures 領投，Y Combinator 與 Paul Graham 參投。TechCrunch 將其評為 YC Demo Day 的傑出新創公司之一。"
 
@@ -20492,6 +20464,9 @@ msgstr "未來可重複使用的 Paradev 代理設定、提示詞與設定指南
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "主機以 {0} 而非 {targetVersion} 恢復。"
+
+msgid "The host created a project with no repository"
+msgstr "主機建立了一個沒有儲存庫的專案"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "主機未在十五分鐘內恢復。"
@@ -20923,8 +20898,8 @@ msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "此環境開啟的是 {environmentRepository}，而不是 {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "此環境開啟的是{environmentRepositories}，而不是{workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此環境的儲存庫已固定；請再次提升一個工作區以變更它們"
@@ -21091,6 +21066,9 @@ msgstr "此拉取請求已不可用。"
 msgid "This pull request link is invalid."
 msgstr "這個拉取請求連結無效。"
 
+msgid "This pull request's repository is not known"
+msgstr "此拉取請求所屬的儲存庫不明"
+
 msgid "This recording is too long to transcribe"
 msgstr "這段錄音太長，無法轉寫"
 
@@ -21241,6 +21219,9 @@ msgstr "此工作區"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
+
+msgid "This workspace is still loading. Try again."
+msgstr "此工作區仍在載入。請重試。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "此工作區可能已被移除，或者你不再擁有它的存取權限。"
@@ -22217,9 +22198,6 @@ msgstr "使用此帳戶"
 
 msgid "Use this folder"
 msgstr "使用此資料夾"
-
-msgid "Use this repo"
-msgstr "使用此儲存庫"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "用它修復卡住或無響應的終端。"

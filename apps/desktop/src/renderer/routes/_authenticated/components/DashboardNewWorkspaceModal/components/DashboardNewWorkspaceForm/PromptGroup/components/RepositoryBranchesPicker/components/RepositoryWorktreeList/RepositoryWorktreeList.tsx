@@ -6,6 +6,7 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { RepositoryWorktree } from "renderer/stores/new-workspace-draft";
 
 interface RepositoryWorktreeListProps {
+	projectId: string;
 	repositoryId: string;
 	hostId: string | null;
 	selectedPath: string | null;
@@ -14,6 +15,7 @@ interface RepositoryWorktreeListProps {
 
 /** The repository's worktrees that no workspace uses; picking one moves it into the workspace. */
 export function RepositoryWorktreeList({
+	projectId,
 	repositoryId,
 	hostId,
 	selectedPath,
@@ -25,6 +27,7 @@ export function RepositoryWorktreeList({
 			"workspaceCreation",
 			"listProjectWorktrees",
 			hostUrl,
+			projectId,
 			repositoryId,
 		],
 		enabled: !!hostUrl,
@@ -32,7 +35,8 @@ export function RepositoryWorktreeList({
 			getHostServiceClientByUrl(
 				hostUrl as string,
 			).workspaceCreation.listProjectWorktrees.query({
-				projectId: repositoryId,
+				projectId,
+				repositoryId,
 			}),
 	});
 	const worktrees = (data?.worktrees ?? []).filter(

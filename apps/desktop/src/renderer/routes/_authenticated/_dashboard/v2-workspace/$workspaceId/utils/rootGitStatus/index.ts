@@ -1,0 +1,1 @@
+export { rootGitStatus } from "./rootGitStatus";

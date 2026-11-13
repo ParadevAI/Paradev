@@ -1,6 +1,5 @@
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -17,14 +16,11 @@ export type WorkspaceMoveDirection = "to-cloud" | "to-computer";
 
 /**
  * Where a workspace can move: one on this computer to the cloud, and any
- * workspace to a computer other than its own. Empty when it can move nowhere,
- * which includes every multi-repo workspace.
+ * workspace to a computer other than its own. Empty when it can move nowhere.
  */
 export function useWorkspaceMoveDirections(
 	hostId: string,
-	projectId: string | null,
 ): WorkspaceMoveDirection[] {
-	const { projects: hostProjects } = useHostProjects();
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
 	const movesEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES);
 	const { machineId } = useLocalHostService();
@@ -34,10 +30,7 @@ export function useWorkspaceMoveDirections(
 		{ organizationId: organizationId ?? "" },
 		{ enabled: !!organizationId && movesEnabled === true },
 	);
-	const isMultiRepo =
-		hostProjects.find((project) => project.projectKey === projectId)?.kind ===
-		"container";
-	if (!movesEnabled || isMultiRepo) return [];
+	if (!movesEnabled) return [];
 	const directions: WorkspaceMoveDirection[] = [];
 	const isLocal = hostId === machineId;
 	if (isLocal && cloudEnabled) directions.push("to-cloud");

@@ -23,6 +23,9 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 interface ChangesTabContentProps {
 	workspaceId: string;
+	repositoryId: string | undefined;
+	/** Set when the list shows several checkouts. */
+	repositoryName?: string;
 	status: {
 		data: RouterOutputs["git"]["getStatus"] | undefined;
 		isFetching: boolean;
@@ -57,6 +60,8 @@ interface ChangesTabContentProps {
 
 export const ChangesTabContent = memo(function ChangesTabContent({
 	workspaceId,
+	repositoryId,
+	repositoryName,
 	status,
 	commits,
 	branches,
@@ -185,6 +190,8 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 				files={visibleFiles}
 				isFiltered={isFiltered}
 				workspaceId={workspaceId}
+				repositoryId={repositoryId}
+				repositoryName={repositoryName}
 				isLoading={isLoading}
 				viewMode={viewMode}
 				worktreePath={worktreePath}

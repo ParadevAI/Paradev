@@ -55,10 +55,10 @@ import { usePullRequestActions } from "../../hooks/usePullRequestActions";
 import { useRepositoryShipSnapshots } from "../../hooks/useRepositoryShipSnapshots";
 import { useShipActions } from "../../hooks/useShipActions";
 import { useRightPaneLinkTarget } from "../../providers/RightPaneLinkTargetProvider";
-import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useCheckoutGitStatus } from "../../providers/WorkspaceGitStatusProvider";
 import {
-	hasCheckouts,
-	useWorkspaceRepositories,
+	useAreCheckoutsLoaded,
+	useWorkspaceCheckouts,
 } from "../../state/activeRepositoryStore";
 import type { PagePaneData, PaneViewerData } from "../../types";
 import {
@@ -147,11 +147,14 @@ export function WorkspaceActivityMenu({
 	const { t } = useLingui();
 	const paneAreaStyle = changes != null;
 	const { favoritePageIds } = usePageFavorites();
-	const gitStatus = useWorkspaceGitStatus();
-	const repositories = useWorkspaceRepositories(workspaceId);
-	const isMultiRepo = hasCheckouts(workspaceId, repositories);
+	const checkouts = useWorkspaceCheckouts(workspaceId);
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
+	const isMultiRepo = checkouts.length > 1;
+	const repositoryId = checkouts[0]?.repositoryId;
+	const gitStatus = useCheckoutGitStatus(repositoryId);
 	const repositoryShip = useRepositoryShipSnapshots(
-		isMultiRepo ? repositories.map(({ id }) => id) : [],
+		workspaceId,
+		isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],
 	);
 	const singleRepoStats = useMemo(
 		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
@@ -200,8 +203,8 @@ export function WorkspaceActivityMenu({
 		flowState,
 		sync: branchSync,
 		onRetry: refreshFlowState,
-	} = usePRFlowState(workspaceId, {
-		enabled: paneAreaStyle && !isMultiRepo,
+	} = usePRFlowState(workspaceId, repositoryId, {
+		enabled: paneAreaStyle && checkoutsLoaded && !isMultiRepo,
 	});
 	const currentPr =
 		flowState.kind === "pr-exists" ||
@@ -216,9 +219,10 @@ export function WorkspaceActivityMenu({
 	);
 	const shipActions = useShipActions({
 		workspaceId,
+		repositoryId,
 		onRefresh: refreshFlowState,
 		isPrFormOpen: shipView === "pr",
-		enabled: paneAreaStyle && open && !isMultiRepo,
+		enabled: paneAreaStyle && open && checkoutsLoaded && !isMultiRepo,
 		onCommitted: () => setShipView(null),
 		onPrCreated: () => setShipView(null),
 	});
@@ -757,7 +761,7 @@ export function WorkspaceActivityMenu({
 								/>
 								<RepositoryShipList
 									workspaceId={workspaceId}
-									repositories={repositories}
+									repositories={checkouts}
 									snapshots={repositoryShip.byId}
 									onOpenPullRequest={onOpenPullRequest}
 								/>

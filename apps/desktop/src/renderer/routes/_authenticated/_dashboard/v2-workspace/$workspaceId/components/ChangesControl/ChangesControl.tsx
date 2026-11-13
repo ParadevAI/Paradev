@@ -4,10 +4,10 @@ import { GitCompareArrows } from "lucide-react";
 import { memo, useMemo } from "react";
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
-import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useCheckoutGitStatus } from "../../providers/WorkspaceGitStatusProvider";
 import {
-	hasCheckouts,
-	useWorkspaceRepositories,
+	useAreCheckoutsLoaded,
+	useWorkspaceCheckouts,
 } from "../../state/activeRepositoryStore";
 import { changesPillStats } from "../../utils/changesPillStats";
 import { ChangesStats } from "../ChangesStats";
@@ -49,11 +49,13 @@ export const ChangesControl = memo(function ChangesControl({
 	viewingPullRequestNumber = null,
 }: ChangesControlProps) {
 	const { t } = useLingui();
-	const status = useWorkspaceGitStatus();
-	const repositories = useWorkspaceRepositories(workspaceId);
-	const isMultiRepo = hasCheckouts(workspaceId, repositories);
-	const { flowState, onRetry } = usePRFlowState(workspaceId, {
-		enabled: !isMultiRepo,
+	const checkouts = useWorkspaceCheckouts(workspaceId);
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
+	const isMultiRepo = checkouts.length > 1;
+	const repositoryId = checkouts[0]?.repositoryId;
+	const status = useCheckoutGitStatus(repositoryId);
+	const { flowState, onRetry } = usePRFlowState(workspaceId, repositoryId, {
+		enabled: checkoutsLoaded && !isMultiRepo,
 	});
 	const stats = useMemo(
 		() => (status.data ? changesPillStats(status.data) : null),
@@ -72,7 +74,7 @@ export const ChangesControl = memo(function ChangesControl({
 		return (
 			<MultiRepoShipControl
 				workspaceId={workspaceId}
-				repositories={repositories}
+				repositories={checkouts}
 				isChangesOpen={isChangesOpen}
 				toggleLabel={label}
 				onToggleChanges={onToggleChanges}
@@ -109,6 +111,7 @@ export const ChangesControl = memo(function ChangesControl({
 			{flowState.kind === "no-pr" ? (
 				<ShipControl
 					workspaceId={workspaceId}
+					repositoryId={repositoryId}
 					sync={flowState.sync}
 					onRefresh={onRetry}
 					compact={visibleStats != null}
@@ -117,6 +120,7 @@ export const ChangesControl = memo(function ChangesControl({
 				<PRStatusGroup
 					state={flowState}
 					workspaceId={workspaceId}
+					repositoryId={repositoryId}
 					onRefresh={onRetry}
 					isChangesOpen={isChangesOpen}
 					toggleLabel={label}

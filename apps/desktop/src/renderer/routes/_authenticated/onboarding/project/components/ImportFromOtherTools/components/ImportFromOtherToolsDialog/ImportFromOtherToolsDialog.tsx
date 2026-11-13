@@ -119,8 +119,9 @@ export function ImportFromOtherToolsDialog({
 						snapshot: {
 							id: crypto.randomUUID(),
 							projectId: project.projectId,
-							branch: worktree.branch,
-							worktreePath: worktree.path,
+							checkouts: {
+								[project.repositoryId]: { worktreePath: worktree.path },
+							},
 							runSetup: false,
 						},
 					}).completed;

@@ -71,7 +71,10 @@ export function ImportWorkspacesPage({
 	const v2ProjectIdByV1Id = useMemo(() => {
 		const v2ByPath = new Map<string, string>();
 		for (const v2 of hostProjectListQuery.data ?? []) {
-			if (!v2ByPath.has(v2.repoPath)) v2ByPath.set(v2.repoPath, v2.id);
+			for (const repository of v2.repositories) {
+				if (!v2ByPath.has(repository.path))
+					v2ByPath.set(repository.path, v2.id);
+			}
 		}
 		const map = new Map<string, string>();
 		for (const v1 of projectsQuery.data ?? []) {

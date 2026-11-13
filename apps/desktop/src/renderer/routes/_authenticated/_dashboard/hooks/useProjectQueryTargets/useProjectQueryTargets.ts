@@ -51,7 +51,7 @@ export function groupProjectTargetsByHost(
 }
 
 export function useProjectQueryTargets(projectFilters: string[]) {
-	const { projects, isReady } = useHostProjects();
+	const { projects, hostResults, isReady } = useHostProjects();
 	const { machineId } = useLocalHostService();
 	const selectedProjects = useMemo(() => {
 		if (projectFilters.length === 0) return projects;
@@ -88,5 +88,5 @@ export function useProjectQueryTargets(projectFilters: string[]) {
 		[selectedProjects, machineId, hostUrlById],
 	);
 
-	return { projects, targets, isReady };
+	return { projects, hostResults, targets, isReady };
 }

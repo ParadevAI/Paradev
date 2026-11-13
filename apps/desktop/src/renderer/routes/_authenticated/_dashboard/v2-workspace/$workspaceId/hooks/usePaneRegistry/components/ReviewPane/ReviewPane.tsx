@@ -2,16 +2,18 @@ import type { RendererContext } from "@superset/panes";
 import { useCallback } from "react";
 import type { PullRequestRef } from "renderer/lib/github/pullRequestRef";
 import { useReviewTab } from "../../../../components/WorkspaceSidebar/hooks/useReviewTab";
-import { useActiveRepositoryWorkspaceId } from "../../../../state/activeRepositoryStore";
+import { useActiveRepositoryId } from "../../../../state/activeRepositoryStore";
 import type {
 	CommentPaneData,
-	DiffFocusSide,
 	DiffPaneData,
 	PaneViewerData,
 } from "../../../../types";
 import { openBesidePane } from "../../../../utils/openBesidePane";
 import { openPullRequestPaneInStore } from "../../../../utils/openPullRequestPaneInStore";
-import { useReviewCommentNavigation } from "../../../useReviewCommentNavigation";
+import {
+	type OpenReviewDiff,
+	useReviewCommentNavigation,
+} from "../../../useReviewCommentNavigation";
 
 interface ReviewPaneProps {
 	context: RendererContext<PaneViewerData>;
@@ -34,14 +36,8 @@ export function ReviewPane({ context, workspaceId }: ReviewPaneProps) {
 		[store],
 	);
 
-	const handleOpenDiff = useCallback(
-		(
-			path: string,
-			openInNewTab?: boolean,
-			line?: number,
-			side?: DiffFocusSide,
-			changeKey?: string,
-		) => {
+	const handleOpenDiff = useCallback<OpenReviewDiff>(
+		(path, openInNewTab, line, side, changeKey, _filter, repositoryId) => {
 			openBesidePane(
 				store,
 				paneId,
@@ -50,6 +46,7 @@ export function ReviewPane({ context, workspaceId }: ReviewPaneProps) {
 					data: {
 						path,
 						changeKey,
+						repositoryId,
 						collapsedFiles: [],
 						focusLine: line,
 						focusSide: line != null ? side : undefined,
@@ -63,13 +60,15 @@ export function ReviewPane({ context, workspaceId }: ReviewPaneProps) {
 	);
 
 	// A multi-repo workspace reviews the picked repository's pull request.
-	const reviewWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
+	const repositoryId = useActiveRepositoryId(workspaceId);
 	const onOpenInDiff = useReviewCommentNavigation(
-		reviewWorkspaceId,
+		workspaceId,
+		repositoryId,
 		handleOpenDiff,
 	);
 	const reviewTab = useReviewTab({
-		workspaceId: reviewWorkspaceId,
+		workspaceId,
+		repositoryId,
 		onOpenComment: handleOpenComment,
 		onOpenPullRequest: handleOpenPullRequest,
 		onOpenInDiff,

@@ -39,6 +39,15 @@ type Aliases = Map<string, string>;
 const notFound = (message: string) =>
 	Object.assign(new Error(message), { data: { code: "NOT_FOUND" } });
 
+function toSnapshot(project: { id: string; repoPath: string }) {
+	const repositoryId = `${project.id}-repo`;
+	return {
+		id: project.id,
+		primaryRepositoryId: repositoryId,
+		repositories: [{ id: repositoryId, path: project.repoPath }],
+	};
+}
+
 class FakeHost {
 	omitWorktreePaths = false;
 	projects: HostProject[] = [];
@@ -149,25 +158,15 @@ class FakeHost {
 						};
 					},
 				},
-				setup: {
-					mutate: async ({ projectId }: { projectId: string }) => {
-						const project = this.projects.find((p) => p.id === projectId);
-						if (!project) throw new Error("Project not found");
-						if (this.brokenRepos.has(project.repoPath)) {
-							throw new Error(this.brokenRepos.get(project.repoPath));
-						}
-						this.mutations.push({ kind: "project.setup", args: projectId });
-						return { repoPath: project.repoPath };
-					},
-				},
 				create: {
 					mutate: async ({
 						name,
-						mode,
+						repositories,
 					}: {
 						name: string;
-						mode: { repoPath: string };
+						repositories: { path: string }[];
 					}) => {
+						const mode = { repoPath: repositories[0]?.path ?? "" };
 						if (this.brokenRepos.has(mode.repoPath)) {
 							throw new Error(this.brokenRepos.get(mode.repoPath));
 						}
@@ -177,14 +176,10 @@ class FakeHost {
 						this.mutations.push({ kind: "project.create", args: name });
 						const project = { id: this.id("v2p"), repoPath: mode.repoPath };
 						this.projects.push(project);
-						return {
-							projectId: project.id,
-							repoPath: project.repoPath,
-							created: true,
-						};
+						return { ...toSnapshot(project), created: true };
 					},
 				},
-				list: { query: async () => [...this.projects] },
+				list: { query: async () => this.projects.map(toSnapshot) },
 				get: {
 					query: async ({ projectId }: { projectId: string }) =>
 						this.projects.some((p) => p.id === projectId)
@@ -1081,7 +1076,6 @@ function mulberry32(seed: number) {
 }
 
 const ALLOWED_MUTATIONS = new Set([
-	"project.setup",
 	"project.create",
 	"project.setWorktreeBaseDir",
 	"project.setBranchPrefix",

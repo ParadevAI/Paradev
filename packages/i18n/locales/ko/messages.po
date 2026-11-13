@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {이 워크스페이스에서 변경된 파일 #
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {파일 #개 변경됨} other {파일 #개 변경됨}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {파일 #개} other {파일 #개}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {파일 #개 편집} other {파일 #개 편집}}"
 
@@ -1383,6 +1386,9 @@ msgstr "{remaining} 토큰 남음"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {리포지토리 #개} other {모든 리포지토리 (#개)}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName}을(를) {newPath}(으)로 이동했습니다"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "동작"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "{0} 작업"
 
@@ -2099,11 +2106,11 @@ msgstr "{0}을(를) 워크스페이스에 추가"
 msgid "Add {localizedName}?"
 msgstr "{localizedName}을(를) 추가하시겠습니까?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "먼저 {computer}에 {repositoryName}을(를) 프로젝트로 추가하세요"
+msgid "Add {only} as a project on {computer} first"
+msgstr "먼저 {computer}에 {only}을(를) 프로젝트로 추가하세요"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "먼저 {repositoryName}을(를) 이 컴퓨터의 프로젝트로 추가하세요"
+msgid "Add {only} as a project on this computer first"
+msgstr "먼저 이 컴퓨터에 {only}을(를) 프로젝트로 추가하세요"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber}을(를) 머지 대기열에 추가할까요?"
@@ -2128,6 +2135,12 @@ msgstr "GitHub 이슈를 보려면 프로젝트를 추가하세요."
 
 msgid "Add a project to see pull requests."
 msgstr "풀 리퀘스트를 보려면 프로젝트를 추가하세요."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "먼저 {computer}에 정확히 이 리포지토리들로 구성된 프로젝트를 추가하세요: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "먼저 이 컴퓨터에 정확히 이 리포지토리들로 구성된 프로젝트를 추가하세요: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "짧은 요약 추가…"
@@ -4515,9 +4528,6 @@ msgstr "파이터 선택"
 msgid "Choose a folder"
 msgstr "폴더 선택"
 
-msgid "Choose a parent directory"
-msgstr "상위 디렉터리 선택"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "이슈를 열기 전에 GitHub 이슈 화면에서 프로젝트를 선택하세요."
 
@@ -4532,9 +4542,6 @@ msgstr "섹션을 선택하세요."
 
 msgid "Choose agent"
 msgstr "에이전트 선택"
-
-msgid "Choose an existing repo folder"
-msgstr "기존 리포지토리 폴더 선택"
 
 msgid "Choose an MCP server"
 msgstr "MCP 서버 선택"
@@ -4752,13 +4759,6 @@ msgstr "URL에서 클론"
 
 msgid "clone the repository"
 msgstr "리포지토리를 클론할"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "리포지토리를 클론하거나 호스트에 있는 기존 폴더를 가져옵니다."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "{0}(으)로 클론했습니다"
 
 msgid "Cloning…"
 msgstr "클론하는 중…"
@@ -5122,9 +5122,6 @@ msgstr "명령..."
 
 msgid "Commands"
 msgstr "명령"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "이 리포지토리의 설정, 정리 및 실행 메뉴에서 쓰는 명령."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "워크스페이스 설정, 정리, 실행 버튼에 사용되는 명령입니다."
@@ -5887,6 +5884,9 @@ msgstr "에이전트를 추가하지 못했습니다"
 msgid "Could not add repository"
 msgstr "리포지토리를 추가할 수 없습니다"
 
+msgid "Could not add the repository"
+msgstr "리포지토리를 추가할 수 없습니다"
+
 msgid "Could not answer the agent"
 msgstr "에이전트에 응답할 수 없습니다"
 
@@ -6017,6 +6017,9 @@ msgstr "이 풀 리퀘스트를 불러오지 못했습니다."
 msgid "Could not load your machines"
 msgstr "머신을 불러오지 못했습니다"
 
+msgid "Could not make it the primary repository"
+msgstr "기본 리포지토리로 설정할 수 없습니다"
+
 msgid "Could not mark ready"
 msgstr "준비됨으로 표시할 수 없습니다"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "접근 권한을 제거할 수 없습니다"
 
 msgid "Could not remove repository"
+msgstr "리포지토리를 제거할 수 없습니다"
+
+msgid "Could not remove the repository"
 msgstr "리포지토리를 제거할 수 없습니다"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "{0} 모두 버리기"
 msgid "Discard all staged changes"
 msgstr "스테이징된 변경 사항 모두 버리기"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "{repositoryName}의 스테이징된 변경 사항을 모두 버릴까요?"
+
 msgid "Discard all staged changes?"
 msgstr "스테이징된 변경 사항을 모두 버릴까요?"
 
 msgid "Discard all unstaged changes"
 msgstr "스테이징되지 않은 변경 사항 모두 버리기"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "{repositoryName}의 스테이징되지 않은 변경 사항을 모두 버릴까요?"
 
 msgid "Discard all unstaged changes?"
 msgstr "스테이징되지 않은 변경 사항을 모두 버릴까요?"
@@ -8147,12 +8159,6 @@ msgstr "전체 이메일 주소를 입력하세요"
 msgid "Enter a number"
 msgstr "숫자 입력"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "{hostName}의 상위 디렉터리를 입력하세요"
-
-msgid "Enter a path on {hostName}"
-msgstr "{hostName}의 경로를 입력하세요"
-
 msgid "Enter a URL into the search bar above."
 msgstr "위 검색 바에 URL을 입력하세요."
 
@@ -8294,11 +8300,8 @@ msgstr "매주 수요일 오전 9시에 이번 주 머지된 PR을 검토하고,
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "평일 오전 9시마다 새 GitHub 이슈를 읽고, 라벨을 적용하고, 검토용 첫 답변 초안을 작성합니다."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "멀티 리포지토리 프로젝트의 모든 워크스페이스는 이 리포지토리를 다른 리포지토리와 나란히 체크아웃합니다."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "이 프로젝트의 각 워크스페이스는 모든 리포지토리를 하나의 브랜치에서 나란히 체크아웃합니다."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "이 프로젝트의 각 워크스페이스는 모든 리포지토리를 하나의 브랜치에서 나란히 체크아웃합니다. 설정 및 실행 명령은 기본 리포지토리에서 가져옵니다."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "이것이 일반화될 수 있는지를 두고 모두가 논쟁합니다. 그 논쟁 자체가 해당 단계에 도달했다는 신호입니다."
@@ -8350,12 +8353,6 @@ msgstr "게시한 모든 내용이 숨겨지는 것이 아니라 삭제됩니다
 
 msgid "Executable"
 msgstr "실행 파일"
-
-msgid "Existing repo path"
-msgstr "기존 리포지토리 경로"
-
-msgid "Existing repo path on {hostName}"
-msgstr "{hostName}의 기존 리포지토리 경로"
 
 msgid "existing worktree"
 msgstr "기존 worktree"
@@ -9338,6 +9335,9 @@ msgstr "작업 보기의 검색 입력창에 포커스합니다"
 
 msgid "Folder"
 msgstr "폴더"
+
+msgid "Folder can't be read"
+msgstr "폴더를 읽을 수 없습니다"
 
 msgid "Folder is missing"
 msgstr "폴더가 없습니다"
@@ -10425,9 +10425,6 @@ msgstr "각 v1 프로젝트를 v2로 가져옵니다. 이미 가져온 프로젝
 
 msgid "Import each v1 terminal script into v2."
 msgstr "각 v1 터미널 스크립트를 v2로 가져옵니다."
-
-msgid "Import existing"
-msgstr "기존 항목 가져오기"
 
 msgid "Import existing folder"
 msgstr "기존 폴더 가져오기"
@@ -11552,9 +11549,6 @@ msgstr "{0}–{1}번 줄"
 msgid "Link"
 msgstr "링크"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "클론하려면 먼저 프로젝트에 GitHub 리포지토리를 연결하세요."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "더 불러오는 중..."
 
 msgid "Loading more…"
 msgstr "더 불러오는 중…"
+
+msgid "Loading project repositories…"
+msgstr "프로젝트 리포지토리 불러오는 중…"
 
 msgid "Loading project…"
 msgstr "프로젝트 불러오는 중…"
@@ -11901,6 +11898,9 @@ msgstr "기본값으로 설정"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "기본값으로 설정: 새 터미널과 에이전트를 이 계정으로 실행합니다."
+
+msgid "Make primary"
+msgstr "기본으로 설정"
 
 msgid "Make public"
 msgstr "공개"
@@ -12522,9 +12522,6 @@ msgstr "이 채팅을 여기로 옮기는 중"
 msgid "Moving this workspace…"
 msgstr "이 워크스페이스를 옮기는 중…"
 
-msgid "Multi-repo project"
-msgstr "멀티 리포지토리 프로젝트"
-
 msgid "Multi-select"
 msgstr "다중 선택"
 
@@ -12983,6 +12980,9 @@ msgstr "채널 없음"
 
 msgid "No chats found"
 msgstr "채팅을 찾을 수 없습니다"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "이 워크스페이스에 {currentBranchName} 브랜치의 체크아웃이 없습니다"
 
 msgid "No checks"
 msgstr "검사 없음"
@@ -14581,6 +14581,9 @@ msgstr "채팅 인터페이스에서 여는 중…"
 msgid "Opening pages"
 msgstr "페이지 열기"
 
+msgid "Opens different repositories than this workspace"
+msgstr "이 워크스페이스와 다른 리포지토리를 엽니다"
+
 msgid "Operator"
 msgstr "작업자"
 
@@ -15079,12 +15082,6 @@ msgstr "개발자당 병렬 세션 수가 7개월마다 두 배로 늘어나며 
 msgid "Parameters"
 msgstr "매개변수"
 
-msgid "Parent directory"
-msgstr "상위 디렉터리"
-
-msgid "Parent directory on {hostName}"
-msgstr "{hostName}의 상위 디렉터리"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "일부는 기록이고 일부는 베팅입니다. 앞의 두 항목은 이미 일어나고 있습니다. 나머지는 틀릴 수 있을 만큼 구체적으로 적었습니다."
 
@@ -15272,9 +15269,6 @@ msgstr "다른 요소 선택 (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "디스크에서 폴더를 선택해 프로젝트로 추가합니다"
 
-msgid "Pick a folder…"
-msgstr "폴더 선택…"
-
 msgid "Pick a machine size"
 msgstr "머신 크기 선택"
 
@@ -15284,14 +15278,11 @@ msgstr "모델을 선택하세요"
 msgid "pick a name for the board"
 msgstr "리더보드에 쓸 이름을 정하세요"
 
-msgid "Pick a parent directory"
-msgstr "상위 디렉터리를 선택하세요"
-
-msgid "Pick a project location"
-msgstr "프로젝트 위치를 선택하세요"
-
 msgid "Pick a reason"
 msgstr "사유를 선택하세요"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "{hostName}에서 리포지토리 폴더를 선택하세요."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "플러그인 마켓플레이스 파일이 있는 리포지토리를 선택하세요. Superset이 지금 그리고 다시 동기화할 때마다 플러그인을 동기화합니다."
@@ -15802,13 +15793,8 @@ msgstr "다른 기기의 프로젝트"
 msgid "Project ready. Open it from the sidebar."
 msgstr "프로젝트 준비 완료. 사이드바에서 열어 보세요."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "프로젝트를 {0}(으)로 이동했습니다"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "{0}에 프로젝트를 설정했습니다"
+msgid "Project relocated to {newPath}"
+msgstr "프로젝트를 {newPath}(으)로 이동했습니다"
 
 msgid "Project Settings"
 msgstr "프로젝트 설정"
@@ -16494,6 +16480,9 @@ msgstr "다시 불러오면 편집 내용이 삭제됩니다. 덮어쓰면 디�
 msgid "Relocate"
 msgstr "이동"
 
+msgid "Relocate {repositoryName}?"
+msgstr "{repositoryName}을(를) 이동할까요?"
+
 msgid "Relocate project?"
 msgstr "프로젝트를 이동할까요?"
 
@@ -16577,6 +16566,9 @@ msgstr "그룹에서 제거"
 
 msgid "Remove from queue"
 msgstr "대기열에서 빼기"
+
+msgid "Remove from project"
+msgstr "프로젝트에서 제거"
 
 msgid "Remove from Queue"
 msgstr "대기열에서 제거"
@@ -16859,9 +16851,6 @@ msgstr "리포지토리를 제거했습니다"
 
 msgid "Repository root"
 msgstr "리포지토리 루트"
-
-msgid "Repository settings"
-msgstr "리포지토리 설정"
 
 msgid "Repository URL or path"
 msgstr "리포지토리 URL 또는 경로"
@@ -17432,9 +17421,6 @@ msgstr "일정에 따라 또는 어떤 일이 생겼을 때 에이전트를 실�
 msgid "Run agents side by side"
 msgstr "에이전트를 나란히 실행"
 
-msgid "Run all"
-msgstr "모두 실행"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "코딩 에이전트 군단을"
@@ -17531,9 +17517,6 @@ msgstr "데스크톱, 어떤 터미널, 또는 휴대폰에서 에이전트를 �
 
 msgid "Run your coding agents in the cloud."
 msgstr "코딩 에이전트를 클라우드에서 실행하세요."
-
-msgid "Run: {repositoryName}"
-msgstr "실행: {repositoryName}"
 
 msgid "Run."
 msgstr "실행."
@@ -18180,9 +18163,6 @@ msgstr "조직 선택"
 msgid "Select Organization Logo"
 msgstr "조직 로고 선택"
 
-msgid "Select parent directory to clone into"
-msgstr "클론할 상위 디렉터리 선택"
-
 msgid "Select people"
 msgstr "사람 선택"
 
@@ -18416,9 +18396,6 @@ msgstr "프로젝트 설정…"
 msgid "Set Run"
 msgstr "실행 설정"
 
-msgid "Set run script"
-msgstr "실행 스크립트 설정"
-
 msgid "Set this project"
 msgstr "이 프로젝트로 설정"
 
@@ -18440,9 +18417,6 @@ msgstr "환경 설정"
 
 msgid "Set up once"
 msgstr "한 번만 설정"
-
-msgid "Set up project on {hostName}"
-msgstr "{hostName}에 프로젝트 설정"
 
 msgid "Set up project…"
 msgstr "프로젝트 설정…"
@@ -19227,6 +19201,10 @@ msgstr "스팸 또는 사기"
 msgid "Sparse checkout"
 msgstr "스파스 체크아웃"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "{0}의 스파스 체크아웃"
+
 msgid "Speaking"
 msgstr "말하는 중"
 
@@ -19619,9 +19597,6 @@ msgstr "{label} 중지"
 
 msgid "Stop {name}"
 msgstr "{name} 중지"
-
-msgid "Stop all"
-msgstr "모두 중지"
 
 msgid "Stop dictation"
 msgstr "받아쓰기 중지"
@@ -20387,9 +20362,6 @@ msgstr "코드가 만료되었습니다. 다시 시작하세요."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Paradev가 이 리포지토리의 체크아웃을 설정, 실행, 보관할 때 쓰는 명령으로, config.toml에서 읽습니다."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
@@ -20492,6 +20464,9 @@ msgstr "재사용 가능한 Paradev 에이전트 설정, 프롬프트, 셋업 �
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "호스트가 {targetVersion}이(가) 아닌 {0}(으)로 돌아왔습니다."
+
+msgid "The host created a project with no repository"
+msgstr "호스트가 리포지토리 없는 프로젝트를 만들었습니다"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "호스트가 15분 이내에 다시 연결되지 않았습니다."
@@ -20923,8 +20898,8 @@ msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있�
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 있는 환경을 만든 다음 그 환경에서 워크스페이스를 시작하세요"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "이 환경은 {repository}이(가) 아니라 {environmentRepository}을(를) 엽니다"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "이 환경은 {workspaceRepositories}이(가) 아니라 {environmentRepositories}을(를) 엽니다"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "이 환경의 리포지토리는 고정되어 있습니다. 변경하려면 워크스페이스를 다시 승격하세요"
@@ -21091,6 +21066,9 @@ msgstr "이 풀 리퀘스트는 더 이상 사용할 수 없습니다."
 msgid "This pull request link is invalid."
 msgstr "이 풀 리퀘스트 링크가 올바르지 않습니다."
 
+msgid "This pull request's repository is not known"
+msgstr "이 풀 리퀘스트의 리포지토리를 알 수 없습니다"
+
 msgid "This recording is too long to transcribe"
 msgstr "이 녹음은 너무 길어서 받아쓸 수 없습니다"
 
@@ -21241,6 +21219,9 @@ msgstr "이 워크스페이스"
 
 msgid "This workspace has no project to branch from"
 msgstr "이 워크스페이스에는 분기할 프로젝트가 없습니다"
+
+msgid "This workspace is still loading. Try again."
+msgstr "이 워크스페이스를 아직 불러오는 중입니다. 다시 시도하세요."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "이 워크스페이스가 제거되었거나 더 이상 접근 권한이 없을 수 있습니다."
@@ -22217,9 +22198,6 @@ msgstr "이 계정 사용"
 
 msgid "Use this folder"
 msgstr "이 폴더 사용"
-
-msgid "Use this repo"
-msgstr "이 리포지토리 사용"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "터미널이 멈추거나 응답하지 않을 때 사용하세요."

@@ -27,3 +27,28 @@ describe("resolveProjectIconUrl", () => {
 		).toBeNull();
 	});
 });
+
+describe("resolveProjectIconUrl with repositories", () => {
+	test("uses the primary repository's owner", () => {
+		expect(
+			resolveProjectIconUrl({
+				icon: null,
+				primaryRepositoryId: "web",
+				repositories: [
+					{ id: "api", owner: "other" },
+					{ id: "web", owner: "acme" },
+				],
+			}),
+		).toBe("https://github.com/acme.png?size=64");
+	});
+
+	test("falls back to the first repository when the primary is missing", () => {
+		expect(
+			resolveProjectIconUrl({
+				icon: null,
+				primaryRepositoryId: "gone",
+				repositories: [{ id: "api", owner: "acme" }],
+			}),
+		).toBe("https://github.com/acme.png?size=64");
+	});
+});

@@ -6,19 +6,26 @@ import type { RepositoryReviewThreads } from "../../types";
 
 interface RepositoryReviewThreadsSourceProps {
 	workspaceId: string;
-	onChange: (workspaceId: string, threads: RepositoryReviewThreads) => void;
+	repositoryId: string;
+	onChange: (repositoryId: string, threads: RepositoryReviewThreads) => void;
 }
 
 /** Reports one checkout's review threads and the actions on its own pull request. */
 export function RepositoryReviewThreadsSource({
 	workspaceId,
+	repositoryId,
 	onChange,
 }: RepositoryReviewThreadsSourceProps) {
-	const annotationsByPath = useDiffAnnotationsByPath({ workspaceId });
-	const { target } = useLinkedPullRequest(workspaceId, { enabled: false });
+	const annotationsByPath = useDiffAnnotationsByPath({
+		workspaceId,
+		repositoryId,
+	});
+	const { target } = useLinkedPullRequest(workspaceId, repositoryId, {
+		enabled: false,
+	});
 	const actions = useReviewThreadActions(target);
 	useEffect(() => {
-		onChange(workspaceId, { annotationsByPath, actions });
-	}, [onChange, workspaceId, annotationsByPath, actions]);
+		onChange(repositoryId, { annotationsByPath, actions });
+	}, [onChange, repositoryId, annotationsByPath, actions]);
 	return null;
 }

@@ -7,12 +7,14 @@ import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
-import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useCheckoutGitStatus } from "../../providers/WorkspaceGitStatusProvider";
+import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
+import { checkoutInput } from "../../utils/checkoutInput";
 
 interface UseShipActionsOptions {
 	workspaceId: string;
-	/** Where the new pull request opens: the multi-repo workspace when shipping one of its checkouts. */
-	paneWorkspaceId?: string;
+	/** The checkout to commit, push and open a pull request for. */
+	repositoryId: string | undefined;
 	onRefresh: () => void;
 	isPrFormOpen: boolean;
 	onCommitted: () => void;
@@ -24,7 +26,7 @@ export type ShipActions = ReturnType<typeof useShipActions>;
 
 export function useShipActions({
 	workspaceId,
-	paneWorkspaceId = workspaceId,
+	repositoryId,
 	onRefresh,
 	isPrFormOpen,
 	onCommitted,
@@ -34,8 +36,10 @@ export function useShipActions({
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const { workspace } = useWorkspace();
-	const status = useWorkspaceGitStatus();
+	const status = useCheckoutGitStatus(repositoryId);
+	const scope = checkoutInput(workspaceId, repositoryId);
 	const canCreatePr = workspace.type !== "session";
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 
 	const [commitMessage, setCommitMessage] = useState("");
 	const [prTitle, setPrTitle] = useState("");
@@ -49,17 +53,18 @@ export function useShipActions({
 	// branch.<name>.base (the base createForWorkspace actually opens
 	// against) — measuring against the repo default gets stacked branches
 	// exactly backwards.
-	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
-		{ workspaceId },
-		{ enabled: enabled && canCreatePr, staleTime: Number.POSITIVE_INFINITY },
-	);
+	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(scope, {
+		enabled: enabled && checkoutsLoaded && canCreatePr,
+		staleTime: Number.POSITIVE_INFINITY,
+	});
 	const commitsQuery = workspaceTrpc.git.listCommits.useQuery(
 		{
-			workspaceId,
+			...scope,
 			baseBranch: baseBranchQuery.data?.baseBranch ?? undefined,
 		},
 		{
-			enabled: enabled && canCreatePr && baseBranchQuery.isSuccess,
+			enabled:
+				enabled && checkoutsLoaded && canCreatePr && baseBranchQuery.isSuccess,
 			refetchInterval: 10_000,
 			refetchOnWindowFocus: true,
 			staleTime: 10_000,
@@ -156,10 +161,10 @@ export function useShipActions({
 	const commit = () => {
 		if (commitMutation.isPending) return;
 		const message = commitMessage.trim() || defaultCommitMessage;
-		commitMutation.mutate({ workspaceId, message });
+		commitMutation.mutate({ ...scope, message });
 	};
 
-	const push = () => pushMutation.mutate({ workspaceId });
+	const push = () => pushMutation.mutate(scope);
 
 	const createPr = async () => {
 		const title = prTitle.trim();
@@ -170,7 +175,7 @@ export function useShipActions({
 		// the push then would open the PR at the old remote tip. Pushing an
 		// already-synced branch is a cheap no-op.
 		try {
-			await flowPushMutation.mutateAsync({ workspaceId });
+			await flowPushMutation.mutateAsync(scope);
 		} catch (error) {
 			toast.error(
 				t({
@@ -188,7 +193,7 @@ export function useShipActions({
 		);
 		try {
 			const created = await createPrMutation.mutateAsync({
-				workspaceId,
+				...scope,
 				title,
 				body: prBody.trim() || undefined,
 				draft: prDraft,
@@ -225,10 +230,10 @@ export function useShipActions({
 								return;
 							}
 							usePullRequestPaneIntent.getState().request({
-								workspaceId: paneWorkspaceId,
+								workspaceId,
 								...ref,
 							});
-							void navigateToV2Workspace(paneWorkspaceId, navigate);
+							void navigateToV2Workspace(workspaceId, navigate);
 						},
 					},
 				},

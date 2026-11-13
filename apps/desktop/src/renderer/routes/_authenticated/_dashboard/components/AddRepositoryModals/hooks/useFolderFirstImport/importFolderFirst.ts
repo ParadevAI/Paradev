@@ -1,3 +1,6 @@
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
+import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import type { HostServiceClient } from "renderer/lib/host-service-client";
 import { getBaseName } from "renderer/lib/pathBasename";
 import type { ProjectSetupResult } from "renderer/react-query/projects";
@@ -5,13 +8,17 @@ import type { ProjectSetupResult } from "renderer/react-query/projects";
 export interface MatchingProject {
 	id: string;
 	name: string;
+	/** Set on a local match: the repository at the folder. */
+	repositoryId?: string;
+}
+
+export interface FolderImportResult extends ProjectSetupResult {
+	/** The repository the folder became, or already was. */
+	repositoryId: string;
 }
 
 export type FolderImportClient = {
-	project: Pick<
-		HostServiceClient["project"],
-		"findByPath" | "setup" | "create"
-	>;
+	project: Pick<HostServiceClient["project"], "findByPath" | "create">;
 };
 
 export interface ImportFolderFirstDeps {
@@ -19,7 +26,7 @@ export interface ImportFolderFirstDeps {
 	waitForHostReady: () => Promise<string | null>;
 	getClient: (hostUrl: string) => FolderImportClient;
 	requestGitInit: (repoPath: string) => Promise<boolean>;
-	finalizeSetup: (hostUrl: string, result: ProjectSetupResult) => void;
+	finalizeSetup: (hostUrl: string, result: FolderImportResult) => void;
 	onError?: (message: string) => void;
 	onMultipleProjects?: (input: { candidates: MatchingProject[] }) => void;
 	messages: {
@@ -38,7 +45,7 @@ export async function importFolderFirst({
 	onError,
 	onMultipleProjects,
 	messages,
-}: ImportFolderFirstDeps): Promise<ProjectSetupResult | null> {
+}: ImportFolderFirstDeps): Promise<FolderImportResult | null> {
 	// Pick the folder first — the native dialog is a local Electron call and
 	// must not wait on the host service. Only the registration below needs it.
 	let repoPath: string;
@@ -67,10 +74,7 @@ export async function importFolderFirst({
 		if ("needsGitInit" in response && response.needsGitInit) {
 			const confirmed = await requestGitInit(repoPath);
 			if (!confirmed) return null;
-			const result = await client.project.create.mutate({
-				name: getBaseName(repoPath),
-				mode: { kind: "importLocal", repoPath, initIfNeeded: true },
-			});
+			const result = await createLocalProject(client, repoPath, true);
 			finalizeSetup(activeHostUrl, result);
 			return result;
 		}
@@ -96,26 +100,41 @@ export async function importFolderFirst({
 	}
 
 	try {
-		let result: ProjectSetupResult;
-		if (only) {
-			const setupResult = await client.project.setup.mutate({
-				projectId: only.id,
-				mode: { kind: "import", repoPath },
-			});
-			result = {
-				projectId: only.id,
-				repoPath: setupResult.repoPath,
-			};
-		} else {
-			result = await client.project.create.mutate({
-				name: getBaseName(repoPath),
-				mode: { kind: "importLocal", repoPath },
-			});
-		}
+		// A local match is the project this folder already belongs to.
+		const result: FolderImportResult = only?.repositoryId
+			? { projectId: only.id, repositoryId: only.repositoryId, repoPath }
+			: await createLocalProject(client, repoPath, false);
 		finalizeSetup(activeHostUrl, result);
 		return result;
 	} catch (err) {
 		onError?.(err instanceof Error ? err.message : String(err));
 		return null;
 	}
+}
+
+async function createLocalProject(
+	client: FolderImportClient,
+	repoPath: string,
+	initIfNeeded: boolean,
+): Promise<FolderImportResult> {
+	const project = await client.project.create.mutate({
+		name: getBaseName(repoPath),
+		repositories: [
+			{
+				kind: "local",
+				path: repoPath,
+				...(initIfNeeded ? { initIfNeeded } : {}),
+			},
+		],
+	});
+	const repository = getPrimaryRepository(project);
+	if (!repository)
+		throw new Error(
+			i18n._(msg({ message: "The host created a project with no repository" })),
+		);
+	return {
+		projectId: project.id,
+		repositoryId: repository.id,
+		repoPath: repository.path,
+	};
 }

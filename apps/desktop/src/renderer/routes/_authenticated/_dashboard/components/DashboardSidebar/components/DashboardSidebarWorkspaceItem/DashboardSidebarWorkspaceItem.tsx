@@ -77,10 +77,7 @@ export function DashboardSidebarWorkspaceItem({
 	const environmentItem = isCloudWorkspace ? (
 		<ManageEnvironmentItem workspaceId={id} />
 	) : undefined;
-	const moveDirections = useWorkspaceMoveDirections(
-		workspace.hostId,
-		projectId,
-	);
+	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
 	const move =
 		moveDirections.length > 0
 			? {
@@ -120,6 +117,7 @@ export function DashboardSidebarWorkspaceItem({
 		workspaceName: name,
 		branch,
 		isPinned: workspace.isPinned,
+		pullRequestRepositoryId: pullRequest?.repositoryId,
 	});
 	// A cloud workspace you created is in the sidebar by definition; only an
 	// opted-in teammate's can be taken back out.

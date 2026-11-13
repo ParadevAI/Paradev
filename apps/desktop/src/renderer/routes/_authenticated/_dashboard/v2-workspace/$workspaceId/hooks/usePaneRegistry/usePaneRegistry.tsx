@@ -60,11 +60,6 @@ import type { StoreApi } from "zustand/vanilla";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { V2NotificationStatusIndicator } from "../../components/V2NotificationStatusIndicator";
 import {
-	hasCheckouts,
-	useActiveRepositoryWorkspaceId,
-	useWorkspaceRepositories,
-} from "../../state/activeRepositoryStore";
-import {
 	getDocument,
 	useSharedFileDocument,
 } from "../../state/fileDocumentStore";
@@ -85,7 +80,6 @@ import {
 	type SubagentPaneData,
 	type TerminalPaneData,
 } from "../../types";
-import { checkoutForPath } from "../../utils/checkoutForPath";
 import { ignoreChatTerminal } from "../../utils/closedChatSessions";
 import {
 	findTerminalPaneLocation,
@@ -212,16 +206,6 @@ export function usePaneRegistry({
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
-	const repoWorkspaceId = useActiveRepositoryWorkspaceId(workspaceId);
-	const repositories = useWorkspaceRepositories(workspaceId);
-	// A file pane works on the checkout that holds its file, not the picked one;
-	// a file in no checkout (the multi-repo folder's own files) uses the folder.
-	const fileWorkspaceId = useCallback(
-		(filePath: string) =>
-			checkoutForPath(repositories, filePath) ??
-			(hasCheckouts(workspaceId, repositories) ? workspaceId : repoWorkspaceId),
-		[repositories, workspaceId, repoWorkspaceId],
-	);
 	const closeChatWithUndo = useUndoableChatClose({
 		workspaceId,
 		store,
@@ -350,26 +334,22 @@ export function usePaneRegistry({
 								isActive={ctx.isActive}
 								pinned={Boolean(ctx.pane.pinned)}
 								showDirty={ctx.store !== rightStore}
-								workspaceId={fileWorkspaceId(data.filePath)}
+								workspaceId={workspaceId}
 							/>
 						);
 					},
 					renderPane: (ctx: RendererContext<PaneViewerData>) => {
 						const inRightPane = ctx.store === rightStore;
-						const paneWorkspaceId = fileWorkspaceId(
-							(ctx.pane.data as FilePaneData).filePath,
-						);
 						return (
 							<FileViewLayout
 								context={ctx}
-								workspaceId={repoWorkspaceId}
-								fileWorkspaceId={paneWorkspaceId}
+								workspaceId={workspaceId}
 								showTree={inRightPane}
 								onSearch={onSearch}
 							>
 								<FilePane
 									context={ctx}
-									workspaceId={paneWorkspaceId}
+									workspaceId={workspaceId}
 									inRightPane={inRightPane}
 								/>
 							</FileViewLayout>
@@ -378,9 +358,7 @@ export function usePaneRegistry({
 					renderHeaderExtras: (ctx: RendererContext<PaneViewerData>) => (
 						<FilePaneHeaderExtras
 							context={ctx}
-							workspaceId={fileWorkspaceId(
-								(ctx.pane.data as FilePaneData).filePath,
-							)}
+							workspaceId={workspaceId}
 							inRightPane={ctx.store === rightStore}
 						/>
 					),
@@ -388,10 +366,7 @@ export function usePaneRegistry({
 						ctx.actions.pin(),
 					onBeforeClose: (pane) => {
 						const data = pane.data as FilePaneData;
-						const doc = getDocument(
-							fileWorkspaceId(data.filePath),
-							data.filePath,
-						);
+						const doc = getDocument(workspaceId, data.filePath);
 						if (!doc?.dirty) return true;
 						const name = getFileName(data.filePath);
 						return new Promise<boolean>((resolve) => {
@@ -409,10 +384,7 @@ export function usePaneRegistry({
 											message: "Save",
 										}),
 										onClick: async () => {
-											const doc = getDocument(
-												fileWorkspaceId(data.filePath),
-												data.filePath,
-											);
+											const doc = getDocument(workspaceId, data.filePath);
 											if (!doc) {
 												resolve(true);
 												return;
@@ -438,10 +410,7 @@ export function usePaneRegistry({
 										}),
 										variant: "secondary",
 										onClick: async () => {
-											const doc = getDocument(
-												fileWorkspaceId(data.filePath),
-												data.filePath,
-											);
+											const doc = getDocument(workspaceId, data.filePath);
 											if (doc) await doc.reload();
 											resolve(true);
 										},
@@ -484,7 +453,7 @@ export function usePaneRegistry({
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
 						<DiffPane
 							context={ctx}
-							workspaceId={repoWorkspaceId}
+							workspaceId={workspaceId}
 							onOpenFile={onOpenFile}
 							onCreateNewAgentSession={createNewAgentSession}
 						/>
@@ -907,7 +876,7 @@ export function usePaneRegistry({
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
 						<FilesTreePane
 							context={ctx}
-							workspaceId={repoWorkspaceId}
+							workspaceId={workspaceId}
 							onSearch={onSearch}
 						/>
 					),
@@ -916,7 +885,7 @@ export function usePaneRegistry({
 					getIcon: () => <Files className="size-3.5" />,
 					getTitle: () => t({ message: "Files changed" }),
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
-						<ChangesListPane context={ctx} workspaceId={repoWorkspaceId} />
+						<ChangesListPane context={ctx} workspaceId={workspaceId} />
 					),
 				},
 				review: {
@@ -1211,8 +1180,6 @@ export function usePaneRegistry({
 			store,
 			linkedStores,
 			workspaceId,
-			repoWorkspaceId,
-			fileWorkspaceId,
 			startNewShell,
 			forkIntoOtherSurface,
 			closeChatWithUndo,

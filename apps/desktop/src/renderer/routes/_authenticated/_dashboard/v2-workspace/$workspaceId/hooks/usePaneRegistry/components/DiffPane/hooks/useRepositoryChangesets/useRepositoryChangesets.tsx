@@ -1,7 +1,9 @@
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
-import { RepositoryChangesetSource } from "./components/RepositoryChangesetSource";
-import type { RepositoryChangeset } from "./components/RepositoryChangesetSource/components/RepositoryChangesetReporter";
+import {
+	type RepositoryChangeset,
+	RepositoryChangesetSource,
+} from "./components/RepositoryChangesetSource";
 
 interface UseRepositoryChangesetsResult {
 	/** Every checkout's files in repository order, each tagged with its checkout. */
@@ -12,12 +14,13 @@ interface UseRepositoryChangesetsResult {
 }
 
 export function useRepositoryChangesets(
+	workspaceId: string,
 	repositoryIds: string[],
 ): UseRepositoryChangesetsResult {
 	const [byId, setById] = useState<Record<string, RepositoryChangeset>>({});
 	const handleChange = useCallback(
-		(workspaceId: string, changeset: RepositoryChangeset) =>
-			setById((prev) => ({ ...prev, [workspaceId]: changeset })),
+		(repositoryId: string, changeset: RepositoryChangeset) =>
+			setById((prev) => ({ ...prev, [repositoryId]: changeset })),
 		[],
 	);
 
@@ -30,7 +33,8 @@ export function useRepositoryChangesets(
 	const sources = repositoryIds.map((id) => (
 		<RepositoryChangesetSource
 			key={id}
-			workspaceId={id}
+			workspaceId={workspaceId}
+			repositoryId={id}
 			onChange={handleChange}
 		/>
 	));

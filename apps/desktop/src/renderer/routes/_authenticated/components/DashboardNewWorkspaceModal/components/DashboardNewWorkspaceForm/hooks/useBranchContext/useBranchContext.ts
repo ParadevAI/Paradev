@@ -34,8 +34,16 @@ export function useBranchContext(
 	hostId: string | null,
 	query: string,
 	filter: BranchFilter = "all",
-	cloudRepository: CloudRepository | null = null,
-	canReachHost = true,
+	{
+		cloudRepository = null,
+		canReachHost = true,
+		repositoryId,
+	}: {
+		cloudRepository?: CloudRepository | null;
+		canReachHost?: boolean;
+		/** Defaults to the primary repository. */
+		repositoryId?: string;
+	} = {},
 ) {
 	// A cloud workspace has no host to search — the sandbox doesn't exist until
 	// create — so its branches come from the GitHub remote instead.
@@ -68,6 +76,7 @@ export function useBranchContext(
 			"workspaceCreation",
 			"searchBranches",
 			projectId,
+			repositoryId,
 			hostUrl,
 			query,
 			filter,
@@ -82,6 +91,7 @@ export function useBranchContext(
 			const client = getHostServiceClientByUrl(hostUrl);
 			return client.workspaceCreation.searchBranches.query({
 				projectId,
+				repositoryId,
 				query: query || undefined,
 				cursor: pageParam,
 				limit: PAGE_SIZE,

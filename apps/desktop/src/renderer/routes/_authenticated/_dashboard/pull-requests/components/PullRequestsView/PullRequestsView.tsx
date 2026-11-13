@@ -1,5 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+	getPrimaryRepository,
+	type HostRepository,
+} from "renderer/hooks/host-projects/useHostProjects";
 import { useDebouncedSearchNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDebouncedSearchNavigation";
 import { useProjectQueryTargets } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import { normalizeGithubLogins } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeGithubLogins";
@@ -99,6 +103,7 @@ export function PullRequestsView({
 	const {
 		isReady: areProjectsReady,
 		projects: hostProjects,
+		hostResults: hostProjectResults,
 		targets: projectTargets,
 	} = useProjectQueryTargets(projectFilters);
 
@@ -191,18 +196,34 @@ export function PullRequestsView({
 			})),
 		[hostProjects],
 	);
-	const repoSlugByProjectId = useMemo(
-		() =>
-			new Map(
-				hostProjects.map((project) => [
-					project.projectKey,
-					project.repoOwner && project.repoName
-						? `${project.repoOwner}/${project.repoName}`
-						: project.name,
-				]),
-			),
-		[hostProjects],
-	);
+	const repoSlugById = useMemo(() => {
+		const slugs = new Map<string, string>();
+		const slugOf = (
+			project: { name: string; repositories: HostRepository[] },
+			repository: HostRepository,
+		) =>
+			repository.owner && repository.repoName
+				? `${repository.owner}/${repository.repoName}`
+				: project.repositories.length > 1
+					? repository.name
+					: project.name;
+		for (const project of hostProjects) {
+			const primary = getPrimaryRepository(project);
+			slugs.set(
+				project.projectKey,
+				primary ? slugOf(project, primary) : project.name,
+			);
+		}
+		// Each host has its own repository ids; a row's id comes from its host.
+		for (const result of hostProjectResults) {
+			for (const row of result.rows ?? []) {
+				for (const repository of row.repositories) {
+					slugs.set(repository.id, slugOf(row, repository));
+				}
+			}
+		}
+		return slugs;
+	}, [hostProjects, hostProjectResults]);
 
 	useEffect(() => {
 		if (!areProjectsReady) return;
@@ -352,7 +373,7 @@ export function PullRequestsView({
 					selectedPrNumber={selectedPrNumber}
 					selectedPrProjectId={selectedPrProjectId}
 					selectedPrRepo={selectedPrRepo}
-					repoSlugByProjectId={repoSlugByProjectId}
+					repoSlugById={repoSlugById}
 				/>
 			</div>
 		</div>

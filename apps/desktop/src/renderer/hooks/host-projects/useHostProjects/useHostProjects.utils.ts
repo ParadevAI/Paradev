@@ -2,7 +2,6 @@ import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import type { ProjectSnapshotPayload } from "@superset/workspace-client";
 import { del as idbDel, get as idbGet, set as idbSet } from "idb-keyval";
 
-/** A project row as served by a host (`project.list`). */
 /** One tag folder's host-side presentation row. */
 export interface HostTagSetting {
 	tag: string;
@@ -11,15 +10,16 @@ export interface HostTagSetting {
 	tabOrder: number | null;
 }
 
+/** One repository of a project on its host, sorted by name in `repositories`. */
+export type HostRepository = ProjectSnapshotPayload["repositories"][number];
+
+/** A project row as served by a host (`project.list`). */
 export interface HostProjectRow {
 	id: string;
 	name: string;
-	/** "container" holds repositories and has no folder of its own; repoPath is "". */
-	kind?: "repository" | "container";
-	repoPath: string;
-	repoOwner: string | null;
-	repoName: string | null;
-	repoUrl: string | null;
+	primaryRepositoryId: string;
+	/** Sorted by name; the primary is marked with `isPrimary`, not moved. */
+	repositories: HostRepository[];
 	worktreeBaseDir: string | null;
 	/** Custom icon data-URI, or null to fall back to the GitHub avatar. */
 	icon: string | null;
@@ -41,12 +41,9 @@ export interface HostProjectItem {
 	projectKey: string;
 	id: string;
 	name: string;
-	kind?: "repository" | "container";
-	/** Present when some host serves the project. */
-	repoPath?: string;
-	repoOwner: string | null;
-	repoName: string | null;
-	repoUrl: string | null;
+	primaryRepositoryId: string;
+	/** The local host's replica when it serves the project, else the first seen. */
+	repositories: HostRepository[];
 	/** Custom icon data-URI, or null to fall back to the GitHub avatar. */
 	icon: string | null;
 	/** Accent color as a `#rrggbb` hex, or null for the default. */
@@ -59,6 +56,18 @@ export interface HostProjectItem {
 	updatedAt: number;
 	/** @deprecated Mixed-version fallback; canonical reads use tagFolders. */
 	tagSettings?: HostTagSetting[];
+}
+
+/** The primary repository, or undefined for a row with no repositories. */
+export function getPrimaryRepository(project: {
+	primaryRepositoryId: string;
+	repositories: HostRepository[];
+}): HostRepository | undefined {
+	return (
+		project.repositories.find(
+			(repository) => repository.id === project.primaryRepositoryId,
+		) ?? project.repositories[0]
+	);
 }
 
 export interface HostProjectsQueryTarget {
@@ -145,30 +154,34 @@ export function deriveHostProjectsQueryTargets({
 	return targets;
 }
 
-/**
- * Normalize a project.list row from any host version. Hosts running
- * pre-local-first builds (not-yet-updated desktops, standalone headless
- * hosts) don't serve `name`/`createdAt`/`updatedAt` — fall back the same
- * way the new host does (folder basename; both path separators).
- */
-export function normalizeHostProjectRow(
-	row: Partial<HostProjectRow> & { id: string; repoPath: string },
+/** Keep the fields this hook exposes from a `project.list` row or event snapshot. */
+export function toHostProjectRow(
+	snapshot: ProjectSnapshotPayload,
+	fallbackTagSettings?: HostTagSetting[],
 ): HostProjectRow {
 	return {
-		id: row.id,
-		name: row.name || row.repoPath.split(/[\\/]/).pop() || row.id,
-		kind: row.kind,
-		repoPath: row.repoPath,
-		repoOwner: row.repoOwner ?? null,
-		repoName: row.repoName ?? null,
-		repoUrl: row.repoUrl ?? null,
-		worktreeBaseDir: row.worktreeBaseDir ?? null,
-		icon: row.icon ?? null,
-		color: row.color ?? null,
-		createdAt: row.createdAt ?? 0,
-		updatedAt: row.updatedAt ?? row.createdAt ?? 0,
-		tagSettings: row.tagSettings,
+		id: snapshot.id,
+		name: snapshot.name,
+		primaryRepositoryId: snapshot.primaryRepositoryId,
+		repositories: snapshot.repositories,
+		worktreeBaseDir: snapshot.worktreeBaseDir,
+		icon: snapshot.icon,
+		color: snapshot.color ?? null,
+		createdAt: snapshot.createdAt,
+		updatedAt: snapshot.updatedAt,
+		tagSettings: snapshot.tagSettings ?? fallbackTagSettings,
 	};
+}
+
+/** Snapshots written before projects had repositories are dropped, not migrated. */
+export function isHostProjectRow(value: unknown): value is HostProjectRow {
+	if (typeof value !== "object" || value === null) return false;
+	const row = value as Partial<HostProjectRow>;
+	return (
+		typeof row.id === "string" &&
+		typeof row.primaryRepositoryId === "string" &&
+		Array.isArray(row.repositories)
+	);
 }
 
 const SNAPSHOT_KEY_PREFIX = "host-projects:v1";
@@ -184,9 +197,8 @@ export async function loadHostProjectsSnapshot(
 ): Promise<HostProjectRow[] | undefined> {
 	if (!organizationId) return undefined;
 	try {
-		return await idbGet<HostProjectRow[]>(
-			snapshotKey(organizationId, machineId),
-		);
+		const rows = await idbGet<unknown>(snapshotKey(organizationId, machineId));
+		return Array.isArray(rows) ? rows.filter(isHostProjectRow) : undefined;
 	} catch {
 		return undefined;
 	}
@@ -261,22 +273,9 @@ export function applyProjectChangedEvent(
 	const snapshot = event.project;
 	if (!snapshot) return rows;
 	const existing = rows?.find((row) => row.id === snapshot.id);
-	const nextRow: HostProjectRow = {
-		id: snapshot.id,
-		name: snapshot.name,
-		repoPath: snapshot.repoPath,
-		repoOwner: snapshot.repoOwner,
-		repoName: snapshot.repoName,
-		repoUrl: snapshot.repoUrl,
-		worktreeBaseDir: snapshot.worktreeBaseDir,
-		icon: snapshot.icon,
-		color: snapshot.color ?? null,
-		createdAt: snapshot.createdAt,
-		updatedAt: snapshot.updatedAt,
-		// Old hosts publish settings on project snapshots. New hosts may retain
-		// the field as a compatibility adapter; omission keeps the last value.
-		tagSettings: snapshot.tagSettings ?? existing?.tagSettings,
-	};
+	// Old hosts publish settings on project snapshots. New hosts may retain
+	// the field as a compatibility adapter; omission keeps the last value.
+	const nextRow = toHostProjectRow(snapshot, existing?.tagSettings);
 	if (!rows) return [nextRow];
 	return existing
 		? rows.map((row) => (row.id === nextRow.id ? nextRow : row))
@@ -287,7 +286,7 @@ export function applyProjectChangedEvent(
  * Per-row union merge across hosts on `id`. Legacy cloud-created projects
  * share an id across machines, so their replicas collapse into one item;
  * the most recently updated replica wins shared fields and the local
- * host's replica wins `id`/`repoPath` for open/navigate actions.
+ * host's replica wins the repositories, which are per machine.
  */
 export function mergeHostProjects({
 	hostResults,
@@ -305,12 +304,9 @@ export function mergeHostProjects({
 				byKey.set(key, {
 					projectKey: key,
 					id: row.id,
-					kind: row.kind,
 					name: row.name,
-					repoPath: row.repoPath,
-					repoOwner: row.repoOwner,
-					repoName: row.repoName,
-					repoUrl: row.repoUrl,
+					primaryRepositoryId: row.primaryRepositoryId,
+					repositories: row.repositories,
 					icon: row.icon,
 					color: row.color,
 					hostIds: [result.target.machineId],
@@ -323,20 +319,16 @@ export function mergeHostProjects({
 			}
 			existing.hostIds.push(result.target.machineId);
 			existing.hostReachable = existing.hostReachable || result.reachable;
-			// Most recently updated replica wins the shared fields.
 			if (row.updatedAt > existing.updatedAt) {
 				existing.name = row.name;
-				existing.repoUrl = row.repoUrl;
 				existing.updatedAt = row.updatedAt;
 			}
 			if (row.createdAt < existing.createdAt) {
 				existing.createdAt = row.createdAt;
 			}
-			// Prefer the local host's repoPath for open/navigate actions.
 			if (result.target.isLocal) {
-				existing.repoPath = row.repoPath;
-				existing.repoOwner = row.repoOwner;
-				existing.repoName = row.repoName;
+				existing.primaryRepositoryId = row.primaryRepositoryId;
+				existing.repositories = row.repositories;
 				existing.icon = row.icon;
 				existing.color = row.color;
 			}
@@ -350,4 +342,16 @@ export function mergeHostProjects({
 	}
 
 	return Array.from(byKey.values());
+}
+
+/** One host's own row for a project; repository ids differ between hosts. */
+export function findHostProjectRow(
+	hostResults: HostProjectRowsResult[],
+	hostId: string | null | undefined,
+	projectId: string | null | undefined,
+): HostProjectRow | undefined {
+	if (!hostId || !projectId) return undefined;
+	return hostResults
+		.find((result) => result.target.machineId === hostId)
+		?.rows?.find((row) => row.id === projectId);
 }

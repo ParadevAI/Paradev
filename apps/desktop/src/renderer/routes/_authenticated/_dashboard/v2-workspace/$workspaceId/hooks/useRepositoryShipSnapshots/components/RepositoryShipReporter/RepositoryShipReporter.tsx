@@ -5,7 +5,7 @@ import {
 	repositoryShipStep,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRepositoryShipSnapshots/utils/repositoryShipStep";
 import { useShipActions } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useShipActions";
-import { useWorkspaceGitStatus } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
+import { useCheckoutGitStatus } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
 import {
 	type ChangesPillStats,
 	changesPillStats,
@@ -25,19 +25,22 @@ export interface RepositoryShipSnapshot {
 }
 
 interface RepositoryShipReporterProps {
+	workspaceId: string;
 	repositoryId: string;
 	onChange: (repositoryId: string, snapshot: RepositoryShipSnapshot) => void;
 }
 
 /** Keeps one checkout's ship state live for the multi-repo control's face. */
 export function RepositoryShipReporter({
+	workspaceId,
 	repositoryId,
 	onChange,
 }: RepositoryShipReporterProps) {
-	const status = useWorkspaceGitStatus();
-	const { flowState } = usePRFlowState(repositoryId);
+	const status = useCheckoutGitStatus(repositoryId);
+	const { flowState } = usePRFlowState(workspaceId, repositoryId);
 	const { hasCommitsAhead } = useShipActions({
-		workspaceId: repositoryId,
+		workspaceId,
+		repositoryId,
 		onRefresh: () => {},
 		isPrFormOpen: false,
 		onCommitted: () => {},

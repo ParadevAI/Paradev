@@ -2,15 +2,7 @@ import type { ChangesetFile } from "./types";
 
 export function getChangesetFileKey(file: ChangesetFile): string {
 	const key = getSourceKey(file);
-	return file.workspaceId ? `${file.workspaceId}|${key}` : key;
-}
-
-/** The checkout a file is in: its tag, else the view's own workspace. */
-export function getChangesetFileWorkspaceId(
-	file: ChangesetFile,
-	fallback: string,
-): string {
-	return file.workspaceId ?? fallback;
+	return file.repositoryId ? `${file.repositoryId}|${key}` : key;
 }
 
 function getSourceKey(file: ChangesetFile): string {
@@ -22,4 +14,12 @@ function getSourceKey(file: ChangesetFile): string {
 		return `commit:${source.fromHash ?? ""}:${source.commitHash}:${file.path}`;
 	}
 	return `${source.kind}:${file.path}`;
+}
+
+/** The checkout a file is in: its tag, else the view's own checkout. */
+export function getChangesetFileRepositoryId(
+	file: ChangesetFile,
+	fallback: string | undefined,
+): string | undefined {
+	return file.repositoryId ?? fallback;
 }

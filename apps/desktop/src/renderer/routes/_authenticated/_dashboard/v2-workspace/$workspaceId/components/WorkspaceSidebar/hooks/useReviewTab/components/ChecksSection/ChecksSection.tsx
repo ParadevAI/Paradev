@@ -17,6 +17,7 @@ import {
 } from "react-icons/lu";
 import { VscChevronRight } from "react-icons/vsc";
 import { CHECK_STATUS_ICONS } from "renderer/routes/_authenticated/_dashboard/utils/checkStatusIcons";
+import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 import type { NormalizedCheck, NormalizedPR } from "../../types";
 
 const checkSummaryIconConfig = {
@@ -28,6 +29,7 @@ const checkSummaryIconConfig = {
 
 interface ChecksSectionProps {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	checks: NormalizedCheck[];
 	checksStatus: NormalizedPR["checksStatus"];
 	prUrl: string;
@@ -35,6 +37,7 @@ interface ChecksSectionProps {
 
 export function ChecksSection({
 	workspaceId,
+	repositoryId,
 	checks,
 	checksStatus,
 	prUrl,
@@ -113,6 +116,7 @@ export function ChecksSection({
 						<CheckRow
 							key={`${check.name}-${index}`}
 							workspaceId={workspaceId}
+							repositoryId={repositoryId}
 							check={check}
 							prUrl={prUrl}
 						/>
@@ -135,10 +139,12 @@ function resolveCheckUrl(
 
 function CheckRow({
 	workspaceId,
+	repositoryId,
 	check,
 	prUrl,
 }: {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	check: NormalizedCheck;
 	prUrl: string;
 }) {
@@ -193,7 +199,11 @@ function CheckRow({
 				rowContent
 			)}
 			{canCopyLogs && check.url && (
-				<CopyLogsButton workspaceId={workspaceId} detailsUrl={check.url} />
+				<CopyLogsButton
+					workspaceId={workspaceId}
+					repositoryId={repositoryId}
+					detailsUrl={check.url}
+				/>
 			)}
 		</div>
 	);
@@ -201,9 +211,11 @@ function CheckRow({
 
 function CopyLogsButton({
 	workspaceId,
+	repositoryId,
 	detailsUrl,
 }: {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	detailsUrl: string;
 }) {
 	const { t } = useLingui();
@@ -221,7 +233,7 @@ function CopyLogsButton({
 		setState("loading");
 		try {
 			const { logs } = await utils.git.getCheckJobLogs.fetch({
-				workspaceId,
+				...checkoutInput(workspaceId, repositoryId),
 				detailsUrl,
 			});
 			await navigator.clipboard.writeText(logs);

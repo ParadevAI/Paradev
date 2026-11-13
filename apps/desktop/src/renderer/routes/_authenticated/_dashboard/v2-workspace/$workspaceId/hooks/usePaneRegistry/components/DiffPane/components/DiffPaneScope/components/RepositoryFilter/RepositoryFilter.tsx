@@ -9,7 +9,7 @@ import {
 import { LuChevronDown, LuFolderGit2 } from "react-icons/lu";
 
 interface RepositoryFilterProps {
-	repositories: Array<{ id: string; name: string }>;
+	repositories: Array<{ repositoryId: string; name: string }>;
 	shown: Set<string>;
 	onChange: (repositoryIds: string[]) => void;
 }
@@ -25,7 +25,7 @@ export function RepositoryFilter({
 	const showsAll = shownCount === repositoryCount;
 	const onlyShown =
 		shownCount === 1
-			? repositories.find((repository) => shown.has(repository.id))
+			? repositories.find((repository) => shown.has(repository.repositoryId))
 			: undefined;
 
 	const toggle = (repositoryId: string) => {
@@ -71,10 +71,10 @@ export function RepositoryFilter({
 				<DropdownMenuSeparator />
 				{repositories.map((repository) => (
 					<DropdownMenuCheckboxItem
-						key={repository.id}
-						checked={!showsAll && shown.has(repository.id)}
+						key={repository.repositoryId}
+						checked={!showsAll && shown.has(repository.repositoryId)}
 						onSelect={(event) => event.preventDefault()}
-						onCheckedChange={() => toggle(repository.id)}
+						onCheckedChange={() => toggle(repository.repositoryId)}
 					>
 						{repository.name}
 					</DropdownMenuCheckboxItem>

@@ -90,6 +90,8 @@ interface PullRequestActionsProps {
 	target: PullRequestTarget | null;
 	/** Where an agent or a new workspace on this pull request would run; GitHub actions never go through it. */
 	projectId: string | null;
+	/** The project's repository that holds the PR, when known. */
+	repositoryId?: string | null;
 	hostId: string | null;
 	hostUrl: string | null;
 	data: PullRequestDetail | null | undefined;
@@ -138,6 +140,7 @@ function IconAction({
 export function PullRequestActions({
 	target,
 	projectId,
+	repositoryId = null,
 	hostId,
 	hostUrl,
 	data,
@@ -177,6 +180,7 @@ export function PullRequestActions({
 					hostUrl,
 					prNumber,
 					repoFullName: target?.repoFullName ?? null,
+					repositoryId,
 				}
 			: null,
 	);

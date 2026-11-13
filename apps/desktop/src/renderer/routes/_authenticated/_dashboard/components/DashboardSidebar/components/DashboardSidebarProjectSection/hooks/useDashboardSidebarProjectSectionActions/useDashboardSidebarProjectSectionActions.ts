@@ -5,7 +5,10 @@ import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	getPrimaryRepository,
+	useHostProjects,
+} from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import {
 	useOpenNewWorkspace,
@@ -38,16 +41,18 @@ export function useDashboardSidebarProjectSectionActions({
 	// hostIds order is arbitrary and may lead with an offline remote.
 	const { projects: hostProjects } = useHostProjects();
 	const { machineId } = useLocalHostService();
-	const projectHostIds = useMemo(
-		() =>
-			hostProjects.find((item) => item.projectKey === project.id)?.hostIds ??
-			[],
-		[hostProjects, project.id],
+	const hostProject = hostProjects.find(
+		(item) => item.projectKey === project.id,
 	);
-	// A container has no folder of its own and no repository to list worktrees of.
-	const isContainer =
-		hostProjects.find((item) => item.projectKey === project.id)?.kind ===
-		"container";
+	const projectHostIds = useMemo(
+		() => hostProject?.hostIds ?? [],
+		[hostProject],
+	);
+	const primaryRepository = hostProject
+		? getPrimaryRepository(hostProject)
+		: undefined;
+	// A multi-repo project has no folder of its own and no one repository to list worktrees of.
+	const isMultiRepo = (hostProject?.repositories.length ?? 0) > 1;
 	const servingHostId = useMemo(() => {
 		if (machineId && projectHostIds.includes(machineId)) return machineId;
 		return projectHostIds[0] ?? null;
@@ -130,7 +135,7 @@ export function useDashboardSidebarProjectSectionActions({
 	};
 
 	// A multi-repo project has no folder; its workspace folders sit side by side in one.
-	const containerWorkspacesFolder = (hostId: string) => {
+	const multiRepoWorkspacesFolder = (hostId: string) => {
 		const root = hostWorkspaces.find(
 			(workspace) =>
 				workspace.projectId === project.id &&
@@ -141,19 +146,16 @@ export function useDashboardSidebarProjectSectionActions({
 	};
 
 	const handleOpenInFinder = async () => {
-		const hostProject = hostProjects.find(
-			(item) => item.projectKey === project.id,
-		);
 		const localRepoPath = !(
 			machineId && hostProject?.hostIds.includes(machineId)
 		)
 			? undefined
-			: isContainer
-				? containerWorkspacesFolder(machineId)
-				: hostProject.repoPath;
+			: isMultiRepo
+				? multiRepoWorkspacesFolder(machineId)
+				: primaryRepository?.path;
 		if (!localRepoPath) {
 			toast.error(
-				isContainer
+				isMultiRepo
 					? t({ message: "This project has no workspaces on this machine yet" })
 					: t({
 							message: "Project folder is not on this machine",
@@ -215,7 +217,7 @@ export function useDashboardSidebarProjectSectionActions({
 	// row yet and open the confirmation dialog.
 	const handleImportWorktrees = async () => {
 		if (importingWorktreesRef.current) return;
-		if (!servingHostUrl) {
+		if (!servingHostUrl || !primaryRepository) {
 			toast.error(
 				t({
 					message:
@@ -229,6 +231,7 @@ export function useDashboardSidebarProjectSectionActions({
 				servingHostUrl,
 			).workspaceCreation.listProjectWorktrees.query({
 				projectId: project.id,
+				repositoryId: primaryRepository.id,
 			});
 			// `=== false` also skips hosts too old to report tracked-ness.
 			const untracked = worktrees.filter(
@@ -253,7 +256,7 @@ export function useDashboardSidebarProjectSectionActions({
 		}
 	};
 
-	// Dialog confirm: adopt each worktree via the `worktreePath` branch of
+	// Dialog confirm: adopt each worktree via `checkouts[id].worktreePath` of
 	// `workspaces.create` (no `git worktree add`; setup only when opted in).
 	const confirmImportWorktrees = async ({
 		runSetup,
@@ -262,7 +265,7 @@ export function useDashboardSidebarProjectSectionActions({
 	}) => {
 		const untracked = importableWorktrees;
 		if (importingWorktreesRef.current || !untracked) return;
-		if (!servingHostId) {
+		if (!servingHostId || !primaryRepository) {
 			toast.error(
 				t({
 					message:
@@ -283,7 +286,9 @@ export function useDashboardSidebarProjectSectionActions({
 								id: crypto.randomUUID(),
 								projectId: project.id,
 								branch: worktree.branch,
-								worktreePath: worktree.path,
+								checkouts: {
+									[primaryRepository.id]: { worktreePath: worktree.path },
+								},
 								runSetup,
 							},
 						}).completed,
@@ -329,7 +334,7 @@ export function useDashboardSidebarProjectSectionActions({
 		cancelRename,
 		confirmImportWorktrees,
 		deleteSection,
-		handleImportWorktrees: isContainer ? null : handleImportWorktrees,
+		handleImportWorktrees: isMultiRepo ? null : handleImportWorktrees,
 		hideProject,
 		isDeleteDialogOpen,
 		leaveProjectIfActive,

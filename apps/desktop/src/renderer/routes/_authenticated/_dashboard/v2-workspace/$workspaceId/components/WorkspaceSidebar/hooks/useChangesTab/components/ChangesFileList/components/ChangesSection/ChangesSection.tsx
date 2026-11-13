@@ -14,7 +14,9 @@ import { type ReactNode, useState } from "react";
 import { LuUndo2 } from "react-icons/lu";
 import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
+import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 import {
+	repositoryCollapseKey,
 	useV2ChangesSectionsStore,
 	type V2ChangesSectionKey,
 } from "renderer/stores/v2-changes-sections";
@@ -23,17 +25,26 @@ type SectionKind = "unstaged" | "staged";
 
 interface ChangesSectionProps {
 	sectionKey: V2ChangesSectionKey;
+	repositoryId?: string;
+	/** Set when the list shows several checkouts. */
+	repositoryName?: string;
 	title: string;
 	count: number;
 	/** Section-wide +/− totals, right-aligned on the header. */
 	additions?: number;
 	deletions?: number;
-	stagingActions?: { kind: SectionKind; workspaceId: string };
+	stagingActions?: {
+		kind: SectionKind;
+		workspaceId: string;
+		repositoryId: string | undefined;
+	};
 	children: ReactNode;
 }
 
 export function ChangesSection({
 	sectionKey,
+	repositoryId,
+	repositoryName,
 	title,
 	count,
 	additions = 0,
@@ -42,22 +53,33 @@ export function ChangesSection({
 	children,
 }: ChangesSectionProps) {
 	const { t } = useLingui();
+	const perRepositoryId = repositoryName ? repositoryId : undefined;
 	const collapsed = useV2ChangesSectionsStore(
-		(state) => state.collapsed[sectionKey] ?? false,
+		(state) =>
+			(perRepositoryId
+				? state.repositoryCollapsed[
+						repositoryCollapseKey(perRepositoryId, sectionKey)
+					]
+				: undefined) ??
+			state.collapsed[sectionKey] ??
+			false,
 	);
 	const setCollapsed = useV2ChangesSectionsStore((state) => state.setCollapsed);
+	const setRepositoryCollapsed = useV2ChangesSectionsStore(
+		(state) => state.setRepositoryCollapsed,
+	);
 	const open = !collapsed;
 	const [showConfirm, setShowConfirm] = useState(false);
 	const utils = workspaceTrpc.useUtils();
 
 	const invalidate = () => {
 		if (!stagingActions) return;
-		void utils.git.getStatus.invalidate({
-			workspaceId: stagingActions.workspaceId,
-		});
-		void utils.git.getDiff.invalidate({
-			workspaceId: stagingActions.workspaceId,
-		});
+		void utils.git.getStatus.invalidate(
+			checkoutInput(stagingActions.workspaceId, stagingActions.repositoryId),
+		);
+		void utils.git.getDiff.invalidate(
+			checkoutInput(stagingActions.workspaceId, stagingActions.repositoryId),
+		);
 	};
 
 	const discardAllUnstaged = workspaceTrpc.git.discardAllUnstaged.useMutation({
@@ -115,39 +137,49 @@ export function ChangesSection({
 
 	const runDiscardAll = () => {
 		if (!stagingActions) return;
-		const { kind, workspaceId } = stagingActions;
+		const { kind, workspaceId, repositoryId } = stagingActions;
+		const scope = checkoutInput(workspaceId, repositoryId);
 		if (kind === "unstaged") {
-			discardAllUnstaged.mutate({ workspaceId });
+			discardAllUnstaged.mutate(scope);
 		} else {
-			discardAllStaged.mutate({ workspaceId });
+			discardAllStaged.mutate(scope);
 		}
 	};
 
 	const runStagingToggle = () => {
 		if (!stagingActions) return;
-		const { kind, workspaceId } = stagingActions;
+		const { kind, workspaceId, repositoryId } = stagingActions;
+		const scope = checkoutInput(workspaceId, repositoryId);
 		if (kind === "unstaged") {
-			stageAll.mutate({ workspaceId });
+			stageAll.mutate(scope);
 		} else {
-			unstageAll.mutate({ workspaceId });
+			unstageAll.mutate(scope);
 		}
 	};
 
 	const dialogCopy =
 		stagingActions?.kind === "unstaged"
 			? {
-					title: t({
-						message: "Discard all unstaged changes?",
-					}),
+					title: repositoryName
+						? t({
+								message: `Discard all unstaged changes in ${repositoryName}?`,
+							})
+						: t({
+								message: "Discard all unstaged changes?",
+							}),
 					description: t({
 						message:
 							"This will revert all unstaged modifications and delete untracked files. This cannot be undone.",
 					}),
 				}
 			: {
-					title: t({
-						message: "Discard all staged changes?",
-					}),
+					title: repositoryName
+						? t({
+								message: `Discard all staged changes in ${repositoryName}?`,
+							})
+						: t({
+								message: "Discard all staged changes?",
+							}),
 					description: t({
 						message:
 							"This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone.",
@@ -163,7 +195,11 @@ export function ChangesSection({
 	return (
 		<Collapsible
 			open={open}
-			onOpenChange={(next) => setCollapsed(sectionKey, !next)}
+			onOpenChange={(next) =>
+				perRepositoryId
+					? setRepositoryCollapsed(perRepositoryId, sectionKey, !next)
+					: setCollapsed(sectionKey, !next)
+			}
 		>
 			<div className="flex items-center">
 				<CollapsibleTrigger className="flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1 text-left text-xs hover:bg-accent/30">

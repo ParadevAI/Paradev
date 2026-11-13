@@ -22,6 +22,8 @@ interface DiffSidePreviewProps {
 	side: DiffSide;
 	view: FileView;
 	workspaceId: string;
+	/** The checkout of an untagged file. */
+	repositoryId: string | undefined;
 	worktreePath: string;
 }
 
@@ -65,11 +67,12 @@ function GitObjectSide({
 	side,
 	view,
 	workspaceId,
+	repositoryId,
 	worktreePath,
 }: DiffSidePreviewProps) {
 	const path = side === "old" ? (file.oldPath ?? file.path) : file.path;
 	const query = workspaceTrpc.git.readDiffSideFile.useQuery(
-		{ ...createGetDiffInput(workspaceId, file), path, side },
+		{ ...createGetDiffInput(workspaceId, file, repositoryId), path, side },
 		{ retry: false, staleTime: 30_000 },
 	);
 	const absolutePath = toAbsoluteWorkspacePath(worktreePath, path);

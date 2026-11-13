@@ -8,6 +8,7 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { useState } from "react";
+import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -79,10 +80,14 @@ export function TemplateGalleryModal({
 				const client = getHostServiceClientByUrl(activeHostUrl);
 				const result = await client.project.create.mutate({
 					name: deriveProjectNameFromUrl(template.repo),
-					mode: { kind: "template", parentDir, url: template.repo },
+					repositories: [{ kind: "template", url: template.repo }],
+					parentDir,
 				});
-				finalizeSetup(activeHostUrl, result);
-				createdProjectId = result.projectId;
+				finalizeSetup(activeHostUrl, {
+					projectId: result.id,
+					repoPath: getPrimaryRepository(result)?.path ?? "",
+				});
+				createdProjectId = result.id;
 			} else {
 				createdProjectId = await createV1Project.createFromTemplate({
 					repoUrl: template.repo,

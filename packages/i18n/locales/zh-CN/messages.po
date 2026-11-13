@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {此工作区中有 # 个文件更改} other {�
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# 个文件已更改} other {# 个文件已更改}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {#个文件} other {#个文件}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
 
@@ -1383,6 +1386,9 @@ msgstr "剩余 {remaining} 个 token"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# 个仓库} other {全部 # 个仓库}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName}已迁移到{newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "操作"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "{0}的操作"
 
@@ -2099,11 +2106,11 @@ msgstr "将{0}添加到工作区"
 msgid "Add {localizedName}?"
 msgstr "要添加“{localizedName}”吗？"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "请先在 {computer} 上将 {repositoryName} 添加为项目"
+msgid "Add {only} as a project on {computer} first"
+msgstr "请先在{computer}上将{only}添加为项目"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "请先将 {repositoryName} 添加为此电脑上的项目"
+msgid "Add {only} as a project on this computer first"
+msgstr "请先在此电脑上将{only}添加为项目"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "将 #{prNumber} 加入合并队列?"
@@ -2128,6 +2135,12 @@ msgstr "添加项目以查看GitHub议题。"
 
 msgid "Add a project to see pull requests."
 msgstr "添加一个项目来查看拉取请求。"
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "请先在{computer}上添加一个仓库与此完全一致的项目：{repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "请先在此电脑上添加一个仓库与此完全一致的项目：{repositories}"
 
 msgid "Add a short summary…"
 msgstr "添加简短摘要…"
@@ -4515,9 +4528,6 @@ msgstr "选择一名斗士"
 msgid "Choose a folder"
 msgstr "选择文件夹"
 
-msgid "Choose a parent directory"
-msgstr "选择父目录"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "打开议题前，请先在GitHub议题中选择一个项目。"
 
@@ -4532,9 +4542,6 @@ msgstr "选择一个分区。"
 
 msgid "Choose agent"
 msgstr "选择智能体"
-
-msgid "Choose an existing repo folder"
-msgstr "选择已有的仓库文件夹"
 
 msgid "Choose an MCP server"
 msgstr "选择一个MCP服务器"
@@ -4752,13 +4759,6 @@ msgstr "从URL克隆"
 
 msgid "clone the repository"
 msgstr "克隆仓库"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "克隆仓库，或导入主机上已有的文件夹。"
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "已克隆到{0}"
 
 msgid "Cloning…"
 msgstr "正在克隆…"
@@ -5122,9 +5122,6 @@ msgstr "命令..."
 
 msgid "Commands"
 msgstr "命令"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "此仓库的设置、清理以及运行菜单所用的命令。"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "用于工作区初始化、清理和“运行”按钮的命令。"
@@ -5887,6 +5884,9 @@ msgstr "无法添加智能体"
 msgid "Could not add repository"
 msgstr "无法添加仓库"
 
+msgid "Could not add the repository"
+msgstr "无法添加仓库"
+
 msgid "Could not answer the agent"
 msgstr "无法回复智能体"
 
@@ -6017,6 +6017,9 @@ msgstr "无法加载此拉取请求。"
 msgid "Could not load your machines"
 msgstr "无法加载你的机器"
 
+msgid "Could not make it the primary repository"
+msgstr "无法将其设为主仓库"
+
 msgid "Could not mark ready"
 msgstr "无法标记为待审查"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "无法移除访问权限"
 
 msgid "Could not remove repository"
+msgstr "无法移除仓库"
+
+msgid "Could not remove the repository"
 msgstr "无法移除仓库"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "放弃所有{0}"
 msgid "Discard all staged changes"
 msgstr "放弃所有已暂存的更改"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "放弃 {repositoryName} 中所有已暂存的更改？"
+
 msgid "Discard all staged changes?"
 msgstr "放弃所有已暂存的更改？"
 
 msgid "Discard all unstaged changes"
 msgstr "放弃所有未暂存的更改"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "放弃 {repositoryName} 中所有未暂存的更改？"
 
 msgid "Discard all unstaged changes?"
 msgstr "放弃所有未暂存的更改？"
@@ -8147,12 +8159,6 @@ msgstr "请输入完整的邮箱地址"
 msgid "Enter a number"
 msgstr "输入数字"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "请输入{hostName}上的父目录"
-
-msgid "Enter a path on {hostName}"
-msgstr "请输入{hostName}上的路径"
-
 msgid "Enter a URL into the search bar above."
 msgstr "在上方的搜索栏中输入URL。"
 
@@ -8294,11 +8300,8 @@ msgstr "每周三上午9点，回顾本周合并的PR，更新被它们改过时
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每个工作日上午9点，阅读新的GitHub议题，打上标签，并起草初步回复供我审阅。"
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "多仓库项目的每个工作区都会把此仓库与其他仓库并排检出。"
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "此项目的每个工作区都会在同一分支上并排检出所有仓库。"
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "此项目的每个工作区都会在同一分支上并排检出所有仓库。初始化和运行命令来自主仓库。"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在争论这能否推广。这场争论本身就说明这一级别已经达到了。"
@@ -8350,12 +8353,6 @@ msgstr "你发布过的所有内容都会被删除，而不是隐藏。你之后
 
 msgid "Executable"
 msgstr "可执行文件"
-
-msgid "Existing repo path"
-msgstr "已有仓库路径"
-
-msgid "Existing repo path on {hostName}"
-msgstr "{hostName}上的已有仓库路径"
 
 msgid "existing worktree"
 msgstr "已有worktree"
@@ -9338,6 +9335,9 @@ msgstr "聚焦任务视图中的搜索框"
 
 msgid "Folder"
 msgstr "文件夹"
+
+msgid "Folder can't be read"
+msgstr "无法读取文件夹"
 
 msgid "Folder is missing"
 msgstr "文件夹不存在"
@@ -10425,9 +10425,6 @@ msgstr "将每个 v1 项目导入 v2。已导入的项目会显示为已导入�
 
 msgid "Import each v1 terminal script into v2."
 msgstr "将每个 v1 终端脚本导入 v2。"
-
-msgid "Import existing"
-msgstr "导入已有"
 
 msgid "Import existing folder"
 msgstr "导入已有文件夹"
@@ -11552,9 +11549,6 @@ msgstr "第{0}–{1}行"
 msgid "Link"
 msgstr "链接"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "请先为项目关联GitHub仓库才能克隆。"
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "正在加载更多..."
 
 msgid "Loading more…"
 msgstr "正在加载更多…"
+
+msgid "Loading project repositories…"
+msgstr "正在加载项目仓库…"
 
 msgid "Loading project…"
 msgstr "正在加载项目…"
@@ -11901,6 +11898,9 @@ msgstr "设为默认"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "设为默认：新终端和智能体将使用此账户启动。"
+
+msgid "Make primary"
+msgstr "设为主仓库"
 
 msgid "Make public"
 msgstr "公开"
@@ -12522,9 +12522,6 @@ msgstr "正在将此聊天移到这里"
 msgid "Moving this workspace…"
 msgstr "正在移动此工作区…"
 
-msgid "Multi-repo project"
-msgstr "多仓库项目"
-
 msgid "Multi-select"
 msgstr "多选"
 
@@ -12983,6 +12980,9 @@ msgstr "没有频道"
 
 msgid "No chats found"
 msgstr "未找到聊天"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "此工作区中没有位于 {currentBranchName} 的检出"
 
 msgid "No checks"
 msgstr "无检查"
@@ -14581,6 +14581,9 @@ msgstr "正在聊天界面中打开…"
 msgid "Opening pages"
 msgstr "打开页面"
 
+msgid "Opens different repositories than this workspace"
+msgstr "打开的仓库与此工作区不同"
+
 msgid "Operator"
 msgstr "操作员"
 
@@ -15079,12 +15082,6 @@ msgstr "每位开发者的并行会话数每七个月翻倍，在 2026 年 8 月
 msgid "Parameters"
 msgstr "参数"
 
-msgid "Parent directory"
-msgstr "父目录"
-
-msgid "Parent directory on {hostName}"
-msgstr "{hostName}上的父目录"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "一半是记录，一半是下注。前两条已经在发生。其余的写得足够具体，足以被证明是错的。"
 
@@ -15272,9 +15269,6 @@ msgstr "选择其他元素（esc）"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "选择磁盘上的文件夹并将其添加为项目"
 
-msgid "Pick a folder…"
-msgstr "选择文件夹…"
-
 msgid "Pick a machine size"
 msgstr "选择机器规格"
 
@@ -15284,14 +15278,11 @@ msgstr "选择模型"
 msgid "pick a name for the board"
 msgstr "给榜单上的自己取个名字"
 
-msgid "Pick a parent directory"
-msgstr "请选择父目录"
-
-msgid "Pick a project location"
-msgstr "请选择项目位置"
-
 msgid "Pick a reason"
 msgstr "选择原因"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "在{hostName}上选择一个仓库文件夹。"
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "选择一个包含插件市场文件的仓库。Superset 会立即同步其插件，并在你每次重新同步时再次同步。"
@@ -15802,13 +15793,8 @@ msgstr "其他设备上的项目"
 msgid "Project ready. Open it from the sidebar."
 msgstr "项目已就绪，可从侧边栏打开。"
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "项目已迁移到{0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "项目已设置在{0}"
+msgid "Project relocated to {newPath}"
+msgstr "项目已迁移到{newPath}"
 
 msgid "Project Settings"
 msgstr "项目设置"
@@ -16494,6 +16480,9 @@ msgstr "重新加载将丢弃你的编辑。覆盖将替换磁盘上的文件。
 msgid "Relocate"
 msgstr "迁移"
 
+msgid "Relocate {repositoryName}?"
+msgstr "迁移{repositoryName}？"
+
 msgid "Relocate project?"
 msgstr "迁移项目？"
 
@@ -16577,6 +16566,9 @@ msgstr "移出分组"
 
 msgid "Remove from queue"
 msgstr "移出队列"
+
+msgid "Remove from project"
+msgstr "从项目中移除"
 
 msgid "Remove from Queue"
 msgstr "移出队列"
@@ -16859,9 +16851,6 @@ msgstr "已移除仓库"
 
 msgid "Repository root"
 msgstr "仓库根目录"
-
-msgid "Repository settings"
-msgstr "仓库设置"
 
 msgid "Repository URL or path"
 msgstr "仓库URL或路径"
@@ -17432,9 +17421,6 @@ msgstr "按计划或在发生某件事时运行智能体。"
 msgid "Run agents side by side"
 msgstr "并排运行智能体"
 
-msgid "Run all"
-msgstr "全部运行"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "调动一支"
@@ -17531,9 +17517,6 @@ msgstr "在桌面端、任意终端或手机上运行你的智能体。"
 
 msgid "Run your coding agents in the cloud."
 msgstr "在云端运行你的编程智能体。"
-
-msgid "Run: {repositoryName}"
-msgstr "运行：{repositoryName}"
 
 msgid "Run."
 msgstr "运行。"
@@ -18180,9 +18163,6 @@ msgstr "选择组织"
 msgid "Select Organization Logo"
 msgstr "选择组织标志"
 
-msgid "Select parent directory to clone into"
-msgstr "选择克隆到的父目录"
-
 msgid "Select people"
 msgstr "选择成员"
 
@@ -18416,9 +18396,6 @@ msgstr "设置项目…"
 msgid "Set Run"
 msgstr "设置运行命令"
 
-msgid "Set run script"
-msgstr "设置运行脚本"
-
 msgid "Set this project"
 msgstr "设为此项目"
 
@@ -18440,9 +18417,6 @@ msgstr "设置环境"
 
 msgid "Set up once"
 msgstr "只需设置一次"
-
-msgid "Set up project on {hostName}"
-msgstr "在{hostName}上设置项目"
 
 msgid "Set up project…"
 msgstr "配置项目…"
@@ -19227,6 +19201,10 @@ msgstr "垃圾信息或诈骗"
 msgid "Sparse checkout"
 msgstr "稀疏检出"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "{0}的稀疏检出"
+
 msgid "Speaking"
 msgstr "正在说话"
 
@@ -19619,9 +19597,6 @@ msgstr "停止 {label}"
 
 msgid "Stop {name}"
 msgstr "停止 {name}"
-
-msgid "Stop all"
-msgstr "全部停止"
 
 msgid "Stop dictation"
 msgstr "停止语音输入"
@@ -20387,9 +20362,6 @@ msgstr "代码已过期。请重新开始。"
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev 在设置、运行和归档此项目的工作区时执行的命令，来自仓库的 config.toml。"
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Paradev 用于设置、运行和归档此仓库检出的命令，来自其 config.toml。"
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1150 万美元的种子轮融资，由 Union Square Ventures 领投，Y Combinator 和 Paul Graham 参投。TechCrunch 将其评为 YC Demo Day 的杰出初创公司之一。"
 
@@ -20492,6 +20464,9 @@ msgstr "未来用于存放可复用的 Paradev 智能体配置、提示词与安
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "主机以 {0} 而非 {targetVersion} 恢复。"
+
+msgid "The host created a project with no repository"
+msgstr "主机创建了一个没有仓库的项目"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "主机未在十五分钟内恢复。"
@@ -20923,8 +20898,8 @@ msgstr "此邮箱已通过其他登录方式注册，且提供方未将其确认
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此环境没有仓库。请先在设置中创建包含仓库的环境，再从该环境启动工作区"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "此环境打开的是 {environmentRepository}，而不是 {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "此环境打开的是{environmentRepositories}，而不是{workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "此环境的仓库已固定；请再次提升一个工作区以更改它们"
@@ -21091,6 +21066,9 @@ msgstr "此拉取请求已不可用。"
 msgid "This pull request link is invalid."
 msgstr "这个拉取请求链接无效。"
 
+msgid "This pull request's repository is not known"
+msgstr "此拉取请求所属的仓库未知"
+
 msgid "This recording is too long to transcribe"
 msgstr "这段录音太长，无法转写"
 
@@ -21241,6 +21219,9 @@ msgstr "此工作区"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作区没有可供分叉的项目"
+
+msgid "This workspace is still loading. Try again."
+msgstr "此工作区仍在加载。请重试。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "此工作区可能已被移除，或者你不再拥有它的访问权限。"
@@ -22217,9 +22198,6 @@ msgstr "使用此账户"
 
 msgid "Use this folder"
 msgstr "使用此文件夹"
-
-msgid "Use this repo"
-msgstr "使用此仓库"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "用它修复卡住或无响应的终端。"

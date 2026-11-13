@@ -22,6 +22,7 @@ import { CreatePrForm } from "../../../CreatePrForm";
 
 interface ShipControlProps {
 	workspaceId: string;
+	repositoryId: string | undefined;
 	sync: BranchSyncStatus;
 	onRefresh: () => void;
 	/**
@@ -43,6 +44,7 @@ interface ShipControlProps {
  */
 export function ShipControl({
 	workspaceId,
+	repositoryId,
 	sync,
 	onRefresh,
 	compact = false,
@@ -64,6 +66,7 @@ export function ShipControl({
 	const pendingViewRef = useRef<"commit" | "pr" | null>(null);
 	const actions = useShipActions({
 		workspaceId,
+		repositoryId,
 		onRefresh,
 		isPrFormOpen: view === "pr",
 		onCommitted: () => setView(null),

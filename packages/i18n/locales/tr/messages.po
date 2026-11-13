@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} othe
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# dosya değişti} other {# dosya değişti}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# dosya} other {# dosya}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# dosya düzenlendi} other {# dosya düzenlendi}}"
 
@@ -1383,6 +1386,9 @@ msgstr "{remaining} token kaldı"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# depo} other {Tüm depolar (#)}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName}, {newPath} konumuna taşındı"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Eylemler"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "{0} için eylemler"
 
@@ -2099,11 +2106,11 @@ msgstr "{0} öğesini çalışma alanına ekle"
 msgid "Add {localizedName}?"
 msgstr "{localizedName} eklensin mi?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Önce {repositoryName} deposunu {computer} üzerinde proje olarak ekleyin"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Önce {computer} üzerinde {only} deposunu proje olarak ekleyin"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Önce {repositoryName} deposunu bu bilgisayarda proje olarak ekleyin"
+msgid "Add {only} as a project on this computer first"
+msgstr "Önce bu bilgisayarda {only} deposunu proje olarak ekleyin"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} birleştirme kuyruğuna eklensin mi?"
@@ -2128,6 +2135,12 @@ msgstr "GitHub issue'larını görmek için bir proje ekleyin."
 
 msgid "Add a project to see pull requests."
 msgstr "Pull request'leri görmek için bir proje ekleyin."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Önce {computer} üzerinde tam olarak bu depoları içeren bir proje ekleyin: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Önce bu bilgisayarda tam olarak bu depoları içeren bir proje ekleyin: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Kısa bir özet ekleyin…"
@@ -4515,9 +4528,6 @@ msgstr "Bir dövüşçü seç"
 msgid "Choose a folder"
 msgstr "Bir klasör seçin"
 
-msgid "Choose a parent directory"
-msgstr "Bir üst dizin seçin"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Bir issue açmadan önce GitHub issue'ları bölümünden bir proje seçin."
 
@@ -4532,9 +4542,6 @@ msgstr "Bir bölüm seçin."
 
 msgid "Choose agent"
 msgstr "Ajan seçin"
-
-msgid "Choose an existing repo folder"
-msgstr "Mevcut bir depo klasörü seçin"
 
 msgid "Choose an MCP server"
 msgstr "Bir MCP sunucusu seçin"
@@ -4752,13 +4759,6 @@ msgstr "URL'den klonla"
 
 msgid "clone the repository"
 msgstr "depoyu klonlama"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Depoyu klonlayın veya host'taki mevcut bir klasörü içe aktarın."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "{0} konumuna klonlandı"
 
 msgid "Cloning…"
 msgstr "Klonlanıyor…"
@@ -5122,9 +5122,6 @@ msgstr "Komut..."
 
 msgid "Commands"
 msgstr "Komutlar"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Bu deponun kurulumu, kaldırılması ve Çalıştır menüsü için çalışan komutlar."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Çalışma alanı kurulumu, kapatması ve Çalıştır düğmesi için çalıştırılan komutlar."
@@ -5887,6 +5884,9 @@ msgstr "Ajan eklenemedi"
 msgid "Could not add repository"
 msgstr "Depo eklenemedi"
 
+msgid "Could not add the repository"
+msgstr "Depo eklenemedi"
+
 msgid "Could not answer the agent"
 msgstr "Ajana yanıt verilemedi"
 
@@ -6017,6 +6017,9 @@ msgstr "Bu pull request yüklenemedi."
 msgid "Could not load your machines"
 msgstr "Makineleriniz yüklenemedi"
 
+msgid "Could not make it the primary repository"
+msgstr "Birincil depo yapılamadı"
+
 msgid "Could not mark ready"
 msgstr "Hazır olarak işaretlenemedi"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "Erişim kaldırılamadı"
 
 msgid "Could not remove repository"
+msgstr "Depo kaldırılamadı"
+
+msgid "Could not remove the repository"
 msgstr "Depo kaldırılamadı"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "Tümünü at ({0})"
 msgid "Discard all staged changes"
 msgstr "Hazırlanmış tüm değişiklikleri at"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "{repositoryName} içindeki hazırlanmış tüm değişiklikler atılsın mı?"
+
 msgid "Discard all staged changes?"
 msgstr "Hazırlanmış tüm değişiklikler atılsın mı?"
 
 msgid "Discard all unstaged changes"
 msgstr "Hazırlanmamış tüm değişiklikleri at"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "{repositoryName} içindeki hazırlanmamış tüm değişiklikler atılsın mı?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Hazırlanmamış tüm değişiklikler atılsın mı?"
@@ -8147,12 +8159,6 @@ msgstr "Tam bir e-posta adresi girin"
 msgid "Enter a number"
 msgstr "Bir sayı girin"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "{hostName} üzerinde bir üst dizin girin"
-
-msgid "Enter a path on {hostName}"
-msgstr "{hostName} üzerinde bir yol girin"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Yukarıdaki arama çubuğuna bir URL girin."
 
@@ -8294,11 +8300,8 @@ msgstr "Her çarşamba 09.00'da bu haftanın birleştirilen PR'larını incele v
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Her hafta içi 09.00'da yeni GitHub issue'larını oku, etiket uygula ve incelemem için ilk yanıt taslağını hazırla."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Çoklu depo projesinin her çalışma alanı bu depoyu diğerlerinin yanına checkout eder."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Bu projenin her çalışma alanı hepsini tek bir dalda, yan yana checkout eder."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Bu projenin her çalışma alanı hepsini tek bir dalda yan yana checkout eder. Kurulum ve çalıştırma komutları birincil depodan gelir."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Herkes bunun genellenebilir olup olmadığını tartışır. Bu tartışma, düzeye ulaşıldığının işaretidir."
@@ -8350,12 +8353,6 @@ msgstr "Yayımladığınız her şey gizlenmez, silinir. Daha sonra yeniden kat�
 
 msgid "Executable"
 msgstr "Çalıştırılabilir dosya"
-
-msgid "Existing repo path"
-msgstr "Mevcut depo yolu"
-
-msgid "Existing repo path on {hostName}"
-msgstr "{hostName} üzerindeki mevcut depo yolu"
 
 msgid "existing worktree"
 msgstr "mevcut worktree"
@@ -9338,6 +9335,9 @@ msgstr "Görevler görünümündeki arama girişine odaklan"
 
 msgid "Folder"
 msgstr "Klasör"
+
+msgid "Folder can't be read"
+msgstr "Klasör okunamıyor"
 
 msgid "Folder is missing"
 msgstr "Klasör eksik"
@@ -10425,9 +10425,6 @@ msgstr "Her v1 projesini v2'ye aktarın. Önceden aktarılan projeler içe aktar
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Her v1 terminal betiğini v2'ye aktarın."
-
-msgid "Import existing"
-msgstr "Mevcut olanı içe aktar"
 
 msgid "Import existing folder"
 msgstr "Mevcut klasörü içe aktar"
@@ -11552,9 +11549,6 @@ msgstr "{0}–{1}. satırlar"
 msgid "Link"
 msgstr "Bağlantı"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Klonlamayı etkinleştirmek için önce projeye bir GitHub deposu bağlayın."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Daha fazlası yükleniyor..."
 
 msgid "Loading more…"
 msgstr "Daha fazlası yükleniyor…"
+
+msgid "Loading project repositories…"
+msgstr "Proje depoları yükleniyor…"
 
 msgid "Loading project…"
 msgstr "Proje yükleniyor…"
@@ -11901,6 +11898,9 @@ msgstr "Varsayılan yap"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Varsayılan yap: yeni terminalleri ve ajanları bu hesapta başlat."
+
+msgid "Make primary"
+msgstr "Birincil yap"
 
 msgid "Make public"
 msgstr "Herkese açık yap"
@@ -12522,9 +12522,6 @@ msgstr "Bu sohbet buraya taşınıyor"
 msgid "Moving this workspace…"
 msgstr "Bu çalışma alanı taşınıyor…"
 
-msgid "Multi-repo project"
-msgstr "Çoklu depo projesi"
-
 msgid "Multi-select"
 msgstr "Çoklu seçim"
 
@@ -12983,6 +12980,9 @@ msgstr "Kanal yok"
 
 msgid "No chats found"
 msgstr "Sohbet bulunamadı"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Bu çalışma alanında {currentBranchName} üzerinde olan bir checkout yok"
 
 msgid "No checks"
 msgstr "Kontrol yok"
@@ -14581,6 +14581,9 @@ msgstr "Sohbet arayüzünde açılıyor…"
 msgid "Opening pages"
 msgstr "Sayfaları açma"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Bu çalışma alanından farklı depolar açar"
+
 msgid "Operator"
 msgstr "Operatör"
 
@@ -15079,12 +15082,6 @@ msgstr "Geliştirici başına paralel oturumlar yedi ayda bir ikiye katlanarak A
 msgid "Parameters"
 msgstr "Parametreler"
 
-msgid "Parent directory"
-msgstr "Üst dizin"
-
-msgid "Parent directory on {hostName}"
-msgstr "{hostName} üzerindeki üst dizin"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Bir kısmı kayıt, bir kısmı bahis. İlk iki madde zaten gerçekleşiyor. Gerisi, yanılabileceğimiz kadar somut ifade edildi."
 
@@ -15272,9 +15269,6 @@ msgstr "Farklı bir öğe seç (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Diskte bir klasör seçip proje olarak ekleyin"
 
-msgid "Pick a folder…"
-msgstr "Bir klasör seçin…"
-
 msgid "Pick a machine size"
 msgstr "Bir makine boyutu seçin"
 
@@ -15284,14 +15278,11 @@ msgstr "Bir model seçin"
 msgid "pick a name for the board"
 msgstr "tablo için bir ad seçin"
 
-msgid "Pick a parent directory"
-msgstr "Bir üst dizin seçin"
-
-msgid "Pick a project location"
-msgstr "Bir proje konumu seçin"
-
 msgid "Pick a reason"
 msgstr "Bir neden seçin"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "{hostName} üzerinde bir depo klasörü seçin."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Eklenti pazar yeri dosyası olan bir depo seçin. Superset eklentilerini şimdi ve her yeniden eşitlemenizde eşitler."
@@ -15802,13 +15793,8 @@ msgstr "Başka bir cihazdaki proje"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Proje hazır. Kenar çubuğundan açın."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Proje {0} konumuna taşındı"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Proje {0} konumunda kuruldu"
+msgid "Project relocated to {newPath}"
+msgstr "Proje {newPath} konumuna taşındı"
 
 msgid "Project Settings"
 msgstr "Proje ayarları"
@@ -16494,6 +16480,9 @@ msgstr "Yeniden yükleme düzenlemelerinizi siler. Üzerine yazma diskteki dosya
 msgid "Relocate"
 msgstr "Taşı"
 
+msgid "Relocate {repositoryName}?"
+msgstr "{repositoryName} taşınsın mı?"
+
 msgid "Relocate project?"
 msgstr "Proje taşınsın mı?"
 
@@ -16577,6 +16566,9 @@ msgstr "Gruptan çıkar"
 
 msgid "Remove from queue"
 msgstr "Kuyruktan çıkar"
+
+msgid "Remove from project"
+msgstr "Projeden kaldır"
 
 msgid "Remove from Queue"
 msgstr "Kuyruktan çıkar"
@@ -16859,9 +16851,6 @@ msgstr "Depo kaldırıldı"
 
 msgid "Repository root"
 msgstr "Depo kökü"
-
-msgid "Repository settings"
-msgstr "Depo ayarları"
 
 msgid "Repository URL or path"
 msgstr "Depo URL'si veya yolu"
@@ -17432,9 +17421,6 @@ msgstr "Ajanları bir zamanlamayla veya bir şey olduğunda çalıştırın."
 msgid "Run agents side by side"
 msgstr "Ajanları yan yana çalıştırın"
 
-msgid "Run all"
-msgstr "Tümünü çalıştır"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Kodlama ajanlarından"
@@ -17531,9 +17517,6 @@ msgstr "Ajanlarınızı masaüstünden, herhangi bir terminalden veya telefonunu
 
 msgid "Run your coding agents in the cloud."
 msgstr "Kodlama ajanlarınızı bulutta çalıştırın."
-
-msgid "Run: {repositoryName}"
-msgstr "Çalıştırma: {repositoryName}"
 
 msgid "Run."
 msgstr "Çalıştırın."
@@ -18180,9 +18163,6 @@ msgstr "Kuruluş seçin"
 msgid "Select Organization Logo"
 msgstr "Kuruluş logosu seçin"
 
-msgid "Select parent directory to clone into"
-msgstr "Klonlanacak üst dizini seçin"
-
 msgid "Select people"
 msgstr "Kişileri seç"
 
@@ -18416,9 +18396,6 @@ msgstr "Projeyi ayarla…"
 msgid "Set Run"
 msgstr "Çalıştırmayı ayarla"
 
-msgid "Set run script"
-msgstr "Çalıştırma betiğini ayarla"
-
 msgid "Set this project"
 msgstr "Bu projeyi ayarla"
 
@@ -18440,9 +18417,6 @@ msgstr "Ortamı kur"
 
 msgid "Set up once"
 msgstr "Bir kez kurun"
-
-msgid "Set up project on {hostName}"
-msgstr "{hostName} üzerinde projeyi kur"
 
 msgid "Set up project…"
 msgstr "Projeyi kur…"
@@ -19227,6 +19201,10 @@ msgstr "Spam veya dolandırıcılık"
 msgid "Sparse checkout"
 msgstr "Seyrek checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "{0} için seyrek checkout"
+
 msgid "Speaking"
 msgstr "Konuşuyor"
 
@@ -19619,9 +19597,6 @@ msgstr "{label} öğesini durdur"
 
 msgid "Stop {name}"
 msgstr "{name} öğesini durdur"
-
-msgid "Stop all"
-msgstr "Tümünü durdur"
 
 msgid "Stop dictation"
 msgstr "Sesle yazmayı durdur"
@@ -20387,9 +20362,6 @@ msgstr "Kodun süresi doldu. Yeniden başlayın."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Paradev'in bu projenin çalışma alanlarını hazırlamak, çalıştırmak ve arşivlemek için çalıştırdığı komutlar (deponun config.toml dosyası)."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Paradev'in bu deponun checkout'larını kurmak, çalıştırmak ve arşivlemek için kullandığı komutlar, config.toml dosyasından."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Şirket, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, şirketi YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."
 
@@ -20492,6 +20464,9 @@ msgstr "Yeniden kullanılabilir Paradev ajan yapılandırmaları, istemleri ve k
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Ana makine {targetVersion} yerine {0} ile geri döndü."
+
+msgid "The host created a project with no repository"
+msgstr "Host, deposu olmayan bir proje oluşturdu"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "Ana makine on beş dakika içinde geri gelmedi."
@@ -20923,8 +20898,8 @@ msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağla
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Bu ortam {repository} değil, {environmentRepository} açar"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Bu ortam {workspaceRepositories} değil, {environmentRepositories} açıyor"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Bu ortamın depoları sabittir; değiştirmek için bir çalışma alanını yeniden yükseltin"
@@ -21091,6 +21066,9 @@ msgstr "Bu pull request artık kullanılamıyor."
 msgid "This pull request link is invalid."
 msgstr "Bu pull request bağlantısı geçersiz."
 
+msgid "This pull request's repository is not known"
+msgstr "Bu pull request'in deposu bilinmiyor"
+
 msgid "This recording is too long to transcribe"
 msgstr "Bu kayıt yazıya dökmek için çok uzun"
 
@@ -21241,6 +21219,9 @@ msgstr "Bu çalışma alanı"
 
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Bu çalışma alanı hâlâ yükleniyor. Yeniden deneyin."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."
@@ -22217,9 +22198,6 @@ msgstr "Bu hesabı kullan"
 
 msgid "Use this folder"
 msgstr "Bu klasörü kullan"
-
-msgid "Use this repo"
-msgstr "Bu depoyu kullan"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Takılan veya yanıt vermeyen terminalleri düzeltmek için bunu kullanın."

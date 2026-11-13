@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {# bestand gewijzigd in deze werkruimte} other {
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# bestand gewijzigd} other {# bestanden gewijzigd}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# bestand} other {# bestanden}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# bestand bewerkt} other {# bestanden bewerkt}}"
 
@@ -1383,6 +1386,9 @@ msgstr "Nog {remaining} tokens over"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# repository} other {Alle # repositories}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName} verplaatst naar {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Wijzigingen in # bestand ongedaan gemaakt.} other {Wijzigingen in # bestanden ongedaan gemaakt.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Acties"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Acties voor {0}"
 
@@ -2099,11 +2106,11 @@ msgstr "{0} toevoegen aan werkruimte"
 msgid "Add {localizedName}?"
 msgstr "{localizedName} toevoegen?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Voeg {repositoryName} eerst toe als project op {computer}"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Voeg eerst {only} toe als project op {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Voeg {repositoryName} eerst toe als project op deze computer"
+msgid "Add {only} as a project on this computer first"
+msgstr "Voeg eerst {only} toe als project op deze computer"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} toevoegen aan de mergewachtrij?"
@@ -2128,6 +2135,12 @@ msgstr "Voeg een project toe om GitHub-issues te zien."
 
 msgid "Add a project to see pull requests."
 msgstr "Voeg een project toe om pull requests te zien."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Voeg eerst een project met precies deze repositories toe op {computer}: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Voeg eerst een project met precies deze repositories toe op deze computer: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Voeg een korte samenvatting toe…"
@@ -4515,9 +4528,6 @@ msgstr "Kies een vechter"
 msgid "Choose a folder"
 msgstr "Kies een map"
 
-msgid "Choose a parent directory"
-msgstr "Kies een bovenliggende map"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Kies een project bij GitHub-issues voordat je een issue opent."
 
@@ -4532,9 +4542,6 @@ msgstr "Kies een onderdeel."
 
 msgid "Choose agent"
 msgstr "Kies agent"
-
-msgid "Choose an existing repo folder"
-msgstr "Kies een bestaande repo-map"
 
 msgid "Choose an MCP server"
 msgstr "Kies een MCP-server"
@@ -4752,13 +4759,6 @@ msgstr "Klonen vanaf URL"
 
 msgid "clone the repository"
 msgstr "de repository klonen"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Kloon de repository of importeer een bestaande map op de host."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Gekloond naar {0}"
 
 msgid "Cloning…"
 msgstr "Klonen…"
@@ -5122,9 +5122,6 @@ msgstr "Commando..."
 
 msgid "Commands"
 msgstr "Commando's"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Opdrachten voor de setup en teardown van deze repository en voor het Run-menu."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Commando's voor setup en teardown van werkruimtes en voor de knop Uitvoeren."
@@ -5887,6 +5884,9 @@ msgstr "Kon agent niet toevoegen"
 msgid "Could not add repository"
 msgstr "Kan repository niet toevoegen"
 
+msgid "Could not add the repository"
+msgstr "Kan de repository niet toevoegen"
+
 msgid "Could not answer the agent"
 msgstr "Kan de agent niet antwoorden"
 
@@ -6017,6 +6017,9 @@ msgstr "Kan deze pull request niet laden."
 msgid "Could not load your machines"
 msgstr "Kan je machines niet laden"
 
+msgid "Could not make it the primary repository"
+msgstr "Kan er niet de primaire repository van maken"
+
 msgid "Could not mark ready"
 msgstr "Kan niet als klaar markeren"
 
@@ -6097,6 +6100,9 @@ msgstr "Kan toegang niet verwijderen"
 
 msgid "Could not remove repository"
 msgstr "Kan repository niet verwijderen"
+
+msgid "Could not remove the repository"
+msgstr "Kan de repository niet verwijderen"
 
 msgid "Could not rename the session"
 msgstr "Kan de naam van de sessie niet wijzigen"
@@ -7526,11 +7532,17 @@ msgstr "Alles verwerpen ({0})"
 msgid "Discard all staged changes"
 msgstr "Alle gestagede wijzigingen verwerpen"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Alle gestagede wijzigingen in {repositoryName} verwerpen?"
+
 msgid "Discard all staged changes?"
 msgstr "Alle gestagede wijzigingen verwerpen?"
 
 msgid "Discard all unstaged changes"
 msgstr "Alle niet-gestagede wijzigingen verwerpen"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Alle niet-gestagede wijzigingen in {repositoryName} verwerpen?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Alle niet-gestagede wijzigingen verwerpen?"
@@ -8147,12 +8159,6 @@ msgstr "Voer een volledig e-mailadres in"
 msgid "Enter a number"
 msgstr "Voer een getal in"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Voer een bovenliggende map op {hostName} in"
-
-msgid "Enter a path on {hostName}"
-msgstr "Voer een pad op {hostName} in"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Voer hierboven een URL in de zoekbalk in."
 
@@ -8294,11 +8300,8 @@ msgstr "Elke woensdag om 9 uur: bekijk de gemergede PR's van deze week en werk d
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Elke werkdag om 9 uur: lees nieuwe GitHub-issues, plaats labels en stel een eerste antwoord op voor mijn review."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Elke werkruimte van het multi-repoproject checkt deze repository naast de andere uit."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Elke werkruimte van dit project checkt ze allemaal naast elkaar uit, op één branch."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Elke werkruimte van dit project checkt ze allemaal naast elkaar uit, op één branch. Setup- en uitvoeropdrachten komen uit de primaire repository."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Iedereen discussieert over de vraag of dit generaliseert. Die discussie is het teken dat het niveau is bereikt."
@@ -8350,12 +8353,6 @@ msgstr "Alles wat je hebt gepubliceerd wordt verwijderd, niet verborgen. Je kunt
 
 msgid "Executable"
 msgstr "Uitvoerbaar bestand"
-
-msgid "Existing repo path"
-msgstr "Pad van bestaande repo"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Pad van bestaande repo op {hostName}"
 
 msgid "existing worktree"
 msgstr "bestaande worktree"
@@ -9338,6 +9335,9 @@ msgstr "Het zoekveld in de takenweergave focussen"
 
 msgid "Folder"
 msgstr "Map"
+
+msgid "Folder can't be read"
+msgstr "Map kan niet worden gelezen"
 
 msgid "Folder is missing"
 msgstr "Map ontbreekt"
@@ -10425,9 +10425,6 @@ msgstr "Importeer elk v1-project in v2. Al geïmporteerde projecten worden als g
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Importeer elk v1-terminalscript in v2."
-
-msgid "Import existing"
-msgstr "Bestaande importeren"
 
 msgid "Import existing folder"
 msgstr "Bestaande map importeren"
@@ -11552,9 +11549,6 @@ msgstr "Regels {0}–{1}"
 msgid "Link"
 msgstr "Link"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Koppel eerst een GitHub-repository aan het project om te kunnen klonen."
-
 msgid "Link by Stripe"
 msgstr "Link by Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Meer laden..."
 
 msgid "Loading more…"
 msgstr "Meer laden…"
+
+msgid "Loading project repositories…"
+msgstr "Repository's van het project laden…"
 
 msgid "Loading project…"
 msgstr "Project laden…"
@@ -11901,6 +11898,9 @@ msgstr "Standaard maken"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Standaard maken: start nieuwe terminals en agents op dit account."
+
+msgid "Make primary"
+msgstr "Primair maken"
 
 msgid "Make public"
 msgstr "Openbaar maken"
@@ -12522,9 +12522,6 @@ msgstr "Deze chat wordt hierheen verplaatst"
 msgid "Moving this workspace…"
 msgstr "Deze werkruimte wordt verplaatst…"
 
-msgid "Multi-repo project"
-msgstr "Multi-repoproject"
-
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
 
@@ -12983,6 +12980,9 @@ msgstr "Geen kanalen"
 
 msgid "No chats found"
 msgstr "Geen chats gevonden"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Geen checkout in deze werkruimte staat op {currentBranchName}"
 
 msgid "No checks"
 msgstr "Geen checks"
@@ -14581,6 +14581,9 @@ msgstr "Openen in chatinterface…"
 msgid "Opening pages"
 msgstr "Pagina's openen"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Opent andere repository's dan deze werkruimte"
+
 msgid "Operator"
 msgstr "Operator"
 
@@ -15079,12 +15082,6 @@ msgstr "Parallelle sessies per ontwikkelaar verdubbelen elke zeven maanden en pa
 msgid "Parameters"
 msgstr "Parameters"
 
-msgid "Parent directory"
-msgstr "Bovenliggende map"
-
-msgid "Parent directory on {hostName}"
-msgstr "Bovenliggende map op {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Deels verslag, deels weddenschap. De eerste twee punten gebeuren al. De rest staat concreet genoeg om ongelijk over te krijgen."
 
@@ -15272,9 +15269,6 @@ msgstr "Kies een ander element (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Kies een map op schijf en voeg die toe als project"
 
-msgid "Pick a folder…"
-msgstr "Kies een map…"
-
 msgid "Pick a machine size"
 msgstr "Kies een machinegrootte"
 
@@ -15284,14 +15278,11 @@ msgstr "Kies een model"
 msgid "pick a name for the board"
 msgstr "kies een naam voor de ranglijst"
 
-msgid "Pick a parent directory"
-msgstr "Kies een bovenliggende map"
-
-msgid "Pick a project location"
-msgstr "Kies een projectlocatie"
-
 msgid "Pick a reason"
 msgstr "Kies een reden"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Kies een repositorymap op {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Kies een repository met een plugin-marketplacebestand. Superset synchroniseert de plugins nu en telkens als je opnieuw synchroniseert."
@@ -15802,13 +15793,8 @@ msgstr "Project op een ander apparaat"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Project klaar. Open het via de zijbalk."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Project verplaatst naar {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Project ingesteld op {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Project verplaatst naar {newPath}"
 
 msgid "Project Settings"
 msgstr "Projectinstellingen"
@@ -16494,6 +16480,9 @@ msgstr "Opnieuw laden verwerpt je bewerkingen. Overschrijven vervangt het bestan
 msgid "Relocate"
 msgstr "Verplaatsen"
 
+msgid "Relocate {repositoryName}?"
+msgstr "{repositoryName} verplaatsen?"
+
 msgid "Relocate project?"
 msgstr "Project verplaatsen?"
 
@@ -16577,6 +16566,9 @@ msgstr "Uit groep verwijderen"
 
 msgid "Remove from queue"
 msgstr "Uit wachtrij halen"
+
+msgid "Remove from project"
+msgstr "Uit project verwijderen"
 
 msgid "Remove from Queue"
 msgstr "Uit wachtrij halen"
@@ -16859,9 +16851,6 @@ msgstr "Repository verwijderd"
 
 msgid "Repository root"
 msgstr "Hoofdmap van repository"
-
-msgid "Repository settings"
-msgstr "Repository-instellingen"
 
 msgid "Repository URL or path"
 msgstr "Repository-URL of pad"
@@ -17432,9 +17421,6 @@ msgstr "Draai agents volgens schema of als er iets gebeurt."
 msgid "Run agents side by side"
 msgstr "Draai agents naast elkaar"
 
-msgid "Run all"
-msgstr "Alles uitvoeren"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Draai een leger"
@@ -17531,9 +17517,6 @@ msgstr "Draai je agents vanaf de desktop, elke terminal of je telefoon."
 
 msgid "Run your coding agents in the cloud."
 msgstr "Draai je codeeragents in de cloud."
-
-msgid "Run: {repositoryName}"
-msgstr "Run: {repositoryName}"
 
 msgid "Run."
 msgstr "Voer uit."
@@ -18180,9 +18163,6 @@ msgstr "Kies organisatie"
 msgid "Select Organization Logo"
 msgstr "Kies organisatielogo"
 
-msgid "Select parent directory to clone into"
-msgstr "Kies de bovenliggende map om naartoe te klonen"
-
 msgid "Select people"
 msgstr "Personen kiezen"
 
@@ -18416,9 +18396,6 @@ msgstr "Project instellen…"
 msgid "Set Run"
 msgstr "Run instellen"
 
-msgid "Set run script"
-msgstr "Run-script instellen"
-
 msgid "Set this project"
 msgstr "Dit project instellen"
 
@@ -18440,9 +18417,6 @@ msgstr "Omgeving instellen"
 
 msgid "Set up once"
 msgstr "Eén keer instellen"
-
-msgid "Set up project on {hostName}"
-msgstr "Project instellen op {hostName}"
 
 msgid "Set up project…"
 msgstr "Project instellen…"
@@ -19227,6 +19201,10 @@ msgstr "Spam of oplichting"
 msgid "Sparse checkout"
 msgstr "Sparse checkout"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Sparse checkout van {0}"
+
 msgid "Speaking"
 msgstr "Spreekt"
 
@@ -19619,9 +19597,6 @@ msgstr "{label} stoppen"
 
 msgid "Stop {name}"
 msgstr "{name} stoppen"
-
-msgid "Stop all"
-msgstr "Alles stoppen"
 
 msgid "Stop dictation"
 msgstr "Dicteren stoppen"
@@ -20387,9 +20362,6 @@ msgstr "De code is verlopen. Begin opnieuw."
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "De opdrachten die Paradev uitvoert om de werkruimtes van dit project in te richten, te starten en te archiveren, uit de config.toml van de repository."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "De opdrachten waarmee Paradev de checkouts van deze repository instelt, uitvoert en archiveert, uit zijn config.toml."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Het bedrijf haalde een seedronde van 11,5 miljoen dollar op onder leiding van Union Square Ventures, met Y Combinator en Paul Graham. TechCrunch noemde het een van de opvallendste startups van YC Demo Day."
 
@@ -20492,6 +20464,9 @@ msgstr "De toekomstige plek voor herbruikbare Paradev-agentconfigs, prompts en s
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "De host kwam terug op {0}, niet op {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "De host heeft een project zonder repository aangemaakt"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "De host was na vijftien minuten nog niet terug."
@@ -20923,8 +20898,8 @@ msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de pr
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Deze omgeving opent {environmentRepository}, niet {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Deze omgeving opent {environmentRepositories}, niet {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "De repositories van deze omgeving liggen vast; promoveer opnieuw een werkruimte om ze te wijzigen"
@@ -21091,6 +21066,9 @@ msgstr "Deze pull request is niet meer beschikbaar."
 msgid "This pull request link is invalid."
 msgstr "Deze link naar een pull request is ongeldig."
 
+msgid "This pull request's repository is not known"
+msgstr "De repository van deze pull request is onbekend"
+
 msgid "This recording is too long to transcribe"
 msgstr "Deze opname is te lang om te transcriberen"
 
@@ -21241,6 +21219,9 @@ msgstr "Deze werkruimte"
 
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Deze werkruimte wordt nog geladen. Probeer het opnieuw."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Deze werkruimte is mogelijk verwijderd, of je hebt er geen toegang meer toe."
@@ -22217,9 +22198,6 @@ msgstr "Dit account gebruiken"
 
 msgid "Use this folder"
 msgstr "Deze map gebruiken"
-
-msgid "Use this repo"
-msgstr "Deze repo gebruiken"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Gebruik dit om vastgelopen of niet-reagerende terminals te herstellen."

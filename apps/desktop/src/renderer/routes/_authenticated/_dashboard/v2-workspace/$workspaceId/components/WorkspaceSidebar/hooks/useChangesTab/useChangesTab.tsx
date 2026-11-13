@@ -1,12 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useState } from "react";
+import { workspaceTrpc } from "@superset/workspace-client";
+import { useMemo } from "react";
 import { LuGitCompareArrows } from "react-icons/lu";
-import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
-import {
-	hasCheckouts,
-	useSelectRepository,
-	useWorkspaceRepositories,
-} from "../../../../state/activeRepositoryStore";
+import { useCheckoutGitStatuses } from "../../../../providers/WorkspaceGitStatusProvider";
+import { useWorkspaceCheckouts } from "../../../../state/activeRepositoryStore";
+import { changesPillStats } from "../../../../utils/changesPillStats";
 import type { SidebarTabDefinition } from "../../types";
 import { MultiRepoChanges } from "./components/MultiRepoChanges";
 import {
@@ -14,7 +12,10 @@ import {
 	useChangesContent,
 } from "./hooks/useChangesContent";
 
-export type { SelectedDiffTarget } from "./hooks/useChangesContent";
+export type {
+	SelectDiffFile,
+	SelectedDiffTarget,
+} from "./hooks/useChangesContent";
 
 /**
  * The sidebar's Changes tab: one scope row (commit filter, "vs <base>",
@@ -29,28 +30,31 @@ export function useChangesTab(
 	params: ChangesContentParams,
 ): SidebarTabDefinition {
 	const { t } = useLingui();
-	const single = useChangesContent(params);
+	const checkouts = useWorkspaceCheckouts(params.workspaceId);
+	const folder = workspaceTrpc.workspace.get.useQuery({
+		id: params.workspaceId,
+	}).data?.worktreePath;
+	const isMultiRepo = checkouts.length > 1;
+	const first = checkouts[0];
+	const single = useChangesContent({
+		...params,
+		repositoryId: first?.repositoryId,
+		worktreePath: first?.path ?? folder,
+		tagRepository: false,
+	});
 
-	const groupId = useWorkspace().workspace.id;
-	const repositories = useWorkspaceRepositories(groupId);
-	const selectRepository = useSelectRepository();
-	const [counts, setCounts] = useState<Record<string, number>>({});
-	const handleCountChange = useCallback(
-		(repositoryId: string, count: number) =>
-			setCounts((prev) =>
-				prev[repositoryId] === count
-					? prev
-					: { ...prev, [repositoryId]: count },
-			),
-		[],
+	const statuses = useCheckoutGitStatuses(
+		isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],
 	);
-
-	const isMultiRepo = hasCheckouts(groupId, repositories);
+	// A multi-repo badge counts every checkout's changes under the default scope.
+	const multiRepoCount = useMemo(
+		() =>
+			changesPillStats(statuses.flatMap((status) => status.data ?? []))
+				.fileCount,
+		[statuses],
+	);
 	const changedPathCount = isMultiRepo
-		? repositories.reduce(
-				(sum, repository) => sum + (counts[repository.id] ?? 0),
-				0,
-			)
+		? multiRepoCount
 		: single.changedPathCount;
 
 	return {
@@ -59,14 +63,7 @@ export function useChangesTab(
 		icon: LuGitCompareArrows,
 		badge: changedPathCount > 0 ? changedPathCount : undefined,
 		content: isMultiRepo ? (
-			<MultiRepoChanges
-				{...params}
-				repositories={repositories}
-				onSelectRepository={(repositoryId) =>
-					selectRepository(groupId, repositoryId)
-				}
-				onCountChange={handleCountChange}
-			/>
+			<MultiRepoChanges {...params} checkouts={checkouts} />
 		) : (
 			single.content
 		),

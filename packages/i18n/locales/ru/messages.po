@@ -1056,6 +1056,9 @@ msgstr "{fileCount, plural, one {В этой рабочей области из�
 msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
 msgstr "{fileCount, plural, one {# файл изменён} few {# файла изменено} many {# файлов изменено} other {# файла изменено}}"
 
+msgid "{fileCount, plural, one {# file} other {# files}}"
+msgstr "{fileCount, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}"
+
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Изменён # файл} few {Изменено # файла} many {Изменено # файлов} other {Изменено # файла}}"
 
@@ -1383,6 +1386,9 @@ msgstr "Осталось токенов: {remaining}"
 
 msgid "{repositoryCount, plural, one {# repository} other {All # repositories}}"
 msgstr "{repositoryCount, plural, one {# репозиторий} few {Все # репозитория} many {Все # репозиториев} other {Все # репозитория}}"
+
+msgid "{repositoryName} relocated to {newPath}"
+msgstr "{repositoryName} перемещён в {newPath}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Изменения в # файле отменены.} few {Изменения в # файлах отменены.} many {Изменения в # файлах отменены.} other {Изменения в # файла отменены.}}"
@@ -2044,6 +2050,7 @@ msgid "Actions"
 msgstr "Действия"
 
 #. placeholder {0}: page.title
+#. placeholder {0}: repository.name
 msgid "Actions for {0}"
 msgstr "Действия для {0}"
 
@@ -2099,11 +2106,11 @@ msgstr "Добавить {0} в рабочую область"
 msgid "Add {localizedName}?"
 msgstr "Добавить {localizedName}?"
 
-msgid "Add {repositoryName} as a project on {computer} first"
-msgstr "Сначала добавьте {repositoryName} как проект на компьютере {computer}"
+msgid "Add {only} as a project on {computer} first"
+msgstr "Сначала добавьте {only} как проект на {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Сначала добавьте {repositoryName} как проект на этом компьютере"
+msgid "Add {only} as a project on this computer first"
+msgstr "Сначала добавьте {only} как проект на этом компьютере"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Добавить #{prNumber} в очередь объединения?"
@@ -2128,6 +2135,12 @@ msgstr "Добавьте проект, чтобы видеть задачи GitH
 
 msgid "Add a project to see pull requests."
 msgstr "Добавьте проект, чтобы видеть пул-реквесты."
+
+msgid "Add a project with exactly these repositories on {computer} first: {repositories}"
+msgstr "Сначала добавьте на {computer} проект ровно с этими репозиториями: {repositories}"
+
+msgid "Add a project with exactly these repositories on this computer first: {repositories}"
+msgstr "Сначала добавьте на этот компьютер проект ровно с этими репозиториями: {repositories}"
 
 msgid "Add a short summary…"
 msgstr "Добавьте краткое описание…"
@@ -4515,9 +4528,6 @@ msgstr "Выберите бойца"
 msgid "Choose a folder"
 msgstr "Выберите папку"
 
-msgid "Choose a parent directory"
-msgstr "Выберите родительскую папку"
-
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Выберите проект в разделе задач GitHub, прежде чем открывать задачу."
 
@@ -4532,9 +4542,6 @@ msgstr "Выберите раздел."
 
 msgid "Choose agent"
 msgstr "Выберите агента"
-
-msgid "Choose an existing repo folder"
-msgstr "Выберите папку существующего репозитория"
 
 msgid "Choose an MCP server"
 msgstr "Выберите сервер MCP"
@@ -4752,13 +4759,6 @@ msgstr "Клонировать по URL"
 
 msgid "clone the repository"
 msgstr "клонировать репозиторий"
-
-msgid "Clone the repository, or import an existing folder on the host."
-msgstr "Клонируйте репозиторий или импортируйте существующую папку на хосте."
-
-#. placeholder {0}: result.repoPath
-msgid "Cloned to {0}"
-msgstr "Клонировано в {0}"
 
 msgid "Cloning…"
 msgstr "Клонирование…"
@@ -5122,9 +5122,6 @@ msgstr "Команда..."
 
 msgid "Commands"
 msgstr "Команды"
-
-msgid "Commands run for this repository's setup, teardown, and the Run menu."
-msgstr "Команды для настройки и очистки этого репозитория и для меню «Запустить»."
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Команды для настройки и очистки рабочей области и для кнопки «Запустить»."
@@ -5887,6 +5884,9 @@ msgstr "Не удалось добавить агента"
 msgid "Could not add repository"
 msgstr "Не удалось добавить репозиторий"
 
+msgid "Could not add the repository"
+msgstr "Не удалось добавить репозиторий"
+
 msgid "Could not answer the agent"
 msgstr "Не удалось ответить агенту"
 
@@ -6017,6 +6017,9 @@ msgstr "Не удалось загрузить этот пул-реквест."
 msgid "Could not load your machines"
 msgstr "Не удалось загрузить ваши машины"
 
+msgid "Could not make it the primary repository"
+msgstr "Не удалось сделать его основным репозиторием"
+
 msgid "Could not mark ready"
 msgstr "Не удалось отметить готовым"
 
@@ -6096,6 +6099,9 @@ msgid "Could not remove access"
 msgstr "Не удалось закрыть доступ"
 
 msgid "Could not remove repository"
+msgstr "Не удалось удалить репозиторий"
+
+msgid "Could not remove the repository"
 msgstr "Не удалось удалить репозиторий"
 
 msgid "Could not rename the session"
@@ -7526,11 +7532,17 @@ msgstr "Отменить все {0}"
 msgid "Discard all staged changes"
 msgstr "Отменить все проиндексированные изменения"
 
+msgid "Discard all staged changes in {repositoryName}?"
+msgstr "Отменить все проиндексированные изменения в {repositoryName}?"
+
 msgid "Discard all staged changes?"
 msgstr "Отменить все проиндексированные изменения?"
 
 msgid "Discard all unstaged changes"
 msgstr "Отменить все непроиндексированные изменения"
+
+msgid "Discard all unstaged changes in {repositoryName}?"
+msgstr "Отменить все непроиндексированные изменения в {repositoryName}?"
 
 msgid "Discard all unstaged changes?"
 msgstr "Отменить все непроиндексированные изменения?"
@@ -8147,12 +8159,6 @@ msgstr "Введите полный адрес email"
 msgid "Enter a number"
 msgstr "Введите число"
 
-msgid "Enter a parent directory on {hostName}"
-msgstr "Введите родительскую папку на {hostName}"
-
-msgid "Enter a path on {hostName}"
-msgstr "Введите путь на {hostName}"
-
 msgid "Enter a URL into the search bar above."
 msgstr "Введите URL в строку поиска выше."
 
@@ -8294,11 +8300,8 @@ msgstr "Каждую среду в 9:00 просматривай объедин�
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "Каждый будний день в 9:00 читай новые задачи GitHub, расставляй метки и готовь первый черновик ответа мне на проверку."
 
-msgid "Every workspace of the multi-repo project checks out this repository beside the others."
-msgstr "Каждая рабочая область мультирепозиторного проекта выгружает этот репозиторий рядом с остальными."
-
-msgid "Every workspace of this project checks out all of them, side by side, on one branch."
-msgstr "Каждая рабочая область этого проекта делает checkout их всех рядом друг с другом в одной ветке."
+msgid "Every workspace of this project checks out all of them, side by side, on one branch. Setup and run commands come from the primary repository."
+msgstr "Каждая рабочая область этого проекта делает checkout их всех рядом друг с другом в одной ветке. Команды установки и запуска берутся из основного репозитория."
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "Все спорят, обобщается ли это. Сам спор — признак того, что уровень достигнут."
@@ -8350,12 +8353,6 @@ msgstr "Всё опубликованное удаляется, а не скры
 
 msgid "Executable"
 msgstr "Исполняемый файл"
-
-msgid "Existing repo path"
-msgstr "Путь к существующему репозиторию"
-
-msgid "Existing repo path on {hostName}"
-msgstr "Путь к существующему репозиторию на {hostName}"
 
 msgid "existing worktree"
 msgstr "существующий worktree"
@@ -9338,6 +9335,9 @@ msgstr "Фокус на поле поиска в разделе задач"
 
 msgid "Folder"
 msgstr "Папка"
+
+msgid "Folder can't be read"
+msgstr "Не удаётся прочитать папку"
 
 msgid "Folder is missing"
 msgstr "Папка отсутствует"
@@ -10425,9 +10425,6 @@ msgstr "Импортируйте каждый проект v1 в v2. Уже им
 
 msgid "Import each v1 terminal script into v2."
 msgstr "Импортируйте каждый скрипт терминала v1 в v2."
-
-msgid "Import existing"
-msgstr "Импортировать существующий"
 
 msgid "Import existing folder"
 msgstr "Импорт существующей папки"
@@ -11552,9 +11549,6 @@ msgstr "Строки {0}–{1}"
 msgid "Link"
 msgstr "Ссылка"
 
-msgid "Link a GitHub repository on the project first to enable cloning."
-msgstr "Сначала свяжите проект с репозиторием GitHub, чтобы включить клонирование."
-
 msgid "Link by Stripe"
 msgstr "Link от Stripe"
 
@@ -11721,6 +11715,9 @@ msgstr "Загружаем ещё..."
 
 msgid "Loading more…"
 msgstr "Загружаем ещё…"
+
+msgid "Loading project repositories…"
+msgstr "Загрузка репозиториев проекта…"
 
 msgid "Loading project…"
 msgstr "Загрузка проекта…"
@@ -11901,6 +11898,9 @@ msgstr "Сделать основным"
 
 msgid "Make default: launch new terminals and agents on this account."
 msgstr "Сделать основным: запускать новые терминалы и агентов на этом аккаунте."
+
+msgid "Make primary"
+msgstr "Сделать основным"
 
 msgid "Make public"
 msgstr "Сделать общедоступной"
@@ -12522,9 +12522,6 @@ msgstr "Перенос этого чата сюда"
 msgid "Moving this workspace…"
 msgstr "Эта рабочая область переносится…"
 
-msgid "Multi-repo project"
-msgstr "Мультирепозиторный проект"
-
 msgid "Multi-select"
 msgstr "Множественный выбор"
 
@@ -12983,6 +12980,9 @@ msgstr "Нет каналов"
 
 msgid "No chats found"
 msgstr "Чаты не найдены"
+
+msgid "No checkout in this workspace is on {currentBranchName}"
+msgstr "Ни одна выгрузка в этой рабочей области не находится на {currentBranchName}"
 
 msgid "No checks"
 msgstr "Без проверок"
@@ -14581,6 +14581,9 @@ msgstr "Открытие в интерфейсе чата…"
 msgid "Opening pages"
 msgstr "Открытие страниц"
 
+msgid "Opens different repositories than this workspace"
+msgstr "Открывает не те репозитории, что в этой рабочей области"
+
 msgid "Operator"
 msgstr "Оператор"
 
@@ -15079,12 +15082,6 @@ msgstr "Число параллельных сессий на разработч
 msgid "Parameters"
 msgstr "Параметры"
 
-msgid "Parent directory"
-msgstr "Родительская папка"
-
-msgid "Parent directory on {hostName}"
-msgstr "Родительская папка на {hostName}"
-
 msgid "Part record, part bet. The first two entries are already happening. The rest is stated concretely enough to be wrong about."
 msgstr "Отчасти хроника, отчасти ставка. Первые два пункта уже происходят. Остальное сформулировано достаточно конкретно, чтобы в нём можно было ошибиться."
 
@@ -15272,9 +15269,6 @@ msgstr "Выбрать другой элемент (esc)"
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Выберите папку на диске и добавьте её как проект"
 
-msgid "Pick a folder…"
-msgstr "Выберите папку…"
-
 msgid "Pick a machine size"
 msgstr "Выберите размер машины"
 
@@ -15284,14 +15278,11 @@ msgstr "Выберите модель"
 msgid "pick a name for the board"
 msgstr "выберите имя для рейтинга"
 
-msgid "Pick a parent directory"
-msgstr "Выберите родительскую папку"
-
-msgid "Pick a project location"
-msgstr "Выберите расположение проекта"
-
 msgid "Pick a reason"
 msgstr "Выберите причину"
+
+msgid "Pick a repository folder on {hostName}."
+msgstr "Выберите папку репозитория на {hostName}."
 
 msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
 msgstr "Выберите репозиторий с файлом маркетплейса плагинов. Superset синхронизирует его плагины сейчас и при каждой следующей синхронизации."
@@ -15802,13 +15793,8 @@ msgstr "Проект на другом устройстве"
 msgid "Project ready. Open it from the sidebar."
 msgstr "Проект готов. Откройте его из боковой панели."
 
-#. placeholder {0}: result.repoPath
-msgid "Project relocated to {0}"
-msgstr "Проект перемещён в {0}"
-
-#. placeholder {0}: result.repoPath
-msgid "Project set up at {0}"
-msgstr "Проект настроен в {0}"
+msgid "Project relocated to {newPath}"
+msgstr "Проект перемещён в {newPath}"
 
 msgid "Project Settings"
 msgstr "Настройки проекта"
@@ -16494,6 +16480,9 @@ msgstr "Загрузка с диска отменяет ваши правки. �
 msgid "Relocate"
 msgstr "Переместить"
 
+msgid "Relocate {repositoryName}?"
+msgstr "Переместить {repositoryName}?"
+
 msgid "Relocate project?"
 msgstr "Переместить проект?"
 
@@ -16577,6 +16566,9 @@ msgstr "Убрать из группы"
 
 msgid "Remove from queue"
 msgstr "Убрать из очереди"
+
+msgid "Remove from project"
+msgstr "Удалить из проекта"
 
 msgid "Remove from Queue"
 msgstr "Убрать из очереди"
@@ -16859,9 +16851,6 @@ msgstr "Репозиторий удалён"
 
 msgid "Repository root"
 msgstr "Корень репозитория"
-
-msgid "Repository settings"
-msgstr "Настройки репозитория"
 
 msgid "Repository URL or path"
 msgstr "URL или путь репозитория"
@@ -17432,9 +17421,6 @@ msgstr "Запускайте агентов по расписанию или к�
 msgid "Run agents side by side"
 msgstr "Запускайте агентов бок о бок"
 
-msgid "Run all"
-msgstr "Запустить все"
-
 #. Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.
 msgid "Run an Army of"
 msgstr "Запустите армию"
@@ -17531,9 +17517,6 @@ msgstr "Запускайте агентов с десктопа, из любог
 
 msgid "Run your coding agents in the cloud."
 msgstr "Запускайте своих агентов для кода в облаке."
-
-msgid "Run: {repositoryName}"
-msgstr "Запуск: {repositoryName}"
 
 msgid "Run."
 msgstr "Запустите."
@@ -18180,9 +18163,6 @@ msgstr "Выберите организацию"
 msgid "Select Organization Logo"
 msgstr "Выберите логотип организации"
 
-msgid "Select parent directory to clone into"
-msgstr "Выберите родительскую папку для клонирования"
-
 msgid "Select people"
 msgstr "Выбрать людей"
 
@@ -18416,9 +18396,6 @@ msgstr "Назначить проект…"
 msgid "Set Run"
 msgstr "Задать запуск"
 
-msgid "Set run script"
-msgstr "Задать скрипт запуска"
-
 msgid "Set this project"
 msgstr "Назначить этот проект"
 
@@ -18440,9 +18417,6 @@ msgstr "Настроить окружение"
 
 msgid "Set up once"
 msgstr "Настройте один раз"
-
-msgid "Set up project on {hostName}"
-msgstr "Настроить проект на {hostName}"
 
 msgid "Set up project…"
 msgstr "Настроить проект…"
@@ -19227,6 +19201,10 @@ msgstr "Спам или мошенничество"
 msgid "Sparse checkout"
 msgstr "Частичная выгрузка"
 
+#. placeholder {0}: repository.name
+msgid "Sparse checkout of {0}"
+msgstr "Частичная выгрузка {0}"
+
 msgid "Speaking"
 msgstr "Говорю"
 
@@ -19619,9 +19597,6 @@ msgstr "Остановить {label}"
 
 msgid "Stop {name}"
 msgstr "Остановить {name}"
-
-msgid "Stop all"
-msgstr "Остановить все"
 
 msgid "Stop dictation"
 msgstr "Остановить диктовку"
@@ -20387,9 +20362,6 @@ msgstr "Срок действия кода истёк. Начните занов
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
 msgstr "Команды, которые Paradev выполняет при подготовке, запуске и архивации рабочих областей этого проекта, из config.toml репозитория."
 
-msgid "The commands Paradev runs to set up, run and archive this repository's checkouts, from its config.toml."
-msgstr "Команды, которыми Paradev настраивает, запускает и архивирует checkout'ы этого репозитория, из его config.toml."
-
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Компания привлекла 11,5 млн долларов в посевном раунде под руководством Union Square Ventures при участии Y Combinator и Пола Грэма. TechCrunch назвал её одним из самых заметных стартапов YC Demo Day."
 
@@ -20492,6 +20464,9 @@ msgstr "Будущий дом для переиспользуемых конфи
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Хост вернулся с версией {0}, а не {targetVersion}."
+
+msgid "The host created a project with no repository"
+msgstr "Хост создал проект без репозитория"
 
 msgid "The host did not come back within fifteen minutes."
 msgstr "Хост не восстановил работу в течение пятнадцати минут."
@@ -20923,8 +20898,8 @@ msgstr "Этот адрес электронной почты уже зарег�
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "В этом окружении нет репозиториев. Создайте окружение с репозиториями в Настройках и запустите рабочую область из него"
 
-msgid "This environment opens {environmentRepository}, not {repository}"
-msgstr "Это окружение открывает {environmentRepository}, а не {repository}"
+msgid "This environment opens {environmentRepositories}, not {workspaceRepositories}"
+msgstr "Это окружение открывает {environmentRepositories}, а не {workspaceRepositories}"
 
 msgid "This environment's repositories are fixed; promote a workspace again to change them"
 msgstr "Репозитории этого окружения зафиксированы; чтобы изменить их, снова повысьте рабочую область"
@@ -21091,6 +21066,9 @@ msgstr "Этот пул-реквест больше недоступен."
 msgid "This pull request link is invalid."
 msgstr "Эта ссылка на пул-реквест недействительна."
 
+msgid "This pull request's repository is not known"
+msgstr "Репозиторий этого пул-реквеста неизвестен"
+
 msgid "This recording is too long to transcribe"
 msgstr "Эта запись слишком длинная для расшифровки"
 
@@ -21241,6 +21219,9 @@ msgstr "Эта рабочая область"
 
 msgid "This workspace has no project to branch from"
 msgstr "В этом рабочем пространстве нет проекта для ответвления"
+
+msgid "This workspace is still loading. Try again."
+msgstr "Рабочая область ещё загружается. Повторите попытку."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Возможно, эта рабочая область удалена или у вас больше нет к ней доступа."
@@ -22217,9 +22198,6 @@ msgstr "Использовать этот аккаунт"
 
 msgid "Use this folder"
 msgstr "Использовать эту папку"
-
-msgid "Use this repo"
-msgstr "Использовать этот репозиторий"
 
 msgid "Use this to fix terminals that are stuck or unresponsive."
 msgstr "Используйте это, чтобы починить зависшие или не отвечающие терминалы."

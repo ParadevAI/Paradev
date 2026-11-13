@@ -5,7 +5,10 @@ import { useQueries } from "@tanstack/react-query";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	getPrimaryRepository,
+	useHostProjects,
+} from "renderer/hooks/host-projects/useHostProjects";
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { useHostWorkspacesSource } from "renderer/hooks/host-workspaces/useHostWorkspaces";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -23,6 +26,11 @@ import {
 	EMPTY_CLOUD_SIDEBAR,
 	useCloudSidebarStore,
 } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
+import {
+	primaryCheckoutRepositoryId,
+	sumCheckoutDiffStats,
+	workspaceRowPullRequest,
+} from "renderer/routes/_authenticated/_dashboard/utils/workspaceCheckoutSummaries";
 import {
 	PROJECT_FILTER_SESSIONS,
 	type V2WorkspacesWhereFilter,
@@ -221,6 +229,16 @@ export function useAccessibleV2Workspaces(
 				: [],
 		[includesHosts, hostSource.workspaces, hostWorkspacesCache],
 	);
+	const primaryRepositoryIdByWorkspaceId = useMemo(
+		() =>
+			new Map(
+				hostWorkspaces.map((workspace) => [
+					workspace.id,
+					primaryCheckoutRepositoryId(workspace),
+				]),
+			),
+		[hostWorkspaces],
+	);
 
 	const { hosts: hostRows } = useKnownHosts();
 
@@ -346,10 +364,7 @@ export function useAccessibleV2Workspaces(
 					...shared,
 					projectId: project.projectKey,
 					projectName: project.name,
-					projectIconUrl: resolveProjectIconUrl({
-						icon: project.icon,
-						repoOwner: project.repoOwner,
-					}),
+					projectIconUrl: resolveProjectIconUrl(project),
 				},
 			];
 		});
@@ -415,7 +430,10 @@ export function useAccessibleV2Workspaces(
 			const data = query.data;
 			if (!data) continue;
 			for (const row of data.workspaces) {
-				const pr = row.pullRequest;
+				const pr = workspaceRowPullRequest(
+					row.checkouts,
+					primaryRepositoryIdByWorkspaceId.get(row.workspaceId) ?? null,
+				)?.pullRequest;
 				if (!pr) continue;
 				entries.push([
 					row.workspaceId,
@@ -437,7 +455,7 @@ export function useAccessibleV2Workspaces(
 			}
 		}
 		return entries;
-	}, [pullRequestQueries]);
+	}, [pullRequestQueries, primaryRepositoryIdByWorkspaceId]);
 	const prByWorkspaceId = useStableByWorkspaceId(prSummaryEntries);
 
 	// Live agent status, one host-wide query per host — never per workspace
@@ -482,14 +500,7 @@ export function useAccessibleV2Workspaces(
 		const entries: [string, V2WorkspaceDiffStats][] = [];
 		for (const query of diffStatsQueries) {
 			for (const row of query.data?.workspaces ?? []) {
-				entries.push([
-					row.workspaceId,
-					{
-						additions: row.additions,
-						deletions: row.deletions,
-						fileCount: row.fileCount,
-					},
-				]);
+				entries.push([row.workspaceId, sumCheckoutDiffStats(row.checkouts)]);
 			}
 		}
 		return entries;
@@ -652,8 +663,8 @@ export function useAccessibleV2Workspaces(
 				id: project.projectKey,
 				name: project.name,
 				iconUrl: resolveProjectIconUrl(project),
-				githubOwner: project.repoOwner,
-				githubRepoName: project.repoName,
+				githubOwner: getPrimaryRepository(project)?.owner ?? null,
+				githubRepoName: getPrimaryRepository(project)?.repoName ?? null,
 			})),
 		[hostProjects],
 	);

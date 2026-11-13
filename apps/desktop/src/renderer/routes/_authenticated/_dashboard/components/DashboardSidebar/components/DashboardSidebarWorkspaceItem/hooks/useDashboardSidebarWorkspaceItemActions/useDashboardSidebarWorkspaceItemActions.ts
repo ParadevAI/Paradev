@@ -38,6 +38,8 @@ interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	workspaceName: string;
 	branch: string;
 	isPinned?: boolean;
+	/** The checkout whose PR the row shows; Remove PR Link unlinks that one. */
+	pullRequestRepositoryId?: string | null;
 }
 
 export function useDashboardSidebarWorkspaceItemActions({
@@ -48,6 +50,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 	workspaceName,
 	branch,
 	isPinned = false,
+	pullRequestRepositoryId = null,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
@@ -289,7 +292,10 @@ export function useDashboardSidebarWorkspaceItemActions({
 		try {
 			await getHostServiceClientByUrl(
 				workspaceHostUrl,
-			).pullRequests.unlinkFromWorkspace.mutate({ workspaceId });
+			).pullRequests.unlinkFromWorkspace.mutate({
+				workspaceId,
+				repositoryId: pullRequestRepositoryId ?? undefined,
+			});
 			await queryClient.invalidateQueries({
 				queryKey: DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX,
 			});

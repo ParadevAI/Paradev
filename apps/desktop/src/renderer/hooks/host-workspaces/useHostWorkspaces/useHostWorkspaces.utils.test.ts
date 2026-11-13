@@ -18,6 +18,7 @@ function makeSnapshot(
 		branch: overrides.id,
 		type: "worktree",
 		worktreePath: `/tmp/${overrides.id}`,
+		checkouts: [],
 		taskId: null,
 		createdByUserId: null,
 		createdAt: 1_700_000_000_000,
@@ -239,5 +240,48 @@ describe("toHostWorkspaceItem", () => {
 			lastActivityAt: null,
 			hostReachable: false,
 		});
+	});
+});
+
+describe("checkouts", () => {
+	const checkout = {
+		repositoryId: "repo-api",
+		name: "api",
+		isPrimary: true,
+		path: "/tmp/w1/api",
+		branch: "w1",
+		headSha: null,
+		upstream: null,
+		pullRequestId: null,
+	};
+
+	it("carries the event's checkouts onto the cached row", () => {
+		const rows = applyWorkspaceChangedEvent(
+			undefined,
+			{
+				eventType: "created",
+				workspace: makeSnapshot({ id: "w1", checkouts: [checkout] }),
+			},
+			HOST,
+			"w1",
+			null,
+		);
+		expect(rows?.[0]?.checkouts).toEqual([checkout]);
+	});
+
+	it("normalizes a row cached before checkouts to none", () => {
+		const [row] =
+			applyWorkspaceChangedEvent(
+				undefined,
+				{ eventType: "created", workspace: makeSnapshot({ id: "w1" }) },
+				HOST,
+				"w1",
+				null,
+			) ?? [];
+		if (!row) throw new Error("expected a row");
+		const { checkouts: _omitted, ...cachedBeforeCheckouts } = row;
+		expect(toHostWorkspaceItem(cachedBeforeCheckouts, true).checkouts).toEqual(
+			[],
+		);
 	});
 });

@@ -8,6 +8,7 @@ import type {
 import { useBranchContext } from "../../../../../hooks/useBranchContext";
 
 interface RepositoryRowProps {
+	projectId: string;
 	repository: { id: string; name: string };
 	hostId: string | null;
 	selectedBranch: string | undefined;
@@ -17,6 +18,7 @@ interface RepositoryRowProps {
 }
 
 export function RepositoryRow({
+	projectId,
 	repository,
 	hostId,
 	selectedBranch,
@@ -26,10 +28,13 @@ export function RepositoryRow({
 }: RepositoryRowProps) {
 	// Same query as the repository's branch list, so opening it is instant.
 	const { defaultBranch, isLoading } = useBranchContext(
-		repository.id,
+		projectId,
 		hostId,
 		"",
 		"all",
+		{
+			repositoryId: repository.id,
+		},
 	);
 	const branch = selectedBranch ?? defaultBranch;
 

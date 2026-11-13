@@ -211,18 +211,6 @@ async function migrateProjects(
 				findByPathResult,
 			});
 
-			if (result.kind === "needs-relocate") {
-				summary.skipped++;
-				pushOutcome(ledger, outcomes, {
-					v1Id: project.id,
-					kind: "project",
-					status: "skipped",
-					v2Id: result.v2ProjectId,
-					reason: "needs-relocate",
-				});
-				continue;
-			}
-
 			summary.migrated++;
 			pushOutcome(ledger, outcomes, {
 				v1Id: project.id,
@@ -285,7 +273,11 @@ async function migrateWorkspaces(
 	const v2ProjectIdByV1ProjectId = new Map<string, string>();
 	const v2ByRepoPath = new Map<string, string>();
 	for (const p of hostProjects) {
-		if (!v2ByRepoPath.has(p.repoPath)) v2ByRepoPath.set(p.repoPath, p.id);
+		for (const repository of p.repositories) {
+			if (!v2ByRepoPath.has(repository.path)) {
+				v2ByRepoPath.set(repository.path, p.id);
+			}
+		}
 	}
 	for (const v1 of v1Projects) {
 		const fromLedger = ledger.get(ledgerKey("project", v1.id));
