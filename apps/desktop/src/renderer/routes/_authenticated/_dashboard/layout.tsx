@@ -302,10 +302,7 @@ function DashboardLayout() {
 									>
 										<DashboardSidebar />
 									</WorkspaceSidebarPanel>
-									<ContentCard
-										joinsSidebar={!isWorkspaceSidebarCollapsed}
-										isBordered={!onV2WorkspaceRoute}
-									>
+									<ContentCard joinsSidebar={!isWorkspaceSidebarCollapsed}>
 										{content}
 									</ContentCard>
 								</div>
