@@ -1419,6 +1419,9 @@ msgstr "{teardownFailureCount, plural, one {Trotzdem löschen} other {# trotzdem
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# Agenten-PR gemergt} other {# Agenten-PRs gemergt}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (Kopie)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} unterbrochen"
 
@@ -5932,6 +5935,9 @@ msgstr "Herunterladen fehlgeschlagen: {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Die Vorlage konnte nicht heruntergeladen werden. Prüfe deine Internetverbindung und versuche es erneut."
 
+msgid "Could not duplicate this page"
+msgstr "Diese Seite konnte nicht dupliziert werden"
+
 msgid "Could not forget {domain}"
 msgstr "{domain} konnte nicht vergessen werden"
 
@@ -7823,6 +7829,9 @@ msgstr "Dropdown-, Kontext- und Anwendungsmenüs"
 
 msgid "Due today"
 msgstr "Heute fällig"
+
+msgid "Duplicate"
+msgstr "Duplizieren"
 
 msgid "Duration"
 msgstr "Dauer"
@@ -14722,6 +14731,9 @@ msgstr "Seiteninhalt ist nicht verfügbar"
 
 msgid "Page deleted"
 msgstr "Seite gelöscht"
+
+msgid "Page duplicated"
+msgstr "Seite dupliziert"
 
 msgid "Page has no versions"
 msgstr "Die Seite hat keine Versionen"

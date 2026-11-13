@@ -106,6 +106,12 @@ superset pages versions <page-id-or-slug>
 superset pages pull <page-id-or-slug> --version 1 > original-design.html
 ```
 
+**Duplicate** in the same menu copies the version the page currently serves into a new page that only you can see. The copy starts at version 1 and does not carry the original's comments, shares, or version history. From the CLI:
+
+```bash
+superset pages duplicate <page-id-or-slug> --title "Design, second take"
+```
+
 ## Read What Viewers Stored
 
 A page can keep values under each key with `window.superset.storage`. Each call takes an optional `{ scope }`:

@@ -1419,6 +1419,9 @@ msgstr "{teardownFailureCount, plural, one {Yine de sil} other {Yine de # tanesi
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# ajan PR'ı birleştirildi} other {# ajan PR'ı birleştirildi}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (kopya)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} kesildi"
 
@@ -5932,6 +5935,9 @@ msgstr "{names} indirilemedi."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Şablon indirilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."
 
+msgid "Could not duplicate this page"
+msgstr "Bu sayfa çoğaltılamadı"
+
 msgid "Could not forget {domain}"
 msgstr "{domain} unutulamadı"
 
@@ -7823,6 +7829,9 @@ msgstr "Açılır, bağlam ve uygulama menüleri"
 
 msgid "Due today"
 msgstr "Bugün ödenecek"
+
+msgid "Duplicate"
+msgstr "Çoğalt"
 
 msgid "Duration"
 msgstr "Süre"
@@ -14722,6 +14731,9 @@ msgstr "Sayfa içeriği kullanılamıyor"
 
 msgid "Page deleted"
 msgstr "Sayfa silindi"
+
+msgid "Page duplicated"
+msgstr "Sayfa çoğaltıldı"
 
 msgid "Page has no versions"
 msgstr "Sayfanın sürümü yok"

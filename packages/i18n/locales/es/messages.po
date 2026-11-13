@@ -1419,6 +1419,9 @@ msgstr "{teardownFailureCount, plural, one {Eliminar de todos modos} other {Elim
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# PR de agente fusionada} other {# PR de agente fusionadas}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (copia)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrumpido"
 
@@ -5932,6 +5935,9 @@ msgstr "No se pudo descargar {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "No se pudo descargar la plantilla. Comprueba tu conexión a internet e inténtalo de nuevo."
 
+msgid "Could not duplicate this page"
+msgstr "No se pudo duplicar esta página"
+
 msgid "Could not forget {domain}"
 msgstr "No se pudo olvidar {domain}"
 
@@ -7823,6 +7829,9 @@ msgstr "Menús desplegables, contextuales y de aplicación"
 
 msgid "Due today"
 msgstr "A pagar hoy"
+
+msgid "Duplicate"
+msgstr "Duplicar"
 
 msgid "Duration"
 msgstr "Duración"
@@ -14722,6 +14731,9 @@ msgstr "El contenido de la página no está disponible"
 
 msgid "Page deleted"
 msgstr "Página eliminada"
+
+msgid "Page duplicated"
+msgstr "Página duplicada"
 
 msgid "Page has no versions"
 msgstr "La página no tiene versiones"

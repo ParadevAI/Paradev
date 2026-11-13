@@ -1419,6 +1419,9 @@ msgstr "{teardownFailureCount, plural, one {Всё равно удалить} fe
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {влит # PR агента} few {влито # PR агента} many {влито # PR агента} other {влито # PR агента}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (копия)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} прерван"
 
@@ -5932,6 +5935,9 @@ msgstr "Не удалось скачать: {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Не удалось загрузить шаблон. Проверьте подключение к интернету и попробуйте ещё раз."
 
+msgid "Could not duplicate this page"
+msgstr "Не удалось дублировать эту страницу"
+
 msgid "Could not forget {domain}"
 msgstr "Не удалось забыть {domain}"
 
@@ -7823,6 +7829,9 @@ msgstr "Выпадающие, контекстные и прикладные м�
 
 msgid "Due today"
 msgstr "К оплате сегодня"
+
+msgid "Duplicate"
+msgstr "Дублировать"
 
 msgid "Duration"
 msgstr "Длительность"
@@ -14722,6 +14731,9 @@ msgstr "Содержимое страницы недоступно"
 
 msgid "Page deleted"
 msgstr "Страница удалена"
+
+msgid "Page duplicated"
+msgstr "Страница дублирована"
 
 msgid "Page has no versions"
 msgstr "У страницы нет версий"

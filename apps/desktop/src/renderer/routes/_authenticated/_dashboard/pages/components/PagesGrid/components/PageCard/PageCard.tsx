@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import {
@@ -12,6 +13,7 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import {
 	Building2,
+	Copy,
 	Globe,
 	Link2,
 	Lock,
@@ -51,6 +53,7 @@ interface PageCardProps {
 	onOpen: (page: PageCardItem, event: MouseEvent) => void;
 	onTogglePin: (pageId: string) => void;
 	onDelete: (pageId: string) => Promise<void>;
+	onDuplicate: (pageId: string, title: string) => Promise<void>;
 }
 
 export function PageCard({
@@ -60,6 +63,7 @@ export function PageCard({
 	onOpen,
 	onTogglePin,
 	onDelete,
+	onDuplicate,
 }: PageCardProps) {
 	const { formatRelativeTime } = useFormat();
 
@@ -82,6 +86,20 @@ export function PageCard({
 	const preview = page.commentPreview;
 	const trigger = useCommentPreview({ eligible: preview !== null });
 	const panelDomId = useId();
+
+	const duplicate = async () => {
+		const title = page.title;
+		try {
+			await onDuplicate(
+				page.id,
+				t({ message: `${title} (copy)` }).slice(0, 200),
+			);
+		} catch (error) {
+			toast.error(
+				errorMessage(error, t({ message: "Could not duplicate this page" })),
+			);
+		}
+	};
 
 	const copyLink = async () => {
 		try {
@@ -196,6 +214,10 @@ export function PageCard({
 					<DropdownMenuItem onSelect={() => void copyLink()}>
 						<Link2 className="size-4" />
 						<Trans>Copy link</Trans>
+					</DropdownMenuItem>
+					<DropdownMenuItem onSelect={() => void duplicate()}>
+						<Copy className="size-4" />
+						<Trans>Duplicate</Trans>
 					</DropdownMenuItem>
 					{isOwner ? (
 						<DropdownMenuItem

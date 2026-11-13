@@ -1419,6 +1419,9 @@ msgstr "{teardownFailureCount, plural, one {Supprimer quand même} other {En sup
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# PR d'agent fusionnée} other {# PR d'agent fusionnées}}"
 
+msgid "{title} (copy)"
+msgstr "{title} (copie)"
+
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrompu"
 
@@ -5932,6 +5935,9 @@ msgstr "Impossible de télécharger {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Impossible de télécharger le modèle. Vérifiez votre connexion Internet et réessayez."
 
+msgid "Could not duplicate this page"
+msgstr "Impossible de dupliquer cette page"
+
 msgid "Could not forget {domain}"
 msgstr "Impossible d'oublier {domain}"
 
@@ -7823,6 +7829,9 @@ msgstr "Menus déroulants, contextuels et applicatifs"
 
 msgid "Due today"
 msgstr "À payer aujourd'hui"
+
+msgid "Duplicate"
+msgstr "Dupliquer"
 
 msgid "Duration"
 msgstr "Durée"
@@ -14722,6 +14731,9 @@ msgstr "Le contenu de la page n'est pas disponible"
 
 msgid "Page deleted"
 msgstr "Page supprimée"
+
+msgid "Page duplicated"
+msgstr "Page dupliquée"
 
 msgid "Page has no versions"
 msgstr "La page n'a aucune version"
