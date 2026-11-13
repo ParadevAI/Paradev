@@ -2811,6 +2811,9 @@ msgstr "An agent sets up this environment in a cloud workspace (about 20 minutes
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 
+msgid "An Anthropic API key."
+msgstr "An Anthropic API key."
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "An automation can only use a cloud workspace you created"
 
@@ -2822,6 +2825,9 @@ msgstr "An error occurred"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "An isolated git worktree where an agent runs without touching your main checkout."
+
+msgid "An OpenAI API key."
+msgstr "An OpenAI API key."
 
 msgid "An unknown error occurred"
 msgstr "An unknown error occurred"
@@ -3897,6 +3903,9 @@ msgstr "Bundled with the Paradev app on this device."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Bundled with the Paradev app on this device. Updates with the app."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business plan"
 
@@ -4383,6 +4392,9 @@ msgstr "Checking out a PR requires a project"
 msgid "Checking pull requests in {what}"
 msgstr "Checking pull requests in {what}"
 
+msgid "Checking with the provider."
+msgstr "Checking with the provider."
+
 msgid "Checking workspaces"
 msgstr "Checking workspaces"
 
@@ -4645,6 +4657,9 @@ msgstr "Click an element."
 
 msgid "Click any element to send it to an agent."
 msgstr "Click any element to send it to an agent."
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
 
 msgid "Click here if not redirected"
 msgstr "Click here if not redirected"
@@ -8061,6 +8076,9 @@ msgstr "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgid "Enter new value"
 msgstr "Enter new value"
 
+msgid "Enter this code on the page we opened:"
+msgstr "Enter this code on the page we opened:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Enter this code when OpenAI asks for it:"
 
@@ -9116,6 +9134,9 @@ msgstr "finished · worked for 7s"
 
 msgid "Finishing the move…"
 msgstr "Finishing the move…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 
 msgid "Fit"
 msgstr "Fit"
@@ -14055,8 +14076,17 @@ msgstr "Open ChatGPT admin settings"
 msgid "Open ChatGPT settings"
 msgstr "Open ChatGPT settings"
 
+msgid "Open ChatGPT to sign in"
+msgstr "Open ChatGPT to sign in"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
+
+msgid "Open claude.ai again"
+msgstr "Open claude.ai again"
+
+msgid "Open claude.ai to sign in"
+msgstr "Open claude.ai to sign in"
 
 msgid "Open Command Palette"
 msgstr "Open Command Palette"
@@ -14951,6 +14981,12 @@ msgstr "Paste"
 
 msgid "Paste a link"
 msgstr "Paste a link"
+
+msgid "Paste an API key instead"
+msgstr "Paste an API key instead"
+
+msgid "Paste the code"
+msgstr "Paste the code"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Paste this into Paradev CLI:"
@@ -16885,6 +16921,9 @@ msgstr "Restarted 1 host service"
 msgid "Restarting"
 msgstr "Restarting"
 
+msgid "Restarting {label}…"
+msgstr "Restarting {label}…"
+
 msgid "Restarting {what}"
 msgstr "Restarting {what}"
 
@@ -17423,6 +17462,9 @@ msgstr "Save a checkpoint to {name}?"
 
 msgid "Save All"
 msgstr "Save All"
+
+msgid "Save and continue"
+msgstr "Save and continue"
 
 msgid "Save as environment"
 msgstr "Save as environment"
@@ -18626,6 +18668,9 @@ msgstr "Sign in once. Paradev keeps the connection."
 msgid "Sign in to {0}"
 msgstr "Sign in to {0}"
 
+msgid "Sign in to {label}"
+msgstr "Sign in to {label}"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Sign in to change your organization's plugins."
 
@@ -18721,6 +18766,9 @@ msgstr "Signed in to ChatGPT"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "Signed in to ChatGPT as {connectedAs}"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "Signed in, but {label} did not restart."
+
 msgid "Signed out"
 msgstr "Signed out"
 
@@ -18729,6 +18777,9 @@ msgstr "Signed-in sites"
 
 msgid "Signing in..."
 msgstr "Signing in..."
+
+msgid "Signing in…"
+msgstr "Signing in…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Signup works. The welcome screen loads and the console is clean."
@@ -21353,6 +21404,9 @@ msgstr "Try a different search term or another place."
 msgid "Try again"
 msgstr "Try again"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "Try again, or close this and press Continue in the chat."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Try again, or restart the host service from the Paradev tray menu."
 
@@ -21984,6 +22038,12 @@ msgstr "Use this when calling the Paradev API."
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Use voice transcription and push-to-talk features."
 
+msgid "Use your ChatGPT plan."
+msgstr "Use your ChatGPT plan."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Use your Claude Pro or Max plan."
+
 msgid "Used"
 msgstr "Used"
 
@@ -22235,6 +22295,9 @@ msgstr "Waiting for activity data"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Waiting for approval. Keep this dialog open."
 
+msgid "Waiting for approval…"
+msgstr "Waiting for approval…"
+
 msgid "Waiting for Checks"
 msgstr "Waiting for Checks"
 
@@ -22291,6 +22354,9 @@ msgstr "Wayfinding and disclosure"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "We build in public, so you can see how we work before you talk to us."
+
+msgid "We check it with the provider before we save it."
+msgstr "We check it with the provider before we save it."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "We couldn't charge {amountDue}. Update your payment method to keep this plan."
@@ -23131,6 +23197,9 @@ msgstr "Your changes"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Your changes will be lost if you don't save them."
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "Your chat history stays. Only the agent restarts."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Your cloud workspaces will no longer be able to reach this host."

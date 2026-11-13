@@ -2811,6 +2811,9 @@ msgstr "Agent nastaví toto prostředí v cloudovém pracovním prostoru (asi 20
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Agent píše celé funkce a soubory, zatímco člověk sleduje každý krok a schvaluje každý příkaz. Jeden agent, jeden člověk. Rychlejší, ale pořád sériové."
 
+msgid "An Anthropic API key."
+msgstr "Klíč API od Anthropic."
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Automatizace může používat jen cloudový pracovní prostor, který jste vytvořili"
 
@@ -2822,6 +2825,9 @@ msgstr "Došlo k chybě"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "Izolovaný git worktree, kde agent běží, aniž by sáhl na váš hlavní checkout."
+
+msgid "An OpenAI API key."
+msgstr "Klíč API od OpenAI."
 
 msgid "An unknown error occurred"
 msgstr "Došlo k neznámé chybě"
@@ -3897,6 +3903,9 @@ msgstr "Součást aplikace Paradev na tomto zařízení."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Součást aplikace Paradev na tomto zařízení. Aktualizuje se spolu s aplikací."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Firemní plán"
 
@@ -4383,6 +4392,9 @@ msgstr "Checkout PR vyžaduje projekt"
 msgid "Checking pull requests in {what}"
 msgstr "Kontroluji pull requesty v {what}"
 
+msgid "Checking with the provider."
+msgstr "Ověřování u poskytovatele."
+
 msgid "Checking workspaces"
 msgstr "Kontroluji pracovní prostory"
 
@@ -4645,6 +4657,9 @@ msgstr "Klikněte na prvek."
 
 msgid "Click any element to send it to an agent."
 msgstr "Kliknutím na libovolný prvek ho pošlete agentovi."
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "Na claude.ai klikněte na Authorize. Anthropic pak zobrazí kód. Vložte ho sem."
 
 msgid "Click here if not redirected"
 msgstr "Pokud nedojde k přesměrování, klikněte sem"
@@ -8061,6 +8076,9 @@ msgstr "Zadejte celé číslo od {minHours} do {maxHours} GB-hodin."
 msgid "Enter new value"
 msgstr "Zadejte novou hodnotu"
 
+msgid "Enter this code on the page we opened:"
+msgstr "Zadejte tento kód na stránce, kterou jsme otevřeli:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Až o to OpenAI požádá, zadejte tento kód:"
 
@@ -9116,6 +9134,9 @@ msgstr "hotovo · pracoval 7 s"
 
 msgid "Finishing the move…"
 msgstr "Dokončování přesunu…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "Poprvé? Zapněte přihlášení kódem zařízení v <0>nastavení ChatGPT</0>."
 
 msgid "Fit"
 msgstr "Přizpůsobit"
@@ -14055,8 +14076,17 @@ msgstr "Otevřít nastavení správce ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Otevřít nastavení ChatGPT"
 
+msgid "Open ChatGPT to sign in"
+msgstr "Otevřít ChatGPT a přihlásit se"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Otevírat relace Claude Code, Codex, OpenCode a Pi jako chaty"
+
+msgid "Open claude.ai again"
+msgstr "Znovu otevřít claude.ai"
+
+msgid "Open claude.ai to sign in"
+msgstr "Otevřít claude.ai a přihlásit se"
 
 msgid "Open Command Palette"
 msgstr "Otevřít paletu příkazů"
@@ -14951,6 +14981,12 @@ msgstr "Vložit"
 
 msgid "Paste a link"
 msgstr "Vložte odkaz"
+
+msgid "Paste an API key instead"
+msgstr "Místo toho vložit klíč API"
+
+msgid "Paste the code"
+msgstr "Vložte kód"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Vložte to do Paradev CLI:"
@@ -16885,6 +16921,9 @@ msgstr "Restartována 1 host service"
 msgid "Restarting"
 msgstr "Restartování"
 
+msgid "Restarting {label}…"
+msgstr "Restartuje se {label}…"
+
 msgid "Restarting {what}"
 msgstr "Restartuje se {what}"
 
@@ -17423,6 +17462,9 @@ msgstr "Uložit checkpoint do {name}?"
 
 msgid "Save All"
 msgstr "Uložit vše"
+
+msgid "Save and continue"
+msgstr "Uložit a pokračovat"
 
 msgid "Save as environment"
 msgstr "Uložit jako prostředí"
@@ -18626,6 +18668,9 @@ msgstr "Přihlaste se jednou. Paradev udržuje připojení."
 msgid "Sign in to {0}"
 msgstr "Přihlaste se do {0}"
 
+msgid "Sign in to {label}"
+msgstr "Přihlásit se do {label}"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Pro změnu pluginů organizace se přihlaste."
 
@@ -18721,6 +18766,9 @@ msgstr "Přihlášeno do ChatGPT"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "Přihlášeno do ChatGPT jako {connectedAs}"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "Přihlášeno, ale {label} se nerestartoval."
+
 msgid "Signed out"
 msgstr "Odhlášeno"
 
@@ -18729,6 +18777,9 @@ msgstr "Weby, kde jste přihlášeni"
 
 msgid "Signing in..."
 msgstr "Přihlašuji..."
+
+msgid "Signing in…"
+msgstr "Přihlašování…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Registrace funguje. Uvítací obrazovka se načte a konzole je čistá."
@@ -21353,6 +21404,9 @@ msgstr "Zkuste jiný hledaný výraz nebo jiné místo."
 msgid "Try again"
 msgstr "Zkusit znovu"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "Zkuste to znovu, nebo okno zavřete a v chatu stiskněte Pokračovat."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Zkuste to znovu nebo restartujte službu hostitele z nabídky Paradev v systémové liště."
 
@@ -21984,6 +22038,12 @@ msgstr "Použijte při volání Paradev API."
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Používat přepis řeči a funkce push-to-talk."
 
+msgid "Use your ChatGPT plan."
+msgstr "Použijte svůj plán ChatGPT."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Použijte svůj plán Claude Pro nebo Max."
+
 msgid "Used"
 msgstr "Využito"
 
@@ -22235,6 +22295,9 @@ msgstr "Čeká se na data o aktivitě"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Čeká se na schválení. Nechte tento dialog otevřený."
 
+msgid "Waiting for approval…"
+msgstr "Čeká se na schválení…"
+
 msgid "Waiting for Checks"
 msgstr "Čeká na kontroly"
 
@@ -22291,6 +22354,9 @@ msgstr "Orientace a postupné odkrývání"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "Stavíme veřejně, takže uvidíte, jak pracujeme, ještě než s námi promluvíte."
+
+msgid "We check it with the provider before we save it."
+msgstr "Před uložením ho ověříme u poskytovatele."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "Nepodařilo se strhnout {amountDue}. Aktualizujte způsob platby, ať vám tarif zůstane."
@@ -23131,6 +23197,9 @@ msgstr "Vaše změny"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Pokud změny neuložíte, budou ztraceny."
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "Historie chatu zůstane. Restartuje se jen agent."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Vaše cloudové pracovní prostory už k tomuto hostu nebudou mít přístup."

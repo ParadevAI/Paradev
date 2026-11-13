@@ -2811,6 +2811,9 @@ msgstr "代理会在云工作区中设置此环境（约 20 分钟或更久）�
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "智能体写出完整的函数和文件，人类盯着每一步、批准每一条命令。一个智能体，一个人。更快，但仍是串行。"
 
+msgid "An Anthropic API key."
+msgstr "Anthropic API 密钥。"
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "自动化只能使用你创建的云端工作区"
 
@@ -2822,6 +2825,9 @@ msgstr "发生错误"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "一个隔离的git worktree，智能体在其中运行，不会动到你的主检出。"
+
+msgid "An OpenAI API key."
+msgstr "OpenAI API 密钥。"
 
 msgid "An unknown error occurred"
 msgstr "发生未知错误"
@@ -3897,6 +3903,9 @@ msgstr "随此设备上的 Paradev 应用一起提供。"
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "随此设备上的 Paradev 应用一起提供，并随应用一起更新。"
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business 方案"
 
@@ -4383,6 +4392,9 @@ msgstr "检出PR需要一个项目"
 msgid "Checking pull requests in {what}"
 msgstr "正在检查 {what} 的拉取请求"
 
+msgid "Checking with the provider."
+msgstr "正在向提供商核验。"
+
 msgid "Checking workspaces"
 msgstr "正在检查工作区"
 
@@ -4645,6 +4657,9 @@ msgstr "点击一个元素。"
 
 msgid "Click any element to send it to an agent."
 msgstr "点击任意元素，即可发送给智能体。"
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "在 claude.ai 上点击 Authorize。Anthropic 随后会显示一个代码。请粘贴到这里。"
 
 msgid "Click here if not redirected"
 msgstr "如果没有自动跳转，请点击这里"
@@ -8061,6 +8076,9 @@ msgstr "请输入 {minHours} 到 {maxHours} 之间的整数 GB 小时。"
 msgid "Enter new value"
 msgstr "输入新值"
 
+msgid "Enter this code on the page we opened:"
+msgstr "在我们打开的页面上输入此代码："
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI 要求时输入此代码："
 
@@ -9116,6 +9134,9 @@ msgstr "已完成 · 用时7秒"
 
 msgid "Finishing the move…"
 msgstr "正在完成移动…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "首次使用？请在 <0>ChatGPT 设置</0>中开启设备代码登录。"
 
 msgid "Fit"
 msgstr "适应窗口"
@@ -14055,8 +14076,17 @@ msgstr "打开 ChatGPT 管理员设置"
 msgid "Open ChatGPT settings"
 msgstr "打开 ChatGPT 设置"
 
+msgid "Open ChatGPT to sign in"
+msgstr "打开 ChatGPT 登录"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "以聊天形式打开 Claude Code、Codex、OpenCode 和 Pi 会话"
+
+msgid "Open claude.ai again"
+msgstr "重新打开 claude.ai"
+
+msgid "Open claude.ai to sign in"
+msgstr "打开 claude.ai 登录"
 
 msgid "Open Command Palette"
 msgstr "打开命令面板"
@@ -14951,6 +14981,12 @@ msgstr "粘贴"
 
 msgid "Paste a link"
 msgstr "粘贴链接"
+
+msgid "Paste an API key instead"
+msgstr "改为粘贴 API 密钥"
+
+msgid "Paste the code"
+msgstr "粘贴代码"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "把它粘贴到Paradev CLI："
@@ -16885,6 +16921,9 @@ msgstr "已重启1个主机服务"
 msgid "Restarting"
 msgstr "重启中"
 
+msgid "Restarting {label}…"
+msgstr "正在重启 {label}…"
+
 msgid "Restarting {what}"
 msgstr "正在重启 {what}"
 
@@ -17423,6 +17462,9 @@ msgstr "将检查点保存到 {name}？"
 
 msgid "Save All"
 msgstr "全部保存"
+
+msgid "Save and continue"
+msgstr "保存并继续"
 
 msgid "Save as environment"
 msgstr "保存为环境"
@@ -18626,6 +18668,9 @@ msgstr "登录一次，Paradev 会保持连接。"
 msgid "Sign in to {0}"
 msgstr "登录{0}"
 
+msgid "Sign in to {label}"
+msgstr "登录 {label}"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "登录后才能更改组织的插件。"
 
@@ -18721,6 +18766,9 @@ msgstr "已登录 ChatGPT"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "已作为 {connectedAs} 登录 ChatGPT"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "已登录，但 {label} 未能重启。"
+
 msgid "Signed out"
 msgstr "已退出登录"
 
@@ -18729,6 +18777,9 @@ msgstr "已登录的站点"
 
 msgid "Signing in..."
 msgstr "正在登录..."
+
+msgid "Signing in…"
+msgstr "正在登录…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "注册正常。欢迎页面已加载，控制台没有错误。"
@@ -21353,6 +21404,9 @@ msgstr "试试其他搜索词或其他位置。"
 msgid "Try again"
 msgstr "重试"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "请重试，或关闭此窗口并在聊天中点击“继续”。"
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "请重试，或从 Paradev 托盘菜单重启主机服务。"
 
@@ -21984,6 +22038,12 @@ msgstr "调用Paradev API时使用。"
 msgid "Use voice transcription and push-to-talk features."
 msgstr "使用语音转写和按住说话功能。"
 
+msgid "Use your ChatGPT plan."
+msgstr "使用你的 ChatGPT 套餐。"
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "使用你的 Claude Pro 或 Max 套餐。"
+
 msgid "Used"
 msgstr "已使用"
 
@@ -22235,6 +22295,9 @@ msgstr "正在等待活动数据"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "正在等待批准。请保持此对话框打开。"
 
+msgid "Waiting for approval…"
+msgstr "正在等待批准…"
+
 msgid "Waiting for Checks"
 msgstr "等待检查"
 
@@ -22291,6 +22354,9 @@ msgstr "导航定位与内容展开"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "我们公开构建，你在和我们交谈之前就能看到我们如何工作。"
+
+msgid "We check it with the provider before we save it."
+msgstr "保存前我们会向提供商核验。"
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "我们无法扣取{amountDue}。请更新支付方式以保留此方案。"
@@ -23131,6 +23197,9 @@ msgstr "你的更改"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "如果不保存，你的更改将会丢失。"
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "你的聊天记录会保留。只有智能体会重启。"
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "你的云端工作区将无法再访问此主机。"

@@ -13,6 +13,7 @@ import {
 	useState,
 } from "react";
 import { useTurnFailureActions } from "../../../../../../../../providers/TurnFailureActionsProvider";
+import { AgentSignInDialog } from "./components/AgentSignInDialog";
 import { CopyErrorButton } from "./components/CopyErrorButton";
 import { SignInCommand } from "./components/SignInCommand";
 import {
@@ -60,6 +61,7 @@ export function TurnFailureCard({
 	const [expanded, setExpanded] = useState(false);
 	const [clamped, setClamped] = useState(false);
 	const [signingIn, setSigningIn] = useState(false);
+	const [signInOpen, setSignInOpen] = useState(false);
 	const [running, setRunning] = useState<Running | null>(null);
 	const [newChatFailed, setNewChatFailed] = useState(false);
 	const textRef = useRef<HTMLParagraphElement>(null);
@@ -120,6 +122,9 @@ export function TurnFailureCard({
 		});
 	};
 	const restart = kind === "auth" ? recovery?.restartAndContinue : undefined;
+	const agentSignIn =
+		restart && !manualSignIn ? recovery?.agentSignIn : undefined;
+	const label = agentSignIn?.label;
 	const changeModel = recovery?.changeModel;
 	const newChat = recovery?.startNewChat;
 	const buttons: Record<FailureAction, ActionButton | null> | null = recovery
@@ -146,12 +151,18 @@ export function TurnFailureCard({
 							onClick: changeModel,
 						}
 					: null,
-				sign_in: {
-					label: <Trans>Sign in</Trans>,
-					disabled: false,
-					expanded: signingIn,
-					onClick: () => setSigningIn((open) => !open),
-				},
+				sign_in: label
+					? {
+							label: <Trans>Sign in to {label}</Trans>,
+							disabled: false,
+							onClick: () => setSignInOpen(true),
+						}
+					: {
+							label: <Trans>Sign in</Trans>,
+							disabled: false,
+							expanded: signingIn,
+							onClick: () => setSigningIn((open) => !open),
+						},
 				usage_settings: {
 					label: <Trans>Usage settings</Trans>,
 					disabled: false,
@@ -305,6 +316,14 @@ export function TurnFailureCard({
 					{!limit && offeredButtons}
 				</div>
 			</div>
+			{agentSignIn && restart && (
+				<AgentSignInDialog
+					onOpenChange={setSignInOpen}
+					open={signInOpen}
+					restartAndContinue={restart}
+					signIn={agentSignIn}
+				/>
+			)}
 			{actions && (
 				<button
 					aria-label={t({ message: "Dismiss error" })}

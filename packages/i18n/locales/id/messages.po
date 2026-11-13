@@ -2811,6 +2811,9 @@ msgstr "Agen menyiapkan environment ini di workspace cloud (sekitar 20 menit ata
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Agen menulis fungsi dan file utuh sementara manusia mengawasi tiap langkah dan menyetujui tiap perintah. Satu agen, satu manusia. Lebih cepat, tapi tetap berurutan."
 
+msgid "An Anthropic API key."
+msgstr "Kunci API Anthropic."
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "Otomatisasi hanya bisa menggunakan workspace cloud yang kamu buat"
 
@@ -2822,6 +2825,9 @@ msgstr "Terjadi kesalahan"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "Worktree git terisolasi tempat agen berjalan tanpa menyentuh checkout utama Anda."
+
+msgid "An OpenAI API key."
+msgstr "Kunci API OpenAI."
 
 msgid "An unknown error occurred"
 msgstr "Terjadi kesalahan yang tidak diketahui"
@@ -3897,6 +3903,9 @@ msgstr "Disertakan bersama aplikasi Paradev di perangkat ini."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Disertakan bersama aplikasi Paradev di perangkat ini. Diperbarui bersama aplikasi."
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Paket Business"
 
@@ -4383,6 +4392,9 @@ msgstr "Checkout PR memerlukan sebuah proyek"
 msgid "Checking pull requests in {what}"
 msgstr "Memeriksa pull request di {what}"
 
+msgid "Checking with the provider."
+msgstr "Memeriksa ke penyedia."
+
 msgid "Checking workspaces"
 msgstr "Memeriksa workspace"
 
@@ -4645,6 +4657,9 @@ msgstr "Klik sebuah elemen."
 
 msgid "Click any element to send it to an agent."
 msgstr "Klik elemen apa pun untuk mengirimnya ke agen."
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "Klik Authorize di claude.ai. Anthropic lalu menampilkan kode. Tempel di sini."
 
 msgid "Click here if not redirected"
 msgstr "Klik di sini kalau tidak dialihkan"
@@ -8061,6 +8076,9 @@ msgstr "Masukkan bilangan bulat dari {minHours} sampai {maxHours} GB-jam."
 msgid "Enter new value"
 msgstr "Masukkan nilai baru"
 
+msgid "Enter this code on the page we opened:"
+msgstr "Masukkan kode ini di halaman yang kami buka:"
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Masukkan kode ini saat OpenAI memintanya:"
 
@@ -9116,6 +9134,9 @@ msgstr "selesai · bekerja 7 dtk"
 
 msgid "Finishing the move…"
 msgstr "Menyelesaikan pemindahan…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "Pertama kali? Aktifkan masuk dengan kode perangkat di <0>pengaturan ChatGPT</0>."
 
 msgid "Fit"
 msgstr "Sesuaikan"
@@ -14055,8 +14076,17 @@ msgstr "Buka pengaturan admin ChatGPT"
 msgid "Open ChatGPT settings"
 msgstr "Buka pengaturan ChatGPT"
 
+msgid "Open ChatGPT to sign in"
+msgstr "Buka ChatGPT untuk masuk"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Buka sesi Claude Code, Codex, OpenCode, dan Pi sebagai obrolan"
+
+msgid "Open claude.ai again"
+msgstr "Buka claude.ai lagi"
+
+msgid "Open claude.ai to sign in"
+msgstr "Buka claude.ai untuk masuk"
 
 msgid "Open Command Palette"
 msgstr "Buka Command Palette"
@@ -14951,6 +14981,12 @@ msgstr "Tempel"
 
 msgid "Paste a link"
 msgstr "Tempel tautan"
+
+msgid "Paste an API key instead"
+msgstr "Tempel kunci API saja"
+
+msgid "Paste the code"
+msgstr "Tempel kodenya"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Tempel ini ke Paradev CLI:"
@@ -16885,6 +16921,9 @@ msgstr "Memulai ulang 1 layanan host"
 msgid "Restarting"
 msgstr "Memulai ulang"
 
+msgid "Restarting {label}…"
+msgstr "Memulai ulang {label}…"
+
 msgid "Restarting {what}"
 msgstr "Memulai ulang {what}"
 
@@ -17423,6 +17462,9 @@ msgstr "Simpan checkpoint ke {name}?"
 
 msgid "Save All"
 msgstr "Simpan Semua"
+
+msgid "Save and continue"
+msgstr "Simpan dan lanjutkan"
 
 msgid "Save as environment"
 msgstr "Simpan sebagai environment"
@@ -18626,6 +18668,9 @@ msgstr "Masuk sekali. Paradev menjaga koneksinya."
 msgid "Sign in to {0}"
 msgstr "Masuk ke {0}"
 
+msgid "Sign in to {label}"
+msgstr "Masuk ke {label}"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "Masuk untuk mengubah plugin organisasi Anda."
 
@@ -18721,6 +18766,9 @@ msgstr "Masuk ke ChatGPT"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "Masuk ke ChatGPT sebagai {connectedAs}"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "Berhasil masuk, tetapi {label} tidak dimulai ulang."
+
 msgid "Signed out"
 msgstr "Sudah keluar"
 
@@ -18729,6 +18777,9 @@ msgstr "Situs yang sedang masuk"
 
 msgid "Signing in..."
 msgstr "Sedang masuk..."
+
+msgid "Signing in…"
+msgstr "Sedang masuk…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Pendaftaran berhasil. Layar sambutan termuat dan konsol bersih."
@@ -21353,6 +21404,9 @@ msgstr "Coba kata kunci lain atau tempat lain."
 msgid "Try again"
 msgstr "Coba lagi"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "Coba lagi, atau tutup ini dan tekan Lanjutkan di obrolan."
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "Coba lagi, atau mulai ulang layanan host dari menu Paradev di baki sistem."
 
@@ -21984,6 +22038,12 @@ msgstr "Pakai ini saat memanggil API Paradev."
 msgid "Use voice transcription and push-to-talk features."
 msgstr "Memakai transkripsi suara dan fitur push-to-talk."
 
+msgid "Use your ChatGPT plan."
+msgstr "Gunakan paket ChatGPT Anda."
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Gunakan paket Claude Pro atau Max Anda."
+
 msgid "Used"
 msgstr "Terpakai"
 
@@ -22235,6 +22295,9 @@ msgstr "Menunggu data aktivitas"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Menunggu persetujuan. Biarkan dialog ini tetap terbuka."
 
+msgid "Waiting for approval…"
+msgstr "Menunggu persetujuan…"
+
 msgid "Waiting for Checks"
 msgstr "Menunggu Check"
 
@@ -22291,6 +22354,9 @@ msgstr "Penunjuk arah dan pengungkapan"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "Kami membangun secara terbuka, jadi Anda bisa melihat cara kami bekerja sebelum berbicara dengan kami."
+
+msgid "We check it with the provider before we save it."
+msgstr "Kami memeriksanya ke penyedia sebelum menyimpannya."
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "Kami tidak bisa menagih {amountDue}. Perbarui metode pembayaran Anda untuk mempertahankan paket ini."
@@ -23131,6 +23197,9 @@ msgstr "Perubahan Anda"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "Perubahan Anda akan hilang kalau tidak disimpan."
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "Riwayat obrolan Anda tetap ada. Hanya agen yang dimulai ulang."
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Workspace cloud Anda tidak akan bisa lagi menjangkau host ini."

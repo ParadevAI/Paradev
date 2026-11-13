@@ -2811,6 +2811,9 @@ msgstr "エージェントがクラウドワークスペースでこの環境を
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "エージェントが関数やファイルをまるごと書き、人間は各ステップを見守りコマンドを1つずつ承認します。エージェント1体に人間1人。速くはなりますが、依然として直列です。"
 
+msgid "An Anthropic API key."
+msgstr "AnthropicのAPIキー。"
+
 msgid "An automation can only use a cloud workspace you created"
 msgstr "オートメーションで使用できるのは、自分が作成したクラウドワークスペースのみです"
 
@@ -2822,6 +2825,9 @@ msgstr "エラーが発生しました"
 
 msgid "An isolated git worktree where an agent runs without touching your main checkout."
 msgstr "メインのチェックアウトに触れずにエージェントを動かせる、独立したgitワークツリーです。"
+
+msgid "An OpenAI API key."
+msgstr "OpenAIのAPIキー。"
 
 msgid "An unknown error occurred"
 msgstr "不明なエラーが発生しました"
@@ -3897,6 +3903,9 @@ msgstr "このデバイスのParadevアプリに同梱されています。"
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "このデバイスのParadevアプリに同梱されています。アプリと一緒に更新されます。"
 
+msgid "Business"
+msgstr "Business"
+
 msgid "Business plan"
 msgstr "Business プラン"
 
@@ -4383,6 +4392,9 @@ msgstr "PRのチェックアウトにはプロジェクトが必要です"
 msgid "Checking pull requests in {what}"
 msgstr "{what} のプルリクエストを確認中"
 
+msgid "Checking with the provider."
+msgstr "プロバイダーで確認しています。"
+
 msgid "Checking workspaces"
 msgstr "ワークスペースを確認中"
 
@@ -4645,6 +4657,9 @@ msgstr "要素をクリックします。"
 
 msgid "Click any element to send it to an agent."
 msgstr "要素をクリックすると、エージェントに送られます。"
+
+msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
+msgstr "claude.aiで「Authorize」をクリックしてください。Anthropicがコードを表示します。ここに貼り付けてください。"
 
 msgid "Click here if not redirected"
 msgstr "リダイレクトされない場合はこちらをクリック"
@@ -8061,6 +8076,9 @@ msgstr "{minHours} から {maxHours} GB 時間までの整数を入力してく�
 msgid "Enter new value"
 msgstr "新しい値を入力"
 
+msgid "Enter this code on the page we opened:"
+msgstr "開いたページでこのコードを入力してください："
+
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "OpenAI に求められたら、このコードを入力してください:"
 
@@ -9116,6 +9134,9 @@ msgstr "完了 · 7秒稼働"
 
 msgid "Finishing the move…"
 msgstr "移動を完了しています…"
+
+msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
+msgstr "初めてですか？<0>ChatGPTの設定</0>でデバイスコードによるサインインを有効にしてください。"
 
 msgid "Fit"
 msgstr "全体表示"
@@ -14055,8 +14076,17 @@ msgstr "ChatGPT の管理者設定を開く"
 msgid "Open ChatGPT settings"
 msgstr "ChatGPT の設定を開く"
 
+msgid "Open ChatGPT to sign in"
+msgstr "ChatGPTを開いてサインイン"
+
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code、Codex、OpenCode、Pi のセッションをチャットとして開く"
+
+msgid "Open claude.ai again"
+msgstr "claude.aiをもう一度開く"
+
+msgid "Open claude.ai to sign in"
+msgstr "claude.aiを開いてサインイン"
 
 msgid "Open Command Palette"
 msgstr "コマンドパレットを開く"
@@ -14951,6 +14981,12 @@ msgstr "貼り付け"
 
 msgid "Paste a link"
 msgstr "リンクを貼り付け"
+
+msgid "Paste an API key instead"
+msgstr "代わりにAPIキーを貼り付ける"
+
+msgid "Paste the code"
+msgstr "コードを貼り付け"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "これをParadev CLIに貼り付けてください:"
@@ -16885,6 +16921,9 @@ msgstr "1件のホストサービスを再起動しました"
 msgid "Restarting"
 msgstr "再起動中"
 
+msgid "Restarting {label}…"
+msgstr "{label}を再起動しています…"
+
 msgid "Restarting {what}"
 msgstr "{what} を再起動中"
 
@@ -17423,6 +17462,9 @@ msgstr "{name} にチェックポイントを保存しますか？"
 
 msgid "Save All"
 msgstr "すべて保存"
+
+msgid "Save and continue"
+msgstr "保存して続行"
 
 msgid "Save as environment"
 msgstr "環境として保存"
@@ -18626,6 +18668,9 @@ msgstr "サインインは一度だけ。接続はParadevが保ちます。"
 msgid "Sign in to {0}"
 msgstr "{0}にサインイン"
 
+msgid "Sign in to {label}"
+msgstr "{label}にサインイン"
+
 msgid "Sign in to change your organization's plugins."
 msgstr "組織のプラグインを変更するにはサインインしてください。"
 
@@ -18721,6 +18766,9 @@ msgstr "ChatGPT にサインインしました"
 msgid "Signed in to ChatGPT as {connectedAs}"
 msgstr "{connectedAs} として ChatGPT にサインインしました"
 
+msgid "Signed in, but {label} did not restart."
+msgstr "サインインしましたが、{label}は再起動しませんでした。"
+
 msgid "Signed out"
 msgstr "サインアウトしました"
 
@@ -18729,6 +18777,9 @@ msgstr "サインイン中のサイト"
 
 msgid "Signing in..."
 msgstr "サインイン中..."
+
+msgid "Signing in…"
+msgstr "サインインしています…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "登録は正常に動いています。ウェルカム画面が表示され、コンソールにエラーはありません。"
@@ -21353,6 +21404,9 @@ msgstr "別の検索語や別の場所を試してください。"
 msgid "Try again"
 msgstr "再試行"
 
+msgid "Try again, or close this and press Continue in the chat."
+msgstr "もう一度お試しいただくか、これを閉じてチャットで「続行」を押してください。"
+
 msgid "Try again, or restart the host service from the Paradev tray menu."
 msgstr "もう一度試すか、Paradev のトレイメニューからホストサービスを再起動してください。"
 
@@ -21984,6 +22038,12 @@ msgstr "Paradev APIを呼び出すときに使用します。"
 msgid "Use voice transcription and push-to-talk features."
 msgstr "音声文字起こしとプッシュトゥトーク機能を使用します。"
 
+msgid "Use your ChatGPT plan."
+msgstr "ChatGPTのプランを使用します。"
+
+msgid "Use your Claude Pro or Max plan."
+msgstr "Claude ProまたはMaxのプランを使用します。"
+
 msgid "Used"
 msgstr "使用済み"
 
@@ -22235,6 +22295,9 @@ msgstr "アクティビティデータを待機中"
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "承認を待っています。このダイアログは開いたままにしてください。"
 
+msgid "Waiting for approval…"
+msgstr "承認を待っています…"
+
 msgid "Waiting for Checks"
 msgstr "チェックを待機中"
 
@@ -22291,6 +22354,9 @@ msgstr "案内と情報の開示"
 
 msgid "We build in public, so you can see how we work before you talk to us."
 msgstr "私たちはオープンに開発しています。話す前に、私たちの働き方を見てください。"
+
+msgid "We check it with the provider before we save it."
+msgstr "保存する前にプロバイダーで確認します。"
 
 msgid "We couldn't charge {amountDue}. Update your payment method to keep this plan."
 msgstr "{amountDue}を請求できませんでした。このプランを維持するには支払い方法を更新してください。"
@@ -23131,6 +23197,9 @@ msgstr "編集中の内容"
 
 msgid "Your changes will be lost if you don't save them."
 msgstr "保存しないと変更は失われます。"
+
+msgid "Your chat history stays. Only the agent restarts."
+msgstr "チャット履歴は残ります。再起動するのはエージェントだけです。"
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "クラウドワークスペースからこのホストにアクセスできなくなります。"
