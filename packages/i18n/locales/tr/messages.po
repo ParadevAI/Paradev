@@ -4307,6 +4307,9 @@ msgstr "Sohbet arayüzü"
 msgid "Chat is being reworked"
 msgstr "Sohbet yeniden düzenleniyor"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Sohbet kapalı, ayarları yüklenemedi ya da bu ajan sohbet olarak açılamıyor. Ayarlar > Davranış bölümündeki Sohbet seçeneğini ve bağlantınızı kontrol edip yeniden deneyin."
+
 msgid "Chat Launch"
 msgstr "Sohbet başlatma"
 
@@ -6278,6 +6281,9 @@ msgstr "Alt ajan arka plana taşınamadı"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
+
+msgid "Couldn't open chat"
+msgstr "Sohbet açılamadı"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Sohbet arayüzünde açılamadı"

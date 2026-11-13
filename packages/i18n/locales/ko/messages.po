@@ -4307,6 +4307,9 @@ msgstr "채팅 인터페이스"
 msgid "Chat is being reworked"
 msgstr "채팅을 개편하는 중입니다"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "채팅이 꺼져 있거나, 설정을 불러오지 못했거나, 이 에이전트는 채팅으로 열 수 없습니다. 설정 > 동작 방식에서 채팅과 연결 상태를 확인한 후 다시 시도하세요."
+
 msgid "Chat Launch"
 msgstr "채팅 실행"
 
@@ -6278,6 +6281,9 @@ msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
+
+msgid "Couldn't open chat"
+msgstr "채팅을 열 수 없습니다"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "채팅 인터페이스에서 열 수 없습니다"

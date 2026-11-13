@@ -4307,6 +4307,9 @@ msgstr "Antarmuka chat"
 msgid "Chat is being reworked"
 msgstr "Chat sedang dirombak"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "Chat nonaktif, pengaturannya gagal dimuat, atau agen ini tidak dapat dibuka sebagai chat. Periksa Chat di Pengaturan > Perilaku dan koneksi Anda, lalu coba lagi."
+
 msgid "Chat Launch"
 msgstr "Peluncuran Chat"
 
@@ -6278,6 +6281,9 @@ msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
+
+msgid "Couldn't open chat"
+msgstr "Tidak dapat membuka chat"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Tidak dapat membuka di antarmuka chat"

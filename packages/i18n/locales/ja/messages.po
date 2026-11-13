@@ -4307,6 +4307,9 @@ msgstr "チャット画面"
 msgid "Chat is being reworked"
 msgstr "チャットは再構築中です"
 
+msgid "Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again."
+msgstr "チャットがオフになっているか、設定を読み込めなかったか、このエージェントはチャットとして開けません。設定 > 全般のチャットと接続を確認してから、もう一度お試しください。"
+
 msgid "Chat Launch"
 msgstr "チャット起動"
 
@@ -6278,6 +6281,9 @@ msgstr "サブエージェントをバックグラウンドに移動できませ
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
+
+msgid "Couldn't open chat"
+msgstr "チャットを開けませんでした"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "チャット画面で開けませんでした"
