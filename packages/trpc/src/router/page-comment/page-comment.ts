@@ -23,7 +23,7 @@ import {
 	loadPageShareRole,
 	pageReadableBy,
 } from "../page/access";
-import { publicPageOutside } from "../page/read-loader";
+import { readsAsNonMember } from "../page/read-loader";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	agentSessionFor,
@@ -129,9 +129,9 @@ export const pageCommentRouter = {
 	list: personProcedure
 		.input(listPageCommentsSchema)
 		.query(async ({ ctx, input }) => {
+			if (await readsAsNonMember(ctx, input.pageId)) return [];
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
-			if (await publicPageOutside(input.pageId, organizationId)) return [];
 			await loadReadablePage({ pageId: input.pageId, organizationId, userId });
 
 			const activatedOnly = ctx.agentCaller
