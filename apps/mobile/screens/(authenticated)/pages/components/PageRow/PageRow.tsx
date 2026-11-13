@@ -3,10 +3,13 @@ import { getInitials } from "@superset/shared/names";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Building2, FileText, Globe, Lock } from "lucide-react-native";
+import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { usePageActions } from "../../hooks/usePageActions";
 import type { OrgPage } from "../../hooks/usePages";
+import { PageRowMenu } from "./components/PageRowMenu";
 
 const EDIT_THRESHOLD_MS = 60_000;
 
@@ -18,6 +21,7 @@ export function PageRow({
 	variant?: "row" | "card";
 }) {
 	const router = useRouter();
+	const actions = usePageActions(page);
 
 	const edited = new Date(page.updatedAt).getTime();
 	const created = new Date(page.createdAt).getTime();
@@ -77,8 +81,11 @@ export function PageRow({
 		</View>
 	);
 
+	const menu = (row: ReactNode) =>
+		actions ? <PageRowMenu actions={actions}>{row}</PageRowMenu> : row;
+
 	if (variant === "card") {
-		return (
+		return menu(
 			<Pressable
 				className="active:opacity-60"
 				accessibilityRole="button"
@@ -89,11 +96,11 @@ export function PageRow({
 					{thumbnail}
 				</View>
 				{details}
-			</Pressable>
+			</Pressable>,
 		);
 	}
 
-	return (
+	return menu(
 		<Pressable
 			className="bg-background flex-row items-center gap-3 rounded-xl px-3 py-2 active:opacity-60"
 			accessibilityRole="button"
@@ -104,6 +111,6 @@ export function PageRow({
 				{thumbnail}
 			</View>
 			{details}
-		</Pressable>
+		</Pressable>,
 	);
 }

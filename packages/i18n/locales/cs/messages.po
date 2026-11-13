@@ -6956,6 +6956,9 @@ msgstr "Smazat „{hostName}“?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Smazat „{projectName}“?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Smazat „{title}“?"
+
 msgid "Delete “{title}”?"
 msgstr "Smazat „{title}“?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Stránka"
 
+msgid "Page actions"
+msgstr "Akce stránky"
+
 msgid "Page by you"
 msgstr "Stránka od vás"
 
@@ -18215,9 +18221,6 @@ msgstr "Sdílet stránku (veřejná)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Sdílejte pluginy z repozitáře GitHub. Zafixujte vydání pomocí git tagů."
 
-msgid "Share this page"
-msgstr "Sdílet tuto stránku"
-
 msgid "Share via…"
 msgstr "Sdílet přes…"
 
@@ -20242,6 +20245,9 @@ msgstr "Noční směna"
 
 msgid "The owner's account no longer exists."
 msgstr "Účet vlastníka už neexistuje."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Stránka a všechny její verze budou smazány."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Stránka i její obsah se odstraní. Kdokoli s odkazem ztratí přístup."

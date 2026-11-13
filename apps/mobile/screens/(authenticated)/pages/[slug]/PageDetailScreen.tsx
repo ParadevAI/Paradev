@@ -27,6 +27,7 @@ import { errorCopy, isTransportError } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
+import { usePageActions } from "../hooks/usePageActions";
 import { usePageQuery } from "../hooks/usePages";
 import { CommentPin } from "./components/CommentPin";
 import { PageFrame, type PageFrameHandle } from "./components/PageFrame";
@@ -94,6 +95,7 @@ export function PageDetailScreen({
 
 	const page = usePageQuery(slug);
 	const pageId = page.data?.id;
+	const actions = usePageActions(page.data, { onDeleted: router.back });
 	const version = page.data?.version;
 	const viewUrl = page.data?.viewUrl;
 	const loaded = viewUrl !== undefined && loadedSrc === viewUrl;
@@ -301,17 +303,39 @@ export function PageDetailScreen({
 						});
 					}}
 				/>
-				<Stack.Toolbar.Button
-					icon="square.and.arrow.up"
-					accessibilityLabel={t({ message: "Share this page" })}
-					onPress={() => {
-						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-						router.push({
-							pathname: "/(authenticated)/pages/[slug]/share",
-							params: { slug },
-						});
-					}}
-				/>
+				{actions ? (
+					<Stack.Toolbar.Menu
+						icon="ellipsis"
+						accessibilityLabel={t({ message: "Page actions" })}
+					>
+						<Stack.Toolbar.MenuAction
+							icon="square.and.arrow.up"
+							onPress={actions.share}
+						>
+							{t({ message: "Share" })}
+						</Stack.Toolbar.MenuAction>
+						<Stack.Toolbar.MenuAction
+							icon="plus.square.on.square"
+							onPress={actions.duplicate}
+						>
+							{t({ message: "Duplicate" })}
+						</Stack.Toolbar.MenuAction>
+						{actions.rename ? (
+							<Stack.Toolbar.MenuAction icon="pencil" onPress={actions.rename}>
+								{t({ message: "Rename" })}
+							</Stack.Toolbar.MenuAction>
+						) : null}
+						{actions.remove ? (
+							<Stack.Toolbar.MenuAction
+								icon="trash"
+								destructive
+								onPress={actions.remove}
+							>
+								{t({ message: "Delete" })}
+							</Stack.Toolbar.MenuAction>
+						) : null}
+					</Stack.Toolbar.Menu>
+				) : null}
 			</Stack.Toolbar>
 
 			{pageError || offline ? (

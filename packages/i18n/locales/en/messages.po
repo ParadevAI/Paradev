@@ -6956,6 +6956,9 @@ msgstr "Delete \"{hostName}\"?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Delete \"{projectName}\"?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Delete \"{title}\"?"
+
 msgid "Delete “{title}”?"
 msgstr "Delete “{title}”?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Page"
 
+msgid "Page actions"
+msgstr "Page actions"
+
 msgid "Page by you"
 msgstr "Page by you"
 
@@ -18215,9 +18221,6 @@ msgstr "Share page (public)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Share plugins from a GitHub repo. Pin releases with git tags."
 
-msgid "Share this page"
-msgstr "Share this page"
-
 msgid "Share via…"
 msgstr "Share via…"
 
@@ -20242,6 +20245,9 @@ msgstr "The overnight shift"
 
 msgid "The owner's account no longer exists."
 msgstr "The owner's account no longer exists."
+
+msgid "The page and every version of it will be deleted."
+msgstr "The page and every version of it will be deleted."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "The page and its content are removed. Anyone with the link loses access."
