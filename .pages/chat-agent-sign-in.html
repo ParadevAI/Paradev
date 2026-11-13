@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chat sign-in for Claude and Codex — OAuth + paste</title>
+<style>
+  :root {
+    --sp-measure: 70ch;
+    --bg: #0b0b0b; --panel: #161616; --panel-2: #1c1c1c; --line: #2a2a2a; --line-2: #333;
+    --fg: #ededed; --mute: #9a9a9a; --dim: #6b6b6b; --ok: #34d399; --err: #f87171; --warn: #fbbf24;
+  }
+  body { background: var(--bg); color: var(--fg); }
+  main { max-width: 1180px; margin: 0 auto; padding: 48px 28px 120px; }
+  h1 { font-size: 2rem; margin: .3rem 0 .4rem; letter-spacing: -.01em; }
+  .lede { color: var(--mute); max-width: var(--sp-measure); }
+  h2 { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .letter { font: 600 13px/1 var(--sp-font-mono); color: var(--bg); background: var(--fg); padding: 5px 8px; border-radius: 5px; }
+  .sub { color: var(--mute); max-width: var(--sp-measure); margin-top: -.3rem; }
+  .eyebrow { font: 600 11px/1 var(--sp-font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+  .rec { color: var(--ok); }
+
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; margin-top: 20px; }
+  .shot { display: flex; flex-direction: column; gap: 10px; }
+  .shot > .cap { font-size: 12px; color: var(--mute); max-width: 420px; }
+  .shot > .cap b { color: var(--fg); font-weight: 600; }
+
+  /* Backdrop + dialog, shadcn-like */
+  .stage { background: repeating-linear-gradient(135deg, #111 0 10px, #0e0e0e 10px 20px); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+  .dlg { width: 440px; max-width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.6); font-size: 13.5px; position: relative; }
+  .dlg.wide { width: 520px; }
+  .dlg .x { position: absolute; top: 14px; right: 14px; color: var(--dim); font-size: 16px; line-height: 1; }
+  .dh { padding: 20px 22px 0; }
+  .dh .ti { font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  .dh .de { color: var(--mute); margin-top: 6px; line-height: 1.45; }
+  .db { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .df { padding: 0 22px 20px; display: flex; justify-content: flex-end; gap: 8px; align-items: center; }
+  .df .left { margin-right: auto; color: var(--mute); font-size: 12.5px; }
+
+  .logo { width: 28px; height: 28px; border-radius: 7px; display: inline-grid; place-items: center; font: 700 14px/1 var(--sp-font-sans); flex: none; }
+  .logo.claude { background: #d97757; color: #1a0f0a; }
+  .logo.codex { background: #ededed; color: #0b0b0b; }
+  .logo.big { width: 44px; height: 44px; border-radius: 11px; font-size: 20px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line-2); background: transparent; color: var(--fg); font-weight: 500; font-size: 13px; white-space: nowrap; }
+  .btn.pri { background: var(--fg); color: #0b0b0b; border-color: var(--fg); }
+  .btn.ghost { border-color: transparent; color: var(--mute); }
+  .btn.full { width: 100%; height: 40px; }
+  .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+  .link { color: var(--mute); text-decoration: underline; text-underline-offset: 3px; }
+
+  .opt { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; background: var(--panel-2); }
+  .opt.sel { border-color: #5a5a5a; box-shadow: inset 0 0 0 1px #5a5a5a; }
+  .opt .tx { flex: 1; min-width: 0; }
+  .opt .tx b { display: block; font-weight: 500; }
+  .opt .tx span { color: var(--mute); font-size: 12.5px; }
+  .opt .chev { color: var(--dim); }
+  .opt .radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #555; flex: none; }
+  .opt.sel .radio { border: 5px solid var(--fg); }
+  .pill { font: 600 10px/1 var(--sp-font-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--ok); border: 1px solid rgba(52,211,153,.35); padding: 3px 5px; border-radius: 4px; margin-left: 6px; vertical-align: 1px; }
+
+  .input { height: 34px; border: 1px solid var(--line-2); border-radius: 8px; background: #0f0f0f; padding: 0 10px; display: flex; align-items: center; color: var(--dim); font: 12.5px var(--sp-font-mono); flex: 1; }
+  .input.filled { color: var(--fg); letter-spacing: 2px; }
+  .field { display: flex; gap: 8px; }
+  .lbl { font-size: 12.5px; color: var(--mute); }
+  code.k { font: 12px var(--sp-font-mono); background: #232323; border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; color: var(--fg); }
+
+  .tabs { display: flex; gap: 2px; background: #0f0f0f; border: 1px solid var(--line); border-radius: 9px; padding: 3px; }
+  .tabs span { flex: 1; text-align: center; padding: 6px 0; border-radius: 6px; color: var(--mute); font-size: 12.5px; }
+  .tabs span.on { background: var(--panel-2); color: var(--fg); box-shadow: 0 0 0 1px var(--line-2); }
+
+  .center { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0 4px; }
+  .center .big { font-size: 15px; font-weight: 600; }
+  .center p { color: var(--mute); margin: 0; max-width: 34ch; line-height: 1.45; }
+  .spin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #333; border-top-color: var(--fg); }
+  .check { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(52,211,153,.12); color: var(--ok); font-size: 20px; }
+  .code { font: 600 22px/1 var(--sp-font-mono); letter-spacing: .25em; padding: 12px 16px; border: 1px dashed var(--line-2); border-radius: 10px; background: #0f0f0f; }
+  .err { color: var(--err); font-size: 12.5px; }
+  .note { font-size: 12px; color: var(--dim); line-height: 1.45; }
+  .hr { height: 1px; background: var(--line); margin: 2px 0; }
+  .or { display: flex; align-items: center; gap: 10px; color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .steps { display: flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--dim); }
+  .steps i { width: 18px; height: 3px; border-radius: 2px; background: #333; display: inline-block; }
+  .steps i.on { background: var(--fg); }
+
+  /* Chat card */
+  .card { width: 520px; max-width: 100%; border: 1px solid rgba(248,113,113,.25); background: rgba(248,113,113,.04); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; display: flex; gap: 10px; }
+  .card .ic { color: var(--err); }
+  .card .t { color: var(--err); font-weight: 600; font-size: 13.5px; }
+  .card .m { color: #bdbdbd; font: 12px var(--sp-font-mono); margin-top: 4px; }
+  .card .bs { display: flex; gap: 6px; margin-top: 8px; }
+  .card .bs .btn { height: 26px; font-size: 12px; padding: 0 9px; }
+  .card .bs .btn.p { border-color: rgba(248,113,113,.45); color: var(--err); }
+
+  table { min-width: 720px; }
+  .wrap { overflow-x: auto; }
+  th, td { vertical-align: top; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--mute); }
+  .q { border-left: 3px solid var(--fg); padding: 8px 14px; margin: 12px 0; background: var(--panel); border-radius: 0 8px 8px 0; }
+  .q b { display: block; }
+  .q span { color: var(--mute); font-size: .93em; }
+</style>
+</head>
+<body class="dark">
+<main>
+  <div class="eyebrow">Proposal · v3 · OAuth run by Paradev, then paste</div>
+  <h1>Signing Claude and Codex in from the chat</h1>
+  <p class="lede">For cloud workspaces, Paradev runs the provider's OAuth itself. You approve in the browser and paste back what the provider shows you: a code for Claude, or a key if you prefer. Nothing depends on a CLI on your computer, so it also works from the web app.</p>
+
+  <h2>The chat card</h2>
+  <div class="row">
+    <div class="card">
+      <span class="ic">⊘</span>
+      <div>
+        <div class="t">Sign in to continue</div>
+        <div class="m">Invalid API key · Please run /login</div>
+        <div class="bs"><span class="btn p">Sign in to Claude</span><span class="btn">Continue</span><span class="btn ghost">Copy error</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:10px">“Sign in to Claude” opens the modal below. When sign-in succeeds the modal closes, the agent restarts and the turn continues.</p>
+
+  <!-- ============ CLAUDE ============ -->
+  <h2><span class="letter">1</span> Claude</h2>
+  <p class="sub">The same OAuth flow <code class="k">claude setup-token</code> runs (PKCE, code shown on Anthropic's page), but the API starts it and does the code exchange. The result is a long-lived token held by Paradev, the same kind of credential Settings already saves today.</p>
+
+  <div class="row">
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh">
+            <div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div>
+            <div class="de">Use your Claude Pro or Max plan in cloud workspaces.</div>
+          </div>
+          <div class="db">
+            <span class="btn pri full">Open claude.ai to sign in ↗</span>
+          </div>
+          <div class="df"><span class="left"><span class="link">Paste an API key instead</span></span><span class="btn ghost">Cancel</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>1 · Start.</b> The API makes a PKCE verifier and state, keeps them for 10 minutes, and returns the claude.ai authorize URL. We open it in the browser.</div>
+    </div>
+
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh">
+            <div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div>
+            <div class="de">Click <b>Authorize</b> on claude.ai. Anthropic then shows a code. Paste it here.</div>
+          </div>
+          <div class="db">
+            <div class="field"><span class="input">Paste the code</span></div>
+            <div class="note"><span class="link">Open claude.ai again</span></div>
+          </div>
+          <div class="df"><span class="left"><span class="link">← Back</span></span><span class="btn pri">Sign in</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>2 · Paste the code.</b> The modal stays open while you are in the browser.</div>
+    </div>
+
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div></div>
+          <div class="db">
+            <div class="center">
+              <div class="spin"></div>
+              <div class="big">Signing in…</div>
+              <p>Checking the code with Anthropic.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><b>3 · Exchange.</b> The API trades code + verifier for the token, checks it, encrypts it and saves it. It then applies it to your running boxes.</div>
+    </div>
+
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div></div>
+          <div class="db">
+            <div class="center">
+              <div class="check">✓</div>
+              <div class="big">Signed in</div>
+              <p>Claude Max · your account email<br/>Continuing your chat…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><b>4 · Done.</b> Closes itself, the chat continues.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh">
+            <div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div>
+            <div class="de">Click <b>Authorize</b> on claude.ai. Anthropic then shows a code. Paste it here.</div>
+          </div>
+          <div class="db">
+            <div class="field"><span class="input filled">••••••••••••••</span></div>
+            <div class="err">That code expired or was already used. Open claude.ai again for a new one.</div>
+          </div>
+          <div class="df"><span class="left"><span class="link">← Back</span></span><span class="btn pri">Sign in</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>Error.</b> A wrong, old or reused code. The person stays on the same step.</div>
+    </div>
+
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh">
+            <div class="ti"><span class="logo claude">✳</span>Paste a key</div>
+            <div class="de">An Anthropic API key, or a token from <code class="k">claude setup-token</code>.</div>
+          </div>
+          <div class="db">
+            <div class="field"><span class="input">sk-ant-…</span></div>
+            <div class="note">We see which one it is from its prefix and check it with Anthropic before we save it. <span class="link">Get an API key</span></div>
+          </div>
+          <div class="df"><span class="left"><span class="link">← Back</span></span><span class="btn pri">Save and continue</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>Paste a key.</b> For pay-per-use, or a token someone already has.</div>
+    </div>
+  </div>
+
+  <!-- ============ CODEX ============ -->
+  <h2><span class="letter">2</span> Codex</h2>
+  <p class="sub">The API already runs ChatGPT's OAuth (device code) for Settings. The modal reuses it. You can paste an OpenAI API key instead.</p>
+  <div class="row">
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh">
+            <div class="ti"><span class="logo codex">◎</span>Sign in to Codex</div>
+            <div class="de">Use your ChatGPT plan in cloud workspaces.</div>
+          </div>
+          <div class="db">
+            <div class="tabs"><span class="on">Personal</span><span>Business</span></div>
+            <span class="btn pri full">Open ChatGPT to sign in ↗</span>
+          </div>
+          <div class="df"><span class="left"><span class="link">Paste an API key instead</span></span><span class="btn ghost">Cancel</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>1 · Start.</b></div>
+    </div>
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh"><div class="ti"><span class="logo codex">◎</span>Sign in to Codex</div></div>
+          <div class="db">
+            <div class="center">
+              <p>Enter this code on the page we opened:</p>
+              <div class="code">K7QM-4XPD</div>
+              <span class="btn sm">Copy code</span>
+              <div class="steps" style="margin-top:6px"><div class="spin" style="width:14px;height:14px"></div>&nbsp;Waiting for approval…</div>
+            </div>
+          </div>
+          <div class="df"><span class="btn ghost">Cancel</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>2 · Device code.</b> Here the direction is reversed: you type our code on OpenAI's page, and the API polls until you approve. Then the same “Signed in” state.</div>
+    </div>
+    <div class="shot">
+      <div class="stage">
+        <div class="dlg">
+          <span class="x">×</span>
+          <div class="dh">
+            <div class="ti"><span class="logo codex">◎</span>Paste a key</div>
+            <div class="de">An OpenAI API key.</div>
+          </div>
+          <div class="db">
+            <div class="field"><span class="input">sk-proj-…</span></div>
+            <div class="note">Checked with OpenAI before we save it. <span class="link">Get an API key</span></div>
+          </div>
+          <div class="df"><span class="left"><span class="link">← Back</span></span><span class="btn pri">Save and continue</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>Paste a key.</b></div>
+    </div>
+  </div>
+
+  <!-- ============ SEQUENCE ============ -->
+  <h2>What happens behind the Claude modal</h2>
+  <div class="wrap">
+  <table>
+    <thead><tr><th>#</th><th>Who</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Modal → API</td><td><code class="k">agentCredential.claudeOauthStart</code>: makes <code class="k">code_verifier</code> + <code class="k">state</code>, stores them for 10 min against the person, returns the authorize URL.</td></tr>
+      <tr><td>2</td><td>Person ↔ claude.ai</td><td>Signs in, clicks Authorize. Anthropic's callback page shows the code.</td></tr>
+      <tr><td>3</td><td>Modal → API</td><td><code class="k">agentCredential.claudeOauthFinish({ code })</code>: checks <code class="k">state</code>, exchanges code + verifier for the token, deletes the verifier.</td></tr>
+      <tr><td>4</td><td>API</td><td>Checks the token, saves it encrypted as kind <code class="k">subscription</code>, the same row Settings writes today. The token never goes back to the client.</td></tr>
+      <tr><td>5</td><td>API → boxes</td><td>Applies the firewall rules to the person's running boxes now, not at the next keepalive.</td></tr>
+      <tr><td>6</td><td>Modal → chat</td><td>Restarts the agent and continues the turn.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">The new procedures are additive, so released clients are not affected. Settings › Agents gets the same “Open claude.ai” button instead of “run <code class="k">claude setup-token</code> in a terminal”.</p>
+
+  <h2>What does not change</h2>
+  <ul>
+    <li><b>Manual mode</b>, for people who rotate several accounts: the card stays “The agent is signed out” with Continue and Agent settings. The modal never replaces a Manual setting.</li>
+    <li><b>Someone else's box:</b> no modal. The card says the workspace creator has to sign in.</li>
+    <li><b>Local workspaces:</b> the agent uses your own login there, so the card keeps the login command and adds “Run in terminal”.</li>
+  </ul>
+
+  <h2>Risks to clear before building</h2>
+  <div class="q"><b>Anthropic's terms for running Claude's OAuth from our server.</b><span>The flow uses Claude Code's public OAuth client. The token is only ever used by Claude Code running in the box, and we already do the same for Codex with OpenAI's client. Still, Anthropic restricts third-party use of subscription sign-ins. Someone should confirm this is allowed for us before it ships. If it is not, the fallback is the paste-a-key screen only.</span></div>
+  <div class="q"><b>Endpoints and scopes are not documented.</b><span>The authorize/token URLs, the scope for a long-lived token, and the code format (<code class="k">code#state</code>) come from what the Claude Code CLI does. I'll check them against the current CLI and keep them in one module, as <code class="k">chatgpt.ts</code> does, so a change breaks one place.</span></div>
+  <div class="q"><b>Applying a new credential to running boxes at once.</b><span>Today a saved credential seems to reach a box at its next wake or keepalive. To verify, and add if missing.</span></div>
+
+  <h2>Decide</h2>
+  <div class="q"><b>Go with this flow: Paradev-run OAuth with a pasted code for Claude, device code for Codex, and “Paste a key” as the fallback for both?</b><span>If yes, I'll write it up as a plan, then build.</span></div>
+  <div class="q"><b>Should Settings › Agents switch to the same flow?</b><span>My pick: yes, so there is one way to sign in.</span></div>
+</main>
+</body>
+</html>

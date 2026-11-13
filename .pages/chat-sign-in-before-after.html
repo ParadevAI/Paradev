@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chat sign-in — before and after</title>
+<style>
+  :root {
+    --sp-measure: 70ch;
+    --bg: #0b0b0b; --panel: #161616; --panel-2: #1c1c1c; --line: #2a2a2a; --line-2: #333;
+    --fg: #ededed; --mute: #9a9a9a; --dim: #6b6b6b; --ok: #34d399; --err: #f87171; --warn: #fbbf24;
+  }
+  body { background: var(--bg); color: var(--fg); }
+  main { max-width: 1180px; margin: 0 auto; padding: 48px 28px 120px; }
+  h1 { font-size: 2rem; margin: .3rem 0 .4rem; letter-spacing: -.01em; }
+  .lede { color: var(--mute); max-width: var(--sp-measure); }
+  h2 { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .letter { font: 600 13px/1 var(--sp-font-mono); color: var(--bg); background: var(--fg); padding: 5px 8px; border-radius: 5px; }
+  .sub { color: var(--mute); max-width: var(--sp-measure); margin-top: -.3rem; }
+  .eyebrow { font: 600 11px/1 var(--sp-font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+  .rec { color: var(--ok); }
+
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; margin-top: 20px; }
+  .shot { display: flex; flex-direction: column; gap: 10px; }
+  .shot > .cap { font-size: 12px; color: var(--mute); max-width: 420px; }
+  .shot > .cap b { color: var(--fg); font-weight: 600; }
+
+  /* Backdrop + dialog, shadcn-like */
+  .stage { background: repeating-linear-gradient(135deg, #111 0 10px, #0e0e0e 10px 20px); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+  .dlg { width: 440px; max-width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.6); font-size: 13.5px; position: relative; }
+  .dlg.wide { width: 520px; }
+  .dlg .x { position: absolute; top: 14px; right: 14px; color: var(--dim); font-size: 16px; line-height: 1; }
+  .dh { padding: 20px 22px 0; }
+  .dh .ti { font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  .dh .de { color: var(--mute); margin-top: 6px; line-height: 1.45; }
+  .db { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .df { padding: 0 22px 20px; display: flex; justify-content: flex-end; gap: 8px; align-items: center; }
+  .df .left { margin-right: auto; color: var(--mute); font-size: 12.5px; }
+
+  .logo { width: 28px; height: 28px; border-radius: 7px; display: inline-grid; place-items: center; font: 700 14px/1 var(--sp-font-sans); flex: none; }
+  .logo.claude { background: #d97757; color: #1a0f0a; }
+  .logo.codex { background: #ededed; color: #0b0b0b; }
+  .logo.big { width: 44px; height: 44px; border-radius: 11px; font-size: 20px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line-2); background: transparent; color: var(--fg); font-weight: 500; font-size: 13px; white-space: nowrap; }
+  .btn.pri { background: var(--fg); color: #0b0b0b; border-color: var(--fg); }
+  .btn.ghost { border-color: transparent; color: var(--mute); }
+  .btn.full { width: 100%; height: 40px; }
+  .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+  .link { color: var(--mute); text-decoration: underline; text-underline-offset: 3px; }
+
+  .opt { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; background: var(--panel-2); }
+  .opt.sel { border-color: #5a5a5a; box-shadow: inset 0 0 0 1px #5a5a5a; }
+  .opt .tx { flex: 1; min-width: 0; }
+  .opt .tx b { display: block; font-weight: 500; }
+  .opt .tx span { color: var(--mute); font-size: 12.5px; }
+  .opt .chev { color: var(--dim); }
+  .opt .radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #555; flex: none; }
+  .opt.sel .radio { border: 5px solid var(--fg); }
+  .pill { font: 600 10px/1 var(--sp-font-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--ok); border: 1px solid rgba(52,211,153,.35); padding: 3px 5px; border-radius: 4px; margin-left: 6px; vertical-align: 1px; }
+
+  .input { height: 34px; border: 1px solid var(--line-2); border-radius: 8px; background: #0f0f0f; padding: 0 10px; display: flex; align-items: center; color: var(--dim); font: 12.5px var(--sp-font-mono); flex: 1; }
+  .input.filled { color: var(--fg); letter-spacing: 2px; }
+  .field { display: flex; gap: 8px; }
+  .lbl { font-size: 12.5px; color: var(--mute); }
+  code.k { font: 12px var(--sp-font-mono); background: #232323; border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; color: var(--fg); }
+
+  .tabs { display: flex; gap: 2px; background: #0f0f0f; border: 1px solid var(--line); border-radius: 9px; padding: 3px; }
+  .tabs span { flex: 1; text-align: center; padding: 6px 0; border-radius: 6px; color: var(--mute); font-size: 12.5px; }
+  .tabs span.on { background: var(--panel-2); color: var(--fg); box-shadow: 0 0 0 1px var(--line-2); }
+
+  .center { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0 4px; }
+  .center .big { font-size: 15px; font-weight: 600; }
+  .center p { color: var(--mute); margin: 0; max-width: 34ch; line-height: 1.45; }
+  .spin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #333; border-top-color: var(--fg); }
+  .check { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(52,211,153,.12); color: var(--ok); font-size: 20px; }
+  .code { font: 600 22px/1 var(--sp-font-mono); letter-spacing: .25em; padding: 12px 16px; border: 1px dashed var(--line-2); border-radius: 10px; background: #0f0f0f; }
+  .err { color: var(--err); font-size: 12.5px; }
+  .note { font-size: 12px; color: var(--dim); line-height: 1.45; }
+  .hr { height: 1px; background: var(--line); margin: 2px 0; }
+  .or { display: flex; align-items: center; gap: 10px; color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .steps { display: flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--dim); }
+  .steps i { width: 18px; height: 3px; border-radius: 2px; background: #333; display: inline-block; }
+  .steps i.on { background: var(--fg); }
+
+  /* Chat card */
+  .card { width: 520px; max-width: 100%; border: 1px solid rgba(248,113,113,.25); background: rgba(248,113,113,.04); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; display: flex; gap: 10px; }
+  .card .ic { color: var(--err); }
+  .card .t { color: var(--err); font-weight: 600; font-size: 13.5px; }
+  .card .m { color: #bdbdbd; font: 12px var(--sp-font-mono); margin-top: 4px; }
+  .card .bs { display: flex; gap: 6px; margin-top: 8px; }
+  .card .bs .btn { height: 26px; font-size: 12px; padding: 0 9px; }
+  .card .bs .btn.p { border-color: rgba(248,113,113,.45); color: var(--err); }
+
+  table { min-width: 720px; }
+  .wrap { overflow-x: auto; }
+  th, td { vertical-align: top; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--mute); }
+  .q { border-left: 3px solid var(--fg); padding: 8px 14px; margin: 12px 0; background: var(--panel); border-radius: 0 8px 8px 0; }
+  .q b { display: block; }
+  .q span { color: var(--mute); font-size: .93em; }
+</style>
+<style>
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 18px; }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+  .col h3 { margin: 0 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-family: var(--sp-font-mono); }
+  .col.before h3 { color: var(--err); }
+  .col.after h3 { color: var(--ok); }
+  .col .stage { padding: 20px; }
+  .col .dlg { width: 100%; }
+  .col .card { width: 100%; }
+  .lane { display: flex; flex-direction: column; gap: 14px; }
+  .lane .s { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; }
+  .lane .n { font: 600 12px/24px var(--sp-font-mono); width: 24px; height: 24px; text-align: center; border-radius: 50%; border: 1px solid var(--line-2); color: var(--mute); }
+  .col.before .n { border-color: rgba(248,113,113,.4); color: var(--err); }
+  .col.after .n { border-color: rgba(52,211,153,.4); color: var(--ok); }
+  .lane .s p { margin: 2px 0 8px; color: var(--mute); font-size: 13px; }
+  .lane .s p b { color: var(--fg); font-weight: 600; }
+  .pain { color: var(--err); font-size: 12px; }
+  .gain { color: var(--ok); font-size: 12px; }
+  .term { background: #0a0a0a; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: 12px/1.6 var(--sp-font-mono); color: #cfcfcf; }
+  .term .pr { color: var(--ok); }
+  .term .dim { color: var(--dim); }
+  .banner { display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(251,191,36,.4); background: rgba(251,191,36,.1); padding: 8px 12px; font-size: 13px; border-radius: 0 0 8px 8px; }
+  .banner .w { color: var(--warn); }
+  .banner .sp { flex: 1; }
+  .banner b { font-weight: 500; }
+  .pane { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #0e0e0e; }
+  .pane .body { height: 70px; padding: 10px 12px; color: var(--dim); font-size: 12px; }
+  .toastm { display: inline-flex; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+  .toastm .ok { color: var(--ok); }
+  .big-n { font: 700 34px/1 var(--sp-font-sans); letter-spacing: -.02em; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 16px; }
+  .stat { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--panel); }
+  .stat .l { color: var(--mute); font-size: 12px; margin-top: 6px; }
+  .stat .bf { color: var(--err); font-size: 12px; margin-top: 8px; font-family: var(--sp-font-mono); }
+  .stat .af { color: var(--ok); font-size: 12px; font-family: var(--sp-font-mono); }
+</style>
+</head>
+<body class="dark">
+<main>
+  <div class="eyebrow">Before / after · cloud workspace · Claude signed out mid-chat</div>
+  <h1>Chat sign-in: before and after</h1>
+  <p class="lede">What it takes today to get a signed-out Claude agent working again in a cloud workspace, and what it takes with the new modal. Codex follows the same path, with a ChatGPT device code in place of the pasted code.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="big-n">8 → 2</div><div class="l">actions from you: open claude.ai, paste the code</div></div>
+    <div class="stat"><div class="big-n">3 → 1</div><div class="l">places visited (chat, Settings, laptop terminal → chat only)</div></div>
+    <div class="stat"><div class="big-n">Box → agent</div><div class="l">what restarts. Before: the whole workspace. After: only this chat's Claude process</div></div>
+    <div class="stat"><div class="big-n">0</div><div class="l">CLIs needed on your computer. Before: <code class="k">claude</code></div></div>
+  </div>
+
+  <!-- ========== 1. The error ========== -->
+  <h2><span class="letter">1</span> The agent fails</h2>
+  <div class="cols">
+    <div class="col before">
+      <h3>Before</h3>
+      <div class="stage">
+        <div class="card">
+          <span class="ic">⊘</span>
+          <div>
+            <div class="t">Sign in to continue</div>
+            <div class="m">Invalid API key · Please run /login</div>
+            <div class="bs"><span class="btn p">Sign in</span><span class="btn">Continue</span><span class="btn ghost">Copy error</span></div>
+            <div style="margin-top:10px;color:var(--mute)">Run this in a terminal, then continue:</div>
+            <div class="term" style="margin-top:6px">claude auth login</div>
+          </div>
+        </div>
+      </div>
+      <p class="pain" style="margin-top:8px">✕ In a cloud box this does not help. The firewall's placeholder overrides any login made in the box, and the next boot loses it.</p>
+    </div>
+    <div class="col after">
+      <h3>After</h3>
+      <div class="stage">
+        <div class="card">
+          <span class="ic">⊘</span>
+          <div>
+            <div class="t">Sign in to continue</div>
+            <div class="m">Invalid API key · Please run /login</div>
+            <div class="bs"><span class="btn p">Sign in to Claude</span><span class="btn">Continue</span><span class="btn ghost">Copy error</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="gain" style="margin-top:8px">✓ The button opens a modal. No command to copy.</p>
+    </div>
+  </div>
+
+  <!-- ========== 2. Signing in ========== -->
+  <h2><span class="letter">2</span> Signing in and getting going again</h2>
+  <p class="sub">Before: three places and a full workspace restart. After: one modal from start to finish. The only thing outside it is the claude.ai tab where you click Authorize.</p>
+  <div class="cols">
+    <div class="col before">
+      <h3>Before · Settings, laptop terminal, workspace</h3>
+      <div class="lane">
+        <div class="s"><span class="n">1</span><div><p><b>Find Settings › Agents › Claude</b> on your own. The card does not link there.</p></div></div>
+        <div class="s"><span class="n">2</span><div><p><b>Open a terminal on your laptop</b> and run the command. It needs the <code class="k">claude</code> CLI installed there.</p>
+          <div class="term"><span class="pr">~ $</span> claude setup-token<br/><span class="dim">Opening browser… Authorize…</span><br/>sk-ant-oat01-•••••••••••••••••••••</div></div></div>
+        <div class="s"><span class="n">3</span><div><p><b>Copy the token</b> from the terminal output.</p></div></div>
+        <div class="s"><span class="n">4</span><div><p><b>Paste it in the Settings dialog</b> and Save.</p>
+          <div class="stage" style="padding:14px"><div class="dlg">
+            <div class="dh"><div class="ti">Claude</div><div class="de">How Claude authenticates in cloud workspaces.</div></div>
+            <div class="db"><div class="note">Run <code class="k">claude setup-token</code> in a terminal and paste the token you get back here.</div>
+              <div class="field"><span class="input filled">••••••••••••••••</span><span class="btn">Save</span></div></div>
+          </div></div></div></div>
+      
+        <div class="s"><span class="n">5</span><div><p><b>Go back to the workspace.</b> A banner appears at the bottom.</p>
+          <div class="pane"><div class="body">…workspace panes…</div>
+            <div class="banner"><span class="w">⚠</span><span class="sp">Agent credentials changed</span><b>Restart workspace</b></div></div></div></div>
+        <div class="s"><span class="n">6</span><div><p><b>Restart the workspace.</b> The box is stopped, snapshotted and booted again.</p>
+          <p class="pain">✕ Every process on the box ends: dev servers, terminals, other agents, every chat. It takes as long as a cold boot.</p></div></div>
+        <div class="s"><span class="n">7</span><div><p><b>Wait for the box</b> to come back and reconnect.</p></div></div>
+        <div class="s"><span class="n">8</span><div><p><b>Find the chat, press Continue.</b></p></div></div>
+      </div>
+    </div>
+    <div class="col after">
+      <h3>After · all in one modal</h3>
+      <div class="lane">
+        <div class="s"><span class="n">a</span><div><p><b>You:</b> open claude.ai. Paradev starts the sign-in and opens the browser.</p>
+          <div class="stage" style="padding:14px"><div class="dlg">
+            <span class="x">×</span>
+            <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div><div class="de">Use your Claude Pro or Max plan in cloud workspaces.</div></div>
+            <div class="db"><span class="btn pri full">Open claude.ai to sign in ↗</span></div>
+            <div class="df"><span class="left"><span class="link">Paste an API key instead</span></span><span class="btn ghost">Cancel</span></div>
+          </div></div></div></div>
+        <div class="s"><span class="n">b</span><div><p><b>You:</b> click Authorize in the browser tab, come back, paste the code.</p>
+          <div class="stage" style="padding:14px"><div class="dlg">
+            <span class="x">×</span>
+            <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div><div class="de">Click <b>Authorize</b> on claude.ai. Anthropic then shows a code. Paste it here.</div></div>
+            <div class="db"><div class="field"><span class="input filled">••••••••••••••</span></div></div>
+            <div class="df"><span class="left"><span class="link">← Back</span></span><span class="btn pri">Sign in</span></div>
+          </div></div></div></div>
+        <div class="s"><span class="n">c</span><div><p><b>Paradev:</b> trades the code for a token, saves it, and pushes it to your running boxes (firewall rule, placeholder variables, login files). No workspace restart.</p>
+          <div class="stage" style="padding:14px"><div class="dlg">
+            <span class="x">×</span>
+            <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div></div>
+            <div class="db"><div class="center"><div class="spin"></div><div class="big">Signing in…</div><p>Checking with Anthropic and updating your workspace.</p></div></div>
+          </div></div></div></div>
+        <div class="s"><span class="n">d</span><div><p><b>Paradev:</b> restarts <b>this chat's Claude process</b> (the ACP agent), so it starts with the new variables. The box, terminals, dev servers and other chats keep running.</p>
+          <div class="stage" style="padding:14px"><div class="dlg">
+            <span class="x">×</span>
+            <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div></div>
+            <div class="db"><div class="center"><div class="spin"></div><div class="big">Restarting Claude…</div><p>Your chat history stays. Only the agent process restarts.</p></div></div>
+          </div></div></div></div>
+        <div class="s"><span class="n">e</span><div><p><b>Paradev:</b> sends the failed turn again. The modal closes after a second.</p>
+          <div class="stage" style="padding:14px"><div class="dlg">
+            <span class="x">×</span>
+            <div class="dh"><div class="ti"><span class="logo claude">✳</span>Sign in to Claude</div></div>
+            <div class="db"><div class="center"><div class="check">✓</div><div class="big">Signed in</div><p>Claude Max · your account email<br/>Continuing your chat…</p></div></div>
+          </div></div></div></div>
+        <p class="gain">✓ Two actions from you (a, b). No terminal, no CLI, no workspace restart. Works from the web app too.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Why ========== -->
+  <h2>Why the full restart is not needed</h2>
+  <div class="wrap">
+  <table>
+    <thead><tr><th>Part of a sign-in</th><th>Where it lives</th><th>Can it change on a running box?</th></tr></thead>
+    <tbody>
+      <tr><td>The real token</td><td>Sandbox firewall rule (swaps the placeholder on the way out)</td><td><span class="gain">Yes.</span> <code class="k">applySandboxPolicy</code> already updates a running box. It is how the hourly GitHub token stays fresh.</td></tr>
+      <tr><td>Placeholder variables (<code class="k">CLAUDE_CODE_OAUTH_TOKEN</code>, <code class="k">ANTHROPIC_API_KEY</code>, …)</td><td>host-service memory</td><td><span class="gain">Yes.</span> <code class="k">sandbox.setEnvironment</code> replaces them live, and new agents and terminals pick them up.</td></tr>
+      <tr><td>Codex login file</td><td><code class="k">~/.codex/auth.json</code></td><td><span class="gain">Yes.</span> <code class="k">writeSignInFiles</code> already runs on every wake, including a box that is running.</td></tr>
+      <tr><td>An agent process that is already running</td><td>Its own environment, fixed at start</td><td><span class="pain">No.</span> Restart that process only. The chat already has “restart the agent and continue”.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>A wake already does the first three things. The banner exists only because of the last row, and a workspace restart is a much bigger tool than that row needs. So after a save we run those three steps on the person's running boxes, mark them current, and restart only the agent that failed.</p>
+  <p class="note">If you only replace a token of the same kind (a token for a token, or a key for a key), the variable names stay the same. Then only the firewall changes, and the agent may not need a restart at all. We restart it anyway: it is cheap and always correct.</p>
+
+  <h2>What stays out of scope</h2>
+  <ul>
+    <li><b>Agents started from a terminal</b> (not chat) keep their old environment until you start them again. The modal says “Agents started from a terminal pick this up the next time they start.”</li>
+    <li><b>Someone else's box</b> runs on its creator's sign-in: no modal there.</li>
+    <li><b>Manual mode</b> is unchanged.</li>
+  </ul>
+
+  <h2>To confirm</h2>
+  <div class="q"><b>Remove the “Restart workspace” banner for credential changes, and refresh running boxes in place?</b><span>My pick: yes. The banner only stays as a fallback if the live refresh fails, for example when the box cannot be reached.</span></div>
+  <div class="q"><b>Restart just the failed chat's agent, not the other open chats?</b><span>My pick: just that one. Other chats pick up the new variables when their next agent starts. Their requests already get the new token from the firewall either way.</span></div>
+</main>
+</body>
+</html>
