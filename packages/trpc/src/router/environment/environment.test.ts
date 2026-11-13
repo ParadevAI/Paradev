@@ -3,11 +3,14 @@ import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as plan from "../../lib/billing/plan";
 import * as guards from "../../lib/cloud-guards";
+import * as sandbox from "../../lib/sandbox";
 import { userError } from "../../trpc";
+import * as access from "../cloud-workspace/access";
 import * as integration from "../integration/utils";
 
 const ENVIRONMENT_ID = "6f7a8b9c-0d1e-4f2a-8b3c-4d5e6f7a8b9c";
 const ORGANIZATION_ID = "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d";
+const WORKSPACE_ID = "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e";
 
 let environment: Record<string, unknown> = {};
 let isAdmin = false;
@@ -42,6 +45,17 @@ stub(integration, {
 		}
 	},
 });
+stub(access, {
+	loadVisibleWorkspace: async () => ({
+		id: WORKSPACE_ID,
+		organizationId: ORGANIZATION_ID,
+		environmentId: ENVIRONMENT_ID,
+		status: "ready",
+		baseBranch: "main",
+		branch: "main",
+	}),
+});
+stub(sandbox, { workspaceRepositories: async () => [] });
 stub(plan, {
 	resolveMachineSize: async (_: string, name: string | null | undefined) =>
 		name === "large" || name == null
@@ -99,6 +113,18 @@ describe("environment.update machineSize", () => {
 		await expect(
 			caller.environment.update({ id: ENVIRONMENT_ID, machineSize: "2xlarge" }),
 		).rejects.toMatchObject({ code: "BAD_REQUEST" });
+		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.promote onto an environment", () => {
+	test("a member who neither created nor administers a shared environment cannot replace its checkpoint", async () => {
+		await expect(
+			caller.environment.promote({
+				cloudWorkspaceId: WORKSPACE_ID,
+				environmentId: ENVIRONMENT_ID,
+			}),
+		).rejects.toMatchObject({ code: "FORBIDDEN" });
 		expect(written).toEqual([]);
 	});
 });

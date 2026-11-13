@@ -36,7 +36,12 @@ export function SaveCheckpointDialog({
 		toast.promise(
 			promote
 				.mutateAsync({ cloudWorkspaceId, environmentId: environment.id })
-				.then(() => utils.environment.invalidate()),
+				.then(() =>
+					Promise.all([
+						utils.environment.invalidate(),
+						utils.cloudWorkspace.list.invalidate(),
+					]),
+				),
 			{
 				loading: t({ message: `Saving a checkpoint to ${name}...` }),
 				success: t({ message: `Checkpoint saved to ${name}` }),

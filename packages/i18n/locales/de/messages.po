@@ -8091,6 +8091,9 @@ msgstr "Umgebungs-Setup, flaky Tests und Zugangsdaten-Verkabelung — die langwe
 msgid "Environment Variables"
 msgstr "Umgebungsvariablen"
 
+msgid "Environment's size"
+msgstr "Größe der Umgebung"
+
 msgid "Environments"
 msgstr "Umgebungen"
 
@@ -15257,6 +15260,9 @@ msgstr "Bitte wähle eine Organisation"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Bitte versuche es erneut oder starte Paradev auf dem Gerät neu."
+
+msgid "Please upload a valid .env file."
+msgstr "Bitte lade eine gültige .env-Datei hoch."
 
 msgid "Plugin"
 msgstr "Plugin"

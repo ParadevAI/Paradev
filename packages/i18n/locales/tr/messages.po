@@ -8091,6 +8091,9 @@ msgstr "Ortam kurulumu, kararsız testler ve kimlik bilgisi tesisatı, yani 2025
 msgid "Environment Variables"
 msgstr "Ortam değişkenleri"
 
+msgid "Environment's size"
+msgstr "Ortamın boyutu"
+
 msgid "Environments"
 msgstr "Ortamlar"
 
@@ -15257,6 +15260,9 @@ msgstr "Lütfen bir kuruluş seçin"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Lütfen tekrar deneyin veya o cihazda Paradev’i yeniden başlatın."
+
+msgid "Please upload a valid .env file."
+msgstr "Lütfen geçerli bir .env dosyası yükleyin."
 
 msgid "Plugin"
 msgstr "Eklenti"

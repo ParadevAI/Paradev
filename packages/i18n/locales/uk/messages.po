@@ -8085,6 +8085,9 @@ msgstr "Налаштування середовища, нестабільні т
 msgid "Environment Variables"
 msgstr "Змінні середовища"
 
+msgid "Environment's size"
+msgstr "Розмір середовища"
+
 msgid "Environments"
 msgstr "Середовища"
 
@@ -15251,6 +15254,9 @@ msgstr "Виберіть організацію"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Спробуйте ще раз або перезапустіть Paradev на тому пристрої."
+
+msgid "Please upload a valid .env file."
+msgstr "Завантажте коректний файл .env."
 
 msgid "Plugin"
 msgstr "Плагін"

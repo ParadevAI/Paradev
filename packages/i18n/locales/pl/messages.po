@@ -8091,6 +8091,9 @@ msgstr "Konfiguracja środowiska, niestabilne testy i hydraulika poświadczeń �
 msgid "Environment Variables"
 msgstr "Zmienne środowiskowe"
 
+msgid "Environment's size"
+msgstr "Rozmiar środowiska"
+
 msgid "Environments"
 msgstr "Środowiska"
 
@@ -15257,6 +15260,9 @@ msgstr "Wybierz organizację"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Spróbuj ponownie lub uruchom ponownie Paradev na tym urządzeniu."
+
+msgid "Please upload a valid .env file."
+msgstr "Prześlij prawidłowy plik .env."
 
 msgid "Plugin"
 msgstr "Wtyczka"

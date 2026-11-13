@@ -108,7 +108,6 @@ export async function runInCloud(
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
 		chat,
 		tags: automation.tags,
-		// No size of its own, or one the plan stopped offering: the environment's size applies.
 		machineSize: automation.machineSize
 			? (
 					await resolveMachineSize(

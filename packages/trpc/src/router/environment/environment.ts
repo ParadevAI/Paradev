@@ -42,6 +42,22 @@ import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
 
+async function assertCanChangeForEveryone(
+	environment: {
+		scope: string;
+		createdByUserId: string | null;
+		organizationId: string;
+	},
+	ctx: MemberContext,
+) {
+	if (
+		environment.scope === "organization" &&
+		environment.createdByUserId !== ctx.principal.userId
+	) {
+		await verifyOrgAdmin(ctx.principal.userId, environment.organizationId);
+	}
+}
+
 /** An environment the caller may see; another member's personal one does not exist to them. */
 export async function loadEnvironment(id: string, ctx: MemberContext) {
 	const row = await db.query.environments.findFirst({
@@ -452,6 +468,7 @@ export const environmentRouter = {
 						i18nKey: "serverError.environment.organizationMismatch",
 					});
 				}
+				await assertCanChangeForEveryone(target, ctx);
 			}
 			const targetOwner =
 				target && input.scope === "personal"
@@ -614,13 +631,8 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
-			// A shared environment's size sets the bill for everyone who boots on it.
-			if (
-				input.machineSize !== undefined &&
-				current.scope === "organization" &&
-				current.createdByUserId !== ctx.principal.userId
-			) {
-				await verifyOrgAdmin(ctx.principal.userId, current.organizationId);
+			if (input.machineSize !== undefined) {
+				await assertCanChangeForEveryone(current, ctx);
 			}
 			await assertMachineSizeOffered(current.organizationId, input.machineSize);
 

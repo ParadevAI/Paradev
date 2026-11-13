@@ -12,17 +12,19 @@ export function useStartSetupAgent() {
 	const collections = useCollections();
 	const utils = cloudTrpc.useUtils();
 	const create = cloudTrpc.cloudWorkspace.create.useMutation();
-	const agent = useDefaultCloudAgent();
+	const defaultAgent = useDefaultCloudAgent();
 
 	const start = useCallback(
 		async ({
 			organizationId,
 			environment,
 			prompt,
+			agent = defaultAgent,
 		}: {
 			organizationId: string;
 			environment: { id: string; name: string };
 			prompt: string;
+			agent?: string | null;
 		}) => {
 			if (!agent) {
 				throw new Error(
@@ -56,7 +58,7 @@ export function useStartSetupAgent() {
 			});
 			void utils.cloudWorkspace.list.invalidate();
 		},
-		[create, agent, t, collections, utils, navigate],
+		[create, defaultAgent, t, collections, utils, navigate],
 	);
 
 	return { start, isPending: create.isPending };

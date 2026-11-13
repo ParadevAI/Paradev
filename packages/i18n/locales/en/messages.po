@@ -8091,6 +8091,9 @@ msgstr "Environment setup, flaky tests, and credential plumbing, the boring fail
 msgid "Environment Variables"
 msgstr "Environment Variables"
 
+msgid "Environment's size"
+msgstr "Environment's size"
+
 msgid "Environments"
 msgstr "Environments"
 
@@ -15257,6 +15260,9 @@ msgstr "Please select an organization"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Please try again, or restart Paradev on that device."
+
+msgid "Please upload a valid .env file."
+msgstr "Please upload a valid .env file."
 
 msgid "Plugin"
 msgstr "Plugin"

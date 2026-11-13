@@ -27,8 +27,8 @@ import {
 	DashboardSidebarWorkspaceBulkContextMenu,
 	useWorkspaceRowContextMenu,
 } from "./components/DashboardSidebarWorkspaceBulkContextMenu";
-import { ManageEnvironmentItem } from "./components/DashboardSidebarWorkspaceContextMenu/components/ManageEnvironmentItem";
 import { DashboardSidebarWorkspaceContextMenu } from "./components/DashboardSidebarWorkspaceContextMenu/DashboardSidebarWorkspaceContextMenu";
+import { ManageEnvironmentItem } from "./components/ManageEnvironmentItem";
 import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSidebarWorkspaceItemActions";
 
 interface DashboardSidebarWorkspaceItemProps {

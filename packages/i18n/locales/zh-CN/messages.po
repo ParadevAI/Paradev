@@ -8091,6 +8091,9 @@ msgstr "环境搭建、不稳定的测试、凭据串联，这些在2025年让�
 msgid "Environment Variables"
 msgstr "环境变量"
 
+msgid "Environment's size"
+msgstr "环境的规格"
+
 msgid "Environments"
 msgstr "环境"
 
@@ -15257,6 +15260,9 @@ msgstr "请选择一个组织"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "请重试，或在该设备上重启 Paradev。"
+
+msgid "Please upload a valid .env file."
+msgstr "请上传有效的 .env 文件。"
 
 msgid "Plugin"
 msgstr "插件"

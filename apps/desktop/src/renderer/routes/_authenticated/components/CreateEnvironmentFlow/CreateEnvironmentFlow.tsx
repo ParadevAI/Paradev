@@ -21,6 +21,7 @@ interface CreateEnvironmentFlowProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onStarted?: () => void;
+	agent?: string;
 	setupPrompt?: (environmentUrl: string) => string;
 }
 
@@ -30,6 +31,7 @@ export function CreateEnvironmentFlow({
 	open,
 	onOpenChange,
 	onStarted,
+	agent,
 	setupPrompt = environmentSetupAgentPrompt,
 }: CreateEnvironmentFlowProps) {
 	const { t } = useLingui();
@@ -77,7 +79,6 @@ export function CreateEnvironmentFlow({
 			? usage.data.limit
 			: null;
 
-	// The dialog stays mounted between opens, so each open starts from the first step.
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!nextOpen) {
 			setPicked(null);
@@ -140,6 +141,7 @@ export function CreateEnvironmentFlow({
 				organizationId,
 				environment,
 				prompt: setupPrompt(url),
+				agent,
 			});
 			handleOpenChange(false);
 			onStarted?.();

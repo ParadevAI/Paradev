@@ -8091,6 +8091,9 @@ msgstr "Thiết lập môi trường, test chập chờn và việc đấu nối
 msgid "Environment Variables"
 msgstr "Biến môi trường"
 
+msgid "Environment's size"
+msgstr "Kích thước môi trường"
+
 msgid "Environments"
 msgstr "Môi trường"
 
@@ -15257,6 +15260,9 @@ msgstr "Vui lòng chọn một tổ chức"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Vui lòng thử lại hoặc khởi động lại Paradev trên thiết bị đó."
+
+msgid "Please upload a valid .env file."
+msgstr "Vui lòng tải lên tệp .env hợp lệ."
 
 msgid "Plugin"
 msgstr "Plugin"

@@ -80,7 +80,6 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onRemoveFromSidebar?: () => void;
 	onRename?: () => void;
 	onDelete?: () => void;
-	/** A cloud workspace's environment item, which looks its environment up only once the menu opens. */
 	environmentItem?: React.ReactNode;
 	onToggleUnread: () => void;
 	onClearStatus: () => void;

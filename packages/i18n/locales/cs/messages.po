@@ -8091,6 +8091,9 @@ msgstr "Příprava prostředí, nestabilní testy a rozvody přihlašovacích ú
 msgid "Environment Variables"
 msgstr "Proměnné prostředí"
 
+msgid "Environment's size"
+msgstr "Velikost prostředí"
+
 msgid "Environments"
 msgstr "Prostředí"
 
@@ -15257,6 +15260,9 @@ msgstr "Vyberte prosím organizaci"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Zkuste to znovu nebo na daném zařízení restartujte Paradev."
+
+msgid "Please upload a valid .env file."
+msgstr "Nahrajte prosím platný soubor .env."
 
 msgid "Plugin"
 msgstr "Plugin"

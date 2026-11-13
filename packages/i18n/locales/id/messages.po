@@ -8091,6 +8091,9 @@ msgstr "Penyiapan environment, tes flaky, dan urusan kredensial — mode kegagal
 msgid "Environment Variables"
 msgstr "Variabel Environment"
 
+msgid "Environment's size"
+msgstr "Ukuran lingkungan"
+
 msgid "Environments"
 msgstr "Environment"
 
@@ -15257,6 +15260,9 @@ msgstr "Silakan pilih sebuah organisasi"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Coba lagi, atau mulai ulang Paradev di perangkat tersebut."
+
+msgid "Please upload a valid .env file."
+msgstr "Unggah file .env yang valid."
 
 msgid "Plugin"
 msgstr "Plugin"

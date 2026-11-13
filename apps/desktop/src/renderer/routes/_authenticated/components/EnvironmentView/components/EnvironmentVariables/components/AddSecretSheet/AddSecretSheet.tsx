@@ -29,7 +29,7 @@ import {
 	HiPlus,
 } from "react-icons/hi2";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import { parseEnvContent, validateEnvContent } from "./utils/env-file";
+import { isValidEnvContent, parseEnvContent } from "./utils/env-file";
 
 interface SecretEntry {
 	id: string;
@@ -192,9 +192,8 @@ export function AddSecretSheet({
 				const text = ev.target?.result;
 				if (typeof text !== "string") return;
 
-				const validation = validateEnvContent(text);
-				if (!validation.ok) {
-					toast.error(validation.error);
+				if (!isValidEnvContent(text)) {
+					toast.error(t({ message: "Please upload a valid .env file." }));
 					return;
 				}
 

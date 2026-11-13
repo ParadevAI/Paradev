@@ -8091,6 +8091,9 @@ msgstr "La préparation des environnements, les tests instables et la plomberie 
 msgid "Environment Variables"
 msgstr "Variables d'environnement"
 
+msgid "Environment's size"
+msgstr "Taille de l’environnement"
+
 msgid "Environments"
 msgstr "Environnements"
 
@@ -15257,6 +15260,9 @@ msgstr "Veuillez sélectionner une organisation"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Réessayez ou redémarrez Paradev sur cet appareil."
+
+msgid "Please upload a valid .env file."
+msgstr "Veuillez importer un fichier .env valide."
 
 msgid "Plugin"
 msgstr "Plugin"

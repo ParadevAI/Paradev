@@ -8091,6 +8091,9 @@ msgstr "Omgevingsopzet, flaky tests en credential-geknutsel — de saaie faalvor
 msgid "Environment Variables"
 msgstr "Omgevingsvariabelen"
 
+msgid "Environment's size"
+msgstr "Grootte van de omgeving"
+
 msgid "Environments"
 msgstr "Omgevingen"
 
@@ -15257,6 +15260,9 @@ msgstr "Kies een organisatie"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Probeer het opnieuw of herstart Paradev op dat apparaat."
+
+msgid "Please upload a valid .env file."
+msgstr "Upload een geldig .env-bestand."
 
 msgid "Plugin"
 msgstr "Plugin"

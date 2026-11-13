@@ -8091,6 +8091,9 @@ msgstr "환경 설정, 불안정한 테스트, 자격 증명 연결처럼 2025�
 msgid "Environment Variables"
 msgstr "환경 변수"
 
+msgid "Environment's size"
+msgstr "환경 크기"
+
 msgid "Environments"
 msgstr "환경"
 
@@ -15257,6 +15260,9 @@ msgstr "조직을 선택해 주세요"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "다시 시도하거나 해당 기기에서 Paradev를 다시 시작해 주세요."
+
+msgid "Please upload a valid .env file."
+msgstr "유효한 .env 파일을 업로드하세요."
 
 msgid "Plugin"
 msgstr "플러그인"

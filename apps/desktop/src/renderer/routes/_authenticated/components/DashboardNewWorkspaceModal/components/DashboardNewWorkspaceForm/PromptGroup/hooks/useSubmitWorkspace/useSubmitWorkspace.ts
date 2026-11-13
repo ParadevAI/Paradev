@@ -23,12 +23,9 @@ import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
 import { resolveNames } from "./resolveNames";
 
 interface Overrides {
-	/** An environment made just now, which the selection has not caught up with. */
 	cloudEnvironmentId?: string;
 	cloudPrompt?: (typed: string) => string;
-	/** Sends the cloud prompt alone: no linked context, attachments or typed names, and the draft stays. */
 	ignoreDraft?: boolean;
-	/** Starts the cloud agent with this one instead of the selected agent. */
 	cloudAgent?: WorkspaceCreateAgent;
 }
 
@@ -175,7 +172,6 @@ export function useSubmitWorkspace(
 					const cloudLinkedPR = ignoreDraft ? null : linkedPR;
 					const cloudLinkedIssues = ignoreDraft ? [] : linkedIssues;
 					const cloudAgent = overrides?.cloudAgent ?? selectedAgent;
-					// Model, effort and mode belong to the selected agent.
 					const isSelectedAgent = cloudAgent === selectedAgent;
 					const wantCloudAgent =
 						cloudAgent !== "none" &&

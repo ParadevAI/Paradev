@@ -23,7 +23,9 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { authClient } from "renderer/lib/auth-client";
 import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
 import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 import {
@@ -75,7 +77,6 @@ export function WorkspaceMoreMenu({
 	const { machineId } = useLocalHostService();
 	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
-	// Focus only stays off the trigger when a dialog is about to open.
 	const actionPendingRef = useRef(false);
 	const openAfterClose = (action: () => void) => {
 		actionPendingRef.current = true;
@@ -85,6 +86,13 @@ export function WorkspaceMoreMenu({
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
 	const isWorkspaceReady =
 		cloudWorkspaces?.find((row) => row.id === workspaceId)?.status === "ready";
+	const { data: session } = authClient.useSession();
+	const isAdmin = useIsOrganizationAdmin() === true;
+	const canSaveCheckpoint =
+		!!environment &&
+		(environment.scope !== "organization" ||
+			environment.createdByUserId === session?.user?.id ||
+			isAdmin);
 	const [checkpointOpen, setCheckpointOpen] = useState(false);
 	const navigate = useNavigate();
 
@@ -181,13 +189,15 @@ export function WorkspaceMoreMenu({
 								<Container className="size-4" />
 								<Trans>Manage environment</Trans>
 							</DropdownMenuItem>
-							<DropdownMenuItem
-								disabled={!isWorkspaceReady}
-								onSelect={() => openAfterClose(() => setCheckpointOpen(true))}
-							>
-								<DatabaseBackup className="size-4" />
-								<Trans>Save checkpoint</Trans>
-							</DropdownMenuItem>
+							{canSaveCheckpoint && (
+								<DropdownMenuItem
+									disabled={!isWorkspaceReady}
+									onSelect={() => openAfterClose(() => setCheckpointOpen(true))}
+								>
+									<DatabaseBackup className="size-4" />
+									<Trans>Save checkpoint</Trans>
+								</DropdownMenuItem>
+							)}
 						</>
 					)}
 					{moveDirections.length > 0 && <DropdownMenuSeparator />}
@@ -215,7 +225,7 @@ export function WorkspaceMoreMenu({
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{environment && (
+			{environment && canSaveCheckpoint && (
 				<SaveCheckpointDialog
 					cloudWorkspaceId={workspaceId}
 					environment={environment}

@@ -8091,6 +8091,9 @@ msgstr "環境構築、不安定なテスト、認証情報の受け渡し。202
 msgid "Environment Variables"
 msgstr "環境変数"
 
+msgid "Environment's size"
+msgstr "環境のサイズ"
+
 msgid "Environments"
 msgstr "環境"
 
@@ -15257,6 +15260,9 @@ msgstr "組織を選択してください"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "もう一度試すか、そのデバイスで Paradev を再起動してください。"
+
+msgid "Please upload a valid .env file."
+msgstr "有効な .env ファイルをアップロードしてください。"
 
 msgid "Plugin"
 msgstr "プラグイン"

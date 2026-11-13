@@ -5,6 +5,7 @@ export interface WorkspaceEnvironment {
 	id: string;
 	name: string;
 	sourceKind: string;
+	scope: string;
 	createdByUserId: string | null;
 }
 
@@ -28,6 +29,7 @@ export function useWorkspaceEnvironment(
 				id: environment.id,
 				name: environment.name,
 				sourceKind: environment.sourceKind,
+				scope: environment.scope,
 				createdByUserId: environment.createdByUserId,
 			}
 		: null;

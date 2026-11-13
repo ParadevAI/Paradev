@@ -9,6 +9,7 @@ import {
 	getAgentModelSupport,
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
@@ -150,6 +151,7 @@ export function NewWorkspaceScreen({
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
 		closeModal,
+		closeAndResetDraft,
 		draft,
 		updateDraft,
 		selectProject,
@@ -912,6 +914,17 @@ export function NewWorkspaceScreen({
 			} catch (error) {
 				toast.error(
 					errorMessage(error, t({ message: "Could not create environment" })),
+					isCloudUsageRefusal(error)
+						? {
+								action: {
+									label: t({ message: "Open billing" }),
+									onClick: () => {
+										closeModal();
+										void navigate({ to: "/settings/billing" });
+									},
+								},
+							}
+						: undefined,
 				);
 			} finally {
 				setupInFlightRef.current = false;
@@ -926,6 +939,8 @@ export function NewWorkspaceScreen({
 			setCloudChoice,
 			cloudChoiceKey,
 			createWorkspace,
+			closeModal,
+			navigate,
 			t,
 		],
 	);
@@ -1087,7 +1102,8 @@ export function NewWorkspaceScreen({
 						setIsCreatingEnvironment(open);
 						if (!open) setDialogSendsDraft(false);
 					}}
-					onStarted={closeModal}
+					agent={selectedAgent !== "none" ? selectedAgent : undefined}
+					onStarted={dialogSendsDraft ? closeAndResetDraft : closeModal}
 					setupPrompt={
 						dialogSendsDraft && !isPromptEmpty
 							? (environmentUrl) =>
