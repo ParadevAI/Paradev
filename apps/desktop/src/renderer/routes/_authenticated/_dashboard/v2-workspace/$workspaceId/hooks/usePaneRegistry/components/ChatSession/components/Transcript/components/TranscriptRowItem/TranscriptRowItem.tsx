@@ -4,6 +4,7 @@ import {
 	TurnGroupSection,
 	type TurnGroupSectionProps,
 } from "../TurnGroupSection";
+import { sameRowSnapshot } from "./utils/sameRowSnapshot";
 
 type TranscriptRowItemProps = TurnGroupSectionProps & {
 	className: string;
@@ -34,7 +35,11 @@ function sameRow(
 	const keys = Object.keys(next) as (keyof TranscriptRowItemProps)[];
 	return (
 		keys.length === Object.keys(previous).length &&
-		keys.every((key) => Object.is(previous[key], next[key]))
+		keys.every((key) =>
+			key === "snapshot"
+				? sameRowSnapshot(next.row, previous.snapshot, next.snapshot)
+				: Object.is(previous[key], next[key]),
+		)
 	);
 }
 
