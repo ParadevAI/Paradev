@@ -4,11 +4,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
 import { AppWindow } from "lucide-react";
 import { env } from "renderer/env.renderer";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { getPullRequestTarget } from "renderer/lib/github/getPullRequestTarget";
 import { parseSupersetPageUrl } from "renderer/lib/parseSupersetPageUrl";
 import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 
 export function OpenBrowserPageInAppButton({
 	currentUrl,

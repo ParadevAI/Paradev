@@ -13,13 +13,13 @@ import {
 } from "@superset/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
 import { MachineSizePickerPill } from "renderer/routes/_authenticated/components/MachineSizePickerPill";
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import {
 	NO_PROJECT_KEY,

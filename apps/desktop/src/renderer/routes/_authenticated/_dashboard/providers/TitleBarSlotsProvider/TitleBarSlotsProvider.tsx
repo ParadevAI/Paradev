@@ -8,6 +8,7 @@ import {
 	useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 
 interface TitleBarSlots {
 	main: HTMLElement | null;
@@ -80,7 +81,8 @@ export function useTitleBarSideWidth(): number | null {
  */
 export function useTitleBarMainSlot(): HTMLElement | null | undefined {
 	const slots = useContext(TitleBarSlotsContext);
-	const claimMain = slots?.claimMain;
+	const isScreenActive = useIsScreenActive();
+	const claimMain = isScreenActive ? slots?.claimMain : undefined;
 	useEffect(() => claimMain?.(), [claimMain]);
 	return slots ? slots.main : undefined;
 }
@@ -90,7 +92,8 @@ export function useTitleBarSideSlot(
 	pane: HTMLElement | null,
 ): HTMLElement | null | undefined {
 	const slots = useContext(TitleBarSlotsContext);
-	const setSideWidth = slots?.setSideWidth;
+	const isScreenActive = useIsScreenActive();
+	const setSideWidth = isScreenActive ? slots?.setSideWidth : undefined;
 	useEffect(() => {
 		if (!pane || !setSideWidth) return;
 		const measure = () => {

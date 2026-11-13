@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
-import { useHostTagFolders } from "renderer/hooks/host-projects/useHostTagFolders";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { isSidebarWorkspaceVisible } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
+import { useHostTagFolders } from "renderer/routes/_authenticated/providers/HostTagFoldersProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { getLegacyPresentationPushTargets } from "./getLegacyPresentationPushTargets";
 import {

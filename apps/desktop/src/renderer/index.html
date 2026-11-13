@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Layers rank by first appearance, and the build can link a chunk's CSS
+         ahead of Tailwind's, so fix the order before any stylesheet. -->
+    <style>@layer properties, theme, base, components, utilities;</style>
     <!-- Theme boot script must run before body to prevent flash -->
     <script type="module" src="/theme-boot.js"></script>
     <!--

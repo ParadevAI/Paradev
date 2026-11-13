@@ -5,6 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useCallback } from "react";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
@@ -31,6 +32,7 @@ export interface ChangesScope {
  * the plain collection read of the filter stays fresh.
  */
 export function useChangesScope(workspaceId: string): ChangesScope {
+	const isScreenActive = useIsScreenActive();
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
 	const collections = useCollections();
@@ -84,12 +86,15 @@ export function useChangesScope(workspaceId: string): ChangesScope {
 
 	const commits = workspaceTrpc.git.listCommits.useQuery(
 		{ workspaceId, baseBranch: baseBranch ?? undefined },
-		{ refetchOnWindowFocus: true },
+		{ refetchOnWindowFocus: isScreenActive },
 	);
 
 	const branches = workspaceTrpc.git.listBranches.useQuery(
 		{ workspaceId },
-		{ refetchInterval: 30_000, refetchOnWindowFocus: true },
+		{
+			refetchInterval: isScreenActive ? 30_000 : false,
+			refetchOnWindowFocus: isScreenActive,
+		},
 	);
 
 	const renameBranchMutation = workspaceTrpc.git.renameBranch.useMutation();

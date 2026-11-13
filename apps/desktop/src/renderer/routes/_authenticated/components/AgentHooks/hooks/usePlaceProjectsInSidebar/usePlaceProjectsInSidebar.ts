@@ -1,8 +1,8 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { useEffect } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { selectProjectsToPlace } from "./selectProjectsToPlace";
 

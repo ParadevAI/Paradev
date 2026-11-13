@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
@@ -10,6 +9,7 @@ import {
 	type HostServiceClient,
 } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";

@@ -1,9 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 
 export const Route = createFileRoute("/_authenticated/settings/projects/")({
 	component: ProjectsIndexPage,

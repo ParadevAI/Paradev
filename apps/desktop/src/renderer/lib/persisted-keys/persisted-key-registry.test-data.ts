@@ -59,6 +59,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["v2-pane-scroll-state-v1"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/stores/keptWorkspacesStore/keptWorkspacesStore.ts",
+		["v2-recent-workspaces"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops/pendingChatStops.ts",
 		["pending-chat-stops-v1"],
 	],

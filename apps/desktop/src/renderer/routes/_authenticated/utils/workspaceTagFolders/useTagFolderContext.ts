@@ -1,10 +1,8 @@
 import { useMemo } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
-import {
-	mergeHostTagFoldersWithLegacy,
-	useHostTagFolders,
-} from "renderer/hooks/host-projects/useHostTagFolders";
+import { mergeHostTagFoldersWithLegacy } from "renderer/hooks/host-projects/useHostTagFolders";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
+import { useHostTagFolders } from "renderer/routes/_authenticated/providers/HostTagFoldersProvider";
 import type { TagFolderContext } from "./workspaceTagFolders";
 
 /**

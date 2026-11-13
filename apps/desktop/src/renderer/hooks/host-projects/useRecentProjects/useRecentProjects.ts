@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import type { ProjectOption } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 
 export function useRecentProjects(): ProjectOption[] {
 	// Projects are fully local — the host fan-out is the only source that

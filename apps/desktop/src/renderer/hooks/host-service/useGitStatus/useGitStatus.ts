@@ -3,6 +3,7 @@ import {
 	workspaceTrpc,
 } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo } from "react";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { useWorkspaceEvent } from "../useWorkspaceEvent";
 import { createTrailingRefreshScheduler } from "./createTrailingRefreshScheduler";
 import { invalidateGitQueries } from "./invalidateGitQueries";
@@ -24,6 +25,7 @@ export const GIT_STATUS_GC_TIME_MS = 10 * 60_000;
  */
 export function useGitStatus(workspaceId: string, enabled = true) {
 	const utils = workspaceTrpc.useUtils();
+	const isScreenActive = useIsScreenActive();
 
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(
 		{ workspaceId },
@@ -43,7 +45,7 @@ export function useGitStatus(workspaceId: string, enabled = true) {
 		{
 			enabled: enabled && Boolean(workspaceId),
 			gcTime: GIT_STATUS_GC_TIME_MS,
-			refetchOnWindowFocus: true,
+			refetchOnWindowFocus: isScreenActive,
 			staleTime: GIT_STATUS_STALE_TIME_MS,
 		},
 	);

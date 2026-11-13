@@ -19,8 +19,8 @@ import {
 	HiOutlineSquares2X2,
 } from "react-icons/hi2";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 
 interface ProjectFilterProps {
 	value: string[];

@@ -310,13 +310,7 @@
 
 	/* The OS eats clicks on drag regions, so an open overlay could never be
 	   dismissed by clicking a header. */
-	body:has(
-		[role="menu"][data-state="open"],
-		[role="listbox"][data-state="open"],
-		[role="dialog"][data-state="open"],
-		[role="alertdialog"][data-state="open"]
-	)
-	.drag {
+	:root[data-overlay-open] .drag {
 		-webkit-app-region: no-drag;
 	}
 

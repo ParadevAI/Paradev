@@ -1,12 +1,13 @@
 import type { RendererContext } from "@superset/panes";
-import { useParams } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { replayForwardedKey } from "renderer/hotkeys";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type {
 	BrowserPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { browserRuntimeRegistry } from "../../browserRuntimeRegistry";
 import { DEFAULT_BROWSER_URL } from "../../constants";
 
@@ -27,9 +28,10 @@ export function usePersistentWebview({
 	);
 	const ctxRef = useRef(ctx);
 	ctxRef.current = ctx;
-	// Workspace scoping for the browser bridge (CLI/agent control). Panes only
-	// render inside the $workspaceId route, so this is always present.
-	const { workspaceId } = useParams({ strict: false });
+	const workspaceId = useWorkspace().workspace.id;
+	// The webview lives outside the workspace DOM, so a hidden workspace must
+	// park it or it stays on screen.
+	const isScreenActive = useIsScreenActive();
 
 	const paneData = ctx.pane.data as BrowserPaneData;
 	// Read through a ref so attach keys on paneId alone: navigation echoes
@@ -42,13 +44,13 @@ export function usePersistentWebview({
 
 	useEffect(() => {
 		const placeholder = placeholderRef.current;
-		if (!placeholder) return;
+		if (!placeholder || !isScreenActive) return;
 
 		browserRuntimeRegistry.attach(
 			paneId,
 			placeholder,
 			attachUrlRef.current,
-			workspaceId ?? "",
+			workspaceId,
 			({ url, pageTitle, faviconUrl }) => {
 				const current = ctxRef.current.pane.data as BrowserPaneData;
 				if (
@@ -74,7 +76,7 @@ export function usePersistentWebview({
 			browserRuntimeRegistry.detach(paneId);
 			setOverlayContainer(null);
 		};
-	}, [paneId, workspaceId]);
+	}, [paneId, workspaceId, isScreenActive]);
 
 	useEffect(() => {
 		const newWindowSub = electronTrpcClient.browser.onNewWindow.subscribe(

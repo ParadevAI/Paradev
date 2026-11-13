@@ -73,6 +73,7 @@ import { useDiffCommentNavigation } from "./hooks/useDiffCommentNavigation";
 import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
+import { useMountedAfterPaint } from "./hooks/useMountedAfterPaint";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
 	isDiffContentStale,
@@ -133,6 +134,7 @@ export function DiffPane({
 	const codeViewRef =
 		useRef<CodeViewHandle<DiffAnnotationMetadata, undefined>>(null);
 	const searchContainerRef = useRef<HTMLDivElement>(null);
+	const codeViewMounted = useMountedAfterPaint();
 
 	const showFileList = useRightPaneLinkTarget() !== null;
 	const [rowElement, setRowElement] = useState<HTMLDivElement | null>(null);
@@ -492,6 +494,7 @@ export function DiffPane({
 
 	const { targetItemId, notifyScroll, releaseScroll } = useDiffCodeViewScroll({
 		codeViewRef,
+		codeViewMounted,
 		data,
 		fileByItemId,
 		items,
@@ -1007,24 +1010,26 @@ export function DiffPane({
 							onFindPrevious={search.findPrevious}
 							onClose={search.closeSearch}
 						/>
-						<EditProvider<DiffAnnotationMetadata>
-							createEditor={createDiffEditor}
-						>
-							<CodeView<DiffAnnotationMetadata>
-								ref={codeViewRef}
-								className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
-								style={style}
-								items={items}
-								options={codeViewOptions}
-								onScroll={handleScroll}
-								renderHeaderPrefix={renderHeaderPrefix}
-								renderHeaderFilenameSuffix={renderHeaderFilenameSuffix}
-								renderHeaderMetadata={renderHeaderMetadata}
-								renderAnnotation={renderAnnotation}
-								onItemEditChange={handleItemEditChange}
-								editorOptions={editorOptions}
-							/>
-						</EditProvider>
+						{codeViewMounted && (
+							<EditProvider<DiffAnnotationMetadata>
+								createEditor={createDiffEditor}
+							>
+								<CodeView<DiffAnnotationMetadata>
+									ref={codeViewRef}
+									className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
+									style={style}
+									items={items}
+									options={codeViewOptions}
+									onScroll={handleScroll}
+									renderHeaderPrefix={renderHeaderPrefix}
+									renderHeaderFilenameSuffix={renderHeaderFilenameSuffix}
+									renderHeaderMetadata={renderHeaderMetadata}
+									renderAnnotation={renderAnnotation}
+									onItemEditChange={handleItemEditChange}
+									editorOptions={editorOptions}
+								/>
+							</EditProvider>
+						)}
 					</div>
 				)}
 			</div>

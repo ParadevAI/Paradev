@@ -74,6 +74,8 @@ import { V2NotificationController } from "./components/V2NotificationController"
 import { WindowTitle } from "./components/WindowTitle";
 import { createPierreWorker } from "./lib/pierreWorker";
 import { CollectionsProvider } from "./providers/CollectionsProvider";
+import { HostProjectsProvider } from "./providers/HostProjectsProvider";
+import { HostTagFoldersProvider } from "./providers/HostTagFoldersProvider";
 import { HostWorkspacesProvider } from "./providers/HostWorkspacesProvider";
 import { LocalHostServiceProvider } from "./providers/LocalHostServiceProvider";
 import { SandboxAccessProvider } from "./providers/SandboxAccessProvider";
@@ -338,48 +340,54 @@ function AuthenticatedLayout() {
 					    include them as hosts. */}
 					<SandboxAccessProvider>
 						<HostWorkspacesProvider>
-							<TagFolderWorkspacesProvider>
-								<WorkerPoolContextProvider
-									poolOptions={PIERRE_POOL_OPTIONS}
-									highlighterOptions={PIERRE_HIGHLIGHTER_OPTIONS}
-								>
-									<DiffThemeSync />
-									<AgentHooks />
-									<FileMenuListener />
-									<V2NotificationController />
-									<DockBadgeController />
-									<StarNagObserver />
-									<LeaderboardAutoPublish />
-									<OrganizationPluginSync />
-									<RealtimeNudges />
-									<ChannelsRealtime />
-									<DaemonAutoUpdateFailureDialog />
-									<InterruptedChatsDialog />
-									<Outlet />
-									<V1ImportModal />
-									{isV2CloudEnabled ? (
-										<>
-											<V1MigrationContinuity />
-											<V2FlipWelcome organizationId={activeOrganizationId} />
-											<V1MigrationStatusCard
-												organizationId={activeOrganizationId}
-											/>
-											<V1TerminalsNotice
-												organizationId={activeOrganizationId}
-											/>
-										</>
-									) : (
-										<V1FlipNotice />
-									)}
-									<V1AutoMigration />
-									<WorkspaceInitEffects />
-									<InitGitDialog />
-									<GitInitConfirmDialog />
-									<TeardownLogsDialog />
-									<Paywall />
-									<InviteMemberDialog />
-								</WorkerPoolContextProvider>
-							</TagFolderWorkspacesProvider>
+							<HostProjectsProvider>
+								<HostTagFoldersProvider>
+									<TagFolderWorkspacesProvider>
+										<WorkerPoolContextProvider
+											poolOptions={PIERRE_POOL_OPTIONS}
+											highlighterOptions={PIERRE_HIGHLIGHTER_OPTIONS}
+										>
+											<DiffThemeSync />
+											<AgentHooks />
+											<FileMenuListener />
+											<V2NotificationController />
+											<DockBadgeController />
+											<StarNagObserver />
+											<LeaderboardAutoPublish />
+											<OrganizationPluginSync />
+											<RealtimeNudges />
+											<ChannelsRealtime />
+											<DaemonAutoUpdateFailureDialog />
+											<InterruptedChatsDialog />
+											<Outlet />
+											<V1ImportModal />
+											{isV2CloudEnabled ? (
+												<>
+													<V1MigrationContinuity />
+													<V2FlipWelcome
+														organizationId={activeOrganizationId}
+													/>
+													<V1MigrationStatusCard
+														organizationId={activeOrganizationId}
+													/>
+													<V1TerminalsNotice
+														organizationId={activeOrganizationId}
+													/>
+												</>
+											) : (
+												<V1FlipNotice />
+											)}
+											<V1AutoMigration />
+											<WorkspaceInitEffects />
+											<InitGitDialog />
+											<GitInitConfirmDialog />
+											<TeardownLogsDialog />
+											<Paywall />
+											<InviteMemberDialog />
+										</WorkerPoolContextProvider>
+									</TagFolderWorkspacesProvider>
+								</HostTagFoldersProvider>
+							</HostProjectsProvider>
 						</HostWorkspacesProvider>
 					</SandboxAccessProvider>
 				</LocalHostServiceProvider>

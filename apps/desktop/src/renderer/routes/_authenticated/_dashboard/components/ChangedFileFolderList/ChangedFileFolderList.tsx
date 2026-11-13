@@ -100,6 +100,14 @@ export function ChangedFileFolderList<T extends { path: string }>({
 	}, [groups, folds, getFileKey]);
 
 	const listRef = useRef<HTMLDivElement>(null);
+	const [scrollMargin, setScrollMargin] = useState(0);
+	useEffect(() => {
+		const frame = requestAnimationFrame(() => {
+			const top = listRef.current?.offsetTop ?? 0;
+			setScrollMargin((current) => (current === top ? current : top));
+		});
+		return () => cancelAnimationFrame(frame);
+	});
 	const virtualizer = useVirtualizer({
 		count: rows.length,
 		getScrollElement: () =>
@@ -112,7 +120,7 @@ export function ChangedFileFolderList<T extends { path: string }>({
 		// A hidden panel measures every row at 0; keep the estimate instead.
 		measureElement: (element, entry, instance) =>
 			measureElement(element, entry, instance) || ESTIMATED_ROW_HEIGHT,
-		scrollMargin: listRef.current?.offsetTop ?? 0,
+		scrollMargin,
 		getItemKey: (index) => rows[index]?.key ?? index,
 	});
 

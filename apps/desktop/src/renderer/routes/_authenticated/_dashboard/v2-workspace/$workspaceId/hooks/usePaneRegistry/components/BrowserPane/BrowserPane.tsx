@@ -1,11 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { RendererContext, Tab } from "@superset/panes";
-import { useParams } from "@tanstack/react-router";
 import { GlobeIcon, SquareDashedMousePointer, XIcon } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ImportHistoryDialog } from "renderer/components/ImportHistoryDialog";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import {
 	BROWSER_IMPORT_BANNER_ID,
 	useBrowserImportBannerDismissalsStore,
@@ -79,7 +79,7 @@ export function BrowserPane({
 		paneId,
 		ctx,
 	});
-	const { workspaceId } = useParams({ strict: false });
+	const workspaceId = useWorkspace().workspace.id;
 	const designMode = useDesignModeState(paneId);
 	const isFindBarOpen = useFindBarOpen(paneId);
 	const deviceToolbar = useDeviceToolbarState(paneId);

@@ -9,6 +9,7 @@ import {
 	useState,
 } from "react";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
+import { keptWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/keptWorkspacesStore";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import {
@@ -29,6 +30,9 @@ import {
 } from "./components/DashboardSidebarWorkspaceBulkContextMenu";
 import { DashboardSidebarWorkspaceContextMenu } from "./components/DashboardSidebarWorkspaceContextMenu/DashboardSidebarWorkspaceContextMenu";
 import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSidebarWorkspaceItemActions";
+import { usePressPreview } from "./hooks/usePressPreview";
+
+const PREWARM_HOVER_DELAY_MS = 60;
 
 interface DashboardSidebarWorkspaceItemProps {
 	workspace: DashboardSidebarWorkspace;
@@ -151,8 +155,17 @@ export function DashboardSidebarWorkspaceItem({
 		[workspace, isCloudWorkspace],
 	);
 
+	const prewarmTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+		undefined,
+	);
+	useEffect(() => () => clearTimeout(prewarmTimerRef.current), []);
 	const handleMouseEnter = useCallback(
 		(event: React.MouseEvent) => {
+			clearTimeout(prewarmTimerRef.current);
+			prewarmTimerRef.current = setTimeout(
+				() => keptWorkspacesStore.prewarm(id),
+				PREWARM_HOVER_DELAY_MS,
+			);
 			if (!hoverEligible || !rowRef.current) return;
 			hoverRequestOpen(id, rowRef.current, hoverPayload, {
 				x: event.clientX,
@@ -163,6 +176,7 @@ export function DashboardSidebarWorkspaceItem({
 	);
 	const handleMouseLeave = useCallback(
 		(event: React.MouseEvent) => {
+			clearTimeout(prewarmTimerRef.current);
 			if (!hoverEligible) return;
 			hoverRequestClose(id, { x: event.clientX, y: event.clientY });
 		},
@@ -180,8 +194,10 @@ export function DashboardSidebarWorkspaceItem({
 		hoverSyncIfHovered(id, hoverPayload);
 	}, [isHovered, hoverSyncIfHovered, id, hoverPayload]);
 
+	const pressPreview = usePressPreview(id);
 	const handleExpandedClick = useCallback(
 		(event: MouseEvent<HTMLElement>) => {
+			pressPreview.commit();
 			if (
 				onSelectionClick &&
 				(event.ctrlKey || event.metaKey || event.shiftKey)
@@ -193,20 +209,24 @@ export function DashboardSidebarWorkspaceItem({
 			if (onSelectionClick?.(event)) return;
 			handleClick();
 		},
-		[handleClick, onSelectionClick],
+		[handleClick, onSelectionClick, pressPreview],
 	);
 	const handleExpandedMouseDown = useCallback(
 		(event: MouseEvent<HTMLElement>) => {
-			if (!event.ctrlKey && !event.metaKey && !event.shiftKey) return;
 			if (
 				event.target instanceof Element &&
 				event.target.closest("button, input, textarea, [role='menuitem']")
 			) {
 				return;
 			}
-			onSelectionClick?.(event);
+			if (event.ctrlKey || event.metaKey || event.shiftKey) {
+				onSelectionClick?.(event);
+				return;
+			}
+			if (event.button !== 0 || isRenaming || isActive) return;
+			pressPreview.start(event.clientX, event.clientY);
 		},
-		[onSelectionClick],
+		[onSelectionClick, isRenaming, isActive, pressPreview],
 	);
 	const { isBulkMenu, onRowContextMenu: handleExpandedContextMenu } =
 		useWorkspaceRowContextMenu({

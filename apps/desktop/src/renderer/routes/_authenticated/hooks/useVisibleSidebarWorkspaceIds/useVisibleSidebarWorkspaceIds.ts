@@ -1,8 +1,8 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
-import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { getSidebarWorkspaceIsHidden } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { useHostProjects } from "renderer/routes/_authenticated/providers/HostProjectsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 
 /**

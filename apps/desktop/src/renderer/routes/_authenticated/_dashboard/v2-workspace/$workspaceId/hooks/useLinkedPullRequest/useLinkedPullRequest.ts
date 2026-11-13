@@ -2,6 +2,7 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
+import { useIsScreenActive } from "renderer/lib/screen-active";
 import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 
 /**
@@ -14,12 +15,13 @@ export function useLinkedPullRequest(
 	{ enabled = true }: { enabled?: boolean } = {},
 ) {
 	const organizationId = useActiveOrganizationId();
+	const isScreenActive = useIsScreenActive();
 	const query = workspaceTrpc.git.getPullRequest.useQuery(
 		{ workspaceId },
 		{
 			enabled: !!workspaceId && enabled,
-			refetchInterval: 10_000,
-			refetchOnWindowFocus: true,
+			refetchInterval: isScreenActive ? 10_000 : false,
+			refetchOnWindowFocus: isScreenActive,
 			staleTime: 10_000,
 		},
 	);

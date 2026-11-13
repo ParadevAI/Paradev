@@ -121,12 +121,20 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		} = useFocusVisible();
 
 		useEffect(() => {
-			if (isActive) {
-				localRef.current?.scrollIntoView({
-					block: "nearest",
-					behavior: "smooth",
-				});
-			}
+			if (!isActive) return;
+			let timer: ReturnType<typeof setTimeout> | undefined;
+			const frame = requestAnimationFrame(() => {
+				timer = setTimeout(() => {
+					localRef.current?.scrollIntoView({
+						block: "nearest",
+						behavior: "smooth",
+					});
+				}, 0);
+			});
+			return () => {
+				cancelAnimationFrame(frame);
+				clearTimeout(timer);
+			};
 		}, [isActive]);
 
 		const creationStatusText = isPending ? t({ message: "Creating…" }) : null;
