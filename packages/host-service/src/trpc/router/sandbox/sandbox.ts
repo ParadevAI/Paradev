@@ -6,6 +6,7 @@ import {
 } from "@superset/shared/sandbox-contract";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { readSandboxBoxResources } from "../../../runtime/box-resources";
 import {
 	hasManagedEnv,
 	setManagedEnv,
@@ -95,6 +96,11 @@ export const sandboxRouter = router({
 			startHook: getStartHookState(),
 			runTerminalId: getStartHookRunTerminalId(),
 		};
+	}),
+
+	resources: protectedProcedure.query(() => {
+		if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
+		return readSandboxBoxResources();
 	}),
 
 	/**

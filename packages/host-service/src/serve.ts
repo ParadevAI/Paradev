@@ -13,9 +13,11 @@ import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
 import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
+import { readSandboxBoxResources } from "./runtime/box-resources";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
 import { startSandboxAgentStatusReporter } from "./runtime/sandbox-agent-status";
+import { startSandboxBoxPressureReporter } from "./runtime/sandbox-box-pressure";
 import { startSandboxCredentialRefresh } from "./runtime/sandbox-credential-refresh";
 import { startSandboxKeepalive } from "./runtime/sandbox-keepalive";
 import { startSandboxPullRequestReporter } from "./runtime/sandbox-pull-requests";
@@ -186,6 +188,12 @@ async function main(): Promise<void> {
 				workspaceId: sandboxWorkspaceId,
 				hostSecret: env.HOST_SERVICE_SECRET,
 				store: terminalAgentStore,
+			});
+			startSandboxBoxPressureReporter({
+				apiUrl: env.SUPERSET_API_URL,
+				workspaceId: sandboxWorkspaceId,
+				hostSecret: env.HOST_SERVICE_SECRET,
+				read: readSandboxBoxResources,
 			});
 			startSandboxKeepalive({
 				keepalive: () => api.sandbox.keepalive.mutate(),
