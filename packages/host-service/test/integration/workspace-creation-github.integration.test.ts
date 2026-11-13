@@ -401,6 +401,7 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 		expect(result.rows).toEqual([
 			{
 				projectId,
+				repositoryId: expect.any(String),
 				prNumber: 88,
 				checks: [
 					{

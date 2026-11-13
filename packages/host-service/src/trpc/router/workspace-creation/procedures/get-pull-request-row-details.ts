@@ -21,6 +21,7 @@ const getPullRequestRowDetailsInputSchema = z.object({
 		.array(
 			z.object({
 				projectId: z.string(),
+				repositoryId: z.string().optional(),
 				prNumbers: z.array(z.number().int().positive()).min(1).max(100),
 			}),
 		)
@@ -30,6 +31,7 @@ const getPullRequestRowDetailsInputSchema = z.object({
 
 export interface PullRequestRowDetailsRow extends PullRequestRowDetails {
 	projectId: string;
+	repositoryId: string;
 	prNumber: number;
 }
 
@@ -65,12 +67,13 @@ export const getPullRequestRowDetails = protectedProcedure
 	.query(
 		async ({ ctx, input }): Promise<{ rows: PullRequestRowDetailsRow[] }> => {
 			const settled = await Promise.allSettled(
-				input.projects.map(async ({ projectId, prNumbers }) => {
-					const repo = await resolveGithubRepo(ctx, projectId);
+				input.projects.map(async ({ projectId, repositoryId, prNumbers }) => {
+					const repo = await resolveGithubRepo(ctx, projectId, repositoryId);
 					const details = await readRowDetails(ctx, repo, prNumbers);
 					return [...details].map(
 						([prNumber, row]): PullRequestRowDetailsRow => ({
 							projectId,
+							repositoryId: repo.repositoryId,
 							prNumber,
 							...row,
 						}),
