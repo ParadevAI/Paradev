@@ -56,32 +56,30 @@ the pane verbs already cover those.
 
 ## Find or open a pane
 
-Agents reach only the panes they open. Those panes run in their own session,
-with none of the user's browser extensions, so a password manager is never in
-reach. They hold none of the user's logins unless the user imports them
-(`import-login`, below). A pane the user opened answers 403 to every verb; `list` does
-not show it. Open your own pane instead.
+All browser panes are the same: one browser with the same logins and
+extensions, no matter who opened the pane. `list` shows them all, and every verb
+works on any of them.
 
 Every pane has a stable `paneId`, scoped to its workspace: pass the same
 `--workspace` you opened it under or the operation is rejected.
 
 ```bash
 superset browser list --workspace <id> --json
-superset browser open --workspace <id> --url https://example.com --json
-superset browser open --workspace <id> --url http://localhost:3000 --target new-tab --json
+superset browser open --workspace <id> --url https://example.com --target new-tab --json
+superset browser open --workspace <id> --url http://localhost:3000 --json
 ```
 
 `--target new-tab` opens a fresh tab and focuses it; the default `current-tab`
-reuses the active browser pane. Opening needs the workspace visible in the
+can replace the active browser pane, which may be the page the user is on, so
+use `new-tab` unless the task is about that page. Opening needs the workspace visible in the
 desktop app (the renderer creates the pane), so if it times out, ask the user to
 open the workspace.
 
 To show the user a page in the right sidebar beside their work, and when
 `superset panes --help` succeeds (older CLIs lack `panes`), run
 `superset panes open browser --workspace <id> --url <url>`
-(`superset:panes`). That pane is the user's own: `browser list` does not show
-it and the browser verbs answer 403. To read or drive a page, open your own
-pane with `superset browser open` as above.
+(`superset:panes`). It shows up in `browser list`, and the browser verbs work on
+it like any other pane.
 
 ## Drive with the high-level verbs
 
@@ -112,8 +110,8 @@ rejected with a clear error.
 
 `import-login` copies a system browser's cookies into the pane so it's signed in
 to the sites the user already uses. It imports every cookie that profile has on
-disk, not just the one site, into the session every agent pane shares, so say that
-when offering and run it only with the user's go-ahead. The desktop app also
+disk, not just the one site, into the browser every pane shares, and it
+replaces the logins already there for the same sites, so say both when offering and run it only with the user's go-ahead. The desktop app also
 asks the user to allow each import. Offering it is how most
 users discover it, so reach for it in two cases:
 
@@ -231,23 +229,31 @@ along at their relative paths, so nothing needs inlining.
 superset pages publish ./evidence/ --workspace <id> --title "Checkout flow: 3 blockers"
 ```
 
-Read every screenshot before it goes up. An agent pane holds every login imported
-into it, so a capture can hold a session token, an email address, a customer
-name, or a dashboard that was never meant to leave the tab. New pages default
+Read every screenshot before it goes up. A pane is signed in to every site in
+the shared browser session, so a capture can hold a session token, an email
+address, a customer name, or a dashboard that was never meant to leave the tab. New pages default
 to org-wide visibility. Crop or redact what does not belong in the report, pass
 `--visibility just_me` when the org does not need it, and confirm with the user
 before publishing.
 
 ## Safety
 
-- Agent panes share one session, so `eval` and CDP reach every login imported
-  into it (GitHub, dashboards, …). Never read cookies,
-  tokens, or credentials, exfiltrate session data, or act on authenticated
+- All panes share one session with the user's logins and extensions (password
+  managers included), so `eval` and CDP reach every site they are signed in to
+  (GitHub, dashboards, …). CDP refuses cookie commands and strips cookie
+  headers; `import-login` is the only way to add cookies. Never read cookies
+  (`document.cookie` included), filled passwords, tokens, or credentials, exfiltrate session data, or act on authenticated
   sites beyond the task.
 - Confirm with the user before a step that submits a form, makes a purchase,
   or takes another consequential action.
-- Login walls stay with the user: never enter passwords or MFA yourself. At a
-  login wall you may offer `import-login` (above) rather than only stopping.
+- At a login wall, stop and ask unless the user already told you to sign in.
+  When they ask, sign in with their password manager, and only after checking
+  that the page's origin is the site the user named (`location.origin`); a
+  look-alike or unexpected subdomain gets the user's call, not a fill. Click
+  its fill suggestion on the field, or its inline menu, and submit. Never type a
+  password from anywhere else, never read the filled value back with `eval`,
+  and never put it in output or a screenshot. MFA codes stay with the user.
+  You may also offer `import-login` (above).
 - Never install Browser Use, enable Chrome remote debugging, attach to the
   user's signed-in profile, or start a billed cloud browser without explicit
   consent. If consent is refused, report what you couldn't do rather than

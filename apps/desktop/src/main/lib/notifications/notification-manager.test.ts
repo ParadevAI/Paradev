@@ -304,7 +304,7 @@ describe("NotificationManager", () => {
 
 			expect(createNotification).toHaveBeenCalledWith(
 				expect.objectContaining({
-					title: "Awaiting Response — Test Workspace",
+					title: "Awaiting Response · Test Workspace",
 					body: '"Test Title" is waiting for your reply',
 				}),
 			);
@@ -322,7 +322,7 @@ describe("NotificationManager", () => {
 
 			expect(createNotification).toHaveBeenCalledWith(
 				expect.objectContaining({
-					title: "Agent Complete — Test Workspace",
+					title: "Agent Complete · Test Workspace",
 					body: '"Test Title" has finished its task',
 				}),
 			);

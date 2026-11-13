@@ -1,11 +1,12 @@
 ---
 title: "Best Herdr Alternatives in 2026"
-description: "The best alternatives to Herdr for running AI coding agents, including Paradev, Orca, Emdash, cmux, and Claude Squad, from full workspaces to terminal-native tools."
+description: "The best alternatives to Herdr for running AI coding agents, including Paradev, Rex, Orca, Emdash, cmux, and Claude Squad, from full workspaces to terminal-native tools."
 date: 2026-08-07
-lastUpdated: 2026-11-05
+lastUpdated: 2026-11-10
 type: "roundup"
 competitors:
   - herdr
+  - rex
   - orca
   - emdash
   - cmux
@@ -15,11 +16,13 @@ keywords:
   - herdr alternatives
   - herdr competitors
   - herdr vs superset
+  - herdr desktop app alternative
+  - rex alternative
   - tmux for ai agents
   - ai agent orchestration
 ---
 
-Herdr gives coding agents a persistent home in your terminal. If you like that workflow and want a desktop interface around it, Paradev adds visual diff review, file editing, and browser previews beside your existing CLI agents. You can start with one task and use separate workspaces to keep unfinished work organized across projects.
+Herdr gives coding agents a persistent home, first in its terminal app and, since October 2026, in a separate native desktop app built on `herdr-core`. Both keep agents running outside the window. If you want the next steps in the same place, diff review, pull requests, automations, and a cloud workspace a teammate can open, Paradev adds them around the CLI agents you already use.
 
 **Our recommendation: choose Paradev for a visual workspace around your CLI-agent workflow.** The alternatives below cover other preferences, including open-source desktop environments and terminal-focused tools.
 
@@ -32,6 +35,7 @@ Herdr gives coding agents a persistent home in your terminal. If you like that w
 | Alternative | Best for | Platform | License |
 |---|---|---|---|
 | **Paradev** | The full loop: worktrees, review, browser, automations | macOS; experimental Linux AppImage; Windows unavailable | Open source (MIT) |
+| **Rex** | A multiplexer as the product, configured in Lua | macOS app, Linux and FreeBSD server; invite-only beta | Not stated |
 | **Orca** | Free cross-platform desktop ADE with mobile apps | macOS, Windows, Linux + iOS/Android | Open source (MIT) |
 | **Emdash** | Open-source ADE with broad tracker integrations | macOS, Windows, Linux | Open source (Apache-2.0) |
 | **Claude Squad** | Terminal-native parallel agents, like Herdr but simpler | macOS, Linux | Open source (AGPL) |
@@ -39,7 +43,9 @@ Herdr gives coding agents a persistent home in your terminal. If you like that w
 
 ## Why Look for a Herdr Alternative?
 
-Herdr already supports terminal organization, remote attachment, mouse controls, and Git worktree creation. Its [documentation](https://herdr.dev/docs/) and [worktree configuration](https://herdr.dev/docs/configuration/#worktrees) explain those capabilities. A reason to choose Paradev is to bring the next steps (inspecting the diff, editing files, and previewing the app) into the same desktop workspace.
+Herdr covers terminal organization, agent status, remote machines over SSH, worktrees, and, in the desktop app, layouts and mods you shape by asking an agent to edit files. It is free, Apache-2.0, and runs on macOS, Linux, and Windows, with phone apps on both platforms.
+
+Reasons to look elsewhere are usually about what happens after the agent stops. Herdr has no accounts and no sharing, so a teammate cannot open what you are running; it has no cloud, so the machine has to stay awake; and review happens in whatever tool you already use. Note also that Herdr TUI and the Herdr desktop app are separate programs that, in Herdr's words, "don't share agents."
 
 ## The Best Alternatives
 
@@ -50,6 +56,14 @@ Paradev builds a visual workspace around persistent terminal sessions backed by 
 For UI work, [point to an element and send the change to your agent](/blog/change-ui-with-your-coding-agent). For team review, [share a Page with comments that reach the agent](/blog/review-agent-work-with-pages).
 
 For the direct comparison, see [Paradev vs Herdr](/compare/superset-vs-herdr).
+
+### Rex
+
+Rex is the first product from Superlogical, the company Mitchell Hashimoto started after Ghostty. It is a terminal multiplexer with long-lived sessions, windows, and blocks, configured in a single Lua file, with Tailscale built into its server and an agent skill that lets Claude Code, Codex, OpenCode, or Pi open tabs, split panes, and read a screen. It reports program status over OSC 7501, the same open protocol Herdr reads.
+
+It is the closest thing to Herdr TUI in spirit, and it is early: as of November 10, 2026 it is in invite-only beta, with a macOS client and a Linux or FreeBSD server, and no license stated for Rex itself. Superlogical says Rex "is and will always be free."
+
+See [Paradev vs Rex](/compare/superset-vs-rex).
 
 ### Orca
 
@@ -78,6 +92,8 @@ See [Paradev vs cmux](/compare/superset-vs-cmux).
 ## How To Choose
 
 - For the full workspace -- worktrees, review, browser, automations, remote hosts -- choose **Paradev**.
+- For a cloud workspace that keeps running with your laptop closed, and that a teammate can open and prompt, choose **Paradev**.
+- For a multiplexer as the product, with Lua config and Tailscale, choose **Rex**, once you have an invite.
 - For a free, open-source desktop ADE with mobile companions, choose **Orca**.
 - For open-source with deep issue-tracker intake, choose **Emdash**.
 - To stay terminal-native with less machinery than Herdr, choose **Claude Squad**.

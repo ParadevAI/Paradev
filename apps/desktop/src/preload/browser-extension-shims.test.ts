@@ -52,6 +52,7 @@ function runInMainWorld(
 		callDnr?: unknown;
 		console?: unknown;
 		installedEvent?: unknown;
+		listContexts?: unknown;
 	} = {},
 ): MainWorld {
 	const { protocol, hostname } = new URL(url);
@@ -68,6 +69,7 @@ function runInMainWorld(
 		dnrMethods,
 		dnrConstants,
 		installedEvent,
+		listContexts,
 	] = args;
 	const world = {
 		location: { protocol, hostname },
@@ -93,6 +95,7 @@ function runInMainWorld(
 			dnrMethods,
 			dnrConstants,
 			overrides.installedEvent ?? installedEvent,
+			overrides.listContexts ?? listContexts,
 		],
 	};
 	runInNewContext(`(${func.toString()})(...args)`, world);
@@ -520,4 +523,53 @@ test("a failed chrome.declarativeNetRequest promise rejects with Chrome's bare m
 	await expect(dnr.updateDynamicRules({})).rejects.toThrow(
 		/^Rule with id 1 does not have a unique ID\.$/,
 	);
+});
+
+test("a service worker gets runtime.getContexts, which Electron does not have", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const asked: unknown[] = [];
+	const chrome = { runtime: { getManifest: () => ({}) } } as Record<
+		string,
+		unknown
+	>;
+
+	const world = runInMainWorld(shim, "chrome-extension://abc/background.js", {
+		isServiceWorker: true,
+		chrome,
+		listContexts: (filter?: unknown) => {
+			asked.push(filter);
+			return Promise.resolve([{ contextType: "POPUP" }]);
+		},
+	});
+
+	const runtime = (world.chrome as { runtime: Record<string, unknown> })
+		.runtime;
+	const getContexts = runtime.getContexts as (f?: unknown) => Promise<unknown>;
+	expect(typeof getContexts).toBe("function");
+	await expect(getContexts({ contextTypes: ["POPUP"] })).resolves.toEqual([
+		{ contextType: "POPUP" },
+	]);
+	expect(asked).toEqual([{ contextTypes: ["POPUP"] }]);
+});
+
+test("the shim replaces Electron's getContexts, which sees only the worker, and leaves frames alone", async () => {
+	const shim = await importInWorkerPreloadRealm();
+	const electronOwn = () => Promise.resolve([{ contextType: "BACKGROUND" }]);
+
+	const page = runInMainWorld(shim, "chrome-extension://abc/popup.html", {
+		chrome: { runtime: { getManifest: () => ({}) } },
+	});
+	const worker = runInMainWorld(shim, "chrome-extension://abc/background.js", {
+		isServiceWorker: true,
+		chrome: { runtime: { getManifest: () => ({}), getContexts: electronOwn } },
+		listContexts: () => Promise.resolve([{ contextType: "POPUP" }]),
+	});
+
+	expect(
+		(page.chrome as { runtime: Record<string, unknown> }).runtime.getContexts,
+	).toBeUndefined();
+	const replaced = (worker.chrome as { runtime: Record<string, unknown> })
+		.runtime.getContexts as () => Promise<unknown>;
+	expect(replaced).not.toBe(electronOwn);
+	await expect(replaced()).resolves.toEqual([{ contextType: "POPUP" }]);
 });

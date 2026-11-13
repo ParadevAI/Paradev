@@ -1,6 +1,6 @@
 {
 	"name": "@superset/host-service",
-	"version": "2.0.5",
+	"version": "2.0.8",
 	"private": true,
 	"type": "module",
 	"exports": {
@@ -78,7 +78,7 @@
 		"test": "bun test --pass-with-no-tests --parallel",
 		"test:integration": "bun test --pass-with-no-tests test/integration",
 		"test:integration:daemon": "node --experimental-strip-types --test src/terminal/DaemonClient/DaemonClient.node-test.ts src/daemon/DaemonSupervisor.node-test.ts",
-		"test:integration:terminal": "node --import tsx --test src/terminal/terminal.initial-command.node-test.ts src/terminal/terminal.ungated-launch.node-test.ts src/terminal/terminal.shell-ready-learning.node-test.ts src/terminal/terminal.fish-prompt-transport.node-test.ts src/terminal/terminal.send-snapshot.node-test.ts",
+		"test:integration:terminal": "node --import tsx --test src/terminal/terminal.initial-command.node-test.ts src/terminal/terminal.ungated-launch.node-test.ts src/terminal/terminal.shell-ready-learning.node-test.ts src/terminal/terminal.fish-prompt-transport.node-test.ts src/terminal/terminal.send-snapshot.node-test.ts src/trpc/router/usage/history/usage-sqlite.node-test.ts",
 		"test:integration:ports": "node --experimental-strip-types --test src/ports/forward-mux-route.node-test.ts",
 		"test:integration:workers": "node --experimental-strip-types --test src/workers/worker-termination.node-test.ts",
 		"test:e2e": "bun run scripts/test-e2e.ts",
@@ -110,7 +110,7 @@
 		"drizzle-orm": "0.45.2",
 		"entities": "7.0.1",
 		"expo-device-hub": "0.18.0",
-		"hono": "4.13.7",
+		"hono": "4.13.11",
 		"mime-types": "3.0.2",
 		"node-pty": "1.2.0-beta.14",
 		"partysocket": "1.3.0",
@@ -119,7 +119,7 @@
 		"simple-git": "4.0.2",
 		"superjson": "2.2.6",
 		"tree-kill": "1.2.2",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/host-client": "workspace:*",

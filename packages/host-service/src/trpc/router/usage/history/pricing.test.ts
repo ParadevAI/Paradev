@@ -119,6 +119,17 @@ describe("matchModelRate", () => {
 		).toBeCloseTo(24.2);
 	});
 
+	test("prices Fable 5.2 and Mythos 5.2 at their own rates, not Fable 5.1's", () => {
+		for (const model of ["claude-fable-5-2", "claude-mythos-5-2"]) {
+			expect(matchModelRate("claude", model)).toMatchObject({
+				inputPerM: 8,
+				outputPerM: 40,
+				cacheReadPerM: 0.2,
+				approximate: false,
+			});
+		}
+	});
+
 	test("prices Fable 5.1 and Mythos 5.1 cache reads at their own rate, not the usual 0.1x", () => {
 		const fable51 = matchModelRate("claude", "claude-fable-5-1");
 		const fable5 = matchModelRate("claude", "claude-fable-5");

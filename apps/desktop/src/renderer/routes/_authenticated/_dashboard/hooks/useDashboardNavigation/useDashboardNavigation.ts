@@ -104,6 +104,7 @@ export function useDashboardNavigation() {
 					search: pullRequestsFilters.search,
 					projectFilters: pullRequestsFilters.projectFilters,
 					authorFilter: pullRequestsFilters.authorFilter,
+					reviewerFilter: pullRequestsFilters.reviewerFilter,
 					reviewFilter: pullRequestsFilters.reviewFilter,
 					includeClosed: pullRequestsFilters.includeClosed,
 					mergedOnly: pullRequestsFilters.mergedOnly,

@@ -1547,7 +1547,7 @@ export class HostServiceCoordinator extends EventEmitter {
 			detail: i18n._(
 				msg({
 					message:
-						"Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart.",
+						"Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart.",
 				}),
 			),
 		});

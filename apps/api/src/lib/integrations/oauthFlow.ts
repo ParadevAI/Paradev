@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 import { createSignedState } from "@/lib/oauth-state";
 
@@ -40,7 +41,7 @@ export function connectorStateCookie(slug: string): StateCookie {
 const MAX_AGE_SECONDS = 600;
 
 function attributes(cookie: StateCookie): string {
-	const secure = env.NEXT_PUBLIC_API_URL.startsWith("https") ? " Secure;" : "";
+	const secure = getBrowserApiUrl(env).startsWith("https") ? " Secure;" : "";
 	return `HttpOnly;${secure} SameSite=Lax; Path=${cookie.path}`;
 }
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import {
+	CLOUD_AGENT_IDS,
 	CLOUD_AGENT_LAUNCH_ENV_NAMES,
 	cloudAgentLaunchSchema,
 	cloudAgentLaunchToEnv,
@@ -8,6 +9,7 @@ import {
 	readCloudAgentLaunch,
 	supportsCloudAgentChat,
 } from "./cloud-agent-launch";
+import { HOST_AGENT_PRESETS } from "./host-agent-presets";
 import { sandboxIdentitySchema } from "./sandbox-contract";
 
 const fileId = "0b8f3c1e-5a2d-4f6b-9c7e-1d2e3f4a5b6c";
@@ -16,11 +18,17 @@ describe("cloud agent launch", () => {
 	it.each([
 		["claude", true],
 		["pdev", true],
-		["codex", false],
+		["codex", true],
 		["opencode", false],
 		[undefined, false],
 	] as const)("chat support for %s is %s", (agent, supported) => {
 		expect(supportsCloudAgentChat(agent)).toBe(supported);
+	});
+	it("offers chat only for agents the sandbox installs", () => {
+		const chatAgents = HOST_AGENT_PRESETS.map(
+			(preset) => preset.presetId,
+		).filter(supportsCloudAgentChat);
+		expect(chatAgents.every((id) => CLOUD_AGENT_IDS.includes(id))).toBe(true);
 	});
 	it("describes a server-planned chat without exposing its prompt", async () => {
 		const launch = await describeCloudAgentLaunch({

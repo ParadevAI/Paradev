@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { projects } from "../../../../db/schema";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import { createUserSimpleGit } from "../../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../../types";
 import type { ProjectNotSetupCause } from "../../../error-types";
@@ -41,9 +40,7 @@ export async function resolveGithubRepo(
 	ctx: HostServiceContext,
 	projectId: string,
 ): Promise<ResolvedGithubRepo> {
-	const local = ctx.db.query.projects
-		.findFirst({ where: eq(projects.id, projectId) })
-		.sync();
+	const local = getLocalProject(ctx.db, projectId);
 	if (!local?.repoPath) {
 		throw projectNotSetupError(projectId);
 	}

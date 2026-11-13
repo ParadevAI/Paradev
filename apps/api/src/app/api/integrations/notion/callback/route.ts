@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import {
 	connectorMethod,
 	requireConnector,
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
 		body: JSON.stringify({
 			grant_type: "authorization_code",
 			code: params.code,
-			redirect_uri: `${env.NEXT_PUBLIC_API_URL}/api/integrations/notion/callback`,
+			redirect_uri: `${getBrowserApiUrl(env)}/api/integrations/notion/callback`,
 		}),
 		signal: AbortSignal.timeout(15_000),
 	}).catch((error: unknown) => {

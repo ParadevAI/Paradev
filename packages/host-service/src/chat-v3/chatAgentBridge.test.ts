@@ -100,6 +100,72 @@ describe("createChatAgentBridge", () => {
 		bridge.stopped("chat-1");
 	});
 
+	it("a turn the user stopped settles quietly, with no Finished notification", () => {
+		const { bridge, lifecycle, status, start, publish, terminalAgentStore } =
+			setup();
+		start("chat-1");
+		status("chat-1", "idle");
+		status("chat-1", "running");
+		const startedAt = terminalAgentStore.getChat(TERMINAL)?.lastEventAt;
+		publish("chat-1", {
+			type: "turn",
+			turn: { id: "turn-1", status: "interrupted", startedAtMs: 1 },
+		});
+		status("chat-1", "idle");
+
+		expect(lifecycle.mock.calls.map(([event]) => event.eventType)).toEqual([
+			"Start",
+		]);
+		expect(terminalAgentStore.getChat(TERMINAL)).toMatchObject({
+			lastEventType: "Stop",
+			lastEventAt: startedAt,
+		});
+		bridge.stopped("chat-1");
+	});
+
+	it("a turn that failed while the chat lives on reports Failed, not Finished", () => {
+		const { bridge, lifecycle, status, start, publish } = setup();
+		start("chat-1");
+		status("chat-1", "idle");
+		status("chat-1", "running");
+		publish("chat-1", {
+			type: "turn",
+			turn: {
+				id: "turn-1",
+				status: "failed",
+				error: { message: "exited", kind: "crashed" },
+				startedAtMs: 1,
+			},
+		});
+		status("chat-1", "idle");
+
+		expect(lifecycle.mock.calls.map(([event]) => event.eventType)).toEqual([
+			"Start",
+			"Failed",
+		]);
+		bridge.stopped("chat-1");
+	});
+
+	it("a chat Paradev closed mid-turn comes back unseen, without a notification", () => {
+		const { bridge, lifecycle, terminalAgentStore } = setup();
+		bridge.closedMidTurn({
+			sessionId: "chat-1",
+			scopeId: WORKSPACE,
+			harness: "claude-acp",
+			harnessSessionId: "agent-1",
+			terminalId: TERMINAL,
+			interrupted: true,
+			prompts: [],
+			pausedPrompts: [],
+		});
+
+		expect(terminalAgentStore.getChat(TERMINAL)).toMatchObject({
+			lastEventType: "Stop",
+			chatSessionId: "chat-1",
+		});
+		expect(lifecycle).not.toHaveBeenCalled();
+	});
+
 	it("keeps the main agent's reply as the preview when a subagent speaks last", () => {
 		const { bridge, lifecycle, status, reply, start, publish } = setup();
 		start("chat-1");

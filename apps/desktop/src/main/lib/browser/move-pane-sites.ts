@@ -40,47 +40,65 @@ function paneSiteOrigins(
 	return [...origins].filter((origin) => !isOwnHost(new URL(origin).hostname));
 }
 
+async function paneCookies(from: CookieStore): Promise<Electron.Cookie[]> {
+	return (await from.get({})).filter(
+		(cookie) => !isOwnHost((cookie.domain ?? "").replace(/^\./, "")),
+	);
+}
+
 /**
  * The browser pane moved from the app's session to its own. Copies the pane's
- * cookies across once, so users stay signed in to sites, then clears those
- * sites from the app session so "Clear browsing data" reaches all of it again.
- * The copy runs once, so a cookie the user clears in the pane does not come
- * back; a clean-up that failed runs again on the next start. Paradev's own
+ * cookies across once, so users stay signed in to sites. The copy runs once, so
+ * a cookie the user clears in the pane does not come back. Paradev's own
  * cookies stay in the app session, away from pane extensions.
  */
 export async function movePaneSitesOnce({
 	from,
 	to,
 	markerPath,
-	readVisitedUrls,
-	clearOldSites,
 }: {
 	from: CookieStore;
 	to: CookieStore;
 	markerPath: string;
+}): Promise<number> {
+	if (existsSync(markerPath) || existsSync(clearedMarkerPath(markerPath))) {
+		return 0;
+	}
+	const cookies = await paneCookies(from);
+	const copied = await copyCookies(cookies, to);
+	writeFileSync(markerPath, `${copied}/${cookies.length}\n`);
+	return copied;
+}
+
+/**
+ * After a full copy, clears the moved sites from the app session so "Clear
+ * browsing data" reaches all of it again. On a large app session this can take
+ * minutes, so startup must not wait on it. A clean-up that did not finish runs
+ * again on the next start; it never touches the pane session.
+ */
+export async function clearMovedPaneSitesOnce({
+	from,
+	markerPath,
+	readVisitedUrls,
+	clearOldSites,
+}: {
+	from: CookieStore;
+	markerPath: string;
 	readVisitedUrls: () => string[];
 	clearOldSites: (origins: string[]) => Promise<void>;
-}): Promise<number> {
-	const clearedPath = `${markerPath}.cleared`;
-	if (existsSync(clearedPath)) return 0;
+}): Promise<void> {
+	const clearedPath = clearedMarkerPath(markerPath);
+	if (existsSync(clearedPath) || !existsSync(markerPath)) return;
+	const [done, total] = readFileSync(markerPath, "utf8").trim().split("/");
+	if (done !== total) return;
 
-	const cookies = (await from.get({})).filter(
-		(cookie) => !isOwnHost((cookie.domain ?? "").replace(/^\./, "")),
-	);
-	let copied = 0;
-	if (existsSync(markerPath)) {
-		const [done, total] = readFileSync(markerPath, "utf8").trim().split("/");
-		if (done !== total) return 0;
-	} else {
-		copied = await copyCookies(cookies, to);
-		writeFileSync(markerPath, `${copied}/${cookies.length}\n`);
-		if (copied < cookies.length) return copied;
-	}
-
-	const origins = paneSiteOrigins(cookies, readVisitedUrls());
+	const origins = paneSiteOrigins(await paneCookies(from), readVisitedUrls());
 	if (origins.length > 0) await clearOldSites(origins);
 	writeFileSync(clearedPath, "");
-	return copied;
+}
+
+function clearedMarkerPath(markerPath: string): string {
+	return `${markerPath}.cleared`;
 }
 
 async function copyCookies(

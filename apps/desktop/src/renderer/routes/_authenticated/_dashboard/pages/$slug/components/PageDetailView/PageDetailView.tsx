@@ -92,7 +92,9 @@ export function PageDetailView({
 						sharing={sharing}
 						onRename={onRename}
 						onRefresh={onRefresh}
-						onPreviewVersion={setPreviewVersion}
+						onPreviewVersion={(next) =>
+							setPreviewVersion(next === page.servedVersion ? null : next)
+						}
 						previewVersion={
 							previewVersion === page.servedVersion ? null : previewVersion
 						}
@@ -123,6 +125,7 @@ export function PageDetailView({
 					onCommentsEnabledChange={setCommentsEnabled}
 					initialThreadId={initialThreadId}
 					initialPanelOpen={initialPanelOpen}
+					findActive
 				/>
 			</div>
 		</div>

@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
 			notionAuthUrl.searchParams.set("client_id", clientId);
 			notionAuthUrl.searchParams.set(
 				"redirect_uri",
-				`${env.NEXT_PUBLIC_API_URL}/api/integrations/notion/callback`,
+				`${getBrowserApiUrl(env)}/api/integrations/notion/callback`,
 			);
 			notionAuthUrl.searchParams.set("response_type", "code");
 			// The only value Notion accepts; a workspace is authorized by one of

@@ -31,7 +31,10 @@ export async function GET(request: Request) {
 		cookie: STATE_COOKIES.github,
 	});
 	if (callback instanceof Response) return callback;
-	const { organizationId, userId, params, exit } = callback;
+	const { organizationId, userId, role, params, exit } = callback;
+	if (role !== "owner" && role !== "admin") {
+		return exit(`${settingsUrl}?error=admin_required`);
+	}
 	const installationId = params.installation_id;
 
 	try {

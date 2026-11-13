@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "streamdown/styles.css";
 @import "../../../../packages/ui/src/motion.css";
+@import "../../../../packages/ui/src/components/overflow-fade/fade-edge.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -337,6 +338,29 @@
 		background-color: var(--highlight-active);
 	}
 
+	/* UpdatesPill: marquee progress bar while installing */
+	@keyframes ascii-bar {
+		0% {
+			content: "[##····]";
+		}
+		16.667% {
+			content: "[·##···]";
+		}
+		33.333% {
+			content: "[··##··]";
+		}
+		50% {
+			content: "[···##·]";
+		}
+		66.667% {
+			content: "[····##]";
+		}
+		83.333%,
+		100% {
+			content: "[#····#]";
+		}
+	}
+
 	/* UpdatesPill: checkmark draw-in on download-confirmed */
 	@keyframes check-draw {
 		from {
@@ -406,6 +430,7 @@
 
 /* Embedded documents hit-test ahead of the host; while a host gesture is in
    flight they yield to it. See renderer/lib/pointer-passthrough.ts. */
-html[data-pointer-passthrough] iframe {
+html[data-pointer-passthrough] iframe,
+html[data-pointer-passthrough] [data-pointer-passthrough-target] {
 	pointer-events: none;
 }

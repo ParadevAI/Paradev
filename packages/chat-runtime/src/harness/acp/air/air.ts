@@ -96,3 +96,24 @@ export function isSubagentControlCall(raw: unknown): boolean {
 		SUBAGENT_CONTROL_TOOLS.has(claudeCode?.toolName ?? "")
 	);
 }
+
+const permissionMetaSchema = z.looseObject({
+	_meta: z.looseObject({
+		jetbrains: z.looseObject({
+			air: z.looseObject({
+				permission: z.looseObject({
+					description: z.string().nullable().optional(),
+				}),
+			}),
+		}),
+	}),
+});
+
+// claude-agent-acp calls this field temporary diagnostic text: an adapter bump may change or drop it.
+export function airPermissionReason(raw: unknown): string | undefined {
+	const parsed = permissionMetaSchema.safeParse(raw);
+	if (!parsed.success) return undefined;
+	const description =
+		parsed.data._meta.jetbrains.air.permission.description?.trim();
+	return description?.replace(/^Reason:\s*/, "") || undefined;
+}

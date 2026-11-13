@@ -20,11 +20,11 @@ import {
 } from "react-icons/hi2";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
-} from "../../PromptGroup/components/FormPickerTrigger";
+} from "renderer/routes/_authenticated/components/FormPickerTrigger";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { PickerChevron } from "../PickerChevron";
 import { useWorkspaceHostOptions } from "./hooks/useWorkspaceHostOptions";
 

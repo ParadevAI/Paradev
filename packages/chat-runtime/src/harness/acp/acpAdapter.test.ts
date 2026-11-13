@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from "bun:test";
+import { describe, expect, it, jest, spyOn } from "bun:test";
 import { spawn } from "node:child_process";
 import type { ChatSelections } from "@superset/chat/core";
 import type { Item } from "@superset/chat/protocol";
@@ -2452,6 +2452,44 @@ describe("AcpAdapter on protocol v2", () => {
 		expect(
 			itemsOf(events).filter((item) => item.kind === "approval_request"),
 		).toHaveLength(2);
+
+		await adapter.dispose();
+	});
+
+	it("shows the reason claude-agent-acp sends in the AIR permission meta", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+
+		agent.requestPermissionWith(
+			{
+				toolCall: { toolCallId: "tc-1", title: "rm -rf build" },
+				options: [
+					{ optionId: "allow-once", name: "Yes", kind: "allow_once" },
+					{ optionId: "reject", name: "No", kind: "reject_once" },
+				],
+				_meta: {
+					jetbrains: {
+						air: {
+							version: 1,
+							permission: {
+								version: 1,
+								title: "rm -rf build",
+								description: "Reason: Deletes files",
+							},
+						},
+					},
+				},
+			},
+			9306,
+		);
+		await flush();
+
+		expect(
+			itemsOf(events).find((item) => item.kind === "approval_request"),
+		).toMatchObject({ reason: "Deletes files", status: "pending" });
 
 		await adapter.dispose();
 	});
@@ -5809,6 +5847,51 @@ describe("AcpAdapter config options", () => {
 		await adapter.dispose();
 	});
 
+	it("turns fast mode on once the agent has taken the start model", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [
+			MODEL_OPTION,
+			{
+				id: "fast",
+				name: "Fast mode",
+				type: "select",
+				currentValue: "off",
+				options: [
+					{ value: "off", name: "Off" },
+					{ value: "on", name: "On" },
+				],
+			},
+		];
+		agent.holdSelections = true;
+		const { adapter } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			fast: "on",
+		});
+		const configured = () =>
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params);
+		await flush();
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+		]);
+
+		agent.holdSelections = false;
+		agent.releaseSelections();
+		await flush(20);
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "fast", value: "on" },
+		]);
+		expect(await adapter.startSelections()).toEqual({
+			modelId: "sonnet",
+			fast: "on",
+		});
+
+		await adapter.dispose();
+	});
+
 	it("skips the start effort when the agent refuses the start model, and reports what it took", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
@@ -5851,6 +5934,26 @@ describe("AcpAdapter config options", () => {
 		).toEqual({ sessionId: "sess-1", configId: "model", value: "sonnet" });
 		expect(await adapter.startSelections()).toEqual({ modelId: "sonnet" });
 
+		await adapter.dispose();
+	});
+
+	it("warns when the agent lists no options in time to take the start effort", async () => {
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{ effortId: "high" },
+			{ startOptionsGraceMs: 1 },
+		);
+
+		expect(await adapter.startSelections()).toEqual({});
+		expect(warn).toHaveBeenCalledWith(
+			'[acp] the agent did not take reasoning effort "high"; it runs at its default',
+		);
+
+		warn.mockRestore();
 		await adapter.dispose();
 	});
 

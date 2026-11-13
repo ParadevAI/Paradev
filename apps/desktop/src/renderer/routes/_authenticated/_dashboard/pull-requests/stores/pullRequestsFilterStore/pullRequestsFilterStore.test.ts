@@ -31,6 +31,7 @@ describe("pullRequestsSearchFromFilters", () => {
 				search: "",
 				projectFilters: [],
 				authorFilter: null,
+				reviewerFilter: null,
 				reviewFilter: null,
 				includeClosed: false,
 				mergedOnly: false,
@@ -44,6 +45,7 @@ describe("pullRequestsSearchFromFilters", () => {
 				search: "remote host",
 				projectFilters: ["project-1", "project-2"],
 				authorFilter: "octocat,teammate",
+				reviewerFilter: "reviewer-one,reviewer-two",
 				reviewFilter: "changes-requested",
 				includeClosed: true,
 				mergedOnly: false,
@@ -52,6 +54,7 @@ describe("pullRequestsSearchFromFilters", () => {
 			search: "remote host",
 			projects: "project-1,project-2",
 			author: "octocat,teammate",
+			reviewer: "reviewer-one,reviewer-two",
 			review: "changes-requested",
 			state: "all",
 		});
@@ -63,6 +66,7 @@ describe("pullRequestsSearchFromFilters", () => {
 				search: "",
 				projectFilters: [],
 				authorFilter: null,
+				reviewerFilter: null,
 				reviewFilter: null,
 				includeClosed: true,
 				mergedOnly: true,
@@ -110,6 +114,21 @@ describe("migratePullRequestsFilterState", () => {
 			mergedOnly: false,
 		});
 	});
+});
+
+test("keeps the reviewer filter independent of the author filter", () => {
+	const store = usePullRequestsFilterStore.getState();
+	store.setAuthorFilter("alice");
+	// Deduped case-insensitively, but each login keeps the casing first seen.
+	store.setReviewerFilter(" @bob, CAROL, BOB ");
+	expect(usePullRequestsFilterStore.getState().reviewerFilter).toBe(
+		"bob,CAROL",
+	);
+	expect(usePullRequestsFilterStore.getState().authorFilter).toBe("alice");
+	// Injected qualifiers must not survive into the GitHub query.
+	store.setReviewerFilter("bob review-requested:carol");
+	expect(usePullRequestsFilterStore.getState().reviewerFilter).toBeNull();
+	store.setAuthorFilter(null);
 });
 
 test("restores saved multiple authors", () => {

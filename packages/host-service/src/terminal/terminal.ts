@@ -37,9 +37,10 @@ import type { Hono } from "hono";
 import { getSupervisor } from "../daemon/index.ts";
 import { isProcessAlive, readPtyDaemonManifest } from "../daemon/manifest.ts";
 import type { HostDb } from "../db/index.ts";
-import { projects, terminalSessions, workspaces } from "../db/schema.ts";
+import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
+import { getProjectIncludingDeleted } from "../projects/local-project-store.ts";
 import {
 	getPathState,
 	inaccessiblePathMessage,
@@ -3069,9 +3070,7 @@ async function createTerminalSessionUnlocked({
 	// (null projectId) have no main repo; the session dir is the only root.
 	let rootPath = "";
 	const project = workspace.projectId
-		? db.query.projects
-				.findFirst({ where: eq(projects.id, workspace.projectId) })
-				.sync()
+		? getProjectIncludingDeleted(db, workspace.projectId)
 		: undefined;
 	if (project?.repoPath) {
 		rootPath = project.repoPath;

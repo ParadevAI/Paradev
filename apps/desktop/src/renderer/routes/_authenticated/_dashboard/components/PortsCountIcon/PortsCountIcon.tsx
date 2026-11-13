@@ -24,12 +24,14 @@ export function PortsCountIcon({
 			className={cn("relative flex items-center justify-center", sizing.box)}
 		>
 			<LuRadioTower className={sizing.icon} strokeWidth={1.75} />
-			<CountBadge
-				size={size}
-				className="ring-sidebar dark:ring-[color-mix(in_oklab,var(--muted)_35%,var(--background))]"
-			>
-				{count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : count}
-			</CountBadge>
+			{count > 0 && (
+				<CountBadge
+					size={size}
+					className="ring-sidebar dark:ring-[color-mix(in_oklab,var(--muted)_35%,var(--background))]"
+				>
+					{count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : count}
+				</CountBadge>
+			)}
 		</span>
 	);
 }
