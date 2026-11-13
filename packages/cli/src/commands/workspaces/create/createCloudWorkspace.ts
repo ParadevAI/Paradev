@@ -4,6 +4,7 @@ import { TRPCClientError } from "@trpc/client";
 import type { ApiClient } from "../../../lib/api-client";
 import { resolveCloudEnvironment } from "../../../lib/cloud-workspaces";
 import { workspaceLinks } from "../../../lib/open-url";
+import { uploadToCloudStorage } from "../../../lib/upload-attachments";
 
 /** What `ws create` parsed; the host-only flags are here only to be refused. */
 export interface CloudCreateOptions {
@@ -35,8 +36,9 @@ export async function createCloudWorkspace(args: {
 	api: ApiClient;
 	organizationId: string;
 	options: CloudCreateOptions;
+	fetchImpl?: typeof fetch;
 }): Promise<{ data: unknown; message: string }> {
-	const { api, organizationId, options } = args;
+	const { api, organizationId, options, fetchImpl } = args;
 
 	// A cloud workspace's checkout is its environment's: no project, worktree
 	// or host. Those flags mean the caller wanted a host, so say how.
@@ -47,11 +49,6 @@ export async function createCloudWorkspace(args: {
 		["--pr", options.pr],
 		["--task", options.task],
 		["--skip-branch-prefix", options.skipBranchPrefix || undefined],
-		["--tag", options.tag?.length ? options.tag : undefined],
-		[
-			"--attachment",
-			options.attachment?.length ? options.attachment : undefined,
-		],
 		["--command", options.command],
 	] as const) {
 		if (value !== undefined) {
@@ -74,6 +71,10 @@ export async function createCloudWorkspace(args: {
 		["--prompt", options.prompt],
 		["--model", options.model],
 		["--effort", options.effort],
+		[
+			"--attachment",
+			options.attachment?.length ? options.attachment : undefined,
+		],
 	] as const) {
 		if (value !== undefined && !options.agent) {
 			throw new CLIError(
@@ -97,6 +98,10 @@ export async function createCloudWorkspace(args: {
 		options.environment,
 	);
 
+	const attachmentFileIds = options.attachment?.length
+		? await uploadToCloudStorage({ api, paths: options.attachment, fetchImpl })
+		: [];
+
 	const row = await api.cloudWorkspace.create
 		.mutate({
 			organizationId,
@@ -108,6 +113,8 @@ export async function createCloudWorkspace(args: {
 			...(options.model ? { model: options.model } : {}),
 			...(options.effort ? { effort: options.effort } : {}),
 			...(options.machineSize ? { machineSize: options.machineSize } : {}),
+			...(attachmentFileIds.length > 0 ? { attachmentFileIds } : {}),
+			...(options.tag?.length ? { tags: options.tag } : {}),
 		})
 		.catch(rethrowWithLocationHint);
 

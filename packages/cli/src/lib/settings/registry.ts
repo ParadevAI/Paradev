@@ -378,6 +378,8 @@ export const EXCLUDED_SETTINGS_COLUMNS: Record<string, string> = {
 	disabledSkills: "skill-name list; use the app's Plugins page",
 	installedPlugins:
 		"legacy install list; the app copies it into installed_plugins.json, retained for rollback",
+	browserPinnedExtensions:
+		"extension-id list; pin from the browser pane's Extensions menu",
 	terminalPersistence: "dead column; nothing reads it, retained for rollback",
 	deleteLocalBranch: "v2 reads renderer localStorage, unreachable externally",
 	exposeHostServiceViaRelay:

@@ -36,7 +36,7 @@ export const launchContextMultiSource: LaunchContext = {
 		{
 			id: `task:${internalTaskRefactorAuth.id}`,
 			kind: "internal-task",
-			label: `Task ${internalTaskRefactorAuth.id} — ${internalTaskRefactorAuth.title}`,
+			label: `Task ${internalTaskRefactorAuth.id} · ${internalTaskRefactorAuth.title}`,
 			content: [
 				{
 					type: "text",
@@ -48,7 +48,7 @@ export const launchContextMultiSource: LaunchContext = {
 		{
 			id: `issue:${githubIssueAuthMiddleware.number}`,
 			kind: "github-issue",
-			label: `Issue #${githubIssueAuthMiddleware.number} — ${githubIssueAuthMiddleware.title}`,
+			label: `Issue #${githubIssueAuthMiddleware.number} · ${githubIssueAuthMiddleware.title}`,
 			content: [
 				{
 					type: "text",
@@ -63,7 +63,7 @@ export const launchContextMultiSource: LaunchContext = {
 		{
 			id: `issue:${githubIssueTokenRotation.number}`,
 			kind: "github-issue",
-			label: `Issue #${githubIssueTokenRotation.number} — ${githubIssueTokenRotation.title}`,
+			label: `Issue #${githubIssueTokenRotation.number} · ${githubIssueTokenRotation.title}`,
 			content: [
 				{
 					type: "text",
@@ -78,7 +78,7 @@ export const launchContextMultiSource: LaunchContext = {
 		{
 			id: `pr:${githubPrAuthRewrite.number}`,
 			kind: "github-pr",
-			label: `PR #${githubPrAuthRewrite.number} — ${githubPrAuthRewrite.title}`,
+			label: `PR #${githubPrAuthRewrite.number} · ${githubPrAuthRewrite.title}`,
 			content: [
 				{
 					type: "text",

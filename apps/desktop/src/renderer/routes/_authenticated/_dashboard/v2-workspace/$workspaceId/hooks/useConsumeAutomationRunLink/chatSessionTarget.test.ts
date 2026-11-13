@@ -7,6 +7,7 @@ const session: NonNullable<SessionResult["session"]> = {
 	sessionId: "chat-1",
 	scopeId: "workspace-1",
 	harness: "claude-acp",
+	agentConfigId: null,
 	harnessSessionId: "native-1",
 	epoch: "epoch-1",
 	status: "idle",
@@ -14,6 +15,7 @@ const session: NonNullable<SessionResult["session"]> = {
 	queuedCount: 0,
 	updatedAt: 1,
 	closedAt: null,
+	closedByUser: false,
 };
 const result: SessionResult = { session, cursor: null, live: true };
 const liveSession: Awaited<ReturnType<ChatTransport["listSessions"]>>[number] =

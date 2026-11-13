@@ -18,10 +18,13 @@ type OpenablePort = Pick<
  */
 export function getPortBrowserUrl(
 	port: Pick<DashboardSidebarPort, "port" | "hostType">,
-	forward: Pick<PortForward, "status"> | null,
+	forward:
+		| (Pick<PortForward, "status"> & Partial<Pick<PortForward, "localPort">>)
+		| null,
 ): string | null {
 	const localPort =
-		forward?.status.state === "active" ? forward.status.localPort : null;
+		forward?.localPort ??
+		(forward?.status.state === "active" ? forward.status.localPort : null);
 	if (port.hostType !== "local-device" && localPort === null) return null;
 	return `http://localhost:${localPort ?? port.port}`;
 }
@@ -42,7 +45,9 @@ export function usePortOpener() {
 
 	const openPort = (
 		port: OpenablePort,
-		forward: Pick<PortForward, "status"> | null,
+		forward:
+			| (Pick<PortForward, "status"> & Partial<Pick<PortForward, "localPort">>)
+			| null,
 	) => {
 		const url = getPortBrowserUrl(port, forward);
 		if (url === null) {

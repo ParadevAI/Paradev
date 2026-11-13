@@ -9,9 +9,9 @@ interface SidebarSlideProps {
 	width: number;
 	onLayoutFrame?: () => void;
 	keepMounted?: boolean;
+	alwaysMounted?: boolean;
 	durationMs?: number;
-	/** The window edge the panel sits on; its content stays pinned there while the width moves. */
-	side?: "left" | "right";
+	edge?: "left" | "right";
 	children: (fill: boolean) => React.ReactNode;
 }
 
@@ -20,18 +20,23 @@ export function SidebarSlide({
 	width,
 	onLayoutFrame,
 	keepMounted = false,
+	alwaysMounted = false,
 	durationMs = 300,
-	side = "right",
+	edge = "right",
 	children,
 }: SidebarSlideProps) {
 	const [settled, setSettled] = useState<SidebarSlideMode>(mode);
 	const [move, setMove] = useState<{
 		from: SidebarSlideMode;
 		to: SidebarSlideMode;
+		/** Where a move that reverses another one starts: the width on screen. */
+		fromWidth: number | undefined;
 	} | null>(null);
 	const [armed, setArmed] = useState(false);
 	const [hasOpened, setHasOpened] = useState(mode !== "closed");
 	const headingRef = useRef(mode);
+	const slideRef = useRef<HTMLDivElement>(null);
+	const movingRef = useRef(false);
 	const onLayoutFrameRef = useRef(onLayoutFrame);
 	onLayoutFrameRef.current = onLayoutFrame;
 
@@ -39,8 +44,12 @@ export function SidebarSlide({
 		const from = headingRef.current;
 		if (from === mode) return;
 		headingRef.current = mode;
+		const fromWidth = movingRef.current
+			? slideRef.current?.getBoundingClientRect().width
+			: undefined;
+		movingRef.current = true;
 		if (mode !== "closed") setHasOpened(true);
-		setMove({ from, to: mode });
+		setMove({ from, to: mode, fromWidth });
 		setArmed(false);
 		let timer: ReturnType<typeof setTimeout> | undefined;
 		let frame = requestAnimationFrame(() => {
@@ -48,6 +57,7 @@ export function SidebarSlide({
 				setArmed(true);
 				timer = setTimeout(() => {
 					cancelAnimationFrame(layoutFrame);
+					movingRef.current = false;
 					setSettled(mode);
 					setMove(null);
 				}, durationMs);
@@ -68,8 +78,9 @@ export function SidebarSlide({
 		if (!move) onLayoutFrameRef.current?.();
 	}, [move]);
 
-	if (!hasOpened) return null;
-	if (!keepMounted && !move && settled === "closed") return null;
+	if (!alwaysMounted && !hasOpened) return null;
+	if (!alwaysMounted && !keepMounted && !move && settled === "closed")
+		return null;
 
 	// Settled open lays the panel out in flow so a drag-resize sizes everything
 	// from the panel itself. The element tree stays the same in every mode, so
@@ -82,7 +93,9 @@ export function SidebarSlide({
 		? move.from === "expanded" || move.to === "expanded"
 		: settled === "expanded";
 	const panelWidth = move
-		? widthOf(armed ? move.to : move.from)
+		? armed
+			? widthOf(move.to)
+			: (move.fromWidth ?? widthOf(move.from))
 		: widthOf(settled);
 	const contentWidth = fill ? "100%" : width;
 	const transition = {
@@ -93,6 +106,7 @@ export function SidebarSlide({
 
 	return (
 		<div
+			ref={slideRef}
 			data-sidebar-slide=""
 			className="relative flex h-full shrink-0 ease-[ease] motion-reduce:transition-none"
 			style={{ width: inFlow ? undefined : panelWidth, ...transition }}
@@ -110,9 +124,10 @@ export function SidebarSlide({
 						"flex",
 						inFlow
 							? "h-full"
-							: side === "left"
-								? "absolute inset-y-0 left-0"
-								: "absolute inset-y-0 right-0",
+							: cn(
+									"absolute inset-y-0",
+									edge === "left" ? "left-0" : "right-0",
+								),
 						hidden && "invisible",
 					)}
 					style={{

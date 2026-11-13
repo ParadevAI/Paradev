@@ -5,16 +5,15 @@ import { basename, extname, join } from "node:path";
 import { downloads } from "@superset/local-db";
 import { desc, eq, ne } from "drizzle-orm";
 import { app, session, shell } from "electron";
+import { APP_PARTITION, BROWSER_PARTITION } from "shared/constants";
 import { localDb } from "../local-db";
 
-/** The partition the in-app browser pane (and app renderer) use. */
-const BROWSER_PARTITION = "persist:superset";
 const MAX_TRACKED_DOWNLOADS = 200;
 
 /**
- * Tracks downloads started from the in-app browser pane's session. A single
- * `will-download` listener on the shared partition covers every pane (and
- * window) using it, matching a normal browser's one global downloads list.
+ * Tracks downloads started from the in-app browser pane and the app window.
+ * One `will-download` listener per session feeds a single list, matching a
+ * normal browser's one global downloads list.
  */
 class DownloadManager extends EventEmitter {
 	private activeItems = new Map<string, Electron.DownloadItem>();
@@ -54,11 +53,11 @@ class DownloadManager extends EventEmitter {
 			.where(eq(downloads.state, "progressing"))
 			.run();
 
-		const ses = session.fromPartition(BROWSER_PARTITION);
 		const downloadDir = app.getPath("downloads");
-		ses.setDownloadPath(downloadDir);
-
-		ses.on("will-download", (_event, item) => {
+		const onWillDownload = (
+			_event: Electron.Event,
+			item: Electron.DownloadItem,
+		): void => {
 			const id = randomUUID();
 			const savePath = this.reserveSavePath(downloadDir, item.getFilename());
 			item.setSavePath(savePath);
@@ -107,7 +106,13 @@ class DownloadManager extends EventEmitter {
 					.run();
 				this.emit("changed");
 			});
-		});
+		};
+
+		for (const partition of [APP_PARTITION, BROWSER_PARTITION]) {
+			const ses = session.fromPartition(partition);
+			ses.setDownloadPath(downloadDir);
+			ses.on("will-download", onWillDownload);
+		}
 	}
 
 	list() {

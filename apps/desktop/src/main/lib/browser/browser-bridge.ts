@@ -10,8 +10,14 @@
 
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, Server } from "node:http";
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
 import { desktopNotificationSchema } from "@superset/shared/desktop-notification";
-import { paneLayoutRequestSchema } from "@superset/shared/pane-layout-ops";
+import {
+	allLayoutTabs,
+	paneLayoutRequestSchema,
+} from "@superset/shared/pane-layout-ops";
+import { BrowserWindow, dialog } from "electron";
 import log from "electron-log";
 import express, { type Request, type Response } from "express";
 import { type WebSocket, WebSocketServer } from "ws";
@@ -24,6 +30,7 @@ import {
 import { setBrowserBridgeInfo } from "./browser-bridge-info";
 import {
 	type BrowserOpenRequest,
+	type BrowserPaneInfo,
 	browserManager,
 	CdpBusyError,
 	resolveGuestUrl,
@@ -38,19 +45,83 @@ import {
 } from "./chrome-history-import";
 
 const OPEN_PANE_TIMEOUT_MS = 15_000;
+const WAKE_PANE_TIMEOUT_MS = 10_000;
 const MAX_CDP_MESSAGE_BYTES = 4 * 1024 * 1024;
+const MAX_EARLY_CDP_FRAMES = 64;
 const CDP_PATH = /^\/panes\/([^/]+)\/cdp$/;
+const LOGIN_IMPORT_REFUSED = "The user did not allow this login import.";
+const EXTENSION_ID = /^[a-p]{32}$/;
+const EXTENSION_INSTALL_REFUSED = "The user did not allow this extension.";
+const EXTENSION_REMOVE_REFUSED = "The user kept this extension.";
+const EXTENSION_UNANSWERED =
+	"Nobody answered the question in the app in time. Nothing changed.";
+// Under the relay's 65 s request limit, so a CLI that gives up never sees a later yes take effect.
+const ANSWER_DEADLINE_MS = 50_000;
+
+export interface UserExtensionSummary {
+	id: string;
+	name: string;
+	version: string;
+}
+
+export type UserExtensionInstall =
+	| {
+			status: "installed" | "already-installed";
+			extension: UserExtensionSummary;
+	  }
+	| { status: "declined" };
+
+/** The browser panes' extensions. The CLI can manage them but never open, click or read them. */
+export interface UserExtensions {
+	list(): (UserExtensionSummary & { pinned: boolean })[];
+	/** The question closes, as a no, when `signal` aborts. */
+	install(
+		extensionId: string,
+		signal: AbortSignal,
+	): Promise<UserExtensionInstall>;
+	/** False when the user says no, or `signal` aborts first. */
+	remove(extensionId: string, signal: AbortSignal): Promise<boolean>;
+	setPinned(extensionId: string, pinned: boolean): void;
+}
+
+// Cookies are live sign-ins, so the user says yes to each copy.
+async function confirmLoginImport(
+	browserName: string,
+	profileName: string,
+): Promise<boolean> {
+	const box: Electron.MessageBoxOptions = {
+		type: "question",
+		buttons: [
+			i18n._(msg({ message: "Allow" })),
+			i18n._(msg({ message: "Don't allow" })),
+		],
+		defaultId: 1,
+		cancelId: 1,
+		message: i18n._(
+			msg({ message: `Let an agent use your ${browserName} logins?` }),
+		),
+		detail: i18n._(
+			msg({
+				message: `It copies the cookies from your "${profileName}" profile into the in-app browser. Agents can then act on the sites you are signed in to.`,
+			}),
+		),
+	};
+	const window =
+		BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+	const { response } = window
+		? await dialog.showMessageBox(window, box)
+		: await dialog.showMessageBox(box);
+	return response === 0;
+}
 
 let server: Server | null = null;
 
-// Tail of the per-workspace open chain, so concurrent `/open` requests for one
-// workspace run one at a time (see the handler for why). Keyed by workspaceId;
-// entries delete themselves once the chain drains.
-const openQueues = new Map<string, Promise<void>>();
-// How many opens are queued per workspace, so a stuck renderer (each open waits
-// up to OPEN_PANE_TIMEOUT_MS) can't let the chain grow without bound.
-const openDepth = new Map<string, number>();
-const MAX_QUEUED_OPENS = 8;
+// Opens still waiting on the renderer per workspace, so a stuck renderer (each
+// open waits up to OPEN_PANE_TIMEOUT_MS) cannot pile up requests without bound.
+const pendingOpens = new Map<string, number>();
+const MAX_PENDING_OPENS = 8;
+
+type BrowserPaneListing = BrowserPaneInfo & { loaded: boolean };
 
 function isAuthorized(secret: string, req: IncomingMessage): boolean {
 	const url = new URL(req.url ?? "/", "http://127.0.0.1");
@@ -62,42 +133,145 @@ function isAuthorized(secret: string, req: IncomingMessage): boolean {
 }
 
 /**
- * Pull the workspaceId every pane op must carry (body for POST, query for
- * GET). The bridge never operates unscoped — a missing workspaceId is a 400,
- * and BrowserManager then rejects a pane that isn't in that workspace.
+ * The pane's live webContents, rebuilding it first when hidden-pane eviction
+ * unloaded it.
  */
-function requireScope(
+async function liveWebContents(
+	paneId: string,
+	workspaceId: string,
+	wakeTimeoutMs: number,
+): Promise<Electron.WebContents | null> {
+	const live = browserManager.getWebContents(paneId, workspaceId);
+	if (live) return live;
+	const registered = browserManager.whenRegistered(
+		paneId,
+		workspaceId,
+		wakeTimeoutMs,
+	);
+	try {
+		await paneLayoutRequests.request(workspaceId, {
+			type: "wakeBrowser",
+			paneId,
+		});
+	} catch (err) {
+		registered.cancel();
+		// Only the renderer's "no such pane" means the pane is gone; a window that
+		// is not ready yet must not read as a missing pane.
+		if (err instanceof PaneLayoutRequestError && err.status === 404)
+			return null;
+		throw err;
+	}
+	const wc = await registered.ready;
+	if (!wc) {
+		throw new PaneLayoutRequestError(
+			504,
+			`Browser pane ${paneId} did not finish loading in time.`,
+		);
+	}
+	return wc;
+}
+
+/**
+ * Resolve the workspace-scoped pane every pane op must name, or answer
+ * the request with an error. The workspaceId is required (body for POST,
+ * query for GET): the bridge never operates unscoped.
+ */
+async function resolvePane(
 	req: Request,
 	res: Response,
-): { paneId: string; workspaceId: string } | null {
+	wakeTimeoutMs: number,
+): Promise<{
+	wc: Electron.WebContents;
+	paneId: string;
+	workspaceId: string;
+} | null> {
 	const paneId = req.params.paneId as string;
-	const raw = req.body?.workspaceId ?? req.query.workspaceId;
-	if (typeof raw !== "string" || raw.length === 0) {
+	const workspaceId = req.body?.workspaceId ?? req.query.workspaceId;
+	if (typeof workspaceId !== "string" || workspaceId.length === 0) {
 		res.status(400).json({ error: "workspaceId is required" });
 		return null;
 	}
-	return { paneId, workspaceId: raw };
-}
-
-/** Resolve the live, workspace-scoped webContents or 404. */
-function withPane(
-	req: Request,
-	res: Response,
-	fn: (wc: Electron.WebContents, paneId: string, workspaceId: string) => void,
-): void {
-	const scope = requireScope(req, res);
-	if (!scope) return;
-	const wc = browserManager.getWebContents(scope.paneId, scope.workspaceId);
+	let wc: Electron.WebContents | null;
+	try {
+		wc = await liveWebContents(paneId, workspaceId, wakeTimeoutMs);
+	} catch (err) {
+		res
+			.status(err instanceof PaneLayoutRequestError ? err.status : 500)
+			.json({ error: errorMessage(err) });
+		return null;
+	}
 	if (!wc) {
 		res
 			.status(404)
-			.json({ error: `No live pane ${scope.paneId} in this workspace` });
-		return;
+			.json({ error: `No browser pane ${paneId} in this workspace` });
+		return null;
 	}
-	fn(wc, scope.paneId, scope.workspaceId);
+	browserManager.markUse(paneId);
+	return { wc, paneId, workspaceId };
 }
 
-export async function startBrowserBridge(): Promise<void> {
+/** Runs `fn` on the resolved pane; a throw anywhere answers 500 instead of leaving the request open. */
+function withPane(
+	req: Request,
+	res: Response,
+	wakeTimeoutMs: number,
+	fn: (pane: {
+		wc: Electron.WebContents;
+		paneId: string;
+		workspaceId: string;
+	}) => void,
+): void {
+	resolvePane(req, res, wakeTimeoutMs)
+		.then((pane) => {
+			if (pane) fn(pane);
+		})
+		.catch((err) => {
+			if (!res.headersSent) res.status(500).json({ error: errorMessage(err) });
+		});
+}
+
+async function listPanes(workspaceId: string): Promise<BrowserPaneListing[]> {
+	const live = new Map(
+		browserManager
+			.listPanes(workspaceId)
+			.map((pane) => [pane.paneId, { ...pane, loaded: true }]),
+	);
+	const layout = await paneLayoutRequests
+		.request(workspaceId, { type: "list" })
+		.then((result) => result.layout)
+		.catch(() => null);
+	if (!layout) return [...live.values()];
+	const panes: BrowserPaneListing[] = [];
+	for (const pane of allLayoutTabs(layout).flatMap((tab) => tab.panes)) {
+		const listed = live.get(pane.id);
+		if (listed) {
+			panes.push(listed);
+			live.delete(pane.id);
+		} else if (pane.browser) {
+			panes.push({
+				paneId: pane.id,
+				workspaceId,
+				url: pane.browser.url,
+				title: pane.title ?? "",
+				isLoading: false,
+				loaded: false,
+			});
+		}
+	}
+	return [...panes, ...live.values()];
+}
+
+export async function startBrowserBridge({
+	homeDir,
+	extensions,
+	answerDeadlineMs = ANSWER_DEADLINE_MS,
+	wakeTimeoutMs = WAKE_PANE_TIMEOUT_MS,
+}: {
+	homeDir?: string;
+	extensions?: UserExtensions;
+	answerDeadlineMs?: number;
+	wakeTimeoutMs?: number;
+} = {}): Promise<void> {
 	if (server) return;
 	const secret = randomBytes(32).toString("hex");
 	const app = express();
@@ -112,11 +286,14 @@ export async function startBrowserBridge(): Promise<void> {
 	});
 
 	app.get("/panes", (req, res) => {
-		const workspaceId =
-			typeof req.query.workspaceId === "string"
-				? req.query.workspaceId
-				: undefined;
-		res.json({ panes: browserManager.listPanes(workspaceId) });
+		const workspaceId = req.query.workspaceId;
+		if (typeof workspaceId !== "string" || workspaceId.length === 0) {
+			res.status(400).json({ error: "workspaceId is required" });
+			return;
+		}
+		listPanes(workspaceId)
+			.then((panes) => res.json({ panes }))
+			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
 	});
 
 	app.post("/open", (req, res) => {
@@ -126,9 +303,6 @@ export async function startBrowserBridge(): Promise<void> {
 			return;
 		}
 		const resolvedTarget = target === "new-tab" ? "new-tab" : "current-tab";
-
-		// Reject a disallowed scheme up front (clear error, no pane created) and
-		// normalize bare input the same way the pane will.
 		let resolvedUrl: string;
 		try {
 			resolvedUrl = resolveGuestUrl(url);
@@ -136,91 +310,75 @@ export async function startBrowserBridge(): Promise<void> {
 			res.status(400).json({ error: errorMessage(err) });
 			return;
 		}
-
-		if ((openDepth.get(workspaceId) ?? 0) >= MAX_QUEUED_OPENS) {
+		if ((pendingOpens.get(workspaceId) ?? 0) >= MAX_PENDING_OPENS) {
 			res.status(429).json({
 				error:
 					"Too many pending browser-open requests for this workspace. Try again once the earlier ones settle.",
 			});
 			return;
 		}
+		pendingOpens.set(workspaceId, (pendingOpens.get(workspaceId) ?? 0) + 1);
 
-		// Each open resolves to "the first pane registered in this workspace that
-		// wasn't already open". The registration event can't tell us which request
-		// it belongs to, so two concurrent opens in one workspace would both latch
-		// onto the same new pane. Serialize opens per workspace instead: the next
-		// one only snapshots `known` (and starts listening) after the previous
-		// pane is registered, so each request matches exactly its own pane.
-		const run = () =>
-			new Promise<void>((resolveOpen) => {
-				const requestId = randomBytes(8).toString("hex");
-				const known = new Set(
-					browserManager.listPanes(workspaceId).map((p) => p.paneId),
+		// The renderer names the pane it made for this requestId; the answer
+		// waits until that pane is registered, so it is never another pane.
+		const requestId = randomBytes(8).toString("hex");
+		let registered: ReturnType<typeof browserManager.whenRegistered> | null =
+			null;
+		let settled = false;
+		const finish = (fn: () => void) => {
+			if (settled) return;
+			settled = true;
+			clearTimeout(timer);
+			browserManager.off(`open-resolved:${requestId}`, onResolved);
+			registered?.cancel();
+			const left = (pendingOpens.get(workspaceId) ?? 1) - 1;
+			if (left > 0) pendingOpens.set(workspaceId, left);
+			else pendingOpens.delete(workspaceId);
+			fn();
+		};
+		const timer = setTimeout(() => {
+			finish(() =>
+				res.status(504).json({
+					error:
+						"No browser pane appeared for this workspace. Is the desktop app running and signed in?",
+				}),
+			);
+		}, OPEN_PANE_TIMEOUT_MS);
+		res.on("close", () => finish(() => {}));
+
+		const onResolved = (paneId: string) => {
+			registered = browserManager.whenRegistered(
+				paneId,
+				workspaceId,
+				OPEN_PANE_TIMEOUT_MS,
+			);
+			void registered.ready.then((wc) => {
+				if (!wc) return;
+				const info = browserManager
+					.listPanes(workspaceId)
+					.find((pane) => pane.paneId === paneId);
+				const loaded = info && info.url !== "about:blank" && !info.isLoading;
+				finish(() =>
+					res.json({
+						paneId,
+						url: loaded ? info.url : resolvedUrl,
+						title: loaded ? info.title : "",
+					}),
 				);
-
-				let settled = false;
-				const finish = (fn: () => void) => {
-					if (settled) return;
-					settled = true;
-					clearTimeout(timer);
-					browserManager.off("pane-registered", onRegistered);
-					fn();
-					resolveOpen();
-				};
-				const timer = setTimeout(() => {
-					finish(() =>
-						res.status(504).json({
-							error:
-								"No browser pane appeared for this workspace. Is the desktop app running and signed in?",
-						}),
-					);
-				}, OPEN_PANE_TIMEOUT_MS);
-				// Client hung up before the pane appeared — stop waiting and free the listener.
-				res.on("close", () => finish(() => {}));
-
-				const onRegistered = (event: {
-					paneId: string;
-					workspaceId: string | null;
-				}) => {
-					if (event.workspaceId !== workspaceId) return;
-					if (known.has(event.paneId)) return;
-					const info = browserManager
-						.listPanes(workspaceId)
-						.find((p) => p.paneId === event.paneId);
-					finish(() =>
-						res.json({
-							paneId: event.paneId,
-							url: info?.url ?? resolvedUrl,
-							title: info?.title ?? "",
-						}),
-					);
-				};
-				browserManager.on("pane-registered", onRegistered);
-
-				browserManager.requestOpen({
-					workspaceId,
-					projectId: typeof projectId === "string" ? projectId : null,
-					url: resolvedUrl,
-					target: resolvedTarget,
-					show: show === true,
-					requestId,
-				} satisfies BrowserOpenRequest);
 			});
-
-		openDepth.set(workspaceId, (openDepth.get(workspaceId) ?? 0) + 1);
-		const prev = openQueues.get(workspaceId) ?? Promise.resolve();
-		const next = prev.then(run, run);
-		openQueues.set(workspaceId, next);
-		void next.finally(() => {
-			openDepth.set(workspaceId, (openDepth.get(workspaceId) ?? 1) - 1);
-			if ((openDepth.get(workspaceId) ?? 0) <= 0) openDepth.delete(workspaceId);
-			if (openQueues.get(workspaceId) === next) openQueues.delete(workspaceId);
-		});
+		};
+		browserManager.once(`open-resolved:${requestId}`, onResolved);
+		browserManager.requestOpen({
+			workspaceId,
+			projectId: typeof projectId === "string" ? projectId : null,
+			url: resolvedUrl,
+			target: resolvedTarget,
+			show: show === true,
+			requestId,
+		} satisfies BrowserOpenRequest);
 	});
 
 	app.post("/panes/:paneId/navigate", (req, res) => {
-		const scope = requireScope(req, res);
-		if (!scope) return;
 		const url = req.body?.url;
 		if (typeof url !== "string") {
 			res.status(400).json({ error: "url is required" });
@@ -234,65 +392,69 @@ export async function startBrowserBridge(): Promise<void> {
 			res.status(400).json({ error: errorMessage(err) });
 			return;
 		}
-		try {
-			browserManager.navigate(scope.paneId, resolvedUrl, scope.workspaceId);
-			res.json({ ok: true });
-		} catch (err) {
-			res.status(404).json({ error: errorMessage(err) });
-		}
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			try {
+				browserManager.navigate(pane.paneId, resolvedUrl, pane.workspaceId);
+				res.json({ ok: true });
+			} catch (err) {
+				res.status(404).json({ error: errorMessage(err) });
+			}
+		});
 	});
 
 	app.post("/panes/:paneId/back", (req, res) => {
-		withPane(req, res, (wc) => {
-			if (wc.canGoBack()) wc.goBack();
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			if (pane.wc.canGoBack()) pane.wc.goBack();
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/forward", (req, res) => {
-		withPane(req, res, (wc) => {
-			if (wc.canGoForward()) wc.goForward();
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			if (pane.wc.canGoForward()) pane.wc.goForward();
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/reload", (req, res) => {
-		withPane(req, res, (wc) => {
+		withPane(req, res, wakeTimeoutMs, (pane) => {
 			if (req.body?.hard) {
-				wc.reloadIgnoringCache();
+				pane.wc.reloadIgnoringCache();
 			} else {
-				wc.reload();
+				pane.wc.reload();
 			}
 			res.json({ ok: true });
 		});
 	});
 
 	app.post("/panes/:paneId/screenshot", (req, res) => {
-		const scope = requireScope(req, res);
-		if (!scope) return;
-		browserManager
-			.capturePng(scope.paneId, scope.workspaceId)
-			.then((base64) => res.json({ base64 }))
-			.catch((err) => res.status(404).json({ error: errorMessage(err) }));
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			browserManager
+				.capturePng(pane.paneId, pane.workspaceId)
+				.then((base64) => res.json({ base64 }))
+				.catch((err) => res.status(404).json({ error: errorMessage(err) }));
+		});
 	});
 
 	app.post("/panes/:paneId/eval", (req, res) => {
-		const scope = requireScope(req, res);
-		if (!scope) return;
 		const code = req.body?.code;
 		if (typeof code !== "string") {
 			res.status(400).json({ error: "code is required" });
 			return;
 		}
-		browserManager
-			.evaluateJS(scope.paneId, code, scope.workspaceId)
-			.then((result) => res.json({ result: result ?? null }))
-			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			browserManager
+				.evaluateJS(pane.paneId, code, pane.workspaceId)
+				.then((result) => res.json({ result: result ?? null }))
+				.catch((err) => res.status(500).json({ error: errorMessage(err) }));
+		});
 	});
 
 	app.get("/panes/:paneId/console", (req, res) => {
-		withPane(req, res, (_wc, paneId, workspaceId) => {
-			res.json({ entries: browserManager.getConsoleLogs(paneId, workspaceId) });
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			res.json({
+				entries: browserManager.getConsoleLogs(pane.paneId, pane.workspaceId),
+			});
 		});
 	});
 
@@ -330,29 +492,135 @@ export async function startBrowserBridge(): Promise<void> {
 
 	// Import logins (cookies) from a system browser into this pane's session.
 	app.post("/panes/:paneId/import-cookies", (req, res) => {
-		const scope = requireScope(req, res);
-		if (!scope) return;
 		const sourceId = req.body?.sourceId;
 		if (typeof sourceId !== "string" || sourceId.length === 0) {
 			res.status(400).json({ error: "sourceId is required" });
 			return;
 		}
-		const profile = resolveImportProfile(sourceId);
+		const profile = resolveImportProfile(sourceId, homeDir);
 		if (!profile) {
 			res.status(404).json({ error: "Unknown import source" });
 			return;
 		}
-		const wc = browserManager.getWebContents(scope.paneId, scope.workspaceId);
-		if (!wc) {
-			res
-				.status(404)
-				.json({ error: `No live pane ${scope.paneId} in this workspace` });
+		withPane(req, res, wakeTimeoutMs, (pane) => {
+			confirmLoginImport(profile.browserName, profile.profileName)
+				.then(async (allowed) => {
+					if (!allowed) {
+						res.status(403).json({ error: LOGIN_IMPORT_REFUSED });
+						return;
+					}
+					res.json(
+						await importCookiesIntoSession(
+							pane.wc.session,
+							profile.profileDir,
+							profile.browserKey,
+						),
+					);
+				})
+				.catch((err) => res.status(500).json({ error: errorMessage(err) }));
+		});
+	});
+
+	const extensionRoute = (
+		{ requireInstalled }: { requireInstalled: boolean },
+		handler: (
+			extensions: UserExtensions,
+			extensionId: string,
+			req: Request,
+			res: Response,
+		) => Promise<void>,
+	) => {
+		return (req: Request, res: Response) => {
+			if (!extensions) {
+				res.status(503).json({ error: "Browser extensions are not available" });
+				return;
+			}
+			const extensionId = req.body?.extensionId;
+			if (typeof extensionId !== "string" || !EXTENSION_ID.test(extensionId)) {
+				res
+					.status(400)
+					.json({ error: "extensionId must be a Chrome Web Store ID" });
+				return;
+			}
+			if (
+				requireInstalled &&
+				!extensions.list().some((extension) => extension.id === extensionId)
+			) {
+				res
+					.status(404)
+					.json({ error: `No extension ${extensionId} is installed` });
+				return;
+			}
+			handler(extensions, extensionId, req, res).catch((err) =>
+				res.status(500).json({ error: errorMessage(err) }),
+			);
+		};
+	};
+
+	app.get("/extensions", (_req, res) => {
+		if (!extensions) {
+			res.status(503).json({ error: "Browser extensions are not available" });
 			return;
 		}
-		importCookiesIntoSession(wc.session, profile.profileDir, profile.browserKey)
-			.then((result) => res.json(result))
-			.catch((err) => res.status(500).json({ error: errorMessage(err) }));
+		res.json({ extensions: extensions.list() });
 	});
+
+	// The question closes when the caller hangs up or the deadline passes.
+	const answerSignal = (res: Response): AbortSignal => {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), answerDeadlineMs);
+		res.on("close", () => {
+			clearTimeout(timer);
+			controller.abort();
+		});
+		return controller.signal;
+	};
+	const refuse = (res: Response, signal: AbortSignal, refusal: string) => {
+		if (signal.aborted) res.status(408).json({ error: EXTENSION_UNANSWERED });
+		else res.status(403).json({ error: refusal });
+	};
+
+	app.post(
+		"/extensions/install",
+		extensionRoute(
+			{ requireInstalled: false },
+			async (extensions, extensionId, _req, res) => {
+				const signal = answerSignal(res);
+				const result = await extensions.install(extensionId, signal);
+				if (result.status === "declined") {
+					refuse(res, signal, EXTENSION_INSTALL_REFUSED);
+					return;
+				}
+				res.json(result);
+			},
+		),
+	);
+
+	app.post(
+		"/extensions/remove",
+		extensionRoute(
+			{ requireInstalled: true },
+			async (extensions, extensionId, _req, res) => {
+				const signal = answerSignal(res);
+				if (!(await extensions.remove(extensionId, signal))) {
+					refuse(res, signal, EXTENSION_REMOVE_REFUSED);
+					return;
+				}
+				res.json({ ok: true });
+			},
+		),
+	);
+
+	app.post(
+		"/extensions/pin",
+		extensionRoute(
+			{ requireInstalled: true },
+			async (extensions, extensionId, req, res) => {
+				extensions.setPinned(extensionId, req.body?.pinned !== false);
+				res.json({ ok: true });
+			},
+		),
+	);
 
 	const wss = new WebSocketServer({
 		noServer: true,
@@ -374,7 +642,7 @@ export async function startBrowserBridge(): Promise<void> {
 		}
 		const paneId = match[1] as string;
 		wss.handleUpgrade(req, socket, head, (ws) => {
-			handleCdpSocket(paneId, workspaceId, ws);
+			handleCdpSocket(paneId, workspaceId, ws, wakeTimeoutMs);
 		});
 	});
 
@@ -388,39 +656,87 @@ export async function startBrowserBridge(): Promise<void> {
 	log.info(`[browser-bridge] listening on ${endpoint}`);
 }
 
+export async function stopBrowserBridge(): Promise<void> {
+	const running = server;
+	if (!running) return;
+	server = null;
+	running.closeAllConnections();
+	await new Promise<void>((resolve) => running.close(() => resolve()));
+}
+
 function handleCdpSocket(
 	paneId: string,
 	workspaceId: string,
 	ws: WebSocket,
+	wakeTimeoutMs: number,
 ): void {
-	let session: ReturnType<typeof browserManager.attachCdp>;
-	try {
-		session = browserManager.attachCdp(
-			paneId,
-			workspaceId,
-			(payload) => {
-				if (ws.readyState === ws.OPEN) ws.send(payload);
-			},
-			(reason) => {
-				ws.close(1011, `debugger detached: ${reason}`.slice(0, 100));
-			},
-		);
-	} catch (err) {
-		// 1013 (Try Again Later) tells the client the pane is busy with another
-		// CDP session and to retry once it disconnects; 1011 = genuine failure.
-		const code = err instanceof CdpBusyError ? 1013 : 1011;
-		ws.close(code, errorMessage(err).slice(0, 100));
-		return;
+	// Messages that arrive while an unloaded pane is rebuilt go out once attached.
+	const early: string[] = [];
+	let earlyBytes = 0;
+	const queue = (data: unknown) => {
+		const message = String(data);
+		earlyBytes += Buffer.byteLength(message, "utf8");
+		if (
+			early.length >= MAX_EARLY_CDP_FRAMES ||
+			earlyBytes > MAX_CDP_MESSAGE_BYTES
+		) {
+			early.length = 0;
+			ws.close(1009, "CDP frame backlog exceeded");
+			return;
+		}
+		early.push(message);
+	};
+	ws.on("message", queue);
+	void liveWebContents(paneId, workspaceId, wakeTimeoutMs).then(
+		onPane,
+		(err) => {
+			const retry =
+				err instanceof PaneLayoutRequestError &&
+				(err.status === 503 || err.status === 504);
+			ws.close(retry ? 1013 : 1011, errorMessage(err).slice(0, 100));
+		},
+	);
+	function onPane(wc: Electron.WebContents | null) {
+		if (ws.readyState !== ws.OPEN) return;
+		if (!wc) {
+			ws.close(
+				1011,
+				`No browser pane ${paneId} in this workspace`.slice(0, 100),
+			);
+			return;
+		}
+		browserManager.markUse(paneId);
+		let cdp: ReturnType<typeof browserManager.attachCdp>;
+		try {
+			cdp = browserManager.attachCdp(
+				paneId,
+				workspaceId,
+				(payload) => {
+					if (ws.readyState === ws.OPEN) ws.send(payload);
+				},
+				(reason) => {
+					ws.close(1011, `debugger detached: ${reason}`.slice(0, 100));
+				},
+			);
+		} catch (err) {
+			// 1013 (Try Again Later) tells the client the pane is busy with another
+			// CDP session and to retry once it disconnects; 1011 = genuine failure.
+			const code = err instanceof CdpBusyError ? 1013 : 1011;
+			ws.close(code, errorMessage(err).slice(0, 100));
+			return;
+		}
+		ws.off("message", queue);
+		for (const message of early) cdp.send(message);
+		ws.on("message", (data) => {
+			cdp.send(data.toString());
+		});
+		ws.on("close", () => {
+			cdp.detach();
+		});
+		ws.on("error", () => {
+			cdp.detach();
+		});
 	}
-	ws.on("message", (data) => {
-		session.send(data.toString());
-	});
-	ws.on("close", () => {
-		session.detach();
-	});
-	ws.on("error", () => {
-		session.detach();
-	});
 }
 
 function errorMessage(err: unknown): string {

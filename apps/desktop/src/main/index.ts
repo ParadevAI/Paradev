@@ -9,7 +9,7 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { settings } from "@superset/local-db";
+import { browserHistory, settings } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
@@ -35,6 +35,8 @@ import {
 import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
+	APP_PARTITION,
+	BROWSER_PARTITION,
 	DEFAULT_CONFIRM_ON_QUIT,
 	PLATFORM,
 	PROTOCOL_SCHEME,
@@ -51,6 +53,15 @@ import {
 import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
+import {
+	initBrowserExtensionHost,
+	userExtensions,
+} from "./lib/browser/extension-host";
+import {
+	clearMovedPaneSitesOnce,
+	movePaneSitesOnce,
+} from "./lib/browser/move-pane-sites";
+import { preparePaneSessions } from "./lib/browser/pane-session";
 import {
 	installBundledCliShim,
 	installBundledPdevShim,
@@ -527,7 +538,7 @@ if (!gotTheLock) {
 		};
 		protocol.handle("superset-icon", iconProtocolHandler);
 		session
-			.fromPartition("persist:superset")
+			.fromPartition(APP_PARTITION)
 			.protocol.handle("superset-icon", iconProtocolHandler);
 
 		// Serve system fonts (e.g. SF Mono on macOS) via custom protocol
@@ -556,7 +567,7 @@ if (!gotTheLock) {
 			};
 			protocol.handle("superset-font", fontProtocolHandler);
 			session
-				.fromPartition("persist:superset")
+				.fromPartition(APP_PARTITION)
 				.protocol.handle("superset-font", fontProtocolHandler);
 		}
 
@@ -573,7 +584,9 @@ if (!gotTheLock) {
 		sweepNetworkLogs();
 		sweepDevAppProfiles();
 
+		preparePaneSessions();
 		await loadWebviewBrowserExtension();
+		initBrowserExtensionHost();
 
 		await stopMigratedV1SessionsOnBoot(readMigratedV1WorkspaceIds());
 
@@ -581,12 +594,26 @@ if (!gotTheLock) {
 		// bridge endpoint/secret from its env, so a late bridge means browser
 		// control stays dark until the next respawn.
 		try {
-			await startBrowserBridge();
+			await startBrowserBridge({ extensions: userExtensions });
 		} catch (error) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
+		const appSession = session.fromPartition(APP_PARTITION);
+		const paneCookiesMarkerPath = path.join(
+			app.getPath("userData"),
+			"pane-cookies-copied",
+		);
+		try {
+			await movePaneSitesOnce({
+				from: appSession.cookies,
+				to: session.fromPartition(BROWSER_PARTITION).cookies,
+				markerPath: paneCookiesMarkerPath,
+			});
+		} catch (error) {
+			console.error("[main] Failed to copy browser pane cookies:", error);
+		}
 		downloadManager.start();
-		allowRendererToReachDeviceHub("persist:superset");
+		allowRendererToReachDeviceHub(APP_PARTITION);
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
@@ -687,6 +714,19 @@ if (!gotTheLock) {
 		await makeAppSetup(
 			() => createPlatformWindow({ orgId: null }),
 			restoreWindows,
+		);
+		void clearMovedPaneSitesOnce({
+			from: appSession.cookies,
+			markerPath: paneCookiesMarkerPath,
+			readVisitedUrls: () =>
+				localDb
+					.select({ url: browserHistory.url })
+					.from(browserHistory)
+					.all()
+					.map((row) => row.url),
+			clearOldSites: (origins) => appSession.clearData({ origins }),
+		}).catch((error) =>
+			console.error("[main] Failed to clear moved browser pane sites:", error),
 		);
 		setupAutoUpdater();
 		initTray();

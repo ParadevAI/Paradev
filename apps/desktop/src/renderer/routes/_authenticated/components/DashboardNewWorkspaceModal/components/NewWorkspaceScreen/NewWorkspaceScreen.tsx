@@ -10,6 +10,7 @@ import {
 } from "@superset/shared/agent-models";
 import type { MachineSize } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { Button } from "@superset/ui/button";
 import { isEnterSubmit } from "@superset/ui/lib/keyboard";
@@ -18,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { HistoryIcon, Settings2Icon } from "lucide-react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
 import type { AgentSelectAgent } from "renderer/components/AgentSelect";
@@ -48,16 +50,13 @@ import { ModePicker } from "renderer/routes/_authenticated/components/AgentCompo
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
+import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
+import { MachineSizePickerPill } from "renderer/routes/_authenticated/components/MachineSizePickerPill";
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
-import {
-	NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-	NEW_WORKSPACE_SCREEN_MAX_WIDTH,
-	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
-	useNewWorkspaceWidthStore,
-} from "renderer/stores/new-workspace-width";
 import {
 	environmentBranchKey,
 	NO_PROJECT_KEY,
@@ -69,8 +68,6 @@ import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePick
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { CheckoutPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/CheckoutPickerPill";
 import { CompareBaseBranchPicker } from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
-import { EnvironmentPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/EnvironmentPickerPill";
-import { MachineSizePickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/MachineSizePickerPill";
 import { ProjectPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/ProjectPickerPill";
 import { PromptHistoryCommand } from "../DashboardNewWorkspaceForm/PromptGroup/components/PromptHistoryCommand";
 import { useBranchPickerController } from "../DashboardNewWorkspaceForm/PromptGroup/hooks/useBranchPickerController";
@@ -86,14 +83,13 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
-import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
 import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
+import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
-import { useProjectPreselection } from "./hooks/useProjectPreselection";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
 import {
@@ -103,7 +99,12 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
-import { resolveCloudChoices } from "./utils/resolveCloudChoices";
+import { resolveLaunchHost } from "./utils/resolveLaunchHost";
+import {
+	type LaunchProjectPick,
+	resolveLaunchProject,
+	toLaunchProject,
+} from "./utils/resolveLaunchProject";
 
 const NO_HIDDEN_MODES: ReadonlySet<string> = new Set();
 
@@ -152,9 +153,32 @@ export function NewWorkspaceScreen({
 	const setLastProjectId = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectId,
 	);
+	const lastHostId = useV2WorkspaceCreateDefaultsStore(
+		(state) => state.lastHostId,
+	);
 	const setLastHostId = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastHostId,
 	);
+	const hostId = resolveLaunchHost({
+		intentHostId: preSelectedHostId,
+		savedHostId: lastHostId,
+		machineId,
+	});
+	const clearHostIntent = useCallback(() => {
+		void navigate({
+			to: "/new-workspace",
+			search: (prev) => ({ ...prev, host: undefined }),
+			replace: true,
+		});
+	}, [navigate]);
+	useConsumeHostIntent({
+		isOpen,
+		intentHostId: preSelectedHostId,
+		saveHost: setLastHostId,
+		clearIntent: clearHostIntent,
+	});
+	const isCloudHost = hostId === CLOUD_HOST_ID;
+	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
 	const setLastProjectChoice = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectChoice,
 	);
@@ -186,7 +210,7 @@ export function NewWorkspaceScreen({
 	// ── Projects ─────────────────────────────────────────────────────
 	const { projects: hostProjects, isReady: areProjectsReady } =
 		useHostProjects();
-	const setUpProjectIds = useSelectedHostProjectIds(draft.hostId);
+	const setUpProjectIds = useSelectedHostProjectIds(hostId);
 	const projects = useMemo(
 		() =>
 			hostProjects
@@ -207,7 +231,6 @@ export function NewWorkspaceScreen({
 		[hostProjects, setUpProjectIds],
 	);
 
-	const isCloudHost = draft.hostId === CLOUD_HOST_ID;
 	// On the cloud the GitHub App's repositories join the picker as stand-in
 	// projects; a device's projects are its checkouts.
 	const github = useGitHubRepositoryProjects({
@@ -234,64 +257,67 @@ export function NewWorkspaceScreen({
 		(state) =>
 			state.lastProjectChoice[isCloudHost ? "cloud" : "device"] ?? null,
 	);
-	const { isPending: isProjectPreselectionPending, releasePreselection } =
-		useProjectPreselection({
-			isOpen,
-			areProjectsReady: areProjectsReady && (!isCloudHost || !github.isLoading),
-			projects: selectableProjects,
-			preSelectedProjectId,
-			preSelectedSession,
-			selectedProjectId: draft.selectedProjectId,
-			isSession: draft.isSession,
-			target: isCloudHost ? "cloud" : "device",
-			lastChoice: lastProjectChoice,
-			selectProject,
-			selectSession,
-			updateDraft,
-		});
 
-	// A project without a GitHub repository can't start in the cloud, so a
-	// handoff of one keeps everything but the host.
+	const appliedIntentRef = useRef<string | null>(null);
 	useEffect(() => {
-		if (
-			!isOpen ||
-			!isCloudHost ||
-			!preSelectedProjectId ||
-			!areProjectsReady ||
-			github.isLoading ||
-			!machineId
-		)
+		if (!isOpen) return;
+		const intent = preSelectedSession
+			? "session"
+			: preSelectedProjectId
+				? `project:${preSelectedProjectId}`
+				: null;
+		if (!intent) {
+			appliedIntentRef.current = null;
 			return;
-		const isCloudProject = cloudProjects.some(
-			(project) => project.id === preSelectedProjectId,
-		);
-		const isDeviceProject = projects.some(
-			(project) => project.id === preSelectedProjectId,
-		);
-		if (!isCloudProject && isDeviceProject) updateDraft({ hostId: machineId });
+		}
+		if (intent === appliedIntentRef.current) return;
+		appliedIntentRef.current = intent;
+		if (preSelectedSession) selectSession();
+		else if (
+			preSelectedProjectId &&
+			draft.selectedProjectId !== preSelectedProjectId
+		)
+			selectProject(preSelectedProjectId);
 	}, [
 		isOpen,
-		isCloudHost,
 		preSelectedProjectId,
-		areProjectsReady,
-		github.isLoading,
-		machineId,
-		cloudProjects,
-		projects,
-		updateDraft,
+		preSelectedSession,
+		draft.selectedProjectId,
+		selectProject,
+		selectSession,
 	]);
 
-	const storedComposerWidth = useNewWorkspaceWidthStore(
-		(state) => state.screenWidth,
-	);
-	const setStoredComposerWidth = useNewWorkspaceWidthStore(
-		(state) => state.setScreenWidth,
-	);
-	/** Width while a resize drag is in flight; persisted on release. */
-	const [liveComposerWidth, setLiveComposerWidth] = useState<number | null>(
-		null,
-	);
-	const composerWidth = liveComposerWidth ?? storedComposerWidth;
+	const resolvedProject = useMemo(() => {
+		const pick: LaunchProjectPick = draft.isSession
+			? { kind: "session" }
+			: draft.selectedProjectId
+				? {
+						kind: "project",
+						projectId: draft.selectedProjectId,
+						repository: draft.selectedProjectRepository,
+					}
+				: { kind: "none" };
+		return resolveLaunchProject({
+			pick,
+			projects: selectableProjects.map(toLaunchProject),
+			knownProjects: [...projects, ...github.repositories].map(toLaunchProject),
+			isReady: areProjectsReady && (!isCloudHost || !github.isLoading),
+			lastChoice: lastProjectChoice,
+		});
+	}, [
+		draft.isSession,
+		draft.selectedProjectId,
+		draft.selectedProjectRepository,
+		selectableProjects,
+		projects,
+		github.repositories,
+		areProjectsReady,
+		isCloudHost,
+		github.isLoading,
+		lastProjectChoice,
+	]);
+	const isSession = resolvedProject.isSession;
+	const isProjectPending = resolvedProject.isPending;
 
 	// One suggestion per open. resetKey only bumps on resetDraft, so ordinary
 	// modal reopens roll their own counter; the tiptap Placeholder extension
@@ -310,17 +336,14 @@ export function NewWorkspaceScreen({
 			PROMPT_PLACEHOLDERS[
 				Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length)
 			];
-		const prompt = descriptor
+		return descriptor
 			? t(descriptor)
 			: t({
 					message: "What do you want to do?",
 				});
-		return t({
-			message: `${prompt} · # to change project, host, and more`,
-		});
 	}, [resetKey, placeholderRoll, t]);
 
-	const projectId = draft.selectedProjectId;
+	const projectId = resolvedProject.projectId;
 	const selectedProject = selectableProjects.find(
 		(project) => project.id === projectId,
 	);
@@ -336,7 +359,7 @@ export function NewWorkspaceScreen({
 			? `${selectedProject.githubOwner}/${selectedProject.githubRepoName}`
 			: null;
 	const machineSizeOptions = useMachineSizeOptions();
-	const cloudProjectId = draft.isSession ? null : projectId;
+	const cloudProjectId = isSession ? null : projectId;
 	const cloudChoiceKey = cloudProjectId ?? NO_PROJECT_KEY;
 	const cloudSelection = useMemo(
 		() =>
@@ -386,32 +409,6 @@ export function NewWorkspaceScreen({
 	);
 	useLinkedIssueNaming(linkedIssues);
 
-	// Restore the last-used launch host once per mount, like the modal does.
-	// A host named in the URL (the sidebar's Cloud "+") wins, and applies when
-	// it arrives rather than only at mount — this screen stays mounted across
-	// navigations to it.
-	const appliedPersistedHostRef = useRef(false);
-	const appliedPreSelectedHostRef = useRef<string | null>(null);
-	useEffect(() => {
-		if (!isOpen) return;
-		if (
-			preSelectedHostId &&
-			preSelectedHostId !== appliedPreSelectedHostRef.current
-		) {
-			appliedPreSelectedHostRef.current = preSelectedHostId;
-			appliedPersistedHostRef.current = true;
-			updateDraft({ hostId: preSelectedHostId });
-			return;
-		}
-		if (appliedPersistedHostRef.current) return;
-		appliedPersistedHostRef.current = true;
-		const persistedHostId =
-			useV2WorkspaceCreateDefaultsStore.getState().lastHostId;
-		if (typeof persistedHostId === "string") {
-			updateDraft({ hostId: persistedHostId });
-		}
-	}, [isOpen, preSelectedHostId, updateDraft]);
-
 	// Reset baseBranch when what it branches from changes, defaulting to the
 	// user's last branch there — the draft store is global, so a stale branch
 	// from another repository would otherwise ride into the create. On the
@@ -434,35 +431,34 @@ export function NewWorkspaceScreen({
 		(state) => state.clearBaseBranchDefault,
 	);
 	const previousBranchDefaultKeyRef = useRef(branchDefaultKey);
-	const previousHostIdRef = useRef(draft.hostId);
+	const previousHostIdRef = useRef(hostId);
 	useEffect(() => {
 		if (
 			previousBranchDefaultKeyRef.current !== branchDefaultKey ||
-			previousHostIdRef.current !== draft.hostId
+			previousHostIdRef.current !== hostId
 		) {
 			previousBranchDefaultKeyRef.current = branchDefaultKey;
-			previousHostIdRef.current = draft.hostId;
+			previousHostIdRef.current = hostId;
 			updateDraft({
 				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
 				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
 			});
 		}
-	}, [branchDefaultKey, draft.hostId, persistedBaseBranchDefault, updateDraft]);
+	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
 
 	// ── Agent / model / effort ───────────────────────────────────────
 	const launchHostUrl = useMemo(() => {
-		const id = draft.hostId ?? machineId;
-		if (!id || !activeOrganizationId) return null;
+		if (!hostId || !activeOrganizationId) return null;
 		return (
 			resolveHostUrl({
-				hostId: id,
+				hostId,
 				machineId,
 				activeHostUrl,
 				organizationId: activeOrganizationId,
 				relayUrl,
 			}) ?? null
 		);
-	}, [draft.hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
+	}, [hostId, machineId, activeHostUrl, activeOrganizationId, relayUrl]);
 	const githubProviders = useGitHubMentionProviders(
 		useMemo(
 			() =>
@@ -474,16 +470,12 @@ export function NewWorkspaceScreen({
 	);
 
 	const handleSelectHostId = useCallback(
-		(next: string | null) => {
-			setLastHostId(next);
-			updateDraft({ hostId: next });
-		},
-		[setLastHostId, updateDraft],
+		(next: string | null) => setLastHostId(next),
+		[setLastHostId],
 	);
 	const handleSelectProject = useCallback(
 		(selectedProjectId: string | null) => {
 			const target = isCloudHost ? "cloud" : "device";
-			releasePreselection();
 			if (selectedProjectId === null) {
 				setLastProjectChoice(target, { kind: "none" });
 				selectSession();
@@ -497,11 +489,17 @@ export function NewWorkspaceScreen({
 			// device's last project for next time.
 			if (projects.some((project) => project.id === selectedProjectId))
 				setLastProjectId(selectedProjectId);
-			selectProject(selectedProjectId);
+			const picked = selectableProjects.find(
+				(project) => project.id === selectedProjectId,
+			);
+			selectProject(
+				selectedProjectId,
+				picked && toLaunchProject(picked).repository,
+			);
 		},
 		[
 			isCloudHost,
-			releasePreselection,
+			selectableProjects,
 			setLastProjectChoice,
 			selectSession,
 			projects,
@@ -572,8 +570,8 @@ export function NewWorkspaceScreen({
 		useV2AgentChoices(launchHostUrl);
 	const cloudAgents = useCloudAgentChoices();
 	// Under Cloud the built-in presets stand in for a host's agent list.
-	const v2Agents = draft.hostId === CLOUD_HOST_ID ? cloudAgents : hostAgents;
-	const v2AgentsFetched = draft.hostId === CLOUD_HOST_ID || hostAgentsFetched;
+	const v2Agents = isCloudHost ? cloudAgents : hostAgents;
+	const v2AgentsFetched = isCloudHost || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
 		() => v2Agents.map((agent) => agent.id),
 		[v2Agents],
@@ -713,18 +711,18 @@ export function NewWorkspaceScreen({
 	const selectedRemoteHostPresence = useMemo(
 		() =>
 			resolveRemoteHostPresence({
-				selectedHostId: draft.hostId ?? machineId,
+				selectedHostId: hostId,
 				localHostId: machineId,
 				hosts: otherHosts,
 				hostsSettled,
 			}),
-		[draft.hostId, machineId, otherHosts, hostsSettled],
+		[hostId, machineId, otherHosts, hostsSettled],
 	);
 
 	// ── Base branch ──────────────────────────────────────────────────
 	const { pickerProps } = useBranchPickerController({
 		projectId,
-		hostId: draft.hostId,
+		hostId,
 		remoteHostPresence: selectedRemoteHostPresence,
 		cloudRepository,
 		baseBranch: draft.baseBranch,
@@ -745,17 +743,14 @@ export function NewWorkspaceScreen({
 	// ── Submit ───────────────────────────────────────────────────────
 	// A cloud workspace has no host to upload to, so its attachments go to
 	// cloud storage and the sandbox pulls them once it is up.
-	const uploadTarget =
-		(draft.hostId ?? machineId) === CLOUD_HOST_ID
-			? CLOUD_UPLOAD_TARGET
-			: launchHostUrl;
+	const uploadTarget = isCloudHost ? CLOUD_UPLOAD_TARGET : launchHostUrl;
 	const uploadAttachments = useUploadAttachments({
 		files: draft.promptAttachments,
 		hostUrl: uploadTarget,
 	});
 	const promptContext = useNewWorkspacePromptContext({
 		projectId,
-		hostId: draft.hostId,
+		hostId,
 		linkedPR,
 		linkedIssues,
 	});
@@ -770,23 +765,29 @@ export function NewWorkspaceScreen({
 		promptContext,
 		resolvedEnvironment?.id ?? null,
 		isCloudHost ? cloudSelection.machineSize : null,
+		hostId,
+		isSession,
 	);
 
 	const submitBlocker = useMemo<string | null>(() => {
-		const selectedHostId = draft.hostId ?? machineId;
 		// A cloud workspace is provisioned by the API from its environment: no
 		// host readiness to wait on, and the project only narrows the list.
-		if (selectedHostId === CLOUD_HOST_ID) {
+		if (isCloudHost) {
+			if (cloudEnabled === false)
+				return t({
+					message:
+						"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
+				});
 			if (isCloudTargetLoading) return t({ message: "Loading environments…" });
 			return resolvedEnvironment
 				? null
 				: t({ message: "Select an environment" });
 		}
-		if (isProjectPreselectionPending || (!selectedProject && !draft.isSession))
+		if (isProjectPending || (!selectedProject && !isSession))
 			return t({
 				message: "Select a project",
 			});
-		if (!selectedHostId)
+		if (!hostId)
 			return t({
 				message: "No active host",
 			});
@@ -802,11 +803,12 @@ export function NewWorkspaceScreen({
 		}
 		return null;
 	}, [
-		isProjectPreselectionPending,
+		isCloudHost,
+		cloudEnabled,
+		isProjectPending,
 		selectedProject,
-		draft.isSession,
-		draft.hostId,
-		machineId,
+		isSession,
+		hostId,
 		activeHostUrl,
 		selectedRemoteHostPresence,
 		isCloudTargetLoading,
@@ -821,9 +823,9 @@ export function NewWorkspaceScreen({
 		void navigate({
 			to: "/settings/projects/$projectId",
 			params: { projectId: targetProjectId },
-			search: { hostId: draft.hostId ?? machineId ?? undefined },
+			search: { hostId: hostId ?? undefined },
 		});
-	}, [closeModal, draft.hostId, machineId, navigate, selectedProject?.id]);
+	}, [closeModal, hostId, navigate, selectedProject?.id]);
 
 	// AI naming (title + branch) follows the project's naming instructions;
 	// this is the jump from "where do these names come from?" to the setting.
@@ -835,11 +837,11 @@ export function NewWorkspaceScreen({
 			to: "/settings/projects/$projectId",
 			params: { projectId: targetProjectId },
 			search: {
-				hostId: draft.hostId ?? machineId ?? undefined,
+				hostId: hostId ?? undefined,
 				focus: "naming-instructions",
 			},
 		});
-	}, [closeModal, draft.hostId, machineId, navigate, selectedProject?.id]);
+	}, [closeModal, hostId, navigate, selectedProject?.id]);
 
 	const handleSubmit = useCallback(() => {
 		if (needsSetup) {
@@ -847,7 +849,7 @@ export function NewWorkspaceScreen({
 			return;
 		}
 		if (submitBlocker) {
-			if ((draft.hostId ?? machineId) === machineId && !activeHostUrl) {
+			if (hostId === machineId && !activeHostUrl) {
 				showHostServiceUnavailableToast(hostService, {
 					action: "createWorkspace",
 				});
@@ -860,7 +862,7 @@ export function NewWorkspaceScreen({
 	}, [
 		activeHostUrl,
 		createWorkspace,
-		draft.hostId,
+		hostId,
 		handleGoToSetup,
 		hostService,
 		machineId,
@@ -933,14 +935,14 @@ export function NewWorkspaceScreen({
 		/>
 	);
 	const devicePicker = (
-		<DevicePicker hostId={draft.hostId} onSelectHostId={handleSelectHostId} />
+		<DevicePicker hostId={hostId} onSelectHostId={handleSelectHostId} />
 	);
 	const contextPickers = (
 		<>
 			<ProjectPickerPill
 				selectedProject={selectedProject}
 				projects={isCloudHost ? cloudHostProjects : projects}
-				isSessionSelected={draft.isSession}
+				isSessionSelected={isSession}
 				githubRepositories={isCloudHost ? github.repositories : []}
 				githubConnection={isCloudHost ? github.connection : null}
 				isLoading={!areProjectsReady || (isCloudHost && github.isLoading)}
@@ -951,7 +953,7 @@ export function NewWorkspaceScreen({
 					selectedEnvironment={resolvedEnvironment}
 					linked={cloudSelection.linked}
 					other={cloudSelection.other}
-					projectName={draft.isSession ? undefined : selectedProject?.name}
+					projectName={isSession ? undefined : selectedProject?.name}
 					onSelectEnvironment={handleSelectEnvironment}
 					onCreateEnvironment={() => setIsCreatingEnvironment(true)}
 					onManageEnvironments={() => {
@@ -973,7 +975,7 @@ export function NewWorkspaceScreen({
 					onStarted={closeModal}
 					open={isCreatingEnvironment}
 					organizationId={activeOrganizationId}
-					projectId={draft.isSession ? null : projectId}
+					projectId={isSession ? null : projectId}
 				/>
 			)}
 			{linkedPR ? (
@@ -988,9 +990,9 @@ export function NewWorkspaceScreen({
 						<Trans>based off PR #{linkedPR.prNumber}</Trans>
 					</span>
 				</>
-			) : draft.hostId === CLOUD_HOST_ID ? (
+			) : isCloudHost ? (
 				<CompareBaseBranchPicker {...pickerProps} />
-			) : draft.isSession ? null : (
+			) : isSession ? null : (
 				<>
 					<CheckoutPickerPill
 						checkout={draft.checkout}
@@ -1037,22 +1039,6 @@ export function NewWorkspaceScreen({
 			<Trans>Set up project…</Trans>
 		</Button>
 	);
-	const resizeHandles = (
-		<SymmetricResizeHandles
-			currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}
-			minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
-			maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
-			onWidthChange={setLiveComposerWidth}
-			onWidthCommit={(width) => {
-				setStoredComposerWidth(width);
-				setLiveComposerWidth(null);
-			}}
-			onReset={() => {
-				setStoredComposerWidth(null);
-				setLiveComposerWidth(null);
-			}}
-		/>
-	);
 
 	if (isParadevShell) {
 		return (
@@ -1069,12 +1055,7 @@ export function NewWorkspaceScreen({
 						className="mb-6"
 						reserveSpace
 					/>
-					<div
-						className="relative flex w-full flex-col gap-2.5"
-						style={{
-							maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-						}}
-					>
+					<div className="relative flex w-full max-w-[592px] flex-col gap-2.5">
 						<AnimatePresence initial={false}>
 							{isPromptEmpty &&
 								!samplePromptsPending &&
@@ -1107,7 +1088,6 @@ export function NewWorkspaceScreen({
 							layout="inline"
 							allowEmptySubmit
 							autoFocus
-							className="w-full"
 							draft={{
 								segments: draft.promptDraft,
 								attachments: draft.promptAttachments,
@@ -1149,7 +1129,6 @@ export function NewWorkspaceScreen({
 								)}
 							</div>
 						</div>
-						{resizeHandles}
 					</div>
 				</div>
 			</ComposerDropZone>
@@ -1163,20 +1142,20 @@ export function NewWorkspaceScreen({
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}
 			/>
-			<div className="flex flex-1 flex-col items-center justify-center gap-8">
+			<div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 flex-col items-center gap-8 [@media(max-height:640px)]:hidden">
 				<SupersetIcon className="h-10 w-auto text-muted-foreground/70" />
 				<h1 className="text-center text-3xl font-medium text-foreground/90">
 					<Trans>What should we build next?</Trans>
 				</h1>
-				<GitHubStarPill surface="new_workspace" reserveSpace />
+				<GitHubStarPill
+					surface="new_workspace"
+					className="pointer-events-auto"
+					reserveSpace
+				/>
 			</div>
-			<div className="flex w-full flex-col items-center px-6 pb-8">
-				<div
-					className="relative flex w-full flex-col"
-					style={{
-						maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-					}}
-				>
+			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
+				{/* On short windows the editor stops before the centred heading. */}
+				<div className="relative flex w-full max-w-[592px] flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]">
 					<AnimatePresence initial={false}>
 						{isPromptEmpty &&
 							!samplePromptsPending &&
@@ -1204,7 +1183,6 @@ export function NewWorkspaceScreen({
 					<AgentComposer
 						allowEmptySubmit
 						autoFocus
-						className="w-full"
 						draft={{
 							segments: draft.promptDraft,
 							attachments: draft.promptAttachments,
@@ -1244,7 +1222,6 @@ export function NewWorkspaceScreen({
 						</div>
 						{setupButton}
 					</div>
-					{resizeHandles}
 				</div>
 			</div>
 		</ComposerDropZone>

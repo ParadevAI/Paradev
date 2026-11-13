@@ -3,6 +3,7 @@ import {
 	ensureSidebarProjectRecord,
 	setSidebarProjectHidden,
 	tombstoneSidebarWorkspaceRecord,
+	updateRows,
 } from "./sidebarMutations";
 
 /**
@@ -263,5 +264,40 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 		expect(row?.sidebarState.pinnedAt).toBeNull();
 		expect(row?.rightPaneLayout).toBeUndefined();
 		expect(cleaned).toEqual(["ws-1"]);
+	});
+});
+
+describe("updateRows", () => {
+	it("writes every row in one update call, in key order", () => {
+		const rows = new Map([
+			["a", { tabOrder: 0 }],
+			["b", { tabOrder: 0 }],
+		]);
+		const calls: string[][] = [];
+		const collection = {
+			update: (
+				keys: string[],
+				callback: (drafts: Array<{ tabOrder: number }>) => void,
+			) => {
+				calls.push(keys);
+				callback(keys.map((key) => rows.get(key) ?? { tabOrder: -1 }));
+			},
+		};
+
+		updateRows<{ tabOrder: number }, number>(
+			collection as never,
+			new Map([
+				["b", 2],
+				["a", 1],
+			]),
+			(draft, tabOrder) => {
+				draft.tabOrder = tabOrder;
+			},
+		);
+		updateRows(collection as never, new Map(), () => {});
+
+		expect(calls).toEqual([["b", "a"]]);
+		expect(rows.get("a")?.tabOrder).toBe(1);
+		expect(rows.get("b")?.tabOrder).toBe(2);
 	});
 });

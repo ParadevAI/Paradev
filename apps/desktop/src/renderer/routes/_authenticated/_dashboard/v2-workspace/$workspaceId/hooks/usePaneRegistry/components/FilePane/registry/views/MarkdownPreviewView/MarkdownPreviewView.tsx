@@ -55,7 +55,7 @@ export function MarkdownPreviewView({
 				{frontMatter !== "" && showFrontMatterNote && (
 					<div className="mx-auto mb-2 max-w-3xl select-text text-xs text-muted-foreground">
 						<Trans>
-							Front matter hidden — switch to the Markdown view to edit it
+							Front matter hidden. Switch to the Markdown view to edit it
 						</Trans>
 					</div>
 				)}

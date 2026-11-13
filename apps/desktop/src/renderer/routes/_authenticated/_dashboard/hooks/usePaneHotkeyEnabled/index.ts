@@ -1,0 +1,1 @@
+export { usePaneHotkeyEnabled } from "./usePaneHotkeyEnabled";

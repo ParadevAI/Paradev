@@ -4,7 +4,6 @@ import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
 import { useNewWorkspaceModalStore } from "renderer/stores/new-workspace-modal";
-import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
 
 interface NewWorkspaceHandoff {
 	isV2CloudEnabled: boolean;
@@ -16,24 +15,20 @@ export function openNewWorkspace(
 	{ isV2CloudEnabled, navigate }: NewWorkspaceHandoff,
 	projectId?: string | null,
 	requestedHostId?: string,
+	repository?: string | null,
 ) {
 	if (!isV2CloudEnabled) {
 		useNewWorkspaceModalStore.getState().openModal(projectId ?? undefined);
 		return;
 	}
-	const hostId =
-		requestedHostId ?? (projectId ? resolveHandoffHostId() : undefined);
-	if (hostId) {
-		useNewWorkspaceDraftStore.getState().updateDraft({ hostId });
-	}
 	if (projectId) {
-		useNewWorkspaceDraftStore.getState().selectProject(projectId);
+		useNewWorkspaceDraftStore.getState().selectProject(projectId, repository);
 	}
 	void navigate({
 		to: "/new-workspace",
 		search:
-			projectId || hostId
-				? { projectId: projectId ?? undefined, host: hostId }
+			projectId || requestedHostId
+				? { projectId: projectId ?? undefined, host: requestedHostId }
 				: undefined,
 	});
 }
@@ -46,14 +41,8 @@ export function openNewSession({
 		useNewWorkspaceModalStore.getState().openSessionModal();
 		return;
 	}
-	const hostId = resolveHandoffHostId();
-	const draftStore = useNewWorkspaceDraftStore.getState();
-	if (hostId) draftStore.updateDraft({ hostId });
-	draftStore.selectSession();
-	void navigate({
-		to: "/new-workspace",
-		search: { session: true, host: hostId },
-	});
+	useNewWorkspaceDraftStore.getState().selectSession();
+	void navigate({ to: "/new-workspace", search: { session: true } });
 }
 
 /**
@@ -67,23 +56,18 @@ export function useOpenNewWorkspace() {
 	const { machineId } = useLocalHostService();
 
 	return useCallback(
-		(projectId?: string | null, requestedHostId?: string) =>
+		(
+			projectId?: string | null,
+			requestedHostId?: string,
+			repository?: string | null,
+		) =>
 			openNewWorkspace(
 				{ isV2CloudEnabled, machineId, navigate },
 				projectId,
 				requestedHostId,
+				repository,
 			),
 		[isV2CloudEnabled, machineId, navigate],
-	);
-}
-
-// A project or session handoff keeps the host you were on; only the project
-// changes. The host goes in the URL so the page's restore can't replace it.
-function resolveHandoffHostId() {
-	return (
-		useNewWorkspaceDraftStore.getState().hostId ??
-		useV2WorkspaceCreateDefaultsStore.getState().lastHostId ??
-		undefined
 	);
 }
 
@@ -134,10 +118,11 @@ export function useOpenNewWorkspaceForHost() {
 				useNewWorkspaceModalStore.getState().openHostModal(hostId);
 				return;
 			}
-			void navigate({
-				to: "/new-workspace",
-				search: projectId ? { host: hostId, projectId } : { host: hostId },
-			});
+			openNewWorkspace(
+				{ isV2CloudEnabled, machineId: null, navigate },
+				projectId,
+				hostId,
+			);
 		},
 		[isV2CloudEnabled, navigate],
 	);

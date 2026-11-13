@@ -42,9 +42,12 @@ export type {
 	WorkspaceProps,
 } from "./react";
 export {
+	PaneAreaFocusedContext,
 	resolveTabTitle,
 	TabVisibilityContext,
 	useIsTabVisible,
+	usePaneAppearance,
+	usePaneAreaFocused,
 	usePaneFocus,
 	useTabTitle,
 	Workspace,

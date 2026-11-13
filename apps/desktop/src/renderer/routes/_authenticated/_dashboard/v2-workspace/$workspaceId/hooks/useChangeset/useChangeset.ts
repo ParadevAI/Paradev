@@ -1,6 +1,6 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
-import type { FileStatus } from "../../components/StatusIndicator";
+import type { FileStatus } from "renderer/routes/_authenticated/_dashboard/components/StatusIndicator";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
 import { buildChangesetFiles } from "./buildChangesetFiles";
 import type { ChangesetFile, DiffRef } from "./types";

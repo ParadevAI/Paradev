@@ -44,6 +44,7 @@ export interface ScopeDraft {
 	environmentId: string | null;
 	machineSize: MachineSize | null;
 	continueAgentSession: boolean;
+	reuseWorkspace: boolean;
 	tags: string[];
 }
 
@@ -153,7 +154,6 @@ export function TriggersCard({
 											targetHostId: nextHostId,
 											v2WorkspaceId: null,
 											cloudWorkspaceId: null,
-											continueAgentSession: false,
 											...(nextHostId === CLOUD_HOST_ID
 												? {
 														v2ProjectId: null,
@@ -190,7 +190,6 @@ export function TriggersCard({
 										: {
 												v2ProjectId,
 												v2WorkspaceId: null,
-												continueAgentSession: false,
 											},
 								)
 							}
@@ -203,13 +202,18 @@ export function TriggersCard({
 							workspaces={ownCloudWorkspaces}
 							allWorkspaces={cloudWorkspaces}
 							value={scope.cloudWorkspaceId}
+							reuse={scope.reuseWorkspace}
 							disabled={readOnly}
-							onChange={(cloudWorkspaceId) =>
+							onChange={({ cloudWorkspaceId, reuse }) => {
+								if (reuse && scope.reuseWorkspace) return;
 								onScopeChange({
 									cloudWorkspaceId,
-									...(cloudWorkspaceId ? {} : { continueAgentSession: false }),
-								})
-							}
+									reuseWorkspace: reuse,
+									...(cloudWorkspaceId || reuse
+										? {}
+										: { continueAgentSession: false }),
+								});
+							}}
 						/>
 					) : (
 						<WorkspacePicker
@@ -217,11 +221,16 @@ export function TriggersCard({
 							hostId={hostId}
 							projectId={scope.v2ProjectId}
 							value={scope.v2WorkspaceId}
+							reuse={scope.reuseWorkspace}
 							disabled={readOnly}
-							onChange={(v2WorkspaceId) =>
+							onChange={({ workspaceId: v2WorkspaceId, reuse }) => {
+								if (reuse && scope.reuseWorkspace) return;
 								onScopeChange({
 									v2WorkspaceId,
-									...(v2WorkspaceId ? {} : { continueAgentSession: false }),
+									reuseWorkspace: reuse,
+									...(v2WorkspaceId || reuse
+										? {}
+										: { continueAgentSession: false }),
 									// Denormalized pin: the cloud stores both without a registry lookup.
 									...(v2WorkspaceId && hostId
 										? {
@@ -229,9 +238,24 @@ export function TriggersCard({
 												v2ProjectId: scope.v2ProjectId,
 											}
 										: {}),
-								})
-							}
+								});
+							}}
 						/>
+					)}
+					{(scope.reuseWorkspace ||
+						scope.v2WorkspaceId ||
+						scope.cloudWorkspaceId) && (
+						<>
+							<span>and</span>
+							<SessionModePicker
+								className={SCOPE_CHIP}
+								continueAgentSession={scope.continueAgentSession}
+								disabled={readOnly}
+								onChange={(continueAgentSession) =>
+									onScopeChange({ continueAgentSession })
+								}
+							/>
+						</>
 					)}
 					{cloud && !scope.cloudWorkspaceId && (
 						<MachineSizePicker
@@ -241,7 +265,7 @@ export function TriggersCard({
 							onChange={(machineSize) => onScopeChange({ machineSize })}
 						/>
 					)}
-					{!cloud && (
+					{!(scope.v2WorkspaceId ?? scope.cloudWorkspaceId) && (
 						<>
 							<span>tagged</span>
 							<AutomationTagsPicker
@@ -250,19 +274,6 @@ export function TriggersCard({
 								projectId={scope.v2ProjectId}
 								disabled={readOnly}
 								onChange={(tags) => onScopeChange({ tags })}
-							/>
-						</>
-					)}
-					{(scope.v2WorkspaceId ?? scope.cloudWorkspaceId) && (
-						<>
-							<span>running</span>
-							<SessionModePicker
-								className={SCOPE_CHIP}
-								continueAgentSession={scope.continueAgentSession}
-								disabled={readOnly}
-								onChange={(continueAgentSession) =>
-									onScopeChange({ continueAgentSession })
-								}
 							/>
 						</>
 					)}

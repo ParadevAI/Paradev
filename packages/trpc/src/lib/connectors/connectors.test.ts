@@ -521,6 +521,19 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "user_01", label: null });
 	});
 
+	test("ahrefs_mcp keys on token_type, the one field a token response must carry", async () => {
+		const identity = await probeIdentity(
+			"ahrefs_mcp",
+			connectorMethod(requireConnector("ahrefs_mcp")),
+			"ahrefs_test",
+			undefined,
+			{ access_token: "ahrefs_test", token_type: "Bearer" },
+		);
+
+		expect(identity.account).toEqual({ id: "Bearer", label: null });
+		expect(identity.user).toEqual({ id: "Bearer", label: null });
+	});
+
 	test("stripe survives an account with no name", async () => {
 		globalThis.fetch = (async (_url: string, init: RequestInit) => {
 			const body = init.body

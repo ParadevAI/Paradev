@@ -4,9 +4,11 @@ import * as authSchema from "@superset/db/schema/auth";
 import { PaymentFailedEmail } from "@superset/email/emails/billing/payment-failed";
 import { RenewalUpcomingEmail } from "@superset/email/emails/billing/renewal-upcoming";
 import { NOREPLY_FROM } from "@superset/email/sender";
+import { planCatalogFromAutumn } from "@superset/shared/billing";
 import { Client } from "@upstash/qstash";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
+import { billingUsesAutumn } from "../../autumn";
 import { env } from "../../env";
 import { stripeClient } from "../../stripe";
 import {
@@ -15,7 +17,11 @@ import {
 } from "../../utils/billing";
 import { captureBillingEvent } from "../billing-analytics";
 import { resend } from "../resend";
+import { catalogAutumnPlans } from "./autumn/catalog";
 import { organizationForStripeCustomer } from "./autumn/customer";
+import { type EmailPlan, emailPlanFor } from "./autumn/plan-family";
+import { organizationBilling } from "./autumn/plan-state";
+import { seatItem } from "./autumn/subscription-row";
 import { NOTIFY_SLACK_URL } from "./subscription-events";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
@@ -38,6 +44,25 @@ async function isStripeSubscriptionCancelled(stripeSubscriptionId: string) {
 		);
 		return false;
 	}
+}
+
+async function autumnEmailPlan(
+	organizationId: string,
+): Promise<EmailPlan | null> {
+	if (!billingUsesAutumn) return null;
+	try {
+		const { autumnPlanId } = await organizationBilling(organizationId);
+		if (!autumnPlanId) return null;
+		const catalog = planCatalogFromAutumn(await catalogAutumnPlans());
+		return emailPlanFor(catalog, autumnPlanId);
+	} catch (error) {
+		console.error("[stripe/payment-failed] Failed to read plan:", error);
+		return null;
+	}
+}
+
+function displayPlanName(plan: string): string {
+	return plan.charAt(0).toUpperCase() + plan.slice(1);
 }
 
 /**
@@ -98,6 +123,8 @@ export async function handleStripeBillingEvent(
 			const nextRetryDate = invoice.next_payment_attempt
 				? new Date(invoice.next_payment_attempt * 1000)
 				: null;
+			// The row's plan is the tier, so Team and Ultra orgs read as "pro".
+			const emailPlan = await autumnEmailPlan(org.id);
 
 			await resend.batch.send(
 				recipients.map((recipient) => ({
@@ -109,7 +136,9 @@ export async function handleStripeBillingEvent(
 					react: PaymentFailedEmail({
 						recipientName: recipient.name,
 						organizationName: org.name,
-						planName: subscription?.plan ?? "Pro",
+						planName:
+							emailPlan?.name ?? displayPlanName(subscription?.plan ?? "pro"),
+						includesCloud: emailPlan?.cloudHoursPerSeat != null,
 						amount,
 						nextRetryDate,
 						// Anyone holding the link can settle a hosted invoice,
@@ -320,14 +349,16 @@ export async function handleStripeBillingEvent(
 			| Partial<Stripe.Subscription>
 			| undefined;
 
-		const previousPriceId = previousAttributes?.items?.data?.[0]?.price?.id;
-		const currentPriceId = stripeSubscription.items.data[0]?.price?.id;
+		const previousItem = previousAttributes?.items
+			? seatItem({ items: previousAttributes.items })
+			: undefined;
+		const previousPriceId = previousItem?.price?.id;
+		const currentPriceId = seatItem(stripeSubscription)?.price?.id;
 
 		if (!previousPriceId || previousPriceId === currentPriceId) return;
 
 		const previousInterval =
-			previousAttributes?.items?.data?.[0]?.price?.recurring?.interval ===
-			"year"
+			previousItem?.price?.recurring?.interval === "year"
 				? "yearly"
 				: "monthly";
 
@@ -338,6 +369,8 @@ export async function handleStripeBillingEvent(
 					eventType: "plan_changed",
 					stripeSubscriptionId: stripeSubscription.id,
 					previousInterval,
+					previousPriceId,
+					previousSeats: previousItem?.quantity ?? undefined,
 				},
 				retries: 3,
 			});

@@ -343,6 +343,8 @@ function hostService(): void {
 			"mkdir -p /rt && cd /rt && cp -R /out/stage/dist/. /rt/ && cp -R /out/stage/drizzle /rt/drizzle && cp -R /out/stage/agent-templates /rt/agent-templates && cp /out/stage/RUNTIME /rt/RUNTIME",
 			// host-service resolves the daemon side by side with itself, the way the desktop ships it.
 			"cp /out/stage/pty-daemon/pty-daemon.js /rt/pty-daemon.js",
+			// The natives below build against this node, so the runtime carries it: an environment's setup may replace the box's node.
+			"cp /usr/local/bin/node /rt/node",
 			"cd /rt && npm init -y >/dev/null && npm pkg set type=module >/dev/null",
 			`npm install ${[...natives, ...acpAdapters.map(pinned)].join(" ")} @parcel/watcher @xterm/headless --no-audit --no-fund >/dev/null`,
 			// The adapters bring their own claude and codex binaries (~650 MB); host-service points them at the box's pinned CLIs instead.

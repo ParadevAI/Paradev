@@ -13,6 +13,7 @@ import { hostReadsAttachmentParts } from "@superset/shared/host-version";
 import { TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
+import { randomUUID } from "expo-crypto";
 import {
 	Stack,
 	useFocusEffect,
@@ -105,6 +106,7 @@ import { useActiveChat } from "../stores/activeChatStore";
 import { keyboardOverlap } from "../utils/keyboardOverlap";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { PULL_REQUEST_SYMBOL, pullRequestStatus } from "../utils/pullRequest";
+import { resumeChat } from "../utils/resumeChat";
 import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
@@ -555,6 +557,34 @@ export function WorkspaceScreen() {
 		[router, invalidateTerminals],
 	);
 
+	// Opening a finished chat starts its agent session again, as reopening a
+	// desktop chat pane does. The resumed chat replaces the finished one.
+	const resumingChatRef = useRef<string | null>(null);
+	useEffect(() => {
+		const chat = activeRow?.kind === "chat" ? activeRow.chat : undefined;
+		if (!activeRow || !chat || chat.live || !chat.harnessSessionId) return;
+		if (!hostUrl || !id || resumingChatRef.current === activeRow.terminalId)
+			return;
+		resumingChatRef.current = activeRow.terminalId;
+		resumeChat({
+			transport: getChatTransport(hostUrl),
+			workspaceId: id,
+			chat: {
+				sessionId: activeRow.terminalId,
+				harness: chat.harness,
+				harnessSessionId: chat.harnessSessionId,
+			},
+			commandId: randomUUID(),
+		})
+			.then(openSession)
+			.catch((error: unknown) =>
+				Alert.alert(
+					t({ message: "Could not resume the chat" }),
+					errorCopy(error),
+				),
+			);
+	}, [activeRow, hostUrl, id, openSession, t]);
+
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
@@ -586,7 +616,10 @@ export function WorkspaceScreen() {
 			const row = rows.find((candidate) => candidate.terminalId === terminalId);
 			const closing =
 				row?.kind === "chat"
-					? getChatTransport(hostUrl).closeSession({ sessionId: terminalId })
+					? getChatTransport(hostUrl).closeSession({
+							sessionId: terminalId,
+							userClosed: true,
+						})
 					: getHostServiceClientByUrl(hostUrl).terminal.killSession.mutate({
 							terminalId,
 							workspaceId: id,

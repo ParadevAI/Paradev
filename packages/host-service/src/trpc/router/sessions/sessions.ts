@@ -2,8 +2,8 @@ import { presetForAcpHarness } from "@superset/chat/core";
 import { cursorSchema } from "@superset/chat/protocol";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { protectedProcedure, router } from "../../index";
-import { chatLaunchTarget } from "../agents/agents";
+import { protectedProcedure, queryProcedure, router } from "../../index";
+import { chatLaunchTarget, storedChatConfig } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import {
 	createChatSessionInWorkspace,
@@ -19,6 +19,16 @@ const sessionInput = z.object({
 });
 
 export const sessionsRouter = router({
+	closedMidTurn: queryProcedure.query(
+		({ ctx }) => ctx.runtime.closedMidTurn?.list() ?? [],
+	),
+	resumeClosedMidTurn: protectedProcedure.mutation(async ({ ctx }) => ({
+		resumed: (await ctx.runtime.closedMidTurn?.resume()) ?? 0,
+	})),
+	keepClosedMidTurnPaused: protectedProcedure.mutation(({ ctx }) => {
+		ctx.runtime.closedMidTurn?.keepPaused();
+		return { ok: true };
+	}),
 	capabilities: protectedProcedure
 		.input(z.object({ agent: z.string().min(1) }))
 		.query(({ ctx, input }) => {
@@ -112,7 +122,10 @@ export const sessionsRouter = router({
 			input.workspaceId,
 			input.sessionId,
 		);
-		return chat.commands.closeSession({ sessionId: input.sessionId });
+		return chat.commands.closeSession({
+			sessionId: input.sessionId,
+			userClosed: true,
+		});
 	}),
 	resume: protectedProcedure
 		.input(sessionInput.extend({ commandId: z.string().uuid().optional() }))
@@ -141,11 +154,26 @@ export const sessionsRouter = router({
 					code: "PRECONDITION_FAILED",
 					message: "This chat has no saved provider session to resume.",
 				});
-			return createChatSessionInWorkspace(ctx, {
-				workspaceId: input.workspaceId,
-				agent: presetId,
-				resumeSessionId: session.harnessSessionId,
-				commandId: input.commandId,
-			});
+			// Reopen on the agent config it ran under, so it keeps that account.
+			// A config deleted or moved to another CLI since then falls back to
+			// the default account, and the reply says so.
+			const { stored, keeps: keepsConfig } = storedChatConfig(ctx.db, session);
+			const created = await createChatSessionInWorkspace(
+				ctx,
+				{
+					workspaceId: input.workspaceId,
+					agent: keepsConfig && stored ? stored.id : presetId,
+					resumeSessionId: session.harnessSessionId,
+					commandId: input.commandId,
+				},
+				{ withoutAgentConfig: !keepsConfig },
+			);
+			if (!session.agentConfigId || keepsConfig) return created;
+			return {
+				...created,
+				notice: stored
+					? `Agent "${stored.label}" no longer runs this chat's CLI, so the chat resumed on the default ${presetId} account.`
+					: `The agent this chat ran under was deleted, so the chat resumed on the default ${presetId} account.`,
+			};
 		}),
 });

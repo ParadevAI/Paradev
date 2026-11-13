@@ -45,7 +45,7 @@ export function GithubStarRow({ searchQuery }: GithubStarRowProps) {
 			</div>
 			{state === "starred" ? (
 				<span className="text-xs text-muted-foreground">
-					<Trans>Starred — thank you!</Trans>
+					<Trans>Starred. Thank you!</Trans>
 				</span>
 			) : state === "unknown" ? (
 				// A disabled shadcn Button has pointer-events-none baked into its
@@ -64,7 +64,7 @@ export function GithubStarRow({ searchQuery }: GithubStarRowProps) {
 					</TooltipTrigger>
 					<TooltipContent side="left">
 						<Trans>
-							Couldn't confirm star status — check that the GitHub CLI (`gh`) is
+							Couldn't confirm star status. Check that the GitHub CLI (`gh`) is
 							installed, signed in, and that you have a network connection
 						</Trans>
 					</TooltipContent>

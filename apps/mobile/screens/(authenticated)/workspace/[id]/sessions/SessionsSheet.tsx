@@ -91,6 +91,7 @@ export function SessionsSheet() {
 								row.kind === "chat"
 									? getChatTransport(hostUrl).closeSession({
 											sessionId: row.terminalId,
+											userClosed: true,
 										})
 									: getHostServiceClientByUrl(
 											hostUrl,

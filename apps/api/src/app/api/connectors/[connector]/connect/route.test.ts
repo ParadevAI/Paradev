@@ -31,4 +31,18 @@ describe("connector connect route", () => {
 		expect(location.pathname).toBe("/connect/vercel_mcp");
 		expect(location.searchParams.get("error")).toBe("connect_failed");
 	});
+
+	test("a failed connect started from a plugin goes back to that plugin", async () => {
+		const response = await GET(
+			new Request(
+				"http://localhost/api/connectors/vercel_mcp/connect?organizationId=org-1&method=oauth2&plugin=vercel",
+			),
+			{ params: Promise.resolve({ connector: "vercel_mcp" }) },
+		);
+
+		expect(response.status).toBe(302);
+		const location = new URL(response.headers.get("location") ?? "");
+		expect(location.pathname).toBe("/plugins/vercel");
+		expect(location.searchParams.get("error")).toBe("connect_failed");
+	});
 });

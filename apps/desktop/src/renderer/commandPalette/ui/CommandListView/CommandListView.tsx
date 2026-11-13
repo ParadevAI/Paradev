@@ -1,5 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useMemo } from "react";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
@@ -7,6 +9,7 @@ import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections, scoreCommand } from "../../core/rankCommands";
 import type { Command } from "../../core/types";
 import { useActiveCommands } from "../../core/useActiveCommands";
+import { ChatSearchResults } from "../ChatSearchResults";
 import { CommandItemRow } from "../CommandItemRow/CommandItemRow";
 import { useSwitcherGroups } from "../WorkspaceList/hooks/useSwitcherGroups";
 import {
@@ -73,6 +76,8 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const parsed = parseRootQuery(query);
 	const trimmed = parsed.query.trim();
+	const chatSearchEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
 	const ranked = useMemo(
 		() => rankSections(sections, parsed.query),
 		[sections, parsed.query],
@@ -129,6 +134,9 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 				<Trans>No results</Trans>
 			</CommandEmpty>
 			{blocks.map((block) => block.node)}
+			{chatSearchEnabled && !parsed.commandsOnly && (
+				<ChatSearchResults query={parsed.query} />
+			)}
 		</CommandList>
 	);
 }

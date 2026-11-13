@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HiOutlineCog6Tooth } from "react-icons/hi2";
 import {
 	SidebarCardSlot,
@@ -24,6 +24,7 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
@@ -186,6 +187,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	const matchRoute = useMatchRoute();
 	const settingsHotkey = useHotkeyDisplay("OPEN_SETTINGS").text;
 	const isSettingsOpen = !!matchRoute({ to: "/settings", fuzzy: true });
+	const footerRef = useRef<HTMLDivElement>(null);
 	const { activeHostUrl } = useLocalHostService();
 	const v2RouteMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
 	const activeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
@@ -217,7 +219,13 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		groups.map((p) => p.id),
 	);
 	useEffect(() => {
-		setProjectOrder(groups.map((p) => p.id));
+		setProjectOrder((current) => {
+			const next = groups.map((p) => p.id);
+			return next.length === current.length &&
+				next.every((id, index) => id === current[index])
+				? current
+				: next;
+		});
 	}, [groups]);
 
 	const orderedGroups = useMemo(() => {
@@ -573,6 +581,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 										</OverflowFadeContainer>
 										{cardSlot}
 										<div
+											ref={footerRef}
 											className={cn(
 												isCollapsed
 													? "flex flex-col items-center gap-2 py-2"
@@ -588,6 +597,11 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											)}
 
 											<UpdatesPill isCollapsed={isCollapsed} />
+											<ParadevAnywhereButton
+												variant="footer"
+												side={isCollapsed ? "right" : "top"}
+												anchorRef={isCollapsed ? undefined : footerRef}
+											/>
 											<Tooltip delayDuration={300}>
 												<TooltipTrigger asChild>
 													<button

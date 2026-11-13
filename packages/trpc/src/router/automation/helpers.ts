@@ -313,8 +313,10 @@ export const automationBaseColumns = {
 	tags: automations.tags,
 	group: automations.group,
 	continueAgentSession: automations.continueAgentSession,
+	reuseWorkspace: automations.reuseWorkspace,
 	machineSize: automations.machineSize,
 	enabled: automations.enabled,
+	archivedAt: automations.archivedAt,
 	createdAt: automations.createdAt,
 	updatedAt: automations.updatedAt,
 };
@@ -368,8 +370,8 @@ export async function automationNotFound(
 	});
 }
 
-/** Deleting runs nothing on anyone's machine, so an organization owner may do it for any automation. */
-export async function requireAutomationDeleteAccess(
+/** Archiving and deleting run nothing on anyone's machine, so an organization owner may do them for any automation. */
+export async function requireAutomationArchiveAccess(
 	userId: string,
 	organizationId: string,
 	id: string,
@@ -408,8 +410,9 @@ export async function requireAutomationDeleteAccess(
 	throw userError({
 		code: "FORBIDDEN",
 		message:
-			"Only the owner or an organization owner can delete this automation",
-		i18nKey: "serverError.automation.onlyTheOwnerOrAnOrganizationOwner",
+			"Only the owner or an organization owner can archive this automation",
+		i18nKey:
+			"serverError.automation.onlyTheOwnerOrAnOrganizationOwnerCanArchive",
 	});
 }
 
@@ -433,6 +436,15 @@ export async function resolveAutomationGroup(
 		)
 		.limit(1);
 	return existing?.group ?? group;
+}
+
+export function assertNotArchived(automation: { archivedAt: Date | null }) {
+	if (automation.archivedAt === null) return;
+	throw userError({
+		code: "PRECONDITION_FAILED",
+		message: "This automation is archived. Restore it first.",
+		i18nKey: "serverError.automation.automationIsArchived",
+	});
 }
 
 export async function getAutomationForUser(

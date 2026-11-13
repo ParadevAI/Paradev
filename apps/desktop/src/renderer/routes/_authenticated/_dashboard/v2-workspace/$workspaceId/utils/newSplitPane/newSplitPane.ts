@@ -12,8 +12,7 @@ export function newSplitPane(
 	mintTerminalId: () => string,
 ): CreatePaneInput<PaneViewerData> {
 	if (source?.kind === "chat-v3") {
-		const { agent, chatModelId, chatModelLabel, chatModeId } =
-			source.data as ChatPaneData;
+		const { agent, chatModelId, chatModeId } = source.data as ChatPaneData;
 		if (agent?.id && acpHarnessForPreset(agent.id)) {
 			const label =
 				agent.id in AGENT_IDENTITY_LABELS
@@ -29,7 +28,6 @@ export function newSplitPane(
 					sessionId: null,
 					agent: { id: agent.id },
 					...(chatModelId ? { chatModelId } : {}),
-					...(chatModelLabel ? { chatModelLabel } : {}),
 					...(chatModeId ? { chatModeId } : {}),
 				} satisfies ChatPaneData,
 			};

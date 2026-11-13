@@ -1,3 +1,4 @@
+import { hasShellSyntax } from "@superset/shared/agent-prompt-launch";
 import {
 	AGENT_PRESET_FEATURE_FLAGS,
 	getPresetById,
@@ -32,10 +33,6 @@ function areEnvMapsEqual(
 	const rightEntries = Object.entries(right);
 	if (leftEntries.length !== rightEntries.length) return false;
 	return leftEntries.every(([key, value]) => right[key] === value);
-}
-
-function hasShellSyntax(commandText: string): boolean {
-	return parse(commandText).some((token) => typeof token !== "string");
 }
 
 export function getAgentCommandText(agent: AgentLaunchConfig): string {

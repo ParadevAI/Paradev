@@ -10,7 +10,7 @@ const POLL_TIMEOUT_MS = 10 * 60_000;
 export default command({
 	sandbox: false,
 	description:
-		"Install the Paradev GitHub App for the organization in the browser, so its repositories can back cloud environments",
+		"Install the Paradev GitHub App on a GitHub organization or account in the browser, so its repositories can back cloud environments; run again to add another",
 	options: {
 		noWait: boolean().desc("Print the install URL and exit without waiting"),
 	},
@@ -19,15 +19,10 @@ export default command({
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
-		const existing = await ctx.api.integration.github.getInstallation.query({
+		const existing = await ctx.api.integration.github.listInstallations.query({
 			organizationId,
 		});
-		if (existing) {
-			return {
-				data: { installation: existing },
-				message: `Already installed on ${existing.accountLogin}. Choose which repositories it can see in that account's GitHub settings.`,
-			};
-		}
+		const known = new Set(existing.map((installation) => installation.id));
 
 		if (!(await ctx.api.integration.syncAllowed.query({ organizationId }))) {
 			throw new CLIError(
@@ -43,19 +38,30 @@ export default command({
 				() => true,
 				() => false,
 			));
-		const instructions = `${opened ? "If your browser did not open, open" : "Open"} this URL, signed in to Paradev in that browser, to install the GitHub App:\n  ${url}`;
+		const action =
+			existing.length > 0
+				? `add another GitHub organization or account (connected: ${existing.map((i) => i.accountLogin).join(", ")})`
+				: "install the GitHub App";
+		const instructions = `${opened ? "If your browser did not open, open" : "Open"} this URL, signed in to Paradev in that browser, to ${action}:\n  ${url}`;
 		if (options.noWait) {
 			return { data: { url }, message: instructions };
 		}
-		process.stderr.write(`${instructions}\nWaiting for the installation…\n`);
+		const waiting =
+			existing.length > 0
+				? "Waiting for a new GitHub account… Picking an account that is already connected only updates its repository access; press Ctrl+C once you have saved it."
+				: "Waiting for the installation…";
+		process.stderr.write(`${instructions}\n${waiting}\n`);
 
 		const deadline = Date.now() + POLL_TIMEOUT_MS;
 		while (Date.now() < deadline) {
 			await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-			const installation =
-				await ctx.api.integration.github.getInstallation.query({
+			const installations =
+				await ctx.api.integration.github.listInstallations.query({
 					organizationId,
 				});
+			const installation = installations.find(
+				(candidate) => !known.has(candidate.id),
+			);
 			if (installation) {
 				return {
 					data: { installation },

@@ -1,8 +1,10 @@
-import type {
-	RealtimeNudgeKind,
-	RealtimeUpdate,
+import {
+	type RealtimeNudgeKind,
+	type RealtimeUpdate,
+	realtimeWorkspaceForwardsPath,
 } from "@superset/shared/realtime";
 import { waitUntil } from "@vercel/functions";
+import { z } from "zod";
 import { env } from "../env";
 
 /**
@@ -39,3 +41,38 @@ export function nudge(
 			}),
 	);
 }
+
+export async function readWorkspaceForwards(
+	organizationId: string,
+	workspaceId: string,
+): Promise<z.infer<typeof forwardsResponseSchema>["forwards"]> {
+	const response = await fetch(
+		`${env.REALTIME_URL}${realtimeWorkspaceForwardsPath(organizationId, workspaceId)}`,
+		{
+			headers: { authorization: `Bearer ${env.REALTIME_NUDGE_SECRET}` },
+			signal: AbortSignal.timeout(5_000),
+		},
+	);
+	if (!response.ok) {
+		throw new Error(`realtime forwards read: ${response.status}`);
+	}
+	const parsed = forwardsResponseSchema.safeParse(await response.json());
+	if (!parsed.success) throw new Error("realtime forwards read: malformed");
+	return parsed.data.forwards;
+}
+
+const port = z.number().int().min(1).max(65535);
+const forwardsResponseSchema = z.object({
+	forwards: z.array(
+		z.object({
+			port,
+			localPort: port,
+			since: z.number(),
+			user: z.object({
+				id: z.string(),
+				name: z.string(),
+				image: z.string().nullable(),
+			}),
+		}),
+	),
+});

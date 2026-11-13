@@ -1,11 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import {
 	collapseWorkLog,
+	deriveTimeline,
+	emptySnapshot,
 	type OutboxEntry,
+	reduceMany,
 	type TurnGroup,
 } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
+	DurableEnvelope,
 	Item,
 	ToolCall,
 	UserMessage,
@@ -107,6 +111,122 @@ describe("transcriptRows", () => {
 		expect(rows.at(-1)).toMatchObject({
 			status: "failed",
 			error: { message },
+		});
+	});
+
+	test("a turn cut off when Paradev closed says why once, on its card", () => {
+		const error = {
+			message: "Commands the agent was running were stopped.",
+			kind: "host_stopped" as const,
+		};
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						error,
+						startedAtMs: 3,
+						completedAtMs: 3,
+					},
+					entries: [
+						{
+							kind: "item",
+							item: {
+								id: "notice-1",
+								kind: "notice",
+								noticeKind: "error",
+								text: error.message,
+								startedAtMs: 3,
+							},
+						},
+					],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.some((row) => row.kind === "item")).toBe(false);
+		expect(rows.at(-1)).toMatchObject({ kind: "turn_status", error });
+	});
+
+	test("a turn the user stopped says so once, on its clock", () => {
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 30_000,
+					},
+					entries: [{ kind: "item", item: prompt }],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.find((row) => row.kind === "working")).toMatchObject({
+			stopped: true,
+		});
+		expect(rows.some((row) => row.kind === "turn_status")).toBe(false);
+	});
+
+	test("a quick stop the agent recorded says so once", () => {
+		const stop = {
+			id: "stop",
+			kind: "user_message",
+			startedAtMs: 100,
+			content: [{ type: "text", text: "[Request interrupted by user]" }],
+		} as UserMessage;
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 200,
+					},
+					entries: [
+						{ kind: "item", item: prompt },
+						{ kind: "user_stop", item: stop, stop: "response" },
+					],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.filter((row) => row.kind === "turn_status")).toHaveLength(1);
+	});
+
+	test("a stop too quick for a clock still gets its line", () => {
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 200,
+					},
+					entries: [{ kind: "item", item: prompt }],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.at(-1)).toMatchObject({
+			kind: "turn_status",
+			status: "interrupted",
 		});
 	});
 
@@ -590,5 +710,56 @@ describe("the changed-files card", () => {
 			find,
 		).find((row) => row.kind === "changed_files");
 		expect(commandOnly).toMatchObject({ files: [] });
+	});
+});
+
+test("a stop replayed from Claude Code history is a stopped row where it happened, not a prompt", () => {
+	const replayed = (id: string, text: string, startedAtMs: number): Item => ({
+		id,
+		kind: "user_message",
+		startedAtMs,
+		content: [{ type: "text", text }],
+	});
+	const reply = (id: string, startedAtMs: number): Item => ({
+		id,
+		kind: "agent_message",
+		text: id,
+		startedAtMs,
+		completedAtMs: startedAtMs,
+	});
+	const stored: DurableEnvelope[] = [
+		["h1", replayed("p1", "delete the build folder", 10)],
+		["h1", reply("asks-to-run", 11)],
+		["h2", replayed("stop", "[Request interrupted by user for tool use]", 12)],
+		["h2", replayed("p2", "keep it, clean the cache", 13)],
+		["h2", reply("done", 14)],
+	].map(([turnId, item], index) => ({
+		v: 1,
+		sessionId: "s1",
+		ts: index,
+		cursor: { epoch: "e1", seq: index + 1 },
+		event: { type: "item", item: item as Item, turnId: turnId as string },
+	}));
+
+	const rows = transcriptRows(
+		deriveTimeline(reduceMany(emptySnapshot(), stored), {
+			harness: "claude-acp",
+		}),
+		[],
+		new Set(),
+		find,
+	);
+
+	expect(rows.map((row) => row.key)).toEqual([
+		"p1",
+		"asks-to-run",
+		"stop:stop",
+		"p2",
+		"done",
+	]);
+	expect(rows[2]).toMatchObject({
+		kind: "turn_status",
+		status: "interrupted",
+		userStop: "tool_use",
 	});
 });

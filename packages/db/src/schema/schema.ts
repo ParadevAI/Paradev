@@ -1468,6 +1468,11 @@ export const v2Hosts = pgTable(
 		version: text(),
 		platform: text(),
 		installSource: text("install_source"),
+		// Whether the owner lets their cloud workspaces reach this host through
+		// the relay.
+		allowCloudWorkspaces: boolean("allow_cloud_workspaces")
+			.notNull()
+			.default(false),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -1650,6 +1655,11 @@ export const chatSessions = pgTable(
 		}),
 		v2WorkspaceId: uuid("v2_workspace_id"),
 		title: text(),
+		harness: text(),
+		harnessSessionId: text("harness_session_id"),
+		epoch: text(),
+		lastSeq: integer("last_seq"),
+		status: text(),
 		lastActiveAt: timestamp("last_active_at").notNull().defaultNow(),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -1742,10 +1752,14 @@ export const automations = pgTable(
 		continueAgentSession: boolean("continue_agent_session")
 			.notNull()
 			.default(false),
+		// With no pinned workspace, keep the one the first run creates as the
+		// pin, so later runs reuse it.
+		reuseWorkspace: boolean("reuse_workspace").notNull().default(false),
 		machineSize: text("machine_size"),
 
 		// The schedule lives in the automation's `schedule` trigger.
 		enabled: boolean().notNull().default(true),
+		archivedAt: timestamp("archived_at", { withTimezone: true }),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()

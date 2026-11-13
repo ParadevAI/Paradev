@@ -29,7 +29,7 @@ const MESSAGES: Record<ErrorReason, MessageDescriptor> = {
 		message: "This path is a directory",
 	}),
 	"binary-unsupported": msg({
-		message: "Binary file — cannot display",
+		message: "Binary file. Cannot display",
 	}),
 	"load-failed": msg({
 		message: "Failed to load file",

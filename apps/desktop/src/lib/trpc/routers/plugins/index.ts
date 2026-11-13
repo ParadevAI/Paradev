@@ -1,3 +1,4 @@
+import { rethrowCloudUnreachable } from "@superset/host-service/cloud-api-error";
 import { isOrganizationMarketplace } from "@superset/shared/plugins";
 import { TRPCError } from "@trpc/server";
 import {
@@ -5,6 +6,7 @@ import {
 	getBundledSkillIcons,
 	getBundledSkillPath,
 	getDisabledSkills,
+	installedPluginIcons,
 	installOrganizationPlugin,
 	installPlugin,
 	organizationPluginVersions,
@@ -122,6 +124,8 @@ export const createPluginsRouter = () => {
 				return setPluginEnabled(input.name, input.enabled);
 			}),
 
+		installedIcons: publicProcedure.query(() => installedPluginIcons()),
+
 		organizationVersions: publicProcedure.query(() =>
 			organizationPluginVersions(),
 		),
@@ -131,7 +135,12 @@ export const createPluginsRouter = () => {
 				z.object({ organizationId: z.string().min(1).optional() }).optional(),
 			)
 			.mutation(async ({ input }) => {
-				await syncPlugins(input?.organizationId);
+				try {
+					await syncPlugins(input?.organizationId);
+				} catch (error) {
+					rethrowCloudUnreachable(error);
+					throw error;
+				}
 				return { ok: true };
 			}),
 	});

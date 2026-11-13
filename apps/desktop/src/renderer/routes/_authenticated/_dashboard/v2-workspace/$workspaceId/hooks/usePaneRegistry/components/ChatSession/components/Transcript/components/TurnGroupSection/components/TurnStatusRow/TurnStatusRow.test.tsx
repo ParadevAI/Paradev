@@ -2,6 +2,8 @@ import { afterEach, expect, mock, test } from "bun:test";
 import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { ChatPaneActionsProvider } from "../../../../../../providers/ChatPaneActionsProvider";
 import {
 	type TurnFailureActions,
 	TurnFailureActionsProvider,
@@ -104,6 +106,24 @@ test("a turn the user stopped is one quiet line", () => {
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 });
 
+test("a stop the agent recorded says the user stopped it, and whether it was at a tool call", () => {
+	const line = (userStop: "response" | "tool_use") =>
+		render(
+			<TurnStatusRow
+				error={undefined}
+				latest={false}
+				status="interrupted"
+				turnId="t1"
+				userStop={userStop}
+			/>,
+		).container;
+	expect(line("response").textContent).toBe("You stopped this response");
+	expect(line("tool_use").textContent).toBe(
+		"You stopped this response at a tool call",
+	);
+	expect(line("response").querySelector("button, textarea")).toBeNull();
+});
+
 test("a turn the usage limit stopped is one quiet line, not a failure card", () => {
 	const view = render(
 		<TurnStatusRow
@@ -116,4 +136,159 @@ test("a turn the usage limit stopped is one quiet line, not a failure card", () 
 	expect(view.container.textContent).toBe("Stopped by the usage limit");
 	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
 	expect(view.queryByText("Copy error")).toBeNull();
+});
+
+test("a spend limit the host did not classify is a limit notice, not a red failure", () => {
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+				changeModel: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{
+					message:
+						"You have reached your specified workspace API usage limits.",
+					kind: "unknown",
+				}}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+	const card = view.container.querySelector(
+		'[data-turn-failure="usage_limit"]',
+	);
+	expect(card?.getAttribute("role")).toBe("status");
+	expect(card?.textContent).toContain("Usage limit reached");
+	expect(card?.className).not.toContain("destructive");
+	for (const action of ["Usage settings", "Change model", "Continue"]) {
+		expect(view.getByText(action)).toBeTruthy();
+	}
+	expect(card?.textContent).not.toContain("workspace API usage limits");
+	fireEvent.click(view.getByText("Show details"));
+	expect(card?.textContent).toContain("workspace API usage limits");
+});
+
+function authCard(actions: Partial<TurnFailureActions>) {
+	return render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+				...actions,
+			}}
+		>
+			<TurnStatusRow
+				error={{ message: "Not logged in. Please run /login", kind: "auth" }}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+}
+
+test("an auth failure offers Sign in", () => {
+	const view = authCard({});
+	expect(view.container.textContent).toContain("Sign in to continue");
+	expect(view.getByText("Sign in")).toBeTruthy();
+});
+
+test("an auth failure in manual mode offers no sign-in: Continue or agent settings", () => {
+	const restartAndContinue = mock(async () => true);
+	const openAgentSettings = mock(() => {});
+	const view = authCard({
+		manualSignIn: true,
+		openAgentSettings,
+		restartAndContinue,
+		changeModel: () => {},
+		startNewChat: async () => true,
+	});
+	expect(view.container.textContent).toContain("The agent is signed out");
+	expect(view.container.textContent).toContain("In manual mode");
+	expect(view.container.textContent).toContain("turn off manual mode");
+	expect(view.queryByText("Sign in")).toBeNull();
+	expect(view.queryByText("Sign in to continue")).toBeNull();
+	expect(view.queryByText("Change model")).toBeNull();
+	expect(view.queryByText("Start a new chat")).toBeNull();
+	fireEvent.click(view.getByText("Continue"));
+	expect(restartAndContinue).toHaveBeenCalledTimes(1);
+	fireEvent.click(view.getByText("Agent settings"));
+	expect(openAgentSettings).toHaveBeenCalledTimes(1);
+});
+
+test("a turn cut off when Paradev closed is a quiet paused line that resumes", () => {
+	const continueTask = mock(() => {});
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask,
+				dismissed: new Set(),
+				setDismissed: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{ message: "Paradev closed", kind: "host_stopped" }}
+				latest
+				status="interrupted"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+
+	expect(view.container.querySelector("[data-turn-failure]")).toBeNull();
+	expect(view.container.textContent).toContain("Paused when Paradev closed");
+	fireEvent.click(view.getByText("Resume"));
+	expect(continueTask).toHaveBeenCalledTimes(1);
+});
+
+test("an older paused turn offers no Resume", () => {
+	const view = render(
+		<TurnStatusRow
+			error={{ message: "Paradev closed", kind: "host_stopped" }}
+			latest={false}
+			status="interrupted"
+			turnId="t1"
+		/>,
+	);
+	expect(view.container.textContent).toBe("Paused when Paradev closed");
+});
+
+test("a cloud workspace shows no paused row", () => {
+	const view = render(
+		<SandboxAccessContext.Provider
+			value={{
+				targets: [
+					{
+						workspaceId: "w1",
+						organizationId: "o1",
+						url: "https://box",
+						desktopUrl: "https://box/desktop",
+					},
+				],
+				isReady: true,
+				agentCredentialsChangedWorkspaceId: null,
+				usageRefusal: null,
+			}}
+		>
+			<ChatPaneActionsProvider workspaceId="w1">
+				<TurnStatusRow
+					error={{ message: "Paradev closed", kind: "host_stopped" }}
+					latest
+					status="interrupted"
+					turnId="t1"
+				/>
+			</ChatPaneActionsProvider>
+		</SandboxAccessContext.Provider>,
+	);
+	expect(view.container.textContent).toBe("");
 });

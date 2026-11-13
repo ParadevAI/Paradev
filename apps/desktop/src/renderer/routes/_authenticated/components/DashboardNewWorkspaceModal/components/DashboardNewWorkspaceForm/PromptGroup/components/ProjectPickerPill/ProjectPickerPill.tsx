@@ -25,6 +25,10 @@ import {
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
+import {
+	FORM_PICKER_MENU_CLASS,
+	FormPickerTrigger,
+} from "renderer/routes/_authenticated/components/FormPickerTrigger";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import {
 	useOpenEmptyProjectModal,
@@ -36,10 +40,6 @@ import type {
 	GitHubRepositoryOption,
 	ProjectOption,
 } from "../../types";
-import {
-	FORM_PICKER_MENU_CLASS,
-	FormPickerTrigger,
-} from "../FormPickerTrigger";
 
 interface ProjectPickerPillProps {
 	selectedProject: ProjectOption | undefined;

@@ -56,20 +56,42 @@ async function signInWithChatgpt(api: ApiClient) {
 export default command({
 	sandbox: false,
 	description:
-		"Store an agent's subscription token or API key for your cloud workspaces; read from stdin or a prompt",
+		"Choose how an agent signs in to your cloud workspaces: a subscription token or API key (read from stdin or a prompt), or manual",
 	args: [positional("agent").required().desc("Agent: claude or codex")],
 	options: {
 		kind: string()
-			.enum("subscription", "api_key")
+			.enum("subscription", "api_key", "manual")
 			.required()
 			.desc(
-				"subscription: the token from `claude setup-token`, or for codex a ChatGPT sign-in; api_key: a provider or gateway key",
+				"subscription: the token from `claude setup-token`, or for codex a ChatGPT sign-in; api_key: a provider or gateway key; manual: your own script keeps the agent signed in, and nothing is stored or injected",
 			),
 		gateway: boolean().desc("The key is a Vercel AI Gateway key"),
 		baseUrl: string().desc("A compatible endpoint the key is for"),
 	},
 	run: async ({ ctx, args, options }) => {
 		const agent = args.agent as string;
+		if (options.kind === "manual") {
+			if (agent !== "claude" && agent !== "codex") {
+				throw new CLIError(
+					`${agent} cannot be set to manual`,
+					"Use claude or codex",
+				);
+			}
+			if (options.gateway || options.baseUrl) {
+				throw new CLIError(
+					"--gateway and --base-url do not apply to --kind manual",
+				);
+			}
+			const saved = await ctx.api.agentCredential.setManual.mutate({ agent });
+			const loginFile =
+				agent === "claude"
+					? "~/.claude/.credentials.json or an apiKeyHelper"
+					: "~/.codex/auth.json";
+			return {
+				data: { agent: saved.agent, kind: "manual" as const },
+				message: `${saved.agent} is manual in your cloud workspaces: your own script keeps ${loginFile} current`,
+			};
+		}
 		if (agent === "codex" && options.kind === "subscription") {
 			const saved = await signInWithChatgpt(ctx.api);
 			return {

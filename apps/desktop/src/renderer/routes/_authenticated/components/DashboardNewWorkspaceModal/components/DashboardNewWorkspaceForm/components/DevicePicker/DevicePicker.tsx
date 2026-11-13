@@ -13,7 +13,6 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useEffect } from "react";
 import {
 	HiCheck,
 	HiOutlineComputerDesktop,
@@ -21,11 +20,11 @@ import {
 } from "react-icons/hi2";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
-} from "../../PromptGroup/components/FormPickerTrigger";
+} from "renderer/routes/_authenticated/components/FormPickerTrigger";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { PickerChevron } from "../PickerChevron";
 import { useWorkspaceHostOptions } from "./hooks/useWorkspaceHostOptions";
 
@@ -66,6 +65,8 @@ interface DevicePickerProps {
 	 * the event that opens a DropdownMenu.
 	 */
 	disabled?: boolean;
+	/** False on surfaces that can only launch on a host. */
+	offersCloud?: boolean;
 }
 
 function getSelectedIcon(
@@ -88,6 +89,7 @@ export function DevicePicker({
 	className,
 	showLocalOnlineState = false,
 	disabled,
+	offersCloud = true,
 }: DevicePickerProps) {
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
@@ -95,14 +97,6 @@ export function DevicePicker({
 	const isParadevShell = useParadevShell();
 	const { currentDeviceName, localHostIsOnline, otherHosts } =
 		useWorkspaceHostOptions();
-	// A remembered cloud target outlives the flag that offers it, and the menu
-	// then has no cloud entry to point at what the trigger claims is selected.
-	// Undefined means the flags haven't resolved, which is not a "no".
-	useEffect(() => {
-		if (hostId === CLOUD_HOST_ID && cloudEnabled === false) {
-			onSelectHostId(machineId);
-		}
-	}, [cloudEnabled, hostId, machineId, onSelectHostId]);
 	const isLocal = hostId === null || hostId === machineId;
 	const selectedLabel =
 		hostId === CLOUD_HOST_ID
@@ -161,13 +155,13 @@ export function DevicePicker({
 					{localOnline !== null && <OnlineDot online={localOnline} />}
 					{isLocal && <HiCheck className="size-4" />}
 				</DropdownMenuItem>
-				{cloudEnabled && (
+				{offersCloud && (cloudEnabled || isCloud) && (
 					<DropdownMenuItem onSelect={() => onSelectHostId(CLOUD_HOST_ID)}>
 						<CloudGlyph className="size-4" />
 						<span className="flex-1">
 							<Trans>Cloud</Trans>
 						</span>
-						{hostId === CLOUD_HOST_ID && <HiCheck className="size-4" />}
+						{isCloud && <HiCheck className="size-4" />}
 					</DropdownMenuItem>
 				)}
 				{otherHosts.length > 0 && (

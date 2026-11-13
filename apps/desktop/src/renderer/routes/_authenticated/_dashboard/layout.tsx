@@ -19,6 +19,8 @@ import { DashboardSidebarPortsProvider } from "renderer/routes/_authenticated/_d
 import { PortForwardsProvider } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { WorkspaceSidebarPanel } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
+import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
+import { useResumeMovesToThisComputer } from "renderer/routes/_authenticated/_dashboard/hooks/useResumeMovesToThisComputer";
 import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
@@ -42,16 +44,18 @@ import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMount";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
-import { SidebarSlide } from "./components/SidebarSlide";
 import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
 import { WindowFocusSync } from "./components/WindowFocusSync";
 import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
+import { browserRuntimeRegistry } from "./v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
 });
+
+const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 
 /** v1 only — v2 deletes go through the globally-mounted DeleteWorkspaceMount
  * (see delete-workspace-intent store). */
@@ -134,7 +138,9 @@ function DashboardLayout() {
 		[hostWorkspaces, currentV2WorkspaceId],
 	);
 	const { machineId: localMachineId } = useLocalHostService();
+	const openNewWorkspaceInViewedProject = useOpenNewWorkspaceInViewedProject();
 	useWorkspaceNamingFailedToast();
+	useResumeMovesToThisComputer();
 	// Forwarding needs port data only for a workspace on another machine;
 	// a local selection must not switch on cross-host port polling.
 	// machineId is "" until the device query answers; treat unknown as local
@@ -151,9 +157,6 @@ function DashboardLayout() {
 	const isWorkspaceSidebarCollapsed = useWorkspaceSidebarStore((s) =>
 		s.isCollapsed(),
 	);
-	const workspaceSidebarOpenWidth = useWorkspaceSidebarStore((s) =>
-		s.isCollapsed() ? s.lastExpandedWidth : s.width,
-	);
 
 	// Global hotkeys for dashboard
 	useHotkey("OPEN_SETTINGS", () => navigate({ to: "/settings/account" }));
@@ -162,10 +165,9 @@ function DashboardLayout() {
 	});
 	useHotkey("TOGGLE_WORKSPACE_SIDEBAR", toggleWorkspaceSidebarCollapsed);
 	useHotkey("NEW_WORKSPACE", () =>
-		openNewWorkspace(
-			currentWorkspace?.projectId ?? currentV2Workspace?.projectId ?? undefined,
-			currentV2Workspace?.hostId,
-		),
+		currentWorkspace?.projectId
+			? openNewWorkspace(currentWorkspace.projectId)
+			: openNewWorkspaceInViewedProject(),
 	);
 	useHotkey(
 		"QUICK_CREATE_WORKSPACE",
@@ -292,23 +294,18 @@ function DashboardLayout() {
 								<ChatTabs />
 								<div className="flex min-h-0 flex-1">
 									<NavigationRail />
-									<SidebarSlide
-										side="left"
-										mode={isWorkspaceSidebarCollapsed ? "closed" : "open"}
-										width={workspaceSidebarOpenWidth}
+									<WorkspaceSidebarPanel
+										collapsedWidth={0}
+										slides
+										onLayoutFrame={relayoutBrowserPanes}
+										className="mb-1.5 h-auto self-stretch rounded-l-[10px] border-y border-l border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
 									>
-										{() => (
-											// Collapsed, the panel keeps its open width and content:
-											// it is only on screen while it slides shut.
-											<WorkspaceSidebarPanel
-												collapsedWidth={workspaceSidebarOpenWidth}
-												className="mb-1.5 h-auto self-stretch rounded-l-[10px] border-y border-l border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
-											>
-												<DashboardSidebar isCollapsed={false} />
-											</WorkspaceSidebarPanel>
-										)}
-									</SidebarSlide>
-									<ContentCard joinsSidebar={!isWorkspaceSidebarCollapsed}>
+										<DashboardSidebar />
+									</WorkspaceSidebarPanel>
+									<ContentCard
+										joinsSidebar={!isWorkspaceSidebarCollapsed}
+										isBordered={!onV2WorkspaceRoute}
+									>
 										{content}
 									</ContentCard>
 								</div>

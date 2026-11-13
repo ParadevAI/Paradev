@@ -6,6 +6,7 @@ import {
 
 import * as agentsCreate from "./agents/create";
 import * as agentsList from "./agents/list";
+import * as automationsArchive from "./automations/archive";
 import * as automationsCreate from "./automations/create";
 import * as automationsDelete from "./automations/delete";
 import * as automationsGet from "./automations/get";
@@ -60,6 +61,7 @@ const REGISTRARS = [
 	automationsCreate,
 	automationsUpdate,
 	automationsSetPrompt,
+	automationsArchive,
 	automationsDelete,
 	automationsPause,
 	automationsResume,

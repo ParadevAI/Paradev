@@ -15,10 +15,12 @@ function probedRuntime(page: DiscoverSessionsResult | Error | null) {
 		started: 0,
 		disposed: 0,
 		factoryCalls: 0,
+		configs: [] as (string | undefined)[],
 		queries: [] as DiscoverNativeSessionsInput[],
 	};
-	const adapter = (): HarnessAdapter => {
+	const adapter = (options: { agentConfigId?: string }): HarnessAdapter => {
 		probe.factoryCalls += 1;
+		probe.configs.push(options.agentConfigId);
 		return {
 			start(): AsyncIterable<never> {
 				probe.started += 1;
@@ -27,7 +29,7 @@ function probedRuntime(page: DiscoverSessionsResult | Error | null) {
 			prompt() {},
 			cancelTurn() {},
 			respondToApproval() {},
-			setMode() {},
+			setMode: () => Promise.resolve(true),
 			...(page === null
 				? {}
 				: {
@@ -94,6 +96,29 @@ describe("discoverSessions", () => {
 			"here-trailing-slash",
 		]);
 		expect(page.nextCursor).toBe("page-2");
+		await runtime.dispose();
+	});
+
+	test("lists an account's history through an adapter of that account", async () => {
+		const { runtime, probe } = probedRuntime({ supported: true, sessions: [] });
+		runtime.commands.createSession({
+			commandId: randomUUID(),
+			...query,
+			agentConfigId: "config-a",
+		});
+
+		await runtime.commands.discoverSessions({
+			...query,
+			agentConfigId: "config-a",
+		});
+		expect(probe.configs).toEqual(["config-a"]);
+		await runtime.commands.discoverSessions({
+			...query,
+			agentConfigId: "config-b",
+		});
+
+		expect(probe.configs).toEqual(["config-a", "config-b"]);
+		expect(probe.queries).toHaveLength(2);
 		await runtime.dispose();
 	});
 

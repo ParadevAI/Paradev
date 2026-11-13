@@ -16,5 +16,7 @@ process.env.DATABASE_URL_UNPOOLED ??= process.env.DATABASE_URL;
 process.env.SANDBOX_GATE_SECRET ??= "test-sandbox-gate-secret-placeholder-0000";
 process.env.AGENT_WORKER_SECRET ??=
 	"test-agent-worker-secret-placeholder-00000";
+process.env.AGENT_SESSION_SECRET ??=
+	"test-agent-session-secret-placeholder-0000";
 process.env.AGENT_TURN_SIGNING_SECRET ??=
 	"test-agent-turn-signing-secret-placeholder-0";

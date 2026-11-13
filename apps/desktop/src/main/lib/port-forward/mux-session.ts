@@ -66,9 +66,12 @@ export class MuxSession {
 
 	constructor(
 		url: string,
-		private readonly options: { onClosed: () => void },
+		private readonly options: {
+			onClosed: () => void;
+			headers?: Record<string, string>;
+		},
 	) {
-		this.ws = new WebSocket(url);
+		this.ws = new WebSocket(url, { headers: options.headers });
 		this.ready = new Promise<void>((resolve, reject) => {
 			const helloTimer = setTimeout(() => {
 				this.ws.terminate();
@@ -76,7 +79,12 @@ export class MuxSession {
 			}, HELLO_TIMEOUT_MS);
 			this.ws.once("unexpected-response", (_req, res) => {
 				clearTimeout(helloTimer);
-				reject(new Error(describeUpgradeFailure(res.statusCode)));
+				const reason = new Error(describeUpgradeFailure(res.statusCode));
+				reject(reason);
+				// ws emits no close after a refused upgrade; without this the
+				// transport keeps handing out a session that can never open.
+				this.destroySession(reason);
+				this.ws.terminate();
 			});
 			this.ws.once("error", (err) => {
 				clearTimeout(helloTimer);

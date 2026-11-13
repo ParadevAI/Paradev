@@ -133,6 +133,11 @@ export interface WorkspaceProps<TData> {
 	appearance?: PaneAppearance;
 	/** With `cards`, panes on the left edge keep square left corners, to continue a surface beside the workspace. */
 	joinsLeft?: boolean;
+	/**
+	 * Defaults to true. False when another workspace in the same window has
+	 * keyboard focus: the active tab and pane header then look inactive.
+	 */
+	isFocused?: boolean;
 	store: StoreApi<WorkspaceStore<TData>>;
 	registry: PaneRegistry<TData>;
 	className?: string;

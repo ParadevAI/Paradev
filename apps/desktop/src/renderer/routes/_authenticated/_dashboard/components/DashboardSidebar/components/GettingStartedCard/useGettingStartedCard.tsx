@@ -1,7 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useNavigate } from "@tanstack/react-router";
-import { useActiveFeatureFlags, useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect } from "react";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import type { SidebarCardEntry } from "renderer/components/SidebarCardSlot/types";
@@ -17,9 +15,6 @@ export function useGettingStartedCard(): SidebarCardEntry | null {
 		useGettingStartedStore();
 	const navigate = useNavigate();
 	const { gateFeature, hasAccess, isReady } = usePaywall();
-	const flags = useActiveFeatureFlags();
-	const mobileFlag = useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH);
-	const mobileEnabled = mobileFlag === true;
 	const visible =
 		!dismissed && isReady && hasAccess(GATED_FEATURES.REMOTE_ACCESS);
 	const { data: remoteEnabled } =
@@ -31,14 +26,10 @@ export function useGettingStartedCard(): SidebarCardEntry | null {
 	});
 	const completed =
 		(tried & 1) | (remoteEnabled ? 2 : 0) | (automations?.length ? 4 : 0);
-	const steps = GETTING_STARTED_STEPS.filter(
-		(step) => step.feature !== GATED_FEATURES.MOBILE_APP || mobileEnabled,
-	);
-	const allCompleted = steps.every(
+	const allCompleted = GETTING_STARTED_STEPS.every(
 		(step) => (completed & (1 << step.progressIndex)) !== 0,
 	);
-	const shouldComplete =
-		visible && flags !== undefined && allCompleted && !hasCompleted;
+	const shouldComplete = visible && allCompleted && !hasCompleted;
 	useEffect(() => {
 		if (shouldComplete) complete();
 	}, [shouldComplete, complete]);
@@ -50,9 +41,9 @@ export function useGettingStartedCard(): SidebarCardEntry | null {
 		children: (
 			<GettingStartedChecklist
 				completed={completed}
-				steps={steps}
+				steps={GETTING_STARTED_STEPS}
 				onStart={(index) => {
-					const step = steps[index];
+					const step = GETTING_STARTED_STEPS[index];
 					if (step) gateFeature(step.feature, () => navigate({ to: step.to }));
 				}}
 			/>

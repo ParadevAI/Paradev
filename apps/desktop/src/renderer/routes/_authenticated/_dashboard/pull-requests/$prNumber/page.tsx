@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
+import { useOpenPullRequestInApp } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenPullRequestInApp";
 import { useProjectHost } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectHost";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
 import { PullRequestDetailContent } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailContent";
@@ -11,13 +12,20 @@ import {
 	PullRequestDetailTabs,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
 import { PullRequestListToggle } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestListToggle";
+import { PullRequestStackNotice } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackNotice";
+import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
 import { usePullRequestDetail } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestDetail";
+import { usePullRequestListPreview } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestListPreview";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
 import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
+import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useStackRestack";
+import { findPullRequestWorkspace } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/findPullRequestWorkspace";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { parsePositiveIntegerParam } from "renderer/routes/_authenticated/_dashboard/utils/parsePositiveIntegerParam";
+import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { Route as PullRequestsLayoutRoute } from "../layout";
 
 export const Route = createFileRoute(
@@ -47,7 +55,14 @@ function PullRequestDetailPage() {
 		prNumber,
 		repoFullName: search.repo,
 	});
+	const preview = usePullRequestListPreview({
+		projectId,
+		repoFullName: search.repo ?? null,
+		prNumber,
+	});
 	const data = detail.data ?? null;
+	const navigate = useNavigate();
+	const openPullRequestInApp = useOpenPullRequestInApp();
 	const diffStat =
 		data?.additions !== undefined && data.deletions !== undefined
 			? { additions: data.additions, deletions: data.deletions }
@@ -61,6 +76,13 @@ function PullRequestDetailPage() {
 					prNumber,
 				};
 	const commentTarget = target && canActOnPullRequest(target) ? target : null;
+	const flow = usePullRequestMergeFlow({ target });
+	const restack = useStackRestack(
+		detail.projectId && hostId && hostUrl && prNumber !== null
+			? { projectId: detail.projectId, hostId, hostUrl, prNumber }
+			: null,
+		flow.stack,
+	);
 	const { refresh, isRefreshing } = useRefreshPullRequest({
 		target,
 		url: detail.data?.url,
@@ -85,6 +107,27 @@ function PullRequestDetailPage() {
 						/>
 					</div>
 					<div className="drag h-full min-w-4 flex-1" />
+					{flow.stack ? (
+						<PullRequestStackPopover
+							stack={flow.stack}
+							flow={flow}
+							appearance="badge"
+							restack={restack}
+							onSelectLayer={(layer) => {
+								void findPullRequestWorkspace({
+									hostUrl,
+									projectId: detail.projectId,
+									prNumber: layer.number,
+								}).then((workspaceId) => {
+									if (workspaceId) {
+										void navigateToV2Workspace(workspaceId, navigate);
+									} else {
+										openPullRequestInApp(layer.url);
+									}
+								});
+							}}
+						/>
+					) : null}
 					<PullRequestActions
 						target={target}
 						projectId={detail.projectId}
@@ -92,11 +135,15 @@ function PullRequestDetailPage() {
 						hostUrl={hostUrl}
 						data={detail.data}
 						isLoading={detail.isLoading}
+						flow={flow}
 						onRefresh={refresh}
 						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</PageHeader>
+			{flow.stackQuery.isIncomplete && data?.state === "open" ? (
+				<PullRequestStackNotice onRefresh={flow.stackQuery.refetch} />
+			) : null}
 			<PullRequestDetailContent
 				activeTab={activeTab}
 				detail={detail}
@@ -106,6 +153,7 @@ function PullRequestDetailPage() {
 				hostUrl={hostUrl}
 				hostId={hostId}
 				commentTarget={commentTarget}
+				preview={preview}
 			/>
 		</div>
 	);

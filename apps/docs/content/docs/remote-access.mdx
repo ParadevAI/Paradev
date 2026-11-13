@@ -6,23 +6,23 @@ pro: true
 
 ## Overview
 
-A workspace lives on the machine that hosts its files, terminal, and ports. **Remote access** lets you reach a workspace that's hosted on a different machine, like a Mac mini under your desk, a sandbox your team shares, or a spare laptop in the office.
+A workspace lives on the machine that hosts its files, terminal, and ports. **Remote access** lets you reach a workspace hosted on another machine, such as a Mac mini, a shared sandbox, or a spare laptop.
 
-**Paradev Relay** is a service that provides a secure way to route traffic between your different devices. There are two ways to grant a device remote access through the relay:
+**Paradev Relay** routes traffic between your devices. You can grant a device remote access through the relay in two ways:
 
 ## Option 1: Desktop
 
 <Callout type="warn">
-Exposing your primary workstation through the relay means anything reachable by your local host service (files, terminals, agent runs) becomes reachable by clients you grant access to. The recommended setup is a **separate machine** provisioned with only the repos and credentials you intend to share. That way a misclick or compromised client can't wipe an unrelated project or leak unrelated secrets.
+Exposing your primary workstation through the relay makes everything your local host service reaches (files, terminals, agent runs) reachable by clients you grant access to. Prefer a **separate machine** with only the repos and credentials you intend to share, so a misclick or compromised client can't touch unrelated projects or secrets.
 
-Use the desktop toggle when you genuinely need it on this machine. Otherwise prefer the CLI path on a dedicated host.
+Use the desktop toggle only when you need it on this machine. Otherwise use the CLI on a dedicated host.
 </Callout>
 
 Open the desktop app and go to **Settings → Remote Access**. Flip on **Allow remote access to this device via relay**.
 
 ![Settings → Remote Access relay toggle](/images/remote-workspaces-security-toggle.png)
 
-Enabling the toggle restarts the host service, so any running terminals on this device will be interrupted. You'll be asked to type a confirmation phrase before the change applies.
+Enabling the toggle restarts the host service and interrupts running terminals on this device. You must type a confirmation phrase first.
 
 ## Option 2: CLI
 
@@ -30,16 +30,16 @@ Enabling the toggle restarts the host service, so any running terminals on this 
 See the CLI's [Getting Started](/cli/getting-started) and [Host Server](/cli/host-server) docs to get set up.
 </Callout>
 
-On the machine you want to add to your shared relay network, sign in and start the host server.
+On the machine to add, sign in and start the host server.
 
 ```bash
 superset auth login
 superset start --daemon
 ```
 
-`superset start --daemon` runs a small HTTP server in the background and registers the machine with the relay so other clients in your organization can find it.
+`superset start --daemon` runs the host server in the background and registers the machine with the relay so other clients in your organization can find it.
 
-Verify it's online:
+Check that it is online:
 
 ```bash
 superset status
@@ -54,9 +54,9 @@ export SUPERSET_API_KEY=sk_live_…
 superset start --daemon --org <id|slug|name>
 ```
 
-Pass `--org` to choose which organization the host registers under. It's required when your key belongs to more than one organization (the CLI won't guess); with a single organization you can omit it. The host claims itself to the key's user on first registration. No desktop step required.
+`--org` picks the organization the host registers under. It is required when your key belongs to more than one organization; with one, you can omit it. The host claims itself to the key's user on first registration. No desktop step is needed.
 
-Observe or manage it from the same headless environment. Every `hosts`/`status` command takes the same `--org`:
+Every `hosts` and `status` command takes the same `--org`:
 
 ```bash
 superset hosts list --org <id|slug|name>
@@ -96,11 +96,11 @@ On any other device signed into the same organization, open the desktop app's **
 
 ![Device filter in the workspaces list](/images/remote-workspaces-device-filter.png)
 
-Pick a remote host to see the workspaces hosted there. Open one and you get the full Paradev experience (terminals, agent runs, the diff viewer) proxied through the relay to the host machine.
+Pick a remote host to see the workspaces hosted there. Terminals, agent runs, and the diff viewer all work, proxied through the relay to the host.
 
 ### Ports on a remote host
 
-The ports sidebar shows ports listening **on the remote host**. When you select a remote workspace, the desktop app forwards each of its ports to the same port number on your machine, so `localhost:3000` reaches the dev server on the host. All traffic for a workspace shares one tunnel, established when you select the workspace; every connection reuses it. When you select another workspace, the app stops those forwards and starts the new workspace's forwards.
+The ports sidebar shows ports listening **on the remote host**. When you select a remote workspace, the desktop app forwards each of its ports to the same port number on your machine, so `localhost:3000` reaches the dev server on the host. All traffic for a workspace shares one tunnel, opened when you select it. Selecting another workspace stops those forwards and starts forwards for the new workspace.
 
 Only ports that the workspace started are forwarded. Other services on the host stay unreachable.
 
@@ -110,7 +110,7 @@ The remote server sees each forwarded connection as coming from its own loopback
 
 Forwarding needs a host on the current relay running host-service 1.26 or newer. For a host you reach some other way, [forward a port yourself](/ports#forward-a-port-yourself) with SSH or Tailscale.
 
-Forwarded traffic passes through the Paradev relay, like terminal traffic does. A browser talking to a forwarded dev server sends whatever it normally would (cookies, auth headers, query strings), so treat a forwarded port like the remote service it reaches, not like localhost.
+Forwarded traffic passes through the Paradev relay, like terminal traffic does. A browser sends its usual cookies, auth headers, and query strings to a forwarded dev server, so treat a forwarded port as the remote service, not as localhost.
 
 ## Turning access off
 

@@ -6,10 +6,11 @@ import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
 import { VscExtensions } from "react-icons/vsc";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { env } from "renderer/env.renderer";
+import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
+import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
-import { RailButton } from "./components/RailButton";
 import { RailMoreMenu } from "./components/RailMoreMenu";
 import { SolarCheckCircleIcon } from "./components/SolarCheckCircleIcon";
 
@@ -102,6 +103,7 @@ export function NavigationRail() {
 			/>
 			<RailMoreMenu />
 			<div className="mt-auto flex flex-col items-center gap-1.5">
+				<ParadevAnywhereButton variant="rail" />
 				<UpdatesPill isCollapsed />
 				<OrganizationDropdown variant="rail" />
 			</div>

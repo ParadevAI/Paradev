@@ -1,4 +1,4 @@
-import { and, eq, inArray, ne } from "drizzle-orm";
+import { and, eq, inArray, isNull, ne } from "drizzle-orm";
 import { db, dbWs } from "../client";
 import { members } from "../schema/auth";
 import {
@@ -35,6 +35,7 @@ async function loadEffects(
 			and(
 				eq(automations.organizationId, organizationId),
 				eq(automations.ownerUserId, userId),
+				isNull(automations.archivedAt),
 			),
 		);
 	const access = await reader

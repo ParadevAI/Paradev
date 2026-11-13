@@ -10,6 +10,7 @@ import {
 	registerWindow,
 	setOrg,
 	unregisterWindow,
+	watchWindows,
 } from "./window-registry";
 
 /**
@@ -33,6 +34,28 @@ beforeEach(() => {
 });
 
 describe("window registry", () => {
+	test("a watcher sees each open window, then each new one", () => {
+		const first = makeWindow(1);
+		const second = makeWindow(2);
+		registerWindow({ window: first, orgId: null, key: "key-1" });
+		const seen: BrowserWindow[] = [];
+		watchWindows((window) => seen.push(window));
+		registerWindow({ window: second, orgId: null, key: "key-2" });
+		expect(seen).toEqual([first, second]);
+	});
+
+	test("a watcher that throws does not stop the others", () => {
+		const seen: BrowserWindow[] = [];
+		watchWindows(() => {
+			throw new Error("broken watcher");
+		});
+		watchWindows((window) => seen.push(window));
+		const win = makeWindow(3);
+		registerWindow({ window: win, orgId: null, key: "key-3" });
+		expect(seen).toEqual([win]);
+		expect(getEntry(3)?.window).toBe(win);
+	});
+
 	test("register then read entry and org", () => {
 		const win = makeWindow(1);
 		registerWindow({ window: win, orgId: "org-a", key: "key-14" });

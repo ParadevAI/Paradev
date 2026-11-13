@@ -13,7 +13,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
-import { $getNearestNodeOfType } from "@lexical/utils";
+import { $getNearestNodeOfType, IS_APPLE } from "@lexical/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { isLargePaste, normalizePastedText } from "@superset/chat/core";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
@@ -123,6 +123,7 @@ import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
 import { MentionSubmenu } from "../MentionSubmenu";
+import { getFormatShortcutTarget } from "./utils/getFormatShortcutTarget";
 
 function footerButtonClasses(base: string, ghost: string) {
 	return {
@@ -748,15 +749,17 @@ export function ComposerBody({
 				const key = event.key.toLowerCase();
 				const mod = event.metaKey || event.ctrlKey;
 				pasteAsTextRef.current = event.shiftKey && mod && key === "v";
-				// ⌘B and ⌘I format here; app hotkeys on the same keys must not also fire.
-				if (
-					mod &&
-					!event.shiftKey &&
-					!event.altKey &&
-					(key === "b" || key === "i")
-				)
-					event.stopPropagation();
-				return false;
+				const selection = $getSelection();
+				const target = getFormatShortcutTarget(event, {
+					isApple: IS_APPLE,
+					hasSelection:
+						$isRangeSelection(selection) && !selection.isCollapsed(),
+				});
+				if (target === "editor") event.stopPropagation();
+				if (target !== "app") return false;
+				// true skips Lexical's bold shortcut; preventDefault stops the native formatBold.
+				event.preventDefault();
+				return true;
 			},
 			COMMAND_PRIORITY_LOW,
 		);
@@ -1305,8 +1308,10 @@ export function ComposerBody({
 					aria-label={t({
 						message: "Stop response",
 					})}
+					disabled={!onStop}
+					title={onStop ? undefined : t({ message: "Starting the agent…" })}
 					onClick={onStop}
-					className={buttons.filled}
+					className={onStop ? buttons.filled : buttons.inactiveSend}
 				>
 					<SquareIcon className="size-3 fill-current" />
 				</button>
@@ -1314,12 +1319,12 @@ export function ComposerBody({
 				<button
 					type="button"
 					aria-label={
-						status === "streaming"
-							? t({ message: "Queue message" })
-							: t({ message: "Send message" })
+						status === "ready"
+							? t({ message: "Send message" })
+							: t({ message: "Queue message" })
 					}
 					title={
-						status === "streaming"
+						(status === "streaming" && onStop) || status === "background"
 							? t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}

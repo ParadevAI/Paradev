@@ -21,7 +21,6 @@ describe("newSplitPane", () => {
 			chat({
 				agent: { id: "claude", sessionId: "h-1" },
 				chatModelId: "opus",
-				chatModelLabel: "Opus",
 				chatModeId: "plan",
 				chatTitle: "Fix the rail",
 			}),
@@ -35,7 +34,6 @@ describe("newSplitPane", () => {
 			sessionId: null,
 			agent: { id: "claude" },
 			chatModelId: "opus",
-			chatModelLabel: "Opus",
 			chatModeId: "plan",
 		});
 		expect(data.terminalId).not.toBe("t-source");

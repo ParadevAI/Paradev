@@ -356,6 +356,7 @@ export async function applySandboxPolicy(args: {
 export async function describeSandbox(providerSandboxId: string): Promise<{
 	hostTarget: string;
 	running: boolean;
+	vcpus: number | undefined;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -363,9 +364,12 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 			name: providerSandboxId,
 			resume: false,
 		});
+		const running = sandbox.status === "running";
 		return {
 			hostTarget: sandbox.domain(HOST_SERVICE_PORT),
-			running: sandbox.status === "running",
+			running,
+			// `sandbox.vcpus` is the configured size, which a running session does not pick up.
+			vcpus: running ? sandbox.currentSession().vcpus : sandbox.vcpus,
 		};
 	} catch (error) {
 		if (isUnavailable(error))

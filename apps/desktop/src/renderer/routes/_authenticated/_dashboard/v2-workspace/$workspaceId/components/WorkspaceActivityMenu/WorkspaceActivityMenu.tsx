@@ -33,13 +33,23 @@ import {
 } from "renderer/lib/github/openPullRequestLink";
 import { clearTerminalBackgroundMarker } from "renderer/lib/terminal/terminal-background-intents";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { WORKSPACE_SIDEBAR_ATTRIBUTE } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceSidebarPanel";
 import { usePageFavorites } from "renderer/routes/_authenticated/_dashboard/hooks/usePageFavorites";
 import { usePagesList } from "renderer/routes/_authenticated/_dashboard/hooks/usePagesList";
+import { PullRequestMergeFlowDialog } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMergeFlowDialog";
+import { PullRequestStackPosition } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPosition";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import { pagesListInput } from "renderer/routes/_authenticated/_dashboard/utils/pagesListInput";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
+import { AsciiSpinner } from "renderer/screens/main/components/AsciiSpinner";
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
 import type { StoreApi } from "zustand/vanilla";
 import type { CreateNewAgentSession } from "../../hooks/useAgentSessionLauncher";
+import {
+	useOpenStackLayer,
+	usePendingStackLayer,
+} from "../../hooks/useOpenStackLayer";
 import { usePRFlowState } from "../../hooks/usePRFlowState";
 import { usePullRequestActions } from "../../hooks/usePullRequestActions";
 import { useShipActions } from "../../hooks/useShipActions";
@@ -77,6 +87,7 @@ import {
 	PullRequestRow,
 } from "./components/PullRequestRow";
 import { ShipActionsMenu, type ShipView } from "./components/ShipActionsMenu";
+import { StackLayerRows } from "./components/StackLayerRows";
 import {
 	ACTIVITY_DIVIDER_CLASS,
 	ACTIVITY_SEGMENT_CLASS,
@@ -143,7 +154,6 @@ export function WorkspaceActivityMenu({
 			: null;
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
-	const [popoverOpen, setPopoverOpen] = useState(false);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const anchorNode = useActivityPanelStore(
 		(state) => state.anchorNodes[workspaceId],
@@ -158,6 +168,12 @@ export function WorkspaceActivityMenu({
 		(state) => state.hidden[workspaceId] === true,
 	);
 	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const popoverOpen = useActivityPanelStore(
+		(state) => state.floatingOpen[workspaceId] === true,
+	);
+	const setFloatingOpen = useActivityPanelStore(
+		(state) => state.setFloatingOpen,
+	);
 	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
 	const open = docked || floating;
@@ -221,17 +237,43 @@ export function WorkspaceActivityMenu({
 			),
 	};
 	const organizationId = useActiveOrganizationId();
+	const currentPrTarget: PullRequestTarget | null = currentPr
+		? {
+				organizationId,
+				repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,
+				prNumber: currentPr.number,
+			}
+		: null;
 	const prActions = usePullRequestActions({
 		workspaceId,
-		target: currentPr
-			? {
-					organizationId,
-					repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,
-					prNumber: currentPr.number,
-				}
-			: null,
+		target: currentPrTarget,
 		onRefresh: refreshFlowState,
 	});
+	const refreshWorkspacePullRequest =
+		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
+	const mergeFlow = usePullRequestMergeFlow({
+		target: currentPrTarget,
+		onMerged: async () => {
+			try {
+				await refreshWorkspacePullRequest.mutateAsync({
+					workspaceIds: [workspaceId],
+				});
+			} catch (error) {
+				console.warn("Failed to refresh PR state after merge", error);
+			}
+			refreshFlowState();
+		},
+	});
+
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest, {
+		onSwitched: refreshFlowState,
+		layers: mergeFlow.stack?.layers,
+	});
+	const stackSwitch = usePendingStackLayer(
+		workspaceId,
+		currentPr?.number ?? null,
+	);
+	const pendingLayer = stackSwitch?.layer ?? null;
 
 	const pagePolicy = usePagePolicy("4-tier");
 	const rightPane = useRightPaneLinkTarget();
@@ -304,9 +346,22 @@ export function WorkspaceActivityMenu({
 		[detachedTerminals],
 	);
 	const agentWork = useAgentWork(workspaceId);
+	const stackLayerNumbers = new Set(
+		mergeFlow.stack?.layers
+			.filter((layer) => layer.number !== currentPr?.number)
+			.map((layer) => layer.number) ?? [],
+	);
 	const linkedPullRequests = useWorkspacePullRequests(workspaceId, {
 		enabled: open,
-	});
+	}).filter(
+		(pullRequest) =>
+			!(
+				currentPr &&
+				pullRequest.repoOwner === currentPr.repoOwner &&
+				pullRequest.repoName === currentPr.repoName &&
+				stackLayerNumbers.has(pullRequest.number)
+			),
+	);
 	const pullRequests: PullRequestEntry[] =
 		changes &&
 		currentPr &&
@@ -338,35 +393,67 @@ export function WorkspaceActivityMenu({
 		pullRequest.number === currentPr.number &&
 		pullRequest.repoOwner === currentPr.repoOwner &&
 		pullRequest.repoName === currentPr.repoName;
-	const pullRequestRow = (pullRequest: PullRequestEntry) => (
-		<PullRequestRow
-			key={`${pullRequest.repoOwner}/${pullRequest.repoName}#${pullRequest.number}`}
-			pullRequest={pullRequest}
-			menu={
-				isCurrentPullRequest(pullRequest) && currentPr ? (
-					<ShipActionsMenu
-						canCreatePr={false}
-						{...shipMenuProps}
-						pullRequest={{
-							canMarkReady: currentPrState === "draft",
-							canMerge: currentPr.state === "open" && !currentPr.isDraft,
-							isMarkingReady: prActions.isMarkingReady,
-							isMerging: prActions.isMerging,
-							onMarkReady: prActions.markReady,
-							onMerge: prActions.merge,
+	const pullRequestRow = (pullRequest: PullRequestEntry) => {
+		const stack =
+			isCurrentPullRequest(pullRequest) && mergeFlow.stack
+				? mergeFlow.stack
+				: null;
+		return (
+			<div
+				key={`${pullRequest.repoOwner}/${pullRequest.repoName}#${pullRequest.number}`}
+			>
+				<PullRequestRow
+					pullRequest={pullRequest}
+					stack={
+						stack
+							? { position: stack.currentPosition, size: stack.layers.length }
+							: null
+					}
+					menu={
+						isCurrentPullRequest(pullRequest) && currentPr ? (
+							<ShipActionsMenu
+								canCreatePr={false}
+								{...shipMenuProps}
+								pullRequest={{
+									target: currentPrTarget,
+									flow: mergeFlow,
+									canMarkReady: currentPrState === "draft",
+									canMerge: currentPr.state === "open" && !currentPr.isDraft,
+									isQueued:
+										currentPr.state === "queued" || mergeFlow.queued !== null,
+									isMarkingReady: prActions.isMarkingReady,
+									isMerging: prActions.isMerging,
+									onMarkReady: prActions.markReady,
+									onMerge: prActions.merge,
+								}}
+							/>
+						) : undefined
+					}
+					onOpen={(target, event) =>
+						openPullRequestLink(
+							target.url,
+							pullRequestLinkPolicy.getAction(event),
+							onOpenPullRequest,
+						)
+					}
+				/>
+				{stack ? (
+					<StackLayerRows
+						layers={stack.layers.filter(
+							(layer) => layer.number !== pullRequest.number,
+						)}
+						pendingNumber={
+							stackSwitch?.isCheckingOut ? stackSwitch.layer.number : null
+						}
+						onSelect={(layer) => {
+							openStackLayer(layer);
+							if (!fits) setFloating(false);
 						}}
 					/>
-				) : undefined
-			}
-			onOpen={(target, event) =>
-				openPullRequestLink(
-					target.url,
-					pullRequestLinkPolicy.getAction(event),
-					onOpenPullRequest,
-				)
-			}
-		/>
-	);
+				) : null}
+			</div>
+		);
+	};
 	const paneStores = useMemo(
 		() => [store, ...linkedStores],
 		[store, linkedStores],
@@ -443,11 +530,11 @@ export function WorkspaceActivityMenu({
 	}, [open, workspaceId, newestPublishedAt, markSeen]);
 
 	useEffect(() => {
-		if (fits) setPopoverOpen(false);
-	}, [fits]);
+		if (fits) setFloatingOpen(workspaceId, false);
+	}, [fits, workspaceId, setFloatingOpen]);
 
 	const setFloating = (next: boolean) => {
-		setPopoverOpen(next);
+		setFloatingOpen(workspaceId, next);
 		if (next) {
 			void utils.page.listPaginated.invalidate(workspaceListInput);
 			return;
@@ -782,14 +869,33 @@ export function WorkspaceActivityMenu({
 							<>
 								<span className={ACTIVITY_DIVIDER_CLASS} />
 								<span className={ACTIVITY_SEGMENT_CLASS}>
-									<PRIcon
-										state={currentPrState}
-										className="size-3.5 shrink-0"
-									/>
-									<span className="tabular-nums">#{currentPr.number}</span>
-									{currentPrChecks && showsChecks(currentPrState) && (
-										<PRStatusIndicators checks={currentPrChecks} />
+									{pendingLayer ? (
+										<span className="flex size-3.5 shrink-0 items-center justify-center">
+											<AsciiSpinner className="text-base leading-none" />
+										</span>
+									) : (
+										<PRIcon
+											state={currentPrState}
+											className="size-3.5 shrink-0"
+										/>
 									)}
+									<span className="tabular-nums">
+										#{pendingLayer?.number ?? currentPr.number}
+									</span>
+									{mergeFlow.stack ? (
+										<PullRequestStackPosition
+											position={
+												pendingLayer?.position ??
+												mergeFlow.stack.currentPosition
+											}
+											size={mergeFlow.stack.layers.length}
+										/>
+									) : null}
+									{!pendingLayer &&
+										currentPrChecks &&
+										showsChecks(currentPrState) && (
+											<PRStatusIndicators checks={currentPrChecks} />
+										)}
 								</span>
 							</>
 						) : (
@@ -836,7 +942,11 @@ export function WorkspaceActivityMenu({
 					if (shipView || composing) event.preventDefault();
 				}}
 				onInteractOutside={(event) => {
-					if (triggerRef.current?.contains(event.target as Node))
+					const target = event.target as Element;
+					if (
+						triggerRef.current?.contains(target) ||
+						target.closest?.(`[${WORKSPACE_SIDEBAR_ATTRIBUTE}]`)
+					)
 						event.preventDefault();
 				}}
 			>
@@ -845,6 +955,12 @@ export function WorkspaceActivityMenu({
 			{asideNode &&
 				dockedMounted &&
 				createPortal(renderPanel("docked"), asideNode)}
+			{currentPr ? (
+				<PullRequestMergeFlowDialog
+					flow={mergeFlow}
+					prNumber={currentPr.number}
+				/>
+			) : null}
 		</Popover>
 	);
 }
