@@ -293,7 +293,7 @@ function DashboardLayout() {
 										className={
 											isWorkspaceSidebarCollapsed
 												? "overflow-visible border-r-0"
-												: "mb-1.5 h-auto self-stretch rounded-l-[10px] border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
+												: "mb-1.5 h-auto self-stretch rounded-l-[10px] border-y border-l border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
 										}
 									>
 										<DashboardSidebar
