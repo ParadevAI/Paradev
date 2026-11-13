@@ -60,6 +60,10 @@
 			"types": "./src/trpc/router/host/cloud-api-error.ts",
 			"default": "./src/trpc/router/host/cloud-api-error.ts"
 		},
+		"./github-availability": {
+			"types": "./src/runtime/pull-requests/utils/github-availability/index.ts",
+			"default": "./src/runtime/pull-requests/utils/github-availability/index.ts"
+		},
 		"./attachments": {
 			"types": "./src/trpc/router/attachments/index.ts",
 			"default": "./src/trpc/router/attachments/index.ts"

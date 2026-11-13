@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/core";
 import { LocalGitCredentialProvider } from "@superset/host-service/git-credentials";
+import { isGitHubUnreachableError } from "@superset/host-service/github-availability";
 import {
 	isGithubAttachmentUrl,
 	signedGithubAttachmentUrl,
@@ -81,7 +82,9 @@ export function createViewerGithubRouter(
 			);
 		} catch (error) {
 			throw new TRPCError({
-				code: githubErrorCode(error),
+				code: isGitHubUnreachableError(error)
+					? "SERVICE_UNAVAILABLE"
+					: githubErrorCode(error),
 				message:
 					error instanceof Error && error.message ? error.message : fallback,
 				cause: error,
