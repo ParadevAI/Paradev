@@ -141,8 +141,13 @@ export function parseDiffNumstat(
 			isBinary: addStr === "-" && delStr === "-",
 		};
 
+		const compactRenameMatch = rawPath.match(/^(.*?)\{(.*?) => (.*?)\}(.*)$/);
 		const renameMatch = rawPath.match(/^(.+) => (.+)$/);
-		if (renameMatch) {
+		if (compactRenameMatch) {
+			const [, prefix, oldPart, newPart, suffix] = compactRenameMatch;
+			stats.set(`${prefix}${newPart}${suffix}`, statEntry);
+			stats.set(`${prefix}${oldPart}${suffix}`, statEntry);
+		} else if (renameMatch) {
 			const oldPath = renameMatch[1];
 			const newPath = renameMatch[2];
 			stats.set(newPath, statEntry);
