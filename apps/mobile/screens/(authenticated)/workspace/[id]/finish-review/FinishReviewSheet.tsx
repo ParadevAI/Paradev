@@ -1,6 +1,11 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+	Stack,
+	useLocalSearchParams,
+	useNavigation,
+	useRouter,
+} from "expo-router";
 import { useMemo, useState } from "react";
 import { Alert, ScrollView, TextInput, View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -20,11 +25,9 @@ import {
 	useHostTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
-import {
-	agentLaunchPresetId,
-	useAgentLaunchPreferences,
-} from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
+import { agentLaunchPreferencesFor } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { resolveAgentConfig } from "@/screens/(authenticated)/utils/resolveAgentConfig";
 import {
 	type DraftComment,
 	NO_COMMENTS,
@@ -54,6 +57,7 @@ export function FinishReviewSheet() {
 	const { t } = useLingui();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
+	const navigation = useNavigation();
 	const queryClient = useQueryClient();
 	const workspaceId = id ?? "";
 
@@ -74,12 +78,8 @@ export function FinishReviewSheet() {
 		machineId: host?.machineId ?? null,
 		hostUrl: host ? hostServiceUrl(host.organizationId, host.machineId) : null,
 	});
-	const agentConfig = agentConfigs.data?.find(
-		(config) => config.presetId === agentId,
-	);
-	// The preset id stands in until the configs answer (see NewChatWidget).
-	const launch = useAgentLaunchPreferences(
-		agentConfig ? agentLaunchPresetId(agentConfig) : agentId,
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		host ? state.agentConfigIdByHost[host.machineId] : undefined,
 	);
 
 	const terminalRows = useMemo(
@@ -103,6 +103,13 @@ export function FinishReviewSheet() {
 		setSending(true);
 		try {
 			if (target === "new") {
+				const launched = await resolveAgentConfig(
+					agentConfigs,
+					agentId,
+					pickedConfigId,
+				);
+				if (!navigation.isFocused()) return;
+				const launch = agentLaunchPreferencesFor(launched, agentId);
 				startWorkspaceTerminal.mutate(
 					{
 						target: {
@@ -111,6 +118,7 @@ export function FinishReviewSheet() {
 						},
 						message: { text: prompt, attachments: [] },
 						agentId,
+						agentConfigId: launched?.id,
 						model: launch.model?.id ?? null,
 						effort: launch.effort?.id ?? null,
 					},

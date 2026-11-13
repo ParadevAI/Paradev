@@ -18,6 +18,7 @@ import { CLOUD_TARGET_ID } from "@/screens/(authenticated)/(home)/home/component
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 import { useIsCloudAgentEnabled } from "@/screens/(authenticated)/(home)/hooks/useIsCloudAgentEnabled";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 
 const CLOUD_AGENT_CONFIGS = HOST_AGENT_PRESETS.filter((preset) =>
 	isCloudAgentId(preset.presetId),
@@ -60,6 +61,9 @@ export function AgentPickerScreen() {
 	const agentId = useNewSessionPreferencesStore((state) => state.agentId);
 	const setAgentId = useNewSessionPreferencesStore((state) => state.setAgentId);
 	const { machineId } = useLocalSearchParams<{ machineId?: string }>();
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		machineId ? state.agentConfigIdByHost[machineId] : undefined,
+	);
 	const isCloudAgentEnabled = useIsCloudAgentEnabled();
 	// Under Cloud a laptop-only preset resolves to the one that launches.
 	const selectedAgentId =
@@ -89,6 +93,11 @@ export function AgentPickerScreen() {
 					isCloudAgentEnabled(config.presetId),
 				)
 			: (configsQuery.data ?? []);
+	const selectedConfigId = selectAgentConfig(
+		configs,
+		selectedAgentId,
+		pickedConfigId,
+	)?.id;
 
 	let notice: string | null = null;
 	let isLoading = false;
@@ -167,14 +176,19 @@ export function AgentPickerScreen() {
 			) : null}
 			{notice === null &&
 				configs.map((config) => {
-					// Persist the presetId, not the row id: config ids are per-host
-					// UUIDs, presetIds resolve on any host (agents.run accepts both).
-					const isSelected = config.presetId === selectedAgentId;
+					// The presetId is what carries to other hosts: config ids are
+					// per-host UUIDs. The row id is kept for this host only.
+					const isSelected = config.id === selectedConfigId;
 					return (
 						<Pressable
 							key={config.id}
 							onPress={() => {
-								setAgentId(config.presetId);
+								setAgentId(
+									config.presetId,
+									host
+										? { machineId: host.machineId, configId: config.id }
+										: undefined,
+								);
 								posthog.capture("new_session_agent_selected", {
 									agent: config.presetId,
 								});

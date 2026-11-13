@@ -18,6 +18,7 @@ import { useCloudCreateSelection } from "@/screens/(authenticated)/(home)/hooks/
 import { useIsCloudAgentEnabled } from "@/screens/(authenticated)/(home)/hooks/useIsCloudAgentEnabled";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
 import {
+	agentLaunchPreferencesFor,
 	agentLaunchPresetId,
 	useAgentLaunchPreferences,
 } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
@@ -28,6 +29,8 @@ import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useC
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
 import { usePasteAttachments } from "@/screens/(authenticated)/hooks/usePasteAttachments";
 import { HOME_DRAFT_KEY } from "@/screens/(authenticated)/stores/composerDraftsStore";
+import { resolveAgentConfig } from "@/screens/(authenticated)/utils/resolveAgentConfig";
+import { selectAgentConfig } from "@/screens/(authenticated)/utils/selectAgentConfig";
 import { useComposerFocusStore } from "../../stores/composerFocusStore";
 import { useAgentIconUri } from "./hooks/useAgentIconUri";
 import { useCreateCloudWorkspace } from "./hooks/useCreateCloudWorkspace";
@@ -83,6 +86,11 @@ export function NewChatWidget({
 	const { targets, defaultTarget } = useNewChatTargets(workspaces);
 	const selectedTarget =
 		targets.find((target) => target.key === targetKey) ?? defaultTarget;
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		selectedTarget
+			? state.agentConfigIdByHost[selectedTarget.machineId]
+			: undefined,
+	);
 	const isCloudTarget = selectedTarget?.kind === "cloud";
 	const isSessionTarget = selectedTarget?.projectId === null;
 	const cloudScope = useWorkspaceScope() === "cloud";
@@ -127,7 +135,7 @@ export function NewChatWidget({
 	const createTerminalWorkspace = useCreateTerminalWorkspace();
 	const isCloudAgentEnabled = useIsCloudAgentEnabled();
 	const createCloudWorkspace = useCreateCloudWorkspace();
-	const { data: agentConfigs } = useHostAgentConfigs({
+	const agentConfigs = useHostAgentConfigs({
 		machineId: selectedTarget?.machineId ?? null,
 		hostUrl: selectedTarget?.hostUrl ?? null,
 		// A cloud target has no host to list agents from; it offers the
@@ -136,7 +144,7 @@ export function NewChatWidget({
 	});
 	const selectedAgent = isCloudTarget
 		? cloudAgentConfig(agentId, isCloudAgentEnabled)
-		: agentConfigs?.find((config) => config.presetId === agentId);
+		: selectAgentConfig(agentConfigs.data ?? [], agentId, pickedConfigId);
 	// A preset picked for a laptop may not exist in the sandbox; under Cloud
 	// the effective agent is the one that will actually launch.
 	const effectiveAgentId = isCloudTarget
@@ -268,15 +276,22 @@ export function NewChatWidget({
 				.catch(() => {});
 			return;
 		}
+		const hostAgent = await resolveAgentConfig(
+			agentConfigs,
+			agentId,
+			pickedConfigId,
+		);
+		const hostLaunch = agentLaunchPreferencesFor(hostAgent, agentId);
 		await createTerminalWorkspace
 			.mutateAsync({
 				target: selectedTarget,
 				baseBranch,
 				branchLabel,
 				agentId,
-				agentLabel: selectedAgent?.label ?? "Claude",
-				model,
-				effort,
+				agentConfigId: hostAgent?.id,
+				agentLabel: hostAgent?.label ?? "Claude",
+				model: hostLaunch.model?.id ?? null,
+				effort: hostLaunch.effort?.id ?? null,
 				message,
 				attachmentFileIds,
 				onOpened: resetComposer,
