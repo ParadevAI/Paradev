@@ -50,11 +50,11 @@ export function RenameBranchDialog({
 	const workspaceHostUrl =
 		hostTarget.status === "ready" ? hostTarget.url : activeHostUrl;
 	const hostWorkspaces = useContext(HostWorkspacesContext);
-	const checkouts = hostWorkspaces
-		? hostWorkspaces.workspaces.find(
-				(workspace) => workspace.id === workspaceId,
-			)?.checkouts
-		: null;
+	const hostWorkspace = hostWorkspaces?.workspaces.find(
+		(workspace) => workspace.id === workspaceId,
+	);
+	const checkouts =
+		hostWorkspace?.checkouts ?? (hostWorkspaces?.isReady ? null : undefined);
 
 	useEffect(() => {
 		if (open) setValue(currentBranchName);

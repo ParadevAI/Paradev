@@ -273,7 +273,7 @@ async function migrateWorkspaces(
 	const v2ProjectIdByV1ProjectId = new Map<string, string>();
 	const v2ByRepoPath = new Map<string, string>();
 	for (const p of hostProjects) {
-		for (const repository of p.repositories) {
+		for (const repository of p.repositories ?? []) {
 			if (!v2ByRepoPath.has(repository.path)) {
 				v2ByRepoPath.set(repository.path, p.id);
 			}

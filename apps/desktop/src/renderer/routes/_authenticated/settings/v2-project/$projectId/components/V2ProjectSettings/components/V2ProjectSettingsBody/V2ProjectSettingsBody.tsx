@@ -159,11 +159,11 @@ export function V2ProjectSettingsBody({
 									isRemoteTarget={isRemoteTarget}
 									onChanged={() => onHostProjectChanged()}
 								/>
-							) : (
+							) : hostProject === null ? (
 								<span className="text-sm text-muted-foreground">
 									<Trans>Not set up on {hostName}</Trans>
 								</span>
-							)}
+							) : null}
 						</SettingsRow>
 					) : (
 						<SettingsRow

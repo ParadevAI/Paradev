@@ -5,8 +5,8 @@ export type RenameTargets =
 
 /**
  * The checkouts a branch rename applies to: those on the current branch.
- * `checkouts` is null outside the host workspaces provider (v1 screens, one
- * checkout) and undefined while the workspace row is not loaded.
+ * `checkouts` is null for a workspace no host lists (v1, one checkout) and
+ * undefined while the hosts' lists are not loaded.
  */
 export function resolveRenameTargets({
 	checkouts,
