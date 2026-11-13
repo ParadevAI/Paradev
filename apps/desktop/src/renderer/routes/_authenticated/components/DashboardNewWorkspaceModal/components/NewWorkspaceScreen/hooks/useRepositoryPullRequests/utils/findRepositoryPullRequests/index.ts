@@ -1,4 +1,1 @@
-export {
-	findRepositoryPullRequests,
-	type SearchProjectPullRequests,
-} from "./findRepositoryPullRequests";
+export { findRepositoryPullRequests } from "./findRepositoryPullRequests";

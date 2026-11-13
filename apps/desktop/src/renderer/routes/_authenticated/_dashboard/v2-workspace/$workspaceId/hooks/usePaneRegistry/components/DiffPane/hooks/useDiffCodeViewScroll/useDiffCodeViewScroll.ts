@@ -5,6 +5,7 @@ import type { DiffPaneData } from "../../../../../../types";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
+	getChangesetFileRepositoryId,
 } from "../../../../../useChangeset";
 import type { DiffAnnotationMetadata } from "../useDiffAnnotations";
 import {
@@ -79,11 +80,20 @@ export function useDiffCodeViewScroll({
 	const targetItemId = useMemo(() => {
 		if (data.changeKey) return `diff:${data.changeKey}`;
 		if (!data.path) return undefined;
+		let firstPathMatch: string | undefined;
 		for (const item of items) {
-			if (fileByItemId.get(item.id)?.path === data.path) return item.id;
+			const file = fileByItemId.get(item.id);
+			if (file?.path !== data.path) continue;
+			if (
+				!data.repositoryId ||
+				getChangesetFileRepositoryId(file, undefined) === data.repositoryId
+			) {
+				return item.id;
+			}
+			firstPathMatch ??= item.id;
 		}
-		return undefined;
-	}, [data.changeKey, data.path, items, fileByItemId]);
+		return firstPathMatch;
+	}, [data.changeKey, data.path, data.repositoryId, items, fileByItemId]);
 
 	useEffect(() => {
 		const scrollKey = [

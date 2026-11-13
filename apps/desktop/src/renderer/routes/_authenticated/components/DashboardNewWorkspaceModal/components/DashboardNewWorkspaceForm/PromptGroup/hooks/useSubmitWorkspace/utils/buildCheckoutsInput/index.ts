@@ -1,4 +1,1 @@
-export {
-	buildCheckoutsInput,
-	type CheckoutsInput,
-} from "./buildCheckoutsInput";
+export { buildCheckoutsInput } from "./buildCheckoutsInput";

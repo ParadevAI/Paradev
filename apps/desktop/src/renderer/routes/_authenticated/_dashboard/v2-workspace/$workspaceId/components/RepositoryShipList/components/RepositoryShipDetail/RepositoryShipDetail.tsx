@@ -10,6 +10,7 @@ import {
 import { ChangesStats } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesStats";
 import { CommitForm } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/CommitForm";
 import { CreatePrForm } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/CreatePrForm";
+import { useRefreshCheckoutShipState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRefreshCheckoutShipState";
 import type { RepositoryShipSnapshot } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRepositoryShipSnapshots";
 import { useShipActions } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useShipActions";
 import { PRIcon } from "renderer/screens/main/components/PRIcon";
@@ -39,10 +40,14 @@ export function RepositoryShipDetail({
 	const pr = snapshot?.pr ?? null;
 	const stats = snapshot?.stats ?? null;
 	const showCreatePr = step === "create-pr";
+	const refreshShipState = useRefreshCheckoutShipState(
+		workspaceId,
+		repository.repositoryId,
+	);
 	const actions = useShipActions({
 		workspaceId,
 		repositoryId: repository.repositoryId,
-		onRefresh: () => {},
+		onRefresh: refreshShipState,
 		isPrFormOpen: showCreatePr,
 		onCommitted: () => {},
 		onPrCreated: () => {},

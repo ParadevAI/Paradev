@@ -1239,6 +1239,9 @@ msgstr "{name}: {monthly} за пользователя в месяц"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за пользователя в месяц или {yearly} при оплате за год"
 
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
+msgstr "{notSetUpProjectName} не настроен на {notSetUpHostName}. Выберите другой хост."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
 
@@ -10432,9 +10435,6 @@ msgstr "Импортируйте каждый скрипт терминала v1
 msgid "Import existing folder"
 msgstr "Импорт существующей папки"
 
-msgid "Import failed"
-msgstr "Не удалось импортировать"
-
 msgid "Import failed: {message}"
 msgstr "Не удалось импортировать: {message}"
 
@@ -12528,14 +12528,6 @@ msgstr "Эта рабочая область переносится…"
 msgid "Multi-select"
 msgstr "Множественный выбор"
 
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
-msgstr "Этот репозиторий используют несколько проектов ({0}). Выберите проект в настройках, чтобы настроить его на этом устройстве."
-
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
-msgstr "Этот репозиторий используют несколько проектов ({0}). Откройте нужный проект из настроек, чтобы настроить его на этом устройстве."
-
 msgid "Mute"
 msgstr "Выключить микрофон"
 
@@ -14437,9 +14429,6 @@ msgstr "Открыть предпросмотр"
 
 msgid "Open Project"
 msgstr "Открыть проект"
-
-msgid "Open Projects"
-msgstr "Открыть проекты"
 
 msgid "Open pull request"
 msgstr "Открыть пул-реквест"
@@ -18427,9 +18416,6 @@ msgstr "Настроить окружение"
 msgid "Set up once"
 msgstr "Настройте один раз"
 
-msgid "Set up project…"
-msgstr "Настроить проект…"
-
 msgid "Set up this project for Paradev"
 msgstr "Настроить этот проект под Paradev"
 
@@ -20619,6 +20605,9 @@ msgstr "Пул обновляется каждый месяц. Использо�
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Основной репозиторий должен быть одним из репозиториев окружения"
 
+msgid "The project is still loading. Try again."
+msgstr "Проект ещё загружается. Попробуйте снова."
+
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout проекта как есть: файлы и ветка общие"
 
@@ -20921,6 +20910,9 @@ msgstr "Файл пуст или удалён."
 
 msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
 msgstr "Эта установка GitHub уже подключена к другой организации Paradev. Отключите её там или удалите GitHub App Paradev, затем повторите."
+
+msgid "this host"
+msgstr "этом хосте"
 
 msgid "This host"
 msgstr "Этот хост"
@@ -22020,14 +22012,23 @@ msgstr "Требуется обновление"
 msgid "update the branch prefix"
 msgstr "обновить префикс ветки"
 
+msgid "Update the cloud workspace to move it"
+msgstr "Обновите облачную рабочую область, чтобы её переместить"
+
 msgid "Update the host service on both computers and try again."
 msgstr "Обновите службу хоста на обоих компьютерах и повторите попытку."
 
 msgid "Update the host service on this device and try again."
 msgstr "Обновите службу хоста на этом устройстве и повторите попытку."
 
+msgid "Update the host this workspace is on to move it"
+msgstr "Обновите хост этой рабочей области, чтобы её переместить"
+
 msgid "Update the value for <0>{key}</0>"
 msgstr "Обновите значение <0>{key}</0>"
+
+msgid "Update this computer's host to move this workspace"
+msgstr "Обновите хост этого компьютера, чтобы переместить эту рабочую область"
 
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"

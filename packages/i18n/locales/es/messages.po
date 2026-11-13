@@ -1239,6 +1239,9 @@ msgstr "{name}: {monthly} por usuario/mes"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} por usuario/mes, o {yearly} con facturación anual"
 
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
+msgstr "{notSetUpProjectName} no está configurado en {notSetUpHostName}. Elige otro host."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Especifica al menos una persona, o elige {choice}.} sender {Especifica al menos un remitente, o elige {choice}.} other {Especifica al menos un elemento, o elige {choice}.}}"
 
@@ -10432,9 +10435,6 @@ msgstr "Importa cada script de terminal v1 a v2."
 msgid "Import existing folder"
 msgstr "Importar una carpeta existente"
 
-msgid "Import failed"
-msgstr "Error al importar"
-
 msgid "Import failed: {message}"
 msgstr "Error al importar: {message}"
 
@@ -12528,14 +12528,6 @@ msgstr "Moviendo este espacio de trabajo…"
 msgid "Multi-select"
 msgstr "Selección múltiple"
 
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
-msgstr "Varios proyectos usan este repositorio ({0}). Elige el proyecto en la configuración para configurarlo en este dispositivo."
-
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
-msgstr "Varios proyectos usan este repositorio ({0}). Abre desde la configuración el proyecto que quieras para configurarlo en este dispositivo."
-
 msgid "Mute"
 msgstr "Silenciar"
 
@@ -14437,9 +14429,6 @@ msgstr "Abrir la vista previa"
 
 msgid "Open Project"
 msgstr "Abrir proyecto"
-
-msgid "Open Projects"
-msgstr "Proyectos abiertos"
 
 msgid "Open pull request"
 msgstr "Abrir pull request"
@@ -18427,9 +18416,6 @@ msgstr "Configurar entorno"
 msgid "Set up once"
 msgstr "Configúralo una vez"
 
-msgid "Set up project…"
-msgstr "Configurar el proyecto…"
-
 msgid "Set up this project for Paradev"
 msgstr "Preparar este proyecto para Paradev"
 
@@ -20619,6 +20605,9 @@ msgstr "El fondo se renueva cada mes. El uso que lo supere se cobra por GB-hora 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "El repositorio principal debe ser uno de los repositorios del entorno"
 
+msgid "The project is still loading. Try again."
+msgstr "El proyecto aún se está cargando. Inténtalo de nuevo."
+
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "El checkout del proyecto tal cual: los archivos y la rama se comparten"
 
@@ -20921,6 +20910,9 @@ msgstr "Este archivo está vacío o fue eliminado."
 
 msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
 msgstr "Esta instalación de GitHub ya está conectada a otra organización de Paradev. Desconéctala allí, o desinstala la GitHub App de Paradev, y vuelve a intentarlo."
+
+msgid "this host"
+msgstr "este host"
 
 msgid "This host"
 msgstr "Este host"
@@ -22020,14 +22012,23 @@ msgstr "Actualización necesaria"
 msgid "update the branch prefix"
 msgstr "actualizar el prefijo de rama"
 
+msgid "Update the cloud workspace to move it"
+msgstr "Actualiza el espacio de trabajo en la nube para moverlo"
+
 msgid "Update the host service on both computers and try again."
 msgstr "Actualiza el servicio de host en ambos equipos y vuelve a intentarlo."
 
 msgid "Update the host service on this device and try again."
 msgstr "Actualiza el servicio de host en este dispositivo y vuelve a intentarlo."
 
+msgid "Update the host this workspace is on to move it"
+msgstr "Actualiza el host de este espacio de trabajo para moverlo"
+
 msgid "Update the value for <0>{key}</0>"
 msgstr "Actualiza el valor de <0>{key}</0>"
+
+msgid "Update this computer's host to move this workspace"
+msgstr "Actualiza el host de este equipo para mover este espacio de trabajo"
 
 msgid "Update this host to message subagents"
 msgstr "Actualiza este host para enviar mensajes a los subagentes"

@@ -64,12 +64,19 @@ export function buildCheckoutsInput({
 	const isResolved =
 		linkedPR !== null && draft.checkoutPullRequestsFor === linkedPR.url;
 	if (isResolved) {
-		// The PR picked first names the branch, so it goes first.
-		const pullRequests = Object.entries(draft.checkoutPullRequests)
-			.filter(([repositoryId]) => !draft.checkoutWorktrees[repositoryId])
-			.sort(([, a], [, b]) => Number(a.matched) - Number(b.matched));
+		const pullRequests = Object.entries(draft.checkoutPullRequests).filter(
+			([repositoryId]) => !draft.checkoutWorktrees[repositoryId],
+		);
 		for (const [repositoryId, repositoryPullRequest] of pullRequests) {
 			setCheckout(repositoryId, { pr: repositoryPullRequest.prNumber });
+		}
+		// The host names the branch after `pullRequest`, the PR the user linked.
+		if (
+			pullRequests.some(
+				([, repositoryPullRequest]) => !repositoryPullRequest.matched,
+			)
+		) {
+			pullRequest = pullRequestInput(linkedPR);
 		}
 	} else if (linkedPR) {
 		// Not found in a repository yet: the host matches it, or names what is missing.

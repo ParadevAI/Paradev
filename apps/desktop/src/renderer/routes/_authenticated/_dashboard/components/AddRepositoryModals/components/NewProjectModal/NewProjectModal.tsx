@@ -14,7 +14,6 @@ import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { useEffect, useRef, useState } from "react";
 import { LuFolderOpen, LuLoaderCircle } from "react-icons/lu";
-import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -171,7 +170,6 @@ export function NewProjectModal({
 			);
 			finalizeSetup(activeHostUrl, {
 				projectId: result.id,
-				repoPath: getPrimaryRepository(result)?.path ?? "",
 			});
 			onSuccess?.({ projectId: result.id });
 			reset();

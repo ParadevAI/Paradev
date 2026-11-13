@@ -58,4 +58,34 @@ describe("useDiffCodeViewScroll", () => {
 			},
 		]);
 	});
+
+	test("a pane saved with only a path scrolls to that path in its own checkout", () => {
+		const codeViewRef = {
+			current: {
+				scrollTo: () => {},
+				getInstance: () => ({ getTopForItem: () => 0 }),
+			} as unknown as CodeViewHandle<DiffAnnotationMetadata, undefined>,
+		};
+		const apiItem = "diff:api|unstaged:a.ts";
+		const webItem = "diff:web|unstaged:a.ts";
+		const { result } = renderHook(() =>
+			useDiffCodeViewScroll({
+				codeViewRef,
+				data: { path: "a.ts", repositoryId: "web", collapsedFiles: [] },
+				fileByItemId: new Map([
+					[apiItem, { ...file, repositoryId: "api" }],
+					[webItem, { ...file, repositoryId: "web" }],
+				]),
+				items: [
+					{ id: apiItem, type: "diff" },
+					{ id: webItem, type: "diff" },
+				] as unknown as CodeViewItem<DiffAnnotationMetadata>[],
+				collapsedSet: new Set(),
+				setCollapsed: () => {},
+				scrollStateKey: "pane-1",
+			}),
+		);
+
+		expect(result.current.targetItemId).toBe(webItem);
+	});
 });

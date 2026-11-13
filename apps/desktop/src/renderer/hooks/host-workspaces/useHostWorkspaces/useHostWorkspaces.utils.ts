@@ -34,14 +34,14 @@ export type HostShapedWorkspace = Omit<
 	lastActivityAt?: number | null;
 };
 
-/**
- * A workspace row as served by a host (`workspace.list`) — the cloud row
- * shape plus the host-only extras.
- */
 /** One repository's checkout in a workspace. */
 export type HostWorkspaceCheckout =
 	WorkspaceSnapshotPayload["checkouts"][number];
 
+/**
+ * A workspace row as served by a host (`workspace.list`) — the cloud row
+ * shape plus the host-only extras.
+ */
 export interface HostWorkspaceRow extends HostShapedWorkspace {
 	worktreePath: string;
 	/** One per repository, sorted by name; absent from snapshots saved before checkouts. */

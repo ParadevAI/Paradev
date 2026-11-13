@@ -44,8 +44,6 @@ interface EnvironmentPickerPillProps {
 	linked: EnvironmentOption[];
 	other: EnvironmentOption[];
 	projectName?: string;
-	/** Shown disabled, each with why it cannot be picked. */
-	unavailable?: { environment: EnvironmentOption; reason: string }[];
 	onSelectEnvironment: (environmentId: string) => void;
 	onCreateEnvironment: () => void;
 	onManageEnvironments: () => void;
@@ -59,7 +57,6 @@ export function EnvironmentPickerPill({
 	linked,
 	other,
 	projectName,
-	unavailable = [],
 	onSelectEnvironment,
 	onCreateEnvironment,
 	onManageEnvironments,
@@ -168,28 +165,6 @@ export function EnvironmentPickerPill({
 									}
 								>
 									{other.map(renderItem)}
-								</CommandGroup>
-							</>
-						)}
-						{unavailable.length > 0 && (
-							<>
-								<CommandSeparator />
-								<CommandGroup>
-									{unavailable.map(({ environment, reason }) => (
-										<CommandItem
-											key={environment.id}
-											value={searchValue(environment)}
-											disabled
-										>
-											<LuContainer className="size-4 text-muted-foreground" />
-											<span className="flex min-w-0 flex-1 flex-col">
-												<span className="truncate">{environment.name}</span>
-												<span className="truncate text-xs text-muted-foreground">
-													{reason}
-												</span>
-											</span>
-										</CommandItem>
-									))}
 								</CommandGroup>
 							</>
 						)}

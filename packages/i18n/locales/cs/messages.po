@@ -1239,6 +1239,9 @@ msgstr "{name}: {monthly} za uživatele/měsíc"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za uživatele/měsíc, nebo {yearly} při roční fakturaci"
 
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
+msgstr "{notSetUpProjectName} není na {notSetUpHostName} nastaven. Vyberte jiný host."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Zadejte alespoň jednu osobu, nebo zvolte {choice}.} sender {Zadejte alespoň jednoho odesílatele, nebo zvolte {choice}.} other {Zadejte alespoň jednu položku, nebo zvolte {choice}.}}"
 
@@ -10432,9 +10435,6 @@ msgstr "Importujte každý terminálový skript v1 do v2."
 msgid "Import existing folder"
 msgstr "Importovat existující složku"
 
-msgid "Import failed"
-msgstr "Import selhal"
-
 msgid "Import failed: {message}"
 msgstr "Import selhal: {message}"
 
@@ -12528,14 +12528,6 @@ msgstr "Přesouvá se tento pracovní prostor…"
 msgid "Multi-select"
 msgstr "Výběr více možností"
 
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
-msgstr "Tento repozitář používá více projektů ({0}). Vyberte v nastavení projekt, který chcete na tomto zařízení nastavit."
-
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
-msgstr "Tento repozitář používá více projektů ({0}). Otevřete v nastavení projekt, který chcete na tomto zařízení nastavit."
-
 msgid "Mute"
 msgstr "Ztlumit"
 
@@ -14437,9 +14429,6 @@ msgstr "Otevřít náhled"
 
 msgid "Open Project"
 msgstr "Otevřít projekt"
-
-msgid "Open Projects"
-msgstr "Otevřít projekty"
 
 msgid "Open pull request"
 msgstr "Otevřít pull request"
@@ -18427,9 +18416,6 @@ msgstr "Nastavit prostředí"
 msgid "Set up once"
 msgstr "Nastavte jednou"
 
-msgid "Set up project…"
-msgstr "Nastavit projekt…"
-
 msgid "Set up this project for Paradev"
 msgstr "Připravit tento projekt pro Paradev"
 
@@ -20619,6 +20605,9 @@ msgstr "Fond se každý měsíc obnovuje. Využití nad jeho rámec se účtuje 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Primární repozitář musí být jedním z repozitářů prostředí"
 
+msgid "The project is still loading. Try again."
+msgstr "Projekt se stále načítá. Zkuste to znovu."
+
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout projektu tak, jak je: soubory a větev jsou sdílené"
 
@@ -20921,6 +20910,9 @@ msgstr "Tento soubor je prázdný nebo byl smazán."
 
 msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
 msgstr "Tato instalace GitHubu je už připojená k jiné organizaci Paradev. Odpojte ji tam, nebo odinstalujte Paradev GitHub App, a zkuste to znovu."
+
+msgid "this host"
+msgstr "tomto hostu"
 
 msgid "This host"
 msgstr "Tento host"
@@ -22020,14 +22012,23 @@ msgstr "Vyžadována aktualizace"
 msgid "update the branch prefix"
 msgstr "aktualizovat prefix větve"
 
+msgid "Update the cloud workspace to move it"
+msgstr "Aby šel pracovní prostor přesunout, aktualizujte ho v cloudu"
+
 msgid "Update the host service on both computers and try again."
 msgstr "Aktualizujte službu hostitele na obou počítačích a zkuste to znovu."
 
 msgid "Update the host service on this device and try again."
 msgstr "Aktualizujte službu hostitele na tomto zařízení a zkuste to znovu."
 
+msgid "Update the host this workspace is on to move it"
+msgstr "Aby šel tento pracovní prostor přesunout, aktualizujte jeho host"
+
 msgid "Update the value for <0>{key}</0>"
 msgstr "Aktualizujte hodnotu <0>{key}</0>"
+
+msgid "Update this computer's host to move this workspace"
+msgstr "Aby šel tento pracovní prostor přesunout, aktualizujte host tohoto počítače"
 
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"

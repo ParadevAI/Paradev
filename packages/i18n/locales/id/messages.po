@@ -1239,6 +1239,9 @@ msgstr "{name}: {monthly} per pengguna/bulan"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per pengguna/bulan, atau {yearly} ditagih tahunan"
 
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
+msgstr "{notSetUpProjectName} belum disiapkan di {notSetUpHostName}. Pilih host lain."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Tentukan minimal satu orang, atau pilih {choice}.} sender {Tentukan minimal satu pengirim, atau pilih {choice}.} other {Tentukan minimal satu entri, atau pilih {choice}.}}"
 
@@ -10432,9 +10435,6 @@ msgstr "Impor setiap skrip terminal v1 ke v2."
 msgid "Import existing folder"
 msgstr "Impor folder yang ada"
 
-msgid "Import failed"
-msgstr "Impor gagal"
-
 msgid "Import failed: {message}"
 msgstr "Impor gagal: {message}"
 
@@ -12528,14 +12528,6 @@ msgstr "Memindahkan workspace ini…"
 msgid "Multi-select"
 msgstr "Pilih banyak"
 
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
-msgstr "Beberapa proyek memakai repositori ini ({0}). Pilih proyeknya di pengaturan untuk menyiapkannya di perangkat ini."
-
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
-msgstr "Beberapa proyek memakai repositori ini ({0}). Buka proyek yang Anda inginkan dari pengaturan untuk menyiapkannya di perangkat ini."
-
 msgid "Mute"
 msgstr "Bisukan"
 
@@ -14436,9 +14428,6 @@ msgid "Open Preview"
 msgstr "Buka Pratinjau"
 
 msgid "Open Project"
-msgstr "Buka Proyek"
-
-msgid "Open Projects"
 msgstr "Buka Proyek"
 
 msgid "Open pull request"
@@ -18427,9 +18416,6 @@ msgstr "Siapkan lingkungan"
 msgid "Set up once"
 msgstr "Atur sekali"
 
-msgid "Set up project…"
-msgstr "Siapkan proyek…"
-
 msgid "Set up this project for Paradev"
 msgstr "Siapkan proyek ini untuk Paradev"
 
@@ -20619,6 +20605,9 @@ msgstr "Kumpulan direset setiap bulan. Penggunaan di atasnya ditagih per GB-jam 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Repositori utama harus salah satu repositori lingkungan"
 
+msgid "The project is still loading. Try again."
+msgstr "Proyek masih dimuat. Coba lagi."
+
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout proyek apa adanya: file dan branch dibagikan"
 
@@ -20921,6 +20910,9 @@ msgstr "File ini kosong atau sudah dihapus."
 
 msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
 msgstr "Instalasi GitHub ini sudah terhubung ke organisasi Paradev lain. Putuskan di sana, atau copot GitHub App Paradev, lalu coba lagi."
+
+msgid "this host"
+msgstr "host ini"
 
 msgid "This host"
 msgstr "Host ini"
@@ -22020,14 +22012,23 @@ msgstr "Pembaruan Diperlukan"
 msgid "update the branch prefix"
 msgstr "memperbarui prefix branch"
 
+msgid "Update the cloud workspace to move it"
+msgstr "Perbarui workspace cloud untuk memindahkannya"
+
 msgid "Update the host service on both computers and try again."
 msgstr "Perbarui layanan host di kedua komputer, lalu coba lagi."
 
 msgid "Update the host service on this device and try again."
 msgstr "Perbarui layanan host di perangkat ini, lalu coba lagi."
 
+msgid "Update the host this workspace is on to move it"
+msgstr "Perbarui host workspace ini untuk memindahkannya"
+
 msgid "Update the value for <0>{key}</0>"
 msgstr "Perbarui nilai untuk <0>{key}</0>"
+
+msgid "Update this computer's host to move this workspace"
+msgstr "Perbarui host komputer ini untuk memindahkan workspace ini"
 
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"

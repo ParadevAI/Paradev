@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { usePRFlowState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePRFlowState";
+import { useRefreshCheckoutShipState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRefreshCheckoutShipState";
 import {
 	type RepositoryShipStep,
 	repositoryShipStep,
@@ -43,11 +44,15 @@ export function RepositoryShipReporter({
 	const { flowState } = usePRFlowState(workspaceId, repositoryId, {
 		enabled,
 	});
+	const refreshShipState = useRefreshCheckoutShipState(
+		workspaceId,
+		repositoryId,
+	);
 	const { hasCommitsAhead } = useShipActions({
 		workspaceId,
 		repositoryId,
 		enabled,
-		onRefresh: () => {},
+		onRefresh: refreshShipState,
 		isPrFormOpen: false,
 		onCommitted: () => {},
 		onPrCreated: () => {},

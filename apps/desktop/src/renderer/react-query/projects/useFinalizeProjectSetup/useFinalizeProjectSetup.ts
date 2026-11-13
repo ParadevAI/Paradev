@@ -5,7 +5,6 @@ import { hostProjectListQueryKey } from "../useHostProjectIds";
 
 export interface ProjectSetupResult {
 	projectId: string;
-	repoPath: string;
 }
 
 /**

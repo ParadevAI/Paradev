@@ -9,7 +9,6 @@ import { useRequestGitInitConfirm } from "renderer/stores/git-init-confirm";
 import {
 	type FolderImportResult,
 	importFolderFirst,
-	type MatchingProject,
 } from "./importFolderFirst";
 
 export interface UseFolderFirstImportResult {
@@ -18,7 +17,6 @@ export interface UseFolderFirstImportResult {
 
 export function useFolderFirstImport(options?: {
 	onError?: (message: string) => void;
-	onMultipleProjects?: (input: { candidates: MatchingProject[] }) => void;
 }): UseFolderFirstImportResult {
 	const { t } = useLingui();
 	const hostService = useLocalHostService();
@@ -26,7 +24,7 @@ export function useFolderFirstImport(options?: {
 	const finalizeSetup = useFinalizeProjectSetup();
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
 	const requestGitInit = useRequestGitInitConfirm();
-	const { onError, onMultipleProjects } = options ?? {};
+	const { onError } = options ?? {};
 
 	const start = useCallback(
 		(repoPath?: string) =>
@@ -44,7 +42,6 @@ export function useFolderFirstImport(options?: {
 				requestGitInit,
 				finalizeSetup,
 				onError,
-				onMultipleProjects,
 				messages: {
 					hostUnavailable: () =>
 						getHostServiceUnavailableMessage(hostService, {
@@ -54,10 +51,6 @@ export function useFolderFirstImport(options?: {
 						t({
 							message: `Couldn't reach cloud for ${first.url}: ${first.message}`,
 						}),
-					multipleProjects: (candidates) =>
-						t({
-							message: `Multiple projects use this repository (${candidates.length}). Open the project you want from settings to set it up on this device.`,
-						}),
 				},
 			}),
 		[
@@ -65,7 +58,6 @@ export function useFolderFirstImport(options?: {
 			finalizeSetup,
 			hostService,
 			onError,
-			onMultipleProjects,
 			requestGitInit,
 			selectDirectory,
 			t,

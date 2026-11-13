@@ -44,25 +44,31 @@ describe("buildCheckoutsInput", () => {
 		).toEqual({ checkout: "local", isPrCheckout: false });
 	});
 
-	test("several repositories: PRs first, unmatched before matched, then branches and worktrees", () => {
-		const result = buildCheckoutsInput({
-			draft: {
-				...emptyDraft,
-				checkout: "local",
-				checkoutBaseBranches: { api: "main", web: "ignored" },
-				checkoutPullRequests: {
-					shared: { ...linkedPR, prNumber: 4, headRefName: "t", matched: true },
-					web: { ...linkedPR, headRefName: "t", matched: false },
-					docs: { ...linkedPR, prNumber: 9, headRefName: "t", matched: true },
+	test("several repositories: every PR, branch and worktree goes to its checkout", () => {
+		expect(
+			buildCheckoutsInput({
+				draft: {
+					...emptyDraft,
+					checkout: "local",
+					checkoutBaseBranches: { api: "main", web: "ignored" },
+					checkoutPullRequests: {
+						shared: {
+							...linkedPR,
+							prNumber: 4,
+							headRefName: "t",
+							matched: true,
+						},
+						web: { ...linkedPR, headRefName: "t", matched: false },
+						docs: { ...linkedPR, prNumber: 9, headRefName: "t", matched: true },
+					},
+					checkoutPullRequestsFor: linkedPR.url,
+					checkoutWorktrees: { docs: { path: "/wt/docs", branch: "x" } },
 				},
-				checkoutPullRequestsFor: linkedPR.url,
-				checkoutWorktrees: { docs: { path: "/wt/docs", branch: "x" } },
-			},
-			linkedPR,
-			primaryRepositoryId: "api",
-			isMultiRepo: true,
-		});
-		expect(result).toEqual({
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+			}),
+		).toEqual({
 			checkout: "worktree",
 			isPrCheckout: true,
 			checkouts: {
@@ -71,13 +77,30 @@ describe("buildCheckoutsInput", () => {
 				api: { baseBranch: "main" },
 				docs: { worktreePath: "/wt/docs" },
 			},
+			pullRequest: { repository: "o/web", number: 7 },
 		});
-		expect(Object.keys(result.checkouts ?? {})).toEqual([
-			"web",
-			"shared",
-			"api",
-			"docs",
-		]);
+	});
+
+	test("several repositories: no pullRequest when the linked PR's checkout is an existing worktree", () => {
+		const result = buildCheckoutsInput({
+			draft: {
+				...emptyDraft,
+				checkoutPullRequests: {
+					web: { ...linkedPR, headRefName: "t", matched: false },
+					shared: { ...linkedPR, prNumber: 4, headRefName: "t", matched: true },
+				},
+				checkoutPullRequestsFor: linkedPR.url,
+				checkoutWorktrees: { web: { path: "/wt/web", branch: "t" } },
+			},
+			linkedPR,
+			primaryRepositoryId: "api",
+			isMultiRepo: true,
+		});
+		expect(result.pullRequest).toBeUndefined();
+		expect(result.checkouts).toEqual({
+			shared: { pr: 4 },
+			web: { worktreePath: "/wt/web" },
+		});
 	});
 
 	test("several repositories: an unresolved PR goes by its repository name", () => {

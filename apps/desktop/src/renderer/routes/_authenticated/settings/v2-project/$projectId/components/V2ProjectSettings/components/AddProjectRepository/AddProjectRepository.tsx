@@ -10,6 +10,7 @@ import {
 	AddRepositoryMenu,
 	type CloneSource,
 } from "renderer/routes/_authenticated/components/AddRepositoryMenu";
+import { hostRefusalReason } from "../../utils/hostRefusalReason";
 import { cloneParentDir } from "./utils/cloneParentDir";
 
 type RepositorySource =
@@ -57,7 +58,7 @@ export function AddProjectRepository({
 		onSettled: () => onChanged(),
 		onError: (err) =>
 			toast.error(t({ message: "Could not add the repository" }), {
-				description: errorMessage(err),
+				description: hostRefusalReason(errorMessage(err)),
 			}),
 	});
 

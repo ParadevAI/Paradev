@@ -1,4 +1,1 @@
-export {
-	type RenameTargets,
-	resolveRenameTargets,
-} from "./resolveRenameTargets";
+export { resolveRenameTargets } from "./resolveRenameTargets";

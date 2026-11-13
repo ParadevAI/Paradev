@@ -14,7 +14,6 @@ import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { LuFolderGit2, LuGithub, LuLoaderCircle, LuX } from "react-icons/lu";
-import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getBaseName } from "renderer/lib/pathBasename";
@@ -106,7 +105,6 @@ export function NewLocalProjectModal({
 			);
 			finalizeSetup(activeHostUrl, {
 				projectId: result.id,
-				repoPath: getPrimaryRepository(result)?.path ?? "",
 			});
 			onSuccess({ projectId: result.id });
 			handleOpenChange(false);

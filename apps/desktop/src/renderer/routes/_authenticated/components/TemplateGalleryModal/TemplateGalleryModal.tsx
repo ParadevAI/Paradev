@@ -8,7 +8,6 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { useState } from "react";
-import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -85,7 +84,6 @@ export function TemplateGalleryModal({
 				});
 				finalizeSetup(activeHostUrl, {
 					projectId: result.id,
-					repoPath: getPrimaryRepository(result)?.path ?? "",
 				});
 				createdProjectId = result.id;
 			} else {

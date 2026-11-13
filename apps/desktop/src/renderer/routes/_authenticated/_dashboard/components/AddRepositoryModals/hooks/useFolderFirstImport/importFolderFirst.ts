@@ -5,7 +5,7 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
 import { getBaseName } from "renderer/lib/pathBasename";
 import type { ProjectSetupResult } from "renderer/react-query/projects";
 
-export interface MatchingProject {
+interface MatchingProject {
 	id: string;
 	name: string;
 	/** Set on a local match: the repository at the folder. */
@@ -28,11 +28,9 @@ export interface ImportFolderFirstDeps {
 	requestGitInit: (repoPath: string) => Promise<boolean>;
 	finalizeSetup: (hostUrl: string, result: FolderImportResult) => void;
 	onError?: (message: string) => void;
-	onMultipleProjects?: (input: { candidates: MatchingProject[] }) => void;
 	messages: {
 		hostUnavailable: () => string;
 		cloudUnreachable: (first: { url: string; message: string }) => string;
-		multipleProjects: (candidates: MatchingProject[]) => string;
 	};
 }
 
@@ -43,7 +41,6 @@ export async function importFolderFirst({
 	requestGitInit,
 	finalizeSetup,
 	onError,
-	onMultipleProjects,
 	messages,
 }: ImportFolderFirstDeps): Promise<FolderImportResult | null> {
 	// Pick the folder first — the native dialog is a local Electron call and
@@ -89,20 +86,12 @@ export async function importFolderFirst({
 		return null;
 	}
 
-	const [only, ...rest] = candidates;
-	if (rest.length > 0) {
-		if (onMultipleProjects) {
-			onMultipleProjects({ candidates });
-		} else {
-			onError?.(messages.multipleProjects(candidates));
-		}
-		return null;
-	}
+	const [only] = candidates;
 
 	try {
 		// A local match is the project this folder already belongs to.
 		const result: FolderImportResult = only?.repositoryId
-			? { projectId: only.id, repositoryId: only.repositoryId, repoPath }
+			? { projectId: only.id, repositoryId: only.repositoryId }
 			: await createLocalProject(client, repoPath, false);
 		finalizeSetup(activeHostUrl, result);
 		return result;
@@ -135,6 +124,5 @@ async function createLocalProject(
 	return {
 		projectId: project.id,
 		repositoryId: repository.id,
-		repoPath: repository.path,
 	};
 }

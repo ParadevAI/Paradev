@@ -785,7 +785,8 @@ export function NewWorkspaceScreen({
 		};
 	}, [selectedAgent, setSelectedAgent, v2Agents]);
 
-	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
+	const { otherHosts, hostsSettled, currentDeviceName } =
+		useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(
 		() =>
 			resolveRemoteHostPresence({
@@ -898,7 +899,7 @@ export function NewWorkspaceScreen({
 		t,
 	]);
 
-	const handleGoToSetup = useCallback(() => {
+	const handleGoToProjectSettings = useCallback(() => {
 		if (!selectedProject?.id) return;
 		const targetProjectId = selectedProject.id;
 		closeModal();
@@ -1010,10 +1011,7 @@ export function NewWorkspaceScreen({
 	const isStarting = isCreating || isCreatingProjectEnvironment;
 	const handleSubmit = useCallback(() => {
 		if (isStarting) return;
-		if (needsSetup) {
-			handleGoToSetup();
-			return;
-		}
+		if (needsSetup) return;
 		if (submitBlocker) {
 			if (hostId === machineId && !activeHostUrl) {
 				showHostServiceUnavailableToast(hostService, {
@@ -1039,7 +1037,6 @@ export function NewWorkspaceScreen({
 		setupPlan,
 		runEnvironmentSetup,
 		hostId,
-		handleGoToSetup,
 		hostService,
 		machineId,
 		needsSetup,
@@ -1272,7 +1269,7 @@ export function NewWorkspaceScreen({
 					{draft.checkout === "worktree" && (
 						<CompareBaseBranchPicker
 							{...pickerProps}
-							onChangeProjectLocation={handleGoToSetup}
+							onChangeProjectLocation={handleGoToProjectSettings}
 						/>
 					)}
 				</>
@@ -1296,16 +1293,19 @@ export function NewWorkspaceScreen({
 			}
 		/>
 	);
-	const setupButton = needsSetup && (
-		<Button
-			type="button"
-			variant="outline"
-			size="sm"
-			className="h-6 px-2 text-[11px] text-amber-500 hover:text-amber-500"
-			onClick={handleGoToSetup}
-		>
-			<Trans>Set up project…</Trans>
-		</Button>
+	const notSetUpProjectName = selectedProject?.name ?? "";
+	const notSetUpHostName =
+		(hostId === machineId
+			? currentDeviceName
+			: otherHosts.find((host) => host.id === hostId)?.name) ??
+		t({ message: "this host" });
+	const notSetUpNotice = needsSetup && (
+		<span className="text-[11px] text-amber-500">
+			<Trans>
+				{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another
+				host.
+			</Trans>
+		</span>
 	);
 
 	if (isParadevShell) {
@@ -1389,7 +1389,7 @@ export function NewWorkspaceScreen({
 								/>
 							</div>
 							<div className="flex shrink-0 items-center gap-1.5">
-								{setupButton}
+								{notSetUpNotice}
 								{selectedAgent !== "none" && (
 									<ModelPicker
 										configOptions={launchOptions}
@@ -1494,7 +1494,7 @@ export function NewWorkspaceScreen({
 							{devicePicker}
 							{contextPickers}
 						</div>
-						{setupButton}
+						{notSetUpNotice}
 					</div>
 				</div>
 			</div>

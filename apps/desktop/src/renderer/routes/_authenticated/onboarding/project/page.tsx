@@ -12,7 +12,6 @@ import {
 	LuLayoutTemplate,
 } from "react-icons/lu";
 import { showStarNagOnboardingToast } from "renderer/components/StarNagToast";
-import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOpenNewWorkspaceForLocalProject } from "renderer/hooks/useOpenNewWorkspace";
 import { track } from "renderer/lib/analytics";
@@ -272,10 +271,7 @@ function OnboardingProjectPage() {
 					setCloneError(toCloneError(err, gitMissingMessage));
 					return;
 				}
-				finalizeSetup(activeHostUrl, {
-					projectId: created.id,
-					repoPath: getPrimaryRepository(created)?.path ?? "",
-				});
+				finalizeSetup(activeHostUrl, { projectId: created.id });
 				await finish(created.id);
 			} else {
 				let projectId: string | null;

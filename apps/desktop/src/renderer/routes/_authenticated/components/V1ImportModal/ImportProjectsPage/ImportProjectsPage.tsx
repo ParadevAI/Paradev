@@ -370,7 +370,6 @@ async function importProject({
 	});
 	finalizeSetup(activeHostUrl, {
 		projectId: result.v2ProjectId,
-		repoPath: result.repoPath,
 	});
 	return result;
 }

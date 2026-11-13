@@ -110,6 +110,10 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 				);
 				return;
 			}
+			if (target.worktreePath && !repositoryId) {
+				toast.error(t({ message: "The project is still loading. Try again." }));
+				return;
+			}
 			const branchName = target.branchName;
 			const snapshotId = crypto.randomUUID();
 			const workspaceName = resolveActionWorkspaceName(branchName);

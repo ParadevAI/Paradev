@@ -166,6 +166,14 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 								leaving.terminals,
 							);
 						}
+						// Hosts older than multi-repo workspaces return no snapshots.
+						if (!Array.isArray(prepared.snapshots)) {
+							throw new Error(
+								fromCloud
+									? t`Update the cloud workspace to move it`
+									: t`Update the host this workspace is on to move it`,
+							);
+						}
 						const project = requireProject(
 							prepared.snapshots.map((snapshot) => snapshot.repositoryFullName),
 						);

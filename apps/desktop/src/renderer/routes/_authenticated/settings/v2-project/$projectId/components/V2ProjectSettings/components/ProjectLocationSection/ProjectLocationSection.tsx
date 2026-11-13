@@ -21,6 +21,7 @@ import type { HostRepository } from "renderer/hooks/host-projects/useHostProject
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { ClickablePath } from "../../../../../../components/ClickablePath";
+import { hostRefusalReason } from "../../utils/hostRefusalReason";
 
 interface ProjectLocationSectionProps {
 	projectId: string;
@@ -137,7 +138,7 @@ export function ProjectLocationSection({
 			onChanged?.();
 			setPendingPath(null);
 		} catch (err) {
-			toast.error(errorMessage(err));
+			toast.error(hostRefusalReason(errorMessage(err)));
 		} finally {
 			setIsSubmitting(false);
 		}

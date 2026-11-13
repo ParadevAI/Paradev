@@ -1239,6 +1239,9 @@ msgstr "{name}: {monthly} mỗi người dùng/tháng"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} mỗi người dùng/tháng, hoặc {yearly} khi thanh toán theo năm"
 
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
+msgstr "{notSetUpProjectName} chưa được thiết lập trên {notSetUpHostName}. Hãy chọn host khác."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Hãy chỉ định ít nhất một người, hoặc chọn {choice}.} sender {Hãy chỉ định ít nhất một người gửi, hoặc chọn {choice}.} other {Hãy chỉ định ít nhất một mục, hoặc chọn {choice}.}}"
 
@@ -10432,9 +10435,6 @@ msgstr "Nhập từng tập lệnh terminal v1 vào v2."
 msgid "Import existing folder"
 msgstr "Nhập thư mục có sẵn"
 
-msgid "Import failed"
-msgstr "Nhập thất bại"
-
 msgid "Import failed: {message}"
 msgstr "Nhập thất bại: {message}"
 
@@ -12528,14 +12528,6 @@ msgstr "Đang chuyển không gian làm việc này…"
 msgid "Multi-select"
 msgstr "Chọn nhiều"
 
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
-msgstr "Nhiều dự án đang dùng repository này ({0}). Chọn dự án trong cài đặt để thiết lập nó trên thiết bị này."
-
-#. placeholder {0}: candidates.length
-msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
-msgstr "Nhiều dự án đang dùng repository này ({0}). Mở dự án bạn muốn từ cài đặt để thiết lập nó trên thiết bị này."
-
 msgid "Mute"
 msgstr "Tắt tiếng"
 
@@ -14437,9 +14429,6 @@ msgstr "Mở bản xem trước"
 
 msgid "Open Project"
 msgstr "Mở dự án"
-
-msgid "Open Projects"
-msgstr "Mở Dự án"
 
 msgid "Open pull request"
 msgstr "Mở pull request"
@@ -18427,9 +18416,6 @@ msgstr "Thiết lập môi trường"
 msgid "Set up once"
 msgstr "Thiết lập một lần"
 
-msgid "Set up project…"
-msgstr "Thiết lập dự án…"
-
 msgid "Set up this project for Paradev"
 msgstr "Thiết lập dự án này cho Paradev"
 
@@ -20619,6 +20605,9 @@ msgstr "Quỹ được làm mới mỗi tháng. Phần sử dụng vượt quỹ
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Kho lưu trữ chính phải là một trong các kho lưu trữ của môi trường"
 
+msgid "The project is still loading. Try again."
+msgstr "Dự án vẫn đang tải. Hãy thử lại."
+
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout của dự án như hiện có: tệp và nhánh được dùng chung"
 
@@ -20921,6 +20910,9 @@ msgstr "Tệp này rỗng hoặc đã bị xóa."
 
 msgid "This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again."
 msgstr "Bản cài đặt GitHub này đã kết nối với một tổ chức Paradev khác. Hãy ngắt kết nối ở đó, hoặc gỡ Paradev GitHub App, rồi thử lại."
+
+msgid "this host"
+msgstr "host này"
 
 msgid "This host"
 msgstr "Host này"
@@ -22020,14 +22012,23 @@ msgstr "Cần cập nhật"
 msgid "update the branch prefix"
 msgstr "cập nhật tiền tố nhánh"
 
+msgid "Update the cloud workspace to move it"
+msgstr "Hãy cập nhật workspace cloud để di chuyển nó"
+
 msgid "Update the host service on both computers and try again."
 msgstr "Hãy cập nhật dịch vụ host trên cả hai máy tính rồi thử lại."
 
 msgid "Update the host service on this device and try again."
 msgstr "Hãy cập nhật dịch vụ host trên thiết bị này rồi thử lại."
 
+msgid "Update the host this workspace is on to move it"
+msgstr "Hãy cập nhật host của workspace này để di chuyển nó"
+
 msgid "Update the value for <0>{key}</0>"
 msgstr "Cập nhật giá trị cho <0>{key}</0>"
+
+msgid "Update this computer's host to move this workspace"
+msgstr "Hãy cập nhật host của máy tính này để di chuyển workspace này"
 
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"

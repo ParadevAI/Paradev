@@ -291,7 +291,6 @@ export function V1AutoMigration() {
 					onProjectImported: (result) => {
 						finalizeSetup(hostUrl, {
 							projectId: result.v2ProjectId,
-							repoPath: result.repoPath,
 						});
 					},
 					onWorkspaceAdopted: (v2WorkspaceId, v2ProjectId) => {

@@ -51,7 +51,6 @@ function startImport(overrides: Partial<ImportFolderFirstDeps> = {}) {
 			hostUnavailable: () => "host unavailable",
 			cloudUnreachable: (first) =>
 				`Couldn't reach cloud for ${first.url}: ${first.message}`,
-			multipleProjects: (candidates) => `multiple: ${candidates.length}`,
 		},
 		...overrides,
 	});
@@ -110,7 +109,6 @@ describe("importFolderFirst", () => {
 		const created = {
 			projectId: "created-project",
 			repositoryId: "repository",
-			repoPath,
 		};
 		expect(finalizeSetupMock).toHaveBeenCalledWith(hostUrl, created);
 		expect(result).toEqual(created);
@@ -150,13 +148,11 @@ describe("importFolderFirst with a known folder", () => {
 		expect(result).toEqual({
 			projectId: "existing",
 			repositoryId: "repo-1",
-			repoPath,
 		});
 		expect(createMock).not.toHaveBeenCalled();
 		expect(finalizeSetupMock).toHaveBeenCalledWith(hostUrl, {
 			projectId: "existing",
 			repositoryId: "repo-1",
-			repoPath,
 		});
 	});
 
@@ -173,7 +169,6 @@ describe("importFolderFirst with a known folder", () => {
 		expect(result).toEqual({
 			projectId: "created-project",
 			repositoryId: "repository",
-			repoPath,
 		});
 	});
 });

@@ -121,6 +121,12 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 							leaving.terminals,
 						);
 					}
+					// Hosts older than multi-repo workspaces return no snapshots.
+					if (!Array.isArray(prepared.snapshots)) {
+						throw new Error(
+							t`Update this computer's host to move this workspace`,
+						);
+					}
 					assertEnvironmentOpens(
 						prepared.snapshots.map((snapshot) => snapshot.repositoryFullName),
 					);
