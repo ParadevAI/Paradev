@@ -13,11 +13,6 @@ import {
 	type PageStorageWriteRequest,
 	parsePageStorageScope,
 } from "@superset/shared/page-storage";
-import {
-	type PageStorageActor,
-	readable,
-	writableFor,
-} from "@superset/shared/page-storage-access";
 import type { PageStorageHubRequest } from "@superset/shared/page-storage-hub";
 import {
 	isRealtimeNudgeKind,
@@ -28,7 +23,7 @@ import {
 	verifyAgentSessionTicket,
 	verifyPageConnectTicket,
 } from "@superset/shared/usercontent";
-import { type AuthContext, verifyJWT } from "@superset/shared/verify-jwt";
+import { verifyJWT } from "@superset/shared/verify-jwt";
 import { parseVersionedWorkspaceAccess } from "@superset/shared/workspace-access";
 import type { Context } from "hono";
 import { Hono } from "hono";
@@ -61,14 +56,6 @@ function parseJson(text: string): unknown {
 app.use("*", cors());
 
 app.get("/health", (c) => c.json({ ok: true }));
-
-function storageActor(auth: AuthContext): PageStorageActor {
-	return {
-		userId: auth.sub,
-		organizationIds: auth.organizationIds,
-		teamIds: auth.teamIds,
-	};
-}
 
 function extractToken(c: Context<AppContext>): string | null {
 	const header = c.req.header("Authorization");
@@ -157,13 +144,12 @@ app.post("/v2/page/:pageId/storage/ticket", async (c) => {
 	if (!auth?.sub) return c.json({ error: "Unauthorized" }, 401);
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
-	const manifest = await stub.readManifest();
-	if (!manifest) return c.json({ error: "Not found" }, 404);
-
-	const viewer = storageActor(auth);
-	if (!readable(manifest, viewer)) {
-		return c.json({ error: "Forbidden" }, 403);
-	}
+	const { found, access } = await stub.accessFor({
+		userId: auth.sub,
+		organizationIds: auth.organizationIds,
+	});
+	if (!found) return c.json({ error: "Not found" }, 404);
+	if (!access.read) return c.json({ error: "Forbidden" }, 403);
 
 	const nonce = crypto.randomUUID();
 	const ticket = await signPageConnectTicket(c.env.NUDGE_SECRET, {
@@ -172,9 +158,8 @@ app.post("/v2/page/:pageId/storage/ticket", async (c) => {
 		name: auth.name ?? "Someone",
 		image: auth.image ?? null,
 		organizationIds: auth.organizationIds,
-		teamIds: auth.teamIds,
-		author: manifest.createdByUserId === auth.sub,
-		writable: writableFor(manifest, viewer),
+		author: access.author,
+		writable: access.write,
 		nonce,
 		exp: Math.floor(Date.now() / 1000) + PAGE_STORAGE_TICKET_SECONDS,
 	});
@@ -207,11 +192,12 @@ app.get("/v2/page/:pageId/storage/records", async (c) => {
 	}
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
-	const manifest = await stub.readManifest();
-	if (!manifest) return c.json({ error: "Not found" }, 404);
-
-	const viewer = storageActor(auth);
-	if (!readable(manifest, viewer)) {
+	const { found, access } = await stub.accessFor({
+		userId: auth.sub,
+		organizationIds: auth.organizationIds,
+	});
+	if (!found) return c.json({ error: "Not found" }, 404);
+	if (!access.read) {
 		return c.json({ error: "You cannot read this page's storage" }, 403);
 	}
 
@@ -270,11 +256,12 @@ app.post("/v2/page/:pageId/storage/records", async (c) => {
 	}
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
-	const manifest = await stub.readManifest();
-	if (!manifest) return c.json({ error: "Not found" }, 404);
-
-	const viewer = storageActor(auth);
-	if (!writableFor(manifest, viewer)) {
+	const { found, access } = await stub.accessFor({
+		userId: auth.sub,
+		organizationIds: auth.organizationIds,
+	});
+	if (!found) return c.json({ error: "Not found" }, 404);
+	if (!access.write) {
 		return c.json({ error: "You cannot write this page's storage" }, 403);
 	}
 
@@ -318,7 +305,6 @@ app.get("/v2/page/:pageId/storage/socket", async (c) => {
 			name: claims.name,
 			image: claims.image,
 			organizationIds: claims.organizationIds,
-			teamIds: claims.teamIds,
 			nonce: claims.nonce,
 		}),
 	);
@@ -341,7 +327,6 @@ app.get("/v2/page/:pageId/presence", async (c) => {
 		name: string;
 		image: string | null;
 		organizationIds: string[];
-		teamIds: string[];
 		guest: boolean;
 	};
 	const token = extractToken(c);
@@ -354,7 +339,6 @@ app.get("/v2/page/:pageId/presence", async (c) => {
 			name: auth.name ?? "Someone",
 			image: auth.image ?? null,
 			organizationIds: auth.organizationIds,
-			teamIds: auth.teamIds,
 			guest: false,
 		};
 	} else if (guestId && UUID.test(guestId)) {
@@ -371,7 +355,6 @@ app.get("/v2/page/:pageId/presence", async (c) => {
 			name: "",
 			image: null,
 			organizationIds: [],
-			teamIds: [],
 			guest: true,
 		};
 	} else {

@@ -31,7 +31,6 @@ export interface PageConnectTicketClaims {
 	name: string;
 	image: string | null;
 	organizationIds: string[];
-	teamIds: string[];
 	author: boolean;
 	writable: boolean;
 	nonce: string;
@@ -186,7 +185,6 @@ export async function signPageConnectTicket(
 		name: claims.name,
 		image: claims.image,
 		organizationIds: claims.organizationIds,
-		teamIds: claims.teamIds,
 		author: claims.author,
 		writable: claims.writable,
 		nonce: claims.nonce,
@@ -208,7 +206,6 @@ export async function verifyPageConnectTicket(
 		name,
 		image,
 		organizationIds,
-		teamIds,
 		author,
 		writable,
 		nonce,
@@ -222,9 +219,6 @@ export async function verifyPageConnectTicket(
 		!(image === null || typeof image === "string") ||
 		!Array.isArray(organizationIds) ||
 		organizationIds.some((id) => typeof id !== "string") ||
-		(teamIds !== undefined &&
-			(!Array.isArray(teamIds) ||
-				teamIds.some((id) => typeof id !== "string"))) ||
 		typeof author !== "boolean" ||
 		typeof writable !== "boolean" ||
 		typeof nonce !== "string" ||
@@ -238,7 +232,6 @@ export async function verifyPageConnectTicket(
 		name,
 		image,
 		organizationIds: organizationIds as string[],
-		teamIds: (teamIds as string[] | undefined) ?? [],
 		author,
 		writable,
 		nonce,

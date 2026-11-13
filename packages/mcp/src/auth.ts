@@ -1,4 +1,4 @@
-import { auth, mintUserJwt, teamIdsFor } from "@superset/auth/server";
+import { auth, mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
@@ -243,10 +243,7 @@ export async function resolveMcpContext(
 		throw new McpUnauthorizedError("Unrecognized token format");
 	}
 
-	const [{ email, organizationIds }, teamIds] = await Promise.all([
-		loadUserAndOrgs(userId),
-		teamIdsFor(userId, [organizationId]),
-	]);
+	const { email, organizationIds } = await loadUserAndOrgs(userId);
 	if (!organizationIds.includes(organizationId)) {
 		throw new McpUnauthorizedError(
 			"Token references an organization the user does not belong to",
@@ -259,7 +256,6 @@ export async function resolveMcpContext(
 	const bearerToken = await mintUserJwt({
 		userId,
 		organizationIds: [organizationId],
-		teamIds,
 		ttlSeconds: 300,
 	});
 

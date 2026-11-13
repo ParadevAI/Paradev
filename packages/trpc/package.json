@@ -60,9 +60,9 @@
 			"types": "./src/router/page/schema.ts",
 			"default": "./src/router/page/schema.ts"
 		},
-		"./page-manifests-job": {
-			"types": "./src/router/page/manifests-job.ts",
-			"default": "./src/router/page/manifests-job.ts"
+		"./page-access": {
+			"types": "./src/router/page/access.ts",
+			"default": "./src/router/page/access.ts"
 		},
 		"./page-thumbnail": {
 			"types": "./src/router/page/thumbnail.ts",

@@ -29,8 +29,45 @@ const PUBLIC_PAGE = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee";
 const GUEST = "f0f0f0f0-6666-4666-8666-f0f0f0f0f0f0";
 const SHARED_ONLY_WRITER = "66666666-6666-4666-8666-666666666666";
 const SHARED_WITH_PAGE = "abababab-7777-4777-8777-abababababab";
-const TEAMMATE = "77777777-7777-4777-8777-777777777777";
-const TEAM = "88888888-8888-4888-8888-888888888888";
+
+interface FakePage {
+	visibility: string;
+	organizationId?: string;
+	createdByUserId?: string;
+}
+const fakePages = new Map<string, FakePage>();
+const fakeShares = new Map<string, Set<string>>();
+const fakeOrganizations = new Map<string, string[]>();
+const failingPages = new Set<string>();
+const accessCalls: { pageId: string; userIds: string[] }[] = [];
+
+function fakeAccess(pageId: string, userIds: string[]) {
+	const page = fakePages.get(pageId);
+	if (!page) return null;
+	return {
+		guests: page.visibility === "everyone",
+		users: Object.fromEntries(
+			userIds.map((userId) => {
+				const inOrganization =
+					page.organizationId !== undefined &&
+					(fakeOrganizations.get(userId) ?? []).includes(page.organizationId);
+				const read =
+					inOrganization &&
+					(page.visibility !== "just_me" ||
+						page.createdByUserId === userId ||
+						fakeShares.get(pageId)?.has(userId) === true);
+				return [
+					userId,
+					{
+						read,
+						write: read,
+						author: read && page.createdByUserId === userId,
+					},
+				];
+			}),
+		),
+	};
+}
 
 let failures = 0;
 const check = (name: string, ok: boolean, detail?: unknown) => {
@@ -57,6 +94,8 @@ function manifest(pageId: string, extra: Record<string, unknown>) {
 }
 
 function seed(pageId: string, body: string) {
+	const { visibility, organizationId, createdByUserId } = JSON.parse(body);
+	fakePages.set(pageId, { visibility, organizationId, createdByUserId });
 	const file = join(PERSIST, `${pageId}.json`);
 	writeFileSync(file, body);
 	const result = spawnSync(
@@ -96,9 +135,27 @@ async function main() {
 
 	const jwks = Bun.serve({
 		port: JWKS_PORT,
-		fetch(request) {
-			if (new URL(request.url).pathname === "/api/auth/jwks") {
+		async fetch(request) {
+			const { pathname } = new URL(request.url);
+			if (pathname === "/api/auth/jwks") {
 				return Response.json({ keys: [jwk] });
+			}
+			if (pathname === "/api/pages/access" && request.method === "POST") {
+				if (request.headers.get("authorization") !== `Bearer ${SECRET}`) {
+					return new Response("unauthorized", { status: 401 });
+				}
+				const { pageId, userIds } = (await request.json()) as {
+					pageId: string;
+					userIds: string[];
+				};
+				accessCalls.push({ pageId, userIds });
+				if (failingPages.has(pageId)) {
+					return new Response("down", { status: 500 });
+				}
+				const answer = fakeAccess(pageId, userIds);
+				return answer
+					? Response.json(answer)
+					: new Response("not found", { status: 404 });
 			}
 			return new Response("not found", { status: 404 });
 		},
@@ -110,9 +167,9 @@ async function main() {
 		organizationIds: string[],
 		name = "Ada",
 		image: string | null = null,
-		teamIds: string[] = [],
-	) =>
-		new SignJWT({ organizationIds, teamIds, name, image })
+	) => {
+		fakeOrganizations.set(sub, organizationIds);
+		return new SignJWT({ organizationIds, name, image })
 			.setProtectedHeader({ alg: "RS256", kid: "test-key" })
 			.setIssuer(issuer)
 			.setAudience(issuer)
@@ -120,6 +177,7 @@ async function main() {
 			.setIssuedAt()
 			.setExpirationTime("10m")
 			.sign(privateKey as KeyLike);
+	};
 
 	seed(
 		ORG_PAGE,
@@ -1284,16 +1342,27 @@ async function main() {
 	check("guest presence is rate-limited per client", limited);
 
 	console.log("\nshared viewers of a just_me page");
-	const sharedManifest = (sharedUserIds: string[], sharedTeamIds: string[]) =>
+	const nudgeShared = () =>
+		fetch(`${base}/v2/page/${SHARED_WITH_PAGE}/storage/manifest-changed`, {
+			method: "POST",
+			headers: { authorization: `Bearer ${SECRET}` },
+		});
+	const callsFor = (pageId: string) =>
+		accessCalls.filter((call) => call.pageId === pageId).length;
+	const closedCode = (socket: WebSocket) =>
+		new Promise<string>((resolve) => {
+			socket.addEventListener("close", (event) => resolve(`${event.code}`));
+			setTimeout(() => resolve("still open"), 3000);
+		});
+	seed(
+		SHARED_WITH_PAGE,
 		manifest(SHARED_WITH_PAGE, {
 			visibility: "just_me",
 			organizationId: ORG,
 			createdByUserId: AUTHOR,
-			sharedUserIds,
-			sharedTeamIds,
-		});
-	seed(SHARED_WITH_PAGE, sharedManifest([MEMBER], [TEAM]));
-	const teammateJwt = await mint(TEAMMATE, [ORG], "Linus", null, [TEAM]);
+		}),
+	);
+	fakeShares.set(SHARED_WITH_PAGE, new Set([MEMBER]));
 	const strangerJwt = await mint(crypto.randomUUID(), [ORG], "Ken");
 	const sharedOrigin = `http://${SHARED_WITH_PAGE}.frame.usercontent.localhost:9999`;
 
@@ -1310,6 +1379,7 @@ async function main() {
 		strangerTicket,
 	);
 
+	const callsBefore = callsFor(SHARED_WITH_PAGE);
 	const shareeRecords = await fetch(
 		`${base}/v2/page/${SHARED_WITH_PAGE}/storage/records`,
 		{ headers: { authorization: `Bearer ${memberJwt}` } },
@@ -1318,6 +1388,23 @@ async function main() {
 		"the readback route lets a shared member read",
 		shareeRecords.status === 200,
 		shareeRecords.status,
+	);
+	check(
+		"a second check within the TTL is answered from the cache",
+		callsFor(SHARED_WITH_PAGE) === callsBefore,
+		accessCalls.slice(callsBefore),
+	);
+
+	const staleToken = await mint(MEMBER, [
+		"99999999-9999-4999-8999-999999999999",
+	]);
+	fakeOrganizations.set(MEMBER, [ORG]);
+	const staleAnswer = fakeAccess(SHARED_WITH_PAGE, [MEMBER]);
+	const staleTicket = await ticket(SHARED_WITH_PAGE, staleToken);
+	check(
+		"refuses a token without the page's organization, even when the API says yes",
+		staleAnswer?.users[MEMBER]?.read === true && staleTicket.status === 403,
+		{ staleAnswer, staleTicket },
 	);
 
 	const sharedPresence = enter(SHARED_WITH_PAGE, `?token=${memberJwt}`);
@@ -1331,52 +1418,86 @@ async function main() {
 		sharedPresence.inbox,
 	);
 
-	const teamTicket = await ticket(SHARED_WITH_PAGE, teammateJwt);
-	const teamOpen = await open(String(teamTicket.url), sharedOrigin).catch(
+	const sharedOpen = await open(String(directTicket.url), sharedOrigin).catch(
 		(error) => (error as Error).message,
 	);
 	check(
-		"a team share opens the storage socket",
-		typeof teamOpen !== "string" &&
-			(teamOpen.first as { type?: string }).type === "hello",
-		teamOpen,
+		"a share opens the storage socket, writable",
+		typeof sharedOpen !== "string" &&
+			(sharedOpen.first as { type?: string }).type === "hello" &&
+			(sharedOpen.first as { writable?: boolean }).writable === true,
+		sharedOpen,
 	);
-	if (typeof teamOpen !== "string") {
-		const teamClosed = new Promise<string>((resolve) => {
-			teamOpen.socket.addEventListener("close", (event) =>
-				resolve(`${event.code}`),
-			);
-			setTimeout(() => resolve("still open"), 3000);
-		});
-		const nudgeShared = () =>
-			fetch(`${base}/v2/page/${SHARED_WITH_PAGE}/storage/manifest-changed`, {
-				method: "POST",
-				headers: { authorization: `Bearer ${SECRET}` },
-			});
-		await rpc(teamOpen.socket, { op: "get", key: "k" }, "shared-0");
+	if (typeof sharedOpen !== "string") {
+		const sharedClosed = closedCode(sharedOpen.socket);
 		await nudgeShared();
 		const stillThere = await rpc(
-			teamOpen.socket,
+			sharedOpen.socket,
 			{ op: "get", key: "k" },
 			"shared-1",
 		).catch((error) => (error as Error).message);
 		check(
-			"a nudge that keeps the share keeps the team member connected",
+			"a nudge that keeps the share keeps the member connected",
 			typeof stillThere !== "string" && stillThere.ok === true,
 			stillThere,
 		);
 
-		seed(SHARED_WITH_PAGE, sharedManifest([], []));
+		fakeShares.set(SHARED_WITH_PAGE, new Set());
 		await nudgeShared();
 		check(
 			"removing the share revokes the live storage socket",
-			(await teamClosed) === "4403",
+			(await sharedClosed) === "4403",
 		);
 		check(
 			"removing the share closes the shared member's presence",
 			(await sharedPresence.waitClosed())?.code === 4403,
 		);
+		const afterRemoval = await ticket(SHARED_WITH_PAGE, memberJwt);
+		check(
+			"the nudge cleared the cached yes, so a new ticket is refused",
+			afterRemoval.status === 403,
+			afterRemoval,
+		);
 	}
+
+	console.log("\nfail closed when the API cannot answer");
+	const authorShared = await ticket(SHARED_WITH_PAGE, authorJwt);
+	const authorOpen = await open(String(authorShared.url), sharedOrigin).catch(
+		(error) => (error as Error).message,
+	);
+	check(
+		"the author opens the socket while the API is up",
+		typeof authorOpen !== "string",
+		authorOpen,
+	);
+	failingPages.add(SHARED_WITH_PAGE);
+	if (typeof authorOpen !== "string") {
+		const authorClosed = closedCode(authorOpen.socket);
+		await nudgeShared();
+		check(
+			"a failed re-check after a nudge revokes the open socket",
+			(await authorClosed) === "4403",
+		);
+	}
+	const whileDown = await ticket(SHARED_WITH_PAGE, authorJwt);
+	check(
+		"a failed lookup refuses a ticket with 403",
+		whileDown.status === 403,
+		whileDown,
+	);
+	const downAgain = callsFor(SHARED_WITH_PAGE);
+	await ticket(SHARED_WITH_PAGE, authorJwt);
+	check(
+		"a failed lookup is not cached, so the next request asks again",
+		callsFor(SHARED_WITH_PAGE) > downAgain,
+	);
+	failingPages.delete(SHARED_WITH_PAGE);
+	const recovered = await ticket(SHARED_WITH_PAGE, authorJwt);
+	check(
+		"the author is let back in once the API answers",
+		recovered.status === 200,
+		recovered,
+	);
 
 	shutdown();
 

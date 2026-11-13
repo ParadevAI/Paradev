@@ -54,10 +54,8 @@ import {
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
-import { enqueuePageManifestRewrite } from "./lib/page-manifests-job";
 import {
 	convertPendingShares,
-	pagesSharedWithTeam,
 	removeInvitationShares,
 	removeMemberShares,
 } from "./lib/pending-shares";
@@ -67,7 +65,6 @@ import {
 	resolveSessionOrganizationState,
 	type SessionOrganizationContext,
 } from "./lib/resolve-session-organization-state";
-import { teamIdsFor } from "./lib/team-ids";
 import { stripeClient, syncCustomerName } from "./stripe";
 import {
 	countBillableSeats,
@@ -77,7 +74,6 @@ import {
 import { previewNextInvoice } from "./utils/invoice-preview";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
-const pagesOfDeletedTeams = new Map<string, string[]>();
 
 const userOptions = {
 	additionalFields: {
@@ -374,16 +370,20 @@ export const auth = betterAuth({
 					user: { id: string; name?: string | null; image?: string | null };
 					session: Record<string, unknown>;
 				}) => {
-					const [userMemberships, teamIds] = await Promise.all([
+					const [userMemberships, userTeams] = await Promise.all([
 						db.query.members.findMany({
 							where: eq(members.userId, user.id),
 							columns: { organizationId: true },
 						}),
-						teamIdsFor(user.id),
+						db
+							.select({ teamId: authSchema.teamMembers.teamId })
+							.from(authSchema.teamMembers)
+							.where(eq(authSchema.teamMembers.userId, user.id)),
 					]);
 					const organizationIds = [
 						...new Set(userMemberships.map((m) => m.organizationId)),
 					];
+					const teamIds = [...new Set(userTeams.map((t) => t.teamId))];
 					// A Worker that attributes content to a person has to read
 					// who they are from the signed token; a caller-supplied name
 					// is a name they chose for someone else.
@@ -447,7 +447,6 @@ export const auth = betterAuth({
 				return {
 					organizationId: referenceId ?? undefined,
 					organizationIds,
-					teamIds: user?.id ? await teamIdsFor(user.id) : [],
 					client_name: typeof clientName === "string" ? clientName : undefined,
 				};
 			},
@@ -625,9 +624,6 @@ export const auth = betterAuth({
 						});
 					}
 
-					// The FK cascade drops these share rows, so afterDeleteTeam can no longer find them.
-					pagesOfDeletedTeams.set(team.id, await pagesSharedWithTeam(team.id));
-
 					// Linear-style: deleting a team would otherwise orphan any
 					// members who were only in this team. Re-home them into the
 					// next-oldest team in the org before the FK cascade fires.
@@ -677,12 +673,6 @@ export const auth = betterAuth({
 							})),
 						)
 						.onConflictDoNothing();
-				},
-
-				afterDeleteTeam: async ({ team }) => {
-					const pageIds = pagesOfDeletedTeams.get(team.id) ?? [];
-					pagesOfDeletedTeams.delete(team.id);
-					await enqueuePageManifestRewrite(pageIds);
 				},
 
 				beforeDeleteOrganization: async ({ organization }) => {
@@ -758,13 +748,11 @@ export const auth = betterAuth({
 
 				afterAddMember: async ({ member, user, organization }) => {
 					try {
-						await enqueuePageManifestRewrite(
-							await convertPendingShares({
-								organizationId: organization.id,
-								userId: member.userId,
-								email: user.email,
-							}),
-						);
+						await convertPendingShares({
+							organizationId: organization.id,
+							userId: member.userId,
+							email: user.email,
+						});
 					} catch (error) {
 						console.error(
 							"[org/after-add-member] Failed to convert pending shares:",
@@ -927,12 +915,10 @@ export const auth = betterAuth({
 
 				afterRemoveMember: async ({ user, organization }) => {
 					try {
-						await enqueuePageManifestRewrite(
-							await removeMemberShares({
-								organizationId: organization.id,
-								userId: user.id,
-							}),
-						);
+						await removeMemberShares({
+							organizationId: organization.id,
+							userId: user.id,
+						});
 					} catch (error) {
 						console.error(
 							"[org/after-remove-member] Failed to remove shares:",
@@ -1289,7 +1275,6 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
-export { teamIdsFor };
 
 /**
  * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT
@@ -1304,8 +1289,6 @@ export { teamIdsFor };
 export async function mintUserJwt(args: {
 	userId: string;
 	organizationIds: string[];
-	/** Looked up from `organizationIds` when omitted. */
-	teamIds?: string[];
 	scope?: string;
 	runId?: string;
 	/** Token lifetime in seconds. Default 300 (5 minutes). */
@@ -1318,8 +1301,6 @@ export async function mintUserJwt(args: {
 			payload: {
 				sub: args.userId,
 				organizationIds: args.organizationIds,
-				teamIds:
-					args.teamIds ?? (await teamIdsFor(args.userId, args.organizationIds)),
 				scope: args.scope,
 				runId: args.runId,
 				exp,

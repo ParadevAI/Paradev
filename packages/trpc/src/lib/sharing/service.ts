@@ -55,7 +55,7 @@ export function grantsTo(table: ShareTable, userId: string): SQL {
 	) as SQL;
 }
 
-export function matchesGrantee(table: ShareTable, grantee: GranteeRef): SQL {
+function matchesGrantee(table: ShareTable, grantee: GranteeRef): SQL {
 	switch (grantee.kind) {
 		case "user":
 			return eq(table.userId, grantee.userId);

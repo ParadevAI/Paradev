@@ -2,7 +2,6 @@ import { db } from "@superset/db/client";
 import {
 	attachments,
 	files,
-	pageShares,
 	pages,
 	pageVersions,
 	type SelectPage,
@@ -46,11 +45,6 @@ export async function writePageManifest(pageId: string): Promise<void> {
 		notifyPageHub(pageId);
 		return;
 	}
-
-	const shares = await db
-		.select({ userId: pageShares.userId, teamId: pageShares.teamId })
-		.from(pageShares)
-		.where(eq(pageShares.pageId, pageId));
 
 	const rows = await db
 		.select({
@@ -101,12 +95,6 @@ export async function writePageManifest(pageId: string): Promise<void> {
 		visibility: page.visibility,
 		organizationId: page.organizationId,
 		createdByUserId: page.createdByUserId,
-		sharedUserIds: shares.flatMap((share) =>
-			share.userId ? [share.userId] : [],
-		),
-		sharedTeamIds: shares.flatMap((share) =>
-			share.teamId ? [share.teamId] : [],
-		),
 		sharedVersion: page.sharedVersion,
 		latestVersion: rows.at(-1)?.version ?? null,
 		versions: Object.fromEntries(

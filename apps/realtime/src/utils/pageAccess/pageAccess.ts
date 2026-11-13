@@ -1,0 +1,153 @@
+import type { SqlLike } from "@superset/shared/page-storage-records";
+
+export const ACCESS_TTL_MS = 5 * 60_000;
+/** The most people /api/pages/access takes in one request. */
+export const MAX_ACCESS_ASK = 1000;
+
+export interface UserAccess {
+	read: boolean;
+	write: boolean;
+	author: boolean;
+}
+
+export interface AccessAnswer {
+	guests: boolean;
+	users: Record<string, UserAccess>;
+}
+
+export interface CheckedAccess {
+	guests: boolean;
+	users: Map<string, UserAccess>;
+}
+
+/** Resolves null when the page is missing or taken down; rejects when the API cannot answer. */
+export type AskAccess = (userIds: string[]) => Promise<AccessAnswer | null>;
+
+const REFUSED: UserAccess = { read: false, write: false, author: false };
+
+function isUserAccess(value: unknown): value is UserAccess {
+	if (!value || typeof value !== "object") return false;
+	const { read, write, author } = value as Record<string, unknown>;
+	return (
+		typeof read === "boolean" &&
+		typeof write === "boolean" &&
+		typeof author === "boolean"
+	);
+}
+
+export function parseAccessAnswer(value: unknown): AccessAnswer | null {
+	if (!value || typeof value !== "object") return null;
+	const { guests, users } = value as Record<string, unknown>;
+	if (typeof guests !== "boolean" || !users || typeof users !== "object") {
+		return null;
+	}
+	const parsed: Record<string, UserAccess> = {};
+	for (const [userId, access] of Object.entries(users)) {
+		if (!isUserAccess(access)) return null;
+		parsed[userId] = {
+			read: access.read,
+			write: access.write,
+			author: access.author,
+		};
+	}
+	return { guests, users: parsed };
+}
+
+type CachedUser = {
+	user_id: string;
+	read: number;
+	write: number;
+	author: number;
+};
+
+export class PageAccessCache {
+	constructor(
+		private readonly sql: SqlLike,
+		private readonly ask: AskAccess,
+		private readonly now: () => number = Date.now,
+	) {}
+
+	ensureSchema(): void {
+		this.sql.exec(
+			`CREATE TABLE IF NOT EXISTS access_cache (
+				user_id TEXT PRIMARY KEY,
+				read INTEGER NOT NULL,
+				write INTEGER NOT NULL,
+				author INTEGER NOT NULL,
+				at INTEGER NOT NULL
+			)`,
+		);
+		this.sql.exec(
+			`CREATE TABLE IF NOT EXISTS page_flags (
+				id INTEGER PRIMARY KEY CHECK (id = 1),
+				guests INTEGER NOT NULL,
+				at INTEGER NOT NULL
+			)`,
+		);
+	}
+
+	clear(): void {
+		this.sql.exec("DELETE FROM access_cache");
+		this.sql.exec("DELETE FROM page_flags");
+	}
+
+	async check(userIds: readonly string[]): Promise<CheckedAccess> {
+		const fresh = this.now() - ACCESS_TTL_MS;
+		this.sql.exec("DELETE FROM access_cache WHERE at <= ?", fresh);
+		const wanted = new Set(userIds);
+		const users = new Map<string, UserAccess>();
+		for (const row of this.sql
+			.exec<CachedUser>("SELECT user_id, read, write, author FROM access_cache")
+			.toArray()) {
+			if (!wanted.has(row.user_id)) continue;
+			users.set(row.user_id, {
+				read: row.read === 1,
+				write: row.write === 1,
+				author: row.author === 1,
+			});
+		}
+		const [flags] = this.sql
+			.exec<{ guests: number }>(
+				"SELECT guests FROM page_flags WHERE at > ?",
+				fresh,
+			)
+			.toArray();
+		const missing = [...wanted].filter((userId) => !users.has(userId));
+		if (flags && missing.length === 0) {
+			return { guests: flags.guests === 1, users };
+		}
+
+		const answers: (AccessAnswer | null)[] = [];
+		for (
+			let start = 0;
+			start === 0 || start < missing.length;
+			start += MAX_ACCESS_ASK
+		) {
+			answers.push(
+				await this.ask(missing.slice(start, start + MAX_ACCESS_ASK)),
+			);
+		}
+		const at = this.now();
+		const guests = answers.every((answer) => answer?.guests === true);
+		this.sql.exec(
+			"INSERT OR REPLACE INTO page_flags (id, guests, at) VALUES (1, ?, ?)",
+			guests ? 1 : 0,
+			at,
+		);
+		for (const userId of missing) {
+			const access =
+				answers.find((answer) => answer?.users[userId])?.users[userId] ??
+				REFUSED;
+			users.set(userId, access);
+			this.sql.exec(
+				"INSERT OR REPLACE INTO access_cache (user_id, read, write, author, at) VALUES (?, ?, ?, ?, ?)",
+				userId,
+				access.read ? 1 : 0,
+				access.write ? 1 : 0,
+				access.author ? 1 : 0,
+				at,
+			);
+		}
+		return { guests, users };
+	}
+}

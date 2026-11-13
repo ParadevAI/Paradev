@@ -129,7 +129,6 @@ describe("page connect tickets", () => {
 		name: "Ada",
 		image: null,
 		organizationIds: ["org-1"],
-		teamIds: ["team-1"],
 		author: true,
 		writable: true,
 		nonce: "n-1",

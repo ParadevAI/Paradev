@@ -521,10 +521,6 @@
 			"types": "./src/workspace-activity.ts",
 			"default": "./src/workspace-activity.ts"
 		},
-		"./page-storage-access": {
-			"types": "./src/page-storage-access.ts",
-			"default": "./src/page-storage-access.ts"
-		},
 		"./page-storage-ticket": {
 			"types": "./src/page-storage-ticket.ts",
 			"default": "./src/page-storage-ticket.ts"

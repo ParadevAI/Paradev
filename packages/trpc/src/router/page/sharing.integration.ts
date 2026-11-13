@@ -1,38 +1,20 @@
-import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
-
-const objectStore = new Map<string, string>();
-let failPuts = false;
-mock.module("../../lib/r2", () => ({
-	putObject: async ({ key, body }: { key: string; body: string }) => {
-		if (failPuts) throw new Error("r2 down");
-		objectStore.set(key, body);
-	},
-	deleteObjects: async (keys: string[]) => {
-		for (const key of keys) objectStore.delete(key);
-	},
-	presignedGetUrl: async (key: string) => `https://storage.test/${key}`,
-	presignedPutUrl: async ({ key }: { key: string }) => ({
-		url: `https://storage.test/${key}`,
-		headers: {},
-	}),
-	getObject: async () => null,
-	headObject: async () => null,
-	copyObject: async () => {},
-	objectExists: async () => true,
-	listObjects: async () => [],
-}));
-
-const { db, dbWs } = await import("@superset/db/client");
-const { members, organizations, pageShares, pages, teamMembers, teams, users } =
-	await import("@superset/db/schema");
-const { parsePageManifest, pageManifestKey } = await import(
-	"@superset/shared/usercontent"
-);
-const { eq, inArray } = await import("drizzle-orm");
-const { pageRouter } = await import("./page");
-const { rewritePageManifests } = await import("./manifests-job");
-const { createCallerFactory, createTRPCContext, createTRPCRouter } =
-	await import("../../trpc");
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { db, dbWs } from "@superset/db/client";
+import {
+	members,
+	organizations,
+	pages,
+	teamMembers,
+	teams,
+	users,
+} from "@superset/db/schema";
+import { eq, inArray } from "drizzle-orm";
+import {
+	createCallerFactory,
+	createTRPCContext,
+	createTRPCRouter,
+} from "../../trpc";
+import { pageRouter } from "./page";
 
 const ORG = crypto.randomUUID();
 const OWNER = crypto.randomUUID();
@@ -40,6 +22,37 @@ const SHAREE = crypto.randomUUID();
 const TEAM = crypto.randomUUID();
 const PAGE = crypto.randomUUID();
 const suffix = Date.now();
+
+const nudges: { path: string; authorization: string | null }[] = [];
+let heard: (() => void) | null = null;
+const realtime = Bun.serve({
+	port: 0,
+	fetch(request) {
+		nudges.push({
+			path: new URL(request.url).pathname,
+			authorization: request.headers.get("authorization"),
+		});
+		heard?.();
+		return Response.json({ ok: true });
+	},
+});
+process.env.REALTIME_URL = `http://localhost:${realtime.port}`;
+process.env.REALTIME_NUDGE_SECRET = "sharing-test-secret";
+
+const nudged = async (change: () => Promise<unknown>) => {
+	nudges.length = 0;
+	const arrived = new Promise<void>((resolve) => {
+		heard = resolve;
+	});
+	await change();
+	await Promise.race([arrived, Bun.sleep(1000)]);
+	return nudges.slice();
+};
+
+const expected = {
+	path: `/v2/page/${PAGE}/storage/manifest-changed`,
+	authorization: "Bearer sharing-test-secret",
+};
 
 const owner = createCallerFactory(createTRPCRouter({ page: pageRouter }))(
 	createTRPCContext({
@@ -51,11 +64,6 @@ const owner = createCallerFactory(createTRPCRouter({ page: pageRouter }))(
 		headers: new Headers(),
 	}),
 );
-
-const manifest = () => {
-	const text = objectStore.get(pageManifestKey(PAGE));
-	return text === undefined ? null : parsePageManifest(text);
-};
 
 beforeAll(async () => {
 	await db.insert(organizations).values({
@@ -86,7 +94,9 @@ beforeAll(async () => {
 		slug: `share-team-${suffix}`,
 		organizationId: ORG,
 	});
-	await db.insert(teamMembers).values({ teamId: TEAM, userId: SHAREE });
+	await db
+		.insert(teamMembers)
+		.values({ teamId: TEAM, userId: SHAREE, organizationId: ORG });
 	await db.insert(pages).values({
 		id: PAGE,
 		slug: `share-page-${suffix}`,
@@ -98,83 +108,48 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+	realtime.stop(true);
 	await db.delete(organizations).where(eq(organizations.id, ORG));
 	await db.delete(users).where(inArray(users.id, [OWNER, SHAREE]));
 	await dbWs.$client.end?.().catch(() => {});
 });
 
-describe("page.sharing and the manifest the realtime hub reads", () => {
-	test("adding a share writes the grantees into the manifest", async () => {
-		await owner.page.sharing.add({
-			id: PAGE,
-			grantees: [
-				{ kind: "user", userId: SHAREE },
-				{ kind: "team", teamId: TEAM },
-			],
-			role: "view",
-		});
-		expect(manifest()?.sharedUserIds).toEqual([SHAREE]);
-		expect(manifest()?.sharedTeamIds).toEqual([TEAM]);
+describe("page.sharing tells the page's realtime hub to ask again", () => {
+	test("adding a share nudges the hub", async () => {
+		expect(
+			await nudged(() =>
+				owner.page.sharing.add({
+					id: PAGE,
+					grantees: [
+						{ kind: "user", userId: SHAREE },
+						{ kind: "team", teamId: TEAM },
+					],
+					role: "view",
+				}),
+			),
+		).toEqual([expected]);
 	});
 
-	test("removing a share takes it out of the manifest", async () => {
-		await owner.page.sharing.remove({
-			id: PAGE,
-			grantee: { kind: "user", userId: SHAREE },
-		});
-		expect(manifest()?.sharedUserIds).toEqual([]);
-		expect(manifest()?.sharedTeamIds).toEqual([TEAM]);
-	});
-});
-
-describe("when the manifest cannot be written", () => {
-	test("a removed share is put back, so the database never says less than the hub enforces", async () => {
-		failPuts = true;
-		try {
-			await expect(
-				owner.page.sharing.remove({
+	test("changing a share's role nudges the hub", async () => {
+		expect(
+			await nudged(() =>
+				owner.page.sharing.setRole({
 					id: PAGE,
 					grantee: { kind: "team", teamId: TEAM },
+					role: "comment",
 				}),
-			).rejects.toThrow("r2 down");
-		} finally {
-			failPuts = false;
-		}
-		const rows = await db
-			.select({ teamId: pageShares.teamId })
-			.from(pageShares)
-			.where(eq(pageShares.pageId, PAGE));
-		expect(rows.map((row) => row.teamId)).toEqual([TEAM]);
+			),
+		).toEqual([expected]);
 	});
 
-	test("a failed add leaves the sharee out of the manifest, and a retry lets them in", async () => {
-		const add = () =>
-			owner.page.sharing.add({
-				id: PAGE,
-				grantees: [{ kind: "user", userId: SHAREE }],
-			});
-		failPuts = true;
-		try {
-			await expect(add()).rejects.toThrow("r2 down");
-		} finally {
-			failPuts = false;
-		}
-		expect(manifest()?.sharedUserIds).toEqual([]);
-		expect((await add()).added).toEqual([]);
-		expect(manifest()?.sharedUserIds).toEqual([SHAREE]);
-		await db.delete(pageShares).where(eq(pageShares.userId, SHAREE));
-	});
-});
-
-describe("the manifests job", () => {
-	test("rewrites a page whose share was deleted outside the router", async () => {
-		await db
-			.insert(pageShares)
-			.values({ pageId: PAGE, userId: SHAREE, sharedByUserId: OWNER });
-		await rewritePageManifests([PAGE]);
-		expect(manifest()?.sharedUserIds).toEqual([SHAREE]);
-		await db.delete(pageShares).where(eq(pageShares.userId, SHAREE));
-		await rewritePageManifests([PAGE]);
-		expect(manifest()?.sharedUserIds).toEqual([]);
+	test("removing a share nudges the hub", async () => {
+		expect(
+			await nudged(() =>
+				owner.page.sharing.remove({
+					id: PAGE,
+					grantee: { kind: "user", userId: SHAREE },
+				}),
+			),
+		).toEqual([expected]);
 	});
 });

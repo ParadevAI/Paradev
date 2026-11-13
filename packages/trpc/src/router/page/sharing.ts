@@ -1,12 +1,12 @@
 import { db } from "@superset/db/client";
-import { pageShares, pages, users } from "@superset/db/schema";
+import { pages, users } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { notifyPageHub } from "../../lib/page-store";
 import {
 	addPageSharesSchema,
 	addShares,
 	listGrantees,
-	matchesGrantee,
 	removeShare,
 	removeShareSchema,
 	setPageShareRole,
@@ -22,7 +22,6 @@ import {
 	loadPageShareRole,
 	pageAccess,
 } from "./access";
-import { writePageManifest } from "./storage";
 
 async function loadSharedPage(
 	ctx: Parameters<typeof requireActiveOrgMembership>[0] & {
@@ -98,7 +97,7 @@ export const pageSharingRouter = {
 				sharedByUserId: userId,
 				role: input.role,
 			});
-			await writePageManifest(page.id);
+			notifyPageHub(page.id);
 			return { added };
 		}),
 
@@ -106,27 +105,11 @@ export const pageSharingRouter = {
 		.input(removeShareSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
-			const rows = await db
-				.select()
-				.from(pageShares)
-				.where(
-					and(
-						eq(pageShares.pageId, page.id),
-						matchesGrantee(pageShares, input.grantee),
-					),
-				);
 			const removed = await removeShare(
 				{ kind: "page", id: page.id },
 				input.grantee,
 			);
-			try {
-				await writePageManifest(page.id);
-			} catch (error) {
-				if (rows.length > 0) {
-					await db.insert(pageShares).values(rows).onConflictDoNothing();
-				}
-				throw error;
-			}
+			notifyPageHub(page.id);
 			return { removed };
 		}),
 
@@ -134,8 +117,12 @@ export const pageSharingRouter = {
 		.input(setShareRoleSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
-			return {
-				updated: await setPageShareRole(page.id, input.grantee, input.role),
-			};
+			const updated = await setPageShareRole(
+				page.id,
+				input.grantee,
+				input.role,
+			);
+			notifyPageHub(page.id);
+			return { updated };
 		}),
 } satisfies TRPCRouterRecord;
