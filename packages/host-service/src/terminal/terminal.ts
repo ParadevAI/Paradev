@@ -3066,9 +3066,7 @@ async function createTerminalSessionUnlocked({
 		};
 	}
 
-	const cwd = cwdOverride
-		? resolveTerminalCwd(cwdOverride, workspace.worktreePath)
-		: workspace.worktreePath;
+	const cwd = resolveTerminalCwd(cwdOverride, workspace.worktreePath);
 	const rootPath = repositoryRootPath(db, workspace, cwd);
 	// Adoption overrides these with the PTY's live dims below: the session's
 	// belief must match the kernel's, or the reanchor repaint logic misjudges

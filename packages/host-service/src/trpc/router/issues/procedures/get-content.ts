@@ -1,12 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import { protectedProcedure } from "../../../index";
 import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
-import { execGh } from "../../workspace-creation/utils/exec-gh";
 
 const getContentInputSchema = z.object({
 	projectId: z.string(),
 	issueNumber: z.number().int().positive(),
+	repositoryId: z.string().optional(),
 });
 
 const ghIssueContentSchema = z.object({
@@ -26,9 +27,14 @@ const ghIssueContentSchema = z.object({
 export const getContent = protectedProcedure
 	.input(getContentInputSchema)
 	.query(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId ??
+				getLocalProject(ctx.db, input.projectId)?.primaryRepositoryId,
+		);
 		try {
-			const raw = await execGh([
+			const raw = await ctx.execGh([
 				"issue",
 				"view",
 				String(input.issueNumber),

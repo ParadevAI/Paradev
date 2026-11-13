@@ -281,10 +281,22 @@ function replaceCheckout(
 ): void {
 	store.db.transaction((tx) => {
 		tx.delete(workspaceRepositories)
-			.where(eq(workspaceRepositories.workspaceId, workspaceId))
+			.where(
+				and(
+					eq(workspaceRepositories.workspaceId, workspaceId),
+					ne(workspaceRepositories.repositoryId, repositoryId),
+				),
+			)
 			.run();
 		tx.insert(workspaceRepositories)
 			.values({ workspaceId, repositoryId, branch })
+			.onConflictDoUpdate({
+				target: [
+					workspaceRepositories.workspaceId,
+					workspaceRepositories.repositoryId,
+				],
+				set: { branch },
+			})
 			.run();
 	});
 }

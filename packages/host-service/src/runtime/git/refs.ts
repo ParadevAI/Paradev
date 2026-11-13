@@ -202,18 +202,17 @@ export async function resolveRef(
 
 /**
  * Resolve the repo's default branch name (typically `main`) from
- * `origin/HEAD`. Falls back to `"main"` if symbolic-ref isn't set.
+ * `<remote>/HEAD`. Falls back to `"main"` if symbolic-ref isn't set.
  */
 export async function resolveDefaultBranchName(
 	git: SimpleGit,
+	remote = "origin",
 ): Promise<string> {
 	try {
-		const ref = await git.raw([
-			"symbolic-ref",
-			"refs/remotes/origin/HEAD",
-			"--short",
-		]);
-		return ref.trim().replace(/^origin\//, "");
+		const ref = (
+			await git.raw(["symbolic-ref", `refs/remotes/${remote}/HEAD`, "--short"])
+		).trim();
+		return ref.startsWith(`${remote}/`) ? ref.slice(remote.length + 1) : ref;
 	} catch {
 		return "main";
 	}

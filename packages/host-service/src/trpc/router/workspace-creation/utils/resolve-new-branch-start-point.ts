@@ -31,8 +31,9 @@ export async function resolveNewBranchStartPoint(
 	// fetcher so the network fetch doesn't spawn/drain in-process.
 	fetchRemoteRef: BaseRefFetcher = (target) =>
 		git.fetch([target.remote, target.branch, "--quiet", "--no-tags"]),
+	remote = "origin",
 ): Promise<ResolvedRef> {
-	let startPoint = await resolveStartPoint(git, baseBranch);
+	let startPoint = await resolveStartPoint(git, baseBranch, remote);
 
 	if (startPoint.kind === "local") {
 		const upstream = await resolveUpstream(git, startPoint.shortName);

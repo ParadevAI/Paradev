@@ -10,8 +10,14 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
+import { eq } from "drizzle-orm";
 import { simpleGit } from "simple-git";
-import { workspaceRepositories, workspaces } from "../../src/db/schema";
+import {
+	projects,
+	repositories,
+	workspaceRepositories,
+	workspaces,
+} from "../../src/db/schema";
 import { getTomlConfigPath } from "../../src/runtime/setup/project-config-toml";
 import * as terminal from "../../src/terminal/terminal";
 import { cleanupGitOps } from "../../src/trpc/router/workspace-cleanup/git-ops";
@@ -790,4 +796,157 @@ test("AI naming renames the branch in every checkout still on the generated name
 		queued.mockRestore();
 		generator.mockRestore();
 	}
+});
+
+test("a repeated create on the same typed branch opens the existing workspace", async () => {
+	const scenario = await multiRepoScenario();
+	const first = await createBoth(scenario);
+
+	const second = await scenario.host.trpc.workspaces.create.mutate({
+		projectId: scenario.projectId,
+		branch: "feature/both",
+	});
+
+	expect(second.alreadyExists).toBe(true);
+	expect(second.workspace.id).toBe(first.id);
+});
+
+test("a branch named from the workspace name skips names any repository already has", async () => {
+	const scenario = await multiRepoScenario();
+	await scenario.api.git.branch(["fix-login"]);
+	const create = async () =>
+		(
+			await scenario.host.trpc.workspaces.create.mutate({
+				projectId: scenario.projectId,
+				name: "Fix login",
+			})
+		).workspace.branch;
+
+	expect(await create()).toBe("fix-login-2");
+	expect(await create()).toBe("fix-login-3");
+});
+
+test("a typed new branch gets the project prefix; an existing branch and skipBranchPrefix do not", async () => {
+	const scenario = await multiRepoScenario();
+	scenario.host.db
+		.update(projects)
+		.set({ branchPrefixMode: "custom", branchPrefixCustom: "me" })
+		.where(eq(projects.id, scenario.projectId))
+		.run();
+	await scenario.api.git.branch(["release"]);
+	const create = async (branch: string, skipBranchPrefix?: boolean) =>
+		(
+			await scenario.host.trpc.workspaces.create.mutate({
+				projectId: scenario.projectId,
+				branch,
+				skipBranchPrefix,
+			})
+		).workspace.branch;
+
+	expect(await create("feature/new")).toBe("me/feature/new");
+	expect(await create("release")).toBe("release");
+	expect(await create("feature/exact", true)).toBe("feature/exact");
+});
+
+test("a moved branch under a remote not named origin is checked out, not branched anew", async () => {
+	const scenario = await multiRepoScenario();
+	scenario.host.db
+		.update(repositories)
+		.set({ remoteName: "upstream" })
+		.where(eq(repositories.id, scenario.apiId))
+		.run();
+	const remote = mkdtempSync(join(tmpdir(), "multi-repo-remote-"));
+	scenario.cleanup.push(remote);
+	await simpleGit(remote).init(["--bare"]);
+	const { api } = scenario;
+	await api.git.addRemote("upstream", remote);
+	await api.git.checkoutLocalBranch("superset/move");
+	const moved = await api.commit("moved work", { "moved.txt": "moved\n" });
+	await api.git.push("upstream", "superset/move");
+	await api.git.checkout("main");
+	await api.git.deleteLocalBranch("superset/move", true);
+
+	const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
+		projectId: scenario.projectId,
+		branch: "superset/move",
+	});
+
+	const apiCheckout = workspace.checkouts.find(
+		(checkout) => checkout.repositoryId === scenario.apiId,
+	);
+	expect((await headOf(apiCheckout?.path ?? "")).oid).toStartWith(moved);
+});
+
+test("a branch rename or checkout in one checkout broadcasts the workspace", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	await scenario.api.git.branch(["other"]);
+	const broadcast = spyOn(scenario.host.eventBus, "broadcastWorkspaceChanged");
+	const apiBranch = () => {
+		const event = broadcast.mock.calls.at(-1)?.[0];
+		return event?.workspace?.checkouts.find(
+			(checkout) => checkout.repositoryId === scenario.apiId,
+		)?.branch;
+	};
+	try {
+		await scenario.host.trpc.git.renameBranch.mutate({
+			workspaceId: workspace.id,
+			repositoryId: scenario.apiId,
+			oldName: "feature/both",
+			newName: "feature/renamed",
+		});
+		expect(apiBranch()).toBe("feature/renamed");
+
+		await scenario.host.trpc.git.checkoutBranch.mutate({
+			workspaceId: workspace.id,
+			repositoryId: scenario.apiId,
+			branch: "other",
+		});
+		expect(apiBranch()).toBe("other");
+	} finally {
+		broadcast.mockRestore();
+	}
+});
+
+test("issue content comes from the primary repository unless repositoryId names another", async () => {
+	const repos: string[] = [];
+	const scenario = await multiRepoScenario({
+		execGh: async (args) => {
+			if (args[0] !== "issue") throw new Error(`unexpected gh call: ${args}`);
+			repos.push(args[args.indexOf("--repo") + 1] ?? "");
+			return {
+				number: 3,
+				title: "Bug",
+				body: "",
+				url: "https://github.com/o/x/issues/3",
+				state: "OPEN",
+			};
+		},
+	});
+	await scenario.web.git.addRemote("origin", "https://github.com/o/web.git");
+	await scenario.api.git.addRemote("origin", "https://github.com/o/api.git");
+
+	await scenario.host.trpc.issues.getContent.query({
+		projectId: scenario.projectId,
+		issueNumber: 3,
+	});
+	await scenario.host.trpc.issues.getContent.query({
+		projectId: scenario.projectId,
+		issueNumber: 3,
+		repositoryId: scenario.apiId,
+	});
+
+	expect(repos).toEqual(["o/web", "o/api"]);
+});
+
+test("adopt on a multi-repo project points to workspaces.create", async () => {
+	const scenario = await multiRepoScenario();
+
+	await expect(
+		scenario.host.trpc.workspaceCreation.adopt.mutate({
+			projectId: scenario.projectId,
+			workspaceName: "x",
+			branch: "feature/x",
+		}),
+	).rejects.toThrow(/checkouts\[repositoryId\]\.worktreePath/);
 });

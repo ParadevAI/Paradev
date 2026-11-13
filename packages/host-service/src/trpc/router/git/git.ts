@@ -34,7 +34,11 @@ import {
 	type ResolvedCheckout,
 	resolveCheckout,
 } from "../../../workspaces/checkouts";
-import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
+import {
+	emitLocalWorkspaceUpdated,
+	getLocalWorkspace,
+	updateLocalWorkspace,
+} from "../../../workspaces/local-workspace-store";
 import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
@@ -196,6 +200,14 @@ export const MAX_DIFF_STATS_BATCH = 500;
  */
 function invalidateStatus(statusKey: string): void {
 	gitStatusStore.recordChange(statusKey, undefined);
+}
+
+function emitWorkspaceUpdated(
+	ctx: Pick<HostServiceContext, "db" | "eventBus">,
+	workspaceId: string,
+): void {
+	const row = getLocalWorkspace(ctx.db, workspaceId);
+	if (row) emitLocalWorkspaceUpdated(ctx, row);
 }
 
 // A name git could read as an option (`--upload-pack=...`) never reaches it.
@@ -697,6 +709,7 @@ export const gitRouter = router({
 					)
 					.run();
 				followSharedCheckoutBranch(ctx.db, input.workspaceId);
+				emitWorkspaceUpdated(ctx, input.workspaceId);
 			}
 			invalidateStatus(checkout.statusKey);
 			return { name: input.newName };
@@ -757,6 +770,7 @@ export const gitRouter = router({
 				);
 			} else {
 				followSharedCheckoutBranch(ctx.db, input.workspaceId);
+				emitWorkspaceUpdated(ctx, input.workspaceId);
 			}
 			invalidateStatus(checkout.statusKey);
 			return { branch: input.branch };

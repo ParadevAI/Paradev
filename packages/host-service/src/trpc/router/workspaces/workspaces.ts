@@ -446,8 +446,9 @@ async function planBranchSource(
 	branch: string,
 	baseBranch: string | undefined,
 	fetchRemoteRef?: BaseRefFetcher,
+	remote = "origin",
 ): Promise<BranchSourcePlan> {
-	const resolved = await resolveRef(git, branch);
+	const resolved = await resolveRef(git, branch, { remote });
 
 	if (
 		resolved &&
@@ -474,6 +475,7 @@ async function planBranchSource(
 		git,
 		baseBranch,
 		fetchRemoteRef,
+		remote,
 	);
 	return { branch, startPoint, usedExistingBranch: false };
 }
@@ -742,6 +744,7 @@ async function createRepositoryCheckouts(
 					args.branch,
 					args.requests[repository.id]?.baseBranch,
 					createWorkerBaseRefFetcher(ctx, repository.repoPath),
+					repository.remoteName ?? "origin",
 				);
 				checkout.branch = plan.branch;
 				checkout.createdBranch = !plan.usedExistingBranch;
@@ -924,26 +927,48 @@ async function createMultiRepoCheckoutsAndRow(
 		typedBranch ||
 		(input.name ? sanitizeBranchCandidate(input.name) : "") ||
 		`${promptBranchSlug(composerPrompt) ?? generateFriendlyBranchName()}-${(input.id ?? randomUUID()).slice(0, 8)}`;
+	const existingBranches = (
+		await Promise.all(
+			repositories.map((repository) =>
+				listBranchNames(
+					ctx,
+					repository.repoPath,
+					repository.remoteName ?? "origin",
+				),
+			),
+		)
+	).flat();
+	const typedNewBranch =
+		!!input.branch?.trim() &&
+		!existingBranches.some(
+			(name) => name.toLowerCase() === candidate.toLowerCase(),
+		);
+	// Task, PR, adopted and existing branches keep their exact names.
+	const namesNewBranch = !typedBranch || typedNewBranch;
 	const primary =
 		repositories.find((r) => r.id === project.primaryRepositoryId) ??
 		repositories[0];
 	const prefix =
-		typedBranch || input.skipBranchPrefix
-			? null
-			: await resolveProjectBranchPrefix({
+		namesNewBranch && !input.skipBranchPrefix
+			? await resolveProjectBranchPrefix({
 					ctx,
 					project,
 					getAuthorName: createOffLoopAuthorNameGetter(primary?.repoPath ?? ""),
-					existingBranches: [],
-				});
-	const branch = prefix ? `${prefix}/${candidate}` : candidate;
-	// The PR's branch is already open in a workspace: open it again.
-	const existingForPr = firstPr
-		? findExistingWorkspaceByBranch(ctx, project.id, branch)
-		: null;
-	if (existingForPr) {
+					existingBranches,
+				})
+			: undefined;
+	const branch = namesNewBranch
+		? deduplicateBranchName(
+				prefix ? `${prefix}/${candidate}` : candidate,
+				existingBranches,
+			)
+		: candidate;
+	const existingWorkspace = firstAdopted
+		? null
+		: findExistingWorkspaceByBranch(ctx, project.id, branch);
+	if (existingWorkspace) {
 		return {
-			row: existingForPr,
+			row: existingWorkspace,
 			alreadyExists: true,
 			automaticBranch: false,
 			wantAi: false,
@@ -1577,6 +1602,7 @@ export const workspacesRouter = router({
 
 			const git = await ctx.git(repoPath);
 			const fetchBaseRefOffLoop = createWorkerBaseRefFetcher(ctx, repoPath);
+			const remoteName = repository.remoteName ?? "origin";
 			const worktreeBaseDir =
 				localProject.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
 			const worktreesFolder = getProjectWorktreesFolder(ctx, localProject);
@@ -1938,8 +1964,9 @@ export const workspacesRouter = router({
 							resolvedBranch,
 							request.baseBranch,
 							fetchBaseRefOffLoop,
+							remoteName,
 						),
-						listBranchNames(ctx, repoPath),
+						listBranchNames(ctx, repoPath, remoteName),
 					]);
 					plan = planResult;
 					// plan.branch may carry an existing branch's canonical casing.
@@ -1969,8 +1996,9 @@ export const workspacesRouter = router({
 							git,
 							request.baseBranch,
 							fetchBaseRefOffLoop,
+							remoteName,
 						),
-						listBranchNames(ctx, repoPath),
+						listBranchNames(ctx, repoPath, remoteName),
 					]);
 					const prefix = await resolveProjectBranchPrefix({
 						ctx,
@@ -2338,7 +2366,11 @@ export const workspacesRouter = router({
 			const existingBranches = (
 				await Promise.all(
 					repositories.map((repository) =>
-						listBranchNames(ctx, repository.repoPath),
+						listBranchNames(
+							ctx,
+							repository.repoPath,
+							repository.remoteName ?? "origin",
+						),
 					),
 				)
 			).flat();

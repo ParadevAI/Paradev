@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { eq } from "drizzle-orm";
-import { workspaces } from "../../src/db/schema";
+import { workspaceRepositories, workspaces } from "../../src/db/schema";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import {
 	createBasicScenario,
@@ -140,5 +140,51 @@ describe("workspaceCreation.adopt integration", () => {
 			await scenario.repo.git.raw(["config", "branch.feature/base.base"])
 		).trim();
 		expect(configured).toBe("main");
+	});
+
+	test("re-adopting a worktree whose branch was renamed keeps its checkout row", async () => {
+		const scenario = await createProjectScenario({
+			hostOptions: { apiOverrides: cloudFlows.workspaceCreateOk() },
+		});
+		dispose = scenario.dispose;
+		const worktreePath = join(scenario.repo.repoPath, ".worktrees", "renamed");
+		await scenario.repo.git.raw([
+			"worktree",
+			"add",
+			"-b",
+			"feature/old",
+			worktreePath,
+		]);
+		const adopt = (branch: string) =>
+			scenario.host.trpc.workspaceCreation.adopt.mutate({
+				projectId: scenario.projectId,
+				workspaceName: "renamed",
+				branch,
+				worktreePath,
+			});
+		const { workspace } = await adopt("feature/old");
+		scenario.host.db
+			.update(workspaceRepositories)
+			.set({ headSha: "abc123", upstreamBranch: "feature/old" })
+			.where(eq(workspaceRepositories.workspaceId, workspace.id))
+			.run();
+		await scenario.repo.git.raw(["branch", "-m", "feature/old", "feature/new"]);
+
+		const readopted = await adopt("feature/new");
+
+		expect(readopted.workspace.id).toBe(workspace.id);
+		expect(
+			scenario.host.db
+				.select()
+				.from(workspaceRepositories)
+				.where(eq(workspaceRepositories.workspaceId, workspace.id))
+				.all(),
+		).toMatchObject([
+			{
+				branch: "feature/new",
+				headSha: "abc123",
+				upstreamBranch: "feature/old",
+			},
+		]);
 	});
 });

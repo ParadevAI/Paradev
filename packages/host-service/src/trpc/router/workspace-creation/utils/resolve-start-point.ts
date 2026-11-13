@@ -39,9 +39,10 @@ async function refExists(git: SimpleGit, fullRef: string): Promise<boolean> {
 export async function resolveStartPoint(
 	git: SimpleGit,
 	baseBranch: string | undefined,
+	remote = "origin",
 ): Promise<ResolvedRef> {
-	const branch = baseBranch?.trim() || (await resolveDefaultBranchName(git));
-	const remote = "origin";
+	const branch =
+		baseBranch?.trim() || (await resolveDefaultBranchName(git, remote));
 
 	const localRef = asLocalRef(branch);
 	if (await refExists(git, localRef)) {

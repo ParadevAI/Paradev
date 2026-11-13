@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { listProjectRepositories } from "../../../../projects/repositories";
 import { protectedProcedure } from "../../../index";
 import { adoptInputSchema } from "../schemas";
 import { adoptExistingWorktree } from "../shared/adopt-existing-worktree";
@@ -20,6 +21,13 @@ import type { TerminalDescriptor } from "../shared/types";
 export const adopt = protectedProcedure
 	.input(adoptInputSchema)
 	.mutation(async ({ ctx, input }) => {
+		if (listProjectRepositories(ctx.db, input.projectId).length > 1) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message:
+					"adopt_single_repo: this project has several repositories; adopt a worktree with workspaces.create checkouts[repositoryId].worktreePath",
+			});
+		}
 		const { repository } = requireProjectRepository(ctx, input.projectId);
 		const repoPath = requireRepositoryPath(repository);
 
