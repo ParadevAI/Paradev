@@ -4795,6 +4795,9 @@ msgstr "Tutup panel saat ini"
 msgid "Close the current tab"
 msgstr "Tutup tab saat ini"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Tutup tab saat perintah setup selesai tanpa error. Jika setup gagal, tab tetap terbuka agar Anda bisa melihat error-nya"
+
 msgid "Close Window"
 msgstr "Tutup Jendela"
 
@@ -4803,6 +4806,9 @@ msgstr "Tutup workspace"
 
 msgid "Close Workspace"
 msgstr "Tutup Workspace"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Tutup tab Workspace Setup saat setup berhasil"
 
 msgid "Close your laptop"
 msgstr "Tutup laptop Anda"

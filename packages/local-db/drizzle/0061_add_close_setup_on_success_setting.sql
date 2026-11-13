@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `close_setup_on_success` integer;

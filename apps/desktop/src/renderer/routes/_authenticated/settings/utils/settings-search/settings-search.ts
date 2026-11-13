@@ -82,6 +82,7 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_CHAT_TURN_SNAPSHOTS: "experimental-chat-turn-snapshots",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
+	EXPERIMENTAL_CLOSE_SETUP_ON_SUCCESS: "experimental-close-setup-on-success",
 	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
 
 	BILLING_OVERVIEW: "billing-overview",
@@ -247,6 +248,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS]: "v2",
 	// Gates both the v1 renderer launch and the v2 host-side launch.
 	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
+	[SETTING_ITEM_ID.EXPERIMENTAL_CLOSE_SETUP_ON_SUCCESS]: "v2",
 	[SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING]: "shared",
 
 	[SETTING_ITEM_ID.BILLING_OVERVIEW]: "shared",
@@ -1577,6 +1579,26 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"finish",
 			"reuse",
 			"sequential",
+			"install",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_CLOSE_SETUP_ON_SUCCESS,
+		section: "experimental",
+		title: "Close Workspace Setup tab when setup succeeds",
+		description:
+			"Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error",
+		keywords: [
+			"experimental",
+			"workspace",
+			"setup",
+			"script",
+			"terminal",
+			"tab",
+			"close",
+			"auto",
+			"success",
+			"finish",
 			"install",
 		],
 	},

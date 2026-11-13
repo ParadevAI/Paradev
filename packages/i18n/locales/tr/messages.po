@@ -4795,6 +4795,9 @@ msgstr "Geçerli bölmeyi kapat"
 msgid "Close the current tab"
 msgstr "Geçerli sekmeyi kapat"
 
+msgid "Close the tab when the setup commands finish without errors. When setup fails, the tab stays open so you can see the error"
+msgstr "Kurulum komutları hatasız bitince sekmeyi kapatır. Kurulum başarısız olursa hatayı görebilmen için sekme açık kalır"
+
 msgid "Close Window"
 msgstr "Pencereyi kapat"
 
@@ -4803,6 +4806,9 @@ msgstr "Çalışma alanını kapat"
 
 msgid "Close Workspace"
 msgstr "Çalışma alanını kapat"
+
+msgid "Close Workspace Setup tab when setup succeeds"
+msgstr "Kurulum başarılı olunca Çalışma Alanı Kurulumu sekmesini kapat"
 
 msgid "Close your laptop"
 msgstr "Dizüstünüzü kapatın"

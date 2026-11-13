@@ -41,6 +41,8 @@ export const terminalSessions = sqliteTable(
 		 * broadcast must not be the only chance to kill a session).
 		 */
 		disposeRequestedAt: integer("dispose_requested_at"),
+		/** Close this session's pane once it prints the setup-succeeded marker. */
+		closeOnSetupSuccess: integer("close_on_setup_success", { mode: "boolean" }),
 	},
 	(table) => [
 		index("terminal_sessions_origin_workspace_id_idx").on(
