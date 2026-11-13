@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b75ad752-61cd-4273-927b-56ce76231df2",
+  "id": "ddbb73bd-4900-4da2-b7dd-075a410002ba",
   "prevId": "b482bc32-9f2b-47ab-99b6-78b75a60e5a1",
   "tables": {
     "host_agent_configs": {
@@ -279,61 +279,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "kind": {
-          "name": "kind",
+        "primary_repository_id": {
+          "name": "primary_repository_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "'repository'"
-        },
-        "parent_project_id": {
-          "name": "parent_project_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "repo_path": {
-          "name": "repo_path",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "repo_provider": {
-          "name": "repo_provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "repo_owner": {
-          "name": "repo_owner",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "repo_name": {
-          "name": "repo_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "repo_url": {
-          "name": "repo_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "remote_name": {
-          "name": "remote_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "worktree_base_dir": {
@@ -366,13 +316,6 @@
         },
         "color": {
           "name": "color",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sparse_checkout_paths": {
-          "name": "sparse_checkout_paths",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -423,15 +366,7 @@
           "autoincrement": false
         }
       },
-      "indexes": {
-        "projects_repo_path_idx": {
-          "name": "projects_repo_path_idx",
-          "columns": [
-            "repo_path"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -447,8 +382,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "project_id": {
-          "name": "project_id",
+        "repository_id": {
+          "name": "repository_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -585,10 +520,10 @@
         }
       },
       "indexes": {
-        "pull_requests_project_id_idx": {
-          "name": "pull_requests_project_id_idx",
+        "pull_requests_repository_id_idx": {
+          "name": "pull_requests_repository_id_idx",
           "columns": [
-            "project_id"
+            "repository_id"
           ],
           "isUnique": false
         },
@@ -614,9 +549,133 @@
         }
       },
       "foreignKeys": {
-        "pull_requests_project_id_projects_id_fk": {
-          "name": "pull_requests_project_id_projects_id_fk",
+        "pull_requests_repository_id_repositories_id_fk": {
+          "name": "pull_requests_repository_id_repositories_id_fk",
           "tableFrom": "pull_requests",
+          "tableTo": "repositories",
+          "columnsFrom": [
+            "repository_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "repositories": {
+      "name": "repositories",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "repo_path": {
+          "name": "repo_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "owner": {
+          "name": "owner",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "repo_name": {
+          "name": "repo_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "remote_name": {
+          "name": "remote_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sparse_checkout_paths": {
+          "name": "sparse_checkout_paths",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "repositories_project_name_unique": {
+          "name": "repositories_project_name_unique",
+          "columns": [
+            "project_id",
+            "name"
+          ],
+          "isUnique": true
+        },
+        "repositories_repo_path_idx": {
+          "name": "repositories_repo_path_idx",
+          "columns": [
+            "repo_path"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "repositories_project_id_projects_id_fk": {
+          "name": "repositories_project_id_projects_id_fk",
+          "tableFrom": "repositories",
           "tableTo": "projects",
           "columnsFrom": [
             "project_id"
@@ -987,6 +1046,164 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "workspace_repositories": {
+      "name": "workspace_repositories",
+      "columns": {
+        "workspace_id": {
+          "name": "workspace_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "repository_id": {
+          "name": "repository_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "head_sha": {
+          "name": "head_sha",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "upstream_owner": {
+          "name": "upstream_owner",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "upstream_repo": {
+          "name": "upstream_repo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "upstream_branch": {
+          "name": "upstream_branch",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pull_request_id": {
+          "name": "pull_request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "suppressed_pull_request_id": {
+          "name": "suppressed_pull_request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "workspace_repositories_repository_id_idx": {
+          "name": "workspace_repositories_repository_id_idx",
+          "columns": [
+            "repository_id"
+          ],
+          "isUnique": false
+        },
+        "workspace_repositories_pull_request_id_idx": {
+          "name": "workspace_repositories_pull_request_id_idx",
+          "columns": [
+            "pull_request_id"
+          ],
+          "isUnique": false
+        },
+        "workspace_repositories_upstream_ref_idx": {
+          "name": "workspace_repositories_upstream_ref_idx",
+          "columns": [
+            "upstream_owner",
+            "upstream_repo",
+            "upstream_branch"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "workspace_repositories_workspace_id_workspaces_id_fk": {
+          "name": "workspace_repositories_workspace_id_workspaces_id_fk",
+          "tableFrom": "workspace_repositories",
+          "tableTo": "workspaces",
+          "columnsFrom": [
+            "workspace_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "workspace_repositories_repository_id_repositories_id_fk": {
+          "name": "workspace_repositories_repository_id_repositories_id_fk",
+          "tableFrom": "workspace_repositories",
+          "tableTo": "repositories",
+          "columnsFrom": [
+            "repository_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "workspace_repositories_pull_request_id_pull_requests_id_fk": {
+          "name": "workspace_repositories_pull_request_id_pull_requests_id_fk",
+          "tableFrom": "workspace_repositories",
+          "tableTo": "pull_requests",
+          "columnsFrom": [
+            "pull_request_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "workspace_repositories_suppressed_pull_request_id_pull_requests_id_fk": {
+          "name": "workspace_repositories_suppressed_pull_request_id_pull_requests_id_fk",
+          "tableFrom": "workspace_repositories",
+          "tableTo": "pull_requests",
+          "columnsFrom": [
+            "suppressed_pull_request_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "workspace_repositories_workspace_id_repository_id_pk": {
+          "columns": [
+            "workspace_id",
+            "repository_id"
+          ],
+          "name": "workspace_repositories_workspace_id_repository_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "workspace_tags": {
       "name": "workspace_tags",
       "columns": {
@@ -1081,60 +1298,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "parent_workspace_id": {
-          "name": "parent_workspace_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "branch": {
           "name": "branch",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "head_sha": {
-          "name": "head_sha",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "upstream_owner": {
-          "name": "upstream_owner",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "upstream_repo": {
-          "name": "upstream_repo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "upstream_branch": {
-          "name": "upstream_branch",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "pull_request_id": {
-          "name": "pull_request_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "suppressed_pull_request_id": {
-          "name": "suppressed_pull_request_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "name": {
@@ -1218,22 +1386,6 @@
             "archived_at"
           ],
           "isUnique": false
-        },
-        "workspaces_upstream_ref_idx": {
-          "name": "workspaces_upstream_ref_idx",
-          "columns": [
-            "upstream_owner",
-            "upstream_repo",
-            "upstream_branch"
-          ],
-          "isUnique": false
-        },
-        "workspaces_pull_request_id_idx": {
-          "name": "workspaces_pull_request_id_idx",
-          "columns": [
-            "pull_request_id"
-          ],
-          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -1248,32 +1400,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "workspaces_pull_request_id_pull_requests_id_fk": {
-          "name": "workspaces_pull_request_id_pull_requests_id_fk",
-          "tableFrom": "workspaces",
-          "tableTo": "pull_requests",
-          "columnsFrom": [
-            "pull_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "workspaces_suppressed_pull_request_id_pull_requests_id_fk": {
-          "name": "workspaces_suppressed_pull_request_id_pull_requests_id_fk",
-          "tableFrom": "workspaces",
-          "tableTo": "pull_requests",
-          "columnsFrom": [
-            "suppressed_pull_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

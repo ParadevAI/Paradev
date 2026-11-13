@@ -118,7 +118,7 @@ describe("migration 0019 upgrade", () => {
 
 		const sqlite = new BunDatabase(dbPath, { create: false, readwrite: true });
 		sqlite.exec("PRAGMA foreign_keys = ON");
-		// 0019 severs the terminal links; 0040 cannot drop `projects` at all.
+		// 0019 severs the terminal links; 0039 cannot drop `projects` at all.
 		expect(() =>
 			migrate(drizzle(sqlite, { schema }), {
 				migrationsFolder: MIGRATIONS_DIR,
