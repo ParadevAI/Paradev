@@ -23,3 +23,14 @@ test("stops polling once aborted", async () => {
 	).rejects.toBeDefined();
 	expect(poll).toHaveBeenCalledTimes(1);
 });
+
+test("an approval that arrives after the wait was aborted does not count", async () => {
+	const controller = new AbortController();
+	const poll = mock(async () => {
+		controller.abort();
+		return { status: "connected" };
+	});
+	await expect(
+		waitForApproval({ poll, intervalMs: 0, signal: controller.signal }),
+	).rejects.toBeDefined();
+});

@@ -52,6 +52,7 @@ import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
 import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
 import { railMessages } from "../../utils/railMessages";
+import { unrunPrompt } from "../../utils/unrunPrompt";
 import {
 	type AgentChoice,
 	type AgentSwitcher,
@@ -646,7 +647,7 @@ export function SessionView({
 			manualSignIn,
 			openAgentSettings,
 			agentSignIn,
-			lastPrompt: history.at(-1),
+			lastPrompt: unrunPrompt(timeline),
 			onRestartAndContinue,
 			onStartNewChat,
 			openModelPicker,

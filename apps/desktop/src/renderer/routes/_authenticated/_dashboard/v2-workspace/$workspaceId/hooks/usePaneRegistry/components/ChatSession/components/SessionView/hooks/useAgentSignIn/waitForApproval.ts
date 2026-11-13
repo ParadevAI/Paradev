@@ -21,6 +21,8 @@ export async function waitForApproval({
 			signal.addEventListener("abort", onAbort, { once: true });
 		});
 		signal.throwIfAborted();
-		if ((await poll()).status === "connected") return;
+		const { status } = await poll();
+		signal.throwIfAborted();
+		if (status === "connected") return;
 	}
 }

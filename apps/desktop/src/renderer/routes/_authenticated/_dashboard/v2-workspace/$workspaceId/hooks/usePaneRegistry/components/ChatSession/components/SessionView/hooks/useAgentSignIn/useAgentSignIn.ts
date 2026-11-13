@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { TRPCClientError } from "@trpc/client";
 import { useCallback, useMemo } from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { authClient } from "renderer/lib/auth-client";
@@ -58,11 +59,18 @@ export function useAgentSignIn(presetId: string | undefined): {
 			return { label: agent.label, mode: "command", command: agent.login };
 		}
 		if (!ownBox) return undefined;
-		// An API from before applySignIns: the next wake hands the sign-in over.
 		const handOver = () =>
 			applySignIns({ id: boxId }).then(
 				() => undefined,
-				() => undefined,
+				(error: unknown) => {
+					// An API from before applySignIns: the next wake hands the sign-in over.
+					if (
+						error instanceof TRPCClientError &&
+						/No procedure/.test(error.message)
+					)
+						return;
+					throw error;
+				},
 			);
 		const saveApiKey = async (value: string) => {
 			await setCredential({ agent: presetId, kind: "api_key", value });
