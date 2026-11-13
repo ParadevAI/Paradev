@@ -19,6 +19,7 @@ import { LuArchive, LuContainer } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "../ArchiveEnvironmentDialog";
 import { EnvironmentPropertyRow } from "../EnvironmentPropertyRow";
+import { EnvironmentMachineSize } from "./components/EnvironmentMachineSize";
 import { EnvironmentProjectLinks } from "./components/EnvironmentProjectLinks";
 import { EnvironmentVariables } from "./components/EnvironmentVariables";
 
@@ -41,9 +42,6 @@ export function EnvironmentView({
 	const environment = cloudTrpc.environment.get.useQuery({
 		id: environmentId,
 	});
-	const secrets = cloudTrpc.environment.secrets.list.useQuery({
-		environmentId,
-	});
 	const [confirmingArchive, setConfirmingArchive] = useState(false);
 
 	const update = cloudTrpc.environment.update.useMutation({
@@ -54,7 +52,10 @@ export function EnvironmentView({
 	});
 	const archive = cloudTrpc.environment.archive.useMutation({
 		onSuccess: async () => {
-			await utils.environment.list.invalidate();
+			await Promise.all([
+				utils.environment.list.invalidate(),
+				utils.billing.environmentUsage.invalidate(),
+			]);
 			toast.success(t({ message: "Environment archived" }));
 			onArchived?.();
 		},
@@ -144,6 +145,20 @@ export function EnvironmentView({
 					</span>
 				</EnvironmentPropertyRow>
 				<EnvironmentPropertyRow
+					htmlFor="environment-view-machine-size"
+					label={<Trans>Machine size</Trans>}
+				>
+					<EnvironmentMachineSize
+						className={ROW_CONTROL}
+						disabled={update.isPending}
+						id="environment-view-machine-size"
+						machineSize={row.machineSize}
+						onChange={(machineSize) =>
+							update.mutate({ id: row.id, machineSize })
+						}
+					/>
+				</EnvironmentPropertyRow>
+				<EnvironmentPropertyRow
 					htmlFor="environment-view-repositories"
 					label={<Trans>Repositories</Trans>}
 				>
@@ -197,10 +212,7 @@ export function EnvironmentView({
 				</EnvironmentPropertyRow>
 			</div>
 
-			<EnvironmentVariables
-				isLoading={secrets.isLoading}
-				variables={secrets.data ?? []}
-			/>
+			<EnvironmentVariables environmentId={row.id} />
 
 			<div className="mt-auto pt-2">
 				<Button

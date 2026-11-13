@@ -984,6 +984,9 @@ msgstr "{count} máy chủ đang chạy dịch vụ máy chủ cũ hơn ứng d�
 msgid "{count} selected"
 msgstr "Đã chọn {count}"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "Không thể lưu {count} biến. Xem các dòng được đánh dấu"
+
 msgid "{count}/day"
 msgstr "{count}/ngày"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, other {# dòng}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (thiết bị này)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (không có trong gói của bạn)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "thêm một agent"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "Thêm một environment trong Settings trước khi tạo workspace cloud"
 
+msgid "Add Another"
+msgstr "Thêm biến khác"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Kết nối tài khoản khác, hoặc ngắt tài khoản bạn không còn dùng."
 
@@ -2135,6 +2144,9 @@ msgstr "Thêm mô tả"
 
 msgid "Add description..."
 msgstr "Thêm mô tả..."
+
+msgid "Add Environment Variable"
+msgstr "Thêm biến môi trường"
 
 msgid "Add extension"
 msgstr "Thêm tiện ích"
@@ -2172,6 +2184,9 @@ msgstr "Thêm nữa…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Thêm một agent từ menu ở thanh bên để bắt đầu."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "Thêm một hoặc nhiều biến môi trường. Bạn cũng có thể kéo thả tệp .env."
 
 msgid "Add people"
 msgstr "Thêm người"
@@ -2284,8 +2299,17 @@ msgstr "Đã thêm {added}"
 msgid "Added {added} files to {where}"
 msgstr "Đã thêm {added} tệp vào {where}"
 
+msgid "Added {addedOn}"
+msgstr "Đã thêm {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "Đã thêm {bought} GB-giờ."
+
+msgid "Added {count} environment variables"
+msgstr "Đã thêm {count} biến môi trường"
+
+msgid "Added {key}"
+msgstr "Đã thêm {key}"
 
 msgid "Added 1 file to {where}"
 msgstr "Đã thêm 1 tệp vào {where}"
@@ -2780,6 +2804,9 @@ msgstr "Luôn biết agent nào cần bạn, với thông báo dẫn thẳng t�
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agent hoàn thành trọn vẹn các thay đổi trên nhiều tệp."
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "Một agent sẽ thiết lập environment này trong một workspace trên cloud (khoảng 20 phút trở lên): cài đặt dependency, viết cấu hình thiết lập và hỏi các secret cần thiết. Bạn có thể dừng bất cứ lúc nào, hoặc tiếp quản trong workspace để tự hoàn tất thiết lập."
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Agent viết nguyên hàm và nguyên tệp trong khi con người theo dõi từng bước và duyệt từng lệnh. Một agent, một người. Nhanh hơn, nhưng vẫn tuần tự."
@@ -4393,6 +4420,9 @@ msgstr "Checkpoint · trước khi refactor tooltip"
 msgid "Checkpoint saved {0}"
 msgstr "Đã lưu checkpoint {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Đã lưu checkpoint vào {name}"
+
 msgid "Checks"
 msgstr "Check"
 
@@ -4636,6 +4666,9 @@ msgstr "Nhấp vào đây nếu không được chuyển hướng"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Nhấp vào nút “↑ update” để xem xác nhận trước khi cập nhật"
+
+msgid "Click to copy"
+msgstr "Nhấp để sao chép"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Nhấp để sao chép ID phiên (resume bằng `claude --resume <id>`)."
@@ -5833,6 +5866,9 @@ msgstr "Không thể sao chép liên kết"
 
 msgid "Could not create cloud workspace"
 msgstr "Không thể tạo workspace trên cloud"
+
+msgid "Could not create environment"
+msgstr "Không thể tạo môi trường"
 
 msgid "Could not create project"
 msgstr "Không thể tạo dự án"
@@ -7425,6 +7461,9 @@ msgstr "Bỏ thay đổi?"
 msgid "Discard recording"
 msgstr "Bỏ bản ghi"
 
+msgid "Discard unsaved changes?"
+msgstr "Bỏ các thay đổi chưa lưu?"
+
 msgid "Discarded"
 msgstr "Đã bỏ"
 
@@ -7830,6 +7869,9 @@ msgstr "Đã đạt {name} ×{tier}"
 msgid "Edit"
 msgstr "Sửa"
 
+msgid "Edit {selectedName}"
+msgstr "Chỉnh sửa {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "Sửa tên kênh"
 
@@ -7842,8 +7884,8 @@ msgstr "Sửa mô tả"
 msgid "Edit Description"
 msgstr "Sửa mô tả"
 
-msgid "Edit environment"
-msgstr "Chỉnh sửa environment"
+msgid "Edit Environment Variable"
+msgstr "Sửa biến môi trường"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Sửa tệp không cần hỏi; hỏi trước khi chạy lệnh"
@@ -8034,6 +8076,9 @@ msgstr "Nhập một số nguyên"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Nhập số nguyên từ {minHours} đến {maxHours} GB-giờ."
 
+msgid "Enter new value"
+msgstr "Nhập giá trị mới"
+
 msgid "Enter this code on the page we opened:"
 msgstr "Nhập mã này trên trang chúng tôi đã mở:"
 
@@ -8066,6 +8111,9 @@ msgstr "Thiết lập môi trường, test chập chờn và việc đấu nối
 
 msgid "Environment Variables"
 msgstr "Biến môi trường"
+
+msgid "Environment's size"
+msgstr "Kích thước môi trường"
 
 msgid "Environments"
 msgstr "Môi trường"
@@ -8498,6 +8546,9 @@ msgstr "Không thể xóa tài khoản"
 msgid "Failed to delete automation"
 msgstr "Không thể xóa tự động hóa"
 
+msgid "Failed to delete environment variable"
+msgstr "Không thể xóa biến môi trường"
+
 msgid "Failed to delete host"
 msgstr "Không xóa được máy chủ"
 
@@ -8616,6 +8667,9 @@ msgstr "Đăng trả lời thất bại"
 msgid "Failed to push branch"
 msgstr "Không thể push nhánh"
 
+msgid "Failed to read file."
+msgstr "Không thể đọc tệp."
+
 msgid "Failed to record page version"
 msgstr "Không thể ghi nhận phiên bản trang"
 
@@ -8709,6 +8763,9 @@ msgstr "Không thể chạy lệnh của workspace"
 msgid "Failed to save"
 msgstr "Không thể lưu"
 
+msgid "Failed to save environment variables"
+msgstr "Không thể lưu biến môi trường"
+
 msgid "Failed to save installation. Please try again."
 msgstr "Không thể lưu bản cài đặt. Vui lòng thử lại."
 
@@ -8774,6 +8831,9 @@ msgstr "Không thể cập nhật ảnh đại diện"
 
 msgid "Failed to update branch prefix"
 msgstr "Không thể cập nhật tiền tố nhánh"
+
+msgid "Failed to update environment variable"
+msgstr "Không thể cập nhật biến môi trường"
 
 msgid "Failed to update hooks"
 msgstr "Không thể cập nhật hook"
@@ -8918,6 +8978,9 @@ msgstr "Chế độ mở tệp"
 
 msgid "File opens when the workspace wakes up"
 msgstr "Tệp sẽ mở khi workspace thức dậy"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "Tệp quá lớn. Kích thước tối đa là 256 KB."
 
 msgid "File viewer"
 msgstr "Trình xem tệp"
@@ -10219,6 +10282,9 @@ msgstr "Mạo danh người khác"
 msgid "Import"
 msgstr "Nhập"
 
+msgid "Import .env"
+msgstr "Nhập .env"
+
 msgid "import a folder"
 msgstr "nhập một thư mục"
 
@@ -10960,6 +11026,9 @@ msgstr "Đã giữ tệp mới, nó đã thay đổi sau khi được tạo"
 msgid "Kept the new folder because it is no longer empty"
 msgstr "Đã giữ thư mục mới, nó không còn rỗng"
 
+msgid "Key"
+msgstr "Khóa"
+
 msgid "Key dates"
 msgstr "Các mốc quan trọng"
 
@@ -11104,6 +11173,9 @@ msgstr "Lần cuối trực tuyến: {lastSeen}"
 
 msgid "Last updated"
 msgstr "Cập nhật lần cuối"
+
+msgid "Last Updated"
+msgstr "Cập nhật gần nhất"
 
 msgid "Last updated on {date}"
 msgstr "Cập nhật lần cuối vào {date}"
@@ -11695,9 +11767,6 @@ msgstr "Tài nguyên máy"
 msgid "Machine size"
 msgstr "Kích thước máy"
 
-msgid "Machine size: {label}"
-msgstr "Kích thước máy: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Workspace trên cloud không phụ thuộc máy, dựng trong vài giây và chia sẻ được với đồng đội."
 
@@ -11754,6 +11823,9 @@ msgstr "Quản lý tài khoản…"
 
 msgid "Manage billing"
 msgstr "Quản lý thanh toán"
+
+msgid "Manage environment"
+msgstr "Quản lý environment"
 
 msgid "Manage environments"
 msgstr "Quản lý environment"
@@ -12382,6 +12454,10 @@ msgstr "Thợ máy bí ẩn"
 msgid "Name"
 msgstr "Tên"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "Tên"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Tên và một slug thân thiện với URL. Cả hai đều đổi được sau."
 
@@ -12732,6 +12808,9 @@ msgstr "Không có workspace đang hoạt động"
 msgid "No agent"
 msgstr "Không có agent"
 
+msgid "No agent is available to set up the environment"
+msgstr "Không có agent nào để thiết lập environment"
+
 msgid "No agent is configured on this host"
 msgstr "Không có tác nhân nào được cấu hình trên máy chủ này"
 
@@ -12879,6 +12958,9 @@ msgstr "Chưa có lượt tải xuống nào"
 
 msgid "No emoji found"
 msgstr "Không tìm thấy emoji"
+
+msgid "No environment variables yet"
+msgstr "Chưa có biến môi trường nào"
 
 msgid "No environments available"
 msgstr "Không có environment nào"
@@ -13035,6 +13117,9 @@ msgstr "Không có pull request phù hợp"
 
 msgid "No matching tasks"
 msgstr "Không có tác vụ phù hợp"
+
+msgid "No matching variables"
+msgstr "Không có biến phù hợp"
 
 msgid "No MCP servers found"
 msgstr "Không tìm thấy server MCP"
@@ -13343,8 +13428,8 @@ msgstr "Không tìm thấy dự án v1 trên thiết bị này."
 msgid "No v1 terminal scripts found."
 msgstr "Không tìm thấy tập lệnh terminal v1."
 
-msgid "No variables set yet."
-msgstr "Chưa đặt biến nào."
+msgid "No valid environment variables found in file"
+msgstr "Không tìm thấy biến môi trường hợp lệ trong tệp"
 
 msgid "No versions yet"
 msgstr "Chưa có phiên bản nào"
@@ -13740,6 +13825,9 @@ msgstr "Một plugin. Mọi agent lập trình."
 
 msgid "One step left"
 msgstr "Còn một bước nữa"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "Không thể lưu một biến. Xem dòng được đánh dấu"
 
 msgid "online"
 msgstr "trực tuyến"
@@ -14405,6 +14493,9 @@ msgstr "Không bắt buộc. Giúp chúng tôi biết kênh nào hiệu quả."
 msgid "Options"
 msgstr "Tùy chọn"
 
+msgid "or paste .env contents in Key input"
+msgstr "hoặc dán nội dung .env vào ô Khóa"
+
 msgid "Orange"
 msgstr "Cam"
 
@@ -14434,6 +14525,9 @@ msgstr "Tổ chức {id}"
 
 msgid "Organization created successfully!"
 msgstr "Đã tạo tổ chức thành công!"
+
+msgid "Organization default ({defaultName})"
+msgstr "Mặc định của tổ chức ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Đã xóa tổ chức"
@@ -15101,8 +15195,8 @@ msgstr "Chọn thư mục dự án mới trên {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Chọn thư mục worktree của dự án trên {hostName}."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "Chọn các repository mà nó lấy về. Một agent trên máy này sẽ tìm ra cần cài gì và chạy nó trên đám mây."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "Chọn các repository cần checkout. Một agent trong workspace trên cloud sẽ tìm ra những gì cần cài và giúp mọi thứ chạy được."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Chọn thư mục worktree trên {hostName}."
@@ -15205,6 +15299,9 @@ msgstr "Vui lòng chọn một tổ chức"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "Vui lòng thử lại hoặc khởi động lại Paradev trên thiết bị đó."
+
+msgid "Please upload a valid .env file."
+msgstr "Vui lòng tải lên tệp .env hợp lệ."
 
 msgid "Plugin"
 msgstr "Plugin"
@@ -17363,6 +17460,9 @@ msgstr "Lưu"
 msgid "Save & create workspace"
 msgstr "Lưu & tạo workspace"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Lưu checkpoint vào {name}?"
+
 msgid "Save All"
 msgstr "Lưu tất cả"
 
@@ -17377,6 +17477,9 @@ msgstr "Lưu thành chế độ xem"
 
 msgid "Save Changes"
 msgstr "Lưu thay đổi"
+
+msgid "Save checkpoint"
+msgstr "Lưu checkpoint"
 
 msgid "Save edits"
 msgstr "Lưu chỉnh sửa"
@@ -17418,8 +17521,20 @@ msgstr "Đã lưu"
 msgid "Saved \"{0}\" as an environment"
 msgstr "Đã lưu \"{0}\" thành một environment"
 
+msgid "Saved {name}"
+msgstr "Đã lưu {name}"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "Đã lưu {name}, nhưng không thể khởi động workspace thiết lập: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "Đã lưu vào Downloads"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Lưu workspace này ở trạng thái hiện tại, cùng mọi thứ đã cài trong đó. Các workspace mới từ {name} sẽ bắt đầu từ checkpoint này. Workspace sẽ dừng một lúc trong khi lưu."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Đang lưu checkpoint vào {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Đang lưu làm môi trường..."
@@ -17855,9 +17970,6 @@ msgstr "Chọn một agent"
 msgid "Select an editor from the dropdown"
 msgstr "Chọn một editor từ danh sách thả xuống"
 
-msgid "Select an environment"
-msgstr "Chọn một môi trường"
-
 msgid "Select an organization"
 msgstr "Chọn một tổ chức"
 
@@ -18038,6 +18150,12 @@ msgstr "Đang gửi…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Gửi {0} ký tự ngữ cảnh terminal (khoảng {1} token) tới {2}."
 
+msgid "Sensitive"
+msgstr "Nhạy cảm"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "Giá trị nhạy cảm được mã hóa và không thể hiển thị sau khi lưu."
+
 msgid "Sent"
 msgstr "Đã gửi"
 
@@ -18113,9 +18231,6 @@ msgstr "Phiên"
 msgid "Sessions · top {0} by cost"
 msgstr "Phiên · {0} phiên tốn nhiều nhất"
 
-msgid "Set"
-msgstr "Đã đặt"
-
 msgid "Set a notification schedule"
 msgstr "Đặt lịch thông báo"
 
@@ -18157,6 +18272,9 @@ msgstr "Thiết lập host qua SSH"
 
 msgid "Set up an automation"
 msgstr "Thiết lập tự động hóa"
+
+msgid "Set up Environment"
+msgstr "Thiết lập môi trường"
 
 msgid "Set up once"
 msgstr "Thiết lập một lần"
@@ -18724,9 +18842,6 @@ msgstr "Sáu mức tự chủ của nhà máy"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Sáu mức tự chủ của nhà máy, các cổng giữa chúng, và dự báo của chúng tôi về việc 2026 đưa ta đi được bao xa. Viết ra bây giờ để sau này bạn chấm điểm chúng tôi."
 
-msgid "size"
-msgstr "Kích thước"
-
 msgid "Size"
 msgstr "Kích thước"
 
@@ -18750,6 +18865,9 @@ msgstr "Màu da"
 
 msgid "Skip"
 msgstr "Bỏ qua"
+
+msgid "Skip & save"
+msgstr "Bỏ qua và lưu"
 
 msgid "Skip All"
 msgstr "Bỏ qua tất cả"
@@ -19150,6 +19268,9 @@ msgstr "Bắt đầu trò chuyện mới"
 
 msgid "Start a session"
 msgstr "Bắt đầu một phiên"
+
+msgid "Start agent"
+msgstr "Bắt đầu agent"
 
 msgid "Start agents on events or a schedule"
 msgstr "Khởi chạy agent theo sự kiện hoặc theo lịch"
@@ -21353,6 +21474,10 @@ msgstr "Hai tay"
 msgid "Type"
 msgstr "Kiểu"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "Loại"
+
 msgid "Type @linear in any prompt."
 msgstr "Gõ @linear trong bất kỳ prompt nào."
 
@@ -21726,6 +21851,9 @@ msgstr "Hãy cập nhật dịch vụ host trên cả hai máy tính rồi thử
 msgid "Update the host service on this device and try again."
 msgstr "Hãy cập nhật dịch vụ host trên thiết bị này rồi thử lại."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "Cập nhật giá trị cho <0>{key}</0>"
+
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
 
@@ -21741,6 +21869,9 @@ msgstr "Đã cập nhật {0}"
 
 msgid "Updated {date}"
 msgstr "Cập nhật {date}"
+
+msgid "Updated {key}"
+msgstr "Đã cập nhật {key}"
 
 msgid "Updated {updatedRelative}"
 msgstr "Cập nhật {updatedRelative}"
@@ -21965,6 +22096,9 @@ msgstr "user@host, ssh://user@host:2222 hoặc một bí danh trong cấu hình 
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId không khớp với dự án của workspace"
+
+msgid "Value"
+msgstr "Giá trị"
 
 msgid "Variables"
 msgstr "Biến"
@@ -22964,6 +23098,9 @@ msgstr "Bạn không có quyền truy cập terminal này."
 
 msgid "You don't have permission to remove this member"
 msgstr "Bạn không có quyền gỡ thành viên này"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "Bạn có biến môi trường chưa lưu. Bạn có chắc muốn đóng?"
 
 msgid "You install and connect once per account."
 msgstr "Bạn cài đặt và kết nối một lần cho mỗi tài khoản."

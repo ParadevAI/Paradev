@@ -1,1 +1,0 @@
-export { setupPrompt } from "./setupPrompt";

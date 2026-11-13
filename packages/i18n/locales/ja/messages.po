@@ -984,6 +984,9 @@ msgstr "{count}台のホストがこのアプリより古いホストサービ�
 msgid "{count} selected"
 msgstr "{count}件を選択中"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "{count} 個の変数を保存できません。強調表示された行を確認してください"
+
 msgid "{count}/day"
 msgstr "{count}/日"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, other {# 行}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（このデバイス）"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize}（ご利用のプランにはありません）"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "エージェントを追加する"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "クラウドワークスペースを作成する前に、設定で環境を追加してください"
 
+msgid "Add Another"
+msgstr "さらに追加"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "別のアカウントを接続するか、使わなくなったものを解除します。"
 
@@ -2135,6 +2144,9 @@ msgstr "説明を追加"
 
 msgid "Add description..."
 msgstr "説明を追加..."
+
+msgid "Add Environment Variable"
+msgstr "環境変数を追加"
 
 msgid "Add extension"
 msgstr "拡張機能を追加"
@@ -2172,6 +2184,9 @@ msgstr "さらに追加…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "サイドバーのメニューから追加して始めましょう。"
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "1 つ以上の環境変数を追加します。.env ファイルをドラッグ＆ドロップすることもできます。"
 
 msgid "Add people"
 msgstr "ユーザーを追加"
@@ -2284,8 +2299,17 @@ msgstr "{added} を追加しました"
 msgid "Added {added} files to {where}"
 msgstr "{added}件のファイルを{where}に追加しました"
 
+msgid "Added {addedOn}"
+msgstr "{addedOn} に追加"
+
 msgid "Added {bought} GB-hours."
 msgstr "{bought} GB 時間を追加しました。"
+
+msgid "Added {count} environment variables"
+msgstr "{count} 個の環境変数を追加しました"
+
+msgid "Added {key}"
+msgstr "{key} を追加しました"
 
 msgid "Added 1 file to {where}"
 msgstr "1件のファイルを{where}に追加しました"
@@ -2780,6 +2804,9 @@ msgstr "どのエージェントがあなたを必要としているかが常に
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "エージェントが複数ファイルにまたがる変更を最後までやり切る。"
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "エージェントがクラウドワークスペースでこの環境をセットアップします（20 分以上かかります）。依存関係のインストールやセットアップ設定の作成を行い、必要なシークレットを尋ねます。いつでも中断したり、ワークスペースで引き継いで自分でセットアップを完了したりできます。"
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "エージェントが関数やファイルをまるごと書き、人間は各ステップを見守りコマンドを1つずつ承認します。エージェント1体に人間1人。速くはなりますが、依然として直列です。"
@@ -4393,6 +4420,9 @@ msgstr "チェックポイント · tooltipリファクタリング前"
 msgid "Checkpoint saved {0}"
 msgstr "チェックポイント保存 {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "{name} にチェックポイントを保存しました"
+
 msgid "Checks"
 msgstr "チェック"
 
@@ -4636,6 +4666,9 @@ msgstr "リダイレクトされない場合はこちらをクリック"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "「↑ update」ボタンをクリックすると更新前の確認が表示されます"
+
+msgid "Click to copy"
+msgstr "クリックしてコピー"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "クリックでセッションIDをコピーします(`claude --resume <id>`で再開)。"
@@ -5833,6 +5866,9 @@ msgstr "リンクをコピーできませんでした"
 
 msgid "Could not create cloud workspace"
 msgstr "クラウドワークスペースを作成できませんでした"
+
+msgid "Could not create environment"
+msgstr "環境を作成できませんでした"
 
 msgid "Could not create project"
 msgstr "プロジェクトを作成できませんでした"
@@ -7425,6 +7461,9 @@ msgstr "変更を破棄しますか?"
 msgid "Discard recording"
 msgstr "録音を破棄"
 
+msgid "Discard unsaved changes?"
+msgstr "保存していない変更を破棄しますか？"
+
 msgid "Discarded"
 msgstr "破棄しました"
 
@@ -7830,6 +7869,9 @@ msgstr "「{name}」×{tier} を獲得"
 msgid "Edit"
 msgstr "編集"
 
+msgid "Edit {selectedName}"
+msgstr "{selectedName} を編集"
+
 msgid "Edit Channel Name"
 msgstr "チャンネル名を編集"
 
@@ -7842,8 +7884,8 @@ msgstr "説明を編集"
 msgid "Edit Description"
 msgstr "説明を編集"
 
-msgid "Edit environment"
-msgstr "環境を編集"
+msgid "Edit Environment Variable"
+msgstr "環境変数を編集"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "ファイルは確認なしで編集し、コマンドは事前に確認"
@@ -8034,6 +8076,9 @@ msgstr "整数を入力"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "{minHours} から {maxHours} GB 時間までの整数を入力してください。"
 
+msgid "Enter new value"
+msgstr "新しい値を入力"
+
 msgid "Enter this code on the page we opened:"
 msgstr "開いたページでこのコードを入力してください："
 
@@ -8066,6 +8111,9 @@ msgstr "環境構築、不安定なテスト、認証情報の受け渡し。202
 
 msgid "Environment Variables"
 msgstr "環境変数"
+
+msgid "Environment's size"
+msgstr "環境のサイズ"
 
 msgid "Environments"
 msgstr "環境"
@@ -8498,6 +8546,9 @@ msgstr "アカウントの削除に失敗しました"
 msgid "Failed to delete automation"
 msgstr "オートメーションを削除できませんでした"
 
+msgid "Failed to delete environment variable"
+msgstr "環境変数を削除できませんでした"
+
 msgid "Failed to delete host"
 msgstr "ホストを削除できませんでした"
 
@@ -8616,6 +8667,9 @@ msgstr "返信の投稿に失敗しました"
 msgid "Failed to push branch"
 msgstr "ブランチをプッシュできませんでした"
 
+msgid "Failed to read file."
+msgstr "ファイルを読み込めませんでした。"
+
 msgid "Failed to record page version"
 msgstr "ページバージョンの記録に失敗しました"
 
@@ -8709,6 +8763,9 @@ msgstr "ワークスペースコマンドの実行に失敗しました"
 msgid "Failed to save"
 msgstr "保存に失敗しました"
 
+msgid "Failed to save environment variables"
+msgstr "環境変数を保存できませんでした"
+
 msgid "Failed to save installation. Please try again."
 msgstr "インストール情報を保存できませんでした。もう一度お試しください。"
 
@@ -8774,6 +8831,9 @@ msgstr "アバターの更新に失敗しました"
 
 msgid "Failed to update branch prefix"
 msgstr "ブランチプレフィックスの更新に失敗しました"
+
+msgid "Failed to update environment variable"
+msgstr "環境変数を更新できませんでした"
 
 msgid "Failed to update hooks"
 msgstr "フックの更新に失敗しました"
@@ -8918,6 +8978,9 @@ msgstr "ファイルの開き方"
 
 msgid "File opens when the workspace wakes up"
 msgstr "ワークスペースが起動するとファイルが開きます"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "ファイルが大きすぎます。最大 256 KB です。"
 
 msgid "File viewer"
 msgstr "ファイルビューア"
@@ -10219,6 +10282,9 @@ msgstr "他人へのなりすまし"
 msgid "Import"
 msgstr "インポート"
 
+msgid "Import .env"
+msgstr ".env をインポート"
+
 msgid "import a folder"
 msgstr "フォルダをインポートする"
 
@@ -10960,6 +11026,9 @@ msgstr "新しいファイルを保持しました、作成後に変更されて
 msgid "Kept the new folder because it is no longer empty"
 msgstr "新しいフォルダを保持しました、空ではなくなっています"
 
+msgid "Key"
+msgstr "キー"
+
 msgid "Key dates"
 msgstr "主な日程"
 
@@ -11103,6 +11172,9 @@ msgid "Last seen {lastSeen}"
 msgstr "最終確認: {lastSeen}"
 
 msgid "Last updated"
+msgstr "最終更新"
+
+msgid "Last Updated"
 msgstr "最終更新"
 
 msgid "Last updated on {date}"
@@ -11695,9 +11767,6 @@ msgstr "マシンリソース"
 msgid "Machine size"
 msgstr "マシンサイズ"
 
-msgid "Machine size: {label}"
-msgstr "マシンサイズ: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "マシンに縛られないクラウドワークスペース。数秒で立ち上がり、チームメイトと共有できます。"
 
@@ -11754,6 +11823,9 @@ msgstr "アカウントを管理…"
 
 msgid "Manage billing"
 msgstr "請求を管理"
+
+msgid "Manage environment"
+msgstr "環境を管理"
 
 msgid "Manage environments"
 msgstr "環境を管理"
@@ -12382,6 +12454,10 @@ msgstr "謎の機械工"
 msgid "Name"
 msgstr "名前"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "名前"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "名前とURLフレンドリーなスラッグ。どちらも後で変更できます。"
 
@@ -12732,6 +12808,9 @@ msgstr "アクティブなワークスペースはありません"
 msgid "No agent"
 msgstr "エージェントなし"
 
+msgid "No agent is available to set up the environment"
+msgstr "環境をセットアップできるエージェントがありません"
+
 msgid "No agent is configured on this host"
 msgstr "このホストにはエージェントが設定されていません"
 
@@ -12879,6 +12958,9 @@ msgstr "ダウンロードはまだありません"
 
 msgid "No emoji found"
 msgstr "絵文字が見つかりません"
+
+msgid "No environment variables yet"
+msgstr "環境変数はまだありません"
 
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
@@ -13035,6 +13117,9 @@ msgstr "一致するプルリクエストはありません"
 
 msgid "No matching tasks"
 msgstr "一致するタスクはありません"
+
+msgid "No matching variables"
+msgstr "一致する変数はありません"
 
 msgid "No MCP servers found"
 msgstr "MCPサーバーが見つかりません"
@@ -13343,8 +13428,8 @@ msgstr "このデバイスにv1プロジェクトが見つかりません。"
 msgid "No v1 terminal scripts found."
 msgstr "v1ターミナルスクリプトが見つかりません。"
 
-msgid "No variables set yet."
-msgstr "変数はまだ設定されていません。"
+msgid "No valid environment variables found in file"
+msgstr "ファイルに有効な環境変数が見つかりませんでした"
 
 msgid "No versions yet"
 msgstr "バージョンはまだありません"
@@ -13740,6 +13825,9 @@ msgstr "ひとつのプラグインを、すべてのコーディングエージ
 
 msgid "One step left"
 msgstr "あと1ステップ"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "1 つの変数を保存できません。強調表示された行を確認してください"
 
 msgid "online"
 msgstr "オンライン"
@@ -14405,6 +14493,9 @@ msgstr "任意。効果的な施策を知るのに役立ちます。"
 msgid "Options"
 msgstr "オプション"
 
+msgid "or paste .env contents in Key input"
+msgstr "または .env の内容をキー欄に貼り付け"
+
 msgid "Orange"
 msgstr "オレンジ"
 
@@ -14434,6 +14525,9 @@ msgstr "組織 {id}"
 
 msgid "Organization created successfully!"
 msgstr "組織を作成しました!"
+
+msgid "Organization default ({defaultName})"
+msgstr "組織のデフォルト（{defaultName}）"
 
 msgid "Organization deleted"
 msgstr "組織を削除しました"
@@ -15101,8 +15195,8 @@ msgstr "{hostName}の新しいプロジェクトフォルダを選択してく�
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "{hostName}のプロジェクトのワークツリーフォルダを選択してください。"
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "チェックアウトするリポジトリを選んでください。このマシン上のエージェントが必要なものを判断し、クラウドで動く状態にします。"
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "チェックアウトするリポジトリを選択します。クラウドワークスペースのエージェントが、インストールが必要なものを判断して動作させます。"
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}のワークツリーフォルダを選択してください。"
@@ -15205,6 +15299,9 @@ msgstr "組織を選択してください"
 
 msgid "Please try again, or restart Paradev on that device."
 msgstr "もう一度試すか、そのデバイスで Paradev を再起動してください。"
+
+msgid "Please upload a valid .env file."
+msgstr "有効な .env ファイルをアップロードしてください。"
 
 msgid "Plugin"
 msgstr "プラグイン"
@@ -17363,6 +17460,9 @@ msgstr "保存"
 msgid "Save & create workspace"
 msgstr "保存してワークスペースを作成"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "{name} にチェックポイントを保存しますか？"
+
 msgid "Save All"
 msgstr "すべて保存"
 
@@ -17377,6 +17477,9 @@ msgstr "ビューとして保存"
 
 msgid "Save Changes"
 msgstr "変更を保存"
+
+msgid "Save checkpoint"
+msgstr "チェックポイントを保存"
 
 msgid "Save edits"
 msgstr "編集を保存"
@@ -17418,8 +17521,20 @@ msgstr "保存済み"
 msgid "Saved \"{0}\" as an environment"
 msgstr "「{0}」を環境として保存しました"
 
+msgid "Saved {name}"
+msgstr "{name} を保存しました"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name} を保存しましたが、セットアップ用ワークスペースを開始できませんでした: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "このワークスペースを、インストール済みのものも含めて現在の状態で保存します。{name} から作成する新しいワークスペースはこのチェックポイントから始まります。保存中、ワークスペースは少しの間停止します。"
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "{name} にチェックポイントを保存中..."
 
 msgid "Saving as an environment..."
 msgstr "環境として保存しています..."
@@ -17855,9 +17970,6 @@ msgstr "エージェントを選択"
 msgid "Select an editor from the dropdown"
 msgstr "ドロップダウンからエディタを選択してください"
 
-msgid "Select an environment"
-msgstr "環境を選択してください"
-
 msgid "Select an organization"
 msgstr "組織を選択"
 
@@ -18038,6 +18150,12 @@ msgstr "送信中…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "ターミナルのコンテキスト {0} 文字（約 {1} トークン）を {2} に送信します。"
 
+msgid "Sensitive"
+msgstr "機密"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "機密値は暗号化され、保存後は表示できません。"
+
 msgid "Sent"
 msgstr "送信日"
 
@@ -18113,9 +18231,6 @@ msgstr "セッション"
 msgid "Sessions · top {0} by cost"
 msgstr "セッション · コスト上位{0}件"
 
-msgid "Set"
-msgstr "設定済み"
-
 msgid "Set a notification schedule"
 msgstr "通知スケジュールを設定"
 
@@ -18157,6 +18272,9 @@ msgstr "SSH でホストを設定"
 
 msgid "Set up an automation"
 msgstr "自動化を設定する"
+
+msgid "Set up Environment"
+msgstr "環境をセットアップ"
 
 msgid "Set up once"
 msgstr "一度設定するだけ"
@@ -18724,9 +18842,6 @@ msgstr "工場の自律性、6つのレベル"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "工場の自律性を6段階に分け、その間にあるゲートと、2026年にどこまで進むかの予測をまとめました。後から採点できるように、いま書き残しておきます。"
 
-msgid "size"
-msgstr "サイズ"
-
 msgid "Size"
 msgstr "サイズ"
 
@@ -18750,6 +18865,9 @@ msgstr "肌の色"
 
 msgid "Skip"
 msgstr "スキップ"
+
+msgid "Skip & save"
+msgstr "スキップして保存"
 
 msgid "Skip All"
 msgstr "すべてスキップ"
@@ -19150,6 +19268,9 @@ msgstr "新しいチャットを開始"
 
 msgid "Start a session"
 msgstr "セッションを開始"
+
+msgid "Start agent"
+msgstr "エージェントを開始"
 
 msgid "Start agents on events or a schedule"
 msgstr "イベントやスケジュールでエージェントを起動"
@@ -21353,6 +21474,10 @@ msgstr "両手"
 msgid "Type"
 msgstr "型"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "種類"
+
 msgid "Type @linear in any prompt."
 msgstr "どのプロンプトでも @linear と入力します。"
 
@@ -21726,6 +21851,9 @@ msgstr "両方のコンピューターでホストサービスを更新してか
 msgid "Update the host service on this device and try again."
 msgstr "このデバイスのホストサービスを更新してから、もう一度お試しください。"
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "<0>{key}</0> の値を更新"
+
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"
 
@@ -21741,6 +21869,9 @@ msgstr "更新: {0}"
 
 msgid "Updated {date}"
 msgstr "{date}に更新"
+
+msgid "Updated {key}"
+msgstr "{key} を更新しました"
 
 msgid "Updated {updatedRelative}"
 msgstr "{updatedRelative}に更新"
@@ -21965,6 +22096,9 @@ msgstr "user@host、ssh://user@host:2222、または ssh config のエイリア�
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectIdがワークスペースのプロジェクトと一致しません"
+
+msgid "Value"
+msgstr "値"
 
 msgid "Variables"
 msgstr "変数"
@@ -22964,6 +23098,9 @@ msgstr "このターミナルへのアクセス権がありません。"
 
 msgid "You don't have permission to remove this member"
 msgstr "このメンバーを削除する権限がありません"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "保存していない環境変数があります。閉じてもよろしいですか？"
 
 msgid "You install and connect once per account."
 msgstr "インストールと接続は、アカウントごとに一度だけです。"
