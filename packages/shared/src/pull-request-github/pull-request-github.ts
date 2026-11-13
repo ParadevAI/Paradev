@@ -279,6 +279,7 @@ export type GithubErrorCode =
 	| "UNAUTHORIZED"
 	| "CONFLICT"
 	| "BAD_REQUEST"
+	| "SERVICE_UNAVAILABLE"
 	| "INTERNAL_SERVER_ERROR";
 
 /** What GitHub's answer means, as the error code clients branch on. */
@@ -305,6 +306,15 @@ export function githubErrorCode(error: unknown): GithubErrorCode {
 		if (types.has("NOT_FOUND")) return "NOT_FOUND";
 		if (types.has("FORBIDDEN")) return "FORBIDDEN";
 		return "BAD_REQUEST";
+	}
+	// Octokit reports a request that never got a response (reset, DNS, timeout)
+	// as status 500 with no `response`; GitHub did not answer, so it is not a 500.
+	if (
+		status === 500 &&
+		(error as { name?: unknown }).name === "HttpError" &&
+		(error as { response?: unknown }).response === undefined
+	) {
+		return "SERVICE_UNAVAILABLE";
 	}
 	switch (status) {
 		// 405 not mergeable (conflicts/draft), 409 head branch moved on.
