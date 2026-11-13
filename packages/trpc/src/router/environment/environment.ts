@@ -7,6 +7,7 @@ import {
 	environments,
 	githubRepositories,
 } from "@superset/db/schema";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -30,6 +31,7 @@ import {
 } from "../../lib/sandbox";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { assertMachineSizeOffered } from "../cloud-workspace/start";
 import { currentBundleSha } from "./current-bundle";
 import {
 	assertEnvironmentCapacity,
@@ -296,11 +298,14 @@ export const environmentRouter = {
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
 				projectId: z.string().min(1).max(200).optional(),
+				/** The size its workspaces boot at; omitted = the organization's default. */
+				machineSize: z.enum(MACHINE_SIZES).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
+			await assertMachineSizeOffered(input.organizationId, input.machineSize);
 			const limit = await assertEnvironmentCapacity(input.organizationId);
 			if (!input.repositoryIds.includes(input.primaryRepositoryId)) {
 				throw primaryNotIncluded();
@@ -319,6 +324,7 @@ export const environmentRouter = {
 						region: input.region ?? regionForRequest(ctx.headers),
 						bundleSha,
 						scope: input.scope,
+						machineSize: input.machineSize ?? null,
 						createdByUserId: ctx.principal.userId,
 					})
 					.returning();
@@ -525,6 +531,7 @@ export const environmentRouter = {
 									name: input.name as string,
 									...fromGolden,
 									scope: input.scope ?? source?.scope ?? "organization",
+									machineSize: source?.machineSize ?? null,
 									createdByUserId: ctx.principal.userId,
 								})
 								.returning();
@@ -599,11 +606,14 @@ export const environmentRouter = {
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20).optional(),
 				primaryRepositoryId: z.string().uuid().optional(),
 				scope: z.enum(environmentScopeValues).optional(),
+				/** Null goes back to the organization's default. */
+				machineSize: z.enum(MACHINE_SIZES).nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
+			await assertMachineSizeOffered(current.organizationId, input.machineSize);
 
 			// A golden was built for its repositories and set up by its primary.
 			// Changing either means a different golden, so it is promoted again.
@@ -647,6 +657,9 @@ export const environmentRouter = {
 			const patch = {
 				...(input.name ? { name: input.name } : {}),
 				...(input.scope ? { scope: input.scope } : {}),
+				...(input.machineSize !== undefined
+					? { machineSize: input.machineSize }
+					: {}),
 				...(input.scope === "personal"
 					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
 					: {}),

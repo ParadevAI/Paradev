@@ -984,6 +984,9 @@ msgstr "{count} hosts executam um serviço de host mais antigo que este app"
 msgid "{count} selected"
 msgstr "{count} selecionadas"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "{count} variáveis não podem ser salvas. Veja as linhas destacadas"
+
 msgid "{count}/day"
 msgstr "{count}/dia"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, one {# linha} other {# linhas}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (este dispositivo)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (fora do seu plano)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "adicionar um agente"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "Adicione um ambiente em Configurações antes de criar uma área de trabalho na nuvem"
 
+msgid "Add Another"
+msgstr "Adicionar outra"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Conecte outra conta ou desconecte uma que você não usa mais."
 
@@ -2135,6 +2144,9 @@ msgstr "Adicionar descrição"
 
 msgid "Add description..."
 msgstr "Adicionar descrição..."
+
+msgid "Add Environment Variable"
+msgstr "Adicionar variável de ambiente"
 
 msgid "Add extension"
 msgstr "Adicionar extensão"
@@ -2172,6 +2184,9 @@ msgstr "Adicionar mais…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Adicione um pelo menu da barra lateral para começar."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "Adicione uma ou mais variáveis de ambiente. Você também pode arrastar e soltar um arquivo .env."
 
 msgid "Add people"
 msgstr "Adicionar pessoas"
@@ -2284,8 +2299,17 @@ msgstr "{added} adicionado"
 msgid "Added {added} files to {where}"
 msgstr "{added} arquivos adicionados a {where}"
 
+msgid "Added {addedOn}"
+msgstr "Adicionada em {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "{bought} GB-horas adicionadas."
+
+msgid "Added {count} environment variables"
+msgstr "{count} variáveis de ambiente adicionadas"
+
+msgid "Added {key}"
+msgstr "{key} adicionada"
 
 msgid "Added 1 file to {where}"
 msgstr "1 arquivo adicionado a {where}"
@@ -2780,6 +2804,9 @@ msgstr "Saiba sempre qual agente precisa de você, com notificações que levam 
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Um agente conclui mudanças em vários arquivos de ponta a ponta."
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "Um agente configura este ambiente em um workspace na nuvem (cerca de 20 minutos ou mais): instala as dependências, escreve a configuração e pede os segredos necessários. Interrompa a qualquer momento ou assuma no workspace para concluir a configuração você mesmo."
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Um agente escreve funções e arquivos inteiros enquanto uma pessoa acompanha cada passo e aprova cada comando. Um agente, uma pessoa. Mais rápido, mas ainda serial."
@@ -4381,6 +4408,9 @@ msgstr "Checkpoint · antes da refatoração dos tooltips"
 msgid "Checkpoint saved {0}"
 msgstr "Checkpoint salvo {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Checkpoint salvo em {name}"
+
 msgid "Checks"
 msgstr "Verificações"
 
@@ -4621,6 +4651,9 @@ msgstr "Clique aqui se não for redirecionado"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Clique em “↑ update” para ver a confirmação antes da atualização"
+
+msgid "Click to copy"
+msgstr "Clique para copiar"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Clique para copiar o ID da sessão (retome com `claude --resume <id>`)."
@@ -5815,6 +5848,9 @@ msgstr "Não foi possível copiar o link"
 
 msgid "Could not create cloud workspace"
 msgstr "Não foi possível criar a área de trabalho na nuvem"
+
+msgid "Could not create environment"
+msgstr "Não foi possível criar o ambiente"
 
 msgid "Could not create project"
 msgstr "Não foi possível criar o projeto"
@@ -7407,6 +7443,9 @@ msgstr "Descartar as alterações?"
 msgid "Discard recording"
 msgstr "Descartar gravação"
 
+msgid "Discard unsaved changes?"
+msgstr "Descartar alterações não salvas?"
+
 msgid "Discarded"
 msgstr "Descartado"
 
@@ -7812,6 +7851,9 @@ msgstr "{name} ×{tier} conquistado"
 msgid "Edit"
 msgstr "Editar"
 
+msgid "Edit {selectedName}"
+msgstr "Editar {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "Editar nome do canal"
 
@@ -7824,8 +7866,8 @@ msgstr "Editar descrição"
 msgid "Edit Description"
 msgstr "Editar descrição"
 
-msgid "Edit environment"
-msgstr "Editar ambiente"
+msgid "Edit Environment Variable"
+msgstr "Editar variável de ambiente"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Editar arquivos sem perguntar; perguntar antes de comandos"
@@ -8015,6 +8057,9 @@ msgstr "Digite um número inteiro"
 
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Digite um número inteiro de {minHours} a {maxHours} GB-horas."
+
+msgid "Enter new value"
+msgstr "Digite um novo valor"
 
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Digite este código quando o OpenAI pedir:"
@@ -8477,6 +8522,9 @@ msgstr "Falha ao excluir a conta"
 msgid "Failed to delete automation"
 msgstr "Falha ao excluir a automação"
 
+msgid "Failed to delete environment variable"
+msgstr "Não foi possível excluir a variável de ambiente"
+
 msgid "Failed to delete host"
 msgstr "Falha ao excluir o host"
 
@@ -8595,6 +8643,9 @@ msgstr "Não foi possível publicar a resposta"
 msgid "Failed to push branch"
 msgstr "Falha ao fazer push da branch"
 
+msgid "Failed to read file."
+msgstr "Não foi possível ler o arquivo."
+
 msgid "Failed to record page version"
 msgstr "Falha ao registrar a versão da página"
 
@@ -8688,6 +8739,9 @@ msgstr "Falha ao executar o comando da área de trabalho"
 msgid "Failed to save"
 msgstr "Falha ao salvar"
 
+msgid "Failed to save environment variables"
+msgstr "Não foi possível salvar as variáveis de ambiente"
+
 msgid "Failed to save installation. Please try again."
 msgstr "Falha ao salvar a instalação. Tente novamente."
 
@@ -8753,6 +8807,9 @@ msgstr "Falha ao atualizar o avatar"
 
 msgid "Failed to update branch prefix"
 msgstr "Falha ao atualizar o prefixo de branch"
+
+msgid "Failed to update environment variable"
+msgstr "Não foi possível atualizar a variável de ambiente"
 
 msgid "Failed to update hooks"
 msgstr "Falha ao atualizar os hooks"
@@ -8897,6 +8954,9 @@ msgstr "Modo de abertura de arquivos"
 
 msgid "File opens when the workspace wakes up"
 msgstr "O arquivo abre quando a área de trabalho for ativada"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "Arquivo muito grande. O tamanho máximo é 256 KB."
 
 msgid "File viewer"
 msgstr "Visualizador de arquivos"
@@ -10195,6 +10255,9 @@ msgstr "Finge ser outra pessoa"
 msgid "Import"
 msgstr "Importar"
 
+msgid "Import .env"
+msgstr "Importar .env"
+
 msgid "import a folder"
 msgstr "importar uma pasta"
 
@@ -10936,6 +10999,9 @@ msgstr "O novo arquivo foi mantido, ele mudou depois de criado"
 msgid "Kept the new folder because it is no longer empty"
 msgstr "A nova pasta foi mantida, ela não está mais vazia"
 
+msgid "Key"
+msgstr "Chave"
+
 msgid "Key dates"
 msgstr "Datas importantes"
 
@@ -11079,6 +11145,9 @@ msgid "Last seen {lastSeen}"
 msgstr "Visto pela última vez: {lastSeen}"
 
 msgid "Last updated"
+msgstr "Última atualização"
+
+msgid "Last Updated"
 msgstr "Última atualização"
 
 msgid "Last updated on {date}"
@@ -11671,9 +11740,6 @@ msgstr "Recursos da máquina"
 msgid "Machine size"
 msgstr "Tamanho da máquina"
 
-msgid "Machine size: {label}"
-msgstr "Tamanho da máquina: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Áreas de trabalho na nuvem sem máquina fixa, que sobem em segundos e podem ser compartilhadas com o time."
 
@@ -11730,6 +11796,9 @@ msgstr "Gerenciar contas…"
 
 msgid "Manage billing"
 msgstr "Gerenciar faturamento"
+
+msgid "Manage environment"
+msgstr "Gerenciar ambiente"
 
 msgid "Manage environments"
 msgstr "Gerenciar ambientes"
@@ -12358,6 +12427,10 @@ msgstr "Maquinista Misterioso"
 msgid "Name"
 msgstr "Nome"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "Nome"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Nome e um slug amigável para URL. Os dois podem mudar depois."
 
@@ -12856,6 +12929,9 @@ msgstr "Nenhum download ainda"
 msgid "No emoji found"
 msgstr "Nenhum emoji encontrado"
 
+msgid "No environment variables yet"
+msgstr "Ainda não há variáveis de ambiente"
+
 msgid "No environments available"
 msgstr "Nenhum ambiente disponível"
 
@@ -13011,6 +13087,9 @@ msgstr "Nenhum pull request correspondente"
 
 msgid "No matching tasks"
 msgstr "Nenhuma tarefa correspondente"
+
+msgid "No matching variables"
+msgstr "Nenhuma variável correspondente"
 
 msgid "No MCP servers found"
 msgstr "Nenhum servidor MCP encontrado"
@@ -13319,8 +13398,8 @@ msgstr "Nenhum projeto v1 encontrado neste dispositivo."
 msgid "No v1 terminal scripts found."
 msgstr "Nenhum script de terminal v1 encontrado."
 
-msgid "No variables set yet."
-msgstr "Nenhuma variável definida ainda."
+msgid "No valid environment variables found in file"
+msgstr "Nenhuma variável de ambiente válida encontrada no arquivo"
 
 msgid "No versions yet"
 msgstr "Nenhuma versão ainda"
@@ -13716,6 +13795,9 @@ msgstr "Um plugin. Todos os agentes de código."
 
 msgid "One step left"
 msgstr "Falta um passo"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "Uma variável não pode ser salva. Veja a linha destacada"
 
 msgid "online"
 msgstr "online"
@@ -14372,6 +14454,9 @@ msgstr "Opcional. Nos ajuda a entender o que funciona."
 msgid "Options"
 msgstr "Opções"
 
+msgid "or paste .env contents in Key input"
+msgstr "ou cole o conteúdo de um .env no campo Chave"
+
 msgid "Orange"
 msgstr "Laranja"
 
@@ -14401,6 +14486,9 @@ msgstr "Organização {id}"
 
 msgid "Organization created successfully!"
 msgstr "Organização criada com sucesso!"
+
+msgid "Organization default ({defaultName})"
+msgstr "Padrão da organização ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organização excluída"
@@ -15062,8 +15150,8 @@ msgstr "Escolha a nova pasta do projeto em {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Escolha a pasta de worktrees do projeto em {hostName}."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "Escolha os repositórios que ele obtém. Um agente nesta máquina descobre o que instalar e o coloca para rodar na nuvem."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "Escolha os repositórios que ele baixa. Um agente em um workspace na nuvem descobre o que instalar e coloca tudo para funcionar."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Escolha a pasta das worktrees em {hostName}."
@@ -17321,6 +17409,9 @@ msgstr "Salvar"
 msgid "Save & create workspace"
 msgstr "Salvar e criar a área de trabalho"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Salvar um checkpoint em {name}?"
+
 msgid "Save All"
 msgstr "Salvar tudo"
 
@@ -17332,6 +17423,9 @@ msgstr "Salvar como visualização"
 
 msgid "Save Changes"
 msgstr "Salvar alterações"
+
+msgid "Save checkpoint"
+msgstr "Salvar checkpoint"
 
 msgid "Save edits"
 msgstr "Salvar as edições"
@@ -17373,8 +17467,20 @@ msgstr "Salvo"
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" salvo como ambiente"
 
+msgid "Saved {name}"
+msgstr "{name} salvo"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name} salvo, mas não foi possível iniciar o workspace de configuração: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "Salvo em Downloads"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Salva este workspace como está agora, com tudo o que está instalado nele. Novos workspaces de {name} começam a partir deste checkpoint. O workspace para por um momento enquanto salva."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Salvando um checkpoint em {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Salvando como ambiente..."
@@ -17810,9 +17916,6 @@ msgstr "Selecione um agente"
 msgid "Select an editor from the dropdown"
 msgstr "Selecione um editor no menu"
 
-msgid "Select an environment"
-msgstr "Selecione um ambiente"
-
 msgid "Select an organization"
 msgstr "Selecione uma organização"
 
@@ -17993,6 +18096,12 @@ msgstr "Enviando…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Envia {0} caracteres de contexto do terminal (cerca de {1} tokens) para {2}."
 
+msgid "Sensitive"
+msgstr "Sensível"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "Valores sensíveis são criptografados e não podem ser exibidos depois de salvos."
+
 msgid "Sent"
 msgstr "Enviado"
 
@@ -18068,9 +18177,6 @@ msgstr "Sessões"
 msgid "Sessions · top {0} by cost"
 msgstr "Sessões · top {0} por custo"
 
-msgid "Set"
-msgstr "Definida"
-
 msgid "Set a notification schedule"
 msgstr "Definir um horário de notificações"
 
@@ -18112,6 +18218,9 @@ msgstr "Configurar um host via SSH"
 
 msgid "Set up an automation"
 msgstr "Configure uma automação"
+
+msgid "Set up Environment"
+msgstr "Configurar ambiente"
 
 msgid "Set up once"
 msgstr "Configure uma vez"
@@ -18666,9 +18775,6 @@ msgstr "Seis níveis de autonomia da fábrica"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Seis níveis de autonomia da fábrica, os portões entre eles e nossa previsão de até onde 2026 nos leva. Escrito agora para você poder nos cobrar depois."
 
-msgid "size"
-msgstr "Tamanho"
-
 msgid "Size"
 msgstr "Tamanho"
 
@@ -18692,6 +18798,9 @@ msgstr "Tom de pele"
 
 msgid "Skip"
 msgstr "Pular"
+
+msgid "Skip & save"
+msgstr "Pular e salvar"
 
 msgid "Skip All"
 msgstr "Pular tudo"
@@ -19092,6 +19201,9 @@ msgstr "Iniciar um novo chat"
 
 msgid "Start a session"
 msgstr "Iniciar uma sessão"
+
+msgid "Start agent"
+msgstr "Iniciar agente"
 
 msgid "Start agents on events or a schedule"
 msgstr "Inicie agentes por eventos ou por agenda"
@@ -21292,6 +21404,10 @@ msgstr "Duas mãos"
 msgid "Type"
 msgstr "Tipo"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "Tipo"
+
 msgid "Type @linear in any prompt."
 msgstr "Digite @linear em qualquer prompt."
 
@@ -21665,6 +21781,9 @@ msgstr "Atualize o serviço de host nos dois computadores e tente novamente."
 msgid "Update the host service on this device and try again."
 msgstr "Atualize o serviço de host neste dispositivo e tente novamente."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "Atualize o valor de <0>{key}</0>"
+
 msgid "Update this host to message subagents"
 msgstr "Atualize este host para enviar mensagens aos subagentes"
 
@@ -21680,6 +21799,9 @@ msgstr "Atualizado {0}"
 
 msgid "Updated {date}"
 msgstr "Atualizado em {date}"
+
+msgid "Updated {key}"
+msgstr "{key} atualizada"
 
 msgid "Updated {updatedRelative}"
 msgstr "Atualizado {updatedRelative}"
@@ -21898,6 +22020,9 @@ msgstr "usuário@host, ssh://usuário@host:2222 ou um alias da configuração do
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId não corresponde ao projeto da área de trabalho"
+
+msgid "Value"
+msgstr "Valor"
 
 msgid "Variables"
 msgstr "Variáveis"
@@ -22891,6 +23016,9 @@ msgstr "Você não tem acesso a este terminal."
 
 msgid "You don't have permission to remove this member"
 msgstr "Você não tem permissão para remover este membro"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "Você tem variáveis de ambiente não salvas. Tem certeza de que deseja fechar?"
 
 msgid "You install and connect once per account."
 msgstr "Você instala e conecta uma vez por conta."

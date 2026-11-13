@@ -1,0 +1,238 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
+import { formatDate } from "@superset/i18n/format";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@superset/ui/alert-dialog";
+import { Avatar } from "@superset/ui/atoms/Avatar";
+import { Button } from "@superset/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@superset/ui/dropdown-menu";
+import { toast } from "@superset/ui/sonner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
+import { useCallback, useState } from "react";
+import {
+	HiEllipsisHorizontal,
+	HiEye,
+	HiEyeSlash,
+	HiLockClosed,
+	HiOutlineCodeBracket,
+} from "react-icons/hi2";
+import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { apiTrpcClient } from "renderer/lib/api-trpc-client";
+
+interface SecretRowProps {
+	environmentId: string;
+	secret: {
+		id: string;
+		key: string;
+		value: string;
+		sensitive: boolean;
+		createdAt: Date;
+		updatedAt: Date;
+		createdBy: { id: string; name: string; image: string | null } | null;
+	};
+	onEdit: () => void;
+	onDeleted: () => void;
+}
+
+export function SecretRow({
+	environmentId,
+	secret,
+	onEdit,
+	onDeleted,
+}: SecretRowProps) {
+	const { t } = useLingui();
+	const [isRevealed, setIsRevealed] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+	const [valueHovered, setValueHovered] = useState(false);
+
+	const handleDelete = useCallback(async () => {
+		setIsDeleting(true);
+		try {
+			await apiTrpcClient.environment.secrets.remove.mutate({
+				environmentId,
+				key: secret.key,
+			});
+			onDeleted();
+		} catch (err) {
+			console.error("[secrets/delete] Failed to delete:", err);
+			toast.error(
+				errorMessage(
+					err,
+					t({ message: "Failed to delete environment variable" }),
+				),
+			);
+		} finally {
+			setIsDeleting(false);
+		}
+	}, [secret.key, environmentId, onDeleted, t]);
+
+	const { copyToClipboard, copied } = useCopyToClipboard(1500);
+	const handleCopy = useCallback(() => {
+		copyToClipboard(secret.value);
+	}, [secret.value, copyToClipboard]);
+
+	const isEmpty = !secret.sensitive && !secret.value;
+	const addedOn = formatDate(secret.createdAt, {
+		month: "short",
+		day: "numeric",
+	});
+
+	return (
+		<div
+			className={cn(
+				"flex items-center px-4 py-4 border-b last:border-b-0 group hover:bg-accent/30 transition-colors",
+				isDeleting && "opacity-50 pointer-events-none",
+			)}
+		>
+			<div className="flex items-center justify-center size-9 rounded-full border bg-background shrink-0">
+				{secret.sensitive ? (
+					<HiLockClosed className="h-4 w-4 text-muted-foreground" />
+				) : (
+					<HiOutlineCodeBracket className="h-4 w-4 text-muted-foreground" />
+				)}
+			</div>
+
+			<div className="flex items-center gap-2 min-w-0 flex-1 basis-0 ml-3">
+				<span className="font-mono font-medium text-sm truncate">
+					{secret.key}
+				</span>
+				{secret.sensitive && (
+					<span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
+						<Trans>Sensitive</Trans>
+					</span>
+				)}
+			</div>
+
+			<div className="flex items-center gap-1.5 shrink-0">
+				{!secret.sensitive &&
+					(isEmpty ? (
+						<span className="text-sm text-muted-foreground italic">
+							<Trans>Empty</Trans>
+						</span>
+					) : (
+						<>
+							<button
+								type="button"
+								onClick={() => setIsRevealed(!isRevealed)}
+								className="text-muted-foreground hover:text-foreground transition-colors p-1"
+							>
+								{isRevealed ? (
+									<HiEyeSlash className="h-4 w-4" />
+								) : (
+									<HiEye className="h-4 w-4" />
+								)}
+							</button>
+							{/* The reserved width lives here so revealing cannot resize the
+							    row, while the value itself stays intrinsic — a hover target
+							    that covers empty space reads as a bigger control than it is. */}
+							<div className="flex w-[200px] items-center">
+								{isRevealed ? (
+									<Tooltip open={valueHovered}>
+										<TooltipTrigger asChild>
+											<button
+												type="button"
+												onClick={handleCopy}
+												onMouseEnter={() => setValueHovered(true)}
+												onMouseLeave={() => setValueHovered(false)}
+												className="font-mono text-sm text-muted-foreground max-w-full text-left truncate rounded px-1 py-0.5 hover:bg-accent transition-colors cursor-pointer"
+											>
+												{secret.value}
+											</button>
+										</TooltipTrigger>
+										<TooltipContent>
+											{copied ? (
+												<Trans>Copied!</Trans>
+											) : (
+												<Trans>Click to copy</Trans>
+											)}
+										</TooltipContent>
+									</Tooltip>
+								) : (
+									<span className="font-mono text-sm text-muted-foreground max-w-full truncate">
+										{
+											"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+										}
+									</span>
+								)}
+							</div>
+						</>
+					))}
+			</div>
+
+			<div className="flex items-center justify-end gap-2 flex-1 basis-0 text-xs text-muted-foreground">
+				<span>
+					<Trans>Added {addedOn}</Trans>
+				</span>
+				{secret.createdBy && (
+					<Avatar
+						size="xs"
+						fullName={secret.createdBy.name}
+						image={secret.createdBy.image}
+					/>
+				)}
+			</div>
+
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 ml-3">
+						<HiEllipsisHorizontal className="h-4 w-4" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					{!secret.sensitive && (
+						<DropdownMenuItem onClick={onEdit}>
+							<Trans>Edit</Trans>
+						</DropdownMenuItem>
+					)}
+					<DropdownMenuItem
+						onSelect={() => setConfirmingDelete(true)}
+						variant="destructive"
+					>
+						<Trans>Delete</Trans>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+			<AlertDialog onOpenChange={setConfirmingDelete} open={confirmingDelete}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							<Trans>Delete {secret.key}?</Trans>
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							<Trans>
+								Workspaces started from this environment will stop receiving it.
+							</Trans>
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>
+							<Trans>Cancel</Trans>
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => void handleDelete()}
+							variant="destructive"
+						>
+							<Trans>Delete</Trans>
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</div>
+	);
+}

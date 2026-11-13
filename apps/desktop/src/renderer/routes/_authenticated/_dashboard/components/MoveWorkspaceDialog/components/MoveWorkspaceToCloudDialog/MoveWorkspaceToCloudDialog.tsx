@@ -18,7 +18,6 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
-import { MachineSizePickerPill } from "renderer/routes/_authenticated/components/MachineSizePickerPill";
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import {
@@ -104,7 +103,6 @@ export function MoveWorkspaceToCloudDialog({
 				id: environment.id,
 				repositoryFullName: environment.repositories?.[0]?.fullName ?? null,
 			},
-			machineSize: selection.machineSize,
 			onStage: (stage) =>
 				progress.setStage(stage === "saving" ? "saving" : "creating"),
 			onBegun: progress.begun,
@@ -163,13 +161,6 @@ export function MoveWorkspaceToCloudDialog({
 							}}
 							isLoading={environmentsQuery.isLoading}
 						/>
-						<MachineSizePickerPill
-							triggerClassName={PICKER_TRIGGER_CLASS}
-							machineSize={selection.machineSize}
-							onSelectMachineSize={(machineSize) =>
-								setCloudChoice(choiceKey, { machineSize })
-							}
-						/>
 					</div>
 					<DialogFooter>
 						<Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -185,8 +176,9 @@ export function MoveWorkspaceToCloudDialog({
 				<CreateEnvironmentFlow
 					open={isCreatingEnvironment}
 					onOpenChange={setIsCreatingEnvironment}
+					onStarted={() => onOpenChange(false)}
 					organizationId={organizationId}
-					projectId={projectId}
+					project={projectId ? { id: projectId, repositoryFullName } : null}
 				/>
 			)}
 		</>

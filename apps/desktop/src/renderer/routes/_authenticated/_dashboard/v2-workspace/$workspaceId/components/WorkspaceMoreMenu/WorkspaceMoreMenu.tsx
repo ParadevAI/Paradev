@@ -9,8 +9,11 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { useNavigate } from "@tanstack/react-router";
 import {
 	CloudUpload,
+	Container,
+	DatabaseBackup,
 	Ellipsis,
 	Laptop,
 	Play,
@@ -18,9 +21,11 @@ import {
 	Square,
 	X,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
+import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 import {
 	useWorkspaceMoveDirections,
 	type WorkspaceMoveDirection,
@@ -31,6 +36,7 @@ import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
 import { useWorkspaceOpenIn } from "../../hooks/useWorkspaceOpenIn";
 import { useWorkspaceOpenInTarget } from "../../hooks/useWorkspaceOpenInTarget";
+import { SaveCheckpointDialog } from "./components/SaveCheckpointDialog";
 import { WorkspaceOpenInItems } from "./components/WorkspaceOpenInItems";
 
 interface WorkspaceMoreMenuProps {
@@ -69,6 +75,18 @@ export function WorkspaceMoreMenu({
 	const { machineId } = useLocalHostService();
 	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
+	// Focus only stays off the trigger when a dialog is about to open.
+	const actionPendingRef = useRef(false);
+	const openAfterClose = (action: () => void) => {
+		actionPendingRef.current = true;
+		runAfterClose(action);
+	};
+	const environment = useWorkspaceEnvironment(workspaceId);
+	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
+	const isWorkspaceReady =
+		cloudWorkspaces?.find((row) => row.id === workspaceId)?.status === "ready";
+	const [checkpointOpen, setCheckpointOpen] = useState(false);
+	const navigate = useNavigate();
 
 	return (
 		<>
@@ -90,9 +108,11 @@ export function WorkspaceMoreMenu({
 				<DropdownMenuContent
 					align="end"
 					className="min-w-56"
-					onCloseAutoFocus={
-						moveDirections.length > 0 ? onCloseAutoFocus : undefined
-					}
+					onCloseAutoFocus={(event) => {
+						if (!actionPendingRef.current) return;
+						actionPendingRef.current = false;
+						onCloseAutoFocus(event);
+					}}
 				>
 					{openInTarget && (
 						<>
@@ -147,11 +167,34 @@ export function WorkspaceMoreMenu({
 							)}
 						</DropdownMenuItem>
 					)}
+					{environment && (
+						<>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onClick={() =>
+									void navigate({
+										to: "/settings/environments/$environmentId",
+										params: { environmentId: environment.id },
+									})
+								}
+							>
+								<Container className="size-4" />
+								<Trans>Manage environment</Trans>
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								disabled={!isWorkspaceReady}
+								onSelect={() => openAfterClose(() => setCheckpointOpen(true))}
+							>
+								<DatabaseBackup className="size-4" />
+								<Trans>Save checkpoint</Trans>
+							</DropdownMenuItem>
+						</>
+					)}
 					{moveDirections.length > 0 && <DropdownMenuSeparator />}
 					{moveDirections.map((direction) => (
 						<DropdownMenuItem
 							key={direction}
-							onSelect={() => runAfterClose(() => setMoveOpen(direction))}
+							onSelect={() => openAfterClose(() => setMoveOpen(direction))}
 						>
 							{direction === "to-cloud" ? (
 								<>
@@ -172,6 +215,14 @@ export function WorkspaceMoreMenu({
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
+			{environment && (
+				<SaveCheckpointDialog
+					cloudWorkspaceId={workspaceId}
+					environment={environment}
+					open={checkpointOpen}
+					onOpenChange={setCheckpointOpen}
+				/>
+			)}
 			{moveOpen && (
 				<MoveWorkspaceDialog
 					direction={moveOpen}

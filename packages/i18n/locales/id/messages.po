@@ -984,6 +984,9 @@ msgstr "{count} host menjalankan layanan host yang lebih lama dari aplikasi ini"
 msgid "{count} selected"
 msgstr "{count} dipilih"
 
+msgid "{count} variables can't be saved. See the highlighted rows"
+msgstr "{count} variabel tidak dapat disimpan. Lihat baris yang disorot"
+
 msgid "{count}/day"
 msgstr "{count}/hari"
 
@@ -1131,6 +1134,9 @@ msgstr "{lines, plural, other {# baris}}"
 
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (perangkat ini)"
+
+msgid "{machineSize} (not on your plan)"
+msgstr "{machineSize} (tidak termasuk paket Anda)"
 
 #. placeholder {0}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} result for &ldquo;{query}&rdquo; </>
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
@@ -2109,6 +2115,9 @@ msgstr "menambah agen"
 msgid "Add an environment in Settings before creating a cloud workspace"
 msgstr "Tambahkan environment di Pengaturan sebelum membuat workspace cloud"
 
+msgid "Add Another"
+msgstr "Tambah lagi"
+
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Hubungkan akun lain, atau putuskan yang tidak lagi kamu pakai."
 
@@ -2135,6 +2144,9 @@ msgstr "Tambahkan Deskripsi"
 
 msgid "Add description..."
 msgstr "Tambah deskripsi..."
+
+msgid "Add Environment Variable"
+msgstr "Tambah variabel environment"
 
 msgid "Add extension"
 msgstr "Tambahkan ekstensi"
@@ -2172,6 +2184,9 @@ msgstr "Tambah lagi…"
 
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Tambahkan satu dari menu di sidebar untuk memulai."
+
+msgid "Add one or more environment variables. You can also drag and drop a .env file."
+msgstr "Tambahkan satu atau beberapa variabel environment. Anda juga bisa menyeret dan melepas file .env."
 
 msgid "Add people"
 msgstr "Tambah orang"
@@ -2284,8 +2299,17 @@ msgstr "{added} ditambahkan"
 msgid "Added {added} files to {where}"
 msgstr "Menambahkan {added} file ke {where}"
 
+msgid "Added {addedOn}"
+msgstr "Ditambahkan {addedOn}"
+
 msgid "Added {bought} GB-hours."
 msgstr "{bought} GB-jam ditambahkan."
+
+msgid "Added {count} environment variables"
+msgstr "{count} variabel environment ditambahkan"
+
+msgid "Added {key}"
+msgstr "{key} ditambahkan"
 
 msgid "Added 1 file to {where}"
 msgstr "Menambahkan 1 file ke {where}"
@@ -2780,6 +2804,9 @@ msgstr "Selalu tahu agen mana yang membutuhkan Anda, dengan notifikasi yang lang
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agen menyelesaikan perubahan lintas file dari awal sampai akhir."
+
+msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
+msgstr "Agen menyiapkan environment ini di workspace cloud (sekitar 20 menit atau lebih): memasang dependensi, menulis konfigurasi penyiapan, dan meminta secret yang diperlukan. Hentikan kapan saja, atau ambil alih di workspace untuk menyelesaikan penyiapan sendiri."
 
 msgid "An agent writes whole functions and files while a human watches every step and approves every command. One agent, one human. Faster, but still serial."
 msgstr "Agen menulis fungsi dan file utuh sementara manusia mengawasi tiap langkah dan menyetujui tiap perintah. Satu agen, satu manusia. Lebih cepat, tapi tetap berurutan."
@@ -4381,6 +4408,9 @@ msgstr "Checkpoint · sebelum refactor tooltip"
 msgid "Checkpoint saved {0}"
 msgstr "Checkpoint tersimpan {0}"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Checkpoint disimpan ke {name}"
+
 msgid "Checks"
 msgstr "Check"
 
@@ -4621,6 +4651,9 @@ msgstr "Klik di sini kalau tidak dialihkan"
 
 msgid "Click the “↑ update” pill to see the pre-update confirm"
 msgstr "Klik tombol “↑ update” untuk melihat konfirmasi sebelum pembaruan"
+
+msgid "Click to copy"
+msgstr "Klik untuk menyalin"
 
 msgid "Click to copy the session ID (resume with `claude --resume <id>`)."
 msgstr "Klik untuk menyalin ID sesi (lanjutkan dengan `claude --resume <id>`)."
@@ -5815,6 +5848,9 @@ msgstr "Tidak bisa menyalin tautan"
 
 msgid "Could not create cloud workspace"
 msgstr "Tidak bisa membuat workspace cloud"
+
+msgid "Could not create environment"
+msgstr "Tidak dapat membuat lingkungan"
 
 msgid "Could not create project"
 msgstr "Tidak bisa membuat proyek"
@@ -7407,6 +7443,9 @@ msgstr "Buang perubahan?"
 msgid "Discard recording"
 msgstr "Buang rekaman"
 
+msgid "Discard unsaved changes?"
+msgstr "Buang perubahan yang belum disimpan?"
+
 msgid "Discarded"
 msgstr "Dibuang"
 
@@ -7812,6 +7851,9 @@ msgstr "{name} ×{tier} diraih"
 msgid "Edit"
 msgstr "Edit"
 
+msgid "Edit {selectedName}"
+msgstr "Edit {selectedName}"
+
 msgid "Edit Channel Name"
 msgstr "Edit Nama Saluran"
 
@@ -7824,8 +7866,8 @@ msgstr "Edit deskripsi"
 msgid "Edit Description"
 msgstr "Edit Deskripsi"
 
-msgid "Edit environment"
-msgstr "Edit environment"
+msgid "Edit Environment Variable"
+msgstr "Edit variabel environment"
 
 msgid "Edit files without asking; ask before commands"
 msgstr "Edit file tanpa bertanya; tanya sebelum perintah"
@@ -8015,6 +8057,9 @@ msgstr "Masukkan bilangan bulat"
 
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Masukkan bilangan bulat dari {minHours} sampai {maxHours} GB-jam."
+
+msgid "Enter new value"
+msgstr "Masukkan nilai baru"
 
 msgid "Enter this code when OpenAI asks for it:"
 msgstr "Masukkan kode ini saat OpenAI memintanya:"
@@ -8477,6 +8522,9 @@ msgstr "Gagal menghapus akun"
 msgid "Failed to delete automation"
 msgstr "Gagal menghapus otomatisasi"
 
+msgid "Failed to delete environment variable"
+msgstr "Gagal menghapus variabel environment"
+
 msgid "Failed to delete host"
 msgstr "Gagal menghapus host"
 
@@ -8595,6 +8643,9 @@ msgstr "Gagal mengirim balasan"
 msgid "Failed to push branch"
 msgstr "Gagal mem-push branch"
 
+msgid "Failed to read file."
+msgstr "Gagal membaca file."
+
 msgid "Failed to record page version"
 msgstr "Gagal mencatat versi halaman"
 
@@ -8688,6 +8739,9 @@ msgstr "Gagal menjalankan perintah workspace"
 msgid "Failed to save"
 msgstr "Gagal menyimpan"
 
+msgid "Failed to save environment variables"
+msgstr "Gagal menyimpan variabel environment"
+
 msgid "Failed to save installation. Please try again."
 msgstr "Gagal menyimpan instalasi. Silakan coba lagi."
 
@@ -8753,6 +8807,9 @@ msgstr "Gagal memperbarui avatar"
 
 msgid "Failed to update branch prefix"
 msgstr "Gagal memperbarui prefix branch"
+
+msgid "Failed to update environment variable"
+msgstr "Gagal memperbarui variabel environment"
 
 msgid "Failed to update hooks"
 msgstr "Gagal memperbarui hook"
@@ -8897,6 +8954,9 @@ msgstr "Mode buka file"
 
 msgid "File opens when the workspace wakes up"
 msgstr "File terbuka saat workspace bangun"
+
+msgid "File too large. Maximum size is 256 KB."
+msgstr "File terlalu besar. Ukuran maksimum 256 KB."
 
 msgid "File viewer"
 msgstr "Penampil file"
@@ -10195,6 +10255,9 @@ msgstr "Menyamar sebagai orang lain"
 msgid "Import"
 msgstr "Impor"
 
+msgid "Import .env"
+msgstr "Impor .env"
+
 msgid "import a folder"
 msgstr "mengimpor folder"
 
@@ -10936,6 +10999,9 @@ msgstr "File baru dipertahankan, isinya berubah setelah dibuat"
 msgid "Kept the new folder because it is no longer empty"
 msgstr "Folder baru dipertahankan, sudah tidak kosong"
 
+msgid "Key"
+msgstr "Kunci"
+
 msgid "Key dates"
 msgstr "Tanggal penting"
 
@@ -11079,6 +11145,9 @@ msgid "Last seen {lastSeen}"
 msgstr "Terakhir terlihat: {lastSeen}"
 
 msgid "Last updated"
+msgstr "Terakhir diperbarui"
+
+msgid "Last Updated"
 msgstr "Terakhir diperbarui"
 
 msgid "Last updated on {date}"
@@ -11671,9 +11740,6 @@ msgstr "Sumber daya mesin"
 msgid "Machine size"
 msgstr "Ukuran mesin"
 
-msgid "Machine size: {label}"
-msgstr "Ukuran mesin: {label}"
-
 msgid "Machine-unbound cloud workspaces that spin up in seconds and can be shared with teammates."
 msgstr "Workspace cloud yang tidak terikat mesin, siap dalam hitungan detik dan bisa dibagikan ke rekan tim."
 
@@ -11730,6 +11796,9 @@ msgstr "Kelola akun…"
 
 msgid "Manage billing"
 msgstr "Kelola penagihan"
+
+msgid "Manage environment"
+msgstr "Kelola environment"
 
 msgid "Manage environments"
 msgstr "Kelola environment"
@@ -12358,6 +12427,10 @@ msgstr "Masinis Misterius"
 msgid "Name"
 msgstr "Nama"
 
+msgctxt "sort order"
+msgid "Name"
+msgstr "Nama"
+
 msgid "Name and a URL-friendly slug. Both can be changed later."
 msgstr "Nama dan slug yang ramah URL. Keduanya bisa diubah nanti."
 
@@ -12856,6 +12929,9 @@ msgstr "Belum ada unduhan"
 msgid "No emoji found"
 msgstr "Emoji tidak ditemukan"
 
+msgid "No environment variables yet"
+msgstr "Belum ada variabel environment"
+
 msgid "No environments available"
 msgstr "Tidak ada environment yang tersedia"
 
@@ -13011,6 +13087,9 @@ msgstr "Tidak ada pull request yang cocok"
 
 msgid "No matching tasks"
 msgstr "Tidak ada tugas yang cocok"
+
+msgid "No matching variables"
+msgstr "Tidak ada variabel yang cocok"
 
 msgid "No MCP servers found"
 msgstr "Tidak ada server MCP"
@@ -13319,8 +13398,8 @@ msgstr "Tidak ada proyek v1 di perangkat ini."
 msgid "No v1 terminal scripts found."
 msgstr "Tidak ada skrip terminal v1."
 
-msgid "No variables set yet."
-msgstr "Belum ada variabel yang diatur."
+msgid "No valid environment variables found in file"
+msgstr "Tidak ada variabel environment yang valid di file"
 
 msgid "No versions yet"
 msgstr "Belum ada versi"
@@ -13716,6 +13795,9 @@ msgstr "Satu plugin. Setiap agen coding."
 
 msgid "One step left"
 msgstr "Tinggal satu langkah"
+
+msgid "One variable can't be saved. See the highlighted row"
+msgstr "Satu variabel tidak dapat disimpan. Lihat baris yang disorot"
 
 msgid "online"
 msgstr "online"
@@ -14372,6 +14454,9 @@ msgstr "Opsional. Membantu kami mengetahui apa yang berhasil."
 msgid "Options"
 msgstr "Opsi"
 
+msgid "or paste .env contents in Key input"
+msgstr "atau tempel isi .env di kolom Kunci"
+
 msgid "Orange"
 msgstr "Oranye"
 
@@ -14401,6 +14486,9 @@ msgstr "Organisasi {id}"
 
 msgid "Organization created successfully!"
 msgstr "Organisasi berhasil dibuat!"
+
+msgid "Organization default ({defaultName})"
+msgstr "Bawaan organisasi ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organisasi dihapus"
@@ -15062,8 +15150,8 @@ msgstr "Pilih folder proyek yang baru di {hostName}."
 msgid "Pick the project worktree folder on {hostName}."
 msgstr "Pilih folder worktree proyek di {hostName}."
 
-msgid "Pick the repositories it checks out. An agent on this machine works out what to install and gets it running in the cloud."
-msgstr "Pilih repositori yang diambilnya. Agen di mesin ini mencari tahu apa yang perlu dipasang dan menjalankannya di cloud."
+msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
+msgstr "Pilih repositori yang di-checkout. Agen di workspace cloud mencari tahu apa yang perlu dipasang dan menjalankannya."
 
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Pilih folder worktree di {hostName}."
@@ -17321,6 +17409,9 @@ msgstr "Simpan"
 msgid "Save & create workspace"
 msgstr "Simpan & buat workspace"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Simpan checkpoint ke {name}?"
+
 msgid "Save All"
 msgstr "Simpan Semua"
 
@@ -17332,6 +17423,9 @@ msgstr "Simpan sebagai tampilan"
 
 msgid "Save Changes"
 msgstr "Simpan Perubahan"
+
+msgid "Save checkpoint"
+msgstr "Simpan checkpoint"
 
 msgid "Save edits"
 msgstr "Simpan suntingan"
@@ -17373,8 +17467,20 @@ msgstr "Tersimpan"
 msgid "Saved \"{0}\" as an environment"
 msgstr "\"{0}\" disimpan sebagai environment"
 
+msgid "Saved {name}"
+msgstr "{name} disimpan"
+
+msgid "Saved {name}, but its setup workspace could not start: {reason}"
+msgstr "{name} disimpan, tetapi workspace penyiapannya tidak dapat dimulai: {reason}"
+
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Menyimpan workspace ini seperti sekarang, dengan semua yang terpasang di dalamnya. Workspace baru dari {name} akan dimulai dari checkpoint ini. Workspace berhenti sebentar saat menyimpan."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Menyimpan checkpoint ke {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
@@ -17810,9 +17916,6 @@ msgstr "Pilih agen"
 msgid "Select an editor from the dropdown"
 msgstr "Pilih editor dari dropdown"
 
-msgid "Select an environment"
-msgstr "Pilih lingkungan"
-
 msgid "Select an organization"
 msgstr "Pilih sebuah organisasi"
 
@@ -17993,6 +18096,12 @@ msgstr "Mengirim…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Mengirim {0} karakter konteks terminal (sekitar {1} token) ke {2}."
 
+msgid "Sensitive"
+msgstr "Sensitif"
+
+msgid "Sensitive values are encrypted and cannot be revealed in the UI after saving."
+msgstr "Nilai sensitif dienkripsi dan tidak dapat ditampilkan setelah disimpan."
+
 msgid "Sent"
 msgstr "Dikirim"
 
@@ -18068,9 +18177,6 @@ msgstr "Sesi"
 msgid "Sessions · top {0} by cost"
 msgstr "Sesi · {0} teratas menurut biaya"
 
-msgid "Set"
-msgstr "Diatur"
-
 msgid "Set a notification schedule"
 msgstr "Atur jadwal notifikasi"
 
@@ -18112,6 +18218,9 @@ msgstr "Siapkan host lewat SSH"
 
 msgid "Set up an automation"
 msgstr "Siapkan otomatisasi"
+
+msgid "Set up Environment"
+msgstr "Siapkan lingkungan"
 
 msgid "Set up once"
 msgstr "Atur sekali"
@@ -18666,9 +18775,6 @@ msgstr "Enam level otonomi pabrik"
 msgid "Six levels of factory autonomy, the gates between them, and our forecast for how far 2026 gets us. Written down now so you can grade us later."
 msgstr "Enam level otonomi pabrik, gerbang di antaranya, dan prakiraan kami soal sejauh mana 2026 membawa kita. Ditulis sekarang supaya Anda bisa menilai kami nanti."
 
-msgid "size"
-msgstr "Ukuran"
-
 msgid "Size"
 msgstr "Ukuran"
 
@@ -18692,6 +18798,9 @@ msgstr "Warna Kulit"
 
 msgid "Skip"
 msgstr "Lewati"
+
+msgid "Skip & save"
+msgstr "Lewati & simpan"
 
 msgid "Skip All"
 msgstr "Lewati Semua"
@@ -19092,6 +19201,9 @@ msgstr "Mulai chat baru"
 
 msgid "Start a session"
 msgstr "Mulai sesi"
+
+msgid "Start agent"
+msgstr "Mulai agen"
 
 msgid "Start agents on events or a schedule"
 msgstr "Jalankan agen saat ada event atau sesuai jadwal"
@@ -21292,6 +21404,10 @@ msgstr "Dua tangan"
 msgid "Type"
 msgstr "Tipe"
 
+msgctxt "sort order"
+msgid "Type"
+msgstr "Jenis"
+
 msgid "Type @linear in any prompt."
 msgstr "Ketik @linear di prompt mana pun."
 
@@ -21665,6 +21781,9 @@ msgstr "Perbarui layanan host di kedua komputer, lalu coba lagi."
 msgid "Update the host service on this device and try again."
 msgstr "Perbarui layanan host di perangkat ini, lalu coba lagi."
 
+msgid "Update the value for <0>{key}</0>"
+msgstr "Perbarui nilai untuk <0>{key}</0>"
+
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 
@@ -21680,6 +21799,9 @@ msgstr "Diperbarui {0}"
 
 msgid "Updated {date}"
 msgstr "Diperbarui {date}"
+
+msgid "Updated {key}"
+msgstr "{key} diperbarui"
 
 msgid "Updated {updatedRelative}"
 msgstr "Diperbarui {updatedRelative}"
@@ -21898,6 +22020,9 @@ msgstr "user@host, ssh://user@host:2222, atau alias dari konfigurasi ssh"
 
 msgid "v2ProjectId does not match the workspace's project"
 msgstr "v2ProjectId tidak cocok dengan proyek workspace"
+
+msgid "Value"
+msgstr "Nilai"
 
 msgid "Variables"
 msgstr "Variabel"
@@ -22891,6 +23016,9 @@ msgstr "Anda tidak punya akses ke terminal ini."
 
 msgid "You don't have permission to remove this member"
 msgstr "Anda tidak punya izin untuk menghapus anggota ini"
+
+msgid "You have unsaved environment variables. Are you sure you want to close?"
+msgstr "Ada variabel environment yang belum disimpan. Yakin ingin menutup?"
 
 msgid "You install and connect once per account."
 msgstr "Anda menginstal dan menghubungkan sekali per akun."

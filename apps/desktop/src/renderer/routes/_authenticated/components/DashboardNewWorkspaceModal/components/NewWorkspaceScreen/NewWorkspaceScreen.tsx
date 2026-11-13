@@ -2,13 +2,13 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { acpStartModes } from "@superset/chat/core";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { draftText } from "@superset/chat-ui/PromptInput";
+import { errorMessage } from "@superset/i18n/errors";
 import {
 	getAgentEffortSupport,
 	getAgentEfforts,
 	getAgentModelSupport,
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
-import type { MachineSize } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
@@ -24,6 +24,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
 import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
+import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
@@ -51,10 +52,15 @@ import { useGitHubMentionProviders } from "renderer/routes/_authenticated/compon
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
-import { MachineSizePickerPill } from "renderer/routes/_authenticated/components/MachineSizePickerPill";
+import { SetUpEnvironmentButton } from "renderer/routes/_authenticated/components/SetUpEnvironmentButton";
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import {
+	ENVIRONMENT_SETUP_PROMPT,
+	environmentSetupAgentPrompt,
+	withEnvironmentSetupSkill,
+} from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
@@ -88,6 +94,7 @@ import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
 import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
+import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
@@ -139,6 +146,7 @@ export function NewWorkspaceScreen({
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
 		closeModal,
+		closeAndResetDraft,
 		draft,
 		updateDraft,
 		selectProject,
@@ -380,8 +388,28 @@ export function NewWorkspaceScreen({
 		],
 	);
 	const resolvedEnvironment = cloudSelection.environment ?? undefined;
-	const isCloudTargetLoading = environmentsQuery.isLoading || github.isLoading;
+	const isCloudTargetLoading =
+		environmentsQuery.isLoading || github.isLoading || isProjectPending;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
+	const [dialogSendsDraft, setDialogSendsDraft] = useState(false);
+	const [pendingSetupEnvironmentId, setPendingSetupEnvironmentId] = useState<
+		string | null
+	>(null);
+	const awaitingSetup =
+		isCloudHost &&
+		pendingSetupEnvironmentId !== null &&
+		resolvedEnvironment?.id === pendingSetupEnvironmentId;
+	const needsEnvironment =
+		isCloudHost &&
+		cloudEnabled !== false &&
+		environmentsQuery.isSuccess &&
+		!isCloudTargetLoading &&
+		!resolvedEnvironment;
+	const projectRepository = projectRepositoryFullName
+		? github.repositoriesByFullName.get(projectRepositoryFullName.toLowerCase())
+		: undefined;
+	const { createEnvironment, isCreating: isCreatingProjectEnvironment } =
+		useCreateProjectEnvironment(activeOrganizationId);
 	const cloudRepository = useMemo(() => {
 		if (!isCloudHost) return null;
 		const primary = resolvedEnvironment?.repositories?.[0];
@@ -512,28 +540,15 @@ export function NewWorkspaceScreen({
 			setCloudChoice(cloudChoiceKey, { environmentId }),
 		[setCloudChoice, cloudChoiceKey],
 	);
-	const handleSelectMachineSize = useCallback(
-		(machineSize: MachineSize) =>
-			setCloudChoice(cloudChoiceKey, { machineSize }),
-		[setCloudChoice, cloudChoiceKey],
-	);
 	const cloudSettings = useMemo(
 		() =>
 			isCloudHost
 				? {
 						environments: [...cloudSelection.linked, ...cloudSelection.other],
 						onSelectEnvironment: handleSelectEnvironment,
-						machineSizes: machineSizeOptions.options,
-						onSelectMachineSize: handleSelectMachineSize,
 					}
 				: null,
-		[
-			isCloudHost,
-			cloudSelection,
-			handleSelectEnvironment,
-			machineSizeOptions,
-			handleSelectMachineSize,
-		],
+		[isCloudHost, cloudSelection, handleSelectEnvironment],
 	);
 	const settingProviders = useWorkspaceSettingMentionProviders({
 		projects: selectableProjects,
@@ -764,7 +779,6 @@ export function NewWorkspaceScreen({
 		uploadAttachments,
 		promptContext,
 		resolvedEnvironment?.id ?? null,
-		isCloudHost ? cloudSelection.machineSize : null,
 		hostId,
 		isSession,
 	);
@@ -779,9 +793,9 @@ export function NewWorkspaceScreen({
 						"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 				});
 			if (isCloudTargetLoading) return t({ message: "Loading environments…" });
-			return resolvedEnvironment
-				? null
-				: t({ message: "Select an environment" });
+			if (environmentsQuery.isError)
+				return t({ message: "Could not load environments" });
+			return null;
 		}
 		if (isProjectPending || (!selectedProject && !isSession))
 			return t({
@@ -812,7 +826,7 @@ export function NewWorkspaceScreen({
 		activeHostUrl,
 		selectedRemoteHostPresence,
 		isCloudTargetLoading,
-		resolvedEnvironment,
+		environmentsQuery.isError,
 		t,
 	]);
 
@@ -843,7 +857,67 @@ export function NewWorkspaceScreen({
 		});
 	}, [closeModal, hostId, navigate, selectedProject?.id]);
 
+	const setupInFlightRef = useRef(false);
+	const runEnvironmentSetup = useCallback(
+		async ({
+			cloudPrompt,
+			ignoreDraft,
+		}: {
+			cloudPrompt: (typed: string, environmentUrl: string) => string;
+			ignoreDraft: boolean;
+		}) => {
+			if (setupInFlightRef.current) return;
+			setupInFlightRef.current = true;
+			try {
+				let environmentId = awaitingSetup ? pendingSetupEnvironmentId : null;
+				if (!environmentId) {
+					if (!projectRepository) {
+						setDialogSendsDraft(!ignoreDraft);
+						setIsCreatingEnvironment(true);
+						return;
+					}
+					environmentId = await createEnvironment({
+						repository: projectRepository,
+						projectId: cloudProjectId,
+					});
+					if (!environmentId) return;
+					setCloudChoice(cloudChoiceKey, { environmentId });
+					setPendingSetupEnvironmentId(environmentId);
+				}
+				const environmentUrl = new URL(
+					`/environments/${environmentId}`,
+					env.NEXT_PUBLIC_WEB_URL,
+				).toString();
+				const started = await createWorkspace({
+					cloudEnvironmentId: environmentId,
+					cloudPrompt: (typed) => cloudPrompt(typed, environmentUrl),
+					ignoreDraft,
+				});
+				if (started) setPendingSetupEnvironmentId(null);
+			} catch (error) {
+				toast.error(
+					errorMessage(error, t({ message: "Could not create environment" })),
+				);
+			} finally {
+				setupInFlightRef.current = false;
+			}
+		},
+		[
+			awaitingSetup,
+			pendingSetupEnvironmentId,
+			projectRepository,
+			createEnvironment,
+			cloudProjectId,
+			setCloudChoice,
+			cloudChoiceKey,
+			createWorkspace,
+			t,
+		],
+	);
+
+	const isStarting = isCreating || isCreatingProjectEnvironment;
 	const handleSubmit = useCallback(() => {
+		if (isStarting) return;
 		if (needsSetup) {
 			handleGoToSetup();
 			return;
@@ -858,10 +932,21 @@ export function NewWorkspaceScreen({
 			}
 			return;
 		}
+		if (needsEnvironment || awaitingSetup) {
+			void runEnvironmentSetup({
+				cloudPrompt: withEnvironmentSetupSkill,
+				ignoreDraft: false,
+			});
+			return;
+		}
 		void createWorkspace();
 	}, [
 		activeHostUrl,
 		createWorkspace,
+		isStarting,
+		needsEnvironment,
+		awaitingSetup,
+		runEnvironmentSetup,
 		hostId,
 		handleGoToSetup,
 		hostService,
@@ -934,6 +1019,17 @@ export function NewWorkspaceScreen({
 			tier={samplePromptTier}
 		/>
 	);
+	const setUpEnvironmentButton = (needsEnvironment || awaitingSetup) && (
+		<SetUpEnvironmentButton
+			onClick={() =>
+				void runEnvironmentSetup({
+					cloudPrompt: () => ENVIRONMENT_SETUP_PROMPT,
+					ignoreDraft: true,
+				})
+			}
+			pending={isStarting}
+		/>
+	);
 	const devicePicker = (
 		<DevicePicker hostId={hostId} onSelectHostId={handleSelectHostId} />
 	);
@@ -960,22 +1056,39 @@ export function NewWorkspaceScreen({
 						closeModal();
 						void navigate({ to: "/settings/environments" });
 					}}
+					onEditEnvironment={(environmentId) => {
+						closeModal();
+						void navigate({
+							to: "/settings/environments/$environmentId",
+							params: { environmentId },
+						});
+					}}
 					isLoading={environmentsQuery.isLoading}
-				/>
-			)}
-			{isCloudHost && (
-				<MachineSizePickerPill
-					machineSize={cloudSelection.machineSize}
-					onSelectMachineSize={handleSelectMachineSize}
 				/>
 			)}
 			{activeOrganizationId && (
 				<CreateEnvironmentFlow
-					onOpenChange={setIsCreatingEnvironment}
-					onStarted={closeModal}
+					onOpenChange={(open) => {
+						setIsCreatingEnvironment(open);
+						if (!open) setDialogSendsDraft(false);
+					}}
+					onStarted={dialogSendsDraft ? closeAndResetDraft : closeModal}
+					setupPrompt={
+						dialogSendsDraft && !isPromptEmpty
+							? (environmentUrl) =>
+									withEnvironmentSetupSkill(
+										draftText(draft.promptDraft),
+										environmentUrl,
+									)
+							: environmentSetupAgentPrompt
+					}
 					open={isCreatingEnvironment}
 					organizationId={activeOrganizationId}
-					projectId={isSession ? null : projectId}
+					project={
+						isSession || !projectId
+							? null
+							: { id: projectId, repositoryFullName: projectRepositoryFullName }
+					}
 				/>
 			)}
 			{linkedPR ? (
@@ -1056,28 +1169,31 @@ export function NewWorkspaceScreen({
 						reserveSpace
 					/>
 					<div className="relative flex w-full max-w-[592px] flex-col gap-2.5">
-						<AnimatePresence initial={false}>
-							{isPromptEmpty &&
-								!samplePromptsPending &&
-								!samplePromptsDismissed && (
-									<motion.div
-										key="sample-prompts"
-										initial={{ opacity: 0, y: 12 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, transition: { duration: 0 } }}
-										transition={{
-											type: "tween",
-											duration: 0.15,
-											ease: "easeOut",
-										}}
-										// Out of flow, below the block: the composer is centred on
-										// the screen and must not move when the suggestions go.
-										className="absolute inset-x-0 top-full mt-3"
-									>
-										{samplePromptsList}
-									</motion.div>
-								)}
-						</AnimatePresence>
+						{/* Out of flow, below the block: the composer is centred on
+						the screen and must not move when the suggestions go. */}
+						<div className="absolute inset-x-0 top-full mt-3 flex flex-col items-start gap-2">
+							{setUpEnvironmentButton}
+							<AnimatePresence initial={false}>
+								{isPromptEmpty &&
+									!samplePromptsPending &&
+									!samplePromptsDismissed && (
+										<motion.div
+											key="sample-prompts"
+											initial={{ opacity: 0, y: 12 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, transition: { duration: 0 } }}
+											transition={{
+												type: "tween",
+												duration: 0.15,
+												ease: "easeOut",
+											}}
+											className="w-full"
+										>
+											{samplePromptsList}
+										</motion.div>
+									)}
+							</AnimatePresence>
+						</div>
 						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
 							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{contextPickers}
@@ -1105,7 +1221,7 @@ export function NewWorkspaceScreen({
 								return false;
 							}}
 							mentionProviders={mentionProviders}
-							pending={isCreating}
+							pending={isStarting}
 							placeholder={t({ message: "Do anything in Paradev" })}
 						/>
 						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
@@ -1180,6 +1296,9 @@ export function NewWorkspaceScreen({
 								</motion.div>
 							)}
 					</AnimatePresence>
+					{setUpEnvironmentButton && (
+						<div className="mb-2 flex">{setUpEnvironmentButton}</div>
+					)}
 					<AgentComposer
 						allowEmptySubmit
 						autoFocus
@@ -1200,7 +1319,7 @@ export function NewWorkspaceScreen({
 							return false;
 						}}
 						mentionProviders={mentionProviders}
-						pending={isCreating}
+						pending={isStarting}
 						placeholder={promptPlaceholder}
 						toolbar={modePicker}
 						toolbarEnd={

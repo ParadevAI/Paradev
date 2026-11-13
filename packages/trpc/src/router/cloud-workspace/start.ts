@@ -144,7 +144,16 @@ async function start(args: StartCloudWorkspaceInput) {
 	const openAsChat =
 		args.chat === true && supportsCloudAgentChat(args.launch?.agent);
 	const environment = await loadUsableEnvironment(args);
-	const size = await resolveMachineSize(args.organizationId, args.machineSize);
+	// A size the plan no longer offers on the environment falls back to the
+	// organization's default; one the caller named is refused.
+	const size =
+		(await resolveMachineSize(
+			args.organizationId,
+			args.machineSize ?? environment.machineSize,
+		)) ??
+		(args.machineSize
+			? null
+			: await resolveMachineSize(args.organizationId, undefined));
 	if (!size) throw machineSizeNotAvailable(args.machineSize);
 	const machineSize = size.name;
 	await assertMayBoot(args.organizationId, size.vcpus);

@@ -50,6 +50,7 @@ import { useFooterTier } from "renderer/routes/_authenticated/components/AgentCo
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { ENVIRONMENT_SETUP_PROMPT } from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
@@ -62,6 +63,7 @@ import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { EnvironmentSetupNotice } from "./components/EnvironmentSetupNotice";
 import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
@@ -607,6 +609,22 @@ export const Composer = memo(function Composer({
 		[availableCommands, blocked, runTyped, send, t, target],
 	);
 
+	const insertSetupPrompt = useCallback(() => {
+		const input = promptInputRef.current;
+		if (!input) return;
+		input.restoreDraft({
+			segments: [
+				{
+					type: "text",
+					text: input.isEmpty()
+						? ENVIRONMENT_SETUP_PROMPT
+						: `\n\n${ENVIRONMENT_SETUP_PROMPT}`,
+				},
+			],
+			attachments: [],
+		});
+	}, []);
+
 	return (
 		<div
 			ref={rootRef}
@@ -621,6 +639,13 @@ export const Composer = memo(function Composer({
 					className={CHAT_COLUMN_CLASSNAME}
 					terminalId={terminalId}
 					workspaceId={workspaceId}
+				/>
+			)}
+			{!target && (
+				<EnvironmentSetupNotice
+					className={CHAT_COLUMN_CLASSNAME}
+					workspaceId={workspaceId}
+					onSetUp={insertSetupPrompt}
 				/>
 			)}
 			<AgentComposer
