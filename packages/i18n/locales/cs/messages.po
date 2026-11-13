@@ -4367,6 +4367,9 @@ msgstr "Zkontrolujte připojení nebo to zkuste otevřít znovu."
 msgid "Check your inbox"
 msgstr "Zkontrolujte schránku"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Kontrolujte, měňte a uklízejte feature flagy"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Zaškrtávátko · Přepínač · Vypínač"
 

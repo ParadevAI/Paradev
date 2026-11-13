@@ -307,6 +307,65 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "acct_1Example", label: "Tegon" });
 	});
 
+	test("launchdarkly_mcp reads the member behind the token", async () => {
+		const member = {
+			id: "5a0e7c1f9b2d4e0012345678",
+			email: "h@tegon.ai",
+			firstName: "Harshith",
+			lastName: "Mullapudi",
+			displayName: "Harshith Mullapudi",
+			teams: [],
+		};
+		const calls: { method?: string; name?: string; auth: string | null }[] = [];
+		globalThis.fetch = (async (_url: string, init: RequestInit) => {
+			const body = init.body
+				? (JSON.parse(String(init.body)) as {
+						id?: number;
+						method?: string;
+						params?: { name?: string };
+					})
+				: {};
+			calls.push({
+				method: body.method,
+				name: body.params?.name,
+				auth: new Headers(init.headers).get("Authorization"),
+			});
+			if (init.method === "DELETE") return new Response(null, { status: 204 });
+			if (body.id === undefined) return new Response(null, { status: 202 });
+			const result =
+				body.method === "tools/call"
+					? { structuredContent: member }
+					: { protocolVersion: "2025-06-18" };
+			return new Response(
+				JSON.stringify({ jsonrpc: "2.0", id: body.id, result }),
+				{
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}) as unknown as typeof fetch;
+
+		const identity = await probeIdentity(
+			"launchdarkly_mcp",
+			connectorMethod(requireConnector("launchdarkly_mcp")),
+			"ld-test",
+		);
+
+		expect(calls[2]).toEqual({
+			method: "tools/call",
+			name: "get-member-self",
+			auth: "Bearer ld-test",
+		});
+		expect(identity.account).toEqual({
+			id: "5a0e7c1f9b2d4e0012345678",
+			label: "h@tegon.ai",
+		});
+		expect(identity.user).toEqual({
+			id: "5a0e7c1f9b2d4e0012345678",
+			label: "h@tegon.ai",
+		});
+	});
+
 	test("neon_mcp reads the first organization from a text array", async () => {
 		const organizations = [{ id: "org-cold-bar", name: "Tegon" }];
 		const calls: { method?: string; name?: string }[] = [];

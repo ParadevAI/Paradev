@@ -4367,6 +4367,9 @@ msgstr "연결 상태를 확인하거나 다시 열어 보세요."
 msgid "Check your inbox"
 msgstr "받은편지함을 확인하세요"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "기능 플래그 확인, 변경, 정리"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "체크박스 · 라디오 · 스위치"
 

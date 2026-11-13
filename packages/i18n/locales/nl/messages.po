@@ -4367,6 +4367,9 @@ msgstr "Controleer je verbinding of probeer de pagina opnieuw te openen."
 msgid "Check your inbox"
 msgstr "Check je inbox"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Feature flags controleren, wijzigen en opruimen"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 

@@ -11,6 +11,7 @@ import {
 import { AutumnIcon } from "./components/AutumnIcon";
 import { FirecrawlIcon } from "./components/FirecrawlIcon";
 import { InngestIcon } from "./components/InngestIcon";
+import { LaunchDarklyIcon } from "./components/LaunchDarklyIcon";
 import { PeecIcon } from "./components/PeecIcon";
 import { ResendIcon } from "./components/ResendIcon";
 import { SazabiIcon } from "./components/SazabiIcon";
@@ -34,6 +35,7 @@ export const GLYPH_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
 	inngest: { icon: InngestIcon },
+	launchdarkly: { icon: LaunchDarklyIcon },
 	linear: { icon: SiLinear },
 	notion: { icon: SiNotion },
 	peec: { icon: PeecIcon },

@@ -4367,6 +4367,9 @@ msgstr "Vérifiez votre connexion ou essayez de l'ouvrir à nouveau."
 msgid "Check your inbox"
 msgstr "Consultez votre boîte de réception"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "Vérifier, modifier et nettoyer les feature flags"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Case à cocher · Radio · Interrupteur"
 

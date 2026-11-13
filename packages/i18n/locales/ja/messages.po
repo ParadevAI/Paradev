@@ -4367,6 +4367,9 @@ msgstr "接続を確認するか、もう一度開いてみてください。"
 msgid "Check your inbox"
 msgstr "受信トレイを確認してください"
 
+msgid "Check, change, and clean up feature flags"
+msgstr "フィーチャーフラグの確認、変更、整理"
+
 msgid "Checkbox · Radio · Switch"
 msgstr "Checkbox · Radio · Switch"
 
