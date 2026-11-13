@@ -11,6 +11,7 @@ import * as os from "node:os";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { hasHarnessSession } from ".";
+import { codexSessionStore } from "./codex";
 import { readHarnessTranscript } from "./transcript";
 
 const sessionId = "019f5cac-9077-73d2-83a3-f17e383fc705";
@@ -160,10 +161,12 @@ describe("codex session files", () => {
 		).toBeNull();
 
 		const sessions = join(home, ".codex-work", "sessions");
-		for (let i = 0; i < 2_000; i++)
-			mkdirSync(join(sessions, `d${i}`), { recursive: true });
+		mkdirSync(join(sessions, "day"), { recursive: true });
 		expect(
-			hasHarnessSession({ agentId: "codex", sessionId, env: workEnv() }),
+			codexSessionStore.hasSession(
+				{ sessionId, worktreePath: null, env: workEnv() },
+				1,
+			),
 		).toBeNull();
 	});
 

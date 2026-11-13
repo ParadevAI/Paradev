@@ -67,18 +67,21 @@ describe("claudeSessionStore.hasSession", () => {
 		return configDir;
 	}
 
-	const ask = (configDir: string) =>
-		claudeSessionStore.hasSession?.({
-			sessionId,
-			worktreePath: "/work/tree",
-			env: { CLAUDE_CONFIG_DIR: configDir },
-		});
+	const ask = (configDir: string, maxDirs?: number) =>
+		claudeSessionStore.hasSession?.(
+			{
+				sessionId,
+				worktreePath: "/work/tree",
+				env: { CLAUDE_CONFIG_DIR: configDir },
+			},
+			maxDirs,
+		);
 
 	test("answers false only after searching every project directory", () => {
 		expect(ask(configWithProjects(10))).toBe(false);
 	});
 
 	test("answers unknown when the search stopped at its cap", () => {
-		expect(ask(configWithProjects(5_000))).toBeNull();
+		expect(ask(configWithProjects(2), 2)).toBeNull();
 	});
 });

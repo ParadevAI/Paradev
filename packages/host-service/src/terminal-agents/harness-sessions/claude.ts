@@ -64,6 +64,7 @@ function layoutPath(root: string, query: HarnessSessionQuery): string | null {
 function searchProjects(
 	root: string,
 	fileName: string,
+	maxDirs = MAX_PROJECT_DIRS_SCANNED,
 ): { path: string | null; complete: boolean } {
 	const projectsDir = join(root, "projects");
 	let entries: string[];
@@ -72,13 +73,13 @@ function searchProjects(
 	} catch {
 		return { path: null, complete: false };
 	}
-	for (const entry of entries.slice(0, MAX_PROJECT_DIRS_SCANNED)) {
+	for (const entry of entries.slice(0, maxDirs)) {
 		const candidate = join(projectsDir, entry, fileName);
 		if (isFile(candidate)) return { path: candidate, complete: true };
 	}
 	return {
 		path: null,
-		complete: entries.length <= MAX_PROJECT_DIRS_SCANNED,
+		complete: entries.length <= maxDirs,
 	};
 }
 
@@ -157,17 +158,21 @@ export const claudeSessionFiles: HarnessSessionFiles = {
 	parseTurns,
 };
 
-export const claudeSessionStore: HarnessSessionStore = {
+export const claudeSessionStore = {
 	/** Only the launch env's store: that is where a relaunch will look. */
-	hasSession(query) {
+	hasSession(query, maxDirs = MAX_PROJECT_DIRS_SCANNED) {
 		const root = configDir(query.env);
 		if (!existsSync(root)) return null;
 		if (layoutPath(root, query)) return true;
-		const search = searchProjects(root, sessionFileName(query.sessionId));
+		const search = searchProjects(
+			root,
+			sessionFileName(query.sessionId),
+			maxDirs,
+		);
 		if (search.path) return true;
 		// Absence is evidence only when the whole store was searched and the
 		// worktree's own project directory is there to have held the file.
 		if (!search.complete || !query.worktreePath) return null;
 		return existsSync(projectDir(root, query.worktreePath)) ? false : null;
 	},
-};
+} satisfies HarnessSessionStore;
