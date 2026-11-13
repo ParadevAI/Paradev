@@ -34,7 +34,7 @@ import {
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
-	parseMergedAt,
+	parseGitHubTimestamp,
 } from "./utils/github-query";
 import type {
 	GitHubCheckContextNode,
@@ -56,6 +56,7 @@ import {
 	type ReviewDecision,
 } from "./utils/pull-request-mappers";
 import {
+	readBranchSince,
 	readWorkspaceRefs,
 	type WorkspaceRefsSnapshot,
 } from "./utils/workspace-refs";
@@ -213,14 +214,19 @@ interface MatchedPullRequest {
 	headSha: string;
 }
 
-// A branch name outlives its PRs: a PR that closed before the workspace
-// existed is not its work unless the workspace sits on the PR's head.
+// A branch name outlives its PRs: a PR that closed before the workspace moved
+// onto its branch is not its work unless the workspace sits on the PR's head.
 function isEarlierUseOfBranch(
 	pullRequest: Pick<MatchedPullRequest, "isOpen" | "closedAt" | "headSha">,
-	workspace: Pick<typeof workspaces.$inferSelect, "createdAt" | "headSha">,
+	workspace: Pick<
+		typeof workspaces.$inferSelect,
+		"branchSince" | "createdAt" | "headSha"
+	>,
 ): boolean {
 	if (pullRequest.isOpen || pullRequest.closedAt === null) return false;
-	if (pullRequest.closedAt >= workspace.createdAt) return false;
+	if (pullRequest.closedAt >= (workspace.branchSince ?? workspace.createdAt)) {
+		return false;
+	}
 	return (
 		pullRequest.headSha.toLowerCase() !==
 		workspace.headSha?.trim().toLowerCase()
@@ -646,7 +652,7 @@ export class PullRequestRuntimeManager {
 			isDraft,
 			headBranch: pullRequest.headRefName,
 			headSha: pullRequest.headRefOid,
-			mergedAt: parseMergedAt(pullRequest.mergedAt ?? null),
+			mergedAt: parseGitHubTimestamp(pullRequest.mergedAt ?? null),
 			reviewDecision: coerceReviewDecision(existing?.reviewDecision ?? null),
 			checksStatus: coerceChecksStatus(existing?.checksStatus ?? null),
 			checksJson: JSON.stringify(existingChecks),
@@ -747,11 +753,14 @@ export class PullRequestRuntimeManager {
 	}
 
 	private forgetEarlierBranchUseLinks(
-		workspace: typeof workspaces.$inferSelect,
-		rejectedPullRequestId: string | null,
+		projectWorkspaces: (typeof workspaces.$inferSelect)[],
+		rejectedPullRequestIds: Map<string, string>,
 	): void {
-		const staleIds = this.db
+		if (projectWorkspaces.length === 0) return;
+		const byId = new Map(projectWorkspaces.map((w) => [w.id, w]));
+		const stale = this.db
 			.select({
+				workspaceId: workspacePullRequests.workspaceId,
 				pullRequestId: workspacePullRequests.pullRequestId,
 				state: pullRequests.state,
 				mergedAt: pullRequests.mergedAt,
@@ -768,35 +777,35 @@ export class PullRequestRuntimeManager {
 			)
 			.where(
 				and(
-					eq(workspacePullRequests.workspaceId, workspace.id),
+					inArray(workspacePullRequests.workspaceId, [...byId.keys()]),
 					isNull(workspaces.archivedAt),
 				),
 			)
 			.all()
-			.filter(
-				(row) =>
-					row.pullRequestId === rejectedPullRequestId ||
+			.filter((row) => {
+				const workspace = byId.get(row.workspaceId);
+				if (!workspace) return false;
+				return (
+					rejectedPullRequestIds.get(row.workspaceId) === row.pullRequestId ||
 					(row.state === "merged" &&
 						isEarlierUseOfBranch(
-							{
-								isOpen: false,
-								closedAt: row.mergedAt,
-								headSha: row.headSha,
-							},
+							{ isOpen: false, closedAt: row.mergedAt, headSha: row.headSha },
 							workspace,
-						)),
-			)
-			.map((row) => row.pullRequestId);
-		if (staleIds.length === 0) return;
-		this.db
-			.delete(workspacePullRequests)
-			.where(
-				and(
-					eq(workspacePullRequests.workspaceId, workspace.id),
-					inArray(workspacePullRequests.pullRequestId, staleIds),
-				),
-			)
-			.run();
+						))
+				);
+			});
+		if (stale.length === 0) return;
+		for (const row of stale) {
+			this.db
+				.delete(workspacePullRequests)
+				.where(
+					and(
+						eq(workspacePullRequests.workspaceId, row.workspaceId),
+						eq(workspacePullRequests.pullRequestId, row.pullRequestId),
+					),
+				)
+				.run();
+		}
 		for (const listener of this.linkListeners) listener();
 	}
 
@@ -943,9 +952,17 @@ export class PullRequestRuntimeManager {
 				this.pullRequestHeadMatches(workspace.pullRequestId, headSha)
 					? workspace.pullRequestId
 					: null;
+			const branchSince =
+				branch === workspace.branch && workspace.branchSince !== null
+					? workspace.branchSince
+					: ((await this.readWorkspaceBranchSince(
+							workspace.worktreePath,
+							branch,
+						)) ?? (branch === workspace.branch ? null : Date.now()));
 
 			if (
 				branch === workspace.branch &&
+				branchSince === workspace.branchSince &&
 				headSha === workspace.headSha &&
 				upstreamOwner === workspace.upstreamOwner &&
 				upstreamRepo === workspace.upstreamRepo &&
@@ -964,6 +981,7 @@ export class PullRequestRuntimeManager {
 					upstreamRepo,
 					upstreamBranch,
 					pullRequestId,
+					branchSince,
 					...(branch !== workspace.branch ? { updatedAt: Date.now() } : {}),
 				})
 				// Guard: the workspace can archive during the awaited ref read;
@@ -983,6 +1001,17 @@ export class PullRequestRuntimeManager {
 					error,
 				},
 			);
+			return null;
+		}
+	}
+
+	private async readWorkspaceBranchSince(
+		worktreePath: string,
+		branch: string,
+	): Promise<number | null> {
+		try {
+			return await readBranchSince(await this.git(worktreePath), branch);
+		} catch {
 			return null;
 		}
 	}
@@ -1115,6 +1144,7 @@ export class PullRequestRuntimeManager {
 
 		const { failedKeys, matched: keyToPullRequest } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
+		const rejectedPullRequestIds = new Map<string, string>();
 
 		for (const workspace of projectWorkspaces) {
 			const key = this.effectiveUpstreamKey(workspace, repo);
@@ -1156,10 +1186,9 @@ export class PullRequestRuntimeManager {
 			}
 			const isEarlierBranchUse =
 				!!rawMatch && isEarlierUseOfBranch(rawMatch, workspace);
-			this.forgetEarlierBranchUseLinks(
-				workspace,
-				isEarlierBranchUse ? rawMatch.id : null,
-			);
+			if (isEarlierBranchUse) {
+				rejectedPullRequestIds.set(workspace.id, rawMatch.id);
+			}
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
 				rawMatch?.id === workspace.suppressedPullRequestId ||
@@ -1193,6 +1222,7 @@ export class PullRequestRuntimeManager {
 					.run();
 			}
 		}
+		this.forgetEarlierBranchUseLinks(projectWorkspaces, rejectedPullRequestIds);
 	}
 
 	private async getProjectRepository(

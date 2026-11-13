@@ -150,3 +150,46 @@ export async function readWorkspaceRefs(
 	const upstream = await resolveWorkspaceUpstream(git, branch);
 	return { branch, headSha, upstream };
 }
+
+const REFLOG_ENTRY = /^HEAD@\{(\d+)\}(?:\t(.*))?$/;
+
+/**
+ * When this checkout moved onto `branch`, from its HEAD reflog (newest
+ * first): the last `checkout: moving from … to <branch>`, else the oldest
+ * entry, which is when the checkout was cloned or added. Null when the
+ * reflog is empty.
+ */
+export function branchSinceFromReflog(
+	reflog: string,
+	branch: string,
+): number | null {
+	let oldest: number | null = null;
+	for (const line of reflog.split("\n")) {
+		const match = REFLOG_ENTRY.exec(line);
+		if (!match) continue;
+		const [, seconds, subject = ""] = match;
+		const at = Number(seconds) * 1000;
+		if (
+			subject.startsWith("checkout: moving from ") &&
+			subject.endsWith(` to ${branch}`)
+		) {
+			return at;
+		}
+		oldest = at;
+	}
+	return oldest;
+}
+
+export async function readBranchSince(
+	git: SimpleGit,
+	branch: string,
+): Promise<number | null> {
+	const reflog = await tryRaw(git, [
+		"log",
+		"--walk-reflogs",
+		"--date=unix",
+		"--format=%gd%x09%gs",
+		"HEAD",
+	]);
+	return reflog ? branchSinceFromReflog(reflog, branch) : null;
+}

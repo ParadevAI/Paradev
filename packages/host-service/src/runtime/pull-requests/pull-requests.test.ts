@@ -58,6 +58,7 @@ function seedWorkspace(
 		pullRequestId?: string | null;
 		worktreePath?: string;
 		createdAt?: number;
+		branchSince?: number | null;
 	},
 ) {
 	db.insert(schema.workspaces)
@@ -67,6 +68,7 @@ function seedWorkspace(
 			worktreePath: w.worktreePath ?? `/repo/.worktrees/${w.id}`,
 			branch: w.branch,
 			createdAt: w.createdAt ?? Date.now(),
+			branchSince: w.branchSince ?? null,
 			headSha: w.headSha ?? null,
 			upstreamOwner: w.upstreamOwner ?? null,
 			upstreamRepo: w.upstreamRepo ?? null,
@@ -1918,6 +1920,61 @@ describe("earlier use of a branch name", () => {
 
 		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBe(
 			getPrByNumber(db, 600)?.id,
+		);
+	});
+
+	test("a long-lived workspace that moves onto the branch after the PR merged does not link it", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws-release",
+			branch: "feature",
+			headSha: "workspace-sha",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "feature",
+			createdAt: Date.parse("2025-01-01T00:00:00Z"),
+			branchSince: Date.parse("2025-01-01T00:00:00Z"),
+		});
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
+			readWorkspaceRefs: async () => ({
+				branch: "release",
+				headSha: "workspace-sha",
+				upstream: { owner: REPO.owner, name: REPO.name, branch: "release" },
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
+
+		const workspace = getWorkspace(db, "ws-release");
+		expect(workspace?.branch).toBe("release");
+		expect(workspace?.pullRequestId).toBeNull();
+	});
+
+	test("an adopted worktree keeps a PR that merged after it moved onto the branch", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws-release",
+			branch: "release",
+			headSha: "behind-pr-head-sha",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "release",
+			createdAt: WORKSPACE_CREATED_AT,
+			branchSince: Date.parse("2025-12-01T00:00:00Z"),
+		});
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
+
+		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBe(
+			getPrByNumber(db, 515)?.id,
 		);
 	});
 
