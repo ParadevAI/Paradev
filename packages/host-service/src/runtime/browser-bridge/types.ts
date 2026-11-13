@@ -7,6 +7,8 @@ export interface BrowserPane {
 	url: string;
 	title: string;
 	isLoading: boolean;
+	/** False when hidden-pane eviction unloaded it; the next command rebuilds it. Absent from older desktop apps. */
+	loaded?: boolean;
 }
 
 export interface ConsoleEntry {

@@ -1,3 +1,4 @@
+import babel from "@rolldown/plugin-babel";
 import type { StorybookConfig } from "@storybook/react-vite";
 import tailwindcss from "@tailwindcss/vite";
 import reactPlugin from "@vitejs/plugin-react";
@@ -23,15 +24,13 @@ const config: StorybookConfig = {
 	],
 	framework: "@storybook/react-vite",
 	viteFinal: (viteConfig) => {
-		// Storybook adds its own React plugin; ours compiles the Lingui macro,
-		// so it replaces Storybook's rather than stacking on it.
+		// Storybook adds its own React plugin; ours replaces it rather than stacking on it.
 		const plugins = (viteConfig.plugins ?? []).flat(Number.POSITIVE_INFINITY);
 		viteConfig.plugins = [
 			...plugins.filter((plugin) => !isReactPlugin(plugin)),
 			tailwindcss(),
-			reactPlugin({
-				babel: { plugins: ["@lingui/babel-plugin-lingui-macro"] },
-			}),
+			reactPlugin(),
+			babel({ plugins: ["@lingui/babel-plugin-lingui-macro"] }),
 		];
 		return viteConfig;
 	},

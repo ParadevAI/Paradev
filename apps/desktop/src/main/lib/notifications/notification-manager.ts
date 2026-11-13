@@ -72,13 +72,13 @@ export class NotificationManager {
 			title: isWaiting
 				? i18n._({
 						...msg({
-							message: "Awaiting Response — {workspaceName}",
+							message: "Awaiting Response · {workspaceName}",
 						}),
 						values: { workspaceName },
 					})
 				: i18n._({
 						...msg({
-							message: "Agent Complete — {workspaceName}",
+							message: "Agent Complete · {workspaceName}",
 						}),
 						values: { workspaceName },
 					}),

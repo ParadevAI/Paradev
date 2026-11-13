@@ -44,3 +44,17 @@ test("a sign-in popup from an extension window stays a popup; a plain link opens
 	contents.listeners.get("did-create-window")?.({ webContents: child });
 	expect(child.openHandler).not.toBeNull();
 });
+
+test("a window an extension page opens is handed back, so it becomes a tab", () => {
+	const contents = fakeContents();
+	const windows: unknown[] = [];
+	guardExtensionContents(
+		contents as unknown as Electron.WebContents,
+		() => {},
+		(window) => windows.push(window),
+	);
+	const child = { webContents: fakeContents() };
+	contents.listeners.get("did-create-window")?.(child);
+
+	expect(windows).toEqual([child]);
+});

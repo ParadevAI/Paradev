@@ -408,35 +408,30 @@ describe("applyPaneLayoutOp", () => {
 		).toBe(true);
 	});
 
-	test("only terminals and chats can go into the main area", () => {
-		expectError(
-			() =>
-				applyPaneLayoutOp(fixture(), {
-					type: "move",
-					paneId: "d",
-					targetPaneId: "a",
-					direction: "right",
-				}),
-			"BAD_REQUEST",
-		);
-		expectError(
-			() =>
-				applyPaneLayoutOp(fixture(), {
-					type: "moveToNewTab",
-					paneId: "d",
-					area: "main",
-				}),
-			"BAD_REQUEST",
-		);
-		expectError(
-			() =>
-				applyPaneLayoutOp(fixture(), {
-					type: "swap",
-					paneId: "c",
-					withPaneId: "d",
-				}),
-			"BAD_REQUEST",
-		);
+	test("any pane kind can move into the main area", () => {
+		const moved = applyPaneLayoutOp(fixture(), {
+			type: "move",
+			paneId: "d",
+			targetPaneId: "a",
+			direction: "right",
+		});
+		expect(moved.areas.main.tabs[0]?.panes.d?.kind).toBe("diff");
+		const newTab = applyPaneLayoutOp(fixture(), {
+			type: "moveToNewTab",
+			paneId: "d",
+			area: "main",
+		});
+		expect(
+			newTab.areas.main.tabs.some((tab) => tab.panes.d?.kind === "diff"),
+		).toBe(true);
+		const swapped = applyPaneLayoutOp(fixture(), {
+			type: "swap",
+			paneId: "c",
+			withPaneId: "d",
+		});
+		expect(
+			swapped.areas.main.tabs.some((tab) => tab.panes.d?.kind === "diff"),
+		).toBe(true);
 	});
 
 	test("open reuses a tool already in the sidebar", () => {

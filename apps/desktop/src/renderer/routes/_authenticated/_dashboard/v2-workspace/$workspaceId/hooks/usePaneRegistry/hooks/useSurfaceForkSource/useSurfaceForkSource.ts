@@ -1,7 +1,6 @@
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { useTerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
 import type { ChatPaneData, TerminalPaneData } from "../../../../types";
 import type { SurfaceForkSource } from "../useSurfaceFork";
@@ -16,27 +15,22 @@ export type AgentPane =
 export function useSurfaceForkSource(
 	workspaceId: string,
 	pane: AgentPane,
-): { enabled: boolean; source: SurfaceForkSource | null } {
-	const enabled = useAcpChatEnabled();
+): SurfaceForkSource | null {
 	const binding = useTerminalAgentBinding(workspaceId, pane.data.terminalId);
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const { data: configs = [] } = useV2AgentConfigs(hostUrl);
-	if (!enabled) return { enabled, source: null };
 
 	if (pane.kind === "chat") {
 		const { agent } = pane.data;
-		if (!agent?.sessionId) return { enabled, source: null };
+		if (!agent?.sessionId) return null;
 		const config = configs.find(
 			(entry) => entry.presetId === agent.id && entry.forkArgs?.length,
 		);
-		if (!config) return { enabled, source: null };
+		if (!config) return null;
 		return {
-			enabled,
-			source: {
-				into: "cli",
-				configId: config.id,
-				harnessSessionId: agent.sessionId,
-			},
+			into: "cli",
+			configId: config.id,
+			harnessSessionId: agent.sessionId,
 		};
 	}
 
@@ -46,14 +40,11 @@ export function useSurfaceForkSource(
 		LOCKED_WHILE_CLI_RUNS.has(binding.agentId) ||
 		!acpHarnessForPreset(binding.agentId)
 	) {
-		return { enabled, source: null };
+		return null;
 	}
 	return {
-		enabled,
-		source: {
-			into: "chat",
-			presetId: binding.agentId,
-			harnessSessionId: binding.agentSessionId,
-		},
+		into: "chat",
+		presetId: binding.agentId,
+		harnessSessionId: binding.agentSessionId,
 	};
 }

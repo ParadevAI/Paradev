@@ -44,12 +44,12 @@ export function DashboardSidebarWorkspaceHostGlyph({
 			<TooltipContent side="top">
 				{hostType === "cloud" ? (
 					cloudState === "connecting" ? (
-						<Trans>Cloud workspace — connecting</Trans>
+						<Trans>Cloud workspace: connecting</Trans>
 					) : (
 						<Trans>Cloud workspace</Trans>
 					)
 				) : isOffline ? (
-					<Trans>Remote workspace — device offline</Trans>
+					<Trans>Remote workspace: device offline</Trans>
 				) : (
 					<Trans>Remote workspace</Trans>
 				)}

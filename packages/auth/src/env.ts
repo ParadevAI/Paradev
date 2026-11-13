@@ -7,6 +7,7 @@ config({ path: path.resolve(process.cwd(), "../../../.env"), quiet: true });
 
 export const env = createEnv({
 	server: {
+		BROWSER_API_URL: z.string().url().optional(),
 		GH_CLIENT_ID: z.string(),
 		GH_CLIENT_SECRET: z.string(),
 		GOOGLE_CLIENT_ID: z.string(),

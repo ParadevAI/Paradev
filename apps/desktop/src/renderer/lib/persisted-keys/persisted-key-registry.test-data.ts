@@ -85,7 +85,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
 	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
-	["src/renderer/stores/new-workspace-width.ts", ["new-workspace-width"]],
 	[
 		"src/renderer/stores/workspace-sidebar-state.ts",
 		["workspace-sidebar-store"],
@@ -125,6 +124,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/v2-notifications/store.ts", ["v2-notifications-v1"]],
 	["src/renderer/stores/hiring-banner/store.ts", ["hiring-banner-v1"]],
+	[
+		"src/renderer/stores/payment-failed-card-dismissal/store.ts",
+		["payment-failed-card-dismissal-v1"],
+	],
 	["src/renderer/stores/star-nag/store.ts", ["star-nag-v1"]],
 	[
 		"src/renderer/stores/release-notes-card/store.ts",

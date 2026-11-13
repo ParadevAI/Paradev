@@ -147,18 +147,21 @@ function normalizePullRequestCandidates(
 	head: GitHubPullRequestHeadRef,
 ): GitHubPullRequestNode | null {
 	const requestedKey = headKey(head.owner, head.repo, head.branch);
+	const candidates = asArray(raw)
+		.map((item) => normalizePullRequest(item))
+		.filter(
+			(node): node is GitHubPullRequestNode =>
+				node !== null &&
+				headKey(
+					node.headRepositoryOwner?.login,
+					node.headRepository?.name,
+					node.headRefName,
+				) === requestedKey,
+		);
+	// Candidates arrive most recently updated first; a reused branch name must
+	// not resolve to an old merged PR while a newer one is still open.
 	return (
-		asArray(raw)
-			.map((item) => normalizePullRequest(item))
-			.find(
-				(node) =>
-					node &&
-					headKey(
-						node.headRepositoryOwner?.login,
-						node.headRepository?.name,
-						node.headRefName,
-					) === requestedKey,
-			) ?? null
+		candidates.find((node) => node.state === "OPEN") ?? candidates[0] ?? null
 	);
 }
 

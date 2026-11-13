@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
+	agentCommandText,
+	buildArgvCommand,
 	buildFishPromptCommandString,
 	buildPromptCommandString,
 	parsePromptHeredocCommand,
@@ -162,6 +164,41 @@ describe("buildFishPromptCommandString", () => {
 			}),
 		).toBe(
 			"begin; command rm -f -- '/tmp/p.txt'; amp --dangerous; end < '/tmp/p.txt'",
+		);
+	});
+});
+
+describe("buildArgvCommand", () => {
+	it("leaves plain tokens bare and quotes anything a shell would expand", () => {
+		expect(
+			buildArgvCommand([
+				"claude",
+				"--model=opus",
+				"",
+				"~/x",
+				"=ls",
+				"%self",
+				"a b",
+				"$(id)",
+				"`id`",
+				"a;id",
+			]),
+		).toBe(
+			"claude --model=opus '' '~/x' '=ls' '%self' 'a b' '$(id)' '`id`' 'a;id'",
+		);
+	});
+});
+
+describe("agentCommandText", () => {
+	it("runs shell code as written and quotes a plain command and its args", () => {
+		expect(agentCommandText("ccr code | tee log", [])).toBe(
+			"ccr code | tee log",
+		);
+		expect(agentCommandText("/opt/My Agent/claude", [])).toBe(
+			"'/opt/My Agent/claude'",
+		);
+		expect(agentCommandText("~/bin/claude", ["--model=opus", "a b"])).toBe(
+			"~/bin/claude --model=opus 'a b'",
 		);
 	});
 });

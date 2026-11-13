@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ChevronRight } from "lucide-react";
-import { Fragment, type MouseEvent } from "react";
+import { Fragment, type MouseEvent, type ReactNode } from "react";
 import type { SubagentCrumb } from "../../../../stores/chatSubagentStore";
 
 const CRUMB_CLASSNAME =
@@ -15,7 +15,7 @@ export function SubagentBreadcrumb({
 	path,
 	onSelect,
 }: {
-	root: string;
+	root: ReactNode;
 	path: readonly SubagentCrumb[];
 	onSelect: (id: string | null) => void;
 }) {
@@ -28,13 +28,7 @@ export function SubagentBreadcrumb({
 			className="flex min-w-0 items-center gap-1 text-xs"
 			onClick={stopHeaderClick}
 		>
-			<button
-				className={CRUMB_CLASSNAME}
-				onClick={() => onSelect(null)}
-				type="button"
-			>
-				{root}
-			</button>
+			{root}
 			{path.slice(0, -1).map((crumb) => (
 				<Fragment key={crumb.id}>
 					<ChevronRight className="size-3 shrink-0 text-foreground/30" />

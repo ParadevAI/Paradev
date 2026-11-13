@@ -196,11 +196,11 @@ export function useFilesTabActions({
 					toast.info(
 						entry.mode === "folder"
 							? t({
-									message: "Kept the new folder — it is no longer empty",
+									message: "Kept the new folder because it is no longer empty",
 								})
 							: t({
 									message:
-										"Kept the new file — it changed after it was created",
+										"Kept the new file because it changed after it was created",
 								}),
 					);
 				})

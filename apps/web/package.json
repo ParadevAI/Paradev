@@ -13,8 +13,8 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@lingui/core": "6.8.0",
-		"@lingui/react": "6.8.0",
+		"@lingui/core": "6.12.0",
+		"@lingui/react": "6.12.0",
 		"@sentry/nextjs": "10.75.2",
 		"@superset/auth": "workspace:*",
 		"@superset/cloud-client": "workspace:*",
@@ -48,7 +48,7 @@
 		"require-in-the-middle": "8.0.1",
 		"server-only": "0.0.1",
 		"superjson": "2.2.6",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@lingui/swc-plugin": "6.7.1",

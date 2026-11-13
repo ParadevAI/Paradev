@@ -8,6 +8,7 @@ export const env = createEnv({
 			.default("development"),
 	},
 	server: {
+		BROWSER_API_URL: z.string().url().optional(),
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),
 		GOOGLE_CLIENT_ID: z.string().min(1),

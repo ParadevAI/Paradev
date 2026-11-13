@@ -111,6 +111,7 @@ export function TurnGroupSection({
 				<WorkingFor
 					completedAtMs={row.completedAtMs}
 					startedAtMs={row.startedAtMs}
+					stopped={row.stopped}
 					waiting={row.waiting}
 				/>
 			);
@@ -181,6 +182,7 @@ export function TurnGroupSection({
 					latest={row.latest}
 					status={row.status}
 					turnId={row.turnId}
+					userStop={row.userStop}
 				/>
 			);
 		case "changed_files":

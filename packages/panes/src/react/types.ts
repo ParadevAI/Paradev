@@ -131,6 +131,11 @@ export type PaneAppearance = "default" | "cards";
 
 export interface WorkspaceProps<TData> {
 	appearance?: PaneAppearance;
+	/**
+	 * Defaults to true. False when another workspace in the same window has
+	 * keyboard focus: the active tab and pane header then look inactive.
+	 */
+	isFocused?: boolean;
 	store: StoreApi<WorkspaceStore<TData>>;
 	registry: PaneRegistry<TData>;
 	className?: string;
