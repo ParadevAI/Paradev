@@ -272,7 +272,7 @@ export function CommitFilterDropdown({
 				onOpenChange={setRangeModalOpen}
 				commits={commits}
 				onSelect={(fromHash, toHash) =>
-					onFilterChange({ kind: "range", fromHash, toHash })
+					onFilterChange({ kind: "range", fromHash, toHash, includeFrom: true })
 				}
 			/>
 		</>

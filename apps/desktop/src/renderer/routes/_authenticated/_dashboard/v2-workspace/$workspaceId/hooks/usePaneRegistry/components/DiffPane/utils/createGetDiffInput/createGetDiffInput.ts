@@ -27,6 +27,7 @@ export function createGetDiffInput(
 			category: "commit",
 			commitHash: source.commitHash,
 			fromHash: source.fromHash,
+			includeFrom: source.includeFrom,
 		};
 	}
 	return {

@@ -151,6 +151,7 @@ const changesFilterSchema = z.discriminatedUnion("kind", [
 		kind: z.literal("range"),
 		fromHash: z.string(),
 		toHash: z.string(),
+		includeFrom: z.boolean().optional(),
 	}),
 ]);
 
