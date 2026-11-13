@@ -34,7 +34,11 @@ host-service calls on a box must go in that list too.
 Automation reads were allowed while updates were blocked by the same list. Cloud workspaces now
 allow `automation.update`, `setPrompt`, `setGroup`, and `setEnabled`, so the CLI can edit automation
 settings, prompts, groups, and enabled state. Existing organization and automation permission checks
-still apply. This is an API change; existing boxes do not need a new host-service bundle.
+still apply. Writes also check the resolved target against the relay's cloud workspace access
+policy: the creator must own the host and its owner must have enabled cloud workspace access. A
+cloud workspace cannot leave the host unspecified, since dispatch could then select a closed host.
+Prompt, group, and enabled-state updates check the existing target too. Signed-in clients keep
+their existing access. This is an API change; existing boxes do not need a new host-service bundle.
 
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.

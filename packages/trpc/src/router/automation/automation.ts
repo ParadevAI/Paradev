@@ -52,11 +52,17 @@ import { z } from "zod";
 import { env } from "../../env";
 import { assertCloudAccess } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
-import { personProcedure, planRequiredError, userError } from "../../trpc";
+import {
+	personProcedure,
+	planRequiredError,
+	type TRPCContext,
+	userError,
+} from "../../trpc";
 import {
 	assertMachineSizeOffered,
 	loadUsableEnvironment,
 } from "../cloud-workspace/start";
+import { findHostForCloudWorkspace } from "../host/findHostForCloudWorkspace";
 import { joinSlackTriggerChannels } from "../integration/slack/joinChannels";
 import {
 	requireActiveOrgMembership,
@@ -78,6 +84,7 @@ import {
 	summarizeSchedules,
 	syncScheduleTrigger,
 } from "./helpers";
+import { assertSandboxTargetAccess } from "./sandboxTargetAccess";
 import {
 	createAutomationSchema,
 	listOrgRunsSchema,
@@ -287,7 +294,9 @@ function assertPromptFitsTarget(targetHostId: string | null, prompt: string) {
 
 /** Looks up what the input names, plans the target, then runs the checks the plan asks for. */
 async function resolveTarget(
-	ctx: { session: { user: { id: string; email: string } } },
+	ctx: Pick<TRPCContext, "sandboxCaller"> & {
+		session: { user: { id: string; email: string } };
+	},
 	organizationId: string,
 	existing: AutomationTarget,
 	input: TargetInput,
@@ -311,6 +320,11 @@ async function resolveTarget(
 	}
 
 	const plan = planTarget(existing, input, lookups);
+	await assertSandboxTargetAccess(
+		ctx.sandboxCaller,
+		plan.target.targetHostId,
+		findHostForCloudWorkspace,
+	);
 	for (const hostId of plan.hostsToVerify) {
 		await verifyHostAccess(userId, organizationId, hostId);
 	}
@@ -852,7 +866,16 @@ export const automationRouter = {
 		.input(setAutomationGroupSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
-			await getAutomationForUser(ctx.session.user.id, organizationId, input.id);
+			const existing = await getAutomationForUser(
+				ctx.session.user.id,
+				organizationId,
+				input.id,
+			);
+			await assertSandboxTargetAccess(
+				ctx.sandboxCaller,
+				existing.targetHostId,
+				findHostForCloudWorkspace,
+			);
 
 			const group = await resolveAutomationGroup(organizationId, input.group);
 			await db
@@ -871,6 +894,11 @@ export const automationRouter = {
 				ctx.session.user.id,
 				organizationId,
 				input.id,
+			);
+			await assertSandboxTargetAccess(
+				ctx.sandboxCaller,
+				existing.targetHostId,
+				findHostForCloudWorkspace,
 			);
 
 			if (existing.prompt === input.prompt) {
@@ -989,6 +1017,11 @@ export const automationRouter = {
 				ctx.session.user.id,
 				organizationId,
 				input.id,
+			);
+			await assertSandboxTargetAccess(
+				ctx.sandboxCaller,
+				existing.targetHostId,
+				findHostForCloudWorkspace,
 			);
 
 			if (input.enabled) assertNotArchived(existing);
