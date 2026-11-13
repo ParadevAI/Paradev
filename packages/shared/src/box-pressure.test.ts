@@ -1,7 +1,16 @@
 import { describe, expect, test } from "bun:test";
-import { parseBoxPressure, parseBoxPressureMessage } from "./box-pressure";
+import {
+	type BoxPressure,
+	parseBoxPressure,
+	parseBoxPressureMessage,
+} from "./box-pressure";
 
-const busy = { level: "busy", limitedBy: ["cpu"], reap: null, at: 1 };
+const busy: BoxPressure = {
+	level: "busy",
+	limitedBy: ["cpu"],
+	reap: null,
+	at: 1,
+};
 
 describe("parseBoxPressure", () => {
 	test("accepts a report and drops duplicate resources", () => {
