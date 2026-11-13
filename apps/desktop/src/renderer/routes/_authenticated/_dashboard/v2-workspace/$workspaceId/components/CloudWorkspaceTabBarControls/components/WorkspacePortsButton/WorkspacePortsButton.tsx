@@ -33,10 +33,11 @@ export function WorkspacePortsButton({
 		(forward) => !detected.has(forward.id),
 	);
 	const totalPortCount = ports.length;
-	// The topbar layout's org-wide ports pill already lists this workspace.
+	// The topbar layout's org-wide ports pill already lists this workspace's
+	// ports, but not stale forwards, which would then have no Stop.
 	const portsDisplayMode = usePortsDisplayMode();
 
-	if (portsDisplayMode === "topbar") return null;
+	if (portsDisplayMode === "topbar" && stale.length === 0) return null;
 
 	return (
 		<Popover>
