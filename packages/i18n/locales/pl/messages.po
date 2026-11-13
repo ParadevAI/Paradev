@@ -3926,9 +3926,6 @@ msgstr "Dołączony do aplikacji Paradev na tym urządzeniu."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Dołączony do aplikacji Paradev na tym urządzeniu. Aktualizuje się razem z aplikacją."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Plan Business"
 
@@ -4689,9 +4686,6 @@ msgstr "Kliknij element."
 
 msgid "Click any element to send it to an agent."
 msgstr "Kliknij dowolny element, aby wysłać go do agenta."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Kliknij Authorize na claude.ai. Anthropic pokaże kod. Wklej go tutaj."
 
 msgid "Click here if not redirected"
 msgstr "Kliknij tutaj, jeśli przekierowanie nie nastąpi"
@@ -10264,6 +10258,9 @@ msgstr "Zaczynam poranne spacery z pomysłem, a kończę z pull requestem."
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Jestem na miejscu #{rank} w rankingu {company} z {tokens} tokenów zużycia agentów."
 
+msgid "I've signed in"
+msgstr "Zalogowałem(-am) się"
+
 msgid "Icon"
 msgstr "Ikona"
 
@@ -14124,12 +14121,6 @@ msgstr "Otwórz ChatGPT, aby się zalogować"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Otwieraj sesje Claude Code, Codex, OpenCode i Pi jako czaty"
 
-msgid "Open claude.ai again"
-msgstr "Otwórz ponownie claude.ai"
-
-msgid "Open claude.ai to sign in"
-msgstr "Otwórz claude.ai, aby się zalogować"
-
 msgid "Open Command Palette"
 msgstr "Otwórz paletę poleceń"
 
@@ -15038,9 +15029,6 @@ msgstr "Wklej link"
 
 msgid "Paste an API key instead"
 msgstr "Zamiast tego wklej klucz API"
-
-msgid "Paste the code"
-msgstr "Wklej kod"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Wklej to w CLI Paradev:"
@@ -17423,6 +17411,9 @@ msgstr "Uruchomić to polecenie?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Uruchom to w terminalu, a potem kontynuuj:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Uruchom to w terminalu, a potem wklej wyświetlony token:"
 
 msgid "Run workspace command"
 msgstr "Uruchom polecenie obszaru roboczego"
@@ -22115,9 +22106,6 @@ msgstr "Transkrypcja głosu i funkcje push-to-talk."
 
 msgid "Use your ChatGPT plan."
 msgstr "Użyj swojego planu ChatGPT."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Użyj swojego planu Claude Pro lub Max."
 
 msgid "Used"
 msgstr "Wykorzystano"

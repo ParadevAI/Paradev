@@ -3926,9 +3926,6 @@ msgstr "Bu cihazdaki Paradev uygulamasıyla birlikte gelir."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Bu cihazdaki Paradev uygulamasıyla birlikte gelir. Uygulamayla birlikte güncellenir."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Business planı"
 
@@ -4689,9 +4686,6 @@ msgstr "Bir öğeye tıklayın."
 
 msgid "Click any element to send it to an agent."
 msgstr "Herhangi bir öğeye tıklayıp bir ajana gönderin."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "claude.ai'de Authorize'a tıklayın. Anthropic ardından bir kod gösterir. Buraya yapıştırın."
 
 msgid "Click here if not redirected"
 msgstr "Yönlendirilmediyseniz buraya tıklayın"
@@ -10264,6 +10258,9 @@ msgstr "Sabah yürüyüşlerime bir fikirle başlıyor, bir pull request ile bit
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "{tokens} token ajan kullanımıyla {company} lider tablosunda #{rank} sıradayım."
 
+msgid "I've signed in"
+msgstr "Oturum açtım"
+
 msgid "Icon"
 msgstr "Simge"
 
@@ -14124,12 +14121,6 @@ msgstr "Oturum açmak için ChatGPT'yi aç"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code, Codex, OpenCode ve Pi oturumlarını sohbet olarak aç"
 
-msgid "Open claude.ai again"
-msgstr "claude.ai'yi yeniden aç"
-
-msgid "Open claude.ai to sign in"
-msgstr "Oturum açmak için claude.ai'yi aç"
-
 msgid "Open Command Palette"
 msgstr "Komut paletini aç"
 
@@ -15038,9 +15029,6 @@ msgstr "Bağlantı yapıştır"
 
 msgid "Paste an API key instead"
 msgstr "Bunun yerine bir API anahtarı yapıştır"
-
-msgid "Paste the code"
-msgstr "Kodu yapıştırın"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Bunu Paradev CLI'ye yapıştırın:"
@@ -17423,6 +17411,9 @@ msgstr "Bu komut çalıştırılsın mı?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Bunu bir terminalde çalıştırın, ardından devam edin:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Bunu bir terminalde çalıştırın, ardından yazdırdığı belirteci yapıştırın:"
 
 msgid "Run workspace command"
 msgstr "Çalışma alanı komutunu çalıştır"
@@ -22115,9 +22106,6 @@ msgstr "Sesli yazıya dökme ve bas-konuş özelliklerini kullanın."
 
 msgid "Use your ChatGPT plan."
 msgstr "ChatGPT planınızı kullanın."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Claude Pro veya Max planınızı kullanın."
 
 msgid "Used"
 msgstr "Kullanılan"

@@ -6515,7 +6515,7 @@ describe("AcpAdapter when the agent fails", () => {
 		await adapter.dispose();
 	});
 
-	it("names this agent's own login when it cannot open a session signed out", async () => {
+	it("keeps a chat that cannot open signed out, and fails each prompt with the agent's own login", async () => {
 		const agent = new FakeAcpAgent();
 		agent.newSessionError = "Authentication required";
 		const { adapter, events } = startAdapter(
@@ -6526,15 +6526,20 @@ describe("AcpAdapter when the agent fails", () => {
 				launch: async () => ({ command: "fake", loginCommand: "codex login" }),
 			},
 		);
+		adapter.prompt([{ type: "text", text: "hi" }]);
+		await flush();
+		adapter.prompt([{ type: "text", text: "again" }]);
 		await flush();
 
-		const notice = itemsOf(events).find(
-			(item) => item.kind === "notice" && item.noticeKind === "error",
+		const failed = events.flatMap((e) =>
+			e.kind === "turn" && e.turn.status === "failed" ? [e.turn] : [],
 		);
-		expect(notice?.kind === "notice" && notice.text).toContain(
-			"Run `codex login` in a terminal",
-		);
-		expect(JSON.stringify(notice)).not.toContain("claude");
+		expect(failed).toHaveLength(2);
+		expect(failed[1]?.error).toMatchObject({
+			kind: "auth",
+			loginCommand: "codex login",
+		});
+		expect(sessionsOf(events).some((s) => s.status === "dead")).toBe(false);
 
 		await adapter.dispose();
 	});

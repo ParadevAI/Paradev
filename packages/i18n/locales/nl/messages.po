@@ -3926,9 +3926,6 @@ msgstr "Meegeleverd met de Paradev-app op dit apparaat."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Meegeleverd met de Paradev-app op dit apparaat. Wordt samen met de app bijgewerkt."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Business-abonnement"
 
@@ -4689,9 +4686,6 @@ msgstr "Klik op een element."
 
 msgid "Click any element to send it to an agent."
 msgstr "Klik op een element om het naar een agent te sturen."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Klik op Authorize op claude.ai. Anthropic toont dan een code. Plak die hier."
 
 msgid "Click here if not redirected"
 msgstr "Klik hier als je niet wordt doorgestuurd"
@@ -10264,6 +10258,9 @@ msgstr "Ik begin mijn ochtendwandelingen met een idee en eindig met een pull req
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Ik sta #{rank} op de ranglijst van {company} met {tokens} tokens aan agentgebruik."
 
+msgid "I've signed in"
+msgstr "Ik ben ingelogd"
+
 msgid "Icon"
 msgstr "Icoon"
 
@@ -14124,12 +14121,6 @@ msgstr "ChatGPT openen om in te loggen"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Claude Code-, Codex-, OpenCode- en Pi-sessies als chats openen"
 
-msgid "Open claude.ai again"
-msgstr "claude.ai opnieuw openen"
-
-msgid "Open claude.ai to sign in"
-msgstr "claude.ai openen om in te loggen"
-
 msgid "Open Command Palette"
 msgstr "Opdrachtenpalet openen"
 
@@ -15038,9 +15029,6 @@ msgstr "Plak een link"
 
 msgid "Paste an API key instead"
 msgstr "In plaats daarvan een API-sleutel plakken"
-
-msgid "Paste the code"
-msgstr "Plak de code"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Plak dit in de Paradev-CLI:"
@@ -17423,6 +17411,9 @@ msgstr "Deze opdracht uitvoeren?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Voer dit uit in een terminal en ga dan verder:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Voer dit uit in een terminal en plak daarna het token dat het toont:"
 
 msgid "Run workspace command"
 msgstr "Werkruimtecommando uitvoeren"
@@ -22115,9 +22106,6 @@ msgstr "Spraaktranscriptie en push-to-talk gebruiken."
 
 msgid "Use your ChatGPT plan."
 msgstr "Gebruik je ChatGPT-abonnement."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Gebruik je Claude Pro- of Max-abonnement."
 
 msgid "Used"
 msgstr "Gebruikt"

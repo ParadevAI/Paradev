@@ -3926,9 +3926,6 @@ msgstr "随此设备上的 Paradev 应用一起提供。"
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "随此设备上的 Paradev 应用一起提供，并随应用一起更新。"
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Business 方案"
 
@@ -4689,9 +4686,6 @@ msgstr "点击一个元素。"
 
 msgid "Click any element to send it to an agent."
 msgstr "点击任意元素，即可发送给智能体。"
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "在 claude.ai 上点击 Authorize。Anthropic 随后会显示一个代码。请粘贴到这里。"
 
 msgid "Click here if not redirected"
 msgstr "如果没有自动跳转，请点击这里"
@@ -10264,6 +10258,9 @@ msgstr "我带着一个想法开始晨间散步，结束时就有了一个拉取
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "我在{company}排行榜上排第{rank}名，智能体用量{tokens}个token。"
 
+msgid "I've signed in"
+msgstr "我已登录"
+
 msgid "Icon"
 msgstr "图标"
 
@@ -14124,12 +14121,6 @@ msgstr "打开 ChatGPT 登录"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "以聊天形式打开 Claude Code、Codex、OpenCode 和 Pi 会话"
 
-msgid "Open claude.ai again"
-msgstr "重新打开 claude.ai"
-
-msgid "Open claude.ai to sign in"
-msgstr "打开 claude.ai 登录"
-
 msgid "Open Command Palette"
 msgstr "打开命令面板"
 
@@ -15038,9 +15029,6 @@ msgstr "粘贴链接"
 
 msgid "Paste an API key instead"
 msgstr "改为粘贴 API 密钥"
-
-msgid "Paste the code"
-msgstr "粘贴代码"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "把它粘贴到Paradev CLI："
@@ -17423,6 +17411,9 @@ msgstr "运行此命令？"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "在终端中运行以下命令，然后继续："
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "在终端中运行此命令，然后粘贴它输出的令牌："
 
 msgid "Run workspace command"
 msgstr "运行工作区命令"
@@ -22115,9 +22106,6 @@ msgstr "使用语音转写和按住说话功能。"
 
 msgid "Use your ChatGPT plan."
 msgstr "使用你的 ChatGPT 套餐。"
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "使用你的 Claude Pro 或 Max 套餐。"
 
 msgid "Used"
 msgstr "已使用"

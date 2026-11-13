@@ -3926,9 +3926,6 @@ msgstr "Поставляется вместе с приложением Paradev 
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Поставляется вместе с приложением Paradev на этом устройстве. Обновляется вместе с приложением."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Тариф Business"
 
@@ -4689,9 +4686,6 @@ msgstr "Нажмите на элемент."
 
 msgid "Click any element to send it to an agent."
 msgstr "Нажмите на любой элемент, чтобы отправить его агенту."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Нажмите Authorize на claude.ai. Затем Anthropic покажет код. Вставьте его сюда."
 
 msgid "Click here if not redirected"
 msgstr "Нажмите здесь, если переход не произошёл"
@@ -10264,6 +10258,9 @@ msgstr "Я начинаю утреннюю прогулку с идеей, а з
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Я на #{rank} месте в рейтинге {company} с {tokens} токенами использования агентов."
 
+msgid "I've signed in"
+msgstr "Я вошёл в систему"
+
 msgid "Icon"
 msgstr "Иконка"
 
@@ -14124,12 +14121,6 @@ msgstr "Открыть ChatGPT для входа"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Открывать сеансы Claude Code, Codex, OpenCode и Pi как чаты"
 
-msgid "Open claude.ai again"
-msgstr "Снова открыть claude.ai"
-
-msgid "Open claude.ai to sign in"
-msgstr "Открыть claude.ai для входа"
-
 msgid "Open Command Palette"
 msgstr "Открыть палитру команд"
 
@@ -15038,9 +15029,6 @@ msgstr "Вставьте ссылку"
 
 msgid "Paste an API key instead"
 msgstr "Вставить ключ API вместо этого"
-
-msgid "Paste the code"
-msgstr "Вставьте код"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Вставьте это в Paradev CLI:"
@@ -17423,6 +17411,9 @@ msgstr "Выполнить эту команду?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Выполните это в терминале, затем продолжите:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Выполните это в терминале, затем вставьте токен, который он выведет:"
 
 msgid "Run workspace command"
 msgstr "Запустить команду рабочей области"
@@ -22115,9 +22106,6 @@ msgstr "Использовать голосовую расшифровку и р
 
 msgid "Use your ChatGPT plan."
 msgstr "Используйте свой план ChatGPT."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Используйте свой план Claude Pro или Max."
 
 msgid "Used"
 msgstr "Использовано"

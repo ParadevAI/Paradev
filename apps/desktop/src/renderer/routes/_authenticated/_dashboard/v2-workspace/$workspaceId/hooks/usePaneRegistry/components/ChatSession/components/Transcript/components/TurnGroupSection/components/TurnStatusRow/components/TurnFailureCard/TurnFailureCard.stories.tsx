@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn, userEvent, within } from "storybook/test";
 import {
 	type AgentSignIn,
-	type SignedInAccount,
 	TurnFailureActionsProvider,
 } from "../../../../../../../../providers/TurnFailureActionsProvider";
 import { TurnFailureCard } from "./TurnFailureCard";
@@ -61,43 +60,44 @@ export const Crashed: Story = {
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Any value starting with "bad" is refused, so the error states can be tried. */
-async function check(value: string, account: string): Promise<SignedInAccount> {
+async function check(value: string): Promise<void> {
 	await wait(1200);
 	if (value.startsWith("bad")) {
 		throw new Error("The provider refused it: invalid or expired.");
 	}
-	return { accountLabel: account };
 }
 
-const claudeSignIn: AgentSignIn = {
-	agent: "claude",
+const localClaude: AgentSignIn = {
 	label: "Claude",
-	openUrl: fn(),
-	startOauth: async () => {
-		await wait(400);
-		return { url: "https://claude.ai/oauth/authorize?code=true" };
-	},
-	finishOauth: (code) => check(code, "Claude Max · person@example.com"),
-	saveApiKey: (key) => check(key, "Anthropic API key"),
+	mode: "command",
+	command: "claude auth login",
 };
 
-const codexSignIn: AgentSignIn = {
-	agent: "codex",
+const cloudClaude: AgentSignIn = {
+	label: "Claude",
+	mode: "token",
+	saveToken: check,
+	saveApiKey: check,
+};
+
+const cloudCodex: AgentSignIn = {
 	label: "Codex",
+	mode: "device",
 	openUrl: fn(),
 	startDeviceCode: async () => {
 		await wait(400);
 		return {
 			userCode: "K7QM-4XPD",
 			verificationUrl: "https://auth.openai.com/codex/device",
+			handle: "handle",
+			intervalSeconds: 5,
 		};
 	},
 	waitForDeviceCode: async (_code, signal) => {
 		await wait(4000);
 		signal.throwIfAborted();
-		return { accountLabel: "ChatGPT Plus · person@example.com" };
 	},
-	saveApiKey: (key) => check(key, "OpenAI API key"),
+	saveApiKey: check,
 };
 
 function withSignIn(agentSignIn: AgentSignIn, restarts = true) {
@@ -127,26 +127,31 @@ const claudeAuthError = {
 	message: "Invalid API key · Please run /login",
 };
 
-/** Paste any code to sign in; one starting with "bad" shows the error. */
-export const ClaudeSignIn: Story = {
-	args: { error: claudeAuthError },
-	decorators: [withSignIn(claudeSignIn)],
+export const LocalSignIn: Story = {
+	args: { error: { ...claudeAuthError, loginCommand: "claude auth login" } },
+	decorators: [withSignIn(localClaude)],
 };
 
-export const ClaudeSignInRestartFails: Story = {
+/** Paste any token to sign in; one starting with "bad" shows the error. */
+export const CloudClaudeSignIn: Story = {
 	args: { error: claudeAuthError },
-	decorators: [withSignIn(claudeSignIn, false)],
+	decorators: [withSignIn(cloudClaude)],
+};
+
+export const CloudClaudeRestartFails: Story = {
+	args: { error: claudeAuthError },
+	decorators: [withSignIn(cloudClaude, false)],
 };
 
 /** The code is approved by itself after four seconds. */
-export const CodexSignIn: Story = {
+export const CloudCodexSignIn: Story = {
 	args: {
 		error: {
 			kind: "auth",
 			message: "Your access token could not be refreshed. Please log in again.",
 		},
 	},
-	decorators: [withSignIn(codexSignIn)],
+	decorators: [withSignIn(cloudCodex)],
 };
 
 export const ManualSignInIsUnchanged: Story = {
@@ -158,7 +163,7 @@ export const ManualSignInIsUnchanged: Story = {
 					blocked: false,
 					continueTask: fn(),
 					restartAndContinue: async () => true,
-					agentSignIn: claudeSignIn,
+					agentSignIn: cloudClaude,
 					manualSignIn: true,
 					openAgentSettings: fn(),
 					dismissed: new Set(),

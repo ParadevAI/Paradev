@@ -82,3 +82,20 @@ test("a model the agent refuses does not continue the task", async () => {
 	]);
 	expect(sendPrompt).not.toHaveBeenCalled();
 });
+
+test("a restart after a sign-in resends the prompt the agent never ran", async () => {
+	const onRestartAndContinue = mock(async (_prompt: string) => true);
+	const hook = renderHook(() =>
+		useFailureRecovery({
+			blocked: false,
+			configOptions: undefined,
+			lastPrompt: "Say hello in one word.",
+			onRestartAndContinue,
+			openModelPicker: () => {},
+			sendPrompt: () => {},
+			setConfigOption: async () => {},
+		}),
+	);
+	await hook.result.current.failureActions.restartAndContinue?.();
+	expect(onRestartAndContinue.mock.calls).toEqual([["Say hello in one word."]]);
+});

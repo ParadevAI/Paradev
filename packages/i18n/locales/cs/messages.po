@@ -3926,9 +3926,6 @@ msgstr "Součást aplikace Paradev na tomto zařízení."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Součást aplikace Paradev na tomto zařízení. Aktualizuje se spolu s aplikací."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Firemní plán"
 
@@ -4689,9 +4686,6 @@ msgstr "Klikněte na prvek."
 
 msgid "Click any element to send it to an agent."
 msgstr "Kliknutím na libovolný prvek ho pošlete agentovi."
-
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Na claude.ai klikněte na Authorize. Anthropic pak zobrazí kód. Vložte ho sem."
 
 msgid "Click here if not redirected"
 msgstr "Pokud nedojde k přesměrování, klikněte sem"
@@ -10264,6 +10258,9 @@ msgstr "Ranní procházky začínám s nápadem a končím s pull requestem."
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Jsem #{rank} v žebříčku {company} s {tokens} tokeny využití agentů."
 
+msgid "I've signed in"
+msgstr "Přihlásil(a) jsem se"
+
 msgid "Icon"
 msgstr "Ikona"
 
@@ -14124,12 +14121,6 @@ msgstr "Otevřít ChatGPT a přihlásit se"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Otevírat relace Claude Code, Codex, OpenCode a Pi jako chaty"
 
-msgid "Open claude.ai again"
-msgstr "Znovu otevřít claude.ai"
-
-msgid "Open claude.ai to sign in"
-msgstr "Otevřít claude.ai a přihlásit se"
-
 msgid "Open Command Palette"
 msgstr "Otevřít paletu příkazů"
 
@@ -15038,9 +15029,6 @@ msgstr "Vložte odkaz"
 
 msgid "Paste an API key instead"
 msgstr "Místo toho vložit klíč API"
-
-msgid "Paste the code"
-msgstr "Vložte kód"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Vložte to do Paradev CLI:"
@@ -17423,6 +17411,9 @@ msgstr "Spustit tento příkaz?"
 
 msgid "Run this in a terminal, then continue:"
 msgstr "Spusťte toto v terminálu a pak pokračujte:"
+
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Spusťte tento příkaz v terminálu a pak vložte token, který vypíše:"
 
 msgid "Run workspace command"
 msgstr "Spustit příkaz pracovního prostoru"
@@ -22115,9 +22106,6 @@ msgstr "Používat přepis řeči a funkce push-to-talk."
 
 msgid "Use your ChatGPT plan."
 msgstr "Použijte svůj plán ChatGPT."
-
-msgid "Use your Claude Pro or Max plan."
-msgstr "Použijte svůj plán Claude Pro nebo Max."
 
 msgid "Used"
 msgstr "Využito"
