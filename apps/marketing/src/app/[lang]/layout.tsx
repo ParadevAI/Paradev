@@ -9,6 +9,7 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ExternalTracking } from "@/components/ExternalTracking";
 import {
 	OrganizationJsonLd,
 	SoftwareApplicationJsonLd,
@@ -187,6 +188,9 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
+				<Suspense fallback={null}>
+					<ExternalTracking />
+				</Suspense>
 			</body>
 		</html>
 	);

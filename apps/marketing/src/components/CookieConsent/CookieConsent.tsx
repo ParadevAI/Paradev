@@ -30,6 +30,8 @@ export function CookieConsent() {
 		localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
 		withPosthog(declineAnalytics);
 		setShowBanner(false);
+		// The external tracker has no teardown API; discard its listeners and timers.
+		window.location.reload();
 	};
 
 	return (

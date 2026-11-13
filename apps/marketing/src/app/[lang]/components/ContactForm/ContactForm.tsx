@@ -3,6 +3,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { trackExternalFormSubmission } from "@/lib/analytics/external-tracking-runtime";
 import { submitContactInquiry } from "../../contact/actions";
 
 export function ContactForm() {
@@ -28,6 +29,7 @@ export function ContactForm() {
 			const result = await submitContactInquiry(formState, i18n.locale);
 
 			if (result.success) {
+				trackExternalFormSubmission("contact", formState.email);
 				setStatus("success");
 			} else {
 				setStatus("error");
