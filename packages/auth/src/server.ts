@@ -10,7 +10,6 @@ import { seedDefaultStatuses } from "@superset/db/seed-default-statuses";
 import { MemberAddedBillingEmail } from "@superset/email/emails/billing/member-added";
 import { OrganizationInvitationEmail } from "@superset/email/emails/team/invitation";
 import { MemberAddedEmail } from "@superset/email/emails/team/member-added";
-import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
 import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
@@ -47,8 +46,6 @@ import {
 	setAutumnSeats,
 	withAutumnBilling,
 } from "./lib/billing";
-import { syncSeatsAfterRemoval } from "./lib/billing/seat-removal";
-import { seatRemovalDeps } from "./lib/billing/seat-removal-deps";
 import {
 	NOTIFY_SLACK_URL,
 	notifySubscriptionCanceled,
@@ -57,12 +54,14 @@ import {
 import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
-import { afterMemberLeft, type LeftMember } from "./lib/member-left";
-import { memberLeftDeps } from "./lib/member-left-deps";
+import {
+	afterMemberDeparted,
+	type DepartedMember,
+} from "./lib/member-departure";
+import { memberDepartureDeps } from "./lib/member-departure-deps";
 import {
 	convertPendingShares,
 	removeInvitationShares,
-	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
 import { resend } from "./lib/resend";
@@ -188,7 +187,10 @@ export const auth = betterAuth({
 			if (ctx.path === "/organization/leave") {
 				const left = ctx.context.returned;
 				if (isAPIError(left) || !left) return;
-				await afterMemberLeft(left as LeftMember, memberLeftDeps());
+				await afterMemberDeparted(
+					left as DepartedMember,
+					memberDepartureDeps({ removedByName: null }),
+				);
 				return;
 			}
 
@@ -205,7 +207,7 @@ export const auth = betterAuth({
 			// the route settled on, or null when the active organization is cleared.
 			if (ctx.path !== "/organization/set-active") return;
 			const returned = ctx.context.returned;
-			if (returned instanceof APIError) return;
+			if (isAPIError(returned)) return;
 
 			const organizationId =
 				returned && typeof returned === "object" && "id" in returned
@@ -927,36 +929,12 @@ export const auth = betterAuth({
 				},
 
 				afterRemoveMember: async ({ user, organization }) => {
-					try {
-						await removeMemberShares({
-							organizationId: organization.id,
-							userId: user.id,
-						});
-					} catch (error) {
-						console.error(
-							"[org/after-remove-member] Failed to remove shares:",
-							error,
-						);
-					}
-
-					await resend.emails.send({
-						from: NOREPLY_FROM,
-						to: user.email,
-						subject: `You've been removed from ${organization.name}`,
-						react: MemberRemovedEmail({
-							memberName: user.name,
-							organizationName: organization.name,
+					await afterMemberDeparted(
+						{ userId: user.id, organizationId: organization.id },
+						memberDepartureDeps({
 							removedByName: "A team admin",
+							departure: { organization, user },
 						}),
-					});
-
-					await syncSeatsAfterRemoval(
-						{
-							organization,
-							member: user,
-							removedByName: "A team admin",
-						},
-						seatRemovalDeps(),
 					);
 				},
 

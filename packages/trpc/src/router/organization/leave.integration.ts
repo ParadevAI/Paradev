@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { auth } from "@superset/auth/server";
 import { db, dbWs } from "@superset/db/client";
 import {
+	automations,
 	cloudWorkspaceShares,
 	cloudWorkspaces,
 	environments,
@@ -10,6 +11,8 @@ import {
 	pageShares,
 	pages,
 	users,
+	v2Hosts,
+	v2UsersHosts,
 } from "@superset/db/schema";
 import { sessions } from "@superset/db/schema/auth";
 import { eq, inArray } from "drizzle-orm";
@@ -20,12 +23,15 @@ import {
 } from "../../trpc";
 import { organizationRouter } from "./organization";
 
-const LEFT_ORG = crypto.randomUUID();
-const KEPT_ORG = crypto.randomUUID();
 const OWNER = crypto.randomUUID();
 const LEAVER = crypto.randomUUID();
 const SESSION_TOKEN = `leave-${crypto.randomUUID()}`;
+const headers = new Headers({ authorization: `Bearer ${SESSION_TOKEN}` });
 const suffix = Date.now();
+const LEFT_VIA_TRPC = crypto.randomUUID();
+const STAYED_IN = crypto.randomUUID();
+const LEFT_VIA_AUTH = crypto.randomUUID();
+const ORGS = [LEFT_VIA_TRPC, STAYED_IN, LEFT_VIA_AUTH];
 
 const leaverCaller = createCallerFactory(
 	createTRPCRouter({ organization: organizationRouter }),
@@ -33,14 +39,24 @@ const leaverCaller = createCallerFactory(
 	createTRPCContext({
 		session: {
 			user: { id: LEAVER, email: `leaver-${suffix}@example.com` },
-			session: { activeOrganizationId: LEFT_ORG },
+			session: { activeOrganizationId: null },
 		} as never,
 		auth,
-		headers: new Headers({ authorization: `Bearer ${SESSION_TOKEN}` }),
+		headers,
 	}),
 );
 
-async function seedSharedResources(organizationId: string) {
+/** An organization where the leaver has a shared page, a shared cloud workspace, an automation and a host only they own. */
+async function seedOrg(organizationId: string) {
+	await db.insert(organizations).values({
+		id: organizationId,
+		name: "Leave Org",
+		slug: `leave-org-${organizationId}`,
+	});
+	await db.insert(members).values([
+		{ organizationId, userId: OWNER, role: "owner" },
+		{ organizationId, userId: LEAVER, role: "member" },
+	]);
 	const [environment] = await db
 		.insert(environments)
 		.values({
@@ -82,68 +98,110 @@ async function seedSharedResources(organizationId: string) {
 		userId: LEAVER,
 		sharedByUserId: OWNER,
 	});
+	await db.insert(automations).values({
+		organizationId,
+		ownerUserId: LEAVER,
+		name: "Nightly",
+		prompt: "Run the nightly report",
+		agent: "claude",
+	});
+	const machineId = `machine-${organizationId}`;
+	await db
+		.insert(v2Hosts)
+		.values({ organizationId, machineId, name: "Leaver laptop" });
+	await db.insert(v2UsersHosts).values({
+		organizationId,
+		userId: LEAVER,
+		hostId: machineId,
+		role: "owner",
+	});
 }
 
-async function leaverShares() {
-	const pageRows = await db
-		.select({ organizationId: pages.organizationId })
-		.from(pageShares)
-		.innerJoin(pages, eq(pages.id, pageShares.pageId))
-		.where(eq(pageShares.userId, LEAVER));
-	const workspaceRows = await db
-		.select({ organizationId: cloudWorkspaces.organizationId })
-		.from(cloudWorkspaceShares)
-		.innerJoin(
-			cloudWorkspaces,
-			eq(cloudWorkspaces.id, cloudWorkspaceShares.cloudWorkspaceId),
-		)
-		.where(eq(cloudWorkspaceShares.userId, LEAVER));
+/** Per organization: the leaver's shares and hosts, and whether any of their automations is still enabled. */
+async function leaverState(organizationId: string) {
+	const [pageRows, workspaceRows, automationRows, hostRows] = await Promise.all(
+		[
+			db
+				.select({ id: pageShares.id })
+				.from(pageShares)
+				.innerJoin(pages, eq(pages.id, pageShares.pageId))
+				.where(eq(pages.organizationId, organizationId)),
+			db
+				.select({ id: cloudWorkspaceShares.id })
+				.from(cloudWorkspaceShares)
+				.innerJoin(
+					cloudWorkspaces,
+					eq(cloudWorkspaces.id, cloudWorkspaceShares.cloudWorkspaceId),
+				)
+				.where(eq(cloudWorkspaces.organizationId, organizationId)),
+			db
+				.select({ enabled: automations.enabled })
+				.from(automations)
+				.where(eq(automations.organizationId, organizationId)),
+			db
+				.select({ machineId: v2Hosts.machineId })
+				.from(v2Hosts)
+				.where(eq(v2Hosts.organizationId, organizationId)),
+		],
+	);
 	return {
-		pageShares: pageRows.map((row) => row.organizationId),
-		cloudWorkspaceShares: workspaceRows.map((row) => row.organizationId),
+		pageShares: pageRows.length,
+		cloudWorkspaceShares: workspaceRows.length,
+		automationsEnabled: automationRows.some((row) => row.enabled),
+		hosts: hostRows.length,
 	};
 }
 
+const LEFT = {
+	pageShares: 0,
+	cloudWorkspaceShares: 0,
+	automationsEnabled: false,
+	hosts: 0,
+};
+const STAYED = {
+	pageShares: 1,
+	cloudWorkspaceShares: 1,
+	automationsEnabled: true,
+	hosts: 1,
+};
+
 beforeAll(async () => {
-	await db.insert(organizations).values([
-		{ id: LEFT_ORG, name: "Left Org", slug: `left-org-${suffix}` },
-		{ id: KEPT_ORG, name: "Kept Org", slug: `kept-org-${suffix}` },
-	]);
 	await db.insert(users).values([
 		{ id: OWNER, name: "Owner", email: `owner-${suffix}@example.com` },
 		{ id: LEAVER, name: "Leaver", email: `leaver-${suffix}@example.com` },
 	]);
-	await db.insert(members).values(
-		[LEFT_ORG, KEPT_ORG].flatMap((organizationId) => [
-			{ organizationId, userId: OWNER, role: "owner" },
-			{ organizationId, userId: LEAVER, role: "member" },
-		]),
-	);
 	await db.insert(sessions).values({
 		token: SESSION_TOKEN,
 		userId: LEAVER,
-		activeOrganizationId: LEFT_ORG,
 		expiresAt: new Date(Date.now() + 60 * 60 * 1000),
 	});
-	await seedSharedResources(LEFT_ORG);
-	await seedSharedResources(KEPT_ORG);
+	await Promise.all(ORGS.map(seedOrg));
 });
 
 afterAll(async () => {
-	await db
-		.delete(organizations)
-		.where(inArray(organizations.id, [LEFT_ORG, KEPT_ORG]));
+	await db.delete(organizations).where(inArray(organizations.id, ORGS));
 	await db.delete(users).where(inArray(users.id, [OWNER, LEAVER]));
 	await dbWs.$client.end?.().catch(() => {});
 });
 
-describe("organization.leave", () => {
-	test("drops the leaver's shares in that organization only", async () => {
-		await leaverCaller.organization.leave({ organizationId: LEFT_ORG });
-
-		expect(await leaverShares()).toEqual({
-			pageShares: [KEPT_ORG],
-			cloudWorkspaceShares: [KEPT_ORG],
+describe("leaving an organization", () => {
+	test("organization.leave cleans up after the leaver in that organization only and reports it", async () => {
+		const result = await leaverCaller.organization.leave({
+			organizationId: LEFT_VIA_TRPC,
 		});
+
+		expect(result.cleanup).toEqual({ automations: 1, hosts: 1 });
+		expect(
+			await Promise.all([leaverState(LEFT_VIA_TRPC), leaverState(STAYED_IN)]),
+		).toEqual([LEFT, STAYED]);
+	});
+
+	test("better-auth's own leave route cleans up after the leaver too", async () => {
+		await auth.api.leaveOrganization({
+			body: { organizationId: LEFT_VIA_AUTH },
+			headers,
+		});
+
+		expect(await leaverState(LEFT_VIA_AUTH)).toEqual(LEFT);
 	});
 });
