@@ -19,5 +19,8 @@ export interface GitCredentialProvider {
 
 export type GitFactory = (
 	path: string,
-	options?: Pick<SimpleGitOptions, "timeout">,
+	options?: Pick<SimpleGitOptions, "timeout"> & {
+		/** Merged over the resolved credential env. */
+		env?: Record<string, string>;
+	},
 ) => Promise<SimpleGit>;

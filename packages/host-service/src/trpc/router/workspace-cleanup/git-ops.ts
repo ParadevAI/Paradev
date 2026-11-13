@@ -7,6 +7,7 @@
 // test and restore them (bun's mock.module leaks across test files in the
 // same process, so a module mock would poison the integration suite).
 
+import { gitCeilingEnv } from "../../../runtime/git/ceiling";
 import { createGitEnvResolver } from "../../../runtime/git/git";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
@@ -36,11 +37,12 @@ export function isIndeterminateGitTaskFailure(err: unknown): boolean {
 export const cleanupGitOps = {
 	/** Same failure surface as `ctx.git(repoPath)` — a throw here maps to the
 	 * saga's "failed to open project repo" handling. */
-	resolveGitEnv(
+	async resolveGitEnv(
 		ctx: Pick<HostServiceContext, "credentials">,
 		repoPath: string,
 	): Promise<GitTaskEnv> {
-		return createGitEnvResolver(ctx.credentials)(repoPath);
+		const env = await createGitEnvResolver(ctx.credentials)(repoPath);
+		return { ...env, ...gitCeilingEnv(repoPath) };
 	},
 
 	readWorktreeState(

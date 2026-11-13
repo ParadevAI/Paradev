@@ -12,6 +12,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject } from "../../../../test/helpers/seed";
 import * as schema from "../../../db/schema";
 import type { HostServiceContext } from "../../../types";
 import { configRouter } from "./config";
@@ -35,11 +36,15 @@ function createRepo(): Sandbox {
 	};
 }
 
-function createCaller(repoPath: string) {
+function createCaller(repoPath: string, otherRepoPaths: string[] = []) {
 	const sqlite = new Database(":memory:");
 	const db = drizzle(sqlite, { schema });
 	migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
-	db.insert(schema.projects).values({ id: PROJECT_ID, repoPath }).run();
+	seedProject({ db } as unknown as Parameters<typeof seedProject>[0], {
+		id: PROJECT_ID,
+		repoPath,
+		repositories: otherRepoPaths.map((path) => ({ repoPath: path })),
+	});
 	const ctx = { db, isAuthenticated: true } as unknown as HostServiceContext;
 	return configRouter.createCaller(ctx);
 }
@@ -75,6 +80,15 @@ describe("configRouter", () => {
 			const result = await caller.getConfigContent({ projectId: PROJECT_ID });
 			expect(result.exists).toBe(true);
 			expect(result.content).toBe(`{"setup":["bun install"]}`);
+		});
+
+		it("reads the primary repository's config in a multi-repo project", async () => {
+			const other = join(sandbox.repoPath, "..", "other");
+			mkdirSync(join(other, ".paradev"), { recursive: true });
+			writeFileSync(join(other, ".paradev", "config.json"), "{}", "utf-8");
+			const caller = createCaller(sandbox.repoPath, [other]);
+			const result = await caller.getConfigContent({ projectId: PROJECT_ID });
+			expect(result).toEqual({ content: null, exists: false });
 		});
 
 		it("throws NOT_FOUND when project isn't registered locally", async () => {

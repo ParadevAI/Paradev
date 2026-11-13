@@ -4,9 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { workspaces } from "../../../db/schema";
-import { isContainerWorkspace } from "../../../projects/multi-repo";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import type { HostServiceContext } from "../../../types";
+import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
 import { chatContinuationTarget, chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
@@ -171,7 +171,7 @@ export async function createChatSessionInWorkspace(
 	const rootPath = workspace.worktreePath;
 	if (
 		workspace.projectId === null ||
-		isContainerWorkspace(ctx.db, workspace.id)
+		listWorkspaceCheckouts(ctx.db, workspace).length > 1
 	) {
 		const config = resolveHostAgentConfig(ctx.db, input.agent);
 		if (config) await seedAgentFolderTrust(ctx.db, rootPath, config);

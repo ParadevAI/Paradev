@@ -21,6 +21,8 @@ export interface BasicScenario {
 	host: TestHost;
 	repo: GitFixture;
 	projectId: string;
+	/** The project's one repository. */
+	repositoryId: string;
 	/** Workspace whose `worktreePath` points at the project root (i.e. a
 	 *  local workspace by `workspace.delete`'s path-equality rule). */
 	workspaceId: string;
@@ -41,7 +43,9 @@ export async function createBasicScenario(
 	const host = await createTestHost(options.hostOptions);
 	const repo = await createGitFixture();
 
-	const { id: projectId } = seedProject(host, { repoPath: repo.repoPath });
+	const { id: projectId, repositoryId } = seedProject(host, {
+		repoPath: repo.repoPath,
+	});
 	const { id: workspaceId } = seedWorkspace(host, {
 		projectId,
 		worktreePath: repo.repoPath,
@@ -52,6 +56,7 @@ export async function createBasicScenario(
 		host,
 		repo,
 		projectId,
+		repositoryId,
 		workspaceId,
 		dispose: async () => {
 			await host.dispose();
@@ -113,15 +118,19 @@ export async function createProjectScenario(
 	host: TestHost;
 	repo: GitFixture;
 	projectId: string;
+	repositoryId: string;
 	dispose(): Promise<void>;
 }> {
 	const host = await createTestHost(options.hostOptions);
 	const repo = await createGitFixture();
-	const { id: projectId } = seedProject(host, { repoPath: repo.repoPath });
+	const { id: projectId, repositoryId } = seedProject(host, {
+		repoPath: repo.repoPath,
+	});
 	return {
 		host,
 		repo,
 		projectId,
+		repositoryId,
 		dispose: async () => {
 			await host.dispose();
 			repo.dispose();

@@ -20,11 +20,14 @@ const ALLOWLIST = new Set([
 	"db/schema.ts",
 	"trpc/router/project/handlers.ts",
 	"trpc/router/project/project.ts",
-	"trpc/router/project/utils/persist-project.ts",
 
 	// Snapshot consumer: shapes project rows for renderer display
 	// (avatar/GitHub link), never for query routing.
 	"projects/local-project-store.ts",
+	// Builds the repository snapshot clients read.
+	"projects/repositories.ts",
+	// Seeds PR rows for tests.
+	"trpc/router/git/utils/test-checkout/test-checkout.ts",
 
 	// Resolver itself: mentions field names in JSDoc, no member reads.
 	"trpc/router/workspace-creation/shared/project-helpers.ts",

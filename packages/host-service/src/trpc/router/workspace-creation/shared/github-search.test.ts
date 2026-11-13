@@ -24,7 +24,10 @@ function projectRepo(
 	owner: string,
 	name: string,
 ): ProjectRepo {
-	return { projectId, repo: { owner, name, repoPath: `/tmp/${name}` } };
+	return {
+		projectId,
+		repo: { repositoryId: projectId, owner, name, repoPath: `/tmp/${name}` },
+	};
 }
 
 describe("chunkProjectRepos", () => {
@@ -190,11 +193,13 @@ describe("rate-limit error detection", () => {
 
 describe("resolveProjectRepos", () => {
 	const webRepo: ProjectRepo["repo"] = {
+		repositoryId: "web",
 		owner: "octocat",
 		name: "web",
 		repoPath: "/tmp/web",
 	};
 	const apiRepo: ProjectRepo["repo"] = {
+		repositoryId: "api",
 		owner: "octocat",
 		name: "api",
 		repoPath: "/tmp/api",

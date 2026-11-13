@@ -20,7 +20,7 @@ import { createUserSimpleGit } from "../runtime/git/simple-git";
 import { hasTagFolderScope } from "../tag-folders";
 import { createCallerFactory } from "../trpc/index";
 import { configRouter } from "../trpc/router/config";
-import { createFromImportLocal } from "../trpc/router/project/handlers";
+import { createProject } from "../trpc/router/project/handlers";
 import { projectRouter } from "../trpc/router/project/project";
 import { tagFoldersRouter } from "../trpc/router/tag-folders/tag-folders";
 import { isLocalCheckoutWorkspace } from "../trpc/router/workspace-cleanup/is-local-checkout-workspace";
@@ -72,20 +72,22 @@ async function setUp() {
 		organizationId: "org-test",
 	} as unknown as HostServiceContext;
 	const repo = await createRepo();
-	const { projectId } = await createFromImportLocal(ctx, {
+	const { id: projectId, primaryRepositoryId } = await createProject(ctx, {
 		name: "Demo",
-		repoPath: repo,
+		repositories: [{ kind: "local", path: repo }],
 	});
 	const worktree = insertLocalWorkspace(ctx, {
 		projectId,
 		worktreePath: tempDir(),
 		branch: "feature",
 		name: "feature",
+		checkouts: [{ repositoryId: primaryRepositoryId, branch: "feature" }],
 	});
 	return {
 		ctx,
 		repo,
 		projectId,
+		primaryRepositoryId,
 		worktreeId: worktree.id,
 		project: createCallerFactory(projectRouter)(ctx),
 		config: createCallerFactory(configRouter)(ctx),
@@ -115,7 +117,14 @@ const liveOnly: Record<string, (env: Env) => unknown> = {
 	"project.setSparseCheckoutPaths": (e) =>
 		e.project.setSparseCheckoutPaths({
 			projectId: e.projectId,
+			repositoryId: e.primaryRepositoryId,
 			paths: ["apps"],
+		}),
+	"project.relocateRepository": (e) =>
+		e.project.relocateRepository({
+			projectId: e.projectId,
+			repositoryId: e.primaryRepositoryId,
+			path: e.repo,
 		}),
 	"project.setBranchPrefix": (e) =>
 		e.project.setBranchPrefix({ projectId: e.projectId, mode: "none" }),
@@ -186,12 +195,11 @@ describe("a deleted project is hidden from live-only lookups", () => {
 });
 
 describe("lookups that must still see a deleted project", () => {
-	it("remove is idempotent and keeps reporting the repo path", async () => {
+	it("remove is idempotent", async () => {
 		const env = await setUp();
-		const first = await env.project.remove({ projectId: env.projectId });
+		await env.project.remove({ projectId: env.projectId });
 		const second = await env.project.remove({ projectId: env.projectId });
-		expect(first.repoPath).toBe(env.repo);
-		expect(second.repoPath).toBe(env.repo);
+		expect(second.success).toBe(true);
 	});
 
 	it("restore brings back the project and the workspaces deleted with it", async () => {
@@ -218,25 +226,14 @@ describe("lookups that must still see a deleted project", () => {
 		).toBeUndefined();
 	});
 
-	it("setup of the deleted project's own id restores it in place", async () => {
-		const env = await setUp();
-		await env.project.remove({ projectId: env.projectId });
-		const result = await env.project.setup({
-			projectId: env.projectId,
-			mode: { kind: "import", repoPath: env.repo },
-		});
-		expect(result.repoPath).toBe(env.repo);
-		expect(getLocalProject(env.ctx.db, env.projectId)?.name).toBe("Demo");
-	});
-
 	it("importLocal of the same folder revives the deleted project", async () => {
 		const env = await setUp();
 		await env.project.remove({ projectId: env.projectId });
-		const again = await createFromImportLocal(env.ctx, {
+		const again = await createProject(env.ctx, {
 			name: "Other",
-			repoPath: env.repo,
+			repositories: [{ kind: "local", path: env.repo }],
 		});
-		expect(again).toMatchObject({ projectId: env.projectId, created: false });
+		expect(again).toMatchObject({ id: env.projectId, created: false });
 		expect(getLocalProject(env.ctx.db, env.projectId)?.name).toBe("Demo");
 	});
 
@@ -244,7 +241,7 @@ describe("lookups that must still see a deleted project", () => {
 		const env = await setUp();
 		await env.project.remove({ projectId: env.projectId });
 		const result = await isLocalCheckoutWorkspace(env.ctx, env.worktreeId);
-		expect(result.project?.repoPath).toBe(env.repo);
+		expect(result.checkouts[0]?.repository.repoPath).toBe(env.repo);
 	});
 
 	it("path lookups tell live and deleted rows apart", async () => {

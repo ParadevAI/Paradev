@@ -58,9 +58,13 @@ describe("workspace router integration", () => {
 			id: scenario.workspaceId,
 		});
 		expect(status.workspaceId).toBe(scenario.workspaceId);
-		expect(status.branch).toBe("main");
-		expect(status.isClean).toBe(true);
-		expect(status.files).toEqual([]);
+		expect(status.checkouts).toHaveLength(1);
+		expect(status.checkouts[0]).toMatchObject({
+			branch: "main",
+			isClean: true,
+			files: [],
+		});
+		expect(status.checkouts[0]?.repositoryId).toBeString();
 	});
 
 	test("gitStatus reports modified files when worktree is dirty", async () => {
@@ -73,8 +77,8 @@ describe("workspace router integration", () => {
 		const status = await scenario.host.trpc.workspace.gitStatus.query({
 			id: scenario.workspaceId,
 		});
-		expect(status.isClean).toBe(false);
-		const paths = status.files.map((f) => f.path).sort();
+		expect(status.checkouts[0]?.isClean).toBe(false);
+		const paths = (status.checkouts[0]?.files ?? []).map((f) => f.path).sort();
 		expect(paths).toContain("README.md");
 		expect(paths).toContain("new.txt");
 	});

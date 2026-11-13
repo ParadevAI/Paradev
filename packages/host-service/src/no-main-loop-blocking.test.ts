@@ -69,16 +69,16 @@ const RULES: Rule[] = [
 			// runtime/git/). Shrink by porting to worker tasks: resolve env
 			// on-loop with createGitEnvResolver, run the git work in the pool
 			// (see workspace-cleanup/git-ops.ts for the pattern).
-			"trpc/router/git/git.ts": 12,
+			"trpc/router/git/git.ts": 1,
 			"trpc/router/project/utils/create-local-workspace.ts": 1,
 			"trpc/router/workspace-creation/procedures/adopt.ts": 1,
 			"trpc/router/workspace-creation/procedures/list-project-worktrees.ts": 1,
 			"trpc/router/workspace-creation/procedures/search-branches.ts": 1,
 			"trpc/router/workspace-creation/utils/ai-workspace-names.ts": 1,
 			"trpc/router/workspace-creation/utils/list-branch-names.ts": 1,
-			"trpc/router/workspace/workspace.ts": 1,
-			// ponytail: +1 for multi-repo checkouts (prototype); port createRepositoryCheckouts to a worker task.
-			"trpc/router/workspaces/workspaces.ts": 2,
+			"trpc/router/git/utils/workspace-git-status/workspace-git-status.ts": 1,
+			// +3 for multi-repo create/undo (worktree add/move/remove, PR branch); same on-loop client as single-repo create.
+			"trpc/router/workspaces/workspaces.ts": 4,
 		},
 		advice:
 			"ctx.git() hands back an on-loop client — every call spawns and drains git on the event loop, and the ratchet's other rules can't see it. Resolve the env on-loop (createGitEnvResolver) and run the git work as a worker task instead (workers/tasks/git.ts; see workspace-cleanup/git-ops.ts). The pattern only matches direct property access — don't dodge it by destructuring/aliasing the factory off the context.",

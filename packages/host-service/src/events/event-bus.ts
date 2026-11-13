@@ -134,6 +134,7 @@ export class EventBus {
 			this.broadcast({
 				type: "git:changed",
 				workspaceId: event.workspaceId,
+				repositoryId: event.repositoryId,
 				...(event.paths !== undefined ? { paths: event.paths } : {}),
 			});
 		});
@@ -226,8 +227,8 @@ export class EventBus {
 	}
 
 	/** For git state changes GitWatcher cannot see, such as a ref fetched into the common dir. */
-	broadcastGitChanged(workspaceId: string): void {
-		this.broadcast({ type: "git:changed", workspaceId });
+	broadcastGitChanged(workspaceId: string, repositoryId: string | null): void {
+		this.broadcast({ type: "git:changed", workspaceId, repositoryId });
 	}
 
 	/**
@@ -406,7 +407,7 @@ export class EventBus {
 	private getPortLabel(port: DetectedPort): string | null {
 		const labels = getLabelsForWorkspace((workspaceId) => {
 			try {
-				return this.filesystem.resolveWorkspaceRoot(workspaceId);
+				return this.filesystem.resolvePrimaryCheckoutPath(workspaceId);
 			} catch {
 				return null;
 			}

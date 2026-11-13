@@ -1,12 +1,16 @@
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { SimpleGit } from "simple-git";
 import { z } from "zod";
-import { pullRequests, workspaces } from "../../../db/schema";
-import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
-import { createGitEnvResolver } from "../../../runtime/git";
+import type { HostDb } from "../../../db";
+import {
+	pullRequests,
+	workspaceRepositories,
+	workspaces,
+} from "../../../db/schema";
+import { createGitEnvResolver, gitCeilingEnv } from "../../../runtime/git";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
@@ -25,9 +29,12 @@ import {
 	gitStatusSnapshotTask,
 } from "../../../workers/tasks/git";
 import {
-	getLocalWorkspace,
-	updateLocalWorkspace,
-} from "../../../workspaces/local-workspace-store";
+	followSharedCheckoutBranch,
+	listCheckoutsByWorkspaceId,
+	type ResolvedCheckout,
+	resolveCheckout,
+} from "../../../workspaces/checkouts";
+import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
@@ -55,14 +62,14 @@ import {
 	resolveDiffCategoryRefs,
 } from "./utils/git-helpers";
 import { gitStatusRefreshLimiter } from "./utils/git-status-refresh-limiter";
-import { gitStatusStore } from "./utils/git-status-store";
+import { checkoutStatusKey, gitStatusStore } from "./utils/git-status-store";
 import {
 	type GraphQLThreadsResult,
 	parseGraphQLThreads,
 	REVIEW_THREADS_QUERY,
 } from "./utils/graphql";
 import { replyToReviewComment } from "./utils/reply-to-review-comment";
-import { resolveWorktreePath } from "./utils/resolve-worktree";
+import { resolveCheckoutPath } from "./utils/resolve-worktree";
 import { attachSpawnFailureDiagnostics } from "./utils/spawn-failure-diagnostics";
 
 // Front-door cap for commit-file diffs. Statuses are admitted by
@@ -103,11 +110,67 @@ function runCommitFilesDeduped(
 
 /** Credential env for a worker git task, resolved in-process (the provider
  * can't cross the thread boundary) and passed to the worker as plain data. */
-function resolveGitTaskEnv(
+async function resolveGitTaskEnv(
 	ctx: Pick<HostServiceContext, "credentials">,
-	worktreePath: string,
+	checkoutPath: string,
 ): Promise<Record<string, string>> {
-	return createGitEnvResolver(ctx.credentials)(worktreePath);
+	return {
+		...(await createGitEnvResolver(ctx.credentials)(checkoutPath)),
+		...gitCeilingEnv(checkoutPath),
+	};
+}
+
+type GitCtx = Pick<HostServiceContext, "db" | "git" | "credentials">;
+
+const checkoutInput = {
+	workspaceId: z.string(),
+	repositoryId: z.string().optional(),
+};
+
+interface OpenCheckout extends ResolvedCheckout {
+	repositoryId: string | null;
+	statusKey: string;
+}
+
+function openCheckout(
+	ctx: Pick<HostServiceContext, "db">,
+	input: { workspaceId: string; repositoryId?: string },
+): OpenCheckout {
+	const checkout = resolveCheckoutPath(
+		ctx,
+		input.workspaceId,
+		input.repositoryId,
+	);
+	const repositoryId = checkout.repository?.id ?? null;
+	return {
+		...checkout,
+		repositoryId,
+		statusKey: checkoutStatusKey(input.workspaceId, repositoryId),
+	};
+}
+
+function checkoutGit(ctx: GitCtx, checkoutPath: string): Promise<SimpleGit> {
+	return ctx.git(checkoutPath, { env: gitCeilingEnv(checkoutPath) });
+}
+
+/** The checkout's linked PR row, or null; no disk access. */
+function getCheckoutPullRequest(
+	db: HostDb,
+	input: { workspaceId: string; repositoryId?: string },
+): { checkout: ResolvedCheckout; pr: typeof pullRequests.$inferSelect | null } {
+	const checkout = resolveCheckout(db, input.workspaceId, input.repositoryId);
+	const pullRequestId = checkout.row?.pullRequestId;
+	if (!pullRequestId) return { checkout, pr: null };
+	const pr = db.query.pullRequests
+		.findFirst({ where: eq(pullRequests.id, pullRequestId) })
+		.sync();
+	if (!pr) {
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: `Pull request ${pullRequestId} not found in database`,
+		});
+	}
+	return { checkout, pr };
 }
 
 /** Delete for a discard. Recursive because an untracked or staged-as-added
@@ -126,15 +189,13 @@ async function removeFromWorktree(
  * has more than a few dozen workspaces; anything larger is a runaway caller. */
 export const MAX_DIFF_STATS_BATCH = 500;
 
-/** Limiter-admitted status snapshot; shared by getStatus and the batched
- * diff-stats query so both see identical numbers for a workspace. */
 /**
  * A mutation that rewrites the index or refs returns before the `.git/`
  * watcher event flushes, and the client refetches status immediately. Mark
- * the workspace for a full walk so that refetch cannot be served from cache.
+ * the checkout for a full walk so that refetch cannot be served from cache.
  */
-function invalidateStatus(workspaceId: string): void {
-	gitStatusStore.recordChange(workspaceId, undefined);
+function invalidateStatus(statusKey: string): void {
+	gitStatusStore.recordChange(statusKey, undefined);
 }
 
 // A name git could read as an option (`--upload-pack=...`) never reaches it.
@@ -181,23 +242,36 @@ async function assertBranchNotPushed(
 	}
 }
 
+const checkoutsByStatusKey = new Map<
+	string,
+	{ workspaceId: string; repositoryId: string | null }
+>();
+
+/** Limiter-admitted status snapshot of one checkout; shared by getStatus and
+ * the batched diff-stats query so both see identical numbers. */
 function runStatusSnapshot(
-	ctx: Parameters<typeof resolveWorktreePath>[0] &
-		Pick<HostServiceContext, "credentials" | "eventBus">,
+	ctx: Pick<HostServiceContext, "db" | "credentials" | "eventBus">,
 	input: {
 		workspaceId: string;
+		repositoryId?: string;
 		baseBranch?: string;
 		priority?: "foreground" | "background";
 	},
 ) {
+	const checkout = openCheckout(ctx, input);
+	const { statusKey } = checkout;
+	const worktreePath = checkout.path;
+	checkoutsByStatusKey.set(statusKey, {
+		workspaceId: input.workspaceId,
+		repositoryId: checkout.repositoryId,
+	});
 	const baseBranch = input.baseBranch || undefined;
 	const requestKey = JSON.stringify({ baseBranch: baseBranch ?? null });
 	return gitStatusRefreshLimiter.run({
-		workspaceId: input.workspaceId,
+		workspaceId: statusKey,
 		requestKey,
 		priority: input.priority,
 		run: async () => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			const workerPool = getHostWorkerPool();
 
@@ -220,7 +294,7 @@ function runStatusSnapshot(
 						coordinatorGit,
 						worktreePath,
 						target,
-						{ workspaceId: input.workspaceId, snapshotStartedAt },
+						{ workspaceId: statusKey, snapshotStartedAt },
 						() =>
 							workerPool.run(
 								gitFetchBaseRefTask,
@@ -231,10 +305,16 @@ function runStatusSnapshot(
 									dedupeKey: `${worktreePath}:base-ref:${target.remote}/${target.branch}`,
 								},
 							),
-					).then((staleWorkspaceIds) => {
-						for (const workspaceId of staleWorkspaceIds) {
-							invalidateStatus(workspaceId);
-							ctx.eventBus.broadcastGitChanged(workspaceId);
+					).then((staleStatusKeys) => {
+						for (const key of staleStatusKeys) {
+							invalidateStatus(key);
+							const stale = checkoutsByStatusKey.get(key);
+							if (stale) {
+								ctx.eventBus.broadcastGitChanged(
+									stale.workspaceId,
+									stale.repositoryId,
+								);
+							}
 						}
 					});
 				}
@@ -242,7 +322,7 @@ function runStatusSnapshot(
 			};
 
 			return gitStatusStore.read({
-				workspaceId: input.workspaceId,
+				workspaceId: statusKey,
 				baseBranch: baseBranch ?? null,
 				computeFull,
 				computePartial: (paths) =>
@@ -277,7 +357,7 @@ function sumSnapshotDiffStats(snapshot: {
 }
 
 const getDiffInputShape = z.object({
-	workspaceId: z.string(),
+	...checkoutInput,
 	path: z.string(),
 	category: z.enum(["against-base", "staged", "unstaged", "commit"]),
 	baseBranch: z.string().optional(),
@@ -294,7 +374,7 @@ const DIFF_SIDE_FILE_MAX_BYTES = 10 * 1024 * 1024;
 // A rename is two index entries (delete of `oldPath`, add of `filePath`);
 // staging or unstaging only one end would split it into a delete plus an add.
 const stagingTargetInput = z.object({
-	workspaceId: z.string(),
+	...checkoutInput,
 	filePath: z.string(),
 	oldPath: z.string().optional(),
 });
@@ -312,10 +392,11 @@ function resolveStagingTargetPaths(
 
 export const gitRouter = router({
 	listBranches: queryProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.query(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 
 			// `%(HEAD)` emits "*" for the checked-out branch, " " otherwise.
 			// Single spawn — independent of branch count. Only `name`/`isHead`
@@ -350,7 +431,7 @@ export const gitRouter = router({
 		.meta({ timeoutMs: 15_000 })
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				baseBranch: z.string().optional(),
 				priority: z.enum(["foreground", "background"]).optional(),
 			}),
@@ -364,7 +445,7 @@ export const gitRouter = router({
 				rethrowWorkerTaskAbort(error);
 				// The worker boundary strips prototypes, so a simple-git failure
 				// arrives as a plain error — classify it by message here. The
-				// worktree can vanish between resolveWorktreePath's existsSync
+				// checkout can vanish between resolveCheckoutPath's existence
 				// check and the git spawn.
 				rethrowEnvironmentalGitError(error);
 				// A spawn that never produced a process reports with no
@@ -386,11 +467,29 @@ export const gitRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			const queue = [...input.workspaceIds];
-			const workspaces: {
+			const rows = input.workspaceIds.length
+				? ctx.db
+						.select({
+							id: workspaces.id,
+							worktreePath: workspaces.worktreePath,
+							projectId: workspaces.projectId,
+						})
+						.from(workspaces)
+						.where(inArray(workspaces.id, input.workspaceIds))
+						.all()
+				: [];
+			const checkoutsByWorkspace = listCheckoutsByWorkspaceId(ctx.db, rows);
+			const sessionIds = new Set(
+				rows.filter((row) => row.projectId === null).map((row) => row.id),
+			);
+			const result: {
 				workspaceId: string;
-				additions: number;
-				deletions: number;
-				fileCount: number;
+				checkouts: {
+					repositoryId: string | null;
+					additions: number;
+					deletions: number;
+					fileCount: number;
+				}[];
 			}[] = [];
 			// Small local cap; each status is additionally admitted by
 			// gitStatusRefreshLimiter at background priority, so this batch can
@@ -403,51 +502,47 @@ export const gitRouter = router({
 						workspaceId !== undefined;
 						workspaceId = queue.shift()
 					) {
-						// A multi-repo workspace's stats are the sum of its checkouts'.
-						const checkoutIds = listRepositoryWorkspaces(
-							ctx.db,
-							workspaceId,
-						).map((checkout) => checkout.id);
-						const totals = { additions: 0, deletions: 0, fileCount: 0 };
-						let counted = false;
-						for (const checkoutId of checkoutIds.length > 0
-							? checkoutIds
-							: [workspaceId]) {
+						const repositoryIds: (string | null)[] =
+							checkoutsByWorkspace
+								.get(workspaceId)
+								?.map((checkout) => checkout.repository.id) ??
+							(sessionIds.has(workspaceId) ? [null] : []);
+						const checkouts: (typeof result)[number]["checkouts"] = [];
+						for (const repositoryId of repositoryIds) {
 							try {
 								const stats = sumSnapshotDiffStats(
 									await runStatusSnapshot(ctx, {
-										workspaceId: checkoutId,
+										workspaceId,
+										repositoryId: repositoryId ?? undefined,
 										priority: "background",
 									}),
 								);
-								totals.additions += stats.additions;
-								totals.deletions += stats.deletions;
-								totals.fileCount += stats.fileCount;
-								counted = true;
+								checkouts.push({ repositoryId, ...stats });
 							} catch {
 								// Missing worktree, wedged repo, etc. — omit it rather
 								// than failing the whole batch.
 							}
 						}
-						if (counted) workspaces.push({ workspaceId, ...totals });
+						if (checkouts.length > 0) result.push({ workspaceId, checkouts });
 					}
 				},
 			);
 			await Promise.all(workers);
-			return { workspaces };
+			return { workspaces: result };
 		}),
 
 	listCommits: queryProcedure
 		.meta({ timeoutMs: 30_000 })
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				baseBranch: z.string().optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 
 			const base = await resolveBaseComparison(git, input.baseBranch);
 			const baseRef = base?.baseRef ?? "HEAD";
@@ -481,15 +576,16 @@ export const gitRouter = router({
 		.meta({ timeoutMs: 15_000 })
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				commitHash: z.string(),
 				fromHash: z.string().optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
-			const dedupeKey = `${input.workspaceId}:commit-files:${input.fromHash ?? ""}:${input.commitHash}`;
+			const dedupeKey = `${checkout.statusKey}:commit-files:${input.fromHash ?? ""}:${input.commitHash}`;
 			const files = await runCommitFilesDeduped(dedupeKey, () =>
 				getHostWorkerPool().run(
 					gitCommitFilesTask,
@@ -511,10 +607,11 @@ export const gitRouter = router({
 		}),
 
 	getBaseBranch: queryProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.query(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			const currentBranch = (
 				await git.revparse(["--abbrev-ref", "HEAD"]).catch(() => "")
 			).trim();
@@ -532,13 +629,14 @@ export const gitRouter = router({
 	setBaseBranch: protectedProcedure
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				baseBranch: z.string().nullable(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			const currentBranch = (
 				await git.revparse(["--abbrev-ref", "HEAD"]).catch(() => "")
 			).trim();
@@ -567,74 +665,40 @@ export const gitRouter = router({
 	renameBranch: protectedProcedure
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				oldName: z.string(),
 				newName: z.string(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// A multi-repo workspace keeps one branch name across its checkouts.
-			const containerId =
-				getLocalWorkspace(ctx.db, input.workspaceId)?.parentWorkspaceId ??
-				(listRepositoryWorkspaces(ctx.db, input.workspaceId).length > 0
-					? input.workspaceId
-					: null);
-			const targetIds = containerId
-				? listRepositoryWorkspaces(ctx.db, containerId).map(
-						(checkout) => checkout.id,
-					)
-				: [input.workspaceId];
+			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const git = await checkoutGit(ctx, checkout.path);
+			// Background naming may have renamed the branch after the caller
+			// read it. Only then does the caller's name no longer exist, and
+			// the row holds the branch the checkout has now.
+			const callerBranchExists =
+				(await git.raw(["branch", "--list", input.oldName])).trim() !== "";
+			const oldName = callerBranchExists
+				? input.oldName
+				: (checkout.row?.branch ?? input.oldName);
+			await assertBranchNotPushed(git, oldName);
+			await git.raw(["branch", "-m", oldName, input.newName]);
 
-			const renames: {
-				workspaceId: string;
-				git: SimpleGit;
-				oldName: string;
-			}[] = [];
-			for (const workspaceId of targetIds) {
-				await cancelAndWaitWorkspaceTitleCommit(ctx.db, workspaceId);
-				const git = await ctx.git(resolveWorktreePath(ctx, workspaceId));
-				// Background naming may have renamed the branch after the caller
-				// read it. Only then does the caller's name no longer exist, and
-				// the row holds the branch the workspace has now. The row can lag
-				// a checkout, so an existing name is always taken as given.
-				const callerBranchExists =
-					(await git.raw(["branch", "--list", input.oldName])).trim() !== "";
-				if (!callerBranchExists && workspaceId !== input.workspaceId) continue;
-				const oldName = callerBranchExists
-					? input.oldName
-					: (getLocalWorkspace(ctx.db, workspaceId)?.branch ?? input.oldName);
-				await assertBranchNotPushed(git, oldName);
-				renames.push({ workspaceId, git, oldName });
-			}
-
-			const done: typeof renames = [];
-			try {
-				for (const rename of renames) {
-					await rename.git.raw(["branch", "-m", rename.oldName, input.newName]);
-					done.push(rename);
-				}
-			} catch (error) {
-				for (const rename of done) {
-					await rename.git
-						.raw(["branch", "-m", input.newName, rename.oldName])
-						.catch(() => {});
-				}
-				throw error;
-			}
-
-			if (containerId) {
+			if (checkout.row) {
 				ctx.db
-					.update(workspaces)
+					.update(workspaceRepositories)
 					.set({ branch: input.newName })
 					.where(
-						inArray(workspaces.id, [
-							containerId,
-							...renames.map((rename) => rename.workspaceId),
-						]),
+						and(
+							eq(workspaceRepositories.workspaceId, input.workspaceId),
+							eq(workspaceRepositories.repositoryId, checkout.row.repositoryId),
+						),
 					)
 					.run();
+				followSharedCheckoutBranch(ctx.db, input.workspaceId);
 			}
-			for (const rename of renames) invalidateStatus(rename.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { name: input.newName };
 		}),
 
@@ -646,10 +710,11 @@ export const gitRouter = router({
 	 * branch, because git allows a branch in one worktree at a time.
 	 */
 	checkoutBranch: protectedProcedure
-		.input(z.object({ workspaceId: z.string(), branch: branchName }))
+		.input(z.object({ ...checkoutInput, branch: branchName }))
 		.mutation(async ({ ctx, input }) => {
 			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			const result = await getHostWorkerPool()
 				.run(
@@ -668,25 +733,46 @@ export const gitRouter = router({
 					message: refusal.message(input.branch),
 				});
 			}
-			updateLocalWorkspace(
-				{ db: ctx.db, eventBus: ctx.eventBus, userId: ctx.userId },
-				input.workspaceId,
-				{ branch: input.branch },
-			);
-			invalidateStatus(input.workspaceId);
+			if (checkout.row) {
+				ctx.db
+					.update(workspaceRepositories)
+					.set({ branch: input.branch })
+					.where(
+						and(
+							eq(workspaceRepositories.workspaceId, input.workspaceId),
+							eq(workspaceRepositories.repositoryId, checkout.row.repositoryId),
+						),
+					)
+					.run();
+			}
+			const checkoutCount =
+				listCheckoutsByWorkspaceId(ctx.db, [checkout.workspace]).get(
+					input.workspaceId,
+				)?.length ?? 0;
+			if (checkoutCount <= 1) {
+				updateLocalWorkspace(
+					{ db: ctx.db, eventBus: ctx.eventBus, userId: ctx.userId },
+					input.workspaceId,
+					{ branch: input.branch },
+				);
+			} else {
+				followSharedCheckoutBranch(ctx.db, input.workspaceId);
+			}
+			invalidateStatus(checkout.statusKey);
 			return { branch: input.branch };
 		}),
 
 	fetchBranches: protectedProcedure
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				branches: z.array(branchName).max(20),
 				missingOnly: z.boolean().default(false),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			const result = await getHostWorkerPool()
 				.run(
@@ -703,21 +789,22 @@ export const gitRouter = router({
 					rethrowEnvironmentalGitError(error);
 					throw error;
 				});
-			if (result.fetched.length > 0) invalidateStatus(input.workspaceId);
+			if (result.fetched.length > 0) invalidateStatus(checkout.statusKey);
 			return result;
 		}),
 
 	discardChanges: protectedProcedure
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				filePath: z.string(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			assertSafeRelativePath(input.filePath);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			const status = await git.status();
 			const isUntracked = status.not_added.includes(input.filePath);
 			if (isUntracked) {
@@ -725,26 +812,28 @@ export const gitRouter = router({
 			} else {
 				await git.raw(["checkout", "HEAD", "--", input.filePath]);
 			}
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true };
 		}),
 
 	discardAllUnstaged: protectedProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			await git.raw(["checkout", "--", "."]);
 			await git.raw(["clean", "-fd"]);
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true };
 		}),
 
 	discardAllStaged: protectedProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			const status = await git.status();
 
 			// Files with a staged change (index entry differs from HEAD).
@@ -789,7 +878,7 @@ export const gitRouter = router({
 			for (const filePath of deletePaths) {
 				await removeFromWorktree(worktreePath, filePath);
 			}
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true };
 		}),
 
@@ -797,7 +886,8 @@ export const gitRouter = router({
 		.input(stagingTargetInput)
 		.mutation(async ({ ctx, input }) => {
 			const paths = resolveStagingTargetPaths(input);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			const result = await getHostWorkerPool().run(gitStagePathsTask, {
 				worktreePath,
@@ -805,7 +895,7 @@ export const gitRouter = router({
 				action: "stage",
 				gitEnv,
 			});
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return result;
 		}),
 
@@ -813,7 +903,8 @@ export const gitRouter = router({
 		.input(stagingTargetInput)
 		.mutation(async ({ ctx, input }) => {
 			const paths = resolveStagingTargetPaths(input);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			const result = await getHostWorkerPool().run(gitStagePathsTask, {
 				worktreePath,
@@ -821,27 +912,29 @@ export const gitRouter = router({
 				action: "unstage",
 				gitEnv,
 			});
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return result;
 		}),
 
 	stageAll: protectedProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			await git.raw(["add", "-A"]);
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true };
 		}),
 
 	unstageAll: protectedProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			await git.raw(["reset", "HEAD"]);
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true };
 		}),
 
@@ -850,13 +943,14 @@ export const gitRouter = router({
 		.meta({ timeoutMs: 60_000 })
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				message: z.string().trim().min(1),
 				stageAll: z.boolean().default(true),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			const result = await getHostWorkerPool().run(
 				gitCommitTask,
@@ -874,23 +968,22 @@ export const gitRouter = router({
 					message: "Nothing to commit",
 				});
 			}
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true, hash: result.hash };
 		}),
 
 	push: protectedProcedure
 		.meta({ timeoutMs: 120_000 })
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.mutation(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			// The linked PR lookup stays on-loop (sync db reads); the git work
 			// itself — upstream resolution and the push — runs in the pool.
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			const linkedPr = workspace?.pullRequestId
+			const linkedPullRequestId = checkout.row?.pullRequestId;
+			const linkedPr = linkedPullRequestId
 				? ctx.db.query.pullRequests
-						.findFirst({ where: eq(pullRequests.id, workspace.pullRequestId) })
+						.findFirst({ where: eq(pullRequests.id, linkedPullRequestId) })
 						.sync()
 				: null;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
@@ -921,7 +1014,7 @@ export const gitRouter = router({
 							: "No git remote to push to",
 				});
 			}
-			invalidateStatus(input.workspaceId);
+			invalidateStatus(checkout.statusKey);
 			return { success: true };
 		}),
 
@@ -930,8 +1023,9 @@ export const gitRouter = router({
 		.input(getDiffInputShape)
 		.query(async ({ ctx, input }) => {
 			assertSafeRelativePath(input.path);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 			const refs = await resolveDiffCategoryRefs(git, input.category, input);
 			return loadFileDiffContent(
 				git,
@@ -969,7 +1063,8 @@ export const gitRouter = router({
 						"The unstaged new side is the working tree, not a git object",
 				});
 			}
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			return getHostWorkerPool().run(
 				gitDiffSideBlobTask,
@@ -998,7 +1093,7 @@ export const gitRouter = router({
 		.meta({ timeoutMs: 60_000 })
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				paths: z.array(z.string()).min(1).max(MAX_DIFF_BULK_PATHS),
 				category: z.enum(["against-base", "staged", "unstaged", "commit"]),
 				baseBranch: z.string().optional(),
@@ -1008,7 +1103,8 @@ export const gitRouter = router({
 		)
 		.query(async ({ ctx, input }) => {
 			for (const path of input.paths) assertSafeRelativePath(path);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			// Ref resolution and every file's `git show` pair run inside the
 			// worker task, off the host-service event loop — see
@@ -1036,7 +1132,7 @@ export const gitRouter = router({
 		.meta({ timeoutMs: 60_000 })
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				category: z.enum(["against-base", "staged", "unstaged", "commit"]),
 				paths: z.array(z.string()).max(MAX_DIFF_BULK_PATHS).optional(),
 				untrackedPaths: z.array(z.string()).max(MAX_DIFF_BULK_PATHS).optional(),
@@ -1049,7 +1145,8 @@ export const gitRouter = router({
 			for (const path of input.paths ?? []) assertSafeRelativePath(path);
 			for (const path of input.untrackedPaths ?? [])
 				assertSafeRelativePath(path);
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
 			return getHostWorkerPool()
 				.run(
@@ -1081,10 +1178,11 @@ export const gitRouter = router({
 
 	getBranchSyncStatus: queryProcedure
 		.meta({ timeoutMs: 30_000 })
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.query(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-			const git = await ctx.git(worktreePath);
+			const checkout = openCheckout(ctx, input);
+			const worktreePath = checkout.path;
+			const git = await checkoutGit(ctx, worktreePath);
 
 			const currentBranch = (
 				await git.revparse(["--abbrev-ref", "HEAD"]).catch(() => "")
@@ -1148,28 +1246,10 @@ export const gitRouter = router({
 		}),
 
 	getPullRequest: queryProcedure
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.query(({ ctx, input }) => {
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			if (!workspace) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Workspace not found",
-				});
-			}
-			if (!workspace.pullRequestId) return null;
-
-			const pr = ctx.db.query.pullRequests
-				.findFirst({ where: eq(pullRequests.id, workspace.pullRequestId) })
-				.sync();
-			if (!pr) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Pull request ${workspace.pullRequestId} not found in database`,
-				});
-			}
+			const { pr } = getCheckoutPullRequest(ctx.db, input);
+			if (!pr) return null;
 
 			let checks: CheckRun[] = [];
 			try {
@@ -1208,25 +1288,13 @@ export const gitRouter = router({
 
 	getCheckJobLogs: queryProcedure
 		.meta({ timeoutMs: 30_000 })
-		.input(z.object({ workspaceId: z.string(), detailsUrl: z.string() }))
+		.input(z.object({ ...checkoutInput, detailsUrl: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			if (!workspace?.pullRequestId) {
+			const { pr } = getCheckoutPullRequest(ctx.db, input);
+			if (!pr) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Workspace has no associated pull request",
-				});
-			}
-
-			const pr = ctx.db.query.pullRequests
-				.findFirst({ where: eq(pullRequests.id, workspace.pullRequestId) })
-				.sync();
-			if (!pr) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Pull request ${workspace.pullRequestId} not found in database`,
 				});
 			}
 
@@ -1259,38 +1327,20 @@ export const gitRouter = router({
 	/** @deprecated Use the API's `integration.github.getPullRequestThreads`, which acts as the viewer. Kept for released clients. */
 	getPullRequestThreads: queryProcedure
 		.meta({ timeoutMs: 30_000 })
-		.input(z.object({ workspaceId: z.string() }))
+		.input(z.object(checkoutInput))
 		.query(async ({ ctx, input }) => {
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			if (!workspace) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Workspace not found",
-				});
-			}
-			if (!workspace.pullRequestId) {
-				return { reviewThreads: [], conversationComments: [] };
-			}
-
-			const pr = ctx.db.query.pullRequests
-				.findFirst({ where: eq(pullRequests.id, workspace.pullRequestId) })
-				.sync();
-			if (!pr) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Pull request ${workspace.pullRequestId} not found in database`,
-				});
-			}
-
+			const { checkout, pr } = getCheckoutPullRequest(ctx.db, input);
 			// Session workspaces (null projectId) have no GitHub remote.
-			if (workspace.projectId === null) {
+			if (!pr || !checkout.workspace.projectId || !checkout.repository) {
 				return { reviewThreads: [], conversationComments: [] };
 			}
 			let repo: { owner: string; name: string };
 			try {
-				repo = await resolveGithubRepo(ctx, workspace.projectId);
+				repo = await resolveGithubRepo(
+					ctx,
+					checkout.workspace.projectId,
+					checkout.repository.id,
+				);
 			} catch (err) {
 				// Expected resolver failures (project not set up locally, no
 				// GitHub remote) degrade silently — the review tab just stays
@@ -1364,21 +1414,13 @@ export const gitRouter = router({
 	setReviewThreadResolution: protectedProcedure
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				threadId: z.string(),
 				resolved: z.boolean(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			if (!workspace) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Workspace not found",
-				});
-			}
+			resolveCheckout(ctx.db, input.workspaceId, input.repositoryId);
 
 			const octokit = await ctx.github();
 			const mutation = input.resolved
@@ -1414,29 +1456,17 @@ export const gitRouter = router({
 	replyToReviewThread: protectedProcedure
 		.input(
 			z.object({
-				workspaceId: z.string(),
+				...checkoutInput,
 				commentId: z.number().int().positive(),
 				body: z.string().trim().min(1),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			if (!workspace?.pullRequestId) {
+			const { pr } = getCheckoutPullRequest(ctx.db, input);
+			if (!pr) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Workspace has no associated pull request",
-				});
-			}
-
-			const pr = ctx.db.query.pullRequests
-				.findFirst({ where: eq(pullRequests.id, workspace.pullRequestId) })
-				.sync();
-			if (!pr) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Pull request ${workspace.pullRequestId} not found in database`,
 				});
 			}
 

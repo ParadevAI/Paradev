@@ -67,9 +67,10 @@ describe("checkouts", () => {
 		);
 
 		expect(
-			listWorkspaceCheckouts(db, { id: workspace.id, worktreePath: "/wt/root" }).map(
-				(c) => [c.repository.name, c.path],
-			),
+			listWorkspaceCheckouts(db, {
+				id: workspace.id,
+				worktreePath: "/wt/root",
+			}).map((c) => [c.repository.name, c.path]),
 		).toEqual([
 			["api", "/wt/root/api"],
 			["web", "/wt/root/web"],

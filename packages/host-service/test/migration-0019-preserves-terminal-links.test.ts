@@ -113,15 +113,17 @@ describe("migration 0019 upgrade", () => {
 		expect(terminal?.origin_workspace_id).toBe("w1");
 	});
 
-	test("foreign keys ON during migrate severs terminal links — the failure the discipline prevents", () => {
+	test("foreign keys ON during migrate breaks the upgrade — the failure the discipline prevents", () => {
 		const { dbPath } = seedPre0019Db();
 
 		const sqlite = new BunDatabase(dbPath, { create: false, readwrite: true });
 		sqlite.exec("PRAGMA foreign_keys = ON");
-		migrate(drizzle(sqlite, { schema }), { migrationsFolder: MIGRATIONS_DIR });
+		// 0019 severs the terminal links; 0040 cannot drop `projects` at all.
+		expect(() =>
+			migrate(drizzle(sqlite, { schema }), {
+				migrationsFolder: MIGRATIONS_DIR,
+			}),
+		).toThrow();
 		sqlite.close();
-
-		const { terminal } = readLinks(dbPath);
-		expect(terminal?.origin_workspace_id).toBeNull();
 	});
 });

@@ -1,9 +1,8 @@
 import { deriveWorkspaceTitleFromPrompt } from "@superset/shared/workspace-launch";
+import { and, eq } from "drizzle-orm";
+import { workspaceRepositories } from "../../../../db/schema";
 import { getProjectIncludingDeleted } from "../../../../projects/local-project-store";
-import {
-	isContainerProject,
-	listRepositoryWorkspaces,
-} from "../../../../projects/multi-repo";
+import { gitCeilingEnv } from "../../../../runtime/git/ceiling";
 import { createGitEnvResolver } from "../../../../runtime/git/git";
 import type { HostServiceContext } from "../../../../types";
 import { getHostWorkerPool } from "../../../../workers/host-worker-pool";
@@ -11,6 +10,7 @@ import {
 	gitAutomaticBranchRenamableTask,
 	gitRenameBranchTask,
 } from "../../../../workers/tasks/git";
+import { listWorkspaceCheckouts } from "../../../../workspaces/checkouts";
 import {
 	getLocalWorkspace,
 	updateLocalWorkspace,
@@ -24,7 +24,10 @@ import {
 	hasWorkspaceTitleJob,
 	queueWorkspaceTitleJob,
 } from "../../../../workspaces/workspace-title-jobs";
-import { gitStatusStore } from "../../git/utils/git-status-store";
+import {
+	checkoutStatusKey,
+	gitStatusStore,
+} from "../../git/utils/git-status-store";
 import { resolveGithubRepo } from "../shared/project-helpers";
 import {
 	canNameWithAgent,
@@ -117,7 +120,10 @@ export const namingGitOps = {
 		worktreePath: string,
 		branch: string,
 	): Promise<boolean> {
-		const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+		const gitEnv = {
+			...(await createGitEnvResolver(ctx.credentials)(worktreePath)),
+			...gitCeilingEnv(worktreePath),
+		};
 		const { renamable } = await getHostWorkerPool().run(
 			gitAutomaticBranchRenamableTask,
 			{ worktreePath, branch, gitEnv },
@@ -132,7 +138,10 @@ export const namingGitOps = {
 		from: string,
 		to: string,
 	): Promise<void> {
-		const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+		const gitEnv = {
+			...(await createGitEnvResolver(ctx.credentials)(worktreePath)),
+			...gitCeilingEnv(worktreePath),
+		};
 		await getHostWorkerPool().run(
 			gitRenameBranchTask,
 			{ worktreePath, from, to, gitEnv },
@@ -191,7 +200,8 @@ export function scheduleWorkspaceNaming(
 		const oldBranch = current.naming.branch;
 		const branchStillAutomatic =
 			!!project && !!oldBranch && current.row.branch === oldBranch;
-		const checkouts = project ? namingCheckouts(ctx, current.row, project) : [];
+		const checkouts =
+			project && oldBranch ? namingCheckouts(ctx, current.row, oldBranch) : [];
 		// A failed probe (git lock, hung index) says nothing about the branch,
 		// so the attempt counts as failed and the next turn tries again.
 		const canRenameBranch =
@@ -257,34 +267,24 @@ export function scheduleWorkspaceNaming(
 }
 
 interface NamingCheckout {
-	id: string;
+	repositoryId: string;
 	worktreePath: string;
 	repoPath: string;
 }
 
-/** The checkouts that carry the workspace's branch: each repository's in a multi-repo workspace. */
+/** The checkouts still on the generated branch; a PR or adopted checkout keeps its own. */
 function namingCheckouts(
 	ctx: HostServiceContext,
 	row: { id: string; worktreePath: string },
-	project: { kind: string; repoPath: string },
+	oldBranch: string,
 ): NamingCheckout[] {
-	if (!isContainerProject(project)) {
-		return [
-			{
-				id: row.id,
-				worktreePath: row.worktreePath,
-				repoPath: project.repoPath,
-			},
-		];
-	}
-	return listRepositoryWorkspaces(ctx.db, row.id).flatMap((checkout) => {
-		const repoPath = checkout.projectId
-			? getProjectIncludingDeleted(ctx.db, checkout.projectId)?.repoPath
-			: undefined;
-		return repoPath
-			? [{ id: checkout.id, worktreePath: checkout.worktreePath, repoPath }]
-			: [];
-	});
+	return listWorkspaceCheckouts(ctx.db, row)
+		.filter((checkout) => checkout.row.branch === oldBranch)
+		.map((checkout) => ({
+			repositoryId: checkout.repository.id,
+			worktreePath: checkout.path,
+			repoPath: checkout.repository.repoPath,
+		}));
 }
 
 async function renameAutomaticBranch(
@@ -340,10 +340,20 @@ async function renameAutomaticBranch(
 			throw error;
 		}
 		for (const checkout of input.checkouts) {
-			gitStatusStore.recordChange(checkout.id, undefined);
-			if (checkout.id !== workspaceId) {
-				updateLocalWorkspace(ctx, checkout.id, { branch: target });
-			}
+			ctx.db
+				.update(workspaceRepositories)
+				.set({ branch: target })
+				.where(
+					and(
+						eq(workspaceRepositories.workspaceId, workspaceId),
+						eq(workspaceRepositories.repositoryId, checkout.repositoryId),
+					),
+				)
+				.run();
+			gitStatusStore.recordChange(
+				checkoutStatusKey(workspaceId, checkout.repositoryId),
+				undefined,
+			);
 		}
 		updateLocalWorkspace(ctx, workspaceId, {
 			name: input.title,

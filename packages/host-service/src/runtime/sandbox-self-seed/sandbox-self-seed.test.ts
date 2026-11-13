@@ -64,11 +64,12 @@ describe("startHookPlan", () => {
 		else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
 	});
 
-	function planFor(toml: string) {
-		mkdirSync(join(root, ".superset"), { recursive: true });
-		writeFileSync(join(root, ".superset", "config.toml"), toml, "utf-8");
+	function planFor(toml: string, primary = root) {
+		mkdirSync(join(primary, ".superset"), { recursive: true });
+		writeFileSync(join(primary, ".superset", "config.toml"), toml, "utf-8");
 		return startHookPlan({
-			worktreePath: root,
+			workspaceRoot: root,
+			worktreePath: primary,
 			workspaceId: "ws-1",
 		} as SandboxIdentity);
 	}
@@ -79,6 +80,20 @@ describe("startHookPlan", () => {
 				'[setup]\nrun = "local-setup"\n[setup.cloud]\nrun = "cloud-setup"\n[terminals.dev]\nrun = "bun dev"\ndefault = true\n',
 			),
 		).toEqual({ setup: "cloud-setup", run: { command: "bun dev" } });
+	});
+
+	test("a multi-repo box reads the primary's config and runs it from the root", () => {
+		const web = join(root, "web");
+		mkdirSync(web);
+		expect(
+			planFor(
+				'[setup.cloud]\nrun = "bun install"\ncwd = "web"\n[terminals.dev]\nrun = "ls"\ndefault = true\n',
+				web,
+			),
+		).toEqual({
+			setup: `(cd '${web}' && bun install)`,
+			run: { command: "ls" },
+		});
 	});
 
 	test("chains setup so it stops at its first failure", () => {
@@ -131,7 +146,11 @@ describe("start hook run terminal", () => {
 	function identityWith(toml: string): SandboxIdentity {
 		mkdirSync(join(root, ".superset"), { recursive: true });
 		writeFileSync(join(root, ".superset", "config.toml"), toml, "utf-8");
-		return { worktreePath: root, workspaceId: "ws-1" } as SandboxIdentity;
+		return {
+			workspaceRoot: root,
+			worktreePath: root,
+			workspaceId: "ws-1",
+		} as SandboxIdentity;
 	}
 
 	function fakeStarter(live: string[] = []) {

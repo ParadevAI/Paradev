@@ -7,9 +7,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { projects, workspaces } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
+import { seedProject, seedWorkspace } from "../helpers/seed";
 
 describe("bug-hunt-v2: workspaceCleanup.destroy phase ordering", () => {
 	let host: TestHost;
@@ -37,19 +37,13 @@ describe("bug-hunt-v2: workspaceCleanup.destroy phase ordering", () => {
 				"v2Workspace.delete.mutate": () => ({ success: true }),
 			},
 		});
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath: repo.repoPath,
-				branch: "main",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath: repo.repoPath,
+			branch: "main",
+		});
 		writeFileSync(join(repo.repoPath, "dirty.txt"), "uncommitted");
 
 		const result = await host.trpc.workspaceCleanup.destroy.mutate({
@@ -90,13 +84,8 @@ describe("bug-hunt-v2: workspaceCreation.adopt cross-project safety", () => {
 		});
 		repoA = await createGitFixture();
 		repoB = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values([
-				{ id: projectIdA, repoPath: repoA.repoPath },
-				{ id: projectIdB, repoPath: repoB.repoPath },
-			])
-			.run();
+		seedProject(host, { id: projectIdA, repoPath: repoA.repoPath });
+		seedProject(host, { id: projectIdB, repoPath: repoB.repoPath });
 	});
 
 	afterEach(async () => {

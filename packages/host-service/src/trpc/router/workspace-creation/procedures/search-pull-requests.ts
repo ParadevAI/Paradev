@@ -1,6 +1,6 @@
 import type { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import { z } from "zod";
-import { expandRepositoryProjectIds } from "../../../../projects/multi-repo";
+import { listProjectRepositories } from "../../../../projects/repositories";
 import {
 	isGithubNotFoundError,
 	isGithubRateLimitError,
@@ -61,8 +61,8 @@ interface PullRequestResult {
 	additions: number | null;
 	deletions: number | null;
 	headRefName: string | null;
-	/** Set when `projectId` is a multi-repo project: the repository holding the PR. */
-	repositoryProjectId?: string;
+	/** The repository of `projectId` holding the PR. */
+	repositoryId?: string;
 	repositoryName?: string;
 }
 
@@ -887,29 +887,43 @@ async function enrichPageWithChecks(
 export const searchPullRequests = protectedProcedure
 	.input(searchPullRequestsInputSchema)
 	.query(async ({ ctx, input }): Promise<PullRequestsPage> => {
-		const repositories = expandRepositoryProjectIds(
-			ctx.db,
-			input.projectIds ?? [input.projectId],
+		const requested = input.projectIds ?? [input.projectId];
+		const repositories = requested.flatMap((projectId) =>
+			listProjectRepositories(ctx.db, projectId),
 		);
-		if (repositories.ownerByRepositoryId.size === 0) {
-			return searchPullRequestsPage(ctx, input);
+		if (repositories.length === 0) {
+			// Surfaces the project's own error (not set up) for a single request.
+			if (input.projectIds === undefined) {
+				await resolveGithubRepo(ctx, input.projectId);
+			}
+			return emptyPullRequestsPage(input.page ?? 1);
 		}
-		const result = await searchPullRequestsPage(ctx, {
-			...input,
-			projectIds: repositories.projectIds,
+		const repositoryById = new Map(
+			repositories.map((repository) => [repository.id, repository]),
+		);
+		// Results are searched per repository and keyed by its id until here.
+		const result = await searchPullRequestsPage(ctx, input, {
+			targetIds: repositories.map((repository) => repository.id),
+			isBatch: input.projectIds !== undefined || repositories.length > 1,
+			resolve: (repositoryId) => {
+				const repository = repositoryById.get(repositoryId);
+				return resolveGithubRepo(
+					ctx,
+					repository?.projectId ?? "",
+					repositoryId,
+				);
+			},
 		});
 		return {
 			...result,
 			pullRequests: result.pullRequests.map((pullRequest) => {
-				const owner = repositories.ownerByRepositoryId.get(
-					pullRequest.projectId,
-				);
-				return owner
+				const repository = repositoryById.get(pullRequest.projectId);
+				return repository
 					? {
 							...pullRequest,
-							projectId: owner.projectId,
-							repositoryProjectId: pullRequest.projectId,
-							repositoryName: owner.repositoryName,
+							projectId: repository.projectId,
+							repositoryId: repository.id,
+							repositoryName: repository.name,
 						}
 					: pullRequest;
 			}),
@@ -919,12 +933,16 @@ export const searchPullRequests = protectedProcedure
 async function searchPullRequestsPage(
 	ctx: HostServiceContext,
 	input: z.infer<typeof searchPullRequestsInputSchema>,
+	targets: {
+		targetIds: string[];
+		isBatch: boolean;
+		resolve: (targetId: string) => Promise<ResolvedGithubRepo>;
+	},
 ): Promise<PullRequestsPage> {
-	const projectIds = input.projectIds ?? [input.projectId];
 	const projectRepos: ProjectRepo[] = await resolveProjectRepos(
-		projectIds,
-		input.projectIds !== undefined,
-		(projectId) => resolveGithubRepo(ctx, projectId),
+		targets.targetIds,
+		targets.isBatch,
+		targets.resolve,
 	);
 	if (projectRepos.length === 0) {
 		return emptyPullRequestsPage(input.page ?? 1);

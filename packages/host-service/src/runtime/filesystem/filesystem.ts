@@ -7,10 +7,13 @@ import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db/index.ts";
 import { workspaces } from "../../db/schema.ts";
 import { getLocalProject } from "../../projects/local-project-store.ts";
+import { getPrimaryRepository } from "../../projects/repositories.ts";
+import { getCheckoutSnapshots } from "../../workspaces/checkouts.ts";
+import { getLocalWorkspace } from "../../workspaces/local-workspace-store.ts";
 import { WatchAttachGuard } from "./watch-attach-guard.ts";
 import {
-	scanGitIgnoredDirectories,
 	scanNestedRepositories,
+	scanWorkspaceGitIgnoredDirectories,
 } from "./watcher-scans.ts";
 
 export interface WorkspaceFilesystemManagerOptions {
@@ -35,7 +38,8 @@ export class WorkspaceFilesystemManager {
 	private readonly db: HostDb;
 	private readonly watcherManager = new FsWatcherManager({
 		useDefaultIgnores: false,
-		listGitIgnoredDirs: scanGitIgnoredDirectories,
+		listGitIgnoredDirs: (rootPath, signal) =>
+			scanWorkspaceGitIgnoredDirectories(this.db, rootPath, signal),
 		findNestedRepoRoots: scanNestedRepositories,
 	});
 	private readonly watchAttachGuard = new WatchAttachGuard(this.watcherManager);
@@ -57,6 +61,19 @@ export class WorkspaceFilesystemManager {
 		return workspace.worktreePath;
 	}
 
+	/** Where the primary repository's `.paradev` files are: the root, or `<root>/<primary name>`. */
+	resolvePrimaryCheckoutPath(workspaceId: string): string {
+		const workspace = getLocalWorkspace(this.db, workspaceId);
+		if (!workspace) {
+			throw new WorkspaceNotFoundError(`Workspace not found: ${workspaceId}`);
+		}
+		return (
+			getCheckoutSnapshots(this.db, workspace).find(
+				(checkout) => checkout.isPrimary,
+			)?.path ?? workspace.worktreePath
+		);
+	}
+
 	resolveProjectRoot(projectId: string): string {
 		const project = getLocalProject(this.db, projectId);
 
@@ -64,7 +81,11 @@ export class WorkspaceFilesystemManager {
 			throw new ProjectNotFoundError(`Project not found: ${projectId}`);
 		}
 
-		return project.repoPath;
+		const repository = getPrimaryRepository(this.db, project);
+		if (!repository) {
+			throw new ProjectNotFoundError(`Project not found: ${projectId}`);
+		}
+		return repository.repoPath;
 	}
 
 	getServiceForWorkspace(workspaceId: string): FsHostService {
@@ -103,7 +124,7 @@ export class WorkspaceFilesystemManager {
 		);
 	}
 
-	private getServiceForRootPath(rootPath: string): FsHostService {
+	getServiceForRootPath(rootPath: string): FsHostService {
 		let service = this.serviceCache.get(rootPath);
 		if (!service) {
 			service = createFsHostService({

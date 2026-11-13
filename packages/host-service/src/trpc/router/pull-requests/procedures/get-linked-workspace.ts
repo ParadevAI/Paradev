@@ -1,69 +1,58 @@
 import { z } from "zod";
-import { getLocalProject } from "../../../../projects/local-project-store";
-import {
-	isContainerProject,
-	listRepositoryProjects,
-} from "../../../../projects/multi-repo";
+import { listProjectRepositories } from "../../../../projects/repositories";
 import type { HostServiceContext } from "../../../../types";
-import { getLocalWorkspace } from "../../../../workspaces/local-workspace-store";
 import { protectedProcedure } from "../../../index";
 import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
 import {
-	findLinkedWorkspaceIds,
+	findLinkedCheckouts,
 	findPullRequestRows,
-	findPullRequestRowsByProject,
+	findPullRequestRowsByRepository,
 	type LinkedPullRequestRow,
 } from "../shared/linked-workspaces";
 
 const getLinkedWorkspaceInputSchema = z.object({
 	projectId: z.string(),
 	prNumber: z.number().int().positive(),
+	repositoryId: z.string().optional(),
 	// A multi-repo project's repositories reuse PR numbers; this names the one meant.
 	repoFullName: z.string().optional(),
 });
 
 /**
- * Whichever live, non-archived workspace currently points at this PR, if
- * any. Used by the Code tab's "+" comment composer to decide whether to
- * send a prompt into an already-open workspace or spin up a new one. When
- * the project's repository cannot be resolved (checkout gone, remote
- * unreachable) the rows the project wrote itself still answer, so an
- * existing link is never mistaken for "none".
+ * The checkout of a live, non-archived workspace that currently points at
+ * this PR, if any. Used by the Code tab's "+" comment composer to decide
+ * whether to send a prompt into an already-open workspace or spin up a new
+ * one. When a repository's remote cannot be resolved (clone gone, remote
+ * unreachable) the rows it wrote itself still answer, so an existing link is
+ * never mistaken for "none".
  */
 export const getLinkedWorkspace = protectedProcedure
 	.input(getLinkedWorkspaceInputSchema)
 	.query(async ({ ctx, input }) => {
-		const projectIds = isContainerProject(
-			getLocalProject(ctx.db, input.projectId),
-		)
-			? listRepositoryProjects(ctx.db, input.projectId).map((repo) => repo.id)
-			: [input.projectId];
+		const repositoryIds = listProjectRepositories(ctx.db, input.projectId)
+			.map((repository) => repository.id)
+			.filter((id) => !input.repositoryId || id === input.repositoryId);
 		const rows = (
 			await Promise.all(
-				projectIds.map((projectId) =>
-					findProjectPullRequestRows(ctx, projectId, input),
+				repositoryIds.map((repositoryId) =>
+					findRepositoryPullRequestRows(ctx, repositoryId, input),
 				),
 			)
 		).flat();
-		const [linkedId] = findLinkedWorkspaceIds(
+		const [linked] = findLinkedCheckouts(
 			ctx.db,
 			rows.map((row) => row.id),
 		);
-		if (!linkedId) return { workspaceId: null };
-		// A multi-repo checkout is hidden; its workspace is the one to open.
-		return {
-			workspaceId:
-				getLocalWorkspace(ctx.db, linkedId)?.parentWorkspaceId ?? linkedId,
-		};
+		return linked ?? { workspaceId: null, repositoryId: null };
 	});
 
-async function findProjectPullRequestRows(
+async function findRepositoryPullRequestRows(
 	ctx: HostServiceContext,
-	projectId: string,
-	input: { prNumber: number; repoFullName?: string },
+	repositoryId: string,
+	input: { projectId: string; prNumber: number; repoFullName?: string },
 ): Promise<LinkedPullRequestRow[]> {
 	try {
-		const repo = await resolveGithubRepo(ctx, projectId);
+		const repo = await resolveGithubRepo(ctx, input.projectId, repositoryId);
 		if (
 			input.repoFullName &&
 			`${repo.owner}/${repo.name}`.toLowerCase() !==
@@ -73,6 +62,10 @@ async function findProjectPullRequestRows(
 		}
 		return findPullRequestRows(ctx.db, repo, input.prNumber);
 	} catch {
-		return findPullRequestRowsByProject(ctx.db, projectId, input.prNumber);
+		return findPullRequestRowsByRepository(
+			ctx.db,
+			repositoryId,
+			input.prNumber,
+		);
 	}
 }

@@ -25,6 +25,8 @@ import {
 
 const MIGRATIONS_FOLDER = resolve(import.meta.dir, "../../drizzle");
 
+type HttpBatchFetch = NonNullable<Parameters<typeof httpBatchLink>[0]["fetch"]>;
+
 export interface TestHostOptions {
 	organizationId?: string;
 	cloudApiUrl?: string;
@@ -153,9 +155,8 @@ export async function createTestHost(
 				httpBatchLink({
 					url: "http://host-service.test/trpc",
 					transformer: SuperJSON,
-					fetch: async (url, init) => {
-						return fetchApp(new Request(url as string, init as RequestInit));
-					},
+					fetch: ((url: string, init?: RequestInit) =>
+						fetchApp(new Request(url, init))) as unknown as HttpBatchFetch,
 					headers: () => (authorized ? { authorization: `Bearer ${psk}` } : {}),
 				}),
 			],

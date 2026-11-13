@@ -11,10 +11,11 @@ import {
 } from "@superset/shared/workspace-tags";
 import { and, eq, inArray } from "drizzle-orm";
 import type { HostDb } from "../db";
-import { workspaces, workspaceTags } from "../db/schema";
+import { workspaceRepositories, workspaces, workspaceTags } from "../db/schema";
 import type { EventBus } from "../events";
-import type { WorkspaceSnapshot } from "../events/types";
+import type { CheckoutSnapshot, WorkspaceSnapshot } from "../events/types";
 import type { ApiClient } from "../types";
+import { getCheckoutSnapshots } from "./checkouts";
 
 import {
 	keepWorkspaceBranch,
@@ -112,6 +113,7 @@ export interface CloudShapedWorkspace {
 export function toWorkspaceSnapshot(
 	row: HostWorkspaceRow,
 	tagAssignments: WorkspaceTagAssignment[],
+	checkouts: CheckoutSnapshot[],
 ): WorkspaceSnapshot {
 	return {
 		id: row.id,
@@ -120,6 +122,7 @@ export function toWorkspaceSnapshot(
 		branch: row.branch,
 		type: row.type,
 		worktreePath: row.worktreePath,
+		checkouts,
 		taskId: row.taskId,
 		createdByUserId: row.createdByUserId,
 		createdAt: row.createdAt,
@@ -246,6 +249,18 @@ export interface InsertLocalWorkspaceValues {
 	taskId?: string | null;
 	createdByUserId?: string | null;
 	tags?: string[];
+	/** One per repository; required for a project workspace, absent for a session. */
+	checkouts?: InsertCheckoutValues[];
+}
+
+export interface InsertCheckoutValues {
+	repositoryId: string;
+	branch: string;
+	headSha?: string | null;
+	upstreamOwner?: string | null;
+	upstreamRepo?: string | null;
+	upstreamBranch?: string | null;
+	pullRequestId?: string | null;
 }
 
 /**
@@ -274,6 +289,11 @@ export function insertLocalWorkspace(
 				updatedAt: now,
 			})
 			.run();
+		if (values.checkouts && values.checkouts.length > 0) {
+			tx.insert(workspaceRepositories)
+				.values(values.checkouts.map((c) => ({ ...c, workspaceId: id })))
+				.run();
+		}
 		if (tags.length > 0) {
 			// Adoption paths don't stamp the row's creator, but the tags are
 			// still the acting user's — never let them fall through as public.
@@ -532,13 +552,13 @@ function emitWorkspaceChanged(
 	eventType: "created" | "updated",
 	row: HostWorkspaceRow,
 ): void {
-	if (row.parentWorkspaceId) return;
 	ctx.eventBus.broadcastWorkspaceChanged({
 		workspaceId: row.id,
 		eventType,
 		workspace: toWorkspaceSnapshot(
 			row,
 			getWorkspaceTagAssignments(ctx.db, row.id),
+			getCheckoutSnapshots(ctx.db, row),
 		),
 		occurredAt: Date.now(),
 	});

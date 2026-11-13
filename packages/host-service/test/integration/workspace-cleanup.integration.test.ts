@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Server, type ServerOptions } from "@superset/pty-daemon";
 import { eq } from "drizzle-orm";
-import { workspaces } from "../../src/db/schema";
+import { workspaceRepositories, workspaces } from "../../src/db/schema";
 import { disposeDaemonClient } from "../../src/terminal/daemon-client-singleton";
 import {
 	initTerminalBaseEnv,
@@ -258,15 +258,15 @@ describe("workspaceCleanup.destroy integration", () => {
 
 	test("destroying a workspace with a merged PR archives with reason 'merged'", async () => {
 		const { id: prId } = seedPullRequest(scenario.host, {
-			projectId: scenario.projectId,
+			repositoryId: scenario.repositoryId,
 			prNumber: 4242,
 			state: "merged",
 			headBranch: scenario.branch,
 		});
 		scenario.host.db
-			.update(workspaces)
+			.update(workspaceRepositories)
 			.set({ pullRequestId: prId })
-			.where(eq(workspaces.id, scenario.featureWorkspaceId))
+			.where(eq(workspaceRepositories.workspaceId, scenario.featureWorkspaceId))
 			.run();
 
 		const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({

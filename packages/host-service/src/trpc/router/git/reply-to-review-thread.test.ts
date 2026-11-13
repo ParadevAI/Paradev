@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { TRPCError } from "@trpc/server";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 interface ReplyCall {
 	owner: string;
@@ -18,18 +18,11 @@ function createCaller(opts: {
 	rejection?: unknown;
 }) {
 	const replyCalls: ReplyCall[] = [];
-	const ctx = {
-		isAuthenticated: true,
-		db: {
-			query: {
-				workspaces: {
-					findFirst: () => ({ sync: () => opts.workspace }),
-				},
-				pullRequests: {
-					findFirst: () => ({ sync: () => opts.pr }),
-				},
-			},
-		},
+	const { db } = seedTestCheckout({
+		workspaceId: "ws-1",
+		pullRequest: opts.workspace?.pullRequestId ? opts.pr : undefined,
+	});
+	const ctx = testGitContext(db, {
 		github: async () => ({
 			pulls: {
 				createReplyForReviewComment: async (args: ReplyCall) => {
@@ -39,7 +32,7 @@ function createCaller(opts: {
 				},
 			},
 		}),
-	} as unknown as HostServiceContext;
+	});
 	return { caller: gitRouter.createCaller(ctx), replyCalls };
 }
 
@@ -109,22 +102,6 @@ describe("gitRouter.replyToReviewThread", () => {
 				body: "Looks good",
 			}),
 			"NOT_FOUND",
-		);
-		expect(replyCalls).toHaveLength(0);
-	});
-
-	it("reports a linked pull request missing from the database as a server error", async () => {
-		const { caller, replyCalls } = createCaller({
-			workspace: { pullRequestId: "pr-1" },
-		});
-
-		await expectTrpcError(
-			caller.replyToReviewThread({
-				workspaceId: "ws-1",
-				commentId: 555,
-				body: "Looks good",
-			}),
-			"INTERNAL_SERVER_ERROR",
 		);
 		expect(replyCalls).toHaveLength(0);
 	});

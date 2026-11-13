@@ -7,9 +7,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { eq } from "drizzle-orm";
-import { projects, workspaces } from "../../src/db/schema";
+import { workspaces } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
+import { seedProject, seedWorkspace } from "../helpers/seed";
 
 describe("bug-hunt-4: cross-project leakage", () => {
 	let host: TestHost;
@@ -35,13 +36,8 @@ describe("bug-hunt-4: cross-project leakage", () => {
 		});
 		repoA = await createGitFixture();
 		repoB = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values([
-				{ id: projectIdA, repoPath: repoA.repoPath },
-				{ id: projectIdB, repoPath: repoB.repoPath },
-			])
-			.run();
+		seedProject(host, { id: projectIdA, repoPath: repoA.repoPath });
+		seedProject(host, { id: projectIdB, repoPath: repoB.repoPath });
 	});
 
 	afterEach(async () => {
@@ -118,19 +114,13 @@ describe("bug-hunt-4: double-call cloud propagation", () => {
 
 	test("workspaceCleanup.destroy called twice: both succeed", async () => {
 		host = await createTestHost();
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath: actualWorktreePath,
-				branch: "feature/double",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath: actualWorktreePath,
+			branch: "feature/double",
+		});
 
 		const first = await host.trpc.workspaceCleanup.destroy.mutate({
 			workspaceId,
@@ -157,19 +147,13 @@ describe("bug-hunt-4: abort-signal handling", () => {
 	beforeEach(async () => {
 		host = await createTestHost();
 		repo = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath: repo.repoPath,
-				branch: "main",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath: repo.repoPath,
+			branch: "main",
+		});
 	});
 
 	afterEach(async () => {

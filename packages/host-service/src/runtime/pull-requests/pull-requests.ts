@@ -3,20 +3,34 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import { and, eq, inArray, isNull, notInArray, or } from "drizzle-orm";
+import {
+	and,
+	eq,
+	inArray,
+	isNotNull,
+	isNull,
+	notInArray,
+} from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
-	projects,
 	pullRequests,
+	repositories,
 	workspacePullRequests,
+	workspaceRepositories,
 	workspaces,
 } from "../../db/schema";
 import type { EventBus } from "../../events/event-bus";
 import type { GitWatcher } from "../../events/git-watcher";
-import { getLocalProject } from "../../projects/local-project-store";
-import { isContainerProject } from "../../projects/multi-repo";
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
-import { type GitFactory, resolveDefaultBranchName } from "../git";
+import {
+	type Checkout,
+	listWorkspaceCheckouts,
+} from "../../workspaces/checkouts";
+import {
+	type GitFactory,
+	gitCeilingEnv,
+	resolveDefaultBranchName,
+} from "../git";
 import { ConditionalGh } from "./utils/conditional-gh";
 import {
 	GitHubAvailabilityGate,
@@ -66,11 +80,11 @@ import {
 // branch syncs are event-driven via `GitWatcher.onChanged`; this is a
 // belt-and-braces backup, not the primary path.
 const SAFETY_NET_INTERVAL_MS = 5 * 60_000;
-// Long-cadence safety net for project-level PR refresh. Steady-state
-// refreshes are triggered by `syncOneWorkspace` whenever a workspace's
+// Long-cadence safety net for repository-level PR refresh. Steady-state
+// refreshes are triggered by `syncOneCheckout` whenever a checkout's
 // branch/HEAD/upstream changes. The 60s repo-PR cache deduplicates across
 // concurrent triggers.
-const PROJECT_REFRESH_INTERVAL_MS = 5 * 60_000;
+const REPOSITORY_REFRESH_INTERVAL_MS = 5 * 60_000;
 // Sweeps outlive this cache on purpose: they revalidate through ConditionalGh,
 // and a 304 costs no rate limit. Raising it past the sweep only makes PRs staler.
 const REPO_PULL_REQUEST_CACHE_TTL_MS = 60_000;
@@ -96,6 +110,19 @@ function upstreamKey(
 
 type RepoProvider = "github";
 
+type CheckoutRow = typeof workspaceRepositories.$inferSelect;
+
+function checkoutKey(workspaceId: string, repositoryId: string): string {
+	return `${workspaceId}\0${repositoryId}`;
+}
+
+function checkoutWhere(workspaceId: string, repositoryId: string) {
+	return and(
+		eq(workspaceRepositories.workspaceId, workspaceId),
+		eq(workspaceRepositories.repositoryId, repositoryId),
+	);
+}
+
 export interface PullRequestStateSnapshot {
 	url: string;
 	number: number;
@@ -108,11 +135,17 @@ export interface PullRequestStateSnapshot {
 	mergedAt: number | null;
 }
 
-export interface PullRequestWorkspaceSnapshot {
-	workspaceId: string;
+export interface CheckoutPullRequestSnapshot {
+	repositoryId: string;
 	pullRequest: PullRequestStateSnapshot | null;
 	error: string | null;
 	lastFetchedAt: string | null;
+}
+
+export interface PullRequestWorkspaceSnapshot {
+	workspaceId: string;
+	/** One per checkout, sorted by repository name; empty for a session workspace. */
+	checkouts: CheckoutPullRequestSnapshot[];
 }
 
 export interface WorkspacePullRequestHistoryEntry {
@@ -132,13 +165,20 @@ export interface WorkspacePullRequestHistoryEntry {
 	updatedAt: number;
 	/** When this workspace first linked to the PR, epoch ms. */
 	linkedAt: number;
-	/** True for the PR the sidebar shows: the one on the current branch. */
+	/** True for the PR the sidebar shows: the one on the checkout's current branch. */
 	isCurrent: boolean;
 }
 
 export interface WorkspacePullRequestHistory {
 	workspaceId: string;
-	pullRequests: WorkspacePullRequestHistoryEntry[];
+	/**
+	 * Current checkouts sorted by repository name, then any repository the
+	 * workspace linked a PR in but no longer checks out.
+	 */
+	checkouts: {
+		repositoryId: string;
+		pullRequests: WorkspacePullRequestHistoryEntry[];
+	}[];
 }
 
 export interface PullRequestRuntimeManagerOptions {
@@ -147,7 +187,7 @@ export interface PullRequestRuntimeManagerOptions {
 	git: GitFactory;
 	github: () => Promise<Octokit>;
 	gitWatcher: GitWatcher;
-	/** Override to run the per-workspace branch/HEAD/upstream read off the
+	/** Override to run the per-checkout branch/HEAD/upstream read off the
 	 * event loop (app wiring passes a worker-pool-backed reader). Defaults
 	 * to reading in-process via `git`. */
 	readWorkspaceRefs?: (worktreePath: string) => Promise<WorkspaceRefsSnapshot>;
@@ -206,10 +246,10 @@ function deriveCheckoutPullRequestUpstream(
 	return { owner, name, branch: pr.headRefName };
 }
 
-interface ProjectRefreshOptions {
+interface RepositoryRefreshOptions {
 	bypassCache?: boolean;
-	/** Limit fetching and relinking to these workspaces; absent = whole project. */
-	workspaceIds?: string[];
+	/** Limit fetching and relinking to these checkouts; absent = every checkout. */
+	checkoutKeys?: string[];
 }
 
 interface PullRequestDetails {
@@ -227,10 +267,10 @@ export class PullRequestRuntimeManager {
 	private readonly github: () => Promise<Octokit>;
 	private readonly gitWatcher: GitWatcher;
 	private safetyNetTimer: ReturnType<typeof setInterval> | null = null;
-	private projectRefreshTimer: ReturnType<typeof setInterval> | null = null;
+	private repositoryRefreshTimer: ReturnType<typeof setInterval> | null = null;
 	private unsubscribeFromGitWatcher: (() => void) | null = null;
 	private unsubscribeFromWorkspaceEvents: (() => void) | null = null;
-	private readonly inFlightProjects = new Map<string, Promise<void>>();
+	private readonly inFlightRepositories = new Map<string, Promise<void>>();
 	// One gate for every GitHub call the runtime makes: an unreachable GitHub
 	// is a property of this host's network, not of any repo.
 	private readonly githubGate = new GitHubAvailabilityGate();
@@ -238,7 +278,7 @@ export class PullRequestRuntimeManager {
 	// appear once the limit resets" is true within seconds rather than at
 	// the next 5-minute sweep.
 	private holdRecoveryTimer: ReturnType<typeof setTimeout> | null = null;
-	private readonly workspaceSyncState = new Map<
+	private readonly checkoutSyncState = new Map<
 		string,
 		{ running: Promise<void>; rerunPending: boolean; bypassCache: boolean }
 	>();
@@ -276,10 +316,13 @@ export class PullRequestRuntimeManager {
 	) => Promise<WorkspaceRefsSnapshot>;
 	private readonly worktreeExists: (worktreePath: string) => boolean;
 	// Worktrees deleted out from under us (external `rm`, crashed teardown).
-	// While a workspace is listed here, sync attempts cost one existsSync and
+	// While a checkout is listed here, sync attempts cost one existsSync and
 	// spawn no git; the probe timer re-enters the normal sync path when the
 	// directory reappears. One log line per transition, never per attempt.
-	private readonly missingWorktrees = new Map<string, string>();
+	private readonly missingWorktrees = new Map<
+		string,
+		{ workspaceId: string; repositoryId: string; path: string }
+	>();
 	private missingWorktreeProbeTimer: ReturnType<typeof setInterval> | null =
 		null;
 	private readonly linkListeners = new Set<() => void>();
@@ -293,61 +336,57 @@ export class PullRequestRuntimeManager {
 		this.gitWatcher = options.gitWatcher;
 		this.readWorkspaceRefs =
 			options.readWorkspaceRefs ??
-			(async (worktreePath) => readWorkspaceRefs(await this.git(worktreePath)));
+			(async (worktreePath) =>
+				readWorkspaceRefs(
+					await this.git(worktreePath, { env: gitCeilingEnv(worktreePath) }),
+				));
 		this.worktreeExists = options.worktreeExists ?? existsSync;
 	}
 
 	start() {
 		if (
 			this.safetyNetTimer ||
-			this.projectRefreshTimer ||
+			this.repositoryRefreshTimer ||
 			this.unsubscribeFromGitWatcher
 		)
 			return;
 
-		// One initial sweep so workspaces that existed before this manager
+		// One initial sweep so checkouts that existed before this manager
 		// started have correct branch/sha/upstream rows even if no `.git/`
 		// activity has happened since the last process boot.
 		void this.syncWorkspaceBranches();
-		void this.refreshEligibleProjects();
+		void this.refreshEligibleRepositories();
 
-		// Steady-state: react to real `.git/` activity per workspace. Per-workspace
-		// debounce lives in `GitWatcher` (300 ms), and concurrent project refreshes
-		// are deduplicated by `inFlightProjects`. We additionally serialize per
-		// workspace so two debounce-separated bursts can't race their git reads
-		// and have the slower one overwrite the newer snapshot.
+		// Steady-state: react to real `.git/` activity per checkout. Debounce
+		// lives in `GitWatcher` (300 ms), and concurrent repository refreshes
+		// are deduplicated by `inFlightRepositories`. We additionally serialize
+		// per checkout so two debounce-separated bursts can't race their git
+		// reads and have the slower one overwrite the newer snapshot.
 		//
-		// Deliberately never calls `gitWatcher.watchWorkspace()` here: this
-		// manager cares about every non-session workspace (see
-		// `syncWorkspaceBranches`'s scan below), the same scope `GitWatcher`
-		// used to watch unconditionally before #6729/#6848. Establishing that
-		// same interest here would put every workspace back under a live
-		// fs.watch permanently, regardless of whether any renderer is looking
-		// at it — reintroducing the exact watcher/subprocess fan-out #6848
-		// fixed, just from a different caller. So for a workspace no renderer
-		// currently watches, branch/HEAD/upstream sync degrades to the
-		// `SAFETY_NET_INTERVAL_MS` sweep below instead of firing instantly —
-		// an accepted staleness tradeoff, not a gap to close by watching more.
+		// Deliberately never calls `gitWatcher.watchWorkspace()` here: watching
+		// every workspace would put each one under a live fs.watch permanently,
+		// reintroducing the watcher/subprocess fan-out #6848 fixed. For a
+		// workspace no renderer watches, sync degrades to the
+		// `SAFETY_NET_INTERVAL_MS` sweep below — an accepted staleness tradeoff.
 		this.unsubscribeFromGitWatcher = this.gitWatcher.onChanged((event) => {
-			void this.enqueueWorkspaceSync(event.workspaceId);
+			if (event.repositoryId) {
+				void this.enqueueCheckoutSync(event.workspaceId, event.repositoryId);
+			}
 		});
 
-		// Long-cadence safety net for `GitWatcher` overflow / error paths, and —
-		// per the comment above — the primary (not just backup) sync path for
-		// any workspace nobody currently holds a live git-watch on.
 		this.safetyNetTimer = setInterval(() => {
 			void this.syncWorkspaceBranches();
 		}, SAFETY_NET_INTERVAL_MS);
-		this.projectRefreshTimer = setInterval(() => {
-			void this.refreshEligibleProjects();
-		}, PROJECT_REFRESH_INTERVAL_MS);
+		this.repositoryRefreshTimer = setInterval(() => {
+			void this.refreshEligibleRepositories();
+		}, REPOSITORY_REFRESH_INTERVAL_MS);
 	}
 
 	// A brand-new worktree is git-idle, so `GitWatcher` never fires for it and
-	// its row (NULL upstream/head) is invisible to PR matching until the 5-min
-	// safety net. Reacting to `created` closes that gap via the same coalesced
-	// sync path. Wired post-construction because app.ts builds the EventBus
-	// after this manager. Only `created`: renames/branch edits already arrive
+	// its checkout rows (NULL upstream/head) are invisible to PR matching until
+	// the 5-min safety net. Reacting to `created` closes that gap via the same
+	// coalesced sync path. Wired post-construction because app.ts builds the
+	// EventBus after this manager. Only `created`: branch edits already arrive
 	// through GitWatcher, and this manager's own row writes bypass the store
 	// emitters, so syncing can't re-trigger itself.
 	subscribeToWorkspaceEvents(
@@ -365,7 +404,7 @@ export class PullRequestRuntimeManager {
 	stop() {
 		this.conditionalGh.clear();
 		if (this.safetyNetTimer) clearInterval(this.safetyNetTimer);
-		if (this.projectRefreshTimer) clearInterval(this.projectRefreshTimer);
+		if (this.repositoryRefreshTimer) clearInterval(this.repositoryRefreshTimer);
 		if (this.missingWorktreeProbeTimer)
 			clearInterval(this.missingWorktreeProbeTimer);
 		if (this.holdRecoveryTimer) clearTimeout(this.holdRecoveryTimer);
@@ -373,116 +412,103 @@ export class PullRequestRuntimeManager {
 		this.unsubscribeFromGitWatcher?.();
 		this.unsubscribeFromWorkspaceEvents?.();
 		this.safetyNetTimer = null;
-		this.projectRefreshTimer = null;
+		this.repositoryRefreshTimer = null;
 		this.missingWorktreeProbeTimer = null;
 		this.missingWorktrees.clear();
 		this.unsubscribeFromGitWatcher = null;
 		this.unsubscribeFromWorkspaceEvents = null;
 	}
 
-	/**
-	 * The workspaces that hold each id's git state: a multi-repo workspace's
-	 * checkouts, or the workspace itself.
-	 */
-	private checkoutsByWorkspace(workspaceIds: string[]): Map<string, string[]> {
-		const children = this.db
-			.select({
-				id: workspaces.id,
-				parentWorkspaceId: workspaces.parentWorkspaceId,
-			})
-			.from(workspaces)
-			.where(inArray(workspaces.parentWorkspaceId, workspaceIds))
+	/** Checkout rows of these workspaces with their repository's name, by workspace. */
+	private checkoutRowsByWorkspace(
+		workspaceIds: string[],
+	): Map<string, (CheckoutRow & { repositoryName: string })[]> {
+		const byWorkspace = new Map<
+			string,
+			(CheckoutRow & { repositoryName: string })[]
+		>();
+		if (workspaceIds.length === 0) return byWorkspace;
+		const rows = this.db
+			.select({ row: workspaceRepositories, repositoryName: repositories.name })
+			.from(workspaceRepositories)
+			.innerJoin(
+				repositories,
+				eq(repositories.id, workspaceRepositories.repositoryId),
+			)
+			.where(inArray(workspaceRepositories.workspaceId, workspaceIds))
 			.all();
-		const result = new Map<string, string[]>();
-		for (const child of children) {
-			if (!child.parentWorkspaceId) continue;
-			result.set(child.parentWorkspaceId, [
-				...(result.get(child.parentWorkspaceId) ?? []),
-				child.id,
-			]);
+		for (const { row, repositoryName } of rows) {
+			const list = byWorkspace.get(row.workspaceId) ?? [];
+			list.push({ ...row, repositoryName });
+			byWorkspace.set(row.workspaceId, list);
 		}
-		for (const workspaceId of workspaceIds) {
-			if (!result.has(workspaceId)) result.set(workspaceId, [workspaceId]);
+		for (const list of byWorkspace.values()) {
+			list.sort((a, b) => a.repositoryName.localeCompare(b.repositoryName));
 		}
-		return result;
+		return byWorkspace;
+	}
+
+	private existingWorkspaceIds(workspaceIds: string[]): string[] {
+		if (workspaceIds.length === 0) return [];
+		const found = new Set(
+			this.db
+				.select({ id: workspaces.id })
+				.from(workspaces)
+				.where(inArray(workspaces.id, workspaceIds))
+				.all()
+				.map((row) => row.id),
+		);
+		return workspaceIds.filter((id) => found.has(id));
 	}
 
 	async getPullRequestsByWorkspaces(
 		workspaceIds: string[],
 	): Promise<PullRequestWorkspaceSnapshot[]> {
-		if (workspaceIds.length === 0) return [];
+		const ids = this.existingWorkspaceIds(workspaceIds);
+		if (ids.length === 0) return [];
+		const checkouts = this.checkoutRowsByWorkspace(ids);
+		const linkedIds = [...checkouts.values()]
+			.flat()
+			.map((row) => row.pullRequestId)
+			.filter((id) => id !== null);
+		const prById = new Map(
+			(linkedIds.length
+				? this.db
+						.select()
+						.from(pullRequests)
+						.where(inArray(pullRequests.id, linkedIds))
+						.all()
+				: []
+			).map((row) => [row.id, row]),
+		);
 
-		const rows = this.db
-			.select({
-				workspaceId: workspaces.id,
-				parentWorkspaceId: workspaces.parentWorkspaceId,
-				pullRequestUrl: pullRequests.url,
-				pullRequestNumber: pullRequests.prNumber,
-				pullRequestTitle: pullRequests.title,
-				pullRequestState: pullRequests.state,
-				pullRequestReviewDecision: pullRequests.reviewDecision,
-				pullRequestChecksStatus: pullRequests.checksStatus,
-				pullRequestChecksJson: pullRequests.checksJson,
-				pullRequestMergedAt: pullRequests.mergedAt,
-				pullRequestLastFetchedAt: pullRequests.lastFetchedAt,
-				pullRequestError: pullRequests.error,
-			})
-			.from(workspaces)
-			.leftJoin(pullRequests, eq(workspaces.pullRequestId, pullRequests.id))
-			.where(
-				or(
-					inArray(workspaces.id, workspaceIds),
-					inArray(workspaces.parentWorkspaceId, workspaceIds),
-				),
-			)
-			.all();
-
-		// A multi-repo workspace has no pull request of its own: it shows the
-		// first one any of its checkouts has.
-		const requested = new Set(workspaceIds);
-		const checkoutRows = new Map<string, (typeof rows)[number]>();
-		for (const row of rows) {
-			if (
-				row.parentWorkspaceId &&
-				!requested.has(row.workspaceId) &&
-				row.pullRequestUrl &&
-				!checkoutRows.has(row.parentWorkspaceId)
-			) {
-				checkoutRows.set(row.parentWorkspaceId, row);
-			}
-		}
-
-		return rows
-			.filter((row) => requested.has(row.workspaceId))
-			.map((own) => {
-				const row = own.pullRequestUrl
-					? own
-					: (checkoutRows.get(own.workspaceId) ?? own);
+		return ids.map((workspaceId) => ({
+			workspaceId,
+			checkouts: (checkouts.get(workspaceId) ?? []).map((checkout) => {
+				const pr = checkout.pullRequestId
+					? prById.get(checkout.pullRequestId)
+					: undefined;
 				return {
-					workspaceId: own.workspaceId,
-					pullRequest:
-						row.pullRequestUrl &&
-						row.pullRequestNumber !== null &&
-						row.pullRequestNumber !== undefined
-							? {
-									url: row.pullRequestUrl,
-									number: row.pullRequestNumber,
-									title: row.pullRequestTitle ?? "",
-									state: coercePullRequestState(row.pullRequestState),
-									reviewDecision: coerceReviewDecision(
-										row.pullRequestReviewDecision,
-									),
-									checksStatus: coerceChecksStatus(row.pullRequestChecksStatus),
-									checks: parseChecksJson(row.pullRequestChecksJson),
-									mergedAt: row.pullRequestMergedAt ?? null,
-								}
-							: null,
-					error: row.pullRequestError ?? null,
-					lastFetchedAt: row.pullRequestLastFetchedAt
-						? new Date(row.pullRequestLastFetchedAt).toISOString()
+					repositoryId: checkout.repositoryId,
+					pullRequest: pr
+						? {
+								url: pr.url,
+								number: pr.prNumber,
+								title: pr.title,
+								state: coercePullRequestState(pr.state),
+								reviewDecision: coerceReviewDecision(pr.reviewDecision),
+								checksStatus: coerceChecksStatus(pr.checksStatus),
+								checks: parseChecksJson(pr.checksJson),
+								mergedAt: pr.mergedAt ?? null,
+							}
+						: null,
+					error: pr?.error ?? null,
+					lastFetchedAt: pr?.lastFetchedAt
+						? new Date(pr.lastFetchedAt).toISOString()
 						: null,
 				};
-			});
+			}),
+		}));
 	}
 
 	/**
@@ -495,22 +521,23 @@ export class PullRequestRuntimeManager {
 	}
 
 	/**
-	 * Every PR each workspace has ever been linked to, currently-linked one
-	 * first and then newest link first. Suppressed ("Remove PR Link") PRs stay
-	 * listed — suppression governs the sidebar pointer, not the history.
+	 * Every PR each workspace has ever been linked to, per repository, the
+	 * checkout's current one first and then newest link first. Suppressed
+	 * ("Remove PR Link") PRs stay listed — suppression governs the sidebar
+	 * pointer, not the history.
 	 */
 	async getPullRequestHistoryByWorkspaces(
 		workspaceIds: string[],
 	): Promise<WorkspacePullRequestHistory[]> {
 		if (workspaceIds.length === 0) return [];
 
-		const checkouts = this.checkoutsByWorkspace(workspaceIds);
+		const checkouts = this.checkoutRowsByWorkspace(workspaceIds);
 		const rows = this.db
 			.select({
 				workspaceId: workspacePullRequests.workspaceId,
 				linkedAt: workspacePullRequests.linkedAt,
-				currentPullRequestId: workspaces.pullRequestId,
 				pullRequestRowId: pullRequests.id,
+				repositoryId: pullRequests.repositoryId,
 				repoOwner: pullRequests.repoOwner,
 				repoName: pullRequests.repoName,
 				prNumber: pullRequests.prNumber,
@@ -529,20 +556,22 @@ export class PullRequestRuntimeManager {
 				pullRequests,
 				eq(workspacePullRequests.pullRequestId, pullRequests.id),
 			)
-			.innerJoin(
-				workspaces,
-				eq(workspacePullRequests.workspaceId, workspaces.id),
-			)
-			.where(
-				inArray(
-					workspacePullRequests.workspaceId,
-					[...checkouts.values()].flat(),
-				),
-			)
+			.where(inArray(workspacePullRequests.workspaceId, workspaceIds))
 			.all();
 
-		const byWorkspace = new Map<string, WorkspacePullRequestHistoryEntry[]>();
+		const current = new Map<string, string | null>();
+		for (const list of checkouts.values()) {
+			for (const checkout of list) {
+				current.set(
+					checkoutKey(checkout.workspaceId, checkout.repositoryId),
+					checkout.pullRequestId,
+				);
+			}
+		}
+
+		const byCheckout = new Map<string, WorkspacePullRequestHistoryEntry[]>();
 		for (const row of rows) {
+			const key = checkoutKey(row.workspaceId, row.repositoryId);
 			const entry: WorkspacePullRequestHistoryEntry = {
 				repoOwner: row.repoOwner,
 				repoName: row.repoName,
@@ -557,51 +586,57 @@ export class PullRequestRuntimeManager {
 				mergedAt: row.mergedAt ?? null,
 				updatedAt: row.updatedAt,
 				linkedAt: row.linkedAt,
-				isCurrent: row.pullRequestRowId === row.currentPullRequestId,
+				isCurrent: row.pullRequestRowId === current.get(key),
 			};
-			const list = byWorkspace.get(row.workspaceId);
+			const list = byCheckout.get(key);
 			if (list) list.push(entry);
-			else byWorkspace.set(row.workspaceId, [entry]);
+			else byCheckout.set(key, [entry]);
 		}
 
 		return workspaceIds.map((workspaceId) => {
-			const entries = (checkouts.get(workspaceId) ?? []).flatMap(
-				(checkoutId) => byWorkspace.get(checkoutId) ?? [],
+			const repositoryIds = (checkouts.get(workspaceId) ?? []).map(
+				(checkout) => checkout.repositoryId,
 			);
-			entries.sort((a, b) => {
-				if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
-				return b.linkedAt - a.linkedAt;
-			});
-			return { workspaceId, pullRequests: entries };
+			for (const row of rows) {
+				if (
+					row.workspaceId === workspaceId &&
+					!repositoryIds.includes(row.repositoryId)
+				) {
+					repositoryIds.push(row.repositoryId);
+				}
+			}
+			return {
+				workspaceId,
+				checkouts: repositoryIds.map((repositoryId) => ({
+					repositoryId,
+					pullRequests: (
+						byCheckout.get(checkoutKey(workspaceId, repositoryId)) ?? []
+					).sort((a, b) => {
+						if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+						return b.linkedAt - a.linkedAt;
+					}),
+				})),
+			};
 		});
 	}
 
 	async refreshPullRequestsByWorkspaces(workspaceIds: string[]): Promise<void> {
 		if (workspaceIds.length === 0) return;
 
-		const rows = this.db
-			.select()
-			.from(workspaces)
-			.where(
-				inArray(
-					workspaces.id,
-					[...this.checkoutsByWorkspace(workspaceIds).values()].flat(),
-				),
-			)
-			.all();
-
 		// Session workspaces (null projectId) have no remote to sync; archived
 		// workspaces keep their PR state frozen at destroy time.
-		const active = rows.filter(
-			(row) => row.archivedAt == null && row.projectId != null,
-		);
+		const active = this.db
+			.select()
+			.from(workspaces)
+			.where(inArray(workspaces.id, workspaceIds))
+			.all()
+			.filter((row) => row.archivedAt == null && row.projectId != null);
 
-		// Re-read each workspace's git refs before matching: callers hit this
+		// Re-read each checkout's git refs before matching: callers hit this
 		// right after changing git state (first push, PR create, merge), and
 		// the refresh matches PRs by the row's recorded upstream — a stale row
-		// (e.g. still tracking the base branch it forked from) would miss the
-		// freshly created PR entirely until the next watcher sweep. Through
-		// the per-workspace queue, so an overlapping watcher sync can't
+		// would miss the freshly created PR until the next watcher sweep.
+		// Through the per-checkout queue, so an overlapping watcher sync can't
 		// interleave with this read+write and clobber the newer snapshot.
 		await Promise.all(
 			active.map((workspace) =>
@@ -624,7 +659,9 @@ export class PullRequestRuntimeManager {
 			string,
 			{ repository: string; number: number; linkedAt: number }
 		>();
-		for (const pullRequest of histories.flatMap((h) => h.pullRequests)) {
+		for (const pullRequest of histories.flatMap((h) =>
+			h.checkouts.flatMap((checkout) => checkout.pullRequests),
+		)) {
 			const repository = `${pullRequest.repoOwner}/${pullRequest.repoName}`;
 			const key = `${repository.toLowerCase()}#${pullRequest.number}`;
 			const seen = earliest.get(key);
@@ -639,49 +676,36 @@ export class PullRequestRuntimeManager {
 		return [...earliest.values()];
 	}
 
-	// User-initiated "Remove PR Link". Recording the removed PR id keeps the
-	// refresh sweep from re-linking it while its branch still matches; a
-	// different PR on the branch (or an explicit re-link) still links.
-	unlinkWorkspacePullRequest(workspaceId: string): void {
-		for (const checkoutId of this.checkoutsByWorkspace([workspaceId]).get(
-			workspaceId,
-		) ?? []) {
-			this.unlinkOwnPullRequest(checkoutId);
-		}
-	}
-
-	private unlinkOwnPullRequest(workspaceId: string): void {
-		const workspace = this.db
-			.select({ pullRequestId: workspaces.pullRequestId })
-			.from(workspaces)
-			.where(eq(workspaces.id, workspaceId))
-			.get();
-		if (!workspace?.pullRequestId) return;
-
+	// User-initiated "Remove PR Link" on one checkout. Recording the removed PR
+	// id keeps the refresh sweep from re-linking it while its branch still
+	// matches; a different PR on the branch (or an explicit re-link) still links.
+	unlinkWorkspacePullRequest(workspaceId: string, repositoryId: string): void {
+		const checkout = this.getCheckoutRow(workspaceId, repositoryId);
+		if (!checkout?.pullRequestId) return;
 		this.db
-			.update(workspaces)
+			.update(workspaceRepositories)
 			.set({
 				pullRequestId: null,
-				suppressedPullRequestId: workspace.pullRequestId,
+				suppressedPullRequestId: checkout.pullRequestId,
 			})
-			.where(eq(workspaces.id, workspaceId))
+			.where(checkoutWhere(workspaceId, repositoryId))
 			.run();
 	}
 
 	async linkWorkspaceToCheckoutPullRequest({
 		workspaceId,
-		projectId,
+		repositoryId,
 		pullRequest,
 	}: {
 		workspaceId: string;
-		projectId: string;
+		repositoryId: string;
 		pullRequest: CheckoutPullRequestMetadata;
 	}): Promise<string | null> {
-		const repo = await this.getProjectRepository(projectId);
+		const repo = await this.getRepositoryIdentity(repositoryId);
 		if (!repo) {
 			console.warn(
-				"[host-service:pull-request-runtime] linkWorkspaceToCheckoutPullRequest: skipping; project repo metadata unavailable",
-				{ projectId, workspaceId, prNumber: pullRequest.number },
+				"[host-service:pull-request-runtime] linkWorkspaceToCheckoutPullRequest: skipping; repository metadata unavailable",
+				{ repositoryId, workspaceId, prNumber: pullRequest.number },
 			);
 			return null;
 		}
@@ -692,7 +716,7 @@ export class PullRequestRuntimeManager {
 		const isDraft = pullRequest.isDraft ?? false;
 		const rowId = this.upsertPullRequestRow({
 			existing,
-			projectId,
+			repositoryId,
 			repo,
 			prNumber: pullRequest.number,
 			url: pullRequest.url,
@@ -712,7 +736,7 @@ export class PullRequestRuntimeManager {
 
 		const upstream = deriveCheckoutPullRequestUpstream(repo, pullRequest);
 		this.db
-			.update(workspaces)
+			.update(workspaceRepositories)
 			.set({
 				pullRequestId: rowId,
 				// An explicit checkout link overrides an earlier "Remove PR Link".
@@ -722,7 +746,7 @@ export class PullRequestRuntimeManager {
 				upstreamRepo: upstream?.name ?? null,
 				upstreamBranch: upstream?.branch ?? null,
 			})
-			.where(eq(workspaces.id, workspaceId))
+			.where(checkoutWhere(workspaceId, repositoryId))
 			.run();
 		this.recordWorkspacePullRequestLink(workspaceId, rowId, now);
 
@@ -755,7 +779,7 @@ export class PullRequestRuntimeManager {
 	// open, e.g. a git-flow release PR, keeps its history row.
 	private forgetPastPromotionLinks(
 		workspaceId: string,
-		projectId: string,
+		repositoryId: string,
 		repo: NormalizedRepoIdentity,
 	): void {
 		if (!repo.defaultBranch) return;
@@ -778,7 +802,7 @@ export class PullRequestRuntimeManager {
 				and(
 					eq(workspacePullRequests.workspaceId, workspaceId),
 					isNull(workspaces.archivedAt),
-					eq(pullRequests.projectId, projectId),
+					eq(pullRequests.repositoryId, repositoryId),
 					eq(pullRequests.repoOwner, repo.owner),
 					eq(pullRequests.repoName, repo.name),
 					eq(pullRequests.headBranch, repo.defaultBranch),
@@ -806,44 +830,68 @@ export class PullRequestRuntimeManager {
 		return () => this.linkListeners.delete(listener);
 	}
 
-	private async syncWorkspaceBranches(): Promise<void> {
-		// Route every workspace through the same per-workspace queue as the
-		// watcher path, so a concurrent watcher-triggered sync can't race the
-		// sweep's read+write and clobber the newer snapshot. enqueueWorkspaceSync
-		// coalesces — if a sync is already running for a workspace, this just
-		// flips its rerunPending flag.
-		// Session workspaces (null projectId) have no remote and no PRs, and
-		// archived workspaces are frozen. Filtered in JS: the unit-test fakes
-		// stub select().from().all() without a where() builder.
-		const ids = this.db
+	/** Checkouts of live project workspaces; session and archived ones never sync. */
+	private listSyncableCheckouts(): {
+		workspaceId: string;
+		repositoryId: string;
+	}[] {
+		return this.db
 			.select({
-				id: workspaces.id,
-				projectId: workspaces.projectId,
-				archivedAt: workspaces.archivedAt,
+				workspaceId: workspaceRepositories.workspaceId,
+				repositoryId: workspaceRepositories.repositoryId,
 			})
-			.from(workspaces)
-			.all()
-			.filter((row) => row.projectId !== null && row.archivedAt == null);
+			.from(workspaceRepositories)
+			.innerJoin(
+				workspaces,
+				eq(workspaces.id, workspaceRepositories.workspaceId),
+			)
+			.where(
+				and(isNull(workspaces.archivedAt), isNotNull(workspaces.projectId)),
+			)
+			.all();
+	}
 
-		// Sequential to keep git subprocess concurrency bounded; matches the
-		// original sweep's behavior. refreshProject inside each sync still
-		// dedupes across workspaces in the same project via inFlightProjects.
-		for (const row of ids) {
-			await this.enqueueWorkspaceSync(row.id);
+	private async syncWorkspaceBranches(): Promise<void> {
+		// Route every checkout through the same per-checkout queue as the
+		// watcher path, so a concurrent watcher-triggered sync can't race the
+		// sweep's read+write. Sequential to keep git subprocess concurrency
+		// bounded; refreshRepository dedupes via inFlightRepositories.
+		for (const checkout of this.listSyncableCheckouts()) {
+			await this.enqueueCheckoutSync(
+				checkout.workspaceId,
+				checkout.repositoryId,
+			);
 		}
 	}
 
-	private enqueueWorkspaceSync(
+	private async enqueueWorkspaceSync(
 		workspaceId: string,
 		options: { bypassCache?: boolean } = {},
 	): Promise<void> {
-		// Coalesce: if a sync is already running for this workspace, just mark
-		// "rerun pending" — there's no value in queuing N back-to-back syncs
-		// when only the final state matters. At most one sync runs and one
-		// rerun is queued, regardless of how many events fire. A bypass
+		const rows = this.db
+			.select({ repositoryId: workspaceRepositories.repositoryId })
+			.from(workspaceRepositories)
+			.where(eq(workspaceRepositories.workspaceId, workspaceId))
+			.all();
+		await Promise.all(
+			rows.map((row) =>
+				this.enqueueCheckoutSync(workspaceId, row.repositoryId, options),
+			),
+		);
+	}
+
+	private enqueueCheckoutSync(
+		workspaceId: string,
+		repositoryId: string,
+		options: { bypassCache?: boolean } = {},
+	): Promise<void> {
+		// Coalesce: if a sync is already running for this checkout, just mark
+		// "rerun pending" — only the final state matters. At most one sync runs
+		// and one rerun is queued, regardless of how many events fire. A bypass
 		// request sticks to the rerun so the user's refresh is never served
 		// from cache by a sync that happened to be in flight.
-		const existing = this.workspaceSyncState.get(workspaceId);
+		const key = checkoutKey(workspaceId, repositoryId);
+		const existing = this.checkoutSyncState.get(key);
 		if (existing) {
 			existing.rerunPending = true;
 			existing.bypassCache ||= options.bypassCache ?? false;
@@ -854,22 +902,23 @@ export class PullRequestRuntimeManager {
 			let bypassCache = options.bypassCache ?? false;
 			try {
 				do {
-					const state = this.workspaceSyncState.get(workspaceId);
+					const state = this.checkoutSyncState.get(key);
 					if (state) {
 						state.rerunPending = false;
 						state.bypassCache = false;
 					}
-					await this.syncOneWorkspace(workspaceId, { bypassCache });
-					bypassCache =
-						this.workspaceSyncState.get(workspaceId)?.bypassCache ?? false;
-				} while (this.workspaceSyncState.get(workspaceId)?.rerunPending);
+					await this.syncOneCheckout(workspaceId, repositoryId, {
+						bypassCache,
+					});
+					bypassCache = this.checkoutSyncState.get(key)?.bypassCache ?? false;
+				} while (this.checkoutSyncState.get(key)?.rerunPending);
 			} finally {
-				this.workspaceSyncState.delete(workspaceId);
+				this.checkoutSyncState.delete(key);
 			}
 		};
 
 		const running = run();
-		this.workspaceSyncState.set(workspaceId, {
+		this.checkoutSyncState.set(key, {
 			running,
 			rerunPending: false,
 			bypassCache: false,
@@ -877,11 +926,36 @@ export class PullRequestRuntimeManager {
 		return running;
 	}
 
-	private async syncOneWorkspace(
+	private getCheckoutRow(
 		workspaceId: string,
+		repositoryId: string,
+	): CheckoutRow | undefined {
+		return this.db
+			.select()
+			.from(workspaceRepositories)
+			.where(checkoutWhere(workspaceId, repositoryId))
+			.get();
+	}
+
+	private isLiveWorkspace(workspaceId: string): boolean {
+		return (
+			this.db
+				.select({ id: workspaces.id })
+				.from(workspaces)
+				.where(
+					and(eq(workspaces.id, workspaceId), isNull(workspaces.archivedAt)),
+				)
+				.get() !== undefined
+		);
+	}
+
+	private async syncOneCheckout(
+		workspaceId: string,
+		repositoryId: string,
 		options: { bypassCache?: boolean } = {},
 	): Promise<void> {
-		// Look up the row fresh — the workspace may have been deleted between
+		const key = checkoutKey(workspaceId, repositoryId);
+		// Look up the rows fresh — the workspace may have been deleted between
 		// the GitWatcher event firing and this handler running. That's expected
 		// during teardown / workspace removal; silently no-op.
 		const workspace = this.db
@@ -889,83 +963,89 @@ export class PullRequestRuntimeManager {
 			.from(workspaces)
 			.where(eq(workspaces.id, workspaceId))
 			.get();
-		if (!workspace) {
-			this.forgetMissingWorktree(workspaceId);
+		// Session workspaces (null projectId) have no remote and no PRs.
+		// Archived workspaces are frozen tombstones — never resync or relink.
+		if (
+			!workspace ||
+			workspace.projectId === null ||
+			workspace.archivedAt !== null
+		) {
+			this.forgetMissingWorktree(key);
 			return;
 		}
-		// Session workspaces (null projectId) have no remote and no PRs; the
-		// GitWatcher still fires for their repos, so gate here too. Archived
-		// workspaces are frozen tombstones — never resync or relink them.
-		if (workspace.projectId === null || workspace.archivedAt !== null) {
-			this.forgetMissingWorktree(workspaceId);
+		const checkouts = listWorkspaceCheckouts(this.db, workspace);
+		const checkout = checkouts.find((c) => c.repository.id === repositoryId);
+		if (!checkout) {
+			this.forgetMissingWorktree(key);
 			return;
 		}
 
 		// A watcher event refreshes only when the row actually changed; an
 		// explicit refresh always does, even if the git read failed.
-		const projectId =
-			(await this.syncWorkspaceRow(workspace)) ??
-			(options.bypassCache ? workspace.projectId : null);
-		// One workspace moved, so only its own ref can have gained or lost a
-		// PR. Refreshing the whole project here was the runtime's biggest
-		// GitHub amplifier: every commit by any agent re-fetched every linked
-		// PR in the project. PRs opened for other workspaces are picked up by
-		// the 5-minute project sweep or their own git activity.
-		if (projectId) {
-			await this.refreshProject(projectId, {
+		const changed = await this.syncCheckoutRow(
+			workspace,
+			checkout,
+			checkouts.filter((other) => other !== checkout),
+		);
+		// One checkout moved, so only its own ref can have gained or lost a PR.
+		// Refreshing the whole repository here was the runtime's biggest GitHub
+		// amplifier: every commit by any agent re-fetched every linked PR.
+		if (changed || options.bypassCache) {
+			await this.refreshRepository(repositoryId, {
 				...options,
-				workspaceIds: [workspaceId],
+				checkoutKeys: [key],
 			});
 		}
 	}
 
-	private async syncWorkspaceRow(
+	private async syncCheckoutRow(
 		workspace: typeof workspaces.$inferSelect,
-	): Promise<string | null> {
-		// A multi-repo workspace's folder is not a repository: git there reads
-		// whatever repository encloses it. Its checkouts carry the refs.
-		if (
-			workspace.projectId &&
-			isContainerProject(getLocalProject(this.db, workspace.projectId))
-		) {
-			return null;
-		}
+		checkout: Checkout,
+		otherCheckouts: Checkout[],
+	): Promise<boolean> {
+		const { row, path } = checkout;
+		const key = checkoutKey(row.workspaceId, row.repositoryId);
 		// A worktree deleted outside the app is a routine lifecycle state, not
 		// an error to retry: skip the git spawn entirely until the directory is
 		// back on disk (external restore, workspace repair).
-		if (!this.worktreeExists(workspace.worktreePath)) {
-			this.noteWorktreeMissing(workspace.id, workspace.worktreePath);
-			return null;
+		if (!this.worktreeExists(path)) {
+			this.noteWorktreeMissing(key, row, path);
+			return false;
 		}
-		this.noteWorktreePresent(workspace.id);
+		this.noteWorktreePresent(key);
 		try {
-			const { branch, headSha, upstream } = await this.readWorkspaceRefs(
-				workspace.worktreePath,
-			);
-			if (!branch) return null;
+			const { branch, headSha, upstream } = await this.readWorkspaceRefs(path);
+			if (!branch) return false;
 
 			const upstreamOwner = upstream?.owner ?? null;
 			const upstreamRepo = upstream?.name ?? null;
 			const upstreamBranch = upstream?.branch ?? null;
 			const pullRequestId =
-				upstream ||
-				this.pullRequestHeadMatches(workspace.pullRequestId, headSha)
-					? workspace.pullRequestId
+				upstream || this.pullRequestHeadMatches(row.pullRequestId, headSha)
+					? row.pullRequestId
 					: null;
+			const mirrorBranch =
+				branch !== workspace.branch &&
+				otherCheckouts.every((other) => other.row.branch === branch);
 
 			if (
-				branch === workspace.branch &&
-				headSha === workspace.headSha &&
-				upstreamOwner === workspace.upstreamOwner &&
-				upstreamRepo === workspace.upstreamRepo &&
-				upstreamBranch === workspace.upstreamBranch &&
-				pullRequestId === workspace.pullRequestId
+				!mirrorBranch &&
+				branch === row.branch &&
+				headSha === row.headSha &&
+				upstreamOwner === row.upstreamOwner &&
+				upstreamRepo === row.upstreamRepo &&
+				upstreamBranch === row.upstreamBranch &&
+				pullRequestId === row.pullRequestId
 			) {
-				return null;
+				return false;
 			}
 
+			// Guard: the workspace can archive during the awaited ref read; a
+			// tombstone's branch/PR link is frozen. Sync reads and writes, so
+			// nothing can interleave between this check and the writes.
+			if (!this.isLiveWorkspace(workspace.id)) return false;
 			this.db
-				.update(workspaces)
+				.update(workspaceRepositories)
 				.set({
 					branch,
 					headSha,
@@ -973,184 +1053,189 @@ export class PullRequestRuntimeManager {
 					upstreamRepo,
 					upstreamBranch,
 					pullRequestId,
-					...(branch !== workspace.branch ? { updatedAt: Date.now() } : {}),
 				})
-				// Guard: the workspace can archive during the awaited ref read;
-				// a tombstone's branch/PR link is frozen.
-				.where(
-					and(eq(workspaces.id, workspace.id), isNull(workspaces.archivedAt)),
-				)
+				.where(checkoutWhere(row.workspaceId, row.repositoryId))
 				.run();
-
-			return workspace.projectId;
+			if (mirrorBranch) {
+				this.db
+					.update(workspaces)
+					.set({ branch, updatedAt: Date.now() })
+					.where(eq(workspaces.id, workspace.id))
+					.run();
+			}
+			return true;
 		} catch (error) {
 			console.warn(
-				"[host-service:pull-request-runtime] Failed to sync workspace branch",
+				"[host-service:pull-request-runtime] Failed to sync checkout branch",
 				{
-					workspaceId: workspace.id,
-					worktreePath: workspace.worktreePath,
+					workspaceId: row.workspaceId,
+					repositoryId: row.repositoryId,
+					path,
 					error,
 				},
 			);
-			return null;
+			return false;
 		}
 	}
 
-	private noteWorktreeMissing(workspaceId: string, worktreePath: string): void {
-		if (this.missingWorktrees.has(workspaceId)) return;
-		this.missingWorktrees.set(workspaceId, worktreePath);
+	private noteWorktreeMissing(
+		key: string,
+		row: { workspaceId: string; repositoryId: string },
+		path: string,
+	): void {
+		if (this.missingWorktrees.has(key)) return;
+		this.missingWorktrees.set(key, {
+			workspaceId: row.workspaceId,
+			repositoryId: row.repositoryId,
+			path,
+		});
 		console.warn(
 			"[host-service:pull-request-runtime] Worktree missing on disk; pausing branch sync until it reappears",
-			{ workspaceId, worktreePath },
+			{ workspaceId: row.workspaceId, repositoryId: row.repositoryId, path },
 		);
 		this.missingWorktreeProbeTimer ??= setInterval(() => {
-			for (const [id, path] of this.missingWorktrees) {
-				if (this.worktreeExists(path)) void this.enqueueWorkspaceSync(id);
+			for (const missing of this.missingWorktrees.values()) {
+				if (this.worktreeExists(missing.path)) {
+					void this.enqueueCheckoutSync(
+						missing.workspaceId,
+						missing.repositoryId,
+					);
+				}
 			}
 		}, MISSING_WORKTREE_PROBE_INTERVAL_MS);
 	}
 
-	private noteWorktreePresent(workspaceId: string): void {
-		const worktreePath = this.missingWorktrees.get(workspaceId);
-		if (worktreePath === undefined) return;
-		this.forgetMissingWorktree(workspaceId);
+	private noteWorktreePresent(key: string): void {
+		const missing = this.missingWorktrees.get(key);
+		if (missing === undefined) return;
+		this.forgetMissingWorktree(key);
 		console.warn(
 			"[host-service:pull-request-runtime] Worktree reappeared; resuming branch sync",
-			{ workspaceId, worktreePath },
+			missing,
 		);
 	}
 
-	private forgetMissingWorktree(workspaceId: string): void {
-		if (!this.missingWorktrees.delete(workspaceId)) return;
+	private forgetMissingWorktree(key: string): void {
+		if (!this.missingWorktrees.delete(key)) return;
 		if (this.missingWorktrees.size === 0 && this.missingWorktreeProbeTimer) {
 			clearInterval(this.missingWorktreeProbeTimer);
 			this.missingWorktreeProbeTimer = null;
 		}
 	}
 
-	private async refreshEligibleProjects(): Promise<void> {
-		const rows = this.db
-			.select({
-				projectId: workspaces.projectId,
-				archivedAt: workspaces.archivedAt,
-			})
-			.from(workspaces)
-			.all();
-		// Session workspaces (null projectId) have no remote to sync; archived
-		// workspaces are frozen. Filtered in JS for the same fake-friendly
-		// reason as syncWorkspaceBranches.
-		const projectIds = [
+	private async refreshEligibleRepositories(): Promise<void> {
+		const repositoryIds = [
 			...new Set(
-				rows
-					.filter((row) => row.archivedAt == null)
-					.map((row) => row.projectId)
-					.filter((id) => id !== null),
+				this.listSyncableCheckouts().map((checkout) => checkout.repositoryId),
 			),
 		];
 		await Promise.all(
-			projectIds.map((projectId) => this.refreshProject(projectId)),
+			repositoryIds.map((repositoryId) => this.refreshRepository(repositoryId)),
 		);
 	}
 
-	private async refreshProject(
-		projectId: string,
-		options: ProjectRefreshOptions = {},
+	private async refreshRepository(
+		repositoryId: string,
+		options: RepositoryRefreshOptions = {},
 	): Promise<void> {
 		// A scoped refresh and a full one are different work; only identical
 		// requests share an in-flight promise.
-		const inFlightKey = options.workspaceIds
-			? `${projectId}\0${[...options.workspaceIds].sort().join(",")}`
-			: projectId;
-		const existing = this.inFlightProjects.get(inFlightKey);
+		const inFlightKey = options.checkoutKeys
+			? `${repositoryId}\0${[...options.checkoutKeys].sort().join(",")}`
+			: repositoryId;
+		const existing = this.inFlightRepositories.get(inFlightKey);
 		if (existing) {
 			await existing;
 			return;
 		}
 
-		const refreshPromise = this.performProjectRefresh(projectId, options)
+		const refreshPromise = this.performRepositoryRefresh(repositoryId, options)
 			.catch((error) => {
 				console.warn(
-					"[host-service:pull-request-runtime] Project refresh failed",
-					{
-						projectId,
-						error,
-					},
+					"[host-service:pull-request-runtime] Repository refresh failed",
+					{ repositoryId, error },
 				);
 			})
 			.finally(() => {
-				this.inFlightProjects.delete(inFlightKey);
+				this.inFlightRepositories.delete(inFlightKey);
 			});
 
-		this.inFlightProjects.set(inFlightKey, refreshPromise);
+		this.inFlightRepositories.set(inFlightKey, refreshPromise);
 		await refreshPromise;
 	}
 
-	private async performProjectRefresh(
-		projectId: string,
-		options: ProjectRefreshOptions = {},
+	/** Point a checkout at a PR, unless its workspace archived meanwhile. */
+	private setCheckoutPullRequest(
+		checkout: CheckoutRow,
+		pullRequestId: string | null,
+	): void {
+		if (!this.isLiveWorkspace(checkout.workspaceId)) return;
+		this.db
+			.update(workspaceRepositories)
+			.set({ pullRequestId })
+			.where(checkoutWhere(checkout.workspaceId, checkout.repositoryId))
+			.run();
+	}
+
+	private async performRepositoryRefresh(
+		repositoryId: string,
+		options: RepositoryRefreshOptions = {},
 	): Promise<void> {
-		const repo = await this.getProjectRepository(projectId);
+		const repo = await this.getRepositoryIdentity(repositoryId);
 		if (!repo) return;
 
-		const scope = options.workspaceIds ? new Set(options.workspaceIds) : null;
-		const projectWorkspaces = this.db
-			.select()
-			.from(workspaces)
-			.where(eq(workspaces.projectId, projectId))
+		const scope = options.checkoutKeys ? new Set(options.checkoutKeys) : null;
+		// Archived workspaces keep their frozen PR link; refreshing them could
+		// clear it (e.g. branch deleted). Rows outside the scope are neither
+		// fetched nor relinked.
+		const checkouts = this.db
+			.select({ row: workspaceRepositories })
+			.from(workspaceRepositories)
+			.innerJoin(
+				workspaces,
+				eq(workspaces.id, workspaceRepositories.workspaceId),
+			)
+			.where(
+				and(
+					eq(workspaceRepositories.repositoryId, repositoryId),
+					isNull(workspaces.archivedAt),
+				),
+			)
 			.all()
-			// JS-filtered like the sweeps: archived rows keep their frozen PR
-			// link; refreshing them could clear it (e.g. branch deleted).
-			// Rows outside the scope are neither fetched nor relinked.
+			.map(({ row }) => row)
 			.filter(
-				(workspace) =>
-					workspace.archivedAt == null && (!scope || scope.has(workspace.id)),
+				(row) =>
+					!scope || scope.has(checkoutKey(row.workspaceId, row.repositoryId)),
 			);
-		if (projectWorkspaces.length === 0) return;
+		if (checkouts.length === 0) return;
 
 		const wantedRefs = new Map<string, GitHubPullRequestHeadRef>();
-		for (const workspace of projectWorkspaces) {
-			const upstreamOwner = workspace.upstreamOwner;
-			const upstreamRepo = workspace.upstreamRepo;
-			const upstreamBranch = workspace.upstreamBranch ?? workspace.branch;
-			const key = this.effectiveUpstreamKey(workspace, repo);
-			if (key && upstreamOwner && upstreamRepo) {
+		for (const checkout of checkouts) {
+			const key = this.effectiveUpstreamKey(checkout, repo);
+			if (key && checkout.upstreamOwner && checkout.upstreamRepo) {
 				wantedRefs.set(key, {
-					owner: upstreamOwner,
-					repo: upstreamRepo,
-					branch: upstreamBranch,
+					owner: checkout.upstreamOwner,
+					repo: checkout.upstreamRepo,
+					branch: checkout.upstreamBranch ?? checkout.branch,
 				});
 			}
 		}
 
 		const { failedKeys, matched: keyToPullRequest } =
-			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
+			await this.fetchRepoPullRequests(repositoryId, repo, wantedRefs, options);
 
-		for (const workspace of projectWorkspaces) {
-			const key = this.effectiveUpstreamKey(workspace, repo);
+		for (const checkout of checkouts) {
+			const key = this.effectiveUpstreamKey(checkout, repo);
 			if (!key) {
 				// PR checkouts recovered from GitHub's archived refs intentionally
 				// have no upstream. Keep the explicit PR link only while the
-				// workspace HEAD still matches the selected PR head.
+				// checkout HEAD still matches the selected PR head.
 				if (
-					this.pullRequestHeadMatches(
-						workspace.pullRequestId,
-						workspace.headSha,
-					)
+					this.pullRequestHeadMatches(checkout.pullRequestId, checkout.headSha)
 				) {
 					continue;
 				}
-				if (workspace.pullRequestId) {
-					this.db
-						.update(workspaces)
-						.set({ pullRequestId: null })
-						.where(
-							and(
-								eq(workspaces.id, workspace.id),
-								isNull(workspaces.archivedAt),
-							),
-						)
-						.run();
-				}
+				if (checkout.pullRequestId) this.setCheckoutPullRequest(checkout, null);
 				continue;
 			}
 			const rawMatch = keyToPullRequest.get(key);
@@ -1159,63 +1244,57 @@ export class PullRequestRuntimeManager {
 			const isPastPromotion =
 				!!rawMatch &&
 				!rawMatch.isOpen &&
-				this.tracksBaseDefaultBranch(workspace, repo);
-			if (this.tracksBaseDefaultBranch(workspace, repo)) {
-				this.forgetPastPromotionLinks(workspace.id, projectId, repo);
+				this.tracksBaseDefaultBranch(checkout, repo);
+			if (this.tracksBaseDefaultBranch(checkout, repo)) {
+				this.forgetPastPromotionLinks(checkout.workspaceId, repositoryId, repo);
 			}
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId || isPastPromotion
+				rawMatch?.id === checkout.suppressedPullRequestId || isPastPromotion
 					? undefined
 					: rawMatch;
 			if (match) {
-				this.db
-					.update(workspaces)
-					.set({ pullRequestId: match.id })
-					.where(
-						and(eq(workspaces.id, workspace.id), isNull(workspaces.archivedAt)),
-					)
-					.run();
+				this.setCheckoutPullRequest(checkout, match.id);
 				// The sweep re-asserts the link every pass, so this also heals
 				// history rows for links that predate the table.
-				this.recordWorkspacePullRequestLink(workspace.id, match.id, Date.now());
+				this.recordWorkspacePullRequestLink(
+					checkout.workspaceId,
+					match.id,
+					Date.now(),
+				);
 				continue;
 			}
 
 			if (failedKeys.has(key)) continue;
 
-			if (workspace.pullRequestId) {
-				this.db
-					.update(workspaces)
-					.set({ pullRequestId: null })
-					.where(
-						and(eq(workspaces.id, workspace.id), isNull(workspaces.archivedAt)),
-					)
-					.run();
-			}
+			if (checkout.pullRequestId) this.setCheckoutPullRequest(checkout, null);
 		}
 	}
 
-	private async getProjectRepository(
-		projectId: string,
+	private async getRepositoryIdentity(
+		repositoryId: string,
 	): Promise<NormalizedRepoIdentity | null> {
-		const project = getLocalProject(this.db, projectId);
-		if (!project) return null;
+		const repository = this.db
+			.select()
+			.from(repositories)
+			.where(eq(repositories.id, repositoryId))
+			.get();
+		if (!repository) return null;
 
 		let identity: Omit<NormalizedRepoIdentity, "defaultBranch">;
 		if (
-			project.repoProvider === "github" &&
-			project.repoOwner &&
-			project.repoName &&
-			project.repoUrl &&
-			project.remoteName
+			repository.provider === "github" &&
+			repository.owner &&
+			repository.repoName &&
+			repository.url &&
+			repository.remoteName
 		) {
 			identity = {
 				provider: "github",
-				owner: project.repoOwner,
-				name: project.repoName,
-				url: project.repoUrl,
-				remoteName: project.remoteName,
+				owner: repository.owner,
+				name: repository.repoName,
+				url: repository.url,
+				remoteName: repository.remoteName,
 			};
 		} else {
 			const remoteName = "origin";
@@ -1224,7 +1303,9 @@ export class PullRequestRuntimeManager {
 			// disk throws GitConstructError, which is "no repo" here, not a
 			// refresh failure to warn about every sweep.
 			try {
-				const git = await this.git(project.repoPath);
+				const git = await this.git(repository.repoPath, {
+					env: gitCeilingEnv(repository.repoPath),
+				});
 				const value = await git.remote(["get-url", remoteName]);
 				if (typeof value !== "string") {
 					return null;
@@ -1238,21 +1319,21 @@ export class PullRequestRuntimeManager {
 			if (!parsedRemote) return null;
 
 			this.db
-				.update(projects)
+				.update(repositories)
 				.set({
-					repoProvider: parsedRemote.provider,
-					repoOwner: parsedRemote.owner,
+					provider: parsedRemote.provider,
+					owner: parsedRemote.owner,
 					repoName: parsedRemote.name,
-					repoUrl: parsedRemote.url,
+					url: parsedRemote.url,
 					remoteName,
 				})
-				.where(eq(projects.id, projectId))
+				.where(eq(repositories.id, repositoryId))
 				.run();
 
 			identity = { ...parsedRemote, remoteName };
 		}
 
-		const defaultBranch = await this.resolveDefaultBranch(project.repoPath);
+		const defaultBranch = await this.resolveDefaultBranch(repository.repoPath);
 		return { ...identity, defaultBranch };
 	}
 
@@ -1269,34 +1350,34 @@ export class PullRequestRuntimeManager {
 	// Base repo only, so fork / `gh pr checkout` renames whose head is
 	// `<default>` are not treated as tracking the default branch.
 	private tracksBaseDefaultBranch(
-		workspace: typeof workspaces.$inferSelect,
+		checkout: CheckoutRow,
 		repo: NormalizedRepoIdentity,
 	): boolean {
 		return (
 			repo.defaultBranch !== null &&
-			(workspace.upstreamBranch ?? workspace.branch) === repo.defaultBranch &&
-			workspace.upstreamOwner?.toLowerCase() === repo.owner.toLowerCase() &&
-			workspace.upstreamRepo?.toLowerCase() === repo.name.toLowerCase()
+			(checkout.upstreamBranch ?? checkout.branch) === repo.defaultBranch &&
+			checkout.upstreamOwner?.toLowerCase() === repo.owner.toLowerCase() &&
+			checkout.upstreamRepo?.toLowerCase() === repo.name.toLowerCase()
 		);
 	}
 
-	// Guard: a workspace that merely tracks `origin/<default>` (branched off it,
+	// Guard: a checkout that merely tracks `origin/<default>` (branched off it,
 	// never pushed) must not key on `<default>` and grab a head=<default> PR —
-	// only its own default-branch workspace may.
+	// only a checkout on the default branch may.
 	private effectiveUpstreamKey(
-		workspace: typeof workspaces.$inferSelect,
+		checkout: CheckoutRow,
 		repo: NormalizedRepoIdentity,
 	): string | null {
 		if (
-			this.tracksBaseDefaultBranch(workspace, repo) &&
-			workspace.branch !== repo.defaultBranch
+			this.tracksBaseDefaultBranch(checkout, repo) &&
+			checkout.branch !== repo.defaultBranch
 		) {
 			return null;
 		}
 		return upstreamKey(
-			workspace.upstreamOwner,
-			workspace.upstreamRepo,
-			workspace.upstreamBranch ?? workspace.branch,
+			checkout.upstreamOwner,
+			checkout.upstreamRepo,
+			checkout.upstreamBranch ?? checkout.branch,
 		);
 	}
 
@@ -1333,7 +1414,7 @@ export class PullRequestRuntimeManager {
 
 	private upsertPullRequestRow({
 		existing,
-		projectId,
+		repositoryId,
 		repo,
 		prNumber,
 		url,
@@ -1351,7 +1432,7 @@ export class PullRequestRuntimeManager {
 		now,
 	}: {
 		existing: PullRequestRow | undefined;
-		projectId: string;
+		repositoryId: string;
 		repo: NormalizedRepoIdentity;
 		prNumber: number;
 		url: string;
@@ -1371,7 +1452,7 @@ export class PullRequestRuntimeManager {
 	}): string {
 		const rowId = existing?.id ?? randomUUID();
 		const data = {
-			projectId,
+			repositoryId,
 			repoProvider: repo.provider,
 			repoOwner: repo.owner,
 			repoName: repo.name,
@@ -1474,7 +1555,7 @@ export class PullRequestRuntimeManager {
 		if (this.holdRecoveryTimer) clearTimeout(this.holdRecoveryTimer);
 		this.holdRecoveryTimer = setTimeout(() => {
 			this.holdRecoveryTimer = null;
-			void this.refreshEligibleProjects();
+			void this.refreshEligibleRepositories();
 		}, hold.holdMs + 1_000);
 		this.holdRecoveryTimer.unref?.();
 	}
@@ -1703,7 +1784,7 @@ export class PullRequestRuntimeManager {
 	}
 
 	private async fetchRepoPullRequests(
-		projectId: string,
+		repositoryId: string,
 		repo: NormalizedRepoIdentity,
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
@@ -1737,7 +1818,7 @@ export class PullRequestRuntimeManager {
 					console.warn(
 						"[host-service:pull-request-runtime] Failed to fetch PR by head",
 						{
-							projectId,
+							repositoryId,
 							owner: repo.owner,
 							name: repo.name,
 							head,
@@ -1783,7 +1864,7 @@ export class PullRequestRuntimeManager {
 				for (const key of unmatchedKeys) failedKeys.add(key);
 				console.warn(
 					"[host-service:pull-request-runtime] Open-PR sweep failed",
-					{ projectId, owner: repo.owner, name: repo.name, error },
+					{ repositoryId, owner: repo.owner, name: repo.name, error },
 				);
 			}
 		}
@@ -1802,7 +1883,7 @@ export class PullRequestRuntimeManager {
 					console.warn(
 						"[host-service:pull-request-runtime] Failed to fetch PR review/check state",
 						{
-							projectId,
+							repositoryId,
 							owner: repo.owner,
 							name: repo.name,
 							prNumber: node.number,
@@ -1828,7 +1909,7 @@ export class PullRequestRuntimeManager {
 				coercePullRequestState(existing?.state ?? null) === "queued";
 			const rowId = this.upsertPullRequestRow({
 				existing,
-				projectId,
+				repositoryId,
 				prNumber: node.number,
 				repo,
 				url: node.url,

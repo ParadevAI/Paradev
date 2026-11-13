@@ -7,15 +7,16 @@ import { join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject } from "../../../../test/helpers/seed";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
-import { projects, workspaces } from "../../../db/schema";
+import { projects, repositories, workspaces } from "../../../db/schema";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
 import { insertLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { createCallerFactory } from "../../index";
 import { workspaceCreationRouter } from "../workspace-creation/workspace-creation";
-import { createFromImportLocal } from "./handlers";
+import { createProject } from "./handlers";
 import { projectRouter } from "./project";
 import { createLocalWorkspace } from "./utils/create-local-workspace";
 
@@ -81,6 +82,21 @@ function createRecordingApiStub() {
 	return { api, calls };
 }
 
+async function importLocal(
+	ctx: HostServiceContext,
+	args: { name: string; repoPath: string },
+) {
+	const project = await createProject(ctx, {
+		name: args.name,
+		repositories: [{ kind: "local", path: args.repoPath }],
+	});
+	return {
+		...project,
+		projectId: project.id,
+		repoPath: project.repositories[0]?.path,
+	};
+}
+
 function createTestContext(db: HostDb, api: unknown): HostServiceContext {
 	// Absorbs any broadcast method emitProjectChanged / workspace stores call.
 	const eventBus = new Proxy({}, { get: () => () => {} });
@@ -103,14 +119,7 @@ describe("findByPath walkAllRemotes (v1 importer)", () => {
 
 		// Local-first project: exists only in the host's local DB — the
 		// cloud has never heard of it (this is the bug's exact setup).
-		db.insert(projects)
-			.values({
-				id: randomUUID(),
-				repoPath: root,
-				name: "My Project",
-				updatedAt: 1,
-			})
-			.run();
+		const seeded = seedProject({ db }, { repoPath: root, name: "My Project" });
 
 		const caller = createCallerFactory(projectRouter)(ctx);
 		const result = await caller.findByPath({
@@ -121,6 +130,7 @@ describe("findByPath walkAllRemotes (v1 importer)", () => {
 		expect(result.candidates).toHaveLength(1);
 		expect(result.candidates[0]?.source).toBe("local-path");
 		expect(result.candidates[0]?.name).toBe("My Project");
+		expect(result.candidates[0]?.repositoryId).toBe(seeded.repositoryId);
 		expect(result.cloudErrors).toHaveLength(0);
 		// The whole point: no staleness probe, no remote walk.
 		expect(calls).toHaveLength(0);
@@ -151,7 +161,7 @@ describe("createFromImportLocal idempotency", () => {
 		const ctx = createTestContext(db, api);
 		const root = await createTempGitRepo();
 
-		const first = await createFromImportLocal(ctx, {
+		const first = await importLocal(ctx, {
 			name: "Imported",
 			repoPath: root,
 		});
@@ -163,7 +173,7 @@ describe("createFromImportLocal idempotency", () => {
 			.where(eq(projects.id, first.projectId))
 			.run();
 
-		const second = await createFromImportLocal(ctx, {
+		const second = await importLocal(ctx, {
 			name: "Imported (again)",
 			repoPath: root,
 		});
@@ -193,44 +203,13 @@ describe("detached-HEAD repos (v1 importer)", () => {
 		const root = await createTempGitRepo();
 		await detachHead(root);
 
-		const result = await createFromImportLocal(ctx, {
+		const result = await importLocal(ctx, {
 			name: "Detached",
 			repoPath: root,
 		});
 
 		expect(result.created).toBe(true);
 		expect(result.repoPath).toBe(root);
-		const row = db
-			.select()
-			.from(projects)
-			.where(eq(projects.id, result.projectId))
-			.get();
-		expect(row?.repoPath).toBe(root);
-		expect(db.select().from(workspaces).all()).toHaveLength(0);
-	});
-
-	it("setup mode=import links the project without a main workspace", async () => {
-		const db = createTestDb();
-		const { api } = createRecordingApiStub();
-		const ctx = createTestContext(db, api);
-		const root = await createTempGitRepo();
-		await detachHead(root);
-		const projectId = randomUUID();
-
-		const caller = createCallerFactory(projectRouter)(ctx);
-		const result = await caller.setup({
-			projectId,
-			origin: { name: "Detached" },
-			mode: { kind: "import", repoPath: root, allowRelocate: false },
-		});
-
-		expect(result.repoPath).toBe(root);
-		const row = db
-			.select()
-			.from(projects)
-			.where(eq(projects.id, projectId))
-			.get();
-		expect(row?.repoPath).toBe(root);
 		expect(db.select().from(workspaces).all()).toHaveLength(0);
 	});
 
@@ -240,7 +219,7 @@ describe("detached-HEAD repos (v1 importer)", () => {
 		const ctx = createTestContext(db, api);
 		const root = await createTempGitRepo();
 		const branch = await detachHead(root);
-		const { projectId } = await createFromImportLocal(ctx, {
+		const { projectId } = await importLocal(ctx, {
 			name: "Detached",
 			repoPath: root,
 		});
@@ -262,14 +241,13 @@ describe("detached-HEAD repos (v1 importer)", () => {
 		const ctx = createTestContext(db, api);
 		const root = await createTempGitRepo();
 		const branch = await detachHead(root);
-		const { projectId } = await createFromImportLocal(ctx, {
+		const { projectId } = await importLocal(ctx, {
 			name: "Detached",
 			repoPath: root,
 		});
 
 		const attempt = createLocalWorkspace(ctx, {
 			projectId,
-			repoPath: root,
 			name: "local",
 		});
 		await expect(attempt).rejects.toMatchObject({
@@ -281,7 +259,6 @@ describe("detached-HEAD repos (v1 importer)", () => {
 		await createUserSimpleGit(root).raw(["checkout", branch]);
 		const created = await createLocalWorkspace(ctx, {
 			projectId,
-			repoPath: root,
 			name: "local",
 		});
 		expect(created.projectId).toBe(projectId);
@@ -306,10 +283,11 @@ describe("listProjectWorktrees", () => {
 			"feature",
 			worktreePath,
 		]);
-		const { projectId } = await createFromImportLocal(ctx, {
+		const project = await importLocal(ctx, {
 			name: "Worktrees",
 			repoPath: root,
 		});
+		const { projectId } = project;
 		const caller = createCallerFactory(workspaceCreationRouter)(ctx);
 		const feature = async () =>
 			(await caller.listProjectWorktrees({ projectId })).worktrees.find(
@@ -326,6 +304,9 @@ describe("listProjectWorktrees", () => {
 			worktreePath,
 			branch: "feature",
 			name: "feature",
+			checkouts: [
+				{ repositoryId: project.primaryRepositoryId, branch: "feature" },
+			],
 		});
 		expect(await feature()).toMatchObject({
 			hasWorkspace: true,
@@ -341,16 +322,20 @@ describe("a deleted project on the same repo", () => {
 		const ctx = createTestContext(db, api);
 		const caller = createCallerFactory(projectRouter)(ctx);
 		const root = await createTempGitRepo();
-		const deleted = await createFromImportLocal(ctx, {
+		const deleted = await importLocal(ctx, {
 			name: "Deleted",
 			repoPath: root,
 		});
 		await caller.remove({ projectId: deleted.projectId });
-		const projectId = randomUUID();
-		await caller.setup({
+		const other = await importLocal(ctx, {
+			name: "Other",
+			repoPath: await createTempGitRepo(),
+		});
+		const projectId = other.projectId;
+		await caller.relocateRepository({
 			projectId,
-			origin: { name: "From other machine" },
-			mode: { kind: "import", repoPath: root },
+			repositoryId: other.primaryRepositoryId,
+			path: root,
 		});
 		return { db, ctx, caller, root, deletedId: deleted.projectId, projectId };
 	}
@@ -359,7 +344,13 @@ describe("a deleted project on the same repo", () => {
 		const { db, deletedId, projectId, root } = await setUpThenDelete();
 
 		const live = db.select().from(projects).where(eq(projects.id, projectId));
-		expect(live.get()?.repoPath).toBe(root);
+		expect(
+			db
+				.select()
+				.from(repositories)
+				.where(eq(repositories.projectId, projectId))
+				.get()?.repoPath,
+		).toBe(root);
 		expect(live.get()?.deletedAt).toBeNull();
 		const old = db.select().from(projects).where(eq(projects.id, deletedId));
 		expect(old.get()?.deletedAt).not.toBeNull();
@@ -376,7 +367,7 @@ describe("a deleted project on the same repo", () => {
 	it("re-importing the folder returns the live project, not the deleted one", async () => {
 		const { ctx, root, projectId } = await setUpThenDelete();
 
-		const again = await createFromImportLocal(ctx, {
+		const again = await importLocal(ctx, {
 			name: "Again",
 			repoPath: root,
 		});

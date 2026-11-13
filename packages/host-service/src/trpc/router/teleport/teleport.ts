@@ -7,8 +7,8 @@ import type { ChatRuntime } from "@superset/chat-runtime";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
-import { createGitEnvResolver } from "../../../runtime/git";
+import { listProjectRepositories } from "../../../projects/repositories";
+import { createGitEnvResolver, gitCeilingEnv } from "../../../runtime/git";
 import {
 	downloadBundle,
 	uploadBundle,
@@ -28,15 +28,17 @@ import {
 	harnessPlaceSessionTask,
 	harnessSessionFileTask,
 } from "../../../workers/tasks/harness";
+import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
+import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
-import { resolveWorktreePath } from "../git/utils/resolve-worktree";
+import {
+	resolveCheckoutPath,
+	resolveWorktreePath,
+} from "../git/utils/resolve-worktree";
 import { requireChatRuntime } from "../sessions/session-service";
 import { resolveDefaultAccountTerminalEnv } from "../usage/default-account";
-import {
-	requireLocalProject,
-	requireProjectRepoPath,
-} from "../workspace-creation/shared/local-project";
+import { requireLocalProject } from "../workspace-creation/shared/local-project";
 import {
 	importTerminalSession,
 	listMovableTerminals,
@@ -95,6 +97,14 @@ function requireChat(
 		});
 	}
 	return session;
+}
+
+function multiRepoUnsupported() {
+	return new TRPCError({
+		code: "PRECONDITION_FAILED",
+		message:
+			"multi_repo_unsupported: a workspace with several repositories cannot be moved yet",
+	});
 }
 
 function busyError() {
@@ -169,11 +179,9 @@ export const teleportRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (listRepositoryWorkspaces(ctx.db, input.workspaceId).length > 0) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "A multi-repo workspace cannot be moved yet",
-				});
+			const workspace = getLocalWorkspace(ctx.db, input.workspaceId);
+			if (workspace && listWorkspaceCheckouts(ctx.db, workspace).length > 1) {
+				throw multiRepoUnsupported();
 			}
 			const chat = requireChatRuntime(ctx);
 			const chatSync = ctx.runtime.chatSync;
@@ -222,10 +230,13 @@ export const teleportRouter = router({
 				busy().length > 0 || terminals.some((terminal) => terminal.busy);
 			if (anyBusy && !input.stopIfBusy) throw busyError();
 
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const worktreePath = resolveCheckoutPath(ctx, input.workspaceId).path;
 			const env = resolveDefaultAccountTerminalEnv(ctx.db);
 			const pool = getHostWorkerPool();
-			const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+			const gitEnv = {
+				...(await createGitEnvResolver(ctx.credentials)(worktreePath)),
+				...gitCeilingEnv(worktreePath),
+			};
 			const target = await pool
 				.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
 				.catch((error: unknown) => {
@@ -488,9 +499,17 @@ export const teleportRouter = router({
 	fetchBranch: machineOnlyProcedure
 		.input(z.object({ projectId: z.string(), branch: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
-			const repoPath = requireProjectRepoPath(
-				requireLocalProject(ctx, input.projectId),
-			);
+			requireLocalProject(ctx, input.projectId);
+			const repositories = listProjectRepositories(ctx.db, input.projectId);
+			const [repository] = repositories;
+			if (!repository) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Project has no repository on this host",
+				});
+			}
+			if (repositories.length > 1) throw multiRepoUnsupported();
+			const repoPath = repository.repoPath;
 			const gitEnv = await createGitEnvResolver(ctx.credentials)(repoPath);
 			await execFileAsync(
 				"git",

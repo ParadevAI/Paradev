@@ -1,5 +1,4 @@
 import { spawn } from "node:child_process";
-import { createHash } from "node:crypto";
 import { existsSync, openSync, readFileSync, writeFileSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -18,7 +17,12 @@ import {
 } from "@superset/shared/sandbox-contract";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
-import { projects, workspaces } from "../../db/schema";
+import {
+	projects,
+	repositories,
+	workspaceRepositories,
+	workspaces,
+} from "../../db/schema";
 import {
 	createTerminalSessionInternal,
 	isAgentTerminalAlive,
@@ -187,9 +191,10 @@ export interface StartHookPlan {
  * Exported for tests.
  */
 export function startHookPlan(identity: SandboxIdentity): StartHookPlan {
-	const root = identity.worktreePath;
+	// Config comes from the primary repository; scripts run in the root, as on a host.
+	const root = identity.workspaceRoot;
 	const config = loadProjectConfig({
-		repoPath: root,
+		repoPath: identity.worktreePath,
 		projectId: identity.workspaceId,
 	});
 	if (!config) return { setup: null, run: null };
@@ -368,7 +373,7 @@ export async function runSandboxStartHook(
 	const command = plan.setup;
 	const log = openSync(files.log, "a");
 	const child = spawn("bash", ["-lc", command], {
-		cwd: identity.worktreePath,
+		cwd: identity.workspaceRoot,
 		env: buildStartHookEnv(process.env, getManagedEnv()),
 		stdio: ["ignore", log, log],
 		detached: true,
@@ -670,20 +675,15 @@ async function waitForFlag(path: string, timeoutMs: number): Promise<boolean> {
 }
 
 /**
- * A cloud workspace's id names its primary checkout's row, which is what the
- * app opens; every other repository gets a row of its own with an id derived
- * from the workspace's, so a restart seeds the same ids.
+ * The sandbox's one project holds every repository on the box and its one
+ * workspace checks them all out. Each repository is its own main checkout:
+ * the box has no base repo it was branched from, so the workspace is
+ * type='local'. A checkout's folder is `<root>/<name>` with several
+ * repositories, so a repository's name is its sandbox path.
+ *
+ * Idempotent. A box seeded before multi-repo has one project and one
+ * workspace per repository; those are folded into the primary's.
  */
-export function sandboxRepositoryWorkspaceId(
-	workspaceId: string,
-	path: string,
-): string {
-	const hash = createHash("sha256")
-		.update(`${workspaceId}:${path}`)
-		.digest("hex");
-	return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-8${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
-}
-
 export function runSandboxSelfSeed(
 	db: HostDb,
 	identity: SandboxIdentity,
@@ -692,61 +692,117 @@ export function runSandboxSelfSeed(
 	seedSandboxAgents(db, identity.workspaceRoot, agentDir);
 	const root = identity.workspaceRoot;
 	const now = Date.now();
-	identity.repositories.forEach((repo, index) => {
-		const id =
-			index === 0
-				? identity.workspaceId
-				: sandboxRepositoryWorkspaceId(identity.workspaceId, repo.path);
-		const parsed = parseGitHubRemote(repo.url);
-		const repoFields = parsed
-			? {
-					repoProvider: parsed.provider,
-					repoOwner: parsed.owner,
-					repoName: parsed.name,
-					repoUrl: parsed.url,
-					remoteName: "origin",
-				}
-			: {};
-		const existing = db
-			.select({ projectId: workspaces.projectId })
+	const several = identity.repositories.length > 1;
+	db.transaction((tx) => {
+		const existing = tx
+			.select()
 			.from(workspaces)
-			.where(eq(workspaces.id, id))
+			.where(eq(workspaces.id, identity.workspaceId))
 			.get();
-		if (existing) {
-			// Boxes seeded before the repo identity was recorded.
-			if (parsed && existing.projectId) {
-				db.update(projects)
-					.set({ ...repoFields, updatedAt: now })
-					.where(eq(projects.id, existing.projectId))
+		const projectId = existing?.projectId ?? crypto.randomUUID();
+		const repositoryIds: { id: string; branch: string }[] = [];
+		for (const repo of identity.repositories) {
+			const repoPath = sandboxCheckoutDir(root, repo.path);
+			const parsed = parseGitHubRemote(repo.url);
+			const fields = {
+				projectId,
+				name: several || !parsed ? repo.path : parsed.name,
+				repoPath,
+				provider: parsed?.provider ?? null,
+				owner: parsed?.owner ?? null,
+				repoName: parsed?.name ?? null,
+				url: parsed?.url ?? null,
+				remoteName: parsed ? "origin" : null,
+				updatedAt: now,
+			};
+			const found = tx
+				.select()
+				.from(repositories)
+				.where(eq(repositories.repoPath, repoPath))
+				.get();
+			if (found && found.projectId !== projectId) {
+				// A pre-multi-repo sibling: its project and workspace go, the
+				// repository (and its pull requests) moves here.
+				const sibling = found.projectId;
+				tx.delete(workspaceRepositories)
+					.where(eq(workspaceRepositories.repositoryId, found.id))
+					.run();
+				tx.delete(workspaces).where(eq(workspaces.projectId, sibling)).run();
+				if (!existing?.projectId)
+					insertProject(tx, projectId, found.id, identity.projectName, now);
+				tx.update(repositories)
+					.set(fields)
+					.where(eq(repositories.id, found.id))
+					.run();
+				tx.delete(projects).where(eq(projects.id, sibling)).run();
+				repositoryIds.push({ id: found.id, branch: repo.branch });
+				continue;
+			}
+			const id = found?.id ?? crypto.randomUUID();
+			if (!existing?.projectId && repositoryIds.length === 0) {
+				insertProject(tx, projectId, id, identity.projectName, now);
+			}
+			if (found) {
+				tx.update(repositories)
+					.set(fields)
+					.where(eq(repositories.id, id))
+					.run();
+			} else {
+				tx.insert(repositories)
+					.values({ id, ...fields, createdAt: now })
 					.run();
 			}
-			return;
+			repositoryIds.push({ id, branch: repo.branch });
 		}
-		const projectId = crypto.randomUUID();
-		const worktreePath = sandboxCheckoutDir(root, repo.path);
-		db.insert(projects)
-			.values({
-				id: projectId,
-				repoPath: worktreePath,
-				name: index === 0 ? identity.projectName : repo.path,
-				...repoFields,
-				createdAt: now,
-				updatedAt: now,
-			})
+		const [primary] = repositoryIds;
+		if (!primary) return;
+		tx.update(projects)
+			.set({ primaryRepositoryId: primary.id })
+			.where(eq(projects.id, projectId))
 			.run();
-		// type='local' because the checkout *is* the repo here — there is no
-		// base repo it was branched from.
-		db.insert(workspaces)
-			.values({
-				id,
-				projectId,
-				worktreePath,
-				branch: repo.branch,
-				name: index === 0 ? identity.workspaceName : repo.path,
-				type: "local",
-				createdAt: now,
-				updatedAt: now,
-			})
-			.run();
+		if (!existing) {
+			tx.insert(workspaces)
+				.values({
+					id: identity.workspaceId,
+					projectId,
+					worktreePath: root,
+					branch: primary.branch,
+					name: identity.workspaceName,
+					type: "local",
+					createdAt: now,
+					updatedAt: now,
+				})
+				.run();
+		} else if (existing.worktreePath !== root) {
+			tx.update(workspaces)
+				.set({ worktreePath: root, updatedAt: now })
+				.where(eq(workspaces.id, existing.id))
+				.run();
+		}
+		for (const { id, branch } of repositoryIds) {
+			tx.insert(workspaceRepositories)
+				.values({ workspaceId: identity.workspaceId, repositoryId: id, branch })
+				.onConflictDoNothing()
+				.run();
+		}
 	});
+}
+
+function insertProject(
+	tx: Pick<HostDb, "insert">,
+	projectId: string,
+	primaryRepositoryId: string,
+	name: string,
+	now: number,
+): void {
+	tx.insert(projects)
+		.values({
+			id: projectId,
+			name,
+			primaryRepositoryId,
+			createdAt: now,
+			updatedAt: now,
+		})
+		.onConflictDoNothing()
+		.run();
 }

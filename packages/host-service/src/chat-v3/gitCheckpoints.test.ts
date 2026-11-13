@@ -630,4 +630,15 @@ describe("createGitCheckpoints", () => {
 			rmSync(other, { recursive: true, force: true });
 		}
 	});
+
+	test("does not snapshot an enclosing repository from a folder that is not one", async () => {
+		const root = join(repo, "multi-repo-root");
+		await mkdir(root);
+		await writeFile(join(root, "note.txt"), "x\n");
+
+		expect(
+			await checkpoints.capture({ cwd: root, sessionId: "s1" }),
+		).toBeNull();
+		expect(await git.raw(["for-each-ref", "refs/superset"])).toBe("");
+	});
 });

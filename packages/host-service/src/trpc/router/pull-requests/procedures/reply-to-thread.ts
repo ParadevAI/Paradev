@@ -5,6 +5,7 @@ import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpe
 
 const replyToThreadInputSchema = z.object({
 	projectId: z.string(),
+	repositoryId: z.string().optional(),
 	prNumber: z.number().int().positive(),
 	/** REST databaseId of any comment already in the thread — GitHub's
 	 *  reply endpoint threads the new comment onto it regardless of which
@@ -19,7 +20,11 @@ const replyToThreadInputSchema = z.object({
 export const replyToThread = protectedProcedure
 	.input(replyToThreadInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
 		const octokit = await ctx.github();
 		return replyToReviewComment(octokit, {
 			owner: repo.owner,

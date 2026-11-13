@@ -1,5 +1,6 @@
 import type { Octokit } from "@octokit/rest";
 import { z } from "zod";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import {
 	isGithubNotFoundError,
 	isGithubRateLimitError,
@@ -224,7 +225,13 @@ export const searchGitHubIssues = protectedProcedure
 		const projectRepos: ProjectRepo[] = await resolveProjectRepos(
 			projectIds,
 			input.projectIds !== undefined,
-			(projectId) => resolveGithubRepo(ctx, projectId),
+			// Issues are searched in each project's primary repository.
+			(projectId) =>
+				resolveGithubRepo(
+					ctx,
+					projectId,
+					getLocalProject(ctx.db, projectId)?.primaryRepositoryId,
+				),
 		);
 		const limit = input.limit ?? 30;
 		const page = input.page ?? 1;

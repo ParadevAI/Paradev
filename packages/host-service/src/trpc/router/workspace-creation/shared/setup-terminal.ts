@@ -1,23 +1,19 @@
-import { basename, resolve as resolvePath } from "node:path";
 import { eq } from "drizzle-orm";
-import { projects, workspaces } from "../../../../db/schema";
-import { listRepositoryWorkspaces } from "../../../../projects/multi-repo";
+import { workspaces } from "../../../../db/schema";
 import {
 	chainPhases,
 	invalidConfigCommand,
 	loadProjectConfig,
-	shellSingleQuote,
 } from "../../../../runtime/setup/config";
 import { trackConfigResolved } from "../../../../runtime/setup/track-config-resolved";
 import { createTerminalSessionInternal } from "../../../../terminal/terminal";
 import type { HostServiceContext } from "../../../../types";
+import { resolveWorkspaceScriptContext } from "../../../../workspaces/script-context";
 import type { TerminalDescriptor } from "./types";
 
 interface StartSetupTerminalArgs {
 	ctx: HostServiceContext;
 	workspaceId: string;
-	/** A repository of a multi-repo workspace whose setup to run. */
-	repositoryWorkspaceId?: string;
 	/**
 	 * Appended to the resolved setup command with ` && `, so it runs in the
 	 * setup terminal only after setup succeeds. Ignored when no setup command
@@ -46,53 +42,37 @@ interface StartSetupTerminalResult {
 export async function startSetupTerminalIfPresent(
 	args: StartSetupTerminalArgs,
 ): Promise<StartSetupTerminalResult> {
-	const row = args.ctx.db
-		.select({
-			worktreePath: workspaces.worktreePath,
-			repoPath: projects.repoPath,
-			// The inner join guarantees a project row; select its id rather
-			// than the (nullable) workspace column.
-			projectId: projects.id,
-		})
+	const none = { terminal: null, warning: null, chained: false };
+	const workspace = args.ctx.db
+		.select()
 		.from(workspaces)
-		.innerJoin(projects, eq(projects.id, workspaces.projectId))
-		.where(eq(workspaces.id, args.repositoryWorkspaceId ?? args.workspaceId))
+		.where(eq(workspaces.id, args.workspaceId))
 		.get();
-
-	if (!row || !row.worktreePath || !row.repoPath) {
-		return { terminal: null, warning: null, chained: false };
-	}
+	if (!workspace?.worktreePath) return none;
+	const context = resolveWorkspaceScriptContext(args.ctx.db, workspace);
+	if (!context) return none;
+	const configArgs = {
+		repoPath: context.repoPath,
+		projectId: context.projectId,
+		worktreePath: context.configWorktreePath ?? undefined,
+	};
 
 	const resolved = resolveInitialCommand({
-		repoPath: row.repoPath,
-		projectId: row.projectId,
-		worktreePath: row.worktreePath,
+		...configArgs,
+		scriptRoot: context.scriptRoot,
 	});
 	trackConfigResolved({
 		api: args.ctx.api,
 		organizationId: args.ctx.organizationId,
 		workspaceId: args.workspaceId,
 		phase: "setup",
-		repoPath: row.repoPath,
-		projectId: row.projectId,
-		worktreePath: row.worktreePath,
+		...configArgs,
 	});
-	if (!resolved) {
-		return { terminal: null, warning: null, chained: false };
-	}
+	if (!resolved) return none;
 
-	const multiRepo =
-		args.repositoryWorkspaceId !== undefined ||
-		listRepositoryWorkspaces(args.ctx.db, args.workspaceId).length > 0;
-	const setupCwd = resolved.cwd
-		? resolvePath(row.worktreePath, resolved.cwd)
-		: row.worktreePath;
-	const setupCommand = multiRepo
-		? `(cd ${shellSingleQuote(setupCwd)} && export SUPERSET_ROOT_PATH=${shellSingleQuote(row.repoPath)} && ${resolved.initialCommand})`
-		: resolved.initialCommand;
 	const initialCommand = args.chainCommand
-		? `${setupCommand} && ${args.chainCommand}`
-		: setupCommand;
+		? `${resolved.initialCommand} && ${args.chainCommand}`
+		: resolved.initialCommand;
 
 	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
@@ -101,7 +81,7 @@ export async function startSetupTerminalIfPresent(
 		db: args.ctx.db,
 		eventBus: args.ctx.eventBus,
 		initialCommand,
-		...(!multiRepo && resolved.cwd && { cwd: resolved.cwd }),
+		...(resolved.cwd && { cwd: resolved.cwd }),
 	});
 	if ("error" in result) {
 		return {
@@ -112,13 +92,7 @@ export async function startSetupTerminalIfPresent(
 	}
 
 	return {
-		terminal: {
-			id: terminalId,
-			role: "setup",
-			label: args.repositoryWorkspaceId
-				? `Setup: ${basename(row.repoPath)}`
-				: "Workspace Setup",
-		},
+		terminal: { id: terminalId, role: "setup", label: "Workspace Setup" },
 		warning: null,
 		chained: Boolean(args.chainCommand),
 	};
@@ -129,6 +103,8 @@ export function resolveInitialCommand(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath?: string;
+	/** Where the scripts run; defaults to the checkout. */
+	scriptRoot?: string;
 	appHomeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
 	const config = loadProjectConfig(args);
@@ -138,7 +114,7 @@ export function resolveInitialCommand(args: {
 	}
 	const setup = chainPhases(
 		[config.resolved.install, config.resolved.setup],
-		args.worktreePath ?? args.repoPath,
+		args.scriptRoot ?? args.worktreePath ?? args.repoPath,
 	);
 	if (!setup) return null;
 	return {

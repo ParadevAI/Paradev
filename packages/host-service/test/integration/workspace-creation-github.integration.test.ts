@@ -4,8 +4,8 @@ import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { simpleGit } from "simple-git";
-import { projects } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
+import { seedProject } from "../helpers/seed";
 
 /**
  * Real temp git working tree with a remote, plus a `projects` row pointing
@@ -21,18 +21,12 @@ async function seedRepoFixture(
 	const git = simpleGit(dir);
 	await git.init(["--initial-branch=main"]);
 	await git.addRemote("origin", remoteUrl);
-	host.db
-		.insert(projects)
-		.values({
-			id: projectId,
-			repoPath: dir,
-			repoProvider: "github",
-			repoOwner: null,
-			repoName: null,
-			repoUrl: null,
-			remoteName: "origin",
-		})
-		.run();
+	seedProject(host, {
+		id: projectId,
+		repoPath: dir,
+		repoProvider: "github",
+		remoteName: "origin",
+	});
 	return dir;
 }
 
@@ -621,18 +615,12 @@ describe("resolveGithubRepo prefers the user-configured remoteName", () => {
 		await git.init(["--initial-branch=main"]);
 		await git.addRemote("origin", "https://github.com/me/cli.git");
 		await git.addRemote("upstream", "https://github.com/upstream-org/cli.git");
-		host.db
-			.insert(projects)
-			.values({
-				id: projectId,
-				repoPath: repoDir,
-				repoProvider: "github",
-				repoOwner: null,
-				repoName: null,
-				repoUrl: null,
-				remoteName: "upstream",
-			})
-			.run();
+		seedProject(host, {
+			id: projectId,
+			repoPath: repoDir,
+			repoProvider: "github",
+			remoteName: "upstream",
+		});
 	});
 
 	afterEach(async () => {

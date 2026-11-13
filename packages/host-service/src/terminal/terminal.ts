@@ -40,8 +40,6 @@ import type { HostDb } from "../db/index.ts";
 import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
-import { getProjectIncludingDeleted } from "../projects/local-project-store.ts";
-import { repositoryRootPathFor } from "../projects/multi-repo.ts";
 import {
 	getPathState,
 	inaccessiblePathMessage,
@@ -76,6 +74,7 @@ import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
+import { repositoryRootPath } from "./repository-root-path.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
 import {
 	getShellReadyMarkerEvidence,
@@ -3067,21 +3066,10 @@ async function createTerminalSessionUnlocked({
 		};
 	}
 
-	// Derive root path from the workspace's project. Session workspaces
-	// (null projectId) have no main repo; the session dir is the only root.
-	let rootPath = "";
-	const project = workspace.projectId
-		? getProjectIncludingDeleted(db, workspace.projectId)
-		: undefined;
 	const cwd = cwdOverride
 		? resolveTerminalCwd(cwdOverride, workspace.worktreePath)
 		: workspace.worktreePath;
-	if (project?.repoPath) {
-		rootPath = project.repoPath;
-	} else {
-		// A multi-repo workspace: the repository whose checkout holds the cwd.
-		rootPath = repositoryRootPathFor(db, workspaceId, cwd);
-	}
+	const rootPath = repositoryRootPath(db, workspace, cwd);
 	// Adoption overrides these with the PTY's live dims below: the session's
 	// belief must match the kernel's, or the reanchor repaint logic misjudges
 	// whether a client resize will deliver a real SIGWINCH.

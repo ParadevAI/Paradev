@@ -3,10 +3,10 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { simpleGit } from "simple-git";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
 import { getGitStatusSnapshot } from "./utils/git-status";
-import { gitStatusStore } from "./utils/git-status-store";
+import { checkoutStatusKey, gitStatusStore } from "./utils/git-status-store";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 const roots: string[] = [];
 afterEach(async () => {
@@ -32,24 +32,16 @@ for (const action of ["stageFile", "unstageFile"] as const) {
 		if (action === "unstageFile") await git.add(".");
 
 		const workspaceId = `staging-status-${action}`;
-		const caller = gitRouter.createCaller({
-			isAuthenticated: true,
-			db: {
-				query: {
-					workspaces: {
-						findFirst: () => ({ sync: () => ({ worktreePath: repo }) }),
-					},
-				},
-			},
-			credentials: {
-				getCredentials: async () => ({ env: {} }),
-				getToken: async () => null,
-			},
-		} as unknown as HostServiceContext);
+		const { db, repositoryId } = seedTestCheckout({
+			workspaceId,
+			worktreePath: repo,
+		});
+		const caller = gitRouter.createCaller(testGitContext(db));
+		const statusKey = checkoutStatusKey(workspaceId, repositoryId);
 		let fullReads = 0;
 		const read = () =>
 			gitStatusStore.read({
-				workspaceId,
+				workspaceId: statusKey,
 				baseBranch: null,
 				computeFull: async () => {
 					fullReads++;
@@ -60,7 +52,7 @@ for (const action of ["stageFile", "unstageFile"] as const) {
 					throw new Error("mutation must invalidate in full");
 				},
 			});
-		gitStatusStore.attach(workspaceId);
+		gitStatusStore.attach(statusKey);
 		try {
 			await read();
 			await read();
@@ -75,7 +67,7 @@ for (const action of ["stageFile", "unstageFile"] as const) {
 				action === "unstageFile" ? ["tracked.txt"] : [],
 			);
 		} finally {
-			gitStatusStore.drop(workspaceId);
+			gitStatusStore.drop(statusKey);
 		}
 	}, 30_000);
 }

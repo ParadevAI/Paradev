@@ -1,7 +1,6 @@
 import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import {
-	basename,
 	dirname,
 	isAbsolute,
 	join,
@@ -14,16 +13,13 @@ import { WorkspaceFsPathError } from "@superset/workspace-fs/host";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getLocalProject } from "../../../projects/local-project-store";
-import {
-	isContainerProject,
-	listRepositoryProjects,
-	listRepositoryWorkspaces,
-} from "../../../projects/multi-repo";
+import { listProjectRepositories } from "../../../projects/repositories";
 import {
 	ProjectNotFoundError,
 	WorkspaceNotFoundError,
 } from "../../../runtime/filesystem/filesystem";
 import type { HostServiceContext } from "../../../types";
+import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 
 type FsErrnoCode =
@@ -124,6 +120,14 @@ function translateWorkspaceNotFound(error: unknown): never {
 	throw error;
 }
 
+function resolveWorkspaceRoot(ctx: HostServiceContext, workspaceId: string) {
+	try {
+		return ctx.runtime.filesystem.resolveWorkspaceRoot(workspaceId);
+	} catch (error) {
+		translateWorkspaceNotFound(error);
+	}
+}
+
 function getFilesystemService(ctx: HostServiceContext, workspaceId: string) {
 	try {
 		return ctx.runtime.filesystem.getServiceForWorkspace(workspaceId);
@@ -150,19 +154,18 @@ function getProjectFilesystemService(
 }
 
 /**
- * A container root holds no `.git`, so its own index stops at a shallow depth
+ * A multi-repo root holds no `.git`, so its own index stops at a shallow depth
  * and gets no watcher patches: search each checkout and rank the results together.
  */
 async function searchCheckouts(
 	ctx: HostServiceContext,
-	workspaceId: string,
-	checkouts: Array<{ id: string }>,
+	root: string,
+	checkoutPaths: string[],
 	input: SearchInput,
 ): Promise<{ matches: FsSearchMatch[] }> {
-	const root = ctx.runtime.filesystem.resolveWorkspaceRoot(workspaceId);
 	return searchRepositories(
-		checkouts.map((checkout) => ({
-			service: getFilesystemService(ctx, checkout.id),
+		checkoutPaths.map((path) => ({
+			service: ctx.runtime.filesystem.getServiceForRootPath(path),
 			relativePathOf: (match: FsSearchMatch) =>
 				relative(root, match.absolutePath),
 		})),
@@ -173,22 +176,17 @@ async function searchCheckouts(
 /** A multi-repo project searches its repositories, as a new workspace lays them out. */
 async function searchRepositoryProjects(
 	ctx: HostServiceContext,
-	projectId: string,
+	repositories: Array<{ name: string; repoPath: string }>,
 	input: SearchInput,
 ): Promise<{ matches: FsSearchMatch[] }> {
 	return searchRepositories(
-		listRepositoryProjects(ctx.db, projectId).flatMap((repository) => {
-			const service = getProjectFilesystemService(ctx, repository.id);
-			if (!service) return [];
-			const folder = basename(repository.repoPath);
-			return [
-				{
-					service,
-					relativePathOf: (match: FsSearchMatch) =>
-						join(folder, match.relativePath),
-				},
-			];
-		}),
+		repositories.map((repository) => ({
+			service: ctx.runtime.filesystem.getServiceForRootPath(
+				repository.repoPath,
+			),
+			relativePathOf: (match: FsSearchMatch) =>
+				join(repository.name, match.relativePath),
+		})),
 		input,
 	);
 }
@@ -646,17 +644,27 @@ export const filesystemRouter = router({
 			}
 
 			const { workspaceId, projectId, ...serviceInput } = input;
-			const checkouts = workspaceId
-				? listRepositoryWorkspaces(ctx.db, workspaceId)
-				: [];
-			if (workspaceId && checkouts.length > 0) {
-				return await searchCheckouts(ctx, workspaceId, checkouts, {
-					...serviceInput,
-					query: trimmedQuery,
+			if (workspaceId) {
+				const root = resolveWorkspaceRoot(ctx, workspaceId);
+				const checkouts = listWorkspaceCheckouts(ctx.db, {
+					id: workspaceId,
+					worktreePath: root,
 				});
+				if (checkouts.length > 1) {
+					return await searchCheckouts(
+						ctx,
+						root,
+						checkouts.map((checkout) => checkout.path),
+						{ ...serviceInput, query: trimmedQuery },
+					);
+				}
 			}
-			if (projectId && isContainerProject(getLocalProject(ctx.db, projectId))) {
-				return await searchRepositoryProjects(ctx, projectId, {
+			const repositories =
+				projectId && getLocalProject(ctx.db, projectId)
+					? listProjectRepositories(ctx.db, projectId)
+					: [];
+			if (repositories.length > 1) {
+				return await searchRepositoryProjects(ctx, repositories, {
 					...serviceInput,
 					query: trimmedQuery,
 				});

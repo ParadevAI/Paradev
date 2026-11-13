@@ -14,6 +14,7 @@ afterEach(() => mock.restore());
 
 test("ready runs gh pr ready and records the write", async () => {
 	spyOn(projects, "resolveGithubRepo").mockResolvedValue({
+		repositoryId: "repository-1",
 		owner: "owner",
 		name: "repo",
 		repoPath: "/unused",
@@ -31,7 +32,12 @@ test("ready runs gh pr ready and records the write", async () => {
 		"owner/repo",
 	]);
 	expect(synced).toHaveBeenCalledWith(expect.anything(), {
-		repo: { owner: "owner", name: "repo", repoPath: "/unused" },
+		repo: {
+			repositoryId: "repository-1",
+			owner: "owner",
+			name: "repo",
+			repoPath: "/unused",
+		},
 		prNumber: 12,
 		action: "ready",
 	});
@@ -39,6 +45,7 @@ test("ready runs gh pr ready and records the write", async () => {
 
 test("draft runs gh pr ready --undo", async () => {
 	spyOn(projects, "resolveGithubRepo").mockResolvedValue({
+		repositoryId: "repository-1",
 		owner: "owner",
 		name: "repo",
 		repoPath: "/unused",

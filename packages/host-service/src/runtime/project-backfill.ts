@@ -1,4 +1,3 @@
-import { basename } from "node:path";
 import { and, eq } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { projects } from "../db/schema";
@@ -7,6 +6,7 @@ import {
 	emitProjectChanged,
 	getProjectIncludingDeleted,
 } from "../projects/local-project-store";
+import { getPrimaryRepository } from "../projects/repositories";
 
 export interface ProjectBackfillContext {
 	db: HostDb;
@@ -35,12 +35,15 @@ export async function runProjectBackfill(
 		// select must not be clobbered by a stale name.
 		const result = ctx.db
 			.update(projects)
-			.set({ name: basename(row.repoPath), updatedAt: Date.now() })
+			.set({
+				name: getPrimaryRepository(ctx.db, row)?.name ?? row.id,
+				updatedAt: Date.now(),
+			})
 			.where(and(eq(projects.id, row.id), eq(projects.name, "")))
 			.run();
 		if (result.changes === 0) continue;
 		const updated = getProjectIncludingDeleted(ctx.db, row.id);
-		if (updated) emitProjectChanged(ctx.eventBus, "updated", updated);
+		if (updated) emitProjectChanged(ctx, "updated", updated);
 		filled++;
 	}
 	console.log(`[project-backfill] backfilled ${filled} row(s)`);

@@ -4,6 +4,7 @@ import { and, eq, isNotNull, isNull } from "drizzle-orm";
 import { projects, workspaces } from "../db/schema";
 import { destroyWorkspace } from "../trpc/router/workspace-cleanup";
 import type { HostServiceContext } from "../types";
+import { listWorkspaceCheckouts } from "../workspaces/checkouts";
 
 /**
  * Finish crash-interrupted deletes. The destroy pipeline archives the row
@@ -44,7 +45,7 @@ export async function runArchivedWorkspaceReconcile(
 
 	let resumed = 0;
 	for (const row of stranded) {
-		if (!isSameWorktree(row)) {
+		if (!isSameWorkspace(ctx, row)) {
 			console.warn(
 				"[archived-workspace-reconcile] left a reused or unreadable folder alone",
 				{ workspaceId: row.id, worktreePath: row.worktreePath },
@@ -86,6 +87,31 @@ export async function runArchivedWorkspaceReconcile(
 			`[archived-workspace-reconcile] finished ${resumed} interrupted delete(s)`,
 		);
 	}
+}
+
+/** Every checkout still on disk must be the one this row made. */
+export function isSameWorkspace(
+	ctx: Pick<HostServiceContext, "db">,
+	row: {
+		id: string;
+		worktreePath: string;
+		branch: string;
+		archivedAt: number | null;
+	},
+): boolean {
+	const checkouts = listWorkspaceCheckouts(ctx.db, row);
+	if (checkouts.length === 0) return isSameWorktree(row);
+	const present = checkouts.filter((checkout) => existsSync(checkout.path));
+	return (
+		present.length > 0 &&
+		present.every((checkout) =>
+			isSameWorktree({
+				worktreePath: checkout.path,
+				branch: checkout.row.branch,
+				archivedAt: row.archivedAt,
+			}),
+		)
+	);
 }
 
 function isSameWorktree(row: {

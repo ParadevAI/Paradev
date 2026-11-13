@@ -1,8 +1,7 @@
 import type { DetectedPort } from "@superset/port-scanner";
 import { z } from "zod";
 import { portManager } from "../../../ports/port-manager";
-import { getLabelsForWorkspaces } from "../../../ports/static-ports";
-import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
+import { getLabelsForWorkspace } from "../../../ports/static-ports";
 import { protectedProcedure, router } from "../../index";
 
 export interface EnrichedPort extends DetectedPort {
@@ -24,20 +23,15 @@ export const portsRouter = router({
 			const requestedWorkspaceIds = new Set(input.workspaceIds);
 			const resolve = (workspaceId: string): string | null => {
 				try {
-					return ctx.runtime.filesystem.resolveWorkspaceRoot(workspaceId);
+					return ctx.runtime.filesystem.resolvePrimaryCheckoutPath(workspaceId);
 				} catch {
 					// Workspace deleted or unknown — no labels for this row.
 					return null;
 				}
 			};
-			// A multi-repo workspace also takes each checkout's labels.
 			const labelsFor = (workspaceId: string) =>
-				getLabelsForWorkspaces(resolve, [
-					workspaceId,
-					...listRepositoryWorkspaces(ctx.db, workspaceId).map(
-						(checkout) => checkout.id,
-					),
-				]);
+				getLabelsForWorkspace(resolve, workspaceId) ??
+				new Map<number, string>();
 			const labelsByWorkspace = new Map<string, Map<number, string>>();
 			return portManager
 				.getAllPorts()

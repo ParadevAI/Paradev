@@ -1,15 +1,11 @@
-import { rm, rmdir } from "node:fs/promises";
-import { join } from "node:path";
+import { readdir, rm, rmdir } from "node:fs/promises";
+import { join, relative, sep } from "node:path";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
-import { eq, isNull } from "drizzle-orm";
+import { inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { invalidateLabelCache } from "../../../ports/static-ports";
-import {
-	isContainerProject,
-	listRepositoryWorkspaces,
-} from "../../../projects/multi-repo";
 import { isMissingPath } from "../../../runtime/path-state";
 import { coercePullRequestState } from "../../../runtime/pull-requests/utils/pull-request-mappers";
 import { trackConfigResolved } from "../../../runtime/setup/track-config-resolved";
@@ -21,12 +17,13 @@ import {
 import { disposeSessionsByWorkspaceId } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import type { GitTaskEnv } from "../../../workers/tasks/git";
+import type { Checkout } from "../../../workspaces/checkouts";
 import {
 	archiveLocalWorkspace,
-	getLocalWorkspace,
 	trackWorkspaceDeleted,
 	unarchiveLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
+import { resolveWorkspaceScriptContext } from "../../../workspaces/script-context";
 import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import type {
 	DeleteInProgressCause,
@@ -35,9 +32,13 @@ import type {
 import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
+import { WORKSPACE_CONTEXT_FILES } from "../workspace-creation/shared/workspace-context-files";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
-import { isLocalCheckoutWorkspace } from "./is-local-checkout-workspace";
+import {
+	isLocalCheckoutWorkspace,
+	type LocalCheckoutWorkspaceResult,
+} from "./is-local-checkout-workspace";
 import { removeDirectoryTree } from "./remove-directory-tree";
 
 /**
@@ -133,28 +134,17 @@ export const workspaceCleanupRouter = router({
 	 */
 	inspect: protectedProcedure
 		.input(z.object({ workspaceId: z.string() }))
-		.query(async ({ ctx, input, signal }): Promise<InspectResult> => {
-			const repositories = listRepositoryWorkspaces(ctx.db, input.workspaceId);
-			if (repositories.length === 0) {
-				return {
-					canDelete: true,
-					reason: null,
-					...(await inspectCheckout(ctx, input.workspaceId, signal)),
-				};
-			}
-			const states = await Promise.all(
-				repositories.map((repository) =>
-					inspectCheckout(ctx, repository.id, signal),
-				),
-			);
-			return {
+		.query(
+			async ({ ctx, input, signal }): Promise<InspectResult> => ({
 				canDelete: true,
 				reason: null,
-				hasChanges: states.some((state) => state.hasChanges),
-				hasUnpushedCommits: states.some((state) => state.hasUnpushedCommits),
-				sharesProjectCheckout: false,
-			};
-		}),
+				...(await inspectCheckouts(
+					ctx,
+					await isLocalCheckoutWorkspace(ctx, input.workspaceId),
+					signal,
+				)),
+			}),
+		),
 
 	/**
 	 * Destroy a workspace in phases:
@@ -225,15 +215,29 @@ export const workspaceCleanupRouter = router({
 		),
 });
 
-async function inspectCheckout(
+/** Where git runs for a workspace: each checkout, or a session's own folder. */
+function gitPathsOf({ local, checkouts }: LocalCheckoutWorkspaceResult): Array<{
+	label: string | null;
+	path: string;
+}> {
+	if (!local) return [];
+	if (checkouts.length === 0) {
+		return local.type === "session"
+			? [{ label: null, path: local.worktreePath }]
+			: [];
+	}
+	return checkouts.map((checkout) => ({
+		label: checkouts.length > 1 ? checkout.repository.name : null,
+		path: checkout.path,
+	}));
+}
+
+async function inspectCheckouts(
 	ctx: HostServiceContext,
-	workspaceId: string,
+	workspace: LocalCheckoutWorkspaceResult,
 	signal: AbortSignal | undefined,
 ) {
-	const { local, sharesProjectCheckout } = await isLocalCheckoutWorkspace(
-		ctx,
-		workspaceId,
-	);
+	const { local, sharesProjectCheckout } = workspace;
 	const clean = {
 		hasChanges: false,
 		hasUnpushedCommits: false,
@@ -243,24 +247,30 @@ async function inspectCheckout(
 	// no uncommitted or unpushed work to warn about losing.
 	if (!local || sharesProjectCheckout) return clean;
 
-	try {
-		const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, local.worktreePath);
-		const state = await cleanupGitOps.readWorktreeState(
-			{
-				worktreePath: local.worktreePath,
-				gitEnv,
-				ignoreInitialCommit: local.type === "session",
-			},
-			signal,
-		);
-		return {
-			hasChanges: state.hasChanges,
-			hasUnpushedCommits: state.hasUnpushedCommits,
-			sharesProjectCheckout: false,
-		};
-	} catch {
-		return clean;
-	}
+	const states = await Promise.all(
+		gitPathsOf(workspace).map(async ({ path }) => {
+			try {
+				const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, path);
+				return await cleanupGitOps.readWorktreeState(
+					{
+						worktreePath: path,
+						gitEnv,
+						ignoreInitialCommit: local.type === "session",
+					},
+					signal,
+				);
+			} catch {
+				return { hasChanges: false, hasUnpushedCommits: false };
+			}
+		}),
+	);
+	const leftovers = await rootLeftovers(workspace);
+	return {
+		hasChanges:
+			leftovers.length > 0 || states.some((state) => state.hasChanges),
+		hasUnpushedCommits: states.some((state) => state.hasUnpushedCommits),
+		sharesProjectCheckout: false,
+	};
 }
 
 export async function destroyWorkspace(
@@ -283,31 +293,7 @@ export async function destroyWorkspace(
 	}
 	destroysInFlight.add(input.workspaceId);
 	try {
-		const repositories = listRepositoryWorkspaces(ctx.db, input.workspaceId);
-		const root = getLocalWorkspace(ctx.db, input.workspaceId)?.worktreePath;
-		// Every checkout is checked before any is removed, so one dirty checkout
-		// leaves the whole workspace in place.
-		if (!input.force) {
-			for (const repository of repositories) {
-				await assertCheckoutClean(
-					ctx,
-					await isLocalCheckoutWorkspace(ctx, repository.id),
-				);
-			}
-		}
-		for (const repository of repositories) {
-			await runDestroy(ctx, { ...input, workspaceId: repository.id });
-		}
-		const result = await runDestroy(ctx, input);
-		if (repositories.length > 0 && root) {
-			for (const file of ["AGENTS.md", "CLAUDE.md"]) {
-				await rm(join(root, file), { force: true });
-			}
-			await rmdir(root).catch((err) =>
-				console.warn(`[workspace-cleanup] left ${root} on disk:`, err),
-			);
-		}
-		return result;
+		return await runDestroy(ctx, input);
 	} finally {
 		destroysInFlight.delete(input.workspaceId);
 	}
@@ -322,12 +308,11 @@ async function runDestroy(
 
 	// `isLocalCheckoutWorkspace` already loads workspace + project rows from
 	// sqlite; thread them through to avoid duplicate sync queries downstream.
-	const checkout = await isLocalCheckoutWorkspace(ctx, input.workspaceId);
-	const { local, sharesProjectCheckout } = checkout;
-	// A container's folder is not a repository: no git, no teardown.
-	const project = isContainerProject(checkout.project)
-		? undefined
-		: checkout.project;
+	const workspace = await isLocalCheckoutWorkspace(ctx, input.workspaceId);
+	const { local, project, checkouts, sharesProjectCheckout } = workspace;
+	const scriptContext = local
+		? resolveWorkspaceScriptContext(ctx.db, local)
+		: null;
 
 	// ─── Step 0: Archive (the commit point) ────────────────────────
 	// FIRST, before any slow work (git preflight, teardown script): the
@@ -344,7 +329,11 @@ async function runDestroy(
 	// including tombstones, so a tombstone's path can't be reused.
 	const marked = local != null;
 	if (marked) {
-		archiveLocalWorkspace(ctx, input.workspaceId, archiveReasonFor(ctx, local));
+		archiveLocalWorkspace(
+			ctx,
+			input.workspaceId,
+			archiveReasonFor(ctx, checkouts),
+		);
 	}
 
 	try {
@@ -353,7 +342,7 @@ async function runDestroy(
 		// case). Missing/broken local state is handled by the cleanup phase.
 		// Sessions are standalone repos — the same dirty check applies even
 		// though they have no project row.
-		if (!input.force) await assertCheckoutClean(ctx, checkout);
+		if (!input.force) await assertCheckoutClean(ctx, workspace);
 
 		// ─── Step 2: Teardown ──────────────────────────────────────
 		// Script is the user's last chance to stop services / flush state
@@ -366,15 +355,15 @@ async function runDestroy(
 		if (
 			input.teardownMode !== "skip" &&
 			!sharesProjectCheckout &&
-			local &&
-			project
+			scriptContext
 		) {
 			const teardown: TeardownResult = await cleanupTeardownOps.runTeardown({
 				db: ctx.db,
 				workspaceId: input.workspaceId,
-				worktreePath: local.worktreePath,
-				repoPath: project.repoPath,
-				projectId: project.id,
+				worktreePath: scriptContext.configWorktreePath ?? undefined,
+				scriptRoot: scriptContext.scriptRoot,
+				repoPath: scriptContext.repoPath,
+				projectId: scriptContext.projectId,
 			});
 			if (teardown.status === "failed") {
 				if (input.teardownMode === "blocking") {
@@ -397,24 +386,24 @@ async function runDestroy(
 			}
 		}
 
-		if (local && project) {
+		if (scriptContext) {
 			trackConfigResolved({
 				api: ctx.api,
 				organizationId: ctx.organizationId,
 				workspaceId: input.workspaceId,
 				phase: "archive",
-				repoPath: project.repoPath,
-				projectId: project.id,
-				worktreePath: local.worktreePath,
+				repoPath: scriptContext.repoPath,
+				projectId: scriptContext.projectId,
+				worktreePath: scriptContext.configWorktreePath ?? undefined,
 			});
 		}
 
 		const result = await runDestroyPhases(ctx, input, {
 			local,
 			project,
+			checkouts,
 			sharesProjectCheckout,
 			warnings,
-			isContainer: isContainerProject(checkout.project),
 		});
 		// Telemetry at the true commit: a failed destroy un-archives below and
 		// must not count, and a retried destroy must count exactly once.
@@ -428,68 +417,104 @@ async function runDestroy(
 
 async function assertCheckoutClean(
 	ctx: HostServiceContext,
-	{
-		local,
-		project,
-		sharesProjectCheckout,
-	}: Awaited<ReturnType<typeof isLocalCheckoutWorkspace>>,
+	workspace: LocalCheckoutWorkspaceResult,
 ) {
-	if (sharesProjectCheckout || !local) return;
-	// A container's folder is not a repository: its checkouts are checked
-	// one by one.
-	if (local.type !== "session" && (!project || isContainerProject(project))) {
-		return;
+	if (workspace.sharesProjectCheckout || !workspace.local) return;
+	// Every checkout is checked before any is removed, so one dirty checkout
+	// leaves the whole workspace in place.
+	for (const { label, path } of gitPathsOf(workspace)) {
+		const named = (message: string) =>
+			label ? `${label}: ${message}` : message;
+		try {
+			const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, path);
+			const state = await cleanupGitOps.readWorktreeState({
+				worktreePath: path,
+				gitEnv,
+			});
+			if (state.hasChanges) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: named("Worktree has uncommitted changes"),
+				});
+			}
+		} catch (err) {
+			if (err instanceof TRPCError) throw err;
+			if (isIndeterminateGitTaskFailure(err)) {
+				// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
+				// this destructive path rather than silently skipping the
+				// dirty-worktree block — a retry usually succeeds (the first
+				// attempt warmed the FS cache), and force skips preflight
+				// entirely as the explicit escape hatch.
+				const message = err instanceof Error ? err.message : String(err);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: named(
+						`Couldn't verify worktree state at ${path}: ${message}`,
+					),
+				});
+			}
+			// Can't read status (missing worktree dir, etc.) — not a
+			// conflict. Continue; step 3b will skip idempotently.
+		}
 	}
-	try {
-		const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, local.worktreePath);
-		const state = await cleanupGitOps.readWorktreeState({
-			worktreePath: local.worktreePath,
-			gitEnv,
+	const leftovers = await rootLeftovers(workspace);
+	if (leftovers.length > 0) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: `Workspace folder has files outside the repositories: ${leftovers.join(", ")}`,
 		});
-		if (state.hasChanges) {
-			throw new TRPCError({
-				code: "CONFLICT",
-				message: "Worktree has uncommitted changes",
-			});
-		}
-	} catch (err) {
-		if (err instanceof TRPCError) throw err;
-		if (isIndeterminateGitTaskFailure(err)) {
-			// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
-			// this destructive path rather than silently skipping the
-			// dirty-worktree block — a retry usually succeeds (the first
-			// attempt warmed the FS cache), and force skips preflight
-			// entirely as the explicit escape hatch.
-			const message = err instanceof Error ? err.message : String(err);
-			throw new TRPCError({
-				code: "INTERNAL_SERVER_ERROR",
-				message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
-			});
-		}
-		// Can't read status (missing worktree dir, etc.) — not a
-		// conflict. Continue; step 3b will skip idempotently.
 	}
 }
 
-/** "merged" when the linked PR was observed merged; every other delete —
+/**
+ * Entries in a multi-repo workspace's root other than its checkouts and the
+ * generated context files: agents start in the root and write there.
+ */
+async function rootLeftovers({
+	local,
+	checkouts,
+}: Pick<LocalCheckoutWorkspaceResult, "local" | "checkouts">): Promise<
+	string[]
+> {
+	if (!local || checkouts.length < 2) return [];
+	const owned = new Set<string>([
+		...WORKSPACE_CONTEXT_FILES,
+		...checkouts.map(
+			(checkout) =>
+				relative(local.worktreePath, checkout.path).split(sep)[0] ?? "",
+		),
+	]);
+	try {
+		const entries = await readdir(local.worktreePath);
+		return entries.filter((name) => !owned.has(name)).sort();
+	} catch {
+		return [];
+	}
+}
+
+/** "merged" when every linked PR was observed merged; every other delete —
  * open/closed/draft PR or none at all — is a plain "deleted". */
 function archiveReasonFor(
 	ctx: HostServiceContext,
-	local: { pullRequestId: string | null },
+	checkouts: Checkout[],
 ): "merged" | "deleted" {
-	if (!local.pullRequestId) return "deleted";
+	const pullRequestIds = checkouts.flatMap((checkout) =>
+		checkout.row.pullRequestId ? [checkout.row.pullRequestId] : [],
+	);
+	if (pullRequestIds.length === 0) return "deleted";
 	try {
-		const pr = ctx.db.query.pullRequests
-			.findFirst({ where: eq(pullRequests.id, local.pullRequestId) })
+		const rows = ctx.db.query.pullRequests
+			.findMany({ where: inArray(pullRequests.id, pullRequestIds) })
 			.sync();
-		return coercePullRequestState(pr?.state ?? null) === "merged"
+		return rows.length === pullRequestIds.length &&
+			rows.every((pr) => coercePullRequestState(pr.state) === "merged")
 			? "merged"
 			: "deleted";
 	} catch (err) {
 		// A reason lookup failure must never block the delete — but a merged
 		// workspace misfiled under Deleted deserves a trace.
 		console.warn("[workspace-cleanup] archive reason lookup failed", {
-			pullRequestId: local.pullRequestId,
+			pullRequestIds,
 			err,
 		});
 		return "deleted";
@@ -502,13 +527,13 @@ async function runDestroyPhases(
 	{
 		local,
 		project,
+		checkouts,
 		sharesProjectCheckout,
 		warnings,
-		isContainer,
 	}: Pick<
-		Awaited<ReturnType<typeof isLocalCheckoutWorkspace>>,
-		"local" | "project" | "sharesProjectCheckout"
-	> & { warnings: string[]; isContainer: boolean },
+		LocalCheckoutWorkspaceResult,
+		"local" | "project" | "checkouts" | "sharesProjectCheckout"
+	> & { warnings: string[] },
 ) {
 	// ─── Step 3: Local cleanup ─────────────────────────────────────
 	// 3a. PTYs
@@ -532,13 +557,10 @@ async function runDestroyPhases(
 		warnings.push(`Failed to stop chat sessions: ${message}`);
 	}
 
-	// 3b. Worktree. Double-force unlocks the rare locked-worktree case and
-	//     clears stale metadata when the directory was manually removed.
-	//     Runs in the worker pool: the removal is a recursive delete of the
-	//     whole worktree directory, which would otherwise stall the loop.
+	// 3b. Worktrees. Each checkout's is removed from its own repository.
 	let worktreeRemoved = false;
 	let branchDeleted = false;
-	let repoGitEnv: GitTaskEnv | null = null;
+	const removedCheckouts: RemovedCheckout[] = [];
 	if (sharesProjectCheckout) {
 		// The files are the repository itself; nothing on disk belongs to
 		// this workspace alone.
@@ -569,7 +591,7 @@ async function runDestroyPhases(
 				}
 			}
 		}
-	} else if (local && !project && !isContainer) {
+	} else if (local && (!project || checkouts.length === 0)) {
 		worktreeRemoved = isMissingPath(local.worktreePath, {
 			followSymlinks: false,
 		});
@@ -578,137 +600,29 @@ async function runDestroyPhases(
 				`Skipped worktree removal at ${local.worktreePath}: project metadata is missing`,
 			);
 		}
-	}
-	if (local && project && !sharesProjectCheckout) {
-		worktreeRemoved = isMissingPath(local.worktreePath, {
-			followSymlinks: false,
-		});
-		const repoMissing = isMissingPath(project.repoPath);
-		if (repoMissing && !worktreeRemoved) {
-			// The project repo was moved or deleted outside Superset: there is
-			// no repository to run `git worktree remove` in, and the worktree's
-			// gitdir pointer is already dead, so no retry can ever succeed.
-			// Only a genuine ENOENT takes this branch — a repo this process
-			// merely cannot read (EPERM/EACCES) is not gone, and keeps the
-			// "failed to open" throw below rather than losing its worktree.
-			// Delete the folder directly under the same root guard the
-			// sessions branch uses — anything outside the project's managed
-			// worktrees root is left on disk (warned) while the delete proceeds.
-			const worktreeBaseDir =
-				project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
-			if (
-				!isInsideProjectWorktreesRoot(
-					local.worktreePath,
+	} else if (local && project) {
+		const multiRepo = checkouts.length > 1;
+		for (const checkout of checkouts) {
+			removedCheckouts.push(
+				await removeCheckoutWorktree(ctx, {
 					project,
-					worktreeBaseDir,
-				)
-			) {
-				warnings.push(
-					`Skipped worktree removal at ${local.worktreePath}: project repo at ${project.repoPath} is missing and the folder is outside the managed worktrees root`,
-				);
-			} else {
-				try {
-					await rm(local.worktreePath, { recursive: true, force: true });
-					worktreeRemoved = true;
-				} catch (err) {
-					const message = err instanceof Error ? err.message : String(err);
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: `Failed to remove worktree at ${local.worktreePath}: ${message}`,
-					});
-				}
-			}
-		} else if (!repoMissing) {
-			try {
-				repoGitEnv = await cleanupGitOps.resolveGitEnv(ctx, project.repoPath);
-			} catch (err) {
-				const message = err instanceof Error ? err.message : String(err);
-				if (!worktreeRemoved) {
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: `Failed to open project repo at ${project.repoPath}: ${message}`,
-					});
-				}
-				warnings.push(
-					`Failed to open project repo at ${project.repoPath}: ${message}`,
-				);
-			}
+					checkout,
+					label: multiRepo ? checkout.repository.name : null,
+					warnings,
+				}),
+			);
 		}
-
-		if (repoGitEnv) {
-			// A task failure here means the post-remove state is unknown —
-			// treat that like "still registered" and block rather than risk
-			// orphaning disk past the archive commit point.
-			let stillRegistered = true;
-			let removeError: string | undefined;
-			try {
-				({ stillRegistered, removeError } = await cleanupGitOps.removeWorktree({
-					repoPath: project.repoPath,
-					worktreePath: local.worktreePath,
-					gitEnv: repoGitEnv,
-				}));
-			} catch (err) {
-				const message = err instanceof Error ? err.message : String(err);
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Failed to verify worktree removal at ${local.worktreePath}: ${message}`,
-				});
-			}
-			if (stillRegistered) {
-				// git still tracks a live worktree here — removal genuinely
-				// failed. Un-archive so the workspace stays visible and
-				// retryable instead of orphaning disk past the commit point.
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Failed to remove worktree at ${local.worktreePath}${
-						removeError ? `: ${removeError}` : ""
-					}`,
-				});
-			}
-			if (!isMissingPath(local.worktreePath, { followSymlinks: false })) {
-				// Unregistered is not removed: git's unregistration and its
-				// recursive delete are not atomic, so `remove --force --force`
-				// can drop the registration and still fail partway through
-				// deleting files (locked file, live writer). Trusting the
-				// registry alone silently orphaned the folder — no list shows
-				// it, and a retry reports success without touching it (#6730).
-				// Fall back to the same guarded direct removal the other
-				// branches use.
-				const worktreeBaseDir =
-					project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
-				if (
-					!isInsideProjectWorktreesRoot(
-						local.worktreePath,
-						project,
-						worktreeBaseDir,
-					)
-				) {
-					warnings.push(
-						`Worktree at ${local.worktreePath} is no longer registered with git, but its folder is outside the managed worktrees root and was left on disk`,
-					);
-				} else {
-					try {
-						await removeDirectoryTree(local.worktreePath);
-					} catch (err) {
-						const message = err instanceof Error ? err.message : String(err);
-						throw new TRPCError({
-							code: "INTERNAL_SERVER_ERROR",
-							message: `Worktree at ${local.worktreePath} is no longer registered with git, but its folder could not be removed: ${message}${
-								removeError ? ` (git worktree remove: ${removeError})` : ""
-							}`,
-						});
-					}
-				}
-			}
-			// The outside-root branch above leaves the folder in place, so
-			// report removal from the final disk state rather than assuming
-			// this path always cleared it (#6785 review). `isMissingPath`
-			// rather than `existsSync`: a leftover this process cannot read,
-			// or a dangling symlink, still exists and must not be reported
-			// as removed.
-			worktreeRemoved = isMissingPath(local.worktreePath, {
-				followSymlinks: false,
+		worktreeRemoved = removedCheckouts.every((removed) => removed.removed);
+		if (multiRepo) {
+			await removeWorkspaceRoot(ctx, {
+				root: local.worktreePath,
+				project,
+				recursive: input.force && worktreeRemoved,
+				warnings,
 			});
+			worktreeRemoved =
+				worktreeRemoved &&
+				isMissingPath(local.worktreePath, { followSymlinks: false });
 		}
 	}
 
@@ -718,18 +632,29 @@ async function runDestroyPhases(
 	// satisfies the goal, so the task skips the delete without a scary
 	// warning; a thrown git failure lands in the warning below rather than
 	// being mistaken for "already gone".
-	if (repoGitEnv && project && local?.branch && input.deleteBranch) {
-		try {
-			await cleanupGitOps.deleteLocalBranch({
-				repoPath: project.repoPath,
-				branch: local.branch,
-				gitEnv: repoGitEnv,
-			});
-			branchDeleted = true;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-			warnings.push(`Failed to delete branch ${local.branch}: ${message}`);
+	if (input.deleteBranch) {
+		let deletedAll = removedCheckouts.length > 0;
+		for (const removed of removedCheckouts) {
+			const branch = removed.checkout.row.branch;
+			if (!removed.gitEnv || !branch) {
+				deletedAll = false;
+				continue;
+			}
+			try {
+				await cleanupGitOps.deleteLocalBranch({
+					repoPath: removed.checkout.repository.repoPath,
+					branch,
+					gitEnv: removed.gitEnv,
+				});
+			} catch (err) {
+				deletedAll = false;
+				const message = err instanceof Error ? err.message : String(err);
+				warnings.push(
+					`${removed.label ? `${removed.label}: ` : ""}Failed to delete branch ${branch}: ${message}`,
+				);
+			}
 		}
+		branchDeleted = deletedAll;
 	}
 
 	// ─── Step 5: Caches ────────────────────────────────────────────
@@ -766,6 +691,209 @@ async function runDestroyPhases(
 		branchDeleted,
 		warnings,
 	};
+}
+
+/**
+ * Removes a multi-repo workspace's root once its checkouts are gone. Only a
+ * confirmed delete takes what agents left there, and only inside the
+ * project's worktrees folder.
+ */
+async function removeWorkspaceRoot(
+	ctx: HostServiceContext,
+	{
+		root,
+		project,
+		recursive,
+		warnings,
+	}: {
+		root: string;
+		project: NonNullable<LocalCheckoutWorkspaceResult["project"]>;
+		recursive: boolean;
+		warnings: string[];
+	},
+) {
+	const worktreeBaseDir =
+		project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
+	if (
+		recursive &&
+		isInsideProjectWorktreesRoot(root, project, worktreeBaseDir)
+	) {
+		try {
+			await removeDirectoryTree(root);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err);
+			warnings.push(`Left ${root} on disk: ${message}`);
+		}
+		return;
+	}
+	for (const file of WORKSPACE_CONTEXT_FILES) {
+		await rm(join(root, file), { force: true });
+	}
+	await rmdir(root).catch((err) => {
+		if (isMissingPath(root, { followSymlinks: false })) return;
+		const message = err instanceof Error ? err.message : String(err);
+		warnings.push(`Left ${root} on disk: ${message}`);
+	});
+}
+
+interface RemovedCheckout {
+	checkout: Checkout;
+	label: string | null;
+	removed: boolean;
+	/** Null when the repository could not be opened; no branch is deleted then. */
+	gitEnv: GitTaskEnv | null;
+}
+
+/**
+ * `git worktree remove` from the checkout's repository. Double-force unlocks
+ * the rare locked-worktree case and clears stale metadata when the directory
+ * was manually removed. Runs in the worker pool: the removal is a recursive
+ * delete of the whole worktree directory, which would otherwise stall the
+ * loop. Throws (naming the checkout) when it cannot tell the worktree is gone.
+ */
+async function removeCheckoutWorktree(
+	ctx: HostServiceContext,
+	{
+		project,
+		checkout,
+		label,
+		warnings,
+	}: {
+		project: NonNullable<LocalCheckoutWorkspaceResult["project"]>;
+		checkout: Checkout;
+		label: string | null;
+		warnings: string[];
+	},
+): Promise<RemovedCheckout> {
+	const named = (message: string) => (label ? `${label}: ${message}` : message);
+	const worktreePath = checkout.path;
+	const repoPath = checkout.repository.repoPath;
+	const worktreeBaseDir =
+		project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
+	const result: RemovedCheckout = {
+		checkout,
+		label,
+		removed: isMissingPath(worktreePath, { followSymlinks: false }),
+		gitEnv: null,
+	};
+	const repoMissing = isMissingPath(repoPath);
+	if (repoMissing && !result.removed) {
+		// The repository was moved or deleted outside Superset: there is no
+		// repository to run `git worktree remove` in, and the worktree's
+		// gitdir pointer is already dead, so no retry can ever succeed. Only
+		// a genuine ENOENT takes this branch — a repo this process merely
+		// cannot read (EPERM/EACCES) is not gone, and keeps the "failed to
+		// open" throw below rather than losing its worktree. Delete the
+		// folder directly under the managed-root guard.
+		if (!isInsideProjectWorktreesRoot(worktreePath, project, worktreeBaseDir)) {
+			warnings.push(
+				named(
+					`Skipped worktree removal at ${worktreePath}: project repo at ${repoPath} is missing and the folder is outside the managed worktrees root`,
+				),
+			);
+		} else {
+			try {
+				await rm(worktreePath, { recursive: true, force: true });
+				result.removed = true;
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: named(
+						`Failed to remove worktree at ${worktreePath}: ${message}`,
+					),
+				});
+			}
+		}
+		return result;
+	}
+	if (repoMissing) return result;
+
+	try {
+		result.gitEnv = await cleanupGitOps.resolveGitEnv(ctx, repoPath);
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		if (!result.removed) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: named(
+					`Failed to open project repo at ${repoPath}: ${message}`,
+				),
+			});
+		}
+		warnings.push(
+			named(`Failed to open project repo at ${repoPath}: ${message}`),
+		);
+		return result;
+	}
+
+	// A task failure here means the post-remove state is unknown — treat
+	// that like "still registered" and block rather than risk orphaning
+	// disk past the archive commit point.
+	let stillRegistered = true;
+	let removeError: string | undefined;
+	try {
+		({ stillRegistered, removeError } = await cleanupGitOps.removeWorktree({
+			repoPath,
+			worktreePath,
+			gitEnv: result.gitEnv,
+		}));
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: named(
+				`Failed to verify worktree removal at ${worktreePath}: ${message}`,
+			),
+		});
+	}
+	if (stillRegistered) {
+		// git still tracks a live worktree here — removal genuinely failed.
+		// Un-archive so the workspace stays visible and retryable instead of
+		// orphaning disk past the commit point.
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: named(
+				`Failed to remove worktree at ${worktreePath}${
+					removeError ? `: ${removeError}` : ""
+				}`,
+			),
+		});
+	}
+	if (!isMissingPath(worktreePath, { followSymlinks: false })) {
+		// Unregistered is not removed: git's unregistration and its
+		// recursive delete are not atomic, so `remove --force --force` can
+		// drop the registration and still fail partway through deleting
+		// files (locked file, live writer). Trusting the registry alone
+		// silently orphaned the folder (#6730). Fall back to the same
+		// guarded direct removal.
+		if (!isInsideProjectWorktreesRoot(worktreePath, project, worktreeBaseDir)) {
+			warnings.push(
+				named(
+					`Worktree at ${worktreePath} is no longer registered with git, but its folder is outside the managed worktrees root and was left on disk`,
+				),
+			);
+		} else {
+			try {
+				await removeDirectoryTree(worktreePath);
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: named(
+						`Worktree at ${worktreePath} is no longer registered with git, but its folder could not be removed: ${message}${
+							removeError ? ` (git worktree remove: ${removeError})` : ""
+						}`,
+					),
+				});
+			}
+		}
+	}
+	// `isMissingPath` rather than `existsSync`: a leftover this process
+	// cannot read, or a dangling symlink, still exists and must not be
+	// reported as removed.
+	result.removed = isMissingPath(worktreePath, { followSymlinks: false });
+	return result;
 }
 
 /**

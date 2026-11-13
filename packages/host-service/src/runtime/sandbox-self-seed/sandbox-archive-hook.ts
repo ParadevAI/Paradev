@@ -37,13 +37,13 @@ export async function runSandboxArchiveHook(
 	});
 	const archive =
 		config?.kind === "ok"
-			? chainPhases([config.resolved.archive], identity.worktreePath)
+			? chainPhases([config.resolved.archive], identity.workspaceRoot)
 			: null;
 	if (!archive) return { status: "skipped" };
 	const { command } = archive;
 	const configured = archive.cwd
-		? resolve(identity.worktreePath, archive.cwd)
-		: identity.worktreePath;
+		? resolve(identity.workspaceRoot, archive.cwd)
+		: identity.workspaceRoot;
 
 	return await new Promise<ArchiveHookResult>((done) => {
 		let output = "";
@@ -56,7 +56,7 @@ export async function runSandboxArchiveHook(
 			done(result);
 		};
 		const child = spawn("bash", ["-lc", command], {
-			cwd: existsSync(configured) ? configured : identity.worktreePath,
+			cwd: existsSync(configured) ? configured : identity.workspaceRoot,
 			env: buildStartHookEnv(process.env, getManagedEnv()),
 			stdio: ["ignore", "pipe", "pipe"],
 			detached: true,

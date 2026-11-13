@@ -41,7 +41,11 @@ import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reco
 import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
-import { createGitEnvResolver, createGitFactory } from "./runtime/git";
+import {
+	createGitEnvResolver,
+	createGitFactory,
+	gitCeilingEnv,
+} from "./runtime/git";
 import { applyLegacyHomeMove } from "./runtime/legacy-home-paths";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
@@ -67,7 +71,10 @@ import {
 	ATTACHMENT_SWEEP_INTERVAL_MS,
 	sweepAttachmentStore,
 } from "./trpc/router/attachments/sweep";
-import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
+import {
+	checkoutStatusKey,
+	gitStatusStore,
+} from "./trpc/router/git/utils/git-status-store";
 import {
 	disposeLocalMobileDevices,
 	startLocalMobileDeviceCleanup,
@@ -186,12 +193,20 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	// GitWatcher is the single source of truth for `.git/` and worktree fs
 	// activity per workspace. Both EventBus (broadcasts to clients) and the
 	// pull-requests runtime (event-driven branch sync) subscribe to it.
-	const gitWatcher = new GitWatcher(db, filesystem, (workspaceId, watched) => {
-		if (watched) gitStatusStore.attach(workspaceId);
-		else gitStatusStore.drop(workspaceId);
-	});
+	const gitWatcher = new GitWatcher(
+		db,
+		filesystem,
+		(workspaceId, repositoryId, watched) => {
+			const key = checkoutStatusKey(workspaceId, repositoryId);
+			if (watched) gitStatusStore.attach(key);
+			else gitStatusStore.drop(key);
+		},
+	);
 	gitWatcher.onChanged((event) => {
-		gitStatusStore.recordChange(event.workspaceId, event.paths);
+		gitStatusStore.recordChange(
+			checkoutStatusKey(event.workspaceId, event.repositoryId),
+			event.paths,
+		);
 	});
 	gitWatcher.start();
 	// Per-workspace branch/HEAD/upstream reads run in the worker pool: the
@@ -205,7 +220,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		github,
 		gitWatcher,
 		readWorkspaceRefs: async (worktreePath) => {
-			const gitEnv = await resolveGitEnv(worktreePath);
+			const gitEnv = {
+				...(await resolveGitEnv(worktreePath)),
+				...gitCeilingEnv(worktreePath),
+			};
 			return getHostWorkerPool().run(
 				gitWorkspaceRefsTask,
 				{ worktreePath, gitEnv },

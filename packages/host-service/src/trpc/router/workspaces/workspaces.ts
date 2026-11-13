@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
-import { basename, dirname, join } from "node:path";
+import { dirname, join } from "node:path";
 import {
 	deriveWorkspaceBranchFromPrompt,
 	generateFriendlyBranchName,
@@ -15,12 +15,11 @@ import { z } from "zod";
 import { workspaces } from "../../../db/schema";
 import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
 import {
-	isContainerProject,
-	listRepositoryProjects,
-	listRepositoryWorkspaces,
-	writeWorkspaceContextFiles,
-} from "../../../projects/multi-repo";
-import { createGitEnvResolver } from "../../../runtime/git";
+	getPrimaryRepository,
+	type HostRepositoryRow,
+	listProjectRepositories,
+} from "../../../projects/repositories";
+import { createGitEnvResolver, gitCeilingEnv } from "../../../runtime/git";
 import { getGitAuthorName } from "../../../runtime/git/identity";
 import { resolveRef } from "../../../runtime/git/refs";
 import type { HostServiceContext } from "../../../types";
@@ -32,9 +31,16 @@ import {
 	type RestoreWorktreeResult,
 } from "../../../workers/tasks/git";
 import {
+	type Checkout,
+	type CheckoutSnapshot,
+	getCheckoutSnapshots,
+	listWorkspaceCheckouts,
+} from "../../../workspaces/checkouts";
+import {
 	type CloudShapedWorkspace,
 	getLocalWorkspace,
 	type HostWorkspaceRow,
+	type InsertCheckoutValues,
 	insertLocalWorkspace,
 	toCloudShape,
 	unarchiveLocalWorkspace,
@@ -76,11 +82,15 @@ import {
 import { enablePushAutoSetupRemote } from "../workspace-creation/shared/git-config";
 import {
 	getProjectWorktreesFolder,
+	type LocalProject,
 	requireLocalProject,
-	requireProjectRepoPath,
+	requireRepositoryPath,
 } from "../workspace-creation/shared/local-project";
 import { moveWorktree } from "../workspace-creation/shared/move-worktree";
-import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
+import {
+	projectNotSetupError,
+	resolveGithubRepo,
+} from "../workspace-creation/shared/project-helpers";
 import { requireIndependentWorktree } from "../workspace-creation/shared/require-independent-worktree";
 import { startSetupTerminalIfPresent } from "../workspace-creation/shared/setup-terminal";
 import {
@@ -88,6 +98,7 @@ import {
 	parseSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
 import type { GitClient } from "../workspace-creation/shared/types";
+import { writeWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
 import {
 	listGitWorktrees,
 	normalizeWorktreePath,
@@ -117,7 +128,6 @@ import {
 	type BaseRefFetcher,
 	resolveNewBranchStartPoint,
 } from "../workspace-creation/utils/resolve-new-branch-start-point";
-import { resolveStartPoint } from "../workspace-creation/utils/resolve-start-point";
 import { deduplicateBranchName } from "../workspace-creation/utils/sanitize-branch";
 import { scheduleWorkspaceNaming } from "../workspace-creation/utils/workspace-naming-job";
 
@@ -143,22 +153,29 @@ const createInputSchema = z
 		// comes from an external provider (Linear's branchName), whose exact
 		// format the provider autolinks.
 		skipBranchPrefix: z.boolean().optional(),
-		pr: z.number().int().positive().optional(),
-		// Multi-repo projects: `owner/name` of the repository that holds `pr`.
-		prRepository: z.string().min(1).optional(),
-		baseBranch: z.string().min(1).optional(),
-		// Multi-repo projects: the base branch of each repository, by its project id.
-		// A repository left out branches from its default branch.
-		repositoryBaseBranches: z.record(z.string(), z.string().min(1)).optional(),
-		// Multi-repo projects: the PR each repository starts from, by its project id.
-		// The first one names the branch every other repository is created on.
-		repositoryPullRequests: z
-			.record(z.string(), z.number().int().positive())
+		// Per repository, by repository id. A repository left out branches
+		// from its default branch.
+		checkouts: z
+			.record(
+				z.string(),
+				z.object({
+					baseBranch: z.string().min(1).optional(),
+					pr: z.number().int().positive().optional(),
+					// Adopt the worktree git already has at this path. It keeps
+					// its branch; with several repositories it is moved into the
+					// workspace folder.
+					worktreePath: z.string().min(1).optional(),
+				}),
+			)
 			.optional(),
-		// Multi-repo projects: an existing worktree to move into the workspace,
-		// by repository project id. It keeps its branch; with no PR or typed
-		// branch, the first one names the branch of the other repositories.
-		repositoryWorktrees: z.record(z.string(), z.string().min(1)).optional(),
+		// A PR by its repository's GitHub `owner/name` (case-insensitive);
+		// the same as that repository's `checkouts[id].pr`.
+		pullRequest: z
+			.object({
+				repository: z.string().min(1),
+				number: z.number().int().positive(),
+			})
+			.optional(),
 		taskId: z.string().uuid().optional(),
 		agents: z.array(agentLaunchSchema).optional(),
 		// Desktop "Wait for workspace setup before starting agents" setting,
@@ -170,31 +187,20 @@ const createInputSchema = z
 		namingPrompt: z.string().min(1).optional(),
 		namingAgent: z.string().min(1).optional(),
 		id: z.string().uuid().optional(),
-		// Adopt the worktree git already has at this path instead of
-		// inferring the path from `branch`. When present, `branch` is
-		// caller context only; the server reads the current branch from git.
-		worktreePath: z.string().min(1).optional(),
 		// When false, skip the setup terminal. Used by worktree import,
 		// where the worktree is usually already set up.
 		runSetup: z.boolean().optional(),
 		tags: workspaceTagsInputSchema.optional(),
 	})
-	.refine((value) => !(value.branch && value.pr), {
-		message: "`branch` and `pr` cannot both be set",
-	})
-	.refine((value) => !(value.worktreePath && value.pr), {
-		message: "`worktreePath` and `pr` cannot both be set",
-	})
 	.refine(
 		(value) =>
 			value.checkout !== "local" ||
 			(value.branch === undefined &&
-				value.pr === undefined &&
-				value.baseBranch === undefined &&
-				value.worktreePath === undefined),
+				value.checkouts === undefined &&
+				value.pullRequest === undefined),
 		{
 			message:
-				"A local workspace uses the project's checkout: `branch`, `pr`, `baseBranch` and `worktreePath` cannot be set",
+				"A local workspace uses the project's checkout: `branch`, `checkouts` and `pullRequest` cannot be set",
 		},
 	);
 
@@ -245,12 +251,39 @@ async function acquireWorkspaceCreateLock(key: string): Promise<() => void> {
 type CloudWorkspace = CloudShapedWorkspace;
 
 type WorkspaceCreateResult = {
-	workspace: CloudWorkspace;
+	workspace: CreatedWorkspaceResponse;
 	terminals: Array<{ terminalId: string; label?: string }>;
 	agents: AgentLaunchResult[];
 	alreadyExists: boolean;
 	txid: number | null;
 };
+
+type CreatedWorkspaceResponse = CloudWorkspace & {
+	worktreePath: string;
+	checkouts: CheckoutSnapshot[];
+};
+
+function withCheckouts(
+	ctx: HostServiceContext,
+	row: CloudWorkspace,
+): CreatedWorkspaceResponse {
+	const latest = getLocalWorkspace(ctx.db, row.id);
+	if (!latest) return { ...row, worktreePath: "", checkouts: [] };
+	return {
+		...row,
+		...toCloudShape(latest, ctx.organizationId),
+		worktreePath: latest.worktreePath,
+		checkouts: getCheckoutSnapshots(ctx.db, latest),
+	};
+}
+
+function getPrimaryRepositoryPath(
+	ctx: HostServiceContext,
+	projectId: string,
+): string {
+	const project = requireLocalProject(ctx, projectId);
+	return getPrimaryRepository(ctx.db, project)?.repoPath ?? "";
+}
 
 function extractCreateTxid(row: CloudWorkspace): number | null {
 	const txid = (row as { txid?: unknown }).txid;
@@ -286,7 +319,7 @@ function findExistingWorkspaceByBranch(
 	if (
 		local &&
 		normalizeWorktreePath(local.worktreePath) ===
-			normalizeWorktreePath(requireLocalProject(ctx, projectId).repoPath)
+			normalizeWorktreePath(getPrimaryRepositoryPath(ctx, projectId))
 	)
 		return null;
 	return local ? toCloudShape(local, ctx.organizationId) : null;
@@ -445,55 +478,221 @@ async function planBranchSource(
 	return { branch, startPoint, usedExistingBranch: false };
 }
 
+type CheckoutRequest = {
+	baseBranch?: string;
+	pr?: number;
+	worktreePath?: string;
+};
+
 /**
- * Check out each repository of a container project inside its workspace
- * folder, all on one branch. Each gets a hidden workspace row of its own so
- * the per-repository git, PR, and teardown code works on it unchanged.
+ * Each repository's request, by repository id. `pullRequest` names its
+ * repository by GitHub `owner/name` and becomes that repository's `pr`.
+ */
+async function resolveCheckoutRequests(
+	ctx: HostServiceContext,
+	input: z.infer<typeof createInputSchema>,
+	repositories: HostRepositoryRow[],
+): Promise<Record<string, CheckoutRequest>> {
+	const requests: Record<string, CheckoutRequest> = {};
+	for (const [repositoryId, request] of Object.entries(input.checkouts ?? {})) {
+		if (!repositories.some((repository) => repository.id === repositoryId)) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: `repository_not_in_project: repository ${repositoryId} is not part of this project`,
+			});
+		}
+		requests[repositoryId] = { ...request };
+	}
+	if (input.pullRequest) {
+		const repositoryId = await findRepositoryByGithubName(
+			ctx,
+			repositories,
+			input.pullRequest.repository,
+		);
+		if (!repositoryId) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: `repository_not_in_project: ${input.pullRequest.repository} is not a repository of this project`,
+			});
+		}
+		const request = requests[repositoryId] ?? {};
+		if (request.pr !== undefined && request.pr !== input.pullRequest.number) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `${input.pullRequest.repository} is given two different PRs`,
+			});
+		}
+		requests[repositoryId] = { ...request, pr: input.pullRequest.number };
+	}
+	for (const [repositoryId, request] of Object.entries(requests)) {
+		if (request.pr !== undefined && request.worktreePath !== undefined) {
+			const name =
+				repositories.find((repository) => repository.id === repositoryId)
+					?.name ?? repositoryId;
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `${name} cannot start from both a PR and an existing worktree`,
+			});
+		}
+	}
+	return requests;
+}
+
+/** Matched on the live remote: the stored owner/name drift on rename and fork. */
+async function findRepositoryByGithubName(
+	ctx: HostServiceContext,
+	repositories: HostRepositoryRow[],
+	fullName: string,
+): Promise<string | undefined> {
+	const wanted = fullName.trim().toLowerCase();
+	for (const repository of repositories) {
+		const repo = await resolveGithubRepo(
+			ctx,
+			repository.projectId,
+			repository.id,
+		).catch(() => null);
+		if (repo && `${repo.owner}/${repo.name}`.toLowerCase() === wanted) {
+			return repository.id;
+		}
+	}
+	return undefined;
+}
+
+interface AdoptableWorktree {
+	path: string;
+	branch: string;
+}
+
+/** An existing worktree to move in, checked before any checkout so a bad one changes nothing. */
+async function resolveAdoptableWorktree(
+	ctx: HostServiceContext,
+	repository: HostRepositoryRow,
+	requestedPath: string,
+): Promise<AdoptableWorktree> {
+	const path = normalizeWorktreePath(requestedPath);
+	const record = (
+		await listGitWorktrees(await ctx.git(repository.repoPath))
+	).find((worktree) => normalizeWorktreePath(worktree.path) === path);
+	if (
+		!record?.branch ||
+		record.bare ||
+		record.prunable ||
+		path === normalizeWorktreePath(repository.repoPath)
+	) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `${path} is not a worktree of ${repository.name} that can be moved`,
+		});
+	}
+	if (record.locked) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `The worktree at ${path} is locked`,
+		});
+	}
+	const owners = findWorktreeOwners(ctx.db, repository.repoPath);
+	if (findWorktreeOwner(owners, { path, branch: record.branch })) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: `The worktree at ${path} already belongs to a workspace`,
+		});
+	}
+	return { path: record.path, branch: record.branch };
+}
+
+interface CreatedCheckout {
+	repository: HostRepositoryRow;
+	worktreePath: string;
+	branch: string;
+	/** The checkout created this branch, so removing the checkout deletes it. */
+	createdBranch: boolean;
+	/** An adopted worktree's original path; undoing moves it back there. */
+	movedFrom?: string;
+}
+
+/**
+ * Undoes createRepositoryCheckouts: worktrees, the branches they created and
+ * the root. An adopted worktree that cannot move back keeps the root on disk.
+ */
+async function removeRepositoryCheckouts(
+	ctx: HostServiceContext,
+	root: string,
+	checkouts: CreatedCheckout[],
+): Promise<void> {
+	const stranded: string[] = [];
+	for (const checkout of checkouts) {
+		const { movedFrom, worktreePath, repository } = checkout;
+		try {
+			const git = await ctx.git(repository.repoPath);
+			if (movedFrom) {
+				await moveWorktree(git, worktreePath, movedFrom);
+			} else {
+				await git
+					.raw(["worktree", "remove", "--force", worktreePath])
+					.catch(() => {});
+			}
+			if (checkout.createdBranch) {
+				await git.raw(["branch", "-D", checkout.branch]).catch(() => {});
+			}
+		} catch (err) {
+			if (movedFrom) {
+				stranded.push(
+					`${repository.name} is still at ${worktreePath}, not ${movedFrom} (${err instanceof Error ? err.message : String(err)})`,
+				);
+			}
+		}
+	}
+	if (stranded.length > 0) {
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: `Could not move adopted worktrees back, so ${root} was kept: ${stranded.join("; ")}`,
+		});
+	}
+	await rm(root, { recursive: true, force: true });
+}
+
+/**
+ * Check out each repository at `<root>/<name>`: from its PR, by moving an
+ * adopted worktree in, or on `branch` from its base. Undoes everything it
+ * made when any repository fails.
  */
 async function createRepositoryCheckouts(
 	ctx: HostServiceContext,
 	args: {
-		parentId: string;
-		name: string;
 		branch: string;
 		root: string;
-		repositoryProjects: ReturnType<typeof listRepositoryProjects>;
-		baseBranches?: Record<string, string>;
-		pullRequests?: Record<string, PrMetadata>;
-		worktrees?: Record<string, AdoptableWorktree>;
-		/** Used by each repository that has this branch and no base of its own. */
-		sharedBaseBranch?: string;
+		repositories: HostRepositoryRow[];
+		requests: Record<string, CheckoutRequest>;
+		pullRequests: Record<string, PrMetadata>;
+		adopted: Record<string, AdoptableWorktree>;
 	},
 ): Promise<CreatedCheckout[]> {
 	const created: CreatedCheckout[] = [];
-	for (const repository of args.repositoryProjects) {
-		const worktreePath = join(args.root, basename(repository.repoPath));
-		const pr = args.pullRequests?.[repository.id];
-		const adopted = args.worktrees?.[repository.id];
+	for (const repository of args.repositories) {
+		const worktreePath = join(args.root, repository.name);
+		const pr = args.pullRequests[repository.id];
+		const adopted = args.adopted[repository.id];
 		const branch = adopted
 			? adopted.branch
 			: pr
 				? derivePrLocalBranchName(pr)
 				: args.branch;
-		let createdBranch = false;
-		let movedFrom: string | undefined;
+		const sparsePaths = parseSparseCheckoutPaths(
+			repository.sparseCheckoutPaths,
+		);
+		const checkout: CreatedCheckout = {
+			repository,
+			worktreePath,
+			branch,
+			createdBranch: false,
+		};
 		try {
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
 			if (adopted) {
 				await moveWorktree(git, adopted.path, worktreePath);
-				movedFrom = adopted.path;
-				created.push(
-					insertRepositoryCheckout(ctx, args, repository, {
-						worktreePath,
-						branch,
-						createdBranch,
-						movedFrom,
-					}),
-				);
-				continue;
-			}
-			if (pr) {
+				checkout.movedFrom = adopted.path;
+			} else if (pr) {
 				const materialized = await materializePrBranch({
 					git,
 					branch,
@@ -503,12 +702,12 @@ async function createRepositoryCheckouts(
 				if (materialized.warning) {
 					console.warn(`[workspaces.create] ${materialized.warning}`);
 				}
-				createdBranch = materialized.createdBranch;
+				checkout.createdBranch = materialized.createdBranch;
 				await addWorktreeWithSparseCheckout({
 					git,
 					worktreeArgs: [worktreePath, branch],
 					worktreePath,
-					sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
+					sparsePaths,
 					logPrefix: "[workspaces.create]",
 				});
 				await enablePushAutoSetupRemote(
@@ -524,397 +723,268 @@ async function createRepositoryCheckouts(
 						baseBranch: pr.baseRefName,
 					});
 				}
-				created.push(
-					insertRepositoryCheckout(ctx, args, repository, {
-						worktreePath,
-						branch,
-						createdBranch,
-					}),
+			} else {
+				const plan = await planBranchSource(
+					git,
+					args.branch,
+					args.requests[repository.id]?.baseBranch,
+					createWorkerBaseRefFetcher(ctx, repository.repoPath),
 				);
-				continue;
-			}
-			const sharedBase = args.sharedBaseBranch?.trim();
-			const baseBranch =
-				args.baseBranches?.[repository.id] ??
-				(sharedBase &&
-				(await resolveStartPoint(git, sharedBase)).kind !== "head"
-					? sharedBase
-					: undefined);
-			const plan = await planBranchSource(
-				git,
-				args.branch,
-				baseBranch,
-				createWorkerBaseRefFetcher(ctx, repository.repoPath),
-			);
-			await addBranchWorktree({
-				git,
-				plan,
-				worktreePath,
-				sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
-			});
-			createdBranch = !plan.usedExistingBranch;
-			await enablePushAutoSetupRemote(git, worktreePath, "[workspaces.create]");
-			if (!plan.usedExistingBranch && plan.startPoint.kind !== "head") {
-				await recordBaseBranchConfig({
+				checkout.branch = plan.branch;
+				checkout.createdBranch = !plan.usedExistingBranch;
+				await addBranchWorktree({ git, plan, worktreePath, sparsePaths });
+				await enablePushAutoSetupRemote(
 					git,
 					worktreePath,
-					branch: plan.branch,
-					baseBranch: plan.startPoint.shortName,
-				});
+					"[workspaces.create]",
+				);
+				if (!plan.usedExistingBranch && plan.startPoint.kind !== "head") {
+					await recordBaseBranchConfig({
+						git,
+						worktreePath,
+						branch: plan.branch,
+						baseBranch: plan.startPoint.shortName,
+					});
+				}
 			}
 		} catch (err) {
-			await removeRepositoryCheckouts(ctx, [
+			await removeRepositoryCheckouts(ctx, args.root, [
 				...created,
-				{
-					id: null,
-					repoPath: repository.repoPath,
-					worktreePath,
-					branch,
-					createdBranch,
-					movedFrom,
-				},
-			]);
+				checkout,
+			]).catch((undoError: TRPCError) => {
+				throw new TRPCError({
+					code: undoError.code,
+					message: `Could not check out ${repository.name}: ${err instanceof Error ? err.message : String(err)}. ${undoError.message}`,
+					cause: err,
+				});
+			});
+			if (err instanceof TRPCError) {
+				throw new TRPCError({
+					code: err.code,
+					message: `${repository.name}: ${err.message}`,
+					cause: err,
+				});
+			}
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
-				message: `Could not check out ${basename(repository.repoPath)}: ${err instanceof Error ? err.message : String(err)}`,
+				message: `Could not check out ${repository.name}: ${err instanceof Error ? err.message : String(err)}`,
 				cause: err,
 			});
 		}
-		created.push(
-			insertRepositoryCheckout(ctx, args, repository, {
-				worktreePath,
-				branch,
-				createdBranch,
-			}),
-		);
+		created.push(checkout);
 	}
 	return created;
 }
 
-function insertRepositoryCheckout(
-	ctx: HostServiceContext,
-	args: { parentId: string; name: string },
-	repository: ReturnType<typeof listRepositoryProjects>[number],
-	checkout: {
-		worktreePath: string;
-		branch: string;
-		createdBranch: boolean;
-		movedFrom?: string;
-	},
-): CreatedCheckout {
-	const id = randomUUID();
-	const now = Date.now();
-	ctx.db
-		.insert(workspaces)
-		.values({
-			id,
-			projectId: repository.id,
-			parentWorkspaceId: args.parentId,
-			worktreePath: checkout.worktreePath,
-			branch: checkout.branch,
-			name: args.name,
-			type: "worktree",
-			createdByUserId: ctx.userId ?? null,
-			createdAt: now,
-			updatedAt: now,
-		})
-		.run();
-	return { id, repoPath: repository.repoPath, ...checkout };
-}
-
-async function findRepositoryByGithubName(
-	ctx: HostServiceContext,
-	repositories: ReturnType<typeof listRepositoryProjects>,
-	fullName: string | undefined,
-): Promise<string | undefined> {
-	if (!fullName) return undefined;
-	for (const repository of repositories) {
-		const repo = await resolveGithubRepo(ctx, repository.id).catch(() => null);
-		if (
-			repo &&
-			`${repo.owner}/${repo.name}`.toLowerCase() === fullName.toLowerCase()
-		) {
-			return repository.id;
-		}
-	}
-	return undefined;
-}
-
-/** Each repository's PR, read before any checkout so a bad one changes nothing. */
-async function fetchRepositoryPullRequests(
-	ctx: HostServiceContext,
-	repositories: ReturnType<typeof listRepositoryProjects>,
-	requested: Record<string, number>,
-): Promise<{ order: string[]; byRepository: Record<string, PrMetadata> }> {
-	const order = Object.keys(requested);
-	const byRepository: Record<string, PrMetadata> = {};
-	for (const repositoryId of order) {
-		const repository = repositories.find((repo) => repo.id === repositoryId);
-		if (!repository) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `Repository ${repositoryId} is not part of this project`,
-			});
-		}
-		byRepository[repositoryId] = await fetchPrMetadata({
-			cwd: repository.repoPath,
-			prNumber: requested[repositoryId] as number,
-			execGh: ctx.execGh,
-		});
-	}
-	return { order, byRepository };
-}
-
-interface AdoptableWorktree {
-	path: string;
-	branch: string;
-}
-
-/** Each existing worktree to move in, checked before any checkout so a bad one changes nothing. */
-async function resolveRepositoryWorktrees(
-	ctx: HostServiceContext,
-	repositories: ReturnType<typeof listRepositoryProjects>,
-	requested: Record<string, string>,
-	pullRequestRepositoryIds: string[],
-): Promise<{
-	order: string[];
-	byRepository: Record<string, AdoptableWorktree>;
-}> {
-	const order = Object.keys(requested);
-	const byRepository: Record<string, AdoptableWorktree> = {};
-	for (const repositoryId of order) {
-		const repository = repositories.find((repo) => repo.id === repositoryId);
-		if (!repository) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `Repository ${repositoryId} is not part of this project`,
-			});
-		}
-		const name = basename(repository.repoPath);
-		if (pullRequestRepositoryIds.includes(repositoryId)) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `${name} cannot start from both a PR and an existing worktree`,
-			});
-		}
-		const path = normalizeWorktreePath(requested[repositoryId] as string);
-		const record = (
-			await listGitWorktrees(await ctx.git(repository.repoPath))
-		).find((worktree) => normalizeWorktreePath(worktree.path) === path);
-		if (
-			!record?.branch ||
-			record.bare ||
-			record.prunable ||
-			path === normalizeWorktreePath(repository.repoPath)
-		) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `${path} is not a worktree of ${name} that can be moved`,
-			});
-		}
-		if (record.locked) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `The worktree at ${path} is locked`,
-			});
-		}
-		const owners = findWorktreeOwners(ctx.db, repository.repoPath);
-		if (findWorktreeOwner(owners, { path, branch: record.branch })) {
-			throw new TRPCError({
-				code: "CONFLICT",
-				message: `The worktree at ${path} already belongs to a workspace`,
-			});
-		}
-		byRepository[repositoryId] = { path: record.path, branch: record.branch };
-	}
-	return { order, byRepository };
-}
-
-interface RepositoryCheckout {
-	/** Null before its row exists. */
-	id: string | null;
-	repoPath: string;
-	worktreePath: string;
-	branch: string;
-	/** The checkout created this branch, so removing the checkout deletes it. */
-	createdBranch: boolean;
-	/** An adopted worktree's original path; undoing moves it back there. */
-	movedFrom?: string;
-}
-
-type CreatedCheckout = RepositoryCheckout & { id: string };
-
-/** Undoes createRepositoryCheckouts: worktrees, the branches they created, and their rows. */
-async function removeRepositoryCheckouts(
-	ctx: HostServiceContext,
-	checkouts: RepositoryCheckout[],
-): Promise<void> {
-	for (const checkout of checkouts) {
-		try {
-			const git = await ctx.git(checkout.repoPath);
-			await (checkout.movedFrom
-				? moveWorktree(git, checkout.worktreePath, checkout.movedFrom)
-				: git.raw(["worktree", "remove", "--force", checkout.worktreePath])
-			).catch(() => {});
-			if (checkout.createdBranch) {
-				await git.raw(["branch", "-D", checkout.branch]).catch(() => {});
-			}
-		} catch {
-			// The repository itself is unusable; nothing in it to undo.
-		}
-		if (checkout.id) {
-			ctx.db.delete(workspaces).where(eq(workspaces.id, checkout.id)).run();
-		}
-	}
+interface CreatedWorkspace {
+	row: CloudWorkspace;
+	alreadyExists: boolean;
+	/** The branch was generated, so background naming may rename it. */
+	automaticBranch: boolean;
+	/** Background naming may set the title. */
+	wantAi: boolean;
 }
 
 /**
- * A container project's workspace: one folder that holds a checkout of every
- * repository, all on one new branch. The folder itself is not a repository.
+ * A workspace with a checkout of every repository of the project in
+ * `<root>/<name>`. The root itself is not a repository.
  */
-async function createContainerWorkspace(
+async function createMultiRepoWorkspace(
 	ctx: HostServiceContext,
 	input: z.infer<typeof createInputSchema>,
-	project: ReturnType<typeof requireLocalProject>,
-) {
-	const repositories = listRepositoryProjects(ctx.db, project.id);
-	if (repositories.length === 0) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: "Add a repository to this project first",
-		});
-	}
+	project: LocalProject,
+	repositories: HostRepositoryRow[],
+	requests: Record<string, CheckoutRequest>,
+): Promise<CreatedWorkspace> {
 	if (input.checkout === "local") {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message:
-				"A multi-repo project has no single checkout to work in; create a worktree workspace instead",
+				"local_checkout_single_repo: a multi-repo project has no single checkout to work in; create a worktree workspace instead",
 		});
 	}
-	if (input.worktreePath !== undefined) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: "A multi-repo workspace cannot adopt an existing worktree",
-		});
-	}
-	const prRepositoryId =
-		input.pr === undefined
-			? undefined
-			: await findRepositoryByGithubName(ctx, repositories, input.prRepository);
-	if (input.pr !== undefined && !prRepositoryId) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message:
-				"Could not tell which repository of this project the PR belongs to",
-		});
-	}
+	for (const repository of repositories) requireRepositoryPath(repository);
 	const existing = input.id ? getLocalWorkspace(ctx.db, input.id) : undefined;
 	if (existing) {
+		if (
+			existing.projectId !== input.projectId ||
+			existing.type !== "worktree" ||
+			existing.archivedAt != null ||
+			(input.branch !== undefined && existing.branch !== input.branch)
+		) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: "Workspace ID is already in use",
+			});
+		}
 		return {
-			workspace: toCloudShape(existing, ctx.organizationId),
-			terminals: [],
-			agents: [],
+			row: toCloudShape(existing, ctx.organizationId),
 			alreadyExists: true,
-			txid: null,
+			automaticBranch: false,
+			wantAi: false,
 		};
 	}
 
-	const pullRequests = await fetchRepositoryPullRequests(
-		ctx,
-		repositories,
-		prRepositoryId && input.pr !== undefined
-			? { [prRepositoryId]: input.pr, ...input.repositoryPullRequests }
-			: (input.repositoryPullRequests ?? {}),
-	);
-	const firstPr = pullRequests.byRepository[pullRequests.order[0] ?? ""];
-	const adopted = await resolveRepositoryWorktrees(
-		ctx,
-		repositories,
-		input.repositoryWorktrees ?? {},
-		pullRequests.order,
-	);
-	const firstAdopted = adopted.byRepository[adopted.order[0] ?? ""];
+	const prNumber =
+		input.pullRequest?.number ??
+		repositories
+			.map((repository) => requests[repository.id]?.pr)
+			.find((pr) => pr !== undefined);
+	const release =
+		prNumber === undefined
+			? null
+			: await acquireWorkspaceCreateLock(`pr:${project.id}:${prNumber}`);
+	try {
+		return await createMultiRepoCheckoutsAndRow(
+			ctx,
+			input,
+			project,
+			repositories,
+			requests,
+		);
+	} finally {
+		release?.();
+	}
+}
+
+async function createMultiRepoCheckoutsAndRow(
+	ctx: HostServiceContext,
+	input: z.infer<typeof createInputSchema>,
+	project: LocalProject,
+	repositories: HostRepositoryRow[],
+	requests: Record<string, CheckoutRequest>,
+): Promise<CreatedWorkspace> {
+	// Every PR and adopted worktree is read before anything changes on disk.
+	const pullRequestOrder = [
+		...(input.pullRequest
+			? repositories.filter(
+					(r) => requests[r.id]?.pr === input.pullRequest?.number,
+				)
+			: []),
+		...repositories,
+	].filter((r, i, all) => all.indexOf(r) === i);
+	const pullRequests: Record<string, PrMetadata> = {};
+	const adopted: Record<string, AdoptableWorktree> = {};
+	for (const repository of repositories) {
+		const request = requests[repository.id];
+		if (request?.pr !== undefined) {
+			pullRequests[repository.id] = await fetchPrMetadata({
+				cwd: repository.repoPath,
+				prNumber: request.pr,
+				execGh: ctx.execGh,
+			}).catch((err) => {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: `${repository.name}: could not read PR #${request.pr}: ${err instanceof Error ? err.message : String(err)}`,
+					cause: err,
+				});
+			});
+		}
+		if (request?.worktreePath !== undefined) {
+			adopted[repository.id] = await resolveAdoptableWorktree(
+				ctx,
+				repository,
+				request.worktreePath,
+			);
+		}
+	}
+	const firstPr = pullRequestOrder
+		.map((repository) => pullRequests[repository.id])
+		.find(Boolean);
+	const firstAdopted = repositories
+		.map((repository) => adopted[repository.id])
+		.find(Boolean);
+
 	const composerPrompt =
 		input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
+	const taskBranch =
+		!input.branch && input.taskId
+			? await fetchLinkedTaskBranch(ctx, input.taskId)
+			: undefined;
 	const typedBranch =
 		input.branch?.trim() ||
+		taskBranch ||
 		(firstPr ? derivePrLocalBranchName(firstPr) : "") ||
 		(firstAdopted?.branch ?? "");
+	const automaticBranch = !typedBranch && !input.name;
 	const candidate =
 		typedBranch ||
 		(input.name ? sanitizeBranchCandidate(input.name) : "") ||
 		`${promptBranchSlug(composerPrompt) ?? generateFriendlyBranchName()}-${(input.id ?? randomUUID()).slice(0, 8)}`;
+	const primary =
+		repositories.find((r) => r.id === project.primaryRepositoryId) ??
+		repositories[0];
 	const prefix =
 		typedBranch || input.skipBranchPrefix
 			? null
 			: await resolveProjectBranchPrefix({
 					ctx,
 					project,
-					getAuthorName: createOffLoopAuthorNameGetter(
-						repositories[0]?.repoPath ?? "",
-					),
+					getAuthorName: createOffLoopAuthorNameGetter(primary?.repoPath ?? ""),
 					existingBranches: [],
 				});
 	const branch = prefix ? `${prefix}/${candidate}` : candidate;
-	// The PR's branch is already checked out in this workspace: open it again.
+	// The PR's branch is already open in a workspace: open it again.
 	const existingForPr = firstPr
 		? findExistingWorkspaceByBranch(ctx, project.id, branch)
 		: null;
 	if (existingForPr) {
 		return {
-			workspace: existingForPr,
-			terminals: [],
-			agents: await dispatchSugarAgents(
-				ctx,
-				existingForPr.id,
-				input.agents ?? [],
-			),
+			row: existingForPr,
 			alreadyExists: true,
-			txid: null,
+			automaticBranch: false,
+			wantAi: false,
 		};
 	}
+
 	const root = safeResolveWorktreePath(
 		getProjectWorktreesFolder(ctx, project),
 		branch,
 		project.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx),
 	);
-	mkdirSync(root, { recursive: true });
-	// Every checkout exists before the workspace does, so a failure leaves
-	// nothing behind.
-	const workspaceId = input.id ?? randomUUID();
-	const name = input.name ?? firstPr?.title ?? NEW_WORKSPACE_NAME;
-	let checkouts: CreatedCheckout[];
-	try {
-		checkouts = await createRepositoryCheckouts(ctx, {
-			parentId: workspaceId,
-			name,
-			branch,
-			root,
-			repositoryProjects: repositories,
-			baseBranches: input.repositoryBaseBranches,
-			pullRequests: pullRequests.byRepository,
-			worktrees: adopted.byRepository,
-			sharedBaseBranch: input.baseBranch,
+	if (existsSync(root)) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: `A folder already exists at ${root}`,
 		});
-	} catch (error) {
-		await rm(root, { recursive: true, force: true });
-		throw error;
+	}
+	mkdirSync(root, { recursive: true });
+	const checkouts = await createRepositoryCheckouts(ctx, {
+		branch,
+		root,
+		repositories,
+		requests,
+		pullRequests,
+		adopted,
+	});
+	try {
+		writeWorkspaceContextFiles(
+			root,
+			checkouts.map((checkout) => ({
+				name: checkout.repository.name,
+				path: checkout.worktreePath,
+				branch: checkout.branch,
+			})),
+		);
+	} catch (err) {
+		await removeRepositoryCheckouts(ctx, root, checkouts);
+		throw err;
 	}
 	const workspaceRow = await registerLocalWorkspace({
 		ctx,
-		id: workspaceId,
+		id: input.id,
 		projectId: project.id,
-		name,
+		name: input.name ?? firstPr?.title ?? NEW_WORKSPACE_NAME,
 		branch,
 		worktreePath: root,
 		taskId: input.taskId,
 		tags: input.tags,
-		rollbackWorktree: async () => {
-			await removeRepositoryCheckouts(ctx, checkouts);
-			await rm(root, { recursive: true, force: true });
-		},
+		checkouts: checkouts.map((checkout) => ({
+			repositoryId: checkout.repository.id,
+			branch: checkout.branch,
+		})),
+		rollbackWorktree: () => removeRepositoryCheckouts(ctx, root, checkouts),
 	});
-	writeWorkspaceContextFiles(root, checkouts);
 	if (firstPr) {
 		// Link the PRs now, not at the next sweep, so ship rows don't offer "Create PR".
 		void ctx.runtime.pullRequests
@@ -923,64 +993,12 @@ async function createContainerWorkspace(
 				console.warn("[workspaces.create] PR link refresh failed", error);
 			});
 	}
-
-	if (composerPrompt && input.name === undefined && !firstPr) {
-		setWorkspaceNamingState(ctx.db, workspaceRow.id, {
-			prompt: composerPrompt,
-			attempts: 0,
-			branch: typedBranch || input.name ? null : branch,
-			agent: input.agents?.[0]?.agent ?? input.namingAgent ?? null,
-		});
-		scheduleWorkspaceNaming(ctx, workspaceRow.id);
-	}
-
-	const terminals: Array<{ terminalId: string; label?: string }> = [];
-	const agents = await dispatchSugarAgents(
-		ctx,
-		workspaceRow.id,
-		input.agents ?? [],
-	);
-	if (input.runSetup !== false) {
-		for (const checkout of checkouts) {
-			const setup = await startSetupTerminalIfPresent({
-				ctx,
-				workspaceId: workspaceRow.id,
-				repositoryWorkspaceId: checkout.id,
-			});
-			if (setup.warning) {
-				console.warn(`[workspaces.create] setup warning: ${setup.warning}`);
-			}
-			if (setup.terminal) {
-				terminals.push({
-					terminalId: setup.terminal.id,
-					label: setup.terminal.label,
-				});
-			}
-		}
-	}
-	if (input.command) {
-		const command = await startCommandTerminal({
-			ctx,
-			workspaceId: workspaceRow.id,
-			command: input.command,
-		});
-		if (command.terminal) {
-			terminals.push({
-				terminalId: command.terminal.id,
-				label: command.terminal.label,
-			});
-		}
-	}
-
-	const latest = getLocalWorkspace(ctx.db, workspaceRow.id);
 	return {
-		workspace: latest
-			? { ...workspaceRow, ...toCloudShape(latest, ctx.organizationId) }
-			: workspaceRow,
-		terminals,
-		agents,
+		row: workspaceRow,
 		alreadyExists: false,
-		txid: extractCreateTxid(workspaceRow),
+		automaticBranch,
+		wantAi:
+			!!composerPrompt && input.name === undefined && !firstPr && !firstAdopted,
 	};
 }
 
@@ -1053,6 +1071,7 @@ async function registerLocalWorkspace(args: {
 	worktreePath: string;
 	taskId: string | undefined;
 	tags: string[] | undefined;
+	checkouts: InsertCheckoutValues[];
 	rollbackWorktree: () => Promise<void>;
 }): Promise<CloudWorkspace> {
 	const { ctx } = args;
@@ -1068,12 +1087,18 @@ async function registerLocalWorkspace(args: {
 			taskId: args.taskId ?? null,
 			createdByUserId: ctx.userId ?? null,
 			tags: args.tags,
+			checkouts: args.checkouts,
 		});
 	} catch (err) {
-		await args.rollbackWorktree();
+		const rollbackError = await args.rollbackWorktree().then(
+			() => null,
+			(error: unknown) => error,
+		);
+		const rollbackNote =
+			rollbackError instanceof Error ? `. ${rollbackError.message}` : "";
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
-			message: `Failed to persist workspace locally: ${err instanceof Error ? err.message : String(err)}`,
+			message: `Failed to persist workspace locally: ${err instanceof Error ? err.message : String(err)}${rollbackNote}`,
 		});
 	}
 
@@ -1097,9 +1122,10 @@ async function registerLocalWorkspace(args: {
 }
 
 /**
- * Bring a deleted or merged workspace back on its original branch and path.
- * Only committed work returns: the delete removed the folder, so the setup
- * script runs again in the new worktree.
+ * Bring a deleted or merged workspace back on its original branches and
+ * paths. Only committed work returns: the delete removed the folders, so the
+ * setup script runs again. Every checkout is back before the row is
+ * un-archived, so a failure leaves the workspace archived and retryable.
  */
 async function restoreArchivedWorkspace(
 	ctx: HostServiceContext,
@@ -1113,6 +1139,12 @@ async function restoreArchivedWorkspace(
 		});
 	}
 	if (row.archivedAt == null) return toCloudShape(row, ctx.organizationId);
+	if (row.type === "session" || !row.projectId) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "Session workspaces cannot be restored",
+		});
+	}
 	const release = claimWorkspaceRestore(workspaceId);
 	if (!release) {
 		throw new TRPCError({
@@ -1121,19 +1153,68 @@ async function restoreArchivedWorkspace(
 		});
 	}
 	try {
-		if (
-			row.projectId &&
-			isContainerProject(requireLocalProject(ctx, row.projectId))
-		) {
-			await restoreContainerCheckouts(ctx, row);
-			return toCloudShape(
-				getLocalWorkspace(ctx.db, workspaceId) ?? row,
-				ctx.organizationId,
+		requireLocalProject(ctx, row.projectId);
+		const checkouts = listWorkspaceCheckouts(ctx.db, row);
+		for (const checkout of checkouts)
+			requireRepositoryPath(checkout.repository);
+		const onRepository =
+			row.type === "local" ||
+			checkouts.some(
+				(checkout) =>
+					normalizeWorktreePath(checkout.path) ===
+					normalizeWorktreePath(checkout.repository.repoPath),
 			);
+		let recreated: Checkout[] = [];
+		if (!onRepository) {
+			const liveOnBranch = findExistingWorkspaceByBranch(
+				ctx,
+				row.projectId,
+				row.branch,
+			);
+			if (liveOnBranch) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: `Branch "${row.branch}" is already open in workspace "${liveOnBranch.name}"`,
+				});
+			}
+			const multiRepo = checkouts.length > 1;
+			const createdRoot =
+				multiRepo &&
+				mkdirSync(row.worktreePath, { recursive: true }) !== undefined;
+			try {
+				for (const checkout of checkouts) {
+					if (await recreateArchivedCheckout(ctx, checkout)) {
+						recreated.push(checkout);
+					}
+				}
+			} catch (err) {
+				for (const checkout of recreated) {
+					await ctx
+						.git(checkout.repository.repoPath)
+						.then((git) =>
+							git.raw(["worktree", "remove", "--force", checkout.path]),
+						)
+						.catch(() => {});
+				}
+				recreated = [];
+				if (createdRoot) {
+					await rm(row.worktreePath, { recursive: true, force: true });
+				}
+				throw err;
+			}
+			if (multiRepo) {
+				writeWorkspaceContextFiles(
+					row.worktreePath,
+					checkouts.map((checkout) => ({
+						name: checkout.repository.name,
+						path: checkout.path,
+						branch: checkout.row.branch,
+					})),
+				);
+			}
 		}
-		const recreated = await recreateArchivedCheckout(ctx, row);
 		unarchiveLocalWorkspace(ctx, workspaceId);
-		if (recreated) {
+		if (recreated.length > 0) {
 			try {
 				const { warning } = await startSetupTerminalIfPresent({
 					ctx,
@@ -1153,92 +1234,40 @@ async function restoreArchivedWorkspace(
 	return toCloudShape(restored, ctx.organizationId);
 }
 
-/**
- * Checks out every repository again before any row is un-archived, so a
- * failure leaves the whole workspace archived and the restore retryable.
- */
-async function restoreContainerCheckouts(
-	ctx: HostServiceContext,
-	row: HostWorkspaceRow,
-): Promise<void> {
-	const checkouts = listRepositoryWorkspaces(ctx.db, row.id, {
-		includeArchived: true,
-	});
-	mkdirSync(row.worktreePath, { recursive: true });
-	const recreated: HostWorkspaceRow[] = [];
-	for (const checkout of checkouts) {
-		if (await recreateArchivedCheckout(ctx, checkout)) recreated.push(checkout);
-	}
-	writeWorkspaceContextFiles(row.worktreePath, checkouts);
-	for (const checkout of checkouts) unarchiveLocalWorkspace(ctx, checkout.id);
-	unarchiveLocalWorkspace(ctx, row.id);
-	for (const checkout of recreated) {
-		try {
-			const { warning } = await startSetupTerminalIfPresent({
-				ctx,
-				workspaceId: row.id,
-				repositoryWorkspaceId: checkout.id,
-			});
-			if (warning) {
-				console.warn(`[workspaces.restore] setup warning: ${warning}`);
-			}
-		} catch (err) {
-			console.warn("[workspaces.restore] setup terminal failed:", err);
-		}
-	}
-}
-
 /** Returns true when a new worktree was checked out. */
 async function recreateArchivedCheckout(
 	ctx: HostServiceContext,
-	row: HostWorkspaceRow,
+	checkout: Checkout,
 ): Promise<boolean> {
-	if (row.type === "session" || !row.projectId) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: "Session workspaces cannot be restored",
-		});
-	}
-	const project = requireLocalProject(ctx, row.projectId);
-	const repoPath = requireProjectRepoPath(project);
-	if (
-		row.type === "local" ||
-		normalizeWorktreePath(row.worktreePath) === normalizeWorktreePath(repoPath)
-	) {
-		return false;
-	}
-
-	const liveOnBranch = findExistingWorkspaceByBranch(
-		ctx,
-		row.projectId,
-		row.branch,
-	);
-	if (liveOnBranch) {
-		throw new TRPCError({
-			code: "CONFLICT",
-			message: `Branch "${row.branch}" is already open in workspace "${liveOnBranch.name}"`,
-		});
-	}
-
-	const remoteName = project.remoteName ?? "origin";
+	const { repository, path } = checkout;
+	const branch = checkout.row.branch;
+	const repoPath = repository.repoPath;
+	const remoteName = repository.remoteName ?? "origin";
+	const where = (message: string) =>
+		checkout.path === repoPath ? message : `${repository.name}: ${message}`;
 	let result: RestoreWorktreeResult;
 	try {
 		result = await getHostWorkerPool().run(
 			gitRestoreWorktreeTask,
 			{
 				repoPath,
-				worktreePath: row.worktreePath,
-				branch: row.branch,
+				worktreePath: path,
+				branch,
 				remoteName,
-				sparsePaths: parseSparseCheckoutPaths(project.sparseCheckoutPaths),
-				gitEnv: await createGitEnvResolver(ctx.credentials)(repoPath),
+				sparsePaths: parseSparseCheckoutPaths(repository.sparseCheckoutPaths),
+				gitEnv: {
+					...(await createGitEnvResolver(ctx.credentials)(repoPath)),
+					...gitCeilingEnv(path),
+				},
 			},
 			{ timeoutMs: 120_000 },
 		);
 	} catch (err) {
 		throw new TRPCError({
 			code: "CONFLICT",
-			message: err instanceof Error ? err.message : "Failed to add worktree",
+			message: where(
+				err instanceof Error ? err.message : "Failed to add worktree",
+			),
 		});
 	}
 
@@ -1250,28 +1279,191 @@ async function recreateArchivedCheckout(
 		case "registered-elsewhere":
 			throw new TRPCError({
 				code: "CONFLICT",
-				message: `Branch "${row.branch}" is checked out at ${result.path}`,
+				message: where(`Branch "${branch}" is checked out at ${result.path}`),
 			});
 		case "path-occupied":
 			throw new TRPCError({
 				code: "CONFLICT",
-				message: `A folder already exists at ${row.worktreePath}`,
+				message: where(`A folder already exists at ${path}`),
 			});
 		case "branch-missing":
 			throw userError({
 				code: "NOT_FOUND",
-				message: `Branch "${row.branch}" is not on this device or on ${remoteName}. Only pushed commits can be restored.`,
+				message: `Branch "${branch}" is not on this device or on ${remoteName}. Only pushed commits can be restored.`,
 				i18nKey: "serverError.workspaces.restoreBranchMissing",
-				params: { branch: row.branch, remote: remoteName },
+				params: { branch, remote: remoteName },
 			});
 		case "fetch-failed":
 			throw userError({
 				code: "BAD_GATEWAY",
-				message: `Could not reach ${remoteName} to look for branch "${row.branch}". Check your connection and access to ${remoteName}, then try again.`,
+				message: `Could not reach ${remoteName} to look for branch "${branch}". Check your connection and access to ${remoteName}, then try again.`,
 				i18nKey: "serverError.workspaces.restoreFetchFailed",
-				params: { branch: row.branch, remote: remoteName },
+				params: { branch, remote: remoteName },
 			});
 	}
+}
+
+interface CreatedWorkspaceState {
+	workspaceRow: CloudWorkspace;
+	alreadyExists: boolean;
+	automaticBranch: boolean;
+	wantAi: boolean;
+	composerPrompt: string;
+}
+
+/** Naming, agents, setup and the command terminal for a created workspace. */
+async function finishCreate(
+	ctx: HostServiceContext,
+	input: z.infer<typeof createInputSchema>,
+	{
+		workspaceRow,
+		alreadyExists,
+		automaticBranch,
+		wantAi,
+		composerPrompt,
+	}: CreatedWorkspaceState,
+): Promise<WorkspaceCreateResult> {
+	const namingAgent = input.agents?.[0]?.agent ?? input.namingAgent;
+	if (!alreadyExists && wantAi) {
+		setWorkspaceNamingState(ctx.db, workspaceRow.id, {
+			prompt: composerPrompt,
+			attempts: 0,
+			branch: automaticBranch ? workspaceRow.branch : null,
+			agent: namingAgent ?? null,
+		});
+		scheduleWorkspaceNaming(ctx, workspaceRow.id);
+	}
+
+	const terminalsResult: Array<{ terminalId: string; label?: string }> = [];
+	const replayedLocalCreate = input.checkout === "local" && alreadyExists;
+	const sugarLaunches = replayedLocalCreate ? [] : (input.agents ?? []);
+
+	// Wait-for-setup gate: chain a single terminal agent behind the setup
+	// commands in the setup terminal, so the agent starts only after setup
+	// succeeds and no second terminal is created. Multi-agent launches keep
+	// the parallel path, mirroring the renderer's v1 gating. Build the agent
+	// command up-front; if it fails (unknown agent, missing attachment) fall
+	// back to the parallel dispatch, which surfaces the error in the agents
+	// result.
+	let chainAgent: { fullCommand: string; label: string } | null = null;
+	const soleLaunch = sugarLaunches.length === 1 ? sugarLaunches[0] : null;
+	if (
+		!alreadyExists &&
+		input.waitForSetupBeforeAgents &&
+		soleLaunch &&
+		soleLaunch.surface !== "chat"
+	) {
+		try {
+			chainAgent = buildTerminalAgentLaunch(ctx.db, {
+				workspaceId: workspaceRow.id,
+				agent: soleLaunch.agent,
+				prompt: soleLaunch.prompt,
+				attachmentIds: soleLaunch.attachmentIds,
+				model: soleLaunch.model,
+				effort: soleLaunch.effort,
+				mode: soleLaunch.mode,
+			});
+		} catch (err) {
+			console.warn(
+				"[workspaces.create] wait-for-setup chain unavailable, dispatching agent in parallel:",
+				err,
+			);
+		}
+	}
+
+	// Not chaining? Then the agent and the setup script are independent —
+	// that is what this path means — so launch the agent first. Its
+	// session is the one the user came for, and every client's tab order
+	// follows creation order, which had been handing the first slot to a
+	// setup shell nobody asked to look at.
+	const earlyAgentsResult =
+		chainAgent === null && sugarLaunches.length > 0
+			? await dispatchSugarAgents(ctx, workspaceRow.id, sugarLaunches)
+			: null;
+
+	let chainedAgentResult: AgentLaunchResult | null = null;
+	// The project's checkout is already set up; a local workspace only
+	// adds a new identity over it.
+	const runSetup = input.runSetup !== false && input.checkout !== "local";
+	if (!alreadyExists && runSetup) {
+		const { terminal, warning, chained } = await startSetupTerminalIfPresent({
+			ctx,
+			workspaceId: workspaceRow.id,
+			...(chainAgent ? { chainCommand: chainAgent.fullCommand } : {}),
+		});
+		if (warning) {
+			console.warn(`[workspaces.create] setup warning: ${warning}`);
+		}
+		if (terminal) {
+			terminalsResult.push({
+				terminalId: terminal.id,
+				label: terminal.label,
+			});
+		}
+		if (chained && chainAgent && terminal) {
+			chainedAgentResult = {
+				ok: true,
+				kind: "terminal",
+				sessionId: terminal.id,
+				label: chainAgent.label,
+			};
+		}
+	}
+
+	const [agentsResult, commandResult] = await Promise.all([
+		earlyAgentsResult ??
+			dispatchSugarAgents(
+				ctx,
+				workspaceRow.id,
+				chainedAgentResult ? [] : sugarLaunches,
+			),
+		input.command && !replayedLocalCreate
+			? startCommandTerminal({
+					ctx,
+					workspaceId: workspaceRow.id,
+					command: input.command,
+				})
+			: Promise.resolve(null),
+	]);
+
+	if (commandResult?.warning) {
+		console.warn(
+			`[workspaces.create] command warning: ${commandResult.warning}`,
+		);
+	}
+	if (commandResult?.terminal) {
+		terminalsResult.push({
+			terminalId: commandResult.terminal.id,
+			label: commandResult.terminal.label,
+		});
+	}
+
+	// Work is starting on the linked task — move it to In Progress.
+	// Best-effort cloud call; creation never blocks on it. A reused
+	// workspace keeps its own task link, so only nudge when this call
+	// actually linked the requested task.
+	if (
+		input.taskId &&
+		(!alreadyExists || workspaceRow.taskId === input.taskId)
+	) {
+		const taskId = input.taskId;
+		void ctx.api.task.start.mutate({ id: taskId }).catch((err) => {
+			console.warn(
+				`[workspaces.create] failed to mark task ${taskId} as started:`,
+				err,
+			);
+		});
+	}
+
+	return {
+		workspace: withCheckouts(ctx, workspaceRow),
+		terminals: terminalsResult,
+		agents: chainedAgentResult
+			? [chainedAgentResult, ...agentsResult]
+			: agentsResult,
+		alreadyExists,
+		txid: extractCreateTxid(workspaceRow),
+	};
 }
 
 export const workspacesRouter = router({
@@ -1295,10 +1487,39 @@ export const workspacesRouter = router({
 			}
 
 			const localProject = requireLocalProject(ctx, input.projectId);
-			if (isContainerProject(localProject)) {
-				return createContainerWorkspace(ctx, input, localProject);
+			const repositories = listProjectRepositories(ctx.db, localProject.id);
+			const requests = await resolveCheckoutRequests(ctx, input, repositories);
+			const composerPrompt =
+				input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
+			if (repositories.length > 1) {
+				const created = await createMultiRepoWorkspace(
+					ctx,
+					input,
+					localProject,
+					repositories,
+					requests,
+				);
+				return finishCreate(ctx, input, {
+					workspaceRow: created.row,
+					alreadyExists: created.alreadyExists,
+					automaticBranch: created.automaticBranch,
+					wantAi: created.wantAi,
+					composerPrompt,
+				});
 			}
-			const repoPath = requireProjectRepoPath(localProject);
+			const repository = repositories[0];
+			if (!repository) throw projectNotSetupError(localProject.id);
+			const repoPath = requireRepositoryPath(repository);
+			const request = requests[repository.id] ?? {};
+			if (input.branch && request.pr !== undefined) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "`branch` and `pr` cannot both be set",
+				});
+			}
+			const checkoutsOn = (branch: string): InsertCheckoutValues[] => [
+				{ repositoryId: repository.id, branch },
+			];
 
 			if (input.id && input.checkout !== "local") {
 				const existing = getLocalWorkspace(ctx.db, input.id);
@@ -1317,7 +1538,10 @@ export const workspacesRouter = router({
 						});
 					}
 					return {
-						workspace: toCloudShape(existing, ctx.organizationId),
+						workspace: withCheckouts(
+							ctx,
+							toCloudShape(existing, ctx.organizationId),
+						),
 						terminals: [],
 						agents: [],
 						alreadyExists: true,
@@ -1326,14 +1550,11 @@ export const workspacesRouter = router({
 				}
 			}
 
-			const composerPrompt =
-				input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
 			const wantAi =
-				input.pr === undefined &&
-				input.worktreePath === undefined &&
+				request.pr === undefined &&
+				request.worktreePath === undefined &&
 				input.name === undefined &&
 				!!composerPrompt;
-			const namingAgent = input.agents?.[0]?.agent ?? input.namingAgent;
 
 			const git = await ctx.git(repoPath);
 			const fetchBaseRefOffLoop = createWorkerBaseRefFetcher(ctx, repoPath);
@@ -1343,7 +1564,7 @@ export const workspacesRouter = router({
 			// Empty means a full checkout. Only applies to worktrees we create —
 			// adopted ones keep whatever checkout they already have.
 			const sparsePaths = parseSparseCheckoutPaths(
-				localProject.sparseCheckoutPaths,
+				repository.sparseCheckoutPaths,
 			);
 
 			if (input.checkout !== "local") {
@@ -1391,7 +1612,6 @@ export const workspacesRouter = router({
 						row = await createLocalWorkspace(ctx, {
 							id: input.id,
 							projectId: input.projectId,
-							repoPath,
 							name: input.name ?? nextLocalWorkspaceName(ctx, input.projectId),
 							taskId: input.taskId,
 							tags: input.tags,
@@ -1422,14 +1642,15 @@ export const workspacesRouter = router({
 								err,
 							);
 						});
-			} else if (input.pr !== undefined) {
+			} else if (request.pr !== undefined) {
+				const prNumber = request.pr;
 				const releaseCreateLock = await acquireWorkspaceCreateLock(
-					`pr:${input.projectId}:${input.pr}`,
+					`pr:${input.projectId}:${prNumber}`,
 				);
 				try {
 					const prMetadata = await fetchPrMetadata({
 						cwd: repoPath,
-						prNumber: input.pr,
+						prNumber,
 						execGh: ctx.execGh,
 					});
 					resolvedBranch = derivePrLocalBranchName(prMetadata);
@@ -1470,7 +1691,7 @@ export const workspacesRouter = router({
 									await normalizePrBranchTracking({
 										git,
 										branch: resolvedBranch,
-										remoteName: localProject.remoteName ?? "origin",
+										remoteName: repository.remoteName ?? "origin",
 										pr: prMetadata,
 									}),
 								);
@@ -1494,7 +1715,7 @@ export const workspacesRouter = router({
 								: `Inspect with \`git log ${resolvedBranch}\`, then \`git branch -D ${resolvedBranch}\` if safe.`;
 							throw new TRPCError({
 								code: "CONFLICT",
-								message: `Local branch "${resolvedBranch}" exists outside Paradev and points at a different commit than PR #${input.pr} (local ${localOid.slice(0, 7)}, PR ${prMetadata.headRefOid.slice(0, 7)}). ${cleanupHint}`,
+								message: `Local branch "${resolvedBranch}" exists outside Paradev and points at a different commit than PR #${prNumber} (local ${localOid.slice(0, 7)}, PR ${prMetadata.headRefOid.slice(0, 7)}). ${cleanupHint}`,
 							});
 						}
 
@@ -1505,6 +1726,7 @@ export const workspacesRouter = router({
 								ctx,
 								git,
 								projectId: input.projectId,
+								repository,
 								branch: resolvedBranch,
 								worktreePath,
 								workspaceName: input.name ?? prMetadata.title ?? resolvedBranch,
@@ -1583,7 +1805,7 @@ export const workspacesRouter = router({
 									materialized = await materializePrBranch({
 										git,
 										branch: resolvedBranch,
-										remoteName: localProject.remoteName ?? "origin",
+										remoteName: repository.remoteName ?? "origin",
 										pr: prMetadata,
 									});
 									recordMaterializedWarning(materialized);
@@ -1621,6 +1843,7 @@ export const workspacesRouter = router({
 								worktreePath,
 								taskId: input.taskId,
 								tags: input.tags,
+								checkouts: checkoutsOn(resolvedBranch),
 								rollbackWorktree: rollbackCreatedWorktree,
 							});
 
@@ -1637,30 +1860,31 @@ export const workspacesRouter = router({
 				} finally {
 					releaseCreateLock();
 				}
-			} else if (input.worktreePath) {
+			} else if (request.worktreePath) {
 				// Read the branch from git rather than trusting `input.branch`
 				// — a stale name on the caller side would otherwise mis-target
 				// the registration.
 				const actualBranch = await getWorktreeBranchAtPath(
 					git,
-					input.worktreePath,
+					request.worktreePath,
 				);
 				if (!actualBranch) {
 					throw new TRPCError({
 						code: "NOT_FOUND",
-						message: `No branch-checked git worktree registered at "${input.worktreePath}"`,
+						message: `No branch-checked git worktree registered at "${request.worktreePath}"`,
 					});
 				}
 				resolvedBranch = actualBranch;
-				worktreePath = input.worktreePath;
+				worktreePath = request.worktreePath;
 				const result = await adoptExistingWorktree({
 					ctx,
 					git,
 					projectId: input.projectId,
+					repository,
 					branch: resolvedBranch,
 					worktreePath,
 					workspaceName: input.name ?? resolvedBranch,
-					baseBranch: input.baseBranch,
+					baseBranch: request.baseBranch,
 					idempotencyId: input.id,
 					taskId: input.taskId,
 					tags: input.tags,
@@ -1693,7 +1917,7 @@ export const workspacesRouter = router({
 						planBranchSource(
 							git,
 							resolvedBranch,
-							input.baseBranch,
+							request.baseBranch,
 							fetchBaseRefOffLoop,
 						),
 						listBranchNames(ctx, repoPath),
@@ -1724,7 +1948,7 @@ export const workspacesRouter = router({
 					const [startPoint, existing] = await Promise.all([
 						resolveNewBranchStartPoint(
 							git,
-							input.baseBranch,
+							request.baseBranch,
 							fetchBaseRefOffLoop,
 						),
 						listBranchNames(ctx, repoPath),
@@ -1778,6 +2002,7 @@ export const workspacesRouter = router({
 							ctx,
 							git,
 							projectId: input.projectId,
+							repository,
 							branch: resolvedBranch,
 							worktreePath,
 							workspaceName: input.name ?? resolvedBranch,
@@ -1843,6 +2068,7 @@ export const workspacesRouter = router({
 										ctx,
 										git,
 										projectId: input.projectId,
+										repository,
 										branch: resolvedBranch,
 										worktreePath,
 										workspaceName: input.name ?? NEW_WORKSPACE_NAME,
@@ -1900,6 +2126,7 @@ export const workspacesRouter = router({
 								worktreePath,
 								taskId: input.taskId,
 								tags: input.tags,
+								checkouts: checkoutsOn(resolvedBranch),
 								rollbackWorktree,
 							});
 						}
@@ -1907,150 +2134,13 @@ export const workspacesRouter = router({
 				}
 			}
 
-			if (!alreadyExists && wantAi) {
-				setWorkspaceNamingState(ctx.db, workspaceRow.id, {
-					prompt: composerPrompt,
-					attempts: 0,
-					branch: automaticBranch && worktreePath ? workspaceRow.branch : null,
-					agent: namingAgent ?? null,
-				});
-				scheduleWorkspaceNaming(ctx, workspaceRow.id);
-			}
-
-			const terminalsResult: Array<{ terminalId: string; label?: string }> = [];
-			const replayedLocalCreate = input.checkout === "local" && alreadyExists;
-			const sugarLaunches = replayedLocalCreate ? [] : (input.agents ?? []);
-
-			// Wait-for-setup gate: chain a single terminal agent behind the setup
-			// commands in the setup terminal, so the agent starts only after setup
-			// succeeds and no second terminal is created. Multi-agent launches keep
-			// the parallel path, mirroring the renderer's v1 gating. Build the agent
-			// command up-front; if it fails (unknown agent, missing attachment) fall
-			// back to the parallel dispatch, which surfaces the error in the agents
-			// result.
-			let chainAgent: { fullCommand: string; label: string } | null = null;
-			const soleLaunch = sugarLaunches.length === 1 ? sugarLaunches[0] : null;
-			if (
-				!alreadyExists &&
-				input.waitForSetupBeforeAgents &&
-				soleLaunch &&
-				soleLaunch.surface !== "chat"
-			) {
-				try {
-					chainAgent = buildTerminalAgentLaunch(ctx.db, {
-						workspaceId: workspaceRow.id,
-						agent: soleLaunch.agent,
-						prompt: soleLaunch.prompt,
-						attachmentIds: soleLaunch.attachmentIds,
-						model: soleLaunch.model,
-						effort: soleLaunch.effort,
-						mode: soleLaunch.mode,
-					});
-				} catch (err) {
-					console.warn(
-						"[workspaces.create] wait-for-setup chain unavailable, dispatching agent in parallel:",
-						err,
-					);
-				}
-			}
-
-			// Not chaining? Then the agent and the setup script are independent —
-			// that is what this path means — so launch the agent first. Its
-			// session is the one the user came for, and every client's tab order
-			// follows creation order, which had been handing the first slot to a
-			// setup shell nobody asked to look at.
-			const earlyAgentsResult =
-				chainAgent === null && sugarLaunches.length > 0
-					? await dispatchSugarAgents(ctx, workspaceRow.id, sugarLaunches)
-					: null;
-
-			let chainedAgentResult: AgentLaunchResult | null = null;
-			// The project's checkout is already set up; a local workspace only
-			// adds a new identity over it.
-			const runSetup = input.runSetup !== false && input.checkout !== "local";
-			if (!alreadyExists && runSetup) {
-				const { terminal, warning, chained } =
-					await startSetupTerminalIfPresent({
-						ctx,
-						workspaceId: workspaceRow.id,
-						...(chainAgent ? { chainCommand: chainAgent.fullCommand } : {}),
-					});
-				if (warning) {
-					console.warn(`[workspaces.create] setup warning: ${warning}`);
-				}
-				if (terminal) {
-					terminalsResult.push({
-						terminalId: terminal.id,
-						label: terminal.label,
-					});
-				}
-				if (chained && chainAgent && terminal) {
-					chainedAgentResult = {
-						ok: true,
-						kind: "terminal",
-						sessionId: terminal.id,
-						label: chainAgent.label,
-					};
-				}
-			}
-
-			const [agentsResult, commandResult] = await Promise.all([
-				earlyAgentsResult ??
-					dispatchSugarAgents(
-						ctx,
-						workspaceRow.id,
-						chainedAgentResult ? [] : sugarLaunches,
-					),
-				input.command && !replayedLocalCreate
-					? startCommandTerminal({
-							ctx,
-							workspaceId: workspaceRow.id,
-							command: input.command,
-						})
-					: Promise.resolve(null),
-			]);
-
-			if (commandResult?.warning) {
-				console.warn(
-					`[workspaces.create] command warning: ${commandResult.warning}`,
-				);
-			}
-			if (commandResult?.terminal) {
-				terminalsResult.push({
-					terminalId: commandResult.terminal.id,
-					label: commandResult.terminal.label,
-				});
-			}
-
-			// Work is starting on the linked task — move it to In Progress.
-			// Best-effort cloud call; creation never blocks on it. A reused
-			// workspace keeps its own task link, so only nudge when this call
-			// actually linked the requested task.
-			if (
-				input.taskId &&
-				(!alreadyExists || workspaceRow.taskId === input.taskId)
-			) {
-				const taskId = input.taskId;
-				void ctx.api.task.start.mutate({ id: taskId }).catch((err) => {
-					console.warn(
-						`[workspaces.create] failed to mark task ${taskId} as started:`,
-						err,
-					);
-				});
-			}
-
-			const latest = getLocalWorkspace(ctx.db, workspaceRow.id);
-			return {
-				workspace: latest
-					? { ...workspaceRow, ...toCloudShape(latest, ctx.organizationId) }
-					: workspaceRow,
-				terminals: terminalsResult,
-				agents: chainedAgentResult
-					? [chainedAgentResult, ...agentsResult]
-					: agentsResult,
+			return finishCreate(ctx, input, {
+				workspaceRow,
 				alreadyExists,
-				txid: extractCreateTxid(workspaceRow),
-			};
+				automaticBranch: automaticBranch && worktreePath !== undefined,
+				wantAi,
+				composerPrompt,
+			});
 		}),
 
 	/**
@@ -2076,8 +2166,13 @@ export const workspacesRouter = router({
 			for (const launch of input.agents ?? []) {
 				validateAgentLaunchOptions(ctx.db, launch);
 			}
-			const project = requireLocalProject(ctx, input.projectId);
-			if (!isContainerProject(project)) requireProjectRepoPath(project);
+			requireLocalProject(ctx, input.projectId);
+			for (const repository of listProjectRepositories(
+				ctx.db,
+				input.projectId,
+			)) {
+				requireRepositoryPath(repository);
+			}
 
 			void createWorkspacesCaller(ctx)
 				.create(input)
@@ -2166,13 +2261,26 @@ export const workspacesRouter = router({
 					message: "Local project not found for workspace",
 				});
 			}
-			const repoPath = project.repoPath ?? "";
+			const checkouts = listWorkspaceCheckouts(ctx.db, local)
+				.filter((checkout) => checkout.row.branch === local.branch)
+				.map((checkout) => ({
+					repositoryId: checkout.repository.id,
+					repoPath: checkout.repository.repoPath,
+					worktreePath: checkout.path,
+				}));
+			const repoPath = getPrimaryRepository(ctx.db, project)?.repoPath ?? "";
 			const branchPrefix = repoPath
 				? await resolveProjectBranchPrefix({
 						ctx,
 						project,
 						getAuthorName: createOffLoopAuthorNameGetter(repoPath),
-						existingBranches: await listBranchNames(ctx, repoPath),
+						existingBranches: (
+							await Promise.all(
+								checkouts.map((checkout) =>
+									listBranchNames(ctx, checkout.repoPath),
+								),
+							)
+						).flat(),
 					}).catch((err) => {
 						console.warn(
 							"[workspaces.aiRename] branch prefix resolution failed",
@@ -2184,8 +2292,7 @@ export const workspacesRouter = router({
 			void applyAiWorkspaceRename({
 				ctx,
 				workspaceId: input.workspaceId,
-				repoPath,
-				worktreePath: local.worktreePath,
+				checkouts,
 				oldBranchName: local.branch,
 				oldWorkspaceName: local.name || local.branch,
 				prompt: input.prompt,
@@ -2208,16 +2315,22 @@ export const workspacesRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const localProject = requireLocalProject(ctx, input.projectId);
-			const existingBranches = await listBranchNames(
-				ctx,
-				localProject.repoPath,
-			);
+			const repositories = listProjectRepositories(ctx.db, localProject.id);
+			const existingBranches = (
+				await Promise.all(
+					repositories.map((repository) =>
+						listBranchNames(ctx, repository.repoPath),
+					),
+				)
+			).flat();
 			const derived = deriveWorkspaceBranchFromPrompt(input.prompt);
 			if (!derived) return { branchName: null };
 			const prefix = await resolveProjectBranchPrefix({
 				ctx,
 				project: localProject,
-				getAuthorName: createOffLoopAuthorNameGetter(localProject.repoPath),
+				getAuthorName: createOffLoopAuthorNameGetter(
+					getPrimaryRepository(ctx.db, localProject)?.repoPath ?? "",
+				),
 				existingBranches,
 			});
 			const candidate = prefix ? `${prefix}/${derived}` : derived;

@@ -29,8 +29,9 @@ import {
 } from "@superset/pty-daemon/protocol";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { seedProject } from "../../test/helpers/seed.ts";
 import { createDb, type HostDb } from "../db/index.ts";
-import { projects, terminalSessions, workspaces } from "../db/schema.ts";
+import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { DaemonUnavailableError } from "./DaemonClient/index.ts";
 import {
@@ -126,7 +127,7 @@ before(async () => {
 
 	const projectId = randomUUID();
 	workspaceId = randomUUID();
-	db.insert(projects).values({ id: projectId, repoPath: worktreePath }).run();
+	seedProject({ db }, { id: projectId, repoPath: worktreePath });
 	db.insert(workspaces)
 		.values({ id: workspaceId, projectId, worktreePath, branch: "main" })
 		.run();

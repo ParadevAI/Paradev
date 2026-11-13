@@ -1,1 +1,5 @@
-export { GitStatusStore, gitStatusStore } from "./git-status-store";
+export {
+	checkoutStatusKey,
+	GitStatusStore,
+	gitStatusStore,
+} from "./git-status-store";

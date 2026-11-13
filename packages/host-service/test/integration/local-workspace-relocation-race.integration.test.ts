@@ -1,14 +1,15 @@
 import { expect, test } from "bun:test";
-import { projects, workspaces } from "../../src/db/schema";
+import { repositories, workspaces } from "../../src/db/schema";
 import { createCallerFactory } from "../../src/trpc";
 import { workspacesRouter } from "../../src/trpc/router/workspaces/workspaces";
 import type { HostServiceContext } from "../../src/types";
 import { createGitFixture } from "../helpers/git-fixture";
 import { createProjectScenario } from "../helpers/scenarios";
 
-test.each([
-	1, 2,
-])("Local create rejects relocation during git read %i and retries on the new checkout", async (pausedRead) => {
+// Read 1 opens the project git client before the local path is chosen; read 2
+// reads the checked-out branch, which a relocation must not outlive.
+test("Local create rejects relocation during the branch read and retries on the new checkout", async () => {
+	const pausedRead = 2;
 	let gitReads = 0;
 	const s = await createProjectScenario();
 	const moved = await createGitFixture();
@@ -35,9 +36,10 @@ test.each([
 			name: "concurrent",
 		});
 		await entered.promise;
-		await s.host.trpc.project.setup.mutate({
+		await s.host.trpc.project.relocateRepository.mutate({
 			projectId: s.projectId,
-			mode: { kind: "import", repoPath: moved.repoPath, allowRelocate: true },
+			repositoryId: s.repositoryId,
+			path: moved.repoPath,
 		});
 		release.resolve();
 		await expect(creating).rejects.toMatchObject({ code: "CONFLICT" });
@@ -47,8 +49,8 @@ test.each([
 			name: "retried",
 		});
 		const row = s.host.db.select().from(workspaces).all()[0];
-		const project = s.host.db.select().from(projects).all()[0];
-		expect(row?.worktreePath).toBe(project?.repoPath);
+		const repository = s.host.db.select().from(repositories).all()[0];
+		expect(row?.worktreePath).toBe(repository?.repoPath);
 	} finally {
 		release.resolve();
 		await s.dispose();

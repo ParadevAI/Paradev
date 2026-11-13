@@ -18,6 +18,28 @@ import { applyLegacyHomeMove } from "./legacy-home-paths";
 
 const MIGRATIONS = resolve(import.meta.dir, "../../../drizzle");
 
+type TestDb = ReturnType<typeof drizzle<typeof schema>>;
+
+function seedCheckout(
+	db: TestDb,
+	repoPath: string,
+	worktreePath: string,
+	branch: string,
+) {
+	db.insert(schema.projects)
+		.values({ id: "p1", primaryRepositoryId: "r1" })
+		.run();
+	db.insert(schema.repositories)
+		.values({ id: "r1", projectId: "p1", name: "app", repoPath })
+		.run();
+	db.insert(schema.workspaces)
+		.values({ id: "w1", projectId: "p1", worktreePath, branch })
+		.run();
+	db.insert(schema.workspaceRepositories)
+		.values({ workspaceId: "w1", repositoryId: "r1", branch })
+		.run();
+}
+
 let appHome: string;
 
 beforeEach(() => {
@@ -33,17 +55,12 @@ describe("applyLegacyHomeMove", () => {
 		const sqlite = new Database(":memory:");
 		const db = drizzle(sqlite, { schema });
 		runMigrations(db, MIGRATIONS);
-		db.insert(schema.projects)
-			.values({ id: "p1", repoPath: "/u/.superset/projects/app" })
-			.run();
-		db.insert(schema.workspaces)
-			.values({
-				id: "w1",
-				projectId: "p1",
-				worktreePath: "/u/.superset/worktrees/app/main",
-				branch: "main",
-			})
-			.run();
+		seedCheckout(
+			db,
+			"/u/.superset/projects/app",
+			"/u/.superset/worktrees/app/main",
+			"main",
+		);
 		writeFileSync(
 			join(appHome, "legacy-home-move.json"),
 			JSON.stringify({ from: "/u/.superset", to: "/u/.paradev" }),
@@ -51,7 +68,7 @@ describe("applyLegacyHomeMove", () => {
 
 		await applyLegacyHomeMove(db, appHome);
 
-		expect(db.select().from(schema.projects).get()?.repoPath).toBe(
+		expect(db.select().from(schema.repositories).get()?.repoPath).toBe(
 			"/u/.paradev/projects/app",
 		);
 		expect(db.select().from(schema.workspaces).get()?.worktreePath).toBe(
@@ -87,10 +104,7 @@ describe("applyLegacyHomeMove", () => {
 		const sqlite = new Database(":memory:");
 		const db = drizzle(sqlite, { schema });
 		runMigrations(db, MIGRATIONS);
-		db.insert(schema.projects).values({ id: "p1", repoPath: repo }).run();
-		db.insert(schema.workspaces)
-			.values({ id: "w1", projectId: "p1", worktreePath, branch: "wt" })
-			.run();
+		seedCheckout(db, repo, worktreePath, "wt");
 		writeFileSync(
 			join(home, "legacy-home-move.json"),
 			JSON.stringify({ from: legacy, to: home }),

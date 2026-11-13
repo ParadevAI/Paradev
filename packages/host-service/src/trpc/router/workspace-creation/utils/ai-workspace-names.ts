@@ -17,8 +17,11 @@ import {
 	deriveWorkspaceBranchFromPrompt,
 	deriveWorkspaceTitleFromPrompt,
 } from "@superset/shared/workspace-launch";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import type { HostDb } from "../../../../db";
+import { workspaceRepositories } from "../../../../db/schema";
+import { gitCeilingEnv } from "../../../../runtime/git/ceiling";
 import { resolveHostAgentConfig } from "../../../../terminal-agents/agent-config";
 import type { HostServiceContext } from "../../../../types";
 import { updateLocalWorkspace } from "../../../../workspaces/local-workspace-store";
@@ -456,11 +459,17 @@ export async function generateWorkspaceNamesFromPrompt(
 	return derived;
 }
 
+export interface RenameCheckout {
+	repositoryId: string;
+	repoPath: string;
+	worktreePath: string;
+}
+
 interface ApplyGeneratedNamesArgs {
 	ctx: HostServiceContext;
 	workspaceId: string;
-	repoPath: string;
-	worktreePath: string;
+	/** The checkouts still on `oldBranchName`; each one's branch is renamed. */
+	checkouts: RenameCheckout[];
 	oldBranchName: string;
 	oldWorkspaceName: string;
 	/** Replace the workspace title with an AI-picked one. Skip when the user typed a name. */
@@ -525,8 +534,7 @@ export async function applyGeneratedWorkspaceNames(
 	const {
 		ctx,
 		workspaceId,
-		repoPath,
-		worktreePath,
+		checkouts,
 		oldBranchName,
 		oldWorkspaceName,
 		names: aiNames,
@@ -545,26 +553,59 @@ export async function applyGeneratedWorkspaceNames(
 		});
 	const titleChanged =
 		renameTitle && aiNames.title !== "" && aiNames.title !== oldWorkspaceName;
-	const branchChanged = renameBranch && candidateChanged;
+	const branchChanged =
+		renameBranch && candidateChanged && checkouts.length > 0;
 	if (!titleChanged && !branchChanged) return null;
 
 	let deduped = oldBranchName;
 	let gitRenamed = false;
 	if (branchChanged) {
-		const freshBranches = await listBranchNames(ctx, repoPath);
+		const freshBranches = (
+			await Promise.all(
+				checkouts.map((checkout) => listBranchNames(ctx, checkout.repoPath)),
+			)
+		).flat();
 		deduped = deduplicateBranchName(
 			prefixedCandidate,
 			freshBranches.filter((b) => b !== oldBranchName),
 		);
+		const renamed: RenameCheckout[] = [];
 		try {
-			const worktreeGit = await ctx.git(worktreePath);
-			await worktreeGit.raw(["branch", "-m", oldBranchName, deduped]);
+			for (const checkout of checkouts) {
+				const worktreeGit = await ctx.git(checkout.worktreePath, {
+					env: gitCeilingEnv(checkout.worktreePath),
+				});
+				await worktreeGit.raw(["branch", "-m", oldBranchName, deduped]);
+				renamed.push(checkout);
+			}
 			gitRenamed = true;
 		} catch (err) {
 			console.warn(
 				"[applyGeneratedWorkspaceNames] git branch rename failed",
 				err,
 			);
+			for (const checkout of renamed) {
+				await ctx
+					.git(checkout.worktreePath, {
+						env: gitCeilingEnv(checkout.worktreePath),
+					})
+					.then((git) => git.raw(["branch", "-m", deduped, oldBranchName]))
+					.catch(() => {});
+			}
+		}
+		if (gitRenamed) {
+			for (const checkout of checkouts) {
+				ctx.db
+					.update(workspaceRepositories)
+					.set({ branch: deduped })
+					.where(
+						and(
+							eq(workspaceRepositories.workspaceId, workspaceId),
+							eq(workspaceRepositories.repositoryId, checkout.repositoryId),
+						),
+					)
+					.run();
+			}
 		}
 	}
 

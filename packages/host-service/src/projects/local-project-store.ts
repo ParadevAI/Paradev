@@ -1,9 +1,14 @@
-import { basename } from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { projects } from "../db/schema";
 import type { EventBus } from "../events";
 import type { ProjectSnapshot, TagSettingSnapshot } from "../events/types";
+import {
+	getLiveRepositoryAtPath,
+	getRepositoryAtPathIncludingDeleted,
+	listProjectRepositories,
+	toRepositorySnapshot,
+} from "./repositories";
 
 export type HostProjectRow = typeof projects.$inferSelect;
 
@@ -13,19 +18,26 @@ export interface ProjectStoreContext {
 }
 
 export function toProjectSnapshot(
+	db: HostDb,
 	row: HostProjectRow,
 	tagSettings?: TagSettingSnapshot[],
 ): ProjectSnapshot {
+	const repositoryRows = listProjectRepositories(db, row.id);
+	const primary = repositoryRows.find((r) => r.id === row.primaryRepositoryId);
 	return {
 		id: row.id,
 		// Rows that predate local ownership have an empty name until the
-		// backfill sweep fills it; the folder name is the honest fallback.
-		name: row.name || basename(row.repoPath) || row.id,
-		repoPath: row.repoPath,
-		repoOwner: row.repoOwner,
-		repoName: row.repoName,
-		repoUrl: row.repoUrl,
+		// backfill sweep fills it; the primary repository's name is the honest
+		// fallback.
+		name: row.name || primary?.name || row.id,
+		primaryRepositoryId: row.primaryRepositoryId,
+		repositories: repositoryRows.map((r) =>
+			toRepositorySnapshot(r, row.primaryRepositoryId),
+		),
 		worktreeBaseDir: row.worktreeBaseDir,
+		branchPrefixMode: row.branchPrefixMode,
+		branchPrefixCustom: row.branchPrefixCustom,
+		namingInstructions: row.namingInstructions,
 		icon: row.icon,
 		color: row.color,
 		createdAt: row.createdAt,
@@ -52,41 +64,39 @@ export function getProjectIncludingDeleted(
 	return db.query.projects.findFirst({ where: eq(projects.id, id) }).sync();
 }
 
+/** The live project with a repository at `repoPath`. */
 export function getLiveProjectAtPath(
 	db: HostDb,
 	repoPath: string,
 ): HostProjectRow | undefined {
-	return db.query.projects
-		.findFirst({
-			where: and(eq(projects.repoPath, repoPath), isNull(projects.deletedAt)),
-		})
-		.sync();
+	const repository = getLiveRepositoryAtPath(db, repoPath);
+	return repository ? getLocalProject(db, repository.projectId) : undefined;
 }
 
 export function getProjectAtPathIncludingDeleted(
 	db: HostDb,
 	repoPath: string,
 ): HostProjectRow | undefined {
-	return db.query.projects
-		.findFirst({ where: eq(projects.repoPath, repoPath) })
-		.sync();
+	const repository = getRepositoryAtPathIncludingDeleted(db, repoPath);
+	return repository
+		? getProjectIncludingDeleted(db, repository.projectId)
+		: undefined;
 }
 
 export function emitProjectChanged(
-	eventBus: EventBus,
+	ctx: ProjectStoreContext,
 	eventType: "created" | "updated" | "deleted",
 	rowOrId: HostProjectRow | string,
 	tagSettings?: TagSettingSnapshot[],
 ): void {
-	if (typeof rowOrId !== "string" && rowOrId.parentProjectId) return;
 	const deleted = eventType === "deleted";
-	eventBus.broadcastProjectChanged({
+	ctx.eventBus.broadcastProjectChanged({
 		projectId: typeof rowOrId === "string" ? rowOrId : rowOrId.id,
 		eventType,
 		project:
 			deleted || typeof rowOrId === "string"
 				? null
-				: toProjectSnapshot(rowOrId, tagSettings),
+				: toProjectSnapshot(ctx.db, rowOrId, tagSettings),
 		occurredAt: Date.now(),
 	});
 }
@@ -112,6 +122,6 @@ export function updateLocalProject(
 		.run();
 	const row = getLocalProject(ctx.db, id);
 	if (!row) return undefined;
-	emitProjectChanged(ctx.eventBus, "updated", row);
+	emitProjectChanged(ctx, "updated", row);
 	return row;
 }

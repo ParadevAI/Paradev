@@ -132,23 +132,6 @@ export function getLabelsForWorkspace(
 	return setLabelCache(workspaceId, worktreePath, safeLoadLabels(worktreePath));
 }
 
-/** Labels for a group of workspaces; the first workspace that names a port wins. */
-export function getLabelsForWorkspaces(
-	resolveWorktreePath: (workspaceId: string) => string | null,
-	workspaceIds: string[],
-): Map<number, string> {
-	const merged = new Map<number, string>();
-	for (const workspaceId of workspaceIds) {
-		for (const [port, label] of getLabelsForWorkspace(
-			resolveWorktreePath,
-			workspaceId,
-		) ?? []) {
-			if (!merged.has(port)) merged.set(port, label);
-		}
-	}
-	return merged;
-}
-
 export function invalidateLabelCache(workspaceId?: string): void {
 	if (workspaceId === undefined) labelCache.clear();
 	else labelCache.delete(workspaceId);

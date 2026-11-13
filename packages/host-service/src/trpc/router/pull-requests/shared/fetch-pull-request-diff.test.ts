@@ -19,6 +19,7 @@ test("project and repository endpoints share a case-insensitive in-flight cache"
 			}),
 	);
 	spyOn(projects, "resolveGithubRepo").mockResolvedValue({
+		repositoryId: "repository-1",
 		owner: "Owner",
 		name: "Shared",
 		repoPath: "/unused",

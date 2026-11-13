@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, ne, or } from "drizzle-orm";
-import { workspaces } from "../../../../db/schema";
+import { workspaceRepositories, workspaces } from "../../../../db/schema";
+import type { HostRepositoryRow } from "../../../../projects/repositories";
 import type { HostServiceContext } from "../../../../types";
 import {
 	type CloudShapedWorkspace,
@@ -13,7 +14,6 @@ import {
 	type WorkspaceStoreContext,
 } from "../../../../workspaces/local-workspace-store";
 import { gitConfigWrite } from "../../git/utils/config-write";
-import { requireLocalProject } from "./local-project";
 import { requireIndependentWorktree } from "./require-independent-worktree";
 import type { GitClient } from "./types";
 import { normalizeWorktreePath } from "./worktree-list";
@@ -26,6 +26,8 @@ export interface AdoptExistingWorktreeArgs {
 	ctx: HostServiceContext;
 	git: GitClient;
 	projectId: string;
+	/** The project's only repository; adoption makes a single-repo workspace. */
+	repository: HostRepositoryRow;
 	branch: string;
 	worktreePath: string;
 	workspaceName: string;
@@ -68,6 +70,7 @@ export async function adoptExistingWorktree(
 		ctx,
 		git,
 		projectId,
+		repository,
 		branch,
 		worktreePath,
 		workspaceName,
@@ -77,8 +80,8 @@ export async function adoptExistingWorktree(
 		taskId,
 		tags,
 	} = args;
-	const project = requireLocalProject(ctx, projectId);
-	requireIndependentWorktree(project.repoPath, worktreePath);
+	const repoPath = repository.repoPath;
+	requireIndependentWorktree(repoPath, worktreePath);
 	if (existingWorkspaceId) {
 		const existing = getLocalWorkspace(ctx.db, existingWorkspaceId);
 		if (
@@ -90,8 +93,7 @@ export async function adoptExistingWorktree(
 				message: "This workspace cannot be relinked to a worktree.",
 			});
 		}
-		if (existing)
-			requireIndependentWorktree(project.repoPath, existing.worktreePath);
+		if (existing) requireIndependentWorktree(repoPath, existing.worktreePath);
 	}
 	const store: WorkspaceStoreContext = {
 		db: ctx.db,
@@ -109,10 +111,11 @@ export async function adoptExistingWorktree(
 			worktreePath,
 			branch,
 			keepWorkspaceId: existingWorkspaceId,
-			repoPath: project.repoPath,
+			repoPath,
 		});
 		const existing = getLocalWorkspace(ctx.db, existingWorkspaceId);
 		if (existing) {
+			replaceCheckout(store, existingWorkspaceId, repository.id, branch);
 			const updated =
 				updateLocalWorkspace(store, existingWorkspaceId, {
 					projectId,
@@ -132,6 +135,7 @@ export async function adoptExistingWorktree(
 			name: workspaceName,
 			taskId: taskId ?? null,
 			tags,
+			checkouts: [{ repositoryId: repository.id, branch }],
 		});
 		return {
 			workspace: toCloudShape(inserted, ctx.organizationId),
@@ -176,8 +180,9 @@ export async function adoptExistingWorktree(
 			worktreePath,
 			branch,
 			keepWorkspaceId: existingByPath.id,
-			repoPath: project.repoPath,
+			repoPath,
 		});
+		replaceCheckout(store, existingByPath.id, repository.id, branch);
 		const updated = updateLocalWorkspace(store, existingByPath.id, { branch });
 		await recordBaseBranch(git, branch, baseBranch);
 		if (updated) {
@@ -197,7 +202,7 @@ export async function adoptExistingWorktree(
 		worktreePath,
 		branch,
 		keepWorkspaceId: id,
-		repoPath: project.repoPath,
+		repoPath,
 	});
 
 	let inserted: ReturnType<typeof insertLocalWorkspace>;
@@ -210,6 +215,7 @@ export async function adoptExistingWorktree(
 			name: workspaceName,
 			taskId: taskId ?? null,
 			tags,
+			checkouts: [{ repositoryId: repository.id, branch }],
 		});
 	} catch (err) {
 		throw new TRPCError({
@@ -264,6 +270,23 @@ function deleteLocalWorkspaceConflicts(
 			deleteLocalWorkspace(store, conflict.id);
 		}
 	}
+}
+
+/** A relinked or renamed single-repo workspace checks out exactly this. */
+function replaceCheckout(
+	store: WorkspaceStoreContext,
+	workspaceId: string,
+	repositoryId: string,
+	branch: string,
+): void {
+	store.db.transaction((tx) => {
+		tx.delete(workspaceRepositories)
+			.where(eq(workspaceRepositories.workspaceId, workspaceId))
+			.run();
+		tx.insert(workspaceRepositories)
+			.values({ workspaceId, repositoryId, branch })
+			.run();
+	});
 }
 
 async function recordBaseBranch(

@@ -1,9 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure } from "../../../index";
-import {
-	requireLocalProject,
-	requireProjectRepoPath,
-} from "../shared/local-project";
+import { requireRepositoryPath } from "../shared/local-project";
+import { requireProjectRepository } from "../shared/project-helpers";
 import {
 	listGitWorktrees,
 	normalizeWorktreePath,
@@ -23,14 +21,20 @@ import {
  * repository picker to offer existing worktrees.
  */
 export const listProjectWorktrees = protectedProcedure
-	.input(z.object({ projectId: z.string() }))
+	.input(
+		z.object({ projectId: z.string(), repositoryId: z.string().optional() }),
+	)
 	.query(async ({ ctx, input }) => {
-		const localProject = requireLocalProject(ctx, input.projectId);
-		const repoPath = requireProjectRepoPath(localProject);
+		const { repository } = requireProjectRepository(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
+		const repoPath = requireRepositoryPath(repository);
 		const git = await ctx.git(repoPath);
 		const records = await listGitWorktrees(git);
 		const owners = findWorktreeOwners(ctx.db, repoPath);
-		const mainRepoPath = normalizeWorktreePath(localProject.repoPath);
+		const mainRepoPath = normalizeWorktreePath(repository.repoPath);
 
 		const worktrees: {
 			branch: string;

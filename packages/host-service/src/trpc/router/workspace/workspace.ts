@@ -1,12 +1,15 @@
-import { basename } from "node:path";
 import { workspaceTagsInputSchema } from "@superset/shared/workspace-tags";
 import { TRPCError } from "@trpc/server";
-import { and, eq, isNotNull, isNull } from "drizzle-orm";
+import { eq, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
-import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
-import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
+import { listRepositoriesByProjectId } from "../../../projects/repositories";
 import { isMissingPath } from "../../../runtime/path-state";
+import {
+	getCheckoutSnapshots,
+	listCheckoutsByWorkspaceId,
+	toCheckoutSnapshot,
+} from "../../../workspaces/checkouts";
 import {
 	getWorkspaceTags,
 	getWorkspaceTagsByWorkspaceId,
@@ -15,7 +18,7 @@ import {
 } from "../../../workspaces/local-workspace-store";
 import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, router } from "../../index";
-import { resolveWorktreePath } from "../git/utils/resolve-worktree";
+import { readWorkspaceGitStatus } from "../git/utils/workspace-git-status";
 import { destroyWorkspace } from "../workspace-cleanup";
 
 export const workspaceRouter = router({
@@ -35,35 +38,9 @@ export const workspaceRouter = router({
 
 			return {
 				...localWorkspace,
+				checkouts: getCheckoutSnapshots(ctx.db, localWorkspace),
 				worktreeExists: !isMissingPath(localWorkspace.worktreePath),
 			};
-		}),
-
-	/** A container workspace's checkouts in the order their repositories were added; a single-repo workspace is its own. */
-	repositories: protectedProcedure
-		.input(z.object({ workspaceId: z.string() }))
-		.query(({ ctx, input }) => {
-			const workspace = ctx.db.query.workspaces
-				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-				.sync();
-			if (!workspace) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Workspace not found",
-				});
-			}
-			const children = listRepositoryWorkspaces(ctx.db, workspace.id);
-			return (children.length > 0 ? children : [workspace]).map((row) => {
-				const project = row.projectId
-					? getProjectIncludingDeleted(ctx.db, row.projectId)
-					: undefined;
-				return {
-					id: row.id,
-					name: basename(project?.repoPath || row.worktreePath),
-					branch: row.branch,
-					worktreePath: row.worktreePath,
-				};
-			});
 		}),
 
 	/**
@@ -88,7 +65,6 @@ export const workspaceRouter = router({
 				? ctx.db
 						.select()
 						.from(workspaces)
-						.where(isNull(workspaces.parentWorkspaceId))
 						.all()
 						.filter(
 							(row) => !row.projectId || !deletedProjectIds.has(row.projectId),
@@ -96,27 +72,24 @@ export const workspaceRouter = router({
 				: ctx.db
 						.select()
 						.from(workspaces)
-						.where(
-							and(
-								isNull(workspaces.archivedAt),
-								isNull(workspaces.parentWorkspaceId),
-							),
-						)
+						.where(isNull(workspaces.archivedAt))
 						.all();
-			const projectNameById = new Map(
-				ctx.db
-					.select({
-						id: projects.id,
-						name: projects.name,
-						repoPath: projects.repoPath,
-					})
-					.from(projects)
-					.all()
-					.map((project) => [
-						project.id,
-						project.name || basename(project.repoPath),
-					]),
+			const projectRows = ctx.db.select().from(projects).all();
+			const repositoriesByProjectId = listRepositoriesByProjectId(
+				ctx.db,
+				projectRows.map((project) => project.id),
 			);
+			const projectById = new Map(
+				projectRows.map((project) => [project.id, project]),
+			);
+			const projectName = (projectId: string) => {
+				const project = projectById.get(projectId);
+				if (!project) return null;
+				const primary = repositoriesByProjectId
+					.get(projectId)
+					?.find((repository) => repository.id === project.primaryRepositoryId);
+				return project.name || primary?.name || null;
+			};
 			// Tags are the caller's own: on a shared host each user files the
 			// same workspaces into their own folders.
 			const tagsByWorkspaceId = getWorkspaceTagsByWorkspaceId(
@@ -124,17 +97,24 @@ export const workspaceRouter = router({
 				rows.map((row) => row.id),
 				ctx.userId,
 			);
+			const checkoutsByWorkspaceId = listCheckoutsByWorkspaceId(ctx.db, rows);
 			return rows.map((row) => ({
 				...toCloudShape(row, ctx.organizationId),
 				tags: tagsByWorkspaceId.get(row.id) ?? [],
 				worktreePath: row.worktreePath,
+				checkouts: (checkoutsByWorkspaceId.get(row.id) ?? []).map((checkout) =>
+					toCheckoutSnapshot(
+						checkout,
+						row.projectId
+							? (projectById.get(row.projectId)?.primaryRepositoryId ?? "")
+							: "",
+					),
+				),
 				// Tombstones' worktrees are gone by definition; stat-checking an
 				// unbounded, forever-growing archive on every poll adds up.
 				worktreeExists:
 					row.archivedAt == null ? !isMissingPath(row.worktreePath) : false,
-				projectName: row.projectId
-					? (projectNameById.get(row.projectId) ?? null)
-					: null,
+				projectName: row.projectId ? projectName(row.projectId) : null,
 				// Host-only: the frozen cloud shape never had an activity signal.
 				lastActivityAt: row.lastActivityAt,
 				archivedAt: row.archivedAt,
@@ -218,22 +198,7 @@ export const workspaceRouter = router({
 	// an empty read so released clients that still call it don't error.
 	gitStatus: protectedProcedure
 		.input(z.object({ id: z.string() }))
-		.query(async ({ ctx, input }) => {
-			const worktreePath = resolveWorktreePath(ctx, input.id);
-			const git = await ctx.git(worktreePath);
-			const status = await git.status();
-
-			return {
-				workspaceId: input.id,
-				branch: status.current,
-				files: status.files.map((f) => ({
-					path: f.path,
-					index: f.index,
-					workingDir: f.working_dir,
-				})),
-				isClean: status.isClean(),
-			};
-		}),
+		.query(({ ctx, input }) => readWorkspaceGitStatus(ctx, input.id)),
 
 	delete: protectedProcedure
 		.input(z.object({ id: z.string() }))

@@ -4,8 +4,8 @@ import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type SimpleGit, simpleGit } from "simple-git";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 /**
  * `getDiffPatch` returns one patch per category, which the Changes pane parses
@@ -14,22 +14,8 @@ import { gitRouter } from "./git";
  */
 
 function createCaller(worktreePath: string) {
-	const ctx = {
-		isAuthenticated: true,
-		db: {
-			query: {
-				workspaces: {
-					findFirst: () => ({ sync: () => ({ worktreePath }) }),
-				},
-			},
-		},
-		git: async (path: string) => simpleGit(path),
-		credentials: {
-			getCredentials: async () => ({ env: {} }),
-			getToken: async () => null,
-		},
-	} as unknown as HostServiceContext;
-	return gitRouter.createCaller(ctx);
+	const { db } = seedTestCheckout({ workspaceId: "ws", worktreePath });
+	return gitRouter.createCaller(testGitContext(db));
 }
 
 async function initRepo(path: string): Promise<SimpleGit> {

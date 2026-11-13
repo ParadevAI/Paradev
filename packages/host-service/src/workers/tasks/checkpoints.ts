@@ -16,6 +16,7 @@ import type {
 	TurnUndoResult,
 } from "@superset/chat-runtime";
 import type { SimpleGit } from "simple-git";
+import { gitCeilingEnv } from "../../runtime/git/ceiling.ts";
 import { createUserSimpleGit } from "../../runtime/git/simple-git.ts";
 import { defineWorkerTask } from "../define-worker-task.ts";
 
@@ -82,6 +83,7 @@ function gitAt(
 		...(abort ? { abort } : {}),
 		env: {
 			...envWithoutRepoLocation(),
+			...gitCeilingEnv(cwd),
 			GIT_OPTIONAL_LOCKS: "0",
 			GIT_LITERAL_PATHSPECS: "1",
 			...env,
@@ -113,11 +115,12 @@ async function repoAt(cwd: string): Promise<Repo | null> {
 	if (!root || !index || !snapshotIndex) return null;
 	const real = await realpath(cwd).catch(() => "");
 	const sameFolder = real === root || real.toLowerCase() === root.toLowerCase();
+	if (!sameFolder) return null;
 	return {
 		root,
 		index: resolve(cwd, index),
 		snapshotIndex: resolve(cwd, snapshotIndex),
-		shownRoot: sameFolder ? cwd.replace(/[\\/]+$/, "") : root,
+		shownRoot: cwd.replace(/[\\/]+$/, ""),
 	};
 }
 

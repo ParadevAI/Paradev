@@ -7,6 +7,7 @@ import { syncPullRequestAfterWrite } from "../shared/sync-after-write";
 
 const setDraftInputSchema = z.object({
 	projectId: z.string(),
+	repositoryId: z.string().optional(),
 	prNumber: z.number().int().positive(),
 	draft: z.boolean(),
 });
@@ -15,7 +16,11 @@ const setDraftInputSchema = z.object({
 export const setDraft = protectedProcedure
 	.input(setDraftInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
 		const action = input.draft ? "draft" : "ready";
 		try {
 			await execGh([

@@ -173,7 +173,7 @@ describe("GitWatcher batching bounds", () => {
 
 		internals(watcher).addWorktreePaths("w", [...paths, "one-more"]);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events[1]).toEqual({ workspaceId: "w" });
+		expect(events[1]).toEqual({ workspaceId: "w", repositoryId: null });
 	});
 
 	test("two sub-cap batches in one window that together exceed the cap go broad", () => {
@@ -190,7 +190,7 @@ describe("GitWatcher batching bounds", () => {
 			Array.from({ length: 100 }, (_, i) => `b${i}`),
 		);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "w" }]);
+		expect(events).toEqual([{ workspaceId: "w", repositoryId: null }]);
 	});
 
 	test("a broad worktree batch followed by one .git event flushes on the short window", () => {
@@ -200,7 +200,7 @@ describe("GitWatcher batching bounds", () => {
 		internals(watcher).markWorktreeBroad("w");
 		internals(watcher).handleGitDirEvent("w", "index");
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "w" }]);
+		expect(events).toEqual([{ workspaceId: "w", repositoryId: null }]);
 	});
 
 	test("a broad worktree batch plus a steady .git event stream still flushes within the wide window", () => {
@@ -243,9 +243,15 @@ describe("GitWatcher batching bounds", () => {
 		});
 		internals(watcher).addWorktreePaths("w", ["first"]);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "w", paths: ["first"] }]);
+		expect(events).toEqual([
+			{ workspaceId: "w", repositoryId: null, paths: ["first"] },
+		]);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events[1]).toEqual({ workspaceId: "w", paths: ["from-listener"] });
+		expect(events[1]).toEqual({
+			workspaceId: "w",
+			repositoryId: null,
+			paths: ["from-listener"],
+		});
 	});
 
 	test("close() with a pending batch never emits and leaves no timer", () => {
@@ -293,6 +299,8 @@ describe("GitWatcher batching bounds", () => {
 		const nfd = "café.txt";
 		internals(watcher).addWorktreePaths("w", ["", nfd]);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "w", paths: [nfd] }]);
+		expect(events).toEqual([
+			{ workspaceId: "w", repositoryId: null, paths: [nfd] },
+		]);
 	});
 });

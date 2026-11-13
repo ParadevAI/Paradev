@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const searchBranchesInputSchema = z.object({
 	projectId: z.string(),
+	/** Defaults to the primary repository. */
+	repositoryId: z.string().optional(),
 	query: z.string().optional(),
 	cursor: z.string().optional(),
 	limit: z.number().min(1).max(200).optional(),

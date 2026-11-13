@@ -4,8 +4,9 @@ import { homedir } from "node:os";
 import { basename, join } from "node:path";
 import { MAX_BACKFILL_DAYS } from "@superset/trpc/leaderboard-periods";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { projects, workspaces } from "../../../db/schema";
+import { projects, repositories, workspaces } from "../../../db/schema";
 import { WorkerPoolUnavailableError } from "../../../workers/host-worker-pool";
 import {
 	leaderboardPayloadTask,
@@ -378,20 +379,29 @@ export const usageRouter = router({
 						})
 						.from(workspaces)
 						.all();
-					const projectRows = ctx.db
+					const repositoryRows = ctx.db
 						.select({
-							id: projects.id,
-							repoPath: projects.repoPath,
-							name: projects.name,
+							projectId: projects.id,
+							projectName: projects.name,
+							primaryRepositoryId: projects.primaryRepositoryId,
+							repositoryId: repositories.id,
+							repoPath: repositories.repoPath,
 						})
-						.from(projects)
+						.from(repositories)
+						.innerJoin(projects, eq(projects.id, repositories.projectId))
 						.all();
-					const projectNameById = new Map(
-						projectRows.map((row) => [
-							row.id,
-							row.name || basename(row.repoPath),
-						]),
-					);
+					const projectNameById = new Map<string, string>();
+					for (const row of repositoryRows) {
+						if (
+							row.projectName ||
+							row.repositoryId === row.primaryRepositoryId
+						) {
+							projectNameById.set(
+								row.projectId,
+								row.projectName || basename(row.repoPath),
+							);
+						}
+					}
 					const cwdLabels = [
 						...workspaceRows.map((row) => ({
 							prefix: row.worktreePath,
@@ -403,8 +413,9 @@ export const usageRouter = router({
 						})),
 						// A repo checkout groups with its own project so the project
 						// rollup includes work done directly in the main checkout.
-						...projectRows.map((row) => {
-							const label = row.name || basename(row.repoPath);
+						...repositoryRows.map((row) => {
+							const label =
+								projectNameById.get(row.projectId) ?? basename(row.repoPath);
 							return {
 								prefix: row.repoPath,
 								label,

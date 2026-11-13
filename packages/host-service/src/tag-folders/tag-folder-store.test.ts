@@ -4,9 +4,9 @@ import { resolve } from "node:path";
 import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject } from "../../test/helpers/seed";
 import type { HostDb } from "../db";
 import * as schema from "../db/schema";
-import { projects } from "../db/schema";
 import type { EventBus } from "../events";
 import type { TagFoldersChangedMessage } from "../events/types";
 import {
@@ -28,9 +28,7 @@ function createHarness() {
 	// bun:sqlite's drizzle type differs from the better-sqlite3-based HostDb,
 	// but the query surface used here is identical (same cast as other tests).
 	const db = rawDb as unknown as HostDb;
-	db.insert(projects)
-		.values({ id: PROJECT, repoPath: "/tmp/repo", createdAt: 1 })
-		.run();
+	seedProject({ db }, { id: PROJECT, repoPath: "/tmp/repo" });
 	const messages: TagFoldersChangedMessage[] = [];
 	const eventBus = {
 		broadcastTagFoldersChanged: (

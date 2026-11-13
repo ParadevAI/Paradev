@@ -21,8 +21,9 @@ import { after, before, describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { Server } from "@superset/pty-daemon";
 import { buildPromptCommandString } from "@superset/shared/agent-prompt-launch";
+import { seedProject } from "../../test/helpers/seed.ts";
 import { createDb, type HostDb } from "../db/index.ts";
-import { projects, workspaces } from "../db/schema.ts";
+import { workspaces } from "../db/schema.ts";
 import { disposeDaemonClient } from "./daemon-client-singleton.ts";
 import { initTerminalBaseEnv } from "./env.ts";
 import {
@@ -115,7 +116,7 @@ before(async () => {
 
 	const projectId = randomUUID();
 	workspaceId = randomUUID();
-	db.insert(projects).values({ id: projectId, repoPath: worktreePath }).run();
+	seedProject({ db }, { id: projectId, repoPath: worktreePath });
 	db.insert(workspaces)
 		.values({
 			id: workspaceId,

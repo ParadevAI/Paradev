@@ -1,15 +1,14 @@
 import { basename } from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import type { HostDb } from "../db";
-import type { RepositorySnapshot } from "../events/types";
 import { projects, repositories } from "../db/schema";
+import type { RepositorySnapshot } from "../events/types";
 import { getPathState } from "../runtime/path-state";
 import { parseSparseCheckoutPaths } from "../trpc/router/workspace-creation/shared/sparse-checkout";
 
 export type { RepositorySnapshot };
 
 export type HostRepositoryRow = typeof repositories.$inferSelect;
-
 
 /** The folder a repository's checkout gets in a multi-repo workspace. */
 export function repositoryName(input: {
@@ -55,11 +54,7 @@ export function getRepository(
 	db: HostDb,
 	id: string,
 ): HostRepositoryRow | undefined {
-	return db
-		.select()
-		.from(repositories)
-		.where(eq(repositories.id, id))
-		.get();
+	return db.select().from(repositories).where(eq(repositories.id, id)).get();
 }
 
 export function getPrimaryRepository(

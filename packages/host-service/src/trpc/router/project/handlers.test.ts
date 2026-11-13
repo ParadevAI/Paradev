@@ -10,7 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { TRPCError } from "@trpc/server";
 import type { HostServiceContext } from "../../../types";
-import { createFromClone, createFromEmpty } from "./handlers";
+import { createProject } from "./handlers";
 
 const COMMAND_LINE_TOOLS_STUB_OUTPUT =
 	"xcode-select: note: No developer tools were found, requesting install.\n" +
@@ -39,14 +39,15 @@ function useGitWithoutCommandLineTools(): void {
 	process.env.PATH = binDir;
 }
 
-describe("createFromEmpty", () => {
+describe("createProject with an empty repository", () => {
 	it("reports missing Command Line Tools as a classified git error", async () => {
 		const parentDir = mkdtempSync(join(tmpdir(), "empty-project-"));
 		tempDirs.push(parentDir);
 		useGitWithoutCommandLineTools();
 
-		const error = (await createFromEmpty({} as HostServiceContext, {
+		const error = (await createProject({} as HostServiceContext, {
 			name: "hello",
+			repositories: [{ kind: "empty", name: "hello" }],
 			parentDir,
 		}).catch((err: unknown) => err)) as TRPCError;
 
@@ -59,16 +60,18 @@ describe("createFromEmpty", () => {
 	});
 });
 
-describe("createFromClone", () => {
+describe("createProject with a clone", () => {
 	it("reports missing Command Line Tools as a classified git error", async () => {
 		const parentDir = mkdtempSync(join(tmpdir(), "clone-project-"));
 		tempDirs.push(parentDir);
 		useGitWithoutCommandLineTools();
 
-		const error = (await createFromClone({} as HostServiceContext, {
+		const error = (await createProject({} as HostServiceContext, {
 			name: "Hello-World",
+			repositories: [
+				{ kind: "clone", url: "https://github.com/octocat/Hello-World" },
+			],
 			parentDir,
-			url: "https://github.com/octocat/Hello-World",
 		}).catch((err: unknown) => err)) as TRPCError;
 
 		expect(error.code).toBe("PRECONDITION_FAILED");

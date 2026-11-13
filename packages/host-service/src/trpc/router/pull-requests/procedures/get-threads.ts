@@ -9,6 +9,7 @@ import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpe
 
 const getThreadsInputSchema = z.object({
 	projectId: z.string(),
+	repositoryId: z.string().optional(),
 	prNumber: z.number().int().positive(),
 });
 
@@ -19,7 +20,11 @@ const getThreadsInputSchema = z.object({
 export const getThreads = protectedProcedure
 	.input(getThreadsInputSchema)
 	.query(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
 		const octokit = await ctx.github();
 
 		try {

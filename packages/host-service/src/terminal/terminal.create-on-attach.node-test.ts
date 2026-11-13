@@ -23,10 +23,10 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { Server } from "@superset/pty-daemon";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { seedProject } from "../../test/helpers/seed.ts";
 import { createDb, type HostDb } from "../db/index.ts";
 import {
 	hostAgentConfigs,
-	projects,
 	terminalAgentBindings,
 	terminalSessions,
 	workspaces,
@@ -143,7 +143,7 @@ before(async () => {
 
 	const projectId = randomUUID();
 	workspaceId = randomUUID();
-	db.insert(projects).values({ id: projectId, repoPath: worktreePath }).run();
+	seedProject({ db }, { id: projectId, repoPath: worktreePath });
 	db.insert(workspaces)
 		.values({ id: workspaceId, projectId, worktreePath, branch: "main" })
 		.run();
@@ -267,9 +267,7 @@ test("concurrent create=1 dials from different workspaces don't share a shell", 
 	const otherWorktree = path.join(TEST_HOME, "worktree-b");
 	fs.mkdirSync(otherWorktree, { recursive: true });
 	const otherProjectId = randomUUID();
-	db.insert(projects)
-		.values({ id: otherProjectId, repoPath: otherWorktree })
-		.run();
+	seedProject({ db }, { id: otherProjectId, repoPath: otherWorktree });
 	db.insert(workspaces)
 		.values({
 			id: otherWorkspaceId,

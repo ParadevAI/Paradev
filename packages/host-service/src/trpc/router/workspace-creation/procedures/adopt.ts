@@ -6,10 +6,8 @@ import {
 	getWorktreeBranchAtPath,
 	listWorktreeBranches,
 } from "../shared/branch-search";
-import {
-	requireLocalProject,
-	requireProjectRepoPath,
-} from "../shared/local-project";
+import { requireRepositoryPath } from "../shared/local-project";
+import { requireProjectRepository } from "../shared/project-helpers";
 import type { TerminalDescriptor } from "../shared/types";
 
 /**
@@ -22,8 +20,8 @@ import type { TerminalDescriptor } from "../shared/types";
 export const adopt = protectedProcedure
 	.input(adoptInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const localProject = requireLocalProject(ctx, input.projectId);
-		const repoPath = requireProjectRepoPath(localProject);
+		const { repository } = requireProjectRepository(ctx, input.projectId);
+		const repoPath = requireRepositoryPath(repository);
 
 		let branch = input.branch.trim();
 		if (!branch) {
@@ -68,6 +66,7 @@ export const adopt = protectedProcedure
 			ctx,
 			git,
 			projectId: input.projectId,
+			repository,
 			branch,
 			worktreePath,
 			workspaceName: input.workspaceName,

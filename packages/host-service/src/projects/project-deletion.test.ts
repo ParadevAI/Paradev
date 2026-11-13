@@ -12,12 +12,15 @@ import { join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject, seedRepository } from "../../test/helpers/seed";
 import type { HostDb } from "../db";
 import * as schema from "../db/schema";
 import {
 	projects,
+	repositories,
 	terminalAgentBindings,
 	terminalSessions,
+	workspaceRepositories,
 	workspaces,
 } from "../db/schema";
 import { runArchivedWorkspaceReconcile } from "../runtime/archived-workspace-reconcile";
@@ -51,7 +54,10 @@ function setup() {
 	const dir = mkdtempSync(join(root, "case-"));
 	const repoPath = join(dir, "repo");
 	mkdirSync(repoPath);
-	db.insert(projects).values({ id: PROJECT_ID, repoPath, name: "demo" }).run();
+	const { repositoryId } = seedProject(
+		{ db },
+		{ id: PROJECT_ID, repoPath, name: "demo" },
+	);
 	const addWorkspace = (
 		id: string,
 		values: Partial<typeof workspaces.$inferInsert> = {},
@@ -68,6 +74,10 @@ function setup() {
 				...values,
 			})
 			.run();
+		if ((values.projectId ?? PROJECT_ID) === PROJECT_ID)
+			db.insert(workspaceRepositories)
+				.values({ workspaceId: id, repositoryId, branch: id })
+				.run();
 		return worktreePath;
 	};
 	const events: { kind: string; id: string; type: string }[] = [];
@@ -323,6 +333,49 @@ describe("purge", () => {
 });
 
 describe("delete permanently", () => {
+	test("removes every checkout of a multi-repo workspace, then its root", async () => {
+		const { ctx, db, gitCalls, repoPath } = setup();
+		const apiRepo = `${repoPath}-api`;
+		mkdirSync(apiRepo);
+		const api = seedRepository({ db }, PROJECT_ID, {
+			repoPath: apiRepo,
+			name: "api",
+		});
+		const primary = db.select().from(repositories).all()[0];
+		const root = mkdtempSync(join(tmpdir(), "purge-multi-"));
+		db.insert(workspaces)
+			.values({
+				id: "multi",
+				projectId: PROJECT_ID,
+				worktreePath: root,
+				branch: "f",
+				name: "multi",
+			})
+			.run();
+		for (const repository of [primary, api]) {
+			db.insert(workspaceRepositories)
+				.values({
+					workspaceId: "multi",
+					repositoryId: repository?.id ?? "",
+					branch: "f",
+				})
+				.run();
+		}
+		mkdirSync(join(root, "api"));
+		mkdirSync(join(root, primary?.name ?? ""));
+		writeFileSync(join(root, "AGENTS.md"), "# Workspace\n");
+		writeFileSync(join(root, "CLAUDE.md"), "@AGENTS.md\n");
+
+		await softDeleteProject(ctx, PROJECT_ID);
+		expect(await purgeDeletedProject(ctx, PROJECT_ID)).toBe(true);
+
+		expect(gitCalls.map((call) => call[2]).sort()).toEqual(
+			[join(root, "api"), join(root, primary?.name ?? "")].sort(),
+		);
+		expect(existsSync(root)).toBe(false);
+		expect(existsSync(apiRepo)).toBe(true);
+	});
+
 	test("purges a deleted project right away", async () => {
 		const { ctx, addWorkspace, gitCalls, project, repoPath } = setup();
 		const live = addWorkspace("live");

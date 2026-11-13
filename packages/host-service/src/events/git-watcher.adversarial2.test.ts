@@ -85,7 +85,11 @@ describe("round 2: flush deadline", () => {
 		expect(events).toHaveLength(1);
 		jest.advanceTimersByTime(1);
 		expect(events).toHaveLength(2);
-		expect(events[1]).toEqual({ workspaceId: "w", paths: ["b"] });
+		expect(events[1]).toEqual({
+			workspaceId: "w",
+			repositoryId: null,
+			paths: ["b"],
+		});
 		jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS * 3);
 		expect(events).toHaveLength(2);
 		expectIdle(watcher);
@@ -126,13 +130,17 @@ describe("round 2: flush deadline", () => {
 			jest.advanceTimersByTime(200);
 		}
 		expect(events).toHaveLength(1);
-		expect(events[0]).toEqual({ workspaceId: "w", paths: ["x"] });
+		expect(events[0]).toEqual({
+			workspaceId: "w",
+			repositoryId: null,
+			paths: ["x"],
+		});
 		expect(internals(watcher).pendingBatches.size).toBe(1);
 		jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS - 1);
 		expect(events).toHaveLength(1);
 		jest.advanceTimersByTime(1);
 		expect(events).toHaveLength(2);
-		expect(events[1]).toEqual({ workspaceId: "w" });
+		expect(events[1]).toEqual({ workspaceId: "w", repositoryId: null });
 		expectIdle(watcher);
 	});
 
@@ -166,7 +174,9 @@ describe("round 2: flush deadline", () => {
 		internals(watcher).addWorktreePaths("w", ["new"]);
 		jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS * 2);
 		errors.mockRestore();
-		expect(events).toEqual([{ workspaceId: "w", paths: ["new"] }]);
+		expect(events).toEqual([
+			{ workspaceId: "w", repositoryId: null, paths: ["new"] },
+		]);
 		expectIdle(watcher);
 	});
 
@@ -186,7 +196,10 @@ describe("round 2: flush deadline", () => {
 			}
 		}
 		expect(events).toHaveLength(2);
-		expect(events).toEqual([{ workspaceId: "w" }, { workspaceId: "w" }]);
+		expect(events).toEqual([
+			{ workspaceId: "w", repositoryId: null },
+			{ workspaceId: "w", repositoryId: null },
+		]);
 		expectIdle(watcher);
 	});
 
@@ -225,12 +238,14 @@ describe("round 2: flush deadline", () => {
 		jest.advanceTimersByTime(100);
 		internals(watcher).handleGitDirEvent("b", "index");
 		jest.advanceTimersByTime(DEBOUNCE_MS - 100);
-		expect(events).toEqual([{ workspaceId: "a", paths: ["a1"] }]);
+		expect(events).toEqual([
+			{ workspaceId: "a", repositoryId: null, paths: ["a1"] },
+		]);
 		watcher.unwatchWorkspace("a");
 		jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS);
 		expect(events).toEqual([
-			{ workspaceId: "a", paths: ["a1"] },
-			{ workspaceId: "b" },
+			{ workspaceId: "a", repositoryId: null, paths: ["a1"] },
+			{ workspaceId: "b", repositoryId: null },
 		]);
 		expectIdle(watcher);
 	});

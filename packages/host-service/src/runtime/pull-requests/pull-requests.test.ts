@@ -3,7 +3,7 @@ import { describe, expect, setSystemTime, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../db";
@@ -21,6 +21,7 @@ import type { WorkspaceRefsSnapshot } from "./utils/workspace-refs";
 // on purpose.
 const MIGRATIONS_FOLDER = resolve(import.meta.dir, "../../../drizzle");
 const PROJECT_ID = "project-1";
+const REPO_ID = "repository-1";
 const REPO = { owner: "base-owner", name: "base-repo" };
 
 function createRealDb(): HostDb {
@@ -35,30 +36,38 @@ function seedProject(db: HostDb) {
 	db.insert(schema.projects)
 		.values({
 			id: PROJECT_ID,
-			repoPath: "/repo",
+			primaryRepositoryId: REPO_ID,
 			createdAt: Date.now(),
-			repoProvider: "github",
-			repoOwner: REPO.owner,
+		})
+		.run();
+	db.insert(schema.repositories)
+		.values({
+			id: REPO_ID,
+			projectId: PROJECT_ID,
+			name: REPO.name,
+			repoPath: "/repo",
+			provider: "github",
+			owner: REPO.owner,
 			repoName: REPO.name,
-			repoUrl: `https://github.com/${REPO.owner}/${REPO.name}.git`,
+			url: `https://github.com/${REPO.owner}/${REPO.name}.git`,
 			remoteName: "origin",
 		})
 		.run();
 }
 
+interface SeedCheckout {
+	branch: string;
+	headSha?: string | null;
+	upstreamOwner?: string | null;
+	upstreamRepo?: string | null;
+	upstreamBranch?: string | null;
+	pullRequestId?: string | null;
+}
+
+/** A workspace with one checkout of the project's repository. */
 function seedWorkspace(
 	db: HostDb,
-	w: {
-		id: string;
-		branch: string;
-		headSha?: string | null;
-		upstreamOwner?: string | null;
-		upstreamRepo?: string | null;
-		upstreamBranch?: string | null;
-		pullRequestId?: string | null;
-		worktreePath?: string;
-		parentWorkspaceId?: string;
-	},
+	w: SeedCheckout & { id: string; worktreePath?: string },
 ) {
 	db.insert(schema.workspaces)
 		.values({
@@ -67,13 +76,45 @@ function seedWorkspace(
 			worktreePath: w.worktreePath ?? `/repo/.worktrees/${w.id}`,
 			branch: w.branch,
 			createdAt: Date.now(),
-			headSha: w.headSha ?? null,
-			upstreamOwner: w.upstreamOwner ?? null,
-			upstreamRepo: w.upstreamRepo ?? null,
-			upstreamBranch: w.upstreamBranch ?? null,
-			pullRequestId: w.pullRequestId ?? null,
-			parentWorkspaceId: w.parentWorkspaceId ?? null,
 		})
+		.run();
+	seedCheckout(db, w.id, REPO_ID, w);
+}
+
+function seedCheckout(
+	db: HostDb,
+	workspaceId: string,
+	repositoryId: string,
+	c: SeedCheckout,
+) {
+	db.insert(schema.workspaceRepositories)
+		.values({
+			workspaceId,
+			repositoryId,
+			branch: c.branch,
+			headSha: c.headSha ?? null,
+			upstreamOwner: c.upstreamOwner ?? null,
+			upstreamRepo: c.upstreamRepo ?? null,
+			upstreamBranch: c.upstreamBranch ?? null,
+			pullRequestId: c.pullRequestId ?? null,
+		})
+		.run();
+}
+
+function updateCheckout(
+	db: HostDb,
+	workspaceId: string,
+	values: Partial<typeof schema.workspaceRepositories.$inferInsert>,
+	repositoryId = REPO_ID,
+) {
+	db.update(schema.workspaceRepositories)
+		.set(values)
+		.where(
+			and(
+				eq(schema.workspaceRepositories.workspaceId, workspaceId),
+				eq(schema.workspaceRepositories.repositoryId, repositoryId),
+			),
+		)
 		.run();
 }
 
@@ -90,18 +131,21 @@ function seedPullRequest(
 		checksStatus?: string;
 		checksJson?: string;
 		mergedAt?: number | null;
+		repositoryId?: string;
+		repo?: { owner: string; name: string };
 	},
 ) {
+	const repo = pr.repo ?? REPO;
 	db.insert(schema.pullRequests)
 		.values({
 			mergedAt: pr.mergedAt ?? null,
 			id: pr.id,
-			projectId: PROJECT_ID,
+			repositoryId: pr.repositoryId ?? REPO_ID,
 			repoProvider: "github",
-			repoOwner: REPO.owner,
-			repoName: REPO.name,
+			repoOwner: repo.owner,
+			repoName: repo.name,
 			prNumber: pr.prNumber,
-			url: `https://github.com/${REPO.owner}/${REPO.name}/pull/${pr.prNumber}`,
+			url: `https://github.com/${repo.owner}/${repo.name}/pull/${pr.prNumber}`,
 			title: pr.title ?? `PR ${pr.prNumber}`,
 			state: pr.state ?? "open",
 			headBranch: pr.headBranch,
@@ -115,8 +159,25 @@ function seedPullRequest(
 		.run();
 }
 
-function getWorkspace(db: HostDb, id: string) {
-	return db.select().from(workspaces).where(eq(workspaces.id, id)).get();
+/** The workspace row overlaid with its checkout of `repositoryId`. */
+function getWorkspace(db: HostDb, id: string, repositoryId = REPO_ID) {
+	const workspace = db
+		.select()
+		.from(workspaces)
+		.where(eq(workspaces.id, id))
+		.get();
+	const checkout = db
+		.select()
+		.from(schema.workspaceRepositories)
+		.where(
+			and(
+				eq(schema.workspaceRepositories.workspaceId, id),
+				eq(schema.workspaceRepositories.repositoryId, repositoryId),
+			),
+		)
+		.get();
+	if (!workspace || !checkout) return undefined;
+	return { ...workspace, ...checkout, workspaceBranch: workspace.branch };
 }
 
 function getPrById(db: HostDb, id: string) {
@@ -251,7 +312,7 @@ describe("PullRequestRuntimeManager direct checkout PR linking", () => {
 
 		const prId = await manager.linkWorkspaceToCheckoutPullRequest({
 			workspaceId: "ws",
-			projectId: PROJECT_ID,
+			repositoryId: REPO_ID,
 			pullRequest: {
 				number: 42,
 				url: "https://github.com/base-owner/base-repo/pull/42",
@@ -287,7 +348,7 @@ describe("PullRequestRuntimeManager direct checkout PR linking", () => {
 
 		const prId = await manager.linkWorkspaceToCheckoutPullRequest({
 			workspaceId: "ws",
-			projectId: PROJECT_ID,
+			repositoryId: REPO_ID,
 			pullRequest: {
 				number: 42,
 				url: "https://github.com/base-owner/base-repo/pull/42",
@@ -320,7 +381,7 @@ describe("PullRequestRuntimeManager direct checkout PR linking", () => {
 
 		await manager.linkWorkspaceToCheckoutPullRequest({
 			workspaceId: "ws",
-			projectId: PROJECT_ID,
+			repositoryId: REPO_ID,
 			pullRequest: {
 				number: 42,
 				url: "https://github.com/base-owner/base-repo/pull/42",
@@ -333,10 +394,7 @@ describe("PullRequestRuntimeManager direct checkout PR linking", () => {
 				isCrossRepository: true,
 			},
 		});
-		db.update(workspaces)
-			.set({ headSha: "def456" })
-			.where(eq(workspaces.id, "ws"))
-			.run();
+		updateCheckout(db, "ws", { headSha: "def456" });
 
 		await manager.refreshPullRequestsByWorkspaces(["ws"]);
 
@@ -530,7 +588,7 @@ describe("PullRequestRuntimeManager mergedAt attribution", () => {
 
 			const prId = await manager.linkWorkspaceToCheckoutPullRequest({
 				workspaceId: "ws",
-				projectId: PROJECT_ID,
+				repositoryId: REPO_ID,
 				pullRequest: {
 					number: 42,
 					url: "https://github.com/base-owner/base-repo/pull/42",
@@ -559,7 +617,7 @@ describe("PullRequestRuntimeManager mergedAt attribution", () => {
 
 			const prId = await manager.linkWorkspaceToCheckoutPullRequest({
 				workspaceId: "ws",
-				projectId: PROJECT_ID,
+				repositoryId: REPO_ID,
 				pullRequest: {
 					number: 42,
 					url: "https://github.com/base-owner/base-repo/pull/42",
@@ -594,7 +652,7 @@ describe("PullRequestRuntimeManager mergedAt attribution", () => {
 
 		const prId = await manager.linkWorkspaceToCheckoutPullRequest({
 			workspaceId: "ws",
-			projectId: PROJECT_ID,
+			repositoryId: REPO_ID,
 			pullRequest: {
 				number: 42,
 				url: "https://github.com/base-owner/base-repo/pull/42",
@@ -644,7 +702,7 @@ describe("PullRequestRuntimeManager unlink", () => {
 			}),
 		});
 
-		manager.unlinkWorkspacePullRequest("ws");
+		manager.unlinkWorkspacePullRequest("ws", REPO_ID);
 
 		const unlinked = getWorkspace(db, "ws");
 		expect(unlinked?.pullRequestId).toBeNull();
@@ -669,7 +727,7 @@ describe("PullRequestRuntimeManager unlink", () => {
 			}),
 		});
 
-		manager.unlinkWorkspacePullRequest("ws");
+		manager.unlinkWorkspacePullRequest("ws", REPO_ID);
 		await manager.refreshPullRequestsByWorkspaces(["ws"]);
 
 		const ws = getWorkspace(db, "ws");
@@ -683,7 +741,7 @@ describe("PullRequestRuntimeManager unlink", () => {
 		seedLinkedWorkspace(db);
 		const manager = createManager(db);
 
-		manager.unlinkWorkspacePullRequest("ws");
+		manager.unlinkWorkspacePullRequest("ws", REPO_ID);
 		db.delete(pullRequests).where(eq(pullRequests.id, "pr-1")).run();
 
 		expect(getWorkspace(db, "ws")?.suppressedPullRequestId).toBeNull();
@@ -695,10 +753,10 @@ describe("PullRequestRuntimeManager unlink", () => {
 		seedLinkedWorkspace(db);
 		const manager = createManager(db);
 
-		manager.unlinkWorkspacePullRequest("ws");
+		manager.unlinkWorkspacePullRequest("ws", REPO_ID);
 		await manager.linkWorkspaceToCheckoutPullRequest({
 			workspaceId: "ws",
-			projectId: PROJECT_ID,
+			repositoryId: REPO_ID,
 			pullRequest: {
 				number: 101,
 				url: "https://github.com/base-owner/base-repo/pull/101",
@@ -1149,10 +1207,10 @@ describe("PullRequestRuntimeManager refresh", () => {
 				throw new Error("octokit must not run during an outage");
 			}) as never,
 		});
-		const refreshProject = projectRefresher(manager);
+		const refreshRepository = projectRefresher(manager);
 
 		// Warm every cache while online: head lookup, reviews, checks, queue.
-		await withSilencedWarnings(() => refreshProject(PROJECT_ID));
+		await withSilencedWarnings(() => refreshRepository(REPO_ID));
 		expect(getWorkspace(db, "ws")?.pullRequestId).not.toBeNull();
 		const warmAttempts = ghAttempts;
 
@@ -1169,7 +1227,7 @@ describe("PullRequestRuntimeManager refresh", () => {
 		const heldAttempts = ghAttempts;
 
 		// While held, polling spawns nothing at all.
-		await withSilencedWarnings(() => refreshProject(PROJECT_ID));
+		await withSilencedWarnings(() => refreshRepository(REPO_ID));
 		expect(ghAttempts).toBe(heldAttempts);
 		expect(octokitAttempts).toBe(0);
 	});
@@ -1221,8 +1279,8 @@ describe("PullRequestRuntimeManager refresh", () => {
 				githubGate: GitHubAvailabilityGate;
 			};
 			accessible.githubGate = gate;
-			const refreshProject = projectRefresher(manager);
-			await withSilencedWarnings(() => refreshProject(PROJECT_ID));
+			const refreshRepository = projectRefresher(manager);
+			await withSilencedWarnings(() => refreshRepository(REPO_ID));
 			expect(getWorkspace(db, "ws")?.pullRequestId).not.toBeNull();
 			warming = false;
 			const offline = Object.assign(new Error("offline"), {
@@ -1233,7 +1291,7 @@ describe("PullRequestRuntimeManager refresh", () => {
 			// that success is what resets the streak to the base window.
 			now = 61_000;
 			setSystemTime(new Date(t0 + 61_000));
-			await withSilencedWarnings(() => refreshProject(PROJECT_ID));
+			await withSilencedWarnings(() => refreshRepository(REPO_ID));
 			expect(gate.recordFailure(offline)).toEqual({
 				reason: "unreachable",
 				opened: true,
@@ -1506,8 +1564,8 @@ describe("case-variant branch isolation", () => {
 
 		// refreshProject (private) uses the cache (bypassCache defaults false).
 		await (
-			manager as unknown as { refreshProject: (id: string) => Promise<void> }
-		).refreshProject(PROJECT_ID);
+			manager as unknown as { refreshRepository: (id: string) => Promise<void> }
+		).refreshRepository(REPO_ID);
 
 		expect(getWorkspace(db, "ws-lower")?.pullRequestId).toBe(
 			getPrByNumber(db, 101)?.id,
@@ -1652,7 +1710,11 @@ describe("default-branch guard", () => {
 		const [entry] = await manager.getPullRequestHistoryByWorkspaces([
 			"ws-main",
 		]);
-		return entry?.pullRequests.map((pr) => pr.number) ?? [];
+		return (
+			entry?.checkouts.flatMap((checkout) =>
+				checkout.pullRequests.map((pr) => pr.number),
+			) ?? []
+		);
 	}
 
 	test("drops a head=main PR linked after it merged from the default-branch workspace's link history", async () => {
@@ -2131,42 +2193,46 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 			manager.refreshPullRequestsByWorkspaces(["ws"]),
 		);
 		const first = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(first[0]?.pullRequests.map((pr) => pr.number)).toEqual([101]);
-		expect(first[0]?.pullRequests[0]?.isCurrent).toBe(true);
+		expect(first[0]?.checkouts[0]?.pullRequests.map((pr) => pr.number)).toEqual(
+			[101],
+		);
+		expect(first[0]?.checkouts[0]?.pullRequests[0]?.isCurrent).toBe(true);
 
 		// The workspace moves on: new branch, new PR. The pointer follows;
 		// the history keeps both.
-		db.update(workspaces)
-			.set({
-				branch: "branch-b",
-				headSha: "sha-branch-b",
-				upstreamBranch: "branch-b",
-			})
-			.where(eq(workspaces.id, "ws"))
-			.run();
+		updateCheckout(db, "ws", {
+			branch: "branch-b",
+			headSha: "sha-branch-b",
+			upstreamBranch: "branch-b",
+		});
 		prsByBranch.set("branch-b", 102);
 		await withSilencedWarnings(() =>
 			manager.refreshPullRequestsByWorkspaces(["ws"]),
 		);
 
 		const both = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(both[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
-		expect(both[0]?.pullRequests.map((pr) => pr.isCurrent)).toEqual([
-			true,
-			false,
+		expect(both[0]?.checkouts[0]?.pullRequests.map((pr) => pr.number)).toEqual([
+			102, 101,
 		]);
+		expect(
+			both[0]?.checkouts[0]?.pullRequests.map((pr) => pr.isCurrent),
+		).toEqual([true, false]);
 		const current = await manager.getPullRequestsByWorkspaces(["ws"]);
-		expect(current[0]?.pullRequest?.number).toBe(102);
+		expect(current[0]?.checkouts[0]?.pullRequest?.number).toBe(102);
 
 		// Remove PR Link: the sidebar loses the pointer; history keeps 102.
-		manager.unlinkWorkspacePullRequest("ws");
+		manager.unlinkWorkspacePullRequest("ws", REPO_ID);
 		const afterUnlink = await manager.getPullRequestsByWorkspaces(["ws"]);
-		expect(afterUnlink[0]?.pullRequest).toBeNull();
+		expect(afterUnlink[0]?.checkouts[0]?.pullRequest).toBeNull();
 		const history = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(history[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
-		expect(history[0]?.pullRequests.every((pr) => pr.isCurrent === false)).toBe(
-			true,
-		);
+		expect(
+			history[0]?.checkouts[0]?.pullRequests.map((pr) => pr.number),
+		).toEqual([102, 101]);
+		expect(
+			history[0]?.checkouts[0]?.pullRequests.every(
+				(pr) => pr.isCurrent === false,
+			),
+		).toBe(true);
 	});
 
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
@@ -2191,7 +2257,9 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		);
 
 		const history = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(history[0]?.pullRequests.map((pr) => pr.number)).toEqual([101]);
+		expect(
+			history[0]?.checkouts[0]?.pullRequests.map((pr) => pr.number),
+		).toEqual([101]);
 	});
 });
 
@@ -2199,9 +2267,9 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 // tell a cached answer from a refetch.
 function projectRefresher(manager: PullRequestRuntimeManager) {
 	const accessible = manager as unknown as {
-		refreshProject(projectId: string): Promise<void>;
+		refreshRepository(repositoryId: string): Promise<void>;
 	};
-	return accessible.refreshProject.bind(accessible);
+	return accessible.refreshRepository.bind(accessible);
 }
 
 test("revalidates unchanged PRs after the polling cache expires without falling back", async () => {
@@ -2247,19 +2315,19 @@ test("revalidates unchanged PRs after the polling cache expires without falling 
 	});
 	try {
 		setSystemTime(new Date("2026-10-04T12:00:00Z"));
-		await projectRefresher(manager)(PROJECT_ID);
+		await projectRefresher(manager)(REPO_ID);
 		const initialRequests = requests;
 		expect(initialRequests).toBeGreaterThan(0);
 		setSystemTime(new Date("2026-10-04T12:05:01Z"));
-		await projectRefresher(manager)(PROJECT_ID);
+		await projectRefresher(manager)(REPO_ID);
 		expect(notModified).toBe(initialRequests);
 		expect(requests).toBe(initialRequests * 2);
 		expect(fallbacks).toBe(0);
 		const [snapshot] = await manager.getPullRequestsByWorkspaces([
 			"ws-conditional",
 		]);
-		expect(snapshot?.pullRequest?.number).toBe(42);
-		expect(snapshot?.error).toBeNull();
+		expect(snapshot?.checkouts[0]?.pullRequest?.number).toBe(42);
+		expect(snapshot?.checkouts[0]?.error).toBeNull();
 	} finally {
 		setSystemTime();
 		manager.stop();
@@ -2321,9 +2389,9 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 				counts,
 			),
 		});
-		const refreshProject = projectRefresher(manager);
+		const refreshRepository = projectRefresher(manager);
 
-		await refreshProject(PROJECT_ID);
+		await refreshRepository(REPO_ID);
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
 		expect(counts).toEqual({
 			"head-lookup": 1,
@@ -2334,7 +2402,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 		});
 
 		// A second timer sweep inside the TTL costs nothing.
-		await refreshProject(PROJECT_ID);
+		await refreshRepository(REPO_ID);
 		expect(counts).toEqual({
 			"head-lookup": 1,
 			reviews: 1,
@@ -2374,12 +2442,12 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 					counts,
 				)(args),
 		});
-		const refreshProject = projectRefresher(manager);
+		const refreshRepository = projectRefresher(manager);
 		const cache = (
 			manager as unknown as { pullRequestDetailsCache: Map<string, unknown> }
 		).pullRequestDetailsCache;
 
-		await refreshProject(PROJECT_ID);
+		await refreshRepository(REPO_ID);
 		expect(counts.reviews).toBe(1);
 		expect(cache.size).toBe(1);
 
@@ -2476,7 +2544,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 
 			// Polling spawns nothing while the hold lasts.
 			const spawnsBeforeHold = ghSpawns;
-			await withSilencedWarnings(() => projectRefresher(manager)(PROJECT_ID));
+			await withSilencedWarnings(() => projectRefresher(manager)(REPO_ID));
 			expect(ghSpawns).toBe(spawnsBeforeHold);
 			// An explicit refresh probes once per workspace and, still limited,
 			// leaves the hold and the links exactly as they were.
@@ -2535,22 +2603,22 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 			},
 		});
 		try {
-			const refreshProject = projectRefresher(manager);
+			const refreshRepository = projectRefresher(manager);
 
 			// Trip the gate, then let several timer sweeps hit the hold: each
 			// would otherwise cache a rejection with a doubling TTL.
-			await withSilencedWarnings(() => refreshProject(PROJECT_ID));
+			await withSilencedWarnings(() => refreshRepository(REPO_ID));
 			expect(manager.getGithubStatus()?.reason).toBe("rate-limited");
 			for (let i = 1; i <= 3; i++) {
 				setSystemTime(new Date(t0 + i * 61_000));
-				await withSilencedWarnings(() => refreshProject(PROJECT_ID));
+				await withSilencedWarnings(() => refreshRepository(REPO_ID));
 			}
 			const spawnsDuringHold = ghSpawns;
 
 			// Just past the 5-minute hold, the timer path must ask GitHub again.
 			setSystemTime(new Date(t0 + 5 * 60_000 + 1));
 			quotaSpent = false;
-			await refreshProject(PROJECT_ID);
+			await refreshRepository(REPO_ID);
 			expect(ghSpawns).toBeGreaterThan(spawnsDuringHold);
 			expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
 			expect(manager.getGithubStatus()).toBeNull();
@@ -2621,7 +2689,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 
 		// The project-wide sweep still covers everyone (c is still cached).
 		headsLookedUp.length = 0;
-		await projectRefresher(manager)(PROJECT_ID);
+		await projectRefresher(manager)(REPO_ID);
 		expect([...headsLookedUp].sort()).toEqual([
 			`${REPO.owner}:a`,
 			`${REPO.owner}:b`,
@@ -2663,74 +2731,177 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 });
 
 describe("PullRequestRuntimeManager multi-repo workspace", () => {
-	function seedContainer(db: HostDb) {
+	const API_REPO_ID = "repository-api";
+	const API = { owner: REPO.owner, name: "api-repo" };
+	const prNumberByRepo: Record<string, number> = {
+		[REPO.name]: 201,
+		[API.name]: 202,
+	};
+
+	// Two checkouts on the same branch name, each in its own GitHub repository.
+	function seedTwoRepoWorkspace(db: HostDb) {
 		seedProject(db);
-		seedWorkspace(db, { id: "container", branch: "feature" });
-		for (const [id, prNumber] of [
-			["web", 201],
-			["api", 202],
-		] as const) {
-			seedPullRequest(db, {
-				id: `pr-${id}`,
-				prNumber,
-				headBranch: "feature",
-				headSha: `sha-${id}`,
-			});
-			seedWorkspace(db, {
-				id,
+		db.insert(schema.repositories)
+			.values({
+				id: API_REPO_ID,
+				projectId: PROJECT_ID,
+				name: API.name,
+				repoPath: "/api",
+				provider: "github",
+				owner: API.owner,
+				repoName: API.name,
+				url: `https://github.com/${API.owner}/${API.name}.git`,
+				remoteName: "origin",
+			})
+			.run();
+		db.insert(schema.workspaces)
+			.values({
+				id: "ws",
+				projectId: PROJECT_ID,
+				worktreePath: "/ws",
 				branch: "feature",
-				parentWorkspaceId: "container",
-				pullRequestId: `pr-${id}`,
-			});
-			db.insert(schema.workspacePullRequests)
-				.values({ workspaceId: id, pullRequestId: `pr-${id}`, linkedAt: 1 })
-				.run();
+			})
+			.run();
+		for (const repositoryId of [REPO_ID, API_REPO_ID]) {
+			seedCheckout(db, "ws", repositoryId, { branch: "feature" });
 		}
 	}
 
-	test("the container's history lists every checkout's pull request", async () => {
+	function perRepoGh() {
+		return async (args: string[]): Promise<unknown> => {
+			if (args.includes("graphql")) {
+				return {
+					data: { repository: { pullRequest: { mergeQueueEntry: null } } },
+				};
+			}
+			const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+			if (path.endsWith("/reviews")) return [];
+			if (path.endsWith("/check-runs")) return { check_runs: [] };
+			if (path.endsWith("/statuses")) return [];
+			const repoName = path.split("/")[2] ?? "";
+			const number = prNumberByRepo[repoName];
+			if (!number || !path.endsWith("/pulls")) return [];
+			const node = makePrNode({
+				number,
+				headRef: "feature",
+				headSha: `sha-${repoName}`,
+				headRepo: repoName,
+			});
+			return [
+				{
+					...node,
+					html_url: `https://github.com/${REPO.owner}/${repoName}/pull/${number}`,
+					base: { repo: { full_name: `${REPO.owner}/${repoName}` } },
+				},
+			];
+		};
+	}
+
+	// Each checkout reads refs in its own folder and tracks its own repository.
+	const readRefs = async (worktreePath: string) => {
+		const name = worktreePath.split("/").at(-1) ?? "";
+		return {
+			branch: "feature",
+			headSha: `sha-${name}`,
+			upstream: { owner: REPO.owner, name, branch: "feature" },
+		};
+	};
+
+	function linkedPrOf(db: HostDb, repositoryId: string) {
+		const id = getWorkspace(db, "ws", repositoryId)?.pullRequestId;
+		return id ? getPrById(db, id) : undefined;
+	}
+
+	test("each checkout links the PR of its own repository and branch", async () => {
 		const db = createRealDb();
-		seedContainer(db);
-		const [history] = await createManager(db).getPullRequestHistoryByWorkspaces(
-			["container"],
-		);
-
-		expect(history?.workspaceId).toBe("container");
-		expect(history?.pullRequests.map((pr) => pr.number).sort()).toEqual([
-			201, 202,
-		]);
-	});
-
-	test("removing the container's link removes every checkout's link", () => {
-		const db = createRealDb();
-		seedContainer(db);
-
-		createManager(db).unlinkWorkspacePullRequest("container");
-
-		expect(getWorkspace(db, "web")?.pullRequestId).toBeNull();
-		expect(getWorkspace(db, "api")?.pullRequestId).toBeNull();
-		expect(getWorkspace(db, "api")?.suppressedPullRequestId).toBe("pr-api");
-	});
-
-	test("refreshing the container re-reads every checkout, not its folder", async () => {
-		const db = createRealDb();
-		seedContainer(db);
+		seedTwoRepoWorkspace(db);
 		const read: string[] = [];
 		const manager = createManager(db, {
-			execGh: routeGh({}),
-			readWorkspaceRefs: async (worktreePath) => {
-				read.push(worktreePath);
-				return { branch: "feature", headSha: null, upstream: null };
+			execGh: perRepoGh(),
+			readWorkspaceRefs: (path) => {
+				read.push(path);
+				return readRefs(path);
 			},
 		});
 
 		await withSilencedWarnings(() =>
-			manager.refreshPullRequestsByWorkspaces(["container"]),
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
 		);
 
-		expect(read.sort()).toEqual([
-			"/repo/.worktrees/api",
-			"/repo/.worktrees/web",
+		expect(read.sort()).toEqual(["/ws/api-repo", "/ws/base-repo"]);
+		expect(linkedPrOf(db, REPO_ID)).toMatchObject({
+			prNumber: 201,
+			repoName: REPO.name,
+			repositoryId: REPO_ID,
+		});
+		expect(linkedPrOf(db, API_REPO_ID)).toMatchObject({
+			prNumber: 202,
+			repoName: API.name,
+			repositoryId: API_REPO_ID,
+		});
+		// Several checkouts: the workspace keeps the branch it was created with.
+		expect(getWorkspace(db, "ws")?.workspaceBranch).toBe("feature");
+
+		const [snapshot] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(
+			snapshot?.checkouts.map((c) => [c.repositoryId, c.pullRequest?.number]),
+		).toEqual([
+			[API_REPO_ID, 202],
+			[REPO_ID, 201],
 		]);
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(
+			history?.checkouts.map((c) => [
+				c.repositoryId,
+				c.pullRequests.map((pr) => [pr.number, pr.isCurrent]),
+			]),
+		).toEqual([
+			[API_REPO_ID, [[202, true]]],
+			[REPO_ID, [[201, true]]],
+		]);
+	});
+
+	test("removing one checkout's link leaves the other checkout's", async () => {
+		const db = createRealDb();
+		seedTwoRepoWorkspace(db);
+		const manager = createManager(db, {
+			execGh: perRepoGh(),
+			readWorkspaceRefs: readRefs,
+		});
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+
+		manager.unlinkWorkspacePullRequest("ws", API_REPO_ID);
+
+		expect(getWorkspace(db, "ws", API_REPO_ID)?.pullRequestId).toBeNull();
+		expect(linkedPrOf(db, REPO_ID)?.prNumber).toBe(201);
+		const suppressed = getWorkspace(
+			db,
+			"ws",
+			API_REPO_ID,
+		)?.suppressedPullRequestId;
+		expect(suppressed && getPrById(db, suppressed)?.prNumber).toBe(202);
+	});
+
+	test("a one-checkout workspace takes its checkout's branch", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, { id: "solo", branch: "old-name" });
+		const manager = createManager(db, {
+			execGh: routeGh({}),
+			readWorkspaceRefs: async () => ({
+				branch: "new-name",
+				headSha: null,
+				upstream: null,
+			}),
+		});
+
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["solo"]),
+		);
+
+		expect(getWorkspace(db, "solo")?.branch).toBe("new-name");
+		expect(getWorkspace(db, "solo")?.workspaceBranch).toBe("new-name");
 	});
 });

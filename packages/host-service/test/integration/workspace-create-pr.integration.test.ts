@@ -153,7 +153,7 @@ describe("workspaces.create PR checkout integration", () => {
 		const result = await scenario.host.trpc.workspaces.create.mutate({
 			projectId: scenario.projectId,
 			name: "PR workspace",
-			pr: prNumber,
+			checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 		});
 
 		const expectedBranch = "contributor/feature/pr-lockfile";
@@ -273,7 +273,7 @@ describe("workspaces.create PR checkout integration", () => {
 		const result = await scenario.host.trpc.workspaces.create.mutate({
 			projectId: scenario.projectId,
 			name: "Adopted PR workspace",
-			pr: prNumber,
+			checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 		});
 
 		const expectedBranch = "contributor/feature/adopt-local";
@@ -387,7 +387,7 @@ describe("workspaces.create PR checkout integration", () => {
 		const result = await scenario.host.trpc.workspaces.create.mutate({
 			projectId: scenario.projectId,
 			name: "Rollback PR workspace",
-			pr: prNumber,
+			checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 		});
 
 		// The local row is authoritative; a cloud failure never rolls it back.
@@ -456,7 +456,7 @@ describe("workspaces.create PR checkout integration", () => {
 			.mutate({
 				projectId: scenario.projectId,
 				name: "Stale PR workspace",
-				pr: prNumber,
+				checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 			})
 			.catch((err: unknown) => err);
 
@@ -520,7 +520,7 @@ describe("workspaces.create PR checkout integration", () => {
 		const result = await scenario.host.trpc.workspaces.create.mutate({
 			projectId: scenario.projectId,
 			name: "Same repo PR workspace",
-			pr: prNumber,
+			checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 		});
 
 		worktreePath = getWorkspaceRow(scenario, "feature/same-repo")?.worktreePath;
@@ -602,7 +602,7 @@ describe("workspaces.create PR checkout integration", () => {
 		const result = await scenario.host.trpc.workspaces.create.mutate({
 			projectId: scenario.projectId,
 			name: "Deleted branch PR workspace",
-			pr: prNumber,
+			checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 		});
 
 		worktreePath = getWorkspaceRow(
@@ -684,7 +684,7 @@ describe("workspaces.create PR checkout integration", () => {
 			.mutate({
 				projectId: scenario.projectId,
 				name: "Conflict PR workspace",
-				pr: prNumber,
+				checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 			})
 			.catch((err: unknown) => err);
 
@@ -783,12 +783,12 @@ describe("workspaces.create PR checkout integration", () => {
 			scenario.host.trpc.workspaces.create.mutate({
 				projectId: scenario.projectId,
 				name: "Concurrent PR workspace",
-				pr: prNumber,
+				checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 			}),
 			scenario.host.trpc.workspaces.create.mutate({
 				projectId: scenario.projectId,
 				name: "Concurrent PR workspace",
-				pr: prNumber,
+				checkouts: { [scenario.repositoryId]: { pr: prNumber } },
 			}),
 		]);
 

@@ -5,39 +5,25 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { eq } from "drizzle-orm";
 import { type SimpleGit, simpleGit } from "simple-git";
-import { projects, workspaces } from "../../../db/schema";
-import type { HostServiceContext } from "../../../types";
-import { createTestDb } from "../pull-requests/shared/test-db";
+import { workspaceRepositories, workspaces } from "../../../db/schema";
 import { gitRouter } from "./git";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 function createCaller(worktreePath: string) {
-	const db = createTestDb();
-	db.insert(projects).values({ id: "project", repoPath: worktreePath }).run();
-	db.insert(workspaces)
-		.values({
-			id: "ws",
-			projectId: "project",
-			worktreePath,
-			branch: "main",
-			createdAt: 1,
-			updatedAt: 1,
-			lastActivityAt: 1,
-		})
-		.run();
-	const ctx = {
-		isAuthenticated: true,
-		db,
+	const { db } = seedTestCheckout({ workspaceId: "ws", worktreePath });
+	const ctx = testGitContext(db, {
 		eventBus: { emit: () => {}, broadcastWorkspaceChanged: () => {} },
-		git: async (path: string) => simpleGit(path),
-		credentials: {
-			getCredentials: async () => ({ env: {} }),
-			getToken: async () => null,
-		},
-	} as unknown as HostServiceContext;
+	});
 	return {
 		caller: gitRouter.createCaller(ctx),
 		branchOfRow: () =>
 			db.select().from(workspaces).where(eq(workspaces.id, "ws")).get()?.branch,
+		branchOfCheckout: () =>
+			db
+				.select()
+				.from(workspaceRepositories)
+				.where(eq(workspaceRepositories.workspaceId, "ws"))
+				.get()?.branch,
 	};
 }
 
@@ -71,7 +57,7 @@ afterEach(() => {
 });
 
 test("a clean workspace switches to the branch and the row follows", async () => {
-	const { caller, branchOfRow } = createCaller(repo);
+	const { caller, branchOfRow, branchOfCheckout } = createCaller(repo);
 	const result = await caller.checkoutBranch({
 		workspaceId: "ws",
 		branch: "layer-2",
@@ -79,6 +65,7 @@ test("a clean workspace switches to the branch and the row follows", async () =>
 	expect(result).toEqual({ branch: "layer-2" });
 	expect((await git.revparse(["--abbrev-ref", "HEAD"])).trim()).toBe("layer-2");
 	expect(branchOfRow()).toBe("layer-2");
+	expect(branchOfCheckout()).toBe("layer-2");
 });
 
 test("a dirty workspace is refused and stays where it was", async () => {

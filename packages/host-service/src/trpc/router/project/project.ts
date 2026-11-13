@@ -1,5 +1,4 @@
 import { homedir } from "node:os";
-import { basename, resolve as resolvePath } from "node:path";
 import {
 	type ParsedGitHubRemote,
 	parseGitHubRemote,
@@ -8,28 +7,22 @@ import { BRANCH_PREFIX_MODES } from "@superset/shared/workspace-launch";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { z } from "zod";
-import { projects, workspaces } from "../../../db/schema";
+import { projects, repositories, workspaces } from "../../../db/schema";
 import type { TagSettingSnapshot } from "../../../events/types";
 import {
 	emitProjectChanged,
-	getLiveProjectAtPath,
 	getLocalProject,
-	getProjectIncludingDeleted,
 	toProjectSnapshot,
 	updateLocalProject,
 } from "../../../projects/local-project-store";
 import {
-	isContainerProject,
-	listRepositoryProjects,
-} from "../../../projects/multi-repo";
-import {
 	listDeletedProjects,
 	purgeDeletedProject,
 	readDeletionImpact,
-	repoTakenError,
 	restoreProject,
 	softDeleteProject,
 } from "../../../projects/project-deletion";
+import { getLiveRepositoryAtPath } from "../../../projects/repositories";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import {
 	deleteTagFolderSetting,
@@ -37,8 +30,9 @@ import {
 	upsertTagFolderSetting,
 } from "../../../tag-folders";
 import { getStrictShellEnvironment } from "../../../terminal/clean-shell-env";
+import type { HostServiceContext } from "../../../types";
 import { gitDetectExternalWorktreesTask } from "../../../workers/tasks/git";
-import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
+import { listCheckoutsByWorkspaceId } from "../../../workspaces/checkouts";
 import {
 	machineOnlyProcedure,
 	protectedProcedure,
@@ -46,33 +40,23 @@ import {
 	router,
 } from "../../index";
 import { offLoop } from "../../off-loop";
-import { projectDirExists } from "../workspace-creation/shared/local-project";
 import {
 	normalizeSparseCheckoutPaths,
-	parseSparseCheckoutPaths,
 	serializeSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
 import { normalizeWorktreePath } from "../workspace-creation/shared/worktree-list";
 import { normalizeWorktreeBaseDir } from "../workspace-creation/shared/worktree-paths";
 import {
-	addProjectRepository,
-	createContainerProject,
-	createFromClone,
-	createFromEmpty,
-	createFromImportLocal,
-	createFromTemplate,
-	removeProjectRepository,
+	addRepository,
+	createProject,
+	relocateRepository,
+	removeRepository,
+	setPrimaryRepository,
 } from "./handlers";
-import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import { getGitHubRemotes } from "./utils/git-remote";
 import { listGitHubRepositories } from "./utils/github-repositories";
-import { persistLocalProject } from "./utils/persist-project";
 import {
-	adoptLocalRepo,
-	cloneRepoInto,
-	type ResolvedRepo,
 	resolveLocalRepo,
-	resolveMatchingSlug,
 	tryRevParseGitRoot,
 	validateDirectoryPath,
 } from "./utils/resolve-repo";
@@ -91,11 +75,34 @@ const MAX_NAMING_INSTRUCTIONS_LENGTH = 2000;
  * exported router's declaration emit can name it. */
 export interface FindByPathCandidate {
 	id: string;
+	/** Set on a local match: the repository at the path. */
+	repositoryId?: string;
 	name: string;
 	repoCloneUrl: string | null;
 	source: "local-path" | "remote";
 	matchesExpected: boolean;
 }
+
+const repositorySourceSchema = z.discriminatedUnion("kind", [
+	z.object({
+		kind: z.literal("local"),
+		path: z.string().min(1),
+		// `git init` a non-git folder in place first. The UI sets this only
+		// after confirming intent with the user (see findByPath's needsGitInit).
+		initIfNeeded: z.boolean().optional(),
+	}),
+	z.object({ kind: z.literal("clone"), url: z.string().min(1) }),
+	z.object({ kind: z.literal("empty"), name: z.string().min(1) }),
+	z.object({
+		kind: z.literal("template"),
+		url: z
+			.string()
+			.min(1)
+			.refine((value) => /^https?:\/\//i.test(value), {
+				message: "Template URL must be http(s)",
+			}),
+	}),
+]);
 
 export const projectRouter = router({
 	listGitHubRepositories: machineOnlyProcedure.query(() =>
@@ -115,27 +122,11 @@ export const projectRouter = router({
 		return ctx.db
 			.select()
 			.from(projects)
-			.where(and(isNull(projects.deletedAt), isNull(projects.parentProjectId)))
+			.where(isNull(projects.deletedAt))
 			.all()
-			.map((row) => ({
-				id: row.id,
-				// Deprecated wire compatibility for desktops that predate the
-				// tagFolders router. Storage still has one canonical table.
-				tagSettings: tagSettingsByProject.get(row.id) ?? [],
-				// Empty until the backfill sweep fills it; folder name is the
-				// honest fallback (same rule as toProjectSnapshot).
-				kind: row.kind,
-				name: row.name || basename(row.repoPath),
-				repoPath: row.repoPath,
-				repoOwner: row.repoOwner,
-				repoName: row.repoName,
-				repoUrl: row.repoUrl,
-				worktreeBaseDir: row.worktreeBaseDir,
-				icon: row.icon,
-				color: row.color,
-				createdAt: row.createdAt,
-				updatedAt: row.updatedAt || row.createdAt,
-			}));
+			.map((row) =>
+				toProjectSnapshot(ctx.db, row, tagSettingsByProject.get(row.id) ?? []),
+			);
 	}),
 
 	/** Rename. Commits locally — projects have no cloud dependency. */
@@ -158,7 +149,7 @@ export const projectRouter = router({
 					message: "Project is not set up on this host",
 				});
 			}
-			return toProjectSnapshot(row);
+			return toProjectSnapshot(ctx.db, row);
 		}),
 
 	/** @deprecated Use tagFolders.upsert. Kept for mixed desktop/host versions. */
@@ -199,7 +190,7 @@ export const projectRouter = router({
 				});
 			}
 			// Old desktops only listen for project:changed.
-			emitProjectChanged(ctx.eventBus, "updated", project, settings);
+			emitProjectChanged(ctx, "updated", project, settings);
 			return { tagSettings: settings };
 		}),
 
@@ -225,85 +216,56 @@ export const projectRouter = router({
 					message: "Invalid tag",
 				});
 			}
-			emitProjectChanged(ctx.eventBus, "updated", project, settings);
+			emitProjectChanged(ctx, "updated", project, settings);
 			return { tagSettings: settings };
 		}),
 
 	get: protectedProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
-		.query(async ({ ctx, input }) => {
-			const row = getLocalProject(ctx.db, input.projectId);
-			if (!row) return null;
-			return {
-				id: row.id,
-				// Same fallback rule as project.list / toProjectSnapshot.
-				kind: row.kind,
-				// Set on a repository of a multi-repo project.
-				parentProjectId: row.parentProjectId,
-				name: row.name || basename(row.repoPath),
-				repoPath: row.repoPath,
-				repoPathExists:
-					isContainerProject(row) || (await projectDirExists(row.repoPath)),
-				repoOwner: row.repoOwner,
-				repoName: row.repoName,
-				repoUrl: row.repoUrl,
-				worktreeBaseDir: row.worktreeBaseDir,
-				branchPrefixMode: row.branchPrefixMode,
-				branchPrefixCustom: row.branchPrefixCustom,
-				icon: row.icon,
-				color: row.color,
-				// Always an array; the column's JSON encoding stays internal.
-				sparseCheckoutPaths: parseSparseCheckoutPaths(row.sparseCheckoutPaths),
-				namingInstructions: row.namingInstructions,
-			};
-		}),
-
-	/** A container project's repositories in the order they were added; a single-repo project is its own. */
-	repositories: protectedProcedure
-		.input(z.object({ projectId: z.string().uuid() }))
 		.query(({ ctx, input }) => {
 			const row = getLocalProject(ctx.db, input.projectId);
-			if (!row) return [];
-			const repos = isContainerProject(row)
-				? listRepositoryProjects(ctx.db, row.id)
-				: [row];
-			return repos.map((repo) => ({
-				id: repo.id,
-				name: basename(repo.repoPath),
-				repoPath: repo.repoPath,
-			}));
+			return row ? toProjectSnapshot(ctx.db, row) : null;
 		}),
-
-	createContainer: machineOnlyProcedure
-		.input(
-			z.object({
-				name: z.string().min(1),
-				repoPaths: z.array(z.string().min(1)),
-				cloneUrls: z.array(z.string().min(1)).optional(),
-				cloneParentDir: z.string().min(1).optional(),
-			}),
-		)
-		.mutation(({ ctx, input, signal }) =>
-			createContainerProject(ctx, { ...input, signal }),
-		),
 
 	addRepository: machineOnlyProcedure
 		.input(
 			z.object({
 				projectId: z.string().uuid(),
-				repoPath: z.string().min(1),
+				source: repositorySourceSchema,
+				parentDir: z.string().min(1).optional(),
 			}),
 		)
-		.mutation(({ ctx, input }) => addProjectRepository(ctx, input)),
+		.mutation(({ ctx, input, signal }) =>
+			addRepository(ctx, { ...input, signal }),
+		),
 
 	removeRepository: machineOnlyProcedure
 		.input(
 			z.object({
 				projectId: z.string().uuid(),
-				repositoryProjectId: z.string().uuid(),
+				repositoryId: z.string().min(1),
 			}),
 		)
-		.mutation(({ ctx, input }) => removeProjectRepository(ctx, input)),
+		.mutation(({ ctx, input }) => removeRepository(ctx, input)),
+
+	setPrimaryRepository: machineOnlyProcedure
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				repositoryId: z.string().min(1),
+			}),
+		)
+		.mutation(({ ctx, input }) => setPrimaryRepository(ctx, input)),
+
+	relocateRepository: machineOnlyProcedure
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				repositoryId: z.string().min(1),
+				path: z.string().min(1),
+			}),
+		)
+		.mutation(({ ctx, input }) => relocateRepository(ctx, input)),
 
 	/**
 	 * Set (or clear) this project's custom icon. Local-first: the icon is a
@@ -338,7 +300,7 @@ export const projectRouter = router({
 					message: "Project is not set up on this host",
 				});
 			}
-			return toProjectSnapshot(row);
+			return toProjectSnapshot(ctx.db, row);
 		}),
 
 	/**
@@ -367,7 +329,7 @@ export const projectRouter = router({
 					message: "Project is not set up on this host",
 				});
 			}
-			return toProjectSnapshot(row);
+			return toProjectSnapshot(ctx.db, row);
 		}),
 
 	setWorktreeBaseDir: protectedProcedure
@@ -440,6 +402,7 @@ export const projectRouter = router({
 		.input(
 			z.object({
 				projectId: z.string().uuid(),
+				repositoryId: z.string().min(1),
 				// Bounded well above the post-dedupe cap in
 				// `normalizeSparseCheckoutPaths`, so a runaway payload is
 				// rejected before we bother normalizing every entry.
@@ -448,14 +411,22 @@ export const projectRouter = router({
 		)
 		.mutation(({ ctx, input }) => {
 			const paths = normalizeSparseCheckoutPaths(input.paths);
-			const updated = ctx.db
-				.update(projects)
-				.set({ sparseCheckoutPaths: serializeSparseCheckoutPaths(paths) })
-				.where(
-					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
-				)
-				.returning({ id: projects.id })
-				.get();
+			const updated =
+				getLocalProject(ctx.db, input.projectId) &&
+				ctx.db
+					.update(repositories)
+					.set({
+						sparseCheckoutPaths: serializeSparseCheckoutPaths(paths),
+						updatedAt: Date.now(),
+					})
+					.where(
+						and(
+							eq(repositories.id, input.repositoryId),
+							eq(repositories.projectId, input.projectId),
+						),
+					)
+					.returning({ id: repositories.id })
+					.get();
 			if (!updated) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
@@ -563,7 +534,10 @@ export const projectRouter = router({
 				!!cloneUrl &&
 				cloneUrl.toLowerCase() === expectedUrlLower;
 
-			const localProject = getLiveProjectAtPath(ctx.db, gitRoot);
+			const localRepository = getLiveRepositoryAtPath(ctx.db, gitRoot);
+			const localProject = localRepository
+				? getLocalProject(ctx.db, localRepository.projectId)
+				: undefined;
 
 			// A local-DB row keyed by this repo's git root is authoritative:
 			// the repo is already a v2 project on this device ("local is
@@ -573,16 +547,16 @@ export const projectRouter = router({
 			// too — local-first projects have no cloud row, so any cloud
 			// probe here misreads them as stale and makes the importer
 			// create duplicates.
-			if (localProject) {
+			if (localProject && localRepository) {
 				return {
 					candidates: [
 						{
 							id: localProject.id,
-							name:
-								localProject.name || localProject.repoName || basename(gitRoot),
-							repoCloneUrl: localProject.repoUrl ?? null,
+							repositoryId: localRepository.id,
+							name: localProject.name || localRepository.name,
+							repoCloneUrl: localRepository.url ?? null,
 							source: "local-path" as const,
-							matchesExpected: matches(localProject.repoUrl ?? null),
+							matchesExpected: matches(localRepository.url ?? null),
 						},
 					],
 					cloudErrors: [] as { url: string; message: string }[],
@@ -669,220 +643,15 @@ export const projectRouter = router({
 		.input(
 			z.object({
 				name: z.string().min(1),
-				mode: z.discriminatedUnion("kind", [
-					z.object({
-						kind: z.literal("empty"),
-						parentDir: z.string().min(1),
-					}),
-					z.object({
-						kind: z.literal("clone"),
-						parentDir: z.string().min(1),
-						url: z.string().min(1),
-					}),
-					z.object({
-						kind: z.literal("importLocal"),
-						repoPath: z.string().min(1),
-						// When set, `git init` a non-git folder in place before
-						// importing. The UI sets this only after confirming intent
-						// with the user (see findByPath's needsGitInit).
-						initIfNeeded: z.boolean().optional().default(false),
-					}),
-					z.object({
-						kind: z.literal("template"),
-						parentDir: z.string().min(1),
-						url: z
-							.string()
-							.min(1)
-							.refine((value) => /^https?:\/\//i.test(value), {
-								message: "Template URL must be http(s)",
-							}),
-					}),
-				]),
+				/** The first is the primary. */
+				repositories: z.array(repositorySourceSchema).min(1),
+				/** Where clone, empty and template repositories go. */
+				parentDir: z.string().min(1).optional(),
 			}),
 		)
-		.mutation(async ({ ctx, input, signal }) => {
-			switch (input.mode.kind) {
-				case "empty":
-					return createFromEmpty(ctx, {
-						name: input.name,
-						parentDir: input.mode.parentDir,
-					});
-				case "template":
-					return createFromTemplate(ctx, {
-						name: input.name,
-						parentDir: input.mode.parentDir,
-						url: input.mode.url,
-					});
-				case "clone":
-					return createFromClone(ctx, {
-						name: input.name,
-						parentDir: input.mode.parentDir,
-						url: input.mode.url,
-						signal,
-					});
-				case "importLocal":
-					return createFromImportLocal(ctx, {
-						name: input.name,
-						repoPath: input.mode.repoPath,
-						initIfNeeded: input.mode.initIfNeeded,
-					});
-			}
-		}),
-
-	setup: machineOnlyProcedure
-		.input(
-			z.object({
-				projectId: z.string().uuid(),
-				/**
-				 * Repo coordinates supplied by the caller (from the host
-				 * fan-out) so a local-first project created on ANOTHER host can
-				 * be set up on this device. Required whenever this host has no
-				 * local row for the project — nothing else knows the repo.
-				 */
-				origin: z
-					.object({
-						repoCloneUrl: z.string().nullish(),
-						name: z.string().min(1).optional(),
-					})
-					.optional(),
-				mode: z.discriminatedUnion("kind", [
-					z.object({
-						kind: z.literal("clone"),
-						parentDir: z.string().min(1),
-					}),
-					z.object({
-						kind: z.literal("import"),
-						repoPath: z.string().min(1),
-						allowRelocate: z.boolean().default(false),
-					}),
-				]),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			restoreProject(ctx, input.projectId);
-			const existing = getProjectIncludingDeleted(ctx.db, input.projectId);
-
-			// Projects are host-owned, so a local row is this host's only
-			// self-contained source of repo coordinates. Without one the
-			// caller must supply them from the host fan-out — there is no
-			// registry left to ask.
-			if (!existing && !input.origin) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message:
-						input.mode.kind === "clone"
-							? `Project ${input.projectId} is not set up on this host. Pass origin.repoCloneUrl to clone it.`
-							: `Project ${input.projectId} is not set up on this host. Pass origin to import it.`,
-				});
-			}
-			const origin = {
-				repoCloneUrl: input.origin?.repoCloneUrl ?? null,
-				name: input.origin?.name,
-			};
-
-			const allowRelocate =
-				input.mode.kind === "import" && input.mode.allowRelocate;
-
-			const rejectIfRepoint = (targetPath: string) => {
-				if (!existing) return;
-				if (existing.repoPath === targetPath) return;
-				if (allowRelocate) return;
-				throw new TRPCError({
-					code: "CONFLICT",
-					message: `Project is already set up on this device at ${existing.repoPath}. Remove it first to re-import at a different location.`,
-				});
-			};
-
-			switch (input.mode.kind) {
-				case "clone": {
-					if (existing) {
-						// Already on this device — same folder name predicted from
-						// the local row; a different parentDir means a repoint.
-						rejectIfRepoint(
-							resolvePath(input.mode.parentDir, basename(existing.repoPath)),
-						);
-						return {
-							repoPath: existing.repoPath,
-						};
-					}
-					if (!origin.repoCloneUrl) {
-						throw new TRPCError({
-							code: "BAD_REQUEST",
-							message:
-								"Project has no linked GitHub repository — cannot clone. Import an existing local folder instead.",
-						});
-					}
-					const expectedParsed = parseGitHubRemote(origin.repoCloneUrl);
-					if (!expectedParsed) {
-						throw new TRPCError({
-							code: "BAD_REQUEST",
-							message: `Could not parse GitHub remote from ${origin.repoCloneUrl}`,
-						});
-					}
-					const resolved = await cloneRepoInto(
-						origin.repoCloneUrl,
-						input.mode.parentDir,
-						ctx.credentials,
-					);
-					persistLocalProject(ctx, input.projectId, resolved, {
-						name: origin.name,
-					});
-					return {
-						repoPath: resolved.repoPath,
-					};
-				}
-				case "import": {
-					let resolved: ResolvedRepo;
-					if (origin.repoCloneUrl) {
-						const parsed = parseGitHubRemote(origin.repoCloneUrl);
-						if (!parsed) {
-							throw new TRPCError({
-								code: "BAD_REQUEST",
-								message: `Could not parse GitHub remote from ${origin.repoCloneUrl}`,
-							});
-						}
-						resolved = await resolveMatchingSlug(
-							input.mode.repoPath,
-							`${parsed.owner}/${parsed.name}`,
-						);
-					} else {
-						resolved = await adoptLocalRepo(input.mode.repoPath);
-					}
-
-					// Each on-disk repo path maps to at most one project in the
-					// local DB; importing the same folder under a second project
-					// would clobber the first. Cloud-side GitHub URL collisions
-					// are allowed (see findBackfillConflict), but local-path
-					// collisions are not.
-					const localOwner = getLiveProjectAtPath(ctx.db, resolved.repoPath);
-					if (localOwner && localOwner.id !== input.projectId) {
-						throw repoTakenError();
-					}
-
-					rejectIfRepoint(resolved.repoPath);
-					if (existing && existing.repoPath === resolved.repoPath) {
-						return {
-							repoPath: existing.repoPath,
-						};
-					}
-
-					persistLocalProject(ctx, input.projectId, resolved, {
-						name: origin.name,
-					});
-					// Local workspaces are the checkout; when it moves, so do they.
-					for (const row of listLiveLocalWorkspaces(ctx, input.projectId)) {
-						if (row.worktreePath === resolved.repoPath) continue;
-						updateLocalWorkspace(ctx, row.id, {
-							worktreePath: resolved.repoPath,
-						});
-					}
-					return {
-						repoPath: resolved.repoPath,
-					};
-				}
-			}
-		}),
-
+		.mutation(({ ctx, input, signal }) =>
+			createProject(ctx, { ...input, signal }),
+		),
 	/**
 	 * Soft delete: the project and its live workspaces disappear for
 	 * everyone on this device, teardown runs and terminals stop, and the
@@ -892,8 +661,8 @@ export const projectRouter = router({
 	remove: machineOnlyProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const deleted = await softDeleteProject(ctx, input.projectId);
-			return { success: true, repoPath: deleted?.repoPath ?? null };
+			await softDeleteProject(ctx, input.projectId);
+			return { success: true };
 		}),
 
 	restore: machineOnlyProcedure
@@ -930,15 +699,20 @@ export const projectRouter = router({
 			task: gitDetectExternalWorktreesTask,
 			prepare: async ({ ctx }) => ({
 				homeDir: homedir(),
-				trackedWorktreePaths: ctx.db
-					.select({ worktreePath: workspaces.worktreePath })
-					.from(workspaces)
-					.leftJoin(projects, eq(projects.id, workspaces.projectId))
-					.where(
-						or(isNull(workspaces.archivedAt), isNotNull(projects.deletedAt)),
-					)
-					.all()
-					.map((row) => normalizeWorktreePath(row.worktreePath)),
+				trackedWorktreePaths: trackedCheckoutPaths(
+					ctx.db,
+					ctx.db
+						.select({
+							id: workspaces.id,
+							worktreePath: workspaces.worktreePath,
+						})
+						.from(workspaces)
+						.leftJoin(projects, eq(projects.id, workspaces.projectId))
+						.where(
+							or(isNull(workspaces.archivedAt), isNotNull(projects.deletedAt)),
+						)
+						.all(),
+				),
 				gitEnv: await getStrictShellEnvironment().catch(
 					() => process.env as Record<string, string>,
 				),
@@ -951,3 +725,16 @@ export const projectRouter = router({
 		.input(z.object({ projectId: z.string().uuid() }))
 		.query(({ ctx, input }) => readDeletionImpact(ctx, input.projectId)),
 });
+
+function trackedCheckoutPaths(
+	db: HostServiceContext["db"],
+	rows: { id: string; worktreePath: string }[],
+): string[] {
+	const byWorkspace = listCheckoutsByWorkspaceId(db, rows);
+	return rows.flatMap((row) => [
+		normalizeWorktreePath(row.worktreePath),
+		...(byWorkspace.get(row.id) ?? []).map((c) =>
+			normalizeWorktreePath(c.path),
+		),
+	]);
+}

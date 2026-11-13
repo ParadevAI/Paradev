@@ -12,7 +12,8 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
+import { repositories, workspaceRepositories } from "../src/db/schema";
 import { workspaceRouter } from "../src/trpc/router/workspace";
 import { cleanupGitOps } from "../src/trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../src/trpc/router/workspace-cleanup/is-local-checkout-workspace";
@@ -116,8 +117,36 @@ function makeCtx(spec: ContextSpec): HostServiceContext & {
 	}));
 	const projectFindFirst = mock(() => ({
 		// `projects.name` is NOT NULL DEFAULT '' in the real table.
-		sync: () => (spec.project ? { name: "", ...spec.project } : undefined),
+		sync: () =>
+			spec.project
+				? { name: "", primaryRepositoryId: spec.project.id, ...spec.project }
+				: undefined,
 	}));
+	// The project's one repository shares its id and holds its repoPath.
+	const repositoryRow = spec.project
+		? {
+				id: spec.project.id,
+				projectId: spec.project.id,
+				name: basename(spec.project.repoPath),
+				repoPath: spec.project.repoPath,
+				remoteName: null,
+				sparseCheckoutPaths: null,
+			}
+		: undefined;
+	const checkoutRows =
+		repositoryRow && workspaceRow?.projectId
+			? [
+					{
+						row: {
+							workspaceId: workspaceRow.id,
+							repositoryId: repositoryRow.id,
+							branch: workspaceRow.branch,
+							pullRequestId: workspaceRow.pullRequestId ?? null,
+						},
+						repository: repositoryRow,
+					},
+				]
+			: [];
 
 	const dbDeleteRun = mock(() => {});
 	const dbDeleteWhere = mock(() => ({ run: dbDeleteRun }));
@@ -144,15 +173,35 @@ function makeCtx(spec: ContextSpec): HostServiceContext & {
 			query: {
 				workspaces: { findFirst: workspaceFindFirst },
 				projects: { findFirst: projectFindFirst },
-				pullRequests: { findFirst: () => ({ sync: () => undefined }) },
+				pullRequests: {
+					findFirst: () => ({ sync: () => undefined }),
+					findMany: () => ({ sync: () => [] }),
+				},
 			},
 			select: () => ({
-				from: () => ({
-					// `.all` serves the terminal-session sweep; `.get` serves
-					// getHostWorktreeBaseDir when a spec sets no per-project
-					// worktreeBaseDir ("no host settings row" shape).
-					where: () => ({ all: terminalSelectAll, get: () => undefined }),
-				}),
+				from: (table: unknown) =>
+					table === workspaceRepositories
+						? {
+								innerJoin: () => ({
+									where: () => ({ all: () => checkoutRows }),
+								}),
+							}
+						: table === repositories
+							? {
+									where: () => ({
+										all: () => (repositoryRow ? [repositoryRow] : []),
+										get: () => repositoryRow,
+									}),
+								}
+							: {
+									// `.all` serves the terminal-session sweep; `.get` serves
+									// getHostWorktreeBaseDir when a spec sets no per-project
+									// worktreeBaseDir ("no host settings row" shape).
+									where: () => ({
+										all: terminalSelectAll,
+										get: () => undefined,
+									}),
+								},
 			}),
 			update: () => ({
 				set: () => ({ where: () => ({ run: dbUpdateRun }) }),

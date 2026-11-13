@@ -1,14 +1,14 @@
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import type { HostDb } from "../db";
-import type { CheckoutSnapshot } from "../events/types";
 import {
 	projects,
 	repositories,
 	workspaceRepositories,
 	workspaces,
 } from "../db/schema";
+import type { CheckoutSnapshot } from "../events/types";
 import type { HostRepositoryRow } from "../projects/repositories";
 
 export type { CheckoutSnapshot };
@@ -21,7 +21,6 @@ export interface Checkout {
 	/** Where the checkout is on disk; never stored, see {@link checkoutPath}. */
 	path: string;
 }
-
 
 /**
  * A workspace with one checkout is that checkout; with several, each one is
@@ -169,7 +168,12 @@ export function resolveCheckout(
 	const [only] = checkouts;
 	if (checkouts.length === 1 && only) return { ...only, workspace };
 	if (checkouts.length === 0 && workspace.projectId === null) {
-		return { workspace, repository: null, row: null, path: workspace.worktreePath };
+		return {
+			workspace,
+			repository: null,
+			row: null,
+			path: workspace.worktreePath,
+		};
 	}
 	if (checkouts.length === 0) {
 		throw new TRPCError({
@@ -183,6 +187,27 @@ export function resolveCheckout(
 			.map((c) => `${c.repository.name}=${c.repository.id}`)
 			.join(", ")}); pass repositoryId`,
 	});
+}
+
+/** Points the workspace's branch at the branch every checkout is on, if they share one. */
+export function followSharedCheckoutBranch(
+	db: HostDb,
+	workspaceId: string,
+): void {
+	const branches = new Set(
+		db
+			.select({ branch: workspaceRepositories.branch })
+			.from(workspaceRepositories)
+			.where(eq(workspaceRepositories.workspaceId, workspaceId))
+			.all()
+			.map((row) => row.branch),
+	);
+	const [branch] = branches;
+	if (branches.size !== 1 || !branch) return;
+	db.update(workspaces)
+		.set({ branch, updatedAt: Date.now() })
+		.where(and(eq(workspaces.id, workspaceId), ne(workspaces.branch, branch)))
+		.run();
 }
 
 /** A workspace's checkouts as clients see them, primary marked from its project. */

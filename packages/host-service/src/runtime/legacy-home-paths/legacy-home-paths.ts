@@ -7,10 +7,15 @@ import {
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
-import { projects, workspaces } from "../../db/schema.ts";
+import {
+	repositories,
+	workspaceRepositories,
+	workspaces,
+} from "../../db/schema.ts";
+import { checkoutPath } from "../../workspaces/checkouts.ts";
 
 const PATH_COLUMNS = [
-	["projects", "repo_path"],
+	["repositories", "repo_path"],
 	["projects", "worktree_base_dir"],
 	["host_settings", "worktree_base_dir"],
 	["host_settings", "default_claude_config_dir"],
@@ -35,14 +40,39 @@ export async function applyLegacyHomeMove(
 	if (!move) return;
 	try {
 		rewriteLegacyHomePaths(db.$client, PATH_COLUMNS, move);
-		const moved = db
+		const rows = db
 			.select({
-				repoPath: projects.repoPath,
-				worktreePath: workspaces.worktreePath,
+				workspaceId: workspaces.id,
+				workspacePath: workspaces.worktreePath,
+				repoPath: repositories.repoPath,
+				name: repositories.name,
 			})
-			.from(workspaces)
-			.innerJoin(projects, eq(workspaces.projectId, projects.id))
-			.all()
+			.from(workspaceRepositories)
+			.innerJoin(
+				workspaces,
+				eq(workspaces.id, workspaceRepositories.workspaceId),
+			)
+			.innerJoin(
+				repositories,
+				eq(repositories.id, workspaceRepositories.repositoryId),
+			)
+			.all();
+		const checkoutCount = new Map<string, number>();
+		for (const row of rows) {
+			checkoutCount.set(
+				row.workspaceId,
+				(checkoutCount.get(row.workspaceId) ?? 0) + 1,
+			);
+		}
+		const moved = rows
+			.map((row) => ({
+				repoPath: row.repoPath,
+				worktreePath: checkoutPath(
+					row.workspacePath,
+					row.name,
+					checkoutCount.get(row.workspaceId) ?? 1,
+				),
+			}))
 			.filter(({ worktreePath }) => worktreePath.startsWith(`${move.to}/`));
 		await repairGitWorktrees(moved, move.from);
 	} catch (error) {

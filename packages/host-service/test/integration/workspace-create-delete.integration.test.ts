@@ -295,7 +295,7 @@ describe("workspace.create + workspace.delete integration", () => {
 			projectId: scenario.projectId,
 			name: staleBranch,
 			branch: staleBranch,
-			worktreePath: explicitPath,
+			checkouts: { [scenario.repositoryId]: { worktreePath: explicitPath } },
 		});
 
 		expect(result?.workspace?.branch).toBe(actualBranch);

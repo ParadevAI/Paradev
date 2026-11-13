@@ -31,7 +31,6 @@ import { z } from "zod";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
-import { isContainerWorkspace } from "../../../projects/multi-repo";
 import {
 	createTerminalSessionInternal,
 	sendAgentMessage,
@@ -47,6 +46,7 @@ import {
 } from "../../../terminal-agents/agent-config";
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
+import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
 import { protectedProcedure, router } from "../../index";
 import {
 	handOutAttachment,
@@ -883,7 +883,7 @@ export async function runAgentInWorkspace(
 	const rootPath = workspace.worktreePath;
 	if (
 		workspace.projectId === null ||
-		isContainerWorkspace(ctx.db, workspace.id)
+		listWorkspaceCheckouts(ctx.db, workspace).length > 1
 	) {
 		const config = resolveHostAgentConfig(ctx.db, input.agent);
 		if (config) {

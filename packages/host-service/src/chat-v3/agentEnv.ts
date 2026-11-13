@@ -3,9 +3,9 @@ import { getBinDir } from "@superset/agent-setup";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { workspaces } from "../db/schema";
-import { getProjectIncludingDeleted } from "../projects/local-project-store";
 import { waitForSandboxManagedEnv } from "../runtime/sandbox-managed-env";
 import { buildHostLaunchEnv, waitForTerminalBaseEnv } from "../terminal/env";
+import { repositoryRootPath } from "../terminal/repository-root-path";
 import {
 	agentLaunchEnv,
 	resolveHostAgentConfig,
@@ -20,12 +20,9 @@ function workspacePaths(
 	const workspace = db.query.workspaces
 		.findFirst({ where: eq(workspaces.id, workspaceId) })
 		.sync();
-	const project = workspace?.projectId
-		? getProjectIncludingDeleted(db, workspace.projectId)
-		: undefined;
 	return {
 		workspacePath: workspace?.worktreePath ?? "",
-		rootPath: project?.repoPath ?? "",
+		rootPath: workspace ? repositoryRootPath(db, workspace) : "",
 	};
 }
 

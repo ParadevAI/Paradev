@@ -81,16 +81,45 @@ describe("0040 multi-repo tables", () => {
 		migrateToLatest(sqlite);
 
 		expect(
-			rows(sqlite, "SELECT id, primary_repository_id, name, deleted_at FROM projects ORDER BY id"),
+			rows(
+				sqlite,
+				"SELECT id, primary_repository_id, name, deleted_at FROM projects ORDER BY id",
+			),
 		).toEqual([
 			{ id: "p1", primary_repository_id: "p1", name: "Acme", deleted_at: null },
-			{ id: "p2", primary_repository_id: "p2", name: "Scratch", deleted_at: 99 },
+			{
+				id: "p2",
+				primary_repository_id: "p2",
+				name: "Scratch",
+				deleted_at: 99,
+			},
 		]);
 		expect(
-			rows(sqlite, "SELECT id, project_id, name, repo_path, owner, repo_name, remote_name, sparse_checkout_paths FROM repositories ORDER BY id"),
+			rows(
+				sqlite,
+				"SELECT id, project_id, name, repo_path, owner, repo_name, remote_name, sparse_checkout_paths FROM repositories ORDER BY id",
+			),
 		).toEqual([
-			{ id: "p1", project_id: "p1", name: "api", repo_path: "/src/acme-api", owner: "acme", repo_name: "api", remote_name: "origin", sparse_checkout_paths: '["apps/web"]' },
-			{ id: "p2", project_id: "p2", name: "scratch", repo_path: "/src/scratch", owner: null, repo_name: null, remote_name: null, sparse_checkout_paths: null },
+			{
+				id: "p1",
+				project_id: "p1",
+				name: "api",
+				repo_path: "/src/acme-api",
+				owner: "acme",
+				repo_name: "api",
+				remote_name: "origin",
+				sparse_checkout_paths: '["apps/web"]',
+			},
+			{
+				id: "p2",
+				project_id: "p2",
+				name: "scratch",
+				repo_path: "/src/scratch",
+				owner: null,
+				repo_name: null,
+				remote_name: null,
+				sparse_checkout_paths: null,
+			},
 		]);
 		expect(rows(sqlite, "SELECT * FROM workspace_repositories")).toEqual([
 			{
@@ -105,10 +134,12 @@ describe("0040 multi-repo tables", () => {
 				suppressed_pull_request_id: null,
 			},
 		]);
-		expect(rows(sqlite, "SELECT id, repository_id FROM pull_requests")).toEqual([
-			{ id: "pr1", repository_id: "p1" },
-		]);
-		expect(rows(sqlite, "SELECT id, worktree_path FROM workspaces ORDER BY id")).toEqual([
+		expect(rows(sqlite, "SELECT id, repository_id FROM pull_requests")).toEqual(
+			[{ id: "pr1", repository_id: "p1" }],
+		);
+		expect(
+			rows(sqlite, "SELECT id, worktree_path FROM workspaces ORDER BY id"),
+		).toEqual([
 			{ id: "w1", worktree_path: "/wt/feat" },
 			{ id: "w2", worktree_path: "/sessions/s" },
 		]);
@@ -135,9 +166,9 @@ describe("0040 multi-repo tables", () => {
 
 		migrateToLatest(sqlite);
 
-		expect(rows(sqlite, "SELECT id, primary_repository_id FROM projects")).toEqual([
-			{ id: "c", primary_repository_id: "a" },
-		]);
+		expect(
+			rows(sqlite, "SELECT id, primary_repository_id FROM projects"),
+		).toEqual([{ id: "c", primary_repository_id: "a" }]);
 		expect(
 			rows(sqlite, "SELECT id, project_id, name FROM repositories ORDER BY id"),
 		).toEqual([
@@ -146,17 +177,20 @@ describe("0040 multi-repo tables", () => {
 		]);
 		expect(rows(sqlite, "SELECT id FROM workspaces")).toEqual([{ id: "W" }]);
 		expect(
-			rows(sqlite, "SELECT workspace_id, repository_id, branch FROM workspace_repositories ORDER BY repository_id"),
+			rows(
+				sqlite,
+				"SELECT workspace_id, repository_id, branch FROM workspace_repositories ORDER BY repository_id",
+			),
 		).toEqual([
 			{ workspace_id: "W", repository_id: "a", branch: "feat" },
 			{ workspace_id: "W", repository_id: "b", branch: "pr-head" },
 		]);
-		expect(rows(sqlite, "SELECT origin_workspace_id FROM terminal_sessions")).toEqual([
-			{ origin_workspace_id: "W" },
-		]);
-		expect(rows(sqlite, "SELECT workspace_id FROM terminal_agent_bindings")).toEqual([
-			{ workspace_id: "W" },
-		]);
+		expect(
+			rows(sqlite, "SELECT origin_workspace_id FROM terminal_sessions"),
+		).toEqual([{ origin_workspace_id: "W" }]);
+		expect(
+			rows(sqlite, "SELECT workspace_id FROM terminal_agent_bindings"),
+		).toEqual([{ workspace_id: "W" }]);
 		expect(rows(sqlite, "SELECT * FROM workspace_tags")).toEqual([]);
 	});
 	test("prototype leftovers: repeated folder names, one-checkout containers, orphans and workspaces on a child project", () => {
@@ -200,23 +234,37 @@ describe("0040 multi-repo tables", () => {
 			{ id: "w3", project_id: "c", name: "web-2" },
 		]);
 		expect(
-			rows(sqlite, "SELECT id, project_id, worktree_path FROM workspaces ORDER BY id"),
+			rows(
+				sqlite,
+				"SELECT id, project_id, worktree_path FROM workspaces ORDER BY id",
+			),
 		).toEqual([
 			{ id: "O", project_id: "one", worktree_path: "/wt/one/solo" },
 			{ id: "W", project_id: "c", worktree_path: "/wt/dup/web" },
 			{ id: "direct", project_id: "c", worktree_path: "/wt/direct" },
 		]);
 		expect(
-			rows(sqlite, "SELECT workspace_id, repository_id, pull_request_id FROM workspace_repositories ORDER BY workspace_id"),
+			rows(
+				sqlite,
+				"SELECT workspace_id, repository_id, pull_request_id FROM workspace_repositories ORDER BY workspace_id",
+			),
 		).toEqual([
 			{ workspace_id: "O", repository_id: "solo", pull_request_id: null },
 			{ workspace_id: "W", repository_id: "w1", pull_request_id: "pr" },
 			{ workspace_id: "direct", repository_id: "w2", pull_request_id: null },
 		]);
-		expect(rows(sqlite, "SELECT workspace_id, pull_request_id FROM workspace_pull_requests")).toEqual([
-			{ workspace_id: "W", pull_request_id: "pr" },
-		]);
-		expect(rows(sqlite, "SELECT id, origin_workspace_id FROM terminal_sessions ORDER BY id")).toEqual([
+		expect(
+			rows(
+				sqlite,
+				"SELECT workspace_id, pull_request_id FROM workspace_pull_requests",
+			),
+		).toEqual([{ workspace_id: "W", pull_request_id: "pr" }]);
+		expect(
+			rows(
+				sqlite,
+				"SELECT id, origin_workspace_id FROM terminal_sessions ORDER BY id",
+			),
+		).toEqual([
 			{ id: "t1", origin_workspace_id: null },
 			{ id: "t2", origin_workspace_id: null },
 			{ id: "t3", origin_workspace_id: null },

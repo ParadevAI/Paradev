@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import type { HostServiceContext } from "../types";
 import { createCallerFactory, publicProcedure, router } from "./index";
 import { rethrowEnvironmentalGitError } from "./router/git/utils/classify-git-error";
-import { requireProjectRepoPath } from "./router/workspace-creation/shared/local-project";
+import { requireRepositoryPath } from "./router/workspace-creation/shared/local-project";
 
 const missingRepoPath = "/nonexistent/superset-test/acme-web";
 
@@ -16,8 +16,8 @@ const testRouter = router({
 		);
 	}),
 	branches: publicProcedure.query(() =>
-		requireProjectRepoPath({ repoPath: missingRepoPath } as Parameters<
-			typeof requireProjectRepoPath
+		requireRepositoryPath({ repoPath: missingRepoPath } as Parameters<
+			typeof requireRepositoryPath
 		>[0]),
 	),
 });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolveCheckout } from "../../../workspaces/checkouts";
 import { protectedProcedure, router } from "../../index";
 import { addComment } from "./procedures/add-comment";
 import { createForWorkspace } from "./procedures/create-for-workspace";
@@ -35,7 +36,7 @@ export const pullRequestsRouter = router({
 			};
 		}),
 	/**
-	 * Every PR each workspace has ever been linked to, current one first.
+	 * Every PR each workspace has ever been linked to, per checkout, current one first.
 	 * `getByWorkspaces` stays the sidebar's view (the one currently-linked PR,
 	 * honoring Remove PR Link); this is the full record behind it.
 	 */
@@ -56,10 +57,21 @@ export const pullRequestsRouter = router({
 		.input(
 			z.object({
 				workspaceId: z.string(),
+				repositoryId: z.string().optional(),
 			}),
 		)
 		.mutation(({ ctx, input }) => {
-			ctx.runtime.pullRequests.unlinkWorkspacePullRequest(input.workspaceId);
+			const { repository } = resolveCheckout(
+				ctx.db,
+				input.workspaceId,
+				input.repositoryId,
+			);
+			if (repository) {
+				ctx.runtime.pullRequests.unlinkWorkspacePullRequest(
+					input.workspaceId,
+					repository.id,
+				);
+			}
 			return { ok: true };
 		}),
 	refreshByWorkspaces: protectedProcedure

@@ -15,6 +15,7 @@ export class FakeApiAuthProvider implements ApiAuthProvider {
 	async getHeaders(): Promise<Record<string, string>> {
 		return { ...this.headers };
 	}
+	invalidateCache(): void {}
 }
 
 export class FakeHostAuthProvider implements HostAuthProvider {
@@ -35,7 +36,8 @@ export class MemoryGitCredentialProvider implements GitCredentialProvider {
 		private readonly tokenSource: TokenSource | null = null,
 	) {}
 	async getCredentials(): Promise<{ env: Record<string, string> }> {
-		return { env: {} };
+		// git is found through PATH only where it is not in /usr/bin (NixOS).
+		return { env: process.env.PATH ? { PATH: process.env.PATH } : {} };
 	}
 	async getToken(): Promise<string | null> {
 		return this.token;

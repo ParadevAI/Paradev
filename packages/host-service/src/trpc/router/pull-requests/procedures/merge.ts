@@ -6,6 +6,7 @@ import { syncPullRequestAfterWrite } from "../shared/sync-after-write";
 
 const mergeInputSchema = z.object({
 	projectId: z.string(),
+	repositoryId: z.string().optional(),
 	prNumber: z.number().int().positive(),
 	mergeMethod: z.enum(["merge", "squash", "rebase"]).default("merge"),
 	commitMessage: z.string().trim().min(1).optional(),
@@ -19,7 +20,11 @@ const mergeInputSchema = z.object({
 export const mergePR = protectedProcedure
 	.input(mergeInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
 		const octokit = await ctx.github();
 		let merged: Awaited<ReturnType<typeof octokit.pulls.merge>>["data"];
 		try {

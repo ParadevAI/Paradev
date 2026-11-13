@@ -5,27 +5,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
 import { type SimpleGit, simpleGit } from "simple-git";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
-import { gitStatusStore } from "./utils/git-status-store";
+import { checkoutStatusKey, gitStatusStore } from "./utils/git-status-store";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 /**
  * Real repos on a real filesystem — only the db lookup and the git factory are
  * stubbed, because `discardChanges` is otherwise pure git + fs.
  */
 function createCaller(worktreePath: string | undefined) {
-	const ctx = {
-		isAuthenticated: true,
-		db: {
-			query: {
-				workspaces: {
-					findFirst: () => ({ sync: () => ({ worktreePath }) }),
-				},
-			},
-		},
-		git: async (path: string) => simpleGit(path),
-	} as unknown as HostServiceContext;
-	return gitRouter.createCaller(ctx);
+	const { db } = seedTestCheckout({ workspaceId: "ws-1", worktreePath });
+	return gitRouter.createCaller(testGitContext(db));
 }
 
 async function initRepo(path: string): Promise<SimpleGit> {
@@ -59,12 +49,17 @@ describe("gitRouter.discardChanges", () => {
 
 	test("forces the next status read to walk in full", async () => {
 		const workspaceId = "ws-discard-invalidates";
-		gitStatusStore.attach(workspaceId);
-		gitStatusStore.recordChange(workspaceId, []);
+		const { db, repositoryId } = seedTestCheckout({
+			workspaceId,
+			worktreePath: repo,
+		});
+		const statusKey = checkoutStatusKey(workspaceId, repositoryId);
+		gitStatusStore.attach(statusKey);
+		gitStatusStore.recordChange(statusKey, []);
 		let fullWalks = 0;
 		const read = () =>
 			gitStatusStore.read({
-				workspaceId,
+				workspaceId: statusKey,
 				baseBranch: null,
 				computeFull: async () => {
 					fullWalks++;
@@ -85,14 +80,14 @@ describe("gitRouter.discardChanges", () => {
 			expect(fullWalks).toBe(1);
 
 			await writeFile(join(repo, "tracked.txt"), "edited\n");
-			await createCaller(repo).discardChanges({
+			await gitRouter.createCaller(testGitContext(db)).discardChanges({
 				workspaceId,
 				filePath: "tracked.txt",
 			});
 			await read();
 			expect(fullWalks).toBe(2);
 		} finally {
-			gitStatusStore.drop(workspaceId);
+			gitStatusStore.drop(statusKey);
 		}
 	});
 

@@ -83,42 +83,39 @@ export const terminalAgentBindings = sqliteTable(
 	],
 );
 
-export const projects = sqliteTable(
-	"projects",
-	{
-		id: text().primaryKey(),
-		// No foreign key: repositories reference projects, and SQLite cannot
-		// create the cycle. Write paths keep it pointing at a live repository.
-		primaryRepositoryId: text("primary_repository_id").notNull(),
-		worktreeBaseDir: text("worktree_base_dir"),
-		// Per-project branch-prefix override. A null `branchPrefixMode` means
-		// "fall back to the host-wide default" in `host_settings`.
-		branchPrefixMode: text("branch_prefix_mode").$type<BranchPrefixMode>(),
-		branchPrefixCustom: text("branch_prefix_custom"),
-		// Custom project icon as a small downscaled data-URI. Null falls back to
-		// the GitHub owner avatar (when a repo is linked) or a placeholder.
-		icon: text("icon"),
-		// Accent color as a `#rrggbb` hex. Null means the default (no accent).
-		color: text("color"),
-		// Free-text instructions injected into AI workspace/branch naming for
-		// this project (e.g. "include the Linear ticket id in the branch name").
-		// Null means the default naming behavior.
-		namingInstructions: text("naming_instructions"),
-		// Empty string means "not yet backfilled" — the startup sweep targets
-		// these rows (name from cloud legacy row if reachable, else basename).
-		name: text().notNull().default(""),
-		// Non-null = soft-deleted: hidden everywhere, restorable until the
-		// purge sweep removes it. Workspaces deleted with the project carry
-		// the same value as their archivedAt, which is how restore finds them.
-		deletedAt: integer("deleted_at"),
-		deletedByUserId: text("deleted_by_user_id"),
-		// 0 means "predates local ownership"; write paths always set it.
-		updatedAt: integer("updated_at").notNull().default(0),
-		createdAt: integer("created_at")
-			.notNull()
-			.$defaultFn(() => Date.now()),
-	},
-);
+export const projects = sqliteTable("projects", {
+	id: text().primaryKey(),
+	// No foreign key: repositories reference projects, and SQLite cannot
+	// create the cycle. Write paths keep it pointing at a live repository.
+	primaryRepositoryId: text("primary_repository_id").notNull(),
+	worktreeBaseDir: text("worktree_base_dir"),
+	// Per-project branch-prefix override. A null `branchPrefixMode` means
+	// "fall back to the host-wide default" in `host_settings`.
+	branchPrefixMode: text("branch_prefix_mode").$type<BranchPrefixMode>(),
+	branchPrefixCustom: text("branch_prefix_custom"),
+	// Custom project icon as a small downscaled data-URI. Null falls back to
+	// the GitHub owner avatar (when a repo is linked) or a placeholder.
+	icon: text("icon"),
+	// Accent color as a `#rrggbb` hex. Null means the default (no accent).
+	color: text("color"),
+	// Free-text instructions injected into AI workspace/branch naming for
+	// this project (e.g. "include the Linear ticket id in the branch name").
+	// Null means the default naming behavior.
+	namingInstructions: text("naming_instructions"),
+	// Empty string means "not yet backfilled" — the startup sweep targets
+	// these rows (name from cloud legacy row if reachable, else basename).
+	name: text().notNull().default(""),
+	// Non-null = soft-deleted: hidden everywhere, restorable until the
+	// purge sweep removes it. Workspaces deleted with the project carry
+	// the same value as their archivedAt, which is how restore finds them.
+	deletedAt: integer("deleted_at"),
+	deletedByUserId: text("deleted_by_user_id"),
+	// 0 means "predates local ownership"; write paths always set it.
+	updatedAt: integer("updated_at").notNull().default(0),
+	createdAt: integer("created_at")
+		.notNull()
+		.$defaultFn(() => Date.now()),
+});
 
 /**
  * A git repository of a project. Every project has at least one; a single-repo
@@ -340,9 +337,7 @@ export const workspaceRepositories = sqliteTable(
 	(table) => [
 		primaryKey({ columns: [table.workspaceId, table.repositoryId] }),
 		index("workspace_repositories_repository_id_idx").on(table.repositoryId),
-		index("workspace_repositories_pull_request_id_idx").on(
-			table.pullRequestId,
-		),
+		index("workspace_repositories_pull_request_id_idx").on(table.pullRequestId),
 		index("workspace_repositories_upstream_ref_idx").on(
 			table.upstreamOwner,
 			table.upstreamRepo,

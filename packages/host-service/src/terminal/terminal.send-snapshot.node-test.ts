@@ -25,8 +25,9 @@ import * as path from "node:path";
 import { after, before, describe, mock, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { Server } from "@superset/pty-daemon";
+import { seedProject } from "../../test/helpers/seed.ts";
 import { createDb, type HostDb } from "../db/index.ts";
-import { projects, workspaces } from "../db/schema.ts";
+import { workspaces } from "../db/schema.ts";
 import { buildWatchPrompt } from "../page-watch/buildPrompt.ts";
 import {
 	markTerminalAgentBindingEnded,
@@ -156,7 +157,7 @@ before(async () => {
 
 	projectId = randomUUID();
 	workspaceId = randomUUID();
-	db.insert(projects).values({ id: projectId, repoPath: worktreePath }).run();
+	seedProject({ db }, { id: projectId, repoPath: worktreePath });
 	db.insert(workspaces)
 		.values({
 			id: workspaceId,

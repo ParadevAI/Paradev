@@ -4,8 +4,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type SimpleGit, simpleGit } from "simple-git";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 /**
  * Real repos on a real filesystem — only the db lookup and the git factory
@@ -16,33 +16,14 @@ function createCaller(
 	worktreePath: string | undefined,
 	linkedPrHeadBranch?: string,
 ) {
-	const ctx = {
-		isAuthenticated: true,
-		db: {
-			query: {
-				workspaces: {
-					findFirst: () => ({
-						sync: () => ({
-							worktreePath,
-							pullRequestId: linkedPrHeadBranch ? "pr-1" : null,
-						}),
-					}),
-				},
-				pullRequests: {
-					findFirst: () => ({
-						sync: () =>
-							linkedPrHeadBranch ? { headBranch: linkedPrHeadBranch } : null,
-					}),
-				},
-			},
-		},
-		git: async (path: string) => simpleGit(path),
-		credentials: {
-			getCredentials: async () => ({ env: {} }),
-			getToken: async () => null,
-		},
-	} as unknown as HostServiceContext;
-	return gitRouter.createCaller(ctx);
+	const { db } = seedTestCheckout({
+		workspaceId: "ws",
+		worktreePath,
+		pullRequest: linkedPrHeadBranch
+			? { repoOwner: "o", repoName: "r", headBranch: linkedPrHeadBranch }
+			: undefined,
+	});
+	return gitRouter.createCaller(testGitContext(db));
 }
 
 async function initRepo(path: string): Promise<SimpleGit> {

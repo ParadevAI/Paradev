@@ -1,11 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import { protectedProcedure } from "../../../index";
 import { resolveGithubRepo } from "../shared/project-helpers";
 import { execGh } from "../utils/exec-gh";
 
 const getRepoContributorsInputSchema = z.object({
 	projectId: z.string(),
+	/** Defaults to the primary repository. */
+	repositoryId: z.string().optional(),
 });
 
 const ghContributorSchema = z.object({
@@ -34,7 +37,12 @@ const repoContributorsCache = new Map<
 export const getRepoContributors = protectedProcedure
 	.input(getRepoContributorsInputSchema)
 	.query(async ({ ctx, input }): Promise<RepoContributor[]> => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId ??
+				getLocalProject(ctx.db, input.projectId)?.primaryRepositoryId,
+		);
 		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}`;
 		const cached = repoContributorsCache.get(cacheKey);
 		if (

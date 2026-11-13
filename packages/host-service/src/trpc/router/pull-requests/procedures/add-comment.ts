@@ -7,6 +7,7 @@ import { evictPullRequestContent } from "../shared/pull-request-content-cache";
 
 const addCommentInputSchema = z.object({
 	projectId: z.string(),
+	repositoryId: z.string().optional(),
 	prNumber: z.number().int().positive(),
 	// GitHub rejects bodies past 65536 characters; stop them before the spawn.
 	body: z.string().trim().min(1).max(65536),
@@ -16,7 +17,11 @@ const addCommentInputSchema = z.object({
 export const addComment = protectedProcedure
 	.input(addCommentInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
 		try {
 			// One REST request: `gh pr comment` posts over GraphQL and then reads
 			// back, and a failure in that read reported a comment that had landed.

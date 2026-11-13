@@ -88,6 +88,7 @@ test("project and repository reads reuse the same in-flight request and mutation
 			}),
 	);
 	spyOn(projects, "resolveGithubRepo").mockResolvedValue({
+		repositoryId: "repository-1",
 		owner: "Owner",
 		name: "SharedContent",
 		repoPath: "/unused",

@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import {
 	getDefaultTerminal,
 	parseProjectConfig,
@@ -8,7 +8,7 @@ import { resolveProjectConfigDirName } from "@superset/shared/project-config/dir
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getLocalProject } from "../../../projects/local-project-store";
-import { listRepositoryWorkspaces } from "../../../projects/multi-repo";
+import { getPrimaryRepository } from "../../../projects/repositories";
 import {
 	getProjectConfigPath,
 	hasProjectConfig,
@@ -82,13 +82,14 @@ function requireProject(
 	projectId: string,
 ): { id: string; repoPath: string } {
 	const row = getLocalProject(ctx.db, projectId);
-	if (!row || !row.repoPath) {
+	const repository = row ? getPrimaryRepository(ctx.db, row) : undefined;
+	if (!row || !repository?.repoPath) {
 		throw new TRPCError({
 			code: "NOT_FOUND",
 			message: `Project not set up locally: ${projectId}`,
 		});
 	}
-	return { id: row.id, repoPath: row.repoPath };
+	return { id: row.id, repoPath: repository.repoPath };
 }
 
 export const configRouter = router({
@@ -279,36 +280,4 @@ export const configRouter = router({
 				...(terminal.cwd && { cwd: terminal.cwd }),
 			};
 		}),
-
-	/** Each checkout's run script in a multi-repo workspace, run in that checkout. */
-	getRepositoryRunDefinitions: protectedProcedure
-		.input(z.object({ workspaceId: z.string() }))
-		.query(({ ctx, input }) =>
-			listRepositoryWorkspaces(ctx.db, input.workspaceId).map((checkout) => {
-				const project = checkout.projectId
-					? getLocalProject(ctx.db, checkout.projectId)
-					: undefined;
-				const config = project?.repoPath
-					? loadProjectConfig({
-							repoPath: project.repoPath,
-							projectId: project.id,
-						})
-					: null;
-				const terminal =
-					config?.kind === "ok" ? getDefaultTerminal(config.resolved) : null;
-				return terminal
-					? {
-							repositoryId: checkout.id,
-							projectId: checkout.projectId,
-							commands: terminal.commands,
-							cwd: resolve(checkout.worktreePath, terminal.cwd ?? "."),
-						}
-					: {
-							repositoryId: checkout.id,
-							projectId: checkout.projectId,
-							commands: null,
-							cwd: null,
-						};
-			}),
-		),
 });

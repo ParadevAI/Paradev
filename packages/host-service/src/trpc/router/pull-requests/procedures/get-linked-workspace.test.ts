@@ -10,6 +10,7 @@ import {
 	PR_NUMBER,
 	PROJECT_ID,
 	REPO,
+	REPOSITORY_ID,
 	seedLinkedPullRequest,
 	UNLINKED_PR_NUMBER,
 } from "../shared/test-db";
@@ -55,7 +56,7 @@ describe("pullRequests.getLinkedWorkspace", () => {
 				projectId: PROJECT_ID,
 				prNumber: PR_NUMBER,
 			}),
-		).toEqual({ workspaceId: "ws-newer" });
+		).toEqual({ workspaceId: "ws-newer", repositoryId: REPOSITORY_ID });
 	});
 
 	test("still answers an existing link when the checkout is unavailable", async () => {
@@ -67,7 +68,7 @@ describe("pullRequests.getLinkedWorkspace", () => {
 				projectId: PROJECT_ID,
 				prNumber: PR_NUMBER,
 			}),
-		).toEqual({ workspaceId: "ws-newer" });
+		).toEqual({ workspaceId: "ws-newer", repositoryId: REPOSITORY_ID });
 	});
 
 	test("answers none for a PR with a row but no live workspace", async () => {
@@ -79,6 +80,6 @@ describe("pullRequests.getLinkedWorkspace", () => {
 				projectId: PROJECT_ID,
 				prNumber: UNLINKED_PR_NUMBER,
 			}),
-		).toEqual({ workspaceId: null });
+		).toEqual({ workspaceId: null, repositoryId: null });
 	});
 });

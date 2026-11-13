@@ -1,5 +1,9 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { workspaces } from "../../../../db/schema";
+import {
+	getPrimaryRepository,
+	getRepository,
+} from "../../../../projects/repositories";
 import { resolveDefaultBranchName } from "../../../../runtime/git/refs";
 import { protectedProcedure } from "../../../index";
 import { searchBranchesInputSchema } from "../schemas";
@@ -13,7 +17,7 @@ import {
 } from "../shared/branch-search";
 import {
 	findLocalProject,
-	requireProjectRepoPath,
+	requireRepositoryPath,
 } from "../shared/local-project";
 import type { BranchRow } from "../shared/types";
 
@@ -39,12 +43,22 @@ export const searchBranches = protectedProcedure
 			};
 		}
 
-		const git = await ctx.git(requireProjectRepoPath(localProject));
+		const repository = input.repositoryId
+			? getRepository(ctx.db, input.repositoryId)
+			: getPrimaryRepository(ctx.db, localProject);
+		if (!repository || repository.projectId !== localProject.id) {
+			return {
+				defaultBranch: null as string | null,
+				items: [] as BranchRow[],
+				nextCursor: null as string | null,
+			};
+		}
+		const git = await ctx.git(requireRepositoryPath(repository));
 
 		// Honor `refresh` only if TTL elapsed — prevents thrashing `git fetch`
 		// on every keystroke when the client tags first-page requests.
-		if (input.refresh && shouldRefetchRemote(input.projectId)) {
-			markRefetchRemote(input.projectId);
+		if (input.refresh && shouldRefetchRemote(repository.id)) {
+			markRefetchRemote(repository.id);
 			try {
 				await git.fetch(["--prune", "--quiet", "--no-tags"]);
 			} catch {

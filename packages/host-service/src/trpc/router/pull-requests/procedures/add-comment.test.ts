@@ -13,6 +13,7 @@ afterEach(() => mock.restore());
 
 test("posts the trimmed body through the REST comments endpoint", async () => {
 	spyOn(projects, "resolveGithubRepo").mockResolvedValue({
+		repositoryId: "repository-1",
 		owner: "owner",
 		name: "repo",
 		repoPath: "/unused",
@@ -38,6 +39,7 @@ test("posts the trimmed body through the REST comments endpoint", async () => {
 
 test("rejects an empty body before spawning gh", async () => {
 	spyOn(projects, "resolveGithubRepo").mockResolvedValue({
+		repositoryId: "repository-1",
 		owner: "owner",
 		name: "repo",
 		repoPath: "/unused",

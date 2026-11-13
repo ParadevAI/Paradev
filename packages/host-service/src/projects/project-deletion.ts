@@ -1,6 +1,8 @@
 import { existsSync } from "node:fs";
+import { rm, rmdir } from "node:fs/promises";
+import { join } from "node:path";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import {
 	projects,
 	tagFolderSettings,
@@ -13,17 +15,25 @@ import { runTeardown } from "../runtime/teardown";
 import { disposeSessionsByWorkspaceId } from "../terminal/terminal";
 import { cleanupGitOps } from "../trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../trpc/router/workspace-cleanup/is-local-checkout-workspace";
+import { WORKSPACE_CONTEXT_FILES } from "../trpc/router/workspace-creation/shared/workspace-context-files/workspace-context-files";
 import type { HostServiceContext } from "../types";
+import { listWorkspaceCheckouts } from "../workspaces/checkouts";
 import {
 	archiveLocalWorkspace,
 	trackWorkspaceDeleted,
 	unarchiveLocalWorkspace,
 } from "../workspaces/local-workspace-store";
+import { resolveWorkspaceScriptContext } from "../workspaces/script-context";
 import {
 	emitProjectChanged,
-	getLiveProjectAtPath,
 	getProjectIncludingDeleted,
+	type HostProjectRow,
 } from "./local-project-store";
+import {
+	getLiveRepositoryAtPath,
+	getPrimaryRepository,
+	listProjectRepositories,
+} from "./repositories";
 
 export const PROJECT_RESTORE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 export const PROJECT_PURGE_INTERVAL_MS = 6 * 60 * 60 * 1000;
@@ -49,11 +59,11 @@ type ProjectDeletionContext = Pick<
 export async function softDeleteProject(
 	ctx: ProjectDeletionContext,
 	projectId: string,
-): Promise<{ repoPath: string; deletedAt: number } | null> {
+): Promise<{ deletedAt: number } | null> {
 	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project) return null;
 	if (project.deletedAt != null) {
-		return { repoPath: project.repoPath, deletedAt: project.deletedAt };
+		return { deletedAt: project.deletedAt };
 	}
 	const deletedAt = Date.now();
 	const live = ctx.db
@@ -72,19 +82,6 @@ export async function softDeleteProject(
 			})
 			.where(eq(projects.id, projectId))
 			.run();
-		tx.update(projects)
-			.set({
-				deletedAt,
-				deletedByUserId: ctx.userId ?? null,
-				updatedAt: deletedAt,
-			})
-			.where(
-				and(
-					eq(projects.parentProjectId, projectId),
-					isNull(projects.deletedAt),
-				),
-			)
-			.run();
 		if (live.length > 0)
 			tx.update(workspaces)
 				.set({
@@ -101,21 +98,32 @@ export async function softDeleteProject(
 				.run();
 	});
 	for (const row of live) archiveLocalWorkspace(ctx, row.id, "deleted");
-	emitProjectChanged(ctx.eventBus, "deleted", projectId);
+	emitProjectChanged(ctx, "deleted", projectId);
 	await Promise.all(live.map((row) => stopWorkspace(ctx, row.id)));
-	return { repoPath: project.repoPath, deletedAt };
+	return { deletedAt };
 }
 
 async function stopWorkspace(ctx: ProjectDeletionContext, workspaceId: string) {
-	const { local, project, sharesProjectCheckout } =
-		await isLocalCheckoutWorkspace(ctx as HostServiceContext, workspaceId);
-	if (local && project && !sharesProjectCheckout) {
+	const local = ctx.db
+		.select()
+		.from(workspaces)
+		.where(eq(workspaces.id, workspaceId))
+		.get();
+	const context = local ? resolveWorkspaceScriptContext(ctx.db, local) : null;
+	// A local workspace is the repository itself; teardown is for worktrees.
+	const onRepository =
+		local !== undefined &&
+		(local.type === "local" ||
+			(await isLocalCheckoutWorkspace(ctx as HostServiceContext, local.id))
+				.sharesProjectCheckout);
+	if (local && context && !onRepository) {
 		const teardown = await runTeardown({
 			db: ctx.db,
 			workspaceId,
-			worktreePath: local.worktreePath,
-			repoPath: project.repoPath,
-			projectId: project.id,
+			worktreePath: context.configWorktreePath ?? undefined,
+			scriptRoot: context.scriptRoot,
+			repoPath: context.repoPath,
+			projectId: context.projectId,
 		}).catch((err: unknown) => ({ status: "failed" as const, err }));
 		if (teardown.status === "failed") {
 			console.warn("[project-deletion] teardown failed", {
@@ -169,26 +177,27 @@ export function restoreProject(
 	const project = getProjectIncludingDeleted(ctx.db, projectId);
 	if (!project) return null;
 	if (project.deletedAt == null) return { restoredWorkspaceCount: 0 };
-	if (getLiveProjectAtPath(ctx.db, project.repoPath)) throw repoTakenError();
+	const repositoryRows = listProjectRepositories(ctx.db, projectId);
+	if (repositoryRows.some((r) => getLiveRepositoryAtPath(ctx.db, r.repoPath)))
+		throw repoTakenError();
 	const restorable = workspacesDeletedWith(ctx, {
 		id: project.id,
 		deletedAt: project.deletedAt,
-	}).filter((row) => row.type === "local" || !isMissingPath(row.worktreePath));
+	}).filter(
+		(row) =>
+			row.type === "local" ||
+			(!isMissingPath(row.worktreePath) &&
+				listWorkspaceCheckouts(ctx.db, row).every(
+					(checkout) => !isMissingPath(checkout.path),
+				)),
+	);
 	ctx.db
 		.update(projects)
 		.set({ deletedAt: null, deletedByUserId: null, updatedAt: Date.now() })
-		.where(
-			or(
-				eq(projects.id, projectId),
-				and(
-					eq(projects.parentProjectId, projectId),
-					eq(projects.deletedAt, project.deletedAt),
-				),
-			),
-		)
+		.where(eq(projects.id, projectId))
 		.run();
 	const restored = getProjectIncludingDeleted(ctx.db, projectId);
-	if (restored) emitProjectChanged(ctx.eventBus, "created", restored);
+	if (restored) emitProjectChanged(ctx, "created", restored);
 	for (const row of restorable) unarchiveLocalWorkspace(ctx, row.id);
 	return { restoredWorkspaceCount: restorable.length };
 }
@@ -197,12 +206,14 @@ export function listDeletedProjects(ctx: Pick<ProjectDeletionContext, "db">) {
 	return ctx.db
 		.select()
 		.from(projects)
-		.where(and(isNotNull(projects.deletedAt), isNull(projects.parentProjectId)))
+		.where(isNotNull(projects.deletedAt))
 		.all()
 		.map((row) => ({
 			id: row.id,
-			name: row.name || row.repoPath.split(/[\\/]/).pop() || row.id,
-			repoPath: row.repoPath,
+			name: row.name || row.id,
+			repositoryPaths: listProjectRepositories(ctx.db, row.id).map(
+				(r) => r.repoPath,
+			),
 			deletedAt: row.deletedAt as number,
 			deletedByUserId: row.deletedByUserId,
 			purgeAt: (row.deletedAt as number) + PROJECT_RESTORE_WINDOW_MS,
@@ -248,43 +259,57 @@ export async function purgeDeletedProject(
 
 async function purgeProject(
 	ctx: ProjectDeletionContext,
-	project: typeof projects.$inferSelect,
+	project: HostProjectRow,
 ) {
 	const rows = ctx.db
 		.select()
 		.from(workspaces)
 		.where(eq(workspaces.projectId, project.id))
 		.all();
-	const worktrees = rows.filter(
-		(row) =>
-			row.type !== "local" &&
-			row.worktreePath !== project.repoPath &&
-			existsSync(row.worktreePath),
-	);
-	if (worktrees.length > 0) {
-		try {
-			const gitEnv = await cleanupGitOps.resolveGitEnv(ctx, project.repoPath);
-			for (const row of worktrees) {
+	const gitEnvByRepo = new Map<
+		string,
+		Awaited<ReturnType<typeof cleanupGitOps.resolveGitEnv>>
+	>();
+	for (const row of rows) {
+		if (row.type === "local") continue;
+		const checkouts = listWorkspaceCheckouts(ctx.db, row);
+		for (const checkout of checkouts) {
+			const repoPath = checkout.repository.repoPath;
+			if (checkout.path === repoPath || !existsSync(checkout.path)) continue;
+			try {
+				let gitEnv = gitEnvByRepo.get(repoPath);
+				if (!gitEnv) {
+					gitEnv = await cleanupGitOps.resolveGitEnv(ctx, repoPath);
+					gitEnvByRepo.set(repoPath, gitEnv);
+				}
 				const { stillRegistered, removeError } =
 					await cleanupGitOps.removeWorktree({
-						repoPath: project.repoPath,
-						worktreePath: row.worktreePath,
+						repoPath,
+						worktreePath: checkout.path,
 						gitEnv,
 						force: false,
 					});
 				if (stillRegistered) {
 					console.warn("[project-deletion] left worktree on disk", {
 						projectId: project.id,
-						worktreePath: row.worktreePath,
+						worktreePath: checkout.path,
 						removeError,
 					});
 				}
+			} catch (err) {
+				console.warn("[project-deletion] left worktree on disk", {
+					projectId: project.id,
+					worktreePath: checkout.path,
+					err,
+				});
 			}
-		} catch (err) {
-			console.warn("[project-deletion] left worktrees on disk", {
-				projectId: project.id,
-				err,
-			});
+		}
+		// A multi-repo root holds only the checkouts; a non-empty one stays.
+		if (checkouts.length > 1) {
+			for (const file of WORKSPACE_CONTEXT_FILES) {
+				await rm(join(row.worktreePath, file), { force: true });
+			}
+			await rmdir(row.worktreePath).catch(() => {});
 		}
 	}
 	ctx.db.transaction((tx) => {

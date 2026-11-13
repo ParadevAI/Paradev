@@ -1,6 +1,11 @@
-import { and, inArray, isNull } from "drizzle-orm";
-import { projects, workspaces } from "../../../../db/schema";
+import { and, eq, inArray, isNull } from "drizzle-orm";
+import {
+	repositories,
+	workspaceRepositories,
+	workspaces,
+} from "../../../../db/schema";
 import type { HostServiceContext } from "../../../../types";
+import { listCheckoutsByWorkspaceId } from "../../../../workspaces/checkouts";
 import { normalizeWorktreePath } from "./worktree-list";
 
 export interface WorktreeOwners {
@@ -9,44 +14,49 @@ export interface WorktreeOwners {
 }
 
 /**
- * The live workspaces of every project on this repository, keyed by branch and
- * by worktree path. A repository can belong to its own project and to a
- * multi-repo project at once; a worktree used by either is taken.
+ * The live workspaces with a checkout of any repository at `repoPath`, keyed
+ * by the checkout's branch and by its path. A worktree used by any of them is
+ * taken.
  */
 export function findWorktreeOwners(
 	db: HostServiceContext["db"],
 	repoPath: string,
 ): WorktreeOwners {
 	const repo = normalizeWorktreePath(repoPath);
-	const projectIds = db
-		.select({ id: projects.id, repoPath: projects.repoPath })
-		.from(projects)
-		.all()
-		.filter(
-			(project) =>
-				project.repoPath && normalizeWorktreePath(project.repoPath) === repo,
-		)
-		.map((project) => project.id);
+	const repositoryIds = new Set(
+		db
+			.select({ id: repositories.id, repoPath: repositories.repoPath })
+			.from(repositories)
+			.all()
+			.filter((row) => normalizeWorktreePath(row.repoPath) === repo)
+			.map((row) => row.id),
+	);
 	const owners: WorktreeOwners = { byBranch: new Map(), byPath: new Map() };
-	if (projectIds.length === 0) return owners;
+	if (repositoryIds.size === 0) return owners;
 	const rows = db
-		.select({
+		.selectDistinct({
 			id: workspaces.id,
-			branch: workspaces.branch,
 			worktreePath: workspaces.worktreePath,
 		})
 		.from(workspaces)
+		.innerJoin(
+			workspaceRepositories,
+			eq(workspaceRepositories.workspaceId, workspaces.id),
+		)
 		.where(
 			and(
-				inArray(workspaces.projectId, projectIds),
+				inArray(workspaceRepositories.repositoryId, [...repositoryIds]),
 				isNull(workspaces.archivedAt),
 			),
 		)
 		.all();
-	for (const row of rows) {
-		if (row.branch) owners.byBranch.set(row.branch, row.id);
-		if (row.worktreePath) {
-			owners.byPath.set(normalizeWorktreePath(row.worktreePath), row.id);
+	for (const [workspaceId, checkouts] of listCheckoutsByWorkspaceId(db, rows)) {
+		for (const checkout of checkouts) {
+			if (!repositoryIds.has(checkout.repository.id)) continue;
+			if (checkout.row.branch) {
+				owners.byBranch.set(checkout.row.branch, workspaceId);
+			}
+			owners.byPath.set(normalizeWorktreePath(checkout.path), workspaceId);
 		}
 	}
 	return owners;

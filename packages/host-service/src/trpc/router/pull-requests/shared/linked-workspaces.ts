@@ -1,6 +1,10 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { HostDb } from "../../../../db";
-import { pullRequests, workspaces } from "../../../../db/schema";
+import {
+	pullRequests,
+	workspaceRepositories,
+	workspaces,
+} from "../../../../db/schema";
 
 export interface RepoIdentity {
 	owner: string;
@@ -14,13 +18,19 @@ export interface LinkedPullRequestRow {
 	mergedAt: number | null;
 }
 
+const linkedPullRequestColumns = {
+	id: pullRequests.id,
+	state: pullRequests.state,
+	isDraft: pullRequests.isDraft,
+	mergedAt: pullRequests.mergedAt,
+};
+
 /**
- * The host's rows for this PR, matched by repository rather than project:
- * rows are unique per repository and number, and each refresh stamps the
- * project that performed it, so a project-scoped match misses a row that a
- * sibling project on the same repository refreshed last. The match ignores
- * case but the unique index does not, so two projects that spell the
- * repository differently can own one row each; callers treat every match.
+ * The host's rows for this PR, matched by GitHub repository rather than by
+ * host repository row: two projects can check out the same GitHub repository,
+ * and each refresh stamps the repository row that performed it. The match
+ * ignores case but the unique index does not, so two rows that spell the
+ * repository differently can exist; callers treat every match.
  */
 export function findPullRequestRows(
 	db: HostDb,
@@ -28,12 +38,7 @@ export function findPullRequestRows(
 	prNumber: number,
 ): LinkedPullRequestRow[] {
 	return db
-		.select({
-			id: pullRequests.id,
-			state: pullRequests.state,
-			isDraft: pullRequests.isDraft,
-			mergedAt: pullRequests.mergedAt,
-		})
+		.select(linkedPullRequestColumns)
 		.from(pullRequests)
 		.where(
 			and(
@@ -47,52 +52,53 @@ export function findPullRequestRows(
 }
 
 /**
- * Fallback for a project whose repository cannot be resolved right now (the
- * checkout is gone, the remote is unreachable): the rows the project itself
- * wrote. Misses a row a sibling project refreshed last, which the
- * repository-keyed lookup exists for, but keeps an existing link reachable.
+ * Fallback for a repository whose remote cannot be resolved right now (the
+ * clone is gone, the remote is unreachable): the rows it wrote itself.
  */
-export function findPullRequestRowsByProject(
+export function findPullRequestRowsByRepository(
 	db: HostDb,
-	projectId: string,
+	repositoryId: string,
 	prNumber: number,
 ): LinkedPullRequestRow[] {
 	return db
-		.select({
-			id: pullRequests.id,
-			state: pullRequests.state,
-			isDraft: pullRequests.isDraft,
-			mergedAt: pullRequests.mergedAt,
-		})
+		.select(linkedPullRequestColumns)
 		.from(pullRequests)
 		.where(
 			and(
-				eq(pullRequests.projectId, projectId),
+				eq(pullRequests.repositoryId, repositoryId),
 				eq(pullRequests.prNumber, prNumber),
 			),
 		)
 		.all();
 }
 
+export interface LinkedCheckout {
+	workspaceId: string;
+	repositoryId: string;
+}
+
 /**
- * Live workspaces whose current link is one of these rows, most recent
- * activity first, so a caller that wants exactly one takes index 0
- * deterministically. `lastActivityAt` follows agent activity and is null on
- * rows that predate it, where `updatedAt` (metadata writes) stands in.
- * `workspaces.pullRequestId` has no unique constraint: two worktrees on the
- * same branch, or a stale duplicate, can point at one PR.
+ * Checkouts of live workspaces whose current link is one of these rows, most
+ * recent workspace activity first, so a caller that wants exactly one takes
+ * index 0 deterministically. `lastActivityAt` is null on rows that predate
+ * it, where `updatedAt` stands in. Nothing makes a link unique: two worktrees
+ * on the same branch can point at one PR.
  */
-export function findLinkedWorkspaceIds(
+export function findLinkedCheckouts(
 	db: HostDb,
 	pullRequestIds: string[],
-): string[] {
+): LinkedCheckout[] {
 	if (pullRequestIds.length === 0) return [];
 	return db
-		.select({ id: workspaces.id })
-		.from(workspaces)
+		.select({
+			workspaceId: workspaceRepositories.workspaceId,
+			repositoryId: workspaceRepositories.repositoryId,
+		})
+		.from(workspaceRepositories)
+		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
 		.where(
 			and(
-				inArray(workspaces.pullRequestId, pullRequestIds),
+				inArray(workspaceRepositories.pullRequestId, pullRequestIds),
 				isNull(workspaces.archivedAt),
 			),
 		)
@@ -102,6 +108,17 @@ export function findLinkedWorkspaceIds(
 			),
 			desc(workspaces.createdAt),
 		)
-		.all()
-		.map((row) => row.id);
+		.all();
+}
+
+/** {@link findLinkedCheckouts} by workspace, each workspace once. */
+export function findLinkedWorkspaceIds(
+	db: HostDb,
+	pullRequestIds: string[],
+): string[] {
+	return [
+		...new Set(
+			findLinkedCheckouts(db, pullRequestIds).map((c) => c.workspaceId),
+		),
+	];
 }

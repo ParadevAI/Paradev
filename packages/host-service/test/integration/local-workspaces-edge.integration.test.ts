@@ -12,14 +12,10 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
-import { projects, terminalSessions, workspaces } from "../../src/db/schema";
-import {
-	runSandboxSelfSeed,
-	sandboxRepositoryWorkspaceId,
-} from "../../src/runtime/sandbox-self-seed/sandbox-self-seed";
+import { terminalSessions, workspaces } from "../../src/db/schema";
+import { runSandboxSelfSeed } from "../../src/runtime/sandbox-self-seed/sandbox-self-seed";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
 import { createGitFixture } from "../helpers/git-fixture";
@@ -287,20 +283,20 @@ describe("local workspaces: creation edge cases", () => {
 
 			const created = await host.trpc.project.create.mutate({
 				name: "detached",
-				mode: { kind: "importLocal", repoPath: repo.repoPath },
+				repositories: [{ kind: "local", path: repo.repoPath }],
 			});
 			expect(created.created).toBe(true);
 
 			await expect(
 				host.trpc.workspaces.create.mutate({
-					projectId: created.projectId,
+					projectId: created.id,
 					checkout: "local",
 					name: "x",
 				}),
 			).rejects.toMatchObject({ data: { code: "PRECONDITION_FAILED" } });
 
 			const worktree = await host.trpc.workspaces.create.mutate({
-				projectId: created.projectId,
+				projectId: created.id,
 				name: "feat",
 				branch: "feature/detached",
 			});
@@ -577,11 +573,13 @@ describe("local workspaces: update, list, relocate", () => {
 		});
 		const moved = await createGitFixture();
 		try {
-			const setup = await scenario.host.trpc.project.setup.mutate({
-				projectId: scenario.projectId,
-				mode: { kind: "import", repoPath: moved.repoPath, allowRelocate: true },
-			});
-			expect(setup.repoPath).toBe(moved.repoPath);
+			const relocated =
+				await scenario.host.trpc.project.relocateRepository.mutate({
+					projectId: scenario.projectId,
+					repositoryId: scenario.repositoryId,
+					path: moved.repoPath,
+				});
+			expect(relocated.repositories[0]?.path).toBe(moved.repoPath);
 
 			const row = liveRows(scenario.host.db).find(
 				(r) => r.id === a.workspace.id,
@@ -684,7 +682,7 @@ describe("local workspaces: sessions and sandbox seed", () => {
 		dispose = null;
 	});
 
-	test("18. sandbox self-seed writes a local workspace on the checkout and is idempotent", async () => {
+	test("18. sandbox self-seed writes one local workspace at the root and is idempotent", async () => {
 		const host = await createTestHost(hostOptions);
 		dispose = () => host.dispose();
 		const identity = {
@@ -714,49 +712,12 @@ describe("local workspaces: sessions and sandbox seed", () => {
 			JSON.parse(readFileSync(join(agentDir, "trust.json"), "utf8")),
 		).toEqual({ "/workspace": true });
 		const rows = host.db.select().from(workspaces).all();
-		// One local workspace per checkout: the primary under the cloud
-		// workspace's id, the sibling under an id derived from it.
-		expect(rows).toHaveLength(2);
-		expect(rows.find((row) => row.id === identity.workspaceId)).toMatchObject({
+		expect(rows).toHaveLength(1);
+		expect(rows[0]).toMatchObject({
+			id: identity.workspaceId,
 			type: "local",
-			worktreePath: "/workspace/repo",
-			name: "sandbox ws",
+			worktreePath: "/workspace",
 		});
-		expect(
-			rows.find(
-				(row) =>
-					row.id === sandboxRepositoryWorkspaceId(identity.workspaceId, "docs"),
-			),
-		).toMatchObject({ type: "local", worktreePath: "/workspace/docs" });
-		const primaryProjectId =
-			rows.find((row) => row.id === identity.workspaceId)?.projectId ?? "";
-		const readPrimaryProject = () =>
-			host.db
-				.select()
-				.from(projects)
-				.where(eq(projects.id, primaryProjectId))
-				.get();
-		const repoIdentity = {
-			repoProvider: "github",
-			repoOwner: "acme",
-			repoName: "repo",
-			repoUrl: "https://github.com/acme/repo",
-			remoteName: "origin",
-		};
-		expect(readPrimaryProject()).toMatchObject(repoIdentity);
-		host.db
-			.update(projects)
-			.set({
-				repoProvider: null,
-				repoOwner: null,
-				repoName: null,
-				repoUrl: null,
-				remoteName: null,
-			})
-			.where(eq(projects.id, primaryProjectId))
-			.run();
-		runSandboxSelfSeed(host.db, identity, agentDir);
-		expect(readPrimaryProject()).toMatchObject(repoIdentity);
 		// A sandbox's only workspace can still be retired record-only.
 		const preview = await host.trpc.workspaceCleanup.inspect.query({
 			workspaceId: identity.workspaceId,

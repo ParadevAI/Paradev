@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { TRPCError } from "@trpc/server";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 const ACTIONS_URL =
 	"https://github.com/acme/widgets/actions/runs/42/job/123456";
@@ -13,18 +13,11 @@ function createCaller(opts: {
 }) {
 	const downloadCalls: Array<{ owner: string; repo: string; job_id: number }> =
 		[];
-	const ctx = {
-		isAuthenticated: true,
-		db: {
-			query: {
-				workspaces: {
-					findFirst: () => ({ sync: () => opts.workspace }),
-				},
-				pullRequests: {
-					findFirst: () => ({ sync: () => opts.pr }),
-				},
-			},
-		},
+	const { db } = seedTestCheckout({
+		workspaceId: "ws-1",
+		pullRequest: opts.workspace?.pullRequestId ? opts.pr : undefined,
+	});
+	const ctx = testGitContext(db, {
 		github: async () => ({
 			rest: {
 				actions: {
@@ -39,7 +32,7 @@ function createCaller(opts: {
 				},
 			},
 		}),
-	} as unknown as HostServiceContext;
+	});
 	return { caller: gitRouter.createCaller(ctx), downloadCalls };
 }
 

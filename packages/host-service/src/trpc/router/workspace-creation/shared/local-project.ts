@@ -58,16 +58,18 @@ export async function projectDirExists(repoPath: string): Promise<boolean> {
 	);
 }
 
-export function requireProjectRepoPath(localProject: LocalProject): string {
-	if (!isProjectDirPresent(localProject.repoPath)) {
+export function requireRepositoryPath(repository: {
+	repoPath: string;
+}): string {
+	if (!isProjectDirPresent(repository.repoPath)) {
 		throw new TRPCError({
 			code: "NOT_FOUND",
 			message: "Project directory is no longer a directory on disk",
 			cause: {
 				kind: "PROJECT_DIR_MISSING",
-				repoPath: localProject.repoPath,
+				repoPath: repository.repoPath,
 			} satisfies ProjectDirMissingCause,
 		});
 	}
-	return localProject.repoPath;
+	return repository.repoPath;
 }

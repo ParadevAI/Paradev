@@ -1,24 +1,23 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { workspaces } from "../../../../db/schema";
-import { createGitEnvResolver } from "../../../../runtime/git";
+import { createGitEnvResolver, gitCeilingEnv } from "../../../../runtime/git";
 import { getHostWorkerPool } from "../../../../workers/host-worker-pool";
 import { gitPrHeadBaseTask } from "../../../../workers/tasks/git";
 import { protectedProcedure } from "../../../index";
-import { resolveWorktreePath } from "../../git/utils/resolve-worktree";
+import { resolveCheckoutPath } from "../../git/utils/resolve-worktree";
 import { actionRejectionError } from "../../github/github";
 import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
 
 const createInputSchema = z.object({
 	workspaceId: z.string(),
+	repositoryId: z.string().optional(),
 	title: z.string().trim().min(1),
 	body: z.string().optional(),
 	draft: z.boolean().default(false),
 });
 
 /**
- * Creates a GitHub PR from the workspace's current branch. The base is the
+ * Creates a GitHub PR from the current branch of one of the workspace's checkouts. The base is the
  * branch's configured `branch.<name>.base` (what the Changes panel's base
  * selector writes) falling back to the repo default branch. After creation
  * the workspace's PR link is refreshed immediately so the UI doesn't wait
@@ -27,18 +26,24 @@ const createInputSchema = z.object({
 export const createForWorkspace = protectedProcedure
 	.input(createInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const workspace = ctx.db.query.workspaces
-			.findFirst({ where: eq(workspaces.id, input.workspaceId) })
-			.sync();
-		if (!workspace?.projectId) {
+		const checkout = resolveCheckoutPath(
+			ctx,
+			input.workspaceId,
+			input.repositoryId,
+		);
+		const projectId = checkout.workspace.projectId;
+		if (!projectId || !checkout.repository) {
 			throw new TRPCError({
 				code: "BAD_REQUEST",
 				message:
 					"Workspace has no linked project, so there is no repository to open a pull request on",
 			});
 		}
-		const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
-		const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+		const worktreePath = checkout.path;
+		const gitEnv = {
+			...(await createGitEnvResolver(ctx.credentials)(worktreePath)),
+			...gitCeilingEnv(worktreePath),
+		};
 		const refs = await getHostWorkerPool().run(
 			gitPrHeadBaseTask,
 			{ worktreePath, gitEnv },
@@ -68,7 +73,11 @@ export const createForWorkspace = protectedProcedure
 			});
 		}
 
-		const repo = await resolveGithubRepo(ctx, workspace.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			projectId,
+			checkout.repository.id,
+		);
 		const octokit = await ctx.github();
 		let created: { number: number; html_url: string };
 		try {

@@ -6,6 +6,7 @@ import {
 	type FindNestedRepoRootsResult,
 	findNestedRepoRoots,
 } from "@superset/workspace-fs/watch-scan";
+import { gitCeilingEnv } from "../../runtime/git/ceiling.ts";
 import { listGitIgnoredDirs } from "../../runtime/git/ignored-dirs.ts";
 import { defineWorkerTask } from "../define-worker-task.ts";
 
@@ -20,12 +21,31 @@ export const nestedRepositoriesTask = defineWorkerTask<
 	handler: ({ rootPath, options }) => findNestedRepoRoots(rootPath, options),
 });
 
+async function ownGitDirectory(rootPath: string): Promise<string | null> {
+	try {
+		const { stdout } = await promisify(execFile)(
+			"git",
+			["rev-parse", "--git-dir"],
+			{
+				cwd: rootPath,
+				timeout: 3_000,
+				env: { ...process.env, ...gitCeilingEnv(rootPath) },
+			},
+		);
+		return resolve(rootPath, stdout.trim());
+	} catch {
+		return null;
+	}
+}
+
+/** `listGitIgnoredDirs` sets no ceiling, so it runs only in a folder that is a repository itself. */
 export const ignoredDirectoriesTask = defineWorkerTask<
 	{ rootPath: string },
 	string[]
 >({
 	type: "watcher/ignored-directories",
-	handler: ({ rootPath }) => listGitIgnoredDirs(rootPath),
+	handler: async ({ rootPath }) =>
+		(await ownGitDirectory(rootPath)) ? listGitIgnoredDirs(rootPath) : [],
 });
 
 export const gitDirectoryTask = defineWorkerTask<
@@ -33,18 +53,7 @@ export const gitDirectoryTask = defineWorkerTask<
 	string | null
 >({
 	type: "watcher/git-directory",
-	handler: async ({ rootPath }) => {
-		try {
-			const { stdout } = await promisify(execFile)(
-				"git",
-				["rev-parse", "--git-dir"],
-				{ cwd: rootPath, timeout: 3_000 },
-			);
-			return resolve(rootPath, stdout.trim());
-		} catch {
-			return null;
-		}
-	},
+	handler: ({ rootPath }) => ownGitDirectory(rootPath),
 });
 
 export const watcherTasks = [

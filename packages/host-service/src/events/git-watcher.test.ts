@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
+import { seedProject, seedWorkspace } from "../../test/helpers/seed";
+import { createTestDb } from "../trpc/router/pull-requests/shared/test-db";
 import {
 	collectWorktreeBatchPaths,
 	DEBOUNCE_MS,
@@ -261,7 +263,9 @@ describe("GitWatcher .git event filtering", () => {
 		internals(watcher).handleGitDirEvent("workspace-1", "index");
 		jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS);
 
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
 	});
 });
 
@@ -286,7 +290,9 @@ describe("GitWatcher adaptive debounce", () => {
 
 		// Flushes once the wide window elapses.
 		jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS - DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
 	});
 
 	test("a worktree-path batch flushes on the short window", () => {
@@ -298,7 +304,7 @@ describe("GitWatcher adaptive debounce", () => {
 
 		jest.advanceTimersByTime(DEBOUNCE_MS);
 		expect(events).toEqual([
-			{ workspaceId: "workspace-1", paths: ["src/app.ts"] },
+			{ workspaceId: "workspace-1", repositoryId: null, paths: ["src/app.ts"] },
 		]);
 	});
 
@@ -317,7 +323,9 @@ describe("GitWatcher adaptive debounce", () => {
 		internals(watcher).addWorktreePaths("workspace-1", ["src/later.ts"]);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
 
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
 	});
 
 	test("an ignore-rule change turns a scoped batch into a broad one", () => {
@@ -330,7 +338,9 @@ describe("GitWatcher adaptive debounce", () => {
 		internals(watcher).addWorktreePaths("workspace-1", ["src/later.ts"]);
 		jest.advanceTimersByTime(DEBOUNCE_MS);
 
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
 	});
 
 	test("a worktree edit joining a `.git/` batch restores the short window", () => {
@@ -345,7 +355,9 @@ describe("GitWatcher adaptive debounce", () => {
 
 		jest.advanceTimersByTime(DEBOUNCE_MS);
 		// Broad signal (no `paths`) because the batch saw `.git/` activity.
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
 	});
 
 	test("rapid `.git/`-only events ride the first wide window instead of resetting it", () => {
@@ -364,7 +376,9 @@ describe("GitWatcher adaptive debounce", () => {
 
 		// The window armed by the first event still elapses on schedule.
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
 	});
 
 	test("a batch with neither `.git/` activity nor worktree paths uses the short window", () => {
@@ -378,6 +392,102 @@ describe("GitWatcher adaptive debounce", () => {
 		internals(watcher).scheduleFlush("workspace-1");
 
 		jest.advanceTimersByTime(DEBOUNCE_MS);
-		expect(events).toEqual([{ workspaceId: "workspace-1" }]);
+		expect(events).toEqual([
+			{ workspaceId: "workspace-1", repositoryId: null },
+		]);
+	});
+});
+
+describe("GitWatcher per-checkout targets", () => {
+	interface TargetInternals {
+		listTargets(workspace: {
+			id: string;
+			worktreePath: string;
+			projectId: string | null;
+		}): { workspaceId: string; repositoryId: string | null; path: string }[];
+	}
+
+	test("a multi-repo workspace is watched once per checkout, never at its folder", () => {
+		const db = createTestDb();
+		const project = seedProject(
+			{ db },
+			{
+				repoPath: "/src/api",
+				repoName: "api",
+				repositories: [{ repoPath: "/src/web", repoName: "web" }],
+			},
+		);
+		seedWorkspace(
+			{ db },
+			{ id: "ws", projectId: project.id, worktreePath: "/ws", branch: "b" },
+		);
+		const watcher = new GitWatcher(
+			db,
+			{} as unknown as ConstructorParameters<typeof GitWatcher>[1],
+		);
+
+		const targets = (watcher as unknown as TargetInternals).listTargets({
+			id: "ws",
+			worktreePath: "/ws",
+			projectId: project.id,
+		});
+
+		expect(
+			targets.map(({ workspaceId, repositoryId, path }) => ({
+				workspaceId,
+				repositoryId,
+				path,
+			})),
+		).toEqual([
+			{
+				workspaceId: "ws",
+				repositoryId: project.repositoryIds[0] ?? "",
+				path: "/ws/api",
+			},
+			{
+				workspaceId: "ws",
+				repositoryId: project.repositoryIds[1] ?? "",
+				path: "/ws/web",
+			},
+		]);
+	});
+
+	test("a session workspace is watched at its own folder", () => {
+		const watcher = new GitWatcher(
+			createTestDb(),
+			{} as unknown as ConstructorParameters<typeof GitWatcher>[1],
+		);
+		const targets = (watcher as unknown as TargetInternals).listTargets({
+			id: "session",
+			worktreePath: "/sessions/s",
+			projectId: null,
+		});
+		expect(targets.map((t) => [t.repositoryId, t.path])).toEqual([
+			[null, "/sessions/s"],
+		]);
+	});
+
+	test("an event carries the checkout it came from", () => {
+		jest.useFakeTimers();
+		try {
+			const watcher = createWatcher();
+			const events: GitChangedEvent[] = [];
+			watcher.onChanged((event) => events.push(event));
+			const internal = watcher as unknown as {
+				targets: Map<string, unknown>;
+				markGitDirDirty(key: string): void;
+			};
+			internal.targets.set("ws\0repo-web", {
+				key: "ws\0repo-web",
+				workspaceId: "ws",
+				repositoryId: "repo-web",
+				path: "/ws/web",
+			});
+			internal.markGitDirDirty("ws\0repo-web");
+			jest.advanceTimersByTime(GIT_DIR_DEBOUNCE_MS);
+			expect(events).toEqual([{ workspaceId: "ws", repositoryId: "repo-web" }]);
+		} finally {
+			jest.useRealTimers();
+		}
 	});
 });

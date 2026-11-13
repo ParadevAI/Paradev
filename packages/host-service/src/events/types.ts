@@ -1,5 +1,6 @@
 import type { DetectedPort } from "@superset/port-scanner";
 import type { AgentIdentity } from "@superset/shared/agent-identity";
+import type { BranchPrefixMode } from "@superset/shared/workspace-launch";
 import type { WorkspaceTagAssignment } from "@superset/shared/workspace-tags";
 import type { FsWatchEvent } from "@superset/workspace-fs/host";
 import type { AgentLifecycleEventType } from "./map-event-type.ts";
@@ -15,11 +16,13 @@ export interface FsEventsMessage {
 export interface GitChangedMessage {
 	type: "git:changed";
 	workspaceId: string;
+	/** The checkout that changed; null for a project-less session workspace. */
+	repositoryId: string | null;
 	/**
-	 * Worktree-relative paths that changed when the batch was worktree-only.
+	 * Checkout-relative paths that changed when the batch was worktree-only.
 	 * Absent means a broad git state change (`.git/` activity — commit, index,
 	 * refs, or mixed) — consumers should invalidate everything for the
-	 * workspace.
+	 * checkout.
 	 */
 	paths?: string[];
 }
@@ -203,6 +206,9 @@ export interface ProjectSnapshot {
 	/** Sorted by name; the primary is marked, not moved. */
 	repositories: RepositorySnapshot[];
 	worktreeBaseDir: string | null;
+	branchPrefixMode: BranchPrefixMode | null;
+	branchPrefixCustom: string | null;
+	namingInstructions: string | null;
 	/** Custom icon data-URI, or null to fall back to the GitHub avatar. */
 	icon: string | null;
 	/** Accent color as a `#rrggbb` hex, or null for the default. */

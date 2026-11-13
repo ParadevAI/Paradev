@@ -43,7 +43,9 @@ describe("project router integration", () => {
 			projectId: scenario.projectId,
 		});
 		expect(found?.id).toBe(scenario.projectId);
-		expect(found?.repoPath).toBe(scenario.repo.repoPath);
+		expect(found?.repositories.map((r) => r.path)).toEqual([
+			scenario.repo.repoPath,
+		]);
 
 		const missing = await scenario.host.trpc.project.get.query({
 			projectId: randomUUID(),

@@ -38,6 +38,7 @@ describe("project sparse checkout", () => {
 
 		const set = await scenario.host.trpc.project.setSparseCheckoutPaths.mutate({
 			projectId: scenario.projectId,
+			repositoryId: scenario.repositoryId,
 			// Deliberately messy: duplicates, blanks, and decorated separators.
 			paths: ["./apps/desktop/", "packages/ui", "", "  ", "apps/desktop"],
 		});
@@ -46,16 +47,20 @@ describe("project sparse checkout", () => {
 		let got = await scenario.host.trpc.project.get.query({
 			projectId: scenario.projectId,
 		});
-		expect(got?.sparseCheckoutPaths).toEqual(["apps/desktop", "packages/ui"]);
+		expect(got?.repositories[0]?.sparseCheckoutPaths).toEqual([
+			"apps/desktop",
+			"packages/ui",
+		]);
 
 		await scenario.host.trpc.project.setSparseCheckoutPaths.mutate({
 			projectId: scenario.projectId,
+			repositoryId: scenario.repositoryId,
 			paths: [],
 		});
 		got = await scenario.host.trpc.project.get.query({
 			projectId: scenario.projectId,
 		});
-		expect(got?.sparseCheckoutPaths).toEqual([]);
+		expect(got?.repositories[0]?.sparseCheckoutPaths).toEqual([]);
 	});
 
 	test("get defaults to an empty list for a project that never set it", async () => {
@@ -65,7 +70,7 @@ describe("project sparse checkout", () => {
 		const got = await scenario.host.trpc.project.get.query({
 			projectId: scenario.projectId,
 		});
-		expect(got?.sparseCheckoutPaths).toEqual([]);
+		expect(got?.repositories[0]?.sparseCheckoutPaths).toEqual([]);
 	});
 
 	test("setSparseCheckoutPaths rejects traversal and a missing project", async () => {
@@ -75,6 +80,7 @@ describe("project sparse checkout", () => {
 		await expect(
 			scenario.host.trpc.project.setSparseCheckoutPaths.mutate({
 				projectId: scenario.projectId,
+				repositoryId: scenario.repositoryId,
 				paths: ["../../etc"],
 			}),
 		).rejects.toBeInstanceOf(TRPCClientError);
@@ -82,6 +88,7 @@ describe("project sparse checkout", () => {
 		await expect(
 			scenario.host.trpc.project.setSparseCheckoutPaths.mutate({
 				projectId: randomUUID(),
+				repositoryId: scenario.repositoryId,
 				paths: ["apps/desktop"],
 			}),
 		).rejects.toBeInstanceOf(TRPCClientError);
@@ -96,6 +103,7 @@ describe("project sparse checkout", () => {
 
 		await scenario.host.trpc.project.setSparseCheckoutPaths.mutate({
 			projectId: scenario.projectId,
+			repositoryId: scenario.repositoryId,
 			paths: ["apps/desktop"],
 		});
 

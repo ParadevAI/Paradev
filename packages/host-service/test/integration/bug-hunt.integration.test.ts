@@ -30,9 +30,10 @@ import {
 import { join } from "node:path";
 import { TRPCClientError } from "@trpc/client";
 import { eq } from "drizzle-orm";
-import { projects, workspaces } from "../../src/db/schema";
+import { workspaces } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
+import { seedProject, seedWorkspace } from "../helpers/seed";
 
 describe("bug-hunt: filesystem sandbox (structural mutations confined, reads and edits host-wide)", () => {
 	let host: TestHost;
@@ -43,19 +44,13 @@ describe("bug-hunt: filesystem sandbox (structural mutations confined, reads and
 	beforeEach(async () => {
 		host = await createTestHost();
 		repo = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath: repo.repoPath,
-				branch: "main",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath: repo.repoPath,
+			branch: "main",
+		});
 	});
 
 	afterEach(async () => {
@@ -185,19 +180,13 @@ describe("bug-hunt: git-flag injection", () => {
 	beforeEach(async () => {
 		host = await createTestHost();
 		repo = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath: repo.repoPath,
-				branch: "main",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath: repo.repoPath,
+			branch: "main",
+		});
 	});
 
 	afterEach(async () => {
@@ -275,8 +264,8 @@ describe("bug-hunt: idempotency", () => {
 		const id = randomUUID();
 		const a = await host.trpc.project.remove.mutate({ projectId: id });
 		const b = await host.trpc.project.remove.mutate({ projectId: id });
-		expect(a).toEqual({ success: true, repoPath: null });
-		expect(b).toEqual({ success: true, repoPath: null });
+		expect(a).toEqual({ success: true });
+		expect(b).toEqual({ success: true });
 	});
 });
 

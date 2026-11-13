@@ -6,11 +6,19 @@ import { fetchPullRequestDiff } from "../shared/fetch-pull-request-diff";
 
 export const getDiff = protectedProcedure
 	.input(
-		z.object({ projectId: z.string(), prNumber: z.number().int().positive() }),
+		z.object({
+			projectId: z.string(),
+			repositoryId: z.string().optional(),
+			prNumber: z.number().int().positive(),
+		}),
 	)
 	.query(async ({ ctx, input }) => {
 		try {
-			const repo = await resolveGithubRepo(ctx, input.projectId);
+			const repo = await resolveGithubRepo(
+				ctx,
+				input.projectId,
+				input.repositoryId,
+			);
 			return await fetchPullRequestDiff(
 				`${repo.owner}/${repo.name}`,
 				input.prNumber,

@@ -141,3 +141,11 @@ export class GitStatusStore {
 }
 
 export const gitStatusStore = new GitStatusStore();
+
+/** The store and the refresh limiter hold one entry per checkout, under this key. */
+export function checkoutStatusKey(
+	workspaceId: string,
+	repositoryId: string | null,
+): string {
+	return repositoryId ? `${workspaceId}:${repositoryId}` : workspaceId;
+}

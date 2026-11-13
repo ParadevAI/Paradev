@@ -4,8 +4,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type SimpleGit, simpleGit } from "simple-git";
-import type { HostServiceContext } from "../../../types";
 import { gitRouter } from "./git";
+import { seedTestCheckout, testGitContext } from "./utils/test-checkout";
 
 /**
  * Proves `getDiffBulk` scales to a large changeset in one call: a real repo
@@ -17,22 +17,8 @@ import { gitRouter } from "./git";
 const FILE_COUNT = 300;
 
 function createCaller(worktreePath: string) {
-	const ctx = {
-		isAuthenticated: true,
-		db: {
-			query: {
-				workspaces: {
-					findFirst: () => ({ sync: () => ({ worktreePath }) }),
-				},
-			},
-		},
-		git: async (path: string) => simpleGit(path),
-		credentials: {
-			getCredentials: async () => ({ env: {} }),
-			getToken: async () => null,
-		},
-	} as unknown as HostServiceContext;
-	return gitRouter.createCaller(ctx);
+	const { db } = seedTestCheckout({ workspaceId: "ws-1", worktreePath });
+	return gitRouter.createCaller(testGitContext(db));
 }
 
 async function initRepo(path: string): Promise<SimpleGit> {

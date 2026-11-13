@@ -6,9 +6,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { projects } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
+import { seedProject, seedWorkspace } from "../helpers/seed";
 
 describe("bug-hunt-3: workspace.delete + dirty worktree", () => {
 	let host: TestHost;
@@ -44,20 +44,13 @@ describe("bug-hunt-3: workspace.delete + dirty worktree", () => {
 				"v2Workspace.delete.mutate": () => ({ success: true }),
 			},
 		});
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		const { workspaces } = await import("../../src/db/schema");
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath,
-				branch: "feature/dirty",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath,
+			branch: "feature/dirty",
+		});
 
 		const result = await host.trpc.workspace.delete.mutate({ id: workspaceId });
 		expect(result.success).toBe(true);
@@ -76,20 +69,13 @@ describe("bug-hunt-3: race + repeated config writes", () => {
 	beforeEach(async () => {
 		host = await createTestHost();
 		repo = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-		const { workspaces } = await import("../../src/db/schema");
-		host.db
-			.insert(workspaces)
-			.values({
-				id: workspaceId,
-				projectId,
-				worktreePath: repo.repoPath,
-				branch: "main",
-			})
-			.run();
+		seedProject(host, { id: projectId, repoPath: repo.repoPath });
+		seedWorkspace(host, {
+			id: workspaceId,
+			projectId,
+			worktreePath: repo.repoPath,
+			branch: "main",
+		});
 	});
 
 	afterEach(async () => {

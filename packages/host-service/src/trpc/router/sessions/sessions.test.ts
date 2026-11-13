@@ -11,6 +11,7 @@ import { createTestRuntime, waitFor } from "@superset/chat-runtime/testing";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { seedProject, seedWorkspace } from "../../../../test/helpers/seed";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import { TerminalAgentStore } from "../../../terminal-agents";
@@ -37,17 +38,18 @@ beforeEach(() => {
 	migrate(db as never, {
 		migrationsFolder: resolve(import.meta.dir, "../../../../drizzle"),
 	});
-	db.insert(schema.projects).values({ id: "project", repoPath: "/repo" }).run();
+	const project = seedProject({ db }, { id: "project", repoPath: "/repo" });
 	for (const id of [WORKSPACE, OTHER_WORKSPACE])
-		db.insert(schema.workspaces)
-			.values({
+		seedWorkspace(
+			{ db },
+			{
 				id,
-				projectId: "project",
+				projectId: project.id,
 				worktreePath: "/repo",
 				branch: "main",
 				name: "fixture",
-			})
-			.run();
+			},
+		);
 	db.insert(schema.hostAgentConfigs)
 		.values({
 			id: "claude-config",

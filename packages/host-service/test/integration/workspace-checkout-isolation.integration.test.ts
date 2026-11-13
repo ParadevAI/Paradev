@@ -35,7 +35,7 @@ test("rejects shared-checkout adoption without deleting sibling identities", asy
 		await expect(
 			s.host.trpc.workspaces.create.mutate({
 				projectId: s.projectId,
-				worktreePath: s.repo.repoPath,
+				checkouts: { [s.repositoryId]: { worktreePath: s.repo.repoPath } },
 			}),
 		).rejects.toMatchObject({ data: { code: "CONFLICT" } });
 		const rows = s.host.db.select().from(workspaces).all();
@@ -105,7 +105,10 @@ test("rejects PR creation on the shared-checkout branch", async () => {
 			name: "one",
 		});
 		await expect(
-			s.host.trpc.workspaces.create.mutate({ projectId: s.projectId, pr: 42 }),
+			s.host.trpc.workspaces.create.mutate({
+				projectId: s.projectId,
+				checkouts: { [s.repositoryId]: { pr: 42 } },
+			}),
 		).rejects.toMatchObject({ data: { code: "CONFLICT" } });
 		expect(
 			s.host.db
@@ -166,7 +169,7 @@ test("adopting an independent worktree preserves stale local branch records", as
 			.run();
 		const adopted = await s.host.trpc.workspaces.create.mutate({
 			projectId: s.projectId,
-			worktreePath: path,
+			checkouts: { [s.repositoryId]: { worktreePath: path } },
 		});
 		expect(adopted.workspace.type).toBe("worktree");
 		expect(adopted.workspace.id).not.toBe(local.workspace.id);

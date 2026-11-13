@@ -4,7 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { FsWatchEvent } from "@superset/workspace-fs/host";
 import { simpleGit } from "simple-git";
+import { workspaces } from "../db/schema";
 import { GitStatusStore } from "../trpc/router/git/utils/git-status-store/git-status-store";
+import { createTestDb } from "../trpc/router/pull-requests/shared/test-db";
 import { GitDirectoryWatcher } from "./git-directory-watcher";
 import { GitWatcher } from "./git-watcher";
 
@@ -63,12 +65,16 @@ for (const failure of ["reject", "end", "subscribe", "git"] as const) {
 		const repo = await mkdtemp(join(tmpdir(), "git-watch-failure-"));
 		await simpleGit(repo).init();
 		const workspaceId = "watch-failure";
-		const row = { id: workspaceId, worktreePath: repo };
-		const db = {
-			select: () => ({
-				from: () => ({ where: () => ({ get: () => row, all: () => [row] }) }),
-			}),
-		};
+		const db = createTestDb();
+		db.insert(workspaces)
+			.values({
+				id: workspaceId,
+				projectId: null,
+				worktreePath: repo,
+				branch: "main",
+				type: "session",
+			})
+			.run();
 		const streams: Stream[] = [];
 		let failSubscribe = failure === "subscribe";
 		let backingOff = false;
@@ -87,9 +93,9 @@ for (const failure of ["reject", "end", "subscribe", "git"] as const) {
 		const store = new GitStatusStore();
 		const states: boolean[] = [];
 		const watcher = new GitWatcher(
-			db as unknown as ConstructorParameters<typeof GitWatcher>[0],
+			db,
 			filesystem as unknown as ConstructorParameters<typeof GitWatcher>[1],
-			(id, watched) => {
+			(id, _repositoryId, watched) => {
 				states.push(watched);
 				if (watched) store.attach(id);
 				else store.drop(id);

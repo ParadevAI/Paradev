@@ -7,6 +7,7 @@ import { syncPullRequestAfterWrite } from "../shared/sync-after-write";
 
 const setStateInputSchema = z.object({
 	projectId: z.string(),
+	repositoryId: z.string().optional(),
 	prNumber: z.number().int().positive(),
 	// Only open/closed — GitHub has no CLI verb to un-merge a PR, so a
 	// merged state isn't reachable through this mutation.
@@ -16,7 +17,11 @@ const setStateInputSchema = z.object({
 export const setState = protectedProcedure
 	.input(setStateInputSchema)
 	.mutation(async ({ ctx, input }) => {
-		const repo = await resolveGithubRepo(ctx, input.projectId);
+		const repo = await resolveGithubRepo(
+			ctx,
+			input.projectId,
+			input.repositoryId,
+		);
 		const verb = input.state === "closed" ? "close" : "reopen";
 		try {
 			await execGh([

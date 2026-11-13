@@ -2,6 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { workspaces } from "../../../../db/schema";
 import { getLocalProject } from "../../../../projects/local-project-store";
+import {
+	getPrimaryRepository,
+	listProjectRepositories,
+} from "../../../../projects/repositories";
 import type { HostServiceContext } from "../../../../types";
 import {
 	type HostWorkspaceRow,
@@ -78,7 +82,6 @@ export function listLiveLocalWorkspaces(
 
 export interface CreateLocalWorkspaceValues {
 	projectId: string;
-	repoPath: string;
 	name: string;
 	id?: string;
 	taskId?: string | null;
@@ -96,9 +99,9 @@ export async function createLocalWorkspace(
 	ctx: LocalWorkspaceContext,
 	values: CreateLocalWorkspaceValues,
 ): Promise<HostWorkspaceRow> {
-	requireUnchangedProjectCheckout(ctx, values.projectId, values.repoPath);
-	const branch = await requireCheckedOutBranch(ctx, values.repoPath);
-	requireUnchangedProjectCheckout(ctx, values.projectId, values.repoPath);
+	const repository = requireSingleRepository(ctx, values.projectId);
+	const branch = await requireCheckedOutBranch(ctx, repository.repoPath);
+	requireUnchangedProjectCheckout(ctx, values.projectId, repository);
 	return insertLocalWorkspace(
 		{
 			db: ctx.db,
@@ -111,21 +114,44 @@ export async function createLocalWorkspace(
 		{
 			id: values.id,
 			projectId: values.projectId,
-			worktreePath: values.repoPath,
+			worktreePath: repository.repoPath,
 			branch,
 			name: values.name,
 			type: "local",
 			taskId: values.taskId ?? null,
 			createdByUserId: values.createdByUserId ?? null,
 			tags: values.tags,
+			checkouts: [{ repositoryId: repository.id, branch }],
 		},
 	);
+}
+
+/** A local workspace is the repository's own checkout, so it needs a project of one repository. */
+function requireSingleRepository(
+	ctx: Pick<LocalWorkspaceContext, "db">,
+	projectId: string,
+) {
+	const project = getLocalProject(ctx.db, projectId);
+	if (!project)
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "Project no longer exists.",
+		});
+	const repositories = listProjectRepositories(ctx.db, projectId);
+	const [only] = repositories;
+	if (repositories.length !== 1 || !only)
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message:
+				"local_checkout_single_repo: a project with several repositories can only have worktree workspaces",
+		});
+	return only;
 }
 
 function requireUnchangedProjectCheckout(
 	ctx: Pick<LocalWorkspaceContext, "db">,
 	projectId: string,
-	repoPath: string,
+	repository: { id: string; repoPath: string },
 ): void {
 	const project = getLocalProject(ctx.db, projectId);
 	if (!project)
@@ -133,7 +159,8 @@ function requireUnchangedProjectCheckout(
 			code: "NOT_FOUND",
 			message: "Project no longer exists.",
 		});
-	if (project.repoPath !== repoPath)
+	const primary = getPrimaryRepository(ctx.db, project);
+	if (primary?.id !== repository.id || primary.repoPath !== repository.repoPath)
 		throw new TRPCError({
 			code: "CONFLICT",
 			message:

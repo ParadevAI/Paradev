@@ -2,20 +2,25 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import {
 	existsSync,
 	mkdirSync,
+	mkdtempSync,
+	readdirSync,
 	readFileSync,
 	rmSync,
 	writeFileSync,
 } from "node:fs";
-import { basename, dirname, join } from "node:path";
-import { eq, isNull } from "drizzle-orm";
+import { tmpdir } from "node:os";
+import { dirname, join, relative } from "node:path";
 import { simpleGit } from "simple-git";
-import { workspaces } from "../../src/db/schema";
-import { repositoryRootPathFor } from "../../src/projects/multi-repo";
+import { workspaceRepositories, workspaces } from "../../src/db/schema";
+import { getTomlConfigPath } from "../../src/runtime/setup/project-config-toml";
+import * as terminal from "../../src/terminal/terminal";
+import * as addBranchWorktreeModule from "../../src/trpc/router/workspace-creation/shared/add-branch-worktree";
 import * as naming from "../../src/trpc/router/workspace-creation/utils/ai-workspace-names";
+import * as titleJobs from "../../src/workspaces/workspace-title-jobs";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
-import { createGitFixture } from "../helpers/git-fixture";
-import { seedPullRequest } from "../helpers/seed";
+import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
+import { seedProject, seedRepository } from "../helpers/seed";
 
 let dispose: (() => Promise<void>) | undefined;
 
@@ -24,485 +29,266 @@ afterEach(async () => {
 	dispose = undefined;
 });
 
-async function containerScenario(
-	hostOptions: Partial<Parameters<typeof createTestHost>[0]> = {},
-) {
+type ExecGh = NonNullable<Parameters<typeof createTestHost>[0]>["execGh"];
+
+/** A project of `web` (primary) and `api`, each its own real repository. */
+async function multiRepoScenario(options: { execGh?: ExecGh } = {}) {
 	const host = await createTestHost({
 		apiOverrides: cloudFlows.workspaceCreateOk(),
-		...hostOptions,
+		...(options.execGh ? { execGh: options.execGh } : {}),
 	});
 	const web = await createGitFixture();
 	const api = await createGitFixture();
+	const worktreeBaseDir = mkdtempSync(join(tmpdir(), "multi-repo-worktrees-"));
+	const cleanup: string[] = [worktreeBaseDir];
 	dispose = async () => {
 		const roots = host.db
 			.select({ worktreePath: workspaces.worktreePath })
 			.from(workspaces)
-			.where(isNull(workspaces.parentWorkspaceId))
 			.all();
 		await host.dispose();
-		for (const { worktreePath } of roots) {
-			rmSync(worktreePath, { recursive: true, force: true });
+		for (const path of [...roots.map((row) => row.worktreePath), ...cleanup]) {
+			rmSync(path, { recursive: true, force: true });
 		}
 		web.dispose();
 		api.dispose();
 	};
-	const { projectId } = await host.trpc.project.createContainer.mutate({
-		name: "orbit",
-		repoPaths: [web.repoPath, api.repoPath],
+	const project = seedProject(host, {
+		repoPath: web.repoPath,
+		repositoryName: "web",
+		worktreeBaseDir,
+		repositories: [
+			{ repoPath: api.repoPath, name: "api", repoOwner: "o", repoName: "api" },
+		],
 	});
+	const [webId, apiId] = project.repositoryIds as [string, string];
 	return {
 		host,
-		projectId,
-		repoPaths: [web.repoPath, api.repoPath],
-		fixtures: [web, api],
+		projectId: project.id,
+		web,
+		api,
+		webId,
+		apiId,
+		cleanup,
+		worktreeBaseDir,
 	};
 }
 
-test("a container workspace holds a checkout of every repository and removes them together", async () => {
-	const { host, projectId, repoPaths } = await containerScenario();
-	const { trpc } = host;
-	expect((await trpc.project.list.query()).map((row) => row.id)).toEqual([
-		projectId,
-	]);
-
-	const { workspace } = await trpc.workspaces.create.mutate({
-		projectId,
-		name: "both",
-		branch: "feature/both",
-	});
-
-	const checkouts = await trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(checkouts.map((checkout) => checkout.name)).toEqual(
-		repoPaths.map((path) => basename(path)),
-	);
-	const root = dirname(checkouts[0]?.worktreePath ?? "");
-	for (const checkout of checkouts) {
-		expect(checkout.branch).toBe("feature/both");
-		expect(existsSync(join(checkout.worktreePath, ".git"))).toBe(true);
-	}
-	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
-		checkouts[0]?.worktreePath ?? "missing",
-	);
-	expect((await trpc.workspace.list.query()).map((row) => row.id)).toEqual([
-		workspace.id,
-	]);
-
-	const destroyed = await trpc.workspaceCleanup.destroy.mutate({
-		workspaceId: workspace.id,
-	});
-	expect(destroyed.warnings).toEqual([]);
-	expect(existsSync(root)).toBe(false);
-});
-
-test("deleting a container project frees its repositories, and restoring brings them back", async () => {
-	const { host, projectId, repoPaths } = await containerScenario();
-	const { trpc } = host;
-
-	await trpc.project.remove.mutate({ projectId });
-	expect(
-		(await trpc.project.listDeleted.query()).map((project) => project.id),
-	).toEqual([projectId]);
-
-	await trpc.project.restore.mutate({ projectId });
-	expect(
-		(await trpc.project.repositories.query({ projectId })).map(
-			(repository) => repository.repoPath,
-		),
-	).toEqual(repoPaths);
-});
-
-async function containerWorkspace() {
-	const scenario = await containerScenario();
+async function createBoth(
+	scenario: Awaited<ReturnType<typeof multiRepoScenario>>,
+) {
 	const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
 		projectId: scenario.projectId,
 		name: "both",
 		branch: "feature/both",
 	});
-	const checkouts = await scenario.host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	return { ...scenario, workspace, checkouts };
+	return workspace;
 }
 
-test("the delete preview warns about uncommitted changes in any checkout", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-	writeFileSync(join(checkouts[1]?.worktreePath ?? "", "dirty.txt"), "wip");
+const headOf = async (path: string) => {
+	const git = simpleGit(path);
+	return {
+		oid: (await git.revparse(["HEAD"])).trim(),
+		branch: (await git.revparse(["--abbrev-ref", "HEAD"])).trim(),
+	};
+};
 
-	const preview = await host.trpc.workspaceCleanup.inspect.query({
-		workspaceId: workspace.id,
+const worktreeCount = (repoPath: string) =>
+	Bun.spawnSync(["git", "worktree", "list"], { cwd: repoPath })
+		.stdout.toString()
+		.trim()
+		.split("\n").length;
+
+test("a one-repository workspace's folder is its checkout", async () => {
+	const host = await createTestHost({
+		apiOverrides: cloudFlows.workspaceCreateOk(),
 	});
-	expect(preview.hasChanges).toBe(true);
-});
-
-test("a dirty checkout blocks the delete before any checkout is removed", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-	writeFileSync(join(checkouts[1]?.worktreePath ?? "", "dirty.txt"), "wip");
-
-	await expect(
-		host.trpc.workspaceCleanup.destroy.mutate({ workspaceId: workspace.id }),
-	).rejects.toThrow("uncommitted changes");
-	for (const checkout of checkouts) {
-		expect(existsSync(checkout.worktreePath)).toBe(true);
-	}
-});
-
-test("the pull request lookup for a container workspace reports a checkout's pull request", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-	const checkout = host.db
-		.select()
-		.from(workspaces)
-		.where(eq(workspaces.id, checkouts[1]?.id ?? ""))
-		.get();
-	const { id: pullRequestId } = seedPullRequest(host, {
-		projectId: checkout?.projectId ?? "",
-		prNumber: 7,
-		title: "api change",
-		headBranch: "feature/both",
-	});
-	host.db
-		.update(workspaces)
-		.set({ pullRequestId })
-		.where(eq(workspaces.id, checkout?.id ?? ""))
-		.run();
-
-	const result = await host.trpc.pullRequests.getByWorkspaces.query({
-		workspaceIds: [workspace.id],
-	});
-	expect(result.workspaces.some((row) => row.pullRequest?.number === 7)).toBe(
-		true,
-	);
-});
-
-test("each checkout reports its own sync state, for the ship actions", async () => {
-	const { host, checkouts } = await containerWorkspace();
-	writeFileSync(join(checkouts[0]?.worktreePath ?? "", "dirty.txt"), "wip");
-
-	const [first, second] = await Promise.all(
-		checkouts.map((checkout) =>
-			host.trpc.git.getBranchSyncStatus.query({ workspaceId: checkout.id }),
-		),
-	);
-	expect(first).toMatchObject({ hasUncommitted: true });
-	expect(second).toMatchObject({ hasUncommitted: false });
-});
-
-test("each checkout reports its own pull request, for the Review tab", async () => {
-	const { host, checkouts } = await containerWorkspace();
-	const checkout = host.db
-		.select()
-		.from(workspaces)
-		.where(eq(workspaces.id, checkouts[1]?.id ?? ""))
-		.get();
-	const { id: pullRequestId } = seedPullRequest(host, {
-		projectId: checkout?.projectId ?? "",
-		prNumber: 7,
-		title: "api change",
-		headBranch: "feature/both",
-	});
-	host.db
-		.update(workspaces)
-		.set({ pullRequestId })
-		.where(eq(workspaces.id, checkout?.id ?? ""))
-		.run();
-
-	const [first, second] = await Promise.all(
-		checkouts.map((checkout) =>
-			host.trpc.git.getPullRequest.query({ workspaceId: checkout.id }),
-		),
-	);
-	expect(first).toBeNull();
-	expect(second).toMatchObject({ number: 7 });
-});
-
-test("each repository branches from the base branch picked for it", async () => {
-	const { host, projectId, fixtures } = await containerScenario();
-	const api = fixtures[1];
-	await api?.git.checkoutLocalBranch("release");
-	await api?.commit("release work", { "release.txt": "v2" });
-	await api?.git.checkout("main");
-	const repositories = await host.trpc.project.repositories.query({
-		projectId,
-	});
+	const repo = await createGitFixture();
+	dispose = async () => {
+		await host.dispose();
+		repo.dispose();
+	};
+	const project = seedProject(host, { repoPath: repo.repoPath });
 
 	const { workspace } = await host.trpc.workspaces.create.mutate({
-		projectId,
-		name: "both",
-		branch: "feature/both",
-		repositoryBaseBranches: { [repositories[1]?.id ?? ""]: "release" },
+		projectId: project.id,
+		branch: "feature/one",
 	});
 
-	const [web, apiCheckout] = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(existsSync(join(web?.worktreePath ?? "", "release.txt"))).toBe(false);
-	expect(existsSync(join(apiCheckout?.worktreePath ?? "", "release.txt"))).toBe(
-		true,
-	);
-	expect(
-		(await api?.git.raw(["config", "branch.feature/both.base"]))?.trim(),
-	).toBe("release");
-});
-
-test("file search finds files deep inside every checkout", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-	const api = checkouts[1];
-	if (!api) throw new Error("missing checkout");
-	const deepDir = join(api.worktreePath, "a/b/c/d/e/f/g/h/i");
-	mkdirSync(deepDir, { recursive: true });
-	writeFileSync(join(deepDir, "deep-target.ts"), "export {};\n");
-
-	const { matches } = await host.trpc.filesystem.searchFiles.query({
-		workspaceId: workspace.id,
-		query: "deep-target",
-	});
-
-	expect(matches.map((match) => match.relativePath)).toEqual([
-		`${basename(api.worktreePath)}/a/b/c/d/e/f/g/h/i/deep-target.ts`,
+	expect(workspace.checkouts).toMatchObject([
+		{
+			repositoryId: project.repositoryId,
+			isPrimary: true,
+			path: workspace.worktreePath,
+			branch: "feature/one",
+		},
 	]);
-});
-
-test("file search by project looks inside each repository", async () => {
-	const { host, projectId, repoPaths } = await containerScenario();
-	const api = repoPaths[1];
-	if (!api) throw new Error("missing repository");
-	writeFileSync(join(api, "project-target.ts"), "export {};\n");
-
-	const { matches } = await host.trpc.filesystem.searchFiles.query({
-		projectId,
-		query: "project-target",
-	});
-
-	expect(matches.map((match) => match.relativePath)).toEqual([
-		`${basename(api)}/project-target.ts`,
-	]);
-});
-
-test("restoring a deleted container workspace brings back every checkout", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-	const root = dirname(checkouts[0]?.worktreePath ?? "");
+	expect(existsSync(join(workspace.worktreePath, ".git"))).toBe(true);
 	await host.trpc.workspaceCleanup.destroy.mutate({
 		workspaceId: workspace.id,
 	});
-	expect(existsSync(root)).toBe(false);
-
-	await host.trpc.workspaces.restore.mutate({ workspaceId: workspace.id });
-
-	const restored = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(restored.map((checkout) => checkout.id)).toEqual(
-		checkouts.map((checkout) => checkout.id),
-	);
-	for (const checkout of restored) {
-		expect(checkout.branch).toBe("feature/both");
-		expect(existsSync(join(checkout.worktreePath, ".git"))).toBe(true);
-	}
-	expect(existsSync(join(root, "AGENTS.md"))).toBe(true);
+	expect(existsSync(workspace.worktreePath)).toBe(false);
 });
 
-test("each checkout reports its own run script, for the Run menu", async () => {
-	const { host, projectId, workspace, checkouts } = await containerWorkspace();
-	const [webProject, apiProject] = await host.trpc.project.repositories.query({
-		projectId,
-	});
-	if (!webProject || !apiProject) throw new Error("missing repositories");
-	await host.trpc.config.updateConfig.mutate({
-		projectId: apiProject.id,
-		run: ["bun server.ts"],
-	});
-
-	const definitions = await host.trpc.config.getRepositoryRunDefinitions.query({
-		workspaceId: workspace.id,
-	});
-
-	expect(definitions).toEqual([
-		{
-			repositoryId: checkouts[0]?.id ?? "",
-			projectId: webProject.id,
-			commands: null,
-			cwd: null,
-		},
-		{
-			repositoryId: checkouts[1]?.id ?? "",
-			projectId: apiProject.id,
-			commands: ["bun server.ts"],
-			cwd: checkouts[1]?.worktreePath ?? "",
-		},
-	]);
-});
-
-test("the container's diff stats sum every checkout, for the Workspaces board", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-	writeFileSync(join(checkouts[0]?.worktreePath ?? "", "a.txt"), "one\n");
-	writeFileSync(join(checkouts[1]?.worktreePath ?? "", "b.txt"), "one\ntwo\n");
-
-	const { workspaces: stats } =
-		await host.trpc.git.getDiffStatsByWorkspaces.query({
-			workspaceIds: [workspace.id],
-		});
-
-	expect(stats).toEqual([
-		{ workspaceId: workspace.id, additions: 3, deletions: 0, fileCount: 2 },
-	]);
-});
-
-test("renaming the branch in one checkout renames it in every checkout", async () => {
-	const { host, workspace, checkouts } = await containerWorkspace();
-
-	await host.trpc.git.renameBranch.mutate({
-		workspaceId: checkouts[0]?.id ?? "",
-		oldName: "feature/both",
-		newName: "feature/renamed",
-	});
-
-	const renamed = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(renamed.map((checkout) => checkout.branch)).toEqual([
-		"feature/renamed",
-		"feature/renamed",
-	]);
-	for (const checkout of checkouts) {
-		const head = Bun.spawnSync(["git", "branch", "--show-current"], {
-			cwd: checkout.worktreePath,
-		});
-		expect(head.stdout.toString().trim()).toBe("feature/renamed");
-	}
-	const container = host.db
-		.select({ branch: workspaces.branch })
-		.from(workspaces)
-		.where(eq(workspaces.id, workspace.id))
-		.get();
-	expect(container?.branch).toBe("feature/renamed");
-});
-
-test("moving a multi-repo workspace is refused with a clear reason", async () => {
-	const { host, workspace } = await containerWorkspace();
-
-	await expect(
-		host.trpc.teleport.prepareWorkspace.mutate({ workspaceId: workspace.id }),
-	).rejects.toThrow("A multi-repo workspace cannot be moved yet");
-});
-
-test("a terminal inside a checkout gets that repository's main checkout as its root path", async () => {
-	const { host, workspace, checkouts, repoPaths } = await containerWorkspace();
-	const root = dirname(checkouts[0]?.worktreePath ?? "");
+test("a two-repository workspace checks out each one at <root>/<name>, and get and list return them", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const root = workspace.worktreePath;
 
 	expect(
-		repositoryRootPathFor(
-			host.db,
-			workspace.id,
-			join(checkouts[1]?.worktreePath ?? "", "src"),
-		),
-	).toBe(repoPaths[1] ?? "missing");
-	expect(repositoryRootPathFor(host.db, workspace.id, root)).toBe("");
-});
-
-test("a shared base branch applies to every repository that has it", async () => {
-	const { host, projectId, fixtures } = await containerScenario();
-	const api = fixtures[1];
-	if (!api) throw new Error("missing fixture");
-	await api.git.checkoutLocalBranch("release");
-	await api.commit("release only", { "release.txt": "release" });
-	await api.git.checkout("main");
-
-	const { workspace } = await host.trpc.workspaces.create.mutate({
-		projectId,
-		name: "from release",
-		branch: "feature/from-release",
-		baseBranch: "release",
-	});
-
-	const [web, apiCheckout] = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	expect(existsSync(join(apiCheckout?.worktreePath ?? "", "release.txt"))).toBe(
-		true,
+		workspace.checkouts.map(({ name, path, branch, isPrimary }) => ({
+			name,
+			path,
+			branch,
+			isPrimary,
+		})),
+	).toEqual([
+		{
+			name: "api",
+			path: join(root, "api"),
+			branch: "feature/both",
+			isPrimary: false,
+		},
+		{
+			name: "web",
+			path: join(root, "web"),
+			branch: "feature/both",
+			isPrimary: true,
+		},
+	]);
+	for (const checkout of workspace.checkouts) {
+		expect(await headOf(checkout.path)).toMatchObject({
+			branch: "feature/both",
+		});
+	}
+	expect(existsSync(join(root, ".git"))).toBe(false);
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+		join(root, "api"),
 	);
-	expect(existsSync(join(web?.worktreePath ?? "", "README.md"))).toBe(true);
+
+	const got = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(got.checkouts).toEqual(workspace.checkouts);
+	const [listed] = await scenario.host.trpc.workspace.list.query();
+	expect(listed?.checkouts).toEqual(workspace.checkouts);
 });
 
-test("a local-checkout workspace is refused for a multi-repo project", async () => {
-	const { host, projectId } = await containerScenario();
+test("deleting a multi-repo workspace removes every worktree and the root", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
 
-	await expect(
-		host.trpc.workspaces.create.mutate({ projectId, checkout: "local" }),
-	).rejects.toThrow("A multi-repo project has no single checkout");
-});
+	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+		deleteBranch: true,
+	});
 
-test("AI naming renames the branch in every checkout", async () => {
-	const generator = spyOn(
-		naming,
-		"generateWorkspaceNamesFromPrompt",
-	).mockResolvedValue({ title: "Fix login", branchName: "repair-auth" });
-	try {
-		const { host, projectId } = await containerScenario();
-		const { workspace } = await host.trpc.workspaces.create.mutate({
-			projectId,
-			namingPrompt: "Fix the login bug",
-		});
-		const containerRow = () =>
-			host.db
-				.select()
-				.from(workspaces)
-				.where(eq(workspaces.id, workspace.id))
-				.get();
-		for (let i = 0; i < 200 && containerRow()?.name !== "Fix login"; i++) {
-			await new Promise((resolve) => setTimeout(resolve, 10));
-		}
-
-		const branch = containerRow()?.branch ?? "";
-		expect(containerRow()?.name).toBe("Fix login");
-		expect(branch).toContain("repair-auth");
-		const checkouts = await host.trpc.workspace.repositories.query({
-			workspaceId: workspace.id,
-		});
-		for (const checkout of checkouts) {
-			const head = Bun.spawnSync(["git", "branch", "--show-current"], {
-				cwd: checkout.worktreePath,
-			});
-			expect(head.stdout.toString().trim()).toBe(branch);
-			expect(checkout.branch).toBe(branch);
-		}
-	} finally {
-		generator.mockRestore();
+	expect(result).toMatchObject({
+		worktreeRemoved: true,
+		branchDeleted: true,
+		warnings: [],
+	});
+	expect(existsSync(workspace.worktreePath)).toBe(false);
+	for (const fixture of [scenario.web, scenario.api]) {
+		expect(worktreeCount(fixture.repoPath)).toBe(1);
+		expect((await fixture.git.branchLocal()).all.includes("feature/both")).toBe(
+			false,
+		);
 	}
 });
 
-test("a repository that fails to check out undoes the whole create", async () => {
-	const { host, projectId, fixtures } = await containerScenario();
-	const [web, api] = fixtures;
-	if (!web || !api) throw new Error("missing fixture");
-	rmSync(join(api.repoPath, ".git"), { recursive: true, force: true });
+test("a dirty checkout blocks the delete and is named, before any checkout is removed", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const api = workspace.checkouts.find((c) => c.name === "api");
+	writeFileSync(join(api?.path ?? "", "dirty.txt"), "wip");
 
 	await expect(
-		host.trpc.workspaces.create.mutate({
-			projectId,
-			name: "broken",
-			branch: "feature/broken",
+		scenario.host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
 		}),
-	).rejects.toThrow(basename(api.repoPath));
-
-	expect(host.db.select().from(workspaces).all()).toEqual([]);
-	const worktrees = Bun.spawnSync(["git", "worktree", "list"], {
-		cwd: web.repoPath,
+	).rejects.toThrow("api: Worktree has uncommitted changes");
+	for (const checkout of workspace.checkouts) {
+		expect(existsSync(checkout.path)).toBe(true);
+	}
+	const row = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
 	});
-	expect(worktrees.stdout.toString().trim().split("\n")).toHaveLength(1);
-	const branches = Bun.spawnSync(
-		["git", "branch", "--list", "feature/broken"],
-		{
-			cwd: web.repoPath,
-		},
-	);
-	expect(branches.stdout.toString().trim()).toBe("");
+	expect(row.archivedAt).toBeNull();
 });
 
-test("each repository with a PR starts from it, and the others branch on the PR's branch", async () => {
+test("files an agent left in the root warn and block the delete; a forced delete removes the root", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const root = workspace.worktreePath;
+	mkdirSync(join(root, ".claude"));
+	writeFileSync(join(root, ".claude", "settings.local.json"), "{}");
+
+	const inspected = await scenario.host.trpc.workspaceCleanup.inspect.query({
+		workspaceId: workspace.id,
+	});
+	expect(inspected.hasChanges).toBe(true);
+	await expect(
+		scenario.host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
+		}),
+	).rejects.toThrow(
+		"Workspace folder has files outside the repositories: .claude",
+	);
+	expect(existsSync(join(root, "api"))).toBe(true);
+
+	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+		force: true,
+	});
+	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
+	expect(existsSync(root)).toBe(false);
+});
+
+test("restoring a deleted multi-repo workspace brings back every checkout", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+
+	await scenario.host.trpc.workspaces.restore.mutate({
+		workspaceId: workspace.id,
+	});
+
+	for (const checkout of workspace.checkouts) {
+		expect(await headOf(checkout.path)).toMatchObject({
+			branch: "feature/both",
+		});
+	}
+	expect(existsSync(join(workspace.worktreePath, "AGENTS.md"))).toBe(true);
+});
+
+test("each repository branches from the base branch picked for it, the rest from their default", async () => {
+	const scenario = await multiRepoScenario();
+	await scenario.api.git.checkoutLocalBranch("release");
+	await scenario.api.commit("release work", { "release.txt": "v2" });
+	await scenario.api.git.checkout("main");
+
+	const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
+		projectId: scenario.projectId,
+		branch: "feature/both",
+		checkouts: { [scenario.apiId]: { baseBranch: "release" } },
+	});
+
+	const [api, web] = workspace.checkouts;
+	expect(existsSync(join(api?.path ?? "", "release.txt"))).toBe(true);
+	expect(existsSync(join(web?.path ?? "", "release.txt"))).toBe(false);
+	expect(
+		(await scenario.api.git.raw(["config", "branch.feature/both.base"])).trim(),
+	).toBe("release");
+});
+
+/** `api` has PR #7 on a bare remote; gh answers for it only. */
+async function pullRequestScenario() {
 	let prHeadOid = "";
 	let apiRepoPath = "";
-	const { host, projectId, fixtures } = await containerScenario({
+	const scenario = await multiRepoScenario({
 		execGh: async (args, options?: unknown) => {
 			const cwd = (options as { cwd?: string } | undefined)?.cwd;
 			if (args[0] === "pr" && args[1] === "view" && cwd === apiRepoPath) {
@@ -522,16 +308,11 @@ test("each repository with a PR starts from it, and the others branch on the PR'
 			throw new Error(`unexpected gh call: ${args.join(" ")}`);
 		},
 	});
-	const [web, api] = fixtures;
-	if (!web || !api) throw new Error("expected two repositories");
+	const { api } = scenario;
 	apiRepoPath = api.repoPath;
 	const remote = `${api.repoPath}-origin.git`;
+	scenario.cleanup.push(remote);
 	await simpleGit().raw(["init", "--bare", "--initial-branch=main", remote]);
-	const previousDispose = dispose;
-	dispose = async () => {
-		await previousDispose?.();
-		rmSync(remote, { recursive: true, force: true });
-	};
 	await api.git.addRemote("origin", remote);
 	await api.git.push("origin", "main", ["--set-upstream"]);
 	await api.git.checkoutLocalBranch("add-todo-tags");
@@ -540,44 +321,79 @@ test("each repository with a PR starts from it, and the others branch on the PR'
 	await api.git.push("origin", "add-todo-tags");
 	await api.git.checkout("main");
 	await api.git.deleteLocalBranch("add-todo-tags", true);
-	const repositories = await host.trpc.project.repositories.query({
-		projectId,
-	});
-	const apiRepository = repositories.find(
-		(repository) => repository.repoPath === api.repoPath,
-	);
-	if (!apiRepository) throw new Error("expected the api repository");
+	return { ...scenario, prHeadOid };
+}
 
-	const { workspace } = await host.trpc.workspaces.create.mutate({
-		projectId,
-		repositoryPullRequests: { [apiRepository.id]: 7 },
-	});
-
+async function expectPrCheckouts(
+	scenario: Awaited<ReturnType<typeof pullRequestScenario>>,
+	workspace: { branch: string; name: string; checkouts: { path: string }[] },
+	web: GitFixture,
+) {
 	expect(workspace.branch).toBe("add-todo-tags");
 	expect(workspace.name).toBe("Add todo tags");
-	const checkouts = host.db
-		.select()
-		.from(workspaces)
-		.where(eq(workspaces.parentWorkspaceId, workspace.id))
-		.all();
-	const headOf = async (repoPath: string) => {
-		const checkout = checkouts.find(
-			(row) => basename(row.worktreePath) === basename(repoPath),
-		);
-		if (!checkout) throw new Error(`no checkout of ${repoPath}`);
-		const git = simpleGit(checkout.worktreePath);
-		return {
-			oid: (await git.revparse(["HEAD"])).trim(),
-			branch: (await git.revparse(["--abbrev-ref", "HEAD"])).trim(),
-		};
-	};
-	expect(await headOf(api.repoPath)).toEqual({
-		oid: prHeadOid,
+	const [api, webCheckout] = workspace.checkouts;
+	expect(await headOf(api?.path ?? "")).toEqual({
+		oid: scenario.prHeadOid,
 		branch: "add-todo-tags",
 	});
-	expect(await headOf(web.repoPath)).toEqual({
+	expect(await headOf(webCheckout?.path ?? "")).toEqual({
 		oid: (await web.git.revparse(["main"])).trim(),
 		branch: "add-todo-tags",
+	});
+}
+
+test("a repository's checkouts[id].pr starts it from the PR, the others branch on the PR's branch", async () => {
+	const scenario = await pullRequestScenario();
+
+	const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
+		projectId: scenario.projectId,
+		checkouts: { [scenario.apiId]: { pr: 7 } },
+	});
+
+	await expectPrCheckouts(scenario, workspace, scenario.web);
+});
+
+test("two creates from one PR at once return one workspace", async () => {
+	const scenario = await pullRequestScenario();
+	const create = () =>
+		scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			checkouts: { [scenario.apiId]: { pr: 7 } },
+		});
+
+	const [first, second] = await Promise.all([create(), create()]);
+
+	expect(second.workspace.id).toBe(first.workspace.id);
+	expect([first.alreadyExists, second.alreadyExists].sort()).toEqual([
+		false,
+		true,
+	]);
+});
+
+test("pullRequest names its repository by owner/name, case-insensitively", async () => {
+	const scenario = await pullRequestScenario();
+	// The repository is matched on its live GitHub remote, not stored fields.
+	await scenario.api.git.addRemote("github", "https://github.com/o/api.git");
+
+	const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
+		projectId: scenario.projectId,
+		pullRequest: { repository: "O/API", number: 7 },
+	});
+
+	await expectPrCheckouts(scenario, workspace, scenario.web);
+});
+
+test("pullRequest for a repository outside the project is NOT_FOUND", async () => {
+	const scenario = await multiRepoScenario();
+
+	await expect(
+		scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			pullRequest: { repository: "someone/else", number: 7 },
+		}),
+	).rejects.toMatchObject({
+		data: { code: "NOT_FOUND" },
+		message: expect.stringContaining("repository_not_in_project"),
 	});
 });
 
@@ -590,140 +406,307 @@ function addOutsideWorktree(repoPath: string, branch: string): string {
 	return path;
 }
 
-test("an existing worktree moves into the workspace, and the others branch on its branch", async () => {
-	const { host, projectId, fixtures } = await containerScenario();
-	const [web, api] = fixtures;
-	if (!web || !api) throw new Error("missing fixture");
-	const outside = addOutsideWorktree(api.repoPath, "feature/started");
-	const [, apiProject] = await host.trpc.project.repositories.query({
-		projectId,
+test("an adopted worktree moves to <root>/<name>, and the others branch on its branch", async () => {
+	const scenario = await multiRepoScenario();
+	const outside = addOutsideWorktree(scenario.api.repoPath, "feature/started");
+
+	const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
+		projectId: scenario.projectId,
+		checkouts: { [scenario.apiId]: { worktreePath: outside } },
 	});
 
-	const { workspace } = await host.trpc.workspaces.create.mutate({
-		projectId,
-		repositoryWorktrees: { [apiProject?.id ?? ""]: outside },
-	});
-
-	const checkouts = await host.trpc.workspace.repositories.query({
-		workspaceId: workspace.id,
-	});
-	const root = dirname(checkouts[0]?.worktreePath ?? "");
+	expect(workspace.branch).toBe("feature/started");
 	expect(
-		checkouts.map(({ worktreePath, branch }) => ({ worktreePath, branch })),
+		workspace.checkouts.map(({ path, branch }) => ({ path, branch })),
 	).toEqual([
-		{
-			worktreePath: join(root, basename(web.repoPath)),
-			branch: "feature/started",
-		},
-		{
-			worktreePath: join(root, basename(api.repoPath)),
-			branch: "feature/started",
-		},
+		{ path: join(workspace.worktreePath, "api"), branch: "feature/started" },
+		{ path: join(workspace.worktreePath, "web"), branch: "feature/started" },
 	]);
 	expect(existsSync(outside)).toBe(false);
 	const { worktrees } =
-		await host.trpc.workspaceCreation.listProjectWorktrees.query({
-			projectId: apiProject?.id ?? "",
+		await scenario.host.trpc.workspaceCreation.listProjectWorktrees.query({
+			projectId: scenario.projectId,
+			repositoryId: scenario.apiId,
 		});
 	expect(
 		worktrees.find((worktree) => worktree.branch === "feature/started")
-			?.hasWorkspace,
-	).toBe(true);
+			?.workspaceId,
+	).toBe(workspace.id);
 });
 
-test("a failed create moves an adopted worktree back", async () => {
-	const { host, projectId, fixtures } = await containerScenario();
-	const [web, api] = fixtures;
-	if (!web || !api) throw new Error("missing fixture");
-	const outside = addOutsideWorktree(web.repoPath, "feature/kept");
-	const [webProject] = await host.trpc.project.repositories.query({
-		projectId,
-	});
-	rmSync(join(api.repoPath, ".git"), { recursive: true, force: true });
+test("a failed create leaves nothing behind: no row, worktree, branch or root, and the adopted worktree is back", async () => {
+	const scenario = await multiRepoScenario();
+	const outside = addOutsideWorktree(scenario.api.repoPath, "feature/kept");
+	scenario.cleanup.push(outside);
+	rmSync(join(scenario.web.repoPath, ".git"), { recursive: true, force: true });
 
 	await expect(
-		host.trpc.workspaces.create.mutate({
-			projectId,
-			repositoryWorktrees: { [webProject?.id ?? ""]: outside },
+		scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			checkouts: { [scenario.apiId]: { worktreePath: outside } },
 		}),
-	).rejects.toThrow(basename(api.repoPath));
+	).rejects.toThrow("web");
 
-	expect(existsSync(join(outside, ".git"))).toBe(true);
-	const branch = Bun.spawnSync(["git", "branch", "--show-current"], {
-		cwd: outside,
-	});
-	expect(branch.stdout.toString().trim()).toBe("feature/kept");
-	rmSync(outside, { recursive: true, force: true });
-});
-
-test("a worktree that already belongs to a workspace cannot be moved in", async () => {
-	const { host, projectId, checkouts } = await containerWorkspace();
-	const [, apiCheckout] = checkouts;
-	const [, apiProject] = await host.trpc.project.repositories.query({
-		projectId,
-	});
-
-	await expect(
-		host.trpc.workspaces.create.mutate({
-			projectId,
-			repositoryWorktrees: {
-				[apiProject?.id ?? ""]: apiCheckout?.worktreePath ?? "",
-			},
-		}),
-	).rejects.toThrow("already belongs to a workspace");
-});
-
-test("a multi-repo project can clone its repositories when it is created", async () => {
-	const host = await createTestHost({
-		apiOverrides: cloudFlows.workspaceCreateOk(),
-	});
-	const local = await createGitFixture();
-	const remote = await createGitFixture();
-	const cloneParentDir = `${local.repoPath}-clones`;
-	dispose = async () => {
-		await host.dispose();
-		rmSync(cloneParentDir, { recursive: true, force: true });
-		local.dispose();
-		remote.dispose();
-	};
-
-	const { projectId } = await host.trpc.project.createContainer.mutate({
-		name: "mixed",
-		repoPaths: [local.repoPath],
-		cloneUrls: [remote.repoPath],
-		cloneParentDir,
-	});
-
-	expect(
-		(await host.trpc.project.repositories.query({ projectId })).map(
-			(repository) => repository.repoPath,
-		),
-	).toEqual([local.repoPath, join(cloneParentDir, basename(remote.repoPath))]);
-});
-
-test("a failed clone leaves no project and no cloned folders", async () => {
-	const host = await createTestHost({
-		apiOverrides: cloudFlows.workspaceCreateOk(),
-	});
-	const remote = await createGitFixture();
-	const cloneParentDir = `${remote.repoPath}-clones`;
-	dispose = async () => {
-		await host.dispose();
-		rmSync(cloneParentDir, { recursive: true, force: true });
-		remote.dispose();
-	};
-
-	await expect(
-		host.trpc.project.createContainer.mutate({
-			name: "broken",
-			repoPaths: [],
-			cloneUrls: [remote.repoPath, `${remote.repoPath}-missing`],
-			cloneParentDir,
-		}),
-	).rejects.toThrow();
-
-	expect(await host.trpc.project.list.query()).toEqual([]);
-	expect(existsSync(join(cloneParentDir, basename(remote.repoPath)))).toBe(
-		false,
+	expect(scenario.host.db.select().from(workspaces).all()).toEqual([]);
+	expect(scenario.host.db.select().from(workspaceRepositories).all()).toEqual(
+		[],
 	);
+	expect(await headOf(outside)).toMatchObject({ branch: "feature/kept" });
+	expect(worktreeCount(scenario.api.repoPath)).toBe(2);
+	expect(
+		readdirSync(scenario.worktreeBaseDir, { recursive: true }).filter((entry) =>
+			String(entry).endsWith("kept"),
+		),
+	).toEqual([]);
+});
+
+test("when an adopted worktree cannot move back, the failed create keeps the root and the adopted files", async () => {
+	const scenario = await multiRepoScenario();
+	const outside = addOutsideWorktree(scenario.api.repoPath, "feature/wip");
+	scenario.cleanup.push(outside);
+	writeFileSync(join(outside, "wip.txt"), "uncommitted");
+	const added = spyOn(
+		addBranchWorktreeModule,
+		"addBranchWorktree",
+	).mockImplementation(async () => {
+		writeFileSync(outside, "something took the old path");
+		throw new Error("web checkout failed");
+	});
+	try {
+		const error = await scenario.host.trpc.workspaces.create
+			.mutate({
+				projectId: scenario.projectId,
+				checkouts: { [scenario.apiId]: { worktreePath: outside } },
+			})
+			.then(
+				() => null,
+				(err: Error) => err,
+			);
+
+		const root = error?.message.match(/so (\S+) was kept/)?.[1] ?? "";
+		expect(error?.message).toContain(`api is still at ${join(root, "api")}`);
+		expect(readFileSync(join(root, "api", "wip.txt"), "utf8")).toBe(
+			"uncommitted",
+		);
+		expect(scenario.host.db.select().from(workspaces).all()).toEqual([]);
+	} finally {
+		added.mockRestore();
+	}
+});
+
+test("a local checkout is refused for a multi-repo project", async () => {
+	const scenario = await multiRepoScenario();
+
+	await expect(
+		scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			checkout: "local",
+		}),
+	).rejects.toMatchObject({ data: { code: "BAD_REQUEST" } });
+	expect(scenario.host.db.select().from(workspaces).all()).toEqual([]);
+});
+
+function writeTomlConfig(repoPath: string, name: string) {
+	const path = getTomlConfigPath(repoPath);
+	mkdirSync(dirname(path), { recursive: true });
+	writeFileSync(
+		path,
+		`[install]\nrun = ["echo ${name}-install"]\ncwd = "${name}"\n\n[setup]\nrun = ["echo ${name}-setup"]\n`,
+	);
+}
+
+test("setup runs once in the workspace root, from the current primary repository's config.toml", async () => {
+	const scenario = await multiRepoScenario();
+	const started = spyOn(
+		terminal,
+		"createTerminalSessionInternal",
+	).mockResolvedValue({} as never);
+	try {
+		writeTomlConfig(scenario.web.repoPath, "web");
+		writeTomlConfig(scenario.api.repoPath, "api");
+
+		const { workspace, terminals } =
+			await scenario.host.trpc.workspaces.create.mutate({
+				projectId: scenario.projectId,
+				branch: "feature/setup",
+			});
+		const root = workspace.worktreePath;
+		const setupOf = (name: string) =>
+			`(cd '${join(root, name)}' && echo ${name}-install) && (cd '${root}' && echo ${name}-setup)`;
+
+		expect(terminals).toHaveLength(1);
+		expect(started).toHaveBeenCalledTimes(1);
+		expect(started.mock.calls[0]?.[0]).toMatchObject({
+			workspaceId: workspace.id,
+			initialCommand: setupOf("web"),
+		});
+
+		await scenario.host.trpc.project.setPrimaryRepository.mutate({
+			projectId: scenario.projectId,
+			repositoryId: scenario.apiId,
+		});
+		await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
+		});
+		started.mockClear();
+		await scenario.host.trpc.workspaces.restore.mutate({
+			workspaceId: workspace.id,
+		});
+
+		expect(started).toHaveBeenCalledTimes(1);
+		expect(started.mock.calls[0]?.[0]).toMatchObject({
+			workspaceId: workspace.id,
+			initialCommand: setupOf("api"),
+		});
+	} finally {
+		started.mockRestore();
+	}
+});
+
+test("a workspace with no checkout of a new primary repository reads only that repository's config", async () => {
+	const host = await createTestHost({
+		apiOverrides: cloudFlows.workspaceCreateOk(),
+	});
+	const web = await createGitFixture();
+	const api = await createGitFixture();
+	let root = "";
+	dispose = async () => {
+		await host.dispose();
+		rmSync(root, { recursive: true, force: true });
+		web.dispose();
+		api.dispose();
+	};
+	const project = seedProject(host, { repoPath: web.repoPath, name: "web" });
+	mkdirSync(dirname(getTomlConfigPath(web.repoPath)), { recursive: true });
+	await web.commit("config", {
+		[relative(web.repoPath, getTomlConfigPath(web.repoPath))]:
+			'[setup]\nrun = ["echo web-setup"]\n',
+	});
+	const started = spyOn(
+		terminal,
+		"createTerminalSessionInternal",
+	).mockResolvedValue({} as never);
+	try {
+		const { workspace } = await host.trpc.workspaces.create.mutate({
+			projectId: project.id,
+			branch: "feature/primary",
+		});
+		root = workspace.worktreePath;
+		const apiId = seedRepository(host, project.id, {
+			repoPath: api.repoPath,
+			name: "api",
+		}).id;
+		writeTomlConfig(api.repoPath, "api");
+		await host.trpc.project.setPrimaryRepository.mutate({
+			projectId: project.id,
+			repositoryId: apiId,
+		});
+		await host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
+		});
+		started.mockClear();
+		await host.trpc.workspaces.restore.mutate({ workspaceId: workspace.id });
+
+		expect(started.mock.calls[0]?.[0]).toMatchObject({
+			workspaceId: workspace.id,
+			initialCommand: `(cd '${join(root, "api")}' && echo api-install) && (cd '${root}' && echo api-setup)`,
+		});
+	} finally {
+		started.mockRestore();
+	}
+});
+
+test("git calls on a multi-repo workspace must name the repository", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+
+	await expect(
+		scenario.host.trpc.git.getStatus.query({ workspaceId: workspace.id }),
+	).rejects.toThrow("repository_required");
+	const status = await scenario.host.trpc.git.getStatus.query({
+		workspaceId: workspace.id,
+		repositoryId: scenario.apiId,
+	});
+	expect(status).toBeTruthy();
+});
+
+test("the workspace branch follows once every checkout is renamed to the same branch", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const rename = (repositoryId: string) =>
+		scenario.host.trpc.git.renameBranch.mutate({
+			workspaceId: workspace.id,
+			repositoryId,
+			oldName: "feature/both",
+			newName: "feature/renamed",
+		});
+	const workspaceBranch = async () =>
+		(await scenario.host.trpc.workspace.get.query({ id: workspace.id })).branch;
+
+	await rename(scenario.apiId);
+	expect(await workspaceBranch()).toBe("feature/both");
+	await rename(scenario.webId);
+	expect(await workspaceBranch()).toBe("feature/renamed");
+});
+
+test("a repository a live workspace checks out cannot be removed from the project", async () => {
+	const scenario = await multiRepoScenario();
+	await createBoth(scenario);
+
+	await expect(
+		scenario.host.trpc.project.removeRepository.mutate({
+			projectId: scenario.projectId,
+			repositoryId: scenario.apiId,
+		}),
+	).rejects.toMatchObject({ data: { code: "PRECONDITION_FAILED" } });
+});
+
+test("moving a multi-repo workspace is refused", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+
+	await expect(
+		scenario.host.trpc.teleport.prepareWorkspace.mutate({
+			workspaceId: workspace.id,
+		}),
+	).rejects.toThrow("multi_repo_unsupported");
+});
+
+test("AI naming renames the branch in every checkout still on the generated name", async () => {
+	const generator = spyOn(
+		naming,
+		"generateWorkspaceNamesFromPrompt",
+	).mockResolvedValue({ title: "Fix login", branchName: "repair-auth" });
+	const queueTitleJob = titleJobs.queueWorkspaceTitleJob;
+	let namingDone!: () => void;
+	const named = new Promise<void>((resolve) => {
+		namingDone = resolve;
+	});
+	const queued = spyOn(titleJobs, "queueWorkspaceTitleJob").mockImplementation(
+		(db, workspaceId, run) =>
+			queueTitleJob(db, workspaceId, (isCurrent, signal) =>
+				run(isCurrent, signal).finally(namingDone),
+			),
+	);
+	try {
+		const scenario = await multiRepoScenario();
+		const { workspace } = await scenario.host.trpc.workspaces.create.mutate({
+			projectId: scenario.projectId,
+			namingPrompt: "Fix the login bug",
+		});
+		await named;
+
+		const renamed = await scenario.host.trpc.workspace.get.query({
+			id: workspace.id,
+		});
+		expect(renamed.name).toBe("Fix login");
+		expect(renamed.branch).toContain("repair-auth");
+		for (const checkout of renamed.checkouts) {
+			expect(checkout.branch).toBe(renamed.branch);
+			expect((await headOf(checkout.path)).branch).toBe(renamed.branch);
+		}
+	} finally {
+		queued.mockRestore();
+		generator.mockRestore();
+	}
 });

@@ -10,7 +10,12 @@ import { DEBOUNCE_MS, type GitChangedEvent, GitWatcher } from "./git-watcher";
  * seam the earlier rounds used.
  */
 interface GitWatcherInternals {
-	startWorktreeWatch(workspaceId: string, worktreePath: string): () => void;
+	startWorktreeWatch(target: {
+		key: string;
+		workspaceId: string;
+		repositoryId: string | null;
+		path: string;
+	}): () => void;
 }
 
 class FakeStream {
@@ -83,10 +88,12 @@ describe("round 3: overflow and root-level events through the real stream loop",
 		stream = new FakeStream();
 		watcher = createWatcher(stream);
 		watcher.onChanged((event) => emitted.push(event));
-		dispose = (watcher as unknown as GitWatcherInternals).startWorktreeWatch(
-			WS,
-			WORKTREE,
-		);
+		dispose = (watcher as unknown as GitWatcherInternals).startWorktreeWatch({
+			key: WS,
+			workspaceId: WS,
+			repositoryId: null,
+			path: WORKTREE,
+		});
 	});
 
 	afterEach(() => {
@@ -101,7 +108,7 @@ describe("round 3: overflow and root-level events through the real stream loop",
 		]);
 		await settle();
 		jest.advanceTimersByTime(DEBOUNCE_MS + 1);
-		expect(emitted).toEqual([{ workspaceId: WS }]);
+		expect(emitted).toEqual([{ workspaceId: WS, repositoryId: null }]);
 	});
 
 	test("an overflow batch landing in a window that already has scoped paths must widen it to broad", async () => {

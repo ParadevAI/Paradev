@@ -22,8 +22,9 @@ import { after, before, describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { Server } from "@superset/pty-daemon";
 import { eq } from "drizzle-orm";
+import { seedProject } from "../../test/helpers/seed.ts";
 import { createDb, type HostDb } from "../db/index.ts";
-import { projects, terminalSessions, workspaces } from "../db/schema.ts";
+import { terminalSessions, workspaces } from "../db/schema.ts";
 import {
 	disposeDaemonClient,
 	getDaemonClient,
@@ -80,7 +81,7 @@ before(async () => {
 
 	projectId = randomUUID();
 	workspaceId = randomUUID();
-	db.insert(projects).values({ id: projectId, repoPath: worktreePath }).run();
+	seedProject({ db }, { id: projectId, repoPath: worktreePath });
 	db.insert(workspaces)
 		.values({
 			id: workspaceId,
@@ -677,13 +678,9 @@ describe("createTerminalSessionInternal — host-service restart adoption", () =
 		const ghostWorkspaceId = randomUUID();
 		const ghostWorktree = path.join(TEST_HOME, "ghost-worktree");
 		fs.mkdirSync(ghostWorktree, { recursive: true });
-		db.insert(projects)
-			.values({ id: randomUUID(), repoPath: ghostWorktree })
-			.run();
+		seedProject({ db }, { id: randomUUID(), repoPath: ghostWorktree });
 		const ghostProject = randomUUID();
-		db.insert(projects)
-			.values({ id: ghostProject, repoPath: ghostWorktree })
-			.run();
+		seedProject({ db }, { id: ghostProject, repoPath: ghostWorktree });
 		db.insert(workspaces)
 			.values({
 				id: ghostWorkspaceId,

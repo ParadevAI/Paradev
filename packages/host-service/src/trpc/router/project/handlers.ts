@@ -1,20 +1,34 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
-import { basename } from "node:path";
 import { TRPCError } from "@trpc/server";
-import { and, eq, isNull } from "drizzle-orm";
-import { projects, workspaces } from "../../../db/schema";
+import { and, eq, ne, sql } from "drizzle-orm";
+import {
+	projects,
+	pullRequests,
+	repositories,
+	workspaceRepositories,
+	workspaces,
+} from "../../../db/schema";
+import type { ProjectSnapshot } from "../../../events/types";
 import {
 	emitProjectChanged,
 	getLiveProjectAtPath,
 	getLocalProject,
 	getProjectAtPathIncludingDeleted,
+	type HostProjectRow,
+	toProjectSnapshot,
 } from "../../../projects/local-project-store";
-import { isContainerProject } from "../../../projects/multi-repo";
 import { restoreProject } from "../../../projects/project-deletion";
+import {
+	getLiveRepositoryAtPath,
+	getRepository,
+	listProjectRepositories,
+	repositoryName,
+} from "../../../projects/repositories";
 import type { HostServiceContext } from "../../../types";
+import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
-import { persistLocalProject } from "./utils/persist-project";
+import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
 	adoptLocalRepo,
 	cloneRepoInto,
@@ -22,8 +36,15 @@ import {
 	initEmptyRepo,
 	initLocalRepoInPlace,
 	type ResolvedRepo,
+	resolveMatchingSlug,
 	tryRevParseGitRoot,
 } from "./utils/resolve-repo";
+
+export type RepositorySource =
+	| { kind: "local"; path: string; initIfNeeded?: boolean }
+	| { kind: "clone"; url: string }
+	| { kind: "empty"; name: string }
+	| { kind: "template"; url: string };
 
 function dirNameForEmpty(name: string): string {
 	const slug = name
@@ -33,10 +54,21 @@ function dirNameForEmpty(name: string): string {
 	if (!slug) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
-			message: "Project name must produce a non-empty directory name",
+			message: "Repository name must produce a non-empty directory name",
 		});
 	}
 	return slug;
+}
+
+function dirNameForTemplate(url: string): string {
+	const last = url
+		.replace(/[?#].*$/, "")
+		.replace(/[\\/]+$/, "")
+		.replace(/\.git$/i, "")
+		.split(/[/:\\]/)
+		.filter(Boolean)
+		.pop();
+	return dirNameForEmpty(last ?? "");
 }
 
 async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
@@ -48,314 +80,499 @@ async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
 	}
 }
 
-export interface CreateResult {
-	projectId: string;
-	repoPath: string;
-	/** False when an existing local project row for the same repo path was
-	 * reused instead of inserting a new one (importLocal only). Callers use
-	 * this to skip side effects that would clobber user customizations. */
+interface ResolvedSource {
+	resolved: ResolvedRepo;
+	/** We made this folder, so a failure later removes it. */
 	created: boolean;
 }
 
-/**
- * Create-project saga — fully local, the cloud is never involved:
- *
- *   1. Local file ops (handled by the caller — clone / mkdir / etc.)
- *   2. Local DB project row (host-minted UUID)
- *
- * A project starts with zero workspaces; the user creates a local or
- * worktree workspace when they open it. A failure in step 2 unwinds the
- * file ops when the caller asked for that.
- */
-async function persistFromResolved(
-	ctx: HostServiceContext,
-	args: {
-		name: string;
-		resolved: ResolvedRepo;
-		cleanupRepoPathOnFailure: boolean;
-	},
-): Promise<CreateResult> {
-	const projectId = randomUUID();
-	try {
-		persistLocalProject(ctx, projectId, args.resolved, { name: args.name });
-	} catch (err) {
-		if (args.cleanupRepoPathOnFailure) {
-			try {
-				await rm(args.resolved.repoPath, { recursive: true, force: true });
-			} catch (cleanupErr) {
-				console.warn("[project.create] repo dir cleanup failed", {
-					repoPath: args.resolved.repoPath,
-					cleanupErr,
-				});
-			}
-		}
-		throw err;
-	}
-	return { projectId, repoPath: args.resolved.repoPath, created: true };
-}
-
-export async function createFromClone(
-	ctx: HostServiceContext,
-	args: { name: string; parentDir: string; url: string; signal?: AbortSignal },
-): Promise<CreateResult> {
-	const resolved = await cloneRepoInto(
-		args.url,
-		args.parentDir,
-		ctx.credentials,
-		args.signal,
-	);
-	return persistFromResolved(ctx, {
-		name: args.name,
-		resolved,
-		cleanupRepoPathOnFailure: true,
-	});
-}
-
-/**
- * Resolve an existing repo, or — when `initIfNeeded` and the folder isn't a git
- * repo yet — `git init` it in place first. The init branch only runs after the
- * UI has confirmed intent with the user.
- */
-async function resolveOrInitLocalRepo(
-	repoPath: string,
-	initIfNeeded: boolean,
-): Promise<ResolvedRepo> {
-	if (!initIfNeeded) return adoptLocalRepo(repoPath);
-	const root = await tryRevParseGitRoot(repoPath);
-	return root ? adoptLocalRepo(root) : initLocalRepoInPlace(repoPath);
-}
-
-export async function createFromImportLocal(
-	ctx: HostServiceContext,
-	args: { name: string; repoPath: string; initIfNeeded?: boolean },
-): Promise<CreateResult> {
-	const resolved = await resolveOrInitLocalRepo(
-		args.repoPath,
-		args.initIfNeeded ?? false,
-	);
-
-	// Idempotency guard: importing a repo that is already a project on this
-	// device returns the existing project instead of minting a duplicate
-	// row. Deliberately leaves the row untouched (no rename, no repo-field
-	// refresh) — the user may have customized it in v2. A live row wins over
-	// a deleted one; a deleted one is restored.
-	const existing =
-		getLiveProjectAtPath(ctx.db, resolved.repoPath) ??
-		getProjectAtPathIncludingDeleted(ctx.db, resolved.repoPath);
-	if (existing) {
-		restoreProject(ctx, existing.id);
-		return {
-			projectId: existing.id,
-			repoPath: resolved.repoPath,
-			created: false,
-		};
-	}
-
-	return persistFromResolved(ctx, {
-		name: args.name,
-		resolved,
-		// User pointed us at an existing folder; never rm it.
-		cleanupRepoPathOnFailure: false,
-	});
-}
-
-/**
- * Empty mode: mkdir + git init + initial commit, then run the saga.
- * The project lives local-only — no GitHub remote until first push.
- */
-export async function createFromEmpty(
-	ctx: HostServiceContext,
-	args: { name: string; parentDir: string },
-): Promise<CreateResult> {
-	const resolved = await classifyGitFailure(
-		initEmptyRepo(args.parentDir, dirNameForEmpty(args.name)),
-	);
-	return persistFromResolved(ctx, {
-		name: args.name,
-		resolved,
-		cleanupRepoPathOnFailure: true,
-	});
-}
-
-/**
- * Template mode: clone the template repo, strip history, re-init, then
- * run the saga. Like empty, the project lives local-only — no GitHub
- * remote until first push.
- */
-export async function createFromTemplate(
-	ctx: HostServiceContext,
-	args: { name: string; parentDir: string; url: string },
-): Promise<CreateResult> {
-	const resolved = await classifyGitFailure(
-		cloneTemplateInto(
-			args.url,
-			args.parentDir,
-			dirNameForEmpty(args.name),
-			ctx.credentials,
-		),
-	);
-	return persistFromResolved(ctx, {
-		name: args.name,
-		resolved,
-		cleanupRepoPathOnFailure: true,
-	});
-}
-
-async function resolveRepositoryForContainer(
-	ctx: HostServiceContext,
-	containerId: string | null,
-	repoPath: string,
-): Promise<ResolvedRepo> {
-	const resolved = await adoptLocalRepo(repoPath);
-	const owner = getLiveProjectAtPath(ctx.db, resolved.repoPath);
-	if (owner) {
+function requireParentDir(parentDir: string | undefined): string {
+	if (!parentDir?.trim()) {
 		throw new TRPCError({
-			code: "CONFLICT",
-			message:
-				owner.parentProjectId === containerId
-					? "This repository is already part of the project"
-					: `${basename(resolved.repoPath)} already belongs to another project`,
+			code: "BAD_REQUEST",
+			message: "Pick a folder for new and cloned repositories (parentDir)",
 		});
 	}
-	return resolved;
+	return parentDir;
 }
 
-function insertRepositoryRow(
+async function resolveSource(
 	ctx: HostServiceContext,
-	containerId: string,
-	resolved: ResolvedRepo,
-): string {
-	const id = randomUUID();
-	ctx.db
-		.insert(projects)
-		.values({
-			id,
-			parentProjectId: containerId,
-			repoPath: resolved.repoPath,
-			repoProvider: resolved.parsed ? "github" : null,
-			repoOwner: resolved.parsed?.owner ?? null,
-			repoName: resolved.parsed?.name ?? null,
-			repoUrl: resolved.parsed?.url ?? null,
-			remoteName: resolved.remoteName,
-			name: basename(resolved.repoPath),
-			updatedAt: Date.now(),
-		})
-		.run();
-	return id;
+	source: RepositorySource,
+	parentDir: string | undefined,
+	signal?: AbortSignal,
+): Promise<ResolvedSource> {
+	switch (source.kind) {
+		case "local": {
+			if (!source.initIfNeeded) {
+				return { resolved: await adoptLocalRepo(source.path), created: false };
+			}
+			const root = await tryRevParseGitRoot(source.path);
+			return {
+				resolved: root
+					? await adoptLocalRepo(root)
+					: await initLocalRepoInPlace(source.path),
+				created: false,
+			};
+		}
+		case "clone":
+			return {
+				resolved: await classifyGitFailure(
+					cloneRepoInto(
+						source.url,
+						requireParentDir(parentDir),
+						ctx.credentials,
+						signal,
+					),
+				),
+				created: true,
+			};
+		case "empty":
+			return {
+				resolved: await classifyGitFailure(
+					initEmptyRepo(
+						requireParentDir(parentDir),
+						dirNameForEmpty(source.name),
+					),
+				),
+				created: true,
+			};
+		case "template":
+			return {
+				resolved: await classifyGitFailure(
+					cloneTemplateInto(
+						source.url,
+						requireParentDir(parentDir),
+						dirNameForTemplate(source.url),
+						ctx.credentials,
+					),
+				),
+				created: true,
+			};
+	}
 }
 
-/** A project that holds repositories and has none of its own. */
-export async function createContainerProject(
+async function removeCreated(sources: ResolvedSource[]): Promise<void> {
+	for (const { resolved, created } of sources) {
+		if (!created) continue;
+		await rm(resolved.repoPath, { recursive: true, force: true }).catch(
+			(cleanupErr) =>
+				console.warn("[project] repository cleanup failed", {
+					repoPath: resolved.repoPath,
+					cleanupErr,
+				}),
+		);
+	}
+}
+
+/** Every source resolves, or every folder made for them is removed. */
+async function resolveSources(
+	ctx: HostServiceContext,
+	sources: RepositorySource[],
+	parentDir: string | undefined,
+	signal?: AbortSignal,
+): Promise<ResolvedSource[]> {
+	const settled = await Promise.allSettled(
+		sources.map((source) => resolveSource(ctx, source, parentDir, signal)),
+	);
+	const done = settled.flatMap((r) =>
+		r.status === "fulfilled" ? [r.value] : [],
+	);
+	const failed = settled.find((r) => r.status === "rejected");
+	if (failed) {
+		await removeCreated(done);
+		throw failed.reason;
+	}
+	return done;
+}
+
+function duplicateNameError(name: string): TRPCError {
+	return new TRPCError({
+		code: "CONFLICT",
+		message: `duplicate_name: the project already has a repository named "${name}"`,
+	});
+}
+
+function repositoryTakenError(path: string): TRPCError {
+	return new TRPCError({
+		code: "CONFLICT",
+		message: `repository_taken: ${path} already belongs to a project on this device`,
+	});
+}
+
+function nameOf(resolved: ResolvedRepo): string {
+	return repositoryName({
+		repoName: resolved.parsed?.name,
+		repoPath: resolved.repoPath,
+	});
+}
+
+/** Names are folder names, so compare them the way a case-insensitive disk would. */
+function requireUniqueNames(names: string[]): void {
+	const seen = new Set<string>();
+	for (const name of names) {
+		const key = name.toLowerCase();
+		if (seen.has(key)) throw duplicateNameError(name);
+		seen.add(key);
+	}
+}
+
+function repositoryValues(projectId: string, resolved: ResolvedRepo) {
+	const now = Date.now();
+	return {
+		id: randomUUID(),
+		projectId,
+		name: nameOf(resolved),
+		repoPath: resolved.repoPath,
+		provider: resolved.parsed ? ("github" as const) : null,
+		owner: resolved.parsed?.owner ?? null,
+		repoName: resolved.parsed?.name ?? null,
+		url: resolved.parsed?.url ?? null,
+		remoteName: resolved.remoteName,
+		createdAt: now,
+		updatedAt: now,
+	};
+}
+
+function snapshotOf(
+	ctx: HostServiceContext,
+	projectId: string,
+): ProjectSnapshot {
+	const row = getLocalProject(ctx.db, projectId);
+	if (!row) {
+		throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
+	}
+	return toProjectSnapshot(ctx.db, row);
+}
+
+function requireProject(
+	ctx: HostServiceContext,
+	projectId: string,
+): HostProjectRow {
+	const row = getLocalProject(ctx.db, projectId);
+	if (!row) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "Project is not set up on this host",
+		});
+	}
+	return row;
+}
+
+function requireRepositoryOf(
+	ctx: HostServiceContext,
+	projectId: string,
+	repositoryId: string,
+) {
+	const repository = getRepository(ctx.db, repositoryId);
+	if (!repository || repository.projectId !== projectId) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: `repository_not_found: project ${projectId} has no repository ${repositoryId}`,
+		});
+	}
+	return repository;
+}
+
+function touchProject(ctx: HostServiceContext, projectId: string): void {
+	ctx.db
+		.update(projects)
+		.set({ updatedAt: Date.now() })
+		.where(eq(projects.id, projectId))
+		.run();
+	const row = getLocalProject(ctx.db, projectId);
+	if (row) emitProjectChanged(ctx, "updated", row);
+}
+
+export type CreateProjectResult = ProjectSnapshot & {
+	/** False when one local folder that already was a project was reused. */
+	created: boolean;
+};
+
+/**
+ * Create a project from one or more repositories, the first being the
+ * primary. Fully local; the cloud is never involved.
+ */
+export async function createProject(
 	ctx: HostServiceContext,
 	args: {
 		name: string;
-		repoPaths: string[];
-		/** Cloned into `cloneParentDir` before the project exists; removed if it fails. */
-		cloneUrls?: string[];
-		cloneParentDir?: string;
+		repositories: RepositorySource[];
+		parentDir?: string;
 		signal?: AbortSignal;
 	},
-): Promise<{ projectId: string }> {
+): Promise<CreateProjectResult> {
 	const name = args.name.trim();
 	if (!name) {
 		throw new TRPCError({ code: "BAD_REQUEST", message: "Name the project" });
 	}
-	const cloneUrls = args.cloneUrls ?? [];
-	if (args.repoPaths.length + cloneUrls.length === 0) {
+	if (args.repositories.length === 0) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: "Add a repository to the project",
 		});
 	}
-	if (cloneUrls.length > 0 && !args.cloneParentDir?.trim()) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: "Pick a folder to clone the repositories into",
-		});
-	}
-	const resolved: ResolvedRepo[] = [];
-	for (const repoPath of args.repoPaths) {
-		const repo = await resolveRepositoryForContainer(ctx, null, repoPath);
-		if (!resolved.some((other) => other.repoPath === repo.repoPath)) {
-			resolved.push(repo);
+
+	const [first] = args.repositories;
+	if (args.repositories.length === 1 && first?.kind === "local") {
+		const { resolved } = await resolveSource(ctx, first, args.parentDir);
+		// Importing a folder that already is a project returns that project
+		// untouched; a deleted one is restored.
+		const existing =
+			getLiveProjectAtPath(ctx.db, resolved.repoPath) ??
+			getProjectAtPathIncludingDeleted(ctx.db, resolved.repoPath);
+		if (existing) {
+			restoreProject(ctx, existing.id);
+			return { ...snapshotOf(ctx, existing.id), created: false };
 		}
+		return {
+			...insertProject(ctx, name, [{ resolved, created: false }]),
+			created: true,
+		};
 	}
-	const cloned: string[] = [];
+
+	const resolved = await resolveSources(
+		ctx,
+		args.repositories,
+		args.parentDir,
+		args.signal,
+	);
 	try {
-		for (const url of cloneUrls) {
-			const repo = await classifyGitFailure(
-				cloneRepoInto(
-					url,
-					args.cloneParentDir as string,
-					ctx.credentials,
-					args.signal,
-				),
-			);
-			cloned.push(repo.repoPath);
-			resolved.push(repo);
-		}
-	} catch (error) {
-		for (const path of cloned) {
-			await rm(path, { recursive: true, force: true });
-		}
-		throw error;
+		return { ...insertProject(ctx, name, resolved), created: true };
+	} catch (err) {
+		await removeCreated(resolved);
+		throw err;
 	}
-	const projectId = randomUUID();
-	ctx.db
-		.insert(projects)
-		.values({
-			id: projectId,
-			kind: "container",
-			repoPath: "",
-			name,
-			updatedAt: Date.now(),
-		})
-		.run();
-	for (const repo of resolved) insertRepositoryRow(ctx, projectId, repo);
-	const row = getLocalProject(ctx.db, projectId);
-	if (row) emitProjectChanged(ctx.eventBus, "created", row);
-	return { projectId };
 }
 
-export async function addProjectRepository(
+function insertProject(
 	ctx: HostServiceContext,
-	args: { projectId: string; repoPath: string },
-): Promise<{ projectId: string; repoPath: string }> {
-	const container = getLocalProject(ctx.db, args.projectId);
-	if (!isContainerProject(container)) {
-		throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
+	name: string,
+	sources: ResolvedSource[],
+): ProjectSnapshot {
+	const paths = new Set<string>();
+	for (const { resolved } of sources) {
+		if (
+			paths.has(resolved.repoPath) ||
+			getLiveRepositoryAtPath(ctx.db, resolved.repoPath)
+		) {
+			throw repositoryTakenError(resolved.repoPath);
+		}
+		paths.add(resolved.repoPath);
 	}
-	const resolved = await resolveRepositoryForContainer(
+	requireUniqueNames(sources.map(({ resolved }) => nameOf(resolved)));
+
+	const projectId = randomUUID();
+	const rows = sources.map(({ resolved }) =>
+		repositoryValues(projectId, resolved),
+	);
+	const [primary] = rows;
+	if (!primary) throw new Error("insertProject needs a repository");
+	ctx.db.transaction((tx) => {
+		tx.insert(projects)
+			.values({
+				id: projectId,
+				name,
+				primaryRepositoryId: primary.id,
+				updatedAt: Date.now(),
+			})
+			.run();
+		tx.insert(repositories).values(rows).run();
+	});
+	const row = getLocalProject(ctx.db, projectId);
+	if (row) emitProjectChanged(ctx, "created", row);
+	return snapshotOf(ctx, projectId);
+}
+
+/** Live workspaces are not changed: they gain no checkout. */
+export async function addRepository(
+	ctx: HostServiceContext,
+	args: {
+		projectId: string;
+		source: RepositorySource;
+		parentDir?: string;
+		signal?: AbortSignal;
+	},
+): Promise<ProjectSnapshot> {
+	requireProject(ctx, args.projectId);
+	const [source] = await resolveSources(
+		ctx,
+		[args.source],
+		args.parentDir,
+		args.signal,
+	);
+	if (!source) throw new Error("addRepository resolved nothing");
+	try {
+		const { resolved } = source;
+		const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
+		if (owner) {
+			throw owner.projectId === args.projectId
+				? new TRPCError({
+						code: "CONFLICT",
+						message:
+							"repository_taken: this repository is already part of the project",
+					})
+				: repositoryTakenError(resolved.repoPath);
+		}
+		requireUniqueNames([
+			...listProjectRepositories(ctx.db, args.projectId).map((r) => r.name),
+			nameOf(resolved),
+		]);
+		ctx.db
+			.insert(repositories)
+			.values(repositoryValues(args.projectId, resolved))
+			.run();
+	} catch (err) {
+		await removeCreated([source]);
+		throw err;
+	}
+	touchProject(ctx, args.projectId);
+	return snapshotOf(ctx, args.projectId);
+}
+
+/**
+ * Removes the repository from the project, never its files. A repository a
+ * workspace checks out stays, archived workspaces included: their restore
+ * needs it.
+ */
+export function removeRepository(
+	ctx: HostServiceContext,
+	args: { projectId: string; repositoryId: string },
+): ProjectSnapshot {
+	const project = requireProject(ctx, args.projectId);
+	const repository = requireRepositoryOf(
 		ctx,
 		args.projectId,
-		args.repoPath,
+		args.repositoryId,
 	);
-	return {
-		projectId: insertRepositoryRow(ctx, args.projectId, resolved),
-		repoPath: resolved.repoPath,
-	};
-}
-
-export function removeProjectRepository(
-	ctx: HostServiceContext,
-	args: { projectId: string; repositoryProjectId: string },
-): void {
-	const repo = getLocalProject(ctx.db, args.repositoryProjectId);
-	if (!repo || repo.parentProjectId !== args.projectId) {
-		throw new TRPCError({ code: "NOT_FOUND", message: "Repository not found" });
-	}
-	const inUse = ctx.db
-		.select({ id: workspaces.id })
-		.from(workspaces)
-		.where(
-			and(eq(workspaces.projectId, repo.id), isNull(workspaces.archivedAt)),
-		)
-		.get();
-	if (inUse) {
+	if (repository.id === project.primaryRepositoryId) {
 		throw new TRPCError({
-			code: "CONFLICT",
-			message: "Delete the workspaces that use this repository first",
+			code: "PRECONDITION_FAILED",
+			message: "primary_repository: make another repository the primary first",
 		});
 	}
-	ctx.db.delete(projects).where(eq(projects.id, repo.id)).run();
+	if (listProjectRepositories(ctx.db, args.projectId).length <= 1) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: "last_repository: a project needs at least one repository",
+		});
+	}
+	const users = ctx.db
+		.select({ name: workspaces.name, archivedAt: workspaces.archivedAt })
+		.from(workspaceRepositories)
+		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
+		.where(eq(workspaceRepositories.repositoryId, repository.id))
+		.all();
+	if (users.length > 0) {
+		const archived = users.filter((u) => u.archivedAt !== null).length;
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: `repository_in_use: ${users.length} workspace(s) check out ${repository.name}${
+				archived > 0 ? ` (${archived} archived)` : ""
+			}; delete them first`,
+		});
+	}
+	// PR rows are shared by GitHub identity: another clone of the same
+	// repository may link them, so they move to it instead of cascading.
+	const twin =
+		repository.owner && repository.repoName
+			? ctx.db
+					.select({ id: repositories.id })
+					.from(repositories)
+					.where(
+						and(
+							ne(repositories.id, repository.id),
+							sql`lower(${repositories.owner}) = lower(${repository.owner})`,
+							sql`lower(${repositories.repoName}) = lower(${repository.repoName})`,
+						),
+					)
+					.get()
+			: undefined;
+	ctx.db.transaction((tx) => {
+		if (twin) {
+			tx.update(pullRequests)
+				.set({ repositoryId: twin.id })
+				.where(eq(pullRequests.repositoryId, repository.id))
+				.run();
+		}
+		tx.delete(repositories).where(eq(repositories.id, repository.id)).run();
+	});
+	touchProject(ctx, args.projectId);
+	return snapshotOf(ctx, args.projectId);
+}
+
+export function setPrimaryRepository(
+	ctx: HostServiceContext,
+	args: { projectId: string; repositoryId: string },
+): ProjectSnapshot {
+	requireProject(ctx, args.projectId);
+	requireRepositoryOf(ctx, args.projectId, args.repositoryId);
+	ctx.db
+		.update(projects)
+		.set({ primaryRepositoryId: args.repositoryId })
+		.where(eq(projects.id, args.projectId))
+		.run();
+	touchProject(ctx, args.projectId);
+	return snapshotOf(ctx, args.projectId);
+}
+
+/**
+ * Point a repository at the folder it now lives in. A repository with a
+ * GitHub remote only accepts a folder with the same remote. Its name stays:
+ * live workspaces keep their checkout folders.
+ */
+export async function relocateRepository(
+	ctx: HostServiceContext,
+	args: { projectId: string; repositoryId: string; path: string },
+): Promise<ProjectSnapshot> {
+	requireProject(ctx, args.projectId);
+	const repository = requireRepositoryOf(
+		ctx,
+		args.projectId,
+		args.repositoryId,
+	);
+	const resolved =
+		repository.owner && repository.repoName
+			? await resolveMatchingSlug(
+					args.path,
+					`${repository.owner}/${repository.repoName}`,
+				)
+			: await adoptLocalRepo(args.path);
+	const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
+	if (owner && owner.id !== repository.id) {
+		throw repositoryTakenError(resolved.repoPath);
+	}
+	if (resolved.repoPath === repository.repoPath) {
+		return snapshotOf(ctx, args.projectId);
+	}
+	ctx.db
+		.update(repositories)
+		.set({
+			repoPath: resolved.repoPath,
+			provider: resolved.parsed ? "github" : null,
+			owner: resolved.parsed?.owner ?? null,
+			repoName: resolved.parsed?.name ?? null,
+			url: resolved.parsed?.url ?? null,
+			remoteName: resolved.remoteName,
+			updatedAt: Date.now(),
+		})
+		.where(eq(repositories.id, repository.id))
+		.run();
+	// A local workspace is the repository's own checkout: it moves with it.
+	for (const row of listLiveLocalWorkspaces(ctx, args.projectId)) {
+		const checksOut = ctx.db
+			.select({ id: workspaceRepositories.repositoryId })
+			.from(workspaceRepositories)
+			.where(
+				and(
+					eq(workspaceRepositories.workspaceId, row.id),
+					eq(workspaceRepositories.repositoryId, repository.id),
+				),
+			)
+			.get();
+		if (!checksOut || row.worktreePath === resolved.repoPath) continue;
+		updateLocalWorkspace(ctx, row.id, { worktreePath: resolved.repoPath });
+	}
+	touchProject(ctx, args.projectId);
+	return snapshotOf(ctx, args.projectId);
 }

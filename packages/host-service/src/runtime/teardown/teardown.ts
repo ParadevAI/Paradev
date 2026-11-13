@@ -32,7 +32,10 @@ export type TeardownResult =
 interface RunTeardownOptions {
 	db: HostDb;
 	workspaceId: string;
-	worktreePath: string;
+	/** The checkout whose config wins over the main repo's; omit to read only the main repo. */
+	worktreePath?: string;
+	/** Where the script runs and what its `cwd` is relative to; defaults to the checkout. */
+	scriptRoot?: string;
 	/** Main repo path — source of truth for the repo's config. */
 	repoPath: string;
 	projectId: string;
@@ -58,6 +61,7 @@ export async function runTeardown({
 	db,
 	workspaceId,
 	worktreePath,
+	scriptRoot,
 	repoPath,
 	projectId,
 	timeoutMs = TEARDOWN_TIMEOUT_MS,
@@ -67,6 +71,7 @@ export async function runTeardown({
 		repoPath,
 		projectId,
 		worktreePath,
+		scriptRoot,
 		appHomeDir,
 	});
 	if (resolved === null) return { status: "skipped" };
@@ -166,12 +171,16 @@ export async function runTeardown({
 export function resolveTeardownCommand(args: {
 	repoPath: string;
 	projectId: string;
-	worktreePath: string;
+	worktreePath?: string;
+	scriptRoot?: string;
 	appHomeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
 	const config = loadProjectConfig(args);
 	if (config?.kind !== "ok") return null;
-	const archive = chainPhases([config.resolved.archive], args.worktreePath);
+	const archive = chainPhases(
+		[config.resolved.archive],
+		args.scriptRoot ?? args.worktreePath ?? args.repoPath,
+	);
 	if (!archive) return null;
 	return {
 		initialCommand: buildTeardownCommandFromShell(archive.command),

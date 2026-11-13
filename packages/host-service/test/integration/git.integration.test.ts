@@ -3,7 +3,7 @@ import { rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { TRPCClientError } from "@trpc/client";
 import { eq } from "drizzle-orm";
-import { workspaces } from "../../src/db/schema";
+import { workspaceRepositories, workspaces } from "../../src/db/schema";
 import { type BasicScenario, createBasicScenario } from "../helpers/scenarios";
 
 describe("git router integration", () => {
@@ -300,6 +300,11 @@ describe("git router integration", () => {
 			.update(workspaces)
 			.set({ branch: "feature/renamed-by-ai" })
 			.where(eq(workspaces.id, scenario.workspaceId))
+			.run();
+		scenario.host.db
+			.update(workspaceRepositories)
+			.set({ branch: "feature/renamed-by-ai" })
+			.where(eq(workspaceRepositories.workspaceId, scenario.workspaceId))
 			.run();
 
 		const result = await scenario.host.trpc.git.renameBranch.mutate({
