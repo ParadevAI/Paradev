@@ -2112,59 +2112,68 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 	}
 
 	test("history accumulates across branch moves; unlink hides the pointer, never the history", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedWorkspace(db, {
-			id: "ws",
-			branch: "branch-a",
-			headSha: "sha-branch-a",
-			upstreamOwner: REPO.owner,
-			upstreamRepo: REPO.name,
-			upstreamBranch: "branch-a",
-		});
-		const prsByBranch = new Map([["branch-a", 101]]);
-		const manager = createManager(db, { execGh: historyExecGh(prsByBranch) });
+		const LINKED_A = Date.parse("2026-05-08T12:00:00Z");
+		setSystemTime(new Date(LINKED_A));
+		try {
+			const db = createRealDb();
+			seedProject(db);
+			seedWorkspace(db, {
+				id: "ws",
+				branch: "branch-a",
+				headSha: "sha-branch-a",
+				upstreamOwner: REPO.owner,
+				upstreamRepo: REPO.name,
+				upstreamBranch: "branch-a",
+			});
+			const prsByBranch = new Map([["branch-a", 101]]);
+			const manager = createManager(db, { execGh: historyExecGh(prsByBranch) });
 
-		await withSilencedWarnings(() =>
-			manager.refreshPullRequestsByWorkspaces(["ws"]),
-		);
-		const first = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(first[0]?.pullRequests.map((pr) => pr.number)).toEqual([101]);
-		expect(first[0]?.pullRequests[0]?.isCurrent).toBe(true);
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
+			const first = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+			expect(first[0]?.pullRequests.map((pr) => pr.number)).toEqual([101]);
+			expect(first[0]?.pullRequests[0]?.isCurrent).toBe(true);
 
-		// The workspace moves on: new branch, new PR. The pointer follows;
-		// the history keeps both.
-		db.update(workspaces)
-			.set({
-				branch: "branch-b",
-				headSha: "sha-branch-b",
-				upstreamBranch: "branch-b",
-			})
-			.where(eq(workspaces.id, "ws"))
-			.run();
-		prsByBranch.set("branch-b", 102);
-		await withSilencedWarnings(() =>
-			manager.refreshPullRequestsByWorkspaces(["ws"]),
-		);
+			// The workspace moves on: new branch, new PR. The pointer follows;
+			// the history keeps both.
+			db.update(workspaces)
+				.set({
+					branch: "branch-b",
+					headSha: "sha-branch-b",
+					upstreamBranch: "branch-b",
+				})
+				.where(eq(workspaces.id, "ws"))
+				.run();
+			prsByBranch.set("branch-b", 102);
+			setSystemTime(new Date(LINKED_A + 1_000));
+			await withSilencedWarnings(() =>
+				manager.refreshPullRequestsByWorkspaces(["ws"]),
+			);
 
-		const both = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(both[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
-		expect(both[0]?.pullRequests.map((pr) => pr.isCurrent)).toEqual([
-			true,
-			false,
-		]);
-		const current = await manager.getPullRequestsByWorkspaces(["ws"]);
-		expect(current[0]?.pullRequest?.number).toBe(102);
+			const both = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+			expect(both[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
+			expect(both[0]?.pullRequests.map((pr) => pr.isCurrent)).toEqual([
+				true,
+				false,
+			]);
+			const current = await manager.getPullRequestsByWorkspaces(["ws"]);
+			expect(current[0]?.pullRequest?.number).toBe(102);
 
-		// Remove PR Link: the sidebar loses the pointer; history keeps 102.
-		manager.unlinkWorkspacePullRequest("ws");
-		const afterUnlink = await manager.getPullRequestsByWorkspaces(["ws"]);
-		expect(afterUnlink[0]?.pullRequest).toBeNull();
-		const history = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
-		expect(history[0]?.pullRequests.map((pr) => pr.number)).toEqual([102, 101]);
-		expect(history[0]?.pullRequests.every((pr) => pr.isCurrent === false)).toBe(
-			true,
-		);
+			// Remove PR Link: the sidebar loses the pointer; history keeps 102.
+			manager.unlinkWorkspacePullRequest("ws");
+			const afterUnlink = await manager.getPullRequestsByWorkspaces(["ws"]);
+			expect(afterUnlink[0]?.pullRequest).toBeNull();
+			const history = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+			expect(history[0]?.pullRequests.map((pr) => pr.number)).toEqual([
+				102, 101,
+			]);
+			expect(
+				history[0]?.pullRequests.every((pr) => pr.isCurrent === false),
+			).toBe(true);
+		} finally {
+			setSystemTime();
+		}
 	});
 
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
