@@ -902,6 +902,12 @@ msgstr "{count, plural, one {#次搜索} other {#次搜索}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, other {# 个步骤}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# 个终端留在了原工作区。} other {# 个终端留在了原工作区。}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# 个终端已停止，无法重新启动。} other {# 个终端已停止，无法重新启动。}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {此仓库中有#个worktree没有对应的工作区，将被导入为工作区。} other {此仓库中有#个worktree没有对应的工作区，将被导入为工作区。}}"
 
@@ -1802,6 +1808,9 @@ msgstr "云端自动化的指令最多 {max} 个字符"
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "云端工作区无法调用 {path}。请在你已登录的客户端中执行。"
+
+msgid "A computer"
+msgstr "一台电脑"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}已经在删除中。"
@@ -2813,6 +2822,9 @@ msgstr "随时知道哪个智能体需要你，通知可直接跳转到被阻塞
 msgid "An agent completes multi-file changes end to end."
 msgstr "智能体能端到端完成跨文件改动。"
 
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "这里有智能体仍在工作。重试即可停止它并移动。"
+
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "代理会在云工作区中设置此环境（约 20 分钟或更久）：安装依赖、编写设置配置，并询问所需的密钥。你可以随时中断，或在工作区中接手并自行完成设置。"
 
@@ -2878,6 +2890,9 @@ msgstr "匿名装配工"
 
 msgid "Another AI assistant"
 msgstr "其他 AI 助手"
+
+msgid "Another computer"
+msgstr "另一台电脑"
 
 msgid "another device"
 msgstr "另一台设备"
@@ -6269,6 +6284,9 @@ msgstr "无法加载贡献者，请直接输入用户名。"
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "无法加载更早的消息。重试"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "无法加载环境。重试"
 
 msgid "Couldn't load its activity"
 msgstr "无法加载其活动"
@@ -10913,9 +10931,6 @@ msgstr "同步完成后，其插件会显示出来。"
 msgid "Its replies go with it."
 msgstr "其回复也会一并删除。"
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "它的工作（包括未提交的更改）会推送到一个新分支。所选电脑上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重启之前，其工作区和终端都不可用，请使用Paradev托盘菜单 > 主机服务 > 重启。"
 
@@ -12404,23 +12419,8 @@ msgstr "迁移云端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关闭则将其打开"
 
-msgid "Move this workspace to a computer?"
-msgstr "将此工作区移至一台电脑？"
-
-msgid "Move this workspace to the cloud?"
-msgstr "将此工作区移至云端？"
-
-msgid "Move to a computer"
-msgstr "移至一台电脑"
-
-msgid "Move to another computer"
-msgstr "移至另一台电脑"
-
 msgid "Move to background"
 msgstr "移到后台"
-
-msgid "Move to cloud"
-msgstr "移至云端"
 
 msgid "Move to group"
 msgstr "移动到分组"
@@ -12445,6 +12445,9 @@ msgstr "已将 {name} 移至{destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "正在将 {name} 移至{destination}"
+
+msgid "Moving its terminals…"
+msgstr "正在移动其终端…"
 
 msgid "Moving this chat here"
 msgstr "正在将此聊天移到这里"
@@ -23401,9 +23404,6 @@ msgstr "你的 v1 项目和工作区正在迁移到新版 Paradev。每一项准
 
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "你的工作（包括未提交的更改）会推送到远程的一个新分支。云端工作区会在你选择的环境中从该分支启动，每个 Claude 聊天都将在那里继续。正在工作的智能体会先停止。终端和其他聊天会留在这里。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的设备码登录由你的工作区管理员开启。"

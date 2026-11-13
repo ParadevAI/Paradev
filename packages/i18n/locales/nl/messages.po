@@ -902,6 +902,12 @@ msgstr "{count, plural, one {# zoekopdracht} other {# zoekopdrachten}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, one {# stap} other {# stappen}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# terminal is in de oude werkruimte gebleven.} other {# terminals zijn in de oude werkruimte gebleven.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# terminal is gestopt en kon niet opnieuw starten.} other {# terminals zijn gestopt en konden niet opnieuw starten.}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree in deze repository heeft geen werkruimte. Die wordt als werkruimte geïmporteerd.} other {# worktrees in deze repository hebben geen werkruimte. Ze worden als werkruimtes geïmporteerd.}}"
 
@@ -1802,6 +1808,9 @@ msgstr "De instructies van een cloudautomatisering mogen maximaal {max} tekens b
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Een cloud-workspace kan {path} niet aanroepen. Doe dit vanuit een client waarop je bent ingelogd."
+
+msgid "A computer"
+msgstr "Een computer"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Er wordt al een verwijdering uitgevoerd voor {workspaceName}."
@@ -2813,6 +2822,9 @@ msgstr "Weet altijd welke agent jou nodig heeft, met meldingen die rechtstreeks 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Een agent voltooit wijzigingen over meerdere bestanden van begin tot eind."
 
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "Een agent is hier nog aan het werk. Probeer opnieuw om hem te stoppen en te verplaatsen."
+
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "Een agent richt deze omgeving in een cloudworkspace in (ongeveer 20 minuten of langer): hij installeert afhankelijkheden, schrijft de setupconfiguratie en vraagt om benodigde secrets. Onderbreek hem op elk moment, of neem het over in de workspace om de installatie zelf af te ronden."
 
@@ -2878,6 +2890,9 @@ msgstr "Anonieme Assembleur"
 
 msgid "Another AI assistant"
 msgstr "Een andere AI-assistent"
+
+msgid "Another computer"
+msgstr "Andere computer"
 
 msgid "another device"
 msgstr "een ander apparaat"
@@ -6269,6 +6284,9 @@ msgstr "Kan contributors niet laden. Typ in plaats daarvan een gebruikersnaam."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Eerdere berichten konden niet worden geladen. Opnieuw proberen"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "Omgevingen konden niet worden geladen. Opnieuw proberen"
 
 msgid "Couldn't load its activity"
 msgstr "Kon de activiteit niet laden"
@@ -10913,9 +10931,6 @@ msgstr "De plugins verschijnen zodra de synchronisatie klaar is."
 msgid "Its replies go with it."
 msgstr "De antwoorden worden ook verwijderd."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Het werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op de computer die je kiest begint vanaf die branch, en elke Claude-chat gaat daar verder. Agents die aan het werk zijn, stoppen eerst. Terminals en andere chats blijven waar ze zijn."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "De werkruimtes en terminals zijn niet beschikbaar tot de service opnieuw start. Gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten."
 
@@ -12404,23 +12419,8 @@ msgstr "Cloudwerk verhuizen"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "De focus verplaatsen tussen de hoofdtabbladen en de rechterzijbalk, en de zijbalk openen als die gesloten is"
 
-msgid "Move this workspace to a computer?"
-msgstr "Deze werkruimte naar een computer verplaatsen?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Deze werkruimte naar de cloud verplaatsen?"
-
-msgid "Move to a computer"
-msgstr "Naar een computer verplaatsen"
-
-msgid "Move to another computer"
-msgstr "Naar een andere computer verplaatsen"
-
 msgid "Move to background"
 msgstr "Naar de achtergrond"
-
-msgid "Move to cloud"
-msgstr "Naar cloud verplaatsen"
 
 msgid "Move to group"
 msgstr "Naar groep verplaatsen"
@@ -12445,6 +12445,9 @@ msgstr "{name} verplaatst naar {destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "{name} wordt verplaatst naar {destination}"
+
+msgid "Moving its terminals…"
+msgstr "Terminals worden verplaatst…"
 
 msgid "Moving this chat here"
 msgstr "Deze chat wordt hierheen verplaatst"
@@ -23401,9 +23404,6 @@ msgstr "Je v1-projecten en -workspaces worden overgezet naar het nieuwe Paradev.
 
 msgid "Your version: {currentVersion}"
 msgstr "Jouw versie: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Je werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch op de remote gepusht. Een cloudwerkruimte start vanaf die branch in de omgeving die je kiest, en elke Claude-chat gaat daar verder. Agents die bezig zijn, stoppen eerst. Terminals en andere chats blijven hier."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "De beheerder van je workspace zet aanmelden met apparaatcode voor Codex aan."

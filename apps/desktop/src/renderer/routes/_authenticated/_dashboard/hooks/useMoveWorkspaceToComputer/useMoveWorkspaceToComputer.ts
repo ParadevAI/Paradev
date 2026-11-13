@@ -15,8 +15,15 @@ import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/reque
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
+import {
+	handOffTerminals,
+	type MovingTerminal,
+	mergeHandoffs,
+	skippedTerminalNames,
+} from "../../utils/handOffTerminals";
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
+import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
@@ -30,7 +37,8 @@ export type MoveDestination = { hostId: string; name: string | null };
  * on a computer: its work comes over on one branch, and each of its chats
  * moves on its own. The control plane records the moves; this desktop
  * carries them out, since the control plane cannot reach a computer's
- * host-service to bring a chat in. Returns the chats that could not move.
+ * host-service to bring a chat in. Its terminal agents start again there
+ * too. Returns the chats that could not move, and later the terminals.
  */
 export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { t } = useLingui();
@@ -45,11 +53,13 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	return useCallback(
 		async ({
 			destination,
+			stopIfBusy = false,
 			onStage,
 			onBegun,
 			signal,
 		}: {
 			destination: MoveDestination;
+			stopIfBusy?: boolean;
 			onStage: (stage: MoveToComputerStage) => void;
 			onBegun?: (workspaceMoveId: string) => void;
 			signal?: AbortSignal;
@@ -99,10 +109,11 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				});
 			onBegun?.(workspaceMoveId);
 			const target = getHostServiceClientByUrl(destinationUrl);
-			const leaving: { source: HostServiceClient | null; chats: string[] } = {
-				source: null,
-				chats: [],
-			};
+			const leaving: {
+				source: HostServiceClient | null;
+				chats: string[];
+				terminals: string[];
+			} = { source: null, chats: [], terminals: [] };
 			const { prepared, project, created, moves, skipped } =
 				await keepMoveAlive({
 					workspaceMoveId,
@@ -121,9 +132,20 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						leaving.source = source;
 						const prepared = await source.teleport.prepareWorkspace.mutate({
 							workspaceId: workspace.id,
-							stopIfBusy: true,
+							stopIfBusy,
+							moveTerminals: true,
 						});
 						leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
+						leaving.terminals = (prepared.terminals ?? []).map(
+							(terminal) => terminal.terminalId,
+						);
+						if (moveSignal.aborted) {
+							await releaseSourceTerminals(
+								source,
+								workspace.id,
+								leaving.terminals,
+							);
+						}
 						const project = requireProject(prepared.repositoryFullName);
 						moveSignal.throwIfAborted();
 
@@ -171,6 +193,11 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
 					if (leaving.source) {
 						await releaseSourceChats(leaving.source, leaving.chats);
+						await releaseSourceTerminals(
+							leaving.source,
+							workspace.id,
+							leaving.terminals,
+						);
 					}
 					throw error;
 				});
@@ -207,12 +234,28 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					);
 				}
 			})();
+			// A host older than terminal moves returns neither list.
+			const terminals: MovingTerminal[] = prepared.terminals ?? [];
+			const skippedTerminals = skippedTerminalNames(prepared.skippedTerminals);
+			const terminalHandoff = leaving.source
+				? handOffTerminals({
+						terminals,
+						source: leaving.source,
+						sourceWorkspaceId: workspace.id,
+						toWorkspaceId: created.workspaceId,
+						connect: async () => target,
+						resolveUrls: (fileIds) =>
+							cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
+					}).then((handoff) => mergeHandoffs(skippedTerminals, handoff))
+				: Promise.resolve(skippedTerminals);
 			return {
 				toWorkspaceId: created.workspaceId,
 				stayed: [
 					...prepared.skipped.filter((chat) => chat.reason !== "not_started"),
 					...prepared.chats.filter((chat) => refused.has(chat.chatSessionId)),
 				].map((chat) => chat.title ?? t({ message: "Untitled chat" })),
+				terminalHandoff,
+				movingTerminals: terminals.length > 0,
 			};
 		},
 		[

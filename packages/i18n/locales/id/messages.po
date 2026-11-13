@@ -902,6 +902,12 @@ msgstr "{count, plural, one {# pencarian} other {# pencarian}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, other {# langkah}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# terminal tetap di workspace lama.} other {# terminal tetap di workspace lama.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# terminal berhenti dan tidak bisa dijalankan lagi.} other {# terminal berhenti dan tidak bisa dijalankan lagi.}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree di repositori ini belum punya workspace. Worktree itu akan diimpor sebagai workspace.} other {# worktree di repositori ini belum punya workspace. Worktree itu akan diimpor sebagai workspace.}}"
 
@@ -1802,6 +1808,9 @@ msgstr "Instruksi automasi cloud maksimal {max} karakter"
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Workspace cloud tidak bisa memanggil {path}. Lakukan dari klien tempat kamu masuk."
+
+msgid "A computer"
+msgstr "Komputer"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Penghapusan untuk {workspaceName} sedang berlangsung."
@@ -2813,6 +2822,9 @@ msgstr "Selalu tahu agen mana yang membutuhkan Anda, dengan notifikasi yang lang
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agen menyelesaikan perubahan lintas file dari awal sampai akhir."
 
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "Seorang agen masih bekerja di sini. Coba lagi untuk menghentikannya dan memindahkan."
+
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "Agen menyiapkan environment ini di workspace cloud (sekitar 20 menit atau lebih): memasang dependensi, menulis konfigurasi penyiapan, dan meminta secret yang diperlukan. Hentikan kapan saja, atau ambil alih di workspace untuk menyelesaikan penyiapan sendiri."
 
@@ -2878,6 +2890,9 @@ msgstr "Perakit Anonim"
 
 msgid "Another AI assistant"
 msgstr "Asisten AI lain"
+
+msgid "Another computer"
+msgstr "Komputer lain"
 
 msgid "another device"
 msgstr "perangkat lain"
@@ -6269,6 +6284,9 @@ msgstr "Tidak bisa memuat kontributor. Ketik username saja."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Tidak dapat memuat pesan sebelumnya. Coba lagi"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "Gagal memuat environment. Coba lagi"
 
 msgid "Couldn't load its activity"
 msgstr "Tidak dapat memuat aktivitasnya"
@@ -10913,9 +10931,6 @@ msgstr "Plugin-pluginnya muncul setelah sinkronisasi selesai."
 msgid "Its replies go with it."
 msgstr "Balasannya ikut terhapus."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di komputer yang Anda pilih dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Workspace dan terminalnya tidak tersedia sampai layanan ini dimulai ulang. Pakai menu tray Paradev > Host Service > Restart."
 
@@ -12404,23 +12419,8 @@ msgstr "Pindahkan pekerjaan cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
 
-msgid "Move this workspace to a computer?"
-msgstr "Pindahkan workspace ini ke komputer?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Pindahkan workspace ini ke cloud?"
-
-msgid "Move to a computer"
-msgstr "Pindahkan ke komputer"
-
-msgid "Move to another computer"
-msgstr "Pindahkan ke komputer lain"
-
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
-
-msgid "Move to cloud"
-msgstr "Pindahkan ke cloud"
 
 msgid "Move to group"
 msgstr "Pindahkan ke grup"
@@ -12445,6 +12445,9 @@ msgstr "{name} dipindahkan ke {destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "Memindahkan {name} ke {destination}"
+
+msgid "Moving its terminals…"
+msgstr "Memindahkan terminalnya…"
 
 msgid "Moving this chat here"
 msgstr "Memindahkan chat ini ke sini"
@@ -23401,9 +23404,6 @@ msgstr "Proyek dan workspace v1 Anda sedang dipindahkan ke Paradev yang baru. Se
 
 msgid "Your version: {currentVersion}"
 msgstr "Versi Anda: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di sini."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Admin workspace Anda mengaktifkan masuk dengan kode perangkat untuk Codex."

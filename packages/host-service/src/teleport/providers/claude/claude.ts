@@ -21,6 +21,7 @@ const SESSION_DIR = "session";
  */
 export const claudeTeleportProvider: TeleportProvider = {
 	harnesses: ["claude-acp", "claude-code"],
+	terminalAgents: ["claude"],
 
 	async collect({ harnessSessionId, worktreePath, locate, stageDir }) {
 		const mainFile = await locate();

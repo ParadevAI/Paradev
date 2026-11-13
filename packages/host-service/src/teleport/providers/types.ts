@@ -73,6 +73,8 @@ export function parseBundleManifest(value: unknown): BundleManifest | null {
  */
 export type TeleportProvider = {
 	harnesses: readonly string[];
+	/** Terminal agents whose sessions this provider moves, by agent id. */
+	terminalAgents: readonly string[];
 	/**
 	 * Copies the session's files into `stageDir`; returns what `place` needs,
 	 * or null when the agent has not written its session yet.

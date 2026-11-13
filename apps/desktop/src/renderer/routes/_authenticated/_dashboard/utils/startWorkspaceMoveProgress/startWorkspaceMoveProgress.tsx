@@ -7,6 +7,7 @@ import {
 	type WorkspaceMoveProgressStage,
 } from "../../stores/workspaceMoveProgressStore";
 import { MOVE_CANCELLED } from "../describeMoveError";
+import type { TerminalHandoff } from "../handOffTerminals";
 
 const POLL_MS = 2_000;
 /** Longer than a stuck move takes to fail on its own. */
@@ -28,7 +29,14 @@ export interface WorkspaceMoveProgressHandle {
 	 */
 	follow: (
 		toWorkspaceId: string,
-		destination: { open: () => void; stayed: string[] },
+		destination: {
+			open: () => void;
+			stayed: string[];
+			/** The terminals' handoff, which can outlast the chats' move. */
+			terminals?: Promise<TerminalHandoff>;
+			/** Terminals are still moving, so the move is not done when the chats are. */
+			terminalsPending?: boolean;
+		},
 	) => void;
 	fail: (message: string) => void;
 }
@@ -57,6 +65,9 @@ export function startWorkspaceMoveProgress(args: {
 		destination: args.destination,
 		toCloud: args.toCloud,
 		stayed: [],
+		stayedTerminals: [],
+		notRestartedTerminals: [],
+		terminalsPending: false,
 		open: null,
 		stage: "saving",
 		chats: null,
@@ -80,6 +91,7 @@ export function startWorkspaceMoveProgress(args: {
 
 	const stillViewingSource = () =>
 		window.location.hash.includes(`/v2-workspace/${args.sourceWorkspaceId}`);
+	let terminalsSettled: Promise<void> = Promise.resolve();
 	const finish = (stage: WorkspaceMoveProgressStage, land: () => void) => {
 		if (stage === "failed") return;
 		const landed = stillViewingSource();
@@ -88,7 +100,9 @@ export function startWorkspaceMoveProgress(args: {
 			update(id, { open: null });
 		}
 		if (stage === "ready") {
-			setTimeout(dismiss, landed ? SUCCESS_LINGER_MS : OPEN_LINGER_MS);
+			void terminalsSettled.then(() =>
+				setTimeout(dismiss, landed ? SUCCESS_LINGER_MS : OPEN_LINGER_MS),
+			);
 		}
 	};
 
@@ -123,7 +137,19 @@ export function startWorkspaceMoveProgress(args: {
 				cancel: null,
 				open,
 				stayed: destination.stayed,
+				terminalsPending: destination.terminalsPending ?? false,
 			});
+			if (destination.terminals) {
+				terminalsSettled = destination.terminals.then(
+					(handoff) =>
+						update(id, {
+							terminalsPending: false,
+							stayedTerminals: handoff.stayed,
+							notRestartedTerminals: handoff.notRestarted,
+						}),
+					() => update(id, { terminalsPending: false }),
+				);
+			}
 			const startedAt = Date.now();
 			let missed = 0;
 			const poll = async () => {

@@ -11,11 +11,9 @@ import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-clos
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
 import {
-	CloudUpload,
 	Container,
 	DatabaseBackup,
 	Ellipsis,
-	Laptop,
 	Play,
 	Settings,
 	Square,
@@ -26,13 +24,9 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { authClient } from "renderer/lib/auth-client";
-import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
+import { WorkspaceMoveMenu } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMoveMenu";
 import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
-import {
-	useWorkspaceMoveDirections,
-	type WorkspaceMoveDirection,
-} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
@@ -74,8 +68,6 @@ export function WorkspaceMoreMenu({
 	const label = t({ message: "More actions" });
 	const { workspace } = useWorkspace();
 	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
-	const { machineId } = useLocalHostService();
-	const [moveOpen, setMoveOpen] = useState<WorkspaceMoveDirection | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const actionPendingRef = useRef(false);
 	const openAfterClose = (action: () => void) => {
@@ -200,29 +192,21 @@ export function WorkspaceMoreMenu({
 							)}
 						</>
 					)}
-					{moveDirections.length > 0 && <DropdownMenuSeparator />}
-					{moveDirections.map((direction) => (
-						<DropdownMenuItem
-							key={direction}
-							onSelect={() => openAfterClose(() => setMoveOpen(direction))}
-						>
-							{direction === "to-cloud" ? (
-								<>
-									<CloudUpload className="size-4" />
-									<Trans>Move to cloud</Trans>
-								</>
-							) : (
-								<>
-									<Laptop className="size-4" />
-									{workspace.hostId === machineId ? (
-										<Trans>Move to another computer</Trans>
-									) : (
-										<Trans>Move to a computer</Trans>
-									)}
-								</>
-							)}
-						</DropdownMenuItem>
-					))}
+					{moveDirections.length > 0 && (
+						<>
+							<DropdownMenuSeparator />
+							<WorkspaceMoveMenu
+								menu="dropdown"
+								workspace={{
+									id: workspaceId,
+									hostId: workspace.hostId,
+									projectId: workspace.projectId,
+									name: workspace.name,
+								}}
+								directions={moveDirections}
+							/>
+						</>
+					)}
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{environment && canSaveCheckpoint && (
@@ -231,21 +215,6 @@ export function WorkspaceMoreMenu({
 					environment={environment}
 					open={checkpointOpen}
 					onOpenChange={setCheckpointOpen}
-				/>
-			)}
-			{moveOpen && (
-				<MoveWorkspaceDialog
-					direction={moveOpen}
-					workspace={{
-						id: workspaceId,
-						hostId: workspace.hostId,
-						projectId: workspace.projectId,
-						name: workspace.name,
-					}}
-					open
-					onOpenChange={(open) => {
-						if (!open) setMoveOpen(null);
-					}}
 				/>
 			)}
 		</>

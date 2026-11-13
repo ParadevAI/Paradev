@@ -902,6 +902,12 @@ msgstr "{count, plural, one {#次搜尋} other {#次搜尋}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, other {# 個步驟}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# 個終端機留在了原工作區。} other {# 個終端機留在了原工作區。}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# 個終端機已停止，無法重新啟動。} other {# 個終端機已停止，無法重新啟動。}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {此儲存庫中有#個worktree沒有對應的工作區，將被匯入為工作區。} other {此儲存庫中有#個worktree沒有對應的工作區，將被匯入為工作區。}}"
 
@@ -1802,6 +1808,9 @@ msgstr "雲端自動化的指示最多 {max} 個字元"
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "雲端工作區無法呼叫 {path}。請在你已登入的用戶端中執行。"
+
+msgid "A computer"
+msgstr "一台電腦"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}已經在刪除中。"
@@ -2813,6 +2822,9 @@ msgstr "隨時知道哪個代理程式需要你，通知可直接跳轉到被阻
 msgid "An agent completes multi-file changes end to end."
 msgstr "代理程式能端到端完成跨檔案改動。"
 
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "這裡有代理程式仍在運作。重試即可停止它並移動。"
+
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "代理程式會在雲端工作區中設定此環境（約 20 分鐘或更久）：安裝相依套件、撰寫設定組態，並詢問所需的密鑰。你可以隨時中斷，或在工作區中接手並自行完成設定。"
 
@@ -2878,6 +2890,9 @@ msgstr "匿名組裝工"
 
 msgid "Another AI assistant"
 msgstr "其他 AI 助理"
+
+msgid "Another computer"
+msgstr "另一台電腦"
 
 msgid "another device"
 msgstr "另一臺裝置"
@@ -6269,6 +6284,9 @@ msgstr "無法載入貢獻者，請直接輸入使用者名稱。"
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "無法載入較早的訊息。重試"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "無法載入環境。重試"
 
 msgid "Couldn't load its activity"
 msgstr "無法載入其活動"
@@ -10913,9 +10931,6 @@ msgstr "同步完成後，其外掛會顯示出來。"
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "它的工作（包括未提交的變更）會推送到一個新分支。所選電腦上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重啟之前，其工作區和終端都不可用，請使用Paradev托盤選單 > 主機服務 > 重啟。"
 
@@ -12404,23 +12419,8 @@ msgstr "遷移雲端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主要分頁與右側邊欄之間移動焦點，若側邊欄已關閉則將其開啟"
 
-msgid "Move this workspace to a computer?"
-msgstr "要將此工作區移至一台電腦嗎？"
-
-msgid "Move this workspace to the cloud?"
-msgstr "要將此工作區移至雲端嗎？"
-
-msgid "Move to a computer"
-msgstr "移至一台電腦"
-
-msgid "Move to another computer"
-msgstr "移至另一台電腦"
-
 msgid "Move to background"
 msgstr "移到背景"
-
-msgid "Move to cloud"
-msgstr "移至雲端"
 
 msgid "Move to group"
 msgstr "移動到群組"
@@ -12445,6 +12445,9 @@ msgstr "已將 {name} 移至{destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "正在將 {name} 移至{destination}"
+
+msgid "Moving its terminals…"
+msgstr "正在移動其終端機…"
 
 msgid "Moving this chat here"
 msgstr "正在將此聊天移到這裡"
@@ -23401,9 +23404,6 @@ msgstr "你的 v1 專案和工作區正在移轉到新版 Paradev。每一項準
 
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "你的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，每個 Claude 聊天都將在那裡繼續。正在工作的代理程式會先停止。終端和其他聊天會留在這裡。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的裝置碼登入由你的工作區管理員開啟。"

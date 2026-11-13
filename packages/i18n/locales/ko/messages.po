@@ -902,6 +902,12 @@ msgstr "{count, plural, one {검색 #회} other {검색 #회}}"
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, other {#단계}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {터미널 #개가 이전 워크스페이스에 남았습니다.} other {터미널 #개가 이전 워크스페이스에 남았습니다.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {터미널 #개가 중지되었고 다시 시작할 수 없었습니다.} other {터미널 #개가 중지되었고 다시 시작할 수 없었습니다.}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.} other {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.}}"
 
@@ -1802,6 +1808,9 @@ msgstr "클라우드 자동화의 지침은 최대 {max}자까지 입력할 수 
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "클라우드 워크스페이스에서는 {path}를 호출할 수 없습니다. 로그인한 클라이언트에서 실행하세요."
+
+msgid "A computer"
+msgstr "컴퓨터"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}에 대한 삭제가 이미 진행 중입니다."
@@ -2813,6 +2822,9 @@ msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습�
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
 
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "여기서 에이전트가 아직 작업 중입니다. 다시 시도하면 중지하고 이동합니다."
+
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "에이전트가 클라우드 워크스페이스에서 이 환경을 설정합니다(약 20분 이상). 의존성을 설치하고 설정 구성을 작성하며 필요한 시크릿을 요청합니다. 언제든 중단하거나 워크스페이스에서 직접 이어받아 설정을 마칠 수 있습니다."
 
@@ -2878,6 +2890,9 @@ msgstr "익명의 조립공"
 
 msgid "Another AI assistant"
 msgstr "다른 AI 어시스턴트"
+
+msgid "Another computer"
+msgstr "다른 컴퓨터"
 
 msgid "another device"
 msgstr "다른 기기"
@@ -6269,6 +6284,9 @@ msgstr "기여자를 불러오지 못했습니다. 대신 사용자 이름을 �
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "이전 메시지를 불러올 수 없습니다. 다시 시도"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "환경을 불러오지 못했습니다. 다시 시도"
 
 msgid "Couldn't load its activity"
 msgstr "활동을 불러올 수 없습니다"
@@ -10913,9 +10931,6 @@ msgstr "동기화가 끝나면 플러그인이 표시됩니다."
 msgid "Its replies go with it."
 msgstr "답글도 함께 삭제됩니다."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "커밋하지 않은 변경 사항을 포함한 작업이 새 브랜치로 푸시됩니다. 선택한 컴퓨터의 워크스페이스가 그 브랜치에서 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 멈춥니다. 터미널과 다른 채팅은 그대로 남습니다."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "다시 시작할 때까지 해당 워크스페이스와 터미널을 사용할 수 없습니다. Paradev 트레이 메뉴 > 호스트 서비스 > 다시 시작을 사용하세요."
 
@@ -12404,23 +12419,8 @@ msgstr "클라우드 작업 옮기기"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "메인 탭과 오른쪽 사이드바 사이에서 포커스를 옮기고, 사이드바가 닫혀 있으면 엽니다"
 
-msgid "Move this workspace to a computer?"
-msgstr "이 워크스페이스를 컴퓨터로 옮길까요?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "이 워크스페이스를 클라우드로 옮길까요?"
-
-msgid "Move to a computer"
-msgstr "컴퓨터로 옮기기"
-
-msgid "Move to another computer"
-msgstr "다른 컴퓨터로 옮기기"
-
 msgid "Move to background"
 msgstr "백그라운드로 이동"
-
-msgid "Move to cloud"
-msgstr "클라우드로 옮기기"
 
 msgid "Move to group"
 msgstr "그룹으로 이동"
@@ -12445,6 +12445,9 @@ msgstr "{name}을(를) {destination}(으)로 옮겼습니다"
 
 msgid "Moving {name} to {destination}"
 msgstr "{name}을(를) {destination}(으)로 옮기는 중"
+
+msgid "Moving its terminals…"
+msgstr "터미널을 이동하는 중…"
 
 msgid "Moving this chat here"
 msgstr "이 채팅을 여기로 옮기는 중"
@@ -23401,9 +23404,6 @@ msgstr "v1 프로젝트와 워크스페이스를 새 Paradev로 옮기는 중입
 
 msgid "Your version: {currentVersion}"
 msgstr "현재 버전: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "커밋하지 않은 변경 사항을 포함한 작업이 원격의 새 브랜치로 푸시됩니다. 선택한 환경에서 해당 브랜치로 클라우드 워크스페이스가 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 중지됩니다. 터미널과 다른 채팅은 여기에 남습니다."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex용 기기 코드 로그인은 워크스페이스 관리자가 켭니다."

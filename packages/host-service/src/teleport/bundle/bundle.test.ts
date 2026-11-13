@@ -11,7 +11,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { assertPlainEntries, gunzipBounded } from "./bundle";
+import { assertPlainEntries, gunzipBounded, putBundle } from "./bundle";
 
 describe("gunzipBounded", () => {
 	let root: string;
@@ -68,5 +68,25 @@ describe("gunzipBounded", () => {
 		await expect(assertPlainEntries(absolute)).rejects.toThrow(
 			"will not unpack",
 		);
+	});
+});
+
+describe("putBundle", () => {
+	test("gives up on an upload the server never answers", async () => {
+		const server = Bun.serve({
+			port: 0,
+			fetch: () => new Promise<Response>(() => {}),
+		});
+		try {
+			await expect(
+				putBundle(
+					{ url: `http://127.0.0.1:${server.port}/`, headers: {} },
+					Buffer.from("bundle") as Buffer<ArrayBuffer>,
+					50,
+				),
+			).rejects.toThrow();
+		} finally {
+			server.stop(true);
+		}
 	});
 });

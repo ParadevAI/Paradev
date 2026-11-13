@@ -896,6 +896,12 @@ msgstr "{count, plural, one {# пошук} few {# пошуки} many {# пошу
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, one {# крок} few {# кроки} many {# кроків} other {# кроку}}"
 
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# термінал залишився в старому робочому просторі.} few {# термінали залишилися в старому робочому просторі.} many {# терміналів залишилися в старому робочому просторі.} other {# терміналу залишилося в старому робочому просторі.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# термінал зупинено, і його не вдалося запустити знову.} few {# термінали зупинено, і їх не вдалося запустити знову.} many {# терміналів зупинено, і їх не вдалося запустити знову.} other {# терміналу зупинено, і його не вдалося запустити знову.}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree у цьому репозиторії не має робочого простору. Його буде імпортовано як робочий простір.} few {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} many {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} other {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.}}"
 
@@ -1796,6 +1802,9 @@ msgstr "Інструкції хмарної автоматизації можу�
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Хмарний робочий простір не може викликати {path}. Зробіть це в клієнті, де ви ввійшли."
+
+msgid "A computer"
+msgstr "Комп’ютер"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Видалення {workspaceName} уже триває."
@@ -2807,6 +2816,9 @@ msgstr "Завжди знайте, якому агенту ви потрібні
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
 
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "Тут ще працює агент. Повторіть, щоб зупинити його й перенести."
+
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "Агент налаштує це середовище в хмарному робочому просторі (близько 20 хвилин або довше): встановить залежності, запише конфігурацію й попросить потрібні секрети. Його можна перервати будь-коли або продовжити роботу в робочому просторі й завершити налаштування самостійно."
 
@@ -2872,6 +2884,9 @@ msgstr "Анонімний асемблер"
 
 msgid "Another AI assistant"
 msgstr "Інший ШІ-асистент"
+
+msgid "Another computer"
+msgstr "Інший комп’ютер"
 
 msgid "another device"
 msgstr "інший пристрій"
@@ -6263,6 +6278,9 @@ msgstr "Не вдалося завантажити контриб'юторів. 
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Не вдалося завантажити попередні повідомлення. Повторити"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "Не вдалося завантажити середовища. Повторити"
 
 msgid "Couldn't load its activity"
 msgstr "Не вдалося завантажити його активність"
@@ -10907,9 +10925,6 @@ msgstr "Його плагіни з'являться, коли синхроніз
 msgid "Its replies go with it."
 msgstr "Відповіді на нього буде видалено разом із ним."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на вибраному комп’ютері починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
-
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Його робочі простори й термінали недоступні, доки він не перезапуститься. Скористайтеся меню Paradev у треї > Host Service > Перезапустити."
 
@@ -12398,23 +12413,8 @@ msgstr "Перенесіть роботу з хмари"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Переміщувати фокус між основними вкладками та правою бічною панеллю і відкривати панель, якщо вона закрита"
 
-msgid "Move this workspace to a computer?"
-msgstr "Перемістити цей робочий простір на комп’ютер?"
-
-msgid "Move this workspace to the cloud?"
-msgstr "Перемістити цей робочий простір у хмару?"
-
-msgid "Move to a computer"
-msgstr "Перемістити на комп’ютер"
-
-msgid "Move to another computer"
-msgstr "Перемістити на інший комп’ютер"
-
 msgid "Move to background"
 msgstr "Перевести у фоновий режим"
-
-msgid "Move to cloud"
-msgstr "Перемістити в хмару"
 
 msgid "Move to group"
 msgstr "Перемістити до групи"
@@ -12439,6 +12439,9 @@ msgstr "{name} переміщено: {destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "Переміщення {name}: {destination}"
+
+msgid "Moving its terminals…"
+msgstr "Перенесення терміналів…"
 
 msgid "Moving this chat here"
 msgstr "Перенесення цього чату сюди"
@@ -23395,9 +23398,6 @@ msgstr "Ваші проєкти й робочі простори з v1 пере�
 
 msgid "Your version: {currentVersion}"
 msgstr "Ваша версія: {currentVersion}"
-
-msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
-msgstr "Ваша робота, включно з незакомітованими змінами, надсилається до нової гілки у віддаленому репозиторії. Хмарний робочий простір запускається з цієї гілки у вибраному вами середовищі, і кожен чат із Claude продовжується там. Агенти, що працюють, спочатку зупиняться. Термінали та інші чати залишаться тут."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Адміністратор вашого робочого простору вмикає вхід за кодом пристрою для Codex."

@@ -3,6 +3,7 @@ import {
 	and,
 	desc,
 	eq,
+	gte,
 	inArray,
 	isNotNull,
 	isNull,
@@ -233,6 +234,62 @@ export function markResumeCandidateResumedInto(
 	db.update(terminalAgentBindings)
 		.set({ resumedIntoTerminalId })
 		.where(eq(terminalAgentBindings.terminalId, terminalId))
+		.run();
+}
+
+/**
+ * The binding of a terminal stopped for a workspace move, read back from the
+ * database so a host restart does not lose it: an ended "disposed" binding
+ * with its session id, or one already resumed into a successor terminal.
+ */
+export function findMoveStoppedBinding(
+	db: HostDb,
+	workspaceId: string,
+	terminalId: string,
+	endedSince: number,
+):
+	| { kind: "stopped"; binding: TerminalAgentBinding }
+	| { kind: "resumed"; terminalId: string }
+	| undefined {
+	const row = db
+		.select({
+			...bindingColumns,
+			resumedInto: terminalAgentBindings.resumedIntoTerminalId,
+		})
+		.from(terminalAgentBindings)
+		.where(
+			and(
+				eq(terminalAgentBindings.terminalId, terminalId),
+				eq(terminalAgentBindings.workspaceId, workspaceId),
+				isNotNull(terminalAgentBindings.agentSessionId),
+				gte(terminalAgentBindings.endedAt, endedSince),
+				inArray(terminalAgentBindings.endReason, ["disposed", "resumed"]),
+			),
+		)
+		.get();
+	if (!row) return undefined;
+	if (row.endReason === "resumed") {
+		return row.resumedInto
+			? { kind: "resumed", terminalId: row.resumedInto }
+			: undefined;
+	}
+	return { kind: "stopped", binding: rowToBinding(row) };
+}
+
+/** Records that a move-stopped terminal now runs as `resumedIntoTerminalId`. */
+export function markMoveStoppedBindingResumedInto(
+	db: HostDb,
+	terminalId: string,
+	resumedIntoTerminalId: string,
+): void {
+	db.update(terminalAgentBindings)
+		.set({ endReason: "resumed", resumedIntoTerminalId })
+		.where(
+			and(
+				eq(terminalAgentBindings.terminalId, terminalId),
+				eq(terminalAgentBindings.endReason, "disposed"),
+			),
+		)
 		.run();
 }
 
