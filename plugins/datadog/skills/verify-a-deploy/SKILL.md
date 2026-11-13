@@ -36,8 +36,11 @@ For the service as a whole, compare before and after:
   OpenTelemetry SDK (a sampler in its tracing config, or `trace.*` hits well
   below the request counts in its logs or load balancer metrics). If it does,
   the metrics see only the sample, and a sampler that keeps errors more often
-  skews the rate. Prefer an unsampled counter (the service's own request and
-  error metrics, or the load balancer's) and name the source in the verdict.
+  skews the rate. Prefer an unsampled counter of the service's own requests and
+  errors. A load balancer's counter only works when its errors are the
+  service's errors; gRPC, for one, reports failures with HTTP 200. Name the
+  source in the verdict. With no such counter, say the error rate comes from
+  sampled `trace.*` metrics and may be biased, and call it inconclusive.
 - P95 latency on the endpoints the change touched.
 - New error kinds that did not exist before the deploy.
 - Monitors on the service now alerting (`search_datadog_monitors`).
