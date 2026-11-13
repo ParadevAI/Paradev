@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
-import { LuCheck, LuCopy, LuGitPullRequest } from "react-icons/lu";
+import { LuCheck, LuCopy, LuList } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestPaneData } from "../../../../../../types";
@@ -72,7 +72,7 @@ export function PullRequestPaneHeaderExtras({
 						})}
 						className="rounded p-1 text-muted-foreground/60 transition-colors hover:text-muted-foreground"
 					>
-						<LuGitPullRequest className="size-3.5" />
+						<LuList className="size-3.5" />
 					</button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
