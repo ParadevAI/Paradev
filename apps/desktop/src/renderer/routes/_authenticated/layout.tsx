@@ -69,6 +69,7 @@ import { GitInitConfirmDialog } from "./components/GitInitConfirmDialog";
 import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
 import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
+import { ResizeMachineConfirmDialog } from "./components/ResizeMachineConfirmDialog";
 import { TeardownLogsDialog } from "./components/TeardownLogsDialog";
 import { V2NotificationController } from "./components/V2NotificationController";
 import { WindowTitle } from "./components/WindowTitle";
@@ -378,6 +379,7 @@ function AuthenticatedLayout() {
 									<TeardownLogsDialog />
 									<Paywall />
 									<InviteMemberDialog />
+									<ResizeMachineConfirmDialog />
 								</WorkerPoolContextProvider>
 							</TagFolderWorkspacesProvider>
 						</HostWorkspacesProvider>

@@ -563,6 +563,11 @@ msgstr "검사 {1}개 중 {0}개 실패"
 msgid "{0} of {1} checks running"
 msgstr "검사 {1}개 중 {0}개 실행 중"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "총 {totalCount}개 중 {0}개"
@@ -1884,6 +1889,9 @@ msgstr "루틴에는 일정이나 지켜볼 대상이 필요합니다."
 
 msgid "A run for this automation is already in progress."
 msgstr "이 자동화의 실행이 이미 진행 중입니다."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "실행 중인 머신은 다시 시작됩니다. 파일과 커밋하지 않은 변경 사항은 유지됩니다. 프로젝트의 시작 서비스와 에이전트 세션은 다시 시작되며, 터미널에서 실행 중인 그 밖의 작업은 중지됩니다."
 
 msgid "A selection of integrations curated by our team."
 msgstr "저희 팀이 엄선한 연동 모음입니다."
@@ -4185,6 +4193,9 @@ msgstr "아이콘 변경"
 msgid "Change location"
 msgstr "위치 변경"
 
+msgid "Change machine size"
+msgstr "머신 크기 변경"
+
 msgid "Change model"
 msgstr "모델 변경"
 
@@ -4226,6 +4237,9 @@ msgstr "상태 변경 (현재: {0})"
 msgid "Change to {0}"
 msgstr "{0}(으)로 변경"
 
+msgid "Change to {pendingName}"
+msgstr "{pendingName}(으)로 변경"
+
 msgid "Change to Annual"
 msgstr "연간으로 변경"
 
@@ -4261,6 +4275,9 @@ msgstr "변경 요청됨"
 
 msgid "Changes saved"
 msgstr "변경 사항이 저장되었습니다"
+
+msgid "Changing to {label}…"
+msgstr "{label}(으)로 변경하는 중…"
 
 msgid "Changing..."
 msgstr "변경하는 중..."
@@ -4922,6 +4939,12 @@ msgstr "클라우드 워크스페이스"
 
 msgid "Cloud workspace: connecting"
 msgstr "클라우드 워크스페이스: 연결 중"
+
+msgid "Cloud workspace: out of memory"
+msgstr "클라우드 워크스페이스: 메모리 부족"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "클라우드 워크스페이스: 부하 높음"
 
 msgid "Cloud workspaces"
 msgstr "클라우드 워크스페이스"
@@ -6148,6 +6171,10 @@ msgstr "대화를 분기할 수 없습니다"
 msgid "Couldn't cancel the move"
 msgstr "옮기기를 취소하지 못했습니다"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "머신 크기를 변경하지 못했습니다: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "루틴을 변경할 수 없습니다"
 
@@ -6471,8 +6498,16 @@ msgstr "에이전트의 파일 편집을 기준으로 집계합니다. 셸 명�
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPU 코어"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU 부족"
 
 msgid "Create"
 msgstr "만들기"
@@ -12043,6 +12078,10 @@ msgstr "메모리"
 msgid "Memory share"
 msgstr "메모리 점유율"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "메모리 부족 상태"
+
 msgid "Mention."
 msgstr "멘션."
 
@@ -14602,6 +14641,18 @@ msgstr "투자자"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "2026년 8월 기준, 우리 팀과 가까이 지켜보는 팀들을 바탕으로 한 판단입니다. F3은 대부분 열렸고, F4는 대부분 닫혀 있습니다. 그 간극이 곧 해야 할 일입니다."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "메모리 부족"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "메모리 부족: 머신이 곧 응답하지 않을 수 있습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "메모리 부족: 머신이 계속 실행되도록 {0}({1} GB)을(를) 중지했습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
+
 msgid "Out of scope"
 msgstr "범위를 벗어남"
 
@@ -16821,6 +16872,9 @@ msgstr "크기 조절 가능"
 msgid "Resize panel"
 msgstr "패널 크기 조정"
 
+msgid "Resize to {suggestedName}"
+msgstr "{suggestedName}(으)로 변경"
+
 msgid "Resolve"
 msgstr "해결"
 
@@ -16917,6 +16971,9 @@ msgstr "호스트 서비스 {restartedOrgCount}개를 재시작했습니다"
 
 msgid "Restarted 1 host service"
 msgstr "호스트 서비스 1개를 재시작했습니다"
+
+msgid "Restarted at {label}"
+msgstr "{label}(으)로 다시 시작했습니다"
 
 msgid "Restarting"
 msgstr "다시 시작 중"
@@ -19380,6 +19437,9 @@ msgstr "{date} 시작"
 msgid "Starts a fresh session in this workspace"
 msgstr "이 워크스페이스에서 새 세션을 시작합니다"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "다음에 깨어날 때 {label}(으)로 시작합니다"
+
 msgid "State"
 msgstr "상태"
 
@@ -19483,6 +19543,11 @@ msgstr "중지됨"
 msgid "Stopped"
 msgstr "중지됨"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "메모리를 확보하려고 {0}({1} GB)을(를) 중지했습니다"
+
 msgid "Stopped by the usage limit"
 msgstr "사용량 한도로 중단됨"
 
@@ -19561,6 +19626,10 @@ msgstr "성공!"
 msgid "Successful runs <0>· 7d</0>"
 msgstr "성공한 실행 <0>· 7일</0>"
 
+msgid "Suggested"
+msgstr "추천"
+
+msgctxt "machine size"
 msgid "Suggested"
 msgstr "추천"
 
@@ -20176,6 +20245,9 @@ msgstr "자동화 소유자가 더 이상 이 조직에서 클라우드 워크�
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "최고의 에이전트는 바뀝니다.<0/>워크플로는 그럴 필요 없습니다."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "머신이 {wanted} vCPU가 아닌 {actual} vCPU로 시작되었습니다. 다시 시작해 보세요."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
@@ -22283,6 +22355,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "에이전트를 시작하기 전에 워크스페이스 설정 기다리기"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "지난 1분 중 {0}% 동안 CPU 대기"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b

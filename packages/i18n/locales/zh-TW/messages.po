@@ -563,6 +563,11 @@ msgstr "{1}項檢查中有{0}項失敗"
 msgid "{0} of {1} checks running"
 msgstr "{1}項檢查中有{0}項在執行"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0}/{totalCount}"
@@ -1884,6 +1889,9 @@ msgstr "例行任務需要一個計劃或要關注的內容。"
 
 msgid "A run for this automation is already in progress."
 msgstr "此自動化已有一次執行正在進行中。"
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "執行中的機器會重新啟動。檔案和未提交的變更會保留。專案的啟動服務和代理程式工作階段會重新開始；終端機中執行的其他內容將停止。"
 
 msgid "A selection of integrations curated by our team."
 msgstr "我們團隊精選的一組整合。"
@@ -4185,6 +4193,9 @@ msgstr "變更圖示"
 msgid "Change location"
 msgstr "更改位置"
 
+msgid "Change machine size"
+msgstr "變更機器規格"
+
 msgid "Change model"
 msgstr "更換模型"
 
@@ -4226,6 +4237,9 @@ msgstr "變更狀態（目前：{0}）"
 msgid "Change to {0}"
 msgstr "更改為{0}"
 
+msgid "Change to {pendingName}"
+msgstr "變更為 {pendingName}"
+
 msgid "Change to Annual"
 msgstr "改為按年"
 
@@ -4261,6 +4275,9 @@ msgstr "已要求修改"
 
 msgid "Changes saved"
 msgstr "更改已儲存"
+
+msgid "Changing to {label}…"
+msgstr "正在變更為 {label}…"
 
 msgid "Changing..."
 msgstr "正在更改..."
@@ -4922,6 +4939,12 @@ msgstr "雲端工作區"
 
 msgid "Cloud workspace: connecting"
 msgstr "雲端工作區，正在連線"
+
+msgid "Cloud workspace: out of memory"
+msgstr "雲端工作區：記憶體不足"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "雲端工作區：負載過高"
 
 msgid "Cloud workspaces"
 msgstr "雲端工作區"
@@ -6148,6 +6171,10 @@ msgstr "無法分叉對話"
 msgid "Couldn't cancel the move"
 msgstr "無法取消移動"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "無法變更機器規格：{0}"
+
 msgid "Couldn't change the routine"
 msgstr "無法變更例行任務"
 
@@ -6471,8 +6498,16 @@ msgstr "根據代理程式的檔案編輯統計。不包括透過 shell 指令�
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPU核心"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU 受限"
 
 msgid "Create"
 msgstr "建立"
@@ -12043,6 +12078,10 @@ msgstr "記憶體"
 msgid "Memory share"
 msgstr "記憶體佔比"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "記憶體受限"
+
 msgid "Mention."
 msgstr "提及。"
 
@@ -14602,6 +14641,18 @@ msgstr "我們的投資人"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "這是我們截至2026年8月的判斷，依據是我們自己的團隊和我們密切關注的團隊。F3大多已開啟，F4大多還沒開啟。這道差距就是要做的事。"
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "記憶體不足"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "記憶體不足：機器即將沒有回應。{sizeName} 有 {memoryGb} GB 記憶體。"
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "記憶體不足：為了繼續運作，機器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 記憶體。"
+
 msgid "Out of scope"
 msgstr "超出範圍"
 
@@ -16821,6 +16872,9 @@ msgstr "可調整大小"
 msgid "Resize panel"
 msgstr "調整面板大小"
 
+msgid "Resize to {suggestedName}"
+msgstr "調整為 {suggestedName}"
+
 msgid "Resolve"
 msgstr "解決"
 
@@ -16917,6 +16971,9 @@ msgstr "已重啟{restartedOrgCount}個主機服務"
 
 msgid "Restarted 1 host service"
 msgstr "已重啟1個主機服務"
+
+msgid "Restarted at {label}"
+msgstr "已以 {label} 重新啟動"
 
 msgid "Restarting"
 msgstr "重新啟動中"
@@ -19380,6 +19437,9 @@ msgstr "{date} 開始"
 msgid "Starts a fresh session in this workspace"
 msgstr "在這個工作區裡開一個新會話"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "下次喚醒時將以 {label} 啟動"
+
 msgid "State"
 msgstr "狀態"
 
@@ -19483,6 +19543,11 @@ msgstr "已停止"
 msgid "Stopped"
 msgstr "已停止"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "已停止 {0}（{1} GB）以釋放記憶體"
+
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
@@ -19563,6 +19628,10 @@ msgstr "成功執行 <0>· 7天</0>"
 
 msgid "Suggested"
 msgstr "推薦"
+
+msgctxt "machine size"
+msgid "Suggested"
+msgstr "建議"
 
 msgid "Suggestions"
 msgstr "建議"
@@ -20176,6 +20245,9 @@ msgstr "此自動化的擁有者已無法在此組織中使用雲端工作區。
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "最好的代理程式會變。<0/>你的工作流不該變。"
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "機器以 {actual} vCPU 啟動，而非 {wanted} vCPU。請重新啟動後再試一次。"
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
@@ -22283,6 +22355,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "啟動代理程式前等待工作區設定完成"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "過去一分鐘內有 {0}% 的時間在等待 CPU"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b

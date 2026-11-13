@@ -563,6 +563,11 @@ msgstr "{0} of {1} checks failed"
 msgid "{0} of {1} checks running"
 msgstr "{0} of {1} checks running"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} of {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0} of {totalCount}"
@@ -1884,6 +1889,9 @@ msgstr "A routine needs a schedule or something to watch."
 
 msgid "A run for this automation is already in progress."
 msgstr "A run for this automation is already in progress."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
 
 msgid "A selection of integrations curated by our team."
 msgstr "A selection of integrations curated by our team."
@@ -4185,6 +4193,9 @@ msgstr "Change icon"
 msgid "Change location"
 msgstr "Change location"
 
+msgid "Change machine size"
+msgstr "Change machine size"
+
 msgid "Change model"
 msgstr "Change model"
 
@@ -4226,6 +4237,9 @@ msgstr "Change status from {0}"
 msgid "Change to {0}"
 msgstr "Change to {0}"
 
+msgid "Change to {pendingName}"
+msgstr "Change to {pendingName}"
+
 msgid "Change to Annual"
 msgstr "Change to Annual"
 
@@ -4261,6 +4275,9 @@ msgstr "Changes Requested"
 
 msgid "Changes saved"
 msgstr "Changes saved"
+
+msgid "Changing to {label}…"
+msgstr "Changing to {label}…"
 
 msgid "Changing..."
 msgstr "Changing..."
@@ -4922,6 +4939,12 @@ msgstr "Cloud workspace"
 
 msgid "Cloud workspace: connecting"
 msgstr "Cloud workspace: connecting"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Cloud workspace: out of memory"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Cloud workspace: under heavy load"
 
 msgid "Cloud workspaces"
 msgstr "Cloud workspaces"
@@ -6148,6 +6171,10 @@ msgstr "Couldn't branch the conversation"
 msgid "Couldn't cancel the move"
 msgstr "Couldn't cancel the move"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Couldn't change the machine size: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "Couldn't change the routine"
 
@@ -6471,8 +6498,16 @@ msgstr "Counted from the agent's file edits. Changes made by shell commands, not
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPU cores"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU-bound"
 
 msgid "Create"
 msgstr "Create"
@@ -12043,6 +12078,10 @@ msgstr "Memory"
 msgid "Memory share"
 msgstr "Memory share"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Memory-bound"
+
 msgid "Mention."
 msgstr "Mention."
 
@@ -14602,6 +14641,18 @@ msgstr "Our investors"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Out of memory"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+
 msgid "Out of scope"
 msgstr "Out of scope"
 
@@ -16821,6 +16872,9 @@ msgstr "Resizable"
 msgid "Resize panel"
 msgstr "Resize panel"
 
+msgid "Resize to {suggestedName}"
+msgstr "Resize to {suggestedName}"
+
 msgid "Resolve"
 msgstr "Resolve"
 
@@ -16917,6 +16971,9 @@ msgstr "Restarted {restartedOrgCount} host services"
 
 msgid "Restarted 1 host service"
 msgstr "Restarted 1 host service"
+
+msgid "Restarted at {label}"
+msgstr "Restarted at {label}"
 
 msgid "Restarting"
 msgstr "Restarting"
@@ -19380,6 +19437,9 @@ msgstr "starts {date}"
 msgid "Starts a fresh session in this workspace"
 msgstr "Starts a fresh session in this workspace"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Starts at {label} when it next wakes"
+
 msgid "State"
 msgstr "State"
 
@@ -19483,6 +19543,11 @@ msgstr "stopped"
 msgid "Stopped"
 msgstr "Stopped"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "Stopped {0} ({1} GB) to free memory"
+
 msgid "Stopped by the usage limit"
 msgstr "Stopped by the usage limit"
 
@@ -19561,6 +19626,10 @@ msgstr "Success!"
 msgid "Successful runs <0>· 7d</0>"
 msgstr "Successful runs <0>· 7d</0>"
 
+msgid "Suggested"
+msgstr "Suggested"
+
+msgctxt "machine size"
 msgid "Suggested"
 msgstr "Suggested"
 
@@ -20176,6 +20245,9 @@ msgstr "The automation's owner can't use cloud workspaces in this organization a
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "The best agent will change.<0/>Your workflow shouldn't."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "The button now stands out. I checked it in your pane."
@@ -22283,6 +22355,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "Wait for workspace setup before starting agents"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "Waiting {0}% of the last minute"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b

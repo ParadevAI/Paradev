@@ -563,6 +563,11 @@ msgstr "{1}项检查中有{0}项失败"
 msgid "{0} of {1} checks running"
 msgstr "{1}项检查中有{0}项在运行"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0}/{totalCount}"
@@ -1884,6 +1889,9 @@ msgstr "例行任务需要一个计划或要关注的内容。"
 
 msgid "A run for this automation is already in progress."
 msgstr "此自动化已有一次运行正在进行中。"
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "正在运行的机器会重启。文件和未提交的更改会保留。项目的启动服务和智能体会话会重新开始；终端中运行的其他内容将停止。"
 
 msgid "A selection of integrations curated by our team."
 msgstr "我们团队精选的一组集成。"
@@ -4185,6 +4193,9 @@ msgstr "更改图标"
 msgid "Change location"
 msgstr "更改位置"
 
+msgid "Change machine size"
+msgstr "更改机器规格"
+
 msgid "Change model"
 msgstr "更换模型"
 
@@ -4226,6 +4237,9 @@ msgstr "更改状态（当前：{0}）"
 msgid "Change to {0}"
 msgstr "更改为{0}"
 
+msgid "Change to {pendingName}"
+msgstr "更改为 {pendingName}"
+
 msgid "Change to Annual"
 msgstr "改为按年"
 
@@ -4261,6 +4275,9 @@ msgstr "已要求修改"
 
 msgid "Changes saved"
 msgstr "更改已保存"
+
+msgid "Changing to {label}…"
+msgstr "正在更改为 {label}…"
 
 msgid "Changing..."
 msgstr "正在更改..."
@@ -4922,6 +4939,12 @@ msgstr "云端工作区"
 
 msgid "Cloud workspace: connecting"
 msgstr "云端工作区，正在连接"
+
+msgid "Cloud workspace: out of memory"
+msgstr "云端工作区：内存不足"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "云端工作区：负载过高"
 
 msgid "Cloud workspaces"
 msgstr "云工作区"
@@ -6148,6 +6171,10 @@ msgstr "无法分叉对话"
 msgid "Couldn't cancel the move"
 msgstr "无法取消移动"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "无法更改机器规格：{0}"
+
 msgid "Couldn't change the routine"
 msgstr "无法更改例行任务"
 
@@ -6471,8 +6498,16 @@ msgstr "根据智能体的文件编辑统计。不包括通过 shell 命令、no
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPU核心"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU 受限"
 
 msgid "Create"
 msgstr "创建"
@@ -12043,6 +12078,10 @@ msgstr "内存"
 msgid "Memory share"
 msgstr "内存占比"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "内存受限"
+
 msgid "Mention."
 msgstr "提及。"
 
@@ -14602,6 +14641,18 @@ msgstr "我们的投资人"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "这是我们截至2026年8月的判断，依据是我们自己的团队和我们密切关注的团队。F3大多已开启，F4大多还没开启。这道差距就是要做的事。"
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "内存不足"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "内存不足：机器即将无响应。{sizeName} 有 {memoryGb} GB 内存。"
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "内存不足：为保持运行，机器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 内存。"
+
 msgid "Out of scope"
 msgstr "超出范围"
 
@@ -16821,6 +16872,9 @@ msgstr "可调整大小"
 msgid "Resize panel"
 msgstr "调整面板大小"
 
+msgid "Resize to {suggestedName}"
+msgstr "调整为 {suggestedName}"
+
 msgid "Resolve"
 msgstr "解决"
 
@@ -16917,6 +16971,9 @@ msgstr "已重启{restartedOrgCount}个主机服务"
 
 msgid "Restarted 1 host service"
 msgstr "已重启1个主机服务"
+
+msgid "Restarted at {label}"
+msgstr "已按 {label} 重启"
 
 msgid "Restarting"
 msgstr "重启中"
@@ -19380,6 +19437,9 @@ msgstr "{date} 开始"
 msgid "Starts a fresh session in this workspace"
 msgstr "在这个工作区里开一个新会话"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "下次唤醒时将以 {label} 启动"
+
 msgid "State"
 msgstr "状态"
 
@@ -19483,6 +19543,11 @@ msgstr "已停止"
 msgid "Stopped"
 msgstr "已停止"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "已停止 {0}（{1} GB）以释放内存"
+
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
@@ -19561,6 +19626,10 @@ msgstr "成功！"
 msgid "Successful runs <0>· 7d</0>"
 msgstr "成功运行 <0>· 7天</0>"
 
+msgid "Suggested"
+msgstr "推荐"
+
+msgctxt "machine size"
 msgid "Suggested"
 msgstr "推荐"
 
@@ -20176,6 +20245,9 @@ msgstr "该自动化的所有者已无法在此组织中使用云端工作区。
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "最好的智能体会变。<0/>你的工作流不该变。"
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "机器以 {actual} vCPU 启动，而不是 {wanted} vCPU。请重启后重试。"
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
@@ -22283,6 +22355,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "启动智能体前等待工作区设置完成"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "过去一分钟内 {0}% 的时间在等待 CPU"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b

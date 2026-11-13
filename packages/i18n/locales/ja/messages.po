@@ -563,6 +563,11 @@ msgstr "{1}件中{0}件のチェックが失敗しました"
 msgid "{0} of {1} checks running"
 msgstr "{1}件中{0}件のチェックが実行中です"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} / {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{totalCount}件中{0}件目"
@@ -1884,6 +1889,9 @@ msgstr "ルーティンにはスケジュールか監視対象が必要です。
 
 msgid "A run for this automation is already in progress."
 msgstr "このオートメーションの実行はすでに進行中です。"
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "実行中のマシンは再起動します。ファイルと未コミットの変更は保持されます。プロジェクトの起動サービスとエージェントセッションは再開しますが、それ以外にターミナルで実行中のものは停止します。"
 
 msgid "A selection of integrations curated by our team."
 msgstr "チームが厳選した連携です。"
@@ -4185,6 +4193,9 @@ msgstr "アイコンを変更"
 msgid "Change location"
 msgstr "場所を変更"
 
+msgid "Change machine size"
+msgstr "マシンサイズを変更"
+
 msgid "Change model"
 msgstr "モデルを変更"
 
@@ -4226,6 +4237,9 @@ msgstr "ステータスを変更（現在: {0}）"
 msgid "Change to {0}"
 msgstr "{0}に変更"
 
+msgid "Change to {pendingName}"
+msgstr "{pendingName} に変更"
+
 msgid "Change to Annual"
 msgstr "年払いに変更"
 
@@ -4261,6 +4275,9 @@ msgstr "変更がリクエストされています"
 
 msgid "Changes saved"
 msgstr "変更を保存しました"
+
+msgid "Changing to {label}…"
+msgstr "{label} に変更中…"
 
 msgid "Changing..."
 msgstr "変更中..."
@@ -4922,6 +4939,12 @@ msgstr "クラウドワークスペース"
 
 msgid "Cloud workspace: connecting"
 msgstr "クラウドワークスペース：接続中"
+
+msgid "Cloud workspace: out of memory"
+msgstr "クラウドワークスペース: メモリ不足"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "クラウドワークスペース: 高負荷"
 
 msgid "Cloud workspaces"
 msgstr "クラウドワークスペース"
@@ -6148,6 +6171,10 @@ msgstr "会話を分岐できませんでした"
 msgid "Couldn't cancel the move"
 msgstr "移動をキャンセルできませんでした"
 
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "マシンサイズを変更できませんでした: {0}"
+
 msgid "Couldn't change the routine"
 msgstr "ルーティンを変更できませんでした"
 
@@ -6471,8 +6498,16 @@ msgstr "エージェントのファイル編集から集計しています。シ
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "CPUコア数"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "CPU 不足"
 
 msgid "Create"
 msgstr "作成"
@@ -12043,6 +12078,10 @@ msgstr "メモリ"
 msgid "Memory share"
 msgstr "メモリシェア"
 
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "メモリ不足気味"
+
 msgid "Mention."
 msgstr "メンション。"
 
@@ -14602,6 +14641,18 @@ msgstr "投資家一覧"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "2026年8月時点の当社の見立てです。自チームと、近くで見ているチームの実態にもとづいています。F3はほぼ通過済み、F4はほぼ未通過。この差が、これからの仕事です。"
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "メモリ不足"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "メモリ不足: マシンが応答しなくなりかけています。{sizeName} のメモリは {memoryGb} GB です。"
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "メモリ不足: マシンは動作を続けるため {0} ({1} GB) を停止しました。{sizeName} のメモリは {memoryGb} GB です。"
+
 msgid "Out of scope"
 msgstr "スコープ外"
 
@@ -16821,6 +16872,9 @@ msgstr "Resizable"
 msgid "Resize panel"
 msgstr "パネルのサイズを変更"
 
+msgid "Resize to {suggestedName}"
+msgstr "{suggestedName} に変更"
+
 msgid "Resolve"
 msgstr "解決する"
 
@@ -16917,6 +16971,9 @@ msgstr "{restartedOrgCount}件のホストサービスを再起動しました"
 
 msgid "Restarted 1 host service"
 msgstr "1件のホストサービスを再起動しました"
+
+msgid "Restarted at {label}"
+msgstr "{label} で再起動しました"
 
 msgid "Restarting"
 msgstr "再起動中"
@@ -19380,6 +19437,9 @@ msgstr "{date} 開始"
 msgid "Starts a fresh session in this workspace"
 msgstr "このワークスペースで新しいセッションを開始します"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "次回の起動時に {label} で起動します"
+
 msgid "State"
 msgstr "状態"
 
@@ -19483,6 +19543,11 @@ msgstr "停止"
 msgid "Stopped"
 msgstr "停止しました"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "メモリを確保するため {0} ({1} GB) を停止しました"
+
 msgid "Stopped by the usage limit"
 msgstr "使用量の上限により停止"
 
@@ -19563,6 +19628,10 @@ msgstr "成功した実行 <0>· 7日</0>"
 
 msgid "Suggested"
 msgstr "提案"
+
+msgctxt "machine size"
+msgid "Suggested"
+msgstr "おすすめ"
 
 msgid "Suggestions"
 msgstr "Suggestions"
@@ -20176,6 +20245,9 @@ msgstr "このオートメーションの所有者は、この組織でクラウ
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "最良のエージェントは変わります。<0/>ワークフローは変わるべきではありません。"
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "マシンは {wanted} vCPU ではなく {actual} vCPU で起動しました。もう一度再起動してください。"
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "ボタンが目立つようになりました。ペインで確認済みです。"
@@ -22283,6 +22355,10 @@ msgstr "VS Code"
 
 msgid "Wait for workspace setup before starting agents"
 msgstr "エージェント起動前にワークスペースのセットアップを待つ"
+
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "直近 1 分間の {0}% は CPU 待ち"
 
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b
