@@ -131,3 +131,18 @@ Connector client metadata keeps its stable client ID and accepts callback twins
 on our own domains. Existing dynamic-client grants look up their original client
 across those callback twins, scoped to the same issuer and connector; new grants
 still select registrations for the current callback only.
+
+## Domain move opt-in
+
+`DOMAIN_MOVE_ENABLED` is optional in API and web, and only literal `true` enables
+the routing flag lookup. Every other value defaults to the existing behavior,
+without a rollout cookie or added remote lookup. It is server-only and included
+in Turbo's env inputs and API/web preview/manual build/runtime passthrough.
+The web proxy reads this optional string directly from `process.env` so its
+auth gate does not load the full app environment schema. The API reads its
+declared server environment value.
+Production passthrough is required in a separately approved activation change. No
+secret or local `.env` value is set by the inert preparation change. Stage and
+final artifact preparation explicitly pass `false`. See
+[the cutover handoff](paradev-staging.md#inert-domain-cutover-preparation) before
+any future activation, including its merge/deployment warning.

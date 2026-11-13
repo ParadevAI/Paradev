@@ -1,9 +1,7 @@
 # Paradev staging with production state
 
-`.github/workflows/deploy-paradev-staging.yml` is manual-only. Review and merge it
-with its parent changes (PR #9687) before a separately approved dispatch from
+`.github/workflows/deploy-paradev-staging.yml` is manual-only and runs from
 `main`. It does nothing on PRs or pushes, and rejects other refs and repositories.
-Do not dispatch it as part of preparing or reviewing this change.
 
 The job reads the GitHub `production` environment secrets only inside Actions.
 Never fetch those secrets locally. It retains the production API/web build
@@ -95,3 +93,175 @@ auth cookies are stage-scoped. These deployments use the **production** PostHog
 key/host: check the intended project, stage event URL/host, and designated test
 identity. Expect test events in production analytics; this is not the Preview
 PostHog project. Discard the profile after testing.
+
+## Inert domain cutover preparation
+
+Production `DOMAIN_MOVE_ENABLED` build/runtime passthrough is deliberately
+absent. Adding it to `deploy-production.yml` is required before rollout; that
+watched path can redeploy relay, realtime and agent-worker. Do not weaken those
+filters. Building final artifacts does not activate routing or assign domains.
+
+The manual workflow now accepts `mode`, a fixed choice defaulting to `stage`.
+Stage retains the table and ownership checks above. `prepare-final` builds the
+same exact new projects with these settings:
+
+| Setting | API | Web |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | `https://api.superset.sh` | `https://api.paradev.com` |
+| `BROWSER_API_URL` | `https://api.paradev.com` | `https://api.paradev.com` |
+| `NEXT_PUBLIC_WEB_URL` | `https://app.paradev.com` | `https://app.paradev.com` |
+| `NEXT_PUBLIC_COOKIE_DOMAIN` | `paradev.com` | `paradev.com` |
+| `DOMAIN_MOVE_ENABLED` | `false` | `false` |
+
+Both modes use `--prod --skip-domain`, reject cron output, and retain the exact
+project ID/name/team/root and pulled project-link checks. Final preparation does
+not require final domains on those projects: they may still belong to legacy
+projects. It makes no domain/alias requests, transfers, migrations, or worker
+changes. After verifying both deployments are READY on their expected projects,
+the Actions summary records only their IDs/URLs and the source SHA for approval.
+Production secrets stay in the existing Actions environment references. Preparing
+these production-state-capable artifacts still requires a separately approved
+dispatch; preparing source is not dispatch authorization.
+
+### Disabled by default
+
+The optional server setting `DOMAIN_MOVE_ENABLED` must be exactly `true` before
+any domain-move flag lookup, PostHog client import by the routing hook, or rollout
+cookie creation. Missing, empty, `false`, and other values retain the existing
+response. API/web preview jobs pass the optional setting from
+`secrets.DOMAIN_MOVE_ENABLED`; production passthrough remains a required separate
+activation change. This preparation creates or changes no secret. The
+isolated stage/final workflow explicitly keeps the setting `false`.
+
+Once explicitly enabled, eligible requests evaluate the shared PostHog flag
+`web-domain-move`. Only boolean `true` moves the request. Missing/deleted flags,
+variants, errors and the 500 ms evaluation deadline retain the old flow. Exposure
+events are suppressed. There is no application result cache (maximum age zero)
+and no per-user map. The deadline bounds added request latency, including lazy
+client loading; it does not cancel the SDK's underlying request. Rollback must
+allow already-started evaluations/OAuth flows to finish.
+
+Eligible requests use a random UUID in the functional first-party cookie
+`__Secure-domain-move-id`, scoped to `superset.sh`, path `/`, Secure, HttpOnly,
+SameSite=Lax, 30-day lifetime. This is independent of analytics cookies, IP,
+provider and OAuth state. Both legacy hosts read the same browser cohort. A
+first-time desktop start gets an ID before evaluation, so a 100% boolean rollout
+can cover it. After server opt-in, the cookie intentionally persists even when
+the percentage excludes the browser or the flag lookup fails. Ineligible routes
+never create it; disabling the server opt-in creates no cookies and does not
+refresh existing ones. Clearing/blocking cookies or using another browser can
+change cohort assignment. Both signed-in and anonymous requests use this same
+cookie, never `user.id`;
+desktop start adds no session lookup. Percentage rollout is browser-scoped and
+stays consistent across both old hosts after login. Staff validation must target
+the explicit browser cohort UUID, not a staff user ID or person property. Never
+use this flag or cookie for access control.
+
+### Routing contract and approval handoff
+
+Eligible old-app browser document GET/HEAD requests receive a fixed-origin 307
+to `https://app.paradev.com`, with the path/query preserved and
+`Cache-Control: private, no-store`. New/stage/preview hosts do not move. Host and
+forwarded-host headers cannot override the URL origin; conflicting values fail
+closed. Verify actual Vercel request-host normalization before activation.
+
+Keep `/` (desktop billing cancel/default portal return), `/settings/billing`,
+invitation, API/tRPC, OAuth, CLI auth, desktop auth/success, `.well-known`, MCP,
+assets, telemetry, RSC/prefetch and server actions on the old flow. Sign-in/up
+continuations to retained routes, including encoded/absolute/nested root and
+billing continuations, also stay there. Invalid or foreign continuations remain
+with the existing sanitizer. Pending-deletion and internal-route enforcement
+remain on the existing path. Root retention deliberately leaves ordinary root
+visits on the old app too.
+
+Only exact GET `https://api.superset.sh/api/auth/desktop/connect` can move to
+`https://api.paradev.com/api/auth/desktop/connect`. Required provider/state and
+protocol validation still runs first. Preserve the original query bytes,
+including duplicates, provider, state, protocol and Linux loopback callback.
+No old-host OAuth call or state/session cookie is issued on the move branch;
+only the functional cohort cookie may be set. Invalid local callbacks retain the
+existing deep-link fallback. Old callbacks and desktop success remain available
+for in-flight sessions; API issuer/audience and released client defaults stay
+unchanged. No provider fallback buttons are added.
+
+Before requesting activation support, collect the reviewed SHA, prepared final
+IDs/URLs, existing stage/final alias owners and rollback deployment IDs. Read
+ownership separately; preparation must not auto-transfer it. Confirm final
+Google/GitHub registrations, database compatibility, and the designated test
+account. Do not remove old callbacks. Request explicit support for final alias
+assignment/transfer, removal of any new-to-old platform redirect, and server
+opt-in/flag rollout separately. A new-to-old redirect would loop once the
+old-to-new gate is active; the source helper cannot prevent an external reverse
+redirect. Verify final hosts independently before enabling the old-host gate.
+
+After explicit authorization, test designated-account browser sign-in, released
+desktop Google/GitHub starts and Linux loopback, query/state handoff, cookies,
+RSC navigation, CLI/MCP consent and AASA/public links. Confirm stage still points
+to stage-configured deployments. Do not perform billing/vendor operations as
+part of these checks. Live verification and provider readiness are not proven
+by local tests.
+
+For rollback, turn the shared flag off first; the next completed evaluation
+fails closed without an application cache delay. The server opt-in can also be
+disabled on both legacy deployments. Keep old and new callbacks/deployments so
+in-flight OAuth completes. Do not restore any new-to-old redirect until the
+old-to-new move is disabled. Restoring recorded final alias owners requires its
+own routing approval; never send final hosts to stage-configured builds. No DB
+rollback is involved.
+
+### Verified staging evidence — 2026-11-12
+
+Coordinator-observed evidence, from before this preparation commit:
+
+- Production-state staging [workflow run 43332717765](https://github.com/ParadevAI/Paradev/actions/runs/43332717765)
+  succeeded at `6dcb20252acb34dd8deb99c35a5f4ad646b6604f`.
+- Real Google and GitHub stage sign-in succeeded. A real desktop Google loopback
+  temporary session was cryptographically validated against the legacy
+  issuer/audience/JWKS; only that test session was revoked.
+- Chrome's marketing-to-stage-sign-in journey joined one identified
+  [PostHog person](https://us.posthog.com/project/264803/persons/8a200ca9-4273-540e-aa06-6418b8511a64).
+- The primary Slack and Linear production consoles already contained the final
+  callbacks. Sentry, Teams and Notion settings remain unverified, as do actual
+  integration consent/writes and final-host routing/cutover.
+- At observation, `https://app.paradev.com/sign-in` still returned 307 to
+  `https://app.superset.sh/sign-in`; old and stage sign-in returned 200. Both
+  observed OAuth metadata responses retained issuer `https://api.superset.sh`,
+  and MCP resource discovery retained `https://api.superset.sh/mcp` with 200
+  responses.
+
+This evidence does not validate this commit on live final hosts or authorize
+removing the reverse redirect, assigning final aliases, or enabling rollout.
+
+### Sentry legacy connect fallback
+
+Sentry's public integration has one fixed callback,
+`https://api.superset.sh/api/integrations/sentry/callback`. Until a separately
+reviewed provider change, final and stage API Sentry connect requests must reach
+that legacy host before OAuth state is created. This preparation changes no
+provider registration, environment setting, or live routing.
+
+An explicit Sentry connect request on `https://api.paradev.com` or
+`https://api.stage.paradev.com` now follows this sequence:
+
+1. Validate the explicit `organizationId` UUID, then return a no-store 307 to
+   `https://app.superset.sh/auth/integration-connect?provider=sentry&organizationId=...`.
+   No new-host membership lookup, OAuth state, or state cookie is created.
+2. The legacy-web continuation accepts only Sentry and one valid organization
+   UUID. It reads the existing legacy auth session. Without a session, it sends
+   the browser to the existing legacy sign-in page with a **relative** continuation
+   containing the same provider and organization ID.
+3. After sign-in, redirect to the fixed old API Sentry connect route with the
+   explicit organization ID. `requireOrgMember` remains the authorization check
+   there before the original OAuth flow runs. Active organization selection is
+   never used to choose the target, and no session/token is forwarded.
+
+`/auth/integration-connect`, `/integrations/sentry`, and sign-in/up continuations
+into either route remain on legacy even at 100% domain rollout. Old, local, and
+preview Sentry starts retain their original behavior. Other providers are
+unchanged. This is a handoff for an explicit user connect action, not an automatic
+installation or authorization grant. The user may need to sign in on legacy.
+
+Local tests cover the redirect/sign-in/resume sequence and routing exclusions;
+no real Sentry consent, installation, callback or connection write was performed.
+Final-host/provider integration verification still needs separately authorized
+access and a designated test organization.

@@ -8,6 +8,7 @@ export const env = createEnv({
 			.default("development"),
 	},
 	server: {
+		DOMAIN_MOVE_ENABLED: z.string().optional(),
 		BROWSER_API_URL: z.string().url().optional(),
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),
