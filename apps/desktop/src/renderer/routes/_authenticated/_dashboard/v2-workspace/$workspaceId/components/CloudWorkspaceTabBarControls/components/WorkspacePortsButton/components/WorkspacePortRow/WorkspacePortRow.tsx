@@ -8,11 +8,11 @@ import { usePortForward } from "renderer/routes/_authenticated/_dashboard/compon
 import { PortForwardBusyActions } from "renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 
-interface SharePortRowProps {
+interface WorkspacePortRowProps {
 	port: DashboardSidebarPort;
 }
 
-export function SharePortRow({ port }: SharePortRowProps) {
+export function WorkspacePortRow({ port }: WorkspacePortRowProps) {
 	const { t } = useLingui();
 	const forward = usePortForward(port);
 	const { openExternal } = usePortOpener();
