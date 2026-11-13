@@ -25,7 +25,13 @@ import {
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
-import { bootStampsFrom, type HostAnswer } from "./boot-trace";
+import {
+	type BootProgress,
+	bootProgressFrom,
+	bootStampsFrom,
+	describeBootProgress,
+	type HostAnswer,
+} from "./boot-trace";
 import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
@@ -254,20 +260,89 @@ export async function provisionSandbox(args: {
 }
 
 const HOST_READY_TIMEOUT_MS = 60_000;
+/**
+ * How long a wake keeps waiting, in all, when the box's boot log shows its
+ * boot still running at `HOST_READY_TIMEOUT_MS`. A box whose snapshot
+ * predates the pinned bundle upgrades itself before host-service starts
+ * (44 s measured on a create, longer on a cold resume); cut off at 60 s, the
+ * wake failed and every retry waited another minute on the same boot.
+ * Well inside the tRPC route's 300 s `maxDuration`.
+ */
+const HOST_BOOTING_TIMEOUT_MS = 180_000;
 const HOST_READY_POLL_MS = 100;
+const BOOT_LOG_READ_TIMEOUT_MS = 3_000;
+/** The latest boot is a few dozen lines; the log keeps every earlier one too. */
+const BOOT_LOG_TAIL_BYTES = 64 * 1024;
 
 export class SandboxNotReadyError extends Error {
-	constructor(providerSandboxId: string) {
-		super(`host-service in ${providerSandboxId} did not answer in time`);
+	constructor(
+		providerSandboxId: string,
+		/** Where the box's boot stood when the wait gave up; null when not read. */
+		readonly boot: BootProgress | null = null,
+		readBoot = false,
+	) {
+		super(
+			`host-service in ${providerSandboxId} did not answer in time${
+				readBoot ? ` (${describeBootProgress(boot, Date.now())})` : ""
+			}`,
+		);
 		this.name = "SandboxNotReadyError";
 	}
 }
 
+/** The box's latest boot as its boot log tells it; null when the log cannot be read. */
+async function readBootProgress(
+	sandbox: Sandbox,
+): Promise<BootProgress | null> {
+	try {
+		const log = await sandbox.readFileToBuffer(
+			{ path: SANDBOX_PATHS.bootLog },
+			{ signal: AbortSignal.timeout(BOOT_LOG_READ_TIMEOUT_MS) },
+		);
+		if (!log) return null;
+		return bootProgressFrom(
+			log.subarray(-BOOT_LOG_TAIL_BYTES).toString("utf8"),
+			Date.now(),
+		);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Waits for host-service to answer. With `readBoot`, a box whose boot is
+ * still running when the first minute is up gets until
+ * `HOST_BOOTING_TIMEOUT_MS`, and the error says where the boot stood.
+ */
 async function waitForHostService(
 	target: string,
 	providerSandboxId: string,
+	readBoot?: () => Promise<BootProgress | null>,
 ): Promise<HostAnswer> {
-	const deadline = Date.now() + HOST_READY_TIMEOUT_MS;
+	const startedAt = Date.now();
+	const answer = await pollHostService(
+		target,
+		startedAt + HOST_READY_TIMEOUT_MS,
+	);
+	if (answer) return answer;
+	if (!readBoot) throw new SandboxNotReadyError(providerSandboxId);
+	const progress = await readBoot();
+	if (progress?.state === "booting") {
+		Sentry.getActiveSpan()?.setAttribute("sandbox.boot_wait_extended", true);
+		const late = await pollHostService(
+			target,
+			startedAt + HOST_BOOTING_TIMEOUT_MS,
+		);
+		if (late) return late;
+		throw new SandboxNotReadyError(providerSandboxId, await readBoot(), true);
+	}
+	throw new SandboxNotReadyError(providerSandboxId, progress, true);
+}
+
+async function pollHostService(
+	target: string,
+	deadline: number,
+): Promise<HostAnswer | null> {
 	while (Date.now() < deadline) {
 		const body: unknown = await fetch(`${target}/trpc/health.check`, {
 			signal: AbortSignal.timeout(HOST_READY_POLL_MS * 6),
@@ -281,7 +356,7 @@ async function waitForHostService(
 		}
 		await new Promise((resolve) => setTimeout(resolve, HOST_READY_POLL_MS));
 	}
-	throw new SandboxNotReadyError(providerSandboxId);
+	return null;
 }
 
 /**
@@ -293,10 +368,13 @@ export async function settleSandbox(args: {
 	providerSandboxId: string;
 	hostTarget: string;
 	claim: SandboxClaim;
+	/** Lets a box still booting at the first minute keep going; see `waitForHostService`. */
+	readBoot?: () => Promise<BootProgress | null>;
 }): Promise<HostAnswer> {
 	const answer = await waitForHostService(
 		args.hostTarget,
 		args.providerSandboxId,
+		args.readBoot,
 	);
 	await pushManagedEnv(
 		args.hostTarget,
@@ -496,6 +574,7 @@ export async function wakeSandbox(args: {
 					providerSandboxId: args.providerSandboxId,
 					hostTarget,
 					claim: args.claim,
+					readBoot: () => readBootProgress(sandbox),
 				}),
 		);
 		return { hostTarget, booted: !wasRunning, rebooted: !serving, answer };
