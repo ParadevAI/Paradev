@@ -365,12 +365,13 @@ describe("settleBoot", () => {
 		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
 	});
 
-	test("a settle whose next lock fails keeps the billed window, so a retry does not confirm it again", async () => {
+	test("a settle whose next lock fails keeps the billed window and moves to a new lock id for the retry", async () => {
 		renewalError = new Error("autumn down");
 		await expect(settleBoot("boot_1")).rejects.toThrow("autumn down");
 		expect(writes).toContainEqual(
 			expect.objectContaining({
 				lockOpen: false,
+				lockSeq: 1,
 				finalizedThrough: expect.any(Date),
 			}),
 		);
