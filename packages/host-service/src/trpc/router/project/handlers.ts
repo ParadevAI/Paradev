@@ -31,6 +31,7 @@ import {
 	updateLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
+import { syncWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
 	adoptLocalRepo,
@@ -530,7 +531,10 @@ export function setPrimaryRepository(
 			),
 		)
 		.all();
-	for (const row of live) emitLocalWorkspaceUpdated(ctx, row);
+	for (const row of live) {
+		syncWorkspaceContextFiles(ctx.db, row.id);
+		emitLocalWorkspaceUpdated(ctx, row);
+	}
 	touchProject(ctx, args.projectId);
 	return snapshotOf(ctx, args.projectId);
 }

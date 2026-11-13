@@ -22,6 +22,27 @@ export const WORKSPACE_CONTEXT_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 /** Each agent folder whose `skills/` the root links per repository. */
 export const WORKSPACE_SKILL_FOLDERS = [".agents", ".claude"] as const;
 
+/**
+ * Agent config the root links from the primary repository. Never
+ * `.claude/settings.local.json`: Claude Code keeps the root's approvals there.
+ */
+export const WORKSPACE_CONFIG_LINKS = [
+	{ path: ".mcp.json", type: "file" },
+	{ path: ".claude/settings.json", type: "file" },
+	{ path: ".codex/config.toml", type: "file" },
+	{ path: ".cursor/mcp.json", type: "file" },
+	{ path: ".cursor/rules", type: "dir" },
+] as const;
+
+const AGENT_FOLDERS = [".agents", ".claude", ".codex", ".cursor"] as const;
+
+/** Top-level root entries the host makes, besides the checkout folders. */
+export const WORKSPACE_ROOT_ENTRIES = [
+	...WORKSPACE_CONTEXT_FILES,
+	".mcp.json",
+	...AGENT_FOLDERS,
+] as const;
+
 const INSTRUCTION_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 
 export interface ContextCheckout {
@@ -39,8 +60,6 @@ export function writeWorkspaceContextFiles(
 	root: string,
 	checkouts: ContextCheckout[],
 ): void {
-	writeIfChanged(join(root, "AGENTS.md"), renderAgentsFile(checkouts));
-	writeIfChanged(join(root, "CLAUDE.md"), "@AGENTS.md\n");
 	const ordered = [...checkouts].sort(
 		(a, b) => Number(b.isPrimary) - Number(a.isPrimary),
 	);
@@ -54,9 +73,23 @@ export function writeWorkspaceContextFiles(
 			);
 		}
 	}
+	const primary = checkouts.find((checkout) => checkout.isPrimary);
+	const linked = syncConfigLinks(
+		root,
+		primary,
+		checkouts.map((checkout) => checkout.path),
+	);
+	writeIfChanged(
+		join(root, "AGENTS.md"),
+		renderAgentsFile(checkouts, linked.length > 0 ? primary : undefined),
+	);
+	writeIfChanged(join(root, "CLAUDE.md"), "@AGENTS.md\n");
 }
 
-function renderAgentsFile(checkouts: ContextCheckout[]): string {
+function renderAgentsFile(
+	checkouts: ContextCheckout[],
+	configSource: ContextCheckout | undefined,
+): string {
 	const lines = [
 		"# Workspace",
 		"",
@@ -85,6 +118,16 @@ function renderAgentsFile(checkouts: ContextCheckout[]): string {
 			return `- ${checkout.name}: ${files.length > 0 ? files.join(", ") : "no AGENTS.md or CLAUDE.md at its root"}`;
 		}),
 		"",
+		...(configSource
+			? [
+					"## MCP servers and settings",
+					"",
+					`MCP servers and settings come from the primary repository (${configSource.name}).`,
+					"They run with this workspace folder as the working folder, so a relative",
+					"path in them resolves from this folder, not from the repository.",
+					"",
+				]
+			: []),
 	];
 	return lines.join("\n");
 }
@@ -133,6 +176,7 @@ export function removeWorkspaceContextFiles(
 	for (const file of WORKSPACE_CONTEXT_FILES) {
 		removeFile(join(root, file));
 	}
+	syncConfigLinks(root, undefined, checkoutPaths);
 	for (const folder of WORKSPACE_SKILL_FOLDERS) {
 		const skills = join(root, folder, "skills");
 		try {
@@ -152,15 +196,23 @@ export function removeWorkspaceContextFiles(
 }
 
 /**
- * What a user or agent put in the root's agent folders, as root-relative
- * paths; the host's own skill links are not listed.
+ * What a user or agent put at `.mcp.json` or in the root's agent folders, as
+ * root-relative paths; the host's own links are not listed.
  */
-export function listSkillFolderLeftovers(
+export function listAgentFolderLeftovers(
 	root: string,
 	checkoutPaths: string[],
 ): string[] {
+	const configLinks = new Set<string>(
+		WORKSPACE_CONFIG_LINKS.map((link) => link.path),
+	);
+	const skillFolders = new Set<string>(WORKSPACE_SKILL_FOLDERS);
 	const leftovers: string[] = [];
-	for (const folder of WORKSPACE_SKILL_FOLDERS) {
+	const mcp = join(root, ".mcp.json");
+	if (isPresent(mcp) && !isLinkIntoCheckouts(mcp, checkoutPaths)) {
+		leftovers.push(".mcp.json");
+	}
+	for (const folder of AGENT_FOLDERS) {
 		const path = join(root, folder);
 		if (!isPresent(path)) continue;
 		const entries = listRealFolder(path);
@@ -169,8 +221,15 @@ export function listSkillFolderLeftovers(
 			continue;
 		}
 		for (const entry of entries) {
-			if (entry !== "skills") {
-				leftovers.push(`${folder}/${entry}`);
+			const entryPath = `${folder}/${entry}`;
+			if (configLinks.has(entryPath)) {
+				if (!isLinkIntoCheckouts(join(path, entry), checkoutPaths)) {
+					leftovers.push(entryPath);
+				}
+				continue;
+			}
+			if (entry !== "skills" || !skillFolders.has(folder)) {
+				leftovers.push(entryPath);
 				continue;
 			}
 			const skills = join(path, "skills");
@@ -246,6 +305,63 @@ function syncSkillLinks(
 	}
 	removeIfEmpty(skills);
 	removeIfEmpty(join(root, folder));
+}
+
+/**
+ * Links the primary repository's agent config at the root and reaps the
+ * host's links that no longer match. Returns the root-relative paths linked.
+ */
+function syncConfigLinks(
+	root: string,
+	primary: ContextCheckout | undefined,
+	checkoutPaths: string[],
+): string[] {
+	const linked: string[] = [];
+	for (const { path, type } of WORKSPACE_CONFIG_LINKS) {
+		const link = join(root, path);
+		const folder = dirname(link);
+		const target = primary ? join(primary.path, path) : undefined;
+		const wanted = target !== undefined && isEntryOfType(target, type);
+		try {
+			if (isPresent(link)) {
+				if (!isLinkIntoCheckouts(link, checkoutPaths)) {
+					if (wanted) {
+						console.warn(
+							`[workspace-context-files] skipped ${path}: a file the host did not make is there`,
+						);
+					}
+					continue;
+				}
+				if (wanted && linkTarget(link) === target) {
+					linked.push(path);
+					continue;
+				}
+				unlinkSync(link);
+			}
+			if (wanted) {
+				mkdirSync(folder, { recursive: true });
+				symlinkSync(relative(folder, target), link, type);
+				linked.push(path);
+			} else if (folder !== root) {
+				removeIfEmpty(folder);
+			}
+		} catch (err) {
+			console.warn(
+				`[workspace-context-files] could not link ${path} in ${root}`,
+				err,
+			);
+		}
+	}
+	return linked;
+}
+
+function isEntryOfType(path: string, type: "file" | "dir"): boolean {
+	try {
+		const stats = statSync(path);
+		return type === "dir" ? stats.isDirectory() : stats.isFile();
+	} catch {
+		return false;
+	}
 }
 
 function listSkillNames(source: string): string[] {

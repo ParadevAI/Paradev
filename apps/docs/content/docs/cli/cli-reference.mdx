@@ -902,7 +902,10 @@ the other repositories on a new branch of the same name, and `--base-branch web=
 picks the branch `web` starts from. `--checkout local` is for one-repository projects only.
 The workspace folder also gets an `AGENTS.md` and a `CLAUDE.md` that list the repositories and
 point agents to each repository's own instruction files, and links to each repository's skills
-in `.agents/skills` and `.claude/skills`.
+in `.agents/skills` and `.claude/skills`. MCP servers and settings come from the primary
+repository: the folder links its `.mcp.json`, `.claude/settings.json`, `.codex/config.toml`,
+`.cursor/mcp.json` and `.cursor/rules` when it has them. Agents run in the workspace folder, so
+a relative path in that config resolves from there.
 
 `--checkout local` shares the project's existing files, git index, and checked-out branch.
 It does not switch branches or run setup. Do not combine it with `--branch`, `--pr`,

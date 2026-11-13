@@ -43,8 +43,14 @@ has, for the agent to read before it works there. It also links each skill in
 `<repo>/.agents/skills/` and `<repo>/.claude/skills/` at `<root>/.agents/skills/<name>` and
 `<root>/.claude/skills/<name>`. On a name clash the primary repository's skill wins. The host
 never replaces a file it did not make, and it rewrites all of this when a branch changes or the
-workspace is restored (`workspace-creation/shared/workspace-context-files/`). Repository
-settings and MCP config are not linked.
+workspace is restored (`workspace-creation/shared/workspace-context-files/`).
+
+MCP servers and settings come from the primary repository only. When it has them, the root links
+`.mcp.json`, `.claude/settings.json`, `.codex/config.toml`, `.cursor/mcp.json` and `.cursor/rules`
+to the primary's files, and the root's `AGENTS.md` says so. Agents still run in the root, so a
+relative path in that config resolves from the root. The root's `.claude/settings.local.json` is
+never linked: Claude Code keeps the root's approvals there. When the primary changes, or a branch
+no longer has the file, the host removes the old link.
 
 ## UFO
 

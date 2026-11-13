@@ -257,6 +257,33 @@ test("the root links each repository's skills and points at its instructions; de
 	expect(existsSync(root)).toBe(false);
 });
 
+test("the root links the primary repository's .mcp.json, follows a primary change, and delete removes it", async () => {
+	const scenario = await multiRepoScenario();
+	await scenario.web.commit("web mcp", { ".mcp.json": '{"web":true}\n' });
+	await scenario.api.commit("api mcp", { ".mcp.json": '{"api":true}\n' });
+	const workspace = await createBoth(scenario);
+	const mcp = join(workspace.worktreePath, ".mcp.json");
+
+	expect(readFileSync(mcp, "utf8")).toBe('{"web":true}\n');
+	expect(
+		readFileSync(join(workspace.worktreePath, "AGENTS.md"), "utf8"),
+	).toContain(
+		"MCP servers and settings come from the primary repository (web).",
+	);
+
+	await scenario.host.trpc.project.setPrimaryRepository.mutate({
+		projectId: scenario.projectId,
+		repositoryId: scenario.apiId,
+	});
+	expect(readFileSync(mcp, "utf8")).toBe('{"api":true}\n');
+
+	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
+	expect(existsSync(workspace.worktreePath)).toBe(false);
+});
+
 test("a dirty checkout blocks the delete and is named, before any checkout is removed", async () => {
 	const scenario = await multiRepoScenario();
 	const workspace = await createBoth(scenario);

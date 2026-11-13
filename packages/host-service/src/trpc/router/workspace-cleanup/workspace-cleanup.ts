@@ -33,10 +33,9 @@ import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
 import {
-	listSkillFolderLeftovers,
+	listAgentFolderLeftovers,
 	removeWorkspaceContextFiles,
-	WORKSPACE_CONTEXT_FILES,
-	WORKSPACE_SKILL_FOLDERS,
+	WORKSPACE_ROOT_ENTRIES,
 } from "../workspace-creation/shared/workspace-context-files";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
@@ -483,8 +482,7 @@ async function rootLeftovers({
 > {
 	if (!local || checkouts.length < 2) return [];
 	const owned = new Set<string>([
-		...WORKSPACE_CONTEXT_FILES,
-		...WORKSPACE_SKILL_FOLDERS,
+		...WORKSPACE_ROOT_ENTRIES,
 		...checkouts.map(
 			(checkout) =>
 				relative(local.worktreePath, checkout.path).split(sep)[0] ?? "",
@@ -494,7 +492,7 @@ async function rootLeftovers({
 		const entries = await readdir(local.worktreePath);
 		return [
 			...entries.filter((name) => !owned.has(name)),
-			...listSkillFolderLeftovers(
+			...listAgentFolderLeftovers(
 				local.worktreePath,
 				checkouts.map((checkout) => checkout.path),
 			),

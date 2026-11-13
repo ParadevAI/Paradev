@@ -15,7 +15,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
 	type ContextCheckout,
-	listSkillFolderLeftovers,
+	listAgentFolderLeftovers,
 	removeWorkspaceContextFiles,
 	writeWorkspaceContextFiles,
 } from "./workspace-context-files";
@@ -160,7 +160,7 @@ test("removing takes the files and the host's links, and leaves what a user put 
 	writeFileSync(join(root, ".claude", "settings.local.json"), "{}");
 	const paths = [api.path, web.path];
 
-	expect(listSkillFolderLeftovers(root, paths)).toEqual([
+	expect(listAgentFolderLeftovers(root, paths)).toEqual([
 		".claude/settings.local.json",
 	]);
 	removeWorkspaceContextFiles(root, paths);
@@ -177,4 +177,112 @@ test("without skills no agent folders are made at the root", () => {
 
 	expect(existsSync(join(root, ".agents"))).toBe(false);
 	expect(existsSync(join(root, ".claude"))).toBe(false);
+});
+
+function addFile(repo: ContextCheckout, path: string, content = "{}") {
+	mkdirSync(join(repo.path, path, ".."), { recursive: true });
+	writeFileSync(join(repo.path, path), content);
+}
+
+test("the primary repository's agent config is linked at the root, only where it has it", () => {
+	const web = checkout("web", true);
+	const api = checkout("api");
+	addFile(web, ".mcp.json");
+	addFile(web, ".claude/settings.json");
+	addFile(web, ".claude/settings.local.json");
+	mkdirSync(join(web.path, ".cursor", "rules"), { recursive: true });
+	addFile(api, ".codex/config.toml", "");
+
+	writeWorkspaceContextFiles(root, [api, web]);
+
+	expect(readlinkSync(join(root, ".mcp.json"))).toBe("web/.mcp.json");
+	expect(readlinkSync(join(root, ".claude", "settings.json"))).toBe(
+		"../web/.claude/settings.json",
+	);
+	expect(readlinkSync(join(root, ".cursor", "rules"))).toBe(
+		"../web/.cursor/rules",
+	);
+	expect(existsSync(join(root, ".claude", "settings.local.json"))).toBe(false);
+	expect(existsSync(join(root, ".codex"))).toBe(false);
+	expect(existsSync(join(root, ".cursor", "mcp.json"))).toBe(false);
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+		"MCP servers and settings come from the primary repository (web).",
+	);
+});
+
+test("without agent config the root AGENTS.md does not mention it", () => {
+	writeWorkspaceContextFiles(root, [checkout("web", true), checkout("api")]);
+
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).not.toContain(
+		"MCP servers",
+	);
+});
+
+test("a root config file the host did not make is never replaced or touched", () => {
+	const web = checkout("web", true);
+	const api = checkout("api");
+	addFile(web, ".mcp.json");
+	addFile(web, ".claude/settings.json");
+	writeFileSync(join(root, ".mcp.json"), "mine");
+	mkdirSync(join(root, ".claude"));
+	writeFileSync(join(root, ".claude", "settings.local.json"), "approvals");
+	const paths = [api.path, web.path];
+
+	writeWorkspaceContextFiles(root, [api, web]);
+
+	expect(readFileSync(join(root, ".mcp.json"), "utf8")).toBe("mine");
+	expect(lstatSync(join(root, ".mcp.json")).isSymbolicLink()).toBe(false);
+	expect(listAgentFolderLeftovers(root, paths)).toEqual([
+		".mcp.json",
+		".claude/settings.local.json",
+	]);
+	removeWorkspaceContextFiles(root, paths);
+	expect(readFileSync(join(root, ".mcp.json"), "utf8")).toBe("mine");
+	expect(
+		readFileSync(join(root, ".claude", "settings.local.json"), "utf8"),
+	).toBe("approvals");
+	expect(existsSync(join(root, ".claude", "settings.json"))).toBe(false);
+});
+
+test("config links follow the primary and are reaped when its file is gone", () => {
+	const web = checkout("web", true);
+	const api = checkout("api");
+	addFile(web, ".mcp.json");
+	addFile(web, ".codex/config.toml", "");
+	addFile(api, ".mcp.json");
+	writeWorkspaceContextFiles(root, [api, web]);
+
+	writeWorkspaceContextFiles(root, [
+		{ ...api, isPrimary: true },
+		{ ...web, isPrimary: false },
+	]);
+
+	expect(readlinkSync(join(root, ".mcp.json"))).toBe("api/.mcp.json");
+	expect(existsSync(join(root, ".codex"))).toBe(false);
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+		"primary repository (api)",
+	);
+
+	rmSync(join(api.path, ".mcp.json"));
+	writeWorkspaceContextFiles(root, [{ ...api, isPrimary: true }, web]);
+
+	expect(() => lstatSync(join(root, ".mcp.json"))).toThrow();
+	expect(listAgentFolderLeftovers(root, [api.path, web.path])).toEqual([]);
+});
+
+test("removing takes the config links and the folders made for them", () => {
+	const web = checkout("web", true);
+	const api = checkout("api");
+	addFile(web, ".mcp.json");
+	addFile(web, ".cursor/mcp.json");
+	mkdirSync(join(web.path, ".cursor", "rules"));
+	const paths = [api.path, web.path];
+	writeWorkspaceContextFiles(root, [api, web]);
+
+	expect(listAgentFolderLeftovers(root, paths)).toEqual([]);
+	removeWorkspaceContextFiles(root, paths);
+
+	expect(() => lstatSync(join(root, ".mcp.json"))).toThrow();
+	expect(existsSync(join(root, ".cursor"))).toBe(false);
+	expect(existsSync(join(web.path, ".cursor", "rules"))).toBe(true);
 });
