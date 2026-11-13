@@ -56,8 +56,10 @@ local_check_dependencies() {
     for dep in "${missing[@]}"; do echo "  - $dep"; done
     return 1
   fi
-  if ! docker info &> /dev/null; then
-    error "Docker is installed but its daemon is not reachable (start Docker Desktop, or run 'colima start')"
+  local docker_error
+  if ! docker_error="$(docker info 2>&1 >/dev/null)"; then
+    error "Docker is installed but 'docker info' failed (start Docker Desktop, run 'colima start', or check socket permissions):"
+    echo "$docker_error" | sed 's/^/  /'
     return 1
   fi
   success "All dependencies found"
