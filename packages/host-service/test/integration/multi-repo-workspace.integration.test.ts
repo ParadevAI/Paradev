@@ -661,15 +661,33 @@ test("a repository a live workspace checks out cannot be removed from the projec
 	).rejects.toMatchObject({ data: { code: "PRECONDITION_FAILED" } });
 });
 
-test("moving a multi-repo workspace is refused", async () => {
+test("fetchBranch fetches the move branch into every repository, and names one that lacks it", async () => {
 	const scenario = await multiRepoScenario();
-	const workspace = await createBoth(scenario);
+	const branch = "superset/teleport-abc";
+	for (const fixture of [scenario.web, scenario.api]) {
+		const remote = mkdtempSync(join(tmpdir(), "multi-repo-remote-"));
+		scenario.cleanup.push(remote);
+		await simpleGit(remote).init(["--bare"]);
+		await fixture.git.addRemote("origin", remote);
+	}
+	await scenario.web.git.push("origin", `HEAD:refs/heads/${branch}`);
+	const fetchBranch = () =>
+		scenario.host.trpc.teleport.fetchBranch.mutate({
+			projectId: scenario.projectId,
+			branch,
+		});
 
-	await expect(
-		scenario.host.trpc.teleport.prepareWorkspace.mutate({
-			workspaceId: workspace.id,
-		}),
-	).rejects.toThrow("multi_repo_unsupported");
+	await expect(fetchBranch()).rejects.toThrow(/not on the remote of: api$/);
+
+	await scenario.api.git.push("origin", `HEAD:refs/heads/${branch}`);
+	await fetchBranch();
+	for (const fixture of [scenario.web, scenario.api]) {
+		expect(
+			(
+				await fixture.git.raw(["branch", "-r", "--list", `origin/${branch}`])
+			).trim(),
+		).toBe(`origin/${branch}`);
+	}
 });
 
 test("AI naming renames the branch in every checkout still on the generated name", async () => {

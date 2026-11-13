@@ -4,7 +4,6 @@ import { promisify } from "node:util";
 import { sessionSelections } from "@superset/chat/core";
 import type { DurableEvent } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
-import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { listProjectRepositories } from "../../../projects/repositories";
@@ -21,21 +20,12 @@ import {
 } from "../../../teleport/providers";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
-	gitPushSnapshotTask,
-	gitSnapshotRemoteTask,
-} from "../../../workers/tasks/git";
-import {
 	harnessPlaceSessionTask,
 	harnessSessionFileTask,
 } from "../../../workers/tasks/harness";
-import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
-import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
-import {
-	resolveCheckoutPath,
-	resolveWorktreePath,
-} from "../git/utils/resolve-worktree";
+import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { requireChatRuntime } from "../sessions/session-service";
 import { resolveDefaultAccountTerminalEnv } from "../usage/default-account";
 import { requireLocalProject } from "../workspace-creation/shared/local-project";
@@ -49,6 +39,7 @@ import {
 	type StopState,
 	stopTerminalsForMove,
 } from "./terminal-sessions";
+import { pushSnapshots, resolveSnapshotTargets } from "./utils/snapshots";
 
 const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
@@ -97,14 +88,6 @@ function requireChat(
 		});
 	}
 	return session;
-}
-
-function multiRepoUnsupported() {
-	return new TRPCError({
-		code: "PRECONDITION_FAILED",
-		message:
-			"multi_repo_unsupported: a workspace with several repositories cannot be moved yet",
-	});
 }
 
 function busyError() {
@@ -179,10 +162,6 @@ export const teleportRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const workspace = getLocalWorkspace(ctx.db, input.workspaceId);
-			if (workspace && listWorkspaceCheckouts(ctx.db, workspace).length > 1) {
-				throw multiRepoUnsupported();
-			}
 			const chat = requireChatRuntime(ctx);
 			const chatSync = ctx.runtime.chatSync;
 			if (!chatSync) {
@@ -230,27 +209,10 @@ export const teleportRouter = router({
 				busy().length > 0 || terminals.some((terminal) => terminal.busy);
 			if (anyBusy && !input.stopIfBusy) throw busyError();
 
-			const worktreePath = resolveCheckoutPath(ctx, input.workspaceId).path;
 			const env = resolveDefaultAccountTerminalEnv(ctx.db);
 			const pool = getHostWorkerPool();
-			const gitEnv = {
-				...(await createGitEnvResolver(ctx.credentials)(worktreePath)),
-				...gitCeilingEnv(worktreePath),
-			};
-			const target = await pool
-				.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
-				.catch((error: unknown) => {
-					rethrowEnvironmentalGitError(error);
-					throw error;
-				});
-			const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
-			const repository = repositories[0];
-			if (!target || !repository || repositories.some((repo) => !repo)) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Moving a workspace needs a GitHub repository",
-				});
-			}
+			const targets = await resolveSnapshotTargets(ctx, input.workspaceId);
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 
 			for (const { sessionId } of busy()) {
 				await stopRunningTurn(chat, sessionId);
@@ -276,18 +238,10 @@ export const teleportRouter = router({
 			const prepared: PreparedChat[] = [];
 			const followed: string[] = [];
 			let firstFailure: unknown = null;
+			let snapshots: Awaited<ReturnType<typeof pushSnapshots>> = [];
 			try {
 				await stopTerminalsForMove(ctx, terminals, stopState);
-				await pool
-					.run(
-						gitPushSnapshotTask,
-						{ worktreePath, remote: target.remote, branch, gitEnv },
-						{ timeoutMs: 150_000 },
-					)
-					.catch((error: unknown) => {
-						rethrowEnvironmentalGitError(error);
-						throw error;
-					});
+				snapshots = await pushSnapshots(targets, branch);
 
 				for (const { terminal, sessionFile } of stopState.stopped) {
 					try {
@@ -400,7 +354,7 @@ export const teleportRouter = router({
 
 			return {
 				branch,
-				repositoryFullName: `${repository.owner}/${repository.name}`,
+				snapshots,
 				chats: prepared,
 				skipped,
 				terminals: movedTerminals,
@@ -495,36 +449,56 @@ export const teleportRouter = router({
 			return { ok: true };
 		}),
 
-	/** Makes a branch another host pushed available to create a worktree from. */
+	/** Makes a branch another host pushed available to create a worktree from, in every repository. */
 	fetchBranch: machineOnlyProcedure
 		.input(z.object({ projectId: z.string(), branch: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			requireLocalProject(ctx, input.projectId);
 			const repositories = listProjectRepositories(ctx.db, input.projectId);
-			const [repository] = repositories;
-			if (!repository) {
+			if (repositories.length === 0) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Project has no repository on this host",
 				});
 			}
-			if (repositories.length > 1) throw multiRepoUnsupported();
-			const repoPath = repository.repoPath;
-			const gitEnv = await createGitEnvResolver(ctx.credentials)(repoPath);
-			await execFileAsync(
-				"git",
-				[
-					"-C",
-					repoPath,
-					"fetch",
-					"origin",
-					`+refs/heads/${input.branch}:refs/remotes/origin/${input.branch}`,
-				],
-				{ env: { ...process.env, ...gitEnv } },
-			).catch((error: unknown) => {
-				rethrowEnvironmentalGitError(error);
-				throw error;
-			});
+			const resolveEnv = createGitEnvResolver(ctx.credentials);
+			const missing: string[] = [];
+			await Promise.all(
+				repositories.map(async (repository) => {
+					const remote = repository.remoteName ?? "origin";
+					const gitEnv = await resolveEnv(repository.repoPath);
+					await execFileAsync(
+						"git",
+						[
+							"-C",
+							repository.repoPath,
+							"fetch",
+							remote,
+							`+refs/heads/${input.branch}:refs/remotes/${remote}/${input.branch}`,
+						],
+						{
+							env: {
+								...process.env,
+								...gitEnv,
+								...gitCeilingEnv(repository.repoPath),
+							},
+						},
+					).catch((error: unknown) => {
+						if (/couldn't find remote ref/i.test(String(error))) {
+							missing.push(repository.name);
+							return;
+						}
+						rethrowEnvironmentalGitError(error);
+						throw error;
+					});
+				}),
+			);
+			if (missing.length > 0) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `Branch ${input.branch} is not on the remote of: ${missing.sort().join(", ")}`,
+				});
+			}
 			return { branch: input.branch };
 		}),
 

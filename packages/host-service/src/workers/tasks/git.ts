@@ -843,14 +843,15 @@ const SNAPSHOT_IDENTITY = {
 
 /** The remote a snapshot goes to (`origin`, else the first), and every URL `git push` uses for it. */
 export const gitSnapshotRemoteTask = defineWorkerTask<
-	{ worktreePath: string; gitEnv: GitTaskEnv },
+	{ worktreePath: string; gitEnv: GitTaskEnv; preferred?: string | null },
 	{ remote: string; pushUrls: string[] } | null
 >({
 	type: "git/snapshotRemote",
-	handler: async ({ worktreePath, gitEnv }) => {
+	handler: async ({ worktreePath, gitEnv, preferred }) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
 		const remotes = await git.getRemotes(false);
 		const remote =
+			remotes.find((entry) => entry.name === preferred)?.name ??
 			remotes.find((entry) => entry.name === "origin")?.name ??
 			remotes[0]?.name;
 		if (!remote) return null;
@@ -914,6 +915,22 @@ export const gitPushSnapshotTask = defineWorkerTask<
 	},
 });
 
+/** Deletes a snapshot branch pushed for a move that then failed. */
+export const gitDeleteSnapshotTask = defineWorkerTask<
+	{ worktreePath: string; remote: string; branch: string; gitEnv: GitTaskEnv },
+	void
+>({
+	type: "git/deleteSnapshot",
+	handler: async ({ worktreePath, remote, branch, gitEnv }) => {
+		await createUserSimpleGit(worktreePath, { env: gitEnv }).raw([
+			"push",
+			remote,
+			"--delete",
+			`refs/heads/${branch}`,
+		]);
+	},
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitStatusPartialTask,
@@ -937,6 +954,7 @@ export const gitTasks = [
 	gitPushTask,
 	gitSnapshotRemoteTask,
 	gitPushSnapshotTask,
+	gitDeleteSnapshotTask,
 	gitPrHeadBaseTask,
 	gitRestoreWorktreeTask,
 	gitDetectExternalWorktreesTask,
