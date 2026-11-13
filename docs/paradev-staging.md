@@ -102,6 +102,11 @@ desktop rollout can precede existing web users. Changing this workflow's
 watched path can redeploy relay, realtime and agent-worker; do not weaken those
 filters. Building final artifacts does not activate routing or assign domains.
 
+The production API job waits for legacy web to deploy successfully, so the
+web continuation accepts all allowlisted providers before API handoffs use it.
+Wait for that production run to succeed before preparing and assigning updated
+final artifacts as well.
+
 The manual workflow now accepts `mode`, a fixed choice defaulting to `stage`.
 Stage retains the table and ownership checks above. `prepare-final` builds the
 same exact new projects with these settings:

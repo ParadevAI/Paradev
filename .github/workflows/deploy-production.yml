@@ -70,7 +70,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
     environment: production
-    needs: deploy-database
+    needs: [deploy-database, deploy-web]
 
     steps:
       - name: Checkout repository
