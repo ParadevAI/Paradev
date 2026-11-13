@@ -4919,9 +4919,6 @@ msgstr "Data v cloudu se smažou. Nejdřív pushněte své větve."
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud končí {shutdownDate}. Aplikace pro Mac končí začátkem roku 2027"
 
-msgid "Cloud environment setup"
-msgstr "Nastavení cloudového prostředí"
-
 msgid "Cloud environments"
 msgstr "Cloudová prostředí"
 
@@ -13296,9 +13293,6 @@ msgstr "Žádný projekt neodpovídá."
 msgid "No projects on this host yet"
 msgstr "Na tomto hostu zatím nejsou žádné projekty"
 
-msgid "No projects to link."
-msgstr "Žádné projekty k propojení."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "Za posledních 30 dní nebyly smazány žádné projekty."
 
@@ -15699,9 +15693,6 @@ msgstr "Projekt není na tomto hostu nastaven"
 
 msgid "Project not trusted in Codex"
 msgstr "Projekt není v Codexu důvěryhodný"
-
-msgid "Project on another device"
-msgstr "Projekt na jiném zařízení"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Projekt je připravený. Otevřete ho v postranním panelu."
@@ -21752,9 +21743,6 @@ msgstr "Neznámý pracovní prostor"
 
 msgid "Unlimited"
 msgstr "Neomezeně"
-
-msgid "Unlink project"
-msgstr "Zrušit propojení projektu"
 
 msgid "Unlink task"
 msgstr "Odpojit úkol"

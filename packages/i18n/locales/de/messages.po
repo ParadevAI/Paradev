@@ -4919,9 +4919,6 @@ msgstr "Cloud-Daten werden gelöscht. Pushe vorher deine Branches."
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud endet am {shutdownDate}. Mac-App endet Anfang 2027"
 
-msgid "Cloud environment setup"
-msgstr "Einrichtung der Cloud-Umgebung"
-
 msgid "Cloud environments"
 msgstr "Cloud-Umgebungen"
 
@@ -13296,9 +13293,6 @@ msgstr "Keine passenden Projekte."
 msgid "No projects on this host yet"
 msgstr "Noch keine Projekte auf diesem Host"
 
-msgid "No projects to link."
-msgstr "Keine Projekte zum Verknüpfen."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "In den letzten 30 Tagen wurden keine Projekte gelöscht."
 
@@ -15699,9 +15693,6 @@ msgstr "Projekt auf diesem Host nicht eingerichtet"
 
 msgid "Project not trusted in Codex"
 msgstr "Projekt in Codex nicht vertrauenswürdig"
-
-msgid "Project on another device"
-msgstr "Projekt auf einem anderen Gerät"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Projekt bereit. Öffne es in der Seitenleiste."
@@ -21752,9 +21743,6 @@ msgstr "Unbekannter Arbeitsbereich"
 
 msgid "Unlimited"
 msgstr "Unbegrenzt"
-
-msgid "Unlink project"
-msgstr "Projektverknüpfung aufheben"
 
 msgid "Unlink task"
 msgstr "Aufgabe trennen"

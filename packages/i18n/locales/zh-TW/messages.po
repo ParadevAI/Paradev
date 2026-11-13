@@ -4919,9 +4919,6 @@ msgstr "雲端資料將被刪除。請先推送你的分支。"
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud 於{shutdownDate}結束。Mac 應用程式於 2027 年初結束"
 
-msgid "Cloud environment setup"
-msgstr "雲端環境設定"
-
 msgid "Cloud environments"
 msgstr "雲端環境"
 
@@ -13296,9 +13293,6 @@ msgstr "沒有匹配的專案。"
 msgid "No projects on this host yet"
 msgstr "此主機上暫無專案"
 
-msgid "No projects to link."
-msgstr "沒有可關聯的專案。"
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "過去 30 天內沒有刪除任何專案。"
 
@@ -15699,9 +15693,6 @@ msgstr "專案未在此主機上設定"
 
 msgid "Project not trusted in Codex"
 msgstr "專案在Codex中未受信任"
-
-msgid "Project on another device"
-msgstr "其他裝置上的專案"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "專案已就緒，可從側邊欄開啟。"
@@ -21752,9 +21743,6 @@ msgstr "未知工作區"
 
 msgid "Unlimited"
 msgstr "無限"
-
-msgid "Unlink project"
-msgstr "取消關聯專案"
 
 msgid "Unlink task"
 msgstr "取消連結任務"

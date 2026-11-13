@@ -4919,9 +4919,6 @@ msgstr "Dữ liệu cloud sẽ bị xóa. Hãy push các nhánh của bạn trư
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud kết thúc vào {shutdownDate}. Ứng dụng Mac kết thúc đầu năm 2027"
 
-msgid "Cloud environment setup"
-msgstr "Thiết lập environment đám mây"
-
 msgid "Cloud environments"
 msgstr "Môi trường đám mây"
 
@@ -13296,9 +13293,6 @@ msgstr "Không có dự án nào khớp."
 msgid "No projects on this host yet"
 msgstr "Chưa có dự án nào trên host này"
 
-msgid "No projects to link."
-msgstr "Không có dự án nào để liên kết."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "Không có dự án nào bị xóa trong 30 ngày qua."
 
@@ -15699,9 +15693,6 @@ msgstr "Dự án chưa được thiết lập trên host này"
 
 msgid "Project not trusted in Codex"
 msgstr "Dự án chưa được tin cậy trong Codex"
-
-msgid "Project on another device"
-msgstr "Dự án trên thiết bị khác"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Dự án đã sẵn sàng. Mở nó từ thanh bên."
@@ -21752,9 +21743,6 @@ msgstr "Workspace không xác định"
 
 msgid "Unlimited"
 msgstr "Không giới hạn"
-
-msgid "Unlink project"
-msgstr "Hủy liên kết dự án"
 
 msgid "Unlink task"
 msgstr "Bỏ liên kết nhiệm vụ"

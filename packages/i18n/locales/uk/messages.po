@@ -4913,9 +4913,6 @@ msgstr "Дані в хмарі буде видалено. Спершу запу�
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Хмара закривається {shutdownDate}. Застосунок для Mac — на початку 2027"
 
-msgid "Cloud environment setup"
-msgstr "Налаштування хмарного середовища"
-
 msgid "Cloud environments"
 msgstr "Хмарні середовища"
 
@@ -13290,9 +13287,6 @@ msgstr "Немає відповідних проєктів."
 msgid "No projects on this host yet"
 msgstr "На цьому хості ще немає проєктів"
 
-msgid "No projects to link."
-msgstr "Немає проєктів для прив'язки."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "За останні 30 днів жодного проєкту не видалено."
 
@@ -15693,9 +15687,6 @@ msgstr "Проєкт не налаштовано на цьому хості"
 
 msgid "Project not trusted in Codex"
 msgstr "Проєкт не позначено як довірений у Codex"
-
-msgid "Project on another device"
-msgstr "Проєкт на іншому пристрої"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Проєкт готовий. Відкрийте його з бічної панелі."
@@ -21746,9 +21737,6 @@ msgstr "Невідомий робочий простір"
 
 msgid "Unlimited"
 msgstr "Без обмежень"
-
-msgid "Unlink project"
-msgstr "Відв'язати проєкт"
 
 msgid "Unlink task"
 msgstr "Від'єднати завдання"

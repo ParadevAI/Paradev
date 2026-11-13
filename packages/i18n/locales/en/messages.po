@@ -4919,9 +4919,6 @@ msgstr "Cloud data gets deleted. Push your branches first."
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud ends {shutdownDate}. Mac app ends early 2027"
 
-msgid "Cloud environment setup"
-msgstr "Cloud environment setup"
-
 msgid "Cloud environments"
 msgstr "Cloud environments"
 
@@ -13296,9 +13293,6 @@ msgstr "No projects match."
 msgid "No projects on this host yet"
 msgstr "No projects on this host yet"
 
-msgid "No projects to link."
-msgstr "No projects to link."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "No projects were deleted in the last 30 days."
 
@@ -15699,9 +15693,6 @@ msgstr "Project not set up on this host"
 
 msgid "Project not trusted in Codex"
 msgstr "Project not trusted in Codex"
-
-msgid "Project on another device"
-msgstr "Project on another device"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Project ready. Open it from the sidebar."
@@ -21752,9 +21743,6 @@ msgstr "Unknown workspace"
 
 msgid "Unlimited"
 msgstr "Unlimited"
-
-msgid "Unlink project"
-msgstr "Unlink project"
 
 msgid "Unlink task"
 msgstr "Unlink task"

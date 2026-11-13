@@ -7,16 +7,15 @@ import { groupEnvironmentsForProject } from "../groupEnvironmentsForProject";
 
 interface ResolvableEnvironment {
 	id: string;
-	projectIds?: readonly string[] | null;
 	repositories?: ReadonlyArray<{ fullName: string }> | null;
 }
 
 /**
  * What the cloud pills show for a project. A project gets the environment
- * last used with it, else its first linked environment. Without a
- * project it gets the newest environment used anywhere. An unlinked project
- * never inherits another project's environment: that would clone the wrong
- * repository.
+ * last used with it, else the first environment on its repository. Without a
+ * project it gets the newest environment used anywhere. A project with no
+ * environment on its repository never inherits another project's
+ * environment: that would clone the wrong repository.
  */
 export function resolveCloudChoices<T extends ResolvableEnvironment>({
 	environments,
@@ -38,7 +37,6 @@ export function resolveCloudChoices<T extends ResolvableEnvironment>({
 	const { linked, other } = projectId
 		? groupEnvironmentsForProject({
 				environments,
-				projectId,
 				repositoryFullName,
 			})
 		: { linked: [], other: [...environments] };

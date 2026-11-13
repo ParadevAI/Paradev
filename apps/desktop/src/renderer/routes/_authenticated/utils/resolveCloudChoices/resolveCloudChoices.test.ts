@@ -4,17 +4,14 @@ import { resolveCloudChoices } from "./resolveCloudChoices";
 
 const web = {
 	id: "env-web",
-	projectIds: ["project-web"],
 	repositories: [{ fullName: "acme/web" }],
 };
 const api = {
 	id: "env-api",
-	projectIds: [],
 	repositories: [{ fullName: "acme/api" }],
 };
 const webGpu = {
 	id: "env-web-gpu",
-	projectIds: [],
 	repositories: [{ fullName: "acme/web" }],
 };
 const environments = [web, api, webGpu];
@@ -33,7 +30,7 @@ function resolve(
 }
 
 describe("resolveCloudChoices", () => {
-	test("a project with no memory takes its first linked environment", () => {
+	test("a project with no memory takes the first environment on its repository", () => {
 		const result = resolve("project-web");
 		expect(result.environment?.id).toBe("env-web");
 		expect(result.linked.map((row) => row.id)).toEqual([
@@ -43,14 +40,14 @@ describe("resolveCloudChoices", () => {
 		expect(result.other.map((row) => row.id)).toEqual(["env-api"]);
 	});
 
-	test("a project keeps an environment picked for it, linked or not", () => {
+	test("a project keeps an environment picked for it, on its repository or not", () => {
 		const result = resolve("project-web", {
 			"project-web": { environmentId: "env-api", usedAt: 1 },
 		});
 		expect(result.environment?.id).toBe("env-api");
 	});
 
-	test("an unlinked project does not inherit another project's environment", () => {
+	test("a project with no environment on its repository does not inherit another project's environment", () => {
 		const result = resolve(
 			"project-docs",
 			{ "project-web": { environmentId: "env-web", usedAt: 1 } },

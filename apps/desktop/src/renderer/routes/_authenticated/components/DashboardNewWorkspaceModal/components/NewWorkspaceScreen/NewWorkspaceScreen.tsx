@@ -893,7 +893,6 @@ export function NewWorkspaceScreen({
 				if (setupPlan.kind === "create") {
 					environmentId = await createEnvironment({
 						repository: setupPlan.repository,
-						projectId: cloudProjectId,
 					});
 					if (!environmentId) return;
 					setCloudChoice(cloudChoiceKey, { environmentId });
@@ -935,7 +934,6 @@ export function NewWorkspaceScreen({
 			selectedAgent,
 			defaultCloudAgent,
 			createEnvironment,
-			cloudProjectId,
 			setCloudChoice,
 			cloudChoiceKey,
 			createWorkspace,
@@ -1115,11 +1113,6 @@ export function NewWorkspaceScreen({
 					}
 					open={isCreatingEnvironment}
 					organizationId={activeOrganizationId}
-					project={
-						isSession || !projectId
-							? null
-							: { id: projectId, repositoryFullName: projectRepositoryFullName }
-					}
 				/>
 			)}
 			{linkedPR ? (

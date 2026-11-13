@@ -20,7 +20,6 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "../ArchiveEnvironmentDialog";
 import { EnvironmentPropertyRow } from "../EnvironmentPropertyRow";
 import { EnvironmentMachineSize } from "./components/EnvironmentMachineSize";
-import { EnvironmentProjectLinks } from "./components/EnvironmentProjectLinks";
 import { EnvironmentVariables } from "./components/EnvironmentVariables";
 
 type EnvironmentScope = "organization" | "personal";
@@ -181,17 +180,6 @@ export function EnvironmentView({
 							</span>
 						))}
 					</div>
-				</EnvironmentPropertyRow>
-				<EnvironmentPropertyRow
-					htmlFor="environment-view-projects"
-					label={<Trans>Projects</Trans>}
-				>
-					<EnvironmentProjectLinks
-						environmentId={row.id}
-						id="environment-view-projects"
-						projectIds={row.projectIds}
-						repositories={row.repositories}
-					/>
 				</EnvironmentPropertyRow>
 				<EnvironmentPropertyRow
 					htmlFor="environment-view-snapshot"

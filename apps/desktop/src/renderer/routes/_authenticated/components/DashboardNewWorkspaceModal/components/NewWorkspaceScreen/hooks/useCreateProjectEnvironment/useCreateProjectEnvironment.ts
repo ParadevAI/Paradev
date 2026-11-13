@@ -8,7 +8,7 @@ interface EnvironmentRepository {
 
 /**
  * Makes the personal environment a project's first cloud workspace starts
- * from: its repository alone, linked to the project.
+ * from: its repository alone.
  */
 export function useCreateProjectEnvironment(organizationId: string | null) {
 	const utils = cloudTrpc.useUtils();
@@ -19,10 +19,8 @@ export function useCreateProjectEnvironment(organizationId: string | null) {
 	const createEnvironment = useCallback(
 		async ({
 			repository,
-			projectId,
 		}: {
 			repository: EnvironmentRepository;
-			projectId: string | null;
 		}): Promise<string | null> => {
 			if (!organizationId || inFlightRef.current) return null;
 			inFlightRef.current = true;
@@ -34,7 +32,6 @@ export function useCreateProjectEnvironment(organizationId: string | null) {
 					repositoryIds: [repository.id],
 					primaryRepositoryId: repository.id,
 					scope: "personal",
-					...(projectId ? { projectId } : {}),
 				});
 				void utils.environment.list.invalidate();
 				void utils.billing.environmentUsage.invalidate();

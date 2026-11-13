@@ -4919,9 +4919,6 @@ msgstr "クラウドのデータは削除されます。先にブランチをプ
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud は{shutdownDate}に終了。Mac アプリは 2027年前半に終了"
 
-msgid "Cloud environment setup"
-msgstr "クラウド環境のセットアップ"
-
 msgid "Cloud environments"
 msgstr "クラウド環境"
 
@@ -13296,9 +13293,6 @@ msgstr "一致するプロジェクトがありません。"
 msgid "No projects on this host yet"
 msgstr "このホストにはまだプロジェクトがありません"
 
-msgid "No projects to link."
-msgstr "リンクできるプロジェクトはありません。"
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "過去 30 日間に削除されたプロジェクトはありません。"
 
@@ -15699,9 +15693,6 @@ msgstr "このホストにプロジェクトがセットアップされていま
 
 msgid "Project not trusted in Codex"
 msgstr "Codexで信頼されていないプロジェクト"
-
-msgid "Project on another device"
-msgstr "別のデバイスのプロジェクト"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "プロジェクトの準備ができました。サイドバーから開いてください。"
@@ -21752,9 +21743,6 @@ msgstr "不明なワークスペース"
 
 msgid "Unlimited"
 msgstr "無制限"
-
-msgid "Unlink project"
-msgstr "プロジェクトのリンクを解除"
 
 msgid "Unlink task"
 msgstr "タスクのリンクを解除"

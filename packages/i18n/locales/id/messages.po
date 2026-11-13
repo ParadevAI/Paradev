@@ -4919,9 +4919,6 @@ msgstr "Data cloud akan dihapus. Push branch Anda terlebih dahulu."
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud berakhir {shutdownDate}. Aplikasi Mac berakhir awal 2027"
 
-msgid "Cloud environment setup"
-msgstr "Penyiapan environment cloud"
-
 msgid "Cloud environments"
 msgstr "Environment cloud"
 
@@ -13296,9 +13293,6 @@ msgstr "Tidak ada proyek yang cocok."
 msgid "No projects on this host yet"
 msgstr "Belum ada proyek di host ini"
 
-msgid "No projects to link."
-msgstr "Tidak ada proyek untuk ditautkan."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "Tidak ada proyek yang dihapus dalam 30 hari terakhir."
 
@@ -15699,9 +15693,6 @@ msgstr "Proyek belum disiapkan di host ini"
 
 msgid "Project not trusted in Codex"
 msgstr "Proyek tidak dipercaya di Codex"
-
-msgid "Project on another device"
-msgstr "Proyek di perangkat lain"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Proyek siap. Buka dari sidebar."
@@ -21752,9 +21743,6 @@ msgstr "Workspace tidak dikenal"
 
 msgid "Unlimited"
 msgstr "Tanpa batas"
-
-msgid "Unlink project"
-msgstr "Lepaskan tautan proyek"
 
 msgid "Unlink task"
 msgstr "Lepaskan tautan tugas"

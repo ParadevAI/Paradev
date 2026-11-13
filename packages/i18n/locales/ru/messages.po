@@ -4919,9 +4919,6 @@ msgstr "Данные в облаке удаляются. Сначала запу
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Облако закрывается {shutdownDate}. Приложение для Mac — в начале 2027"
 
-msgid "Cloud environment setup"
-msgstr "Настройка облачного окружения"
-
 msgid "Cloud environments"
 msgstr "Облачные окружения"
 
@@ -13296,9 +13293,6 @@ msgstr "Нет подходящих проектов."
 msgid "No projects on this host yet"
 msgstr "На этом хосте пока нет проектов"
 
-msgid "No projects to link."
-msgstr "Нет проектов для связывания."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "За последние 30 дней проекты не удалялись."
 
@@ -15699,9 +15693,6 @@ msgstr "Проект не настроен на этом хосте"
 
 msgid "Project not trusted in Codex"
 msgstr "Проект не помечен как доверенный в Codex"
-
-msgid "Project on another device"
-msgstr "Проект на другом устройстве"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Проект готов. Откройте его из боковой панели."
@@ -21752,9 +21743,6 @@ msgstr "Неизвестная рабочая область"
 
 msgid "Unlimited"
 msgstr "Без ограничений"
-
-msgid "Unlink project"
-msgstr "Отвязать проект"
 
 msgid "Unlink task"
 msgstr "Отвязать задачу"

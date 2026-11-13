@@ -4919,9 +4919,6 @@ msgstr "Buluttaki veriler silinir. Önce dallarınızı push edin."
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Bulut {shutdownDate} tarihinde sona eriyor. Mac uygulaması 2027 başında sona eriyor"
 
-msgid "Cloud environment setup"
-msgstr "Bulut ortamı kurulumu"
-
 msgid "Cloud environments"
 msgstr "Bulut ortamları"
 
@@ -13296,9 +13293,6 @@ msgstr "Eşleşen proje yok."
 msgid "No projects on this host yet"
 msgstr "Bu host'ta henüz proje yok"
 
-msgid "No projects to link."
-msgstr "Bağlanacak proje yok."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "Son 30 günde hiçbir proje silinmedi."
 
@@ -15699,9 +15693,6 @@ msgstr "Proje bu host'ta kurulu değil"
 
 msgid "Project not trusted in Codex"
 msgstr "Proje Codex'te güvenilir değil"
-
-msgid "Project on another device"
-msgstr "Başka bir cihazdaki proje"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Proje hazır. Kenar çubuğundan açın."
@@ -21752,9 +21743,6 @@ msgstr "Bilinmeyen çalışma alanı"
 
 msgid "Unlimited"
 msgstr "Sınırsız"
-
-msgid "Unlink project"
-msgstr "Projenin bağlantısını kaldır"
 
 msgid "Unlink task"
 msgstr "Görevin bağlantısını kaldır"

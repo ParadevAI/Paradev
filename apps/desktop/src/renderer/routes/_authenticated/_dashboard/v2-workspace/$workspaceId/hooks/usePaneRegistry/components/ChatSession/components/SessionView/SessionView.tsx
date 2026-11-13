@@ -15,7 +15,6 @@ import type {
 	SessionConfigOption,
 	SessionState,
 	UserContent,
-	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	useApprovals,
@@ -30,7 +29,6 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { env } from "renderer/env.renderer";
 import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
@@ -61,7 +59,6 @@ import {
 	prependToDraft,
 } from "../Composer";
 import { SessionHeader } from "../SessionHeader";
-import { SetupSessionHeader } from "../SetupSessionHeader";
 import { SubagentView } from "../SubagentView";
 import { Transcript, type TranscriptHandle } from "../Transcript";
 import { useChildrenByParent } from "../Transcript/hooks/useChildrenByParent";
@@ -90,7 +87,6 @@ import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
-import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 import { withStoredHistory } from "./utils/withStoredHistory";
 
 const RESUME_FOLLOW_PX = 24;
@@ -323,17 +319,6 @@ export function SessionView({
 	);
 
 	const snapshotItems = session.snapshot.items;
-	const setupEnvironment = useMemo(() => {
-		for (const { item } of snapshotItems.values()) {
-			if (item.kind === "user_message") {
-				return setupEnvironmentId(
-					userMessageText(item as UserMessage),
-					env.NEXT_PUBLIC_WEB_URL,
-				);
-			}
-		}
-		return null;
-	}, [snapshotItems]);
 	useLaunchPromptDelivered(snapshotItems, onLaunchPromptDelivered);
 	const queuedPrompts = useStableList(
 		useMemo(
@@ -686,9 +671,6 @@ export function SessionView({
 						left={headerLeft}
 						session={session.snapshot.session}
 					/>
-				)}
-				{setupEnvironment && (
-					<SetupSessionHeader environmentId={setupEnvironment} />
 				)}
 				<MessageScroller.Provider
 					autoScroll

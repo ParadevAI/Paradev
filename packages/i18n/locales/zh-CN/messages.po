@@ -4919,9 +4919,6 @@ msgstr "云端数据将被删除。请先推送你的分支。"
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud 于{shutdownDate}结束。Mac 应用于 2027 年初结束"
 
-msgid "Cloud environment setup"
-msgstr "云环境设置"
-
 msgid "Cloud environments"
 msgstr "云端环境"
 
@@ -13296,9 +13293,6 @@ msgstr "没有匹配的项目。"
 msgid "No projects on this host yet"
 msgstr "此主机上暂无项目"
 
-msgid "No projects to link."
-msgstr "没有可关联的项目。"
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "过去 30 天内没有删除任何项目。"
 
@@ -15699,9 +15693,6 @@ msgstr "项目未在此主机上设置"
 
 msgid "Project not trusted in Codex"
 msgstr "项目在Codex中未受信任"
-
-msgid "Project on another device"
-msgstr "其他设备上的项目"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "项目已就绪，可从侧边栏打开。"
@@ -21752,9 +21743,6 @@ msgstr "未知工作区"
 
 msgid "Unlimited"
 msgstr "无限"
-
-msgid "Unlink project"
-msgstr "取消关联项目"
 
 msgid "Unlink task"
 msgstr "取消关联任务"

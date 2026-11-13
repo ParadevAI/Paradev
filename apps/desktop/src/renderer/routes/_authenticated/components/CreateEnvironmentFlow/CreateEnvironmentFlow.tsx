@@ -12,12 +12,9 @@ import { ChoosePrimaryStep } from "./components/ChoosePrimaryStep";
 import { ConnectGitHubStep } from "./components/ConnectGitHubStep";
 import { PickRepositoriesStep } from "./components/PickRepositoriesStep";
 import { useStartSetupAgent } from "./hooks/useStartSetupAgent";
-import { type EnvironmentProject, projectToLink } from "./utils/projectToLink";
 
 interface CreateEnvironmentFlowProps {
 	organizationId: string;
-	/** Linked to the new environment when it opens on the project's repository. */
-	project?: EnvironmentProject | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onStarted?: () => void;
@@ -27,7 +24,6 @@ interface CreateEnvironmentFlowProps {
 
 export function CreateEnvironmentFlow({
 	organizationId,
-	project,
 	open,
 	onOpenChange,
 	onStarted,
@@ -102,7 +98,6 @@ export function CreateEnvironmentFlow({
 		);
 		if (!primary || inFlightRef.current) return;
 		inFlightRef.current = true;
-		const projectId = projectToLink(project, primary.fullName);
 		let environment: Awaited<ReturnType<typeof create.mutateAsync>>;
 		try {
 			environment = await create.mutateAsync({
@@ -116,7 +111,6 @@ export function CreateEnvironmentFlow({
 				],
 				primaryRepositoryId: primary.id,
 				scope: "personal",
-				...(projectId ? { projectId } : {}),
 			});
 		} catch (error) {
 			inFlightRef.current = false;

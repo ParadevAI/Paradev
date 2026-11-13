@@ -882,7 +882,7 @@ export const environmentRepositories = pgTable(
 	],
 );
 
-/** Projects an environment is linked to; the new-workspace picker offers linked environments first. */
+/** @deprecated Only released desktops read or write it; current clients match environments by repository. */
 export const environmentProjects = pgTable(
 	"environment_projects",
 	{

@@ -283,6 +283,7 @@ export const environmentRouter = {
 			return rows.map((row) => ({
 				...row,
 				repositories: repos.get(row.id) ?? [],
+				/** @deprecated Read by released desktops. */
 				projectIds: projects.get(row.id) ?? [],
 			}));
 		}),
@@ -299,6 +300,7 @@ export const environmentRouter = {
 			return {
 				...row,
 				repositories: repos.get(row.id) ?? [],
+				/** @deprecated Read by released desktops. */
 				projectIds: projects.get(row.id) ?? [],
 			};
 		}),
@@ -314,6 +316,7 @@ export const environmentRouter = {
 				scope: z.enum(environmentScopeValues).default("organization"),
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
+				/** @deprecated Ignored. Released desktops still send it. */
 				projectId: z.string().min(1).max(200).optional(),
 				/** The size its workspaces boot at; omitted = the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
@@ -360,13 +363,6 @@ export const environmentRouter = {
 					repositoryIds: input.repositoryIds,
 					primaryRepositoryId: input.primaryRepositoryId,
 				});
-				if (input.projectId) {
-					await linkProject({
-						environmentId: row.id,
-						organizationId: input.organizationId,
-						projectId: input.projectId,
-					});
-				}
 			} catch (error) {
 				await db.delete(environments).where(eq(environments.id, row.id));
 				throw error;
@@ -374,6 +370,7 @@ export const environmentRouter = {
 			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
 		}),
 
+	/** @deprecated Released desktops still call it; newer ones match environments by repository. */
 	linkProject: personProcedure
 		.input(
 			z.object({
@@ -392,6 +389,7 @@ export const environmentRouter = {
 			return { linked: true };
 		}),
 
+	/** @deprecated Released desktops still call it. */
 	unlinkProject: personProcedure
 		.input(
 			z.object({

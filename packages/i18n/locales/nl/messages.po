@@ -4919,9 +4919,6 @@ msgstr "Clouddata wordt verwijderd. Push eerst je branches."
 msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
 msgstr "Cloud stopt op {shutdownDate}. Mac-app stopt begin 2027"
 
-msgid "Cloud environment setup"
-msgstr "Cloudomgeving instellen"
-
 msgid "Cloud environments"
 msgstr "Cloudomgevingen"
 
@@ -13296,9 +13293,6 @@ msgstr "Geen overeenkomende projecten."
 msgid "No projects on this host yet"
 msgstr "Nog geen projecten op deze host"
 
-msgid "No projects to link."
-msgstr "Geen projecten om te koppelen."
-
 msgid "No projects were deleted in the last 30 days."
 msgstr "Er zijn de afgelopen 30 dagen geen projecten verwijderd."
 
@@ -15699,9 +15693,6 @@ msgstr "Project is niet ingesteld op deze host"
 
 msgid "Project not trusted in Codex"
 msgstr "Project niet vertrouwd in Codex"
-
-msgid "Project on another device"
-msgstr "Project op een ander apparaat"
 
 msgid "Project ready. Open it from the sidebar."
 msgstr "Project klaar. Open het via de zijbalk."
@@ -21752,9 +21743,6 @@ msgstr "Onbekende werkruimte"
 
 msgid "Unlimited"
 msgstr "Onbeperkt"
-
-msgid "Unlink project"
-msgstr "Project ontkoppelen"
 
 msgid "Unlink task"
 msgstr "Taak ontkoppelen"
