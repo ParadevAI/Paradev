@@ -8666,6 +8666,12 @@ msgstr "Falha ao restaurar os padrões"
 msgid "Failed to resume {0}"
 msgstr "Falha ao retomar {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Falha ao mostrar no Explorador de Arquivos"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Falha ao mostrar no gerenciador de arquivos"
+
 msgid "Failed to reveal in Finder"
 msgstr "Falha ao mostrar no Finder"
 
@@ -16944,6 +16950,12 @@ msgstr "Execuções de terminal reutilizáveis. Clique em um script para editar 
 
 msgid "Reusing {keptName}"
 msgstr "Reutilizando {keptName}"
+
+msgid "Reveal in File Explorer"
+msgstr "Mostrar no Explorador de Arquivos"
+
+msgid "Reveal in File Manager"
+msgstr "Mostrar no gerenciador de arquivos"
 
 msgid "Reveal in Finder"
 msgstr "Mostrar no Finder"

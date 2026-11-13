@@ -8666,6 +8666,12 @@ msgstr "Gagal memulihkan setelan bawaan"
 msgid "Failed to resume {0}"
 msgstr "Gagal melanjutkan {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Gagal menampilkan di File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Gagal menampilkan di pengelola file"
+
 msgid "Failed to reveal in Finder"
 msgstr "Gagal menampilkan di Finder"
 
@@ -16944,6 +16950,12 @@ msgstr "Peluncuran terminal pakai ulang. Klik sebuah skrip untuk mengedit atau s
 
 msgid "Reusing {keptName}"
 msgstr "Memakai ulang {keptName}"
+
+msgid "Reveal in File Explorer"
+msgstr "Tampilkan di File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Tampilkan di pengelola file"
 
 msgid "Reveal in Finder"
 msgstr "Tampilkan di Finder"

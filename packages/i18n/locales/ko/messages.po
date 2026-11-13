@@ -8666,6 +8666,12 @@ msgstr "기본값을 복원하지 못했습니다"
 msgid "Failed to resume {0}"
 msgstr "{0}을(를) 재개하지 못했습니다"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "파일 탐색기에서 표시하지 못했습니다"
+
+msgid "Failed to reveal in File Manager"
+msgstr "파일 관리자에서 표시하지 못했습니다"
+
 msgid "Failed to reveal in Finder"
 msgstr "Finder에서 표시하지 못했습니다"
 
@@ -16944,6 +16950,12 @@ msgstr "재사용 가능한 터미널 실행입니다. 스크립트를 클릭하
 
 msgid "Reusing {keptName}"
 msgstr "{keptName} 재사용 중"
+
+msgid "Reveal in File Explorer"
+msgstr "파일 탐색기에서 보기"
+
+msgid "Reveal in File Manager"
+msgstr "파일 관리자에서 보기"
 
 msgid "Reveal in Finder"
 msgstr "Finder에서 보기"

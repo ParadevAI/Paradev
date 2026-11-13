@@ -8666,6 +8666,12 @@ msgstr "Échec de la restauration des valeurs par défaut"
 msgid "Failed to resume {0}"
 msgstr "Échec de la reprise de {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Échec de l'affichage dans l'Explorateur de fichiers"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Échec de l'affichage dans le gestionnaire de fichiers"
+
 msgid "Failed to reveal in Finder"
 msgstr "Échec de l'affichage dans le Finder"
 
@@ -16944,6 +16950,12 @@ msgstr "Lancements de terminal réutilisables. Cliquez sur un script pour le mod
 
 msgid "Reusing {keptName}"
 msgstr "Réutilise {keptName}"
+
+msgid "Reveal in File Explorer"
+msgstr "Afficher dans l'Explorateur de fichiers"
+
+msgid "Reveal in File Manager"
+msgstr "Afficher dans le gestionnaire de fichiers"
 
 msgid "Reveal in Finder"
 msgstr "Afficher dans le Finder"

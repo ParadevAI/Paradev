@@ -8666,6 +8666,12 @@ msgstr "Không thể khôi phục mặc định"
 msgid "Failed to resume {0}"
 msgstr "Không thể resume {0}"
 
+msgid "Failed to reveal in File Explorer"
+msgstr "Không thể hiện trong File Explorer"
+
+msgid "Failed to reveal in File Manager"
+msgstr "Không thể hiện trong trình quản lý tệp"
+
 msgid "Failed to reveal in Finder"
 msgstr "Không thể hiện trong Finder"
 
@@ -16944,6 +16950,12 @@ msgstr "Các lệnh terminal dùng lại được. Nhấp vào một script đ�
 
 msgid "Reusing {keptName}"
 msgstr "Đang dùng lại {keptName}"
+
+msgid "Reveal in File Explorer"
+msgstr "Hiện trong File Explorer"
+
+msgid "Reveal in File Manager"
+msgstr "Hiện trong trình quản lý tệp"
 
 msgid "Reveal in Finder"
 msgstr "Hiện trong Finder"
