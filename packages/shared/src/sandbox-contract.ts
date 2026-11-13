@@ -130,6 +130,12 @@ export const sandboxRepositorySchema = z.object({
 	 * the base, and the checkout tracks it instead of branching off it.
 	 */
 	baseBranch: z.string().min(1).optional(),
+	/**
+	 * The base (`baseBranch`, else `branch`) must exist on the remote: the
+	 * checkout fails rather than start from the default branch. Set when the
+	 * work is already on that branch, as in a move.
+	 */
+	requireBase: z.boolean().optional(),
 	path: z.string().regex(/^(\.|[A-Za-z0-9_-][A-Za-z0-9._-]*)$/),
 });
 export const sandboxRepositoriesSchema = z

@@ -1077,6 +1077,15 @@ export const cloudWorkspaceRepositories = pgTable(
 			.notNull()
 			.references(() => githubRepositories.id, { onDelete: "cascade" }),
 		path: text().notNull(),
+		/**
+		 * The remote branch this checkout starts from. Null = the workspace's
+		 * `base_branch` for the primary, the default branch for the others.
+		 */
+		baseBranch: text("base_branch"),
+		/** The box fails the checkout when `base_branch` is missing, instead of using the default branch. */
+		baseBranchRequired: boolean("base_branch_required")
+			.notNull()
+			.default(false),
 	},
 	(table) => [
 		unique("cloud_workspace_repositories_workspace_repository_unique").on(

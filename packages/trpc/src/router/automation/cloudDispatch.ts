@@ -66,7 +66,7 @@ type Launch =
 			headers: Record<string, string>;
 			previous: PreviousRunSession | undefined;
 	  }
-	| { kind: "new"; environmentId: string; branch: string | undefined };
+	| ({ kind: "new"; environmentId: string } & PullRequestBases);
 
 /**
  * Runs the agent in the pinned cloud workspace, woken and reached directly (a sandbox is never on
@@ -105,6 +105,7 @@ export async function runInCloud(
 		environmentId: launch.environmentId,
 		name: automation.name.slice(0, 200),
 		branch: launch.branch,
+		repositoryBaseBranches: launch.repositoryBaseBranches,
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
 		chat,
 		tags: automation.tags,
@@ -212,9 +213,7 @@ async function prepareLaunch({
 	return {
 		kind: "new",
 		environmentId: automation.environmentId,
-		branch: event
-			? await pullRequestBranch(event, automation.environmentId)
-			: undefined,
+		...(event ? await pullRequestBranch(event, automation.environmentId) : {}),
 	};
 }
 
@@ -286,22 +285,52 @@ async function reachablePin(
 	}
 }
 
-/** The event's pull request branch, only when the event is about the environment's primary repository. */
+type PullRequestBases = {
+	/** The primary's base. */
+	branch?: string;
+	/** Bases of the other repositories, by repository id. */
+	repositoryBaseBranches?: Record<string, string>;
+};
+
+/** The event's pull request branch as the base of its repository, when that is one of the environment's. */
 async function pullRequestBranch(
 	event: { provider: string; repositoryId: string | null; payload: unknown },
 	environmentId: string,
-): Promise<string | undefined> {
+): Promise<PullRequestBases> {
 	const pullRequest = nonForkPullRequest(event);
-	if (!pullRequest?.headRef || event.repositoryId === null) return undefined;
+	if (!pullRequest?.headRef || event.repositoryId === null) return {};
 	const environment = await db.query.environments.findFirst({
 		where: eq(environments.id, environmentId),
 		columns: { primaryRepositoryId: true },
 	});
-	const primary = primaryRepository(
-		await environmentRepositoryRows(environmentId),
-		environment?.primaryRepositoryId,
+	return pullRequestBases({
+		repositories: await environmentRepositoryRows(environmentId),
+		primaryRepositoryId: environment?.primaryRepositoryId,
+		eventRepositoryId: event.repositoryId,
+		headRef: pullRequest.headRef,
+	});
+}
+
+/**
+ * The primary keeps its base on `branch`, as before repositories were many;
+ * another repository's goes to `repositoryBaseBranches`. Neither is
+ * required: a deleted head falls back to the default branch.
+ */
+export function pullRequestBases(args: {
+	repositories: readonly { id: string; repoId: string; fullName: string }[];
+	primaryRepositoryId: string | null | undefined;
+	eventRepositoryId: string;
+	headRef: string;
+}): PullRequestBases {
+	const repository = args.repositories.find(
+		(row) => row.repoId === args.eventRepositoryId,
 	);
-	return primary?.repoId === event.repositoryId
-		? pullRequest.headRef
-		: undefined;
+	if (!repository) return {};
+	const primary = primaryRepository(
+		args.repositories,
+		args.primaryRepositoryId,
+	);
+	return repository.id === primary?.id
+		? { branch: args.headRef }
+		: { repositoryBaseBranches: { [repository.id]: args.headRef } };
 }

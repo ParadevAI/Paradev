@@ -420,6 +420,13 @@ export const cloudWorkspaceRouter = {
 							.array(z.string().uuid())
 							.max(MAX_MOVED_CHATS)
 							.default([]),
+						/**
+						 * The source's repositories as owner/name. When given they
+						 * must be the environment's (PRECONDITION_FAILED,
+						 * `repository_set_mismatch: …`), and `branch` is the base of
+						 * every repository instead of the primary only.
+						 */
+						repositories: z.array(z.string().min(1).max(300)).min(1).optional(),
 					})
 					.optional(),
 			}),
@@ -483,6 +490,7 @@ export const cloudWorkspaceRouter = {
 					: {}),
 				...(input.move
 					? {
+							move: { repositories: input.move.repositories },
 							beforeProvision: async (workspaceId: string) => {
 								const move = input.move as NonNullable<typeof input.move>;
 								const attached = await attachWorkspaceMove({

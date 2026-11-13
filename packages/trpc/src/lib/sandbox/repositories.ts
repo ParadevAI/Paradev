@@ -35,6 +35,8 @@ export interface WorkspaceRepository {
 	branch: string;
 	/** The remote branch it is cut from, and what a pull request targets. */
 	baseBranch: string;
+	/** The checkout fails when `baseBranch` is missing, instead of using the default branch. */
+	requireBase: boolean;
 	path: string;
 }
 
@@ -108,6 +110,33 @@ export function primaryRepository<T extends { id: string; fullName: string }>(
 	return sorted.find((row) => row.id === primaryRepositoryId) ?? sorted[0];
 }
 
+/**
+ * What differs between these repositories and an owner/name list, compared
+ * without case and order; null when they are the same set.
+ */
+export function repositorySetMismatch(
+	repositories: readonly { fullName: string }[],
+	fullNames: readonly string[],
+): string | null {
+	const have = new Set(repositories.map((row) => row.fullName.toLowerCase()));
+	const want = new Set(fullNames.map((name) => name.toLowerCase()));
+	const notInEnvironment = [...want].filter((name) => !have.has(name)).sort();
+	const onlyInEnvironment = [...have].filter((name) => !want.has(name)).sort();
+	if (notInEnvironment.length === 0 && onlyInEnvironment.length === 0) {
+		return null;
+	}
+	return [
+		notInEnvironment.length
+			? `not in the environment: ${notInEnvironment.join(", ")}`
+			: null,
+		onlyInEnvironment.length
+			? `only in the environment: ${onlyInEnvironment.join(", ")}`
+			: null,
+	]
+		.filter(Boolean)
+		.join("; ");
+}
+
 export class RepositoryError extends Error {
 	constructor(message: string) {
 		super(message);
@@ -130,19 +159,31 @@ export async function environmentRepositoryRows(
 	return sortRepositories(rows.map((row) => row.repository));
 }
 
+/** A base the caller named for one checkout. */
+export interface RecordedBase {
+	branch: string;
+	/** The box fails the checkout when `branch` is missing, instead of using the default branch. */
+	required: boolean;
+}
+
 /**
  * Fixes a new workspace's checkouts: the repositories it was created with,
- * each at a path under the workspace root.
+ * each at a path under the workspace root, and the base a checkout starts
+ * from when the caller named one.
  */
 export async function recordWorkspaceRepositories(args: {
 	cloudWorkspaceId: string;
 	repositories: readonly RepositoryRow[];
+	/** By repository id; a repository not named here gets no recorded base. */
+	baseBranches?: Readonly<Record<string, RecordedBase>>;
 }): Promise<void> {
 	await db.insert(cloudWorkspaceRepositories).values(
 		args.repositories.map((repository) => ({
 			cloudWorkspaceId: args.cloudWorkspaceId,
 			repositoryId: repository.id,
 			path: sandboxRepositoryPath(repository, args.repositories),
+			baseBranch: args.baseBranches?.[repository.id]?.branch ?? null,
+			baseBranchRequired: args.baseBranches?.[repository.id]?.required ?? false,
 		})),
 	);
 }
@@ -151,14 +192,18 @@ export async function recordWorkspaceRepositories(args: {
 export async function workspaceRepositories(args: {
 	cloudWorkspaceId: string;
 	primaryRepositoryId: string | null;
-	/** The base the primary is cut from; the others use their default branch. */
+	/** The base the primary is cut from when it has no recorded base. */
 	primaryBranch: string;
 	/** The branch every checkout works on. */
 	workingBranch: string;
 }): Promise<WorkspaceRepository[]> {
 	const rows = await db
 		.select({
-			link: cloudWorkspaceRepositories,
+			link: {
+				path: cloudWorkspaceRepositories.path,
+				baseBranch: cloudWorkspaceRepositories.baseBranch,
+				baseBranchRequired: cloudWorkspaceRepositories.baseBranchRequired,
+			},
 			repository: githubRepositories,
 		})
 		.from(cloudWorkspaceRepositories)
@@ -171,11 +216,32 @@ export async function workspaceRepositories(args: {
 		);
 	if (rows.length === 0)
 		throw new RepositoryError("This workspace has no repositories");
-	const primary = primaryRepository(
+	return orderCheckouts(rows, args);
+}
+
+/**
+ * The primary first, then by name. A recorded base wins; without one the
+ * primary uses `primaryBranch` and the others their default branch.
+ */
+export function orderCheckouts(
+	rows: readonly {
+		link: {
+			path: string;
+			baseBranch: string | null;
+			baseBranchRequired: boolean;
+		};
+		repository: RepositoryRow;
+	}[],
+	args: {
+		primaryRepositoryId: string | null;
+		primaryBranch: string;
+		workingBranch: string;
+	},
+): WorkspaceRepository[] {
+	const primaryId = primaryRepository(
 		rows.map((row) => row.repository),
 		args.primaryRepositoryId,
-	);
-	const primaryId = primary?.id;
+	)?.id;
 	const ordered = [...rows].sort((a, b) =>
 		a.repository.id === primaryId
 			? -1
@@ -189,9 +255,11 @@ export async function workspaceRepositories(args: {
 		repository,
 		branch: args.workingBranch,
 		baseBranch:
-			repository.id === primaryId
+			link.baseBranch ??
+			(repository.id === primaryId
 				? args.primaryBranch
-				: repository.defaultBranch,
+				: repository.defaultBranch),
+		requireBase: link.baseBranch !== null && link.baseBranchRequired,
 		path: link.path,
 	}));
 }
@@ -210,6 +278,7 @@ export function toSandboxRepositories(
 		...(entry.baseBranch === entry.branch
 			? {}
 			: { baseBranch: entry.baseBranch }),
+		...(entry.requireBase ? { requireBase: true } : {}),
 		path: entry.path,
 	}));
 }

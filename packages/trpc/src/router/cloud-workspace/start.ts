@@ -12,6 +12,7 @@ import {
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_START_TRANSACTION } from "@superset/shared/constants";
+import { TRPCError } from "@trpc/server";
 import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
@@ -24,7 +25,9 @@ import { nudge } from "../../lib/realtime";
 import {
 	environmentRepositoryRows,
 	primaryRepository,
+	type RecordedBase,
 	recordWorkspaceRepositories,
+	repositorySetMismatch,
 	workspaceBranchName,
 } from "../../lib/sandbox";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
@@ -127,8 +130,19 @@ export interface StartCloudWorkspaceInput {
 	prompt?: string;
 	/** What the person typed, kept on the record when it differs from the agent's prompt. */
 	typedPrompt?: string;
-	/** Omitted = the repo's default branch. */
+	/** The primary's base. Omitted = its default branch. */
 	branch?: string;
+	/**
+	 * Bases by repository id, recorded per checkout. A missing one falls back
+	 * to the default branch; a repository not named here keeps the default.
+	 */
+	repositoryBaseBranches?: Record<string, string>;
+	/**
+	 * A workspace that moves in. `branch` holds the moved work, so it is a
+	 * required base: of the primary, or with `repositories` (the source's
+	 * owner/name list, which must equal the environment's) of every repository.
+	 */
+	move?: { repositories?: string[] };
 	launch?: CloudAgentLaunch;
 	/** Opens `launch` as a chat when its agent supports one. */
 	chat?: boolean;
@@ -138,6 +152,32 @@ export interface StartCloudWorkspaceInput {
 	/** Normalized workspace tags, filed under `userId`. */
 	tags?: string[];
 	beforeProvision?: (workspaceId: string) => Promise<void>;
+}
+
+/** The bases `cloud_workspace_repositories` records, by repository id. */
+export function recordedBaseBranches(args: {
+	repositories: readonly { id: string }[];
+	primaryRepositoryId: string;
+	branch: string | undefined;
+	repositoryBaseBranches: Record<string, string> | undefined;
+	move: { repositories?: string[] } | undefined;
+}): Record<string, RecordedBase> {
+	const bases: Record<string, RecordedBase> = {};
+	for (const repository of args.repositories) {
+		const base = args.repositoryBaseBranches?.[repository.id];
+		if (base) bases[repository.id] = { branch: base, required: false };
+	}
+	if (args.move && args.branch) {
+		for (const repository of args.repositories) {
+			if (
+				args.move.repositories ||
+				repository.id === args.primaryRepositoryId
+			) {
+				bases[repository.id] = { branch: args.branch, required: true };
+			}
+		}
+	}
+	return bases;
 }
 
 async function start(args: StartCloudWorkspaceInput) {
@@ -171,7 +211,27 @@ async function start(args: StartCloudWorkspaceInput) {
 		repositories,
 		environment.primaryRepositoryId,
 	) as (typeof repositories)[number];
-	const branch = args.branch ?? primary.defaultBranch;
+	if (args.move?.repositories) {
+		const mismatch = repositorySetMismatch(
+			repositories,
+			args.move.repositories,
+		);
+		if (mismatch) {
+			throw new TRPCError({
+				code: "PRECONDITION_FAILED",
+				message: `repository_set_mismatch: ${mismatch}`,
+			});
+		}
+	}
+	const baseBranches = recordedBaseBranches({
+		repositories,
+		primaryRepositoryId: primary.id,
+		branch: args.branch,
+		repositoryBaseBranches: args.repositoryBaseBranches,
+		move: args.move,
+	});
+	const branch =
+		args.branch ?? baseBranches[primary.id]?.branch ?? primary.defaultBranch;
 	// A connected person's workspace acts as them on GitHub, so a
 	// repository they cannot see would fail to clone later; say so now.
 	const githubToken = await githubUserTokenFor(args.userId);
@@ -223,6 +283,7 @@ async function start(args: StartCloudWorkspaceInput) {
 	await recordWorkspaceRepositories({
 		cloudWorkspaceId: row.id,
 		repositories,
+		baseBranches,
 	});
 	if (args.tags?.length) {
 		await db.insert(cloudWorkspaceTags).values(

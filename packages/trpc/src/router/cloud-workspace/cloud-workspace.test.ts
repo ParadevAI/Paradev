@@ -38,7 +38,9 @@ stub(db.query.cloudWorkspaces, { findFirst: async () => ROW });
 stub(db.query.environments, {
 	findFirst: async () => ({
 		id: ENVIRONMENT_ID,
+		organizationId: "org-1",
 		scope: "organization",
+		primaryRepositoryId: "r-web",
 		machineSize: environmentSize,
 	}),
 });
@@ -97,14 +99,15 @@ stub(realtime, {
 	readWorkspaceForwards: async () => [FORWARD],
 });
 stub(sandbox, {
+	environmentRepositoryRows: async () => [
+		{ id: "r-api", fullName: "acme/api", defaultBranch: "main" },
+		{ id: "r-web", fullName: "acme/web", defaultBranch: "main" },
+	],
 	describeSandbox: async () => ({
 		hostTarget: "https://box-1.example",
 		running,
 		vcpus: boxVcpus,
 	}),
-	environmentRepositoryRows: async () => [
-		{ id: "repo-1", defaultBranch: "main" },
-	],
 	primaryRepository: (rows: unknown[]) => rows[0],
 	recordWorkspaceRepositories: async () => {},
 	workspaceBranchName: () => "paradev/ws-1",
@@ -265,5 +268,25 @@ describe("cloudWorkspace.forwards", () => {
 				id: "9c1d2e3f-4a5b-4c6d-8e7f-0a1b2c3d4e5f",
 			}),
 		).rejects.toMatchObject({ code: "NOT_FOUND" });
+	});
+});
+
+describe("cloudWorkspace.create", () => {
+	test("a move refuses an environment whose repositories differ from the source's", async () => {
+		await expect(
+			caller.cloudWorkspace.create({
+				organizationId: "1f2e3d4c-5b6a-4978-8a9b-0c1d2e3f4a5b",
+				environmentId: ENVIRONMENT_ID,
+				machineSize: "xlarge",
+				branch: "superset/teleport-0b8f4c1e",
+				move: {
+					workspaceMoveId: "7a8b9c0d-1e2f-4a3b-8c4d-5e6f7a8b9c0d",
+					repositories: ["Acme/Web"],
+				},
+			}),
+		).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message: "repository_set_mismatch: only in the environment: acme/api",
+		});
 	});
 });
