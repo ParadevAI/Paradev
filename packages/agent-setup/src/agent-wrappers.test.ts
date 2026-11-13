@@ -8,13 +8,14 @@ import {
 	it,
 	mock,
 } from "bun:test";
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import {
 	chmodSync,
 	existsSync,
 	mkdirSync,
 	readFileSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -745,6 +746,54 @@ describe("agent-wrappers copilot", () => {
 		const updated = readFileSync(hookFile, "utf-8");
 		expect(updated).toContain(hookScriptPath);
 		expect(updated).not.toContain("/tmp/old-hook.sh");
+	});
+
+	it("never resolves to itself when its bin dir is on PATH under another spelling", async () => {
+		// e.g. ~/.superset -> ~/.paradev with HOME changed by a test runner: the
+		// $HOME-based skip patterns miss the alias, and the old resolver picked the
+		// wrapper itself and recursed without end.
+		const realBinDir = path.join(TEST_ROOT, "real-bin");
+		const aliasHome = path.join(TEST_ROOT, "alias-home");
+		mkdirSync(realBinDir, { recursive: true });
+		writeFileSync(
+			path.join(realBinDir, "copilot"),
+			"#!/bin/bash\necho real-copilot\n",
+			{ mode: 0o755 },
+		);
+		symlinkSync(TEST_SUPERSET_HOME_DIR, aliasHome);
+		writeFileSync(
+			path.join(TEST_BIN_DIR, "copilot"),
+			buildWrapperScript("copilot", buildCopilotWrapperExecLine()),
+			{ mode: 0o755 },
+		);
+
+		// Own process group, so a recursing wrapper is killed with every copy it
+		// spawned; killing only the direct child would orphan the chain.
+		const child = spawn(path.join(aliasHome, "bin", "copilot"), [], {
+			cwd: TEST_ROOT,
+			detached: true,
+			env: {
+				...process.env,
+				HOME: path.join(TEST_ROOT, "elsewhere"),
+				PATH: `${path.join(aliasHome, "bin")}:${realBinDir}:/usr/bin:/bin`,
+			},
+		});
+		let stdout = "";
+		child.stdout.on("data", (chunk) => {
+			stdout += chunk;
+		});
+		const exited = await new Promise<boolean>((resolve) => {
+			// A working wrapper exits in well under a second; the old one never does.
+			const timer = setTimeout(() => resolve(false), 5_000);
+			child.on("exit", () => {
+				clearTimeout(timer);
+				resolve(true);
+			});
+		});
+		if (!exited && child.pid) process.kill(-child.pid, "SIGKILL");
+
+		expect(exited).toBe(true);
+		expect(stdout).toContain("real-copilot");
 	});
 
 	it("tails codex's process-scoped TUI session log to drive Start events", () => {
