@@ -11877,10 +11877,6 @@ msgstr "Керуйте ключами для доступу до MCP-серве�
 msgid "Manage members"
 msgstr "Керувати учасниками"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Керувати на {0}"
-
 msgid "Manage Plan"
 msgstr "Керувати тарифом"
 
@@ -21948,10 +21944,6 @@ msgstr "Покращити тариф"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Онови залежність і виправ те, що зламається…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Покращити тариф на {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Перейти на {planName}"

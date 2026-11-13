@@ -11883,10 +11883,6 @@ msgstr "Zarządzaj kluczami dostępu do serwerów MCP i zewnętrznych integracji
 msgid "Manage members"
 msgstr "Zarządzaj członkami"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Zarządzaj na {0}"
-
 msgid "Manage Plan"
 msgstr "Zarządzaj planem"
 
@@ -21954,10 +21950,6 @@ msgstr "Podnieś plan"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Zaktualizuj zależność i napraw to, co się zepsuje…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Przejdź na Pro na {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Przejdź na {planName}"

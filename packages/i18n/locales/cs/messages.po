@@ -11883,10 +11883,6 @@ msgstr "Spravujte klíče pro přístup k MCP serveru a externí integrace, jako
 msgid "Manage members"
 msgstr "Spravovat členy"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Spravovat na {0}"
-
 msgid "Manage Plan"
 msgstr "Spravovat tarif"
 
@@ -21954,10 +21950,6 @@ msgstr "Přejít výš"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aktualizuj závislost a oprav, co se rozbije…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Přejít na Pro na {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Přejít na {planName}"

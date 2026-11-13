@@ -11883,10 +11883,6 @@ msgstr "MCP sunucusu erişimi ve Claude Desktop veya Claude Code gibi harici ent
 msgid "Manage members"
 msgstr "Üyeleri yönet"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "{0} adresinde yönet"
-
 msgid "Manage Plan"
 msgstr "Planı yönet"
 
@@ -21954,10 +21950,6 @@ msgstr "Yükselt"
 
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Bir bağımlılığı yükselt ve bozulanları düzelt…"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "{0} üzerinden yükselt"
 
 msgid "Upgrade to {planName}"
 msgstr "{planName} planına yükselt"
