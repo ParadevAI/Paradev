@@ -28,6 +28,8 @@ import {
 	fetchOpenPullRequestsFromGh,
 	fetchPullRequestByHead,
 	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumber,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecks,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueState,
@@ -80,6 +82,7 @@ const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
 // Re-probe cadence for worktrees observed missing on disk. existsSync-only —
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
+const PAST_PULL_REQUEST_LOOKUP_BATCH = 8;
 // Dedup + link-assignment key. Branch stays case-sensitive: `feature` and
 // `Feature` are distinct branches with distinct PRs, so collapsing them here
 // would mislink. Case drift is tolerated only in the fallback in
@@ -266,6 +269,14 @@ export class PullRequestRuntimeManager {
 		string,
 		{
 			promise: Promise<GitHubPullRequestNode[]>;
+			fetchedAt: number;
+			consecutiveFailures: number;
+		}
+	>();
+	private readonly pullRequestNumberCache = new Map<
+		string,
+		{
+			promise: Promise<GitHubPullRequestNode | null>;
 			fetchedAt: number;
 			consecutiveFailures: number;
 		}
@@ -1039,6 +1050,13 @@ export class PullRequestRuntimeManager {
 
 		const { failedKeys, matched: keyToPullRequest } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
+		await this.refreshPastPullRequests(
+			projectId,
+			repo,
+			projectWorkspaces.map((workspace) => workspace.id),
+			new Set([...keyToPullRequest.values()].map((match) => match.id)),
+			options,
+		);
 
 		for (const workspace of projectWorkspaces) {
 			const key = this.effectiveUpstreamKey(workspace, repo);
@@ -1615,6 +1633,115 @@ export class PullRequestRuntimeManager {
 					{ probe: options.bypassCache === true },
 				),
 		);
+	}
+
+	// A head lookup only reaches the PR on a workspace's current branch. PRs it
+	// linked before (another stack layer, an earlier branch) are fetched by
+	// number until GitHub reports them closed or merged.
+	private async refreshPastPullRequests(
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+		workspaceIds: string[],
+		refreshedRowIds: ReadonlySet<string>,
+		options: { bypassCache?: boolean } = {},
+	): Promise<void> {
+		const rowIds = this.db
+			.selectDistinct({ id: pullRequests.id })
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.where(
+				and(
+					inArray(workspacePullRequests.workspaceId, workspaceIds),
+					eq(pullRequests.repoProvider, repo.provider),
+					eq(pullRequests.repoOwner, repo.owner),
+					eq(pullRequests.repoName, repo.name),
+					inArray(pullRequests.state, ["open", "draft", "queued"]),
+				),
+			)
+			.all()
+			.map((row) => row.id)
+			.filter((id) => !refreshedRowIds.has(id));
+
+		for (
+			let start = 0;
+			start < rowIds.length;
+			start += PAST_PULL_REQUEST_LOOKUP_BATCH
+		) {
+			await Promise.all(
+				rowIds
+					.slice(start, start + PAST_PULL_REQUEST_LOOKUP_BATCH)
+					.map((id) =>
+						this.refreshPastPullRequest(projectId, repo, id, options),
+					),
+			);
+		}
+	}
+
+	private async refreshPastPullRequest(
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+		rowId: string,
+		options: { bypassCache?: boolean },
+	): Promise<void> {
+		const existing = this.findPullRequestRowById(rowId);
+		if (!existing) return;
+		const { prNumber } = existing;
+		const context = {
+			projectId,
+			owner: repo.owner,
+			name: repo.name,
+			prNumber,
+		};
+		const startedAt = Date.now();
+		try {
+			const node = await this.cachedGitHubFetch(
+				this.pullRequestNumberCache,
+				`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${prNumber}`,
+				options,
+				() =>
+					this.fetchFromGitHub(
+						"PR number lookup",
+						context,
+						() => fetchPullRequestByNumberFromGh(this.execGh, repo, prNumber),
+						async () =>
+							fetchPullRequestByNumber(await this.github(), repo, prNumber),
+						{ probe: options.bypassCache === true },
+					),
+			);
+			if (!node || node.number !== prNumber) return;
+			// A lookup that started earlier can resolve later; never let it
+			// overwrite what a newer one already stored.
+			const latest = this.findPullRequestRowById(rowId);
+			if (!latest || (latest.lastFetchedAt ?? 0) > startedAt) return;
+			const now = Date.now();
+			this.upsertPullRequestRow({
+				existing: latest,
+				projectId: latest.projectId,
+				prNumber,
+				repo,
+				url: node.url,
+				title: node.title,
+				state: mapPullRequestState(node.state, node.isDraft),
+				isDraft: node.isDraft,
+				headBranch: node.headRefName,
+				headSha: node.headRefOid,
+				mergedAt: node.mergedAt,
+				reviewDecision: coerceReviewDecision(latest.reviewDecision),
+				checksStatus: coerceChecksStatus(latest.checksStatus),
+				checksJson: latest.checksJson,
+				lastFetchedAt: now,
+				error: null,
+				now,
+			});
+		} catch (error) {
+			console.warn(
+				"[host-service:pull-request-runtime] Failed to fetch past PR by number",
+				{ ...context, error },
+			);
+		}
 	}
 
 	private async fetchRepoPullRequests(
