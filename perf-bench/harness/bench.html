@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="utf-8" />
+		<title>chat bench</title>
+		<script>
+			if (new URLSearchParams(location.search).get("attrib") === "1") {
+				const PERFORMED_WORK = 1;
+				const COMPONENT_TAGS = new Set([0, 1, 11, 14, 15]);
+				const nameOf = (fiber) => {
+					const type = fiber.type;
+					if (!type) return "?";
+					if (typeof type === "function") return type.displayName || type.name || "anon";
+					if (type.render) return type.displayName || type.render.displayName || type.render.name || "forwardRef";
+					if (type.type) return type.displayName || nameOf({ type: type.type });
+					return "?";
+				};
+				const attrib = { commits: 0, renders: {}, selfMs: {}, origins: {} };
+				window.__attrib = attrib;
+				const visit = (fiber, parentRendered) => {
+					for (let child = fiber; child; child = child.sibling) {
+						let rendered = parentRendered;
+						if (COMPONENT_TAGS.has(child.tag)) {
+							rendered = child.alternate === null || (child.flags & PERFORMED_WORK) === PERFORMED_WORK;
+							if (rendered) {
+								const name = nameOf(child);
+								attrib.renders[name] = (attrib.renders[name] || 0) + 1;
+								attrib.selfMs[name] = (attrib.selfMs[name] || 0) + (child.selfBaseDuration || 0);
+								if (!parentRendered && child.alternate !== null) attrib.origins[name] = (attrib.origins[name] || 0) + 1;
+							}
+						}
+						const reused = child.alternate !== null && child.child === child.alternate.child;
+						if (child.child && !reused) visit(child.child, rendered);
+					}
+				};
+				window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+					supportsFiber: true,
+					renderers: new Map(),
+					inject(renderer) {
+						const id = this.renderers.size + 1;
+						this.renderers.set(id, renderer);
+						return id;
+					},
+					checkDCE() {},
+					onScheduleFiberRoot() {},
+					onCommitFiberUnmount() {},
+					onPostCommitFiberRoot() {},
+					onCommitFiberRoot(_id, root) {
+						if (!window.__bench?.stats.recording) return;
+						attrib.commits += 1;
+						visit(root.current.child, false);
+					},
+				};
+			}
+		</script>
+		<script>
+			const inert = () => new Proxy(function () {}, { get: (_t, k) => (k === "then" ? undefined : inert()), apply: () => inert() });
+			window.electronTRPC = { sendMessage() {}, onMessage() {} };
+			window.App = inert();
+			window.ipcRenderer = inert();
+			window.webUtils = inert();
+		</script>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="./bench.tsx"></script>
+	</body>
+</html>
