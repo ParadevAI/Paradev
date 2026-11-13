@@ -24,6 +24,9 @@ export interface ComposerDraft {
 	 * so a progress tick leaves the `attachments` array identity alone — it
 	 * crosses into SwiftUI as a prop, and re-creating it sixty times a second
 	 * would rebuild the whole tray.
+	 *
+	 * Only `beginUpload` adds an entry. A host draft uploads nothing, and an
+	 * entry that nothing settles keeps the composer's Send disabled forever.
 	 */
 	uploads: Record<string, AttachmentUpload>;
 }
@@ -76,12 +79,6 @@ export const useComposerDraftsStore = create<ComposerDraftsStore>()((set) => ({
 			update(state, key, (draft) => ({
 				...draft,
 				attachments: [...draft.attachments, ...items],
-				uploads: {
-					...draft.uploads,
-					...Object.fromEntries(
-						items.map((item) => [item.id, { progress: 0 }]),
-					),
-				},
 			})),
 		),
 	removeAttachment: (key, id) =>
@@ -101,13 +98,17 @@ export const useComposerDraftsStore = create<ComposerDraftsStore>()((set) => ({
 			return { draftsByKey: rest };
 		}),
 	beginUpload: (key, id) =>
-		set((state) =>
-			patchUpload(state, key, id, {
-				progress: 0,
-				fileId: undefined,
-				error: undefined,
-			}),
-		),
+		set((state) => {
+			const draft = state.draftsByKey[key];
+			if (!draft?.attachments.some((item) => item.id === id)) return state;
+			return update(state, key, (current) => ({
+				...current,
+				uploads: {
+					...current.uploads,
+					[id]: { progress: 0, fileId: undefined, error: undefined },
+				},
+			}));
+		}),
 	setUploadProgress: (key, id, progress) =>
 		set((state) => patchUpload(state, key, id, { progress })),
 	finishUpload: (key, id, fileId) =>
