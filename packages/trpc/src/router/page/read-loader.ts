@@ -75,11 +75,14 @@ export async function loadReadablePage(
 	| { page: SelectPage; member: false; caller: PageCaller | null }
 > {
 	const identity = pageIdentity(ref);
-	const caller = await pageCaller(ctx).catch((error: unknown) => {
-		if (error instanceof TRPCError && error.code === "FORBIDDEN") return error;
-		throw error;
-	});
-	const [page] = await db.select().from(pages).where(identity).limit(1);
+	const [caller, [page]] = await Promise.all([
+		pageCaller(ctx).catch((error: unknown) => {
+			if (error instanceof TRPCError && error.code === "FORBIDDEN")
+				return error;
+			throw error;
+		}),
+		db.select().from(pages).where(identity).limit(1),
+	]);
 	if (caller instanceof TRPCError) {
 		if (page && isPubliclyServed(page)) {
 			return { page: asSeenByAnyone(page), member: false, caller: null };
@@ -136,18 +139,14 @@ export async function versionNotServed(
 	});
 }
 
-export async function publicPageOutside(
-	pageId: string,
-	organizationId: string,
-): Promise<SelectPage | null> {
-	const [page] = await db
-		.select()
-		.from(pages)
-		.where(eq(pages.id, pageId))
-		.limit(1);
-	return page &&
-		page.organizationId !== organizationId &&
-		isPubliclyServed(page)
-		? page
-		: null;
+export async function readsAsNonMember(
+	ctx: Parameters<typeof pageCaller>[0],
+	id: string,
+): Promise<boolean> {
+	try {
+		return !(await loadReadablePage(ctx, { id })).member;
+	} catch (error) {
+		if (error instanceof TRPCError) return false;
+		throw error;
+	}
 }

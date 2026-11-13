@@ -348,6 +348,11 @@ describe("a signed-in reader outside the organization", () => {
 		expect((await unattached.page.pull({ slug: slug("public") })).version).toBe(
 			1,
 		);
+		expect(await unattached.page.sharing.get({ id: PUBLIC })).toMatchObject({
+			grantees: [],
+			canManage: false,
+		});
+		expect(await unattached.pageComment.list({ pageId: PUBLIC })).toEqual([]);
 		await expect(unattached.page.get({ slug: slug("org") })).rejects.toThrow(
 			"No active organization selected",
 		);
@@ -358,6 +363,10 @@ describe("a signed-in reader outside the organization", () => {
 		expect((await removed.page.get({ slug: slug("public") })).member).toBe(
 			false,
 		);
+		expect(await removed.pageComment.list({ pageId: PUBLIC })).toEqual([]);
+		await expect(
+			removed.pageComment.list({ pageId: ORG_ONLY }),
+		).rejects.toThrow("Not a member of this organization");
 		await expect(removed.page.get({ slug: slug("org") })).rejects.toThrow(
 			"Not a member of this organization",
 		);
