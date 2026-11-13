@@ -22,8 +22,11 @@ export type AgentSignIn = SharedSignIn &
 		| {
 				agent: "codex";
 				startDeviceCode: (plan: "personal" | "business") => Promise<DeviceCode>;
-				/** Resolves once the person approves the code on OpenAI's page. */
-				waitForDeviceCode: () => Promise<SignedInAccount>;
+				/** Resolves once the person approves this code on OpenAI's page; stops on abort. */
+				waitForDeviceCode: (
+					code: DeviceCode,
+					signal: AbortSignal,
+				) => Promise<SignedInAccount>;
 		  }
 	);
 

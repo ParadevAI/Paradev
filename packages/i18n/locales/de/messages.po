@@ -1123,6 +1123,9 @@ msgstr "{label} ist danach wieder nicht eingerichtet. In deinen Arbeitsbereichen
 msgid "{label} is set to manual"
 msgstr "{label} nutzt jetzt die manuelle Anmeldung"
 
+msgid "{label} is starting again with this sign-in."
+msgstr "{label} wird mit dieser Anmeldung neu gestartet."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -5582,9 +5585,6 @@ msgstr "Mit Google fortfahren"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Das Fortsetzen einer Agent-Sitzung erfordert einen angehefteten Workspace"
-
-msgid "Continuing your chat…"
-msgstr "Dein Chat wird fortgesetzt…"
 
 msgid "Continuing…"
 msgstr "Wird fortgesetzt…"
@@ -18668,7 +18668,6 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "Einmal anmelden. Paradev hält die Verbindung."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
-#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "Bei {0} anmelden"
 

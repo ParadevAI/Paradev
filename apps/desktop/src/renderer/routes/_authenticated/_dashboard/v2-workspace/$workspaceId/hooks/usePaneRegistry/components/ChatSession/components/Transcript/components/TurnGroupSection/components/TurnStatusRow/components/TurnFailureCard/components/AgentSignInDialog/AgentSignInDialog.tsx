@@ -32,6 +32,12 @@ type Step =
 	| { name: "restart_failed"; account: SignedInAccount }
 	| { name: "done"; account: SignedInAccount };
 
+const BUSY_STEPS: ReadonlySet<Step["name"]> = new Set([
+	"signing_in",
+	"restarting",
+	"done",
+]);
+
 export function AgentSignInDialog({
 	open,
 	onOpenChange,
@@ -50,16 +56,32 @@ export function AgentSignInDialog({
 	const [plan, setPlan] = useState<"personal" | "business">("personal");
 	const [opening, setOpening] = useState(false);
 	const attempt = useRef(0);
+	const pending = useRef<AbortController | null>(null);
 	const { label } = signIn;
+	const busy = BUSY_STEPS.has(step.name);
+
+	const abandon = () => {
+		attempt.current += 1;
+		pending.current?.abort();
+		pending.current = null;
+		setOpening(false);
+	};
+
+	useEffect(() => {
+		if (!open) return;
+		setStep({ name: "start" });
+		setValue("");
+		setError(null);
+	}, [open]);
 
 	useEffect(() => {
 		if (open) return;
 		attempt.current += 1;
-		setStep({ name: "start" });
-		setValue("");
-		setError(null);
-		setOpening(false);
+		pending.current?.abort();
+		pending.current = null;
 	}, [open]);
+
+	useEffect(() => () => pending.current?.abort(), []);
 
 	useEffect(() => {
 		if (step.name !== "done") return;
@@ -80,7 +102,12 @@ export function AgentSignInDialog({
 
 	const restart = async (account: SignedInAccount, current: number) => {
 		setStep({ name: "restarting", account });
-		const restarted = await restartAndContinue();
+		let restarted = false;
+		try {
+			restarted = await restartAndContinue();
+		} catch {
+			restarted = false;
+		}
 		if (current !== attempt.current) return;
 		setStep(
 			restarted
@@ -93,19 +120,21 @@ export function AgentSignInDialog({
 		const current = ++attempt.current;
 		setError(null);
 		setStep({ name: "signing_in" });
+		let account: SignedInAccount;
 		try {
-			const account = await submit();
-			if (current !== attempt.current) return;
-			await restart(account, current);
+			account = await submit();
 		} catch (cause) {
 			if (current !== attempt.current) return;
 			setStep(back);
 			setError(reason(cause));
+			return;
 		}
+		await restart(account, current);
 	};
 
 	const begin = async () => {
-		const current = ++attempt.current;
+		abandon();
+		const current = attempt.current;
 		setError(null);
 		setOpening(true);
 		try {
@@ -113,18 +142,22 @@ export function AgentSignInDialog({
 				const { url } = await signIn.startOauth();
 				if (current !== attempt.current) return;
 				signIn.openUrl(url);
-				go({ name: "paste_code" });
+				setStep({ name: "paste_code" });
 				return;
 			}
 			const code = await signIn.startDeviceCode(plan);
 			if (current !== attempt.current) return;
 			signIn.openUrl(code.verificationUrl);
 			go({ name: "device_code", code });
-			const account = await signIn.waitForDeviceCode();
+			const controller = new AbortController();
+			pending.current = controller;
+			const account = await signIn.waitForDeviceCode(code, controller.signal);
 			if (current !== attempt.current) return;
+			pending.current = null;
 			await restart(account, current);
 		} catch (cause) {
 			if (current !== attempt.current) return;
+			pending.current = null;
 			setStep({ name: "start" });
 			setError(reason(cause));
 		} finally {
@@ -132,15 +165,31 @@ export function AgentSignInDialog({
 		}
 	};
 
+	const back = () => {
+		abandon();
+		go({ name: "start" });
+	};
+
 	const trimmed = value.trim();
-	const busy =
-		step.name === "signing_in" ||
-		step.name === "restarting" ||
-		step.name === "done";
+	const describedByStep =
+		step.name === "start" ||
+		step.name === "paste_code" ||
+		step.name === "device_code" ||
+		step.name === "api_key";
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md">
+		<Dialog
+			open={open}
+			onOpenChange={(next) => {
+				if (!next && busy) return;
+				onOpenChange(next);
+			}}
+		>
+			<DialogContent
+				className="sm:max-w-md"
+				showCloseButton={!busy}
+				{...(describedByStep ? {} : { "aria-describedby": undefined })}
+			>
 				<DialogHeader>
 					<DialogTitle>
 						<Trans>Sign in to {label}</Trans>
@@ -160,6 +209,11 @@ export function AgentSignInDialog({
 								Click Authorize on claude.ai. Anthropic then shows a code. Paste
 								it here.
 							</Trans>
+						</DialogDescription>
+					)}
+					{step.name === "device_code" && (
+						<DialogDescription>
+							<Trans>Enter this code on the page we opened:</Trans>
 						</DialogDescription>
 					)}
 					{step.name === "api_key" && (
@@ -251,20 +305,19 @@ export function AgentSignInDialog({
 							value={value}
 						/>
 						<button
-							className="self-start text-muted-foreground text-xs underline underline-offset-4 hover:text-foreground"
+							className="flex items-center gap-1.5 self-start text-muted-foreground text-xs underline underline-offset-4 hover:text-foreground disabled:opacity-50"
+							disabled={opening}
 							onClick={() => void begin()}
 							type="button"
 						>
 							<Trans>Open claude.ai again</Trans>
+							{opening && <Spinner className="size-3" />}
 						</button>
 					</form>
 				)}
 
 				{step.name === "device_code" && (
 					<div className="flex flex-col items-center gap-3 py-2 text-center">
-						<p className="text-muted-foreground text-sm">
-							<Trans>Enter this code on the page we opened:</Trans>
-						</p>
 						<div className="flex items-center gap-1 rounded-lg border border-dashed px-4 py-2.5">
 							<span className="font-mono font-semibold text-xl tracking-[0.2em]">
 								{step.code.userCode}
@@ -307,52 +360,58 @@ export function AgentSignInDialog({
 					</form>
 				)}
 
-				{step.name === "signing_in" && (
-					<SignInProgress title={<Trans>Signing in…</Trans>}>
-						<Trans>Checking with the provider.</Trans>
-					</SignInProgress>
-				)}
+				<div aria-live="polite">
+					{step.name === "signing_in" && (
+						<SignInProgress title={<Trans>Signing in…</Trans>}>
+							<Trans>Checking with the provider.</Trans>
+						</SignInProgress>
+					)}
 
-				{step.name === "restarting" && (
-					<SignInProgress title={<Trans>Restarting {label}…</Trans>}>
-						<Trans>Your chat history stays. Only the agent restarts.</Trans>
-					</SignInProgress>
-				)}
+					{step.name === "restarting" && (
+						<SignInProgress title={<Trans>Restarting {label}…</Trans>}>
+							<Trans>Your chat history stays. Only the agent restarts.</Trans>
+						</SignInProgress>
+					)}
 
-				{step.name === "done" && (
-					<div className="flex flex-col items-center gap-2 py-4 text-center">
-						<span className="flex size-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
-							<Check className="size-5" />
-						</span>
-						<p className="font-medium">
-							<Trans>Signed in</Trans>
-						</p>
-						<p className="text-muted-foreground text-sm">
-							{step.account.accountLabel ? (
-								<>
-									{step.account.accountLabel}
-									<br />
-								</>
-							) : null}
-							<Trans>Continuing your chat…</Trans>
-						</p>
-					</div>
-				)}
+					{step.name === "done" && (
+						<div className="flex flex-col items-center gap-2 py-4 text-center">
+							<span className="flex size-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
+								<Check className="size-5" />
+							</span>
+							<p className="font-medium">
+								<Trans>Signed in</Trans>
+							</p>
+							<p className="text-muted-foreground text-sm">
+								{step.account.accountLabel ? (
+									<>
+										{step.account.accountLabel}
+										<br />
+									</>
+								) : null}
+								<Trans>{label} is starting again with this sign-in.</Trans>
+							</p>
+						</div>
+					)}
 
-				{step.name === "restart_failed" && (
-					<div className="flex flex-col gap-1 py-2 text-sm">
-						<p className="font-medium">
-							<Trans>Signed in, but {label} did not restart.</Trans>
-						</p>
-						<p className="text-muted-foreground">
-							<Trans>
-								Try again, or close this and press Continue in the chat.
-							</Trans>
-						</p>
-					</div>
-				)}
+					{step.name === "restart_failed" && (
+						<div className="flex flex-col gap-1 py-2 text-sm">
+							<p className="font-medium">
+								<Trans>Signed in, but {label} did not restart.</Trans>
+							</p>
+							<p className="text-muted-foreground">
+								<Trans>
+									Try again, or close this and press Continue in the chat.
+								</Trans>
+							</p>
+						</div>
+					)}
+				</div>
 
-				{error && <p className="text-destructive text-sm">{error}</p>}
+				{error && (
+					<p className="text-destructive text-sm" role="alert">
+						{error}
+					</p>
+				)}
 
 				{!busy && (
 					<DialogFooter className="items-center sm:justify-between">
@@ -371,11 +430,7 @@ export function AgentSignInDialog({
 								step.name === "device_code") && (
 								<button
 									className="text-muted-foreground underline underline-offset-4 hover:text-foreground"
-									onClick={() => {
-										attempt.current += 1;
-										setOpening(false);
-										go({ name: "start" });
-									}}
+									onClick={back}
 									type="button"
 								>
 									<Trans>Back</Trans>

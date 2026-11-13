@@ -92,8 +92,9 @@ const codexSignIn: AgentSignIn = {
 			verificationUrl: "https://auth.openai.com/codex/device",
 		};
 	},
-	waitForDeviceCode: async () => {
+	waitForDeviceCode: async (_code, signal) => {
 		await wait(4000);
+		signal.throwIfAborted();
 		return { accountLabel: "ChatGPT Plus · person@example.com" };
 	},
 	saveApiKey: (key) => check(key, "OpenAI API key"),

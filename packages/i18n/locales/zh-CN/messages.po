@@ -1123,6 +1123,9 @@ msgstr "{label} 将恢复为未设置。工作区内不会有任何变化：你�
 msgid "{label} is set to manual"
 msgstr "{label} 已设为手动登录"
 
+msgid "{label} is starting again with this sign-in."
+msgstr "正在使用此登录重启 {label}。"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -5582,9 +5585,6 @@ msgstr "使用Google继续"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "继续智能体会话需要固定的工作区"
-
-msgid "Continuing your chat…"
-msgstr "正在继续你的聊天…"
 
 msgid "Continuing…"
 msgstr "正在继续…"
@@ -18668,7 +18668,6 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "登录一次，Paradev 会保持连接。"
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
-#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "登录{0}"
 

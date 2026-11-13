@@ -1123,6 +1123,9 @@ msgstr "{label} wraca do stanu nieskonfigurowanego. W obszarach roboczych nic si
 msgid "{label} is set to manual"
 msgstr "{label} używa teraz logowania ręcznego"
 
+msgid "{label} is starting again with this sign-in."
+msgstr "{label} uruchamia się ponownie z tym logowaniem."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -5582,9 +5585,6 @@ msgstr "Kontynuuj z Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Kontynuowanie sesji agenta wymaga przypiętego obszaru roboczego"
-
-msgid "Continuing your chat…"
-msgstr "Wznawianie czatu…"
 
 msgid "Continuing…"
 msgstr "Kontynuowanie…"
@@ -18668,7 +18668,6 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "Zaloguj się raz. Paradev utrzymuje połączenie."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
-#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "Zaloguj się do {0}"
 

@@ -1123,6 +1123,9 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
+msgid "{label} is starting again with this sign-in."
+msgstr "{label} se znovu spouští s tímto přihlášením."
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -5582,9 +5585,6 @@ msgstr "Pokračovat přes Google"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "Pokračování v relaci agenta vyžaduje připnutý pracovní prostor"
-
-msgid "Continuing your chat…"
-msgstr "Pokračuje se v chatu…"
 
 msgid "Continuing…"
 msgstr "Pokračuje se…"
@@ -18668,7 +18668,6 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "Přihlaste se jednou. Paradev udržuje připojení."
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
-#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "Přihlaste se do {0}"
 

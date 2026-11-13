@@ -124,6 +124,7 @@ export function TurnFailureCard({
 	const restart = kind === "auth" ? recovery?.restartAndContinue : undefined;
 	const agentSignIn =
 		restart && !manualSignIn ? recovery?.agentSignIn : undefined;
+	const label = agentSignIn?.label;
 	const changeModel = recovery?.changeModel;
 	const newChat = recovery?.startNewChat;
 	const buttons: Record<FailureAction, ActionButton | null> | null = recovery
@@ -150,9 +151,9 @@ export function TurnFailureCard({
 							onClick: changeModel,
 						}
 					: null,
-				sign_in: agentSignIn
+				sign_in: label
 					? {
-							label: <Trans>Sign in to {agentSignIn.label}</Trans>,
+							label: <Trans>Sign in to {label}</Trans>,
 							disabled: false,
 							onClick: () => setSignInOpen(true),
 						}

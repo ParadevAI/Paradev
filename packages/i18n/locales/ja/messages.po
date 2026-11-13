@@ -1123,6 +1123,9 @@ msgstr "{label} は未設定の状態に戻ります。ワークスペース内�
 msgid "{label} is set to manual"
 msgstr "{label} を手動サインインに設定しました"
 
+msgid "{label} is starting again with this sign-in."
+msgstr "{label}をこのサインインで再起動しています。"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -5582,9 +5585,6 @@ msgstr "Googleで続行"
 
 msgid "Continuing an agent session requires a pinned workspace"
 msgstr "エージェントセッションを継続するには、ワークスペースをピン留めする必要があります"
-
-msgid "Continuing your chat…"
-msgstr "チャットを続行しています…"
 
 msgid "Continuing…"
 msgstr "続行しています…"
@@ -18668,7 +18668,6 @@ msgid "Sign in once. Paradev keeps the connection."
 msgstr "サインインは一度だけ。接続はParadevが保ちます。"
 
 #. placeholder {0}: activeOrganization?.name ?? t({ message: "this organization", })
-#. placeholder {0}: agentSignIn.label
 msgid "Sign in to {0}"
 msgstr "{0}にサインイン"
 
