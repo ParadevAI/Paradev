@@ -152,24 +152,33 @@ export async function readApiBillingFingerprint(
 	}
 }
 
+export interface ClaudeProfileScan {
+	profiles: ClaudeProfile[];
+	/** Stopped at the time budget, so it can lack profiles that exist. */
+	partial: boolean;
+}
+
 /**
  * Extra Claude profile dirs beyond the defaults. Default homes are excluded —
- * callers already cover `~/.claude` and `~/.config/claude`. `candidates`
- * overrides the home-dir scan for tests.
+ * callers already cover `~/.claude` and `~/.config/claude`. `candidates` and
+ * `now` override the home-dir scan and the clock for tests.
  */
-export async function discoverClaudeProfiles(
+export async function scanClaudeProfiles(
 	candidates?: string[],
-): Promise<ClaudeProfile[]> {
+	now: () => number = Date.now,
+): Promise<ClaudeProfileScan> {
 	const home = homedir();
 	const excluded = new Set([
 		join(home, ".claude"),
 		join(home, ".config", "claude"),
 	]);
-	const started = Date.now();
+	const started = now();
 	const profiles: ClaudeProfile[] = [];
 
 	for (const candidate of candidates ?? (await candidateDirectories())) {
-		if (Date.now() - started > SCAN_TIME_BUDGET_MS) break;
+		if (now() - started > SCAN_TIME_BUDGET_MS) {
+			return { profiles, partial: true };
+		}
 		if (excluded.has(candidate)) continue;
 		const [identity, apiFingerprint] = await Promise.all([
 			readClaudeIdentity(candidate),
@@ -186,7 +195,13 @@ export async function discoverClaudeProfiles(
 			keychainServices: keychainServicesForConfigDir(candidate),
 		});
 	}
-	return profiles;
+	return { profiles, partial: false };
+}
+
+export async function discoverClaudeProfiles(
+	candidates?: string[],
+): Promise<ClaudeProfile[]> {
+	return (await scanClaudeProfiles(candidates)).profiles;
 }
 
 const KEYCHAIN_ACCOUNT_PATTERN = /^[a-zA-Z0-9._-]+$/;

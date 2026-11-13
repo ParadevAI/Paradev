@@ -1,1 +1,5 @@
-export { type FoundLogin, findCompletedLogin } from "./findCompletedLogin";
+export {
+	type FoundLogin,
+	findCompletedLogin,
+	nextBaseline,
+} from "./findCompletedLogin";
