@@ -32,7 +32,7 @@ export function SessionsSheet() {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { workspace, host } = useWorkspaceHost(id ?? null);
-	const { terminalsByWorkspace } = useHostTerminals(host);
+	const { terminalsByWorkspace } = useHostTerminals(host, id);
 	const hostUrl = host
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;

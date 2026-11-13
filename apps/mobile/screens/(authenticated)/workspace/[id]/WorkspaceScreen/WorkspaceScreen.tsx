@@ -193,7 +193,7 @@ export function WorkspaceScreen() {
 		terminalsByWorkspace,
 		isReady: terminalsReady,
 		isError: terminalsFailed,
-	} = useHostTerminals(host);
+	} = useHostTerminals(host, id);
 	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	// Tabs hold the arrangement the user dragged in the sessions sheet, falling
