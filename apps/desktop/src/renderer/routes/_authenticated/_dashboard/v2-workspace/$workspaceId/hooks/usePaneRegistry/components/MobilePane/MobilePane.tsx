@@ -1,20 +1,42 @@
 import { Trans } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { workspaceTrpc } from "@superset/workspace-client";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { CloudSimulator } from "./components/CloudSimulator";
 import { LocalDevices } from "./components/LocalDevices";
+import { LocalHostClient } from "./components/LocalHostClient";
 import { PaneMessage } from "./components/PaneMessage";
+import { useLatch } from "./hooks/useLatch";
+import { fallsBackToLocalHost } from "./utils/fallsBackToLocalHost";
 
 /** Mobile simulator backed by whichever this host can produce: a hosted
  * simulator on a cloud sandbox, or a local iOS/Android simulator on a real
  * machine. */
 interface MobilePaneProps {
 	workspaceId: string;
+	/** The pane asks this machine, not the workspace's host. */
+	onLocalHost?: boolean;
 }
 
-export function MobilePane({ workspaceId }: MobilePaneProps) {
+export function MobilePane({
+	workspaceId,
+	onLocalHost = false,
+}: MobilePaneProps) {
+	const workspaceHost = useWorkspaceHostTarget(workspaceId);
 	const statusQuery = workspaceTrpc.mobile.status.useQuery();
 	const backend = statusQuery.data?.backend;
+
+	const fellBack = useLatch(
+		!onLocalHost && fallsBackToLocalHost({ workspaceHost, backend }),
+	);
+
+	if (fellBack) {
+		return (
+			<LocalHostClient>
+				<MobilePane workspaceId={workspaceId} onLocalHost />
+			</LocalHostClient>
+		);
+	}
 
 	if (backend === "eas") {
 		return (
@@ -27,7 +49,7 @@ export function MobilePane({ workspaceId }: MobilePaneProps) {
 	if (backend === "local-ios" || backend === "local-android") {
 		return (
 			<div className="size-full bg-background">
-				<LocalDevices workspaceId={workspaceId} />
+				<LocalDevices workspaceId={workspaceId} remembersPick={!onLocalHost} />
 			</div>
 		);
 	}
