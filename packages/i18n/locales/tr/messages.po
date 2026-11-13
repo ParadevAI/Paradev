@@ -6956,6 +6956,9 @@ msgstr "\"{hostName}\" silinsin mi?"
 msgid "Delete \"{projectName}\"?"
 msgstr "\"{projectName}\" silinsin mi?"
 
+msgid "Delete \"{title}\"?"
+msgstr "“{title}” silinsin mi?"
+
 msgid "Delete “{title}”?"
 msgstr "“{title}” silinsin mi?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Sayfa"
 
+msgid "Page actions"
+msgstr "Sayfa işlemleri"
+
 msgid "Page by you"
 msgstr "Sizin sayfanız"
 
@@ -18215,9 +18221,6 @@ msgstr "Sayfayı paylaş (herkese açık)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Eklentileri bir GitHub deposundan paylaşın. Sürümleri git etiketleriyle sabitleyin."
 
-msgid "Share this page"
-msgstr "Bu sayfayı paylaş"
-
 msgid "Share via…"
 msgstr "Şununla paylaş…"
 
@@ -20242,6 +20245,9 @@ msgstr "Gece vardiyası"
 
 msgid "The owner's account no longer exists."
 msgstr "Sahibin hesabı artık mevcut değil."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Sayfa ve tüm sürümleri silinecek."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Sayfa ve içeriği kaldırılır. Bağlantıya sahip herkes erişimini kaybeder."

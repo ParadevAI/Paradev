@@ -6956,6 +6956,9 @@ msgstr "¿Eliminar \"{hostName}\"?"
 msgid "Delete \"{projectName}\"?"
 msgstr "¿Eliminar \"{projectName}\"?"
 
+msgid "Delete \"{title}\"?"
+msgstr "¿Eliminar «{title}»?"
+
 msgid "Delete “{title}”?"
 msgstr "¿Eliminar “{title}”?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Página"
 
+msgid "Page actions"
+msgstr "Acciones de la página"
+
 msgid "Page by you"
 msgstr "Página creada por ti"
 
@@ -18215,9 +18221,6 @@ msgstr "Compartir la página (pública)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Comparte plugins desde un repo de GitHub. Fija versiones con tags de git."
 
-msgid "Share this page"
-msgstr "Compartir esta página"
-
 msgid "Share via…"
 msgstr "Compartir mediante…"
 
@@ -20242,6 +20245,9 @@ msgstr "El turno de noche"
 
 msgid "The owner's account no longer exists."
 msgstr "La cuenta del propietario ya no existe."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Se eliminarán la página y todas sus versiones."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Se eliminan la página y su contenido. Quien tenga el enlace perderá el acceso."

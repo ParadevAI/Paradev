@@ -6956,6 +6956,9 @@ msgstr "\"{hostName}\"을(를) 삭제할까요?"
 msgid "Delete \"{projectName}\"?"
 msgstr "\"{projectName}\"을(를) 삭제할까요?"
 
+msgid "Delete \"{title}\"?"
+msgstr "“{title}”을(를) 삭제할까요?"
+
 msgid "Delete “{title}”?"
 msgstr "“{title}”을(를) 삭제할까요?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "페이지"
 
+msgid "Page actions"
+msgstr "페이지 작업"
+
 msgid "Page by you"
 msgstr "내가 만든 페이지"
 
@@ -18215,9 +18221,6 @@ msgstr "페이지 공유(공개)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHub 저장소에서 플러그인을 공유하세요. git 태그로 릴리스를 고정합니다."
 
-msgid "Share this page"
-msgstr "이 페이지 공유"
-
 msgid "Share via…"
 msgstr "공유 방법…"
 
@@ -20242,6 +20245,9 @@ msgstr "야간 근무"
 
 msgid "The owner's account no longer exists."
 msgstr "소유자의 계정이 더 이상 존재하지 않습니다."
+
+msgid "The page and every version of it will be deleted."
+msgstr "페이지와 모든 버전이 삭제됩니다."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "페이지와 그 내용이 삭제됩니다. 링크가 있는 사람도 접근할 수 없게 됩니다."

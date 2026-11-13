@@ -6956,6 +6956,9 @@ msgstr "Xóa \"{hostName}\"?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Xóa \"{projectName}\"?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Xóa “{title}”?"
+
 msgid "Delete “{title}”?"
 msgstr "Xóa “{title}”?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Trang"
 
+msgid "Page actions"
+msgstr "Thao tác với trang"
+
 msgid "Page by you"
 msgstr "Trang do bạn tạo"
 
@@ -18215,9 +18221,6 @@ msgstr "Chia sẻ trang (công khai)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Chia sẻ plugin từ một repo GitHub. Ghim bản phát hành bằng git tag."
 
-msgid "Share this page"
-msgstr "Chia sẻ trang này"
-
 msgid "Share via…"
 msgstr "Chia sẻ qua…"
 
@@ -20242,6 +20245,9 @@ msgstr "Ca đêm"
 
 msgid "The owner's account no longer exists."
 msgstr "Tài khoản của chủ sở hữu không còn tồn tại."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Trang và mọi phiên bản của trang sẽ bị xóa."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Trang và nội dung của nó sẽ bị gỡ. Bất kỳ ai có liên kết đều mất quyền truy cập."

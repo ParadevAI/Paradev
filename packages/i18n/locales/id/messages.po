@@ -6956,6 +6956,9 @@ msgstr "Hapus \"{hostName}\"?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Hapus \"{projectName}\"?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Hapus “{title}”?"
+
 msgid "Delete “{title}”?"
 msgstr "Hapus “{title}”?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Halaman"
 
+msgid "Page actions"
+msgstr "Tindakan halaman"
+
 msgid "Page by you"
 msgstr "Halaman oleh Anda"
 
@@ -18215,9 +18221,6 @@ msgstr "Bagikan halaman (publik)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Bagikan plugin dari repo GitHub. Sematkan rilis dengan tag git."
 
-msgid "Share this page"
-msgstr "Bagikan halaman ini"
-
 msgid "Share via…"
 msgstr "Bagikan lewat…"
 
@@ -20242,6 +20245,9 @@ msgstr "Shift malam"
 
 msgid "The owner's account no longer exists."
 msgstr "Akun pemiliknya sudah tidak ada."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Halaman dan semua versinya akan dihapus."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Halaman beserta isinya dihapus. Siapa pun yang punya tautannya kehilangan akses."

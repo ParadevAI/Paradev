@@ -6956,6 +6956,9 @@ msgstr "\"{hostName}\" verwijderen?"
 msgid "Delete \"{projectName}\"?"
 msgstr "\"{projectName}\" verwijderen?"
 
+msgid "Delete \"{title}\"?"
+msgstr "‘{title}’ verwijderen?"
+
 msgid "Delete “{title}”?"
 msgstr "“{title}” verwijderen?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Pagina"
 
+msgid "Page actions"
+msgstr "Pagina-acties"
+
 msgid "Page by you"
 msgstr "Pagina van jou"
 
@@ -18215,9 +18221,6 @@ msgstr "Pagina delen (openbaar)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Deel plugins vanuit een GitHub-repo. Zet releases vast met git-tags."
 
-msgid "Share this page"
-msgstr "Deze pagina delen"
-
 msgid "Share via…"
 msgstr "Delen via…"
 
@@ -20242,6 +20245,9 @@ msgstr "De nachtploeg"
 
 msgid "The owner's account no longer exists."
 msgstr "Het account van de eigenaar bestaat niet meer."
+
+msgid "The page and every version of it will be deleted."
+msgstr "De pagina en alle versies ervan worden verwijderd."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "De pagina en de inhoud worden verwijderd. Iedereen met de link verliest toegang."

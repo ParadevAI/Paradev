@@ -6956,6 +6956,9 @@ msgstr "Usunąć „{hostName}”?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Usunąć „{projectName}”?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Usunąć „{title}”?"
+
 msgid "Delete “{title}”?"
 msgstr "Usunąć „{title}”?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Strona"
 
+msgid "Page actions"
+msgstr "Akcje strony"
+
 msgid "Page by you"
 msgstr "Strona utworzona przez Ciebie"
 
@@ -18215,9 +18221,6 @@ msgstr "Udostępnij stronę (publiczna)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Udostępniaj wtyczki z repozytorium GitHub. Przypinaj wydania tagami git."
 
-msgid "Share this page"
-msgstr "Udostępnij tę stronę"
-
 msgid "Share via…"
 msgstr "Udostępnij przez…"
 
@@ -20242,6 +20245,9 @@ msgstr "Nocna zmiana"
 
 msgid "The owner's account no longer exists."
 msgstr "Konto właściciela już nie istnieje."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Strona i wszystkie jej wersje zostaną usunięte."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Strona i jej treść zostaną usunięte. Każdy z linkiem straci dostęp."

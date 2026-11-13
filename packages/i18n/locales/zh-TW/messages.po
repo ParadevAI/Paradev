@@ -6956,6 +6956,9 @@ msgstr "刪除「{hostName}」？"
 msgid "Delete \"{projectName}\"?"
 msgstr "刪除「{projectName}」？"
 
+msgid "Delete \"{title}\"?"
+msgstr "要刪除「{title}」嗎？"
+
 msgid "Delete “{title}”?"
 msgstr "刪除「{title}」？"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "頁面"
 
+msgid "Page actions"
+msgstr "頁面操作"
+
 msgid "Page by you"
 msgstr "你建立的頁面"
 
@@ -18215,9 +18221,6 @@ msgstr "分享頁面（公開）"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "從 GitHub 儲存庫分享外掛，用 git 標籤固定版本。"
 
-msgid "Share this page"
-msgstr "分享此頁面"
-
 msgid "Share via…"
 msgstr "分享方式…"
 
@@ -20242,6 +20245,9 @@ msgstr "夜班"
 
 msgid "The owner's account no longer exists."
 msgstr "擁有者的帳戶已不存在。"
+
+msgid "The page and every version of it will be deleted."
+msgstr "此頁面及其所有版本都會被刪除。"
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "頁面及其內容會被移除。持有連結的人將失去存取權限。"

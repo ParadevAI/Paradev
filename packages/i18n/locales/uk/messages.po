@@ -6950,6 +6950,9 @@ msgstr "Видалити «{hostName}»?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Видалити «{projectName}»?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Видалити «{title}»?"
+
 msgid "Delete “{title}”?"
 msgstr "Видалити «{title}»?"
 
@@ -14548,6 +14551,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Сторінка"
 
+msgid "Page actions"
+msgstr "Дії зі сторінкою"
+
 msgid "Page by you"
 msgstr "Ваша сторінка"
 
@@ -18209,9 +18215,6 @@ msgstr "Поділитися сторінкою (публічно)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Діліться плагінами з репозиторію GitHub. Закріплюйте релізи git-тегами."
 
-msgid "Share this page"
-msgstr "Поділитися цією сторінкою"
-
 msgid "Share via…"
 msgstr "Поділитися через…"
 
@@ -20236,6 +20239,9 @@ msgstr "Нічна зміна"
 
 msgid "The owner's account no longer exists."
 msgstr "Облікового запису власника більше не існує."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Сторінку та всі її версії буде видалено."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Сторінку та її вміст буде видалено. Усі, хто має посилання, втратять доступ."

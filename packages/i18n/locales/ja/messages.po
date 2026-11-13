@@ -6956,6 +6956,9 @@ msgstr "「{hostName}」を削除しますか?"
 msgid "Delete \"{projectName}\"?"
 msgstr "「{projectName}」を削除しますか?"
 
+msgid "Delete \"{title}\"?"
+msgstr "「{title}」を削除しますか？"
+
 msgid "Delete “{title}”?"
 msgstr "「{title}」を削除しますか?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "ページ"
 
+msgid "Page actions"
+msgstr "ページの操作"
+
 msgid "Page by you"
 msgstr "自分が作成したページ"
 
@@ -18215,9 +18221,6 @@ msgstr "ページを共有（公開）"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHubリポジトリからプラグインを共有。gitタグでリリースを固定できます。"
 
-msgid "Share this page"
-msgstr "このページを共有"
-
 msgid "Share via…"
 msgstr "共有方法を選択…"
 
@@ -20242,6 +20245,9 @@ msgstr "夜間シフト"
 
 msgid "The owner's account no longer exists."
 msgstr "オーナーのアカウントは存在しません。"
+
+msgid "The page and every version of it will be deleted."
+msgstr "このページとすべてのバージョンが削除されます。"
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "ページとその内容が削除されます。リンクを知っている人もアクセスできなくなります。"

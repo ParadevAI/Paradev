@@ -6956,6 +6956,9 @@ msgstr "Supprimer « {hostName} » ?"
 msgid "Delete \"{projectName}\"?"
 msgstr "Supprimer « {projectName} » ?"
 
+msgid "Delete \"{title}\"?"
+msgstr "Supprimer « {title} » ?"
+
 msgid "Delete “{title}”?"
 msgstr "Supprimer « {title} » ?"
 
@@ -14554,6 +14557,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Page"
 
+msgid "Page actions"
+msgstr "Actions de la page"
+
 msgid "Page by you"
 msgstr "Page créée par vous"
 
@@ -18215,9 +18221,6 @@ msgstr "Partager la page (publique)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Partagez des plugins depuis un dépôt GitHub. Épinglez les versions avec des tags git."
 
-msgid "Share this page"
-msgstr "Partager cette page"
-
 msgid "Share via…"
 msgstr "Partager via…"
 
@@ -20242,6 +20245,9 @@ msgstr "L'équipe de nuit"
 
 msgid "The owner's account no longer exists."
 msgstr "Le compte du propriétaire n'existe plus."
+
+msgid "The page and every version of it will be deleted."
+msgstr "La page et toutes ses versions seront supprimées."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "La page et son contenu sont supprimés. Toute personne disposant du lien perd l'accès."
