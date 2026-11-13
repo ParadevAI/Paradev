@@ -67,11 +67,14 @@ export default command({
 		const width = Math.max(...Object.keys(detail).map((key) => key.length));
 		const message = Object.entries(detail)
 			.map(([key, value]) => {
-				const shown = Array.isArray(value)
-					? formatCheckouts(value, width + 2)
-					: value === null || value === undefined
+				const shown =
+					value === null ||
+					value === undefined ||
+					(Array.isArray(value) && value.length === 0)
 						? "—"
-						: value;
+						: Array.isArray(value)
+							? formatCheckouts(value, width + 2)
+							: value;
 				return `${key.padEnd(width)}  ${shown}`;
 			})
 			.join("\n");

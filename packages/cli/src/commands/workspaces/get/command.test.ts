@@ -156,6 +156,12 @@ describe("workspaces get", () => {
 		);
 	});
 
+	test("shows the empty marker for a workspace with no checkouts", async () => {
+		workspaces = [{ ...WORKSPACE, checkouts: [] }];
+		const text = (await invoke({ id: WORKSPACE.id })) as { message: string };
+		expect(text.message).toMatch(/^checkouts\s+—$/m);
+	});
+
 	test("--field with a null value yields an empty message", async () => {
 		workspaces = [WORKSPACE];
 		const result = (await invoke(

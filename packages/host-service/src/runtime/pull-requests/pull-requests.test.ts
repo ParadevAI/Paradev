@@ -2905,3 +2905,55 @@ describe("PullRequestRuntimeManager multi-repo workspace", () => {
 		expect(getWorkspace(db, "solo")?.workspaceBranch).toBe("new-name");
 	});
 });
+
+describe("PullRequestRuntimeManager stop and drain", () => {
+	test("stop() blocks new syncs and drain() waits for the running one", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, { id: "ws", branch: "feature" });
+		seedWorkspace(db, { id: "ws-late", branch: "late" });
+		const refs = Promise.withResolvers<WorkspaceRefsSnapshot>();
+		const readStarted = Promise.withResolvers<void>();
+		let refsReads = 0;
+		let ghCalls = 0;
+		const manager = createManager(db, {
+			execGh: async () => {
+				ghCalls += 1;
+				return [];
+			},
+			readWorkspaceRefs: () => {
+				refsReads += 1;
+				readStarted.resolve();
+				return refsReads === 1
+					? refs.promise
+					: Promise.resolve({ branch: "late", headSha: null, upstream: null });
+			},
+		});
+
+		const firstSync = manager.refreshPullRequestsByWorkspaces(["ws"]);
+		await readStarted.promise;
+		manager.stop();
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-late"]);
+		expect(refsReads).toBe(1);
+
+		let drained = false;
+		const drain = manager.drain().then(() => {
+			drained = true;
+		});
+		await new Promise((resolve) => setImmediate(resolve));
+		expect(drained).toBe(false);
+
+		refs.resolve({
+			branch: "feature",
+			headSha: "sha-moved",
+			upstream: { owner: REPO.owner, name: REPO.name, branch: "feature" },
+		});
+		await drain;
+		await firstSync;
+
+		expect(drained).toBe(true);
+		expect(refsReads).toBe(1);
+		expect(ghCalls).toBe(0);
+	});
+});

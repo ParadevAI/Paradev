@@ -1095,6 +1095,14 @@ superset workspaces share remove ws_a --user ann@example.com
   taskId: string | null;
   worktreePath: string;
   worktreeExists: boolean;
+  checkouts: {
+    repositoryId: string;
+    name: string;
+    isPrimary: boolean;
+    path: string;
+    branch: string;
+    pullRequestId: string | null;
+  }[];
   createdAt: Date;
   url: string;
   webUrl: string;
@@ -1102,6 +1110,8 @@ superset workspaces share remove ws_a --user ann@example.com
 >
 Show details for a single workspace on its host. `--field` is handy in
 scripts: `superset workspaces get --field worktreePath`.
+`--field checkouts` prints one line per checkout, name, branch and path, with
+`*` after the primary repository's name.
 
 ```bash
 superset workspaces get ws_…

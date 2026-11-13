@@ -34,7 +34,7 @@ describe("buildCheckouts", () => {
 		expect(() =>
 			buildCheckouts({ repositories: [api, web], pr: ["api=1", "api=2"] }),
 		).toThrow(/given twice/);
-		for (const pr of ["x", "12abc", "1e3", "0"]) {
+		for (const pr of ["x", "12abc", "1e3", "0", "12345678901234567890"]) {
 			expect(() => buildCheckouts({ repositories: [api], pr: [pr] })).toThrow(
 				/not a pull request number/,
 			);

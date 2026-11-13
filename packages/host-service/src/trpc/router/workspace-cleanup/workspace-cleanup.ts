@@ -619,7 +619,7 @@ async function runDestroyPhases(
 				if (!(err instanceof TRPCError) || removed.length === 0) throw err;
 				throw new TRPCError({
 					code: err.code,
-					message: `${err.message}. Already removed: ${removed.join(", ")}`,
+					message: `${err.message.replace(/\.$/, "")}. Already removed: ${removed.join(", ")}`,
 					cause: err,
 				});
 			}
