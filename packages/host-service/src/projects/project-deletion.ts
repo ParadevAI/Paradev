@@ -31,7 +31,6 @@ import {
 } from "./local-project-store";
 import {
 	getLiveRepositoryAtPath,
-	getPrimaryRepository,
 	listProjectRepositories,
 } from "./repositories";
 

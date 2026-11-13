@@ -3,14 +3,7 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import {
-	and,
-	eq,
-	inArray,
-	isNotNull,
-	isNull,
-	notInArray,
-} from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, notInArray } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	pullRequests,

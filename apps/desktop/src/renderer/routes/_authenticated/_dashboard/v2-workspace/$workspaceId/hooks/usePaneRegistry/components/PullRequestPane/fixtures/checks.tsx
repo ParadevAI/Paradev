@@ -24,6 +24,12 @@ mock.module(`${root}/v2-workspace/providers/WorkspaceProvider`, () => ({
 mock.module(`${pane}/hooks/usePullRequestCheckoutId`, () => ({
 	usePullRequestCheckoutId: () => null,
 }));
+mock.module(
+	`${root}/v2-workspace/$workspaceId/state/activeRepositoryStore`,
+	() => ({
+		useWorkspaceCheckouts: () => [],
+	}),
+);
 mock.module(`${pane}/hooks/usePullRequestPaneDetail`, () => ({
 	usePullRequestPaneDetail: () => detail,
 }));
