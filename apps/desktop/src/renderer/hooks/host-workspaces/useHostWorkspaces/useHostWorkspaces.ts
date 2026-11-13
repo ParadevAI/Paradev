@@ -77,6 +77,13 @@ export interface UseHostWorkspacesResult {
 	 * cover only the local host.
 	 */
 	hostsSettled: boolean;
+	/**
+	 * Per-host state of the live list, keyed by machine id. Stricter than
+	 * isReady: a snapshot-served or failed host is never "live". Writers that
+	 * reconcile against host rows (e.g. pruning stale sidebar folders) need
+	 * this — a failed read must never look like an empty host.
+	 */
+	hostStatuses: ReadonlyMap<string, HostWorkspacesHostStatus>;
 	cache: HostWorkspacesCacheOps;
 }
 
@@ -89,6 +96,8 @@ function pickQueryState<TData>(results: UseQueryResult<TData>[]) {
 		isSuccess,
 	}));
 }
+
+export type HostWorkspacesHostStatus = "live" | "pending" | "error" | "offline";
 
 /**
  * The workspace read path: `workspace.list` per host (local direct, remote
@@ -472,8 +481,33 @@ export function useHostWorkspacesSource(
 		};
 	}, [targets, queryClient]);
 
+	const hostStatuses = useMemo(
+		() =>
+			new Map<string, HostWorkspacesHostStatus>(
+				targets.map((target, index) => {
+					const query = queries[index];
+					const status: HostWorkspacesHostStatus =
+						target.hostUrl === null
+							? "offline"
+							: query?.isError
+								? "error"
+								: query?.isSuccess
+									? "live"
+									: "pending";
+					return [target.machineId, status];
+				}),
+			),
+		[targets, queries],
+	);
+
 	return useMemo(
-		() => ({ workspaces, isReady, hostsSettled: knownHostsSettled, cache }),
-		[workspaces, isReady, knownHostsSettled, cache],
+		() => ({
+			workspaces,
+			isReady,
+			hostsSettled: knownHostsSettled,
+			hostStatuses,
+			cache,
+		}),
+		[workspaces, isReady, knownHostsSettled, hostStatuses, cache],
 	);
 }
