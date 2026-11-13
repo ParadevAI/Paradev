@@ -15,6 +15,10 @@ import {
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
+import {
+	failChatMovesTo,
+	queueChatMovesTo,
+} from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { transitionCloudWorkspace } from "./transition";
@@ -141,6 +145,15 @@ async function provision(
 				where: eq(cloudWorkspaces.id, row.id),
 				columns: { status: true, providerSandboxId: true },
 			});
+			if (current?.status === "deleted") {
+				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
+				);
+			}
 			if (
 				current?.status === "deleted" ||
 				current?.providerSandboxId !== providerSandboxId
@@ -168,6 +181,12 @@ async function provision(
 					hostTarget: sandbox.hostTarget,
 					claim,
 				}),
+		);
+		await queueChatMovesTo(row.id).catch((error) =>
+			console.error(
+				`[cloud-workspace] could not start the chat moving into ${row.id}`,
+				error,
+			),
 		);
 		try {
 			recordBootSpans(answer);
@@ -205,13 +224,24 @@ async function provision(
 				teardownError,
 			);
 		});
-		await transitionCloudWorkspace({
+		const failed = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning", "ready"],
 			to: "failed",
 			providerSandboxId,
 		});
 		nudge(row.organizationId, "cloud_workspaces");
+		if (failed) {
+			await failChatMovesTo(
+				row.id,
+				"The cloud workspace could not start",
+			).catch((moveError) =>
+				console.error(
+					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+					moveError,
+				),
+			);
+		}
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
 	}

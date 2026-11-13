@@ -1,0 +1,450 @@
+name: Deploy Paradev Staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-paradev-staging
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  VERCEL_CLI_VERSION: 50.22.1
+
+jobs:
+  deploy-staging:
+    name: Deploy isolated Paradev API and web
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'ParadevAI/Paradev'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
+    environment: production
+    env:
+      VERCEL_PARADEV_API_PROJECT_ID: ${{ vars.VERCEL_PARADEV_API_PROJECT_ID }}
+      VERCEL_PARADEV_WEB_PROJECT_ID: ${{ vars.VERCEL_PARADEV_WEB_PROJECT_ID }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Bun
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install Vercel CLI
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      - name: Prepare project and alias ownership checks
+        run: |
+          cat > "$RUNNER_TEMP/paradev-staging-guard.py" <<'PYTHON'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+          from urllib.error import HTTPError
+          from urllib.parse import urlencode, urlparse
+          from urllib.request import Request, urlopen
+
+          TARGETS = (
+              ("API", "prj_MmAnFWXbST3HSeLr313KNqZ00Pve", "api-paradev", "api.stage.paradev.com", "apps/api"),
+              ("WEB", "prj_7XZEFgKHMki81K1bTCl0JCG4lToQ", "web-paradev", "app.stage.paradev.com", "apps/web"),
+          )
+
+          def require(condition, message):
+              if not condition:
+                  sys.exit(message)
+
+          for kind, project_id, *_ in TARGETS:
+              require(os.environ.get(f"VERCEL_PARADEV_{kind}_PROJECT_ID") == project_id,
+                      f"Missing or incorrect {kind} project variable; refusing deployment")
+          require(os.environ.get("VERCEL_ORG_ID") and os.environ.get("VERCEL_TOKEN"), "Missing Vercel credentials")
+
+          def request(path, body=None, allow_missing=False, **query):
+              query["teamId"] = os.environ["VERCEL_ORG_ID"]
+              req = Request("https://api.vercel.com" + path + "?" + urlencode(query),
+                            data=json.dumps(body).encode() if body is not None else None,
+                            headers={"Authorization": "Bearer " + os.environ["VERCEL_TOKEN"],
+                                     "Content-Type": "application/json"})
+              try:
+                  with urlopen(req, timeout=30) as response:
+                      result = json.load(response)
+                      require(not result.get("error"), "Vercel returned an error")
+                      return result
+              except HTTPError as error:
+                  if allow_missing and error.code == 404:
+                      return None
+                  sys.exit(f"Vercel ownership check/request failed: HTTP {error.code}")
+
+          def check_target(target):
+              kind, project_id, name, host, root = target
+              project = request(f"/v9/projects/{project_id}")
+              require(project["id"] == project_id and project["name"] == name
+                      and project["accountId"] == os.environ["VERCEL_ORG_ID"]
+                      and project["rootDirectory"] == root, f"Unexpected project identity for {kind}")
+              domain = request(f"/v9/projects/{project_id}/domains/{host}")
+              require(domain["name"] == host and domain.get("verified") is True
+                      and not domain.get("redirect") and not domain.get("gitBranch")
+                      and not domain.get("customEnvironmentId"), f"Stage domain must already belong to {name}")
+              alias = request(f"/v4/aliases/{host}", allow_missing=True)
+              if alias is not None:
+                  require(alias.get("projectId") == project_id and not alias.get("redirect"),
+                          f"Refusing to take alias {host} from another target")
+              return alias
+
+          for target in TARGETS:
+              check_target(target)
+
+          if sys.argv[1] == "alias":
+              deployments = []
+              for target in TARGETS:
+                  kind, project_id, name, host, root = target
+                  url = Path(os.environ["RUNNER_TEMP"], f"paradev-{kind.lower()}-url").read_text().strip()
+                  parsed = urlparse(url)
+                  require(parsed.scheme == "https" and parsed.netloc.endswith(".vercel.app")
+                          and parsed.path in ("", "/") and not parsed.query and not parsed.fragment,
+                          f"Invalid deployment URL for {kind}")
+                  deployment = request(f"/v13/deployments/{parsed.netloc}")
+                  require(deployment["projectId"] == project_id and deployment["readyState"] == "READY"
+                          and deployment["target"] == "production", f"Unexpected deployment for {kind}")
+                  deployments.append(deployment["id"])
+              for target, deployment_id in zip(TARGETS, deployments):
+                  alias = check_target(target)
+                  host = target[3]
+                  if alias is None or alias.get("deploymentId") != deployment_id:
+                      request(f"/v2/deployments/{deployment_id}/aliases", body={"alias": host})
+                  assigned = request(f"/v4/aliases/{host}")
+                  require(assigned["projectId"] == target[1] and assigned["deploymentId"] == deployment_id,
+                          f"Alias verification failed for {host}")
+                  print(f"Verified https://{host} -> {deployment_id}")
+          PYTHON
+
+      - name: Check both staging targets before building
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: python3 "$RUNNER_TEMP/paradev-staging-guard.py" check
+
+      - name: Cache Next.js build cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: apps/api/.next/cache
+          key: next-paradev-staging-api-${{ github.sha }}
+          restore-keys: next-paradev-staging-api-
+
+      - name: Build and Deploy API
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PARADEV_API_PROJECT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          BROWSER_API_URL: https://api.stage.paradev.com
+          NEXT_PUBLIC_API_URL: https://api.superset.sh
+          NEXT_PUBLIC_WEB_URL: https://app.stage.paradev.com
+          NEXT_PUBLIC_MARKETING_URL: https://paradev.com
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
+          NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: stage.paradev.com
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_PRIVATE_BUCKET: ${{ secrets.R2_PRIVATE_BUCKET }}
+          R2_PUBLIC_BUCKET: ${{ secrets.R2_PUBLIC_BUCKET }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          USERCONTENT_URL: ${{ secrets.USERCONTENT_URL }}
+          MEDIA_URL: ${{ secrets.MEDIA_URL }}
+          STATIC_URL: ${{ secrets.STATIC_URL }}
+          USERCONTENT_TOKEN_SECRET: ${{ secrets.USERCONTENT_TOKEN_SECRET }}
+          AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
+          AGENT_TURN_SIGNING_SECRET: ${{ secrets.AGENT_TURN_SIGNING_SECRET }}
+          AGENT_SESSION_SECRET: ${{ secrets.AGENT_SESSION_SECRET }}
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+          TEMPORAL_NAMESPACE: ${{ secrets.TEMPORAL_NAMESPACE }}
+          TEMPORAL_API_KEY: ${{ secrets.TEMPORAL_API_KEY }}
+          CLOUDFLARE_BROWSER_RENDERING_TOKEN: ${{ secrets.CLOUDFLARE_BROWSER_RENDERING_TOKEN }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CONNECTIONS_CLIENT_ID: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_ID }}
+          GOOGLE_CONNECTIONS_CLIENT_SECRET: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_SECRET }}
+          GOOGLE_PUBSUB_TOPIC: ${{ secrets.GOOGLE_PUBSUB_TOPIC }}
+          GOOGLE_PUBSUB_PUSH_TOKEN: ${{ secrets.GOOGLE_PUBSUB_PUSH_TOKEN }}
+          SUPPORT_LOOKUP_TOKEN: ${{ secrets.SUPPORT_LOOKUP_TOKEN }}
+          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          NEXT_PUBLIC_SENTRY_DSN_API: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_API }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+          LEADERBOARD_INTERNAL_TOKEN: ${{ secrets.LEADERBOARD_INTERNAL_TOKEN }}
+          KV_URL: ${{ secrets.KV_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
+          LINEAR_CLIENT_ID: ${{ secrets.LINEAR_CLIENT_ID }}
+          LINEAR_CLIENT_SECRET: ${{ secrets.LINEAR_CLIENT_SECRET }}
+          LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
+          NOTION_CLIENT_ID: ${{ secrets.NOTION_CLIENT_ID }}
+          NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
+          NOTION_WEBHOOK_VERIFICATION_TOKEN: ${{ secrets.NOTION_WEBHOOK_VERIFICATION_TOKEN }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
+          SENTRY_APP_SLUG: ${{ secrets.SENTRY_APP_SLUG }}
+          SENTRY_CLIENT_ID: ${{ secrets.SENTRY_CLIENT_ID }}
+          SENTRY_CLIENT_SECRET: ${{ secrets.SENTRY_CLIENT_SECRET }}
+          SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+          SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
+          GH_APP_ID: ${{ secrets.GH_APP_ID }}
+          GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          GH_WEBHOOK_SECRET: ${{ secrets.GH_WEBHOOK_SECRET }}
+          GH_APP_CLIENT_ID: ${{ secrets.GH_APP_CLIENT_ID }}
+          GH_APP_CLIENT_SECRET: ${{ secrets.GH_APP_CLIENT_SECRET }}
+          QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
+          QSTASH_URL: ${{ secrets.QSTASH_URL }}
+          QSTASH_CURRENT_SIGNING_KEY: ${{ secrets.QSTASH_CURRENT_SIGNING_KEY }}
+          QSTASH_NEXT_SIGNING_KEY: ${{ secrets.QSTASH_NEXT_SIGNING_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          PLUGIN_CLIENT_METADATA_BASE_URL: ${{ secrets.PLUGIN_CLIENT_METADATA_BASE_URL }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
+          STRIPE_PRO_YEARLY_PRICE_ID: ${{ secrets.STRIPE_PRO_YEARLY_PRICE_ID }}
+          STRIPE_ENTERPRISE_YEARLY_PRICE_ID: ${{ secrets.STRIPE_ENTERPRISE_YEARLY_PRICE_ID }}
+          SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
+          SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          REALTIME_URL: ${{ secrets.REALTIME_URL }}
+          REALTIME_NUDGE_SECRET: ${{ secrets.REALTIME_NUDGE_SECRET }}
+          VERCEL_SANDBOX_TOKEN: ${{ secrets.VERCEL_SANDBOX_TOKEN }}
+          VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
+          VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
+          AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
+          AUTUMN_WEBHOOK_SECRET: ${{ secrets.AUTUMN_WEBHOOK_SECRET }}
+          BILLING_PROVIDER: ${{ secrets.BILLING_PROVIDER }}
+          SANDBOX_GATE_SECRET: ${{ secrets.SANDBOX_GATE_SECRET }}
+          SANDBOX_GATE_ORIGIN: ${{ secrets.SANDBOX_GATE_ORIGIN }}
+          SENTRY_DSN_SANDBOX: ${{ secrets.SENTRY_DSN_SANDBOX }}
+          SERVER_OPENAI_API_KEY: ${{ secrets.SERVER_OPENAI_API_KEY }}
+          GH_APP_SLUG: ${{ secrets.GH_APP_SLUG }}
+        run: |
+          set -euo pipefail
+          python3 "$RUNNER_TEMP/paradev-staging-guard.py" check
+          rm -rf .vercel
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          jq -e --arg project "$VERCEL_PROJECT_ID" --arg org "$VERCEL_ORG_ID" \
+            '.projectId == $project and .orgId == $org' .vercel/project.json > /dev/null
+          vercel build --prod --token=$VERCEL_TOKEN
+          jq -e '(.crons // []) | length == 0' .vercel/output/config.json > /dev/null
+          vercel deploy --prod --skip-domain --prebuilt --archive=tgz --token=$VERCEL_TOKEN \
+            --env DATABASE_URL=$DATABASE_URL \
+            --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
+            --env CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID \
+            --env R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID \
+            --env R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY \
+            --env R2_PRIVATE_BUCKET=$R2_PRIVATE_BUCKET \
+            --env R2_PUBLIC_BUCKET=$R2_PUBLIC_BUCKET \
+            --env R2_ENDPOINT=$R2_ENDPOINT \
+            --env USERCONTENT_URL=$USERCONTENT_URL \
+            --env MEDIA_URL=$MEDIA_URL \
+            --env STATIC_URL=$STATIC_URL \
+            --env USERCONTENT_TOKEN_SECRET=$USERCONTENT_TOKEN_SECRET \
+            --env AGENT_WORKER_SECRET=$AGENT_WORKER_SECRET \
+            --env AGENT_TURN_SIGNING_SECRET=$AGENT_TURN_SIGNING_SECRET \
+            --env AGENT_SESSION_SECRET=$AGENT_SESSION_SECRET \
+            --env TEMPORAL_ADDRESS=$TEMPORAL_ADDRESS \
+            --env TEMPORAL_NAMESPACE=$TEMPORAL_NAMESPACE \
+            --env TEMPORAL_API_KEY=$TEMPORAL_API_KEY \
+            --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
+            --env BROWSER_API_URL="$BROWSER_API_URL" \
+            --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
+            --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
+            --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
+            --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
+            --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
+            --env GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+            --env GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+            --env GOOGLE_CONNECTIONS_CLIENT_ID=$GOOGLE_CONNECTIONS_CLIENT_ID \
+            --env GOOGLE_CONNECTIONS_CLIENT_SECRET=$GOOGLE_CONNECTIONS_CLIENT_SECRET \
+            --env GOOGLE_PUBSUB_TOPIC=$GOOGLE_PUBSUB_TOPIC \
+            --env GOOGLE_PUBSUB_PUSH_TOKEN=$GOOGLE_PUBSUB_PUSH_TOKEN \
+            --env SUPPORT_LOOKUP_TOKEN=$SUPPORT_LOOKUP_TOKEN \
+            --env GH_CLIENT_ID=$GH_CLIENT_ID \
+            --env GH_CLIENT_SECRET=$GH_CLIENT_SECRET \
+            --env NEXT_PUBLIC_SENTRY_DSN_API=$NEXT_PUBLIC_SENTRY_DSN_API \
+            --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
+            --env POSTHOG_API_KEY=$POSTHOG_API_KEY \
+            --env POSTHOG_PROJECT_ID=$POSTHOG_PROJECT_ID \
+            --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
+            --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
+            --env KV_REST_API_URL=$KV_REST_API_URL \
+            --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
+            --env LEADERBOARD_INTERNAL_TOKEN=$LEADERBOARD_INTERNAL_TOKEN \
+            --env KV_URL=$KV_URL \
+            --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
+            --env LINEAR_CLIENT_ID=$LINEAR_CLIENT_ID \
+            --env LINEAR_CLIENT_SECRET=$LINEAR_CLIENT_SECRET \
+            --env LINEAR_WEBHOOK_SECRET=$LINEAR_WEBHOOK_SECRET \
+            --env NOTION_CLIENT_ID=$NOTION_CLIENT_ID \
+            --env NOTION_CLIENT_SECRET=$NOTION_CLIENT_SECRET \
+            --env NOTION_WEBHOOK_VERIFICATION_TOKEN=$NOTION_WEBHOOK_VERIFICATION_TOKEN \
+            --env MICROSOFT_CLIENT_ID=$MICROSOFT_CLIENT_ID \
+            --env MICROSOFT_CLIENT_SECRET=$MICROSOFT_CLIENT_SECRET \
+            --env SENTRY_APP_SLUG=$SENTRY_APP_SLUG \
+            --env SENTRY_CLIENT_ID=$SENTRY_CLIENT_ID \
+            --env SENTRY_CLIENT_SECRET=$SENTRY_CLIENT_SECRET \
+            --env SLACK_CLIENT_ID=$SLACK_CLIENT_ID \
+            --env SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET \
+            --env SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET \
+            --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY \
+            --env GH_APP_ID="$GH_APP_ID" \
+            --env GH_APP_PRIVATE_KEY="$GH_APP_PRIVATE_KEY" \
+            --env GH_WEBHOOK_SECRET="$GH_WEBHOOK_SECRET" \
+            --env GH_APP_CLIENT_ID="$GH_APP_CLIENT_ID" \
+            --env GH_APP_CLIENT_SECRET="$GH_APP_CLIENT_SECRET" \
+            --env QSTASH_TOKEN=$QSTASH_TOKEN \
+            --env QSTASH_URL=$QSTASH_URL \
+            --env QSTASH_CURRENT_SIGNING_KEY=$QSTASH_CURRENT_SIGNING_KEY \
+            --env QSTASH_NEXT_SIGNING_KEY=$QSTASH_NEXT_SIGNING_KEY \
+            --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
+            --env PLUGIN_CLIENT_METADATA_BASE_URL="$PLUGIN_CLIENT_METADATA_BASE_URL" \
+            --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
+            --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
+            --env STRIPE_PRO_YEARLY_PRICE_ID=$STRIPE_PRO_YEARLY_PRICE_ID \
+            --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
+            --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
+            --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
+            --env RELAY_URL=$RELAY_URL \
+            --env REALTIME_URL=$REALTIME_URL \
+            --env REALTIME_NUDGE_SECRET=$REALTIME_NUDGE_SECRET \
+            --env VERCEL_SANDBOX_TOKEN=$VERCEL_SANDBOX_TOKEN \
+            --env VERCEL_SANDBOX_TEAM_ID=$VERCEL_SANDBOX_TEAM_ID \
+            --env VERCEL_SANDBOX_PROJECT_ID=$VERCEL_SANDBOX_PROJECT_ID \
+            --env AUTUMN_SECRET_KEY=$AUTUMN_SECRET_KEY \
+            --env AUTUMN_WEBHOOK_SECRET=$AUTUMN_WEBHOOK_SECRET \
+            --env BILLING_PROVIDER=$BILLING_PROVIDER \
+            --env SANDBOX_GATE_SECRET=$SANDBOX_GATE_SECRET \
+            --env SANDBOX_GATE_ORIGIN=$SANDBOX_GATE_ORIGIN \
+            --env SENTRY_DSN_SANDBOX=$SENTRY_DSN_SANDBOX \
+            --env SERVER_OPENAI_API_KEY=$SERVER_OPENAI_API_KEY \
+            --env GH_APP_SLUG=$GH_APP_SLUG > "$RUNNER_TEMP/paradev-api-url"
+
+      - name: Cache Next.js build cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: apps/web/.next/cache
+          key: next-paradev-staging-web-${{ github.sha }}
+          restore-keys: next-paradev-staging-web-
+
+      - name: Build and Deploy Web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PARADEV_WEB_PROJECT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          BROWSER_API_URL: https://api.stage.paradev.com
+          NEXT_PUBLIC_API_URL: https://api.stage.paradev.com
+          NEXT_PUBLIC_WEB_URL: https://app.stage.paradev.com
+          NEXT_PUBLIC_MARKETING_URL: https://paradev.com
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
+          NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
+          NEXT_PUBLIC_DOCS_URL: ${{ secrets.NEXT_PUBLIC_DOCS_URL }}
+          NEXT_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
+          NEXT_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
+          USERCONTENT_URL: ${{ secrets.USERCONTENT_URL }}
+          MEDIA_URL: ${{ secrets.MEDIA_URL }}
+          STATIC_URL: ${{ secrets.STATIC_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: stage.paradev.com
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+          NEXT_PUBLIC_SENTRY_DSN_WEB: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_WEB }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
+          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+          KV_URL: ${{ secrets.KV_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
+          STRIPE_PRO_YEARLY_PRICE_ID: ${{ secrets.STRIPE_PRO_YEARLY_PRICE_ID }}
+          STRIPE_ENTERPRISE_YEARLY_PRICE_ID: ${{ secrets.STRIPE_ENTERPRISE_YEARLY_PRICE_ID }}
+          SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
+          SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
+          SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_BACKUP_URL: ${{ secrets.RELAY_BACKUP_URL }}
+        run: |
+          set -euo pipefail
+          python3 "$RUNNER_TEMP/paradev-staging-guard.py" check
+          rm -rf .vercel
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          jq -e --arg project "$VERCEL_PROJECT_ID" --arg org "$VERCEL_ORG_ID" \
+            '.projectId == $project and .orgId == $org' .vercel/project.json > /dev/null
+          vercel build --prod --token=$VERCEL_TOKEN
+          jq -e '(.crons // []) | length == 0' .vercel/output/config.json > /dev/null
+          vercel deploy --prod --skip-domain --prebuilt --archive=tgz --token=$VERCEL_TOKEN \
+            --env DATABASE_URL=$DATABASE_URL \
+            --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
+            --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
+            --env BROWSER_API_URL="$BROWSER_API_URL" \
+            --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
+            --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
+            --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
+            --env NEXT_PUBLIC_DOCS_URL=$NEXT_PUBLIC_DOCS_URL \
+            --env NEXT_PUBLIC_RELAY_URL=$NEXT_PUBLIC_RELAY_URL \
+            --env NEXT_PUBLIC_REALTIME_URL=$NEXT_PUBLIC_REALTIME_URL \
+            --env USERCONTENT_URL=$USERCONTENT_URL \
+            --env MEDIA_URL=$MEDIA_URL \
+            --env STATIC_URL=$STATIC_URL \
+            --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
+            --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
+            --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
+            --env NEXT_PUBLIC_SENTRY_DSN_WEB=$NEXT_PUBLIC_SENTRY_DSN_WEB \
+            --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
+            --env KV_REST_API_URL=$KV_REST_API_URL \
+            --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
+            --env KV_URL=$KV_URL \
+            --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
+            --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
+            --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
+            --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
+            --env STRIPE_PRO_YEARLY_PRICE_ID=$STRIPE_PRO_YEARLY_PRICE_ID \
+            --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
+            --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
+            --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
+            --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY > "$RUNNER_TEMP/paradev-web-url"
+
+      - name: Assign only staging aliases after both deployments succeed
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: python3 "$RUNNER_TEMP/paradev-staging-guard.py" alias

@@ -160,6 +160,7 @@ export const ChatSessionView = forwardRef<
 	);
 	const session = chat.snapshot.session;
 	const queuePaused = session?.queuePaused === true;
+	const queuePausedByShutdown = session?.queuePausedByShutdown === true;
 	const queueControls = session?.queueControls === true;
 	const harness = session?.harness;
 	const turnId = runningTurnId(chat.snapshot.turns);
@@ -313,6 +314,7 @@ export const ChatSessionView = forwardRef<
 			running: turnId !== null,
 			queued,
 			queuePaused,
+			queuePausedByShutdown,
 			queueControls,
 			selectMode: (modeId) => actionsRef.current.selectMode(modeId),
 			stop: () => actionsRef.current.stop(),
@@ -328,6 +330,7 @@ export const ChatSessionView = forwardRef<
 		turnId,
 		queued,
 		queuePaused,
+		queuePausedByShutdown,
 		queueControls,
 	]);
 	useEffect(

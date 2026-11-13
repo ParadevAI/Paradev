@@ -24,6 +24,8 @@ import { PageFrame } from "../PageFrame";
 import { PageToolConsentDialog } from "../PageToolConsentDialog";
 import { CommentBubble, pinClassName } from "./components/CommentBubble";
 import { CommentPopover } from "./components/CommentPopover";
+import { PageFindBar } from "./components/PageFindBar";
+import { type PageFindOptions, usePageFind } from "./hooks/usePageFind";
 import {
 	type PinPoint,
 	pinPointOf,
@@ -47,7 +49,10 @@ interface PageCommentsViewProps {
 	onLinkClick?: (click: PageLinkClick) => void;
 	storageTicket?: () => Promise<string | null>;
 	presenceUrl?: () => Promise<string | null>;
+	onPublished?: () => void;
 	toolHost?: PageToolHost;
+	/** Opt in to the find bar; a browser host leaves it to its own find. */
+	find?: PageFindOptions;
 }
 
 export function PageCommentsView({
@@ -61,7 +66,9 @@ export function PageCommentsView({
 	onLinkClick,
 	storageTicket,
 	presenceUrl,
+	onPublished,
 	toolHost,
+	find: findOptions,
 }: PageCommentsViewProps) {
 	const onLinkClickRef = useRef(onLinkClick);
 	onLinkClickRef.current = onLinkClick;
@@ -112,7 +119,7 @@ export function PageCommentsView({
 		host: toolHost,
 		pageId,
 	});
-	useJoinPresence({ roomId: pageId, url: presenceUrl });
+	useJoinPresence({ roomId: pageId, url: presenceUrl, onPublished });
 
 	const [lastHoverRect, setLastHoverRect] = useState<FrameRect | null>(null);
 	useEffect(() => {
@@ -168,6 +175,15 @@ export function PageCommentsView({
 		},
 		[frameOrigin],
 	);
+
+	const find = usePageFind({
+		frameRef,
+		frameOrigin,
+		send,
+		options: findOptions,
+	});
+	const findOpen = find.state.open;
+	const closeFind = find.close;
 
 	const popoverThread = panelOpen
 		? null
@@ -254,7 +270,10 @@ export function PageCommentsView({
 					setActiveThreadId(null);
 				}
 			}
-			if (data.type === "escape") dismiss();
+			if (data.type === "escape") {
+				if (findOpen) closeFind();
+				else dismiss();
+			}
 			if (data.type === "rects")
 				setRects(
 					data.entries.map((entry) => ({
@@ -273,8 +292,10 @@ export function PageCommentsView({
 		window.addEventListener("message", onMessage);
 		return () => window.removeEventListener("message", onMessage);
 	}, [
+		closeFind,
 		discardDraft,
 		dismiss,
+		findOpen,
 		frameOrigin,
 		pinchZoomEnabled,
 		notifyFramePointerDown,
@@ -330,6 +351,8 @@ export function PageCommentsView({
 		[pins],
 	);
 	const stackIndex = useMemo(() => stackPins(pins), [pins]);
+
+	const commentsButtonShown = !panelOpen && (threads.length > 0 || enabled);
 
 	const activePoint = popoverThread ? pinPoints.get(popoverThread.id) : null;
 	const draftRect = draft ? (rects[PENDING_ANCHOR_ID] ?? draft.rect) : null;
@@ -457,6 +480,17 @@ export function PageCommentsView({
 					/>
 				) : null}
 			</div>
+
+			{findOpen ? (
+				<PageFindBar
+					state={find.state}
+					className={commentsButtonShown ? "top-14" : "top-3"}
+					onQueryChange={find.setQuery}
+					onNext={find.next}
+					onPrevious={find.previous}
+					onClose={closeFind}
+				/>
+			) : null}
 
 			<PageToolConsentDialog
 				key={

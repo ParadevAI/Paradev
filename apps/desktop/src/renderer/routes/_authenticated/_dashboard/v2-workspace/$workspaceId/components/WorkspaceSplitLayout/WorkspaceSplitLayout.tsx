@@ -2,6 +2,7 @@ import {
 	type MutableRefObject,
 	type ReactNode,
 	type SyntheticEvent,
+	useCallback,
 	useEffect,
 	useLayoutEffect,
 	useRef,
@@ -26,6 +27,7 @@ function paneAreaOf(element: Element | null): PaneArea | null {
 interface WorkspaceSplitLayoutProps {
 	mode: SidebarSlideMode;
 	activeAreaRef: MutableRefObject<PaneArea>;
+	onActiveAreaChange?: (area: PaneArea) => void;
 	width: number | undefined;
 	minWidth: number;
 	maxWidth: number;
@@ -42,6 +44,7 @@ interface WorkspaceSplitLayoutProps {
 export function WorkspaceSplitLayout({
 	mode,
 	activeAreaRef,
+	onActiveAreaChange,
 	width,
 	minWidth,
 	maxWidth,
@@ -66,21 +69,27 @@ export function WorkspaceSplitLayout({
 		observer.observe(element);
 		return () => observer.disconnect();
 	}, []);
+	const onActiveAreaChangeRef = useRef(onActiveAreaChange);
+	onActiveAreaChangeRef.current = onActiveAreaChange;
+	const setActiveArea = useCallback(
+		(area: PaneArea | null) => {
+			if (!area || activeAreaRef.current === area) return;
+			activeAreaRef.current = area;
+			onActiveAreaChangeRef.current?.(area);
+		},
+		[activeAreaRef],
+	);
 	useEffect(() => {
-		const onWindowBlur = () => {
-			const area = paneAreaOf(document.activeElement);
-			if (area) activeAreaRef.current = area;
-		};
+		const onWindowBlur = () =>
+			setActiveArea(paneAreaOf(document.activeElement));
 		window.addEventListener("blur", onWindowBlur);
 		return () => window.removeEventListener("blur", onWindowBlur);
-	}, [activeAreaRef]);
+	}, [setActiveArea]);
 	useEffect(() => {
-		if (mode === "expanded") activeAreaRef.current = "right";
-	}, [mode, activeAreaRef]);
-	const trackActiveArea = (event: SyntheticEvent) => {
-		const area = paneAreaOf(event.target as Element);
-		if (area) activeAreaRef.current = area;
-	};
+		if (mode === "expanded") setActiveArea("right");
+	}, [mode, setActiveArea]);
+	const trackActiveArea = (event: SyntheticEvent) =>
+		setActiveArea(paneAreaOf(event.target as Element));
 	const clamped = clampSideWidth({
 		width: width ?? defaultWidth(containerWidth),
 		minWidth,

@@ -3,6 +3,7 @@ import { db } from "@superset/db/client";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
+import * as moves from "../../lib/moves";
 import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
 import * as meter from "./meter";
@@ -25,6 +26,7 @@ let row: Row;
 let whileTheBoxIsMade: () => void;
 let boxFails: boolean;
 let teardowns: string[];
+let moveOps: string[];
 
 function holdsFor(target: Row, condition: SQL): boolean {
 	const { sql, params } = dialect.sqlToQuery(condition);
@@ -84,6 +86,12 @@ stub(meter, {
 	releaseBoot: async () => {},
 });
 stub(realtime, { nudge: () => {} });
+stub(moves, {
+	callMoves: async (_organizationId: string, request: { op: string }) => {
+		moveOps.push(request.op);
+		return { ids: [] };
+	},
+});
 
 const restoredWithANewBox = () => {
 	row = { ...row, status: "provisioning", providerSandboxId: "box-2" };
@@ -102,6 +110,7 @@ beforeEach(() => {
 	whileTheBoxIsMade = () => {};
 	boxFails = false;
 	teardowns = [];
+	moveOps = [];
 });
 
 test("an older job that finishes its box after a restore leaves the new box on the row and deletes its own", async () => {
@@ -122,6 +131,16 @@ test("an older job whose box fails after a restore does not fail the restored wo
 
 	expect(row.status).toBe("provisioning");
 	expect(row.providerSandboxId).toBe("box-2");
+	expect(moveOps).toEqual([]);
+});
+
+test("a job whose box fails fails the chat moves into its workspace", async () => {
+	boxFails = true;
+
+	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
+
+	expect(row.status).toBe("failed");
+	expect(moveOps).toEqual(["failInto"]);
 });
 
 test("a job left alone makes its box the ready workspace", async () => {

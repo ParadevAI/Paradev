@@ -1,15 +1,21 @@
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
+import type {
+	AsyncMergeRequest,
+	PullRequestMergeProgress,
+} from "@superset/shared/pull-request-async-merge";
 import type { PullRequestDetailRead } from "@superset/shared/pull-request-detail";
 import type { PullRequestDiff } from "@superset/shared/pull-request-diff";
 import type {
 	PullRequestMergeMethod,
 	PullRequestThreads,
 } from "@superset/shared/pull-request-github";
+import type { PullRequestStack } from "@superset/shared/pull-request-stack";
 import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
 import { toPullRequestDetail } from "../toPullRequestDetail";
 
-export type { PullRequestMergeMethod, PullRequestThreads };
+export type { AsyncMergeRequest, PullRequestMergeMethod, PullRequestThreads };
 
 /** A pull request by its own identity; no project or host is involved. */
 export interface PullRequestTarget {
@@ -37,6 +43,14 @@ export function canActOnPullRequest(target: PullRequestTarget): boolean {
 export function pullRequestDiffQueryKey(target: PullRequestTarget | null) {
 	return [
 		"pull-request-diff",
+		target?.repoFullName?.toLowerCase() ?? null,
+		target?.prNumber ?? null,
+	] as const;
+}
+
+export function pullRequestStackQueryKey(target: PullRequestTarget | null) {
+	return [
+		"pull-request-stack",
 		target?.repoFullName?.toLowerCase() ?? null,
 		target?.prNumber ?? null,
 	] as const;
@@ -86,6 +100,24 @@ interface GithubProcedures<I> {
 	setPullRequestDraft: {
 		mutate: (input: I & { draft: boolean }) => Promise<unknown>;
 	};
+	getPullRequestStack: {
+		query: (input: I) => Promise<PullRequestStack | null>;
+	};
+	requestPullRequestMerge: {
+		mutate: (input: I & AsyncMergeRequest) => Promise<PullRequestMergeProgress>;
+	};
+	getPullRequestMergeResult: {
+		query: (input: I & { uuid: string }) => Promise<PullRequestMergeProgress>;
+	};
+	createPullRequestStack: {
+		mutate: (
+			input: I & { pullRequests: number[] },
+		) => Promise<{ stackNumber: number | null }>;
+	};
+	enqueuePullRequest: {
+		mutate: (input: I & { sha?: string }) => Promise<unknown>;
+	};
+	dequeuePullRequest: { mutate: (input: I) => Promise<unknown> };
 }
 
 function bind<I>(github: GithubProcedures<I>, input: I) {
@@ -108,6 +140,16 @@ function bind<I>(github: GithubProcedures<I>, input: I) {
 			github.setPullRequestState.mutate({ ...input, state }),
 		setDraft: (draft: boolean) =>
 			github.setPullRequestDraft.mutate({ ...input, draft }),
+		stack: () => github.getPullRequestStack.query(input),
+		requestMerge: (request: AsyncMergeRequest) =>
+			github.requestPullRequestMerge.mutate({ ...input, ...request }),
+		mergeResult: (uuid: string) =>
+			github.getPullRequestMergeResult.query({ ...input, uuid }),
+		createStack: (pullRequests: number[]) =>
+			github.createPullRequestStack.mutate({ ...input, pullRequests }),
+		enqueue: (sha?: string) =>
+			github.enqueuePullRequest.mutate({ ...input, ...(sha ? { sha } : {}) }),
+		dequeue: () => github.dequeuePullRequest.mutate(input),
 	};
 }
 
@@ -200,6 +242,98 @@ export async function setPullRequestDraft(
 	deps: PullRequestGateways = gateways,
 ): Promise<void> {
 	await (await githubFor(target, deps)).setDraft(draft);
+}
+
+/** An API that predates the read has no stacks to show. */
+export async function readPullRequestStack(
+	target: PullRequestTarget,
+	deps: PullRequestGateways = gateways,
+): Promise<PullRequestStack | null> {
+	try {
+		return await (await githubFor(target, deps)).stack();
+	} catch (error) {
+		if (isMissingProcedureError(error)) return null;
+		throw error;
+	}
+}
+
+/**
+ * `pending`: GitHub is still merging after every poll. `unavailable`: the
+ * repository has no background merge, or the API predates it.
+ */
+export type BackgroundMergeOutcome =
+	| "merged"
+	| "enqueued"
+	| "pending"
+	| "unavailable";
+
+const MERGE_POLL_INTERVAL_MS = 1_500;
+const MERGE_POLL_LIMIT = 120;
+const MERGE_POLL_FAILURE_LIMIT = 3;
+
+export async function mergeInBackground(
+	target: PullRequestTarget,
+	request: AsyncMergeRequest,
+	deps: PullRequestGateways = gateways,
+	polling: {
+		sleep?: (ms: number) => Promise<void>;
+		intervalMs?: number;
+		limit?: number;
+	} = {},
+): Promise<BackgroundMergeOutcome> {
+	const sleep =
+		polling.sleep ??
+		((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+	const github = await githubFor(target, deps);
+	let progress: PullRequestMergeProgress;
+	try {
+		progress = await github.requestMerge(request);
+	} catch (error) {
+		if (isMissingProcedureError(error)) return "unavailable";
+		throw error;
+	}
+	let failures = 0;
+	for (
+		let poll = 0;
+		progress.status === "pending" && poll < (polling.limit ?? MERGE_POLL_LIMIT);
+		poll++
+	) {
+		await sleep(polling.intervalMs ?? MERGE_POLL_INTERVAL_MS);
+		try {
+			progress = await github.mergeResult(progress.uuid);
+			failures = 0;
+		} catch {
+			// GitHub already accepted the merge: a failed read is not a failed merge.
+			if (++failures >= MERGE_POLL_FAILURE_LIMIT) return "pending";
+		}
+	}
+	return progress.status;
+}
+
+/** `pullRequests`: the chain's numbers, bottom to top. */
+export async function createPullRequestStack(
+	target: PullRequestTarget,
+	pullRequests: number[],
+	deps: PullRequestGateways = gateways,
+): Promise<void> {
+	await (await githubFor(target, deps)).createStack(pullRequests);
+}
+
+/** `sha`: the head the person looked at. */
+export async function enqueuePullRequest(
+	target: PullRequestTarget,
+	sha?: string,
+	deps: PullRequestGateways = gateways,
+): Promise<void> {
+	await (await githubFor(target, deps)).enqueue(sha);
+}
+
+/** Leaving the queue also takes every stacked pull request above this one out. */
+export async function dequeuePullRequest(
+	target: PullRequestTarget,
+	deps: PullRequestGateways = gateways,
+): Promise<void> {
+	await (await githubFor(target, deps)).dequeue();
 }
 
 /** The person has no GitHub login here and no Superset connection; connecting fixes it. */

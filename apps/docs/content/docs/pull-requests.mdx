@@ -55,12 +55,25 @@ From the detail header:
 
 - **Start Workspace** - check out the PR into a new workspace to run, test, or continue it. See [Workspaces](/workspaces)
 - **Merge** - choose **Squash and merge** (combine all commits), **Merge commit** (preserve commit history), or **Rebase and merge** (reapply all commits)
+- **Merge stack** - when the PR sits in a stack, the button names how many PRs it lands, and the confirmation lists each one
+- **Add to merge queue** - on a base branch that uses a merge queue, add the PR (or the whole stack) to the queue, see its position, and remove it again
 - **Close** / reopen the PR
 - Open the PR on GitHub
 
 <Callout type="info">
 Merging, closing, and commenting act on the real PR through your GitHub connection - same permissions, same effects as doing it on github.com.
 </Callout>
+
+### Stacked PRs
+
+A PR whose base branch is another PR's branch is part of a stack. Paradev uses GitHub's own stack when there is one, and otherwise infers the chain from base branches. A stack chip (for example **2/4**) appears on the PR. Click it to see:
+
+- One verdict for the stack, with the reason when a merge is blocked
+- A status for each layer
+- **Create GitHub stack**: turn a chain of base branches into a GitHub stack
+- **Restack**: shown when the branch still carries a layer that already merged below it
+
+A merge lands every open layer below the PR, so a blocker in a lower layer blocks the layers above it.
 
 ### Open a PR from a Workspace
 

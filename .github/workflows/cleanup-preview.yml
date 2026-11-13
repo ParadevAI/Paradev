@@ -9,11 +9,32 @@ jobs:
     name: Cleanup Preview Resources
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: preview
     permissions:
       contents: read
       pull-requests: write
 
     steps:
+      - name: Setup Bun for owned-domain cleanup
+        if: contains(github.event.pull_request.labels.*.name, 'domain-preview')
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: 1.4.3
+
+      - name: Remove owned preview aliases
+        if: contains(github.event.pull_request.labels.*.name, 'domain-preview')
+        continue-on-error: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          failed=0
+          for host in "pr-$PR_NUMBER.paradev.com" "app.pr-$PR_NUMBER.paradev.com" "api.pr-$PR_NUMBER.paradev.com"; do
+            bunx vercel@50.22.1 alias rm "$host" --yes --scope="$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" || failed=1
+          done
+          exit "$failed"
+
       - name: Delete Neon branch
         id: neon-cleanup
         uses: neondatabase/delete-branch-action@4468d825d5a88ef4012f1705a82f02ec3072f776 # v3.2.1

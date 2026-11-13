@@ -1,1 +1,4 @@
-export { openPullRequestPaneInStore } from "./openPullRequestPaneInStore";
+export {
+	findVisiblePullRequestNumber,
+	openPullRequestPaneInStore,
+} from "./openPullRequestPaneInStore";

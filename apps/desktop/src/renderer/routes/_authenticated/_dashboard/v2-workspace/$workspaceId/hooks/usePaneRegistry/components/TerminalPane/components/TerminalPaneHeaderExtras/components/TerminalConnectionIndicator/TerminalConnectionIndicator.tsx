@@ -373,8 +373,8 @@ export function TerminalConnectionIndicator({
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							<Trans>
-								This closes every terminal session — in this workspace and any
-								others — and can't be undone. If they're only briefly stuck,
+								This closes every terminal session, in this workspace and any
+								others, and can't be undone. If they're only briefly stuck,
 								waiting usually brings them back.
 							</Trans>
 						</AlertDialogDescription>

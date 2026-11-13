@@ -38,8 +38,6 @@ export interface BrowserPaneData {
 	url: string;
 	pageTitle?: string;
 	faviconUrl?: string | null;
-	/** Opened by an agent: it runs in the agent session, without the user's extensions. */
-	agent?: true;
 }
 
 export interface DevtoolsPaneData {
@@ -106,6 +104,8 @@ export interface PendingCloudChatPaneData {
 
 export interface ChatPaneData {
 	terminalId: string;
+	/** Set on a pane opened onto a chat that is still moving to this host. */
+	awaitingMove?: boolean;
 	draftId?: string;
 	sessionId: string | null;
 	agent?: {
@@ -182,8 +182,7 @@ export type WorkspaceSearchKey =
 	| "subagentType"
 	| "openUrl"
 	| "openUrlTarget"
-	| "openUrlRequestId"
-	| "openUrlAgent";
+	| "openUrlRequestId";
 
 /**
  * Drops the search params a deep link arrived with, once the hook that owns

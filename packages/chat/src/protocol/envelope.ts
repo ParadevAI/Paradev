@@ -99,6 +99,8 @@ export const sessionStateSchema = z.looseObject({
 	usageLimit: usageLimitSchema.optional(),
 	/** The queue paused for a usage limit, which stays the reason after its notice is dismissed. */
 	queuePausedByLimit: z.boolean().optional(),
+	/** The queue was waiting when Paradev closed, and stays paused until someone resumes it. */
+	queuePausedByShutdown: z.boolean().optional(),
 	backgroundTasks: z.array(backgroundTaskSchema).optional(),
 	awaitingBackground: z.boolean().optional(),
 });
@@ -114,6 +116,7 @@ export const TURN_FAILURE_KINDS = [
 	"refused",
 	"usage_limit",
 	"session_lost",
+	"host_stopped",
 	"unknown",
 ] as const;
 export const turnFailureKindSchema = z.enum(TURN_FAILURE_KINDS);
@@ -129,6 +132,17 @@ export const turnErrorSchema = z.looseObject({
 	loginCommand: z.string().optional(),
 });
 export type TurnError = z.infer<typeof turnErrorSchema>;
+
+const USAGE_LIMIT_MESSAGE =
+	/(?:usage|spend|spending|monthly|weekly|daily) limits? (?:reached|exceeded)|(?:reached|hit) your (?:[\w'-]+ ){0,4}(?:usage|spend|spending) limits?|hit your (?:usage )?limit|(?:quota|credits?) (?:exceeded|exhausted|depleted)|exceeded your current quota|insufficient[_ ](?:quota|credits)|credit balance is too low/i;
+
+/** Gemini words a per-minute 429 as "exceeded your current quota" and links its rate-limit docs. */
+const RATE_LIMIT_MESSAGE = /rate[-_ ]?limit/i;
+
+/** Providers word a usage or spend refusal many ways; adapters often see only that text. */
+export function isUsageLimitMessage(message: string): boolean {
+	return USAGE_LIMIT_MESSAGE.test(message) && !RATE_LIMIT_MESSAGE.test(message);
+}
 
 export const turnSchema = z.looseObject({
 	id: z.string().min(1),

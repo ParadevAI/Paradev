@@ -12,7 +12,6 @@ import {
 	addPendingChatStop,
 	removePendingChatStop,
 } from "../../../../utils/pendingChatStops";
-import { CHAT_ADOPT_MAX_LIVE_CHATS } from "../../constants";
 import { chatSessionsToAdopt } from "./chatSessionsToAdopt";
 
 const NOW = 1_000_000;
@@ -82,7 +81,7 @@ describe("chatSessionsToAdopt", () => {
 		expect(target?.terminalId).toBe("mobile");
 	});
 
-	it("skips dead, unsupported, closed, and already shown chats", () => {
+	it("skips unsupported, closed, and already shown chats", () => {
 		const store = createWorkspaceStore<PaneViewerData>();
 		store.getState().addTab({
 			panes: [
@@ -124,7 +123,8 @@ describe("chatSessionsToAdopt", () => {
 		expect(
 			adoptedIds(
 				[
-					listed("dead", { live: false }),
+					listed("closed-by-host", { live: false, closedAt: NOW }),
+					listed("closed-by-user", { live: false, closedByUser: true }),
 					listed("unknown", { harness: "unknown" }),
 					listed("closed"),
 					listed("shown"),
@@ -136,16 +136,26 @@ describe("chatSessionsToAdopt", () => {
 		).toEqual([]);
 	});
 
-	it("adopts a chat however long it was idle, but only among the most recent live chats", () => {
-		const sessions = Array.from(
-			{ length: CHAT_ADOPT_MAX_LIVE_CHATS + 2 },
-			(_, index) => listed(`chat-${index}`, { updatedAt: index }),
+	it("adopts every open chat, running or finished", () => {
+		const sessions = Array.from({ length: 12 }, (_, index) =>
+			listed(`chat-${index}`, {
+				updatedAt: index,
+				live: index % 2 === 0,
+				terminalId: index % 2 === 0 ? `terminal-chat-${index}` : null,
+			}),
 		);
-		const adopted = adoptedIds(sessions);
-		expect(adopted).toHaveLength(CHAT_ADOPT_MAX_LIVE_CHATS);
-		expect(adopted).not.toContain("chat-0");
-		expect(adopted).not.toContain("chat-1");
-		expect(adopted.at(-1)).toBe(`chat-${CHAT_ADOPT_MAX_LIVE_CHATS + 1}`);
+		expect(adoptedIds(sessions)).toEqual(
+			sessions.map((session) => session.sessionId),
+		);
+	});
+
+	it("adopts a finished chat under its session id", () => {
+		const [target] = chatSessionsToAdopt({
+			sessions: [listed("finished", { live: false, terminalId: null })],
+			tabs: [],
+			workspaceId: WORKSPACE_ID,
+		});
+		expect(target?.terminalId).toBe("finished");
 	});
 
 	it("skips chats on an ignored terminal, such as a closed tab's or a fork loader's", () => {

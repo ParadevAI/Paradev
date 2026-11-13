@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { connections, type SelectConnection } from "@superset/db/schema";
-import { and, asc, desc, eq, isNull, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, ne, type SQL } from "drizzle-orm";
 import { decryptSecret } from "../../router/plugins/crypto";
 import { ensureFreshConnection } from "./refresh";
 
@@ -157,6 +157,28 @@ export async function connectorConnections(
 		.from(connections)
 		.where(live(options, [eq(connections.connector, connector)]))
 		.orderBy(asc(connections.id));
+}
+
+/**
+ * Whether another live connection holds the same upstream grant as this one.
+ * Revoking the grant upstream would also cut that connection off.
+ */
+export async function grantSharedWithAnotherConnection(
+	connection: Pick<SelectConnection, "id" | "connector" | "externalUserId">,
+): Promise<boolean> {
+	if (!connection.externalUserId) return false;
+	const [row] = await db
+		.select({ id: connections.id })
+		.from(connections)
+		.where(
+			live({}, [
+				eq(connections.connector, connection.connector),
+				eq(connections.externalUserId, connection.externalUserId),
+				ne(connections.id, connection.id),
+			]),
+		)
+		.limit(1);
+	return row !== undefined;
 }
 
 export async function connectionById(

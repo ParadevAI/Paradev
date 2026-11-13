@@ -11,6 +11,7 @@ import {
 	setManagedEnv,
 } from "../../../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
+	getStartHookRunTerminalId,
 	getStartHookState,
 	readSandboxIdentity,
 	runSandboxArchiveHook,
@@ -89,7 +90,11 @@ export const sandboxRouter = router({
 
 	status: protectedProcedure.query(() => {
 		sandboxOnly();
-		return { ...readSandboxBootStatus(), startHook: getStartHookState() };
+		return {
+			...readSandboxBootStatus(),
+			startHook: getStartHookState(),
+			runTerminalId: getStartHookRunTerminalId(),
+		};
 	}),
 
 	/**
@@ -100,9 +105,9 @@ export const sandboxRouter = router({
 	 */
 	runStartHook: protectedProcedure
 		.input(z.object({ force: z.boolean().optional() }).optional())
-		.mutation(async ({ input }) => {
+		.mutation(async ({ ctx, input }) => {
 			sandboxOnly();
-			return await runSandboxStartHook(requireSandboxIdentity(), {
+			return await runSandboxStartHook(ctx, requireSandboxIdentity(), {
 				force: input?.force,
 			});
 		}),

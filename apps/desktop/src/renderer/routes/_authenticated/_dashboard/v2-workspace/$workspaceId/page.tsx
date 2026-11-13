@@ -4,10 +4,9 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
@@ -53,6 +52,7 @@ import {
 import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
+import { WorkspaceMoveBanner } from "./components/WorkspaceMoveBanner";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
 import {
 	type PaneArea,
@@ -77,7 +77,7 @@ import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/Browser
 import { browserRuntimeRegistry } from "./hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
 import { useRestoreExpandedPaneArea } from "./hooks/useRestoreExpandedPaneArea";
-import { useRightPaneAreaLifecycle } from "./hooks/useRightPaneAreaLifecycle";
+import { useRightSidebarHotkeys } from "./hooks/useRightSidebarHotkeys";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
@@ -106,6 +106,7 @@ import {
 	findVisibleChangesPane,
 	openChangesPaneInStore,
 } from "./utils/openChangesPaneInStore";
+import { findVisiblePullRequestNumber } from "./utils/openPullRequestPaneInStore";
 import { openSubagentPaneInStore } from "./utils/openSubagentPaneInStore";
 import type { V2WorkspaceUrlOpenTarget } from "./utils/openUrlInV2Workspace";
 
@@ -127,7 +128,6 @@ interface WorkspaceSearch {
 	openUrl?: string;
 	openUrlTarget?: V2WorkspaceUrlOpenTarget;
 	openUrlRequestId?: string;
-	openUrlAgent?: true;
 }
 
 function parseOpenUrlTarget(
@@ -153,7 +153,6 @@ export const Route = createFileRoute(
 		openUrl: parseNonEmptyString(raw.openUrl),
 		openUrlTarget: parseOpenUrlTarget(raw.openUrlTarget),
 		openUrlRequestId: parseNonEmptyString(raw.openUrlRequestId),
-		openUrlAgent: raw.openUrlAgent === true ? true : undefined,
 	}),
 });
 
@@ -201,7 +200,6 @@ function V2WorkspaceContent() {
 		openUrl,
 		openUrlTarget,
 		openUrlRequestId,
-		openUrlAgent,
 	} = Route.useSearch();
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
@@ -229,9 +227,8 @@ function V2WorkspaceContent() {
 		setShowPresetsBar,
 	} = useV2UserPreferences();
 	const showPresetsBar = v2UserPreferences.showPresetsBar;
-	const { store, isLayoutReady, hasRow } = useV2WorkspacePaneLayout();
-	const rightPaneAreaFlag = useRightPaneAreaEnabled();
-	const isRightPaneAreaEnabled = rightPaneAreaFlag === true;
+	const { store, isLayoutReady } = useV2WorkspacePaneLayout();
+	const isRightPaneAreaEnabled = useRightPaneAreaEnabled();
 	const {
 		isOpen: sidebarOpen,
 		setOpen: setRightSidebarOpen,
@@ -251,14 +248,6 @@ function V2WorkspaceContent() {
 		centerStore: store,
 		rightStore,
 		isReady: isLayoutReady && isRightLayoutReady,
-	});
-	useRightPaneAreaLifecycle({
-		workspaceId,
-		flag: rightPaneAreaFlag,
-		centerStore: store,
-		rightStore,
-		isReady: isLayoutReady && isRightLayoutReady,
-		hasRow,
 	});
 	const openRightSidebar = useCallback(
 		() => setRightSidebarOpen(true),
@@ -306,11 +295,9 @@ function V2WorkspaceContent() {
 		openNewChat,
 		focusAgentTerminal,
 	} = useAgentSessionLauncher({ workspaceId, store });
-	const acpChat = useAcpChatEnabled();
 	const addChatTab = useCallback(() => {
 		void openNewChat();
 	}, [openNewChat]);
-	const onAddChat = acpChat ? addChatTab : undefined;
 	const {
 		matchedPresets,
 		newTabPresets,
@@ -378,7 +365,6 @@ function V2WorkspaceContent() {
 		url: openUrl,
 		target: openUrlTarget,
 		requestId: openUrlRequestId,
-		agent: openUrlAgent,
 		consumeSearch,
 	});
 
@@ -467,6 +453,10 @@ function V2WorkspaceContent() {
 		store,
 		(state) => findVisibleChangesPane(state) != null,
 	);
+	const viewingPullRequestNumber = useStore(
+		store,
+		findVisiblePullRequestNumber,
+	);
 	const isRightChangesTabOpen = useStore(
 		rightStore,
 		(state) => findVisibleChangesPane(state) != null,
@@ -539,6 +529,9 @@ function V2WorkspaceContent() {
 	const onBeforeCloseTab = useTabCloseGuard(store);
 	const onBeforeCloseRightTab = useTabCloseGuard(rightStore);
 	const activeAreaRef = useRef<PaneArea>("center");
+	const [focusedArea, setFocusedArea] = useState<PaneArea>("center");
+	const isRightAreaFocused =
+		isRightPaneAreaEnabled && sidebarOpen && focusedArea === "right";
 	const getCloseTarget = useCallback(
 		() =>
 			isRightPaneAreaEnabled && sidebarOpen && activeAreaRef.current === "right"
@@ -577,8 +570,17 @@ function V2WorkspaceContent() {
 		isSandbox,
 		isMobilePaneEnabled,
 	});
+	useRightSidebarHotkeys({
+		centerStore: store,
+		rightStore,
+		enabled: isRightPaneAreaEnabled,
+		isOpen: sidebarOpen,
+		isExpanded: rightPaneMode === "expanded",
+		open: openRightSidebar,
+		activeAreaRef,
+	});
 	useHotkey("QUICK_OPEN", handleQuickOpen);
-	useHotkey("NEW_CHAT", addChatTab, { enabled: acpChat });
+	useHotkey("NEW_CHAT", addChatTab);
 	useHotkey("RUN_WORKSPACE_COMMAND", () => {
 		void workspaceRun.toggleWorkspaceRun();
 	});
@@ -638,6 +640,7 @@ function V2WorkspaceContent() {
 			toolbar={renderWorkspaceToolbar(true)}
 			isFullScreen={rightPaneMode === "expanded"}
 			onToggleFullScreen={toggleRightPaneAreaFullScreen}
+			isFocused={isRightAreaFocused}
 		/>
 	);
 
@@ -649,6 +652,7 @@ function V2WorkspaceContent() {
 					<WorkspaceSplitLayout
 						mode={rightPaneMode}
 						activeAreaRef={activeAreaRef}
+						onActiveAreaChange={setFocusedArea}
 						{...(isRightPaneAreaEnabled
 							? {
 									width: v2UserPreferences.rightPaneAreaWidth,
@@ -695,6 +699,7 @@ function V2WorkspaceContent() {
 							data-pane-area="center"
 						>
 							{rightPaneMode !== "expanded" && <HostConnectionPill />}
+							<WorkspaceMoveBanner workspaceId={workspaceId} />
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}
@@ -703,6 +708,7 @@ function V2WorkspaceContent() {
 										inert: rightPaneMode === "expanded",
 									})}
 									appearance={isParadevShell ? "cards" : "default"}
+									isFocused={!isRightAreaFocused}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}
@@ -727,7 +733,7 @@ function V2WorkspaceContent() {
 										<AddTabMenu
 											onAddTerminal={addTerminalTab}
 											runAfterClose={runAfterClose}
-											onAddChat={onAddChat}
+											onAddChat={addChatTab}
 											onAddBrowser={
 												isRightPaneAreaEnabled ? undefined : addBrowserTab
 											}
@@ -768,6 +774,9 @@ function V2WorkspaceContent() {
 															isChangesOpen={isChangesOpen}
 															onToggleChanges={toggleChanges}
 															onOpenPullRequest={openPullRequestPane}
+															viewingPullRequestNumber={
+																viewingPullRequestNumber
+															}
 														/>
 													)}
 													{/* Open-in must not depend on the right sidebar being open,
@@ -788,7 +797,7 @@ function V2WorkspaceContent() {
 										<WorkspaceEmptyState
 											onOpenBrowser={addBrowserTab}
 											onOpenChanges={openChanges}
-											onOpenChat={onAddChat}
+											onOpenChat={addChatTab}
 											onOpenQuickOpen={handleQuickOpen}
 											onOpenTerminal={addTerminalTab}
 										/>

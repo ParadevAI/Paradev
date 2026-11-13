@@ -29,6 +29,7 @@ import {
 } from "../../lib/sandbox";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { userError } from "../../trpc";
+import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { assertMayBoot } from "./meter";
@@ -308,6 +309,15 @@ export async function queueProvision(
 			from: ["provisioning"],
 			to: "failed",
 		});
+		await failChatMovesTo(
+			job.cloudWorkspaceId,
+			"The cloud workspace could not start",
+		).catch((moveError) =>
+			console.error(
+				`[cloud-workspace] could not fail the chat moves into ${job.cloudWorkspaceId}`,
+				moveError,
+			),
+		);
 		console.error(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,

@@ -3,17 +3,17 @@ import type { AppRouter } from "@superset/host-service";
 import { Spinner } from "@superset/ui/spinner";
 import type { inferRouterOutputs } from "@trpc/server";
 import { memo, useCallback, useDeferredValue, useMemo, useState } from "react";
+import { ChangesListHeader } from "renderer/routes/_authenticated/_dashboard/components/ChangesListHeader";
+import { ChangesSearchInput } from "renderer/routes/_authenticated/_dashboard/components/ChangesSearchInput";
+import { useFoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
+import { filterChangedFiles } from "renderer/routes/_authenticated/_dashboard/utils/filterChangedFiles";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type {
 	ChangesFilter,
 	ChangesViewMode,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
-import type { FoldSignal } from "../ChangesFileList";
 import { ChangesFileList } from "../ChangesFileList";
 import { ChangesToolbar } from "../ChangesToolbar";
-import { ChangesListOptionsMenu } from "./components/ChangesListOptionsMenu";
-import { ChangesSearchInput } from "./components/ChangesSearchInput";
-import { filterChangesetFiles } from "./filterChangesetFiles";
 import { shouldShowChangesLoading } from "./shouldShowChangesLoading";
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
@@ -73,23 +73,7 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	canRenameBranch,
 	compact = false,
 }: ChangesTabContentProps) {
-	const [foldSignal, setFoldSignal] = useState<FoldSignal>({
-		epoch: 0,
-		action: "expand",
-	});
-	const foldCollapsed =
-		foldSignal.epoch > 0 && foldSignal.action === "collapse";
-	const toggleFold = useCallback(
-		() =>
-			setFoldSignal((s) => {
-				const wasCollapsed = s.epoch > 0 && s.action === "collapse";
-				return {
-					epoch: s.epoch + 1,
-					action: wasCollapsed ? "expand" : "collapse",
-				};
-			}),
-		[],
-	);
+	const { foldSignal, collapsed: foldCollapsed, toggleFold } = useFoldSignal();
 
 	// Search is view-local and deliberately not persisted: reopening the tab
 	// starts from the full list. Filtering runs on the deferred query so the
@@ -107,7 +91,7 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	}, []);
 
 	const visibleFiles = useMemo(
-		() => filterChangesetFiles(files, deferredQuery),
+		() => filterChangedFiles(files, deferredQuery),
 		[files, deferredQuery],
 	);
 	// From the query, not a length comparison: with zero changed files both
@@ -136,24 +120,14 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{compact ? (
-				<div className="flex items-center gap-1 pt-1 pr-1.5">
-					<div className="min-w-0 flex-1 [&>div]:mr-0">
-						<ChangesSearchInput
-							query={searchQuery}
-							onQueryChange={setSearchQuery}
-							onClose={() => setSearchQuery("")}
-							autoFocus={false}
-						/>
-					</div>
-					<div className="mt-1">
-						<ChangesListOptionsMenu
-							viewMode={viewMode}
-							onViewModeChange={onViewModeChange}
-							collapsed={foldCollapsed}
-							onToggleFold={toggleFold}
-						/>
-					</div>
-				</div>
+				<ChangesListHeader
+					query={searchQuery}
+					onQueryChange={setSearchQuery}
+					viewMode={viewMode}
+					onViewModeChange={onViewModeChange}
+					collapsed={foldCollapsed}
+					onToggleFold={toggleFold}
+				/>
 			) : (
 				<>
 					<div className="pt-1">

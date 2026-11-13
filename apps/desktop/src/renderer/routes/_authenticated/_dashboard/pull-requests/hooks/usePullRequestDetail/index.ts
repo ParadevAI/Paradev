@@ -1,10 +1,13 @@
 export {
+	type CachedPullRequestDetail,
+	cachedMergeMethods,
 	type PullRequestDetail,
 	type PullRequestDetailActor,
 	type PullRequestDetailComment,
 	type PullRequestDetailCommit,
 	type PullRequestDetailCommitAuthor,
 	type PullRequestMergeability,
+	type PullRequestMergeQueue,
 	pullRequestDetailQueryKey,
 	pullRequestDetailQueryOptions,
 	useInvalidatePullRequestDetail,

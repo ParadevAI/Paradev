@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./browser-api-url": "./src/browser-api-url.ts",
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
 			"default": "./src/agent-routines.ts"
@@ -72,6 +73,10 @@
 		"./page-tools-runtime": {
 			"types": "./src/page-tools-runtime.ts",
 			"default": "./src/page-tools-runtime.ts"
+		},
+		"./move-book": {
+			"types": "./src/move-book/index.ts",
+			"default": "./src/move-book/index.ts"
 		},
 		"./page-storage-hub": {
 			"types": "./src/page-storage-hub.ts",
@@ -201,6 +206,10 @@
 			"types": "./src/pull-request.ts",
 			"default": "./src/pull-request.ts"
 		},
+		"./github-attachment": {
+			"types": "./src/github-attachment/index.ts",
+			"default": "./src/github-attachment/index.ts"
+		},
 		"./pull-request-github": {
 			"types": "./src/pull-request-github/index.ts",
 			"default": "./src/pull-request-github/index.ts"
@@ -208,6 +217,18 @@
 		"./pull-request-detail": {
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
+		},
+		"./pull-request-merge-methods": {
+			"types": "./src/pull-request-merge-methods/index.ts",
+			"default": "./src/pull-request-merge-methods/index.ts"
+		},
+		"./pull-request-stack": {
+			"types": "./src/pull-request-stack/index.ts",
+			"default": "./src/pull-request-stack/index.ts"
+		},
+		"./pull-request-async-merge": {
+			"types": "./src/pull-request-async-merge/index.ts",
+			"default": "./src/pull-request-async-merge/index.ts"
 		},
 		"./pull-request-checks": {
 			"types": "./src/pull-request-checks/index.ts",
@@ -525,7 +546,7 @@
 	},
 	"dependencies": {
 		"@date-fns/tz": "1.4.1",
-		"@lingui/core": "6.8.0",
+		"@lingui/core": "6.12.0",
 		"@superset/i18n": "workspace:*",
 		"culori": "4.0.2",
 		"drizzle-orm": "0.45.2",
@@ -533,14 +554,16 @@
 		"jose": "6.2.13",
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
+		"shell-quote": "1.11.0",
 		"smol-toml": "1.9.1",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/culori": "4.0.1",
 		"@types/friendly-words": "1.2.2",
 		"@types/semver": "7.7.1",
+		"@types/shell-quote": "1.7.5",
 		"@xterm/xterm": "6.1.0-beta.315",
 		"bun-types": "1.4.3",
 		"typescript": "7.0.2"

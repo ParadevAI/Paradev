@@ -16,7 +16,7 @@ export function PluginKindBadges({ plugin }: { plugin: PluginCatalogEntry }) {
 		mcp: {
 			label: t({ message: "MCP" }),
 			tooltip: t({
-				message: "Remote MCP server — connects over HTTP",
+				message: "Remote MCP server, connects over HTTP",
 			}),
 		},
 		cli: {

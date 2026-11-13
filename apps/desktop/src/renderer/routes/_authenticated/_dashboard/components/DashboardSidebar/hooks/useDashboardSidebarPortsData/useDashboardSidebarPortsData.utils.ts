@@ -129,6 +129,7 @@ export function deriveHostPortQueryTargets({
 	relayUrl,
 	workspaces,
 	fallbackOrganizationId,
+	openSandbox = null,
 }: {
 	activeHostUrl: string | null;
 	hosts: DashboardSidebarHostRow[];
@@ -137,6 +138,15 @@ export function deriveHostPortQueryTargets({
 	workspaces: DashboardSidebarWorkspaceRow[];
 	/** Org for the synthesized local target — see derivePullRequestQueryTargets. */
 	fallbackOrganizationId?: string | null;
+	/**
+	 * The open cloud workspace's sandbox. Only that one: asking a sandbox for
+	 * its ports keeps it awake, and a sidebar of cloud rows must not.
+	 */
+	openSandbox?: {
+		workspaceId: string;
+		organizationId: string;
+		url: string;
+	} | null;
 }): HostPortsQueryTarget[] {
 	const workspaceIdsByHostId = new Map<string, string[]>();
 	for (const workspace of workspaces) {
@@ -154,7 +164,7 @@ export function deriveHostPortQueryTargets({
 		.map((workspace) => workspace.id)
 		.sort((a, b) => a.localeCompare(b));
 
-	const targets = hosts.flatMap((host) => {
+	const targets: HostPortsQueryTarget[] = hosts.flatMap((host) => {
 		const workspaceIds = workspaceIdsByHostId.get(host.machineId);
 		if (!workspaceIds || workspaceIds.length === 0) return [];
 
@@ -207,6 +217,19 @@ export function deriveHostPortQueryTargets({
 				workspaceIds: allWorkspaceIds,
 			});
 		}
+	}
+
+	if (
+		openSandbox &&
+		workspaces.some((workspace) => workspace.id === openSandbox.workspaceId)
+	) {
+		targets.push({
+			organizationId: openSandbox.organizationId,
+			machineId: openSandbox.workspaceId,
+			hostType: "cloud",
+			hostUrl: openSandbox.url,
+			workspaceIds: [openSandbox.workspaceId],
+		});
 	}
 
 	return targets;

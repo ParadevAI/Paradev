@@ -47,6 +47,7 @@ function detail(checks: PullRequestCheck[] = []): PullRequestDetail {
 			requiresThreadResolution: false,
 			queue: null,
 			allowedMergeMethods: ["squash"],
+			defaultMergeMethod: "squash",
 		},
 		capabilities: {
 			merge: true,
