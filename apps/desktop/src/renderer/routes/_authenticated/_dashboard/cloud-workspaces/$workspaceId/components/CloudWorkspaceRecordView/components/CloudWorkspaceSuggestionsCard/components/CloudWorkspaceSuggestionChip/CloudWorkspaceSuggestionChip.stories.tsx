@@ -7,8 +7,6 @@ import { CloudWorkspaceSuggestionChip } from "./CloudWorkspaceSuggestionChip";
 const task = {
 	id: "t2",
 	slug: "SUPER-2384",
-	externalProvider: null,
-	externalKey: null,
 	title: "Mobile: block comment popover on small screens",
 	status: { type: "started", color: "#f2c94c", progressPercent: 50 },
 };

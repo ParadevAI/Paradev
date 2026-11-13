@@ -322,8 +322,6 @@ function TaskRow({
 	taskData: {
 		id: string;
 		slug: string;
-		externalProvider: string | null;
-		externalKey: string | null;
 		title: string;
 		statusColor: string;
 		statusType: string;

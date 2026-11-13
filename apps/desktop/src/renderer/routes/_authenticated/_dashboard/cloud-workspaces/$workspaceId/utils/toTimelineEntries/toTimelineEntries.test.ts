@@ -8,8 +8,6 @@ const kiet = { userId: "kiet", name: "Kiet Ho", image: null };
 const task = {
 	id: "t1",
 	slug: "SUPER-1",
-	externalProvider: null,
-	externalKey: null,
 	title: "A task",
 	status: null,
 };

@@ -137,15 +137,6 @@ export interface Task {
 	labels: string[];
 	branch: string | null;
 	prUrl: string | null;
-	externalProvider: string | null;
-	externalId: string | null;
-	externalKey: string | null;
-	externalUrl: string | null;
-	lastSyncedAt: string | null;
-	syncError: string | null;
-	assigneeExternalId: string | null;
-	assigneeDisplayName: string | null;
-	assigneeAvatarUrl: string | null;
 	startedAt: string | null;
 	completedAt: string | null;
 	deletedAt: string | null;

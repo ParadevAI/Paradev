@@ -1,5 +1,4 @@
 import { db, dbWs } from "@superset/db/client";
-import type { IntegrationProvider } from "@superset/db/enums";
 import {
 	cloudWorkspaceActivity,
 	cloudWorkspaceLabels,
@@ -17,7 +16,6 @@ import {
 	teams,
 	users,
 } from "@superset/db/schema";
-import { retiredTaskColumns } from "@superset/db/task-list-query";
 import { MAX_ATTACHMENTS } from "@superset/shared/attachment-limits";
 import { LABELS_MAX_PER_WORKSPACE } from "@superset/shared/labels";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -43,8 +41,6 @@ const DESCRIPTION_MAX_LENGTH = 20_000;
 export const taskColumns = {
 	id: tasks.id,
 	slug: tasks.slug,
-	externalProvider: retiredTaskColumns.externalProvider,
-	externalKey: retiredTaskColumns.externalKey,
 	title: tasks.title,
 	statusType: taskStatuses.type,
 	statusColor: taskStatuses.color,
@@ -54,8 +50,6 @@ export const taskColumns = {
 type TaskColumns = {
 	id: string;
 	slug: string;
-	externalProvider: IntegrationProvider | null;
-	externalKey: string | null;
 	title: string;
 	statusType: string | null;
 	statusColor: string | null;
@@ -66,8 +60,6 @@ export function toTaskChip(row: TaskColumns) {
 	return {
 		id: row.id,
 		slug: row.slug,
-		externalProvider: row.externalProvider,
-		externalKey: row.externalKey,
 		title: row.title,
 		status:
 			row.statusType && row.statusColor
@@ -365,8 +357,6 @@ export const cloudWorkspaceRecordRouter = {
 					linkedTask: {
 						id: linkedTask.id,
 						slug: linkedTask.slug,
-						externalProvider: retiredTaskColumns.externalProvider,
-						externalKey: retiredTaskColumns.externalKey,
 						title: linkedTask.title,
 						statusType: linkedStatus.type,
 						statusColor: linkedStatus.color,
@@ -375,8 +365,6 @@ export const cloudWorkspaceRecordRouter = {
 					unlinkedTask: {
 						id: unlinkedTask.id,
 						slug: unlinkedTask.slug,
-						externalProvider: retiredTaskColumns.externalProvider,
-						externalKey: retiredTaskColumns.externalKey,
 						title: unlinkedTask.title,
 						statusType: unlinkedStatus.type,
 						statusColor: unlinkedStatus.color,

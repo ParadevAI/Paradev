@@ -500,9 +500,6 @@ async function buildTaskListFilters(
 		creatorId: input?.creatorMe ? userId : undefined,
 		search: input?.search ?? undefined,
 		labels: input?.labels ?? undefined,
-		externalProjectId: input?.externalProjectId ?? undefined,
-		externalProjectName: input?.externalProjectName ?? undefined,
-		externalCycleId: input?.externalCycleId ?? undefined,
 		dueDateFrom: dueDateRange.from,
 		dueDateTo: dueDateRange.to,
 	});

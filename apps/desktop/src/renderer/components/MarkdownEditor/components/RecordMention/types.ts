@@ -4,8 +4,6 @@ export type RecordMentionItem =
 			kind: "task";
 			id: string;
 			slug: string;
-			externalProvider: string | null;
-			externalKey: string | null;
 			title: string;
 			status: { type: string; color: string; progressPercent: number | null };
 	  }

@@ -14,8 +14,6 @@ const meta = {
 		task: {
 			id: "t1",
 			slug: "SUPER-2311",
-			externalProvider: null,
-			externalKey: null,
 			title: "Plugins in cloud boxes",
 			status: { type: "started", color: "#f2c94c", progressPercent: 50 },
 		},
