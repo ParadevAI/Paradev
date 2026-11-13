@@ -9,6 +9,7 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ExternalTracking } from "@/components/ExternalTracking";
 import {
 	OrganizationJsonLd,
 	SoftwareApplicationJsonLd,
@@ -187,12 +188,7 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
-				<Script
-					id="paradev-external-tracking"
-					src="https://x.paradev.com/js/external-tracking.js"
-					data-tracking-id="tk_7cd75fb5e34042539263f0d7e1a98b57"
-					strategy="afterInteractive"
-				/>
+				<ExternalTracking />
 			</body>
 		</html>
 	);
