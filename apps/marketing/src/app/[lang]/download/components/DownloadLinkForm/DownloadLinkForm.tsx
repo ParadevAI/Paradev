@@ -4,7 +4,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { HiMiniArrowRight, HiMiniCheck } from "react-icons/hi2";
 import { track } from "@/lib/analytics";
-import { trackExternalFormSubmission } from "@/lib/analytics/external-tracking-runtime";
 import { sendDownloadLink } from "./actions";
 
 export function DownloadLinkForm() {
@@ -30,7 +29,6 @@ export function DownloadLinkForm() {
 			}
 
 			setSubmittedEmail(email);
-			trackExternalFormSubmission("download-link", email);
 			track("download_link_emailed", { platform: "mobile" });
 		} catch {
 			setError(

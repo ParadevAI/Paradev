@@ -5,7 +5,6 @@ export const EXTERNAL_TRACKING_ENDPOINT =
 export type ExternalTrackingForm =
 	| "contact"
 	| "enterprise"
-	| "download-link"
 	| "windows-linux-waitlist"
 	| "ios-waitlist"
 	| "android-waitlist";

@@ -35,7 +35,7 @@ export function ExternalTracking() {
 	useEffect(() => {
 		if (
 			pathname === window.location.pathname &&
-			search === window.location.search.slice(1)
+			search === new URLSearchParams(window.location.search).toString()
 		)
 			trackExternalPageView();
 	}, [pathname, search]);
