@@ -5,6 +5,7 @@ import { useDrop } from "react-dnd";
 import { useStore } from "zustand";
 import type { StoreApi } from "zustand/vanilla";
 import type { WorkspaceStore } from "../../../../../../../core/store";
+import { getSpatialNeighborPaneId } from "../../../../../../../core/store/utils";
 import {
 	transferPaneToSplit,
 	transferTabToSplit,
@@ -14,7 +15,10 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
-import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
+import {
+	usePaneAppearance,
+	usePaneJoinsLeft,
+} from "../../../../../../hooks/usePaneAppearance";
 import { usePaneAside } from "../../../../../../hooks/usePaneAside";
 import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
@@ -102,6 +106,10 @@ export function Pane<TData>({
 	// and the animation outlives that render.
 	const [springsIn] = useState(appears);
 	const isCards = usePaneAppearance() === "cards";
+	const joinsLeft =
+		usePaneJoinsLeft() &&
+		tab.layout != null &&
+		getSpatialNeighborPaneId(tab.layout, pane.id, "left") === null;
 	const definition = registry[pane.kind];
 
 	const tabs = store.getState().tabs;
@@ -324,7 +332,7 @@ export function Pane<TData>({
 					// holds both the header's absolute popovers and the pane's banners.
 					className={
 						isCards
-							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none${springsIn ? " animate-pane-appear motion-reduce:animate-none" : ""}`
+							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none${joinsLeft ? " rounded-l-none" : ""}${springsIn ? " animate-pane-appear motion-reduce:animate-none" : ""}`
 							: `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
 									isActive && parentDirection !== null
 										? "border-primary/15"

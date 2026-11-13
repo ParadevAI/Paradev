@@ -103,6 +103,7 @@ export function RightPaneArea({
 			<Workspace<PaneViewerData>
 				{...titleBarTabBarProps(titleBarSideSlot, { paneArea: "right" })}
 				appearance={isParadevShell ? "cards" : "default"}
+				className={isParadevShell ? "bg-shell-frame pl-1.5" : undefined}
 				keepAliveTabs={RIGHT_PANE_KEPT_TABS}
 				registry={registry}
 				paneActions={rightPaneActions}

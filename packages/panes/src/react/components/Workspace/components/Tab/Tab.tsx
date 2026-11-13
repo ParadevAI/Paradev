@@ -3,7 +3,6 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@superset/ui/resizable";
-import { cn } from "@superset/ui/utils";
 import { useEffect, useRef } from "react";
 import type { StoreApi } from "zustand/vanilla";
 import type { WorkspaceStore } from "../../../../../core/store";
@@ -405,7 +404,6 @@ export function Tab<TData>({
 	onPaneError,
 	onSplitResizeDragging,
 }: TabProps<TData>) {
-	const isCards = usePaneAppearance() === "cards";
 	const newPaneIds = useNewPaneIds(
 		tab.id,
 		tab.layout ? getPaneIdsInLayout(tab.layout) : [],
@@ -422,12 +420,7 @@ export function Tab<TData>({
 		// isolate contains the resize handles' z-indexes so they never paint
 		// above body-portalled overlays (dialogs, menus).
 		<PaneAsideTargetContext.Provider value={topRightPaneId(tab.layout)}>
-			<div
-				className={cn(
-					"isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto",
-					isCards && "p-1.5",
-				)}
-			>
+			<div className="isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto">
 				<LayoutNodeView
 					store={store}
 					tab={tab}

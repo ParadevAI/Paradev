@@ -283,7 +283,7 @@ function DashboardLayout() {
 						<CommandPaletteHost />
 						<WindowFocusSync />
 						<TitleBarSlotsProvider>
-							<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
+							<div className="flex h-full w-full flex-col overflow-hidden bg-shell-frame">
 								<TitleBar />
 								<ChatTabs />
 								<div className="flex min-h-0 flex-1">
@@ -293,14 +293,16 @@ function DashboardLayout() {
 										className={
 											isWorkspaceSidebarCollapsed
 												? "overflow-visible border-r-0"
-												: "border-r-0"
+												: "mb-1.5 h-auto self-stretch rounded-l-[10px] border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
 										}
 									>
 										<DashboardSidebar
 											isCollapsed={isWorkspaceSidebarCollapsed}
 										/>
 									</WorkspaceSidebarPanel>
-									<ContentCard>{content}</ContentCard>
+									<ContentCard joinsSidebar={!isWorkspaceSidebarCollapsed}>
+										{content}
+									</ContentCard>
 								</div>
 							</div>
 						</TitleBarSlotsProvider>

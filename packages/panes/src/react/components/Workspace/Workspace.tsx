@@ -4,7 +4,10 @@ import { useDragLayer } from "react-dnd";
 import { useStore } from "zustand";
 import { isPaneInLinkedStore } from "../../../core/transfer";
 import type { Pane, Tab as TabType } from "../../../types";
-import { PaneAppearanceContext } from "../../hooks/usePaneAppearance";
+import {
+	PaneAppearanceContext,
+	PaneJoinsLeftContext,
+} from "../../hooks/usePaneAppearance";
 import { PaneAsideRenderContext } from "../../hooks/usePaneAside";
 import type { WorkspaceProps } from "../../types";
 import { KeptTab } from "./components/KeptTab";
@@ -19,6 +22,7 @@ const NO_KEPT_TABS: readonly KeptTabEntry[] = [];
 
 export function Workspace<TData>({
 	appearance = "default",
+	joinsLeft = false,
 	store,
 	registry,
 	className,
@@ -196,54 +200,56 @@ export function Workspace<TData>({
 
 	return (
 		<PaneAppearanceContext.Provider value={appearance}>
-			<PaneAsideRenderContext.Provider value={renderPaneAside}>
-				<div
-					className={cn(
-						"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground",
-						appearance === "cards" ? "bg-sidebar" : "bg-background",
-						className,
-					)}
-				>
-					{renderTabBar ? renderTabBar(tabBar) : tabBar}
-					{renderBelowTabBar?.()}
-					{keepAliveTabs > 0 ? (
-						<div className="relative min-h-0 min-w-0 flex-1">
-							{mountedTabs.map((tab) => (
-								<KeptTab
-									key={tab.id}
-									isVisible={tab.id === displayedTab?.id}
-									store={store}
-									tab={tab}
-									registry={registry}
-									paneActions={paneActions}
-									contextMenuActions={contextMenuActions}
-									onPaneError={onPaneError}
-									onSplitResizeDragging={onSplitResizeDragging}
-								/>
-							))}
-							{!displayedTab && (
-								<div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-									{renderEmptyState?.() ?? "No tabs open"}
-								</div>
-							)}
-						</div>
-					) : displayedTab ? (
-						<Tab
-							store={store}
-							tab={displayedTab}
-							registry={registry}
-							paneActions={paneActions}
-							contextMenuActions={contextMenuActions}
-							onPaneError={onPaneError}
-							onSplitResizeDragging={onSplitResizeDragging}
-						/>
-					) : (
-						<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
-							{renderEmptyState?.() ?? "No tabs open"}
-						</div>
-					)}
-				</div>
-			</PaneAsideRenderContext.Provider>
+			<PaneJoinsLeftContext.Provider value={joinsLeft}>
+				<PaneAsideRenderContext.Provider value={renderPaneAside}>
+					<div
+						className={cn(
+							"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground",
+							appearance === "cards" ? "bg-sidebar" : "bg-background",
+							className,
+						)}
+					>
+						{renderTabBar ? renderTabBar(tabBar) : tabBar}
+						{renderBelowTabBar?.()}
+						{keepAliveTabs > 0 ? (
+							<div className="relative min-h-0 min-w-0 flex-1">
+								{mountedTabs.map((tab) => (
+									<KeptTab
+										key={tab.id}
+										isVisible={tab.id === displayedTab?.id}
+										store={store}
+										tab={tab}
+										registry={registry}
+										paneActions={paneActions}
+										contextMenuActions={contextMenuActions}
+										onPaneError={onPaneError}
+										onSplitResizeDragging={onSplitResizeDragging}
+									/>
+								))}
+								{!displayedTab && (
+									<div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+										{renderEmptyState?.() ?? "No tabs open"}
+									</div>
+								)}
+							</div>
+						) : displayedTab ? (
+							<Tab
+								store={store}
+								tab={displayedTab}
+								registry={registry}
+								paneActions={paneActions}
+								contextMenuActions={contextMenuActions}
+								onPaneError={onPaneError}
+								onSplitResizeDragging={onSplitResizeDragging}
+							/>
+						) : (
+							<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
+								{renderEmptyState?.() ?? "No tabs open"}
+							</div>
+						)}
+					</div>
+				</PaneAsideRenderContext.Provider>
+			</PaneJoinsLeftContext.Provider>
 		</PaneAppearanceContext.Provider>
 	);
 }

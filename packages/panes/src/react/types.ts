@@ -131,6 +131,8 @@ export type PaneAppearance = "default" | "cards";
 
 export interface WorkspaceProps<TData> {
 	appearance?: PaneAppearance;
+	/** With `cards`, panes on the left edge keep square left corners, to continue a surface beside the workspace. */
+	joinsLeft?: boolean;
 	store: StoreApi<WorkspaceStore<TData>>;
 	registry: PaneRegistry<TData>;
 	className?: string;

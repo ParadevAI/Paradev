@@ -76,15 +76,24 @@
 	/* Sidebar row fills: low-opacity foreground washes so they track any theme */
 	--fill-hover: color-mix(in oklab, var(--foreground) 7%, transparent);
 	--fill-selected: color-mix(in oklab, var(--foreground) 10%, transparent);
+	/* The redesigned shell's three surfaces: the frame (title bar, rail, gaps),
+	   then the open sidebar, then panes on --background. Mixed from the theme's
+	   own colours so every theme, custom ones included, keeps that order. */
+	--shell-frame: color-mix(in oklab, var(--foreground) 15%, var(--background));
+	--shell-sidebar: color-mix(in oklab, var(--foreground) 5%, var(--background));
 	--tab-capsule: color-mix(in oklab, var(--foreground) 7%, transparent);
 	--tab-hover: color-mix(in oklab, var(--foreground) 5%, transparent);
-	--tab-selected: color-mix(in oklab, var(--foreground) 15%, var(--sidebar));
+	--tab-selected: color-mix(
+		in oklab,
+		var(--foreground) 15%,
+		var(--shell-frame)
+	);
 	--tab-selected-shadow: inset 0 0 0 0.8px rgb(255 255 255 / 0.1);
 	--tab-switcher-hover: color-mix(in oklab, var(--foreground) 20%, #1a1716);
 	/* Tab icon cards: frosted glass over the tab bar */
 	--tab-glass-fill: color-mix(
 		in oklab,
-		color-mix(in oklab, var(--foreground) 9%, var(--sidebar)) 82%,
+		color-mix(in oklab, var(--foreground) 9%, var(--shell-frame)) 82%,
 		transparent
 	);
 	--tab-glass-sheen: rgb(255 255 255 / 0.22);
@@ -164,7 +173,7 @@
 :root[data-window-focused="false"] {
 	--tab-capsule: transparent;
 	--tab-hover: transparent;
-	--tab-selected: color-mix(in oklab, var(--foreground) 7%, var(--sidebar));
+	--tab-selected: color-mix(in oklab, var(--foreground) 7%, var(--shell-frame));
 	--tab-selected-shadow: none;
 	--tab-switcher-hover: var(--tab-selected);
 }
@@ -209,6 +218,7 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--color-shell-frame: var(--shell-frame);
 	--color-sidebar: var(--sidebar);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar-primary: var(--sidebar-primary);

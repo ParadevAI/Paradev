@@ -31,6 +31,7 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
+import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { useStore } from "zustand";
 import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useWorkspace } from "../providers/WorkspaceProvider";
@@ -210,6 +211,9 @@ function V2WorkspaceContent() {
 	const navigate = Route.useNavigate();
 	const titleBarMainSlot = useTitleBarMainSlot();
 	const isParadevShell = useParadevShell();
+	const isWorkspaceSidebarCollapsed = useWorkspaceSidebarStore((s) =>
+		s.isCollapsed(),
+	);
 	const consumeSearch = useCallback<ConsumeSearch>(
 		(keys) => {
 			void navigate({
@@ -727,6 +731,8 @@ function V2WorkspaceContent() {
 										inert: rightPaneMode === "expanded",
 									})}
 									appearance={isParadevShell ? "cards" : "default"}
+									className={isParadevShell ? "bg-shell-frame" : undefined}
+									joinsLeft={isParadevShell && !isWorkspaceSidebarCollapsed}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
 									contextMenuActions={centerContextMenuActions}

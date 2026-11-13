@@ -1,1 +1,6 @@
-export { PaneAppearanceContext, usePaneAppearance } from "./usePaneAppearance";
+export {
+	PaneAppearanceContext,
+	PaneJoinsLeftContext,
+	usePaneAppearance,
+	usePaneJoinsLeft,
+} from "./usePaneAppearance";
