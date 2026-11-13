@@ -1,19 +1,30 @@
 export type DepartedMember = { userId: string; organizationId: string };
 
+export type DepartureKind = { kind: "left" } | { kind: "removed"; by: string };
+
 type Step = (member: DepartedMember) => Promise<void>;
 
 export type MemberDepartureDeps = {
 	removeShares: Step;
 	cleanUp: Step;
-	/** Absent when the member left on their own. */
 	notifyMember?: Step;
 	syncSeats: Step;
+	reportFailure: (step: string, member: DepartedMember, error: unknown) => void;
 };
+
+/** Null for anything but a member row, such as an `APIError`. */
+export function departedMemberFrom(returned: unknown): DepartedMember | null {
+	if (!returned || typeof returned !== "object") return null;
+	const { userId, organizationId } = returned as Record<string, unknown>;
+	return typeof userId === "string" && typeof organizationId === "string"
+		? { userId, organizationId }
+		: null;
+}
 
 /**
  * Runs after the member row is gone, for both better-auth's leave route and
  * `afterRemoveMember`. The departure has already happened, so a failed step is
- * logged, not thrown.
+ * reported, not thrown.
  */
 export async function afterMemberDeparted(
 	member: DepartedMember,
@@ -30,10 +41,7 @@ export async function afterMemberDeparted(
 		try {
 			await run(member);
 		} catch (error) {
-			console.error(
-				`[member-departure] Failed to ${name} for ${member.userId} in ${member.organizationId}:`,
-				error,
-			);
+			deps.reportFailure(name, member, error);
 		}
 	}
 }

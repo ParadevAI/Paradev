@@ -56,7 +56,7 @@ import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import {
 	afterMemberDeparted,
-	type DepartedMember,
+	departedMemberFrom,
 } from "./lib/member-departure";
 import { memberDepartureDeps } from "./lib/member-departure-deps";
 import {
@@ -185,11 +185,11 @@ export const auth = betterAuth({
 		}),
 		after: createAuthMiddleware(async (ctx) => {
 			if (ctx.path === "/organization/leave") {
-				const left = ctx.context.returned;
-				if (isAPIError(left) || !left) return;
+				const member = departedMemberFrom(ctx.context.returned);
+				if (!member) return;
 				await afterMemberDeparted(
-					left as DepartedMember,
-					memberDepartureDeps({ removedByName: null }),
+					member,
+					memberDepartureDeps({ how: { kind: "left" } }),
 				);
 				return;
 			}
@@ -932,7 +932,7 @@ export const auth = betterAuth({
 					await afterMemberDeparted(
 						{ userId: user.id, organizationId: organization.id },
 						memberDepartureDeps({
-							removedByName: "A team admin",
+							how: { kind: "removed", by: "A team admin" },
 							departure: { organization, user },
 						}),
 					);

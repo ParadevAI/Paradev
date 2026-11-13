@@ -2,13 +2,13 @@ import type { MemberRemovedBillingEmail } from "@superset/email/emails/billing/m
 import type Stripe from "stripe";
 import { formatPrice } from "../../utils/billing";
 import type { NextInvoicePreview } from "../../utils/invoice-preview";
+import type { DepartureKind } from "../member-departure";
 import { seatItem } from "./autumn/subscription-row";
 
 export type SeatRemoval = {
 	organization: { id: string; name: string };
 	member: { name: string | null; email: string };
-	/** Null when the member left on their own. */
-	removedByName: string | null;
+	how: DepartureKind;
 };
 
 export type SeatRemovalDeps = {
@@ -56,7 +56,7 @@ export type SeatRemovalDeps = {
 };
 
 export async function syncSeatsAfterRemoval(
-	{ organization, member, removedByName }: SeatRemoval,
+	{ organization, member, how }: SeatRemoval,
 	deps: SeatRemovalDeps,
 ) {
 	const subscription = await deps.activeSubscription(organization.id);
@@ -99,28 +99,9 @@ export async function syncSeatsAfterRemoval(
 
 	const memberName = member.name ?? "Former member";
 	const subject =
-		removedByName === null
+		how.kind === "left"
 			? `Billing update: Member left ${organization.name}`
 			: `Billing update: Member removed from ${organization.name}`;
-	await deps.sendEmails(
-		recipients.map((recipient) => ({
-			to: recipient.email,
-			subject,
-			props: {
-				recipientName: recipient.name,
-				prorationAmount: preview?.prorationAmount ?? null,
-				nextInvoiceTotal: preview?.nextInvoiceTotal ?? null,
-				organizationName: organization.name,
-				removedMemberName: memberName,
-				removedMemberEmail: member.email,
-				removedByName,
-				newSeatCount: quantity,
-				newMonthlyTotal,
-				billingInterval,
-			},
-		})),
-	);
-
 	try {
 		await deps.notifySlack({
 			eventType: "seat_removed",
@@ -135,4 +116,23 @@ export async function syncSeatsAfterRemoval(
 			error,
 		);
 	}
+
+	await deps.sendEmails(
+		recipients.map((recipient) => ({
+			to: recipient.email,
+			subject,
+			props: {
+				recipientName: recipient.name,
+				prorationAmount: preview?.prorationAmount ?? null,
+				nextInvoiceTotal: preview?.nextInvoiceTotal ?? null,
+				organizationName: organization.name,
+				removedMemberName: memberName,
+				removedMemberEmail: member.email,
+				removedByName: how.kind === "left" ? null : how.by,
+				newSeatCount: quantity,
+				newMonthlyTotal,
+				billingInterval,
+			},
+		})),
+	);
 }

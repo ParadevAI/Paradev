@@ -81,6 +81,49 @@ export function findMemberRemovalEffects(
 	return loadEffects(db, member);
 }
 
+/** The part of `planned` that is now done: automations paused and hosts deleted. */
+export async function completedMemberRemovalEffects(
+	organizationId: string,
+	planned: MemberRemovalEffects,
+): Promise<MemberRemovalEffects> {
+	const [paused, kept] = await Promise.all([
+		planned.automations.length === 0
+			? []
+			: db
+					.select({ id: automations.id })
+					.from(automations)
+					.where(
+						and(
+							inArray(
+								automations.id,
+								planned.automations.map((row) => row.id),
+							),
+							eq(automations.enabled, false),
+						),
+					),
+		planned.hosts.length === 0
+			? []
+			: db
+					.select({ machineId: v2Hosts.machineId })
+					.from(v2Hosts)
+					.where(
+						and(
+							eq(v2Hosts.organizationId, organizationId),
+							inArray(
+								v2Hosts.machineId,
+								planned.hosts.map((row) => row.machineId),
+							),
+						),
+					),
+	]);
+	const pausedIds = new Set(paused.map((row) => row.id));
+	const keptIds = new Set(kept.map((row) => row.machineId));
+	return {
+		automations: planned.automations.filter((row) => pausedIds.has(row.id)),
+		hosts: planned.hosts.filter((row) => !keptIds.has(row.machineId)),
+	};
+}
+
 /** Runs after the membership row is gone; deleting hosts cascades their workspaces and access rows. */
 export function cleanupRemovedMember(
 	member: MemberRef,

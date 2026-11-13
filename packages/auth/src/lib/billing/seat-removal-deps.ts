@@ -14,6 +14,7 @@ import {
 } from "../../utils/billing";
 import { previewNextInvoice } from "../../utils/invoice-preview";
 import { resend } from "../resend";
+import { throwOnResendError } from "../resend-result";
 import { setAutumnSeats } from "./autumn/seats";
 import type { SeatRemovalDeps } from "./seat-removal";
 import { NOTIFY_SLACK_URL } from "./subscription-events";
@@ -44,13 +45,15 @@ export function seatRemovalDeps(): SeatRemovalDeps {
 		previewCredit: ({ customerId, subscriptionId, itemId }) =>
 			previewNextInvoice(customerId, subscriptionId, itemId, "credit"),
 		sendEmails: async (emails) => {
-			await resend.batch.send(
-				emails.map(({ to, subject, props }) => ({
-					from: NOREPLY_FROM,
-					to,
-					subject,
-					react: MemberRemovedBillingEmail(props),
-				})),
+			throwOnResendError(
+				await resend.batch.send(
+					emails.map(({ to, subject, props }) => ({
+						from: NOREPLY_FROM,
+						to,
+						subject,
+						react: MemberRemovedBillingEmail(props),
+					})),
+				),
 			);
 		},
 		notifySlack: async (body) => {

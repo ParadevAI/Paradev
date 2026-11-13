@@ -15,6 +15,10 @@ import {
 	v2UsersHosts,
 } from "@superset/db/schema";
 import { sessions } from "@superset/db/schema/auth";
+import {
+	completedMemberRemovalEffects,
+	findMemberRemovalEffects,
+} from "@superset/db/utils";
 import { eq, inArray } from "drizzle-orm";
 import {
 	createCallerFactory,
@@ -203,5 +207,21 @@ describe("leaving an organization", () => {
 		});
 
 		expect(await leaverState(LEFT_VIA_AUTH)).toEqual(LEFT);
+	});
+});
+
+test("reports none of the planned cleanup when it did not happen", async () => {
+	const planned = await findMemberRemovalEffects({
+		userId: LEAVER,
+		organizationId: STAYED_IN,
+	});
+
+	expect({
+		automations: planned.automations.length,
+		hosts: planned.hosts.length,
+	}).toEqual({ automations: 1, hosts: 1 });
+	expect(await completedMemberRemovalEffects(STAYED_IN, planned)).toEqual({
+		automations: [],
+		hosts: [],
 	});
 });

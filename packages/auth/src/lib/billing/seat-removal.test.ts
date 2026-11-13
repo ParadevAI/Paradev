@@ -8,7 +8,7 @@ import {
 const LEFT: SeatRemoval = {
 	organization: { id: "org-1", name: "Acme" },
 	member: { name: "Alice", email: "alice@example.com" },
-	removedByName: null,
+	how: { kind: "left" },
 };
 
 function fakeDeps(overrides: Partial<SeatRemovalDeps> = {}) {
@@ -94,7 +94,7 @@ describe("syncSeatsAfterRemoval", () => {
 
 		try {
 			await syncSeatsAfterRemoval(
-				{ ...LEFT, removedByName: "A team admin" },
+				{ ...LEFT, how: { kind: "removed", by: "A team admin" } },
 				deps,
 			);
 
@@ -119,6 +119,19 @@ describe("syncSeatsAfterRemoval", () => {
 		await expect(syncSeatsAfterRemoval(LEFT, deps)).rejects.toThrow(
 			"stripe down",
 		);
+	});
+
+	test("a failed billing email still sends the Slack event and reaches the caller", async () => {
+		const { deps, calls } = fakeDeps({
+			sendEmails: async () => {
+				throw new Error("Resend rate_limit_exceeded: Too many requests");
+			},
+		});
+
+		await expect(syncSeatsAfterRemoval(LEFT, deps)).rejects.toThrow(
+			"rate_limit_exceeded",
+		);
+		expect(calls.map((c) => c.method)).toContain("notifySlack");
 	});
 
 	test("writes seats to Autumn and not Stripe when Autumn owns them", async () => {

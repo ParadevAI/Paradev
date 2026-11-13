@@ -16,6 +16,7 @@ import {
 	verifications,
 } from "@superset/db/schema/auth";
 import {
+	completedMemberRemovalEffects,
 	findMemberRemovalEffects,
 	findOrgMembership,
 } from "@superset/db/utils";
@@ -632,7 +633,7 @@ export const organizationRouter = {
 				});
 			}
 
-			const effects = await findMemberRemovalEffects({
+			const planned = await findMemberRemovalEffects({
 				userId: input.userId,
 				organizationId: input.organizationId,
 			});
@@ -645,7 +646,12 @@ export const organizationRouter = {
 				headers: ctx.headers,
 			});
 
-			return { success: true, cleanup: countEffects(effects) };
+			const cleanup = await completedMemberRemovalEffects(
+				input.organizationId,
+				planned,
+			);
+
+			return { success: true, cleanup: countEffects(cleanup) };
 		}),
 
 	/**
@@ -691,7 +697,7 @@ export const organizationRouter = {
 				});
 			}
 
-			const effects = await findMemberRemovalEffects({
+			const planned = await findMemberRemovalEffects({
 				userId: ctx.session.user.id,
 				organizationId: input.organizationId,
 			});
@@ -708,6 +714,11 @@ export const organizationRouter = {
 					i18nKey: "serverError.organization.failedToLeaveOrganization",
 				});
 			}
+
+			const cleanup = await completedMemberRemovalEffects(
+				input.organizationId,
+				planned,
+			);
 
 			const otherMembership = await db.query.members.findFirst({
 				where: and(
@@ -731,7 +742,7 @@ export const organizationRouter = {
 			return {
 				success: true,
 				activeOrganizationId: otherMembership?.organizationId ?? null,
-				cleanup: countEffects(effects),
+				cleanup: countEffects(cleanup),
 			};
 		}),
 

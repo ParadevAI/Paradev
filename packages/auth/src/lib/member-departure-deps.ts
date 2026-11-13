@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { organizations, users } from "@superset/db/schema";
 import { cleanupRemovedMember } from "@superset/db/utils";
@@ -7,9 +8,14 @@ import { eq } from "drizzle-orm";
 import { alertBilling } from "./billing/autumn/alert";
 import { syncSeatsAfterRemoval } from "./billing/seat-removal";
 import { seatRemovalDeps } from "./billing/seat-removal-deps";
-import type { DepartedMember, MemberDepartureDeps } from "./member-departure";
+import type {
+	DepartedMember,
+	DepartureKind,
+	MemberDepartureDeps,
+} from "./member-departure";
 import { removeMemberShares } from "./pending-shares";
 import { resend } from "./resend";
+import { throwOnResendError } from "./resend-result";
 
 type Departure = {
 	organization: { id: string; name: string };
@@ -33,12 +39,11 @@ async function loadDeparture({
 	return organization && user ? { organization, user } : null;
 }
 
-/** `removedByName` is null when the member left on their own. */
 export function memberDepartureDeps({
-	removedByName,
+	how,
 	departure: known,
 }: {
-	removedByName: string | null;
+	how: DepartureKind;
 	departure?: Departure;
 }): MemberDepartureDeps {
 	let loaded: Promise<Departure | null> | undefined;
@@ -52,21 +57,23 @@ export function memberDepartureDeps({
 			await cleanupRemovedMember(member);
 		},
 		notifyMember:
-			removedByName === null
+			how.kind === "left"
 				? undefined
 				: async (member) => {
 						const departure = await departureOf(member);
 						if (!departure) return;
-						await resend.emails.send({
-							from: NOREPLY_FROM,
-							to: departure.user.email,
-							subject: `You've been removed from ${departure.organization.name}`,
-							react: MemberRemovedEmail({
-								memberName: departure.user.name,
-								organizationName: departure.organization.name,
-								removedByName,
+						throwOnResendError(
+							await resend.emails.send({
+								from: NOREPLY_FROM,
+								to: departure.user.email,
+								subject: `You've been removed from ${departure.organization.name}`,
+								react: MemberRemovedEmail({
+									memberName: departure.user.name,
+									organizationName: departure.organization.name,
+									removedByName: how.by,
+								}),
 							}),
-						});
+						);
 					},
 		syncSeats: async (member) => {
 			try {
@@ -76,16 +83,26 @@ export function memberDepartureDeps({
 					{
 						organization: departure.organization,
 						member: departure.user,
-						removedByName,
+						how,
 					},
 					seatRemovalDeps(),
 				);
 			} catch (error) {
 				await alertBilling(
-					`Seat sync for ${member.organizationId} failed after ${member.userId} left or was removed; check its seat count and billing emails`,
+					`Seat sync for ${member.organizationId} failed after ${member.userId} ${how.kind === "left" ? "left" : "was removed"}; check its seat count and billing emails`,
 					error,
 				);
 			}
+		},
+		reportFailure: (step, member, error) => {
+			console.error(
+				`[member-departure] Failed to ${step} for ${member.userId} in ${member.organizationId}:`,
+				error,
+			);
+			Sentry.captureException(error, {
+				tags: { memberDepartureStep: step },
+				extra: { ...member, how: how.kind },
+			});
 		},
 	};
 }
