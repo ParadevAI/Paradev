@@ -7,8 +7,11 @@ import {
 	useRef,
 	useState,
 } from "react";
+import {
+	SidebarSlide,
+	type SidebarSlideMode,
+} from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
-import { SidebarSlide, type SidebarSlideMode } from "../SidebarSlide";
 import { clampSideWidth } from "./utils/clampSideWidth";
 
 export type PaneArea = "center" | "right";

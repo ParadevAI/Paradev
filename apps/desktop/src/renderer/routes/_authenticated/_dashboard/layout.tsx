@@ -42,6 +42,7 @@ import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMount";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
+import { SidebarSlide } from "./components/SidebarSlide";
 import { TitleBar } from "./components/TitleBar";
 import { TopBar } from "./components/TopBar";
 import { WindowFocusSync } from "./components/WindowFocusSync";
@@ -149,6 +150,9 @@ function DashboardLayout() {
 	);
 	const isWorkspaceSidebarCollapsed = useWorkspaceSidebarStore((s) =>
 		s.isCollapsed(),
+	);
+	const workspaceSidebarOpenWidth = useWorkspaceSidebarStore((s) =>
+		s.isCollapsed() ? s.lastExpandedWidth : s.width,
 	);
 
 	// Global hotkeys for dashboard
@@ -288,18 +292,22 @@ function DashboardLayout() {
 								<ChatTabs />
 								<div className="flex min-h-0 flex-1">
 									<NavigationRail />
-									<WorkspaceSidebarPanel
-										collapsedWidth={0}
-										className={
-											isWorkspaceSidebarCollapsed
-												? "overflow-visible border-r-0"
-												: "mb-1.5 h-auto self-stretch rounded-l-[10px] border-y border-l border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
-										}
+									<SidebarSlide
+										side="left"
+										mode={isWorkspaceSidebarCollapsed ? "closed" : "open"}
+										width={workspaceSidebarOpenWidth}
 									>
-										<DashboardSidebar
-											isCollapsed={isWorkspaceSidebarCollapsed}
-										/>
-									</WorkspaceSidebarPanel>
+										{() => (
+											// Collapsed, the panel keeps its open width and content:
+											// it is only on screen while it slides shut.
+											<WorkspaceSidebarPanel
+												collapsedWidth={workspaceSidebarOpenWidth}
+												className="mb-1.5 h-auto self-stretch rounded-l-[10px] border-y border-l border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
+											>
+												<DashboardSidebar isCollapsed={false} />
+											</WorkspaceSidebarPanel>
+										)}
+									</SidebarSlide>
 									<ContentCard joinsSidebar={!isWorkspaceSidebarCollapsed}>
 										{content}
 									</ContentCard>

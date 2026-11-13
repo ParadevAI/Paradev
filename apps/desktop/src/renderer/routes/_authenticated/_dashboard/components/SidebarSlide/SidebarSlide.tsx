@@ -10,6 +10,8 @@ interface SidebarSlideProps {
 	onLayoutFrame?: () => void;
 	keepMounted?: boolean;
 	durationMs?: number;
+	/** The window edge the panel sits on; its content stays pinned there while the width moves. */
+	side?: "left" | "right";
 	children: (fill: boolean) => React.ReactNode;
 }
 
@@ -19,6 +21,7 @@ export function SidebarSlide({
 	onLayoutFrame,
 	keepMounted = false,
 	durationMs = 300,
+	side = "right",
 	children,
 }: SidebarSlideProps) {
 	const [settled, setSettled] = useState<SidebarSlideMode>(mode);
@@ -105,7 +108,11 @@ export function SidebarSlide({
 					inert={hidden}
 					className={cn(
 						"flex",
-						inFlow ? "h-full" : "absolute inset-y-0 right-0",
+						inFlow
+							? "h-full"
+							: side === "left"
+								? "absolute inset-y-0 left-0"
+								: "absolute inset-y-0 right-0",
 						hidden && "invisible",
 					)}
 					style={{
