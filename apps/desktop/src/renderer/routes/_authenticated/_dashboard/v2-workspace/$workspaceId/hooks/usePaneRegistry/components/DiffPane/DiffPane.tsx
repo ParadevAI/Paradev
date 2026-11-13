@@ -39,7 +39,10 @@ import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHea
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
-import { useWorkspaceCheckouts } from "../../../../state/activeRepositoryStore";
+import {
+	useWorkspaceCheckouts,
+	useWorkspaceFolder,
+} from "../../../../state/activeRepositoryStore";
 import type { DiffPaneData, PaneViewerData } from "../../../../types";
 import { changesPillStats } from "../../../../utils/changesPillStats";
 import { checkoutInput } from "../../../../utils/checkoutInput";
@@ -288,10 +291,7 @@ export function DiffPane({
 		{ enabled: false },
 	);
 	const threadActions = useReviewThreadActions(linkedPullRequest);
-	const workspaceQuery = workspaceTrpc.workspace.get.useQuery({
-		id: workspaceId,
-	});
-	const worktreePath = workspaceQuery.data?.worktreePath;
+	const worktreePath = useWorkspaceFolder(workspaceId);
 	const getFileRepositoryId = useCallback(
 		(file: ChangesetFile) =>
 			getChangesetFileRepositoryId(file, primaryRepositoryId),

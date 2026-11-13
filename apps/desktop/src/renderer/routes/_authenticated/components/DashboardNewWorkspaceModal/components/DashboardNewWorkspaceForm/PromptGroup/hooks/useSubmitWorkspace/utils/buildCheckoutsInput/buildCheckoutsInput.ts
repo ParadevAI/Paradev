@@ -66,13 +66,18 @@ export function buildCheckoutsInput({
 		return withCheckouts(linkedPR !== null, checkouts, pullRequest);
 	}
 
-	const resolvedPullRequests =
+	const draftPullRequests =
 		linkedPR !== null && draft.checkoutPullRequestsFor === linkedPR.url
-			? Object.entries(draft.checkoutPullRequests).filter(([repositoryId]) =>
-					known.has(repositoryId),
-				)
-			: [];
-	if (linkedPR && resolvedPullRequests.length > 0) {
+			? Object.entries(draft.checkoutPullRequests)
+			: null;
+	const resolvedPullRequests =
+		draftPullRequests?.filter(([repositoryId]) => known.has(repositoryId)) ??
+		null;
+	const resolvedOnlyForRemovedRepositories =
+		draftPullRequests !== null &&
+		draftPullRequests.length > 0 &&
+		resolvedPullRequests?.length === 0;
+	if (linkedPR && resolvedPullRequests && !resolvedOnlyForRemovedRepositories) {
 		const pullRequests = resolvedPullRequests.filter(
 			([repositoryId]) => !draft.checkoutWorktrees[repositoryId],
 		);

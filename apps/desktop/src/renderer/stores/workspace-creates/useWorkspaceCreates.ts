@@ -25,7 +25,10 @@ import type {
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { adoptsExistingWorktree } from "./adoptsExistingWorktree";
+import {
+	adoptedWorktreeCount,
+	adoptsEveryCheckout,
+} from "./adoptsEveryCheckout";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
 import { recoverAgentLaunches } from "./recoverAgentLaunches";
 import { resolveChatAgentIds } from "./resolveChatAgentIds";
@@ -424,17 +427,25 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 					// Creation presets run only for genuinely new worktrees — never
 					// reopened ones or project-less sessions (createSession has no
 					// alreadyExists signal, so an undefined value here is treated as
-					// "not new"). They also skip adopting an existing worktree (the
-					// host reports that as new) and creates that opted out of setup,
-					// e.g. "Import worktrees" with "Run setup" off.
+					// "not new"). They also skip a workspace made only of adopted
+					// worktrees (the host reports that as new) and creates that opted
+					// out of setup, e.g. "Import worktrees" with "Run setup" off.
 					if (
 						result.workspace.projectId !== null &&
 						result.alreadyExists === false
 					) {
-						const adoptsWorktree = adoptsExistingWorktree(snapshot);
+						const adoptsAll =
+							adoptedWorktreeCount(snapshot) > 0 &&
+							adoptsEveryCheckout(
+								snapshot,
+								await getHostServiceClientByUrl(hostUrl)
+									.workspace.get.query({ id: result.workspace.id })
+									.then((workspace) => workspace?.checkouts.length ?? null)
+									.catch(() => null),
+							);
 						const skipsSetup =
 							"runSetup" in snapshot && snapshot.runSetup === false;
-						if (!adoptsWorktree && !skipsSetup) {
+						if (!adoptsAll && !skipsSetup) {
 							queueWorkspaceCreationPresets(collections, {
 								id: result.workspace.id,
 								projectId: result.workspace.projectId,

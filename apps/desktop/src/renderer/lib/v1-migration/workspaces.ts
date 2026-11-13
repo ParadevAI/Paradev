@@ -77,6 +77,8 @@ export interface OnDiskWorktree {
 	/** Host rows store git's spelling, not the real path. */
 	path: string;
 	isMainWorktree: boolean;
+	/** Set when the project has several repositories. */
+	repositoryId?: string;
 }
 
 export function hostWorkspaceKey(projectId: string, branch: string): string {
@@ -291,4 +293,25 @@ export async function adoptV1Workspace(
 		}
 		throw err;
 	}
+}
+
+/**
+ * A multi-repo project has no single-repository adopt: each worktree joins
+ * one new workspace as its repository's checkout, and the host moves it into
+ * the workspace folder. The other repositories get new checkouts on `branch`.
+ */
+export async function adoptV1WorkspacesIntoMultiRepoProject(
+	hostClient: HostServiceClient,
+	entry: Pick<AdoptPlanEntry, "v2ProjectId" | "name" | "branch"> & {
+		checkouts: Record<string, { worktreePath: string }>;
+	},
+) {
+	return await hostClient.workspaces.create.mutate({
+		projectId: entry.v2ProjectId,
+		name: entry.name,
+		branch: entry.branch,
+		skipBranchPrefix: true,
+		checkouts: entry.checkouts,
+		runSetup: false,
+	});
 }

@@ -1,9 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
-import { workspaceTrpc } from "@superset/workspace-client";
 import { useMemo } from "react";
 import { LuGitCompareArrows } from "react-icons/lu";
 import { useCheckoutGitStatuses } from "../../../../providers/WorkspaceGitStatusProvider";
-import { useWorkspaceCheckouts } from "../../../../state/activeRepositoryStore";
+import {
+	useWorkspaceCheckouts,
+	useWorkspaceFolder,
+} from "../../../../state/activeRepositoryStore";
 import { changesPillStats } from "../../../../utils/changesPillStats";
 import type { SidebarTabDefinition } from "../../types";
 import { MultiRepoChanges } from "./components/MultiRepoChanges";
@@ -31,9 +33,7 @@ export function useChangesTab(
 ): SidebarTabDefinition {
 	const { t } = useLingui();
 	const checkouts = useWorkspaceCheckouts(params.workspaceId);
-	const folder = workspaceTrpc.workspace.get.useQuery({
-		id: params.workspaceId,
-	}).data?.worktreePath;
+	const folder = useWorkspaceFolder(params.workspaceId);
 	const isMultiRepo = checkouts.length > 1;
 	const first = checkouts[0];
 	const single = useChangesContent({

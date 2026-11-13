@@ -23,6 +23,8 @@ import { runV1Migration } from "./runV1Migration";
 interface HostProject {
 	id: string;
 	repoPath: string;
+	/** Several repositories; their worktrees are listed at `/disk/<id>-<branch>`. */
+	repositories?: Array<{ id: string; path: string }>;
 }
 interface HostWorkspace {
 	tags: string[];
@@ -39,12 +41,14 @@ type Aliases = Map<string, string>;
 const notFound = (message: string) =>
 	Object.assign(new Error(message), { data: { code: "NOT_FOUND" } });
 
-function toSnapshot(project: { id: string; repoPath: string }) {
-	const repositoryId = `${project.id}-repo`;
+function toSnapshot(project: HostProject) {
+	const repositories = project.repositories ?? [
+		{ id: `${project.id}-repo`, path: project.repoPath },
+	];
 	return {
 		id: project.id,
-		primaryRepositoryId: repositoryId,
-		repositories: [{ id: repositoryId, path: project.repoPath }],
+		primaryRepositoryId: repositories[0]?.id,
+		repositories,
 	};
 }
 
@@ -82,6 +86,10 @@ class FakeHost {
 
 	private gitPath(branch: string): string {
 		return this.worktreePaths.get(branch) ?? `/disk/${branch}`;
+	}
+
+	private isMultiRepo(projectId: string): boolean {
+		return !!this.projects.find((p) => p.id === projectId)?.repositories;
 	}
 
 	private real(path: string): string {
@@ -151,7 +159,9 @@ class FakeHost {
 						if (this.nonGitPaths.has(repoPath)) {
 							return { candidates: [], cloudErrors: [], needsGitInit: true };
 						}
-						const local = this.projects.find((p) => p.repoPath === repoPath);
+						const local = this.projects.find((p) =>
+							toSnapshot(p).repositories.some((r) => r.path === repoPath),
+						);
 						return {
 							candidates: local ? [{ id: local.id, source: "local-path" }] : [],
 							cloudErrors: [],
@@ -254,6 +264,9 @@ class FakeHost {
 						checkout: "local";
 						name: string;
 					}) => {
+						if (this.isMultiRepo(args.projectId)) {
+							throw new Error("local_checkout_single_repo");
+						}
 						this.mutations.push({ kind: "workspaces.create", args });
 						const row: HostWorkspace = {
 							tags: [],
@@ -266,11 +279,49 @@ class FakeHost {
 						return { workspace: row, alreadyExists: false };
 					},
 				},
+				create: {
+					mutate: async (args: { projectId: string; branch: string }) => {
+						this.mutations.push({ kind: "workspaces.create", args });
+						const row: HostWorkspace = {
+							tags: [],
+							id: this.id("v2w"),
+							projectId: args.projectId,
+							branch: args.branch,
+						};
+						this.workspaces.push(row);
+						return { workspace: row, alreadyExists: false };
+					},
+				},
 			},
 			workspaceCreation: {
 				listProjectWorktrees: {
-					query: async ({ projectId }: { projectId: string }) => {
+					query: async ({
+						projectId,
+						repositoryId,
+					}: {
+						projectId: string;
+						repositoryId?: string;
+					}) => {
 						const project = this.projects.find((p) => p.id === projectId);
+						if (project?.repositories) {
+							const repository = project.repositories.find(
+								(r) => r.id === repositoryId,
+							);
+							if (!repository) throw new Error("repository_required");
+							return {
+								worktrees: [
+									...(this.diskBranches.get(repository.path) ?? []),
+								].map((branch) => ({
+									branch,
+									path:
+										branch === "main"
+											? repository.path
+											: `/disk/${repository.id}-${branch}`,
+									hasWorkspace: false,
+									isMainWorktree: branch === "main",
+								})),
+							};
+						}
 						const branches = project
 							? (this.diskBranches.get(project.repoPath) ?? new Set())
 							: new Set<string>();
@@ -300,6 +351,9 @@ class FakeHost {
 						branch: string;
 						worktreePath?: string;
 					}) => {
+						if (this.isMultiRepo(args.projectId)) {
+							throw new Error("adopt_single_repo");
+						}
 						if (this.adoptFaults > 0) {
 							this.adoptFaults--;
 							throw new Error("host transient adopt failure");
@@ -1288,5 +1342,70 @@ describe("v1 groups to tags", () => {
 		await run(ipc, host);
 		expect(host.folders).toHaveLength(0);
 		expect(host.workspaces[0].tags).toEqual([]);
+	});
+});
+
+describe("runV1Migration into a multi-repo project", () => {
+	test("v1 worktrees of one branch become one workspace; the main checkout is skipped", async () => {
+		const ipc = new FakeIpc();
+		const host = new FakeHost();
+		host.projects = [
+			{
+				id: "mr",
+				repoPath: "/repo/web",
+				repositories: [
+					{ id: "web", path: "/repo/web" },
+					{ id: "api", path: "/repo/api" },
+				],
+			},
+		];
+		host.diskBranches.set("/repo/web", new Set(["main", "feat"]));
+		host.diskBranches.set("/repo/api", new Set(["main", "feat"]));
+		ipc.projects = [
+			project("p-web", "/repo/web"),
+			project("p-api", "/repo/api"),
+		];
+		ipc.worktrees = [
+			{ id: "wt-web", path: "/disk/web-feat", baseBranch: "main" },
+			{ id: "wt-api", path: "/disk/api-feat", baseBranch: "main" },
+		];
+		ipc.workspaces = [
+			workspace("w-web", "p-web", "feat", "wt-web"),
+			workspace("w-api", "p-api", "feat", "wt-api"),
+			{ ...workspace("w-main", "p-web", "main"), type: "branch" },
+		];
+
+		const summary = await run(ipc, host);
+
+		const created = host.mutations.filter(
+			(m) => m.kind === "workspaces.create",
+		);
+		expect(created.map((m) => m.args)).toEqual([
+			{
+				projectId: "mr",
+				name: "w-web",
+				branch: "feat",
+				skipBranchPrefix: true,
+				checkouts: {
+					web: { worktreePath: "/disk/web-feat" },
+					api: { worktreePath: "/disk/api-feat" },
+				},
+				runSetup: false,
+			},
+		]);
+		const v2Id = host.workspaces[0]?.id;
+		expect(ipc.ledger.get("workspace\0w-web")).toMatchObject({
+			status: "success",
+			v2Id,
+		});
+		expect(ipc.ledger.get("workspace\0w-api")).toMatchObject({
+			status: "success",
+			v2Id,
+		});
+		expect(ipc.ledger.get("workspace\0w-main")).toMatchObject({
+			status: "skipped",
+			reason: "local-checkout-multi-repo",
+		});
+		expect(summary.workspaces.failed).toBe(0);
 	});
 });

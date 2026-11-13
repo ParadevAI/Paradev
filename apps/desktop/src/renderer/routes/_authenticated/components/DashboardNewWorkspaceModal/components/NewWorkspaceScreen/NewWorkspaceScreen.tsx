@@ -860,6 +860,12 @@ export function NewWorkspaceScreen({
 		},
 	);
 
+	const notSetUpProjectName = selectedProject?.name ?? "";
+	const notSetUpHostName =
+		(hostId === machineId
+			? currentDeviceName
+			: otherHosts.find((host) => host.id === hostId)?.name) ??
+		t({ message: "this host" });
 	const submitBlocker = useMemo<string | null>(() => {
 		// A cloud workspace is provisioned by the API from its environment: no
 		// host readiness to wait on, and the project only narrows the list.
@@ -892,10 +898,17 @@ export function NewWorkspaceScreen({
 				message: "Host service is not running",
 			});
 		}
+		if (needsSetup)
+			return t({
+				message: `${notSetUpProjectName} is not set up on ${notSetUpHostName}. Pick another host.`,
+			});
 		if (!isSession && !primaryRepositoryId)
 			return t({ message: "Loading project repositories…" });
 		return null;
 	}, [
+		needsSetup,
+		notSetUpProjectName,
+		notSetUpHostName,
 		primaryRepositoryId,
 		isCloudHost,
 		cloudEnabled,
@@ -1304,12 +1317,6 @@ export function NewWorkspaceScreen({
 			}
 		/>
 	);
-	const notSetUpProjectName = selectedProject?.name ?? "";
-	const notSetUpHostName =
-		(hostId === machineId
-			? currentDeviceName
-			: otherHosts.find((host) => host.id === hostId)?.name) ??
-		t({ message: "this host" });
 	const notSetUpNotice = needsSetup && (
 		<span className="text-[11px] text-amber-500">
 			<Trans>

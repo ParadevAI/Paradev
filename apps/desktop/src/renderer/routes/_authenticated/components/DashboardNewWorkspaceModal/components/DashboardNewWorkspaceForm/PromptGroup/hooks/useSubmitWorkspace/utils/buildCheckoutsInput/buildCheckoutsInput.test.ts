@@ -84,14 +84,18 @@ describe("buildCheckoutsInput", () => {
 		});
 	});
 
-	test("several repositories: no pullRequest when the linked PR's checkout is an existing worktree", () => {
+	const sharedPullRequest = {
+		...linkedPR,
+		prNumber: 4,
+		headRefName: "t",
+		matched: true,
+	};
+
+	test("several repositories: a worktree picked for the linked PR's repository replaces the PR", () => {
 		const result = buildCheckoutsInput({
 			draft: {
 				...emptyDraft,
-				checkoutPullRequests: {
-					web: { ...linkedPR, headRefName: "t", matched: false },
-					shared: { ...linkedPR, prNumber: 4, headRefName: "t", matched: true },
-				},
+				checkoutPullRequests: { shared: sharedPullRequest },
 				checkoutPullRequestsFor: linkedPR.url,
 				checkoutWorktrees: { web: { path: "/wt/web", branch: "t" } },
 			},
@@ -104,6 +108,46 @@ describe("buildCheckoutsInput", () => {
 		expect(result.checkouts).toEqual({
 			shared: { pr: 4 },
 			web: { worktreePath: "/wt/web" },
+		});
+	});
+
+	test("several repositories: a base branch picked for the linked PR's repository replaces the PR", () => {
+		const result = buildCheckoutsInput({
+			draft: {
+				...emptyDraft,
+				checkoutBaseBranches: { web: "dev" },
+				checkoutPullRequests: { shared: sharedPullRequest },
+				checkoutPullRequestsFor: linkedPR.url,
+			},
+			linkedPR,
+			primaryRepositoryId: "api",
+			isMultiRepo: true,
+			repositoryIds: ["api", "web", "shared", "docs"],
+		});
+		expect(result.pullRequest).toBeUndefined();
+		expect(result.checkouts).toEqual({
+			shared: { pr: 4 },
+			web: { baseBranch: "dev" },
+		});
+	});
+
+	test("several repositories: no PR is sent once every resolved PR is replaced", () => {
+		expect(
+			buildCheckoutsInput({
+				draft: {
+					...emptyDraft,
+					checkoutBaseBranches: { web: "dev", shared: "main" },
+					checkoutPullRequestsFor: linkedPR.url,
+				},
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+				repositoryIds: ["api", "web", "shared", "docs"],
+			}),
+		).toEqual({
+			checkout: "worktree",
+			isPrCheckout: false,
+			checkouts: { web: { baseBranch: "dev" }, shared: { baseBranch: "main" } },
 		});
 	});
 

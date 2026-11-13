@@ -11,7 +11,10 @@ import {
 	PULL_REQUEST_STACK_QUERY_KEY_PREFIX,
 	type PullRequestStackLayer,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestStack";
-import { findPullRequestWorkspace } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/findPullRequestWorkspace";
+import {
+	findPullRequestWorkspace,
+	pullRequestWorkspaceQueryKey,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/findPullRequestWorkspace";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useWorkspaceCheckouts } from "../../state/activeRepositoryStore";
@@ -51,14 +54,21 @@ export function useOpenStackLayer(
 		(checkouts.length <= 1 || repositoryId !== undefined);
 
 	const layerWorkspace = useCallback(
-		(prNumber: number) =>
-			queryClient.fetchQuery({
-				queryKey: ["pull-request-workspace", hostUrl, projectId, prNumber],
-				queryFn: () =>
-					findPullRequestWorkspace({ hostUrl, projectId, prNumber }),
+		(layer: PullRequestStackLayer) => {
+			const lookup = {
+				hostUrl,
+				projectId,
+				prNumber: layer.number,
+				repositoryId,
+				repoFullName: pullRequestRefFromUrl(layer.url)?.repoFullName,
+			};
+			return queryClient.fetchQuery({
+				queryKey: pullRequestWorkspaceQueryKey(lookup),
+				queryFn: () => findPullRequestWorkspace(lookup),
 				staleTime: LAYER_WORKSPACE_STALE_MS,
-			}),
-		[queryClient, hostUrl, projectId],
+			});
+		},
+		[queryClient, hostUrl, projectId, repositoryId],
 	);
 
 	const openLayers = (layers ?? []).filter(
@@ -70,7 +80,7 @@ export function useOpenStackLayer(
 	// biome-ignore lint/correctness/useExhaustiveDependencies: warmKey stands for openLayers
 	useEffect(() => {
 		if (!canSwitch || !hostUrl || openLayers.length === 0) return;
-		for (const layer of openLayers) void layerWorkspace(layer.number);
+		for (const layer of openLayers) void layerWorkspace(layer);
 		void getHostServiceClientByUrl(hostUrl)
 			.git.fetchBranches.mutate({
 				...checkoutInput(workspace.id, repositoryId),
@@ -94,7 +104,7 @@ export function useOpenStackLayer(
 			const switches =
 				!layer.isCurrent && layer.state === "open" && canSwitch && hostUrl;
 			if (switches) begin(workspace.id, layer);
-			void layerWorkspace(number).then(async (workspaceId) => {
+			void layerWorkspace(layer).then(async (workspaceId) => {
 				if (workspaceId && workspaceId !== workspace.id) {
 					end(workspace.id, number);
 					void navigateToV2Workspace(workspaceId, navigate);

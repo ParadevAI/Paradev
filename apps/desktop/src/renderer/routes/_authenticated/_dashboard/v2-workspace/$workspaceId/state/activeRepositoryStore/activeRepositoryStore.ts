@@ -28,6 +28,11 @@ export function useWorkspaceCheckouts(
 	return useWorkspaceQuery(workspaceId).data?.checkouts ?? NO_CHECKOUTS;
 }
 
+/** The workspace folder; a multi-repo workspace's checkouts sit inside it. */
+export function useWorkspaceFolder(workspaceId: string): string | undefined {
+	return useWorkspaceQuery(workspaceId).data?.worktreePath;
+}
+
 /** Whether the checkouts are known (or failed to load), so a git call can name its repository. */
 export function useAreCheckoutsLoaded(workspaceId: string): boolean {
 	return areCheckoutsSettled(useWorkspaceQuery(workspaceId));

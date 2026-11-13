@@ -30,7 +30,9 @@ import {
 	planTerminalMigration,
 } from "./terminals";
 import {
+	type AdoptPlanEntry,
 	adoptV1Workspace,
+	adoptV1WorkspacesIntoMultiRepoProject,
 	hostWorkspaceKey,
 	type OnDiskWorktree,
 	planWorkspaceAdoptions,
@@ -271,21 +273,36 @@ async function migrateWorkspaces(
 	// v1 project → v2 project via the ledger first (authoritative mapping
 	// written by the project step), falling back to repo-path equality.
 	const v2ProjectIdByV1ProjectId = new Map<string, string>();
-	const v2ByRepoPath = new Map<string, string>();
+	const repositoryIdByV1ProjectId = new Map<string, string>();
+	const v2ByRepoPath = new Map<
+		string,
+		{ projectId: string; repositoryId: string }
+	>();
+	const multiRepoProjectIds = new Set<string>();
 	for (const p of hostProjects) {
-		for (const repository of p.repositories ?? []) {
+		const repositories = p.repositories ?? [];
+		if (repositories.length > 1) multiRepoProjectIds.add(p.id);
+		for (const repository of repositories) {
 			if (!v2ByRepoPath.has(repository.path)) {
-				v2ByRepoPath.set(repository.path, p.id);
+				v2ByRepoPath.set(repository.path, {
+					projectId: p.id,
+					repositoryId: repository.id,
+				});
 			}
 		}
 	}
 	for (const v1 of v1Projects) {
 		const fromLedger = ledger.get(ledgerKey("project", v1.id));
+		const atPath = v2ByRepoPath.get(v1.mainRepoPath);
 		const v2Id =
 			(fromLedger && isTerminalStatus(fromLedger.status)
 				? fromLedger.v2Id
-				: null) ?? v2ByRepoPath.get(v1.mainRepoPath);
-		if (v2Id) v2ProjectIdByV1ProjectId.set(v1.id, v2Id);
+				: null) ?? atPath?.projectId;
+		if (!v2Id) continue;
+		v2ProjectIdByV1ProjectId.set(v1.id, v2Id);
+		if (atPath?.projectId === v2Id) {
+			repositoryIdByV1ProjectId.set(v1.id, atPath.repositoryId);
+		}
 	}
 
 	const hostWorkspaceIds = new Set(hostWorkspaces.map((w) => w.id));
@@ -313,30 +330,46 @@ async function migrateWorkspaces(
 			return false;
 		});
 
-	const mappedV2ProjectIds = new Set(
-		pendingWorkspaces
-			.map((w) => v2ProjectIdByV1ProjectId.get(w.projectId))
-			.filter((id): id is string => !!id),
-	);
+	const listingsByV2ProjectId = new Map<string, Set<string | undefined>>();
+	for (const w of pendingWorkspaces) {
+		const v2ProjectId = v2ProjectIdByV1ProjectId.get(w.projectId);
+		if (!v2ProjectId) continue;
+		const repositoryIds =
+			listingsByV2ProjectId.get(v2ProjectId) ?? new Set<string | undefined>();
+		repositoryIds.add(
+			multiRepoProjectIds.has(v2ProjectId)
+				? repositoryIdByV1ProjectId.get(w.projectId)
+				: undefined,
+		);
+		listingsByV2ProjectId.set(v2ProjectId, repositoryIds);
+	}
 	const onDiskBranchesByV2ProjectId = new Map<string, Set<string>>();
 	const mainBranchByV2ProjectId = new Map<string, string>();
 	const onDiskWorktrees: OnDiskWorktree[] = [];
 	await Promise.all(
-		Array.from(mappedV2ProjectIds, async (v2ProjectId) => {
+		Array.from(listingsByV2ProjectId, async ([v2ProjectId, repositoryIds]) => {
 			try {
-				const result =
-					await deps.hostClient.workspaceCreation.listProjectWorktrees.query({
-						projectId: v2ProjectId,
-					});
+				// A multi-repo project lists each repository; one it cannot
+				// name (undefined) fails the listing, so all of it stays unknown.
+				const results = await Promise.all(
+					Array.from(repositoryIds, async (repositoryId) => ({
+						repositoryId,
+						result:
+							await deps.hostClient.workspaceCreation.listProjectWorktrees.query(
+								{ projectId: v2ProjectId, repositoryId },
+							),
+					})),
+				);
+				const worktrees = results.flatMap(({ repositoryId, result }) =>
+					result.worktrees.map((w) => ({ ...w, repositoryId })),
+				);
 				onDiskBranchesByV2ProjectId.set(
 					v2ProjectId,
 					new Set(
-						result.worktrees
-							.filter((w) => !w.isMainWorktree)
-							.map((w) => w.branch),
+						worktrees.filter((w) => !w.isMainWorktree).map((w) => w.branch),
 					),
 				);
-				for (const w of result.worktrees) {
+				for (const w of worktrees) {
 					// Older hosts list no path; those match by branch.
 					if (typeof w.path !== "string") continue;
 					onDiskWorktrees.push({
@@ -344,10 +377,13 @@ async function migrateWorkspaces(
 						branch: w.branch,
 						path: w.path,
 						isMainWorktree: !!w.isMainWorktree,
+						...(w.repositoryId ? { repositoryId: w.repositoryId } : {}),
 					});
 				}
-				const main = result.worktrees.find((w) => w.isMainWorktree);
-				if (main) mainBranchByV2ProjectId.set(v2ProjectId, main.branch);
+				const main = worktrees.find((w) => w.isMainWorktree);
+				if (main && !multiRepoProjectIds.has(v2ProjectId)) {
+					mainBranchByV2ProjectId.set(v2ProjectId, main.branch);
+				}
 			} catch {
 				// Leave unset: planWorkspaceAdoptions treats unknown as adoptable
 				// and lets adopt() decide.
@@ -437,6 +473,16 @@ async function migrateWorkspaces(
 	};
 	const createdLocalByProject = new Map<string, string>();
 	for (const entry of plan.toCreateLocal) {
+		if (multiRepoProjectIds.has(entry.v2ProjectId)) {
+			summary.skipped++;
+			pushOutcome(ledger, outcomes, {
+				v1Id: entry.v1WorkspaceId,
+				kind: "workspace",
+				status: "skipped",
+				reason: "local-checkout-multi-repo",
+			});
+			continue;
+		}
 		const earlier = createdLocalByProject.get(entry.v2ProjectId);
 		if (linkToEarlier(entry.v1WorkspaceId, earlier)) continue;
 		try {
@@ -473,8 +519,16 @@ async function migrateWorkspaces(
 	}
 
 	const adoptedByKey = new Map<string, string>();
+	const multiRepoAdoptions = new Map<string, AdoptPlanEntry[]>();
 	for (const entry of plan.toAdopt) {
 		const key = hostWorkspaceKey(entry.v2ProjectId, entry.branch);
+		if (multiRepoProjectIds.has(entry.v2ProjectId)) {
+			multiRepoAdoptions.set(key, [
+				...(multiRepoAdoptions.get(key) ?? []),
+				entry,
+			]);
+			continue;
+		}
 		if (linkToEarlier(entry.v1WorkspaceId, adoptedByKey.get(key))) continue;
 		try {
 			const result = await adoptV1Workspace(deps.hostClient, entry);
@@ -483,44 +537,100 @@ async function migrateWorkspaces(
 				hostWorkspaceKey(entry.v2ProjectId, result.workspace.branch),
 				result.workspace.id,
 			);
-			summary.migrated++;
-			pushOutcome(ledger, outcomes, {
-				v1Id: entry.v1WorkspaceId,
-				kind: "workspace",
-				status: "success",
-				v2Id: result.workspace.id,
-			});
-			try {
-				deps.onWorkspaceAdopted?.(result.workspace.id, entry.v2ProjectId);
-			} catch (err) {
-				console.error("[v1-migration] onWorkspaceAdopted callback failed", {
-					v1WorkspaceId: entry.v1WorkspaceId,
-					err,
-				});
-			}
+			recordAdopted(entry, result.workspace.id);
 		} catch (err) {
-			const unmigratable = classifyUnmigratableRepoError(err);
-			if (unmigratable) {
+			recordAdoptError(entry, err);
+		}
+	}
+
+	// v1 workspaces of one branch across a multi-repo project's repositories
+	// become one workspace, each worktree the checkout of its repository.
+	for (const entries of multiRepoAdoptions.values()) {
+		const checkouts: Record<string, { worktreePath: string }> = {};
+		const adopting: AdoptPlanEntry[] = [];
+		const sameRepository: AdoptPlanEntry[] = [];
+		for (const entry of entries) {
+			const atPath = entry.worktreePath
+				? onDiskWorktrees.find((w) => w.path === entry.worktreePath)
+				: undefined;
+			const repositoryId =
+				atPath?.repositoryId ??
+				repositoryIdByV1ProjectId.get(entry.v1ProjectId);
+			if (!repositoryId || !entry.worktreePath) {
 				summary.skipped++;
 				pushOutcome(ledger, outcomes, {
 					v1Id: entry.v1WorkspaceId,
 					kind: "workspace",
 					status: "skipped",
-					reason: unmigratable,
+					reason: WORKTREE_NEEDS_ATTENTION,
 				});
 				continue;
 			}
-			summary.failed++;
-			pushOutcome(ledger, outcomes, {
-				v1Id: entry.v1WorkspaceId,
-				kind: "workspace",
-				status: "error",
-				reason: errorMessage(err),
-			});
+			if (checkouts[repositoryId]) {
+				sameRepository.push(entry);
+				continue;
+			}
+			checkouts[repositoryId] = { worktreePath: entry.worktreePath };
+			adopting.push(entry);
+		}
+		const [first] = adopting;
+		if (!first) continue;
+		try {
+			const result = await adoptV1WorkspacesIntoMultiRepoProject(
+				deps.hostClient,
+				{ ...first, checkouts },
+			);
+			for (const entry of adopting) recordAdopted(entry, result.workspace.id);
+			for (const entry of sameRepository) {
+				linkToEarlier(entry.v1WorkspaceId, result.workspace.id);
+			}
+		} catch (err) {
+			for (const entry of [...adopting, ...sameRepository]) {
+				recordAdoptError(entry, err);
+			}
 		}
 	}
 
 	return summary;
+
+	function recordAdopted(entry: AdoptPlanEntry, v2WorkspaceId: string) {
+		summary.migrated++;
+		pushOutcome(ledger, outcomes, {
+			v1Id: entry.v1WorkspaceId,
+			kind: "workspace",
+			status: "success",
+			v2Id: v2WorkspaceId,
+		});
+		try {
+			deps.onWorkspaceAdopted?.(v2WorkspaceId, entry.v2ProjectId);
+		} catch (err) {
+			console.error("[v1-migration] onWorkspaceAdopted callback failed", {
+				v1WorkspaceId: entry.v1WorkspaceId,
+				err,
+			});
+		}
+	}
+
+	function recordAdoptError(entry: AdoptPlanEntry, err: unknown) {
+		const unmigratable = classifyUnmigratableRepoError(err);
+		if (unmigratable) {
+			summary.skipped++;
+			pushOutcome(ledger, outcomes, {
+				v1Id: entry.v1WorkspaceId,
+				kind: "workspace",
+				status: "skipped",
+				reason: unmigratable,
+			});
+			return;
+		}
+		summary.failed++;
+		pushOutcome(ledger, outcomes, {
+			v1Id: entry.v1WorkspaceId,
+			kind: "workspace",
+			status: "error",
+			reason: errorMessage(err),
+		});
+	}
 }
 
 /**

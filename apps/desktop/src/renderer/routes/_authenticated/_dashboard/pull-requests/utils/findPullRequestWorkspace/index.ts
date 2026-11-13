@@ -1,1 +1,5 @@
-export { findPullRequestWorkspace } from "./findPullRequestWorkspace";
+export {
+	findPullRequestWorkspace,
+	linkedWorkspaceInput,
+	pullRequestWorkspaceQueryKey,
+} from "./findPullRequestWorkspace";

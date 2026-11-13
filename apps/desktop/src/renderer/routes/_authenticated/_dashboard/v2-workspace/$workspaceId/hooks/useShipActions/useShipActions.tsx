@@ -8,8 +8,8 @@ import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 import { useCheckoutGitStatus } from "../../providers/WorkspaceGitStatusProvider";
-import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
 import { checkoutInput } from "../../utils/checkoutInput";
+import { useHasCommitsAhead } from "../useHasCommitsAhead";
 
 interface UseShipActionsOptions {
 	workspaceId: string;
@@ -39,41 +39,14 @@ export function useShipActions({
 	const status = useCheckoutGitStatus(repositoryId);
 	const scope = checkoutInput(workspaceId, repositoryId);
 	const canCreatePr = workspace.type !== "session";
-	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 
 	const [commitMessage, setCommitMessage] = useState("");
 	const [prTitle, setPrTitle] = useState("");
 	const [prBody, setPrBody] = useState("");
 	const [prDraft, setPrDraft] = useState(false);
 
-	// The branch's commits ahead of its base: prefills the PR title from the
-	// latest subject, and gates Create PR — GitHub rejects a PR with no
-	// commits between base and head, so the action disables instead of
-	// surfacing that as a failure toast. Counted against the configured
-	// branch.<name>.base (the base createForWorkspace actually opens
-	// against) — measuring against the repo default gets stacked branches
-	// exactly backwards.
-	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(scope, {
-		enabled: enabled && checkoutsLoaded && canCreatePr,
-		staleTime: Number.POSITIVE_INFINITY,
-	});
-	const commitsQuery = workspaceTrpc.git.listCommits.useQuery(
-		{
-			...scope,
-			baseBranch: baseBranchQuery.data?.baseBranch ?? undefined,
-		},
-		{
-			enabled:
-				enabled && checkoutsLoaded && canCreatePr && baseBranchQuery.isSuccess,
-			refetchInterval: 10_000,
-			refetchOnWindowFocus: true,
-			staleTime: 10_000,
-		},
-	);
-	// Optimistic while loading so the action doesn't flash disabled.
-	const hasCommitsAhead =
-		commitsQuery.data == null || commitsQuery.data.commits.length > 0;
-	const latestSubject = commitsQuery.data?.commits[0]?.message ?? "";
+	const { hasCommitsAhead, latestSubject, commitsLoaded, refetchCommits } =
+		useHasCommitsAhead({ workspaceId, repositoryId, enabled });
 
 	const commitMutation = workspaceTrpc.git.commit.useMutation({
 		onSuccess: () => {
@@ -82,7 +55,7 @@ export function useShipActions({
 			setCommitMessage("");
 			// The 10s poll is too slow here: Create PR must not sit disabled
 			// on pre-commit data.
-			void commitsQuery.refetch();
+			void refetchCommits();
 			onRefresh();
 		},
 		onError: (error) => {
@@ -257,7 +230,7 @@ export function useShipActions({
 	return {
 		canCreatePr,
 		hasCommitsAhead,
-		commitsLoaded: commitsQuery.isSuccess,
+		commitsLoaded,
 		commitMessage,
 		setCommitMessage,
 		defaultCommitMessage,

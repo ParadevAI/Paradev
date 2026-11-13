@@ -1,11 +1,10 @@
 import { useEffect, useMemo } from "react";
+import { useHasCommitsAhead } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useHasCommitsAhead";
 import { usePRFlowState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePRFlowState";
-import { useRefreshCheckoutShipState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRefreshCheckoutShipState";
 import {
 	type RepositoryShipStep,
 	repositoryShipStep,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRepositoryShipSnapshots/utils/repositoryShipStep";
-import { useShipActions } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useShipActions";
 import { useCheckoutGitStatus } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
 import {
 	type ChangesPillStats,
@@ -44,18 +43,10 @@ export function RepositoryShipReporter({
 	const { flowState } = usePRFlowState(workspaceId, repositoryId, {
 		enabled,
 	});
-	const refreshShipState = useRefreshCheckoutShipState(
-		workspaceId,
-		repositoryId,
-	);
-	const { hasCommitsAhead } = useShipActions({
+	const { hasCommitsAhead } = useHasCommitsAhead({
 		workspaceId,
 		repositoryId,
 		enabled,
-		onRefresh: refreshShipState,
-		isPrFormOpen: false,
-		onCommitted: () => {},
-		onPrCreated: () => {},
 	});
 
 	const snapshot = useMemo<RepositoryShipSnapshot>(

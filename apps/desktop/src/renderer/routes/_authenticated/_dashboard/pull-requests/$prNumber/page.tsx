@@ -124,6 +124,8 @@ function PullRequestDetailPage() {
 								void findPullRequestWorkspace({
 									hostUrl,
 									projectId: detail.projectId,
+									repositoryId: detail.repositoryId,
+									repoFullName: detail.repoFullName,
 									prNumber: layer.number,
 								}).then((workspaceId) => {
 									if (workspaceId) {
