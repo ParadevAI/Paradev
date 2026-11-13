@@ -494,6 +494,47 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a tool call the agent reports as failed after a stop is canceled", async () => {
+		const { runtime, sessionId } = startSession({
+			failsToolsOnCancel: true,
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "item", item: toolCall("c1"), turnId: "t1" },
+				],
+			],
+		});
+		sendPrompt(runtime, sessionId, "run it");
+		await waitFor(() =>
+			journalEnvelopes(runtime, sessionId).some(
+				(envelope) =>
+					envelope.event.type === "item" && envelope.event.item.id === "c1",
+			),
+		);
+
+		runtime.commands.cancelTurn({
+			commandId: randomUUID(),
+			sessionId,
+			turnId: "t1",
+		});
+		await waitFor(
+			() =>
+				reduceMany(
+					emptySnapshot(),
+					journalEnvelopes(runtime, sessionId),
+				).turns.get("t1")?.status === "interrupted",
+		);
+
+		const snapshot = reduceMany(
+			emptySnapshot(),
+			journalEnvelopes(runtime, sessionId),
+		);
+		expect(snapshot.items.get("c1")?.item).toMatchObject({
+			status: "canceled",
+		});
+		await runtime.dispose();
+	});
+
 	test("cancelTurn for a turn that is no longer running is a no-op", async () => {
 		const { runtime, sessionId } = startSession(SINGLE_TURN);
 		sendPrompt(runtime, sessionId, "hello");

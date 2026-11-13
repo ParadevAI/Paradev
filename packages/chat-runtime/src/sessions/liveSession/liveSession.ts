@@ -141,6 +141,7 @@ export class LiveSession {
 	private resumeTimer: ReturnType<typeof setTimeout> | null = null;
 	private sessionState: SessionState;
 	private currentTurn: Turn | null = null;
+	private stoppingTurnId: string | null = null;
 	private pump: Promise<void> | null = null;
 	private stopped = false;
 	private heldUntilStarted: UserContent[][] = [];
@@ -630,6 +631,9 @@ export class LiveSession {
 				queuePausedByShutdown: false,
 			});
 		}
+		if (this.currentTurn?.status === "running") {
+			this.stoppingTurnId = this.currentTurn.id;
+		}
 		this.options.adapter.cancelTurn();
 	}
 
@@ -727,7 +731,9 @@ export class LiveSession {
 				this.noteReplayedStop(event.item, event.turnId);
 				this.appendDurable({
 					type: "item",
-					item: this.withCarriedCancel(event.item),
+					item: this.withCarriedCancel(
+						this.withStopCancel(event.item, event.turnId),
+					),
 					turnId: event.turnId,
 				});
 				return;
@@ -736,6 +742,7 @@ export class LiveSession {
 				this.currentTurn = this.withLimitKind(
 					this.afterCarriedFailure(event.turn),
 				);
+				if (event.turn.status !== "running") this.stoppingTurnId = null;
 				this.appendDurable({ type: "turn", turn: this.currentTurn });
 				if (
 					previous?.id === event.turn.id &&
@@ -808,6 +815,15 @@ export class LiveSession {
 		this.replayedShutdownStop = userStopOf(item, this.options.harness)
 			? { item: item as UserMessage, turnId }
 			: null;
+	}
+
+	/** An agent may report the call a stop cut off as failed; the stop is why it ended. */
+	private withStopCancel(item: Item, turnId: string): Item {
+		return item.kind === "tool_call" &&
+			item.status === "failed" &&
+			turnId === this.stoppingTurnId
+			? { ...item, status: "canceled" }
+			: item;
 	}
 
 	private withCarriedCancel(item: Item): Item {
