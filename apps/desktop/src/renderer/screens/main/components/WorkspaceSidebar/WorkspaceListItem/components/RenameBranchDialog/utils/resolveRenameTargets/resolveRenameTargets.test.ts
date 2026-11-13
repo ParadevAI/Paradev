@@ -23,6 +23,12 @@ describe("resolveRenameTargets", () => {
 		).toEqual({ kind: "no-match" });
 	});
 
+	it("renames the one checkout of a workspace no host lists", () => {
+		expect(
+			resolveRenameTargets({ checkouts: null, currentBranchName: "feat" }),
+		).toEqual({ kind: "rename", repositoryIds: [undefined] });
+	});
+
 	it("sends nothing while the workspace row is unknown", () => {
 		expect(
 			resolveRenameTargets({ checkouts: undefined, currentBranchName: "feat" }),
