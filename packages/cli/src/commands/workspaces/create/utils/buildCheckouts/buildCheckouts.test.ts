@@ -39,6 +39,15 @@ describe("buildCheckouts", () => {
 		);
 	});
 
+	test("with one repository, a prefix that names no repository is part of the branch", () => {
+		expect(
+			buildCheckouts({ repositories: [api], baseBranch: ["feat=x"] }),
+		).toEqual({ "r-api": { baseBranch: "feat=x" } });
+		expect(
+			buildCheckouts({ repositories: [api], baseBranch: ["api=feat=x"] }),
+		).toEqual({ "r-api": { baseBranch: "feat=x" } });
+	});
+
 	test("nothing given is no checkouts", () => {
 		expect(buildCheckouts({ repositories: [api] })).toBeUndefined();
 	});

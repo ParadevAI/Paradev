@@ -27,6 +27,12 @@ export default command({
 		if (source.kind === "clone" && !options.parentDir) {
 			throw new CLIError("Cloning a URL needs --parent-dir");
 		}
+		if (source.kind === "local" && options.parentDir) {
+			throw new CLIError(
+				"--parent-dir applies to a cloned URL",
+				"A local path is used where it is",
+			);
+		}
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");

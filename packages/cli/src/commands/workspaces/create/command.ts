@@ -274,16 +274,20 @@ export default command({
 		if (!options.name) {
 			throw new CLIError("--name is required when --project is set");
 		}
-		const checkouts =
+		const project =
 			options.pr?.length || options.baseBranch?.length
-				? buildCheckouts({
-						repositories:
-							(await target.client.project.get.query({ projectId }))
-								?.repositories ?? [],
-						pr: options.pr,
-						baseBranch: options.baseBranch,
-					})
+				? await target.client.project.get.query({ projectId })
 				: undefined;
+		if (project === null) {
+			throw new CLIError(`Project ${projectId} is not on this host`);
+		}
+		const checkouts = project
+			? buildCheckouts({
+					repositories: project.repositories,
+					pr: options.pr,
+					baseBranch: options.baseBranch,
+				})
+			: undefined;
 		const create =
 			checkout === "local"
 				? target.client.workspaces.createLocal

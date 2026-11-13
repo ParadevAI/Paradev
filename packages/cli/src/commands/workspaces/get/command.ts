@@ -55,7 +55,12 @@ export default command({
 			const value = (detail as Record<string, unknown>)[options.field];
 			return {
 				data: detail,
-				message: value === null || value === undefined ? "" : String(value),
+				message:
+					value === null || value === undefined
+						? ""
+						: Array.isArray(value)
+							? formatCheckouts(value, 0)
+							: String(value),
 			};
 		}
 

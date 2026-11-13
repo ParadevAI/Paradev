@@ -22,7 +22,7 @@ export default command({
 			"Repository the worktree belongs to, by name or ID (default: the primary)",
 		),
 		path: string().desc(
-			"Worktree path. Specify exactly one of --path, --branch or --all",
+			"Worktree path. Specify exactly one of --path, --branch or --all. On a project of several repositories, the worktree is moved into the new workspace folder",
 		),
 		branch: string().desc("Branch checked out in the worktree"),
 		all: boolean().desc(
@@ -73,6 +73,17 @@ export default command({
 					options.repository,
 				)
 			: await primaryRepository(target.client, options.project);
+		if (options.all) {
+			const project = await target.client.project.get.query({
+				projectId: options.project,
+			});
+			if ((project?.repositories.length ?? 0) > 1) {
+				throw new CLIError(
+					"--all is not available on a project of several repositories",
+					"Each worktree is moved into a new workspace folder. Open them one at a time with --path or --branch",
+				);
+			}
+		}
 		const worktrees = await listProjectWorktrees(
 			target.client,
 			options.project,

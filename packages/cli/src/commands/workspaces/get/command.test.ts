@@ -23,6 +23,24 @@ const WORKSPACE = {
 	updatedAt: new Date("2026-04-24T22:00:41.950Z"),
 	worktreePath: "/home/me/.superset/worktrees/proj-1/setup",
 	worktreeExists: true,
+	checkouts: [
+		{
+			repositoryId: "repo-web",
+			name: "web",
+			isPrimary: true,
+			path: "/home/me/.superset/worktrees/proj-1/setup/web",
+			branch: "setup",
+			pullRequestId: null,
+		},
+		{
+			repositoryId: "repo-api",
+			name: "api",
+			isPrimary: false,
+			path: "/home/me/.superset/worktrees/proj-1/setup/api",
+			branch: "setup",
+			pullRequestId: null,
+		},
+	],
 };
 
 function makeCtx(
@@ -118,6 +136,24 @@ describe("workspaces get", () => {
 			message: string;
 		};
 		expect(field.message).toBe(webUrl);
+	});
+
+	test("lists each checkout, primary marked, in the text and in --field", async () => {
+		workspaces = [WORKSPACE];
+		const text = (await invoke({ id: WORKSPACE.id })) as { message: string };
+		expect(text.message).toContain(
+			"web*  setup  /home/me/.superset/worktrees/proj-1/setup/web",
+		);
+		expect(text.message).toContain(
+			"api  setup  /home/me/.superset/worktrees/proj-1/setup/api",
+		);
+		const field = (await invoke(
+			{ id: WORKSPACE.id },
+			{ field: "checkouts" },
+		)) as { message: string };
+		expect(field.message).toBe(
+			"web*  setup  /home/me/.superset/worktrees/proj-1/setup/web\napi  setup  /home/me/.superset/worktrees/proj-1/setup/api",
+		);
 	});
 
 	test("--field with a null value yields an empty message", async () => {

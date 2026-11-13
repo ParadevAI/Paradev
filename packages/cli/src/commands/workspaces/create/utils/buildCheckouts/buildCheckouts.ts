@@ -27,12 +27,18 @@ function resolveFlagValues(
 	const seen = new Set<string>();
 	return values.map((raw) => {
 		const separator = raw.indexOf("=");
-		const key = separator > 0 ? raw.slice(0, separator) : null;
-		const value = separator > 0 ? raw.slice(separator + 1) : raw;
-		const repository = key
+		const prefix = separator > 0 ? raw.slice(0, separator) : null;
+		const named = prefix
 			? repositories.find(
-					(r) => r.id === key || r.name.toLowerCase() === key.toLowerCase(),
+					(r) =>
+						r.id === prefix || r.name.toLowerCase() === prefix.toLowerCase(),
 				)
+			: undefined;
+		// Git allows `=` in branch names, so with one repository an unknown prefix is part of the value.
+		const key = named || repositories.length !== 1 ? prefix : null;
+		const value = key ? raw.slice(separator + 1) : raw;
+		const repository = key
+			? named
 			: repositories.length === 1
 				? repositories[0]
 				: undefined;
