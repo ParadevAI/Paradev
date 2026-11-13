@@ -346,8 +346,11 @@ export class LiveSession {
 			(part) => !(part.type === "text" && part.hidden),
 		);
 		const sent = withHiddenWrapped(content);
+		const wantsSteer =
+			steerTurnId !== undefined ||
+			this.sessionState.awaitingBackground === true;
 		const running =
-			steerTurnId !== undefined && this.queue.length === 0
+			wantsSteer && this.queue.length === 0
 				? this.steerableTurn(steerTurnId)
 				: null;
 		if (running) {
@@ -790,6 +793,7 @@ export class LiveSession {
 				}
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
+				if (event.session.awaitingBackground) this.steerQueueIntoHeldTurn();
 				return;
 			case "delta":
 				this.options.publish({
@@ -1049,6 +1053,16 @@ export class LiveSession {
 
 	private delivered(item: UserMessage): UserMessage {
 		return { ...withoutQueued(item), startedAtMs: this.now() };
+	}
+
+	private steerQueueIntoHeldTurn(): void {
+		if (this.queuePaused) return;
+		const turn = this.steerableTurn();
+		if (!turn) return;
+		for (const queued of this.queue.splice(0)) {
+			if (this.steerTarget === queued.item.id) this.steerTarget = null;
+			this.injectInto(turn, { ...queued, item: this.delivered(queued.item) });
+		}
 	}
 
 	private injectInto(
