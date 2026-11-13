@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { gatedMachineSizesFromFlags } from "./entitlements";
+import {
+	gatedMachineSizesFromFlags,
+	paidPlanIdFromFlags,
+	tierFromFlags,
+} from "./entitlements";
 
 const on = { planId: null };
 
@@ -10,5 +14,14 @@ describe("gatedMachineSizesFromFlags", () => {
 			"xlarge",
 		]);
 		expect(gatedMachineSizesFromFlags(undefined)).toEqual([]);
+	});
+});
+
+describe("an in-app purchase plan", () => {
+	const flags = { pro_access: { planId: "pro_mobile" } };
+
+	test("grants the pro tier through pro_access", () => {
+		expect(tierFromFlags(flags)).toBe("pro");
+		expect(paidPlanIdFromFlags(flags)).toBe("pro_mobile");
 	});
 });
