@@ -2,7 +2,12 @@ import { describe, expect, it } from "bun:test";
 import type { CommandConfig } from "./command";
 import { CLIError } from "./errors";
 import type { CliDescription } from "./help";
-import { boolean, type GenericBuilderInternals, string } from "./option";
+import {
+	boolean,
+	type GenericBuilderInternals,
+	positional,
+	string,
+} from "./option";
 import { formatError, introspectCli, type RunOptions, run } from "./runner";
 
 function trpcError(
@@ -167,6 +172,110 @@ describe("introspectCli", () => {
 		expect(() => introspectCli()).toThrow(
 			/only available while a command runs/,
 		);
+	});
+});
+
+describe("positional validation", () => {
+	async function runProbe(args: string[], command: CommandConfig) {
+		const stderr: string[] = [];
+		const write = process.stderr.write;
+		const exit = process.exit;
+		let exitCode: number | undefined;
+		process.stderr.write = ((chunk: string | Uint8Array, cb?: () => void) => {
+			stderr.push(String(chunk));
+			cb?.();
+			return true;
+		}) as never;
+		process.exit = ((code?: number) => {
+			exitCode = code;
+		}) as never;
+		try {
+			await runArgs(["probe", ...args], {
+				name: "demo",
+				version: "0.0.0",
+				tree: { groups: [], commands: [{ path: ["probe"], command }] },
+			});
+		} finally {
+			process.stderr.write = write;
+			process.exit = exit;
+		}
+		return { stderr: stderr.join(""), exitCode };
+	}
+
+	it("rejects a stray word on a command without args", async () => {
+		const result = await runProbe(["stray-token"], cmd("Probe"));
+		expect(result.stderr).toBe("Error: Unexpected argument: stray-token\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("suggests the single missing required option for a stray positional", async () => {
+		const result = await runProbe(
+			["7b7a6e31", "--workspace", "w1"],
+			cmd("Probe", {
+				options: {
+					terminal: string().required(),
+					workspace: string().required(),
+				},
+			}),
+		);
+		expect(result.stderr).toBe(
+			"Error: Unexpected argument: 7b7a6e31\nHint: Did you mean --terminal 7b7a6e31?\n",
+		);
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("rejects a positional beyond the declared argument", async () => {
+		const result = await runProbe(
+			["TASK-1", "stray-token"],
+			cmd("Probe", { args: [positional("id").required()] as never }),
+		);
+		expect(result.stderr).toBe("Error: Unexpected argument: stray-token\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("accepts variadic positionals after the separator", async () => {
+		let received: unknown;
+		const result = await runProbe(
+			["first", "--", "--second"],
+			cmd("Probe", {
+				args: [positional("ids").variadic()] as never,
+				run: async ({ args }) => {
+					received = args;
+					return undefined;
+				},
+			}),
+		);
+		expect(received).toEqual({ ids: ["first", "--second"] });
+		expect(result.stderr).toBe("");
+		expect(result.exitCode).toBeUndefined();
+	});
+
+	it("omits the hint when multiple required options are missing", async () => {
+		const result = await runProbe(
+			["stray-token"],
+			cmd("Probe", {
+				options: {
+					terminal: string().required(),
+					workspace: string().required(),
+				},
+			}),
+		);
+		expect(result.stderr).toBe("Error: Unexpected argument: stray-token\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("keeps the missing option message without a stray positional", async () => {
+		const result = await runProbe(
+			["--workspace", "w1"],
+			cmd("Probe", {
+				options: {
+					terminal: string().required(),
+					workspace: string().required(),
+				},
+			}),
+		);
+		expect(result.stderr).toBe("Error: Missing required option: --terminal\n");
+		expect(result.exitCode).toBe(1);
 	});
 });
 

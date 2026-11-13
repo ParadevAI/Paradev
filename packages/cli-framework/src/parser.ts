@@ -32,6 +32,7 @@ export function parseArgv(
 	argv: string[],
 	optionConfigs: Record<string, ProcessedBuilderConfig>,
 	globalConfigs?: Record<string, ProcessedBuilderConfig>,
+	positionalLimit?: number,
 ): ParseResult {
 	const args = argv.slice(2);
 	const commandPath: string[] = [];
@@ -191,6 +192,7 @@ export function parseArgv(
 	}
 
 	// Validate required options
+	const missingFlags: string[] = [];
 	for (const [key, config] of Object.entries(allConfigs)) {
 		if (config.type === "positional") continue;
 		const value = options[key];
@@ -201,8 +203,20 @@ export function parseArgv(
 			const flag = config.name.startsWith("-")
 				? config.name
 				: `--${config.name}`;
-			throw new CLIError(`Missing required option: ${flag}`);
+			missingFlags.push(flag);
 		}
+	}
+	if (positionalLimit !== undefined && positionals.length > positionalLimit) {
+		const unexpected = positionals[positionalLimit];
+		throw new CLIError(
+			`Unexpected argument: ${unexpected}`,
+			missingFlags.length === 1
+				? `Did you mean ${missingFlags[0]} ${unexpected}?`
+				: undefined,
+		);
+	}
+	if (missingFlags.length > 0) {
+		throw new CLIError(`Missing required option: ${missingFlags[0]}`);
 	}
 
 	// Validate conflicts
