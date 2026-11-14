@@ -22,7 +22,7 @@ This separation prevents multiple instances from interfering with each other.
 | `codex` | Wrapper for Codex CLI that enables native hooks and session-log signals |
 | `droid` | Wrapper for Factory Droid CLI that preserves Superset hook integration |
 | `opencode` | Wrapper for OpenCode CLI that sets `OPENCODE_CONFIG_DIR` |
-| `prime-agent` | Wrapper for Prime Agent that loads the Superset extension through a per-launch bridge |
+| `prime-agent` | Wrapper for Prime Agent that loads the Superset extension through a per-launch bridge, only when the real binary's `--help` lists `--extension` (the Rust build has no JS extensions, so it starts `prime-agent-watch.mjs` alongside instead). With the watcher, it also takes a trailing launch message out of argv, because the Rust TUI sends an argv message again each time it reconnects to its session; the watcher sends that message once. `-p`, `--resume`, `--continue`, `--fork`, `--mode`, `--cwd` and any option it does not know keep the message in argv |
 
 These wrappers are added to `PATH` via shell integration, allowing them to intercept
 agent commands and inject Superset-specific configuration.
@@ -35,6 +35,7 @@ agent commands and inject Superset-specific configuration.
 | `claude-settings.json` | Claude Code settings file with hook configuration |
 | `opencode/plugin/superset-notify.js` | OpenCode plugin for lifecycle events |
 | `prime-agent-notify.mjs` | Prime Agent extension for lifecycle events and the `superset_ask_user` tool |
+| `prime-agent-watch.mjs` | Status watcher for Prime Agent builds without extensions: polls `prime-agent sessions --json` and reports SessionStart, Start, Stop and SessionEnd for the session in the terminal's directory. It also sends the launch message the wrapper held back, once, with `prime-agent send` to the new empty session in that directory, then deletes the `$TMPDIR/superset-prime-prompt.*` folder. If it cannot send within 2 minutes, the wrapper keeps the file and prints its path when the TUI exits. It cannot report Needs attention, and there is no `superset_ask_user` tool |
 | `prime-agent-*/bridge.mjs` | Per-launch bridge that gives the extension the terminal's Superset env. The wrapper deletes it on exit if no session loaded it (no `bridge.mjs.loaded` marker); a loaded bridge stays until its session quits |
 
 ## Global Tool Settings Files

@@ -41,6 +41,10 @@ describe("Prime Agent integration", () => {
 		writeFileSync(
 			path.join(realBin, "prime-agent"),
 			`#!/bin/bash
+if [ "$1" = "--help" ]; then
+  [ "$PRIME_TEST_NO_EXTENSION" = "1" ] || echo "  -e, --extension <path>  Load an extension"
+  exit 0
+fi
 if [ "$1" = "--extension" ] && [ "$PRIME_TEST_REUSE" != "1" ]; then
   node --input-type=module -e '
     const { default: extension } = await import(process.argv[1]);
@@ -79,6 +83,175 @@ exit "\${PRIME_TEST_EXIT_CODE:-0}"
 		expect(
 			run("terminal-1", ["sessions", "--all"]).stdout.trim().split("\n"),
 		).toEqual(["sessions", "--all"]);
+	});
+
+	it("launches without the bridge when the real binary has no --extension flag", () => {
+		const hooksBefore = readdirSync(path.join(home, "hooks")).sort();
+		const result = spawnSync(
+			path.join(home, "bin", "prime-agent"),
+			["--resume", "session-1"],
+			{
+				encoding: "utf8",
+				env: {
+					...process.env,
+					SUPERSET_TERMINAL_ID: "terminal-1",
+					SUPERSET_AGENT_ID: "",
+					PRIME_TEST_NO_EXTENSION: "1",
+					PATH: `${path.join(home, "bin")}:${path.join(home, "real-bin")}:${process.env.PATH}`,
+				},
+			},
+		);
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim().split("\n")).toEqual(["--resume", "session-1"]);
+		expect(readdirSync(path.join(home, "hooks")).sort()).toEqual(hooksBefore);
+	});
+
+	it("reports working and idle through the sessions watcher when --extension is missing", () => {
+		const dir = mkdtempSync(path.join(tmpdir(), "prime-watch-"));
+		const state = path.join(dir, "sessions.json");
+		const events = path.join(dir, "events.jsonl");
+		const notify = path.join(home, "hooks", "notify.sh");
+		writeFileSync(
+			notify,
+			`#!/bin/bash\nprintf "%s\\n" "$1" >> ${JSON.stringify(events)}\n`,
+			{ mode: 0o755 },
+		);
+		chmodSync(notify, 0o755);
+		const fakeBin = path.join(dir, "bin");
+		mkdirSync(fakeBin);
+		const session = (activity: string) =>
+			JSON.stringify({
+				sessions: [
+					{
+						sessionId: "s-1",
+						cwd: dir,
+						activity,
+						attachedClients: 1,
+						modified: activity,
+					},
+				],
+			});
+		writeFileSync(
+			path.join(fakeBin, "prime-agent"),
+			`#!/bin/bash
+case "$1" in
+  --help) echo "  --model <id>"; exit 0 ;;
+  sessions) cat ${JSON.stringify(state)} 2>/dev/null || echo '{"sessions":[]}'; exit 0 ;;
+esac
+sleep 0.6
+printf '%s' ${JSON.stringify(session("working"))} > ${JSON.stringify(state)}
+sleep 0.8
+printf '%s' ${JSON.stringify(session("idle"))} > ${JSON.stringify(state)}
+sleep 0.8
+exit 3
+`,
+			{ mode: 0o755 },
+		);
+		const result = spawnSync(path.join(home, "bin", "prime-agent"), [], {
+			cwd: dir,
+			encoding: "utf8",
+			env: {
+				...process.env,
+				SUPERSET_HOME_DIR: home,
+				SUPERSET_TERMINAL_ID: "terminal-1",
+				SUPERSET_AGENT_ID: "",
+				SUPERSET_PRIME_WATCH_POLL_MS: "100",
+				PATH: `${path.join(home, "bin")}:${fakeBin}:${process.env.PATH}`,
+			},
+		});
+		expect(result.status).toBe(3);
+		const names = readFileSync(events, "utf8")
+			.trim()
+			.split("\n")
+			.map((line) => JSON.parse(line))
+			.filter((event) => event.session_id === "s-1")
+			.map((event) => event.hook_event_name);
+		expect(names).toEqual(["SessionStart", "Start", "Stop", "SessionEnd"]);
+		rmSync(notify, { force: true });
+		rmSync(dir, { recursive: true, force: true });
+	});
+
+	function writeFakeSendBinary(dir: string, main: string): string {
+		const fakeBin = path.join(dir, "bin");
+		mkdirSync(fakeBin);
+		writeFileSync(
+			path.join(fakeBin, "prime-agent"),
+			`#!/bin/bash
+case "$1" in
+  --help) echo "  --model <id>"; exit 0 ;;
+  sessions) cat ${JSON.stringify(path.join(dir, "sessions.json"))} 2>/dev/null || echo '{"sessions":[]}'; exit 0 ;;
+  send) printf '%s|%s\\n' "$2" "$3" >> ${JSON.stringify(path.join(dir, "sends"))}; exit 0 ;;
+esac
+printf '%s\\n' "$@" > ${JSON.stringify(path.join(dir, "argv"))}
+${main}
+`,
+			{ mode: 0o755 },
+		);
+		return fakeBin;
+	}
+
+	function runWithTerminal(dir: string, fakeBin: string, args: string[]) {
+		return spawnSync(path.join(home, "bin", "prime-agent"), args, {
+			cwd: dir,
+			encoding: "utf8",
+			env: {
+				...process.env,
+				TMPDIR: dir,
+				SUPERSET_HOME_DIR: home,
+				SUPERSET_TERMINAL_ID: "terminal-1",
+				SUPERSET_AGENT_ID: "",
+				SUPERSET_PRIME_WATCH_POLL_MS: "100",
+				PATH: `${path.join(home, "bin")}:${fakeBin}:${process.env.PATH}`,
+			},
+		});
+	}
+
+	it("sends the launch message once with prime send instead of passing it to the TUI", () => {
+		const dir = mkdtempSync(path.join(tmpdir(), "prime-prompt-"));
+		const draft = JSON.stringify({
+			sessions: [
+				{
+					id: "d-1",
+					sessionId: "s-1",
+					cwd: dir,
+					messageCount: 0,
+					created: "CREATED",
+				},
+			],
+		});
+		const fakeBin = writeFakeSendBinary(
+			dir,
+			`printf '%s' ${JSON.stringify(draft)} | sed "s/CREATED/$(date -u +%Y-%m-%dT%H:%M:%SZ)/" > ${JSON.stringify(path.join(dir, "sessions.json"))}
+sleep 1.2`,
+		);
+		const result = runWithTerminal(dir, fakeBin, [
+			"--model",
+			"m",
+			"Hello there",
+		]);
+		expect(result.status).toBe(0);
+		expect(readFileSync(path.join(dir, "argv"), "utf8")).toBe("--model\nm\n");
+		expect(readFileSync(path.join(dir, "sends"), "utf8")).toBe(
+			"d-1|Hello there\n",
+		);
+		expect(
+			readdirSync(dir).filter((name) =>
+				name.startsWith("superset-prime-prompt."),
+			),
+		).toEqual([]);
+		rmSync(dir, { recursive: true, force: true });
+	});
+
+	it("keeps a launch message it could not send and says where it is", () => {
+		const dir = mkdtempSync(path.join(tmpdir(), "prime-prompt-"));
+		const fakeBin = writeFakeSendBinary(dir, "exit 0");
+		const result = runWithTerminal(dir, fakeBin, ["Hello there"]);
+		expect(result.status).toBe(0);
+		expect(readFileSync(path.join(dir, "argv"), "utf8")).toBe("\n");
+		const saved = result.stderr.match(/saved in (\S+)/)?.[1];
+		expect(saved && readFileSync(saved, "utf8")).toBe("Hello there");
+		expect(existsSync(path.join(dir, "sends"))).toBe(false);
+		rmSync(dir, { recursive: true, force: true });
 	});
 
 	it("reaps unused bridges on repeated resumes and failed launches without touching loaded bridges", () => {
