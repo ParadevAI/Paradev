@@ -8,7 +8,8 @@ import {
 } from "../../../../lib/host-target";
 
 export default command({
-	description: "Point a repository at the folder it now lives in on the host",
+	description:
+		"Point a repository at the folder it now lives in on the host. Refused while workspaces use worktrees of that repository",
 	args: [positional("repository").desc("Repository name or ID")],
 	options: {
 		host: string().desc("Target host machineId (required unless --local)"),

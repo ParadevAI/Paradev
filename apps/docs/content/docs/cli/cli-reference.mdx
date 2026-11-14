@@ -663,7 +663,8 @@ workspaces run from then on.
 Point a repository at the folder it now lives in on the host, after you moved it.
 A repository with a GitHub remote only accepts a folder with the same remote. Its
 name stays the same, so the checkout folders of existing workspaces do not change. A
-workspace on the repository's own checkout (`--checkout local`) moves with it.
+workspace on the repository's own checkout (`--checkout local`) moves with it. The command is
+refused while workspaces use worktrees of that repository.
 
 ```bash
 superset projects repos relocate api --project prj_… --path ~/src/api --local
@@ -678,7 +679,7 @@ superset projects repos relocate api --project prj_… --path ~/src/api --local
 	options={[
 		{ flag: "--clone-into <dir>", description: "Clone every repository into `<dir>/<name>/`. Repositories given a `--path` are not cloned." },
 		{ flag: "--path <repo>=<dir>", description: "Use the existing folder `<dir>` for the repository `<repo>` (its name or ID). Repeatable; wins over `--clone-into` for that repository." },
-		{ flag: "--allow-relocate", description: "If this host already has a repository in another folder that still works, move it to its `--path` folder. Needs `--path`. A repository that workspaces use worktrees of is not moved." },
+		{ flag: "--allow-relocate", description: "If this host already has a repository in another folder that still works, move it to its `--path` folder. Needs `--path`. Refused while workspaces use worktrees of a repository it would move." },
 		{ flag: "--from-host <id>", description: "Host machineId to copy the project from. Default: the only other online host that has it." },
 		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`." },
 		{ flag: "--local", description: "Target this machine (the default)." },

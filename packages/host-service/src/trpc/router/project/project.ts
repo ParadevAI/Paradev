@@ -12,6 +12,7 @@ import type { TagSettingSnapshot } from "../../../events/types";
 import {
 	emitProjectChanged,
 	getLocalProject,
+	getProjectIncludingDeleted,
 	toProjectSnapshot,
 	updateLocalProject,
 } from "../../../projects/local-project-store";
@@ -222,10 +223,19 @@ export const projectRouter = router({
 		}),
 
 	get: protectedProcedure
-		.input(z.object({ projectId: z.string().uuid() }))
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				includeDeleted: z.boolean().optional(),
+			}),
+		)
 		.query(({ ctx, input }) => {
-			const row = getLocalProject(ctx.db, input.projectId);
-			return row ? toProjectSnapshot(ctx.db, row) : null;
+			const row = input.includeDeleted
+				? getProjectIncludingDeleted(ctx.db, input.projectId)
+				: getLocalProject(ctx.db, input.projectId);
+			return row
+				? { ...toProjectSnapshot(ctx.db, row), deleted: row.deletedAt != null }
+				: null;
 		}),
 
 	addRepository: machineOnlyProcedure

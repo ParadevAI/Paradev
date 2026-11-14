@@ -83,7 +83,7 @@ type SetupResult = Awaited<
 	ReturnType<ResolvedHostTarget["client"]["project"]["setup"]["mutate"]>
 >;
 
-/** Brings back a project this host deleted; null when the host never had it. */
+/** Brings back a project this host deleted, for a host whose project.get cannot list deleted projects; null when the host never had it. */
 async function restoreDeleted(
 	target: ResolvedHostTarget,
 	projectId: string,
@@ -117,7 +117,7 @@ export default command({
 				"<repo>=<dir>: use the existing folder <dir> for the repository named <repo> (name or ID). Repeatable; wins over --clone-into",
 			),
 		allowRelocate: boolean().desc(
-			"Move a repository this host already has to its --path folder, even if its current folder still works. A repository that workspaces use worktrees of is not moved",
+			"Move a repository this host already has to its --path folder, even if its current folder still works. Refused while workspaces use worktrees of a repository it would move",
 		),
 	},
 	run: async ({ ctx, args, options }) => {
@@ -183,15 +183,19 @@ export default command({
 			fromHostId: options.fromHost ?? undefined,
 		};
 
-		const existing = await target.client.project.get.query({ projectId });
-		const restoredProject = existing
+		const found = await target.client.project.get.query({
+			projectId,
+			includeDeleted: true,
+		});
+		const existing = found?.deleted ? null : found;
+		const restoredProject = found
 			? null
 			: await restoreDeleted(target, projectId);
 		let source: SourceProject | null = null;
 		let added: HostProject["repositories"] = [];
 		let result: SetupResult;
-		if (existing || restoredProject) {
-			const known = (existing ?? restoredProject) as HostProject;
+		if (found || restoredProject) {
+			const known = (found ?? restoredProject) as HostProject;
 			const knownRepositories = requireRepositories(known);
 			source = await findSourceWithNewRepositories({
 				...sourceArgs,
