@@ -19,7 +19,7 @@ const appAccessInstructions = [
 ].join("\n");
 
 module.exports = {
-	packageName: "sh.superset.mobile",
+	packageName: "com.paradev.mobile",
 	defaultLanguage: "en-US",
 	listings: {
 		"en-US": {

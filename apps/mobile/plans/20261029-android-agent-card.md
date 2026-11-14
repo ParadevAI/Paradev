@@ -102,7 +102,7 @@ fans out to APNs and FCM v1.
 
 - **Credentials.** APNs key (.p8) and FCM v1 service account JSON uploaded to EAS
   (`eas credentials`). Android also needs `android.googleServicesFile` in `app.config.ts`
-  (a `google-services.json` from a Firebase project for `sh.superset.mobile`).
+  (a `google-services.json` from a Firebase project for `com.paradev.mobile`).
 - **Mobile.** `apps/mobile/lib/push/` (seam per the AGENTS convention: `registerPush.types.ts`,
   `.native.ts`, fallback `.ts`), called once from the authenticated layout:
   1. ask permission (`requestPermissionsAsync`; on Android 13+ this is the `POST_NOTIFICATIONS`

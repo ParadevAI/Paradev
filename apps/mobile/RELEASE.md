@@ -213,7 +213,7 @@ adb install -r /tmp/superset.apk
 `--local` needs JDK 17 and the Android SDK, and pulls the `production` EAS
 environment and the upload keystore. It submits nothing, but it spends a
 `versionCode`. The installed app talks to production. Check
-`adb shell pm get-app-links sh.superset.mobile` for the App Links hosts.
+`adb shell pm get-app-links com.paradev.mobile` for the App Links hosts.
 
 - R8 runs in full mode in release builds only. A keep rule it ignores shows up
   at run time, not at build time: look for `NoSuchMethodException` or

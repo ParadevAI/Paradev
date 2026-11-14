@@ -1,6 +1,6 @@
 # Signs in through the dev email prompt as ${EMAIL}, signing out first if needed.
 # Run by scripts/android-dev.sh --user; works on the iOS simulator too.
-appId: sh.superset.mobile
+appId: com.paradev.mobile
 ---
 - extendedWaitUntil:
     visible: "Sign in with email \\(dev\\)"

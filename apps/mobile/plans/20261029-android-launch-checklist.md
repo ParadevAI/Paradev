@@ -32,13 +32,13 @@ Do Google Cloud in both projects that own a `GOOGLE_CLIENT_ID` web client: dev a
       `01:19:18:27:15:2A:D2:39:1B:FE:BC:D0:AD:A1:2D:89:28:1A:5C:42:04:EA:26:6C:0A:54:E8:47:23:E5:C1:93`.
       Was: In `apps/mobile`: `eas credentials -p android`, production profile,
       let EAS generate the keystore. Copy its SHA-1 and SHA-256.
-- [ ] **Play Console app.** Create the app with package `sh.superset.mobile` and accept Play App
+- [ ] **Play Console app.** Create the app with package `com.paradev.mobile` and accept Play App
       Signing. Copy the app signing key's SHA-1 and SHA-256 from Test and release → App
       integrity.
 
 ### Google sign-in (native, Credential Manager)
 
-- [ ] **Android OAuth clients** for `sh.superset.mobile`, one per signing key, in project
+- [ ] **Android OAuth clients** for `com.paradev.mobile`, one per signing key, in project
       `fair-scout-481221-v0` (it holds both the Web and Web Dev clients). Debug and upload-key
       clients created 2026-10-29; the Play App Signing one waits for the Play app. No client secret:
   - Debug, dev project only (React Native's shared template keystore):
@@ -59,8 +59,8 @@ platforms.
 
 - [ ] Put both SHA-256 values (upload key and Play App Signing key, uppercase, colon-separated) in
       `ANDROID_SIGNING_CERT_SHA256` in `packages/shared/src/constants.ts`, and deploy web. Check
-      on a device: `adb shell pm verify-app-links --re-verify sh.superset.mobile`, then
-      `adb shell pm get-app-links sh.superset.mobile`.
+      on a device: `adb shell pm verify-app-links --re-verify com.paradev.mobile`, then
+      `adb shell pm get-app-links com.paradev.mobile`.
 
 ### Play submission
 

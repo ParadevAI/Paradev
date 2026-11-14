@@ -3,7 +3,7 @@
 # worktree's Metro, API, relay and realtime.
 #
 # The emulator is shared by every worktree on the machine, and they all install
-# the same package (sh.superset.mobile). The script writes which worktree and
+# the same package (com.paradev.mobile). The script writes which worktree and
 # native fingerprint the installed APK came from onto the device, and rebuilds
 # only when that does not match this checkout. JS/TS changes ship through Metro.
 #
@@ -57,7 +57,7 @@ if [ -n "$SIGN_IN_EMAIL" ] && ! [[ "$SIGN_IN_EMAIL" =~ ^[a-z0-9._+-]+@local\.tes
 	exit 1
 fi
 
-PACKAGE=sh.superset.mobile
+PACKAGE=com.paradev.mobile
 OWNER_FILE=/data/local/tmp/superset-mobile-owner
 STATE_DIR="$ROOT_DIR/.tmp/android-dev"
 METRO_LOG="$STATE_DIR/metro.log"

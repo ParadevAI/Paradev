@@ -33,7 +33,7 @@ apps/mobile/scripts/android-dev.sh --user maya@local.test   # also sign in as a 
 
 ## One emulator, many worktrees
 
-Every worktree installs the same package, `sh.superset.mobile`, so the last install wins.
+Every worktree installs the same package, `com.paradev.mobile`, so the last install wins.
 
 - The script writes the worktree path and native fingerprint of the installed APK to
   `/data/local/tmp/superset-mobile-owner` on the device. A mismatch rebuilds, so another worktree's
@@ -54,7 +54,7 @@ Every worktree installs the same package, `sh.superset.mobile`, so the last inst
   after `pm clear`. Blank it and restart Metro to see the sign-in screen.
 - **Notification permission.** Home asks for `POST_NOTIFICATIONS` once, when the first agent card
   would show, and remembers the answer. The script grants it up front; to see the prompt, run
-  `adb shell pm revoke sh.superset.mobile android.permission.POST_NOTIFICATIONS` and `pm clear`.
+  `adb shell pm revoke com.paradev.mobile android.permission.POST_NOTIFICATIONS` and `pm clear`.
 - **iOS-only header items.** SF Symbol `Stack.Toolbar` buttons and `Stack.SearchBar` do not render
   on Android, and a form sheet draws no native bar there (see the sheet convention in
   `apps/mobile/AGENTS.md`). An empty header on Android is not always a regression.
@@ -69,7 +69,7 @@ Every worktree installs the same package, `sh.superset.mobile`, so the last inst
 
 - **Low memory kills the dev app.** The dev build holds about 800 MB (Hermes runs the full dev
   bundle). An AVD that booted from a 2 GB snapshot loses the app to the low-memory killer as soon as
-  a picker or Chrome opens (`lowmemorykiller: Kill 'sh.superset.mobile'` in logcat). Check
+  a picker or Chrome opens (`lowmemorykiller: Kill 'com.paradev.mobile'` in logcat). Check
   `adb shell cat /proc/meminfo`; if `MemTotal` is near 2 GB, restart that AVD with
   `emulator -avd <avd> -port <port> -memory 4096 -no-snapshot-load`.
 - **The emulator mic.** `adb emu avd hostmicon` feeds the Mac microphone to the AVD, so the
@@ -83,11 +83,11 @@ adb exec-out screencap -p > shot.png                      # or: android-dev.sh -
 adb shell screenrecord /sdcard/run.mp4                    # stop with Ctrl-C, then adb pull
 adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml   # element bounds for taps
 adb shell input tap X Y; adb shell input text 'hello'; adb shell input keyevent 4   # 4 = back
-adb shell am start -a android.intent.action.VIEW -d 'superset://settings' sh.superset.mobile
+adb shell am start -a android.intent.action.VIEW -d 'superset://settings' com.paradev.mobile
 adb logcat -d -s ReactNativeJS:V                          # JS console
 adb logcat -d -b crash                                    # native crashes
 adb shell cmd statusbar expand-notifications              # the agent card lives here
-adb shell cmd locale set-app-locales sh.superset.mobile --locales de-DE   # per-app locale
+adb shell cmd locale set-app-locales com.paradev.mobile --locales de-DE   # per-app locale
 adb shell settings put system font_scale 1.3              # large text; reset to 1.0
 ```
 

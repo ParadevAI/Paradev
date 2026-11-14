@@ -11,7 +11,7 @@ export const IOS_APP = {
 } as const;
 
 export const ANDROID_APP = {
-	PACKAGE: "sh.superset.mobile",
+	PACKAGE: "com.paradev.mobile",
 } as const;
 
 // Mobile bundles inline only EXPO_PUBLIC_*. The desktop renderer has no
