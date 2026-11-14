@@ -2,7 +2,11 @@ import { useWorkspaceClient } from "@superset/workspace-client";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
-import { acquireDocument, releaseDocument } from "./fileDocumentStore";
+import {
+	acquireDocument,
+	getDocumentSnapshot,
+	releaseDocument,
+} from "./fileDocumentStore";
 import type { SharedFileDocument } from "./types";
 
 interface UseSharedFileDocumentParams {
@@ -69,11 +73,7 @@ export function useSharedFileDocument({
 		};
 	}, [hostUrl, workspaceId, absolutePath]);
 
-	useSyncExternalStore(
-		state.handle.subscribe,
-		state.handle.getVersion,
-		state.handle.getVersion,
+	return useSyncExternalStore(state.handle.subscribe, () =>
+		getDocumentSnapshot(state.handle),
 	);
-
-	return state.handle;
 }

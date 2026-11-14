@@ -11,10 +11,11 @@ import { useState } from "react";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { PriorityIcon } from "../../../../components/shared/PriorityIcon";
 import { ALL_PRIORITIES } from "../../../../utils/sorting";
+import type { TasksTableFeatures } from "../../tasksTableFeatures";
 import type { TaskWithStatus } from "../../useTasksTable";
 
 interface PriorityCellProps {
-	info: CellContext<TaskWithStatus, TaskPriority>;
+	info: CellContext<TasksTableFeatures, TaskWithStatus, TaskPriority>;
 }
 
 export function PriorityCell({ info }: PriorityCellProps) {

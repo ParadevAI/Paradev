@@ -4445,7 +4445,7 @@ msgstr "Punkt kontrolny"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Punkt kontrolny · przed refaktoryzacją tooltipów"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "Punkt kontrolny zapisany {0}"
 
@@ -6689,7 +6689,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Utworzono"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -21922,7 +21922,7 @@ msgstr "Zaktualizuj tego hosta, aby przenosić subagentów w tło"
 msgid "Updated"
 msgstr "Zaktualizowano"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "Zaktualizowano {0}"
 

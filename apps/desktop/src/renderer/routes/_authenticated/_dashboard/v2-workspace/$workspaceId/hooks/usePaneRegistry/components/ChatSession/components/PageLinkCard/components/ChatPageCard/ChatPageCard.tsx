@@ -7,6 +7,7 @@ import {
 import { cn } from "@superset/ui/utils";
 import { FileText } from "lucide-react";
 import { type MouseEvent, useState } from "react";
+import { useNow } from "renderer/hooks/useNow";
 
 export type ChatPageCardPage = {
 	title: string;
@@ -29,11 +30,12 @@ export function ChatPageCard({
 	onOpen: (event: MouseEvent) => void;
 	className?: string;
 }) {
+	const now = useNow(60_000);
 	const { formatCompactRelativeTime } = useFormat();
 	const [failedThumbnail, setFailedThumbnail] = useState<string | null>(null);
 	const thumbnail =
 		page.thumbnailUrl === failedThumbnail ? null : page.thumbnailUrl;
-	const ago = formatCompactRelativeTime(page.updatedAt);
+	const ago = formatCompactRelativeTime(page.updatedAt, now);
 
 	return (
 		<button

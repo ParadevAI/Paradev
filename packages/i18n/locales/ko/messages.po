@@ -4445,7 +4445,7 @@ msgstr "체크포인트"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "체크포인트 · 툴팁 리팩터링 전"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "체크포인트 저장됨 {0}"
 
@@ -6689,7 +6689,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "생성됨"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -21922,7 +21922,7 @@ msgstr "서브 에이전트를 백그라운드로 옮기려면 이 호스트를 
 msgid "Updated"
 msgstr "업데이트됨"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "{0} 업데이트됨"
 

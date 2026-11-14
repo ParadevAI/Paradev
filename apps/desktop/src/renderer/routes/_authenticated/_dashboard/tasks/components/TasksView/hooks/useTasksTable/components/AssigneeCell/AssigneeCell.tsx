@@ -13,10 +13,11 @@ import { HiOutlineUserCircle } from "react-icons/hi2";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { AssigneeMenuItems } from "../../../../components/shared/AssigneeMenuItems";
+import type { TasksTableFeatures } from "../../tasksTableFeatures";
 import type { TaskWithStatus } from "../../useTasksTable";
 
 interface AssigneeCellProps {
-	info: CellContext<TaskWithStatus, string | null>;
+	info: CellContext<TasksTableFeatures, TaskWithStatus, string | null>;
 }
 
 export function AssigneeCell({ info }: AssigneeCellProps) {

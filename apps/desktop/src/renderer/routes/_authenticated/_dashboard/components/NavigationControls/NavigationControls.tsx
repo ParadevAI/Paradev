@@ -4,7 +4,7 @@ import {
 } from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useLocation, useRouter } from "@tanstack/react-router";
+import { useCanGoBack, useLocation, useRouter } from "@tanstack/react-router";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { HotkeyLabel } from "renderer/hotkeys";
@@ -14,7 +14,7 @@ export function NavigationControls() {
 	const router = useRouter();
 	const location = useLocation();
 
-	const canGoBack = router.history.canGoBack();
+	const canGoBack = useCanGoBack();
 	const canGoForward = location.state.__TSR_index < router.history.length - 1;
 	const isParadevShell = useParadevShell();
 	const buttonClassName = isParadevShell

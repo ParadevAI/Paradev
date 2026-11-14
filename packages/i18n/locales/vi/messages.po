@@ -4445,7 +4445,7 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · trước khi refactor tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "Đã lưu checkpoint {0}"
 
@@ -6689,7 +6689,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Đã tạo"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -21922,7 +21922,7 @@ msgstr "Cập nhật máy chủ này để chuyển agent con sang chạy nền"
 msgid "Updated"
 msgstr "Đã cập nhật"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "Đã cập nhật {0}"
 
