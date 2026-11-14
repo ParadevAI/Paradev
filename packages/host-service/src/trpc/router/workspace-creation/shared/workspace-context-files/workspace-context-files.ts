@@ -23,7 +23,8 @@ export const WORKSPACE_CONTEXT_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 export const WORKSPACE_SKILL_FOLDERS = [".agents", ".claude"] as const;
 
 /**
- * Agent config the root links from the primary repository. Never
+ * Agent config the root links from the primary repository, or from the
+ * first checkout by name when the primary is not checked out. Never
  * `.claude/settings.local.json`: Claude Code keeps the root's approvals there.
  */
 export const WORKSPACE_CONFIG_LINKS = [
@@ -73,15 +74,17 @@ export function writeWorkspaceContextFiles(
 			);
 		}
 	}
-	const primary = checkouts.find((checkout) => checkout.isPrimary);
+	const configSource =
+		checkouts.find((checkout) => checkout.isPrimary) ??
+		[...checkouts].sort((a, b) => a.name.localeCompare(b.name))[0];
 	const linked = syncConfigLinks(
 		root,
-		primary,
+		configSource,
 		checkouts.map((checkout) => checkout.path),
 	);
 	writeIfChanged(
 		join(root, "AGENTS.md"),
-		renderAgentsFile(checkouts, linked.length > 0 ? primary : undefined),
+		renderAgentsFile(checkouts, linked.length > 0 ? configSource : undefined),
 	);
 	writeIfChanged(join(root, "CLAUDE.md"), "@AGENTS.md\n");
 }
@@ -126,7 +129,9 @@ function renderAgentsFile(
 			? [
 					"## MCP servers and settings",
 					"",
-					`MCP servers and settings come from the primary repository (${configSource.name}).`,
+					configSource.isPrimary
+						? `MCP servers and settings come from the primary repository (${configSource.name}).`
+						: `MCP servers and settings come from ${configSource.name}, as this workspace has no checkout of the primary repository.`,
 					"They run with this workspace folder as the working folder, so a relative",
 					"path in them resolves from this folder, not from the repository.",
 					"",
@@ -313,19 +318,19 @@ function syncSkillLinks(
 }
 
 /**
- * Links the primary repository's agent config at the root and reaps the
+ * Links the config repository's agent config at the root and reaps the
  * host's links that no longer match. Returns the root-relative paths linked.
  */
 function syncConfigLinks(
 	root: string,
-	primary: ContextCheckout | undefined,
+	configSource: ContextCheckout | undefined,
 	checkoutPaths: string[],
 ): string[] {
 	const linked: string[] = [];
 	for (const { path, type } of WORKSPACE_CONFIG_LINKS) {
 		const link = join(root, path);
 		const folder = dirname(link);
-		const target = primary ? join(primary.path, path) : undefined;
+		const target = configSource ? join(configSource.path, path) : undefined;
 		const wanted = target !== undefined && isEntryOfType(target, type);
 		try {
 			if (!isRealFolderPath(root, folder)) {

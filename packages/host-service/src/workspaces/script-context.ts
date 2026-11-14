@@ -17,9 +17,9 @@ export interface WorkspaceScriptContext {
 }
 
 /**
- * A workspace with one checkout uses that repository's config; a root of
- * several uses the primary repository's. Scripts run in the workspace root.
- * Null for a project-less workspace.
+ * A workspace uses the primary repository's config when it checks it out,
+ * else the config of its first checkout by name. Scripts run in the
+ * workspace root. Null for a project-less workspace.
  */
 export function resolveWorkspaceScriptContext(
 	db: HostDb,
@@ -29,11 +29,12 @@ export function resolveWorkspaceScriptContext(
 	const project = getProjectIncludingDeleted(db, workspace.projectId);
 	if (!project) return null;
 	const checkouts = listWorkspaceCheckouts(db, workspace);
-	const only = checkouts.length === 1 ? checkouts[0] : undefined;
-	const repository = only?.repository ?? getPrimaryRepository(db, project);
-	if (!repository) return null;
 	const configCheckout =
-		only ?? checkouts.find((c) => c.repository.id === repository.id);
+		checkouts.find((c) => c.repository.id === project.primaryRepositoryId) ??
+		checkouts[0];
+	const repository =
+		configCheckout?.repository ?? getPrimaryRepository(db, project);
+	if (!repository) return null;
 	return {
 		projectId: project.id,
 		repoPath: repository.repoPath,

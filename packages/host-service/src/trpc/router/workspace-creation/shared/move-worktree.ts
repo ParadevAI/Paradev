@@ -1,4 +1,4 @@
-import { cp, rm } from "node:fs/promises";
+import { cp, lstat, rm } from "node:fs/promises";
 import type { GitClient } from "./types";
 
 /** `git worktree move`, which renames the folder, so it falls back to a copy across filesystems. */
@@ -19,20 +19,29 @@ export async function moveWorktree(
 const removeFolder = (path: string) =>
 	rm(path, { recursive: true, force: true });
 
+const pathExists = (path: string) =>
+	lstat(path).then(
+		() => true,
+		() => false,
+	);
+
 export async function copyWorktree(
 	git: GitClient,
 	from: string,
 	to: string,
 	removeSource: (path: string) => Promise<void> = removeFolder,
 ): Promise<void> {
-	await cp(from, to, {
-		recursive: true,
-		verbatimSymlinks: true,
-		preserveTimestamps: true,
-		errorOnExist: true,
-		force: false,
-	});
+	if (await pathExists(to)) {
+		throw new Error(`Cannot move ${from}: ${to} already exists`);
+	}
 	try {
+		await cp(from, to, {
+			recursive: true,
+			verbatimSymlinks: true,
+			preserveTimestamps: true,
+			errorOnExist: true,
+			force: false,
+		});
 		await git.raw(["worktree", "repair", to]);
 	} catch (error) {
 		await removeFolder(to);

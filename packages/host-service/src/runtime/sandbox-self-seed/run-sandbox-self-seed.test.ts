@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { describe, expect, test } from "bun:test";
+import { describe, expect, spyOn, test } from "bun:test";
 import {
 	mkdirSync,
 	mkdtempSync,
@@ -17,6 +17,7 @@ import * as schema from "../../db/schema";
 import { listProjectRepositories } from "../../projects/repositories";
 import { resolveCheckout } from "../../workspaces/checkouts";
 import {
+	readSandboxIdentity,
 	runSandboxSelfSeed,
 	runSandboxStartHook,
 	type SandboxIdentity,
@@ -144,6 +145,26 @@ describe("sandbox self-seed", () => {
 		expect(db.select().from(schema.repositories).all()).toMatchObject([
 			{ name: "workspace", repoPath: "/workspace", owner: null },
 		]);
+	});
+
+	test("a box of several repositories with one at a path the root keeps is refused with a log line", () => {
+		const env = (paths: string[]) => ({
+			SUPERSET_SANDBOX_WORKSPACE_ID: WORKSPACE_ID,
+			SUPERSET_SANDBOX_WORKSPACE_PATH: "/workspace",
+			SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify(
+				identity(paths).repositories,
+			),
+		});
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		try {
+			expect(readSandboxIdentity(env(["web", "Claude.md"]))).toBeNull();
+			expect(warn.mock.calls[0]?.[0]).toContain("Claude.md");
+			expect(readSandboxIdentity(env(["AGENTS.md"]))).toMatchObject({
+				worktreePath: "/workspace/AGENTS.md",
+			});
+		} finally {
+			warn.mockRestore();
+		}
 	});
 
 	test("a box seeded before multi-repo folds its sibling projects into the primary's", () => {

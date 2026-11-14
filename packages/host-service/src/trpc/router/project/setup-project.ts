@@ -30,7 +30,7 @@ import {
 	repositoryTakenError,
 	repositoryValues,
 	requireUniqueNames,
-	requireUsableName,
+	requireUsableNames,
 	resolveRepositoryFolder,
 	snapshotOf,
 } from "./handlers";
@@ -49,7 +49,7 @@ export interface SetupOrigin {
 }
 
 export type SetupPlacementMode =
-	| { kind: "clone"; parentDir: string }
+	| { kind: "clone"; parentDir: string; allowRelocate?: boolean }
 	| { kind: "import"; path: string; allowRelocate?: boolean };
 
 export interface SetupPlacement {
@@ -76,14 +76,12 @@ export async function setupProject(
 	const existing = getProjectIncludingDeleted(ctx.db, args.projectId);
 	if (existing) {
 		await placeExisting(ctx, existing, args.repositories, args.signal);
+		if (!getLocalProject(ctx.db, args.projectId)) {
+			throw notSetUpError(args.projectId);
+		}
 		return { ...snapshotOf(ctx, args.projectId), created: false };
 	}
-	if (!args.origin) {
-		throw new TRPCError({
-			code: "NOT_FOUND",
-			message: `not_set_up: project ${args.projectId} is not on this host; pass origin to set it up`,
-		});
-	}
+	if (!args.origin) throw notSetUpError(args.projectId);
 	return {
 		...(await placeNew(
 			ctx,
@@ -94,6 +92,13 @@ export async function setupProject(
 		)),
 		created: true,
 	};
+}
+
+function notSetUpError(projectId: string): TRPCError {
+	return new TRPCError({
+		code: "NOT_FOUND",
+		message: `not_set_up: project ${projectId} is not on this host; pass origin to set it up`,
+	});
 }
 
 function requireDistinctPlacements(placements: SetupPlacement[]): void {
@@ -179,7 +184,7 @@ async function placeExisting(
 		}
 	}
 	const relocations: Relocation[] = [];
-	const clones: { repository: HostRepositoryRow; url: string }[] = [];
+	const clones: Clone[] = [];
 	for (const { id, mode } of placements) {
 		const row = rows.get(id) as HostRepositoryRow;
 		const current = resolvePath(row.repoPath);
@@ -191,7 +196,11 @@ async function placeExisting(
 				? join(parentDir, cloneDirectoryName(row.url))
 				: null;
 			if (row.url && target === current && !existsSync(current)) {
-				clones.push({ repository: row, url: row.url });
+				clones.push({ repository: row, url: row.url, parentDir });
+				continue;
+			}
+			if (row.url && target && target !== current && mode.allowRelocate) {
+				clones.push({ repository: row, url: row.url, parentDir, target });
 				continue;
 			}
 			throw sameParent ? folderUnusableError(row) : alreadySetUpError(row);
@@ -201,12 +210,14 @@ async function placeExisting(
 		if (!mode.allowRelocate) throw alreadySetUpError(row);
 		relocations.push({ repository: row, resolved });
 	}
-	const relocated = new Map(
-		relocations.map(({ repository, resolved }) => [
-			repository.id,
-			resolved.repoPath,
-		]),
-	);
+	const relocated = new Map([
+		...relocations.map(
+			({ repository, resolved }) => [repository.id, resolved.repoPath] as const,
+		),
+		...clones.flatMap(({ repository, target }) =>
+			target ? [[repository.id, target] as const] : [],
+		),
+	]);
 	const targets = new Set<string>();
 	for (const row of projectRows) {
 		const target = relocated.get(row.id) ?? resolvePath(row.repoPath);
@@ -228,7 +239,9 @@ async function placeExisting(
 			[...relocations, ...cloned],
 			movableWorkspaces(ctx, project),
 		);
-		if (project.deletedAt != null) restoreProject(ctx, projectId);
+		if (project.deletedAt != null && !restoreProject(ctx, projectId)) {
+			throw notSetUpError(projectId);
+		}
 	} catch (err) {
 		await removeCreated(
 			cloned.map(({ resolved }) => ({ resolved, created: true })),
@@ -237,22 +250,25 @@ async function placeExisting(
 	}
 }
 
+interface Clone {
+	repository: HostRepositoryRow;
+	url: string;
+	parentDir: string;
+	/** Set when the clone relocates the repository away from its stored folder. */
+	target?: string;
+}
+
 /** Every clone lands, or every folder made for them is removed. */
 async function cloneAll(
 	ctx: HostServiceContext,
-	clones: { repository: HostRepositoryRow; url: string }[],
+	clones: Clone[],
 	signal?: AbortSignal,
 ): Promise<Relocation[]> {
 	const settled = await Promise.allSettled(
-		clones.map(async ({ repository, url }) => ({
+		clones.map(async ({ repository, url, parentDir }) => ({
 			repository,
 			resolved: await classifyGitFailure(
-				cloneRepoInto(
-					url,
-					dirname(resolvePath(repository.repoPath)),
-					ctx.credentials,
-					signal,
-				),
+				cloneRepoInto(url, parentDir, ctx.credentials, signal),
 			),
 		})),
 	);
@@ -308,7 +324,7 @@ function requireUsableOrigin(
 		});
 	}
 	const names = origin.repositories.map((r) => r.name);
-	for (const name of names) requireUsableName(name);
+	requireUsableNames(names);
 	requireUniqueNames(names);
 	for (const placement of placements) {
 		if (!ids.has(placement.id)) {

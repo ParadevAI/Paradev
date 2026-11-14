@@ -86,3 +86,37 @@ test("with no checkout, only the primary's main checkout's config is read", () =
 		scriptRoot: "/wt/feat",
 	});
 });
+
+test("a root without the primary's checkout uses its first repository by name", () => {
+	const db = createDb();
+	const project = seedProject(
+		{ db },
+		{
+			repoPath: "/src/api",
+			repositoryName: "api",
+			repositories: [
+				{ repoPath: "/src/web", name: "web" },
+				{ repoPath: "/src/docs", name: "docs" },
+			],
+		},
+	);
+	const [, webId, docsId] = project.repositoryIds as [string, string, string];
+	const { id } = seedWorkspace(
+		{ db },
+		{
+			projectId: project.id,
+			worktreePath: "/wt/feat",
+			branch: "feat",
+			repositoryIds: [webId, docsId],
+		},
+	);
+	const workspace = getLocalWorkspace(db, id);
+	if (!workspace) throw new Error("workspace not seeded");
+
+	expect(resolveWorkspaceScriptContext(db, workspace)).toEqual({
+		projectId: project.id,
+		repoPath: "/src/docs",
+		configWorktreePath: "/wt/feat/docs",
+		scriptRoot: "/wt/feat",
+	});
+});

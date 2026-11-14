@@ -1206,6 +1206,13 @@ async function restoreArchivedWorkspace(
 	try {
 		requireLocalProject(ctx, row.projectId);
 		const checkouts = listWorkspaceCheckouts(ctx.db, row);
+		if (checkouts.length === 0) {
+			throw new TRPCError({
+				code: "PRECONDITION_FAILED",
+				message:
+					"no_checkouts: every repository this workspace checked out was removed from the project",
+			});
+		}
 		for (const checkout of checkouts)
 			requireRepositoryPath(checkout.repository);
 		const onRepository =

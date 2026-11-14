@@ -280,6 +280,20 @@ test("config links follow the primary and are reaped when its file is gone", () 
 	expect(listAgentFolderLeftovers(root, [api.path, web.path])).toEqual([]);
 });
 
+test("a root without the primary's checkout links the config of its first repository by name", () => {
+	const web = checkout("web");
+	const api = checkout("api");
+	addFile(web, ".mcp.json");
+	addFile(api, ".mcp.json");
+
+	writeWorkspaceContextFiles(root, [web, api]);
+
+	expect(readlinkSync(join(root, ".mcp.json"))).toBe("api/.mcp.json");
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+		"MCP servers and settings come from api, as this workspace has no checkout of the primary repository.",
+	);
+});
+
 test("removing takes the config links and the folders made for them", () => {
 	const web = checkout("web", true);
 	const api = checkout("api");

@@ -112,12 +112,16 @@ describe("project repositories", () => {
 		});
 	});
 
-	it("refuses a repository named like a file the workspace folder keeps", async () => {
+	it("refuses a repository named like a file the workspace folder keeps only beside another repository", async () => {
 		const { caller } = setup();
 		const claude = await gitRepo(".Claude");
+		const web = await gitRepo("web");
 
 		await expect(
-			caller.create({ name: "Solo", repositories: [local(claude)] }),
+			caller.create({
+				name: "Both",
+				repositories: [local(web), local(claude)],
+			}),
 		).rejects.toMatchObject({
 			code: "BAD_REQUEST",
 			message: expect.stringContaining("reserved_name"),
@@ -125,13 +129,28 @@ describe("project repositories", () => {
 
 		const project = await caller.create({
 			name: "Acme",
-			repositories: [local(await gitRepo("web"))],
+			repositories: [local(web)],
 		});
 		await expect(
 			caller.addRepository({ projectId: project.id, source: local(claude) }),
 		).rejects.toMatchObject({
 			code: "BAD_REQUEST",
 			message: expect.stringContaining("reserved_name"),
+		});
+
+		const solo = await caller.create({
+			name: "Dotfiles",
+			repositories: [local(claude)],
+		});
+		expect(solo.repositories.map((r) => r.name)).toEqual([".Claude"]);
+		await expect(
+			caller.addRepository({
+				projectId: solo.id,
+				source: local(await gitRepo("api")),
+			}),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining('".Claude"'),
 		});
 	});
 
@@ -229,7 +248,7 @@ describe("project repositories", () => {
 		).toHaveLength(1);
 	});
 
-	it("refuses to remove the primary or a repository a workspace checks out, archived or not", async () => {
+	it("refuses to remove the primary or a repository a live workspace checks out, and drops an archived workspace's checkout", async () => {
 		const { caller, db } = setup();
 		const project = await caller.create({
 			name: "Acme",
@@ -237,11 +256,25 @@ describe("project repositories", () => {
 		});
 		const api = project.repositories.find((r) => r.name === "api");
 		if (!api) throw new Error("no api repository");
-		const workspace = seedWorkspace(
+		const live = seedWorkspace(
+			{ db },
+			{ projectId: project.id, worktreePath: "/wt/live", branch: "live" },
+		);
+		const archived = seedWorkspace(
 			{ db },
 			{ projectId: project.id, worktreePath: "/wt/feat", branch: "feat" },
 		);
-		db.update(schema.workspaces).set({ archivedAt: 1 }).run();
+		db.update(schema.workspaces)
+			.set({ archivedAt: 1 })
+			.where(eq(schema.workspaces.id, archived.id))
+			.run();
+		const checkoutsOf = (workspaceId: string) =>
+			db
+				.select()
+				.from(schema.workspaceRepositories)
+				.all()
+				.filter((row) => row.workspaceId === workspaceId)
+				.map((row) => row.repositoryId);
 
 		await expect(
 			caller.removeRepository({
@@ -256,17 +289,18 @@ describe("project repositories", () => {
 			caller.removeRepository({ projectId: project.id, repositoryId: api.id }),
 		).rejects.toMatchObject({
 			code: "PRECONDITION_FAILED",
-			message: expect.stringMatching(/is checked out by ".+" \(1 archived\)/),
+			message: expect.stringMatching(/is checked out by "live"; delete/),
 		});
+		expect(checkoutsOf(archived.id)).toHaveLength(2);
 
-		db.delete(schema.workspaces).run();
+		db.delete(schema.workspaces).where(eq(schema.workspaces.id, live.id)).run();
 		const after = await caller.removeRepository({
 			projectId: project.id,
 			repositoryId: api.id,
 		});
 		expect(after.repositories.map((r) => r.name)).toEqual(["web"]);
 		expect(existsSync(api.path)).toBe(true);
-		expect(workspace.id).toBeDefined();
+		expect(checkoutsOf(archived.id)).toEqual([project.primaryRepositoryId]);
 	});
 
 	it("moves the primary mark, and relocates a repository keeping its name", async () => {

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
-import { and, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import {
 	projects,
 	pullRequests,
@@ -231,17 +231,22 @@ const RESERVED_NAMES = new Set(
 	WORKSPACE_ROOT_ENTRIES.map((entry) => entry.toLowerCase()),
 );
 
-export function requireUsableName(name: string): void {
-	if (name === "" || name === "." || name === ".." || /[/\\\0]/.test(name)) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: `invalid_name: "${name}" cannot be the folder name of a repository`,
-		});
+/** Only a project with several repositories gives its workspaces a root folder whose own files a name can collide with. */
+export function requireUsableNames(names: string[]): void {
+	for (const name of names) {
+		if (name === "" || name === "." || name === ".." || /[/\\\0]/.test(name)) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `invalid_name: "${name}" cannot be the folder name of a repository`,
+			});
+		}
 	}
-	if (!RESERVED_NAMES.has(name.toLowerCase())) return;
+	if (names.length < 2) return;
+	const reserved = names.find((name) => RESERVED_NAMES.has(name.toLowerCase()));
+	if (reserved === undefined) return;
 	throw new TRPCError({
 		code: "BAD_REQUEST",
-		message: `reserved_name: a repository cannot be named "${name}", the workspace folder uses that name for its own files`,
+		message: `reserved_name: a project with several repositories cannot have one named "${reserved}", the workspace folder uses that name for its own files`,
 	});
 }
 
@@ -393,7 +398,7 @@ function insertProject(
 		paths.add(resolved.repoPath);
 	}
 	const names = sources.map(({ resolved }) => nameOf(resolved));
-	for (const name of names) requireUsableName(name);
+	requireUsableNames(names);
 	requireUniqueNames(names);
 
 	const projectId = randomUUID();
@@ -452,7 +457,7 @@ export async function addRepository(
 			...listProjectRepositories(ctx.db, args.projectId).map((r) => r.name),
 			nameOf(resolved),
 		];
-		for (const name of names) requireUsableName(name);
+		requireUsableNames(names);
 		requireUniqueNames(names);
 		ctx.db
 			.insert(repositories)
@@ -468,8 +473,7 @@ export async function addRepository(
 
 /**
  * Removes the repository from the project, never its files. A repository a
- * workspace checks out stays, archived workspaces included: their restore
- * needs it.
+ * live workspace checks out stays; archived workspaces lose that checkout.
  */
 export function removeRepository(
 	ctx: HostServiceContext,
@@ -494,13 +498,17 @@ export function removeRepository(
 		});
 	}
 	const users = ctx.db
-		.select({ name: workspaces.name, archivedAt: workspaces.archivedAt })
+		.select({ id: workspaces.id, name: workspaces.name })
 		.from(workspaceRepositories)
 		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
-		.where(eq(workspaceRepositories.repositoryId, repository.id))
+		.where(
+			and(
+				eq(workspaceRepositories.repositoryId, repository.id),
+				isNull(workspaces.archivedAt),
+			),
+		)
 		.all();
 	if (users.length > 0) {
-		const archived = users.filter((u) => u.archivedAt !== null).length;
 		const shown = users.slice(0, 3).map((u) => `"${u.name}"`);
 		const more =
 			users.length > shown.length
@@ -508,9 +516,7 @@ export function removeRepository(
 				: "";
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
-			message: `repository_in_use: ${repository.name} is checked out by ${shown.join(", ")}${more}${
-				archived > 0 ? ` (${archived} archived)` : ""
-			}; delete them first`,
+			message: `repository_in_use: ${repository.name} is checked out by ${shown.join(", ")}${more}; delete them first`,
 		});
 	}
 	// PR rows are shared by GitHub identity: another clone of the same
@@ -536,6 +542,20 @@ export function removeRepository(
 				.where(eq(pullRequests.repositoryId, repository.id))
 				.run();
 		}
+		tx.delete(workspaceRepositories)
+			.where(
+				and(
+					eq(workspaceRepositories.repositoryId, repository.id),
+					inArray(
+						workspaceRepositories.workspaceId,
+						tx
+							.select({ id: workspaces.id })
+							.from(workspaces)
+							.where(isNotNull(workspaces.archivedAt)),
+					),
+				),
+			)
+			.run();
 		tx.delete(repositories).where(eq(repositories.id, repository.id)).run();
 	});
 	touchProject(ctx, args.projectId);

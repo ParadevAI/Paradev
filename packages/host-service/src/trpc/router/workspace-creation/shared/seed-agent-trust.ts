@@ -190,22 +190,72 @@ function codexProjectEntryExists(content: string, folderPath: string): boolean {
 }
 
 /**
+ * Where a `trust_level` line for an existing entry of `folderPath` goes, or
+ * null when the entry already sets one. A revoke can leave the entry with
+ * other keys but no level.
+ */
+function codexTrustInsertion(
+	lines: string[],
+	folderPath: string,
+): { index: number; dotted: boolean } | null {
+	let table: "top" | "match" | "other" = "top";
+	let header: number | undefined;
+	let firstTable: number | undefined;
+	let dottedEntry = false;
+	for (const [index, line] of lines.entries()) {
+		const projectHeader = CODEX_PROJECT_HEADER.exec(line);
+		if (projectHeader || /^\s*\[/.test(line)) {
+			firstTable ??= index;
+			const key = projectHeader ? codexKey(projectHeader) : undefined;
+			table = key === folderPath ? "match" : "other";
+			if (table === "match") header = index;
+			continue;
+		}
+		if (table === "match" && CODEX_ANY_LEVEL.test(line)) return null;
+		if (table !== "top") continue;
+		const dotted = CODEX_DOTTED_ENTRY.exec(line);
+		if (!dotted || codexKey(dotted) !== folderPath) continue;
+		if (CODEX_DOTTED_ANY_LEVEL.test(line)) return null;
+		dottedEntry = true;
+	}
+	if (header !== undefined) return { index: header + 1, dotted: false };
+	if (dottedEntry) return { index: firstTable ?? lines.length, dotted: true };
+	return { index: -1, dotted: false };
+}
+
+/**
  * Append a `[projects."<path>"]` table with `trust_level = "trusted"` to a
- * Codex config.toml. An existing entry for the path is left untouched — a
- * user's explicit "untrusted" must not be overridden.
+ * Codex config.toml, or add the line to an entry for the path that has no
+ * level. An existing level is left untouched — a user's explicit
+ * "untrusted" must not be overridden.
  */
 export async function seedCodexFolderTrust(
 	configFile: string,
 	folderPath: string,
 ): Promise<void> {
 	let content = "";
+	const escaped = folderPath.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 	if (existsSync(configFile)) {
 		content = await readFile(configFile, "utf-8");
-		if (codexProjectEntryExists(content, folderPath)) return;
+		if (codexProjectEntryExists(content, folderPath)) {
+			const lines = content.split("\n");
+			const insertion = codexTrustInsertion(lines, folderPath);
+			if (!insertion) return;
+			if (insertion.index >= 0) {
+				lines.splice(
+					insertion.index,
+					0,
+					insertion.dotted
+						? `projects."${escaped}".trust_level = "trusted"`
+						: 'trust_level = "trusted"',
+				);
+				await atomicWrite(configFile, lines.join("\n"));
+				return;
+			}
+		}
 	} else if (!existsSync(dirname(configFile))) {
 		return;
 	}
-	const escaped = folderPath.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 	const block = `[projects."${escaped}"]\ntrust_level = "trusted"\n`;
 	const next =
 		content.length === 0 ? block : `${content.replace(/\n*$/, "\n\n")}${block}`;
@@ -266,6 +316,13 @@ const CODEX_DOTTED_TRUST = new RegExp(
 	String.raw`^\s*projects\s*\.\s*${CODEX_STRING_KEY}\s*\.\s*trust_level\s*=\s*["']trusted["']`,
 );
 const CODEX_TRUST_LINE = /^\s*trust_level\s*=\s*["']trusted["']/;
+const CODEX_ANY_LEVEL = /^\s*trust_level\s*=/;
+const CODEX_DOTTED_ENTRY = new RegExp(
+	String.raw`^\s*projects\s*\.\s*${CODEX_STRING_KEY}\s*\.`,
+);
+const CODEX_DOTTED_ANY_LEVEL = new RegExp(
+	String.raw`^\s*projects\s*\.\s*${CODEX_STRING_KEY}\s*\.\s*trust_level\s*=`,
+);
 
 function codexKey(match: RegExpExecArray): string | undefined {
 	return match[1] !== undefined

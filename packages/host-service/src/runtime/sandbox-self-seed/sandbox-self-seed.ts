@@ -35,7 +35,10 @@ import {
 import { importCloudAttachments } from "../../trpc/router/attachments/attachments";
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
 import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
-import { syncWorkspaceContextFiles } from "../../trpc/router/workspace-creation/shared/workspace-context-files";
+import {
+	syncWorkspaceContextFiles,
+	WORKSPACE_ROOT_ENTRIES,
+} from "../../trpc/router/workspace-creation/shared/workspace-context-files";
 import type { HostServiceContext } from "../../types";
 import {
 	getManagedEnv,
@@ -108,8 +111,22 @@ function readSandboxRepositories(raw: string | undefined): SandboxRepository[] {
 		);
 		return [];
 	}
+	const reserved =
+		parsed.data.length > 1
+			? parsed.data.find(({ path }) => RESERVED_PATHS.has(path.toLowerCase()))
+			: undefined;
+	if (reserved) {
+		console.warn(
+			`[sandbox] SUPERSET_SANDBOX_REPOSITORIES puts ${reserved.url} at ${reserved.path}, which the workspace root keeps for its own files`,
+		);
+		return [];
+	}
 	return parsed.data;
 }
+
+const RESERVED_PATHS = new Set(
+	WORKSPACE_ROOT_ENTRIES.map((entry) => entry.toLowerCase()),
+);
 
 export function readSandboxIdentity(
 	env: NodeJS.ProcessEnv = process.env,

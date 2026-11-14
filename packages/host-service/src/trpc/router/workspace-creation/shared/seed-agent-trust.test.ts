@@ -276,6 +276,25 @@ describe("seedCodexFolderTrust", () => {
 		expect(readFileSync(file, "utf-8")).toBe(content);
 	});
 
+	test("trusts again a folder whose revoke kept its table for other keys", async () => {
+		const file = join(dir, "config.toml");
+		writeFileSync(
+			file,
+			'projects."/dotted".note = "y"\n\n[projects."/root"]\ntrust_level = "trusted"\nnote = "x"\n',
+		);
+		await revokeCodexFolderTrust(file, ["/root", "/dotted"]);
+		expect(await isCodexFolderTrusted(file, ["/root"])).toBe(false);
+
+		await seedCodexFolderTrust(file, "/root");
+		await seedCodexFolderTrust(file, "/dotted");
+
+		expect(readFileSync(file, "utf-8")).toBe(
+			'projects."/dotted".note = "y"\n\nprojects."/dotted".trust_level = "trusted"\n[projects."/root"]\ntrust_level = "trusted"\nnote = "x"\n',
+		);
+		expect(await isCodexFolderTrusted(file, ["/root"])).toBe(true);
+		expect(await isCodexFolderTrusted(file, ["/dotted"])).toBe(true);
+	});
+
 	test("still appends when only a different path is defined", async () => {
 		const file = join(dir, "config.toml");
 		writeFileSync(file, '[ projects . "/other" ]\ntrust_level = "trusted"\n');

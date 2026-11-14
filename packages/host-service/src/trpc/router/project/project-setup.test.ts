@@ -1,7 +1,13 @@
 import { Database } from "bun:sqlite";
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it, spyOn } from "bun:test";
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import {
+	existsSync,
+	mkdtempSync,
+	readdirSync,
+	realpathSync,
+	rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
@@ -14,6 +20,7 @@ import {
 } from "../../../../test/helpers/git-fixture";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
+import * as projectDeletion from "../../../projects/project-deletion";
 import type { HostServiceContext } from "../../../types";
 import { createCallerFactory } from "../../index";
 import { projectRouter } from "./project";
@@ -507,6 +514,100 @@ describe("project.setup", () => {
 		expect(back.repositories.map((r) => r.path)).toEqual([path]);
 		expect(existsSync(join(path, ".git"))).toBe(true);
 		expect((await caller.list()).map((p) => p.id)).toEqual([projectId]);
+	});
+
+	it("clones a deleted project into another folder only when asked to relocate", async () => {
+		const { caller, paths, projectId, ids } = await setUpClonedAndDeleted([
+			"web",
+		]);
+		const id = ids[0] as string;
+		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
+		const moved = join(elsewhere, basename(paths[0] as string));
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [{ id, mode: { kind: "clone", parentDir: elsewhere } }],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("already_set_up"),
+		});
+		expect(existsSync(moved)).toBe(false);
+
+		const back = await caller.setup({
+			projectId,
+			repositories: [
+				{
+					id,
+					mode: { kind: "clone", parentDir: elsewhere, allowRelocate: true },
+				},
+			],
+		});
+
+		expect(back.repositories.map((r) => r.path)).toEqual([moved]);
+		expect(existsSync(join(moved, ".git"))).toBe(true);
+		expect((await caller.list()).map((p) => p.id)).toEqual([projectId]);
+	});
+
+	it("removes a relocating clone when another clone of the set-up fails", async () => {
+		const { caller, db, paths, projectId, ids } = await setUpClonedAndDeleted([
+			"web",
+			"api",
+		]);
+		db.update(schema.repositories)
+			.set({ url: join(root, "no-such-source", "api") })
+			.where(eq(schema.repositories.id, ids[1] as string))
+			.run();
+		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: ids.map((id) => ({
+					id,
+					mode: {
+						kind: "clone" as const,
+						parentDir: elsewhere,
+						allowRelocate: true,
+					},
+				})),
+			}),
+		).rejects.toThrow();
+
+		expect(readdirSync(elsewhere)).toEqual([]);
+		expect(
+			db
+				.select({ repoPath: schema.repositories.repoPath })
+				.from(schema.repositories)
+				.all()
+				.map((r) => r.repoPath)
+				.sort(),
+		).toEqual([...paths].sort());
+		expect(await caller.list()).toEqual([]);
+	});
+
+	it("a deleted project that cannot be restored is a not_set_up error", async () => {
+		const { caller, parentDir, projectId, ids } = await setUpClonedAndDeleted([
+			"web",
+		]);
+		const restore = spyOn(projectDeletion, "restoreProject").mockReturnValue(
+			null,
+		);
+		try {
+			await expect(
+				caller.setup({
+					projectId,
+					repositories: [
+						{ id: ids[0] as string, mode: { kind: "clone", parentDir } },
+					],
+				}),
+			).rejects.toMatchObject({
+				code: "NOT_FOUND",
+				message: expect.stringContaining("not_set_up"),
+			});
+		} finally {
+			restore.mockRestore();
+		}
 	});
 
 	it("removes every clone and leaves the project deleted when one clone fails", async () => {

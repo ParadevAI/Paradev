@@ -796,6 +796,76 @@ test("a repository a live workspace checks out cannot be removed from the projec
 	).rejects.toMatchObject({ data: { code: "PRECONDITION_FAILED" } });
 });
 
+test("a deleted workspace restores without the checkout of a repository removed since", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	await scenario.host.trpc.project.removeRepository.mutate({
+		projectId: scenario.projectId,
+		repositoryId: scenario.apiId,
+	});
+
+	await scenario.host.trpc.workspaces.restore.mutate({
+		workspaceId: workspace.id,
+	});
+
+	const restored = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(restored.checkouts).toMatchObject([
+		{ repositoryId: scenario.webId, path: workspace.worktreePath },
+	]);
+	expect(await headOf(workspace.worktreePath)).toMatchObject({
+		branch: "feature/both",
+	});
+});
+
+test("a deleted workspace whose every repository was removed refuses to restore", async () => {
+	const host = await createTestHost({
+		apiOverrides: {
+			...cloudFlows.workspaceCreateOk(),
+			"v2Workspace.trackCreated.mutate": () => ({}),
+		},
+	});
+	const web = copyGitFixture(templates.web);
+	const api = copyGitFixture(templates.api);
+	dispose = async () => {
+		await host.dispose();
+		web.dispose();
+		api.dispose();
+	};
+	const project = seedProject(host, { repoPath: web.repoPath, name: "web" });
+	const { workspace } = await host.trpc.workspaces.create.mutate({
+		projectId: project.id,
+		branch: "feature/gone",
+	});
+	const apiId = seedRepository(host, project.id, {
+		repoPath: api.repoPath,
+		name: "api",
+	}).id;
+	await host.trpc.project.setPrimaryRepository.mutate({
+		projectId: project.id,
+		repositoryId: apiId,
+	});
+	await host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	await host.trpc.project.removeRepository.mutate({
+		projectId: project.id,
+		repositoryId: project.repositoryId,
+	});
+
+	await expect(
+		host.trpc.workspaces.restore.mutate({ workspaceId: workspace.id }),
+	).rejects.toMatchObject({
+		message: expect.stringContaining("no_checkouts"),
+		data: { code: "PRECONDITION_FAILED" },
+	});
+	expect(existsSync(workspace.worktreePath)).toBe(false);
+});
+
 test("fetchBranch fetches the move branch into every repository, and names one that lacks it", async () => {
 	const scenario = await multiRepoScenario();
 	const branch = "superset/teleport-abc";
