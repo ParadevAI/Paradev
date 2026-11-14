@@ -15921,8 +15921,8 @@ msgstr "Pytania"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Pytania, opinie, wsparcie albo cokolwiek innego. Napisz, a skierujemy wiadomość do właściwej osoby."
 
-msgid "Queue a message · ⌘↩ to send now"
-msgstr "Dodaj wiadomość do kolejki · ⌘↩, aby wysłać teraz"
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Dodaj wiadomość do kolejki · {SEND_NOW_KEYS}, aby wysłać teraz"
 
 msgid "Queue message"
 msgstr "Dodaj wiadomość do kolejki"

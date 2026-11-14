@@ -15921,8 +15921,8 @@ msgstr "常见问题"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "问题、反馈、支持，或者别的什么都行。写给我们，我们会转给合适的人。"
 
-msgid "Queue a message · ⌘↩ to send now"
-msgstr "将消息加入队列 · ⌘↩ 立即发送"
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "将消息加入队列 · {SEND_NOW_KEYS} 立即发送"
 
 msgid "Queue message"
 msgstr "将消息加入队列"

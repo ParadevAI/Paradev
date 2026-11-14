@@ -15921,8 +15921,8 @@ msgstr "Vragen"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Vragen, feedback, support of iets anders. Stuur een bericht, dan sturen we het door naar de juiste persoon."
 
-msgid "Queue a message · ⌘↩ to send now"
-msgstr "Zet een bericht in de wachtrij · ⌘↩ om nu te versturen"
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Zet een bericht in de wachtrij · {SEND_NOW_KEYS} om nu te versturen"
 
 msgid "Queue message"
 msgstr "Bericht in wachtrij zetten"

@@ -457,6 +457,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
 	/** Async task id of each turn the agent started on its own, to the turn shown for it. */
 	private readonly autonomousTurns = new Map<string, string>();
+	private lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
 	private awaitingBackground = false;
 	/** The v2 config option that stands in for v1's session mode, once seen. */
 	private modeConfigId: string | null = null;
@@ -516,7 +517,9 @@ export class AcpAdapter implements HarnessAdapter {
 			(tasks) => {
 				const live = new Set(tasks.map((task) => task.id));
 				for (const id of this.backgroundTaskTurns.keys()) {
-					if (!live.has(id)) this.backgroundTaskTurns.delete(id);
+					if (live.has(id)) continue;
+					this.backgroundTaskTurns.delete(id);
+					this.lastBackgroundEndMs = this.now();
 				}
 				for (const id of live) {
 					if (!this.backgroundTaskTurns.has(id)) {
@@ -608,10 +611,32 @@ export class AcpAdapter implements HarnessAdapter {
 			this.emitSession({ status: "idle" });
 			return;
 		}
-		this.client.notify("session/cancel", { sessionId: this.sessionId });
-		if (this.cancelPendingApprovals(this.currentTurn.id)) {
+		const turnId = this.currentTurn.id;
+		const autonomousTask = [...this.autonomousTurns].find(
+			([, id]) => id === turnId,
+		)?.[0];
+		if (autonomousTask) void this.stopAutonomousTurn(autonomousTask);
+		else this.client.notify("session/cancel", { sessionId: this.sessionId });
+		if (this.cancelPendingApprovals(turnId)) {
 			this.emitSession({ status: this.statusAfterApprovals() });
 		}
+	}
+
+	/** `session/cancel` would also stop the session's background workflows. */
+	private async stopAutonomousTurn(asyncTaskId: string): Promise<void> {
+		const client = this.client;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId) return;
+		const response = await client
+			.request(
+				AIR_ASYNC_TASK_STOP_METHOD,
+				{ sessionId, asyncTaskId },
+				this.requestTimeoutMs(),
+			)
+			.catch(() => null);
+		if ((response as { stopped?: unknown } | null)?.stopped === true) return;
+		if (this.autonomousTurns.has(asyncTaskId))
+			client.notify("session/cancel", { sessionId });
 	}
 
 	respondToApproval(approvalId: string, decision: Decision): void {
@@ -1995,7 +2020,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private startAutonomousTurn(asyncTaskId: string): void {
 		const latest = this.currentTurn;
 		if (latest?.status === "running") return;
-		if (!latest) {
+		if (!latest || !this.continuesBackgroundWork(latest)) {
 			const turnId = this.mintId();
 			this.autonomousTurns.set(asyncTaskId, turnId);
 			this.emitTurn({
@@ -2011,6 +2036,18 @@ export class AcpAdapter implements HarnessAdapter {
 		this.emitSession({ status: this.statusAfterApprovals() });
 	}
 
+	/**
+	 * Only a reply to background work continues the turn. A stopped or failed
+	 * turn keeps its ending, and a scheduled wakeup gets a turn of its own.
+	 */
+	private continuesBackgroundWork(turn: Turn): boolean {
+		return (
+			turn.status === "completed" &&
+			(this.backgroundTaskTurns.size > 0 ||
+				this.lastBackgroundEndMs >= turn.startedAtMs)
+		);
+	}
+
 	private endAutonomousTurn(asyncTaskId: string, state: string): void {
 		const turnId = this.autonomousTurns.get(asyncTaskId);
 		this.autonomousTurns.delete(asyncTaskId);
@@ -2023,6 +2060,7 @@ export class AcpAdapter implements HarnessAdapter {
 			completedAtMs: this.now(),
 		});
 		this.emitSession({ status: this.statusAfterApprovals() });
+		this.sendCustomAnswer();
 	}
 
 	private handleConfigOptions(raw: unknown): void {

@@ -15921,8 +15921,8 @@ msgstr "よくある質問"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "ご質問、フィードバック、サポート、その他何でも。メッセージをお送りいただければ、適切な担当者にお繋ぎします。"
 
-msgid "Queue a message · ⌘↩ to send now"
-msgstr "メッセージをキューに追加 · ⌘↩ で今すぐ送信"
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "メッセージをキューに追加 · {SEND_NOW_KEYS} で今すぐ送信"
 
 msgid "Queue message"
 msgstr "メッセージをキューに追加"
