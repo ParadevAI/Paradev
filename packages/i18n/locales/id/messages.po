@@ -17772,6 +17772,9 @@ msgstr "Cari di Linear"
 msgid "Search Linear…"
 msgstr "Cari di Linear…"
 
+msgid "Search logs, metrics, and traces"
+msgstr "Cari log, metrik, dan trace"
+
 msgid "Search MCP servers…"
 msgstr "Cari server MCP…"
 

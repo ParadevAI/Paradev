@@ -1105,6 +1105,58 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"datadog": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "datadog",
+		"version": "1.0.0",
+		"description": "Investigate production with Datadog: search logs, metrics, traces and monitors, read incidents and dashboards, and check a deploy before you call it done.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"datadog",
+			"logs",
+			"metrics",
+			"apm",
+			"monitoring",
+			"observability",
+			"incidents"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Datadog",
+					"category": "Developer tools",
+					"icon": "datadog"
+				},
+				"connector": {
+					"slug": "datadog_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.datadoghq.com/v1/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "investigate-production",
+				"description": "Find out what is actually failing in production from Datadog's logs, traces and metrics before touching code — scope to the right service and environment, rank errors with aggregates, read the traces behind them, and separate the symptom from its cause. Use when the user reports a production error, a slow or failing endpoint, a customer complaint, or asks what is broken, what changed, or why something stopped working."
+			},
+			{
+				"name": "respond-to-an-alert",
+				"description": "Work a Datadog monitor alert or incident from the page to a cause — read what the monitor measures and its threshold, confirm the signal is real, correlate it with deploys and other changes, and report impact and next step. Use when a Datadog monitor fires or pages, the user pastes a monitor or incident link, asks why an alert is firing, or is on call and needs to know what is going on."
+			},
+			{
+				"name": "verify-a-deploy",
+				"description": "Check in Datadog that a change you shipped works in production before you call the task done — compare error rate, latency and new error kinds before and after the deploy, confirm the targeted error stopped, and catch regressions early. Use after merging or deploying a fix or feature, when the user asks whether a deploy is healthy, did the fix work, or is it safe to move on."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

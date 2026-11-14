@@ -256,6 +256,16 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "datadog",
+			"description": "Investigate production with Datadog: search logs, metrics, traces and monitors, read incidents and dashboards, and check a deploy before you call it done.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "development",
+			"source": "./plugins/datadog",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

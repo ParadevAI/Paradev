@@ -467,6 +467,41 @@
 				}
 			]
 		},
+		"datadog_mcp": {
+			"displayName": "Datadog",
+			"icon": "datadog",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.datadoghq.com/v1/mcp",
+					"scopes": ["mcp_all"],
+					"identity": {
+						"url": "https://api.datadoghq.com/api/v2/current_user",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.data.relationships.org.data.id",
+							"label": "$.data.attributes.email"
+						},
+						"user": {
+							"id": "$.data.id",
+							"label": "$.data.attributes.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"microsoft_teams": {
 			"displayName": "Microsoft Teams",
 			"icon": "microsoft-teams",

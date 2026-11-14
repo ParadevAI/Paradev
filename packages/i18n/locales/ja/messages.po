@@ -17772,6 +17772,9 @@ msgstr "Linearを検索"
 msgid "Search Linear…"
 msgstr "Linearを検索…"
 
+msgid "Search logs, metrics, and traces"
+msgstr "ログ、メトリクス、トレースを検索"
+
 msgid "Search MCP servers…"
 msgstr "MCPサーバーを検索…"
 

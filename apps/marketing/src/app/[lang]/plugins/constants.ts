@@ -107,6 +107,11 @@ export const CATALOG: {
 				installed: true,
 			},
 			{
+				name: "datadog",
+				displayName: "Datadog",
+				description: msg({ message: "Search logs, metrics, and traces" }),
+			},
+			{
 				name: "vercel",
 				displayName: "Vercel",
 				description: msg({ message: "Read deployment and build logs" }),
