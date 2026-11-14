@@ -1239,9 +1239,6 @@ msgstr "{name}: {monthly} за пользователя в месяц или {ye
 msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or <0>set it up in project settings</0>."
 msgstr "{notSetUpProjectName} не настроен на {notSetUpHostName}. Выберите другой хост или <0>настройте его в параметрах проекта</0>."
 
-msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or set it up in project settings."
-msgstr "{notSetUpProjectName} не настроен на {notSetUpHostName}. Выберите другой хост или настройте его в параметрах проекта."
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
 
@@ -12765,6 +12762,9 @@ msgstr "Новые люди получат приглашение в {organizati
 msgid "New project"
 msgstr "Новый проект"
 
+msgid "New project of several repositories"
+msgstr "Новый проект из нескольких репозиториев"
+
 msgid "New push to branch"
 msgstr "Новый push в ветку"
 
@@ -14440,6 +14440,9 @@ msgstr "Открыть PR #{0}"
 
 msgid "Open Preview"
 msgstr "Открыть предпросмотр"
+
+msgid "Open project"
+msgstr "Открыть проект"
 
 msgid "Open Project"
 msgstr "Открыть проект"

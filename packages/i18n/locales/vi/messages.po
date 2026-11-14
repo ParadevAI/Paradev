@@ -1239,9 +1239,6 @@ msgstr "{name}: {monthly} mỗi người dùng/tháng, hoặc {yearly} khi thanh
 msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or <0>set it up in project settings</0>."
 msgstr "{notSetUpProjectName} chưa được thiết lập trên {notSetUpHostName}. Hãy chọn host khác, hoặc <0>thiết lập nó trong cài đặt dự án</0>."
 
-msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or set it up in project settings."
-msgstr "{notSetUpProjectName} chưa được thiết lập trên {notSetUpHostName}. Hãy chọn host khác, hoặc thiết lập nó trong cài đặt dự án."
-
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Hãy chỉ định ít nhất một người, hoặc chọn {choice}.} sender {Hãy chỉ định ít nhất một người gửi, hoặc chọn {choice}.} other {Hãy chỉ định ít nhất một mục, hoặc chọn {choice}.}}"
 
@@ -12765,6 +12762,9 @@ msgstr "Người mới sẽ nhận email mời tham gia {organizationName}. Họ
 msgid "New project"
 msgstr "Dự án mới"
 
+msgid "New project of several repositories"
+msgstr "Dự án mới từ nhiều kho lưu trữ"
+
 msgid "New push to branch"
 msgstr "Push mới lên nhánh"
 
@@ -14440,6 +14440,9 @@ msgstr "Mở PR #{0}"
 
 msgid "Open Preview"
 msgstr "Mở bản xem trước"
+
+msgid "Open project"
+msgstr "Mở dự án"
 
 msgid "Open Project"
 msgstr "Mở dự án"
