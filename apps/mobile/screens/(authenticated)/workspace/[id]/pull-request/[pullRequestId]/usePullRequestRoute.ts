@@ -31,5 +31,11 @@ export function usePullRequestRoute() {
 		repo,
 		pullNumber,
 	});
-	return { workspaceId, pullNumber, owner, repo, ...detail };
+	// The sheets resolve the PR from these, so they carry the repository too.
+	const routeParams = {
+		id: workspaceId ?? "",
+		pullRequestId: String(pullNumber),
+		...(owner && repo ? { owner, repo } : {}),
+	};
+	return { workspaceId, pullNumber, owner, repo, routeParams, ...detail };
 }

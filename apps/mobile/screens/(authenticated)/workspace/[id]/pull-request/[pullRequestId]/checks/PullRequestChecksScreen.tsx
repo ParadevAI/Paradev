@@ -5,7 +5,7 @@ import { usePullRequestRoute } from "../usePullRequestRoute";
 
 /** The checks sheet, presented as a sheet route the way the app's others are. */
 export function PullRequestChecksScreen() {
-	const { detail, workspaceId, pullNumber } = usePullRequestRoute();
+	const { detail, routeParams } = usePullRequestRoute();
 	if (!detail) return <View className="bg-background flex-1" />;
 	return (
 		<ChecksSheet
@@ -13,11 +13,7 @@ export function PullRequestChecksScreen() {
 			onOpenCheck={(check) =>
 				router.push({
 					pathname: "/workspace/[id]/pull-request/[pullRequestId]/check",
-					params: {
-						id: workspaceId ?? "",
-						pullRequestId: String(pullNumber),
-						name: check.name,
-					},
+					params: { ...routeParams, name: check.name },
 				})
 			}
 		/>

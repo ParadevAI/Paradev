@@ -50,6 +50,7 @@ export function PullRequestScreen() {
 		pullNumber,
 		owner,
 		repo,
+		routeParams: params,
 	} = usePullRequestRoute();
 
 	// Once per pull request the screen shows, not once per refetch.
@@ -167,8 +168,6 @@ export function PullRequestScreen() {
 			</View>
 		);
 	}
-
-	const params = { id: workspaceId ?? "", pullRequestId: String(pullNumber) };
 
 	const onAction = (action: ActionId) => {
 		if (action === "merge") {
