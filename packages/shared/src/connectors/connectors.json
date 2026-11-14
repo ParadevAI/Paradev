@@ -445,11 +445,8 @@
 					"scopes": [],
 					"identity": {
 						"mcp": "https://mcp.sentry.dev/mcp",
-						"tool": "execute_sentry_tool",
-						"arguments": {
-							"name": "whoami",
-							"arguments": {}
-						},
+						"tool": "whoami",
+						"arguments": {},
 						"account": {
 							"id": "$.user.id",
 							"label": "$.user.email"
