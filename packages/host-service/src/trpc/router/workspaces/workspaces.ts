@@ -118,7 +118,10 @@ import {
 } from "../workspace-creation/utils/ai-workspace-names";
 import { resolveProjectBranchPrefix } from "../workspace-creation/utils/branch-prefix";
 import type { ExecGh } from "../workspace-creation/utils/exec-gh";
-import { listBranchNames } from "../workspace-creation/utils/list-branch-names";
+import {
+	listBranchNames,
+	repositoryBranchRemote,
+} from "../workspace-creation/utils/list-branch-names";
 import {
 	deleteMaterializedPrBranchIfSafe,
 	type MaterializePrBranchResult,
@@ -2323,7 +2326,11 @@ export const workspacesRouter = router({
 						existingBranches: (
 							await Promise.all(
 								checkouts.map((checkout) =>
-									listBranchNames(ctx, checkout.repoPath),
+									listBranchNames(
+										ctx,
+										checkout.repoPath,
+										repositoryBranchRemote(ctx.db, checkout.repositoryId),
+									),
 								),
 							)
 						).flat(),

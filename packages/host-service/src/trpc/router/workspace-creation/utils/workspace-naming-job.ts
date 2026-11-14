@@ -37,7 +37,7 @@ import {
 	resolveGeneratedBranchName,
 	trimTitle,
 } from "./ai-workspace-names";
-import { listBranchNames } from "./list-branch-names";
+import { listBranchNames, repositoryBranchRemote } from "./list-branch-names";
 import { findGitHubReferences, resolveNamingLinks } from "./naming-links";
 import { deduplicateBranchName } from "./sanitize-branch";
 
@@ -307,7 +307,11 @@ async function renameAutomaticBranch(
 	const branches = (
 		await Promise.all(
 			input.checkouts.map((checkout) =>
-				listBranchNames(ctx, checkout.repoPath),
+				listBranchNames(
+					ctx,
+					checkout.repoPath,
+					repositoryBranchRemote(ctx.db, checkout.repositoryId),
+				),
 			),
 		)
 	).flat();

@@ -2884,6 +2884,30 @@ describe("PullRequestRuntimeManager multi-repo workspace", () => {
 		expect(suppressed && getPrById(db, suppressed)?.prNumber).toBe(202);
 	});
 
+	test("checkouts that switch to one branch at the same time give the workspace that branch", async () => {
+		const db = createRealDb();
+		seedTwoRepoWorkspace(db);
+		let reads = 0;
+		const bothReading = Promise.withResolvers<void>();
+		const manager = createManager(db, {
+			execGh: routeGh({}),
+			readWorkspaceRefs: async () => {
+				reads += 1;
+				if (reads === 2) bothReading.resolve();
+				await bothReading.promise;
+				return { branch: "next", headSha: null, upstream: null };
+			},
+		});
+
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+
+		expect(getWorkspace(db, "ws", REPO_ID)?.branch).toBe("next");
+		expect(getWorkspace(db, "ws", API_REPO_ID)?.branch).toBe("next");
+		expect(getWorkspace(db, "ws")?.workspaceBranch).toBe("next");
+	});
+
 	test("a one-checkout workspace takes its checkout's branch", async () => {
 		const db = createRealDb();
 		seedProject(db);

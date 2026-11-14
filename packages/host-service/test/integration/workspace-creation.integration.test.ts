@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
+import { and, eq } from "drizzle-orm";
+import { workspaceRepositories } from "../../src/db/schema";
+import { createGitFixture } from "../helpers/git-fixture";
 import { createProjectScenario } from "../helpers/scenarios";
-import { seedWorkspace } from "../helpers/seed";
+import { seedRepository, seedWorkspace } from "../helpers/seed";
 
 describe("workspaceCreation.searchBranches integration", () => {
 	let scenario: Awaited<ReturnType<typeof createProjectScenario>>;
@@ -137,5 +140,55 @@ describe("workspaceCreation.searchBranches integration", () => {
 		const branch = result.items.find((b) => b.name === "feature/path-row");
 		expect(branch?.worktreePath).toBe(worktreePath);
 		expect(branch?.isCheckedOut).toBe(true);
+	});
+
+	test("in a multi-repo project, lists the repository's own remote and its checkouts' branches", async () => {
+		const api = await createGitFixture();
+		try {
+			const { id: apiId } = seedRepository(scenario.host, scenario.projectId, {
+				repoPath: api.repoPath,
+				name: "api",
+				remoteName: "upstream",
+			});
+			const head = (await api.git.revparse(["HEAD"])).trim();
+			await api.git.raw(["update-ref", "refs/remotes/upstream/trunk", head]);
+			await api.git.raw([
+				"symbolic-ref",
+				"refs/remotes/upstream/HEAD",
+				"refs/remotes/upstream/trunk",
+			]);
+			await api.git.raw(["update-ref", "refs/remotes/origin/elsewhere", head]);
+			await api.git.branch(["feat-api"]);
+			const { id: workspaceId } = seedWorkspace(scenario.host, {
+				projectId: scenario.projectId,
+				worktreePath: join(api.repoPath, ".worktrees", "root"),
+				branch: "feat-web",
+			});
+			scenario.host.db
+				.update(workspaceRepositories)
+				.set({ branch: "feat-api" })
+				.where(
+					and(
+						eq(workspaceRepositories.workspaceId, workspaceId),
+						eq(workspaceRepositories.repositoryId, apiId),
+					),
+				)
+				.run();
+
+			const result =
+				await scenario.host.trpc.workspaceCreation.searchBranches.query({
+					projectId: scenario.projectId,
+					repositoryId: apiId,
+				});
+
+			expect(result.defaultBranch).toBe("trunk");
+			expect(result.items.map((b) => b.name)).not.toContain("elsewhere");
+			expect(result.items.find((b) => b.name === "trunk")?.isRemote).toBe(true);
+			expect(
+				result.items.find((b) => b.name === "feat-api")?.hasWorkspace,
+			).toBe(true);
+		} finally {
+			api.dispose();
+		}
 	});
 });

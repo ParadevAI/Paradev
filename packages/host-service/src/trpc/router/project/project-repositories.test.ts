@@ -39,6 +39,15 @@ async function gitRepo(
 	return (await git.revparse(["--show-toplevel"])).trim();
 }
 
+function isUnborn(dir: string): Promise<boolean> {
+	return createUserSimpleGit(dir)
+		.raw(["rev-parse", "--verify", "HEAD"])
+		.then(
+			() => false,
+			() => true,
+		);
+}
+
 function setup() {
 	const sqlite = new Database(":memory:");
 	sqlite.run("PRAGMA foreign_keys = ON");
@@ -273,6 +282,36 @@ describe("project repositories", () => {
 				() => "unborn",
 			);
 		expect(head).toBe("unborn");
+	});
+
+	it("leaves an unborn repository without a commit, and a plain folder without git, when an add is refused", async () => {
+		const { caller } = setup();
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
+		});
+		const unborn = join(mkdtempSync(join(root, "case-")), "web");
+		mkdirSync(unborn);
+		await createUserSimpleGit(unborn).init(["--initial-branch=main"]);
+		const plain = join(mkdtempSync(join(root, "case-")), "api");
+		mkdirSync(plain);
+
+		await expect(
+			caller.addRepository({ projectId: project.id, source: local(unborn) }),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("duplicate_name"),
+		});
+		await expect(
+			caller.addRepository({
+				projectId: project.id,
+				source: { kind: "local", path: plain, initIfNeeded: true },
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("duplicate_name"),
+		});
+
+		expect(await isUnborn(unborn)).toBe(true);
+		expect(existsSync(join(plain, ".git"))).toBe(false);
 	});
 
 	it("adds a repository without giving live workspaces a checkout of it", async () => {
@@ -580,6 +619,18 @@ describe("project repositories", () => {
 				path: await gitRepo("api-moved"),
 			}),
 		).rejects.toThrow("repository_has_worktrees");
+
+		const unborn = join(mkdtempSync(join(root, "case-")), "api");
+		mkdirSync(unborn);
+		await createUserSimpleGit(unborn).init(["--initial-branch=main"]);
+		await expect(
+			caller.relocateRepository({
+				projectId: project.id,
+				repositoryId: api.id,
+				path: unborn,
+			}),
+		).rejects.toThrow("repository_has_worktrees");
+		expect(await isUnborn(unborn)).toBe(true);
 	});
 
 	it("sets sparse checkout paths per repository", async () => {

@@ -58,12 +58,7 @@ interface OriginRepository {
 }
 
 export type SetupPlacementMode =
-	| {
-			kind: "clone";
-			parentDir: string;
-			/** Ignored: a clone never replaces a folder that still works. */
-			allowRelocate?: boolean;
-	  }
+	| { kind: "clone"; parentDir: string }
 	| { kind: "import"; path: string; allowRelocate?: boolean };
 
 export interface SetupPlacement {

@@ -26,7 +26,7 @@ import { resolveHostAgentConfig } from "../../../../terminal-agents/agent-config
 import type { HostServiceContext } from "../../../../types";
 import { updateLocalWorkspace } from "../../../../workspaces/local-workspace-store";
 import { syncWorkspaceContextFiles } from "../shared/workspace-context-files";
-import { listBranchNames } from "./list-branch-names";
+import { listBranchNames, repositoryBranchRemote } from "./list-branch-names";
 import { deduplicateBranchName } from "./sanitize-branch";
 
 const WORKSPACE_TITLE_MAX = 150;
@@ -563,7 +563,13 @@ export async function applyGeneratedWorkspaceNames(
 	if (branchChanged) {
 		const freshBranches = (
 			await Promise.all(
-				checkouts.map((checkout) => listBranchNames(ctx, checkout.repoPath)),
+				checkouts.map((checkout) =>
+					listBranchNames(
+						ctx,
+						checkout.repoPath,
+						repositoryBranchRemote(ctx.db, checkout.repositoryId),
+					),
+				),
 			)
 		).flat();
 		deduped = deduplicateBranchName(

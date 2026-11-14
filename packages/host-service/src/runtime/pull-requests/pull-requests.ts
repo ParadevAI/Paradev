@@ -18,6 +18,7 @@ import { syncWorkspaceContextFiles } from "../../trpc/router/workspace-creation/
 import type { ExecGh } from "../../trpc/router/workspace-creation/utils/exec-gh";
 import {
 	type Checkout,
+	followSharedCheckoutBranch,
 	listWorkspaceCheckouts,
 } from "../../workspaces/checkouts";
 import {
@@ -1132,13 +1133,7 @@ export class PullRequestRuntimeManager {
 				})
 				.where(checkoutWhere(row.workspaceId, row.repositoryId))
 				.run();
-			if (mirrorBranch) {
-				this.db
-					.update(workspaces)
-					.set({ branch, updatedAt: Date.now() })
-					.where(eq(workspaces.id, workspace.id))
-					.run();
-			}
+			followSharedCheckoutBranch(this.db, workspace.id);
 			if (branch !== row.branch) {
 				syncWorkspaceContextFiles(this.db, workspace.id);
 			}

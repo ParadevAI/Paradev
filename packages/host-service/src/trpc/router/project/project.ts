@@ -695,7 +695,6 @@ export const projectRouter = router({
 							z.object({
 								kind: z.literal("clone"),
 								parentDir: z.string().min(1),
-								allowRelocate: z.boolean().optional(),
 							}),
 							z.object({
 								kind: z.literal("import"),

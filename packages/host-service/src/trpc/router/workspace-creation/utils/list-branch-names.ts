@@ -1,4 +1,21 @@
+import type { HostDb } from "../../../../db";
+import {
+	getRepository,
+	listProjectRepositories,
+} from "../../../../projects/repositories";
 import type { HostServiceContext } from "../../../../types";
+
+/** A single-repo project lists origin's branches, as before multi-repo projects. */
+export function repositoryBranchRemote(
+	db: HostDb,
+	repositoryId: string,
+): string {
+	const repository = getRepository(db, repositoryId);
+	if (!repository?.remoteName) return "origin";
+	return listProjectRepositories(db, repository.projectId).length > 1
+		? repository.remoteName
+		: "origin";
+}
 
 export async function listBranchNames(
 	ctx: HostServiceContext,

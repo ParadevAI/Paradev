@@ -1,8 +1,9 @@
 import { and, eq, isNull } from "drizzle-orm";
-import { workspaces } from "../../../../db/schema";
+import { workspaceRepositories, workspaces } from "../../../../db/schema";
 import {
 	getPrimaryRepository,
 	getRepository,
+	listProjectRepositories,
 } from "../../../../projects/repositories";
 import { resolveDefaultBranchName } from "../../../../runtime/git/refs";
 import { protectedProcedure } from "../../../index";
@@ -54,6 +55,12 @@ export const searchBranches = protectedProcedure
 			};
 		}
 		const git = await ctx.git(requireRepositoryPath(repository));
+		const multiRepoProject =
+			listProjectRepositories(ctx.db, localProject.id).length > 1;
+		const remote = multiRepoProject
+			? (repository.remoteName ?? "origin")
+			: "origin";
+		const remotePrefix = `refs/remotes/${remote}/`;
 
 		// Honor `refresh` only if TTL elapsed — prevents thrashing `git fetch`
 		// on every keystroke when the client tags first-page requests.
@@ -66,26 +73,41 @@ export const searchBranches = protectedProcedure
 			}
 		}
 
-		const defaultBranch = await resolveDefaultBranchName(git);
+		const defaultBranch = await resolveDefaultBranchName(git, remote);
 		const { worktreeMap, checkedOutBranches } = await listWorktreeBranches(git);
 		const recencyMap = await getRecentBranchOrder(git, 30);
 
 		// Branches that already have a workspace row on this host. The
 		// Worktree tab uses this to distinguish Open (has row) from
 		// Create (orphan worktree — worktree on disk, no workspace row).
+		const liveWorkspace = and(
+			eq(workspaces.projectId, input.projectId),
+			isNull(workspaces.archivedAt),
+		);
 		const workspaceBranches = new Set<string>(
-			ctx.db
-				.select()
-				.from(workspaces)
-				.where(
-					and(
-						eq(workspaces.projectId, input.projectId),
-						isNull(workspaces.archivedAt),
-					),
-				)
-				.all()
-				.map((workspace) => workspace.branch)
-				.filter((branch): branch is string => Boolean(branch)),
+			multiRepoProject
+				? ctx.db
+						.select({ branch: workspaceRepositories.branch })
+						.from(workspaceRepositories)
+						.innerJoin(
+							workspaces,
+							eq(workspaces.id, workspaceRepositories.workspaceId),
+						)
+						.where(
+							and(
+								liveWorkspace,
+								eq(workspaceRepositories.repositoryId, repository.id),
+							),
+						)
+						.all()
+						.map((row) => row.branch)
+				: ctx.db
+						.select()
+						.from(workspaces)
+						.where(liveWorkspace)
+						.all()
+						.map((workspace) => workspace.branch)
+						.filter((branch): branch is string => Boolean(branch)),
 		);
 
 		const branchMap = new Map<string, BranchAccum>();
@@ -95,7 +117,7 @@ export const searchBranches = protectedProcedure
 				"--sort=-committerdate",
 				"--format=%(refname)\t%(refname:short)\t%(committerdate:unix)",
 				"refs/heads/",
-				"refs/remotes/origin/",
+				remotePrefix,
 			]);
 			for (const line of raw.trim().split("\n").filter(Boolean)) {
 				const [refname, _short, timestamp] = line.split("\t");
@@ -110,8 +132,8 @@ export const searchBranches = protectedProcedure
 				if (refname.startsWith("refs/heads/")) {
 					name = refname.slice("refs/heads/".length);
 					isLocal = true;
-				} else if (refname.startsWith("refs/remotes/origin/")) {
-					name = refname.slice("refs/remotes/origin/".length);
+				} else if (refname.startsWith(remotePrefix)) {
+					name = refname.slice(remotePrefix.length);
 					isRemote = true;
 				} else {
 					continue;

@@ -593,7 +593,7 @@ describe("project.setup", () => {
 		expect(readdirSync(elsewhere)).toEqual([basename(api)]);
 	});
 
-	it("a clone never replaces a folder that still works, even when asked to relocate", async () => {
+	it("a clone never replaces a folder that still works", async () => {
 		const { caller, paths, projectId, ids } = await setUpCloned(["web"]);
 		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
 
@@ -602,7 +602,7 @@ describe("project.setup", () => {
 			repositories: [
 				{
 					id: ids[0] as string,
-					mode: { kind: "clone", parentDir: elsewhere, allowRelocate: true },
+					mode: { kind: "clone", parentDir: elsewhere },
 				},
 			],
 		});
@@ -794,11 +794,7 @@ describe("project.setup", () => {
 				projectId,
 				repositories: ids.map((id) => ({
 					id,
-					mode: {
-						kind: "clone" as const,
-						parentDir: elsewhere,
-						allowRelocate: true,
-					},
+					mode: { kind: "clone" as const, parentDir: elsewhere },
 				})),
 			}),
 		).rejects.toThrow();

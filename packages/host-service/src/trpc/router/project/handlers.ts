@@ -542,34 +542,20 @@ export async function addRepository(
 	},
 ): Promise<ProjectSnapshot> {
 	requireProject(ctx, args.projectId);
-	const [source] = await resolveSources(
-		ctx,
-		[args.source],
-		args.parentDir,
-		args.signal,
-	);
+	const local =
+		args.source.kind === "local"
+			? await checkLocalSource(args.source)
+			: undefined;
+	if (local) requireAddable(ctx, args.projectId, local.resolved);
+	const [source] = local
+		? [{ resolved: await local.adopt(), created: false }]
+		: await resolveSources(ctx, [args.source], args.parentDir, args.signal);
 	if (!source) throw new Error("addRepository resolved nothing");
 	try {
-		const { resolved } = source;
-		const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
-		if (owner) {
-			throw owner.projectId === args.projectId
-				? new TRPCError({
-						code: "CONFLICT",
-						message:
-							"repository_taken: this repository is already part of the project",
-					})
-				: repositoryTakenError(resolved.repoPath);
-		}
-		const names = [
-			...listProjectRepositories(ctx.db, args.projectId).map((r) => r.name),
-			nameOf(resolved),
-		];
-		requireUsableNames(names);
-		requireUniqueNames(names);
+		requireAddable(ctx, args.projectId, source.resolved);
 		ctx.db
 			.insert(repositories)
-			.values(repositoryValues(args.projectId, resolved))
+			.values(repositoryValues(args.projectId, source.resolved))
 			.run();
 	} catch (err) {
 		await removeCreated([source]);
@@ -577,6 +563,29 @@ export async function addRepository(
 	}
 	touchProject(ctx, args.projectId);
 	return snapshotOf(ctx, args.projectId);
+}
+
+function requireAddable(
+	ctx: HostServiceContext,
+	projectId: string,
+	resolved: ResolvedRepo,
+): void {
+	const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
+	if (owner) {
+		throw owner.projectId === projectId
+			? new TRPCError({
+					code: "CONFLICT",
+					message:
+						"repository_taken: this repository is already part of the project",
+				})
+			: repositoryTakenError(resolved.repoPath);
+	}
+	const names = [
+		...listProjectRepositories(ctx.db, projectId).map((r) => r.name),
+		nameOf(resolved),
+	];
+	requireUsableNames(names);
+	requireUniqueNames(names);
 }
 
 export function workspaceList(rows: { name: string }[]): string {
@@ -799,13 +808,18 @@ export async function relocateRepository(
 		args.projectId,
 		args.repositoryId,
 	);
-	const resolved = await resolveRepositoryFolder(repository, args.path);
+	const resolved = await resolveRepositoryFolder(
+		repository,
+		args.path,
+		CHECK_ONLY,
+	);
 	const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
 	if (owner && owner.id !== repository.id) {
 		throw repositoryTakenError(resolved.repoPath);
 	}
 	if (resolved.repoPath !== repository.repoPath) {
 		requireNoWorktrees(ctx, repository);
+		await ensureNotUnborn(resolved.repoPath);
 		applyRelocations(
 			ctx,
 			args.projectId,
