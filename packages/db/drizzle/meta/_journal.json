@@ -1359,6 +1359,13 @@
       "when": 1794541805805,
       "tag": "0193_environment_machine_size",
       "breakpoints": true
+    },
+    {
+      "idx": 194,
+      "version": "7",
+      "when": 1794568184152,
+      "tag": "0194_user_settings_naming_instructions",
+      "breakpoints": true
     }
   ]
 }
