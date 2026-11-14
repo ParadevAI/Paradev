@@ -21,16 +21,15 @@ import {
 	loadPageShareRole,
 	pageAccess,
 } from "./access";
-import { publicPageOutside } from "./read-loader";
+import { readAsMember } from "./read-loader";
 
 async function loadSharedPage(
 	ctx: Parameters<typeof requireActiveOrgMembership>[0] & {
 		session: { user: { id: string } };
 	},
 	id: string,
-	organizationId?: string,
 ) {
-	organizationId ??= await requireActiveOrgMembership(ctx);
+	const organizationId = await requireActiveOrgMembership(ctx);
 	const userId = ctx.session.user.id;
 	const [page] = await db
 		.select()
@@ -62,8 +61,10 @@ export const pageSharingRouter = {
 	get: personProcedure
 		.input(sharingResourceSchema)
 		.query(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-			if (await publicPageOutside(input.id, organizationId)) {
+			const loaded = await readAsMember(ctx, input.id, () =>
+				loadSharedPage(ctx, input.id),
+			);
+			if (!loaded) {
 				return {
 					owner: null,
 					grantees: [],
@@ -71,11 +72,7 @@ export const pageSharingRouter = {
 					organizationRole: "view" as const,
 				};
 			}
-			const { page, userId, shareRole } = await loadSharedPage(
-				ctx,
-				input.id,
-				organizationId,
-			);
+			const { page, userId, shareRole } = loaded;
 			const [owner] = page.createdByUserId
 				? await db
 						.select({
