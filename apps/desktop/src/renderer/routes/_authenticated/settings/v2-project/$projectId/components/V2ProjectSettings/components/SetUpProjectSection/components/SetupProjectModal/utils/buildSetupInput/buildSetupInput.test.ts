@@ -12,7 +12,7 @@ const project = {
 };
 
 describe("buildSetupInput", () => {
-	test("clones every repository into the one folder unless it has a folder of its own", () => {
+	test("clones into the one folder, and imports a folder of its own even at a new place", () => {
 		const result = buildSetupInput({
 			projectId: "p-1",
 			project,
@@ -25,9 +25,18 @@ describe("buildSetupInput", () => {
 				projectId: "p-1",
 				origin: project,
 				repositories: [
-					{ id: "r-api", mode: { kind: "clone", parentDir: "/code" } },
-					{ id: "r-web", mode: { kind: "clone", parentDir: "/code" } },
-					{ id: "r-docs", mode: { kind: "import", path: "/old/docs" } },
+					{
+						id: "r-api",
+						mode: { kind: "clone", parentDir: "/code", allowRelocate: true },
+					},
+					{
+						id: "r-web",
+						mode: { kind: "clone", parentDir: "/code", allowRelocate: true },
+					},
+					{
+						id: "r-docs",
+						mode: { kind: "import", path: "/old/docs", allowRelocate: true },
+					},
 				],
 			},
 		});

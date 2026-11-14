@@ -12584,6 +12584,9 @@ msgstr "Le mie parole chiave"
 msgid "My Tasks"
 msgstr "I miei task"
 
+msgid "my-project"
+msgstr "mio-progetto"
+
 msgid "Mystery Machinist"
 msgstr "Macchinista Misterioso"
 

@@ -12584,6 +12584,9 @@ msgstr "Moje klíčová slova"
 msgid "My Tasks"
 msgstr "Moje úkoly"
 
+msgid "my-project"
+msgstr "muj-projekt"
+
 msgid "Mystery Machinist"
 msgstr "Záhadný strojník"
 

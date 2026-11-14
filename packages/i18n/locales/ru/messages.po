@@ -12584,6 +12584,9 @@ msgstr "Мои ключевые слова"
 msgid "My Tasks"
 msgstr "Мои задачи"
 
+msgid "my-project"
+msgstr "moy-proekt"
+
 msgid "Mystery Machinist"
 msgstr "Загадочный станочник"
 

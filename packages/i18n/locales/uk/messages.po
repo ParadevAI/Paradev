@@ -12578,6 +12578,9 @@ msgstr "Мої ключові слова"
 msgid "My Tasks"
 msgstr "Мої завдання"
 
+msgid "my-project"
+msgstr "miy-proekt"
+
 msgid "Mystery Machinist"
 msgstr "Таємничий верстатник"
 

@@ -43,13 +43,13 @@ export function buildSetupInput({
 			if (path)
 				repositories.push({
 					id: repository.id,
-					mode: { kind: "import", path },
+					mode: { kind: "import", path, allowRelocate: true },
 				});
 			else missing.push(repository.name);
 		} else if (repository.url && cloneInto) {
 			repositories.push({
 				id: repository.id,
-				mode: { kind: "clone", parentDir: cloneInto },
+				mode: { kind: "clone", parentDir: cloneInto, allowRelocate: true },
 			});
 		} else {
 			missing.push(repository.name);

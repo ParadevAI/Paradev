@@ -12584,6 +12584,9 @@ msgstr "Từ khóa của tôi"
 msgid "My Tasks"
 msgstr "Tác vụ của tôi"
 
+msgid "my-project"
+msgstr "du-an-cua-toi"
+
 msgid "Mystery Machinist"
 msgstr "Thợ máy bí ẩn"
 

@@ -12584,6 +12584,9 @@ msgstr "내 키워드"
 msgid "My Tasks"
 msgstr "내 작업"
 
+msgid "my-project"
+msgstr "my-project"
+
 msgid "Mystery Machinist"
 msgstr "수수께끼의 기계공"
 

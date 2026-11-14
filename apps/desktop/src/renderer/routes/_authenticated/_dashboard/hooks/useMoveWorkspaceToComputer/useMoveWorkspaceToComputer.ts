@@ -27,6 +27,7 @@ import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import { holdsExactRepositorySet } from "../../utils/repositorySet";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
+import { workspaceSourceProject } from "../../utils/workspaceSourceProject";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 import { useWorkspaceRepositoryFullNames } from "../useWorkspaceRepositoryFullNames";
 import { earlyMoveRepositoryNames } from "./utils/earlyMoveRepositoryNames";
@@ -114,7 +115,12 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			// An early check only: the snapshots name the checkouts the workspace really has.
 			const earlyRepositoryNames = earlyMoveRepositoryNames(
 				checkoutRepositories,
-				projects.find((row) => row.id === workspace.projectId),
+				workspaceSourceProject({
+					hostResults,
+					projects,
+					hostId: workspace.hostId,
+					projectId: workspace.projectId,
+				}),
 			);
 			if (earlyRepositoryNames) requireProject(earlyRepositoryNames);
 			onStage("saving");

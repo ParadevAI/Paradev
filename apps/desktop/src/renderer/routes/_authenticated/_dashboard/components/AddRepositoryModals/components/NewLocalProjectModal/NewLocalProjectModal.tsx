@@ -144,7 +144,7 @@ export function NewLocalProjectModal({
 							id="local-project-name"
 							value={name}
 							onChange={(event) => setTypedName(event.target.value)}
-							placeholder="my-project"
+							placeholder={t({ message: "my-project" })}
 							disabled={working}
 						/>
 					</div>

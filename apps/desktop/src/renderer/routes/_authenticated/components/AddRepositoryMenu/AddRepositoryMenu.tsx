@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import {
 	Command,
@@ -155,7 +156,7 @@ export function AddRepositoryMenu({
 									{repositoriesQuery.isLoading ? (
 										<Trans>Loading repositories...</Trans>
 									) : repositoriesQuery.isError ? (
-										repositoriesQuery.error.message
+										errorMessage(repositoriesQuery.error)
 									) : (
 										<Trans>No matches</Trans>
 									)}

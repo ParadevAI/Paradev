@@ -12584,6 +12584,9 @@ msgstr "Kata kunci saya"
 msgid "My Tasks"
 msgstr "Tugas Saya"
 
+msgid "my-project"
+msgstr "proyek-saya"
+
 msgid "Mystery Machinist"
 msgstr "Masinis Misterius"
 

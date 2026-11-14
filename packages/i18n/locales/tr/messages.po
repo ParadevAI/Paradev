@@ -12584,6 +12584,9 @@ msgstr "Anahtar kelimelerim"
 msgid "My Tasks"
 msgstr "Görevlerim"
 
+msgid "my-project"
+msgstr "projem"
+
 msgid "Mystery Machinist"
 msgstr "Gizemli Makinist"
 
