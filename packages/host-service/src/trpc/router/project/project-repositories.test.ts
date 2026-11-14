@@ -337,6 +337,60 @@ describe("project repositories", () => {
 		expect((await remove()).repositories.map((r) => r.name)).toEqual(["web"]);
 	});
 
+	it("refuses while an archived workspace of one or three checkouts keeps the repository's folder on disk", async () => {
+		const { caller, db } = setup();
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [
+				local(await gitRepo("web")),
+				local(await gitRepo("api")),
+				local(await gitRepo("docs")),
+			],
+		});
+		const api = project.repositories.find((r) => r.name === "api");
+		if (!api) throw new Error("no api repository");
+		const soloRoot = mkdtempSync(join(root, "solo-"));
+		const trioRoot = mkdtempSync(join(root, "trio-"));
+		mkdirSync(join(trioRoot, "api"));
+		mkdirSync(join(trioRoot, "web"));
+		for (const [worktreePath, branch, repositoryIds] of [
+			[soloRoot, "solo", [api.id]],
+			[trioRoot, "trio", undefined],
+		] as const) {
+			const archived = seedWorkspace(
+				{ db },
+				{
+					projectId: project.id,
+					worktreePath,
+					branch,
+					...(repositoryIds ? { repositoryIds: [...repositoryIds] } : {}),
+				},
+			);
+			db.update(schema.workspaces)
+				.set({ archivedAt: 1 })
+				.where(eq(schema.workspaces.id, archived.id))
+				.run();
+		}
+		const remove = () =>
+			caller.removeRepository({ projectId: project.id, repositoryId: api.id });
+
+		await expect(remove()).rejects.toMatchObject({
+			message: expect.stringContaining(
+				'archived workspaces whose folders are still on disk ("solo", "trio")',
+			),
+		});
+		rmSync(soloRoot, { recursive: true });
+		await expect(remove()).rejects.toMatchObject({
+			message: expect.stringContaining('still on disk ("trio")'),
+		});
+
+		rmSync(join(trioRoot, "api"), { recursive: true });
+		expect((await remove()).repositories.map((r) => r.name).sort()).toEqual([
+			"docs",
+			"web",
+		]);
+	});
+
 	it("moves the primary mark, and relocates a repository keeping its name", async () => {
 		const { caller, db, events } = setup();
 		const project = await caller.create({

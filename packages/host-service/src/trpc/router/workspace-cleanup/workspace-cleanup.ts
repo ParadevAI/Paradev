@@ -303,11 +303,22 @@ export async function destroyWorkspace(
 	}
 }
 
-/** Once a checkout of a multi-repo workspace is gone, the workspace stays archived and a retry finishes the delete. */
-function isPartlyRemoved(checkouts: Checkout[]): boolean {
+/**
+ * Once a delete has removed a checkout of a multi-repo workspace, the
+ * workspace stays archived and a retry finishes the delete. A folder the
+ * user removed by hand does not count.
+ */
+function keepsArchivedOnFailure(
+	checkouts: Checkout[],
+	{
+		wasArchived,
+		presentBefore,
+	}: { wasArchived: boolean; presentBefore: Checkout[] },
+): boolean {
+	if (checkouts.length < 2) return false;
 	return (
-		checkouts.length > 1 &&
-		checkouts.some((checkout) =>
+		wasArchived ||
+		presentBefore.some((checkout) =>
 			isMissingPath(checkout.path, { followSymlinks: false }),
 		)
 	);
@@ -342,6 +353,10 @@ async function runDestroy(
 	// "deleted"), and session folder names are claimed against ALL rows
 	// including tombstones, so a tombstone's path can't be reused.
 	const marked = local != null;
+	const wasArchived = local?.archivedAt != null;
+	const presentBefore = checkouts.filter(
+		(checkout) => !isMissingPath(checkout.path, { followSymlinks: false }),
+	);
 	if (marked) {
 		archiveLocalWorkspace(
 			ctx,
@@ -424,7 +439,10 @@ async function runDestroy(
 		if (marked && local) trackWorkspaceDeleted(ctx, local);
 		return result;
 	} catch (err) {
-		if (marked && !isPartlyRemoved(checkouts)) {
+		if (
+			marked &&
+			!keepsArchivedOnFailure(checkouts, { wasArchived, presentBefore })
+		) {
 			unarchiveLocalWorkspace(ctx, input.workspaceId);
 		}
 		throw err;

@@ -150,3 +150,65 @@ test("a rescan moves the watch when a checkout's folder changes", async () => {
 
 	expect(watchedPaths()).toEqual([join(root, "api"), join(root, "web")]);
 });
+
+test("changed ignore rules in a checkout also refresh the workspace root's watch", async () => {
+	const root = mkdtempSync(join(tmpdir(), "git-watch-checkouts-"));
+	for (const name of ["api", "web"]) {
+		mkdirSync(join(root, name));
+		execFileSync("git", ["init", "-q", join(root, name)]);
+	}
+	const db = createTestDb();
+	const project = seedProject(
+		{ db },
+		{
+			repoPath: "/src/api",
+			repoName: "api",
+			repositories: [{ repoPath: "/src/web", repoName: "web" }],
+		},
+	);
+	seedWorkspace(
+		{ db },
+		{ id: "ws", projectId: project.id, worktreePath: root, branch: "b" },
+	);
+	const refreshed: string[] = [];
+	const filesystem = {
+		getServiceForRootPath: () => ({
+			watchPath: () => ({
+				[Symbol.asyncIterator]: () => ({ next: () => new Promise(() => {}) }),
+			}),
+		}),
+		refreshWatcherIgnores: async (rootPath: string) => {
+			refreshed.push(rootPath);
+			return false;
+		},
+		isWatchAttachBackingOff: () => false,
+	};
+	const watcher = new GitWatcher(
+		db,
+		filesystem as unknown as ConstructorParameters<typeof GitWatcher>[1],
+	);
+	cleanups.push(() => {
+		watcher.close();
+		rmSync(root, { recursive: true, force: true });
+	});
+	const internals = watcher as unknown as Internals & {
+		getOrCreateIgnoredDirsState(key: string): {
+			refreshing: boolean;
+			rulesChanged: boolean;
+		};
+		refreshIgnoredDirs(key: string, worktreePath: string, force: boolean): void;
+	};
+	watcher.watchWorkspace("ws");
+	await waitFor(() => internals.watched.size === 2);
+	const [key, entry] = [...internals.watched.entries()].find(([, watched]) =>
+		watched.worktreePath.endsWith("/api"),
+	) as [string, { worktreePath: string }];
+	const state = internals.getOrCreateIgnoredDirsState(key);
+	await waitFor(() => !state.refreshing);
+
+	state.rulesChanged = true;
+	internals.refreshIgnoredDirs(key, entry.worktreePath, true);
+	await waitFor(() => refreshed.length === 2);
+
+	expect(refreshed.sort()).toEqual([root, join(root, "api")].sort());
+});

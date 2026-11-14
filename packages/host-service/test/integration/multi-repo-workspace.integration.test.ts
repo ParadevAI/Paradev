@@ -372,6 +372,27 @@ test("a retry that meets a dirty checkout after another was removed keeps the wo
 	expect(row.archivedAt).not.toBeNull();
 });
 
+test("a refused delete of a workspace with a checkout removed by hand brings the workspace back", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	rmSync(join(workspace.worktreePath, "api"), {
+		recursive: true,
+		force: true,
+	});
+	writeFileSync(join(workspace.worktreePath, "web", "dirty.txt"), "wip");
+
+	await expect(
+		scenario.host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
+		}),
+	).rejects.toThrow("web: Worktree has uncommitted changes");
+
+	const row = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(row.archivedAt).toBeNull();
+});
+
 test("a deleted workspace whose root keeps the user's files stays deleted at startup; the reconcile takes only the generated files", async () => {
 	const scenario = await multiRepoScenario();
 	const workspace = await createBoth(scenario);

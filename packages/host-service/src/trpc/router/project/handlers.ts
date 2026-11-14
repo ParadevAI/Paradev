@@ -478,7 +478,8 @@ function workspaceList(rows: { name: string }[]): string {
 /**
  * Removes the repository from the project, never its files. A repository a
  * live workspace checks out stays; archived workspaces lose that checkout,
- * unless one would keep a single checkout while its folders are on disk.
+ * unless its folder is still on disk, or one would keep a single checkout
+ * while its folders are on disk.
  */
 export function removeRepository(
 	ctx: HostServiceContext,
@@ -516,13 +517,18 @@ export function removeRepository(
 			message: `repository_in_use: ${repository.name} is checked out by ${workspaceList(live)}; delete ${live.length === 1 ? "it" : "them"} first`,
 		});
 	}
-	// With one checkout left, its path becomes the root, not the folder on disk.
+	// A destroy deletes only the folders of checkout rows, and with one
+	// checkout left its path becomes the root, not the folder on disk.
 	const stranded = users.filter((row) => {
 		const checkouts = listWorkspaceCheckouts(ctx.db, row);
-		return (
-			checkouts.length === 2 &&
-			checkouts.some((checkout) => !isMissingPath(checkout.path))
-		);
+		const onDisk = (checkout: (typeof checkouts)[number]) =>
+			!isMissingPath(checkout.path);
+		return checkouts.length === 2
+			? checkouts.some(onDisk)
+			: checkouts.some(
+					(checkout) =>
+						checkout.repository.id === repository.id && onDisk(checkout),
+				);
 	});
 	if (stranded.length > 0) {
 		throw new TRPCError({

@@ -195,6 +195,8 @@ interface WatchTarget {
 	workspaceId: string;
 	repositoryId: string | null;
 	path: string;
+	/** The workspace folder; the same as `path` unless the workspace has several repositories. */
+	rootPath: string;
 }
 
 function watchKey(workspaceId: string, repositoryId: string | null): string {
@@ -350,6 +352,7 @@ export class GitWatcher {
 				workspaceId: key,
 				repositoryId: null,
 				path: "",
+				rootPath: "",
 			}
 		);
 	}
@@ -381,6 +384,7 @@ export class GitWatcher {
 					workspaceId: workspace.id,
 					repositoryId: null,
 					path: workspace.worktreePath,
+					rootPath: workspace.worktreePath,
 				},
 			];
 		}
@@ -389,6 +393,7 @@ export class GitWatcher {
 			workspaceId: workspace.id,
 			repositoryId: checkout.repository.id,
 			path: checkout.path,
+			rootPath: workspace.worktreePath,
 		}));
 	}
 
@@ -529,17 +534,27 @@ export class GitWatcher {
 					// re-derives the set and swaps the subscription only when it
 					// actually shrank; after a swap, force one broad status refresh
 					// to cover anything written during the swap gap.
-					const swapped = await this.filesystem
-						.refreshWatcherIgnores(this.targetFor(key).path)
-						.catch((error) => {
-							console.error("[git-watcher] watcher ignore refresh failed", {
-								key,
-								error,
-							});
-							return false;
-						});
+					// A multi-repo root's own watch prunes `<checkout>/<dir>`
+					// entries, so it goes stale with the checkout's rules too.
+					const { path, rootPath } = this.targetFor(key);
+					const paths =
+						rootPath && rootPath !== path ? [path, rootPath] : [path];
+					const swaps = await Promise.all(
+						paths.map((watchRoot) =>
+							this.filesystem
+								.refreshWatcherIgnores(watchRoot)
+								.catch((error) => {
+									console.error("[git-watcher] watcher ignore refresh failed", {
+										key,
+										watchRoot,
+										error,
+									});
+									return false;
+								}),
+						),
+					);
 					if (!stillCurrent()) return;
-					if (swapped) this.markGitDirDirty(key);
+					if (swaps.some(Boolean)) this.markGitDirDirty(key);
 				}
 			})
 			.catch((error) => {

@@ -1433,7 +1433,15 @@ export const gitRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			resolveCheckout(ctx.db, input.workspaceId, input.repositoryId);
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
 
 			const octokit = await ctx.github();
 			const mutation = input.resolved
