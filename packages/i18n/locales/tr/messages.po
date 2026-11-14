@@ -23081,8 +23081,8 @@ msgstr "Çalışma alanları, git worktree'leriyle desteklenen yalıtılmış g�
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Bu ortamdan başlatılan çalışma alanları artık bunu almayacak."
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Bunu kullanan çalışma alanları önce silinmelidir. Arşivlenen çalışma alanları bunun checkout'unu kaybeder ve başka hiçbir şeyi kalmayan bir çalışma alanı artık geri yüklenemez. Yeni çalışma alanları artık bunu checkout etmez. Klasör diskte {repositoryPath} konumunda kalır."
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Onu kullanan çalışma alanları önce silinmelidir; klasörü hâlâ diskte olan arşivlenmiş çalışma alanları da öyle. Diğer arşivlenmiş çalışma alanları onun checkout'unu kaybeder ve başka hiçbir şeyi kalmayan bir çalışma alanı artık geri yüklenemez. Yeni çalışma alanları onu artık checkout etmez. Klasör diskte {repositoryPath} konumunda kalır."
 
 msgid "Workspaces you can open will show up here."
 msgstr "Açabileceğiniz çalışma alanları burada görünecek."

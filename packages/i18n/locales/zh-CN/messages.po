@@ -23081,8 +23081,8 @@ msgstr "工作区是由git worktree支撑的隔离任务环境。"
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "从此环境启动的工作区将不再收到它。"
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "必须先删除使用它的工作区。已归档的工作区会失去它的检出,没有其他内容剩下的工作区将无法再恢复。新工作区将不再检出它。文件夹会保留在磁盘上的 {repositoryPath}。"
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "必须先删除使用它的工作区，以及磁盘上仍有其文件夹的已归档工作区。其他已归档工作区会失去它的检出，没有其他内容剩下的工作区将无法再恢复。新工作区不再检出它。文件夹仍保留在磁盘上的 {repositoryPath}。"
 
 msgid "Workspaces you can open will show up here."
 msgstr "你可以打开的工作区会显示在这里。"

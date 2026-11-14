@@ -23081,8 +23081,8 @@ msgstr "Les espaces de travail sont des environnements de tâche isolés reposan
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Les espaces de travail démarrés depuis cet environnement ne le recevront plus."
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Les espaces de travail qui l'utilisent doivent d'abord être supprimés. Les espaces de travail archivés perdent leur checkout de celui-ci, et un espace à qui il ne reste rien d'autre ne peut plus être restauré. Les nouveaux espaces de travail ne le récupèrent plus. Le dossier reste sur le disque dans {repositoryPath}."
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Les espaces de travail qui l’utilisent doivent d’abord être supprimés, ainsi que les espaces de travail archivés dont le dossier est encore sur le disque. Les autres espaces de travail archivés perdent leur checkout de ce dépôt, et un espace auquel il ne reste rien d’autre ne peut plus être restauré. Les nouveaux espaces de travail ne l’extraient plus. Le dossier reste sur le disque à {repositoryPath}."
 
 msgid "Workspaces you can open will show up here."
 msgstr "Les espaces de travail que vous pouvez ouvrir apparaîtront ici."

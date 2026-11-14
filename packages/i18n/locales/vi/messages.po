@@ -23081,8 +23081,8 @@ msgstr "Workspace là môi trường tác vụ tách biệt, dựa trên git wor
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Các workspace khởi động từ môi trường này sẽ không còn nhận được nó."
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Các workspace dùng nó phải được xóa trước. Các workspace đã lưu trữ sẽ mất bản checkout của nó, và workspace không còn gì khác sẽ không thể khôi phục được nữa. Các workspace mới sẽ không checkout nó nữa. Thư mục vẫn nằm trên đĩa tại {repositoryPath}."
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Phải xóa trước các workspace đang dùng nó, và cả các workspace đã lưu trữ vẫn còn thư mục của nó trên đĩa. Các workspace đã lưu trữ khác mất checkout của nó, và workspace không còn gì khác thì không thể khôi phục nữa. Workspace mới không checkout nó nữa. Thư mục vẫn nằm trên đĩa tại {repositoryPath}."
 
 msgid "Workspaces you can open will show up here."
 msgstr "Workspace bạn có thể mở sẽ xuất hiện ở đây."

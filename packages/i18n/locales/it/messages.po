@@ -23081,8 +23081,8 @@ msgstr "I workspace sono ambienti di lavoro isolati basati sui worktree git."
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "I workspace avviati da questo ambiente non la riceveranno più."
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "I workspace che lo usano devono prima essere eliminati. I workspace archiviati perdono il loro checkout di questo repository, e uno a cui non resta nient'altro non può più essere ripristinato. I nuovi workspace smettono di farne il checkout. La cartella resta sul disco in {repositoryPath}."
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Prima vanno eliminati i workspace che lo usano, e anche i workspace archiviati che hanno ancora la sua cartella sul disco. Gli altri workspace archiviati perdono il loro checkout, e uno a cui non resta altro non può più essere ripristinato. I nuovi workspace smettono di farne il checkout. La cartella resta sul disco in {repositoryPath}."
 
 msgid "Workspaces you can open will show up here."
 msgstr "I workspace che puoi aprire compariranno qui."

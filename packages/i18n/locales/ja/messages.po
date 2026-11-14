@@ -23081,8 +23081,8 @@ msgstr "ワークスペースはgitワークツリーを基盤とした独立し
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "この環境から起動したワークスペースはこれを受け取らなくなります。"
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "これを使っているワークスペースを先に削除する必要があります。アーカイブ済みのワークスペースはこのチェックアウトを失い、ほかに何も残らないものは復元できなくなります。新しいワークスペースはこれをチェックアウトしなくなります。フォルダは {repositoryPath} にディスク上で残ります。"
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "これを使っているワークスペースを先に削除する必要があります。このフォルダがまだディスク上にあるアーカイブ済みのワークスペースも同様です。ほかのアーカイブ済みのワークスペースはこのチェックアウトを失い、ほかに何も残らないものは復元できなくなります。新しいワークスペースはこれをチェックアウトしなくなります。フォルダは {repositoryPath} にディスク上で残ります。"
 
 msgid "Workspaces you can open will show up here."
 msgstr "開けるワークスペースがここに表示されます。"

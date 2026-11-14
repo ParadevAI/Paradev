@@ -23075,8 +23075,8 @@ msgstr "Робочі простори — це ізольовані середо
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Робочі простори, запущені з цього середовища, більше не отримуватимуть це значення."
 
-msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Спочатку потрібно видалити робочі простори, які його використовують. Архівні робочі простори втрачають його витягнуту копію, а той, у якого більше нічого не залишилося, уже не можна відновити. Нові робочі простори перестануть його витягувати. Тека залишиться на диску в {repositoryPath}."
+msgid "Workspaces that use it must be deleted first, and so must archived workspaces that still have its folder on disk. Other archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Спершу треба видалити робочі простори, які його використовують, а також архівні робочі простори, у яких його папка ще є на диску. Інші архівні робочі простори втрачають його checkout, а той, у якому більше нічого не лишилося, вже не можна відновити. Нові робочі простори більше не роблять його checkout. Папка лишається на диску в {repositoryPath}."
 
 msgid "Workspaces you can open will show up here."
 msgstr "Тут з'являться робочі простори, які ви можете відкрити."

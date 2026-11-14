@@ -174,10 +174,11 @@ export function RepositoriesSection({
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							<Trans>
-								Workspaces that use it must be deleted first. Archived
-								workspaces lose their checkout of it, and one with nothing else
-								left can no longer be restored. New workspaces stop checking it
-								out. The folder stays on disk at {repositoryPath}.
+								Workspaces that use it must be deleted first, and so must
+								archived workspaces that still have its folder on disk. Other
+								archived workspaces lose their checkout of it, and one with
+								nothing else left can no longer be restored. New workspaces stop
+								checking it out. The folder stays on disk at {repositoryPath}.
 							</Trans>
 						</AlertDialogDescription>
 					</AlertDialogHeader>
