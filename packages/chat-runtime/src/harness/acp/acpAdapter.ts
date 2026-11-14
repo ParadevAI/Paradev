@@ -41,6 +41,7 @@ import {
 } from "../usageLimit";
 import {
 	AIR_ASYNC_TASK_STOP_METHOD,
+	AIR_AUTONOMOUS_TURN_TASK_TYPE,
 	AIR_CLIENT_META,
 	airAsyncTaskProgressSchema,
 	airAsyncTaskSpawnedSchema,
@@ -454,6 +455,8 @@ export class AcpAdapter implements HarnessAdapter {
 	private sessionUsage: SessionUsage | undefined;
 	private reportedCostUsd: number | undefined;
 	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
+	/** Async task id of each turn the agent started on its own, to the turn shown for it. */
+	private readonly autonomousTurns = new Map<string, string>();
 	private awaitingBackground = false;
 	/** The v2 config option that stands in for v1's session mode, once seen. */
 	private modeConfigId: string | null = null;
@@ -1945,7 +1948,11 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskSpawned(sessionId: string, raw: unknown): void {
 		const parsed = airAsyncTaskSpawnedSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const { asyncTaskId, name, description, canStop } = parsed.data;
+		const { asyncTaskId, name, description, canStop, taskType } = parsed.data;
+		if (taskType === AIR_AUTONOMOUS_TURN_TASK_TYPE) {
+			if (sessionId === this.sessionId) this.startAutonomousTurn(asyncTaskId);
+			return;
+		}
 		if (this.finishedSubagents.has(sessionId)) return;
 		const owner = this.subagents.get(sessionId);
 		if (owner) {
@@ -1972,7 +1979,50 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskState(raw: unknown): void {
 		const parsed = airAsyncTaskStateSchema.safeParse(raw);
 		if (!parsed.success || !isTerminalAirState(parsed.data.state)) return;
-		this.backgroundTasks.end(parsed.data.asyncTaskId);
+		const { asyncTaskId, state } = parsed.data;
+		if (this.autonomousTurns.has(asyncTaskId)) {
+			this.endAutonomousTurn(asyncTaskId, state);
+			return;
+		}
+		this.backgroundTasks.end(asyncTaskId);
+	}
+
+	/**
+	 * A turn the agent starts after its answer, such as the reply to a
+	 * finished background subagent, reopens the latest turn, so the reply
+	 * reads as part of it and the turn's clock stays its last line.
+	 */
+	private startAutonomousTurn(asyncTaskId: string): void {
+		const latest = this.currentTurn;
+		if (latest?.status === "running") return;
+		if (!latest) {
+			const turnId = this.mintId();
+			this.autonomousTurns.set(asyncTaskId, turnId);
+			this.emitTurn({
+				id: turnId,
+				status: "running",
+				startedAtMs: this.nextStartMs(),
+			});
+		} else {
+			const { completedAtMs: _completedAtMs, ...reopened } = latest;
+			this.autonomousTurns.set(asyncTaskId, latest.id);
+			this.emitTurn({ ...reopened, status: "running" });
+		}
+		this.emitSession({ status: this.statusAfterApprovals() });
+	}
+
+	private endAutonomousTurn(asyncTaskId: string, state: string): void {
+		const turnId = this.autonomousTurns.get(asyncTaskId);
+		this.autonomousTurns.delete(asyncTaskId);
+		const turn = this.currentTurn;
+		if (!turnId || turn?.id !== turnId || turn.status !== "running") return;
+		this.main.flush();
+		this.emitTurn({
+			...turn,
+			status: state === "cancelled" ? "interrupted" : "completed",
+			completedAtMs: this.now(),
+		});
+		this.emitSession({ status: this.statusAfterApprovals() });
 	}
 
 	private handleConfigOptions(raw: unknown): void {

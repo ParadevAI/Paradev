@@ -3449,6 +3449,61 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("reopens the latest turn for a turn the agent starts on its own", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "start a background subagent" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			taskType: "turn",
+			showInTranscript: false,
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			content: { type: "text", text: "The subagent finished." },
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "autonomous-turn-1",
+			state: "completed",
+		});
+		await flush();
+
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(new Set(turns.map((turn) => turn.id)).size).toBe(1);
+		expect(turns.map((turn) => turn.status)).toEqual([
+			"running",
+			"completed",
+			"running",
+			"completed",
+		]);
+		const reply = events.find(
+			(e) =>
+				e.kind === "item" &&
+				e.item.kind === "agent_message" &&
+				textOf(e.item) === "The subagent finished.",
+		);
+		expect(reply?.kind === "item" ? reply.turnId : null).toBe(
+			turns[0]?.id ?? "",
+		);
+		expect(
+			events.some(
+				(e) =>
+					e.kind === "session" && (e.session.backgroundTasks ?? []).length > 0,
+			),
+		).toBe(false);
+
+		await adapter.dispose();
+	});
+
 	it("ends a subagent's background task with the subagent", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(agent);

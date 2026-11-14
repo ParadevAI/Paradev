@@ -1,6 +1,11 @@
 type AcpTranslator =
-	| { adapter: string; executableEnv: string }
-	| { adapter?: undefined; executableEnv?: undefined };
+	| {
+			adapter: string;
+			executableEnv: string;
+			/** Variables the bundled translator itself reads. */
+			adapterEnv?: Record<string, string>;
+	  }
+	| { adapter?: undefined; executableEnv?: undefined; adapterEnv?: undefined };
 
 export type AcpHarness = {
 	registryId: string;
@@ -26,10 +31,13 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		minVersion: "2.1.226",
 		adapter: "@agentclientprotocol/claude-agent-acp",
 		executableEnv: "CLAUDE_CODE_EXECUTABLE",
+		// The adapter serves ACP v2 since 0.95, where steering is not yet
+		// supported and turns end differently. Chat is built and tested on v1.
+		adapterEnv: { CLAUDE_AGENT_ACP_PROTOCOL: "v1" },
 		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
 		fullAccessModeId: "bypassPermissions",
 		forkAtMessage: true,
-		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286.",
+		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 is tested only with 2.1.311.",
 	},
 	"codex-acp": {
 		registryId: "codex-acp",
