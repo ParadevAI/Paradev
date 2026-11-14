@@ -25,5 +25,21 @@ export function useChangesSidebarFilePolicy() {
 		[policy.map],
 	);
 
-	return { ...policy, getIntent, tierForIntent, hint };
+	const { resolve, getAction, tierForAction, map } = policy;
+	return useMemo(
+		() => ({
+			resolve,
+			getAction,
+			tierForAction,
+			map,
+			hint,
+			getIntent,
+			tierForIntent,
+		}),
+		[resolve, getAction, tierForAction, map, hint, getIntent, tierForIntent],
+	);
 }
+
+export type ChangesSidebarFilePolicy = ReturnType<
+	typeof useChangesSidebarFilePolicy
+>;

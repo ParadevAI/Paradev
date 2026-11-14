@@ -14,6 +14,7 @@ import {
 	markBootMounted,
 	reportBootError,
 } from "./lib/boot-errors";
+import { trackOpenOverlays } from "./lib/overlayOpenClass";
 import { parseDeepLinkPath } from "./lib/parseDeepLinkPath";
 import { sweepDeadPersistedKeys } from "./lib/persisted-keys";
 import { persistentHistory } from "./lib/persistent-hash-history";
@@ -31,6 +32,7 @@ initBootErrorHandling(rootElement);
 pruneExpiredTerminalState();
 // Keys from removed features otherwise live on user profiles forever.
 sweepDeadPersistedKeys();
+trackOpenOverlays();
 
 const router = createRouter({
 	routeTree,
