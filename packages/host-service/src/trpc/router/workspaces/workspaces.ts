@@ -922,7 +922,7 @@ async function createMultiRepoCheckoutsAndRow(
 				listBranchNames(
 					ctx,
 					repository.repoPath,
-					repository.remoteName ?? "origin",
+					repositoryBranchRemote(ctx.db, repository.id),
 				),
 			),
 		)
