@@ -4913,15 +4913,6 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
-msgid "Cloud credentials"
-msgstr "Cloud credentials"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "Cloud data gets deleted. Push your branches first."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud ends {shutdownDate}. Mac app ends early 2027"
-
 msgid "Cloud environment setup"
 msgstr "Cloud environment setup"
 
@@ -4934,14 +4925,8 @@ msgstr "Cloud environments check out your repositories from GitHub. Connect thes
 msgid "Cloud GB-hours per seat each month"
 msgstr "Cloud GB-hours per seat each month"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud goes read-only"
-
 msgid "Cloud sandboxes"
 msgstr "Cloud sandboxes"
-
-msgid "Cloud shuts down"
-msgstr "Cloud shuts down"
 
 msgid "Cloud usage"
 msgstr "Cloud usage"
@@ -5218,21 +5203,8 @@ msgstr "Composable form layout — pairs with @superset/ui/form for react-hook-f
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Conductor chat history. Export it in Conductor under Settings → Account"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Conductor Cloud guide"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Conductor details are from its public docs. See the <0>full comparison</0>."
@@ -5240,9 +5212,6 @@ msgstr "Conductor details are from its public docs. See the <0>full comparison</
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor joins Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "Conflicts"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Conflicts with {0}"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
 
 msgid "Connect"
 msgstr "Connect"
@@ -9480,14 +9446,14 @@ msgstr "Free for one user. Open source under MIT."
 msgid "Free for one user. Paid plans per user"
 msgstr "Free for one user. Paid plans per user"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Free for one user. Pro from {proPrice}/user/mo"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
 
 msgid "Frequently Used"
 msgstr "Frequently Used"
@@ -10306,6 +10272,9 @@ msgstr "Idle"
 msgid "Idle · branch pushed"
 msgstr "Idle · branch pushed"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 
@@ -10811,8 +10780,8 @@ msgstr "Invoices and payment method"
 msgid "iOS app"
 msgstr "iOS app"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "iOS app, ending {shutdownDate}"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS app; cloud and experimental local Mac remote control"
 
 msgid "iOS Simulator"
 msgstr "iOS Simulator"
@@ -11096,9 +11065,6 @@ msgstr "Kept the new folder because it is no longer empty"
 
 msgid "Key"
 msgstr "Key"
-
-msgid "Key dates"
-msgstr "Key dates"
 
 msgid "Key name"
 msgstr "Key name"
@@ -11731,9 +11697,6 @@ msgstr "Local First"
 msgid "Local Network"
 msgstr "Local Network"
 
-msgid "Local work can move at your own pace."
-msgstr "Local work can move at your own pace."
-
 msgid "Local workspace"
 msgstr "Local workspace"
 
@@ -11825,9 +11788,6 @@ msgstr "Low"
 
 msgid "Low severity"
 msgstr "Low severity"
-
-msgid "Mac app winds down"
-msgstr "Mac app winds down"
 
 msgid "Machine resources"
 msgstr "Machine resources"
@@ -12449,6 +12409,9 @@ msgstr "Move this workspace to the cloud?"
 msgid "Move to"
 msgstr "Move to"
 
+msgid "Move to {companyName} in minutes."
+msgstr "Move to {companyName} in minutes."
+
 msgid "Move to background"
 msgstr "Move to background"
 
@@ -12467,8 +12430,11 @@ msgstr "Move to Right Side"
 msgid "Move to Tab"
 msgstr "Move to Tab"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Move your agents before {shutdownDate}."
+msgid "Move your agents."
+msgstr "Move your agents."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "Moved \"{name}\" to {group}"
@@ -13160,9 +13126,6 @@ msgstr "no logins"
 msgid "No longer in source"
 msgstr "No longer in source"
 
-msgid "No longer on sale"
-msgstr "No longer on sale"
-
 msgid "No match"
 msgstr "No match"
 
@@ -13539,6 +13502,9 @@ msgstr "No workspaces yet"
 msgid "No-Prompt Launch"
 msgstr "No-Prompt Launch"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 
@@ -13628,9 +13594,6 @@ msgstr "Not on the leaderboard. Opt in first."
 
 msgid "Not on this version"
 msgstr "Not on this version"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
@@ -14806,6 +14769,9 @@ msgstr "pagination"
 
 msgid "Pagination"
 msgstr "Pagination"
+
+msgid "Paid plans"
+msgstr "Paid plans"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
@@ -17341,9 +17307,6 @@ msgstr "Routine tickets with no mid-task intervention"
 msgid "Routines"
 msgstr "Routines"
 
-msgid "Routines, ending with Cloud"
-msgstr "Routines, ending with Cloud"
-
 msgid "Row actions"
 msgstr "Row actions"
 
@@ -17965,6 +17928,9 @@ msgstr "See all stats →"
 
 msgid "See Changes"
 msgstr "See Changes"
+
+msgid "See Conductor for current plans and account access"
+msgstr "See Conductor for current plans and account access"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "See how {companyName}'s GitHub stars have grown over time."
@@ -18733,9 +18699,6 @@ msgstr "Shown publicly alongside your name."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Shut down {0}"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "Shuts down {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Side by side"
@@ -19784,6 +19747,9 @@ msgstr "Switch sign-in"
 msgid "Switch sign-in…"
 msgstr "Switch sign-in…"
 
+msgid "Switch to {companyName}"
+msgstr "Switch to {companyName}"
+
 msgid "Switch to {planName}"
 msgstr "Switch to {planName}"
 
@@ -20044,9 +20010,6 @@ msgstr "Team"
 
 msgid "Team activity feed"
 msgstr "Team activity feed"
-
-msgid "Team and Ultra plans"
-msgstr "Team and Ultra plans"
 
 msgid "Team collaboration"
 msgstr "Team collaboration"
@@ -20652,9 +20615,6 @@ msgstr "the target host"
 
 msgid "The team"
 msgstr "The team"
-
-msgid "The team announced the news."
-msgstr "The team announced the news."
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
@@ -21848,8 +21808,8 @@ msgstr "Unpublished"
 msgid "Unpushed"
 msgstr "Unpushed"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Unpushed Cloud work. Push before {shutdownDate}"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Unpushed cloud changes. Save and push the work you want to move."
 
 msgid "Unranked"
 msgstr "Unranked"
@@ -23189,9 +23149,6 @@ msgstr "You can only edit your own messages"
 msgid "You can only share with people and teams in this organization"
 msgstr "You can only share with people and teams in this organization"
 
-msgid "You can read and export, but not run agents."
-msgstr "You can read and export, but not run agents."
-
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 
@@ -23498,39 +23455,3 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-
-msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
-msgstr "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
-
-msgid "Move to {companyName} in minutes."
-msgstr "Move to {companyName} in minutes."
-
-msgid "Move your agents."
-msgstr "Move your agents."
-
-msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-
-msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
-msgstr "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
-
-msgid "Paid plans"
-msgstr "Paid plans"
-
-msgid "See Conductor for current plans and account access"
-msgstr "See Conductor for current plans and account access"
-
-msgid "Switch to {companyName}"
-msgstr "Switch to {companyName}"
-
-msgid "Unpushed cloud changes. Save and push the work you want to move."
-msgstr "Unpushed cloud changes. Save and push the work you want to move."
-
-msgid "iOS app; cloud and experimental local Mac remote control"
-msgstr "iOS app; cloud and experimental local Mac remote control"

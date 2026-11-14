@@ -4913,15 +4913,6 @@ msgstr "Bulut"
 msgid "Cloud · us-east"
 msgstr "Bulut · us-east"
 
-msgid "Cloud credentials"
-msgstr "Bulut kimlik bilgileri"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "Buluttaki veriler silinir. Önce dallarınızı push edin."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Bulut {shutdownDate} tarihinde sona eriyor. Mac uygulaması 2027 başında sona eriyor"
-
 msgid "Cloud environment setup"
 msgstr "Bulut ortamı kurulumu"
 
@@ -4934,14 +4925,8 @@ msgstr "Bulut ortamları depolarınızı GitHub'dan alır. Önce bunları bağla
 msgid "Cloud GB-hours per seat each month"
 msgstr "Koltuk başına aylık bulut GB-saat"
 
-msgid "Cloud goes read-only"
-msgstr "Bulut salt okunur olur"
-
 msgid "Cloud sandboxes"
 msgstr "Bulut sandbox'ları"
-
-msgid "Cloud shuts down"
-msgstr "Bulut kapanır"
 
 msgid "Cloud usage"
 msgstr "Bulut kullanımı"
@@ -5218,21 +5203,8 @@ msgstr "Birleştirilebilir form düzeni — react-hook-form için @superset/ui/f
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Conductor sohbet geçmişi. Conductor'da Settings → Account altından dışa aktarın"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud {shutdownDate} tarihinde sona eriyor. Dakikalar içinde {0}'e geçin."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud {shutdownDate} tarihinde sona eriyor. {companyName}'e geçin"
-
 msgid "Conductor Cloud guide"
 msgstr "Conductor Cloud rehberi"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud {shutdownDateLong} tarihinde kapanıyor. Worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor bunları {shutdownDate} sonrasında siler ve {companyName} bunlara erişemez. O tarihten önce dallarınızı push edin ve sohbetlerinizi dışa aktarın."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Conductor bilgileri herkese açık belgelerinden alınmıştır. <0>Tam karşılaştırmaya</0> bakın."
@@ -5240,9 +5212,6 @@ msgstr "Conductor bilgileri herkese açık belgelerinden alınmıştır. <0>Tam 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor, sahibinin ticari markasıdır. {0}, Conductor veya Meta ile bağlantılı değildir ve onlar tarafından onaylanmamıştır."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor, Meta'ya katılıyor"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "Çakışmalar"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "{0} ile çakışıyor"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Meta'ya katılan Conductor ekibini tebrik ederiz. Tarihler <0>duyurularından</0> alınmıştır."
 
 msgid "Connect"
 msgstr "Bağla"
@@ -9480,14 +9446,14 @@ msgstr "Tek kullanıcı için ücretsiz. MIT lisansıyla açık kaynak."
 msgid "Free for one user. Paid plans per user"
 msgstr "Tek kullanıcı için ücretsiz. Ücretli planlar kullanıcı başına"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Tek kullanıcı için ücretsiz. Pro, otomasyonları ve mobil uygulamayı ekler. Team, bulut çalışma alanlarını ekler."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Bir kullanıcı için ücretsiz. Pro, otomasyonları ve mobil uygulamayı ekler. Ücretli planlarla bulut çalışma alanlarına erişebilirsiniz. Dahil edilen kullanım ve ek tüketim ücretleri için fiyatlara bakın."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Tek kullanıcı için ücretsiz. Pro {proPrice}/kullanıcı/ay'dan başlar"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Tek kullanıcı için ücretsiz. Pro, kullanıcı başına aylık {proPrice}'dır ve otomasyonları ve mobil uygulamayı ekler. Team {teamPrice}'dır ve bulut çalışma alanlarını ekler."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Bir kullanıcı için ücretsiz. Pro, kullanıcı başına aylık {proPrice}'dır ve otomasyonları ve mobil uygulamayı ekler. Team {teamPrice}'dır. Ücretli planlarla bulut çalışma alanlarına erişebilirsiniz. Dahil edilen kullanım ve ek tüketim ücretleri için fiyatlara bakın."
 
 msgid "Frequently Used"
 msgstr "Sık Kullanılanlar"
@@ -10306,6 +10272,9 @@ msgstr "Boşta"
 msgid "Idle · branch pushed"
 msgstr "Boşta · dal push edildi"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Taşınmayı seçerseniz dallarınızı kaydedin ve saklamak istediğiniz verileri dışa aktarın. Dışa aktarımlar Conductor sohbetlerini {companyName}'e içe aktarmaz."
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Paradev'den şimdiye kadar memnunsanız, bir GitHub yıldızı diğer geliştiricilerin onu keşfetmesine yardımcı olur."
 
@@ -10811,8 +10780,8 @@ msgstr "Faturalar ve ödeme yöntemi"
 msgid "iOS app"
 msgstr "iOS uygulaması"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "iOS uygulaması, {shutdownDate} tarihinde sona eriyor"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS uygulaması; bulut ve deneysel yerel Mac uzaktan kontrolü"
 
 msgid "iOS Simulator"
 msgstr "iOS Simülatörü"
@@ -11096,9 +11065,6 @@ msgstr "Yeni klasör korundu, artık boş değil"
 
 msgid "Key"
 msgstr "Anahtar"
-
-msgid "Key dates"
-msgstr "Önemli tarihler"
 
 msgid "Key name"
 msgstr "Anahtar adı"
@@ -11731,9 +11697,6 @@ msgstr "Yerel öncelikli"
 msgid "Local Network"
 msgstr "Yerel ağ"
 
-msgid "Local work can move at your own pace."
-msgstr "Yerel işinizi kendi hızınızda taşıyabilirsiniz."
-
 msgid "Local workspace"
 msgstr "Yerel çalışma alanı"
 
@@ -11825,9 +11788,6 @@ msgstr "Düşük"
 
 msgid "Low severity"
 msgstr "Düşük önem"
-
-msgid "Mac app winds down"
-msgstr "Mac uygulaması kapanıyor"
 
 msgid "Machine resources"
 msgstr "Makine kaynakları"
@@ -12449,6 +12409,9 @@ msgstr "Bu çalışma alanı buluta taşınsın mı?"
 msgid "Move to"
 msgstr "Taşı"
 
+msgid "Move to {companyName} in minutes."
+msgstr "Dakikalar içinde {companyName}'e geçin."
+
 msgid "Move to background"
 msgstr "Arka plana taşı"
 
@@ -12467,8 +12430,11 @@ msgstr "Sağ tarafa taşı"
 msgid "Move to Tab"
 msgstr "Sekmeye taşı"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Ajanlarınızı {shutdownDate} tarihinden önce taşıyın."
+msgid "Move your agents."
+msgstr "Ajanlarınızı taşıyın."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\", {group} grubuna taşındı"
@@ -13160,9 +13126,6 @@ msgstr "oturum bilgisi yok"
 msgid "No longer in source"
 msgstr "Artık kaynakta yok"
 
-msgid "No longer on sale"
-msgstr "Artık satışta değil"
-
 msgid "No match"
 msgstr "Eşleşme yok"
 
@@ -13539,6 +13502,9 @@ msgstr "Henüz çalışma alanı yok"
 msgid "No-Prompt Launch"
 msgstr "İstemsiz başlatma"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Hayır. {companyName}, model çağrıları için asla proxy görevi görmez. Ajanlar kendi aboneliklerinizi ve anahtarlarınızı kullanır."
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Hayır. Ajanlarınız bağımsız kalır; Paradev onların etrafındaki orkestrasyon katmanıdır. Her görev kendi Git worktree'sini ve dalını, kalıcı oturumları, diff incelemesini ve olaylarla ya da bir zamanlamayla çalışan otomasyonları alır; iş akışı tek bir sağlayıcıya bağlanmaz."
 
@@ -13628,9 +13594,6 @@ msgstr "Lider tablosunda değilsiniz. Önce katılın."
 
 msgid "Not on this version"
 msgstr "Bu sürümde yok"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Kendi makinenizde hayır. Ajanlar sağlayıcılarını doğrudan çağırır ve faturalandırma orada yapılır. Bulut çalışma alanlarında anahtarlarınız asla sandbox'a girmez. {companyName}, giden isteklere oturum bilgilerinizi ekler."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Henüz olay alınmıyor: Microsoft Graph bildirim aboneliklerini reddetti. Uygulamanın yönetici onayını ve korumalı API onayını kontrol edip yeniden bağlanın."
@@ -14806,6 +14769,9 @@ msgstr "sayfalama"
 
 msgid "Pagination"
 msgstr "Sayfalama"
+
+msgid "Paid plans"
+msgstr "Ücretli planlar"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "Ücretli planlar kullanıcı başına aylık fiyatlandırılır ve ekibinizdeki her aktif koltuk için faturalandırılır. {planPrices}."
@@ -17341,9 +17307,6 @@ msgstr "Görev ortasında müdahale olmadan rutin biletler"
 msgid "Routines"
 msgstr "Rutinler"
 
-msgid "Routines, ending with Cloud"
-msgstr "Routines, Bulut ile birlikte sona eriyor"
-
 msgid "Row actions"
 msgstr "Satır eylemleri"
 
@@ -17965,6 +17928,9 @@ msgstr "Tüm istatistikleri gör →"
 
 msgid "See Changes"
 msgstr "Değişiklikleri görün"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Güncel planlar ve hesap erişimi için Conductor'a bakın"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "{companyName}'in GitHub yıldızlarının zaman içinde nasıl arttığını görün."
@@ -18733,9 +18699,6 @@ msgstr "Adınızın yanında herkese açık gösterilir."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "{0} cihazını kapat"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "{shutdownDate} tarihinde kapanıyor"
 
 msgid "Side by side"
 msgstr "Yan yana"
@@ -19784,6 +19747,9 @@ msgstr "Oturumu değiştir"
 msgid "Switch sign-in…"
 msgstr "Oturumu değiştir…"
 
+msgid "Switch to {companyName}"
+msgstr "{companyName}'e geçin"
+
 msgid "Switch to {planName}"
 msgstr "{planName} planına geç"
 
@@ -20044,9 +20010,6 @@ msgstr "Takım"
 
 msgid "Team activity feed"
 msgstr "Takım etkinlik akışı"
-
-msgid "Team and Ultra plans"
-msgstr "Team ve Ultra planları"
 
 msgid "Team collaboration"
 msgstr "Takım iş birliği"
@@ -20652,9 +20615,6 @@ msgstr "hedef host"
 
 msgid "The team"
 msgstr "Ekip"
-
-msgid "The team announced the news."
-msgstr "Ekip haberi duyurdu."
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Takım daveti ya süresi dolmuş ya da mevcut değil. Takım sahibinden yeni bir bağlantı isteyin veya URL'nin doğru girildiğini kontrol edin."
@@ -21848,8 +21808,8 @@ msgstr "Yayından kaldırıldı"
 msgid "Unpushed"
 msgstr "Push edilmemiş"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Buluttaki push edilmemiş işler. {shutdownDate} tarihinden önce push edin"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Gönderilmemiş bulut değişiklikleri. Taşımak istediğiniz çalışmayı kaydedip gönderin."
 
 msgid "Unranked"
 msgstr "Sırasız"
@@ -23189,9 +23149,6 @@ msgstr "Yalnızca kendi mesajlarınızı düzenleyebilirsiniz"
 msgid "You can only share with people and teams in this organization"
 msgstr "Yalnızca bu kuruluştaki kişiler ve takımlarla paylaşabilirsiniz"
 
-msgid "You can read and export, but not run agents."
-msgstr "Okuyabilir ve dışa aktarabilirsiniz, ancak ajan çalıştıramazsınız."
-
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin. Depo klasörü asla silinmez."
 
@@ -23498,41 +23455,3 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "Bir kullanıcı için ücretsiz. Pro, otomasyonları ve mobil uygulamayı ekler. Ücretli planlarla bulut çalışma alanlarına erişebilirsiniz. Dahil edilen kullanım ve ek tüketim ücretleri için fiyatlara bakın."
-
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "Bir kullanıcı için ücretsiz. Pro, kullanıcı başına aylık {proPrice}'dır ve otomasyonları ve mobil uygulamayı ekler. Team {teamPrice}'dır. Ücretli planlarla bulut çalışma alanlarına erişebilirsiniz. Dahil edilen kullanım ve ek tüketim ücretleri için fiyatlara bakın."
-
-msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
-msgstr "Taşınmayı seçerseniz dallarınızı kaydedin ve saklamak istediğiniz verileri dışa aktarın. Dışa aktarımlar Conductor sohbetlerini {companyName}'e içe aktarmaz."
-
-msgid "Move to {companyName} in minutes."
-msgstr "Dakikalar içinde {companyName}'e geçin."
-
-msgid "Move your agents."
-msgstr "Ajanlarınızı taşıyın."
-
-msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
-
-msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
-msgstr "Hayır. {companyName}, model çağrıları için asla proxy görevi görmez. Ajanlar kendi aboneliklerinizi ve anahtarlarınızı kullanır."
-
-msgid "Paid plans"
-msgstr "Ücretli planlar"
-
-msgid "See Conductor for current plans and account access"
-msgstr "Güncel planlar ve hesap erişimi için Conductor'a bakın"
-
-msgid "Switch to {companyName}"
-msgstr "{companyName}'e geçin"
-
-msgid "Unpushed cloud changes. Save and push the work you want to move."
-msgstr ""
-"Gönderilmemiş bulut değişiklikleri. Taşımak istediğiniz çalışmayı kaydedip "
-"gönderin."
-
-msgid "iOS app; cloud and experimental local Mac remote control"
-msgstr "iOS uygulaması; bulut ve deneysel yerel Mac uzaktan kontrolü"

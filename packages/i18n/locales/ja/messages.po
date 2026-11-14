@@ -4913,15 +4913,6 @@ msgstr "クラウド"
 msgid "Cloud · us-east"
 msgstr "クラウド · us-east"
 
-msgid "Cloud credentials"
-msgstr "クラウドの認証情報"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "クラウドのデータは削除されます。先にブランチをプッシュしてください。"
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud は{shutdownDate}に終了。Mac アプリは 2027年前半に終了"
-
 msgid "Cloud environment setup"
 msgstr "クラウド環境のセットアップ"
 
@@ -4934,14 +4925,8 @@ msgstr "クラウド環境は GitHub からリポジトリをチェックアウ�
 msgid "Cloud GB-hours per seat each month"
 msgstr "1席あたりの毎月のクラウド GB 時間"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud が読み取り専用に"
-
 msgid "Cloud sandboxes"
 msgstr "クラウドサンドボックス"
-
-msgid "Cloud shuts down"
-msgstr "Cloud が終了"
 
 msgid "Cloud usage"
 msgstr "クラウド使用量"
@@ -5218,21 +5203,8 @@ msgstr "組み合わせ可能なフォームレイアウト — react-hook-form�
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Conductor のチャット履歴。Conductor の Settings → Account からエクスポートしてください"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud は{shutdownDate}に終了します。数分で {0} に移行できます。"
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud は{shutdownDate}に終了。{companyName} に乗り換えましょう"
-
 msgid "Conductor Cloud guide"
 msgstr "Conductor Cloud ガイド"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud は{shutdownDateLong}に終了します。ワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor は{shutdownDate}以降にデータを削除し、{companyName} からはアクセスできません。それまでにブランチをプッシュし、チャットをエクスポートしてください。"
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Conductor の情報は公開ドキュメントに基づいています。<0>詳しい比較</0>をご覧ください。"
@@ -5240,9 +5212,6 @@ msgstr "Conductor の情報は公開ドキュメントに基づいています�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor はその所有者の商標です。{0} は Conductor および Meta と提携しておらず、承認も受けていません。"
-
-msgid "Conductor joins Meta"
-msgstr "Conductor が Meta に参加"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "コンフリクト"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "{0} とコンフリクトしています"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Meta への参加、Conductor チームの皆さんおめでとうございます。日付は<0>同チームの発表</0>に基づいています。"
 
 msgid "Connect"
 msgstr "接続"
@@ -9480,14 +9446,14 @@ msgstr "1ユーザーなら無料。MIT ライセンスのオープンソース�
 msgid "Free for one user. Paid plans per user"
 msgstr "1ユーザーなら無料。有料プランはユーザー単位"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "1ユーザーなら無料。Pro ではオートメーションとモバイルアプリが、Team ではクラウドワークスペースが追加されます。"
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "1ユーザーは無料。Pro ではオートメーションとモバイルアプリが追加されます。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "1ユーザーなら無料。Pro は {proPrice}/ユーザー/月から"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "1ユーザーなら無料。Pro は1ユーザーあたり月額 {proPrice} で、オートメーションとモバイルアプリが追加されます。Team は {teamPrice} で、クラウドワークスペースが追加されます。"
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "1ユーザーは無料。Pro は1ユーザーあたり月額 {proPrice} で、オートメーションとモバイルアプリが追加されます。Team は {teamPrice}です。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
 
 msgid "Frequently Used"
 msgstr "よく使う絵文字"
@@ -10306,6 +10272,9 @@ msgstr "アイドル"
 msgid "Idle · branch pushed"
 msgstr "アイドル · ブランチをプッシュ済み"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "移行する場合は、ブランチを保存し、残したいデータをエクスポートしてください。エクスポートではConductorのチャットを{companyName}にインポートできません。"
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Paradevを気に入っていただけたら、GitHubスターが他の開発者の発見につながります。"
 
@@ -10811,8 +10780,8 @@ msgstr "請求書と支払い方法"
 msgid "iOS app"
 msgstr "iOSアプリ"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "iOS アプリ（{shutdownDate}に終了）"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOSアプリ。クラウドと、実験的なローカルMacのリモート操作に対応"
 
 msgid "iOS Simulator"
 msgstr "iOSシミュレータ"
@@ -11096,9 +11065,6 @@ msgstr "新しいフォルダを保持しました、空ではなくなってい
 
 msgid "Key"
 msgstr "キー"
-
-msgid "Key dates"
-msgstr "主な日程"
 
 msgid "Key name"
 msgstr "キー名"
@@ -11731,9 +11697,6 @@ msgstr "ローカルファースト"
 msgid "Local Network"
 msgstr "ローカルネットワーク"
 
-msgid "Local work can move at your own pace."
-msgstr "ローカルの作業は自分のペースで移行できます。"
-
 msgid "Local workspace"
 msgstr "ローカルワークスペース"
 
@@ -11825,9 +11788,6 @@ msgstr "低"
 
 msgid "Low severity"
 msgstr "重要度: 低"
-
-msgid "Mac app winds down"
-msgstr "Mac アプリが終了へ"
 
 msgid "Machine resources"
 msgstr "マシンリソース"
@@ -12449,6 +12409,9 @@ msgstr "このワークスペースをクラウドに移動しますか？"
 msgid "Move to"
 msgstr "移動先"
 
+msgid "Move to {companyName} in minutes."
+msgstr "数分で {companyName} に移行できます。"
+
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
 
@@ -12467,8 +12430,11 @@ msgstr "右側に移動"
 msgid "Move to Tab"
 msgstr "タブに移動"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "{shutdownDate}までにエージェントを移行しましょう。"
+msgid "Move your agents."
+msgstr "エージェントを移行しましょう。"
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "ワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "「{name}」を {group} へ移動しました"
@@ -13160,9 +13126,6 @@ msgstr "ログイン情報なし"
 msgid "No longer in source"
 msgstr "ソースから削除済み"
 
-msgid "No longer on sale"
-msgstr "販売終了"
-
 msgid "No match"
 msgstr "一致なし"
 
@@ -13539,6 +13502,9 @@ msgstr "ワークスペースはまだありません"
 msgid "No-Prompt Launch"
 msgstr "プロンプトなし起動"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "いいえ。{companyName}がモデル呼び出しをプロキシすることはありません。エージェントはご自身のサブスクリプションとキーを使います。"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "いいえ。エージェントは独立したままで、Paradevはその周りのオーケストレーション層です。タスクごとに専用のGitワークツリーとブランチ、永続的なセッション、差分レビュー、イベントやスケジュールで動くオートメーションが手に入り、ワークフローが特定のプロバイダーに縛られることもありません。"
 
@@ -13628,9 +13594,6 @@ msgstr "リーダーボードに参加していません。先に参加してく
 
 msgid "Not on this version"
 msgstr "このバージョンにはありません"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "お使いのマシン上ではプロキシしません。エージェントは各プロバイダーを直接呼び出し、料金もそちらで請求されます。クラウドワークスペースでは、キーがサンドボックスに入ることはありません。{companyName} が送信リクエストにサインイン情報を付加します。"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "まだイベントを受信していません: Microsoft Graphが通知サブスクリプションを拒否しました。アプリの管理者同意と保護されたAPIの承認を確認してから、再接続してください。"
@@ -14806,6 +14769,9 @@ msgstr "ページネーション"
 
 msgid "Pagination"
 msgstr "Pagination"
+
+msgid "Paid plans"
+msgstr "有料プラン"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "有料プランは1ユーザーあたりの月額料金で、チームの有効な席ごとに請求されます。{planPrices}。"
@@ -17341,9 +17307,6 @@ msgstr "途中の介入なしで完了する定型チケット"
 msgid "Routines"
 msgstr "ルーチン"
 
-msgid "Routines, ending with Cloud"
-msgstr "ルーティン（Cloud とともに終了）"
-
 msgid "Row actions"
 msgstr "行の操作"
 
@@ -17965,6 +17928,9 @@ msgstr "すべての統計を見る →"
 
 msgid "See Changes"
 msgstr "変更を確認"
+
+msgid "See Conductor for current plans and account access"
+msgstr "現在のプランとアカウント利用条件はConductorをご確認ください"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "{companyName}のGitHubスター数がどのように伸びてきたかをご覧ください。"
@@ -18733,9 +18699,6 @@ msgstr "名前と一緒に公開されます。"
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "{0} をシャットダウン"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "{shutdownDate}に終了"
 
 msgid "Side by side"
 msgstr "並べて比較"
@@ -19784,6 +19747,9 @@ msgstr "サインインを切り替え"
 msgid "Switch sign-in…"
 msgstr "サインインを切り替え…"
 
+msgid "Switch to {companyName}"
+msgstr "{companyName} に乗り換えましょう"
+
 msgid "Switch to {planName}"
 msgstr "{planName} に変更"
 
@@ -20044,9 +20010,6 @@ msgstr "チーム"
 
 msgid "Team activity feed"
 msgstr "チームのアクティビティフィード"
-
-msgid "Team and Ultra plans"
-msgstr "Team および Ultra プラン"
 
 msgid "Team collaboration"
 msgstr "チームでのコラボレーション"
@@ -20652,9 +20615,6 @@ msgstr "対象ホスト"
 
 msgid "The team"
 msgstr "チーム"
-
-msgid "The team announced the news."
-msgstr "チームがこのニュースを発表しました。"
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "チームの招待は期限切れか、存在しません。チームのオーナーに新しいリンクを依頼するか、URLが正しく入力されているか確認してください。"
@@ -21848,8 +21808,8 @@ msgstr "非公開化"
 msgid "Unpushed"
 msgstr "未プッシュ"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "プッシュしていない Cloud の作業。{shutdownDate}までにプッシュしてください"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "プッシュしていないクラウド上の変更。移行したい作業を保存してプッシュしてください。"
 
 msgid "Unranked"
 msgstr "ランク外"
@@ -23189,9 +23149,6 @@ msgstr "自分のメッセージのみ編集できます"
 msgid "You can only share with people and teams in this organization"
 msgstr "共有できるのはこの組織内のユーザーとチームのみです"
 
-msgid "You can read and export, but not run agents."
-msgstr "閲覧とエクスポートはできますが、エージェントは実行できません。"
-
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30 日間は「設定 → プロジェクト」から復元できます。リポジトリのフォルダーが削除されることはありません。"
 
@@ -23498,39 +23455,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "1ユーザーは無料。Pro ではオートメーションとモバイルアプリが追加されます。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
-
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "1ユーザーは無料。Pro は1ユーザーあたり月額 {proPrice} で、オートメーションとモバイルアプリが追加されます。Team は {teamPrice}です。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
-
-msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
-msgstr "移行する場合は、ブランチを保存し、残したいデータをエクスポートしてください。エクスポートではConductorのチャットを{companyName}にインポートできません。"
-
-msgid "Move to {companyName} in minutes."
-msgstr "数分で {companyName} に移行できます。"
-
-msgid "Move your agents."
-msgstr "エージェントを移行しましょう。"
-
-msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "ワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
-
-msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
-msgstr "いいえ。{companyName}がモデル呼び出しをプロキシすることはありません。エージェントはご自身のサブスクリプションとキーを使います。"
-
-msgid "Paid plans"
-msgstr "有料プラン"
-
-msgid "See Conductor for current plans and account access"
-msgstr "現在のプランとアカウント利用条件はConductorをご確認ください"
-
-msgid "Switch to {companyName}"
-msgstr "{companyName} に乗り換えましょう"
-
-msgid "Unpushed cloud changes. Save and push the work you want to move."
-msgstr "プッシュしていないクラウド上の変更。移行したい作業を保存してプッシュしてください。"
-
-msgid "iOS app; cloud and experimental local Mac remote control"
-msgstr "iOSアプリ。クラウドと、実験的なローカルMacのリモート操作に対応"

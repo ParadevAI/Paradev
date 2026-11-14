@@ -4913,15 +4913,6 @@ msgstr "雲端"
 msgid "Cloud · us-east"
 msgstr "雲端 · us-east"
 
-msgid "Cloud credentials"
-msgstr "雲端憑證"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "雲端資料將被刪除。請先推送你的分支。"
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud 於{shutdownDate}結束。Mac 應用程式於 2027 年初結束"
-
 msgid "Cloud environment setup"
 msgstr "雲端環境設定"
 
@@ -4934,14 +4925,8 @@ msgstr "雲端環境會從 GitHub 檢出你的儲存庫。請先連結這些;只
 msgid "Cloud GB-hours per seat each month"
 msgstr "每席位每月雲端 GB 小時"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud 變為唯讀"
-
 msgid "Cloud sandboxes"
 msgstr "雲端沙箱"
-
-msgid "Cloud shuts down"
-msgstr "Cloud 關閉"
 
 msgid "Cloud usage"
 msgstr "雲端用量"
@@ -5218,21 +5203,8 @@ msgstr "可組合的表單佈局——搭配@superset/ui/form用於react-hook-fo
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Conductor 聊天紀錄。請在 Conductor 的 Settings → Account 中匯出"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud 將於{shutdownDate}結束。幾分鐘即可遷移到 {0}。"
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud 將於{shutdownDate}結束。切換到 {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Conductor Cloud 指南"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud 將於{shutdownDateLong}關閉。幾分鐘即可把你的 worktree 和代理程式遷移到 {companyName}。免費且開源。"
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor 會在{shutdownDate}之後刪除這些資料，{companyName} 無法存取它們。請在此之前推送分支並匯出聊天紀錄。"
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Conductor 的資訊來自其公開文件。查看<0>完整比較</0>。"
@@ -5240,9 +5212,6 @@ msgstr "Conductor 的資訊來自其公開文件。查看<0>完整比較</0>。"
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor 是其所有者的商標。{0} 與 Conductor 或 Meta 無關聯，也未獲得其認可。"
-
-msgid "Conductor joins Meta"
-msgstr "Conductor 加入 Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "衝突"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "與 {0} 衝突"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "恭喜 Conductor 團隊加入 Meta。日期來自<0>他們的公告</0>。"
 
 msgid "Connect"
 msgstr "連線"
@@ -9480,14 +9446,14 @@ msgstr "單一使用者免費。以 MIT 授權開源。"
 msgid "Free for one user. Paid plans per user"
 msgstr "單一使用者免費。付費方案按使用者計費"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "單一使用者免費。Pro 增加自動化和行動應用程式。Team 增加雲端工作區。"
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "單一使用者免費。Pro 增加自動化和行動應用程式。付費方案可存取雲端工作區。內含用量與額外用量計費請參閱價格頁面。"
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "單一使用者免費。Pro {proPrice}/使用者/月起"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "單一使用者免費。Pro 為每位使用者每月 {proPrice}，增加自動化和行動應用程式。Team 為 {teamPrice}，增加雲端工作區。"
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "單一使用者免費。Pro 為每位使用者每月 {proPrice}，增加自動化和行動應用程式。Team 為 {teamPrice}。付費方案可存取雲端工作區。內含用量與額外用量計費請參閱價格頁面。"
 
 msgid "Frequently Used"
 msgstr "常用"
@@ -10306,6 +10272,9 @@ msgstr "空閒"
 msgid "Idle · branch pushed"
 msgstr "空閒 · 分支已推送"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "如果決定遷移，請儲存分支並匯出要保留的資料。匯出檔無法將 Conductor 聊天匯入 {companyName}。"
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "如果你覺得Paradev還不錯，一個GitHub星標能幫助更多開發者發現它。"
 
@@ -10811,8 +10780,8 @@ msgstr "發票與支付方式"
 msgid "iOS app"
 msgstr "iOS應用"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "iOS 應用程式，{shutdownDate}結束"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS App；支援雲端與實驗性的本機 Mac 遠端控制"
 
 msgid "iOS Simulator"
 msgstr "iOS 模擬器"
@@ -11096,9 +11065,6 @@ msgstr "已保留新資料夾，它已不再為空"
 
 msgid "Key"
 msgstr "鍵"
-
-msgid "Key dates"
-msgstr "關鍵日期"
 
 msgid "Key name"
 msgstr "金鑰名稱"
@@ -11731,9 +11697,6 @@ msgstr "本地優先"
 msgid "Local Network"
 msgstr "本地網路"
 
-msgid "Local work can move at your own pace."
-msgstr "本機工作可以按你自己的節奏遷移。"
-
 msgid "Local workspace"
 msgstr "本地工作區"
 
@@ -11825,9 +11788,6 @@ msgstr "低"
 
 msgid "Low severity"
 msgstr "低嚴重性"
-
-msgid "Mac app winds down"
-msgstr "Mac 應用程式逐步停用"
 
 msgid "Machine resources"
 msgstr "機器資源"
@@ -12449,6 +12409,9 @@ msgstr "要將此工作區移至雲端嗎？"
 msgid "Move to"
 msgstr "移至"
 
+msgid "Move to {companyName} in minutes."
+msgstr "幾分鐘即可遷移到 {companyName}。"
+
 msgid "Move to background"
 msgstr "移到背景"
 
@@ -12467,8 +12430,11 @@ msgstr "移到右側"
 msgid "Move to Tab"
 msgstr "移動到分頁"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "請在{shutdownDate}之前遷移你的代理程式。"
+msgid "Move your agents."
+msgstr "遷移你的代理程式。"
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "幾分鐘即可把你的 worktree 和代理程式遷移到 {companyName}。免費且開源。"
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "已將「{name}」移動到 {group}"
@@ -13160,9 +13126,6 @@ msgstr "無登入資訊"
 msgid "No longer in source"
 msgstr "已不在來源中"
 
-msgid "No longer on sale"
-msgstr "已停止銷售"
-
 msgid "No match"
 msgstr "無匹配項"
 
@@ -13539,6 +13502,9 @@ msgstr "暫無工作區"
 msgid "No-Prompt Launch"
 msgstr "無提示詞啟動"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "不會。{companyName} 從不代理模型呼叫。代理程式使用你自己的訂閱和金鑰。"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "不是。你的代理保持獨立；Paradev 是圍繞它們的編排層。每個任務都有自己的 Git worktree 和分支、持久工作階段、差異審查，以及依事件或排程執行的自動化，而不會把工作流程綁定在單一供應商。"
 
@@ -13628,9 +13594,6 @@ msgstr "不在排行榜中。請先加入。"
 
 msgid "Not on this version"
 msgstr "不在此版本中"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "在你的機器上不會。代理程式直接呼叫各自的供應商，並由供應商向你計費。在雲端工作區中，你的金鑰永遠不會進入沙箱，{companyName} 會把你的登入憑證加到送出的請求中。"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "尚未接收到事件：Microsoft Graph拒絕了通知訂閱。請檢查應用的管理員同意和受保護API的審批，然後重新連線。"
@@ -14806,6 +14769,9 @@ msgstr "分頁"
 
 msgid "Pagination"
 msgstr "分頁"
+
+msgid "Paid plans"
+msgstr "付費方案"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "付費方案依每位使用者每月計價，並依團隊中的每個使用中席位計費。{planPrices}。"
@@ -17341,9 +17307,6 @@ msgstr "常規工單無需中途干預"
 msgid "Routines"
 msgstr "例行任務"
 
-msgid "Routines, ending with Cloud"
-msgstr "例行任務，隨 Cloud 一起結束"
-
 msgid "Row actions"
 msgstr "行操作"
 
@@ -17965,6 +17928,9 @@ msgstr "檢視全部資料 →"
 
 msgid "See Changes"
 msgstr "檢視改動"
+
+msgid "See Conductor for current plans and account access"
+msgstr "目前方案與帳號存取資訊請參閱 Conductor"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "瞭解 {companyName} 的 GitHub 星標隨時間的成長情況。"
@@ -18733,9 +18699,6 @@ msgstr "會與你的名字一起公開顯示。"
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "關閉 {0}"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "{shutdownDate}關閉"
 
 msgid "Side by side"
 msgstr "並排比較"
@@ -19784,6 +19747,9 @@ msgstr "切換登入"
 msgid "Switch sign-in…"
 msgstr "切換登入…"
 
+msgid "Switch to {companyName}"
+msgstr "切換到 {companyName}"
+
 msgid "Switch to {planName}"
 msgstr "切換到 {planName}"
 
@@ -20044,9 +20010,6 @@ msgstr "團隊"
 
 msgid "Team activity feed"
 msgstr "團隊動態"
-
-msgid "Team and Ultra plans"
-msgstr "Team 和 Ultra 方案"
 
 msgid "Team collaboration"
 msgstr "團隊協作"
@@ -20652,9 +20615,6 @@ msgstr "目標主機"
 
 msgid "The team"
 msgstr "團隊"
-
-msgid "The team announced the news."
-msgstr "團隊宣布了這個消息。"
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "該團隊邀請已過期或不存在。請向團隊擁有者索取新連結，或檢查URL是否輸入正確。"
@@ -21848,8 +21808,8 @@ msgstr "已取消發佈"
 msgid "Unpushed"
 msgstr "未推送"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "未推送的 Cloud 工作。請在{shutdownDate}之前推送"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "尚未推送的雲端變更。請儲存並推送要遷移的工作。"
 
 msgid "Unranked"
 msgstr "未上榜"
@@ -23189,9 +23149,6 @@ msgstr "你只能編輯自己的訊息"
 msgid "You can only share with people and teams in this organization"
 msgstr "你只能與此組織中的人員和團隊分享"
 
-msgid "You can read and export, but not run agents."
-msgstr "你可以查看和匯出，但無法執行代理程式。"
-
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "你可以在 30 天內從「設定 → 專案」還原。儲存庫資料夾永遠不會被刪除。"
 
@@ -23498,39 +23455,3 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
-
-msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "單一使用者免費。Pro 增加自動化和行動應用程式。付費方案可存取雲端工作區。內含用量與額外用量計費請參閱價格頁面。"
-
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
-msgstr "單一使用者免費。Pro 為每位使用者每月 {proPrice}，增加自動化和行動應用程式。Team 為 {teamPrice}。付費方案可存取雲端工作區。內含用量與額外用量計費請參閱價格頁面。"
-
-msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
-msgstr "如果決定遷移，請儲存分支並匯出要保留的資料。匯出檔無法將 Conductor 聊天匯入 {companyName}。"
-
-msgid "Move to {companyName} in minutes."
-msgstr "幾分鐘即可遷移到 {companyName}。"
-
-msgid "Move your agents."
-msgstr "遷移你的代理程式。"
-
-msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "幾分鐘即可把你的 worktree 和代理程式遷移到 {companyName}。免費且開源。"
-
-msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
-msgstr "不會。{companyName} 從不代理模型呼叫。代理程式使用你自己的訂閱和金鑰。"
-
-msgid "Paid plans"
-msgstr "付費方案"
-
-msgid "See Conductor for current plans and account access"
-msgstr "目前方案與帳號存取資訊請參閱 Conductor"
-
-msgid "Switch to {companyName}"
-msgstr "切換到 {companyName}"
-
-msgid "Unpushed cloud changes. Save and push the work you want to move."
-msgstr "尚未推送的雲端變更。請儲存並推送要遷移的工作。"
-
-msgid "iOS app; cloud and experimental local Mac remote control"
-msgstr "iOS App；支援雲端與實驗性的本機 Mac 遠端控制"
