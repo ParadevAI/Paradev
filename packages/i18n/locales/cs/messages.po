@@ -1053,9 +1053,6 @@ msgstr "Selhává {failing} z {total} kontrol"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {V tomto pracovním prostoru se změnil # soubor} few {V tomto pracovním prostoru se změnily # soubory} many {V tomto pracovním prostoru se změnilo # souboru} other {V tomto pracovním prostoru se změnilo # souborů}}"
 
-msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
-msgstr "{fileCount, plural, one {# změněný soubor} few {# změněné soubory} many {# změněného souboru} other {# změněných souborů}}"
-
 msgid "{fileCount, plural, one {# file} other {# files}}"
 msgstr "{fileCount, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
 
@@ -1355,17 +1352,11 @@ msgstr "{productName} získal 11,5 milionu dolarů v seed kole, které vedl fond
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se až do října 2026 jmenoval {formerName}."
 
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit ke stažení} few {# commity ke stažení} many {# commitu ke stažení} other {# commitů ke stažení}}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · cíl {base}"
-
-msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
-msgstr "{pushCount, plural, one {# nepushnutý commit} few {# nepushnuté commity} many {# nepushnutého commitu} other {# nepushnutých commitů}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# zpráva čeká ve frontě} few {# zprávy čekají ve frontě} many {# zprávy čeká ve frontě} other {# zpráv čeká ve frontě}}"
@@ -2111,6 +2102,12 @@ msgstr "Přidat {0} do pracovního prostoru"
 
 msgid "Add {localizedName}?"
 msgstr "Přidat {localizedName}?"
+
+msgid "Add {missing} to the {projectName} project on {computer} first"
+msgstr "Nejprve přidejte {missing} do projektu {projectName} na {computer}"
+
+msgid "Add {missing} to the {projectName} project on this computer first"
+msgstr "Nejprve přidejte {missing} do projektu {projectName} na tomto počítači"
 
 msgid "Add {only} as a project on {computer} first"
 msgstr "Nejprve přidejte {only} jako projekt na {computer}"
@@ -3831,9 +3828,6 @@ msgstr "Název větve není dostupný"
 
 msgid "Branch names cannot end with a space."
 msgstr "Názvy větví nesmí končit mezerou."
-
-msgid "Branch not published"
-msgstr "Větev není publikovaná"
 
 msgid "Branch or tag (optional)"
 msgstr "Větev nebo tag (volitelné)"
@@ -6026,9 +6020,6 @@ msgstr "Pluginy se nepodařilo načíst. Zkontrolujte připojení a zkuste to zn
 msgid "Could not load presets from the host"
 msgstr "Nepodařilo se načíst přednastavení z hosta"
 
-msgid "Could not load the repository's status"
-msgstr "Stav repozitáře se nepodařilo načíst"
-
 msgid "Could not load this diff"
 msgstr "Tento rozdíl se nepodařilo načíst"
 
@@ -7417,17 +7408,11 @@ msgstr "Destructive"
 msgid "Detached"
 msgstr "Odpojeno"
 
-msgid "Detached HEAD"
-msgstr "Odpojený HEAD"
-
 msgid "Details"
 msgstr "Podrobnosti"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Podrobnosti zde nejsou k dispozici, ale odkaz se přesto otevře."
-
-msgid "Details for {repositoryName}"
-msgstr "Podrobnosti o {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Zjišťovat vaši fyzickou polohu"
@@ -13429,9 +13414,6 @@ msgstr "Žádné poznámky k vydání na {url}"
 msgid "No remote"
 msgstr "Bez vzdáleného repozitáře"
 
-msgid "No remote repository"
-msgstr "Žádný vzdálený repozitář"
-
 msgid "No repositories found."
 msgstr "Nenalezeny žádné repozitáře."
 
@@ -13554,9 +13536,6 @@ msgstr "Zatím žádná vlákna"
 
 msgid "No triggers"
 msgstr "Žádné spouštěče"
-
-msgid "No uncommitted changes"
-msgstr "Žádné necommitnuté změny"
 
 msgid "No Updates"
 msgstr "Žádné aktualizace"
@@ -13775,9 +13754,6 @@ msgstr "Za posledních 30 dní zatím nebylo nic publikováno. Vaše pozice se o
 msgid "Nothing to open yet. Send a message first."
 msgstr "Zatím není co otevřít. Nejdřív pošlete zprávu."
 
-msgid "Nothing to ship"
-msgstr "Není co odeslat"
-
 msgid "Nothing was missed"
 msgstr "Nic nebylo zmeškáno"
 
@@ -13913,9 +13889,6 @@ msgstr "při žádosti o revizi"
 
 msgid "on the board"
 msgstr "v žebříčku"
-
-msgid "On the default branch"
-msgstr "Na výchozí větvi"
 
 msgid "On this pace"
 msgstr "Tímto tempem"
@@ -15542,9 +15515,6 @@ msgstr "PR #{0} vytvořen"
 msgid "PR #{0} is not in any repository of this project"
 msgstr "PR #{0} není v žádném repozitáři tohoto projektu"
 
-msgid "PR #{prNumber}"
-msgstr "PR #{prNumber}"
-
 msgid "PR Closed"
 msgstr "PR uzavřen"
 
@@ -16294,9 +16264,6 @@ msgstr "Čte a píše"
 
 msgid "Ready"
 msgstr "Připraven"
-
-msgid "Ready for a pull request"
-msgstr "Připraveno na pull request"
 
 msgid "Ready for review"
 msgstr "Připraveno k revizi"
@@ -18616,17 +18583,11 @@ msgstr "Zvýrazněno Shiki, volitelně s čísly řádků"
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer Label"
 
-msgid "Ship"
-msgstr "Odeslat"
-
 msgid "Ship every week"
 msgstr "Vydáváme každý týden"
 
 msgid "Ship It"
 msgstr "Dodáno"
-
-msgid "Ship repositories"
-msgstr "Odeslat repozitáře"
 
 msgid "Short walkthroughs"
 msgstr "Krátké návody"

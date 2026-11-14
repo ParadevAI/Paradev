@@ -1053,9 +1053,6 @@ msgstr "{total} kontrolden {failing} tanesi başarısız"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} other {Bu çalışma alanında # dosya değişti}}"
 
-msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
-msgstr "{fileCount, plural, one {# dosya değişti} other {# dosya değişti}}"
-
 msgid "{fileCount, plural, one {# file} other {# files}}"
 msgstr "{fileCount, plural, one {# dosya} other {# dosya}}"
 
@@ -1355,17 +1352,11 @@ msgstr "{productName}, Union Square Ventures liderliğinde, Y Combinator ve Paul
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName}, Ekim 2026'ya kadar {formerName} adını taşıyordu."
 
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {Çekilecek # commit} other {Çekilecek # commit}}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · hedef {base}"
-
-msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
-msgstr "{pushCount, plural, one {Push edilmemiş # commit} other {Push edilmemiş # commit}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {Kuyrukta bekleyen # mesaj} other {Kuyrukta bekleyen # mesaj}}"
@@ -2111,6 +2102,12 @@ msgstr "{0} öğesini çalışma alanına ekle"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} eklensin mi?"
+
+msgid "Add {missing} to the {projectName} project on {computer} first"
+msgstr "Önce {missing} deposunu {computer} üzerindeki {projectName} projesine ekleyin"
+
+msgid "Add {missing} to the {projectName} project on this computer first"
+msgstr "Önce {missing} deposunu bu bilgisayardaki {projectName} projesine ekleyin"
 
 msgid "Add {only} as a project on {computer} first"
 msgstr "Önce {computer} üzerinde {only} deposunu proje olarak ekleyin"
@@ -3831,9 +3828,6 @@ msgstr "Dal adı kullanılamıyor"
 
 msgid "Branch names cannot end with a space."
 msgstr "Dal adları boşlukla bitemez."
-
-msgid "Branch not published"
-msgstr "Dal yayımlanmadı"
 
 msgid "Branch or tag (optional)"
 msgstr "Dal veya etiket (isteğe bağlı)"
@@ -6026,9 +6020,6 @@ msgstr "Eklentiler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin."
 msgid "Could not load presets from the host"
 msgstr "Host'tan hazır ayarlar yüklenemedi"
 
-msgid "Could not load the repository's status"
-msgstr "Deponun durumu yüklenemedi"
-
 msgid "Could not load this diff"
 msgstr "Bu fark yüklenemedi"
 
@@ -7417,17 +7408,11 @@ msgstr "Yıkıcı"
 msgid "Detached"
 msgstr "Ayrılmış"
 
-msgid "Detached HEAD"
-msgstr "Ayrılmış HEAD"
-
 msgid "Details"
 msgstr "Ayrıntılar"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Ayrıntılar burada görüntülenemiyor, ancak bağlantı yine de açılır."
-
-msgid "Details for {repositoryName}"
-msgstr "{repositoryName} ayrıntıları"
 
 msgid "Detect your physical location"
 msgstr "Fiziksel konumunuzu algılama"
@@ -13429,9 +13414,6 @@ msgstr "{url} adresinde sürüm notu yok"
 msgid "No remote"
 msgstr "Uzak depo yok"
 
-msgid "No remote repository"
-msgstr "Uzak depo yok"
-
 msgid "No repositories found."
 msgstr "Depo bulunamadı."
 
@@ -13554,9 +13536,6 @@ msgstr "Henüz ileti dizisi yok"
 
 msgid "No triggers"
 msgstr "Tetikleyici yok"
-
-msgid "No uncommitted changes"
-msgstr "Commit edilmemiş değişiklik yok"
 
 msgid "No Updates"
 msgstr "Güncelleme yok"
@@ -13775,9 +13754,6 @@ msgstr "Son 30 günde henüz hiçbir şey yayınlanmadı. Bu makinedeki kullanı
 msgid "Nothing to open yet. Send a message first."
 msgstr "Henüz açılacak bir şey yok. Önce bir mesaj gönderin."
 
-msgid "Nothing to ship"
-msgstr "Gönderilecek bir şey yok"
-
 msgid "Nothing was missed"
 msgstr "Hiçbir şey kaçırılmadı"
 
@@ -13913,9 +13889,6 @@ msgstr "inceleme isteğinde"
 
 msgid "on the board"
 msgstr "tabloda"
-
-msgid "On the default branch"
-msgstr "Varsayılan dalda"
 
 msgid "On this pace"
 msgstr "Bu hızla"
@@ -15542,9 +15515,6 @@ msgstr "PR #{0} oluşturuldu"
 msgid "PR #{0} is not in any repository of this project"
 msgstr "PR #{0} bu projenin hiçbir deposunda değil"
 
-msgid "PR #{prNumber}"
-msgstr "PR #{prNumber}"
-
 msgid "PR Closed"
 msgstr "PR kapatıldı"
 
@@ -16294,9 +16264,6 @@ msgstr "Okur ve paylaşır"
 
 msgid "Ready"
 msgstr "Hazır"
-
-msgid "Ready for a pull request"
-msgstr "Pull request için hazır"
 
 msgid "Ready for review"
 msgstr "İncelemeye hazır"
@@ -18616,17 +18583,11 @@ msgstr "Shiki ile vurgulanmış, isteğe bağlı satır numaralarıyla"
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer etiketi"
 
-msgid "Ship"
-msgstr "Gönder"
-
 msgid "Ship every week"
 msgstr "Her hafta yayınlıyoruz"
 
 msgid "Ship It"
 msgstr "Teslim edildi"
-
-msgid "Ship repositories"
-msgstr "Depoları gönder"
 
 msgid "Short walkthroughs"
 msgstr "Kısa anlatımlar"

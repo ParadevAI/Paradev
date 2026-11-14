@@ -1047,9 +1047,6 @@ msgstr "Не пройдено {failing} з {total} перевірок"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {У цьому робочому просторі змінено # файл} few {У цьому робочому просторі змінено # файли} many {У цьому робочому просторі змінено # файлів} other {У цьому робочому просторі змінено # файлу}}"
 
-msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
-msgstr "{fileCount, plural, one {# файл змінено} few {# файли змінено} many {# файлів змінено} other {# файлу змінено}}"
-
 msgid "{fileCount, plural, one {# file} other {# files}}"
 msgstr "{fileCount, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
 
@@ -1349,17 +1346,11 @@ msgstr "{productName} залучив $11,5 млн у seed-раунді на чо
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "До жовтня 2026 року {productName} мав назву {formerName}."
 
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# коміт для пулу} few {# коміти для пулу} many {# комітів для пулу} other {# коміту для пулу}}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} few {# PR} many {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · у {base}"
-
-msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
-msgstr "{pushCount, plural, one {# незапушений коміт} few {# незапушені коміти} many {# незапушених комітів} other {# незапушеного коміту}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# повідомлення чекає в черзі} few {# повідомлення чекають у черзі} many {# повідомлень чекають у черзі} other {# повідомлення чекає в черзі}}"
@@ -2105,6 +2096,12 @@ msgstr "Додати {0} до робочого простору"
 
 msgid "Add {localizedName}?"
 msgstr "Додати {localizedName}?"
+
+msgid "Add {missing} to the {projectName} project on {computer} first"
+msgstr "Спочатку додайте {missing} до проєкту {projectName} на {computer}"
+
+msgid "Add {missing} to the {projectName} project on this computer first"
+msgstr "Спочатку додайте {missing} до проєкту {projectName} на цьому комп’ютері"
 
 msgid "Add {only} as a project on {computer} first"
 msgstr "Спочатку додайте {only} як проєкт на {computer}"
@@ -3825,9 +3822,6 @@ msgstr "Ця назва гілки недоступна"
 
 msgid "Branch names cannot end with a space."
 msgstr "Назва гілки не може закінчуватися пробілом."
-
-msgid "Branch not published"
-msgstr "Гілку не опубліковано"
 
 msgid "Branch or tag (optional)"
 msgstr "Гілка або тег (необов'язково)"
@@ -6020,9 +6014,6 @@ msgstr "Не вдалося завантажити плагіни. Переві�
 msgid "Could not load presets from the host"
 msgstr "Не вдалося завантажити пресети з хоста"
 
-msgid "Could not load the repository's status"
-msgstr "Не вдалося завантажити стан репозиторію"
-
 msgid "Could not load this diff"
 msgstr "Не вдалося завантажити цей diff"
 
@@ -7411,17 +7402,11 @@ msgstr "Деструктивна"
 msgid "Detached"
 msgstr "Від'єднано"
 
-msgid "Detached HEAD"
-msgstr "Від’єднаний HEAD"
-
 msgid "Details"
 msgstr "Подробиці"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Подробиці тут недоступні, але посилання все одно відкривається."
-
-msgid "Details for {repositoryName}"
-msgstr "Подробиці: {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Визначати ваше місцезнаходження"
@@ -13423,9 +13408,6 @@ msgstr "Немає нотаток до релізу за адресою {url}"
 msgid "No remote"
 msgstr "Немає віддаленого"
 
-msgid "No remote repository"
-msgstr "Немає віддаленого репозиторію"
-
 msgid "No repositories found."
 msgstr "Репозиторіїв не знайдено."
 
@@ -13548,9 +13530,6 @@ msgstr "Тредів ще немає"
 
 msgid "No triggers"
 msgstr "Немає тригерів"
-
-msgid "No uncommitted changes"
-msgstr "Немає незакомічених змін"
 
 msgid "No Updates"
 msgstr "Оновлень немає"
@@ -13769,9 +13748,6 @@ msgstr "За останні 30 днів ще нічого не опубліко�
 msgid "Nothing to open yet. Send a message first."
 msgstr "Поки що нічого відкривати. Спершу надішліть повідомлення."
 
-msgid "Nothing to ship"
-msgstr "Нічого відправляти"
-
 msgid "Nothing was missed"
 msgstr "Нічого не пропущено"
 
@@ -13907,9 +13883,6 @@ msgstr "на запит рев'ю"
 
 msgid "on the board"
 msgstr "у рейтингу"
-
-msgid "On the default branch"
-msgstr "На гілці за замовчуванням"
 
 msgid "On this pace"
 msgstr "За такого темпу"
@@ -15536,9 +15509,6 @@ msgstr "PR #{0} створено"
 msgid "PR #{0} is not in any repository of this project"
 msgstr "PR #{0} немає в жодному репозиторії цього проєкту"
 
-msgid "PR #{prNumber}"
-msgstr "PR #{prNumber}"
-
 msgid "PR Closed"
 msgstr "PR закрито"
 
@@ -16288,9 +16258,6 @@ msgstr "Читає й публікує"
 
 msgid "Ready"
 msgstr "Готово"
-
-msgid "Ready for a pull request"
-msgstr "Готово до PR"
 
 msgid "Ready for review"
 msgstr "Готово до рев'ю"
@@ -18610,17 +18577,11 @@ msgstr "Підсвітка Shiki, з необов'язковими номера�
 msgid "Shimmer · Shimmer Label"
 msgstr "Мерехтіння · Мітка мерехтіння"
 
-msgid "Ship"
-msgstr "Відправити"
-
 msgid "Ship every week"
 msgstr "Релізи щотижня"
 
 msgid "Ship It"
 msgstr "Випускаємо"
-
-msgid "Ship repositories"
-msgstr "Відправити репозиторії"
 
 msgid "Short walkthroughs"
 msgstr "Короткі огляди"

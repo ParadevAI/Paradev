@@ -1053,9 +1053,6 @@ msgstr "{failing} van {total} checks mislukt"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# bestand gewijzigd in deze werkruimte} other {# bestanden gewijzigd in deze werkruimte}}"
 
-msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
-msgstr "{fileCount, plural, one {# bestand gewijzigd} other {# bestanden gewijzigd}}"
-
 msgid "{fileCount, plural, one {# file} other {# files}}"
 msgstr "{fileCount, plural, one {# bestand} other {# bestanden}}"
 
@@ -1355,17 +1352,11 @@ msgstr "{productName} haalde een seedronde van 11,5 miljoen dollar op onder leid
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} heette tot oktober 2026 {formerName}."
 
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit om te pullen} other {# commits om te pullen}}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR's}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · naar {base}"
-
-msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
-msgstr "{pushCount, plural, one {# commit niet gepusht} other {# commits niet gepusht}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# bericht wacht in de wachtrij} other {# berichten wachten in de wachtrij}}"
@@ -2111,6 +2102,12 @@ msgstr "{0} toevoegen aan werkruimte"
 
 msgid "Add {localizedName}?"
 msgstr "{localizedName} toevoegen?"
+
+msgid "Add {missing} to the {projectName} project on {computer} first"
+msgstr "Voeg eerst {missing} toe aan het project {projectName} op {computer}"
+
+msgid "Add {missing} to the {projectName} project on this computer first"
+msgstr "Voeg eerst {missing} toe aan het project {projectName} op deze computer"
 
 msgid "Add {only} as a project on {computer} first"
 msgstr "Voeg eerst {only} toe als project op {computer}"
@@ -3831,9 +3828,6 @@ msgstr "Branchnaam is niet beschikbaar"
 
 msgid "Branch names cannot end with a space."
 msgstr "Branchnamen mogen niet op een spatie eindigen."
-
-msgid "Branch not published"
-msgstr "Branch niet gepubliceerd"
 
 msgid "Branch or tag (optional)"
 msgstr "Branch of tag (optioneel)"
@@ -6026,9 +6020,6 @@ msgstr "Plugins konden niet worden geladen. Controleer je verbinding en probeer 
 msgid "Could not load presets from the host"
 msgstr "Kan presets van de host niet laden"
 
-msgid "Could not load the repository's status"
-msgstr "Kan de status van de repository niet laden"
-
 msgid "Could not load this diff"
 msgstr "Kan deze diff niet laden"
 
@@ -7417,17 +7408,11 @@ msgstr "Destructief"
 msgid "Detached"
 msgstr "Losgekoppeld"
 
-msgid "Detached HEAD"
-msgstr "Losgekoppelde HEAD"
-
 msgid "Details"
 msgstr "Details"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details zijn hier niet beschikbaar, maar de link opent nog steeds."
-
-msgid "Details for {repositoryName}"
-msgstr "Details van {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Je fysieke locatie detecteren"
@@ -13429,9 +13414,6 @@ msgstr "Geen releasenotes op {url}"
 msgid "No remote"
 msgstr "Geen remote"
 
-msgid "No remote repository"
-msgstr "Geen externe repository"
-
 msgid "No repositories found."
 msgstr "Geen repositories gevonden."
 
@@ -13554,9 +13536,6 @@ msgstr "Nog geen threads"
 
 msgid "No triggers"
 msgstr "Geen triggers"
-
-msgid "No uncommitted changes"
-msgstr "Geen niet-gecommitte wijzigingen"
 
 msgid "No Updates"
 msgstr "Geen updates"
@@ -13775,9 +13754,6 @@ msgstr "Nog niets gepubliceerd in de laatste 30 dagen. Je positie verschijnt zod
 msgid "Nothing to open yet. Send a message first."
 msgstr "Nog niets om te openen. Stuur eerst een bericht."
 
-msgid "Nothing to ship"
-msgstr "Niets te shippen"
-
 msgid "Nothing was missed"
 msgstr "Er is niets gemist"
 
@@ -13913,9 +13889,6 @@ msgstr "bij reviewverzoek"
 
 msgid "on the board"
 msgstr "op de ranglijst"
-
-msgid "On the default branch"
-msgstr "Op de standaardbranch"
 
 msgid "On this pace"
 msgstr "In dit tempo"
@@ -15542,9 +15515,6 @@ msgstr "PR #{0} aangemaakt"
 msgid "PR #{0} is not in any repository of this project"
 msgstr "PR #{0} staat in geen enkele repository van dit project"
 
-msgid "PR #{prNumber}"
-msgstr "PR #{prNumber}"
-
 msgid "PR Closed"
 msgstr "PR gesloten"
 
@@ -16294,9 +16264,6 @@ msgstr "Leest en plaatst"
 
 msgid "Ready"
 msgstr "Klaar"
-
-msgid "Ready for a pull request"
-msgstr "Klaar voor een pull request"
 
 msgid "Ready for review"
 msgstr "Klaar voor review"
@@ -18616,17 +18583,11 @@ msgstr "Met Shiki gehighlight, met optionele regelnummers"
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer-label"
 
-msgid "Ship"
-msgstr "Shippen"
-
 msgid "Ship every week"
 msgstr "Elke week opleveren"
 
 msgid "Ship It"
 msgstr "Geleverd"
-
-msgid "Ship repositories"
-msgstr "Repository's shippen"
 
 msgid "Short walkthroughs"
 msgstr "Korte rondleidingen"

@@ -1053,9 +1053,6 @@ msgstr "{failing} de {total} comprobaciones fallan"
 msgid "{fileCount, plural, one {# file changed in this workspace} other {# files changed in this workspace}}"
 msgstr "{fileCount, plural, one {# archivo cambió en este espacio de trabajo} other {# archivos cambiaron en este espacio de trabajo}}"
 
-msgid "{fileCount, plural, one {# file changed} other {# files changed}}"
-msgstr "{fileCount, plural, one {# archivo modificado} other {# archivos modificados}}"
-
 msgid "{fileCount, plural, one {# file} other {# files}}"
 msgstr "{fileCount, plural, one {# archivo} other {# archivos}}"
 
@@ -1355,17 +1352,11 @@ msgstr "{productName} levantó una ronda semilla de 11,5 millones de dólares li
 msgid "{productName} was called {formerName} until October 2026."
 msgstr "{productName} se llamaba {formerName} hasta octubre de 2026."
 
-msgid "{pullCount, plural, one {# commit to pull} other {# commits to pull}}"
-msgstr "{pullCount, plural, one {# commit por traer} other {# commits por traer}}"
-
 msgid "{pullRequestCount, plural, one {# PR} other {# PRs}}"
 msgstr "{pullRequestCount, plural, one {# PR} other {# PR}}"
 
 msgid "{pullRequests} · targets {base}"
 msgstr "{pullRequests} · hacia {base}"
-
-msgid "{pushCount, plural, one {# commit not pushed} other {# commits not pushed}}"
-msgstr "{pushCount, plural, one {# commit sin enviar} other {# commits sin enviar}}"
 
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# mensaje en espera en la cola} other {# mensajes en espera en la cola}}"
@@ -2111,6 +2102,12 @@ msgstr "Añadir {0} al espacio de trabajo"
 
 msgid "Add {localizedName}?"
 msgstr "¿Añadir {localizedName}?"
+
+msgid "Add {missing} to the {projectName} project on {computer} first"
+msgstr "Primero añade {missing} al proyecto {projectName} en {computer}"
+
+msgid "Add {missing} to the {projectName} project on this computer first"
+msgstr "Primero añade {missing} al proyecto {projectName} en este equipo"
 
 msgid "Add {only} as a project on {computer} first"
 msgstr "Primero añade {only} como proyecto en {computer}"
@@ -3831,9 +3828,6 @@ msgstr "El nombre de la rama no está disponible"
 
 msgid "Branch names cannot end with a space."
 msgstr "Los nombres de rama no pueden terminar en espacio."
-
-msgid "Branch not published"
-msgstr "Rama sin publicar"
 
 msgid "Branch or tag (optional)"
 msgstr "Rama o etiqueta (opcional)"
@@ -6026,9 +6020,6 @@ msgstr "No se pudieron cargar los plugins. Comprueba tu conexión e inténtalo d
 msgid "Could not load presets from the host"
 msgstr "No se pudieron cargar los preajustes del host"
 
-msgid "Could not load the repository's status"
-msgstr "No se pudo cargar el estado del repositorio"
-
 msgid "Could not load this diff"
 msgstr "No se pudo cargar este diff"
 
@@ -7417,17 +7408,11 @@ msgstr "Destructivo"
 msgid "Detached"
 msgstr "Desconectada"
 
-msgid "Detached HEAD"
-msgstr "HEAD separado"
-
 msgid "Details"
 msgstr "Detalles"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Los detalles no están disponibles aquí, pero el enlace se abre igualmente."
-
-msgid "Details for {repositoryName}"
-msgstr "Detalles de {repositoryName}"
 
 msgid "Detect your physical location"
 msgstr "Detectar tu ubicación física"
@@ -13429,9 +13414,6 @@ msgstr "No hay notas de la versión en {url}"
 msgid "No remote"
 msgstr "Sin remoto"
 
-msgid "No remote repository"
-msgstr "Sin repositorio remoto"
-
 msgid "No repositories found."
 msgstr "No se encontraron repositorios."
 
@@ -13554,9 +13536,6 @@ msgstr "Aún no hay hilos"
 
 msgid "No triggers"
 msgstr "Sin disparadores"
-
-msgid "No uncommitted changes"
-msgstr "No hay cambios sin confirmar"
 
 msgid "No Updates"
 msgstr "Sin actualizaciones"
@@ -13775,9 +13754,6 @@ msgstr "Aún no has publicado nada en los últimos 30 días. Tu puesto aparecer�
 msgid "Nothing to open yet. Send a message first."
 msgstr "Aún no hay nada que abrir. Envía un mensaje primero."
 
-msgid "Nothing to ship"
-msgstr "Nada que enviar"
-
 msgid "Nothing was missed"
 msgstr "No se perdió nada"
 
@@ -13913,9 +13889,6 @@ msgstr "al solicitar revisión"
 
 msgid "on the board"
 msgstr "en la clasificación"
-
-msgid "On the default branch"
-msgstr "En la rama predeterminada"
 
 msgid "On this pace"
 msgstr "A este ritmo"
@@ -15542,9 +15515,6 @@ msgstr "PR #{0} creado"
 msgid "PR #{0} is not in any repository of this project"
 msgstr "La PR #{0} no está en ningún repositorio de este proyecto"
 
-msgid "PR #{prNumber}"
-msgstr "PR #{prNumber}"
-
 msgid "PR Closed"
 msgstr "PR cerrada"
 
@@ -16294,9 +16264,6 @@ msgstr "Lee y publica"
 
 msgid "Ready"
 msgstr "Listo"
-
-msgid "Ready for a pull request"
-msgstr "Listo para una pull request"
 
 msgid "Ready for review"
 msgstr "Lista para revisión"
@@ -18616,17 +18583,11 @@ msgstr "Resaltado con Shiki, con números de línea opcionales"
 msgid "Shimmer · Shimmer Label"
 msgstr "Shimmer · Shimmer Label"
 
-msgid "Ship"
-msgstr "Enviar"
-
 msgid "Ship every week"
 msgstr "Lanzar cada semana"
 
 msgid "Ship It"
 msgstr "Entregado"
-
-msgid "Ship repositories"
-msgstr "Enviar repositorios"
 
 msgid "Short walkthroughs"
 msgstr "Tutoriales breves"
