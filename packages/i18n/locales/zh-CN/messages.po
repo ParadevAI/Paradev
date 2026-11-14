@@ -18486,6 +18486,10 @@ msgstr "快捷键已被使用"
 msgid "Show"
 msgstr "显示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "再显示 {0} 个"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "退出应用时显示确认对话框"
 
@@ -22242,9 +22246,6 @@ msgstr "查看全部"
 
 msgid "View All"
 msgstr "查看全部"
-
-msgid "View all (+{moreCount} more)"
-msgstr "查看全部（另有 {moreCount} 项）"
 
 msgid "View all members of this channel"
 msgstr "查看此频道的所有成员"

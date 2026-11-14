@@ -18486,6 +18486,10 @@ msgstr "Zkratka se už používá"
 msgid "Show"
 msgstr "Zobrazit"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Zobrazit další ({0})"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
 
@@ -22242,9 +22246,6 @@ msgstr "Zobrazit vše"
 
 msgid "View All"
 msgstr "Zobrazit vše"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Zobrazit vše (+{moreCount} navíc)"
 
 msgid "View all members of this channel"
 msgstr "Zobrazit všechny členy kanálu"

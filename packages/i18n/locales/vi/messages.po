@@ -18486,6 +18486,10 @@ msgstr "Phím tắt đã được dùng"
 msgid "Show"
 msgstr "Hiện"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Hiện thêm {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Hiện hộp thoại xác nhận khi thoát ứng dụng"
 
@@ -22242,9 +22246,6 @@ msgstr "Xem tất cả"
 
 msgid "View All"
 msgstr "Xem tất cả"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Xem tất cả (+{moreCount} mục nữa)"
 
 msgid "View all members of this channel"
 msgstr "Xem tất cả thành viên của kênh"

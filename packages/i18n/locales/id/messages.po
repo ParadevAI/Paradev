@@ -18486,6 +18486,10 @@ msgstr "Pintasan sudah dipakai"
 msgid "Show"
 msgstr "Tampilkan"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Tampilkan {0} lagi"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Tampilkan dialog konfirmasi saat keluar dari aplikasi"
 
@@ -22242,9 +22246,6 @@ msgstr "Lihat semua"
 
 msgid "View All"
 msgstr "Lihat Semua"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Lihat semua (+{moreCount} lainnya)"
 
 msgid "View all members of this channel"
 msgstr "Lihat semua anggota saluran ini"

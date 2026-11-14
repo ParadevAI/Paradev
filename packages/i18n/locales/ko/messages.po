@@ -18486,6 +18486,10 @@ msgstr "이미 사용 중인 단축키"
 msgid "Show"
 msgstr "표시"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "{0}개 더 보기"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "앱을 종료할 때 확인 대화 상자를 표시합니다"
 
@@ -22242,9 +22246,6 @@ msgstr "전체 보기"
 
 msgid "View All"
 msgstr "전체 보기"
-
-msgid "View all (+{moreCount} more)"
-msgstr "모두 보기 (+{moreCount}개 더)"
 
 msgid "View all members of this channel"
 msgstr "이 채널의 모든 멤버 보기"

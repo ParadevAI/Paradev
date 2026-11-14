@@ -18486,6 +18486,10 @@ msgstr "快速鍵已被使用"
 msgid "Show"
 msgstr "顯示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "再顯示 {0} 個"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "退出應用時顯示確認對話方塊"
 
@@ -22242,9 +22246,6 @@ msgstr "檢視全部"
 
 msgid "View All"
 msgstr "檢視全部"
-
-msgid "View all (+{moreCount} more)"
-msgstr "查看全部（另有 {moreCount} 項）"
 
 msgid "View all members of this channel"
 msgstr "查看此頻道的所有成員"

@@ -16,7 +16,10 @@ import type {
 	TurnError,
 	UserMessage,
 } from "@superset/chat/protocol";
-import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
+import type {
+	PageLink,
+	PageLinkFinder,
+} from "../../../../../../utils/pageLinks";
 import {
 	changesFiles,
 	type TurnFileChange,

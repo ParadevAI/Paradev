@@ -18486,6 +18486,10 @@ msgstr "Сочетание уже используется"
 msgid "Show"
 msgstr "Показать"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Показать ещё {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Показывать подтверждение при выходе из приложения"
 
@@ -22242,9 +22246,6 @@ msgstr "Смотреть все"
 
 msgid "View All"
 msgstr "Смотреть все"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Показать все (ещё {moreCount})"
 
 msgid "View all members of this channel"
 msgstr "Показать всех участников канала"

@@ -18486,6 +18486,10 @@ msgstr "Sneltoets al in gebruik"
 msgid "Show"
 msgstr "Tonen"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Nog {0} tonen"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Toon een bevestiging bij het afsluiten van de app"
 
@@ -22242,9 +22246,6 @@ msgstr "Alles bekijken"
 
 msgid "View All"
 msgstr "Alles bekijken"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Alles bekijken (+{moreCount} meer)"
 
 msgid "View all members of this channel"
 msgstr "Alle leden van dit kanaal bekijken"

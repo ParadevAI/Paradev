@@ -11,7 +11,7 @@ import type {
 	ToolCall,
 } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import { pageLinkFinder } from "../../../../utils/pageLinks";
+import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { NestedItemsProvider } from "../../providers/NestedItemsProvider";
 import { replyFooters } from "../../utils/replyFooters";
 import { subagentLines } from "../../utils/subagentLines";

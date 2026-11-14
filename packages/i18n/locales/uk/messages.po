@@ -18480,6 +18480,10 @@ msgstr "Комбінація клавіш уже використовуєтьс�
 msgid "Show"
 msgstr "Показати"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Показати ще {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Показувати діалог підтвердження під час виходу із застосунку"
 
@@ -22236,9 +22240,6 @@ msgstr "Показати всі"
 
 msgid "View All"
 msgstr "Показати всі"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Показати всі (ще {moreCount})"
 
 msgid "View all members of this channel"
 msgstr "Переглянути всіх учасників цього каналу"

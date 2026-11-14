@@ -18486,6 +18486,10 @@ msgstr "ショートカットは使用中です"
 msgid "Show"
 msgstr "表示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "さらに {0} 件を表示"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "アプリ終了時に確認ダイアログを表示"
 
@@ -22242,9 +22246,6 @@ msgstr "すべて表示"
 
 msgid "View All"
 msgstr "すべて表示"
-
-msgid "View all (+{moreCount} more)"
-msgstr "すべて表示（他{moreCount}件）"
 
 msgid "View all members of this channel"
 msgstr "このチャンネルのメンバーをすべて表示"

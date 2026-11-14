@@ -18486,6 +18486,10 @@ msgstr "Shortcut already in use"
 msgid "Show"
 msgstr "Show"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Show {0} more"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Show a confirmation dialog when quitting the app"
 
@@ -22242,9 +22246,6 @@ msgstr "View all"
 
 msgid "View All"
 msgstr "View All"
-
-msgid "View all (+{moreCount} more)"
-msgstr "View all (+{moreCount} more)"
 
 msgid "View all members of this channel"
 msgstr "View all members of this channel"

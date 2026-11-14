@@ -18486,6 +18486,10 @@ msgstr "Kürzel bereits belegt"
 msgid "Show"
 msgstr "Anzeigen"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "{0} weitere anzeigen"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Beim Beenden der App einen Bestätigungsdialog anzeigen"
 
@@ -22242,9 +22246,6 @@ msgstr "Alle ansehen"
 
 msgid "View All"
 msgstr "Alle ansehen"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Alle anzeigen (+{moreCount} weitere)"
 
 msgid "View all members of this channel"
 msgstr "Alle Mitglieder dieses Kanals anzeigen"

@@ -14,7 +14,7 @@ import type {
 	ToolCall,
 	UserMessage,
 } from "@superset/chat/protocol";
-import { pageLinkFinder } from "../../../../utils/pageLinks";
+import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { transcriptRows } from "./transcriptRows";
 
 const WEB_URL = "https://app.superset.sh";

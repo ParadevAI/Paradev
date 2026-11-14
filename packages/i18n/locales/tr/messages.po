@@ -18486,6 +18486,10 @@ msgstr "Kısayol zaten kullanımda"
 msgid "Show"
 msgstr "Göster"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "{0} tane daha göster"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Uygulamadan çıkarken onay penceresi göster"
 
@@ -22242,9 +22246,6 @@ msgstr "Tümünü görüntüle"
 
 msgid "View All"
 msgstr "Tümünü görüntüle"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Tümünü göster (+{moreCount} tane daha)"
 
 msgid "View all members of this channel"
 msgstr "Bu kanalın tüm üyelerini gör"
