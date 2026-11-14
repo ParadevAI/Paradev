@@ -24,7 +24,6 @@ export function useReviewCommentNavigation(
 	onSelectDiffFile?: OpenReviewDiff,
 ) {
 	const isMultiRepo = useWorkspaceCheckouts(workspaceId).length > 1;
-	// A multi-repo diff tags each entry with its repository.
 	const tag = isMultiRepo ? repositoryId : undefined;
 	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(

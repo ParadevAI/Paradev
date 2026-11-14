@@ -52,6 +52,13 @@ export function MultiRepoChanges({
 	);
 	const changesets = useRepositoryChangesets(workspaceId, repositoryIds);
 	const statuses = useCheckoutGitStatuses(repositoryIds);
+	const failedRepositories = useMemo(
+		() =>
+			repositories.filter((repository) =>
+				changesets.failedRepositoryIds.includes(repository.repositoryId),
+			),
+		[repositories, changesets.failedRepositoryIds],
+	);
 	const onlyFilter = useChangesFilter(workspaceId, repositoryIds[0]);
 	const scopeLabel = changesFilterLabel(
 		repositoryIds.length === 1 ? onlyFilter : { kind: picker.scopeKind },
@@ -84,6 +91,7 @@ export function MultiRepoChanges({
 				isLoading={changesets.isLoading && changesets.files.length === 0}
 				worktreePath={folder}
 				repositories={repositories}
+				failedRepositories={failedRepositories}
 				selectedFilePath={selectedFilePath}
 				selectedChangeKey={
 					selectedCheckout ? selectedDiffTarget?.changeKey : undefined

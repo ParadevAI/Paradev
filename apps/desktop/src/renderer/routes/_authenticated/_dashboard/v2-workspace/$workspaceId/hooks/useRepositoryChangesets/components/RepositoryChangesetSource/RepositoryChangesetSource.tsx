@@ -8,6 +8,7 @@ import { useSidebarDiffRef } from "renderer/routes/_authenticated/_dashboard/v2-
 export interface RepositoryChangeset {
 	files: ChangesetFile[];
 	isLoading: boolean;
+	isError: boolean;
 }
 
 interface RepositoryChangesetSourceProps {
@@ -23,14 +24,14 @@ export function RepositoryChangesetSource({
 	onChange,
 }: RepositoryChangesetSourceProps) {
 	const ref = useSidebarDiffRef(workspaceId, repositoryId);
-	const { files, isLoading } = useChangeset({
+	const { files, isLoading, isError } = useChangeset({
 		workspaceId,
 		repositoryId,
 		ref,
 		tagRepository: true,
 	});
 	useEffect(() => {
-		onChange(repositoryId, { files, isLoading });
-	}, [onChange, repositoryId, files, isLoading]);
+		onChange(repositoryId, { files, isLoading, isError });
+	}, [onChange, repositoryId, files, isLoading, isError]);
 	return null;
 }

@@ -14,6 +14,7 @@ import { useFoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/u
 import { filterChangedFiles } from "renderer/routes/_authenticated/_dashboard/utils/filterChangedFiles";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type { ChangesViewMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import { FailedRepositoryRows } from "../../../../../FailedRepositoryRows";
 import type { SelectDiffFile } from "../../hooks/useChangesContent";
 import { ChangesFileList } from "../ChangesFileList";
 import type { RepositoryRoot } from "../ChangesFileList/utils/repositoryTree";
@@ -35,6 +36,8 @@ interface ChangesTabContentProps {
 	isLoading: boolean;
 	worktreePath?: string;
 	repositories?: RepositoryRoot[];
+	/** Shown repositories whose changes failed to load. */
+	failedRepositories?: RepositoryRoot[];
 	selectedFilePath?: string;
 	selectedChangeKey?: string;
 	onSelectFile?: SelectDiffFile;
@@ -43,6 +46,8 @@ interface ChangesTabContentProps {
 	onViewModeChange: (viewMode: ChangesViewMode) => void;
 	compact?: boolean;
 }
+
+const NO_REPOSITORIES: RepositoryRoot[] = [];
 
 export const ChangesTabContent = memo(function ChangesTabContent({
 	workspaceId,
@@ -54,6 +59,7 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	isLoading,
 	worktreePath,
 	repositories,
+	failedRepositories = NO_REPOSITORIES,
 	selectedFilePath,
 	selectedChangeKey,
 	onSelectFile,
@@ -139,6 +145,7 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 					)}
 				</>
 			)}
+			<FailedRepositoryRows repositories={failedRepositories} />
 			<ChangesFileList
 				files={visibleFiles}
 				isFiltered={isFiltered}

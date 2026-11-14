@@ -24,6 +24,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import type { DashboardSidebarProject } from "../../../../types";
 import type { ImportableWorktree } from "../../components/ImportWorktreesDialog";
+import { workspacesFolderOf } from "./utils/workspacesFolderOf";
 
 interface UseDashboardSidebarProjectSectionActionsOptions {
 	project: DashboardSidebarProject;
@@ -136,13 +137,18 @@ export function useDashboardSidebarProjectSectionActions({
 
 	// A multi-repo project has no folder; its workspace folders sit side by side in one.
 	const multiRepoWorkspacesFolder = (hostId: string) => {
-		const root = hostWorkspaces.find(
-			(workspace) =>
-				workspace.projectId === project.id &&
-				workspace.hostId === hostId &&
-				workspace.worktreePath,
-		)?.worktreePath;
-		return root?.replace(/[\\/][^\\/]+[\\/]?$/, "") || undefined;
+		const roots = hostWorkspaces.flatMap((workspace) =>
+			workspace.projectId === project.id &&
+			workspace.hostId === hostId &&
+			workspace.worktreePath
+				? [{ path: workspace.worktreePath, branch: workspace.branch }]
+				: [],
+		);
+		for (const root of roots) {
+			const folder = workspacesFolderOf(root.path, root.branch);
+			if (folder) return folder;
+		}
+		return roots[0]?.path.replace(/[\\/][^\\/]+[\\/]?$/, "") || undefined;
 	};
 
 	const handleOpenInFinder = async () => {

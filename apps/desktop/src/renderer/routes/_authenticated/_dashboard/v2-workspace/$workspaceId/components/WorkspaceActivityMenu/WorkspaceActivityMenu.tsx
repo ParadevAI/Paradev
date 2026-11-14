@@ -112,6 +112,7 @@ import {
 	type BackgroundWork,
 	collectBackgroundWork,
 } from "./utils/collectBackgroundWork";
+import { menuCurrentPullRequest } from "./utils/menuCurrentPullRequest";
 import { paneSourceTitle } from "./utils/paneSourceTitle";
 import {
 	pullRequestDisplayState,
@@ -213,12 +214,7 @@ export function WorkspaceActivityMenu({
 	} = usePRFlowState(workspaceId, repositoryId, {
 		enabled: paneAreaStyle && checkoutsLoaded && !isMultiRepo,
 	});
-	const currentPr =
-		flowState.kind === "pr-exists" ||
-		flowState.kind === "busy" ||
-		flowState.kind === "error"
-			? flowState.pr
-			: null;
+	const currentPr = menuCurrentPullRequest(flowState, isMultiRepo);
 	const currentPrState = currentPr ? pullRequestDisplayState(currentPr) : null;
 	const currentPrChecks = useMemo(
 		() => (currentPr ? computeChecksRollup(currentPr.checks) : null),

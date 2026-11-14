@@ -1,3 +1,4 @@
+import { workspaceTrpc } from "@superset/workspace-client";
 import {
 	createContext,
 	useCallback,
@@ -17,12 +18,17 @@ import {
 } from "../../utils/workspaceScopedEntries";
 import { CheckoutGitStatusSource } from "./components/CheckoutGitStatusSource";
 import type { CheckoutGitStatus } from "./types";
+import { readCachedCheckoutGitStatus } from "./utils/readCachedCheckoutGitStatus";
 
-type StatusByRepositoryId = Record<string, CheckoutGitStatus>;
+interface WorkspaceGitStatusContextValue {
+	byRepositoryId: Record<string, CheckoutGitStatus>;
+	readCached: (
+		repositoryId: string | undefined,
+	) => CheckoutGitStatus | undefined;
+}
 
-const WorkspaceGitStatusContext = createContext<StatusByRepositoryId | null>(
-	null,
-);
+const WorkspaceGitStatusContext =
+	createContext<WorkspaceGitStatusContextValue | null>(null);
 
 const PENDING: CheckoutGitStatus = {
 	data: undefined,
@@ -57,6 +63,16 @@ export function WorkspaceGitStatusProvider({
 		[],
 	);
 	const byRepositoryId = entriesForWorkspace(statuses, workspaceId);
+	const utils = workspaceTrpc.useUtils();
+	const readCached = useCallback(
+		(repositoryId: string | undefined) =>
+			readCachedCheckoutGitStatus(utils.git, workspaceId, repositoryId),
+		[utils, workspaceId],
+	);
+	const value = useMemo(
+		() => ({ byRepositoryId, readCached }),
+		[byRepositoryId, readCached],
+	);
 	const repositoryIds = useMemo<Array<string | undefined>>(
 		() =>
 			!checkoutsLoaded
@@ -68,7 +84,7 @@ export function WorkspaceGitStatusProvider({
 	);
 
 	return (
-		<WorkspaceGitStatusContext.Provider value={byRepositoryId}>
+		<WorkspaceGitStatusContext.Provider value={value}>
 			{repositoryIds.map((repositoryId) => (
 				<CheckoutGitStatusSource
 					key={repositoryId ?? ""}
@@ -82,7 +98,7 @@ export function WorkspaceGitStatusProvider({
 	);
 }
 
-function useStatusByRepositoryId(): StatusByRepositoryId {
+function useWorkspaceGitStatusContext(): WorkspaceGitStatusContextValue {
 	const value = useContext(WorkspaceGitStatusContext);
 	if (!value) {
 		throw new Error(
@@ -96,18 +112,23 @@ function useStatusByRepositoryId(): StatusByRepositoryId {
 export function useCheckoutGitStatus(
 	repositoryId: string | undefined,
 ): CheckoutGitStatus {
-	return useStatusByRepositoryId()[repositoryId ?? ""] ?? PENDING;
+	const { byRepositoryId, readCached } = useWorkspaceGitStatusContext();
+	return (
+		byRepositoryId[repositoryId ?? ""] ?? readCached(repositoryId) ?? PENDING
+	);
 }
 
 /** Every checkout's git status, in checkout order; `undefined` for a workspace without checkouts. */
 export function useCheckoutGitStatuses(
 	repositoryIds: Array<string | undefined>,
 ): CheckoutGitStatus[] {
-	const byRepositoryId = useStatusByRepositoryId();
+	const { byRepositoryId, readCached } = useWorkspaceGitStatusContext();
 	const key = JSON.stringify(repositoryIds.map((id) => id ?? ""));
 	return useMemo(
 		() =>
-			(JSON.parse(key) as string[]).map((id) => byRepositoryId[id] ?? PENDING),
-		[byRepositoryId, key],
+			(JSON.parse(key) as string[]).map(
+				(id) => byRepositoryId[id] ?? readCached(id || undefined) ?? PENDING,
+			),
+		[byRepositoryId, readCached, key],
 	);
 }

@@ -41,7 +41,7 @@ export function useBranchContext(
 	}: {
 		cloudRepository?: CloudRepository | null;
 		canReachHost?: boolean;
-		/** Defaults to the primary repository. */
+		/** Required when the project has several repositories. */
 		repositoryId?: string;
 	} = {},
 ) {

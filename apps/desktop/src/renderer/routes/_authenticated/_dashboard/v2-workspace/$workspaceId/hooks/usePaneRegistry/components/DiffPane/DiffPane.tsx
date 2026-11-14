@@ -38,6 +38,7 @@ import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFil
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import { FailedRepositoryRows } from "../../../../components/FailedRepositoryRows";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
 import {
 	useWorkspaceCheckouts,
@@ -155,8 +156,6 @@ export function DiffPane({
 		? fileListLayout({ containerWidth, open: fileListOpen })
 		: "hidden";
 
-	// A multi-repo workspace shows every checkout's changes, each file tagged
-	// with its repository; an untagged file is in the primary checkout.
 	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const isMultiRepo = checkouts.length > 1;
 	const primaryRepositoryId = (
@@ -199,7 +198,6 @@ export function DiffPane({
 		targetRepositoryId: isMultiRepo ? data.repositoryId : undefined,
 		targetTick: data.focusTick,
 	});
-	// One repository shown: the header scopes that checkout's diff.
 	const scopeRepositoryId =
 		isMultiRepo && shownRepositories.size === 1
 			? ([...shownRepositories][0] ?? primaryRepositoryId)
@@ -259,6 +257,17 @@ export function DiffPane({
 	const isLoading = isMultiRepo
 		? repositoryChangesets.isLoading
 		: ownChangeset.isLoading;
+	const failedRepositories = useMemo(
+		() =>
+			checkouts.filter(
+				(checkout) =>
+					shownRepositories.has(checkout.repositoryId) &&
+					repositoryChangesets.failedRepositoryIds.includes(
+						checkout.repositoryId,
+					),
+			),
+		[checkouts, shownRepositories, repositoryChangesets.failedRepositoryIds],
+	);
 	const rootPathOf = useCallback(
 		(file: ChangesetFile, path: string) =>
 			rootFilePath(
@@ -1130,6 +1139,7 @@ export function DiffPane({
 					actionsSlot,
 				)}
 			<div className="flex h-full min-h-0 min-w-0 flex-1 flex-col">
+				<FailedRepositoryRows repositories={failedRepositories} />
 				{files.length === 0 ? (
 					<div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
 						{isLoading

@@ -59,7 +59,6 @@ export function ReviewPane({ context, workspaceId }: ReviewPaneProps) {
 		[store, paneId],
 	);
 
-	// A multi-repo workspace reviews the picked repository's pull request.
 	const repositoryId = useActiveRepositoryId(workspaceId);
 	const onOpenInDiff = useReviewCommentNavigation(
 		workspaceId,
