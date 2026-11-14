@@ -51,6 +51,7 @@ import { useDictation } from "./hooks/useDictation";
 import { useSwipeToDismiss } from "./hooks/useSwipeToDismiss";
 import { clusterColumn } from "./utils/clusterColumn";
 import { composerKeyHandler } from "./utils/composerKeyHandler";
+import { editorHeightBounds } from "./utils/editorHeightBounds";
 import { joinDraft } from "./utils/joinDraft";
 import {
 	committedSlashDraft,
@@ -119,6 +120,9 @@ export const Composer: ComposerComponent = forwardRef<
 	// Android keeps focus when Back lowers the keyboard; iOS collapses there.
 	const keyboardHeight = useKeyboardHeight(() => inputRef.current?.blur());
 	const insets = useSafeAreaInsets();
+	const [anchorHeight, setAnchorHeight] = useState<number | null>(null);
+	const [stackHeight, setStackHeight] = useState<number | null>(null);
+	const [inputHeight, setInputHeight] = useState<number | null>(null);
 
 	const setDraft = (text: string) => {
 		setDraftState(text);
@@ -189,6 +193,19 @@ export const Composer: ComposerComponent = forwardRef<
 		: COMPOSER_METRICS.editorLines;
 	// React Native reports the keyboard without the navigation bar under it.
 	const lift = keyboardHeight + insets.bottom;
+	const editorRoom =
+		expanded &&
+		anchorHeight !== null &&
+		stackHeight !== null &&
+		inputHeight !== null
+			? anchorHeight - lift - COMPOSER_METRICS.gap - (stackHeight - inputHeight)
+			: null;
+	const editorHeight = editorHeightBounds({
+		lineHeight: COMPOSER_METRICS.lineHeight,
+		minLines: editorLines,
+		maxLines: COMPOSER_METRICS.maxEditorLines,
+		room: editorRoom,
+	});
 
 	return (
 		<View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
@@ -201,6 +218,7 @@ export const Composer: ComposerComponent = forwardRef<
 			) : null}
 			<View
 				pointerEvents="box-none"
+				onLayout={(event) => setAnchorHeight(event.nativeEvent.layout.height)}
 				style={[styles.anchor, { paddingBottom: lift }]}
 			>
 				{suggestions ? (
@@ -213,9 +231,10 @@ export const Composer: ComposerComponent = forwardRef<
 				) : null}
 				<View
 					pointerEvents="box-none"
-					onLayout={(event) =>
-						onHeightChange?.(event.nativeEvent.layout.height)
-					}
+					onLayout={(event) => {
+						setStackHeight(event.nativeEvent.layout.height);
+						onHeightChange?.(event.nativeEvent.layout.height);
+					}}
 					style={[styles.stack, clusterColumn]}
 				>
 					{sessionTabs && sessionTabs.length > 0 ? (
@@ -285,6 +304,9 @@ export const Composer: ComposerComponent = forwardRef<
 								onFocus={() => setExpanded(true)}
 								onBlur={() => setExpanded(false)}
 								onKeyPress={onKeyPress}
+								onLayout={(event) =>
+									setInputHeight(event.nativeEvent.layout.height)
+								}
 								placeholder={placeholder}
 								placeholderTextColor={COMPOSER_COLORS.muted}
 								autoCapitalize={
@@ -293,15 +315,7 @@ export const Composer: ComposerComponent = forwardRef<
 								autoCorrect={autocapitalization !== "never"}
 								multiline
 								textAlignVertical="top"
-								style={[
-									styles.input,
-									{
-										minHeight: COMPOSER_METRICS.lineHeight * editorLines,
-										maxHeight:
-											COMPOSER_METRICS.lineHeight *
-											COMPOSER_METRICS.maxEditorLines,
-									},
-								]}
+								style={[styles.input, editorHeight]}
 							/>
 						</View>
 						<View style={styles.row}>
