@@ -860,9 +860,6 @@ msgstr "{0} kontrolden {completed} tanesi tamamlandı"
 msgid "{completed} of {total} completed"
 msgstr "{total} adımdan {completed} tanesi tamamlandı"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (çevrimdışı)"
-
 msgid "{configTitle} font size"
 msgstr "{configTitle} yazı tipi boyutu"
 
@@ -1808,9 +1805,6 @@ msgstr "Bulut otomasyonunun talimatları en fazla {max} karakter olabilir"
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Bulut çalışma alanı {path} çağıramaz. Bunu oturum açtığın bir istemciden yap."
-
-msgid "A computer"
-msgstr "Bir bilgisayar"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName} için zaten bir silme işlemi sürüyor."
@@ -2899,9 +2893,6 @@ msgstr "Anonim Montajcı"
 
 msgid "Another AI assistant"
 msgstr "Başka bir yapay zekâ asistanı"
-
-msgid "Another computer"
-msgstr "Başka bir bilgisayar"
 
 msgid "another device"
 msgstr "başka bir cihaz"
@@ -12680,9 +12671,6 @@ msgstr "Yeni sohbet"
 msgid "New Chat"
 msgstr "Yeni sohbet"
 
-msgid "New cloud workspace"
-msgstr "Yeni bulut çalışma alanı"
-
 msgid "New environment"
 msgstr "Yeni ortam"
 
@@ -13259,8 +13247,8 @@ msgstr "Kuruluş seçilmedi"
 msgid "No other chats here"
 msgstr "Burada başka sohbet yok"
 
-msgid "No other computer is set up for this account."
-msgstr "Bu hesap için başka bir bilgisayar ayarlanmamış."
+msgid "No other device is set up for this account."
+msgstr "Bu hesap için başka bir cihaz ayarlanmamış."
 
 msgid "No pages match"
 msgstr "Eşleşen sayfa yok"
@@ -20839,12 +20827,6 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
-
-msgid "this computer"
-msgstr "bu bilgisayar"
-
-msgid "This computer"
-msgstr "Bu bilgisayar"
 
 msgid "This computer's host is not running"
 msgstr "Bu bilgisayarın host hizmeti çalışmıyor"

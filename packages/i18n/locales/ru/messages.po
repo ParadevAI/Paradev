@@ -860,9 +860,6 @@ msgstr "{completed} из {0} проверок завершено"
 msgid "{completed} of {total} completed"
 msgstr "Завершено {completed} из {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (не в сети)"
-
 msgid "{configTitle} font size"
 msgstr "Размер шрифта: {configTitle}"
 
@@ -1808,9 +1805,6 @@ msgstr "Инструкции облачной автоматизации мог�
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Облачное рабочее пространство не может вызвать {path}. Сделайте это в клиенте, где вы вошли в систему."
-
-msgid "A computer"
-msgstr "Компьютер"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Удаление {workspaceName} уже выполняется."
@@ -2899,9 +2893,6 @@ msgstr "Анонимный сборщик"
 
 msgid "Another AI assistant"
 msgstr "Другой ИИ-ассистент"
-
-msgid "Another computer"
-msgstr "Другой компьютер"
 
 msgid "another device"
 msgstr "другое устройство"
@@ -12680,9 +12671,6 @@ msgstr "Новый чат"
 msgid "New Chat"
 msgstr "Новый чат"
 
-msgid "New cloud workspace"
-msgstr "Новая облачная рабочая область"
-
 msgid "New environment"
 msgstr "Новое окружение"
 
@@ -13259,8 +13247,8 @@ msgstr "Организация не выбрана"
 msgid "No other chats here"
 msgstr "Других чатов здесь нет"
 
-msgid "No other computer is set up for this account."
-msgstr "Для этого аккаунта не настроен другой компьютер."
+msgid "No other device is set up for this account."
+msgstr "Для этого аккаунта не настроено другое устройство."
 
 msgid "No pages match"
 msgstr "Нет подходящих страниц"
@@ -20839,12 +20827,6 @@ msgstr "Не удаётся запустить эту облачную рабо�
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Облачное рабочее пространство запускается. После простоя это может занять до 30 секунд."
-
-msgid "this computer"
-msgstr "этот компьютер"
-
-msgid "This computer"
-msgstr "Этот компьютер"
 
 msgid "This computer's host is not running"
 msgstr "Хост этого компьютера не запущен"

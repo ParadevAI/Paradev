@@ -854,9 +854,6 @@ msgstr "Завершено {completed} з {0} перевірок"
 msgid "{completed} of {total} completed"
 msgstr "Завершено {completed} з {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (не в мережі)"
-
 msgid "{configTitle} font size"
 msgstr "Розмір шрифту: {configTitle}"
 
@@ -1802,9 +1799,6 @@ msgstr "Інструкції хмарної автоматизації можу�
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Хмарний робочий простір не може викликати {path}. Зробіть це в клієнті, де ви ввійшли."
-
-msgid "A computer"
-msgstr "Комп’ютер"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Видалення {workspaceName} уже триває."
@@ -2893,9 +2887,6 @@ msgstr "Анонімний асемблер"
 
 msgid "Another AI assistant"
 msgstr "Інший ШІ-асистент"
-
-msgid "Another computer"
-msgstr "Інший комп’ютер"
 
 msgid "another device"
 msgstr "інший пристрій"
@@ -12674,9 +12665,6 @@ msgstr "Новий чат"
 msgid "New Chat"
 msgstr "Новий чат"
 
-msgid "New cloud workspace"
-msgstr "Новий хмарний робочий простір"
-
 msgid "New environment"
 msgstr "Нове середовище"
 
@@ -13253,8 +13241,8 @@ msgstr "Організацію не вибрано"
 msgid "No other chats here"
 msgstr "Тут немає інших чатів"
 
-msgid "No other computer is set up for this account."
-msgstr "Для цього облікового запису не налаштовано іншого комп’ютера."
+msgid "No other device is set up for this account."
+msgstr "Для цього облікового запису не налаштовано іншого пристрою."
 
 msgid "No pages match"
 msgstr "Немає відповідних сторінок"
@@ -20833,12 +20821,6 @@ msgstr "Цей хмарний робочий простір не може зап
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Цей хмарний робочий простір прокидається; після простою це може тривати до 30 секунд."
-
-msgid "this computer"
-msgstr "цей комп’ютер"
-
-msgid "This computer"
-msgstr "Цей комп’ютер"
 
 msgid "This computer's host is not running"
 msgstr "Хост цього комп'ютера не запущено"

@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
-import { LuCloudUpload, LuLaptop, LuSend } from "react-icons/lu";
+import { LuArrowRightLeft } from "react-icons/lu";
 import type { MenuParts } from "renderer/lib/menuParts";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import type {
 	MovableWorkspace,
 	WorkspaceMoveDirection,
@@ -17,28 +17,27 @@ interface WorkspaceMoveMenuProps {
 	directions: WorkspaceMoveDirection[];
 }
 
-/** Move, with a submenu per destination; picking one starts the move. */
+/** Move to: Cloud with its environments, then the hosts; picking one starts the move. */
 export function WorkspaceMoveMenu({
 	parts,
 	workspace,
 	directions,
 }: WorkspaceMoveMenuProps) {
-	const { Sub, SubTrigger, SubContent } = parts;
+	const { Sub, SubTrigger, SubContent, Separator } = parts;
 	const iconClassName = cn("size-4", parts.iconClassName);
-	const { machineId } = useLocalHostService();
 	const startMove = useStartWorkspaceMove(workspace);
 
 	return (
 		<Sub>
 			<SubTrigger>
-				<LuSend className={iconClassName} />
-				<Trans>Move</Trans>
+				<LuArrowRightLeft className={iconClassName} />
+				<Trans>Move to</Trans>
 			</SubTrigger>
 			<SubContent>
 				{directions.includes("to-cloud") && (
 					<Sub>
 						<SubTrigger>
-							<LuCloudUpload className={iconClassName} />
+							<CloudGlyph className={iconClassName} />
 							<Trans>Cloud</Trans>
 						</SubTrigger>
 						<SubContent>
@@ -50,24 +49,14 @@ export function WorkspaceMoveMenu({
 						</SubContent>
 					</Sub>
 				)}
+				{directions.includes("to-cloud") &&
+					directions.includes("to-computer") && <Separator />}
 				{directions.includes("to-computer") && (
-					<Sub>
-						<SubTrigger>
-							<LuLaptop className={iconClassName} />
-							{workspace.hostId === machineId ? (
-								<Trans>Another computer</Trans>
-							) : (
-								<Trans>A computer</Trans>
-							)}
-						</SubTrigger>
-						<SubContent>
-							<MoveToComputerItems
-								parts={parts}
-								hostId={workspace.hostId}
-								onSelectComputer={startMove.toComputer}
-							/>
-						</SubContent>
-					</Sub>
+					<MoveToComputerItems
+						parts={parts}
+						hostId={workspace.hostId}
+						onSelectComputer={startMove.toComputer}
+					/>
 				)}
 			</SubContent>
 		</Sub>
