@@ -6492,6 +6492,9 @@ msgstr "풀 리퀘스트를 업데이트하지 못했습니다"
 msgid "Couldn't update the Chat setting"
 msgstr "채팅 설정을 업데이트할 수 없습니다"
 
+msgid "Couldn't update the global naming setting"
+msgstr "전역 이름 지정 설정을 업데이트할 수 없습니다"
+
 msgid "Couldn't update the queue"
 msgstr "대기열을 업데이트할 수 없습니다"
 
@@ -9861,6 +9864,12 @@ msgstr "가이드"
 msgid "Guides AI-generated workspace and branch names for this project. Empty uses the default naming."
 msgstr "이 프로젝트에서 AI가 생성하는 워크스페이스와 브랜치 이름을 안내합니다. 비워 두면 기본 이름 규칙을 사용합니다."
 
+msgid "Guides AI-generated workspace and branch names for this project. These are added after your global instructions and win where the two conflict. Empty uses the global instructions."
+msgstr "이 프로젝트에서 AI가 생성하는 워크스페이스와 브랜치 이름을 안내합니다. 전역 지침 다음에 추가되며, 둘이 충돌하면 이 지침이 우선합니다. 비워 두면 전역 지침을 사용합니다."
+
+msgid "Guides AI-generated workspace and branch names in every project, on all your devices. A project's own instructions are added after these and win where the two conflict."
+msgstr "모든 기기의 모든 프로젝트에서 AI가 생성하는 워크스페이스와 브랜치 이름을 안내합니다. 프로젝트 자체 지침은 이 지침 다음에 추가되며, 둘이 충돌하면 프로젝트 지침이 우선합니다."
+
 msgid "Guides and references"
 msgstr "가이드와 레퍼런스"
 
@@ -10290,6 +10299,9 @@ msgstr "지금까지 Paradev가 마음에 드셨다면 GitHub 스타가 다른 �
 
 msgid "Ignore @channel and @here"
 msgstr "@channel 및 @here 무시"
+
+msgid "Ignore global naming instructions"
+msgstr "전역 이름 지정 지침 무시"
 
 msgid "Illegal content"
 msgstr "불법 콘텐츠"
