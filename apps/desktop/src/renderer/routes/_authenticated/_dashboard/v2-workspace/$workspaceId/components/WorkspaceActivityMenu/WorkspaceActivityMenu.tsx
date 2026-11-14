@@ -80,7 +80,6 @@ import { CommitForm } from "../CommitForm";
 import { CreatePrForm } from "../CreatePrForm";
 import { NewPageComposer } from "../NewPageComposer";
 import { PRStatusIndicators } from "../PRStatusIndicators";
-import { RepositoryShipList } from "../RepositoryShipList";
 import { ActivityMenuHeader } from "./components/ActivityMenuHeader";
 import { AnimatedHeight } from "./components/AnimatedHeight";
 import { BackgroundWorkRow } from "./components/BackgroundWorkRow";
@@ -111,7 +110,6 @@ import {
 	type BackgroundWork,
 	collectBackgroundWork,
 } from "./utils/collectBackgroundWork";
-import { actionableShipRepositories } from "./utils/actionableShipRepositories";
 import { paneSourceTitle } from "./utils/paneSourceTitle";
 import {
 	pullRequestDisplayState,
@@ -157,7 +155,6 @@ export function WorkspaceActivityMenu({
 	const gitStatus = useCheckoutGitStatus(repositoryId);
 	const { workspace: currentWorkspace } = useWorkspace();
 	const [shipView, setShipView] = useState<ShipView | null>(null);
-	const [shipRepositoryId, setShipRepositoryId] = useState<string | null>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const anchorNode = useActivityPanelStore(
 		(state) => state.anchorNodes[workspaceId],
@@ -181,7 +178,6 @@ export function WorkspaceActivityMenu({
 	const docked = fits && !hidden;
 	const floating = popoverOpen && !fits;
 	const open = docked || floating;
-	// The trigger needs only the changed-file totals; the menu rows need the PRs.
 	const repositoryShip = useRepositoryShipSnapshots(
 		workspaceId,
 		isMultiRepo ? checkouts.map((checkout) => checkout.repositoryId) : [],
@@ -190,11 +186,6 @@ export function WorkspaceActivityMenu({
 	const singleRepoStats = useMemo(
 		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
 		[gitStatus.data],
-	);
-	const actionableCheckouts = actionableShipRepositories(
-		checkouts,
-		repositoryShip.byId,
-		shipRepositoryId,
 	);
 	const changesStats = isMultiRepo ? repositoryShip.totals : singleRepoStats;
 	const triggerChangesStats =
@@ -566,7 +557,6 @@ export function WorkspaceActivityMenu({
 		}
 		setComposing(false);
 		setShipView(null);
-		setShipRepositoryId(null);
 	};
 
 	const onTriggerClick = () => {
@@ -771,16 +761,6 @@ export function WorkspaceActivityMenu({
 									isOpen={changes.isOpen}
 									onToggle={changes.onToggle}
 								/>
-								{actionableCheckouts.length > 0 && (
-									<RepositoryShipList
-										workspaceId={workspaceId}
-										repositories={actionableCheckouts}
-										snapshots={repositoryShip.byId}
-										onOpenPullRequest={onOpenPullRequest}
-										activeRepositoryId={shipRepositoryId}
-										onActiveRepositoryIdChange={setShipRepositoryId}
-									/>
-								)}
 							</section>
 						) : (
 							changes &&
@@ -987,11 +967,6 @@ export function WorkspaceActivityMenu({
 					sideOffset={0}
 					className="w-80 border-0 bg-transparent p-0 shadow-none duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] data-[state=closed]:duration-150 data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)] data-[side=bottom]:slide-in-from-top-1 motion-reduce:animate-none"
 					onEscapeKeyDown={(event) => {
-						if (shipRepositoryId) {
-							event.preventDefault();
-							setShipRepositoryId(null);
-							return;
-						}
 						if (shipView || composing) event.preventDefault();
 					}}
 					onInteractOutside={(event) => {
