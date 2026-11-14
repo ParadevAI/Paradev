@@ -1165,6 +1165,69 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("steerQueuedPrompt does not interrupt a turn whose cancel would stop an older subagent", async () => {
+		const { harnesses, adapters } = fakeHarnessRegistry({
+			turns: [
+				[
+					{
+						kind: "session",
+						session: {
+							backgroundTasks: [
+								{
+									id: "sub-1",
+									kind: "subagent",
+									name: "Helper",
+									canStop: true,
+									startedAtMs: 1,
+								},
+							],
+						},
+					},
+					{ kind: "turn", turn: turn("t1", { startedAtMs: 10 }) },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+				],
+				...GATED_THEN_QUICK.turns.slice(1),
+			],
+		});
+		const factory = harnesses.get(FAKE_HARNESS);
+		if (!factory) throw new Error("fake harness missing");
+		const runtime = createTestRuntime({
+			harnesses: new Map([["claude-acp", factory]]),
+		});
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: "claude-acp",
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+		const adapter = adapters[0];
+		if (!adapter) throw new Error("adapter missing");
+		let cancels = 0;
+		const cancelTurn = adapter.cancelTurn.bind(adapter);
+		adapter.cancelTurn = () => {
+			cancels += 1;
+			cancelTurn();
+		};
+
+		runtime.commands.steerQueuedPrompt({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: third.itemId,
+		});
+
+		expect(cancels).toBe(0);
+		expect(
+			runtime.live
+				.require(sessionId)
+				.queueState.prompts.map((prompt) => prompt.itemId),
+		).toEqual([third.itemId, second.itemId]);
+		await runtime.dispose();
+	});
+
 	test("steerQueuedPrompt interrupts the turn and delivers that prompt next", async () => {
 		const { runtime, sessionId } = startSession(GATED_THEN_QUICK);
 		sendPrompt(runtime, sessionId, "first");
