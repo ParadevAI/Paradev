@@ -58,7 +58,7 @@ export async function runChatMove(
 			// A claim whose answer was lost leaves the move copying, and a redelivery finds nothing to claim.
 			await failAttempt(
 				{ organizationId: job.organizationId, id: job.moveId },
-				attempt,
+				{ attempt, orUnowned: false },
 				error,
 			).catch((failError: unknown) =>
 				console.error(
@@ -80,9 +80,12 @@ export async function runChatMove(
 			organizationId: move.organizationId,
 			userId: move.createdBy,
 		});
+		await keepClaim(move);
+		const chatImport = await buildChatImport(move);
+		await keepClaim(move);
 		await destination.mutation(
 			"teleport.importChat",
-			await buildChatImport(move),
+			chatImport,
 			IMPORT_TIMEOUT_MS,
 		);
 		await completeChatMove(
@@ -108,6 +111,15 @@ export async function runChatMove(
 		await failChatMove(move, error, { attempt });
 		return "failed";
 	}
+}
+
+/** Keeps a copy this job holds from looking abandoned between its long steps. */
+async function keepClaim(move: SelectChatMove): Promise<void> {
+	const { alive } = await callMoves(move.organizationId, {
+		op: "touchChatMove",
+		id: move.id,
+	});
+	if (!alive) throw new ChatMoveError("The move is no longer running");
 }
 
 /**
@@ -319,7 +331,11 @@ export async function failChatMove(
 		}
 	}
 	if (options.attempt) {
-		const handled = await failAttempt(move, options.attempt, error);
+		const handled = await failAttempt(
+			move,
+			{ attempt: options.attempt, orUnowned: true },
+			error,
+		);
 		if (handled) return;
 	}
 	await callMoves(move.organizationId, {
@@ -330,17 +346,22 @@ export async function failChatMove(
 	});
 }
 
-/** Fails the copy this attempt holds; false only when realtime cannot tell attempts apart yet. */
+/**
+ * Fails the copy this attempt holds, or one claimed without an attempt
+ * when the caller holds it; false only when realtime cannot tell attempts
+ * apart yet.
+ */
 async function failAttempt(
 	move: MoveOfChat,
-	attempt: string,
+	holder: { attempt: string; orUnowned: boolean },
 	error: unknown,
 ): Promise<boolean> {
 	return callMoves(move.organizationId, {
 		op: "failAttempt",
 		id: move.id,
-		attempt,
+		attempt: holder.attempt,
 		error: errorText(error),
+		...(holder.orUnowned ? { orUnowned: true } : {}),
 	}).then(
 		() => true,
 		(refusal: unknown) => {

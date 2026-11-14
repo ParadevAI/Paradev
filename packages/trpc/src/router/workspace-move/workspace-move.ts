@@ -56,6 +56,7 @@ export const workspaceMoveRouter = {
 								failError,
 							),
 						);
+						skipped.push({ chatSessionId: move.sessionId, reason: "failed" });
 						return null;
 					},
 				);
@@ -84,8 +85,11 @@ export const workspaceMoveRouter = {
 		.input(abandonWorkspaceMoveInputSchema)
 		.mutation(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			await abandonWorkspaceMove({ ...input, ...mover });
-			return { workspaceMoveId: input.workspaceMoveId };
+			const { movedChatSessionIds } = await abandonWorkspaceMove({
+				...input,
+				...mover,
+			});
+			return { workspaceMoveId: input.workspaceMoveId, movedChatSessionIds };
 		}),
 
 	/**

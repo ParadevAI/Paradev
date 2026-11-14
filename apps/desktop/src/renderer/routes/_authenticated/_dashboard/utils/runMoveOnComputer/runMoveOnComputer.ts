@@ -10,10 +10,13 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
  * stays where it was. A move another run already claimed is left to it,
  * here or in another window.
  */
+/** `held` when another run holds the copy, here or in another window; it may be taken over once that run goes quiet. */
+export type MoveRunOutcome = "done" | "held";
+
 export function runMoveOnComputer(args: {
 	moveId: string;
 	host: HostServiceClient;
-}): Promise<void> {
+}): Promise<MoveRunOutcome> {
 	const running = runningMoves.get(args.moveId);
 	if (running) return running;
 	const run = carryOut(args).finally(() => runningMoves.delete(args.moveId));
@@ -22,7 +25,7 @@ export function runMoveOnComputer(args: {
 }
 
 /** The pane, the workspace move and the boot pickup may all start the same move. */
-const runningMoves = new Map<string, Promise<void>>();
+const runningMoves = new Map<string, Promise<MoveRunOutcome>>();
 
 async function carryOut({
 	moveId,
@@ -30,7 +33,7 @@ async function carryOut({
 }: {
 	moveId: string;
 	host: HostServiceClient;
-}): Promise<void> {
+}): Promise<MoveRunOutcome> {
 	const attemptId = crypto.randomUUID();
 	let started: {
 		workspaceId: string;
@@ -45,7 +48,7 @@ async function carryOut({
 			await recordFailure(moveId, attemptId, error);
 			throw error;
 		});
-	if (!claimed) return;
+	if (!claimed) return "held";
 	try {
 		const events = [];
 		let afterSeq = 0;
@@ -73,6 +76,7 @@ async function carryOut({
 	await host.teleport.continueChat.mutate(started).catch((error: unknown) => {
 		console.warn("[chat-move] the moved chat's agent did not start", error);
 	});
+	return "done";
 }
 
 async function recordFailure(

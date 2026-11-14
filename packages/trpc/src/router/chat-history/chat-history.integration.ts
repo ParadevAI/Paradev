@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import {
 	afterAll,
+	afterEach,
 	beforeAll,
 	beforeEach,
 	describe,
@@ -914,6 +915,9 @@ describe("workspace move safety", () => {
 });
 
 describe("chat moves", () => {
+	// A move still arriving would stop later tests moving chats out of this workspace.
+	afterEach(() => failChatMovesTo(MY_CLOUD, "test over"));
+
 	beforeEach(() => {
 		WORKSPACE = crypto.randomUUID();
 	});
@@ -1126,8 +1130,6 @@ describe("chat moves", () => {
 				workspaceId: MY_CLOUD,
 			}),
 		).rejects.toThrow("still moving");
-		// A move still arriving would stop the next tests moving chats out of this workspace.
-		await failChatMovesTo(MY_CLOUD, "The cloud workspace could not start");
 	});
 
 	test("a failed move leaves the chat where it was, and can be tried again", async () => {
@@ -1378,6 +1380,31 @@ describe("chat moves", () => {
 		);
 	});
 
+	test("a copy an older store claimed without an attempt still completes under a newer one", async () => {
+		const sessionId = await chatOnLaptop();
+		const mover = routerFor(USER).chatMove;
+		const started = await startOne({
+			chatSessionId: sessionId,
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
+		});
+		const attemptId = crypto.randomUUID();
+		await withMoveStore(
+			async (organizationId, request) => {
+				if (request.op !== "claim") return localMoves(organizationId, request);
+				const { attempt: _ignored, ...older } = request;
+				return localMoves(organizationId, older);
+			},
+			() => mover.claim({ moveId: started.moveId, attemptId }),
+		);
+		await mover.complete({ moveId: started.moveId, attemptId });
+		expect((await moveOf(started.moveId)).status).toBe("ready");
+		expect((await history(sessionId)).session.v2WorkspaceId).toBe(
+			DESKTOP_WORKSPACE,
+		);
+	});
+
 	test("a lost claim fails only the copy its own job holds", async () => {
 		const sessionId = await chatOnLaptop();
 		const move = await createChatMove({
@@ -1419,7 +1446,6 @@ describe("chat moves", () => {
 			),
 		).rejects.toThrow();
 		expect((await moveOf(second.id)).status).toBe("failed");
-		await failChatMovesTo(MY_CLOUD, "test over");
 	});
 
 	test("a retry refuses a chat that went on after the failed move began", async () => {

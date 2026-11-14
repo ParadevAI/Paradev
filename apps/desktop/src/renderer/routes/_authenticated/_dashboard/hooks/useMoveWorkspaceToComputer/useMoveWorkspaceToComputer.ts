@@ -193,9 +193,18 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						return { prepared, project, created, moves, skipped };
 					},
 				}).catch(async (error: unknown) => {
-					await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
+					const moved = new Set(
+						(await abandonWorkspaceMove(
+							workspaceMoveId,
+							error,
+							signal?.aborted,
+						)) ?? [],
+					);
 					if (leaving.source) {
-						await releaseSourceChats(leaving.source, leaving.chats);
+						await releaseSourceChats(
+							leaving.source,
+							leaving.chats.filter((id) => !moved.has(id)),
+						);
 						await releaseSourceTerminals(
 							leaving.source,
 							workspace.id,

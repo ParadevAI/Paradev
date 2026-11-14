@@ -103,30 +103,42 @@ describe("MoveBook", () => {
 		});
 	});
 
-	it("ends an abandoned move even once it has its destination", () => {
+	it("ends an abandoned move with a destination only when asked, and leaves a switching chat to finish", () => {
 		const { ok } = newBook();
 		const parent = begin(ok);
-		const [move] = ok({
+		const [waiting, switching] = ok({
 			op: "attach",
 			workspaceMoveId: parent.id,
 			toWorkspaceId: "cloud",
 			branch: "move/1",
-			chats: [chat("a")],
+			chats: [chat("a"), chat("b")],
 		}).moves;
-		ok({ op: "abandon", workspaceMoveId: parent.id, error: "gone" });
-		expect(ok({ op: "workspaceMove", id: parent.id }).move).toMatchObject({
-			status: "failed",
-			error: "gone",
-		});
-		expect(ok({ op: "chatMove", id: move?.id as string }).move?.status).toBe(
-			"failed",
+		ok({ op: "claim", id: switching?.id as string, attempt: "job" });
+		ok({ op: "switching", id: switching?.id as string, attempt: "job" });
+
+		ok({ op: "abandon", workspaceMoveId: parent.id, error: "stale cancel" });
+		expect(ok({ op: "workspaceMove", id: parent.id }).move?.status).toBe(
+			"moving",
 		);
 
-		ok({ op: "abandon", workspaceMoveId: parent.id, error: "again" });
-		expect(ok({ op: "workspaceMove", id: parent.id }).move?.error).toBe("gone");
+		expect(
+			ok({
+				op: "abandon",
+				workspaceMoveId: parent.id,
+				error: "gone",
+				withDestination: true,
+			}).movedSessionIds,
+		).toEqual(["b"]);
+		expect(ok({ op: "chatMove", id: waiting?.id as string }).move?.status).toBe(
+			"failed",
+		);
+		ok({ op: "finish", id: switching?.id as string, attempt: "job" });
+		expect(ok({ op: "workspaceMove", id: parent.id }).move?.status).toBe(
+			"partial",
+		);
 	});
 
-	it("retries a chat only from the newest move of its workspace", () => {
+	it("retries a chat unless it moved again in a later move", () => {
 		const { book, ok } = newBook();
 		const first = begin(ok);
 		expect(
@@ -140,15 +152,61 @@ describe("MoveBook", () => {
 			chats: [chat("a")],
 		}).moves;
 		ok({ op: "fail", id: a?.id as string, error: "no bundle" });
-		const second = begin(ok);
-		ok({ op: "abandon", workspaceMoveId: second.id, error: "stopped" });
 
+		const cancelled = begin(ok);
+		ok({ op: "abandon", workspaceMoveId: cancelled.id, error: "cancelled" });
+		const retried = ok({
+			op: "retry",
+			workspaceMoveId: first.id,
+			chat: chat("a"),
+		}).move;
+		ok({ op: "fail", id: retried.id, error: "no bundle" });
+
+		const second = begin(ok);
+		const [again] = ok({
+			op: "attach",
+			workspaceMoveId: second.id,
+			toWorkspaceId: "cloud-2",
+			branch: "move/2",
+			chats: [chat("a")],
+		}).moves;
+		ok({ op: "fail", id: again?.id as string, error: "no bundle" });
 		expect(
 			book.apply({ op: "retry", workspaceMoveId: first.id, chat: chat("a") }),
 		).toMatchObject({ ok: false, code: "precondition" });
-		expect(ok({ op: "workspaceMove", id: first.id }).move?.status).toBe(
-			"failed",
-		);
+	});
+
+	it("lets a caller holding a copy claimed without an attempt finish or fail it", () => {
+		const { ok } = newBook();
+		const parent = begin(ok);
+		const [a, b] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a"), chat("b")],
+		}).moves;
+		ok({ op: "claim", id: a?.id as string });
+		ok({ op: "claim", id: b?.id as string });
+		expect(
+			ok({ op: "switching", id: a?.id as string, attempt: "new" }).switching,
+		).toBe(true);
+		expect(
+			ok({ op: "finish", id: a?.id as string, attempt: "new" }).finished,
+		).toBe(true);
+		expect(
+			ok({ op: "failAttempt", id: b?.id as string, attempt: "new", error: "x" })
+				.failed,
+		).toBe(false);
+		expect(
+			ok({
+				op: "failAttempt",
+				id: b?.id as string,
+				attempt: "new",
+				error: "x",
+				orUnowned: true,
+			}).failed,
+		).toBe(true);
 	});
 
 	it("lets only the attempt that holds a copy finish or fail it, and hands a quiet copy over", () => {

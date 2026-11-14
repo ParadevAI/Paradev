@@ -27,9 +27,11 @@ export const STALE_MOVE_MS = 6 * 60 * 1000;
 
 /**
  * Longer than the quietest step of a copy (an import, up to 150 s), so a
- * copy this quiet lost its runner and another attempt may take it over.
+ * copy this quiet lost its runner and another attempt may take it over,
+ * and shorter than STALE_MOVE_MS, so a desktop that came back can take it
+ * over before the sweep fails it.
  */
-export const CLAIM_LEASE_MS = 3 * 60 * 1000;
+export const CLAIM_LEASE_MS = 4 * 60 * 1000;
 
 export const MOVE_STOPPED_ANSWERING = "The move stopped answering";
 
@@ -116,7 +118,13 @@ export type MoveBookRequest =
 			branch: string;
 			chats: NewChatMove[];
 	  }
-	| { op: "abandon"; workspaceMoveId: string; error: string }
+	| {
+			op: "abandon";
+			workspaceMoveId: string;
+			error: string;
+			/** Also ends a move that already has its destination, as when the desktop could not finish it. */
+			withDestination?: boolean;
+	  }
 	| { op: "retry"; workspaceMoveId: string; chat: NewChatMove }
 	| { op: "workspaceMove"; id: string }
 	| { op: "chatMove"; id: string }
@@ -166,6 +174,8 @@ export type MoveBookRequest =
 			id: string;
 			attempt: string;
 			error: string;
+			/** Also fails a copy claimed without an attempt, by a caller that holds it. */
+			orUnowned?: boolean;
 	  }
 	| {
 			/** Marks the copy this attempt holds as switching its chat, just before the switch. */
@@ -185,7 +195,8 @@ export type MoveBookRequest =
 type Replies = {
 	begin: { move: WorkspaceMove };
 	attach: { moves: ChatMove[] };
-	abandon: Record<never, never>;
+	/** The chats the move took, or is switching, which stay where they went. */
+	abandon: { movedSessionIds: string[] };
 	retry: { move: ChatMove };
 	workspaceMove: { move: WorkspaceMove | null };
 	chatMove: { move: ChatMove | null };
