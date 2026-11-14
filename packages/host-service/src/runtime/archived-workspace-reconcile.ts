@@ -2,7 +2,10 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
 import { and, eq, isNotNull, isNull } from "drizzle-orm";
 import { projects, workspaces } from "../db/schema";
-import { destroyWorkspace } from "../trpc/router/workspace-cleanup";
+import {
+	destroyWorkspace,
+	removeGeneratedWorkspaceRoot,
+} from "../trpc/router/workspace-cleanup";
 import type { HostServiceContext } from "../types";
 import { listWorkspaceCheckouts } from "../workspaces/checkouts";
 
@@ -12,7 +15,9 @@ import { listWorkspaceCheckouts } from "../workspaces/checkouts";
  * archived row whose worktree still exists on disk. The delete resumes with
  * best-effort teardown, but never with force: uncommitted files block it and
  * un-archive the row. A folder that may not be that worktree any more (made
- * after the delete, on another branch, or unreadable) is left alone.
+ * after the delete, on another branch, or unreadable) is left alone. A
+ * multi-repo root whose checkouts are all gone loses only the files Superset
+ * wrote there, and its row stays archived.
  */
 export async function runArchivedWorkspaceReconcile(
 	ctx: HostServiceContext,
@@ -65,6 +70,28 @@ export async function runArchivedWorkspaceReconcile(
 			)
 			.get();
 		if (liveOwner) continue;
+		const checkouts = listWorkspaceCheckouts(ctx.db, row);
+		if (
+			checkouts.length > 1 &&
+			!checkouts.some((checkout) => existsSync(checkout.path))
+		) {
+			// Only the root is left: what is still in it is the user's.
+			const warnings: string[] = [];
+			await removeGeneratedWorkspaceRoot(
+				row.worktreePath,
+				checkouts.map((checkout) => checkout.path),
+				warnings,
+			);
+			if (warnings.length > 0) {
+				console.warn(
+					"[archived-workspace-reconcile] left files in a deleted workspace's folder",
+					{ workspaceId: row.id, warnings },
+				);
+			} else {
+				resumed++;
+			}
+			continue;
+		}
 		try {
 			await destroyWorkspace(ctx, {
 				workspaceId: row.id,

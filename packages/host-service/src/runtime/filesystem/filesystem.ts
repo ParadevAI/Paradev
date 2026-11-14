@@ -12,8 +12,8 @@ import { getCheckoutSnapshots } from "../../workspaces/checkouts.ts";
 import { getLocalWorkspace } from "../../workspaces/local-workspace-store.ts";
 import { WatchAttachGuard } from "./watch-attach-guard.ts";
 import {
-	scanNestedRepositories,
 	scanWorkspaceGitIgnoredDirectories,
+	scanWorkspaceNestedRepositories,
 } from "./watcher-scans.ts";
 
 export interface WorkspaceFilesystemManagerOptions {
@@ -40,7 +40,8 @@ export class WorkspaceFilesystemManager {
 		useDefaultIgnores: false,
 		listGitIgnoredDirs: (rootPath, signal) =>
 			scanWorkspaceGitIgnoredDirectories(this.db, rootPath, signal),
-		findNestedRepoRoots: scanNestedRepositories,
+		findNestedRepoRoots: (rootPath, options) =>
+			scanWorkspaceNestedRepositories(this.db, rootPath, options),
 	});
 	private readonly watchAttachGuard = new WatchAttachGuard(this.watcherManager);
 	private readonly serviceCache = new Map<string, FsHostService>();

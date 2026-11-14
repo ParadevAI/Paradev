@@ -19,11 +19,13 @@ import {
 	workspaceRepositories,
 	workspaces,
 } from "../../src/db/schema";
+import { runArchivedWorkspaceReconcile } from "../../src/runtime/archived-workspace-reconcile";
 import { getTomlConfigPath } from "../../src/runtime/setup/project-config-toml";
 import * as terminal from "../../src/terminal/terminal";
 import { cleanupGitOps } from "../../src/trpc/router/workspace-cleanup/git-ops";
 import * as addBranchWorktreeModule from "../../src/trpc/router/workspace-creation/shared/add-branch-worktree";
 import * as naming from "../../src/trpc/router/workspace-creation/utils/ai-workspace-names";
+import type { HostServiceContext } from "../../src/types";
 import * as titleJobs from "../../src/workspaces/workspace-title-jobs";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import { createTestHost } from "../helpers/createTestHost";
@@ -336,6 +338,70 @@ test("a delete that fails on one checkout names the checkouts already removed, s
 	});
 	expect(retried).toMatchObject({ worktreeRemoved: true });
 	expect(existsSync(workspace.worktreePath)).toBe(false);
+});
+
+test("a retry that meets a dirty checkout after another was removed keeps the workspace archived", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const realRemove = cleanupGitOps.removeWorktree;
+	const remove = spyOn(cleanupGitOps, "removeWorktree").mockImplementation(
+		async (args) =>
+			args.worktreePath.endsWith("/web")
+				? { stillRegistered: true, removeError: "locked" }
+				: realRemove(args),
+	);
+	try {
+		await expect(
+			scenario.host.trpc.workspaceCleanup.destroy.mutate({
+				workspaceId: workspace.id,
+			}),
+		).rejects.toThrow("Already removed: api");
+	} finally {
+		remove.mockRestore();
+	}
+	writeFileSync(join(workspace.worktreePath, "web", "dirty.txt"), "wip");
+
+	await expect(
+		scenario.host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
+		}),
+	).rejects.toThrow("web: Worktree has uncommitted changes");
+	const row = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(row.archivedAt).not.toBeNull();
+});
+
+test("a deleted workspace whose root keeps the user's files stays deleted at startup; the reconcile takes only the generated files", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const root = workspace.worktreePath;
+	writeFileSync(join(root, "notes.md"), "agent notes");
+	const elsewhere = mkdtempSync(join(tmpdir(), "multi-repo-elsewhere-"));
+	scenario.cleanup.push(elsewhere);
+	scenario.host.db
+		.update(projects)
+		.set({ worktreeBaseDir: elsewhere })
+		.where(eq(projects.id, scenario.projectId))
+		.run();
+	await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+		force: true,
+	});
+	expect(existsSync(join(root, "notes.md"))).toBe(true);
+	const ctx = { db: scenario.host.db } as unknown as HostServiceContext;
+
+	await runArchivedWorkspaceReconcile(ctx);
+
+	expect(readdirSync(root)).toEqual(["notes.md"]);
+	const row = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(row.archivedAt).not.toBeNull();
+
+	rmSync(join(root, "notes.md"));
+	await runArchivedWorkspaceReconcile(ctx);
+	expect(existsSync(root)).toBe(false);
 });
 
 test("files an agent left in the root warn and block the delete; a forced delete removes the root", async () => {

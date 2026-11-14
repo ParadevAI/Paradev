@@ -303,8 +303,15 @@ export async function destroyWorkspace(
 	}
 }
 
-/** Some checkouts are already gone: the workspace stays archived, and a retry finishes the delete. */
-class PartialRemovalError extends TRPCError {}
+/** Once a checkout of a multi-repo workspace is gone, the workspace stays archived and a retry finishes the delete. */
+function isPartlyRemoved(checkouts: Checkout[]): boolean {
+	return (
+		checkouts.length > 1 &&
+		checkouts.some((checkout) =>
+			isMissingPath(checkout.path, { followSymlinks: false }),
+		)
+	);
+}
 
 async function runDestroy(
 	ctx: HostServiceContext,
@@ -417,7 +424,7 @@ async function runDestroy(
 		if (marked && local) trackWorkspaceDeleted(ctx, local);
 		return result;
 	} catch (err) {
-		if (marked && !(err instanceof PartialRemovalError)) {
+		if (marked && !isPartlyRemoved(checkouts)) {
 			unarchiveLocalWorkspace(ctx, input.workspaceId);
 		}
 		throw err;
@@ -632,7 +639,7 @@ async function runDestroyPhases(
 					.filter((r) => r.removed)
 					.map((r) => r.checkout.repository.name);
 				if (!(err instanceof TRPCError) || removed.length === 0) throw err;
-				throw new PartialRemovalError({
+				throw new TRPCError({
 					code: err.code,
 					message: `${err.message.replace(/\.$/, "")}. Already removed: ${removed.join(", ")}`,
 					cause: err,
@@ -756,6 +763,15 @@ async function removeWorkspaceRoot(
 		}
 		return;
 	}
+	await removeGeneratedWorkspaceRoot(root, checkoutPaths, warnings);
+}
+
+/** Takes the files Superset wrote into a multi-repo root, then the root if nothing else is left. */
+export async function removeGeneratedWorkspaceRoot(
+	root: string,
+	checkoutPaths: string[],
+	warnings: string[],
+) {
 	try {
 		await removeWorkspaceContextFiles(root, checkoutPaths);
 	} catch (err) {
