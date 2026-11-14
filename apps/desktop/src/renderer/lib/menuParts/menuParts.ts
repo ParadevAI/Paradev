@@ -22,7 +22,7 @@ export interface MenuParts {
 		className?: string;
 		disabled?: boolean;
 		variant?: "default" | "destructive";
-		onSelect?: () => void;
+		onSelect?: (event: Event) => void;
 		onClick?: () => void;
 		children: ReactNode;
 	}>;
