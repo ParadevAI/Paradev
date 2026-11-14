@@ -12,7 +12,7 @@ import {
 	Share2,
 	Trash2,
 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useNow } from "../../../../../../hooks/use-now";
 import { cn } from "../../../../../../lib/utils";
 import { Button } from "../../../../../ui/button";
@@ -79,7 +79,10 @@ export function PageTitleMenu({
 		action();
 	};
 
+	const duplicating = useRef(false);
 	const duplicate = async () => {
+		if (duplicating.current) return;
+		duplicating.current = true;
 		const title = page.title;
 		try {
 			await onDuplicate(t({ message: `${title} (copy)` }).slice(0, 200));
@@ -87,6 +90,8 @@ export function PageTitleMenu({
 			toast.error(
 				errorMessage(error, t({ message: "Could not duplicate this page" })),
 			);
+		} finally {
+			duplicating.current = false;
 		}
 	};
 

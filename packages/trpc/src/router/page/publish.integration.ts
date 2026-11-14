@@ -700,4 +700,15 @@ describe("duplicate", () => {
 		expect(carried).toEqual([{ fileId: asset.id, path: "site.css" }]);
 		expect(objectStore.has(fileOriginalKey(asset.id))).toBe(true);
 	});
+
+	test("refuses a private page the caller cannot read", async () => {
+		const theirs = await publish({
+			userId: OTHER_USER,
+			title: "Theirs",
+			visibility: "just_me",
+		});
+		await expect(caller.page.duplicate({ id: theirs.id })).rejects.toThrow(
+			/not found/i,
+		);
+	});
 });

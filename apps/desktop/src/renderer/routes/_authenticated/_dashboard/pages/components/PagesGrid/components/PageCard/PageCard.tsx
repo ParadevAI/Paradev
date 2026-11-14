@@ -22,7 +22,7 @@ import {
 	PinOff,
 	Trash2,
 } from "lucide-react";
-import { type MouseEvent, useId, useState } from "react";
+import { type MouseEvent, useId, useRef, useState } from "react";
 import { useNow } from "renderer/hooks/useNow";
 import { PageThumbnail } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
 import { CommentCount } from "./components/CommentCount";
@@ -89,7 +89,10 @@ export function PageCard({
 	const trigger = useCommentPreview({ eligible: preview !== null });
 	const panelDomId = useId();
 
+	const duplicating = useRef(false);
 	const duplicate = async () => {
+		if (duplicating.current) return;
+		duplicating.current = true;
 		const title = page.title;
 		try {
 			await onDuplicate(
@@ -100,6 +103,8 @@ export function PageCard({
 			toast.error(
 				errorMessage(error, t({ message: "Could not duplicate this page" })),
 			);
+		} finally {
+			duplicating.current = false;
 		}
 	};
 

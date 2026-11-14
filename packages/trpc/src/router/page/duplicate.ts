@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { dbWs } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
 	attachments,
 	pages,
@@ -10,17 +10,13 @@ import { mintPageSlug } from "@superset/shared/page-slug";
 import { pageVersionKey } from "@superset/shared/usercontent";
 import { and, desc, eq } from "drizzle-orm";
 import { userError } from "../../i18n-error";
-import { copyObject } from "../../lib/r2";
+import { detachAll, reapOrphanFiles } from "../../lib/files";
+import { copyObject, deleteObjects } from "../../lib/r2";
 import { pageUrl } from "./page-url";
 import { servedVersion } from "./shared-version";
 import { writePageManifest } from "./storage";
 import { enqueuePageThumbnail } from "./thumbnail";
 
-/**
- * A private page of `userId`'s holding the version `source` serves, as its
- * version 1. Assets are shared with the source by reference; comments,
- * shares, history and the workspace link stay behind.
- */
 export async function duplicatePage({
 	source,
 	title,
@@ -34,19 +30,29 @@ export async function duplicatePage({
 	const key = pageVersionKey(copyId, 1);
 	const copyTitle = title ?? source.title;
 
-	const copy = await dbWs.transaction(async (tx) => {
-		// Held until commit: a concurrent delete of the source waits, so it
-		// cannot reap files this copy is about to reference.
+	const { copy, versionId } = await dbWs.transaction(async (tx) => {
+		// A concurrent delete of the source waits on this lock, so it cannot
+		// reap files this copy is about to reference.
 		const [held] = await tx
-			.select({ id: pages.id })
+			.select({
+				sharedVersion: pages.sharedVersion,
+				takenDownAt: pages.takenDownAt,
+			})
 			.from(pages)
 			.where(eq(pages.id, source.id))
-			.for("share");
+			.for("key share");
 		if (!held) {
 			throw userError({
 				code: "NOT_FOUND",
 				message: "Page not found",
 				i18nKey: "serverError.page.pageNotFound",
+			});
+		}
+		if (held.takenDownAt) {
+			throw userError({
+				code: "FORBIDDEN",
+				message: "This page was taken down and can no longer be changed",
+				i18nKey: "serverError.page.thisPageWasTakenDown",
 			});
 		}
 
@@ -56,10 +62,7 @@ export async function duplicatePage({
 			.where(eq(pageVersions.pageId, source.id))
 			.orderBy(desc(pageVersions.version))
 			.limit(1);
-		const version = servedVersion(
-			source.sharedVersion,
-			latest?.version ?? null,
-		);
+		const version = servedVersion(held.sharedVersion, latest?.version ?? null);
 		const [from] =
 			version === null
 				? []
@@ -138,10 +141,21 @@ export async function duplicatePage({
 			key,
 			contentType: from.contentType,
 		});
-		return page;
+		return { copy: page, versionId: row.id };
 	});
 
-	await writePageManifest(copy.id);
+	try {
+		await writePageManifest(copy.id);
+	} catch (error) {
+		// Without a manifest the origin cannot serve the copy, and a retry
+		// would make a second page instead of repairing this one.
+		await db.delete(pages).where(eq(pages.id, copy.id));
+		await reapOrphanFiles(
+			await detachAll({ parentKind: "page_version", parentIds: [versionId] }),
+		);
+		await deleteObjects([key]);
+		throw error;
+	}
 	void enqueuePageThumbnail({ pageId: copy.id, version: 1 });
 
 	return {

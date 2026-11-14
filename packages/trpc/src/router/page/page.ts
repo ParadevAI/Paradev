@@ -1166,13 +1166,6 @@ export const pageRouter = {
 			const organizationId = await requireActiveOrgMembership(ctx);
 			const userId = ctx.session.user.id;
 			const source = await loadPage({ id: input.id, organizationId, userId });
-			if (source.takenDownAt) {
-				throw userError({
-					code: "FORBIDDEN",
-					message: "This page was taken down and can no longer be changed",
-					i18nKey: "serverError.page.thisPageWasTakenDown",
-				});
-			}
 			return await duplicatePage({ source, title: input.title, userId });
 		}),
 
