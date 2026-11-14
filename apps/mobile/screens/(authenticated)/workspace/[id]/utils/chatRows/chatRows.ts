@@ -81,6 +81,7 @@ export function chatRows(
 ): ChatRow[] {
 	const rows: ChatRow[] = [];
 	const echoed = new Set<string>();
+	const itemKeys = new Set<string>();
 
 	for (const group of groups) {
 		let failureText: string | undefined;
@@ -95,11 +96,11 @@ export function chatRows(
 					const clientId = (entry.item as UserMessage).clientId;
 					if (clientId) echoed.add(clientId);
 				}
-				rows.push({
-					kind: "item",
-					key: transcriptItemKey(entry.item),
-					item: entry.item,
-				});
+				// Older hosts gave every CLI prompt one client id.
+				const itemKey = transcriptItemKey(entry.item);
+				const key = itemKeys.has(itemKey) ? entry.item.id : itemKey;
+				itemKeys.add(key);
+				rows.push({ kind: "item", key, item: entry.item });
 				return;
 			}
 			if (entry.kind === "user_stop") {

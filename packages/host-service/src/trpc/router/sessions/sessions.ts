@@ -12,6 +12,7 @@ import {
 	requireChatSession,
 	requireSessionWorkspace,
 } from "./session-service";
+import { sessionsClientId } from "./utils/sessionsClientId";
 
 const sessionInput = z.object({
 	workspaceId: z.string().uuid(),
@@ -109,10 +110,11 @@ export const sessionsRouter = router({
 					message:
 						"This chat session is stopped. Resume it before sending a prompt.",
 				});
+			const commandId = input.commandId ?? crypto.randomUUID();
 			return chat.commands.prompt({
-				commandId: input.commandId ?? crypto.randomUUID(),
+				commandId,
 				sessionId: input.sessionId,
-				clientId: "superset-sessions",
+				clientId: sessionsClientId(commandId),
 				content: [{ type: "text", text: input.prompt }],
 			});
 		}),
