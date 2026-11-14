@@ -45,6 +45,9 @@ export const TerminalWebView = forwardRef<
 			bounces={false}
 			scrollEnabled={false}
 			setSupportMultipleWindows={false}
+			// Android scales page text by the system font size, so glyphs outgrow
+			// the cells xterm measured and their tops and bottoms are cut off.
+			textZoom={100}
 			keyboardDisplayRequiresUserAction={false}
 			hideKeyboardAccessoryView
 			webviewDebuggingEnabled={__DEV__}
