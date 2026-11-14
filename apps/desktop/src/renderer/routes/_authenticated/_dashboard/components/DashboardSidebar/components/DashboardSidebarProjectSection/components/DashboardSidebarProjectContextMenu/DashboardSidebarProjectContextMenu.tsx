@@ -29,7 +29,7 @@ interface DashboardSidebarProjectContextMenuProps {
 	onCreateSection: () => void;
 	/** Null when the project has no folder or worktrees of its own. */
 	onImportWorktrees: (() => void) | null;
-	onOpenInFinder: (() => void) | null;
+	onOpenInFinder: () => void;
 	onOpenSettings: () => void;
 	onHide: () => void;
 	/** Null when the user cannot delete (not an organization owner). */
@@ -64,12 +64,10 @@ export function DashboardSidebarProjectContextMenu({
 							<Trans>Rename</Trans>
 						</ContextMenuItem>
 						<ContextMenuSeparator />
-						{onOpenInFinder ? (
-							<ContextMenuItem onSelect={onOpenInFinder}>
-								<LuFolderOpen className="size-4 mr-2" />
-								<Trans>Open in Finder</Trans>
-							</ContextMenuItem>
-						) : null}
+						<ContextMenuItem onSelect={onOpenInFinder}>
+							<LuFolderOpen className="size-4 mr-2" />
+							<Trans>Open in Finder</Trans>
+						</ContextMenuItem>
 						<ContextMenuItem onSelect={onOpenSettings}>
 							<LuSettings className="size-4 mr-2" />
 							<Trans>Project Settings</Trans>

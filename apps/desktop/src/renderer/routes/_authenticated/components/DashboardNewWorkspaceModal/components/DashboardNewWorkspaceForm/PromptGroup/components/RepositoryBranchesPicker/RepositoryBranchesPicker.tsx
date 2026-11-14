@@ -157,7 +157,7 @@ export function RepositoryBranchesPicker({
 							repositoryId={active.id}
 							hostId={hostId}
 							selectedBranch={
-								worktrees[active.id] ? null : (baseBranches[active.id] ?? null)
+								worktrees[active.id] ? null : baseBranches[active.id]
 							}
 							onSelect={(branch) => {
 								onBaseBranchChange(active.id, branch);

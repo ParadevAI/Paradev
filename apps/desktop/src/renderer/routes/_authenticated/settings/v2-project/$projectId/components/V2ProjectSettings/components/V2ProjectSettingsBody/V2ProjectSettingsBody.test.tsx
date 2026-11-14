@@ -89,6 +89,7 @@ function renderBody(props: Partial<BodyProps> = {}) {
 					hostOptions={[]}
 					onHostChange={() => {}}
 					onHostProjectChanged={() => {}}
+					onRepositoryRelocated={() => {}}
 					scriptsEditor={<div data-testid="scripts" />}
 					usesConfigToml={false}
 					dangerZone={<div data-testid="danger" />}

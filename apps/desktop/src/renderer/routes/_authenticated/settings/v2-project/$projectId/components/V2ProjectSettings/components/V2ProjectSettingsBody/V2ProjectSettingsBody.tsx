@@ -48,6 +48,7 @@ interface V2ProjectSettingsBodyProps {
 	hostOptions: HostSelectOption[];
 	onHostChange: (hostId: string) => void;
 	onHostProjectChanged: () => unknown;
+	onRepositoryRelocated: () => unknown;
 	scriptsEditor: ReactNode;
 	usesConfigToml: boolean;
 	dangerZone: ReactNode;
@@ -66,6 +67,7 @@ export function V2ProjectSettingsBody({
 	hostOptions,
 	onHostChange,
 	onHostProjectChanged,
+	onRepositoryRelocated,
 	scriptsEditor,
 	usesConfigToml,
 	dangerZone,
@@ -101,7 +103,7 @@ export function V2ProjectSettingsBody({
 			hostUrl={targetHostUrl}
 			hostName={targetHostName}
 			isRemoteTarget={isRemoteTarget}
-			onChanged={() => onHostProjectChanged()}
+			onChanged={() => onRepositoryRelocated()}
 		/>
 	);
 	const updateHostNotice = (

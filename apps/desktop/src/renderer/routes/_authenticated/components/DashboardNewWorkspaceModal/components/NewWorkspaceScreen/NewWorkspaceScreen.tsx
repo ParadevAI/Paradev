@@ -1060,7 +1060,10 @@ export function NewWorkspaceScreen({
 	const isStarting = isCreating || isCreatingProjectEnvironment;
 	const handleSubmit = useCallback(() => {
 		if (isStarting) return;
-		if (needsSetup) return;
+		if (needsSetup) {
+			handleGoToProjectSettings();
+			return;
+		}
 		if (submitBlocker) {
 			if (hostId === machineId && !activeHostUrl) {
 				showHostServiceUnavailableToast(hostService, {
@@ -1086,6 +1089,7 @@ export function NewWorkspaceScreen({
 		setupPlan,
 		runEnvironmentSetup,
 		hostId,
+		handleGoToProjectSettings,
 		hostService,
 		machineId,
 		needsSetup,

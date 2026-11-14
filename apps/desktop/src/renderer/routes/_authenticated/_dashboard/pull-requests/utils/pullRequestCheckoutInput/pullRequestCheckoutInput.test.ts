@@ -1,24 +1,24 @@
 import { expect, test } from "bun:test";
 import { pullRequestCheckoutInput } from "./pullRequestCheckoutInput";
 
-test("names the PR by its repository when known", () => {
+test("starts the PR in the repository's checkout when the repository is known", () => {
 	expect(
 		pullRequestCheckoutInput({
 			prNumber: 4,
 			repoFullName: "o/web",
 			repositoryId: "web",
 		}),
-	).toEqual({ pullRequest: { repository: "o/web", number: 4 } });
+	).toEqual({ checkouts: { web: { pr: 4 } } });
 });
 
-test("falls back to the repository's checkout, then to nothing", () => {
+test("falls back to the repository's GitHub name, then to nothing", () => {
 	expect(
 		pullRequestCheckoutInput({
 			prNumber: 4,
-			repoFullName: null,
-			repositoryId: "web",
+			repoFullName: "o/web",
+			repositoryId: null,
 		}),
-	).toEqual({ checkouts: { web: { pr: 4 } } });
+	).toEqual({ pullRequest: { repository: "o/web", number: 4 } });
 	expect(
 		pullRequestCheckoutInput({
 			prNumber: 4,

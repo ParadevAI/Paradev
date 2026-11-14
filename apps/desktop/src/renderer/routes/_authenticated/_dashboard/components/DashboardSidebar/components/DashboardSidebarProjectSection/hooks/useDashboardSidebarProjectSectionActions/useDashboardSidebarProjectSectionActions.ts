@@ -227,12 +227,26 @@ export function useDashboardSidebarProjectSectionActions({
 			return;
 		}
 		try {
-			const { worktrees } = await getHostServiceClientByUrl(
-				servingHostUrl,
-			).workspaceCreation.listProjectWorktrees.query({
+			const client = getHostServiceClientByUrl(servingHostUrl);
+			// The host moves an adopted worktree into the workspace folder of a
+			// project of several repositories; another tool's folder must stay put.
+			const servedProject = await client.project.get.query({
 				projectId: project.id,
-				repositoryId: primaryRepository.id,
 			});
+			if ((servedProject?.repositories.length ?? 0) > 1) {
+				toast.error(
+					t({
+						message:
+							"Not available on a project of several repositories: importing would move this folder",
+					}),
+				);
+				return;
+			}
+			const { worktrees } =
+				await client.workspaceCreation.listProjectWorktrees.query({
+					projectId: project.id,
+					repositoryId: primaryRepository.id,
+				});
 			// `=== false` also skips hosts too old to report tracked-ness.
 			const untracked = worktrees.filter(
 				(worktree) =>

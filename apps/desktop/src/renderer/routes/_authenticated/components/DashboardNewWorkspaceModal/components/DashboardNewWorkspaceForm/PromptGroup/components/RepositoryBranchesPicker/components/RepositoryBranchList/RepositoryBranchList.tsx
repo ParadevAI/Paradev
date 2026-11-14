@@ -10,7 +10,8 @@ interface RepositoryBranchListProps {
 	projectId: string;
 	repositoryId: string;
 	hostId: string | null;
-	selectedBranch: string | null;
+	/** Undefined marks the default branch; null marks none. */
+	selectedBranch: string | null | undefined;
 	onSelect: (branch: string) => void;
 }
 
@@ -35,7 +36,9 @@ export function RepositoryBranchList({
 		<BranchCommand
 			branches={context.branches}
 			defaultBranch={context.defaultBranch}
-			selectedBranch={selectedBranch ?? context.defaultBranch}
+			selectedBranch={
+				selectedBranch === undefined ? context.defaultBranch : selectedBranch
+			}
 			search={search}
 			onSearchChange={setSearch}
 			filter={filter}

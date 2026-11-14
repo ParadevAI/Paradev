@@ -11,6 +11,7 @@ import {
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
+import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import type { HostSelectOption } from "../../../../components/HostSelect";
 import { DeleteProjectSection } from "./components/DeleteProjectSection";
@@ -35,6 +36,7 @@ export function V2ProjectSettings({
 	const usesConfigToml =
 		useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_CONFIG_TOML) === true;
 	const { machineId } = useLocalHostService();
+	const { ensureProjectInSidebar } = useDashboardSidebarState();
 	const { currentDeviceName, localHostId, otherHosts } =
 		useWorkspaceHostOptions();
 	const targetHostUrl = useHostUrl(hostId);
@@ -171,6 +173,10 @@ export function V2ProjectSettings({
 				});
 			}}
 			onHostProjectChanged={refetchHostProject}
+			onRepositoryRelocated={() => {
+				ensureProjectInSidebar(projectId);
+				void refetchHostProject();
+			}}
 			usesConfigToml={usesConfigToml}
 			scriptsEditor={scriptsEditor}
 			dangerZone={
