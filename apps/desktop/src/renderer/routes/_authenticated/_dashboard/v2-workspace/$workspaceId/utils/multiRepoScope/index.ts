@@ -1,4 +1,5 @@
 export {
+	type BaseBranchSnapshot,
 	baseBranchToRestore,
 	type MultiRepoScopeKind,
 	multiRepoScopeKind,

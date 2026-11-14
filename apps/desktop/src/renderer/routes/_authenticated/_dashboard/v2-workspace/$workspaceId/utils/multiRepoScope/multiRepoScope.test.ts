@@ -97,22 +97,41 @@ describe("pickChangesRepositories", () => {
 });
 
 describe("baseBranchToRestore", () => {
+	const onFeature = (baseBranch: string | null) => ({
+		branch: "feature",
+		baseBranch,
+	});
+
 	test("restores the snapshot when the base changed", () => {
-		expect(baseBranchToRestore({ baseBranch: "release-2" }, "main")).toEqual({
-			baseBranch: "release-2",
-		});
-		expect(baseBranchToRestore({ baseBranch: null }, "main")).toEqual({
+		expect(
+			baseBranchToRestore(onFeature("release-2"), onFeature("main")),
+		).toEqual({ baseBranch: "release-2" });
+		expect(baseBranchToRestore(onFeature(null), onFeature("main"))).toEqual({
 			baseBranch: null,
 		});
 	});
 
 	test("writes nothing without a snapshot", () => {
-		expect(baseBranchToRestore(undefined, "main")).toBeNull();
+		expect(baseBranchToRestore(undefined, onFeature("main"))).toBeNull();
 	});
 
 	test("writes nothing when the base is unchanged", () => {
 		expect(
-			baseBranchToRestore({ baseBranch: "release-2" }, "release-2"),
+			baseBranchToRestore(onFeature("release-2"), onFeature("release-2")),
 		).toBeNull();
+	});
+
+	test("writes nothing when HEAD moved to another branch", () => {
+		expect(
+			baseBranchToRestore(onFeature("release-2"), {
+				branch: "other",
+				baseBranch: "main",
+			}),
+		).toBeNull();
+	});
+
+	test("writes nothing when the snapshot was taken on a detached HEAD", () => {
+		const detached = { branch: null, baseBranch: null };
+		expect(baseBranchToRestore(detached, detached)).toBeNull();
 	});
 });

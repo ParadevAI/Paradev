@@ -10,6 +10,7 @@ import {
 	useWorkspaceLocalStateRow,
 } from "../../state/activeRepositoryStore";
 import {
+	type BaseBranchSnapshot,
 	baseBranchToRestore,
 	type MultiRepoScopeKind,
 	multiRepoScopeKind,
@@ -22,10 +23,11 @@ import { useSetBaseBranch } from "../useSetBaseBranch";
 const NONE: string[] = [];
 const NO_FILTERS: Record<string, ChangesFilter> = {};
 
-type BaseBranchSnapshot = { baseBranch: string | null } | undefined;
-
 /** Base branches taken when a repository became the only one shown, by workspace and repository. */
-const baseBranchSnapshots = new Map<string, Promise<BaseBranchSnapshot>>();
+const baseBranchSnapshots = new Map<
+	string,
+	Promise<BaseBranchSnapshot | undefined>
+>();
 /** Restores still in flight; a new snapshot waits for them so it never takes a value about to be undone. */
 const pendingRestores = new Map<string, Promise<void>>();
 
@@ -64,21 +66,29 @@ export function useChangesRepositoryPicker(
 		[repositoryIds, picked],
 	);
 
+	const readBaseBranch = useCallback(
+		async (repositoryId: string): Promise<BaseBranchSnapshot> => {
+			const input = { workspaceId, repositoryId };
+			const [{ currentBranch }, { baseBranch }] = await Promise.all([
+				utils.git.getBranchSyncStatus.fetch(input, { staleTime: 0 }),
+				utils.git.getBaseBranch.fetch(input, { staleTime: 0 }),
+			]);
+			return { branch: currentBranch, baseBranch };
+		},
+		[utils, workspaceId],
+	);
+
 	const snapshotBaseBranch = useCallback(
 		(repositoryId: string) => {
-			const input = { workspaceId, repositoryId };
 			const key = snapshotKey(workspaceId, repositoryId);
 			baseBranchSnapshots.set(
 				key,
 				(pendingRestores.get(key) ?? Promise.resolve())
-					.then(() => utils.git.getBaseBranch.fetch(input, { staleTime: 0 }))
-					.then(
-						({ baseBranch }): BaseBranchSnapshot => ({ baseBranch }),
-						(): BaseBranchSnapshot => undefined,
-					),
+					.then(() => readBaseBranch(repositoryId))
+					.catch(() => undefined),
 			);
 		},
-		[utils, workspaceId],
+		[workspaceId, readBaseBranch],
 	);
 
 	const restoreBaseBranch = useCallback(
@@ -87,15 +97,16 @@ export function useChangesRepositoryPicker(
 			const snapshot = baseBranchSnapshots.get(key);
 			if (!snapshot) return;
 			baseBranchSnapshots.delete(key);
-			const input = { workspaceId, repositoryId };
 			const restoring = (async () => {
 				const taken = await snapshot;
 				if (!taken) return;
-				const { baseBranch } = await utils.git.getBaseBranch.fetch(input, {
-					staleTime: 0,
-				});
-				const restore = baseBranchToRestore(taken, baseBranch);
-				if (restore) await setBaseBranch({ ...input, ...restore });
+				const restore = baseBranchToRestore(
+					taken,
+					await readBaseBranch(repositoryId),
+				);
+				if (restore) {
+					await setBaseBranch({ workspaceId, repositoryId, ...restore });
+				}
 			})()
 				.catch((error: unknown) => {
 					toast.error(
@@ -108,7 +119,7 @@ export function useChangesRepositoryPicker(
 				});
 			pendingRestores.set(key, restoring);
 		},
-		[utils, workspaceId, setBaseBranch, t],
+		[workspaceId, readBaseBranch, setBaseBranch, t],
 	);
 
 	const pick = useCallback(

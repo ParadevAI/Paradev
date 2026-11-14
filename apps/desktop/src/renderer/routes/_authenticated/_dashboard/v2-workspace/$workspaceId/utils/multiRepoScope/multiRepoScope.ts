@@ -71,14 +71,21 @@ function onlyRepositoryId(shown: Set<string>): string | null {
 	return shown.size === 1 ? ([...shown][0] ?? null) : null;
 }
 
+export interface BaseBranchSnapshot {
+	/** The branch checked out when the base was read; null on a detached HEAD. */
+	branch: string | null;
+	baseBranch: string | null;
+}
+
 /**
- * The base branch to put back, or null when there is no snapshot or the base
- * did not change.
+ * The base branch to put back, or null when there is no snapshot, the base
+ * did not change, or HEAD moved to another branch since the snapshot.
  */
 export function baseBranchToRestore(
-	snapshot: { baseBranch: string | null } | undefined,
-	currentBaseBranch: string | null,
+	snapshot: BaseBranchSnapshot | undefined,
+	current: BaseBranchSnapshot,
 ): { baseBranch: string | null } | null {
-	if (!snapshot || snapshot.baseBranch === currentBaseBranch) return null;
+	if (!snapshot?.branch || snapshot.branch !== current.branch) return null;
+	if (snapshot.baseBranch === current.baseBranch) return null;
 	return { baseBranch: snapshot.baseBranch };
 }

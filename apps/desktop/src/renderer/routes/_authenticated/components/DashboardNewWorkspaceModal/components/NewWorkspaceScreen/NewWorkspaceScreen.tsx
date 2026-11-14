@@ -113,6 +113,7 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
+import { linkedPullRequestsUpdate } from "./utils/linkedPullRequestsUpdate";
 import {
 	type PendingEnvironmentSetup,
 	planEnvironmentSetup,
@@ -508,21 +509,12 @@ export function NewWorkspaceScreen({
 	});
 	const linkedPRUrl = isMultiRepoProject ? (linkedPR?.url ?? null) : null;
 	useEffect(() => {
-		if (linkedPRUrl === null) {
-			if (draft.checkoutPullRequestsFor !== null) {
-				updateDraft({
-					checkoutPullRequests: {},
-					checkoutPullRequestsFor: null,
-				});
-			}
-			return;
-		}
-		if (draft.checkoutPullRequestsFor === linkedPRUrl) return;
-		if (!checkoutPullRequests.data) return;
-		updateDraft({
-			checkoutPullRequests: checkoutPullRequests.data,
-			checkoutPullRequestsFor: linkedPRUrl,
+		const update = linkedPullRequestsUpdate({
+			linkedPRUrl,
+			appliedFor: draft.checkoutPullRequestsFor,
+			found: checkoutPullRequests.data,
 		});
+		if (update) updateDraft(update);
 	}, [
 		linkedPRUrl,
 		draft.checkoutPullRequestsFor,

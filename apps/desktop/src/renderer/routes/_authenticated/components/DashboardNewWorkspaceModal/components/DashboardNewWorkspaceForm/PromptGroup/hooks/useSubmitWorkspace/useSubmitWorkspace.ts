@@ -48,9 +48,9 @@ export function useSubmitWorkspace(
 	selectedMode: string | null,
 	uploadAttachments: UseUploadAttachmentsApi,
 	promptContext: NewWorkspacePromptContextApi,
-	cloudEnvironmentId: string | null = null,
-	hostId: string | null = null,
-	isSession = false,
+	cloudEnvironmentId: string | null,
+	hostId: string | null,
+	isSession: boolean,
 	{
 		primaryRepositoryId,
 		isMultiRepo,
@@ -61,10 +61,6 @@ export function useSubmitWorkspace(
 		isMultiRepo: boolean;
 		repositoryIds: readonly string[];
 		githubNames?: Readonly<Record<string, string | null>>;
-	} = {
-		primaryRepositoryId: null,
-		isMultiRepo: false,
-		repositoryIds: [],
 	},
 ) {
 	const { t } = useLingui();

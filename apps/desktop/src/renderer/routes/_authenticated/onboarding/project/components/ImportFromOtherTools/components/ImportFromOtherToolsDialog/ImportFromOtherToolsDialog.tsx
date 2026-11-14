@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { Checkbox } from "@superset/ui/checkbox";
 import {
@@ -20,7 +21,10 @@ import {
 } from "react-icons/lu";
 import { track } from "renderer/lib/analytics";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import type { ExternalWorktreeOffer } from "../../hooks/useExternalWorktrees";
 import { ToolIcon } from "../ToolIcon";
@@ -58,6 +62,8 @@ export function ImportFromOtherToolsDialog({
 			? `~${path.slice(homeDir.length)}`
 			: path;
 	const { submit } = useWorkspaceCreates();
+	const hostService = useLocalHostService();
+	const { waitForHostReady } = hostService;
 	const folderImport = useFolderFirstImport({
 		onError: (message) => toast.error(message),
 	});
@@ -87,6 +93,32 @@ export function ImportFromOtherToolsDialog({
 			return next;
 		});
 
+	// The host moves an adopted worktree into the workspace folder of a
+	// project of several repositories; another tool's folder must stay put.
+	const multiRepoRefusal = async (
+		projectId: string,
+	): Promise<string | null> => {
+		try {
+			const hostUrl = await waitForHostReady();
+			if (!hostUrl) {
+				return getHostServiceUnavailableMessage(hostService, {
+					action: "importFolder",
+				});
+			}
+			const project = await getHostServiceClientByUrl(
+				hostUrl,
+			).project.get.query({ projectId });
+			return (project?.repositories.length ?? 0) > 1
+				? t({
+						message:
+							"Not available on a project of several repositories: importing would move this folder",
+					})
+				: null;
+		} catch (error) {
+			return errorMessage(error);
+		}
+	};
+
 	const handleImport = async () => {
 		setPhase("importing");
 		setStatus(
@@ -109,6 +141,13 @@ export function ImportFromOtherToolsDialog({
 						state: "failed",
 						error: t`Couldn't add this repo`,
 					});
+				}
+				continue;
+			}
+			const refusal = await multiRepoRefusal(project.projectId);
+			if (refusal) {
+				for (const worktree of worktrees) {
+					setItem(worktree.path, { state: "failed", error: refusal });
 				}
 				continue;
 			}
