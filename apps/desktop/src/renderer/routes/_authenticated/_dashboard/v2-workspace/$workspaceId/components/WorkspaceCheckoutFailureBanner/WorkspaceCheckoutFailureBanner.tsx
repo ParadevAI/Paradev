@@ -14,7 +14,7 @@ export function WorkspaceCheckoutFailureBanner({
 		{ id: workspaceId },
 		{
 			refetchInterval: (query) =>
-				query.state.data?.checkouts.some(
+				query.state.data?.checkouts?.some(
 					(checkout) => checkout.boxCheckout?.state === "cloning",
 				)
 					? POLL_MS
@@ -24,7 +24,7 @@ export function WorkspaceCheckoutFailureBanner({
 	if (!data || dismissedId === workspaceId) return null;
 	return (
 		<CheckoutFailureNotice
-			checkouts={data.checkouts}
+			checkouts={data.checkouts ?? []}
 			onDismiss={() => setDismissedId(workspaceId)}
 		/>
 	);

@@ -1,6 +1,7 @@
 /**
  * The pick that also shows `repositoryId`, keeping the repositories already
- * shown; null when it is shown already or is not a checkout of the workspace.
+ * shown (`[]` once that is every one); null when it is shown already or is not
+ * a checkout of the workspace.
  */
 export function pickShowingRepository(
 	repositoryIds: string[],
@@ -9,5 +10,8 @@ export function pickShowingRepository(
 ): string[] | null {
 	if (!repositoryId || shown.has(repositoryId)) return null;
 	if (!repositoryIds.includes(repositoryId)) return null;
-	return repositoryIds.filter((id) => id === repositoryId || shown.has(id));
+	const picked = repositoryIds.filter(
+		(id) => id === repositoryId || shown.has(id),
+	);
+	return picked.length === repositoryIds.length ? [] : picked;
 }

@@ -20,3 +20,9 @@ test("leaves the pick when the repository is shown or unknown", () => {
 		pickShowingRepository(repositoryIds, new Set(["api"]), undefined),
 	).toBeNull();
 });
+
+test("shows every repository once the pick covers them all", () => {
+	expect(
+		pickShowingRepository(["api", "web"], new Set(["web"]), "api"),
+	).toEqual([]);
+});
