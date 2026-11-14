@@ -57,6 +57,7 @@ import {
 import { pageAssetRouter } from "./assets";
 import { withCommentSummaries } from "./comment-summary";
 import { decodePageCursor, encodePageCursor } from "./cursor";
+import { duplicatePage } from "./duplicate";
 import { noPageAccess, pageCaller, pageReader } from "./page-caller";
 import { pageUrl } from "./page-url";
 import { pagePreview } from "./preview";
@@ -74,6 +75,7 @@ import {
 	clearPageWatchSchema,
 	createPageSchema,
 	deletePageSchema,
+	duplicatePageSchema,
 	type ListPagesInput,
 	legacyListPagesSchema,
 	listPagesSchema,
@@ -1156,6 +1158,15 @@ export const pageRouter = {
 			await wipePageStorage(page.id);
 
 			return { id: page.id, deleted: true };
+		}),
+
+	duplicate: personProcedure
+		.input(duplicatePageSchema)
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			const userId = ctx.session.user.id;
+			const source = await loadPage({ id: input.id, organizationId, userId });
+			return await duplicatePage({ source, title: input.title, userId });
 		}),
 
 	versions: actorProcedure
