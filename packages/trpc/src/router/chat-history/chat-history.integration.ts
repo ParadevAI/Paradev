@@ -1163,32 +1163,6 @@ describe("chat moves", () => {
 		expect(retried.moveId).not.toBe(toDesktop.moveId);
 	});
 
-	test("a claim whose answer was lost fails the move, rather than leaving it copying", async () => {
-		const sessionId = await chatOnLaptop();
-		const move = await createChatMove({
-			chatSessionId: sessionId,
-			fromHostId: LAPTOP,
-			toWorkspaceId: MY_CLOUD,
-			organizationId: ORG,
-			userId: USER,
-		});
-		await expect(
-			withMoveStore(
-				async (organizationId, request) => {
-					const response = await localMoves(organizationId, request);
-					if (request.op === "claim") throw new Error("answer lost");
-					return response;
-				},
-				() =>
-					runChatMove({ organizationId: ORG, moveId: move.id }, fakeHosts()),
-			),
-		).rejects.toThrow();
-		expect((await moveOf(move.id)).status).toBe("failed");
-		expect(
-			await runChatMove({ organizationId: ORG, moveId: move.id }, fakeHosts()),
-		).toBe("skipped");
-	});
-
 	test("the box a chat left is told the chat moved", async () => {
 		const sessionId = newSession();
 		const box = callerFor(USER, MY_CLOUD);

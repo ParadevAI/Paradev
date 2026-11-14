@@ -47,21 +47,7 @@ export async function runChatMove(
 	job: { organizationId: string; moveId: string },
 	deps: RunChatMoveDeps = { hostFor: workspaceHost },
 ): Promise<"ready" | "failed" | "skipped"> {
-	const move = await claimMove(job.organizationId, job.moveId).catch(
-		async (error: unknown) => {
-			// A claim whose answer was lost leaves the move copying, and a redelivery finds nothing to claim.
-			await failChatMove(
-				{ organizationId: job.organizationId, id: job.moveId },
-				error,
-			).catch((failError: unknown) =>
-				console.error(
-					`[chat-move] could not fail move ${job.moveId} after its claim failed`,
-					failError,
-				),
-			);
-			throw error;
-		},
-	);
+	const move = await claimMove(job.organizationId, job.moveId);
 	if (!move) return "skipped";
 	try {
 		if (move.toHostId) {
