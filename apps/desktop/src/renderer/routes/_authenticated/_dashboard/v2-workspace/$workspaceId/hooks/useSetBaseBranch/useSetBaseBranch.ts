@@ -5,12 +5,12 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback } from "react";
 import { checkoutInput } from "../../utils/checkoutInput";
 
-/** Sets a checkout's base branch and refreshes that checkout's diff. */
+/** Sets a checkout's base branch and refreshes that checkout's diff; settles once the host answered. */
 export function useSetBaseBranch(): (input: {
 	workspaceId: string;
 	repositoryId?: string;
 	baseBranch: string | null;
-}) => void {
+}) => Promise<void> {
 	const { t } = useLingui();
 	const utils = workspaceTrpc.useUtils();
 	const mutation = workspaceTrpc.git.setBaseBranch.useMutation({
@@ -31,6 +31,13 @@ export function useSetBaseBranch(): (input: {
 				errorMessage(error, t({ message: "Failed to change base branch" })),
 			),
 	});
-	const { mutate } = mutation;
-	return useCallback((input) => mutate(input), [mutate]);
+	const { mutateAsync } = mutation;
+	return useCallback(
+		(input) =>
+			mutateAsync(input).then(
+				() => undefined,
+				() => undefined,
+			),
+		[mutateAsync],
+	);
 }

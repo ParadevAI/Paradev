@@ -26,6 +26,8 @@ type BaseBranchSnapshot = { baseBranch: string | null } | undefined;
 
 /** Base branches taken when a repository became the only one shown, by workspace and repository. */
 const baseBranchSnapshots = new Map<string, Promise<BaseBranchSnapshot>>();
+/** Restores still in flight; a new snapshot waits for them so it never takes a value about to be undone. */
+const pendingRestores = new Map<string, Promise<void>>();
 
 function snapshotKey(workspaceId: string, repositoryId: string): string {
 	return JSON.stringify([workspaceId, repositoryId]);
@@ -65,12 +67,15 @@ export function useChangesRepositoryPicker(
 	const snapshotBaseBranch = useCallback(
 		(repositoryId: string) => {
 			const input = { workspaceId, repositoryId };
+			const key = snapshotKey(workspaceId, repositoryId);
 			baseBranchSnapshots.set(
-				snapshotKey(workspaceId, repositoryId),
-				utils.git.getBaseBranch.fetch(input).then(
-					({ baseBranch }): BaseBranchSnapshot => ({ baseBranch }),
-					(): BaseBranchSnapshot => undefined,
-				),
+				key,
+				(pendingRestores.get(key) ?? Promise.resolve())
+					.then(() => utils.git.getBaseBranch.fetch(input, { staleTime: 0 }))
+					.then(
+						({ baseBranch }): BaseBranchSnapshot => ({ baseBranch }),
+						(): BaseBranchSnapshot => undefined,
+					),
 			);
 		},
 		[utils, workspaceId],
@@ -83,17 +88,25 @@ export function useChangesRepositoryPicker(
 			if (!snapshot) return;
 			baseBranchSnapshots.delete(key);
 			const input = { workspaceId, repositoryId };
-			void (async () => {
+			const restoring = (async () => {
 				const taken = await snapshot;
 				if (!taken) return;
-				const { baseBranch } = await utils.git.getBaseBranch.fetch(input);
+				const { baseBranch } = await utils.git.getBaseBranch.fetch(input, {
+					staleTime: 0,
+				});
 				const restore = baseBranchToRestore(taken, baseBranch);
-				if (restore) setBaseBranch({ ...input, ...restore });
-			})().catch((error: unknown) =>
-				toast.error(
-					errorMessage(error, t({ message: "Failed to change base branch" })),
-				),
-			);
+				if (restore) await setBaseBranch({ ...input, ...restore });
+			})()
+				.catch((error: unknown) => {
+					toast.error(
+						errorMessage(error, t({ message: "Failed to change base branch" })),
+					);
+				})
+				.finally(() => {
+					if (pendingRestores.get(key) === restoring)
+						pendingRestores.delete(key);
+				});
+			pendingRestores.set(key, restoring);
 		},
 		[utils, workspaceId, setBaseBranch, t],
 	);
