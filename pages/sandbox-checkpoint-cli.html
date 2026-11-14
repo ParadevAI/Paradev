@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Saving a checkpoint from inside a cloud box</title>
+    <style>
+      main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+      .lede { font-size: 1.1rem; color: var(--sp-muted); max-width: var(--sp-measure); }
+      .tldr { background: var(--sp-surface); border-left: 3px solid var(--sp-chart-1); padding: 1rem 1.25rem; border-radius: var(--sp-radius); }
+      .tldr p { margin: .35rem 0; }
+      .wrap { overflow-x: auto; }
+      table { width: 100%; }
+      td code, li code, p code { white-space: nowrap; }
+      .tag { font-size: .75rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--sp-muted); }
+      ol.flow li { margin-bottom: .5rem; }
+      .opt { border-top: 1px solid var(--sp-border); padding-top: 1rem; margin-top: 1.25rem; }
+      .opt h3 { margin-top: 0; }
+      .rec { color: var(--sp-chart-2); font-weight: 600; }
+    </style>
+  </head>
+  <body class="auto">
+    <main>
+      <p class="tag">Investigation · 2026-11-14 · from the #C0BUF5V2S83 thread</p>
+      <h1>Saving a checkpoint from inside a cloud box</h1>
+      <p class="lede">Avi tried to save a checkpoint on a box and could not. The guess in the thread was that the box ships an old CLI. That is not the cause. The box runs current code. The checkpoint command is blocked inside a box on purpose, in two places.</p>
+
+      <div class="tldr">
+        <p><strong>1. The box CLI is not stale.</strong> Boxes get a <code>superset</code> binary built from <code>main</code> by the nightly sandbox release. This box has <code>superset-2.0.8</code> and <code>host-service-2.0.8+65dea8b3</code> (main as of 2026-11-13 17:57 PT). Updating the sandbox would change nothing.</p>
+        <p><strong>2. Checkpoint save is in the CLI, but hidden in a box.</strong> The command is <code>superset environments replace &lt;env&gt; --workspace &lt;ws&gt;</code>. It is tagged <code>sandbox: false</code>, so in a box it prints <code>Unknown command: replace</code>. The API also refuses <code>environment.promote</code> from a box credential.</p>
+        <p><strong>3. The real bug is new.</strong> #9707 (merged 2026-11-13) added "Set up Environment" in a cloud chat. It runs the <code>superset:environment</code> skill <em>inside the box</em>. Step 5 of that skill is the checkpoint command, which cannot work there.</p>
+      </div>
+
+      <h2>1. Which CLI the box ships, and where it is set</h2>
+      <p>Checked on this box (<code>SUPERSET_SANDBOX_WORKSPACE_ID=65bbe9f8…</code>, image tag <code>env-internal-mwfrhk47</code>):</p>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Asset</th><th>On the box</th><th>Committed row in <code>assets.json</code></th></tr></thead>
+          <tbody>
+            <tr><td><code>superset</code> CLI</td><td><code>2.0.8</code> (<code>superset --version</code>)</td><td><code>1.35.0</code></td></tr>
+            <tr><td>host-service</td><td><code>2.0.8+65dea8b3</code></td><td><code>1.29.0+bfc1ec72a</code></td></tr>
+            <tr><td>Claude Code</td><td><code>2.1.311</code></td><td><code>2.1.280</code></td></tr>
+            <tr><td>Codex</td><td><code>0.169.0</code></td><td><code>0.162.1</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The committed rows are only a floor for PR boot tests. The real versions are set at release time:</p>
+      <ul>
+        <li><code>packages/sandbox/src/assets/produce.ts:405</code>: <code>cli()</code> builds <code>packages/cli</code> from the release checkout. It names the file with the version in <code>packages/cli/package.json</code>, so the label stays <code>2.0.8</code> even when the code is newer than the <code>cli-v2.0.8</code> tag.</li>
+        <li><code>.github/workflows/sandbox.yml:17</code>: <code>production-release</code> runs <code>bun run release --production</code> from <code>main</code> every night at 09:00 UTC, and on merges that touch <code>packages/sandbox/**</code>.</li>
+        <li><code>packages/sandbox/bundle/steps/install-cli.sh</code> links that binary to <code>/usr/local/bin/superset</code> and <code>paradev</code> on every boot.</li>
+      </ul>
+      <p>Note: the version label cannot tell you how fresh a box CLI is. The host-service suffix (<code>+65dea8b3</code>) is the commit to check. That build already includes #9707 and the <code>replace</code> command.</p>
+
+      <h2>2. Is checkpoint save in the CLI?</h2>
+      <p>Yes, since #7913 (2026-09). Two commands call <code>environment.promote</code>:</p>
+      <ul>
+        <li><code>superset environments replace &lt;env-id&gt; --workspace &lt;ws-id&gt; --yes</code>: saves a checkpoint into an existing environment. This is the same call as the desktop "Save checkpoint" menu item (<code>SaveCheckpointDialog.tsx</code>).</li>
+        <li><code>superset environments save --workspace &lt;ws-id&gt; --name &lt;name&gt;</code>: saves the box as a new environment.</li>
+      </ul>
+      <p>Both work from a laptop. Inside a box they are blocked twice:</p>
+      <ol class="flow">
+        <li><strong>The CLI hides them.</strong> <code>packages/cli/src/commands/environments/replace/command.ts:10</code> sets <code>sandbox: false</code>. <code>packages/cli/cli.config.ts:35</code> treats any process with <code>SUPERSET_SANDBOX_WORKSPACE_ID</code> as a box, and <code>packages/cli-framework/src/router.ts:43</code> removes those commands from the tree. Added in #7794: "visibility only; the API keeps enforcing". Verified here: <code>superset environments --help</code> lists only <code>list</code> and <code>secrets</code>.</li>
+        <li><strong>The API refuses them.</strong> A box calls the API with the box credential. <code>packages/trpc/src/trpc.ts:127</code> rejects any path that is not in <code>SANDBOX_ALLOWED_PROCEDURES</code> (<code>packages/trpc/src/lib/sandbox/api-credential.ts:25</code>). That list has <code>environment.get</code>, <code>list</code> and <code>secrets.list</code>, but not <code>environment.promote</code>.</li>
+      </ol>
+
+      <h2>3. Why this showed up now</h2>
+      <p>The <code>superset:environment</code> skill was written to run on the user's machine (<code>plugins/superset/skills/environment/SKILL.md:10</code>: "You run on the user's machine with their Paradev login. You build the environment by driving a cloud box from here.").</p>
+      <p>#9707 added a "Set up Environment" chip to cloud chats and the new-workspace screen. Its prompt (<code>apps/desktop/src/renderer/routes/_authenticated/utils/environmentSetupPrompt/environmentSetupPrompt.ts:8</code>) says: "You are already in a box on that environment, so set it up here instead of starting another box." So the agent runs the skill inside the box. Steps 1–4 work. Step 5 (<code>environments replace</code>) cannot. #9707 is not in the <code>cli-v2.0.8</code> / desktop 2.0.8 tag, but it is in the box build, and anyone on canary or dev hits it.</p>
+
+      <h2>4. Why this is not a one-line fix</h2>
+      <p>Removing <code>sandbox: false</code> and adding <code>environment.promote</code> to the allowlist would let the call through, but the box would kill its own caller:</p>
+      <ul>
+        <li><code>promoteSandboxToEnvironment</code> (<code>packages/trpc/src/lib/sandbox/vercel.ts:571</code>) runs <code>source.snapshot()</code>, which stops the box. The CLI process waiting for the reply, the agent that ran it, and its terminal all stop. The request takes about 50 s, and the client is gone before the reply. Then <code>runBoot</code> starts the box again.</li>
+        <li>The box credential acts as the creator but anything in the box can use it (comment on <code>sandboxProcedure</code>). If <code>promote</code> into an <code>organization</code>-scoped environment were allowed, code in one box could replace the golden that every new workspace forks from. The allowlist leaves it out on purpose.</li>
+      </ul>
+      <p>So I did not open a PR.</p>
+
+      <h2>Options</h2>
+      <div class="opt">
+        <h3>A. Hand the checkpoint back to the person <span class="rec">· recommended now</span></h3>
+        <p>Change step 5 of the skill: when <code>SUPERSET_SANDBOX_WORKSPACE_ID</code> is set, the agent stops and asks the user to click <strong>… → Save checkpoint</strong> on the workspace (added in #9707), or to run <code>superset environments replace</code> from their laptop. Also fix line 10 of the skill so it covers both places it runs. This is a skill change and a <code>superset plugins publish superset --bump patch</code>, with no API change. Small, but it changes the setup flow, so the owner of #9707 should agree first.</p>
+      </div>
+      <div class="opt">
+        <h3>B. Let a box ask for its own checkpoint, done after the reply</h3>
+        <p>Add a sandbox procedure such as <code>environment.requestCheckpoint</code> to <code>SANDBOX_ALLOWED_PROCEDURES</code>. It accepts only the caller's own workspace (<code>ctx.sandboxWorkspace.id</code>) and only that workspace's own environment, and only when the environment is <code>personal</code> and owned by the creator. It returns at once and runs the promote in the background (a job, not inside the request). Then show <code>environments replace</code> in a box again, routed to this procedure, with a message that the box restarts now. The chat on the box must resume after the restart, so check that chat sessions survive a stop and wake. This needs a <code>trpc-compat</code> review and a host-service/sandbox release.</p>
+      </div>
+      <div class="opt">
+        <h3>C. Run the setup agent outside the box</h3>
+        <p>Make the chip start the setup in a local chat that drives the box, as the skill was written for. This works with no API change, but it undoes the in-box setup that #9707 added and needs a local host.</p>
+      </div>
+
+      <h2>Next steps</h2>
+      <ol>
+        <li>Tell the thread: the box CLI is current; checkpoint save is blocked in boxes by design, and the in-box setup flow from #9707 needs it. For now, save with <strong>… → Save checkpoint</strong> in the desktop app, or run <code>superset environments replace &lt;env&gt; --workspace &lt;ws&gt; --yes</code> from a laptop.</li>
+        <li>Decide between A (now) and B (later) with the owner of #9707.</li>
+        <li>Add this case to <code>docs/cloud-sandbox-mismatches.md</code> under "Identity and ownership".</li>
+        <li>Optional: put the build commit in the box CLI version label (as host-service does), so "is the box current?" can be answered from <code>superset --version</code>.</li>
+      </ol>
+    </main>
+  </body>
+</html>
