@@ -17,6 +17,7 @@ import {
 import { MENU_ROW_CLASS } from "../../../../constants";
 import { useFavoriteModels } from "../../hooks/useFavoriteModels";
 import type { AgentSwitcher } from "../../types";
+import { favoriteRows } from "./utils/favoriteRows";
 
 type Row = {
 	presetId: string;
@@ -82,11 +83,11 @@ export function ModelPanel({
 	};
 	const onFavoritesTab = tab === FAVORITES_TAB;
 	const rows: Row[] = onFavoritesTab
-		? favorites.flatMap((favorite) => {
-				const agent = agentSwitcher?.agents.find(
-					(entry) => entry.presetId === favorite.presetId,
-				);
-				return agent ? [{ ...favorite, agentLabel: agent.label }] : [];
+		? favoriteRows({
+				favorites,
+				agents: agentSwitcher?.agents ?? [],
+				currentPresetId,
+				model,
 			})
 		: rowsFor(tab);
 	const pickRow = (row: Row) => {
