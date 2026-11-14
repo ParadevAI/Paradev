@@ -1,1 +1,0 @@
-ALTER TABLE `workspaces` ADD `branch_since` integer;

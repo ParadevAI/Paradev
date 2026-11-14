@@ -274,13 +274,6 @@
       "when": 1792467855578,
       "tag": "0038_mobile_devices",
       "breakpoints": true
-    },
-    {
-      "idx": 39,
-      "version": "6",
-      "when": 1794592182741,
-      "tag": "0039_workspace_branch_since",
-      "breakpoints": true
     }
   ]
 }

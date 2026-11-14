@@ -40,8 +40,6 @@ export interface GitHubPullRequestNode {
 	updatedAt: string;
 	/** GitHub's `merged_at` parsed to epoch ms; null when absent or unparseable. */
 	mergedAt: number | null;
-	/** GitHub's `closed_at` parsed to epoch ms; set for merged PRs too. */
-	closedAt: number | null;
 }
 
 export type GitHubPullRequestReviewDecision =

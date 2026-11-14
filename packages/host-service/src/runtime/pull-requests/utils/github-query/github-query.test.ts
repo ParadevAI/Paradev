@@ -5,7 +5,7 @@ import {
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecisionFromGh,
-	parseGitHubTimestamp,
+	parseMergedAt,
 } from "./github-query";
 
 interface GhCall {
@@ -72,7 +72,6 @@ describe("GitHub pull request REST queries", () => {
 			headRepository: { name: "superset" },
 			updatedAt: "2026-05-08T12:00:00Z",
 			mergedAt: null,
-			closedAt: null,
 		});
 		expect(calls).toEqual([
 			{
@@ -554,16 +553,16 @@ describe("GitHub pull request REST queries", () => {
 // same payload lands on a different instant per host, and an impossible
 // calendar date rolls forward into a real one. Both would be stored as if
 // GitHub had reported them.
-describe("parseGitHubTimestamp", () => {
+describe("parseMergedAt", () => {
 	test("accepts the ISO 8601 UTC timestamps GitHub sends", () => {
-		expect(parseGitHubTimestamp("2026-05-01T10:00:00Z")).toBe(
+		expect(parseMergedAt("2026-05-01T10:00:00Z")).toBe(
 			Date.parse("2026-05-01T10:00:00Z"),
 		);
-		expect(parseGitHubTimestamp("2026-05-01T10:00:00.123Z")).toBe(
+		expect(parseMergedAt("2026-05-01T10:00:00.123Z")).toBe(
 			Date.parse("2026-05-01T10:00:00.123Z"),
 		);
 		// A real leap day stays a real leap day.
-		expect(parseGitHubTimestamp("2028-02-29T10:00:00Z")).toBe(
+		expect(parseMergedAt("2028-02-29T10:00:00Z")).toBe(
 			Date.parse("2028-02-29T10:00:00Z"),
 		);
 	});
@@ -571,24 +570,24 @@ describe("parseGitHubTimestamp", () => {
 	test("rejects a calendar date that does not exist", () => {
 		// Date.parse rolls February 31st forward to March 3rd.
 		expect(Date.parse("2026-02-31T10:00:00Z")).not.toBeNaN();
-		expect(parseGitHubTimestamp("2026-02-31T10:00:00Z")).toBeNull();
-		expect(parseGitHubTimestamp("2026-04-31T00:00:00Z")).toBeNull();
-		expect(parseGitHubTimestamp("2026-02-29T10:00:00Z")).toBeNull();
+		expect(parseMergedAt("2026-02-31T10:00:00Z")).toBeNull();
+		expect(parseMergedAt("2026-04-31T00:00:00Z")).toBeNull();
+		expect(parseMergedAt("2026-02-29T10:00:00Z")).toBeNull();
 	});
 
 	test("rejects timestamps outside GitHub's format", () => {
 		// No zone marker: the instant would depend on the host's timezone.
-		expect(parseGitHubTimestamp("2026-05-01T10:00:00")).toBeNull();
-		expect(parseGitHubTimestamp("2026-05-01 10:00:00")).toBeNull();
-		expect(parseGitHubTimestamp("2026-05-01")).toBeNull();
-		expect(parseGitHubTimestamp("2026")).toBeNull();
-		expect(parseGitHubTimestamp("May 1, 2026")).toBeNull();
-		expect(parseGitHubTimestamp("Fri, 01 May 2026 10:00:00 GMT")).toBeNull();
-		expect(parseGitHubTimestamp("not-a-date")).toBeNull();
+		expect(parseMergedAt("2026-05-01T10:00:00")).toBeNull();
+		expect(parseMergedAt("2026-05-01 10:00:00")).toBeNull();
+		expect(parseMergedAt("2026-05-01")).toBeNull();
+		expect(parseMergedAt("2026")).toBeNull();
+		expect(parseMergedAt("May 1, 2026")).toBeNull();
+		expect(parseMergedAt("Fri, 01 May 2026 10:00:00 GMT")).toBeNull();
+		expect(parseMergedAt("not-a-date")).toBeNull();
 	});
 
 	test("reports no merge time for an absent merged_at", () => {
-		expect(parseGitHubTimestamp(null)).toBeNull();
-		expect(parseGitHubTimestamp("")).toBeNull();
+		expect(parseMergedAt(null)).toBeNull();
+		expect(parseMergedAt("")).toBeNull();
 	});
 });

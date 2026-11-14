@@ -57,8 +57,6 @@ function seedWorkspace(
 		upstreamBranch?: string | null;
 		pullRequestId?: string | null;
 		worktreePath?: string;
-		createdAt?: number;
-		branchSince?: number | null;
 	},
 ) {
 	db.insert(schema.workspaces)
@@ -67,8 +65,7 @@ function seedWorkspace(
 			projectId: PROJECT_ID,
 			worktreePath: w.worktreePath ?? `/repo/.worktrees/${w.id}`,
 			branch: w.branch,
-			createdAt: w.createdAt ?? Date.now(),
-			branchSince: w.branchSince ?? null,
+			createdAt: Date.now(),
 			headSha: w.headSha ?? null,
 			upstreamOwner: w.upstreamOwner ?? null,
 			upstreamRepo: w.upstreamRepo ?? null,
@@ -195,7 +192,6 @@ function makePrNode(pr: {
 	title?: string;
 	state?: "open" | "closed";
 	mergedAt?: string | null;
-	closedAt?: string | null;
 }) {
 	return {
 		number: pr.number,
@@ -204,7 +200,6 @@ function makePrNode(pr: {
 		state: pr.state ?? "open",
 		draft: false,
 		merged_at: pr.mergedAt ?? null,
-		closed_at: pr.closedAt ?? pr.mergedAt ?? null,
 		updated_at: "2026-05-08T12:00:00Z",
 		head: {
 			ref: pr.headRef,
@@ -1792,289 +1787,6 @@ describe("default-branch guard", () => {
 		expect(getWorkspace(db, "ws-fork")?.pullRequestId).toBe(
 			getPrByNumber(db, 88)?.id,
 		);
-	});
-});
-
-describe("earlier use of a branch name", () => {
-	const WORKSPACE_CREATED_AT = Date.parse("2026-11-13T17:00:00Z");
-	const OLD_RELEASE_PR = {
-		number: 515,
-		headRef: "release",
-		headSha: "old-release-sha",
-		title: "chore(desktop): bump version to 0.0.37",
-		state: "closed" as const,
-		mergedAt: "2025-12-27T08:33:59Z",
-	};
-
-	function seedReleaseWorkspace(
-		db: HostDb,
-		w: { headSha: string; pullRequestId?: string },
-	) {
-		seedWorkspace(db, {
-			id: "ws-release",
-			branch: "release",
-			headSha: w.headSha,
-			upstreamOwner: REPO.owner,
-			upstreamRepo: REPO.name,
-			upstreamBranch: "release",
-			pullRequestId: w.pullRequestId,
-			createdAt: WORKSPACE_CREATED_AT,
-		});
-	}
-
-	async function historyNumbers(manager: PullRequestRuntimeManager) {
-		const [entry] = await manager.getPullRequestHistoryByWorkspaces([
-			"ws-release",
-		]);
-		return entry?.pullRequests.map((pr) => pr.number) ?? [];
-	}
-
-	test("drops a PR that merged before the workspace existed from its link and history", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedPullRequest(db, {
-			id: "pr-old-release",
-			prNumber: 515,
-			headBranch: "release",
-			headSha: "old-release-sha",
-			state: "merged",
-			mergedAt: Date.parse("2025-12-27T08:33:59Z"),
-		});
-		seedReleaseWorkspace(db, {
-			headSha: "workspace-sha",
-			pullRequestId: "pr-old-release",
-		});
-		db.insert(schema.workspacePullRequests)
-			.values({
-				workspaceId: "ws-release",
-				pullRequestId: "pr-old-release",
-				linkedAt: WORKSPACE_CREATED_AT + 1_000,
-			})
-			.run();
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBeNull();
-		expect(await historyNumbers(manager)).toEqual([]);
-	});
-
-	test("does not link a PR that was closed without merging before the workspace existed", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedReleaseWorkspace(db, { headSha: "workspace-sha" });
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({
-				release: makePrNode({
-					number: 85,
-					headRef: "release",
-					headSha: "old-release-sha",
-					state: "closed",
-					closedAt: "2025-11-19T17:33:23Z",
-				}),
-			}),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBeNull();
-		expect(await historyNumbers(manager)).toEqual([]);
-	});
-
-	test("still links an old merged PR while the workspace sits on its head", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedReleaseWorkspace(db, { headSha: "old-release-sha" });
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBe(
-			getPrByNumber(db, 515)?.id,
-		);
-	});
-
-	test("still links a PR that merged after the workspace was created", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedReleaseWorkspace(db, { headSha: "workspace-sha" });
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({
-				release: makePrNode({
-					...OLD_RELEASE_PR,
-					number: 600,
-					mergedAt: "2026-11-13T18:00:00Z",
-				}),
-			}),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBe(
-			getPrByNumber(db, 600)?.id,
-		);
-	});
-
-	test("a long-lived workspace that moves onto the branch after the PR merged does not link it", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedWorkspace(db, {
-			id: "ws-release",
-			branch: "feature",
-			headSha: "workspace-sha",
-			upstreamOwner: REPO.owner,
-			upstreamRepo: REPO.name,
-			upstreamBranch: "feature",
-			createdAt: Date.parse("2025-01-01T00:00:00Z"),
-			branchSince: Date.parse("2025-01-01T00:00:00Z"),
-		});
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
-			readWorkspaceRefs: async () => ({
-				branch: "release",
-				headSha: "workspace-sha",
-				upstream: { owner: REPO.owner, name: REPO.name, branch: "release" },
-			}),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		const workspace = getWorkspace(db, "ws-release");
-		expect(workspace?.branch).toBe("release");
-		expect(workspace?.pullRequestId).toBeNull();
-	});
-
-	test("an adopted worktree keeps a PR that merged after it moved onto the branch", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedWorkspace(db, {
-			id: "ws-release",
-			branch: "release",
-			headSha: "behind-pr-head-sha",
-			upstreamOwner: REPO.owner,
-			upstreamRepo: REPO.name,
-			upstreamBranch: "release",
-			createdAt: WORKSPACE_CREATED_AT,
-			branchSince: Date.parse("2025-12-01T00:00:00Z"),
-		});
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(getWorkspace(db, "ws-release")?.pullRequestId).toBe(
-			getPrByNumber(db, 515)?.id,
-		);
-	});
-
-	test("keeps a PR linked while open in history after the workspace moves to another branch", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedPullRequest(db, {
-			id: "pr-feature",
-			prNumber: 700,
-			headBranch: "feature",
-			headSha: "feature-sha",
-			state: "merged",
-			mergedAt: Date.parse("2026-11-01T00:00:00Z"),
-		});
-		seedReleaseWorkspace(db, { headSha: "workspace-sha" });
-		db.update(schema.workspaces)
-			.set({ branchSince: Date.parse("2026-11-10T00:00:00Z") })
-			.run();
-		db.insert(schema.workspacePullRequests)
-			.values({
-				workspaceId: "ws-release",
-				pullRequestId: "pr-feature",
-				linkedAt: Date.parse("2026-10-20T00:00:00Z"),
-			})
-			.run();
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({}),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(await historyNumbers(manager)).toEqual([700]);
-	});
-
-	test("takes the cutoff from each sync's reflog read, so leaving the branch and coming back resets it", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedWorkspace(db, {
-			id: "ws-release",
-			branch: "release",
-			headSha: "workspace-sha",
-			upstreamOwner: REPO.owner,
-			upstreamRepo: REPO.name,
-			upstreamBranch: "release",
-			createdAt: Date.parse("2025-01-01T00:00:00Z"),
-			branchSince: Date.parse("2025-01-01T00:00:00Z"),
-		});
-		const returnedToRelease = Date.parse("2026-11-13T09:00:00Z");
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({ release: makePrNode(OLD_RELEASE_PR) }),
-			readWorkspaceRefs: async () => ({
-				branch: "release",
-				headSha: "workspace-sha",
-				upstream: { owner: REPO.owner, name: REPO.name, branch: "release" },
-				branchSince: returnedToRelease,
-			}),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		const workspace = getWorkspace(db, "ws-release");
-		expect(workspace?.branchSince).toBe(returnedToRelease);
-		expect(workspace?.pullRequestId).toBeNull();
-	});
-
-	test("drops an older merged PR from history while a new PR on the branch is open", async () => {
-		const db = createRealDb();
-		seedProject(db);
-		seedPullRequest(db, {
-			id: "pr-old-release",
-			prNumber: 515,
-			headBranch: "release",
-			headSha: "old-release-sha",
-			state: "merged",
-			mergedAt: Date.parse("2025-12-27T08:33:59Z"),
-		});
-		seedReleaseWorkspace(db, { headSha: "workspace-sha" });
-		db.insert(schema.workspacePullRequests)
-			.values({
-				workspaceId: "ws-release",
-				pullRequestId: "pr-old-release",
-				linkedAt: WORKSPACE_CREATED_AT + 1_000,
-			})
-			.run();
-		const manager = createManager(db, {
-			git: defaultBranchGit("main"),
-			execGh: routeGh({
-				release: makePrNode({
-					number: 9800,
-					headRef: "release",
-					headSha: "workspace-sha",
-				}),
-			}),
-		});
-
-		await manager.refreshPullRequestsByWorkspaces(["ws-release"]);
-
-		expect(await historyNumbers(manager)).toEqual([9800]);
 	});
 });
 

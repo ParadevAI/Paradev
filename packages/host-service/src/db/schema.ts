@@ -243,9 +243,6 @@ export const workspaces = sqliteTable(
 		upstreamOwner: text("upstream_owner"),
 		upstreamRepo: text("upstream_repo"),
 		upstreamBranch: text("upstream_branch"),
-		// Epoch ms the checkout moved onto `branch`. Null until the PR sync
-		// first reads it.
-		branchSince: integer("branch_since"),
 		pullRequestId: text("pull_request_id").references(() => pullRequests.id, {
 			onDelete: "set null",
 		}),

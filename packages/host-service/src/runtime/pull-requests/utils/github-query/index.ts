@@ -9,7 +9,7 @@ export {
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
-	parseGitHubTimestamp,
+	parseMergedAt,
 } from "./github-query";
 export type {
 	GitHubCheckContextNode,

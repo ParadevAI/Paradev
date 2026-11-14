@@ -23,8 +23,6 @@ export interface WorkspaceRefsSnapshot {
 	branch: string | null;
 	headSha: string | null;
 	upstream: WorkspaceUpstream | null;
-	/** Epoch ms the checkout moved onto `branch`; see branchSinceFromReflog. */
-	branchSince?: number | null;
 }
 
 async function getCurrentBranchName(git: SimpleGit): Promise<string | null> {
@@ -150,56 +148,5 @@ export async function readWorkspaceRefs(
 
 	const headSha = await getHeadSha(git);
 	const upstream = await resolveWorkspaceUpstream(git, branch);
-	const branchSince = await readBranchSince(git, branch);
-	return { branch, headSha, upstream, branchSince };
-}
-
-const REFLOG_ENTRY = /^HEAD@\{(\d+)\}(?:\t(.*))?$/;
-
-/**
- * When this checkout moved onto `branch`, from its HEAD reflog (newest
- * first): the last checkout onto it from another branch, else the checkout's
- * creation (clone, first commit, worktree add) if the reflog still holds it.
- * Null when neither is there, e.g. after reflog expiry.
- */
-export function branchSinceFromReflog(
-	reflog: string,
-	branch: string,
-): number | null {
-	let oldest: { at: number; subject: string } | null = null;
-	for (const line of reflog.split("\n")) {
-		const match = REFLOG_ENTRY.exec(line);
-		if (!match) continue;
-		const [, seconds, subject = ""] = match;
-		const at = Number(seconds) * 1000;
-		if (
-			subject.startsWith("checkout: moving from ") &&
-			subject.endsWith(` to ${branch}`) &&
-			subject !== `checkout: moving from ${branch} to ${branch}`
-		) {
-			return at;
-		}
-		oldest = { at, subject };
-	}
-	if (!oldest) return null;
-	const isCreation =
-		oldest.subject === "" ||
-		oldest.subject.startsWith("clone: ") ||
-		oldest.subject.startsWith("commit (initial): ");
-	return isCreation ? oldest.at : null;
-}
-
-export async function readBranchSince(
-	git: SimpleGit,
-	branch: string,
-): Promise<number | null> {
-	const reflog = await tryRaw(git, [
-		"log",
-		"--walk-reflogs",
-		"--max-count=1000",
-		"--date=unix",
-		"--format=%gd%x09%gs",
-		"HEAD",
-	]);
-	return reflog ? branchSinceFromReflog(reflog, branch) : null;
+	return { branch, headSha, upstream };
 }

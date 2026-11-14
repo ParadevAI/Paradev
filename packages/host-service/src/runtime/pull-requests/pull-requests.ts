@@ -34,7 +34,7 @@ import {
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecision,
 	fetchPullRequestReviewDecisionFromGh,
-	parseGitHubTimestamp,
+	parseMergedAt,
 } from "./utils/github-query";
 import type {
 	GitHubCheckContextNode,
@@ -203,33 +203,6 @@ function deriveCheckoutPullRequestUpstream(
 	const name = pr.headRepositoryName?.trim();
 	if (!owner || !name) return null;
 	return { owner, name, branch: pr.headRefName };
-}
-
-interface MatchedPullRequest {
-	id: string;
-	isOpen: boolean;
-	/** Epoch ms; null while open or when GitHub sent no usable time. */
-	closedAt: number | null;
-	headSha: string;
-}
-
-// A branch name outlives its PRs: a PR that closed before the workspace moved
-// onto its branch is not its work unless the workspace sits on the PR's head.
-function isEarlierUseOfBranch(
-	pullRequest: Pick<MatchedPullRequest, "isOpen" | "closedAt" | "headSha">,
-	workspace: Pick<
-		typeof workspaces.$inferSelect,
-		"branchSince" | "createdAt" | "headSha"
-	>,
-): boolean {
-	if (pullRequest.isOpen || pullRequest.closedAt === null) return false;
-	if (pullRequest.closedAt >= (workspace.branchSince ?? workspace.createdAt)) {
-		return false;
-	}
-	return (
-		pullRequest.headSha.toLowerCase() !==
-		workspace.headSha?.trim().toLowerCase()
-	);
 }
 
 interface ProjectRefreshOptions {
@@ -651,7 +624,7 @@ export class PullRequestRuntimeManager {
 			isDraft,
 			headBranch: pullRequest.headRefName,
 			headSha: pullRequest.headRefOid,
-			mergedAt: parseGitHubTimestamp(pullRequest.mergedAt ?? null),
+			mergedAt: parseMergedAt(pullRequest.mergedAt ?? null),
 			reviewDecision: coerceReviewDecision(existing?.reviewDecision ?? null),
 			checksStatus: coerceChecksStatus(existing?.checksStatus ?? null),
 			checksJson: JSON.stringify(existingChecks),
@@ -748,72 +721,6 @@ export class PullRequestRuntimeManager {
 				),
 			)
 			.run();
-		for (const listener of this.linkListeners) listener();
-	}
-
-	private forgetEarlierBranchUseLinks(
-		projectWorkspaces: (typeof workspaces.$inferSelect)[],
-		rejectedMatches: Map<string, MatchedPullRequest>,
-	): void {
-		if (projectWorkspaces.length === 0) return;
-		const byId = new Map(projectWorkspaces.map((w) => [w.id, w]));
-		const stale = this.db
-			.select({
-				workspaceId: workspacePullRequests.workspaceId,
-				pullRequestId: workspacePullRequests.pullRequestId,
-				linkedAt: workspacePullRequests.linkedAt,
-				state: pullRequests.state,
-				mergedAt: pullRequests.mergedAt,
-				headSha: pullRequests.headSha,
-			})
-			.from(workspacePullRequests)
-			.innerJoin(
-				pullRequests,
-				eq(workspacePullRequests.pullRequestId, pullRequests.id),
-			)
-			.innerJoin(
-				workspaces,
-				eq(workspacePullRequests.workspaceId, workspaces.id),
-			)
-			.where(
-				and(
-					inArray(workspacePullRequests.workspaceId, [...byId.keys()]),
-					isNull(workspaces.archivedAt),
-				),
-			)
-			.all()
-			.filter((row) => {
-				const workspace = byId.get(row.workspaceId);
-				if (!workspace) return false;
-				// A PR linked while it was still open stays in history.
-				const rejected = rejectedMatches.get(row.workspaceId);
-				if (rejected?.id === row.pullRequestId) {
-					return (
-						rejected.closedAt !== null && rejected.closedAt <= row.linkedAt
-					);
-				}
-				return (
-					row.state === "merged" &&
-					row.mergedAt !== null &&
-					row.mergedAt <= row.linkedAt &&
-					isEarlierUseOfBranch(
-						{ isOpen: false, closedAt: row.mergedAt, headSha: row.headSha },
-						workspace,
-					)
-				);
-			});
-		if (stale.length === 0) return;
-		for (const row of stale) {
-			this.db
-				.delete(workspacePullRequests)
-				.where(
-					and(
-						eq(workspacePullRequests.workspaceId, row.workspaceId),
-						eq(workspacePullRequests.pullRequestId, row.pullRequestId),
-					),
-				)
-				.run();
-		}
 		for (const listener of this.linkListeners) listener();
 	}
 
@@ -947,8 +854,9 @@ export class PullRequestRuntimeManager {
 		}
 		this.noteWorktreePresent(workspace.id);
 		try {
-			const refs = await this.readWorkspaceRefs(workspace.worktreePath);
-			const { branch, headSha, upstream } = refs;
+			const { branch, headSha, upstream } = await this.readWorkspaceRefs(
+				workspace.worktreePath,
+			);
 			if (!branch) return null;
 
 			const upstreamOwner = upstream?.owner ?? null;
@@ -959,13 +867,9 @@ export class PullRequestRuntimeManager {
 				this.pullRequestHeadMatches(workspace.pullRequestId, headSha)
 					? workspace.pullRequestId
 					: null;
-			const branchSince =
-				refs.branchSince ??
-				(branch === workspace.branch ? workspace.branchSince : Date.now());
 
 			if (
 				branch === workspace.branch &&
-				branchSince === workspace.branchSince &&
 				headSha === workspace.headSha &&
 				upstreamOwner === workspace.upstreamOwner &&
 				upstreamRepo === workspace.upstreamRepo &&
@@ -984,7 +888,6 @@ export class PullRequestRuntimeManager {
 					upstreamRepo,
 					upstreamBranch,
 					pullRequestId,
-					branchSince,
 					...(branch !== workspace.branch ? { updatedAt: Date.now() } : {}),
 				})
 				// Guard: the workspace can archive during the awaited ref read;
@@ -1136,7 +1039,6 @@ export class PullRequestRuntimeManager {
 
 		const { failedKeys, matched: keyToPullRequest } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
-		const rejectedMatches = new Map<string, MatchedPullRequest>();
 
 		for (const workspace of projectWorkspaces) {
 			const key = this.effectiveUpstreamKey(workspace, repo);
@@ -1176,14 +1078,9 @@ export class PullRequestRuntimeManager {
 			if (this.tracksBaseDefaultBranch(workspace, repo)) {
 				this.forgetPastPromotionLinks(workspace.id, projectId, repo);
 			}
-			const isEarlierBranchUse =
-				!!rawMatch && isEarlierUseOfBranch(rawMatch, workspace);
-			if (isEarlierBranchUse) rejectedMatches.set(workspace.id, rawMatch);
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId ||
-				isPastPromotion ||
-				isEarlierBranchUse
+				rawMatch?.id === workspace.suppressedPullRequestId || isPastPromotion
 					? undefined
 					: rawMatch;
 			if (match) {
@@ -1212,7 +1109,6 @@ export class PullRequestRuntimeManager {
 					.run();
 			}
 		}
-		this.forgetEarlierBranchUseLinks(projectWorkspaces, rejectedMatches);
 	}
 
 	private async getProjectRepository(
@@ -1727,10 +1623,10 @@ export class PullRequestRuntimeManager {
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<{
-		matched: Map<string, MatchedPullRequest>;
+		matched: Map<string, { id: string; isOpen: boolean }>;
 		failedKeys: Set<string>;
 	}> {
-		const matched = new Map<string, MatchedPullRequest>();
+		const matched = new Map<string, { id: string; isOpen: boolean }>();
 		const failedKeys = new Set<string>();
 		if (wantedRefs.size === 0) return { matched, failedKeys };
 
@@ -1865,12 +1761,7 @@ export class PullRequestRuntimeManager {
 				now,
 			});
 
-			matched.set(key, {
-				id: rowId,
-				isOpen: node.state === "OPEN",
-				closedAt: node.closedAt ?? node.mergedAt,
-				headSha: node.headRefOid,
-			});
+			matched.set(key, { id: rowId, isOpen: node.state === "OPEN" });
 		}
 
 		return { matched, failedKeys };
