@@ -553,6 +553,24 @@ package root), update the key in `patchedDependencies`, run `bun install`, then
 `bun test apps/mobile/react-native-enriched-markdown-list-patch.test.ts`. It is
 a native change: rebuild the app to see it.
 
+## @legendapp/list (`@legendapp%2Flist@<version>.patch`)
+
+**Why:** on Android, the chat's scroll-to-bottom button stopped part way down a
+long thread, and a second tap was needed to reach the last message.
+`scrollToEnd` aims at the last row with estimated heights for rows not yet
+measured. When the animated scroll ends short of the real end, 3.0.3 aims again
+only on iOS (`shouldRetryUnalignedEndScroll = Platform.OS === "ios" && ...`).
+
+**What it changes:** that condition becomes `Platform.OS !== "web"` in
+`react-native.js` and `react-native.mjs`, so Android aims again too. iOS runs
+the same code as before. This is the upstream fix; 3.7.2 ships the same line.
+
+**Guard test:** `apps/mobile/legendapp-list-scroll-to-end-patch.test.ts`.
+
+**Regenerating after a version bump:** check the new version first. From 3.7.2
+the line is already `Platform.OS !== "web"`: drop the patch and the guard test.
+Before that, apply the same one-line change with `bun patch @legendapp/list`.
+
 ## @better-auth/oauth-provider (`@better-auth%2Foauth-provider@<version>.patch`)
 
 **Why:** the token endpoint rotates the refresh token on every refresh. When a
