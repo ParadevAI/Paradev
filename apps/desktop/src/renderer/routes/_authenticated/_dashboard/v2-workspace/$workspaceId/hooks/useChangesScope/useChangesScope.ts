@@ -16,6 +16,7 @@ import {
 	useSetChangesFilter,
 } from "../../state/repositoryChangesFilterStore";
 import { checkoutInput } from "../../utils/checkoutInput";
+import { useSetBaseBranch } from "../useSetBaseBranch";
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
@@ -58,35 +59,12 @@ export function useChangesScope(
 	});
 	const baseBranch = baseBranchQuery.data?.baseBranch ?? null;
 
-	const setBaseBranchMutation = workspaceTrpc.git.setBaseBranch.useMutation({
-		// The variables, not `scope`: the hook can move to another repository
-		// while the mutation is in flight.
-		onSuccess: (_data, variables) => {
-			const changed = checkoutInput(
-				variables.workspaceId,
-				variables.repositoryId,
-			);
-			void utils.git.getBaseBranch.invalidate(changed);
-			void utils.git.getStatus.invalidate(changed);
-			void utils.git.listCommits.invalidate(changed);
-			void utils.git.getDiff.invalidate(changed);
-		},
-		// The picker re-renders from getBaseBranch, so a rejected change
-		// silently snaps back without this.
-		onError: (error) =>
-			toast.error(
-				error.message ||
-					t({
-						message: "Failed to change base branch",
-					}),
-			),
-	});
-
+	const setCheckoutBaseBranch = useSetBaseBranch();
 	const setBaseBranch = useCallback(
 		(branchName: string | null) => {
-			setBaseBranchMutation.mutate({ ...scope, baseBranch: branchName });
+			setCheckoutBaseBranch({ ...scope, baseBranch: branchName });
 		},
-		[setBaseBranchMutation, scope],
+		[setCheckoutBaseBranch, scope],
 	);
 
 	const commits = workspaceTrpc.git.listCommits.useQuery(

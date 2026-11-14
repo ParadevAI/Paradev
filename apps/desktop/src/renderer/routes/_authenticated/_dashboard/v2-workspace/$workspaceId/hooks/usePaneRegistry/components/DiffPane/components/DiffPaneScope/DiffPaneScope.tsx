@@ -48,21 +48,13 @@ export function DiffPaneScope({
 		0,
 	);
 
-	const pickRepositories = (repositoryIds: string[]) => {
-		if (!repositoryPicker) return;
-		const clearBaseBranchOf = repositoryPicker.picker.pick(repositoryIds);
-		if (clearBaseBranchOf === repositoryId && scope.baseBranch !== null) {
-			scope.setBaseBranch(null);
-		}
-	};
-
 	return (
 		<div className="flex min-w-0 items-center gap-1 text-xs">
 			{repositoryPicker && shown && (
 				<RepositoryFilter
 					repositories={repositoryPicker.repositories}
 					shown={shown}
-					onChange={pickRepositories}
+					onChange={repositoryPicker.picker.pick}
 				/>
 			)}
 			{repositoryPicker && showsSeveral && !filter?.range && (

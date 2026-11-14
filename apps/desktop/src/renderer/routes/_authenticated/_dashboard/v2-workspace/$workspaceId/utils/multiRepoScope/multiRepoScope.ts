@@ -30,8 +30,9 @@ export function withMultiRepoScope(
 /**
  * A new repository pick. With several repositories shown, every shown one
  * takes the scope that was in force before, so a commit or range scope
- * becomes "all". Going from one repository to several also clears that
- * repository's base branch.
+ * becomes "all". A repository's base branch can change only while it is the
+ * one shown, so its base is kept when it becomes the one shown and put back
+ * when it stops being that.
  */
 export function pickChangesRepositories({
 	repositoryIds,
@@ -43,13 +44,41 @@ export function pickChangesRepositories({
 	picked: string[];
 	nextPicked: string[];
 	filters: RepositoryFilters;
-}): { filters: RepositoryFilters; clearBaseBranchOf: string | null } {
+}): {
+	filters: RepositoryFilters;
+	snapshotBaseBranchOf: string | null;
+	restoreBaseBranchOf: string | null;
+} {
 	const before = shownRepositoryIds(repositoryIds, picked);
 	const after = shownRepositoryIds(repositoryIds, nextPicked);
-	if (after.size < 2) return { filters, clearBaseBranchOf: null };
-	const kind = multiRepoScopeKind(before, filters);
+	const onlyBefore = onlyRepositoryId(before);
+	const onlyAfter = onlyRepositoryId(after);
 	return {
-		filters: withMultiRepoScope(after, kind, filters),
-		clearBaseBranchOf: before.size === 1 ? ([...before][0] ?? null) : null,
+		filters:
+			after.size < 2
+				? filters
+				: withMultiRepoScope(
+						after,
+						multiRepoScopeKind(before, filters),
+						filters,
+					),
+		snapshotBaseBranchOf: onlyAfter !== onlyBefore ? onlyAfter : null,
+		restoreBaseBranchOf: onlyBefore !== onlyAfter ? onlyBefore : null,
 	};
+}
+
+function onlyRepositoryId(shown: Set<string>): string | null {
+	return shown.size === 1 ? ([...shown][0] ?? null) : null;
+}
+
+/**
+ * The base branch to put back, or null when there is no snapshot or the base
+ * did not change.
+ */
+export function baseBranchToRestore(
+	snapshot: { baseBranch: string | null } | undefined,
+	currentBaseBranch: string | null,
+): { baseBranch: string | null } | null {
+	if (!snapshot || snapshot.baseBranch === currentBaseBranch) return null;
+	return { baseBranch: snapshot.baseBranch };
 }

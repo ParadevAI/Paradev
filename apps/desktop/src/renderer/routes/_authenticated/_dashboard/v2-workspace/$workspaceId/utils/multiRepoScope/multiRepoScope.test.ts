@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	baseBranchToRestore,
 	multiRepoScopeKind,
 	pickChangesRepositories,
 	withMultiRepoScope,
@@ -37,7 +38,7 @@ describe("withMultiRepoScope", () => {
 });
 
 describe("pickChangesRepositories", () => {
-	test("one to several: a commit scope becomes all and the base branch is cleared", () => {
+	test("one to several: a commit scope becomes all and the base branch is restored", () => {
 		expect(
 			pickChangesRepositories({
 				repositoryIds: ids,
@@ -47,7 +48,8 @@ describe("pickChangesRepositories", () => {
 			}),
 		).toEqual({
 			filters: { api: { kind: "all" }, web: { kind: "all" } },
-			clearBaseBranchOf: "api",
+			snapshotBaseBranchOf: null,
+			restoreBaseBranchOf: "api",
 		});
 	});
 
@@ -66,7 +68,7 @@ describe("pickChangesRepositories", () => {
 		});
 	});
 
-	test("several to one changes nothing", () => {
+	test("several to one keeps the filters and snapshots the base branch", () => {
 		const filters = { api: { kind: "uncommitted" as const } };
 		expect(
 			pickChangesRepositories({
@@ -75,17 +77,42 @@ describe("pickChangesRepositories", () => {
 				nextPicked: ["api"],
 				filters,
 			}),
-		).toEqual({ filters, clearBaseBranchOf: null });
+		).toEqual({
+			filters,
+			snapshotBaseBranchOf: "api",
+			restoreBaseBranchOf: null,
+		});
 	});
 
-	test("several to several keeps the base branch", () => {
+	test("several to several leaves the base branch alone", () => {
+		const result = pickChangesRepositories({
+			repositoryIds: ids,
+			picked: ["api", "web"],
+			nextPicked: [],
+			filters: {},
+		});
+		expect(result.snapshotBaseBranchOf).toBeNull();
+		expect(result.restoreBaseBranchOf).toBeNull();
+	});
+});
+
+describe("baseBranchToRestore", () => {
+	test("restores the snapshot when the base changed", () => {
+		expect(baseBranchToRestore({ baseBranch: "release-2" }, "main")).toEqual({
+			baseBranch: "release-2",
+		});
+		expect(baseBranchToRestore({ baseBranch: null }, "main")).toEqual({
+			baseBranch: null,
+		});
+	});
+
+	test("writes nothing without a snapshot", () => {
+		expect(baseBranchToRestore(undefined, "main")).toBeNull();
+	});
+
+	test("writes nothing when the base is unchanged", () => {
 		expect(
-			pickChangesRepositories({
-				repositoryIds: ids,
-				picked: ["api", "web"],
-				nextPicked: [],
-				filters: {},
-			}).clearBaseBranchOf,
+			baseBranchToRestore({ baseBranch: "release-2" }, "release-2"),
 		).toBeNull();
 	});
 });

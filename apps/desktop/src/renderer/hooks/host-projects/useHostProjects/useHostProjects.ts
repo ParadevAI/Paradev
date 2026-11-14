@@ -203,6 +203,7 @@ export function useHostProjects(): UseHostProjectsResult {
 					target,
 					rows: live ?? snapshots.get(target.machineId),
 					reachable: live !== undefined && !query?.isError,
+					failed: target.hostUrl === null || query?.isError === true,
 				};
 			}),
 		[targets, queries, snapshots],

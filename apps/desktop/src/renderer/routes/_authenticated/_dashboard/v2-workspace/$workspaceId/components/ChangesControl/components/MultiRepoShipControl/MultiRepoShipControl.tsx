@@ -12,7 +12,7 @@ import {
 import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
 import { useRepositoryShipSnapshots } from "../../../../hooks/useRepositoryShipSnapshots";
 import { ChangesStats } from "../../../ChangesStats";
-import { RepositoryShipList } from "../../../RepositoryShipList";
+import { RepositoryShipList } from "./components/RepositoryShipList";
 
 interface MultiRepoShipControlProps {
 	workspaceId: string;

@@ -177,6 +177,9 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	const { model, fileByTreePath } = useChangedFilesTree<TreeEntry>({
 		files: entries,
 		foldSignal,
+		// Pierre can only flatten every folder chain or none, and a flattened
+		// repository folder would merge into the folder below it.
+		flattenEmptyDirectories: repositories ? false : undefined,
 		unsafeCSS: HOVER_ACTIONS_ROW_CSS,
 		onSelectFile: (entry) => {
 			lastUserSelectRef.current = absolutePathOf(entry.file) ?? null;

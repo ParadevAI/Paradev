@@ -193,7 +193,7 @@ export function DiffPane({
 	const repositoryPicker = useChangesRepositoryPicker(workspaceId);
 	const shownRepositories = repositoryPicker.shown;
 	useShowTargetRepository({
-		workspaceId,
+		paneId: context.pane.id,
 		repositoryIds,
 		picker: repositoryPicker,
 		targetRepositoryId: isMultiRepo ? data.repositoryId : undefined,

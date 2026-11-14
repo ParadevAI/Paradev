@@ -86,6 +86,8 @@ export interface HostProjectRowsResult {
 	target: HostProjectsQueryTarget;
 	rows: HostProjectRow[] | undefined;
 	reachable: boolean;
+	/** Set when the host could not be asked for its projects. */
+	failed?: boolean;
 }
 
 export interface HostRowForTargets {

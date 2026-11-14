@@ -1,4 +1,5 @@
 export {
+	baseBranchToRestore,
 	type MultiRepoScopeKind,
 	multiRepoScopeKind,
 	pickChangesRepositories,

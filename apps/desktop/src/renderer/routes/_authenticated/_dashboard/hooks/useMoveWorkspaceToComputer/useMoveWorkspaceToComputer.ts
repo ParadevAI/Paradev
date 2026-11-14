@@ -88,9 +88,10 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			};
 			const destinationUrl = hostUrlOf(destination.hostId);
 			const fromCloud = cloudWorkspaces.some((row) => row.id === workspace.id);
-			const destinationRows = hostResults.find(
+			const destinationResult = hostResults.find(
 				(result) => result.target.machineId === destination.hostId,
-			)?.rows;
+			);
+			const destinationRows = destinationResult?.rows;
 			// The destination project holds exactly the repositories the workspace checks out.
 			const requireProject = (repositoryNames: string[]) => {
 				const found = destinationRows?.find((row) =>
@@ -124,6 +125,9 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				}),
 			);
 			if (!destinationRows) {
+				if (destinationResult?.failed) {
+					throw new Error(t`That computer can't be reached`);
+				}
 				const computer = destination.name;
 				throw new Error(
 					computer
