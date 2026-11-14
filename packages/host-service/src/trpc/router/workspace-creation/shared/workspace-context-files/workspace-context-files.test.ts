@@ -348,3 +348,39 @@ test("nothing is written or removed through a root agent folder that is a symlin
 		true,
 	);
 });
+
+test("a checkout at a root entry's name is never written, linked into or removed", async () => {
+	const web = checkout("web", true);
+	const claude = checkout(".claude");
+	const agents = checkout("AGENTS.md");
+	const app = checkout(".paradev");
+	addSkill(web, ".claude", "deploy");
+	addFile(web, ".claude/settings.json", "web");
+	addSkill(claude, "", "own");
+	symlinkSync("own", join(claude.path, "skills", "alias"));
+	addFile(claude, "settings.json", "claude repo");
+	addFile(app, "attachments/notes.txt", "kept");
+	const all = [web, claude, agents, app];
+	const paths = all.map((repo) => repo.path);
+
+	writeWorkspaceContextFiles(root, all);
+
+	expect(lstatSync(join(root, "AGENTS.md")).isDirectory()).toBe(true);
+	expect(readFileSync(join(root, "CLAUDE.md"), "utf8")).toContain(
+		`| web | ${web.path} | feature/x |`,
+	);
+	expect(existsSync(linkAt(".claude", "deploy"))).toBe(false);
+	expect(listAgentFolderLeftovers(root, paths)).toEqual([]);
+
+	await removeWorkspaceContextFiles(root, paths);
+
+	expect(lstatSync(join(root, "AGENTS.md")).isDirectory()).toBe(true);
+	expect(existsSync(join(root, "CLAUDE.md"))).toBe(false);
+	expect(readlinkSync(linkAt(".claude", "alias"))).toBe("own");
+	expect(readFileSync(join(claude.path, "settings.json"), "utf8")).toBe(
+		"claude repo",
+	);
+	expect(readFileSync(join(app.path, "attachments", "notes.txt"), "utf8")).toBe(
+		"kept",
+	);
+});

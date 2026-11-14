@@ -148,25 +148,41 @@ describe("sandbox self-seed", () => {
 		]);
 	});
 
-	test("a box of several repositories with one at a path the root keeps is refused with a log line", () => {
-		const env = (paths: string[]) => ({
-			SUPERSET_SANDBOX_WORKSPACE_ID: WORKSPACE_ID,
-			SUPERSET_SANDBOX_WORKSPACE_PATH: "/workspace",
-			SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify(
-				identity(paths).repositories,
-			),
-		});
+	test("a box made before root names were kept seeds a repository at one, with a log line", () => {
+		const db = createDb();
+		const root = mkdtempSync(join(tmpdir(), "seed-root-"));
+		for (const path of ["web", "CLAUDE.md"]) mkdirSync(join(root, path));
+		writeFileSync(join(root, "CLAUDE.md", "README.md"), "claude.md repo\n");
 		const warn = spyOn(console, "warn").mockImplementation(() => {});
 		try {
-			expect(readSandboxIdentity(env(["web", "Claude.md"]))).toBeNull();
-			expect(warn.mock.calls[0]?.[0]).toContain(
-				"repository acme/Claude.md at Claude.md",
-			);
-			expect(readSandboxIdentity(env(["AGENTS.md"]))).toMatchObject({
-				worktreePath: "/workspace/AGENTS.md",
+			const seed = readSandboxIdentity({
+				SUPERSET_SANDBOX_WORKSPACE_ID: WORKSPACE_ID,
+				SUPERSET_SANDBOX_WORKSPACE_PATH: root,
+				SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify(
+					identity(["web", "CLAUDE.md"], root).repositories,
+				),
 			});
+			expect(seed?.repositories.map((repo) => repo.path)).toEqual([
+				"web",
+				"CLAUDE.md",
+			]);
+			expect(warn.mock.calls[0]?.[0]).toContain(
+				"repository acme/CLAUDE.md is at CLAUDE.md",
+			);
+
+			runSandboxSelfSeed(db, seed as SandboxIdentity, agentDir());
+
+			expect(db.select().from(schema.repositories).all()).toHaveLength(2);
+			expect(db.select().from(schema.workspaces).all()).toHaveLength(1);
+			expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+				`| CLAUDE.md | ${join(root, "CLAUDE.md")} | feat |`,
+			);
+			expect(readFileSync(join(root, "CLAUDE.md", "README.md"), "utf8")).toBe(
+				"claude.md repo\n",
+			);
 		} finally {
 			warn.mockRestore();
+			rmSync(root, { recursive: true, force: true });
 		}
 	});
 

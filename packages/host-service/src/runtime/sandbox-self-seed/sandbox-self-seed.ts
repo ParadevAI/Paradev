@@ -109,19 +109,17 @@ function readSandboxRepositories(raw: string | undefined): SandboxRepository[] {
 		);
 		return [];
 	}
-	const reserved =
-		parsed.data.length > 1
-			? parsed.data.find(({ path }) => isReservedRootName(path))
-			: undefined;
-	if (reserved) {
-		const parsedRemote = parseGitHubRemote(reserved.url);
-		const repository = parsedRemote
-			? `${parsedRemote.owner}/${parsedRemote.name}`
-			: reserved.url;
-		console.warn(
-			`[sandbox] nothing seeded: SUPERSET_SANDBOX_REPOSITORIES puts repository ${repository} at ${reserved.path}, which the workspace root keeps for its own files`,
-		);
-		return [];
+	if (parsed.data.length > 1) {
+		for (const { url, path } of parsed.data) {
+			if (!isReservedRootName(path)) continue;
+			const parsedRemote = parseGitHubRemote(url);
+			const repository = parsedRemote
+				? `${parsedRemote.owner}/${parsedRemote.name}`
+				: url;
+			console.warn(
+				`[sandbox] repository ${repository} is at ${path}, a name the workspace root keeps for its own files; the root leaves that entry to the checkout`,
+			);
+		}
 	}
 	return parsed.data;
 }

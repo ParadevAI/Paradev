@@ -12,12 +12,13 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { rm } from "node:fs/promises";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
 import {
 	WORKSPACE_AGENT_FOLDERS,
 	WORKSPACE_APP_FOLDER,
 	WORKSPACE_CONTEXT_FILES,
+	WORKSPACE_ROOT_ENTRIES,
 } from "@superset/shared/workspace-root";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../../db";
@@ -63,7 +64,17 @@ export function writeWorkspaceContextFiles(
 	const ordered = [...checkouts].sort(
 		(a, b) => Number(b.isPrimary) - Number(a.isPrimary),
 	);
+	const taken = rootNamesTakenByCheckouts(
+		root,
+		checkouts.map((checkout) => checkout.path),
+	);
+	for (const entry of taken) {
+		console.warn(
+			`[workspace-context-files] skipped ${entry} in ${root}: a repository is checked out there`,
+		);
+	}
 	for (const folder of WORKSPACE_SKILL_FOLDERS) {
+		if (taken.has(folder)) continue;
 		try {
 			syncSkillLinks(root, folder, ordered);
 		} catch (err) {
@@ -78,12 +89,40 @@ export function writeWorkspaceContextFiles(
 		root,
 		configSource,
 		checkouts.map((checkout) => checkout.path),
+		taken,
 	);
-	writeIfChanged(
-		join(root, "AGENTS.md"),
-		renderAgentsFile(checkouts, linked.length > 0 ? configSource : undefined),
+	const agentsFile = renderAgentsFile(
+		checkouts,
+		linked.length > 0 ? configSource : undefined,
 	);
-	writeIfChanged(join(root, "CLAUDE.md"), "@AGENTS.md\n");
+	if (!taken.has("AGENTS.md")) {
+		writeIfChanged(join(root, "AGENTS.md"), agentsFile);
+	}
+	if (!taken.has("CLAUDE.md")) {
+		writeIfChanged(
+			join(root, "CLAUDE.md"),
+			taken.has("AGENTS.md") ? agentsFile : "@AGENTS.md\n",
+		);
+	}
+}
+
+/**
+ * Root entries that have the name of a checkout folder, compared the way a
+ * case-insensitive disk would. A cloud box made before these names were
+ * refused can have one; the host never writes, links or removes under it.
+ */
+function rootNamesTakenByCheckouts(
+	root: string,
+	checkoutPaths: string[],
+): Set<string> {
+	const names = new Set(
+		checkoutPaths
+			.filter((path) => dirname(resolve(path)) === resolve(root))
+			.map((path) => basename(path).toLowerCase()),
+	);
+	return new Set<string>(
+		WORKSPACE_ROOT_ENTRIES.filter((entry) => names.has(entry.toLowerCase())),
+	);
 }
 
 function tableCell(value: string): string {
@@ -179,11 +218,13 @@ export async function removeWorkspaceContextFiles(
 	root: string,
 	checkoutPaths: string[],
 ): Promise<void> {
+	const taken = rootNamesTakenByCheckouts(root, checkoutPaths);
 	for (const file of WORKSPACE_CONTEXT_FILES) {
-		removeFile(join(root, file));
+		if (!taken.has(file)) removeFile(join(root, file));
 	}
-	syncConfigLinks(root, undefined, checkoutPaths);
+	syncConfigLinks(root, undefined, checkoutPaths, taken);
 	for (const folder of WORKSPACE_SKILL_FOLDERS) {
+		if (taken.has(folder)) continue;
 		const skills = join(root, folder, "skills");
 		if (!isRealFolderPath(root, skills)) continue;
 		try {
@@ -200,7 +241,12 @@ export async function removeWorkspaceContextFiles(
 			);
 		}
 	}
-	if (!isRealFolderPath(root, join(root, WORKSPACE_APP_FOLDER))) return;
+	if (
+		taken.has(WORKSPACE_APP_FOLDER) ||
+		!isRealFolderPath(root, join(root, WORKSPACE_APP_FOLDER))
+	) {
+		return;
+	}
 	try {
 		await rm(join(root, WORKSPACE_ATTACHMENTS_DIR), {
 			recursive: true,
@@ -228,12 +274,18 @@ export function listAgentFolderLeftovers(
 		WORKSPACE_CONFIG_LINKS.map((link) => link.path),
 	);
 	const skillFolders = new Set<string>(WORKSPACE_SKILL_FOLDERS);
+	const taken = rootNamesTakenByCheckouts(root, checkoutPaths);
 	const leftovers: string[] = [];
 	const mcp = join(root, ".mcp.json");
-	if (isPresent(mcp) && !isLinkIntoCheckouts(mcp, checkoutPaths)) {
+	if (
+		!taken.has(".mcp.json") &&
+		isPresent(mcp) &&
+		!isLinkIntoCheckouts(mcp, checkoutPaths)
+	) {
 		leftovers.push(".mcp.json");
 	}
 	for (const folder of WORKSPACE_AGENT_FOLDERS) {
+		if (taken.has(folder)) continue;
 		const path = join(root, folder);
 		if (!isPresent(path)) continue;
 		const entries = listRealFolder(path);
@@ -267,7 +319,7 @@ export function listAgentFolderLeftovers(
 		}
 	}
 	const appFolder = join(root, WORKSPACE_APP_FOLDER);
-	if (isPresent(appFolder)) {
+	if (!taken.has(WORKSPACE_APP_FOLDER) && isPresent(appFolder)) {
 		const entries = listRealFolder(appFolder);
 		if (!entries) leftovers.push(WORKSPACE_APP_FOLDER);
 		for (const entry of entries ?? []) {
@@ -345,9 +397,11 @@ function syncConfigLinks(
 	root: string,
 	configSource: ContextCheckout | undefined,
 	checkoutPaths: string[],
+	taken: ReadonlySet<string>,
 ): string[] {
 	const linked: string[] = [];
 	for (const { path, type } of WORKSPACE_CONFIG_LINKS) {
+		if (taken.has(path.split("/")[0] ?? path)) continue;
 		const link = join(root, path);
 		const folder = dirname(link);
 		const target = configSource ? join(configSource.path, path) : undefined;
