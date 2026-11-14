@@ -140,3 +140,15 @@ export function localizeMdxHref(
 		return href;
 	return `/${locale}${pathname === "/" ? local.slice(1) : local}`;
 }
+
+export function localizeMarkdownLinks(
+	content: string,
+	locale: SupportedLocale = "en",
+): string {
+	if (locale === "en") return content;
+	return content.replace(
+		/(```[\s\S]*?```|~~~[\s\S]*?~~~|`+[^`]*?`+)|(!?\[[^\]\n]+\]\()([^\s)]+)(\))/g,
+		(_match, code, opening, href, closing) =>
+			code ?? `${opening}${localizeMdxHref(locale, href)}${closing}`,
+	);
+}

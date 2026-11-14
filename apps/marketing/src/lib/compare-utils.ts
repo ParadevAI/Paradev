@@ -66,9 +66,21 @@ export function splitComparisonFaq(content: string): {
 	if (faqStart === -1) {
 		return { body: content, faq: null };
 	}
+	let fragmentStart = faqStart;
+	while (fragmentStart > 0 && !lines[fragmentStart - 1]?.trim())
+		fragmentStart--;
+	if (
+		/^<span id="(frequently-asked-questions|faq)" \/>$/.test(
+			lines[fragmentStart - 1]?.trim() ?? "",
+		)
+	) {
+		fragmentStart--;
+	} else {
+		fragmentStart = faqStart;
+	}
 	return {
-		body: lines.slice(0, faqStart).join("\n"),
-		faq: lines.slice(faqStart).join("\n"),
+		body: lines.slice(0, fragmentStart).join("\n"),
+		faq: lines.slice(fragmentStart).join("\n"),
 	};
 }
 

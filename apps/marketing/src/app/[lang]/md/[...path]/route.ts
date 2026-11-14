@@ -37,6 +37,7 @@ import {
 	MCP_SERVER_URL,
 	stripMdxSyntax,
 } from "@/lib/llms";
+import { localizeMarkdownLinks } from "@/lib/localized-mdx";
 import { markdownNotFound } from "@/lib/markdown-not-found";
 import { getAllPeople } from "@/lib/people";
 import { renderProfileMarkdown } from "@/lib/profile-markdown";
@@ -292,7 +293,10 @@ async function loadPage(
 			url: `${baseUrl}/compare/${page.slug}`,
 			date: page.lastUpdated ?? page.date,
 			description: page.description,
-			content: stripMdxSyntax(page.content),
+			content:
+				slug === "superset-vs-conductor"
+					? localizeMarkdownLinks(stripMdxSyntax(page.content), locale)
+					: stripMdxSyntax(page.content),
 		};
 	}
 	if (section === "category") {

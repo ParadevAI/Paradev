@@ -1,8 +1,12 @@
 import { expect, test } from "bun:test";
 import { SUPPORTED_LOCALES } from "@superset/i18n";
 import { extractCompareToc, getComparisonPage } from "./compare";
-import { extractComparisonFaqItems } from "./compare-utils";
-import { localizedMdxFile, localizeMdxHref } from "./localized-mdx";
+import { extractComparisonFaqItems, splitComparisonFaq } from "./compare-utils";
+import {
+	localizedMdxFile,
+	localizeMarkdownLinks,
+	localizeMdxHref,
+} from "./localized-mdx";
 
 test("Conductor comparison loads its existing locales and compatible FAQ anchors", () => {
 	for (const locale of SUPPORTED_LOCALES) {
@@ -14,6 +18,12 @@ test("Conductor comparison loads its existing locales and compatible FAQ anchors
 		).toBeGreaterThan(3);
 		if (locale !== "en") {
 			expect(page?.content).toContain('id="frequently-asked-questions"');
+			const split = splitComparisonFaq(page?.content ?? "");
+			expect(split.body).not.toContain('id="frequently-asked-questions"');
+			expect(split.faq).toStartWith('<span id="frequently-asked-questions" />');
+			expect(localizeMarkdownLinks(page?.content ?? "", locale)).toContain(
+				`](/${locale}/conductor)`,
+			);
 		}
 	}
 });
@@ -31,4 +41,20 @@ test("focused comparison localization leaves absent article translations in Engl
 	expect(
 		localizeMdxHref("ja", "https://docs.paradev.com/migrate-from-conductor"),
 	).toBe("https://docs.paradev.com/migrate-from-conductor");
+});
+
+test("localized Markdown links preserve code, external URLs, locale prefixes and assets", () => {
+	const content = [
+		"[Pricing](/pricing#plans) [Local](/ja/conductor) ![Image](/images/demo.png)",
+		"[Docs](https://docs.paradev.com/migrate-from-conductor)",
+		"`[Code](/pricing)`",
+		"```md\n[Example](/conductor)\n```",
+	].join("\n");
+	expect(localizeMarkdownLinks(content, "en")).toBe(content);
+	expect(localizeMarkdownLinks(content, "ja")).toBe(
+		content.replace(
+			"[Pricing](/pricing#plans)",
+			"[Pricing](/ja/pricing#plans)",
+		),
+	);
 });
