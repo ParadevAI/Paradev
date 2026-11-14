@@ -20676,6 +20676,12 @@ msgstr "Проект ещё загружается. Попробуйте сно�
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout проекта как есть: файлы и ветка общие"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "Проекты на {computer} ещё не загрузились. Повторите попытку через минуту."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "Проекты на этом компьютере ещё не загрузились. Повторите попытку через минуту."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Провайдер ответил {0}."
@@ -23108,6 +23114,9 @@ msgstr "Рабочие области — это изолированные ок
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Рабочие пространства, запущенные из этого окружения, перестанут её получать."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Сначала нужно удалить рабочие пространства, которые его используют. Архивные рабочие пространства теряют его извлечённую копию, а то, у которого больше ничего не осталось, уже нельзя восстановить. Новые рабочие пространства перестанут его извлекать. Папка останется на диске в {repositoryPath}."
+
 msgid "Workspaces you can open will show up here."
 msgstr "Рабочие области, которые вы можете открыть, появятся здесь."
 
@@ -23316,9 +23325,6 @@ msgstr "Делиться можно только с людьми и команд
 
 msgid "You can read and export, but not run agents."
 msgstr "Можно читать и экспортировать, но не запускать агентов."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Удалить его можно, только когда его не использует ни одно рабочее пространство, включая архивные. Новые рабочие пространства перестанут его извлекать. Папка останется на диске в {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Его можно восстановить в разделе «Настройки → Проекты» в течение 30 дней. Папка репозитория никогда не удаляется."

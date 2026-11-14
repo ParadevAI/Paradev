@@ -81,7 +81,9 @@ export function AddRepositoryMenu({
 	const addUrl = () => {
 		const trimmed = url.trim();
 		if (!trimmed) return;
-		onToggleClone({ url: trimmed, label: repositoryLabel(trimmed) });
+		if (!selectedCloneUrls.includes(trimmed)) {
+			onToggleClone({ url: trimmed, label: repositoryLabel(trimmed) });
+		}
 		handleOpenChange(false);
 	};
 	const back = (

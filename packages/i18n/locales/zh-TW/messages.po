@@ -20676,6 +20676,12 @@ msgstr "專案仍在載入。請再試一次。"
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "按原樣使用專案的簽出: 檔案和分支是共用的"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "{computer} 上的專案尚未載入。請稍後再試。"
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "此電腦上的專案尚未載入。請稍後再試。"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "提供商回應了{0}。"
@@ -23108,6 +23114,9 @@ msgstr "工作區是由git worktree支撐的隔離任務環境。"
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "從此環境啟動的工作區將不再收到它。"
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "必須先刪除使用它的工作區。已封存的工作區會失去它的簽出,沒有其他內容剩下的工作區將無法再還原。新工作區將不再簽出它。資料夾會保留在磁碟上的 {repositoryPath}。"
+
 msgid "Workspaces you can open will show up here."
 msgstr "你可以開啟的工作區會顯示在這裡。"
 
@@ -23316,9 +23325,6 @@ msgstr "你只能與此組織中的人員和團隊分享"
 
 msgid "You can read and export, but not run agents."
 msgstr "你可以查看和匯出，但無法執行代理程式。"
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "只有在沒有任何工作區(包括已封存的)使用它時才能移除。新工作區將不再簽出它。資料夾會保留在磁碟上的 {repositoryPath}。"
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "你可以在 30 天內從「設定 → 專案」還原。儲存庫資料夾永遠不會被刪除。"

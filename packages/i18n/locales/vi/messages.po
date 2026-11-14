@@ -20676,6 +20676,12 @@ msgstr "Dự án vẫn đang tải. Hãy thử lại."
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout của dự án như hiện có: tệp và nhánh được dùng chung"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "Các dự án trên {computer} chưa tải xong. Hãy thử lại sau giây lát."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "Các dự án trên máy tính này chưa tải xong. Hãy thử lại sau giây lát."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Nhà cung cấp trả về {0}."
@@ -23108,6 +23114,9 @@ msgstr "Workspace là môi trường tác vụ tách biệt, dựa trên git wor
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Các workspace khởi động từ môi trường này sẽ không còn nhận được nó."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Các workspace dùng nó phải được xóa trước. Các workspace đã lưu trữ sẽ mất bản checkout của nó, và workspace không còn gì khác sẽ không thể khôi phục được nữa. Các workspace mới sẽ không checkout nó nữa. Thư mục vẫn nằm trên đĩa tại {repositoryPath}."
+
 msgid "Workspaces you can open will show up here."
 msgstr "Workspace bạn có thể mở sẽ xuất hiện ở đây."
 
@@ -23316,9 +23325,6 @@ msgstr "Bạn chỉ có thể chia sẻ với người và nhóm trong tổ ch�
 
 msgid "You can read and export, but not run agents."
 msgstr "Bạn có thể đọc và xuất dữ liệu, nhưng không thể chạy agent."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Bạn chỉ có thể gỡ nó khi không có workspace nào dùng nó, kể cả các workspace đã lưu trữ. Các workspace mới sẽ không checkout nó nữa. Thư mục vẫn nằm trên đĩa tại {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Bạn có thể khôi phục trong Cài đặt → Dự án trong 30 ngày. Thư mục repository không bao giờ bị xóa."

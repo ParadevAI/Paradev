@@ -20676,6 +20676,12 @@ msgstr "O projeto ainda está carregando. Tente novamente."
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "O checkout do projeto como está: arquivos e branch são compartilhados"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "Os projetos em {computer} ainda não foram carregados. Tente de novo em instantes."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "Os projetos neste computador ainda não foram carregados. Tente de novo em instantes."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "O provedor respondeu {0}."
@@ -23108,6 +23114,9 @@ msgstr "Áreas de trabalho são ambientes isolados por tarefa, baseados em workt
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Workspaces iniciados a partir deste ambiente deixarão de recebê-la."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Os workspaces que o usam precisam ser excluídos primeiro. Workspaces arquivados perdem o checkout dele, e um que não tenha mais nada não pode mais ser restaurado. Novos workspaces deixam de fazer checkout dele. A pasta continua no disco em {repositoryPath}."
+
 msgid "Workspaces you can open will show up here."
 msgstr "As áreas de trabalho que você pode abrir aparecem aqui."
 
@@ -23316,9 +23325,6 @@ msgstr "Você só pode compartilhar com pessoas e equipes desta organização"
 
 msgid "You can read and export, but not run agents."
 msgstr "Você pode ler e exportar, mas não rodar agentes."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Você só pode removê-lo quando nenhum workspace o usa, incluindo os arquivados. Novos workspaces deixam de fazer checkout dele. A pasta continua no disco em {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Você pode restaurá-lo em Configurações → Projetos por 30 dias. A pasta do repositório nunca é excluída."

@@ -176,9 +176,10 @@ export function RepositoriesSection({
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							<Trans>
-								You can remove it only when no workspace uses it, archived
-								workspaces included. New workspaces stop checking it out. The
-								folder stays on disk at {repositoryPath}.
+								Workspaces that use it must be deleted first. Archived
+								workspaces lose their checkout of it, and one with nothing else
+								left can no longer be restored. New workspaces stop checking it
+								out. The folder stays on disk at {repositoryPath}.
 							</Trans>
 						</AlertDialogDescription>
 					</AlertDialogHeader>

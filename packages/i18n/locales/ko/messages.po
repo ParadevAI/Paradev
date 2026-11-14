@@ -20676,6 +20676,12 @@ msgstr "프로젝트를 아직 불러오는 중입니다. 다시 시도하세요
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "프로젝트의 체크아웃을 그대로 사용: 파일과 브랜치가 공유됩니다"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "{computer}의 프로젝트를 아직 불러오지 못했습니다. 잠시 후 다시 시도하세요."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "이 컴퓨터의 프로젝트를 아직 불러오지 못했습니다. 잠시 후 다시 시도하세요."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "제공사가 {0}을(를) 반환했습니다."
@@ -23108,6 +23114,9 @@ msgstr "워크스페이스는 git worktree를 기반으로 한 격리된 작업 
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "이 환경에서 시작한 워크스페이스는 더 이상 이 값을 받지 않습니다."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "이를 사용하는 워크스페이스를 먼저 삭제해야 합니다. 보관된 워크스페이스는 이 체크아웃을 잃으며, 남은 것이 없는 워크스페이스는 더 이상 복원할 수 없습니다. 새 워크스페이스는 더 이상 이를 체크아웃하지 않습니다. 폴더는 디스크의 {repositoryPath}에 그대로 남습니다."
+
 msgid "Workspaces you can open will show up here."
 msgstr "열 수 있는 워크스페이스가 여기에 표시됩니다."
 
@@ -23316,9 +23325,6 @@ msgstr "이 조직의 사람과 팀하고만 공유할 수 있습니다"
 
 msgid "You can read and export, but not run agents."
 msgstr "읽기와 내보내기는 가능하지만 에이전트는 실행할 수 없습니다."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "보관된 워크스페이스를 포함해 어떤 워크스페이스도 사용하지 않을 때만 제거할 수 있습니다. 새 워크스페이스는 더 이상 이를 체크아웃하지 않습니다. 폴더는 디스크의 {repositoryPath}에 그대로 남습니다."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30일 동안 설정 → 프로젝트에서 복원할 수 있습니다. 저장소 폴더는 절대 삭제되지 않습니다."

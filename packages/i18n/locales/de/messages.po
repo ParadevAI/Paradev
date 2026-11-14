@@ -20676,6 +20676,12 @@ msgstr "Das Projekt wird noch geladen. Versuche es erneut."
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Der Checkout des Projekts, wie er ist: Dateien und Branch werden geteilt"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "Die Projekte auf {computer} sind noch nicht geladen. Versuche es gleich noch einmal."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "Die Projekte auf diesem Computer sind noch nicht geladen. Versuche es gleich noch einmal."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Der Anbieter hat mit {0} geantwortet."
@@ -23108,6 +23114,9 @@ msgstr "Arbeitsbereiche sind isolierte Aufgaben-Umgebungen auf Basis von Git-Wor
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Workspaces, die aus dieser Umgebung gestartet werden, erhalten sie nicht mehr."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Workspaces, die es nutzen, müssen zuerst gelöscht werden. Archivierte Workspaces verlieren ihren Checkout davon, und einer, dem sonst nichts bleibt, kann nicht mehr wiederhergestellt werden. Neue Workspaces checken es nicht mehr aus. Der Ordner bleibt auf der Festplatte unter {repositoryPath}."
+
 msgid "Workspaces you can open will show up here."
 msgstr "Arbeitsbereiche, die du öffnen kannst, erscheinen hier."
 
@@ -23316,9 +23325,6 @@ msgstr "Du kannst nur mit Personen und Teams in dieser Organisation teilen"
 
 msgid "You can read and export, but not run agents."
 msgstr "Du kannst lesen und exportieren, aber keine Agenten ausführen."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Du kannst es nur entfernen, wenn kein Workspace es nutzt, archivierte eingeschlossen. Neue Workspaces checken es nicht mehr aus. Der Ordner bleibt auf der Festplatte unter {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Du kannst es 30 Tage lang unter Einstellungen → Projekte wiederherstellen. Der Repository-Ordner wird nie gelöscht."

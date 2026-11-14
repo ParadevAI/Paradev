@@ -20676,6 +20676,12 @@ msgstr "Projekt se stále načítá. Zkuste to znovu."
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Checkout projektu tak, jak je: soubory a větev jsou sdílené"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "Projekty na {computer} se ještě nenačetly. Zkuste to znovu za chvíli."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "Projekty na tomto počítači se ještě nenačetly. Zkuste to znovu za chvíli."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Poskytovatel odpověděl {0}."
@@ -23108,6 +23114,9 @@ msgstr "Pracovní prostory jsou izolovaná prostředí pro úkoly postavená na 
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Workspacy spuštěné z tohoto prostředí ji přestanou dostávat."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Pracovní prostory, které jej používají, je nutné nejprve smazat. Archivované pracovní prostory o jeho checkout přijdou a ten, kterému nic jiného nezbude, už nelze obnovit. Nové pracovní prostory jej přestanou checkoutovat. Složka zůstane na disku v {repositoryPath}."
+
 msgid "Workspaces you can open will show up here."
 msgstr "Pracovní prostory, které můžete otevřít, se objeví tady."
 
@@ -23316,9 +23325,6 @@ msgstr "Sdílet můžete jen s lidmi a týmy v této organizaci"
 
 msgid "You can read and export, but not run agents."
 msgstr "Můžete číst a exportovat, ale ne spouštět agenty."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Odebrat jej můžete, jen když jej nepoužívá žádný pracovní prostor, včetně archivovaných. Nové pracovní prostory jej přestanou checkoutovat. Složka zůstane na disku v {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Můžete ho obnovit v Nastavení → Projekty po dobu 30 dnů. Složka repozitáře se nikdy nemaže."

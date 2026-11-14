@@ -20670,6 +20670,12 @@ msgstr "Проєкт ще завантажується. Спробуйте ще 
 msgid "The project's checkout as it is: files and branch are shared"
 msgstr "Робоча копія проєкту як є: файли та гілка спільні"
 
+msgid "The projects on {computer} have not loaded yet. Try again in a moment."
+msgstr "Проєкти на {computer} ще не завантажилися. Спробуйте ще раз за хвилину."
+
+msgid "The projects on this computer have not loaded yet. Try again in a moment."
+msgstr "Проєкти на цьому комп’ютері ще не завантажилися. Спробуйте ще раз за хвилину."
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Провайдер відповів {0}."
@@ -23102,6 +23108,9 @@ msgstr "Робочі простори — це ізольовані середо
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Робочі простори, запущені з цього середовища, більше не отримуватимуть це значення."
 
+msgid "Workspaces that use it must be deleted first. Archived workspaces lose their checkout of it, and one with nothing else left can no longer be restored. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Спочатку потрібно видалити робочі простори, які його використовують. Архівні робочі простори втрачають його витягнуту копію, а той, у якого більше нічого не залишилося, уже не можна відновити. Нові робочі простори перестануть його витягувати. Тека залишиться на диску в {repositoryPath}."
+
 msgid "Workspaces you can open will show up here."
 msgstr "Тут з'являться робочі простори, які ви можете відкрити."
 
@@ -23310,9 +23319,6 @@ msgstr "Ділитися можна лише з людьми й командам
 
 msgid "You can read and export, but not run agents."
 msgstr "Можна читати й експортувати, але не запускати агентів."
-
-msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Видалити його можна, лише коли його не використовує жоден робочий простір, зокрема архівний. Нові робочі простори перестануть його витягувати. Тека залишиться на диску в {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Ви можете відновити його в «Налаштування → Проєкти» протягом 30 днів. Папку репозиторію ніколи не буде видалено."

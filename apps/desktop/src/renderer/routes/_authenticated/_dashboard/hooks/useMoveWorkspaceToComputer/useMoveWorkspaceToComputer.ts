@@ -88,13 +88,14 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			};
 			const destinationUrl = hostUrlOf(destination.hostId);
 			const fromCloud = cloudWorkspaces.some((row) => row.id === workspace.id);
+			const destinationRows = hostResults.find(
+				(result) => result.target.machineId === destination.hostId,
+			)?.rows;
 			// The destination project holds exactly the repositories the workspace checks out.
 			const requireProject = (repositoryNames: string[]) => {
-				const found = hostResults
-					.find((result) => result.target.machineId === destination.hostId)
-					?.rows?.find((row) =>
-						holdsExactRepositorySet(row.repositories, repositoryNames),
-					);
+				const found = destinationRows?.find((row) =>
+					holdsExactRepositorySet(row.repositories, repositoryNames),
+				);
 				if (found) return found;
 				const computer = destination.name;
 				const [only] = repositoryNames;
@@ -122,6 +123,14 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 					projectId: workspace.projectId,
 				}),
 			);
+			if (!destinationRows) {
+				const computer = destination.name;
+				throw new Error(
+					computer
+						? t`The projects on ${computer} have not loaded yet. Try again in a moment.`
+						: t`The projects on this computer have not loaded yet. Try again in a moment.`,
+				);
+			}
 			if (earlyRepositoryNames) requireProject(earlyRepositoryNames);
 			onStage("saving");
 			const { workspaceMoveId } =
