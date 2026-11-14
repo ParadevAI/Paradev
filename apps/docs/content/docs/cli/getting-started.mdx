@@ -129,7 +129,7 @@ If the project already exists in your org but isn't on this machine,
 attach to it instead of creating a duplicate:
 
 ```bash
-superset projects setup PROJECT_ID --local --parent-dir ~/code
+superset projects setup PROJECT_ID --clone-into ~/code
 ```
 
 Then create a workspace against it:
@@ -251,7 +251,7 @@ superset workspaces list --host HOST_ID   # another host
 ```
 
 Every host-scoped command targets exactly one host. `projects list`
-defaults to this machine. `projects create` and `projects setup` require
+and `projects setup` default to this machine. `projects create` requires
 `--host` or `--local`. `workspaces create`, `workspaces list`, and
 `terminals` commands default to the cloud when your account has cloud
 workspaces, and to this machine when it does not, so pass `--local` or

@@ -169,22 +169,23 @@ workspaces yet.
 
 #### Subsequent machines: `projects setup <id>`
 
-If another machine already created the project, adopt it. Running `create`
-again would register a second, unrelated project for the same repo.
-Projects are host-owned, so pick the ID from a machine that has it
-(`projects list --host <id>`), then:
+If another machine already created the project, add it to this machine with
+`setup`. Running `create` again would make a second, unrelated project for the
+same repositories. Projects are host-owned, so pick the ID from a machine that
+has it (`projects list --host <id>`), then:
 
 ```bash
-# Clone the project's repo onto this machine
-superset projects setup 47c31b04-… --local --parent-dir ~/code
+# Clone every repository of the project into ~/code
+superset projects setup 47c31b04-… --clone-into ~/code
 
-# Or attach to an existing local checkout
-superset projects setup 47c31b04-… --local --import ~/code/repo
+# Or use a checkout that is already on disk for one repository
+superset projects setup 47c31b04-… --clone-into ~/code --path api=~/src/api
 ```
 
-The URL for clone mode comes from the cloud project record, so `setup`
-doesn't need `--clone <url>`. `setup` is idempotent: re-running against a
-project that's already set up here is a no-op.
+`setup` reads the project, with its repositories and their Git URLs, from the
+other host that has it; pass `--from-host <id>` if more than one does. Every
+repository needs a folder: `--clone-into` or a `--path <repo>=<dir>`.
+Re-running against a project that is already set up here sets up nothing new.
 
 ### Create your first workspace
 

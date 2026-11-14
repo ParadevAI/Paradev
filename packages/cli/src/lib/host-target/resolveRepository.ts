@@ -2,7 +2,7 @@ import { CLIError } from "@superset/cli-framework";
 import { requireRepositories } from "./requireRepositories";
 import type { HostServiceClient } from "./resolveHostTarget";
 
-type HostProject = NonNullable<
+export type HostProject = NonNullable<
 	Awaited<ReturnType<HostServiceClient["project"]["get"]["query"]>>
 >;
 

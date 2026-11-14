@@ -669,33 +669,53 @@ superset projects repos relocate api --project prj_… --path ~/src/api --local
 <Command
 	name="superset projects setup <id>"
 	args={[
-		{ name: "id", required: true, description: "Project UUID to adopt." },
+		{ name: "id", required: true, description: "Project ID." },
 	]}
 	options={[
-		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`; one is required." },
-		{ flag: "--local", description: "Target this machine. Mutually exclusive with `--host`; one is required." },
-		{ flag: "--project <id>", description: "Project UUID to adopt. Alias for the positional argument." },
-		{ flag: "--parent-dir <path>", description: "Parent directory to clone the project's repo into (clone mode)." },
-		{ flag: "--import <path>", description: "Existing repo path on the target host (import mode)." },
-		{ flag: "--path <path>", description: "Alias for `--import`." },
-		{ flag: "--allow-relocate", description: "Permit re-importing at a different path if the project is already set up here. `--import`/`--path` only." },
+		{ flag: "--clone-into <dir>", description: "Clone every repository into `<dir>/<name>/`. Repositories given a `--path` are not cloned." },
+		{ flag: "--path <repo>=<dir>", description: "Use the existing folder `<dir>` for the repository `<repo>` (its name or ID). Repeatable; wins over `--clone-into` for that repository." },
+		{ flag: "--allow-relocate", description: "If this host already has a repository at another folder, move it to its `--path` folder. `--path` only." },
+		{ flag: "--from-host <id>", description: "Host machineId to copy the project from. Default: the only other online host that has it." },
+		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`." },
+		{ flag: "--local", description: "Target this machine (the default)." },
 	]}
 	output={`{
-  repoPath: string;
+  id: string;
+  name: string;
+  primaryRepositoryId: string;
+  repositories: Repository[];
+  created: boolean;
 }`}
 >
-Adopt an existing project onto a host without creating a duplicate cloud
-record. Use it instead of [`create`](#superset-projects-create) on a new
-machine when the repo is already in the org. Find the project ID with
-[`projects list`](#superset-projects-list) (add `--host <id>` for the host that already has the project). Re-running against a project already
-set up at the same path is a no-op.
+Put a project that another host of the organization has on this host too, with
+the same project and repository IDs. Use it instead of
+[`create`](#superset-projects-create) on a new machine: `create` would make a
+second, unrelated project.
+
+The command reads the project (its name, repositories and their Git URLs) from
+the host that has it. With no `--from-host`, it asks every other online host and
+uses the one that has the project; if several have it, pass `--from-host <id>`.
+Find the project ID with [`projects list --host <id>`](#superset-projects-list).
+
+Every repository needs a folder: `--clone-into` clones all of them, and
+`--path <repo>=<dir>` uses a folder that already has the repository. A
+repository with no Git remote must have a `--path`. Relative paths are resolved
+against the current directory on this machine; for another host, give absolute
+paths.
+
+If the host already has the project, `created` is `false` and nothing new is
+set up: the command checks each repository you give a folder for, and with
+`--allow-relocate` moves it there.
 
 ```bash
-# Pick an ID from `superset projects list`, then clone it onto this machine
-superset projects setup 47c31b04-… --local --parent-dir ~/code
+# Clone every repository of the project into ~/code
+superset projects setup 47c31b04-… --clone-into ~/code
 
-# Or register an existing local checkout
-superset projects setup 47c31b04-… --local --import ~/code/my-app
+# Use an existing checkout of `api`, clone the others
+superset projects setup 47c31b04-… --clone-into ~/code --path api=~/src/api
+
+# Two other hosts have the project: copy it from one of them
+superset projects setup 47c31b04-… --clone-into ~/code --from-host <id>
 ```
 </Command>
 

@@ -89,7 +89,13 @@ superset projects create --name "My Project" --local \
   --repo https://github.com/org/repo.git --parent-dir ~/code
 ```
 
-If the project already exists on another machine, attach this server to it with `projects setup` instead. See [Create or adopt a project](/cli/host-server#create-or-adopt-a-project).
+If the project already exists on another machine, add it to this server with `projects setup` instead. It reads the project from that machine and clones each repository:
+
+```bash
+superset projects setup <project-id> --local --clone-into ~/code
+```
+
+Pass `--path <repo>=<dir>` for a repository that is already on the server. See [Create or adopt a project](/cli/host-server#create-or-adopt-a-project).
 
 ## 5. Work on it
 
