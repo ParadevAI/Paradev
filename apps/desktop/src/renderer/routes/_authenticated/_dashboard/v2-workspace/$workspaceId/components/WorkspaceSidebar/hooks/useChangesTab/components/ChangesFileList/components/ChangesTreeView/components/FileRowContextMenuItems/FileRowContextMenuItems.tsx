@@ -35,7 +35,7 @@ interface FileRowContextMenuItemsProps {
 		changeKey?: string,
 	) => void;
 	onOpenFile?: (absolutePath: string, openInNewTab?: boolean) => void;
-	onOpenInEditor?: (path: string) => void;
+	onOpenInEditor?: (absolutePath: string) => void;
 	/**
 	 * Ask the parent to run the discard flow for this file. The confirm dialog
 	 * lives on `ChangesTreeView`, not here — Pierre unmounts `renderContextMenu`
@@ -115,8 +115,8 @@ export function FileRowContextMenuItems({
 				<Trans>Open File in New Tab</Trans>
 			</DropdownMenuItem>
 			<DropdownMenuItem
-				onSelect={() => onOpenInEditor?.(file.path)}
-				disabled={!onOpenInEditor}
+				onSelect={() => absolutePath && onOpenInEditor?.(absolutePath)}
+				disabled={!onOpenInEditor || !absolutePath}
 			>
 				<ExternalLink />
 				<Trans>Open in Editor</Trans>

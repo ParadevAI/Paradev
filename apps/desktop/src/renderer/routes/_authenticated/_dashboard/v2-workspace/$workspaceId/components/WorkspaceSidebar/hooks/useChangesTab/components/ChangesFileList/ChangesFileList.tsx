@@ -7,9 +7,14 @@ import { memo, useMemo } from "react";
 import type { FoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type { ChangesViewMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
+import type { SelectDiffFile } from "../../hooks/useChangesContent";
 import { ChangesFoldersView } from "./components/ChangesFoldersView";
 import { ChangesSection } from "./components/ChangesSection";
 import { ChangesTreeView } from "./components/ChangesTreeView";
+import {
+	groupFilesByRepository,
+	type RepositoryRoot,
+} from "./utils/repositoryTree";
 
 interface ChangesFileListProps {
 	files: ChangesetFile[];
@@ -17,20 +22,18 @@ interface ChangesFileListProps {
 	isFiltered?: boolean;
 	workspaceId: string;
 	repositoryId: string | undefined;
-	repositoryName?: string;
 	isLoading?: boolean;
 	viewMode: ChangesViewMode;
+	/** The folder the list's paths start from: the checkout, or the workspace folder for several. */
 	worktreePath?: string;
+	/** Set when the list shows several checkouts, each as a top-level folder. */
+	repositories?: RepositoryRoot[];
 	selectedFilePath?: string;
 	selectedChangeKey?: string;
 	foldSignal: FoldSignal;
-	onSelectFile?: (
-		path: string,
-		openInNewTab?: boolean,
-		changeKey?: string,
-	) => void;
+	onSelectFile?: SelectDiffFile;
 	onOpenFile?: (absolutePath: string, openInNewTab?: boolean) => void;
-	onOpenInEditor?: (path: string) => void;
+	onOpenInEditor?: (absolutePath: string) => void;
 }
 
 type GroupKey = ChangesetFile["source"]["kind"];
@@ -60,10 +63,10 @@ export const ChangesFileList = memo(function ChangesFileList({
 	isFiltered,
 	workspaceId,
 	repositoryId,
-	repositoryName,
 	isLoading,
 	viewMode,
 	worktreePath,
+	repositories,
 	selectedFilePath,
 	selectedChangeKey,
 	foldSignal,
@@ -114,12 +117,21 @@ export const ChangesFileList = memo(function ChangesFileList({
 				const groupFiles = grouped[key];
 				if (groupFiles.length === 0) return null;
 				const hasStagingActions = key === "unstaged" || key === "staged";
+				const groupRepositories = repositories
+					? groupFilesByRepository(groupFiles, repositories).map(
+							({ repository }) => repository,
+						)
+					: undefined;
 				return (
 					<ChangesSection
 						key={key}
 						sectionKey={key}
-						repositoryId={repositoryId}
-						repositoryName={repositoryName}
+						repositoryIds={
+							groupRepositories?.map(({ repositoryId: id }) => id) ?? [
+								repositoryId,
+							]
+						}
+						repositoryNames={groupRepositories?.map(({ name }) => name)}
 						title={i18n._(GROUP_TITLES[key])}
 						count={groupFiles.length}
 						additions={groupFiles.reduce(
@@ -146,6 +158,7 @@ export const ChangesFileList = memo(function ChangesFileList({
 								workspaceId={workspaceId}
 								repositoryId={repositoryId}
 								worktreePath={worktreePath}
+								repositories={repositories}
 								selectedFilePath={selectedFilePath}
 								selectedChangeKey={selectedChangeKey}
 								foldSignal={foldSignal}
@@ -159,6 +172,7 @@ export const ChangesFileList = memo(function ChangesFileList({
 								workspaceId={workspaceId}
 								repositoryId={repositoryId}
 								worktreePath={worktreePath}
+								repositories={repositories}
 								selectedFilePath={selectedFilePath}
 								selectedChangeKey={selectedChangeKey}
 								foldSignal={foldSignal}

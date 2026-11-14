@@ -45,6 +45,7 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import type { SelectDiffFile } from "../../../../hooks/useChangesContent";
 import { useFileDrag } from "../../hooks/useFileDrag";
 import { useStagingMutations } from "../../hooks/useStagingMutations";
 import { StageToggleButton } from "../StageToggleButton";
@@ -58,9 +59,9 @@ interface FileRowProps {
 	hideDir?: boolean;
 	/** Highlight as the diff pane's currently open file. */
 	isSelected?: boolean;
-	onSelect?: (path: string, openInNewTab?: boolean, changeKey?: string) => void;
+	onSelect?: SelectDiffFile;
 	onOpenFile?: (absolutePath: string, openInNewTab?: boolean) => void;
-	onOpenInEditor?: (path: string) => void;
+	onOpenInEditor?: (absolutePath: string) => void;
 }
 
 export const FileRow = memo(function FileRow({
@@ -139,12 +140,14 @@ export const FileRow = memo(function FileRow({
 				{...fileDrag}
 				onClick={(e) => {
 					const intent = policy.getIntent(e);
-					if (intent === "external") onOpenInEditor?.(file.path);
-					else if (intent === "file" && absolutePath)
+					if (intent === "external") {
+						if (absolutePath) onOpenInEditor?.(absolutePath);
+					} else if (intent === "file" && absolutePath)
 						onOpenFile?.(absolutePath, false);
 					else if (intent === "diffNewTab")
-						onSelect?.(file.path, true, changeKey);
-					else if (intent === "diff") onSelect?.(file.path, false, changeKey);
+						onSelect?.(file.path, true, changeKey, repositoryId);
+					else if (intent === "diff")
+						onSelect?.(file.path, false, changeKey, repositoryId);
 				}}
 			/>
 			<div className="pointer-events-none absolute inset-y-0 right-2 flex items-center gap-0.5 opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 has-[[data-state=open]]:pointer-events-auto has-[[data-state=open]]:opacity-100">
@@ -194,13 +197,17 @@ export const FileRow = memo(function FileRow({
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-64">
 						<DropdownMenuItem
-							onSelect={() => onSelect?.(file.path, false, changeKey)}
+							onSelect={() =>
+								onSelect?.(file.path, false, changeKey, repositoryId)
+							}
 						>
 							<GitCompare />
 							<Trans>Open Diff</Trans>
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onSelect={() => onSelect?.(file.path, true, changeKey)}
+							onSelect={() =>
+								onSelect?.(file.path, true, changeKey, repositoryId)
+							}
 						>
 							<SquarePlus />
 							<Trans>Open Diff in New Tab</Trans>
@@ -230,8 +237,8 @@ export const FileRow = memo(function FileRow({
 							<Trans>Open File in New Tab</Trans>
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onSelect={() => onOpenInEditor?.(file.path)}
-							disabled={!onOpenInEditor}
+							onSelect={() => absolutePath && onOpenInEditor?.(absolutePath)}
+							disabled={!onOpenInEditor || !absolutePath}
 						>
 							<ExternalLink />
 							<Trans>Open in Editor</Trans>
@@ -275,13 +282,13 @@ export const FileRow = memo(function FileRow({
 			</Tooltip>
 			<ContextMenuContent className="w-64">
 				<ContextMenuItem
-					onSelect={() => onSelect?.(file.path, false, changeKey)}
+					onSelect={() => onSelect?.(file.path, false, changeKey, repositoryId)}
 				>
 					<GitCompare />
 					<Trans>Open Diff</Trans>
 				</ContextMenuItem>
 				<ContextMenuItem
-					onSelect={() => onSelect?.(file.path, true, changeKey)}
+					onSelect={() => onSelect?.(file.path, true, changeKey, repositoryId)}
 				>
 					<SquarePlus />
 					<Trans>Open Diff in New Tab</Trans>
@@ -309,8 +316,8 @@ export const FileRow = memo(function FileRow({
 					<Trans>Open File in New Tab</Trans>
 				</ContextMenuItem>
 				<ContextMenuItem
-					onSelect={() => onOpenInEditor?.(file.path)}
-					disabled={!onOpenInEditor}
+					onSelect={() => absolutePath && onOpenInEditor?.(absolutePath)}
+					disabled={!onOpenInEditor || !absolutePath}
 				>
 					<ExternalLink />
 					<Trans>Open in Editor</Trans>

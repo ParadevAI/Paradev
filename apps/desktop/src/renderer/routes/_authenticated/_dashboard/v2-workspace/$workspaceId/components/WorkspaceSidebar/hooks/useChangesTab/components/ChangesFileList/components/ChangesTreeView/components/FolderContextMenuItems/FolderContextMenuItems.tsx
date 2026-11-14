@@ -8,10 +8,10 @@ import { PathActionsMenuItems } from "renderer/routes/_authenticated/_dashboard/
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 
 interface FolderContextMenuItemsProps {
-	/** Folder path relative to the workspace root. */
+	/** Folder path relative to worktreePath. */
 	relativePath: string;
 	worktreePath?: string;
-	onOpenInEditor?: (path: string) => void;
+	onOpenInEditor?: (absolutePath: string) => void;
 }
 
 /**
@@ -31,8 +31,8 @@ export function FolderContextMenuItems({
 	return (
 		<>
 			<DropdownMenuItem
-				onSelect={() => onOpenInEditor?.(relativePath)}
-				disabled={!onOpenInEditor}
+				onSelect={() => absolutePath && onOpenInEditor?.(absolutePath)}
+				disabled={!onOpenInEditor || !absolutePath}
 			>
 				<ExternalLink />
 				<Trans>Open in Editor</Trans>

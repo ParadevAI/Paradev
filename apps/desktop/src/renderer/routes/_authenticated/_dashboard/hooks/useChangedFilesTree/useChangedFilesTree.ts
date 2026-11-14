@@ -35,6 +35,10 @@ interface UseChangedFilesTreeParams<T extends ChangedFileEntry> {
 	selectedPath?: string | null;
 	flattenEmptyDirectories?: boolean;
 	unsafeCSS?: string;
+	/** Replaces the file count on a folder row; undefined keeps the count. */
+	directoryDecoration?: (
+		directoryPath: string,
+	) => FileTreeRowDecoration | null | undefined;
 }
 
 /**
@@ -54,6 +58,7 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 	selectedPath,
 	flattenEmptyDirectories,
 	unsafeCSS = "",
+	directoryDecoration,
 }: UseChangedFilesTreeParams<T>) {
 	const { treePaths, toTreePath, toRealPath } = useMemo(
 		() => buildCollisionSafeTreePaths(files.map((f) => f.path)),
@@ -201,7 +206,10 @@ export function useChangedFilesTree<T extends ChangedFileEntry>({
 	// painted by setGitStatus.
 	handlersRef.current.renderRowDecoration = (ctx) => {
 		if (ctx.item.kind === "directory") {
-			const count = dirFileCount.get(stripTrailingSlash(ctx.item.path));
+			const directoryPath = stripTrailingSlash(ctx.item.path);
+			const custom = directoryDecoration?.(directoryPath);
+			if (custom !== undefined) return custom;
+			const count = dirFileCount.get(directoryPath);
 			return count ? { text: String(count) } : null;
 		}
 		const file = fileByTreePath.get(ctx.item.path);

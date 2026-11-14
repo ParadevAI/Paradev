@@ -1,6 +1,6 @@
-import { type ReactNode, useCallback, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
-import type { FoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
+import { ChangesScopeControl } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/ChangesScopeControl";
 import { useChangeset } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import { useChangesScope } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangesScope";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
@@ -35,16 +35,12 @@ export interface ChangesContentParams {
 	/** The Changes pane's chrome: scope lives in the pane header, so the list
 	 * keeps only an always-open search and a view menu. */
 	compact?: boolean;
-	shared?: { query: string; foldSignal: FoldSignal };
 }
 
 interface CheckoutChangesContentParams extends ChangesContentParams {
 	repositoryId: string | undefined;
 	/** The checkout's folder; file paths are relative to it. */
 	worktreePath: string | undefined;
-	/** Tags files with repositoryId, for a list that shows several checkouts. */
-	tagRepository: boolean;
-	repositoryName?: string;
 }
 
 /** One checkout's Changes view. */
@@ -56,9 +52,6 @@ export function useChangesContent({
 	onSelectFile,
 	onOpenFile,
 	compact = false,
-	tagRepository,
-	repositoryName,
-	shared,
 }: CheckoutChangesContentParams): {
 	content: ReactNode;
 	changedPathCount: number;
@@ -72,7 +65,7 @@ export function useChangesContent({
 		commits,
 		branches,
 		canRenameBranch,
-		renameBranch: handleRenameBranch,
+		renameBranch,
 	} = useChangesScope(workspaceId, repositoryId);
 	const { preferences, setChangesViewMode: setViewMode } =
 		useV2UserPreferences();
@@ -83,33 +76,16 @@ export function useChangesContent({
 		workspaceId,
 		repositoryId,
 		ref,
-		tagRepository,
 	});
 
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
-
-	const handleOpenInEditor = useCallback(
-		(relativePath: string) => {
-			if (!worktreePath) return;
-			openInExternalEditor(toAbsoluteWorkspacePath(worktreePath, relativePath));
-		},
-		[worktreePath, openInExternalEditor],
-	);
-
-	const handleSelectFile = useMemo(
-		() =>
-			onSelectFile &&
-			((path: string, openInNewTab?: boolean, changeKey?: string) =>
-				onSelectFile(path, openInNewTab, changeKey, repositoryId)),
-		[onSelectFile, repositoryId],
-	);
 
 	// The list compares absolute paths — the contract its rows share with the
 	// Files tab — while the pane records checkout-relative targets.
 	const targetsThisCheckout = isDiffTargetForCheckout({
 		targetRepositoryId: selectedDiffTarget?.repositoryId,
 		repositoryId,
-		isMultiRepo: tagRepository,
+		isMultiRepo: false,
 	});
 	const selectedFilePath =
 		selectedDiffTarget && worktreePath && targetsThisCheckout
@@ -125,17 +101,35 @@ export function useChangesContent({
 		[files],
 	);
 
+	const statusData = status.data;
+	const scope = statusData && (
+		<ChangesScopeControl
+			filter={filter}
+			onFilterChange={setFilter}
+			commits={commits.data?.commits ?? []}
+			uncommittedCount={statusData.staged.length + statusData.unstaged.length}
+			baseBranch={baseBranch ?? statusData.defaultBranch.name}
+			branches={branches.data?.branches ?? []}
+			// Picking the repo default clears the override (null) instead of
+			// pinning it, so the workspace follows a later default change.
+			onBaseBranchChange={(branchName) =>
+				setBaseBranch(
+					branchName === statusData.defaultBranch.name ? null : branchName,
+				)
+			}
+			currentBranchName={statusData.currentBranch.name}
+			canRenameBranch={canRenameBranch}
+			onRenameBranch={renameBranch}
+		/>
+	);
+
 	const content = (
 		<ChangesTabContent
 			workspaceId={workspaceId}
 			repositoryId={repositoryId}
-			repositoryName={repositoryName}
 			status={status}
-			commits={commits}
-			branches={branches}
-			filter={filter}
+			scope={scope}
 			viewMode={viewMode}
-			baseBranch={baseBranch}
 			files={files}
 			isLoading={isLoading}
 			worktreePath={worktreePath}
@@ -143,16 +137,11 @@ export function useChangesContent({
 			selectedChangeKey={
 				targetsThisCheckout ? selectedDiffTarget?.changeKey : undefined
 			}
-			onSelectFile={handleSelectFile}
+			onSelectFile={onSelectFile}
 			onOpenFile={onOpenFile}
-			onOpenInEditor={handleOpenInEditor}
-			onFilterChange={setFilter}
+			onOpenInEditor={openInExternalEditor}
 			onViewModeChange={setViewMode}
-			onBaseBranchChange={setBaseBranch}
-			onRenameBranch={handleRenameBranch}
-			canRenameBranch={canRenameBranch}
 			compact={compact}
-			shared={shared}
 		/>
 	);
 
