@@ -14,6 +14,12 @@ describe("pageRefFromArg", () => {
 		expect(pageRefFromArg(ID)).toEqual({ id: ID });
 		expect(pageRefFromArg("q3-pipeline")).toEqual({ slug: "q3-pipeline" });
 	});
+
+	test("keeps a link with a malformed escape as it is", () => {
+		const link = "https://app.superset.sh/page/%E0";
+		expect(pageRefFromArg(link)).toEqual({ slug: link });
+		expect(pageLinkVersion(`${link}?v=2`)).toBeUndefined();
+	});
 });
 
 describe("pageLinkVersion", () => {

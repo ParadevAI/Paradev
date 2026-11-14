@@ -5,7 +5,16 @@ function pageLink(value: string): { slug: string; url: URL } | null {
 	if (!URL.canParse(value)) return null;
 	const url = new URL(value);
 	const match = PAGE_PATH.exec(url.pathname);
-	return match?.[1] ? { slug: decodeURIComponent(match[1]), url } : null;
+	const slug = match?.[1] && decodedSegment(match[1]);
+	return slug ? { slug, url } : null;
+}
+
+function decodedSegment(segment: string): string | null {
+	try {
+		return decodeURIComponent(segment);
+	} catch {
+		return null;
+	}
 }
 
 export function pageRefFromArg(
