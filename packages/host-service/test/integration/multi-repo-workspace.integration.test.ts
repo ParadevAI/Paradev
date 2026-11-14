@@ -783,6 +783,67 @@ test("unlinkFromWorkspace for a repository outside the workspace is NOT_FOUND an
 	});
 });
 
+test("unlinkFromWorkspace with one checkout refuses another repository's name, unless the remote cannot be read", async () => {
+	const scenario = await multiRepoScenario();
+	await scenario.api.git.addRemote("origin", "https://github.com/o/api.git");
+	const linkOnly = (
+		repositoryId: string,
+		repoName: string,
+		repoOwner = "o",
+	) => {
+		const { id: pullRequestId } = seedPullRequest(scenario.host, {
+			repositoryId,
+			repoOwner,
+			repoName,
+			prNumber: 7,
+			headBranch: "feature/one",
+		});
+		return seedWorkspace(scenario.host, {
+			projectId: scenario.projectId,
+			worktreePath: scenario.worktreeBaseDir,
+			branch: "feature/one",
+			repositoryIds: [repositoryId],
+			pullRequestId,
+		});
+	};
+	const linked = (workspaceId: string) =>
+		scenario.host.db
+			.select()
+			.from(workspaceRepositories)
+			.where(eq(workspaceRepositories.workspaceId, workspaceId))
+			.get()?.pullRequestId != null;
+
+	const api = linkOnly(scenario.apiId, "api");
+	await expect(
+		scenario.host.trpc.pullRequests.unlinkFromWorkspace.mutate({
+			workspaceId: api.id,
+			repository: "o/other",
+		}),
+	).rejects.toMatchObject({
+		message: expect.stringContaining("repository_not_in_project"),
+	});
+	expect(linked(api.id)).toBe(true);
+	await scenario.host.trpc.pullRequests.unlinkFromWorkspace.mutate({
+		workspaceId: api.id,
+		repository: "O/Api",
+	});
+	expect(linked(api.id)).toBe(false);
+
+	const fromUpstream = linkOnly(scenario.apiId, "api", "upstream");
+	await scenario.host.trpc.pullRequests.unlinkFromWorkspace.mutate({
+		workspaceId: fromUpstream.id,
+		repository: "upstream/api",
+	});
+	expect(linked(fromUpstream.id)).toBe(false);
+
+	const web = linkOnly(scenario.webId, "web");
+	await scenario.host.trpc.pullRequests.unlinkFromWorkspace.mutate({
+		workspaceId: web.id,
+		repository: "o/renamed",
+	});
+	expect(linked(web.id)).toBe(false);
+});
+
 function addOutsideWorktree(repoPath: string, branch: string): string {
 	const path = `${repoPath}-${branch.replaceAll("/", "-")}`;
 	const added = Bun.spawnSync(["git", "worktree", "add", "-b", branch, path], {

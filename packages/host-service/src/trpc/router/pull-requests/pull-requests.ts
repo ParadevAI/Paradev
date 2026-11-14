@@ -8,7 +8,10 @@ import {
 	resolveCheckout,
 } from "../../../workspaces/checkouts";
 import { protectedProcedure, router } from "../../index";
-import { findRepositoryByGithubName } from "../workspace-creation/shared/project-helpers";
+import {
+	findRepositoryByGithubName,
+	resolveGithubRepo,
+} from "../workspace-creation/shared/project-helpers";
 import { addComment } from "./procedures/add-comment";
 import { createForWorkspace } from "./procedures/create-for-workspace";
 import { getContent } from "./procedures/get-content";
@@ -22,6 +25,7 @@ import { replyToThread } from "./procedures/reply-to-thread";
 import { setDraft } from "./procedures/set-draft";
 import { setState } from "./procedures/set-state";
 import { setThreadResolution } from "./procedures/set-thread-resolution";
+import { isPullRequestOfRepo } from "./shared/linked-workspaces";
 
 export const pullRequestsRouter = router({
 	getByWorkspaces: protectedProcedure
@@ -129,7 +133,10 @@ export const pullRequestsRouter = router({
 	mergePR,
 });
 
-/** Only a workspace of several checkouts needs the name; with one, it is that checkout. */
+/**
+ * A single checkout matches by its remote or its linked PR's repository; one
+ * whose remote cannot be read is taken as the one named.
+ */
 async function findCheckoutRepositoryByGithubName(
 	ctx: HostServiceContext,
 	workspaceId: string,
@@ -142,17 +149,41 @@ async function findCheckoutRepositoryByGithubName(
 		.get();
 	if (!workspace) return undefined;
 	const checkouts = listWorkspaceCheckouts(ctx.db, workspace);
-	if (checkouts.length < 2) return undefined;
+	const [only] = checkouts;
+	if (!only) return undefined;
+	if (checkouts.length === 1) {
+		const remote = await resolveGithubRepo(
+			ctx,
+			only.repository.projectId,
+			only.repository.id,
+		).catch(() => null);
+		const [owner, name, ...rest] = fullName.trim().split("/");
+		const wanted = owner && name && rest.length === 0 ? { owner, name } : null;
+		const linkedToWanted =
+			wanted !== null &&
+			only.row.pullRequestId !== null &&
+			isPullRequestOfRepo(ctx.db, only.row.pullRequestId, wanted);
+		const remoteIsWanted =
+			remote !== null &&
+			`${remote.owner}/${remote.name}`.toLowerCase() ===
+				fullName.trim().toLowerCase();
+		if (!remote || remoteIsWanted || linkedToWanted) {
+			return only.repository.id;
+		}
+		throw repositoryNotInWorkspaceError(fullName);
+	}
 	const repositoryId = await findRepositoryByGithubName(
 		ctx,
 		checkouts.map((checkout) => checkout.repository),
 		fullName,
 	);
-	if (!repositoryId) {
-		throw new TRPCError({
-			code: "NOT_FOUND",
-			message: `repository_not_in_project: ${fullName} is not a repository of this workspace`,
-		});
-	}
+	if (!repositoryId) throw repositoryNotInWorkspaceError(fullName);
 	return repositoryId;
+}
+
+function repositoryNotInWorkspaceError(fullName: string): TRPCError {
+	return new TRPCError({
+		code: "NOT_FOUND",
+		message: `repository_not_in_project: ${fullName} is not a repository of this workspace`,
+	});
 }

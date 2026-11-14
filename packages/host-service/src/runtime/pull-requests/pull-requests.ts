@@ -1139,7 +1139,7 @@ export class PullRequestRuntimeManager {
 					.where(eq(workspaces.id, workspace.id))
 					.run();
 			}
-			if (branch !== row.branch || headSha !== row.headSha) {
+			if (branch !== row.branch) {
 				syncWorkspaceContextFiles(this.db, workspace.id);
 			}
 			return true;

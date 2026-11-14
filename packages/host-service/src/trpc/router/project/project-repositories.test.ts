@@ -229,6 +229,52 @@ describe("project repositories", () => {
 		expect(db.select().from(schema.projects).all()).toHaveLength(0);
 	});
 
+	it("leaves a plain folder without git when a clone beside it fails", async () => {
+		const { caller, db } = setup();
+		const parentDir = mkdtempSync(join(root, "parent-"));
+		const plain = join(mkdtempSync(join(root, "case-")), "plain");
+		mkdirSync(plain);
+		writeFileSync(join(plain, "a.txt"), "x");
+
+		await expect(
+			caller.create({
+				name: "Half",
+				parentDir,
+				repositories: [
+					{ kind: "local", path: plain, initIfNeeded: true },
+					{ kind: "clone", url: join(root, "no-such-remote") },
+				],
+			}),
+		).rejects.toBeDefined();
+
+		expect(existsSync(join(plain, ".git"))).toBe(false);
+		expect(db.select().from(schema.projects).all()).toHaveLength(0);
+	});
+
+	it("leaves an unborn repository without a commit when the create is refused", async () => {
+		const { caller } = setup();
+		const unborn = join(mkdtempSync(join(root, "case-")), "web");
+		mkdirSync(unborn);
+		await createUserSimpleGit(unborn).init(["--initial-branch=main"]);
+
+		await expect(
+			caller.create({
+				name: "Dup",
+				repositories: [local(unborn), local(await gitRepo("web"))],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("duplicate_name"),
+		});
+
+		const head = await createUserSimpleGit(unborn)
+			.raw(["rev-parse", "--verify", "HEAD"])
+			.then(
+				() => "born",
+				() => "unborn",
+			);
+		expect(head).toBe("unborn");
+	});
+
 	it("adds a repository without giving live workspaces a checkout of it", async () => {
 		const { caller, db } = setup();
 		const project = await caller.create({

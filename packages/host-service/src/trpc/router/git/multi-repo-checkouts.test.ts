@@ -7,6 +7,10 @@ import { TRPCError } from "@trpc/server";
 import { simpleGit } from "simple-git";
 import { seedProject, seedWorkspace } from "../../../../test/helpers/seed";
 import { gitCeilingEnv } from "../../../runtime/git";
+import {
+	getWorkspaceNamingState,
+	setWorkspaceNamingState,
+} from "../../../workspaces/workspace-naming-state";
 import { createTestDb } from "../pull-requests/shared/test-db";
 import { gitRouter } from "./git";
 import { testGitContext } from "./utils/test-checkout";
@@ -64,7 +68,12 @@ async function seedTwoRepoWorkspace(options: { webIsRepo?: boolean } = {}) {
 		},
 	);
 	return {
-		caller: gitRouter.createCaller(testGitContext(db)),
+		caller: gitRouter.createCaller(
+			testGitContext(db, {
+				eventBus: { broadcastWorkspaceChanged: () => {} },
+			}),
+		),
+		db,
 		workspacePath,
 		apiId,
 		webId,
@@ -135,6 +144,25 @@ describe("git on a multi-repo workspace", () => {
 		);
 		expect(byRepository[apiId]).toMatchObject({ fileCount: 1, additions: 2 });
 		expect(byRepository[webId]).toMatchObject({ fileCount: 1, deletions: 1 });
+	});
+
+	test("a branch checked out in one checkout stops naming from renaming the branch", async () => {
+		const { caller, db, workspacePath, apiId } = await seedTwoRepoWorkspace();
+		await simpleGit(join(workspacePath, "api")).raw(["branch", "picked"]);
+		setWorkspaceNamingState(db, "ws", {
+			prompt: "fix the login",
+			attempts: 0,
+			branch: "x",
+			agent: null,
+		});
+
+		await caller.checkoutBranch({
+			workspaceId: "ws",
+			repositoryId: apiId,
+			branch: "picked",
+		});
+
+		expect(getWorkspaceNamingState(db, "ws")?.branch).toBeNull();
 	});
 
 	test("git cannot walk up from a checkout into the repository around it", async () => {

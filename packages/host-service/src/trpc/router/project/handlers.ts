@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { realpathSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { isReservedRootName } from "@superset/shared/workspace-root";
 import { TRPCError } from "@trpc/server";
@@ -48,15 +49,19 @@ import {
 	cloneDirectoryName,
 	cloneRepoInto,
 	cloneTemplateInto,
+	ensureNotUnborn,
 	initEmptyRepo,
 	initLocalRepoInPlace,
 	type ResolvedRepo,
 	resolveMatchingSlug,
 	tryRevParseGitRoot,
+	validateDirectoryPath,
 } from "./utils/resolve-repo";
 
+type LocalSource = { kind: "local"; path: string; initIfNeeded?: boolean };
+
 export type RepositorySource =
-	| { kind: "local"; path: string; initIfNeeded?: boolean }
+	| LocalSource
 	| { kind: "clone"; url: string }
 	| { kind: "empty"; name: string }
 	| { kind: "template"; url: string };
@@ -165,6 +170,42 @@ async function resolveSource(
 				created: true,
 			};
 	}
+}
+
+const CHECK_ONLY = { checkOnly: true } as const;
+
+interface CheckedLocalSource {
+	/** For a folder that is not a repository yet, what `git init` will give. */
+	resolved: ResolvedRepo;
+	/** Writes to the user's folder: the scaffold commit or `git init`. */
+	adopt: () => Promise<ResolvedRepo>;
+}
+
+async function checkLocalSource(
+	source: LocalSource,
+): Promise<CheckedLocalSource> {
+	const root = source.initIfNeeded
+		? await tryRevParseGitRoot(source.path)
+		: source.path;
+	if (root !== null) {
+		const resolved = await adoptLocalRepo(root, CHECK_ONLY);
+		return {
+			resolved,
+			adopt: async () => {
+				await ensureNotUnborn(resolved.repoPath);
+				return resolved;
+			},
+		};
+	}
+	validateDirectoryPath(source.path, "Path");
+	return {
+		resolved: {
+			repoPath: realpathSync(source.path),
+			remoteName: null,
+			parsed: null,
+		},
+		adopt: () => initLocalRepoInPlace(source.path),
+	};
 }
 
 /** The folder a source makes in parentDir; sources that make none give []. */
@@ -386,18 +427,77 @@ export async function createProject(
 		};
 	}
 
-	const resolved = await resolveSources(
+	return createFromSeveralSources(ctx, name, args);
+}
+
+/**
+ * Writes to a user's folder only once every check passed and every clone
+ * and new repository is in place.
+ */
+async function createFromSeveralSources(
+	ctx: HostServiceContext,
+	name: string,
+	args: {
+		repositories: RepositorySource[];
+		parentDir?: string;
+		signal?: AbortSignal;
+	},
+): Promise<CreateProjectResult> {
+	const locals = await Promise.all(
+		args.repositories.map((source) =>
+			source.kind === "local" ? checkLocalSource(source) : undefined,
+		),
+	);
+	const localRepos = locals.flatMap((local) => (local ? [local.resolved] : []));
+	requireInsertable(ctx, localRepos, [
+		...localRepos.map(nameOf),
+		...args.repositories.flatMap(createdFolderName),
+	]);
+
+	const created = await resolveSources(
 		ctx,
-		args.repositories,
+		args.repositories.filter((source) => source.kind !== "local"),
 		args.parentDir,
 		args.signal,
 	);
+	const inOrder = (inLocalOrder: ResolvedRepo[]): ResolvedSource[] => {
+		const [nextLocal, nextCreated] = [[...inLocalOrder], [...created]];
+		return locals.map((local) => {
+			const next = local
+				? { resolved: nextLocal.shift(), created: false }
+				: nextCreated.shift();
+			if (!next?.resolved) throw new Error("createProject lost a repository");
+			return { resolved: next.resolved, created: next.created };
+		});
+	};
 	try {
-		return { ...insertProject(ctx, name, resolved), created: true };
+		const planned = inOrder(localRepos).map((source) => source.resolved);
+		requireInsertable(ctx, planned, planned.map(nameOf));
+		const adopted: ResolvedRepo[] = [];
+		for (const local of locals) {
+			if (local) adopted.push(await local.adopt());
+		}
+		return { ...insertProject(ctx, name, inOrder(adopted)), created: true };
 	} catch (err) {
-		await removeCreated(resolved);
+		await removeCreated(created);
 		throw err;
 	}
+}
+
+function requireInsertable(
+	ctx: HostServiceContext,
+	resolved: ResolvedRepo[],
+	names: string[],
+): void {
+	const paths = new Set<string>();
+	for (const { repoPath } of resolved) {
+		if (paths.has(repoPath) || getLiveRepositoryAtPath(ctx.db, repoPath)) {
+			throw repositoryTakenError(repoPath);
+		}
+		paths.add(repoPath);
+	}
+	requireUsableNames(names);
+	requireUniqueNames(names);
 }
 
 function insertProject(
@@ -405,19 +505,8 @@ function insertProject(
 	name: string,
 	sources: ResolvedSource[],
 ): ProjectSnapshot {
-	const paths = new Set<string>();
-	for (const { resolved } of sources) {
-		if (
-			paths.has(resolved.repoPath) ||
-			getLiveRepositoryAtPath(ctx.db, resolved.repoPath)
-		) {
-			throw repositoryTakenError(resolved.repoPath);
-		}
-		paths.add(resolved.repoPath);
-	}
-	const names = sources.map(({ resolved }) => nameOf(resolved));
-	requireUsableNames(names);
-	requireUniqueNames(names);
+	const resolved = sources.map((source) => source.resolved);
+	requireInsertable(ctx, resolved, resolved.map(nameOf));
 
 	const projectId = randomUUID();
 	const rows = sources.map(({ resolved }) =>

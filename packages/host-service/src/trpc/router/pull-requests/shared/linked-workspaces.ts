@@ -51,6 +51,26 @@ export function findPullRequestRows(
 		.all();
 }
 
+export function isPullRequestOfRepo(
+	db: HostDb,
+	pullRequestId: string,
+	repo: RepoIdentity,
+): boolean {
+	return (
+		db
+			.select({ id: pullRequests.id })
+			.from(pullRequests)
+			.where(
+				and(
+					eq(pullRequests.id, pullRequestId),
+					eq(sql`lower(${pullRequests.repoOwner})`, repo.owner.toLowerCase()),
+					eq(sql`lower(${pullRequests.repoName})`, repo.name.toLowerCase()),
+				),
+			)
+			.get() !== undefined
+	);
+}
+
 /**
  * Fallback for a repository whose remote cannot be resolved right now (the
  * clone is gone, the remote is unreachable): the rows it wrote itself.

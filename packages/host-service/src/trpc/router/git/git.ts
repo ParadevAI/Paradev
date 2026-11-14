@@ -39,7 +39,11 @@ import {
 	getLocalWorkspace,
 	updateLocalWorkspace,
 } from "../../../workspaces/local-workspace-store";
-import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
+import { keepWorkspaceBranch } from "../../../workspaces/workspace-naming-state";
+import {
+	cancelAndWaitWorkspaceTitleCommit,
+	cancelWorkspaceTitleJob,
+} from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
 import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
@@ -767,6 +771,8 @@ export const gitRouter = router({
 					{ branch: input.branch },
 				);
 			} else {
+				cancelWorkspaceTitleJob(ctx.db, input.workspaceId);
+				keepWorkspaceBranch(ctx.db, input.workspaceId);
 				followSharedCheckoutBranch(ctx.db, input.workspaceId);
 				syncWorkspaceContextFiles(ctx.db, input.workspaceId);
 				emitWorkspaceUpdated(ctx, input.workspaceId);
