@@ -59,10 +59,12 @@ export interface HostProjectItem {
 }
 
 /** The primary repository, or undefined for a row with no repositories. */
-export function getPrimaryRepository(project: {
+export function getPrimaryRepository<
+	Repository extends { id: string },
+>(project: {
 	primaryRepositoryId: string;
-	repositories: HostRepository[];
-}): HostRepository | undefined {
+	repositories: Repository[];
+}): Repository | undefined {
 	const repositories = project.repositories ?? [];
 	return (
 		repositories.find(

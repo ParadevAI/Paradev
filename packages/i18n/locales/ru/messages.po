@@ -12796,9 +12796,6 @@ msgstr "Новая рабочая область ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Новая рабочая область в {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Новые рабочие пространства больше не будут его извлекать. Папка останется на диске в {repositoryPath}."
-
 msgid "Newer than this app"
 msgstr "Новее этого приложения"
 
@@ -21227,6 +21224,9 @@ msgstr "Эта рабочая область"
 msgid "This workspace has no project to branch from"
 msgstr "В этом рабочем пространстве нет проекта для ответвления"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "У этого рабочего пространства нет worktree, который можно перенести в рабочее пространство с несколькими репозиториями."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Рабочая область ещё загружается. Повторите попытку."
 
@@ -23238,6 +23238,9 @@ msgstr "Делиться можно только с людьми и команд
 
 msgid "You can read and export, but not run agents."
 msgstr "Можно читать и экспортировать, но не запускать агентов."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Удалить его можно, только когда его не использует ни одно рабочее пространство, включая архивные. Новые рабочие пространства перестанут его извлекать. Папка останется на диске в {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Его можно восстановить в разделе «Настройки → Проекты» в течение 30 дней. Папка репозитория никогда не удаляется."

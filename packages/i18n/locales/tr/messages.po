@@ -12796,9 +12796,6 @@ msgstr "Yeni çalışma alanı ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name} içinde yeni çalışma alanı"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Yeni çalışma alanları artık bunu checkout etmez. Klasör diskte {repositoryPath} konumunda kalır."
-
 msgid "Newer than this app"
 msgstr "Bu uygulamadan daha yeni"
 
@@ -21227,6 +21224,9 @@ msgstr "Bu çalışma alanı"
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "Bu çalışma alanında çok depolu bir çalışma alanına taşınabilecek bir worktree yok."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Bu çalışma alanı hâlâ yükleniyor. Yeniden deneyin."
 
@@ -23238,6 +23238,9 @@ msgstr "Yalnızca bu kuruluştaki kişiler ve takımlarla paylaşabilirsiniz"
 
 msgid "You can read and export, but not run agents."
 msgstr "Okuyabilir ve dışa aktarabilirsiniz, ancak ajan çalıştıramazsınız."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Bunu yalnızca hiçbir çalışma alanı (arşivlenenler dahil) kullanmıyorsa kaldırabilirsiniz. Yeni çalışma alanları artık bunu checkout etmez. Klasör diskte {repositoryPath} konumunda kalır."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin. Depo klasörü asla silinmez."

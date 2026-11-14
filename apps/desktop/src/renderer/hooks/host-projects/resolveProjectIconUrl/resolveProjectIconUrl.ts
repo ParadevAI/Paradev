@@ -1,3 +1,5 @@
+import { getPrimaryRepository } from "../useHostProjects/useHostProjects.utils";
+
 /**
  * Sentinel stored in the host `icon` column meaning "explicitly no icon":
  * suppresses the GitHub avatar fallback so surfaces render the letter tile
@@ -26,16 +28,10 @@ export function resolveProjectIconUrl(
 ): string | null {
 	if (project.icon === PROJECT_ICON_NONE) return null;
 	if (project.icon) return project.icon;
-	let owner: string | null | undefined;
-	if ("repositories" in project) {
-		const repositories = project.repositories ?? [];
-		owner = (
-			repositories.find((r) => r.id === project.primaryRepositoryId) ??
-			repositories[0]
-		)?.owner;
-	} else {
-		owner = project.repoOwner;
-	}
+	const owner =
+		"repositories" in project
+			? getPrimaryRepository(project)?.owner
+			: project.repoOwner;
 	if (owner) {
 		return `https://github.com/${owner}.png?size=64`;
 	}

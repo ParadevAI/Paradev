@@ -12796,9 +12796,6 @@ msgstr "New Workspace ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "New workspace in {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-
 msgid "Newer than this app"
 msgstr "Newer than this app"
 
@@ -21227,6 +21224,9 @@ msgstr "This workspace"
 msgid "This workspace has no project to branch from"
 msgstr "This workspace has no project to branch from"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "This workspace has no worktree that can move into a multi-repo workspace."
+
 msgid "This workspace is still loading. Try again."
 msgstr "This workspace is still loading. Try again."
 
@@ -23238,6 +23238,9 @@ msgstr "You can only share with people and teams in this organization"
 
 msgid "You can read and export, but not run agents."
 msgstr "You can read and export, but not run agents."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."

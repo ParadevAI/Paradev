@@ -385,6 +385,23 @@ export function NewWorkspaceScreen({
 		() => (projectRepositoryIdsKey ? projectRepositoryIdsKey.split("\n") : []),
 		[projectRepositoryIdsKey],
 	);
+	const projectGithubNamesKey = projectRepositories
+		.map((repository) =>
+			repository.owner && repository.repoName
+				? `${repository.id}\t${repository.owner}/${repository.repoName}`
+				: "",
+		)
+		.join("\n");
+	const projectGithubNames = useMemo(
+		() =>
+			Object.fromEntries(
+				projectGithubNamesKey
+					.split("\n")
+					.filter(Boolean)
+					.map((line) => line.split("\t")),
+			) as Record<string, string>,
+		[projectGithubNamesKey],
+	);
 	const primaryRepositoryId = selectedHostProject
 		? (getPrimaryRepository(selectedHostProject)?.id ?? null)
 		: null;
@@ -857,6 +874,7 @@ export function NewWorkspaceScreen({
 			primaryRepositoryId,
 			isMultiRepo: isMultiRepoProject,
 			repositoryIds: projectRepositoryIds,
+			githubNames: projectGithubNames,
 		},
 	);
 

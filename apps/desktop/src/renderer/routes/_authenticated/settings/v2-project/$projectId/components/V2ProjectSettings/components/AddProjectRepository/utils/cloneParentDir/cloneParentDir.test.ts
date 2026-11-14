@@ -7,8 +7,15 @@ describe("cloneParentDir", () => {
 		expect(cloneParentDir("C:\\src\\orbit\\web\\")).toBe("C:\\src\\orbit");
 	});
 
+	test("is the filesystem root for a repository at the root", () => {
+		expect(cloneParentDir("/repo")).toBe("/");
+		expect(cloneParentDir("/repo/")).toBe("/");
+		expect(cloneParentDir("C:\\repo")).toBe("C:\\");
+	});
+
 	test("is undefined without a primary path or a parent", () => {
 		expect(cloneParentDir(undefined)).toBeUndefined();
-		expect(cloneParentDir("/web")).toBeUndefined();
+		expect(cloneParentDir("/")).toBeUndefined();
+		expect(cloneParentDir("repo")).toBeUndefined();
 	});
 });

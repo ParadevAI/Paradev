@@ -12796,9 +12796,6 @@ msgstr "새 워크스페이스 ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name}에 새 워크스페이스"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "새 워크스페이스에서 더 이상 체크아웃하지 않습니다. 폴더는 {repositoryPath}에 그대로 남습니다."
-
 msgid "Newer than this app"
 msgstr "이 앱보다 최신"
 
@@ -21227,6 +21224,9 @@ msgstr "이 워크스페이스"
 msgid "This workspace has no project to branch from"
 msgstr "이 워크스페이스에는 분기할 프로젝트가 없습니다"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "이 워크스페이스에는 다중 저장소 워크스페이스로 옮길 수 있는 worktree가 없습니다."
+
 msgid "This workspace is still loading. Try again."
 msgstr "이 워크스페이스를 아직 불러오는 중입니다. 다시 시도하세요."
 
@@ -23238,6 +23238,9 @@ msgstr "이 조직의 사람과 팀하고만 공유할 수 있습니다"
 
 msgid "You can read and export, but not run agents."
 msgstr "읽기와 내보내기는 가능하지만 에이전트는 실행할 수 없습니다."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "보관된 워크스페이스를 포함해 어떤 워크스페이스도 사용하지 않을 때만 제거할 수 있습니다. 새 워크스페이스는 더 이상 이를 체크아웃하지 않습니다. 폴더는 디스크의 {repositoryPath}에 그대로 남습니다."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30일 동안 설정 → 프로젝트에서 복원할 수 있습니다. 저장소 폴더는 절대 삭제되지 않습니다."

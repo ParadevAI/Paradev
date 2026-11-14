@@ -12796,9 +12796,6 @@ msgstr "Nuevo espacio de trabajo ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nuevo espacio de trabajo en {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Los nuevos espacios de trabajo dejarán de hacer checkout de él. La carpeta se queda en el disco en {repositoryPath}."
-
 msgid "Newer than this app"
 msgstr "Más reciente que esta app"
 
@@ -21227,6 +21224,9 @@ msgstr "Este espacio de trabajo"
 msgid "This workspace has no project to branch from"
 msgstr "Este espacio de trabajo no tiene un proyecto desde el que bifurcar"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "Este espacio de trabajo no tiene ningún worktree que pueda pasar a un espacio de trabajo con varios repositorios."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Este espacio de trabajo aún se está cargando. Inténtalo de nuevo."
 
@@ -23238,6 +23238,9 @@ msgstr "Solo puedes compartir con personas y equipos de esta organización"
 
 msgid "You can read and export, but not run agents."
 msgstr "Puedes leer y exportar, pero no ejecutar agentes."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Solo puedes quitarlo cuando ningún espacio de trabajo lo use, incluidos los archivados. Los nuevos espacios de trabajo dejan de hacer checkout de él. La carpeta se queda en el disco en {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Puedes restaurarlo desde Configuración → Proyectos durante 30 días. La carpeta del repositorio nunca se elimina."

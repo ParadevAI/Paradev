@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui as useTranslation } from "@lingui/react";
+import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { LuLayoutGrid } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import {
 	adoptV1Workspace,
 	recordV1MigrationOutcome,
@@ -14,7 +16,11 @@ import {
 import { electronV1MigrationIpc } from "renderer/lib/v1-migration/ipc";
 import { isForeignV1Workspace } from "renderer/lib/v1-migration/ownership";
 import { withV1MigrationRunLock } from "renderer/lib/v1-migration/run-lock";
-import { findGitWorktreeAtFolder } from "renderer/lib/v1-migration/workspaces";
+import {
+	adoptV1WorkspaceGroupIntoMultiRepoProject,
+	findGitWorktreeAtFolder,
+	mapV1ProjectsToV2Targets,
+} from "renderer/lib/v1-migration/workspaces";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { ImportPageShell } from "../components/ImportPageShell";
 import { ImportRow, type RowAction } from "../components/ImportRow";
@@ -68,21 +74,14 @@ export function ImportWorkspacesPage({
 		},
 	});
 
-	const v2ProjectIdByV1Id = useMemo(() => {
-		const v2ByPath = new Map<string, string>();
-		for (const v2 of hostProjectListQuery.data ?? []) {
-			for (const repository of v2.repositories ?? []) {
-				if (!v2ByPath.has(repository.path))
-					v2ByPath.set(repository.path, v2.id);
-			}
-		}
-		const map = new Map<string, string>();
-		for (const v1 of projectsQuery.data ?? []) {
-			const v2Id = v2ByPath.get(v1.mainRepoPath);
-			if (v2Id) map.set(v1.id, v2Id);
-		}
-		return map;
-	}, [hostProjectListQuery.data, projectsQuery.data]);
+	const targetByV1Id = useMemo(
+		() =>
+			mapV1ProjectsToV2Targets(
+				hostProjectListQuery.data ?? [],
+				projectsQuery.data ?? [],
+			),
+		[hostProjectListQuery.data, projectsQuery.data],
+	);
 
 	const hostWorkspaceKeys = useMemo(() => {
 		const set = new Set<string>();
@@ -92,13 +91,21 @@ export function ImportWorkspacesPage({
 		return set;
 	}, [hostWorkspacesQuery.data]);
 
-	const importedV2ProjectIds = Array.from(new Set(v2ProjectIdByV1Id.values()));
+	const importedRepositories = Array.from(
+		new Map(
+			Array.from(targetByV1Id.values(), (target) => [
+				target.repositoryId,
+				target,
+			]),
+		).values(),
+	);
 
 	const worktreeListQueries = useQueries({
-		queries: importedV2ProjectIds.map((v2ProjectId) => ({
+		queries: importedRepositories.map(({ v2ProjectId, repositoryId }) => ({
 			queryKey: [
 				...WORKTREE_LIST_KEY_PREFIX,
 				v2ProjectId,
+				repositoryId,
 				activeHostUrl,
 			] as const,
 			queryFn: async () => {
@@ -106,18 +113,19 @@ export function ImportWorkspacesPage({
 				const result =
 					await client.workspaceCreation.listProjectWorktrees.query({
 						projectId: v2ProjectId,
+						repositoryId,
 					});
 				return result.worktrees;
 			},
 		})),
 	});
 
-	const validBranchesByV2ProjectId = new Map<string, Set<string>>();
-	importedV2ProjectIds.forEach((v2ProjectId, index) => {
+	const validBranchesByRepositoryId = new Map<string, Set<string>>();
+	importedRepositories.forEach(({ repositoryId }, index) => {
 		const data = worktreeListQueries[index]?.data;
 		if (!data) return;
-		validBranchesByV2ProjectId.set(
-			v2ProjectId,
+		validBranchesByRepositoryId.set(
+			repositoryId,
 			new Set(data.map((w) => w.branch)),
 		);
 	});
@@ -161,6 +169,8 @@ export function ImportWorkspacesPage({
 	type VisibleWorkspace = {
 		workspace: (typeof allWorkspaces)[number];
 		v2ProjectId: string;
+		repositoryId: string;
+		multiRepo: boolean;
 		alreadyImported: boolean;
 		ownedElsewhere: boolean;
 		worktreePath: string | undefined;
@@ -168,14 +178,15 @@ export function ImportWorkspacesPage({
 	};
 	const visibleWorkspaces: VisibleWorkspace[] = [];
 	for (const workspace of allWorkspaces) {
-		const v2ProjectId = v2ProjectIdByV1Id.get(workspace.projectId);
-		if (!v2ProjectId) continue;
+		const target = targetByV1Id.get(workspace.projectId);
+		if (!target) continue;
+		const { v2ProjectId, repositoryId, multiRepo } = target;
 
 		const alreadyImported = hostWorkspaceKeys.has(
 			`${v2ProjectId}\0${workspace.branch}`,
 		);
 		if (!alreadyImported) {
-			const validBranches = validBranchesByV2ProjectId.get(v2ProjectId);
+			const validBranches = validBranchesByRepositoryId.get(repositoryId);
 			if (validBranches !== undefined && !validBranches.has(workspace.branch)) {
 				continue;
 			}
@@ -186,6 +197,8 @@ export function ImportWorkspacesPage({
 		visibleWorkspaces.push({
 			workspace,
 			v2ProjectId,
+			repositoryId,
+			multiRepo,
 			alreadyImported,
 			ownedElsewhere:
 				!!foreignClaims && isForeignV1Workspace(workspace, foreignClaims),
@@ -215,24 +228,97 @@ export function ImportWorkspacesPage({
 		[],
 	);
 
+	const visibleWorkspacesRef = useRef<VisibleWorkspace[]>([]);
+
+	const isPendingEntry = useCallback((entry: VisibleWorkspace) => {
+		if (entry.alreadyImported || entry.ownedElsewhere) return false;
+		const status = adoptStatesRef.current.get(entry.workspace.id) ?? IDLE;
+		return status.kind === "idle" || status.kind === "error";
+	}, []);
+
 	const adoptWorkspace = useCallback(
-		async (entry: VisibleWorkspace) => {
+		async (entry: VisibleWorkspace): Promise<string[]> => {
 			const { workspace, v2ProjectId, worktreePath, baseBranch } = entry;
-			updateAdoptStatus(workspace.id, { kind: "running" });
+			const members = [entry];
+			if (entry.multiRepo) {
+				for (const other of visibleWorkspacesRef.current) {
+					if (
+						other.v2ProjectId === v2ProjectId &&
+						other.workspace.branch === workspace.branch &&
+						!members.some((m) => m.repositoryId === other.repositoryId) &&
+						isPendingEntry(other)
+					) {
+						members.push(other);
+					}
+				}
+			}
+			const memberIds = members.map((m) => m.workspace.id);
+			for (const id of memberIds) updateAdoptStatus(id, { kind: "running" });
 			try {
 				const client = getHostServiceClientByUrl(activeHostUrl);
-				const v2WorkspaceId = await withV1MigrationRunLock(async () => {
-					// The automatic pass may have adopted it while this waited.
+				const adopted = await withV1MigrationRunLock(async () => {
+					// The automatic pass may have adopted them while this waited.
 					const ledger =
 						await electronV1MigrationIpc.ledgerList(organizationId);
-					const migrated = ledger.find(
-						(row) =>
+					const migratedV2IdByV1Id = new Map<string, string>();
+					for (const row of ledger) {
+						if (
 							row.kind === "workspace" &&
-							row.v1Id === workspace.id &&
 							(row.status === "success" || row.status === "linked") &&
-							row.v2Id,
+							row.v2Id
+						) {
+							migratedV2IdByV1Id.set(row.v1Id, row.v2Id);
+						}
+					}
+					const pending = members.filter(
+						(m) => !migratedV2IdByV1Id.has(m.workspace.id),
 					);
-					if (migrated?.v2Id) return migrated.v2Id;
+					const [firstPending] = pending;
+					if (!firstPending) {
+						return {
+							v2WorkspaceId: migratedV2IdByV1Id.get(workspace.id) ?? null,
+							importedIds: memberIds,
+						};
+					}
+					const alreadyMigratedIds = memberIds.filter((id) =>
+						migratedV2IdByV1Id.has(id),
+					);
+
+					if (entry.multiRepo) {
+						const result = await adoptV1WorkspaceGroupIntoMultiRepoProject(
+							client,
+							electronV1MigrationIpc.resolvePaths,
+							{
+								v2ProjectId,
+								name: firstPending.workspace.name,
+								members: pending.map((m) => ({
+									repositoryId: m.repositoryId,
+									worktreePath: m.worktreePath,
+								})),
+							},
+						);
+						if (!result) {
+							return { v2WorkspaceId: null, importedIds: alreadyMigratedIds };
+						}
+						const adoptedMembers = pending.filter((m) =>
+							result.repositoryIds.includes(m.repositoryId),
+						);
+						for (const m of adoptedMembers) {
+							await recordV1MigrationOutcome(organizationId, {
+								v1Id: m.workspace.id,
+								kind: "workspace",
+								status: "success",
+								v2Id: result.workspace.id,
+							});
+						}
+						return {
+							v2WorkspaceId: result.workspace.id,
+							importedIds: [
+								...alreadyMigratedIds,
+								...adoptedMembers.map((m) => m.workspace.id),
+							],
+						};
+					}
 
 					const gitWorktree = worktreePath
 						? await findGitWorktreeAtFolder(
@@ -240,9 +326,10 @@ export function ImportWorkspacesPage({
 								electronV1MigrationIpc.resolvePaths,
 								v2ProjectId,
 								worktreePath,
+								entry.repositoryId,
 							)
 						: null;
-					const adopted = await adoptV1Workspace(client, {
+					const result = await adoptV1Workspace(client, {
 						v2ProjectId,
 						name: workspace.name,
 						branch: gitWorktree?.branch ?? workspace.branch,
@@ -253,33 +340,60 @@ export function ImportWorkspacesPage({
 						v1Id: workspace.id,
 						kind: "workspace",
 						status: "success",
-						v2Id: adopted.workspace.id,
+						v2Id: result.workspace.id,
 					});
-					return adopted.workspace.id;
+					return {
+						v2WorkspaceId: result.workspace.id,
+						importedIds: memberIds,
+					};
 				});
 
-				ensureWorkspaceInSidebar(v2WorkspaceId, v2ProjectId);
-				updateAdoptStatus(workspace.id, { kind: "imported" });
+				if (adopted.v2WorkspaceId) {
+					ensureWorkspaceInSidebar(adopted.v2WorkspaceId, v2ProjectId);
+				}
+				for (const id of memberIds) {
+					if (adopted.importedIds.includes(id)) {
+						updateAdoptStatus(id, { kind: "imported" });
+					} else if (id === workspace.id) {
+						updateAdoptStatus(id, {
+							kind: "error",
+							message: translate(
+								msg({
+									message:
+										"This workspace has no worktree that can move into a multi-repo workspace.",
+								}),
+							),
+						});
+					} else {
+						updateAdoptStatus(id, IDLE);
+					}
+				}
 				await queryClient.invalidateQueries({
 					queryKey: WORKSPACE_LIST_KEY,
 				});
+				return memberIds;
 			} catch (err) {
-				const message = err instanceof Error ? err.message : String(err);
-				updateAdoptStatus(workspace.id, { kind: "error", message });
+				const message = hostRefusalReason(errorMessage(err));
+				for (const id of memberIds) {
+					updateAdoptStatus(id, { kind: "error", message });
+				}
 				console.error("[v1-import] workspace adopt failed", {
-					v1WorkspaceId: workspace.id,
+					v1WorkspaceIds: memberIds,
 					v2ProjectId,
 					branch: workspace.branch,
 					organizationId,
 					err,
 				});
+				return memberIds;
 			}
 		},
 		[
 			activeHostUrl,
 			ensureWorkspaceInSidebar,
+			isPendingEntry,
 			organizationId,
 			queryClient,
+			translate,
 			updateAdoptStatus,
 		],
 	);
@@ -295,31 +409,27 @@ export function ImportWorkspacesPage({
 		return status.kind === "idle" || status.kind === "error";
 	});
 
-	const visibleWorkspacesRef = useRef(visibleWorkspaces);
 	visibleWorkspacesRef.current = visibleWorkspaces;
 
 	const adoptAll = useCallback(async () => {
-		const queue = visibleWorkspacesRef.current.filter((entry) => {
-			if (entry.alreadyImported || entry.ownedElsewhere) return false;
-			const status = adoptStatesRef.current.get(entry.workspace.id) ?? IDLE;
-			return status.kind === "idle" || status.kind === "error";
-		});
+		const queue = visibleWorkspacesRef.current.filter(isPendingEntry);
 		if (queue.length === 0) return;
+		const handled = new Set<string>();
 		try {
 			for (let i = 0; i < queue.length; i++) {
 				const entry = queue[i];
-				if (!entry) continue;
+				if (!entry || handled.has(entry.workspace.id)) continue;
 				const current = adoptStatesRef.current.get(entry.workspace.id) ?? IDLE;
 				if (current.kind === "running" || current.kind === "imported") {
 					continue;
 				}
 				setAdoptAllProgress({ current: i, total: queue.length });
-				await adoptWorkspace(entry);
+				for (const id of await adoptWorkspace(entry)) handled.add(id);
 			}
 		} finally {
 			setAdoptAllProgress(null);
 		}
-	}, [adoptWorkspace]);
+	}, [adoptWorkspace, isPendingEntry]);
 
 	const isAdoptingAll = adoptAllProgress !== null;
 	const showAdoptAll = pendingEntries.length > 0 || isAdoptingAll;
@@ -371,7 +481,7 @@ export function ImportWorkspacesPage({
 			isLoading={isLoading}
 			itemCount={visibleWorkspaces.length}
 			emptyMessage={
-				importedV2ProjectIds.length === 0
+				targetByV1Id.size === 0
 					? "Import a project on the Projects tab first to bring over its workspaces."
 					: "No v1 workspaces left to import."
 			}

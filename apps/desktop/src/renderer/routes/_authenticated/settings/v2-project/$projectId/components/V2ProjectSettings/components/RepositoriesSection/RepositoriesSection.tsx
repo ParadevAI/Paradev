@@ -176,8 +176,9 @@ export function RepositoriesSection({
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							<Trans>
-								New workspaces stop checking it out. The folder stays on disk at{" "}
-								{repositoryPath}.
+								You can remove it only when no workspace uses it, archived
+								workspaces included. New workspaces stop checking it out. The
+								folder stays on disk at {repositoryPath}.
 							</Trans>
 						</AlertDialogDescription>
 					</AlertDialogHeader>

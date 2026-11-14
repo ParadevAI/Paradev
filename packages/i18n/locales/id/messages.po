@@ -12796,9 +12796,6 @@ msgstr "Workspace Baru ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Workspace baru di {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Workspace baru tidak lagi melakukan checkout-nya. Folder tetap ada di disk di {repositoryPath}."
-
 msgid "Newer than this app"
 msgstr "Lebih baru dari aplikasi ini"
 
@@ -21227,6 +21224,9 @@ msgstr "Workspace ini"
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "Workspace ini tidak punya worktree yang bisa dipindahkan ke workspace multi-repositori."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Workspace ini masih dimuat. Coba lagi."
 
@@ -23238,6 +23238,9 @@ msgstr "Anda hanya dapat berbagi dengan orang dan tim di organisasi ini"
 
 msgid "You can read and export, but not run agents."
 msgstr "Anda bisa membaca dan mengekspor, tetapi tidak bisa menjalankan agen."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Anda hanya bisa menghapusnya jika tidak ada workspace yang memakainya, termasuk yang diarsipkan. Workspace baru tidak lagi melakukan checkout repositori ini. Folder tetap ada di disk di {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari. Folder repositori tidak pernah dihapus."

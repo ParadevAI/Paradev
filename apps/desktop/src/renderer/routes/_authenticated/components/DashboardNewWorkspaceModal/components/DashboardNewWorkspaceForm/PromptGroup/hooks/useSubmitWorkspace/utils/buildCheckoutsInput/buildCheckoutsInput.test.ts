@@ -191,4 +191,39 @@ describe("buildCheckoutsInput", () => {
 			pullRequest: { repository: "o/web", number: 7 },
 		});
 	});
+
+	test("several repositories: a worktree picked in an unresolved PR's repository replaces the PR", () => {
+		const draft = {
+			...emptyDraft,
+			checkoutWorktrees: { web: { path: "/wt/web", branch: "t" } },
+		};
+		const githubNames = { api: "o/api", web: "O/Web" };
+		expect(
+			buildCheckoutsInput({
+				draft,
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+				repositoryIds: ["api", "web"],
+				githubNames,
+			}),
+		).toEqual({
+			checkout: "worktree",
+			isPrCheckout: false,
+			checkouts: { web: { worktreePath: "/wt/web" } },
+		});
+		expect(
+			buildCheckoutsInput({
+				draft: {
+					...emptyDraft,
+					checkoutWorktrees: { api: { path: "/wt/api", branch: "t" } },
+				},
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+				repositoryIds: ["api", "web"],
+				githubNames,
+			}).pullRequest,
+		).toEqual({ repository: "o/web", number: 7 });
+	});
 });

@@ -35,6 +35,7 @@ export function buildCheckoutsInput({
 	primaryRepositoryId,
 	isMultiRepo,
 	repositoryIds,
+	githubNames = {},
 }: {
 	draft: CheckoutsDraft;
 	linkedPR: LinkedPR | null;
@@ -42,6 +43,8 @@ export function buildCheckoutsInput({
 	isMultiRepo: boolean;
 	/** The project's repositories now; a draft can still hold picks for one removed since. */
 	repositoryIds: readonly string[];
+	/** `owner/name` of each repository, by repository id, as the host last read it. */
+	githubNames?: Readonly<Record<string, string | null>>;
 }): CheckoutsInput {
 	const checkouts: Record<string, CheckoutInput> = {};
 	let pullRequest: CheckoutsInput["pullRequest"];
@@ -94,7 +97,16 @@ export function buildCheckoutsInput({
 		}
 	} else if (linkedPR) {
 		// Not found in a repository yet: the host matches it, or names what is missing.
-		pullRequest = pullRequestInput(linkedPR);
+		const unresolved = pullRequestInput(linkedPR);
+		const worktreeReplacesPullRequest = Object.keys(
+			draft.checkoutWorktrees,
+		).some(
+			(repositoryId) =>
+				known.has(repositoryId) &&
+				githubNames[repositoryId]?.toLowerCase() ===
+					unresolved?.repository.toLowerCase(),
+		);
+		if (!worktreeReplacesPullRequest) pullRequest = unresolved;
 	}
 	for (const [repositoryId, baseBranch] of Object.entries(
 		draft.checkoutBaseBranches,

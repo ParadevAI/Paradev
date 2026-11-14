@@ -248,13 +248,23 @@ export async function findGitWorktreeAtFolder(
 	resolvePaths: (paths: string[]) => Promise<(string | null)[]>,
 	v2ProjectId: string,
 	folder: string,
-): Promise<{ path: string; branch: string } | null> {
+	repositoryId?: string,
+): Promise<{ path: string; branch: string; isMainWorktree: boolean } | null> {
 	const { worktrees } =
 		await hostClient.workspaceCreation.listProjectWorktrees.query({
 			projectId: v2ProjectId,
+			repositoryId,
 		});
 	const listed = worktrees.flatMap((w) =>
-		typeof w.path === "string" ? [{ path: w.path, branch: w.branch }] : [],
+		typeof w.path === "string"
+			? [
+					{
+						path: w.path,
+						branch: w.branch,
+						isMainWorktree: !!w.isMainWorktree,
+					},
+				]
+			: [],
 	);
 	const [target, ...realPaths] = await resolvePaths([
 		folder,
@@ -314,4 +324,78 @@ export async function adoptV1WorkspacesIntoMultiRepoProject(
 		checkouts: entry.checkouts,
 		runSetup: false,
 	});
+}
+
+export interface V2ImportTarget {
+	v2ProjectId: string;
+	repositoryId: string;
+	multiRepo: boolean;
+}
+
+/** Each v1 project maps to the first v2 project with a repository at its path. */
+export function mapV1ProjectsToV2Targets(
+	hostProjects: Array<{
+		id: string;
+		repositories?: Array<{ id: string; path: string }>;
+	}>,
+	v1Projects: Array<{ id: string; mainRepoPath: string }>,
+): Map<string, V2ImportTarget> {
+	const byPath = new Map<string, V2ImportTarget>();
+	for (const project of hostProjects) {
+		const repositories = project.repositories ?? [];
+		for (const repository of repositories) {
+			if (byPath.has(repository.path)) continue;
+			byPath.set(repository.path, {
+				v2ProjectId: project.id,
+				repositoryId: repository.id,
+				multiRepo: repositories.length > 1,
+			});
+		}
+	}
+	const targets = new Map<string, V2ImportTarget>();
+	for (const v1 of v1Projects) {
+		const target = byPath.get(v1.mainRepoPath);
+		if (target) targets.set(v1.id, target);
+	}
+	return targets;
+}
+
+/**
+ * Adopts v1 workspaces of one branch into one workspace of a multi-repo
+ * project, each worktree as the checkout of its repository. Returns null
+ * when none has a worktree that can move: a repository's main checkout
+ * never moves into a workspace folder.
+ */
+export async function adoptV1WorkspaceGroupIntoMultiRepoProject(
+	hostClient: HostServiceClient,
+	resolvePaths: (paths: string[]) => Promise<(string | null)[]>,
+	group: {
+		v2ProjectId: string;
+		name: string;
+		members: Array<{ repositoryId: string; worktreePath: string | undefined }>;
+	},
+) {
+	const checkouts: Record<string, { worktreePath: string }> = {};
+	let branch: string | undefined;
+	for (const member of group.members) {
+		if (!member.worktreePath || checkouts[member.repositoryId]) continue;
+		const gitWorktree = await findGitWorktreeAtFolder(
+			hostClient,
+			resolvePaths,
+			group.v2ProjectId,
+			member.worktreePath,
+			member.repositoryId,
+		);
+		if (!gitWorktree || gitWorktree.isMainWorktree) continue;
+		branch ??= gitWorktree.branch;
+		checkouts[member.repositoryId] = { worktreePath: gitWorktree.path };
+	}
+	if (!branch) return null;
+	const result = await adoptV1WorkspacesIntoMultiRepoProject(hostClient, {
+		v2ProjectId: group.v2ProjectId,
+		name: group.name,
+		branch,
+		checkouts,
+	});
+	return { workspace: result.workspace, repositoryIds: Object.keys(checkouts) };
 }

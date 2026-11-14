@@ -12796,9 +12796,6 @@ msgstr "Workspace mới ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Workspace mới trong {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Các workspace mới sẽ không checkout nó nữa. Thư mục vẫn nằm trên ổ đĩa tại {repositoryPath}."
-
 msgid "Newer than this app"
 msgstr "Mới hơn ứng dụng này"
 
@@ -21227,6 +21224,9 @@ msgstr "Workspace này"
 msgid "This workspace has no project to branch from"
 msgstr "Workspace này không có dự án để tạo nhánh"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "Workspace này không có worktree nào có thể chuyển vào một workspace nhiều kho mã."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Workspace này vẫn đang tải. Hãy thử lại."
 
@@ -23238,6 +23238,9 @@ msgstr "Bạn chỉ có thể chia sẻ với người và nhóm trong tổ ch�
 
 msgid "You can read and export, but not run agents."
 msgstr "Bạn có thể đọc và xuất dữ liệu, nhưng không thể chạy agent."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Bạn chỉ có thể gỡ nó khi không có workspace nào dùng nó, kể cả các workspace đã lưu trữ. Các workspace mới sẽ không checkout nó nữa. Thư mục vẫn nằm trên đĩa tại {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Bạn có thể khôi phục trong Cài đặt → Dự án trong 30 ngày. Thư mục repository không bao giờ bị xóa."

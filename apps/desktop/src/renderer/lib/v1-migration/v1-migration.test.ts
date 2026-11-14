@@ -8,7 +8,12 @@ import {
 } from "./projects";
 import { planHostBranchPrefix, planProjectPrefs } from "./settings";
 import { planTerminalMigration, resolveMigratedPaneResume } from "./terminals";
-import { findGitWorktreeAtFolder, planWorkspaceAdoptions } from "./workspaces";
+import {
+	adoptV1WorkspaceGroupIntoMultiRepoProject,
+	findGitWorktreeAtFolder,
+	mapV1ProjectsToV2Targets,
+	planWorkspaceAdoptions,
+} from "./workspaces";
 
 type Candidate = { id: string; source: string };
 const findByPath = (candidates: Candidate[], cloudErrors: unknown[] = []) =>
@@ -764,7 +769,7 @@ describe("findGitWorktreeAtFolder", () => {
 				"p",
 				"/trees/feat/",
 			),
-		).toEqual({ path: "/trees/feat", branch: "feat" });
+		).toEqual({ path: "/trees/feat", branch: "feat", isMainWorktree: false });
 		expect(
 			await findGitWorktreeAtFolder(
 				hostClient,
@@ -773,5 +778,127 @@ describe("findGitWorktreeAtFolder", () => {
 				"/trees/gone",
 			),
 		).toBeNull();
+	});
+});
+
+describe("mapV1ProjectsToV2Targets", () => {
+	test("names the repository and marks multi-repo projects", () => {
+		const targets = mapV1ProjectsToV2Targets(
+			[
+				{ id: "single", repositories: [{ id: "r1", path: "/one" }] },
+				{
+					id: "multi",
+					repositories: [
+						{ id: "r2", path: "/two" },
+						{ id: "r3", path: "/three" },
+					],
+				},
+			],
+			[
+				{ id: "v1-one", mainRepoPath: "/one" },
+				{ id: "v1-three", mainRepoPath: "/three" },
+				{ id: "v1-gone", mainRepoPath: "/gone" },
+			],
+		);
+		expect(Object.fromEntries(targets)).toEqual({
+			"v1-one": { v2ProjectId: "single", repositoryId: "r1", multiRepo: false },
+			"v1-three": {
+				v2ProjectId: "multi",
+				repositoryId: "r3",
+				multiRepo: true,
+			},
+		});
+	});
+});
+
+describe("adoptV1WorkspaceGroupIntoMultiRepoProject", () => {
+	function fakeHost() {
+		const listCalls: unknown[] = [];
+		const createCalls: unknown[] = [];
+		const worktreesByRepository: Record<
+			string,
+			Array<{ path: string; branch: string; isMainWorktree?: boolean }>
+		> = {
+			api: [
+				{ path: "/api", branch: "main", isMainWorktree: true },
+				{ path: "/trees/api-feat", branch: "feat" },
+			],
+			web: [{ path: "/trees/web-feat", branch: "feat" }],
+		};
+		const hostClient = {
+			workspaceCreation: {
+				listProjectWorktrees: {
+					query: async (input: { repositoryId: string }) => {
+						listCalls.push(input);
+						return {
+							worktrees: worktreesByRepository[input.repositoryId] ?? [],
+						};
+					},
+				},
+			},
+			workspaces: {
+				create: {
+					mutate: async (input: unknown) => {
+						createCalls.push(input);
+						return { workspace: { id: "w-new" } };
+					},
+				},
+			},
+		} as unknown as HostServiceClient;
+		return { hostClient, listCalls, createCalls };
+	}
+	const resolvePaths = async (paths: string[]) => paths;
+
+	test("adopts each repository's worktree into one workspace", async () => {
+		const { hostClient, listCalls, createCalls } = fakeHost();
+		const result = await adoptV1WorkspaceGroupIntoMultiRepoProject(
+			hostClient,
+			resolvePaths,
+			{
+				v2ProjectId: "p",
+				name: "Feat",
+				members: [
+					{ repositoryId: "api", worktreePath: "/trees/api-feat" },
+					{ repositoryId: "web", worktreePath: "/trees/web-feat" },
+				],
+			},
+		);
+		expect(result?.workspace.id).toBe("w-new");
+		expect(result?.repositoryIds).toEqual(["api", "web"]);
+		expect(listCalls).toEqual([
+			{ projectId: "p", repositoryId: "api" },
+			{ projectId: "p", repositoryId: "web" },
+		]);
+		expect(createCalls).toEqual([
+			{
+				projectId: "p",
+				name: "Feat",
+				branch: "feat",
+				skipBranchPrefix: true,
+				checkouts: {
+					api: { worktreePath: "/trees/api-feat" },
+					web: { worktreePath: "/trees/web-feat" },
+				},
+				runSetup: false,
+			},
+		]);
+	});
+
+	test("never moves a main checkout and adopts nothing without a worktree", async () => {
+		const { hostClient, createCalls } = fakeHost();
+		const result = await adoptV1WorkspaceGroupIntoMultiRepoProject(
+			hostClient,
+			resolvePaths,
+			{
+				v2ProjectId: "p",
+				name: "Main",
+				members: [
+					{ repositoryId: "api", worktreePath: "/api" },
+					{ repositoryId: "web", worktreePath: undefined },
+				],
+			},
+		);
+		expect(result).toBeNull();
+		expect(createCalls).toEqual([]);
 	});
 });

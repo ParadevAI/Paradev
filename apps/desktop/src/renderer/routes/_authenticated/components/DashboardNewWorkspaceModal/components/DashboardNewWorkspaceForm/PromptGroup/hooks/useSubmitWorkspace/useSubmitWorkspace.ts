@@ -55,10 +55,12 @@ export function useSubmitWorkspace(
 		primaryRepositoryId,
 		isMultiRepo,
 		repositoryIds,
+		githubNames,
 	}: {
 		primaryRepositoryId: string | null;
 		isMultiRepo: boolean;
 		repositoryIds: readonly string[];
+		githubNames?: Readonly<Record<string, string | null>>;
 	} = {
 		primaryRepositoryId: null,
 		isMultiRepo: false,
@@ -305,6 +307,7 @@ export function useSubmitWorkspace(
 				primaryRepositoryId,
 				isMultiRepo,
 				repositoryIds,
+				githubNames,
 			});
 			const { isPrCheckout } = checkoutsInput;
 			const isLocalCheckout = checkoutsInput.checkout === "local";
@@ -476,6 +479,7 @@ export function useSubmitWorkspace(
 			primaryRepositoryId,
 			isMultiRepo,
 			repositoryIds,
+			githubNames,
 		],
 	);
 

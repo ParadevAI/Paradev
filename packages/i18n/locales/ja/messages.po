@@ -12796,9 +12796,6 @@ msgstr "新規ワークスペース({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name} に新規ワークスペース"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "新しいワークスペースではチェックアウトされなくなります。フォルダは {repositoryPath} にそのまま残ります。"
-
 msgid "Newer than this app"
 msgstr "このアプリより新しい"
 
@@ -21227,6 +21224,9 @@ msgstr "このワークスペース"
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "このワークスペースには、マルチリポジトリのワークスペースに移せる worktree がありません。"
+
 msgid "This workspace is still loading. Try again."
 msgstr "このワークスペースはまだ読み込み中です。もう一度お試しください。"
 
@@ -23238,6 +23238,9 @@ msgstr "共有できるのはこの組織内のユーザーとチームのみで
 
 msgid "You can read and export, but not run agents."
 msgstr "閲覧とエクスポートはできますが、エージェントは実行できません。"
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "どのワークスペースも使っていないとき(アーカイブ済みを含む)だけ削除できます。新しいワークスペースはこれをチェックアウトしなくなります。フォルダは {repositoryPath} にディスク上で残ります。"
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "30 日間は「設定 → プロジェクト」から復元できます。リポジトリのフォルダーが削除されることはありません。"

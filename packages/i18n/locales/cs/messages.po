@@ -12796,9 +12796,6 @@ msgstr "Nový pracovní prostor ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nový pracovní prostor v {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Nové pracovní prostory ho přestanou checkoutovat. Složka zůstane na disku v {repositoryPath}."
-
 msgid "Newer than this app"
 msgstr "Novější než tato aplikace"
 
@@ -21227,6 +21224,9 @@ msgstr "Tento pracovní prostor"
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "Tento pracovní prostor nemá žádný worktree, který lze přesunout do pracovního prostoru s více repozitáři."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Tento pracovní prostor se ještě načítá. Zkuste to znovu."
 
@@ -23238,6 +23238,9 @@ msgstr "Sdílet můžete jen s lidmi a týmy v této organizaci"
 
 msgid "You can read and export, but not run agents."
 msgstr "Můžete číst a exportovat, ale ne spouštět agenty."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Odebrat jej můžete, jen když jej nepoužívá žádný pracovní prostor, včetně archivovaných. Nové pracovní prostory jej přestanou checkoutovat. Složka zůstane na disku v {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Můžete ho obnovit v Nastavení → Projekty po dobu 30 dnů. Složka repozitáře se nikdy nemaže."

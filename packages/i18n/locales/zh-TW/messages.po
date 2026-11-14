@@ -12796,9 +12796,6 @@ msgstr "新建工作區（{shortcutText}）"
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作區"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "新工作區將不再簽出它。資料夾仍保留在磁碟上的 {repositoryPath}。"
-
 msgid "Newer than this app"
 msgstr "比此應用程式新"
 
@@ -21227,6 +21224,9 @@ msgstr "此工作區"
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "此工作區沒有可以移入多儲存庫工作區的 worktree。"
+
 msgid "This workspace is still loading. Try again."
 msgstr "此工作區仍在載入。請重試。"
 
@@ -23238,6 +23238,9 @@ msgstr "你只能與此組織中的人員和團隊分享"
 
 msgid "You can read and export, but not run agents."
 msgstr "你可以查看和匯出，但無法執行代理程式。"
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "只有在沒有任何工作區(包括已封存的)使用它時才能移除。新工作區將不再簽出它。資料夾會保留在磁碟上的 {repositoryPath}。"
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "你可以在 30 天內從「設定 → 專案」還原。儲存庫資料夾永遠不會被刪除。"

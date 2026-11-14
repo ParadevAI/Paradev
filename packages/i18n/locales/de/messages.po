@@ -12796,9 +12796,6 @@ msgstr "Neuer Arbeitsbereich ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Neuer Arbeitsbereich in {name}"
 
-msgid "New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
-msgstr "Neue Workspaces checken es nicht mehr aus. Der Ordner bleibt unter {repositoryPath} auf der Festplatte."
-
 msgid "Newer than this app"
 msgstr "Neuer als diese App"
 
@@ -21227,6 +21224,9 @@ msgstr "Dieser Arbeitsbereich"
 msgid "This workspace has no project to branch from"
 msgstr "Dieser Workspace hat kein Projekt, von dem aus verzweigt werden kann"
 
+msgid "This workspace has no worktree that can move into a multi-repo workspace."
+msgstr "Dieser Workspace hat keinen Worktree, der in einen Workspace mit mehreren Repositorys verschoben werden kann."
+
 msgid "This workspace is still loading. Try again."
 msgstr "Dieser Arbeitsbereich wird noch geladen. Versuche es erneut."
 
@@ -23238,6 +23238,9 @@ msgstr "Du kannst nur mit Personen und Teams in dieser Organisation teilen"
 
 msgid "You can read and export, but not run agents."
 msgstr "Du kannst lesen und exportieren, aber keine Agenten ausführen."
+
+msgid "You can remove it only when no workspace uses it, archived workspaces included. New workspaces stop checking it out. The folder stays on disk at {repositoryPath}."
+msgstr "Du kannst es nur entfernen, wenn kein Workspace es nutzt, archivierte eingeschlossen. Neue Workspaces checken es nicht mehr aus. Der Ordner bleibt auf der Festplatte unter {repositoryPath}."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Du kannst es 30 Tage lang unter Einstellungen → Projekte wiederherstellen. Der Repository-Ordner wird nie gelöscht."

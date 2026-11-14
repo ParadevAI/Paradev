@@ -1,0 +1,1 @@
+export { projectFolderName } from "./projectFolderName";

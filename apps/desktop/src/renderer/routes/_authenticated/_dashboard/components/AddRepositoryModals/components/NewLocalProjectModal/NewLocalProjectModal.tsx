@@ -25,6 +25,7 @@ import {
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { buildCreateProjectInput } from "./utils/buildCreateProjectInput";
 import { defaultProjectName, parentOf } from "./utils/defaultProjectName";
+import { projectFolderName } from "./utils/projectFolderName";
 
 interface NewLocalProjectModalProps {
 	open: boolean;
@@ -53,7 +54,7 @@ export function NewLocalProjectModal({
 			clones.map((clone) => clone.url),
 		);
 	const cloneDir = homeDir
-		? `${homeDir}/.paradev/projects/${name.trim() || "project"}`
+		? `${homeDir}/.paradev/projects/${projectFolderName(name)}`
 		: "";
 	const repositoryCount = repoPaths.length + clones.length;
 
