@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { getHostId } from "@superset/shared/host-info";
 import {
 	answerHostProcedures,
@@ -34,6 +34,7 @@ let setupCalls: Record<string, unknown>[];
 let localProject: typeof PROJECT | null;
 let localDeleted: boolean;
 let setupCreates: boolean;
+let hostListFails: boolean;
 
 withLocalHostService("org-1", {
 	"project.get": () => localProject,
@@ -43,9 +44,10 @@ withLocalHostService("org-1", {
 		}
 		setupInput = input;
 		setupCalls.push(input);
+		const origin = input.origin as typeof PROJECT | undefined;
 		return {
 			...PROJECT,
-			repositories: PROJECT.repositories.map((r) => ({
+			repositories: (origin ?? PROJECT).repositories.map((r) => ({
 				...r,
 				path: `/here/${r.name}`,
 			})),
@@ -80,11 +82,14 @@ const api = {
 	host: {
 		relayEndpoint: { query: async () => ({ url: relay.url.origin }) },
 		list: {
-			query: async () => [
-				{ id: getHostId(), name: "laptop", online: true },
-				{ id: "host-a", name: "server-a", online: true },
-				{ id: "host-b", name: "server-b", online: true },
-			],
+			query: async () => {
+				if (hostListFails) throw new Error("fetch failed");
+				return [
+					{ id: getHostId(), name: "laptop", online: true },
+					{ id: "host-a", name: "server-a", online: true },
+					{ id: "host-b", name: "server-b", online: true },
+				];
+			},
 		},
 	},
 };
@@ -104,6 +109,7 @@ beforeEach(() => {
 	localProject = null;
 	localDeleted = false;
 	setupCreates = true;
+	hostListFails = false;
 	remoteHosts["host-a"] = hasProject;
 	remoteHosts["host-b"] = lacksProject;
 });
@@ -189,27 +195,89 @@ describe("projects setup", () => {
 		expect(result.message).toContain("web  /here/web  (moved)");
 	});
 
-	test("--allow-relocate with --clone-into asks to move every clone", async () => {
+	test("--allow-relocate applies to --path folders, not to clones", async () => {
 		localProject = PROJECT;
 		setupCreates = false;
-		await invoke({ cloneInto: "/src", allowRelocate: true });
+		await invoke({
+			cloneInto: "/src",
+			path: ["api=/code/api"],
+			allowRelocate: true,
+		});
 		expect(setupInput?.repositories).toEqual([
 			{
 				id: "r-api",
-				mode: { kind: "clone", parentDir: "/src", allowRelocate: true },
+				mode: { kind: "import", path: "/code/api", allowRelocate: true },
 			},
-			{
-				id: "r-web",
-				mode: { kind: "clone", parentDir: "/src", allowRelocate: true },
-			},
+			{ id: "r-web", mode: { kind: "clone", parentDir: "/src" } },
 		]);
 	});
 
-	test("refuses --allow-relocate without a folder to move to", async () => {
-		await expect(invoke({ allowRelocate: true })).rejects.toThrow(
-			"--allow-relocate only applies to --path or --clone-into",
-		);
+	test("refuses --allow-relocate without --path", async () => {
+		await expect(
+			invoke({ cloneInto: "/src", allowRelocate: true }),
+		).rejects.toThrow("--allow-relocate only applies to --path");
 		expect(setupInput).toBeUndefined();
+	});
+
+	describe("a repository another host added to a project this host has", () => {
+		const docs = {
+			id: "r-docs",
+			name: "docs",
+			url: "https://github.com/acme/docs",
+			isPrimary: false,
+			path: "/elsewhere/docs",
+		};
+
+		beforeEach(() => {
+			localProject = PROJECT;
+			setupCreates = false;
+			remoteHosts["host-a"] = {
+				"project.get": () => ({
+					...PROJECT,
+					repositories: [...PROJECT.repositories, docs],
+				}),
+			};
+		});
+
+		test("is set up from that host's origin", async () => {
+			const result = await invoke({ cloneInto: "/src" });
+			expect(
+				(setupInput?.origin as typeof PROJECT).repositories.map((r) => r.id),
+			).toEqual(["r-api", "r-web", "r-docs"]);
+			expect(setupInput?.repositories).toContainEqual({
+				id: "r-docs",
+				mode: { kind: "clone", parentDir: "/src" },
+			});
+			expect(result.message).toContain(
+				"docs  /here/docs  (added from host host-a)",
+			);
+		});
+
+		test("a failed host lookup warns and sets up as before", async () => {
+			hostListFails = true;
+			const stderr = spyOn(process.stderr, "write").mockImplementation(
+				() => true,
+			);
+			try {
+				await invoke({ path: ["web=/here/web"] });
+				expect(stderr).toHaveBeenCalledWith(
+					"Could not ask other hosts for repositories added there: fetch failed\n",
+				);
+			} finally {
+				stderr.mockRestore();
+			}
+			expect(setupInput?.origin).toBeUndefined();
+			expect(setupInput?.repositories).toEqual([
+				{ id: "r-web", mode: { kind: "import", path: "/here/web" } },
+			]);
+		});
+
+		test("needs a placement", async () => {
+			await expect(invoke({})).rejects.toThrow(
+				"Pick a folder for docs, added to the project on host host-a",
+			);
+			expect(setupInput).toBeUndefined();
+		});
 	});
 
 	test("restores a project this host deleted without another host", async () => {

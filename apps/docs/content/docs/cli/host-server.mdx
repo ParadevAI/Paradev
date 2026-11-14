@@ -185,7 +185,10 @@ superset projects setup 47c31b04-… --clone-into ~/code --path api=~/src/api
 `setup` reads the project, with its repositories and their Git URLs, from the
 other host that has it; pass `--from-host <id>` if more than one does. Every
 repository needs a folder: `--clone-into` or a `--path <repo>=<dir>`.
-Re-running against a project that is already set up here sets up nothing new.
+Re-running against a project that is already set up here keeps the folders
+that still work. It sets up the repositories that were added to the project on
+another host; give them a folder as for a new project. With `--clone-into`, it
+also clones again a repository whose folder is gone.
 
 ### Create your first workspace
 

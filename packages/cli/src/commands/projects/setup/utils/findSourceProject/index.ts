@@ -1,1 +1,5 @@
-export { findSourceProject, type SourceProject } from "./findSourceProject";
+export {
+	findSourceProject,
+	findSourceWithNewRepositories,
+	type SourceProject,
+} from "./findSourceProject";

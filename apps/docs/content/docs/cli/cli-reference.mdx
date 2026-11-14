@@ -678,7 +678,7 @@ superset projects repos relocate api --project prj_… --path ~/src/api --local
 	options={[
 		{ flag: "--clone-into <dir>", description: "Clone every repository into `<dir>/<name>/`. Repositories given a `--path` are not cloned." },
 		{ flag: "--path <repo>=<dir>", description: "Use the existing folder `<dir>` for the repository `<repo>` (its name or ID). Repeatable; wins over `--clone-into` for that repository." },
-		{ flag: "--allow-relocate", description: "If this host already has a repository in another folder that still works, move it to its `--path` folder, or clone it into `--clone-into`. Needs `--path` or `--clone-into`." },
+		{ flag: "--allow-relocate", description: "If this host already has a repository in another folder that still works, move it to its `--path` folder. Needs `--path`. A repository that workspaces use worktrees of is not moved." },
 		{ flag: "--from-host <id>", description: "Host machineId to copy the project from. Default: the only other online host that has it." },
 		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`." },
 		{ flag: "--local", description: "Target this machine (the default)." },
@@ -708,10 +708,17 @@ against the current directory on this machine; for another host, give absolute
 paths.
 
 If the host already has the project, `created` is `false`. A repository whose
-folder still works stays where it is; `--allow-relocate` moves it to the folder
-you give. A repository whose folder is gone or is no longer a checkout of it is
-cloned into `--clone-into`, or uses its `--path` folder with
-`--allow-relocate`.
+folder still works stays where it is; `--allow-relocate` moves it to its
+`--path` folder, unless workspaces use worktrees of it. A repository whose
+folder is gone or is no longer a checkout of it is cloned into `--clone-into`,
+or uses its `--path` folder with `--allow-relocate`. A repository cannot move
+to another folder while a workspace, or an archived workspace whose folder is
+still on disk, uses a worktree of it; delete those workspaces first.
+
+Repositories that were added to the project on another host are set up here
+too. The command reads them from the other host that has the project (or from
+`--from-host`). Give each one a folder with `--clone-into` or `--path`, as for
+a new project.
 
 ```bash
 # Clone every repository of the project into ~/code
@@ -724,6 +731,9 @@ superset projects setup 47c31b04-… --clone-into ~/code --path api=~/src/api
 superset projects setup 47c31b04-… --clone-into ~/code --from-host <id>
 
 # This host lost the folder of one repository: clone only that one again
+superset projects setup 47c31b04-… --clone-into ~/code
+
+# Another host added a repository to the project: clone it here too
 superset projects setup 47c31b04-… --clone-into ~/code
 ```
 </Command>
