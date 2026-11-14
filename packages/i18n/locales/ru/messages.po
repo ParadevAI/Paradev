@@ -13005,9 +13005,6 @@ msgstr "Нет каналов"
 msgid "No chats found"
 msgstr "Чаты не найдены"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Ни одна выгрузка в этой рабочей области не находится на {currentBranchName}"
-
 msgid "No checks"
 msgstr "Без проверок"
 

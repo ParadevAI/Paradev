@@ -13005,9 +13005,6 @@ msgstr "채널 없음"
 msgid "No chats found"
 msgstr "채팅을 찾을 수 없습니다"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "이 워크스페이스에 {currentBranchName} 브랜치의 체크아웃이 없습니다"
-
 msgid "No checks"
 msgstr "검사 없음"
 

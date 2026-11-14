@@ -13005,9 +13005,6 @@ msgstr "Kanal yok"
 msgid "No chats found"
 msgstr "Sohbet bulunamadı"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Bu çalışma alanında {currentBranchName} üzerinde olan bir checkout yok"
-
 msgid "No checks"
 msgstr "Kontrol yok"
 

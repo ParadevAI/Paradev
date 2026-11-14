@@ -13005,9 +13005,6 @@ msgstr "Geen kanalen"
 msgid "No chats found"
 msgstr "Geen chats gevonden"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Geen checkout in deze werkruimte staat op {currentBranchName}"
-
 msgid "No checks"
 msgstr "Geen checks"
 

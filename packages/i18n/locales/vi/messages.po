@@ -13005,9 +13005,6 @@ msgstr "Không có kênh nào"
 msgid "No chats found"
 msgstr "Không tìm thấy cuộc trò chuyện"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Không có checkout nào trong workspace này ở {currentBranchName}"
-
 msgid "No checks"
 msgstr "Không có check"
 

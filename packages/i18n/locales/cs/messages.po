@@ -13005,9 +13005,6 @@ msgstr "Žádné kanály"
 msgid "No chats found"
 msgstr "Nebyly nalezeny žádné chaty"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Žádný checkout v tomto pracovním prostoru není na {currentBranchName}"
-
 msgid "No checks"
 msgstr "Žádné kontroly"
 

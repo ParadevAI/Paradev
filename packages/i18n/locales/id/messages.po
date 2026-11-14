@@ -13005,9 +13005,6 @@ msgstr "Tidak ada saluran"
 msgid "No chats found"
 msgstr "Tidak ada obrolan ditemukan"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Tidak ada checkout di workspace ini yang berada di {currentBranchName}"
-
 msgid "No checks"
 msgstr "Tidak ada check"
 

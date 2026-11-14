@@ -12999,9 +12999,6 @@ msgstr "Немає каналів"
 msgid "No chats found"
 msgstr "Чатів не знайдено"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "Жоден чекаут у цьому робочому просторі не на {currentBranchName}"
-
 msgid "No checks"
 msgstr "Немає перевірок"
 

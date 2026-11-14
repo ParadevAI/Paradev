@@ -13005,9 +13005,6 @@ msgstr "沒有頻道"
 msgid "No chats found"
 msgstr "找不到聊天"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "此工作區中沒有位於 {currentBranchName} 的檢出"
-
 msgid "No checks"
 msgstr "無檢查"
 

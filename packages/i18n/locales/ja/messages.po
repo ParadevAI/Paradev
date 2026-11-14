@@ -13005,9 +13005,6 @@ msgstr "チャンネルがありません"
 msgid "No chats found"
 msgstr "チャットが見つかりません"
 
-msgid "No checkout in this workspace is on {currentBranchName}"
-msgstr "このワークスペースに {currentBranchName} 上のチェックアウトはありません"
-
 msgid "No checks"
 msgstr "チェックなし"
 
