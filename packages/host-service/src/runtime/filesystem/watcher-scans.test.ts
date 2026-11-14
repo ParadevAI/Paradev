@@ -1,8 +1,14 @@
 import { Database } from "bun:sqlite";
 import { afterEach, describe, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import {
+	mkdirSync,
+	mkdtempSync,
+	realpathSync,
+	rmSync,
+	symlinkSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { FsWatcherManager } from "@superset/workspace-fs/host";
 import { findNestedRepoRoots } from "@superset/workspace-fs/watch-scan";
 import { drizzle } from "drizzle-orm/bun-sqlite";
@@ -25,7 +31,10 @@ function makeRepo(path: string) {
 	mkdirSync(join(path, ".git"), { recursive: true });
 }
 
-function setUp(extraRepositories: { repoPath: string; repoName: string }[]) {
+function setUp(
+	extraRepositories: { repoPath: string; repoName: string }[],
+	storedPath: (root: string) => string = (root) => root,
+) {
 	const sqlite = new Database(":memory:");
 	const db = drizzle(sqlite, { schema }) as unknown as HostDb;
 	migrate(db as never, {
@@ -43,7 +52,7 @@ function setUp(extraRepositories: { repoPath: string; repoName: string }[]) {
 	);
 	seedWorkspace(
 		{ db },
-		{ projectId: project.id, worktreePath: root, branch: "feat" },
+		{ projectId: project.id, worktreePath: storedPath(root), branch: "feat" },
 	);
 	return { db, root };
 }
@@ -117,4 +126,42 @@ test("a multi-repo root's watcher keeps its checkouts and prunes repositories ne
 	expect(manager.isPathPruned(root, join(nested, "x.ts"))).toBe(true);
 	expect(manager.isPathPruned(root, join(root, "web", "new.ts"))).toBe(false);
 	expect(manager.isPathPruned(root, join(root, "api", "new.ts"))).toBe(false);
+});
+
+test("a multi-repo root stored through a symlinked folder is found by its real path", async () => {
+	const parent = realpathSync(
+		mkdtempSync(join(tmpdir(), "watcher-scans-link-")),
+	);
+	cleanups.push(() => rmSync(parent, { recursive: true, force: true }));
+	const { db, root } = setUp(
+		[{ repoPath: "/src/api", repoName: "api" }],
+		(root) => {
+			const link = join(parent, "worktrees");
+			symlinkSync(dirname(root), link);
+			return join(link, basename(root));
+		},
+	);
+	makeRepo(join(root, "web"));
+	makeRepo(join(root, "api"));
+	const nested = join(root, "web", "packages", "lib");
+	makeRepo(nested);
+
+	const result = await scanWorkspaceNestedRepositories(
+		db,
+		root,
+		scanOptions,
+		scan,
+	);
+
+	expect(result.roots).toEqual([nested]);
+	expect(
+		(
+			await scanWorkspaceGitIgnoredDirectories(
+				db,
+				root,
+				undefined,
+				async () => ["dist"],
+			)
+		).sort(),
+	).toEqual(["api/dist", "web/dist"]);
 });

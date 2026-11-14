@@ -306,9 +306,12 @@ export async function destroyWorkspace(
 }
 
 /**
- * Once a delete has removed a checkout of a multi-repo workspace, the
- * workspace stays archived and a retry finishes the delete. A folder the
- * user removed by hand does not count.
+ * A multi-repo workspace stays archived after a failed delete only when it is
+ * half-deleted, so a retry finishes the delete: this run removed a checkout,
+ * or it was already archived (an earlier delete was interrupted) and a
+ * checkout is gone. A folder the user removed by hand from a live workspace
+ * does not count, and a delete interrupted before it removed anything brings
+ * the workspace back.
  */
 function keepsArchivedOnFailure(
 	checkouts: Checkout[],
@@ -318,12 +321,10 @@ function keepsArchivedOnFailure(
 	}: { wasArchived: boolean; presentBefore: Checkout[] },
 ): boolean {
 	if (checkouts.length < 2) return false;
-	return (
-		wasArchived ||
-		presentBefore.some((checkout) =>
-			isMissingPath(checkout.path, { followSymlinks: false }),
-		)
-	);
+	const isGone = (checkout: Checkout) =>
+		isMissingPath(checkout.path, { followSymlinks: false });
+	if (presentBefore.some(isGone)) return true;
+	return wasArchived && checkouts.some(isGone);
 }
 
 async function runDestroy(

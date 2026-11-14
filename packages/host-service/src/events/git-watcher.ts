@@ -897,7 +897,8 @@ export class GitWatcher {
 		let iterator: AsyncIterator<{ events: FsWatchEvent[] }> | null = null;
 
 		try {
-			// Each checkout is its own watch root: a root watch prunes nested repositories.
+			// Each checkout is its own watch root, so its events, ignore rules and
+			// paths are that checkout's.
 			const service = this.filesystem.getServiceForRootPath(worktreePath);
 			const stream = service.watchPath({
 				absolutePath: worktreePath,

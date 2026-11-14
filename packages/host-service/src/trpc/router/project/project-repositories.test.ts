@@ -561,4 +561,82 @@ describe("removing a repository", () => {
 				.get()?.repositoryId,
 		).toBe(b.primaryRepositoryId);
 	});
+
+	it("prefers a clone in a project that is not deleted", async () => {
+		const { caller, db } = setup();
+		const a = await caller.create({
+			name: "A",
+			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
+		});
+		const apiA = a.repositories.find((r) => r.name === "api");
+		if (!apiA) throw new Error("no api repository");
+		const deleted = await caller.create({
+			name: "Deleted",
+			repositories: [local(await gitRepo("api"))],
+		});
+		const live = await caller.create({
+			name: "Live",
+			repositories: [local(await gitRepo("api"))],
+		});
+		db.update(schema.projects)
+			.set({ deletedAt: 1 })
+			.where(eq(schema.projects.id, deleted.id))
+			.run();
+		for (const id of [
+			apiA.id,
+			deleted.primaryRepositoryId,
+			live.primaryRepositoryId,
+		]) {
+			db.update(schema.repositories)
+				.set({ owner: "acme", repoName: "api", createdAt: 1 })
+				.where(eq(schema.repositories.id, id))
+				.run();
+		}
+		const pr = seedPullRequest(
+			{ db },
+			{ repositoryId: apiA.id, prNumber: 1, headBranch: "feat" },
+		);
+
+		await caller.removeRepository({ projectId: a.id, repositoryId: apiA.id });
+
+		expect(
+			db
+				.select()
+				.from(schema.pullRequests)
+				.where(eq(schema.pullRequests.id, pr.id))
+				.get()?.repositoryId,
+		).toBe(live.primaryRepositoryId);
+	});
+
+	it("is not blocked by an archived local workspace whose folder is the repository itself", async () => {
+		const { caller, db } = setup();
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
+		});
+		const api = project.repositories.find((r) => r.name === "api");
+		if (!api) throw new Error("no api repository");
+		const own = seedWorkspace(
+			{ db },
+			{
+				projectId: project.id,
+				worktreePath: api.path,
+				branch: "main",
+				type: "local",
+				repositoryIds: [api.id],
+			},
+		);
+		db.update(schema.workspaces)
+			.set({ archivedAt: 1 })
+			.where(eq(schema.workspaces.id, own.id))
+			.run();
+
+		const after = await caller.removeRepository({
+			projectId: project.id,
+			repositoryId: api.id,
+		});
+
+		expect(after.repositories.map((r) => r.name)).toEqual(["web"]);
+		expect(existsSync(api.path)).toBe(true);
+	});
 });

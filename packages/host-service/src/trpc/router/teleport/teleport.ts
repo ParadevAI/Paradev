@@ -470,7 +470,10 @@ export const teleportRouter = router({
 			const missing: string[] = [];
 			await Promise.all(
 				repositories.map(async (repository) => {
-					const remote = repository.remoteName ?? "origin";
+					const remote =
+						repositories.length > 1
+							? (repository.remoteName ?? "origin")
+							: "origin";
 					const gitEnv = await resolveEnv(repository.repoPath);
 					await execFileAsync(
 						"git",

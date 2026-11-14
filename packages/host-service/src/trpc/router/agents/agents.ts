@@ -874,10 +874,9 @@ export async function runAgentInWorkspace(
 		continueChatAgent(ctx, input) ?? (await continueTerminalAgent(ctx, input));
 	if (continued) return continued;
 
-	const rootPath = workspace.worktreePath;
 	await seedWorkspaceFolderTrust(ctx.db, workspace.id, input.agent);
 	return (
-		launchChatAgent(ctx, input, rootPath, launch.terminalId) ??
+		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
 		runTerminalAgent(ctx, input, launch.terminalId)
 	);
 }

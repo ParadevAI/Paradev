@@ -1604,7 +1604,6 @@ export const workspacesRouter = router({
 
 			const git = await ctx.git(repoPath);
 			const fetchBaseRefOffLoop = createWorkerBaseRefFetcher(ctx, repoPath);
-			const remoteName = repository.remoteName ?? "origin";
 			const worktreeBaseDir =
 				localProject.worktreeBaseDir ?? getHostWorktreeBaseDir(ctx);
 			const worktreesFolder = getProjectWorktreesFolder(ctx, localProject);
@@ -1966,9 +1965,8 @@ export const workspacesRouter = router({
 							resolvedBranch,
 							request.baseBranch,
 							fetchBaseRefOffLoop,
-							remoteName,
 						),
-						listBranchNames(ctx, repoPath, remoteName),
+						listBranchNames(ctx, repoPath),
 					]);
 					plan = planResult;
 					// plan.branch may carry an existing branch's canonical casing.
@@ -1998,9 +1996,8 @@ export const workspacesRouter = router({
 							git,
 							request.baseBranch,
 							fetchBaseRefOffLoop,
-							remoteName,
 						),
-						listBranchNames(ctx, repoPath, remoteName),
+						listBranchNames(ctx, repoPath),
 					]);
 					const prefix = await resolveProjectBranchPrefix({
 						ctx,
@@ -2371,7 +2368,9 @@ export const workspacesRouter = router({
 						listBranchNames(
 							ctx,
 							repository.repoPath,
-							repository.remoteName ?? "origin",
+							repositories.length > 1
+								? (repository.remoteName ?? "origin")
+								: undefined,
 						),
 					),
 				)

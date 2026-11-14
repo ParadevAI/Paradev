@@ -89,11 +89,6 @@ export interface PortChangedMessage {
 	occurredAt: number;
 }
 
-/**
- * Snapshot of a host-owned workspace row as carried on the event bus.
- * Structural (not the drizzle inferred type) so workspace-client consumers
- * don't couple to the host's schema module.
- */
 export interface RepositorySnapshot {
 	id: string;
 	projectId: string;
@@ -123,6 +118,11 @@ export interface CheckoutSnapshot {
 	pullRequestId: string | null;
 }
 
+/**
+ * Snapshot of a host-owned workspace row as carried on the event bus.
+ * Structural (not the drizzle inferred type) so workspace-client consumers
+ * don't couple to the host's schema module.
+ */
 export interface WorkspaceSnapshot {
 	id: string;
 	/** Null for project-less "session" workspaces. */

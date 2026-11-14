@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { isReservedRootName } from "@superset/shared/workspace-root";
 import { TRPCError } from "@trpc/server";
-import { and, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import {
 	projects,
 	pullRequests,
@@ -543,6 +543,7 @@ export async function removeRepository(
 	const stranded = users.filter((row) => {
 		const checkouts = listWorkspaceCheckouts(ctx.db, row);
 		const onDisk = (checkout: (typeof checkouts)[number]) =>
+			checkout.path !== checkout.repository.repoPath &&
 			!isMissingPath(checkout.path);
 		return checkouts.length === 2
 			? checkouts.some(onDisk)
@@ -570,12 +571,18 @@ export async function removeRepository(
 			? ctx.db
 					.select({ id: repositories.id })
 					.from(repositories)
+					.innerJoin(projects, eq(projects.id, repositories.projectId))
 					.where(
 						and(
 							ne(repositories.id, repository.id),
 							sql`lower(${repositories.owner}) = lower(${repository.owner})`,
 							sql`lower(${repositories.repoName}) = lower(${repository.repoName})`,
 						),
+					)
+					.orderBy(
+						sql`${projects.deletedAt} is not null`,
+						asc(repositories.createdAt),
+						asc(repositories.id),
 					)
 					.get()
 			: undefined;

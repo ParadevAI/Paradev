@@ -1,6 +1,7 @@
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import type { HostDb } from "../../../../../db";
+import { listProjectRepositories } from "../../../../../projects/repositories";
 import {
 	createGitEnvResolver,
 	gitCeilingEnv,
@@ -47,6 +48,9 @@ export async function resolveSnapshotTargets(
 ): Promise<SnapshotTarget[]> {
 	const workspace = getLocalWorkspace(ctx.db, workspaceId);
 	const checkouts = workspace ? listWorkspaceCheckouts(ctx.db, workspace) : [];
+	const multiRepoProject =
+		workspace?.projectId != null &&
+		listProjectRepositories(ctx.db, workspace.projectId).length > 1;
 	const entries =
 		checkouts.length > 1
 			? checkouts.map((checkout) => {
@@ -62,7 +66,9 @@ export async function resolveSnapshotTargets(
 					repositoryId: checkout.repository?.id ?? null,
 					name: checkout.repository?.name ?? "",
 					path: checkout.path,
-					remoteName: checkout.repository?.remoteName ?? null,
+					remoteName: multiRepoProject
+						? (checkout.repository?.remoteName ?? null)
+						: null,
 				}));
 	const resolveEnv = createGitEnvResolver(ctx.credentials);
 	const targets = await Promise.all(

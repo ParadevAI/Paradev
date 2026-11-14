@@ -166,13 +166,12 @@ export async function createChatSessionInWorkspace(
 			};
 		}
 	}
-	const rootPath = workspace.worktreePath;
 	await seedWorkspaceFolderTrust(ctx.db, workspace.id, input.agent);
 	return createChatSession(
 		chat,
 		target,
 		{ ...input, commandId },
-		rootPath,
+		workspace.worktreePath,
 		launch.terminalId,
 	);
 }

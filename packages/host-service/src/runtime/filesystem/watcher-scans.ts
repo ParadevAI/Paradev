@@ -1,3 +1,5 @@
+import { realpath } from "node:fs/promises";
+import { basename } from "node:path";
 import type { findNestedRepoRoots } from "@superset/workspace-fs/watch-scan";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db/index.ts";
@@ -31,13 +33,35 @@ export function scanGitIgnoredDirectories(
 	);
 }
 
-function multiRepoCheckouts(db: HostDb, rootPath: string) {
-	return db
-		.select({ id: workspaces.id, worktreePath: workspaces.worktreePath })
+async function workspacesAt(db: HostDb, rootPath: string) {
+	const columns = { id: workspaces.id, worktreePath: workspaces.worktreePath };
+	const exact = db
+		.select(columns)
 		.from(workspaces)
 		.where(eq(workspaces.worktreePath, rootPath))
+		.all();
+	if (exact.length > 0) return exact;
+	// The watcher hands over the real path; a stored path may go through a symlink.
+	const sameName = db
+		.select(columns)
+		.from(workspaces)
 		.all()
-		.map((workspace) => listWorkspaceCheckouts(db, workspace))
+		.filter(
+			(workspace) => basename(workspace.worktreePath) === basename(rootPath),
+		);
+	const realPaths = await Promise.all(
+		sameName.map((workspace) =>
+			realpath(workspace.worktreePath).catch(() => null),
+		),
+	);
+	return sameName.filter((_, index) => realPaths[index] === rootPath);
+}
+
+async function multiRepoCheckouts(db: HostDb, rootPath: string) {
+	return (await workspacesAt(db, rootPath))
+		.map((workspace) =>
+			listWorkspaceCheckouts(db, { id: workspace.id, worktreePath: rootPath }),
+		)
 		.find((list) => list.length > 1);
 }
 
@@ -48,7 +72,7 @@ export async function scanWorkspaceNestedRepositories(
 	options: Parameters<typeof findNestedRepoRoots>[1],
 	scan: typeof findNestedRepoRoots = scanNestedRepositories,
 ): ReturnType<typeof findNestedRepoRoots> {
-	const checkouts = multiRepoCheckouts(db, rootPath);
+	const checkouts = await multiRepoCheckouts(db, rootPath);
 	if (!checkouts) return scan(rootPath, options);
 	const checkoutPaths = new Set(checkouts.map(({ path }) => path));
 	const results = await Promise.all([
@@ -70,7 +94,7 @@ export async function scanWorkspaceGitIgnoredDirectories(
 	signal?: AbortSignal,
 	scan: typeof scanGitIgnoredDirectories = scanGitIgnoredDirectories,
 ): Promise<string[]> {
-	const checkouts = multiRepoCheckouts(db, rootPath);
+	const checkouts = await multiRepoCheckouts(db, rootPath);
 	if (!checkouts) return scan(rootPath, signal);
 	const perCheckout = await Promise.all(
 		checkouts.map(async ({ path, repository }) =>
