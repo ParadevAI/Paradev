@@ -17339,7 +17339,7 @@ msgid "Routine tickets with no mid-task intervention"
 msgstr "Рутинные тикеты без вмешательства по ходу задачи"
 
 msgid "Routines"
-msgstr "Рутины"
+msgstr "Регулярные задачи"
 
 msgid "Routines, ending with Cloud"
 msgstr "Routines, закрываются вместе с облаком"
@@ -23498,3 +23498,43 @@ msgstr "Отдалить"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Бесплатно для одного пользователя. Pro добавляет автоматизации и мобильное приложение. Платные тарифы дают доступ к облачным рабочим пространствам. Включённый объём и доплату за превышение смотрите на странице цен."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Бесплатно для одного пользователя. Pro стоит {proPrice} за пользователя в месяц и добавляет автоматизации и мобильное приложение. Team стоит {teamPrice}. Платные тарифы дают доступ к облачным рабочим пространствам. Включённый объём и доплату за превышение смотрите на странице цен."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Если решите перейти, сохраните ветки и экспортируйте нужные данные. Экспорт не импортирует чаты Conductor в {companyName}."
+
+msgid "Move to {companyName} in minutes."
+msgstr "Перейдите на {companyName} за несколько минут."
+
+msgid "Move your agents."
+msgstr "Перенесите агентов."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Перенесите worktree и агентов в {companyName} за несколько минут. Бесплатно и open source."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Нет. {companyName} никогда не проксирует вызовы моделей. Агенты используют ваши подписки и ключи."
+
+msgid "Paid plans"
+msgstr "Платные тарифы"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Актуальные тарифы и условия доступа к аккаунтам смотрите у Conductor"
+
+msgid "Switch to {companyName}"
+msgstr "Переходите на {companyName}"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr ""
+"Неотправленные изменения в облаке. Сохраните и отправьте работу, которую "
+"хотите перенести."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr ""
+"Приложение iOS; облако и экспериментальное удалённое управление локальным "
+"Mac"

@@ -1,0 +1,85 @@
+---
+title: "Paradev frente a Conductor: agentes locales, espacios de trabajo en la nube y revisión"
+description: "Compara Paradev y Conductor para agentes de programación paralelos, espacios de trabajo locales y en la nube, revisión, colaboración en equipo y acceso móvil."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset vs conductor
+  - alternativa a conductor
+  - orquestación de agentes de IA
+  - gestión de agentes de programación
+  - conductor vs superset
+  - cierre de conductor
+  - migrar desde conductor
+---
+
+Si decides cambiar, consulta [Cambiar de Conductor a Paradev](/conductor) para ver las opciones de migración, o sigue [Migrar desde Conductor](https://docs.paradev.com/migrate-from-conductor) para la aplicación local o [Migrar desde Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) para los espacios de trabajo en la nube.
+
+Paradev y Conductor organizan tareas de programación paralelas en espacios de trabajo separados. Conductor ofrece espacios de trabajo en la nube, conversaciones de equipo compartidas, una API y un servidor MCP, Routines programadas y una aplicación para iOS con acceso a la nube y control remoto experimental de espacios de trabajo locales de Mac. La aplicación de Paradev para iPhone y iPad se conecta a sus espacios de trabajo en la nube y a los hosts que tienes, para que puedas continuar con las terminales de los espacios de trabajo y revisar las diferencias desde donde se ejecuten los agentes.
+
+## De un vistazo
+
+| Requisito | Paradev | Conductor |
+|---|---|---|
+| Agentes | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp y cualquier agente CLI personalizado que añadas | Claude Code, Codex, Cursor, OpenCode |
+| Ubicación de ejecución | Espacios de trabajo locales, hosts conectados, tu propio servidor Linux ([Trae tu propia nube](https://docs.paradev.com/bring-your-own-cloud)) y [espacios de trabajo en la nube](https://docs.paradev.com/cloud-workspaces) | Espacios de trabajo locales de Mac y entornos aislados en la nube |
+| Revisión | El panel Cambios confirma, envía y abre PR; el panel PR muestra comprobaciones, conversaciones de revisión y fusión | Diferencias, comprobaciones, solicitudes de incorporación de cambios, fusión y archivado |
+| Acceso del equipo | Hosts que añadas, con acceso concedido por miembro, además del acceso de la organización | Espacios de trabajo y conversaciones compartidos en la nube |
+| Navegador | Panel de navegador integrado con modo Diseño: selecciona un elemento y envíalo a un agente | Vista previa en el navegador |
+| Automatizaciones | Ejecuciones de agentes programadas de Pro en un host elegido, con historial y reintentos de ejecuciones fallidas | Routines programadas o iniciadas por una acción de GitHub, ejecutadas en la nube |
+| Control mediante código | CLI, SDK de TypeScript y servidor MCP | API y Conductor MCP |
+| Teléfono | Aplicación para iPhone y iPad en App Store, iOS o iPadOS 26+, Pro; funciona con espacios de trabajo en la nube y tus propios hosts | Aplicación para iOS; espacios de trabajo en la nube y [control remoto experimental de espacios de trabajo locales de Mac](https://www.conductor.build/docs/reference/remote-control). Para el control remoto, el Mac debe permanecer abierto, activo y conectado. |
+| Precios | Gratis; Pro {{price:pro}}/usuario/mes o {{price:pro:yearly}} con facturación anual; Team {{price:team}} o {{price:team:yearly}} con facturación anual; Ultra {{price:ultra}}; Enterprise, precio personalizado. Los planes de pago permiten acceder a la nube; consulta [precios](/pricing) para conocer el uso incluido y los extras medidos. | Consulta Conductor para ver los [planes actuales y el acceso a las cuentas](https://www.conductor.build/docs/cloud/faq) |
+
+La [introducción](https://www.conductor.build/docs) de Conductor enumera cuatro entornos de agentes y su proceso de revisión. Su [documentación de Cloud](https://www.conductor.build/docs/cloud) explica los entornos compartidos y los entornos aislados. Su documentación actual también describe el [control remoto experimental de espacios de trabajo locales de Mac desde iPhone](https://www.conductor.build/docs/reference/remote-control).
+
+## Requisitos de Paradev
+
+Paradev ejecuta agentes CLI de programación en espacios de trabajo separados, con terminales y revisión de diferencias en una sola aplicación. La versión de escritorio es compatible con macOS y ofrece una AppImage experimental para Linux. Windows todavía no está disponible. Paradev es de código abierto con licencia MIT. Quienes usaban el chat de Conductor pueden usar la [interfaz de chat](https://docs.paradev.com/chat) para Claude Code, Codex, OpenCode y Pi.
+
+Para gestionar muchas sesiones a la vez, la página Espacios de trabajo las agrupa por estado (Necesita atención, En curso, Necesita revisión, Inactivo, Fusionado) en todos tus hosts. Las sesiones de agentes interrumpidas se reanudan en el mismo panel, y los subagentes que inician Claude Code o Codex aparecen debajo de su agente principal.
+
+Para usar [Paradev en iPhone y iPad](/mobile), necesitas iOS 26 o iPadOS 26 o posterior, y Pro. Los espacios de trabajo en la nube funcionan sin mantener conectado tu propio ordenador; para los espacios de trabajo de tu propia máquina, ese host debe permanecer en línea. El acceso remoto y las automatizaciones también requieren un plan de pago. Consulta [precios](/pricing) y [configuración del acceso remoto](https://docs.paradev.com/remote-access).
+
+## Pruébalo en tu repositorio
+
+Esta comparación la publica Paradev. La documentación de Conductor enlazada respalda las descripciones de funciones; la prueba que sigue es un método de evaluación, no una clasificación basada en mediciones de rendimiento.
+
+Para comparar las aplicaciones, usa la misma confirmación del repositorio, el mismo agente y modelo, y dos instrucciones de tarea independientes en cada aplicación. Anota las versiones de la aplicación y el agente, la fecha y cualquier diferencia en la configuración. La [guía de tareas paralelas](/blog/parallel-coding-agents-guide) incluye instrucciones con un alcance definido.
+
+| Paso de la prueba | Evidencia que debes registrar |
+|---|---|
+| Crea dos tareas independientes | Rutas de los espacios de trabajo y nombres de las ramas; pasos de configuración necesarios antes de ejecutar las pruebas |
+| Deja que cada agente complete un cambio pequeño | Instrucción, modelo, archivos modificados y resultado de las comprobaciones |
+| Pide una corrección | Si puedes encontrar y reanudar la sesión correcta |
+| Revisa e integra ambos cambios | Pasos de revisión, conflictos y resultado de las pruebas combinadas |
+| Prueba el acceso remoto si lo necesitas | Disponibilidad del host, plan necesario y qué ocurre al desconectarse |
+
+Mide por separado el tiempo de configuración y revisión y el tiempo de ejecución del agente. Repite la prueba antes de sacar conclusiones sobre la velocidad: los resultados del agente varían y una ejecución más rápida puede producir diferencias de peor calidad. Los worktrees de Git separan los archivos de trabajo; no garantizan una integración sin conflictos ni permisos aislados para el agente.
+
+![Revisión de un cambio en Paradev.](/images/readme/diff-viewer.png)
+
+## Qué pueden hacer ahora quienes usan Conductor
+
+Si decides cambiar, guarda tus ramas y exporta los registros que quieras conservar.
+
+Elige Paradev si quieres responder a un agente desde tu iPhone y revisar sus cambios mientras la tarea se ejecuta en tu propio ordenador, en un host o en un espacio de trabajo en la nube, con cualquier agente CLI. Comprueba la configuración con la [guía para el teléfono](/blog/claude-code-codex-iphone). Para trasladar tu trabajo, sigue la [guía de la aplicación local](https://docs.paradev.com/migrate-from-conductor) o la [guía de Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
+
+Compara los [planes actuales de Paradev](/pricing), incluidos los costes de computación y del proveedor del agente. El uso del proveedor del agente se factura por separado.
+
+## Preguntas frecuentes
+
+### ¿Conductor solo sirve para trabajar en local?
+
+No. La documentación de Conductor describe espacios de trabajo locales de Mac y [entornos aislados en la nube](https://www.conductor.build/docs/cloud), incluidos espacios de trabajo compartidos en la nube. Su aplicación para iOS también ofrece [control remoto experimental de espacios de trabajo locales de Mac](https://www.conductor.build/docs/reference/remote-control).
+
+### ¿Conductor puede ejecutar OpenCode?
+
+Sí. Su introducción incluye OpenCode junto con Claude Code, Codex y Cursor.
+
+### ¿Paradev exige cambiar de editor?
+
+No. Puedes abrir el directorio de un espacio de trabajo en tu editor mientras Paradev gestiona sus terminales y espacios de trabajo. Asegúrate de que haya un único responsable de los cambios que puedan solaparse.

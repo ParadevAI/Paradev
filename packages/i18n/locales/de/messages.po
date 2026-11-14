@@ -23498,3 +23498,41 @@ msgstr "Verkleinern"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Für einen Nutzer kostenlos. Pro bietet zusätzlich Automatisierungen und die mobile App. Bezahlte Tarife bieten Zugang zu Cloud-Arbeitsbereichen. Inklusivkontingente und Mehrverbrauch findest du auf der Preisseite."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Für einen Nutzer kostenlos. Pro kostet {proPrice} pro Nutzer und Monat und bietet zusätzlich Automatisierungen und die mobile App. Team kostet {teamPrice}. Bezahlte Tarife bieten Zugang zu Cloud-Arbeitsbereichen. Inklusivkontingente und Mehrverbrauch findest du auf der Preisseite."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Wenn du wechseln möchtest, sichere deine Branches und exportiere die gewünschten Daten. Exporte importieren keine Conductor-Chats in {companyName}."
+
+msgid "Move to {companyName} in minutes."
+msgstr "Wechsle in wenigen Minuten zu {companyName}."
+
+msgid "Move your agents."
+msgstr "Zieh deine Agenten um."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Zieh deine Worktrees und Agenten in wenigen Minuten zu {companyName} um. Kostenlos und Open Source."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Nein. {companyName} leitet Modellaufrufe niemals über einen Proxy. Die Agenten nutzen deine eigenen Abonnements und Schlüssel."
+
+msgid "Paid plans"
+msgstr "Kostenpflichtige Tarife"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Aktuelle Tarife und Kontozugang bei Conductor prüfen"
+
+msgid "Switch to {companyName}"
+msgstr "Wechsle zu {companyName}"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr ""
+"Nicht gepushte Cloud-Änderungen. Speichere und pushe die Arbeit, die du "
+"übertragen möchtest."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS-App; Cloud und experimentelle Fernsteuerung des lokalen Mac"

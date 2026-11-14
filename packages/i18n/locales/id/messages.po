@@ -23498,3 +23498,41 @@ msgstr "Perkecil"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis untuk satu pengguna. Pro menambahkan otomasi dan aplikasi mobile. Paket berbayar dapat mengakses ruang kerja cloud. Lihat harga untuk kuota yang disertakan dan biaya penggunaan tambahan."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis untuk satu pengguna. Pro seharga {proPrice} per pengguna per bulan dan menambahkan otomasi serta aplikasi mobile. Team seharga {teamPrice}. Paket berbayar dapat mengakses ruang kerja cloud. Lihat harga untuk kuota yang disertakan dan biaya penggunaan tambahan."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Jika memilih pindah, simpan branch dan ekspor data yang ingin disimpan. Ekspor tidak mengimpor percakapan Conductor ke {companyName}."
+
+msgid "Move to {companyName} in minutes."
+msgstr "Pindah ke {companyName} dalam hitungan menit."
+
+msgid "Move your agents."
+msgstr "Pindahkan agen Anda."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Pindahkan worktree dan agen Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Tidak. {companyName} tidak pernah menjadi proxy untuk panggilan model. Agen menggunakan langganan dan kunci Anda sendiri."
+
+msgid "Paid plans"
+msgstr "Paket berbayar"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Lihat Conductor untuk paket dan akses akun saat ini"
+
+msgid "Switch to {companyName}"
+msgstr "Beralih ke {companyName}"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr ""
+"Perubahan cloud yang belum di-push. Simpan dan push pekerjaan yang ingin "
+"dipindahkan."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "Aplikasi iOS; cloud dan kendali jarak jauh Mac lokal eksperimental"

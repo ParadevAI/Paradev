@@ -23498,3 +23498,39 @@ msgstr "축소"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "사용자 1명은 무료입니다. Pro는 자동화와 모바일 앱을 추가합니다. 유료 요금제에서 클라우드 작업 공간을 이용할 수 있습니다. 포함 사용량과 추가 사용 요금은 가격 페이지를 확인하세요."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "사용자 1명은 무료입니다. Pro는 사용자당 월 {proPrice}이며 자동화와 모바일 앱을 추가합니다. Team은 {teamPrice}입니다. 유료 요금제에서 클라우드 작업 공간을 이용할 수 있습니다. 포함 사용량과 추가 사용 요금은 가격 페이지를 확인하세요."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "이전하기로 결정하면 브랜치를 저장하고 보관할 데이터를 내보내세요. 내보내기 파일로 Conductor 채팅을 {companyName}에 가져올 수는 없습니다."
+
+msgid "Move to {companyName} in minutes."
+msgstr "몇 분 만에 {companyName}(으)로 옮기세요."
+
+msgid "Move your agents."
+msgstr "에이전트를 옮기세요."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "몇 분 만에 worktree와 에이전트를 {companyName}(으)로 옮기세요. 무료 오픈 소스입니다."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "아니요. {companyName}는 모델 호출을 프록시하지 않습니다. 에이전트는 내 구독과 키를 사용합니다."
+
+msgid "Paid plans"
+msgstr "유료 요금제"
+
+msgid "See Conductor for current plans and account access"
+msgstr "현재 요금제 및 계정 접근 정보는 Conductor에서 확인하세요"
+
+msgid "Switch to {companyName}"
+msgstr "{companyName}(으)로 전환하세요"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "푸시하지 않은 클라우드 변경 사항. 이전할 작업을 저장하고 푸시하세요."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS 앱: 클라우드 및 실험적 로컬 Mac 원격 제어"

@@ -23498,3 +23498,41 @@ msgstr "Uzaklaştır"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Bir kullanıcı için ücretsiz. Pro, otomasyonları ve mobil uygulamayı ekler. Ücretli planlarla bulut çalışma alanlarına erişebilirsiniz. Dahil edilen kullanım ve ek tüketim ücretleri için fiyatlara bakın."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Bir kullanıcı için ücretsiz. Pro, kullanıcı başına aylık {proPrice}'dır ve otomasyonları ve mobil uygulamayı ekler. Team {teamPrice}'dır. Ücretli planlarla bulut çalışma alanlarına erişebilirsiniz. Dahil edilen kullanım ve ek tüketim ücretleri için fiyatlara bakın."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Taşınmayı seçerseniz dallarınızı kaydedin ve saklamak istediğiniz verileri dışa aktarın. Dışa aktarımlar Conductor sohbetlerini {companyName}'e içe aktarmaz."
+
+msgid "Move to {companyName} in minutes."
+msgstr "Dakikalar içinde {companyName}'e geçin."
+
+msgid "Move your agents."
+msgstr "Ajanlarınızı taşıyın."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Hayır. {companyName}, model çağrıları için asla proxy görevi görmez. Ajanlar kendi aboneliklerinizi ve anahtarlarınızı kullanır."
+
+msgid "Paid plans"
+msgstr "Ücretli planlar"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Güncel planlar ve hesap erişimi için Conductor'a bakın"
+
+msgid "Switch to {companyName}"
+msgstr "{companyName}'e geçin"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr ""
+"Gönderilmemiş bulut değişiklikleri. Taşımak istediğiniz çalışmayı kaydedip "
+"gönderin."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS uygulaması; bulut ve deneysel yerel Mac uzaktan kontrolü"

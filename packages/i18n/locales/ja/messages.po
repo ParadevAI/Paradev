@@ -17339,7 +17339,7 @@ msgid "Routine tickets with no mid-task intervention"
 msgstr "途中の介入なしで完了する定型チケット"
 
 msgid "Routines"
-msgstr "ルーティン"
+msgstr "ルーチン"
 
 msgid "Routines, ending with Cloud"
 msgstr "ルーティン（Cloud とともに終了）"
@@ -23498,3 +23498,39 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "1ユーザーは無料。Pro ではオートメーションとモバイルアプリが追加されます。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "1ユーザーは無料。Pro は1ユーザーあたり月額 {proPrice} で、オートメーションとモバイルアプリが追加されます。Team は {teamPrice}です。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "移行する場合は、ブランチを保存し、残したいデータをエクスポートしてください。エクスポートではConductorのチャットを{companyName}にインポートできません。"
+
+msgid "Move to {companyName} in minutes."
+msgstr "数分で {companyName} に移行できます。"
+
+msgid "Move your agents."
+msgstr "エージェントを移行しましょう。"
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "ワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "いいえ。{companyName}がモデル呼び出しをプロキシすることはありません。エージェントはご自身のサブスクリプションとキーを使います。"
+
+msgid "Paid plans"
+msgstr "有料プラン"
+
+msgid "See Conductor for current plans and account access"
+msgstr "現在のプランとアカウント利用条件はConductorをご確認ください"
+
+msgid "Switch to {companyName}"
+msgstr "{companyName} に乗り換えましょう"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "プッシュしていないクラウド上の変更。移行したい作業を保存してプッシュしてください。"
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOSアプリ。クラウドと、実験的なローカルMacのリモート操作に対応"

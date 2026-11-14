@@ -23498,3 +23498,39 @@ msgstr "Zoom Out"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+
+msgid "Move to {companyName} in minutes."
+msgstr "Move to {companyName} in minutes."
+
+msgid "Move your agents."
+msgstr "Move your agents."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+
+msgid "Paid plans"
+msgstr "Paid plans"
+
+msgid "See Conductor for current plans and account access"
+msgstr "See Conductor for current plans and account access"
+
+msgid "Switch to {companyName}"
+msgstr "Switch to {companyName}"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Unpushed cloud changes. Save and push the work you want to move."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS app; cloud and experimental local Mac remote control"

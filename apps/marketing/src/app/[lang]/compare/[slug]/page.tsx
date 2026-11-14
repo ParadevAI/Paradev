@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
-import { mdxComponents } from "@/app/[lang]/blog/components/mdx-components";
+import {
+	getMdxComponents,
+	mdxComponents,
+} from "@/app/[lang]/blog/components/mdx-components";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import {
@@ -31,23 +34,27 @@ interface PageProps {
 }
 
 export default async function ComparePageRoute({ params }: PageProps) {
-	await initServerI18n();
+	const lang = await initServerI18n();
 
 	const { slug } = await params;
-	const page = await getPricedComparisonPage(slug);
+	const contentLocale = slug === "superset-vs-conductor" ? lang : "en";
+	const page = await getPricedComparisonPage(slug, contentLocale);
 
 	if (!page) {
 		notFound();
 	}
 
-	const url = `${COMPANY.MARKETING_URL}/compare/${slug}`;
+	const url =
+		slug === "superset-vs-conductor"
+			? localeUrl(lang, `/compare/${slug}`)
+			: `${COMPANY.MARKETING_URL}/compare/${slug}`;
 	const { body, faq } = splitComparisonFaq(page.content);
 	const faqItems = extractComparisonFaqItems(page.content);
 	const roundupItems =
 		page.type === "roundup"
 			? extractRoundupItems(page.content).map((item) => ({
 					name: item,
-					url: `${url}#${slugify(item)}`,
+					url: `${url}#${slugify(item, contentLocale)}`,
 				}))
 			: [];
 
@@ -80,12 +87,16 @@ export default async function ComparePageRoute({ params }: PageProps) {
 			{faqItems.length > 0 && <FAQPageJsonLd items={faqItems} />}
 			<CompareLayout
 				page={page}
-				toc={extractCompareToc(page.content)}
+				toc={extractCompareToc(page.content, contentLocale)}
 				faq={
 					faq && (
 						<MDXRemote
 							source={faq}
-							components={mdxComponents}
+							components={
+								slug === "superset-vs-conductor"
+									? getMdxComponents(lang)
+									: mdxComponents
+							}
 							options={mdxOptions}
 						/>
 					)
@@ -93,7 +104,11 @@ export default async function ComparePageRoute({ params }: PageProps) {
 			>
 				<MDXRemote
 					source={body}
-					components={mdxComponents}
+					components={
+						slug === "superset-vs-conductor"
+							? getMdxComponents(lang)
+							: mdxComponents
+					}
 					options={mdxOptions}
 				/>
 			</CompareLayout>
@@ -112,7 +127,8 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const { slug } = await params;
-	const page = await getPricedComparisonPage(slug);
+	const contentLocale = slug === "superset-vs-conductor" ? lang : "en";
+	const page = await getPricedComparisonPage(slug, contentLocale);
 
 	if (!page) {
 		return {};

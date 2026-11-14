@@ -17339,7 +17339,7 @@ msgid "Routine tickets with no mid-task intervention"
 msgstr "Ticket thường ngày không cần can thiệp giữa chừng"
 
 msgid "Routines"
-msgstr "Quy trình"
+msgstr "Tác vụ định kỳ"
 
 msgid "Routines, ending with Cloud"
 msgstr "Quy trình, kết thúc cùng Cloud"
@@ -23498,3 +23498,42 @@ msgstr "Thu nhỏ"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Miễn phí cho một người dùng. Pro thêm tự động hóa và ứng dụng di động. Các gói trả phí có thể truy cập không gian làm việc trên đám mây. Xem bảng giá để biết hạn mức đi kèm và phí dùng thêm."
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Miễn phí cho một người dùng. Pro có giá {proPrice} mỗi người mỗi tháng, thêm tự động hóa và ứng dụng di động. Team có giá {teamPrice}. Các gói trả phí có thể truy cập không gian làm việc trên đám mây. Xem bảng giá để biết hạn mức đi kèm và phí dùng thêm."
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Nếu quyết định chuyển, hãy lưu các nhánh và xuất dữ liệu bạn muốn giữ. Tệp xuất không nhập các cuộc trò chuyện Conductor vào {companyName}."
+
+msgid "Move to {companyName} in minutes."
+msgstr "Chuyển sang {companyName} chỉ trong vài phút."
+
+msgid "Move your agents."
+msgstr "Hãy chuyển agent của bạn."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Chuyển worktree và agent của bạn sang {companyName} trong vài phút. Miễn phí và mã nguồn mở."
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Không. {companyName} không bao giờ làm proxy cho các lệnh gọi mô hình. Agent dùng gói đăng ký và khóa của chính bạn."
+
+msgid "Paid plans"
+msgstr "Gói trả phí"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Xem Conductor để biết các gói và quyền truy cập tài khoản hiện tại"
+
+msgid "Switch to {companyName}"
+msgstr "Chuyển sang {companyName}"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr ""
+"Các thay đổi trên đám mây chưa được đẩy lên. Lưu và đẩy phần việc bạn muốn "
+"chuyển."
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr ""
+"Ứng dụng iOS; đám mây và tính năng thử nghiệm điều khiển Mac cục bộ từ xa"

@@ -23498,3 +23498,39 @@ msgstr "縮小"
 
 msgid "zsh"
 msgstr "zsh"
+
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "單一使用者免費。Pro 增加自動化和行動應用程式。付費方案可存取雲端工作區。內含用量與額外用量計費請參閱價格頁面。"
+
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "單一使用者免費。Pro 為每位使用者每月 {proPrice}，增加自動化和行動應用程式。Team 為 {teamPrice}。付費方案可存取雲端工作區。內含用量與額外用量計費請參閱價格頁面。"
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "如果決定遷移，請儲存分支並匯出要保留的資料。匯出檔無法將 Conductor 聊天匯入 {companyName}。"
+
+msgid "Move to {companyName} in minutes."
+msgstr "幾分鐘即可遷移到 {companyName}。"
+
+msgid "Move your agents."
+msgstr "遷移你的代理程式。"
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "幾分鐘即可把你的 worktree 和代理程式遷移到 {companyName}。免費且開源。"
+
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "不會。{companyName} 從不代理模型呼叫。代理程式使用你自己的訂閱和金鑰。"
+
+msgid "Paid plans"
+msgstr "付費方案"
+
+msgid "See Conductor for current plans and account access"
+msgstr "目前方案與帳號存取資訊請參閱 Conductor"
+
+msgid "Switch to {companyName}"
+msgstr "切換到 {companyName}"
+
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "尚未推送的雲端變更。請儲存並推送要遷移的工作。"
+
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS App；支援雲端與實驗性的本機 Mac 遠端控制"
