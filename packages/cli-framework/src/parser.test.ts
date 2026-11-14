@@ -7,6 +7,7 @@ const configs: Record<string, ProcessedBuilderConfig> = {
 	prompt: { name: "prompt", aliases: [], type: "string" },
 	offset: { name: "offset", aliases: [], type: "number" },
 	json: { name: "json", aliases: [], type: "boolean" },
+	"2fa": { name: "2fa", aliases: ["2"], type: "string" },
 };
 
 function parse(...args: string[]) {
@@ -31,6 +32,9 @@ describe("parseArgv", () => {
 		["--offset=3"],
 		["-x"],
 		["--unknown"],
+		["--2fa"],
+		["--2fa=123456"],
+		["-2"],
 		["--", "text"],
 		[],
 	])("reports a missing value when the option is followed by %p", (...rest) => {

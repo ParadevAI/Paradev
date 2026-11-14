@@ -152,7 +152,10 @@ export function parseArgv(
 
 			// String/number: consume next arg as value
 			const nextArg = args[i + 1];
-			if (!isOptionValue(nextArg)) {
+			if (
+				!isOptionValue(nextArg) ||
+				optionsByFlag.has(nextArg.split("=", 1)[0]!)
+			) {
 				throw new CLIError(
 					`Option ${arg} requires a value`,
 					entry[1].enumVals
