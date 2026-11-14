@@ -3,7 +3,9 @@ import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import {
 	findRepository,
+	type HostProject,
 	hostPath,
+	type ResolvedHostTarget,
 	requireRepositories,
 	resolveHostFilter,
 	resolveHostTarget,
@@ -44,6 +46,28 @@ function placementState({
 	if (created || (!restored && previousPath === undefined)) return "set up";
 	if (restored) return "restored";
 	return previousPath === path ? "already there" : "moved";
+}
+
+type SetupResult = Awaited<
+	ReturnType<ResolvedHostTarget["client"]["project"]["setup"]["mutate"]>
+>;
+
+/** Brings back a project this host deleted; null when the host never had it. */
+async function restoreDeleted(
+	target: ResolvedHostTarget,
+	projectId: string,
+): Promise<SetupResult | null> {
+	try {
+		return await target.client.project.setup.mutate({
+			projectId,
+			repositories: [],
+		});
+	} catch (error) {
+		if (error instanceof Error && error.message.startsWith("not_set_up:")) {
+			return null;
+		}
+		throw error;
+	}
 }
 
 export default command({
@@ -95,10 +119,48 @@ export default command({
 			userJwt: ctx.bearer,
 			api: ctx.api,
 		});
+		const placementsFor = (project: HostProject) => {
+			const placements = new Map<string, PlacementMode>();
+			for (const { ref, dir } of paths) {
+				const repository = findRepository(project, ref);
+				if (placements.has(repository.id)) {
+					throw new CLIError(`--path names ${repository.name} twice`);
+				}
+				placements.set(repository.id, {
+					kind: "import",
+					path: hostPath(target, dir),
+					...(options.allowRelocate ? { allowRelocate: true } : {}),
+				});
+			}
+			if (options.cloneInto) {
+				const parentDir = hostPath(target, options.cloneInto);
+				for (const repository of requireRepositories(project)) {
+					if (!placements.has(repository.id)) {
+						placements.set(repository.id, { kind: "clone", parentDir });
+					}
+				}
+			}
+			return [...placements].map(([id, mode]) => ({ id, mode }));
+		};
+
 		const existing = await target.client.project.get.query({ projectId });
-		let project = existing;
+		const restoredProject = existing
+			? null
+			: await restoreDeleted(target, projectId);
 		let source: SourceProject | null = null;
-		if (!project) {
+		let result: SetupResult;
+		if (existing || restoredProject) {
+			const placements = placementsFor(
+				(existing ?? restoredProject) as HostProject,
+			);
+			result =
+				restoredProject && placements.length === 0
+					? restoredProject
+					: await target.client.project.setup.mutate({
+							projectId,
+							repositories: placements,
+						});
+		} else {
 			source = await findSourceProject({
 				api: ctx.api,
 				userJwt: ctx.bearer,
@@ -107,55 +169,31 @@ export default command({
 				targetHostId: target.hostId,
 				fromHostId: options.fromHost ?? undefined,
 			});
-			project = source.project;
-		}
-		const repositories = requireRepositories(project);
-
-		const placements = new Map<string, PlacementMode>();
-		for (const { ref, dir } of paths) {
-			const repository = findRepository(project, ref);
-			if (placements.has(repository.id)) {
-				throw new CLIError(`--path names ${repository.name} twice`);
+			const { project } = source;
+			const repositories = requireRepositories(project);
+			const placements = placementsFor(project);
+			const placed = new Set(placements.map(({ id }) => id));
+			const unplaced = repositories.filter((r) => !placed.has(r.id));
+			if (unplaced.length > 0) {
+				throw new CLIError(
+					`Pick a folder for ${unplaced.map((r) => r.name).join(", ")}`,
+					"Pass --clone-into <dir> to clone them, or --path <repo>=<dir> for a folder that already has one",
+				);
 			}
-			placements.set(repository.id, {
-				kind: "import",
-				path: hostPath(target, dir),
-				...(options.allowRelocate ? { allowRelocate: true } : {}),
+			result = await target.client.project.setup.mutate({
+				projectId,
+				origin: {
+					name: project.name,
+					primaryRepositoryId: project.primaryRepositoryId,
+					repositories: repositories.map(({ id, name, url }) => ({
+						id,
+						name,
+						url,
+					})),
+				},
+				repositories: placements,
 			});
 		}
-		if (options.cloneInto) {
-			const parentDir = hostPath(target, options.cloneInto);
-			for (const repository of repositories) {
-				if (!placements.has(repository.id)) {
-					placements.set(repository.id, { kind: "clone", parentDir });
-				}
-			}
-		}
-		const unplaced = repositories.filter((r) => !placements.has(r.id));
-		if (!existing && unplaced.length > 0) {
-			throw new CLIError(
-				`Pick a folder for ${unplaced.map((r) => r.name).join(", ")}`,
-				"Pass --clone-into <dir> to clone them, or --path <repo>=<dir> for a folder that already has one",
-			);
-		}
-
-		const result = await target.client.project.setup.mutate({
-			projectId,
-			...(source
-				? {
-						origin: {
-							name: project.name,
-							primaryRepositoryId: project.primaryRepositoryId,
-							repositories: repositories.map(({ id, name, url }) => ({
-								id,
-								name,
-								url,
-							})),
-						},
-					}
-				: {}),
-			repositories: [...placements].map(([id, mode]) => ({ id, mode })),
-		});
 
 		const before = new Map(
 			(existing?.repositories ?? []).map((r) => [r.id, r.path]),

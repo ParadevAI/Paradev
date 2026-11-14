@@ -301,6 +301,22 @@ describe("workspaces create on a project of several repositories", () => {
 		expect(createInput).toBeUndefined();
 	});
 
+	test("sends --branch with --pr", async () => {
+		await invoke({ branch: "feat/x", pr: ["web=12"] });
+		expect(createInput).toMatchObject({
+			branch: "feat/x",
+			checkouts: { "r-web": { pr: 12 } },
+		});
+	});
+
+	test("refuses --branch with --pr on a project of one repository", async () => {
+		projectRepositories = [{ id: "r-api", name: "api", isPrimary: true }];
+		await expect(invoke({ branch: "feat/x", pr: ["12"] })).rejects.toThrow(
+			"Specify only one of --branch or --pr",
+		);
+		expect(createInput).toBeUndefined();
+	});
+
 	test("refuses a bare --pr, naming the repositories", async () => {
 		await expect(invoke({ branch: undefined, pr: ["12"] })).rejects.toThrow(
 			/needs a repository/,

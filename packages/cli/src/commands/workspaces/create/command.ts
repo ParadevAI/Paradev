@@ -177,19 +177,11 @@ export default command({
 					);
 				}
 			}
-		} else {
-			if (options.branch && options.pr?.length) {
-				throw new CLIError(
-					"Specify only one of --branch or --pr",
-					"Use --branch <name> or --pr <number>",
-				);
-			}
-			if (!options.branch && !options.pr?.length && !options.task) {
-				throw new CLIError(
-					"Specify --branch, --pr, --task, or --checkout local",
-					"Use --branch <name>, --pr <number>, --task <id>, or --checkout local",
-				);
-			}
+		} else if (!options.branch && !options.pr?.length && !options.task) {
+			throw new CLIError(
+				"Specify --branch, --pr, --task, or --checkout local",
+				"Use --branch <name>, --pr <number>, --task <id>, or --checkout local",
+			);
 		}
 
 		if (options.prompt && !options.agent) {
@@ -280,9 +272,16 @@ export default command({
 		if (project === null) {
 			throw new CLIError(`Project ${projectId} is not on this host`);
 		}
-		const checkouts = project
+		const repositories = project ? requireRepositories(project) : undefined;
+		if (options.branch && options.pr?.length && repositories?.length === 1) {
+			throw new CLIError(
+				"Specify only one of --branch or --pr",
+				"Use --branch <name> or --pr <number>",
+			);
+		}
+		const checkouts = repositories
 			? buildCheckouts({
-					repositories: requireRepositories(project),
+					repositories,
 					pr: options.pr,
 					baseBranch: options.baseBranch,
 				})

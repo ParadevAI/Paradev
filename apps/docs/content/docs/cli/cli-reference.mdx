@@ -909,8 +909,8 @@ project id when the host does not know the project's name.
 	output={`{ workspace: Workspace; alreadyExists: boolean; url: string; webUrl: string }`}
 >
 Create a workspace on the target host. With `--project`, specify one of
-`--checkout local`, `--branch`, `--pr`, or `--task` (`--branch` and `--pr` are mutually
-exclusive). If you pass `--agent`, you must also pass `--prompt`. `--command`
+`--checkout local`, `--branch`, `--pr`, or `--task` (on a project of one repository,
+`--branch` and `--pr` are mutually exclusive). If you pass `--agent`, you must also pass `--prompt`. `--command`
 runs a one-off shell command in the workspace directory and is independent of
 `--agent`/`--prompt`. Pass either or both. `--model` and `--effort` require
 `--agent`; see the [agent effort levels](#agent-effort-levels) below.
@@ -1286,7 +1286,7 @@ superset worktrees list --project prj_…
 		{ flag: "--repository <nameOrId>", description: "Repository the worktree belongs to, by name or ID. Default: the primary." },
 		{ flag: "--path <dir>", description: "Worktree path. Specify exactly one of `--path`, `--branch` or `--all`. Must be absolute on another host. On a project of several repositories, the worktree moves into the new workspace folder." },
 		{ flag: "--branch <name>", description: "Branch checked out in the worktree." },
-		{ flag: "--all", description: "Every worktree that is not the main checkout and has no workspace." },
+		{ flag: "--all", description: "Every worktree that is not the main checkout and has no workspace. Refused on a project of several repositories; open those worktrees one at a time." },
 		{ flag: "--host <id>", description: "Host the project is on (machineId). Mutually exclusive with `--local`." },
 		{ flag: "--local", description: "This machine (the default)." },
 		{ flag: "--run-setup", description: "Run the project's setup script in a newly opened workspace. Off by default." },

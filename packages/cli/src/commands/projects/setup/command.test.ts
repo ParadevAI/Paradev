@@ -30,13 +30,19 @@ const PROJECT = {
 };
 
 let setupInput: Record<string, unknown> | undefined;
+let setupCalls: Record<string, unknown>[];
 let localProject: typeof PROJECT | null;
+let localDeleted: boolean;
 let setupCreates: boolean;
 
 withLocalHostService("org-1", {
 	"project.get": () => localProject,
 	"project.setup": (input) => {
+		if (!input.origin && !localProject && !localDeleted) {
+			throw new Error("not_set_up: project project-1 is not on this host");
+		}
 		setupInput = input;
+		setupCalls.push(input);
 		return {
 			...PROJECT,
 			repositories: PROJECT.repositories.map((r) => ({
@@ -63,7 +69,12 @@ const relay = Bun.serve({
 afterAll(() => relay.stop(true));
 
 const hasProject = { "project.get": () => PROJECT };
-const lacksProject = { "project.get": () => null };
+const lacksProject = {
+	"project.get": () => null,
+	"project.setup": () => {
+		throw new Error("not_set_up: project project-1 is not on this host");
+	},
+};
 
 const api = {
 	host: {
@@ -89,7 +100,9 @@ function invoke(options: Record<string, unknown>) {
 
 beforeEach(() => {
 	setupInput = undefined;
+	setupCalls = [];
 	localProject = null;
+	localDeleted = false;
 	setupCreates = true;
 	remoteHosts["host-a"] = hasProject;
 	remoteHosts["host-b"] = lacksProject;
@@ -176,11 +189,31 @@ describe("projects setup", () => {
 		expect(result.message).toContain("web  /here/web  (moved)");
 	});
 
-	test("says the host restored a project it had deleted", async () => {
+	test("restores a project this host deleted without another host", async () => {
+		localDeleted = true;
 		setupCreates = false;
+		remoteHosts["host-a"] = lacksProject;
 		const result = await invoke({ cloneInto: "/src" });
+		expect(setupCalls).toEqual([
+			{ projectId: "project-1", repositories: [] },
+			{
+				projectId: "project-1",
+				repositories: [
+					{ id: "r-api", mode: { kind: "clone", parentDir: "/src" } },
+					{ id: "r-web", mode: { kind: "clone", parentDir: "/src" } },
+				],
+			},
+		]);
 		expect(result.message).toContain('Restored project "shop" on host');
 		expect(result.message).toContain("api  /here/api  (restored)");
 		expect(result.message).not.toContain("moved");
+	});
+
+	test("restores a deleted project in place when no folder is given", async () => {
+		localDeleted = true;
+		setupCreates = false;
+		const result = await invoke({});
+		expect(setupCalls).toEqual([{ projectId: "project-1", repositories: [] }]);
+		expect(result.message).toContain('Restored project "shop" on host');
 	});
 });
