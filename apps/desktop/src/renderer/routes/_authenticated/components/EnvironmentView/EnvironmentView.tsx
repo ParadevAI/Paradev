@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { formatRelativeTime } from "@superset/i18n/format";
-import { SANDBOX_REGIONS } from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGIONS } from "@superset/shared/sandbox/regions";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import {
@@ -16,6 +16,7 @@ import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { LuArchive, LuContainer } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "../ArchiveEnvironmentDialog";
 import { EnvironmentPropertyRow } from "../EnvironmentPropertyRow";
@@ -37,6 +38,7 @@ export function EnvironmentView({
 	environmentId,
 	onArchived,
 }: EnvironmentViewProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
 	const environment = cloudTrpc.environment.get.useQuery({
@@ -106,7 +108,9 @@ export function EnvironmentView({
 						)}
 					</div>
 					<div className="mt-0.5 text-xs text-muted-foreground">
-						<Trans>Created {formatRelativeTime(new Date(row.createdAt))}</Trans>
+						<Trans>
+							Created {formatRelativeTime(new Date(row.createdAt), now)}
+						</Trans>
 					</div>
 				</div>
 			</div>
@@ -203,7 +207,8 @@ export function EnvironmentView({
 					>
 						{row.sourceKind === "fork" ? (
 							<Trans>
-								Checkpoint saved {formatRelativeTime(new Date(row.updatedAt))}
+								Checkpoint saved{" "}
+								{formatRelativeTime(new Date(row.updatedAt), now)}
 							</Trans>
 						) : (
 							<Trans>Base image · no checkpoint yet</Trans>

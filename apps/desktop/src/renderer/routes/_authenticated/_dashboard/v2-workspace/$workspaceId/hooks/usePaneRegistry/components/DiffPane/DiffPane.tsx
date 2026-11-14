@@ -29,6 +29,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
 import {
 	createPaneScrollStateKey,
@@ -731,6 +732,7 @@ export function DiffPane({
 		[getFile],
 	);
 
+	const sidebarFilePolicy = useSidebarFilePolicy();
 	const renderHeaderMetadata = useCallback(
 		(item: CodeViewItem<DiffAnnotationMetadata>) => {
 			const file = getFile(item.id);
@@ -756,10 +758,12 @@ export function DiffPane({
 					onCancelEditing={
 						isEditing ? () => requestExitEditing(item.id) : undefined
 					}
+					policy={sidebarFilePolicy}
 				/>
 			);
 		},
 		[
+			sidebarFilePolicy,
 			getFile,
 			workspaceId,
 			setCollapsed,

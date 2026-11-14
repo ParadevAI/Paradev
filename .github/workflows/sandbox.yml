@@ -6,13 +6,13 @@ on:
       - "packages/sandbox/**"
       - "packages/host-service/**"
       - "packages/pty-daemon/**"
-      - "packages/shared/src/sandbox-contract.ts"
+      - "packages/shared/src/sandbox/contract.ts"
       - ".github/workflows/sandbox.yml"
   push:
     branches: [main]
     paths:
       - "packages/sandbox/**"
-      - "packages/shared/src/sandbox-contract.ts"
+      - "packages/shared/src/sandbox/contract.ts"
   schedule:
     - cron: "0 9 * * *"
   workflow_dispatch:

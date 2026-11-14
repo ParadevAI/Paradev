@@ -112,6 +112,7 @@ function renderGitStatus(hostUrl: string) {
 								isReady: true,
 								agentCredentialsChangedWorkspaceId: null,
 								usageRefusal: null,
+								wakeOpenWorkspace: async () => {},
 							}}
 						>
 							{children}

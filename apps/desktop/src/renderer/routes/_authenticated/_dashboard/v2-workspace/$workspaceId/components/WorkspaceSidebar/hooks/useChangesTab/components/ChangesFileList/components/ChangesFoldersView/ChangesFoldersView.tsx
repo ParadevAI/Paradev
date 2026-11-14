@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useChangesSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { ChangedFileFolderList } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileFolderList";
 import type { FoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
 import {
@@ -42,6 +43,7 @@ export const ChangesFoldersView = memo(function ChangesFoldersView({
 	onOpenFile,
 	onOpenInEditor,
 }: ChangesFoldersViewProps) {
+	const policy = useChangesSidebarFilePolicy();
 	const selectedRelPath =
 		selectedFilePath && worktreePath
 			? toRelativeWorkspacePath(worktreePath, selectedFilePath)
@@ -66,6 +68,7 @@ export const ChangesFoldersView = memo(function ChangesFoldersView({
 					onSelect={onSelectFile}
 					onOpenFile={onOpenFile}
 					onOpenInEditor={onOpenInEditor}
+					policy={policy}
 				/>
 			)}
 		/>

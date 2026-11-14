@@ -400,7 +400,16 @@ export function attachToContainer(
 
 	runtime.container = container;
 	container.appendChild(runtime.wrapper);
-	measureAndResize(runtime, onResize);
+	const stillAttached = () =>
+		runtime.container === container &&
+		runtime.wrapper.parentElement === container;
+	// The rest of a pane switch is still writing the DOM; measuring now would
+	// lay the whole page out once per terminal.
+	requestAnimationFrame(() => {
+		if (!stillAttached()) return;
+		measureAndResize(runtime, onResize);
+		if (options.focus !== false) runtime.terminal.focus();
+	});
 	scheduleFontSettleRefit(
 		runtime.terminal,
 		() => hostIsVisible(runtime.container),
@@ -415,10 +424,6 @@ export function attachToContainer(
 	observer.observe(container);
 	runtime.resizeObserver = observer;
 	runtime._disposeResizeObserver = scheduler.dispose;
-
-	if (options.focus !== false) {
-		runtime.terminal.focus();
-	}
 }
 
 /** Returns whether the buffer snapshot was persisted, so callers can keep

@@ -1,0 +1,19 @@
+import type { ReactNode, Ref } from "react";
+
+export interface SearchBarHandle {
+	focus: () => void;
+}
+
+export interface SearchBarProps {
+	ref?: Ref<SearchBarHandle>;
+	placeholder: string;
+	onChangeText: (text: string) => void;
+	onCancel: () => void;
+	/** Return pressed in the field. */
+	onSubmit?: () => void;
+	/** Closes the sheet, where its header has no close button of its own. */
+	onClose: () => void;
+}
+
+/** The search sheet's query field, in its header. */
+export type SearchBarComponent = (props: SearchBarProps) => ReactNode;

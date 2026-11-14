@@ -14,7 +14,7 @@ import { join } from "node:path";
 import {
 	renderContractShell,
 	SANDBOX_PATHS,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { PACKAGE_ROOT } from "./build";
 import { sha256 } from "./manifest";
 

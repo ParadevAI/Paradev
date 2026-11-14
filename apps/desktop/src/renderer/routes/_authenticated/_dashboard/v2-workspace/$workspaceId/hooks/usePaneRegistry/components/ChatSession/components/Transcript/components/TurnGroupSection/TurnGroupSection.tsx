@@ -11,8 +11,8 @@ import type {
 } from "@superset/chat/protocol";
 import { isImageAttachment } from "@superset/chat/protocol";
 import type { ReactNode } from "react";
+import type { PageLink } from "../../../../../../utils/pageLinks";
 import type { ChatForkTarget } from "../../../../types";
-import type { PageLink } from "../../../../utils/pageLinks";
 import { PageLinkCard } from "../../../PageLinkCard";
 import type { TranscriptRow } from "../../utils/transcriptRows";
 import { AttachmentRail, type RailImage } from "../AttachmentRail";

@@ -21,6 +21,7 @@ import {
 	githubAccessFailure,
 	useGithubConnection,
 } from "@/lib/github-connection";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
 import {
@@ -198,8 +199,8 @@ export function PullRequestScreen() {
 						: undefined,
 				}}
 			/>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Copy link to pull request",
 					})}
@@ -207,29 +208,26 @@ export function PullRequestScreen() {
 					onPress={() => void copyLink()}
 					separateBackground
 				/>
-				<Stack.Toolbar.Menu
+				<HeaderToolbar.Menu
 					accessibilityLabel={t({
 						message: "Pull request actions",
 					})}
-					icon="ellipsis"
+					icon="overflow"
 					separateBackground
 				>
-					<Stack.Toolbar.MenuAction
-						icon="doc.on.doc"
-						onPress={() => void copyLink()}
-					>
+					<HeaderToolbar.MenuAction icon="copy" onPress={() => void copyLink()}>
 						{t({ message: "Copy link" })}
-					</Stack.Toolbar.MenuAction>
-					<Stack.Toolbar.MenuAction
-						icon="arrow.up.right"
+					</HeaderToolbar.MenuAction>
+					<HeaderToolbar.MenuAction
+						icon="openLink"
 						onPress={() => void Linking.openURL(detail.pullRequest.url)}
 					>
 						{t({
 							message: "Open in GitHub",
 						})}
-					</Stack.Toolbar.MenuAction>
-					<Stack.Toolbar.MenuAction
-						icon="square.and.arrow.up"
+					</HeaderToolbar.MenuAction>
+					<HeaderToolbar.MenuAction
+						icon="share"
 						onPress={() =>
 							void Share.share(
 								{ url: detail.pullRequest.url },
@@ -238,9 +236,9 @@ export function PullRequestScreen() {
 						}
 					>
 						{t({ message: "Share" })}
-					</Stack.Toolbar.MenuAction>
-				</Stack.Toolbar.Menu>
-			</Stack.Toolbar>
+					</HeaderToolbar.MenuAction>
+				</HeaderToolbar.Menu>
+			</HeaderToolbar>
 			<ScrollView
 				alwaysBounceVertical
 				className="bg-background flex-1"

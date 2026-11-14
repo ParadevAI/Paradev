@@ -3,12 +3,13 @@ import type { AppRouter } from "@superset/host-service";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useCallback } from "react";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { useWorkspaceGitStatus } from "../../providers/WorkspaceGitStatusProvider";
-import { useSidebarDiffRef } from "../useSidebarDiffRef";
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
@@ -27,17 +28,20 @@ export interface ChangesScope {
 /**
  * Which diff the Changes list and pane show (the commit filter and the base
  * branch), shared by the sidebar's Changes tab and the Changes pane header.
- * useSidebarDiffRef's live query re-renders on any sidebarState change, so
- * the plain collection read of the filter stays fresh.
  */
 export function useChangesScope(workspaceId: string): ChangesScope {
 	const { t } = useLingui();
 	const status = useWorkspaceGitStatus();
 	const collections = useCollections();
 	const utils = workspaceTrpc.useUtils();
-	useSidebarDiffRef(workspaceId);
-	const localState = collections.v2WorkspaceLocalState.get(workspaceId);
-	const filter: ChangesFilter = localState?.sidebarState?.changesFilter ?? {
+	const { data: rows = [] } = useLiveQuery(
+		(query) =>
+			query
+				.from({ state: collections.v2WorkspaceLocalState })
+				.where(({ state }) => eq(state.workspaceId, workspaceId)),
+		[collections, workspaceId],
+	);
+	const filter: ChangesFilter = rows[0]?.sidebarState?.changesFilter ?? {
 		kind: "all",
 	};
 

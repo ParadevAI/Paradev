@@ -1,9 +1,3 @@
-import {
-	Host,
-	Button as SwiftUIButton,
-	Image as SwiftUIImage,
-	Menu as SwiftUIMenu,
-} from "@expo/ui/swift-ui";
 import { useLingui } from "@lingui/react/macro";
 import * as Haptics from "expo-haptics";
 import { Check, ChevronDown, ChevronRight, Circle } from "lucide-react-native";
@@ -11,10 +5,10 @@ import { memo } from "react";
 import { View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useTheme } from "@/hooks/useTheme";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import type { ChangesetFile } from "../../../hooks/useWorkspaceChangeset";
 import { FILE_HEADER_HEIGHT } from "../../utils/diffMetrics";
+import { FileActionsMenu } from "./components/FileActionsMenu";
 
 export const FileHeaderRow = memo(function FileHeaderRow({
 	file,
@@ -38,7 +32,6 @@ export const FileHeaderRow = memo(function FileHeaderRow({
 	onToggleViewed: (path: string) => void;
 }) {
 	const { t } = useLingui();
-	const theme = useTheme();
 	return (
 		<View
 			className="bg-background border-border/60 flex-row items-center gap-3 border-t border-b px-4"
@@ -60,48 +53,12 @@ export const FileHeaderRow = memo(function FileHeaderRow({
 				</Text>
 			</PressableScale>
 			<View className="bg-border h-5 w-px" />
-			<Host style={{ width: 32, height: 32 }}>
-				<SwiftUIMenu
-					label={
-						<SwiftUIImage
-							systemName="ellipsis"
-							color={theme.mutedForeground}
-							size={16}
-						/>
-					}
-				>
-					<SwiftUIButton
-						label={t({
-							message: "Copy relative path",
-						})}
-						systemImage="doc.on.doc"
-						onPress={() => onCopyPath(file)}
-					/>
-					<SwiftUIButton
-						label={t({
-							message: "View file",
-						})}
-						systemImage="doc.text"
-						onPress={() => onViewFile(file)}
-					/>
-					<SwiftUIButton
-						label={t({
-							message: "Add file comment",
-						})}
-						systemImage="text.bubble"
-						onPress={() => onAddComment(file)}
-					/>
-					{/* biome-ignore lint/a11y/useValidAriaRole: SwiftUI button role, not ARIA */}
-					<SwiftUIButton
-						label={t({
-							message: "Delete file",
-						})}
-						systemImage="trash"
-						role="destructive"
-						onPress={() => onDelete(file)}
-					/>
-				</SwiftUIMenu>
-			</Host>
+			<FileActionsMenu
+				onCopyPath={() => onCopyPath(file)}
+				onViewFile={() => onViewFile(file)}
+				onAddComment={() => onAddComment(file)}
+				onDelete={() => onDelete(file)}
+			/>
 			<PressableScale
 				accessibilityLabel={
 					viewed

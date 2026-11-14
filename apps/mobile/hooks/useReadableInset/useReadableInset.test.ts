@@ -25,4 +25,19 @@ describe("READABLE_WIDTH", () => {
 		expect(js).toBeString();
 		expect(swift).toBe(js);
 	});
+
+	test("matches the React Native composer's column", () => {
+		const hook = readFileSync(
+			join(import.meta.dir, "useReadableInset.ts"),
+			"utf8",
+		);
+		const constants = readFileSync(
+			join(import.meta.dir, "../../modules/composer/src/constants.ts"),
+			"utf8",
+		);
+		const js = hook.match(/export const READABLE_WIDTH = (\d+);/)?.[1];
+		const composer = constants.match(/\tmaxWidth: (\d+),/)?.[1];
+		expect(js).toBeString();
+		expect(composer).toBe(js);
+	});
 });

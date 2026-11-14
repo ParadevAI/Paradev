@@ -141,8 +141,24 @@ in Turbo's env inputs and API/web preview/manual build/runtime passthrough.
 The web proxy reads this optional string directly from `process.env` so its
 auth gate does not load the full app environment schema. The API reads its
 declared server environment value.
-Production passthrough is required in a separately approved activation change. No
-secret or local `.env` value is set by the inert preparation change. Stage and
-final artifact preparation explicitly pass `false`. See
+Production API builds and runtime now pass the optional production
+`DOMAIN_MOVE_ENABLED` secret. Production web deliberately does not pass it, so
+desktop sign-in can roll out before existing web pages move. No secret is set
+by merging the wiring. Stage and final artifact preparation explicitly pass
+`false`. See
 [the cutover handoff](paradev-staging.md#inert-domain-cutover-preparation) before
 any future activation, including its merge/deployment warning.
+
+## Marketing destination override
+
+The production-only GitHub environment secret `MARKETING_WEB_URL` overrides
+`NEXT_PUBLIC_WEB_URL` only in the marketing deploy job. An absent or empty
+override retains the shared `NEXT_PUBLIC_WEB_URL` secret. Set the override to
+`https://app.paradev.com` when marketing traffic is ready to move; remove it or
+set it to `https://app.superset.sh` to roll back, then redeploy marketing.
+
+This is a workflow input, not an application environment variable. The app
+still receives its existing schema-validated `NEXT_PUBLIC_WEB_URL` at build
+and runtime, so no additional app schema or local environment value is needed.
+Do not change the shared `NEXT_PUBLIC_WEB_URL` secret to move marketing: the
+legacy API, web, admin, billing and auth returns still depend on it.

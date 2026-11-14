@@ -8,7 +8,6 @@ import { FileDiff } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ViewInstance } from "react-native";
 import {
-	ActionSheetIOS,
 	ActivityIndicator,
 	Alert,
 	Linking,
@@ -27,9 +26,11 @@ import { tokenizeCode } from "@/components/ai-elements/code-block";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { showActionSheet } from "@/lib/action-sheet";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import {
 	anchorOf,
@@ -58,6 +59,7 @@ import { FileHeaderRow } from "./components/FileHeaderRow";
 import { HunkSegmentCell } from "./components/HunkSegmentCell";
 import { ReviewOverlay } from "./components/ReviewOverlay";
 import { useChangesetListItems } from "./hooks/useChangesetListItems";
+import { useHorizontalWheel } from "./hooks/useHorizontalWheel";
 import { useViewedFilesStore } from "./stores/viewedFilesStore";
 import type { LineRow, ListItem } from "./utils/buildListItems";
 import {
@@ -325,6 +327,7 @@ export function FilesChangedScreen() {
 		}
 	}, [contentWidths.maxOffset, maxScrollX, scrollX]);
 
+	const wheelRef = useHorizontalWheel({ scrollX, maxScrollX });
 	const panStartX = useRef(0);
 	const shareAnchorRef = useRef<ViewInstance>(null);
 	const panResponder = useMemo(
@@ -374,7 +377,7 @@ export function FilesChangedScreen() {
 
 	const onCommentMenu = useCallback(
 		(comment: DraftComment, anchor: number | null) => {
-			ActionSheetIOS.showActionSheetWithOptions(
+			showActionSheet(
 				{
 					anchor: anchor ?? undefined,
 					options: [
@@ -665,15 +668,15 @@ export function FilesChangedScreen() {
 						)}
 					</View>
 				</Stack.Title>
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Menu
-						icon="ellipsis"
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Menu
+						icon="more"
 						accessibilityLabel={t({
 							message: "More actions",
 						})}
 					>
-						<Stack.Toolbar.MenuAction
-							icon="square.and.arrow.up"
+						<HeaderToolbar.MenuAction
+							icon="share"
 							onPress={() => {
 								if (shareUrl)
 									void Share.share(
@@ -683,22 +686,23 @@ export function FilesChangedScreen() {
 							}}
 						>
 							{t({ message: "Share" })}
-						</Stack.Toolbar.MenuAction>
+						</HeaderToolbar.MenuAction>
 						{pullRequest ? (
-							<Stack.Toolbar.MenuAction
-								icon="arrow.up.right.square"
+							<HeaderToolbar.MenuAction
+								icon="openExternal"
 								onPress={() => void Linking.openURL(pullRequest.url)}
 							>
 								{t({
 									message: "Open on GitHub",
 								})}
-							</Stack.Toolbar.MenuAction>
+							</HeaderToolbar.MenuAction>
 						) : null}
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			</Stack.Screen>
 			<CharWidthProbe onMeasure={setCharWidth} />
 			<SafeAreaView
+				ref={wheelRef}
 				edges={["left", "right"]}
 				style={{ flex: 1 }}
 				{...panResponder.panHandlers}

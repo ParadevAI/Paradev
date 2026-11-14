@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import {
 	afterAll,
+	afterEach,
 	beforeAll,
 	beforeEach,
 	describe,
@@ -914,6 +915,9 @@ describe("workspace move safety", () => {
 });
 
 describe("chat moves", () => {
+	// A move still arriving would stop later tests moving chats out of this workspace.
+	afterEach(() => failChatMovesTo(MY_CLOUD, "test over"));
+
 	beforeEach(() => {
 		WORKSPACE = crypto.randomUUID();
 	});
@@ -1050,15 +1054,19 @@ describe("chat moves", () => {
 		expect(started.runsOnThisComputer).toBe(true);
 		expect((await moveOf(started.moveId)).status).toBe("pending");
 
-		const claimed = await mover.claim({ moveId: started.moveId });
+		const attemptId = crypto.randomUUID();
+		const claimed = await mover.claim({ moveId: started.moveId, attemptId });
 		expect(claimed).toMatchObject({
 			workspaceId: DESKTOP_WORKSPACE,
 			chatSessionId: sessionId,
 		});
 		expect(claimed).not.toHaveProperty("events");
-		await expect(mover.claim({ moveId: started.moveId })).rejects.toThrow(
-			"already started",
-		);
+		expect(
+			await mover.claim({ moveId: started.moveId, attemptId }),
+		).toMatchObject({ chatSessionId: sessionId });
+		await expect(
+			mover.claim({ moveId: started.moveId, attemptId: crypto.randomUUID() }),
+		).rejects.toThrow("already started");
 		const first = await mover.events({ moveId: started.moveId, limit: 1 });
 		const rest = await mover.events({
 			moveId: started.moveId,
@@ -1232,7 +1240,7 @@ describe("chat moves", () => {
 		).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
 	});
 
-	test("a finish whose answer was lost fails the move, and the chat stays", async () => {
+	test("a finish whose answer was lost still leaves the chat switched and its move ready", async () => {
 		const sessionId = newSession();
 		const box = callerFor(USER, MY_CLOUD);
 		await push(sessionId, [{ seq: 1, event: agentMessage("a", "a") }], {
@@ -1247,18 +1255,59 @@ describe("chat moves", () => {
 			organizationId: ORG,
 			userId: USER,
 		});
-		await routerFor(USER).chatMove.claim({ moveId: move.id });
+		const attemptId = crypto.randomUUID();
+		await routerFor(USER).chatMove.claim({ moveId: move.id, attemptId });
+		await withMoveStore(
+			async (organizationId, request) => {
+				const response = await localMoves(organizationId, request);
+				if (request.op === "finish") throw new Error("answer lost");
+				return response;
+			},
+			async () =>
+				completeChatMove(
+					await moveOf(move.id),
+					fakeHosts(),
+					{ kind: "computer" },
+					attemptId,
+				),
+		);
+		expect((await moveOf(move.id)).status).toBe("ready");
+		expect((await history(sessionId)).session.v2WorkspaceId).toBe(
+			DESKTOP_WORKSPACE,
+		);
+	});
+
+	test("a switch whose answer was lost fails the move, and the chat stays", async () => {
+		const sessionId = newSession();
+		const box = callerFor(USER, MY_CLOUD);
+		await push(sessionId, [{ seq: 1, event: agentMessage("a", "a") }], {
+			as: box,
+			workspaceId: MY_CLOUD,
+		});
+		await storeBundle(sessionId);
+		const move = await createChatMove({
+			chatSessionId: sessionId,
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			organizationId: ORG,
+			userId: USER,
+		});
+		const attemptId = crypto.randomUUID();
+		await routerFor(USER).chatMove.claim({ moveId: move.id, attemptId });
 		await expect(
 			withMoveStore(
 				async (organizationId, request) => {
 					const response = await localMoves(organizationId, request);
-					if (request.op === "finish") throw new Error("answer lost");
+					if (request.op === "switching") throw new Error("answer lost");
 					return response;
 				},
 				async () =>
-					completeChatMove(await moveOf(move.id), fakeHosts(), {
-						kind: "computer",
-					}),
+					completeChatMove(
+						await moveOf(move.id),
+						fakeHosts(),
+						{ kind: "computer" },
+						attemptId,
+					),
 			),
 		).rejects.toThrow();
 		expect((await moveOf(move.id)).status).toBe("failed");
@@ -1267,6 +1316,136 @@ describe("chat moves", () => {
 			.from(chatSessions)
 			.where(eq(chatSessions.id, sessionId));
 		expect(row?.v2WorkspaceId).toBe(MY_CLOUD);
+	});
+
+	test("a move failed after its chat switched shows as ready", async () => {
+		const sessionId = await chatOnLaptop();
+		const mover = routerFor(USER).chatMove;
+		const started = await startOne({
+			chatSessionId: sessionId,
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
+		});
+		const attemptId = crypto.randomUUID();
+		await mover.claim({ moveId: started.moveId, attemptId });
+		await withMoveStore(
+			async (organizationId, request) => {
+				if (request.op === "finish") throw new Error("job stopped");
+				return localMoves(organizationId, request);
+			},
+			async () =>
+				completeChatMove(
+					await moveOf(started.moveId),
+					fakeHosts(),
+					{ kind: "computer" },
+					attemptId,
+				),
+		);
+		await callMoves(ORG, {
+			op: "fail",
+			id: started.moveId,
+			error: "The move stopped answering",
+		});
+		expect((await moveOf(started.moveId)).status).toBe("failed");
+		expect((await mover.latest({ chatSessionId: sessionId }))?.status).toBe(
+			"ready",
+		);
+		expect((await moveOf(started.moveId)).status).toBe("ready");
+	});
+
+	test("a move store that predates attempts still moves the chat", async () => {
+		const sessionId = await chatOnLaptop();
+		const mover = routerFor(USER).chatMove;
+		const started = await startOne({
+			chatSessionId: sessionId,
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
+		});
+		const olderStore: MoveStore = async (organizationId, request) => {
+			if (["switching", "failAttempt", "reconcile"].includes(request.op)) {
+				return { ok: false, code: "invalid", message: "Unknown move op" };
+			}
+			return localMoves(organizationId, request);
+		};
+		const attemptId = crypto.randomUUID();
+		await withMoveStore(olderStore, async () => {
+			await mover.claim({ moveId: started.moveId, attemptId });
+			await mover.complete({ moveId: started.moveId, attemptId });
+		});
+		expect((await moveOf(started.moveId)).status).toBe("ready");
+		expect((await history(sessionId)).session.v2WorkspaceId).toBe(
+			DESKTOP_WORKSPACE,
+		);
+	});
+
+	test("a copy an older store claimed without an attempt still completes under a newer one", async () => {
+		const sessionId = await chatOnLaptop();
+		const mover = routerFor(USER).chatMove;
+		const started = await startOne({
+			chatSessionId: sessionId,
+			toWorkspaceId: DESKTOP_WORKSPACE,
+			toHostId: DESKTOP,
+			fromHostId: LAPTOP,
+		});
+		const attemptId = crypto.randomUUID();
+		await withMoveStore(
+			async (organizationId, request) => {
+				if (request.op !== "claim") return localMoves(organizationId, request);
+				const { attempt: _ignored, ...older } = request;
+				return localMoves(organizationId, older);
+			},
+			() => mover.claim({ moveId: started.moveId, attemptId }),
+		);
+		await mover.complete({ moveId: started.moveId, attemptId });
+		expect((await moveOf(started.moveId)).status).toBe("ready");
+		expect((await history(sessionId)).session.v2WorkspaceId).toBe(
+			DESKTOP_WORKSPACE,
+		);
+	});
+
+	test("a lost claim fails only the copy its own job holds", async () => {
+		const sessionId = await chatOnLaptop();
+		const move = await createChatMove({
+			chatSessionId: sessionId,
+			fromHostId: LAPTOP,
+			toWorkspaceId: MY_CLOUD,
+			organizationId: ORG,
+			userId: USER,
+		});
+		const claimLost: MoveStore = async (organizationId, request) => {
+			const response = await localMoves(organizationId, request);
+			if (request.op === "claim") throw new Error("answer lost");
+			return response;
+		};
+		const claimNeverLanded: MoveStore = async (organizationId, request) => {
+			if (request.op === "claim") throw new Error("unreachable");
+			return localMoves(organizationId, request);
+		};
+
+		await callMoves(ORG, { op: "claim", id: move.id, attempt: "another-job" });
+		await expect(
+			withMoveStore(claimNeverLanded, () =>
+				runChatMove({ organizationId: ORG, moveId: move.id }, fakeHosts()),
+			),
+		).rejects.toThrow();
+		expect((await moveOf(move.id)).status).toBe("copying");
+		await failChatMovesTo(MY_CLOUD, "test over");
+
+		const second = await createChatMove({
+			chatSessionId: await chatOnLaptop(),
+			fromHostId: LAPTOP,
+			toWorkspaceId: MY_CLOUD,
+			organizationId: ORG,
+			userId: USER,
+		});
+		await expect(
+			withMoveStore(claimLost, () =>
+				runChatMove({ organizationId: ORG, moveId: second.id }, fakeHosts()),
+			),
+		).rejects.toThrow();
+		expect((await moveOf(second.id)).status).toBe("failed");
 	});
 
 	test("a retry refuses a chat that went on after the failed move began", async () => {

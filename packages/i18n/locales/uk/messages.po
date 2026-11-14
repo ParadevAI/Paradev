@@ -1851,6 +1851,9 @@ msgstr "Маніфест і кілька файлів навичок. Paradev к
 msgid "a message from {authorName}"
 msgstr "повідомлення від {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Вийшла нова версія Paradev. Перезавантажте, щоб продовжити."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Щоб продовжити, потрібна нова версія Paradev. Оновіть застосунок до останньої версії."
 
@@ -2132,6 +2135,9 @@ msgstr "Додати ще"
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Додайте ще один обліковий запис або від'єднайте той, яким більше не користуєтеся."
 
+msgid "Add attachment"
+msgstr "Додати вкладення"
+
 msgid "Add Attachment"
 msgstr "Додати вкладення"
 
@@ -2334,7 +2340,7 @@ msgstr "Додано в поле введення агента"
 msgid "Added to merge queue"
 msgstr "Додано до черги злиття"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Щоб додавати людей до {organizationName}, потрібен платний тариф. Тарифом вашої організації керує її власник на {0}."
 
@@ -2719,6 +2725,9 @@ msgstr "Дозвольте доступ через релей"
 
 msgid "Allow for session"
 msgstr "Дозволити на сеанс"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Щоб диктувати, дозвольте доступ до мікрофона в Налаштуваннях."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Дозвольте доступ до мікрофона, щоб використовувати диктування"
@@ -4013,6 +4022,9 @@ msgstr "Календар"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Тригери Calendar і Gmail у цій організації перестануть спрацьовувати, доки знову не буде підключено обліковий запис."
 
+msgid "Camera"
+msgstr "Камера"
+
 msgid "Camera access is not allowed"
 msgstr "Доступ до камери заборонено"
 
@@ -4439,7 +4451,7 @@ msgstr "Контрольна точка"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольна точка · до рефакторингу підказок"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "Контрольну точку збережено {0}"
 
@@ -5574,6 +5586,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Продовжити"
 
+msgid "Continue in browser"
+msgstr "Продовжити в браузері"
+
 msgid "Continue in your browser"
 msgstr "Продовжте в браузері"
 
@@ -5990,6 +6005,9 @@ msgstr "Не вдалося відкрити посилання"
 msgid "Could not open Photos"
 msgstr "Не вдалося відкрити «Фото»"
 
+msgid "Could not open this file"
+msgstr "Не вдалося відкрити цей файл"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6103,6 +6121,9 @@ msgstr "Не вдалося розпочати оформлення оплати
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Не вдалося почати підготовку хмарного робочого простору"
+
+msgid "Could not start dictation"
+msgstr "Не вдалося почати диктування"
 
 msgid "Could not start session"
 msgstr "Не вдалося почати сеанс"
@@ -6683,7 +6704,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Створено"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7408,11 +7429,20 @@ msgstr "Диктувати"
 msgid "Dictation"
 msgstr "Диктування"
 
+msgid "Dictation is not available in this language."
+msgstr "Диктування недоступне цією мовою."
+
 msgid "Dictation is not available on this device"
 msgstr "Диктування недоступне на цьому пристрої"
 
 msgid "Dictation is not available right now"
 msgstr "Диктування зараз недоступне"
+
+msgid "Dictation needs a network connection."
+msgstr "Для диктування потрібне з’єднання з мережею."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Диктування зупинено. Те, що вже розпізнано, є у вашому повідомленні."
 
 msgid "Didn't hear back"
 msgstr "Відповіді не надійшло"
@@ -11877,7 +11907,7 @@ msgstr "Керуйте ключами для доступу до MCP-серве�
 msgid "Manage members"
 msgstr "Керувати учасниками"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Керувати на {0}"
 
@@ -13760,6 +13790,9 @@ msgstr "Офлайн"
 msgid "Offline / local-first mode"
 msgstr "Офлайн / режим local-first"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Старіші"
 
@@ -15024,6 +15057,9 @@ msgstr "Вставте посилання"
 msgid "Paste an API key instead"
 msgstr "Натомість вставити ключ API"
 
+msgid "Paste attachment"
+msgstr "Вставити вкладення"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Вставте це в Paradev CLI:"
 
@@ -15164,6 +15200,9 @@ msgstr "Телефон"
 
 msgid "Phone number"
 msgstr "Номер телефону"
+
+msgid "Photos"
+msgstr "Фото"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Виберіть {name} у сітці тем, щоб застосувати її."
@@ -18482,6 +18521,10 @@ msgstr "Комбінація клавіш уже використовуєтьс�
 
 msgid "Show"
 msgstr "Показати"
+
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Показати ще {0}"
 
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Показувати діалог підтвердження під час виходу із застосунку"
@@ -21886,6 +21929,12 @@ msgstr "Оновити інструкції з іменування"
 msgid "Update naming instructions for {0}"
 msgstr "Оновити інструкції з іменування для {0}"
 
+msgid "Update on Google Play"
+msgstr "Оновити в Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Щоб продовжити, оновіть Paradev у Google Play."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Оновіть Paradev на тому пристрої. Оновлення із застосунку потребують підтримуваної окремої інсталяції та випущеної версії застосунку."
 
@@ -21919,7 +21968,7 @@ msgstr "Оновіть цей хост, щоб переводити субаге
 msgid "Updated"
 msgstr "Оновлено"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "Оновлено {0}"
 
@@ -21952,7 +22001,7 @@ msgstr "Покращити тариф"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Онови залежність і виправ те, що зламається…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Покращити тариф на {0}"
 
@@ -22239,9 +22288,6 @@ msgstr "Показати всі"
 
 msgid "View All"
 msgstr "Показати всі"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Показати всі (ще {moreCount})"
 
 msgid "View all members of this channel"
 msgstr "Переглянути всіх учасників цього каналу"
@@ -23131,7 +23177,7 @@ msgstr "Ви можете переглядати цю сторінку, але �
 msgid "You can view this page but not comment on it"
 msgstr "Ви можете переглядати цю сторінку, але не можете її коментувати"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Ви не можете змінити цю підписку в застосунку. Тарифом вашої організації керує її власник на {0}."
 

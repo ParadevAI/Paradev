@@ -2,6 +2,9 @@ import { Platform, TextInput } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
+// Android fills the selection with this colour, so it must stay see-through.
+const SELECTION_ANDROID = "rgba(250, 250, 250, 0.3)";
+
 function Input({
 	className,
 	...props
@@ -30,7 +33,11 @@ function Input({
 				}),
 				className,
 			)}
-			selectionColor={theme.foreground}
+			selectionColor={Platform.select({
+				android: SELECTION_ANDROID,
+				default: theme.foreground,
+			})}
+			cursorColor={theme.foreground}
 			{...props}
 		/>
 	);

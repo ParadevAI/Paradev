@@ -3,6 +3,7 @@ import { formatDateTime, formatRelativeTime } from "@superset/i18n/format";
 import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { cn } from "@superset/ui/utils";
 import { ArrowRight } from "lucide-react";
+import { useNow } from "renderer/hooks/useNow";
 import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
 import type { PullRequestActionTarget } from "../../hooks/usePullRequestDraftMutation";
 import { PullRequestDraftStateMenu } from "../PullRequestDraftStateMenu";
@@ -25,6 +26,7 @@ export function PullRequestItemHeader({
 	actionTarget = null,
 	className,
 }: PullRequestItemHeaderProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const repositoryName =
 		data.repoFullName.split("/").pop() ?? data.repoFullName;
@@ -81,7 +83,7 @@ export function PullRequestItemHeader({
 							className="shrink-0"
 						>
 							<time dateTime={data.createdAt}>
-								{formatRelativeTime(createdAt)}
+								{formatRelativeTime(createdAt, now)}
 							</time>
 						</PullRequestCopyText>
 					</>

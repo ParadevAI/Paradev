@@ -130,16 +130,23 @@ export async function attachWorkspaceMove(
 	return { moves, skipped };
 }
 
-/** Ends a begun workspace move that never got its destination, as when its work could not be pushed. */
+/** Ends a begun workspace move that will not finish, as when its work could not be pushed or its destination could not be made. */
 export async function abandonWorkspaceMove(
-	args: Owner & { workspaceMoveId: string; error: string },
-): Promise<void> {
+	args: Owner & {
+		workspaceMoveId: string;
+		error: string;
+		withDestination?: boolean;
+	},
+): Promise<{ movedChatSessionIds: string[] | null }> {
 	const parent = await loadOwnWorkspaceMove(args, args.workspaceMoveId);
-	await callMoves(args.organizationId, {
+	const reply = await callMoves(args.organizationId, {
 		op: "abandon",
 		workspaceMoveId: parent.id,
 		error: args.error,
+		...(args.withDestination ? { withDestination: true } : {}),
 	});
+	// Realtime deploys apart from the API: an older one does not say which chats moved.
+	return { movedChatSessionIds: reply.movedSessionIds ?? null };
 }
 
 /**

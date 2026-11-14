@@ -7,6 +7,7 @@ import { FlatList, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
 import { useWorkspaceCommits } from "../hooks/useWorkspaceCommits";
@@ -97,15 +98,15 @@ export function CommitsSheet() {
 					</View>
 				</View>
 			</Stack.Title>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<FlatList
 				className="bg-background flex-1"
 				data={commits}

@@ -227,7 +227,7 @@ describe("document auto save", () => {
 		);
 		const trigger = () =>
 			mode === "onFocusChange"
-				? controller.onFocusChange(document)
+				? controller.onFocusChange(document.id)
 				: controller.onWindowChange();
 		document.setContent("one");
 		trigger();

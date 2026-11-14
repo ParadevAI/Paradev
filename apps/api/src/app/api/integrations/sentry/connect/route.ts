@@ -1,4 +1,4 @@
-import { withLegacySentryConnect } from "@superset/shared/legacy-integration-connect";
+import { withLegacyIntegrationConnect } from "@superset/shared/legacy-integration-connect";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
@@ -14,7 +14,7 @@ import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
  * state cookie rather than through Sentry.
  */
 export async function GET(request: Request) {
-	return withLegacySentryConnect(request, async () => {
+	return withLegacyIntegrationConnect(request, async () => {
 		const member = await requireOrgMember(request);
 		if (member instanceof Response) return member;
 

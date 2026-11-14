@@ -7,6 +7,18 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 
 /**
+ * A copy the app left behind when it reloaded is still held by its old run
+ * until the claim lease runs out; trying again each minute takes it over
+ * before the sweep fails it.
+ */
+const HELD_RETRY_MS = 60_000;
+const HELD_RETRIES = 6;
+
+function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * Takes up the person's chat moves to this computer that a closed or
  * reloaded app left unfinished, one after another, as the move that
  * started them would have.
@@ -34,13 +46,23 @@ export function useResumeMovesToThisComputer(): void {
 		for (const id of moveIds) taken.current.add(id);
 		const host = getHostServiceClientByUrl(activeHostUrl);
 		void (async () => {
-			for (const moveId of moveIds) {
-				await runMoveOnComputer({ moveId, host }).catch((error: unknown) =>
-					console.warn(
-						`[chat-move] could not finish move ${moveId} to this computer`,
-						error,
-					),
-				);
+			let waiting = moveIds;
+			for (let round = 0; waiting.length > 0; round++) {
+				if (round > 0) await sleep(HELD_RETRY_MS);
+				const held: string[] = [];
+				for (const moveId of waiting) {
+					const outcome = await runMoveOnComputer({ moveId, host }).catch(
+						(error: unknown) => {
+							console.warn(
+								`[chat-move] could not finish move ${moveId} to this computer`,
+								error,
+							);
+							return "done" as const;
+						},
+					);
+					if (outcome === "held") held.push(moveId);
+				}
+				waiting = round < HELD_RETRIES ? held : [];
 			}
 			void utils.chatMove.latest.invalidate();
 			void utils.workspaceMove.latest.invalidate();

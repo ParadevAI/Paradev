@@ -9,13 +9,14 @@ export interface PullRequestTime {
 /** A GitHub timestamp as the rail shows it: relative in text, absolute on hover. */
 export function describePullRequestTime(
 	value: string | null | undefined,
+	now: Date | number = Date.now(),
 ): PullRequestTime | null {
 	if (!value) return null;
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) return null;
 	return {
 		iso: date.toISOString(),
-		relative: formatRelativeTime(date),
+		relative: formatRelativeTime(date, now),
 		absolute: formatDateTime(date),
 	};
 }

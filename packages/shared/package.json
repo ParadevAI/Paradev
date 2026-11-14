@@ -192,13 +192,13 @@
 			"types": "./src/plugins/index.ts",
 			"default": "./src/plugins/index.ts"
 		},
-		"./sandbox-regions": {
-			"types": "./src/sandbox-regions.ts",
-			"default": "./src/sandbox-regions.ts"
+		"./sandbox/regions": {
+			"types": "./src/sandbox/regions.ts",
+			"default": "./src/sandbox/regions.ts"
 		},
-		"./sandbox-contract": {
-			"types": "./src/sandbox-contract.ts",
-			"default": "./src/sandbox-contract.ts"
+		"./sandbox/contract": {
+			"types": "./src/sandbox/contract.ts",
+			"default": "./src/sandbox/contract.ts"
 		},
 		"./pull-request-diff": {
 			"types": "./src/pull-request-diff/index.ts",
@@ -240,9 +240,21 @@
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
 		},
-		"./sandbox-gate": {
-			"types": "./src/sandbox-gate.ts",
-			"default": "./src/sandbox-gate.ts"
+		"./sandbox/gate": {
+			"types": "./src/sandbox/gate.ts",
+			"default": "./src/sandbox/gate.ts"
+		},
+		"./sandbox/access": {
+			"types": "./src/sandbox/access.ts",
+			"default": "./src/sandbox/access.ts"
+		},
+		"./sandbox/reach": {
+			"types": "./src/sandbox/reach.ts",
+			"default": "./src/sandbox/reach.ts"
+		},
+		"./sandbox/watch": {
+			"types": "./src/sandbox/watch.ts",
+			"default": "./src/sandbox/watch.ts"
 		},
 		"./sentry": {
 			"types": "./src/sentry.ts",
@@ -423,6 +435,10 @@
 		"./claude-command": {
 			"types": "./src/claude-command.ts",
 			"default": "./src/claude-command.ts"
+		},
+		"./origin-list": {
+			"types": "./src/origin-list.ts",
+			"default": "./src/origin-list.ts"
 		},
 		"./vercel-preview-origins": {
 			"types": "./src/vercel-preview-origins.ts",

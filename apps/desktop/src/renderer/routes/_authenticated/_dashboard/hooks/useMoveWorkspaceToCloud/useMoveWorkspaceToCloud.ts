@@ -6,7 +6,7 @@ import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
+import { sandboxAccess } from "renderer/routes/_authenticated/utils/sandboxAccess";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
 import {
@@ -109,7 +109,10 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 						(terminal) => terminal.terminalId,
 					);
 					if (moveSignal.aborted) {
-						await releaseSourceTerminals(
+						// The move can end while prepare runs, after the catch below released nothing.
+						await releaseSourceChats(source, leaving.chats);
+						leaving.chats = [];
+						leaving.terminals = await releaseSourceTerminals(
 							source,
 							workspace.id,
 							leaving.terminals,
@@ -131,8 +134,17 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					return { prepared, created };
 				},
 			}).catch(async (error: unknown) => {
-				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
-				await releaseSourceChats(source, leaving.chats);
+				const moved = new Set(
+					(await abandonWorkspaceMove(
+						workspaceMoveId,
+						error,
+						signal?.aborted,
+					)) ?? [],
+				);
+				await releaseSourceChats(
+					source,
+					leaving.chats.filter((id) => !moved.has(id)),
+				);
 				await releaseSourceTerminals(source, workspace.id, leaving.terminals);
 				throw error;
 			});
@@ -172,9 +184,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				sourceWorkspaceId: workspace.id,
 				toWorkspaceId: created.id,
 				connect: async () =>
-					getHostServiceClientByUrl(
-						(await requestSandboxAccess(created.id, true)).url,
-					),
+					getHostServiceClientByUrl((await sandboxAccess.wake(created.id)).url),
 				resolveUrls: (fileIds) =>
 					cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
 				attempts: BOX_CONNECT_ATTEMPTS,

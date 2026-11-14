@@ -16,6 +16,7 @@ dist-types
 # electron-builder output (apps/desktop/electron-builder.ts: directories.output);
 # scoped so it can't silently ignore unrelated dirs named "release".
 /apps/desktop/release/
+/apps/mobile/.vercel/
 *.local
 
 # Editor directories and files

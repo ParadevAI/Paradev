@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
+import { RowLink } from "@/components/RowLink";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -141,19 +142,23 @@ export function CloudWorkspaceRow({
 		</Pressable>
 	);
 
-	return archived ? (
-		<ArchivedCloudRowMenu row={row} cache={cache} onCopied={onCopied}>
-			{body}
-		</ArchivedCloudRowMenu>
-	) : (
-		<CloudWorkspaceRowMenu
-			row={row}
-			cache={cache}
-			isUnread={isUnread}
-			onToggleUnread={toggleUnread}
-			onCopied={onCopied}
-		>
-			{body}
-		</CloudWorkspaceRowMenu>
+	return (
+		<RowLink href={`/workspace/${row.id}`}>
+			{archived ? (
+				<ArchivedCloudRowMenu row={row} cache={cache} onCopied={onCopied}>
+					{body}
+				</ArchivedCloudRowMenu>
+			) : (
+				<CloudWorkspaceRowMenu
+					row={row}
+					cache={cache}
+					isUnread={isUnread}
+					onToggleUnread={toggleUnread}
+					onCopied={onCopied}
+				>
+					{body}
+				</CloudWorkspaceRowMenu>
+			)}
+		</RowLink>
 	);
 }

@@ -17,7 +17,7 @@ import {
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
 	type SandboxIdentity,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import {
 	APIError,
 	type NetworkPolicy,

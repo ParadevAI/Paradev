@@ -18,11 +18,11 @@ import {
 	CLOUD_WORKSPACE_IGNORED_ENV_NAMES,
 } from "@superset/shared/agent-credentials";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import {
 	SANDBOX_API_CREDENTIAL_HEADER,
 	sandboxApiCredential,
-} from "@superset/shared/sandbox-gate";
+} from "@superset/shared/sandbox/gate";
 import type { NetworkPolicy, NetworkPolicyRule } from "@vercel/sandbox";
 import { env } from "../../env";
 import type { CodexChatgptSignIn } from "../../router/agent-credential";

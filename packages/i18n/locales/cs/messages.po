@@ -1857,6 +1857,9 @@ msgstr "Manifest a pár souborů se skills. Paradev ho umístí tam, kde ho kaž
 msgid "a message from {authorName}"
 msgstr "zpráva od {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Je k dispozici nová verze Paradevu. Pokračujte po opětovném načtení."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Pro pokračování je potřeba novější verze Paradev. Aktualizujte prosím na nejnovější verzi."
 
@@ -2138,6 +2141,9 @@ msgstr "Přidat další"
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Připoj další účet nebo odpoj ten, který už nepoužíváš."
 
+msgid "Add attachment"
+msgstr "Přidat přílohu"
+
 msgid "Add Attachment"
 msgstr "Přidat přílohu"
 
@@ -2340,7 +2346,7 @@ msgstr "Přidáno do vstupu agenta"
 msgid "Added to merge queue"
 msgstr "Přidáno do fronty slučování"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Přidávání lidí do {organizationName} vyžaduje placený tarif. Tarif vaší organizace spravuje její vlastník na {0}."
 
@@ -2725,6 +2731,9 @@ msgstr "Povolte přístup přes relay"
 
 msgid "Allow for session"
 msgstr "Povolit pro relaci"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Pro diktování povolte přístup k mikrofonu v Nastavení."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Pro diktování povolte přístup k mikrofonu"
@@ -4019,6 +4028,9 @@ msgstr "Kalendář"
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Spouštěče Kalendáře a Gmailu v této organizaci se přestanou spouštět, dokud znovu nepřipojíte účet."
 
+msgid "Camera"
+msgstr "Fotoaparát"
+
 msgid "Camera access is not allowed"
 msgstr "Přístup k fotoaparátu není povolen"
 
@@ -4445,7 +4457,7 @@ msgstr "Kontrolní bod"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrolní bod · před refaktorem tooltipů"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "Kontrolní bod uložen {0}"
 
@@ -5580,6 +5592,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Pokračovat"
 
+msgid "Continue in browser"
+msgstr "Pokračovat v prohlížeči"
+
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
@@ -5996,6 +6011,9 @@ msgstr "Odkaz se nepodařilo otevřít"
 msgid "Could not open Photos"
 msgstr "Nepodařilo se otevřít Fotky"
 
+msgid "Could not open this file"
+msgstr "Tento soubor nelze otevřít"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6127,9 @@ msgstr "Platbu se nepodařilo zahájit. Zkuste to znovu."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Nepodařilo se spustit provisioning cloudového pracovního prostoru"
+
+msgid "Could not start dictation"
+msgstr "Diktování se nepodařilo spustit"
 
 msgid "Could not start session"
 msgstr "Relaci se nepodařilo spustit"
@@ -6689,7 +6710,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Vytvořeno"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7414,11 +7435,20 @@ msgstr "Diktovat"
 msgid "Dictation"
 msgstr "Diktování"
 
+msgid "Dictation is not available in this language."
+msgstr "Diktování není v tomto jazyce k dispozici."
+
 msgid "Dictation is not available on this device"
 msgstr "Diktování není na tomto zařízení dostupné"
 
 msgid "Dictation is not available right now"
 msgstr "Diktování teď není dostupné"
+
+msgid "Dictation needs a network connection."
+msgstr "Diktování vyžaduje připojení k síti."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Diktování se zastavilo. To, co bylo dosud slyšet, je ve zprávě."
 
 msgid "Didn't hear back"
 msgstr "Bez odpovědi"
@@ -11883,7 +11913,7 @@ msgstr "Spravujte klíče pro přístup k MCP serveru a externí integrace, jako
 msgid "Manage members"
 msgstr "Spravovat členy"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Spravovat na {0}"
 
@@ -13766,6 +13796,9 @@ msgstr "Offline"
 msgid "Offline / local-first mode"
 msgstr "Offline / local-first režim"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Starší"
 
@@ -15030,6 +15063,9 @@ msgstr "Vložte odkaz"
 msgid "Paste an API key instead"
 msgstr "Místo toho vložit klíč API"
 
+msgid "Paste attachment"
+msgstr "Vložit přílohu"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Vložte to do Paradev CLI:"
 
@@ -15170,6 +15206,9 @@ msgstr "Telefon"
 
 msgid "Phone number"
 msgstr "Telefonní číslo"
+
+msgid "Photos"
+msgstr "Fotky"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Vyberte {name} z mřížky motivů a použijte ho."
@@ -18488,6 +18527,10 @@ msgstr "Zkratka se už používá"
 
 msgid "Show"
 msgstr "Zobrazit"
+
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Zobrazit další ({0})"
 
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
@@ -21892,6 +21935,12 @@ msgstr "Upravit pravidla pojmenování"
 msgid "Update naming instructions for {0}"
 msgstr "Upravit pravidla pojmenování pro {0}"
 
+msgid "Update on Google Play"
+msgstr "Aktualizovat na Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Pokud chcete pokračovat, aktualizujte Paradev z Google Play."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Aktualizujte Paradev na daném zařízení. Aktualizace z aplikace vyžadují podporovanou samostatnou instalaci a vydanou verzi aplikace."
 
@@ -21925,7 +21974,7 @@ msgstr "Aktualizujte tohoto hostitele, abyste mohli přesouvat subagenty na poza
 msgid "Updated"
 msgstr "Aktualizováno"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "Aktualizováno {0}"
 
@@ -21958,7 +22007,7 @@ msgstr "Přejít výš"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aktualizuj závislost a oprav, co se rozbije…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Přejít na Pro na {0}"
 
@@ -22245,9 +22294,6 @@ msgstr "Zobrazit vše"
 
 msgid "View All"
 msgstr "Zobrazit vše"
-
-msgid "View all (+{moreCount} more)"
-msgstr "Zobrazit vše (+{moreCount} navíc)"
 
 msgid "View all members of this channel"
 msgstr "Zobrazit všechny členy kanálu"
@@ -23137,7 +23183,7 @@ msgstr "Tuto stránku můžete zobrazit, ale ne změnit"
 msgid "You can view this page but not comment on it"
 msgstr "Tuto stránku můžete zobrazit, ale ne komentovat"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Toto předplatné nelze změnit v aplikaci. Tarif vaší organizace spravuje její vlastník na {0}."
 

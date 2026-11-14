@@ -10,7 +10,7 @@ import {
 } from "@superset/composer";
 import type { SlashCommand } from "@superset/shared/slash-commands";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { Alert, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import type {
 	PromptInputAttachmentItem,
 	PromptInputMessage,
@@ -250,7 +250,9 @@ export const TerminalComposer = forwardRef<
 	};
 
 	return (
-		<View>
+		// Fills the screen: the Android composer is a React Native overlay and
+		// sizes itself from this view. The iOS one draws in its own overlay.
+		<View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
 			<Composer
 				ref={composerRef}
 				placeholder={
