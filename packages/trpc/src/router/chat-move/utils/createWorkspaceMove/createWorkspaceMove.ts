@@ -130,7 +130,7 @@ export async function attachWorkspaceMove(
 	return { moves, skipped };
 }
 
-/** Ends a begun workspace move that never got its destination, as when its work could not be pushed. */
+/** Ends a begun workspace move that will not finish, as when its work could not be pushed or its destination could not be made. */
 export async function abandonWorkspaceMove(
 	args: Owner & { workspaceMoveId: string; error: string },
 ): Promise<void> {
