@@ -361,7 +361,11 @@ function formField(
 	if (!choices) {
 		if (property.type === "integer") return { ...base, input: "integer" };
 		if (property.type === "number") return { ...base, input: "number" };
-		return { ...base, input: "text" };
+		return {
+			...base,
+			input: "text",
+			...(property._meta ? { answerFor: property._meta.codex.questionId } : {}),
+		};
 	}
 	return {
 		...base,
@@ -402,7 +406,19 @@ function formErrors(
 			value === undefined ||
 			(Array.isArray(value) ? value.length === 0 : value.trim() === "");
 		if (empty) {
-			if (field.required) errors.push(field.id);
+			if (field.required) {
+				const hasWrittenAnswer =
+					field.input === "single" &&
+					fields.some((other) => {
+						const text = values[other.id];
+						return (
+							other.answerFor === field.id &&
+							typeof text === "string" &&
+							text.trim() !== ""
+						);
+					});
+				if (!hasWrittenAnswer) errors.push(field.id);
+			}
 			continue;
 		}
 		const type = fieldTypes[field.id];

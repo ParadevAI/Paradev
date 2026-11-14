@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type { FormField } from "@superset/chat/protocol";
 import { cn } from "@superset/ui/utils";
 import { Check, PencilLine } from "lucide-react";
+import { useRef } from "react";
 import {
 	answerText,
 	type FormValues,
@@ -24,7 +25,7 @@ export function QuestionPage({
 	question: string;
 	choices: Choice[];
 	values: FormValues;
-	onPick: (value: string) => void;
+	onPick: (value: string | null) => void;
 	onType: (fieldId: string, text: string) => void;
 	onEnter: () => void;
 }) {
@@ -39,6 +40,11 @@ export function QuestionPage({
 	const textField = freeform ? field : other;
 	const textValue = textField ? values[textField.id] : undefined;
 	const typed = answerText(textValue);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const writtenChoice = field.input === "single" && other !== undefined;
+	const ownAnswer =
+		writtenChoice && current === undefined && textValue !== undefined;
+	const note = writtenChoice && current !== undefined;
 	const invalid = isInvalidNumber(field, values[field.id]);
 
 	return (
@@ -100,7 +106,28 @@ export function QuestionPage({
 						</button>
 					);
 				})}
-				{textField && (
+				{writtenChoice && (
+					<button
+						type="button"
+						aria-pressed={ownAnswer}
+						className={cn(
+							"flex items-center gap-3 rounded-lg border px-3 py-2 text-left text-sm font-medium",
+							ownAnswer
+								? "border-foreground/25 bg-foreground/[0.07]"
+								: "border-transparent hover:bg-foreground/[0.04]",
+						)}
+						onClick={() => {
+							onPick(null);
+							requestAnimationFrame(() => inputRef.current?.focus());
+						}}
+					>
+						<span className="flex size-[18px] shrink-0 items-center justify-center rounded-full border border-foreground/40">
+							{ownAnswer && <Check className="size-3" />}
+						</span>
+						<Trans>Write my own answer</Trans>
+					</button>
+				)}
+				{textField && (!writtenChoice || ownAnswer || note) && (
 					<label
 						className={cn(
 							"flex items-center gap-3 rounded-lg border px-3 py-2 text-sm transition-colors",
@@ -111,9 +138,21 @@ export function QuestionPage({
 						)}
 					>
 						<PencilLine className="size-[18px] shrink-0 p-0.5 text-muted-foreground" />
+						{note && (
+							<span className="shrink-0 text-muted-foreground">
+								<Trans>Add a note</Trans>
+							</span>
+						)}
 						<input
+							ref={inputRef}
 							aria-invalid={invalid || undefined}
-							aria-label={textField.description ?? textField.title ?? t`Other`}
+							aria-label={
+								note
+									? t`Add a note`
+									: ownAnswer
+										? t`Write my own answer`
+										: (textField.description ?? textField.title ?? t`Other`)
+							}
 							className="h-6 min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
 							inputMode={
 								field.input === "integer"
@@ -132,11 +171,13 @@ export function QuestionPage({
 									? t`Enter a whole number`
 									: field.input === "number"
 										? t`Enter a number`
-										: freeform
-											? t`Type your answer`
-											: multi
-												? t`Something else? Add it here`
-												: t`Something else? Type your own answer`
+										: note
+											? undefined
+											: freeform || ownAnswer
+												? t`Type your answer`
+												: multi
+													? t`Something else? Add it here`
+													: t`Something else? Type your own answer`
 							}
 							step={field.input === "integer" ? 1 : "any"}
 							type={numeric ? "number" : "text"}

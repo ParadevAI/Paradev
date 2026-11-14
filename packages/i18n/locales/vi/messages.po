@@ -2102,6 +2102,9 @@ msgstr "Thêm bộ lọc"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Hãy thêm một script chạy vòng đời trong Cài đặt dự án hoặc đánh dấu một script terminal làm lệnh chạy của workspace."
 
+msgid "Add a note"
+msgstr "Thêm ghi chú"
+
 msgid "Add a project to see GitHub issues."
 msgstr "Thêm một dự án để xem issue GitHub."
 
@@ -23024,6 +23027,9 @@ msgstr "Viết trả lời…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "Viết tài liệu cho phần ai cũng hỏi…"
+
+msgid "Write my own answer"
+msgstr "Tự viết câu trả lời"
 
 msgid "Write once. Runs in every agent."
 msgstr "Viết một lần. Chạy trong mọi agent."

@@ -413,7 +413,12 @@ const acpEnumOptionSchema = z.looseObject({
 	description: z.string().optional(),
 });
 
+const codexUserNoteSchema = z.object({
+	codex: z.object({ role: z.literal("user_note"), questionId: z.string() }),
+});
+
 export const acpElicitationPropertySchema = z.looseObject({
+	_meta: codexUserNoteSchema.optional().catch(undefined),
 	type: z.string().optional(),
 	title: z.string().optional(),
 	description: z.string().optional(),

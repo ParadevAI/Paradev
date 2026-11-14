@@ -154,9 +154,20 @@ export function QuestionForm({
 	};
 	const next = () => (last ? submit() : goTo(index + 1));
 
-	const pick = (value: string) => {
+	const pick = (value: string | null) => {
 		if (!page) return;
-		const { field } = page;
+		const { field, other } = page;
+		if (value === null) {
+			if (!other) return;
+			setValues((current) => {
+				if (current[field.id] === undefined && other.id in current)
+					return current;
+				const next = { ...current, [other.id]: "" };
+				delete next[field.id];
+				return next;
+			});
+			return;
+		}
 		if (field.input === "multi") {
 			setValues((current) => {
 				const picked = Array.isArray(current[field.id])
@@ -172,8 +183,14 @@ export function QuestionForm({
 			return;
 		}
 		const unpick = values[field.id] === value;
-		setValues((current) => ({ ...current, [field.id]: unpick ? "" : value }));
-		if (!unpick && !last) goTo(index + 1);
+		setValues((current) => {
+			const next = { ...current, [field.id]: value };
+			if (unpick) delete next[field.id];
+			if (other && (unpick || current[field.id] === undefined))
+				delete next[other.id];
+			return next;
+		});
+		if (!other && !unpick && !last) goTo(index + 1);
 	};
 
 	const choices = page ? choicesFor(page.field) : [];

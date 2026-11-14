@@ -2102,6 +2102,9 @@ msgstr "Tambah filter"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Tambahkan skrip run lifecycle di Pengaturan Proyek atau tandai sebuah skrip terminal sebagai run workspace."
 
+msgid "Add a note"
+msgstr "Tambahkan catatan"
+
 msgid "Add a project to see GitHub issues."
 msgstr "Tambahkan proyek untuk melihat issue GitHub."
 
@@ -23024,6 +23027,9 @@ msgstr "Tulis balasan…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "Tulis dokumentasi untuk bagian yang selalu ditanyakan…"
+
+msgid "Write my own answer"
+msgstr "Tulis jawaban sendiri"
 
 msgid "Write once. Runs in every agent."
 msgstr "Tulis sekali. Berjalan di setiap agen."

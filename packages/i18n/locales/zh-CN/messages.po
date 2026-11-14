@@ -2102,6 +2102,9 @@ msgstr "添加筛选条件"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "在项目设置中添加生命周期运行脚本，或将某个终端脚本标记为工作区运行命令。"
 
+msgid "Add a note"
+msgstr "添加备注"
+
 msgid "Add a project to see GitHub issues."
 msgstr "添加项目以查看GitHub议题。"
 
@@ -23024,6 +23027,9 @@ msgstr "写一条回复…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "给大家最常问的那部分写文档…"
+
+msgid "Write my own answer"
+msgstr "自行填写回答"
 
 msgid "Write once. Runs in every agent."
 msgstr "编写一次，在每个智能体中运行。"

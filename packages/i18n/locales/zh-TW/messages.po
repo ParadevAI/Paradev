@@ -2102,6 +2102,9 @@ msgstr "新增篩選條件"
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "在專案設定中新增生命週期執行指令碼，或將某個終端指令碼標記為工作區執行命令。"
 
+msgid "Add a note"
+msgstr "新增備註"
+
 msgid "Add a project to see GitHub issues."
 msgstr "新增專案以檢視GitHub議題。"
 
@@ -23024,6 +23027,9 @@ msgstr "寫一條回覆…"
 
 msgid "Write docs for the part everyone asks about…"
 msgstr "給大家最常問的那部分寫文件…"
+
+msgid "Write my own answer"
+msgstr "自行填寫回答"
 
 msgid "Write once. Runs in every agent."
 msgstr "撰寫一次，在每個代理程式中執行。"

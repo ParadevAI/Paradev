@@ -11,8 +11,17 @@ export function questionPages(fields: readonly FormField[]): QuestionPage[] {
 	const pages: QuestionPage[] = [];
 	for (const field of fields) {
 		const previous = pages.at(-1);
-		if (previous && field.id === `${previous.field.id}_custom`) {
-			previous.other = field;
+		const target =
+			field.answerFor !== undefined
+				? pages.find(
+						({ field: choice }) =>
+							choice.input === "single" && choice.id === field.answerFor,
+					)
+				: previous && field.id === `${previous.field.id}_custom`
+					? previous
+					: undefined;
+		if (target && !target.other) {
+			target.other = field;
 			continue;
 		}
 		pages.push({ field });
