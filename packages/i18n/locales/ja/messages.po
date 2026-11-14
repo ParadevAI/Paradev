@@ -2075,8 +2075,8 @@ msgstr "{localizedName} を追加しますか？"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "先に {computer} で {repositoryName} をプロジェクトとして追加してください"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "まず {repositoryName} をこのコンピューターのプロジェクトとして追加してください"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "まず {repositoryName} をこのデバイスのプロジェクトとして追加してください"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} をマージキューに追加しますか?"
@@ -9663,8 +9663,8 @@ msgstr "iPhone・iPad アプリを入手"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
 
-msgid "Getting the computer ready"
-msgstr "コンピューターを準備しています"
+msgid "Getting the device ready"
+msgstr "デバイスを準備しています"
 
 msgid "Getting Work Done"
 msgstr "仕事に役立つ"
@@ -20207,11 +20207,11 @@ msgstr "このアカウントは接続されていません。別のアカウン
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "このエージェントセッションにはまだ開ける会話がありません。開始されましたが、一度も指示を受けていません。"
 
-msgid "that computer"
-msgstr "そのコンピューター"
+msgid "that device"
+msgstr "そのデバイス"
 
-msgid "That computer can't be reached"
-msgstr "そのコンピューターに接続できません"
+msgid "That device can't be reached"
+msgstr "そのデバイスに接続できません"
 
 msgid "That endpoint could not be resolved."
 msgstr "そのエンドポイントを解決できませんでした。"
@@ -20527,8 +20527,8 @@ msgstr "Claude Code、Codex、そしてあらゆるコーディングエージ�
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code、Codex、OpenCode、そしてあらゆるコーディングエージェントのための、オープンソースのワークスペース。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "移動先または移動元で古いバージョンが動作しています。クラウドワークスペースを再起動するか、コンピューターのホストを更新してから、もう一度お試しください。"
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "移動先または移動元で古いバージョンが動作しています。クラウドワークスペースを再起動するか、デバイスのホストを更新してから、もう一度お試しください。"
 
 msgid "The overnight shift"
 msgstr "夜間シフト"
@@ -20828,9 +20828,6 @@ msgstr "このクラウドワークスペースを起動できません"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
 
-msgid "This computer's host is not running"
-msgstr "このコンピューターのホストが実行されていません"
-
 msgid "This conversation is too long for the model"
 msgstr "この会話はモデルには長すぎます"
 
@@ -20851,6 +20848,9 @@ msgstr "このデバイス ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "このデバイスはParadevリレーに接続されていないため、オートメーションの実行はスキップされます。"
+
+msgid "This device's host is not running"
+msgstr "このデバイスのホストが実行されていません"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "このディレクトリは存在しません。ターミナルスクリプトはワークスペースルートにフォールバックします。"

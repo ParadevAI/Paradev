@@ -69,7 +69,7 @@ export function useWorkspaceMove(
 	const canMoveToCloud = enabled && cloudEnabled && startable.length > 0;
 	const sourceName =
 		hosts.find((host) => host.machineId === workspace.hostId)?.name ??
-		t({ message: "that computer" });
+		t({ message: "that device" });
 
 	const sourceUrl = () => {
 		const url = cache.resolveHostUrl(workspace.hostId);
@@ -117,7 +117,7 @@ export function useWorkspaceMove(
 		]);
 
 	const moveToComputer = (computer: MoveDestinationComputer) => {
-		const computerName = computer.name ?? t({ message: "that computer" });
+		const computerName = computer.name ?? t({ message: "that device" });
 		confirm(
 			t({ message: `Move this workspace to ${computerName}?` }),
 			t({

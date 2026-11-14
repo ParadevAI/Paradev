@@ -2075,8 +2075,8 @@ msgstr "Přidat {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Nejdřív přidejte {repositoryName} jako projekt na počítači {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto počítači"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto zařízení"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Přidat #{prNumber} do fronty slučování?"
@@ -9663,8 +9663,8 @@ msgstr "Stáhnout aplikaci pro iPhone a iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Připravuje se počítač"
+msgid "Getting the device ready"
+msgstr "Připravuje se zařízení"
 
 msgid "Getting Work Done"
 msgstr "Pracovní"
@@ -20207,11 +20207,11 @@ msgstr "Tento účet už není připojený — vyberte jiný."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Tato agentní relace zatím nemá konverzaci k otevření. Byla spuštěna, ale nikdy nedostala zadání."
 
-msgid "that computer"
-msgstr "ten počítač"
+msgid "that device"
+msgstr "to zařízení"
 
-msgid "That computer can't be reached"
-msgstr "Tento počítač není dostupný"
+msgid "That device can't be reached"
+msgstr "Toto zařízení není dostupné"
 
 msgid "That endpoint could not be resolved."
 msgstr "Tento koncový bod se nepodařilo přeložit."
@@ -20527,8 +20527,8 @@ msgstr "Open-source pracovní prostor pro Claude Code, Codex a jakéhokoli kódo
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Open-source pracovní prostor pro Claude Code, Codex, OpenCode a jakéhokoli kódovacího agenta. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Druhá strana přesunu používá starší verzi. Restartujte cloudový pracovní prostor nebo aktualizujte hostitele počítače a zkuste to znovu."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Druhá strana přesunu používá starší verzi. Restartujte cloudový pracovní prostor nebo aktualizujte hostitele zařízení a zkuste to znovu."
 
 msgid "The overnight shift"
 msgstr "Noční směna"
@@ -20828,9 +20828,6 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
-msgid "This computer's host is not running"
-msgstr "Hostitel tohoto počítače neběží"
-
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -20851,6 +20848,9 @@ msgstr "tomto zařízení ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Toto zařízení není připojené k Paradev relay, takže běhy automatizací budou přeskočeny."
+
+msgid "This device's host is not running"
+msgstr "Hostitel tohoto zařízení neběží"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Tento adresář neexistuje. Terminálový skript se vrátí ke kořeni pracovního prostoru."

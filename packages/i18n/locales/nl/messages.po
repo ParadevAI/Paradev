@@ -2075,8 +2075,8 @@ msgstr "{localizedName} toevoegen?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Voeg {repositoryName} eerst toe als project op {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Voeg {repositoryName} eerst toe als project op deze computer"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Voeg {repositoryName} eerst toe als project op dit apparaat"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} toevoegen aan de mergewachtrij?"
@@ -9663,8 +9663,8 @@ msgstr "Download de iPhone- en iPad-app"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Krijgt een uitnodiging voor {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "De computer wordt voorbereid"
+msgid "Getting the device ready"
+msgstr "Het apparaat wordt voorbereid"
 
 msgid "Getting Work Done"
 msgstr "Werk gedaan krijgen"
@@ -20207,11 +20207,11 @@ msgstr "Dit account is niet meer verbonden — kies een ander."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Die agentsessie heeft nog geen gesprek om te openen. Hij is gestart maar nooit aangestuurd."
 
-msgid "that computer"
-msgstr "die computer"
+msgid "that device"
+msgstr "dat apparaat"
 
-msgid "That computer can't be reached"
-msgstr "Die computer is niet bereikbaar"
+msgid "That device can't be reached"
+msgstr "Dat apparaat is niet bereikbaar"
 
 msgid "That endpoint could not be resolved."
 msgstr "Dat endpoint kon niet worden omgezet."
@@ -20527,8 +20527,8 @@ msgstr "De open-source werkruimte voor Claude Code, Codex en elke andere coding 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "De open-source workspace voor Claude Code, Codex, OpenCode en elke andere coding agent. Voer taken parallel uit op aparte branches en review alles op één plek."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "De andere kant van de verplaatsing draait een oudere versie. Herstart een cloudwerkruimte of werk de host van de computer bij en probeer het opnieuw."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "De andere kant van de verplaatsing draait een oudere versie. Herstart een cloudwerkruimte of werk de host van het apparaat bij en probeer het opnieuw."
 
 msgid "The overnight shift"
 msgstr "De nachtploeg"
@@ -20828,9 +20828,6 @@ msgstr "Deze cloudwerkruimte kan niet starten"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 seconden duren."
 
-msgid "This computer's host is not running"
-msgstr "De host van deze computer draait niet"
-
 msgid "This conversation is too long for the model"
 msgstr "Dit gesprek is te lang voor het model"
 
@@ -20851,6 +20848,9 @@ msgstr "dit apparaat ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Dit apparaat is niet verbonden met de Paradev-relay, dus runs van automatiseringen worden overgeslagen."
+
+msgid "This device's host is not running"
+msgstr "De host van dit apparaat draait niet"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Deze map bestaat niet. Het terminalscript valt terug op de root van de werkruimte."

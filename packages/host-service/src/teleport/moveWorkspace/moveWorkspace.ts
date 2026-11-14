@@ -100,13 +100,13 @@ async function resolveTarget(
 		.catch((error: unknown) => {
 			if (isMissingProcedureError(error)) {
 				throw cannotMove(
-					"Update Paradev on that computer to move workspaces to it",
+					"Update Paradev on that device to move workspaces to it",
 				);
 			}
 			throw error;
 		});
 	if (!projectId) {
-		throw cannotMove(`Add ${repository} as a project on that computer first`);
+		throw cannotMove(`Add ${repository} as a project on that device first`);
 	}
 	return { kind: "computer", hostId: destination.hostId, host, projectId };
 }
@@ -232,7 +232,7 @@ async function waitForWorkspace(
 		if (found) return;
 		await new Promise((resolve) => setTimeout(resolve, pollMs));
 	}
-	throw new Error("Timed out waiting for the computer to create the workspace");
+	throw new Error("Timed out waiting for the device to create the workspace");
 }
 
 function abandonReason(error: unknown): string {

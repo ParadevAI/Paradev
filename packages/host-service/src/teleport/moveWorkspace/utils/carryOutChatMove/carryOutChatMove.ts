@@ -66,7 +66,7 @@ async function recordFailure(
 		.mutate({
 			moveId,
 			attemptId,
-			error: message.slice(0, 2000) || "The move to the computer failed",
+			error: message.slice(0, 2000) || "The move to the device failed",
 		})
 		.catch((failError: unknown) =>
 			console.warn(

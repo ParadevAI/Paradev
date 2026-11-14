@@ -2075,8 +2075,8 @@ msgstr "要新增「{localizedName}」嗎？"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "請先在 {computer} 上將 {repositoryName} 新增為專案"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "請先將 {repositoryName} 新增為此電腦上的專案"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "請先將 {repositoryName} 新增為本裝置上的專案"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "將 #{prNumber} 加入合併佇列?"
@@ -9663,8 +9663,8 @@ msgstr "取得 iPhone 和 iPad 應用程式"
 msgid "Gets an invite to join {organizationName}"
 msgstr "將收到加入 {organizationName} 的邀請"
 
-msgid "Getting the computer ready"
-msgstr "正在準備電腦"
+msgid "Getting the device ready"
+msgstr "正在準備裝置"
 
 msgid "Getting Work Done"
 msgstr "工作常用"
@@ -20207,11 +20207,11 @@ msgstr "該帳號已中斷連線，請選擇其他帳號。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "該代理工作階段還沒有可開啟的對話。它已啟動但從未收到指令。"
 
-msgid "that computer"
-msgstr "那台電腦"
+msgid "that device"
+msgstr "那台裝置"
 
-msgid "That computer can't be reached"
-msgstr "無法連線到那台電腦"
+msgid "That device can't be reached"
+msgstr "無法連線到那台裝置"
 
 msgid "That endpoint could not be resolved."
 msgstr "無法解析該端點。"
@@ -20527,8 +20527,8 @@ msgstr "開源工作區，容納Claude Code、Codex和任何編碼代理程式�
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何程式碼代理。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "移動的另一端執行的是舊版本。請重新啟動雲端工作區或更新電腦的主機，然後再試一次。"
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "移動的另一端執行的是舊版本。請重新啟動雲端工作區或更新裝置的主機，然後再試一次。"
 
 msgid "The overnight shift"
 msgstr "夜班"
@@ -20828,9 +20828,6 @@ msgstr "無法啟動此雲端工作區"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
 
-msgid "This computer's host is not running"
-msgstr "此電腦的主機服務未執行"
-
 msgid "This conversation is too long for the model"
 msgstr "此對話對模型來說太長了"
 
@@ -20851,6 +20848,9 @@ msgstr "此裝置（{id}）"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "此裝置沒有連線到Paradev中繼，自動化的執行會被跳過。"
+
+msgid "This device's host is not running"
+msgstr "本裝置的主機服務未執行"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"

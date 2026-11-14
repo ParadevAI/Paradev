@@ -2075,8 +2075,8 @@ msgstr "要添加“{localizedName}”吗？"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "请先在 {computer} 上将 {repositoryName} 添加为项目"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "请先将 {repositoryName} 添加为此电脑上的项目"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "请先将 {repositoryName} 添加为本设备上的项目"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "将 #{prNumber} 加入合并队列?"
@@ -9663,8 +9663,8 @@ msgstr "获取 iPhone 和 iPad 应用"
 msgid "Gets an invite to join {organizationName}"
 msgstr "将收到加入 {organizationName} 的邀请"
 
-msgid "Getting the computer ready"
-msgstr "正在准备计算机"
+msgid "Getting the device ready"
+msgstr "正在准备设备"
 
 msgid "Getting Work Done"
 msgstr "工作常用"
@@ -20207,11 +20207,11 @@ msgstr "该账号已断开连接，请选择其他账号。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "该智能体会话还没有可打开的对话。它已启动但从未收到指令。"
 
-msgid "that computer"
-msgstr "那台电脑"
+msgid "that device"
+msgstr "那台设备"
 
-msgid "That computer can't be reached"
-msgstr "无法连接到那台电脑"
+msgid "That device can't be reached"
+msgstr "无法连接到那台设备"
 
 msgid "That endpoint could not be resolved."
 msgstr "无法解析该端点。"
@@ -20527,8 +20527,8 @@ msgstr "开源工作区，容纳Claude Code、Codex和任何编码智能体。"
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "开源工作区，容纳 Claude Code、Codex、OpenCode 和任何编码智能体。在不同分支上并行运行任务，并在一个地方审查所有内容。"
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "移动的另一端运行的是旧版本。请重启云端工作区或更新计算机的主机，然后重试。"
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "移动的另一端运行的是旧版本。请重启云端工作区或更新设备的主机，然后重试。"
 
 msgid "The overnight shift"
 msgstr "夜班"
@@ -20828,9 +20828,6 @@ msgstr "无法启动此云端工作区"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需要最多 30 秒。"
 
-msgid "This computer's host is not running"
-msgstr "此电脑的主机服务未运行"
-
 msgid "This conversation is too long for the model"
 msgstr "此对话对模型来说太长了"
 
@@ -20851,6 +20848,9 @@ msgstr "此设备（{id}）"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "此设备没有连接到Paradev中继，自动化的运行会被跳过。"
+
+msgid "This device's host is not running"
+msgstr "本设备的主机服务未运行"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "此目录不存在。终端脚本将回退到工作区根目录。"

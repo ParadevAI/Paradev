@@ -2075,8 +2075,8 @@ msgstr "Thêm {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Hãy thêm {repositoryName} làm dự án trên {computer} trước"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Hãy thêm {repositoryName} làm dự án trên máy tính này trước"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Hãy thêm {repositoryName} làm dự án trên thiết bị này trước"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Thêm #{prNumber} vào hàng đợi merge?"
@@ -9663,8 +9663,8 @@ msgstr "Tải ứng dụng cho iPhone và iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Sẽ nhận lời mời tham gia {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Đang chuẩn bị máy tính"
+msgid "Getting the device ready"
+msgstr "Đang chuẩn bị thiết bị"
 
 msgid "Getting Work Done"
 msgstr "Làm việc"
@@ -20207,11 +20207,11 @@ msgstr "Tài khoản đó không còn được kết nối — hãy chọn tài 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở. Nó đã khởi động nhưng chưa từng nhận yêu cầu."
 
-msgid "that computer"
-msgstr "máy tính đó"
+msgid "that device"
+msgstr "thiết bị đó"
 
-msgid "That computer can't be reached"
-msgstr "Không thể kết nối tới máy tính đó"
+msgid "That device can't be reached"
+msgstr "Không thể kết nối tới thiết bị đó"
 
 msgid "That endpoint could not be resolved."
 msgstr "Không thể phân giải endpoint đó."
@@ -20527,8 +20527,8 @@ msgstr "Workspace mã nguồn mở cho Claude Code, Codex và mọi coding agent
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Workspace mã nguồn mở cho Claude Code, Codex, OpenCode và mọi agent lập trình. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Phía bên kia của việc chuyển đang chạy phiên bản cũ hơn. Hãy khởi động lại không gian làm việc trên cloud hoặc cập nhật host của máy tính rồi thử lại."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Phía bên kia của việc chuyển đang chạy phiên bản cũ hơn. Hãy khởi động lại không gian làm việc trên cloud hoặc cập nhật host của thiết bị rồi thử lại."
 
 msgid "The overnight shift"
 msgstr "Ca đêm"
@@ -20828,9 +20828,6 @@ msgstr "Không thể khởi động workspace cloud này"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
 
-msgid "This computer's host is not running"
-msgstr "Máy chủ của máy tính này không chạy"
-
 msgid "This conversation is too long for the model"
 msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
 
@@ -20851,6 +20848,9 @@ msgstr "thiết bị này ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Thiết bị này chưa kết nối tới relay của Paradev nên các lần chạy tự động hóa sẽ bị bỏ qua."
+
+msgid "This device's host is not running"
+msgstr "Máy chủ của thiết bị này không chạy"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Thư mục này không tồn tại. Script terminal sẽ quay về thư mục gốc của workspace."
