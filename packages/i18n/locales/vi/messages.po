@@ -6250,11 +6250,17 @@ msgstr "Không thể thay đổi quy trình"
 msgid "Couldn't check"
 msgstr "Không thể kiểm tra"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Không thể checkout {name}: nhánh {baseBranch} không có trên remote."
+
 msgid "Couldn't check the move"
 msgstr "Không thể kiểm tra việc chuyển"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Không kiểm tra được việc gỡ thành viên này ảnh hưởng đến những gì"
+
+msgid "Couldn't clone {name}."
+msgstr "Không thể clone {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Không xác nhận được trạng thái sao. Hãy kiểm tra GitHub CLI (`gh`) đã cài, đã đăng nhập và bạn có kết nối mạng"

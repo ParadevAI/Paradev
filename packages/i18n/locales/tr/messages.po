@@ -6250,11 +6250,17 @@ msgstr "Rutin değiştirilemedi"
 msgid "Couldn't check"
 msgstr "Kontrol edilemedi"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "{name} checkout yapılamadı: {baseBranch} dalı uzak depoda yok."
+
 msgid "Couldn't check the move"
 msgstr "Taşıma kontrol edilemedi"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Bu üyeyi kaldırmanın nelere etki edeceği kontrol edilemedi"
+
+msgid "Couldn't clone {name}."
+msgstr "{name} klonlanamadı."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Yıldız durumu doğrulanamadı. GitHub CLI'nin (`gh`) kurulu ve oturum açmış olduğunu ve ağ bağlantınızın bulunduğunu kontrol edin"

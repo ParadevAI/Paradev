@@ -6250,11 +6250,17 @@ msgstr "无法更改例行任务"
 msgid "Couldn't check"
 msgstr "无法检查"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "无法检出 {name}：远程仓库中没有其分支 {baseBranch}。"
+
 msgid "Couldn't check the move"
 msgstr "无法检查移动状态"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "无法检查移除此成员会影响哪些内容"
+
+msgid "Couldn't clone {name}."
+msgstr "无法克隆 {name}。"
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "无法确认加星状态，请检查是否已安装并登录GitHub CLI（`gh`），以及网络是否连通"

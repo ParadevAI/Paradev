@@ -6244,11 +6244,17 @@ msgstr "Не вдалося змінити рутину"
 msgid "Couldn't check"
 msgstr "Не вдалося перевірити"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Не вдалося витягнути {name}: гілки {baseBranch} немає у віддаленому репозиторії."
+
 msgid "Couldn't check the move"
 msgstr "Не вдалося перевірити перенесення"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Не вдалося перевірити, на що вплине видалення цього учасника"
+
+msgid "Couldn't clone {name}."
+msgstr "Не вдалося клонувати {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Не вдалося підтвердити статус зірки. Перевірте, що GitHub CLI (`gh`) встановлено, вхід у нього виконано і є з'єднання з мережею"

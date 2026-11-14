@@ -6250,11 +6250,17 @@ msgstr "Kan de routine niet wijzigen"
 msgid "Couldn't check"
 msgstr "Kon niet controleren"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Kan {name} niet uitchecken: de branch {baseBranch} staat niet op de remote."
+
 msgid "Couldn't check the move"
 msgstr "Kan het verplaatsen niet controleren"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Kon niet controleren wat het verwijderen van dit lid beïnvloedt"
+
+msgid "Couldn't clone {name}."
+msgstr "Kan {name} niet klonen."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Kan de sterstatus niet bevestigen. Controleer of de GitHub-CLI (`gh`) is geïnstalleerd, of je bent ingelogd en of je een netwerkverbinding hebt"

@@ -6250,11 +6250,17 @@ msgstr "No se pudo cambiar la rutina"
 msgid "Couldn't check"
 msgstr "No se pudo comprobar"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "No se pudo hacer checkout de {name}: su rama {baseBranch} no está en el remoto."
+
 msgid "Couldn't check the move"
 msgstr "No se pudo comprobar el traslado"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "No se pudo comprobar qué afecta la eliminación de este miembro"
+
+msgid "Couldn't clone {name}."
+msgstr "No se pudo clonar {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "No se pudo confirmar el estado de la estrella. Comprueba que el CLI de GitHub (`gh`) esté instalado, con la sesión iniciada, y que tengas conexión de red"

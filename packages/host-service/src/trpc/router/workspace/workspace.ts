@@ -4,6 +4,7 @@ import { eq, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
 import { listRepositoriesByProjectId } from "../../../projects/repositories";
+import { readBoxCheckoutStates } from "../../../runtime/box-checkout-state";
 import { isMissingPath } from "../../../runtime/path-state";
 import {
 	getCheckoutSnapshots,
@@ -36,9 +37,15 @@ export const workspaceRouter = router({
 				});
 			}
 
+			const boxCheckoutState = readBoxCheckoutStates(localWorkspace.id);
 			return {
 				...localWorkspace,
-				checkouts: getCheckoutSnapshots(ctx.db, localWorkspace),
+				checkouts: getCheckoutSnapshots(ctx.db, localWorkspace).map(
+					(checkout) => ({
+						...checkout,
+						boxCheckout: boxCheckoutState(checkout.path),
+					}),
+				),
 				worktreeExists: !isMissingPath(localWorkspace.worktreePath),
 			};
 		}),

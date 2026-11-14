@@ -6250,11 +6250,17 @@ msgstr "루틴을 변경할 수 없습니다"
 msgid "Couldn't check"
 msgstr "확인할 수 없음"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "{name}을(를) 체크아웃할 수 없습니다: 브랜치 {baseBranch}이(가) 원격에 없습니다."
+
 msgid "Couldn't check the move"
 msgstr "옮기기를 확인하지 못했습니다"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "이 멤버 제거의 영향을 확인할 수 없습니다"
+
+msgid "Couldn't clone {name}."
+msgstr "{name}을(를) 클론할 수 없습니다."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "스타 상태를 확인하지 못했습니다. GitHub CLI(`gh`)가 설치되어 로그인되어 있는지, 네트워크에 연결되어 있는지 확인하세요"

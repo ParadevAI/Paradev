@@ -50,6 +50,7 @@ import {
 	WorkspaceActivityMenu,
 } from "./components/WorkspaceActivityMenu";
 import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
+import { WorkspaceCheckoutFailureBanner } from "./components/WorkspaceCheckoutFailureBanner";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceMoveBanner } from "./components/WorkspaceMoveBanner";
@@ -700,6 +701,7 @@ function V2WorkspaceContent() {
 						>
 							{rightPaneMode !== "expanded" && <HostConnectionPill />}
 							<WorkspaceMoveBanner workspaceId={workspaceId} />
+							<WorkspaceCheckoutFailureBanner workspaceId={workspaceId} />
 							{
 								<Workspace<PaneViewerData>
 									key={workspaceId}

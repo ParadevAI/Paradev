@@ -6250,11 +6250,17 @@ msgstr "ルーティンを変更できませんでした"
 msgid "Couldn't check"
 msgstr "確認できませんでした"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "{name} をチェックアウトできませんでした: ブランチ {baseBranch} がリモートにありません。"
+
 msgid "Couldn't check the move"
 msgstr "移動を確認できませんでした"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "このメンバーの削除による影響を確認できませんでした"
+
+msgid "Couldn't clone {name}."
+msgstr "{name} をクローンできませんでした。"
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "スター状態を確認できませんでした。GitHub CLI (`gh`) がインストール・サインイン済みで、ネットワーク接続があることを確認してください"

@@ -6250,11 +6250,17 @@ msgstr "無法變更例行任務"
 msgid "Couldn't check"
 msgstr "無法檢查"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "無法簽出 {name}：遠端儲存庫中沒有其分支 {baseBranch}。"
+
 msgid "Couldn't check the move"
 msgstr "無法檢查移動狀態"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "無法檢查移除此成員會影響哪些內容"
+
+msgid "Couldn't clone {name}."
+msgstr "無法複製 {name}。"
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "無法確認加星狀態，請檢查是否已安裝並登入GitHub CLI（`gh`），以及網路是否連通"

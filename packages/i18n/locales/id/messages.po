@@ -6250,11 +6250,17 @@ msgstr "Tidak dapat mengubah rutinitas"
 msgid "Couldn't check"
 msgstr "Tidak bisa diperiksa"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Tidak dapat melakukan checkout {name}: branch {baseBranch} tidak ada di remote."
+
 msgid "Couldn't check the move"
 msgstr "Tidak dapat memeriksa pemindahan"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Tidak dapat memeriksa apa yang terdampak jika anggota ini dihapus"
+
+msgid "Couldn't clone {name}."
+msgstr "Tidak dapat meng-clone {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Tidak bisa memastikan status star. Pastikan GitHub CLI (`gh`) terpasang, sudah masuk, dan Anda punya koneksi jaringan"

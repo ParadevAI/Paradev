@@ -6250,11 +6250,17 @@ msgstr "Rutinu se nepodařilo změnit"
 msgid "Couldn't check"
 msgstr "Nepodařilo se ověřit"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Repozitář {name} se nepodařilo vyzvednout: jeho větev {baseBranch} na vzdáleném repozitáři není."
+
 msgid "Couldn't check the move"
 msgstr "Přesun se nepodařilo zkontrolovat"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Nepodařilo se zjistit, čeho se odebrání tohoto člena dotkne"
+
+msgid "Couldn't clone {name}."
+msgstr "Repozitář {name} se nepodařilo naklonovat."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Nepodařilo se ověřit stav hvězdy. Zkontrolujte, že je nainstalované GitHub CLI (`gh`), že jste přihlášeni a že máte připojení k síti"

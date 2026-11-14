@@ -6250,11 +6250,17 @@ msgstr "Не удалось изменить рутину"
 msgid "Couldn't check"
 msgstr "Не удалось проверить"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Не удалось извлечь {name}: ветки {baseBranch} нет в удалённом репозитории."
+
 msgid "Couldn't check the move"
 msgstr "Не удалось проверить перенос"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Не удалось проверить, на что повлияет удаление этого участника"
+
+msgid "Couldn't clone {name}."
+msgstr "Не удалось клонировать {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Не удалось проверить статус звезды. Убедитесь, что GitHub CLI (`gh`) установлен, выполнен вход и есть подключение к сети"

@@ -6250,11 +6250,17 @@ msgstr "Nie udało się zmienić rutyny"
 msgid "Couldn't check"
 msgstr "Nie udało się sprawdzić"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Nie udało się wykonać checkout {name}: gałęzi {baseBranch} nie ma w repozytorium zdalnym."
+
 msgid "Couldn't check the move"
 msgstr "Nie udało się sprawdzić przenoszenia"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Nie udało się sprawdzić, na co wpłynie usunięcie tego członka"
+
+msgid "Couldn't clone {name}."
+msgstr "Nie udało się sklonować {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Nie udało się potwierdzić statusu gwiazdki. Sprawdź, czy GitHub CLI (`gh`) jest zainstalowane, zalogowane i czy masz połączenie z siecią"

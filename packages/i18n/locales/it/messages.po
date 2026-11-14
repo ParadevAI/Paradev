@@ -6250,11 +6250,17 @@ msgstr "Impossibile modificare la routine"
 msgid "Couldn't check"
 msgstr "Impossibile verificare"
 
+msgid "Couldn't check out {name}: its branch {baseBranch} is not on the remote."
+msgstr "Impossibile fare il checkout di {name}: il suo branch {baseBranch} non è sul remoto."
+
 msgid "Couldn't check the move"
 msgstr "Impossibile verificare lo spostamento"
 
 msgid "Couldn't check what removing this member affects"
 msgstr "Impossibile verificare cosa comporta la rimozione di questo membro"
+
+msgid "Couldn't clone {name}."
+msgstr "Impossibile clonare {name}."
 
 msgid "Couldn't confirm star status. Check that the GitHub CLI (`gh`) is installed, signed in, and that you have a network connection"
 msgstr "Impossibile confermare lo stato della star. Controlla che la CLI di GitHub (`gh`) sia installata, che tu abbia effettuato l'accesso e che ci sia connessione di rete"
