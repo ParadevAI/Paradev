@@ -2936,6 +2936,9 @@ msgstr "Paradev'de kurduğunuz herhangi bir ajan, örneğin Claude Code veya Cod
 msgid "Any channel"
 msgstr "Tüm kanallar"
 
+msgid "Any comment"
+msgstr "Herhangi bir yorum"
+
 msgid "Any conclusion"
 msgstr "Tüm sonuçlar"
 
@@ -3970,6 +3973,9 @@ msgstr "{total} karşılığında satın al"
 
 msgid "Buy GB-hours"
 msgstr "GB-saat satın al"
+
+msgid "by"
+msgstr "yazan"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "Yorum işlemleri"
 msgid "Comment added"
 msgstr "Yorum eklendi"
 
+msgid "Comment added in"
+msgstr "Yorum eklenen yer"
+
+msgid "Comment edited"
+msgstr "Yorum düzenlendi"
+
+msgid "Comment edited in"
+msgstr "Yorumun düzenlendiği yer"
+
 msgid "Comment mentions user"
 msgstr "Yorumda kullanıcıdan bahsedildi"
 
@@ -5569,6 +5584,9 @@ msgstr "Destekle iletişime geç"
 
 msgid "Contact Us"
 msgstr "Bize ulaşın"
+
+msgid "Contains \"{pattern}\""
+msgstr "\"{pattern}\" içerir"
 
 msgid "Contains this text..."
 msgstr "Şu metni içerir..."
@@ -10463,6 +10481,9 @@ msgstr "Ajan yönergelerini iyileştir"
 
 msgid "Improved diff viewer"
 msgstr "Geliştirilmiş fark görüntüleyici"
+
+msgid "in"
+msgstr "içinde"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "Oklu"
 
 msgid "With icon"
 msgstr "Simgeli"
+
+msgid "with label"
+msgstr "etiketi"
 
 msgid "With label"
 msgstr "Etiketli"

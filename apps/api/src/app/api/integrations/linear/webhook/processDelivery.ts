@@ -3,6 +3,7 @@ import { db } from "@superset/db/client";
 import type { SelectConnection } from "@superset/db/schema";
 import { connections, webhookEvents } from "@superset/db/schema";
 import { accountConnections } from "@superset/trpc/connectors";
+import { callLinearForConnection } from "@superset/trpc/integrations/linear";
 import {
 	organizationSyncs,
 	syncingOrganizationIds,
@@ -12,6 +13,7 @@ import { ingestAutomationEvent } from "@/lib/automations/ingestAutomationEvent";
 import { recordWebhookDelivery } from "@/lib/ingest/recordWebhookDelivery";
 import { stripNullChars } from "@/lib/strip-null-chars";
 import { connectionEventId, deliveryEventId } from "./deliveryIds";
+import { fetchCommentIssue } from "./fetchCommentIssue";
 import {
 	type LinearDelivery,
 	matchableFrom,
@@ -206,9 +208,20 @@ async function ingest(
 	connection: SelectConnection,
 	webhookEventId: string,
 ): Promise<void> {
-	const event = matchableFrom(delivery);
+	let event = matchableFrom(delivery);
 	// Nothing in the product names this delivery, so there is nothing to record.
 	if (event.names.length === 0) return;
+	if (delivery.type === "Comment") {
+		const issueId = delivery.data.issueId;
+		if (!issueId) return;
+		const commentIssue = await callLinearForConnection(
+			connection.id,
+			(client) => fetchCommentIssue(client, issueId),
+		);
+		if (!commentIssue) return;
+		delivery = { ...delivery, commentIssue };
+		event = matchableFrom(delivery);
+	}
 
 	// Linear's per-delivery id is stable across its retries. The payload itself
 	// carries no such id, so without the header the entity and send time stand

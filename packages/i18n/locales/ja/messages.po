@@ -2936,6 +2936,9 @@ msgstr "Paradevで設定済みのエージェントなら何でも使えます�
 msgid "Any channel"
 msgstr "すべてのチャンネル"
 
+msgid "Any comment"
+msgstr "すべてのコメント"
+
 msgid "Any conclusion"
 msgstr "すべての結果"
 
@@ -3970,6 +3973,9 @@ msgstr "{total} で購入"
 
 msgid "Buy GB-hours"
 msgstr "GB 時間を購入"
+
+msgid "by"
+msgstr "投稿者"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "コメントの操作"
 msgid "Comment added"
 msgstr "コメント追加"
 
+msgid "Comment added in"
+msgstr "コメント追加先"
+
+msgid "Comment edited"
+msgstr "コメントが編集された"
+
+msgid "Comment edited in"
+msgstr "コメントが編集された場所"
+
 msgid "Comment mentions user"
 msgstr "コメントでユーザーをメンション"
 
@@ -5569,6 +5584,9 @@ msgstr "サポートに問い合わせる"
 
 msgid "Contact Us"
 msgstr "お問い合わせ"
+
+msgid "Contains \"{pattern}\""
+msgstr "「{pattern}」を含む"
 
 msgid "Contains this text..."
 msgstr "このテキストを含む..."
@@ -10463,6 +10481,9 @@ msgstr "エージェント向け指示を改善"
 
 msgid "Improved diff viewer"
 msgstr "差分ビューアの改善"
+
+msgid "in"
+msgstr "対象"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "矢印あり"
 
 msgid "With icon"
 msgstr "アイコンあり"
+
+msgid "with label"
+msgstr "ラベル"
 
 msgid "With label"
 msgstr "ラベルあり"

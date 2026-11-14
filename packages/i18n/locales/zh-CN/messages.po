@@ -2936,6 +2936,9 @@ msgstr "你在 Paradev 中设置的任何智能体，例如 Claude Code 或 Code
 msgid "Any channel"
 msgstr "任意频道"
 
+msgid "Any comment"
+msgstr "任何评论"
+
 msgid "Any conclusion"
 msgstr "任意结论"
 
@@ -3970,6 +3973,9 @@ msgstr "以 {total} 购买"
 
 msgid "Buy GB-hours"
 msgstr "购买 GB 小时"
+
+msgid "by"
+msgstr "评论者"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "评论操作"
 msgid "Comment added"
 msgstr "添加了评论"
 
+msgid "Comment added in"
+msgstr "评论添加于"
+
+msgid "Comment edited"
+msgstr "评论已编辑"
+
+msgid "Comment edited in"
+msgstr "评论编辑于"
+
 msgid "Comment mentions user"
 msgstr "评论提及用户"
 
@@ -5569,6 +5584,9 @@ msgstr "联系支持"
 
 msgid "Contact Us"
 msgstr "联系我们"
+
+msgid "Contains \"{pattern}\""
+msgstr "包含“{pattern}”"
 
 msgid "Contains this text..."
 msgstr "包含此文本..."
@@ -10463,6 +10481,9 @@ msgstr "改进智能体说明"
 
 msgid "Improved diff viewer"
 msgstr "更好的差异查看器"
+
+msgid "in"
+msgstr "位于"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "带箭头"
 
 msgid "With icon"
 msgstr "带图标"
+
+msgid "with label"
+msgstr "带有标签"
 
 msgid "With label"
 msgstr "带标签"

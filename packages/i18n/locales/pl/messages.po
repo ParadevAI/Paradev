@@ -2936,6 +2936,9 @@ msgstr "Dowolny agent skonfigurowany w Paradev, np. Claude Code lub Codex."
 msgid "Any channel"
 msgstr "Dowolny kanał"
 
+msgid "Any comment"
+msgstr "Dowolny komentarz"
+
 msgid "Any conclusion"
 msgstr "Dowolny wynik"
 
@@ -3970,6 +3973,9 @@ msgstr "Kup za {total}"
 
 msgid "Buy GB-hours"
 msgstr "Kup GB-godziny"
+
+msgid "by"
+msgstr "przez"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "Akcje komentarza"
 msgid "Comment added"
 msgstr "Dodano komentarz"
 
+msgid "Comment added in"
+msgstr "Komentarz dodany w"
+
+msgid "Comment edited"
+msgstr "Komentarz edytowany"
+
+msgid "Comment edited in"
+msgstr "Komentarz edytowany w"
+
 msgid "Comment mentions user"
 msgstr "Komentarz wspomina użytkownika"
 
@@ -5569,6 +5584,9 @@ msgstr "Kontakt z pomocą"
 
 msgid "Contact Us"
 msgstr "Kontakt"
+
+msgid "Contains \"{pattern}\""
+msgstr "Zawiera \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Zawiera ten tekst..."
@@ -10463,6 +10481,9 @@ msgstr "Popraw instrukcje dla agentów"
 
 msgid "Improved diff viewer"
 msgstr "Ulepszona przeglądarka różnic"
+
+msgid "in"
+msgstr "w"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "Ze strzałką"
 
 msgid "With icon"
 msgstr "Z ikoną"
+
+msgid "with label"
+msgstr "z etykietą"
 
 msgid "With label"
 msgstr "Z etykietą"

@@ -2936,6 +2936,9 @@ msgstr "你在 Paradev 中設定的任何代理程式，例如 Claude Code 或 C
 msgid "Any channel"
 msgstr "任意頻道"
 
+msgid "Any comment"
+msgstr "任何留言"
+
 msgid "Any conclusion"
 msgstr "任意結論"
 
@@ -3970,6 +3973,9 @@ msgstr "以 {total} 購買"
 
 msgid "Buy GB-hours"
 msgstr "購買 GB 小時"
+
+msgid "by"
+msgstr "留言者"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "留言操作"
 msgid "Comment added"
 msgstr "添加了評論"
 
+msgid "Comment added in"
+msgstr "留言新增於"
+
+msgid "Comment edited"
+msgstr "留言已編輯"
+
+msgid "Comment edited in"
+msgstr "留言編輯於"
+
 msgid "Comment mentions user"
 msgstr "評論提及使用者"
 
@@ -5569,6 +5584,9 @@ msgstr "聯絡支援"
 
 msgid "Contact Us"
 msgstr "聯絡我們"
+
+msgid "Contains \"{pattern}\""
+msgstr "包含「{pattern}」"
 
 msgid "Contains this text..."
 msgstr "包含此文字..."
@@ -10463,6 +10481,9 @@ msgstr "改進代理程式說明"
 
 msgid "Improved diff viewer"
 msgstr "更好的差異檢視器"
+
+msgid "in"
+msgstr "位於"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "帶箭頭"
 
 msgid "With icon"
 msgstr "帶圖示"
+
+msgid "with label"
+msgstr "具有標籤"
 
 msgid "With label"
 msgstr "帶標籤"

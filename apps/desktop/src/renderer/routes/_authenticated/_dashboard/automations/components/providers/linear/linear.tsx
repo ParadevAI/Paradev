@@ -3,6 +3,7 @@ import { i18n } from "@superset/i18n";
 import { isEmptyScope } from "@superset/shared/automation-triggers";
 import { SiLinear } from "react-icons/si";
 import { ScopeChip } from "../../TriggerSentence/components/ScopeChip";
+import { TextFilterChip } from "../../TriggerSentence/components/TextFilterChip";
 import { AccountSlot } from "../components/AccountSlot";
 import { Sentence } from "../components/Sentence";
 import type { SentenceContext, TriggerProvider } from "../types";
@@ -118,12 +119,13 @@ function renderSlot(
 				/>
 			);
 		case "assignee":
+		case "actor":
 			return (
 				<ScopeChip
 					key={index}
-					scope={config.assignee}
-					onChange={(v) => set({ assignee: v })}
-					className={mark("assignee")}
+					scope={config[slot] ?? { mode: "any" }}
+					onChange={(v) => set({ [slot]: v })}
+					className={mark(slot)}
 					options={options.linear?.people ?? []}
 					emptyLabel={i18n._(
 						msg({
@@ -136,6 +138,17 @@ function renderSlot(
 						}),
 					)}
 					state={state}
+					disabled={disabled}
+				/>
+			);
+		case "commentFilter":
+			return (
+				<TextFilterChip
+					key={index}
+					value={config.commentFilter ?? null}
+					onChange={(v) => set({ commentFilter: v })}
+					emptyLabel={i18n._(msg({ message: "Any comment" }))}
+					placeholder={i18n._(msg({ message: "Contains this text..." }))}
 					disabled={disabled}
 				/>
 			);

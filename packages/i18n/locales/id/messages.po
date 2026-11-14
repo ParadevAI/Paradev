@@ -2936,6 +2936,9 @@ msgstr "Agen apa pun yang sudah Anda siapkan di Paradev, seperti Claude Code ata
 msgid "Any channel"
 msgstr "Channel mana pun"
 
+msgid "Any comment"
+msgstr "Komentar apa pun"
+
 msgid "Any conclusion"
 msgstr "Kesimpulan apa pun"
 
@@ -3970,6 +3973,9 @@ msgstr "Beli seharga {total}"
 
 msgid "Buy GB-hours"
 msgstr "Beli GB-jam"
+
+msgid "by"
+msgstr "oleh"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "Tindakan komentar"
 msgid "Comment added"
 msgstr "Komentar ditambahkan"
 
+msgid "Comment added in"
+msgstr "Komentar ditambahkan di"
+
+msgid "Comment edited"
+msgstr "Komentar diedit"
+
+msgid "Comment edited in"
+msgstr "Komentar diedit di"
+
 msgid "Comment mentions user"
 msgstr "Komentar menyebut pengguna"
 
@@ -5569,6 +5584,9 @@ msgstr "Hubungi Dukungan"
 
 msgid "Contact Us"
 msgstr "Hubungi Kami"
+
+msgid "Contains \"{pattern}\""
+msgstr "Berisi \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Mengandung teks ini..."
@@ -10463,6 +10481,9 @@ msgstr "Perbaiki instruksi agen"
 
 msgid "Improved diff viewer"
 msgstr "Penampil diff yang lebih baik"
+
+msgid "in"
+msgstr "di"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "Dengan panah"
 
 msgid "With icon"
 msgstr "Dengan ikon"
+
+msgid "with label"
+msgstr "dengan label"
 
 msgid "With label"
 msgstr "Dengan label"

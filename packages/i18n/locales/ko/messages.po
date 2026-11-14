@@ -2936,6 +2936,9 @@ msgstr "Paradev에서 설정한 모든 에이전트, 예를 들어 Claude Code�
 msgid "Any channel"
 msgstr "모든 채널"
 
+msgid "Any comment"
+msgstr "모든 댓글"
+
 msgid "Any conclusion"
 msgstr "모든 결과"
 
@@ -3970,6 +3973,9 @@ msgstr "{total}에 구매"
 
 msgid "Buy GB-hours"
 msgstr "GB 시간 구매"
+
+msgid "by"
+msgstr "작성자"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "댓글 작업"
 msgid "Comment added"
 msgstr "댓글 추가됨"
 
+msgid "Comment added in"
+msgstr "댓글이 추가된 위치"
+
+msgid "Comment edited"
+msgstr "댓글 수정됨"
+
+msgid "Comment edited in"
+msgstr "댓글이 수정된 위치"
+
 msgid "Comment mentions user"
 msgstr "댓글이 사용자를 멘션함"
 
@@ -5569,6 +5584,9 @@ msgstr "지원 문의"
 
 msgid "Contact Us"
 msgstr "문의하기"
+
+msgid "Contains \"{pattern}\""
+msgstr "\"{pattern}\" 포함"
 
 msgid "Contains this text..."
 msgstr "이 텍스트를 포함..."
@@ -10463,6 +10481,9 @@ msgstr "에이전트 지침 개선하기"
 
 msgid "Improved diff viewer"
 msgstr "차이 뷰어 개선"
+
+msgid "in"
+msgstr "위치"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "화살표 포함"
 
 msgid "With icon"
 msgstr "아이콘 포함"
+
+msgid "with label"
+msgstr "레이블"
 
 msgid "With label"
 msgstr "레이블 포함"

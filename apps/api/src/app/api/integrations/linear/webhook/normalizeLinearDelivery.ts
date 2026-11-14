@@ -4,6 +4,18 @@ import {
 } from "@superset/shared/automation-matching";
 import type { NormalizedDelivery } from "@/lib/automations/ingestAutomationEvent";
 
+export interface LinearCommentIssue {
+	id: string;
+	title: string;
+	identifier: string;
+	url: string;
+	teamId: string;
+	projectId: string | null;
+	stateId: string;
+	assigneeId: string | null;
+	labelIds: string[];
+}
+
 /**
  * Normalizes a Linear delivery into the `automation_events` row for one
  * connection.
@@ -24,6 +36,7 @@ export type LinearDelivery = {
 	/** Previous values of every property an update touched. */
 	updatedFrom?: Record<string, unknown> | null;
 	url?: string | null;
+	commentIssue?: LinearCommentIssue;
 	data: {
 		id: string;
 		title?: string;
@@ -37,6 +50,9 @@ export type LinearDelivery = {
 		assigneeId?: string | null;
 		labelIds?: string[];
 		completedAt?: string | null;
+		body?: string;
+		issueId?: string | null;
+		userId?: string | null;
 	};
 };
 
@@ -47,6 +63,7 @@ export type LinearDelivery = {
  */
 export function matchableFrom(delivery: LinearDelivery): LinearMatchableEvent {
 	const { data } = delivery;
+	const issue = delivery.type === "Comment" ? delivery.commentIssue : data;
 	return {
 		provider: "linear",
 		eventType: `${delivery.type}.${delivery.action}`,
@@ -56,24 +73,34 @@ export function matchableFrom(delivery: LinearDelivery): LinearMatchableEvent {
 			updatedFrom: delivery.updatedFrom ?? null,
 			assigneeId: data.assigneeId ?? null,
 			completedAt: data.completedAt ?? null,
+			issueId: data.issueId,
 		}),
-		actorId: delivery.actor?.id ?? null,
+		actorId:
+			delivery.type === "Comment"
+				? (data.userId ?? delivery.actor?.id ?? null)
+				: (delivery.actor?.id ?? null),
 		actorLogin: delivery.actor?.name ?? null,
-		body: null,
-		teamId: data.teamId ?? null,
-		projectId: data.projectId ?? null,
-		stateId: data.stateId ?? null,
-		assigneeId: data.assigneeId ?? null,
-		labelIds: data.labelIds ?? [],
+		body: delivery.type === "Comment" ? (data.body ?? null) : null,
+		teamId: issue?.teamId ?? null,
+		projectId: issue?.projectId ?? null,
+		stateId: issue?.stateId ?? null,
+		assigneeId: issue?.assigneeId ?? null,
+		labelIds: issue?.labelIds ?? [],
 	};
 }
 
 /** Linear ids are stable across renames, so the entity id is the key. */
 export function resourceKeyFor(delivery: LinearDelivery): string {
+	if (delivery.type === "Comment" && delivery.data.issueId) {
+		return `linear:issue:${delivery.data.issueId}`;
+	}
 	return `linear:${delivery.type.toLowerCase()}:${delivery.data.id}`;
 }
 
 export function titleFor(delivery: LinearDelivery): string {
+	if (delivery.commentIssue) {
+		return `${delivery.commentIssue.identifier} ${delivery.commentIssue.title}`;
+	}
 	const { data } = delivery;
 	if (data.title) {
 		return data.identifier ? `${data.identifier} ${data.title}` : data.title;

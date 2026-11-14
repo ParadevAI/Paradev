@@ -2936,6 +2936,9 @@ msgstr "Bất kỳ agent nào bạn đã thiết lập trong Paradev, như Claud
 msgid "Any channel"
 msgstr "Kênh bất kỳ"
 
+msgid "Any comment"
+msgstr "Bất kỳ bình luận nào"
+
 msgid "Any conclusion"
 msgstr "Kết quả bất kỳ"
 
@@ -3970,6 +3973,9 @@ msgstr "Mua với giá {total}"
 
 msgid "Buy GB-hours"
 msgstr "Mua GB-giờ"
+
+msgid "by"
+msgstr "bởi"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "Thao tác bình luận"
 msgid "Comment added"
 msgstr "Có bình luận mới"
 
+msgid "Comment added in"
+msgstr "Bình luận được thêm trong"
+
+msgid "Comment edited"
+msgstr "Bình luận đã chỉnh sửa"
+
+msgid "Comment edited in"
+msgstr "Bình luận đã chỉnh sửa trong"
+
 msgid "Comment mentions user"
 msgstr "Bình luận nhắc đến người dùng"
 
@@ -5569,6 +5584,9 @@ msgstr "Liên hệ hỗ trợ"
 
 msgid "Contact Us"
 msgstr "Liên hệ"
+
+msgid "Contains \"{pattern}\""
+msgstr "Chứa \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Chứa văn bản này..."
@@ -10463,6 +10481,9 @@ msgstr "Cải thiện hướng dẫn cho agent"
 
 msgid "Improved diff viewer"
 msgstr "Khung xem diff cải tiến"
+
+msgid "in"
+msgstr "trong"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "Có mũi tên"
 
 msgid "With icon"
 msgstr "Có biểu tượng"
+
+msgid "with label"
+msgstr "có nhãn"
 
 msgid "With label"
 msgstr "Có nhãn"

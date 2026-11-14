@@ -2936,6 +2936,9 @@ msgstr "Любой агент, которого вы настроили в Parad
 msgid "Any channel"
 msgstr "Любой канал"
 
+msgid "Any comment"
+msgstr "Любой комментарий"
+
 msgid "Any conclusion"
 msgstr "Любой итог"
 
@@ -3970,6 +3973,9 @@ msgstr "Купить за {total}"
 
 msgid "Buy GB-hours"
 msgstr "Купить ГБ-часы"
+
+msgid "by"
+msgstr "от"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5114,6 +5120,15 @@ msgstr "Действия с комментарием"
 msgid "Comment added"
 msgstr "Добавлен комментарий"
 
+msgid "Comment added in"
+msgstr "Комментарий добавлен в"
+
+msgid "Comment edited"
+msgstr "Комментарий изменён"
+
+msgid "Comment edited in"
+msgstr "Комментарий изменён в"
+
 msgid "Comment mentions user"
 msgstr "В комментарии упомянут пользователь"
 
@@ -5569,6 +5584,9 @@ msgstr "Связаться с поддержкой"
 
 msgid "Contact Us"
 msgstr "Связаться с нами"
+
+msgid "Contains \"{pattern}\""
+msgstr "Содержит \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Содержит этот текст..."
@@ -10463,6 +10481,9 @@ msgstr "Улучшить инструкции для агентов"
 
 msgid "Improved diff viewer"
 msgstr "Улучшенный просмотр diff"
+
+msgid "in"
+msgstr "в"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22805,6 +22826,9 @@ msgstr "Со стрелкой"
 
 msgid "With icon"
 msgstr "С иконкой"
+
+msgid "with label"
+msgstr "с меткой"
 
 msgid "With label"
 msgstr "С подписью"

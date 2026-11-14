@@ -227,6 +227,8 @@ export const linearTriggerEventValues = [
 	"issue.created",
 	"issue.status_changed",
 	"issue.assigned",
+	"comment.created",
+	"comment.updated",
 	"cycle.ended",
 ] as const;
 export type LinearTriggerEvent = (typeof linearTriggerEventValues)[number];
@@ -246,6 +248,8 @@ export const linearTriggerConfigSchema = z.object({
 	toStatus: triggerScopeSchema,
 	// The issue's assignee, not who made the change. Ids are Linear user ids.
 	assignee: triggerScopeSchema,
+	actor: triggerScopeSchema,
+	commentFilter: textFilterSchema.nullable().default(null),
 });
 
 export const sentryTriggerEventValues = [
@@ -509,6 +513,13 @@ const REQUIREMENTS: Partial<
 	],
 	linear: [
 		{ field: "teams", noun: "team" },
+		person(
+			"actor",
+			(config) =>
+				config.kind === "linear" &&
+				(config.event === "comment.created" ||
+					config.event === "comment.updated"),
+		),
 		// Only the events whose sentence shows an assignee; a created or cycle
 		// trigger has no chip to clear such a problem with.
 		person(
