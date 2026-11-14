@@ -289,7 +289,9 @@ describe("project repositories", () => {
 			caller.removeRepository({ projectId: project.id, repositoryId: api.id }),
 		).rejects.toMatchObject({
 			code: "PRECONDITION_FAILED",
-			message: expect.stringMatching(/is checked out by "live"; delete/),
+			message: expect.stringMatching(
+				/is checked out by "live"; delete it first$/,
+			),
 		});
 		expect(checkoutsOf(archived.id)).toHaveLength(2);
 
@@ -327,7 +329,7 @@ describe("project repositories", () => {
 		await expect(remove()).rejects.toMatchObject({
 			code: "PRECONDITION_FAILED",
 			message: expect.stringContaining(
-				'repository_in_use: api is checked out by archived workspaces whose folders are still on disk ("feat")',
+				'repository_in_use: api is checked out by an archived workspace whose folders are still on disk ("feat"); delete it first',
 			),
 		});
 

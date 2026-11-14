@@ -76,14 +76,12 @@ export function RepositoriesSection({
 				repositoryId,
 			});
 		},
-		onSuccess: () => {
-			setPendingRemoval(null);
-			onChanged();
-		},
+		onSuccess: () => onChanged(),
 		onError: (err) =>
 			toast.error(t({ message: "Could not remove the repository" }), {
 				description: hostRefusalReason(errorMessage(err)),
 			}),
+		onSettled: () => setPendingRemoval(null),
 	});
 
 	const busy = !hostUrl || makePrimary.isPending || remove.isPending;

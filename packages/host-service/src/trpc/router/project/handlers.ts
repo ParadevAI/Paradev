@@ -513,7 +513,7 @@ export function removeRepository(
 	if (live.length > 0) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
-			message: `repository_in_use: ${repository.name} is checked out by ${workspaceList(live)}; delete them first`,
+			message: `repository_in_use: ${repository.name} is checked out by ${workspaceList(live)}; delete ${live.length === 1 ? "it" : "them"} first`,
 		});
 	}
 	// With one checkout left, its path becomes the root, not the folder on disk.
@@ -527,7 +527,10 @@ export function removeRepository(
 	if (stranded.length > 0) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
-			message: `repository_in_use: ${repository.name} is checked out by archived workspaces whose folders are still on disk (${workspaceList(stranded)}); delete them first`,
+			message:
+				stranded.length === 1
+					? `repository_in_use: ${repository.name} is checked out by an archived workspace whose folders are still on disk (${workspaceList(stranded)}); delete it first`
+					: `repository_in_use: ${repository.name} is checked out by archived workspaces whose folders are still on disk (${workspaceList(stranded)}); delete them first`,
 		});
 	}
 	// PR rows are shared by GitHub identity: another clone of the same

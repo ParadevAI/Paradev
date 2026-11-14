@@ -147,8 +147,8 @@ export function SetupProjectModal({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={handleOpenChange} modal>
-				<DialogContent className="max-w-[560px]">
-					<DialogHeader>
+				<DialogContent className="flex max-h-[calc(100vh-2rem)] flex-col sm:max-w-[560px]">
+					<DialogHeader className="shrink-0">
 						<DialogTitle>
 							<Trans>Set up project on {hostName}</Trans>
 						</DialogTitle>
@@ -160,7 +160,7 @@ export function SetupProjectModal({
 						</DialogDescription>
 					</DialogHeader>
 
-					<div className="flex flex-col gap-3">
+					<div className="-mx-6 -my-1 flex min-h-0 flex-col gap-3 overflow-y-auto px-6 py-1">
 						{clones && (
 							<div className="flex flex-col gap-1.5">
 								<Label htmlFor="setup-parent-dir" className="text-xs">
@@ -199,7 +199,7 @@ export function SetupProjectModal({
 						))}
 					</div>
 
-					<DialogFooter>
+					<DialogFooter className="shrink-0">
 						<Button
 							type="button"
 							variant="ghost"

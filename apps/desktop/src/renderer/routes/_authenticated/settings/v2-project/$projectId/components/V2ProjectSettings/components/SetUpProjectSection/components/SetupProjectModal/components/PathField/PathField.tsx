@@ -29,7 +29,7 @@ export function PathField({
 				onChange={(e) => onChange(e.target.value)}
 				placeholder={placeholder}
 				disabled={disabled}
-				className="flex-1 font-mono text-sm"
+				className="min-w-0 flex-1 font-mono text-sm"
 			/>
 			<Button
 				type="button"

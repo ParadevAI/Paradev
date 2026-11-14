@@ -30,6 +30,7 @@ import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import { workspaceSourceProject } from "../../utils/workspaceSourceProject";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 import { useWorkspaceRepositoryFullNames } from "../useWorkspaceRepositoryFullNames";
+import { closestPartialProject } from "./utils/closestPartialProject";
 import { earlyMoveRepositoryNames } from "./utils/earlyMoveRepositoryNames";
 
 export type MoveToComputerStage = "saving" | "creating";
@@ -105,6 +106,19 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						computer
 							? t`Add ${only} as a project on ${computer} first`
 							: t`Add ${only} as a project on this computer first`,
+					);
+				}
+				const partial = closestPartialProject(
+					destinationRows ?? [],
+					repositoryNames,
+				);
+				if (partial) {
+					const missing = formatList(partial.missing);
+					const projectName = partial.project.name;
+					throw new Error(
+						computer
+							? t`Add ${missing} to the ${projectName} project on ${computer} first`
+							: t`Add ${missing} to the ${projectName} project on this computer first`,
 					);
 				}
 				const repositories = formatList(repositoryNames);
