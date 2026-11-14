@@ -16,6 +16,7 @@ import { useState } from "react";
 import { LuFolderGit2, LuGithub, LuLoaderCircle, LuX } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { getBaseName } from "renderer/lib/pathBasename";
 import { useFinalizeProjectSetup } from "renderer/react-query/projects";
@@ -40,7 +41,8 @@ export function NewLocalProjectModal({
 	onSuccess,
 }: NewLocalProjectModalProps) {
 	const { t } = useLingui();
-	const { activeHostUrl } = useLocalHostService();
+	const hostService = useLocalHostService();
+	const { activeHostUrl } = hostService;
 	const finalizeSetup = useFinalizeProjectSetup();
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
@@ -93,7 +95,11 @@ export function NewLocalProjectModal({
 	};
 
 	const create = async () => {
-		if (!activeHostUrl || repositoryCount === 0 || !name.trim()) return;
+		if (repositoryCount === 0 || !name.trim()) return;
+		if (!activeHostUrl) {
+			showHostServiceUnavailableToast(hostService, { action: "createProject" });
+			return;
+		}
 		setWorking(true);
 		try {
 			const result = await getHostServiceClientByUrl(
