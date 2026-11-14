@@ -1,7 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import {
+	environmentsForRepository,
+	startableCloudEnvironments,
+} from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
+import {
+	listMoveDestinationComputers,
+	type MoveDestinationComputer,
+} from "@superset/shared/move-book";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFeatureFlag } from "posthog-react-native";
 import { useMemo } from "react";
@@ -18,11 +25,6 @@ import type {
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { isMissingProcedureError } from "@/lib/host-service/errors";
-import { environmentsForRepository } from "./utils/environmentsForRepository";
-import {
-	listMoveComputers,
-	type MoveComputer,
-} from "./utils/listMoveComputers";
 
 type Destination =
 	| { kind: "cloud"; environmentId: string }
@@ -48,12 +50,13 @@ export function useWorkspaceMove(
 	const { data: environments } = useCloudEnvironments();
 	const enabled = movesEnabled && !isCloud;
 
-	const computers = useMemo<MoveComputer[]>(
+	const computers = useMemo<MoveDestinationComputer[]>(
 		() =>
 			enabled
-				? listMoveComputers({
+				? listMoveDestinationComputers({
 						hosts,
 						fromHostId: workspace.hostId,
+						thisHostId: null,
 						cloudHostIds: new Set(cloudWorkspaces.map((row) => row.id)),
 					})
 				: [],
@@ -113,8 +116,8 @@ export function useWorkspaceMove(
 			{ text: confirmText, onPress: onConfirm },
 		]);
 
-	const moveToComputer = (computer: MoveComputer) => {
-		const computerName = computer.name;
+	const moveToComputer = (computer: MoveDestinationComputer) => {
+		const computerName = computer.name ?? t({ message: "that computer" });
 		confirm(
 			t({ message: `Move this workspace to ${computerName}?` }),
 			t({
@@ -122,7 +125,7 @@ export function useWorkspaceMove(
 			}),
 			t({ message: "Move" }),
 			() =>
-				void send({ kind: "computer", hostId: computer.hostId }, computer.name),
+				void send({ kind: "computer", hostId: computer.hostId }, computerName),
 		);
 	};
 

@@ -198,7 +198,9 @@ export function WorkspaceMenuItems({
 					</Sub>
 				</>
 			)}
-			<Separator />
+			{(actions.onRemoveFromSidebar ||
+				ports.length > 0 ||
+				actions.onDelete) && <Separator />}
 			{actions.onRemoveFromSidebar && (
 				<Item onSelect={actions.onRemoveFromSidebar}>
 					<LuX className={icon} />

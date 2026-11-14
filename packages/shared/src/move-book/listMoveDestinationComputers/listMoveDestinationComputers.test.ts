@@ -59,6 +59,22 @@ describe("listMoveDestinationComputers", () => {
 		]);
 	});
 
+	test("lists no computer as this one when the caller is not a computer", () => {
+		const computers = listMoveDestinationComputers({
+			hosts,
+			fromHostId: "source",
+			thisHostId: null,
+			cloudHostIds: new Set(["cloud-box"]),
+		});
+		expect(
+			computers.map(({ hostId, isThisComputer }) => [hostId, isThisComputer]),
+		).toEqual([
+			["this", false],
+			["online", false],
+			["offline", false],
+		]);
+	});
+
 	test("lists this computer with no name before the roster knows it", () => {
 		const [first] = listMoveDestinationComputers({
 			hosts: [],

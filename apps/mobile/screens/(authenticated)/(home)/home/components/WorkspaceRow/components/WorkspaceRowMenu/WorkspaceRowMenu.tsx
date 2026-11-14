@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
+import type { MoveDestinationComputer } from "@superset/shared/move-book";
 import { Link } from "expo-router";
 import { type ReactNode, useRef } from "react";
 import type { ViewInstance } from "react-native";
 import { View } from "react-native";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
-import type { MoveComputer } from "../../hooks/useWorkspaceMove/utils/listMoveComputers";
 
 export function WorkspaceRowMenu({
 	pinned,
@@ -36,10 +36,10 @@ export function WorkspaceRowMenu({
 	onShare: (anchor?: number) => void;
 	/** Where the workspace can move; absent where it cannot move from here. */
 	move?: {
-		computers: MoveComputer[];
+		computers: MoveDestinationComputer[];
 		canMoveToCloud: boolean;
 		moveToCloud: () => void;
-		moveToComputer: (computer: MoveComputer) => void;
+		moveToComputer: (computer: MoveDestinationComputer) => void;
 	};
 	children: ReactNode;
 }) {

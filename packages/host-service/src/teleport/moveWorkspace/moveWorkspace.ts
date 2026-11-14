@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { MachineSize } from "@superset/shared/billing";
+import { environmentOpensRepository } from "@superset/shared/cloud-environments";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { keepMoveAlive } from "@superset/shared/move-book";
 import { TRPCError } from "@trpc/server";
@@ -88,12 +89,7 @@ async function resolveTarget(
 		const environment = await deps.api.environment.get.query({
 			id: destination.environmentId,
 		});
-		const wanted = repository.toLowerCase();
-		if (
-			!environment.repositories.some(
-				(repo) => repo.fullName.toLowerCase() === wanted,
-			)
-		) {
+		if (!environmentOpensRepository(environment, repository)) {
 			throw cannotMove(`That cloud environment does not open ${repository}`);
 		}
 		return destination;

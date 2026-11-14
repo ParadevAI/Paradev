@@ -1,11 +1,11 @@
+import {
+	listMoveDestinationComputers,
+	type MoveDestinationComputer,
+} from "@superset/shared/move-book";
 import { useMemo } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import {
-	listMoveDestinationComputers,
-	type MoveDestinationComputer,
-} from "./utils/listMoveDestinationComputers";
 
 export function useMoveDestinationComputers(
 	fromHostId: string,
