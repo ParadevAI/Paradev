@@ -1,7 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -22,22 +24,16 @@ import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToCloudStage = "saving" | "starting";
 
-/** How long moved terminals wait for the new cloud box to answer. */
 const BOX_CONNECT_ATTEMPTS = 120;
 const BOX_CONNECT_RETRY_MS = 5_000;
 
-/**
- * Moves a workspace on this computer into a new cloud workspace: its work
- * goes to one branch, and each of its chats moves on its own. Its terminal
- * agents start again in the new workspace once its box answers. Returns the
- * chats that could not move and stayed here, and later the terminals.
- */
 export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
 	const collections = useCollections();
 	const utils = cloudTrpc.useUtils();
-	const { activeHostUrl } = useLocalHostService();
+	const { activeHostUrl, machineId } = useLocalHostService();
+	const relayUrl = useRelayUrl();
 	const { projects } = useHostProjects();
 	const sourceProject = projects.find(
 		(row) =>
@@ -63,8 +59,19 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			signal?: AbortSignal;
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
-			if (!activeHostUrl) {
-				throw new Error(t`This computer's host is not running`);
+			const sourceUrl = resolveHostUrl({
+				hostId: workspace.hostId,
+				machineId,
+				activeHostUrl,
+				organizationId,
+				relayUrl,
+			});
+			if (!sourceUrl) {
+				throw new Error(
+					workspace.hostId === machineId
+						? t`This computer's host is not running`
+						: t`That computer can't be reached`,
+				);
 			}
 			const assertEnvironmentOpens = (repository: string) => {
 				const environmentRepository = environment.repositoryFullName;
@@ -85,7 +92,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					fromHostId: workspace.hostId,
 				});
 			onBegun?.(workspaceMoveId);
-			const source = getHostServiceClientByUrl(activeHostUrl);
+			const source = getHostServiceClientByUrl(sourceUrl);
 			const leaving: { chats: string[]; terminals: string[] } = {
 				chats: [],
 				terminals: [],
@@ -191,6 +198,8 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 		[
 			organizationId,
 			activeHostUrl,
+			machineId,
+			relayUrl,
 			t,
 			workspace,
 			utils,
