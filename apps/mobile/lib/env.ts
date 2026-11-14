@@ -17,7 +17,7 @@ const envSchema = z.object({
 	/** The API's Google web client (`GOOGLE_CLIENT_ID`). Android asks Credential
 	 * Manager for an ID token addressed to it, and uses the browser without it. */
 	EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: z.string().optional(),
-	/** Set by .superset/setup.sh or setup.cloud.sh (seed-local-mobile-token.ts,
+	/** Set by .paradev/setup.sh or setup.cloud.sh (seed-local-mobile-token.ts,
 	 * seed-cloud-mobile-token.ts): a one-time token redeemable for a real
 	 * session as the real developer/workspace creator, via the dev-only
 	 * `oneTimeToken` better-auth plugin. */

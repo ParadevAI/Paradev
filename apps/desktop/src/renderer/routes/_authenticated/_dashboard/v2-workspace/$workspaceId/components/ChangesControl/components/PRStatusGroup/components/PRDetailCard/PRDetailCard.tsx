@@ -9,6 +9,7 @@ import {
 	LuCircleX,
 	LuGitBranch,
 } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import type { ChecksRollup } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/computeChecksStatus";
 import { PRIcon, type PRState } from "renderer/screens/main/components/PRIcon";
 import type { PullRequest } from "../../../../../../utils/getPRFlowState";
@@ -26,6 +27,7 @@ interface PRDetailCardProps {
  * reasonable PR title on two lines.
  */
 export function PRDetailCard({ pr, checks, linkState }: PRDetailCardProps) {
+	const now = useNow(60_000);
 	const { formatRelativeTime } = useFormat();
 
 	const { t } = useLingui();
@@ -41,7 +43,7 @@ export function PRDetailCard({ pr, checks, linkState }: PRDetailCardProps) {
 	const statePillClass = stateLabelToPillClass(linkState);
 
 	const updatedRelative = pr.updatedAt
-		? formatRelativeTime(new Date(pr.updatedAt))
+		? formatRelativeTime(new Date(pr.updatedAt), now)
 		: null;
 
 	return (

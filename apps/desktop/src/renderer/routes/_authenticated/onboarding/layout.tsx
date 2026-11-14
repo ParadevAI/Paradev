@@ -7,15 +7,17 @@ import {
 	useLocation,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Redirect } from "renderer/components/Redirect";
 import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { WindowControlsInset } from "../_dashboard/components/WindowControlsInset";
+import { useOnboardingRestartStore } from "../stores/onboardingRestartStore";
 import { OnboardingHelpLinks } from "./components/OnboardingHelpLinks";
 import { OnboardingLanguagePicker } from "./components/OnboardingLanguagePicker";
 import { OnboardingNavigation } from "./components/OnboardingNavigation";
+import { useAgentModeStore } from "./stores/agentModeStore";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
 	component: OnboardingFlowLayout,
@@ -33,6 +35,13 @@ const SETUP_STEP = {
 	}),
 };
 
+const MODE_STEP = {
+	path: "/onboarding/mode",
+	match: (p: string) => p === "/onboarding/mode",
+	title: msg({ message: "How do you want to work?" }),
+	subtitle: msg({ message: "You can change this later in Settings." }),
+};
+
 const PROJECT_STEP = {
 	path: "/onboarding/project",
 	match: (p: string) => p === "/onboarding/project",
@@ -42,7 +51,7 @@ const PROJECT_STEP = {
 	}),
 };
 
-const projectRedirect = <Redirect to="/onboarding/project" replace />;
+const modeRedirect = <Redirect to="/onboarding/mode" replace />;
 
 function OnboardingFlowLayout() {
 	const { data: session, isPending } = authClient.useSession();
@@ -51,6 +60,14 @@ function OnboardingFlowLayout() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { i18n } = useLingui();
+	const restarting = useOnboardingRestartStore((s) => s.restarting);
+	useEffect(
+		() => () => {
+			useAgentModeStore.getState().reset();
+			useOnboardingRestartStore.getState().end();
+		},
+		[],
+	);
 	const { data: ghStatus, isPending: isPendingGh } =
 		electronTrpc.system.detectGhCli.useQuery();
 	const ghReady =
@@ -72,16 +89,18 @@ function OnboardingFlowLayout() {
 	}
 
 	if (isPending) return null;
-	if (onboardedOnArrival) {
+	if (onboardedOnArrival && !restarting) {
 		return rootRedirect;
 	}
 
 	// Nothing to set up when GitHub CLI already works, so that step drops out.
 	// Decided on arrival: signing in mid-step must not unmount its own dialog.
-	const steps = ghReadyOnArrival ? [PROJECT_STEP] : [SETUP_STEP, PROJECT_STEP];
+	const steps = ghReadyOnArrival
+		? [MODE_STEP, PROJECT_STEP]
+		: [SETUP_STEP, MODE_STEP, PROJECT_STEP];
 	if (SETUP_STEP.match(location.pathname)) {
 		if (ghReadyOnArrival === null) return null;
-		if (ghReadyOnArrival) return projectRedirect;
+		if (ghReadyOnArrival) return modeRedirect;
 	}
 
 	const currentStepIdx = steps.findIndex((s) => s.match(location.pathname));
@@ -97,10 +116,12 @@ function OnboardingFlowLayout() {
 	};
 
 	// The project step finishes onboarding itself the moment a project is
-	// added, so only the GitHub step gets a footer action
-	const handleContinue =
-		currentStep === SETUP_STEP
-			? () => navigate({ to: PROJECT_STEP.path })
+	// added, so the last step has no footer action unless this is a restart
+	const nextStep = isOnMainStep ? steps[currentStepIdx + 1] : undefined;
+	const handleContinue = nextStep
+		? () => navigate({ to: nextStep.path })
+		: restarting && isOnMainStep
+			? () => navigate({ to: "/" })
 			: null;
 
 	return (

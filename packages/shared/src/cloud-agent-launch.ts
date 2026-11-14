@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_ATTACHMENTS } from "./attachment-limits";
 import { HOST_AGENT_PRESETS } from "./host-agent-presets";
 
 /**
@@ -7,6 +8,13 @@ import { HOST_AGENT_PRESETS } from "./host-agent-presets";
  * is what makes it launchable here.
  */
 const INSTALLED_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
+
+/**
+ * The installed presets that can run as a chat in the sandbox: claude and codex
+ * through the ACP adapters `packages/sandbox/src/assets/produce.ts` bundles,
+ * pdev through `pdev acp`, its own ACP server.
+ */
+const CHAT_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
 
 export const CLOUD_AGENT_IDS: readonly string[] = HOST_AGENT_PRESETS.filter(
 	(preset) => INSTALLED_IN_SANDBOX.has(preset.presetId),
@@ -20,7 +28,7 @@ export function isCloudAgentId(id: string): boolean {
 }
 
 export function supportsCloudAgentChat(agent: string | undefined): boolean {
-	return agent === "claude" || agent === "pdev";
+	return !!agent && CHAT_IN_SANDBOX.has(agent);
 }
 
 /**
@@ -41,13 +49,18 @@ export const cloudAgentLaunchSchema = z.object({
 	 * them to at create time, so the ids travel and the box pulls the bytes
 	 * itself once host-service is up.
 	 */
-	attachmentFileIds: z.array(z.string().uuid()).max(10).optional(),
+	attachmentFileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).optional(),
 	surface: z.enum(["terminal", "chat"]).optional(),
 	/**
 	 * Set only by cloud automation dispatch. A manual create must not name a
 	 * run: the box reports this id, and the API trusts it as the correlation.
 	 */
 	automationRunId: z.string().uuid().optional(),
+	/**
+	 * The terminal id the agent launches under, chosen by whoever created the
+	 * workspace so it can open the agent's pane by that exact id.
+	 */
+	terminalId: z.string().uuid().optional(),
 });
 
 export type CloudAgentLaunch = z.infer<typeof cloudAgentLaunchSchema>;
@@ -56,6 +69,8 @@ export type CloudAgentLaunchDescriptor = {
 	agent: string;
 	surface: "chat" | "terminal";
 	promptHash: string | null;
+	/** Null when the launch picks its own terminal id. */
+	terminalId: string | null;
 };
 
 export async function hashCloudAgentPrompt(prompt: string): Promise<string> {
@@ -78,6 +93,7 @@ export async function describeCloudAgentLaunch(
 		promptHash: launch.prompt.trim()
 			? await hashCloudAgentPrompt(launch.prompt)
 			: null,
+		terminalId: launch.terminalId ?? null,
 	};
 }
 
@@ -90,6 +106,7 @@ const ENV = {
 	attachments: "SUPERSET_SANDBOX_AGENT_ATTACHMENTS",
 	surface: "SUPERSET_SANDBOX_AGENT_SURFACE",
 	automationRunId: "SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID",
+	terminalId: "SUPERSET_SANDBOX_AGENT_TERMINAL_ID",
 } as const;
 
 /** Every variable the launch travels in; stripped when a sandbox is promoted. */
@@ -113,6 +130,7 @@ export function cloudAgentLaunchToEnv(
 		...(launch.automationRunId
 			? { [ENV.automationRunId]: launch.automationRunId }
 			: {}),
+		...(launch.terminalId ? { [ENV.terminalId]: launch.terminalId } : {}),
 	};
 }
 
@@ -129,11 +147,12 @@ export function readCloudAgentLaunch(
 		mode: env[ENV.mode] || undefined,
 		attachmentFileIds: splitAttachmentIds(env[ENV.attachments]),
 		surface: env[ENV.surface] === "chat" ? "chat" : undefined,
-		automationRunId: readAutomationRunId(env[ENV.automationRunId]),
+		automationRunId: readUuid(env[ENV.automationRunId]),
+		terminalId: readUuid(env[ENV.terminalId]),
 	};
 }
 
-function readAutomationRunId(value: string | undefined): string | undefined {
+function readUuid(value: string | undefined): string | undefined {
 	return value && z.string().uuid().safeParse(value).success
 		? value
 		: undefined;

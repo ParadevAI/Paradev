@@ -1,4 +1,11 @@
 import {
+	ensureDefaultMarketplace,
+	type InstallPluginResult,
+	installOrganizationPlugin,
+	installPlugin,
+	listAvailable,
+} from "@superset/agent-setup";
+import {
 	boolean,
 	CLIError,
 	positional,
@@ -10,19 +17,13 @@ import type { ApiClient } from "../../../lib/api-client";
 import { command } from "../../../lib/command";
 import { canReachDesktop, openUrl } from "../../../lib/open-url";
 import { authorizeUrl, chooseAuthMethod } from "../../../lib/plugins/connect";
+import { withPluginHints } from "../../../lib/plugins/errors";
 import { resolvePluginRef } from "../../../lib/plugins/host";
 import {
 	type AuthInputSpec,
 	missingInputsError,
 	parseInputs,
 } from "../../../lib/plugins/inputs";
-import {
-	ensureDefaultMarketplace,
-	installPlugin,
-	listAvailable,
-} from "../../../lib/plugins/install";
-import { syncPluginMcpServers } from "../../../lib/plugins/mcp-servers";
-import { installOrganizationPlugin } from "../../../lib/plugins/organization";
 
 const POLL_INTERVAL_MS = 2_000;
 const POLL_TIMEOUT_MS = 5 * 60_000;
@@ -99,79 +100,78 @@ export default command({
 			["PLUGIN", "VERSION", "SKILLS", "CONNECTION"],
 			[20, 10, 8, 40],
 		),
-	run: async ({ ctx, args, options }) => {
-		await ensureDefaultMarketplace();
-		const { name, marketplace } = resolvePluginRef(
-			args.plugin as string,
-			options.marketplace as string | undefined,
-		);
+	run: ({ ctx, args, options }) =>
+		withPluginHints(async () => {
+			await ensureDefaultMarketplace();
+			const { name, marketplace } = resolvePluginRef(
+				args.plugin as string,
+				options.marketplace as string | undefined,
+			);
 
-		const organization = await organizationPlugin(ctx.api, name, marketplace);
+			const organization = await organizationPlugin(ctx.api, name, marketplace);
 
-		const connected = options.update
-			? ({ status: "ready", connection: "unchanged" } as const)
-			: await connectFirst({
-					api: ctx.api,
-					name,
-					marketplace: organization?.marketplace ?? marketplace,
-					method: options.method as string | undefined,
-					inputs: options.inputs as string | undefined,
-					noWait: Boolean(options.noWait),
-				});
+			const connected = options.update
+				? ({ status: "ready", connection: "unchanged" } as const)
+				: await connectFirst({
+						api: ctx.api,
+						name,
+						marketplace: organization?.marketplace ?? marketplace,
+						method: options.method as string | undefined,
+						inputs: options.inputs as string | undefined,
+						noWait: Boolean(options.noWait),
+					});
 
-		if (connected.status === "authorize") {
-			return {
-				data: [{ name, connection: "authorize", url: connected.url }],
-				message: `Open this URL to connect ${name}:\n  ${connected.url}\nThen run superset plugins install ${name} again to install it.`,
-			};
-		}
+			if (connected.status === "authorize") {
+				return {
+					data: [{ name, connection: "authorize", url: connected.url }],
+					message: `Open this URL to connect ${name}:\n  ${connected.url}\nThen run superset plugins install ${name} again to install it.`,
+				};
+			}
 
-		let local: Awaited<ReturnType<typeof installPlugin>>;
-		let accountError: string | null = null;
+			let local: InstallPluginResult;
+			let accountError: string | null = null;
 
-		if (organization) {
-			await ctx.api.plugins.install.mutate({
-				name,
-				marketplace: organization.marketplace,
-			});
-			local = await installOrganizationPlugin(ctx.api, name);
-		} else {
-			local = await installPlugin(name, marketplace, {
-				update: Boolean(options.update),
-			});
-			try {
+			if (organization) {
 				await ctx.api.plugins.install.mutate({
 					name,
-					marketplace: local.marketplace,
+					marketplace: organization.marketplace,
 				});
-			} catch (error) {
-				accountError = error instanceof Error ? error.message : String(error);
+				local = await installOrganizationPlugin(ctx.api, name);
+			} else {
+				local = await installPlugin(name, marketplace, {
+					update: Boolean(options.update),
+				});
+				try {
+					await ctx.api.plugins.install.mutate({
+						name,
+						marketplace: local.marketplace,
+					});
+				} catch (error) {
+					accountError = error instanceof Error ? error.message : String(error);
+				}
 			}
-		}
 
-		const mcp = syncPluginMcpServers();
+			const next = accountError
+				? ` Its skills work, but tools will not until the account install succeeds: ${accountError}`
+				: local.mcpError
+					? ` Its skills work, but no agent can reach its tools until the MCP config is writable: ${local.mcpError}`
+					: "";
 
-		const next = accountError
-			? ` Its skills work, but tools will not until the account install succeeds: ${accountError}`
-			: mcp.error
-				? ` Its skills work, but no agent can reach its tools until the MCP config is writable: ${mcp.error}`
-				: "";
-
-		return {
-			data: [
-				{
-					name: local.name,
-					version: local.version,
-					marketplace: local.marketplace,
-					skills: local.skills,
-					connection: accountError
-						? "account sync failed"
-						: connected.connection,
-				},
-			],
-			message: `Installed ${local.name}@${local.version}. ${local.skills} skill${local.skills === 1 ? "" : "s"} synced.${next}`,
-		};
-	},
+			return {
+				data: [
+					{
+						name: local.name,
+						version: local.version,
+						marketplace: local.marketplace,
+						skills: local.skills,
+						connection: accountError
+							? "account sync failed"
+							: connected.connection,
+					},
+				],
+				message: `Installed ${local.name}@${local.version}. ${local.skills} skill${local.skills === 1 ? "" : "s"} synced.${next}`,
+			};
+		}),
 });
 
 async function connectFirst({

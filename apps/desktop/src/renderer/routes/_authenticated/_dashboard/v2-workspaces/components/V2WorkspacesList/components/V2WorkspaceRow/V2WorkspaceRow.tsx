@@ -16,6 +16,7 @@ import {
 } from "react-icons/lu";
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
+import { useNow } from "renderer/hooks/useNow";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import {
@@ -92,6 +93,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	workspace,
 	isCurrentRoute,
 }: V2WorkspaceRowProps) {
+	const now = useNow(60_000);
 	const { formatDateTime, formatAge } = useFormat();
 
 	const { t } = useLingui();
@@ -125,7 +127,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 
 	// The visible age tracks activity (matches the sort); creation and
 	// last-agent-event details live in the tooltip.
-	const timeLabel = formatAge(workspaceActivityAt(workspace));
+	const timeLabel = formatAge(workspaceActivityAt(workspace), now);
 	const showsLiveState = hasLiveWorkspaceState(workspace);
 	const createdAtLabel = formatDateTime(workspace.createdAt, undefined);
 	const timeTitle = [
@@ -165,7 +167,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	const whereLabel = isCloud
 		? t({ message: "Cloud workspace" })
 		: isDeviceOffline
-			? t({ message: `${workspace.hostName} — device offline` })
+			? t({ message: `${workspace.hostName}: device offline` })
 			: workspace.hostName;
 
 	const renderHoverActions = (actions: V2WorkspaceActions) =>
@@ -174,7 +176,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 				<RowHoverAction
 					label={
 						actions.isRestoreBlocked
-							? t({ message: `${workspace.hostName} — device offline` })
+							? t({ message: `${workspace.hostName}: device offline` })
 							: t({ message: "Restore workspace" })
 					}
 					onClick={actions.restore}
@@ -256,6 +258,13 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 							: "hover:bg-accent/50 focus-visible:bg-accent/50",
 					)}
 				>
+					{/* Rows without a live state keep the empty slot so names line up. */}
+					{showsLiveState ? (
+						<WorkspaceStateGlyph workspace={workspace} />
+					) : (
+						<span aria-hidden className="size-4 shrink-0" />
+					)}
+
 					{/* Name and creator travel together: the avatar hugs the text
 					    instead of drifting to the far end of the flexible cell. */}
 					<span className="flex min-w-0 flex-1 items-center gap-2">
@@ -366,27 +375,18 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 						</span>
 					</span>
 
-					{/* The cloud tab's trailing cell: a live status glyph while
-					    something runs or waits, the age otherwise. Hover swaps in
-					    the row's actions in place, so the slot keeps one width. */}
+					{/* Hover swaps the row's actions in over the age, so the slot
+					    keeps one width. */}
 					<span className="grid w-[3.25rem] shrink-0 items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
 						<span
 							className={cn(
-								"flex items-center text-xs text-muted-foreground",
+								"flex items-center whitespace-nowrap text-xs tabular-nums text-muted-foreground",
 								"group-hover:invisible group-focus-within:invisible",
 								isDeviceOffline && "text-muted-foreground/60",
 							)}
+							title={timeTitle}
 						>
-							{showsLiveState ? (
-								<WorkspaceStateGlyph workspace={workspace} />
-							) : (
-								<span
-									className="whitespace-nowrap tabular-nums"
-									title={timeTitle}
-								>
-									{timeLabel}
-								</span>
-							)}
+							{timeLabel}
 						</span>
 						<span className="hidden items-center gap-1 group-hover:flex group-focus-within:flex">
 							{renderHoverActions(actions)}

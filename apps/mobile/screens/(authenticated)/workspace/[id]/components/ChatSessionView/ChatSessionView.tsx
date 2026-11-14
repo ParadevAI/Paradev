@@ -29,6 +29,7 @@ import { Alert, Pressable, View } from "react-native";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Text } from "@/components/ui/text";
 import { showActionSheet } from "@/lib/action-sheet";
+import type { ChatAttachmentPart } from "@/lib/attachments/chatParts";
 import {
 	type ChatHost,
 	createChatSessionClient,
@@ -57,6 +58,7 @@ import { DOCK_CHIP_HEIGHT, DockChip } from "./components/DockChip";
 import { ScrollToBottom } from "./components/ScrollToBottom";
 import { StickToBottom } from "./components/StickToBottom";
 import { useTapHandlers } from "./hooks/useTapHandlers";
+import { type TextRow, withRowText } from "./utils/withRowText";
 
 const CONFIG_OPTIONS_GRACE_MS = 1000;
 const BANNER_SPACE = 36;
@@ -75,11 +77,7 @@ function activityTexts(
 	);
 }
 
-export interface ChatAttachment {
-	attachmentId: string;
-	name: string;
-	mimeType: string;
-}
+export type ChatAttachment = Omit<ChatAttachmentPart, "type">;
 
 export interface ChatSessionViewHandle {
 	send: (text: string, attachments?: ChatAttachment[]) => Promise<void>;
@@ -141,6 +139,20 @@ export const ChatSessionView = forwardRef<
 		() => groupActivity(chatRows(groups, chat.outbox)),
 		[groups, chat.outbox],
 	);
+	const [textRowCache] = useState(() => new WeakMap<ChatRow, TextRow>());
+	const textRows = useMemo(
+		() =>
+			withRowText(
+				rows,
+				(row) =>
+					row.kind === "item" &&
+					(row.item.kind === "agent_message" || row.item.kind === "reasoning")
+						? displayText(chat.snapshot, row.item.id)
+						: "",
+				textRowCache,
+			),
+		[rows, chat.snapshot, textRowCache],
+	);
 	const positions = useMemo(() => groupPositions(rows), [rows]);
 	const replyEnds = useMemo(() => lastReplyKeys(rows), [rows]);
 	const [dockHeight, setDockHeight] = useState(0);
@@ -150,6 +162,7 @@ export const ChatSessionView = forwardRef<
 	);
 	const session = chat.snapshot.session;
 	const queuePaused = session?.queuePaused === true;
+	const queuePausedByShutdown = session?.queuePausedByShutdown === true;
 	const queueControls = session?.queueControls === true;
 	const harness = session?.harness;
 	const turnId = runningTurnId(chat.snapshot.turns);
@@ -303,6 +316,7 @@ export const ChatSessionView = forwardRef<
 			running: turnId !== null,
 			queued,
 			queuePaused,
+			queuePausedByShutdown,
 			queueControls,
 			selectMode: (modeId) => actionsRef.current.selectMode(modeId),
 			stop: () => actionsRef.current.stop(),
@@ -318,6 +332,7 @@ export const ChatSessionView = forwardRef<
 		turnId,
 		queued,
 		queuePaused,
+		queuePausedByShutdown,
 		queueControls,
 	]);
 	useEffect(
@@ -333,8 +348,8 @@ export const ChatSessionView = forwardRef<
 				chat.sendPrompt([
 					...(text.trim() ? [{ type: "text" as const, text }] : []),
 					...attachments.map((attachment) => ({
-						type: "attachment" as const,
 						...attachment,
+						type: "attachment" as const,
 					})),
 				]);
 			},
@@ -369,7 +384,7 @@ export const ChatSessionView = forwardRef<
 	}, [openActivityKey, rows, chat.snapshot]);
 
 	const renderRow = useCallback(
-		({ item: row, index }: { item: ChatRow; index: number }) => {
+		({ item: { row, text }, index }: { item: TextRow; index: number }) => {
 			const position = positions[index] ?? "single";
 			const parent =
 				row.kind === "item"
@@ -392,13 +407,7 @@ export const ChatSessionView = forwardRef<
 						onRetryPrompt={chat.retryPrompt}
 						isLastReply={replyEnds.has(row.key)}
 						row={row}
-						text={
-							row.kind === "item" &&
-							(row.item.kind === "agent_message" ||
-								row.item.kind === "reasoning")
-								? displayText(chat.snapshot, row.item.id)
-								: ""
-						}
+						text={text}
 					/>
 				</View>
 			);
@@ -443,8 +452,8 @@ export const ChatSessionView = forwardRef<
 							paddingTop: headerHeight + 16 + (banner ? BANNER_SPACE : 0),
 							paddingHorizontal: columnInset,
 						}}
-						data={rows}
-						keyExtractor={(row) => row.key}
+						data={textRows}
+						keyExtractor={({ row }) => row.key}
 						ListHeaderComponent={
 							chat.hasOlder ? (
 								<Pressable

@@ -3,7 +3,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { presencePeople } from "@superset/shared/page-presence";
 import { useMemo } from "react";
-import { useNow } from "../../hooks/useNow";
+import { useNow } from "../../../../hooks/use-now";
 import {
 	usePresenceViewers,
 	usePresenceVisitors,

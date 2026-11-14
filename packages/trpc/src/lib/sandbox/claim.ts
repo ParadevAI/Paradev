@@ -17,7 +17,7 @@ import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
 	type SandboxRepository,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
 import {

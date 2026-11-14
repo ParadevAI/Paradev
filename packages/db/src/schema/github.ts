@@ -14,7 +14,7 @@ import { organizations, users } from "./auth";
 
 /**
  * GitHub App installations linked to Superset organizations.
- * One organization can have one GitHub installation.
+ * One organization can connect several GitHub accounts, one row each.
  */
 export const githubInstallations = pgTable(
 	"github_installations",
@@ -52,7 +52,7 @@ export const githubInstallations = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		unique("github_installations_org_unique").on(table.organizationId),
+		index("github_installations_org_id_idx").on(table.organizationId),
 		index("github_installations_installation_id_idx").on(table.installationId),
 	],
 );

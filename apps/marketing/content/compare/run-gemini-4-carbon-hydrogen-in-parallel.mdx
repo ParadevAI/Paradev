@@ -1,0 +1,153 @@
+---
+title: "How to Run Gemini 4 Carbon and Hydrogen in Parallel"
+description: "Google released Gemini 4 Carbon on November 10, 2026 and Gemini 4 Hydrogen on November 12. How to pick them in the Antigravity CLI, run several sessions at once in separate Git worktrees, and do the same in Paradev."
+date: 2026-11-13
+lastUpdated: 2026-11-13
+type: "tutorial"
+competitors:
+  - antigravity
+  - git-worktrees
+keywords:
+  - gemini 4 carbon
+  - gemini 4 hydrogen
+  - run gemini 4 carbon in parallel
+  - gemini-4-carbon
+  - gemini-4-hydrogen
+  - antigravity cli agy
+  - antigravity swarm
+  - gemini 4 orchestrator
+---
+
+To run Gemini 4 Carbon or Gemini 4 Hydrogen in parallel, start one Antigravity CLI (`agy`) session per task, each in its own Git worktree and branch, and launch each with `agy --model gemini-4-carbon` or `agy --model gemini-4-hydrogen`. Inside one session, Antigravity's `/swarm` preview splits a single large task across parallel workers. In Paradev, create one workspace per task and start `agy` with the model you want, then review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+
+## What shipped
+
+Google released two Gemini 4 models in the same week, both aimed at coding agents:
+
+| | Gemini 4 Carbon | Gemini 4 Hydrogen |
+|---|---|---|
+| **Released** | [November 10, 2026](https://blog.google/innovation-and-ai/technology/developers-tools/gemini-4-carbon-developers/) | [November 12, 2026](https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-hydrogen/) |
+| **Google's pitch** | Strongest model for long-horizon software engineering and cybersecurity | Cost-efficient model for everyday coding and agent work |
+| **API model id** | `gemini-4-carbon` | `gemini-4-hydrogen` |
+| **API price** | $2 per million input tokens, $10 per million output tokens (introductory rate through November 30, 2026) | $1.50 per million input tokens, $7.50 per million output tokens; also on the free tier |
+| **Thinking levels** | Set with effort | `low`, `medium`, `high` (default), and a new `xhigh` |
+| **In Antigravity** | Google AI Ultra | Google AI Pro and Ultra |
+
+API ids and prices come from the [Gemini API release notes](https://aistudio.google.com/docs/changelog). Google says Carbon ranks first on CursorBench 4.0 and Hydrogen scores 57% on Terminal-Bench 4.1. These figures come from Google and are not independently checked.
+
+Two Antigravity features shipped with them:
+
+- **`/swarm`** (preview, November 10): a coordinator starts parallel workers, each in its own Git worktree, plus verifier agents that run tests and challenge diffs. Agents share a message board, and each agent can be pinned to a different model. Google warns that swarms use quota much faster than a normal chat.
+- **Orchestrator** (November 12): a model choice that hands one task back and forth between Carbon, which plans and explores, and Hydrogen, which edits and runs tests. It is one task with two models, not parallel agents.
+
+Gemini CLI is not the place to run these models. Its [README](https://github.com/google-gemini/gemini-cli) says it is not tuned for the Gemini 4 series and points to the Antigravity CLI instead.
+
+## Pick Gemini 4 in the Antigravity CLI
+
+Update the CLI and list the models your account can use. The list depends on your Google AI plan, and `agy` rejects a model your account does not include:
+
+```bash
+agy update
+agy models
+```
+
+Then start a session on the model you want:
+
+```bash
+agy --model gemini-4-carbon --effort high
+agy --model gemini-4-hydrogen --effort xhigh
+```
+
+`--effort` sets the thinking level for the session. Omit it to use the model's default.
+
+## Run several Gemini 4 sessions at once
+
+There are two ways to get parallel work, and they solve different problems.
+
+**`/swarm` splits one big task.** Type `/swarm` in an `agy` session and describe the job. The coordinator decides how many workers to start and gives each its own worktree. Use `/swarm board` (or Alt+S in the CLI) to watch the board. This fits a single large change, such as a migration across many packages.
+
+**Separate sessions run separate tasks.** For unrelated tasks, give each one its own worktree, branch, and `agy` session:
+
+```bash
+git worktree add -b ai/carbon-migration ../repo-carbon-migration
+git worktree add -b ai/hydrogen-tests ../repo-hydrogen-tests
+
+cd ../repo-carbon-migration && agy --model gemini-4-carbon
+cd ../repo-hydrogen-tests && agy --model gemini-4-hydrogen
+```
+
+Run each in its own terminal. A common split is Carbon on the one hard, long task and Hydrogen on the bounded ones next to it, since Hydrogen costs less per token. Give each task a clear stop condition:
+
+```text
+Task A: Move the billing module from callbacks to async/await. Keep the
+public API the same. Run the billing tests after each file. Stop and
+report when all billing tests pass. Do not commit.
+
+Task B: Add regression tests for the date parser. Change only test files.
+Run the focused test command and report the result. Do not commit.
+```
+
+Check each session with `git branch --show-current` before it starts editing.
+
+### What worktrees do not separate
+
+Worktrees share repository history and run as your user. They do not give each task its own ports, database, credentials, or API quota, and parallel Gemini sessions draw on the same Google AI plan limits. Two sessions can still change the same external service, and their branches can still conflict when you merge. Rerun your checks on the combined branch.
+
+## Run Gemini 4 Carbon and Hydrogen in Paradev
+
+Paradev is a desktop app that runs the Antigravity CLI, Claude Code, Codex, and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: `agy` runs on your own Google AI plan. Paradev is open source under the MIT License.
+
+From the app:
+
+1. Create a new workspace for each task.
+2. In the workspace terminal, start `agy --model gemini-4-carbon` or `agy --model gemini-4-hydrogen`, and give it the task.
+3. Repeat for the next task. Each workspace keeps its own branch and terminal.
+4. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
+
+From the `superset` CLI, start a batch of workspaces with `--command`, which runs a shell command in the new workspace, and group them with a tag:
+
+```bash
+superset ws create --local --project PROJECT_ID --name carbon-migration \
+  --branch ai/carbon-migration --tag gemini-4 \
+  --command "agy --mode accept-edits --model gemini-4-carbon -i 'Move the billing module from callbacks to async/await'"
+
+superset ws create --local --project PROJECT_ID --name hydrogen-tests \
+  --branch ai/hydrogen-tests --tag gemini-4 \
+  --command "agy --mode accept-edits --model gemini-4-hydrogen -i 'Add regression tests for the date parser'"
+
+superset ws list --local --tag gemini-4
+```
+
+`-i` starts `agy` with an initial prompt and keeps the session open. Tagged workspaces collect in a sidebar folder with the tag's name.
+
+To see whether Carbon is worth its price on your code, create two workspaces with the same prompt, one on Carbon and one on Hydrogen, and compare the diffs. You can also run the same prompt with Claude Code or Codex in a third workspace. Long runs do not need your laptop open: run them on a host you added through Remote Access, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud), and check on them from the [iPhone and iPad app](/mobile).
+
+## Frequently Asked Questions
+
+### Which plan do I need for Gemini 4 Carbon in Antigravity?
+
+Google AI Ultra. Hydrogen is available on Google AI Pro and Ultra. On the Gemini API, both are available on the paid tier, and Hydrogen is also on the free tier.
+
+### Can I use Gemini 4 in Gemini CLI?
+
+Google's Gemini CLI README says it is not tuned for the Gemini 4 series and recommends the Antigravity CLI (`agy`) for Gemini 4 models.
+
+### What is the difference between /swarm and Orchestrator?
+
+`/swarm` runs many agents in parallel, each in its own worktree, on one large task. Orchestrator is a single task that passes control between Carbon and Hydrogen. Neither replaces separate sessions for unrelated tasks.
+
+### How much does Gemini 4 Carbon cost?
+
+On the Gemini API, $2 per million input tokens and $10 per million output tokens at the introductory rate through November 30, 2026. Hydrogen is $1.50 and $7.50. In Antigravity, usage counts toward your Google AI plan limits.
+
+### Do parallel Gemini 4 sessions share files?
+
+Not if each runs in its own Git worktree. They still share ports, databases, credentials, and your plan's usage limits, and their branches can conflict when merged.
+
+### Can I mix Gemini 4 with Claude Code or Codex?
+
+Yes. In Paradev, each workspace runs the agent and model you choose, so an `agy` session on Gemini 4 Carbon can run next to Claude Code, Codex, or OpenCode on the same repository.
+
+### Where can I read more?
+
+See [Paradev vs Google Antigravity](/compare/superset-vs-antigravity), [How to run Claude Fable 5.2 in parallel](/compare/run-claude-fable-5-2-in-parallel), and [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).

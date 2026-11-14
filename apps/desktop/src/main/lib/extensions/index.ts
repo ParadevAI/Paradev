@@ -3,9 +3,9 @@ import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { app, session } from "electron";
 import { env } from "main/env.main";
+import { APP_PARTITION, BROWSER_PARTITION } from "shared/constants";
 import { getChromiumUserDataDirs } from "../browser/chromium-profiles";
 
-const APP_PARTITION = "persist:superset";
 const REACT_DEVTOOLS_EXTENSION_ID = "fmkadmapgofadopljbjfkapdkoienihi";
 
 function safeReadDir(pathname: string): string[] {
@@ -175,7 +175,7 @@ export async function loadWebviewBrowserExtension(): Promise<void> {
 
 	try {
 		await session
-			.fromPartition(APP_PARTITION)
+			.fromPartition(BROWSER_PARTITION)
 			.extensions.loadExtension(extensionPath);
 		console.log("[main] Browser extension loaded");
 	} catch (error) {

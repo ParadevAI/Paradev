@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { ChangesScopeControl } from "../../../../../../components/ChangesScopeControl";
-import { DiffStatText } from "../../../../../../components/DiffStatText";
 import type { DiffPaneFilter } from "../../../../../../types";
 import { useChangesScope } from "../../../../../useChangesScope";
 
@@ -45,6 +45,8 @@ export function DiffPaneScope({
 					currentBranchName={status.currentBranch.name}
 					canRenameBranch={scope.canRenameBranch}
 					onRenameBranch={scope.renameBranch}
+					baseClassName="hidden @min-[420px]/pane-header:flex"
+					commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
 				/>
 			)}
 			{filter && (
@@ -65,7 +67,7 @@ export function DiffPaneScope({
 					</button>
 				</span>
 			)}
-			<span className="ml-1 shrink-0 whitespace-nowrap text-[11px] tabular-nums">
+			<span className="ml-1 hidden shrink-0 whitespace-nowrap text-[11px] tabular-nums @min-[360px]/pane-header:inline">
 				<DiffStatText additions={additions} deletions={deletions} />
 			</span>
 		</div>

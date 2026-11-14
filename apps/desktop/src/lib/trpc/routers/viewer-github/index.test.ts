@@ -69,4 +69,99 @@ describe("viewer GitHub on this machine", () => {
 		});
 		expect(tokensUsed).toEqual(["local-token"]);
 	});
+
+	test("losing the connection to GitHub is unavailability, not a bug", async () => {
+		const { call } = caller("local-token", {
+			graphql: (async () => {
+				throw Object.assign(new Error("Connect Timeout Error"), {
+					status: 500,
+					cause: Object.assign(new TypeError("fetch failed"), {
+						cause: Object.assign(new Error("Connect Timeout Error"), {
+							code: "UND_ERR_CONNECT_TIMEOUT",
+						}),
+					}),
+				});
+			}) as unknown as Octokit["graphql"],
+		});
+		await expect(
+			call.getPullRequestStack({ repoFullName: "acme/widgets", number: 7 }),
+		).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
+	});
+
+	test("a server error that GitHub answers with stays an internal error", async () => {
+		const { call } = caller("local-token", {
+			graphql: (async () => {
+				throw Object.assign(new Error("Server Error"), { status: 502 });
+			}) as unknown as Octokit["graphql"],
+		});
+		await expect(
+			call.getPullRequestStack({ repoFullName: "acme/widgets", number: 7 }),
+		).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR" });
+	});
+
+	test("a background merge that GitHub rejects surfaces GitHub's reason as a conflict", async () => {
+		const { call } = caller("local-token", {
+			request: (async () => ({
+				data: { status: "failed", details: { message: "#12 is a draft" } },
+			})) as unknown as Octokit["request"],
+		});
+		await expect(
+			call.requestPullRequestMerge({
+				repoFullName: "acme/widgets",
+				number: 7,
+				mergeAction: "merge_queue",
+			}),
+		).rejects.toMatchObject({ code: "CONFLICT", message: "#12 is a draft" });
+	});
+
+	test("signs a private attachment with the local token, and gives null without one", async () => {
+		const attachment =
+			"https://github.com/user-attachments/assets/eba1526e-7388-4ed6-b058-c2ffcca091dd";
+		const signedWith: string[] = [];
+		const routerFor = (token: string | null) =>
+			createViewerGithubRouter(
+				{ getToken: async () => token },
+				() => ({}) as Octokit,
+				() => 0,
+				async (_url, used) => {
+					signedWith.push(used);
+					return "https://signed.example/shot.png";
+				},
+			).createCaller({} as never);
+
+		expect(
+			await routerFor("local-token").getAttachmentUrl({ url: attachment }),
+		).toEqual({ url: "https://signed.example/shot.png" });
+		expect(await routerFor(null).getAttachmentUrl({ url: attachment })).toEqual(
+			{ url: null },
+		);
+		expect(signedWith).toEqual(["local-token"]);
+		await expect(
+			routerFor("local-token").getAttachmentUrl({
+				url: "https://example.com/x.png",
+			}),
+		).rejects.toMatchObject({ code: "BAD_REQUEST" });
+	});
+
+	test("without a login, failed attachments look the login up once per window", async () => {
+		let lookups = 0;
+		const call = createViewerGithubRouter(
+			{
+				getToken: async () => {
+					lookups++;
+					return null;
+				},
+			},
+			() => ({}) as Octokit,
+			() => 0,
+		).createCaller({} as never);
+		for (const id of ["0", "1", "2"]) {
+			expect(
+				await call.getAttachmentUrl({
+					url: `https://github.com/user-attachments/assets/eba1526e-7388-4ed6-b058-c2ffcca091d${id}`,
+				}),
+			).toEqual({ url: null });
+		}
+		expect(lookups).toBe(1);
+	});
 });

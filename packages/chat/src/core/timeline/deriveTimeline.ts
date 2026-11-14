@@ -5,11 +5,14 @@ import type {
 	ToolCall,
 	UserMessage,
 } from "../../protocol/items";
+import { claudeBookkeeping } from "../bookkeeping/claude";
 import type { SessionSnapshot, StoredItem } from "../reducer/reducer";
+import { type UserStop, userStopOf, userStopReply } from "../userStop/userStop";
 
 export type TimelineEntry =
 	| { kind: "item"; item: Item }
-	| { kind: "tool_run"; items: ToolCall[] };
+	| { kind: "tool_run"; items: ToolCall[] }
+	| { kind: "user_stop"; item: UserMessage; stop: UserStop };
 
 export type TurnGroup = {
 	turn: Turn | null;
@@ -26,7 +29,41 @@ function isToolCall(item: Item): item is ToolCall {
 	return item.kind === "tool_call";
 }
 
-export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
+/** The agent reports a command it was stopped in as failed. */
+function stoppedCall(call: ToolCall): ToolCall {
+	return call.status === "failed" ? { ...call, status: "canceled" } : call;
+}
+
+/** A replay opens a turn at the stop note, so the calls it stopped end the turn before. */
+function stopTrailingCalls(entries: TimelineEntry[]): void {
+	for (let index = entries.length - 1; index >= 0; index--) {
+		const entry = entries[index];
+		if (entry?.kind === "tool_run") {
+			entries[index] = {
+				kind: "tool_run",
+				items: entry.items.map(stoppedCall),
+			};
+		} else if (entry?.kind === "item" && isToolCall(entry.item)) {
+			entries[index] = { kind: "item", item: stoppedCall(entry.item) };
+		} else {
+			return;
+		}
+	}
+}
+
+function isStopReply(item: Item, harness: string | undefined): boolean {
+	return (
+		harness !== undefined &&
+		claudeBookkeeping.harnesses.includes(harness) &&
+		item.kind === "agent_message" &&
+		userStopReply((item as { text?: string }).text ?? "")
+	);
+}
+
+export function collapseWorkLog(
+	items: readonly Item[],
+	harness?: string,
+): TimelineEntry[] {
 	const entries: TimelineEntry[] = [];
 	let run: ToolCall[] = [];
 
@@ -43,8 +80,15 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 			run.push(item);
 			continue;
 		}
+		const stop = userStopOf(item, harness);
+		if (stop) run = run.map(stoppedCall);
 		flush();
-		entries.push({ kind: "item", item });
+		if (isStopReply(item, harness)) continue;
+		entries.push(
+			stop
+				? { kind: "user_stop", item: item as UserMessage, stop }
+				: { kind: "item", item },
+		);
 	}
 	flush();
 	return entries;
@@ -52,6 +96,8 @@ export function collapseWorkLog(items: readonly Item[]): TimelineEntry[] {
 
 export type DeriveTimelineOptions = {
 	nestChildItems?: boolean;
+	/** `SessionState.harness`. A stop marker counts only in the harness that writes it. */
+	harness?: string;
 };
 
 export function deriveTimeline(
@@ -79,7 +125,7 @@ export function deriveTimeline(
 		groups.push({
 			turn: snapshot.turns.get(turnId) ?? null,
 			turnId,
-			entries: collapseWorkLog(items),
+			entries: collapseWorkLog(items, options?.harness),
 		});
 	}
 
@@ -89,15 +135,20 @@ export function deriveTimeline(
 		if (aStart !== bStart) return aStart - bStart;
 		return a.turnId < b.turnId ? -1 : a.turnId > b.turnId ? 1 : 0;
 	});
+	for (const [index, group] of groups.entries()) {
+		if (groups[index + 1]?.entries[0]?.kind === "user_stop") {
+			stopTrailingCalls(group.entries);
+		}
+	}
 	return groups;
 }
 
 function firstItemStart(group: TurnGroup): number {
 	const first = group.entries[0];
 	if (!first) return Number.MAX_SAFE_INTEGER;
-	return first.kind === "item"
-		? first.item.startedAtMs
-		: (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER);
+	return first.kind === "tool_run"
+		? (first.items[0]?.startedAtMs ?? Number.MAX_SAFE_INTEGER)
+		: first.item.startedAtMs;
 }
 
 export function deriveChildrenByParent(
@@ -139,7 +190,7 @@ export function derivePendingApprovals(
 	return pending;
 }
 
-function isPendingApproval(item: Item): boolean {
+export function isPendingApproval(item: Item): boolean {
 	return (
 		item.kind === "approval_request" &&
 		(item as ApprovalRequest).status === "pending"

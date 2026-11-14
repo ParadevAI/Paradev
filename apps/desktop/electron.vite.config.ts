@@ -1,13 +1,13 @@
 import { resolve } from "node:path";
+import babel from "@rolldown/plugin-babel";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import reactPlugin from "@vitejs/plugin-react";
+import reactPlugin, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { config } from "dotenv";
-import { defineConfig, externalizeDepsPlugin } from "electron-vite";
+import { defineConfig } from "electron-vite";
 import injectProcessEnvPlugin from "rollup-plugin-inject-process-env";
-import tsconfigPathsPlugin from "vite-tsconfig-paths";
-import { dependencies, resources, version } from "./package.json";
+import { resources, version } from "./package.json";
 import { mainExternalizedDependencies } from "./runtime-dependencies";
 import {
 	copyResourcesPlugin,
@@ -24,14 +24,6 @@ const DEV_SERVER_PORT = Number(process.env.DESKTOP_VITE_PORT);
 
 // Validate required env vars at build time using the Zod schema (single source of truth)
 await import("./src/main/env.main");
-
-const tsconfigPaths = tsconfigPathsPlugin({
-	projects: [resolve("tsconfig.json")],
-});
-
-const workspaceDependencies = Object.keys(dependencies).filter((dependency) =>
-	dependency.startsWith("@superset/"),
-);
 
 // Sentry plugin for uploading sourcemaps (only in CI with auth token)
 const sentryPlugin = process.env.SENTRY_AUTH_TOKEN
@@ -63,7 +55,7 @@ const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
 
 export default defineConfig({
 	main: {
-		plugins: [tsconfigPaths, linguiMacroPlugin(), copyResourcesPlugin()],
+		plugins: [linguiMacroPlugin(), copyResourcesPlugin()],
 
 		define: {
 			"process.env.NODE_ENV": defineEnv(process.env.NODE_ENV, "production"),
@@ -129,6 +121,7 @@ export default defineConfig({
 
 		build: {
 			sourcemap: true,
+			externalizeDeps: false,
 			rollupOptions: {
 				input: {
 					index: resolve("src/main/index.ts"),
@@ -155,6 +148,7 @@ export default defineConfig({
 			},
 		},
 		resolve: {
+			tsconfigPaths: true,
 			alias: {
 				// @xterm/headless 6.0.0 has a packaging bug: `module` field points to
 				// non-existent `lib/xterm.mjs`. Force Vite to use the CJS entry instead.
@@ -164,16 +158,7 @@ export default defineConfig({
 	},
 
 	preload: {
-		plugins: [
-			tsconfigPaths,
-			externalizeDepsPlugin({
-				exclude: [
-					"trpc-electron",
-					"@sentry/electron",
-					...workspaceDependencies,
-				],
-			}),
-		],
+		resolve: { tsconfigPaths: true },
 
 		define: {
 			"process.env.NODE_ENV": defineEnv(process.env.NODE_ENV, "production"),
@@ -186,9 +171,13 @@ export default defineConfig({
 
 		build: {
 			outDir: resolve(devPath, "preload"),
+			externalizeDeps: false,
 			rollupOptions: {
 				input: {
 					index: resolve("src/preload/index.ts"),
+					"browser-extension-shims": resolve(
+						"src/preload/browser-extension-shims.ts",
+					),
 				},
 			},
 		},
@@ -267,14 +256,17 @@ export default defineConfig({
 				routeFileIgnorePattern:
 					"^(?!(__root|page|layout)\\.tsx$).*\\.(tsx?|jsx?)$",
 			}),
-			tsconfigPaths,
 			tailwindcss(),
-			reactPlugin({
-				// Compiles @lingui/react/macro (Trans, useLingui) at build time.
-				babel: { plugins: ["@lingui/babel-plugin-lingui-macro"] },
+			reactPlugin(),
+			// Babel runs plugins before presets, so the macro sees `t` calls before the compiler rewrites them.
+			babel({
+				plugins: ["@lingui/babel-plugin-lingui-macro"],
+				presets: [reactCompilerPreset()],
 			}),
 			htmlEnvTransformPlugin(),
 		],
+
+		resolve: { tsconfigPaths: true },
 
 		worker: {
 			format: "es",

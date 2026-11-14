@@ -12,6 +12,7 @@ import { useTaskTracker } from "renderer/hooks/useTaskTracker";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import type { StatusType } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/components/shared/StatusIcon";
 import { TASK_PICKER_INPUT } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/hooks/useTasksData";
+import { withSearchMatches } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/utils/withSearchMatches";
 import { linkedIssueFromLinear } from "renderer/routes/_authenticated/utils/linkedIssueFromLinear";
 import type { LinkedIssue } from "renderer/stores/new-workspace-draft";
 import {
@@ -91,8 +92,14 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 					emptyState: t({ message: "No matching tasks" }),
 					search: async (query) => {
 						const includeClosed = query !== "";
-						const [page, statuses] = await Promise.all([
+						const [page, searched, statuses] = await Promise.all([
 							cloudUtils.task.listPage.fetch(TASK_PICKER_INPUT),
+							query
+								? cloudUtils.task.listPage.fetch({
+										...TASK_PICKER_INPUT,
+										search: query,
+									})
+								: undefined,
 							cloudUtils.task.statuses.list.fetch(),
 						]);
 						const closed = new Set(
@@ -100,7 +107,7 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 								.filter((status) => isClosedStatus(status.type as StatusType))
 								.map((status) => status.id),
 						);
-						const open = page.items
+						const open = withSearchMatches(page.items, searched?.items)
 							.map(({ task }) => task)
 							.filter(
 								(task) =>

@@ -15,6 +15,7 @@ import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
 import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { COMPANY } from "@superset/shared/constants";
 import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
@@ -113,7 +114,7 @@ const desktopDevOrigins =
 		: [];
 
 export const auth = betterAuth({
-	baseURL: env.NEXT_PUBLIC_API_URL,
+	baseURL: getBrowserApiUrl(env),
 	secret: env.BETTER_AUTH_SECRET,
 	onAPIError: {
 		// Without this, production better-auth sends OAuth failures to the API root, a 404.
@@ -129,6 +130,7 @@ export const auth = betterAuth({
 		...withOwnDomainTwins([
 			env.NEXT_PUBLIC_WEB_URL,
 			env.NEXT_PUBLIC_API_URL,
+			getBrowserApiUrl(env),
 			env.NEXT_PUBLIC_MARKETING_URL,
 			env.NEXT_PUBLIC_ADMIN_URL,
 			env.NEXT_PUBLIC_DESKTOP_URL,

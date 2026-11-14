@@ -4,6 +4,9 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./legacy-integration-connect": "./src/legacy-integration-connect/index.ts",
+		"./domain-move": "./src/domain-move/index.ts",
+		"./browser-api-url": "./src/browser-api-url.ts",
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
 			"default": "./src/agent-routines.ts"
@@ -11,6 +14,10 @@
 		"./project-config": {
 			"types": "./src/project-config/index.ts",
 			"default": "./src/project-config/index.ts"
+		},
+		"./project-config/dir": {
+			"types": "./src/project-config/dir.ts",
+			"default": "./src/project-config/dir.ts"
 		},
 		"./oauth-refresh": {
 			"types": "./src/oauth-refresh.ts",
@@ -68,6 +75,10 @@
 		"./page-tools-runtime": {
 			"types": "./src/page-tools-runtime.ts",
 			"default": "./src/page-tools-runtime.ts"
+		},
+		"./move-book": {
+			"types": "./src/move-book/index.ts",
+			"default": "./src/move-book/index.ts"
 		},
 		"./page-storage-hub": {
 			"types": "./src/page-storage-hub.ts",
@@ -181,13 +192,13 @@
 			"types": "./src/plugins/index.ts",
 			"default": "./src/plugins/index.ts"
 		},
-		"./sandbox-regions": {
-			"types": "./src/sandbox-regions.ts",
-			"default": "./src/sandbox-regions.ts"
+		"./sandbox/regions": {
+			"types": "./src/sandbox/regions.ts",
+			"default": "./src/sandbox/regions.ts"
 		},
-		"./sandbox-contract": {
-			"types": "./src/sandbox-contract.ts",
-			"default": "./src/sandbox-contract.ts"
+		"./sandbox/contract": {
+			"types": "./src/sandbox/contract.ts",
+			"default": "./src/sandbox/contract.ts"
 		},
 		"./pull-request-diff": {
 			"types": "./src/pull-request-diff/index.ts",
@@ -197,6 +208,10 @@
 			"types": "./src/pull-request.ts",
 			"default": "./src/pull-request.ts"
 		},
+		"./github-attachment": {
+			"types": "./src/github-attachment/index.ts",
+			"default": "./src/github-attachment/index.ts"
+		},
 		"./pull-request-github": {
 			"types": "./src/pull-request-github/index.ts",
 			"default": "./src/pull-request-github/index.ts"
@@ -204,6 +219,18 @@
 		"./pull-request-detail": {
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
+		},
+		"./pull-request-merge-methods": {
+			"types": "./src/pull-request-merge-methods/index.ts",
+			"default": "./src/pull-request-merge-methods/index.ts"
+		},
+		"./pull-request-stack": {
+			"types": "./src/pull-request-stack/index.ts",
+			"default": "./src/pull-request-stack/index.ts"
+		},
+		"./pull-request-async-merge": {
+			"types": "./src/pull-request-async-merge/index.ts",
+			"default": "./src/pull-request-async-merge/index.ts"
 		},
 		"./pull-request-checks": {
 			"types": "./src/pull-request-checks/index.ts",
@@ -213,9 +240,21 @@
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
 		},
-		"./sandbox-gate": {
-			"types": "./src/sandbox-gate.ts",
-			"default": "./src/sandbox-gate.ts"
+		"./sandbox/gate": {
+			"types": "./src/sandbox/gate.ts",
+			"default": "./src/sandbox/gate.ts"
+		},
+		"./sandbox/access": {
+			"types": "./src/sandbox/access.ts",
+			"default": "./src/sandbox/access.ts"
+		},
+		"./sandbox/reach": {
+			"types": "./src/sandbox/reach.ts",
+			"default": "./src/sandbox/reach.ts"
+		},
+		"./sandbox/watch": {
+			"types": "./src/sandbox/watch.ts",
+			"default": "./src/sandbox/watch.ts"
 		},
 		"./sentry": {
 			"types": "./src/sentry.ts",
@@ -345,6 +384,10 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./box-pressure": {
+			"types": "./src/box-pressure.ts",
+			"default": "./src/box-pressure.ts"
+		},
 		"./workspace-launch": {
 			"types": "./src/workspace-launch/index.ts",
 			"default": "./src/workspace-launch/index.ts"
@@ -372,6 +415,10 @@
 		"./workspace-attachments": {
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"
+		},
+		"./workspace-attachments-dir": {
+			"types": "./src/workspace-attachments-dir.ts",
+			"default": "./src/workspace-attachments-dir.ts"
 		},
 		"./agent-permissions-migration": {
 			"types": "./src/agent-permissions-migration.ts",
@@ -508,6 +555,10 @@
 		"./missing-procedure-error": {
 			"types": "./src/missing-procedure-error.ts",
 			"default": "./src/missing-procedure-error.ts"
+		},
+		"./automation-group": {
+			"types": "./src/automation-group.ts",
+			"default": "./src/automation-group.ts"
 		}
 	},
 	"scripts": {
@@ -517,7 +568,7 @@
 	},
 	"dependencies": {
 		"@date-fns/tz": "1.4.1",
-		"@lingui/core": "6.8.0",
+		"@lingui/core": "6.12.0",
 		"@superset/i18n": "workspace:*",
 		"culori": "4.0.2",
 		"drizzle-orm": "0.45.2",
@@ -525,14 +576,16 @@
 		"jose": "6.2.13",
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
+		"shell-quote": "1.11.0",
 		"smol-toml": "1.9.1",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/culori": "4.0.1",
 		"@types/friendly-words": "1.2.2",
 		"@types/semver": "7.7.1",
+		"@types/shell-quote": "1.7.5",
 		"@xterm/xterm": "6.1.0-beta.315",
 		"bun-types": "1.4.3",
 		"typescript": "7.0.2"

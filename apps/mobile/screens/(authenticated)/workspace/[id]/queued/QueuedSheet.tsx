@@ -13,6 +13,7 @@ export function QueuedSheet() {
 	const {
 		queued,
 		queuePaused,
+		queuePausedByShutdown,
 		queueControls,
 		steerQueued,
 		removeQueued,
@@ -47,6 +48,7 @@ export function QueuedSheet() {
 						router.back();
 					}}
 					paused={queuePaused}
+					pausedByShutdown={queuePausedByShutdown}
 					prompts={queued}
 				/>
 			</ScrollView>

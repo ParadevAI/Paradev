@@ -80,7 +80,7 @@ export default function supersetAmpLifecyclePlugin(amp: AmpApi) {
 		return;
 	}
 
-	const supersetHome = env.SUPERSET_HOME_DIR || join(homedir(), ".superset");
+	const supersetHome = env.SUPERSET_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
 	const notifyPath = join(supersetHome, "hooks", "notify.sh");
 	if (!existsSync(notifyPath)) {
 		debugLog("disabled: notify hook missing at " + notifyPath);

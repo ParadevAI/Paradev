@@ -150,7 +150,7 @@ export const SETTINGS: SettingDefinition[] = [
 		section: "git",
 		store: "hostService",
 		description:
-			"Directory where workspace worktrees are created (default: ~/.superset/worktrees)",
+			"Directory where workspace worktrees are created (default: ~/.paradev/worktrees)",
 		defaultValue: null,
 	},
 	// Notifications
@@ -376,7 +376,10 @@ export const EXCLUDED_SETTINGS_COLUMNS: Record<string, string> = {
 	agentPresetPermissionsMigratedAt: "internal migration marker",
 	disabledAgentHooks: "agent-id list; use the app UI",
 	disabledSkills: "skill-name list; use the app's Plugins page",
-	installedPlugins: "structured install records; use the app's Plugins page",
+	installedPlugins:
+		"legacy install list; the app copies it into installed_plugins.json, retained for rollback",
+	browserPinnedExtensions:
+		"extension-id list; pin from the browser pane's Extensions menu",
 	terminalPersistence: "dead column; nothing reads it, retained for rollback",
 	deleteLocalBranch: "v2 reads renderer localStorage, unreachable externally",
 	exposeHostServiceViaRelay:

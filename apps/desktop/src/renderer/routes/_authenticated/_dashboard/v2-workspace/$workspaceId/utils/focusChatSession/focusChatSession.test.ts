@@ -6,7 +6,7 @@ import {
 	markChatSessionClosed,
 } from "../closedChatSessions";
 import { addPendingChatStop, readPendingChatStops } from "../pendingChatStops";
-import { focusChatSession } from "./focusChatSession";
+import { addChatTab, focusChatSession } from "./focusChatSession";
 
 const session = {
 	sessionId: "chat-1",
@@ -68,5 +68,25 @@ describe("focusChatSession", () => {
 				session: { ...session, sessionId: "chat-2", presetId: "codex" },
 			}),
 		).toBe("added");
+	});
+
+	it("adds a chat tab even when a pane shows the same agent session", () => {
+		const store = newStore();
+		focusChatSession({ store, session });
+		store.getState().addTab({
+			panes: [{ kind: "terminal", data: { terminalId: "active" } }],
+		});
+		addChatTab({
+			store,
+			session: { ...session, sessionId: "chat-resumed", terminalId: "t-2" },
+			focus: false,
+		});
+		const tabs = store.getState().tabs;
+		expect(tabs).toHaveLength(3);
+		expect(Object.values(tabs[2]?.panes ?? {})[0]?.data).toMatchObject({
+			sessionId: "chat-resumed",
+			terminalId: "t-2",
+			agent: { id: "claude", sessionId: "native-1" },
+		});
 	});
 });

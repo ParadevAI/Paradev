@@ -31,6 +31,7 @@ import {
 	type ConnectionState,
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRevealInFinder";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -47,27 +48,27 @@ import { useTheme } from "renderer/stores/theme";
 import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 import { isWithinWorkspacePath } from "shared/absolute-paths";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { useSendAttachments } from "../../hooks/useSendAttachments";
 import {
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
-	terminalPullRequestLinkAction,
+	terminalUrlLinkAction,
 } from "../../utils/runTerminalLinkAction";
-import {
-	PasteUploadLimitError,
-	uploadPastedFiles,
-} from "../../utils/uploadPastedFiles";
+import { AttachmentLimitError } from "../../utils/sendAttachmentsToWorkspace";
 import { LinkActionMenu } from "./components/LinkActionMenu";
 import { TerminalAgentAutoResume } from "./components/TerminalAgentAutoResume";
 import { TerminalCopiedIndicator } from "./components/TerminalCopiedIndicator";
 import { TerminalNarrowedBanner } from "./components/TerminalNarrowedBanner";
 import { TerminalRichInput } from "./components/TerminalRichInput";
+import { TerminalSessionEndedFooter } from "./components/TerminalSessionEndedFooter";
 import { terminalContextMenuLinkStore } from "./contextMenuLinkStore";
 import { useCopyOnSelect } from "./hooks/useCopyOnSelect";
 import { useLinkActionMenu } from "./hooks/useLinkActionMenu";
 import { type HoveredLink, useLinkHoverState } from "./hooks/useLinkHoverState";
 import { useTerminalInterruptClear } from "./hooks/useTerminalInterruptClear";
+import { useTerminalSessionEnd } from "./hooks/useTerminalSessionEnd";
 import {
 	terminalRichInputOpenStore,
 	useTerminalRichInputOpen,
@@ -79,6 +80,7 @@ interface TerminalPaneProps {
 	workspaceId: string;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
+	onNewShell: () => Promise<void>;
 }
 
 export function TerminalPane({
@@ -86,6 +88,7 @@ export function TerminalPane({
 	workspaceId,
 	onOpenFile,
 	onRevealPath,
+	onNewShell,
 }: TerminalPaneProps) {
 	const { t } = useLingui();
 	const filePolicy = useTerminalFilePolicy();
@@ -197,6 +200,25 @@ export function TerminalPane({
 		[terminalId, terminalInstanceId],
 	);
 	const connectionState = useSyncExternalStore(subscribe, getSnapshot);
+	const sessionEnd = useTerminalSessionEnd(terminalId, terminalInstanceId);
+	const closePaneRef = useRef(ctx.actions.close);
+	closePaneRef.current = ctx.actions.close;
+	useEffect(() => {
+		if (sessionEnd.endedCleanly) closePaneRef.current();
+	}, [sessionEnd.endedCleanly]);
+	useEffect(() => {
+		if (sessionEnd.ended && !sessionEnd.endedCleanly) {
+			terminalRuntimeRegistry.persistEndedSession(
+				terminalId,
+				terminalInstanceId,
+			);
+		}
+	}, [
+		sessionEnd.ended,
+		sessionEnd.endedCleanly,
+		terminalId,
+		terminalInstanceId,
+	]);
 
 	// DOM-first lifecycle (VSCode/Tabby pattern):
 	//   1. mount() attaches xterm to the container synchronously — terminal
@@ -361,9 +383,7 @@ export function TerminalPane({
 					);
 				},
 				onUrlClick: (event, url) => {
-					const action =
-						terminalPullRequestLinkAction(event, url) ??
-						getUrlAction(event, url);
+					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
 						if (tierFor(event, "4-tier") === "plain") {
 							event.preventDefault();
@@ -418,9 +438,9 @@ export function TerminalPane({
 	// The default paste path forwards Ctrl+V and lets the TUI read the OS
 	// clipboard — which only exists on the machine the PTY runs on. When the
 	// workspace lives on another host (relay-reached machine, cloud sandbox),
-	// ship the clipboard bytes there via filesystem.writeFile and paste the
-	// resulting paths instead. Local workspaces keep the Ctrl+V forward, which
-	// lets TUIs attach the image natively.
+	// send the clipboard files to the workspace and paste the resulting paths
+	// instead. Local workspaces keep the Ctrl+V forward, which lets TUIs
+	// attach the image natively.
 	const { machineId } = useLocalHostService();
 	const hostWorkspaces = useHostWorkspaces();
 	const workspaceHostId = hostWorkspaces.workspaces.find(
@@ -434,28 +454,14 @@ export function TerminalPane({
 		Boolean(machineId) &&
 		workspaceHostId !== machineId;
 
-	const writeFileMutation = workspaceTrpc.filesystem.writeFile.useMutation();
-	const createDirectoryMutation =
-		workspaceTrpc.filesystem.createDirectory.useMutation();
-	const writeFileRef = useRef(writeFileMutation.mutateAsync);
-	writeFileRef.current = writeFileMutation.mutateAsync;
-	const createDirectoryRef = useRef(createDirectoryMutation.mutateAsync);
-	createDirectoryRef.current = createDirectoryMutation.mutateAsync;
+	const sendAttachments = useSendAttachments(workspaceId);
 
 	// Fire-and-forget: ship files to the workspace, then paste the paths.
 	const uploadAndPasteFiles = useCallback(
-		(files: File[], worktree: string) => {
+		(files: File[]) => {
 			void (async () => {
 				try {
-					const paths = await uploadPastedFiles({
-						deps: {
-							createDirectory: (input) => createDirectoryRef.current(input),
-							writeFile: (input) => writeFileRef.current(input),
-						},
-						workspaceId,
-						worktreePath: worktree,
-						files,
-					});
+					const paths = await sendAttachments(files);
 					terminalRuntimeRegistry.paste(
 						terminalId,
 						shellEscapePaths(paths),
@@ -464,7 +470,7 @@ export function TerminalPane({
 				} catch (error) {
 					console.error("[v2 Terminal] remote file upload failed", error);
 					toast.error(
-						error instanceof PasteUploadLimitError
+						error instanceof AttachmentLimitError
 							? error.message
 							: files.length === 1
 								? t({
@@ -477,15 +483,15 @@ export function TerminalPane({
 				}
 			})();
 		},
-		[terminalId, terminalInstanceId, workspaceId, t],
+		[terminalId, terminalInstanceId, sendAttachments, t],
 	);
 
 	useEffect(() => {
-		if (!isRemoteHost || !worktreePath) return;
+		if (!isRemoteHost) return;
 
 		terminalRuntimeRegistry.setImagePasteOverride(
 			terminalId,
-			(files) => uploadAndPasteFiles(files, worktreePath),
+			uploadAndPasteFiles,
 			terminalInstanceId,
 		);
 		return () => {
@@ -495,13 +501,7 @@ export function TerminalPane({
 				terminalInstanceId,
 			);
 		};
-	}, [
-		terminalId,
-		terminalInstanceId,
-		worktreePath,
-		isRemoteHost,
-		uploadAndPasteFiles,
-	]);
+	}, [terminalId, terminalInstanceId, isRemoteHost, uploadAndPasteFiles]);
 
 	useTerminalInterruptClear({
 		terminalId,
@@ -528,8 +528,9 @@ export function TerminalPane({
 		{ enabled: ctx.isActive },
 	);
 
+	const findEnabled = usePaneHotkeyEnabled(ctx.isActive);
 	useHotkey("FIND_IN_TERMINAL", () => setIsSearchOpen((prev) => !prev), {
-		enabled: ctx.isActive,
+		enabled: findEnabled,
 		preventDefault: true,
 	});
 
@@ -605,7 +606,7 @@ export function TerminalPane({
 		// remote workspace's PTY runs on. When every dropped entry is a plain
 		// file, ship the bytes instead. Folders keep the path flow (their File
 		// entries carry no content), which at least preserves today's behavior.
-		if (isRemoteHost && worktreePath) {
+		if (isRemoteHost) {
 			const items = Array.from(event.dataTransfer.items);
 			const allPlainFiles =
 				items.length > 0 &&
@@ -620,7 +621,7 @@ export function TerminalPane({
 				terminalRuntimeRegistry
 					.getTerminal(terminalId, terminalInstanceId)
 					?.focus();
-				uploadAndPasteFiles(files, worktreePath);
+				uploadAndPasteFiles(files);
 				return;
 			}
 		}
@@ -674,6 +675,15 @@ export function TerminalPane({
 				isOpen={isRichInputOpen}
 				onClose={closeRichInput}
 			/>
+			{sessionEnd.ended && !sessionEnd.endedCleanly && (
+				<TerminalSessionEndedFooter
+					key={terminalId}
+					terminalId={terminalId}
+					terminalInstanceId={terminalInstanceId}
+					onNewShell={onNewShell}
+					onClose={ctx.actions.close}
+				/>
+			)}
 			<div
 				className={cn(
 					"pointer-events-none absolute inset-0 bg-primary/10 transition-opacity duration-100",
@@ -727,9 +737,7 @@ function resolveHoverLabel(
 		shiftKey: hovered.shift,
 	};
 	if (hovered.info.kind === "url") {
-		const action =
-			terminalPullRequestLinkAction(event, hovered.info.url) ??
-			getUrlAction(event, hovered.info.url);
+		const action = terminalUrlLinkAction(event, hovered.info.url, getUrlAction);
 		return action ? actionLabel(action, "url") : null;
 	}
 	if (hovered.info.isDirectory) {

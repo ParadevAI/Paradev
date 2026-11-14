@@ -20,6 +20,7 @@ export function AgentChatPane({
 	onOpenFile,
 	onOpenPage,
 	onOpenLink,
+	getOpenFilePaths,
 	onOpenHistory,
 }: {
 	agentSessionId: string;
@@ -31,6 +32,7 @@ export function AgentChatPane({
 	onOpenFile?: OpenFile;
 	onOpenPage?: OpenPage;
 	onOpenLink?: OpenLink;
+	getOpenFilePaths?: () => ReadonlySet<string>;
 	onOpenHistory?: () => void;
 }) {
 	const client = useMemo(
@@ -64,6 +66,7 @@ export function AgentChatPane({
 			openFile={onOpenFile}
 			openPage={onOpenPage}
 			openLink={onOpenLink}
+			getOpenFilePaths={getOpenFilePaths}
 			onOpenHistory={onOpenHistory}
 		/>
 	);

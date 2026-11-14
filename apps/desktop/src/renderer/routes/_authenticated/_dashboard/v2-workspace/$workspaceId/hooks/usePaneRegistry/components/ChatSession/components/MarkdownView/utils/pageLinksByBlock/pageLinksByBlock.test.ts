@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { pageLinkFinder } from "../../../../utils/pageLinks";
+import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { planMarkdown } from "../planMarkdown";
 import { pageLinksByBlock } from "./pageLinksByBlock";
 

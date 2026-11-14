@@ -1,5 +1,5 @@
 import { presetForAnyHarness } from "@superset/chat/core";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getChatTransport } from "@/lib/chat";
 import {
@@ -7,7 +7,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
-import { type LiveChat, listLiveChats } from "./utils/listLiveChats";
+import { listOpenChats, type OpenChat } from "./utils/listOpenChats";
 
 export interface TerminalsHost {
 	organizationId: string;
@@ -20,6 +20,8 @@ export interface TerminalsHost {
 	 * as long as it is open.
 	 */
 	refetchIntervalMs?: number;
+	/** Lists only this workspace's chats, as desktop does for an open workspace. */
+	workspaceId?: string;
 }
 
 export type TerminalAttention = "working" | "permission" | "failed" | "review";
@@ -52,13 +54,35 @@ export interface TerminalRowData {
 	/** Specific agent definition (a custom config id, or the preset id). */
 	definitionId: string | null;
 	attention: TerminalAttention | null;
+	/** Set on chat rows: a finished chat resumes its agent session when opened. */
+	chat?: { live: boolean; harness: string; harnessSessionId: string | null };
 }
 
 const TERMINALS_REFETCH_INTERVAL_MS = 5_000;
 
-export function getHostTerminalsQueryKey(machineId: string | null) {
-	return ["host-terminals", "list", machineId] as const;
+export function getHostTerminalsQueryKey(
+	machineId: string | null,
+	workspaceId?: string,
+) {
+	return workspaceId
+		? (["host-terminals", "list", machineId, workspaceId] as const)
+		: (["host-terminals", "list", machineId] as const);
 }
+
+async function fetchHostTerminals(hostUrl: string, workspaceId?: string) {
+	const client = getHostServiceClientByUrl(hostUrl);
+	const [listed, bindings, chats] = await Promise.all([
+		client.terminal.list.query({}),
+		client.terminalAgents.list.query(),
+		// A host without chat, or one too old to serve it, has no chats.
+		listOpenChats(getChatTransport(hostUrl), workspaceId).catch(
+			(): OpenChat[] => [],
+		),
+	]);
+	return { sessions: listed.sessions, bindings, chats };
+}
+
+type HostTerminalsData = Awaited<ReturnType<typeof fetchHostTerminals>>;
 
 /**
  * Mirror of desktop's deriveTerminalAgentStatus. `permission` is a live
@@ -66,7 +90,7 @@ export function getHostTerminalsQueryKey(machineId: string | null) {
  * when the seen mark catches up to the binding's lastEventAt.
  */
 function chatAttention(
-	chat: LiveChat,
+	chat: OpenChat,
 	lastSeenAt: number | undefined,
 ): TerminalAttention | null {
 	switch (chat.status) {
@@ -131,6 +155,7 @@ export function useHostsTerminals(
 	hosts: TerminalsHost[],
 ): UseHostTerminalsResult {
 	const terminalSeenAt = useTerminalSeenStore((state) => state.terminalSeenAt);
+	const queryClient = useQueryClient();
 
 	const online = useMemo(
 		() =>
@@ -141,30 +166,25 @@ export function useHostsTerminals(
 					hostUrl: hostServiceUrl(host.organizationId, host.machineId),
 					refetchIntervalMs:
 						host.refetchIntervalMs ?? TERMINALS_REFETCH_INTERVAL_MS,
+					workspaceId: host.workspaceId,
 				})),
 		[hosts],
 	);
 
 	const queries = useQueries({
 		queries: online.map((host) => ({
-			queryKey: getHostTerminalsQueryKey(host.machineId),
+			queryKey: getHostTerminalsQueryKey(host.machineId, host.workspaceId),
+			placeholderData: host.workspaceId
+				? queryClient.getQueryData<HostTerminalsData>(
+						getHostTerminalsQueryKey(host.machineId),
+					)
+				: undefined,
 			refetchInterval: host.refetchIntervalMs,
 			refetchIntervalInBackground: false,
 			refetchOnWindowFocus: false,
 			retry: 1,
 			networkMode: "always" as const,
-			queryFn: async () => {
-				const client = getHostServiceClientByUrl(host.hostUrl);
-				const [listed, bindings, chats] = await Promise.all([
-					client.terminal.list.query({}),
-					client.terminalAgents.list.query(),
-					// A host without chat, or one too old to serve it, has no chats.
-					listLiveChats(getChatTransport(host.hostUrl)).catch(
-						(): LiveChat[] => [],
-					),
-				]);
-				return { sessions: listed.sessions, bindings, chats };
-			},
+			queryFn: () => fetchHostTerminals(host.hostUrl, host.workspaceId),
 		})),
 	});
 
@@ -237,6 +257,11 @@ export function useHostsTerminals(
 					agentId,
 					definitionId: agentId,
 					attention,
+					chat: {
+						live: chat.live,
+						harness: chat.harness,
+						harnessSessionId: chat.harnessSessionId,
+					},
 				};
 				const group = terminalsByWorkspace.get(chat.workspaceId);
 				if (group) group.push(row);
@@ -258,16 +283,27 @@ export function useHostsTerminals(
 		return {
 			terminalsByWorkspace,
 			attentionByWorkspace,
-			isReady: queries.every((query) => query.isSuccess || query.isError),
+			// The host-wide placeholder can miss this workspace's chat; it is not an answer.
+			isReady: queries.every(
+				(query) =>
+					(query.isSuccess && !query.isPlaceholderData) || query.isError,
+			),
 			isError: queries.some((query) => query.isError),
 		};
 	}, [queries, terminalSeenAt]);
 }
 
-/** One host's terminals — see `useHostsTerminals`. */
+/**
+ * One host's terminals — see `useHostsTerminals`. Pass `workspaceId` when the
+ * caller only reads that workspace's rows.
+ */
 export function useHostTerminals(
 	host: TerminalsHost | null,
+	workspaceId?: string,
 ): UseHostTerminalsResult {
-	const hosts = useMemo(() => (host ? [host] : []), [host]);
+	const hosts = useMemo(
+		() => (host ? [workspaceId ? { ...host, workspaceId } : host] : []),
+		[host, workspaceId],
+	);
 	return useHostsTerminals(hosts);
 }

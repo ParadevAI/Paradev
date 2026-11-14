@@ -1,3 +1,5 @@
+import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
+import { attachedFilesBlock } from "@superset/chat-runtime";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
 import {
@@ -13,6 +15,7 @@ import {
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
+	agentCommandText,
 	buildArgvCommand,
 	buildPromptCommandString,
 	envOverlayPrefix,
@@ -44,7 +47,10 @@ import {
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
-import { resolveAttachmentPath } from "../attachments/storage";
+import {
+	handOutAttachment,
+	resolveAttachmentPath,
+} from "../attachments/storage";
 import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
@@ -82,26 +88,24 @@ export function buildAgentCommandString(
 	const forkArgv = options.forkSessionId
 		? buildForkArgv(config.forkArgs, options.forkSessionId)
 		: [];
-	const baseArgv = [
-		config.command,
-		...config.args,
-		...modelArgs,
-		...resumeArgv,
-		...forkArgv,
-	];
+	const baseArgv = [...modelArgs, ...resumeArgv, ...forkArgv];
+	const withCommand = (argv: string[]) =>
+		[agentCommandText(config.command, config.args), buildArgvCommand(argv)]
+			.filter(Boolean)
+			.join(" ");
 
 	if (prompt === "") {
-		return buildArgvCommand(baseArgv);
+		return withCommand(baseArgv);
 	}
 
 	if (config.promptTransport === "argv") {
 		// Plain quoted positional, not the shared "$(cat <<…)" form: the command
 		// is typed into the user's configured shell, and fish has no heredocs.
-		return buildArgvCommand([...baseArgv, ...config.promptArgs, prompt]);
+		return withCommand([...baseArgv, ...config.promptArgs, prompt]);
 	}
 
 	return buildPromptCommandString({
-		command: buildArgvCommand([...baseArgv, ...config.promptArgs]),
+		command: withCommand([...baseArgv, ...config.promptArgs]),
 		transport: "stdin",
 		prompt,
 		randomId,
@@ -124,12 +128,10 @@ function buildForkArgv(forkArgs: string[], rawSessionId: string): string[] {
 
 function buildAttachmentBlock(
 	prompt: string,
-	resolved: Array<{ attachmentId: string; path: string }>,
+	resolved: Array<{ name: string; path: string }>,
 ): string {
 	if (resolved.length === 0) return prompt;
-	const lines = resolved.map((item) => `- ${item.path}`);
-	const block = `\n\n# Attached files\n\nThe user attached these files. They are available on this host at:\n\n${lines.join("\n")}`;
-	return prompt + block;
+	return `${prompt}\n\n${attachedFilesBlock(resolved)}`;
 }
 
 export interface AgentRunInput {
@@ -162,6 +164,7 @@ export type AgentRunResult = {
 	sessionId: string;
 	label: string;
 	chatSessionId?: string;
+	chatAgentId?: string;
 };
 
 /**
@@ -236,16 +239,20 @@ export function validateAgentEffortSelection(
 
 /**
  * Validate an explicit launch mode before launch. Omitting mode delegates to
- * the underlying agent's default behaviour.
+ * the underlying agent's default behaviour. A chat launch carries a chat
+ * permission mode, not a terminal launch mode.
  */
 export function validateAgentModeSelection(
 	presetId: string,
 	label: string,
 	mode: string | undefined,
+	surface?: AgentRunInput["surface"],
 ): void {
 	if (!mode) return;
 
-	const support = getAgentModeSupport(presetId);
+	const support =
+		(surface === "chat" ? acpStartModes(presetId) : undefined) ??
+		getAgentModeSupport(presetId);
 	if (!support) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -354,7 +361,7 @@ function validateForkSessionIsResolvable(
  */
 export function validateAgentLaunchOptions(
 	db: HostDb,
-	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode">,
+	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode" | "surface">,
 ): void {
 	if (!input.model && !input.effort && !input.mode) return;
 
@@ -376,7 +383,12 @@ export function validateAgentLaunchOptions(
 		input.effort,
 		input.model,
 	);
-	validateAgentModeSelection(launchPresetId, config.label, input.mode);
+	validateAgentModeSelection(
+		launchPresetId,
+		config.label,
+		input.mode,
+		input.surface,
+	);
 }
 
 /**
@@ -423,16 +435,19 @@ export function buildTerminalAgentLaunch(
 	validateAgentForkSelection(config, input.forkSessionId);
 	validateForkSessionIsResolvable(db, config, input);
 
-	const resolvedAttachments: Array<{ attachmentId: string; path: string }> = [];
+	const resolvedAttachments: Array<{ name: string; path: string }> = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
-		const resolved = resolveAttachmentPath(attachmentId);
+		const resolved = handOutAttachment(attachmentId);
 		if (!resolved) {
 			throw new TRPCError({
 				code: "NOT_FOUND",
 				message: `Attachment not found: ${attachmentId}`,
 			});
 		}
-		resolvedAttachments.push({ attachmentId, path: resolved.path });
+		resolvedAttachments.push({
+			name: resolved.metadata.originalFilename ?? attachmentId,
+			path: resolved.path,
+		});
 	}
 
 	const prompt = buildAttachmentBlock(input.prompt, resolvedAttachments);
@@ -495,10 +510,10 @@ export function bindResumedSession(
 async function runTerminalAgent(
 	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
 	input: AgentRunInput,
+	terminalId: string = crypto.randomUUID(),
 ): Promise<AgentRunResult> {
 	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
 
-	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
 		terminalId,
 		workspaceId: input.workspaceId,
@@ -635,46 +650,100 @@ function bindingRunsConfig(
 	return binding.agentId === launchIdentity(config);
 }
 
+/**
+ * An imported copy keeps its `fileId` next to the host id: the adapters read
+ * `attachmentId` today, and `fileId` is what renders the part without this box.
+ */
+export interface ChatLaunchAttachment {
+	attachmentId: string;
+	fileId?: string;
+	name: string;
+	mimeType: string;
+	sizeBytes: number;
+}
+
 export function chatLaunchTarget(
 	db: HostDb,
 	input: AgentRunInput,
 ): {
 	harness: string;
 	label: string;
-	attachments: Array<{ attachmentId: string; name: string; mimeType: string }>;
+	agentConfigId: string;
+	attachments: ChatLaunchAttachment[];
 } | null {
 	if (
 		input.surface !== "chat" ||
-		input.effort ||
 		input.resumeSessionId ||
 		input.forkSessionId
 	) {
 		return null;
 	}
-	const attachments: Array<{
-		attachmentId: string;
-		name: string;
-		mimeType: string;
-	}> = [];
+	const attachments: ChatLaunchAttachment[] = [];
 	for (const attachmentId of input.attachmentIds ?? []) {
 		const resolved = resolveAttachmentPath(attachmentId);
 		if (!resolved) return null;
 		attachments.push({
 			attachmentId,
+			...(resolved.metadata.fileId ? { fileId: resolved.metadata.fileId } : {}),
 			name: resolved.metadata.originalFilename ?? attachmentId,
 			mimeType: resolved.metadata.mediaType,
+			sizeBytes: resolved.metadata.sizeBytes,
 		});
 	}
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) return null;
+	const launchPresetId = chatLaunchPresetId(config);
+	const harness = acpHarnessForPreset(launchPresetId);
+	if (!harness) return null;
+	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
+	return {
+		harness,
+		label: config.label,
+		agentConfigId: config.id,
+		attachments,
+	};
+}
+
+/**
+ * A custom agent that runs the `claude` or `codex` CLI, typically with its own
+ * account env, can chat as that agent. Terminal launches keep its preset.
+ * A chat takes only the config's env: its args and executable path apply to
+ * terminal launches, and the chat runs the CLI the ACP harness resolves.
+ */
+export function chatLaunchPresetId(
+	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
+): string {
 	const launchPresetId = resolveAgentLaunchPresetId(
 		config.presetId,
 		config.command,
 	);
-	const harness = acpHarnessForPreset(launchPresetId);
-	if (!harness) return null;
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
-	return { harness, label: config.label, attachments };
+	if (!config.presetId.startsWith("custom")) return launchPresetId;
+	const [commandToken = ""] = config.command.trim().split(/\s+/);
+	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
+		.toLowerCase()
+		.replace(/\.exe$/, "");
+	return executable === "claude" || executable === "codex"
+		? executable
+		: launchPresetId;
+}
+
+/**
+ * The agent config a stored chat ran under, and whether it still runs that
+ * chat's CLI. A deleted config, or one moved to another CLI, cannot carry the
+ * chat on, and the chat falls back to the default account.
+ */
+export function storedChatConfig(
+	db: HostDb,
+	session: { harness: string; agentConfigId: string | null },
+): { stored: ResolvedHostAgentConfig | null; keeps: boolean } {
+	const stored = session.agentConfigId
+		? resolveHostAgentConfig(db, session.agentConfigId)
+		: null;
+	const keeps =
+		stored !== null &&
+		acpHarnessForPreset(chatLaunchPresetId(stored)) === session.harness;
+	return { stored, keeps };
 }
 
 function continueChatAgent(
@@ -716,18 +785,21 @@ function launchChatAgent(
 	ctx: Pick<HostServiceContext, "db" | "runtime">,
 	input: AgentRunInput,
 	cwd: string,
+	terminalId?: string,
 ): AgentRunResult | null {
 	const target = chatLaunchTarget(ctx.db, input);
 	if (!target) return null;
 	const chat = ctx.runtime.chat?.();
 	if (!chat?.live.supports(target.harness)) return null;
 
-	const created = createChatSession(chat, target, input, cwd);
+	const created = createChatSession(chat, target, input, cwd, terminalId);
+	const chatAgentId = presetForAcpHarness(target.harness);
 	return {
 		kind: "terminal",
 		sessionId: created.terminalId,
 		label: created.label,
 		chatSessionId: created.sessionId,
+		...(chatAgentId ? { chatAgentId } : {}),
 	};
 }
 
@@ -771,9 +843,11 @@ async function continueTerminalAgent(
 	};
 }
 
+/** `launch.terminalId` is host-internal: the id a cloud launch was promised. */
 export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
+	launch: { terminalId?: string } = {},
 ): Promise<AgentRunResult> {
 	const workspace = ctx.db.query.workspaces
 		.findFirst({
@@ -812,8 +886,8 @@ export async function runAgentInWorkspace(
 		}
 	}
 	return (
-		launchChatAgent(ctx, input, workspace.worktreePath) ??
-		runTerminalAgent(ctx, input)
+		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
+		runTerminalAgent(ctx, input, launch.terminalId)
 	);
 }
 

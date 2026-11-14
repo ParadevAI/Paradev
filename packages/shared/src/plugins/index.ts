@@ -140,6 +140,8 @@ export interface PluginCatalogEntry {
 	interface: {
 		displayName: string;
 		category: PluginCategory;
+		/** A built-in icon key, or an image path inside the plugin (`./assets/icon.png`). */
+		icon?: string;
 	};
 	/**
 	 * Server-name → config. Names land verbatim as config keys in agent CLIs
@@ -522,6 +524,45 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "inngest",
+		version: "1.0.0",
+		description: "Debug runs and operate functions",
+		interface: { displayName: "Inngest", category: "Developer tools" },
+		mcpServers: {
+			inngest: { type: "http", url: "https://api.inngest.com/mcp" },
+		},
+	},
+	{
+		name: "firecrawl",
+		version: "1.0.0",
+		description: "Search, scrape, and crawl the web",
+		interface: { displayName: "Firecrawl", category: "Data & APIs" },
+		mcpServers: {
+			firecrawl: {
+				type: "http",
+				url: "https://mcp.firecrawl.dev/v2/mcp-oauth",
+			},
+		},
+	},
+	{
+		name: "ahrefs",
+		version: "1.0.0",
+		description: "Research backlinks, keywords, and rankings",
+		interface: { displayName: "Ahrefs", category: "Data & APIs" },
+		mcpServers: {
+			ahrefs: { type: "http", url: "https://api.ahrefs.com/mcp/mcp" },
+		},
+	},
+	{
+		name: "wispr",
+		version: "1.0.0",
+		description: "Search your meeting notes and transcripts",
+		interface: { displayName: "Wispr Flow", category: "Productivity" },
+		mcpServers: {
+			wispr: { type: "http", url: "https://api.wisprflow.ai/connect/mcp" },
+		},
+	},
+	{
 		name: "superhuman",
 		version: "1.0.0",
 		description: "Search and manage your email",
@@ -693,9 +734,10 @@ export function getPluginByName(name: string): PluginCatalogEntry | undefined {
 }
 
 /**
- * One install record, persisted as a JSON array on the local-db settings
- * singleton (mirrors `disabledAgentHooks`). Read by the main process at boot
- * to converge agent configs on the installed set.
+ * The desktop's old install record in local-db settings. Nothing writes it
+ * now. The desktop reads it at each boot only to copy entries it has not seen
+ * into installed_plugins.json; the column stays so a build from before the
+ * move can still open the database.
  */
 export interface InstalledPlugin {
 	name: string;

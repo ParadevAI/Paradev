@@ -24,6 +24,8 @@ function working(turnId: string, running: boolean): TranscriptRow {
 		startedAtMs: 0,
 		completedAtMs: running ? undefined : 1,
 		running,
+		waiting: false,
+		stopped: false,
 	};
 }
 

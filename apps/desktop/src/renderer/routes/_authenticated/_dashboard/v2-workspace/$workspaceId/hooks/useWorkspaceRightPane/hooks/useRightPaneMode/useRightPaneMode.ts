@@ -1,10 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { SidebarSlideMode } from "../../../../components/SidebarSlide";
-
-interface FullScreenState {
-	workspaceId: string;
-	closeOnExit: boolean;
-}
+import { useCallback, useEffect, useRef } from "react";
+import type { SidebarSlideMode } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
+import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
 
 export function useRightPaneMode({
 	workspaceId,
@@ -17,7 +13,9 @@ export function useRightPaneMode({
 	setOpen: (open: boolean) => void;
 	canExpand: boolean;
 }): { mode: SidebarSlideMode; toggleFullScreen: () => void } {
-	const [fullScreen, setFullScreen] = useState<FullScreenState | null>(null);
+	const fullScreen = useRightPaneFullScreen((state) => state.fullScreen);
+	const setFullScreen = useRightPaneFullScreen((state) => state.setFullScreen);
+	const clearFor = useRightPaneFullScreen((state) => state.clearFor);
 	const isFullScreen = fullScreen?.workspaceId === workspaceId;
 
 	// Clear only when the pane goes from open to closed: entering from closed
@@ -26,12 +24,8 @@ export function useRightPaneMode({
 	useEffect(() => {
 		const wasOpen = wasOpenRef.current;
 		wasOpenRef.current = isOpen;
-		if (wasOpen && !isOpen) {
-			setFullScreen((current) =>
-				current?.workspaceId === workspaceId ? null : current,
-			);
-		}
-	}, [isOpen, workspaceId]);
+		if (wasOpen && !isOpen) clearFor(workspaceId);
+	}, [isOpen, workspaceId, clearFor]);
 
 	const toggleFullScreen = useCallback(() => {
 		if (isFullScreen && isOpen) {
@@ -41,7 +35,7 @@ export function useRightPaneMode({
 		}
 		setFullScreen({ workspaceId, closeOnExit: !isOpen });
 		if (!isOpen) setOpen(true);
-	}, [isFullScreen, isOpen, fullScreen, workspaceId, setOpen]);
+	}, [isFullScreen, isOpen, fullScreen, workspaceId, setOpen, setFullScreen]);
 
 	const mode: SidebarSlideMode = !isOpen
 		? "closed"

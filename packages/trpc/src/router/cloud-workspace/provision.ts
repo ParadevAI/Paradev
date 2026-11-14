@@ -10,10 +10,15 @@ import {
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
+	recordBootSpans,
 	SandboxNotReadyError,
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
+import {
+	failChatMovesTo,
+	queueChatMovesTo,
+} from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { transitionCloudWorkspace } from "./transition";
@@ -140,6 +145,13 @@ async function provision(
 				columns: { status: true },
 			});
 			if (current?.status === "deleted") {
+				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
+				);
 				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId);
 			}
@@ -155,13 +167,29 @@ async function provision(
 		// The box is booting; the environment it needs arrives once host-service
 		// answers. The client's own wake pushes it again, so a workspace nobody
 		// opens still gets it (an agent launched at boot waits for this).
-		await Sentry.startSpan({ name: "settle", op: "sandbox" }, () =>
-			settleSandbox({
-				providerSandboxId,
-				hostTarget: sandbox.hostTarget,
-				claim,
-			}),
+		const answer = await Sentry.startSpan(
+			{ name: "settle", op: "sandbox" },
+			() =>
+				settleSandbox({
+					providerSandboxId,
+					hostTarget: sandbox.hostTarget,
+					claim,
+				}),
 		);
+		await queueChatMovesTo(row.id).catch((error) =>
+			console.error(
+				`[cloud-workspace] could not start the chat moving into ${row.id}`,
+				error,
+			),
+		);
+		try {
+			recordBootSpans(answer);
+		} catch (error) {
+			console.error(
+				`[cloud-workspace] could not trace the boot of ${row.id}`,
+				error,
+			);
+		}
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);
@@ -197,6 +225,13 @@ async function provision(
 			set: keepForDiagnosis ? { providerSandboxId } : {},
 		});
 		nudge(row.organizationId, "cloud_workspaces");
+		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
+			(moveError) =>
+				console.error(
+					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+					moveError,
+				),
+		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
 	}

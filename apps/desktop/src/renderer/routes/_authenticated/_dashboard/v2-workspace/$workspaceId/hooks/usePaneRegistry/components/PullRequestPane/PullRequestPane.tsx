@@ -1,10 +1,10 @@
 import { useIsTabVisible } from "@superset/panes";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import {
 	isSamePullRequest,
+	type PullRequestRef,
 	pullRequestRefFromUrl,
 } from "renderer/lib/github/pullRequestRef";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
@@ -14,8 +14,12 @@ import {
 	type PullRequestDetailTab,
 	PullRequestDetailTabs,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailTabs";
+import { PullRequestStackNotice } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackNotice";
+import { PullRequestStackPopover } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStackPopover";
+import { usePullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
 import { usePullRequestThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestThreads";
 import { useRefreshPullRequest } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useRefreshPullRequest";
+import { useStackRestack } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useStackRestack";
 import {
 	canActOnPullRequest,
 	type PullRequestTarget,
@@ -23,6 +27,7 @@ import {
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { normalizeThreadsToComments } from "../../../../components/CommentsSection/utils/normalizeThreadsToComments";
 import type { PagePaneData, PullRequestPaneData } from "../../../../types";
+import { useOpenStackLayer } from "../../../useOpenStackLayer";
 import {
 	type OpenReviewDiff,
 	useReviewCommentNavigation,
@@ -36,18 +41,20 @@ interface PullRequestPaneProps {
 	data: PullRequestPaneData;
 	onOpenDiff: OpenReviewDiff;
 	onOpenPage: (page: PagePaneData) => void;
+	onOpenPullRequest: (ref: PullRequestRef) => void;
 }
 
 export function PullRequestPane({
 	data,
 	onOpenDiff,
 	onOpenPage,
+	onOpenPullRequest,
 }: PullRequestPaneProps) {
-	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<PullRequestDetailTab>("summary");
 	const { workspace, hostUrl } = useWorkspace();
 	const organizationId = useActiveOrganizationId();
 	const detail = usePullRequestPaneDetail(data);
+	const openStackLayer = useOpenStackLayer(onOpenPullRequest);
 	const isTabVisible = useIsTabVisible();
 	const target = useMemo<PullRequestTarget>(
 		() => ({
@@ -62,8 +69,8 @@ export function PullRequestPane({
 		url: detail.data?.url,
 	});
 
-	// Pages and "open in diff" belong to the workspace, so they exist only
-	// when this workspace's linked PR is the one on screen.
+	// "Open in diff" belongs to the workspace, so it exists only when this
+	// workspace's linked PR is the one on screen.
 	const linkedPR = workspaceTrpc.git.getPullRequest.useQuery({
 		workspaceId: workspace.id,
 	});
@@ -72,9 +79,15 @@ export function PullRequestPane({
 		: null;
 	const isLinkedPR = linkedRef !== null && isSamePullRequest(linkedRef, data);
 	const evidence = usePullRequestEvidence(
-		workspace.id,
-		isLinkedPR && activeTab === "summary" && isTabVisible,
+		detail.data?.body,
+		activeTab === "summary" && isTabVisible,
 	);
+	const showEvidence =
+		evidence.hasLinks &&
+		(evidence.isPending ||
+			evidence.isError ||
+			evidence.pages.length > 0 ||
+			evidence.moreCount > 0);
 	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
 	const onOpenInDiff = useReviewCommentNavigation(workspace.id, onOpenDiff);
 	const prUrl =
@@ -109,6 +122,20 @@ export function PullRequestPane({
 		isLinkedPR,
 		onOpenInDiff,
 	]);
+	const flow = usePullRequestMergeFlow({ target });
+	const handoffProjectId =
+		(isLinkedPR ? workspace.projectId : null) ?? detail.projectId;
+	const restack = useStackRestack(
+		handoffProjectId
+			? {
+					projectId: handoffProjectId,
+					hostId: workspace.hostId,
+					hostUrl,
+					prNumber: data.number,
+				}
+			: null,
+		flow.stack,
+	);
 	const diffStat =
 		detail.data?.additions !== undefined && detail.data.deletions !== undefined
 			? { additions: detail.data.additions, deletions: detail.data.deletions }
@@ -125,7 +152,18 @@ export function PullRequestPane({
 						diffStat={diffStat}
 					/>
 				</div>
-				<div className="ml-auto flex shrink-0 items-center">
+				<div className="ml-auto flex shrink-0 items-center gap-1.5">
+					{flow.stack ? (
+						<PullRequestStackPopover
+							stack={flow.stack}
+							flow={flow}
+							restack={restack}
+							appearance="badge"
+							workspaceNumber={linkedPR.data?.number ?? null}
+							viewingNumber={data.number}
+							onSelectLayer={openStackLayer}
+						/>
+					) : null}
 					<PullRequestActions
 						target={target}
 						projectId={detail.projectId}
@@ -133,12 +171,16 @@ export function PullRequestPane({
 						hostUrl={hostUrl}
 						data={detail.data}
 						isLoading={detail.isLoading}
+						flow={flow}
 						showStartWorkspace={false}
 						onRefresh={refresh}
 						isRefreshing={isRefreshing}
 					/>
 				</div>
 			</div>
+			{flow.stackQuery.isIncomplete && detail.data?.state === "open" ? (
+				<PullRequestStackNotice onRefresh={flow.stackQuery.refetch} />
+			) : null}
 			<PullRequestDetailContent
 				activeTab={activeTab}
 				detail={detail}
@@ -150,20 +192,20 @@ export function PullRequestPane({
 				commentTarget={commentTarget}
 				threads={activityThreads}
 				summaryAside={
-					isLinkedPR ? (
+					showEvidence ? (
 						<PullRequestEvidence
-							{...evidence}
+							pages={evidence.pages}
+							totalCount={evidence.totalCount}
+							moreCount={evidence.moreCount}
+							onShowMore={evidence.onShowMore}
+							isPending={evidence.isPending}
+							isError={evidence.isError}
+							onRetry={evidence.onRetry}
 							onOpenPage={(page) =>
 								onOpenPage({
 									pageId: page.id,
 									slug: page.slug,
 									title: page.title,
-								})
-							}
-							onViewAll={() =>
-								void navigate({
-									to: "/pages",
-									search: { workspace: workspace.id },
 								})
 							}
 						/>

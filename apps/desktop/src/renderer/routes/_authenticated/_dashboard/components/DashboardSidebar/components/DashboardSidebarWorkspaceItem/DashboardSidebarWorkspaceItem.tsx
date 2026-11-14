@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import {
@@ -27,6 +28,7 @@ import {
 	useWorkspaceRowContextMenu,
 } from "./components/DashboardSidebarWorkspaceBulkContextMenu";
 import { DashboardSidebarWorkspaceContextMenu } from "./components/DashboardSidebarWorkspaceContextMenu/DashboardSidebarWorkspaceContextMenu";
+import { ManageEnvironmentItem } from "./components/ManageEnvironmentItem";
 import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSidebarWorkspaceItemActions";
 
 interface DashboardSidebarWorkspaceItemProps {
@@ -72,6 +74,17 @@ export function DashboardSidebarWorkspaceItem({
 	} = workspace;
 	const isSessionWorkspace = workspace.type === "session";
 	const isCloudWorkspace = hostType === "cloud";
+	const environmentItem = isCloudWorkspace ? (
+		<ManageEnvironmentItem workspaceId={id} />
+	) : undefined;
+	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
+	const move =
+		moveDirections.length > 0
+			? {
+					directions: moveDirections,
+					workspace: { id, hostId: workspace.hostId, projectId, name },
+				}
+			: undefined;
 	const { status: workspaceStatus } = useSidebarWorkspaceStatus(id);
 	const {
 		cancelRename,
@@ -266,6 +279,7 @@ export function DashboardSidebarWorkspaceItem({
 						<DashboardSidebarWorkspaceContextMenu
 							workspaceId={id}
 							projectId={projectId}
+							move={move}
 							isSessionWorkspace={isSessionWorkspace}
 							isInSection={isInSection}
 							isUnread={isUnread}
@@ -286,6 +300,7 @@ export function DashboardSidebarWorkspaceItem({
 							onRemovePullRequest={handleRemovePullRequest}
 							onRename={startRename}
 							onDelete={requestDelete}
+							environmentItem={environmentItem}
 							onToggleUnread={handleToggleUnread}
 							onClearStatus={handleClearStatus}
 						>
@@ -356,6 +371,7 @@ export function DashboardSidebarWorkspaceItem({
 					<DashboardSidebarWorkspaceContextMenu
 						workspaceId={id}
 						projectId={projectId}
+						move={move}
 						isSessionWorkspace={isSessionWorkspace}
 						isInSection={isInSection}
 						isUnread={isUnread}
@@ -376,6 +392,7 @@ export function DashboardSidebarWorkspaceItem({
 						onRemovePullRequest={handleRemovePullRequest}
 						onRename={startRename}
 						onDelete={requestDelete}
+						environmentItem={environmentItem}
 						onToggleUnread={handleToggleUnread}
 						onClearStatus={handleClearStatus}
 					>

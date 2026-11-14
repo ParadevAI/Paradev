@@ -8,10 +8,13 @@ import type {
 	ComposerSessionTab,
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
+import { rawErrorMessage } from "@superset/i18n/errors";
 import { BRAND } from "@superset/shared/brand";
 import { pressableTitle, TitlePress } from "@superset/title-press";
+import { hostReadsAttachmentParts } from "@superset/shared/host-version";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
+import { randomUUID } from "expo-crypto";
 import {
 	Stack,
 	useFocusEffect,
@@ -37,11 +40,18 @@ import {
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { PromptInputAttachmentItem } from "@/components/ai-elements/prompt-input";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import { getHostWorkspacesQueryKey } from "@/hooks/useHostWorkspaces";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { chatAttachmentParts } from "@/lib/attachments/chatParts";
+import {
+	awaitAttachmentUploads,
+	setDraftAttachmentHome,
+	toAttachmentFiles,
+} from "@/lib/attachments/upload";
 import { getChatTransport } from "@/lib/chat";
 import { errorCopy } from "@/lib/errors";
 import {
@@ -98,6 +108,7 @@ import { useActiveChat } from "../stores/activeChatStore";
 import { keyboardOverlap } from "../utils/keyboardOverlap";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { PULL_REQUEST_SYMBOL, pullRequestStatus } from "../utils/pullRequest";
+import { resumeChat } from "../utils/resumeChat";
 import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
@@ -184,7 +195,7 @@ export function WorkspaceScreen() {
 		terminalsByWorkspace,
 		isReady: terminalsReady,
 		isError: terminalsFailed,
-	} = useHostTerminals(host);
+	} = useHostTerminals(host, id);
 	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	// Tabs hold the arrangement the user dragged in the sessions sheet, falling
@@ -416,6 +427,11 @@ export function WorkspaceScreen() {
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
 	const hostCompatibility = useHostCompatibility(hostUrl);
+	const hostVersion = hostCompatibility.hostVersion;
+	useEffect(() => {
+		if (!id || isResolving || !host) return;
+		setDraftAttachmentHome(workspaceDraftKey(id), cloud ? "cloud" : "host");
+	}, [id, isResolving, host, cloud]);
 	const { renameWorkspace, deleteWorkspace, copyId, copyLink, shareWorkspace } =
 		useWorkspaceHeaderActions(workspace, host);
 	const pinned = usePinnedWorkspacesStore((state) =>
@@ -543,6 +559,34 @@ export function WorkspaceScreen() {
 		[router, invalidateTerminals],
 	);
 
+	// Opening a finished chat starts its agent session again, as reopening a
+	// desktop chat pane does. The resumed chat replaces the finished one.
+	const resumingChatRef = useRef<string | null>(null);
+	useEffect(() => {
+		const chat = activeRow?.kind === "chat" ? activeRow.chat : undefined;
+		if (!activeRow || !chat || chat.live || !chat.harnessSessionId) return;
+		if (!hostUrl || !id || resumingChatRef.current === activeRow.terminalId)
+			return;
+		resumingChatRef.current = activeRow.terminalId;
+		resumeChat({
+			transport: getChatTransport(hostUrl),
+			workspaceId: id,
+			chat: {
+				sessionId: activeRow.terminalId,
+				harness: chat.harness,
+				harnessSessionId: chat.harnessSessionId,
+			},
+			commandId: randomUUID(),
+		})
+			.then(openSession)
+			.catch((error: unknown) =>
+				Alert.alert(
+					t({ message: "Could not resume the chat" }),
+					errorCopy(error),
+				),
+			);
+	}, [activeRow, hostUrl, id, openSession, t]);
+
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
@@ -574,7 +618,10 @@ export function WorkspaceScreen() {
 			const row = rows.find((candidate) => candidate.terminalId === terminalId);
 			const closing =
 				row?.kind === "chat"
-					? getChatTransport(hostUrl).closeSession({ sessionId: terminalId })
+					? getChatTransport(hostUrl).closeSession({
+							sessionId: terminalId,
+							userClosed: true,
+						})
 					: getHostServiceClientByUrl(hostUrl).terminal.killSession.mutate({
 							terminalId,
 							workspaceId: id,
@@ -765,35 +812,43 @@ export function WorkspaceScreen() {
 	// separates and delays the Enter, and frames the text as a bracketed paste
 	// only when the running program actually has that mode on.
 	const handleSubmit = useCallback(
-		async (text: string, attachmentFileIds: string[] = []) => {
+		async (text: string, attachments: PromptInputAttachmentItem[] = []) => {
 			if (!hostUrl || !activeTerminalId || !id) {
 				throw new Error("Terminal is not connected");
 			}
 			if (activeIsChat) {
 				if (!chatRef.current) throw new Error("Chat is not connected");
-				// A cloud box resolves only the files attached to it.
-				if (cloud && attachmentFileIds.length > 0) {
-					await apiClient.cloudWorkspace.attachFiles.mutate({
-						id,
-						fileIds: attachmentFileIds,
+				const host = getHostServiceClientByUrl(hostUrl);
+				const home = cloud ? "cloud" : "host";
+				const parts = await chatAttachmentParts({
+					home,
+					readsParts: hostReadsAttachmentParts(hostVersion),
+					files: toAttachmentFiles(attachments),
+					deps: {
+						awaitUploads: () =>
+							awaitAttachmentUploads(workspaceDraftKey(id), attachments),
+						// A cloud box resolves only the files attached to it.
+						attachFiles: (fileIds) =>
+							apiClient.cloudWorkspace.attachFiles.mutate({ id, fileIds }),
+						importFromCloud: (fileIds) =>
+							host.attachments.importFromCloud.mutate({ fileIds }),
+						hostUpload: (input) => host.attachments.upload.mutate(input),
+					},
+				}).catch((error: unknown) => {
+					posthog.capture("attachments_send_failed", {
+						surface: "chat",
+						home,
+						error: rawErrorMessage(error),
 					});
-				}
-				const imported =
-					attachmentFileIds.length > 0
-						? await getHostServiceClientByUrl(
-								hostUrl,
-							).attachments.importFromCloud.mutate({
-								fileIds: attachmentFileIds,
-							})
-						: [];
-				await chatRef.current.send(
-					text,
-					imported.map((entry) => ({
-						attachmentId: entry.attachmentId,
-						name: entry.originalFilename ?? "attachment",
-						mimeType: entry.mediaType,
-					})),
-				);
+					throw error;
+				});
+				if (parts.length > 0)
+					posthog.capture("attachments_sent", {
+						surface: "chat",
+						home,
+						count: parts.length,
+					});
+				await chatRef.current.send(text, parts);
 				composerRef.current?.blur();
 				return;
 			}
@@ -803,7 +858,7 @@ export function WorkspaceScreen() {
 				text,
 			});
 		},
-		[hostUrl, activeTerminalId, id, activeIsChat, cloud],
+		[hostUrl, activeTerminalId, id, activeIsChat, cloud, hostVersion],
 	);
 
 	const handleQuickKey = useCallback(

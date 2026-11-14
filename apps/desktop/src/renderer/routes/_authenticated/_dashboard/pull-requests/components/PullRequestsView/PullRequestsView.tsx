@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebouncedSearchNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDebouncedSearchNavigation";
 import { useProjectQueryTargets } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
-import { normalizeAuthorFilters } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeAuthorFilter";
+import { normalizeGithubLogins } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeGithubLogins";
 import {
 	normalizePullRequestReviewFilter,
 	type PullRequestReviewFilter,
@@ -13,11 +13,13 @@ import {
 } from "../../stores/pullRequestsFilterStore";
 import { PullRequestsContent } from "./components/PullRequestsContent";
 import { PullRequestsTopBar } from "./components/PullRequestsTopBar";
+import { usePullRequestsList } from "./hooks/usePullRequestsList";
 
 interface PullRequestsViewProps {
 	initialSearch?: string;
 	initialProjects?: string[];
 	initialAuthor?: string;
+	initialReviewer?: string;
 	initialReview?: string;
 	initialState?: "open" | "all" | "merged";
 	/** The PR currently open in the detail pane, if any — filter/search
@@ -33,6 +35,7 @@ export function PullRequestsView({
 	initialSearch,
 	initialProjects,
 	initialAuthor,
+	initialReviewer,
 	initialReview,
 	initialState,
 	selectedPrNumber = null,
@@ -44,12 +47,14 @@ export function PullRequestsView({
 		search: storedSearch,
 		projectFilters: storedProjectFilters,
 		authorFilter: storedAuthorFilter,
+		reviewerFilter: storedReviewerFilter,
 		reviewFilter: storedReviewFilter,
 		includeClosed: storedIncludeClosed,
 		mergedOnly: storedMergedOnly,
 		setSearch: storeSetSearch,
 		setProjectFilters: storeSetProjectFilters,
 		setAuthorFilter: storeSetAuthorFilter,
+		setReviewerFilter: storeSetReviewerFilter,
 		setReviewFilter: storeSetReviewFilter,
 		setIncludeClosed: storeSetIncludeClosed,
 		setMergedOnly: storeSetMergedOnly,
@@ -59,7 +64,11 @@ export function PullRequestsView({
 	const authorFilter =
 		initialAuthor === undefined
 			? storedAuthorFilter
-			: normalizeAuthorFilters(initialAuthor);
+			: normalizeGithubLogins(initialAuthor);
+	const reviewerFilter =
+		initialReviewer === undefined
+			? storedReviewerFilter
+			: normalizeGithubLogins(initialReviewer);
 	const reviewFilter =
 		initialReview === undefined
 			? storedReviewFilter
@@ -109,6 +118,7 @@ export function PullRequestsView({
 			search?: string;
 			projects?: string[];
 			author?: string | null;
+			reviewer?: string | null;
 			review?: PullRequestReviewFilter | null;
 			includeClosed?: boolean;
 			mergedOnly?: boolean;
@@ -121,6 +131,10 @@ export function PullRequestsView({
 						: projectFilters,
 				authorFilter:
 					overrides.author !== undefined ? overrides.author : authorFilter,
+				reviewerFilter:
+					overrides.reviewer !== undefined
+						? overrides.reviewer
+						: reviewerFilter,
 				reviewFilter:
 					overrides.review !== undefined ? overrides.review : reviewFilter,
 				includeClosed: overrides.includeClosed ?? includeClosed,
@@ -131,6 +145,7 @@ export function PullRequestsView({
 			includeClosed,
 			mergedOnly,
 			projectFilters,
+			reviewerFilter,
 			reviewFilter,
 			searchQuery,
 		],
@@ -151,6 +166,10 @@ export function PullRequestsView({
 	useEffect(() => {
 		storeSetAuthorFilter(authorFilter);
 	}, [authorFilter, storeSetAuthorFilter]);
+
+	useEffect(() => {
+		storeSetReviewerFilter(reviewerFilter);
+	}, [reviewerFilter, storeSetReviewerFilter]);
 
 	useEffect(() => {
 		storeSetReviewFilter(reviewFilter);
@@ -239,13 +258,54 @@ export function PullRequestsView({
 		navigateTo(buildSearch({ author: nextAuthor }));
 	};
 
+	// Both of these compile to a `review-requested:` qualifier, and GitHub ORs
+	// repeated qualifiers — asking for two at once widens the results instead
+	// of narrowing them, so picking either one drops the other.
+	const handleReviewerFilterChange = (nextReviewer: string | null) => {
+		cancelPendingSearchNavigation();
+		const clearsReview =
+			!!nextReviewer && reviewFilter === "team-review-requested";
+		storeSetReviewerFilter(nextReviewer);
+		if (clearsReview) storeSetReviewFilter(null);
+		navigateTo(
+			buildSearch({
+				reviewer: nextReviewer,
+				...(clearsReview ? { review: null } : {}),
+			}),
+		);
+	};
+
 	const handleReviewFilterChange = (
 		nextReview: PullRequestReviewFilter | null,
 	) => {
 		cancelPendingSearchNavigation();
+		const clearsReviewer =
+			nextReview === "team-review-requested" && !!reviewerFilter;
 		storeSetReviewFilter(nextReview);
-		navigateTo(buildSearch({ review: nextReview }));
+		if (clearsReviewer) storeSetReviewerFilter(null);
+		navigateTo(
+			buildSearch({
+				review: nextReview,
+				...(clearsReviewer ? { reviewer: null } : {}),
+			}),
+		);
 	};
+
+	const list = usePullRequestsList({
+		projectTargets,
+		searchQuery,
+		authorFilter,
+		reviewerFilter,
+		reviewFilter,
+		includeClosed,
+		mergedOnly,
+	});
+	const canRefresh = projectTargets.some((target) => target.hostUrl);
+	const hasRows = list.rows.length > 0;
+	const resultCount =
+		canRefresh && (hasRows || (!list.isFetching && !list.error))
+			? list.totalCount
+			: null;
 
 	const stateFilter: "open" | "all" | "merged" = mergedOnly
 		? "merged"
@@ -266,19 +326,26 @@ export function PullRequestsView({
 				projectTargets={projectTargets}
 				authorFilter={authorFilter}
 				onAuthorFilterChange={handleAuthorFilterChange}
+				reviewerFilter={reviewerFilter}
+				onReviewerFilterChange={handleReviewerFilterChange}
 				reviewFilter={reviewFilter}
 				onReviewFilterChange={handleReviewFilterChange}
 				stateFilter={stateFilter}
 				onStateFilterChange={handleStateFilterChange}
+				resultCount={resultCount}
+				isRefreshing={list.isFetching}
+				onRefresh={canRefresh ? () => void list.refetch() : undefined}
 			/>
 			<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
 				<PullRequestsContent
+					list={list}
 					projectFilters={projectFilters}
 					projectTargets={projectTargets}
 					areProjectsReady={areProjectsReady}
 					hasProjects={projects.length > 0}
 					searchQuery={searchQuery}
 					authorFilter={authorFilter}
+					reviewerFilter={reviewerFilter}
 					reviewFilter={reviewFilter}
 					includeClosed={includeClosed}
 					mergedOnly={mergedOnly}

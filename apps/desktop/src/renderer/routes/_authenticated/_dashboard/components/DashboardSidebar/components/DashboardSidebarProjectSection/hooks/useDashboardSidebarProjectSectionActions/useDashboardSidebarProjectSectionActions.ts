@@ -3,10 +3,11 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import {
 	useOpenNewWorkspace,
 	useOpenNewWorkspaceForHost,
@@ -109,7 +110,7 @@ export function useDashboardSidebarProjectSectionActions({
 		if (!servingHostUrl) {
 			toast.error(
 				t({
-					message: "Project's host is unreachable — cannot rename right now",
+					message: "Project's host is unreachable. Cannot rename right now",
 				}),
 			);
 			return;
@@ -199,7 +200,7 @@ export function useDashboardSidebarProjectSectionActions({
 			toast.error(
 				t({
 					message:
-						"Project's host is unreachable — cannot import worktrees right now",
+						"Project's host is unreachable. Cannot import worktrees right now",
 				}),
 			);
 			return;
@@ -246,7 +247,7 @@ export function useDashboardSidebarProjectSectionActions({
 			toast.error(
 				t({
 					message:
-						"Project's host is unreachable — cannot import worktrees right now",
+						"Project's host is unreachable. Cannot import worktrees right now",
 				}),
 			);
 			return;

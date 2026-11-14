@@ -1,9 +1,10 @@
 import type { SelectTask } from "@superset/db/schema";
 import { Badge } from "@superset/ui/badge";
 import type { CellContext } from "@tanstack/react-table";
+import type { TasksTableFeatures } from "../../tasksTableFeatures";
 
 interface LabelsCellProps {
-	info: CellContext<SelectTask, string[] | null>;
+	info: CellContext<TasksTableFeatures, SelectTask, string[] | null>;
 }
 
 export function LabelsCell({ info }: LabelsCellProps) {

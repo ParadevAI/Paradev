@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { readInstalledPluginSources } from "@superset/agent-setup";
+import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 import {
 	assertSafeSegment,
 	findInstalled,
@@ -222,8 +223,8 @@ describe("installed_plugins.json location", () => {
 		expect(pluginsRoot()).toBe(path.join(root, "data", "plugins"));
 	});
 
-	test("an unset SUPERSET_HOME_DIR falls back to ~/.superset, not the prefix", () => {
+	test("an unset SUPERSET_HOME_DIR falls back to the app home, not the prefix", () => {
 		delete process.env.SUPERSET_HOME_DIR;
-		expect(supersetHome()).toBe(path.join(os.homedir(), ".superset"));
+		expect(supersetHome()).toBe(defaultAppHomeDir());
 	});
 });

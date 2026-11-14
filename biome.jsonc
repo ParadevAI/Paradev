@@ -19,7 +19,9 @@
 			"!apps/mobile/uniwind-types.d.ts",
 			"!packages/sdk/src",
 			// Vendored Vale style packages (synced by `vale sync`); don't reformat.
-			"!apps/marketing/vale-styles"
+			"!apps/marketing/vale-styles",
+			// Written by the CLA bot on every signature; reformatting it would fight the bot.
+			"!signatures"
 		]
 	},
 	"formatter": {

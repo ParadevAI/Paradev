@@ -1,0 +1,49 @@
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
+import { rawErrorMessage } from "@superset/i18n/errors";
+import { toast } from "@superset/ui/sonner";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
+import { MOVE_CANCELLED } from "../describeMoveError";
+
+/**
+ * Ends a begun workspace move that failed, so the workspace can move again.
+ * Returns the chats that moved anyway, which stay where they went; null
+ * when that is not known.
+ */
+export async function abandonWorkspaceMove(
+	workspaceMoveId: string,
+	error: unknown,
+	cancelled = false,
+): Promise<string[] | null> {
+	return cloudTrpcClient.workspaceMove.abandon
+		.mutate({
+			workspaceMoveId,
+			error:
+				cancelled || isAbort(error)
+					? MOVE_CANCELLED
+					: rawErrorMessage(error).slice(0, 2000) || "The move could not start",
+			withDestination: true,
+		})
+		.then(
+			({ movedChatSessionIds }) => movedChatSessionIds ?? null,
+			(abandonError: unknown) => {
+				console.warn(
+					`[workspace-move] could not record that move ${workspaceMoveId} stopped`,
+					abandonError,
+				);
+				toast.error(i18n._(msg({ message: "Couldn't end the move" })), {
+					description: i18n._(
+						msg({
+							message:
+								"Your workspace is unchanged. You can move it again in a few minutes.",
+						}),
+					),
+				});
+				return null;
+			},
+		);
+}
+
+function isAbort(error: unknown): boolean {
+	return error instanceof DOMException && error.name === "AbortError";
+}

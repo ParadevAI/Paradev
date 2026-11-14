@@ -99,6 +99,15 @@ export function useDiffCodeViewTheme() {
 				[data-line-annotation] {
 					container-type: inline-size;
 				}
+				/* Placeholder items are files with one blank line that only
+				 * carry annotations; drop the line and its gutter. */
+				[data-file] [data-gutter],
+				[data-file] [data-content] > [data-line] {
+					display: none;
+				}
+				[data-file] [data-code] {
+					grid-template-columns: 0 minmax(0, 1fr);
+				}
 				/* Container query host for the "Viewed" label visibility rule
 				 * (see DiffHeaderMetadata: @min-[380px]/diff-header:inline). */
 				[data-diffs-header='default'] {

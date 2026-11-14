@@ -1,4 +1,16 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import {
+	DndContext,
+	type DragEndEvent,
+	type DragOverEvent,
+	DragOverlay,
+	type DragStartEvent,
+	MouseSensor,
+	pointerWithin,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core";
+import { plural } from "@lingui/core/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
 import { COMPANY } from "@superset/shared/constants";
@@ -15,6 +27,7 @@ import {
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
 import { Button } from "@superset/ui/button";
+import { Checkbox } from "@superset/ui/checkbox";
 import {
 	Empty,
 	EmptyDescription,
@@ -37,8 +50,9 @@ import { Tabs, TabsList, TabsTrigger } from "@superset/ui/tabs";
 import { cn } from "@superset/ui/utils";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
+	LuArchive,
 	LuArrowUpRight,
 	LuRotateCw,
 	LuSearch,
@@ -64,13 +78,24 @@ import {
 import { useCreateAutomation } from "renderer/routes/_authenticated/_dashboard/hooks/useCreateAutomation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
+import { AutomationBulkBar } from "./components/AutomationBulkBar";
+import { AutomationDragPreview } from "./components/AutomationDragPreview";
+import { AutomationGroupHeaderRow } from "./components/AutomationGroupHeaderRow";
 import { AutomationRow } from "./components/AutomationRow";
 import { AutomationStatCards } from "./components/AutomationStatCards";
 import { AutomationsEmptyState } from "./components/AutomationsEmptyState";
 import { HostOfflineRunDialog } from "./components/HostOfflineRunDialog";
+import { useArchiveAutomations } from "./hooks/useArchiveAutomations";
+import { useRowSelection } from "./hooks/useRowSelection";
+import { useSetAutomationGroup } from "./hooks/useSetAutomationGroup";
 import type { AutomationTemplate } from "./templates";
+import {
+	groupAutomations,
+	listAutomationGroups,
+} from "./utils/groupAutomations";
 import { dispatchErrorCode, runErrorHelp } from "./utils/runErrorHelp";
 import { RUN_STATUS_META } from "./utils/runStatus";
+import { snapToCursor } from "./utils/snapToCursor";
 
 export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 	{
@@ -78,7 +103,7 @@ export const Route = createFileRoute("/_authenticated/_dashboard/automations/")(
 	},
 );
 
-type Scope = "mine" | "team";
+type Scope = "mine" | "team" | "archived";
 
 type AutomationListItem = RouterOutputs["automation"]["list"][number];
 
@@ -96,6 +121,8 @@ const LAST_RUN_SORT_CYCLE: {
 	{ mode: "result", direction: "desc" },
 ];
 
+const UNGROUPED_KEY = "\u0000ungrouped";
+
 // Seeds the "Create with AI" agent session. The skill is provisioned as
 // superset:automate; mentioning it by name loads it (it isn't in the chat
 // slash-command allowlist).
@@ -111,13 +138,32 @@ function AutomationsPage() {
 	const [scope, setScope] = useState<Scope>("mine");
 	const [search, setSearch] = useState("");
 	const [cliHintDismissed, setCliHintDismissed] = useState(false);
-	const [pendingDelete, setPendingDelete] = useState<AutomationListItem | null>(
-		null,
-	);
+	const [pendingGroupDelete, setPendingGroupDelete] = useState<{
+		group: string;
+		ids: string[];
+	} | null>(null);
 	const [hostOfflineRun, setHostOfflineRun] = useState<{
 		hostId: string | null;
 	} | null>(null);
 	const [retryingIds, setRetryingIds] = useState<Set<string>>(new Set());
+	const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+		new Set(),
+	);
+	const { setGroup } = useSetAutomationGroup();
+	const {
+		archive: archiveAutomations,
+		restore: restoreAutomations,
+		confirmDelete: confirmDeleteAutomations,
+		isPending: archivePending,
+	} = useArchiveAutomations();
+
+	const toggleGroupCollapsed = (key: string) =>
+		setCollapsedGroups((prev) => {
+			const next = new Set(prev);
+			if (next.has(key)) next.delete(key);
+			else next.add(key);
+			return next;
+		});
 
 	const addRetrying = useCallback((ids: string[]) => {
 		setRetryingIds((prev) => {
@@ -205,27 +251,46 @@ function AutomationsPage() {
 			),
 	});
 
-	const deleteMutation = useMutation({
-		mutationFn: ({ id }: { id: string; name: string }) =>
-			apiTrpcClient.automation.delete.mutate({ id }),
-		onSuccess: (_, { name }) => {
-			void utils.automation.list.invalidate();
-			setPendingDelete(null);
-			toast.success(
-				t({
-					message: `"${name}" deleted`,
-				}),
+	const bulkEnabledMutation = useMutation({
+		mutationFn: async ({
+			ids,
+			enabled,
+		}: {
+			ids: string[];
+			enabled: boolean;
+		}) => {
+			const results = await Promise.allSettled(
+				ids.map((id) =>
+					apiTrpcClient.automation.setEnabled.mutate({ id, enabled }),
+				),
 			);
+			const failed = results.find((result) => result.status === "rejected");
+			if (failed) throw failed.reason;
 		},
+		onSuccess: (_, { ids, enabled }) =>
+			toast.success(
+				enabled
+					? t({
+							message: plural(ids.length, {
+								one: "# automation resumed",
+								other: "# automations resumed",
+							}),
+						})
+					: t({
+							message: plural(ids.length, {
+								one: "# automation paused",
+								other: "# automations paused",
+							}),
+						}),
+			),
 		onError: (error) =>
 			toast.error(
-				errorMessage(
-					error,
-					t({
-						message: "Failed to delete automation",
-					}),
-				),
+				errorMessage(error, t({ message: "Failed to update automation" })),
 			),
+		onSettled: (_data, _error, { ids }) => {
+			void utils.automation.list.invalidate();
+			for (const id of ids) void utils.automation.get.invalidate({ id });
+		},
 	});
 
 	const {
@@ -237,6 +302,10 @@ function AutomationsPage() {
 	} = cloudTrpc.automation.list.useQuery(undefined, {
 		refetchInterval: 60_000,
 	});
+	const { data: archivedAutomations = [] } = cloudTrpc.automation.list.useQuery(
+		{ archived: true },
+		{ refetchInterval: 60_000, staleTime: 30_000 },
+	);
 
 	const { data: memberRows = [] } = cloudTrpc.organization.listMembers.useQuery(
 		undefined,
@@ -267,11 +336,12 @@ function AutomationsPage() {
 	const teamCount = automations.length - mineCount;
 
 	const tabVisible = useMemo(() => {
+		if (scope === "archived") return archivedAutomations;
 		if (!currentUserId) return automations;
 		return scope === "mine"
 			? automations.filter((a) => a.ownerUserId === currentUserId)
 			: automations.filter((a) => a.ownerUserId !== currentUserId);
-	}, [automations, scope, currentUserId]);
+	}, [automations, archivedAutomations, scope, currentUserId]);
 
 	const visible = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -320,8 +390,9 @@ function AutomationsPage() {
 		if (!value) return;
 		const next = value as Scope;
 		setScope(next);
+		clearSelection();
 		// The Owner column only exists on the team tab; drop the sort with it.
-		if (next !== "team" && sortField === "owner") setSortField(null);
+		if (next === "mine" && sortField === "owner") setSortField(null);
 	};
 
 	const sortedVisible = useMemo(() => {
@@ -375,6 +446,139 @@ function AutomationsPage() {
 		lastRunSortMode,
 	]);
 
+	const groups = useMemo(
+		() => listAutomationGroups(automations),
+		[automations],
+	);
+	// Flat until some automation in this tab has a group.
+	const sections = useMemo(
+		() =>
+			tabVisible.some((a) => a.group) ? groupAutomations(sortedVisible) : null,
+		[tabVisible, sortedVisible],
+	);
+
+	// Only your own automations take actions, so Mine selects. Archived rows
+	// you may restore or delete (yours, or any as an organization owner) select too.
+	const archivedTab = scope === "archived";
+	const selectable = scope === "mine" || archivedTab;
+	const canSelect = useCallback(
+		(automation: AutomationListItem) =>
+			!archivedTab || automation.ownerUserId === currentUserId || isOrgOwner,
+		[archivedTab, currentUserId, isOrgOwner],
+	);
+	const shownOrder = useMemo(() => {
+		if (!selectable) return [];
+		const rows = sections
+			? sections.flatMap(({ group, items }) =>
+					collapsedGroups.has(group ?? UNGROUPED_KEY) ? [] : items,
+				)
+			: sortedVisible;
+		return rows.filter(canSelect).map((row) => row.id);
+	}, [selectable, sections, sortedVisible, collapsedGroups, canSelect]);
+	const {
+		selected,
+		toggle: toggleSelected,
+		setMany: setSelectedMany,
+		clear: clearSelection,
+	} = useRowSelection(shownOrder);
+	const selectedRows = useMemo(
+		() => tabVisible.filter((a) => selected.has(a.id)),
+		[tabVisible, selected],
+	);
+	const selectionActive = selected.size > 0;
+	// Rows sit under a group header, or make room for checkboxes.
+	const indentRows = sections !== null || selectionActive;
+
+	// Dragging rows between sections changes their group, as in Linear.
+	const canDrag = scope === "mine" && sections !== null;
+	const sensors = useSensors(
+		useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+	);
+	const [dragIds, setDragIds] = useState<string[] | null>(null);
+	const [overGroupKey, setOverGroupKey] = useState<string | null>(null);
+	const draggedRows = useMemo(
+		() => (dragIds ? automations.filter((a) => dragIds.includes(a.id)) : []),
+		[automations, dragIds],
+	);
+	const groupKeyOf = (group: string | null) => group ?? UNGROUPED_KEY;
+	// A section lights up only when dropping there would move something.
+	const dropActiveFor = (group: string | null) =>
+		dragIds !== null &&
+		overGroupKey === groupKeyOf(group) &&
+		draggedRows.some((a) => a.group !== group);
+
+	const endDrag = () => {
+		setDragIds(null);
+		setOverGroupKey(null);
+	};
+	const handleDragStart = ({ active }: DragStartEvent) => {
+		const id = String(active.id);
+		setDragIds(
+			selected.has(id)
+				? shownOrder.filter((rowId) => selected.has(rowId))
+				: [id],
+		);
+	};
+	const handleDragOver = ({ over }: DragOverEvent) => {
+		const group = over?.data.current?.group as string | null | undefined;
+		setOverGroupKey(group === undefined ? null : groupKeyOf(group));
+	};
+	const handleDragEnd = ({ over }: DragEndEvent) => {
+		// The drop's mouseup would otherwise also click the row under it.
+		const swallowClick = (event: MouseEvent) => {
+			event.stopPropagation();
+			event.preventDefault();
+		};
+		window.addEventListener("click", swallowClick, {
+			capture: true,
+			once: true,
+		});
+		setTimeout(
+			() => window.removeEventListener("click", swallowClick, true),
+			0,
+		);
+
+		const target = over?.data.current?.group as string | null | undefined;
+		const moving = draggedRows.filter((a) => a.group !== target);
+		endDrag();
+		if (target === undefined || moving.length === 0) return;
+		const [only] = moving;
+		setGroup({
+			ids: moving.map((a) => a.id),
+			name: moving.length === 1 ? only?.name : undefined,
+			group: target,
+		});
+	};
+	const allShownSelected =
+		shownOrder.length > 0 && selected.size === shownOrder.length;
+
+	useEffect(() => {
+		if (!selectable) return;
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.defaultPrevented) return;
+			if (
+				document.querySelector("[role=menu],[role=dialog],[role=alertdialog]")
+			) {
+				return;
+			}
+			const target = event.target as HTMLElement | null;
+			const typing =
+				target?.closest("input, textarea, [contenteditable=true]") != null;
+			if (event.key === "Escape" && selected.size > 0) {
+				clearSelection();
+			} else if (
+				!typing &&
+				event.key === "a" &&
+				(event.metaKey || event.ctrlKey)
+			) {
+				event.preventDefault();
+				setSelectedMany(shownOrder, true);
+			}
+		};
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [selectable, selected, shownOrder, clearSelection, setSelectedMany]);
+
 	const navigate = useNavigate();
 	const { createSession, isPending: creatingWithAgent } =
 		useCreateAgentSession();
@@ -409,28 +613,33 @@ function AutomationsPage() {
 		);
 	};
 
-	const scheduleWidth = scope === "team" ? "w-[16%]" : "w-[18%]";
+	const showOwnerColumn = scope !== "mine";
+	const scheduleWidth = showOwnerColumn ? "w-[16%]" : "w-[18%]";
 	const lastRunWidth = "w-[14%]";
-	const statusWidth = scope === "team" ? "w-[12%]" : "w-[13%]";
-	const columnCount = scope === "team" ? 6 : 5;
+	const statusWidth = showOwnerColumn ? "w-[12%]" : "w-[13%]";
+	const columnCount = showOwnerColumn ? 6 : 5;
 	const showAutomationLoading = automationsPending && tabVisible.length === 0;
 	// A failed read has no rows either, but it is not an empty org — it must not
 	// strip the page chrome or claim the org has no automations.
 	const showAutomationError = automationsFailed && automations.length === 0;
 	// True first run: nothing in the org — stats/tabs/search are noise.
 	const orgEmpty =
-		!automationsPending && !showAutomationError && automations.length === 0;
+		!automationsPending &&
+		!showAutomationError &&
+		automations.length === 0 &&
+		archivedAutomations.length === 0;
 	const tabEmpty =
 		!automationsPending && !showAutomationError && tabVisible.length === 0;
 	const showMineEmptyState = tabEmpty && scope === "mine";
 	const showTeamEmptyState = tabEmpty && scope === "team";
+	const showArchivedEmptyState = tabEmpty && scope === "archived";
 
 	const renderAutomationRow = (automation: AutomationListItem) => (
 		<AutomationRow
 			key={automation.id}
 			automation={automation}
 			owner={usersById.get(automation.ownerUserId)}
-			showOwner={scope === "team"}
+			showOwner={showOwnerColumn}
 			project={
 				automation.v2ProjectId === null
 					? undefined
@@ -440,8 +649,31 @@ function AutomationsPage() {
 			lastRun={lastRunById.get(automation.id) ?? null}
 			now={now}
 			isOwner={automation.ownerUserId === currentUserId}
-			canDelete={automation.ownerUserId === currentUserId || isOrgOwner}
+			canArchive={automation.ownerUserId === currentUserId || isOrgOwner}
 			isRetrying={retryingIds.has(automation.id)}
+			groups={groups}
+			indented={indentRows}
+			drag={
+				canDrag
+					? {
+							enabled: true,
+							dimmed: dragIds?.includes(automation.id) ?? false,
+							dropActive: dropActiveFor(automation.group),
+						}
+					: undefined
+			}
+			selection={
+				selectable && canSelect(automation)
+					? {
+							selected: selected.has(automation.id),
+							active: selectionActive,
+							onSelect: (event) => toggleSelected(automation.id, event),
+						}
+					: undefined
+			}
+			onMoveToGroup={(a, group) =>
+				setGroup({ ids: [a.id], name: a.name, group })
+			}
 			onRunNow={(a) =>
 				gateFeature(GATED_FEATURES.AUTOMATIONS, () =>
 					runNowMutation.mutate({
@@ -461,12 +693,14 @@ function AutomationsPage() {
 				if (a.enabled) toggle();
 				else gateFeature(GATED_FEATURES.AUTOMATIONS, toggle);
 			}}
-			onDelete={setPendingDelete}
+			onArchive={(a) => archiveAutomations([a])}
+			onRestore={(a) => restoreAutomations([a])}
+			onDelete={(a) => confirmDeleteAutomations([a])}
 		/>
 	);
 
 	return (
-		<div className="flex h-full w-full flex-1 flex-col overflow-hidden">
+		<div className="relative flex h-full w-full flex-1 flex-col overflow-hidden">
 			<PageHeader />
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
@@ -551,6 +785,19 @@ function AutomationsPage() {
 											{teamCount}
 										</span>
 									</TabsTrigger>
+									{(archivedAutomations.length > 0 || scope === "archived") && (
+										<>
+											<div className="mx-1 h-4 w-px bg-border" />
+											<TabsTrigger
+												value="archived"
+												className="h-8 rounded-md px-3 data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground/60 data-[state=inactive]:hover:text-muted-foreground"
+											>
+												<span className="text-sm">
+													<Trans>Archived</Trans>
+												</span>
+											</TabsTrigger>
+										</>
+									)}
 								</TabsList>
 							</Tabs>
 							<div className="flex items-center gap-2">
@@ -659,105 +906,211 @@ function AutomationsPage() {
 									</EmptyDescription>
 								</EmptyHeader>
 							</Empty>
+						) : showArchivedEmptyState ? (
+							<Empty className="rounded-xl border border-border py-16">
+								<EmptyHeader>
+									<EmptyMedia
+										variant="icon"
+										className="size-14 [&_svg:not([class*='size-'])]:size-7"
+									>
+										<LuArchive />
+									</EmptyMedia>
+									<EmptyTitle>
+										<Trans>No archived automations</Trans>
+									</EmptyTitle>
+								</EmptyHeader>
+							</Empty>
 						) : (
 							// No overflow-hidden: it would break the sticky header, which
 							// sticks relative to the page scroll container.
 							<div className="rounded-xl border border-border">
-								<Table className="table-fixed">
-									{/* Radius + bg live on the corner cells: Chromium ignores
+								<DndContext
+									sensors={sensors}
+									collisionDetection={pointerWithin}
+									autoScroll={{ threshold: { x: 0, y: 0.1 } }}
+									onDragStart={handleDragStart}
+									onDragOver={handleDragOver}
+									onDragEnd={handleDragEnd}
+									onDragCancel={endDrag}
+								>
+									<Table className="table-fixed">
+										{/* Radius + bg live on the corner cells: Chromium ignores
 									    border-radius on table-header-groups, so a thead bg pokes
 									    square past the container's rounded corners. */}
-									<TableHeader className="sticky top-0 z-10 shadow-[inset_0_-1px_0_0_var(--color-border)] [&_th]:bg-background [&_tr>th:first-child]:rounded-tl-xl [&_tr>th:last-child]:rounded-tr-xl [&_tr]:border-b-0">
-										<TableRow className="hover:bg-transparent">
-											<TableHead className={cn(DATA_TABLE_HEAD_CELL, "pl-4")}>
-												<SortableHeader
-													field="name"
-													label={t({
-														message: "Name",
-													})}
-													sortField={sortField}
-													sortDirection={sortDirection}
-													onSort={handleSort}
-												/>
-											</TableHead>
-											{scope === "team" && (
+										<TableHeader className="sticky top-0 z-10 shadow-[inset_0_-1px_0_0_var(--color-border)] [&_th]:bg-background [&_tr>th:first-child]:rounded-tl-xl [&_tr>th:last-child]:rounded-tr-xl [&_tr]:border-b-0">
+											<TableRow className="hover:bg-transparent">
 												<TableHead
-													className={cn(DATA_TABLE_HEAD_CELL, "w-[14%]")}
+													className={cn(
+														DATA_TABLE_HEAD_CELL,
+														"relative transition-[padding] duration-150",
+														indentRows ? "pl-11" : "pl-4",
+													)}
 												>
+													{selectable && selectionActive && (
+														<Checkbox
+															checked={allShownSelected}
+															data-partial={
+																(selectionActive && !allShownSelected) ||
+																undefined
+															}
+															onClick={(event) => {
+																event.preventDefault();
+																if (allShownSelected) clearSelection();
+																else setSelectedMany(shownOrder, true);
+															}}
+															aria-label={t({ message: "Select all" })}
+															className="absolute inset-y-0 left-3.5 my-auto !translate-y-0 data-[partial]:border-primary animate-in fade-in duration-150"
+														/>
+													)}
 													<SortableHeader
-														field="owner"
+														field="name"
 														label={t({
-															message: "Owner",
+															message: "Name",
 														})}
 														sortField={sortField}
 														sortDirection={sortDirection}
 														onSort={handleSort}
 													/>
 												</TableHead>
-											)}
-											<TableHead
-												className={cn(DATA_TABLE_HEAD_CELL, scheduleWidth)}
-											>
-												<SortableHeader
-													field="schedule"
-													label={t({
-														message: "Schedule",
-													})}
-													sortField={sortField}
-													sortDirection={sortDirection}
-													onSort={handleSort}
-												/>
-											</TableHead>
-											<TableHead
-												className={cn(DATA_TABLE_HEAD_CELL, statusWidth)}
-											>
-												<SortableHeader
-													field="status"
-													label={t({
-														message: "Status",
-													})}
-													sortField={sortField}
-													sortDirection={sortDirection}
-													onSort={handleSort}
-												/>
-											</TableHead>
-											<TableHead
-												className={cn(DATA_TABLE_HEAD_CELL, lastRunWidth)}
-											>
-												<SortableHeader
-													field="lastRun"
-													label={
-														sortField !== "lastRun"
-															? t({ message: "Last run" })
-															: lastRunSortMode === "time"
-																? t({ message: "Last run (time)" })
-																: t({ message: "Last run (result)" })
-													}
-													sortField={sortField}
-													sortDirection={sortDirection}
-													onSort={handleSort}
-												/>
-											</TableHead>
-											<TableHead
-												className={cn(DATA_TABLE_HEAD_CELL, "w-20 pr-4")}
-											/>
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{visible.length === 0 ? (
-											<TableRow className="hover:bg-transparent">
-												<TableCell
-													colSpan={columnCount}
-													className="h-24 text-center text-sm text-muted-foreground"
+												{showOwnerColumn && (
+													<TableHead
+														className={cn(DATA_TABLE_HEAD_CELL, "w-[14%]")}
+													>
+														<SortableHeader
+															field="owner"
+															label={t({
+																message: "Owner",
+															})}
+															sortField={sortField}
+															sortDirection={sortDirection}
+															onSort={handleSort}
+														/>
+													</TableHead>
+												)}
+												<TableHead
+													className={cn(DATA_TABLE_HEAD_CELL, scheduleWidth)}
 												>
-													<Trans>No automations match</Trans>
-												</TableCell>
+													<SortableHeader
+														field="schedule"
+														label={t({
+															message: "Schedule",
+														})}
+														sortField={sortField}
+														sortDirection={sortDirection}
+														onSort={handleSort}
+													/>
+												</TableHead>
+												<TableHead
+													className={cn(DATA_TABLE_HEAD_CELL, statusWidth)}
+												>
+													<SortableHeader
+														field="status"
+														label={t({
+															message: "Status",
+														})}
+														sortField={sortField}
+														sortDirection={sortDirection}
+														onSort={handleSort}
+													/>
+												</TableHead>
+												<TableHead
+													className={cn(DATA_TABLE_HEAD_CELL, lastRunWidth)}
+												>
+													<SortableHeader
+														field="lastRun"
+														label={
+															sortField !== "lastRun"
+																? t({ message: "Last run" })
+																: lastRunSortMode === "time"
+																	? t({ message: "Last run (time)" })
+																	: t({ message: "Last run (result)" })
+														}
+														sortField={sortField}
+														sortDirection={sortDirection}
+														onSort={handleSort}
+													/>
+												</TableHead>
+												<TableHead
+													className={cn(DATA_TABLE_HEAD_CELL, "w-20 pr-4")}
+												/>
 											</TableRow>
-										) : (
-											sortedVisible.map(renderAutomationRow)
+										</TableHeader>
+										<TableBody>
+											{visible.length === 0 ? (
+												<TableRow className="hover:bg-transparent">
+													<TableCell
+														colSpan={columnCount}
+														className="h-24 text-center text-sm text-muted-foreground"
+													>
+														<Trans>No automations match</Trans>
+													</TableCell>
+												</TableRow>
+											) : sections ? (
+												sections.map(({ group, items }) => {
+													const key = group ?? UNGROUPED_KEY;
+													const collapsed = collapsedGroups.has(key);
+													return (
+														<Fragment key={key}>
+															<AutomationGroupHeaderRow
+																group={group}
+																count={items.length}
+																collapsed={collapsed}
+																columnCount={columnCount}
+																onToggle={() => toggleGroupCollapsed(key)}
+																onCreate={() =>
+																	createAutomation({
+																		prompt: "",
+																		projectId: recentProjectId,
+																		group,
+																	})
+																}
+																isCreating={creatingAutomation}
+																onSelectAll={
+																	selectable && !collapsed
+																		? () => {
+																				const ids = items
+																					.filter(canSelect)
+																					.map((a) => a.id);
+																				setSelectedMany(
+																					ids,
+																					!ids.every((id) => selected.has(id)),
+																				);
+																			}
+																		: undefined
+																}
+																onDeleteGroup={
+																	scope === "mine" && group !== null
+																		? () =>
+																				setPendingGroupDelete({
+																					group,
+																					ids: items.map((a) => a.id),
+																				})
+																		: undefined
+																}
+																drop={
+																	canDrag
+																		? { active: dropActiveFor(group) }
+																		: undefined
+																}
+															/>
+															{!collapsed && items.map(renderAutomationRow)}
+														</Fragment>
+													);
+												})
+											) : (
+												sortedVisible.map(renderAutomationRow)
+											)}
+										</TableBody>
+									</Table>
+									<DragOverlay dropAnimation={null} modifiers={[snapToCursor]}>
+										{dragIds && (
+											<AutomationDragPreview
+												name={draggedRows[0]?.name}
+												count={dragIds.length}
+											/>
 										)}
-									</TableBody>
-								</Table>
+									</DragOverlay>
+								</DndContext>
 							</div>
 						)}
 					</div>
@@ -799,6 +1152,53 @@ function AutomationsPage() {
 				</div>
 			</div>
 
+			{selectable && selectionActive && (
+				<div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center px-4 animate-in fade-in slide-in-from-bottom-2 duration-150">
+					<AutomationBulkBar
+						count={selected.size}
+						groups={groups}
+						currentGroup={
+							selectedRows.every((a) => a.group === selectedRows[0]?.group)
+								? (selectedRows[0]?.group ?? null)
+								: undefined
+						}
+						canPause={selectedRows.some((a) => a.enabled)}
+						canResume={selectedRows.some((a) => !a.enabled)}
+						busy={bulkEnabledMutation.isPending || archivePending}
+						onMove={(group) => setGroup({ ids: [...selected], group })}
+						onPause={() =>
+							bulkEnabledMutation.mutate({
+								ids: selectedRows.filter((a) => a.enabled).map((a) => a.id),
+								enabled: false,
+							})
+						}
+						onResume={() =>
+							gateFeature(GATED_FEATURES.AUTOMATIONS, () =>
+								bulkEnabledMutation.mutate({
+									ids: selectedRows.filter((a) => !a.enabled).map((a) => a.id),
+									enabled: true,
+								}),
+							)
+						}
+						onArchive={() => {
+							archiveAutomations(selectedRows);
+							clearSelection();
+						}}
+						archived={archivedTab}
+						onRestore={() => {
+							restoreAutomations(selectedRows);
+							clearSelection();
+						}}
+						onDelete={() =>
+							confirmDeleteAutomations(selectedRows, {
+								onDeleted: clearSelection,
+							})
+						}
+						onClear={clearSelection}
+					/>
+				</div>
+			)}
+
 			<HostOfflineRunDialog
 				hostId={hostOfflineRun?.hostId ?? null}
 				open={!!hostOfflineRun}
@@ -808,23 +1208,22 @@ function AutomationsPage() {
 			/>
 
 			<AlertDialog
-				open={!!pendingDelete}
+				open={!!pendingGroupDelete}
 				onOpenChange={(next) => {
-					if (!next) setPendingDelete(null);
+					if (!next) setPendingGroupDelete(null);
 				}}
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							<Trans>Delete automation?</Trans>
+							<Trans>Delete group "{pendingGroupDelete?.group}"?</Trans>
 						</AlertDialogTitle>
 						<AlertDialogDescription>
-							{pendingDelete ? (
-								<Trans>
-									"{pendingDelete.name}" will stop firing and its run history
-									will be removed. This can't be undone.
-								</Trans>
-							) : null}
+							<Plural
+								value={pendingGroupDelete?.ids.length ?? 0}
+								one="Its # automation moves to No group. The automation itself is kept."
+								other="Its # automations move to No group. The automations themselves are kept."
+							/>
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -832,17 +1231,18 @@ function AutomationsPage() {
 							<Trans>Cancel</Trans>
 						</AlertDialogCancel>
 						<AlertDialogAction
-							disabled={deleteMutation.isPending}
 							onClick={() => {
-								if (pendingDelete) {
-									deleteMutation.mutate({
-										id: pendingDelete.id,
-										name: pendingDelete.name,
-									});
-								}
+								if (!pendingGroupDelete) return;
+								const { group, ids } = pendingGroupDelete;
+								setGroup({
+									ids,
+									group: null,
+									successMessage: t({ message: `Deleted group "${group}"` }),
+								});
+								setPendingGroupDelete(null);
 							}}
 						>
-							<Trans>Delete</Trans>
+							<Trans>Delete group</Trans>
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

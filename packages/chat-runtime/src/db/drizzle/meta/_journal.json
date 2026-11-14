@@ -15,6 +15,34 @@
       "when": 1793301081019,
       "tag": "0001_session_closed_at",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793923174628,
+      "tag": "0002_chat_selections",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1793929979089,
+      "tag": "0003_session_closed_by_user",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794151549057,
+      "tag": "0004_session_agent_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794194559956,
+      "tag": "0005_chat_sync_state",
+      "breakpoints": true
     }
   ]
 }

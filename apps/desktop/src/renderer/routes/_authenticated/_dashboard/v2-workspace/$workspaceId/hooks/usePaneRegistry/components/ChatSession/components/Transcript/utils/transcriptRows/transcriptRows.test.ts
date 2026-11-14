@@ -1,16 +1,20 @@
 import { describe, expect, test } from "bun:test";
 import {
 	collapseWorkLog,
+	deriveTimeline,
+	emptySnapshot,
 	type OutboxEntry,
+	reduceMany,
 	type TurnGroup,
 } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
+	DurableEnvelope,
 	Item,
 	ToolCall,
 	UserMessage,
 } from "@superset/chat/protocol";
-import { pageLinkFinder } from "../../../../utils/pageLinks";
+import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { transcriptRows } from "./transcriptRows";
 
 const WEB_URL = "https://app.superset.sh";
@@ -110,6 +114,122 @@ describe("transcriptRows", () => {
 		});
 	});
 
+	test("a turn cut off when Paradev closed says why once, on its card", () => {
+		const error = {
+			message: "Commands the agent was running were stopped.",
+			kind: "host_stopped" as const,
+		};
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						error,
+						startedAtMs: 3,
+						completedAtMs: 3,
+					},
+					entries: [
+						{
+							kind: "item",
+							item: {
+								id: "notice-1",
+								kind: "notice",
+								noticeKind: "error",
+								text: error.message,
+								startedAtMs: 3,
+							},
+						},
+					],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.some((row) => row.kind === "item")).toBe(false);
+		expect(rows.at(-1)).toMatchObject({ kind: "turn_status", error });
+	});
+
+	test("a turn the user stopped says so once, on its clock", () => {
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 30_000,
+					},
+					entries: [{ kind: "item", item: prompt }],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.find((row) => row.kind === "working")).toMatchObject({
+			stopped: true,
+		});
+		expect(rows.some((row) => row.kind === "turn_status")).toBe(false);
+	});
+
+	test("a quick stop the agent recorded says so once", () => {
+		const stop = {
+			id: "stop",
+			kind: "user_message",
+			startedAtMs: 100,
+			content: [{ type: "text", text: "[Request interrupted by user]" }],
+		} as UserMessage;
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 200,
+					},
+					entries: [
+						{ kind: "item", item: prompt },
+						{ kind: "user_stop", item: stop, stop: "response" },
+					],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.filter((row) => row.kind === "turn_status")).toHaveLength(1);
+	});
+
+	test("a stop too quick for a clock still gets its line", () => {
+		const rows = transcriptRows(
+			[
+				{
+					turnId: "turn-1",
+					turn: {
+						id: "turn-1",
+						status: "interrupted",
+						startedAtMs: 0,
+						completedAtMs: 200,
+					},
+					entries: [{ kind: "item", item: prompt }],
+				},
+			],
+			[],
+			new Set(),
+			find,
+		);
+		expect(rows.at(-1)).toMatchObject({
+			kind: "turn_status",
+			status: "interrupted",
+		});
+	});
+
 	test("an approval is after its target only when the target row is right above", () => {
 		const approval: ApprovalRequest = {
 			id: "approval:tool-1",
@@ -179,6 +299,35 @@ describe("transcriptRows", () => {
 		const rows = transcriptRows([turn], [], new Set(), find);
 		expect(rows.map((row) => row.kind)).toEqual(["item", "working", "item"]);
 		expect(rows[0]?.groupStart).toBe(true);
+	});
+
+	test("the clock of a turn held on a pending approval waits", () => {
+		const approval: ApprovalRequest = {
+			id: "ap1",
+			kind: "approval_request",
+			targetItemId: null,
+			title: "Allow this tool call?",
+			status: "pending",
+			startedAtMs: 3,
+		};
+		const held = (status: ApprovalRequest["status"]) =>
+			transcriptRows(
+				[
+					{
+						turnId: "t1",
+						turn: { id: "t1", status: "running", startedAtMs: 2 },
+						entries: [
+							{ kind: "item", item: prompt },
+							{ kind: "item", item: { ...approval, status } },
+						],
+					},
+				],
+				[],
+				new Set(),
+				find,
+			).find((row) => row.kind === "working");
+		expect(held("pending")).toMatchObject({ running: true, waiting: true });
+		expect(held("answered")).toMatchObject({ running: true, waiting: false });
 	});
 
 	test("a message sent mid-turn moves the clock under it", () => {
@@ -561,5 +710,56 @@ describe("the changed-files card", () => {
 			find,
 		).find((row) => row.kind === "changed_files");
 		expect(commandOnly).toMatchObject({ files: [] });
+	});
+});
+
+test("a stop replayed from Claude Code history is a stopped row where it happened, not a prompt", () => {
+	const replayed = (id: string, text: string, startedAtMs: number): Item => ({
+		id,
+		kind: "user_message",
+		startedAtMs,
+		content: [{ type: "text", text }],
+	});
+	const reply = (id: string, startedAtMs: number): Item => ({
+		id,
+		kind: "agent_message",
+		text: id,
+		startedAtMs,
+		completedAtMs: startedAtMs,
+	});
+	const stored: DurableEnvelope[] = [
+		["h1", replayed("p1", "delete the build folder", 10)],
+		["h1", reply("asks-to-run", 11)],
+		["h2", replayed("stop", "[Request interrupted by user for tool use]", 12)],
+		["h2", replayed("p2", "keep it, clean the cache", 13)],
+		["h2", reply("done", 14)],
+	].map(([turnId, item], index) => ({
+		v: 1,
+		sessionId: "s1",
+		ts: index,
+		cursor: { epoch: "e1", seq: index + 1 },
+		event: { type: "item", item: item as Item, turnId: turnId as string },
+	}));
+
+	const rows = transcriptRows(
+		deriveTimeline(reduceMany(emptySnapshot(), stored), {
+			harness: "claude-acp",
+		}),
+		[],
+		new Set(),
+		find,
+	);
+
+	expect(rows.map((row) => row.key)).toEqual([
+		"p1",
+		"asks-to-run",
+		"stop:stop",
+		"p2",
+		"done",
+	]);
+	expect(rows[2]).toMatchObject({
+		kind: "turn_status",
+		status: "interrupted",
+		userStop: "tool_use",
 	});
 });

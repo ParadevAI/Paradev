@@ -26,6 +26,13 @@ import {
 	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
 } from "./lib/sandbox/api-credential";
+import { tokenOrganizationIds } from "./lib/token-organizations";
+import {
+	actorOf,
+	type DevPrincipal,
+	type PersonPrincipal,
+	type Principal,
+} from "./principal";
 
 export type { I18nErrorCause, RequiredPlan } from "./i18n-error";
 export { isI18nErrorCause, planRequiredError, userError } from "./i18n-error";
@@ -164,6 +171,11 @@ const clientTelemetry = t.middleware(async ({ ctx, path, next }) => {
 
 export const publicProcedure = t.procedure.use(clientTelemetry);
 
+const personPrincipal = (
+	userId: string,
+	organizationId: string | null,
+): PersonPrincipal => ({ kind: "person", userId, organizationId });
+
 /** The only procedures a pending-deletion account may call. */
 const PENDING_DELETION_ALLOWED_PROCEDURES = new Set([
 	"user.me",
@@ -200,54 +212,145 @@ export const sandboxProcedure = t.procedure.use(async ({ ctx, next }) => {
 	return next({ ctx: { ...ctx, sandboxWorkspace: workspace } });
 });
 
-export const protectedProcedure = t.procedure
-	.use(sandboxScope)
-	.use(clientTelemetry)
-	.use(async ({ ctx, next }) => {
-		if (!ctx.session) {
-			throw userError({
-				code: "UNAUTHORIZED",
-				message: "Not authenticated. Please sign in.",
-				i18nKey: "serverError.common.notAuthenticatedPleaseSignIn",
-			});
-		}
+async function personFromSession(ctx: TRPCContext, path: string) {
+	const { session } = ctx;
+	if (!session) {
+		throw userError({
+			code: "UNAUTHORIZED",
+			message: "Not authenticated. Please sign in.",
+			i18nKey: "serverError.common.notAuthenticatedPleaseSignIn",
+		});
+	}
+	if (
+		session.user.deletionRequestedAt &&
+		!PENDING_DELETION_ALLOWED_PROCEDURES.has(path)
+	) {
+		throw userError({
+			code: "FORBIDDEN",
+			message: "Account is pending deletion.",
+			i18nKey: "serverError.common.accountIsPendingDeletion",
+		});
+	}
+	const sessionOrgId = session.session.activeOrganizationId ?? null;
+	const headerOrgId = ctx.headers.get(ORGANIZATION_HEADER)?.trim() || null;
+	assertInBoxOrganization(ctx.sandboxCaller, headerOrgId);
 
-		return next({ ctx: { ...ctx, session: ctx.session } });
-	})
-	.use(async ({ ctx, path, next }) => {
-		if (
-			ctx.session.user.deletionRequestedAt &&
-			!PENDING_DELETION_ALLOWED_PROCEDURES.has(path)
-		) {
-			throw userError({
-				code: "FORBIDDEN",
-				message: "Account is pending deletion.",
-				i18nKey: "serverError.common.accountIsPendingDeletion",
-			});
-		}
-		return next();
-	})
-	.use(async ({ ctx, next }) => {
-		const sessionOrgId = ctx.session.session.activeOrganizationId ?? null;
-		const headerOrgId = ctx.headers.get(ORGANIZATION_HEADER)?.trim() || null;
-		assertInBoxOrganization(ctx.sandboxCaller, headerOrgId);
-
-		let activeOrganizationId = sessionOrgId;
-		if (headerOrgId && headerOrgId !== sessionOrgId) {
-			const membership = await db.query.members.findFirst({
+	let activeOrganizationId = sessionOrgId;
+	if (headerOrgId && headerOrgId !== sessionOrgId) {
+		const membership =
+			tokenOrganizationIds(session)?.includes(headerOrgId) ||
+			(await db.query.members.findFirst({
 				where: and(
-					eq(members.userId, ctx.session.user.id),
+					eq(members.userId, session.user.id),
 					eq(members.organizationId, headerOrgId),
 				),
-			});
-			if (!membership) {
-				throw notAMemberOfOrganization(headerOrgId, ctx.session.user.email);
-			}
-			activeOrganizationId = headerOrgId;
+			}));
+		if (!membership) {
+			throw notAMemberOfOrganization(headerOrgId, session.user.email);
 		}
+		activeOrganizationId = headerOrgId;
+	}
+	return {
+		session,
+		activeOrganizationId,
+		principal: personPrincipal(session.user.id, activeOrganizationId),
+	};
+}
 
-		return next({ ctx: { ...ctx, activeOrganizationId } });
+/**
+ * A Dev inside a running turn, from a turn token in its own header and
+ * signed with its own key, so it can never pass as a user's JWT. A settled
+ * turn, or an archived Dev, stops working at once rather than when the token
+ * expires. Null when the request carries no turn token.
+ */
+async function devFromTurnToken(
+	headers: Headers,
+): Promise<DevPrincipal | null> {
+	const token = headers.get(TURN_TOKEN_HEADER);
+	if (!token) return null;
+	const claims = await verifyTurnToken(env.AGENT_TURN_SIGNING_SECRET, token);
+	if (!claims) {
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "Bad turn token." });
+	}
+	const [turn] = await db
+		.select({
+			status: agentTurns.status,
+			archivedAt: agents.archivedAt,
+			ownerId: agents.createdByUserId,
+		})
+		.from(agentTurns)
+		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
+		.where(
+			and(
+				eq(agentTurns.id, claims.turnId),
+				eq(agentTurns.sessionId, claims.sessionId),
+				eq(agentTurns.agentId, claims.agentId),
+				eq(agentTurns.organizationId, claims.organizationId),
+			),
+		)
+		.limit(1);
+	if (!turn || turn.status !== "running" || turn.archivedAt) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+			message: "Turn is not running.",
+		});
+	}
+	const ownerAsks =
+		turn.ownerId !== null && claims.actingUserId === turn.ownerId;
+	return {
+		kind: "dev",
+		agentId: claims.agentId,
+		organizationId: claims.organizationId,
+		ownerId: turn.ownerId,
+		askerId: claims.actingUserId,
+		ownerAsks,
+		sessionId: claims.sessionId,
+		turnId: claims.turnId,
+	};
+}
+
+/**
+ * Anyone who may call: a Dev with a turn token, or a signed-in person.
+ * Procedures on it check access with `ctx.principal`, never the session.
+ */
+export const actorProcedure = t.procedure
+	.use(sandboxScope)
+	.use(async ({ ctx, path, next }) => {
+		const dev = await devFromTurnToken(ctx.headers);
+		const caller = dev
+			? {
+					session: null,
+					activeOrganizationId: dev.organizationId,
+					principal: dev as Principal,
+				}
+			: await personFromSession(ctx, path);
+		captureApiCall(ctx.client, actorOf(caller.principal), path);
+		return next({
+			ctx: { ...ctx, ...caller, principal: caller.principal as Principal },
+		});
 	});
+
+/** A signed-in person only. */
+export const personProcedure = actorProcedure.use(({ ctx, next }) => {
+	const { principal, session } = ctx;
+	if (principal.kind !== "person" || !session) {
+		throw userError({
+			code: "UNAUTHORIZED",
+			message: "Not authenticated. Please sign in.",
+			i18nKey: "serverError.common.notAuthenticatedPleaseSignIn",
+		});
+	}
+	return next({ ctx: { ...ctx, session, principal } });
+});
+
+/** A Dev inside a running turn only. */
+export const devProcedure = actorProcedure.use(({ ctx, next }) => {
+	const { principal } = ctx;
+	if (principal.kind !== "dev") {
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "No turn token." });
+	}
+	return next({ ctx: { ...ctx, principal } });
+});
 
 /**
  * Callers pass the organization in a header (the CLI sends
@@ -287,114 +390,7 @@ function assertInBoxOrganization(
 	}
 }
 
-const inBoxOrganization = (
-	sandboxCaller: SandboxCaller | null,
-	organizationIds: string[],
-) =>
-	sandboxCaller
-		? organizationIds.filter((id) => id === sandboxCaller.organizationId)
-		: organizationIds;
-
-function resolveActiveOrganizationId(
-	organizationIds: string[],
-	requestedOrganizationId: string | null,
-	signedInAs?: string,
-): string | null {
-	if (!requestedOrganizationId) {
-		return organizationIds[0] ?? null;
-	}
-
-	if (!organizationIds.includes(requestedOrganizationId)) {
-		throw notAMemberOfOrganization(requestedOrganizationId, signedInAs);
-	}
-
-	return requestedOrganizationId;
-}
-
-export const jwtProcedure = t.procedure
-	.use(sandboxScope)
-	.use(async ({ ctx, next }) => {
-		const authHeader = ctx.headers.get("authorization");
-		const bearer = authHeader?.startsWith("Bearer ")
-			? authHeader.slice(7)
-			: null;
-		const headerOrgId = ctx.headers.get(ORGANIZATION_HEADER)?.trim() || null;
-		assertInBoxOrganization(ctx.sandboxCaller, headerOrgId);
-
-		if (bearer) {
-			try {
-				const { payload } = await ctx.auth.api.verifyJWT({
-					body: { token: bearer },
-				});
-				if (payload?.sub) {
-					const organizationIds = inBoxOrganization(
-						ctx.sandboxCaller,
-						Array.isArray(payload.organizationIds)
-							? payload.organizationIds.filter(
-									(id): id is string => typeof id === "string",
-								)
-							: [],
-					);
-					return next({
-						ctx: {
-							userId: payload.sub,
-							organizationIds,
-							activeOrganizationId: resolveActiveOrganizationId(
-								organizationIds,
-								headerOrgId,
-							),
-						},
-					});
-				}
-			} catch (error) {
-				// A live session is the legit fallback for an unverifiable token
-				// (expired/missing). A TRPCError from verifyJWT is an explicit
-				// rejection (revoked/forged) — surface it instead of laundering
-				// it into session auth.
-				if (error instanceof TRPCError) throw error;
-			}
-		}
-
-		if (ctx.session) {
-			const userId = ctx.session.user.id;
-			const memberRows = await db.query.members.findMany({
-				where: eq(members.userId, userId),
-				columns: { organizationId: true },
-			});
-			const organizationIds = inBoxOrganization(
-				ctx.sandboxCaller,
-				memberRows.map((row) => row.organizationId),
-			);
-			return next({
-				ctx: {
-					userId,
-					organizationIds,
-					activeOrganizationId: headerOrgId
-						? resolveActiveOrganizationId(
-								organizationIds,
-								headerOrgId,
-								ctx.session.user.email,
-							)
-						: (ctx.session.session.activeOrganizationId ??
-							organizationIds[0] ??
-							null),
-				},
-			});
-		}
-
-		throw userError({
-			code: "UNAUTHORIZED",
-			message:
-				"Not authenticated. Provide a bearer JWT, x-api-key, or session.",
-			i18nKey: "serverError.common.notAuthenticatedProvideABearerJwt",
-		});
-	})
-	.use(async ({ ctx, path, next }) => {
-		captureApiCall(ctx.client, ctx.userId, path);
-		return next();
-	});
-
-export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+export const adminProcedure = personProcedure.use(async ({ ctx, next }) => {
 	if (!hasAdminAccess(ctx.session.user)) {
 		throw new TRPCError({
 			code: "FORBIDDEN",
@@ -415,50 +411,4 @@ export const workerProcedure = t.procedure.use(async ({ ctx, next }) => {
 		throw new TRPCError({ code: "UNAUTHORIZED", message: "Unknown worker." });
 	}
 	return next();
-});
-
-/**
- * An agent acting inside a running turn, never a person: authenticated by a
- * turn token in its own header and signed with its own key, so it can never
- * pass as a user's JWT. A settled turn, or an archived agent, stops working
- * at once rather than when the token expires.
- */
-export const agentProcedure = t.procedure.use(async ({ ctx, next }) => {
-	const token = ctx.headers.get(TURN_TOKEN_HEADER);
-	const claims = token
-		? await verifyTurnToken(env.AGENT_TURN_SIGNING_SECRET, token)
-		: null;
-	if (!claims) {
-		throw new TRPCError({ code: "UNAUTHORIZED", message: "No turn token." });
-	}
-	const [turn] = await db
-		.select({ status: agentTurns.status, archivedAt: agents.archivedAt })
-		.from(agentTurns)
-		.innerJoin(agents, eq(agents.id, agentTurns.agentId))
-		.where(
-			and(
-				eq(agentTurns.id, claims.turnId),
-				eq(agentTurns.sessionId, claims.sessionId),
-				eq(agentTurns.agentId, claims.agentId),
-				eq(agentTurns.organizationId, claims.organizationId),
-			),
-		)
-		.limit(1);
-	if (!turn || turn.status !== "running" || turn.archivedAt) {
-		throw new TRPCError({
-			code: "UNAUTHORIZED",
-			message: "Turn is not running.",
-		});
-	}
-	return next({
-		ctx: {
-			agentTurn: {
-				agentId: claims.agentId,
-				organizationId: claims.organizationId,
-				sessionId: claims.sessionId,
-				turnId: claims.turnId,
-				actingUserId: claims.actingUserId,
-			},
-		},
-	});
 });

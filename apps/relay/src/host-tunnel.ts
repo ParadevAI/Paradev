@@ -38,7 +38,7 @@ const LIVENESS_SWEEP_MS = 45_000;
 const HOST_STALE_MS = 90_000;
 
 type ConnState =
-	| { kind: "host"; hostId: string }
+	| { kind: "host"; hostId: string; retired?: true }
 	| { kind: "client"; ticket: string; peer?: string }
 	| { kind: "dial"; ticket: string; peer?: string };
 
@@ -161,6 +161,7 @@ export class HostTunnel extends Server<RelayEnv> {
 	}
 
 	private async authorize(caller: Caller): Promise<AccessDecision> {
+		if (caller.preAuthorized) return "allowed";
 		const key = `access:${caller.userId}`;
 		const cached = await this.ctx.storage.get<AccessEntry>(key);
 		if (cached && cached.expiresAt > Date.now()) {
@@ -210,7 +211,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			// Last-write-wins: the new socket evicts any old one.
 			for (const other of this.getConnections(HOST_TAG)) {
 				if (other.id !== conn.id)
-					closeQuietly(other, RELAY_CLOSE.replaced, "Replaced by new tunnel");
+					retireHost(other, RELAY_CLOSE.replaced, "Replaced by new tunnel");
 			}
 			await this.ctx.storage.put("lastHostSeenAt", Date.now());
 			await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
@@ -397,7 +398,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			console.log(
 				`[relay] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
 			);
-			closeQuietly(host, RELAY_CLOSE.staleHost, "No keepalive from host");
+			retireHost(host, RELAY_CLOSE.staleHost, "No keepalive from host");
 			return;
 		}
 
@@ -424,9 +425,12 @@ export class HostTunnel extends Server<RelayEnv> {
 		this.httpExchanges.fail(ticket);
 	}
 
+	// getConnections() trusts readyState, but a closed socket whose peer never
+	// answered reads OPEN again after a wake. The retired mark survives it.
 	private hostConn(): Connection | null {
 		for (const conn of this.getConnections(HOST_TAG)) {
-			if (conn.readyState === WebSocket.OPEN) return conn;
+			const state = conn.state as ConnState | undefined;
+			if (state?.kind === "host" && !state.retired) return conn;
 		}
 		return null;
 	}
@@ -442,6 +446,12 @@ export class HostTunnel extends Server<RelayEnv> {
 	private sendDial(host: Connection, dial: StreamDial): void {
 		host.send(JSON.stringify(dial));
 	}
+}
+
+function retireHost(conn: Connection, code: number, reason: string): void {
+	const state = conn.state as ConnState | undefined;
+	if (state?.kind === "host") conn.setState({ ...state, retired: true });
+	closeQuietly(conn, code, reason);
 }
 
 function closeQuietly(conn: Connection, code: number, reason: string): void {

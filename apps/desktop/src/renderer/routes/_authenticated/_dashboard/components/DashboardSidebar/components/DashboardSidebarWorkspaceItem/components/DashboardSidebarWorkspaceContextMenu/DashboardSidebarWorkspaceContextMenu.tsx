@@ -18,6 +18,7 @@ import {
 	LuBellOff,
 	LuClipboard,
 	LuCopy,
+	LuCpu,
 	LuEye,
 	LuEyeOff,
 	LuFolderOpen,
@@ -34,7 +35,13 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
+import { WorkspaceMoveMenu } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMoveMenu";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
+import type {
+	MovableWorkspace,
+	WorkspaceMoveDirection,
+} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
@@ -44,6 +51,8 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	workspaceId: string;
 	/** Null for project-less session workspaces. */
 	projectId: string | null;
+	/** Absent when the workspace can move nowhere. */
+	move?: { directions: WorkspaceMoveDirection[]; workspace: MovableWorkspace };
 	/** Only sessions and project workspaces can join a group. */
 	isSessionWorkspace?: boolean;
 	isInSection?: boolean;
@@ -70,6 +79,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	onRemoveFromSidebar?: () => void;
 	onRename?: () => void;
 	onDelete?: () => void;
+	environmentItem?: React.ReactNode;
 	onToggleUnread: () => void;
 	onClearStatus: () => void;
 	onRemovePullRequest: () => void;
@@ -79,6 +89,7 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 export function DashboardSidebarWorkspaceContextMenu({
 	workspaceId,
 	projectId,
+	move,
 	isSessionWorkspace = false,
 	isInSection,
 	isLocalWorkspace,
@@ -98,6 +109,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	onRemoveFromSidebar,
 	onRename,
 	onDelete,
+	environmentItem,
 	onToggleUnread,
 	onClearStatus,
 	onRemovePullRequest,
@@ -234,6 +246,35 @@ export function DashboardSidebarWorkspaceContextMenu({
 								<Trans>Ungroup</Trans>
 							</ContextMenuItem>
 						)}
+					</>
+				)}
+				{environmentItem}
+				{move && (
+					<>
+						<ContextMenuSeparator />
+						<WorkspaceMoveMenu
+							menu="context"
+							workspace={move.workspace}
+							directions={move.directions}
+						/>
+					</>
+				)}
+				{isCloudWorkspace && (
+					<>
+						<ContextMenuSeparator />
+						<ContextMenuSub>
+							<ContextMenuSubTrigger>
+								<LuCpu className="size-4 mr-2" />
+								<Trans>Machine size</Trans>
+							</ContextMenuSubTrigger>
+							<ContextMenuSubContent className="min-w-64">
+								<MachineSizeMenuItems
+									workspaceId={workspaceId}
+									menu="context"
+									runAfterClose={runAfterClose}
+								/>
+							</ContextMenuSubContent>
+						</ContextMenuSub>
 					</>
 				)}
 				<ContextMenuSeparator />

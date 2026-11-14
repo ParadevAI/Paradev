@@ -2,6 +2,7 @@ import type { AppRouter } from "@superset/host-service";
 import { useFormat } from "@superset/i18n/react";
 import type { inferRouterOutputs } from "@trpc/server";
 import { Check } from "lucide-react";
+import { useNow } from "renderer/hooks/useNow";
 
 type Commit =
 	inferRouterOutputs<AppRouter>["git"]["listCommits"]["commits"][number];
@@ -17,6 +18,7 @@ export function CommitRow({
 	isSelected,
 	wrap = false,
 }: CommitRowProps) {
+	const now = useNow(60_000);
 	const { formatCompactRelativeTime } = useFormat();
 
 	return (
@@ -27,7 +29,7 @@ export function CommitRow({
 				</div>
 				<div className="truncate text-xs text-muted-foreground">
 					{commit.shortHash} · {commit.author} ·{" "}
-					{formatCompactRelativeTime(new Date(commit.date))}
+					{formatCompactRelativeTime(new Date(commit.date), now)}
 				</div>
 			</div>
 			{isSelected && <Check className="mt-0.5 size-3.5 shrink-0" />}

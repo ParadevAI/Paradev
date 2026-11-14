@@ -70,7 +70,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
     environment: production
-    needs: deploy-database
+    needs: [deploy-database, deploy-web]
 
     steps:
       - name: Checkout repository
@@ -105,6 +105,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
@@ -221,6 +222,7 @@ jobs:
             --env TEMPORAL_NAMESPACE=$TEMPORAL_NAMESPACE \
             --env TEMPORAL_API_KEY=$TEMPORAL_API_KEY \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
+            --env DOMAIN_MOVE_ENABLED=$DOMAIN_MOVE_ENABLED \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
@@ -507,7 +509,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
+          NEXT_PUBLIC_WEB_URL: ${{ secrets.MARKETING_WEB_URL || secrets.NEXT_PUBLIC_WEB_URL }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
@@ -745,6 +747,8 @@ jobs:
               - 'apps/realtime/**'
               - 'packages/shared/src/realtime.ts'
               - 'packages/shared/src/channels.ts'
+              - 'packages/shared/src/move-book/**'
+              - '!packages/shared/src/move-book/**/*.test.ts'
               - 'packages/shared/src/page-storage.ts'
               - 'packages/shared/src/page-storage-hub.ts'
               - 'packages/shared/src/page-storage-access.ts'

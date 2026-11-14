@@ -8,16 +8,12 @@ import {
 describe("rememberCloudChoice", () => {
 	test("merges into the project's entry and bumps it", () => {
 		const choices = rememberCloudChoice(
-			{ a: { environmentId: "env-1", machineSize: "small", usedAt: 1 } },
+			{ a: { environmentId: "env-1", usedAt: 1 } },
 			"a",
-			{ machineSize: "large" },
+			{ environmentId: "env-2" },
 			5,
 		);
-		expect(choices.a).toEqual({
-			environmentId: "env-1",
-			machineSize: "large",
-			usedAt: 5,
-		});
+		expect(choices.a).toEqual({ environmentId: "env-2", usedAt: 5 });
 	});
 
 	test("evicts the least recently used past the cap", () => {

@@ -39,6 +39,18 @@ export function initSentry(options: { organizationId?: string }): void {
 	initialized = true;
 }
 
+/** A file a user attached that the agent did not get. */
+export function reportAttachmentResolveFailure(error: unknown): void {
+	if (!initialized) return;
+	Sentry.captureException(error, { tags: { attachment_resolve: "failed" } });
+}
+
+/** A usage scan that crashed its worker, idle or not; the pool pauses after. */
+export function reportUsageWorkerCrash(error: unknown): void {
+	if (!initialized) return;
+	Sentry.captureException(error, { tags: { usage_worker: "crashed" } });
+}
+
 export async function captureFatalStartupError(error: unknown): Promise<void> {
 	if (!initialized) return;
 	Sentry.captureException(error);

@@ -160,10 +160,9 @@ export function GitHubIssuesContent({
 		resetDraft();
 		selectProject(issue.projectId);
 		updateDraft({
-			hostId: issue.hostId,
 			promptDraft: linkedContextSeed([linkedIssueChip(linkedIssue, isDark)]),
 		});
-		openNewWorkspace(issue.projectId);
+		openNewWorkspace(issue.projectId, issue.hostId ?? undefined);
 	};
 
 	const handleOpenUrl = (url: string) => {

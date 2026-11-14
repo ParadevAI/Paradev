@@ -1,0 +1,42 @@
+import { z } from "zod";
+
+export const chatMoveOfChatInputSchema = z.object({
+	chatSessionId: z.string().uuid(),
+	/** The newest move by anyone in the organization, not only the caller's. */
+	anyone: z.boolean().optional(),
+});
+
+export const chatMovesWaitingOnHostInputSchema = z.object({
+	hostId: z.string().min(1).max(200),
+});
+
+/** As many chats as one workspace move takes. */
+export const MAX_MOVED_CHATS = 50;
+
+export const retryChatMoveInputSchema = z.object({
+	moveId: z.string().uuid(),
+});
+
+export const chatMoveInputSchema = z.object({
+	moveId: z.string().uuid(),
+});
+
+/** Names the run carrying out the move, so only that run can finish or fail its copy. */
+const attemptId = z.string().uuid().optional();
+
+export const chatMoveAttemptInputSchema = chatMoveInputSchema.extend({
+	attemptId,
+});
+
+export const chatMoveEventsInputSchema = z.object({
+	moveId: z.string().uuid(),
+	/** The seq of the last event already received. */
+	afterSeq: z.number().int().nonnegative().default(0),
+	limit: z.number().int().min(1).max(1000).default(500),
+});
+
+export const failChatMoveInputSchema = z.object({
+	moveId: z.string().uuid(),
+	error: z.string().min(1).max(2000),
+	attemptId,
+});

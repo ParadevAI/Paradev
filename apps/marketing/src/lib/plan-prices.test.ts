@@ -27,7 +27,7 @@ function family(
 }
 
 const catalog = [
-	family("pro", 20, 192, null),
+	family("pro", 20, 192, 19200),
 	family("team", 60, 648, 72000),
 	family("ultra", 200, 2400, 240000),
 ];
@@ -40,6 +40,10 @@ describe("fillPlanPrices", () => {
 				catalog,
 			),
 		).toBe("Pro $20 or $16 yearly; Team $60 with 1,200 GB-hours; Ultra $200");
+	});
+
+	test("Pro GB-hours are not advertised", () => {
+		expect(fillPlanPrices("{{gbHours:pro}}", catalog)).toBe(MISSING_PLAN_PRICE);
 	});
 
 	test("an empty catalog falls back to the pricing page", () => {

@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -273,7 +273,7 @@ git clone https://github.com/paradevai/paradev.git
 然后在该工作区的终端中运行开发环境设置:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -287,13 +287,13 @@ bun run dev
 
 ## 配置
 
-在 `.superset/config.json` 中配置工作区的设置、清理和运行脚本。参见[完整文档](https://docs.paradev.com/setup-teardown-scripts)。
+在 `.paradev/config.json` 中配置工作区的设置、清理和运行脚本。参见[完整文档](https://docs.paradev.com/setup-teardown-scripts)。
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -316,7 +316,6 @@ bun run dev
 
 ## 默认私密
 
-- **源码可见**:完整源码以 Elastic License 2.0(ELv2)许可发布在 GitHub 上。
 - **显式连接**:由你决定连接哪些智能体、提供商和集成。
 
 ## 贡献
@@ -346,4 +345,4 @@ bun run dev
 
 **桌面应用永久免费。**在你自己的机器上并行运行智能体永远不需要付费。我们收费的任何东西都会是在此之上的可选服务。
 
-整个应用都在这个仓库中,采用 [Elastic License 2.0](../LICENSE.md) 许可:使用它、fork 它、修改它、为你的团队自托管它,都可以。唯一不允许的,是把 Paradev 本身重新打包成服务卖给他人。
+整个应用都在这个仓库中,采用 [MIT 许可证](../LICENSE.md):使用它、fork 它、修改它、自托管它、再分发它,都可以。

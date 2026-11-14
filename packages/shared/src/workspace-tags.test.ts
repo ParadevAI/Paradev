@@ -95,6 +95,13 @@ describe("workspaceTagInputSchema", () => {
 			).success,
 		).toBe(false);
 	});
+
+	test("rejects control characters, which the database cannot store", () => {
+		expect(workspaceTagInputSchema.safeParse("ok\u0000tag").success).toBe(
+			false,
+		);
+		expect(workspaceTagInputSchema.safeParse("ok\ttag").success).toBe(false);
+	});
 });
 
 describe("workspaceTagsInputSchema", () => {

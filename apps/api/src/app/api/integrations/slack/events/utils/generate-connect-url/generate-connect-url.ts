@@ -1,4 +1,5 @@
 import { createHmac } from "node:crypto";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 
 export interface PendingUnfurl {
@@ -34,5 +35,5 @@ export function generateConnectUrl({
 		.update(payload)
 		.digest("hex");
 	const token = Buffer.from(payload).toString("base64url");
-	return `${env.NEXT_PUBLIC_API_URL}/api/integrations/slack/link?token=${token}&sig=${signature}`;
+	return `${getBrowserApiUrl(env)}/api/integrations/slack/link?token=${token}&sig=${signature}`;
 }

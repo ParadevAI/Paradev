@@ -21,7 +21,7 @@ export type SessionDurableEnvelope = Extract<
 export const sessionWorkspaceOptions = {
 	workspace: string().required().desc("Workspace ID"),
 	host: string().desc(
-		"Host the workspace lives on (default: the cloud if your account has cloud workspaces, else this machine)",
+		"Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)",
 	),
 	local: boolean().desc("The workspace is on this machine"),
 };
@@ -56,6 +56,12 @@ function sessionsClient(client: HostServiceClient): SessionsClient {
 	};
 }
 
+export function desktopTabNote(opened: boolean): string {
+	return opened
+		? ", opened in a desktop tab"
+		: ". No desktop tab was opened yet; the Paradev desktop app adds one when it shows this workspace";
+}
+
 export async function resolveSessionWorkspace(
 	ctx: CliContext,
 	options: { workspace: string; host?: string | null; local?: boolean | null },
@@ -63,6 +69,8 @@ export async function resolveSessionWorkspace(
 	workspace: HostWorkspaceRow;
 	target: ResolvedHostTarget;
 	sessions: SessionsClient;
+	/** Shows a chat session in a background desktop tab; false when no desktop on that host can. */
+	openTab: (sessionId: string) => Promise<boolean>;
 }> {
 	const organizationId = ctx.config.organizationId;
 	if (!organizationId)
@@ -77,5 +85,30 @@ export async function resolveSessionWorkspace(
 		},
 		options.workspace,
 	);
-	return { workspace, target, sessions: sessionsClient(target.client) };
+	return {
+		workspace,
+		target,
+		sessions: sessionsClient(target.client),
+		openTab: async (sessionId) => {
+			try {
+				await target.client.panes.newTab.mutate({
+					workspaceId: options.workspace,
+					sessionId,
+				});
+				return true;
+			} catch (error) {
+				const code = (error as { data?: { code?: string } } | null)?.data?.code;
+				const message = error instanceof Error ? error.message : String(error);
+				const expected =
+					code === "PRECONDITION_FAILED" ||
+					/No procedure found on path "?panes\./.test(message);
+				if (!expected) {
+					process.stderr.write(
+						`Could not open chat session ${sessionId} in a desktop tab: ${message}\n`,
+					);
+				}
+				return false;
+			}
+		},
+	};
 }

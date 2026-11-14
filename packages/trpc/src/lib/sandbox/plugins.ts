@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { organizationPlugins, pluginInstalls } from "@superset/db/schema";
-import type { SandboxPlugin } from "@superset/shared/sandbox-contract";
+import type { SandboxPlugin } from "@superset/shared/sandbox/contract";
 import { and, asc, eq, isNull, or } from "drizzle-orm";
 import {
 	accessibleTo,

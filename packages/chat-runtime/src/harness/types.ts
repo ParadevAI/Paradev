@@ -1,3 +1,4 @@
+import type { ChatSelections } from "@superset/chat/core";
 import type {
 	Decision,
 	Delta,
@@ -14,10 +15,22 @@ export type AdapterEvent =
 	| { kind: "turn"; turn: Turn }
 	| { kind: "session"; session: Partial<SessionState> };
 
-export type HarnessStartOptions = {
+export type AttachmentPart = Extract<UserContent, { type: "attachment" }>;
+
+/** `data` is an image's bytes, base64; empty for any other file, which goes by `path`. */
+export type ResolvedAttachment = {
+	path: string;
+	mimeType: string;
+	data: string;
+};
+
+/** Null when the bytes cannot be had: the adapter tells the agent so. */
+export type ResolveAttachment = (
+	part: AttachmentPart,
+) => Promise<ResolvedAttachment | null>;
+
+export type HarnessStartOptions = ChatSelections & {
 	cwd: string;
-	modeId?: string;
-	modelId?: string;
 	/** `quiet` loads the agent's history without replaying it as items. */
 	resume?: { harnessSessionId: string; quiet?: boolean };
 };
@@ -36,7 +49,10 @@ export interface HarnessAdapter {
 	/** Resolves false when the agent did not accept the prompt, so the caller queues it. */
 	steer?(content: UserContent[]): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): void;
-	setMode(modeId: string): void;
+	/** Resolves false when the agent refused the mode. */
+	setMode(modeId: string): Promise<boolean>;
+	/** The start model, effort and mode the agent took. */
+	startSelections?(): Promise<ChatSelections>;
 	/** Resolves false when the agent refused the change. */
 	setConfigOption?(configId: string, value: string): Promise<boolean>;
 	/**

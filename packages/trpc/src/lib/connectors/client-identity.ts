@@ -1,8 +1,10 @@
 import { db } from "@superset/db/client";
 import { pluginOauthClients } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import type { ConnectorMethod } from "@superset/shared/connectors";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { and, eq, isNotNull, lte } from "drizzle-orm";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { decryptOptional, encryptOptional } from "../../router/plugins/crypto";
 import { credentialFetch } from "../../router/plugins/manifest";
@@ -14,13 +16,38 @@ export interface ClientIdentity {
 	authentication?: "basic" | "post";
 }
 
+/**
+ * Which client a token request goes out as. A new grant takes any client
+ * registered for the scopes it asks for. A grant already issued is bound to its
+ * client: `null` is one issued before that was recorded.
+ */
+export type ClientFor = { newGrant: true } | { issuedTo: string | null };
+
+/** The client a grant was issued to no longer exists, so the grant cannot be refreshed. */
+export class ForgottenClientError extends Error {
+	constructor(issuer: string, clientId: string) {
+		super(`${issuer} client ${clientId} is no longer registered.`);
+		this.name = "ForgottenClientError";
+	}
+}
+
 export function clientMetadataUrl(connectorSlug: string): string {
 	const base = env.PLUGIN_CLIENT_METADATA_BASE_URL ?? env.NEXT_PUBLIC_API_URL;
 	return `${base}/api/connectors/${connectorSlug}/client-metadata`;
 }
 
 export function redirectUriFor(connectorSlug: string): string {
-	return `${env.NEXT_PUBLIC_API_URL}/api/connectors/callback/${connectorSlug}`;
+	return `${getBrowserApiUrl(env)}/api/connectors/callback/${connectorSlug}`;
+}
+
+export function issuedGrantRedirectUris(
+	connectorSlug: string,
+	redirectUri = redirectUriFor(connectorSlug),
+): string[] {
+	return withOwnDomainTwins([
+		redirectUri,
+		`${env.NEXT_PUBLIC_API_URL}/api/connectors/callback/${connectorSlug}`,
+	]);
 }
 
 function pickAuthMethod(
@@ -56,32 +83,68 @@ function authenticationFor(
 	return undefined;
 }
 
+type StoredClientRow = typeof pluginOauthClients.$inferSelect;
+
+function unexpired(row: StoredClientRow): boolean {
+	return !row.clientSecretExpiresAt || row.clientSecretExpiresAt > new Date();
+}
+
 async function storedClient(
 	issuer: string,
-	redirectUri: string,
+	redirectUri: string | string[],
+	pick: { clientId: string } | { coveringScopes: string[] } | { legacy: true },
 ): Promise<ClientIdentity | null> {
-	const [row] = await db
+	const rows = await db
 		.select()
 		.from(pluginOauthClients)
 		.where(
 			and(
 				eq(pluginOauthClients.issuer, issuer),
-				eq(pluginOauthClients.redirectUri, redirectUri),
+				Array.isArray(redirectUri)
+					? inArray(pluginOauthClients.redirectUri, redirectUri)
+					: eq(pluginOauthClients.redirectUri, redirectUri),
 			),
 		)
-		.limit(1);
-	if (!row) return null;
-	if (row.clientSecretExpiresAt && row.clientSecretExpiresAt <= new Date()) {
-		return null;
-	}
+		.orderBy(asc(pluginOauthClients.createdAt));
 
-	const secret = await decryptOptional(row.clientSecret);
+	const row =
+		"clientId" in pick
+			? rows.find((candidate) => candidate.clientId === pick.clientId)
+			: "legacy" in pick
+				? // A grant from before client ids were recorded was issued to the row
+					// from before scopes were. Moving it to a newer client only earns
+					// invalid_client, which would then forget that newer, healthy client.
+					rows.find(
+						(candidate) => candidate.scopes === null && unexpired(candidate),
+					)
+				: // A row from before scopes were recorded covers none, so a connector
+					// asking for any scope registers afresh rather than reuse a client
+					// the server may reject them for.
+					rows.find(
+						(candidate) =>
+							unexpired(candidate) &&
+							pick.coveringScopes.every((scope) =>
+								candidate.scopes?.includes(scope),
+							),
+					);
+	if (!row) return null;
+	return identity(
+		row.clientId,
+		await decryptOptional(row.clientSecret),
+		row.tokenEndpointAuthMethod,
+	);
+}
+
+function identity(
+	clientId: string,
+	secret: string | null | undefined,
+	tokenEndpointAuthMethod: string | null,
+): ClientIdentity {
+	const authentication = authenticationFor(tokenEndpointAuthMethod);
 	return {
-		clientId: row.clientId,
+		clientId,
 		...(secret ? { clientSecret: secret } : {}),
-		...(authenticationFor(row.tokenEndpointAuthMethod)
-			? { authentication: authenticationFor(row.tokenEndpointAuthMethod) }
-			: {}),
+		...(authentication ? { authentication } : {}),
 	};
 }
 
@@ -163,29 +226,24 @@ async function register(
 		),
 		registrationClientUri: payload.registration_client_uri ?? null,
 		tokenEndpointAuthMethod: resolvedAuthMethod,
+		// What was asked for, not what the response echoes: a server that grants
+		// less would otherwise send every connect into another registration.
+		scopes: method.scopes ?? [],
 	};
 
 	await db
 		.insert(pluginOauthClients)
 		.values({ issuer: server.issuer, redirectUri, ...row })
 		.onConflictDoUpdate({
-			target: [pluginOauthClients.issuer, pluginOauthClients.redirectUri],
+			target: [
+				pluginOauthClients.issuer,
+				pluginOauthClients.redirectUri,
+				pluginOauthClients.clientId,
+			],
 			set: row,
-			setWhere: and(
-				isNotNull(pluginOauthClients.clientSecretExpiresAt),
-				lte(pluginOauthClients.clientSecretExpiresAt, new Date()),
-			),
 		});
 
-	return (
-		(await storedClient(server.issuer, redirectUri)) ?? {
-			clientId: payload.client_id,
-			...(payload.client_secret ? { clientSecret: payload.client_secret } : {}),
-			...(authenticationFor(resolvedAuthMethod)
-				? { authentication: authenticationFor(resolvedAuthMethod) }
-				: {}),
-		}
-	);
+	return identity(payload.client_id, payload.client_secret, resolvedAuthMethod);
 }
 
 const registering = new Map<string, Promise<ClientIdentity>>();
@@ -195,8 +253,23 @@ export async function resolveClientIdentity(
 	server: DiscoveredServer,
 	method: ConnectorMethod,
 	redirectUri: string,
+	client: ClientFor,
 ): Promise<ClientIdentity> {
 	const metadataUrl = clientMetadataUrl(connectorSlug);
+	const issuedTo = "issuedTo" in client ? client.issuedTo : null;
+	if (issuedTo === metadataUrl) return { clientId: metadataUrl };
+	if (issuedTo) {
+		const bound = await storedClient(
+			server.issuer,
+			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			{
+				clientId: issuedTo,
+			},
+		);
+		if (!bound) throw new ForgottenClientError(server.issuer, issuedTo);
+		return bound;
+	}
+
 	if (
 		server.metadata.client_id_metadata_document_supported &&
 		new URL(metadataUrl).protocol === "https:"
@@ -204,10 +277,26 @@ export async function resolveClientIdentity(
 		return { clientId: metadataUrl };
 	}
 
-	const existing = await storedClient(server.issuer, redirectUri);
+	const scopes = method.scopes ?? [];
+	if (!("newGrant" in client)) {
+		// Registering here would hand the grant a client its tokens were never issued to.
+		const legacy = await storedClient(
+			server.issuer,
+			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			{
+				legacy: true,
+			},
+		);
+		if (!legacy) throw new ForgottenClientError(server.issuer, "(unrecorded)");
+		return legacy;
+	}
+
+	const existing = await storedClient(server.issuer, redirectUri, {
+		coveringScopes: scopes,
+	});
 	if (existing) return existing;
 
-	const key = `${server.issuer}\n${redirectUri}`;
+	const key = `${server.issuer}\n${redirectUri}\n${scopes.join(" ")}`;
 	const pending = registering.get(key);
 	if (pending) return await pending;
 
@@ -220,7 +309,7 @@ export async function resolveClientIdentity(
 
 export async function forgetClient(
 	issuer: string,
-	redirectUri: string,
+	redirectUri: string | string[],
 	clientId: string,
 ): Promise<void> {
 	await db
@@ -228,7 +317,9 @@ export async function forgetClient(
 		.where(
 			and(
 				eq(pluginOauthClients.issuer, issuer),
-				eq(pluginOauthClients.redirectUri, redirectUri),
+				Array.isArray(redirectUri)
+					? inArray(pluginOauthClients.redirectUri, redirectUri)
+					: eq(pluginOauthClients.redirectUri, redirectUri),
 				eq(pluginOauthClients.clientId, clientId),
 			),
 		);

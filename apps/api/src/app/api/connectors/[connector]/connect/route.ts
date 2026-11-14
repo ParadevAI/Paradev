@@ -35,6 +35,10 @@ export async function GET(
 	const plugin = search.get("plugin");
 	const returnsToPlugin =
 		plugin !== null && pluginConnectorSlug(plugin) === slug;
+	const failUrl =
+		returnsToPlugin && plugin
+			? `${env.NEXT_PUBLIC_WEB_URL}/plugins/${encodeURIComponent(plugin)}`
+			: connectUrl;
 
 	let method: ConnectorMethod;
 	try {
@@ -57,10 +61,14 @@ export async function GET(
 
 	try {
 		const redirect = redirectUriFor(slug);
-		const wantsPkce =
-			method.type === "oauth2" &&
-			(await resolveEndpoints(slug, method, redirect)).pkce;
-		const codeVerifier = wantsPkce ? createCodeVerifier() : null;
+		const endpoints =
+			method.type === "oauth2"
+				? await resolveEndpoints(slug, method, redirect, { newGrant: true })
+				: undefined;
+		const codeVerifier = endpoints?.pkce ? createCodeVerifier() : null;
+		// The callback must redeem the code as the client that asked for it, and
+		// a dynamic connector can have several registered.
+		const clientId = endpoints?.issuer ? endpoints.clientId : null;
 
 		return await beginOAuthFlow({
 			cookie: connectorStateCookie(slug),
@@ -71,6 +79,7 @@ export async function GET(
 					? { codeVerifier: await encryptSecret(codeVerifier) }
 					: {}),
 				...(returnsToPlugin ? { plugin } : {}),
+				...(clientId ? { clientId } : {}),
 			},
 			authorizeUrl: async (state) =>
 				(
@@ -78,15 +87,16 @@ export async function GET(
 						redirectUri: redirect,
 						state,
 						codeVerifier,
+						endpoints,
 					})
 				).url,
 		});
 	} catch (error) {
 		if (error instanceof MissingConnectorEnvError) {
 			console.error(`[connectors/${slug}] ${error.message}`);
-			return Response.redirect(`${connectUrl}?error=not_configured`);
+			return Response.redirect(`${failUrl}?error=not_configured`);
 		}
 		console.error(`[connectors/${slug}] connect failed:`, error);
-		return Response.redirect(`${connectUrl}?error=connect_failed`);
+		return Response.redirect(`${failUrl}?error=connect_failed`);
 	}
 }

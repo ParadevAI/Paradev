@@ -32,12 +32,12 @@ import {
 	useState,
 } from "react";
 import { env } from "renderer/env.renderer";
+import { pageLinkFinder } from "../../../../utils/pageLinks";
 import {
 	CHAT_COLUMN_CLASSNAME,
 	CHAT_SCROLLER_GUTTER_CLASSNAME,
 } from "../../constants";
 import type { ChatForkTarget } from "../../types";
-import { pageLinkFinder } from "../../utils/pageLinks";
 import { TranscriptFindBar } from "./components/TranscriptFindBar";
 import { TranscriptRowItem } from "./components/TranscriptRowItem";
 import { useCarriedReaderPosition } from "./hooks/useCarriedReaderPosition";
@@ -452,7 +452,7 @@ export function Transcript({
 						{contentChildren}
 					</MessageScroller.Content>
 				</MessageScroller.Viewport>
-				<div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+				<div className="pointer-events-none absolute inset-x-0 bottom-9 flex justify-center">
 					<ScrollToBottomButton />
 				</div>
 			</ChatImageGalleryProvider>

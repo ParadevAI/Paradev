@@ -34,6 +34,7 @@ import type {
 } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { useNow } from "renderer/hooks/useNow";
 import {
 	formatResetIn,
 	formatResetLabel,
@@ -79,6 +80,7 @@ function meterColor(usedPercent: number): string {
 
 /** One line per window: label · bar · % · reset. Density over ceremony. */
 function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
+	const now = useNow(60_000);
 	const percent = Math.min(window.usedPercent, 100);
 	return (
 		<div className="grid grid-cols-[minmax(0,9rem)_1fr_2.5rem_5rem] items-center gap-2">
@@ -96,9 +98,11 @@ function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
 			</span>
 			<span
 				className="text-right text-[11px] text-muted-foreground tabular-nums"
-				title={window.resetsAt ? formatResetLabel(window.resetsAt) : undefined}
+				title={
+					window.resetsAt ? formatResetLabel(window.resetsAt, now) : undefined
+				}
 			>
-				{window.resetsAt ? `↺ ${formatResetIn(window.resetsAt)}` : ""}
+				{window.resetsAt ? `↺ ${formatResetIn(window.resetsAt, now)}` : ""}
 			</span>
 		</div>
 	);
@@ -186,7 +190,7 @@ function AccountCard({
 							disabled={isSwitching}
 							title={t({
 								message:
-									"Make default — launch new terminals and agents on this account.",
+									"Make default: launch new terminals and agents on this account.",
 							})}
 							onClick={onMakeDefault ?? undefined}
 						>
@@ -293,7 +297,7 @@ function AccountCard({
 			) : expiredCommand !== null ? (
 				<div className="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[11px] text-muted-foreground">
 					<span>
-						<Trans>Sign-in expired — run</Trans>
+						<Trans>Sign-in expired. Run</Trans>
 					</span>
 					<button
 						type="button"
@@ -592,7 +596,7 @@ export function UsageView({
 						) : agentAccounts.length === 0 ? (
 							<div className="rounded-lg border border-dashed px-3 py-2 text-[11px] text-muted-foreground">
 								<Trans>
-									No {AGENT_LABELS[agent]} logins on this host — sign in and
+									No {AGENT_LABELS[agent]} logins on this host. Sign in and
 									usage appears here.
 								</Trans>
 							</div>

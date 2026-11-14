@@ -57,6 +57,15 @@ describe("matchModelRate", () => {
 		});
 	});
 
+	test("prices GPT-6.1 Terra at its own rate, not the cheapest fallback", () => {
+		expect(matchModelRate("codex", "gpt-6.1-terra")).toMatchObject({
+			inputPerM: 1,
+			outputPerM: 5,
+			cacheReadPerM: 0.05,
+			approximate: false,
+		});
+	});
+
 	test("prices GPT-6.1 Sol including cached input and vendor-qualified ids", () => {
 		const rate = matchModelRate("codex", "gpt-6.1-sol");
 		expect(rate).toMatchObject({
@@ -108,6 +117,17 @@ describe("matchModelRate", () => {
 				output: 1_000_000,
 			}),
 		).toBeCloseTo(24.2);
+	});
+
+	test("prices Fable 5.2 and Mythos 5.2 at their own rates, not Fable 5.1's", () => {
+		for (const model of ["claude-fable-5-2", "claude-mythos-5-2"]) {
+			expect(matchModelRate("claude", model)).toMatchObject({
+				inputPerM: 8,
+				outputPerM: 40,
+				cacheReadPerM: 0.2,
+				approximate: false,
+			});
+		}
 	});
 
 	test("prices Fable 5.1 and Mythos 5.1 cache reads at their own rate, not the usual 0.1x", () => {

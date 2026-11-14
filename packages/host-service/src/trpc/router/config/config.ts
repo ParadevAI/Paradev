@@ -4,10 +4,10 @@ import {
 	getDefaultTerminal,
 	parseProjectConfig,
 } from "@superset/shared/project-config";
+import { resolveProjectConfigDirName } from "@superset/shared/project-config/dir";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { projects } from "../../../db/schema";
+import { getLocalProject } from "../../../projects/local-project-store";
 import {
 	getProjectConfigPath,
 	hasProjectConfig,
@@ -25,8 +25,6 @@ const projectIdInput = z.object({ projectId: z.string().uuid() });
 
 const stringArray = z.array(z.string());
 
-const LOCAL_CONFIG_IGNORE_ENTRY = "/.superset/config.local.toml";
-
 /**
  * Keeps the personal file out of commits on this machine without touching the
  * repository: `.git/info/exclude` is a per-clone ignore list. Best effort.
@@ -35,16 +33,13 @@ function excludeLocalConfig(repoPath: string): void {
 	const gitDir = join(repoPath, ".git");
 	if (!existsSync(gitDir)) return;
 	const excludePath = join(gitDir, "info", "exclude");
+	const entry = `/${resolveProjectConfigDirName(repoPath)}/config.local.toml`;
 	try {
 		const current = readIfExists(excludePath) ?? "";
-		if (current.split("\n").includes(LOCAL_CONFIG_IGNORE_ENTRY)) return;
+		if (current.split("\n").includes(entry)) return;
 		mkdirSync(dirname(excludePath), { recursive: true });
 		const separator = current === "" || current.endsWith("\n") ? "" : "\n";
-		writeFileSync(
-			excludePath,
-			`${current}${separator}${LOCAL_CONFIG_IGNORE_ENTRY}\n`,
-			"utf-8",
-		);
+		writeFileSync(excludePath, `${current}${separator}${entry}\n`, "utf-8");
 	} catch (error) {
 		console.warn(
 			"[config] could not add config.local.toml to .git/info/exclude",
@@ -85,9 +80,7 @@ function requireProject(
 	ctx: HostServiceContext,
 	projectId: string,
 ): { id: string; repoPath: string } {
-	const row = ctx.db.query.projects
-		.findFirst({ where: eq(projects.id, projectId) })
-		.sync();
+	const row = getLocalProject(ctx.db, projectId);
 	if (!row || !row.repoPath) {
 		throw new TRPCError({
 			code: "NOT_FOUND",

@@ -1,7 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { isGithubAttachmentUrl } from "@superset/shared/github-attachment";
 import { type CSSProperties, useState } from "react";
 import { LuImageOff } from "react-icons/lu";
 import { useMarkdownResources } from "renderer/components/MarkdownRenderer/providers/MarkdownResourceProvider";
+import { GithubAttachmentImage } from "./components/GithubAttachmentImage";
 import { useLocalImageUrl } from "./hooks/useLocalImageUrl";
 import { resolveLocalImagePath } from "./utils/resolveLocalImagePath";
 
@@ -90,46 +92,28 @@ export function SafeImage({
 		resources?.readFile,
 		resources?.revision,
 	);
-	// Bytes that arrived but aren't an image (an HTML file named .png, a
-	// text file, an empty file) would otherwise sit there as a broken icon.
-	const [undecodableUrl, setUndecodableUrl] = useState<string | null>(null);
+	// A source that loaded no image (a 404, an HTML file named .png, an
+	// empty file) would otherwise sit there as a broken icon.
+	const [failedUrl, setFailedUrl] = useState<string | null>(null);
 	const imageClassName = className ?? "max-w-full h-auto rounded-md my-4";
 
-	if (localPath !== null) {
-		if (local.status === "loading") return null;
-		if (local.status === "ready" && local.url !== undecodableUrl) {
-			return (
-				<img
-					src={local.url}
-					alt={alt}
-					width={width}
-					height={height}
-					style={hintStyle(height, align)}
-					className={imageClassName}
-					onError={() => setUndecodableUrl(local.url)}
-				/>
-			);
-		}
-	} else if (src && loadsDirectly(src, resources !== null)) {
-		return (
-			<img
-				src={src}
-				alt={alt}
-				width={width}
-				height={height}
-				style={hintStyle(height, align)}
-				className={imageClassName}
-			/>
-		);
-	}
-
-	const failedToLoad = localPath !== null;
-	return (
+	const image = (url: string, onError: () => void) => (
+		<img
+			src={url}
+			alt={alt}
+			width={width}
+			height={height}
+			style={hintStyle(height, align)}
+			className={imageClassName}
+			onError={onError}
+		/>
+	);
+	const placeholder = (failedToLoad: boolean) => (
 		<div
 			className={`inline-flex items-center gap-2 px-3 py-2 rounded-md bg-muted text-muted-foreground text-sm ${className ?? ""}`}
 			title={
 				failedToLoad
-					? localPath
+					? (localPath ?? src)
 					: t({ message: `Image blocked: ${src ?? "(empty)"}` })
 			}
 		>
@@ -143,4 +127,27 @@ export function SafeImage({
 			</span>
 		</div>
 	);
+
+	if (localPath !== null) {
+		if (local.status === "loading") return null;
+		if (local.status === "ready" && local.url !== failedUrl) {
+			const url = local.url;
+			return image(url, () => setFailedUrl(url));
+		}
+		return placeholder(true);
+	}
+	if (src && loadsDirectly(src, resources !== null)) {
+		if (src !== failedUrl) return image(src, () => setFailedUrl(src));
+		if (isGithubAttachmentUrl(src)) {
+			return (
+				<GithubAttachmentImage
+					url={src}
+					renderImage={image}
+					fallback={placeholder(true)}
+				/>
+			);
+		}
+		return placeholder(true);
+	}
+	return placeholder(false);
 }

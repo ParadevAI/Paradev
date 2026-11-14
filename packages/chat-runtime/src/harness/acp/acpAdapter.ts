@@ -1,4 +1,9 @@
 import { randomUUID } from "node:crypto";
+import {
+	type ChatSelections,
+	type SelectionCategory,
+	selectionCategoryOf,
+} from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	AvailableCommand,
@@ -26,6 +31,8 @@ import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
+	ResolvedAttachment,
 } from "../types";
 import {
 	type RefusedWindow,
@@ -39,8 +46,10 @@ import {
 	airAsyncTaskSpawnedSchema,
 	airAsyncTaskStateSchema,
 	airForkPointMeta,
+	airPermissionReason,
 	airSubagentSpawnedSchema,
 	airSubagentStateSchema,
+	isCompactionCall,
 	isSubagentControlCall,
 	isTerminalAirState,
 } from "./air";
@@ -181,11 +190,7 @@ type V2Turn = {
 	idle?: AcpStateUpdate & { seq: number };
 };
 
-export type AcpAttachment = {
-	path: string;
-	mimeType: string;
-	data: string;
-};
+export type AcpAttachment = ResolvedAttachment;
 
 /** `path` is relative to the session cwd. */
 export type AcpStoredImage = { path: string };
@@ -197,6 +202,7 @@ export type AcpImageStoreContext = {
 };
 
 const STARTUP_TIMEOUT_MS = 120_000;
+const START_OPTIONS_GRACE_MS = 1_000;
 const REQUEST_TIMEOUT_MS = 30_000;
 const STDERR_TAIL_CHARS = 4000;
 const ASK_MODE_ID = "default";
@@ -233,7 +239,8 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
-	resolveAttachment?: (attachmentId: string) => Promise<AcpAttachment | null>;
+	startOptionsGraceMs?: number;
+	resolveAttachment?: ResolveAttachment;
 	/** Without it, images the agent sends are dropped. */
 	storeImage?: (
 		image: AcpImageSource,
@@ -452,12 +459,21 @@ export class AcpAdapter implements HarnessAdapter {
 	private modeConfigId: string | null = null;
 	private modeId: string | undefined;
 	private readonly selectionsInFlight = new Set<Promise<void>>();
+	private pendingStart: { apply: (listed: boolean) => void } | null = null;
+	private settleStartSelections: (taken: ChatSelections) => void = () => {};
+	private readonly takenStartSelections = new Promise<ChatSelections>(
+		(resolve) => {
+			this.settleStartSelections = resolve;
+		},
+	);
 	private configOptions: SessionConfigOption[] = [];
 	private replaying = false;
 	private agentName: string | null = null;
 	private quietReplay = false;
 	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
+	/** The session could not open signed out; each prompt fails with this until a restart. */
+	private signedOut: TurnError | null = null;
 	private disposed = false;
 	private dead = false;
 	private stderrTail = "";
@@ -467,6 +483,10 @@ export class AcpAdapter implements HarnessAdapter {
 	private heldTurnId: string | null = null;
 	private readonly shellPids = new Map<string, number>();
 	private shellPoll: ReturnType<typeof setInterval> | null = null;
+	/** Claude aborts a running compaction when a steer arrives, so steers wait for these. */
+	private readonly compactions = new Set<string>();
+	private compactionsSettled: Promise<void> = Promise.resolve();
+	private settleCompactions: (() => void) | null = null;
 
 	constructor(private readonly options: AcpAdapterOptions) {
 		this.main = new SessionStream({
@@ -519,6 +539,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
+		if (this.signedOut) {
+			this.failSignedOutTurn(this.signedOut);
+			return;
+		}
 		if (!this.client || !this.sessionId) {
 			this.queuedPrompts.push(content);
 			return;
@@ -538,11 +562,14 @@ export class AcpAdapter implements HarnessAdapter {
 		const client = this.client;
 		const sessionId = this.sessionId;
 		if (!client || !sessionId || !this.canSteer()) return false;
+		const prompt = await this.toAcpPrompt(content);
+		while (this.compactions.size > 0) await this.compactionsSettled;
+		if (!this.canSteer()) return false;
 		const v2TurnId = this.v2TurnIsCurrent() ? this.v2Turn?.id : undefined;
 		if (v2TurnId) {
 			const response = await client.request("session/prompt", {
 				sessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (parsed?.messageId !== undefined && parsed.stopReason === undefined) {
@@ -553,7 +580,7 @@ export class AcpAdapter implements HarnessAdapter {
 		}
 		const response = await client.request(ACP_STEERING_METHOD, {
 			sessionId,
-			prompt: await this.toAcpPrompt(content),
+			prompt,
 			_meta: { steering: { idleBehavior: "promptRequired" } },
 		});
 		const outcome = acpSteeringResponseSchema.safeParse(response).data?.outcome;
@@ -620,16 +647,16 @@ export class AcpAdapter implements HarnessAdapter {
 		this.emitSession({ status: this.statusAfterApprovals() });
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
 		if (this.options.clientApprovalModes) {
-			if (!isClientApprovalMode(modeId)) return;
+			if (!isClientApprovalMode(modeId)) return Promise.resolve(false);
 			this.emitSession({ modeId });
 			if (autoApproves(modeId)) this.approvePendingPermissions();
-			return;
+			return Promise.resolve(true);
 		}
 		const previous = this.modeId;
 		this.emitSession({ modeId });
-		if (!this.client || !this.sessionId) return;
+		if (!this.client || !this.sessionId) return Promise.resolve(false);
 		// v2 dropped session/set_mode outright: a mode is a config option there,
 		// and `config_option_update` is what told us which one.
 		const pending =
@@ -660,6 +687,10 @@ export class AcpAdapter implements HarnessAdapter {
 			}
 			this.emitNotice("error", error.message);
 		});
+		return pending.then(
+			() => true,
+			() => false,
+		);
 	}
 
 	private trackSelection(request: Promise<unknown>): void {
@@ -881,8 +912,11 @@ export class AcpAdapter implements HarnessAdapter {
 	async dispose(): Promise<void> {
 		if (this.disposed) return;
 		this.disposed = true;
+		this.pendingStart?.apply(false);
+		this.settleStartSelections({});
 		this.stalePendingApprovals();
 		this.backgroundTasks.dispose();
+		this.endCompactions();
 		if (this.shellPoll) clearInterval(this.shellPoll);
 		await this.client?.close();
 		this.queue.close();
@@ -1087,6 +1121,15 @@ export class AcpAdapter implements HarnessAdapter {
 			const queued = this.queuedPrompts.splice(0, this.queuedPrompts.length);
 			for (const content of queued) await this.runTurn(content);
 		} catch (error) {
+			const failure = this.turnError(error);
+			if (failure.kind === "auth") {
+				this.signedOut = failure;
+				this.emitSession({ status: this.statusAfterApprovals() });
+				if (this.queuedPrompts.splice(0).length > 0) {
+					this.failSignedOutTurn(failure);
+				}
+				return;
+			}
 			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
 			this.dead = true;
 			this.emitSession({ status: "dead" });
@@ -1104,7 +1147,7 @@ export class AcpAdapter implements HarnessAdapter {
 			status: "running",
 			startedAtMs: this.nextStartMs(),
 		});
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
 		if (this.heldTurnId !== turnId) return;
@@ -1131,6 +1174,7 @@ export class AcpAdapter implements HarnessAdapter {
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			this.finishTurn(turnId, parsed?.stopReason, parsed?.usage);
 		} catch (error) {
+			this.endCompactions();
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;
 			this.failRefusedTurn(turnId, this.turnError(error));
@@ -1167,7 +1211,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const id = this.mintId();
 		this.turnStderr = "";
 		this.emitTurn({ id, status: "running", startedAtMs: this.now() });
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 		this.v2Turn = { id, inserted: true };
 	}
 
@@ -1188,6 +1232,7 @@ export class AcpAdapter implements HarnessAdapter {
 		stopReason: string | undefined,
 		usage?: AcpPromptUsage,
 	): void {
+		this.endCompactions();
 		this.main.flush();
 		this.emitTurn({
 			id: turnId,
@@ -1213,7 +1258,18 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 	}
 
+	private failSignedOutTurn(failure: TurnError): void {
+		const turnId = this.mintId();
+		this.emitTurn({
+			id: turnId,
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		});
+		this.failTurn(turnId, failure);
+	}
+
 	private failTurn(turnId: string, error: TurnError): void {
+		this.endCompactions();
 		this.customAnswer = null;
 		this.main.flush();
 		this.cancelPendingApprovals(turnId);
@@ -1425,7 +1481,31 @@ export class AcpAdapter implements HarnessAdapter {
 		)
 			return;
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
-		if (item && !this.replaying) this.trackBackgroundShell(item);
+		if (!item || this.replaying) return;
+		this.trackBackgroundShell(item);
+		this.trackCompaction(raw, item);
+	}
+
+	private trackCompaction(raw: unknown, item: ToolCall): void {
+		if (!this.compactions.has(item.id) && !isCompactionCall(raw)) return;
+		if (item.status !== "running") {
+			this.compactions.delete(item.id);
+			if (this.compactions.size === 0) this.endCompactions();
+			return;
+		}
+		if (this.compactions.size === 0) {
+			this.compactionsSettled = new Promise((resolve) => {
+				this.settleCompactions = resolve;
+			});
+		}
+		this.compactions.add(item.id);
+	}
+
+	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
+	private endCompactions(): void {
+		this.compactions.clear();
+		this.settleCompactions?.();
+		this.settleCompactions = null;
 	}
 
 	private trackBackgroundShell(item: ToolCall): void {
@@ -1520,8 +1600,15 @@ export class AcpAdapter implements HarnessAdapter {
 			this.options.clientApprovalModes
 		)
 			return;
+		if (parsed.data.state === "running" && this.cycleEnded) {
+			this.cycleEnded = false;
+			this.syncAwaitingBackground();
+		}
 		const status = SESSION_STATUS_BY_ACP_STATE[parsed.data.state];
-		if (status) this.emitSession({ status });
+		if (!status) return;
+		this.emitSession({
+			status: this.pendingApprovals.size > 0 ? "awaiting_input" : status,
+		});
 	}
 
 	/**
@@ -1924,6 +2011,9 @@ export class AcpAdapter implements HarnessAdapter {
 					}
 				: {}),
 		});
+		if (this.pendingStart && this.configOptions.length > 0) {
+			this.pendingStart.apply(true);
+		}
 	}
 
 	private startModeId(
@@ -1935,38 +2025,135 @@ export class AcpAdapter implements HarnessAdapter {
 		return resumed ? undefined : this.options.defaultModeId;
 	}
 
+	/** Resolves to the value the agent took, or undefined when it took none. */
+	private applyStartSelection(
+		category: SelectionCategory,
+		wanted: string | undefined,
+	): Promise<string | undefined> {
+		const option = this.configOptions.find(
+			(entry) => selectionCategoryOf(entry) === category,
+		);
+		if (!wanted || !option) return Promise.resolve(undefined);
+		const value =
+			category === "mode" || category === "fast"
+				? option.options.some((entry) => entry.id === wanted)
+					? wanted
+					: undefined
+				: startOptionId(option.options, wanted);
+		if (!value) return Promise.resolve(undefined);
+		if (option.currentValue === value) return Promise.resolve(value);
+		return this.setConfigOption(option.id, value).then((taken) =>
+			taken ? value : undefined,
+		);
+	}
+
+	private applyConfigSelections(
+		wanted: ChatSelections,
+	): Promise<ChatSelections> {
+		const model = this.applyStartSelection("model", wanted.modelId);
+		const { effortId } = wanted;
+		// The effort levels on offer belong to the model, so they are only known once it is set.
+		const effort = model.then((modelId) =>
+			effortId && (modelId || !wanted.modelId)
+				? this.applyStartSelection("thought_level", effortId)
+				: undefined,
+		);
+		this.trackSelection(effort);
+		// Fast mode also belongs to the model. It waits for effort too: a refused
+		// setting rolls back every option to before it was sent.
+		const fast = wanted.fast
+			? effort
+					.then(() => model)
+					.then((modelId) =>
+						modelId || !wanted.modelId
+							? this.applyStartSelection("fast", wanted.fast)
+							: undefined,
+					)
+			: Promise.resolve(undefined);
+		if (wanted.fast) this.trackSelection(fast);
+		const mode = this.applyStartSelection("mode", wanted.modeId);
+		return Promise.all([model, effort, mode, fast]).then(
+			([modelId, effortId, modeId, fastTaken]) => ({
+				...(modelId ? { modelId } : {}),
+				...(effortId ? { effortId } : {}),
+				...(modeId ? { modeId } : {}),
+				...(fastTaken ? { fast: fastTaken } : {}),
+			}),
+		);
+	}
+
+	/** An agent may list its options after `session/new`; the first prompt waits a moment for them. */
+	private awaitStartOptions(wanted: ChatSelections): Promise<ChatSelections> {
+		const taken = new Promise<ChatSelections>((resolve) => {
+			const timer = setTimeout(
+				() => this.pendingStart?.apply(false),
+				this.options.startOptionsGraceMs ?? START_OPTIONS_GRACE_MS,
+			);
+			this.pendingStart = {
+				apply: (listed) => {
+					clearTimeout(timer);
+					this.pendingStart = null;
+					resolve(listed ? this.applyConfigSelections(wanted) : {});
+				},
+			};
+		});
+		this.trackSelection(taken);
+		return taken;
+	}
+
 	private applyStartSelections(
 		startOptions: HarnessStartOptions,
 		sessionModes: AcpSessionModes | undefined,
 		resumed: boolean,
 	): void {
 		const modeId = this.startModeId(startOptions, resumed);
-		for (const [category, wanted] of [
-			["model", startOptions.modelId],
-			["mode", this.options.clientApprovalModes ? undefined : modeId],
-		] as const) {
-			const option = this.configOptions.find(
-				(entry) => entry.category === category,
-			);
-			if (!wanted || !option) continue;
-			const value =
-				category === "model"
-					? startOptionId(option.options, wanted)
-					: option.options.some((entry) => entry.id === wanted)
-						? wanted
-						: undefined;
-			if (value && option.currentValue !== value) {
-				this.setConfigOption(option.id, value);
-			}
-		}
+		const wanted: ChatSelections = {
+			...(startOptions.modelId ? { modelId: startOptions.modelId } : {}),
+			...(startOptions.effortId ? { effortId: startOptions.effortId } : {}),
+			...(startOptions.fast ? { fast: startOptions.fast } : {}),
+			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
+		};
+		const configured: Promise<ChatSelections> =
+			this.configOptions.length > 0
+				? this.applyConfigSelections(wanted)
+				: Object.keys(wanted).length > 0
+					? this.awaitStartOptions(wanted)
+					: Promise.resolve({});
+		let sessionMode: Promise<string | undefined> = Promise.resolve(
+			this.options.clientApprovalModes && modeId && isClientApprovalMode(modeId)
+				? modeId
+				: undefined,
+		);
 		if (
 			modeId &&
 			!this.modeConfigId &&
-			sessionModes?.currentModeId !== modeId &&
+			sessionModes?.currentModeId === modeId
+		) {
+			sessionMode = Promise.resolve(modeId);
+		} else if (
+			modeId &&
+			!this.modeConfigId &&
 			sessionModes?.availableModes?.some((mode) => mode.id === modeId)
 		) {
-			this.setMode(modeId);
+			sessionMode = this.setMode(modeId).then((taken) =>
+				taken ? modeId : undefined,
+			);
 		}
+		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+			if (wanted.effortId && !taken.effortId)
+				console.warn(
+					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
+				);
+			this.settleStartSelections({
+				...taken,
+				...(takenMode ? { modeId: takenMode } : {}),
+			});
+		});
+	}
+
+	/** The start model, effort and mode the agent took. */
+	startSelections(): Promise<ChatSelections> {
+		return this.takenStartSelections;
 	}
 
 	private handleServerRequest(request: AcpServerRequest): void {
@@ -2000,6 +2187,7 @@ export class AcpAdapter implements HarnessAdapter {
 			parsed.data.subject?.toolCall?.title ??
 			"Permission required";
 		const description = parsed.data.description;
+		const reason = airPermissionReason(request.params);
 		const asking = [...this.main.allToolCalls()].some(
 			(call) => call.status === "running" && call.title === "ask_user_question",
 		);
@@ -2037,6 +2225,7 @@ export class AcpAdapter implements HarnessAdapter {
 			...(description && description !== title
 				? { detail: [{ type: "text" as const, text: description }] }
 				: {}),
+			...(reason ? { reason } : {}),
 			status: "pending",
 			startedAtMs: this.nextStartMs(),
 			...(question
@@ -2228,7 +2417,7 @@ export class AcpAdapter implements HarnessAdapter {
 				continue;
 			}
 			const attachment = await this.options
-				.resolveAttachment?.(entry.attachmentId)
+				.resolveAttachment?.(entry)
 				.catch(() => null);
 			if (!attachment) {
 				dropped.push(entry.name);
@@ -2357,7 +2546,9 @@ export class AcpAdapter implements HarnessAdapter {
 
 	private statusAfterApprovals(): SessionState["status"] {
 		if (this.pendingApprovals.size > 0) return "awaiting_input";
-		return this.currentTurn?.status === "running" ? "running" : "idle";
+		return this.currentTurn?.status === "running" && !this.awaitingBackground
+			? "running"
+			: "idle";
 	}
 
 	private cancelApprovals(
@@ -2411,7 +2602,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private authAwareMessage(error: unknown): string {
 		const message = error instanceof Error ? error.message : String(error);
 		if (/auth/i.test(message)) {
-			return `${message}. Run the agent's login in a terminal (e.g. \`claude /login\`), then reopen this chat.`;
+			return this.loginCommand
+				? `${message}. Run \`${this.loginCommand}\` in a terminal, then reopen this chat.`
+				: `${message}. Sign in to the agent in a terminal, then reopen this chat.`;
 		}
 		return message;
 	}
@@ -2508,7 +2701,10 @@ export class AcpAdapter implements HarnessAdapter {
 			[...this.backgroundTaskTurns.values()].includes(this.currentTurn.id);
 		if (awaiting === this.awaitingBackground) return;
 		this.awaitingBackground = awaiting;
-		this.emitSession({ awaitingBackground: awaiting });
+		this.emitSession({
+			awaitingBackground: awaiting,
+			status: this.statusAfterApprovals(),
+		});
 	}
 
 	private emitItem(item: Item, turnId: string): void {

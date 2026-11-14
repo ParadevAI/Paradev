@@ -1,4 +1,6 @@
+import { msg } from "@lingui/core/macro";
 import { DEFAULT_LOCALE, getLocaleMessages } from "@superset/i18n";
+import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
 import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
@@ -7,6 +9,7 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ExternalTracking } from "@/components/ExternalTracking";
 import {
 	OrganizationJsonLd,
 	SoftwareApplicationJsonLd,
@@ -14,10 +17,6 @@ import {
 } from "@/components/JsonLd";
 import { getChangelogEntries } from "@/lib/changelog";
 import { REDDIT_PIXEL_ID } from "@/lib/constants";
-import {
-	APPLY_HEADLINE_VARIANT_SCRIPT,
-	HEADLINE_VARIANT_STYLE,
-} from "@/lib/hero-headline";
 
 import { CTAButtons } from "./components/CTAButtons";
 import { Footer } from "./components/Footer";
@@ -46,72 +45,79 @@ const inter = Inter({
 	fallback: [],
 });
 
-const siteDescription =
-	"Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel, isolate changes, and review everything in one place.";
+const siteDescription = msg({
+	message:
+		"The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place.",
+});
 
-export const metadata: Metadata = {
-	metadataBase: new URL(COMPANY.MARKETING_URL),
-	title: {
-		default: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
-		template: `%s | ${BRAND.NAME}`,
-	},
-	description: siteDescription,
-	keywords: [
-		"coding agents",
-		"parallel execution",
-		"developer tools",
-		"AI coding",
-		"git worktrees",
-		"code automation",
-		"Claude Code",
-		"Cursor",
-		"Codex",
-	],
-	authors: [{ name: `${BRAND.NAME} Team` }],
-	creator: BRAND.NAME,
-	openGraph: {
-		type: "website",
-		locale: "en_US",
-		url: COMPANY.MARKETING_URL,
-		siteName: BRAND.NAME,
-		title: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
-		description: siteDescription,
-		images: [
-			{
-				url: "/og-image.png",
-				width: 2400,
-				height: 1260,
-				alt: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
-			},
+export async function generateMetadata(): Promise<Metadata> {
+	const i18n = getI18nInstance(await initServerI18n());
+	const description = `${BRAND.INTRO_NAME}: ${i18n._(siteDescription)}`;
+	return {
+		metadataBase: new URL(COMPANY.MARKETING_URL),
+		title: {
+			default: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
+			template: `%s | ${BRAND.NAME}`,
+		},
+		description,
+		keywords: [
+			"coding agents",
+			"parallel execution",
+			"developer tools",
+			"AI coding",
+			"git worktrees",
+			"code automation",
+			"open source",
+			"Claude Code",
+			"Cursor",
+			"Codex",
 		],
-	},
-	twitter: {
-		card: "summary_large_image",
-		title: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
-		description: siteDescription,
-		images: ["/og-image.png"],
-		creator: SOCIAL.X.handle,
-	},
-	robots: {
-		index: true,
-		follow: true,
-		googleBot: {
+		authors: [{ name: `${BRAND.NAME} Team` }],
+		creator: BRAND.NAME,
+		openGraph: {
+			type: "website",
+			locale: "en_US",
+			url: COMPANY.MARKETING_URL,
+			siteName: BRAND.NAME,
+			title: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
+			description,
+			images: [
+				{
+					url: "/og-image.png",
+					width: 2400,
+					height: 1260,
+					alt: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
+				},
+			],
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: `${BRAND.INTRO_NAME} - Run an army of coding agents`,
+			description,
+			images: ["/og-image.png"],
+			creator: SOCIAL.X.handle,
+		},
+		robots: {
 			index: true,
 			follow: true,
-			"max-video-preview": -1,
-			"max-image-preview": "large",
-			"max-snippet": -1,
+			googleBot: {
+				index: true,
+				follow: true,
+				"max-video-preview": -1,
+				"max-image-preview": "large",
+				"max-snippet": -1,
+			},
 		},
-	},
-	icons: {
-		icon: [
-			{ url: "/favicon.ico", sizes: "32x32" },
-			{ url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
-		],
-		apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
-	},
-	manifest: "/manifest.json",
-};
+		icons: {
+			icon: [
+				{ url: "/favicon.ico", sizes: "32x32" },
+				{ url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+			],
+			apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+		},
+		manifest: "/manifest.json",
+	};
+}
 
 async function currentYear(): Promise<number> {
 	"use cache";
@@ -139,14 +145,6 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
-				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: static script built from constants
-					dangerouslySetInnerHTML={{ __html: APPLY_HEADLINE_VARIANT_SCRIPT }}
-				/>
-				<style
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: static rules built from constants
-					dangerouslySetInnerHTML={{ __html: HEADLINE_VARIANT_STYLE }}
-				/>
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd
 					dateModified={getChangelogEntries()[0]?.date}
@@ -190,6 +188,9 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
+				<Suspense fallback={null}>
+					<ExternalTracking />
+				</Suspense>
 			</body>
 		</html>
 	);

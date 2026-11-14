@@ -126,6 +126,19 @@ itself and the workspaces its organization shares, in `loadReadyWorkspace`,
 `loadVisibleWorkspace` and `delete` together; a check on one of them is
 bypassed through the others.
 
+**A box reaches its creator's own hosts, when a host allows it. Accepted
+(opt-in).** The firewall adds the workspace credential on requests to the
+relay as well as the API, and the relay asks `host.cloudWorkspaceAccess` on
+every call. A host is reachable only if the creator owns it (a member's box is
+refused) and turned on "Allow my cloud workspaces to reach this host"
+(`v2_hosts.allow_cloud_workspaces`, set by `host.setCloudWorkspaceAccess`,
+which a box cannot call). The API is the only lock: host-service does not know
+the call came from a box, so a wrong value in that column opens the host. Once
+on, anything in any box the creator made can drive that host as them,
+including a prompt-injected agent. Off by default; turning it off stops the
+next call. Only HTTP gets through: the firewall refuses WebSocket upgrades on a
+host it rewrites, and the relay refuses them from a box.
+
 **A sandbox has exactly one gate, and it is ours.** A sandbox's own port is
 a public URL that clients never see; they reach a workspace through the
 sandbox gate (`apps/gate`), which verifies a ticket the API signed
@@ -167,8 +180,13 @@ CORS headers, and the app shows "Connecting… / Unknown host" with a hint about
 tray menu Linux does not have. Seen 2026-09-11 from a throwaway prompt that
 invited the agent to "try the new image". Recovery is a platform-side
 `vercel sandbox stop` (snapshots the disk, kills everything) followed by the
-app's Retry, which wakes a clean session. Still owed: memory pressure shown in
-the product. **The kill switch is done (2026-10-21):** measured on a 2 vCPU / 4 GB
+app's Retry, which wakes a clean session. **Pressure is shown in the product
+(2026-11-13):** host-service samples cgroup PSI and memguard's reaps every 5 s
+(`runtime/sandbox-box-pressure`) and reports changes to the API, which hands
+them to the organization's realtime hub; every window gets the boxes under
+pressure as a sidebar dot, and the open workspace an out-of-memory banner. The
+hub keeps only boxes under pressure and drops one that stops re-reporting.
+**The kill switch is done (2026-10-21):** measured on a 2 vCPU / 4 GB
 box, the kernel's killer was the last thing to act — with no swap it drops code
 pages first, and host-service's event loop stalled for 113 s while a 3 GB
 `tsc` refaulted everything. `superset-memguard` (bundle, started by boot as

@@ -3,14 +3,16 @@ import { join } from "node:path";
 import {
 	SANDBOX_PATHS,
 	sandboxManagedEnvSchema,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { readSandboxBoxResources } from "../../../runtime/box-resources";
 import {
 	hasManagedEnv,
 	setManagedEnv,
 } from "../../../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
+	getStartHookRunTerminalId,
 	getStartHookState,
 	readSandboxIdentity,
 	runSandboxArchiveHook,
@@ -89,7 +91,16 @@ export const sandboxRouter = router({
 
 	status: protectedProcedure.query(() => {
 		sandboxOnly();
-		return { ...readSandboxBootStatus(), startHook: getStartHookState() };
+		return {
+			...readSandboxBootStatus(),
+			startHook: getStartHookState(),
+			runTerminalId: getStartHookRunTerminalId(),
+		};
+	}),
+
+	resources: protectedProcedure.query(() => {
+		if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
+		return readSandboxBoxResources();
 	}),
 
 	/**
@@ -100,9 +111,9 @@ export const sandboxRouter = router({
 	 */
 	runStartHook: protectedProcedure
 		.input(z.object({ force: z.boolean().optional() }).optional())
-		.mutation(async ({ input }) => {
+		.mutation(async ({ ctx, input }) => {
 			sandboxOnly();
-			return await runSandboxStartHook(requireSandboxIdentity(), {
+			return await runSandboxStartHook(ctx, requireSandboxIdentity(), {
 				force: input?.force,
 			});
 		}),

@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Führe dann das Entwicklungs-Setup im Terminal dieses Arbeitsbereichs aus:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Siehe [**DEVELOPMENT.md**](../DEVELOPMENT.md) für die komplette Anleitung: was 
 
 ## Konfiguration
 
-Konfiguriere Setup-, Teardown- und Run-Skripte für Arbeitsbereiche in `.superset/config.json`. Siehe die [vollständige Dokumentation](https://docs.paradev.com/setup-teardown-scripts).
+Konfiguriere Setup-, Teardown- und Run-Skripte für Arbeitsbereiche in `.paradev/config.json`. Siehe die [vollständige Dokumentation](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -321,7 +321,6 @@ Tastenkürzel lassen sich unter **Einstellungen → Tastenkürzel** (⌘/) anpas
 
 ## Standardmäßig privat
 
-- **Source Available**: der komplette Quellcode liegt auf GitHub unter der Elastic License 2.0 (ELv2).
 - **Explizite Verbindungen**: du entscheidest, welche Agenten, Provider und Integrationen verbunden werden.
 
 ## Mitmachen
@@ -351,4 +350,4 @@ Tritt der Paradev-Community bei, um Hilfe zu bekommen, Feedback zu teilen und di
 
 **Die Desktop-App ist für immer kostenlos.** Agenten parallel auf deinem eigenen Rechner laufen zu lassen wird niemals etwas kosten. Alles, wofür wir Geld verlangen, wird ein optionaler Dienst obendrauf sein.
 
-Die gesamte App liegt in diesem Repository unter der [Elastic License 2.0](../LICENSE.md): nutze sie, forke sie, verändere sie, hoste sie selbst für dein Team. Das Einzige, was nicht geht, ist, Paradev selbst als Dienst neu zu verpacken und an andere zu verkaufen.
+Die gesamte App liegt in diesem Repository unter der [MIT-Lizenz](../LICENSE.md): nutze sie, forke sie, verändere sie, hoste sie selbst und gib sie weiter.

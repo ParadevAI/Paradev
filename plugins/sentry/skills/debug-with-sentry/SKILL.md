@@ -2,7 +2,7 @@
 name: debug-with-sentry
 description: Root-cause a production error with Sentry's evidence before touching code — pull the issue, read the stack trace and breadcrumbs, and separate the crash from its trigger. Use when the user pastes a Sentry link or issue ID, reports a production error, or asks why something is crashing for users.
 argument-hint: the Sentry issue URL, short ID, or a description of the error
-allowed-tools: mcp__sentry__get_issue_details, mcp__sentry__get_event_stacktrace, mcp__sentry__get_issue_breadcrumbs, mcp__sentry__get_issue_tag_values, mcp__sentry__search_issues, mcp__sentry__search_events, mcp__sentry__find_releases, mcp__sentry__analyze_issue_with_seer, mcp__sentry__update_issue
+allowed-tools: mcp__sentry__get_sentry_resource, mcp__sentry__search_issues, mcp__sentry__search_errors, mcp__sentry__analyze_issue_with_seer, mcp__sentry__search_sentry_tools, mcp__sentry__execute_sentry_tool
 ---
 
 # Root-cause with the evidence, not the guess
@@ -12,13 +12,19 @@ about *why* it broke, backed by the event data, before anyone edits code.
 
 ## 1. Get the real issue, not the search hit
 
-A pasted URL or short ID (`PROJECT-123`) goes straight to `get_issue_details`.
+A pasted URL or short ID (`PROJECT-123`) goes straight to `get_sentry_resource`
+(pass the URL, or `resourceType: 'issue'` with the short ID).
 A described error ("users can't check out") goes through `search_issues` first,
 but treat the results as candidates: match on the error type and the affected
 code path, not on title similarity. If two issues share a message but differ in
 stack trace, they are two bugs.
 
 ## 2. Read the stack trace like a diff
+
+Stack traces, breadcrumbs, tag values and releases are catalog tools: find
+them with `search_sentry_tools`, then call `execute_sentry_tool` with `name`
+set to `get_event_stacktrace`, `get_issue_breadcrumbs`, `get_issue_tag_values`
+or `find_releases`.
 
 Fetch the newest event's stack trace. The top frame is where it *crashed*, not
 where it *broke* — walk down until you leave library code and hit the first

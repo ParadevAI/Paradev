@@ -30,6 +30,7 @@ export {
 export type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
+	PaneAppearance,
 	PaneContext,
 	PaneDefinition,
 	PaneRegistry,
@@ -40,9 +41,12 @@ export type {
 	WorkspaceProps,
 } from "./react";
 export {
+	PaneAreaFocusedContext,
 	resolveTabTitle,
 	TabVisibilityContext,
 	useIsTabVisible,
+	usePaneAppearance,
+	usePaneAreaFocused,
 	usePaneFocus,
 	useTabTitle,
 	Workspace,

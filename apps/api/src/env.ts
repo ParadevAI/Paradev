@@ -9,6 +9,8 @@ export const env = createEnv({
 			.default("development"),
 	},
 	server: {
+		DOMAIN_MOVE_ENABLED: z.string().optional(),
+		BROWSER_API_URL: z.string().url().optional(),
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),
 		GOOGLE_CLIENT_ID: z.string().min(1),
@@ -69,7 +71,7 @@ export const env = createEnv({
 		// edit page, under the webhook documentation.
 		YC_DEALS_WEBHOOK_SECRET: z.string().min(1).optional(),
 		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
-		YC_BOOKFACE_REWARD_ID: z.string().min(1).default("yc-bookface-6mo-pro"),
+		YC_BOOKFACE_REWARD_ID: z.string().min(1).default("yc-bookface-3mo-team"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app

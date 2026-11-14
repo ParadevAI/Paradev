@@ -32,8 +32,9 @@ export function PagePaneHeaderExtras({
 	const { commentsEnabled, setCommentsEnabled, shareOpen, setShareOpen } =
 		usePagePaneUi(paneId);
 
-	const owned =
-		currentUserId !== undefined && currentUserId === page?.createdByUserId;
+	const editable =
+		page?.canEdit ??
+		(currentUserId !== undefined && currentUserId === page?.createdByUserId);
 
 	return (
 		<>
@@ -41,7 +42,7 @@ export function PagePaneHeaderExtras({
 			<PageWatcherMenu
 				workspaceId={workspaceId}
 				pageId={page?.id}
-				canManage={owned}
+				canManage={editable}
 				onCreateNewAgentSession={onCreateNewAgentSession}
 			/>
 			{canComment ? (
@@ -55,12 +56,10 @@ export function PagePaneHeaderExtras({
 			{page ? (
 				<PageShareButton
 					compact
+					labelClassName="hidden @min-[360px]/pane-header:inline"
 					page={page}
 					versions={versions}
-					editable={
-						currentUserId !== undefined &&
-						currentUserId === page.createdByUserId
-					}
+					editable={editable}
 					open={shareOpen}
 					onOpenChange={setShareOpen}
 					onSetVisibility={onSetVisibility}

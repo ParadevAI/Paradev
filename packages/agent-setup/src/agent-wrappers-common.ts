@@ -50,11 +50,11 @@ export function getManagedArtifactGuardHookCommand(): string {
 	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" ] && "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" || true`;
 }
 
-// Dev setup (.superset/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
-// $PWD/superset-dev-data — without a leading dot — so we must recognize that
+// Dev setup (.paradev/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
+// $PWD/paradev-dev-data — without a leading dot — so we must recognize that
 // variant to reap stale notify.sh paths from deleted worktrees.
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =
-	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|(?:paradev|superset)-dev-data)\//;
 
 import { writeFileIfChanged } from "./write-file-if-changed";
 
@@ -125,7 +125,7 @@ function buildRealBinaryResolver(): string {
     [ -z "$dir" ] && continue
     dir="\${dir%/}"
     case "$dir" in
-      "${getBinDir()}"|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
+      "${getBinDir()}"|"$HOME"/.paradev/bin|"$HOME"/.paradev-*/bin|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
     esac
     if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
       printf "%s\\n" "$dir/$name"

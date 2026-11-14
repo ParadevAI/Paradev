@@ -35,6 +35,10 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)peec\.ai$/, "peec"],
 	[/(^|\.)sazabi\.com$/, "sazabi"],
 	[/(^|\.)supabase\.(com|co)$/, "supabase"],
+	[/(^|\.)inngest\.com$/, "inngest"],
+	[/(^|\.)firecrawl\.dev$/, "firecrawl"],
+	[/(^|\.)wisprflow\.ai$/, "wispr"],
+	[/(^|\.)ahrefs\.com$/, "ahrefs"],
 ];
 
 const FILE_EXTENSION = /[^.]\.((?=\d*[a-z])[a-z0-9]{1,8})$/i;

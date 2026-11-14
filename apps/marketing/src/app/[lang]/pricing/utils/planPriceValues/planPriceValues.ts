@@ -6,6 +6,7 @@ import {
 	formatNumber,
 } from "@superset/i18n/format";
 import {
+	advertisedGbMinutesPerSeat,
 	DEFAULT_MACHINE_SIZE,
 	gbHourPackPricePerGbHour,
 	machineSpec,
@@ -15,6 +16,7 @@ import {
 	type PlanFamily,
 	seatPricePerMonth,
 } from "@superset/shared/billing";
+import { COMPANY } from "@superset/shared/constants";
 
 export interface FamilyPriceSet {
 	family: string;
@@ -74,6 +76,7 @@ export function planPriceValues(
 		i18n._({ ...PACK_ITEM, values: { price: currency(value) } });
 	const families = catalog.map((family, index): FamilyPriceSet => {
 		const hasYearlyDiscount = offersYearlyDiscount(family);
+		const gbMinutesPerSeat = advertisedGbMinutesPerSeat(family);
 		return {
 			family: family.family,
 			name: family.name,
@@ -84,24 +87,23 @@ export function planPriceValues(
 					? currency(family.yearly.seatPrice)
 					: null,
 			hasYearlyDiscount,
-			gbHours: family.gbMinutesPerSeat
-				? number(family.gbMinutesPerSeat / 60, 0)
-				: null,
-			hours: family.gbMinutesPerSeat
-				? number(family.gbMinutesPerSeat / 60 / standardBox.memoryGb, 0)
+			gbHours: gbMinutesPerSeat ? number(gbMinutesPerSeat / 60, 0) : null,
+			hours: gbMinutesPerSeat
+				? number(gbMinutesPerSeat / 60 / standardBox.memoryGb, 0)
 				: null,
 			overage:
 				family.overagePerGbHour == null
 					? null
 					: currency(family.overagePerGbHour),
 			overageRate:
-				family.gbMinutesPerSeat && family.overagePerGbHour != null
+				gbMinutesPerSeat && family.overagePerGbHour != null
 					? perGbHour(family.overagePerGbHour)
 					: null,
 			environments: family.environments ? number(family.environments, 0) : null,
-			pack: family.pack
-				? perGbHour(gbHourPackPricePerGbHour(family.pack))
-				: null,
+			pack:
+				gbMinutesPerSeat && family.pack
+					? perGbHour(gbHourPackPricePerGbHour(family.pack))
+					: null,
 			previousName: catalog[index - 1]?.name ?? null,
 		};
 	});
@@ -174,6 +176,7 @@ export function faqValues(values: PlanPriceValues) {
 		planPrices: values.planPrices,
 		overagePrice: values.overagePrice,
 		packPrice: values.packPrice,
+		trustHost: new URL(COMPANY.TRUST_URL).host,
 	};
 }
 

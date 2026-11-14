@@ -2,6 +2,7 @@ import {
 	afterAll,
 	afterEach,
 	beforeAll,
+	beforeEach,
 	describe,
 	expect,
 	mock,
@@ -649,6 +650,30 @@ describe("window.open handling", () => {
 		expect(emitted).toEqual([]);
 	});
 
+	test("an opened popup is announced, so extensions can hold it as a tab", () => {
+		const wc = register("pane-popup-tab");
+		const announced: unknown[] = [];
+		const listener = ({ window }: { window: unknown }) =>
+			announced.push(window);
+		browserManager.on("popup-created", listener);
+		try {
+			const popup = { webContents: makeWc().wc, on: () => {} };
+			const nested = { webContents: makeWc().wc, on: () => {} };
+			for (const created of wc.listeners.get("did-create-window") ?? [])
+				created(popup);
+			// Google opens a consent window from inside the sign-in popup; it is
+			// a tab of its own too.
+			for (const created of popup.webContents.listeners.get(
+				"did-create-window",
+			) ?? [])
+				created(nested);
+
+			expect(announced).toEqual([popup, nested]);
+		} finally {
+			browserManager.off("popup-created", listener);
+		}
+	});
+
 	test("a disallowed scheme is denied outright, popup or not", () => {
 		const wc = register("pane-scheme");
 		const emitted: string[] = [];
@@ -736,5 +761,144 @@ describe("deep links from guest pages", () => {
 		expect(navigate(wc, "https://example.com/docs")).toBe(false);
 		expect(urls).toEqual([]);
 		stop();
+	});
+});
+
+describe("CDP session and browser extensions", () => {
+	test("an agent cannot see, run code in, or debug an extension's world", async () => {
+		const wc = register("pane-extension-worlds");
+		let emit: WcListener = () => {};
+		wc.debugger.on = ((event: string, listener: WcListener) => {
+			if (event === "message") emit = listener;
+		}) as () => void;
+		const sendCommand = mock(async (_method: string, _params?: object) => ({}));
+		wc.debugger.sendCommand = sendCommand;
+		const messages: { id?: number; method?: string; error?: unknown }[] = [];
+		const session = browserManager.attachCdp(
+			"pane-extension-worlds",
+			"ws-1",
+			(raw) => messages.push(JSON.parse(raw)),
+			() => {},
+		);
+		const context = (id: number, origin: string) => ({
+			context: {
+				id,
+				origin,
+				uniqueId: `u${id}`,
+				auxData: { type: "isolated" },
+			},
+		});
+		emit(
+			{},
+			"Runtime.executionContextCreated",
+			context(1, "https://example.com"),
+		);
+		emit(
+			{},
+			"Runtime.executionContextCreated",
+			context(7, "chrome-extension://hdokiejnpimakedhajhdlcegeplioahd"),
+		);
+		emit({}, "Runtime.consoleAPICalled", {
+			type: "log",
+			args: [],
+			executionContextId: 7,
+		});
+		emit({}, "Runtime.consoleAPICalled", {
+			type: "log",
+			args: [],
+			executionContextId: 1,
+		});
+
+		const commands: [string, object][] = [
+			["Runtime.evaluate", { expression: "1", contextId: 7 }],
+			["Runtime.evaluate", { expression: "1", uniqueContextId: "u7" }],
+			[
+				"Runtime.callFunctionOn",
+				{ functionDeclaration: "()=>1", executionContextId: 7 },
+			],
+			["Debugger.enable", {}],
+			["HeapProfiler.takeHeapSnapshot", {}],
+			["Runtime.evaluate", { expression: "1", contextId: 9 }],
+			["Runtime.evaluate", { expression: "1", contextId: 1 }],
+		];
+		commands.forEach(([method, params], index) => {
+			session.send(JSON.stringify({ id: index + 1, method, params }));
+		});
+		await Promise.resolve();
+		session.detach();
+
+		expect(sendCommand.mock.calls.map((call) => call.slice(0, 2))).toEqual([
+			["Runtime.evaluate", { expression: "1", contextId: 1 }],
+		]);
+		expect(
+			messages.map((m) => m.method ?? [m.id, m.error !== undefined]),
+		).toEqual([
+			"Runtime.executionContextCreated",
+			"Runtime.consoleAPICalled",
+			[1, true],
+			[2, true],
+			[3, true],
+			[4, true],
+			[5, true],
+			[6, true],
+			[7, false],
+		]);
+	});
+});
+
+describe("right-click menu", () => {
+	const { Menu } = require("electron") as typeof import("electron");
+	const build = Menu.buildFromTemplate as unknown as ReturnType<typeof mock>;
+	const popup = mock();
+	const params = {
+		linkURL: "",
+		pageURL: "https://example.com",
+		selectionText: "bonjour",
+		editFlags: { canCopy: true, canPaste: false, canSelectAll: false },
+	};
+	const rightClick = (paneId: string) => {
+		const wc = Object.assign(register(paneId), {
+			canGoBack: () => false,
+			canGoForward: () => false,
+		});
+		for (const listener of wc.listeners.get("context-menu") ?? []) {
+			listener({}, params);
+		}
+		return wc;
+	};
+
+	beforeEach(() => {
+		popup.mockClear();
+		build.mockImplementation(() => ({ popup }));
+	});
+	afterEach(() => {
+		browserManager.setExtensionMenuItems(() => []);
+		build.mockImplementation(() => ({}));
+	});
+
+	test("lists the items extensions add, and only for the pane they asked about", () => {
+		const translate = { label: "Google Translate" } as Electron.MenuItem;
+		const asked: Electron.WebContents[] = [];
+		browserManager.setExtensionMenuItems((contents) => {
+			asked.push(contents);
+			return [translate];
+		});
+
+		const wc = rightClick("pane-context-menu");
+
+		const template = build.mock.calls.at(-1)?.[0] as unknown[];
+		expect(template).toContain(translate);
+		expect(asked).toEqual([wc as unknown as Electron.WebContents]);
+		expect(popup).toHaveBeenCalled();
+	});
+
+	test("still opens when an extension's items throw", () => {
+		browserManager.setExtensionMenuItems(() => {
+			throw new Error("broken extension");
+		});
+
+		rightClick("pane-context-menu-broken");
+
+		expect(popup).toHaveBeenCalled();
 	});
 });

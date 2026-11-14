@@ -243,12 +243,12 @@ export function BrowserPane({
 					<span className="min-w-0 flex-1 truncate">
 						{designMode.phase === "selecting" ? (
 							<Trans>
-								Design mode — click any element in the page to send it to an
+								Design mode: click any element in the page to send it to an
 								agent.
 							</Trans>
 						) : (
 							<Trans>
-								Element captured — describe the change, or press esc to pick
+								Element captured. Describe the change, or press esc to pick
 								again.
 							</Trans>
 						)}
@@ -353,7 +353,10 @@ export function BrowserPane({
 							<BrowserErrorOverlay error={state.error} onRetry={reload} />
 						)}
 						{isBlankPage && !state.isLoading && !state.error && (
-							<div className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center bg-background">
+							<div
+								data-pointer-passthrough-target
+								className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center bg-background"
+							>
 								<div className="flex w-full max-w-sm flex-col items-center gap-5 px-6">
 									<div className="flex size-14 items-center justify-center rounded-2xl bg-muted/50">
 										<GlobeIcon className="size-7 text-muted-foreground" />

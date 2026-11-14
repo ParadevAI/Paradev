@@ -25,7 +25,7 @@ import {
 	sql,
 } from "drizzle-orm";
 import { userError } from "../../i18n-error";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { orgDevIds } from "../agent/access";
 import {
 	assertCanManage,
@@ -200,7 +200,7 @@ function summary(access: ChannelAccess, memberCount: number) {
 }
 
 export const channelRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(listChannelsSchema)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -241,29 +241,27 @@ export const channelRouter = {
 				.orderBy(asc(channels.name));
 		}),
 
-	get: protectedProcedure
-		.input(channelIdSchema)
-		.query(async ({ ctx, input }) => {
-			const access = await loadChannelAccess(
-				ctx.session.user.id,
-				input.channelId,
-			);
-			const [people, devs] = await Promise.all([
-				channelMemberIds(access.channel.id),
-				channelDevs(access.channel.id),
-			]);
-			return summary(access, people.length + devs.length);
-		}),
+	get: personProcedure.input(channelIdSchema).query(async ({ ctx, input }) => {
+		const access = await loadChannelAccess(
+			ctx.session.user.id,
+			input.channelId,
+		);
+		const [people, devs] = await Promise.all([
+			channelMemberIds(access.channel.id),
+			channelDevs(access.channel.id),
+		]);
+		return summary(access, people.length + devs.length);
+	}),
 
 	/** People and Devs; `kind` says which. */
-	members: protectedProcedure
+	members: personProcedure
 		.input(channelIdSchema)
 		.query(async ({ ctx, input }) => {
 			await loadChannelAccess(ctx.session.user.id, input.channelId);
 			return listChannelMembers(input.channelId);
 		}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createChannelSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -318,7 +316,7 @@ export const channelRouter = {
 			}
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateChannelSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -350,7 +348,7 @@ export const channelRouter = {
 			return { id: access.channel.id };
 		}),
 
-	archive: protectedProcedure
+	archive: personProcedure
 		.input(channelIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -366,7 +364,7 @@ export const channelRouter = {
 			return { id: access.channel.id };
 		}),
 
-	join: protectedProcedure
+	join: personProcedure
 		.input(channelIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -400,7 +398,7 @@ export const channelRouter = {
 			return { id: access.channel.id };
 		}),
 
-	leave: protectedProcedure
+	leave: personProcedure
 		.input(channelIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -447,7 +445,7 @@ export const channelRouter = {
 			return { id: access.channel.id };
 		}),
 
-	addMembers: protectedProcedure
+	addMembers: personProcedure
 		.input(addMembersSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -496,7 +494,7 @@ export const channelRouter = {
 			return { added: added.all.length };
 		}),
 
-	removeMember: protectedProcedure
+	removeMember: personProcedure
 		.input(memberSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -530,7 +528,7 @@ export const channelRouter = {
 			return { actorId: input.actorId };
 		}),
 
-	setRole: protectedProcedure
+	setRole: personProcedure
 		.input(setRoleSchema)
 		.mutation(async ({ ctx, input }) => {
 			const access = await loadChannelAccess(
@@ -562,7 +560,7 @@ export const channelRouter = {
 			return { actorId: input.actorId, role: input.role };
 		}),
 
-	setNotify: protectedProcedure
+	setNotify: personProcedure
 		.input(setNotifySchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -578,7 +576,7 @@ export const channelRouter = {
 			return { notify: input.notify };
 		}),
 
-	setSuppressBroadcasts: protectedProcedure
+	setSuppressBroadcasts: personProcedure
 		.input(setSuppressBroadcastsSchema)
 		.mutation(async ({ ctx, input }) => {
 			await db
@@ -593,7 +591,7 @@ export const channelRouter = {
 			return { suppressBroadcasts: input.suppressBroadcasts };
 		}),
 
-	setMuted: protectedProcedure
+	setMuted: personProcedure
 		.input(setMutedSchema)
 		.mutation(async ({ ctx, input }) => {
 			await db
@@ -609,7 +607,7 @@ export const channelRouter = {
 		}),
 
 	/** Moves the read point forward only; without `seq`, to the newest message. */
-	markRead: protectedProcedure
+	markRead: personProcedure
 		.input(markReadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -633,7 +631,7 @@ export const channelRouter = {
 	 * read point moves back to before the newest earlier message from
 	 * someone else, as there is nothing of yours to read.
 	 */
-	markUnread: protectedProcedure
+	markUnread: personProcedure
 		.input(messageIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -681,7 +679,7 @@ export const channelRouter = {
 		}),
 
 	/** Shift+Esc: every channel and followed thread in the organization. */
-	markAllRead: protectedProcedure
+	markAllRead: personProcedure
 		.input(listChannelsSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;

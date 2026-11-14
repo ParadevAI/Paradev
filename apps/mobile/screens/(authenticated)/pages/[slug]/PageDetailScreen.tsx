@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { env } from "@/lib/env";
-import { errorCopy } from "@/lib/errors";
+import { errorCopy, isTransportError } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
 import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { pageUrlForSlug } from "@/lib/web-links";
@@ -96,6 +96,8 @@ export function PageDetailScreen({
 	const loaded = viewUrl !== undefined && loadedSrc === viewUrl;
 	const frameFailed = viewUrl !== undefined && failedSrc === viewUrl;
 	const offline = page.status === "pending" && page.fetchStatus === "paused";
+	const pageError =
+		page.data && isTransportError(page.error) ? null : page.error;
 
 	const { threads, refetch: refetchComments } = usePageCommentThreads({
 		pageId: pageId ?? "",
@@ -309,7 +311,7 @@ export function PageDetailScreen({
 				/>
 			</HeaderToolbar>
 
-			{page.error || offline ? (
+			{pageError || offline ? (
 				<View className="flex-1 items-center justify-center px-8">
 					<Text className="text-center font-medium">
 						{offline
@@ -319,9 +321,9 @@ export function PageDetailScreen({
 					<Text className="text-muted-foreground mt-1 text-center text-sm">
 						{offline
 							? t({ message: "It will open once the connection is back." })
-							: errorCopy(page.error)}
+							: errorCopy(pageError)}
 					</Text>
-					{page.error && !offline ? (
+					{pageError && !offline ? (
 						<Button
 							className="mt-6"
 							variant="secondary"
@@ -389,7 +391,13 @@ export function PageDetailScreen({
 						) : null}
 					</View>
 
-					{pageId ? <PagePresence key={pageId} url={presenceUrl} /> : null}
+					{pageId ? (
+						<PagePresence
+							key={pageId}
+							url={presenceUrl}
+							onPublished={() => void page.refetch()}
+						/>
+					) : null}
 
 					{commentMode && !selection ? (
 						<View
@@ -427,7 +435,7 @@ export function PageDetailScreen({
 				</View>
 			) : null}
 
-			{page.error || offline || frameFailed || loaded ? null : (
+			{pageError || offline || frameFailed || loaded ? null : (
 				<View className="absolute inset-0 items-center justify-center">
 					<Spinner className="size-5" />
 				</View>

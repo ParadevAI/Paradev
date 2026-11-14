@@ -797,12 +797,12 @@ export function OrganizationSettings({
 												{members.length > 1 ? (
 													<Trans>
 														All data will be permanently deleted for all{" "}
-														{members.length} members — this cannot be undone.
+														{members.length} members. This cannot be undone.
 													</Trans>
 												) : (
 													<Trans>
 														All of the organization's data will be permanently
-														deleted — this cannot be undone.
+														deleted. This cannot be undone.
 													</Trans>
 												)}{" "}
 												<Trans>Type the organization name to confirm.</Trans>

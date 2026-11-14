@@ -15,9 +15,8 @@
  */
 
 import { createWriteStream, promises as fs, type WriteStream } from "node:fs";
-import { homedir } from "node:os";
 import { join, relative, resolve, sep } from "node:path";
-import { SUPERSET_DIR_NAME } from "shared/constants";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 
 const MAX_HISTORY_BYTES = 5 * 1024 * 1024; // 5MB per session
 const MAX_PENDING_WRITE_BYTES = 256 * 1024; // cap in-memory backlog when disk is slow
@@ -67,7 +66,7 @@ export interface SessionMetadata {
 const TERMINAL_HISTORY_DIR_NAME = "terminal-history";
 
 export function getTerminalHistoryRootDir(): string {
-	return join(homedir(), SUPERSET_DIR_NAME, TERMINAL_HISTORY_DIR_NAME);
+	return join(resolveAppHomeDir(), TERMINAL_HISTORY_DIR_NAME);
 }
 
 function assertSafeIdSegment(label: string, value: string): void {

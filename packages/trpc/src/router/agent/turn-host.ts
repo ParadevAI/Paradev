@@ -3,7 +3,7 @@ import { cloudWorkspaces, members } from "@superset/db/schema";
 import {
 	SANDBOX_API_CREDENTIAL_HEADER,
 	sandboxApiCredential,
-} from "@superset/shared/sandbox-gate";
+} from "@superset/shared/sandbox/gate";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { env } from "../../env";
@@ -41,7 +41,7 @@ const noAccess = () =>
 export async function resolveTurnHost(turn: {
 	agentId: string;
 	organizationId: string;
-	actingUserId: string | null;
+	actingUserId: string;
 	cloudWorkspaceId: string;
 }): Promise<TurnHostAccess> {
 	const row = await db.query.cloudWorkspaces.findFirst({
@@ -54,16 +54,14 @@ export async function resolveTurnHost(turn: {
 	);
 	if (rows[0]?.allowed !== 1) throw noAccess();
 
-	if (turn.actingUserId) {
-		const membership = await db.query.members.findFirst({
-			where: and(
-				eq(members.userId, turn.actingUserId),
-				eq(members.organizationId, row.organizationId),
-			),
-		});
-		if (!membership || !(await canOpenWorkspace(row, turn.actingUserId))) {
-			throw noAccess();
-		}
+	const membership = await db.query.members.findFirst({
+		where: and(
+			eq(members.userId, turn.actingUserId),
+			eq(members.organizationId, row.organizationId),
+		),
+	});
+	if (!membership || !(await canOpenWorkspace(row, turn.actingUserId))) {
+		throw noAccess();
 	}
 
 	if (row.status === "deleted" || row.status === "failed") {

@@ -97,6 +97,10 @@ const {
 	getGeminiSettingsJsonContent,
 	getMastraHooksJsonContent,
 	getOpenCodePluginContent,
+	getOpenCodeTuiPluginContent,
+	getOpenCodeTuiPluginPath,
+	createOpenCodeTuiPlugin,
+	removeOpenCodeTuiPlugin,
 	getOmpExtensionContent,
 	getOmpExtensionPath,
 	OMP_EXTENSION_MARKER,
@@ -420,6 +424,272 @@ describe("agent-wrappers opencode", () => {
 			},
 		});
 		expect(notify).not.toHaveBeenCalled();
+	});
+});
+
+describe("agent-wrappers opencode tui plugin", () => {
+	const originalTerminalId = process.env.SUPERSET_TERMINAL_ID;
+	const tuiRoot = path.join(TEST_ROOT, "opencode-tui");
+	type Handler = (event: { data: Record<string, unknown> }) => void;
+	type Notification = {
+		harness: string;
+		hook_event_name: string;
+		session_id?: string;
+		message?: string;
+	};
+	let renders = 0;
+
+	const renderPlugin = async (notifyDir: string, delaySeconds = 0) => {
+		mkdirSync(notifyDir, { recursive: true });
+		const notifyPath = path.join(notifyDir, "notify.sh");
+		const log = path.join(notifyDir, "notify.log");
+		writeFileSync(
+			notifyPath,
+			`#!/bin/bash\nsleep ${delaySeconds}\necho "$SUPERSET_HOOK_HARNESS $1" >> "$(dirname "$0")/notify.log"\n`,
+		);
+		chmodSync(notifyPath, 0o755);
+		const pluginPath = path.join(tuiRoot, `tui-${++renders}.mjs`);
+		writeFileSync(pluginPath, getOpenCodeTuiPluginContent(notifyPath));
+		const plugin = (await import(pathToFileURL(pluginPath).href)).default as {
+			setup: (ctx: unknown) => unknown;
+		};
+		return { plugin, log };
+	};
+
+	const startPlugin = async (
+		options: {
+			sessions?: Record<
+				string,
+				{ parentID?: string; status?: "idle" | "running" }
+			>;
+			notifyDir?: string;
+			delaySeconds?: number;
+		} = {},
+	) => {
+		const notifyDir =
+			options.notifyDir ?? path.join(tuiRoot, `notify-${renders + 1}`);
+		const { plugin, log } = await renderPlugin(notifyDir, options.delaySeconds);
+		const sessions = options.sessions ?? {
+			shown: {},
+			"shown-child": { parentID: "shown" },
+			other: {},
+		};
+		const handlers = new Map<string, Handler>();
+		const route = {
+			current: { type: "session", sessionID: "shown" } as {
+				type: string;
+				sessionID?: string;
+			},
+		};
+		const cleanup = (await plugin.setup({
+			options: { routePollMs: 5 },
+			data: {
+				on: (type: string, handler: Handler) => {
+					handlers.set(type, handler);
+					return () => handlers.delete(type);
+				},
+				session: {
+					get: (id: string) => sessions[id],
+					root: (id: string) => sessions[id]?.parentID ?? id,
+					status: (id: string) => sessions[id]?.status ?? "idle",
+				},
+			},
+			ui: { router: { current: () => route.current } },
+		})) as (() => Promise<void>) | undefined;
+		const emit = (type: string, data: Record<string, unknown>) =>
+			handlers.get(type)?.({ data });
+		const show = (sessionID: string) => {
+			route.current = { type: "session", sessionID };
+		};
+		const read = (): Notification[] =>
+			existsSync(log)
+				? readFileSync(log, "utf-8")
+						.trim()
+						.split("\n")
+						.map((line) => {
+							const separator = line.indexOf(" ");
+							return {
+								harness: line.slice(0, separator),
+								...JSON.parse(line.slice(separator + 1)),
+							};
+						})
+				: [];
+		const waitFor = async (count: number) => {
+			for (let attempt = 0; attempt < 200 && read().length < count; attempt++) {
+				await new Promise((resolve) => setTimeout(resolve, 10));
+			}
+			return read().map(({ hook_event_name, session_id, message }) =>
+				message
+					? `${hook_event_name}:${session_id}:${message}`
+					: `${hook_event_name}:${session_id}`,
+			);
+		};
+		return { handlers, emit, show, waitFor, read, cleanup, sessions };
+	};
+
+	beforeAll(() => mkdirSync(tuiRoot, { recursive: true }));
+
+	beforeEach(() => {
+		process.env.SUPERSET_TERMINAL_ID = "terminal-1";
+	});
+
+	afterEach(() => {
+		if (originalTerminalId === undefined) {
+			delete process.env.SUPERSET_TERMINAL_ID;
+		} else {
+			process.env.SUPERSET_TERMINAL_ID = originalTerminalId;
+		}
+	});
+
+	it("reports only the shown root session's turns", async () => {
+		const t = await startPlugin();
+		t.emit("session.execution.started", { sessionID: "other" });
+		t.emit("session.execution.succeeded", { sessionID: "other" });
+		t.emit("session.execution.started", { sessionID: "shown" });
+		t.emit("session.execution.started", { sessionID: "shown-child" });
+		t.emit("session.execution.succeeded", { sessionID: "shown-child" });
+		t.emit("session.execution.succeeded", { sessionID: "shown" });
+		t.emit("session.execution.started", { sessionID: "shown" });
+		t.emit("session.execution.interrupted", { sessionID: "shown" });
+
+		expect(await t.waitFor(4)).toEqual([
+			"Start:shown",
+			"Stop:shown",
+			"Start:shown",
+			"Stop:shown",
+		]);
+		expect(t.read()[0]?.harness).toBe("opencode");
+		await t.cleanup?.();
+	});
+
+	it("stays working while a second shown session runs after the first ends", async () => {
+		const t = await startPlugin({ sessions: { a: {}, b: {} } });
+		t.show("a");
+		t.emit("session.execution.started", { sessionID: "a" });
+		t.show("b");
+		t.emit("session.execution.started", { sessionID: "b" });
+		t.emit("session.execution.succeeded", { sessionID: "a" });
+		t.emit("session.execution.succeeded", { sessionID: "b" });
+
+		expect(await t.waitFor(3)).toEqual(["Start:a", "Start:b", "Stop:b"]);
+		await t.cleanup?.();
+	});
+
+	it("does not report a finished session that runs again elsewhere", async () => {
+		const t = await startPlugin({ sessions: { a: {}, b: {} } });
+		t.show("a");
+		t.emit("session.execution.started", { sessionID: "a" });
+		t.emit("session.execution.succeeded", { sessionID: "a" });
+		t.show("b");
+		t.emit("session.execution.started", { sessionID: "a" });
+		t.emit("session.execution.succeeded", { sessionID: "a" });
+		t.emit("permission.asked", { sessionID: "a", id: "perm-1" });
+		t.emit("session.execution.started", { sessionID: "b" });
+
+		expect(await t.waitFor(3)).toEqual(["Start:a", "Stop:a", "Start:b"]);
+		await t.cleanup?.();
+	});
+
+	it("takes over a running session when the terminal navigates to it", async () => {
+		const t = await startPlugin({
+			sessions: { idle: {}, busy: { status: "running" } },
+		});
+		t.show("idle");
+		t.emit("session.execution.started", { sessionID: "busy" });
+		t.show("busy");
+		await t.waitFor(1);
+		t.emit("session.execution.succeeded", { sessionID: "busy" });
+
+		expect(await t.waitFor(2)).toEqual(["Start:busy", "Stop:busy"]);
+		await new Promise((resolve) => setTimeout(resolve, 30));
+		await t.cleanup?.();
+		expect(t.read()).toHaveLength(2);
+	});
+
+	it("returns to working when a permission prompt or question is answered", async () => {
+		const t = await startPlugin();
+		t.emit("session.execution.started", { sessionID: "shown" });
+		t.emit("permission.asked", { sessionID: "shown-child", id: "perm-1" });
+		t.emit("permission.replied", {
+			sessionID: "shown-child",
+			requestID: "perm-1",
+			reply: "once",
+		});
+		t.emit("form.created", { form: { id: "form-1", sessionID: "shown" } });
+		t.emit("form.cancelled", { sessionID: "shown", id: "form-1" });
+		t.emit("permission.asked", { sessionID: "other", id: "perm-2" });
+		t.emit("session.execution.succeeded", { sessionID: "shown" });
+
+		expect(await t.waitFor(6)).toEqual([
+			"Start:shown",
+			"PermissionRequest:shown",
+			"Start:shown",
+			"PermissionRequest:shown",
+			"Start:shown",
+			"Stop:shown",
+		]);
+		await t.cleanup?.();
+	});
+
+	it("reports a failed turn with its error message", async () => {
+		const t = await startPlugin();
+		t.emit("session.execution.started", { sessionID: "shown" });
+		t.emit("session.execution.failed", {
+			sessionID: "shown",
+			error: { message: "Provider unavailable" },
+		});
+
+		expect(await t.waitFor(2)).toEqual([
+			"Start:shown",
+			"Failed:shown:Provider unavailable",
+		]);
+		await t.cleanup?.();
+	});
+
+	it("stops when the running session is deleted", async () => {
+		const t = await startPlugin();
+		t.emit("session.execution.started", { sessionID: "shown" });
+		t.emit("session.deleted", { sessionID: "shown" });
+
+		expect(await t.waitFor(2)).toEqual(["Start:shown", "Stop:shown"]);
+		await t.cleanup?.();
+	});
+
+	it("delivers queued notifications before cleanup resolves", async () => {
+		const t = await startPlugin({ delaySeconds: 0.05 });
+		t.emit("session.execution.started", { sessionID: "shown" });
+		t.emit("session.execution.succeeded", { sessionID: "shown" });
+		await t.cleanup?.();
+
+		expect(t.read().map((n) => n.hook_event_name)).toEqual(["Start", "Stop"]);
+	});
+
+	it("runs a notify script whose path needs escaping", async () => {
+		const t = await startPlugin({
+			notifyDir: path.join(tuiRoot, 'odd "dir" \\ name'),
+		});
+		t.emit("session.execution.started", { sessionID: "shown" });
+
+		expect(await t.waitFor(1)).toEqual(["Start:shown"]);
+		await t.cleanup?.();
+	});
+
+	it("does nothing outside a Superset terminal", async () => {
+		delete process.env.SUPERSET_TERMINAL_ID;
+		const t = await startPlugin();
+		expect(t.handlers.size).toBe(0);
+	});
+
+	it("removes only a Superset-written plugin on teardown", () => {
+		const pluginPath = getOpenCodeTuiPluginPath();
+		mkdirSync(path.dirname(pluginPath), { recursive: true });
+		writeFileSync(pluginPath, "export default {};\n");
+		removeOpenCodeTuiPlugin();
+		expect(existsSync(pluginPath)).toBe(true);
+
+		createOpenCodeTuiPlugin();
+		removeOpenCodeTuiPlugin();
+		expect(existsSync(pluginPath)).toBe(false);
 	});
 });
 
@@ -1024,6 +1294,7 @@ exit 0
 		const cursorHooksPath = path.join(TEST_HOME_DIR, ".cursor", "hooks.json");
 		const staleHookPath =
 			"/tmp/worktree/superset-dev-data/hooks/cursor-hook.sh";
+		const paradevHookPath = "/Users/u/.paradev/hooks/cursor-hook.sh";
 		const currentHookPath = "/tmp/.superset-new/hooks/cursor-hook.sh";
 
 		mkdirSync(path.dirname(cursorHooksPath), { recursive: true });
@@ -1035,6 +1306,7 @@ exit 0
 					hooks: {
 						beforeSubmitPrompt: [
 							{ command: `${staleHookPath} Start` },
+							{ command: `${paradevHookPath} Start` },
 							{ command: "/usr/local/bin/custom-hook Start" },
 						],
 					},
@@ -1060,6 +1332,11 @@ exit 0
 		).toBe(true);
 		expect(
 			beforeSubmitPrompt.some((entry) => entry.command.includes(staleHookPath)),
+		).toBe(false);
+		expect(
+			beforeSubmitPrompt.some((entry) =>
+				entry.command.includes(paradevHookPath),
+			),
 		).toBe(false);
 		expect(
 			beforeSubmitPrompt.some(
@@ -1502,15 +1779,19 @@ describe("agent-wrappers claude settings.json", () => {
 				"/Users/me/.superset/hooks/muse/hooks.json",
 			),
 		).toBeNull();
-		// A previous Superset home (dev data, another install) is ours to replace.
-		expect(
-			getMuseSettingsJsonContent(
-				JSON.stringify({
-					managed_hooks_path: "/tmp/w/superset-dev-data/hooks/muse/hooks.json",
-				}),
-				"/Users/me/.superset/hooks/muse/hooks.json",
-			),
-		).not.toBeNull();
+		// A previous app home (dev data, another install) is ours to replace.
+		for (const previous of [
+			"/tmp/w/superset-dev-data/hooks/muse/hooks.json",
+			"/tmp/w/paradev-dev-data/hooks/muse/hooks.json",
+			"/Users/me/.paradev/hooks/muse/hooks.json",
+		]) {
+			expect(
+				getMuseSettingsJsonContent(
+					JSON.stringify({ managed_hooks_path: previous }),
+					"/tmp/w2/paradev-dev-data/hooks/muse/hooks.json",
+				),
+			).not.toBeNull();
+		}
 	});
 
 	it("removes only Paradev's pointer and env names from Muse settings.json", () => {

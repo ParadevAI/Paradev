@@ -76,8 +76,9 @@ issuing a second one are both worse than a slow answer.
 
 A chargeback is the issuer taking the money back on the customer's word. Opening
 a refund on a disputed charge can cost you the amount twice and still lose the
-dispute. Read the dispute, then either submit evidence through its `evidence`
-fields or accept it deliberately. Say which one you did and why.
+dispute. Read the dispute, then either submit evidence by updating its `evidence`
+fields (with `submit: true`), or accept it deliberately by closing it in the
+Dashboard; the MCP server cannot close a dispute. Say which one you did and why.
 
 ## 6. Report what actually changed
 

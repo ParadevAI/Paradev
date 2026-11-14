@@ -481,6 +481,8 @@ export const connections = pgTable(
 
 		issuer: text(),
 		resource: text(),
+		/** The dynamic client the grant was issued to; its refresh token is bound to it. */
+		oauthClientId: text("oauth_client_id"),
 
 		externalAccountId: text("external_account_id").notNull(),
 		externalAccountLabel: text("external_account_label"),
@@ -814,7 +816,7 @@ export const environments = pgTable(
 		/** The sandbox bundle every workspace of this environment boots on: the newest `sandbox_bundles` row at create, moved by every release. */
 		bundleSha: text("bundle_sha").notNull(),
 		/**
-		 * The repository a workspace opens on. Its `.superset` config is the one
+		 * The repository a workspace opens on. Its Paradev config is the one
 		 * the box runs. Null only after the repository is removed from GitHub.
 		 */
 		primaryRepositoryId: uuid("primary_repository_id").references(
@@ -822,6 +824,8 @@ export const environments = pgTable(
 			{ onDelete: "set null" },
 		),
 		scope: environmentScope().notNull().default("organization"),
+		/** The size a workspace boots at when its create names none; null means the organization's default. */
+		machineSize: text("machine_size"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -1466,6 +1470,11 @@ export const v2Hosts = pgTable(
 		version: text(),
 		platform: text(),
 		installSource: text("install_source"),
+		// Whether the owner lets their cloud workspaces reach this host through
+		// the relay.
+		allowCloudWorkspaces: boolean("allow_cloud_workspaces")
+			.notNull()
+			.default(false),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -1648,6 +1657,11 @@ export const chatSessions = pgTable(
 		}),
 		v2WorkspaceId: uuid("v2_workspace_id"),
 		title: text(),
+		harness: text(),
+		harnessSessionId: text("harness_session_id"),
+		epoch: text(),
+		lastSeq: integer("last_seq"),
+		status: text(),
 		lastActiveAt: timestamp("last_active_at").notNull().defaultNow(),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -1728,6 +1742,9 @@ export const automations = pgTable(
 		// clearing the set in the editor is the opt-out.
 		tags: jsonb().$type<string[]>().notNull().default(["automation"]),
 
+		// Groups the automation in the automations list. Null = ungrouped.
+		group: text("group_name"),
+
 		// Deliver each run's prompt into the agent session the previous run
 		// left behind, rather than starting another beside it. Needs a pinned
 		// v2WorkspaceId or cloudWorkspaceId — that is where the session lives.
@@ -1737,10 +1754,14 @@ export const automations = pgTable(
 		continueAgentSession: boolean("continue_agent_session")
 			.notNull()
 			.default(false),
+		// With no pinned workspace, keep the one the first run creates as the
+		// pin, so later runs reuse it.
+		reuseWorkspace: boolean("reuse_workspace").notNull().default(false),
 		machineSize: text("machine_size"),
 
 		// The schedule lives in the automation's `schedule` trigger.
 		enabled: boolean().notNull().default(true),
+		archivedAt: timestamp("archived_at", { withTimezone: true }),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()

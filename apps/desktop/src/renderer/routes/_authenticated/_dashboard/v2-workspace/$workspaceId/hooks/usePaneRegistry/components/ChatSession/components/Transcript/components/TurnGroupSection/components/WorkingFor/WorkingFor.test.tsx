@@ -20,3 +20,17 @@ test("a finished turn with a toggle keeps it reachable", () => {
 	);
 	expect(view.getByRole("button")).toBeTruthy();
 });
+
+test("a turn waiting on the user says so instead of counting", () => {
+	const view = render(<WorkingFor startedAtMs={0} waiting />);
+	expect(view.getByText("Needs input")).toBeTruthy();
+	expect(view.queryByText(/Working for/)).toBeNull();
+});
+
+test("a turn the user stopped says when, instead of how long it worked", () => {
+	const view = render(
+		<WorkingFor completedAtMs={95_000} startedAtMs={0} stopped />,
+	);
+	expect(view.getByText("You stopped after 1m 35s")).toBeTruthy();
+	expect(view.queryByText(/Worked for/)).toBeNull();
+});

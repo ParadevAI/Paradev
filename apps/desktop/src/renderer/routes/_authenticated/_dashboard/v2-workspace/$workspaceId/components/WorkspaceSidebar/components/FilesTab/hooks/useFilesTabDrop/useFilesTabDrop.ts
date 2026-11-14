@@ -2,10 +2,12 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import type { FileTree } from "@pierre/trees";
 import { i18n } from "@superset/i18n";
+import { MAX_INLINE_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useState } from "react";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { fileToBase64 } from "renderer/lib/file-to-base64";
 import {
 	asDirectoryHandle,
@@ -262,6 +264,10 @@ export function useFilesTabDrop({
 	workspaceId,
 }: UseFilesTabDropOptions): FilesTabDrop {
 	const { t } = useLingui();
+	const hostTarget = useWorkspaceHostTarget(workspaceId);
+	const onThisMachine =
+		hostTarget.status === "local-starting" ||
+		(hostTarget.status === "ready" && hostTarget.kind === "local");
 	const writeFile = workspaceTrpc.filesystem.writeFile.useMutation();
 	const createDirectory =
 		workspaceTrpc.filesystem.createDirectory.useMutation();
@@ -376,10 +382,28 @@ export function useFilesTabDrop({
 			// instead of dribbling them into a worktree the user has left. Files
 			// whose names already exist are collected (not overwritten) and the
 			// user is asked to confirm replacement below.
+			const isTooLarge = (file: File) =>
+				!onThisMachine && file.size > MAX_INLINE_ATTACHMENT_BYTES;
+			const tooLarge = tree.files.filter(({ file }) => isTooLarge(file));
+			if (tooLarge.length > 0) {
+				const count = tooLarge.length;
+				const limit = `${Math.round(MAX_INLINE_ATTACHMENT_BYTES / 1024 / 1024)}MB`;
+				toast.error(
+					tooLarge.length === 1
+						? t({
+								message: `1 file is over ${limit} and was not added`,
+							})
+						: t({
+								message: `${count} files are over ${limit} and were not added`,
+							}),
+				);
+			}
+
 			let added = 0;
 			let failed = 0;
 			const collisions: DroppedFile[] = [];
 			for (const { relPath, file } of tree.files) {
+				if (isTooLarge(file)) continue;
 				if (!bridge.isCurrent(versionToken)) break;
 				try {
 					if ((await writeOneFile(relPath, file, false)) === "exists") {
@@ -532,7 +556,16 @@ export function useFilesTabDrop({
 				],
 			});
 		},
-		[model, bridge, writeFile, createDirectory, rootPath, workspaceId, t],
+		[
+			model,
+			bridge,
+			writeFile,
+			createDirectory,
+			rootPath,
+			workspaceId,
+			onThisMachine,
+			t,
+		],
 	);
 
 	const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {

@@ -1,17 +1,24 @@
 import { LegendList, type LegendListRef } from "@legendapp/list/react-native";
-import { useCallback, useImperativeHandle, useRef } from "react";
+import { useCallback, useImperativeHandle, useRef, useState } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import type { ConversationListComponent } from "./conversation-list.types";
 
 const AT_BOTTOM_THRESHOLD = 48;
+const MAINTAIN_SCROLL_AT_END = {
+	animated: false,
+	on: { dataChange: true, layout: true },
+};
 
 export const ConversationList: ConversationListComponent = ({
 	ref,
 	onAtBottomChange,
 	onScroll,
+	onScrollBeginDrag,
+	onScrollEndDrag,
 	...listProps
 }) => {
 	const listRef = useRef<LegendListRef>(null);
+	const [isDragging, setIsDragging] = useState(false);
 	useImperativeHandle(ref, () => ({
 		scrollToEnd: (options) => listRef.current?.scrollToEnd(options),
 	}));
@@ -28,6 +35,22 @@ export const ConversationList: ConversationListComponent = ({
 		[onAtBottomChange, onScroll],
 	);
 
+	const handleScrollBeginDrag = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+			setIsDragging(true);
+			onScrollBeginDrag?.(event);
+		},
+		[onScrollBeginDrag],
+	);
+
+	const handleScrollEndDrag = useCallback(
+		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+			setIsDragging(false);
+			onScrollEndDrag?.(event);
+		},
+		[onScrollEndDrag],
+	);
+
 	return (
 		// Not alignItemsAtEnd: bottom-anchoring short threads means ANY item
 		// growth (expanding a tool card) shoves the whole thread upward.
@@ -40,15 +63,15 @@ export const ConversationList: ConversationListComponent = ({
 			// makes expanding a collapsible (tool card) yank the whole list up,
 			// so the chevron the user just tapped jumps away. Streaming still
 			// sticks to bottom via `dataChange` (every chunk replaces the data
-			// array) and `layout` covers keyboard/list resizes.
-			maintainScrollAtEnd={{
-				animated: false,
-				on: { dataChange: true, layout: true },
-			}}
+			// array) and `layout` covers keyboard/list resizes. Off while a
+			// finger drags, or each chunk pulls the reader back down.
+			maintainScrollAtEnd={isDragging ? false : MAINTAIN_SCROLL_AT_END}
 			maintainScrollAtEndThreshold={0.15}
 			recycleItems={false}
 			{...listProps}
 			onScroll={handleScroll}
+			onScrollBeginDrag={handleScrollBeginDrag}
+			onScrollEndDrag={handleScrollEndDrag}
 			ref={listRef}
 		/>
 	);

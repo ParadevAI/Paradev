@@ -1,3 +1,4 @@
+import { useNow } from "renderer/hooks/useNow";
 import { PullRequestMarkdown } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestMarkdown";
 import { describePullRequestTime } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/describePullRequestTime";
 import type { NormalizedComment } from "../../../../../../../../components/CommentsSection/types";
@@ -10,7 +11,8 @@ interface PullRequestCommentReplyProps {
 export function PullRequestCommentReply({
 	comment,
 }: PullRequestCommentReplyProps) {
-	const time = describePullRequestTime(comment.createdAt);
+	const now = useNow(60_000);
+	const time = describePullRequestTime(comment.createdAt, now);
 	return (
 		<div className="min-w-0 border-t border-border/60 py-2.5 first:border-t-0">
 			<p className="mb-1.5 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">

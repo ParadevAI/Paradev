@@ -30,6 +30,7 @@ export function usePluginMutations() {
 			utils.plugins.list.invalidate(),
 			utils.plugins.connections.list.invalidate(),
 			machineUtils.plugins.organizationVersions.invalidate(),
+			machineUtils.plugins.installedIcons.invalidate(),
 		]);
 	};
 
@@ -79,9 +80,20 @@ export function usePluginMutations() {
 		}
 	};
 
+	const warnUnreachableTools = (name: string, mcpError: string | null) => {
+		if (!mcpError) return;
+		toast.warning(
+			t({
+				message: `Agents cannot reach ${displayName(name)}'s tools`,
+			}),
+			{ description: mcpError },
+		);
+	};
+
 	const installMutation = electronTrpc.plugins.install.useMutation({
-		onSuccess: (_data, variables) => {
+		onSuccess: (data, variables) => {
 			posthog.capture("plugin_installed", { plugin: variables.name });
+			warnUnreachableTools(variables.name, data.mcpError);
 			toast.success(
 				t({
 					message: `${displayName(variables.name)} installed`,
@@ -157,8 +169,9 @@ export function usePluginMutations() {
 	});
 
 	const updateMutation = electronTrpc.plugins.install.useMutation({
-		onSuccess: (_data, variables) => {
+		onSuccess: (data, variables) => {
 			posthog.capture("plugin_updated", { plugin: variables.name });
+			warnUnreachableTools(variables.name, data.mcpError);
 			toast.success(
 				t({
 					message: `${displayName(variables.name)} updated`,

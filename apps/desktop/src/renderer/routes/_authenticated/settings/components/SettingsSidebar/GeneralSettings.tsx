@@ -3,7 +3,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { cn } from "@superset/ui/utils";
-import { Link, useMatchRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import {
@@ -35,6 +35,7 @@ import { env } from "renderer/env.renderer";
 import { useHostsNeedingUpdateCount } from "renderer/hooks/host-version/useHostsNeedingUpdate";
 import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import type { SettingsSection } from "renderer/stores/settings-state";
 import { getAllowedSectionsForVariant } from "../../utils/settings-search";
@@ -350,7 +351,6 @@ export const FULL_WIDTH_SECTION_PATHS: readonly string[] =
 	);
 
 export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
-	const mobileEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH);
 	const pluginsFlag = useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS);
 	const pluginsEnabled = env.NODE_ENV === "development" || pluginsFlag === true;
 	const isAdmin = useIsOrganizationAdmin() === true;
@@ -373,7 +373,6 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 				const platformItems = group.items.filter(
 					(item) =>
 						(!item.macOnly || isMac) &&
-						(item.section !== "mobile" || mobileEnabled === true) &&
 						(item.section !== "plugins" || pluginsEnabled) &&
 						(!item.adminOnly || isAdmin) &&
 						allowedSections.has(item.section),

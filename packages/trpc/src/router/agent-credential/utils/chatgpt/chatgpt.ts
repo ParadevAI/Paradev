@@ -54,10 +54,40 @@ export class ChatgptSignInError extends Error {
 			| "device-code-disabled"
 			| "rejected"
 			| "unreachable"
+			| "unexpected"
 			| "no-account",
+		readonly code?: string,
 	) {
 		super(message);
 		this.name = "ChatgptSignInError";
+	}
+}
+
+/** The refresh errors Codex itself treats as a session that is gone for good. */
+const DEAD_SESSION_CODES = new Set([
+	"refresh_token_expired",
+	"refresh_token_reused",
+	"refresh_token_invalidated",
+	"invalid_grant",
+]);
+
+/** OpenAI sends the code as `error`, `error.code` or `code`. */
+async function refreshErrorCode(
+	response: Response,
+): Promise<string | undefined> {
+	try {
+		const body = (await response.json()) as {
+			error?: unknown;
+			code?: unknown;
+		};
+		const nested =
+			typeof body.error === "object" && body.error !== null
+				? (body.error as { code?: unknown }).code
+				: body.error;
+		const code = typeof nested === "string" ? nested : body.code;
+		return typeof code === "string" ? code : undefined;
+	} catch {
+		return undefined;
 	}
 }
 
@@ -223,9 +253,18 @@ export async function refreshChatgptTokens(
 		"application/json",
 	);
 	if (response.status === 400 || response.status === 401) {
+		const code = await refreshErrorCode(response);
+		if (code && DEAD_SESSION_CODES.has(code)) {
+			throw new ChatgptSignInError(
+				"OpenAI refused to refresh this sign-in.",
+				"rejected",
+				code,
+			);
+		}
 		throw new ChatgptSignInError(
-			"OpenAI refused to refresh this sign-in.",
-			"rejected",
+			`OpenAI answered ${response.status} to a refresh.`,
+			"unexpected",
+			code,
 		);
 	}
 	if (!response.ok) {

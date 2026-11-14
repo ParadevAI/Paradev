@@ -1,4 +1,5 @@
-import { errorMessage } from "@superset/i18n/errors";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import {
 	Dialog,
 	DialogContent,
@@ -6,7 +7,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -17,6 +17,10 @@ import {
 	useFinalizeProjectSetup,
 } from "renderer/react-query/projects";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import {
+	type ProjectCreateError,
+	toProjectCreateError,
+} from "renderer/routes/_authenticated/utils/projectCreateError";
 import { TemplateCard } from "./components/TemplateCard";
 import { PROJECT_TEMPLATES, type ProjectTemplate } from "./templates";
 
@@ -24,7 +28,7 @@ interface TemplateGalleryModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onCreated: (result: { projectId: string }) => void;
-	onError?: (message: string) => void;
+	onError?: (error: ProjectCreateError) => void;
 }
 
 function deriveProjectNameFromUrl(url: string): string {
@@ -43,27 +47,29 @@ export function TemplateGalleryModal({
 	onCreated,
 	onError,
 }: TemplateGalleryModalProps) {
+	const { _: translate } = useLingui();
 	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const hostService = useLocalHostService();
-	const { activeHostUrl } = hostService;
 	const finalizeSetup = useFinalizeProjectSetup();
 	const createV1Project = useCreateV1Project();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const parentDir = homeDir ? `${homeDir}/.superset/projects` : null;
+	const parentDir = homeDir ? `${homeDir}/.paradev/projects` : null;
 	const [cloningId, setCloningId] = useState<string | null>(null);
+	const [createError, setCreateError] = useState<string | null>(null);
+
+	const reportError = (error: ProjectCreateError) => {
+		setCreateError(error.message);
+		onError?.(error);
+	};
 
 	const handleSelect = async (template: ProjectTemplate) => {
-		if (!template.repo || cloningId) return;
-		if (!parentDir) {
-			const message = "Projects directory not ready yet.";
-			if (onError) onError(message);
-			else toast.error("Could not create project", { description: message });
-			return;
-		}
+		if (!template.repo || cloningId || !parentDir) return;
 		setCloningId(template.id);
+		setCreateError(null);
 		let createdProjectId: string | null = null;
 		try {
 			if (isV2CloudEnabled) {
+				const activeHostUrl = await hostService.waitForHostReady();
 				if (!activeHostUrl) {
 					showHostServiceUnavailableToast(hostService, {
 						action: "createProject",
@@ -84,9 +90,17 @@ export function TemplateGalleryModal({
 				});
 			}
 		} catch (err) {
-			const message = errorMessage(err);
-			if (onError) onError(message);
-			else toast.error("Could not create project", { description: message });
+			reportError(
+				toProjectCreateError(
+					err,
+					translate(
+						msg({
+							message:
+								"Could not download the template. Check your internet connection and try again.",
+						}),
+					),
+				),
+			);
 		} finally {
 			setCloningId(null);
 		}
@@ -95,6 +109,7 @@ export function TemplateGalleryModal({
 
 	const handleOpenChange = (next: boolean) => {
 		if (!next && cloningId) return;
+		if (!next) setCreateError(null);
 		onOpenChange(next);
 	};
 
@@ -111,6 +126,14 @@ export function TemplateGalleryModal({
 						history.
 					</DialogDescription>
 				</DialogHeader>
+				{createError && (
+					<p
+						role="alert"
+						className="select-text cursor-text break-words text-xs text-destructive"
+					>
+						{createError}
+					</p>
+				)}
 				<div className="grid grid-cols-3 gap-3">
 					{PROJECT_TEMPLATES.map((template) => (
 						<TemplateCard
