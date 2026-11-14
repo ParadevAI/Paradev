@@ -19,24 +19,36 @@ export interface HostProjectItem {
 
 const PROJECTS_REFETCH_INTERVAL_MS = 30_000;
 
-export function toHostProjectItem(row: HostProjectRow): HostProjectItem {
-	// A host that predates repositories serves neither field.
+/** What a host older than multi-repo projects serves instead of `repositories`. */
+interface LegacyProjectFields {
+	repoOwner?: string | null;
+	repoName?: string | null;
+	repoPath?: string | null;
+}
+
+function folderName(path: string | null | undefined): string | null {
+	return path?.split(/[\\/]/).filter(Boolean).pop() ?? null;
+}
+
+export function toHostProjectItem(
+	row: HostProjectRow & LegacyProjectFields,
+): HostProjectItem {
 	const primary =
 		(row.repositories ?? []).find(
 			(repository) => repository.id === row.primaryRepositoryId,
 		) ?? null;
-	const repoOwner = primary?.owner ?? null;
+	const repoOwner = primary?.owner ?? row.repoOwner ?? null;
 	// Custom local-first icon wins; fall back to the GitHub owner avatar.
 	const iconUrl =
 		row.icon ??
 		(repoOwner ? `https://github.com/${repoOwner}.png?size=64` : null);
 	return {
 		id: row.id,
-		name: row.name || primary?.name || row.id,
+		name: row.name || primary?.name || folderName(row.repoPath) || row.id,
 		iconUrl,
 		primaryRepositoryId: row.primaryRepositoryId,
 		repoOwner,
-		repoName: primary?.repoName ?? null,
+		repoName: primary?.repoName ?? row.repoName ?? null,
 	};
 }
 

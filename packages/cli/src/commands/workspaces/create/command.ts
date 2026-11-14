@@ -92,19 +92,15 @@ export default command({
 			organizationId,
 		);
 		if (!defaultHostId) {
-			if ((options.baseBranch?.length ?? 0) > 1) {
-				throw new CLIError(
-					"A cloud workspace takes one --base-branch",
-					"Its environment's repositories start from their defaults; pass one branch for the primary",
-				);
-			}
 			return await createCloudWorkspace({
 				api: ctx.api,
 				organizationId,
 				options: {
 					...options,
 					pr: options.pr?.length ? options.pr : undefined,
-					baseBranch: options.baseBranch?.[0],
+					baseBranch: options.baseBranch?.length
+						? options.baseBranch
+						: undefined,
 				},
 			});
 		}

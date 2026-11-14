@@ -30,9 +30,11 @@ const PROJECT = {
 };
 
 let setupInput: Record<string, unknown> | undefined;
+let localProject: typeof PROJECT | null;
+let setupCreates: boolean;
 
 withLocalHostService("org-1", {
-	"project.get": () => null,
+	"project.get": () => localProject,
 	"project.setup": (input) => {
 		setupInput = input;
 		return {
@@ -41,7 +43,7 @@ withLocalHostService("org-1", {
 				...r,
 				path: `/here/${r.name}`,
 			})),
-			created: true,
+			created: setupCreates,
 		};
 	},
 });
@@ -87,6 +89,8 @@ function invoke(options: Record<string, unknown>) {
 
 beforeEach(() => {
 	setupInput = undefined;
+	localProject = null;
+	setupCreates = true;
 	remoteHosts["host-a"] = hasProject;
 	remoteHosts["host-b"] = lacksProject;
 });
@@ -135,5 +139,48 @@ describe("projects setup", () => {
 			"Several hosts have project project-1: server-a (host-a), server-b (host-b)",
 		);
 		expect(setupInput).toBeUndefined();
+	});
+
+	test("uses --from-host when several hosts have the project", async () => {
+		remoteHosts["host-b"] = hasProject;
+		const result = await invoke({ cloneInto: "/src", fromHost: "host-b" });
+		expect(result.message).toContain("from host host-b");
+	});
+
+	test("asks for a folder for every repository it would not place", async () => {
+		await expect(invoke({ path: ["api=/code/api"] })).rejects.toThrow(
+			"Pick a folder for web",
+		);
+		expect(setupInput).toBeUndefined();
+	});
+
+	test("refuses a relative path for another host", async () => {
+		await expect(
+			invoke({ local: undefined, host: "host-b", path: ["api=code/api"] }),
+		).rejects.toThrow("code/api is not an absolute path");
+	});
+
+	test("on a host that has the project, sends no origin and says what moved", async () => {
+		localProject = {
+			...PROJECT,
+			repositories: PROJECT.repositories.map((r) => ({
+				...r,
+				path: r.name === "api" ? "/here/api" : "/old/web",
+			})),
+		};
+		setupCreates = false;
+		const result = await invoke({ path: ["web=/here/web"] });
+		expect(setupInput?.origin).toBeUndefined();
+		expect(result.message).toContain('Project "shop" is already on host');
+		expect(result.message).toContain("api  /here/api  (already there)");
+		expect(result.message).toContain("web  /here/web  (moved)");
+	});
+
+	test("says the host restored a project it had deleted", async () => {
+		setupCreates = false;
+		const result = await invoke({ cloneInto: "/src" });
+		expect(result.message).toContain('Restored project "shop" on host');
+		expect(result.message).toContain("api  /here/api  (restored)");
+		expect(result.message).not.toContain("moved");
 	});
 });

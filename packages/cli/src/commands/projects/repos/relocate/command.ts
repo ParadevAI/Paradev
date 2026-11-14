@@ -1,6 +1,7 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { command } from "../../../../lib/command";
 import {
+	hostPath,
 	requireHostTarget,
 	resolveHostTarget,
 	resolveRepository,
@@ -31,6 +32,7 @@ export default command({
 			userJwt: ctx.bearer,
 			api: ctx.api,
 		});
+		const path = hostPath(target, options.path);
 		const repository = await resolveRepository(
 			target.client,
 			options.project,
@@ -39,11 +41,11 @@ export default command({
 		const project = await target.client.project.relocateRepository.mutate({
 			projectId: options.project,
 			repositoryId: repository.id,
-			path: options.path,
+			path,
 		});
 		return {
 			data: project,
-			message: `${repository.name} is now at ${options.path}`,
+			message: `${repository.name} is now at ${path}`,
 		};
 	},
 });

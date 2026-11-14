@@ -196,7 +196,9 @@ org-wide project registry.
 const projects = await client.projects.list({ hostId: '<machineId>' });
 ```
 
-Returns `Array<Project>` (`id`, `name`, `repoPath`, `repoUrl`, …).
+Returns `Array<Project>` (`id`, `name`, `primaryRepositoryId`, `repositories`, …).
+Each entry of `repositories` has `id`, `name`, `path` (its folder on the host),
+`url` and `isPrimary`.
 
 ---
 

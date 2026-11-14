@@ -1,3 +1,4 @@
+export { hostPath } from "./hostPath";
 export { requireRepositories } from "./requireRepositories";
 export { resolveCloudWorkspaceTarget } from "./resolveCloudWorkspaceTarget";
 export {

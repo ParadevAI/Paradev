@@ -1,6 +1,10 @@
 import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
-import { requireHostTarget, resolveHostTarget } from "../../../lib/host-target";
+import {
+	hostPath,
+	requireHostTarget,
+	resolveHostTarget,
+} from "../../../lib/host-target";
 import { repositorySource } from "../utils/repositorySource";
 
 export default command({
@@ -54,10 +58,22 @@ export default command({
 
 		const result = await target.client.project.create.mutate({
 			name: options.name,
-			repositories,
-			...(options.parentDir ? { parentDir: options.parentDir } : {}),
+			repositories: repositories.map((source) =>
+				source.kind === "local"
+					? { kind: "local", path: hostPath(target, source.path) }
+					: source,
+			),
+			...(options.parentDir
+				? { parentDir: hostPath(target, options.parentDir) }
+				: {}),
 		});
 
+		if (!result.created) {
+			return {
+				data: result,
+				message: `Reused project "${result.name}" (${result.id}): host ${target.hostId} already has a project for that folder, so --name was not applied`,
+			};
+		}
 		return {
 			data: result,
 			message: `Created project "${result.name}" with ${result.repositories.length} repositor${

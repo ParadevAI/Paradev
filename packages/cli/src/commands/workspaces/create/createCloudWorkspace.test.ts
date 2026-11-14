@@ -68,7 +68,7 @@ test("sends --base-branch as the branch the cloud workspace starts from", async 
 	await createCloudWorkspace({
 		api,
 		organizationId: "org",
-		options: { baseBranch: "main" },
+		options: { baseBranch: ["main"] },
 	});
 	expect(calls.createInput).toMatchObject({ branch: "main" });
 });
@@ -82,7 +82,7 @@ test.each([
 		createCloudWorkspace({
 			api,
 			organizationId: "org",
-			options: { baseBranch },
+			options: { baseBranch: [baseBranch] },
 		}),
 	).rejects.toThrow(/not <repository>=<branch>/);
 	expect(calls.createInput).toBeUndefined();
@@ -93,7 +93,7 @@ test("sends a --base-branch with `=` that names no repository", async () => {
 	await createCloudWorkspace({
 		api,
 		organizationId: "org",
-		options: { baseBranch: "feat=x" },
+		options: { baseBranch: ["feat=x"] },
 	});
 	expect(calls.createInput).toMatchObject({ branch: "feat=x" });
 });

@@ -21,7 +21,7 @@ export interface CloudCreateOptions {
 	session?: boolean;
 	pr?: string[];
 	task?: string;
-	baseBranch?: string;
+	baseBranch?: string[];
 	skipBranchPrefix?: boolean;
 	tag?: string[];
 	attachment?: string[];
@@ -66,6 +66,14 @@ export async function createCloudWorkspace(args: {
 		);
 	}
 
+	if ((options.baseBranch?.length ?? 0) > 1) {
+		throw new CLIError(
+			"A cloud workspace takes one --base-branch",
+			"Its environment's repositories start from their defaults; pass one branch for the primary",
+		);
+	}
+	const baseBranch = options.baseBranch?.[0];
+
 	// Same pairing rules as the host path.
 	for (const [flag, value] of [
 		["--prompt", options.prompt],
@@ -97,7 +105,7 @@ export async function createCloudWorkspace(args: {
 		environments,
 		options.environment,
 	);
-	refuseRepositoryPrefix(options.baseBranch, environment.repositories);
+	refuseRepositoryPrefix(baseBranch, environment.repositories);
 
 	const attachmentFileIds = options.attachment?.length
 		? await uploadToCloudStorage({ api, paths: options.attachment, fetchImpl })
@@ -108,7 +116,7 @@ export async function createCloudWorkspace(args: {
 			organizationId,
 			environmentId: environment.id,
 			...(options.name ? { name: options.name } : {}),
-			...(options.baseBranch ? { branch: options.baseBranch } : {}),
+			...(baseBranch ? { branch: baseBranch } : {}),
 			...(options.agent ? { agent: options.agent } : {}),
 			...(options.prompt ? { prompt: options.prompt } : {}),
 			...(options.model ? { model: options.model } : {}),

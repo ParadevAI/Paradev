@@ -1300,7 +1300,8 @@ its folder on a project of one repository; on a project of several, it moves to
 checkout is not a worktree; use `superset workspaces create --checkout local` for it.
 
 To open every untracked worktree, for example after a machine registers as a new host,
-pass `--all` (the project must be on that host first; see [`projects create`](#superset-projects-create)). It returns
+pass `--all`. The project must be on that host first: [`projects setup`](#superset-projects-setup-id)
+adds a project from another host under the same IDs. It returns
 `{ opened, alreadyExisted, failed }`. If a worktree fails, the others still open, and the
 command exits non-zero with the same object as its `--json` output. `superset worktrees
 list` shows what `--all` will open: the rows with `isMain: false` and `hasWorkspace: false`.

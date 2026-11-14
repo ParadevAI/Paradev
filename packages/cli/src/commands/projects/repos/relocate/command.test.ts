@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { resolve } from "node:path";
 import { withLocalHostService } from "../../../../lib/host/test-helpers";
 import relocateCommand from "./command";
 
@@ -35,5 +36,19 @@ describe("projects repos relocate", () => {
 			path: "/moved/api",
 		});
 		expect(result.message).toBe("api is now at /moved/api");
+	});
+
+	test("resolves a relative --path against the current folder", async () => {
+		await relocateCommand.run({
+			ctx: { config: { organizationId: "org-1" }, bearer: "bearer" } as never,
+			args: { repository: "api" } as never,
+			options: {
+				local: true,
+				project: "project-1",
+				path: "moved/api",
+			} as never,
+			signal: new AbortController().signal,
+		});
+		expect(relocateInput?.path).toBe(resolve("moved/api"));
 	});
 });

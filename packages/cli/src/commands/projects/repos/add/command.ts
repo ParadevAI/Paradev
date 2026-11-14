@@ -1,6 +1,7 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { command } from "../../../../lib/command";
 import {
+	hostPath,
 	requireHostTarget,
 	resolveHostTarget,
 } from "../../../../lib/host-target";
@@ -48,8 +49,13 @@ export default command({
 		});
 		const project = await target.client.project.addRepository.mutate({
 			projectId: options.project,
-			source,
-			...(options.parentDir ? { parentDir: options.parentDir } : {}),
+			source:
+				source.kind === "local"
+					? { kind: "local", path: hostPath(target, source.path) }
+					: source,
+			...(options.parentDir
+				? { parentDir: hostPath(target, options.parentDir) }
+				: {}),
 		});
 		return {
 			data: project,

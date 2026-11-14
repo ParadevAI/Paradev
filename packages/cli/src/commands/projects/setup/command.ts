@@ -1,11 +1,9 @@
-import { homedir } from "node:os";
-import { isAbsolute, resolve } from "node:path";
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import {
 	findRepository,
-	type ResolvedHostTarget,
+	hostPath,
 	requireRepositories,
 	resolveHostFilter,
 	resolveHostTarget,
@@ -32,20 +30,20 @@ function parsePathOption(value: string): { ref: string; dir: string } {
 	return { ref, dir };
 }
 
-/** This machine resolves a folder against the cwd; another host needs it absolute. */
-function hostPath(target: ResolvedHostTarget, dir: string): string {
-	if (target.kind === "local") {
-		const expanded =
-			dir === "~" || dir.startsWith("~/") ? `${homedir()}${dir.slice(1)}` : dir;
-		return resolve(expanded);
-	}
-	if (!isAbsolute(dir)) {
-		throw new CLIError(
-			`${dir} is not an absolute path`,
-			`Give the full path of the folder on host ${target.hostId}`,
-		);
-	}
-	return dir;
+function placementState({
+	created,
+	restored,
+	previousPath,
+	path,
+}: {
+	created: boolean;
+	restored: boolean;
+	previousPath: string | undefined;
+	path: string;
+}): string {
+	if (created || (!restored && previousPath === undefined)) return "set up";
+	if (restored) return "restored";
+	return previousPath === path ? "already there" : "moved";
 }
 
 export default command({
@@ -162,17 +160,21 @@ export default command({
 		const before = new Map(
 			(existing?.repositories ?? []).map((r) => [r.id, r.path]),
 		);
+		const restored = !existing && !result.created;
 		const lines = result.repositories.map((repository) => {
-			const state = result.created
-				? "set up"
-				: before.get(repository.id) === repository.path
-					? "already there"
-					: "moved";
+			const state = placementState({
+				created: result.created,
+				restored,
+				previousPath: before.get(repository.id),
+				path: repository.path,
+			});
 			return `  ${repository.name}  ${repository.path}  (${state})`;
 		});
 		const heading = result.created
 			? `Set up project "${result.name}" on host ${target.hostId} from host ${source?.hostId}`
-			: `Project "${result.name}" is already on host ${target.hostId}`;
+			: restored
+				? `Restored project "${result.name}" on host ${target.hostId}`
+				: `Project "${result.name}" is already on host ${target.hostId}`;
 		return { data: result, message: [heading, ...lines].join("\n") };
 	},
 });
