@@ -59,6 +59,8 @@ export default command({
 	args: [positional("page").required().desc("Page id, slug or link")],
 	options: {
 		version: number()
+			.int()
+			.min(1)
 			.alias("v")
 			.desc(
 				"Version to fetch (defaults to a link's ?v=, else the one currently served)",
