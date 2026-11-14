@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, notInArray } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	projects,
@@ -43,6 +43,13 @@ import type {
 	GitHubPullRequestReviewDecision,
 } from "./utils/github-query/types";
 import {
+	type ClosedPullRequest,
+	fetchClosedPullRequest,
+	fetchClosedPullRequestFromGh,
+	fetchLandedMergeTime,
+	fetchLandedMergeTimeFromGh,
+} from "./utils/landed-merge";
+import {
 	type ChecksStatus,
 	coerceChecksStatus,
 	coercePullRequestState,
@@ -80,6 +87,7 @@ const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
 // Re-probe cadence for worktrees observed missing on disk. existsSync-only —
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
+const LANDED_MERGE_BACKFILL_WINDOW_MS = 30 * 24 * 60 * 60_000;
 // Dedup + link-assignment key. Branch stays case-sensitive: `feature` and
 // `Feature` are distinct branches with distinct PRs, so collapsing them here
 // would mislink. Case drift is tolerated only in the fallback in
@@ -282,6 +290,7 @@ export class PullRequestRuntimeManager {
 	private missingWorktreeProbeTimer: ReturnType<typeof setInterval> | null =
 		null;
 	private readonly linkListeners = new Set<() => void>();
+	private readonly landedMergeCache = new Map<string, Promise<number | null>>();
 
 	constructor(options: PullRequestRuntimeManagerOptions) {
 		this.db = options.db;
@@ -309,6 +318,7 @@ export class PullRequestRuntimeManager {
 		// activity has happened since the last process boot.
 		void this.syncWorkspaceBranches();
 		void this.refreshEligibleProjects();
+		void this.backfillLandedMerges();
 
 		// Steady-state: react to real `.git/` activity per workspace. Per-workspace
 		// debounce lives in `GitWatcher` (300 ms), and concurrent project refreshes
@@ -1617,6 +1627,107 @@ export class PullRequestRuntimeManager {
 		);
 	}
 
+	/**
+	 * A merge queue such as Graphite pushes the squashed commit to the base
+	 * branch itself and closes the PR, so GitHub never marks it merged. Returns
+	 * that commit's time when it is on the base branch.
+	 */
+	private async landedMergeTimeFor(
+		repo: NormalizedRepoIdentity,
+		node: GitHubPullRequestNode,
+		existing: PullRequestRow | undefined,
+	): Promise<number | null> {
+		if (node.state !== "CLOSED" || node.mergedAt != null) return null;
+		if (existing?.state === "merged") return null;
+		if (node.closedAt == null || !node.baseRefName) return null;
+		return this.cachedLandedMergeTime(repo, {
+			number: node.number,
+			baseRefName: node.baseRefName,
+			closedAt: node.closedAt,
+		});
+	}
+
+	private cachedLandedMergeTime(
+		repo: Pick<NormalizedRepoIdentity, "owner" | "name">,
+		pr: ClosedPullRequest,
+	): Promise<number | null> {
+		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${pr.number}@${pr.closedAt}`;
+		const cached = this.landedMergeCache.get(cacheKey);
+		if (cached) return cached;
+		const context = { owner: repo.owner, name: repo.name, prNumber: pr.number };
+		const promise = this.fetchFromGitHub(
+			"landed-merge lookup",
+			context,
+			() => fetchLandedMergeTimeFromGh(this.execGh, repo, pr),
+			async () => fetchLandedMergeTime(await this.github(), repo, pr),
+		).catch((error: unknown) => {
+			this.landedMergeCache.delete(cacheKey);
+			if (!(error instanceof GitHubUnavailableError)) {
+				console.warn(
+					"[host-service:pull-request-runtime] Failed to check whether a closed PR landed",
+					{ ...context, error },
+				);
+			}
+			return null;
+		});
+		this.landedMergeCache.set(cacheKey, promise);
+		return promise;
+	}
+
+	// Refreshes skip archived workspaces, so their closed PRs are checked here.
+	private async backfillLandedMerges(): Promise<void> {
+		const cutoff = Date.now() - LANDED_MERGE_BACKFILL_WINDOW_MS;
+		const rows = this.db
+			.selectDistinct({
+				id: pullRequests.id,
+				repoOwner: pullRequests.repoOwner,
+				repoName: pullRequests.repoName,
+				prNumber: pullRequests.prNumber,
+			})
+			.from(pullRequests)
+			.innerJoin(
+				workspacePullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.where(
+				and(
+					eq(pullRequests.state, "closed"),
+					isNull(pullRequests.mergedAt),
+					gte(pullRequests.updatedAt, cutoff),
+				),
+			)
+			.all();
+
+		for (const row of rows) {
+			const repo = { owner: row.repoOwner, name: row.repoName };
+			try {
+				const closed = await this.fetchFromGitHub(
+					"closed-PR lookup",
+					{ ...repo, prNumber: row.prNumber },
+					() => fetchClosedPullRequestFromGh(this.execGh, repo, row.prNumber),
+					async () =>
+						fetchClosedPullRequest(await this.github(), repo, row.prNumber),
+				);
+				if (!closed) continue;
+				const landedAt = await this.cachedLandedMergeTime(repo, closed);
+				if (landedAt == null) continue;
+				this.db
+					.update(pullRequests)
+					.set({ state: "merged", mergedAt: landedAt, updatedAt: Date.now() })
+					.where(
+						and(eq(pullRequests.id, row.id), eq(pullRequests.state, "closed")),
+					)
+					.run();
+			} catch (error) {
+				if (error instanceof GitHubUnavailableError) return;
+				console.warn(
+					"[host-service:pull-request-runtime] Landed-merge backfill failed for a PR",
+					{ ...repo, prNumber: row.prNumber, error },
+				);
+			}
+		}
+	}
+
 	private async fetchRepoPullRequests(
 		projectId: string,
 		repo: NormalizedRepoIdentity,
@@ -1706,8 +1817,15 @@ export class PullRequestRuntimeManager {
 		const now = Date.now();
 
 		const detailsByNumber = new Map<number, PullRequestDetails>();
+		const landedAtByNumber = new Map<number, number>();
 		await Promise.all(
 			Array.from(latestByKey.values()).map(async (node) => {
+				const landedAt = await this.landedMergeTimeFor(
+					repo,
+					node,
+					this.findPullRequestRow(repo, node.number),
+				);
+				if (landedAt != null) landedAtByNumber.set(node.number, landedAt);
 				try {
 					detailsByNumber.set(
 						node.number,
@@ -1741,6 +1859,12 @@ export class PullRequestRuntimeManager {
 			const isInMergeQueue =
 				details?.isInMergeQueue ??
 				coercePullRequestState(existing?.state ?? null) === "queued";
+			// GitHub never turns a merged PR into a closed one, so a stored
+			// "merged" over a fetched CLOSED is an earlier landed-merge match.
+			const landedAt = landedAtByNumber.get(node.number);
+			const landed =
+				landedAt != null ||
+				(node.state === "CLOSED" && existing?.state === "merged");
 			const rowId = this.upsertPullRequestRow({
 				existing,
 				projectId,
@@ -1748,11 +1872,13 @@ export class PullRequestRuntimeManager {
 				repo,
 				url: node.url,
 				title: node.title,
-				state: mapPullRequestState(node.state, node.isDraft, isInMergeQueue),
+				state: landed
+					? "merged"
+					: mapPullRequestState(node.state, node.isDraft, isInMergeQueue),
 				isDraft: node.isDraft,
 				headBranch: node.headRefName,
 				headSha: node.headRefOid,
-				mergedAt: node.mergedAt,
+				mergedAt: node.mergedAt ?? landedAt ?? null,
 				reviewDecision,
 				checksStatus: computeChecksStatus(checks),
 				checksJson: JSON.stringify(checks),
