@@ -26,7 +26,7 @@ async function servedToAnyone(
 	if (!("slug" in ref)) {
 		throw new CLIError(
 			"Not logged in",
-			`Pass the page's slug or link to read a public page, or ${SIGN_IN}`,
+			`Signed out, pass the page's slug or link to read a public page. ${SIGN_IN}`,
 		);
 	}
 	const view = await api.page.publicView.query({
