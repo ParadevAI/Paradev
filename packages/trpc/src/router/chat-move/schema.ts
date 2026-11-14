@@ -21,6 +21,13 @@ export const chatMoveInputSchema = z.object({
 	moveId: z.string().uuid(),
 });
 
+/** Names the run carrying out the move, so only that run can finish or fail its copy. */
+const attemptId = z.string().uuid().optional();
+
+export const chatMoveAttemptInputSchema = chatMoveInputSchema.extend({
+	attemptId,
+});
+
 export const chatMoveEventsInputSchema = z.object({
 	moveId: z.string().uuid(),
 	/** The seq of the last event already received. */
@@ -31,4 +38,5 @@ export const chatMoveEventsInputSchema = z.object({
 export const failChatMoveInputSchema = z.object({
 	moveId: z.string().uuid(),
 	error: z.string().min(1).max(2000),
+	attemptId,
 });

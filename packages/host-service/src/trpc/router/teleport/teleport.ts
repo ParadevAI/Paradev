@@ -53,6 +53,8 @@ const STOP_TIMEOUT_MS = 20_000;
 const STOP_POLL_MS = 200;
 /** As many chats as `workspaceMove.attach` takes in one workspace move. */
 const MAX_MOVED_CHATS = 50;
+/** The most `listSessions` returns at once. */
+const MAX_LISTED_CHATS = 200;
 
 type MovableChat = {
 	sessionId: string;
@@ -71,7 +73,12 @@ type PreparedChat = {
 type SkippedChat = {
 	chatSessionId: string;
 	title: string | null;
-	reason: "unsupported_agent" | "not_started" | "moved_away" | "failed";
+	reason:
+		| "unsupported_agent"
+		| "not_started"
+		| "moved_away"
+		| "failed"
+		| "too_many";
 };
 
 function errorCode(error: unknown): string | undefined {
@@ -176,15 +183,21 @@ export const teleportRouter = router({
 					message: "Chat sync is not available on this host",
 				});
 			}
-			const sessions = chat.commands.listSessions({
-				scopeId: input.workspaceId,
-				limit: MAX_MOVED_CHATS,
-			});
+			const sessions = chat.commands
+				.listSessions({ scopeId: input.workspaceId, limit: MAX_LISTED_CHATS })
+				// A chat closed here is gone for the person; moving it would open it again.
+				.filter((session) => !session.closedAt);
 			const skipped: SkippedChat[] = [];
 			const movable: MovableChat[] = [];
-			for (const session of sessions) {
-				// A chat closed here is gone for the person; moving it would open it again.
-				if (session.closedAt) continue;
+			for (const [index, session] of sessions.entries()) {
+				if (index >= MAX_MOVED_CHATS) {
+					skipped.push({
+						chatSessionId: session.sessionId,
+						title: session.title,
+						reason: "too_many",
+					});
+					continue;
+				}
 				const provider = teleportProviderFor(session.harness);
 				if (!provider || !session.harnessSessionId) {
 					skipped.push({

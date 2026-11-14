@@ -140,7 +140,10 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 							(terminal) => terminal.terminalId,
 						);
 						if (moveSignal.aborted) {
-							await releaseSourceTerminals(
+							// The move can end while prepare runs, after the catch below released nothing.
+							await releaseSourceChats(source, leaving.chats);
+							leaving.chats = [];
+							leaving.terminals = await releaseSourceTerminals(
 								source,
 								workspace.id,
 								leaving.terminals,
@@ -190,9 +193,18 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						return { prepared, project, created, moves, skipped };
 					},
 				}).catch(async (error: unknown) => {
-					await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
+					const moved = new Set(
+						(await abandonWorkspaceMove(
+							workspaceMoveId,
+							error,
+							signal?.aborted,
+						)) ?? [],
+					);
 					if (leaving.source) {
-						await releaseSourceChats(leaving.source, leaving.chats);
+						await releaseSourceChats(
+							leaving.source,
+							leaving.chats.filter((id) => !moved.has(id)),
+						);
 						await releaseSourceTerminals(
 							leaving.source,
 							workspace.id,

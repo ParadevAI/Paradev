@@ -73,6 +73,11 @@ export function setMoveStore(next: MoveStore): void {
 	store = next;
 }
 
+/** Realtime deploys apart from the API, and refuses an op it does not know yet. */
+export function isUnknownMoveOp(error: unknown): boolean {
+	return error instanceof TRPCError && error.code === "BAD_REQUEST";
+}
+
 /** Runs one request against the organization's moves; a refusal throws. */
 export async function callMoves<Request extends MoveBookRequest>(
 	organizationId: string,
