@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="utf-8" />
+		<title>switch sim</title>
+		<script>
+			const inert = () => new Proxy(function () {}, { get: (_t, k) => (k === "then" ? undefined : inert()), apply: () => inert() });
+			window.electronTRPC = { sendMessage() {}, onMessage() {} };
+			window.App = inert();
+			window.ipcRenderer = inert();
+			window.webUtils = inert();
+		</script>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="./switch.tsx"></script>
+	</body>
+</html>

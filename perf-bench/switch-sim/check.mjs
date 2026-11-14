@@ -1,0 +1,23 @@
+import { createReadStream, existsSync, statSync } from "node:fs";
+import { createServer } from "node:http";
+import { createRequire } from "node:module";
+import { extname, join } from "node:path";
+const require = createRequire("/tmp/perf-mac/tools/package.json");
+const { chromium } = require("playwright-core");
+const outDir = process.argv[2];
+const types = { ".js": "text/javascript", ".css": "text/css", ".html": "text/html" };
+const server = createServer((req, res) => {
+	const path = join(outDir, decodeURIComponent(new URL(req.url, "http://x").pathname));
+	if (!existsSync(path) || statSync(path).isDirectory()) return res.writeHead(404).end();
+	res.writeHead(200, { "content-type": types[extname(path)] ?? "application/octet-stream" });
+	createReadStream(path).pipe(res);
+});
+await new Promise((r) => server.listen(0, r));
+const browser = await chromium.launch({ executablePath: `${process.env.HOME}/Library/Caches/ms-playwright/chromium-1248/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`, args: ["--headless=new"] });
+const page = await browser.newPage();
+const errors = [];
+page.on("pageerror", (e) => errors.push(String(e).slice(0, 200)));
+await page.goto(`http://127.0.0.1:${server.address().port}/switch.html`);
+await page.waitForFunction(() => window.__sim);
+console.log(JSON.stringify(await page.evaluate(() => window.__sim.openCheck()), null, 1), "errors:", errors);
+await browser.close(); server.close();

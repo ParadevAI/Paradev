@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Desktop speed changes: chat streaming and workspace switching</title>
+		<style>
+			main { max-width: 68rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+			.lede { color: var(--sp-muted); max-width: var(--sp-measure); }
+			section { margin-top: 2.75rem; }
+			.wrap { overflow-x: auto; }
+			table { font-variant-numeric: tabular-nums; }
+			td, th { vertical-align: top; }
+			td.n, th.n { text-align: right; white-space: nowrap; }
+			.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+			.verdict div { border-top: 2px solid var(--sp-border); padding-top: .6rem; }
+			.verdict b { display: block; font-size: 1.6rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+			.verdict span { color: var(--sp-muted); font-size: .9em; }
+			.tag { font-size: .78em; padding: .05em .45em; border: 1px solid var(--sp-border); border-radius: var(--sp-radius); white-space: nowrap; }
+			.kept { border-color: var(--sp-chart-3, #2f9e6e); color: var(--sp-chart-3, #2f9e6e); }
+			.dropped { color: var(--sp-muted); }
+			.muted { color: var(--sp-muted); }
+			code { font-size: .88em; }
+			h3 { margin-top: 2rem; }
+		</style>
+	</head>
+	<body class="auto">
+		<main>
+			<h1>Desktop speed changes: chat streaming and workspace switching</h1>
+			<p class="lede">
+				Every change made to speed up the desktop app, what it does, and what it measured. Two problems: chat
+				streaming in cloud workspaces, and switching between workspaces that have chat panes open. All numbers
+				come from production builds of the renderer, not the dev build (dev mode was about 10× slower and
+				misleading). Follow-up to
+				<a href="https://app.superset.sh/page/desktop-chat-rendering-production-profile-per-comm-n2l3js">the per-commit chat profile</a>.
+			</p>
+
+			<div class="verdict">
+				<div><b>8.3 → 4.6 ms</b><span>React render time per streamed chat update in a cloud workspace. Local chats were already at 4.2–4.5 ms.</span></div>
+				<div><b>518 → 422 ms</b><span>Median time to first paint when switching to a workspace with a chat pane open (−19%, 32 switches each).</span></div>
+				<div><b>83 → 4</b><span>Frames over 33 ms during 300 streamed updates in a cloud chat, with the CPU slowed 4×.</span></div>
+			</div>
+
+			<section>
+				<h2>Status</h2>
+				<ul>
+					<li>All changes are in one WIP commit, <code>72e78037e</code> on <code>superset/teleport-e8093b7a</code>. Not pushed for review, no PR.</li>
+					<li>4,413 tests pass across the touched areas, including 3 new ones for <code>useStoredHistory</code>. Desktop typecheck and lint are clean.</li>
+					<li>Tested in a cloud sandbox against its local stack, not production: real long Claude transcripts (3,049 events) imported as chat panes into four test workspaces, each also holding terminals, the Changes view, a diff pane, a file viewer and a browser pane.</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>1. Chat streaming in cloud workspaces</h2>
+				<p>
+					<strong>Cause:</strong> in a cloud workspace, <code>SessionView</code> merges the chat stored in the database
+					with the live one through <code>withStoredHistory</code>. It ran on every snapshot change and returned new
+					<code>items</code> and <code>turns</code> Maps each time, even when a streamed delta only changed the live
+					text. So every animation frame rebuilt the whole timeline, every transcript row, and a context that
+					re-rendered every inline code span in the chat. Introduced by #9339.
+				</p>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>Change</th><th>File</th><th>What it does</th><th></th></tr></thead>
+						<tbody>
+							<tr>
+								<td>Memoized stored-history merge</td>
+								<td><code>SessionView/hooks/useStoredHistory</code> (new) and <code>SessionView.tsx</code></td>
+								<td>Merges again only when the live <code>items</code>, <code>turns</code>, <code>cursor</code> or <code>session</code> change; takes <code>liveStreams</code> from the live snapshot each render. <code>withStoredHistory</code> itself is unchanged.</td>
+								<td><span class="tag kept">kept</span></td>
+							</tr>
+							<tr>
+								<td>Stable editable-message set</td>
+								<td><code>SessionView.tsx</code></td>
+								<td><code>editableMessageIds</code> goes through <code>useStableList</code>, so the <code>ChatPaneActions</code> context keeps its value unless the set really changes. Stops a durable event from re-rendering every <code>ChatInlineCode</code>, <code>UserMessageRow</code> and <code>TurnChangesCard</code>.</td>
+								<td><span class="tag kept">kept</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<h3>Numbers</h3>
+				<p class="muted">Render time per streamed update. 1,662 items, then 300 text deltas one every 33 ms. Median of 3 runs.</p>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>Build</th><th class="n">Local</th><th class="n">Cloud</th><th class="n">Cloud + fix</th></tr></thead>
+						<tbody>
+							<tr><td>Before #9339 (<code>b7e21ed0</code>)</td><td class="n">6.9 ms</td><td class="n">6.8 ms</td><td class="n">—</td></tr>
+							<tr><td>#9339 (<code>361ee967</code>)</td><td class="n">6.7 ms</td><td class="n"><strong>12.5 ms</strong></td><td class="n">6.8 ms</td></tr>
+							<tr><td>HEAD (<code>963279d1</code>)</td><td class="n">4.5 ms</td><td class="n"><strong>8.3 ms</strong></td><td class="n">4.5 ms</td></tr>
+							<tr><td>Working tree, real hook</td><td class="n">4.2 ms</td><td class="n">8.2 ms</td><td class="n">4.6 ms</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="muted">
+					Same output: the fixed hook ran next to the current code for 154 renders (initial load, the "host sent
+					nothing yet" branch, durable events, 150 deltas) with 0 mismatches in items, turns, live text and session.
+					At HEAD, a 150-update cloud run did 40,418 component renders against 27,597 with the fix.
+				</p>
+			</section>
+
+			<section>
+				<h2>2. Switching workspaces with chat panes open</h2>
+				<p>
+					<strong>Cause:</strong> not the chat transcript, which is cheap to show. On each switch, the panes' setup code
+					(terminal, browser pane, tab bar, sidebar row, activity panel, overflow fades) read layout right after the
+					page changed. Each read forced the browser to lay out the whole page again: about 7 times per switch at
+					20–35 ms each. Separately, every row in the Changes list and every diff header ran its own live query for
+					the user's click settings.
+				</p>
+
+				<h3>Layout reads moved to after the page settles</h3>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>Where</th><th>File</th><th>Change</th><th></th></tr></thead>
+						<tbody>
+							<tr><td>Terminal</td><td><code>lib/terminal/terminal-runtime.ts</code></td><td>The first fit and focus after attaching run on the next frame, and only if the terminal is still attached there. The resize observer still handles later size changes.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td>Browser pane</td><td><code>BrowserPane/browserRuntimeRegistry.ts</code></td><td>No synchronous <code>getBoundingClientRect</code> on attach; the placeholder's resize observer places the webview on its first callback, after layout and before paint.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td>Tab bar</td><td><code>packages/panes/…/TabBar/TabBar.tsx</code></td><td>Scrolling the active tab into view waits one frame.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td>Sidebar row</td><td><code>DashboardSidebarExpandedWorkspaceRow.tsx</code></td><td><code>scrollIntoView</code> for the active row waits one frame, cancelled if the row stops being active.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td>Activity panel</td><td><code>WorkspaceActivityMenu/…/ActivityPanelAside.tsx</code></td><td>Drops the synchronous width read; the resize observer's first callback measures.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td>Overflow fades</td><td><code>packages/ui/src/hooks/use-overflow-fade.ts</code></td><td>Drops the synchronous scroll-size read on mount; same as above.</td><td><span class="tag kept">kept</span></td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<h3>Click settings read once per list, not once per row</h3>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>File</th><th>Change</th><th></th></tr></thead>
+						<tbody>
+							<tr><td><code>lib/clickPolicy/policies/policy.ts</code></td><td><code>usePolicy</code> returns a memoized object, so it can be passed as a prop and used in callback dependencies.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td><code>lib/clickPolicy/policies/useChangesSidebarFilePolicy.ts</code>, <code>index.ts</code></td><td>Memoized result, plus an exported <code>ChangesSidebarFilePolicy</code> type. Same returned shape as before.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td><code>ChangesFoldersView.tsx</code>, <code>FileRow.tsx</code></td><td>The list reads the policy once and passes it to each <code>FileRow</code>. Each row also mounts its <code>DiscardConfirmDialog</code> only after the user first asks to discard.</td><td><span class="tag kept">kept</span></td></tr>
+							<tr><td><code>DiffPane.tsx</code>, <code>DiffHeaderMetadata.tsx</code></td><td>The diff pane reads the policy once and passes it to each file header.</td><td><span class="tag kept">kept</span></td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<h3>Numbers</h3>
+				<p class="muted">Production builds, real sidebar clicks over the Chrome DevTools protocol, before and after builds run alternately with a fresh launch each, 32 switches per side.</p>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>Workspaces with chat panes</th><th class="n">Before (median)</th><th class="n">After (median)</th><th class="n">Change</th></tr></thead>
+						<tbody>
+							<tr><td>Time to first paint</td><td class="n">518 ms</td><td class="n">422 ms</td><td class="n">−19%</td></tr>
+							<tr><td>Until the main thread settles</td><td class="n">464 ms</td><td class="n">379 ms</td><td class="n">−18%</td></tr>
+							<tr><td>Long-task time</td><td class="n">442 ms</td><td class="n">378 ms</td><td class="n">−14%</td></tr>
+							<tr><td>Longest single task</td><td class="n">418 ms</td><td class="n">356 ms</td><td class="n">−15%</td></tr>
+							<tr><td>Slowest switches (p90 first paint)</td><td class="n">596 ms</td><td class="n">598 ms</td><td class="n">no change</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="muted">
+					Checked in the real app after the change: terminals regain focus and fit their pane after switching back,
+					take typing without a click, the browser pane's webview lands on its placeholder, and there were no page
+					errors (6/6).
+				</p>
+			</section>
+
+			<section>
+				<h2>3. Tried and dropped</h2>
+				<div class="wrap">
+					<table>
+						<thead><tr><th>Idea</th><th>Result</th><th></th></tr></thead>
+						<tbody>
+							<tr>
+								<td>Keep the last 3 workspaces mounted and hidden with React <code>&lt;Activity&gt;</code>, so switching back only reveals them</td>
+								<td>Helped without chats (first paint −16% on small workspaces, −8% on heavier ones) but made switching with chat panes <strong>13% slower</strong> (494 → 559 ms): reconnecting a hidden workspace's effects costs more than it saves. Reverted.</td>
+								<td><span class="tag dropped">dropped</span></td>
+							</tr>
+							<tr>
+								<td>Remove the <code>body:has([role=menu][data-state=open], …) .drag</code> rule in <code>globals.css</code>, which forces whole-page restyles whenever a Radix component toggles <code>data-state</code></td>
+								<td>−12% median without chats but a much worse tail; no gain with chat panes (530 → 538 ms). Not applied. The rule exists so open menus can be dismissed by clicking a drag region, so removing it needs a replacement anyway.</td>
+								<td><span class="tag dropped">dropped</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<section>
+				<h2>4. What is still slow</h2>
+				<p>A switch with chat panes is still about 420 ms on an 8-core sandbox, likely more on a laptop. From the production CPU profile of one switch:</p>
+				<ul>
+					<li><strong>Terminal rich-input editor</strong> (ProseMirror, <code>TerminalRichInput</code>): about 70 ms per switch in <code>updateStateInner</code> and attribute patching, even when it isn't open.</li>
+					<li><strong>xterm <code>focus()</code></strong>: about 25–30 ms, because focusing forces a style and layout pass.</li>
+					<li><strong>Whole-page style recalculation</strong>: about 7 passes of 1,400–1,600 elements each; part of it is the <code>body:has</code> rule above.</li>
+					<li><strong>React commit work</strong> for the rebuilt workspace subtree: every switch still remounts the whole pane tree (<code>remountDeps</code> on the route plus keyed providers).</li>
+				</ul>
+				<p>Next candidates: mount the rich-input editor only when it is opened, and replace the <code>body:has</code> rule with a class set by the menu/dialog components.</p>
+			</section>
+
+			<section>
+				<h2>How it was measured</h2>
+				<ul>
+					<li><strong>Chat streaming:</strong> each commit's own production renderer build, with a harness mounting the real <code>useChatSession</code> (fake client), SessionView's streaming derivations and the real <code>Transcript</code>, in headless Chrome. React Profiler for render time; long tasks, long animation frames and dropped frames from Chrome.</li>
+					<li><strong>Workspace switching:</strong> the full desktop app built with <code>electron-vite build</code> in production mode, driven with real clicks over CDP. First paint is two animation frames after the URL changes; long tasks and long animation frames come from <code>PerformanceObserver</code>; CPU profiles mapped to source through the build's source maps.</li>
+					<li>Benchmark scripts are in <code>perf-bench/</code> in this workspace (part of the WIP commit; they should not ship in a PR).</li>
+				</ul>
+			</section>
+		</main>
+	</body>
+</html>
