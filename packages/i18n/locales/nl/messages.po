@@ -4913,15 +4913,6 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
-msgid "Cloud credentials"
-msgstr "Cloudinloggegevens"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "Clouddata wordt verwijderd. Push eerst je branches."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud stopt op {shutdownDate}. Mac-app stopt begin 2027"
-
 msgid "Cloud environment setup"
 msgstr "Cloudomgeving instellen"
 
@@ -4934,14 +4925,8 @@ msgstr "Cloudomgevingen halen je repositories op van GitHub. Verbind deze eerst;
 msgid "Cloud GB-hours per seat each month"
 msgstr "Cloud-GB-uren per gebruiker per maand"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud wordt alleen-lezen"
-
 msgid "Cloud sandboxes"
 msgstr "Cloudsandboxen"
-
-msgid "Cloud shuts down"
-msgstr "Cloud stopt"
 
 msgid "Cloud usage"
 msgstr "Cloudgebruik"
@@ -5218,21 +5203,8 @@ msgstr "Samenstelbare formulierlay-out — combineert met @superset/ui/form voor
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Conductor-chatgeschiedenis. Exporteer die in Conductor onder Settings → Account"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud stopt op {shutdownDate}. Stap in een paar minuten over naar {0}."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud stopt op {shutdownDate}. Stap over naar {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Gids voor Conductor Cloud"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud stopt op {shutdownDateLong}. Verhuis je worktrees en agents in een paar minuten naar {companyName}. Gratis en open source."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor verwijdert ze na {shutdownDate}, en {companyName} kan er niet bij. Push je branches en exporteer je chats voor die tijd."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Gegevens over Conductor komen uit de openbare documentatie. Zie de <0>volledige vergelijking</0>."
@@ -5240,9 +5212,6 @@ msgstr "Gegevens over Conductor komen uit de openbare documentatie. Zie de <0>vo
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor is een handelsmerk van de eigenaar. {0} is niet verbonden aan of goedgekeurd door Conductor of Meta."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor gaat naar Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "Conflicten"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Conflicten met {0}"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Felicitaties aan het Conductor-team met de stap naar Meta. De datums komen uit <0>hun aankondiging</0>."
 
 msgid "Connect"
 msgstr "Verbinden"
@@ -9480,14 +9446,14 @@ msgstr "Gratis voor één gebruiker. Open source onder MIT."
 msgid "Free for one user. Paid plans per user"
 msgstr "Gratis voor één gebruiker. Betaalde abonnementen per gebruiker"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Gratis voor één gebruiker. Pro voegt automatiseringen en de mobiele app toe. Team voegt cloudwerkruimtes toe."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis voor één gebruiker. Pro voegt automatiseringen en de mobiele app toe. Betaalde abonnementen geven toegang tot cloudwerkruimtes. Bekijk de prijzen voor inbegrepen tegoed en extra verbruik."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Gratis voor één gebruiker. Pro vanaf {proPrice}/gebruiker/maand"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Gratis voor één gebruiker. Pro kost {proPrice} per gebruiker per maand en voegt automatiseringen en de mobiele app toe. Team kost {teamPrice} en voegt cloudwerkruimtes toe."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis voor één gebruiker. Pro kost {proPrice} per gebruiker per maand en voegt automatiseringen en de mobiele app toe. Team kost {teamPrice}. Betaalde abonnementen geven toegang tot cloudwerkruimtes. Bekijk de prijzen voor inbegrepen tegoed en extra verbruik."
 
 msgid "Frequently Used"
 msgstr "Vaak gebruikt"
@@ -10306,6 +10272,9 @@ msgstr "Inactief"
 msgid "Idle · branch pushed"
 msgstr "Inactief · branch gepusht"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Als je overstapt, sla je branches op en exporteer de gegevens die je wilt bewaren. Exports importeren geen Conductor-chats in {companyName}."
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Als Paradev je tot nu toe bevalt, helpt een GitHub-ster andere ontwikkelaars het te ontdekken."
 
@@ -10811,8 +10780,8 @@ msgstr "Facturen en betaalmethode"
 msgid "iOS app"
 msgstr "iOS-app"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "iOS-app, stopt op {shutdownDate}"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "iOS-app; cloud en experimentele afstandsbediening van de lokale Mac"
 
 msgid "iOS Simulator"
 msgstr "iOS-simulator"
@@ -11096,9 +11065,6 @@ msgstr "Nieuwe map behouden, die is niet meer leeg"
 
 msgid "Key"
 msgstr "Sleutel"
-
-msgid "Key dates"
-msgstr "Belangrijke datums"
 
 msgid "Key name"
 msgstr "Naam van sleutel"
@@ -11731,9 +11697,6 @@ msgstr "Local first"
 msgid "Local Network"
 msgstr "Lokaal netwerk"
 
-msgid "Local work can move at your own pace."
-msgstr "Lokaal werk kun je in je eigen tempo verhuizen."
-
 msgid "Local workspace"
 msgstr "Lokale werkruimte"
 
@@ -11825,9 +11788,6 @@ msgstr "Laag"
 
 msgid "Low severity"
 msgstr "Lage ernst"
-
-msgid "Mac app winds down"
-msgstr "Mac-app wordt uitgefaseerd"
 
 msgid "Machine resources"
 msgstr "Machineresources"
@@ -12449,6 +12409,9 @@ msgstr "Deze werkruimte naar de cloud verplaatsen?"
 msgid "Move to"
 msgstr "Verplaatsen naar"
 
+msgid "Move to {companyName} in minutes."
+msgstr "Stap in een paar minuten over naar {companyName}."
+
 msgid "Move to background"
 msgstr "Naar de achtergrond"
 
@@ -12467,8 +12430,11 @@ msgstr "Naar rechts verplaatsen"
 msgid "Move to Tab"
 msgstr "Verplaatsen naar tabblad"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Verhuis je agents vóór {shutdownDate}."
+msgid "Move your agents."
+msgstr "Verhuis je agents."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Verhuis je worktrees en agents in een paar minuten naar {companyName}. Gratis en open source."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" verplaatst naar {group}"
@@ -13160,9 +13126,6 @@ msgstr "geen logins"
 msgid "No longer in source"
 msgstr "Niet meer in de bron"
 
-msgid "No longer on sale"
-msgstr "Niet meer te koop"
-
 msgid "No match"
 msgstr "Geen overeenkomst"
 
@@ -13539,6 +13502,9 @@ msgstr "Nog geen werkruimtes"
 msgid "No-Prompt Launch"
 msgstr "Start zonder prompt"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Nee. {companyName} stuurt modelaanroepen nooit via een proxy. Agents gebruiken je eigen abonnementen en sleutels."
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Nee. Je agents blijven onafhankelijk; Paradev is de orkestratielaag eromheen. Elke taak krijgt een eigen Git-worktree en branch, blijvende sessies, diff-review en automatiseringen die draaien op events of volgens een schema, zonder de workflow aan één provider te binden."
 
@@ -13628,9 +13594,6 @@ msgstr "Niet op de ranglijst. Doe eerst mee."
 
 msgid "Not on this version"
 msgstr "Niet in deze versie"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Niet op je computer. Agents roepen hun providers direct aan, en die factureren jou rechtstreeks. In cloudwerkruimtes komen je sleutels nooit in de sandbox. {companyName} voegt je aanmelding toe aan uitgaande verzoeken."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Er komen nog geen gebeurtenissen binnen: Microsoft Graph heeft de meldingsabonnementen geweigerd. Controleer de beheerderstoestemming en de goedkeuring van de beveiligde API van de app, en verbind opnieuw."
@@ -14806,6 +14769,9 @@ msgstr "paginering"
 
 msgid "Pagination"
 msgstr "Paginering"
+
+msgid "Paid plans"
+msgstr "Betaalde abonnementen"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "Betaalde abonnementen kosten per gebruiker per maand en worden gefactureerd voor elke actieve plek in je team. {planPrices}."
@@ -17341,9 +17307,6 @@ msgstr "Routinetickets zonder tussentijds ingrijpen"
 msgid "Routines"
 msgstr "Routines"
 
-msgid "Routines, ending with Cloud"
-msgstr "Routines, stoppen samen met Cloud"
-
 msgid "Row actions"
 msgstr "Rij-acties"
 
@@ -17965,6 +17928,9 @@ msgstr "Alle statistieken →"
 
 msgid "See Changes"
 msgstr "Wijzigingen bekijken"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Bekijk Conductor voor actuele abonnementen en accounttoegang"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Bekijk hoe de GitHub-stars van {companyName} in de loop van de tijd zijn gegroeid."
@@ -18733,9 +18699,6 @@ msgstr "Wordt publiek naast je naam getoond."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "{0} afsluiten"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "Stopt op {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Naast elkaar"
@@ -19784,6 +19747,9 @@ msgstr "Login wisselen"
 msgid "Switch sign-in…"
 msgstr "Login wisselen…"
 
+msgid "Switch to {companyName}"
+msgstr "Stap over naar {companyName}"
+
 msgid "Switch to {planName}"
 msgstr "Overstappen naar {planName}"
 
@@ -20044,9 +20010,6 @@ msgstr "Team"
 
 msgid "Team activity feed"
 msgstr "Teamactiviteitenfeed"
-
-msgid "Team and Ultra plans"
-msgstr "Team- en Ultra-abonnementen"
 
 msgid "Team collaboration"
 msgstr "Teamsamenwerking"
@@ -20652,9 +20615,6 @@ msgstr "de doelhost"
 
 msgid "The team"
 msgstr "Het team"
-
-msgid "The team announced the news."
-msgstr "Het team maakte het nieuws bekend."
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "De teamuitnodiging is verlopen of bestaat niet. Vraag een nieuwe link aan bij de eigenaar van het team of controleer of de URL klopt."
@@ -21848,8 +21808,8 @@ msgstr "Publicatie ingetrokken"
 msgid "Unpushed"
 msgstr "Niet gepusht"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Niet-gepusht cloudwerk. Push vóór {shutdownDate}"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Niet-gepushte cloudwijzigingen. Sla het werk dat je wilt overzetten op en push het."
 
 msgid "Unranked"
 msgstr "Geen positie"
@@ -23188,9 +23148,6 @@ msgstr "Je kunt alleen je eigen berichten bewerken"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "Je kunt alleen delen met personen en teams in deze organisatie"
-
-msgid "You can read and export, but not run agents."
-msgstr "Je kunt lezen en exporteren, maar geen agents draaien."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Je kunt het 30 dagen lang herstellen via Instellingen → Projecten. De repositorymap wordt nooit verwijderd."

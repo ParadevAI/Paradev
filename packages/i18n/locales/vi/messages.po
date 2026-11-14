@@ -4913,15 +4913,6 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
-msgid "Cloud credentials"
-msgstr "Thông tin xác thực trên cloud"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "Dữ liệu cloud sẽ bị xóa. Hãy push các nhánh của bạn trước."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud kết thúc vào {shutdownDate}. Ứng dụng Mac kết thúc đầu năm 2027"
-
 msgid "Cloud environment setup"
 msgstr "Thiết lập environment đám mây"
 
@@ -4934,14 +4925,8 @@ msgstr "Environment đám mây lấy các repository của bạn từ GitHub. H�
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-giờ đám mây cho mỗi người dùng mỗi tháng"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud chuyển sang chỉ đọc"
-
 msgid "Cloud sandboxes"
 msgstr "Sandbox trên cloud"
-
-msgid "Cloud shuts down"
-msgstr "Cloud ngừng hoạt động"
 
 msgid "Cloud usage"
 msgstr "Mức sử dụng đám mây"
@@ -5218,21 +5203,8 @@ msgstr "Bố cục form ghép được — dùng chung với @superset/ui/form c
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Lịch sử chat Conductor. Xuất trong Conductor tại Settings → Account"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud kết thúc vào {shutdownDate}. Chuyển sang {0} chỉ trong vài phút."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud kết thúc vào {shutdownDate}. Chuyển sang {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Hướng dẫn cho Conductor Cloud"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud ngừng hoạt động vào {shutdownDateLong}. Chuyển worktree và agent của bạn sang {companyName} trong vài phút. Miễn phí và mã nguồn mở."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor sẽ xóa dữ liệu này sau {shutdownDate}, và {companyName} không thể truy cập nó. Hãy push các nhánh và xuất các cuộc chat trước thời điểm đó."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Thông tin về Conductor lấy từ tài liệu công khai của họ. Xem <0>so sánh đầy đủ</0>."
@@ -5240,9 +5212,6 @@ msgstr "Thông tin về Conductor lấy từ tài liệu công khai của họ. 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor là nhãn hiệu của chủ sở hữu. {0} không liên kết với và không được Conductor hay Meta xác nhận."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor gia nhập Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "Xung đột"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Xung đột với {0}"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Chúc mừng đội ngũ Conductor gia nhập Meta. Các mốc thời gian lấy từ <0>thông báo của họ</0>."
 
 msgid "Connect"
 msgstr "Kết nối"
@@ -9480,14 +9446,14 @@ msgstr "Miễn phí cho một người dùng. Mã nguồn mở theo giấy phép
 msgid "Free for one user. Paid plans per user"
 msgstr "Miễn phí cho một người dùng. Gói trả phí tính theo người dùng"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Miễn phí cho một người dùng. Pro thêm tự động hóa và ứng dụng di động. Team thêm workspace cloud."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Miễn phí cho một người dùng. Pro thêm tự động hóa và ứng dụng di động. Các gói trả phí có thể truy cập không gian làm việc trên đám mây. Xem bảng giá để biết hạn mức đi kèm và phí dùng thêm."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Miễn phí cho một người dùng. Pro từ {proPrice}/người/tháng"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Miễn phí cho một người dùng. Pro có giá {proPrice} mỗi người mỗi tháng, thêm tự động hóa và ứng dụng di động. Team có giá {teamPrice}, thêm workspace cloud."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Miễn phí cho một người dùng. Pro có giá {proPrice} mỗi người mỗi tháng, thêm tự động hóa và ứng dụng di động. Team có giá {teamPrice}. Các gói trả phí có thể truy cập không gian làm việc trên đám mây. Xem bảng giá để biết hạn mức đi kèm và phí dùng thêm."
 
 msgid "Frequently Used"
 msgstr "Thường dùng"
@@ -10306,6 +10272,9 @@ msgstr "Rảnh"
 msgid "Idle · branch pushed"
 msgstr "Rảnh · đã push nhánh"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Nếu quyết định chuyển, hãy lưu các nhánh và xuất dữ liệu bạn muốn giữ. Tệp xuất không nhập các cuộc trò chuyện Conductor vào {companyName}."
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Nếu đến giờ bạn thấy Paradev hữu ích, một star trên GitHub sẽ giúp các lập trình viên khác biết đến nó."
 
@@ -10811,8 +10780,8 @@ msgstr "Hóa đơn và phương thức thanh toán"
 msgid "iOS app"
 msgstr "Ứng dụng iOS"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "Ứng dụng iOS, kết thúc vào {shutdownDate}"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "Ứng dụng iOS; đám mây và tính năng thử nghiệm điều khiển Mac cục bộ từ xa"
 
 msgid "iOS Simulator"
 msgstr "Trình mô phỏng iOS"
@@ -11096,9 +11065,6 @@ msgstr "Đã giữ thư mục mới, nó không còn rỗng"
 
 msgid "Key"
 msgstr "Khóa"
-
-msgid "Key dates"
-msgstr "Các mốc quan trọng"
 
 msgid "Key name"
 msgstr "Tên khóa"
@@ -11731,9 +11697,6 @@ msgstr "Ưu tiên cục bộ"
 msgid "Local Network"
 msgstr "Mạng cục bộ"
 
-msgid "Local work can move at your own pace."
-msgstr "Công việc trên máy có thể chuyển theo tốc độ của bạn."
-
 msgid "Local workspace"
 msgstr "Workspace cục bộ"
 
@@ -11825,9 +11788,6 @@ msgstr "Thấp"
 
 msgid "Low severity"
 msgstr "Mức độ nghiêm trọng thấp"
-
-msgid "Mac app winds down"
-msgstr "Ứng dụng Mac dần ngừng hoạt động"
 
 msgid "Machine resources"
 msgstr "Tài nguyên máy"
@@ -12449,6 +12409,9 @@ msgstr "Chuyển không gian làm việc này lên cloud?"
 msgid "Move to"
 msgstr "Chuyển sang"
 
+msgid "Move to {companyName} in minutes."
+msgstr "Chuyển sang {companyName} chỉ trong vài phút."
+
 msgid "Move to background"
 msgstr "Chuyển sang chạy nền"
 
@@ -12467,8 +12430,11 @@ msgstr "Chuyển sang bên phải"
 msgid "Move to Tab"
 msgstr "Chuyển sang tab"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Hãy chuyển agent của bạn trước {shutdownDate}."
+msgid "Move your agents."
+msgstr "Hãy chuyển agent của bạn."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Chuyển worktree và agent của bạn sang {companyName} trong vài phút. Miễn phí và mã nguồn mở."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "Đã chuyển \"{name}\" vào {group}"
@@ -13160,9 +13126,6 @@ msgstr "không có đăng nhập"
 msgid "No longer in source"
 msgstr "Không còn trong nguồn"
 
-msgid "No longer on sale"
-msgstr "Đã ngừng bán"
-
 msgid "No match"
 msgstr "Không khớp"
 
@@ -13539,6 +13502,9 @@ msgstr "Chưa có workspace nào"
 msgid "No-Prompt Launch"
 msgstr "Khởi chạy không prompt"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Không. {companyName} không bao giờ làm proxy cho các lệnh gọi mô hình. Agent dùng gói đăng ký và khóa của chính bạn."
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Không. Các agent của bạn vẫn độc lập; Paradev là lớp điều phối bao quanh chúng. Mỗi tác vụ có Git worktree và nhánh riêng, phiên làm việc lâu dài, xem xét diff và các tự động hóa chạy theo sự kiện hoặc theo lịch, mà không ràng buộc quy trình vào một nhà cung cấp."
 
@@ -13628,9 +13594,6 @@ msgstr "Chưa có trên bảng xếp hạng. Hãy tham gia trước."
 
 msgid "Not on this version"
 msgstr "Không có trong phiên bản này"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Không, khi chạy trên máy của bạn. Agent gọi trực tiếp nhà cung cấp và bạn được tính phí ở đó. Trong workspace cloud, khóa của bạn không bao giờ vào sandbox. {companyName} gắn thông tin đăng nhập của bạn vào các yêu cầu gửi đi."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Chưa nhận được sự kiện: Microsoft Graph đã từ chối các đăng ký thông báo. Hãy kiểm tra phần cấp quyền quản trị và phê duyệt API bảo vệ của ứng dụng, rồi kết nối lại."
@@ -14806,6 +14769,9 @@ msgstr "phân trang"
 
 msgid "Pagination"
 msgstr "Pagination"
+
+msgid "Paid plans"
+msgstr "Gói trả phí"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "Các gói trả phí được tính theo người dùng mỗi tháng và tính phí cho mỗi chỗ ngồi đang hoạt động trong nhóm bạn. {planPrices}."
@@ -17339,10 +17305,7 @@ msgid "Routine tickets with no mid-task intervention"
 msgstr "Ticket thường ngày không cần can thiệp giữa chừng"
 
 msgid "Routines"
-msgstr "Quy trình"
-
-msgid "Routines, ending with Cloud"
-msgstr "Quy trình, kết thúc cùng Cloud"
+msgstr "Tác vụ định kỳ"
 
 msgid "Row actions"
 msgstr "Hành động hàng"
@@ -17965,6 +17928,9 @@ msgstr "Xem tất cả số liệu →"
 
 msgid "See Changes"
 msgstr "Xem thay đổi"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Xem Conductor để biết các gói và quyền truy cập tài khoản hiện tại"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Xem số sao GitHub của {companyName} đã tăng trưởng theo thời gian như thế nào."
@@ -18733,9 +18699,6 @@ msgstr "Hiển thị công khai cùng với tên của bạn."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Tắt {0}"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "Ngừng hoạt động vào {shutdownDate}"
 
 msgid "Side by side"
 msgstr "So sánh song song"
@@ -19784,6 +19747,9 @@ msgstr "Đổi đăng nhập"
 msgid "Switch sign-in…"
 msgstr "Đổi đăng nhập…"
 
+msgid "Switch to {companyName}"
+msgstr "Chuyển sang {companyName}"
+
 msgid "Switch to {planName}"
 msgstr "Chuyển sang {planName}"
 
@@ -20044,9 +20010,6 @@ msgstr "Nhóm"
 
 msgid "Team activity feed"
 msgstr "Bảng tin hoạt động nhóm"
-
-msgid "Team and Ultra plans"
-msgstr "Gói Team và Ultra"
 
 msgid "Team collaboration"
 msgstr "Cộng tác nhóm"
@@ -20652,9 +20615,6 @@ msgstr "host đích"
 
 msgid "The team"
 msgstr "Đội ngũ"
-
-msgid "The team announced the news."
-msgstr "Đội ngũ đã công bố tin này."
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Lời mời vào nhóm đã hết hạn hoặc không tồn tại. Hãy xin liên kết mới từ chủ sở hữu nhóm hoặc kiểm tra lại URL xem đã nhập đúng chưa."
@@ -21848,8 +21808,8 @@ msgstr "Đã hủy xuất bản"
 msgid "Unpushed"
 msgstr "Chưa push"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Công việc chưa push trên Cloud. Hãy push trước {shutdownDate}"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Các thay đổi trên đám mây chưa được đẩy lên. Lưu và đẩy phần việc bạn muốn chuyển."
 
 msgid "Unranked"
 msgstr "Chưa xếp hạng"
@@ -23188,9 +23148,6 @@ msgstr "Bạn chỉ có thể sửa tin nhắn của chính mình"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "Bạn chỉ có thể chia sẻ với người và nhóm trong tổ chức này"
-
-msgid "You can read and export, but not run agents."
-msgstr "Bạn có thể đọc và xuất dữ liệu, nhưng không thể chạy agent."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Bạn có thể khôi phục trong Cài đặt → Dự án trong 30 ngày. Thư mục repository không bao giờ bị xóa."

@@ -4913,15 +4913,6 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
-msgid "Cloud credentials"
-msgstr "Přihlašovací údaje v cloudu"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "Data v cloudu se smažou. Nejdřív pushněte své větve."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud končí {shutdownDate}. Aplikace pro Mac končí začátkem roku 2027"
-
 msgid "Cloud environment setup"
 msgstr "Nastavení cloudového prostředí"
 
@@ -4934,14 +4925,8 @@ msgstr "Cloudová prostředí si stahují vaše repozitáře z GitHubu. Nejdří
 msgid "Cloud GB-hours per seat each month"
 msgstr "Cloudové GB-hodiny na místo měsíčně"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud přechází do režimu jen pro čtení"
-
 msgid "Cloud sandboxes"
 msgstr "Cloudové sandboxy"
-
-msgid "Cloud shuts down"
-msgstr "Cloud se vypíná"
 
 msgid "Cloud usage"
 msgstr "Využití cloudu"
@@ -5218,21 +5203,8 @@ msgstr "Skládatelné rozvržení formuláře — funguje s @superset/ui/form pr
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Historie chatů z Conductor. Exportujte ji v Conductor v Settings → Account"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud končí {shutdownDate}. Přejděte na {0} během pár minut."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud končí {shutdownDate}. Přejděte na {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Průvodce pro Conductor Cloud"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud se vypíná {shutdownDateLong}. Přesuňte své worktree a agenty do {companyName} během pár minut. Zdarma a open source."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor je po {shutdownDate} smaže a {companyName} k nim nemá přístup. Do té doby pushněte své větve a exportujte chaty."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Údaje o Conductor pocházejí z jeho veřejné dokumentace. Viz <0>úplné srovnání</0>."
@@ -5240,9 +5212,6 @@ msgstr "Údaje o Conductor pocházejí z jeho veřejné dokumentace. Viz <0>úpl
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor je ochranná známka svého vlastníka. {0} není s Conductor ani Meta spojen ani jimi podporován."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor přechází pod Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5306,9 +5275,6 @@ msgstr "Konflikty"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Konflikty s {0}"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Gratulujeme týmu Conductor k přechodu pod Meta. Termíny pocházejí z <0>jejich oznámení</0>."
 
 msgid "Connect"
 msgstr "Připojit"
@@ -9480,14 +9446,14 @@ msgstr "Zdarma pro jednoho uživatele. Open source pod licencí MIT."
 msgid "Free for one user. Paid plans per user"
 msgstr "Zdarma pro jednoho uživatele. Placené tarify za uživatele"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Zdarma pro jednoho uživatele. Pro přidává automatizace a mobilní aplikaci. Team přidává cloudové pracovní prostory."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Zdarma pro jednoho uživatele. Pro přidává automatizace a mobilní aplikaci. Placené tarify umožňují přístup ke cloudovým pracovním prostorům. Zahrnuté využití a příplatky podle spotřeby najdete v ceníku."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Zdarma pro jednoho uživatele. Pro od {proPrice} za uživatele/měs."
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Zdarma pro jednoho uživatele. Pro stojí {proPrice} za uživatele měsíčně a přidává automatizace a mobilní aplikaci. Team stojí {teamPrice} a přidává cloudové pracovní prostory."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Zdarma pro jednoho uživatele. Pro stojí {proPrice} za uživatele měsíčně a přidává automatizace a mobilní aplikaci. Team stojí {teamPrice}. Placené tarify umožňují přístup ke cloudovým pracovním prostorům. Zahrnuté využití a příplatky podle spotřeby najdete v ceníku."
 
 msgid "Frequently Used"
 msgstr "Často používané"
@@ -10306,6 +10272,9 @@ msgstr "Nečinný"
 msgid "Idle · branch pushed"
 msgstr "Nečinné · větev odeslána"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Pokud se rozhodnete přejít, uložte větve a exportujte data, která chcete zachovat. Exporty neimportují chaty Conductor do {companyName}."
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Pokud se vám Paradev zatím líbí, hvězda na GitHubu pomůže dalším vývojářům ho objevit."
 
@@ -10811,8 +10780,8 @@ msgstr "Faktury a způsob platby"
 msgid "iOS app"
 msgstr "Aplikace pro iOS"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "Aplikace pro iOS, končí {shutdownDate}"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "Aplikace pro iOS; cloud a experimentální vzdálené ovládání místního Macu"
 
 msgid "iOS Simulator"
 msgstr "Simulátor iOS"
@@ -11096,9 +11065,6 @@ msgstr "Nová složka byla zachována, už není prázdná"
 
 msgid "Key"
 msgstr "Klíč"
-
-msgid "Key dates"
-msgstr "Důležitá data"
 
 msgid "Key name"
 msgstr "Název klíče"
@@ -11731,9 +11697,6 @@ msgstr "Lokálně na prvním místě"
 msgid "Local Network"
 msgstr "Místní síť"
 
-msgid "Local work can move at your own pace."
-msgstr "Lokální práci můžete přesunout svým tempem."
-
 msgid "Local workspace"
 msgstr "Lokální pracovní prostor"
 
@@ -11825,9 +11788,6 @@ msgstr "Nízká"
 
 msgid "Low severity"
 msgstr "Nízká závažnost"
-
-msgid "Mac app winds down"
-msgstr "Aplikace pro Mac postupně končí"
 
 msgid "Machine resources"
 msgstr "Prostředky počítače"
@@ -12449,6 +12409,9 @@ msgstr "Přesunout tento pracovní prostor do cloudu?"
 msgid "Move to"
 msgstr "Přesunout do"
 
+msgid "Move to {companyName} in minutes."
+msgstr "Přejděte na {companyName} během pár minut."
+
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
 
@@ -12467,8 +12430,11 @@ msgstr "Přesunout doprava"
 msgid "Move to Tab"
 msgstr "Přesunout na kartu"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Přesuňte své agenty před {shutdownDate}."
+msgid "Move your agents."
+msgstr "Přesuňte své agenty."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Přesuňte své worktree a agenty do {companyName} během pár minut. Zdarma a open source."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "„{name}“ přesunuto do skupiny {group}"
@@ -13160,9 +13126,6 @@ msgstr "žádná přihlášení"
 msgid "No longer in source"
 msgstr "Už není ve zdroji"
 
-msgid "No longer on sale"
-msgstr "Už se neprodává"
-
 msgid "No match"
 msgstr "Žádná shoda"
 
@@ -13539,6 +13502,9 @@ msgstr "Zatím žádné pracovní prostory"
 msgid "No-Prompt Launch"
 msgstr "Spuštění bez promptu"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Ne. {companyName} nikdy nezprostředkovává volání modelů přes proxy. Agenti používají vaše vlastní předplatná a klíče."
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Ne. Vaši agenti zůstávají nezávislí; Paradev je orchestrační vrstva kolem nich. Každý úkol dostane vlastní Git worktree a větev, trvalé relace, kontrolu diffů a automatizace, které běží při událostech nebo podle plánu, aniž by byl pracovní postup vázán na jednoho poskytovatele."
 
@@ -13628,9 +13594,6 @@ msgstr "Nejste v žebříčku. Nejprve se zapojte."
 
 msgid "Not on this version"
 msgstr "Není v této verzi"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Na vašem počítači ne. Agenti volají své poskytovatele přímo a ti vám účtují u sebe. V cloudových pracovních prostorech se vaše klíče nikdy nedostanou do sandboxu. {companyName} přidá vaše přihlášení k odchozím požadavkům."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Zatím nepřicházejí žádné události: Microsoft Graph odmítl odběry oznámení. Zkontrolujte souhlas administrátora a schválení chráněného API, pak se připojte znovu."
@@ -14806,6 +14769,9 @@ msgstr "stránkování"
 
 msgid "Pagination"
 msgstr "Stránkování"
+
+msgid "Paid plans"
+msgstr "Placené tarify"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "Placené plány se účtují za uživatele a měsíc, a to za každé aktivní místo v týmu. {planPrices}."
@@ -17341,9 +17307,6 @@ msgstr "Rutinní tickety bez zásahu uprostřed úkolu"
 msgid "Routines"
 msgstr "Rutiny"
 
-msgid "Routines, ending with Cloud"
-msgstr "Rutiny, končí spolu s cloudem"
-
 msgid "Row actions"
 msgstr "Akce řádku"
 
@@ -17965,6 +17928,9 @@ msgstr "Zobrazit všechny statistiky →"
 
 msgid "See Changes"
 msgstr "Prohlédněte změny"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Aktuální tarify a přístup k účtům najdete u Conductor"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Podívejte se, jak v čase rostly hvězdy {companyName} na GitHubu."
@@ -18733,9 +18699,6 @@ msgstr "Zobrazuje se veřejně vedle vašeho jména."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Vypnout {0}"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "Končí {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Srovnání"
@@ -19784,6 +19747,9 @@ msgstr "Přepnout přihlášení"
 msgid "Switch sign-in…"
 msgstr "Přepnout přihlášení…"
 
+msgid "Switch to {companyName}"
+msgstr "Přejděte na {companyName}"
+
 msgid "Switch to {planName}"
 msgstr "Přejít na {planName}"
 
@@ -20044,9 +20010,6 @@ msgstr "Tým"
 
 msgid "Team activity feed"
 msgstr "Přehled aktivity týmu"
-
-msgid "Team and Ultra plans"
-msgstr "Tarify Team a Ultra"
 
 msgid "Team collaboration"
 msgstr "Týmová spolupráce"
@@ -20652,9 +20615,6 @@ msgstr "cílový host"
 
 msgid "The team"
 msgstr "Tým"
-
-msgid "The team announced the news."
-msgstr "Tým zprávu oznámil."
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Pozvánka do týmu buď vypršela, nebo neexistuje. Vyžádejte si od vlastníka týmu nový odkaz nebo zkontrolujte, že je URL zadaná správně."
@@ -21848,8 +21808,8 @@ msgstr "Publikování zrušeno"
 msgid "Unpushed"
 msgstr "Neodesláno"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Nepushnutá práce v cloudu. Pushněte před {shutdownDate}"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Neodeslané změny v cloudu. Uložte a odešlete práci, kterou chcete přesunout."
 
 msgid "Unranked"
 msgstr "Bez pořadí"
@@ -23188,9 +23148,6 @@ msgstr "Můžete upravovat jen své vlastní zprávy"
 
 msgid "You can only share with people and teams in this organization"
 msgstr "Sdílet můžete jen s lidmi a týmy v této organizaci"
-
-msgid "You can read and export, but not run agents."
-msgstr "Můžete číst a exportovat, ale ne spouštět agenty."
 
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Můžete ho obnovit v Nastavení → Projekty po dobu 30 dnů. Složka repozitáře se nikdy nemaže."
