@@ -562,8 +562,11 @@ async function migrateWorkspaces(
 		const adopting: AdoptPlanEntry[] = [];
 		const sameRepository: AdoptPlanEntry[] = [];
 		for (const entry of entries) {
+			const projectWorktrees = onDiskWorktrees.filter(
+				(w) => w.v2ProjectId === entry.v2ProjectId,
+			);
 			const atPath = entry.worktreePath
-				? onDiskWorktrees.find((w) => w.path === entry.worktreePath)
+				? projectWorktrees.find((w) => w.path === entry.worktreePath)
 				: undefined;
 			const repositoryId =
 				atPath?.repositoryId ??
@@ -578,11 +581,33 @@ async function migrateWorkspaces(
 				});
 				continue;
 			}
+			// As single-repo adopt: a folder that moved falls back to its branch.
+			const listed =
+				atPath ??
+				projectWorktrees.find(
+					(w) =>
+						w.repositoryId === repositoryId &&
+						w.branch === entry.branch &&
+						!w.isMainWorktree,
+				);
+			const listingKnown = onDiskBranchesByV2ProjectId.has(entry.v2ProjectId);
+			const worktreePath =
+				listed?.path ?? (listingKnown ? undefined : entry.worktreePath);
+			if (!worktreePath) {
+				summary.skipped++;
+				pushOutcome(ledger, outcomes, {
+					v1Id: entry.v1WorkspaceId,
+					kind: "workspace",
+					status: "skipped",
+					reason: "no-worktree-on-disk",
+				});
+				continue;
+			}
 			if (checkouts[repositoryId]) {
 				sameRepository.push(entry);
 				continue;
 			}
-			checkouts[repositoryId] = { worktreePath: entry.worktreePath };
+			checkouts[repositoryId] = { worktreePath };
 			adopting.push(entry);
 		}
 		const [first] = adopting;

@@ -280,7 +280,31 @@ class FakeHost {
 					},
 				},
 				create: {
-					mutate: async (args: { projectId: string; branch: string }) => {
+					mutate: async (args: {
+						projectId: string;
+						branch: string;
+						checkouts?: Record<string, { worktreePath: string }>;
+					}) => {
+						const repositories =
+							this.projects.find((p) => p.id === args.projectId)
+								?.repositories ?? [];
+						for (const [repositoryId, { worktreePath }] of Object.entries(
+							args.checkouts ?? {},
+						)) {
+							const repository = repositories.find(
+								(r) => r.id === repositoryId,
+							);
+							const listed = [
+								...(this.diskBranches.get(repository?.path ?? "") ?? []),
+							]
+								.filter((branch) => branch !== "main")
+								.map((branch) => `/disk/${repositoryId}-${branch}`);
+							if (!listed.includes(worktreePath)) {
+								throw new Error(
+									`${worktreePath} is not a worktree of ${repositoryId} that can be moved`,
+								);
+							}
+						}
 						this.mutations.push({ kind: "workspaces.create", args });
 						const row: HostWorkspace = {
 							tags: [],
@@ -1407,5 +1431,80 @@ describe("runV1Migration into a multi-repo project", () => {
 			reason: "local-checkout-multi-repo",
 		});
 		expect(summary.workspaces.failed).toBe(0);
+	});
+
+	const movedWebWorktree = (webBranches: string[]) => {
+		const ipc = new FakeIpc();
+		const host = new FakeHost();
+		host.projects = [
+			{
+				id: "mr",
+				repoPath: "/repo/web",
+				repositories: [
+					{ id: "web", path: "/repo/web" },
+					{ id: "api", path: "/repo/api" },
+				],
+			},
+		];
+		host.diskBranches.set("/repo/web", new Set(webBranches));
+		host.diskBranches.set("/repo/api", new Set(["main", "feat"]));
+		ipc.projects = [
+			project("p-web", "/repo/web"),
+			project("p-api", "/repo/api"),
+		];
+		ipc.worktrees = [
+			{ id: "wt-web", path: "/gone/web-feat", baseBranch: "main" },
+			{ id: "wt-api", path: "/disk/api-feat", baseBranch: "main" },
+		];
+		ipc.workspaces = [
+			workspace("w-web", "p-web", "feat", "wt-web"),
+			workspace("w-api", "p-api", "feat", "wt-api"),
+		];
+		return { ipc, host };
+	};
+
+	test("a moved worktree whose branch git still lists moves in from git's folder", async () => {
+		const { ipc, host } = movedWebWorktree(["main", "feat"]);
+
+		const summary = await run(ipc, host);
+
+		const created = host.mutations.filter(
+			(m) => m.kind === "workspaces.create",
+		);
+		expect(created.map((m) => m.args)).toMatchObject([
+			{
+				checkouts: {
+					web: { worktreePath: "/disk/web-feat" },
+					api: { worktreePath: "/disk/api-feat" },
+				},
+			},
+		]);
+		expect(ipc.ledger.get("workspace\0w-web")?.status).toBe("success");
+		expect(ipc.ledger.get("workspace\0w-api")?.status).toBe("success");
+		expect(summary.workspaces.failed).toBe(0);
+	});
+
+	test("a gone worktree is skipped and the rest of its group still adopts, once", async () => {
+		const { ipc, host } = movedWebWorktree(["main"]);
+
+		const first = await run(ipc, host);
+
+		const created = host.mutations.filter(
+			(m) => m.kind === "workspaces.create",
+		);
+		expect(created.map((m) => m.args)).toMatchObject([
+			{ checkouts: { api: { worktreePath: "/disk/api-feat" } } },
+		]);
+		expect(ipc.ledger.get("workspace\0w-web")).toMatchObject({
+			status: "skipped",
+			reason: "no-worktree-on-disk",
+		});
+		expect(ipc.ledger.get("workspace\0w-api")?.status).toBe("success");
+		expect(first.workspaces.failed).toBe(0);
+
+		const mutationsAfterFirst = host.mutations.length;
+		const second = await run(ipc, host);
+		expect(second.workspaces.failed).toBe(0);
+		expect(host.mutations.length).toBe(mutationsAfterFirst);
 	});
 });

@@ -6,7 +6,7 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useWorkspaceRepositoryFullNames } from "../../../../hooks/useWorkspaceRepositoryFullNames";
 import { MOVE_MENU_PRIMITIVES, type MoveMenuKind } from "../../constants";
-import { splitEnvironmentsByRepositorySet } from "./utils/splitEnvironmentsByRepositorySet";
+import { filterEnvironmentsByRepositorySet } from "./utils/filterEnvironmentsByRepositorySet";
 
 interface MoveToCloudItemsProps {
 	menu: MoveMenuKind;
@@ -36,10 +36,10 @@ export function MoveToCloudItems({
 		{ organizationId: organizationId ?? "" },
 		{ enabled: !!organizationId && repositoryFullNames !== null },
 	);
-	const environments = splitEnvironmentsByRepositorySet({
+	const environments = filterEnvironmentsByRepositorySet({
 		environments: startableCloudEnvironments(environmentsQuery.data ?? []),
 		repositoryFullNames,
-	}).matching;
+	});
 
 	return (
 		<>

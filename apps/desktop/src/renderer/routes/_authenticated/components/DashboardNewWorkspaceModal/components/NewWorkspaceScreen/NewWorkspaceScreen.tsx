@@ -377,9 +377,12 @@ export function NewWorkspaceScreen({
 	const selectedHostProject = isCloudHost
 		? undefined
 		: findHostProjectRow(hostProjectResults, hostId, projectId);
-	const selectedHostRows = hostProjectResults.find(
+	const selectedHostResult = hostProjectResults.find(
 		(result) => result.target.machineId === hostId,
-	)?.rows;
+	);
+	const selectedHostRows = selectedHostResult?.rows;
+	const hostProjectsFailed =
+		selectedHostResult?.failed === true && selectedHostRows === undefined;
 	const isHostOutdated =
 		!isCloudHost &&
 		!needsSetup &&
@@ -922,11 +925,14 @@ export function NewWorkspaceScreen({
 			return t({
 				message: `Update ${notSetUpHostName} to manage this project`,
 			});
+		if (!isSession && hostProjectsFailed)
+			return t({ message: "Failed to load repositories. Please try again." });
 		if (!isSession && !primaryRepositoryId)
 			return t({ message: "Loading project repositories…" });
 		return null;
 	}, [
 		isHostOutdated,
+		hostProjectsFailed,
 		notSetUpHostName,
 		primaryRepositoryId,
 		isCloudHost,
