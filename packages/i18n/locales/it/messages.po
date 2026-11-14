@@ -18486,6 +18486,10 @@ msgstr "Scorciatoia già in uso"
 msgid "Show"
 msgstr "Mostra"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Mostra altri {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Mostra una finestra di conferma quando esci dall'app"
 

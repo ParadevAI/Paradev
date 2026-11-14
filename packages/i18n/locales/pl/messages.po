@@ -18486,6 +18486,10 @@ msgstr "Skrót jest już używany"
 msgid "Show"
 msgstr "Pokaż"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Pokaż jeszcze {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Pokaż okno potwierdzenia przy zamykaniu aplikacji"
 

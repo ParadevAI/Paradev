@@ -18486,6 +18486,10 @@ msgstr "快捷键已被使用"
 msgid "Show"
 msgstr "显示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "再显示 {0} 个"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "退出应用时显示确认对话框"
 

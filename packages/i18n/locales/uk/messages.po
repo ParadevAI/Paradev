@@ -18480,6 +18480,10 @@ msgstr "Комбінація клавіш уже використовуєтьс�
 msgid "Show"
 msgstr "Показати"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Показати ще {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Показувати діалог підтвердження під час виходу із застосунку"
 

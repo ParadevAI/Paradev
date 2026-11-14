@@ -9,6 +9,8 @@ import {
 interface PullRequestEvidenceProps {
 	pages: EvidencePage[];
 	totalCount?: number;
+	moreCount: number;
+	onShowMore: () => void;
 	isPending: boolean;
 	isError: boolean;
 	onRetry: () => void;
@@ -18,6 +20,8 @@ interface PullRequestEvidenceProps {
 export function PullRequestEvidence({
 	pages,
 	totalCount,
+	moreCount,
+	onShowMore,
 	isPending,
 	isError,
 	onRetry,
@@ -62,6 +66,15 @@ export function PullRequestEvidence({
 								/>
 							))}
 						</div>
+					) : null}
+					{moreCount > 0 ? (
+						<button
+							type="button"
+							onClick={onShowMore}
+							className="self-start rounded text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+						>
+							<Trans>Show {formatNumber(moreCount)} more</Trans>
+						</button>
 					) : null}
 					{isError ? (
 						<div

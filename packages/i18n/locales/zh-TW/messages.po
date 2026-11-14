@@ -18486,6 +18486,10 @@ msgstr "快速鍵已被使用"
 msgid "Show"
 msgstr "顯示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "再顯示 {0} 個"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "退出應用時顯示確認對話方塊"
 

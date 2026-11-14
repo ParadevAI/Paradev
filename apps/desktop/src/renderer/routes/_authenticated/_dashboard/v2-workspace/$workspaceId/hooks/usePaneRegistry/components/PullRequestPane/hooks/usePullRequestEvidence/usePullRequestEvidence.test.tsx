@@ -1,7 +1,7 @@
 import { afterAll, afterEach, describe, expect, test } from "bun:test";
 import type { AppRouter } from "@superset/trpc";
 import { QueryClient } from "@tanstack/react-query";
-import { cleanup, renderHook, waitFor } from "@testing-library/react";
+import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import type { TRPCLink } from "@trpc/client";
 import { observable } from "@trpc/server/observable";
 import type { ReactNode } from "react";
@@ -34,22 +34,21 @@ function renderEvidence(initialProps: {
 				const { slug } = op.input as { slug: string };
 				observer.next({
 					result: {
-						data:
-							slug === "private-notes"
-								? { status: "missing" }
-								: {
-										status: "readable",
-										preview: {
-											id: `id-${slug}`,
-											slug,
-											title: `Title ${slug}`,
-											description: null,
-											url: pageUrl(slug),
-											updatedAt: new Date(0),
-											thumbnailUrl: null,
-											createdBy: null,
-										},
+						data: slug.startsWith("private-")
+							? { status: "missing" }
+							: {
+									status: "readable",
+									preview: {
+										id: `id-${slug}`,
+										slug,
+										title: `Title ${slug}`,
+										description: null,
+										url: pageUrl(slug),
+										updatedAt: new Date(0),
+										thumbnailUrl: null,
+										createdBy: null,
 									},
+								},
 					},
 				});
 				observer.complete();
@@ -105,6 +104,41 @@ describe("PR evidence from the PR description", () => {
 			},
 		]);
 		expect(hook.result.current.totalCount).toBe(2);
+	});
+
+	test("previews the first 12 links and loads the rest on request", async () => {
+		const slugs = Array.from({ length: 13 }, (_, i) => `page-${i + 1}`);
+		const body = slugs.map(pageUrl).join("\n");
+		const { asked, hook } = renderEvidence({ body, enabled: true });
+		await waitFor(() => expect(hook.result.current.isPending).toBe(false));
+		expect(asked).toHaveLength(12);
+		expect(hook.result.current.pages).toHaveLength(12);
+		expect(hook.result.current.moreCount).toBe(1);
+		expect(hook.result.current.totalCount).toBeUndefined();
+
+		act(() => hook.result.current.onShowMore());
+		await waitFor(() => expect(hook.result.current.pages).toHaveLength(13));
+		expect(hook.result.current.moreCount).toBe(0);
+		expect(hook.result.current.totalCount).toBe(13);
+	});
+
+	test("a readable link past 12 unreadable ones stays reachable", async () => {
+		const slugs = [
+			...Array.from({ length: 12 }, (_, i) => `private-${i + 1}`),
+			"screens-b2",
+		];
+		const body = slugs.map(pageUrl).join("\n");
+		const { hook } = renderEvidence({ body, enabled: true });
+		await waitFor(() => expect(hook.result.current.isPending).toBe(false));
+		expect(hook.result.current.pages).toEqual([]);
+		expect(hook.result.current.moreCount).toBe(1);
+
+		act(() => hook.result.current.onShowMore());
+		await waitFor(() =>
+			expect(hook.result.current.pages.map((page) => page.slug)).toEqual([
+				"screens-b2",
+			]),
+		);
 	});
 
 	test("a PR whose body links no page shows none, whatever the workspace has", () => {

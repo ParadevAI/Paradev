@@ -18486,6 +18486,10 @@ msgstr "Kürzel bereits belegt"
 msgid "Show"
 msgstr "Anzeigen"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "{0} weitere anzeigen"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Beim Beenden der App einen Bestätigungsdialog anzeigen"
 

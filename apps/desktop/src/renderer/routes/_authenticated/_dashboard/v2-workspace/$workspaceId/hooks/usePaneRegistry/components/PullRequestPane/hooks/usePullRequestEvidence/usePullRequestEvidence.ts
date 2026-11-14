@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { env } from "renderer/env.renderer";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { pageLinkFinder } from "../../../../utils/pageLinks";
@@ -12,13 +12,16 @@ export function usePullRequestEvidence(
 	body: string | null | undefined,
 	enabled: boolean,
 ) {
-	const slugs = useMemo(
-		() =>
-			findPageLinks(body ?? "")
-				.slice(0, MAX_LINKED_PAGES)
-				.map((link) => link.slug),
+	const [showAll, setShowAll] = useState(false);
+	const linkedSlugs = useMemo(
+		() => findPageLinks(body ?? "").map((link) => link.slug),
 		[body],
 	);
+	const slugs = useMemo(
+		() => (showAll ? linkedSlugs : linkedSlugs.slice(0, MAX_LINKED_PAGES)),
+		[linkedSlugs, showAll],
+	);
+	const moreCount = linkedSlugs.length - slugs.length;
 	const previews = cloudTrpc.useQueries((t) =>
 		slugs.map((slug) =>
 			t.page.preview(
@@ -39,7 +42,9 @@ export function usePullRequestEvidence(
 	return {
 		hasLinks: slugs.length > 0,
 		pages,
-		totalCount: isPending ? undefined : pages.length,
+		totalCount: isPending || moreCount > 0 ? undefined : pages.length,
+		moreCount,
+		onShowMore: () => setShowAll(true),
 		isPending,
 		isError: previews.some((preview) => preview.isError),
 		onRetry: () => {

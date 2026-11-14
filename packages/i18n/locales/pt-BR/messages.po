@@ -18486,6 +18486,10 @@ msgstr "Atalho já em uso"
 msgid "Show"
 msgstr "Mostrar"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Mostrar mais {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Mostra uma confirmação ao encerrar o app"
 

@@ -84,7 +84,10 @@ export function PullRequestPane({
 	);
 	const showEvidence =
 		evidence.hasLinks &&
-		(evidence.isPending || evidence.isError || evidence.pages.length > 0);
+		(evidence.isPending ||
+			evidence.isError ||
+			evidence.pages.length > 0 ||
+			evidence.moreCount > 0);
 	const threads = usePullRequestThreads(target, { enabled: isTabVisible });
 	const onOpenInDiff = useReviewCommentNavigation(workspace.id, onOpenDiff);
 	const prUrl =
@@ -193,6 +196,8 @@ export function PullRequestPane({
 						<PullRequestEvidence
 							pages={evidence.pages}
 							totalCount={evidence.totalCount}
+							moreCount={evidence.moreCount}
+							onShowMore={evidence.onShowMore}
 							isPending={evidence.isPending}
 							isError={evidence.isError}
 							onRetry={evidence.onRetry}

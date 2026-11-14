@@ -37,6 +37,8 @@ const pages = ["Test Results", "Screenshots", "CDP Video"].map(
 const defaults = {
 	pages,
 	totalCount: 3,
+	moreCount: 0,
+	onShowMore: () => {},
 	isPending: false,
 	isError: false,
 	onRetry: () => {},
@@ -65,6 +67,20 @@ describe("PR evidence", () => {
 		expect(view.container.querySelector("img")).toBeNull();
 		fireEvent.click(view.getByRole("button", { name: "Test Results" }));
 		expect(onOpenPage).toHaveBeenCalledWith(pages[0]);
+	});
+
+	test("offers the links beyond the preview limit", () => {
+		const onShowMore = mock(() => {});
+		const view = render(
+			<PullRequestEvidence
+				{...defaults}
+				totalCount={undefined}
+				moreCount={4}
+				onShowMore={onShowMore}
+			/>,
+		);
+		fireEvent.click(view.getByRole("button", { name: "Show 4 more" }));
+		expect(onShowMore).toHaveBeenCalledTimes(1);
 	});
 
 	test("distinguishes loading from failure with retry", () => {

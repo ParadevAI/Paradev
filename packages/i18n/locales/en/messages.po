@@ -18486,6 +18486,10 @@ msgstr "Shortcut already in use"
 msgid "Show"
 msgstr "Show"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Show {0} more"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Show a confirmation dialog when quitting the app"
 

@@ -18486,6 +18486,10 @@ msgstr "Raccourci déjà utilisé"
 msgid "Show"
 msgstr "Afficher"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Afficher {0} de plus"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Afficher une boîte de dialogue de confirmation à la fermeture de l'application"
 

@@ -22,6 +22,8 @@ const meta = {
 					: "/fixtures/thumb-trace.jpg",
 		})),
 		totalCount: 3,
+		moreCount: 0,
+		onShowMore: fn(),
 		isPending: false,
 		isError: false,
 		onRetry: fn(),
@@ -47,4 +49,8 @@ export const Loading: Story = {
 };
 export const Failed: Story = {
 	args: { pages: [], totalCount: undefined, isError: true },
+};
+
+export const MoreLinks: Story = {
+	args: { totalCount: undefined, moreCount: 4 },
 };
