@@ -1,0 +1,28 @@
+{
+	"$schema": "https://paradev.com/schemas/plugin/1.0.0.json",
+	"name": "caspian",
+	"version": "1.0.0",
+	"description": "IT and security system of record: SaaS apps, access, people, devices, spend, policy violations.",
+	"author": {
+		"name": "Caspian",
+		"url": "https://getcaspian.io"
+	},
+	"homepage": "https://getcaspian.io",
+	"license": "MIT",
+	"keywords": ["caspian", "it", "security", "saas", "access", "devices", "compliance"],
+	"extensions": {
+		"superset": {
+			"interface": {
+				"displayName": "Caspian",
+				"category": "Data & APIs"
+			},
+			"connector": {
+				"slug": "caspian_mcp"
+			},
+			"mcp": {
+				"type": "streamable-http",
+				"url": "https://app.getcaspian.io/mcp"
+			}
+		}
+	}
+}
