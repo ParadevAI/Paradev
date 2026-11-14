@@ -5,7 +5,11 @@ import type { CheckoutGitStatus } from "../../types";
 interface CheckoutGitStatusSourceProps {
 	workspaceId: string;
 	repositoryId: string | undefined;
-	onChange: (key: string, status: CheckoutGitStatus) => void;
+	onChange: (
+		workspaceId: string,
+		key: string,
+		status: CheckoutGitStatus,
+	) => void;
 }
 
 /** Keeps one checkout's status in the provider; renders nothing. */
@@ -21,7 +25,7 @@ export function CheckoutGitStatusSource({
 		[data, isLoading, isFetching, isError, error],
 	);
 	useEffect(() => {
-		onChange(repositoryId ?? "", status);
-	}, [onChange, repositoryId, status]);
+		onChange(workspaceId, repositoryId ?? "", status);
+	}, [onChange, workspaceId, repositoryId, status]);
 	return null;
 }

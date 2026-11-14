@@ -29,7 +29,11 @@ interface RepositoryShipReporterProps {
 	repositoryId: string;
 	/** False stops the pull request and commit polling; changed-file stats stay live. */
 	enabled: boolean;
-	onChange: (repositoryId: string, snapshot: RepositoryShipSnapshot) => void;
+	onChange: (
+		workspaceId: string,
+		repositoryId: string,
+		snapshot: RepositoryShipSnapshot,
+	) => void;
 }
 
 /** Keeps one checkout's ship state live for the multi-repo control's face. */
@@ -69,8 +73,8 @@ export function RepositoryShipReporter({
 	);
 
 	useEffect(() => {
-		onChange(repositoryId, snapshot);
-	}, [onChange, repositoryId, snapshot]);
+		onChange(workspaceId, repositoryId, snapshot);
+	}, [onChange, workspaceId, repositoryId, snapshot]);
 
 	return null;
 }

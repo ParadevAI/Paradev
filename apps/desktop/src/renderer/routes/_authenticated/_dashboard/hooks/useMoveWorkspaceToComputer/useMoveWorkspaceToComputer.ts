@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { formatList } from "@superset/i18n/format";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
@@ -24,12 +25,11 @@ import {
 import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
-import {
-	holdsExactRepositorySet,
-	repositoryFullNames,
-} from "../../utils/repositorySet";
+import { holdsExactRepositorySet } from "../../utils/repositorySet";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
+import { useWorkspaceRepositoryFullNames } from "../useWorkspaceRepositoryFullNames";
+import { earlyMoveRepositoryNames } from "./utils/earlyMoveRepositoryNames";
 
 export type MoveToComputerStage = "saving" | "creating";
 
@@ -53,6 +53,10 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 	const { projects, hostResults } = useHostProjects();
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
+	const checkoutRepositories = useWorkspaceRepositoryFullNames(
+		workspace.id,
+		workspace.projectId,
+	);
 
 	return useCallback(
 		async ({
@@ -100,26 +104,19 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 							: t`Add ${only} as a project on this computer first`,
 					);
 				}
-				const repositories = repositoryNames.join(", ");
+				const repositories = formatList(repositoryNames);
 				throw new Error(
 					computer
 						? t`Add a project with exactly these repositories on ${computer} first: ${repositories}`
 						: t`Add a project with exactly these repositories on this computer first: ${repositories}`,
 				);
 			};
-			const sourceProject = projects.find(
-				(row) => row.id === workspace.projectId,
-			);
-			const sourceRepositories = sourceProject
-				? repositoryFullNames(sourceProject.repositories)
-				: [];
 			// An early check only: the snapshots name the checkouts the workspace really has.
-			if (
-				sourceProject?.repositories.length === 1 &&
-				sourceRepositories.length === 1
-			) {
-				requireProject(sourceRepositories);
-			}
+			const earlyRepositoryNames = earlyMoveRepositoryNames(
+				checkoutRepositories,
+				projects.find((row) => row.id === workspace.projectId),
+			);
+			if (earlyRepositoryNames) requireProject(earlyRepositoryNames);
 			onStage("saving");
 			const { workspaceMoveId } =
 				await cloudTrpcClient.workspaceMove.begin.mutate({
@@ -298,6 +295,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 			cloudWorkspaces,
 			projects,
 			hostResults,
+			checkoutRepositories,
 			submit,
 			collections,
 		],

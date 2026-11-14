@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { formatList } from "@superset/i18n/format";
 import { Button } from "@superset/ui/button";
 import {
 	Dialog,
@@ -109,7 +110,7 @@ export function SetupProjectModal({
 		}
 		const built = buildSetupInput({ projectId, project, parentDir, choices });
 		if (!built.ok) {
-			const names = built.missing.join(", ");
+			const names = formatList(built.missing);
 			toast.error(t({ message: `Pick a folder for ${names}` }));
 			return;
 		}

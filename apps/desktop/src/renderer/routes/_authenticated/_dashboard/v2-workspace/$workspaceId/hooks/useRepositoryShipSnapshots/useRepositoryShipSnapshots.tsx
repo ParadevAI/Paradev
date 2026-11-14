@@ -1,6 +1,12 @@
 import { type ReactNode, useCallback, useState } from "react";
 import type { ChangesPillStats } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/changesPillStats";
 import {
+	emptyWorkspaceScopedEntries,
+	entriesForWorkspace,
+	setWorkspaceScopedEntry,
+	type WorkspaceScopedEntries,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/workspaceScopedEntries";
+import {
 	RepositoryShipReporter,
 	type RepositoryShipSnapshot,
 } from "./components/RepositoryShipReporter";
@@ -22,12 +28,26 @@ export function useRepositoryShipSnapshots(
 	repositoryIds: string[],
 	{ enabled = true }: { enabled?: boolean } = {},
 ): UseRepositoryShipSnapshotsResult {
-	const [byId, setById] = useState<Record<string, RepositoryShipSnapshot>>({});
+	const [snapshotsState, setSnapshotsState] = useState<
+		WorkspaceScopedEntries<RepositoryShipSnapshot>
+	>(emptyWorkspaceScopedEntries);
 	const handleChange = useCallback(
-		(repositoryId: string, snapshot: RepositoryShipSnapshot) =>
-			setById((prev) => ({ ...prev, [repositoryId]: snapshot })),
+		(
+			sourceWorkspaceId: string,
+			repositoryId: string,
+			snapshot: RepositoryShipSnapshot,
+		) =>
+			setSnapshotsState((prev) =>
+				setWorkspaceScopedEntry(
+					prev,
+					sourceWorkspaceId,
+					repositoryId,
+					snapshot,
+				),
+			),
 		[],
 	);
+	const byId = entriesForWorkspace(snapshotsState, workspaceId);
 
 	const snapshots = repositoryIds.flatMap((id) => {
 		const snapshot = byId[id];

@@ -9,6 +9,12 @@ import {
 	useAreCheckoutsLoaded,
 	useWorkspaceCheckouts,
 } from "../../state/activeRepositoryStore";
+import {
+	emptyWorkspaceScopedEntries,
+	entriesForWorkspace,
+	setWorkspaceScopedEntry,
+	type WorkspaceScopedEntries,
+} from "../../utils/workspaceScopedEntries";
 import { CheckoutGitStatusSource } from "./components/CheckoutGitStatusSource";
 import type { CheckoutGitStatus } from "./types";
 
@@ -40,16 +46,17 @@ export function WorkspaceGitStatusProvider({
 }: WorkspaceGitStatusProviderProps) {
 	const checkouts = useWorkspaceCheckouts(workspaceId);
 	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
-	const [byRepositoryId, setByRepositoryId] = useState<StatusByRepositoryId>(
-		{},
-	);
+	const [statuses, setStatuses] = useState<
+		WorkspaceScopedEntries<CheckoutGitStatus>
+	>(emptyWorkspaceScopedEntries);
 	const handleChange = useCallback(
-		(key: string, status: CheckoutGitStatus) =>
-			setByRepositoryId((prev) =>
-				prev[key] === status ? prev : { ...prev, [key]: status },
+		(sourceWorkspaceId: string, key: string, status: CheckoutGitStatus) =>
+			setStatuses((prev) =>
+				setWorkspaceScopedEntry(prev, sourceWorkspaceId, key, status),
 			),
 		[],
 	);
+	const byRepositoryId = entriesForWorkspace(statuses, workspaceId);
 	const repositoryIds = useMemo<Array<string | undefined>>(
 		() =>
 			!checkoutsLoaded

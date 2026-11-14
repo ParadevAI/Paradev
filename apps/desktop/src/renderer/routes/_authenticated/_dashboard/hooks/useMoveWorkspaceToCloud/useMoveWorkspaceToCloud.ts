@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { formatList } from "@superset/i18n/format";
 import { useCallback } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
@@ -65,8 +66,8 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			const assertEnvironmentOpens = (repositories: string[]) => {
 				const opens = environment.repositoryFullNames;
 				if (opens.length > 0 && !isSameRepositorySet(opens, repositories)) {
-					const environmentRepositories = opens.join(", ");
-					const workspaceRepositories = repositories.join(", ");
+					const environmentRepositories = formatList(opens);
+					const workspaceRepositories = formatList(repositories);
 					throw new Error(
 						t`This environment opens ${environmentRepositories}, not ${workspaceRepositories}`,
 					);
