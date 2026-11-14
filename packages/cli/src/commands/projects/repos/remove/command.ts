@@ -8,7 +8,7 @@ import {
 
 export default command({
 	description:
-		"Remove a repository from a project. Its files stay on disk; refused while a live workspace checks it out. Archived workspaces lose their checkout of it",
+		"Remove a repository from a project. Its files stay on disk; refused while a live workspace checks it out, or an archived two-repository workspace still has its folders on disk. Archived workspaces lose their checkout of it",
 	args: [positional("repository").desc("Repository name or ID")],
 	options: {
 		host: string().desc("Target host machineId (required unless --local)"),
