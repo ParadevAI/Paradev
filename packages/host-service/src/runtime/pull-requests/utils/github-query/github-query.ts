@@ -229,6 +229,33 @@ function toStatusContextNode(
 	};
 }
 
+export async function fetchPullRequestByNumberFromGh(
+	execGh: ExecGh,
+	repository: { owner: string; name: string },
+	prNumber: number,
+): Promise<GitHubPullRequestNode | null> {
+	const raw = await execGh([
+		"api",
+		"--method",
+		"GET",
+		`repos/${repository.owner}/${repository.name}/pulls/${prNumber}`,
+	]);
+	return normalizePullRequest(raw);
+}
+
+export async function fetchPullRequestByNumber(
+	octokit: Octokit,
+	repository: { owner: string; name: string },
+	prNumber: number,
+): Promise<GitHubPullRequestNode | null> {
+	const response = await octokit.rest.pulls.get({
+		owner: repository.owner,
+		repo: repository.name,
+		pull_number: prNumber,
+	});
+	return normalizePullRequest(response.data);
+}
+
 export async function fetchPullRequestByHeadFromGh(
 	execGh: ExecGh,
 	repository: {

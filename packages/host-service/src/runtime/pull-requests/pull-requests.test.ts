@@ -342,6 +342,109 @@ describe("PullRequestRuntimeManager direct checkout PR linking", () => {
 	});
 });
 
+describe("PullRequestRuntimeManager synthetic PR refs", () => {
+	function setup() {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "deleted-feature",
+			headSha: "abc123",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "refs/pull/42/head",
+		});
+		const paths: string[] = [];
+		const manager = createManager(db, {
+			readWorkspaceRefs: async () => {
+				const workspace = getWorkspace(db, "ws");
+				return {
+					branch: workspace?.branch ?? null,
+					headSha: workspace?.headSha ?? null,
+					upstream: {
+						owner: workspace?.upstreamOwner ?? REPO.owner,
+						name: workspace?.upstreamRepo ?? REPO.name,
+						branch: workspace?.upstreamBranch ?? "refs/pull/42/head",
+					},
+				};
+			},
+			execGh: async (args) => {
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				paths.push(path);
+				if (path === `repos/${REPO.owner}/${REPO.name}/pulls/42`) {
+					return makePrNode({
+						number: 42,
+						headRef: "deleted-feature",
+						headSha: "abc123",
+						state: "closed",
+						mergedAt: "2026-05-01T10:00:00Z",
+					});
+				}
+				if (path?.endsWith("/check-runs")) return { check_runs: [] };
+				return [];
+			},
+		});
+		return { db, manager, paths };
+	}
+
+	test("discovers a merged PR by its synthetic ref without an existing link", async () => {
+		const { db, manager, paths } = setup();
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const [snapshot] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(snapshot?.pullRequest?.number).toBe(42);
+		expect(snapshot?.pullRequest?.state).toBe("merged");
+		expect(getWorkspace(db, "ws")?.upstreamBranch).toBe("refs/pull/42/head");
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+		expect(paths).toContain(`repos/${REPO.owner}/${REPO.name}/pulls/42`);
+		expect(paths).not.toContain(`repos/${REPO.owner}/${REPO.name}/pulls`);
+	});
+
+	test("clears the current checkout link when HEAD changes, keeping its history", async () => {
+		const { db, manager } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
+
+		db.update(workspaces)
+			.set({ headSha: "def456" })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+	});
+
+	test("does not restore an explicitly unlinked synthetic-ref PR", async () => {
+		const { db, manager } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+
+		manager.unlinkWorkspacePullRequest("ws");
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		expect(getWorkspace(db, "ws")?.suppressedPullRequestId).toBe(prId);
+	});
+
+	test("does not resolve a different repository's synthetic ref in the base repo", async () => {
+		const { db, manager, paths } = setup();
+		db.update(workspaces)
+			.set({ upstreamOwner: "fork-owner" })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		expect(paths).not.toContain(`repos/${REPO.owner}/${REPO.name}/pulls/42`);
+	});
+});
+
 describe("PullRequestRuntimeManager mergedAt attribution", () => {
 	const MERGED_AT_ISO = "2026-05-01T10:00:00Z";
 	const MERGED_AT = Date.parse(MERGED_AT_ISO);
