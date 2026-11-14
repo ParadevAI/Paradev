@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { useNow } from "renderer/hooks/useNow";
 import type {
 	PullRequestDetailCommit,
 	PullRequestDetailCommitAuthor,
@@ -28,6 +29,7 @@ export function PullRequestCommitRun({
 	first,
 	last,
 }: PullRequestCommitRunProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const layout = usePullRequestActivityLayout();
 	const count = commits.length;
@@ -37,7 +39,7 @@ export function PullRequestCommitRun({
 			other: "added # commits",
 		}),
 	});
-	const time = describePullRequestTime(commits[count - 1]?.committedDate);
+	const time = describePullRequestTime(commits[count - 1]?.committedDate, now);
 	if (layout === "row") {
 		return (
 			<li>

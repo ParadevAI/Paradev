@@ -11,6 +11,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import { useCallback } from "react";
+import { useNow } from "../../../../../../hooks/use-now";
 import { cn } from "../../../../../../lib/utils";
 import { Button } from "../../../../../ui/button";
 import {
@@ -58,11 +59,12 @@ export function PageTitleMenu({
 	onPreviewVersion,
 	compact = false,
 }: PageTitleMenuProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	useFramePointerDown(useCallback(() => onOpenChange(false), [onOpenChange]));
 
 	const served = page.servedVersion;
-	const updatedAgo = relativeTime(page.updatedAt);
+	const updatedAgo = relativeTime(page.updatedAt, now);
 	const itemClass = compact ? "text-xs" : undefined;
 	const iconClass = compact ? "size-3.5" : undefined;
 

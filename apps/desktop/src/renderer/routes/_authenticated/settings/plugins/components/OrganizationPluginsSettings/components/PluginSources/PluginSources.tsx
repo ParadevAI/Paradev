@@ -8,11 +8,13 @@ import { toast } from "@superset/ui/sonner";
 import { useCallback, useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { LuPlus, LuRefreshCw, LuTrash2 } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { AddPluginSourceDialog } from "renderer/routes/_authenticated/components/AddPluginSourceDialog";
 import { usePendingSourceSyncs } from "./hooks/usePendingSourceSyncs";
 
 export function PluginSources() {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const { formatRelativeTime } = useFormat();
 	const utils = cloudTrpc.useUtils();
@@ -138,7 +140,7 @@ export function PluginSources() {
 						const ref = source.ref ?? t({ message: "Default branch" });
 						const path = source.path || "/";
 						const syncedAgo = source.syncedAt
-							? formatRelativeTime(new Date(source.syncedAt))
+							? formatRelativeTime(new Date(source.syncedAt), now)
 							: null;
 						return (
 							<div key={source.id} className="flex items-start gap-3 py-3">

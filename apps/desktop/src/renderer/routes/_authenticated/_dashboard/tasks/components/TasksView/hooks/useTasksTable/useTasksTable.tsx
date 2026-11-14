@@ -5,13 +5,9 @@ import {
 	type ColumnFiltersState,
 	createColumnHelper,
 	type ExpandedState,
-	getCoreRowModel,
-	getExpandedRowModel,
-	getFilteredRowModel,
-	getGroupedRowModel,
+	type ReactTable,
 	type RowSelectionState,
-	type Table,
-	useReactTable,
+	useTable,
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -32,10 +28,16 @@ import {
 import { AssigneeCell } from "./components/AssigneeCell";
 import { PriorityCell } from "./components/PriorityCell";
 import { StatusCell } from "./components/StatusCell";
+import {
+	type TasksTableFeatures,
+	tasksTableFeatures,
+} from "./tasksTableFeatures";
 
 export type { TaskWithStatus };
 
-const columnHelper = createColumnHelper<TaskWithStatus>();
+export type TasksTable = ReactTable<TasksTableFeatures, TaskWithStatus>;
+
+const columnHelper = createColumnHelper<TasksTableFeatures, TaskWithStatus>();
 
 const useRowSelectionStore = create<{
 	rowSelection: RowSelectionState;
@@ -66,7 +68,7 @@ export function useTasksTable({
 	assigneeFilter,
 	labelFilter,
 }: UseTasksTableParams): TasksPagination & {
-	table: Table<TaskWithStatus>;
+	table: TasksTable;
 	rowSelection: RowSelectionState;
 	setRowSelection: (
 		updater:
@@ -129,180 +131,186 @@ export function useTasksTable({
 	);
 
 	const columns = useMemo(
-		() => [
-			columnHelper.accessor((row) => row.status, {
-				id: "status",
-				header: t({
-					message: "Status",
-				}),
-				filterFn: (row, _columnId, filterValue: TabValue) => {
-					const statusType = row.original.status.type;
-					return matchesTaskStatusFilter(statusType, filterValue);
-				},
-				cell: (info) => {
-					const { row, cell } = info;
-					const status = info.getValue();
+		() =>
+			columnHelper.columns([
+				columnHelper.accessor((row) => row.status, {
+					id: "status",
+					header: t({
+						message: "Status",
+					}),
+					filterFn: (row, _columnId, filterValue: TabValue) => {
+						const statusType = row.original.status.type;
+						return matchesTaskStatusFilter(statusType, filterValue);
+					},
+					cell: (info) => {
+						const { row, cell } = info;
+						const status = info.getValue();
 
-					if (cell.getIsGrouped()) {
-						return (
-							<div
-								className="w-full"
-								style={{
-									background: `linear-gradient(90deg, ${status.color}14 0%, transparent 100%)`,
-								}}
-							>
-								<button
-									type="button"
-									className="group w-full justify-start px-4 py-2 h-auto relative rounded-none bg-transparent flex items-center cursor-pointer border-0"
-									onClick={row.getToggleExpandedHandler()}
+						if (cell.getIsGrouped()) {
+							return (
+								<div
+									className="w-full"
+									style={{
+										background: `linear-gradient(90deg, ${status.color}14 0%, transparent 100%)`,
+									}}
 								>
-									<HiChevronRight
-										className={`h-3 w-3 text-muted-foreground transition-transform duration-100 group-hover:text-foreground ${
-											row.getIsExpanded() ? "rotate-90" : ""
-										}`}
-									/>
-									<div className="flex items-center gap-2 pl-4">
-										<StatusIcon
-											type={status.type as StatusType}
-											color={status.color}
-											progress={status.progressPercent ?? undefined}
+									<button
+										type="button"
+										className="group w-full justify-start px-4 py-2 h-auto relative rounded-none bg-transparent flex items-center cursor-pointer border-0"
+										onClick={row.getToggleExpandedHandler()}
+									>
+										<HiChevronRight
+											className={`h-3 w-3 text-muted-foreground transition-transform duration-100 group-hover:text-foreground ${
+												row.getIsExpanded() ? "rotate-90" : ""
+											}`}
 										/>
-										<span className="text-sm font-medium capitalize">
-											{status.name}
-										</span>
-										<span className="text-xs text-muted-foreground">
-											{row.subRows.length}
-										</span>
-									</div>
-								</button>
+										<div className="flex items-center gap-2 pl-4">
+											<StatusIcon
+												type={status.type as StatusType}
+												color={status.color}
+												progress={status.progressPercent ?? undefined}
+											/>
+											<span className="text-sm font-medium capitalize">
+												{status.name}
+											</span>
+											<span className="text-xs text-muted-foreground">
+												{row.subRows.length}
+											</span>
+										</div>
+									</button>
+								</div>
+							);
+						}
+
+						return null;
+					},
+					getGroupingValue: (row) => row.status.name,
+				}),
+
+				columnHelper.display({
+					id: "checkbox",
+					header: "",
+					cell: ({ row }) => {
+						if (row.getIsGrouped()) return null;
+						return (
+							<Checkbox
+								checked={row.getIsSelected()}
+								onCheckedChange={(checked) =>
+									row.toggleSelected(Boolean(checked))
+								}
+								onClick={(e) => e.stopPropagation()}
+								aria-label={t({
+									message: "Select task",
+								})}
+								className="cursor-pointer"
+							/>
+						);
+					},
+				}),
+
+				columnHelper.accessor("priority", {
+					header: t({
+						message: "Priority",
+					}),
+					cell: (info) => {
+						if (info.cell.getIsPlaceholder()) return null;
+						return <PriorityCell info={info} />;
+					},
+				}),
+
+				columnHelper.accessor("slug", {
+					header: t({
+						message: "ID",
+					}),
+					cell: (info) => {
+						if (info.cell.getIsPlaceholder()) return null;
+						return (
+							<span
+								className="font-mono text-xs text-muted-foreground"
+								style={{ width: slugWidth }}
+							>
+								{info.row.original.slug}
+							</span>
+						);
+					},
+				}),
+
+				columnHelper.accessor("title", {
+					header: t({
+						message: "Title",
+					}),
+					cell: (info) => {
+						if (info.cell.getIsPlaceholder()) return null;
+						const taskWithStatus = info.row.original;
+						const labels = taskWithStatus.labels || [];
+						return (
+							<div className="flex items-center gap-1.5 flex-1 min-w-0">
+								<StatusCell taskWithStatus={taskWithStatus} />
+								<div className="flex items-center justify-between gap-2 flex-1 min-w-0">
+									<span className="text-sm font-medium line-clamp-1 shrink">
+										{info.getValue()}
+									</span>
+									{labels.length > 0 && (
+										<div className="flex gap-1 shrink-0">
+											{labels.slice(0, 2).map((label) => (
+												<Badge
+													key={label}
+													variant="outline"
+													className="text-xs"
+												>
+													{label}
+												</Badge>
+											))}
+											{labels.length > 2 && (
+												<Badge variant="outline" className="text-xs">
+													+{labels.length - 2}
+												</Badge>
+											)}
+										</div>
+									)}
+								</div>
 							</div>
 						);
-					}
-
-					return null;
-				},
-				getGroupingValue: (row) => row.status.name,
-			}),
-
-			columnHelper.display({
-				id: "checkbox",
-				header: "",
-				cell: ({ row }) => {
-					if (row.getIsGrouped()) return null;
-					return (
-						<Checkbox
-							checked={row.getIsSelected()}
-							onCheckedChange={(checked) =>
-								row.toggleSelected(Boolean(checked))
-							}
-							onClick={(e) => e.stopPropagation()}
-							aria-label={t({
-								message: "Select task",
-							})}
-							className="cursor-pointer"
-						/>
-					);
-				},
-			}),
-
-			columnHelper.accessor("priority", {
-				header: t({
-					message: "Priority",
+					},
 				}),
-				cell: (info) => {
-					if (info.cell.getIsPlaceholder()) return null;
-					return <PriorityCell info={info} />;
-				},
-			}),
 
-			columnHelper.accessor("slug", {
-				header: t({
-					message: "ID",
+				columnHelper.accessor("assigneeId", {
+					header: t({
+						message: "Assignee",
+					}),
+					filterFn: (row, _columnId, filterValue: string) => {
+						if (filterValue === "unassigned") {
+							return row.original.assigneeId === null;
+						}
+						return row.original.assigneeId === filterValue;
+					},
+					cell: (info) => {
+						if (info.cell.getIsPlaceholder()) return null;
+						return <AssigneeCell info={info} />;
+					},
 				}),
-				cell: (info) => {
-					if (info.cell.getIsPlaceholder()) return null;
-					return (
-						<span
-							className="font-mono text-xs text-muted-foreground"
-							style={{ width: slugWidth }}
-						>
-							{info.row.original.slug}
-						</span>
-					);
-				},
-			}),
 
-			columnHelper.accessor("title", {
-				header: t({
-					message: "Title",
+				columnHelper.accessor("createdAt", {
+					header: t({
+						message: "Created",
+					}),
+					cell: (info) => {
+						if (info.cell.getIsPlaceholder()) return null;
+						const date = info.getValue();
+						if (!date) return null;
+						return (
+							<span className="text-xs text-muted-foreground shrink-0 w-11">
+								{format(new Date(date), "MMM d")}
+							</span>
+						);
+					},
 				}),
-				cell: (info) => {
-					if (info.cell.getIsPlaceholder()) return null;
-					const taskWithStatus = info.row.original;
-					const labels = taskWithStatus.labels || [];
-					return (
-						<div className="flex items-center gap-1.5 flex-1 min-w-0">
-							<StatusCell taskWithStatus={taskWithStatus} />
-							<div className="flex items-center justify-between gap-2 flex-1 min-w-0">
-								<span className="text-sm font-medium line-clamp-1 shrink">
-									{info.getValue()}
-								</span>
-								{labels.length > 0 && (
-									<div className="flex gap-1 shrink-0">
-										{labels.slice(0, 2).map((label) => (
-											<Badge key={label} variant="outline" className="text-xs">
-												{label}
-											</Badge>
-										))}
-										{labels.length > 2 && (
-											<Badge variant="outline" className="text-xs">
-												+{labels.length - 2}
-											</Badge>
-										)}
-									</div>
-								)}
-							</div>
-						</div>
-					);
-				},
-			}),
-
-			columnHelper.accessor("assigneeId", {
-				header: t({
-					message: "Assignee",
-				}),
-				filterFn: (row, _columnId, filterValue: string) => {
-					if (filterValue === "unassigned") {
-						return row.original.assigneeId === null;
-					}
-					return row.original.assigneeId === filterValue;
-				},
-				cell: (info) => {
-					if (info.cell.getIsPlaceholder()) return null;
-					return <AssigneeCell info={info} />;
-				},
-			}),
-
-			columnHelper.accessor("createdAt", {
-				header: t({
-					message: "Created",
-				}),
-				cell: (info) => {
-					if (info.cell.getIsPlaceholder()) return null;
-					const date = info.getValue();
-					if (!date) return null;
-					return (
-						<span className="text-xs text-muted-foreground shrink-0 w-11">
-							{format(new Date(date), "MMM d")}
-						</span>
-					);
-				},
-			}),
-		],
+			]),
 		[t, slugWidth],
 	);
 
-	const table = useReactTable({
+	const table = useTable({
+		features: tasksTableFeatures,
 		data,
 		columns,
 		state: {
@@ -317,10 +325,6 @@ export function useTasksTable({
 		onGroupingChange: setGrouping,
 		onExpandedChange: setExpanded,
 		onColumnFiltersChange: setColumnFilters,
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getGroupedRowModel: getGroupedRowModel(),
-		getExpandedRowModel: getExpandedRowModel(),
 		autoResetExpanded: false,
 	});
 

@@ -4,7 +4,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useState } from "react";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import {
@@ -47,13 +47,6 @@ export function DashboardSidebarPinnedSection({
 	const { pinnedItems, workspacesById, projectsById, activeType } =
 		useDashboardSidebarDnd();
 	const isDraggingWorkspace = activeType === "workspace";
-	// Captured once per drag, on the render where the drag flag flips — the
-	// only render where "empty" still means "empty at pickup".
-	// biome-ignore lint/correctness/useExhaustiveDependencies: pinnedItems is read at that moment on purpose
-	const emptyAtPickup = useMemo(
-		() => isDraggingWorkspace && pinnedItems.length === 0,
-		[isDraggingWorkspace],
-	);
 	const isSectionCollapsed = useSidebarSectionsCollapseStore(
 		(s) => s.collapsed.pinned,
 	);
@@ -76,11 +69,22 @@ export function DashboardSidebarPinnedSection({
 			/>
 		));
 	const hasPinnedPages = pinnedPages.length > 0;
-	// Snapshotted like `emptyAtPickup`: pages that load or drop out mid-drag
-	// must not mount or unmount the section under the pointer.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: hasPinnedPages is read at that moment on purpose
-	const pagesAtPickup = useMemo(() => hasPinnedPages, [isDraggingWorkspace]);
-	const showsPinnedPages = isDraggingWorkspace ? pagesAtPickup : hasPinnedPages;
+	// Captured once per drag, on the render where the drag flag flips: items
+	// or pages that change mid-drag must not mount or unmount the section
+	// under the pointer.
+	const snapshotPickup = () => ({
+		isDraggingWorkspace,
+		empty: isDraggingWorkspace && pinnedItems.length === 0,
+		hasPinnedPages,
+	});
+	const [pickup, setPickup] = useState(snapshotPickup);
+	if (pickup.isDraggingWorkspace !== isDraggingWorkspace) {
+		setPickup(snapshotPickup());
+	}
+	const emptyAtPickup = pickup.empty;
+	const showsPinnedPages = isDraggingWorkspace
+		? pickup.hasPinnedPages
+		: hasPinnedPages;
 
 	if (isCollapsed) {
 		if (pinnedWorkspaces.length === 0 && !hasPinnedPages) return null;

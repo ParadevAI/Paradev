@@ -1,6 +1,7 @@
 import { Plural, Trans } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { Button } from "@superset/ui/button";
+import { useNow } from "renderer/hooks/useNow";
 import type { DeletedProject } from "../../../hooks/useDeletedProjects/useDeletedProjects.utils";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -24,7 +25,8 @@ export function DeletedProjectRow({
 	onRestore,
 	onDeletePermanently,
 }: DeletedProjectRowProps) {
-	const deletedWhen = formatRelativeTime(project.deletedAt);
+	const now = useNow(60_000);
+	const deletedWhen = formatRelativeTime(project.deletedAt, now);
 	const daysLeft = Math.max(
 		0,
 		Math.ceil((project.purgeAt - Date.now()) / DAY_MS),

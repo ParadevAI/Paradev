@@ -10,8 +10,10 @@ import { HotkeyLabel } from "renderer/hotkeys";
 import { useWorkspaceSidebarStore } from "renderer/stores";
 
 export function SidebarToggle() {
-	const { isCollapsed, toggleCollapsed } = useWorkspaceSidebarStore();
-	const collapsed = isCollapsed();
+	const collapsed = useWorkspaceSidebarStore((state) => state.isCollapsed());
+	const toggleCollapsed = useWorkspaceSidebarStore(
+		(state) => state.toggleCollapsed,
+	);
 	const isParadevShell = useParadevShell();
 	const strokeWidth = isParadevShell ? HEADER_ICON_STROKE_WIDTH : 1.5;
 

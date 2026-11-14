@@ -4445,7 +4445,7 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "チェックポイント保存 {0}"
 
@@ -6689,7 +6689,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "作成"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -21922,7 +21922,7 @@ msgstr "サブエージェントをバックグラウンドに移動するには
 msgid "Updated"
 msgstr "更新済み"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "更新: {0}"
 

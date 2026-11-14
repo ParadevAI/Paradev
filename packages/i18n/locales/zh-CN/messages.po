@@ -4445,7 +4445,7 @@ msgstr "检查点"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "检查点 · tooltip重构之前"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "检查点已保存 {0}"
 
@@ -6689,7 +6689,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "已创建"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -21922,7 +21922,7 @@ msgstr "请更新此主机以将子智能体移到后台"
 msgid "Updated"
 msgstr "已更新"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "更新于{0}"
 

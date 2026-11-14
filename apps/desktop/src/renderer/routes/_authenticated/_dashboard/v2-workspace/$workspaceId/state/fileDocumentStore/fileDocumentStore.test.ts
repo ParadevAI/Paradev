@@ -3,6 +3,7 @@ import {
 	acquireDocument,
 	dispatchFsEvent,
 	getDocument,
+	getDocumentSnapshot,
 	releaseDocument,
 } from "./fileDocumentStore";
 
@@ -127,6 +128,19 @@ test("external reload preserves edits made while the disk read is pending", asyn
 	});
 	expect(f.doc.dirty).toBe(true);
 	expect(f.doc.hasExternalChange).toBe(true);
+	await f.cleanup();
+});
+
+test("a snapshot is a new object only after the document changes", async () => {
+	const f = createReloadFixture();
+	await f.resolve(0, "EMAIL=original");
+	const clean = getDocumentSnapshot(f.doc);
+	expect(getDocumentSnapshot(f.doc)).toBe(clean);
+	f.doc.setContent("EMAIL=edited");
+	const edited = getDocumentSnapshot(f.doc);
+	expect(edited).not.toBe(clean);
+	expect(clean.dirty).toBe(false);
+	expect(edited.dirty).toBe(true);
 	await f.cleanup();
 });
 

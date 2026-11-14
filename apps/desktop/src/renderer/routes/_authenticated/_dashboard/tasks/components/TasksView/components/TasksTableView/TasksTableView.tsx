@@ -1,5 +1,5 @@
 import { cn } from "@superset/ui/utils";
-import { flexRender, type Table } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 import {
 	defaultRangeExtractor,
 	type Range,
@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-virtual";
 import { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
 import { LoadMoreSentinel } from "renderer/routes/_authenticated/_dashboard/components/LoadMoreSentinel";
-import type { TaskWithStatus } from "../../hooks/useTasksTable";
+import type { TasksTable, TaskWithStatus } from "../../hooks/useTasksTable";
 import { TaskContextMenu } from "./components/TaskContextMenu";
 
 const ROW_HEIGHT = 36;
@@ -15,7 +15,7 @@ const OVERSCAN = 50;
 const LOAD_MORE_ROOT_MARGIN = `${ROW_HEIGHT * 10}px`;
 
 interface TasksTableViewProps {
-	table: Table<TaskWithStatus>;
+	table: TasksTable;
 	onTaskClick: (task: TaskWithStatus) => void;
 	hasNextPage: boolean;
 	isFetchingNextPage: boolean;
@@ -116,8 +116,8 @@ export function TasksTableView({
 							{isGroupHeader ? (
 								<div className="sticky top-0 bg-background z-10 border-b border-border/50">
 									{flexRender(
-										row.getVisibleCells()[0].column.columnDef.cell,
-										row.getVisibleCells()[0].getContext(),
+										row.getAllCells()[0].column.columnDef.cell,
+										row.getAllCells()[0].getContext(),
 									)}
 								</div>
 							) : (
@@ -142,7 +142,7 @@ export function TasksTableView({
 										}}
 									>
 										{row
-											.getVisibleCells()
+											.getAllCells()
 											.slice(1)
 											.map((cell) => (
 												<div key={cell.id} className="flex items-center">
