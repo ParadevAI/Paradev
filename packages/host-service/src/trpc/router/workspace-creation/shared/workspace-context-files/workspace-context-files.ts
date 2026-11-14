@@ -11,7 +11,14 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
+import { rm } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
+import { WORKSPACE_ATTACHMENTS_DIR } from "@superset/shared/workspace-attachments";
+import {
+	WORKSPACE_AGENT_FOLDERS,
+	WORKSPACE_APP_FOLDER,
+	WORKSPACE_CONTEXT_FILES,
+} from "@superset/shared/workspace-root";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../../db";
 import { projects, workspaces } from "../../../../../db/schema";
@@ -19,8 +26,6 @@ import {
 	listWorkspaceCheckouts,
 	pickConfigSource,
 } from "../../../../../workspaces/checkouts";
-
-export const WORKSPACE_CONTEXT_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 
 /** Each agent folder whose `skills/` the root links per repository. */
 export const WORKSPACE_SKILL_FOLDERS = [".agents", ".claude"] as const;
@@ -36,15 +41,6 @@ export const WORKSPACE_CONFIG_LINKS = [
 	{ path: ".codex/config.toml", type: "file" },
 	{ path: ".cursor/mcp.json", type: "file" },
 	{ path: ".cursor/rules", type: "dir" },
-] as const;
-
-const AGENT_FOLDERS = [".agents", ".claude", ".codex", ".cursor"] as const;
-
-/** Top-level root entries the host makes, besides the checkout folders. */
-export const WORKSPACE_ROOT_ENTRIES = [
-	...WORKSPACE_CONTEXT_FILES,
-	".mcp.json",
-	...AGENT_FOLDERS,
 ] as const;
 
 const INSTRUCTION_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
@@ -178,11 +174,11 @@ export function syncWorkspaceContextFiles(
 	}
 }
 
-/** Removes the generated files and skill links, and their folders once empty. */
-export function removeWorkspaceContextFiles(
+/** Removes the generated files, skill links and attachments, and their folders once empty. */
+export async function removeWorkspaceContextFiles(
 	root: string,
 	checkoutPaths: string[],
-): void {
+): Promise<void> {
 	for (const file of WORKSPACE_CONTEXT_FILES) {
 		removeFile(join(root, file));
 	}
@@ -204,11 +200,25 @@ export function removeWorkspaceContextFiles(
 			);
 		}
 	}
+	if (!isRealFolderPath(root, join(root, WORKSPACE_APP_FOLDER))) return;
+	try {
+		await rm(join(root, WORKSPACE_ATTACHMENTS_DIR), {
+			recursive: true,
+			force: true,
+		});
+		removeIfEmpty(join(root, WORKSPACE_APP_FOLDER));
+	} catch (err) {
+		console.warn(
+			`[workspace-context-files] could not remove ${WORKSPACE_ATTACHMENTS_DIR} in ${root}`,
+			err,
+		);
+	}
 }
 
 /**
- * What a user or agent put at `.mcp.json` or in the root's agent folders, as
- * root-relative paths; the host's own links are not listed.
+ * What a user or agent put at `.mcp.json`, in the root's agent folders or in
+ * the app folder, as root-relative paths; the host's own links and the
+ * attachments are not listed.
  */
 export function listAgentFolderLeftovers(
 	root: string,
@@ -223,7 +233,7 @@ export function listAgentFolderLeftovers(
 	if (isPresent(mcp) && !isLinkIntoCheckouts(mcp, checkoutPaths)) {
 		leftovers.push(".mcp.json");
 	}
-	for (const folder of AGENT_FOLDERS) {
+	for (const folder of WORKSPACE_AGENT_FOLDERS) {
 		const path = join(root, folder);
 		if (!isPresent(path)) continue;
 		const entries = listRealFolder(path);
@@ -254,6 +264,15 @@ export function listAgentFolderLeftovers(
 					leftovers.push(`${folder}/skills/${name}`);
 				}
 			}
+		}
+	}
+	const appFolder = join(root, WORKSPACE_APP_FOLDER);
+	if (isPresent(appFolder)) {
+		const entries = listRealFolder(appFolder);
+		if (!entries) leftovers.push(WORKSPACE_APP_FOLDER);
+		for (const entry of entries ?? []) {
+			const entryPath = `${WORKSPACE_APP_FOLDER}/${entry}`;
+			if (entryPath !== WORKSPACE_ATTACHMENTS_DIR) leftovers.push(entryPath);
 		}
 	}
 	return leftovers;

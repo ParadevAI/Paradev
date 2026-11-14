@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
+import { ensureWorkspaceAttachmentsDir } from "@superset/shared/workspace-attachments-dir";
 import { eq } from "drizzle-orm";
 import { simpleGit } from "simple-git";
 import {
@@ -360,6 +361,30 @@ test("files an agent left in the root warn and block the delete; a forced delete
 	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
 		workspaceId: workspace.id,
 		force: true,
+	});
+	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
+	expect(existsSync(root)).toBe(false);
+});
+
+test("chat attachments in the root do not block the delete; other files in .paradev do", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const root = workspace.worktreePath;
+	const attachments = ensureWorkspaceAttachmentsDir(root);
+	writeFileSync(join(attachments, "image.png"), "png");
+	writeFileSync(join(root, ".paradev", "notes.txt"), "notes");
+
+	await expect(
+		scenario.host.trpc.workspaceCleanup.destroy.mutate({
+			workspaceId: workspace.id,
+		}),
+	).rejects.toThrow(
+		/Workspace folder has files outside the repositories: \.paradev\/notes\.txt$/,
+	);
+
+	rmSync(join(root, ".paradev", "notes.txt"));
+	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
 	});
 	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
 	expect(existsSync(root)).toBe(false);

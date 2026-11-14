@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
+import { isReservedRootName } from "@superset/shared/workspace-root";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import {
@@ -36,10 +37,7 @@ import {
 } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { revokeRootTrustForNewPrimary } from "../workspace-creation/shared/seed-agent-trust";
-import {
-	syncWorkspaceContextFiles,
-	WORKSPACE_ROOT_ENTRIES,
-} from "../workspace-creation/shared/workspace-context-files";
+import { syncWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
 	type AdoptOptions,
@@ -230,10 +228,6 @@ export function requireUniqueNames(names: string[]): void {
 	}
 }
 
-const RESERVED_NAMES = new Set(
-	WORKSPACE_ROOT_ENTRIES.map((entry) => entry.toLowerCase()),
-);
-
 /** Only a project with several repositories gives its workspaces a root folder whose own files a name can collide with. */
 export function requireUsableNames(names: string[]): void {
 	for (const name of names) {
@@ -245,7 +239,7 @@ export function requireUsableNames(names: string[]): void {
 		}
 	}
 	if (names.length < 2) return;
-	const reserved = names.find((name) => RESERVED_NAMES.has(name.toLowerCase()));
+	const reserved = names.find(isReservedRootName);
 	if (reserved === undefined) return;
 	throw new TRPCError({
 		code: "BAD_REQUEST",

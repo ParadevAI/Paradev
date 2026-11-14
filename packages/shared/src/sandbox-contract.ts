@@ -8,6 +8,7 @@
  * to a path, port or key is one edit in this file and the bundle hash moves.
  */
 import { z } from "zod";
+import { isReservedRootName } from "./workspace-root";
 
 /** Bumped when a box booted on the previous contract can no longer be driven. */
 export const SANDBOX_CONTRACT_VERSION = 1;
@@ -154,7 +155,8 @@ export type SandboxPlugin = z.infer<typeof sandboxPluginSchema>;
 
 /**
  * Where a repository lands. A lone repository is the workspace root itself;
- * several sit under it by name, the owner disambiguating a clash.
+ * several sit under it by name. The owner is added when two names clash, or
+ * when the name is one the workspace root keeps for its own files.
  */
 export function sandboxRepositoryPath(
 	repo: { owner: string; name: string },
@@ -164,7 +166,9 @@ export function sandboxRepositoryPath(
 	const clash = all.some(
 		(other) => other.name === repo.name && other.owner !== repo.owner,
 	);
-	return clash ? `${repo.owner}-${repo.name}` : repo.name;
+	return clash || isReservedRootName(repo.name)
+		? `${repo.owner}-${repo.name}`
+		: repo.name;
 }
 
 /** The absolute directory of a checkout under the workspace root. */

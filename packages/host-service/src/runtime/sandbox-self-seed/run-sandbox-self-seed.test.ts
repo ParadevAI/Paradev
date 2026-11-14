@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { sandboxRepositoryPath } from "@superset/shared/sandbox-contract";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { seedProject, seedWorkspace } from "../../../test/helpers/seed";
@@ -158,13 +159,36 @@ describe("sandbox self-seed", () => {
 		const warn = spyOn(console, "warn").mockImplementation(() => {});
 		try {
 			expect(readSandboxIdentity(env(["web", "Claude.md"]))).toBeNull();
-			expect(warn.mock.calls[0]?.[0]).toContain("Claude.md");
+			expect(warn.mock.calls[0]?.[0]).toContain(
+				"repository acme/Claude.md at Claude.md",
+			);
 			expect(readSandboxIdentity(env(["AGENTS.md"]))).toMatchObject({
 				worktreePath: "/workspace/AGENTS.md",
 			});
 		} finally {
 			warn.mockRestore();
 		}
+	});
+
+	test("a repository named like a root file is seeded under its owner-prefixed folder", () => {
+		const all = [
+			{ owner: "acme", name: "app" },
+			{ owner: "openai", name: "agents.md" },
+		];
+		const repositories = all.map((repo) => ({
+			url: `https://github.com/${repo.owner}/${repo.name}.git`,
+			branch: "feat",
+			path: sandboxRepositoryPath(repo, all),
+		}));
+		const seeded = readSandboxIdentity({
+			SUPERSET_SANDBOX_WORKSPACE_ID: WORKSPACE_ID,
+			SUPERSET_SANDBOX_WORKSPACE_PATH: "/workspace",
+			SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify(repositories),
+		});
+		expect(seeded?.repositories.map((repo) => repo.path)).toEqual([
+			"app",
+			"openai-agents.md",
+		]);
 	});
 
 	test("a box seeded before multi-repo folds its sibling projects into the primary's", () => {

@@ -1,4 +1,4 @@
-import { isAbsolute, relative } from "node:path";
+import { isAbsolute, relative, sep } from "node:path";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../db/index.ts";
 import { projects, repositories } from "../db/schema.ts";
@@ -17,7 +17,8 @@ export function repositoryRootPath(
 	let holder: { path: string; repoPath: string } | undefined;
 	for (const checkout of listWorkspaceCheckouts(db, workspace)) {
 		const inside = relative(checkout.path, cwd);
-		if (inside.startsWith("..") || isAbsolute(inside)) continue;
+		if (inside === ".." || inside.startsWith(`..${sep}`) || isAbsolute(inside))
+			continue;
 		if (!holder || checkout.path.length > holder.path.length) {
 			holder = { path: checkout.path, repoPath: checkout.repository.repoPath };
 		}

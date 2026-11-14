@@ -305,7 +305,7 @@ async function purgeProject(
 		// A multi-repo root holds only the checkouts; a non-empty one stays.
 		if (checkouts.length > 1) {
 			try {
-				removeWorkspaceContextFiles(
+				await removeWorkspaceContextFiles(
 					row.worktreePath,
 					checkouts.map((checkout) => checkout.path),
 				);

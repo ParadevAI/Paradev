@@ -161,7 +161,7 @@ test("links to skills that are gone are reaped; links elsewhere are kept", () =>
 	expect(readlinkSync(linkAt(".agents", "mine"))).toBe(elsewhere);
 });
 
-test("removing takes the files and the host's links, and leaves what a user put there", () => {
+test("removing takes the files and the host's links, and leaves what a user put there", async () => {
 	const web = checkout("web", true);
 	const api = checkout("api");
 	addSkill(web, ".agents", "deploy");
@@ -173,7 +173,7 @@ test("removing takes the files and the host's links, and leaves what a user put 
 	expect(listAgentFolderLeftovers(root, paths)).toEqual([
 		".claude/settings.local.json",
 	]);
-	removeWorkspaceContextFiles(root, paths);
+	await removeWorkspaceContextFiles(root, paths);
 
 	expect(existsSync(join(root, "AGENTS.md"))).toBe(false);
 	expect(existsSync(join(root, "CLAUDE.md"))).toBe(false);
@@ -228,7 +228,7 @@ test("without agent config the root AGENTS.md does not mention it", () => {
 	);
 });
 
-test("a root config file the host did not make is never replaced or touched", () => {
+test("a root config file the host did not make is never replaced or touched", async () => {
 	const web = checkout("web", true);
 	const api = checkout("api");
 	addFile(web, ".mcp.json");
@@ -246,7 +246,7 @@ test("a root config file the host did not make is never replaced or touched", ()
 		".mcp.json",
 		".claude/settings.local.json",
 	]);
-	removeWorkspaceContextFiles(root, paths);
+	await removeWorkspaceContextFiles(root, paths);
 	expect(readFileSync(join(root, ".mcp.json"), "utf8")).toBe("mine");
 	expect(
 		readFileSync(join(root, ".claude", "settings.local.json"), "utf8"),
@@ -294,7 +294,7 @@ test("a root without the primary's checkout links the config of its first reposi
 	);
 });
 
-test("removing takes the config links and the folders made for them", () => {
+test("removing takes the config links and the folders made for them", async () => {
 	const web = checkout("web", true);
 	const api = checkout("api");
 	addFile(web, ".mcp.json");
@@ -304,7 +304,7 @@ test("removing takes the config links and the folders made for them", () => {
 	writeWorkspaceContextFiles(root, [api, web]);
 
 	expect(listAgentFolderLeftovers(root, paths)).toEqual([]);
-	removeWorkspaceContextFiles(root, paths);
+	await removeWorkspaceContextFiles(root, paths);
 
 	expect(() => lstatSync(join(root, ".mcp.json"))).toThrow();
 	expect(existsSync(join(root, ".cursor"))).toBe(false);
@@ -324,7 +324,7 @@ test("a root CLAUDE.md that links into a checkout is replaced, not written throu
 	expect(readFileSync(join(root, "CLAUDE.md"), "utf8")).toBe("@AGENTS.md\n");
 });
 
-test("nothing is written or removed through a root agent folder that is a symlink", () => {
+test("nothing is written or removed through a root agent folder that is a symlink", async () => {
 	const web = checkout("web", true);
 	const api = checkout("api");
 	addSkill(web, ".claude", "deploy");
@@ -339,7 +339,7 @@ test("nothing is written or removed through a root agent folder that is a symlin
 	const paths = [api.path, web.path];
 
 	writeWorkspaceContextFiles(root, [api, web]);
-	removeWorkspaceContextFiles(root, paths);
+	await removeWorkspaceContextFiles(root, paths);
 
 	expect(lstatSync(join(root, ".claude")).isSymbolicLink()).toBe(true);
 	expect(existsSync(join(outside, "skills", "deploy"))).toBe(false);

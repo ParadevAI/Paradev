@@ -1,6 +1,7 @@
 import { readdir, rm, rmdir } from "node:fs/promises";
 import { relative, sep } from "node:path";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
+import { WORKSPACE_ROOT_ENTRIES } from "@superset/shared/workspace-root";
 import { TRPCError } from "@trpc/server";
 import { inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
@@ -35,7 +36,6 @@ import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths
 import {
 	listAgentFolderLeftovers,
 	removeWorkspaceContextFiles,
-	WORKSPACE_ROOT_ENTRIES,
 } from "../workspace-creation/shared/workspace-context-files";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
@@ -757,7 +757,7 @@ async function removeWorkspaceRoot(
 		return;
 	}
 	try {
-		removeWorkspaceContextFiles(root, checkoutPaths);
+		await removeWorkspaceContextFiles(root, checkoutPaths);
 	} catch (err) {
 		const message = err instanceof Error ? err.message : String(err);
 		warnings.push(`Left the workspace files in ${root}: ${message}`);

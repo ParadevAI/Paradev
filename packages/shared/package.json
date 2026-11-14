@@ -402,6 +402,10 @@
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"
 		},
+		"./workspace-root": {
+			"types": "./src/workspace-root.ts",
+			"default": "./src/workspace-root.ts"
+		},
 		"./workspace-attachments-dir": {
 			"types": "./src/workspace-attachments-dir.ts",
 			"default": "./src/workspace-attachments-dir.ts"
