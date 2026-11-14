@@ -1,6 +1,14 @@
+import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { resolveCheckout } from "../../../workspaces/checkouts";
+import { workspaces } from "../../../db/schema";
+import type { HostServiceContext } from "../../../types";
+import {
+	listWorkspaceCheckouts,
+	resolveCheckout,
+} from "../../../workspaces/checkouts";
 import { protectedProcedure, router } from "../../index";
+import { findRepositoryByGithubName } from "../workspace-creation/shared/project-helpers";
 import { addComment } from "./procedures/add-comment";
 import { createForWorkspace } from "./procedures/create-for-workspace";
 import { getContent } from "./procedures/get-content";
@@ -58,13 +66,22 @@ export const pullRequestsRouter = router({
 			z.object({
 				workspaceId: z.string(),
 				repositoryId: z.string().optional(),
+				/** GitHub "owner/name", for a caller that has the PR but not its repository id. */
+				repository: z.string().optional(),
 			}),
 		)
-		.mutation(({ ctx, input }) => {
+		.mutation(async ({ ctx, input }) => {
 			const { repository } = resolveCheckout(
 				ctx.db,
 				input.workspaceId,
-				input.repositoryId,
+				input.repositoryId ??
+					(input.repository
+						? await findCheckoutRepositoryByGithubName(
+								ctx,
+								input.workspaceId,
+								input.repository,
+							)
+						: undefined),
 			);
 			if (repository) {
 				ctx.runtime.pullRequests.unlinkWorkspacePullRequest(
@@ -111,3 +128,31 @@ export const pullRequestsRouter = router({
 	/** @deprecated Use the API's `integration.github.mergePullRequest`, which acts as the viewer. Kept for released clients. */
 	mergePR,
 });
+
+/** Only a workspace of several checkouts needs the name; with one, it is that checkout. */
+async function findCheckoutRepositoryByGithubName(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	fullName: string,
+): Promise<string | undefined> {
+	const workspace = ctx.db
+		.select({ id: workspaces.id, worktreePath: workspaces.worktreePath })
+		.from(workspaces)
+		.where(eq(workspaces.id, workspaceId))
+		.get();
+	if (!workspace) return undefined;
+	const checkouts = listWorkspaceCheckouts(ctx.db, workspace);
+	if (checkouts.length < 2) return undefined;
+	const repositoryId = await findRepositoryByGithubName(
+		ctx,
+		checkouts.map((checkout) => checkout.repository),
+		fullName,
+	);
+	if (!repositoryId) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: `repository_not_in_project: ${fullName} is not a repository of this workspace`,
+		});
+	}
+	return repositoryId;
+}

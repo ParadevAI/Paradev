@@ -17,7 +17,10 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/findPullRequestWorkspace";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
-import { useWorkspaceCheckouts } from "../../state/activeRepositoryStore";
+import {
+	useAreCheckoutsLoaded,
+	useWorkspaceCheckouts,
+} from "../../state/activeRepositoryStore";
 import { checkoutInput } from "../../utils/checkoutInput";
 import { useStackSwitchStore } from "./stores/stackSwitchStore";
 
@@ -48,10 +51,11 @@ export function useOpenStackLayer(
 	const projectId = workspace.projectId ?? null;
 	const { onSwitched, layers, repositoryId } = options;
 	const checkouts = useWorkspaceCheckouts(workspace.id);
+	const checkoutsLoaded = useAreCheckoutsLoaded(workspace.id);
 	const canSwitch =
 		hostUrl !== null &&
 		workspace.type !== "session" &&
-		(checkouts.length <= 1 || repositoryId !== undefined);
+		(repositoryId !== undefined || (checkoutsLoaded && checkouts.length <= 1));
 
 	const layerWorkspace = useCallback(
 		(layer: PullRequestStackLayer) => {

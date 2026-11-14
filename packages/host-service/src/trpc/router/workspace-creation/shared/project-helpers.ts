@@ -116,3 +116,23 @@ export async function resolveGithubRepo(
 		repoPath: gitRoot,
 	};
 }
+
+/** Matched on the live remote: the stored owner/name drift on rename and fork. */
+export async function findRepositoryByGithubName(
+	ctx: HostServiceContext,
+	repositories: HostRepositoryRow[],
+	fullName: string,
+): Promise<string | undefined> {
+	const wanted = fullName.trim().toLowerCase();
+	for (const repository of repositories) {
+		const repo = await resolveGithubRepo(
+			ctx,
+			repository.projectId,
+			repository.id,
+		).catch(() => null);
+		if (repo && `${repo.owner}/${repo.name}`.toLowerCase() === wanted) {
+			return repository.id;
+		}
+	}
+	return undefined;
+}

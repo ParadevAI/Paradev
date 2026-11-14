@@ -9,6 +9,7 @@ import { getTerminalAgentBindingsQueryKey } from "renderer/hooks/host-service/us
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
@@ -40,6 +41,8 @@ interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	isPinned?: boolean;
 	/** The checkout whose PR the row shows; Remove PR Link unlinks that one. */
 	pullRequestRepositoryId?: string | null;
+	/** Names the checkout by its GitHub repository when the row has no repository id. */
+	pullRequestUrl?: string | null;
 }
 
 export function useDashboardSidebarWorkspaceItemActions({
@@ -51,6 +54,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 	branch,
 	isPinned = false,
 	pullRequestRepositoryId = null,
+	pullRequestUrl = null,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
@@ -295,6 +299,10 @@ export function useDashboardSidebarWorkspaceItemActions({
 			).pullRequests.unlinkFromWorkspace.mutate({
 				workspaceId,
 				repositoryId: pullRequestRepositoryId ?? undefined,
+				repository:
+					pullRequestRepositoryId || !pullRequestUrl
+						? undefined
+						: pullRequestRefFromUrl(pullRequestUrl)?.repoFullName,
 			});
 			await queryClient.invalidateQueries({
 				queryKey: DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX,

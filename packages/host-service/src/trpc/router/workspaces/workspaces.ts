@@ -88,8 +88,8 @@ import {
 } from "../workspace-creation/shared/local-project";
 import { moveWorktree } from "../workspace-creation/shared/move-worktree";
 import {
+	findRepositoryByGithubName,
 	projectNotSetupError,
-	resolveGithubRepo,
 } from "../workspace-creation/shared/project-helpers";
 import { requireIndependentWorktree } from "../workspace-creation/shared/require-independent-worktree";
 import { seedWorkspaceFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
@@ -542,26 +542,6 @@ async function resolveCheckoutRequests(
 		}
 	}
 	return requests;
-}
-
-/** Matched on the live remote: the stored owner/name drift on rename and fork. */
-async function findRepositoryByGithubName(
-	ctx: HostServiceContext,
-	repositories: HostRepositoryRow[],
-	fullName: string,
-): Promise<string | undefined> {
-	const wanted = fullName.trim().toLowerCase();
-	for (const repository of repositories) {
-		const repo = await resolveGithubRepo(
-			ctx,
-			repository.projectId,
-			repository.id,
-		).catch(() => null);
-		if (repo && `${repo.owner}/${repo.name}`.toLowerCase() === wanted) {
-			return repository.id;
-		}
-	}
-	return undefined;
 }
 
 interface AdoptableWorktree {

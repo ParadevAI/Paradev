@@ -118,6 +118,7 @@ export function DashboardSidebarWorkspaceItem({
 		branch,
 		isPinned: workspace.isPinned,
 		pullRequestRepositoryId: pullRequest?.repositoryId,
+		pullRequestUrl: pullRequest?.url,
 	});
 	// A cloud workspace you created is in the sidebar by definition; only an
 	// opted-in teammate's can be taken back out.

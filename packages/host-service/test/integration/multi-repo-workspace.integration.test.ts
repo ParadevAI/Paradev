@@ -34,7 +34,12 @@ import {
 	createGitFixture,
 	type GitFixture,
 } from "../helpers/git-fixture";
-import { seedProject, seedRepository } from "../helpers/seed";
+import {
+	seedProject,
+	seedPullRequest,
+	seedRepository,
+	seedWorkspace,
+} from "../helpers/seed";
 
 let dispose: (() => Promise<void>) | undefined;
 let templates: { web: GitFixture; api: GitFixture };
@@ -642,6 +647,80 @@ test("pullRequest and checkouts naming two PRs for one repository is BAD_REQUEST
 	).rejects.toMatchObject({
 		data: { code: "BAD_REQUEST" },
 		message: expect.stringContaining("two different PRs"),
+	});
+});
+
+function workspaceWithTwoLinkedPrs(
+	scenario: Awaited<ReturnType<typeof multiRepoScenario>>,
+) {
+	const workspace = seedWorkspace(scenario.host, {
+		projectId: scenario.projectId,
+		worktreePath: scenario.worktreeBaseDir,
+		branch: "feature/both",
+	});
+	for (const [repositoryId, repoName] of [
+		[scenario.webId, "web"],
+		[scenario.apiId, "api"],
+	] as const) {
+		const { id: pullRequestId } = seedPullRequest(scenario.host, {
+			repositoryId,
+			repoOwner: "o",
+			repoName,
+			prNumber: 7,
+			headBranch: "feature/both",
+		});
+		scenario.host.db
+			.update(workspaceRepositories)
+			.set({ pullRequestId })
+			.where(eq(workspaceRepositories.repositoryId, repositoryId))
+			.run();
+	}
+	return workspace;
+}
+
+const linkedPullRequests = (
+	scenario: Awaited<ReturnType<typeof multiRepoScenario>>,
+) =>
+	Object.fromEntries(
+		scenario.host.db
+			.select()
+			.from(workspaceRepositories)
+			.all()
+			.map((row) => [row.repositoryId, row.pullRequestId !== null]),
+	);
+
+test("unlinkFromWorkspace by owner/name removes only that repository's PR link", async () => {
+	const scenario = await multiRepoScenario();
+	await scenario.api.git.addRemote("github", "https://github.com/o/api.git");
+	const workspace = workspaceWithTwoLinkedPrs(scenario);
+
+	await scenario.host.trpc.pullRequests.unlinkFromWorkspace.mutate({
+		workspaceId: workspace.id,
+		repository: "O/Api",
+	});
+
+	expect(linkedPullRequests(scenario)).toEqual({
+		[scenario.webId]: true,
+		[scenario.apiId]: false,
+	});
+});
+
+test("unlinkFromWorkspace for a repository outside the workspace is NOT_FOUND and unlinks nothing", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = workspaceWithTwoLinkedPrs(scenario);
+
+	await expect(
+		scenario.host.trpc.pullRequests.unlinkFromWorkspace.mutate({
+			workspaceId: workspace.id,
+			repository: "someone/else",
+		}),
+	).rejects.toMatchObject({
+		data: { code: "NOT_FOUND" },
+		message: expect.stringContaining("repository_not_in_project"),
+	});
+	expect(linkedPullRequests(scenario)).toEqual({
+		[scenario.webId]: true,
+		[scenario.apiId]: true,
 	});
 });
 
