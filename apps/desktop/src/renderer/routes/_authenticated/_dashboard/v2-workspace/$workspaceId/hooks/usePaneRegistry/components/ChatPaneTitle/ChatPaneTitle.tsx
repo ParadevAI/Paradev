@@ -125,6 +125,7 @@ export function ChatPaneTitle({
 				)}
 				onClick={stopHeaderClick}
 			>
+				<span className="shrink-0 text-muted-foreground">{icon}</span>
 				<span className="truncate">{title}</span>
 				<ChevronDown className="size-3 shrink-0 opacity-60" />
 				<UsageWarningDot workspaceId={workspaceId} terminalId={chatKey} />
@@ -134,7 +135,6 @@ export function ChatPaneTitle({
 
 	return (
 		<>
-			<span className="shrink-0 text-muted-foreground">{icon}</span>
 			<ChatHistoryPicker
 				current={data}
 				workspaceId={workspaceId}
