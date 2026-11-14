@@ -41,6 +41,7 @@ interface CheckoutChangesContentParams extends ChangesContentParams {
 	repositoryId: string | undefined;
 	/** The checkout's folder; file paths are relative to it. */
 	worktreePath: string | undefined;
+	enabled?: boolean;
 }
 
 /** One checkout's Changes view. */
@@ -52,6 +53,7 @@ export function useChangesContent({
 	onSelectFile,
 	onOpenFile,
 	compact = false,
+	enabled = true,
 }: CheckoutChangesContentParams): {
 	content: ReactNode;
 	changedPathCount: number;
@@ -66,7 +68,7 @@ export function useChangesContent({
 		branches,
 		canRenameBranch,
 		renameBranch,
-	} = useChangesScope(workspaceId, repositoryId);
+	} = useChangesScope(workspaceId, repositoryId, { enabled });
 	const { preferences, setChangesViewMode: setViewMode } =
 		useV2UserPreferences();
 	const viewMode = preferences.changesViewMode;
@@ -76,6 +78,7 @@ export function useChangesContent({
 		workspaceId,
 		repositoryId,
 		ref,
+		enabled,
 	});
 
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
@@ -85,7 +88,6 @@ export function useChangesContent({
 	const targetsThisCheckout = isDiffTargetForCheckout({
 		targetRepositoryId: selectedDiffTarget?.repositoryId,
 		repositoryId,
-		isMultiRepo: false,
 	});
 	const selectedFilePath =
 		selectedDiffTarget && worktreePath && targetsThisCheckout

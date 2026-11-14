@@ -41,6 +41,7 @@ export function useChangesTab(
 		...params,
 		repositoryId: first?.repositoryId,
 		worktreePath: first?.path ?? folder,
+		enabled: !isMultiRepo,
 	});
 
 	const statuses = useCheckoutGitStatuses(

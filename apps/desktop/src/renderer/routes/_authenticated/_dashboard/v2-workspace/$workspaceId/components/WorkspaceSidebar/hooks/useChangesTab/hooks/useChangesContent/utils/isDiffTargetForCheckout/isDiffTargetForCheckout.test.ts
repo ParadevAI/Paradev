@@ -2,20 +2,18 @@ import { describe, expect, it } from "bun:test";
 import { isDiffTargetForCheckout } from "./isDiffTargetForCheckout";
 
 describe("isDiffTargetForCheckout", () => {
-	it("needs the exact repository with several checkouts", () => {
+	it("takes an untagged target or one in the same repository", () => {
 		expect(
 			isDiffTargetForCheckout({
 				targetRepositoryId: undefined,
 				repositoryId: "a",
-				isMultiRepo: true,
-			}),
-		).toBe(false);
-		expect(
-			isDiffTargetForCheckout({
-				targetRepositoryId: undefined,
-				repositoryId: "a",
-				isMultiRepo: false,
 			}),
 		).toBe(true);
+		expect(
+			isDiffTargetForCheckout({ targetRepositoryId: "a", repositoryId: "a" }),
+		).toBe(true);
+		expect(
+			isDiffTargetForCheckout({ targetRepositoryId: "b", repositoryId: "a" }),
+		).toBe(false);
 	});
 });

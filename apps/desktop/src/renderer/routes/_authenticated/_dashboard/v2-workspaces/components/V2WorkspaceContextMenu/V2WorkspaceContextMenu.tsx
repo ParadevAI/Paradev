@@ -26,6 +26,7 @@ import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
@@ -244,9 +245,11 @@ export function V2WorkspaceContextMenu({
 			});
 		} catch (error) {
 			toast.error(
-				errorMessage(
-					error,
-					t({ message: `Couldn't restore "${workspaceName}"` }),
+				hostRefusalReason(
+					errorMessage(
+						error,
+						t({ message: `Couldn't restore "${workspaceName}"` }),
+					),
 				),
 				{ id: toastId },
 			);

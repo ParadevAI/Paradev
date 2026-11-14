@@ -83,6 +83,7 @@ import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
 import { useRepositoryReviewThreads } from "./hooks/useRepositoryReviewThreads";
+import { useShowTargetRepository } from "./hooks/useShowTargetRepository";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
 	isDiffContentStale,
@@ -191,6 +192,13 @@ export function DiffPane({
 	);
 	const repositoryPicker = useChangesRepositoryPicker(workspaceId);
 	const shownRepositories = repositoryPicker.shown;
+	useShowTargetRepository({
+		workspaceId,
+		repositoryIds,
+		picker: repositoryPicker,
+		targetRepositoryId: isMultiRepo ? data.repositoryId : undefined,
+		targetTick: data.focusTick,
+	});
 	// One repository shown: the header scopes that checkout's diff.
 	const scopeRepositoryId =
 		isMultiRepo && shownRepositories.size === 1
@@ -231,6 +239,7 @@ export function DiffPane({
 		workspaceId,
 		repositoryId: primaryRepositoryId,
 		ref,
+		enabled: !isMultiRepo,
 	});
 	const changesetFiles = useMemo(
 		() =>
@@ -279,6 +288,7 @@ export function DiffPane({
 	const threadAnnotationsByPath = useDiffAnnotationsByPath({
 		workspaceId,
 		repositoryId: primaryRepositoryId,
+		enabled: !isMultiRepo,
 	});
 	const { target: linkedPullRequest } = useLinkedPullRequest(
 		workspaceId,

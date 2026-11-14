@@ -13,6 +13,7 @@ interface UseChangesetArgs {
 	ref: DiffRef;
 	/** Tags each file with repositoryId, for views that mix repositories. */
 	tagRepository?: boolean;
+	enabled?: boolean;
 }
 
 interface UseChangesetResult {
@@ -27,6 +28,7 @@ export function useChangeset({
 	repositoryId,
 	ref,
 	tagRepository = false,
+	enabled = true,
 }: UseChangesetArgs): UseChangesetResult {
 	const gitStatus = useCheckoutGitStatus(repositoryId);
 	const scope = checkoutInput(workspaceId, repositoryId);
@@ -40,7 +42,7 @@ export function useChangeset({
 				}
 			: { ...scope, commitHash: "" },
 		{
-			enabled: checkoutsLoaded && ref.kind === "commit",
+			enabled: enabled && checkoutsLoaded && ref.kind === "commit",
 			staleTime: Number.POSITIVE_INFINITY,
 		},
 	);

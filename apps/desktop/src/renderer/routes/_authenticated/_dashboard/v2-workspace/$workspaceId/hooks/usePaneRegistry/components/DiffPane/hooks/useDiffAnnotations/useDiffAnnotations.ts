@@ -46,6 +46,7 @@ export type DiffAnnotationMetadata =
 interface UseDiffAnnotationsByPathOptions {
 	workspaceId: string;
 	repositoryId: string | undefined;
+	enabled?: boolean;
 }
 
 const EMPTY_ANNOTATIONS_BY_PATH = new Map<
@@ -62,11 +63,12 @@ function parseTimestamp(value: string | undefined): number | undefined {
 export function useDiffAnnotationsByPath({
 	workspaceId,
 	repositoryId,
+	enabled = true,
 }: UseDiffAnnotationsByPathOptions): ReadonlyMap<
 	string,
 	DiffLineAnnotation<DiffAnnotationMetadata>[]
 > {
-	const showDiffComments = useSettings((s) => s.showDiffComments);
+	const showDiffComments = useSettings((s) => s.showDiffComments) && enabled;
 	const isTabVisible = useIsTabVisible();
 	const { query: prQuery, target } = useLinkedPullRequest(
 		workspaceId,

@@ -39,6 +39,7 @@ export interface ChangesScope {
 export function useChangesScope(
 	workspaceId: string,
 	repositoryId: string | undefined,
+	{ enabled = true }: { enabled?: boolean } = {},
 ): ChangesScope {
 	const { t } = useLingui();
 	const status = useCheckoutGitStatus(repositoryId);
@@ -49,20 +50,26 @@ export function useChangesScope(
 		() => checkoutInput(workspaceId, repositoryId),
 		[workspaceId, repositoryId],
 	);
-	const checkoutsLoaded = useAreCheckoutsLoaded(workspaceId);
+	const queriesEnabled = useAreCheckoutsLoaded(workspaceId) && enabled;
 
 	const baseBranchQuery = workspaceTrpc.git.getBaseBranch.useQuery(scope, {
-		enabled: checkoutsLoaded,
+		enabled: queriesEnabled,
 		staleTime: Number.POSITIVE_INFINITY,
 	});
 	const baseBranch = baseBranchQuery.data?.baseBranch ?? null;
 
 	const setBaseBranchMutation = workspaceTrpc.git.setBaseBranch.useMutation({
-		onSuccess: () => {
-			void utils.git.getBaseBranch.invalidate(scope);
-			void utils.git.getStatus.invalidate(scope);
-			void utils.git.listCommits.invalidate(scope);
-			void utils.git.getDiff.invalidate(scope);
+		// The variables, not `scope`: the hook can move to another repository
+		// while the mutation is in flight.
+		onSuccess: (_data, variables) => {
+			const changed = checkoutInput(
+				variables.workspaceId,
+				variables.repositoryId,
+			);
+			void utils.git.getBaseBranch.invalidate(changed);
+			void utils.git.getStatus.invalidate(changed);
+			void utils.git.listCommits.invalidate(changed);
+			void utils.git.getDiff.invalidate(changed);
 		},
 		// The picker re-renders from getBaseBranch, so a rejected change
 		// silently snaps back without this.
@@ -84,11 +91,11 @@ export function useChangesScope(
 
 	const commits = workspaceTrpc.git.listCommits.useQuery(
 		{ ...scope, baseBranch: baseBranch ?? undefined },
-		{ enabled: checkoutsLoaded, refetchOnWindowFocus: true },
+		{ enabled: queriesEnabled, refetchOnWindowFocus: true },
 	);
 
 	const branches = workspaceTrpc.git.listBranches.useQuery(scope, {
-		enabled: checkoutsLoaded,
+		enabled: queriesEnabled,
 		refetchInterval: 30_000,
 		refetchOnWindowFocus: true,
 	});

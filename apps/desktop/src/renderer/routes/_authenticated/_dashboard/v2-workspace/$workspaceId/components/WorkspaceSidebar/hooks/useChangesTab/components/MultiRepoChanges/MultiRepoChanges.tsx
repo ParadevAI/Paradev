@@ -3,6 +3,7 @@ import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useChangesRepositoryPicker } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangesRepositoryPicker";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRepositoryChangesets } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRepositoryChangesets";
+import { useCheckoutGitStatuses } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
 import {
 	useWorkspaceFolder,
 	type WorkspaceCheckout,
@@ -13,6 +14,9 @@ import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import type { ChangesContentParams } from "../../hooks/useChangesContent";
 import type { RepositoryRoot } from "../ChangesFileList/utils/repositoryTree";
 import { ChangesTabContent } from "../ChangesTabContent";
+import { everyStatusFailed } from "./utils/everyStatusFailed";
+
+const FAILED_STATUS = { data: undefined, isLoading: false };
 
 interface MultiRepoChangesProps extends ChangesContentParams {
 	checkouts: WorkspaceCheckout[];
@@ -47,6 +51,7 @@ export function MultiRepoChanges({
 		[repositories],
 	);
 	const changesets = useRepositoryChangesets(workspaceId, repositoryIds);
+	const statuses = useCheckoutGitStatuses(repositoryIds);
 	const onlyFilter = useChangesFilter(workspaceId, repositoryIds[0]);
 	const scopeLabel = changesFilterLabel(
 		repositoryIds.length === 1 ? onlyFilter : { kind: picker.scopeKind },
@@ -68,6 +73,7 @@ export function MultiRepoChanges({
 			<ChangesTabContent
 				workspaceId={workspaceId}
 				repositoryId={undefined}
+				status={everyStatusFailed(statuses) ? FAILED_STATUS : undefined}
 				scope={
 					<span className="truncate px-1.5 text-muted-foreground">
 						{scopeLabel}
