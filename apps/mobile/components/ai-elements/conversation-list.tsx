@@ -15,10 +15,13 @@ export const ConversationList: ConversationListComponent = ({
 	onScroll,
 	onScrollBeginDrag,
 	onScrollEndDrag,
+	onTouchStart,
+	onContentSizeChange,
 	...listProps
 }) => {
 	const listRef = useRef<LegendListRef>(null);
 	const [isDragging, setIsDragging] = useState(false);
+	const touched = useRef(false);
 	useImperativeHandle(ref, () => ({
 		scrollToEnd: (options) => listRef.current?.scrollToEnd(options),
 	}));
@@ -41,6 +44,25 @@ export const ConversationList: ConversationListComponent = ({
 			onScrollBeginDrag?.(event);
 		},
 		[onScrollBeginDrag],
+	);
+
+	const handleTouchStart = useCallback<NonNullable<typeof onTouchStart>>(
+		(event) => {
+			touched.current = true;
+			onTouchStart?.(event);
+		},
+		[onTouchStart],
+	);
+
+	// Rows mount at estimated heights and grow as their markdown measures,
+	// which maintainScrollAtEnd does not follow, so a thread that loads after
+	// mount opened at its top. Follow that growth until the reader touches.
+	const handleContentSizeChange = useCallback(
+		(width: number, height: number) => {
+			if (!touched.current) listRef.current?.scrollToEnd({ animated: false });
+			onContentSizeChange?.(width, height);
+		},
+		[onContentSizeChange],
 	);
 
 	const handleScrollEndDrag = useCallback(
@@ -72,6 +94,8 @@ export const ConversationList: ConversationListComponent = ({
 			onScroll={handleScroll}
 			onScrollBeginDrag={handleScrollBeginDrag}
 			onScrollEndDrag={handleScrollEndDrag}
+			onTouchStart={handleTouchStart}
+			onContentSizeChange={handleContentSizeChange}
 			ref={listRef}
 		/>
 	);
