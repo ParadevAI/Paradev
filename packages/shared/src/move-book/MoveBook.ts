@@ -3,6 +3,7 @@ import {
 	CHAT_MOVE_IN_FLIGHT,
 	type ChatMove,
 	type ChatMoveStatus,
+	CLAIM_LEASE_MS,
 	MOVE_STOPPED_ANSWERING,
 	type MoveBookOp,
 	type MoveBookRefusal,
@@ -49,6 +50,7 @@ type ChatMoveRow = {
 	harness_session_id: string;
 	status: string;
 	error: string | null;
+	attempt: string | null;
 	created_at: number;
 	updated_at: number;
 	finished_at: number | null;
@@ -172,16 +174,8 @@ export class MoveBook {
 						);
 				return reply("chatMoving", { moving: !!row });
 			}
-			case "claim": {
-				const [row] = this.rows<ChatMoveRow>(
-					`UPDATE chat_moves SET status = 'copying', updated_at = ?
-					WHERE id = ? AND status = 'pending' RETURNING *`,
-					now,
-					request.id,
-				);
-				if (row) this.settle(row.workspace_move_id, now);
-				return reply("claim", { move: row ? this.toChatMove(row) : null });
-			}
+			case "claim":
+				return reply("claim", { move: this.claim(request, now) });
 			case "touchWorkspaceMove": {
 				const [row] = this.rows<{ id: string }>(
 					`UPDATE workspace_moves SET updated_at = ?
@@ -210,10 +204,13 @@ export class MoveBook {
 			case "finish": {
 				const [row] = this.rows<{ workspace_move_id: string }>(
 					`UPDATE chat_moves SET status = 'ready', finished_at = ?, updated_at = ?
-					WHERE id = ? AND status IN ('copying', 'restoring') RETURNING workspace_move_id`,
+					WHERE id = ? AND status IN ('copying', 'restoring') AND (? IS NULL OR attempt = ?)
+					RETURNING workspace_move_id`,
 					now,
 					now,
 					request.id,
+					request.attempt ?? null,
+					request.attempt ?? null,
 				);
 				if (row) this.settle(row.workspace_move_id, now);
 				return reply("finish", { finished: !!row });
@@ -232,6 +229,47 @@ export class MoveBook {
 				);
 				if (row) this.settle(row.workspace_move_id, now);
 				return reply("fail", {});
+			}
+			case "failAttempt": {
+				const [row] = this.rows<{ workspace_move_id: string }>(
+					`UPDATE chat_moves SET status = 'failed', error = ?, finished_at = ?, updated_at = ?
+					WHERE id = ? AND attempt = ? AND status IN ${CHAT_IN_FLIGHT_SQL} RETURNING workspace_move_id`,
+					request.error,
+					now,
+					now,
+					request.id,
+					request.attempt,
+				);
+				if (row) this.settle(row.workspace_move_id, now);
+				return reply("failAttempt", { failed: !!row });
+			}
+			case "switching": {
+				const [row] = this.rows<{ workspace_move_id: string }>(
+					`UPDATE chat_moves SET status = 'restoring', updated_at = ?
+					WHERE id = ? AND status IN ('copying', 'restoring') AND (? IS NULL OR attempt = ?)
+					RETURNING workspace_move_id`,
+					now,
+					request.id,
+					request.attempt ?? null,
+					request.attempt ?? null,
+				);
+				if (row) this.settle(row.workspace_move_id, now);
+				return reply("switching", { switching: !!row });
+			}
+			case "reconcile": {
+				const [row] = this.rows<{ workspace_move_id: string }>(
+					`UPDATE chat_moves SET status = 'ready', error = NULL, finished_at = ?, updated_at = ?
+					WHERE id = ? AND status = 'failed' AND NOT EXISTS (
+						SELECT 1 FROM chat_moves later WHERE later.session_id = chat_moves.session_id
+						AND (later.created_at > chat_moves.created_at
+							OR (later.created_at = chat_moves.created_at AND later.rowid > chat_moves.rowid))
+					) RETURNING workspace_move_id`,
+					now,
+					now,
+					request.id,
+				);
+				if (row) this.settle(row.workspace_move_id, now);
+				return reply("reconcile", { ready: !!row });
 			}
 			case "pendingInto":
 				return reply("pendingInto", {
@@ -338,6 +376,33 @@ export class MoveBook {
 		return request.chats.map((chat) =>
 			this.insertChatMove(parent.id, chat, now),
 		);
+	}
+
+	/**
+	 * Starts a waiting copy, or hands a copy back to the attempt that holds
+	 * it when its answer was lost. Another attempt takes over a copy only
+	 * once it went quiet for longer than any step takes.
+	 */
+	private claim(
+		request: Extract<MoveBookRequest, { op: "claim" }>,
+		now: number,
+	): ChatMove | null {
+		const attempt = request.attempt ?? null;
+		const [row] = this.rows<ChatMoveRow>(
+			`UPDATE chat_moves SET status = 'copying', attempt = ?, updated_at = ?
+			WHERE id = ? AND (status = 'pending'
+				OR (? IS NOT NULL AND status = 'copying' AND (attempt = ? OR updated_at < ?)))
+			RETURNING *`,
+			attempt,
+			now,
+			request.id,
+			attempt,
+			attempt,
+			now - CLAIM_LEASE_MS,
+		);
+		if (!row) return null;
+		this.settle(row.workspace_move_id, now);
+		return this.toChatMove(row);
 	}
 
 	/**
@@ -697,6 +762,12 @@ export class MoveBook {
 				finished_at INTEGER
 			)`,
 		);
+		const columns = this.rows<{ name: string }>(
+			"PRAGMA table_info(chat_moves)",
+		);
+		if (!columns.some((column) => column.name === "attempt")) {
+			this.sql.exec("ALTER TABLE chat_moves ADD COLUMN attempt TEXT");
+		}
 		this.sql.exec(
 			"CREATE INDEX IF NOT EXISTS chat_moves_session_idx ON chat_moves (session_id, created_at)",
 		);

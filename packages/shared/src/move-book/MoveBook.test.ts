@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import type { SqlLike } from "../page-storage-records";
 import { MoveBook } from "./MoveBook";
 import {
+	CLAIM_LEASE_MS,
 	type MoveBookOp,
 	type MoveBookReplyFor,
 	type MoveBookRequest,
@@ -10,8 +11,7 @@ import {
 	STALE_MOVE_MS,
 } from "./protocol";
 
-function newBook() {
-	const db = new Database(":memory:");
+function newBook(db = new Database(":memory:")) {
 	const sql: SqlLike = {
 		exec(query, ...bindings) {
 			const rows = db.query(query).all(...(bindings as never[]));
@@ -149,6 +149,111 @@ describe("MoveBook", () => {
 		expect(ok({ op: "workspaceMove", id: first.id }).move?.status).toBe(
 			"failed",
 		);
+	});
+
+	it("lets only the attempt that holds a copy finish or fail it, and hands a quiet copy over", () => {
+		const { clock, ok } = newBook();
+		const parent = begin(ok);
+		const [move] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		const id = move?.id as string;
+		expect(
+			ok({ op: "failAttempt", id, attempt: "first", error: "lost" }).failed,
+		).toBe(false);
+		expect(ok({ op: "chatMove", id }).move?.status).toBe("pending");
+
+		expect(ok({ op: "claim", id, attempt: "first" }).move?.id).toBe(id);
+		expect(ok({ op: "claim", id, attempt: "first" }).move?.id).toBe(id);
+		expect(ok({ op: "claim", id, attempt: "second" }).move).toBeNull();
+		expect(ok({ op: "claim", id }).move).toBeNull();
+
+		clock.now += CLAIM_LEASE_MS + 1;
+		expect(ok({ op: "claim", id, attempt: "second" }).move?.id).toBe(id);
+		expect(ok({ op: "finish", id, attempt: "first" }).finished).toBe(false);
+		expect(
+			ok({ op: "failAttempt", id, attempt: "first", error: "late" }).failed,
+		).toBe(false);
+		expect(ok({ op: "finish", id, attempt: "second" }).finished).toBe(true);
+		expect(ok({ op: "workspaceMove", id: parent.id }).move?.status).toBe(
+			"ready",
+		);
+	});
+
+	it("records a switched chat as ready even after the sweep failed its quiet move", () => {
+		const { clock, ok } = newBook();
+		const parent = begin(ok);
+		const [move] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		const id = move?.id as string;
+		ok({ op: "claim", id, attempt: "first" });
+		expect(ok({ op: "switching", id, attempt: "other" }).switching).toBe(false);
+		expect(ok({ op: "switching", id, attempt: "first" }).switching).toBe(true);
+		expect(ok({ op: "chatMove", id }).move?.status).toBe("restoring");
+
+		clock.now += STALE_MOVE_MS + 1;
+		expect(ok({ op: "chatMove", id }).move?.status).toBe("failed");
+		expect(ok({ op: "reconcile", id }).ready).toBe(true);
+		expect(ok({ op: "chatMove", id }).move).toMatchObject({
+			status: "ready",
+			error: null,
+		});
+		expect(ok({ op: "workspaceMove", id: parent.id }).move?.status).toBe(
+			"ready",
+		);
+	});
+
+	it("reconciles only the chat's newest move", () => {
+		const { ok } = newBook();
+		const first = begin(ok);
+		const [old] = ok({
+			op: "attach",
+			workspaceMoveId: first.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		ok({ op: "fail", id: old?.id as string, error: "no bundle" });
+		const retried = ok({
+			op: "retry",
+			workspaceMoveId: first.id,
+			chat: chat("a"),
+		}).move;
+		ok({ op: "fail", id: retried.id, error: "no bundle" });
+		expect(ok({ op: "reconcile", id: old?.id as string }).ready).toBe(false);
+		expect(ok({ op: "reconcile", id: retried.id }).ready).toBe(true);
+	});
+
+	it("adds the attempt column to a book written before it existed", () => {
+		const db = new Database(":memory:");
+		db.run(`CREATE TABLE chat_moves (
+			id TEXT PRIMARY KEY, workspace_move_id TEXT NOT NULL, session_id TEXT NOT NULL,
+			created_by TEXT NOT NULL, from_workspace_id TEXT, from_host_id TEXT,
+			to_workspace_id TEXT NOT NULL, to_host_id TEXT, source_turn_seq INTEGER,
+			transcript_id TEXT NOT NULL, harness_session_id TEXT NOT NULL, status TEXT NOT NULL,
+			error TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, finished_at INTEGER
+		)`);
+		const { ok } = newBook(db);
+		const parent = begin(ok);
+		const [move] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		expect(
+			ok({ op: "claim", id: move?.id as string, attempt: "first" }).move,
+		).not.toBeNull();
 	});
 
 	it("settles a workspace move from the newest attempt of each chat", () => {

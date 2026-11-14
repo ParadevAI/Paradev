@@ -25,6 +25,12 @@ export const WORKSPACE_MOVE_IN_FLIGHT = ["pending", "moving"] as const;
 /** Longer than a move job may run, so a move this quiet has stopped. */
 export const STALE_MOVE_MS = 6 * 60 * 1000;
 
+/**
+ * Longer than the quietest step of a copy (an import, up to 150 s), so a
+ * copy this quiet lost its runner and another attempt may take it over.
+ */
+export const CLAIM_LEASE_MS = 3 * 60 * 1000;
+
 export const MOVE_STOPPED_ANSWERING = "The move stopped answering";
 
 /**
@@ -133,16 +139,44 @@ export type MoveBookRequest =
 			/** Only a move into this workspace that changed state recently. */
 			freshInto?: string;
 	  }
-	| { op: "claim"; id: string }
+	| {
+			op: "claim";
+			id: string;
+			/** Names this run's attempt; the same attempt may claim again, another only once the copy went quiet. */
+			attempt?: string;
+	  }
 	| { op: "touchWorkspaceMove"; id: string }
 	| { op: "touchChatMove"; id: string }
-	| { op: "finish"; id: string }
+	| {
+			op: "finish";
+			id: string;
+			/** Finishes only the copy this attempt holds. */
+			attempt?: string;
+	  }
 	| {
 			op: "fail";
 			id: string;
 			error: string;
 			/** Also fails a `ready` move, whose chat could not be switched after all. */
 			evenIfReady?: boolean;
+	  }
+	| {
+			/** Fails only the copy this attempt holds; a claim that never landed is left to be claimed. */
+			op: "failAttempt";
+			id: string;
+			attempt: string;
+			error: string;
+	  }
+	| {
+			/** Marks the copy this attempt holds as switching its chat, just before the switch. */
+			op: "switching";
+			id: string;
+			attempt?: string;
+	  }
+	| {
+			/** Records as ready a failed move whose chat did switch, when it is the chat's newest move. */
+			op: "reconcile";
+			id: string;
 	  }
 	| { op: "pendingInto"; toWorkspaceId: string }
 	| { op: "finishInto"; toWorkspaceId: string }
@@ -166,6 +200,9 @@ type Replies = {
 	touchChatMove: { alive: boolean };
 	finish: { finished: boolean };
 	fail: Record<never, never>;
+	failAttempt: { failed: boolean };
+	switching: { switching: boolean };
+	reconcile: { ready: boolean };
 	pendingInto: { ids: string[] };
 	waitingOnHost: { ids: string[] };
 	finishInto: Record<never, never>;

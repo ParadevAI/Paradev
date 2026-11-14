@@ -7,7 +7,8 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
  * cannot reach: the chat's history and session files go into that
  * computer's host, the control plane switches the chat there, then its agent
  * starts. Any failure is reported, so the move shows as failed and the chat
- * stays where it was. A move another run already claimed is left to it.
+ * stays where it was. A move another run already claimed is left to it,
+ * here or in another window.
  */
 export function runMoveOnComputer(args: {
 	moveId: string;
@@ -30,17 +31,18 @@ async function carryOut({
 	moveId: string;
 	host: HostServiceClient;
 }): Promise<void> {
+	const attemptId = crypto.randomUUID();
 	let started: {
 		workspaceId: string;
 		chatSessionId: string;
 		harnessSessionId: string;
 	};
 	const claimed = await cloudTrpcClient.chatMove.claim
-		.mutate({ moveId })
+		.mutate({ moveId, attemptId })
 		.catch(async (error: unknown) => {
 			// Another run, or an earlier one, already took it.
 			if (isClaimed(error)) return null;
-			await recordFailure(moveId, error);
+			await recordFailure(moveId, attemptId, error);
 			throw error;
 		});
 	if (!claimed) return;
@@ -57,14 +59,14 @@ async function carryOut({
 			afterSeq = page.nextAfterSeq;
 		}
 		await host.teleport.importChat.mutate({ ...claimed, events });
-		await cloudTrpcClient.chatMove.complete.mutate({ moveId });
+		await cloudTrpcClient.chatMove.complete.mutate({ moveId, attemptId });
 		started = {
 			workspaceId: claimed.workspaceId,
 			chatSessionId: claimed.chatSessionId,
 			harnessSessionId: claimed.session.harnessSessionId,
 		};
 	} catch (error) {
-		await recordFailure(moveId, error);
+		await recordFailure(moveId, attemptId, error);
 		throw error;
 	}
 	// The chat already moved; one whose agent did not start resumes when opened.
@@ -73,10 +75,15 @@ async function carryOut({
 	});
 }
 
-async function recordFailure(moveId: string, error: unknown): Promise<void> {
+async function recordFailure(
+	moveId: string,
+	attemptId: string,
+	error: unknown,
+): Promise<void> {
 	await cloudTrpcClient.chatMove.fail
 		.mutate({
 			moveId,
+			attemptId,
 			error:
 				rawErrorMessage(error).slice(0, 2000) ||
 				"The move to the computer failed",
