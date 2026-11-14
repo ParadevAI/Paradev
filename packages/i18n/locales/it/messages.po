@@ -2802,6 +2802,9 @@ msgstr "Hai già un account? <0>Accedi</0>"
 msgid "Already in tasks"
 msgstr "Già nei task"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Già configurato in {existingPath}. Collegare invece a {repoPath}?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Disponibile anche come CommandDialog per le palette ⌘K"
 
@@ -4531,6 +4534,9 @@ msgstr "Scegli un combattente"
 msgid "Choose a folder"
 msgstr "Scegli una cartella"
 
+msgid "Choose a folder to clone into"
+msgstr "Scegli una cartella in cui clonare"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Scegli un progetto in Issue GitHub prima di aprire una issue."
 
@@ -4572,6 +4578,9 @@ msgstr "Scegli il modello"
 
 msgid "Choose the primary repository"
 msgstr "Scegli il repository principale"
+
+msgid "Choose the repository folder"
+msgstr "Scegli la cartella del repository"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Scegli cosa cancellare dal browser interno."
@@ -4757,8 +4766,17 @@ msgstr "Clona un repository"
 msgid "Clone a repository"
 msgstr "Clona un repository"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Clona ogni repository oppure usa una cartella già presente sull'host."
+
 msgid "Clone from URL"
 msgstr "Clona da URL"
+
+msgid "Clone into"
+msgstr "Clona in"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Clona in una cartella su {hostName}"
 
 msgid "clone the repository"
 msgstr "clonare il repository"
@@ -10435,6 +10453,9 @@ msgstr "Importa ogni script del terminale v1 in v2."
 msgid "Import existing folder"
 msgstr "Importa una cartella esistente"
 
+msgid "Import failed"
+msgstr "Importazione non riuscita"
+
 msgid "Import failed: {message}"
 msgstr "Importazione non riuscita: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Collega un task"
 msgid "Link this task"
 msgstr "Collega questa attività"
 
+msgid "Link to {repoPath}?"
+msgstr "Collegare a {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} collegato al workspace"
 
@@ -12528,6 +12552,14 @@ msgstr "Spostamento di questo workspace…"
 msgid "Multi-select"
 msgstr "Selezione multipla"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Più progetti usano questo repository ({0}). Scegli il progetto nelle impostazioni per configurarlo su questo dispositivo."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Più progetti usano questo repository ({0}). Apri dalle impostazioni il progetto che vuoi per configurarlo su questo dispositivo."
+
 msgid "Mute"
 msgstr "Disattiva microfono"
 
@@ -13387,6 +13419,9 @@ msgstr "Nessuna pull request trovata."
 
 msgid "No release notes at {url}"
 msgstr "Nessuna nota di rilascio su {url}"
+
+msgid "No remote"
+msgstr "Nessun remote"
 
 msgid "No remote repository"
 msgstr "Nessun repository remoto"
@@ -14427,6 +14462,9 @@ msgstr "Apri l'anteprima"
 msgid "Open Project"
 msgstr "Apri progetto"
 
+msgid "Open Projects"
+msgstr "Apri Progetti"
+
 msgid "Open pull request"
 msgstr "Apri la pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Scegli un altro elemento"
 msgid "Pick a different element (esc)"
 msgstr "Scegli un altro elemento (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Scegli una cartella per {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Scegli una cartella sul disco e aggiungila come progetto"
+
+msgid "Pick a folder…"
+msgstr "Scegli una cartella…"
 
 msgid "Pick a machine size"
 msgstr "Scegli una dimensione della macchina"
@@ -15784,6 +15828,9 @@ msgstr "Progetto pronto. Aprilo dalla barra laterale."
 
 msgid "Project relocated to {newPath}"
 msgstr "Progetto spostato in {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Progetto configurato su {hostName}"
 
 msgid "Project Settings"
 msgstr "Impostazioni del progetto"
@@ -18065,6 +18112,9 @@ msgstr "Seleziona {0}"
 msgid "Select a file to view it here"
 msgstr "Seleziona un file per visualizzarlo qui"
 
+msgid "Select a folder to clone into"
+msgstr "Seleziona una cartella in cui clonare"
+
 msgid "Select a project"
 msgstr "Seleziona un progetto"
 
@@ -18193,6 +18243,9 @@ msgstr "Seleziona i team"
 
 msgid "Select terminal script directory"
 msgstr "Seleziona la directory dello script del terminale"
+
+msgid "Select the repository folder"
+msgstr "Seleziona la cartella del repository"
 
 msgid "Select worktree location"
 msgstr "Seleziona la posizione dei worktree"
@@ -18410,8 +18463,14 @@ msgstr "Configura un’automazione"
 msgid "Set up Environment"
 msgstr "Configura ambiente"
 
+msgid "Set up on {hostName}"
+msgstr "Configura su {hostName}"
+
 msgid "Set up once"
 msgstr "Configura una volta"
+
+msgid "Set up project on {hostName}"
+msgstr "Configura il progetto su {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Configura questo progetto per Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Usa “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Usa un percorso relativo al workspace o una cartella assoluta."
 
+msgid "Use an existing folder"
+msgstr "Usa una cartella esistente"
+
 msgid "Use another port"
 msgstr "Usa un'altra porta"
 
@@ -22800,6 +22862,10 @@ msgstr "Quando restano meno di {topupThreshold} GB-ore, aggiungi {topupPrice} ({
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Se disattivato, nient'altro può accedere ai file e agli strumenti di questo dispositivo. Puoi comunque connetterti a sandbox remote da qui. <0>Scopri di più<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Da dove viene {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Dove si aprono i badge delle porte rilevate nella barra laterale quando li clicchi."

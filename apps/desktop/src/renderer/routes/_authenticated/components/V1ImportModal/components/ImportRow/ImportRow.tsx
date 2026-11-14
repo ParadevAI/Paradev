@@ -29,6 +29,15 @@ export type RowAction =
 			candidates: ReadonlyArray<PickCandidate>;
 			onPick: (id: string) => void;
 			disabled?: boolean;
+	  }
+	| {
+			kind: "confirm";
+			message: string;
+			confirmLabel: string;
+			cancelLabel?: string;
+			onConfirm: () => void;
+			onCancel: () => void;
+			disabled?: boolean;
 	  };
 
 interface ImportRowProps {
@@ -80,6 +89,11 @@ export function ImportRow({
 						title={action.reason}
 					>
 						{action.reason}
+					</span>
+				)}
+				{action.kind === "confirm" && (
+					<span className="mt-0.5 select-text cursor-text text-[11px] leading-4 text-muted-foreground [overflow-wrap:anywhere]">
+						{action.message}
 					</span>
 				)}
 			</div>
@@ -148,6 +162,31 @@ function RowActionView({ action }: { action: RowAction }) {
 					<LuTriangle className="size-3 text-destructive" strokeWidth={2.5} />
 					Retry
 				</Button>
+			);
+		case "confirm":
+			return (
+				<div className="flex shrink-0 items-center gap-1.5">
+					<Button
+						type="button"
+						size="sm"
+						variant="ghost"
+						onClick={action.onCancel}
+						disabled={action.disabled}
+						className="h-7 px-2.5 text-[12px] font-medium"
+					>
+						{action.cancelLabel ?? "Cancel"}
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="default"
+						onClick={action.onConfirm}
+						disabled={action.disabled}
+						className="h-7 px-2.5 text-[12px] font-medium"
+					>
+						{action.confirmLabel}
+					</Button>
+				</div>
 			);
 		case "pick":
 			return (

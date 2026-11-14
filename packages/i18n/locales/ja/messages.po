@@ -2802,6 +2802,9 @@ msgstr "すでにアカウントをお持ちですか?<0>サインイン</0>"
 msgid "Already in tasks"
 msgstr "すでにタスクにあります"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "{existingPath} で設定済みです。代わりに {repoPath} にリンクしますか?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "⌘Kパレット向けにCommandDialogとしても利用できます"
 
@@ -4531,6 +4534,9 @@ msgstr "ファイターを選ぶ"
 msgid "Choose a folder"
 msgstr "フォルダを選択"
 
+msgid "Choose a folder to clone into"
+msgstr "クローン先のフォルダを選択"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "issueを開く前に、GitHub issueでプロジェクトを選択してください。"
 
@@ -4572,6 +4578,9 @@ msgstr "モデルを選択"
 
 msgid "Choose the primary repository"
 msgstr "メインのリポジトリを選択"
+
+msgid "Choose the repository folder"
+msgstr "リポジトリのフォルダを選択"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "アプリ内ブラウザから消去する項目を選択してください。"
@@ -4757,8 +4766,17 @@ msgstr "リポジトリをクローン"
 msgid "Clone a repository"
 msgstr "リポジトリをクローン"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "各リポジトリをクローンするか、ホストにすでにあるフォルダを使います。"
+
 msgid "Clone from URL"
 msgstr "URLからクローン"
+
+msgid "Clone into"
+msgstr "クローン先"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "{hostName} のフォルダにクローン"
 
 msgid "clone the repository"
 msgstr "リポジトリをクローンする"
@@ -10435,6 +10453,9 @@ msgstr "各v1ターミナルスクリプトをv2にインポートします。"
 msgid "Import existing folder"
 msgstr "既存のフォルダをインポート"
 
+msgid "Import failed"
+msgstr "インポートに失敗しました"
+
 msgid "Import failed: {message}"
 msgstr "インポートに失敗しました: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "タスクをリンク"
 msgid "Link this task"
 msgstr "このタスクをリンク"
 
+msgid "Link to {repoPath}?"
+msgstr "{repoPath} にリンクしますか?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug}をワークスペースにリンクしました"
 
@@ -12528,6 +12552,14 @@ msgstr "このワークスペースを移動しています…"
 msgid "Multi-select"
 msgstr "複数選択"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "複数のプロジェクトがこのリポジトリ({0})を使用しています。このデバイスでセットアップするプロジェクトを設定で選んでください。"
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "複数のプロジェクトがこのリポジトリ({0})を使用しています。このデバイスでセットアップするには、設定から目的のプロジェクトを開いてください。"
+
 msgid "Mute"
 msgstr "ミュート"
 
@@ -13387,6 +13419,9 @@ msgstr "プルリクエストが見つかりません。"
 
 msgid "No release notes at {url}"
 msgstr "{url} にリリースノートがありません"
+
+msgid "No remote"
+msgstr "リモートなし"
 
 msgid "No remote repository"
 msgstr "リモートリポジトリなし"
@@ -14427,6 +14462,9 @@ msgstr "プレビューを開く"
 msgid "Open Project"
 msgstr "プロジェクトを開く"
 
+msgid "Open Projects"
+msgstr "プロジェクトを開く"
+
 msgid "Open pull request"
 msgstr "プルリクエストを開く"
 
@@ -15255,8 +15293,14 @@ msgstr "別の要素を選ぶ"
 msgid "Pick a different element (esc)"
 msgstr "別の要素を選ぶ (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "{names} のフォルダを選択"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "ディスク上のフォルダを選んでプロジェクトとして追加する"
+
+msgid "Pick a folder…"
+msgstr "フォルダを選択…"
 
 msgid "Pick a machine size"
 msgstr "マシンサイズを選ぶ"
@@ -15784,6 +15828,9 @@ msgstr "プロジェクトの準備ができました。サイドバーから開
 
 msgid "Project relocated to {newPath}"
 msgstr "プロジェクトを{newPath}に移動しました"
+
+msgid "Project set up on {hostName}"
+msgstr "{hostName} にプロジェクトを設定しました"
 
 msgid "Project Settings"
 msgstr "プロジェクト設定"
@@ -18065,6 +18112,9 @@ msgstr "{0} を選択"
 msgid "Select a file to view it here"
 msgstr "ファイルを選択するとここに表示されます"
 
+msgid "Select a folder to clone into"
+msgstr "クローン先のフォルダを選択してください"
+
 msgid "Select a project"
 msgstr "プロジェクトを選択してください"
 
@@ -18193,6 +18243,9 @@ msgstr "チームを選択"
 
 msgid "Select terminal script directory"
 msgstr "ターミナルスクリプトのディレクトリを選択"
+
+msgid "Select the repository folder"
+msgstr "リポジトリのフォルダを選択してください"
 
 msgid "Select worktree location"
 msgstr "ワークツリーの場所を選択"
@@ -18410,8 +18463,14 @@ msgstr "自動化を設定する"
 msgid "Set up Environment"
 msgstr "環境をセットアップ"
 
+msgid "Set up on {hostName}"
+msgstr "{hostName} に設定"
+
 msgid "Set up once"
 msgstr "一度設定するだけ"
+
+msgid "Set up project on {hostName}"
+msgstr "{hostName} にプロジェクトを設定"
 
 msgid "Set up this project for Paradev"
 msgstr "このプロジェクトをParadev向けにセットアップ"
@@ -22155,6 +22214,9 @@ msgstr "「{0}」を使用"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "ワークスペースからの相対パスか絶対パスのフォルダを指定します。"
 
+msgid "Use an existing folder"
+msgstr "既存のフォルダを使う"
+
 msgid "Use another port"
 msgstr "別のポートを使用"
 
@@ -22800,6 +22862,10 @@ msgstr "残りが {topupThreshold} GB 時間を下回ると、{topupPrice} を�
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "オフにすると、このデバイスのファイルやツールに外部からアクセスできなくなります。ここからリモートサンドボックスへの接続は引き続き可能です。<0>詳細<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "{0} の取得元"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "サイドバーの検出ポートバッジをクリックしたときの開き方。"

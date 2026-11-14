@@ -26,6 +26,7 @@ import { NamingInstructionsSection } from "../NamingInstructionsSection";
 import { ProjectLocationSection } from "../ProjectLocationSection";
 import { RepositoriesSection } from "../RepositoriesSection";
 import { RepositorySection } from "../RepositorySection";
+import { SetUpProjectSection } from "../SetUpProjectSection";
 import { SparseCheckoutSection } from "../SparseCheckoutSection";
 import { WorktreeLocationSection } from "../WorktreeLocationSection";
 
@@ -272,7 +273,19 @@ export function V2ProjectSettingsBody({
 								message: "Location",
 							})}
 						>
-							{renderLocation(hostProject ? (primary ?? null) : null)}
+							{hostProject === null ? (
+								<SetUpProjectSection
+									key={`${projectId}:${targetHostId}`}
+									projectId={projectId}
+									project={project}
+									hostUrl={targetHostUrl}
+									hostName={targetHostName}
+									isRemoteTarget={isRemoteTarget}
+									onChanged={() => onHostProjectChanged()}
+								/>
+							) : (
+								renderLocation(hostProject ? (primary ?? null) : null)
+							)}
 						</SettingsRow>
 					)}
 					<SettingsRow

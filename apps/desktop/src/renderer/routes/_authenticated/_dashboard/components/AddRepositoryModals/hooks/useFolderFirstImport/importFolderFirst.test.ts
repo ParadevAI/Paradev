@@ -3,6 +3,7 @@ import {
 	type FolderImportClient,
 	type ImportFolderFirstDeps,
 	importFolderFirst,
+	type MatchingProject,
 } from "./importFolderFirst";
 
 const hostUrl = "http://host-service";
@@ -14,7 +15,7 @@ const cloudError = {
 
 const findByPathMock = mock(
 	async (): Promise<{
-		candidates: { id: string; name: string; repositoryId?: string }[];
+		candidates: MatchingProject[];
 		cloudErrors: (typeof cloudError)[];
 		needsGitInit?: boolean;
 	}> => ({
@@ -26,6 +27,10 @@ const createMock = mock(async () => ({
 	id: "created-project",
 	primaryRepositoryId: "repository",
 	repositories: [{ id: "repository", path: repoPath }],
+	created: true,
+}));
+const setupMock = mock(async (input: { projectId: string }) => ({
+	id: input.projectId,
 	created: true,
 }));
 const finalizeSetupMock = mock(() => undefined);
@@ -42,6 +47,7 @@ function startImport(overrides: Partial<ImportFolderFirstDeps> = {}) {
 				project: {
 					findByPath: { query: findByPathMock },
 					create: { mutate: createMock },
+					setup: { mutate: setupMock },
 				},
 			} as unknown as FolderImportClient;
 		},
@@ -51,6 +57,7 @@ function startImport(overrides: Partial<ImportFolderFirstDeps> = {}) {
 			hostUnavailable: () => "host unavailable",
 			cloudUnreachable: (first) =>
 				`Couldn't reach cloud for ${first.url}: ${first.message}`,
+			multipleProjects: (candidates) => `multiple: ${candidates.length}`,
 		},
 		...overrides,
 	});
@@ -139,7 +146,15 @@ describe("importFolderFirst with a known folder", () => {
 		createMock.mockClear();
 		finalizeSetupMock.mockClear();
 		findByPathMock.mockResolvedValue({
-			candidates: [{ id: "existing", name: "octocat", repositoryId: "repo-1" }],
+			candidates: [
+				{
+					id: "existing",
+					name: "octocat",
+					repositoryId: "repo-1",
+					repoCloneUrl: null,
+					source: "local-path",
+				},
+			],
 			cloudErrors: [],
 		});
 
@@ -170,5 +185,58 @@ describe("importFolderFirst with a known folder", () => {
 			projectId: "created-project",
 			repositoryId: "repository",
 		});
+	});
+});
+
+describe("importFolderFirst with a legacy cloud project", () => {
+	const legacy: MatchingProject = {
+		id: "legacy",
+		name: "Hello",
+		repositoryId: "legacy",
+		repoCloneUrl: "https://github.com/octocat/hello",
+		source: "remote",
+	};
+
+	it("sets the one matching project up on this host with the folder", async () => {
+		createMock.mockClear();
+		setupMock.mockClear();
+		findByPathMock.mockResolvedValue({ candidates: [legacy], cloudErrors: [] });
+
+		const result = await startImport();
+
+		expect(setupMock).toHaveBeenCalledWith({
+			projectId: "legacy",
+			origin: {
+				name: "Hello",
+				primaryRepositoryId: "legacy",
+				repositories: [
+					{
+						id: "legacy",
+						name: "hello",
+						url: "https://github.com/octocat/hello",
+					},
+				],
+			},
+			repositories: [
+				{ id: "legacy", mode: { kind: "import", path: repoPath } },
+			],
+		});
+		expect(createMock).not.toHaveBeenCalled();
+		expect(result).toEqual({ projectId: "legacy", repositoryId: "legacy" });
+	});
+
+	it("asks the person to choose when several projects match", async () => {
+		setupMock.mockClear();
+		findByPathMock.mockResolvedValue({
+			candidates: [legacy, { ...legacy, id: "other", repositoryId: "other" }],
+			cloudErrors: [],
+		});
+		const onMultipleProjects = mock(() => undefined);
+
+		const result = await startImport({ onMultipleProjects });
+
+		expect(result).toBeNull();
+		expect(onMultipleProjects).toHaveBeenCalledTimes(1);
+		expect(setupMock).not.toHaveBeenCalled();
 	});
 });

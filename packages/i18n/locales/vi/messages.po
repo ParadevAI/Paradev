@@ -2802,6 +2802,9 @@ msgstr "Đã có tài khoản? <0>Đăng nhập</0>"
 msgid "Already in tasks"
 msgstr "Đã có trong tác vụ"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Đã thiết lập tại {existingPath}. Liên kết với {repoPath} thay thế?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Cũng có dưới dạng CommandDialog cho bảng lệnh ⌘K"
 
@@ -4531,6 +4534,9 @@ msgstr "Chọn một đấu sĩ"
 msgid "Choose a folder"
 msgstr "Chọn thư mục"
 
+msgid "Choose a folder to clone into"
+msgstr "Chọn thư mục để clone vào"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Chọn một dự án trong mục Issue GitHub trước khi mở một issue."
 
@@ -4572,6 +4578,9 @@ msgstr "Chọn mô hình"
 
 msgid "Choose the primary repository"
 msgstr "Chọn repository chính"
+
+msgid "Choose the repository folder"
+msgstr "Chọn thư mục kho mã"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Chọn thứ cần xóa khỏi trình duyệt trong ứng dụng."
@@ -4757,8 +4766,17 @@ msgstr "Sao chép kho mã"
 msgid "Clone a repository"
 msgstr "Clone một repository"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Clone từng kho mã, hoặc dùng một thư mục đã có trên host."
+
 msgid "Clone from URL"
 msgstr "Clone từ URL"
+
+msgid "Clone into"
+msgstr "Clone vào"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Clone vào một thư mục trên {hostName}"
 
 msgid "clone the repository"
 msgstr "clone repository"
@@ -10435,6 +10453,9 @@ msgstr "Nhập từng tập lệnh terminal v1 vào v2."
 msgid "Import existing folder"
 msgstr "Nhập thư mục có sẵn"
 
+msgid "Import failed"
+msgstr "Nhập thất bại"
+
 msgid "Import failed: {message}"
 msgstr "Nhập thất bại: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Liên kết tác vụ"
 msgid "Link this task"
 msgstr "Liên kết tác vụ này"
 
+msgid "Link to {repoPath}?"
+msgstr "Liên kết với {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "Đã liên kết {slug} với workspace"
 
@@ -12528,6 +12552,14 @@ msgstr "Đang chuyển không gian làm việc này…"
 msgid "Multi-select"
 msgstr "Chọn nhiều"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Nhiều dự án đang dùng repository này ({0}). Chọn dự án trong cài đặt để thiết lập nó trên thiết bị này."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Nhiều dự án đang dùng repository này ({0}). Mở dự án bạn muốn từ cài đặt để thiết lập nó trên thiết bị này."
+
 msgid "Mute"
 msgstr "Tắt tiếng"
 
@@ -13387,6 +13419,9 @@ msgstr "Không tìm thấy pull request nào."
 
 msgid "No release notes at {url}"
 msgstr "Không có ghi chú phát hành tại {url}"
+
+msgid "No remote"
+msgstr "Không có remote"
 
 msgid "No remote repository"
 msgstr "Không có repository từ xa"
@@ -14427,6 +14462,9 @@ msgstr "Mở bản xem trước"
 msgid "Open Project"
 msgstr "Mở dự án"
 
+msgid "Open Projects"
+msgstr "Mở Dự án"
+
 msgid "Open pull request"
 msgstr "Mở pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Chọn phần tử khác"
 msgid "Pick a different element (esc)"
 msgstr "Chọn phần tử khác (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Chọn thư mục cho {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Chọn một thư mục trên ổ đĩa và thêm nó làm dự án"
+
+msgid "Pick a folder…"
+msgstr "Chọn một thư mục…"
 
 msgid "Pick a machine size"
 msgstr "Chọn kích thước máy"
@@ -15784,6 +15828,9 @@ msgstr "Dự án đã sẵn sàng. Mở nó từ thanh bên."
 
 msgid "Project relocated to {newPath}"
 msgstr "Đã chuyển dự án đến {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Đã thiết lập dự án trên {hostName}"
 
 msgid "Project Settings"
 msgstr "Cài đặt dự án"
@@ -18065,6 +18112,9 @@ msgstr "Chọn {0}"
 msgid "Select a file to view it here"
 msgstr "Chọn một tệp để xem tại đây"
 
+msgid "Select a folder to clone into"
+msgstr "Chọn một thư mục để clone vào"
+
 msgid "Select a project"
 msgstr "Chọn một dự án"
 
@@ -18193,6 +18243,9 @@ msgstr "Chọn nhóm"
 
 msgid "Select terminal script directory"
 msgstr "Chọn thư mục cho script terminal"
+
+msgid "Select the repository folder"
+msgstr "Chọn thư mục kho mã"
 
 msgid "Select worktree location"
 msgstr "Chọn vị trí worktree"
@@ -18410,8 +18463,14 @@ msgstr "Thiết lập tự động hóa"
 msgid "Set up Environment"
 msgstr "Thiết lập môi trường"
 
+msgid "Set up on {hostName}"
+msgstr "Thiết lập trên {hostName}"
+
 msgid "Set up once"
 msgstr "Thiết lập một lần"
+
+msgid "Set up project on {hostName}"
+msgstr "Thiết lập dự án trên {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Thiết lập dự án này cho Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Dùng “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Dùng đường dẫn tương đối với workspace hoặc một thư mục tuyệt đối."
 
+msgid "Use an existing folder"
+msgstr "Dùng một thư mục có sẵn"
+
 msgid "Use another port"
 msgstr "Dùng port khác"
 
@@ -22800,6 +22862,10 @@ msgstr "Khi còn ít hơn {topupThreshold} GB-giờ, nạp thêm {topupPrice} ({
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Khi tắt, không gì khác có thể truy cập tệp và công cụ trên thiết bị này. Bạn vẫn có thể kết nối tới sandbox từ xa từ đây. <0>Tìm hiểu thêm<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Nguồn của {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Nơi mở khi nhấp vào huy hiệu cổng phát hiện được ở thanh bên."

@@ -187,6 +187,7 @@ describe("V2ProjectSettingsBody with several repositories", () => {
 			hostProject: null,
 		});
 		expect(view.getAllByText("Not set up on This device").length).toBe(2);
+		expect(view.getByText("Set up on This device")).toBeTruthy();
 		expect(view.queryByText("/repos/api")).toBe(null);
 	});
 });

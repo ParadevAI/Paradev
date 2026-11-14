@@ -3,6 +3,7 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
 import { resolvePresetImport } from "./presets";
 import {
 	decideProjectImport,
+	extractExistingPath,
 	importV1Project,
 	type ProjectFindByPathResult,
 } from "./projects";
@@ -778,6 +779,96 @@ describe("findGitWorktreeAtFolder", () => {
 				"/trees/gone",
 			),
 		).toBeNull();
+	});
+});
+
+describe("importV1Project with a legacy cloud candidate", () => {
+	const v1Project = {
+		id: "v1-1",
+		name: "proj",
+		mainRepoPath: "/tmp/proj",
+		githubOwner: null,
+	};
+	const findByPathResult = {
+		candidates: [
+			{
+				id: "p-legacy",
+				repositoryId: "p-legacy",
+				name: "Legacy",
+				repoCloneUrl: "https://github.com/acme/proj",
+				source: "remote" as const,
+				matchesExpected: true,
+			},
+		],
+		cloudErrors: [],
+	};
+
+	function fakeHostClient(setup: (input: unknown) => Promise<unknown>) {
+		const setupCalls: unknown[] = [];
+		const client = {
+			project: {
+				setup: {
+					mutate: async (input: unknown) => {
+						setupCalls.push(input);
+						return setup(input);
+					},
+				},
+				setColor: { mutate: async () => {} },
+				setIcon: { mutate: async () => {} },
+			},
+		} as unknown as HostServiceClient;
+		return { client, setupCalls };
+	}
+
+	test("sets the project up on this host with the repo as its one repository", async () => {
+		const { client, setupCalls } = fakeHostClient(async () => ({
+			id: "p-legacy",
+			primaryRepositoryId: "p-legacy",
+			repositories: [{ id: "p-legacy", path: "/tmp/proj" }],
+			created: true,
+		}));
+
+		const result = await importV1Project({
+			hostClient: client,
+			project: v1Project,
+			findByPathResult,
+		});
+
+		expect(result).toEqual({
+			kind: "imported",
+			v2ProjectId: "p-legacy",
+			repoPath: "/tmp/proj",
+		});
+		expect(setupCalls).toMatchObject([
+			{
+				projectId: "p-legacy",
+				origin: { primaryRepositoryId: "p-legacy" },
+				repositories: [
+					{ id: "p-legacy", mode: { kind: "import", path: "/tmp/proj" } },
+				],
+			},
+		]);
+	});
+
+	test("asks before moving a project this host already has elsewhere", async () => {
+		const refusal =
+			"already_set_up: proj is already at /old/proj on this host; relocate it to use another folder";
+		const { client } = fakeHostClient(async () => {
+			throw new Error(refusal);
+		});
+
+		const result = await importV1Project({
+			hostClient: client,
+			project: v1Project,
+			findByPathResult,
+		});
+
+		expect(result).toEqual({
+			kind: "needs-relocate",
+			v2ProjectId: "p-legacy",
+			message: refusal,
+		});
+		expect(extractExistingPath(refusal)).toBe("/old/proj");
 	});
 });
 

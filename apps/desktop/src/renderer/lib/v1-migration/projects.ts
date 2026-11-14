@@ -1,4 +1,5 @@
 import type { HostServiceClient } from "renderer/lib/host-service-client";
+import { legacySetupInput } from "renderer/lib/legacySetupInput";
 import { getBaseName } from "renderer/lib/pathBasename";
 
 export interface V1ProjectLike {
@@ -16,11 +17,13 @@ export type ProjectFindByPathResult = Awaited<
 	ReturnType<HostServiceClient["project"]["findByPath"]["query"]>
 >;
 
-export interface ProjectImportOutcome {
-	kind: "imported";
-	v2ProjectId: string;
-	repoPath: string;
-}
+export type ProjectImportOutcome =
+	| {
+			kind: "imported";
+			v2ProjectId: string;
+			repoPath: string;
+	  }
+	| { kind: "needs-relocate"; v2ProjectId: string; message: string };
 
 export type UnmigratableRepoReason = "repo-path-missing" | "not-a-git-repo";
 
@@ -104,12 +107,20 @@ export function classifyUnmigratableRepoError(
 	return null;
 }
 
+export function isAlreadySetUpElsewhereError(err: unknown): boolean {
+	return err instanceof Error && err.message.includes("already_set_up:");
+}
+
+export function extractExistingPath(message: string): string | null {
+	return message.match(/is already at (.+?) on this host;/)?.[1] ?? null;
+}
+
 /**
  * Import one v1 project into v2. A `local-path` candidate is the v2 project
- * the repo already belongs to on this host; otherwise a fresh local-first
- * project of one repository is made via `project.create`. A cloud
- * (`remote`) candidate cannot be linked any more: its name carries over to
- * the new project. Pure host-service calls — UI side effects (sidebar,
+ * the repo already belongs to on this host; a legacy cloud (`remote`)
+ * candidate is set up on this host with the repo as its one repository;
+ * otherwise a fresh local-first project of one repository is made via
+ * `project.create`. Pure host-service calls — UI side effects (sidebar,
  * query invalidation) are the caller's job.
  */
 export async function importV1Project({
@@ -117,11 +128,13 @@ export async function importV1Project({
 	project,
 	findByPathResult,
 	linkToProjectId,
+	allowRelocate = false,
 }: {
 	hostClient: HostServiceClient;
 	project: V1ProjectLike;
 	findByPathResult: ProjectFindByPathResult | undefined;
 	linkToProjectId?: string;
+	allowRelocate?: boolean;
 }): Promise<ProjectImportOutcome> {
 	const candidates = findByPathResult?.candidates ?? [];
 
@@ -143,10 +156,32 @@ export async function importV1Project({
 		};
 	}
 
-	const result = await hostClient.project.create.mutate({
-		name: targetCandidate?.name ?? project.name,
-		repositories: [{ kind: "local", path: project.mainRepoPath }],
-	});
+	let result: Awaited<ReturnType<typeof hostClient.project.create.mutate>>;
+	if (targetCandidate) {
+		try {
+			result = await hostClient.project.setup.mutate(
+				legacySetupInput({
+					candidate: targetCandidate,
+					path: project.mainRepoPath,
+					allowRelocate,
+				}),
+			);
+		} catch (err) {
+			if (isAlreadySetUpElsewhereError(err) && !allowRelocate) {
+				return {
+					kind: "needs-relocate",
+					v2ProjectId: targetCandidate.id,
+					message: err instanceof Error ? err.message : String(err),
+				};
+			}
+			throw err;
+		}
+	} else {
+		result = await hostClient.project.create.mutate({
+			name: project.name,
+			repositories: [{ kind: "local", path: project.mainRepoPath }],
+		});
+	}
 	// Only stamp v1 appearance onto projects this call actually created.
 	// A reused project (created === false) may carry v2 customizations the
 	// user chose after their first import — never overwrite those.

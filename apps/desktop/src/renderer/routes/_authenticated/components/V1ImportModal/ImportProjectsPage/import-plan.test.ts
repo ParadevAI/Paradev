@@ -50,6 +50,22 @@ describe("selectPendingProjects", () => {
 		]);
 		expect(selectPendingProjects(projects, decisions, states)).toHaveLength(1);
 	});
+
+	it("excludes needs-relocate projects — they require the row's confirm flow", () => {
+		const projects = [p("a")];
+		const decisions = new Map([["a", importDecision]]);
+		const states = new Map([
+			[
+				"a",
+				{
+					kind: "needs-relocate" as const,
+					v2ProjectId: "v2-1",
+					message: "already set up elsewhere",
+				},
+			],
+		]);
+		expect(selectPendingProjects(projects, decisions, states)).toHaveLength(0);
+	});
 });
 
 describe("planProjectRowAction", () => {
@@ -86,6 +102,21 @@ describe("planProjectRowAction", () => {
 				status: { kind: "imported", v2ProjectId: "v2-1" },
 			}),
 		).toEqual({ kind: "imported", label: "Linked" });
+	});
+
+	it("needs-relocate renders the confirm flow, disabled during Import All", () => {
+		const status: ProjectImportStatus = {
+			kind: "needs-relocate",
+			v2ProjectId: "v2-1",
+			message: "already set up on this device at /old/path.  Remove",
+		};
+		expect(planProjectRowAction({ ...base, status })).toMatchObject({
+			kind: "confirm-relocate",
+			disabled: false,
+		});
+		expect(
+			planProjectRowAction({ ...base, status, isImportingAll: true }),
+		).toMatchObject({ kind: "confirm-relocate", disabled: true });
 	});
 
 	it("import errors show Queued during a batch, retryable error otherwise", () => {

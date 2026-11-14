@@ -2802,6 +2802,9 @@ msgstr "Masz już konto? <0>Zaloguj się</0>"
 msgid "Already in tasks"
 msgstr "Już jest w zadaniach"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Już skonfigurowano w {existingPath}. Połączyć zamiast tego z {repoPath}?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Dostępne też jako CommandDialog dla palet ⌘K"
 
@@ -4531,6 +4534,9 @@ msgstr "Wybierz wojownika"
 msgid "Choose a folder"
 msgstr "Wybierz folder"
 
+msgid "Choose a folder to clone into"
+msgstr "Wybierz folder do sklonowania"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Wybierz projekt w Zgłoszeniach GitHub, zanim otworzysz zgłoszenie."
 
@@ -4572,6 +4578,9 @@ msgstr "Wybierz model"
 
 msgid "Choose the primary repository"
 msgstr "Wybierz główne repozytorium"
+
+msgid "Choose the repository folder"
+msgstr "Wybierz folder repozytorium"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Wybierz, co wyczyścić z przeglądarki w aplikacji."
@@ -4757,8 +4766,17 @@ msgstr "Sklonuj repozytorium"
 msgid "Clone a repository"
 msgstr "Sklonuj repozytorium"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Sklonuj każde repozytorium albo użyj folderu, który już jest na hoście."
+
 msgid "Clone from URL"
 msgstr "Klonuj z URL"
+
+msgid "Clone into"
+msgstr "Klonuj do"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Klonuj do folderu na {hostName}"
 
 msgid "clone the repository"
 msgstr "sklonować repozytorium"
@@ -10435,6 +10453,9 @@ msgstr "Zaimportuj każdy skrypt terminala v1 do v2."
 msgid "Import existing folder"
 msgstr "Importuj istniejący folder"
 
+msgid "Import failed"
+msgstr "Import nie powiódł się"
+
 msgid "Import failed: {message}"
 msgstr "Import nie powiódł się: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Powiąż zadanie"
 msgid "Link this task"
 msgstr "Połącz to zadanie"
 
+msgid "Link to {repoPath}?"
+msgstr "Połączyć z {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "Powiązano {slug} z obszarem roboczym"
 
@@ -12528,6 +12552,14 @@ msgstr "Przenoszenie tego obszaru roboczego…"
 msgid "Multi-select"
 msgstr "Wielokrotny wybór"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Wiele projektów używa tego repozytorium ({0}). Wybierz projekt w ustawieniach, aby skonfigurować go na tym urządzeniu."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Wiele projektów używa tego repozytorium ({0}). Otwórz wybrany projekt z ustawień, aby skonfigurować go na tym urządzeniu."
+
 msgid "Mute"
 msgstr "Wycisz"
 
@@ -13387,6 +13419,9 @@ msgstr "Nie znaleziono pull requestów."
 
 msgid "No release notes at {url}"
 msgstr "Brak informacji o wydaniu pod {url}"
+
+msgid "No remote"
+msgstr "Brak zdalnego"
 
 msgid "No remote repository"
 msgstr "Brak zdalnego repozytorium"
@@ -14427,6 +14462,9 @@ msgstr "Otwórz podgląd"
 msgid "Open Project"
 msgstr "Otwórz projekt"
 
+msgid "Open Projects"
+msgstr "Otwórz projekty"
+
 msgid "Open pull request"
 msgstr "Otwórz pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Wybierz inny element"
 msgid "Pick a different element (esc)"
 msgstr "Wybierz inny element (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Wybierz folder dla {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Wybierz folder na dysku i dodaj go jako projekt"
+
+msgid "Pick a folder…"
+msgstr "Wybierz folder…"
 
 msgid "Pick a machine size"
 msgstr "Wybierz rozmiar maszyny"
@@ -15784,6 +15828,9 @@ msgstr "Projekt gotowy. Otwórz go z paska bocznego."
 
 msgid "Project relocated to {newPath}"
 msgstr "Przeniesiono projekt do {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Projekt skonfigurowany na {hostName}"
 
 msgid "Project Settings"
 msgstr "Ustawienia projektu"
@@ -18065,6 +18112,9 @@ msgstr "Wybierz {0}"
 msgid "Select a file to view it here"
 msgstr "Wybierz plik, aby go tutaj wyświetlić"
 
+msgid "Select a folder to clone into"
+msgstr "Wybierz folder do sklonowania"
+
 msgid "Select a project"
 msgstr "Wybierz projekt"
 
@@ -18193,6 +18243,9 @@ msgstr "Wybierz zespoły"
 
 msgid "Select terminal script directory"
 msgstr "Wybierz katalog skryptu terminala"
+
+msgid "Select the repository folder"
+msgstr "Wybierz folder repozytorium"
 
 msgid "Select worktree location"
 msgstr "Wybierz lokalizację worktree"
@@ -18410,8 +18463,14 @@ msgstr "Skonfiguruj automatyzację"
 msgid "Set up Environment"
 msgstr "Skonfiguruj środowisko"
 
+msgid "Set up on {hostName}"
+msgstr "Skonfiguruj na {hostName}"
+
 msgid "Set up once"
 msgstr "Skonfiguruj raz"
+
+msgid "Set up project on {hostName}"
+msgstr "Skonfiguruj projekt na {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Skonfiguruj ten projekt pod Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Użyj „{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Użyj ścieżki względem obszaru roboczego albo folderu bezwzględnego."
 
+msgid "Use an existing folder"
+msgstr "Użyj istniejącego folderu"
+
 msgid "Use another port"
 msgstr "Użyj innego portu"
 
@@ -22800,6 +22862,10 @@ msgstr "Gdy zostanie mniej niż {topupThreshold} GB-godzin, doładuj {topupPrice
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Gdy wyłączone, nic innego nie ma dostępu do plików i narzędzi na tym urządzeniu. Nadal możesz łączyć się stąd ze zdalnymi sandboxami. <0>Dowiedz się więcej<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Skąd pochodzi {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Gdzie otwierają się plakietki wykrytych portów na pasku bocznym po kliknięciu."

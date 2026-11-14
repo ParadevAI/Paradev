@@ -2802,6 +2802,9 @@ msgstr "Už máte účet? <0>Přihlaste se</0>"
 msgid "Already in tasks"
 msgstr "Už je v úkolech"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Už nastaveno v {existingPath}. Propojit místo toho s {repoPath}?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Dostupné také jako CommandDialog pro palety ⌘K"
 
@@ -4531,6 +4534,9 @@ msgstr "Vyberte bojovníka"
 msgid "Choose a folder"
 msgstr "Vyberte složku"
 
+msgid "Choose a folder to clone into"
+msgstr "Vyberte složku pro klonování"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Než otevřete issue, vyberte projekt v sekci GitHub issues."
 
@@ -4572,6 +4578,9 @@ msgstr "Vybrat model"
 
 msgid "Choose the primary repository"
 msgstr "Vyberte hlavní repozitář"
+
+msgid "Choose the repository folder"
+msgstr "Vyberte složku repozitáře"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Vyberte, co se má z vestavěného prohlížeče vymazat."
@@ -4757,8 +4766,17 @@ msgstr "Klonovat repozitář"
 msgid "Clone a repository"
 msgstr "Naklonovat repozitář"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Naklonujte každý repozitář, nebo použijte složku, která už na hostiteli je."
+
 msgid "Clone from URL"
 msgstr "Naklonovat z URL"
+
+msgid "Clone into"
+msgstr "Klonovat do"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Klonovat do složky na {hostName}"
 
 msgid "clone the repository"
 msgstr "naklonovat repozitář"
@@ -10435,6 +10453,9 @@ msgstr "Importujte každý terminálový skript v1 do v2."
 msgid "Import existing folder"
 msgstr "Importovat existující složku"
 
+msgid "Import failed"
+msgstr "Import selhal"
+
 msgid "Import failed: {message}"
 msgstr "Import selhal: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Propojit úkol"
 msgid "Link this task"
 msgstr "Propojit tento úkol"
 
+msgid "Link to {repoPath}?"
+msgstr "Propojit s {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} propojeno s pracovním prostorem"
 
@@ -12528,6 +12552,14 @@ msgstr "Přesouvá se tento pracovní prostor…"
 msgid "Multi-select"
 msgstr "Výběr více možností"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Tento repozitář používá více projektů ({0}). Vyberte v nastavení projekt, který chcete na tomto zařízení nastavit."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Tento repozitář používá více projektů ({0}). Otevřete v nastavení projekt, který chcete na tomto zařízení nastavit."
+
 msgid "Mute"
 msgstr "Ztlumit"
 
@@ -13387,6 +13419,9 @@ msgstr "Nenalezeny žádné pull requesty."
 
 msgid "No release notes at {url}"
 msgstr "Žádné poznámky k vydání na {url}"
+
+msgid "No remote"
+msgstr "Bez vzdáleného repozitáře"
 
 msgid "No remote repository"
 msgstr "Žádný vzdálený repozitář"
@@ -14427,6 +14462,9 @@ msgstr "Otevřít náhled"
 msgid "Open Project"
 msgstr "Otevřít projekt"
 
+msgid "Open Projects"
+msgstr "Otevřít projekty"
+
 msgid "Open pull request"
 msgstr "Otevřít pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Vybrat jiný prvek"
 msgid "Pick a different element (esc)"
 msgstr "Vybrat jiný prvek (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Vyberte složku pro {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Vyberte složku na disku a přidejte ji jako projekt"
+
+msgid "Pick a folder…"
+msgstr "Vyberte složku…"
 
 msgid "Pick a machine size"
 msgstr "Vyberte velikost stroje"
@@ -15784,6 +15828,9 @@ msgstr "Projekt je připravený. Otevřete ho v postranním panelu."
 
 msgid "Project relocated to {newPath}"
 msgstr "Projekt přesunut do {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Projekt nastaven na {hostName}"
 
 msgid "Project Settings"
 msgstr "Nastavení projektu"
@@ -18065,6 +18112,9 @@ msgstr "Vybrat {0}"
 msgid "Select a file to view it here"
 msgstr "Vyberte soubor a zobrazí se zde"
 
+msgid "Select a folder to clone into"
+msgstr "Vyberte složku pro klonování"
+
 msgid "Select a project"
 msgstr "Vyberte projekt"
 
@@ -18193,6 +18243,9 @@ msgstr "Vyberte týmy"
 
 msgid "Select terminal script directory"
 msgstr "Vyberte adresář terminálového skriptu"
+
+msgid "Select the repository folder"
+msgstr "Vyberte složku repozitáře"
 
 msgid "Select worktree location"
 msgstr "Vyberte umístění worktree"
@@ -18410,8 +18463,14 @@ msgstr "Nastavte automatizaci"
 msgid "Set up Environment"
 msgstr "Nastavit prostředí"
 
+msgid "Set up on {hostName}"
+msgstr "Nastavit na {hostName}"
+
 msgid "Set up once"
 msgstr "Nastavte jednou"
+
+msgid "Set up project on {hostName}"
+msgstr "Nastavit projekt na {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Připravit tento projekt pro Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Použít „{0}“"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Použijte cestu relativní k pracovnímu prostoru nebo absolutní složku."
 
+msgid "Use an existing folder"
+msgstr "Použít existující složku"
+
 msgid "Use another port"
 msgstr "Použít jiný port"
 
@@ -22800,6 +22862,10 @@ msgstr "Když zbývá méně než {topupThreshold} GB-hodin, dobít {topupPrice}
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Když je vypnuto, nic jiného se nedostane k souborům a nástrojům na tomto zařízení. Odsud se stále můžete připojovat ke vzdáleným sandboxům. <0>Zjistit více<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Odkud pochází {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Kam vedou odznaky rozpoznaných portů v postranním panelu po kliknutí."

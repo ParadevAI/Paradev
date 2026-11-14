@@ -2802,6 +2802,9 @@ msgstr "已有帳戶？<0>登入</0>"
 msgid "Already in tasks"
 msgstr "已在任務中"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "已在 {existingPath} 設定。改為連結到 {repoPath}?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "也可用作CommandDialog，用於⌘K命令面板"
 
@@ -4531,6 +4534,9 @@ msgstr "選擇一名鬥士"
 msgid "Choose a folder"
 msgstr "選擇資料夾"
 
+msgid "Choose a folder to clone into"
+msgstr "選擇要複製到的資料夾"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "開啟議題前，請先在GitHub議題中選擇一個專案。"
 
@@ -4572,6 +4578,9 @@ msgstr "選擇模型"
 
 msgid "Choose the primary repository"
 msgstr "選擇主要儲存庫"
+
+msgid "Choose the repository folder"
+msgstr "選擇儲存庫資料夾"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "選擇要從應用程式內瀏覽器清除的內容。"
@@ -4757,8 +4766,17 @@ msgstr "克隆儲存庫"
 msgid "Clone a repository"
 msgstr "克隆儲存庫"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "複製每個儲存庫,或使用主機上已有的資料夾。"
+
 msgid "Clone from URL"
 msgstr "從URL克隆"
+
+msgid "Clone into"
+msgstr "複製到"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "複製到 {hostName} 上的資料夾"
 
 msgid "clone the repository"
 msgstr "克隆儲存庫"
@@ -10435,6 +10453,9 @@ msgstr "將每個 v1 終端機指令碼匯入 v2。"
 msgid "Import existing folder"
 msgstr "匯入已有資料夾"
 
+msgid "Import failed"
+msgstr "匯入失敗"
+
 msgid "Import failed: {message}"
 msgstr "匯入失敗：{message}"
 
@@ -11567,6 +11588,9 @@ msgstr "關聯任務"
 msgid "Link this task"
 msgstr "連結此任務"
 
+msgid "Link to {repoPath}?"
+msgstr "連結到 {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "已將{slug}關聯到工作區"
 
@@ -12528,6 +12552,14 @@ msgstr "正在移動此工作區…"
 msgid "Multi-select"
 msgstr "多選"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "有多個專案使用此儲存庫（{0}）。請在設定中選擇要在此裝置上配置的專案。"
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "有多個專案使用此儲存庫（{0}）。請在設定中開啟你想要的專案，以在此裝置上配置它。"
+
 msgid "Mute"
 msgstr "靜音"
 
@@ -13387,6 +13419,9 @@ msgstr "未找到拉取請求。"
 
 msgid "No release notes at {url}"
 msgstr "{url} 上沒有版本說明"
+
+msgid "No remote"
+msgstr "無遠端"
 
 msgid "No remote repository"
 msgstr "沒有遠端儲存庫"
@@ -14427,6 +14462,9 @@ msgstr "開啟預覽"
 msgid "Open Project"
 msgstr "開啟專案"
 
+msgid "Open Projects"
+msgstr "開啟專案"
+
 msgid "Open pull request"
 msgstr "開啟拉取請求"
 
@@ -15255,8 +15293,14 @@ msgstr "選擇其他元素"
 msgid "Pick a different element (esc)"
 msgstr "選擇其他元素（esc）"
 
+msgid "Pick a folder for {names}"
+msgstr "為 {names} 選擇資料夾"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "選擇磁碟上的資料夾並將其新增為專案"
+
+msgid "Pick a folder…"
+msgstr "選擇資料夾…"
 
 msgid "Pick a machine size"
 msgstr "選擇機器規格"
@@ -15784,6 +15828,9 @@ msgstr "專案已就緒，可從側邊欄開啟。"
 
 msgid "Project relocated to {newPath}"
 msgstr "專案已遷移到{newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "已在 {hostName} 上設定專案"
 
 msgid "Project Settings"
 msgstr "專案設定"
@@ -18065,6 +18112,9 @@ msgstr "選取 {0}"
 msgid "Select a file to view it here"
 msgstr "選取檔案以在此處檢視"
 
+msgid "Select a folder to clone into"
+msgstr "選擇要複製到的資料夾"
+
 msgid "Select a project"
 msgstr "請選擇專案"
 
@@ -18193,6 +18243,9 @@ msgstr "選擇團隊"
 
 msgid "Select terminal script directory"
 msgstr "選擇終端指令碼目錄"
+
+msgid "Select the repository folder"
+msgstr "選擇儲存庫資料夾"
 
 msgid "Select worktree location"
 msgstr "選擇worktree位置"
@@ -18410,8 +18463,14 @@ msgstr "設定自動化"
 msgid "Set up Environment"
 msgstr "設定環境"
 
+msgid "Set up on {hostName}"
+msgstr "在 {hostName} 上設定"
+
 msgid "Set up once"
 msgstr "只需設定一次"
+
+msgid "Set up project on {hostName}"
+msgstr "在 {hostName} 上設定專案"
 
 msgid "Set up this project for Paradev"
 msgstr "為Paradev配置這個專案"
@@ -22155,6 +22214,9 @@ msgstr "使用「{0}」"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "使用相對於工作區的路徑或絕對路徑資料夾。"
 
+msgid "Use an existing folder"
+msgstr "使用現有資料夾"
+
 msgid "Use another port"
 msgstr "使用其他埠"
 
@@ -22800,6 +22862,10 @@ msgstr "剩餘不足 {topupThreshold} GB 小時時，加值 {topupPrice}（{topu
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "關閉後，任何其他來源都無法存取此裝置上的檔案和工具。你仍可從這裡連線到遠端沙箱。<0>瞭解更多<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "{0} 的來源"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "點選側邊欄中檢測到的埠標記時開啟的位置。"

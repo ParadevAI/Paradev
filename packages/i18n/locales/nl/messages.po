@@ -2802,6 +2802,9 @@ msgstr "Heb je al een account? <0>Inloggen</0>"
 msgid "Already in tasks"
 msgstr "Staat al in taken"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Al ingesteld in {existingPath}. In plaats daarvan koppelen aan {repoPath}?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Ook beschikbaar als CommandDialog voor ⌘K-paletten"
 
@@ -4531,6 +4534,9 @@ msgstr "Kies een vechter"
 msgid "Choose a folder"
 msgstr "Kies een map"
 
+msgid "Choose a folder to clone into"
+msgstr "Kies een map om in te klonen"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Kies een project bij GitHub-issues voordat je een issue opent."
 
@@ -4572,6 +4578,9 @@ msgstr "Model kiezen"
 
 msgid "Choose the primary repository"
 msgstr "Kies de primaire repository"
+
+msgid "Choose the repository folder"
+msgstr "Kies de repositorymap"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Kies wat je uit de ingebouwde browser wilt wissen."
@@ -4757,8 +4766,17 @@ msgstr "Repository klonen"
 msgid "Clone a repository"
 msgstr "Een repository klonen"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Kloon elke repository, of gebruik een map die al op de host staat."
+
 msgid "Clone from URL"
 msgstr "Klonen vanaf URL"
+
+msgid "Clone into"
+msgstr "Klonen naar"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Klonen naar een map op {hostName}"
 
 msgid "clone the repository"
 msgstr "de repository klonen"
@@ -10435,6 +10453,9 @@ msgstr "Importeer elk v1-terminalscript in v2."
 msgid "Import existing folder"
 msgstr "Bestaande map importeren"
 
+msgid "Import failed"
+msgstr "Importeren mislukt"
+
 msgid "Import failed: {message}"
 msgstr "Importeren mislukt: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Taak koppelen"
 msgid "Link this task"
 msgstr "Deze taak koppelen"
 
+msgid "Link to {repoPath}?"
+msgstr "Koppelen aan {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} gekoppeld aan werkruimte"
 
@@ -12528,6 +12552,14 @@ msgstr "Deze werkruimte wordt verplaatst…"
 msgid "Multi-select"
 msgstr "Meerdere keuzes"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Meerdere projecten gebruiken deze repository ({0}). Kies het project in de instellingen om het op dit apparaat in te stellen."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Meerdere projecten gebruiken deze repository ({0}). Open het gewenste project via de instellingen om het op dit apparaat in te stellen."
+
 msgid "Mute"
 msgstr "Dempen"
 
@@ -13387,6 +13419,9 @@ msgstr "Geen pull requests gevonden."
 
 msgid "No release notes at {url}"
 msgstr "Geen releasenotes op {url}"
+
+msgid "No remote"
+msgstr "Geen remote"
 
 msgid "No remote repository"
 msgstr "Geen externe repository"
@@ -14427,6 +14462,9 @@ msgstr "Preview openen"
 msgid "Open Project"
 msgstr "Project openen"
 
+msgid "Open Projects"
+msgstr "Projecten openen"
+
 msgid "Open pull request"
 msgstr "Pull request openen"
 
@@ -15255,8 +15293,14 @@ msgstr "Kies een ander element"
 msgid "Pick a different element (esc)"
 msgstr "Kies een ander element (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Kies een map voor {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Kies een map op schijf en voeg die toe als project"
+
+msgid "Pick a folder…"
+msgstr "Kies een map…"
 
 msgid "Pick a machine size"
 msgstr "Kies een machinegrootte"
@@ -15784,6 +15828,9 @@ msgstr "Project klaar. Open het via de zijbalk."
 
 msgid "Project relocated to {newPath}"
 msgstr "Project verplaatst naar {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Project ingesteld op {hostName}"
 
 msgid "Project Settings"
 msgstr "Projectinstellingen"
@@ -18065,6 +18112,9 @@ msgstr "{0} selecteren"
 msgid "Select a file to view it here"
 msgstr "Selecteer een bestand om het hier te bekijken"
 
+msgid "Select a folder to clone into"
+msgstr "Selecteer een map om in te klonen"
+
 msgid "Select a project"
 msgstr "Kies een project"
 
@@ -18193,6 +18243,9 @@ msgstr "Teams kiezen"
 
 msgid "Select terminal script directory"
 msgstr "Map voor terminalscript kiezen"
+
+msgid "Select the repository folder"
+msgstr "Selecteer de repositorymap"
 
 msgid "Select worktree location"
 msgstr "Locatie voor worktree kiezen"
@@ -18410,8 +18463,14 @@ msgstr "Stel een automatisering in"
 msgid "Set up Environment"
 msgstr "Omgeving instellen"
 
+msgid "Set up on {hostName}"
+msgstr "Instellen op {hostName}"
+
 msgid "Set up once"
 msgstr "Eén keer instellen"
+
+msgid "Set up project on {hostName}"
+msgstr "Project instellen op {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Dit project instellen voor Paradev"
@@ -22155,6 +22214,9 @@ msgstr "“{0}” gebruiken"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Gebruik een pad relatief aan de werkruimte of een absolute map."
 
+msgid "Use an existing folder"
+msgstr "Een bestaande map gebruiken"
+
 msgid "Use another port"
 msgstr "Een andere poort gebruiken"
 
@@ -22800,6 +22862,10 @@ msgstr "Wanneer er minder dan {topupThreshold} GB-uren over zijn, {topupPrice} b
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Als dit uitstaat, kan niets anders bij de bestanden en tools op dit apparaat. Je kunt vanaf hier nog steeds verbinden met externe sandboxes. <0>Meer informatie<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Waar {0} vandaan komt"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Waar de badges van gedetecteerde poorten in de zijbalk openen bij een klik."

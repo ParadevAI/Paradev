@@ -11,6 +11,7 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import {
 	decideProjectImport,
 	expectedRemoteUrlFor,
+	extractExistingPath,
 	importV1Project,
 	isProjectAlreadyImported,
 	type ProjectFindByPathResult,
@@ -202,11 +203,21 @@ export function ImportProjectsPage({
 						findByPathResult,
 						finalizeSetup,
 					});
-					updateImportStatus(project.id, {
-						kind: "imported",
-						v2ProjectId: result.v2ProjectId,
-					});
-					await invalidateProjectImportQueries(queryClient, project);
+					if (result.kind === "imported") {
+						updateImportStatus(project.id, {
+							kind: "imported",
+							v2ProjectId: result.v2ProjectId,
+						});
+						await invalidateProjectImportQueries(queryClient, project);
+					} else {
+						// The row's confirm flow decides; until then the project
+						// stays out of the pending count.
+						updateImportStatus(project.id, {
+							kind: "needs-relocate",
+							v2ProjectId: result.v2ProjectId,
+							message: result.message,
+						});
+					}
 				} catch (err) {
 					const message = err instanceof Error ? err.message : String(err);
 					updateImportStatus(project.id, { kind: "error", message });
@@ -345,6 +356,7 @@ async function importProject({
 	findByPathResult,
 	finalizeSetup,
 	linkToProjectId,
+	allowRelocate = false,
 }: {
 	project: V1Project;
 	organizationId: string;
@@ -352,6 +364,7 @@ async function importProject({
 	findByPathResult: ProjectFindByPathResult | undefined;
 	finalizeSetup: FinalizeProjectSetup;
 	linkToProjectId?: string;
+	allowRelocate?: boolean;
 }): Promise<ProjectImportOutcome> {
 	const result = await withV1MigrationRunLock(async () => {
 		const outcome = await importV1Project({
@@ -359,18 +372,23 @@ async function importProject({
 			project,
 			findByPathResult,
 			linkToProjectId,
+			allowRelocate,
 		});
-		await recordV1MigrationOutcome(organizationId, {
-			v1Id: project.id,
-			kind: "project",
-			status: "success",
-			v2Id: outcome.v2ProjectId,
-		});
+		if (outcome.kind === "imported") {
+			await recordV1MigrationOutcome(organizationId, {
+				v1Id: project.id,
+				kind: "project",
+				status: "success",
+				v2Id: outcome.v2ProjectId,
+			});
+		}
 		return outcome;
 	});
-	finalizeSetup(activeHostUrl, {
-		projectId: result.v2ProjectId,
-	});
+	if (result.kind === "imported") {
+		finalizeSetup(activeHostUrl, {
+			projectId: result.v2ProjectId,
+		});
+	}
 	return result;
 }
 
@@ -396,6 +414,7 @@ function ProjectRow({
 	onStatusChange,
 	disabled,
 }: ProjectRowProps) {
+	const { _: translate } = useTranslation();
 	const queryClient = useQueryClient();
 	const finalizeSetup = useFinalizeProjectSetup();
 
@@ -404,7 +423,10 @@ function ProjectRow({
 		queryFn: projectFindByPathQueryFn(project, activeHostUrl),
 	});
 
-	const runImport = async (linkToProjectId?: string) => {
+	const runImport = async (
+		linkToProjectId?: string,
+		options: { allowRelocate?: boolean } = {},
+	) => {
 		onStatusChange({ kind: "running" });
 		try {
 			// Never import blind: a retry after a failed lookup would otherwise
@@ -421,7 +443,16 @@ function ProjectRow({
 				findByPathResult,
 				finalizeSetup,
 				linkToProjectId,
+				allowRelocate: options.allowRelocate ?? false,
 			});
+			if (result.kind === "needs-relocate") {
+				onStatusChange({
+					kind: "needs-relocate",
+					v2ProjectId: result.v2ProjectId,
+					message: result.message,
+				});
+				return;
+			}
 			onStatusChange({ kind: "imported", v2ProjectId: result.v2ProjectId });
 			await invalidateProjectImportQueries(queryClient, project);
 		} catch (err) {
@@ -455,6 +486,31 @@ function ProjectRow({
 				return { kind: "running", label: plan.label };
 			case "imported":
 				return { kind: "imported", label: plan.label };
+			case "confirm-relocate": {
+				const existingPath = extractExistingPath(plan.message);
+				const relocateTo =
+					status.kind === "needs-relocate" ? status.v2ProjectId : null;
+				const repoPath = project.mainRepoPath;
+				return {
+					kind: "confirm",
+					message: existingPath
+						? translate(
+								msg({
+									message: `Already set up at ${existingPath}. Link to ${repoPath} instead?`,
+								}),
+							)
+						: translate(msg({ message: `Link to ${repoPath}?` })),
+					confirmLabel: translate(msg({ message: "Use this folder" })),
+					cancelLabel: translate(msg({ message: "Cancel" })),
+					disabled: plan.disabled,
+					onConfirm: () => {
+						if (relocateTo) {
+							void runImport(relocateTo, { allowRelocate: true });
+						}
+					},
+					onCancel: () => onStatusChange({ kind: "idle" }),
+				};
+			}
 			case "error":
 				return {
 					kind: "error",

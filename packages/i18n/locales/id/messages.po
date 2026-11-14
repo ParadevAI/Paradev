@@ -2802,6 +2802,9 @@ msgstr "Sudah punya akun? <0>Masuk</0>"
 msgid "Already in tasks"
 msgstr "Sudah ada di tugas"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Sudah disiapkan di {existingPath}. Tautkan ke {repoPath} saja?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Tersedia juga sebagai CommandDialog untuk palet ⌘K"
 
@@ -4531,6 +4534,9 @@ msgstr "Pilih petarung"
 msgid "Choose a folder"
 msgstr "Pilih folder"
 
+msgid "Choose a folder to clone into"
+msgstr "Pilih folder tujuan clone"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Pilih proyek dari issue GitHub sebelum membuka sebuah issue."
 
@@ -4572,6 +4578,9 @@ msgstr "Pilih model"
 
 msgid "Choose the primary repository"
 msgstr "Pilih repositori utama"
+
+msgid "Choose the repository folder"
+msgstr "Pilih folder repositori"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Pilih apa yang ingin dibersihkan dari browser dalam aplikasi."
@@ -4757,8 +4766,17 @@ msgstr "Klon repositori"
 msgid "Clone a repository"
 msgstr "Clone sebuah repositori"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Clone setiap repositori, atau gunakan folder yang sudah ada di host."
+
 msgid "Clone from URL"
 msgstr "Clone dari URL"
+
+msgid "Clone into"
+msgstr "Clone ke"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Clone ke folder di {hostName}"
 
 msgid "clone the repository"
 msgstr "meng-clone repositori"
@@ -10435,6 +10453,9 @@ msgstr "Impor setiap skrip terminal v1 ke v2."
 msgid "Import existing folder"
 msgstr "Impor folder yang ada"
 
+msgid "Import failed"
+msgstr "Impor gagal"
+
 msgid "Import failed: {message}"
 msgstr "Impor gagal: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Tautkan tugas"
 msgid "Link this task"
 msgstr "Tautkan tugas ini"
 
+msgid "Link to {repoPath}?"
+msgstr "Tautkan ke {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} ditautkan ke workspace"
 
@@ -12528,6 +12552,14 @@ msgstr "Memindahkan workspace ini…"
 msgid "Multi-select"
 msgstr "Pilih banyak"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Beberapa proyek memakai repositori ini ({0}). Pilih proyeknya di pengaturan untuk menyiapkannya di perangkat ini."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Beberapa proyek memakai repositori ini ({0}). Buka proyek yang Anda inginkan dari pengaturan untuk menyiapkannya di perangkat ini."
+
 msgid "Mute"
 msgstr "Bisukan"
 
@@ -13387,6 +13419,9 @@ msgstr "Tidak ada pull request ditemukan."
 
 msgid "No release notes at {url}"
 msgstr "Tidak ada catatan rilis di {url}"
+
+msgid "No remote"
+msgstr "Tanpa remote"
 
 msgid "No remote repository"
 msgstr "Tidak ada repositori remote"
@@ -14427,6 +14462,9 @@ msgstr "Buka Pratinjau"
 msgid "Open Project"
 msgstr "Buka Proyek"
 
+msgid "Open Projects"
+msgstr "Buka Proyek"
+
 msgid "Open pull request"
 msgstr "Buka pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Pilih elemen lain"
 msgid "Pick a different element (esc)"
 msgstr "Pilih elemen lain (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Pilih folder untuk {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Pilih folder di disk dan tambahkan sebagai proyek"
+
+msgid "Pick a folder…"
+msgstr "Pilih folder…"
 
 msgid "Pick a machine size"
 msgstr "Pilih ukuran mesin"
@@ -15784,6 +15828,9 @@ msgstr "Proyek siap. Buka dari sidebar."
 
 msgid "Project relocated to {newPath}"
 msgstr "Proyek dipindahkan ke {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Proyek disiapkan di {hostName}"
 
 msgid "Project Settings"
 msgstr "Pengaturan Proyek"
@@ -18065,6 +18112,9 @@ msgstr "Pilih {0}"
 msgid "Select a file to view it here"
 msgstr "Pilih file untuk melihatnya di sini"
 
+msgid "Select a folder to clone into"
+msgstr "Pilih folder tujuan clone"
+
 msgid "Select a project"
 msgstr "Pilih sebuah proyek"
 
@@ -18193,6 +18243,9 @@ msgstr "Pilih tim"
 
 msgid "Select terminal script directory"
 msgstr "Pilih direktori skrip terminal"
+
+msgid "Select the repository folder"
+msgstr "Pilih folder repositori"
 
 msgid "Select worktree location"
 msgstr "Pilih lokasi worktree"
@@ -18410,8 +18463,14 @@ msgstr "Siapkan otomatisasi"
 msgid "Set up Environment"
 msgstr "Siapkan lingkungan"
 
+msgid "Set up on {hostName}"
+msgstr "Siapkan di {hostName}"
+
 msgid "Set up once"
 msgstr "Atur sekali"
+
+msgid "Set up project on {hostName}"
+msgstr "Siapkan proyek di {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Siapkan proyek ini untuk Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Pakai “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Pakai path relatif terhadap workspace atau folder absolut."
 
+msgid "Use an existing folder"
+msgstr "Gunakan folder yang ada"
+
 msgid "Use another port"
 msgstr "Gunakan port lain"
 
@@ -22800,6 +22862,10 @@ msgstr "Saat sisa GB-jam kurang dari {topupThreshold}, tambah {topupPrice} ({top
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Saat nonaktif, tidak ada yang bisa mengakses file dan alat di perangkat ini. Anda tetap bisa terhubung ke sandbox jarak jauh dari sini. <0>Pelajari lebih lanjut<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Asal {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Ke mana badge port yang terdeteksi di sidebar terbuka saat diklik."

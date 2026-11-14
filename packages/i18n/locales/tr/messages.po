@@ -2802,6 +2802,9 @@ msgstr "Zaten hesabınız var mı? <0>Oturum açın</0>"
 msgid "Already in tasks"
 msgstr "Zaten görevlerde"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Zaten {existingPath} konumunda kurulu. Bunun yerine {repoPath} ile bağlansın mı?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "⌘K paletleri için CommandDialog olarak da kullanılabilir"
 
@@ -4531,6 +4534,9 @@ msgstr "Bir dövüşçü seç"
 msgid "Choose a folder"
 msgstr "Bir klasör seçin"
 
+msgid "Choose a folder to clone into"
+msgstr "Klonlanacak klasörü seçin"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Bir issue açmadan önce GitHub issue'ları bölümünden bir proje seçin."
 
@@ -4572,6 +4578,9 @@ msgstr "Modeli seç"
 
 msgid "Choose the primary repository"
 msgstr "Birincil depoyu seçin"
+
+msgid "Choose the repository folder"
+msgstr "Depo klasörünü seçin"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Uygulama içi tarayıcıdan neyin temizleneceğini seçin."
@@ -4757,8 +4766,17 @@ msgstr "Depo klonla"
 msgid "Clone a repository"
 msgstr "Bir depoyu klonla"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Her depoyu klonlayın veya host'ta zaten bulunan bir klasörü kullanın."
+
 msgid "Clone from URL"
 msgstr "URL'den klonla"
+
+msgid "Clone into"
+msgstr "Şuraya klonla"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "{hostName} üzerinde bir klasöre klonla"
 
 msgid "clone the repository"
 msgstr "depoyu klonlama"
@@ -10435,6 +10453,9 @@ msgstr "Her v1 terminal betiğini v2'ye aktarın."
 msgid "Import existing folder"
 msgstr "Mevcut klasörü içe aktar"
 
+msgid "Import failed"
+msgstr "İçe aktarma başarısız"
+
 msgid "Import failed: {message}"
 msgstr "İçe aktarma başarısız: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Görev bağla"
 msgid "Link this task"
 msgstr "Bu görevi bağla"
 
+msgid "Link to {repoPath}?"
+msgstr "{repoPath} ile bağlansın mı?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} çalışma alanına bağlandı"
 
@@ -12528,6 +12552,14 @@ msgstr "Bu çalışma alanı taşınıyor…"
 msgid "Multi-select"
 msgstr "Çoklu seçim"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Bu depoyu birden fazla proje kullanıyor ({0}). Bu cihazda kurmak için ayarlardan projeyi seçin."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Bu depoyu birden fazla proje kullanıyor ({0}). Bu cihazda kurmak için istediğiniz projeyi ayarlardan açın."
+
 msgid "Mute"
 msgstr "Sessize al"
 
@@ -13387,6 +13419,9 @@ msgstr "Pull request bulunamadı."
 
 msgid "No release notes at {url}"
 msgstr "{url} adresinde sürüm notu yok"
+
+msgid "No remote"
+msgstr "Uzak depo yok"
 
 msgid "No remote repository"
 msgstr "Uzak depo yok"
@@ -14427,6 +14462,9 @@ msgstr "Önizlemeyi aç"
 msgid "Open Project"
 msgstr "Proje aç"
 
+msgid "Open Projects"
+msgstr "Projeleri aç"
+
 msgid "Open pull request"
 msgstr "Pull request'i aç"
 
@@ -15255,8 +15293,14 @@ msgstr "Farklı bir öğe seç"
 msgid "Pick a different element (esc)"
 msgstr "Farklı bir öğe seç (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "{names} için bir klasör seçin"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Diskte bir klasör seçip proje olarak ekleyin"
+
+msgid "Pick a folder…"
+msgstr "Bir klasör seçin…"
 
 msgid "Pick a machine size"
 msgstr "Bir makine boyutu seçin"
@@ -15784,6 +15828,9 @@ msgstr "Proje hazır. Kenar çubuğundan açın."
 
 msgid "Project relocated to {newPath}"
 msgstr "Proje {newPath} konumuna taşındı"
+
+msgid "Project set up on {hostName}"
+msgstr "Proje {hostName} üzerinde kuruldu"
 
 msgid "Project Settings"
 msgstr "Proje ayarları"
@@ -18065,6 +18112,9 @@ msgstr "{0} öğesini seç"
 msgid "Select a file to view it here"
 msgstr "Burada görüntülemek için bir dosya seçin"
 
+msgid "Select a folder to clone into"
+msgstr "Klonlanacak bir klasör seçin"
+
 msgid "Select a project"
 msgstr "Bir proje seçin"
 
@@ -18193,6 +18243,9 @@ msgstr "Takımları seç"
 
 msgid "Select terminal script directory"
 msgstr "Terminal betiği dizinini seçin"
+
+msgid "Select the repository folder"
+msgstr "Depo klasörünü seçin"
 
 msgid "Select worktree location"
 msgstr "Worktree konumunu seçin"
@@ -18410,8 +18463,14 @@ msgstr "Bir otomasyon kur"
 msgid "Set up Environment"
 msgstr "Ortamı kur"
 
+msgid "Set up on {hostName}"
+msgstr "{hostName} üzerinde kur"
+
 msgid "Set up once"
 msgstr "Bir kez kurun"
+
+msgid "Set up project on {hostName}"
+msgstr "Projeyi {hostName} üzerinde kur"
 
 msgid "Set up this project for Paradev"
 msgstr "Bu projeyi Paradev için kur"
@@ -22155,6 +22214,9 @@ msgstr "“{0}” kullan"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Çalışma alanına göreli bir yol ya da mutlak bir klasör kullanın."
 
+msgid "Use an existing folder"
+msgstr "Mevcut bir klasörü kullan"
+
 msgid "Use another port"
 msgstr "Başka bir port kullan"
 
@@ -22800,6 +22862,10 @@ msgstr "{topupThreshold} GB-saatten az kaldığında {topupPrice} ekle ({topupGb
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Kapalıyken başka hiçbir şey bu cihazdaki dosya ve araçlara erişemez. Buradan uzak sandbox'lara yine de bağlanabilirsiniz. <0>Daha fazla bilgi<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "{0} nereden geliyor"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Kenar çubuğundaki algılanan port rozetlerine tıklandığında nerede açılacağı."

@@ -2802,6 +2802,9 @@ msgstr "Already have an account? <0>Sign in</0>"
 msgid "Already in tasks"
 msgstr "Already in tasks"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Already set up at {existingPath}. Link to {repoPath} instead?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Also available as CommandDialog for ⌘K palettes"
 
@@ -4531,6 +4534,9 @@ msgstr "Choose a fighter"
 msgid "Choose a folder"
 msgstr "Choose a folder"
 
+msgid "Choose a folder to clone into"
+msgstr "Choose a folder to clone into"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Choose a project from GitHub issues before opening an issue."
 
@@ -4572,6 +4578,9 @@ msgstr "Choose the model"
 
 msgid "Choose the primary repository"
 msgstr "Choose the primary repository"
+
+msgid "Choose the repository folder"
+msgstr "Choose the repository folder"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Choose what to clear from the in-app browser."
@@ -4757,8 +4766,17 @@ msgstr "Clone a repo"
 msgid "Clone a repository"
 msgstr "Clone a repository"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Clone each repository, or use a folder that is already on the host."
+
 msgid "Clone from URL"
 msgstr "Clone from URL"
+
+msgid "Clone into"
+msgstr "Clone into"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Clone into a folder on {hostName}"
 
 msgid "clone the repository"
 msgstr "clone the repository"
@@ -10435,6 +10453,9 @@ msgstr "Import each v1 terminal script into v2."
 msgid "Import existing folder"
 msgstr "Import existing folder"
 
+msgid "Import failed"
+msgstr "Import failed"
+
 msgid "Import failed: {message}"
 msgstr "Import failed: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Link task"
 msgid "Link this task"
 msgstr "Link this task"
 
+msgid "Link to {repoPath}?"
+msgstr "Link to {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "Linked {slug} to workspace"
 
@@ -12528,6 +12552,14 @@ msgstr "Moving this workspace…"
 msgid "Multi-select"
 msgstr "Multi-select"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+
 msgid "Mute"
 msgstr "Mute"
 
@@ -13387,6 +13419,9 @@ msgstr "No pull requests found."
 
 msgid "No release notes at {url}"
 msgstr "No release notes at {url}"
+
+msgid "No remote"
+msgstr "No remote"
 
 msgid "No remote repository"
 msgstr "No remote repository"
@@ -14427,6 +14462,9 @@ msgstr "Open Preview"
 msgid "Open Project"
 msgstr "Open Project"
 
+msgid "Open Projects"
+msgstr "Open Projects"
+
 msgid "Open pull request"
 msgstr "Open pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Pick a different element"
 msgid "Pick a different element (esc)"
 msgstr "Pick a different element (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Pick a folder for {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Pick a folder on disk and add it as a project"
+
+msgid "Pick a folder…"
+msgstr "Pick a folder…"
 
 msgid "Pick a machine size"
 msgstr "Pick a machine size"
@@ -15784,6 +15828,9 @@ msgstr "Project ready. Open it from the sidebar."
 
 msgid "Project relocated to {newPath}"
 msgstr "Project relocated to {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Project set up on {hostName}"
 
 msgid "Project Settings"
 msgstr "Project Settings"
@@ -18065,6 +18112,9 @@ msgstr "Select {0}"
 msgid "Select a file to view it here"
 msgstr "Select a file to view it here"
 
+msgid "Select a folder to clone into"
+msgstr "Select a folder to clone into"
+
 msgid "Select a project"
 msgstr "Select a project"
 
@@ -18193,6 +18243,9 @@ msgstr "Select teams"
 
 msgid "Select terminal script directory"
 msgstr "Select terminal script directory"
+
+msgid "Select the repository folder"
+msgstr "Select the repository folder"
 
 msgid "Select worktree location"
 msgstr "Select worktree location"
@@ -18410,8 +18463,14 @@ msgstr "Set up an automation"
 msgid "Set up Environment"
 msgstr "Set up Environment"
 
+msgid "Set up on {hostName}"
+msgstr "Set up on {hostName}"
+
 msgid "Set up once"
 msgstr "Set up once"
+
+msgid "Set up project on {hostName}"
+msgstr "Set up project on {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Set up this project for Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Use “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Use a workspace-relative path or an absolute folder."
 
+msgid "Use an existing folder"
+msgstr "Use an existing folder"
+
 msgid "Use another port"
 msgstr "Use another port"
 
@@ -22800,6 +22862,10 @@ msgstr "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({top
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Where {0} comes from"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Where detected-port badges in the sidebar open when clicked."

@@ -213,6 +213,18 @@ async function migrateProjects(
 				findByPathResult,
 			});
 
+			if (result.kind === "needs-relocate") {
+				summary.skipped++;
+				pushOutcome(ledger, outcomes, {
+					v1Id: project.id,
+					kind: "project",
+					status: "skipped",
+					v2Id: result.v2ProjectId,
+					reason: "needs-relocate",
+				});
+				continue;
+			}
+
 			summary.migrated++;
 			pushOutcome(ledger, outcomes, {
 				v1Id: project.id,

@@ -2802,6 +2802,9 @@ msgstr "Vous avez déjà un compte ? <0>Se connecter</0>"
 msgid "Already in tasks"
 msgstr "Déjà dans les tâches"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Déjà configuré dans {existingPath}. Lier plutôt à {repoPath} ?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Également disponible sous forme de CommandDialog pour les palettes ⌘K"
 
@@ -4531,6 +4534,9 @@ msgstr "Choisir un combattant"
 msgid "Choose a folder"
 msgstr "Choisir un dossier"
 
+msgid "Choose a folder to clone into"
+msgstr "Choisissez un dossier où cloner"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Choisissez un projet dans Issues GitHub avant d'ouvrir une issue."
 
@@ -4572,6 +4578,9 @@ msgstr "Choisir le modèle"
 
 msgid "Choose the primary repository"
 msgstr "Choisir le dépôt principal"
+
+msgid "Choose the repository folder"
+msgstr "Choisissez le dossier du dépôt"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Choisissez ce qu'il faut effacer du navigateur intégré."
@@ -4757,8 +4766,17 @@ msgstr "Cloner un dépôt"
 msgid "Clone a repository"
 msgstr "Cloner un dépôt"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Clonez chaque dépôt, ou utilisez un dossier déjà présent sur l'hôte."
+
 msgid "Clone from URL"
 msgstr "Cloner depuis une URL"
+
+msgid "Clone into"
+msgstr "Cloner dans"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Cloner dans un dossier sur {hostName}"
 
 msgid "clone the repository"
 msgstr "cloner le dépôt"
@@ -10435,6 +10453,9 @@ msgstr "Importez chaque script de terminal v1 dans v2."
 msgid "Import existing folder"
 msgstr "Importer un dossier existant"
 
+msgid "Import failed"
+msgstr "Échec de l'import"
+
 msgid "Import failed: {message}"
 msgstr "Échec de l'import : {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Lier une tâche"
 msgid "Link this task"
 msgstr "Lier cette tâche"
 
+msgid "Link to {repoPath}?"
+msgstr "Lier à {repoPath} ?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} lié à l'espace de travail"
 
@@ -12528,6 +12552,14 @@ msgstr "Déplacement de cet espace de travail…"
 msgid "Multi-select"
 msgstr "Sélection multiple"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Plusieurs projets utilisent ce dépôt ({0}). Choisissez le projet dans les paramètres pour le configurer sur cet appareil."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Plusieurs projets utilisent ce dépôt ({0}). Ouvrez le projet souhaité depuis les paramètres pour le configurer sur cet appareil."
+
 msgid "Mute"
 msgstr "Couper le micro"
 
@@ -13387,6 +13419,9 @@ msgstr "Aucune pull request trouvée."
 
 msgid "No release notes at {url}"
 msgstr "Aucune note de version sur {url}"
+
+msgid "No remote"
+msgstr "Aucun distant"
 
 msgid "No remote repository"
 msgstr "Aucun dépôt distant"
@@ -14427,6 +14462,9 @@ msgstr "Ouvrir l'aperçu"
 msgid "Open Project"
 msgstr "Ouvrir un projet"
 
+msgid "Open Projects"
+msgstr "Projets ouverts"
+
 msgid "Open pull request"
 msgstr "Ouvrir la pull request"
 
@@ -15255,8 +15293,14 @@ msgstr "Choisir un autre élément"
 msgid "Pick a different element (esc)"
 msgstr "Choisir un autre élément (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Choisissez un dossier pour {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Choisir un dossier sur le disque et l'ajouter comme projet"
+
+msgid "Pick a folder…"
+msgstr "Choisir un dossier…"
 
 msgid "Pick a machine size"
 msgstr "Choisissez une taille de machine"
@@ -15784,6 +15828,9 @@ msgstr "Projet prêt. Ouvrez-le depuis la barre latérale."
 
 msgid "Project relocated to {newPath}"
 msgstr "Projet déplacé vers {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Projet configuré sur {hostName}"
 
 msgid "Project Settings"
 msgstr "Paramètres du projet"
@@ -18065,6 +18112,9 @@ msgstr "Sélectionner {0}"
 msgid "Select a file to view it here"
 msgstr "Sélectionnez un fichier pour l’afficher ici"
 
+msgid "Select a folder to clone into"
+msgstr "Sélectionnez un dossier où cloner"
+
 msgid "Select a project"
 msgstr "Sélectionnez un projet"
 
@@ -18193,6 +18243,9 @@ msgstr "Sélectionner des équipes"
 
 msgid "Select terminal script directory"
 msgstr "Sélectionner le répertoire du script de terminal"
+
+msgid "Select the repository folder"
+msgstr "Sélectionnez le dossier du dépôt"
 
 msgid "Select worktree location"
 msgstr "Sélectionner l'emplacement des worktrees"
@@ -18410,8 +18463,14 @@ msgstr "Configurer une automatisation"
 msgid "Set up Environment"
 msgstr "Configurer l’environnement"
 
+msgid "Set up on {hostName}"
+msgstr "Configurer sur {hostName}"
+
 msgid "Set up once"
 msgstr "Configurez une fois"
+
+msgid "Set up project on {hostName}"
+msgstr "Configurer le projet sur {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Configurer ce projet pour Paradev"
@@ -22155,6 +22214,9 @@ msgstr "Utiliser « {0} »"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Utilisez un chemin relatif à l'espace de travail ou un dossier absolu."
 
+msgid "Use an existing folder"
+msgstr "Utiliser un dossier existant"
+
 msgid "Use another port"
 msgstr "Utiliser un autre port"
 
@@ -22800,6 +22862,10 @@ msgstr "Quand il reste moins de {topupThreshold} Go-heures, ajouter {topupPrice}
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Si désactivé, rien d'autre ne peut accéder aux fichiers et aux outils de cet appareil. Vous pouvez toujours vous connecter à des sandbox distants depuis ici. <0>En savoir plus<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Provenance de {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Ce qu'ouvrent les badges de ports détectés de la barre latérale lorsqu'on clique dessus."

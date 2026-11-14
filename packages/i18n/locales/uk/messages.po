@@ -2796,6 +2796,9 @@ msgstr "Уже маєте обліковий запис? <0>Увійдіть</0>
 msgid "Already in tasks"
 msgstr "Уже в завданнях"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Уже налаштовано в {existingPath}. Зв'язати натомість із {repoPath}?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Також доступний як CommandDialog для палітр ⌘K"
 
@@ -4525,6 +4528,9 @@ msgstr "Виберіть бійця"
 msgid "Choose a folder"
 msgstr "Виберіть папку"
 
+msgid "Choose a folder to clone into"
+msgstr "Виберіть теку для клонування"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Перш ніж відкривати issue, виберіть проєкт у GitHub issues."
 
@@ -4566,6 +4572,9 @@ msgstr "Виберіть модель"
 
 msgid "Choose the primary repository"
 msgstr "Виберіть основний репозиторій"
+
+msgid "Choose the repository folder"
+msgstr "Виберіть теку репозиторію"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Виберіть, що очистити у вбудованому браузері."
@@ -4751,8 +4760,17 @@ msgstr "Клонувати репозиторій"
 msgid "Clone a repository"
 msgstr "Клонувати репозиторій"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Клонуйте кожен репозиторій або використайте теку, що вже є на хості."
+
 msgid "Clone from URL"
 msgstr "Клонувати за URL"
+
+msgid "Clone into"
+msgstr "Клонувати в"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "Клонувати в теку на {hostName}"
 
 msgid "clone the repository"
 msgstr "клонувати репозиторій"
@@ -10429,6 +10447,9 @@ msgstr "Імпортуйте кожен скрипт термінала v1 у v2
 msgid "Import existing folder"
 msgstr "Імпортувати наявну папку"
 
+msgid "Import failed"
+msgstr "Не вдалося імпортувати"
+
 msgid "Import failed: {message}"
 msgstr "Не вдалося імпортувати: {message}"
 
@@ -11561,6 +11582,9 @@ msgstr "Прив'язати завдання"
 msgid "Link this task"
 msgstr "Прив'язати це завдання"
 
+msgid "Link to {repoPath}?"
+msgstr "Зв'язати з {repoPath}?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} прив'язано до робочого простору"
 
@@ -12522,6 +12546,14 @@ msgstr "Цей робочий простір переміщується…"
 msgid "Multi-select"
 msgstr "Множинний вибір"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Цей репозиторій використовують кілька проєктів ({0}). Виберіть проєкт у налаштуваннях, щоб налаштувати його на цьому пристрої."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Цей репозиторій використовують кілька проєктів ({0}). Відкрийте потрібний проєкт у налаштуваннях, щоб налаштувати його на цьому пристрої."
+
 msgid "Mute"
 msgstr "Вимкнути звук"
 
@@ -13381,6 +13413,9 @@ msgstr "Пул-реквестів не знайдено."
 
 msgid "No release notes at {url}"
 msgstr "Немає нотаток до релізу за адресою {url}"
+
+msgid "No remote"
+msgstr "Немає віддаленого"
 
 msgid "No remote repository"
 msgstr "Немає віддаленого репозиторію"
@@ -14421,6 +14456,9 @@ msgstr "Відкрити попередній перегляд"
 msgid "Open Project"
 msgstr "Відкрити проєкт"
 
+msgid "Open Projects"
+msgstr "Відкрити проєкти"
+
 msgid "Open pull request"
 msgstr "Відкрити пул-реквест"
 
@@ -15249,8 +15287,14 @@ msgstr "Вибрати інший елемент"
 msgid "Pick a different element (esc)"
 msgstr "Вибрати інший елемент (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Виберіть теку для {names}"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Виберіть папку на диску й додайте її як проєкт"
+
+msgid "Pick a folder…"
+msgstr "Вибрати папку…"
 
 msgid "Pick a machine size"
 msgstr "Виберіть розмір машини"
@@ -15778,6 +15822,9 @@ msgstr "Проєкт готовий. Відкрийте його з бічної
 
 msgid "Project relocated to {newPath}"
 msgstr "Проєкт переміщено до {newPath}"
+
+msgid "Project set up on {hostName}"
+msgstr "Проєкт налаштовано на {hostName}"
 
 msgid "Project Settings"
 msgstr "Налаштування проєкту"
@@ -18059,6 +18106,9 @@ msgstr "Вибрати {0}"
 msgid "Select a file to view it here"
 msgstr "Виберіть файл, щоб переглянути його тут"
 
+msgid "Select a folder to clone into"
+msgstr "Виберіть теку для клонування"
+
 msgid "Select a project"
 msgstr "Виберіть проєкт"
 
@@ -18187,6 +18237,9 @@ msgstr "Виберіть команди"
 
 msgid "Select terminal script directory"
 msgstr "Виберіть папку скрипта термінала"
+
+msgid "Select the repository folder"
+msgstr "Виберіть теку репозиторію"
 
 msgid "Select worktree location"
 msgstr "Виберіть розташування worktree"
@@ -18404,8 +18457,14 @@ msgstr "Налаштуйте автоматизацію"
 msgid "Set up Environment"
 msgstr "Налаштувати середовище"
 
+msgid "Set up on {hostName}"
+msgstr "Налаштувати на {hostName}"
+
 msgid "Set up once"
 msgstr "Налаштуйте один раз"
+
+msgid "Set up project on {hostName}"
+msgstr "Налаштувати проєкт на {hostName}"
 
 msgid "Set up this project for Paradev"
 msgstr "Налаштуй цей проєкт для Paradev"
@@ -22149,6 +22208,9 @@ msgstr "Використати «{0}»"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Використовуйте шлях відносно робочого простору або абсолютний шлях до папки."
 
+msgid "Use an existing folder"
+msgstr "Використати наявну теку"
+
 msgid "Use another port"
 msgstr "Використати інший порт"
 
@@ -22794,6 +22856,10 @@ msgstr "Коли залишається менше ніж {topupThreshold} ГБ-
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Якщо вимкнено, ніщо інше не матиме доступу до файлів та інструментів на цьому пристрої. Звідси ви все одно можете під'єднуватися до віддалених пісочниць. <0>Докладніше<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Звідки береться {0}"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Де відкриваються бейджі виявлених портів на бічній панелі, коли їх натиснути."

@@ -2,14 +2,17 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import type { HostServiceClient } from "renderer/lib/host-service-client";
+import { legacySetupInput } from "renderer/lib/legacySetupInput";
 import { getBaseName } from "renderer/lib/pathBasename";
 import type { ProjectSetupResult } from "renderer/react-query/projects";
 
-interface MatchingProject {
+export interface MatchingProject {
 	id: string;
 	name: string;
-	/** Set on a local match: the repository at the folder. */
+	/** The repository at the folder; for a legacy cloud match, the project id. */
 	repositoryId?: string;
+	repoCloneUrl: string | null;
+	source: "local-path" | "remote";
 }
 
 export interface FolderImportResult extends ProjectSetupResult {
@@ -18,7 +21,10 @@ export interface FolderImportResult extends ProjectSetupResult {
 }
 
 export type FolderImportClient = {
-	project: Pick<HostServiceClient["project"], "findByPath" | "create">;
+	project: Pick<
+		HostServiceClient["project"],
+		"findByPath" | "setup" | "create"
+	>;
 };
 
 export interface ImportFolderFirstDeps {
@@ -28,9 +34,11 @@ export interface ImportFolderFirstDeps {
 	requestGitInit: (repoPath: string) => Promise<boolean>;
 	finalizeSetup: (hostUrl: string, result: FolderImportResult) => void;
 	onError?: (message: string) => void;
+	onMultipleProjects?: (input: { candidates: MatchingProject[] }) => void;
 	messages: {
 		hostUnavailable: () => string;
 		cloudUnreachable: (first: { url: string; message: string }) => string;
+		multipleProjects: (candidates: MatchingProject[]) => string;
 	};
 }
 
@@ -41,6 +49,7 @@ export async function importFolderFirst({
 	requestGitInit,
 	finalizeSetup,
 	onError,
+	onMultipleProjects,
 	messages,
 }: ImportFolderFirstDeps): Promise<FolderImportResult | null> {
 	// Pick the folder first — the native dialog is a local Electron call and
@@ -86,13 +95,29 @@ export async function importFolderFirst({
 		return null;
 	}
 
-	const [only] = candidates;
+	const [only, ...rest] = candidates;
+	if (rest.length > 0) {
+		if (onMultipleProjects) {
+			onMultipleProjects({ candidates });
+		} else {
+			onError?.(messages.multipleProjects(candidates));
+		}
+		return null;
+	}
 
 	try {
-		// A local match is the project this folder already belongs to.
-		const result: FolderImportResult = only?.repositoryId
-			? { projectId: only.id, repositoryId: only.repositoryId }
-			: await createLocalProject(client, repoPath, false);
+		let result: FolderImportResult;
+		if (only?.repositoryId && only.source === "remote") {
+			const project = await client.project.setup.mutate(
+				legacySetupInput({ candidate: only, path: repoPath }),
+			);
+			result = { projectId: project.id, repositoryId: only.repositoryId };
+		} else if (only?.repositoryId) {
+			// A local match is the project this folder already belongs to.
+			result = { projectId: only.id, repositoryId: only.repositoryId };
+		} else {
+			result = await createLocalProject(client, repoPath, false);
+		}
 		finalizeSetup(activeHostUrl, result);
 		return result;
 	} catch (err) {

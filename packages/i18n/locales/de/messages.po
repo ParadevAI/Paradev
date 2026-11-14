@@ -2802,6 +2802,9 @@ msgstr "Du hast schon ein Konto? <0>Anmelden</0>"
 msgid "Already in tasks"
 msgstr "Bereits in den Aufgaben"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "Bereits eingerichtet unter {existingPath}. Stattdessen mit {repoPath} verknüpfen?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Auch als CommandDialog für ⌘K-Paletten verfügbar"
 
@@ -4531,6 +4534,9 @@ msgstr "Kämpfer auswählen"
 msgid "Choose a folder"
 msgstr "Ordner auswählen"
 
+msgid "Choose a folder to clone into"
+msgstr "Ordner zum Klonen wählen"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "Wähle unter GitHub-Issues ein Projekt, bevor du ein Issue öffnest."
 
@@ -4572,6 +4578,9 @@ msgstr "Modell auswählen"
 
 msgid "Choose the primary repository"
 msgstr "Primäres Repository wählen"
+
+msgid "Choose the repository folder"
+msgstr "Repository-Ordner wählen"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Wähle, was aus dem In-App-Browser gelöscht werden soll."
@@ -4757,8 +4766,17 @@ msgstr "Repository klonen"
 msgid "Clone a repository"
 msgstr "Repository klonen"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "Klone jedes Repository oder nutze einen Ordner, der schon auf dem Host liegt."
+
 msgid "Clone from URL"
 msgstr "Von URL klonen"
+
+msgid "Clone into"
+msgstr "Klonen nach"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "In einen Ordner auf {hostName} klonen"
 
 msgid "clone the repository"
 msgstr "das Repository klonen"
@@ -10435,6 +10453,9 @@ msgstr "Importieren Sie jedes v1-Terminalskript in v2."
 msgid "Import existing folder"
 msgstr "Vorhandenen Ordner importieren"
 
+msgid "Import failed"
+msgstr "Import fehlgeschlagen"
+
 msgid "Import failed: {message}"
 msgstr "Import fehlgeschlagen: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "Aufgabe verknüpfen"
 msgid "Link this task"
 msgstr "Diese Aufgabe verknüpfen"
 
+msgid "Link to {repoPath}?"
+msgstr "Mit {repoPath} verknüpfen?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug} mit Arbeitsbereich verknüpft"
 
@@ -12528,6 +12552,14 @@ msgstr "Dieser Arbeitsbereich wird verschoben…"
 msgid "Multi-select"
 msgstr "Mehrfachauswahl"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "Mehrere Projekte nutzen dieses Repository ({0}). Wähle das Projekt in den Einstellungen, um es auf diesem Gerät einzurichten."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "Mehrere Projekte nutzen dieses Repository ({0}). Öffne das gewünschte Projekt in den Einstellungen, um es auf diesem Gerät einzurichten."
+
 msgid "Mute"
 msgstr "Stummschalten"
 
@@ -13387,6 +13419,9 @@ msgstr "Keine Pull Requests gefunden."
 
 msgid "No release notes at {url}"
 msgstr "Keine Release Notes unter {url}"
+
+msgid "No remote"
+msgstr "Kein Remote"
 
 msgid "No remote repository"
 msgstr "Kein Remote-Repository"
@@ -14427,6 +14462,9 @@ msgstr "Vorschau öffnen"
 msgid "Open Project"
 msgstr "Projekt öffnen"
 
+msgid "Open Projects"
+msgstr "Projekte öffnen"
+
 msgid "Open pull request"
 msgstr "Pull Request öffnen"
 
@@ -15255,8 +15293,14 @@ msgstr "Anderes Element wählen"
 msgid "Pick a different element (esc)"
 msgstr "Anderes Element wählen (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "Ordner für {names} wählen"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "Einen Ordner auf der Festplatte wählen und als Projekt hinzufügen"
+
+msgid "Pick a folder…"
+msgstr "Ordner wählen…"
 
 msgid "Pick a machine size"
 msgstr "Wähle eine Maschinengröße"
@@ -15784,6 +15828,9 @@ msgstr "Projekt bereit. Öffne es in der Seitenleiste."
 
 msgid "Project relocated to {newPath}"
 msgstr "Projekt nach {newPath} verschoben"
+
+msgid "Project set up on {hostName}"
+msgstr "Projekt auf {hostName} eingerichtet"
 
 msgid "Project Settings"
 msgstr "Projekteinstellungen"
@@ -18065,6 +18112,9 @@ msgstr "{0} auswählen"
 msgid "Select a file to view it here"
 msgstr "Wähle eine Datei aus, um sie hier anzuzeigen"
 
+msgid "Select a folder to clone into"
+msgstr "Ordner zum Klonen auswählen"
+
 msgid "Select a project"
 msgstr "Wähle ein Projekt"
 
@@ -18193,6 +18243,9 @@ msgstr "Teams auswählen"
 
 msgid "Select terminal script directory"
 msgstr "Verzeichnis für Terminal-Skript wählen"
+
+msgid "Select the repository folder"
+msgstr "Repository-Ordner auswählen"
 
 msgid "Select worktree location"
 msgstr "Worktree-Speicherort wählen"
@@ -18410,8 +18463,14 @@ msgstr "Automatisierung einrichten"
 msgid "Set up Environment"
 msgstr "Umgebung einrichten"
 
+msgid "Set up on {hostName}"
+msgstr "Auf {hostName} einrichten"
+
 msgid "Set up once"
 msgstr "Einmal einrichten"
+
+msgid "Set up project on {hostName}"
+msgstr "Projekt auf {hostName} einrichten"
 
 msgid "Set up this project for Paradev"
 msgstr "Dieses Projekt für Paradev einrichten"
@@ -22155,6 +22214,9 @@ msgstr "“{0}” verwenden"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Nutze einen Pfad relativ zum Arbeitsbereich oder einen absoluten Ordner."
 
+msgid "Use an existing folder"
+msgstr "Vorhandenen Ordner nutzen"
+
 msgid "Use another port"
 msgstr "Anderen Port verwenden"
 
@@ -22800,6 +22862,10 @@ msgstr "Wenn weniger als {topupThreshold} GB-Stunden übrig sind, {topupPrice} a
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "Wenn deaktiviert, kann nichts anderes auf die Dateien und Tools dieses Geräts zugreifen. Du kannst dich von hier aus weiterhin mit Remote-Sandboxes verbinden. <0>Mehr erfahren<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "Woher {0} kommt"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "Wo Port-Badges in der Seitenleiste beim Klick geöffnet werden."

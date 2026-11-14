@@ -26,8 +26,10 @@ export {
 export {
 	decideProjectImport,
 	expectedRemoteUrlFor,
+	extractExistingPath,
 	findProjectByPath,
 	importV1Project,
+	isAlreadySetUpElsewhereError,
 	isProjectAlreadyImported,
 	type ProjectFindByPathResult,
 	type ProjectImportDecision,

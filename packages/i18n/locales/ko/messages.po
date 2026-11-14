@@ -2802,6 +2802,9 @@ msgstr "이미 계정이 있으신가요? <0>로그인</0>"
 msgid "Already in tasks"
 msgstr "이미 작업에 있습니다"
 
+msgid "Already set up at {existingPath}. Link to {repoPath} instead?"
+msgstr "{existingPath}에 이미 설정되어 있습니다. 대신 {repoPath}에 연결할까요?"
+
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "⌘K 팔레트용 CommandDialog로도 제공됩니다"
 
@@ -4531,6 +4534,9 @@ msgstr "파이터 선택"
 msgid "Choose a folder"
 msgstr "폴더 선택"
 
+msgid "Choose a folder to clone into"
+msgstr "클론할 폴더 선택"
+
 msgid "Choose a project from GitHub issues before opening an issue."
 msgstr "이슈를 열기 전에 GitHub 이슈 화면에서 프로젝트를 선택하세요."
 
@@ -4572,6 +4578,9 @@ msgstr "모델 선택"
 
 msgid "Choose the primary repository"
 msgstr "기본 리포지토리 선택"
+
+msgid "Choose the repository folder"
+msgstr "저장소 폴더 선택"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "인앱 브라우저에서 삭제할 항목을 선택하세요."
@@ -4757,8 +4766,17 @@ msgstr "저장소 클론"
 msgid "Clone a repository"
 msgstr "리포지토리 클론"
 
+msgid "Clone each repository, or use a folder that is already on the host."
+msgstr "각 저장소를 클론하거나 호스트에 이미 있는 폴더를 사용하세요."
+
 msgid "Clone from URL"
 msgstr "URL에서 클론"
+
+msgid "Clone into"
+msgstr "클론 위치"
+
+msgid "Clone into a folder on {hostName}"
+msgstr "{hostName}의 폴더에 클론"
 
 msgid "clone the repository"
 msgstr "리포지토리를 클론할"
@@ -10435,6 +10453,9 @@ msgstr "각 v1 터미널 스크립트를 v2로 가져옵니다."
 msgid "Import existing folder"
 msgstr "기존 폴더 가져오기"
 
+msgid "Import failed"
+msgstr "가져오기 실패"
+
 msgid "Import failed: {message}"
 msgstr "가져오기 실패: {message}"
 
@@ -11567,6 +11588,9 @@ msgstr "작업 연결"
 msgid "Link this task"
 msgstr "이 작업 연결"
 
+msgid "Link to {repoPath}?"
+msgstr "{repoPath}에 연결할까요?"
+
 msgid "Linked {slug} to workspace"
 msgstr "{slug}을(를) 워크스페이스에 연결했습니다"
 
@@ -12528,6 +12552,14 @@ msgstr "이 워크스페이스를 옮기는 중…"
 msgid "Multi-select"
 msgstr "다중 선택"
 
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Choose the project in settings to set it up on this device."
+msgstr "여러 프로젝트가 이 리포지토리({0})를 사용합니다. 설정에서 프로젝트를 선택해 이 기기에 설정하세요."
+
+#. placeholder {0}: candidates.length
+msgid "Multiple projects use this repository ({0}). Open the project you want from settings to set it up on this device."
+msgstr "여러 프로젝트가 이 리포지토리({0})를 사용합니다. 설정에서 원하는 프로젝트를 열어 이 기기에 설정하세요."
+
 msgid "Mute"
 msgstr "음소거"
 
@@ -13387,6 +13419,9 @@ msgstr "풀 리퀘스트를 찾을 수 없습니다."
 
 msgid "No release notes at {url}"
 msgstr "{url}에 릴리스 노트가 없습니다"
+
+msgid "No remote"
+msgstr "원격 없음"
 
 msgid "No remote repository"
 msgstr "원격 리포지토리 없음"
@@ -14427,6 +14462,9 @@ msgstr "미리보기 열기"
 msgid "Open Project"
 msgstr "프로젝트 열기"
 
+msgid "Open Projects"
+msgstr "프로젝트 열기"
+
 msgid "Open pull request"
 msgstr "풀 리퀘스트 열기"
 
@@ -15255,8 +15293,14 @@ msgstr "다른 요소 선택"
 msgid "Pick a different element (esc)"
 msgstr "다른 요소 선택 (esc)"
 
+msgid "Pick a folder for {names}"
+msgstr "{names}의 폴더 선택"
+
 msgid "Pick a folder on disk and add it as a project"
 msgstr "디스크에서 폴더를 선택해 프로젝트로 추가합니다"
+
+msgid "Pick a folder…"
+msgstr "폴더 선택…"
 
 msgid "Pick a machine size"
 msgstr "머신 크기 선택"
@@ -15784,6 +15828,9 @@ msgstr "프로젝트 준비 완료. 사이드바에서 열어 보세요."
 
 msgid "Project relocated to {newPath}"
 msgstr "프로젝트를 {newPath}(으)로 이동했습니다"
+
+msgid "Project set up on {hostName}"
+msgstr "{hostName}에 프로젝트를 설정했습니다"
 
 msgid "Project Settings"
 msgstr "프로젝트 설정"
@@ -18065,6 +18112,9 @@ msgstr "{0} 선택"
 msgid "Select a file to view it here"
 msgstr "파일을 선택하면 여기에 표시됩니다"
 
+msgid "Select a folder to clone into"
+msgstr "클론할 폴더를 선택하세요"
+
 msgid "Select a project"
 msgstr "프로젝트를 선택하세요"
 
@@ -18193,6 +18243,9 @@ msgstr "팀 선택"
 
 msgid "Select terminal script directory"
 msgstr "터미널 스크립트 디렉터리 선택"
+
+msgid "Select the repository folder"
+msgstr "저장소 폴더를 선택하세요"
 
 msgid "Select worktree location"
 msgstr "worktree 위치 선택"
@@ -18410,8 +18463,14 @@ msgstr "자동화 설정하기"
 msgid "Set up Environment"
 msgstr "환경 설정"
 
+msgid "Set up on {hostName}"
+msgstr "{hostName}에 설정"
+
 msgid "Set up once"
 msgstr "한 번만 설정"
+
+msgid "Set up project on {hostName}"
+msgstr "{hostName}에 프로젝트 설정"
 
 msgid "Set up this project for Paradev"
 msgstr "이 프로젝트를 Paradev에 맞게 설정하기"
@@ -22155,6 +22214,9 @@ msgstr "“{0}” 사용"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "워크스페이스 기준 상대 경로나 절대 경로 폴더를 사용하세요."
 
+msgid "Use an existing folder"
+msgstr "기존 폴더 사용"
+
 msgid "Use another port"
 msgstr "다른 포트 사용"
 
@@ -22800,6 +22862,10 @@ msgstr "남은 GB 시간이 {topupThreshold}보다 적어지면 {topupPrice}를 
 
 msgid "When off, nothing else can reach the files and tools on this device. You can still connect out to remote sandboxes from here. <0>Learn more<1/></0>"
 msgstr "끄면 이 기기의 파일과 도구에 아무것도 접근할 수 없습니다. 여기에서 원격 샌드박스로 나가는 연결은 계속 사용할 수 있습니다. <0>자세히 알아보기<1/></0>"
+
+#. placeholder {0}: repository.name
+msgid "Where {0} comes from"
+msgstr "{0}의 출처"
 
 msgid "Where detected-port badges in the sidebar open when clicked."
 msgstr "사이드바의 감지된 포트 배지를 클릭했을 때 열리는 위치입니다."

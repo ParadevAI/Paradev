@@ -90,6 +90,24 @@ export function ProjectPickerPill({
 				}),
 			);
 		},
+		onMultipleProjects: ({ candidates }) => {
+			toast.error(
+				t({
+					message: "Import failed",
+				}),
+				{
+					description: t({
+						message: `Multiple projects use this repository (${candidates.length}). Choose the project in settings to set it up on this device.`,
+					}),
+					action: {
+						label: t({
+							message: "Open Projects",
+						}),
+						onClick: () => navigate({ to: "/settings/projects" }),
+					},
+				},
+			);
+		},
 	});
 
 	const handleCreateNewProject = async () => {
