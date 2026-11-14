@@ -78,6 +78,79 @@ describe("MoveBook", () => {
 		});
 	});
 
+	it("refuses to move a workspace while chats are still moving into it", () => {
+		const { book, ok } = newBook();
+		const parent = begin(ok);
+		ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		});
+		expect(
+			book.apply({
+				op: "begin",
+				createdBy: "user-1",
+				fromWorkspaceId: "cloud",
+				fromHostId: null,
+				toHostId: "host-2",
+			}),
+		).toEqual({
+			ok: false,
+			code: "conflict",
+			message: "Chats are still moving into this workspace",
+		});
+	});
+
+	it("ends an abandoned move even once it has its destination", () => {
+		const { ok } = newBook();
+		const parent = begin(ok);
+		const [move] = ok({
+			op: "attach",
+			workspaceMoveId: parent.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		ok({ op: "abandon", workspaceMoveId: parent.id, error: "gone" });
+		expect(ok({ op: "workspaceMove", id: parent.id }).move).toMatchObject({
+			status: "failed",
+			error: "gone",
+		});
+		expect(ok({ op: "chatMove", id: move?.id as string }).move?.status).toBe(
+			"failed",
+		);
+
+		ok({ op: "abandon", workspaceMoveId: parent.id, error: "again" });
+		expect(ok({ op: "workspaceMove", id: parent.id }).move?.error).toBe("gone");
+	});
+
+	it("retries a chat only from the newest move of its workspace", () => {
+		const { book, ok } = newBook();
+		const first = begin(ok);
+		expect(
+			book.apply({ op: "retry", workspaceMoveId: first.id, chat: chat("a") }),
+		).toMatchObject({ ok: false, code: "precondition" });
+		const [a] = ok({
+			op: "attach",
+			workspaceMoveId: first.id,
+			toWorkspaceId: "cloud",
+			branch: "move/1",
+			chats: [chat("a")],
+		}).moves;
+		ok({ op: "fail", id: a?.id as string, error: "no bundle" });
+		const second = begin(ok);
+		ok({ op: "abandon", workspaceMoveId: second.id, error: "stopped" });
+
+		expect(
+			book.apply({ op: "retry", workspaceMoveId: first.id, chat: chat("a") }),
+		).toMatchObject({ ok: false, code: "precondition" });
+		expect(ok({ op: "workspaceMove", id: first.id }).move?.status).toBe(
+			"failed",
+		);
+	});
+
 	it("settles a workspace move from the newest attempt of each chat", () => {
 		const { ok } = newBook();
 		const parent = begin(ok);

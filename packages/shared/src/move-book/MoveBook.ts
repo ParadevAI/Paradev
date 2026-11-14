@@ -133,14 +133,7 @@ export class MoveBook {
 			case "attach":
 				return reply("attach", { moves: this.attach(request, now) });
 			case "abandon":
-				this.exec(
-					`UPDATE workspace_moves SET status = 'failed', error = ?, finished_at = ?, updated_at = ?
-					WHERE id = ? AND status = 'pending' AND to_workspace_id IS NULL`,
-					request.error,
-					now,
-					now,
-					request.workspaceMoveId,
-				);
+				this.abandon(request, now);
 				return reply("abandon", {});
 			case "retry":
 				return reply("retry", { move: this.retry(request, now) });
@@ -290,6 +283,19 @@ export class MoveBook {
 		);
 		if (moving)
 			throw new Refused("conflict", "This workspace is already moving");
+		const [arriving] = this.rows<{ id: string }>(
+			`SELECT id FROM workspace_moves WHERE to_workspace_id = ? AND status IN ${WORKSPACE_IN_FLIGHT_SQL}
+			UNION ALL
+			SELECT id FROM chat_moves WHERE to_workspace_id = ? AND status IN ${CHAT_IN_FLIGHT_SQL}
+			LIMIT 1`,
+			request.fromWorkspaceId,
+			request.fromWorkspaceId,
+		);
+		if (arriving)
+			throw new Refused(
+				"conflict",
+				"Chats are still moving into this workspace",
+			);
 		const [row] = this.rows<WorkspaceMoveRow>(
 			`INSERT INTO workspace_moves (id, created_by, from_workspace_id, from_host_id, to_host_id, status, created_at, updated_at)
 			VALUES (?, ?, ?, ?, ?, 'pending', ?, ?) RETURNING *`,
@@ -334,12 +340,40 @@ export class MoveBook {
 		);
 	}
 
+	/**
+	 * Ends a begun move that will not finish: its chats still moving fail, and
+	 * a move that already ended is left as it was.
+	 */
+	private abandon(
+		request: Extract<MoveBookRequest, { op: "abandon" }>,
+		now: number,
+	): void {
+		const parent = this.workspaceMove(request.workspaceMoveId);
+		if (!parent) return;
+		if (
+			!(WORKSPACE_MOVE_IN_FLIGHT as readonly string[]).includes(parent.status)
+		)
+			return;
+		this.exec(
+			`UPDATE chat_moves SET status = 'failed', error = ?, finished_at = ?, updated_at = ?
+			WHERE workspace_move_id = ? AND status IN ${CHAT_IN_FLIGHT_SQL}`,
+			request.error,
+			now,
+			now,
+			parent.id,
+		);
+		this.end(parent.id, now, request.error);
+	}
+
 	private retry(
 		request: Extract<MoveBookRequest, { op: "retry" }>,
 		now: number,
 	): ChatMove {
 		const parent = this.workspaceMove(request.workspaceMoveId);
 		if (!parent) throw new Refused("not_found", "Move not found");
+		if (parent.toWorkspaceId === null) {
+			throw new Refused("precondition", "This move has no destination");
+		}
 		const [newer] = this.rows<{ id: string }>(
 			`SELECT id FROM workspace_moves WHERE from_workspace_id = ? AND status IN ${WORKSPACE_IN_FLIGHT_SQL}
 			AND id != ? LIMIT 1`,
@@ -347,6 +381,20 @@ export class MoveBook {
 			parent.id,
 		);
 		if (newer) throw new Refused("conflict", "This workspace is moving again");
+		const [later] = this.rows<{ id: string }>(
+			`SELECT later.id FROM workspace_moves later, workspace_moves parent
+			WHERE parent.id = ? AND later.from_workspace_id = parent.from_workspace_id
+			AND (later.created_at > parent.created_at
+				OR (later.created_at = parent.created_at AND later.rowid > parent.rowid))
+			LIMIT 1`,
+			parent.id,
+		);
+		if (later) {
+			throw new Refused(
+				"precondition",
+				"This workspace moved again after this move. Move it again instead.",
+			);
+		}
 		if (this.isChatMoving(request.chat.sessionId)) {
 			throw new Refused(
 				"conflict",
