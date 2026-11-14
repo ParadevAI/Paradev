@@ -868,7 +868,12 @@ jobs:
           fi
 
           if [[ "${{ needs.deploy-agents.result }}" == "success" ]]; then
-            source agents-status.env
+            if [[ -f agents-status.env ]]; then
+              source agents-status.env
+            else
+              AGENTS_STATUS="➖"
+              AGENTS_LINK="Not set up"
+            fi
           fi
 
           if [[ "${{ needs.deploy-marketing.result }}" == "success" ]]; then
