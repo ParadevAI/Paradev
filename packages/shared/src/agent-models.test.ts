@@ -273,6 +273,16 @@ describe("buildAgentModelArgs", () => {
 		expect(buildAgentModelArgs("polygraph", "gemini")).toEqual([]);
 	});
 
+	it("passes Wally's bare hosted model ids to Wally's own --model flag", () => {
+		expect(buildAgentModelArgs("wally", "glm-5.3-flash")).toEqual([
+			"--model",
+			"glm-5.3-flash",
+		]);
+		expect(buildAgentModelArgs("wally", "runanywhere/glm-5.3-flash")).toEqual(
+			[],
+		);
+	});
+
 	it("builds OMP model args for configured roles and exact models", () => {
 		expect(buildAgentModelArgs("omp", "@plan")).toEqual(["--model", "@plan"]);
 		expect(buildAgentModelArgs("omp", "openai-codex/gpt-5.6-sol")).toEqual([
