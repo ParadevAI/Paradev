@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
-import { Link, useMatchRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 
 function pillClass(isActive: boolean) {
 	return cn(

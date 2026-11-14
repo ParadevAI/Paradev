@@ -4,6 +4,8 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./legacy-integration-connect": "./src/legacy-integration-connect/index.ts",
+		"./domain-move": "./src/domain-move/index.ts",
 		"./browser-api-url": "./src/browser-api-url.ts",
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",

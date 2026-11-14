@@ -1,8 +1,8 @@
 import type { AppRouter } from "@superset/host-service";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { useQuery } from "@tanstack/react-query";
-import { useMatchRoute } from "@tanstack/react-router";
 import type { inferRouterOutputs } from "@trpc/server";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceHostTarget } from "../useWorkspaceHostUrl";
 

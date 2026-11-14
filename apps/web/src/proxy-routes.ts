@@ -2,6 +2,7 @@ const authPageRoutes = ["/sign-in", "/sign-up"] as const;
 
 const otherPublicRoutes = [
 	"/auth/desktop",
+	"/auth/integration-connect",
 	"/api/auth/desktop",
 	"/accept-invitation",
 	"/cli/auth/code",

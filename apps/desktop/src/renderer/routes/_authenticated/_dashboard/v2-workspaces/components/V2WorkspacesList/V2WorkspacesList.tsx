@@ -11,7 +11,6 @@ import {
 	EmptyTitle,
 } from "@superset/ui/empty";
 import { cn } from "@superset/ui/utils";
-import { useMatchRoute } from "@tanstack/react-router";
 import { type Range, useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -23,6 +22,7 @@ import {
 	LuSearchX,
 	LuTerminal,
 } from "react-icons/lu";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { BoardColumnIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/BoardColumnIcon";
 import { V2WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceProjectIcon";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";

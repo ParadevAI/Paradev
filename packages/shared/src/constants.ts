@@ -146,6 +146,7 @@ export const V2_NEW_USER_V1_EXPERIMENT_START = "2026-06-08T06:59:00.000Z";
 export const V2_NEW_USER_V2_DEFAULT_START = "2026-07-09T17:00:00.000Z";
 
 export const FEATURE_FLAGS = {
+	WEB_DOMAIN_MOVE: "web-domain-move",
 	/**
 	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one
