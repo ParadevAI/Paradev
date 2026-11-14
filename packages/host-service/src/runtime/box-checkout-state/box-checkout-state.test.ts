@@ -18,7 +18,7 @@ describe("readBoxCheckoutStates", () => {
 		rmSync(dir, { recursive: true, force: true });
 	});
 
-	it("reports the current boot's missing base and failed clone per checkout folder", () => {
+	it("reports the current boot's missing base and failed clone per checkout folder", async () => {
 		const logPath = join(dir, "boot.log");
 		writeFileSync(
 			logPath,
@@ -34,7 +34,7 @@ describe("readBoxCheckoutStates", () => {
 				"",
 			].join("\n"),
 		);
-		const state = readBoxCheckoutStates(WORKSPACE_ID, {
+		const state = await readBoxCheckoutStates(WORKSPACE_ID, {
 			SUPERSET_HOST_RUN_MODE: "sandbox",
 			SUPERSET_SANDBOX_WORKSPACE_ID: WORKSPACE_ID,
 			SUPERSET_SANDBOX_WORKSPACE_PATH: "/workspace",

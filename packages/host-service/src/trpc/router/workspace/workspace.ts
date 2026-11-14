@@ -25,7 +25,7 @@ import { destroyWorkspace } from "../workspace-cleanup";
 export const workspaceRouter = router({
 	get: protectedProcedure
 		.input(z.object({ id: z.string() }))
-		.query(({ ctx, input }) => {
+		.query(async ({ ctx, input }) => {
 			const localWorkspace = ctx.db.query.workspaces
 				.findFirst({ where: eq(workspaces.id, input.id) })
 				.sync();
@@ -37,7 +37,7 @@ export const workspaceRouter = router({
 				});
 			}
 
-			const boxCheckoutState = readBoxCheckoutStates(localWorkspace.id);
+			const boxCheckoutState = await readBoxCheckoutStates(localWorkspace.id);
 			return {
 				...localWorkspace,
 				checkouts: getCheckoutSnapshots(ctx.db, localWorkspace).map(

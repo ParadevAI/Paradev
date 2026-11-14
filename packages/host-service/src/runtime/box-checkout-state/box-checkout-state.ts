@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { sandboxCheckoutDir } from "@superset/shared/sandbox-contract";
 
 /** A checkout the boot runner has not put in place on this boot; absent once it is in. */
@@ -59,10 +59,10 @@ export function boxCheckoutStatesFromLog(
 }
 
 /** Only the box's own workspace has checkouts the boot runner makes. */
-export function readBoxCheckoutStates(
+export async function readBoxCheckoutStates(
 	workspaceId: string,
 	env: NodeJS.ProcessEnv = process.env,
-): BoxCheckoutStateLookup {
+): Promise<BoxCheckoutStateLookup> {
 	const root = env.SUPERSET_SANDBOX_WORKSPACE_PATH;
 	const logPath = env.SUPERSET_SANDBOX_BOOT_LOG;
 	if (
@@ -73,7 +73,7 @@ export function readBoxCheckoutStates(
 	)
 		return none;
 	try {
-		return boxCheckoutStatesFromLog(readFileSync(logPath, "utf8"), root);
+		return boxCheckoutStatesFromLog(await readFile(logPath, "utf8"), root);
 	} catch {
 		return none;
 	}
