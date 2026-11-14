@@ -15921,6 +15921,9 @@ msgstr "Pytania"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Pytania, opinie, wsparcie albo cokolwiek innego. Napisz, a skierujemy wiadomość do właściwej osoby."
 
+msgid "Queue a message · ⌘↩ to send now"
+msgstr "Dodaj wiadomość do kolejki · ⌘↩, aby wysłać teraz"
+
 msgid "Queue message"
 msgstr "Dodaj wiadomość do kolejki"
 
@@ -22382,6 +22385,9 @@ msgstr "Oczekiwanie na pierwszą wiadomość subagenta…"
 
 msgid "Waiting for your input"
 msgstr "Czeka na Twoją odpowiedź"
+
+msgid "Waiting on background work"
+msgstr "Oczekiwanie na zadania w tle"
 
 msgid "Waking up workspace"
 msgstr "Wybudzanie obszaru roboczego"

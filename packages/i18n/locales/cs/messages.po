@@ -15921,6 +15921,9 @@ msgstr "Otázky"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Dotazy, zpětná vazba, podpora nebo cokoli jiného. Napište nám a předáme to správnému člověku."
 
+msgid "Queue a message · ⌘↩ to send now"
+msgstr "Zařaďte zprávu do fronty · ⌘↩ pro okamžité odeslání"
+
 msgid "Queue message"
 msgstr "Zařadit zprávu do fronty"
 
@@ -22382,6 +22385,9 @@ msgstr "Čekání na první zprávu subagenta…"
 
 msgid "Waiting for your input"
 msgstr "Čeká na váš vstup"
+
+msgid "Waiting on background work"
+msgstr "Čeká se na práci na pozadí"
 
 msgid "Waking up workspace"
 msgstr "Probouzení pracovního prostoru"

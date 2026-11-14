@@ -34,3 +34,9 @@ test("a turn the user stopped says when, instead of how long it worked", () => {
 	expect(view.getByText("You stopped after 1m 35s")).toBeTruthy();
 	expect(view.queryByText(/Worked for/)).toBeNull();
 });
+
+test("a turn held open only by background work says so instead of counting", () => {
+	const view = render(<WorkingFor background startedAtMs={0} />);
+	expect(view.getByText("Waiting on background work")).toBeTruthy();
+	expect(view.queryByText(/Working for/)).toBeNull();
+});

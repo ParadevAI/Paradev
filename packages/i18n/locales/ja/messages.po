@@ -15921,6 +15921,9 @@ msgstr "よくある質問"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "ご質問、フィードバック、サポート、その他何でも。メッセージをお送りいただければ、適切な担当者にお繋ぎします。"
 
+msgid "Queue a message · ⌘↩ to send now"
+msgstr "メッセージをキューに追加 · ⌘↩ で今すぐ送信"
+
 msgid "Queue message"
 msgstr "メッセージをキューに追加"
 
@@ -22382,6 +22385,9 @@ msgstr "サブエージェントの最初のメッセージを待っています
 
 msgid "Waiting for your input"
 msgstr "入力を待っています"
+
+msgid "Waiting on background work"
+msgstr "バックグラウンド処理を待っています"
 
 msgid "Waking up workspace"
 msgstr "ワークスペースを起動中"

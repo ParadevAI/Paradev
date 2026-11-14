@@ -744,6 +744,7 @@ export function SessionView({
 				{!focusedSubagentId && (
 					<ComposerChips
 						backgroundTasks={sessionState?.backgroundTasks}
+						hideSubagents={runningTurnId !== null && !awaitingBackground}
 						liveRefreshKey={liveRefreshKey}
 						onMoveToBackground={onBackgroundSubagent}
 						onOpenSubagent={openSubagent}

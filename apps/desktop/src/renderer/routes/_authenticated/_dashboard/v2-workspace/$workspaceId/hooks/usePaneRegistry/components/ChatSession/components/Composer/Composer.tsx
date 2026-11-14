@@ -658,8 +658,12 @@ export const Composer = memo(function Composer({
 				placeholder={
 					target
 						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
-						: (placeholder ??
-							t({ message: "Ask the agent, @mention files, run /commands" }))
+						: awaitingBackground
+							? t({ message: "Queue a message · ⌘↩ to send now" })
+							: (placeholder ??
+								t({
+									message: "Ask the agent, @mention files, run /commands",
+								}))
 				}
 				status={
 					stop || promptPending

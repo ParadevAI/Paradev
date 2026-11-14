@@ -15921,6 +15921,9 @@ msgstr "자주 묻는 질문"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "질문, 피드백, 지원 등 무엇이든 좋습니다. 메시지를 보내 주시면 담당자에게 전달하겠습니다."
 
+msgid "Queue a message · ⌘↩ to send now"
+msgstr "메시지를 대기열에 추가 · ⌘↩로 지금 보내기"
+
 msgid "Queue message"
 msgstr "메시지 대기열에 추가"
 
@@ -22382,6 +22385,9 @@ msgstr "서브 에이전트의 첫 메시지를 기다리는 중…"
 
 msgid "Waiting for your input"
 msgstr "입력을 기다리는 중"
+
+msgid "Waiting on background work"
+msgstr "백그라운드 작업을 기다리는 중"
 
 msgid "Waking up workspace"
 msgstr "워크스페이스 깨우는 중"

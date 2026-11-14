@@ -11,6 +11,7 @@ import { RunningTasksChip } from "./components/RunningTasksChip";
 
 export function ComposerChips({
 	backgroundTasks,
+	hideSubagents = false,
 	sessionId,
 	terminalId,
 	liveRefreshKey,
@@ -20,6 +21,8 @@ export function ComposerChips({
 	onMoveToBackground,
 }: {
 	backgroundTasks: readonly BackgroundTask[] | undefined;
+	/** A foreground subagent already shows in its turn. */
+	hideSubagents?: boolean;
 	sessionId: string;
 	terminalId: string | undefined;
 	liveRefreshKey: number;
@@ -54,7 +57,7 @@ export function ComposerChips({
 								turnId={runningTurnId}
 							/>
 						)}
-						{subagents.length > 0 && (
+						{subagents.length > 0 && !hideSubagents && (
 							<RunningTasksChip
 								kind="subagent"
 								onMoveToBackground={onMoveToBackground}

@@ -15921,6 +15921,9 @@ msgstr "Pertanyaan"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Pertanyaan, masukan, dukungan, atau apa pun. Kirim pesan dan kami akan meneruskannya ke orang yang tepat."
 
+msgid "Queue a message · ⌘↩ to send now"
+msgstr "Antrekan pesan · ⌘↩ untuk mengirim sekarang"
+
 msgid "Queue message"
 msgstr "Antrekan pesan"
 
@@ -22382,6 +22385,9 @@ msgstr "Menunggu pesan pertama dari subagen…"
 
 msgid "Waiting for your input"
 msgstr "Menunggu masukan Anda"
+
+msgid "Waiting on background work"
+msgstr "Menunggu pekerjaan latar belakang"
 
 msgid "Waking up workspace"
 msgstr "Membangunkan workspace"

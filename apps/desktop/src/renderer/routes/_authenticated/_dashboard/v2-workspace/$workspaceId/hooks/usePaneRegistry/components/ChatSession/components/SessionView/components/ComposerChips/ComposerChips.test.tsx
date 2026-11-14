@@ -19,12 +19,22 @@ const shell = (id: string): BackgroundTask => ({
 	startedAtMs: Date.now(),
 });
 
+const subagent = (id: string): BackgroundTask => ({
+	id,
+	kind: "subagent",
+	name: id,
+	canStop: true,
+	startedAtMs: Date.now(),
+});
+
 const chips = (
 	backgroundTasks: BackgroundTask[],
 	onStopTask: (taskId: string) => Promise<void> = async () => {},
+	hideSubagents = false,
 ) => (
 	<ComposerChips
 		backgroundTasks={backgroundTasks}
+		hideSubagents={hideSubagents}
 		liveRefreshKey={0}
 		onMoveToBackground={() => {}}
 		onOpenSubagent={() => {}}
@@ -76,4 +86,10 @@ test("a second click on stop while the first is pending sends no request", () =>
 		fireEvent.click(stop);
 	});
 	expect(stops).toEqual(["dev"]);
+});
+
+test("a foreground subagent leaves its chip to the turn, background shells keep theirs", () => {
+	render(chips([subagent("review"), shell("dev")], async () => {}, true));
+	expect(screen.queryByRole("button", { name: /Subagents/ })).toBeNull();
+	expect(screen.queryByRole("button", { name: /Background/ })).not.toBeNull();
 });

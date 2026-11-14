@@ -15921,6 +15921,9 @@ msgstr "Sorular"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Sorular, geri bildirim, destek veya başka herhangi bir şey. Bir not gönderin, doğru kişiye yönlendirelim."
 
+msgid "Queue a message · ⌘↩ to send now"
+msgstr "Mesajı sıraya ekle · Şimdi göndermek için ⌘↩"
+
 msgid "Queue message"
 msgstr "Mesajı kuyruğa al"
 
@@ -22382,6 +22385,9 @@ msgstr "Alt ajanın ilk mesajı bekleniyor…"
 
 msgid "Waiting for your input"
 msgstr "Girdinizi bekliyor"
+
+msgid "Waiting on background work"
+msgstr "Arka plan işi bekleniyor"
 
 msgid "Waking up workspace"
 msgstr "Çalışma alanı uyandırılıyor"
