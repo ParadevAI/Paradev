@@ -32,3 +32,18 @@ test("a worktree copied to another folder is the same worktree there", async () 
 	const head = Bun.spawnSync(["git", "branch", "--show-current"], { cwd: to });
 	expect(head.stdout.toString().trim()).toBe("feature");
 });
+
+test("a copy whose old folder cannot be removed still counts as moved", async () => {
+	fixture = await createGitFixture();
+	const from = `${fixture.repoPath}-from`;
+	const to = `${fixture.repoPath}-to`;
+	await fixture.git.raw(["worktree", "add", "-b", "feature", from]);
+
+	await copyWorktree(fixture.git, from, to, async () => {
+		throw new Error("EBUSY");
+	});
+
+	expect(existsSync(from)).toBe(true);
+	const list = await fixture.git.raw(["worktree", "list", "--porcelain"]);
+	expect(list).toContain(`worktree ${to}\n`);
+});

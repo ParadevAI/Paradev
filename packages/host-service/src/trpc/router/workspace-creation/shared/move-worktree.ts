@@ -16,10 +16,14 @@ export async function moveWorktree(
 	await copyWorktree(git, from, to);
 }
 
+const removeFolder = (path: string) =>
+	rm(path, { recursive: true, force: true });
+
 export async function copyWorktree(
 	git: GitClient,
 	from: string,
 	to: string,
+	removeSource: (path: string) => Promise<void> = removeFolder,
 ): Promise<void> {
 	await cp(from, to, {
 		recursive: true,
@@ -31,8 +35,13 @@ export async function copyWorktree(
 	try {
 		await git.raw(["worktree", "repair", to]);
 	} catch (error) {
-		await rm(to, { recursive: true, force: true });
+		await removeFolder(to);
 		throw error;
 	}
-	await rm(from, { recursive: true, force: true });
+	await removeSource(from).catch((error) => {
+		console.warn(
+			`[moveWorktree] moved ${from} to ${to} but could not remove the old copy`,
+			error,
+		);
+	});
 }

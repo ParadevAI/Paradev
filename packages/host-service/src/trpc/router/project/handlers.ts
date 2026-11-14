@@ -29,9 +29,11 @@ import {
 import type { HostServiceContext } from "../../../types";
 import {
 	emitLocalWorkspaceUpdated,
-	updateLocalWorkspace,
+	getLocalWorkspace,
+	type HostWorkspaceRow,
 } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
+import { revokeRootTrustForNewPrimary } from "../workspace-creation/shared/seed-agent-trust";
 import {
 	syncWorkspaceContextFiles,
 	WORKSPACE_ROOT_ENTRIES,
@@ -540,17 +542,20 @@ export function removeRepository(
 	return snapshotOf(ctx, args.projectId);
 }
 
-export function setPrimaryRepository(
+export async function setPrimaryRepository(
 	ctx: HostServiceContext,
 	args: { projectId: string; repositoryId: string },
-): ProjectSnapshot {
-	requireProject(ctx, args.projectId);
+): Promise<ProjectSnapshot> {
+	const project = requireProject(ctx, args.projectId);
 	requireRepositoryOf(ctx, args.projectId, args.repositoryId);
 	ctx.db
 		.update(projects)
 		.set({ primaryRepositoryId: args.repositoryId })
 		.where(eq(projects.id, args.projectId))
 		.run();
+	if (project.primaryRepositoryId !== args.repositoryId) {
+		await revokeRootTrustForNewPrimary(ctx.db, args.projectId);
+	}
 	const live = ctx.db
 		.select()
 		.from(workspaces)
@@ -599,35 +604,72 @@ export async function relocateRepository(
 	if (owner && owner.id !== repository.id) {
 		throw repositoryTakenError(resolved.repoPath);
 	}
-	if (resolved.repoPath === repository.repoPath) {
-		return snapshotOf(ctx, args.projectId);
+	if (resolved.repoPath !== repository.repoPath) {
+		applyRelocations(
+			ctx,
+			args.projectId,
+			[{ repository, resolved }],
+			listLiveLocalWorkspaces(ctx, args.projectId),
+		);
 	}
-	ctx.db
-		.update(repositories)
-		.set({
-			repoPath: resolved.repoPath,
-			provider: resolved.parsed ? "github" : null,
-			owner: resolved.parsed?.owner ?? null,
-			repoName: resolved.parsed?.name ?? null,
-			url: resolved.parsed?.url ?? null,
-			remoteName: resolved.remoteName,
-			updatedAt: Date.now(),
-		})
-		.where(eq(repositories.id, repository.id))
-		.run();
-	// Only a workspace that is the repository's own folder moves with it; a
-	// root of several checkouts (a box one too) keeps its folder.
-	for (const row of listLiveLocalWorkspaces(ctx, args.projectId)) {
-		if (row.worktreePath !== repository.repoPath) continue;
-		const checkouts = ctx.db
-			.select({ repositoryId: workspaceRepositories.repositoryId })
-			.from(workspaceRepositories)
-			.where(eq(workspaceRepositories.workspaceId, row.id))
-			.all();
-		if (checkouts.length !== 1 || checkouts[0]?.repositoryId !== repository.id)
-			continue;
-		updateLocalWorkspace(ctx, row.id, { worktreePath: resolved.repoPath });
-	}
-	touchProject(ctx, args.projectId);
 	return snapshotOf(ctx, args.projectId);
+}
+
+export interface Relocation {
+	repository: HostRepositoryRow;
+	resolved: ResolvedRepo;
+}
+
+/**
+ * Points repositories at new folders in one transaction. Of `candidates`,
+ * only a workspace that is a repository's own folder moves with it; a root
+ * of several checkouts (a box one too) keeps its folder.
+ */
+export function applyRelocations(
+	ctx: HostServiceContext,
+	projectId: string,
+	relocations: Relocation[],
+	candidates: HostWorkspaceRow[],
+): void {
+	if (relocations.length === 0) return;
+	const moved: string[] = [];
+	ctx.db.transaction((tx) => {
+		for (const { repository, resolved } of relocations) {
+			tx.update(repositories)
+				.set({
+					repoPath: resolved.repoPath,
+					provider: resolved.parsed ? "github" : null,
+					owner: resolved.parsed?.owner ?? null,
+					repoName: resolved.parsed?.name ?? null,
+					url: resolved.parsed?.url ?? null,
+					remoteName: resolved.remoteName,
+					updatedAt: Date.now(),
+				})
+				.where(eq(repositories.id, repository.id))
+				.run();
+			for (const row of candidates) {
+				if (row.worktreePath !== repository.repoPath) continue;
+				const checkouts = tx
+					.select({ repositoryId: workspaceRepositories.repositoryId })
+					.from(workspaceRepositories)
+					.where(eq(workspaceRepositories.workspaceId, row.id))
+					.all();
+				if (
+					checkouts.length !== 1 ||
+					checkouts[0]?.repositoryId !== repository.id
+				)
+					continue;
+				tx.update(workspaces)
+					.set({ worktreePath: resolved.repoPath, updatedAt: Date.now() })
+					.where(eq(workspaces.id, row.id))
+					.run();
+				moved.push(row.id);
+			}
+		}
+	});
+	for (const id of moved) {
+		const row = getLocalWorkspace(ctx.db, id);
+		if (row) emitLocalWorkspaceUpdated(ctx, row);
+	}
+	touchProject(ctx, projectId);
 }

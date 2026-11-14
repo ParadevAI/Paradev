@@ -14,6 +14,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { seedProject, seedWorkspace } from "../../../../../test/helpers/seed";
@@ -22,6 +23,9 @@ import * as schema from "../../../../db/schema";
 import {
 	isCodexFolderTrusted,
 	resolveTrustFamily,
+	revokeAgyFolderTrust,
+	revokeCodexFolderTrust,
+	revokeRootTrustForNewPrimary,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
 	seedCodexFolderTrust,
@@ -389,6 +393,121 @@ describe("seedWorkspaceFolderTrust", () => {
 
 		await seedWorkspaceFolderTrust(db, root.id, "claude-test");
 		expect(trusted()).toEqual([join(dir, "web"), join(dir, "api")]);
+	});
+
+	function seedTrustedRoot(db: HostDb, apiTrusted: boolean) {
+		const rootPath = join(dir, "root");
+		writeFileSync(
+			join(dir, ".claude.json"),
+			JSON.stringify({
+				theme: "dark",
+				projects: {
+					[join(dir, "web")]: { hasTrustDialogAccepted: true },
+					[join(dir, "api")]: { hasTrustDialogAccepted: apiTrusted },
+					[rootPath]: { hasTrustDialogAccepted: true, history: ["x"] },
+				},
+			}),
+		);
+		const multi = seedProject(
+			{ db },
+			{
+				repoPath: join(dir, "web"),
+				repositories: [{ repoPath: join(dir, "api") }],
+			},
+		);
+		seedWorkspace(
+			{ db },
+			{ projectId: multi.id, worktreePath: rootPath, branch: "b" },
+		);
+		const [, apiId] = multi.repositoryIds;
+		db.update(schema.projects)
+			.set({ primaryRepositoryId: apiId })
+			.where(eq(schema.projects.id, multi.id))
+			.run();
+		return { projectId: multi.id, rootPath };
+	}
+
+	const readState = () =>
+		JSON.parse(readFileSync(join(dir, ".claude.json"), "utf-8"));
+
+	test("a new primary the agent does not trust takes the root's trust away, and nothing else", async () => {
+		const { db } = setup();
+		const { projectId, rootPath } = seedTrustedRoot(db, false);
+
+		await revokeRootTrustForNewPrimary(db, projectId);
+
+		expect(readState()).toEqual({
+			theme: "dark",
+			projects: {
+				[join(dir, "web")]: { hasTrustDialogAccepted: true },
+				[join(dir, "api")]: { hasTrustDialogAccepted: false },
+				[rootPath]: { hasTrustDialogAccepted: false, history: ["x"] },
+			},
+		});
+	});
+
+	test("a new primary the agent trusts keeps the root trusted", async () => {
+		const { db } = setup();
+		const { projectId, rootPath } = seedTrustedRoot(db, true);
+
+		await revokeRootTrustForNewPrimary(db, projectId);
+
+		expect(readState().projects[rootPath].hasTrustDialogAccepted).toBe(true);
+	});
+});
+
+describe("revoking a folder's trust keeps the rest of the store", () => {
+	test("codex drops only the folder's trust line and its emptied table", async () => {
+		const file = join(dir, "config.toml");
+		writeFileSync(
+			file,
+			[
+				'model = "o3"',
+				'projects."/dotted".trust_level = "trusted"',
+				"",
+				'[projects."/a"]',
+				'trust_level = "trusted"',
+				"",
+				'[projects."/root"]',
+				'trust_level = "trusted"',
+				"",
+				'[projects."/kept"]',
+				'trust_level = "trusted"',
+				"# note",
+				"",
+			].join("\n"),
+		);
+
+		await revokeCodexFolderTrust(file, ["/root", "/dotted"]);
+
+		expect(readFileSync(file, "utf-8")).toBe(
+			[
+				'model = "o3"',
+				"",
+				'[projects."/a"]',
+				'trust_level = "trusted"',
+				"",
+				'[projects."/kept"]',
+				'trust_level = "trusted"',
+				"# note",
+				"",
+			].join("\n"),
+		);
+	});
+
+	test("antigravity drops only the folder from trustedWorkspaces", async () => {
+		const file = join(dir, "settings.json");
+		writeFileSync(
+			file,
+			JSON.stringify({ trustedWorkspaces: ["/a", "/root"], other: 1 }),
+		);
+
+		await revokeAgyFolderTrust(file, ["/root"]);
+
+		expect(JSON.parse(readFileSync(file, "utf-8"))).toEqual({
+			trustedWorkspaces: ["/a"],
+			other: 1,
+		});
 	});
 });
 

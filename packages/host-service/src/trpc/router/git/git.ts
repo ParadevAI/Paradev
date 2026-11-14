@@ -67,7 +67,11 @@ import {
 	resolveDiffCategoryRefs,
 } from "./utils/git-helpers";
 import { gitStatusRefreshLimiter } from "./utils/git-status-refresh-limiter";
-import { checkoutStatusKey, gitStatusStore } from "./utils/git-status-store";
+import {
+	checkoutStatusKey,
+	gitStatusStore,
+	parseCheckoutStatusKey,
+} from "./utils/git-status-store";
 import {
 	type GraphQLThreadsResult,
 	parseGraphQLThreads,
@@ -255,11 +259,6 @@ async function assertBranchNotPushed(
 	}
 }
 
-const checkoutsByStatusKey = new Map<
-	string,
-	{ workspaceId: string; repositoryId: string | null }
->();
-
 /** Limiter-admitted status snapshot of one checkout; shared by getStatus and
  * the batched diff-stats query so both see identical numbers. */
 function runStatusSnapshot(
@@ -274,10 +273,6 @@ function runStatusSnapshot(
 	const checkout = openCheckout(ctx, input);
 	const { statusKey } = checkout;
 	const worktreePath = checkout.path;
-	checkoutsByStatusKey.set(statusKey, {
-		workspaceId: input.workspaceId,
-		repositoryId: checkout.repositoryId,
-	});
 	const baseBranch = input.baseBranch || undefined;
 	const requestKey = JSON.stringify({ baseBranch: baseBranch ?? null });
 	return gitStatusRefreshLimiter.run({
@@ -321,13 +316,11 @@ function runStatusSnapshot(
 					).then((staleStatusKeys) => {
 						for (const key of staleStatusKeys) {
 							invalidateStatus(key);
-							const stale = checkoutsByStatusKey.get(key);
-							if (stale) {
-								ctx.eventBus.broadcastGitChanged(
-									stale.workspaceId,
-									stale.repositoryId,
-								);
-							}
+							const stale = parseCheckoutStatusKey(key);
+							ctx.eventBus.broadcastGitChanged(
+								stale.workspaceId,
+								stale.repositoryId,
+							);
 						}
 					});
 				}

@@ -149,3 +149,16 @@ export function checkoutStatusKey(
 ): string {
 	return repositoryId ? `${workspaceId}:${repositoryId}` : workspaceId;
 }
+
+export function parseCheckoutStatusKey(key: string): {
+	workspaceId: string;
+	repositoryId: string | null;
+} {
+	const separator = key.indexOf(":");
+	return separator === -1
+		? { workspaceId: key, repositoryId: null }
+		: {
+				workspaceId: key.slice(0, separator),
+				repositoryId: key.slice(separator + 1),
+			};
+}

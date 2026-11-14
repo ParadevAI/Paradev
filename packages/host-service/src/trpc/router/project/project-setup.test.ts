@@ -3,7 +3,8 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import {
@@ -58,7 +59,7 @@ function setup(api: unknown = {}) {
 		isAuthenticated: true,
 		organizationId: "org-test",
 	} as unknown as HostServiceContext;
-	return { events, caller: createCallerFactory(projectRouter)(ctx) };
+	return { db, events, caller: createCallerFactory(projectRouter)(ctx) };
 }
 
 function origin(repositories: { name: string; url: string | null }[]) {
@@ -216,6 +217,241 @@ describe("project.setup", () => {
 			code: "BAD_REQUEST",
 			message: expect.stringContaining("No remote matches acme/web"),
 		});
+	});
+
+	it("a refused set-up leaves a deleted project deleted", async () => {
+		const { caller, db } = setup();
+		const web = await repo();
+		const other = await repo();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const id = ids[0] as string;
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [{ id, mode: { kind: "import", path: web } }],
+		});
+		db.update(schema.projects)
+			.set({ deletedAt: Date.now() })
+			.where(eq(schema.projects.id, projectId))
+			.run();
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [{ id, mode: { kind: "import", path: other } }],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("already_set_up"),
+		});
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [
+					{ id: randomUUID(), mode: { kind: "import", path: web } },
+				],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("repository_not_found"),
+		});
+		expect(await caller.list()).toEqual([]);
+	});
+
+	it("brings a deleted project back in a new folder when another project took its old one", async () => {
+		const { caller, db } = setup();
+		const web = await repo();
+		const moved = await repo();
+		const first = origin([{ name: "web", url: null }]);
+		const second = origin([{ name: "web", url: null }]);
+		const id = first.ids[0] as string;
+		await caller.setup({
+			projectId: first.projectId,
+			origin: first.origin,
+			repositories: [{ id, mode: { kind: "import", path: web } }],
+		});
+		db.update(schema.projects)
+			.set({ deletedAt: Date.now() })
+			.where(eq(schema.projects.id, first.projectId))
+			.run();
+		await caller.setup({
+			projectId: second.projectId,
+			origin: second.origin,
+			repositories: [
+				{ id: second.ids[0] as string, mode: { kind: "import", path: web } },
+			],
+		});
+
+		await expect(
+			caller.setup({
+				projectId: first.projectId,
+				repositories: [{ id, mode: { kind: "import", path: web } }],
+			}),
+		).rejects.toMatchObject({
+			code: "CONFLICT",
+			message: expect.stringContaining("repository_taken"),
+		});
+		const back = await caller.setup({
+			projectId: first.projectId,
+			repositories: [
+				{ id, mode: { kind: "import", path: moved, allowRelocate: true } },
+			],
+		});
+
+		expect(back.repositories.map((r) => r.path)).toEqual([moved]);
+		expect((await caller.list()).map((p) => p.id).sort()).toEqual(
+			[first.projectId, second.projectId].sort(),
+		);
+	});
+
+	it("moves every placed repository or none of them", async () => {
+		const { caller } = setup();
+		const [web, api, webMoved, apiMoved] = await Promise.all([
+			repo(),
+			repo(),
+			repo(),
+			repo(),
+		]);
+		const notARepository = mkdtempSync(join(root, "plain-"));
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([
+			{ name: "web", url: null },
+			{ name: "api", url: null },
+		]);
+		const [webId, apiId] = ids as [string, string];
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [
+				{ id: webId, mode: { kind: "import", path: web } },
+				{ id: apiId, mode: { kind: "import", path: api } },
+			],
+		});
+		const paths = async () =>
+			(await caller.get({ projectId }))?.repositories.map((r) => [
+				r.id,
+				r.path,
+			]);
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [
+					{
+						id: webId,
+						mode: { kind: "import", path: webMoved, allowRelocate: true },
+					},
+					{
+						id: apiId,
+						mode: { kind: "import", path: notARepository, allowRelocate: true },
+					},
+				],
+			}),
+		).rejects.toThrow();
+		expect(await paths()).toEqual([
+			[apiId, api],
+			[webId, web],
+		]);
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [
+					{
+						id: webId,
+						mode: { kind: "import", path: api, allowRelocate: true },
+					},
+				],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("repository_taken"),
+		});
+
+		await caller.setup({
+			projectId,
+			repositories: [
+				{
+					id: webId,
+					mode: { kind: "import", path: webMoved, allowRelocate: true },
+				},
+				{
+					id: apiId,
+					mode: { kind: "import", path: apiMoved, allowRelocate: true },
+				},
+			],
+		});
+		expect(await paths()).toEqual([
+			[apiId, apiMoved],
+			[webId, webMoved],
+		]);
+	});
+
+	it("two set-ups of one new project at once: one wins, the other is a CONFLICT", async () => {
+		const { caller } = setup();
+		const [a, b] = await Promise.all([repo(), repo()]);
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const id = ids[0] as string;
+
+		const results = await Promise.allSettled(
+			[a, b].map((path) =>
+				caller.setup({
+					projectId,
+					origin: from,
+					repositories: [{ id, mode: { kind: "import", path } }],
+				}),
+			),
+		);
+
+		expect(results.map((r) => r.status).sort()).toEqual([
+			"fulfilled",
+			"rejected",
+		]);
+		expect(results.find((r) => r.status === "rejected")).toMatchObject({
+			reason: {
+				code: "CONFLICT",
+				message: expect.stringContaining("repository_id_taken"),
+			},
+		});
+	});
+
+	it("a stored path with a trailing slash is the same folder", async () => {
+		const { caller, db } = setup();
+		const web = await repo();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const id = ids[0] as string;
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [{ id, mode: { kind: "import", path: web } }],
+		});
+		db.update(schema.repositories)
+			.set({ repoPath: `${web}/` })
+			.where(eq(schema.repositories.id, id))
+			.run();
+
+		for (const mode of [
+			{ kind: "clone" as const, parentDir: `${dirname(web)}/` },
+			{ kind: "import" as const, path: web },
+		]) {
+			const again = await caller.setup({
+				projectId,
+				repositories: [{ id, mode }],
+			});
+			expect(again.created).toBe(false);
+		}
 	});
 
 	it("gives a legacy cloud candidate the project id as its repository id", async () => {

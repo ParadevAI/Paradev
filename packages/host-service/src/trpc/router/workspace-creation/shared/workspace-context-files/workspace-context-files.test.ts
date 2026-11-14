@@ -66,6 +66,16 @@ test("AGENTS.md lists each repository and points at the instruction files it has
 	expect(readFileSync(join(root, "CLAUDE.md"), "utf8")).toBe("@AGENTS.md\n");
 });
 
+test("a | in a branch name does not break the repository table", () => {
+	const web = { ...checkout("web", true), branch: "fix|pipe" };
+
+	writeWorkspaceContextFiles(root, [web]);
+
+	expect(readFileSync(join(root, "AGENTS.md"), "utf8")).toContain(
+		`| web | ${web.path} | fix\\|pipe |`,
+	);
+});
+
 test("each repository's skills are linked at the root, relative to it", () => {
 	const web = checkout("web", true);
 	const api = checkout("api");

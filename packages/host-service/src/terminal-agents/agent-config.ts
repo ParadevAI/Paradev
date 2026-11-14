@@ -48,7 +48,7 @@ function parseEnv(value: string): Record<string, string> {
 	}
 }
 
-function rowToConfig(
+export function rowToConfig(
 	row: typeof hostAgentConfigs.$inferSelect,
 ): ResolvedHostAgentConfig {
 	return {

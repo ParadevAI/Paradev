@@ -631,7 +631,9 @@ async function removeRepositoryCheckouts(
 		try {
 			const git = await ctx.git(repository.repoPath);
 			if (movedFrom) {
-				await moveWorktree(git, worktreePath, movedFrom);
+				if (existsSync(worktreePath)) {
+					await moveWorktree(git, worktreePath, movedFrom);
+				}
 			} else {
 				await git
 					.raw(["worktree", "remove", "--force", worktreePath])
@@ -709,8 +711,8 @@ async function createRepositoryCheckouts(
 			const git = await ctx.git(repository.repoPath);
 			await git.raw(["worktree", "prune"]).catch(() => {});
 			if (adopted) {
-				await moveWorktree(git, adopted.path, worktreePath);
 				checkout.movedFrom = adopted.path;
+				await moveWorktree(git, adopted.path, worktreePath);
 			} else if (pr) {
 				const materialized = await materializePrBranch({
 					git,

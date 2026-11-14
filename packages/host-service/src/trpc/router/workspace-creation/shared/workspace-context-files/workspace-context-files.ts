@@ -86,6 +86,10 @@ export function writeWorkspaceContextFiles(
 	writeIfChanged(join(root, "CLAUDE.md"), "@AGENTS.md\n");
 }
 
+function tableCell(value: string): string {
+	return value.replaceAll("|", "\\|");
+}
+
 function renderAgentsFile(
 	checkouts: ContextCheckout[],
 	configSource: ContextCheckout | undefined,
@@ -101,7 +105,7 @@ function renderAgentsFile(
 		"| --- | --- | --- |",
 		...checkouts.map(
 			(checkout) =>
-				`| ${checkout.name} | ${checkout.path} | ${checkout.branch} |`,
+				`| ${tableCell(checkout.name)} | ${tableCell(checkout.path)} | ${tableCell(checkout.branch)} |`,
 		),
 		"",
 		"## Repository instructions",

@@ -1,10 +1,13 @@
 import { basename, join, resolve as resolvePath } from "node:path";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
-import { projects, repositories } from "../../../db/schema";
+import { and, eq, isNull } from "drizzle-orm";
+import { projects, repositories, workspaces } from "../../../db/schema";
 import {
 	emitProjectChanged,
 	getLocalProject,
+	getProjectIncludingDeleted,
+	type HostProjectRow,
 } from "../../../projects/local-project-store";
 import { restoreProject } from "../../../projects/project-deletion";
 import {
@@ -14,11 +17,13 @@ import {
 	listProjectRepositories,
 } from "../../../projects/repositories";
 import type { HostServiceContext } from "../../../types";
+import type { HostWorkspaceRow } from "../../../workspaces/local-workspace-store";
 import {
+	applyRelocations,
 	type CreateProjectResult,
 	classifyGitFailure,
+	type Relocation,
 	type ResolvedSource,
-	relocateRepository,
 	removeCreated,
 	repositoryTakenError,
 	repositoryValues,
@@ -65,9 +70,9 @@ export async function setupProject(
 	args: SetupProjectArgs,
 ): Promise<CreateProjectResult> {
 	requireDistinctPlacements(args.repositories);
-	restoreProject(ctx, args.projectId);
-	if (getLocalProject(ctx.db, args.projectId)) {
-		await placeExisting(ctx, args.projectId, args.repositories);
+	const existing = getProjectIncludingDeleted(ctx.db, args.projectId);
+	if (existing) {
+		await placeExisting(ctx, existing, args.repositories);
 		return { ...snapshotOf(ctx, args.projectId), created: false };
 	}
 	if (!args.origin) {
@@ -130,42 +135,84 @@ function alreadySetUpError(row: HostRepositoryRow): TRPCError {
 	});
 }
 
+/**
+ * Checks every placement before anything changes, then moves the
+ * repositories in one transaction and only then brings back a deleted
+ * project, so a refused set-up leaves the project as it was.
+ */
 async function placeExisting(
 	ctx: HostServiceContext,
-	projectId: string,
+	project: HostProjectRow,
 	placements: SetupPlacement[],
 ): Promise<void> {
-	const rows = new Map(
-		listProjectRepositories(ctx.db, projectId).map((row) => [row.id, row]),
-	);
+	const projectId = project.id;
+	const projectRows = listProjectRepositories(ctx.db, projectId);
+	const rows = new Map(projectRows.map((row) => [row.id, row]));
 	for (const placement of placements) {
 		if (!rows.has(placement.id)) {
 			throw repositoryNotFound(projectId, placement.id);
 		}
 	}
+	const relocations: Relocation[] = [];
 	for (const { id, mode } of placements) {
 		const row = rows.get(id) as HostRepositoryRow;
+		const current = resolvePath(row.repoPath);
 		if (mode.kind === "clone") {
-			const predicted = join(
-				resolvePath(mode.parentDir),
-				basename(row.repoPath),
-			);
-			if (predicted !== row.repoPath) throw alreadySetUpError(row);
+			const predicted = join(resolvePath(mode.parentDir), basename(current));
+			if (predicted !== current) throw alreadySetUpError(row);
 			continue;
 		}
 		const resolved = await resolveRepositoryFolder(row, mode.path);
-		const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
-		if (owner && owner.id !== row.id) {
-			throw repositoryTakenError(resolved.repoPath);
-		}
-		if (resolved.repoPath === row.repoPath) continue;
+		if (resolved.repoPath === current) continue;
 		if (!mode.allowRelocate) throw alreadySetUpError(row);
-		await relocateRepository(ctx, {
-			projectId,
-			repositoryId: id,
-			path: mode.path,
-		});
+		relocations.push({ repository: row, resolved });
 	}
+	const relocated = new Map(
+		relocations.map(({ repository, resolved }) => [
+			repository.id,
+			resolved.repoPath,
+		]),
+	);
+	const targets = new Set<string>();
+	for (const row of projectRows) {
+		const target = relocated.get(row.id) ?? resolvePath(row.repoPath);
+		if (targets.has(target)) throw repositoryTakenError(target);
+		targets.add(target);
+		const mustBeFree = relocated.has(row.id) || project.deletedAt != null;
+		const owner = mustBeFree
+			? getLiveRepositoryAtPath(ctx.db, target)
+			: undefined;
+		if (owner && owner.projectId !== projectId) {
+			throw repositoryTakenError(target);
+		}
+	}
+	applyRelocations(
+		ctx,
+		projectId,
+		relocations,
+		movableWorkspaces(ctx, project),
+	);
+	if (project.deletedAt != null) restoreProject(ctx, projectId);
+}
+
+/** The workspaces that may follow a relocated repository: live ones, or those a deleted project will bring back. */
+function movableWorkspaces(
+	ctx: HostServiceContext,
+	project: HostProjectRow,
+): HostWorkspaceRow[] {
+	return ctx.db
+		.select()
+		.from(workspaces)
+		.where(
+			and(
+				eq(workspaces.projectId, project.id),
+				eq(workspaces.type, "local"),
+				project.deletedAt == null
+					? isNull(workspaces.archivedAt)
+					: eq(workspaces.archivedAt, project.deletedAt),
+			),
+		)
+		.all();
 }
 
 function requireUsableOrigin(
@@ -297,17 +344,39 @@ function insertSetUpProject(
 			name: repository.name,
 		});
 	});
-	ctx.db.transaction((tx) => {
-		tx.insert(projects)
-			.values({
-				id: projectId,
-				name: origin.name.trim() || projectId,
-				primaryRepositoryId: origin.primaryRepositoryId,
-				updatedAt: Date.now(),
-			})
-			.run();
-		tx.insert(repositories).values(rows).run();
-	});
+	try {
+		ctx.db.transaction((tx) => {
+			tx.insert(projects)
+				.values({
+					id: projectId,
+					name: origin.name.trim() || projectId,
+					primaryRepositoryId: origin.primaryRepositoryId,
+					updatedAt: Date.now(),
+				})
+				.run();
+			tx.insert(repositories).values(rows).run();
+		});
+	} catch (err) {
+		if (!isUniqueViolation(err)) throw err;
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: `repository_id_taken: project ${projectId} or one of its repositories was set up on this host by another request`,
+			cause: err,
+		});
+	}
 	const row = getLocalProject(ctx.db, projectId);
 	if (row) emitProjectChanged(ctx, "created", row);
+}
+
+function isUniqueViolation(err: unknown): boolean {
+	for (let e = err; e instanceof Error; e = e.cause) {
+		const code = (e as { code?: unknown }).code;
+		if (
+			code === "SQLITE_CONSTRAINT_PRIMARYKEY" ||
+			code === "SQLITE_CONSTRAINT_UNIQUE"
+		) {
+			return true;
+		}
+	}
+	return false;
 }

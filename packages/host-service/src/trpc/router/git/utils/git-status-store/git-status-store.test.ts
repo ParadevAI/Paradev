@@ -3,9 +3,11 @@ import type { Branch, ChangedFile } from "../../types";
 import type { GitStatusSnapshot } from "../git-status";
 import type { GitStatusPartial } from "../git-status-partial";
 import {
+	checkoutStatusKey,
 	GitStatusStore,
 	MAX_PENDING_PATHS,
 	MAX_VARIANTS_PER_WORKSPACE,
+	parseCheckoutStatusKey,
 } from "./git-status-store";
 
 const BRANCH: Branch = {
@@ -551,4 +553,12 @@ describe("GitStatusStore", () => {
 		await read("b-1");
 		expect(h.calls.full).toBe(MAX_VARIANTS_PER_WORKSPACE + 2);
 	});
+});
+
+test("a checkout status key reads back as its workspace and repository", () => {
+	for (const repositoryId of ["repo-1", null]) {
+		expect(
+			parseCheckoutStatusKey(checkoutStatusKey("workspace-1", repositoryId)),
+		).toEqual({ workspaceId: "workspace-1", repositoryId });
+	}
 });

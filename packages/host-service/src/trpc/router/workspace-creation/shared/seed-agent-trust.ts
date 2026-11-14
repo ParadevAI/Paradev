@@ -34,8 +34,16 @@ import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../db";
-import { projects, repositories, workspaces } from "../../../../db/schema";
-import { resolveHostAgentConfig } from "../../../../terminal-agents/agent-config";
+import {
+	hostAgentConfigs,
+	projects,
+	repositories,
+	workspaces,
+} from "../../../../db/schema";
+import {
+	resolveHostAgentConfig,
+	rowToConfig,
+} from "../../../../terminal-agents/agent-config";
 import { listWorkspaceCheckouts } from "../../../../workspaces/checkouts";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
@@ -410,5 +418,167 @@ export async function seedWorkspaceFolderTrust(
 			config,
 			primaryRepositoryPath,
 		);
+	}
+}
+
+/** Clears `hasTrustDialogAccepted` on the folder's own entries only. */
+export async function revokeClaudeFolderTrust(
+	stateFile: string,
+	folderPaths: string[],
+): Promise<void> {
+	const content = await readOptional(stateFile);
+	if (content === null) return;
+	const state = JSON.parse(content);
+	const projectsByPath = (state.projects ?? {}) as Record<
+		string,
+		Record<string, unknown> | undefined
+	>;
+	const revoked = folderPaths.filter(
+		(path) => projectsByPath[path]?.hasTrustDialogAccepted === true,
+	);
+	if (revoked.length === 0) return;
+	state.projects = {
+		...projectsByPath,
+		...Object.fromEntries(
+			revoked.map((path) => [
+				path,
+				{ ...projectsByPath[path], hasTrustDialogAccepted: false },
+			]),
+		),
+	};
+	await atomicWrite(stateFile, JSON.stringify(state, null, 2));
+}
+
+/**
+ * Drops the folder's `trust_level = "trusted"` lines, and its table header
+ * when nothing else is left in that table. Every other line stays as written.
+ */
+export async function revokeCodexFolderTrust(
+	configFile: string,
+	folderPaths: string[],
+): Promise<void> {
+	const content = await readOptional(configFile);
+	if (content === null) return;
+	const lines = content.split("\n");
+	const kept: string[] = [];
+	let table: "top" | "match" | "other" = "top";
+	let matchHeader: number | undefined;
+	let removedFromTable = false;
+	const dropEmptyMatchHeader = () => {
+		if (
+			matchHeader !== undefined &&
+			removedFromTable &&
+			kept.slice(matchHeader + 1).every((line) => line.trim() === "")
+		) {
+			kept.length = matchHeader;
+			while (kept.length > 0 && kept[kept.length - 1]?.trim() === "") {
+				kept.pop();
+			}
+			if (kept.length > 0) kept.push("");
+		}
+		matchHeader = undefined;
+		removedFromTable = false;
+	};
+	let changed = false;
+	for (const line of lines) {
+		const header = CODEX_PROJECT_HEADER.exec(line);
+		if (header || /^\s*\[/.test(line)) {
+			dropEmptyMatchHeader();
+			const key = header ? codexKey(header) : undefined;
+			table =
+				key !== undefined && folderPaths.includes(key) ? "match" : "other";
+			if (table === "match") matchHeader = kept.length;
+			kept.push(line);
+			continue;
+		}
+		if (table === "match" && CODEX_TRUST_LINE.test(line)) {
+			changed = true;
+			removedFromTable = true;
+			continue;
+		}
+		const dotted = table === "top" ? CODEX_DOTTED_TRUST.exec(line) : null;
+		const dottedKey = dotted ? codexKey(dotted) : undefined;
+		if (dottedKey !== undefined && folderPaths.includes(dottedKey)) {
+			changed = true;
+			continue;
+		}
+		kept.push(line);
+	}
+	dropEmptyMatchHeader();
+	if (!changed) return;
+	const next = kept.join("\n").replace(/\n*$/, "\n");
+	await atomicWrite(configFile, next.trim() === "" ? "" : next);
+}
+
+export async function revokeAgyFolderTrust(
+	settingsFile: string,
+	folderPaths: string[],
+): Promise<void> {
+	const content = await readOptional(settingsFile);
+	if (content === null) return;
+	const settings = JSON.parse(content);
+	const trusted = settings.trustedWorkspaces;
+	if (!Array.isArray(trusted)) return;
+	const next = trusted.filter((path) => !folderPaths.includes(path));
+	if (next.length === trusted.length) return;
+	settings.trustedWorkspaces = next;
+	await atomicWrite(settingsFile, JSON.stringify(settings, null, 2));
+}
+
+function revokeFolderTrust(
+	target: TrustTarget,
+	folderPath: string,
+): Promise<void> {
+	const candidates = [
+		...new Set([resolve(folderPath), normalizeFolderPath(folderPath)]),
+	];
+	if (target.family === "claude") {
+		return revokeClaudeFolderTrust(target.file, candidates);
+	}
+	if (target.family === "agy") {
+		return revokeAgyFolderTrust(target.file, candidates);
+	}
+	return revokeCodexFolderTrust(target.file, candidates);
+}
+
+/**
+ * A multi-repo root links the primary repository's agent config, so after a
+ * primary change every store that does not trust the new primary forgets the
+ * roots it was seeded with. Best-effort, like the seed.
+ */
+export async function revokeRootTrustForNewPrimary(
+	db: HostDb,
+	projectId: string,
+): Promise<void> {
+	const primary = db
+		.select({ repoPath: repositories.repoPath })
+		.from(projects)
+		.innerJoin(repositories, eq(repositories.id, projects.primaryRepositoryId))
+		.where(eq(projects.id, projectId))
+		.get();
+	if (!primary) return;
+	const roots = db
+		.select()
+		.from(workspaces)
+		.where(eq(workspaces.projectId, projectId))
+		.all()
+		.filter((workspace) => listWorkspaceCheckouts(db, workspace).length > 1)
+		.map((workspace) => workspace.worktreePath);
+	if (roots.length === 0) return;
+	const targets = new Map<string, TrustTarget>();
+	for (const row of db.select().from(hostAgentConfigs).all()) {
+		const target = resolveTrustTarget(db, rowToConfig(row));
+		if (target) targets.set(`${target.family}:${target.file}`, target);
+	}
+	for (const target of targets.values()) {
+		try {
+			if (await isFolderTrusted(target, primary.repoPath)) continue;
+			for (const root of roots) await revokeFolderTrust(target, root);
+		} catch (err) {
+			console.warn(
+				`[project.setPrimaryRepository] failed to revoke root trust in '${target.file}':`,
+				err,
+			);
+		}
 	}
 }
