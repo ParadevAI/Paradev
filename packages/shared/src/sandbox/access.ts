@@ -49,18 +49,31 @@ export function createSandboxAccess<G extends SandboxGrant>(
 		const wakes = wakesByWorkspaceId.get(workspaceId) ?? 0;
 		const minted = request(workspaceId, wake)
 			.then(async (grant) => {
-				if ((epochByWorkspaceId.get(workspaceId) ?? 0) !== epoch) return grant;
-				if (!wake && (wakesByWorkspaceId.get(workspaceId) ?? 0) !== wakes) {
+				const isCurrent = () =>
+					(epochByWorkspaceId.get(workspaceId) ?? 0) === epoch;
+				const supersededByWake = () =>
+					!wake && (wakesByWorkspaceId.get(workspaceId) ?? 0) !== wakes;
+				if (!isCurrent()) return grant;
+				if (supersededByWake()) {
 					return grantByWorkspaceId.get(workspaceId) ?? grant;
 				}
-				if (wake) wakesByWorkspaceId.set(workspaceId, wakes + 1);
+				if (wake) {
+					wakesByWorkspaceId.set(
+						workspaceId,
+						(wakesByWorkspaceId.get(workspaceId) ?? 0) + 1,
+					);
+				}
+				await onGrant?.(grant);
+				if (!isCurrent()) return grant;
+				if (supersededByWake()) {
+					return grantByWorkspaceId.get(workspaceId) ?? grant;
+				}
 				const previous = grantByWorkspaceId.get(workspaceId);
 				if (previous && previous.url !== grant.url) {
 					tokenByUrl.delete(previous.url);
 				}
 				grantByWorkspaceId.set(workspaceId, grant);
 				tokenByUrl.set(grant.url, grant.token);
-				await onGrant?.(grant);
 				return grant;
 			})
 			.finally(() => {
@@ -101,7 +114,11 @@ export function createSandboxAccess<G extends SandboxGrant>(
 		refresh,
 		clear,
 		prune(keepIds) {
-			for (const workspaceId of grantByWorkspaceId.keys()) {
+			const known = new Set(grantByWorkspaceId.keys());
+			for (const key of inflight.keys()) {
+				known.add(key.slice(0, key.lastIndexOf(":")));
+			}
+			for (const workspaceId of known) {
 				if (!keepIds.has(workspaceId)) clear(workspaceId);
 			}
 		},

@@ -203,9 +203,12 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		return next;
 	}, [workspaces, access, organizationId]);
 
+	const wakeRefused = isCloudUsageRefusal(wake.error);
 	useWakeWhenStopped(
-		targets.find((target) => target.workspaceId === openWorkspace?.id)?.url ??
-			null,
+		wakeRefused
+			? null
+			: (targets.find((target) => target.workspaceId === openWorkspace?.id)
+					?.url ?? null),
 		wakeOpenWorkspace,
 	);
 

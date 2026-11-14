@@ -128,6 +128,35 @@ describe("watchForStoppedSandbox", () => {
 		stop();
 	});
 
+	test("a wake that lands after the socket recovered does not block the next outage", async () => {
+		const socket = fakeBus("reconnecting");
+		let finishWake = () => {};
+		let wakes = 0;
+		const stop = watchForStoppedSandbox({
+			bus: socket.bus,
+			probe: async () => "stopped",
+			wake: () => {
+				wakes++;
+				return new Promise<void>((resolve) => {
+					finishWake = resolve;
+				});
+			},
+			graceMs: 2,
+			recheckMs: 10,
+		});
+		await advance(5);
+		expect(wakes).toBe(1);
+		socket.set("open");
+		finishWake();
+		await advance(1);
+		expect(socket.reconnects()).toBe(0);
+
+		socket.set("reconnecting");
+		await advance(5);
+		expect(wakes).toBe(2);
+		stop();
+	});
+
 	test("does nothing for a socket that reopens within the grace period", async () => {
 		const socket = fakeBus("open");
 		let probes = 0;

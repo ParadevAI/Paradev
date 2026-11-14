@@ -89,6 +89,36 @@ describe("createSandboxAccess", () => {
 		expect(access.get("ws")?.url).toBe("https://after");
 	});
 
+	test("no caller gets a grant before its ticket is registered", async () => {
+		const registration = deferred<void>();
+		const access = createSandboxAccess(
+			() => Promise.resolve(grant("https://a")),
+			{ onGrant: () => registration.promise },
+		);
+		const minted = access.wake("ws");
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(access.get("ws")).toBeNull();
+		expect(access.tokenFor("https://a")).toBeNull();
+		registration.resolve();
+		await minted;
+		expect(access.get("ws")?.url).toBe("https://a");
+	});
+
+	test("prune drops a workspace whose first request is still in flight", async () => {
+		const pending = deferred<SandboxGrant>();
+		const registered: string[] = [];
+		const access = createSandboxAccess(() => pending.promise, {
+			onGrant: (kept) => void registered.push(kept.url),
+		});
+		const minted = access.address("ws");
+		access.prune(new Set());
+		pending.resolve(grant("https://a"));
+		await minted;
+		expect(access.get("ws")).toBeNull();
+		expect(registered).toEqual([]);
+	});
+
 	test("ensure reuses a fresh grant and prune drops unlisted workspaces", async () => {
 		let requests = 0;
 		const access = createSandboxAccess((id) => {

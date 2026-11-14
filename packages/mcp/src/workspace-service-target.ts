@@ -3,10 +3,7 @@ import { callWithWake } from "@superset/shared/sandbox/reach";
 import { z } from "zod";
 import type { McpContext } from "./auth";
 import { createMcpCaller } from "./caller";
-import {
-	HostServiceUnreachableError,
-	hostServiceCall,
-} from "./host-service-client";
+import { canWakeAndRetry, hostServiceCall } from "./host-service-client";
 
 /** Where a workspace-scoped tool reaches: a host by id, or a cloud workspace. */
 export const workspaceLocationInput = {
@@ -43,7 +40,7 @@ export async function requireCloudUnlessHost(
  * sandbox's last known address, which asks the provider nothing; only when
  * nothing answers there (a stopped or moved sandbox) is it woken, and the call
  * made once more. A call host-service answered, error or not, is never
- * repeated.
+ * repeated, and a mutation is repeated only after a stopped box's 410.
  */
 export async function workspaceServiceCall<TOutput>(
 	input: { hostId?: string; workspaceId: string },
@@ -91,6 +88,6 @@ export async function workspaceServiceCall<TOutput>(
 				method,
 				payload,
 			),
-		isUnanswered: (error) => error instanceof HostServiceUnreachableError,
+		isUnanswered: (error) => canWakeAndRetry(method, error),
 	});
 }

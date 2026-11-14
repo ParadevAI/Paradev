@@ -29,6 +29,7 @@ export function watchForStoppedSandbox({
 	let checking = false;
 	let woken = false;
 	let failedWakes = 0;
+	let outage = 0;
 	let stopped = false;
 
 	const isDown = () => bus.getConnectionStatus().state !== "open";
@@ -43,14 +44,17 @@ export function watchForStoppedSandbox({
 
 	const check = async () => {
 		checking = true;
+		const checkedOutage = outage;
+		const current = () => !stopped && outage === checkedOutage;
 		try {
-			if (!isDown() || (await probe()) !== "stopped" || stopped) return;
+			if (!isDown() || (await probe()) !== "stopped" || !current()) return;
 			await wake();
+			if (!current()) return;
 			woken = true;
 			failedWakes = 0;
-			if (!stopped) bus.reconnect();
+			bus.reconnect();
 		} catch {
-			failedWakes++;
+			if (current()) failedWakes++;
 		} finally {
 			checking = false;
 			if (isDown()) {
@@ -61,6 +65,7 @@ export function watchForStoppedSandbox({
 
 	const onStatus = ({ state }: { state: string }) => {
 		if (state === "open") {
+			outage++;
 			woken = false;
 			failedWakes = 0;
 			clearTimeout(timer);
