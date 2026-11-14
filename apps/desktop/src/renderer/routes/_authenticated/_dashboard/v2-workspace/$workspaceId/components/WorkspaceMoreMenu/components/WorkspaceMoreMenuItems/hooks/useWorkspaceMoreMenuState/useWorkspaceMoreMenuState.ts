@@ -6,12 +6,12 @@ import type { HostShapedWorkspace } from "renderer/hooks/host-workspaces/useHost
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { authClient } from "renderer/lib/auth-client";
 import type { WorkspaceMenuState } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMenuItems";
+import { deriveWorkspaceStatus } from "renderer/routes/_authenticated/_dashboard/utils/deriveWorkspaceStatus";
 import { useLinkedPullRequest } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useLinkedPullRequest";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
-import { getHighestPriorityStatus } from "shared/tabs-types";
 
 /** What the sidebar row knows about a workspace, read without the sidebar. */
 export function useWorkspaceMoreMenuState(workspace: HostShapedWorkspace) {
@@ -30,6 +30,9 @@ export function useWorkspaceMoreMenuState(workspace: HostShapedWorkspace) {
 	const markTerminalSeen = useV2NotificationStore(
 		(state) => state.markTerminalSeen,
 	);
+	const seenAt = useV2NotificationStore(
+		(state) => state.workspaceSeenAt[workspaceId],
+	);
 	const { data: localStates = [] } = useLiveQuery(
 		(query) =>
 			query
@@ -44,22 +47,22 @@ export function useWorkspaceMoreMenuState(workspace: HostShapedWorkspace) {
 	const isPinned =
 		localStates.find((row) => row.workspaceId === workspaceId)?.sidebarState
 			.pinnedAt != null;
-	const terminalStatuses = [...statuses.values()];
+	const { status, isUnread } = deriveWorkspaceStatus({
+		terminalStatuses: statuses.values(),
+		hasManualUnread,
+		report: cloudWorkspace && {
+			status: cloudWorkspace.agentStatus ?? null,
+			at: cloudWorkspace.agentStatusAt?.getTime() ?? null,
+		},
+		seenAt,
+	});
 	const state: WorkspaceMenuState = {
 		workspaceId,
 		isLocalWorkspace: workspace.hostId === machineId,
 		isCloudWorkspace: cloudWorkspace !== undefined,
 		isPinned,
-		isUnread:
-			hasManualUnread ||
-			terminalStatuses.some(
-				(status) => status === "review" || status === "failed",
-			),
-		hasStatus:
-			getHighestPriorityStatus([
-				hasManualUnread ? "review" : undefined,
-				...terminalStatuses,
-			]) !== null,
+		isUnread,
+		hasStatus: status !== null,
 		hasPullRequest: Boolean(pullRequest.data),
 	};
 
