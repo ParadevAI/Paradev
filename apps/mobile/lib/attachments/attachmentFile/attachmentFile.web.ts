@@ -1,6 +1,7 @@
 import type {
 	AttachmentSize,
 	OpenAttachmentFile,
+	ReadAttachmentBase64,
 } from "./attachmentFile.types";
 
 // A blob URL has no synchronous size; the upload measures it.
@@ -32,4 +33,15 @@ export const openAttachmentFile: OpenAttachmentFile = async (uri) => {
 				request.send(blob);
 			}),
 	};
+};
+
+export const readAttachmentBase64: ReadAttachmentBase64 = async (uri) => {
+	const blob = await fetch(uri).then((response) => response.blob());
+	const dataUrl = await new Promise<string>((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => resolve(String(reader.result));
+		reader.onerror = () => reject(reader.error);
+		reader.readAsDataURL(blob);
+	});
+	return dataUrl.slice(dataUrl.indexOf(",") + 1);
 };

@@ -10,8 +10,8 @@ import type {
 import { i18n } from "@superset/i18n";
 import { rawErrorMessage } from "@superset/i18n/errors";
 import { BRAND } from "@superset/shared/brand";
-import { pressableTitle, TitlePress } from "@superset/title-press";
 import { hostReadsAttachmentParts } from "@superset/shared/host-version";
+import { pressableTitle, TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import { randomUUID } from "expo-crypto";

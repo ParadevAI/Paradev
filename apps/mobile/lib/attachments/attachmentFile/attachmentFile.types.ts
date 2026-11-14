@@ -18,3 +18,6 @@ export type OpenAttachmentFile = (uri: string) => Promise<AttachmentFile>;
 
 /** The size on disk, read synchronously; 0 when it cannot be measured. */
 export type AttachmentSize = (uri: string) => number;
+
+/** The bytes as base64, read when a host needs them. */
+export type ReadAttachmentBase64 = (uri: string) => Promise<string>;

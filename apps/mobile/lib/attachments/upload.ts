@@ -4,7 +4,12 @@ import { MAX_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
 import type { PromptInputAttachmentItem } from "@/components/ai-elements/prompt-input";
 import { apiClient } from "@/lib/trpc/client";
 import { useComposerDraftsStore } from "@/screens/(authenticated)/stores/composerDraftsStore";
-import { type AttachmentFile, openAttachmentFile } from "./attachmentFile";
+import {
+	type AttachmentFile,
+	attachmentSize,
+	openAttachmentFile,
+	readAttachmentBase64,
+} from "./attachmentFile";
 import type { ChatAttachmentFile } from "./chatParts";
 import { waitForSettledUploads } from "./settle";
 
@@ -220,13 +225,10 @@ export async function awaitAttachmentUploads(
 export function toAttachmentFiles(
 	attachments: PromptInputAttachmentItem[],
 ): ChatAttachmentFile[] {
-	return attachments.map((attachment, index) => {
-		const file = new File(attachment.uri);
-		return {
-			name: nameOf(attachment, index),
-			mimeType: attachment.mediaType ?? FALLBACK_MEDIA_TYPE,
-			size: file.size ?? 0,
-			readBase64: () => file.base64(),
-		};
-	});
+	return attachments.map((attachment, index) => ({
+		name: nameOf(attachment, index),
+		mimeType: attachment.mediaType ?? FALLBACK_MEDIA_TYPE,
+		size: attachmentSize(attachment.uri),
+		readBase64: () => readAttachmentBase64(attachment.uri),
+	}));
 }
