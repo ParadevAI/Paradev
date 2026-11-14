@@ -3,7 +3,6 @@ import { cn } from "@superset/ui/utils";
 import type { ReactNode } from "react";
 import {
 	LuArchive,
-	LuArrowRightLeft,
 	LuBellOff,
 	LuClipboard,
 	LuCopy,
@@ -24,12 +23,12 @@ import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { MenuParts } from "renderer/lib/menuParts";
 import { useDashboardSidebarPortKill } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
-import {
-	type MoveDestinationPick,
-	MoveToDestinationItems,
-} from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
+import { WorkspaceMoveMenu } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMoveMenu";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
-import type { WorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
+import type {
+	MovableWorkspace,
+	WorkspaceMoveDirection,
+} from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 
 export interface WorkspaceMenuState {
 	workspaceId: string;
@@ -65,8 +64,7 @@ interface WorkspaceMenuItemsProps {
 	/** Absent when the workspace can move nowhere. */
 	move?: {
 		directions: WorkspaceMoveDirection[];
-		fromHostId: string;
-		onPick: (pick: MoveDestinationPick) => void;
+		workspace: MovableWorkspace;
 	};
 	/** Items above the shared ones, with their own separator. */
 	leadingItems?: ReactNode;
@@ -74,6 +72,8 @@ interface WorkspaceMenuItemsProps {
 	openInItem?: ReactNode;
 	/** Items between the status group and Move to, with their own separator. */
 	groupItems?: ReactNode;
+	/** Items right after Move, with their own separator. */
+	afterMoveItems?: ReactNode;
 	showDeleteHotkey?: boolean;
 }
 
@@ -86,6 +86,7 @@ export function WorkspaceMenuItems({
 	leadingItems,
 	openInItem,
 	groupItems,
+	afterMoveItems,
 	showDeleteHotkey = false,
 }: WorkspaceMenuItemsProps) {
 	const { Item, Separator, Sub, SubTrigger, SubContent, Shortcut } = parts;
@@ -181,23 +182,14 @@ export function WorkspaceMenuItems({
 			{move && (
 				<>
 					<Separator />
-					<Sub>
-						<SubTrigger>
-							<LuArrowRightLeft className={icon} />
-							<Trans>Move to</Trans>
-						</SubTrigger>
-						<SubContent>
-							<MoveToDestinationItems
-								item={Item}
-								iconClassName={parts.iconClassName}
-								directions={move.directions}
-								fromHostId={move.fromHostId}
-								onPick={move.onPick}
-							/>
-						</SubContent>
-					</Sub>
+					<WorkspaceMoveMenu
+						parts={parts}
+						workspace={move.workspace}
+						directions={move.directions}
+					/>
 				</>
 			)}
+			{afterMoveItems}
 			{(actions.onRemoveFromSidebar ||
 				ports.length > 0 ||
 				actions.onDelete) && <Separator />}

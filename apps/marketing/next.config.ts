@@ -30,6 +30,7 @@ const apiOrigin = process.env.NEXT_PUBLIC_API_URL
 
 // Third parties this site actually loads (probed against production):
 // - Google Ads gtag + Reddit pixel, injected in [lang]/layout.tsx
+// - Paradev external tracking script + LeadConnector event endpoint
 // - Cloudflare Web Analytics, injected at the edge by the Cloudflare proxy
 // - Work at a Startup job board (+ its hCaptcha) on /careers
 // - PostHog goes through the same-origin /ingest rewrite; ui_host is listed
@@ -58,6 +59,7 @@ const contentSecurityPolicy = [
 		"https://googleads.g.doubleclick.net",
 		"https://ad.doubleclick.net",
 		"https://alb.reddit.com",
+		"https://backend.leadconnectorhq.com",
 		"https://www.workatastartup.com",
 		...hcaptcha,
 		!isProduction && "ws:",
@@ -79,6 +81,7 @@ const contentSecurityPolicy = [
 	"object-src 'none'",
 	[
 		"script-src 'self' 'unsafe-inline'",
+		"https://x.paradev.com",
 		...googleAdsScripts,
 		"https://www.redditstatic.com",
 		"https://static.cloudflareinsights.com",

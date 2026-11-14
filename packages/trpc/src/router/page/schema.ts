@@ -241,7 +241,10 @@ export const setPageWatchSchema = z.object({
 
 export const clearPageWatchSchema = z.object({ id: pageFields.id });
 
-export const publicPageSchema = z.object({ slug: pageFields.slug });
+export const publicPageSchema = z.object({
+	slug: pageFields.slug,
+	download: z.boolean().optional(),
+});
 
 export const pagePreviewSchema = z.object({ slug: pageFields.slug });
 

@@ -1180,6 +1180,34 @@
 				}
 			]
 		},
+		"ahrefs_mcp": {
+			"displayName": "Ahrefs",
+			"icon": "ahrefs",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.ahrefs.com/mcp/mcp",
+					"scopes": ["apiv3-mcp"],
+					"identity": {
+						"account": {
+							"id": "$.token_type"
+						},
+						"user": {
+							"id": "$.token_type"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"wispr_mcp": {
 			"displayName": "Wispr Flow",
 			"icon": "wispr",

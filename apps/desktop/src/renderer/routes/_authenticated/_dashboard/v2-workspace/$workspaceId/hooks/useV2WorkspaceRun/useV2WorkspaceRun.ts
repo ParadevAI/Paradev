@@ -7,8 +7,9 @@ import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -123,6 +124,21 @@ export function useV2WorkspaceRun({
 			{ enabled: projectId !== null },
 		);
 
+	const hostTarget = useWorkspaceHostTarget(workspaceId);
+	const isSandbox =
+		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
+	const isBootRunHost = isSandbox && Boolean(configRunDefinition);
+	const { data: sandboxStatus } = workspaceTrpc.sandbox.status.useQuery(
+		undefined,
+		{ enabled: isBootRunHost },
+	);
+	const bootRunTerminalId = sandboxStatus?.runTerminalId ?? null;
+	const { data: bootRunProcess } =
+		workspaceTrpc.terminal.hasRunningProcess.useQuery(
+			{ terminalId: bootRunTerminalId ?? "", workspaceId },
+			{ enabled: bootRunTerminalId !== null },
+		);
+
 	const resolvedMatchedPresets = useMemo(
 		() =>
 			matchedPresets.map((preset) => ({
@@ -167,6 +183,72 @@ export function useV2WorkspaceRun({
 		[collections.v2WorkspaceLocalState, workspaceId],
 	);
 
+	const bootRunCommand = buildTerminalCommand(configRunDefinition?.commands);
+	const adoptBootRun = useCallback(
+		(terminalId: string) => {
+			if (!projectId) return;
+			updateWorkspaceRunTerminals((states) => {
+				states[terminalId] ??= {
+					terminalId,
+					workspaceId,
+					state: "running",
+					command: bootRunCommand ?? "",
+					definitionSource: "project-config",
+					definitionId: projectId,
+					startedAt: Date.now(),
+				};
+			});
+		},
+		[bootRunCommand, projectId, updateWorkspaceRunTerminals, workspaceId],
+	);
+
+	const isBootRunLive = bootRunProcess?.running === true;
+	useEffect(() => {
+		if (!isBootRunLive || !bootRunTerminalId) return;
+		if (workspaceRunTerminals[bootRunTerminalId]) return;
+		adoptBootRun(bootRunTerminalId);
+	}, [adoptBootRun, bootRunTerminalId, isBootRunLive, workspaceRunTerminals]);
+
+	const findLiveBootRun = useCallback(async (): Promise<string | null> => {
+		if (!isBootRunHost) return null;
+		try {
+			const status = await utils.sandbox.status.fetch(undefined, {
+				staleTime: 0,
+			});
+			const terminalId = status.runTerminalId;
+			if (!terminalId || workspaceRunTerminals[terminalId]) return null;
+			const { running } = await utils.terminal.hasRunningProcess.fetch(
+				{ terminalId, workspaceId },
+				{ staleTime: 0 },
+			);
+			return running ? terminalId : null;
+		} catch (error) {
+			console.warn("[workspace-run] could not read the boot run", error);
+			return null;
+		}
+	}, [isBootRunHost, utils, workspaceId, workspaceRunTerminals]);
+
+	const focusTerminalPane = useCallback(
+		(terminalId: string) => {
+			const state = store.getState();
+			for (const tab of state.tabs) {
+				for (const [paneId, pane] of Object.entries(tab.panes)) {
+					if (pane.kind !== "terminal") continue;
+					if ((pane.data as TerminalPaneData).terminalId !== terminalId)
+						continue;
+					state.setActivePane({ tabId: tab.id, paneId });
+					state.setActiveTab(tab.id);
+					return;
+				}
+			}
+			state.addTab({
+				id: crypto.randomUUID(),
+				panes: [makeTerminalPane(terminalId, crypto.randomUUID())],
+			});
+		},
+		[store],
+	);
+
 	const startWorkspaceRun = useCallback(async () => {
 		if (isStartingRef.current) return;
 		const command = buildTerminalCommand(definition?.commands);
@@ -188,10 +270,40 @@ export function useV2WorkspaceRun({
 		isStartingRef.current = true;
 		setIsPending(true);
 		try {
+			if (definition.source === "project-config") {
+				const bootRunId = await findLiveBootRun();
+				if (bootRunId) {
+					adoptBootRun(bootRunId);
+					focusTerminalPane(bootRunId);
+					return;
+				}
+			}
+
 			// A terminal pane is a "workspace run" pane iff its terminalId is in
 			// workspaceRunTerminals. Snapshot before launch so the new terminal
 			// we're about to create doesn't itself match.
 			const priorRunTerminalIds = new Set(Object.keys(workspaceRunTerminals));
+			try {
+				const { sessions } = await utils.terminal.list.fetch(
+					{ workspaceId },
+					{ staleTime: 0 },
+				);
+				await Promise.allSettled(
+					sessions
+						.filter((session) => priorRunTerminalIds.has(session.terminalId))
+						.map((session) =>
+							killSessionMutation.mutateAsync({
+								terminalId: session.terminalId,
+								workspaceId,
+							}),
+						),
+				);
+			} catch (error) {
+				console.warn(
+					"[workspace-run] could not end earlier run terminals",
+					error,
+				);
+			}
 
 			const terminalId = await launcher.create({
 				command,
@@ -259,11 +371,16 @@ export function useV2WorkspaceRun({
 			setIsPending(false);
 		}
 	}, [
+		adoptBootRun,
 		definition,
+		findLiveBootRun,
+		focusTerminalPane,
+		killSessionMutation,
 		launcher,
 		store,
 		t,
 		updateWorkspaceRunTerminals,
+		utils,
 		workspaceId,
 		workspaceRunTerminals,
 	]);

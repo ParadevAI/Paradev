@@ -1,5 +1,5 @@
 import { presetForAnyHarness } from "@superset/chat/core";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getChatTransport } from "@/lib/chat";
 import {
@@ -20,6 +20,8 @@ export interface TerminalsHost {
 	 * as long as it is open.
 	 */
 	refetchIntervalMs?: number;
+	/** Lists only this workspace's chats, as desktop does for an open workspace. */
+	workspaceId?: string;
 }
 
 export type TerminalAttention = "working" | "permission" | "failed" | "review";
@@ -58,9 +60,29 @@ export interface TerminalRowData {
 
 const TERMINALS_REFETCH_INTERVAL_MS = 5_000;
 
-export function getHostTerminalsQueryKey(machineId: string | null) {
-	return ["host-terminals", "list", machineId] as const;
+export function getHostTerminalsQueryKey(
+	machineId: string | null,
+	workspaceId?: string,
+) {
+	return workspaceId
+		? (["host-terminals", "list", machineId, workspaceId] as const)
+		: (["host-terminals", "list", machineId] as const);
 }
+
+async function fetchHostTerminals(hostUrl: string, workspaceId?: string) {
+	const client = getHostServiceClientByUrl(hostUrl);
+	const [listed, bindings, chats] = await Promise.all([
+		client.terminal.list.query({}),
+		client.terminalAgents.list.query(),
+		// A host without chat, or one too old to serve it, has no chats.
+		listOpenChats(getChatTransport(hostUrl), workspaceId).catch(
+			(): OpenChat[] => [],
+		),
+	]);
+	return { sessions: listed.sessions, bindings, chats };
+}
+
+type HostTerminalsData = Awaited<ReturnType<typeof fetchHostTerminals>>;
 
 /**
  * Mirror of desktop's deriveTerminalAgentStatus. `permission` is a live
@@ -133,6 +155,7 @@ export function useHostsTerminals(
 	hosts: TerminalsHost[],
 ): UseHostTerminalsResult {
 	const terminalSeenAt = useTerminalSeenStore((state) => state.terminalSeenAt);
+	const queryClient = useQueryClient();
 
 	const online = useMemo(
 		() =>
@@ -143,30 +166,25 @@ export function useHostsTerminals(
 					hostUrl: hostServiceUrl(host.organizationId, host.machineId),
 					refetchIntervalMs:
 						host.refetchIntervalMs ?? TERMINALS_REFETCH_INTERVAL_MS,
+					workspaceId: host.workspaceId,
 				})),
 		[hosts],
 	);
 
 	const queries = useQueries({
 		queries: online.map((host) => ({
-			queryKey: getHostTerminalsQueryKey(host.machineId),
+			queryKey: getHostTerminalsQueryKey(host.machineId, host.workspaceId),
+			placeholderData: host.workspaceId
+				? queryClient.getQueryData<HostTerminalsData>(
+						getHostTerminalsQueryKey(host.machineId),
+					)
+				: undefined,
 			refetchInterval: host.refetchIntervalMs,
 			refetchIntervalInBackground: false,
 			refetchOnWindowFocus: false,
 			retry: 1,
 			networkMode: "always" as const,
-			queryFn: async () => {
-				const client = getHostServiceClientByUrl(host.hostUrl);
-				const [listed, bindings, chats] = await Promise.all([
-					client.terminal.list.query({}),
-					client.terminalAgents.list.query(),
-					// A host without chat, or one too old to serve it, has no chats.
-					listOpenChats(getChatTransport(host.hostUrl)).catch(
-						(): OpenChat[] => [],
-					),
-				]);
-				return { sessions: listed.sessions, bindings, chats };
-			},
+			queryFn: () => fetchHostTerminals(host.hostUrl, host.workspaceId),
 		})),
 	});
 
@@ -265,16 +283,27 @@ export function useHostsTerminals(
 		return {
 			terminalsByWorkspace,
 			attentionByWorkspace,
-			isReady: queries.every((query) => query.isSuccess || query.isError),
+			// The host-wide placeholder can miss this workspace's chat; it is not an answer.
+			isReady: queries.every(
+				(query) =>
+					(query.isSuccess && !query.isPlaceholderData) || query.isError,
+			),
 			isError: queries.some((query) => query.isError),
 		};
 	}, [queries, terminalSeenAt]);
 }
 
-/** One host's terminals — see `useHostsTerminals`. */
+/**
+ * One host's terminals — see `useHostsTerminals`. Pass `workspaceId` when the
+ * caller only reads that workspace's rows.
+ */
 export function useHostTerminals(
 	host: TerminalsHost | null,
+	workspaceId?: string,
 ): UseHostTerminalsResult {
-	const hosts = useMemo(() => (host ? [host] : []), [host]);
+	const hosts = useMemo(
+		() => (host ? [workspaceId ? { ...host, workspaceId } : host] : []),
+		[host, workspaceId],
+	);
 	return useHostsTerminals(hosts);
 }

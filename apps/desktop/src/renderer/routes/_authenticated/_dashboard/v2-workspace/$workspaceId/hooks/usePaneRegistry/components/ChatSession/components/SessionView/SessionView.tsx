@@ -52,6 +52,7 @@ import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
 import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
 import { railMessages } from "../../utils/railMessages";
+import { unrunPrompt } from "../../utils/unrunPrompt";
 import {
 	type AgentChoice,
 	type AgentSwitcher,
@@ -78,19 +79,20 @@ import {
 	type SwitchableAgent,
 	UsageLimitNotice,
 } from "./components/UsageLimitNotice";
+import { useAgentSignIn } from "./hooks/useAgentSignIn";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useLaunchPromptDelivered } from "./hooks/useLaunchPromptDelivered";
 import { useMainSend } from "./hooks/useMainSend";
-import { useManualSignIn } from "./hooks/useManualSignIn";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
 import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
+import { useStoredHistory } from "./hooks/useStoredHistory";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
-import { withStoredHistory } from "./utils/withStoredHistory";
+import { subagentsInTurn } from "./utils/subagentsInTurn";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
@@ -246,13 +248,7 @@ export function SessionView({
 		}
 	}, [outbox]);
 	useRestoreUnsentPrompts(draftKey, outbox, draftOf);
-	const shownSnapshot = useMemo(
-		() =>
-			storedSnapshot
-				? withStoredHistory(storedSnapshot, session.snapshot)
-				: session.snapshot,
-		[storedSnapshot, session.snapshot],
-	);
+	const shownSnapshot = useStoredHistory(storedSnapshot, session.snapshot);
 	const timeline = useTimeline(shownSnapshot, { nestChildItems: true });
 	const rail = useStableList(
 		useMemo(() => railMessages(timeline), [timeline]),
@@ -286,12 +282,17 @@ export function SessionView({
 		() => findRunningTurnId(session.snapshot.turns),
 		[session.snapshot.turns],
 	);
-	const liveRefreshKey = useMemo(
-		() =>
-			settledToolCalls(
-				timeline.find((group) => group.turnId === runningTurnId),
-			),
+	const runningGroup = useMemo(
+		() => timeline.find((group) => group.turnId === runningTurnId),
 		[timeline, runningTurnId],
+	);
+	const liveRefreshKey = useMemo(
+		() => settledToolCalls(runningGroup),
+		[runningGroup],
+	);
+	const runningTurnSubagents = useMemo(
+		() => subagentsInTurn(runningGroup),
+		[runningGroup],
 	);
 	const turnChanges = useMemo<TurnChangesSource>(
 		() => ({
@@ -412,10 +413,13 @@ export function SessionView({
 		},
 		[onModeChange, setMode],
 	);
-	const editableIds = useMemo(
-		() => editableMessageIds(timeline, harness),
-		[timeline, harness],
+	const editableIdList = useStableList(
+		useMemo(
+			() => [...editableMessageIds(timeline, harness)],
+			[timeline, harness],
+		),
 	);
+	const editableIds = useMemo(() => new Set(editableIdList), [editableIdList]);
 	const editable = onEditMessage !== undefined && held === undefined;
 	const editMessage = useMemo(
 		() =>
@@ -631,7 +635,8 @@ export function SessionView({
 		() => composerRef.current?.openModelPicker(),
 		[],
 	);
-	const { manualSignIn, openAgentSettings } = useManualSignIn(presetId);
+	const { manualSignIn, openAgentSettings, agentSignIn } =
+		useAgentSignIn(presetId);
 	const { failureActions, onSetConfigOption, onModelPickerOpenChange } =
 		useFailureRecovery({
 			blocked:
@@ -644,6 +649,8 @@ export function SessionView({
 			configOptions,
 			manualSignIn,
 			openAgentSettings,
+			agentSignIn,
+			lastPrompt: unrunPrompt(timeline),
 			onRestartAndContinue,
 			onStartNewChat,
 			openModelPicker,
@@ -740,6 +747,9 @@ export function SessionView({
 				{!focusedSubagentId && (
 					<ComposerChips
 						backgroundTasks={sessionState?.backgroundTasks}
+						hiddenSubagents={
+							awaitingBackground ? undefined : runningTurnSubagents
+						}
 						liveRefreshKey={liveRefreshKey}
 						onMoveToBackground={onBackgroundSubagent}
 						onOpenSubagent={openSubagent}

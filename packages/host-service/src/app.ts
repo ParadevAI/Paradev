@@ -7,7 +7,7 @@ import {
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
-import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PORTS } from "@superset/shared/sandbox/contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
 const MAX_DISPLAY_BUFFER_BYTES = 32 * 1024 * 1024;
@@ -49,6 +49,7 @@ import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 } from "./runtime/sandbox-self-seed";
 import {
@@ -710,7 +711,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			isAuthenticated: true,
 			browserBridge: config.browserBridge,
 		} as HostServiceContext;
-		await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		try {
+			await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		} finally {
+			if (sandboxIdentity)
+				await resumeSandboxStartHookRun(ctx, sandboxIdentity);
+		}
 	};
 
 	return {

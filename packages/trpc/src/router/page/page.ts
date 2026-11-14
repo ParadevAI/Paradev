@@ -1,7 +1,5 @@
 import { db, dbWs } from "@superset/db/client";
 import {
-	members,
-	organizations,
 	pageComments,
 	pageCommentThreads,
 	pages,
@@ -39,6 +37,7 @@ import { env } from "../../env";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { deletePageStorage } from "../../lib/page-store";
 import { deleteObjects, objectExists, presignedGetUrl } from "../../lib/r2";
+import { requesterIp } from "../../lib/requester-ip";
 import {
 	actorProcedure,
 	personProcedure,
@@ -61,8 +60,15 @@ import { decodePageCursor, encodePageCursor } from "./cursor";
 import { noPageAccess, pageCaller, pageReader } from "./page-caller";
 import { pageUrl } from "./page-url";
 import { pagePreview } from "./preview";
+import { PUBLIC_DOWNLOAD_SECONDS, publicDownloadUrl } from "./public-download";
 import { publishPage } from "./publish";
 import { isEntryPathConflict } from "./publish-rules";
+import {
+	loadReadablePage,
+	pageIdentity,
+	pageNotFound,
+	versionNotServed,
+} from "./read-loader";
 import { pageReportRouter } from "./reports";
 import {
 	clearPageWatchSchema,
@@ -87,7 +93,11 @@ import {
 	setSharedVersionSchema,
 	updatePageSchema,
 } from "./schema";
-import { resolveSharedVersion, servedVersion } from "./shared-version";
+import {
+	isPubliclyServed,
+	resolveSharedVersion,
+	servedVersion,
+} from "./shared-version";
 import { pageSharingRouter } from "./sharing";
 import {
 	deletePageObjects,
@@ -165,34 +175,6 @@ function pageFilters(
 	return filters;
 }
 
-async function pageNotFound(identity: SQL, userId: string): Promise<TRPCError> {
-	const [elsewhere] = await db
-		.select({ organizationName: organizations.name })
-		.from(pages)
-		.innerJoin(
-			members,
-			and(
-				eq(members.organizationId, pages.organizationId),
-				eq(members.userId, userId),
-			),
-		)
-		.innerJoin(organizations, eq(organizations.id, pages.organizationId))
-		.where(and(identity, pageReadableBy(userId)))
-		.limit(1);
-
-	if (!elsewhere) {
-		return userError({
-			code: "NOT_FOUND",
-			message: "Page not found",
-			i18nKey: "serverError.page.pageNotFound",
-		});
-	}
-	return new TRPCError({
-		code: "FORBIDDEN",
-		message: `This page belongs to ${elsewhere.organizationName}. Switch to that organization to open it.`,
-	});
-}
-
 async function loadPage({
 	id,
 	slug,
@@ -204,15 +186,7 @@ async function loadPage({
 	organizationId: string;
 	userId: string;
 }): Promise<SelectPage> {
-	const identity = id ? eq(pages.id, id) : slug ? eq(pages.slug, slug) : null;
-	if (!identity) {
-		throw userError({
-			code: "BAD_REQUEST",
-			message: "Provide either id or slug",
-			i18nKey: "serverError.page.provideEitherIdOrSlug",
-		});
-	}
-
+	const identity = pageIdentity({ id, slug });
 	const [page] = await db
 		.select()
 		.from(pages)
@@ -224,6 +198,28 @@ async function loadPage({
 	}
 	assertPageReadable(page, userId, await loadPageShareRole(page, userId));
 	return page;
+}
+
+const NOT_WATCHING = { watching: false, agentId: null } as const;
+
+async function servedDownloadUrl(
+	pageId: string,
+	version: number,
+	headers: Headers,
+): Promise<string | null> {
+	const [row] = await db
+		.select({ storageKey: pageVersions.storageKey })
+		.from(pageVersions)
+		.where(
+			and(eq(pageVersions.pageId, pageId), eq(pageVersions.version, version)),
+		)
+		.limit(1);
+	return row
+		? publicDownloadUrl({
+				storageKey: row.storageKey,
+				requester: requesterIp(headers),
+			})
+		: null;
 }
 
 async function loadOwner(userId: string | null) {
@@ -655,29 +651,24 @@ export const pageRouter = {
 		}),
 
 	get: actorProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
-		const caller = await pageCaller(ctx);
-		const reader = pageReader(caller);
-		const page = await loadPage({
-			id: input.id,
-			slug: input.slug,
-			organizationId: caller.organizationId,
-			userId: reader,
-		});
-		const { canEdit } = pageAccess(
-			page,
-			reader,
-			await loadPageShareRole(page, reader),
-		);
+		const read = await loadReadablePage(ctx, input);
+		const { page, member } = read;
+		const reader = read.member ? pageReader(read.caller) : null;
+		const canEdit = reader
+			? pageAccess(page, reader, await loadPageShareRole(page, reader)).canEdit
+			: false;
 
 		const latestVersion = await latestVersionNumber(page.id);
 		const served = servedVersion(page.sharedVersion, latestVersion);
-		const workspaceLinks = await db
-			.select({
-				workspaceId: workspacePages.workspaceId,
-				entryPath: workspacePages.entryPath,
-			})
-			.from(workspacePages)
-			.where(eq(workspacePages.pageId, page.id));
+		const workspaceLinks = member
+			? await db
+					.select({
+						workspaceId: workspacePages.workspaceId,
+						entryPath: workspacePages.entryPath,
+					})
+					.from(workspacePages)
+					.where(eq(workspacePages.pageId, page.id))
+			: [];
 		const { watchState: _ownership, ...pageDetails } = page;
 		return {
 			...pageDetails,
@@ -686,16 +677,19 @@ export const pageRouter = {
 				baseUrl: env.USERCONTENT_URL,
 				pageId: page.id,
 				version: served,
-				ticket: await mintPageTicket(
-					page,
-					served === null ? {} : { version: served },
-				),
+				ticket: member
+					? await mintPageTicket(
+							page,
+							served === null ? {} : { version: served },
+						)
+					: undefined,
 			}),
-			latestVersion,
+			latestVersion: member ? latestVersion : served,
 			servedVersion: served,
 			workspaceLinks,
-			watch: watchState(page, Date.now()),
+			watch: member ? watchState(page, Date.now()) : NOT_WATCHING,
 			canEdit,
+			member,
 		};
 	}),
 
@@ -973,13 +967,16 @@ export const pageRouter = {
 		}),
 
 	access: personProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
-		const organizationId = await requireActiveOrgMembership(ctx);
-		const page = await loadPage({
-			id: input.id,
-			slug: input.slug,
-			organizationId,
-			userId: ctx.session.user.id,
-		});
+		const { page, member } = await loadReadablePage(ctx, input);
+		if (!member) {
+			return {
+				owner: null,
+				canComment: false,
+				canEdit: false,
+				canManage: false,
+				member,
+			};
+		}
 
 		const userId = ctx.session.user.id;
 		const { canComment, canEdit, canManage } = pageAccess(
@@ -992,6 +989,7 @@ export const pageRouter = {
 			canComment,
 			canEdit,
 			canManage,
+			member,
 		};
 	}),
 
@@ -1163,13 +1161,10 @@ export const pageRouter = {
 	versions: actorProcedure
 		.input(pageRefSchema)
 		.query(async ({ ctx, input }) => {
-			const caller = await pageCaller(ctx);
-			const page = await loadPage({
-				id: input.id,
-				slug: input.slug,
-				organizationId: caller.organizationId,
-				userId: pageReader(caller),
-			});
+			const { page, member } = await loadReadablePage(ctx, input);
+			const served = member
+				? null
+				: servedVersion(page.sharedVersion, await latestVersionNumber(page.id));
 
 			const rows = await db
 				.select({
@@ -1182,35 +1177,40 @@ export const pageRouter = {
 					createdByUserId: pageVersions.createdByUserId,
 				})
 				.from(pageVersions)
-				.where(eq(pageVersions.pageId, page.id))
+				.where(
+					and(
+						eq(pageVersions.pageId, page.id),
+						member ? undefined : eq(pageVersions.version, served ?? 0),
+					),
+				)
 				.orderBy(desc(pageVersions.version));
 
 			const baseUrl = env.USERCONTENT_URL;
 			return await Promise.all(
 				rows.map(async (row) => ({
 					...row,
+					createdByUserId: member ? row.createdByUserId : null,
 					thumbnailUrl: pageThumbnailUrl({
 						baseUrl,
 						pageId: page.id,
 						version: row.version,
-						ticket: await mintPageTicket(page, { version: row.version }),
+						ticket: member
+							? await mintPageTicket(page, { version: row.version })
+							: undefined,
 					}),
 				})),
 			);
 		}),
 
 	pull: actorProcedure.input(pullPageSchema).query(async ({ ctx, input }) => {
-		const caller = await pageCaller(ctx);
-		const page = await loadPage({
-			id: input.id,
-			slug: input.slug,
-			organizationId: caller.organizationId,
-			userId: pageReader(caller),
-		});
+		const { page, member, caller } = await loadReadablePage(ctx, input);
 
 		const latestVersion = await latestVersionNumber(page.id);
-		const version =
-			input.version ?? servedVersion(page.sharedVersion, latestVersion);
+		const served = servedVersion(page.sharedVersion, latestVersion);
+		const version = input.version ?? served;
+		if (!member && version !== served) {
+			throw await versionNotServed(caller, input, version);
+		}
 		if (version === null) {
 			throw userError({
 				code: "NOT_FOUND",
@@ -1239,7 +1239,10 @@ export const pageRouter = {
 
 		let downloadUrl: string;
 		try {
-			downloadUrl = await presignedGetUrl(row.storageKey);
+			downloadUrl = await presignedGetUrl(
+				row.storageKey,
+				member ? undefined : PUBLIC_DOWNLOAD_SECONDS,
+			);
 		} catch (error) {
 			console.error("[pages] presign failed", {
 				pageId: page.id,
@@ -1257,7 +1260,9 @@ export const pageRouter = {
 			baseUrl: env.USERCONTENT_URL,
 			pageId: page.id,
 			version: row.version,
-			ticket: await mintPageTicket(page, { version: row.version }),
+			ticket: member
+				? await mintPageTicket(page, { version: row.version })
+				: undefined,
 		});
 
 		return {
@@ -1270,9 +1275,9 @@ export const pageRouter = {
 			createdByUserId: page.createdByUserId,
 			updatedAt: page.updatedAt,
 			sharedVersion: page.sharedVersion,
-			latestVersion,
-			servedVersion: servedVersion(page.sharedVersion, latestVersion),
-			watch: watchState(page, Date.now()),
+			latestVersion: member ? latestVersion : served,
+			servedVersion: served,
+			watch: member ? watchState(page, Date.now()) : NOT_WATCHING,
 			version: row.version,
 			label: row.label,
 			contentType: row.contentType,
@@ -1282,19 +1287,19 @@ export const pageRouter = {
 			storageKey: row.storageKey,
 			downloadUrl,
 			viewUrl,
+			member,
 		};
 	}),
 
 	publicView: publicProcedure
 		.input(publicPageSchema)
-		.query(async ({ input }) => {
+		.query(async ({ ctx, input }) => {
 			const [page] = await db
 				.select()
 				.from(pages)
 				.where(eq(pages.slug, input.slug))
 				.limit(1);
-			if (!page || page.visibility !== "everyone") return null;
-			if (page.takenDownAt) return null;
+			if (!page || !isPubliclyServed(page)) return null;
 
 			const version = servedVersion(
 				page.sharedVersion,
@@ -1317,6 +1322,9 @@ export const pageRouter = {
 				viewUrl: pageViewUrl({ baseUrl, pageId: page.id, version }),
 				thumbnailUrl: captured
 					? pageThumbnailUrl({ baseUrl, pageId: page.id, version })
+					: null,
+				downloadUrl: input.download
+					? await servedDownloadUrl(page.id, version, ctx.headers)
 					: null,
 			};
 		}),

@@ -35,7 +35,7 @@ import {
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
-import { useHotkey } from "renderer/hotkeys";
+import { formatHotkeyDisplay, PLATFORM, useHotkey } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
@@ -62,6 +62,7 @@ import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { EnvironmentSetupNotice } from "./components/EnvironmentSetupNotice";
 import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
@@ -159,6 +160,11 @@ function toMenuCommands(
 }
 
 const FOCUS_HANDOFF_MS = 1000;
+
+const SEND_NOW_KEYS = formatHotkeyDisplay(
+	PLATFORM === "mac" ? "meta+enter" : "ctrl+enter",
+	PLATFORM,
+).text;
 let focusHandoff: { draftKey: string; at: number } | null = null;
 
 export const Composer = memo(function Composer({
@@ -607,6 +613,17 @@ export const Composer = memo(function Composer({
 		[availableCommands, blocked, runTyped, send, t, target],
 	);
 
+	const insertSetupPrompt = useCallback((prompt: string) => {
+		const input = promptInputRef.current;
+		if (!input) return;
+		input.restoreDraft({
+			segments: [
+				{ type: "text", text: input.isEmpty() ? prompt : `\n\n${prompt}` },
+			],
+			attachments: [],
+		});
+	}, []);
+
 	return (
 		<div
 			ref={rootRef}
@@ -621,6 +638,13 @@ export const Composer = memo(function Composer({
 					className={CHAT_COLUMN_CLASSNAME}
 					terminalId={terminalId}
 					workspaceId={workspaceId}
+				/>
+			)}
+			{!target && (
+				<EnvironmentSetupNotice
+					className={CHAT_COLUMN_CLASSNAME}
+					workspaceId={workspaceId}
+					onSetUp={insertSetupPrompt}
 				/>
 			)}
 			<AgentComposer
@@ -639,8 +663,12 @@ export const Composer = memo(function Composer({
 				placeholder={
 					target
 						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
-						: (placeholder ??
-							t({ message: "Ask the agent, @mention files, run /commands" }))
+						: awaitingBackground
+							? t({ message: `Queue a message · ${SEND_NOW_KEYS} to send now` })
+							: (placeholder ??
+								t({
+									message: "Ask the agent, @mention files, run /commands",
+								}))
 				}
 				status={
 					stop || promptPending

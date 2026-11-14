@@ -1,4 +1,7 @@
-import type { PageLink, PageLinkFinder } from "../../../../utils/pageLinks";
+import type {
+	PageLink,
+	PageLinkFinder,
+} from "../../../../../../utils/pageLinks";
 
 /** For each block, the pages it is the first to link. */
 export function pageLinksByBlock(

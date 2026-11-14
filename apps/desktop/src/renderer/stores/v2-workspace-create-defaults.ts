@@ -1,4 +1,3 @@
-import type { MachineSize } from "@superset/shared/billing";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
@@ -17,7 +16,6 @@ export type WorkspaceCreateProjectChoice =
 
 export interface CloudCreateChoice {
 	environmentId?: string;
-	machineSize?: MachineSize;
 	usedAt: number;
 }
 
@@ -50,7 +48,7 @@ export function rememberCloudChoice(
 }
 
 /** The newest remembered value of `field` across every project. */
-export function latestCloudChoice<K extends "environmentId" | "machineSize">(
+export function latestCloudChoice<K extends "environmentId">(
 	choices: Record<string, CloudCreateChoice>,
 	field: K,
 	accept: (value: NonNullable<CloudCreateChoice[K]>) => boolean = () => true,
@@ -162,7 +160,7 @@ export const useV2WorkspaceCreateDefaultsStore =
 				}),
 				{
 					name: "v2-workspace-create-defaults",
-					version: 3,
+					version: 4,
 					migrate: (state, fromVersion) => {
 						let next = state as Record<string, unknown>;
 						if (fromVersion < 2 && next && typeof next === "object") {
@@ -190,6 +188,22 @@ export const useV2WorkspaceCreateDefaultsStore =
 										: {},
 								checkout: "worktree",
 								cloudChoices: {},
+							};
+						}
+						// Sizes moved to the environment; a remembered one is never read again.
+						if (fromVersion < 4 && next && typeof next === "object") {
+							const choices = (next.cloudChoices ?? {}) as Record<
+								string,
+								Record<string, unknown>
+							>;
+							next = {
+								...next,
+								cloudChoices: Object.fromEntries(
+									Object.entries(choices).map(([key, choice]) => {
+										const { machineSize: _omit, ...rest } = choice;
+										return [key, rest];
+									}),
+								),
 							};
 						}
 						return next as unknown as V2WorkspaceCreateDefaultsState;

@@ -23,6 +23,8 @@ export const attachWorkspaceMoveInputSchema = z.object({
 export const abandonWorkspaceMoveInputSchema = z.object({
 	workspaceMoveId: z.string().uuid(),
 	error: z.string().min(1).max(2000),
+	/** Also ends a move that already has its destination; sent by the desktop whose move could not finish, never by a cancel. */
+	withDestination: z.boolean().optional(),
 });
 
 export const workspaceMoveOfWorkspaceInputSchema = z.object({

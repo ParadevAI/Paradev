@@ -8,7 +8,7 @@
 		"@biomejs/biome": "2.4.2",
 		"@types/bun": "1.4.3",
 		"@types/semver": "7.7.1",
-		"@vercel/sandbox": "3.2.2",
+		"@vercel/sandbox": "4.0.0",
 		"babel-plugin-macros": "3.1.0",
 		"dotenv-cli": "11.0.0",
 		"semver": "7.7.4",
@@ -118,6 +118,7 @@
 		"react-native@0.88.1": "patches/react-native@0.88.1.patch",
 		"@pierre/diffs@1.6.2": "patches/@pierre%2Fdiffs@1.6.2.patch",
 		"electron-chrome-web-store@0.13.0": "patches/electron-chrome-web-store@0.13.0.patch",
-		"electron-chrome-extensions@4.10.0": "patches/electron-chrome-extensions@4.10.0.patch"
+		"electron-chrome-extensions@4.10.0": "patches/electron-chrome-extensions@4.10.0.patch",
+		"@vercel/sandbox@4.0.0": "patches/@vercel%2Fsandbox@4.0.0.patch"
 	}
 }

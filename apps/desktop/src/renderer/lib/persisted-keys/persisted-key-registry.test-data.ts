@@ -138,10 +138,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["terminal-close-confirm-v1"],
 	],
 	[
-		"src/renderer/stores/workspace-move-confirm/store.ts",
-		["workspace-move-confirm-v1"],
-	],
-	[
 		"src/renderer/stores/automation-failures/store.ts",
 		["automation-failures-v1"],
 	],

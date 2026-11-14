@@ -7,12 +7,16 @@ import type { HostServiceClient } from "renderer/lib/host-service-client";
  * cannot reach: the chat's history and session files go into that
  * computer's host, the control plane switches the chat there, then its agent
  * starts. Any failure is reported, so the move shows as failed and the chat
- * stays where it was. A move another run already claimed is left to it.
+ * stays where it was. A move another run already claimed is left to it,
+ * here or in another window.
  */
+/** `held` when another run holds the copy, here or in another window; it may be taken over once that run goes quiet. */
+export type MoveRunOutcome = "done" | "held";
+
 export function runMoveOnComputer(args: {
 	moveId: string;
 	host: HostServiceClient;
-}): Promise<void> {
+}): Promise<MoveRunOutcome> {
 	const running = runningMoves.get(args.moveId);
 	if (running) return running;
 	const run = carryOut(args).finally(() => runningMoves.delete(args.moveId));
@@ -21,7 +25,7 @@ export function runMoveOnComputer(args: {
 }
 
 /** The pane, the workspace move and the boot pickup may all start the same move. */
-const runningMoves = new Map<string, Promise<void>>();
+const runningMoves = new Map<string, Promise<MoveRunOutcome>>();
 
 async function carryOut({
 	moveId,
@@ -29,21 +33,22 @@ async function carryOut({
 }: {
 	moveId: string;
 	host: HostServiceClient;
-}): Promise<void> {
+}): Promise<MoveRunOutcome> {
+	const attemptId = crypto.randomUUID();
 	let started: {
 		workspaceId: string;
 		chatSessionId: string;
 		harnessSessionId: string;
 	};
 	const claimed = await cloudTrpcClient.chatMove.claim
-		.mutate({ moveId })
+		.mutate({ moveId, attemptId })
 		.catch(async (error: unknown) => {
 			// Another run, or an earlier one, already took it.
 			if (isClaimed(error)) return null;
-			await recordFailure(moveId, error);
+			await recordFailure(moveId, attemptId, error);
 			throw error;
 		});
-	if (!claimed) return;
+	if (!claimed) return "held";
 	try {
 		const events = [];
 		let afterSeq = 0;
@@ -57,26 +62,32 @@ async function carryOut({
 			afterSeq = page.nextAfterSeq;
 		}
 		await host.teleport.importChat.mutate({ ...claimed, events });
-		await cloudTrpcClient.chatMove.complete.mutate({ moveId });
+		await cloudTrpcClient.chatMove.complete.mutate({ moveId, attemptId });
 		started = {
 			workspaceId: claimed.workspaceId,
 			chatSessionId: claimed.chatSessionId,
 			harnessSessionId: claimed.session.harnessSessionId,
 		};
 	} catch (error) {
-		await recordFailure(moveId, error);
+		await recordFailure(moveId, attemptId, error);
 		throw error;
 	}
 	// The chat already moved; one whose agent did not start resumes when opened.
 	await host.teleport.continueChat.mutate(started).catch((error: unknown) => {
 		console.warn("[chat-move] the moved chat's agent did not start", error);
 	});
+	return "done";
 }
 
-async function recordFailure(moveId: string, error: unknown): Promise<void> {
+async function recordFailure(
+	moveId: string,
+	attemptId: string,
+	error: unknown,
+): Promise<void> {
 	await cloudTrpcClient.chatMove.fail
 		.mutate({
 			moveId,
+			attemptId,
 			error:
 				rawErrorMessage(error).slice(0, 2000) ||
 				"The move to the computer failed",

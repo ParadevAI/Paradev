@@ -3,7 +3,7 @@ import { cloudWorkspaces, members } from "@superset/db/schema";
 import {
 	SANDBOX_API_CREDENTIAL_HEADER,
 	sandboxApiCredential,
-} from "@superset/shared/sandbox-gate";
+} from "@superset/shared/sandbox/gate";
 import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { env } from "../../env";

@@ -383,6 +383,23 @@ function createHandle(entry: DocumentEntry): SharedFileDocument {
 	};
 }
 
+const snapshots = new WeakMap<
+	SharedFileDocument,
+	{ version: number; value: SharedFileDocument }
+>();
+
+/** A copy of the handle's current values. It is a new object after every change. */
+export function getDocumentSnapshot(
+	handle: SharedFileDocument,
+): SharedFileDocument {
+	const version = handle.getVersion();
+	const cached = snapshots.get(handle);
+	if (cached?.version === version) return cached.value;
+	const value = { ...handle };
+	snapshots.set(handle, { version, value });
+	return value;
+}
+
 export function acquireDocument(
 	workspaceId: string,
 	absolutePath: string,

@@ -142,6 +142,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
+      - name: Test Paradev deployment guards
+        run: python3 -B scripts/deploy-paradev-staging/guard_test.py
+
       - name: Setup Bun
         id: setup-bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0

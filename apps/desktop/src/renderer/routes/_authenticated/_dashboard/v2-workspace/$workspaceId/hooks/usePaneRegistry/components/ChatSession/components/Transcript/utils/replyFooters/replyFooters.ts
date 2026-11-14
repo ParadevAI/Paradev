@@ -6,6 +6,7 @@ type ItemRow = Extract<TranscriptRow, { kind: "item" }>;
 /**
  * Places each settled turn's reply footer: under its last reply when that
  * reply ends the turn, else in a `reply_footer` row after the turn's last row.
+ * The turn line is usually that last row, so the footer sits under it.
  */
 export function replyFooters(rows: readonly TranscriptRow[]): {
 	rows: TranscriptRow[];

@@ -36,6 +36,10 @@ config.resolver.assetExts = [...config.resolver.assetExts, "riv"];
 config.resolver.extraNodeModules = {
 	"@superset/alert-prompt": path.resolve(projectRoot, "modules/alert-prompt"),
 	"@superset/composer": path.resolve(projectRoot, "modules/composer"),
+	"@superset/google-credential": path.resolve(
+		projectRoot,
+		"modules/google-credential",
+	),
 	"@superset/symbol-button": path.resolve(projectRoot, "modules/symbol-button"),
 	"@superset/attachments-sheet": path.resolve(
 		projectRoot,

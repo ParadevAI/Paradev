@@ -20,7 +20,6 @@ import {
 import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
-import { WorkspaceMoveConfirmSetting } from "./components/WorkspaceMoveConfirmSetting";
 
 interface BehaviorSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -150,11 +149,6 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
 					<AcpChatSetting />
 				)}
-
-				{isItemVisible(
-					SETTING_ITEM_ID.BEHAVIOR_WORKSPACE_MOVE_CONFIRM,
-					visibleItems,
-				) && <WorkspaceMoveConfirmSetting />}
 
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">

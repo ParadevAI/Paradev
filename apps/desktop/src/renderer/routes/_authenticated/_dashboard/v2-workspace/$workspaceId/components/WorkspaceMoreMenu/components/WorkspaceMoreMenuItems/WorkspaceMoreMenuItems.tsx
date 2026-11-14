@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { HostShapedWorkspace } from "renderer/hooks/host-workspaces/useHostWorkspaces";
 import { DROPDOWN_MENU_PARTS } from "renderer/lib/menuParts";
-import type { MoveDestinationPick } from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
 import { WorkspaceMenuItems } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMenuItems";
 import { useWorkspaceMenuActions } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMenuActions";
 import type { WorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
@@ -12,7 +11,6 @@ interface WorkspaceMoreMenuItemsProps {
 	workspace: HostShapedWorkspace;
 	runItems: ReactNode;
 	moveDirections: WorkspaceMoveDirection[];
-	onPickMove: (pick: MoveDestinationPick) => void;
 	onRename: (target: { cloud: boolean }) => void;
 }
 
@@ -21,7 +19,6 @@ export function WorkspaceMoreMenuItems({
 	workspace,
 	runItems,
 	moveDirections,
-	onPickMove,
 	onRename,
 }: WorkspaceMoreMenuItemsProps) {
 	const { state, isMine, togglePin, markTerminalsSeen } =
@@ -60,8 +57,12 @@ export function WorkspaceMoreMenuItems({
 				moveDirections.length > 0
 					? {
 							directions: moveDirections,
-							fromHostId: workspace.hostId,
-							onPick: onPickMove,
+							workspace: {
+								id: workspace.id,
+								hostId: workspace.hostId,
+								projectId: workspace.projectId,
+								name: workspace.name,
+							},
 						}
 					: undefined
 			}

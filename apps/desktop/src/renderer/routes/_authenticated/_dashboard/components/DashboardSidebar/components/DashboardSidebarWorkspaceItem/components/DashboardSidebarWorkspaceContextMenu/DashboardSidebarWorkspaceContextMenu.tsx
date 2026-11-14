@@ -10,11 +10,14 @@ import {
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
-import { useState } from "react";
-import { LuArrowUp, LuFolderPlus, LuFolderSymlink } from "react-icons/lu";
+import {
+	LuArrowUp,
+	LuCpu,
+	LuFolderPlus,
+	LuFolderSymlink,
+} from "react-icons/lu";
 import { CONTEXT_MENU_PARTS } from "renderer/lib/menuParts";
-import type { MoveDestinationPick } from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
-import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
+import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
 import {
 	type WorkspaceMenuActions,
 	WorkspaceMenuItems,
@@ -40,6 +43,7 @@ interface DashboardSidebarWorkspaceContextMenuProps
 	/** Its folder membership is a tag the API keeps, so it groups like any other row. */
 	isCloudWorkspace?: boolean;
 	showDeleteHotkey?: boolean;
+	environmentItem?: React.ReactNode;
 	onCreateSection: () => void;
 	onMoveToSection: (sectionId: string | null) => void;
 	children: React.ReactNode;
@@ -52,6 +56,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	isInSection,
 	isCloudWorkspace = false,
 	showDeleteHotkey = false,
+	environmentItem,
 	onCreateSection,
 	onMoveToSection,
 	onRename,
@@ -61,7 +66,6 @@ export function DashboardSidebarWorkspaceContextMenu({
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const { setContextMenuOpen } = useDashboardSidebarHoverActions();
 	const canJoinGroup = projectId !== null || isSessionWorkspace;
-	const [moveOpen, setMoveOpen] = useState<MoveDestinationPick | null>(null);
 	const {
 		workspaceId,
 		isLocalWorkspace,
@@ -73,38 +77,31 @@ export function DashboardSidebarWorkspaceContextMenu({
 	} = rest;
 
 	return (
-		<>
-			<ContextMenu onOpenChange={setContextMenuOpen}>
-				<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-				<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
-					<WorkspaceMenuItems
-						parts={CONTEXT_MENU_PARTS}
-						state={{
-							workspaceId,
-							isLocalWorkspace,
-							isCloudWorkspace,
-							isPinned,
-							isUnread,
-							hasStatus,
-							hasPullRequest,
-						}}
-						actions={{
-							...actions,
-							onRename: onRename && (() => runAfterClose(onRename)),
-						}}
-						move={
-							move && {
-								directions: move.directions,
-								fromHostId: move.workspace.hostId,
-								onPick: (pick) => runAfterClose(() => setMoveOpen(pick)),
-							}
-						}
-						showDeleteHotkey={showDeleteHotkey}
-						groupItems={
-							// Group actions change placement (sectionId/tabOrder), which a
-							// pinned row doesn't show; the change would only appear on unpin.
-							!isPinned &&
-							canJoinGroup && (
+		<ContextMenu onOpenChange={setContextMenuOpen}>
+			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
+				<WorkspaceMenuItems
+					parts={CONTEXT_MENU_PARTS}
+					state={{
+						workspaceId,
+						isLocalWorkspace,
+						isCloudWorkspace,
+						isPinned,
+						isUnread,
+						hasStatus,
+						hasPullRequest,
+					}}
+					actions={{
+						...actions,
+						onRename: onRename && (() => runAfterClose(onRename)),
+					}}
+					move={move}
+					showDeleteHotkey={showDeleteHotkey}
+					groupItems={
+						// Group actions change placement (sectionId/tabOrder), which a
+						// pinned row doesn't show; the change would only appear on unpin.
+						<>
+							{!isPinned && canJoinGroup && (
 								<>
 									<ContextMenuSeparator />
 									<ContextMenuItem onSelect={onCreateSection}>
@@ -134,21 +131,32 @@ export function DashboardSidebarWorkspaceContextMenu({
 										</ContextMenuItem>
 									)}
 								</>
-							)
-						}
-					/>
-				</ContextMenuContent>
-			</ContextMenu>
-			{move && moveOpen && (
-				<MoveWorkspaceDialog
-					pick={moveOpen}
-					workspace={move.workspace}
-					open
-					onOpenChange={(open) => {
-						if (!open) setMoveOpen(null);
-					}}
+							)}
+							{environmentItem}
+						</>
+					}
+					afterMoveItems={
+						isCloudWorkspace && (
+							<>
+								<ContextMenuSeparator />
+								<ContextMenuSub>
+									<ContextMenuSubTrigger>
+										<LuCpu className="size-4 mr-2" />
+										<Trans>Machine size</Trans>
+									</ContextMenuSubTrigger>
+									<ContextMenuSubContent className="min-w-64">
+										<MachineSizeMenuItems
+											workspaceId={workspaceId}
+											menu="context"
+											runAfterClose={runAfterClose}
+										/>
+									</ContextMenuSubContent>
+								</ContextMenuSub>
+							</>
+						)
+					}
 				/>
-			)}
-		</>
+			</ContextMenuContent>
+		</ContextMenu>
 	);
 }

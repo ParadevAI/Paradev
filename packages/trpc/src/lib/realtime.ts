@@ -1,3 +1,4 @@
+import type { BoxPressure } from "@superset/shared/box-pressure";
 import {
 	type RealtimeNudgeKind,
 	type RealtimeUpdate,
@@ -40,6 +41,35 @@ export function nudge(
 				);
 			}),
 	);
+}
+
+/** Awaited, unlike a nudge: the box retries only when this fails, and its next report must not overtake this one. */
+export async function publishBoxPressure(
+	organizationId: string,
+	workspaceId: string,
+	pressure: BoxPressure | null,
+): Promise<boolean> {
+	try {
+		const response = await fetch(`${env.REALTIME_URL}/v2/box-pressure`, {
+			method: "POST",
+			headers: {
+				authorization: `Bearer ${env.REALTIME_NUDGE_SECRET}`,
+				"content-type": "application/json",
+			},
+			body: JSON.stringify({ organizationId, workspaceId, pressure }),
+			signal: AbortSignal.timeout(5_000),
+		});
+		if (!response.ok) {
+			console.warn(`[realtime] box pressure rejected: ${response.status}`);
+		}
+		return response.ok;
+	} catch (error) {
+		console.warn(
+			"[realtime] box pressure failed:",
+			error instanceof Error ? error.message : error,
+		);
+		return false;
+	}
 }
 
 export async function readWorkspaceForwards(

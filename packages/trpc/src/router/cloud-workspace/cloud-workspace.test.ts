@@ -31,10 +31,16 @@ let restartedWith: string[] = [];
 const ENVIRONMENT_ID = "5e6f7a8b-9c0d-4e1f-8a2b-3c4d5e6f7a8b";
 let inserted: unknown[] = [];
 let queuedJobs: { launch?: { surface?: string; effort?: string } }[] = [];
+let environmentSize: string | null = null;
+let sizeLookups: (string | null | undefined)[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: async () => ROW });
 stub(db.query.environments, {
-	findFirst: async () => ({ id: ENVIRONMENT_ID, scope: "organization" }),
+	findFirst: async () => ({
+		id: ENVIRONMENT_ID,
+		scope: "organization",
+		machineSize: environmentSize,
+	}),
 });
 stub(db.query.users, {
 	findFirst: async () => ({ id: "user-1", name: "Ana", image: null }),
@@ -70,8 +76,14 @@ stub(guards, {
 });
 stub(access, { canOpenWorkspace: async () => true });
 stub(plan, {
-	resolveMachineSize: async (_: string, name: string) =>
-		name === "xlarge" ? { name, vcpus: 16 } : null,
+	resolveMachineSize: async (_: string, name: string | null | undefined) => {
+		sizeLookups.push(name);
+		return name === "xlarge"
+			? { name, vcpus: 16 }
+			: name == null
+				? { name: "medium", vcpus: 4 }
+				: null;
+	},
 });
 stub(meter, { assertMayBoot: async () => {} });
 const FORWARD = {
@@ -132,6 +144,8 @@ beforeEach(() => {
 	restartedWith = [];
 	inserted = [];
 	queuedJobs = [];
+	environmentSize = null;
+	sizeLookups = [];
 });
 
 describe("cloudWorkspace.create", () => {
@@ -165,6 +179,26 @@ describe("cloudWorkspace.create", () => {
 			mode: "plan",
 		});
 		expect(row.initialLaunch).toMatchObject({ surface: "chat" });
+	});
+
+	test("boots at the environment's size when the create names none", async () => {
+		environmentSize = "xlarge";
+		const row = await create({ machineSize: undefined });
+		expect(row.machineSize).toBe("xlarge");
+	});
+
+	test("falls back to the organization's default when the environment's size is no longer offered", async () => {
+		environmentSize = "2xlarge";
+		const row = await create({ machineSize: undefined });
+		expect(sizeLookups).toEqual(["2xlarge", undefined]);
+		expect(row.machineSize).toBe("medium");
+	});
+
+	test("refuses a size the caller names that the plan does not offer, whatever the environment's", async () => {
+		environmentSize = "xlarge";
+		await expect(create({ machineSize: "2xlarge" })).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+		});
 	});
 });
 

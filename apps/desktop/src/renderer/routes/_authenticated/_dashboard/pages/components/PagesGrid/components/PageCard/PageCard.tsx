@@ -21,6 +21,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import { type MouseEvent, useId, useState } from "react";
+import { useNow } from "renderer/hooks/useNow";
 import { PageThumbnail } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
 import { CommentCount } from "./components/CommentCount";
 import { CommentPreviewPanel } from "./components/CommentPreviewPanel";
@@ -61,6 +62,7 @@ export function PageCard({
 	onTogglePin,
 	onDelete,
 }: PageCardProps) {
+	const now = useNow(60_000);
 	const { formatRelativeTime } = useFormat();
 
 	const { t } = useLingui();
@@ -77,7 +79,7 @@ export function PageCard({
 	const edited = new Date(page.updatedAt).getTime();
 	const created = new Date(page.createdAt).getTime();
 	const wasEdited = edited - created > 60_000;
-	const timestamp = formatRelativeTime(wasEdited ? edited : created);
+	const timestamp = formatRelativeTime(wasEdited ? edited : created, now);
 
 	const preview = page.commentPreview;
 	const trigger = useCommentPreview({ eligible: preview !== null });

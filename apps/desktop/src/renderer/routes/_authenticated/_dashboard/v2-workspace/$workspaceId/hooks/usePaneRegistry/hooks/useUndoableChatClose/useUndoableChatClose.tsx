@@ -60,7 +60,7 @@ export function useUndoableChatClose({
 	const stopStrayChats = useCallback(
 		async (terminalId: string, closedSessionId: string | null) => {
 			const sessions = await wiring.transport
-				.listSessions({ workspaceId })
+				.listSessions({ workspaceId, limit: 200 })
 				.catch((error: unknown) => {
 					console.warn("[acp-chat] could not list chats to stop", error);
 					return [];

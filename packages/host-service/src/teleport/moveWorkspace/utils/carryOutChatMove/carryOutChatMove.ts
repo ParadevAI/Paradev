@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { ApiClient } from "../../../../types";
 import type { RelayHostClient } from "../createRelayHostClient";
 
@@ -18,11 +19,12 @@ export async function carryOutChatMove({
 	host: Pick<RelayHostClient, "teleport">;
 	moveId: string;
 }): Promise<void> {
+	const attemptId = randomUUID();
 	const claimed = await api.chatMove.claim
-		.mutate({ moveId })
+		.mutate({ moveId, attemptId })
 		.catch(async (error: unknown) => {
 			if (isConflict(error)) return null;
-			await recordFailure(api, moveId, error);
+			await recordFailure(api, moveId, attemptId, error);
 			throw error;
 		});
 	if (!claimed) return;
@@ -36,9 +38,9 @@ export async function carryOutChatMove({
 			afterSeq = page.nextAfterSeq;
 		}
 		await host.teleport.importChat.mutate({ ...claimed, events });
-		await api.chatMove.complete.mutate({ moveId });
+		await api.chatMove.complete.mutate({ moveId, attemptId });
 	} catch (error) {
-		await recordFailure(api, moveId, error);
+		await recordFailure(api, moveId, attemptId, error);
 		throw error;
 	}
 	// The chat already moved; one whose agent did not start resumes when opened.
@@ -56,12 +58,14 @@ export async function carryOutChatMove({
 async function recordFailure(
 	api: ApiClient,
 	moveId: string,
+	attemptId: string,
 	error: unknown,
 ): Promise<void> {
 	const message = error instanceof Error ? error.message : String(error);
 	await api.chatMove.fail
 		.mutate({
 			moveId,
+			attemptId,
 			error: message.slice(0, 2000) || "The move to the computer failed",
 		})
 		.catch((failError: unknown) =>

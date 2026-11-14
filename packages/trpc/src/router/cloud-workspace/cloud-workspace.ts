@@ -402,7 +402,7 @@ export const cloudWorkspaceRouter = {
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
-				/** A size the organization offers (see `machineSizes`); omitted = its default. */
+				/** A size the organization offers (see `machineSizes`); omitted = the environment's size, else the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
 				/** The caller's own tags, as `setTags` files them. */
 				tags: workspaceTagsInputSchema.optional(),
@@ -637,6 +637,19 @@ export const cloudWorkspaceRouter = {
 				// ticket. The sandbox's own desktop port is not published.
 				desktop: { url: host.url, token: host.token },
 			};
+		}),
+
+	/**
+	 * Hands the creator's current sign-ins to a running box in place: the
+	 * firewall rules, login files and managed environment, without a restart.
+	 * Agents started before it keep the sign-in they started with.
+	 */
+	applySignIns: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: true };
 		}),
 
 	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */

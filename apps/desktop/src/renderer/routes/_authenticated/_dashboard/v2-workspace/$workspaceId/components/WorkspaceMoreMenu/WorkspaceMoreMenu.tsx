@@ -3,22 +3,35 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { Ellipsis, Play, Settings, Square, X } from "lucide-react";
-import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import {
+	Container,
+	DatabaseBackup,
+	Ellipsis,
+	Play,
+	Settings,
+	Square,
+	X,
+} from "lucide-react";
+import { useRef, useState } from "react";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
 import { useHotkeyDisplay } from "renderer/hotkeys";
-import type { MoveDestinationPick } from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
-import { MoveWorkspaceDialog } from "renderer/routes/_authenticated/_dashboard/components/MoveWorkspaceDialog";
+import { authClient } from "renderer/lib/auth-client";
+import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/RenameDialog";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
+import { SaveCheckpointDialog } from "./components/SaveCheckpointDialog";
 import { WorkspaceMoreMenuItems } from "./components/WorkspaceMoreMenuItems";
 
 interface WorkspaceMoreMenuProps {
@@ -48,9 +61,26 @@ export function WorkspaceMoreMenu({
 	const { workspace } = useWorkspace();
 	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
-	const [moveOpen, setMoveOpen] = useState<MoveDestinationPick | null>(null);
 	const [rename, setRename] = useState<{ cloud: boolean } | null>(null);
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
+	const actionPendingRef = useRef(false);
+	const openAfterClose = (action: () => void) => {
+		actionPendingRef.current = true;
+		runAfterClose(action);
+	};
+	const environment = useWorkspaceEnvironment(workspace.id);
+	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
+	const isWorkspaceReady =
+		cloudWorkspaces?.find((row) => row.id === workspace.id)?.status === "ready";
+	const { data: session } = authClient.useSession();
+	const isAdmin = useIsOrganizationAdmin() === true;
+	const canSaveCheckpoint =
+		!!environment &&
+		(environment.scope !== "organization" ||
+			environment.createdByUserId === session?.user?.id ||
+			isAdmin);
+	const [checkpointOpen, setCheckpointOpen] = useState(false);
+	const navigate = useNavigate();
 
 	const runItems = (
 		<>
@@ -101,6 +131,31 @@ export function WorkspaceMoreMenu({
 					)}
 				</DropdownMenuItem>
 			)}
+			{environment && (
+				<>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem
+						onClick={() =>
+							void navigate({
+								to: "/settings/environments/$environmentId",
+								params: { environmentId: environment.id },
+							})
+						}
+					>
+						<Container className="size-4" />
+						<Trans>Manage environment</Trans>
+					</DropdownMenuItem>
+					{canSaveCheckpoint && (
+						<DropdownMenuItem
+							disabled={!isWorkspaceReady}
+							onSelect={() => openAfterClose(() => setCheckpointOpen(true))}
+						>
+							<DatabaseBackup className="size-4" />
+							<Trans>Save checkpoint</Trans>
+						</DropdownMenuItem>
+					)}
+				</>
+			)}
 		</>
 	);
 
@@ -124,14 +179,17 @@ export function WorkspaceMoreMenu({
 				<DropdownMenuContent
 					align="end"
 					className="min-w-56"
-					onCloseAutoFocus={onCloseAutoFocus}
+					onCloseAutoFocus={(event) => {
+						if (!actionPendingRef.current) return;
+						actionPendingRef.current = false;
+						onCloseAutoFocus(event);
+					}}
 				>
 					<WorkspaceMoreMenuItems
 						workspace={workspace}
 						runItems={runItems}
 						moveDirections={moveDirections}
-						onPickMove={(pick) => runAfterClose(() => setMoveOpen(pick))}
-						onRename={(target) => runAfterClose(() => setRename(target))}
+						onRename={(target) => openAfterClose(() => setRename(target))}
 					/>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -149,19 +207,12 @@ export function WorkspaceMoreMenu({
 					}}
 				/>
 			)}
-			{moveOpen && (
-				<MoveWorkspaceDialog
-					pick={moveOpen}
-					workspace={{
-						id: workspace.id,
-						hostId: workspace.hostId,
-						projectId: workspace.projectId,
-						name: workspace.name,
-					}}
-					open
-					onOpenChange={(open) => {
-						if (!open) setMoveOpen(null);
-					}}
+			{environment && canSaveCheckpoint && (
+				<SaveCheckpointDialog
+					cloudWorkspaceId={workspace.id}
+					environment={environment}
+					open={checkpointOpen}
+					onOpenChange={setCheckpointOpen}
 				/>
 			)}
 		</>

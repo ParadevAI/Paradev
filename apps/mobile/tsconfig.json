@@ -14,6 +14,9 @@
 			],
 			"@superset/composer": ["./modules/composer/src/index.tsx"],
 			"@superset/forward-swipe": ["./modules/forward-swipe/src/index.tsx"],
+			"@superset/google-credential": [
+				"./modules/google-credential/src/index.ts"
+			],
 			"@superset/symbol-button": ["./modules/symbol-button/src/index.tsx"],
 			"@superset/live-activity": ["./modules/live-activity/src/index.ts"],
 			"@superset/title-press": ["./modules/title-press/src/index.tsx"],

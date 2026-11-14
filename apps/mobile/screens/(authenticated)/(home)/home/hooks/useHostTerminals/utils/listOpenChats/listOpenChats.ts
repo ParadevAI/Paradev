@@ -22,11 +22,19 @@ const PROBE_MAX = 50;
  * the host closes it, whether or not its agent is still running. A host from
  * before `listSessions` reported `live` is asked per session instead, newest
  * first, and only its running chats are shown.
+ *
+ * Pass `workspaceId` when only one workspace matters: the host-wide list is the
+ * newest rows across every workspace, closed ones included, so a quiet
+ * workspace's open chat can fall past the limit.
  */
 export async function listOpenChats(
 	transport: Pick<ChatTransport, "listSessions" | "getSession">,
+	workspaceId?: string,
 ): Promise<OpenChat[]> {
-	const rows = await transport.listSessions({ limit: LIST_LIMIT });
+	const rows = await transport.listSessions({
+		limit: LIST_LIMIT,
+		...(workspaceId ? { workspaceId } : {}),
+	});
 	const reportsLive = rows.some((row) => typeof row.live === "boolean");
 	const open = reportsLive
 		? rows.filter(

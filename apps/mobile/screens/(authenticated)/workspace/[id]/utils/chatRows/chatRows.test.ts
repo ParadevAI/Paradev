@@ -5,7 +5,7 @@ import {
 	type StoredItem,
 	type TurnGroup,
 } from "@superset/chat/core";
-import type { Item } from "@superset/chat/protocol";
+import type { Item, TurnError } from "@superset/chat/protocol";
 import {
 	chatRows,
 	groupActivity,
@@ -155,6 +155,32 @@ describe("a turn that ended without the user", () => {
 				row.kind === "turn_status" ? row.status : row.kind,
 			),
 		).toEqual(["item", "paused"]);
+	});
+
+	test("a spend limit reads as stopped by the usage limit, also from hosts that send it as unknown", () => {
+		const limit =
+			"Internal error: You've hit your org's monthly spend limit · ask your admin to raise it at https://claude.ai/admin-settings/usage · your session limit resets 4:30am (UTC)";
+		const statusOf = (error: TurnError) =>
+			chatRows(
+				[
+					{
+						turn: { id: "t1", status: "failed", startedAtMs: 1, error },
+						turnId: "t1",
+						entries: [notice(error.message)],
+					},
+				],
+				[],
+			).map((row) => (row.kind === "turn_status" ? row.status : row.kind));
+
+		expect(statusOf({ message: limit, kind: "usage_limit" })).toEqual([
+			"limited",
+		]);
+		expect(statusOf({ message: limit, kind: "unknown" })).toEqual(["limited"]);
+		expect(statusOf({ message: limit })).toEqual(["limited"]);
+		expect(statusOf({ message: limit, kind: "auth" })).toEqual(["failed"]);
+		expect(statusOf({ message: "Internal error", kind: "unknown" })).toEqual([
+			"failed",
+		]);
 	});
 
 	test("a failed turn's notice folds into its status line, keeping the detail", () => {

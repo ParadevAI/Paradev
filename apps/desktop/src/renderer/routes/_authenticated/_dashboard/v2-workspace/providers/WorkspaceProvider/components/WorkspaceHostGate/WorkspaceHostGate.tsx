@@ -3,6 +3,7 @@ import type { HostShapedWorkspace } from "renderer/hooks/host-workspaces/useHost
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 import { AgentCredentialsChangedBanner } from "./components/AgentCredentialsChangedBanner";
+import { BoxOutOfMemoryBanner } from "./components/BoxOutOfMemoryBanner";
 import { CloudUsageRefusedBanner } from "./components/CloudUsageRefusedBanner";
 import { CloudUsageStoppingBanner } from "./components/CloudUsageStoppingBanner";
 
@@ -17,9 +18,9 @@ export function WorkspaceHostGate({
 	const { agentCredentialsChangedWorkspaceId, usageRefusal } =
 		useSandboxAccess();
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
-	const stoppingAtLimit = Boolean(
-		cloudWorkspaces?.find((row) => row.id === workspace.hostId)?.usageStopAt,
-	);
+	const cloudRow = cloudWorkspaces?.find((row) => row.id === workspace.hostId);
+	const isCloudWorkspace = Boolean(cloudRow);
+	const stoppingAtLimit = Boolean(cloudRow?.usageStopAt);
 
 	// The wrapper renders unconditionally — dropping it when the host is
 	// reachable would move `children` in the tree and remount the whole
@@ -29,6 +30,9 @@ export function WorkspaceHostGate({
 			<div className="flex min-h-0 min-w-0 flex-1">{children}</div>
 			{agentCredentialsChangedWorkspaceId === workspace.hostId ? (
 				<AgentCredentialsChangedBanner workspaceId={workspace.hostId} />
+			) : null}
+			{isCloudWorkspace ? (
+				<BoxOutOfMemoryBanner workspaceId={workspace.hostId} />
 			) : null}
 			{stoppingAtLimit ? <CloudUsageStoppingBanner /> : null}
 			{usageRefusal?.workspaceId === workspace.hostId ? (

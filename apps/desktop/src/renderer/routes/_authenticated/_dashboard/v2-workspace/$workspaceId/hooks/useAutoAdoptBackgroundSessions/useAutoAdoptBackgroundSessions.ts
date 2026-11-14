@@ -5,13 +5,13 @@ import { logStressEvent } from "renderer/lib/performance/stress-instrumentation"
 import { getTerminalBackgroundMarkerIdsKey } from "renderer/lib/terminal/terminal-background-intents";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../types";
+import { adoptTerminalPanes } from "../../utils/adoptTerminalPanes";
 import {
 	getAttachedTerminalIdsKey,
 	getBackgroundTerminalSessions,
 	parseAttachedTerminalIdsKey,
 } from "../../utils/backgroundTerminals";
 import { isTerminalReplacementCancelled } from "../../utils/cancelledTerminalReplacements";
-import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 
 interface UseAutoAdoptBackgroundSessionsArgs {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -75,15 +75,10 @@ export function useAutoAdoptBackgroundSessions({
 		);
 		if (toAdopt.length === 0) return;
 
-		// Oldest→newest so tabs read chronologically; restore the active tab so
-		// adoption never steals focus.
-		const restoreActiveTabId = state.tabs.length > 0 ? state.activeTabId : null;
-		for (const session of toAdopt.reverse()) {
-			focusOrAddTerminalPane(store, session.terminalId, { focus: false });
-		}
-		if (restoreActiveTabId) {
-			store.getState().setActiveTab(restoreActiveTabId);
-		}
+		adoptTerminalPanes(
+			store,
+			toAdopt.reverse().map((session) => session.terminalId),
+		);
 		logStressEvent("background-terminals.auto-adopt", {
 			count: toAdopt.length,
 			workspaceId,

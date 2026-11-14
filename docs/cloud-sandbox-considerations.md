@@ -180,8 +180,13 @@ CORS headers, and the app shows "Connecting… / Unknown host" with a hint about
 tray menu Linux does not have. Seen 2026-09-11 from a throwaway prompt that
 invited the agent to "try the new image". Recovery is a platform-side
 `vercel sandbox stop` (snapshots the disk, kills everything) followed by the
-app's Retry, which wakes a clean session. Still owed: memory pressure shown in
-the product. **The kill switch is done (2026-10-21):** measured on a 2 vCPU / 4 GB
+app's Retry, which wakes a clean session. **Pressure is shown in the product
+(2026-11-13):** host-service samples cgroup PSI and memguard's reaps every 5 s
+(`runtime/sandbox-box-pressure`) and reports changes to the API, which hands
+them to the organization's realtime hub; every window gets the boxes under
+pressure as a sidebar dot, and the open workspace an out-of-memory banner. The
+hub keeps only boxes under pressure and drops one that stops re-reporting.
+**The kill switch is done (2026-10-21):** measured on a 2 vCPU / 4 GB
 box, the kernel's killer was the last thing to act — with no swap it drops code
 pages first, and host-service's event loop stalled for 113 s while a 3 GB
 `tsc` refaulted everything. `superset-memguard` (bundle, started by boot as

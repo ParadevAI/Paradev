@@ -3,6 +3,7 @@ export type {
 	SandboxTarget,
 } from "./SandboxAccessProvider";
 export {
+	refreshSandboxAccess,
 	SandboxAccessContext,
 	SandboxAccessProvider,
 	sandboxWakeQueryKey,

@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import type { MoveDestinationComputer } from "@superset/shared/move-book";
 import { Link } from "expo-router";
-import { type ReactNode, useRef } from "react";
+import { useRef } from "react";
 import type { ViewInstance } from "react-native";
 import { View } from "react-native";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
+import type { WorkspaceRowMenuProps } from "./WorkspaceRowMenu.types";
 
 export function WorkspaceRowMenu({
 	pinned,
@@ -20,29 +20,7 @@ export function WorkspaceRowMenu({
 	onShare,
 	move,
 	children,
-}: {
-	pinned: boolean;
-	onTogglePin?: () => void;
-	canRename: boolean;
-	canDelete: boolean;
-	/** A cloud workspace is archived, not deleted. */
-	isCloud: boolean;
-	isUnread: boolean;
-	onToggleUnread: () => void;
-	onRename: () => void;
-	onDelete: () => void;
-	onCopyId: () => void;
-	/** Gets the row's tag, so iPad's share popover points at the row. */
-	onShare: (anchor?: number) => void;
-	/** Where the workspace can move; absent where it cannot move from here. */
-	move?: {
-		computers: MoveDestinationComputer[];
-		canMoveToCloud: boolean;
-		moveToCloud: () => void;
-		moveToComputer: (computer: MoveDestinationComputer) => void;
-	};
-	children: ReactNode;
-}) {
+}: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
 	const rowRef = useRef<ViewInstance>(null);
 	// Tap navigation lives on the row itself; the Link exists solely because
