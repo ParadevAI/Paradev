@@ -10,6 +10,12 @@ import { settingsTabCommands } from "../settings/commands";
  * Opens the workspace switcher. With the modifier still held, the switcher
  * steps on each further press and switches when the modifier is released.
  */
+export function toggleWorkspaceList(): void {
+	const { open, root, setOpen } = useFrameStackStore.getState();
+	if (open && root === "switcher") setOpen(false);
+	else openWorkspaceList({ via: "pill" });
+}
+
 export function openWorkspaceList(
 	options: { via?: SwitcherOpenedVia; holdsModifier?: boolean } = {},
 ): void {

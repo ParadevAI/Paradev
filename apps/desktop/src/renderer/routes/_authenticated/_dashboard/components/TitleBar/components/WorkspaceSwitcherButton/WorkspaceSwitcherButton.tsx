@@ -1,7 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { openWorkspaceList } from "renderer/commandPalette";
+import {
+	PALETTE_TOGGLE_ATTRIBUTE,
+	toggleWorkspaceList,
+	useFrameStackStore,
+} from "renderer/commandPalette";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { WorkspacesIcon } from "./components/WorkspacesIcon";
 import {
@@ -14,10 +18,11 @@ const WAITING_DOT_CLASS: Record<WaitingWorkspaceBucket, string> = {
 	completed: "bg-green-500",
 };
 
-/** Opens the workspace switcher. Its dot shows when another sidebar workspace waits on the user. */
+/** Opens and closes the workspace switcher. Its dot shows when another sidebar workspace waits on the user. */
 export function WorkspaceSwitcherButton() {
 	const { t } = useLingui();
 	const waiting = useWaitingWorkspaceBucket();
+	const isOpen = useFrameStackStore((s) => s.open && s.root === "switcher");
 
 	return (
 		<Tooltip delayDuration={300}>
@@ -25,8 +30,10 @@ export function WorkspaceSwitcherButton() {
 				<button
 					type="button"
 					aria-haspopup="dialog"
+					aria-expanded={isOpen}
 					aria-label={t({ message: "Switch workspace" })}
-					onClick={() => openWorkspaceList({ via: "pill" })}
+					{...{ [PALETTE_TOGGLE_ATTRIBUTE]: "" }}
+					onClick={toggleWorkspaceList}
 					className="no-drag relative mx-1.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-[var(--tab-selected)] text-foreground shadow-[var(--tab-selected-shadow)] transition-colors hover:bg-[var(--tab-switcher-hover)]"
 				>
 					<WorkspacesIcon className="size-4" />

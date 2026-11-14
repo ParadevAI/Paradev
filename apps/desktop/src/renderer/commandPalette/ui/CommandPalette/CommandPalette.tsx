@@ -21,7 +21,10 @@ import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticat
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useCommandContext } from "../../core/ContextProvider";
 import { executeCommand } from "../../core/execute";
-import { useFrameStackStore } from "../../core/frames";
+import {
+	PALETTE_TOGGLE_ATTRIBUTE,
+	useFrameStackStore,
+} from "../../core/frames";
 import type { Command as CommandType } from "../../core/types";
 import { CommandListView } from "../CommandListView/CommandListView";
 import { CommandPaletteFooter } from "../CommandPaletteFooter";
@@ -198,6 +201,15 @@ export function CommandPalette() {
 			<DialogContent
 				showCloseButton={false}
 				onOpenAutoFocus={focusInput}
+				onInteractOutside={(event) => {
+					// The toggle's own click closes the palette; closing here too would reopen it.
+					if (
+						event.target instanceof Element &&
+						event.target.closest(`[${PALETTE_TOGGLE_ATTRIBUTE}]`)
+					) {
+						event.preventDefault();
+					}
+				}}
 				className="!max-w-[640px] sm:!max-w-[640px] translate-y-0 max-h-[80vh] overflow-hidden rounded-xl p-0"
 				style={{ top: "max(16px, calc(50% - 278px))" }}
 			>

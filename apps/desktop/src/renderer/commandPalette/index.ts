@@ -2,7 +2,7 @@ export { CheckResourcesHotkeyMount } from "./CheckResourcesHotkeyMount";
 export { CommandPaletteHost } from "./CommandPaletteHost";
 export { useCommandContext } from "./core/ContextProvider";
 export { executeCommand } from "./core/execute";
-export { useFrameStackStore } from "./core/frames";
+export { PALETTE_TOGGLE_ATTRIBUTE, useFrameStackStore } from "./core/frames";
 export { registerProvider } from "./core/registry";
 export type {
 	Command,
@@ -11,5 +11,8 @@ export type {
 	CommandSection,
 	SectionId,
 } from "./core/types";
-export { openWorkspaceList } from "./modules/navigation/commands";
+export {
+	openWorkspaceList,
+	toggleWorkspaceList,
+} from "./modules/navigation/commands";
 export { openQuickOpen } from "./modules/workspace/commands";

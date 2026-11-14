@@ -13,6 +13,9 @@ export type PaletteRoot = "commands" | "switcher";
 
 export type SwitcherOpenedVia = "hotkey" | "pill" | "command";
 
+/** Marks a control that toggles the palette, so pressing it does not count as a press outside. */
+export const PALETTE_TOGGLE_ATTRIBUTE = "data-command-palette-toggle";
+
 export interface SwitcherSelection {
 	id: string;
 	name: string;
