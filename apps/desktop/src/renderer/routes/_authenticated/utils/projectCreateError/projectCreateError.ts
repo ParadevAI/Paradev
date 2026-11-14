@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 
 export type GitEnvironmentReason =
 	| "COMMAND_LINE_TOOLS_MISSING"
@@ -89,7 +90,9 @@ export function toProjectCreateError(
 		console.error("[project create] failed", rawErrorMessage(error), error);
 	}
 	return {
-		message: isOwnMessage ? errorMessage(error, fallback) : fallback,
+		message: isOwnMessage
+			? hostRefusalReason(errorMessage(error, fallback))
+			: fallback,
 		gitEnvironmentReason: null,
 	};
 }

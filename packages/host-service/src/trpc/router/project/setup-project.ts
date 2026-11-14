@@ -206,19 +206,21 @@ async function placeExisting(
 		if (mode.kind === "clone") {
 			const parentDir = resolvePath(mode.parentDir);
 			const sameParent = dirname(current) === parentDir;
-			if (sameParent && (await isCheckoutOf(row, current))) continue;
-			const target = row.url
-				? join(parentDir, cloneDirectoryName(row.url))
-				: null;
-			if (row.url && target === current && !existsSync(current)) {
-				clones.push({ repository: row, url: row.url, parentDir });
-				continue;
+			const usable = await isCheckoutOf(row, current);
+			if (usable && (sameParent || !mode.allowRelocate)) continue;
+			if (!row.url) {
+				throw usable ? alreadySetUpError(row) : folderUnusableError(row);
 			}
-			if (row.url && target && target !== current && mode.allowRelocate) {
+			const target = join(parentDir, cloneDirectoryName(row.url));
+			if (target !== current) {
 				clones.push({ repository: row, url: row.url, parentDir, target });
 				continue;
 			}
-			throw sameParent ? folderUnusableError(row) : alreadySetUpError(row);
+			if (!existsSync(current)) {
+				clones.push({ repository: row, url: row.url, parentDir });
+				continue;
+			}
+			throw folderUnusableError(row);
 		}
 		const resolved = await resolveRepositoryFolder(row, mode.path, CHECK_ONLY);
 		if (resolved.repoPath === current) continue;

@@ -2,6 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { getPrimaryRepository } from "renderer/hooks/host-projects/useHostProjects";
 import type { HostServiceClient } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { legacySetupInput } from "renderer/lib/legacySetupInput";
 import { getBaseName } from "renderer/lib/pathBasename";
 import type { ProjectSetupResult } from "renderer/react-query/projects";
@@ -91,7 +92,9 @@ export async function importFolderFirst({
 			return null;
 		}
 	} catch (err) {
-		onError?.(err instanceof Error ? err.message : String(err));
+		onError?.(
+			hostRefusalReason(err instanceof Error ? err.message : String(err)),
+		);
 		return null;
 	}
 
@@ -121,7 +124,9 @@ export async function importFolderFirst({
 		finalizeSetup(activeHostUrl, result);
 		return result;
 	} catch (err) {
-		onError?.(err instanceof Error ? err.message : String(err));
+		onError?.(
+			hostRefusalReason(err instanceof Error ? err.message : String(err)),
+		);
 		return null;
 	}
 }

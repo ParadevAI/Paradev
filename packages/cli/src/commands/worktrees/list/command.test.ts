@@ -1,10 +1,18 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { withLocalHostService } from "../../../lib/host/test-helpers";
 import listCommand from "./command";
 
 let listInput: Record<string, unknown> | undefined;
 
 withLocalHostService("org-1", {
+	"project.get": () => ({
+		id: "project-1",
+		name: "project",
+		repositories: [
+			{ id: "repo-web", name: "web", isPrimary: false },
+			{ id: "repo-api", name: "api", isPrimary: true },
+		],
+	}),
 	"workspaceCreation.listProjectWorktrees": (input) => {
 		listInput = input;
 		return {
@@ -43,6 +51,10 @@ function invoke(options: Record<string, unknown> = {}) {
 	});
 }
 
+afterEach(() => {
+	listInput = undefined;
+});
+
 describe("worktrees list", () => {
 	test("lists every worktree with the workspace that tracks it", async () => {
 		expect(await invoke()).toEqual([
@@ -68,7 +80,18 @@ describe("worktrees list", () => {
 				workspaceId: null,
 			},
 		]);
-		expect(listInput).toEqual({ projectId: "project-1" });
+		expect(listInput).toEqual({
+			projectId: "project-1",
+			repositoryId: "repo-api",
+		});
+	});
+
+	test("lists the named repository's worktrees", async () => {
+		await invoke({ repository: "WEB" });
+		expect(listInput).toEqual({
+			projectId: "project-1",
+			repositoryId: "repo-web",
+		});
 	});
 
 	test("rejects --host with --local", async () => {

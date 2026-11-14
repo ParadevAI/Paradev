@@ -189,6 +189,29 @@ describe("projects setup", () => {
 		expect(result.message).toContain("web  /here/web  (moved)");
 	});
 
+	test("--allow-relocate with --clone-into asks to move every clone", async () => {
+		localProject = PROJECT;
+		setupCreates = false;
+		await invoke({ cloneInto: "/src", allowRelocate: true });
+		expect(setupInput?.repositories).toEqual([
+			{
+				id: "r-api",
+				mode: { kind: "clone", parentDir: "/src", allowRelocate: true },
+			},
+			{
+				id: "r-web",
+				mode: { kind: "clone", parentDir: "/src", allowRelocate: true },
+			},
+		]);
+	});
+
+	test("refuses --allow-relocate without a folder to move to", async () => {
+		await expect(invoke({ allowRelocate: true })).rejects.toThrow(
+			"--allow-relocate only applies to --path or --clone-into",
+		);
+		expect(setupInput).toBeUndefined();
+	});
+
 	test("restores a project this host deleted without another host", async () => {
 		localDeleted = true;
 		setupCreates = false;

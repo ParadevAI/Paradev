@@ -677,7 +677,7 @@ superset projects repos relocate api --project prj_… --path ~/src/api --local
 	options={[
 		{ flag: "--clone-into <dir>", description: "Clone every repository into `<dir>/<name>/`. Repositories given a `--path` are not cloned." },
 		{ flag: "--path <repo>=<dir>", description: "Use the existing folder `<dir>` for the repository `<repo>` (its name or ID). Repeatable; wins over `--clone-into` for that repository." },
-		{ flag: "--allow-relocate", description: "If this host already has a repository at another folder, move it to its `--path` folder. `--path` only." },
+		{ flag: "--allow-relocate", description: "If this host already has a repository in another folder that still works, move it to its `--path` folder, or clone it into `--clone-into`. Needs `--path` or `--clone-into`." },
 		{ flag: "--from-host <id>", description: "Host machineId to copy the project from. Default: the only other online host that has it." },
 		{ flag: "--host <id>", description: "Target host machineId. Mutually exclusive with `--local`." },
 		{ flag: "--local", description: "Target this machine (the default)." },
@@ -706,9 +706,11 @@ repository with no Git remote must have a `--path`. Relative paths are resolved
 against the current directory on this machine; for another host, give absolute
 paths.
 
-If the host already has the project, `created` is `false` and nothing new is
-set up: the command checks each repository you give a folder for, and with
-`--allow-relocate` moves it there.
+If the host already has the project, `created` is `false`. A repository whose
+folder still works stays where it is; `--allow-relocate` moves it to the folder
+you give. A repository whose folder is gone or is no longer a checkout of it is
+cloned into `--clone-into`, or uses its `--path` folder with
+`--allow-relocate`.
 
 ```bash
 # Clone every repository of the project into ~/code
@@ -719,6 +721,9 @@ superset projects setup 47c31b04-… --clone-into ~/code --path api=~/src/api
 
 # Two other hosts have the project: copy it from one of them
 superset projects setup 47c31b04-… --clone-into ~/code --from-host <id>
+
+# This host lost the folder of one repository: clone only that one again
+superset projects setup 47c31b04-… --clone-into ~/code
 ```
 </Command>
 

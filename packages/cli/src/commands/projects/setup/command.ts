@@ -16,7 +16,7 @@ import {
 } from "./utils/findSourceProject";
 
 type PlacementMode =
-	| { kind: "clone"; parentDir: string }
+	| { kind: "clone"; parentDir: string; allowRelocate?: boolean }
 	| { kind: "import"; path: string; allowRelocate?: boolean };
 
 function parsePathOption(value: string): { ref: string; dir: string } {
@@ -86,7 +86,7 @@ export default command({
 				"<repo>=<dir>: use the existing folder <dir> for the repository named <repo> (name or ID). Repeatable; wins over --clone-into",
 			),
 		allowRelocate: boolean().desc(
-			"Move a repository this host already has to its --path folder",
+			"Move a repository this host already has to its --path folder or into --clone-into, even if its current folder still works",
 		),
 	},
 	run: async ({ ctx, args, options }) => {
@@ -102,12 +102,13 @@ export default command({
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
 		const paths = (options.path ?? []).map(parsePathOption);
-		if (options.allowRelocate && paths.length === 0) {
+		if (options.allowRelocate && paths.length === 0 && !options.cloneInto) {
 			throw new CLIError(
-				"--allow-relocate only applies to --path",
-				"Add --path <repo>=<dir>, or drop --allow-relocate",
+				"--allow-relocate only applies to --path or --clone-into",
+				"Add --path <repo>=<dir> or --clone-into <dir>, or drop --allow-relocate",
 			);
 		}
+		const relocate = options.allowRelocate ? { allowRelocate: true } : {};
 
 		const target = await resolveHostTarget({
 			requestedHostId:
@@ -129,14 +130,18 @@ export default command({
 				placements.set(repository.id, {
 					kind: "import",
 					path: hostPath(target, dir),
-					...(options.allowRelocate ? { allowRelocate: true } : {}),
+					...relocate,
 				});
 			}
 			if (options.cloneInto) {
 				const parentDir = hostPath(target, options.cloneInto);
 				for (const repository of requireRepositories(project)) {
 					if (!placements.has(repository.id)) {
-						placements.set(repository.id, { kind: "clone", parentDir });
+						placements.set(repository.id, {
+							kind: "clone",
+							parentDir,
+							...relocate,
+						});
 					}
 				}
 			}

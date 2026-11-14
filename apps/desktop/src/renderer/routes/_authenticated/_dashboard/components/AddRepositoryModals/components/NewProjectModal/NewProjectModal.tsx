@@ -18,6 +18,7 @@ import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import {
 	useCreateV1Project,
 	useFinalizeProjectSetup,
@@ -187,7 +188,7 @@ export function NewProjectModal({
 						message:
 							"Could not create project. Please try a different name or check the logs.",
 					})
-				: errorMessage(err);
+				: hostRefusalReason(errorMessage(err));
 			toast.error(
 				t({
 					message: "Could not create project",

@@ -505,7 +505,7 @@ describe("project.setup", () => {
 		}
 	});
 
-	async function setUpClonedAndDeleted(names: string[]) {
+	async function setUpCloned(names: string[]) {
 		const { caller, db } = setup();
 		const sources = await Promise.all(names.map(() => repo()));
 		const created = origin(
@@ -527,13 +527,89 @@ describe("project.setup", () => {
 				.where(eq(schema.repositories.id, id))
 				.run();
 		});
-		db.update(schema.projects)
-			.set({ deletedAt: Date.now() })
-			.where(eq(schema.projects.id, created.projectId))
-			.run();
-		for (const path of paths) rmSync(path, { recursive: true, force: true });
 		return { caller, db, parentDir, paths, ...created };
 	}
+
+	async function setUpClonedAndDeleted(names: string[]) {
+		const cloned = await setUpCloned(names);
+		cloned.db
+			.update(schema.projects)
+			.set({ deletedAt: Date.now() })
+			.where(eq(schema.projects.id, cloned.projectId))
+			.run();
+		for (const path of cloned.paths) {
+			rmSync(path, { recursive: true, force: true });
+		}
+		return cloned;
+	}
+
+	function storedPaths(db: HostDb): string[] {
+		return db
+			.select({ repoPath: schema.repositories.repoPath })
+			.from(schema.repositories)
+			.all()
+			.map((r) => r.repoPath)
+			.sort();
+	}
+
+	it("leaves a repository that is checked out in another folder where it is", async () => {
+		const { caller, db, paths, projectId, ids } = await setUpCloned(["web"]);
+		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
+
+		const again = await caller.setup({
+			projectId,
+			repositories: [
+				{
+					id: ids[0] as string,
+					mode: { kind: "clone", parentDir: elsewhere },
+				},
+			],
+		});
+
+		expect(again.created).toBe(false);
+		expect(again.repositories.map((r) => r.path)).toEqual(paths);
+		expect(storedPaths(db)).toEqual(paths);
+		expect(readdirSync(elsewhere)).toEqual([]);
+	});
+
+	it("clones only the repository whose folder is lost into the new parent", async () => {
+		const { caller, paths, projectId, ids } = await setUpCloned(["web", "api"]);
+		const [web, api] = paths as [string, string];
+		rmSync(api, { recursive: true, force: true });
+		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
+
+		const again = await caller.setup({
+			projectId,
+			repositories: ids.map((id) => ({
+				id,
+				mode: { kind: "clone" as const, parentDir: elsewhere },
+			})),
+		});
+
+		const movedApi = join(elsewhere, basename(api));
+		expect(again.repositories.map((r) => r.path)).toEqual([web, movedApi]);
+		expect(existsSync(join(movedApi, ".git"))).toBe(true);
+		expect(readdirSync(elsewhere)).toEqual([basename(api)]);
+	});
+
+	it("moves a repository that is checked out elsewhere when asked to relocate", async () => {
+		const { caller, paths, projectId, ids } = await setUpCloned(["web"]);
+		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
+		const moved = join(elsewhere, basename(paths[0] as string));
+
+		const again = await caller.setup({
+			projectId,
+			repositories: [
+				{
+					id: ids[0] as string,
+					mode: { kind: "clone", parentDir: elsewhere, allowRelocate: true },
+				},
+			],
+		});
+
+		expect(again.repositories.map((r) => r.path)).toEqual([moved]);
+		expect(existsSync(join(moved, ".git"))).toBe(true);
+	});
 
 	it("clones a repository back into its folder when the folder is gone", async () => {
 		const { caller, parentDir, paths, projectId, ids } =
@@ -560,30 +636,19 @@ describe("project.setup", () => {
 		expect((await caller.list()).map((p) => p.id)).toEqual([projectId]);
 	});
 
-	it("clones a deleted project into another folder only when asked to relocate", async () => {
+	it("clones a deleted project whose folder is gone into another folder", async () => {
 		const { caller, paths, projectId, ids } = await setUpClonedAndDeleted([
 			"web",
 		]);
-		const id = ids[0] as string;
 		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
 		const moved = join(elsewhere, basename(paths[0] as string));
-
-		await expect(
-			caller.setup({
-				projectId,
-				repositories: [{ id, mode: { kind: "clone", parentDir: elsewhere } }],
-			}),
-		).rejects.toMatchObject({
-			message: expect.stringContaining("already_set_up"),
-		});
-		expect(existsSync(moved)).toBe(false);
 
 		const back = await caller.setup({
 			projectId,
 			repositories: [
 				{
-					id,
-					mode: { kind: "clone", parentDir: elsewhere, allowRelocate: true },
+					id: ids[0] as string,
+					mode: { kind: "clone", parentDir: elsewhere },
 				},
 			],
 		});
@@ -619,14 +684,7 @@ describe("project.setup", () => {
 		).rejects.toThrow();
 
 		expect(readdirSync(elsewhere)).toEqual([]);
-		expect(
-			db
-				.select({ repoPath: schema.repositories.repoPath })
-				.from(schema.repositories)
-				.all()
-				.map((r) => r.repoPath)
-				.sort(),
-		).toEqual([...paths].sort());
+		expect(storedPaths(db)).toEqual([...paths].sort());
 		expect(await caller.list()).toEqual([]);
 	});
 
@@ -706,14 +764,40 @@ describe("project.setup", () => {
 
 		const again = await caller.setup({ projectId, repositories: [clone] });
 		expect(again.created).toBe(false);
+		expect(existsSync(join(dirname(web), "other"))).toBe(false);
+	});
 
-		rmSync(web, { recursive: true, force: true });
+	it("refuses to clone over a folder that is there but is not a checkout", async () => {
+		const { caller, db } = setup();
+		const web = await repo();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const id = ids[0] as string;
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [{ id, mode: { kind: "import", path: web } }],
+		});
+		db.update(schema.repositories)
+			.set({ url: join(root, "no-such-source", basename(web)) })
+			.where(eq(schema.repositories.id, id))
+			.run();
+		rmSync(join(web, ".git"), { recursive: true, force: true });
+
 		await expect(
-			caller.setup({ projectId, repositories: [clone] }),
+			caller.setup({
+				projectId,
+				repositories: [
+					{ id, mode: { kind: "clone", parentDir: dirname(web) } },
+				],
+			}),
 		).rejects.toMatchObject({
 			message: expect.stringContaining("repository_folder_unusable"),
 		});
-		expect(existsSync(join(dirname(web), "other"))).toBe(false);
+		expect(existsSync(web)).toBe(true);
 	});
 
 	it("gives a legacy cloud candidate the project id as its repository id", async () => {

@@ -2,9 +2,11 @@ import { boolean, CLIError, string, table } from "@superset/cli-framework";
 import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import {
+	findPrimaryRepository,
+	findRepository,
+	getHostProject,
 	resolveHostFilter,
 	resolveHostTarget,
-	resolveRepository,
 } from "../../../lib/host-target";
 import { listProjectWorktrees } from "../projectWorktrees";
 
@@ -45,15 +47,10 @@ export default command({
 			userJwt: ctx.bearer,
 			api: ctx.api,
 		});
-		const repositoryId = options.repository
-			? (
-					await resolveRepository(
-						target.client,
-						options.project,
-						options.repository,
-					)
-				).id
-			: undefined;
-		return listProjectWorktrees(target.client, options.project, repositoryId);
+		const project = await getHostProject(target.client, options.project);
+		const repository = options.repository
+			? findRepository(project, options.repository)
+			: findPrimaryRepository(project);
+		return listProjectWorktrees(target.client, options.project, repository.id);
 	},
 });

@@ -19,6 +19,7 @@ import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import {
 	useCreateV1Project,
 	useFinalizeProjectSetup,
@@ -69,7 +70,9 @@ const GH_AUTH_FAILURE_PATTERNS = [
 ];
 
 function toCloneError(err: unknown, gitMissingMessage: string): CloneError {
-	const message = errorMessage(err, "Failed to clone repository");
+	const message = hostRefusalReason(
+		errorMessage(err, "Failed to clone repository"),
+	);
 	const raw = rawErrorMessage(err);
 	if (isGitToolsMissingError(raw)) {
 		return { message: gitMissingMessage, needsGhAuth: false };
@@ -230,7 +233,7 @@ function OnboardingProjectPage() {
 			toast.error(
 				isGitToolsMissingError(rawErrorMessage(err))
 					? gitMissingMessage
-					: errorMessage(err, "Failed to open folder"),
+					: hostRefusalReason(errorMessage(err, "Failed to open folder")),
 			);
 		} finally {
 			setBusy(false);
@@ -295,7 +298,7 @@ function OnboardingProjectPage() {
 			setCloneError({
 				message:
 					err instanceof Error
-						? err.message
+						? hostRefusalReason(err.message)
 						: "Something went wrong. Please try again.",
 				needsGhAuth: false,
 			});
