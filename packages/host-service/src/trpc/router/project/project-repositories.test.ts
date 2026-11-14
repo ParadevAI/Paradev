@@ -1,6 +1,13 @@
 import { Database } from "bun:sqlite";
 import { afterAll, describe, expect, it } from "bun:test";
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
@@ -335,6 +342,53 @@ describe("project repositories", () => {
 
 		rmSync(join(workspaceRoot, "web"), { recursive: true });
 		expect((await remove()).repositories.map((r) => r.name)).toEqual(["web"]);
+	});
+
+	it("an archived root left with one checkout loses the agent trust it had as a multi-repo root", async () => {
+		const { caller, db } = setup();
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
+		});
+		const api = project.repositories.find((r) => r.name === "api");
+		if (!api) throw new Error("no api repository");
+		const workspaceRoot = mkdtempSync(join(root, "archived-"));
+		const archived = seedWorkspace(
+			{ db },
+			{ projectId: project.id, worktreePath: workspaceRoot, branch: "feat" },
+		);
+		db.update(schema.workspaces)
+			.set({ archivedAt: 1 })
+			.where(eq(schema.workspaces.id, archived.id))
+			.run();
+		const claudeDir = mkdtempSync(join(root, "claude-"));
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "claude-test",
+				presetId: "claude",
+				label: "Claude",
+				command: "claude",
+				promptTransport: "argv",
+				envJson: JSON.stringify({ CLAUDE_CONFIG_DIR: claudeDir }),
+				displayOrder: 0,
+			})
+			.run();
+		const store = join(claudeDir, ".claude.json");
+		writeFileSync(
+			store,
+			JSON.stringify({
+				projects: { [workspaceRoot]: { hasTrustDialogAccepted: true } },
+			}),
+		);
+
+		await caller.removeRepository({
+			projectId: project.id,
+			repositoryId: api.id,
+		});
+
+		expect(JSON.parse(readFileSync(store, "utf-8")).projects).toEqual({
+			[workspaceRoot]: { hasTrustDialogAccepted: false },
+		});
 	});
 
 	it("refuses while an archived workspace of one or three checkouts keeps the repository's folder on disk", async () => {

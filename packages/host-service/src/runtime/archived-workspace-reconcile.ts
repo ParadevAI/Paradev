@@ -78,6 +78,7 @@ export async function runArchivedWorkspaceReconcile(
 			// Only the root is left: what is still in it is the user's.
 			const warnings: string[] = [];
 			await removeGeneratedWorkspaceRoot(
+				ctx.db,
 				row.worktreePath,
 				checkouts.map((checkout) => checkout.path),
 				warnings,

@@ -14,6 +14,7 @@ import { runTeardown } from "../runtime/teardown";
 import { disposeSessionsByWorkspaceId } from "../terminal/terminal";
 import { cleanupGitOps } from "../trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../trpc/router/workspace-cleanup/is-local-checkout-workspace";
+import { revokeRootTrust } from "../trpc/router/workspace-creation/shared/seed-agent-trust";
 import { removeWorkspaceContextFiles } from "../trpc/router/workspace-creation/shared/workspace-context-files";
 import type { HostServiceContext } from "../types";
 import { listWorkspaceCheckouts } from "../workspaces/checkouts";
@@ -304,6 +305,7 @@ async function purgeProject(
 		}
 		// A multi-repo root holds only the checkouts; a non-empty one stays.
 		if (checkouts.length > 1) {
+			await revokeRootTrust(ctx.db, [row.worktreePath]);
 			try {
 				await removeWorkspaceContextFiles(
 					row.worktreePath,

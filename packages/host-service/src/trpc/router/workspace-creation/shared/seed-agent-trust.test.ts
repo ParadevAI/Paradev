@@ -20,6 +20,7 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { seedProject, seedWorkspace } from "../../../../../test/helpers/seed";
 import type { HostDb } from "../../../../db";
 import * as schema from "../../../../db/schema";
+import { removeGeneratedWorkspaceRoot } from "../../workspace-cleanup";
 import {
 	isCodexFolderTrusted,
 	resolveTrustFamily,
@@ -528,6 +529,37 @@ describe("seedWorkspaceFolderTrust", () => {
 		await revokeRootTrustForNewPrimary(db, projectId, previousPrimaryId);
 
 		expect(readState().projects[rootPath].hasTrustDialogAccepted).toBe(true);
+	});
+
+	test("a launch in a root whose config repository is not trusted takes away the trust stored for that path", async () => {
+		const { db } = setup();
+		const { rootPath } = seedTrustedRoot(db, false);
+		const [workspace] = db.select().from(schema.workspaces).all();
+
+		await seedWorkspaceFolderTrust(db, workspace?.id ?? "", "claude-test");
+
+		expect(readState().projects[rootPath]).toEqual({
+			hasTrustDialogAccepted: false,
+			history: ["x"],
+		});
+		expect(readState().projects[join(dir, "web")].hasTrustDialogAccepted).toBe(
+			true,
+		);
+	});
+
+	test("removing a multi-repo root takes its trust away first", async () => {
+		const { db } = setup();
+		const { rootPath } = seedTrustedRoot(db, true);
+		mkdirSync(rootPath);
+		const warnings: string[] = [];
+
+		await removeGeneratedWorkspaceRoot(db, rootPath, [], warnings);
+
+		expect(warnings).toEqual([]);
+		expect(readState().projects[rootPath].hasTrustDialogAccepted).toBe(false);
+		expect(readState().projects[join(dir, "api")].hasTrustDialogAccepted).toBe(
+			true,
+		);
 	});
 });
 

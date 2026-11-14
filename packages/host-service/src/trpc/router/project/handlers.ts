@@ -36,7 +36,10 @@ import {
 	type HostWorkspaceRow,
 } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
-import { revokeRootTrustForNewPrimary } from "../workspace-creation/shared/seed-agent-trust";
+import {
+	revokeRootTrust,
+	revokeRootTrustForNewPrimary,
+} from "../workspace-creation/shared/seed-agent-trust";
 import { syncWorkspaceContextFiles } from "../workspace-creation/shared/workspace-context-files";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
@@ -481,10 +484,10 @@ function workspaceList(rows: { name: string }[]): string {
  * unless its folder is still on disk, or one would keep a single checkout
  * while its folders are on disk.
  */
-export function removeRepository(
+export async function removeRepository(
 	ctx: HostServiceContext,
 	args: { projectId: string; repositoryId: string },
-): ProjectSnapshot {
+): Promise<ProjectSnapshot> {
 	const project = requireProject(ctx, args.projectId);
 	const repository = requireRepositoryOf(
 		ctx,
@@ -539,6 +542,9 @@ export function removeRepository(
 					: `repository_in_use: ${repository.name} is checked out by archived workspaces whose folders are still on disk (${workspaceList(stranded)}); delete them first`,
 		});
 	}
+	const singleCheckoutRoots = users
+		.filter((row) => listWorkspaceCheckouts(ctx.db, row).length === 2)
+		.map((row) => row.worktreePath);
 	// PR rows are shared by GitHub identity: another clone of the same
 	// repository may link them, so they move to it instead of cascading.
 	const twin =
@@ -578,6 +584,7 @@ export function removeRepository(
 			.run();
 		tx.delete(repositories).where(eq(repositories.id, repository.id)).run();
 	});
+	await revokeRootTrust(ctx.db, singleCheckoutRoots);
 	touchProject(ctx, args.projectId);
 	return snapshotOf(ctx, args.projectId);
 }

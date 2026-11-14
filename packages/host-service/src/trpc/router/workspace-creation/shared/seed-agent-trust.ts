@@ -414,6 +414,7 @@ export async function seedAgentFolderTrust(
 			requireTrustedPath !== undefined &&
 			!(await isFolderTrusted(target, requireTrustedPath))
 		) {
+			await revokeFolderTrust(target, folderPath);
 			return;
 		}
 		const normalized = normalizeFolderPath(folderPath);
@@ -630,12 +631,7 @@ export async function revokeRootTrustForNewPrimary(
 		});
 	}
 	if (moved.length === 0) return;
-	const targets = new Map<string, TrustTarget>();
-	for (const row of db.select().from(hostAgentConfigs).all()) {
-		const target = resolveTrustTarget(db, rowToConfig(row));
-		if (target) targets.set(`${target.family}:${target.file}`, target);
-	}
-	for (const target of targets.values()) {
+	for (const target of allTrustTargets(db)) {
 		try {
 			for (const { root, sourcePath } of moved) {
 				if (!(await isFolderTrusted(target, sourcePath))) {
@@ -647,6 +643,46 @@ export async function revokeRootTrustForNewPrimary(
 				`[project.setPrimaryRepository] failed to revoke root trust in '${target.file}':`,
 				err,
 			);
+		}
+	}
+}
+
+function allTrustTargets(db: HostDb): TrustTarget[] {
+	const targets = new Map<string, TrustTarget>();
+	for (const row of db.select().from(hostAgentConfigs).all()) {
+		const target = resolveTrustTarget(db, rowToConfig(row));
+		if (target) targets.set(`${target.family}:${target.file}`, target);
+	}
+	return [...targets.values()];
+}
+
+/**
+ * Drops the trust of multi-repo roots that are going away, in every store a
+ * host agent uses, so a later workspace at the same path starts untrusted.
+ * Call it before the folder is removed: a seed can be keyed by its real path.
+ */
+export async function revokeRootTrust(
+	db: HostDb,
+	roots: string[],
+): Promise<void> {
+	if (roots.length === 0) return;
+	let targets: TrustTarget[];
+	try {
+		targets = allTrustTargets(db);
+	} catch (err) {
+		console.warn("[agent-trust] failed to read agent configs:", err);
+		return;
+	}
+	for (const target of targets) {
+		for (const root of roots) {
+			try {
+				await revokeFolderTrust(target, root);
+			} catch (err) {
+				console.warn(
+					`[agent-trust] failed to revoke trust of '${root}' in '${target.file}':`,
+					err,
+				);
+			}
 		}
 	}
 }

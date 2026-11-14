@@ -5,6 +5,7 @@ import { WORKSPACE_ROOT_ENTRIES } from "@superset/shared/workspace-root";
 import { TRPCError } from "@trpc/server";
 import { inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
+import type { HostDb } from "../../../db";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { invalidateLabelCache } from "../../../ports/static-ports";
 import { isMissingPath } from "../../../runtime/path-state";
@@ -32,6 +33,7 @@ import type {
 } from "../../error-types";
 import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
+import { revokeRootTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
 import {
 	listAgentFolderLeftovers,
@@ -773,6 +775,7 @@ async function removeWorkspaceRoot(
 		recursive &&
 		isInsideProjectWorktreesRoot(root, project, worktreeBaseDir)
 	) {
+		await revokeRootTrust(ctx.db, [root]);
 		try {
 			await removeDirectoryTree(root);
 		} catch (err) {
@@ -781,15 +784,17 @@ async function removeWorkspaceRoot(
 		}
 		return;
 	}
-	await removeGeneratedWorkspaceRoot(root, checkoutPaths, warnings);
+	await removeGeneratedWorkspaceRoot(ctx.db, root, checkoutPaths, warnings);
 }
 
 /** Takes the files Superset wrote into a multi-repo root, then the root if nothing else is left. */
 export async function removeGeneratedWorkspaceRoot(
+	db: HostDb,
 	root: string,
 	checkoutPaths: string[],
 	warnings: string[],
 ) {
+	await revokeRootTrust(db, [root]);
 	try {
 		await removeWorkspaceContextFiles(root, checkoutPaths);
 	} catch (err) {
