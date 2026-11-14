@@ -97,6 +97,21 @@ function upstreamKey(
 	return `${owner.toLowerCase()}/${repo.toLowerCase()}#${branch}`;
 }
 
+function syntheticPullRequestNumber(
+	head: GitHubPullRequestHeadRef,
+	repo: { owner: string; name: string },
+): number | null {
+	if (
+		head.owner.toLowerCase() !== repo.owner.toLowerCase() ||
+		head.repo.toLowerCase() !== repo.name.toLowerCase()
+	) {
+		return null;
+	}
+	const match = /^refs\/pull\/([1-9]\d*)\/head$/.exec(head.branch);
+	const number = match ? Number(match[1]) : NaN;
+	return Number.isSafeInteger(number) ? number : null;
+}
+
 type RepoProvider = "github";
 
 export interface PullRequestStateSnapshot {
@@ -1088,6 +1103,12 @@ export class PullRequestRuntimeManager {
 				continue;
 			}
 			const rawMatch = keyToPullRequest.get(key);
+			const head = wantedRefs.get(key);
+			const checkoutHeadChanged =
+				!!rawMatch &&
+				!!head &&
+				syntheticPullRequestNumber(head, repo) !== null &&
+				!this.pullRequestHeadMatches(rawMatch.id, workspace.headSha);
 			// A head=<default> PR that is merged or closed is a past promotion
 			// (e.g. main -> staging), never the default-branch workspace's work.
 			const isPastPromotion =
@@ -1099,7 +1120,9 @@ export class PullRequestRuntimeManager {
 			}
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId || isPastPromotion
+				rawMatch?.id === workspace.suppressedPullRequestId ||
+				isPastPromotion ||
+				checkoutHeadChanged
 					? undefined
 					: rawMatch;
 			if (match) {
@@ -1484,11 +1507,12 @@ export class PullRequestRuntimeManager {
 		return entry.promise;
 	}
 
-	private async getCachedPullRequestByHead(
+	private async getCachedPullRequestForRef(
 		repo: NormalizedRepoIdentity,
 		head: GitHubPullRequestHeadRef,
 		options: { bypassCache?: boolean } = {},
 	): Promise<GitHubPullRequestNode | null> {
+		const prNumber = syntheticPullRequestNumber(head, repo);
 		// Branch stays case-sensitive so two case-variant branches can't share
 		// a cache entry and return each other's PR.
 		const cacheKey = [
@@ -1504,20 +1528,24 @@ export class PullRequestRuntimeManager {
 			options,
 			() =>
 				this.fetchFromGitHub(
-					"PR head lookup",
+					prNumber === null ? "PR head lookup" : "PR number lookup",
 					{ owner: repo.owner, name: repo.name, head },
 					() =>
-						fetchPullRequestByHeadFromGh(
-							this.execGh,
-							{ owner: repo.owner, name: repo.name },
-							head,
-						),
+						prNumber !== null
+							? fetchPullRequestByNumberFromGh(this.execGh, repo, prNumber)
+							: fetchPullRequestByHeadFromGh(
+									this.execGh,
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
 					async () =>
-						fetchPullRequestByHead(
-							await this.github(),
-							{ owner: repo.owner, name: repo.name },
-							head,
-						),
+						prNumber !== null
+							? fetchPullRequestByNumber(await this.github(), repo, prNumber)
+							: fetchPullRequestByHead(
+									await this.github(),
+									{ owner: repo.owner, name: repo.name },
+									head,
+								),
 					{ probe: options.bypassCache === true },
 				),
 		);
@@ -1771,7 +1799,7 @@ export class PullRequestRuntimeManager {
 		await Promise.all(
 			Array.from(wantedRefs.entries()).map(async ([key, head]) => {
 				try {
-					const node = await this.getCachedPullRequestByHead(
+					const node = await this.getCachedPullRequestForRef(
 						repo,
 						head,
 						options,
@@ -1783,7 +1811,12 @@ export class PullRequestRuntimeManager {
 						node.headRepository?.name ?? null,
 						node.headRefName,
 					);
-					if (nodeKey === key) latestByKey.set(key, node);
+					if (
+						nodeKey === key ||
+						node.number === syntheticPullRequestNumber(head, repo)
+					) {
+						latestByKey.set(key, node);
+					}
 				} catch (error) {
 					failedKeys.add(key);
 					console.warn(
@@ -1804,9 +1837,14 @@ export class PullRequestRuntimeManager {
 		// a workspace whose local branch casing drifted from the PR's
 		// headRefName gets nothing from the per-head lookups above. Sweep the
 		// repo's open PRs once and fill the gaps case-insensitively.
-		const unmatchedKeys = Array.from(wantedRefs.keys()).filter(
-			(key) => !latestByKey.has(key) && !failedKeys.has(key),
-		);
+		const unmatchedKeys = Array.from(wantedRefs.entries())
+			.filter(
+				([key, head]) =>
+					!latestByKey.has(key) &&
+					!failedKeys.has(key) &&
+					syntheticPullRequestNumber(head, repo) === null,
+			)
+			.map(([key]) => key);
 		if (unmatchedKeys.length > 0) {
 			try {
 				const openNodes = await this.getCachedOpenPullRequests(repo, options);
