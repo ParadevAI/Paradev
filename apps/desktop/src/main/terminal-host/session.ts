@@ -149,6 +149,7 @@ export class Session {
 
 	private subprocess: ChildProcess | null = null;
 	private subprocessReady = false;
+	private subprocessExited = false;
 	private emulator: HeadlessEmulator;
 	private attachedClients: Map<Socket, AttachedClient> = new Map();
 	private clientSocketsWaitingForDrain: Set<Socket> = new Set();
@@ -169,6 +170,7 @@ export class Session {
 	private outputHead = "";
 	private ptyExitSignal: number | undefined;
 	private ptyExitReported = false;
+	private exitNotified = false;
 	private ptySpawnError: string | null = null;
 
 	// Promise that resolves when PTY is ready to accept writes
@@ -311,7 +313,11 @@ export class Session {
 			console.log(
 				`[Session ${this.sessionId}] Subprocess exited with code ${code}`,
 			);
-			this.handleSubprocessExit(code ?? -1);
+			this.subprocessExited = true;
+			this.updateSubprocessStdoutFlow();
+		});
+		this.subprocess.on("close", (code) => {
+			void this.finishSubprocessExit(code ?? -1);
 		});
 
 		this.subprocess.on("error", (error) => {
@@ -434,18 +440,6 @@ export class Session {
 				this.exitCode = exitCode;
 				this.ptyExitSignal = signal !== 0 ? signal : undefined;
 				this.ptyExitReported = true;
-
-				this.broadcastEvent("exit", {
-					type: "exit",
-					exitCode,
-					signal: signal !== 0 ? signal : undefined,
-				} satisfies TerminalExitEvent);
-
-				this.onSessionExit?.(
-					this.sessionId,
-					exitCode,
-					signal !== 0 ? signal : undefined,
-				);
 				break;
 			}
 
@@ -479,15 +473,17 @@ export class Session {
 	 * Handle subprocess exiting
 	 */
 	private handleSubprocessExit(exitCode: number): void {
-		if (this.exitCode === null) {
-			this.exitCode = exitCode;
+		if (!this.exitNotified) {
+			this.exitCode ??= exitCode;
+			this.exitNotified = true;
 
 			this.broadcastEvent("exit", {
 				type: "exit",
-				exitCode,
+				exitCode: this.exitCode,
+				signal: this.ptyExitSignal,
 			} satisfies TerminalExitEvent);
 
-			this.onSessionExit?.(this.sessionId, exitCode);
+			this.onSessionExit?.(this.sessionId, this.exitCode, this.ptyExitSignal);
 		}
 
 		// Ensure waiters don't hang forever if the subprocess exits before sending Spawned.
@@ -501,11 +497,26 @@ export class Session {
 		this.resetProcessState();
 	}
 
+	private async finishSubprocessExit(exitCode: number): Promise<void> {
+		if (this.disposed) return;
+		this.resolveShellReady("timed_out");
+		if (this.emulatorWriteQueue.length > 0) {
+			await new Promise<void>((resolve) => {
+				this.emulatorFlushWaiters.push(resolve);
+				this.scheduleEmulatorWrite();
+			});
+		}
+		if (this.disposed) return;
+		await this.emulator.flush();
+		if (this.disposed) return;
+		this.handleSubprocessExit(exitCode);
+	}
+
 	/**
 	 * Flush queued frames to subprocess stdin, respecting stream backpressure.
 	 */
 	private flushSubprocessStdinQueue(): void {
-		if (!this.subprocess?.stdin || this.disposed) return;
+		if (!this.subprocess?.stdin || this.isDraining || this.disposed) return;
 
 		while (this.subprocessStdinQueue.length > 0) {
 			const buf = this.subprocessStdinQueue[0];
@@ -537,7 +548,8 @@ export class Session {
 		type: PtySubprocessIpcType,
 		payload?: Buffer,
 	): boolean {
-		if (!this.subprocess?.stdin || this.disposed) return false;
+		if (!this.subprocess?.stdin || this.isDraining || this.disposed)
+			return false;
 
 		const payloadBuffer = payload ?? Buffer.alloc(0);
 		const frameSize = 5 + payloadBuffer.length; // 5-byte header + payload
@@ -785,7 +797,19 @@ export class Session {
 	 * Check if session is alive (PTY running)
 	 */
 	get isAlive(): boolean {
-		return this.subprocess !== null && this.exitCode === null;
+		return (
+			this.subprocess !== null &&
+			!this.subprocessExited &&
+			this.exitCode === null
+		);
+	}
+
+	get isDraining(): boolean {
+		return (
+			!this.disposed &&
+			this.subprocess !== null &&
+			(this.subprocessExited || this.ptyExitReported)
+		);
 	}
 
 	/**
@@ -1069,6 +1093,7 @@ export class Session {
 	private resetProcessState(): void {
 		this.subprocess = null;
 		this.subprocessReady = false;
+		this.subprocessExited = false;
 		this.subprocessDecoder = null;
 		const shellName = this.shell.split("/").pop() || this.shell;
 		this.shellReadyState = SHELLS_WITH_READY_MARKER.has(shellName)
@@ -1215,8 +1240,9 @@ export class Session {
 		if (!stdout) return;
 
 		const shouldPause =
-			this.clientSocketsWaitingForDrain.size > 0 ||
-			this.emulatorWriteBackpressured;
+			!this.subprocessExited &&
+			(this.clientSocketsWaitingForDrain.size > 0 ||
+				this.emulatorWriteBackpressured);
 
 		if (shouldPause) {
 			if (this.subprocessStdoutPaused) return;

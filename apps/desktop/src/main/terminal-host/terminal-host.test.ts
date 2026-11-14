@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
 import type { ChildProcess } from "node:child_process";
 import { EventEmitter } from "node:events";
 import { createFrameHeader, PtySubprocessIpcType } from "./pty-subprocess-ipc";
@@ -6,6 +6,54 @@ import "./xterm-env-polyfill";
 
 // Must import after polyfill since these transitively load @xterm/headless
 const { Session } = await import("./session");
+const { TerminalHost } = await import("./terminal-host");
+
+for (const isDraining of [false, true]) {
+	it(`does not let an old cleanup timer dispose a replacement (draining=${isDraining})`, () => {
+		const host = new TerminalHost();
+		const internals = host as unknown as {
+			sessions: Map<string, InstanceType<typeof Session>>;
+			scheduleSessionCleanup: (id: string) => void;
+		};
+		const original = {
+			isAlive: false,
+			isDraining: false,
+			clientCount: 0,
+			dispose: mock(),
+		};
+		const replacement = {
+			isAlive: false,
+			isDraining,
+			clientCount: 0,
+			dispose: mock(),
+		};
+		internals.sessions.set(
+			"reused-id",
+			original as unknown as InstanceType<typeof Session>,
+		);
+		let fireCleanup!: () => void;
+		const timer = spyOn(globalThis, "setTimeout").mockImplementationOnce(((
+			callback: () => void,
+		) => {
+			fireCleanup = callback as () => void;
+			return 0 as unknown as ReturnType<typeof setTimeout>;
+		}) as typeof setTimeout);
+		try {
+			internals.scheduleSessionCleanup("reused-id");
+		} finally {
+			timer.mockRestore();
+		}
+		internals.sessions.set(
+			"reused-id",
+			replacement as unknown as InstanceType<typeof Session>,
+		);
+		fireCleanup();
+		expect(replacement.dispose).not.toHaveBeenCalled();
+		expect(internals.sessions.get("reused-id")).toBe(
+			replacement as unknown as InstanceType<typeof Session>,
+		);
+	});
+}
 
 // =============================================================================
 // Fakes
@@ -334,7 +382,12 @@ describe("TerminalHost — spawn failure cause", () => {
 	it("does NOT report SHELL_EXITED when the PTY helper failed before opening a PTY", async () => {
 		const session = spawnSession();
 		emitReadyThenError(fakeChild, "Spawn failed: posix_spawn failed: EAGAIN");
+		const exited = new Promise<void>((resolve) =>
+			session.onExit(() => resolve()),
+		);
 		fakeChild.emit("exit", 1);
+		fakeChild.emit("close", 1);
+		await exited;
 
 		expect(session.describeSpawnFailure()).toEqual({
 			kind: "PTY_SPAWN_FAILED",
