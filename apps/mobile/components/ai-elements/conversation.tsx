@@ -1,8 +1,4 @@
-import {
-	LegendList,
-	type LegendListProps,
-	type LegendListRef,
-} from "@legendapp/list/react-native";
+import type { LegendListProps } from "@legendapp/list/react-native";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { ArrowDownIcon } from "lucide-react-native";
@@ -14,7 +10,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useResolveClassNames } from "uniwind";
@@ -22,12 +17,8 @@ import { Button, type ButtonProps } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
-
-const AT_BOTTOM_THRESHOLD = 48;
-const MAINTAIN_SCROLL_AT_END = {
-	animated: false,
-	on: { dataChange: true, layout: true },
-};
+import { ConversationList } from "./conversation-list";
+import type { ConversationListHandle } from "./conversation-list.types";
 
 interface ConversationContextType {
 	isAtBottom: boolean;
@@ -64,44 +55,13 @@ export const Conversation = <ItemT,>({
 	contentContainerClassName,
 	contentContainerStyle,
 	onScroll,
-	onScrollBeginDrag,
-	onScrollEndDrag,
 	children,
 	...listProps
 }: ConversationProps<ItemT>) => {
-	const listRef = useRef<LegendListRef>(null);
+	const listRef = useRef<ConversationListHandle>(null);
 	const [isAtBottom, setIsAtBottom] = useState(true);
-	const [isDragging, setIsDragging] = useState(false);
 	const resolvedContentContainerStyle = useResolveClassNames(
 		contentContainerClassName ?? "",
-	);
-
-	const handleScroll = useCallback(
-		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
-			const { contentOffset, contentSize, layoutMeasurement } =
-				event.nativeEvent;
-			const distanceFromBottom =
-				contentSize.height - layoutMeasurement.height - contentOffset.y;
-			setIsAtBottom(distanceFromBottom < AT_BOTTOM_THRESHOLD);
-			onScroll?.(event);
-		},
-		[onScroll],
-	);
-
-	const handleScrollBeginDrag = useCallback(
-		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
-			setIsDragging(true);
-			onScrollBeginDrag?.(event);
-		},
-		[onScrollBeginDrag],
-	);
-
-	const handleScrollEndDrag = useCallback(
-		(event: NativeSyntheticEvent<NativeScrollEvent>) => {
-			setIsDragging(false);
-			onScrollEndDrag?.(event);
-		},
-		[onScrollEndDrag],
 	);
 
 	const scrollToBottom = useCallback(() => {
@@ -116,23 +76,8 @@ export const Conversation = <ItemT,>({
 	return (
 		<ConversationContext.Provider value={contextValue}>
 			<View className={cn("relative flex-1", className)}>
-				{/* Not alignItemsAtEnd: bottom-anchoring short threads means ANY item
-				    growth (expanding a tool card) shoves the whole thread upward.
-				    Top-aligned short threads grow downward instead, so the tapped
-				    trigger stays put; long threads are unaffected. */}
-				<LegendList
+				<ConversationList
 					data={data}
-					initialScrollAtEnd
-					keyboardShouldPersistTaps="handled"
-					// No `itemLayout` trigger on purpose: re-pinning when an item grows
-					// makes expanding a collapsible (tool card) yank the whole list up,
-					// so the chevron the user just tapped jumps away. Streaming still
-					// sticks to bottom via `dataChange` (every chunk replaces the data
-					// array) and `layout` covers keyboard/list resizes. Off while a
-					// finger drags, or each chunk pulls the reader back down.
-					maintainScrollAtEnd={isDragging ? false : MAINTAIN_SCROLL_AT_END}
-					maintainScrollAtEndThreshold={0.15}
-					recycleItems={false}
 					renderItem={renderItem}
 					{...listProps}
 					contentContainerStyle={
@@ -140,9 +85,8 @@ export const Conversation = <ItemT,>({
 							? [resolvedContentContainerStyle, contentContainerStyle]
 							: contentContainerStyle
 					}
-					onScroll={handleScroll}
-					onScrollBeginDrag={handleScrollBeginDrag}
-					onScrollEndDrag={handleScrollEndDrag}
+					onAtBottomChange={setIsAtBottom}
+					onScroll={onScroll}
 					ref={listRef}
 				/>
 				{children}

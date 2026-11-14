@@ -1,0 +1,1 @@
+export { isWebSheet } from "./isWebSheet";

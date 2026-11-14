@@ -24,6 +24,11 @@
 <td>$WEB_LINK</td>
 </tr>
 <tr>
+<td><img src="https://vercel.com/favicon.ico" width="20" height="20" alt="Vercel"> <strong>Agents Web (Vercel)</strong></td>
+<td align="center">$AGENTS_STATUS</td>
+<td>$AGENTS_LINK</td>
+</tr>
+<tr>
 <td><img src="https://vercel.com/favicon.ico" width="20" height="20" alt="Vercel"> <strong>Marketing (Vercel)</strong></td>
 <td align="center">$MARKETING_STATUS</td>
 <td>$MARKETING_LINK</td>

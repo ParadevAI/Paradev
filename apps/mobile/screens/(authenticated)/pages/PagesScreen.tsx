@@ -1,11 +1,12 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { useLingui } from "@lingui/react/macro";
 import * as Haptics from "expo-haptics";
-import { Stack } from "expo-router";
+
 import { useCallback, useState } from "react";
 import { RefreshControl, useWindowDimensions, View } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar, type MenuIconName } from "@/lib/navigation";
 import { PageRow } from "./components/PageRow";
 import { type OrgPage, usePagesQuery } from "./hooks/usePages";
 import { type PageScope, usePagesFilterStore } from "./stores/pagesFilterStore";
@@ -20,13 +21,13 @@ export function PagesScreen() {
 	const offline = pages.status === "pending" && pages.fetchStatus === "paused";
 	const visible = pages.items;
 	const scopeOptions = [
-		{ value: "all", label: t({ message: "All" }), icon: "square.stack" },
-		{ value: "team", label: t({ message: "Team" }), icon: "globe" },
-		{ value: "mine", label: t({ message: "Just me" }), icon: "lock" },
+		{ value: "all", label: t({ message: "All" }), icon: "collection" },
+		{ value: "team", label: t({ message: "Team" }), icon: "team" },
+		{ value: "mine", label: t({ message: "Just me" }), icon: "private" },
 	] as const satisfies ReadonlyArray<{
 		value: PageScope;
 		label: string;
-		icon: string;
+		icon: MenuIconName;
 	}>;
 
 	const onRefresh = useCallback(async () => {
@@ -55,17 +56,13 @@ export function PagesScreen() {
 
 	return (
 		<>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Menu
-					icon={
-						scope === "all"
-							? "line.3.horizontal.decrease"
-							: "line.3.horizontal.decrease.circle.fill"
-					}
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Menu
+					icon={scope === "all" ? "filter" : "filterActive"}
 					accessibilityLabel={t({ message: "Filter pages" })}
 				>
 					{scopeOptions.map((option) => (
-						<Stack.Toolbar.MenuAction
+						<HeaderToolbar.MenuAction
 							key={option.value}
 							icon={option.icon}
 							isOn={scope === option.value}
@@ -75,10 +72,10 @@ export function PagesScreen() {
 							}}
 						>
 							{option.label}
-						</Stack.Toolbar.MenuAction>
+						</HeaderToolbar.MenuAction>
 					))}
-				</Stack.Toolbar.Menu>
-			</Stack.Toolbar>
+				</HeaderToolbar.Menu>
+			</HeaderToolbar>
 
 			<LegendList
 				key={columns}

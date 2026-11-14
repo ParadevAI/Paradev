@@ -1,26 +1,20 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
-import { type ReactNode, useRef } from "react";
+import { useRef } from "react";
 import type { ViewInstance } from "react-native";
 import { Alert, View } from "react-native";
 import { useCloudWorkspaceActions } from "@/hooks/useCloudWorkspaceActions";
 import { itemFromCloudRow } from "@/hooks/useCloudWorkspaceItems";
-import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
-import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { useWorkspaceRowActions } from "../../../WorkspaceRow/hooks/useWorkspaceRowActions";
+import type { ArchivedCloudRowMenuProps } from "./ArchivedCloudRowMenu.types";
 
 export function ArchivedCloudRowMenu({
 	row,
 	cache,
 	onCopied,
 	children,
-}: {
-	row: CloudWorkspaceRow;
-	cache: HostWorkspacesCacheOps;
-	onCopied: () => void;
-	children: ReactNode;
-}) {
+}: ArchivedCloudRowMenuProps) {
 	const { t } = useLingui();
 	const { unarchive } = useCloudWorkspaceActions();
 	const rowRef = useRef<ViewInstance>(null);

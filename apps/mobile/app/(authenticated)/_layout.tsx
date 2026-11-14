@@ -4,10 +4,25 @@ import { View } from "react-native";
 import { usePrimeRelayUrl } from "@/hooks/usePrimeRelayUrl";
 import { useRealtimeNudges } from "@/hooks/useRealtimeNudges";
 import { useSession } from "@/lib/auth/client";
-import { glassHeaderOptions, sheetDetents } from "@/lib/navigation";
+import {
+	glassHeaderOptions,
+	ParentScreens,
+	screenLayout,
+	sheetDetents,
+	sheetHeaderOptions,
+	sheetScreenOptions,
+} from "@/lib/navigation";
 import { VoiceLayer } from "@/screens/(authenticated)/voice/VoiceLayer";
 
 export const unstable_settings = { anchor: "(home)" };
+
+const PARENT_SCREENS = [
+	"workspace/[id]/index",
+	"workspace/[id]/pull-request/[pullRequestId]/index",
+	"pages/index",
+	"pages/[slug]/index",
+	"settings/index",
+];
 
 const pageScreenOptions = {
 	headerShown: true,
@@ -40,7 +55,19 @@ export default function AuthenticatedLayout() {
 
 	return (
 		<View className="flex-1">
-			<Stack screenOptions={{ headerShown: false }}>
+			<Stack
+				screenOptions={{ headerShown: false }}
+				screenLayout={screenLayout}
+				layout={({ state, navigation, children }) => (
+					<ParentScreens
+						state={state}
+						navigation={navigation}
+						parents={PARENT_SCREENS}
+					>
+						{children}
+					</ParentScreens>
+				)}
+			>
 				{/* Root headers are hidden — `title` here only names routes in
 			    back-button long-press menus (otherwise raw route names leak,
 			    e.g. "(home)"). */}
@@ -59,23 +86,21 @@ export default function AuthenticatedLayout() {
 				/>
 				<Stack.Screen
 					name="voice/chat"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.6, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Voice" }),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="voice/settings"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.6]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Voice settings" }),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="pages/index"
@@ -91,13 +116,12 @@ export default function AuthenticatedLayout() {
 				/>
 				<Stack.Screen
 					name="pages/[slug]/preview"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						title: "",
 						sheetAllowedDetents: sheetDetents([0.6, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="pages/[slug]/comment"
@@ -110,30 +134,27 @@ export default function AuthenticatedLayout() {
 				/>
 				<Stack.Screen
 					name="pages/[slug]/comments"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						headerShown: false,
 						sheetAllowedDetents: [1.0],
 						sheetGrabberVisible: true,
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="pages/[slug]/share"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						headerShown: false,
 						sheetAllowedDetents: [1.0],
 						sheetGrabberVisible: true,
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/share"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						headerShown: false,
 						sheetAllowedDetents: [1.0],
 						sheetGrabberVisible: true,
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="settings/index"
@@ -180,98 +201,89 @@ export default function AuthenticatedLayout() {
 				/>
 				<Stack.Screen
 					name="workspace/[id]/commits"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Commits" }),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/line-comment"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "Add comment",
 						}),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/finish-review"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "Finish review",
 						}),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/actions"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: [1.0],
 						sheetGrabberVisible: true,
 						// The workspace name is the sheet's own centred headline, so
 						// the bar carries no title — only the native close button.
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: "",
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/sessions"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({ message: "Sessions" }),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/new-session"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "New session",
 						}),
-					}}
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/queued"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.5, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/activity"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.6, 1.0]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/pull-requests"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/pull-request/[pullRequestId]/index"
@@ -284,42 +296,38 @@ export default function AuthenticatedLayout() {
 				/>
 				<Stack.Screen
 					name="workspace/[id]/pull-request/[pullRequestId]/checks"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/pull-request/[pullRequestId]/reviewers"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.5]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/pull-request/[pullRequestId]/check"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.6]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
-					}}
+						...sheetHeaderOptions,
+					})}
 				/>
 				<Stack.Screen
 					name="workspace/[id]/jump-to-file"
-					options={{
-						presentation: "formSheet",
+					options={sheetScreenOptions({
 						sheetAllowedDetents: sheetDetents([0.75]),
 						sheetGrabberVisible: true,
-						...glassHeaderOptions,
+						...sheetHeaderOptions,
 						title: t({
 							message: "Jump to file",
 						}),
-					}}
+					})}
 				/>
 			</Stack>
 			<VoiceLayer />

@@ -1857,6 +1857,9 @@ msgstr "一个清单文件加几个技能文件。Paradev 会把它放到每个�
 msgid "a message from {authorName}"
 msgstr "来自 {authorName} 的消息"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev 已有新版本。请重新加载以继续。"
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "需要新版本的Paradev才能继续。请更新到最新版本。"
 
@@ -2138,6 +2141,9 @@ msgstr "再添加一个"
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "连接其他账号，或断开不再使用的账号。"
 
+msgid "Add attachment"
+msgstr "添加附件"
+
 msgid "Add Attachment"
 msgstr "添加附件"
 
@@ -2340,7 +2346,7 @@ msgstr "已添加到智能体输入框"
 msgid "Added to merge queue"
 msgstr "已加入合并队列"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "向 {organizationName} 添加成员需要付费套餐。你所在组织的套餐由其所有者在 {0} 管理。"
 
@@ -2725,6 +2731,9 @@ msgstr "允许通过中继访问"
 
 msgid "Allow for session"
 msgstr "本次会话内允许"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "请在“设置”中允许访问麦克风以使用听写。"
 
 msgid "Allow microphone access to use dictation"
 msgstr "请允许麦克风访问以使用语音输入"
@@ -4018,6 +4027,9 @@ msgstr "日历"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "在重新连接账户之前，此组织中的日历和Gmail触发器将停止触发。"
+
+msgid "Camera"
+msgstr "相机"
 
 msgid "Camera access is not allowed"
 msgstr "相机访问未获允许"
@@ -5580,6 +5592,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "继续"
 
+msgid "Continue in browser"
+msgstr "在浏览器中继续"
+
 msgid "Continue in your browser"
 msgstr "请在浏览器中继续"
 
@@ -5996,6 +6011,9 @@ msgstr "无法打开链接"
 msgid "Could not open Photos"
 msgstr "无法打开“照片”"
 
+msgid "Could not open this file"
+msgstr "无法打开此文件"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6127,9 @@ msgstr "无法开始结账，请重试。"
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "无法开始配置云端工作区"
+
+msgid "Could not start dictation"
+msgstr "无法启动听写"
 
 msgid "Could not start session"
 msgstr "无法启动会话"
@@ -7414,11 +7435,20 @@ msgstr "语音输入"
 msgid "Dictation"
 msgstr "语音输入"
 
+msgid "Dictation is not available in this language."
+msgstr "此语言不支持听写。"
+
 msgid "Dictation is not available on this device"
 msgstr "此设备不支持语音输入"
 
 msgid "Dictation is not available right now"
 msgstr "语音输入暂时不可用"
+
+msgid "Dictation needs a network connection."
+msgstr "听写需要网络连接。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "听写已停止。目前听到的内容已在消息中。"
 
 msgid "Didn't hear back"
 msgstr "未收到响应"
@@ -11883,7 +11913,7 @@ msgstr "管理用于MCP服务器访问以及Claude Desktop、Claude Code等外�
 msgid "Manage members"
 msgstr "管理成员"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "在{0}管理"
 
@@ -13766,6 +13796,9 @@ msgstr "离线"
 msgid "Offline / local-first mode"
 msgstr "离线/本地优先模式"
 
+msgid "OK"
+msgstr "确定"
+
 msgid "Older"
 msgstr "更早"
 
@@ -15030,6 +15063,9 @@ msgstr "粘贴链接"
 msgid "Paste an API key instead"
 msgstr "改为粘贴 API 密钥"
 
+msgid "Paste attachment"
+msgstr "粘贴附件"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "把它粘贴到Paradev CLI："
 
@@ -15170,6 +15206,9 @@ msgstr "手机"
 
 msgid "Phone number"
 msgstr "电话号码"
+
+msgid "Photos"
+msgstr "照片"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "在主题网格中选择{name}即可应用。"
@@ -21893,6 +21932,12 @@ msgstr "更新命名规则"
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名规则"
 
+msgid "Update on Google Play"
+msgstr "在 Google Play 中更新"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "请从 Google Play 更新 Paradev 以继续。"
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "请在该设备上更新 Paradev。应用内更新需要受支持的独立安装和已发布的应用版本。"
 
@@ -21959,7 +22004,7 @@ msgstr "升级"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "升级一个依赖，并修好被它弄坏的地方…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "在 {0} 升级"
 
@@ -23132,7 +23177,7 @@ msgstr "你可以查看此页面，但不能更改"
 msgid "You can view this page but not comment on it"
 msgstr "你可以查看此页面，但不能评论"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "无法在应用内更改此订阅。你所在组织的方案由所有者在{0}管理。"
 

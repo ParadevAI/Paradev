@@ -1,0 +1,10 @@
+{
+	"name": "@superset/google-credential",
+	"version": "0.0.1",
+	"main": "src/index.ts",
+	"private": true,
+	"peerDependencies": {
+		"expo": "*",
+		"react-native": "*"
+	}
+}

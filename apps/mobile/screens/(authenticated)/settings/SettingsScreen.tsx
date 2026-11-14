@@ -23,7 +23,7 @@ import { useSession } from "@/lib/auth/client";
 import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
 import { apiClient } from "@/lib/trpc/client";
-import { billingSettingsUrl } from "@/lib/web-links";
+import { billingSettingsUrl, webHost } from "@/lib/web-links";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
@@ -102,7 +102,7 @@ export function SettingsScreen() {
 				message: "Manage plan on the web",
 			}),
 			t({
-				message: `You can't change this subscription in the app. Your organization's plan is managed by its owner at ${COMPANY.DOMAIN}.`,
+				message: `You can't change this subscription in the app. Your organization's plan is managed by its owner at ${webHost()}.`,
 			}),
 			[
 				{
@@ -111,7 +111,7 @@ export function SettingsScreen() {
 				},
 				{
 					onPress: () => openUrl(billingSettingsUrl(activeOrganizationId)),
-					text: t({ message: `Manage on ${COMPANY.DOMAIN}` }),
+					text: t({ message: `Manage on ${webHost()}` }),
 				},
 			],
 		);

@@ -4,13 +4,14 @@ import {
 	usePageComments,
 	usePageCommentThreads,
 } from "@superset/cloud-client";
-import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
 import { Alert, Pressable, ScrollView, View } from "react-native";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { errorCopy } from "@/lib/errors";
+import { HeaderToolbar } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { usePageQuery } from "../../hooks/usePages";
 import type { CommentComposerHandle } from "../components/CommentComposer";
@@ -122,13 +123,13 @@ export function AllCommentsSheet() {
 
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "Close" })}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 
 			<ScrollView
 				ref={scrollRef}

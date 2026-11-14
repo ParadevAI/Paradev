@@ -14,7 +14,6 @@ import {
 } from "react";
 import { Platform, View } from "react-native";
 import type { MarkdownStyle } from "react-native-enriched-markdown";
-import { StreamdownText } from "react-native-streamdown";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text, TextClassContext } from "@/components/ui/text";
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/tooltip";
 import { THEME } from "@/lib/theme";
 import { cn } from "@/lib/utils";
+import { MessageMarkdown } from "./message-markdown";
 
 export type MessageRole = "system" | "user" | "assistant";
 
@@ -463,25 +463,16 @@ export const MESSAGE_MARKDOWN_STYLE: MarkdownStyle = {
 	},
 };
 
-export type MessageResponseProps = Omit<
-	React.ComponentProps<typeof StreamdownText>,
-	"markdown"
-> & {
+export type MessageResponseProps = {
 	children: string;
+	markdownStyle?: MarkdownStyle;
 };
 
 export const MessageResponse = memo(
-	({
-		children,
-		markdownStyle,
-		flavor = "github",
-		...props
-	}: MessageResponseProps) => (
-		<StreamdownText
-			flavor={flavor}
+	({ children, markdownStyle }: MessageResponseProps) => (
+		<MessageMarkdown
 			markdown={children}
 			markdownStyle={markdownStyle ?? MESSAGE_MARKDOWN_STYLE}
-			{...props}
 		/>
 	),
 	(prevProps, nextProps) =>

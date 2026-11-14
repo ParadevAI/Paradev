@@ -1,0 +1,1 @@
+export { installInputModality } from "./installInputModality";

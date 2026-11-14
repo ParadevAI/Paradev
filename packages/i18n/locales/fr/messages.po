@@ -1857,6 +1857,9 @@ msgstr "Un manifeste et quelques fichiers de compétences. Paradev le place là 
 msgid "a message from {authorName}"
 msgstr "un message de {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Une nouvelle version de Paradev est disponible. Rechargez pour continuer."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Une nouvelle version de Paradev est requise pour continuer. Veuillez mettre à jour vers la dernière version."
 
@@ -2138,6 +2141,9 @@ msgstr "Ajouter une autre"
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Connectez un autre compte, ou déconnectez-en un que vous n'utilisez plus."
 
+msgid "Add attachment"
+msgstr "Ajouter une pièce jointe"
+
 msgid "Add Attachment"
 msgstr "Ajouter une pièce jointe"
 
@@ -2340,7 +2346,7 @@ msgstr "Ajouté à la saisie de l'agent"
 msgid "Added to merge queue"
 msgstr "Ajoutée à la file de fusion"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Ajouter des personnes à {organizationName} nécessite un forfait payant. Le forfait de votre organisation est géré par son propriétaire sur {0}."
 
@@ -2725,6 +2731,9 @@ msgstr "Autoriser l'accès via le relais"
 
 msgid "Allow for session"
 msgstr "Autoriser pour la session"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Autorisez l’accès au micro dans les Réglages pour dicter."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Autorisez l'accès au microphone pour utiliser la dictée"
@@ -4018,6 +4027,9 @@ msgstr "Calendrier"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Les déclencheurs Calendar et Gmail de cette organisation cesseront de se déclencher jusqu'à ce qu'un compte soit reconnecté."
+
+msgid "Camera"
+msgstr "Appareil photo"
 
 msgid "Camera access is not allowed"
 msgstr "L'accès à l'appareil photo n'est pas autorisé"
@@ -5580,6 +5592,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Continuer"
 
+msgid "Continue in browser"
+msgstr "Continuer dans le navigateur"
+
 msgid "Continue in your browser"
 msgstr "Continuez dans votre navigateur"
 
@@ -5996,6 +6011,9 @@ msgstr "Impossible d'ouvrir le lien"
 msgid "Could not open Photos"
 msgstr "Impossible d'ouvrir Photos"
 
+msgid "Could not open this file"
+msgstr "Impossible d'ouvrir ce fichier"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6127,9 @@ msgstr "Impossible de lancer le paiement. Veuillez réessayer."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Impossible de démarrer le provisionnement de l'espace de travail cloud"
+
+msgid "Could not start dictation"
+msgstr "Impossible de démarrer la dictée"
 
 msgid "Could not start session"
 msgstr "Impossible de démarrer la session"
@@ -7414,11 +7435,20 @@ msgstr "Dicter"
 msgid "Dictation"
 msgstr "Dictée"
 
+msgid "Dictation is not available in this language."
+msgstr "La dictée n’est pas disponible dans cette langue."
+
 msgid "Dictation is not available on this device"
 msgstr "La dictée n'est pas disponible sur cet appareil"
 
 msgid "Dictation is not available right now"
 msgstr "La dictée n'est pas disponible pour le moment"
+
+msgid "Dictation needs a network connection."
+msgstr "La dictée nécessite une connexion réseau."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "La dictée s’est arrêtée. Ce qui a été entendu jusqu’ici est dans votre message."
 
 msgid "Didn't hear back"
 msgstr "Aucune réponse"
@@ -11883,7 +11913,7 @@ msgstr "Gérez les clés d'accès aux serveurs MCP et aux intégrations externes
 msgid "Manage members"
 msgstr "Gérer les membres"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Gérer sur {0}"
 
@@ -13766,6 +13796,9 @@ msgstr "Hors ligne"
 msgid "Offline / local-first mode"
 msgstr "Mode hors ligne / local d'abord"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Plus ancien"
 
@@ -15030,6 +15063,9 @@ msgstr "Collez un lien"
 msgid "Paste an API key instead"
 msgstr "Coller plutôt une clé API"
 
+msgid "Paste attachment"
+msgstr "Coller la pièce jointe"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Collez ceci dans la CLI Paradev :"
 
@@ -15170,6 +15206,9 @@ msgstr "Téléphone"
 
 msgid "Phone number"
 msgstr "Numéro de téléphone"
+
+msgid "Photos"
+msgstr "Photos"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Choisissez {name} dans la grille des thèmes pour l'appliquer."
@@ -21893,6 +21932,12 @@ msgstr "Mettre à jour les instructions de nommage"
 msgid "Update naming instructions for {0}"
 msgstr "Mettre à jour les instructions de nommage pour {0}"
 
+msgid "Update on Google Play"
+msgstr "Mettre à jour sur Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Mettez à jour Paradev depuis Google Play pour continuer."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Mettez à jour Paradev sur cet appareil. Les mises à jour depuis l’application nécessitent une installation autonome compatible et une version publiée de l’application."
 
@@ -21959,7 +22004,7 @@ msgstr "Passer à ce forfait"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Mets à jour une dépendance et corrige ce qui casse…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Passer à Pro sur {0}"
 
@@ -23132,7 +23177,7 @@ msgstr "Vous pouvez consulter cette page, mais pas la modifier"
 msgid "You can view this page but not comment on it"
 msgstr "Vous pouvez consulter cette page, mais pas la commenter"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Vous ne pouvez pas modifier cet abonnement dans l'application. Le forfait de votre organisation est géré par son propriétaire sur {0}."
 

@@ -1,6 +1,6 @@
-import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { useEffect, useRef } from "react";
 import { Animated, Easing, View } from "react-native";
+import { GlassSurface } from "@/components/GlassSurface";
 import { Text } from "@/components/ui/text";
 
 const IN_MS = 180;
@@ -59,20 +59,9 @@ export function HeaderNotice({
 
 	return (
 		<Animated.View style={style}>
-			{isLiquidGlassAvailable() ? (
-				<GlassView
-					glassEffectStyle="regular"
-					style={{
-						borderRadius: 999,
-						paddingHorizontal: 12,
-						paddingVertical: 6,
-					}}
-				>
-					{label}
-				</GlassView>
-			) : (
-				<View className="bg-secondary rounded-full px-3 py-1.5">{label}</View>
-			)}
+			<GlassSurface radius={999} fallbackClassName="bg-secondary rounded-full">
+				<View className="px-3 py-1.5">{label}</View>
+			</GlassSurface>
 		</Animated.View>
 	);
 }

@@ -6,8 +6,9 @@ import {
 	VOICE_VOICES,
 	type VoiceReasoningEffort,
 } from "@superset/shared/voice";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { ScrollView } from "react-native";
+import { HeaderToolbar } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceStore } from "@/lib/voice/voiceStore";
 import { OptionChips } from "./components/OptionChips";
@@ -33,13 +34,13 @@ export function VoiceSettingsSheet() {
 
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "Close" })}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="gap-7 px-5 pb-10 pt-3"

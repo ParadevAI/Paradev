@@ -1857,6 +1857,9 @@ msgstr "Một manifest và vài file skill. Paradev đặt nó ở nơi mỗi ag
 msgid "a message from {authorName}"
 msgstr "một tin nhắn từ {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Đã có phiên bản Paradev mới. Hãy tải lại để tiếp tục."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Cần phiên bản Paradev mới để tiếp tục. Vui lòng cập nhật lên phiên bản mới nhất."
 
@@ -2138,6 +2141,9 @@ msgstr "Thêm biến khác"
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Kết nối tài khoản khác, hoặc ngắt tài khoản bạn không còn dùng."
 
+msgid "Add attachment"
+msgstr "Thêm tệp đính kèm"
+
 msgid "Add Attachment"
 msgstr "Thêm tệp đính kèm"
 
@@ -2340,7 +2346,7 @@ msgstr "Đã thêm vào ô nhập của agent"
 msgid "Added to merge queue"
 msgstr "Đã thêm vào hàng đợi merge"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Để thêm người vào {organizationName}, bạn cần gói trả phí. Gói của tổ chức bạn do chủ sở hữu quản lý tại {0}."
 
@@ -2725,6 +2731,9 @@ msgstr "Cho phép truy cập qua relay"
 
 msgid "Allow for session"
 msgstr "Cho phép trong phiên này"
+
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Hãy cho phép truy cập micrô trong Cài đặt để đọc chính tả."
 
 msgid "Allow microphone access to use dictation"
 msgstr "Cho phép truy cập micro để dùng đọc chính tả"
@@ -4018,6 +4027,9 @@ msgstr "Calendar"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Các trigger Calendar và Gmail trong tổ chức này sẽ ngừng chạy cho đến khi kết nối lại một tài khoản."
+
+msgid "Camera"
+msgstr "Máy ảnh"
 
 msgid "Camera access is not allowed"
 msgstr "Không được phép truy cập camera"
@@ -5580,6 +5592,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Tiếp tục"
 
+msgid "Continue in browser"
+msgstr "Tiếp tục trên trình duyệt"
+
 msgid "Continue in your browser"
 msgstr "Tiếp tục trong trình duyệt"
 
@@ -5996,6 +6011,9 @@ msgstr "Không thể mở liên kết"
 msgid "Could not open Photos"
 msgstr "Không thể mở Photos"
 
+msgid "Could not open this file"
+msgstr "Không thể mở tệp này"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6127,9 @@ msgstr "Không thể bắt đầu thanh toán. Vui lòng thử lại."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Không thể bắt đầu cấp phát workspace trên cloud"
+
+msgid "Could not start dictation"
+msgstr "Không thể bắt đầu đọc chính tả"
 
 msgid "Could not start session"
 msgstr "Không thể bắt đầu phiên"
@@ -7414,11 +7435,20 @@ msgstr "Đọc chính tả"
 msgid "Dictation"
 msgstr "Đọc chính tả"
 
+msgid "Dictation is not available in this language."
+msgstr "Đọc chính tả không khả dụng cho ngôn ngữ này."
+
 msgid "Dictation is not available on this device"
 msgstr "Đọc chính tả không khả dụng trên thiết bị này"
 
 msgid "Dictation is not available right now"
 msgstr "Đọc chính tả hiện không khả dụng"
+
+msgid "Dictation needs a network connection."
+msgstr "Đọc chính tả cần kết nối mạng."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Đọc chính tả đã dừng. Nội dung nghe được đến giờ đã có trong tin nhắn."
 
 msgid "Didn't hear back"
 msgstr "Không có phản hồi"
@@ -11883,7 +11913,7 @@ msgstr "Quản lý khóa để truy cập server MCP và các tích hợp bên n
 msgid "Manage members"
 msgstr "Quản lý thành viên"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Quản lý tại {0}"
 
@@ -13766,6 +13796,9 @@ msgstr "Ngoại tuyến"
 msgid "Offline / local-first mode"
 msgstr "Chế độ ngoại tuyến / ưu tiên cục bộ"
 
+msgid "OK"
+msgstr "OK"
+
 msgid "Older"
 msgstr "Cũ hơn"
 
@@ -15030,6 +15063,9 @@ msgstr "Dán liên kết"
 msgid "Paste an API key instead"
 msgstr "Dán khóa API thay thế"
 
+msgid "Paste attachment"
+msgstr "Dán tệp đính kèm"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Dán mã này vào Paradev CLI:"
 
@@ -15170,6 +15206,9 @@ msgstr "Điện thoại"
 
 msgid "Phone number"
 msgstr "Số điện thoại"
+
+msgid "Photos"
+msgstr "Ảnh"
 
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Chọn {name} trong lưới chủ đề để áp dụng."
@@ -21893,6 +21932,12 @@ msgstr "Cập nhật quy tắc đặt tên"
 msgid "Update naming instructions for {0}"
 msgstr "Cập nhật quy tắc đặt tên cho {0}"
 
+msgid "Update on Google Play"
+msgstr "Cập nhật trên Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Hãy cập nhật Paradev từ Google Play để tiếp tục."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Cập nhật Paradev trên thiết bị đó. Cập nhật từ ứng dụng yêu cầu bản cài đặt độc lập được hỗ trợ và phiên bản ứng dụng đã phát hành."
 
@@ -21959,7 +22004,7 @@ msgstr "Nâng cấp"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Nâng cấp một dependency và sửa những gì hỏng…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Nâng cấp trên {0}"
 
@@ -23132,7 +23177,7 @@ msgstr "Bạn có thể xem trang này nhưng không thể thay đổi"
 msgid "You can view this page but not comment on it"
 msgstr "Bạn có thể xem trang này nhưng không thể bình luận"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Bạn không thể thay đổi gói đăng ký này trong ứng dụng. Gói của tổ chức bạn do chủ sở hữu quản lý tại {0}."
 
