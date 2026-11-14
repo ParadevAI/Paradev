@@ -22,6 +22,7 @@ import { restoreProject } from "../../../projects/project-deletion";
 import {
 	getLiveRepositoryAtPath,
 	getRepository,
+	type HostRepositoryRow,
 	listProjectRepositories,
 	repositoryName,
 } from "../../../projects/repositories";
@@ -78,7 +79,7 @@ function dirNameForTemplate(url: string): string {
 	return dirNameForEmpty(last ?? "");
 }
 
-async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
+export async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
 	try {
 		return await work;
 	} catch (err) {
@@ -87,7 +88,7 @@ async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
 	}
 }
 
-interface ResolvedSource {
+export interface ResolvedSource {
 	resolved: ResolvedRepo;
 	/** We made this folder, so a failure later removes it. */
 	created: boolean;
@@ -159,7 +160,7 @@ async function resolveSource(
 	}
 }
 
-async function removeCreated(sources: ResolvedSource[]): Promise<void> {
+export async function removeCreated(sources: ResolvedSource[]): Promise<void> {
 	for (const { resolved, created } of sources) {
 		if (!created) continue;
 		await rm(resolved.repoPath, { recursive: true, force: true }).catch(
@@ -200,7 +201,7 @@ function duplicateNameError(name: string): TRPCError {
 	});
 }
 
-function repositoryTakenError(path: string): TRPCError {
+export function repositoryTakenError(path: string): TRPCError {
 	return new TRPCError({
 		code: "CONFLICT",
 		message: `repository_taken: ${path} already belongs to a project on this device`,
@@ -215,7 +216,7 @@ function nameOf(resolved: ResolvedRepo): string {
 }
 
 /** Names are folder names, so compare them the way a case-insensitive disk would. */
-function requireUniqueNames(names: string[]): void {
+export function requireUniqueNames(names: string[]): void {
 	const seen = new Set<string>();
 	for (const name of names) {
 		const key = name.toLowerCase();
@@ -228,7 +229,7 @@ const RESERVED_NAMES = new Set(
 	WORKSPACE_ROOT_ENTRIES.map((entry) => entry.toLowerCase()),
 );
 
-function requireUsableName(name: string): void {
+export function requireUsableName(name: string): void {
 	if (name === "" || name === "." || name === ".." || /[/\\\0]/.test(name)) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -242,12 +243,16 @@ function requireUsableName(name: string): void {
 	});
 }
 
-function repositoryValues(projectId: string, resolved: ResolvedRepo) {
+export function repositoryValues(
+	projectId: string,
+	resolved: ResolvedRepo,
+	identity?: { id: string; name: string },
+) {
 	const now = Date.now();
 	return {
-		id: randomUUID(),
+		id: identity?.id ?? randomUUID(),
 		projectId,
-		name: nameOf(resolved),
+		name: identity?.name ?? nameOf(resolved),
 		repoPath: resolved.repoPath,
 		provider: resolved.parsed ? ("github" as const) : null,
 		owner: resolved.parsed?.owner ?? null,
@@ -259,7 +264,7 @@ function repositoryValues(projectId: string, resolved: ResolvedRepo) {
 	};
 }
 
-function snapshotOf(
+export function snapshotOf(
 	ctx: HostServiceContext,
 	projectId: string,
 ): ProjectSnapshot {
@@ -564,6 +569,16 @@ export function setPrimaryRepository(
 	return snapshotOf(ctx, args.projectId);
 }
 
+/** A repository with a GitHub remote only accepts a folder with the same remote. */
+export function resolveRepositoryFolder(
+	repository: Pick<HostRepositoryRow, "owner" | "repoName">,
+	path: string,
+): Promise<ResolvedRepo> {
+	return repository.owner && repository.repoName
+		? resolveMatchingSlug(path, `${repository.owner}/${repository.repoName}`)
+		: adoptLocalRepo(path);
+}
+
 /**
  * Point a repository at the folder it now lives in. A repository with a
  * GitHub remote only accepts a folder with the same remote. Its name stays:
@@ -579,13 +594,7 @@ export async function relocateRepository(
 		args.projectId,
 		args.repositoryId,
 	);
-	const resolved =
-		repository.owner && repository.repoName
-			? await resolveMatchingSlug(
-					args.path,
-					`${repository.owner}/${repository.repoName}`,
-				)
-			: await adoptLocalRepo(args.path);
+	const resolved = await resolveRepositoryFolder(repository, args.path);
 	const owner = getLiveRepositoryAtPath(ctx.db, resolved.repoPath);
 	if (owner && owner.id !== repository.id) {
 		throw repositoryTakenError(resolved.repoPath);

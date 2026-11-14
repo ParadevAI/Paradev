@@ -53,6 +53,7 @@ import {
 	removeRepository,
 	setPrimaryRepository,
 } from "./handlers";
+import { setupProject } from "./setup-project";
 import { getGitHubRemotes } from "./utils/git-remote";
 import { listGitHubRepositories } from "./utils/github-repositories";
 import {
@@ -75,7 +76,7 @@ const MAX_NAMING_INSTRUCTIONS_LENGTH = 2000;
  * exported router's declaration emit can name it. */
 export interface FindByPathCandidate {
 	id: string;
-	/** Set on a local match: the repository at the path. */
+	/** The repository at the path; for a legacy cloud match, the project id. */
 	repositoryId?: string;
 	name: string;
 	repoCloneUrl: string | null;
@@ -606,6 +607,7 @@ export const projectRouter = router({
 						} else {
 							byId.set(c.id, {
 								id: c.id,
+								repositoryId: c.id,
 								name: c.name,
 								repoCloneUrl: parsed.url,
 								source: "remote",
@@ -652,6 +654,52 @@ export const projectRouter = router({
 		.mutation(({ ctx, input, signal }) =>
 			createProject(ctx, { ...input, signal }),
 		),
+	/**
+	 * Add a project that lives on another host to this host, keeping its
+	 * project and repository ids so every surface sees one project.
+	 */
+	setup: machineOnlyProcedure
+		.input(
+			z.object({
+				projectId: z.string().uuid(),
+				/** The project as another host has it. Needed when this host has no row for it. */
+				origin: z
+					.object({
+						name: z.string().min(1),
+						primaryRepositoryId: z.string().uuid(),
+						repositories: z
+							.array(
+								z.object({
+									id: z.string().uuid(),
+									name: z.string().min(1),
+									url: z.string().min(1).nullable(),
+								}),
+							)
+							.min(1),
+					})
+					.optional(),
+				repositories: z.array(
+					z.object({
+						id: z.string().uuid(),
+						mode: z.discriminatedUnion("kind", [
+							z.object({
+								kind: z.literal("clone"),
+								parentDir: z.string().min(1),
+							}),
+							z.object({
+								kind: z.literal("import"),
+								path: z.string().min(1),
+								allowRelocate: z.boolean().optional(),
+							}),
+						]),
+					}),
+				),
+			}),
+		)
+		.mutation(({ ctx, input, signal }) =>
+			setupProject(ctx, { ...input, signal }),
+		),
+
 	/**
 	 * Soft delete: the project and its live workspaces disappear for
 	 * everyone on this device, teardown runs and terminals stop, and the
