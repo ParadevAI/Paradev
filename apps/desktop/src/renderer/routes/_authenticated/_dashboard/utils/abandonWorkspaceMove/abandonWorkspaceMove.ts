@@ -5,7 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { MOVE_CANCELLED } from "../describeMoveError";
 
-/** Ends a begun workspace move that failed before it had a destination, so the workspace can move again. */
+/** Ends a begun workspace move that failed, so the workspace can move again. */
 export async function abandonWorkspaceMove(
 	workspaceMoveId: string,
 	error: unknown,

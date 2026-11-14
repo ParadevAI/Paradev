@@ -140,11 +140,15 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 							(terminal) => terminal.terminalId,
 						);
 						if (moveSignal.aborted) {
+							// The move can end while prepare runs, after the catch below released nothing.
+							await releaseSourceChats(source, leaving.chats);
 							await releaseSourceTerminals(
 								source,
 								workspace.id,
 								leaving.terminals,
 							);
+							leaving.chats = [];
+							leaving.terminals = [];
 						}
 						const project = requireProject(prepared.repositoryFullName);
 						moveSignal.throwIfAborted();
