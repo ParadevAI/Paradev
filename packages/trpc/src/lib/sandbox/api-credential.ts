@@ -11,7 +11,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, members } from "@superset/db/schema";
-import { sandboxApiCredential } from "@superset/shared/sandbox-gate";
+import { sandboxApiCredential } from "@superset/shared/sandbox/gate";
 import { and, eq, isNull } from "drizzle-orm";
 import { env } from "../../env";
 

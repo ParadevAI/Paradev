@@ -278,6 +278,7 @@ test("a cloud workspace shows no paused row", () => {
 				isReady: true,
 				agentCredentialsChangedWorkspaceId: null,
 				usageRefusal: null,
+				wakeOpenWorkspace: async () => {},
 			}}
 		>
 			<ChatPaneActionsProvider workspaceId="w1">

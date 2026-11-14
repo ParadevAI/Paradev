@@ -6,7 +6,7 @@ import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
+import { sandboxAccess } from "renderer/routes/_authenticated/utils/sandboxAccess";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
 import {
@@ -172,9 +172,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				sourceWorkspaceId: workspace.id,
 				toWorkspaceId: created.id,
 				connect: async () =>
-					getHostServiceClientByUrl(
-						(await requestSandboxAccess(created.id, true)).url,
-					),
+					getHostServiceClientByUrl((await sandboxAccess.wake(created.id)).url),
 				resolveUrls: (fileIds) =>
 					cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
 				attempts: BOX_CONNECT_ATTEMPTS,

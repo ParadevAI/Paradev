@@ -18,7 +18,7 @@ import {
 	pluginBundleHash,
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
-import { sandboxPluginsSchema } from "@superset/shared/sandbox-contract";
+import { sandboxPluginsSchema } from "@superset/shared/sandbox/contract";
 
 function readManifest(file: string): unknown {
 	try {

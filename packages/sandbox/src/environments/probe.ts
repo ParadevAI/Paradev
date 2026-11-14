@@ -11,7 +11,7 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox/access";
 import { Sandbox } from "@vercel/sandbox";
 

@@ -2,7 +2,7 @@ import { auth, mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
