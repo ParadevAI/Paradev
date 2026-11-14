@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {Started # automation} other {Started # automation
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 
@@ -11055,6 +11058,9 @@ msgstr "Keep editing"
 msgid "Keep paused"
 msgstr "Keep paused"
 
+msgid "Keep running"
+msgstr "Keep running"
+
 msgid "Keep typing an email to invite"
 msgstr "Keep typing an email to invite"
 
@@ -19503,6 +19509,9 @@ msgstr "Stop {label}"
 msgid "Stop {name}"
 msgstr "Stop {name}"
 
+msgid "Stop all"
+msgstr "Stop all"
+
 msgid "Stop dictation"
 msgstr "Stop dictation"
 
@@ -19521,6 +19530,9 @@ msgstr "Stop the agent and send this now"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Stop the agent before you edit a message"
+
+msgid "Stop this response?"
+msgstr "Stop this response?"
 
 msgid "Stop watching"
 msgstr "Stop watching"

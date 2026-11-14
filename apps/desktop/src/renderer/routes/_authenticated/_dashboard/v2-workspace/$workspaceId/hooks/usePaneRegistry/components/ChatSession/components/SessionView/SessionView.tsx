@@ -7,6 +7,7 @@ import {
 	type OutboxEntry,
 	presetForAnyHarness,
 	type SessionSnapshot,
+	subagentsStoppedByCancel,
 	userMessageText,
 } from "@superset/chat/core";
 import type {
@@ -74,6 +75,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { StopWithSubagentsDialog } from "./components/StopWithSubagentsDialog";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -86,6 +88,7 @@ import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
 import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
+import { useStopConfirmation } from "./hooks/useStopConfirmation";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
@@ -546,13 +549,30 @@ export function SessionView({
 		],
 	);
 	const awaitingBackground = sessionState?.awaitingBackground === true;
-	const onCancelTurn = useMemo(
+	const stopTurn = useMemo(
 		() =>
 			loaded && runningTurnId && !awaitingBackground && !held
 				? () => void cancelTurn(runningTurnId, { pauseQueue: true })
 				: null,
 		[loaded, runningTurnId, awaitingBackground, cancelTurn, held],
 	);
+	const runningTurnStartedAtMs = runningTurnId
+		? session.snapshot.turns.get(runningTurnId)?.startedAtMs
+		: undefined;
+	const runningSubagents =
+		runningTurnStartedAtMs === undefined
+			? 0
+			: subagentsStoppedByCancel(
+					harness,
+					sessionState?.backgroundTasks ?? [],
+					runningTurnStartedAtMs,
+				);
+	const stopConfirmation = useStopConfirmation({
+		runningTurnId,
+		stopTurn,
+		subagentCount: runningSubagents,
+	});
+	const onCancelTurn = stopConfirmation.onCancelTurn;
 	const promptQueue = useMemo(
 		() => ({
 			prompts: queuedPrompts,
@@ -798,7 +818,6 @@ export function SessionView({
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
 					promptPending={heldOutbox.length > 0}
-					awaitingBackground={awaitingBackground}
 					terminalId={terminalId}
 					agentLabel={agentLabel}
 					onNewChat={onNewChat}
@@ -807,6 +826,12 @@ export function SessionView({
 					onOpenFind={focusedSubagentId ? undefined : openFind}
 					usageLimited={!held && usageLimit !== undefined}
 					workspaceId={workspaceId}
+				/>
+				<StopWithSubagentsDialog
+					subagentCount={runningSubagents}
+					open={stopConfirmation.open}
+					onOpenChange={stopConfirmation.onOpenChange}
+					onConfirm={stopConfirmation.confirm}
 				/>
 			</ComposerDropZone>
 		</ChatPaneActionsProvider>

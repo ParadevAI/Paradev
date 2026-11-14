@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {# automatisering gestart} other {# automatisering
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent actief} other {# subagents actief}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {De agent kan niet alleen dit antwoord stoppen. Stoppen stopt ook de subagent die nog op de achtergrond draait.} other {De agent kan niet alleen dit antwoord stoppen. Stoppen stopt ook de # subagents die nog op de achtergrond draaien.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {# werkruimte aangemaakt, {failCount} mislukt} other {# werkruimtes aangemaakt, {failCount} mislukt}}"
 
@@ -11055,6 +11058,9 @@ msgstr "Verder bewerken"
 msgid "Keep paused"
 msgstr "Gepauzeerd laten"
 
+msgid "Keep running"
+msgstr "Laten doorlopen"
+
 msgid "Keep typing an email to invite"
 msgstr "Typ verder een e-mailadres om uit te nodigen"
 
@@ -19503,6 +19509,9 @@ msgstr "{label} stoppen"
 msgid "Stop {name}"
 msgstr "{name} stoppen"
 
+msgid "Stop all"
+msgstr "Alles stoppen"
+
 msgid "Stop dictation"
 msgstr "Dicteren stoppen"
 
@@ -19521,6 +19530,9 @@ msgstr "Agent stoppen en nu verzenden"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Stop de agent voordat je een bericht bewerkt"
+
+msgid "Stop this response?"
+msgstr "Dit antwoord stoppen?"
 
 msgid "Stop watching"
 msgstr "Stoppen met volgen"

@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {Đã khởi chạy # tự động hóa} other {Đ
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# agent con đang chạy}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {Tác nhân không thể chỉ dừng phản hồi này. Dừng lại cũng sẽ dừng agent con vẫn đang chạy nền.} other {Tác nhân không thể chỉ dừng phản hồi này. Dừng lại cũng sẽ dừng # agent con vẫn đang chạy nền.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Đã tạo # workspace, {failCount} thất bại} other {Đã tạo # workspace, {failCount} thất bại}}"
 
@@ -11055,6 +11058,9 @@ msgstr "Tiếp tục chỉnh sửa"
 msgid "Keep paused"
 msgstr "Giữ tạm dừng"
 
+msgid "Keep running"
+msgstr "Tiếp tục chạy"
+
 msgid "Keep typing an email to invite"
 msgstr "Tiếp tục nhập email để mời"
 
@@ -19503,6 +19509,9 @@ msgstr "Dừng {label}"
 msgid "Stop {name}"
 msgstr "Dừng {name}"
 
+msgid "Stop all"
+msgstr "Dừng tất cả"
+
 msgid "Stop dictation"
 msgstr "Dừng đọc chính tả"
 
@@ -19521,6 +19530,9 @@ msgstr "Dừng tác tử và gửi ngay"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Hãy dừng tác tử trước khi chỉnh sửa tin nhắn"
+
+msgid "Stop this response?"
+msgstr "Dừng phản hồi này?"
 
 msgid "Stop watching"
 msgstr "Ngừng theo dõi"

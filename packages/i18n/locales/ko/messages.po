@@ -1401,6 +1401,9 @@ msgstr "{started, plural, one {자동화 #개를 시작했습니다} other {자�
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {서브 에이전트 #개 실행 중}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {에이전트는 이 응답만 중지할 수 없습니다. 중지하면 백그라운드에서 실행 중인 서브 에이전트도 함께 중지됩니다.} other {에이전트는 이 응답만 중지할 수 없습니다. 중지하면 백그라운드에서 실행 중인 서브 에이전트 #개도 함께 중지됩니다.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {워크스페이스 #개를 만들었고 {failCount}개는 실패했습니다} other {워크스페이스 #개를 만들었고 {failCount}개는 실패했습니다}}"
 
@@ -11055,6 +11058,9 @@ msgstr "계속 편집"
 msgid "Keep paused"
 msgstr "일시 중지 상태로 두기"
 
+msgid "Keep running"
+msgstr "계속 실행"
+
 msgid "Keep typing an email to invite"
 msgstr "초대하려면 이메일을 계속 입력하세요"
 
@@ -19503,6 +19509,9 @@ msgstr "{label} 중지"
 msgid "Stop {name}"
 msgstr "{name} 중지"
 
+msgid "Stop all"
+msgstr "모두 중지"
+
 msgid "Stop dictation"
 msgstr "받아쓰기 중지"
 
@@ -19521,6 +19530,9 @@ msgstr "에이전트를 중지하고 지금 보내기"
 
 msgid "Stop the agent before you edit a message"
 msgstr "메시지를 편집하기 전에 에이전트를 중지하세요"
+
+msgid "Stop this response?"
+msgstr "이 응답을 중지할까요?"
 
 msgid "Stop watching"
 msgstr "감시 중지"

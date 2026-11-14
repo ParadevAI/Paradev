@@ -129,7 +129,6 @@ export type ComposerProps = {
 	turnRunning?: boolean;
 	/** A prompt is on its way: Stop shows, disabled until there is a turn to stop. */
 	promptPending?: boolean;
-	awaitingBackground?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
 	/** A usage limit holds the chat; its notice sits above the composer. */
@@ -193,7 +192,6 @@ export const Composer = memo(function Composer({
 	target,
 	turnRunning = false,
 	promptPending = false,
-	awaitingBackground = false,
 	terminalId,
 	usageLimited = false,
 	workspaceId,
@@ -661,13 +659,7 @@ export const Composer = memo(function Composer({
 						: (placeholder ??
 							t({ message: "Ask the agent, @mention files, run /commands" }))
 				}
-				status={
-					stop || promptPending
-						? "streaming"
-						: awaitingBackground && !target
-							? "background"
-							: "ready"
-				}
+				status={stop || promptPending ? "streaming" : "ready"}
 				stopOnEscape={!escapeGoesBack}
 				toolbar={
 					target ? (

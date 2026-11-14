@@ -1395,6 +1395,9 @@ msgstr "{started, plural, one {Запущено # автоматизацію} fe
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {Працює # субагент} few {Працюють # субагенти} many {Працює # субагентів} other {Працює # субагента}}"
 
+msgid "{subagentCount, plural, one {The agent cannot stop only this response. Stopping also stops the background subagent that is still running.} other {The agent cannot stop only this response. Stopping also stops the # background subagents that are still running.}}"
+msgstr "{subagentCount, plural, one {Агент не може зупинити лише цю відповідь. Зупинка також зупинить # субагент, який ще працює у фоновому режимі.} few {Агент не може зупинити лише цю відповідь. Зупинка також зупинить # субагенти, які ще працюють у фоновому режимі.} many {Агент не може зупинити лише цю відповідь. Зупинка також зупинить # субагентів, які ще працюють у фоновому режимі.} other {Агент не може зупинити лише цю відповідь. Зупинка також зупинить # субагента, які ще працюють у фоновому режимі.}}"
+
 msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
 msgstr "{successCount, plural, one {Створено # робочий простір, не вдалося: {failCount}} few {Створено # робочі простори, не вдалося: {failCount}} many {Створено # робочих просторів, не вдалося: {failCount}} other {Створено # робочого простору, не вдалося: {failCount}}}"
 
@@ -11049,6 +11052,9 @@ msgstr "Продовжити редагування"
 msgid "Keep paused"
 msgstr "Залишити на паузі"
 
+msgid "Keep running"
+msgstr "Залишити працювати"
+
 msgid "Keep typing an email to invite"
 msgstr "Продовжуйте вводити адресу, щоб запросити"
 
@@ -19497,6 +19503,9 @@ msgstr "Зупинити {label}"
 msgid "Stop {name}"
 msgstr "Зупинити {name}"
 
+msgid "Stop all"
+msgstr "Зупинити все"
+
 msgid "Stop dictation"
 msgstr "Зупинити диктування"
 
@@ -19515,6 +19524,9 @@ msgstr "Зупинити агента й надіслати це зараз"
 
 msgid "Stop the agent before you edit a message"
 msgstr "Зупиніть агента, перш ніж редагувати повідомлення"
+
+msgid "Stop this response?"
+msgstr "Зупинити цю відповідь?"
 
 msgid "Stop watching"
 msgstr "Припинити стеження"

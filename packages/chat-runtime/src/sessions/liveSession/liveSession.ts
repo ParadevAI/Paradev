@@ -3,6 +3,7 @@ import {
 	type ChatSelections,
 	CONTINUE_PROMPT,
 	sessionSelections,
+	subagentsStoppedByCancel,
 	userStopOf,
 } from "@superset/chat/core";
 import {
@@ -463,9 +464,9 @@ export class LiveSession {
 			this.queuePaused = false;
 			this.emitSession({ queuePaused: false });
 		}
-		if (this.currentTurn?.status === "running") {
+		if (this.turnHoldsPrompts()) {
 			this.steerTarget = steered.item.id;
-			this.options.adapter.cancelTurn();
+			if (!this.cancelStopsSubagents()) this.options.adapter.cancelTurn();
 		} else if (this.inFlight()) {
 			this.steerTarget = steered.item.id;
 		} else {
@@ -493,7 +494,7 @@ export class LiveSession {
 		this.clearResumeTimer();
 		this.queuePaused = false;
 		this.emitSession({ queuePaused: false, usageLimit: undefined });
-		if (this.currentTurn?.status !== "running" && !this.inFlight()) {
+		if (!this.turnHoldsPrompts() && !this.inFlight()) {
 			this.deliverNextQueued();
 		}
 	}
@@ -752,7 +753,11 @@ export class LiveSession {
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
 					this.steerTarget = null;
-					if (steered && this.queue[0]?.item.id === steered) {
+					if (
+						steered &&
+						this.queue[0]?.item.id === steered &&
+						!this.cancelStopsSubagents()
+					) {
 						this.options.adapter.cancelTurn();
 					}
 				} else {
@@ -790,6 +795,9 @@ export class LiveSession {
 				}
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
+				if (event.session.awaitingBackground && this.mayDeliverQueued()) {
+					this.deliverNextQueued();
+				}
 				return;
 			case "delta":
 				this.options.publish({
@@ -883,7 +891,7 @@ export class LiveSession {
 		if (status === "dead") return;
 		onReleased?.();
 		const ready = held.map((content) => this.queuedPrompt(content));
-		const idle = this.currentTurn?.status !== "running" && !this.inFlight();
+		const idle = this.mayDeliverQueued();
 		const first = idle && this.queuePaused ? ready.shift() : undefined;
 		this.queue.unshift(...ready);
 		if (first) this.deliver(first);
@@ -973,7 +981,7 @@ export class LiveSession {
 				if (this.capturing !== prompt) return;
 				this.capturing = null;
 				if (this.stopped) return;
-				if (this.currentTurn?.status === "running") {
+				if (this.turnHoldsPrompts()) {
 					this.requeueFirst(prompt);
 					return;
 				}
@@ -1042,7 +1050,7 @@ export class LiveSession {
 
 	private steerableTurn(expectedTurnId?: string): Turn | null {
 		const turn = this.currentTurn;
-		if (turn?.status !== "running" || this.inFlight()) return null;
+		if (!turn || !this.turnHoldsPrompts() || this.inFlight()) return null;
 		if (expectedTurnId && expectedTurnId !== turn.id) return null;
 		return this.options.adapter.canSteer?.() ? turn : null;
 	}
@@ -1072,7 +1080,7 @@ export class LiveSession {
 			if (index === -1) return;
 			this.pendingSteers.splice(index, 1);
 			if (!taken) this.fallBack(prompt, selected);
-			if (this.currentTurn?.status !== "running" && !this.inFlight()) {
+			if (!this.turnHoldsPrompts() && !this.inFlight()) {
 				this.deliverNextQueued();
 			}
 		});
@@ -1224,9 +1232,38 @@ export class LiveSession {
 		);
 	}
 
+	private turnHoldsPrompts(): boolean {
+		return (
+			this.currentTurn?.status === "running" &&
+			this.options.adapter.turnOnlyAwaitsBackground?.() !== true
+		);
+	}
+
+	/** A pending steer goes first: a queued prompt sent before it would start the next turn under it. */
+	private mayDeliverQueued(): boolean {
+		return (
+			!this.turnHoldsPrompts() &&
+			!this.inFlight() &&
+			this.pendingSteers.length === 0
+		);
+	}
+
+	/** A steer that falls back to cancelling must not take older subagents with it. */
+	private cancelStopsSubagents(): boolean {
+		const turn = this.currentTurn;
+		return (
+			turn !== null &&
+			subagentsStoppedByCancel(
+				this.options.harness,
+				this.sessionState.backgroundTasks ?? [],
+				turn.startedAtMs,
+			) > 0
+		);
+	}
+
 	private isBusy(): boolean {
 		return (
-			this.currentTurn?.status === "running" ||
+			this.turnHoldsPrompts() ||
 			this.hasPendingWork() ||
 			this.pendingSteers.length > 0 ||
 			this.heldUntilStarted.length > 0
