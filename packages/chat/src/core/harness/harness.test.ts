@@ -4,6 +4,7 @@ import {
 	acpStartModes,
 	presetForAcpHarness,
 	presetForAnyHarness,
+	subagentsStoppedByCancel,
 } from "./harness";
 
 describe("acpHarnessForPreset", () => {
@@ -52,5 +53,22 @@ describe("acpStartModes", () => {
 		}
 		expect(acpStartModes("opencode")).toBeUndefined();
 		expect(acpStartModes("omp")).toBeUndefined();
+	});
+});
+
+describe("subagentsStoppedByCancel", () => {
+	const tasks = [
+		{ kind: "subagent" as const, startedAtMs: 100 },
+		{ kind: "subagent" as const, startedAtMs: 500 },
+		{ kind: "process" as const, startedAtMs: 100 },
+	];
+
+	test("counts only subagents that started before the running turn", () => {
+		expect(subagentsStoppedByCancel("claude-acp", tasks, 300)).toBe(1);
+	});
+
+	test("is zero on a harness whose cancel leaves subagents running", () => {
+		expect(subagentsStoppedByCancel("codex-acp", tasks, 300)).toBe(0);
+		expect(subagentsStoppedByCancel(undefined, tasks, 300)).toBe(0);
 	});
 });

@@ -3,6 +3,7 @@ import {
 	type ChatSelections,
 	CONTINUE_PROMPT,
 	sessionSelections,
+	subagentsStoppedByCancel,
 	userStopOf,
 } from "@superset/chat/core";
 import {
@@ -465,7 +466,7 @@ export class LiveSession {
 		}
 		if (this.currentTurn?.status === "running") {
 			this.steerTarget = steered.item.id;
-			this.options.adapter.cancelTurn();
+			if (!this.cancelStopsSubagents()) this.options.adapter.cancelTurn();
 		} else if (this.inFlight()) {
 			this.steerTarget = steered.item.id;
 		} else {
@@ -752,7 +753,11 @@ export class LiveSession {
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
 					this.steerTarget = null;
-					if (steered && this.queue[0]?.item.id === steered) {
+					if (
+						steered &&
+						this.queue[0]?.item.id === steered &&
+						!this.cancelStopsSubagents()
+					) {
 						this.options.adapter.cancelTurn();
 					}
 				} else {
@@ -1221,6 +1226,19 @@ export class LiveSession {
 	private hasPendingWork(): boolean {
 		return (
 			(this.queue.length > 0 && !this.queuePaused) || this.inFlight() !== null
+		);
+	}
+
+	/** A steer that falls back to cancelling must not take older subagents with it. */
+	private cancelStopsSubagents(): boolean {
+		const turn = this.currentTurn;
+		return (
+			turn !== null &&
+			subagentsStoppedByCancel(
+				this.options.harness,
+				this.sessionState.backgroundTasks ?? [],
+				turn.startedAtMs,
+			) > 0
 		);
 	}
 
