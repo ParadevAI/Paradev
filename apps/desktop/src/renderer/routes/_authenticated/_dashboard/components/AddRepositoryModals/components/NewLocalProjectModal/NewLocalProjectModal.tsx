@@ -16,6 +16,7 @@ import { useState } from "react";
 import { LuFolderGit2, LuGithub, LuLoaderCircle, LuX } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import { getBaseName } from "renderer/lib/pathBasename";
 import { useFinalizeProjectSetup } from "renderer/react-query/projects";
 import {
@@ -113,7 +114,7 @@ export function NewLocalProjectModal({
 			onOpenChange(false);
 		} catch (err) {
 			toast.error(t({ message: "Could not create project" }), {
-				description: errorMessage(err),
+				description: hostRefusalReason(errorMessage(err)),
 			});
 		} finally {
 			setWorking(false);
