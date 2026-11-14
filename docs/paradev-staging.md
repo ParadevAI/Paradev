@@ -208,11 +208,12 @@ to stage-configured deployments. Do not perform billing/vendor operations as
 part of these checks. Live verification and provider readiness are not proven
 by local tests.
 
-For rollback, turn the shared flag off first; the next completed evaluation
-fails closed without an application cache delay. The server opt-in can also be
+For rollback, turn the flag for the surface off first: `web-pages-domain-move`
+for old-app pages, `web-domain-move` for desktop sign-in. The next completed
+evaluation fails closed without an application cache delay. The server opt-in can also be
 disabled on both legacy deployments. Keep old and new callbacks/deployments so
-in-flight OAuth completes. Do not restore any new-to-old redirect until the
-old-to-new move is disabled. Restoring recorded final alias owners requires its
+in-flight OAuth completes. Do not restore any new-to-old redirect until both
+flags are disabled. Restoring recorded final alias owners requires its
 own routing approval; never send final hosts to stage-configured builds. No DB
 rollback is involved.
 
