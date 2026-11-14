@@ -13633,6 +13633,9 @@ msgstr "Nejste přihlášeni. Přihlaste se prosím."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Nejste přihlášeni. Zadejte bearer JWT, x-api-key nebo relaci."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Není k dispozici pro projekt s více repozitáři: import by tuto složku přesunul"
+
 msgid "Not available on this server"
 msgstr "Na tomto serveru není k dispozici"
 

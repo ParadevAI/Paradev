@@ -13633,6 +13633,9 @@ msgstr "Sin autenticar. Inicia sesión."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Sin autenticar. Proporciona un JWT de tipo bearer, x-api-key o una sesión."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "No disponible en un proyecto con varios repositorios: la importación movería esta carpeta"
+
 msgid "Not available on this server"
 msgstr "No disponible en este servidor"
 

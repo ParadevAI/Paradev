@@ -13633,6 +13633,9 @@ msgstr "Niet geauthenticeerd. Log in."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Niet geauthenticeerd. Geef een bearer-JWT, x-api-key of sessie mee."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Niet beschikbaar voor een project met meerdere repository's: importeren zou deze map verplaatsen"
+
 msgid "Not available on this server"
 msgstr "Niet beschikbaar op deze server"
 

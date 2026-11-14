@@ -13627,6 +13627,9 @@ msgstr "Не автентифіковано. Увійдіть, будь ласк
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Не автентифіковано. Надайте bearer JWT, x-api-key або сеанс."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Недоступно для проєкту з кількома репозиторіями: імпорт перемістить цю папку"
+
 msgid "Not available on this server"
 msgstr "Недоступно на цьому сервері"
 

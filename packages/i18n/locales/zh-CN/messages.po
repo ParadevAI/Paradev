@@ -13633,6 +13633,9 @@ msgstr "未通过身份验证。请登录。"
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "未通过身份验证。请提供bearer JWT、x-api-key或session。"
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "不适用于包含多个仓库的项目：导入会移动此文件夹"
+
 msgid "Not available on this server"
 msgstr "此服务器不可用"
 

@@ -13633,6 +13633,9 @@ msgstr "未通過身份驗證。請登入。"
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "未通過身份驗證。請提供bearer JWT、x-api-key或session。"
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "不適用於包含多個儲存庫的專案：匯入會移動此資料夾"
+
 msgid "Not available on this server"
 msgstr "此伺服器無法使用"
 

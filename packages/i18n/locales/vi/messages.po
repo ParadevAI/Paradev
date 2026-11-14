@@ -13633,6 +13633,9 @@ msgstr "Chưa xác thực. Vui lòng đăng nhập."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Chưa xác thực. Hãy cung cấp bearer JWT, x-api-key hoặc session."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Không khả dụng cho dự án có nhiều kho: nhập sẽ di chuyển thư mục này"
+
 msgid "Not available on this server"
 msgstr "Không khả dụng trên máy chủ này"
 

@@ -13633,6 +13633,9 @@ msgstr "Belum terautentikasi. Silakan masuk."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Belum terautentikasi. Berikan bearer JWT, x-api-key, atau session."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Tidak tersedia untuk proyek dengan beberapa repositori: impor akan memindahkan folder ini"
+
 msgid "Not available on this server"
 msgstr "Tidak tersedia di server ini"
 

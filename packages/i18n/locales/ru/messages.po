@@ -13633,6 +13633,9 @@ msgstr "Не выполнен вход. Войдите в аккаунт."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Не выполнен вход. Передайте bearer JWT, x-api-key или сессию."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Недоступно для проекта с несколькими репозиториями: импорт переместит эту папку"
+
 msgid "Not available on this server"
 msgstr "Недоступно на этом сервере"
 

@@ -13633,6 +13633,9 @@ msgstr "Kimlik doğrulanmadı. Lütfen oturum açın."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Kimlik doğrulanmadı. Bir bearer JWT, x-api-key veya oturum sağlayın."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Birden çok depolu bir projede kullanılamaz: içe aktarma bu klasörü taşır"
+
 msgid "Not available on this server"
 msgstr "Bu sunucuda kullanılamıyor"
 

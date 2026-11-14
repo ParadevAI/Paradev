@@ -13633,6 +13633,9 @@ msgstr "Nicht authentifiziert. Bitte melde dich an."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Nicht authentifiziert. Gib ein Bearer-JWT, x-api-key oder eine Sitzung an."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Für ein Projekt mit mehreren Repositorys nicht verfügbar: Der Import würde diesen Ordner verschieben"
+
 msgid "Not available on this server"
 msgstr "Auf diesem Server nicht verfügbar"
 

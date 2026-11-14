@@ -13633,6 +13633,9 @@ msgstr "認証されていません。サインインしてください。"
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "認証されていません。ベアラーJWT、x-api-key、またはセッションを指定してください。"
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "複数のリポジトリを持つプロジェクトでは利用できません：インポートするとこのフォルダーが移動します"
+
 msgid "Not available on this server"
 msgstr "このサーバーでは利用できません"
 

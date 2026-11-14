@@ -13633,6 +13633,9 @@ msgstr "인증되지 않았습니다. 로그인해 주세요."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "인증되지 않았습니다. bearer JWT, x-api-key 또는 세션을 제공하세요."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "여러 저장소가 있는 프로젝트에서는 사용할 수 없습니다: 가져오면 이 폴더가 이동됩니다"
+
 msgid "Not available on this server"
 msgstr "이 서버에서는 사용할 수 없습니다"
 

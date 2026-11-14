@@ -13633,6 +13633,9 @@ msgstr "Brak uwierzytelnienia. Zaloguj się."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Brak uwierzytelnienia. Podaj token JWT bearer, x-api-key albo sesję."
 
+msgid "Not available on a project of several repositories: importing would move this folder"
+msgstr "Niedostępne dla projektu z wieloma repozytoriami: import przeniósłby ten folder"
+
 msgid "Not available on this server"
 msgstr "Niedostępne na tym serwerze"
 
