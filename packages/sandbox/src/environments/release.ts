@@ -44,8 +44,8 @@ import {
 	SANDBOX_ROOT_CHECKOUT,
 	type SandboxIdentity,
 	sandboxCheckoutDir,
-} from "@superset/shared/sandbox-contract";
-import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/contract";
+import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
 // The provisioning code imports the API env schema; an operator running this

@@ -2,7 +2,7 @@ import { CLIError, string } from "@superset/cli-framework";
 import {
 	SANDBOX_REGION_IDS,
 	type SandboxRegionId,
-} from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/regions";
 import { getWebUrl } from "../../../lib/auth";
 import { command } from "../../../lib/command";
 import { environmentLimitHint } from "../../../lib/environments";

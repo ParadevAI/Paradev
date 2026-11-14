@@ -9,7 +9,7 @@ import {
 } from "@superset/db/schema";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
-import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";

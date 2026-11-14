@@ -19,7 +19,7 @@ import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { PACKAGE_ROOT } from "./build";
 
 const IMAGE = process.env.SANDBOX_IMAGE ?? "superset-sandbox:local";

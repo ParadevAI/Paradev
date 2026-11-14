@@ -1,4 +1,4 @@
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import type { AppRouter } from "@superset/trpc";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import SuperJSON from "superjson";

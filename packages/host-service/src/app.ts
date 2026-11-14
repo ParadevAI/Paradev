@@ -7,7 +7,7 @@ import {
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
-import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PORTS } from "@superset/shared/sandbox/contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
 const MAX_DISPLAY_BUFFER_BYTES = 32 * 1024 * 1024;

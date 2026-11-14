@@ -6,7 +6,7 @@ import {
 	sandboxHostSecret,
 	signSandboxGateTicket,
 	verifySandboxGateTicket,
-} from "./sandbox-gate";
+} from "./gate";
 
 const SECRET = "a-shared-secret-that-is-at-least-thirty-two-bytes";
 const CLAIMS = {

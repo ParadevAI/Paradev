@@ -10,7 +10,7 @@ import {
 	supportsCloudAgentChat,
 } from "./cloud-agent-launch";
 import { HOST_AGENT_PRESETS } from "./host-agent-presets";
-import { sandboxIdentitySchema } from "./sandbox-contract";
+import { sandboxIdentitySchema } from "./sandbox/contract";
 
 const fileId = "0b8f3c1e-5a2d-4f6b-9c7e-1d2e3f4a5b6c";
 

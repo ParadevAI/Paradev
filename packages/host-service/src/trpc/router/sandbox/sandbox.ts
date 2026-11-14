@@ -3,7 +3,7 @@ import { join } from "node:path";
 import {
 	SANDBOX_PATHS,
 	sandboxManagedEnvSchema,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { readSandboxBoxResources } from "../../../runtime/box-resources";

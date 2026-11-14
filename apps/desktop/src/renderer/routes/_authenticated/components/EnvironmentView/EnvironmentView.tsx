@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { formatRelativeTime } from "@superset/i18n/format";
-import { SANDBOX_REGIONS } from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGIONS } from "@superset/shared/sandbox/regions";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import {
