@@ -54,8 +54,10 @@ import {
 	getChangesetFileRepositoryId,
 	useChangeset,
 } from "../../../useChangeset";
+import { useChangesRepositoryPicker } from "../../../useChangesRepositoryPicker";
 import { useLinkedPullRequest } from "../../../useLinkedPullRequest";
 import { useOpenInExternalEditor } from "../../../useOpenInExternalEditor";
+import { useRepositoryChangesets } from "../../../useRepositoryChangesets";
 import { useSidebarDiffRef } from "../../../useSidebarDiffRef";
 import { useViewedFiles } from "../../../useViewedFiles";
 import { useElementWidth } from "../../hooks/useElementWidth";
@@ -79,9 +81,7 @@ import { useDiffCommentComposer } from "./hooks/useDiffCommentComposer";
 import { useDiffCommentNavigation } from "./hooks/useDiffCommentNavigation";
 import { useDiffPaneHeaderSlot } from "./hooks/useDiffPaneHeaderSlot";
 import { useDiffPaneSearch } from "./hooks/useDiffPaneSearch";
-import { useDiffRepositoryFilter } from "./hooks/useDiffRepositoryFilter";
 import { useHeldWhileTabHidden } from "./hooks/useHeldWhileTabHidden";
-import { useRepositoryChangesets } from "./hooks/useRepositoryChangesets";
 import { useRepositoryReviewThreads } from "./hooks/useRepositoryReviewThreads";
 import { createGetDiffInput } from "./utils/createGetDiffInput";
 import {
@@ -95,7 +95,6 @@ import {
 	diffPaneActionsSlotId,
 	diffPaneTitleSlotId,
 } from "./utils/headerSlots";
-import { shownRepositoryIds } from "./utils/shownRepositoryIds";
 import {
 	findItemIdForDiff,
 	pruneTooLargeMarks,
@@ -190,12 +189,8 @@ export function DiffPane({
 			),
 		[repositoryReviewThreads.byRepositoryId],
 	);
-	const [pickedRepositoryIds, setPickedRepositoryIds] =
-		useDiffRepositoryFilter(workspaceId);
-	const shownRepositories = useMemo(
-		() => shownRepositoryIds(repositoryIds, pickedRepositoryIds),
-		[repositoryIds, pickedRepositoryIds],
-	);
+	const repositoryPicker = useChangesRepositoryPicker(workspaceId);
+	const shownRepositories = repositoryPicker.shown;
 	// One repository shown: the header scopes that checkout's diff.
 	const scopeRepositoryId =
 		isMultiRepo && shownRepositories.size === 1
@@ -1089,13 +1084,9 @@ export function DiffPane({
 						deletions={totals.deletions}
 						filter={filter}
 						onClearFilter={clearFilter}
-						repositoryFilter={
+						repositoryPicker={
 							isMultiRepo
-								? {
-										repositories: checkouts,
-										shown: shownRepositories,
-										onChange: setPickedRepositoryIds,
-									}
+								? { repositories: checkouts, picker: repositoryPicker }
 								: undefined
 						}
 					/>,

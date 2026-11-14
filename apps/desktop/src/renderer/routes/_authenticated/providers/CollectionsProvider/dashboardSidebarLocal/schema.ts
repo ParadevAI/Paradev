@@ -262,7 +262,7 @@ export const workspaceLocalStateSchema = z.object({
 	repositoryChangesFilters: z
 		.record(z.string(), changesFilterSchema)
 		.default({}),
-	// Checkouts the Changes pane shows; empty shows them all.
+	// Checkouts the Changes pane and the Changes tab show; empty shows them all.
 	diffRepositoryIds: z.array(z.string()).default([]),
 });
 

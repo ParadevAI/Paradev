@@ -2,8 +2,12 @@ import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { ChangesScopeControl } from "../../../../../../components/ChangesScopeControl";
+import { useCheckoutGitStatuses } from "../../../../../../providers/WorkspaceGitStatusProvider";
+import type { WorkspaceCheckout } from "../../../../../../state/activeRepositoryStore";
 import type { DiffPaneFilter } from "../../../../../../types";
+import type { ChangesRepositoryPicker } from "../../../../../useChangesRepositoryPicker";
 import { useChangesScope } from "../../../../../useChangesScope";
+import { MultiRepoScopeMenu } from "./components/MultiRepoScopeMenu";
 import { RepositoryFilter } from "./components/RepositoryFilter";
 
 interface DiffPaneScopeProps {
@@ -14,8 +18,11 @@ interface DiffPaneScopeProps {
 	deletions: number;
 	filter?: DiffPaneFilter | undefined;
 	onClearFilter: () => void;
-	/** Set when the pane shows several repositories; each keeps its own scope. */
-	repositoryFilter?: React.ComponentProps<typeof RepositoryFilter>;
+	/** Set when the workspace has several repositories. */
+	repositoryPicker?: {
+		repositories: WorkspaceCheckout[];
+		picker: ChangesRepositoryPicker;
+	};
 }
 
 /** The Changes pane header's left side: which diff it shows, and its totals. */
@@ -26,39 +33,67 @@ export function DiffPaneScope({
 	deletions,
 	filter,
 	onClearFilter,
-	repositoryFilter,
+	repositoryPicker,
 }: DiffPaneScopeProps) {
 	const { t } = useLingui();
 	const scope = useChangesScope(workspaceId, repositoryId);
 	const status = scope.status.data;
 	const clearLabel = t({ message: "Show all changes" });
+	const shown = repositoryPicker?.picker.shown;
+	const showsSeveral = shown !== undefined && shown.size > 1;
+	const shownStatuses = useCheckoutGitStatuses(showsSeveral ? [...shown] : []);
+	const shownUncommittedCount = shownStatuses.reduce(
+		(sum, { data }) =>
+			sum + (data ? data.staged.length + data.unstaged.length : 0),
+		0,
+	);
+
+	const pickRepositories = (repositoryIds: string[]) => {
+		if (!repositoryPicker) return;
+		const clearBaseBranchOf = repositoryPicker.picker.pick(repositoryIds);
+		if (clearBaseBranchOf === repositoryId && scope.baseBranch !== null) {
+			scope.setBaseBranch(null);
+		}
+	};
+
 	return (
 		<div className="flex min-w-0 items-center gap-1 text-xs">
-			{repositoryFilter && <RepositoryFilter {...repositoryFilter} />}
-			{(!repositoryFilter || repositoryFilter.shown.size === 1) &&
-				status &&
-				!filter?.range && (
-					<ChangesScopeControl
-						filter={scope.filter}
-						onFilterChange={scope.setFilter}
-						commits={scope.commits.data?.commits ?? []}
-						uncommittedCount={status.staged.length + status.unstaged.length}
-						baseBranch={scope.baseBranch ?? status.defaultBranch.name}
-						branches={scope.branches.data?.branches ?? []}
-						// Picking the repo default clears the override (null) instead of
-						// pinning it, so the workspace follows a later default change.
-						onBaseBranchChange={(branchName) =>
-							scope.setBaseBranch(
-								branchName === status.defaultBranch.name ? null : branchName,
-							)
-						}
-						currentBranchName={status.currentBranch.name}
-						canRenameBranch={scope.canRenameBranch}
-						onRenameBranch={scope.renameBranch}
-						baseClassName="hidden @min-[420px]/pane-header:flex"
-						commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
-					/>
-				)}
+			{repositoryPicker && shown && (
+				<RepositoryFilter
+					repositories={repositoryPicker.repositories}
+					shown={shown}
+					onChange={pickRepositories}
+				/>
+			)}
+			{repositoryPicker && showsSeveral && !filter?.range && (
+				<MultiRepoScopeMenu
+					kind={repositoryPicker.picker.scopeKind}
+					onKindChange={repositoryPicker.picker.setScopeKind}
+					uncommittedCount={shownUncommittedCount}
+				/>
+			)}
+			{!showsSeveral && status && !filter?.range && (
+				<ChangesScopeControl
+					filter={scope.filter}
+					onFilterChange={scope.setFilter}
+					commits={scope.commits.data?.commits ?? []}
+					uncommittedCount={status.staged.length + status.unstaged.length}
+					baseBranch={scope.baseBranch ?? status.defaultBranch.name}
+					branches={scope.branches.data?.branches ?? []}
+					// Picking the repo default clears the override (null) instead of
+					// pinning it, so the workspace follows a later default change.
+					onBaseBranchChange={(branchName) =>
+						scope.setBaseBranch(
+							branchName === status.defaultBranch.name ? null : branchName,
+						)
+					}
+					currentBranchName={status.currentBranch.name}
+					canRenameBranch={scope.canRenameBranch}
+					onRenameBranch={scope.renameBranch}
+					baseClassName="hidden @min-[420px]/pane-header:flex"
+					commitLabelClassName="sr-only @min-[300px]/pane-header:not-sr-only"
+				/>
+			)}
 			{filter && (
 				<span className="flex min-w-0 shrink-0 items-center gap-0.5 rounded-md bg-accent py-0.5 pr-0.5 pl-1.5 text-[11px] text-accent-foreground">
 					<span className="truncate">

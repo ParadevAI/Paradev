@@ -20,6 +20,7 @@ import {
 	Pencil,
 } from "lucide-react";
 import { useRef, useState } from "react";
+import { changesFilterLabel } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/changesFilterLabel";
 import type { ChangesFilter } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
 import { CommitRow } from "./components/CommitRow";
@@ -27,28 +28,6 @@ import { RangeModal } from "./components/RangeModal";
 
 type Commit =
 	inferRouterOutputs<AppRouter>["git"]["listCommits"]["commits"][number];
-
-function getFilterLabel(filter: ChangesFilter, commits: Commit[]): string {
-	if (filter.kind === "all")
-		return i18n._(
-			msg({
-				message: "All commits",
-			}),
-		);
-	if (filter.kind === "uncommitted")
-		return i18n._(
-			msg({
-				message: "Uncommitted",
-			}),
-		);
-	if (filter.kind === "range") {
-		const from = commits.find((c) => c.hash === filter.fromHash);
-		const to = commits.find((c) => c.hash === filter.toHash);
-		return `${from?.shortHash ?? filter.fromHash.slice(0, 7)}..${to?.shortHash ?? filter.toHash.slice(0, 7)}`;
-	}
-	const commit = commits.find((c) => c.hash === filter.hash);
-	return commit?.shortHash ?? filter.hash.slice(0, 7);
-}
 
 interface CommitFilterDropdownProps {
 	filter: ChangesFilter;
@@ -126,7 +105,7 @@ export function CommitFilterDropdown({
 									</>
 								) : (
 									<span className="truncate">
-										{getFilterLabel(filter, commits)}
+										{changesFilterLabel(filter, commits)}
 									</span>
 								)}
 								<ChevronDown className="size-3 shrink-0 text-muted-foreground" />
