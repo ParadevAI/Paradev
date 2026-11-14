@@ -19,6 +19,7 @@ export type {
 
 interface AgentCommentComposerProps {
 	workspaceId: string;
+	preferredTerminalId?: string;
 	/** Short description of what the comment is anchored to ("Lines 3–7",
 	 *  a selected element, …), shown in the composer header. */
 	contextLabel: string;
@@ -33,6 +34,7 @@ interface AgentCommentComposerProps {
 
 export function AgentCommentComposer({
 	workspaceId,
+	preferredTerminalId,
 	contextLabel,
 	placeholder,
 	submitLabel,
@@ -65,6 +67,7 @@ export function AgentCommentComposer({
 	const { value, resolved, onValueChange } = useAgentSessionTarget({
 		sessions,
 		configs,
+		preferredTerminalId,
 	});
 
 	const [comment, setComment] = useState("");
