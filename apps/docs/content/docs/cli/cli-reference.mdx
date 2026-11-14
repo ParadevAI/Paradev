@@ -623,8 +623,9 @@ superset projects repos add ~/code/docs --project prj_… --local
 	output={`Project`}
 >
 Remove a repository from a project. Its files stay on disk. The host refuses to
-remove the primary, the last repository, or one a workspace (archived ones included)
-checks out.
+remove the primary, the last repository, or one a live workspace checks out.
+Archived workspaces lose their checkout of it; an archived workspace with no
+checkouts left can no longer be restored.
 </Command>
 
 <Command

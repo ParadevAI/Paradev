@@ -228,6 +228,28 @@ export default command({
 			throw new CLIError("--name is required when --project is set");
 		}
 
+		const project =
+			!isSession && (options.pr?.length || options.baseBranch?.length)
+				? await target.client.project.get.query({ projectId })
+				: undefined;
+		if (project === null) {
+			throw new CLIError(`Project ${projectId} is not on this host`);
+		}
+		const repositories = project ? requireRepositories(project) : undefined;
+		if (options.branch && options.pr?.length && repositories?.length === 1) {
+			throw new CLIError(
+				"Specify only one of --branch or --pr",
+				"Use --branch <name> or --pr <number>",
+			);
+		}
+		const checkouts = repositories
+			? buildCheckouts({
+					repositories,
+					pr: options.pr,
+					baseBranch: options.baseBranch,
+				})
+			: undefined;
+
 		const attachmentIds = options.attachment
 			? await uploadAttachments({
 					target,
@@ -265,27 +287,6 @@ export default command({
 		if (!options.name) {
 			throw new CLIError("--name is required when --project is set");
 		}
-		const project =
-			options.pr?.length || options.baseBranch?.length
-				? await target.client.project.get.query({ projectId })
-				: undefined;
-		if (project === null) {
-			throw new CLIError(`Project ${projectId} is not on this host`);
-		}
-		const repositories = project ? requireRepositories(project) : undefined;
-		if (options.branch && options.pr?.length && repositories?.length === 1) {
-			throw new CLIError(
-				"Specify only one of --branch or --pr",
-				"Use --branch <name> or --pr <number>",
-			);
-		}
-		const checkouts = repositories
-			? buildCheckouts({
-					repositories,
-					pr: options.pr,
-					baseBranch: options.baseBranch,
-				})
-			: undefined;
 		const create =
 			checkout === "local"
 				? target.client.workspaces.createLocal

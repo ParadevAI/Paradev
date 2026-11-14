@@ -60,6 +60,7 @@ function invoke(
 		pr?: string[];
 		baseBranch?: string[];
 		machineSize?: MachineSize;
+		attachment?: string[];
 	} = {},
 ) {
 	return createWorkspaceCommand.run({
@@ -315,6 +316,18 @@ describe("workspaces create on a project of several repositories", () => {
 			"Specify only one of --branch or --pr",
 		);
 		expect(createInput).toBeUndefined();
+	});
+
+	test("checks --pr before it uploads attachments", async () => {
+		await expect(
+			invoke({
+				branch: undefined,
+				pr: ["12"],
+				agent: "claude",
+				prompt: "go",
+				attachment: ["/nonexistent/never-read.png"],
+			}),
+		).rejects.toThrow(/needs a repository/);
 	});
 
 	test("refuses a bare --pr, naming the repositories", async () => {

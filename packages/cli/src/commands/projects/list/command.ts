@@ -40,7 +40,6 @@ export default command({
 				const repositories = project.repositories ?? [];
 				return {
 					name: project.name,
-					// The primary is marked with `*`.
 					repos: project.repositories
 						? repositories
 								.map((r) => (r.isPrimary ? `${r.name}*` : r.name))

@@ -142,7 +142,7 @@ Each entry in `agents` takes a preset id (e.g. `"claude"`) or a `HostAgentConfig
 ```ts
 const result = await client.workspaces.create({
   hostId: '<machineId>',     // see hosts.list()
-  projectId: '<uuid>',       // see projects.list()
+  projectId: '<uuid>',
   name: 'wire-up-auth',
   branch: 'feat/auth',
   agents: [                  // optional: spawn agents on creation
