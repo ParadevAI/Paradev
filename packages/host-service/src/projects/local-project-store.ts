@@ -1,11 +1,10 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import type { HostDb } from "../db";
-import { projects } from "../db/schema";
+import { projects, repositories } from "../db/schema";
 import type { EventBus } from "../events";
 import type { ProjectSnapshot, TagSettingSnapshot } from "../events/types";
 import {
 	getLiveRepositoryAtPath,
-	getRepositoryAtPathIncludingDeleted,
 	listProjectRepositories,
 	toRepositorySnapshot,
 } from "./repositories";
@@ -73,14 +72,22 @@ export function getLiveProjectAtPath(
 	return repository ? getLocalProject(db, repository.projectId) : undefined;
 }
 
-export function getProjectAtPathIncludingDeleted(
+/** The most recently deleted project whose only repository is at `repoPath`. */
+export function getDeletedSingleRepositoryProjectAtPath(
 	db: HostDb,
 	repoPath: string,
 ): HostProjectRow | undefined {
-	const repository = getRepositoryAtPathIncludingDeleted(db, repoPath);
-	return repository
-		? getProjectIncludingDeleted(db, repository.projectId)
-		: undefined;
+	return db
+		.select({ project: projects })
+		.from(repositories)
+		.innerJoin(projects, eq(projects.id, repositories.projectId))
+		.where(
+			and(eq(repositories.repoPath, repoPath), isNotNull(projects.deletedAt)),
+		)
+		.orderBy(desc(projects.deletedAt))
+		.all()
+		.map((row) => row.project)
+		.find((project) => listProjectRepositories(db, project.id).length === 1);
 }
 
 export function emitProjectChanged(

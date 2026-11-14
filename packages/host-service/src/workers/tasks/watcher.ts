@@ -38,14 +38,12 @@ async function ownGitDirectory(rootPath: string): Promise<string | null> {
 	}
 }
 
-/** `listGitIgnoredDirs` sets no ceiling, so it runs only in a folder that is a repository itself. */
 export const ignoredDirectoriesTask = defineWorkerTask<
 	{ rootPath: string },
 	string[]
 >({
 	type: "watcher/ignored-directories",
-	handler: async ({ rootPath }) =>
-		(await ownGitDirectory(rootPath)) ? listGitIgnoredDirs(rootPath) : [],
+	handler: ({ rootPath }) => listGitIgnoredDirs(rootPath),
 });
 
 export const gitDirectoryTask = defineWorkerTask<

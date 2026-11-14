@@ -168,18 +168,18 @@ test("removing takes the files and the host's links, and leaves what a user put 
 	addSkill(api, ".claude", "migrate");
 	writeWorkspaceContextFiles(root, [api, web]);
 	writeFileSync(join(root, ".claude", "settings.local.json"), "{}");
+	writeFileSync(join(root, ".claude", "notes.md"), "mine");
 	const paths = [api.path, web.path];
 
-	expect(listAgentFolderLeftovers(root, paths)).toEqual([
-		".claude/settings.local.json",
-	]);
+	expect(listAgentFolderLeftovers(root, paths)).toEqual([".claude/notes.md"]);
 	await removeWorkspaceContextFiles(root, paths);
 
 	expect(existsSync(join(root, "AGENTS.md"))).toBe(false);
 	expect(existsSync(join(root, "CLAUDE.md"))).toBe(false);
 	expect(existsSync(join(root, ".agents"))).toBe(false);
 	expect(existsSync(join(root, ".claude", "skills"))).toBe(false);
-	expect(existsSync(join(root, ".claude", "settings.local.json"))).toBe(true);
+	expect(existsSync(join(root, ".claude", "settings.local.json"))).toBe(false);
+	expect(readFileSync(join(root, ".claude", "notes.md"), "utf8")).toBe("mine");
 });
 
 test("without skills no agent folders are made at the root", () => {
@@ -242,16 +242,13 @@ test("a root config file the host did not make is never replaced or touched", as
 
 	expect(readFileSync(join(root, ".mcp.json"), "utf8")).toBe("mine");
 	expect(lstatSync(join(root, ".mcp.json")).isSymbolicLink()).toBe(false);
-	expect(listAgentFolderLeftovers(root, paths)).toEqual([
-		".mcp.json",
-		".claude/settings.local.json",
-	]);
-	await removeWorkspaceContextFiles(root, paths);
-	expect(readFileSync(join(root, ".mcp.json"), "utf8")).toBe("mine");
 	expect(
 		readFileSync(join(root, ".claude", "settings.local.json"), "utf8"),
 	).toBe("approvals");
-	expect(existsSync(join(root, ".claude", "settings.json"))).toBe(false);
+	expect(listAgentFolderLeftovers(root, paths)).toEqual([".mcp.json"]);
+	await removeWorkspaceContextFiles(root, paths);
+	expect(readFileSync(join(root, ".mcp.json"), "utf8")).toBe("mine");
+	expect(existsSync(join(root, ".claude"))).toBe(false);
 });
 
 test("config links follow the primary and are reaped when its file is gone", () => {
@@ -359,6 +356,7 @@ test("a checkout at a root entry's name is never written, linked into or removed
 	addSkill(claude, "", "own");
 	symlinkSync("own", join(claude.path, "skills", "alias"));
 	addFile(claude, "settings.json", "claude repo");
+	addFile(claude, "settings.local.json", "claude repo local");
 	addFile(app, "attachments/notes.txt", "kept");
 	const all = [web, claude, agents, app];
 	const paths = all.map((repo) => repo.path);
@@ -379,6 +377,9 @@ test("a checkout at a root entry's name is never written, linked into or removed
 	expect(readlinkSync(linkAt(".claude", "alias"))).toBe("own");
 	expect(readFileSync(join(claude.path, "settings.json"), "utf8")).toBe(
 		"claude repo",
+	);
+	expect(readFileSync(join(claude.path, "settings.local.json"), "utf8")).toBe(
+		"claude repo local",
 	);
 	expect(readFileSync(join(app.path, "attachments", "notes.txt"), "utf8")).toBe(
 		"kept",

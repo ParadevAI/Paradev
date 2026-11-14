@@ -77,17 +77,6 @@ export function getLiveRepositoryAtPath(
 		.get()?.repository;
 }
 
-export function getRepositoryAtPathIncludingDeleted(
-	db: HostDb,
-	repoPath: string,
-): HostRepositoryRow | undefined {
-	return db
-		.select()
-		.from(repositories)
-		.where(eq(repositories.repoPath, repoPath))
-		.get();
-}
-
 export function toRepositorySnapshot(
 	row: HostRepositoryRow,
 	primaryRepositoryId: string,

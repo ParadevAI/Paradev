@@ -49,6 +49,16 @@ describe("listGitIgnoredDirs", () => {
 		expect(await listGitIgnoredDirs(dir)).toEqual([]);
 	});
 
+	test("returns [] for a non-git folder inside a repository", async () => {
+		const dir = await createRepo();
+		await writeFile(path.join(dir, ".gitignore"), "build/\n");
+		const inner = path.join(dir, "root");
+		await mkdir(path.join(inner, "build"), { recursive: true });
+		await writeFile(path.join(inner, "build", "out.js"), "x");
+
+		expect(await listGitIgnoredDirs(inner)).toEqual([]);
+	});
+
 	test("returns [] for a missing path", async () => {
 		expect(
 			await listGitIgnoredDirs("/nonexistent/definitely-not-here"),

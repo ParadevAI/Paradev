@@ -31,6 +31,7 @@ import {
 	applyRelocations,
 	type CreateProjectResult,
 	classifyGitFailure,
+	duplicateNameError,
 	type Relocation,
 	type ResolvedSource,
 	removeCreated,
@@ -384,8 +385,17 @@ async function placeExisting(
 			),
 		);
 	} catch (err) {
-		if (!isUniqueViolation(err)) throw err;
 		await removeCreated(created);
+		if (!isUniqueViolation(err)) throw err;
+		if (isNameClash(err)) {
+			const taken = new Set(
+				listProjectRepositories(ctx.db, projectId).map((row) => row.name),
+			);
+			const name =
+				added.find(({ repository }) => taken.has(repository.name))?.repository
+					.name ?? "";
+			throw duplicateNameError(name);
+		}
 		throw raceIdTakenError(projectId, err);
 	}
 	if (project.deletedAt != null && !restoreProject(ctx, projectId)) {
@@ -651,6 +661,13 @@ function isUniqueViolation(err: unknown): boolean {
 		) {
 			return true;
 		}
+	}
+	return false;
+}
+
+function isNameClash(err: unknown): boolean {
+	for (let e = err; e instanceof Error; e = e.cause) {
+		if (e.message.includes("repositories.name")) return true;
 	}
 	return false;
 }

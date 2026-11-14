@@ -13,9 +13,9 @@ import {
 import type { ProjectSnapshot } from "../../../events/types";
 import {
 	emitProjectChanged,
+	getDeletedSingleRepositoryProjectAtPath,
 	getLiveProjectAtPath,
 	getLocalProject,
-	getProjectAtPathIncludingDeleted,
 	type HostProjectRow,
 	toProjectSnapshot,
 } from "../../../projects/local-project-store";
@@ -45,6 +45,7 @@ import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
 	type AdoptOptions,
 	adoptLocalRepo,
+	cloneDirectoryName,
 	cloneRepoInto,
 	cloneTemplateInto,
 	initEmptyRepo,
@@ -166,6 +167,20 @@ async function resolveSource(
 	}
 }
 
+/** The folder a source makes in parentDir; sources that make none give []. */
+function createdFolderName(source: RepositorySource): string[] {
+	switch (source.kind) {
+		case "local":
+			return [];
+		case "clone":
+			return [cloneDirectoryName(source.url)];
+		case "empty":
+			return [dirNameForEmpty(source.name)];
+		case "template":
+			return [dirNameForTemplate(source.url)];
+	}
+}
+
 export async function removeCreated(sources: ResolvedSource[]): Promise<void> {
 	for (const { resolved, created } of sources) {
 		if (!created) continue;
@@ -186,6 +201,7 @@ async function resolveSources(
 	parentDir: string | undefined,
 	signal?: AbortSignal,
 ): Promise<ResolvedSource[]> {
+	requireUniqueNames(sources.flatMap(createdFolderName));
 	const settled = await Promise.allSettled(
 		sources.map((source) => resolveSource(ctx, source, parentDir, signal)),
 	);
@@ -200,7 +216,7 @@ async function resolveSources(
 	return done;
 }
 
-function duplicateNameError(name: string): TRPCError {
+export function duplicateNameError(name: string): TRPCError {
 	return new TRPCError({
 		code: "CONFLICT",
 		message: `duplicate_name: the project already has a repository named "${name}"`,
@@ -353,14 +369,16 @@ export async function createProject(
 	const [first] = args.repositories;
 	if (args.repositories.length === 1 && first?.kind === "local") {
 		const { resolved } = await resolveSource(ctx, first, args.parentDir);
-		// Importing a folder that already is a project returns that project
-		// untouched; a deleted one is restored.
-		const existing =
-			getLiveProjectAtPath(ctx.db, resolved.repoPath) ??
-			getProjectAtPathIncludingDeleted(ctx.db, resolved.repoPath);
-		if (existing) {
-			restoreProject(ctx, existing.id);
-			return { ...snapshotOf(ctx, existing.id), created: false };
+		const live = getLiveProjectAtPath(ctx.db, resolved.repoPath);
+		if (live) return { ...snapshotOf(ctx, live.id), created: false };
+		// A deleted multi-repo project is restored only from settings, as a whole.
+		const deleted = getDeletedSingleRepositoryProjectAtPath(
+			ctx.db,
+			resolved.repoPath,
+		);
+		if (deleted) {
+			restoreProject(ctx, deleted.id);
+			return { ...snapshotOf(ctx, deleted.id), created: false };
 		}
 		return {
 			...insertProject(ctx, name, [{ resolved, created: false }]),

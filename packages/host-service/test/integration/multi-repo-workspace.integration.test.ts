@@ -435,7 +435,7 @@ test("files an agent left in the root warn and block the delete; a forced delete
 	const workspace = await createBoth(scenario);
 	const root = workspace.worktreePath;
 	mkdirSync(join(root, ".claude"));
-	writeFileSync(join(root, ".claude", "settings.local.json"), "{}");
+	writeFileSync(join(root, ".claude", "notes.md"), "mine");
 
 	const inspected = await scenario.host.trpc.workspaceCleanup.inspect.query({
 		workspaceId: workspace.id,
@@ -446,13 +446,27 @@ test("files an agent left in the root warn and block the delete; a forced delete
 			workspaceId: workspace.id,
 		}),
 	).rejects.toThrow(
-		"Workspace folder has files outside the repositories: .claude/settings.local.json",
+		"Workspace folder has files outside the repositories: .claude/notes.md",
 	);
 	expect(existsSync(join(root, "api"))).toBe(true);
 
 	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
 		workspaceId: workspace.id,
 		force: true,
+	});
+	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
+	expect(existsSync(root)).toBe(false);
+});
+
+test("Claude Code's approvals in the root do not block the delete and go with the root", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const root = workspace.worktreePath;
+	mkdirSync(join(root, ".claude"));
+	writeFileSync(join(root, ".claude", "settings.local.json"), "{}");
+
+	const result = await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
 	});
 	expect(result).toMatchObject({ worktreeRemoved: true, warnings: [] });
 	expect(existsSync(root)).toBe(false);
@@ -499,6 +513,29 @@ test("restoring a deleted multi-repo workspace brings back every checkout", asyn
 		});
 	}
 	expect(existsSync(join(workspace.worktreePath, "AGENTS.md"))).toBe(true);
+});
+
+test("a failed multi-repo restore removes the checkouts it made and the root, and stays archived", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	await scenario.host.trpc.workspaceCleanup.destroy.mutate({
+		workspaceId: workspace.id,
+	});
+	await scenario.web.git.branch(["-D", "feature/both"]);
+
+	await expect(
+		scenario.host.trpc.workspaces.restore.mutate({
+			workspaceId: workspace.id,
+		}),
+	).rejects.toThrow(/^web: Branch "feature\/both" is not on this device/);
+
+	expect(existsSync(workspace.worktreePath)).toBe(false);
+	expect(worktreeCount(scenario.api.repoPath)).toBe(1);
+	expect(worktreeCount(scenario.web.repoPath)).toBe(1);
+	const row = await scenario.host.trpc.workspace.get.query({
+		id: workspace.id,
+	});
+	expect(row.archivedAt).not.toBeNull();
 });
 
 test("each repository branches from the base branch picked for it, the rest from their default", async () => {

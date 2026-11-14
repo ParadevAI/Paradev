@@ -29,9 +29,9 @@ import { resolveGithubRepo } from "../trpc/router/workspace-creation/shared/proj
 import type { HostServiceContext } from "../types";
 import { insertLocalWorkspace } from "../workspaces/local-workspace-store";
 import {
+	getDeletedSingleRepositoryProjectAtPath,
 	getLiveProjectAtPath,
 	getLocalProject,
-	getProjectAtPathIncludingDeleted,
 	getProjectIncludingDeleted,
 } from "./local-project-store";
 
@@ -49,12 +49,12 @@ function tempDir(): string {
 	return dir;
 }
 
-async function createRepo(): Promise<string> {
+async function createRepo(name = "demo"): Promise<string> {
 	const git = createUserSimpleGit(tempDir());
 	await git.init();
 	await git.addConfig("user.email", "test@test.local");
 	await git.addConfig("user.name", "Test");
-	await git.addRemote("origin", "https://github.com/acme/demo.git");
+	await git.addRemote("origin", `https://github.com/acme/${name}.git`);
 	await git.raw(["commit", "--allow-empty", "-m", "init"]);
 	return (await git.revparse(["--show-toplevel"])).trim();
 }
@@ -237,6 +237,51 @@ describe("lookups that must still see a deleted project", () => {
 		expect(getLocalProject(env.ctx.db, env.projectId)?.name).toBe("Demo");
 	});
 
+	async function deletedMultiRepoProject(env: Env) {
+		const x = await createRepo("x");
+		const y = await createRepo("y");
+		const multi = await createProject(env.ctx, {
+			name: "Multi",
+			repositories: [
+				{ kind: "local", path: x },
+				{ kind: "local", path: y },
+			],
+		});
+		await env.project.remove({ projectId: multi.id });
+		return { x, y, multiId: multi.id };
+	}
+
+	it("importing one folder of a deleted multi-repo project creates a new project", async () => {
+		const env = await setUp();
+		const { y, multiId } = await deletedMultiRepoProject(env);
+		const imported = await createProject(env.ctx, {
+			name: "Only y",
+			repositories: [{ kind: "local", path: y }],
+		});
+		expect(imported.created).toBe(true);
+		expect(imported.id).not.toBe(multiId);
+		expect(imported.name).toBe("Only y");
+		expect(getLocalProject(env.ctx.db, multiId)).toBeUndefined();
+	});
+
+	it("importing a folder of a deleted multi-repo project works while another of its folders is in use", async () => {
+		const env = await setUp();
+		const { x, y, multiId } = await deletedMultiRepoProject(env);
+		await createProject(env.ctx, {
+			name: "Uses y",
+			repositories: [
+				{ kind: "local", path: y },
+				{ kind: "local", path: await createRepo("z") },
+			],
+		});
+		const imported = await createProject(env.ctx, {
+			name: "Only x",
+			repositories: [{ kind: "local", path: x }],
+		});
+		expect(imported).toMatchObject({ name: "Only x", created: true });
+		expect(getLocalProject(env.ctx.db, multiId)).toBeUndefined();
+	});
+
 	it("workspace checks still resolve the project's checkout", async () => {
 		const env = await setUp();
 		await env.project.remove({ projectId: env.projectId });
@@ -248,9 +293,9 @@ describe("lookups that must still see a deleted project", () => {
 		const env = await setUp();
 		await env.project.remove({ projectId: env.projectId });
 		expect(getLiveProjectAtPath(env.ctx.db, env.repo)).toBeUndefined();
-		expect(getProjectAtPathIncludingDeleted(env.ctx.db, env.repo)?.id).toBe(
-			env.projectId,
-		);
+		expect(
+			getDeletedSingleRepositoryProjectAtPath(env.ctx.db, env.repo)?.id,
+		).toBe(env.projectId);
 		expect(
 			env.ctx.db
 				.select()

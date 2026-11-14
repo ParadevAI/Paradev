@@ -101,8 +101,11 @@ export const createForWorkspace = protectedProcedure
 		// network) must not surface as a create failure; the background sync
 		// links it within its next pass anyway.
 		try {
-			await ctx.runtime.pullRequests.refreshPullRequestsByWorkspaces([
-				input.workspaceId,
+			await ctx.runtime.pullRequests.refreshPullRequestsByCheckouts([
+				{
+					workspaceId: input.workspaceId,
+					repositoryId: checkout.repository.id,
+				},
 			]);
 		} catch (error) {
 			console.warn(

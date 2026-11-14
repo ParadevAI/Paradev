@@ -1221,7 +1221,7 @@ async function restoreArchivedWorkspace(
 				mkdirSync(row.worktreePath, { recursive: true }) !== undefined;
 			try {
 				for (const checkout of checkouts) {
-					if (await recreateArchivedCheckout(ctx, checkout)) {
+					if (await recreateArchivedCheckout(ctx, checkout, multiRepo)) {
 						recreated.push(checkout);
 					}
 				}
@@ -1267,6 +1267,7 @@ async function restoreArchivedWorkspace(
 async function recreateArchivedCheckout(
 	ctx: HostServiceContext,
 	checkout: Checkout,
+	multiRepo: boolean,
 ): Promise<boolean> {
 	const { repository, path } = checkout;
 	const branch = checkout.row.branch;
@@ -1316,20 +1317,33 @@ async function recreateArchivedCheckout(
 				message: where(`A folder already exists at ${path}`),
 			});
 		case "branch-missing":
-			throw userError({
+			throw restoreError(multiRepo, {
 				code: "NOT_FOUND",
-				message: `Branch "${branch}" is not on this device or on ${remoteName}. Only pushed commits can be restored.`,
+				message: where(
+					`Branch "${branch}" is not on this device or on ${remoteName}. Only pushed commits can be restored.`,
+				),
 				i18nKey: "serverError.workspaces.restoreBranchMissing",
 				params: { branch, remote: remoteName },
 			});
 		case "fetch-failed":
-			throw userError({
+			throw restoreError(multiRepo, {
 				code: "BAD_GATEWAY",
-				message: `Could not reach ${remoteName} to look for branch "${branch}". Check your connection and access to ${remoteName}, then try again.`,
+				message: where(
+					`Could not reach ${remoteName} to look for branch "${branch}". Check your connection and access to ${remoteName}, then try again.`,
+				),
 				i18nKey: "serverError.workspaces.restoreFetchFailed",
 				params: { branch, remote: remoteName },
 			});
 	}
+}
+
+/** The translated message has no repository name, so only a single checkout gets it. */
+function restoreError(
+	multiRepo: boolean,
+	opts: Parameters<typeof userError>[0],
+): TRPCError {
+	if (!multiRepo) return userError(opts);
+	return new TRPCError({ code: opts.code, message: opts.message });
 }
 
 interface CreatedWorkspaceState {

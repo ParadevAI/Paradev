@@ -426,7 +426,7 @@ export async function seedAgentFolderTrust(
 		}
 	} catch (err) {
 		console.warn(
-			`[agents.run] failed to pre-trust session folder '${folderPath}' for agent '${config.presetId}':`,
+			`[agents.run] failed to pre-trust workspace folder '${folderPath}' for agent '${config.presetId}':`,
 			err,
 		);
 	}

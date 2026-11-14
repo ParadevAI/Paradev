@@ -27,11 +27,11 @@ describe("buildSetupInput", () => {
 				repositories: [
 					{
 						id: "r-api",
-						mode: { kind: "clone", parentDir: "/code", allowRelocate: true },
+						mode: { kind: "clone", parentDir: "/code" },
 					},
 					{
 						id: "r-web",
-						mode: { kind: "clone", parentDir: "/code", allowRelocate: true },
+						mode: { kind: "clone", parentDir: "/code" },
 					},
 					{
 						id: "r-docs",

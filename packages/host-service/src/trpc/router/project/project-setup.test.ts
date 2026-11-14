@@ -943,3 +943,133 @@ describe("project.setup", () => {
 		]);
 	});
 });
+
+describe("project.setup refusals", () => {
+	it("refuses a repository id that another project on this host has", async () => {
+		const { caller } = setup();
+		const first = origin([{ name: "web", url: null }]);
+		await caller.setup({
+			projectId: first.projectId,
+			origin: first.origin,
+			repositories: [
+				{
+					id: first.ids[0] as string,
+					mode: { kind: "import", path: await repo() },
+				},
+			],
+		});
+		const taken = first.ids[0] as string;
+
+		await expect(
+			caller.setup({
+				projectId: randomUUID(),
+				origin: {
+					name: "Other",
+					primaryRepositoryId: taken,
+					repositories: [{ id: taken, name: "api", url: null }],
+				},
+				repositories: [
+					{ id: taken, mode: { kind: "import", path: await repo() } },
+				],
+			}),
+		).rejects.toMatchObject({
+			code: "CONFLICT",
+			message: expect.stringContaining("repository_id_taken"),
+		});
+		expect((await caller.list()).map((p) => p.id)).toEqual([first.projectId]);
+	});
+
+	it("refuses an origin whose primary repository is not in its list", async () => {
+		const { caller } = setup();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+
+		await expect(
+			caller.setup({
+				projectId,
+				origin: { ...from, primaryRepositoryId: randomUUID() },
+				repositories: [
+					{
+						id: ids[0] as string,
+						mode: { kind: "import", path: await repo() },
+					},
+				],
+			}),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("invalid_origin"),
+		});
+		expect(await caller.list()).toEqual([]);
+	});
+
+	it("refuses a repository placed twice", async () => {
+		const { caller } = setup();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const path = await repo();
+
+		await expect(
+			caller.setup({
+				projectId,
+				origin: from,
+				repositories: [
+					{ id: ids[0] as string, mode: { kind: "import", path } },
+					{ id: ids[0] as string, mode: { kind: "import", path } },
+				],
+			}),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("duplicate_placement"),
+		});
+		expect(await caller.list()).toEqual([]);
+	});
+
+	it("refuses to clone a repository that has no remote", async () => {
+		const { caller } = setup();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const parentDir = join(root, "no-clone-url");
+
+		await expect(
+			caller.setup({
+				projectId,
+				origin: from,
+				repositories: [
+					{ id: ids[0] as string, mode: { kind: "clone", parentDir } },
+				],
+			}),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("no_clone_url"),
+		});
+		expect(existsSync(parentDir)).toBe(false);
+	});
+
+	it("refuses a project this host does not have when no origin is passed", async () => {
+		const { caller } = setup();
+
+		await expect(
+			caller.setup({
+				projectId: randomUUID(),
+				repositories: [
+					{
+						id: randomUUID(),
+						mode: { kind: "import", path: await repo() },
+					},
+				],
+			}),
+		).rejects.toMatchObject({
+			code: "NOT_FOUND",
+			message: expect.stringContaining("not_set_up"),
+		});
+	});
+});

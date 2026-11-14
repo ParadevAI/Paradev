@@ -207,20 +207,24 @@ export function listDeletedProjects(ctx: Pick<ProjectDeletionContext, "db">) {
 		.from(projects)
 		.where(isNotNull(projects.deletedAt))
 		.all()
-		.map((row) => ({
-			id: row.id,
-			name: row.name || row.id,
-			repositoryPaths: listProjectRepositories(ctx.db, row.id).map(
-				(r) => r.repoPath,
-			),
-			deletedAt: row.deletedAt as number,
-			deletedByUserId: row.deletedByUserId,
-			purgeAt: (row.deletedAt as number) + PROJECT_RESTORE_WINDOW_MS,
-			workspaceCount: workspacesDeletedWith(ctx, {
+		.map((row) => {
+			const repositoryRows = listProjectRepositories(ctx.db, row.id);
+			const primary = repositoryRows.find(
+				(r) => r.id === row.primaryRepositoryId,
+			);
+			return {
 				id: row.id,
+				name: row.name || primary?.name || row.id,
+				repositoryPaths: repositoryRows.map((r) => r.repoPath),
 				deletedAt: row.deletedAt as number,
-			}).length,
-		}));
+				deletedByUserId: row.deletedByUserId,
+				purgeAt: (row.deletedAt as number) + PROJECT_RESTORE_WINDOW_MS,
+				workspaceCount: workspacesDeletedWith(ctx, {
+					id: row.id,
+					deletedAt: row.deletedAt as number,
+				}).length,
+			};
+		});
 }
 
 /**

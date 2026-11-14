@@ -49,7 +49,7 @@ export function buildSetupInput({
 		} else if (repository.url && cloneInto) {
 			repositories.push({
 				id: repository.id,
-				mode: { kind: "clone", parentDir: cloneInto, allowRelocate: true },
+				mode: { kind: "clone", parentDir: cloneInto },
 			});
 		} else {
 			missing.push(repository.name);

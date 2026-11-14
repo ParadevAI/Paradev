@@ -44,6 +44,9 @@ export const WORKSPACE_CONFIG_LINKS = [
 	{ path: ".cursor/rules", type: "dir" },
 ] as const;
 
+/** Claude Code writes the root's approvals here; the host never edits it, only removes it with the root. */
+const CLAUDE_LOCAL_SETTINGS = ".claude/settings.local.json";
+
 const INSTRUCTION_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 
 export interface ContextCheckout {
@@ -223,6 +226,9 @@ export async function removeWorkspaceContextFiles(
 		if (!taken.has(file)) removeFile(join(root, file));
 	}
 	syncConfigLinks(root, undefined, checkoutPaths, taken);
+	if (isClaudeLocalSettings(root, taken)) {
+		removeFile(join(root, CLAUDE_LOCAL_SETTINGS));
+	}
 	for (const folder of WORKSPACE_SKILL_FOLDERS) {
 		if (taken.has(folder)) continue;
 		const skills = join(root, folder, "skills");
@@ -263,8 +269,8 @@ export async function removeWorkspaceContextFiles(
 
 /**
  * What a user or agent put at `.mcp.json`, in the root's agent folders or in
- * the app folder, as root-relative paths; the host's own links and the
- * attachments are not listed.
+ * the app folder, as root-relative paths; the host's own links, the
+ * attachments and Claude Code's local settings are not listed.
  */
 export function listAgentFolderLeftovers(
 	root: string,
@@ -295,6 +301,12 @@ export function listAgentFolderLeftovers(
 		}
 		for (const entry of entries) {
 			const entryPath = `${folder}/${entry}`;
+			if (
+				entryPath === CLAUDE_LOCAL_SETTINGS &&
+				isClaudeLocalSettings(root, taken)
+			) {
+				continue;
+			}
 			if (configLinks.has(entryPath)) {
 				if (!isLinkIntoCheckouts(join(path, entry), checkoutPaths)) {
 					leftovers.push(entryPath);
@@ -445,6 +457,19 @@ function syncConfigLinks(
 		}
 	}
 	return linked;
+}
+
+function isClaudeLocalSettings(
+	root: string,
+	taken: ReadonlySet<string>,
+): boolean {
+	if (taken.has(".claude") || !isRealFolderPath(root, join(root, ".claude")))
+		return false;
+	try {
+		return lstatSync(join(root, CLAUDE_LOCAL_SETTINGS)).isFile();
+	} catch {
+		return false;
+	}
 }
 
 function isEntryOfType(path: string, type: "file" | "dir"): boolean {

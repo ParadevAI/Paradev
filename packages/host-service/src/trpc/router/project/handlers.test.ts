@@ -82,3 +82,23 @@ describe("createProject with a clone", () => {
 		expect(existsSync(join(parentDir, "Hello-World"))).toBe(false);
 	});
 });
+
+describe("createProject with several clones", () => {
+	it("refuses two clones into the same folder name before cloning", async () => {
+		const parentDir = mkdtempSync(join(tmpdir(), "clone-project-"));
+		tempDirs.push(parentDir);
+		useGitWithoutCommandLineTools();
+
+		const error = (await createProject({} as HostServiceContext, {
+			name: "apps",
+			repositories: [
+				{ kind: "clone", url: "https://github.com/a/app" },
+				{ kind: "clone", url: "https://github.com/b/app" },
+			],
+			parentDir,
+		}).catch((err: unknown) => err)) as TRPCError;
+
+		expect(error.code).toBe("CONFLICT");
+		expect(error.message).toStartWith("duplicate_name:");
+	});
+});
