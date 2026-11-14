@@ -89,7 +89,7 @@ export function useNearRows(
 			if (previous) observerRef.current?.unobserve(previous);
 			if (!element) {
 				elements.current.delete(rowKey);
-				refs.current.delete(rowKey);
+				if (refs.current.get(rowKey) === ref) refs.current.delete(rowKey);
 				setSeenRowKeys((keys) => {
 					if (!keys.has(rowKey)) return keys;
 					const next = new Set(keys);
@@ -100,6 +100,7 @@ export function useNearRows(
 			}
 			element.dataset.rowKey = rowKey;
 			elements.current.set(rowKey, element);
+			refs.current.set(rowKey, ref);
 			observerRef.current?.observe(element);
 		};
 		refs.current.set(rowKey, ref);
