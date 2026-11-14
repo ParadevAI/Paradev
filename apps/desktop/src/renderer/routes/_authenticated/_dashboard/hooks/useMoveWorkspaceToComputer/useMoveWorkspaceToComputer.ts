@@ -32,6 +32,7 @@ import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 import { useWorkspaceRepositoryFullNames } from "../useWorkspaceRepositoryFullNames";
 import { closestPartialProject } from "./utils/closestPartialProject";
 import { earlyMoveRepositoryNames } from "./utils/earlyMoveRepositoryNames";
+import { preparedRepositoryFullNames } from "./utils/preparedRepositoryFullNames";
 
 export type MoveToComputerStage = "saving" | "creating";
 
@@ -196,17 +197,15 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 								leaving.terminals,
 							);
 						}
-						// Hosts older than multi-repo workspaces return no snapshots.
-						if (!Array.isArray(prepared.snapshots)) {
+						const repositoryFullNames = preparedRepositoryFullNames(prepared);
+						if (!repositoryFullNames) {
 							throw new Error(
 								fromCloud
 									? t`Update the cloud workspace to move it`
 									: t`Update the host this workspace is on to move it`,
 							);
 						}
-						const project = requireProject(
-							prepared.snapshots.map((snapshot) => snapshot.repositoryFullName),
-						);
+						const project = requireProject(repositoryFullNames);
 						moveSignal.throwIfAborted();
 
 						onStage("creating");

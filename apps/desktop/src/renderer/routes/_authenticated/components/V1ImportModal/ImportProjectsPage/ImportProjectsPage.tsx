@@ -8,6 +8,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { LuFolder } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
 import {
 	decideProjectImport,
 	expectedRemoteUrlFor,
@@ -219,7 +220,9 @@ export function ImportProjectsPage({
 						});
 					}
 				} catch (err) {
-					const message = err instanceof Error ? err.message : String(err);
+					const message = hostRefusalReason(
+						err instanceof Error ? err.message : String(err),
+					);
 					updateImportStatus(project.id, { kind: "error", message });
 					console.error("[v1-import] project import all failed", {
 						v1ProjectId: project.id,
@@ -456,7 +459,9 @@ function ProjectRow({
 			onStatusChange({ kind: "imported", v2ProjectId: result.v2ProjectId });
 			await invalidateProjectImportQueries(queryClient, project);
 		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
+			const message = hostRefusalReason(
+				err instanceof Error ? err.message : String(err),
+			);
 			onStatusChange({ kind: "error", message });
 			console.error("[v1-import] project import failed", {
 				v1ProjectId: project.id,
