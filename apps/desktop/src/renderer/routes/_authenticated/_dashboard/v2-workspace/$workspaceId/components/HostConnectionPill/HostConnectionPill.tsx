@@ -29,7 +29,11 @@ export function HostConnectionPill() {
 	const { failing: checksFailing, retry: retryChecks } =
 		useChatSessionChecksFailing(hostUrl);
 	const { hosts: hostRows } = useKnownHosts();
-	const { targets: sandboxes, usageRefusal } = useSandboxAccess();
+	const {
+		targets: sandboxes,
+		usageRefusal,
+		wakeOpenWorkspace,
+	} = useSandboxAccess();
 	const isSandbox = sandboxes.some(
 		(sandbox) => sandbox.workspaceId === workspace.hostId,
 	);
@@ -120,7 +124,16 @@ export function HostConnectionPill() {
 					</Link>
 				) : null
 			}
-			onRetry={isCheckFailing ? retryChecks : onRetry}
+			onRetry={
+				isCheckFailing
+					? retryChecks
+					: isSandbox
+						? () =>
+								void wakeOpenWorkspace()
+									.catch(() => {})
+									.then(onRetry)
+						: onRetry
+			}
 		/>
 	);
 }

@@ -11,7 +11,7 @@ import {
 } from "renderer/lib/host-service-client";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
+import { sandboxAccess } from "renderer/routes/_authenticated/utils/sandboxAccess";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
@@ -126,7 +126,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						moveSignal.throwIfAborted();
 						// From the sidebar a cloud box may be asleep: waking it also gives a fresh address.
 						const sourceUrl = fromCloud
-							? (await requestSandboxAccess(workspace.id, true)).url
+							? (await sandboxAccess.wake(workspace.id)).url
 							: hostUrlOf(workspace.hostId);
 						const source = getHostServiceClientByUrl(sourceUrl);
 						leaving.source = source;

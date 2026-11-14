@@ -244,6 +244,18 @@
 			"types": "./src/sandbox/gate.ts",
 			"default": "./src/sandbox/gate.ts"
 		},
+		"./sandbox/access": {
+			"types": "./src/sandbox/access.ts",
+			"default": "./src/sandbox/access.ts"
+		},
+		"./sandbox/reach": {
+			"types": "./src/sandbox/reach.ts",
+			"default": "./src/sandbox/reach.ts"
+		},
+		"./sandbox/watch": {
+			"types": "./src/sandbox/watch.ts",
+			"default": "./src/sandbox/watch.ts"
+		},
 		"./sentry": {
 			"types": "./src/sentry.ts",
 			"default": "./src/sentry.ts"

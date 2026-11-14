@@ -9,16 +9,19 @@ import {
 import {
 	createContext,
 	type ReactNode,
+	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useState,
 } from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import {
-	requestSandboxAccess,
 	type SandboxAccess,
-} from "renderer/routes/_authenticated/utils/requestSandboxAccess";
+	sandboxAccess,
+} from "renderer/routes/_authenticated/utils/sandboxAccess";
+import { useWakeWhenStopped } from "./hooks/useWakeWhenStopped";
 import {
 	accessRefetchInterval,
 	createFailureStreak,
@@ -48,6 +51,8 @@ export interface SandboxAccessValue {
 	/** The open workspace, when its box booted with agent sign-ins its creator has since changed. */
 	agentCredentialsChangedWorkspaceId: string | null;
 	usageRefusal: { workspaceId: string; error: unknown } | null;
+	/** Wakes the open workspace's box now; rejects when the wake failed. */
+	wakeOpenWorkspace: () => Promise<void>;
 }
 
 export const SandboxAccessContext = createContext<SandboxAccessValue | null>(
@@ -68,6 +73,7 @@ export function refreshSandboxAccess(
 	queryClient: QueryClient,
 	workspaceId: string,
 ): Promise<void> {
+	sandboxAccess.refresh(workspaceId);
 	return Promise.all([
 		queryClient.invalidateQueries({
 			queryKey: sandboxAccessQueryKey(workspaceId),
@@ -121,6 +127,11 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		[cloudWorkspaces],
 	);
 
+	useEffect(() => {
+		if (!cloudWorkspaces) return;
+		sandboxAccess.prune(new Set(cloudWorkspaces.map(({ id }) => id)));
+	}, [cloudWorkspaces]);
+
 	const [failureStreak] = useState(createFailureStreak);
 	const access = useQueries({
 		queries: workspaces.map((workspace) => ({
@@ -128,7 +139,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 			// The gate is reachable over the public internet, so this must not
 			// pause with navigator.onLine the way the default mode would.
 			networkMode: "always" as const,
-			queryFn: () => requestSandboxAccess(workspace.id, false),
+			queryFn: () => sandboxAccess.address(workspace.id),
 			refetchInterval: (query: {
 				queryHash: string;
 				state: {
@@ -156,7 +167,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		networkMode: "always",
 		queryFn: async () => {
 			if (!openWorkspace) return null;
-			const access = await requestSandboxAccess(openWorkspace.id, true);
+			const access = await sandboxAccess.wake(openWorkspace.id);
 			queryClient.setQueryData(sandboxAccessQueryKey(openWorkspace.id), access);
 			return access;
 		},
@@ -171,6 +182,12 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		refetchIntervalInBackground: true,
 		gcTime: 0,
 	});
+
+	const { refetch: refetchWake } = wake;
+	const wakeOpenWorkspace = useCallback(async () => {
+		const result = await refetchWake({ cancelRefetch: false });
+		if (result.error) throw result.error;
+	}, [refetchWake]);
 
 	const targets = useMemo(() => {
 		const next: SandboxTarget[] = [];
@@ -187,6 +204,12 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		return next;
 	}, [workspaces, access, organizationId]);
 
+	useWakeWhenStopped(
+		targets.find((target) => target.workspaceId === openWorkspace?.id)?.url ??
+			null,
+		wakeOpenWorkspace,
+	);
+
 	const value = useMemo<SandboxAccessValue>(
 		() => ({
 			targets,
@@ -199,8 +222,17 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 				openWorkspace && isCloudUsageRefusal(wake.error)
 					? { workspaceId: openWorkspace.id, error: wake.error }
 					: null,
+			wakeOpenWorkspace,
 		}),
-		[targets, cloudWorkspaces, access, openWorkspace, wake.data, wake.error],
+		[
+			targets,
+			cloudWorkspaces,
+			access,
+			openWorkspace,
+			wake.data,
+			wake.error,
+			wakeOpenWorkspace,
+		],
 	);
 
 	return (
@@ -210,14 +242,15 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 	);
 }
 
+const NO_SANDBOX_ACCESS: SandboxAccessValue = {
+	targets: [],
+	isReady: true,
+	agentCredentialsChangedWorkspaceId: null,
+	usageRefusal: null,
+	wakeOpenWorkspace: async () => {},
+};
+
 /** Empty (never null) so consumers work outside the provider, e.g. in tests. */
 export function useSandboxAccess(): SandboxAccessValue {
-	return (
-		useContext(SandboxAccessContext) ?? {
-			targets: [],
-			isReady: true,
-			agentCredentialsChangedWorkspaceId: null,
-			usageRefusal: null,
-		}
-	);
+	return useContext(SandboxAccessContext) ?? NO_SANDBOX_ACCESS;
 }

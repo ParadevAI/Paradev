@@ -1,3 +1,5 @@
+import { createSandboxAccess } from "@superset/shared/sandbox/access";
+import { callWithWake } from "@superset/shared/sandbox/reach";
 import { z } from "zod";
 import type { McpContext } from "./auth";
 import { createMcpCaller } from "./caller";
@@ -65,27 +67,30 @@ export async function workspaceServiceCall<TOutput>(
 	}
 	await requireCloudUnlessHost(input, ctx);
 	const caller = createMcpCaller(ctx);
-	const gate = (access: { url: string; token: string }) => ({
-		gateUrl: access.url,
-		ticket: access.token,
+	const access = createSandboxAccess(async (id, wake) => {
+		const granted = wake
+			? await caller.cloudWorkspace.access({ id, wake: true })
+			: await caller.cloudWorkspace.hostTicket({ id });
+		return {
+			url: granted.url,
+			token: granted.token,
+			expiresAt: new Date(granted.expiresAt).getTime(),
+		};
+	});
+	return callWithWake({
+		access,
 		workspaceId: input.workspaceId,
+		call: (grant) =>
+			hostServiceCall<TOutput>(
+				{
+					gateUrl: grant.url,
+					ticket: grant.token,
+					workspaceId: input.workspaceId,
+				},
+				procedure,
+				method,
+				payload,
+			),
+		isUnanswered: (error) => error instanceof HostServiceUnreachableError,
 	});
-	const ticket = await caller.cloudWorkspace.hostTicket({
-		id: input.workspaceId,
-	});
-	try {
-		return await hostServiceCall<TOutput>(
-			gate(ticket),
-			procedure,
-			method,
-			payload,
-		);
-	} catch (error) {
-		if (!(error instanceof HostServiceUnreachableError)) throw error;
-		const woken = await caller.cloudWorkspace.access({
-			id: input.workspaceId,
-			wake: true,
-		});
-		return hostServiceCall<TOutput>(gate(woken), procedure, method, payload);
-	}
 }
