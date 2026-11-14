@@ -635,10 +635,10 @@ export class BrowserRuntimeRegistryImpl {
 		const observer = new ResizeObserver(() => {
 			this.updateLayout(entry);
 		});
+		// Its first notification places the webview, after layout and before paint.
 		observer.observe(placeholder);
 		entry.resizeObserver = observer;
 
-		this.updateLayout(entry);
 		this.applyShownStyle(entry);
 		this.applyPointerPassthrough(pointerPassthrough.active);
 	}
