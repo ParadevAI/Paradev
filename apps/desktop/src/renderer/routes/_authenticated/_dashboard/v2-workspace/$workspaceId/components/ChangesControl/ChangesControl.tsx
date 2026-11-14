@@ -11,7 +11,6 @@ import {
 } from "../../state/activeRepositoryStore";
 import { changesPillStats } from "../../utils/changesPillStats";
 import { ChangesStats } from "../ChangesStats";
-import { MultiRepoShipControl } from "./components/MultiRepoShipControl";
 import { PRStatusGroup } from "./components/PRStatusGroup";
 import { ShipControl } from "./components/ShipControl";
 
@@ -72,18 +71,7 @@ export const ChangesControl = memo(function ChangesControl({
 				message: "Open changes",
 			});
 
-	if (isMultiRepo) {
-		return (
-			<MultiRepoShipControl
-				workspaceId={workspaceId}
-				repositories={checkouts}
-				isChangesOpen={isChangesOpen}
-				toggleLabel={label}
-				onToggleChanges={onToggleChanges}
-				onOpenPullRequest={onOpenPullRequest}
-			/>
-		);
-	}
+	if (isMultiRepo) return null;
 
 	const hasPr =
 		flowState.kind === "pr-exists" ||

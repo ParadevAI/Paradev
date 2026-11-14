@@ -1,1 +1,0 @@
-export { RepositoryShipList } from "./RepositoryShipList";
