@@ -3531,6 +3531,51 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	for (const [ending, end] of [
+		["stopped", (agent: FakeAcpAgent) => agent.releasePrompts("cancelled")],
+		["failed", (agent: FakeAcpAgent) => agent.failHeldPrompts(-32603, "boom")],
+	] as const) {
+		it(`leaves a ${ending} turn as it ended when the agent starts a turn on its own`, async () => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.holdPrompts = true;
+			const { adapter, events } = startAdapter(agent);
+			await flush();
+			adapter.prompt([{ type: "text", text: "start a background subagent" }]);
+			await flush();
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_spawned",
+				asyncTaskId: "task-1",
+				name: "sleep 30",
+			});
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_state_update",
+				asyncTaskId: "task-1",
+				state: "completed",
+			});
+			end(agent);
+			await flush();
+
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_spawned",
+				asyncTaskId: "autonomous-turn-1",
+				name: "Claude is working",
+				taskType: "turn",
+			});
+			await flush();
+
+			const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+			const first = turns.filter((turn) => turn.id === "id-1");
+			expect(first.at(-1)?.status).toBe(
+				ending === "stopped" ? "interrupted" : "failed",
+			);
+			expect(turns.at(-1)?.id).not.toBe("id-1");
+			expect(turns.at(-1)?.status).toBe("running");
+
+			await adapter.dispose();
+		});
+	}
+
 	it("gives a turn the agent starts without background work a turn of its own", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;

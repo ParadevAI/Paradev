@@ -37,7 +37,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
 		fullAccessModeId: "bypassPermissions",
 		forkAtMessage: true,
-		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 is tested only with 2.1.311.",
+		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 verified with 2.1.226 and 2.1.311: a background subagent ends the turn at its reply, the follow-up arrives as a `turn` async task, and steering is advertised.",
 	},
 	"codex-acp": {
 		registryId: "codex-acp",
