@@ -277,6 +277,8 @@ export class FsWatcherManager {
 	private readonly ignore: string[];
 	private readonly listGitIgnoredDirs?: FsWatcherManagerOptions["listGitIgnoredDirs"];
 	private readonly findNestedRoots: typeof findNestedRepoRoots;
+	// Last-listener cleanup leaves the path maps immediately so it can be rewatched.
+	private readonly releasing = new Set<Promise<unknown>>();
 	private readonly pending = new Map<
 		string,
 		{
@@ -381,11 +383,12 @@ export class FsWatcherManager {
 			if (pending && this.pending.get(absolutePath) === pending) {
 				this.pending.delete(absolutePath);
 				pending.controller.abort();
+				await this.trackRelease(Promise.allSettled([pending.promise]));
 			}
 			const current = this.watchers.get(absolutePath);
 			if (current?.listeners === listeners) {
 				this.watchers.delete(absolutePath);
-				await this.disposeWatcherState(current);
+				await this.trackRelease(this.disposeWatcherState(current));
 			}
 		};
 		const onAbort = () => {
@@ -402,6 +405,15 @@ export class FsWatcherManager {
 		}
 	}
 
+	private async trackRelease(work: Promise<unknown>): Promise<void> {
+		this.releasing.add(work);
+		try {
+			await work;
+		} finally {
+			this.releasing.delete(work);
+		}
+	}
+
 	async close(): Promise<void> {
 		const pending = [...this.pending.values()];
 		this.pending.clear();
@@ -409,7 +421,10 @@ export class FsWatcherManager {
 		await Promise.allSettled(pending.map((entry) => entry.promise));
 		const states = Array.from(this.watchers.values());
 		this.watchers.clear();
-		await Promise.all(states.map((state) => this.disposeWatcherState(state)));
+		await Promise.all([
+			...this.releasing,
+			...states.map((state) => this.disposeWatcherState(state)),
+		]);
 	}
 
 	private async disposeWatcherState(state: WatcherState): Promise<void> {
