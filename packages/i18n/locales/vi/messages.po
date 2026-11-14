@@ -5978,6 +5978,9 @@ msgstr "Không thể tải các gói."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "Không tải được plugin. Hãy kiểm tra kết nối và thử lại."
 
+msgid "Could not load power settings."
+msgstr "Không thể tải cài đặt nguồn điện."
+
 msgid "Could not load presets from the host"
 msgstr "Không thể tải preset từ host"
 
@@ -11085,6 +11088,9 @@ msgstr "Tiếp tục chỉnh sửa"
 msgid "Keep paused"
 msgstr "Giữ tạm dừng"
 
+msgid "Keep this computer awake while agents work"
+msgstr "Giữ máy tính này luôn thức khi tác nhân làm việc"
+
 msgid "Keep typing an email to invite"
 msgstr "Tiếp tục nhập email để mời"
 
@@ -15442,6 +15448,9 @@ msgstr "Đăng bình luận"
 
 msgid "Post reply"
 msgstr "Đăng trả lời"
+
+msgid "Power"
+msgstr "Nguồn điện"
 
 msgid "PR"
 msgstr "PR"
@@ -20348,6 +20357,9 @@ msgstr "Diff vẫn là mới nhất. Chỉ có bình luận không tải đượ
 
 msgid "The dispatcher appears"
 msgstr "Người điều phối xuất hiện"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Màn hình vẫn có thể tắt. Khi dùng pin và mức pin dưới 10%, cài đặt ngủ thông thường sẽ được áp dụng."
 
 msgid "The endpoint must use https."
 msgstr "Endpoint phải dùng https."

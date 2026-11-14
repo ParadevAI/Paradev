@@ -5978,6 +5978,9 @@ msgstr "無法載入方案。"
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "無法載入外掛。請檢查連線後再試一次。"
 
+msgid "Could not load power settings."
+msgstr "無法載入電源設定。"
+
 msgid "Could not load presets from the host"
 msgstr "無法從主機載入預設"
 
@@ -11085,6 +11088,9 @@ msgstr "繼續編輯"
 msgid "Keep paused"
 msgstr "保持暫停"
 
+msgid "Keep this computer awake while agents work"
+msgstr "代理程式工作時保持此電腦喚醒"
+
 msgid "Keep typing an email to invite"
 msgstr "繼續輸入電子郵件以邀請"
 
@@ -15442,6 +15448,9 @@ msgstr "發表評論"
 
 msgid "Post reply"
 msgstr "發表回覆"
+
+msgid "Power"
+msgstr "電源"
 
 msgid "PR"
 msgstr "PR"
@@ -20348,6 +20357,9 @@ msgstr "差異仍是最新的，只是評論沒能載入。"
 
 msgid "The dispatcher appears"
 msgstr "排程員出現"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "顯示器仍可關閉。使用電池供電且電量低於 10% 時，將套用一般睡眠設定。"
 
 msgid "The endpoint must use https."
 msgstr "端點必須使用 https。"

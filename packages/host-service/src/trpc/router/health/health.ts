@@ -6,6 +6,7 @@ import {
 	readBootStamps,
 	type SandboxBootReport,
 } from "../../../runtime/boot-stamps";
+import { isKeepAwakeSupported } from "../../../runtime/keep-awake/macos";
 import { getRegistrationState } from "../../../tunnel/registration-state";
 import { publicProcedure, router } from "../../index";
 import { readSandboxBootStatus } from "../sandbox";
@@ -42,6 +43,7 @@ export const healthRouter = router({
 			// the app version for a standalone CLI collecting diagnostics.
 			version: HOST_SERVICE_VERSION,
 			installSource: getHostInstallSource(),
+			capabilities: { keepAwake: isKeepAwakeSupported() },
 			cloudRegistered: registration.registered,
 			registrationError: registration.lastError,
 			sandboxBoot: sandboxBootReport(),

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { TRPCClientError } from "@trpc/client";
+import { isKeepAwakeSupported } from "../../src/runtime/keep-awake/macos";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 
 describe("host-service smoke", () => {
@@ -20,6 +21,7 @@ describe("host-service smoke", () => {
 			pid: process.pid,
 			version: expect.stringMatching(/^\d+\.\d+\.\d+/),
 			installSource: expect.stringMatching(/^(cli|desktop|dev|unknown)$/),
+			capabilities: { keepAwake: isKeepAwakeSupported() },
 			cloudRegistered: false,
 			registrationError: null,
 		});
@@ -32,6 +34,7 @@ describe("host-service smoke", () => {
 			pid: process.pid,
 			version: expect.stringMatching(/^\d+\.\d+\.\d+/),
 			installSource: expect.stringMatching(/^(cli|desktop|dev|unknown)$/),
+			capabilities: { keepAwake: isKeepAwakeSupported() },
 			cloudRegistered: false,
 			registrationError: null,
 		});

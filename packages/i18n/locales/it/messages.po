@@ -5978,6 +5978,9 @@ msgstr "Impossibile caricare i piani."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "Impossibile caricare i plugin. Controlla la connessione e riprova."
 
+msgid "Could not load power settings."
+msgstr "Impossibile caricare le impostazioni di alimentazione."
+
 msgid "Could not load presets from the host"
 msgstr "Impossibile caricare i preset dall'host"
 
@@ -11085,6 +11088,9 @@ msgstr "Continua a modificare"
 msgid "Keep paused"
 msgstr "Lascia in pausa"
 
+msgid "Keep this computer awake while agents work"
+msgstr "Mantieni attivo questo computer mentre gli agenti lavorano"
+
 msgid "Keep typing an email to invite"
 msgstr "Continua a digitare un’email per invitare"
 
@@ -15442,6 +15448,9 @@ msgstr "Pubblica il commento"
 
 msgid "Post reply"
 msgstr "Pubblica la risposta"
+
+msgid "Power"
+msgstr "Alimentazione"
 
 msgid "PR"
 msgstr "PR"
@@ -20348,6 +20357,9 @@ msgstr "Il diff è comunque aggiornato. Solo i commenti non sono stati caricati.
 
 msgid "The dispatcher appears"
 msgstr "Compare il dispatcher"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Lo schermo può comunque spegnersi. Quando il computer è alimentato a batteria e la carica è inferiore al 10%, si applicano le normali impostazioni di sospensione."
 
 msgid "The endpoint must use https."
 msgstr "L'endpoint deve usare https."

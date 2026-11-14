@@ -5978,6 +5978,9 @@ msgstr "Plány se nepodařilo načíst."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "Pluginy se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu."
 
+msgid "Could not load power settings."
+msgstr "Nastavení napájení se nepodařilo načíst."
+
 msgid "Could not load presets from the host"
 msgstr "Nepodařilo se načíst přednastavení z hosta"
 
@@ -11085,6 +11088,9 @@ msgstr "Pokračovat v úpravách"
 msgid "Keep paused"
 msgstr "Ponechat pozastavené"
 
+msgid "Keep this computer awake while agents work"
+msgstr "Zabránit uspání tohoto počítače během práce agentů"
+
 msgid "Keep typing an email to invite"
 msgstr "Pokračujte v psaní e-mailu pro pozvání"
 
@@ -15442,6 +15448,9 @@ msgstr "Odeslat komentář"
 
 msgid "Post reply"
 msgstr "Odeslat odpověď"
+
+msgid "Power"
+msgstr "Napájení"
 
 msgid "PR"
 msgstr "PR"
@@ -20348,6 +20357,9 @@ msgstr "Rozdíly jsou stále aktuální. Nenačetly se jen komentáře."
 
 msgid "The dispatcher appears"
 msgstr "Nastupuje dispečer"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Displej se může nadále vypínat. Při napájení z baterie se při poklesu pod 10 % použije běžné nastavení uspání."
 
 msgid "The endpoint must use https."
 msgstr "Koncový bod musí používat https."

@@ -8,6 +8,7 @@ export interface HostServiceInfo {
 	version: string;
 	installSource: HostInstallSource;
 	updatable: boolean;
+	keepAwakeSupported: boolean;
 	/** From `host.info`, which needs the host to reach the cloud; absent otherwise. */
 	platform?: string;
 	arch?: string;
@@ -36,6 +37,7 @@ export async function readHostServiceInfo(
 	return {
 		version: health.version,
 		updatable: updateStatus?.updatable === true,
+		keepAwakeSupported: health.capabilities?.keepAwake === true,
 		installSource: parseHostInstallSource(
 			health.installSource ?? info?.installSource,
 		),

@@ -11,6 +11,7 @@ import type { ApiAuthProvider } from "./providers/auth/types";
 import type { AgentJobRunner } from "./runtime/agent-jobs";
 import type { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider, GitFactory } from "./runtime/git";
+import type { KeepAwakeController } from "./runtime/keep-awake";
 import type { PullRequestRuntimeManager } from "./runtime/pull-requests";
 import type { TerminalAgentStore } from "./terminal-agents";
 import type { ExecGh } from "./trpc/router/workspace-creation/utils/exec-gh";
@@ -18,6 +19,7 @@ import type { ExecGh } from "./trpc/router/workspace-creation/utils/exec-gh";
 export type ApiClient = TRPCClient<AppRouter>;
 
 export interface HostServiceRuntime {
+	keepAwake?: KeepAwakeController;
 	filesystem: WorkspaceFilesystemManager;
 	pullRequests: PullRequestRuntimeManager;
 	pageWatch: PageWatchManager;

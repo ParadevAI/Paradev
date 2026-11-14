@@ -5978,6 +5978,9 @@ msgstr "플랜을 불러올 수 없습니다."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "플러그인을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요."
 
+msgid "Could not load power settings."
+msgstr "전원 설정을 불러올 수 없습니다."
+
 msgid "Could not load presets from the host"
 msgstr "호스트에서 프리셋을 불러올 수 없습니다"
 
@@ -11085,6 +11088,9 @@ msgstr "계속 편집"
 msgid "Keep paused"
 msgstr "일시 중지 상태로 두기"
 
+msgid "Keep this computer awake while agents work"
+msgstr "에이전트가 작업하는 동안 이 컴퓨터의 절전 방지"
+
 msgid "Keep typing an email to invite"
 msgstr "초대하려면 이메일을 계속 입력하세요"
 
@@ -15442,6 +15448,9 @@ msgstr "댓글 게시"
 
 msgid "Post reply"
 msgstr "답글 게시"
+
+msgid "Power"
+msgstr "전원"
 
 msgid "PR"
 msgstr "PR"
@@ -20348,6 +20357,9 @@ msgstr "차이는 최신 상태입니다. 코멘트만 불러오지 못했습니
 
 msgid "The dispatcher appears"
 msgstr "배차원의 등장"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "화면은 꺼질 수 있습니다. 배터리 전원 사용 중 잔량이 10% 미만이면 일반 절전 설정이 적용됩니다."
 
 msgid "The endpoint must use https."
 msgstr "엔드포인트는 https를 사용해야 합니다."

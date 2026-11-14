@@ -5972,6 +5972,9 @@ msgstr "Не вдалося завантажити тарифи."
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "Не вдалося завантажити плагіни. Перевірте з'єднання та спробуйте ще раз."
 
+msgid "Could not load power settings."
+msgstr "Не вдалося завантажити налаштування живлення."
+
 msgid "Could not load presets from the host"
 msgstr "Не вдалося завантажити пресети з хоста"
 
@@ -11079,6 +11082,9 @@ msgstr "Продовжити редагування"
 msgid "Keep paused"
 msgstr "Залишити на паузі"
 
+msgid "Keep this computer awake while agents work"
+msgstr "Не давати цьому комп’ютеру переходити в сон, поки працюють агенти"
+
 msgid "Keep typing an email to invite"
 msgstr "Продовжуйте вводити адресу, щоб запросити"
 
@@ -15436,6 +15442,9 @@ msgstr "Опублікувати коментар"
 
 msgid "Post reply"
 msgstr "Надіслати відповідь"
+
+msgid "Power"
+msgstr "Живлення"
 
 msgid "PR"
 msgstr "PR"
@@ -20342,6 +20351,9 @@ msgstr "Diff досі актуальний. Не вдалося завантаж
 
 msgid "The dispatcher appears"
 msgstr "З'являється диспетчер"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "Екран при цьому може вимикатися. Під час роботи від батареї із зарядом нижче 10% діють звичайні налаштування сну."
 
 msgid "The endpoint must use https."
 msgstr "Ендпоінт має використовувати https."

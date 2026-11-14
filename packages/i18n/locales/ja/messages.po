@@ -5978,6 +5978,9 @@ msgstr "プランを読み込めませんでした。"
 msgid "Could not load plugins. Check your connection and try again."
 msgstr "プラグインを読み込めませんでした。接続を確認して再試行してください。"
 
+msgid "Could not load power settings."
+msgstr "電源設定を読み込めませんでした。"
+
 msgid "Could not load presets from the host"
 msgstr "ホストからプリセットを読み込めませんでした"
 
@@ -11085,6 +11088,9 @@ msgstr "編集を続ける"
 msgid "Keep paused"
 msgstr "一時停止のままにする"
 
+msgid "Keep this computer awake while agents work"
+msgstr "エージェントの動作中はこのコンピューターのスリープを防ぐ"
+
 msgid "Keep typing an email to invite"
 msgstr "招待するにはメールアドレスを入力し続けてください"
 
@@ -15442,6 +15448,9 @@ msgstr "コメントを投稿"
 
 msgid "Post reply"
 msgstr "返信を投稿"
+
+msgid "Power"
+msgstr "電源"
 
 msgid "PR"
 msgstr "PR"
@@ -20348,6 +20357,9 @@ msgstr "差分は最新です。コメントの読み込みだけが失敗しま
 
 msgid "The dispatcher appears"
 msgstr "ディスパッチャーの登場"
+
+msgid "The display can still turn off. On battery power, normal sleep settings apply below 10%."
+msgstr "ディスプレイはオフにできます。バッテリー駆動中に残量が10%を下回ると、通常のスリープ設定が適用されます。"
 
 msgid "The endpoint must use https."
 msgstr "エンドポイントは https を使用する必要があります。"
