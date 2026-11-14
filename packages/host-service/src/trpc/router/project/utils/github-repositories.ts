@@ -15,25 +15,43 @@ export function parseGitHubRepositories(raw: unknown) {
 	}));
 }
 
-export async function listGitHubRepositories(runGh: ExecGh = execGh) {
+const TIMEOUT_MESSAGE =
+	"Listing GitHub repositories timed out. Check the `gh` connection on this host and try again.";
+
+export async function listGitHubRepositories(
+	runGh: ExecGh = execGh,
+	{ signal = AbortSignal.timeout(30_000) } = {},
+) {
+	let rejectOnAbort = () => {};
+	const aborted = new Promise<never>((_, reject) => {
+		rejectOnAbort = () => reject(signal.reason);
+	});
+	signal.addEventListener("abort", rejectOnAbort, { once: true });
 	const repositories: ReturnType<typeof parseGitHubRepositories> = [];
 	try {
 		for (let page = 1; ; page++) {
-			const raw = await runGh([
-				"api",
-				"--method",
-				"GET",
-				"user/repos",
-				"-f",
-				"affiliation=owner,collaborator,organization_member",
-				"-f",
-				"sort=updated",
-				"-f",
-				"per_page=100",
-				"-f",
-				`page=${page}`,
-				"--jq",
-				"map({full_name, clone_url})",
+			signal.throwIfAborted();
+			const raw = await Promise.race([
+				runGh(
+					[
+						"api",
+						"--method",
+						"GET",
+						"user/repos",
+						"-f",
+						"affiliation=owner,collaborator,organization_member",
+						"-f",
+						"sort=updated",
+						"-f",
+						"per_page=100",
+						"-f",
+						`page=${page}`,
+						"--jq",
+						"map({full_name, clone_url})",
+					],
+					{ signal },
+				),
+				aborted,
 			]);
 			const entries = parseGitHubRepositories([raw]);
 			repositories.push(...entries);
@@ -41,7 +59,12 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 		}
 	} catch (error) {
 		const failure = error instanceof Error ? error : new Error(String(error));
-		const { code, killed, signal, stderr } = failure as Error & {
+		const {
+			code,
+			killed,
+			signal: killSignal,
+			stderr,
+		} = failure as Error & {
 			code?: string | number;
 			killed?: boolean;
 			signal?: string;
@@ -49,16 +72,22 @@ export async function listGitHubRepositories(runGh: ExecGh = execGh) {
 		};
 		const authenticationRequired =
 			code === 4 || /\(HTTP 401\)/.test(stderr ?? failure.message);
+		const timedOut =
+			signal.aborted || (killed && killSignal === "SIGTERM" && code == null);
 		throw new TRPCError({
 			code: authenticationRequired
 				? "PRECONDITION_FAILED"
-				: killed && signal === "SIGTERM" && code == null
+				: timedOut
 					? "TIMEOUT"
 					: "BAD_GATEWAY",
 			message: authenticationRequired
 				? `Could not list GitHub repositories. Run \`gh auth login\` on this host and try again. ${failure.message}`
-				: failure.message,
+				: timedOut
+					? TIMEOUT_MESSAGE
+					: failure.message,
 			cause: error,
 		});
+	} finally {
+		signal.removeEventListener("abort", rejectOnAbort);
 	}
 }

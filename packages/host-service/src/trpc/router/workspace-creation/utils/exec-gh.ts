@@ -11,6 +11,7 @@ export interface ExecGhOptions {
 	maxBuffer?: number;
 	/** Written to stdin, for bodies too long for one argv element. */
 	input?: string;
+	signal?: AbortSignal;
 }
 
 /**
@@ -26,6 +27,7 @@ export type ExecGh = (
 
 export const execGh: ExecGh = async (args, options) => {
 	const env = await getToolEnvironment();
+	options?.signal?.throwIfAborted();
 	const child = execFileAsync("gh", args, {
 		encoding: "utf8",
 		timeout: options?.timeout ?? 10_000,
@@ -34,6 +36,7 @@ export const execGh: ExecGh = async (args, options) => {
 		maxBuffer: options?.maxBuffer ?? 10 * 1024 * 1024,
 		cwd: options?.cwd,
 		env,
+		signal: options?.signal,
 	});
 	if (options?.input !== undefined) child.child.stdin?.end(options.input);
 	const { stdout } = await child;

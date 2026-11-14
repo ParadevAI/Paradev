@@ -71,6 +71,76 @@ test("rejects invalid clone URLs on later pages instead of returning partial res
 	expect(page).toBe(2);
 });
 
+test("times out while a page is still running once the walk's budget ends", async () => {
+	const budget = new AbortController();
+	const signals: (AbortSignal | undefined)[] = [];
+	let secondPageStarted = () => {};
+	const secondPageRunning = new Promise<void>((resolve) => {
+		secondPageStarted = resolve;
+	});
+	const walk = listGitHubRepositories(
+		async (_args, options) => {
+			signals.push(options?.signal);
+			if (signals.length === 1) {
+				return Array.from({ length: 100 }, (_, index) => ({
+					full_name: `owner/repo-${index}`,
+					clone_url: `https://github.com/owner/repo-${index}.git`,
+				}));
+			}
+			secondPageStarted();
+			return new Promise(() => {});
+		},
+		{ signal: budget.signal },
+	);
+	let settled = false;
+	walk
+		.catch(() => {})
+		.finally(() => {
+			settled = true;
+		});
+	await secondPageRunning;
+	budget.abort();
+	await new Promise((resolve) => setTimeout(resolve, 0));
+	expect(settled).toBe(true);
+	await expect(walk).rejects.toMatchObject({
+		code: "TIMEOUT",
+		message: expect.stringContaining("timed out"),
+	});
+	expect(signals).toEqual([budget.signal, budget.signal]);
+});
+
+test("does not start a page after the walk's budget ends", async () => {
+	const budget = new AbortController();
+	budget.abort();
+	let calls = 0;
+	await expect(
+		listGitHubRepositories(
+			async () => {
+				calls++;
+				return [];
+			},
+			{ signal: budget.signal },
+		),
+	).rejects.toMatchObject({ code: "TIMEOUT" });
+	expect(calls).toBe(0);
+});
+
+test("explains a page that timed out instead of showing the gh command", async () => {
+	const failure = Object.assign(
+		new Error("Command failed: gh api --method GET user/repos"),
+		{ killed: true, signal: "SIGTERM", code: null },
+	);
+	const walk = listGitHubRepositories(async () => {
+		throw failure;
+	});
+	await expect(walk).rejects.toMatchObject({
+		code: "TIMEOUT",
+		cause: failure,
+		message: expect.stringContaining("timed out"),
+	});
+	await expect(walk).rejects.not.toThrow("Command failed");
+});
+
 test("returns an empty catalog", async () => {
 	expect(await listGitHubRepositories(async () => [])).toEqual([]);
 });
