@@ -414,7 +414,6 @@ export async function seedAgentFolderTrust(
 			requireTrustedPath !== undefined &&
 			!(await isFolderTrusted(target, requireTrustedPath))
 		) {
-			await revokeFolderTrust(target, folderPath);
 			return;
 		}
 		const normalized = normalizeFolderPath(folderPath);

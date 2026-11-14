@@ -531,20 +531,16 @@ describe("seedWorkspaceFolderTrust", () => {
 		expect(readState().projects[rootPath].hasTrustDialogAccepted).toBe(true);
 	});
 
-	test("a launch in a root whose config repository is not trusted takes away the trust stored for that path", async () => {
+	test("a launch in a root whose config repository is not trusted keeps the trust the user gave the root", async () => {
 		const { db } = setup();
 		const { rootPath } = seedTrustedRoot(db, false);
 		const [workspace] = db.select().from(schema.workspaces).all();
+		const before = readState();
 
 		await seedWorkspaceFolderTrust(db, workspace?.id ?? "", "claude-test");
 
-		expect(readState().projects[rootPath]).toEqual({
-			hasTrustDialogAccepted: false,
-			history: ["x"],
-		});
-		expect(readState().projects[join(dir, "web")].hasTrustDialogAccepted).toBe(
-			true,
-		);
+		expect(readState()).toEqual(before);
+		expect(readState().projects[rootPath].hasTrustDialogAccepted).toBe(true);
 	});
 
 	test("removing a multi-repo root takes its trust away first", async () => {

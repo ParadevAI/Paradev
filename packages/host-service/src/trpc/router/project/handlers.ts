@@ -471,7 +471,7 @@ export async function addRepository(
 	return snapshotOf(ctx, args.projectId);
 }
 
-function workspaceList(rows: { name: string }[]): string {
+export function workspaceList(rows: { name: string }[]): string {
 	const shown = rows.slice(0, 3).map((row) => `"${row.name}"`);
 	const more =
 		rows.length > shown.length ? ` and ${rows.length - shown.length} more` : "";
@@ -677,19 +677,22 @@ export interface Relocation {
 }
 
 /**
- * Points repositories at new folders in one transaction. Of `candidates`,
- * only a workspace that is a repository's own folder moves with it; a root
- * of several checkouts (a box one too) keeps its folder.
+ * Points repositories at new folders, and inserts `added`, in one
+ * transaction. Of `candidates`, only a workspace that is a repository's own
+ * folder moves with it; a root of several checkouts (a box one too) keeps
+ * its folder.
  */
 export function applyRelocations(
 	ctx: HostServiceContext,
 	projectId: string,
 	relocations: Relocation[],
 	candidates: HostWorkspaceRow[],
+	added: ReturnType<typeof repositoryValues>[] = [],
 ): void {
-	if (relocations.length === 0) return;
+	if (relocations.length === 0 && added.length === 0) return;
 	const moved: string[] = [];
 	ctx.db.transaction((tx) => {
+		if (added.length > 0) tx.insert(repositories).values(added).run();
 		for (const { repository, resolved } of relocations) {
 			tx.update(repositories)
 				.set({

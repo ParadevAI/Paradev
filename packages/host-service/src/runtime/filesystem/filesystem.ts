@@ -8,7 +8,10 @@ import type { HostDb } from "../../db/index.ts";
 import { workspaces } from "../../db/schema.ts";
 import { getLocalProject } from "../../projects/local-project-store.ts";
 import { getPrimaryRepository } from "../../projects/repositories.ts";
-import { getCheckoutSnapshots } from "../../workspaces/checkouts.ts";
+import {
+	getCheckoutSnapshots,
+	pickConfigSource,
+} from "../../workspaces/checkouts.ts";
 import { getLocalWorkspace } from "../../workspaces/local-workspace-store.ts";
 import { WatchAttachGuard } from "./watch-attach-guard.ts";
 import {
@@ -62,15 +65,16 @@ export class WorkspaceFilesystemManager {
 		return workspace.worktreePath;
 	}
 
-	/** Where the primary repository's `.paradev` files are: the root, or `<root>/<primary name>`. */
-	resolvePrimaryCheckoutPath(workspaceId: string): string {
+	/** Where the `.paradev` files the workspace uses are, see {@link pickConfigSource}. */
+	resolveConfigCheckoutPath(workspaceId: string): string {
 		const workspace = getLocalWorkspace(this.db, workspaceId);
 		if (!workspace) {
 			throw new WorkspaceNotFoundError(`Workspace not found: ${workspaceId}`);
 		}
 		return (
-			getCheckoutSnapshots(this.db, workspace).find(
-				(checkout) => checkout.isPrimary,
+			pickConfigSource(
+				getCheckoutSnapshots(this.db, workspace),
+				(checkout) => checkout,
 			)?.path ?? workspace.worktreePath
 		);
 	}

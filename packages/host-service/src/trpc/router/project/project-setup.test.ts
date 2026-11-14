@@ -19,6 +19,7 @@ import {
 	createGitFixture,
 	type GitFixture,
 } from "../../../../test/helpers/git-fixture";
+import { seedWorkspace } from "../../../../test/helpers/seed";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import * as projectDeletion from "../../../projects/project-deletion";
@@ -592,10 +593,9 @@ describe("project.setup", () => {
 		expect(readdirSync(elsewhere)).toEqual([basename(api)]);
 	});
 
-	it("moves a repository that is checked out elsewhere when asked to relocate", async () => {
+	it("a clone never replaces a folder that still works, even when asked to relocate", async () => {
 		const { caller, paths, projectId, ids } = await setUpCloned(["web"]);
 		const elsewhere = mkdtempSync(join(root, "elsewhere-"));
-		const moved = join(elsewhere, basename(paths[0] as string));
 
 		const again = await caller.setup({
 			projectId,
@@ -607,8 +607,128 @@ describe("project.setup", () => {
 			],
 		});
 
-		expect(again.repositories.map((r) => r.path)).toEqual([moved]);
-		expect(existsSync(join(moved, ".git"))).toBe(true);
+		expect(again.repositories.map((r) => r.path)).toEqual(paths);
+		expect(readdirSync(elsewhere)).toEqual([]);
+	});
+
+	it("refuses to move a repository while a workspace uses a worktree of it", async () => {
+		const { caller, db } = setup();
+		const web = await repo();
+		const moved = await repo();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const id = ids[0] as string;
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [{ id, mode: { kind: "import", path: web } }],
+		});
+		seedWorkspace(
+			{ db },
+			{
+				projectId,
+				worktreePath: join(root, "worktree-of-web"),
+				branch: "feat",
+				name: "feat",
+			},
+		);
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [
+					{ id, mode: { kind: "import", path: moved, allowRelocate: true } },
+				],
+			}),
+		).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message: expect.stringContaining("repository_has_worktrees"),
+		});
+		expect(storedPaths(db)).toEqual([web]);
+	});
+
+	it("adds the repositories another host added to a project this host deleted", async () => {
+		const { caller, db } = setup();
+		const projectId = randomUUID();
+		const web = { id: randomUUID(), name: "web", url: null };
+		const api = { id: randomUUID(), name: "api", url: null };
+		const webPath = await repo();
+		const apiPath = await repo();
+		await caller.setup({
+			projectId,
+			origin: {
+				name: "Acme",
+				primaryRepositoryId: web.id,
+				repositories: [web],
+			},
+			repositories: [{ id: web.id, mode: { kind: "import", path: webPath } }],
+		});
+		db.update(schema.projects)
+			.set({ deletedAt: Date.now() })
+			.where(eq(schema.projects.id, projectId))
+			.run();
+
+		const back = await caller.setup({
+			projectId,
+			origin: {
+				name: "Acme",
+				primaryRepositoryId: web.id,
+				repositories: [web, api],
+			},
+			repositories: [
+				{ id: web.id, mode: { kind: "import", path: webPath } },
+				{ id: api.id, mode: { kind: "import", path: apiPath } },
+			],
+		});
+
+		expect(back.created).toBe(false);
+		expect(back.repositories.map((r) => [r.id, r.name, r.path]).sort()).toEqual(
+			[
+				[web.id, "web", webPath],
+				[api.id, "api", apiPath],
+			].sort(),
+		);
+		expect((await caller.list()).map((p) => p.id)).toEqual([projectId]);
+	});
+
+	it("refuses an added repository with a name the project already uses", async () => {
+		const { caller } = setup();
+		const projectId = randomUUID();
+		const web = { id: randomUUID(), name: "web", url: null };
+		const twin = { id: randomUUID(), name: "Web", url: null };
+		const webPath = await repo();
+		const twinPath = await repo();
+		await caller.setup({
+			projectId,
+			origin: {
+				name: "Acme",
+				primaryRepositoryId: web.id,
+				repositories: [web],
+			},
+			repositories: [{ id: web.id, mode: { kind: "import", path: webPath } }],
+		});
+
+		await expect(
+			caller.setup({
+				projectId,
+				origin: {
+					name: "Acme",
+					primaryRepositoryId: web.id,
+					repositories: [web, twin],
+				},
+				repositories: [
+					{ id: twin.id, mode: { kind: "import", path: twinPath } },
+				],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("duplicate_name"),
+		});
+		expect((await caller.list())[0]?.repositories.map((r) => r.id)).toEqual([
+			web.id,
+		]);
 	});
 
 	it("clones a repository back into its folder when the folder is gone", async () => {

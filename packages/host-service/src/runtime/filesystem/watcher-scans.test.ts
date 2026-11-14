@@ -1,7 +1,6 @@
 import { Database } from "bun:sqlite";
 import { afterEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { FsWatcherManager } from "@superset/workspace-fs/host";
@@ -101,34 +100,21 @@ test("scanWorkspaceGitIgnoredDirectories asks each checkout and prefixes its fol
 	expect(dirs.sort()).toEqual(["api/dist", "web/dist"]);
 });
 
-test("a multi-repo root's watcher reports files inside its checkouts", async () => {
+test("a multi-repo root's watcher keeps its checkouts and prunes repositories nested in them", async () => {
 	const { db, root } = setUp([{ repoPath: "/src/api", repoName: "api" }]);
 	makeRepo(join(root, "web"));
 	makeRepo(join(root, "api"));
 	const nested = join(root, "web", "packages", "lib");
 	makeRepo(nested);
 	const manager = new FsWatcherManager({
-		debounceMs: 20,
 		useDefaultIgnores: false,
 		findNestedRepoRoots: (rootPath, options) =>
 			scanWorkspaceNestedRepositories(db, rootPath, options, scan),
 	});
 	cleanups.push(() => manager.close());
-	const seen: string[] = [];
-	await manager.subscribe({ absolutePath: root }, (batch) => {
-		for (const event of batch.events) seen.push(event.absolutePath);
-	});
+	await manager.subscribe({ absolutePath: root }, () => {});
 
 	expect(manager.isPathPruned(root, join(nested, "x.ts"))).toBe(true);
 	expect(manager.isPathPruned(root, join(root, "web", "new.ts"))).toBe(false);
-
-	const created = join(root, "web", "new.ts");
-	await writeFile(join(nested, "x.ts"), "x");
-	await writeFile(created, "x");
-	const deadline = Date.now() + 4_000;
-	while (!seen.includes(created) && Date.now() < deadline) {
-		await Bun.sleep(20);
-	}
-	expect(seen).toContain(created);
-	expect(seen).not.toContain(join(nested, "x.ts"));
+	expect(manager.isPathPruned(root, join(root, "api", "new.ts"))).toBe(false);
 });

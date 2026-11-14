@@ -1,9 +1,14 @@
 import { existsSync } from "node:fs";
-import { dirname, join, resolve as resolvePath } from "node:path";
+import { join, resolve as resolvePath } from "node:path";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
-import { projects, repositories, workspaces } from "../../../db/schema";
+import {
+	projects,
+	repositories,
+	workspaceRepositories,
+	workspaces,
+} from "../../../db/schema";
 import {
 	emitProjectChanged,
 	getLocalProject,
@@ -17,7 +22,9 @@ import {
 	type HostRepositoryRow,
 	listProjectRepositories,
 } from "../../../projects/repositories";
+import { isMissingPath } from "../../../runtime/path-state";
 import type { HostServiceContext } from "../../../types";
+import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
 import type { HostWorkspaceRow } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import {
@@ -33,6 +40,7 @@ import {
 	requireUsableNames,
 	resolveRepositoryFolder,
 	snapshotOf,
+	workspaceList,
 } from "./handlers";
 import {
 	adoptLocalRepo,
@@ -46,11 +54,22 @@ import {
 export interface SetupOrigin {
 	name: string;
 	primaryRepositoryId: string;
-	repositories: { id: string; name: string; url: string | null }[];
+	repositories: OriginRepository[];
+}
+
+interface OriginRepository {
+	id: string;
+	name: string;
+	url: string | null;
 }
 
 export type SetupPlacementMode =
-	| { kind: "clone"; parentDir: string; allowRelocate?: boolean }
+	| {
+			kind: "clone";
+			parentDir: string;
+			/** Ignored: a clone never replaces a folder that still works. */
+			allowRelocate?: boolean;
+	  }
 	| { kind: "import"; path: string; allowRelocate?: boolean };
 
 export interface SetupPlacement {
@@ -67,7 +86,8 @@ export interface SetupProjectArgs {
 
 /**
  * Add a project that lives on another host to this host under the same
- * project and repository ids, or check where this host already has it.
+ * project and repository ids, or check where this host already has it. The
+ * origin's repositories this host lacks are added to its project.
  */
 export async function setupProject(
 	ctx: HostServiceContext,
@@ -76,7 +96,13 @@ export async function setupProject(
 	requireDistinctPlacements(args.repositories);
 	const existing = getProjectIncludingDeleted(ctx.db, args.projectId);
 	if (existing) {
-		await placeExisting(ctx, existing, args.repositories, args.signal);
+		await placeExisting(
+			ctx,
+			existing,
+			args.origin,
+			args.repositories,
+			args.signal,
+		);
 		if (!getLocalProject(ctx.db, args.projectId)) {
 			throw notSetUpError(args.projectId);
 		}
@@ -177,40 +203,98 @@ async function isCheckoutOf(
 	}
 }
 
+/** A worktree stays linked to the clone it was made from, so its repository cannot move. */
+function requireNoWorktrees(
+	ctx: HostServiceContext,
+	repository: HostRepositoryRow,
+): void {
+	const own = resolvePath(repository.repoPath);
+	const worktrees = ctx.db
+		.select({ workspace: workspaces })
+		.from(workspaceRepositories)
+		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
+		.where(eq(workspaceRepositories.repositoryId, repository.id))
+		.all()
+		.map((row) => row.workspace)
+		.filter((workspace) => {
+			if (workspace.type === "local") return false;
+			const checkout = listWorkspaceCheckouts(ctx.db, workspace).find(
+				(c) => c.repository.id === repository.id,
+			);
+			if (!checkout || resolvePath(checkout.path) === own) return false;
+			return workspace.archivedAt === null || !isMissingPath(checkout.path);
+		});
+	if (worktrees.length === 0) return;
+	const one = worktrees.length === 1;
+	throw new TRPCError({
+		code: "PRECONDITION_FAILED",
+		message: `repository_has_worktrees: ${repository.name} cannot move to another folder while ${workspaceList(worktrees)} ${one ? "uses a worktree" : "use worktrees"} of it; keep its folder at ${repository.repoPath}, or delete ${one ? "that workspace" : "those workspaces"} first`,
+	});
+}
+
+interface AddedSource {
+	repository: OriginRepository;
+	source: ResolvedSource;
+}
+
 /**
  * Checks every placement before anything changes, clones the repositories
- * whose folder is gone, checks again, then moves the repositories in one
- * transaction and only then brings back a deleted project, so a refused
- * set-up leaves the project and its folders as they were. Nothing awaits
- * between the last check and the restore, so the restore cannot be refused.
+ * whose folder is gone and those the origin adds, checks again, then moves
+ * and adds the repositories in one transaction and only then brings back a
+ * deleted project, so a refused set-up leaves the project and its folders as
+ * they were. Nothing awaits between the last check and the restore, so the
+ * restore cannot be refused.
  */
 async function placeExisting(
 	ctx: HostServiceContext,
 	project: HostProjectRow,
+	origin: SetupOrigin | undefined,
 	placements: SetupPlacement[],
 	signal?: AbortSignal,
 ): Promise<void> {
 	const projectId = project.id;
 	const projectRows = listProjectRepositories(ctx.db, projectId);
 	const rows = new Map(projectRows.map((row) => [row.id, row]));
+	const addedById = new Map(
+		repositoriesToAdd(ctx, origin, projectRows, placements).map((r) => [
+			r.id,
+			r,
+		]),
+	);
 	for (const placement of placements) {
-		if (!rows.has(placement.id)) {
+		if (!rows.has(placement.id) && !addedById.has(placement.id)) {
 			throw repositoryNotFound(projectId, placement.id);
 		}
 	}
 	const relocations: Relocation[] = [];
 	const clones: Clone[] = [];
+	const added: AddedSource[] = [];
 	for (const { id, mode } of placements) {
+		const repository = addedById.get(id);
+		if (repository) {
+			if (mode.kind === "clone") {
+				clones.push({
+					added: repository,
+					url: repository.url as string,
+					parentDir: mode.parentDir,
+				});
+			} else {
+				added.push({
+					repository,
+					source: {
+						resolved: await resolveImport(mode.path, repository.url),
+						created: false,
+					},
+				});
+			}
+			continue;
+		}
 		const row = rows.get(id) as HostRepositoryRow;
 		const current = resolvePath(row.repoPath);
 		if (mode.kind === "clone") {
+			if (await isCheckoutOf(row, current)) continue;
+			if (!row.url) throw folderUnusableError(row);
 			const parentDir = resolvePath(mode.parentDir);
-			const sameParent = dirname(current) === parentDir;
-			const usable = await isCheckoutOf(row, current);
-			if (usable && (sameParent || !mode.allowRelocate)) continue;
-			if (!row.url) {
-				throw usable ? alreadySetUpError(row) : folderUnusableError(row);
-			}
 			const target = join(parentDir, cloneDirectoryName(row.url));
 			if (target !== current) {
 				clones.push({ repository: row, url: row.url, parentDir, target });
@@ -227,12 +311,14 @@ async function placeExisting(
 		if (!mode.allowRelocate) throw alreadySetUpError(row);
 		relocations.push({ repository: row, resolved });
 	}
-	const relocated = new Map([
+	const relocated = new Map<string, string>([
 		...relocations.map(
 			({ repository, resolved }) => [repository.id, resolved.repoPath] as const,
 		),
-		...clones.flatMap(({ repository, target }) =>
-			target ? [[repository.id, target] as const] : [],
+		...clones.flatMap((clone) =>
+			"repository" in clone && clone.target
+				? [[clone.repository.id, clone.target] as const]
+				: [],
 		),
 	]);
 	const requireFreeTargets = () => {
@@ -241,6 +327,7 @@ async function placeExisting(
 		}
 		const targets = new Set<string>();
 		for (const row of projectRows) {
+			if (relocated.has(row.id)) requireNoWorktrees(ctx, row);
 			const target = relocated.get(row.id) ?? resolvePath(row.repoPath);
 			if (targets.has(target)) throw repositoryTakenError(target);
 			targets.add(target);
@@ -252,48 +339,80 @@ async function placeExisting(
 				throw repositoryTakenError(target);
 			}
 		}
+		for (const { source } of added) {
+			const target = source.resolved.repoPath;
+			if (targets.has(target) || getLiveRepositoryAtPath(ctx.db, target)) {
+				throw repositoryTakenError(target);
+			}
+			targets.add(target);
+		}
 	};
 	requireFreeTargets();
 	const cloned = await cloneAll(ctx, clones, signal);
+	const created = cloned.map(({ resolved }) => ({ resolved, created: true }));
+	const clonedRelocations: Relocation[] = [];
+	for (const { clone, resolved } of cloned) {
+		if ("repository" in clone) {
+			clonedRelocations.push({ repository: clone.repository, resolved });
+		} else {
+			added.push({
+				repository: clone.added,
+				source: { resolved, created: true },
+			});
+		}
+	}
 	try {
-		await adoptAll(relocations.map(({ resolved }) => resolved));
+		await adoptAll([
+			...relocations.map(({ resolved }) => resolved),
+			...added.flatMap(({ source }) =>
+				source.created ? [] : [source.resolved],
+			),
+		]);
 		requireFreeTargets();
 	} catch (err) {
-		await removeCreated(
-			cloned.map(({ resolved }) => ({ resolved, created: true })),
-		);
+		await removeCreated(created);
 		throw err;
 	}
-	applyRelocations(
-		ctx,
-		projectId,
-		[...relocations, ...cloned],
-		movableWorkspaces(ctx, project),
-	);
+	try {
+		applyRelocations(
+			ctx,
+			projectId,
+			[...relocations, ...clonedRelocations],
+			movableWorkspaces(ctx, project),
+			added.map(({ repository, source }) =>
+				repositoryValues(projectId, source.resolved, repository),
+			),
+		);
+	} catch (err) {
+		if (!isUniqueViolation(err)) throw err;
+		await removeCreated(created);
+		throw raceIdTakenError(projectId, err);
+	}
 	if (project.deletedAt != null && !restoreProject(ctx, projectId)) {
 		throw notSetUpError(projectId);
 	}
 }
 
-interface Clone {
-	repository: HostRepositoryRow;
-	url: string;
-	parentDir: string;
-	/** Set when the clone relocates the repository away from its stored folder. */
-	target?: string;
-}
+type Clone = { url: string; parentDir: string } & (
+	| {
+			repository: HostRepositoryRow;
+			/** Set when the clone relocates the repository away from its stored folder. */
+			target?: string;
+	  }
+	| { added: OriginRepository }
+);
 
 /** Every clone lands, or every folder made for them is removed. */
 async function cloneAll(
 	ctx: HostServiceContext,
 	clones: Clone[],
 	signal?: AbortSignal,
-): Promise<Relocation[]> {
+): Promise<{ clone: Clone; resolved: ResolvedRepo }[]> {
 	const settled = await Promise.allSettled(
-		clones.map(async ({ repository, url, parentDir }) => ({
-			repository,
+		clones.map(async (clone) => ({
+			clone,
 			resolved: await classifyGitFailure(
-				cloneRepoInto(url, parentDir, ctx.credentials, signal),
+				cloneRepoInto(clone.url, clone.parentDir, ctx.credentials, signal),
 			),
 		})),
 	);
@@ -330,11 +449,7 @@ function movableWorkspaces(
 		.all();
 }
 
-function requireUsableOrigin(
-	origin: SetupOrigin,
-	placements: SetupPlacement[],
-	projectId: string,
-): void {
+function requireDistinctOriginIds(origin: SetupOrigin): Set<string> {
 	const ids = new Set(origin.repositories.map((r) => r.id));
 	if (ids.size !== origin.repositories.length) {
 		throw new TRPCError({
@@ -342,6 +457,76 @@ function requireUsableOrigin(
 			message: "invalid_origin: a repository id is listed twice",
 		});
 	}
+	return ids;
+}
+
+function requireFreeIds(
+	ctx: HostServiceContext,
+	repositoryList: OriginRepository[],
+): void {
+	for (const { id } of repositoryList) {
+		if (getRepository(ctx.db, id)) {
+			throw new TRPCError({
+				code: "CONFLICT",
+				message: `repository_id_taken: repository ${id} belongs to another project on this host`,
+			});
+		}
+	}
+}
+
+function requirePlaced(
+	repositoryList: OriginRepository[],
+	placements: SetupPlacement[],
+): void {
+	const modes = new Map(placements.map((p) => [p.id, p.mode]));
+	const unplaced = repositoryList.filter((r) => !modes.has(r.id));
+	if (unplaced.length > 0) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `repository_unplaced: pick a folder for ${unplaced
+				.map((r) => r.name)
+				.join(", ")}`,
+		});
+	}
+	for (const repository of repositoryList) {
+		if (modes.get(repository.id)?.kind === "clone" && !repository.url) {
+			throw new TRPCError({
+				code: "BAD_REQUEST",
+				message: `no_clone_url: ${repository.name} has no remote to clone; use an existing folder`,
+			});
+		}
+	}
+}
+
+/** The origin's repositories this host lacks, checked as a fresh set-up checks them. */
+function repositoriesToAdd(
+	ctx: HostServiceContext,
+	origin: SetupOrigin | undefined,
+	projectRows: HostRepositoryRow[],
+	placements: SetupPlacement[],
+): OriginRepository[] {
+	if (!origin) return [];
+	const known = new Set(projectRows.map((row) => row.id));
+	const added = origin.repositories.filter((r) => !known.has(r.id));
+	if (added.length === 0) return [];
+	requireDistinctOriginIds(origin);
+	const names = [
+		...projectRows.map((row) => row.name),
+		...added.map((r) => r.name),
+	];
+	requireUsableNames(names);
+	requireUniqueNames(names);
+	requireFreeIds(ctx, added);
+	requirePlaced(added, placements);
+	return added;
+}
+
+function requireUsableOrigin(
+	origin: SetupOrigin,
+	placements: SetupPlacement[],
+	projectId: string,
+): void {
+	const ids = requireDistinctOriginIds(origin);
 	if (!ids.has(origin.primaryRepositoryId)) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -356,25 +541,7 @@ function requireUsableOrigin(
 			throw repositoryNotFound(projectId, placement.id);
 		}
 	}
-	const placed = new Set(placements.map((p) => p.id));
-	const unplaced = origin.repositories.filter((r) => !placed.has(r.id));
-	if (unplaced.length > 0) {
-		throw new TRPCError({
-			code: "BAD_REQUEST",
-			message: `repository_unplaced: pick a folder for ${unplaced
-				.map((r) => r.name)
-				.join(", ")}`,
-		});
-	}
-	for (const placement of placements) {
-		const repository = origin.repositories.find((r) => r.id === placement.id);
-		if (placement.mode.kind === "clone" && !repository?.url) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: `no_clone_url: ${repository?.name} has no remote to clone; use an existing folder`,
-			});
-		}
-	}
+	requirePlaced(origin.repositories, placements);
 }
 
 async function resolvePlacement(
@@ -402,14 +569,7 @@ async function placeNew(
 	signal?: AbortSignal,
 ) {
 	requireUsableOrigin(origin, placements, projectId);
-	for (const { id } of origin.repositories) {
-		if (getRepository(ctx.db, id)) {
-			throw new TRPCError({
-				code: "CONFLICT",
-				message: `repository_id_taken: repository ${id} belongs to another project on this host`,
-			});
-		}
-	}
+	requireFreeIds(ctx, origin.repositories);
 	const byId = new Map(origin.repositories.map((r) => [r.id, r]));
 	const settled = await Promise.allSettled(
 		placements.map((p) =>
@@ -468,14 +628,18 @@ function insertSetUpProject(
 		});
 	} catch (err) {
 		if (!isUniqueViolation(err)) throw err;
-		throw new TRPCError({
-			code: "CONFLICT",
-			message: `repository_id_taken: project ${projectId} or one of its repositories was set up on this host by another request`,
-			cause: err,
-		});
+		throw raceIdTakenError(projectId, err);
 	}
 	const row = getLocalProject(ctx.db, projectId);
 	if (row) emitProjectChanged(ctx, "created", row);
+}
+
+function raceIdTakenError(projectId: string, cause: unknown): TRPCError {
+	return new TRPCError({
+		code: "CONFLICT",
+		message: `repository_id_taken: project ${projectId} or one of its repositories was set up on this host by another request`,
+		cause,
+	});
 }
 
 function isUniqueViolation(err: unknown): boolean {

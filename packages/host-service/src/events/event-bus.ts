@@ -407,7 +407,7 @@ export class EventBus {
 	private getPortLabel(port: DetectedPort): string | null {
 		const labels = getLabelsForWorkspace((workspaceId) => {
 			try {
-				return this.filesystem.resolvePrimaryCheckoutPath(workspaceId);
+				return this.filesystem.resolveConfigCheckoutPath(workspaceId);
 			} catch {
 				return null;
 			}

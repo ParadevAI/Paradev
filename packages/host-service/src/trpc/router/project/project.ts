@@ -662,7 +662,7 @@ export const projectRouter = router({
 		.input(
 			z.object({
 				projectId: z.string().uuid(),
-				/** The project as another host has it. Needed when this host has no row for it. */
+				/** The project as another host has it. Needed when this host has no row for it or lacks some of its repositories. */
 				origin: z
 					.object({
 						name: z.string().min(1),
