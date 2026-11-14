@@ -18,17 +18,10 @@ export interface AccessAnswer {
 export interface CheckedAccess {
 	guests: boolean;
 	users: Map<string, UserAccess>;
-	/** Stale once `clear` has run since the check began. */
-	generation: number;
 }
 
 /** Resolves null when the page is missing or taken down; rejects when the API cannot answer. */
 export type AskAccess = (userIds: string[]) => Promise<AccessAnswer | null>;
-
-interface Asked {
-	guests: boolean;
-	users: Map<string, UserAccess>;
-}
 
 const REFUSED: UserAccess = { read: false, write: false, author: false };
 
@@ -68,8 +61,7 @@ type CachedUser = {
 };
 
 export class PageAccessCache {
-	#generation = 0;
-	private inFlight = new Map<string, Promise<Asked>>();
+	private inFlight = new Map<string, Promise<CheckedAccess>>();
 
 	constructor(
 		private readonly sql: SqlLike,
@@ -97,22 +89,12 @@ export class PageAccessCache {
 	}
 
 	clear(): void {
-		this.#generation += 1;
 		this.inFlight.clear();
 		this.sql.exec("DELETE FROM access_cache");
 		this.sql.exec("DELETE FROM page_flags");
 	}
 
-	get generation(): number {
-		return this.#generation;
-	}
-
-	isCurrent(generation: number): boolean {
-		return generation === this.#generation;
-	}
-
 	async check(userIds: readonly string[]): Promise<CheckedAccess> {
-		const generation = this.#generation;
 		const fresh = this.now() - ACCESS_TTL_MS;
 		this.sql.exec("DELETE FROM access_cache WHERE at <= ?", fresh);
 		const wanted = new Set(userIds);
@@ -135,23 +117,23 @@ export class PageAccessCache {
 			.toArray();
 		const missing = [...wanted].filter((userId) => !users.has(userId)).sort();
 		if (flags && missing.length === 0) {
-			return { guests: flags.guests === 1, users, generation };
+			return { guests: flags.guests === 1, users };
 		}
 
-		const key = `${generation}:${missing.join(",")}`;
+		const key = missing.join(",");
 		let asking = this.inFlight.get(key);
 		if (!asking) {
-			asking = this.askAll(missing, generation).finally(() => {
+			asking = this.askAll(missing).finally(() => {
 				if (this.inFlight.get(key) === asking) this.inFlight.delete(key);
 			});
 			this.inFlight.set(key, asking);
 		}
 		const asked = await asking;
 		for (const [userId, access] of asked.users) users.set(userId, access);
-		return { guests: asked.guests, users, generation };
+		return { guests: asked.guests, users };
 	}
 
-	private async askAll(missing: string[], generation: number): Promise<Asked> {
+	private async askAll(missing: string[]): Promise<CheckedAccess> {
 		const answers: (AccessAnswer | null)[] = [];
 		for (
 			let start = 0;
@@ -171,7 +153,6 @@ export class PageAccessCache {
 					REFUSED,
 			);
 		}
-		if (!this.isCurrent(generation)) return { guests, users: answered };
 		const at = this.now();
 		this.sql.exec(
 			"INSERT OR REPLACE INTO page_flags (id, guests, at) VALUES (1, ?, ?)",

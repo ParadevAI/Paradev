@@ -87,10 +87,7 @@ export interface PageViewer {
 export interface ViewerAccess {
 	found: boolean;
 	access: UserAccess;
-	generation: number;
 }
-
-const SETTLE_ATTEMPTS = 3;
 
 function seenVersions(manifest: PageManifest): SeenVersions {
 	return {
@@ -201,10 +198,8 @@ export class PageHub extends Server<RealtimeEnv> {
 	private async lookup(viewer: PageViewer | "guest"): Promise<{
 		manifest: PageManifest | null;
 		access: UserAccess;
-		generation: number;
 	}> {
 		this.schema();
-		const generation = this.access.generation;
 		const [manifest, checked] = await Promise.all([
 			this.readManifest(),
 			this.access
@@ -214,13 +209,12 @@ export class PageHub extends Server<RealtimeEnv> {
 					return null;
 				}),
 		]);
-		if (!manifest || !checked) return { manifest, access: REFUSED, generation };
+		if (!manifest || !checked) return { manifest, access: REFUSED };
 		if (viewer === "guest") {
 			const read = checked.guests && manifest.organizationId !== undefined;
 			return {
 				manifest,
 				access: { read, write: false, author: false },
-				generation,
 			};
 		}
 		const access = checked.users.get(viewer.userId);
@@ -230,25 +224,13 @@ export class PageHub extends Server<RealtimeEnv> {
 				access && this.inOrganization(manifest, viewer.organizationIds)
 					? access
 					: REFUSED,
-			generation,
 		};
 	}
 
 	/** Refuses when the API cannot answer. */
 	async accessFor(viewer: PageViewer): Promise<ViewerAccess> {
-		const { manifest, access, generation } = await this.lookup(viewer);
-		return { found: manifest !== null, access, generation };
-	}
-
-	/** For a socket about to be pinned: a nudge during the lookup means ask again. */
-	private async settledLookup(
-		viewer: PageViewer | "guest",
-	): Promise<{ manifest: PageManifest | null; access: UserAccess }> {
-		for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt++) {
-			const { manifest, access, generation } = await this.lookup(viewer);
-			if (this.access.isCurrent(generation)) return { manifest, access };
-		}
-		return { manifest: null, access: REFUSED };
+		const { manifest, access } = await this.lookup(viewer);
+		return { found: manifest !== null, access };
 	}
 
 	async manifestChanged(): Promise<void> {
@@ -277,12 +259,12 @@ export class PageHub extends Server<RealtimeEnv> {
 				console.warn("[page-hub] access re-check failed:", error);
 				return null;
 			});
-		if (checked && !this.access.isCurrent(checked.generation)) return;
 		for (const connection of connections) {
 			const pinned = connection.state;
 			if (!pinned) continue;
+			// The page treats "revoked" as final, so only an explicit no revokes.
 			const allowed =
-				checked !== null &&
+				checked === null ||
 				(pinned.guest
 					? checked.guests
 					: checked.users.get(pinned.userId)?.read === true &&
@@ -366,7 +348,7 @@ export class PageHub extends Server<RealtimeEnv> {
 			return;
 		}
 
-		const { access } = await this.settledLookup({
+		const { access } = await this.lookup({
 			userId: claims.userId,
 			organizationIds: claims.organizationIds,
 		});
@@ -422,7 +404,7 @@ export class PageHub extends Server<RealtimeEnv> {
 		}
 		try {
 			const viewerKey = await this.viewerKeyFor(claims.userId);
-			const { manifest, access } = await this.settledLookup(
+			const { manifest, access } = await this.lookup(
 				claims.guest ? "guest" : claims,
 			);
 			if (!access.read || !manifest) {

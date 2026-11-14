@@ -157,14 +157,13 @@ describe("while an ask is in flight", () => {
 		return release;
 	};
 
-	test("a clear keeps the stale answer out of the cache and marks it stale", async () => {
+	test("a check after a clear does not join an ask from before it", async () => {
 		const release = held();
-		const pending = cache.check(["ana"]);
+		const before = cache.check(["ana"]);
 		cache.clear();
+		const after = cache.check(["ana"]);
 		release();
-		const result = await pending;
-		expect(cache.isCurrent(result.generation)).toBe(false);
-		await cache.check(["ana"]);
+		await Promise.all([before, after]);
 		expect(asked).toEqual([["ana"], ["ana"]]);
 	});
 

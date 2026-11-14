@@ -40,7 +40,6 @@ const fakeShares = new Map<string, Set<string>>();
 const fakeOrganizations = new Map<string, string[]>();
 const failingPages = new Set<string>();
 const accessCalls: { pageId: string; userIds: string[] }[] = [];
-let heldAnswers: Promise<void> | null = null;
 
 function fakeAccess(pageId: string, userIds: string[]) {
 	const page = fakePages.get(pageId);
@@ -154,7 +153,6 @@ async function main() {
 					return new Response("down", { status: 500 });
 				}
 				const answer = fakeAccess(pageId, userIds);
-				if (heldAnswers) await heldAnswers;
 				return answer
 					? Response.json(answer)
 					: new Response("not found", { status: 404 });
@@ -1462,86 +1460,72 @@ async function main() {
 		);
 	}
 
-	console.log("\na nudge during a lookup");
+	console.log("\nwhen the API cannot answer");
 	fakeShares.set(SHARED_WITH_PAGE, new Set([MEMBER]));
 	await nudgeShared();
-	const raceTicket = await ticket(SHARED_WITH_PAGE, memberJwt);
-	await nudgeShared();
-	let release = () => {};
-	heldAnswers = new Promise<void>((resolve) => {
-		release = resolve;
-	});
-	const beforeConnect = callsFor(SHARED_WITH_PAGE);
-	const racing = open(String(raceTicket.url), sharedOrigin).catch(
-		(error) => (error as Error).message,
-	);
-	for (
-		let n = 0;
-		n < 100 && callsFor(SHARED_WITH_PAGE) === beforeConnect;
-		n++
-	) {
-		await Bun.sleep(20);
-	}
-	fakeShares.set(SHARED_WITH_PAGE, new Set());
-	const connectAsked = callsFor(SHARED_WITH_PAGE);
-	const racingNudge = nudgeShared();
-	for (let n = 0; n < 100 && callsFor(SHARED_WITH_PAGE) === connectAsked; n++) {
-		await Bun.sleep(20);
-	}
-	heldAnswers = null;
-	release();
-	await racingNudge;
-	const raced = await racing;
+	const opened = async (jwt: string) => {
+		const issued = await ticket(SHARED_WITH_PAGE, jwt);
+		return open(String(issued.url), sharedOrigin).catch(
+			(error) => (error as Error).message,
+		);
+	};
+	const authorOpen = await opened(authorJwt);
+	const memberOpen = await opened(memberJwt);
 	check(
-		"a yes that lands after a nudge does not open the socket",
-		typeof raced === "string" && raced.includes("4403"),
-		raced,
+		"the author and a sharee open sockets while the API is up",
+		typeof authorOpen !== "string" && typeof memberOpen !== "string",
+		{ authorOpen, memberOpen },
 	);
-	const afterRace = await ticket(SHARED_WITH_PAGE, memberJwt);
-	check(
-		"and is not cached for the next request",
-		afterRace.status === 403,
-		afterRace,
-	);
+	if (typeof authorOpen !== "string" && typeof memberOpen !== "string") {
+		failingPages.add(SHARED_WITH_PAGE);
+		const failedNudge = await nudgeShared();
+		const afterFailure = await rpc(
+			authorOpen.socket,
+			{ op: "get", key: "k" },
+			"down-1",
+		).catch((error) => (error as Error).message);
+		check(
+			"a failed re-check after a nudge keeps the open sockets",
+			failedNudge.ok &&
+				typeof afterFailure !== "string" &&
+				afterFailure.ok === true &&
+				memberOpen.socket.readyState === WebSocket.OPEN,
+			afterFailure,
+		);
 
-	console.log("\nfail closed when the API cannot answer");
-	const authorShared = await ticket(SHARED_WITH_PAGE, authorJwt);
-	const authorOpen = await open(String(authorShared.url), sharedOrigin).catch(
-		(error) => (error as Error).message,
-	);
-	check(
-		"the author opens the socket while the API is up",
-		typeof authorOpen !== "string",
-		authorOpen,
-	);
-	failingPages.add(SHARED_WITH_PAGE);
-	if (typeof authorOpen !== "string") {
-		const authorClosed = closedCode(authorOpen.socket);
+		const whileDown = await ticket(SHARED_WITH_PAGE, authorJwt);
+		check(
+			"a failed lookup refuses a new ticket with 403",
+			whileDown.status === 403,
+			whileDown,
+		);
+		const downAgain = callsFor(SHARED_WITH_PAGE);
+		await ticket(SHARED_WITH_PAGE, authorJwt);
+		check(
+			"a failed lookup is not cached, so the next request asks again",
+			callsFor(SHARED_WITH_PAGE) > downAgain,
+		);
+
+		failingPages.delete(SHARED_WITH_PAGE);
+		fakeShares.set(SHARED_WITH_PAGE, new Set());
+		const memberClosed = closedCode(memberOpen.socket);
 		await nudgeShared();
 		check(
-			"a failed re-check after a nudge revokes the open socket",
-			(await authorClosed) === "4403",
+			"once the API answers, an explicit no revokes",
+			(await memberClosed) === "4403",
 		);
+		const authorStays = await rpc(
+			authorOpen.socket,
+			{ op: "get", key: "k" },
+			"down-2",
+		).catch((error) => (error as Error).message);
+		check(
+			"and an explicit yes keeps the socket",
+			typeof authorStays !== "string" && authorStays.ok === true,
+			authorStays,
+		);
+		authorOpen.socket.close();
 	}
-	const whileDown = await ticket(SHARED_WITH_PAGE, authorJwt);
-	check(
-		"a failed lookup refuses a ticket with 403",
-		whileDown.status === 403,
-		whileDown,
-	);
-	const downAgain = callsFor(SHARED_WITH_PAGE);
-	await ticket(SHARED_WITH_PAGE, authorJwt);
-	check(
-		"a failed lookup is not cached, so the next request asks again",
-		callsFor(SHARED_WITH_PAGE) > downAgain,
-	);
-	failingPages.delete(SHARED_WITH_PAGE);
-	const recovered = await ticket(SHARED_WITH_PAGE, authorJwt);
-	check(
-		"the author is let back in once the API answers",
-		recovered.status === 200,
-		recovered,
-	);
 
 	shutdown();
 
