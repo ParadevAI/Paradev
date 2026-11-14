@@ -10,6 +10,7 @@ import {
 	workspaceRepositories,
 	workspaces,
 } from "../../../db/schema";
+import { listProjectRepositories } from "../../../projects/repositories";
 import { createGitEnvResolver, gitCeilingEnv } from "../../../runtime/git";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
@@ -248,9 +249,10 @@ const CHECKOUT_REFUSALS = {
 async function assertBranchNotPushed(
 	git: SimpleGit,
 	branch: string,
+	remoteName: string,
 ): Promise<void> {
 	try {
-		const remote = await git.raw(["ls-remote", "--heads", "origin", branch]);
+		const remote = await git.raw(["ls-remote", "--heads", remoteName, branch]);
 		if (remote.trim()) {
 			throw new TRPCError({
 				code: "PRECONDITION_FAILED",
@@ -692,7 +694,15 @@ export const gitRouter = router({
 			const oldName = callerBranchExists
 				? input.oldName
 				: (checkout.row?.branch ?? input.oldName);
-			await assertBranchNotPushed(git, oldName);
+			const repository = checkout.repository;
+			const multiRepoProject =
+				repository != null &&
+				listProjectRepositories(ctx.db, repository.projectId).length > 1;
+			await assertBranchNotPushed(
+				git,
+				oldName,
+				multiRepoProject ? (repository.remoteName ?? "origin") : "origin",
+			);
 			const renamesCheckedOutBranch =
 				(await git.raw(["rev-parse", "--abbrev-ref", "HEAD"])).trim() ===
 				oldName;

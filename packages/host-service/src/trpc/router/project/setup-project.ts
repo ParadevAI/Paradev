@@ -3,12 +3,7 @@ import { join, resolve as resolvePath } from "node:path";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
-import {
-	projects,
-	repositories,
-	workspaceRepositories,
-	workspaces,
-} from "../../../db/schema";
+import { projects, repositories, workspaces } from "../../../db/schema";
 import {
 	emitProjectChanged,
 	getLocalProject,
@@ -22,9 +17,7 @@ import {
 	type HostRepositoryRow,
 	listProjectRepositories,
 } from "../../../projects/repositories";
-import { isMissingPath } from "../../../runtime/path-state";
 import type { HostServiceContext } from "../../../types";
-import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
 import type { HostWorkspaceRow } from "../../../workspaces/local-workspace-store";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import {
@@ -37,11 +30,11 @@ import {
 	removeCreated,
 	repositoryTakenError,
 	repositoryValues,
+	requireNoWorktrees,
 	requireUniqueNames,
 	requireUsableNames,
 	resolveRepositoryFolder,
 	snapshotOf,
-	workspaceList,
 } from "./handlers";
 import {
 	adoptLocalRepo,
@@ -202,35 +195,6 @@ async function isCheckoutOf(
 		rethrowEnvironmentalGitError(err);
 		return false;
 	}
-}
-
-/** A worktree stays linked to the clone it was made from, so its repository cannot move. */
-function requireNoWorktrees(
-	ctx: HostServiceContext,
-	repository: HostRepositoryRow,
-): void {
-	const own = resolvePath(repository.repoPath);
-	const worktrees = ctx.db
-		.select({ workspace: workspaces })
-		.from(workspaceRepositories)
-		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
-		.where(eq(workspaceRepositories.repositoryId, repository.id))
-		.all()
-		.map((row) => row.workspace)
-		.filter((workspace) => {
-			if (workspace.type === "local") return false;
-			const checkout = listWorkspaceCheckouts(ctx.db, workspace).find(
-				(c) => c.repository.id === repository.id,
-			);
-			if (!checkout || resolvePath(checkout.path) === own) return false;
-			return workspace.archivedAt === null || !isMissingPath(checkout.path);
-		});
-	if (worktrees.length === 0) return;
-	const one = worktrees.length === 1;
-	throw new TRPCError({
-		code: "PRECONDITION_FAILED",
-		message: `repository_has_worktrees: ${repository.name} cannot move to another folder while ${workspaceList(worktrees)} ${one ? "uses a worktree" : "use worktrees"} of it; keep its folder at ${repository.repoPath}, or delete ${one ? "that workspace" : "those workspaces"} first`,
-	});
 }
 
 interface AddedSource {

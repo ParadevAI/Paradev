@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { rm } from "node:fs/promises";
+import { resolve as resolvePath } from "node:path";
 import { isReservedRootName } from "@superset/shared/workspace-root";
 import { TRPCError } from "@trpc/server";
 import { and, asc, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
@@ -754,6 +755,35 @@ export function resolveRepositoryFolder(
 		: adoptLocalRepo(path, options);
 }
 
+/** A worktree stays linked to the clone it was made from, so its repository cannot move. */
+export function requireNoWorktrees(
+	ctx: HostServiceContext,
+	repository: HostRepositoryRow,
+): void {
+	const own = resolvePath(repository.repoPath);
+	const worktrees = ctx.db
+		.select({ workspace: workspaces })
+		.from(workspaceRepositories)
+		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
+		.where(eq(workspaceRepositories.repositoryId, repository.id))
+		.all()
+		.map((row) => row.workspace)
+		.filter((workspace) => {
+			if (workspace.type === "local") return false;
+			const checkout = listWorkspaceCheckouts(ctx.db, workspace).find(
+				(c) => c.repository.id === repository.id,
+			);
+			if (!checkout || resolvePath(checkout.path) === own) return false;
+			return workspace.archivedAt === null || !isMissingPath(checkout.path);
+		});
+	if (worktrees.length === 0) return;
+	const one = worktrees.length === 1;
+	throw new TRPCError({
+		code: "PRECONDITION_FAILED",
+		message: `repository_has_worktrees: ${repository.name} cannot move to another folder while ${workspaceList(worktrees)} ${one ? "uses a worktree" : "use worktrees"} of it; keep its folder at ${repository.repoPath}, or delete ${one ? "that workspace" : "those workspaces"} first`,
+	});
+}
+
 /**
  * Point a repository at the folder it now lives in. A repository with a
  * GitHub remote only accepts a folder with the same remote. Its name stays:
@@ -775,6 +805,7 @@ export async function relocateRepository(
 		throw repositoryTakenError(resolved.repoPath);
 	}
 	if (resolved.repoPath !== repository.repoPath) {
+		requireNoWorktrees(ctx, repository);
 		applyRelocations(
 			ctx,
 			args.projectId,

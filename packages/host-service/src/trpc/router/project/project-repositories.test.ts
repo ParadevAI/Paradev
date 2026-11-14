@@ -550,6 +550,38 @@ describe("project repositories", () => {
 		expect(pathOf(box.id)).toBe(boxRoot);
 	});
 
+	it("refuses to relocate a repository while a workspace uses a worktree of it", async () => {
+		const { caller, db } = setup();
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
+		});
+		const ids = project.repositories.map((r) => r.id);
+		const api = project.repositories.find((r) => r.name === "api");
+		if (!api) throw new Error("no api repository");
+		const wsRoot = join(root, "relocate-ws");
+		mkdirSync(join(wsRoot, "api"), { recursive: true });
+		mkdirSync(join(wsRoot, "web"), { recursive: true });
+		seedWorkspace(
+			{ db },
+			{
+				projectId: project.id,
+				worktreePath: wsRoot,
+				branch: "feat",
+				type: "worktree",
+				repositoryIds: ids,
+			},
+		);
+
+		await expect(
+			caller.relocateRepository({
+				projectId: project.id,
+				repositoryId: api.id,
+				path: await gitRepo("api-moved"),
+			}),
+		).rejects.toThrow("repository_has_worktrees");
+	});
+
 	it("sets sparse checkout paths per repository", async () => {
 		const { caller } = setup();
 		const project = await caller.create({
