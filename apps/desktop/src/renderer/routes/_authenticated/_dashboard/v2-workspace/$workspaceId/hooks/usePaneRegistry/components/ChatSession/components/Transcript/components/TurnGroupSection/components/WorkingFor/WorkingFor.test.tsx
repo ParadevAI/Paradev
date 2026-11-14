@@ -37,6 +37,14 @@ test("a turn the user stopped says when, instead of how long it worked", () => {
 
 test("a turn held open only by background work says so instead of counting", () => {
 	const view = render(<WorkingFor background startedAtMs={0} />);
-	expect(view.getByText("Waiting on background work")).toBeTruthy();
+	expect(view.getAllByText("Waiting on background work")).toHaveLength(2);
+	expect(view.getByRole("status").textContent).toBe(
+		"Waiting on background work",
+	);
 	expect(view.queryByText(/Working for/)).toBeNull();
+});
+
+test("a running turn's clock is not announced as a status", () => {
+	const view = render(<WorkingFor startedAtMs={0} />);
+	expect(view.getByRole("status").textContent).toBe("");
 });

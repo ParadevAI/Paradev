@@ -3498,6 +3498,17 @@ describe("AcpAdapter on protocol v2", () => {
 			"running",
 			"completed",
 		]);
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-2",
+			name: "Claude is working",
+			description: "A scheduled wakeup fired.",
+			taskType: "turn",
+		});
+		await flush();
+		const wakeup = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(wakeup.at(-1)?.id).not.toBe(turns[0]?.id);
 		const reply = events.find(
 			(e) =>
 				e.kind === "item" &&

@@ -615,7 +615,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const autonomousTask = [...this.autonomousTurns].find(
 			([, id]) => id === turnId,
 		)?.[0];
-		if (autonomousTask) void this.stopAutonomousTurn(autonomousTask);
+		if (autonomousTask) void this.stopAutonomousTurn(autonomousTask, turnId);
 		else this.client.notify("session/cancel", { sessionId: this.sessionId });
 		if (this.cancelPendingApprovals(turnId)) {
 			this.emitSession({ status: this.statusAfterApprovals() });
@@ -623,7 +623,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	/** `session/cancel` would also stop the session's background workflows. */
-	private async stopAutonomousTurn(asyncTaskId: string): Promise<void> {
+	private async stopAutonomousTurn(
+		asyncTaskId: string,
+		turnId: string,
+	): Promise<void> {
 		const client = this.client;
 		const sessionId = this.sessionId;
 		if (!client || !sessionId) return;
@@ -635,7 +638,11 @@ export class AcpAdapter implements HarnessAdapter {
 			)
 			.catch(() => null);
 		if ((response as { stopped?: unknown } | null)?.stopped === true) return;
-		if (this.autonomousTurns.has(asyncTaskId))
+		if (
+			this.autonomousTurns.get(asyncTaskId) === turnId &&
+			this.currentTurn?.id === turnId &&
+			this.currentTurn.status === "running"
+		)
 			client.notify("session/cancel", { sessionId });
 	}
 
@@ -2030,6 +2037,7 @@ export class AcpAdapter implements HarnessAdapter {
 			});
 		} else {
 			const { completedAtMs: _completedAtMs, ...reopened } = latest;
+			this.lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
 			this.autonomousTurns.set(asyncTaskId, latest.id);
 			this.emitTurn({ ...reopened, status: "running" });
 		}

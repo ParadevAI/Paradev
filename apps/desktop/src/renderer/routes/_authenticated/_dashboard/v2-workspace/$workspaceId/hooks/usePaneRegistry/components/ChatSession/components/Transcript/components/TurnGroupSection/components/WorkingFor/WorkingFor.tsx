@@ -95,6 +95,9 @@ export function WorkingFor({
 
 	return (
 		<div className="flex min-w-0 items-center gap-1.5 py-1 font-sans text-foreground/50 text-sm">
+			<span className="sr-only" role="status">
+				{background ? t({ message: "Waiting on background work" }) : ""}
+			</span>
 			{onToggle ? (
 				<button
 					className="flex min-w-0 items-center gap-1.5 transition-colors duration-200 hover:text-foreground/80"
