@@ -217,18 +217,29 @@ export function DiffPane({
 				: sidebarRef,
 		[range, sidebarRef],
 	);
-	const scrollStateKey = useMemo(
-		() =>
-			createPaneScrollStateKey({
-				workspaceId,
-				paneId: context.pane.id,
-				viewId: "diff",
-				resourceId: isMultiRepo
-					? JSON.stringify({ repositories: [...shownRepositories].sort(), ref })
-					: JSON.stringify(ref),
-			}),
-		[isMultiRepo, shownRepositories, workspaceId, context.pane.id, ref],
-	);
+	const { refByRepositoryId } = repositoryChangesets;
+	const scrollStateKey = useMemo(() => {
+		const repositories = [...shownRepositories].sort();
+		return createPaneScrollStateKey({
+			workspaceId,
+			paneId: context.pane.id,
+			viewId: "diff",
+			resourceId: isMultiRepo
+				? JSON.stringify({
+						repositories,
+						ref,
+						scopes: repositories.map((id) => refByRepositoryId[id] ?? null),
+					})
+				: JSON.stringify(ref),
+		});
+	}, [
+		isMultiRepo,
+		shownRepositories,
+		refByRepositoryId,
+		workspaceId,
+		context.pane.id,
+		ref,
+	]);
 	const initialScrollState = useMemo(
 		() => getPaneScrollState(scrollStateKey),
 		[scrollStateKey],

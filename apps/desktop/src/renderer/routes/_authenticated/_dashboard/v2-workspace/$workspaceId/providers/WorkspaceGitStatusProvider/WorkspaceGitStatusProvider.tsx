@@ -10,15 +10,15 @@ import {
 	useAreCheckoutsLoaded,
 	useWorkspaceCheckouts,
 } from "../../state/activeRepositoryStore";
+import { CheckoutGitStatusSource } from "./components/CheckoutGitStatusSource";
+import type { CheckoutGitStatus } from "./types";
+import { readCachedCheckoutGitStatus } from "./utils/readCachedCheckoutGitStatus";
 import {
 	emptyWorkspaceScopedEntries,
 	entriesForWorkspace,
 	setWorkspaceScopedEntry,
 	type WorkspaceScopedEntries,
-} from "../../utils/workspaceScopedEntries";
-import { CheckoutGitStatusSource } from "./components/CheckoutGitStatusSource";
-import type { CheckoutGitStatus } from "./types";
-import { readCachedCheckoutGitStatus } from "./utils/readCachedCheckoutGitStatus";
+} from "./utils/workspaceScopedEntries";
 
 interface WorkspaceGitStatusContextValue {
 	byRepositoryId: Record<string, CheckoutGitStatus>;

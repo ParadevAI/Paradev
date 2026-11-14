@@ -1,5 +1,8 @@
 import { type ReactNode, useCallback, useMemo, useState } from "react";
-import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
+import type {
+	ChangesetFile,
+	DiffRef,
+} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import {
 	type RepositoryChangeset,
 	RepositoryChangesetSource,
@@ -12,6 +15,8 @@ interface UseRepositoryChangesetsResult {
 	isLoading: boolean;
 	/** The checkouts whose files failed to load, in repository order. */
 	failedRepositoryIds: string[];
+	/** Each checkout's diff scope, once its source has reported it. */
+	refByRepositoryId: Record<string, DiffRef | undefined>;
 	/** Render these: each one keeps a checkout's git status live. */
 	sources: ReactNode;
 }
@@ -37,6 +42,11 @@ export function useRepositoryChangesets(
 		[repositoryIds, byId],
 	);
 
+	const refByRepositoryId = useMemo(
+		() => Object.fromEntries(repositoryIds.map((id) => [id, byId[id]?.ref])),
+		[repositoryIds, byId],
+	);
+
 	const sources = repositoryIds.map((id) => (
 		<RepositoryChangesetSource
 			key={id}
@@ -46,5 +56,11 @@ export function useRepositoryChangesets(
 		/>
 	));
 
-	return { files, isLoading, failedRepositoryIds, sources };
+	return {
+		files,
+		isLoading,
+		failedRepositoryIds,
+		refByRepositoryId,
+		sources,
+	};
 }

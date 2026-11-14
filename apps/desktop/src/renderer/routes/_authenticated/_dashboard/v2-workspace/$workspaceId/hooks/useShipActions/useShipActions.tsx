@@ -9,7 +9,7 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-works
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 import { useCheckoutGitStatus } from "../../providers/WorkspaceGitStatusProvider";
 import { checkoutInput } from "../../utils/checkoutInput";
-import { useHasCommitsAhead } from "../useHasCommitsAhead";
+import { useHasCommitsAhead } from "./hooks/useHasCommitsAhead";
 
 interface UseShipActionsOptions {
 	workspaceId: string;

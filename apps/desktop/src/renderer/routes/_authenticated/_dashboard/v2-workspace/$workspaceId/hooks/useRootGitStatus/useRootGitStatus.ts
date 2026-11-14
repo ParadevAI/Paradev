@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useCheckoutGitStatuses } from "../../providers/WorkspaceGitStatusProvider";
 import { useWorkspaceCheckouts } from "../../state/activeRepositoryStore";
-import { rootGitStatus } from "../../utils/rootGitStatus";
+import { rootGitStatus } from "./utils/rootGitStatus";
 
 /** Git status for a file tree rooted at the workspace folder. */
 export function useRootGitStatus(workspaceId: string) {

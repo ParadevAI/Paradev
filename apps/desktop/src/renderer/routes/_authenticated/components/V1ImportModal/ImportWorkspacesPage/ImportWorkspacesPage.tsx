@@ -25,6 +25,7 @@ import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/u
 import { ImportPageShell } from "../components/ImportPageShell";
 import { ImportRow, type RowAction } from "../components/ImportRow";
 import { useForeignV1Claims } from "../hooks/useForeignV1Claims";
+import { importedV1WorkspaceCheck } from "./utils/importedV1WorkspaceCheck";
 
 interface ImportWorkspacesPageProps {
 	organizationId: string;
@@ -83,13 +84,10 @@ export function ImportWorkspacesPage({
 		[hostProjectListQuery.data, projectsQuery.data],
 	);
 
-	const hostWorkspaceKeys = useMemo(() => {
-		const set = new Set<string>();
-		for (const w of hostWorkspacesQuery.data ?? []) {
-			set.add(`${w.projectId}\0${w.branch}`);
-		}
-		return set;
-	}, [hostWorkspacesQuery.data]);
+	const isImportedOnHost = useMemo(
+		() => importedV1WorkspaceCheck(hostWorkspacesQuery.data ?? []),
+		[hostWorkspacesQuery.data],
+	);
 
 	const importedRepositories = Array.from(
 		new Map(
@@ -182,9 +180,12 @@ export function ImportWorkspacesPage({
 		if (!target) continue;
 		const { v2ProjectId, repositoryId, multiRepo } = target;
 
-		const alreadyImported = hostWorkspaceKeys.has(
-			`${v2ProjectId}\0${workspace.branch}`,
-		);
+		const alreadyImported = isImportedOnHost({
+			v2ProjectId,
+			repositoryId,
+			multiRepo,
+			branch: workspace.branch,
+		});
 		if (!alreadyImported) {
 			const validBranches = validBranchesByRepositoryId.get(repositoryId);
 			if (validBranches !== undefined && !validBranches.has(workspace.branch)) {

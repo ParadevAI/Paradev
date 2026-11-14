@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {
 	type ChangesetFile,
+	type DiffRef,
 	useChangeset,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import { useSidebarDiffRef } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useSidebarDiffRef";
@@ -9,6 +10,7 @@ export interface RepositoryChangeset {
 	files: ChangesetFile[];
 	isLoading: boolean;
 	isError: boolean;
+	ref: DiffRef;
 }
 
 interface RepositoryChangesetSourceProps {
@@ -31,7 +33,7 @@ export function RepositoryChangesetSource({
 		tagRepository: true,
 	});
 	useEffect(() => {
-		onChange(repositoryId, { files, isLoading, isError });
-	}, [onChange, repositoryId, files, isLoading, isError]);
+		onChange(repositoryId, { files, isLoading, isError, ref });
+	}, [onChange, repositoryId, files, isLoading, isError, ref]);
 	return null;
 }

@@ -1,7 +1,7 @@
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider";
-import { useAreCheckoutsLoaded } from "../../state/activeRepositoryStore";
-import { checkoutInput } from "../../utils/checkoutInput";
+import { useAreCheckoutsLoaded } from "../../../../state/activeRepositoryStore";
+import { checkoutInput } from "../../../../utils/checkoutInput";
 
 /**
  * The branch's commits ahead of its base. GitHub rejects a PR with no
