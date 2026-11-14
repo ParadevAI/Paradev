@@ -12,7 +12,8 @@ withLocalHostService("org-1", {
 				{ id: "r-web", name: "web", isPrimary: false },
 			],
 		},
-		{ id: "p-old", name: "legacy" },
+		{ id: "p-old", name: "legacy", repoPath: "/src/legacy-repo" },
+		{ id: "p-bare", name: "bare" },
 	],
 });
 
@@ -25,7 +26,8 @@ describe("projects list", () => {
 			signal: new AbortController().signal,
 		});
 		expect(result).toMatchObject([
-			{ name: "legacy", repos: "", repositories: [] },
+			{ name: "bare", repos: "-", repositories: [] },
+			{ name: "legacy", repos: "legacy-repo", repositories: [] },
 			{ name: "orbit", repos: "api*, web" },
 		]);
 	});

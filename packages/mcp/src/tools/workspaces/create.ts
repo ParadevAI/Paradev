@@ -205,9 +205,6 @@ export function register(server: McpServer): void {
 					},
 				);
 			}
-			if (input.branch !== undefined && input.pr !== undefined) {
-				throw new Error("`branch` and `pr` cannot both be set");
-			}
 			const target = {
 				relayUrl: ctx.relayUrl,
 				organizationId: ctx.organizationId,
@@ -270,7 +267,12 @@ type HostProject = {
  * without `repositories` predates them and reads the top-level fields.
  */
 export async function checkoutsFor(
-	input: { pr?: number; baseBranch?: string; repository?: string },
+	input: {
+		branch?: string;
+		pr?: number;
+		baseBranch?: string;
+		repository?: string;
+	},
 	getProject: () => Promise<HostProject | null>,
 ): Promise<Record<string, { pr?: number; baseBranch?: string }> | undefined> {
 	const baseBranch = input.baseBranch || undefined;
@@ -282,6 +284,13 @@ export async function checkoutsFor(
 	}
 	const project = await getProject();
 	if (!project) throw new Error("This project is not set up on that host");
+	if (
+		input.branch !== undefined &&
+		input.pr !== undefined &&
+		(project.repositories?.length ?? 1) === 1
+	) {
+		throw new Error("`branch` and `pr` cannot both be set");
+	}
 	if (!project.repositories) {
 		if (input.repository !== undefined) {
 			throw new Error(

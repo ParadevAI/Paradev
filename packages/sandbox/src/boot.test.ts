@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { execFileSync, spawnSync } from "node:child_process";
 import {
 	existsSync,
@@ -68,7 +68,8 @@ describe("superset-boot", () => {
 	});
 
 	describe("checkout_one", () => {
-		const dir = mkdtempSync(join(tmpdir(), "superset-boot-"));
+		let dir = "";
+		let harness = "";
 		const gitEnv = {
 			...process.env,
 			GIT_CONFIG_GLOBAL: "/dev/null",
@@ -80,25 +81,28 @@ describe("superset-boot", () => {
 		};
 		const git = (...args: string[]) =>
 			execFileSync("git", args, { env: gitEnv, stdio: "pipe" });
-		git("init", "-q", "-b", "main", join(dir, "src"));
-		writeFileSync(join(dir, "src", "on-main"), "");
-		git("-C", join(dir, "src"), "add", "on-main");
-		git("-C", join(dir, "src"), "commit", "-q", "-m", "main");
-		git("clone", "-q", "--bare", join(dir, "src"), join(dir, "remote.git"));
-		const fn = boot.match(/^checkout_one\(\) \{\n[\s\S]*?\n\}\n/m)?.[0];
-		const harness = join(dir, "harness.sh");
-		writeFileSync(
-			harness,
-			[
-				"set -uo pipefail",
-				'stamp() { printf "%s\\n" "$*" >> "$SUPERSET_WORKSPACE_DIR/../stamps"; }',
-				'as_user() { "$@"; }',
-				"chown() { :; }",
-				'install() { local last; for last; do :; done; mkdir -p "$last"; }',
-				fn ?? "exit 99",
-				'checkout_one "$@"',
-			].join("\n"),
-		);
+		beforeAll(() => {
+			dir = mkdtempSync(join(tmpdir(), "superset-boot-"));
+			git("init", "-q", "-b", "main", join(dir, "src"));
+			writeFileSync(join(dir, "src", "on-main"), "");
+			git("-C", join(dir, "src"), "add", "on-main");
+			git("-C", join(dir, "src"), "commit", "-q", "-m", "main");
+			git("clone", "-q", "--bare", join(dir, "src"), join(dir, "remote.git"));
+			const fn = boot.match(/^checkout_one\(\) \{\n[\s\S]*?\n\}\n/m)?.[0];
+			harness = join(dir, "harness.sh");
+			writeFileSync(
+				harness,
+				[
+					"set -uo pipefail",
+					'stamp() { printf "%s\\n" "$*" >> "$SUPERSET_WORKSPACE_DIR/../stamps"; }',
+					'as_user() { "$@"; }',
+					"chown() { :; }",
+					'install() { local last; for last; do :; done; mkdir -p "$last"; }',
+					fn ?? "exit 99",
+					'checkout_one "$@"',
+				].join("\n"),
+			);
+		});
 
 		function checkoutOne(
 			path: string,

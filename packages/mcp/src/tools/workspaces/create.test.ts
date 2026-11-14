@@ -126,9 +126,24 @@ test("a host without repositories gets only the legacy fields", async () => {
 		definition.handler({ ...worktree, pr: 7, repository: "docs" }, {}),
 	).rejects.toThrow("too old");
 });
-test("rejects branch plus pr before calling the host", async () => {
+test("rejects branch plus pr on a one-repository project", async () => {
+	hostProject = {
+		primaryRepositoryId: "repo-app",
+		repositories: [{ id: "repo-app", name: "app" }],
+	};
 	await expect(
 		definition.handler({ ...worktree, branch: "feature", pr: 7 }, {}),
 	).rejects.toThrow("cannot both be set");
 	expect(request).toBeUndefined();
+});
+test("sends branch plus pr on a multi-repository project", async () => {
+	hostProject = multiRepoProject;
+	await definition.handler(
+		{ ...worktree, branch: "feature", pr: 7, repository: "docs" },
+		{},
+	);
+	expect(request?.input).toMatchObject({
+		branch: "feature",
+		checkouts: { "repo-docs": { pr: 7 } },
+	});
 });

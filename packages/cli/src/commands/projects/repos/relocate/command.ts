@@ -43,9 +43,11 @@ export default command({
 			repositoryId: repository.id,
 			path,
 		});
+		const stored =
+			project.repositories.find((r) => r.id === repository.id)?.path ?? path;
 		return {
 			data: project,
-			message: `${repository.name} is now at ${path}`,
+			message: `${repository.name} is now at ${stored}`,
 		};
 	},
 });

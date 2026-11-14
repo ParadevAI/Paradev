@@ -41,9 +41,11 @@ export default command({
 				return {
 					name: project.name,
 					// The primary is marked with `*`.
-					repos: repositories
-						.map((r) => (r.isPrimary ? `${r.name}*` : r.name))
-						.join(", "),
+					repos: project.repositories
+						? repositories
+								.map((r) => (r.isPrimary ? `${r.name}*` : r.name))
+								.join(", ")
+						: legacyRepoName(project),
 					id: project.id,
 					repositories,
 				};
@@ -51,3 +53,9 @@ export default command({
 			.sort((a, b) => a.name.localeCompare(b.name));
 	},
 });
+
+function legacyRepoName(project: object): string {
+	const repoPath = "repoPath" in project ? project.repoPath : undefined;
+	if (typeof repoPath !== "string") return "-";
+	return repoPath.split(/[\\/]/).filter(Boolean).pop() ?? "-";
+}

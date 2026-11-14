@@ -14,12 +14,15 @@ withLocalHostService("org-1", {
 	"project.get": () => PROJECT,
 	"project.relocateRepository": (input) => {
 		relocateInput = input;
-		return PROJECT;
+		return {
+			...PROJECT,
+			repositories: [{ ...PROJECT.repositories[0], path: "/real/api" }],
+		};
 	},
 });
 
 describe("projects repos relocate", () => {
-	test("sends the repository and its new folder", async () => {
+	test("sends the repository and its new folder, and prints the stored path", async () => {
 		const result = (await relocateCommand.run({
 			ctx: { config: { organizationId: "org-1" }, bearer: "bearer" } as never,
 			args: { repository: "api" } as never,
@@ -35,7 +38,7 @@ describe("projects repos relocate", () => {
 			repositoryId: "r-api",
 			path: "/moved/api",
 		});
-		expect(result.message).toBe("api is now at /moved/api");
+		expect(result.message).toBe("api is now at /real/api");
 	});
 
 	test("resolves a relative --path against the current folder", async () => {

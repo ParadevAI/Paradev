@@ -185,23 +185,6 @@ await client.workspaces.delete('<workspaceId>', { hostId: '<machineId>' });
 
 ---
 
-## projects
-
-### `projects.list({ hostId })`
-
-List projects set up on a host. Projects are host-owned; there is no
-org-wide project registry.
-
-```ts
-const projects = await client.projects.list({ hostId: '<machineId>' });
-```
-
-Returns `Array<Project>` (`id`, `name`, `primaryRepositoryId`, `repositories`, …).
-Each entry of `repositories` has `id`, `name`, `path` (its folder on the host),
-`url` and `isPrimary`.
-
----
-
 ## hosts
 
 ### `hosts.list()`
