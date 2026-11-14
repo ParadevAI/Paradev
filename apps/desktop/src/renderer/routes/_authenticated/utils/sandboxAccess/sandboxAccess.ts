@@ -12,7 +12,6 @@ export interface SandboxAccess extends SandboxGrant {
 	agentCredentialsChanged: boolean;
 }
 
-/** Every cloud workspace grant this window holds; `wake` starts a stopped box. */
 export const sandboxAccess = createSandboxAccess<SandboxAccess>(
 	async (workspaceId, wake) => {
 		const granted = await apiTrpcClient.cloudWorkspace.access.mutate({

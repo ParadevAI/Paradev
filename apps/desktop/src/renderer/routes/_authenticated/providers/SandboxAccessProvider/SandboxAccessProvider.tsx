@@ -51,7 +51,6 @@ export interface SandboxAccessValue {
 	/** The open workspace, when its box booted with agent sign-ins its creator has since changed. */
 	agentCredentialsChangedWorkspaceId: string | null;
 	usageRefusal: { workspaceId: string; error: unknown } | null;
-	/** Wakes the open workspace's box now; rejects when the wake failed. */
 	wakeOpenWorkspace: () => Promise<void>;
 }
 

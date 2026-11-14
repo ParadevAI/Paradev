@@ -1,6 +1,5 @@
 import type { SandboxHostState } from "./reach";
 
-/** The part of a reconnecting socket this needs; the desktop event bus is one. */
 export interface SandboxSocket {
 	getConnectionStatus(): { state: string };
 	subscribeConnectionStatus(
@@ -9,20 +8,10 @@ export interface SandboxSocket {
 	reconnect(): void;
 }
 
-/** Under this, a dropped socket is an ordinary redial, not a stopped box. */
 export const DOWN_GRACE_MS = 2_000;
-/**
- * A socket that keeps failing stays in one state and reports nothing more,
- * so while it is down the box is probed again at this cadence.
- */
 export const RECHECK_MS = 10_000;
+export const MAX_RECHECK_MS = 5 * 60_000;
 
-/**
- * Wakes a cloud workspace's box when its socket is down because the box
- * stopped. A socket only redials, and a stopped box answers every dial with
- * `410` until something asks the API to resume it. After a wake that
- * succeeded, the next one waits until the socket has opened again.
- */
 export function watchForStoppedSandbox({
 	bus,
 	probe,
@@ -32,7 +21,6 @@ export function watchForStoppedSandbox({
 }: {
 	bus: SandboxSocket;
 	probe: () => Promise<SandboxHostState>;
-	/** Rejects when the wake failed, so a later check may try again. */
 	wake: () => Promise<unknown>;
 	graceMs?: number;
 	recheckMs?: number;
@@ -40,6 +28,7 @@ export function watchForStoppedSandbox({
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	let checking = false;
 	let woken = false;
+	let failedWakes = 0;
 	let stopped = false;
 
 	const isDown = () => bus.getConnectionStatus().state !== "open";
@@ -58,18 +47,22 @@ export function watchForStoppedSandbox({
 			if (!isDown() || (await probe()) !== "stopped" || stopped) return;
 			await wake();
 			woken = true;
+			failedWakes = 0;
 			if (!stopped) bus.reconnect();
 		} catch {
-			// The wake failed; the next check tries again.
+			failedWakes++;
 		} finally {
 			checking = false;
-			if (isDown()) schedule(recheckMs);
+			if (isDown()) {
+				schedule(Math.min(recheckMs * 2 ** failedWakes, MAX_RECHECK_MS));
+			}
 		}
 	};
 
 	const onStatus = ({ state }: { state: string }) => {
 		if (state === "open") {
 			woken = false;
+			failedWakes = 0;
 			clearTimeout(timer);
 			timer = undefined;
 			return;

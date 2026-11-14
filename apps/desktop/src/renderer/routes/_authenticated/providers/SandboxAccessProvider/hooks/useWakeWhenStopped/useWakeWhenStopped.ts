@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { sandboxAccess } from "renderer/routes/_authenticated/utils/sandboxAccess";
 
-/** Wakes the open cloud workspace's box when its socket is down because the box stopped. */
 export function useWakeWhenStopped(
 	hostUrl: string | null,
 	wake: () => Promise<unknown>,

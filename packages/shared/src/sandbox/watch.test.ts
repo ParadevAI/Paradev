@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
 import type { SandboxHostState } from "./reach";
 import { watchForStoppedSandbox } from "./watch";
 
@@ -27,7 +27,15 @@ function fakeBus(initial: string) {
 	};
 }
 
-const settle = () => new Promise((resolve) => setTimeout(resolve, 5));
+async function advance(ms: number) {
+	for (let elapsed = 0; elapsed < ms; elapsed++) {
+		jest.advanceTimersByTime(1);
+		for (let i = 0; i < 5; i++) await Promise.resolve();
+	}
+}
+
+beforeEach(() => jest.useFakeTimers());
+afterEach(() => jest.useRealTimers());
 
 describe("watchForStoppedSandbox", () => {
 	test("wakes a stopped box once per outage, then redials", async () => {
@@ -39,18 +47,16 @@ describe("watchForStoppedSandbox", () => {
 			wake: async () => {
 				wakes++;
 			},
-			graceMs: 0,
+			graceMs: 2,
+			recheckMs: 10,
 		});
-		await settle();
-		socket.set("connecting");
-		socket.set("reconnecting");
-		await settle();
+		await advance(50);
 		expect(wakes).toBe(1);
 		expect(socket.reconnects()).toBe(1);
 
 		socket.set("open");
 		socket.set("reconnecting");
-		await settle();
+		await advance(5);
 		expect(wakes).toBe(2);
 		stop();
 	});
@@ -65,9 +71,10 @@ describe("watchForStoppedSandbox", () => {
 				wake: async () => {
 					wakes++;
 				},
-				graceMs: 0,
+				graceMs: 2,
+				recheckMs: 10,
 			});
-			await settle();
+			await advance(50);
 			expect(wakes).toBe(0);
 			expect(socket.reconnects()).toBe(0);
 			stop();
@@ -88,31 +95,36 @@ describe("watchForStoppedSandbox", () => {
 			wake: async () => {
 				wakes++;
 			},
-			graceMs: 0,
-			recheckMs: 1,
+			graceMs: 2,
+			recheckMs: 10,
 		});
-		await new Promise((resolve) => setTimeout(resolve, 30));
+		await advance(2 + 10 + 9);
+		expect(wakes).toBe(0);
+		await advance(1);
 		expect(wakes).toBe(1);
 		expect(socket.reconnects()).toBe(1);
 		stop();
 	});
 
-	test("tries again after a wake that failed", async () => {
+	test("backs off after each wake that failed", async () => {
 		const socket = fakeBus("reconnecting");
-		let wakes = 0;
+		const wakesAt: number[] = [];
+		let now = 0;
 		const stop = watchForStoppedSandbox({
 			bus: socket.bus,
 			probe: async () => "stopped",
 			wake: async () => {
-				wakes++;
-				if (wakes === 1) throw new Error("wake failed");
+				wakesAt.push(now);
+				throw new Error("wake failed");
 			},
-			graceMs: 0,
-			recheckMs: 1,
+			graceMs: 2,
+			recheckMs: 10,
 		});
-		await new Promise((resolve) => setTimeout(resolve, 30));
-		expect(wakes).toBe(2);
-		expect(socket.reconnects()).toBe(1);
+		for (; now < 2 + 20 + 40 + 1; now++) await advance(1);
+		expect(wakesAt.slice(1).map((at, i) => at - (wakesAt[i] ?? 0))).toEqual([
+			20, 40,
+		]);
+		expect(socket.reconnects()).toBe(0);
 		stop();
 	});
 
@@ -129,8 +141,9 @@ describe("watchForStoppedSandbox", () => {
 			graceMs: 20,
 		});
 		socket.set("reconnecting");
+		await advance(10);
 		socket.set("open");
-		await new Promise((resolve) => setTimeout(resolve, 30));
+		await advance(50);
 		expect(probes).toBe(0);
 		stop();
 	});

@@ -128,10 +128,10 @@ export function HostConnectionPill() {
 				isCheckFailing
 					? retryChecks
 					: isSandbox
-						? () =>
-								void wakeOpenWorkspace()
-									.catch(() => {})
-									.then(onRetry)
+						? () => {
+								onRetry();
+								void wakeOpenWorkspace().then(onRetry, () => {});
+							}
 						: onRetry
 			}
 		/>
