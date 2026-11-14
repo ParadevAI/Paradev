@@ -82,7 +82,7 @@
 		"@types/hast": "3.0.5",
 		"axios": "1.18.1",
 		"happy-dom": "20.11.2",
-		"hono": "4.13.11",
+		"hono": "4.13.16",
 		"kysely": "0.28.17",
 		"mdast-util-to-markdown": "2.1.2",
 		"next": "16.4.1",
