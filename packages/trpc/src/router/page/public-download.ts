@@ -31,7 +31,11 @@ async function withinDownloadLimit(key: string): Promise<boolean> {
 		return false;
 	}
 	try {
-		return limitAllows(await downloadRateLimit.limit(key));
+		const result = await downloadRateLimit.limit(key);
+		if (result.reason === "timeout") {
+			console.error("[page/public-download] rate limiter timed out");
+		}
+		return limitAllows(result);
 	} catch (error) {
 		console.error("[page/public-download] rate limiter unavailable:", error);
 		return false;
