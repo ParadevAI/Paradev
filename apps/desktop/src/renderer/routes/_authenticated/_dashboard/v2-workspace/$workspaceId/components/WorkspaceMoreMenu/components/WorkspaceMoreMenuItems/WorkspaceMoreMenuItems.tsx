@@ -5,6 +5,7 @@ import type { MoveDestinationPick } from "renderer/routes/_authenticated/_dashbo
 import { WorkspaceMenuItems } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMenuItems";
 import { useWorkspaceMenuActions } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMenuActions";
 import type { WorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
+import { WorkspaceOpenInSub } from "./components/WorkspaceOpenInSub";
 import { useWorkspaceMoreMenuState } from "./hooks/useWorkspaceMoreMenuState";
 
 interface WorkspaceMoreMenuItemsProps {
@@ -69,6 +70,14 @@ export function WorkspaceMoreMenuItems({
 					{runItems}
 					<Separator />
 				</>
+			}
+			openInItem={
+				state.isLocalWorkspace && (
+					<WorkspaceOpenInSub
+						parts={DROPDOWN_MENU_PARTS}
+						workspaceId={workspace.id}
+					/>
+				)
 			}
 			showDeleteHotkey
 		/>

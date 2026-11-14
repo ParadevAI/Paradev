@@ -30,7 +30,6 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/components/MoveToDestinationItems";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import type { WorkspaceMoveDirection } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
-import { WorkspaceOpenInSub } from "./components/WorkspaceOpenInSub";
 
 export interface WorkspaceMenuState {
 	workspaceId: string;
@@ -71,6 +70,8 @@ interface WorkspaceMenuItemsProps {
 	};
 	/** Items above the shared ones, with their own separator. */
 	leadingItems?: ReactNode;
+	/** Placed before Copy. */
+	openInItem?: ReactNode;
 	/** Items between the status group and Move to, with their own separator. */
 	groupItems?: ReactNode;
 	showDeleteHotkey?: boolean;
@@ -83,6 +84,7 @@ export function WorkspaceMenuItems({
 	actions,
 	move,
 	leadingItems,
+	openInItem,
 	groupItems,
 	showDeleteHotkey = false,
 }: WorkspaceMenuItemsProps) {
@@ -120,9 +122,7 @@ export function WorkspaceMenuItems({
 				</Item>
 			)}
 			<Separator />
-			{state.isLocalWorkspace && (
-				<WorkspaceOpenInSub parts={parts} workspaceId={state.workspaceId} />
-			)}
+			{openInItem}
 			<Sub>
 				<SubTrigger>
 					<LuCopy className={icon} />

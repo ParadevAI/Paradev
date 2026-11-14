@@ -16,6 +16,7 @@ export function V2WorkspaceOpenInButton({
 			branch={target.branch}
 			path={target.worktreePath}
 			projectId={target.projectId}
+			hotkeys={false}
 		/>
 	);
 }
