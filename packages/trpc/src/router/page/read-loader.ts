@@ -139,7 +139,22 @@ export async function versionNotServed(
 	});
 }
 
-export async function readsAsNonMember(
+export async function readAsMember<T>(
+	ctx: Parameters<typeof pageCaller>[0],
+	id: string,
+	read: () => Promise<T>,
+): Promise<T | null> {
+	try {
+		return await read();
+	} catch (error) {
+		if (error instanceof TRPCError && (await readsAsNonMember(ctx, id))) {
+			return null;
+		}
+		throw error;
+	}
+}
+
+async function readsAsNonMember(
 	ctx: Parameters<typeof pageCaller>[0],
 	id: string,
 ): Promise<boolean> {
