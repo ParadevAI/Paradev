@@ -67,32 +67,32 @@ export function WorkspaceRowMenu({
 				{move && (move.canMoveToCloud || move.computers.length > 0) ? (
 					<Link.Menu
 						title={t({ message: "Move to" })}
-						icon="arrow.right.square"
+						icon="arrow.left.arrow.right"
 					>
 						{move.canMoveToCloud ? (
-							<Link.MenuAction
-								icon="icloud.and.arrow.up"
-								subtitle={t({ message: "New cloud workspace" })}
-								onPress={move.moveToCloud}
-							>
+							<Link.MenuAction icon="cloud" onPress={move.moveToCloud}>
 								{t({ message: "Cloud" })}
 							</Link.MenuAction>
 						) : null}
-						{move.computers.map((computer) => (
-							<Link.MenuAction
-								key={computer.hostId}
-								icon="laptopcomputer"
-								disabled={!computer.online}
-								subtitle={
-									computer.online
-										? t({ message: "Online" })
-										: t({ message: "Offline" })
-								}
-								onPress={() => move.moveToComputer(computer)}
-							>
-								{computer.name}
-							</Link.MenuAction>
-						))}
+						{move.computers.length > 0 ? (
+							<Link.Menu inline>
+								{move.computers.map((computer) => (
+									<Link.MenuAction
+										key={computer.hostId}
+										icon="server.rack"
+										disabled={!computer.online}
+										subtitle={
+											computer.online
+												? t({ message: "Online" })
+												: t({ message: "Offline" })
+										}
+										onPress={() => move.moveToComputer(computer)}
+									>
+										{computer.name}
+									</Link.MenuAction>
+								))}
+							</Link.Menu>
+						) : null}
 					</Link.Menu>
 				) : null}
 				{canDelete && isCloud ? (

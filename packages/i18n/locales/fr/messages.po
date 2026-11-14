@@ -860,9 +860,6 @@ msgstr "{completed} vérifications sur {0} terminées"
 msgid "{completed} of {total} completed"
 msgstr "{completed} sur {total} terminés"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (hors ligne)"
-
 msgid "{configTitle} font size"
 msgstr "Taille de police de {configTitle}"
 
@@ -1808,9 +1805,6 @@ msgstr "Les instructions d'une automatisation cloud peuvent contenir au maximum 
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Un espace de travail cloud ne peut pas appeler {path}. Faites-le depuis un client où vous êtes connecté."
-
-msgid "A computer"
-msgstr "Un ordinateur"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Une suppression est déjà en cours pour {workspaceName}."
@@ -2899,9 +2893,6 @@ msgstr "Assembleur anonyme"
 
 msgid "Another AI assistant"
 msgstr "Un autre assistant IA"
-
-msgid "Another computer"
-msgstr "Un autre ordinateur"
 
 msgid "another device"
 msgstr "un autre appareil"
@@ -12680,9 +12671,6 @@ msgstr "Nouvelle discussion"
 msgid "New Chat"
 msgstr "Nouveau chat"
 
-msgid "New cloud workspace"
-msgstr "Nouvel espace de travail cloud"
-
 msgid "New environment"
 msgstr "Nouvel environnement"
 
@@ -13259,8 +13247,8 @@ msgstr "Aucune organisation sélectionnée"
 msgid "No other chats here"
 msgstr "Aucune autre discussion ici"
 
-msgid "No other computer is set up for this account."
-msgstr "Aucun autre ordinateur n’est configuré pour ce compte."
+msgid "No other device is set up for this account."
+msgstr "Aucun autre appareil n’est configuré pour ce compte."
 
 msgid "No pages match"
 msgstr "Aucune page correspondante"
@@ -20839,12 +20827,6 @@ msgstr "Impossible de démarrer cet espace de travail cloud"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Cet espace de travail cloud est en train de se réveiller, ce qui peut prendre jusqu’à 30 secondes après une période d’inactivité."
-
-msgid "this computer"
-msgstr "cet ordinateur"
-
-msgid "This computer"
-msgstr "Cet ordinateur"
 
 msgid "This computer's host is not running"
 msgstr "L'hôte de cet ordinateur ne fonctionne pas"

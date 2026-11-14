@@ -2,10 +2,11 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { listMoveDestinationComputers } from "@superset/shared/move-book";
 import { cn } from "@superset/ui/utils";
 import { useMemo } from "react";
-import { LuLaptop } from "react-icons/lu";
+import { HiOutlineComputerDesktop, HiOutlineServer } from "react-icons/hi2";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import type { MenuParts } from "renderer/lib/menuParts";
+import { OnlineDot } from "renderer/routes/_authenticated/components/OnlineDot";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 
 interface MoveToComputerItemsProps {
@@ -55,34 +56,34 @@ export function MoveToComputerItems({
 	if (computers.length === 0) {
 		return (
 			<Item disabled>
-				<Trans>No other computer is set up for this account.</Trans>
+				<Trans>No other device is set up for this account.</Trans>
 			</Item>
 		);
 	}
 	return (
 		<>
-			{computers.map((computer) => {
-				const computerName = computer.name ?? t({ message: "This computer" });
-				return (
-					<Item
-						key={computer.hostId}
-						disabled={!computer.online}
-						onSelect={() =>
-							onSelectComputer({
-								hostId: computer.hostId,
-								name: computer.name,
-							})
-						}
-					>
-						<LuLaptop className={iconClassName} />
-						<span className="truncate">
-							{computer.online
-								? computerName
-								: t({ message: `${computerName} (offline)` })}
-						</span>
-					</Item>
-				);
-			})}
+			{computers.map((computer) => (
+				<Item
+					key={computer.hostId}
+					disabled={!computer.online}
+					onSelect={() =>
+						onSelectComputer({
+							hostId: computer.hostId,
+							name: computer.name,
+						})
+					}
+				>
+					{computer.name === null ? (
+						<HiOutlineComputerDesktop className={iconClassName} />
+					) : (
+						<HiOutlineServer className={iconClassName} />
+					)}
+					<span className="min-w-0 flex-1 truncate">
+						{computer.name ?? t({ message: "This device" })}
+					</span>
+					<OnlineDot online={computer.online} />
+				</Item>
+			))}
 		</>
 	);
 }

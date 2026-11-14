@@ -860,9 +860,6 @@ msgstr "{completed} de {0} comprobaciones completadas"
 msgid "{completed} of {total} completed"
 msgstr "{completed} de {total} completados"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (sin conexión)"
-
 msgid "{configTitle} font size"
 msgstr "Tamaño de fuente de {configTitle}"
 
@@ -1808,9 +1805,6 @@ msgstr "Las instrucciones de una automatización en la nube pueden tener como m�
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Un workspace en la nube no puede llamar a {path}. Hazlo desde un cliente en el que hayas iniciado sesión."
-
-msgid "A computer"
-msgstr "Un equipo"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Ya hay una eliminación en curso para {workspaceName}."
@@ -2899,9 +2893,6 @@ msgstr "Ensamblador anónimo"
 
 msgid "Another AI assistant"
 msgstr "Otro asistente de IA"
-
-msgid "Another computer"
-msgstr "Otro equipo"
 
 msgid "another device"
 msgstr "otro dispositivo"
@@ -12680,9 +12671,6 @@ msgstr "Nuevo chat"
 msgid "New Chat"
 msgstr "Nuevo chat"
 
-msgid "New cloud workspace"
-msgstr "Nuevo espacio de trabajo en la nube"
-
 msgid "New environment"
 msgstr "Nuevo entorno"
 
@@ -13259,8 +13247,8 @@ msgstr "Ninguna organización seleccionada"
 msgid "No other chats here"
 msgstr "No hay otros chats aquí"
 
-msgid "No other computer is set up for this account."
-msgstr "No hay otro equipo configurado para esta cuenta."
+msgid "No other device is set up for this account."
+msgstr "No hay otro dispositivo configurado para esta cuenta."
 
 msgid "No pages match"
 msgstr "Ninguna página coincide"
@@ -20839,12 +20827,6 @@ msgstr "No se puede iniciar este espacio de trabajo en la nube"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este espacio de trabajo en la nube se está reactivando, lo que puede tardar hasta 30 segundos tras un periodo de inactividad."
-
-msgid "this computer"
-msgstr "este equipo"
-
-msgid "This computer"
-msgstr "Este equipo"
 
 msgid "This computer's host is not running"
 msgstr "El host de este equipo no se está ejecutando"

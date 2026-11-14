@@ -860,9 +860,6 @@ msgstr "{completed} von {0} Prüfungen abgeschlossen"
 msgid "{completed} of {total} completed"
 msgstr "{completed} von {total} abgeschlossen"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
-
 msgid "{configTitle} font size"
 msgstr "Schriftgröße für {configTitle}"
 
@@ -1808,9 +1805,6 @@ msgstr "Die Anweisungen einer Cloud-Automatisierung dürfen höchstens {max} Zei
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Ein Cloud-Workspace kann {path} nicht aufrufen. Führe das in einem Client aus, in dem du angemeldet bist."
-
-msgid "A computer"
-msgstr "Ein Computer"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Für {workspaceName} läuft bereits ein Löschvorgang."
@@ -2899,9 +2893,6 @@ msgstr "Anonymer Monteur"
 
 msgid "Another AI assistant"
 msgstr "Ein anderer KI-Assistent"
-
-msgid "Another computer"
-msgstr "Anderer Computer"
 
 msgid "another device"
 msgstr "ein anderes Gerät"
@@ -12680,9 +12671,6 @@ msgstr "Neuer Chat"
 msgid "New Chat"
 msgstr "Neuer Chat"
 
-msgid "New cloud workspace"
-msgstr "Neuer Cloud-Arbeitsbereich"
-
 msgid "New environment"
 msgstr "Neue Umgebung"
 
@@ -13259,8 +13247,8 @@ msgstr "Keine Organisation ausgewählt"
 msgid "No other chats here"
 msgstr "Keine weiteren Chats hier"
 
-msgid "No other computer is set up for this account."
-msgstr "Für dieses Konto ist kein anderer Computer eingerichtet."
+msgid "No other device is set up for this account."
+msgstr "Für dieses Konto ist kein anderes Gerät eingerichtet."
 
 msgid "No pages match"
 msgstr "Keine passenden Seiten"
@@ -20839,12 +20827,6 @@ msgstr "Dieser Cloud-Arbeitsbereich kann nicht starten"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Dieser Cloud-Workspace wird gerade aufgeweckt. Nach Inaktivität kann das bis zu 30 Sekunden dauern."
-
-msgid "this computer"
-msgstr "diesen Computer"
-
-msgid "This computer"
-msgstr "Dieser Computer"
 
 msgid "This computer's host is not running"
 msgstr "Der Host dieses Computers läuft nicht"

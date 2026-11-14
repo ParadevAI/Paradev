@@ -860,9 +860,6 @@ msgstr "{completed} dari {0} check selesai"
 msgid "{completed} of {total} completed"
 msgstr "{completed} dari {total} selesai"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
-
 msgid "{configTitle} font size"
 msgstr "Ukuran font {configTitle}"
 
@@ -1808,9 +1805,6 @@ msgstr "Instruksi automasi cloud maksimal {max} karakter"
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Workspace cloud tidak bisa memanggil {path}. Lakukan dari klien tempat kamu masuk."
-
-msgid "A computer"
-msgstr "Komputer"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Penghapusan untuk {workspaceName} sedang berlangsung."
@@ -2899,9 +2893,6 @@ msgstr "Perakit Anonim"
 
 msgid "Another AI assistant"
 msgstr "Asisten AI lain"
-
-msgid "Another computer"
-msgstr "Komputer lain"
 
 msgid "another device"
 msgstr "perangkat lain"
@@ -12680,9 +12671,6 @@ msgstr "Obrolan baru"
 msgid "New Chat"
 msgstr "Chat Baru"
 
-msgid "New cloud workspace"
-msgstr "Workspace cloud baru"
-
 msgid "New environment"
 msgstr "Environment baru"
 
@@ -13259,8 +13247,8 @@ msgstr "Tidak ada organisasi yang dipilih"
 msgid "No other chats here"
 msgstr "Tidak ada obrolan lain di sini"
 
-msgid "No other computer is set up for this account."
-msgstr "Tidak ada komputer lain yang disiapkan untuk akun ini."
+msgid "No other device is set up for this account."
+msgstr "Tidak ada perangkat lain yang disiapkan untuk akun ini."
 
 msgid "No pages match"
 msgstr "Tidak ada halaman yang cocok"
@@ -20839,12 +20827,6 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
-
-msgid "this computer"
-msgstr "komputer ini"
-
-msgid "This computer"
-msgstr "Komputer ini"
 
 msgid "This computer's host is not running"
 msgstr "Host komputer ini tidak berjalan"

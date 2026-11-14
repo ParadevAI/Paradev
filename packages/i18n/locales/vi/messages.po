@@ -860,9 +860,6 @@ msgstr "{completed} trong {0} check đã xong"
 msgid "{completed} of {total} completed"
 msgstr "Đã hoàn thành {completed}/{total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (ngoại tuyến)"
-
 msgid "{configTitle} font size"
 msgstr "Cỡ chữ {configTitle}"
 
@@ -1808,9 +1805,6 @@ msgstr "Hướng dẫn của một automation trên cloud tối đa {max} ký t�
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Workspace trên cloud không thể gọi {path}. Hãy làm việc này từ một client bạn đã đăng nhập."
-
-msgid "A computer"
-msgstr "Một máy tính"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Đang có một thao tác xóa cho {workspaceName}."
@@ -2899,9 +2893,6 @@ msgstr "Thợ lắp ráp ẩn danh"
 
 msgid "Another AI assistant"
 msgstr "Trợ lý AI khác"
-
-msgid "Another computer"
-msgstr "Máy tính khác"
 
 msgid "another device"
 msgstr "thiết bị khác"
@@ -12680,9 +12671,6 @@ msgstr "Cuộc trò chuyện mới"
 msgid "New Chat"
 msgstr "Chat mới"
 
-msgid "New cloud workspace"
-msgstr "Workspace cloud mới"
-
 msgid "New environment"
 msgstr "Environment mới"
 
@@ -13259,8 +13247,8 @@ msgstr "Chưa chọn tổ chức nào"
 msgid "No other chats here"
 msgstr "Không có cuộc trò chuyện nào khác ở đây"
 
-msgid "No other computer is set up for this account."
-msgstr "Tài khoản này chưa thiết lập máy tính nào khác."
+msgid "No other device is set up for this account."
+msgstr "Tài khoản này chưa thiết lập thiết bị nào khác."
 
 msgid "No pages match"
 msgstr "Không có trang nào khớp"
@@ -20839,12 +20827,6 @@ msgstr "Không thể khởi động workspace cloud này"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
-
-msgid "this computer"
-msgstr "máy tính này"
-
-msgid "This computer"
-msgstr "Máy tính này"
 
 msgid "This computer's host is not running"
 msgstr "Máy chủ của máy tính này không chạy"
