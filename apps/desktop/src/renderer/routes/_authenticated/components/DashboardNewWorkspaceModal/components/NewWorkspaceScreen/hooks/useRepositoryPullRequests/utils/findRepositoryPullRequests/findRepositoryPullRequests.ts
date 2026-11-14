@@ -10,6 +10,7 @@ interface SearchRow {
 	state: "open" | "closed" | "merged";
 	isDraft: boolean;
 	headRefName: string | null;
+	headRepositoryOwner?: string | null;
 	repositoryId?: string;
 }
 
@@ -21,9 +22,10 @@ export type SearchProjectPullRequests = (
 
 /**
  * The repository a multi-repo project's PR belongs to, plus each other
- * repository's open PR on the same head branch. A head branch named like a
- * default branch is skipped: search rows carry no head owner, so a fork PR from
- * `main` would match strangers' PRs. Null when no repository holds it.
+ * repository's open PR on the same head branch from the same head owner, so a
+ * fork's `patch-1` does not match a stranger's. Older hosts send no owner; a
+ * head branch named like a default branch is skipped for that case. Null when
+ * no repository holds it.
  */
 export async function findRepositoryPullRequests(
 	search: SearchProjectPullRequests,
@@ -40,11 +42,14 @@ export async function findRepositoryPullRequests(
 		return result;
 	}
 
+	const headOwner = picked.headRepositoryOwner?.toLowerCase();
 	const siblings = await search(`head:${headRefName}`);
 	for (const row of siblings.pullRequests) {
 		const repositoryId = row.repositoryId;
 		if (!repositoryId || result[repositoryId] || row.state !== "open") continue;
 		if ((row.headRefName ?? headRefName) !== headRefName) continue;
+		const rowOwner = row.headRepositoryOwner?.toLowerCase();
+		if (headOwner && rowOwner && rowOwner !== headOwner) continue;
 		result[repositoryId] = {
 			prNumber: row.prNumber,
 			title: row.title,

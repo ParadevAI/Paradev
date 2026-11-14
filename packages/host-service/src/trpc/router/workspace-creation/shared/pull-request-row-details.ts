@@ -17,6 +17,7 @@ export interface PullRequestRowDetails {
 	additions: number | null;
 	deletions: number | null;
 	headRefName: string | null;
+	headRepositoryOwner: string | null;
 }
 
 export type RunGraphqlQuery = (
@@ -38,6 +39,10 @@ const rowDetailsGraphqlDataSchema = z.object({
 					additions: z.number().optional(),
 					deletions: z.number().optional(),
 					headRefName: z.string().optional(),
+					headRepositoryOwner: z
+						.object({ login: z.string() })
+						.nullable()
+						.optional(),
 					statusCheckRollup: z
 						.object({
 							contexts: z.object({
@@ -61,7 +66,7 @@ const MAX_CHECK_PAGES = 20;
 
 type GraphqlDetails = Pick<
 	PullRequestRowDetails,
-	"additions" | "deletions" | "headRefName"
+	"additions" | "deletions" | "headRefName" | "headRepositoryOwner"
 >;
 
 /** One batched GraphQL read per repo, following check-rollup pages past 100. */
@@ -99,6 +104,7 @@ export async function fetchPullRequestRowDetails(
 				additions
 				deletions
 				headRefName
+				headRepositoryOwner { login }
 				statusCheckRollup {
 					contexts(first: 100${cursor ? `, after: $cursor${number}` : ""}) {
 						pageInfo { hasNextPage endCursor }
@@ -157,6 +163,7 @@ export async function fetchPullRequestRowDetails(
 				additions: pullRequest.additions ?? null,
 				deletions: pullRequest.deletions ?? null,
 				headRefName: pullRequest.headRefName ?? null,
+				headRepositoryOwner: pullRequest.headRepositoryOwner?.login ?? null,
 			});
 			const pageInfo = pullRequest.statusCheckRollup?.contexts.pageInfo;
 			if (pageInfo?.hasNextPage) {
@@ -187,6 +194,7 @@ export async function fetchPullRequestRowDetails(
 				additions: null,
 				deletions: null,
 				headRefName: null,
+				headRepositoryOwner: null,
 			};
 			return [pullRequestNumber, { checks, checksStatus, ...details }] as const;
 		}),

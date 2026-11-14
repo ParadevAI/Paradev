@@ -64,7 +64,11 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 						state: "open",
 						merged_at: null,
 						user: { login: "bob" },
-						head: { ref: "feature/x", sha: "headsha33" },
+						head: {
+							ref: "feature/x",
+							sha: "headsha33",
+							repo: { owner: { login: "forker" } },
+						},
 						base: { ref: "main" },
 						draft: false,
 						requested_reviewers: [{ login: "me-user" }],
@@ -89,6 +93,7 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 						additions: 5,
 						deletions: 2,
 						headRefName: "ci-fix",
+						headRepositoryOwner: { login: "octocat" },
 						statusCheckRollup: {
 							contexts: {
 								pageInfo: { hasNextPage: false, endCursor: null },
@@ -263,6 +268,7 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 		});
 		expect(result.pullRequests).toHaveLength(1);
 		expect(result.pullRequests[0].prNumber).toBe(33);
+		expect(result.pullRequests[0].headRepositoryOwner).toBe("forker");
 		expect(calls[0].method).toBe("pulls.get");
 		expect(calls[0].args).toMatchObject({
 			owner: "octocat",
@@ -386,6 +392,7 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 			},
 		]);
 		expect(result.pullRequests[0].checksStatus).toBe("success");
+		expect(result.pullRequests[0].headRepositoryOwner).toBe("octocat");
 		const graphqlCall = calls.find((call) => call.method === "graphql");
 		expect(graphqlCall).toBeDefined();
 		expect(
@@ -414,6 +421,7 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 				additions: 5,
 				deletions: 2,
 				headRefName: "ci-fix",
+				headRepositoryOwner: "octocat",
 			},
 		]);
 	});

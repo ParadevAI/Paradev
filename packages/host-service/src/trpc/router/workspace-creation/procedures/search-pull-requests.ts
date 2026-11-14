@@ -61,6 +61,8 @@ interface PullRequestResult {
 	additions: number | null;
 	deletions: number | null;
 	headRefName: string | null;
+	/** Login owning the PR's head repository; for a fork PR this is the fork's owner. */
+	headRepositoryOwner?: string | null;
 	/** The repository of `projectId` holding the PR. */
 	repositoryId?: string;
 	repositoryName?: string;
@@ -259,10 +261,11 @@ const ghPrViewSchema = z.object({
 	additions: z.number().optional(),
 	deletions: z.number().optional(),
 	headRefName: z.string().optional(),
+	headRepositoryOwner: z.object({ login: z.string() }).nullable().optional(),
 });
 
 const PR_VIEW_FIELDS =
-	"number,title,url,state,isDraft,author,mergedAt,updatedAt,statusCheckRollup,reviewDecision,reviewRequests,latestReviews,additions,deletions,headRefName";
+	"number,title,url,state,isDraft,author,mergedAt,updatedAt,statusCheckRollup,reviewDecision,reviewRequests,latestReviews,additions,deletions,headRefName,headRepositoryOwner";
 
 interface GhDirectLookupReview {
 	decision: string | null;
@@ -307,6 +310,7 @@ async function ghDirectLookup(
 			additions: pr.additions ?? null,
 			deletions: pr.deletions ?? null,
 			headRefName: pr.headRefName ?? null,
+			headRepositoryOwner: pr.headRepositoryOwner?.login ?? null,
 		},
 		review: {
 			decision: pr.reviewDecision || null,
@@ -714,6 +718,7 @@ async function octokitDirectLookupRow(
 		additions: pr.additions ?? null,
 		deletions: pr.deletions ?? null,
 		headRefName: pr.head?.ref ?? null,
+		headRepositoryOwner: pr.head?.repo?.owner.login ?? null,
 	};
 }
 
@@ -791,6 +796,7 @@ async function ghApiSearchPullRequests(
 					additions: null,
 					deletions: null,
 					headRefName: null,
+					headRepositoryOwner: null,
 				},
 			];
 		});
@@ -840,6 +846,7 @@ async function octokitSearchPullRequests(
 					additions: null,
 					deletions: null,
 					headRefName: null,
+					headRepositoryOwner: null,
 				},
 			];
 		});

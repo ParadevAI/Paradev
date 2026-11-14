@@ -80,6 +80,65 @@ describe("findRepositoryPullRequests", () => {
 		expect(Object.keys(result ?? {})).toEqual(["api"]);
 	});
 
+	test("matches a sibling only from the linked PR's head owner", async () => {
+		const result = await findRepositoryPullRequests(
+			async (query) =>
+				query === "#1"
+					? {
+							pullRequests: [
+								{ ...row("api", 1, "patch-1"), headRepositoryOwner: "Forker" },
+							],
+						}
+					: {
+							pullRequests: [
+								{
+									...row("shared", 4, "patch-1"),
+									headRepositoryOwner: "forker",
+								},
+								{
+									...row("web", 9, "patch-1"),
+									headRepositoryOwner: "stranger",
+								},
+								row("docs", 3, "patch-1"),
+							],
+						},
+			{
+				prNumber: 1,
+				title: "Fork",
+				url: "https://github.com/o/api/pull/1",
+				state: "open",
+			},
+		);
+		expect(Object.keys(result ?? {})).toEqual(["api", "shared", "docs"]);
+	});
+
+	test("matches no sibling when every candidate is from another owner", async () => {
+		const result = await findRepositoryPullRequests(
+			async (query) =>
+				query === "#1"
+					? {
+							pullRequests: [
+								{ ...row("api", 1, "patch-1"), headRepositoryOwner: "forker" },
+							],
+						}
+					: {
+							pullRequests: [
+								{
+									...row("web", 9, "patch-1"),
+									headRepositoryOwner: "stranger",
+								},
+							],
+						},
+			{
+				prNumber: 1,
+				title: "Fork",
+				url: "https://github.com/o/api/pull/1",
+				state: "open",
+			},
+		);
+		expect(Object.keys(result ?? {})).toEqual(["api"]);
+	});
+
 	test("is null when no repository of the project holds the PR", async () => {
 		const result = await findRepositoryPullRequests(
 			async () => ({ pullRequests: [row("api", 1, "tags")] }),
