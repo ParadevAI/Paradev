@@ -272,6 +272,22 @@ describe("projects setup", () => {
 			]);
 		});
 
+		test("refuses when hosts added different repositories", async () => {
+			remoteHosts["host-b"] = {
+				"project.get": () => ({
+					...PROJECT,
+					repositories: [
+						...PROJECT.repositories,
+						{ ...docs, id: "r-ops", name: "ops" },
+					],
+				}),
+			};
+			await expect(invoke({ cloneInto: "/src" })).rejects.toThrow(
+				"Hosts list different repositories for project project-1",
+			);
+			expect(setupInput).toBeUndefined();
+		});
+
 		test("needs a placement", async () => {
 			await expect(invoke({})).rejects.toThrow(
 				"Pick a folder for docs, added to the project on host host-a",

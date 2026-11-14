@@ -13,6 +13,7 @@ import {
 import {
 	findSourceProject,
 	findSourceWithNewRepositories,
+	HostsDisagreeError,
 	type SourceProject,
 } from "./utils/findSourceProject";
 
@@ -196,7 +197,8 @@ export default command({
 				...sourceArgs,
 				known,
 			}).catch((error: unknown) => {
-				if (sourceArgs.fromHostId) throw error;
+				if (sourceArgs.fromHostId || error instanceof HostsDisagreeError)
+					throw error;
 				const reason = error instanceof Error ? error.message : String(error);
 				process.stderr.write(
 					`Could not ask other hosts for repositories added there: ${reason}\n`,

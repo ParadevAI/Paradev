@@ -6,6 +6,8 @@ import {
 	resolveHostTarget,
 } from "../../../../../lib/host-target";
 
+export class HostsDisagreeError extends CLIError {}
+
 export interface SourceProject {
 	hostId: string;
 	project: HostProject;
@@ -122,7 +124,7 @@ export async function findSourceWithNewRepositories(
 	const [first] = found;
 	if (!first) return null;
 	if (found.some(({ project }) => newIds(project) !== newIds(first.project))) {
-		throw new CLIError(
+		throw new HostsDisagreeError(
 			`Hosts list different repositories for project ${args.projectId}: ${found
 				.map(({ host }) => `${host.name} (${host.id})`)
 				.join(", ")}`,
