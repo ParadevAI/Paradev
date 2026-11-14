@@ -14,10 +14,6 @@ export type MovableWorkspace = {
 
 export type WorkspaceMoveDirection = "to-cloud" | "to-computer";
 
-/**
- * Where a workspace can move: one on this computer to the cloud, and any
- * workspace to a computer other than its own. Empty when it can move nowhere.
- */
 export function useWorkspaceMoveDirections(
 	hostId: string,
 ): WorkspaceMoveDirection[] {
@@ -33,12 +29,13 @@ export function useWorkspaceMoveDirections(
 	if (!movesEnabled) return [];
 	const directions: WorkspaceMoveDirection[] = [];
 	const isLocal = hostId === machineId;
-	if (isLocal && cloudEnabled) directions.push("to-cloud");
-	const hasOtherComputer = (roster.data ?? []).some(
-		(host) =>
-			host.machineId !== hostId &&
-			!cloudWorkspaces.some((row) => row.id === host.machineId),
+	const computers = (roster.data ?? []).filter(
+		(host) => !cloudWorkspaces.some((row) => row.id === host.machineId),
 	);
+	const onOwnComputer =
+		isLocal || computers.some((host) => host.machineId === hostId);
+	if (onOwnComputer && cloudEnabled) directions.push("to-cloud");
+	const hasOtherComputer = computers.some((host) => host.machineId !== hostId);
 	if (!isLocal || hasOtherComputer) {
 		directions.push("to-computer");
 	}
