@@ -143,7 +143,7 @@ describe("importV1Project appearance carry", () => {
 	});
 
 	test("a local match is the project, nothing is created", async () => {
-		const { client, createCalls } = fakeHostClient(true);
+		const { client, createCalls, setColorCalls } = fakeHostClient(true);
 		const result = await importV1Project({
 			hostClient: client,
 			project: v1Project,
@@ -163,6 +163,7 @@ describe("importV1Project appearance carry", () => {
 		});
 		expect(createCalls).toHaveLength(0);
 		expect(result.v2ProjectId).toBe("p-old");
+		expect(setColorCalls).toEqual([{ projectId: "p-old", color: "#112233" }]);
 	});
 });
 
@@ -788,6 +789,7 @@ describe("importV1Project with a legacy cloud candidate", () => {
 		name: "proj",
 		mainRepoPath: "/tmp/proj",
 		githubOwner: null,
+		color: "#112233",
 	};
 	const findByPathResult = {
 		candidates: [
@@ -805,6 +807,7 @@ describe("importV1Project with a legacy cloud candidate", () => {
 
 	function fakeHostClient(setup: (input: unknown) => Promise<unknown>) {
 		const setupCalls: unknown[] = [];
+		const setColorCalls: unknown[] = [];
 		const client = {
 			project: {
 				setup: {
@@ -813,11 +816,15 @@ describe("importV1Project with a legacy cloud candidate", () => {
 						return setup(input);
 					},
 				},
-				setColor: { mutate: async () => {} },
+				setColor: {
+					mutate: async (input: unknown) => {
+						setColorCalls.push(input);
+					},
+				},
 				setIcon: { mutate: async () => {} },
 			},
 		} as unknown as HostServiceClient;
-		return { client, setupCalls };
+		return { client, setupCalls, setColorCalls };
 	}
 
 	test("sets the project up on this host with the repo as its one repository", async () => {
@@ -847,6 +854,25 @@ describe("importV1Project with a legacy cloud candidate", () => {
 					{ id: "p-legacy", mode: { kind: "import", path: "/tmp/proj" } },
 				],
 			},
+		]);
+	});
+
+	test("carries appearance onto the linked project even when setup creates nothing", async () => {
+		const { client, setColorCalls } = fakeHostClient(async () => ({
+			id: "p-legacy",
+			primaryRepositoryId: "p-legacy",
+			repositories: [{ id: "p-legacy", path: "/tmp/proj" }],
+			created: false,
+		}));
+
+		await importV1Project({
+			hostClient: client,
+			project: v1Project,
+			findByPathResult,
+		});
+
+		expect(setColorCalls).toEqual([
+			{ projectId: "p-legacy", color: "#112233" },
 		]);
 	});
 

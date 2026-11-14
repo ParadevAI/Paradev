@@ -8372,9 +8372,6 @@ msgstr "執行檔"
 msgid "existing worktree"
 msgstr "已有worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "舊路徑下已有的worktree將被孤立。你可以通過worktree流程重新匯入它們。"
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "已有worktree，將移入工作區"
 
@@ -23314,6 +23311,9 @@ msgstr "無法在應用程式內變更此訂閱。你所在組織的方案由擁
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "此操作無法復原。終端窗格會顯示「處理程序已退出」，之後可以重新啟動。"
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "仍有工作區在使用此資料夾的worktree時無法遷移。請先刪除這些工作區。"
 
 msgid "You control the access"
 msgstr "存取權限由你掌控"

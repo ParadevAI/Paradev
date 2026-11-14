@@ -516,11 +516,17 @@ export function NewWorkspaceScreen({
 			linkedPRUrl,
 			appliedFor: draft.checkoutPullRequestsFor,
 			found: checkoutPullRequests.data,
+			pickedRepositoryIds: [
+				...Object.keys(draft.checkoutBaseBranches),
+				...Object.keys(draft.checkoutWorktrees),
+			],
 		});
 		if (update) updateDraft(update);
 	}, [
 		linkedPRUrl,
 		draft.checkoutPullRequestsFor,
+		draft.checkoutBaseBranches,
+		draft.checkoutWorktrees,
 		checkoutPullRequests.data,
 		updateDraft,
 	]);

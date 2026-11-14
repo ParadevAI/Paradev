@@ -60,6 +60,26 @@ describe("findRepositoryPullRequests", () => {
 		});
 	});
 
+	test("matches no other repository's PR on a default branch name", async () => {
+		const queries: string[] = [];
+		const result = await findRepositoryPullRequests(
+			async (query) => {
+				queries.push(query);
+				return {
+					pullRequests: [row("api", 1, "main"), row("web", 7, "main")],
+				};
+			},
+			{
+				prNumber: 1,
+				title: "Fork",
+				url: "https://github.com/o/api/pull/1",
+				state: "open",
+			},
+		);
+		expect(queries).toEqual(["#1"]);
+		expect(Object.keys(result ?? {})).toEqual(["api"]);
+	});
+
 	test("is null when no repository of the project holds the PR", async () => {
 		const result = await findRepositoryPullRequests(
 			async () => ({ pullRequests: [row("api", 1, "tags")] }),

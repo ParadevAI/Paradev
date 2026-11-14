@@ -8372,9 +8372,6 @@ msgstr "File eksekusi"
 msgid "existing worktree"
 msgstr "worktree yang ada"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Worktree yang ada di bawah path lama akan menjadi yatim. Anda bisa mengimpornya lagi lewat alur worktree."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Worktree yang ada, dipindahkan ke workspace"
 
@@ -23314,6 +23311,9 @@ msgstr "Anda tidak bisa mengubah langganan ini di aplikasi. Paket organisasi And
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tindakan ini tidak bisa dibatalkan. Panel terminal akan menampilkan \"Process exited\" dan bisa dijalankan ulang."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Tidak bisa dipindahkan selama ada workspace yang memakai worktree dari folder ini. Hapus workspace tersebut terlebih dahulu."
 
 msgid "You control the access"
 msgstr "Anda mengendalikan akses"

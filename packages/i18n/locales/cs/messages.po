@@ -8372,9 +8372,6 @@ msgstr "Spustitelný soubor"
 msgid "existing worktree"
 msgstr "existující worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Stávající worktree pod původní cestou osiří. Můžete je znovu naimportovat přes import worktree."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Existující worktree, přesunou se do pracovního prostoru"
 
@@ -23314,6 +23311,9 @@ msgstr "Toto předplatné nelze změnit v aplikaci. Tarif vaší organizace spra
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tuto akci nelze vrátit zpět. Panely terminálu zobrazí „Proces skončil“ a půjde je spustit znovu."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Nelze přesunout, dokud pracovní prostory používají worktree této složky. Nejprve tyto pracovní prostory smažte."
 
 msgid "You control the access"
 msgstr "Přístup máte pod kontrolou"

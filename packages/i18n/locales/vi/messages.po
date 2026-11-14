@@ -8372,9 +8372,6 @@ msgstr "Tệp thực thi"
 msgid "existing worktree"
 msgstr "worktree có sẵn"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Các worktree hiện có dưới đường dẫn cũ sẽ bị bỏ rơi. Bạn có thể nhập lại chúng từ luồng worktree."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Worktree có sẵn, được chuyển vào workspace"
 
@@ -23314,6 +23311,9 @@ msgstr "Bạn không thể thay đổi gói đăng ký này trong ứng dụng. 
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Không thể hoàn tác thao tác này. Các khung terminal sẽ hiện \"Process exited\" và có thể khởi động lại."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Không thể chuyển vị trí khi có workspace đang dùng worktree của thư mục này. Hãy xóa các workspace đó trước."
 
 msgid "You control the access"
 msgstr "Bạn kiểm soát quyền truy cập"

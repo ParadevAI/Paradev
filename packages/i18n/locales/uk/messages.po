@@ -8366,9 +8366,6 @@ msgstr "Виконуваний файл"
 msgid "existing worktree"
 msgstr "наявний worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Наявні worktree за старим шляхом втратять прив'язку. Їх можна повторно імпортувати через імпорт worktree."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Наявні worktree, переносяться в робочий простір"
 
@@ -23308,6 +23305,9 @@ msgstr "Ви не можете змінити цю підписку в заст�
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Цю дію неможливо скасувати. Панелі терміналів показуватимуть «Process exited», і їх можна буде перезапустити."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Не можна перемістити, поки робочі простори використовують worktree цієї папки. Спершу видаліть ці робочі простори."
 
 msgid "You control the access"
 msgstr "Ви керуєте доступом"

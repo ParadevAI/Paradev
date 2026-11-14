@@ -8372,9 +8372,6 @@ msgstr "Executable"
 msgid "existing worktree"
 msgstr "existing worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Existing worktrees, moved into the workspace"
 
@@ -23314,6 +23311,9 @@ msgstr "You can't change this subscription in the app. Your organization's plan 
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
 
 msgid "You control the access"
 msgstr "You control the access"

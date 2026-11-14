@@ -149,6 +149,7 @@ export async function importV1Project({
 	}
 
 	if (targetCandidate?.source === "local-path") {
+		await carryV1ProjectAppearance(hostClient, targetCandidate.id, project);
 		return {
 			kind: "imported",
 			v2ProjectId: targetCandidate.id,
@@ -182,10 +183,9 @@ export async function importV1Project({
 			repositories: [{ kind: "local", path: project.mainRepoPath }],
 		});
 	}
-	// Only stamp v1 appearance onto projects this call actually created.
-	// A reused project (created === false) may carry v2 customizations the
-	// user chose after their first import — never overwrite those.
-	if (result.created) {
+	// A project `project.create` reused may carry v2 customizations the user
+	// chose after their first import; never overwrite those.
+	if (targetCandidate || result.created) {
 		await carryV1ProjectAppearance(hostClient, result.id, project);
 	}
 	return {

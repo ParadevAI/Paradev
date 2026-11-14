@@ -248,8 +248,8 @@ export function ProjectLocationSection({
 								</div>
 								<p className="text-muted-foreground">
 									<Trans>
-										Existing worktrees under the old path will be orphaned. You
-										can re-import them from the worktrees flow.
+										You cannot relocate while workspaces use worktrees of this
+										folder. Delete those workspaces first.
 									</Trans>
 								</p>
 							</div>

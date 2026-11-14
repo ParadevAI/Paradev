@@ -8372,9 +8372,6 @@ msgstr "可执行文件"
 msgid "existing worktree"
 msgstr "已有worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "旧路径下已有的worktree将被孤立。你可以通过worktree流程重新导入它们。"
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "已有worktree，将移入工作区"
 
@@ -23314,6 +23311,9 @@ msgstr "无法在应用内更改此订阅。你所在组织的方案由所有者
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "此操作无法撤销。终端窗格会显示“进程已退出”，之后可以重新启动。"
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "仍有工作区在使用此文件夹的worktree时无法迁移。请先删除这些工作区。"
 
 msgid "You control the access"
 msgstr "访问权限由你掌控"

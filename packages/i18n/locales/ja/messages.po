@@ -8372,9 +8372,6 @@ msgstr "実行ファイル"
 msgid "existing worktree"
 msgstr "既存のワークツリー"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "旧パス配下の既存ワークツリーは孤立します。ワークツリーフローから再インポートできます。"
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "既存のワークツリー（ワークスペースに移動されます）"
 
@@ -23314,6 +23311,9 @@ msgstr "このサブスクリプションはアプリでは変更できません
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "この操作は元に戻せません。ターミナルペインに「Process exited」と表示され、再起動できます。"
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "ワークスペースがこのフォルダーのワークツリーを使用している間は移動できません。先にそれらのワークスペースを削除してください。"
 
 msgid "You control the access"
 msgstr "アクセス権はあなたが管理します"

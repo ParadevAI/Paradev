@@ -8372,9 +8372,6 @@ msgstr "실행 파일"
 msgid "existing worktree"
 msgstr "기존 worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "기존 경로 아래의 worktree는 연결이 끊깁니다. worktree 흐름에서 다시 가져올 수 있습니다."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "기존 worktree (워크스페이스로 이동됨)"
 
@@ -23314,6 +23311,9 @@ msgstr "이 구독은 앱에서 변경할 수 없습니다. 조직의 플랜은 
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "이 작업은 되돌릴 수 없습니다. 터미널 패널에 \"Process exited\"가 표시되며 다시 시작할 수 있습니다."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "워크스페이스가 이 폴더의 worktree를 사용하는 동안에는 이동할 수 없습니다. 먼저 해당 워크스페이스를 삭제하세요."
 
 msgid "You control the access"
 msgstr "접근 권한은 사용자가 관리합니다"

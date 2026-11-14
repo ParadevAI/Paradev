@@ -8372,9 +8372,6 @@ msgstr "Exécutable"
 msgid "existing worktree"
 msgstr "worktree existant"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Les worktrees existants sous l'ancien chemin seront orphelins. Vous pouvez les réimporter depuis le flux des worktrees."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Worktrees existants, déplacés dans l'espace de travail"
 
@@ -23314,6 +23311,9 @@ msgstr "Vous ne pouvez pas modifier cet abonnement dans l'application. Le forfai
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Cette action est irréversible. Les volets de terminal afficheront « Processus terminé » et pourront être relancés."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Impossible de déplacer tant que des espaces de travail utilisent des worktrees de ce dossier. Supprimez d'abord ces espaces de travail."
 
 msgid "You control the access"
 msgstr "Vous contrôlez l'accès"

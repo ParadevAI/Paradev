@@ -8372,9 +8372,6 @@ msgstr "Ausführbare Datei"
 msgid "existing worktree"
 msgstr "vorhandener Worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Vorhandene Worktrees unter dem alten Pfad werden verwaist. Du kannst sie über den Worktree-Import erneut einlesen."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Vorhandene Worktrees, werden in den Arbeitsbereich verschoben"
 
@@ -23314,6 +23311,9 @@ msgstr "Dieses Abo lässt sich nicht in der App ändern. Der Tarif deiner Organi
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Das lässt sich nicht rückgängig machen. Terminal-Bereiche zeigen dann \"Process exited\" und können neu gestartet werden."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Verschieben ist nicht möglich, solange Arbeitsbereiche Worktrees dieses Ordners nutzen. Lösche diese Arbeitsbereiche zuerst."
 
 msgid "You control the access"
 msgstr "Sie behalten die Kontrolle"

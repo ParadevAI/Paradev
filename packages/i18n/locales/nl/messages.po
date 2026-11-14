@@ -8372,9 +8372,6 @@ msgstr "Uitvoerbaar bestand"
 msgid "existing worktree"
 msgstr "bestaande worktree"
 
-msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
-msgstr "Bestaande worktrees onder het oude pad raken los. Je kunt ze opnieuw importeren via de worktree-flow."
-
 msgid "Existing worktrees, moved into the workspace"
 msgstr "Bestaande worktrees, verplaatst naar de werkruimte"
 
@@ -23314,6 +23311,9 @@ msgstr "Je kunt dit abonnement niet in de app wijzigen. Het plan van je organisa
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Dit kun je niet ongedaan maken. Terminalpanelen tonen \"Process exited\" en zijn opnieuw te starten."
+
+msgid "You cannot relocate while workspaces use worktrees of this folder. Delete those workspaces first."
+msgstr "Verplaatsen kan niet zolang werkruimtes worktrees van deze map gebruiken. Verwijder die werkruimtes eerst."
 
 msgid "You control the access"
 msgstr "Jij bepaalt de toegang"

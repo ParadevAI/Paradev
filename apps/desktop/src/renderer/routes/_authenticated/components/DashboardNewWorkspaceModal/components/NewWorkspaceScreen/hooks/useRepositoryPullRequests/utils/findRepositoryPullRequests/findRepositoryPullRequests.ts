@@ -13,13 +13,17 @@ interface SearchRow {
 	repositoryId?: string;
 }
 
+const DEFAULT_BRANCH_NAMES = new Set(["main", "master"]);
+
 export type SearchProjectPullRequests = (
 	query: string,
 ) => Promise<{ pullRequests: SearchRow[] }>;
 
 /**
  * The repository a multi-repo project's PR belongs to, plus each other
- * repository's open PR on the same head branch. Null when no repository holds it.
+ * repository's open PR on the same head branch. A head branch named like a
+ * default branch is skipped: search rows carry no head owner, so a fork PR from
+ * `main` would match strangers' PRs. Null when no repository holds it.
  */
 export async function findRepositoryPullRequests(
 	search: SearchProjectPullRequests,
@@ -32,7 +36,9 @@ export async function findRepositoryPullRequests(
 	const result: Record<string, RepositoryPullRequest> = {
 		[picked.repositoryId]: { ...linkedPR, headRefName, matched: false },
 	};
-	if (!headRefName) return result;
+	if (!headRefName || DEFAULT_BRANCH_NAMES.has(headRefName.toLowerCase())) {
+		return result;
+	}
 
 	const siblings = await search(`head:${headRefName}`);
 	for (const row of siblings.pullRequests) {
