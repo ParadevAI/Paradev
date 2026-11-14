@@ -74,7 +74,10 @@ import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { CheckoutPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/CheckoutPickerPill";
-import { CompareBaseBranchPicker } from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
+import {
+	CompareBaseBranchPicker,
+	type OpenWorkspaceTarget,
+} from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
 import { ProjectPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/ProjectPickerPill";
 import { PromptHistoryCommand } from "../DashboardNewWorkspaceForm/PromptGroup/components/PromptHistoryCommand";
 import { useBranchPickerController } from "../DashboardNewWorkspaceForm/PromptGroup/hooks/useBranchPickerController";
@@ -747,7 +750,6 @@ export function NewWorkspaceScreen({
 		remoteHostPresence: selectedRemoteHostPresence,
 		cloudRepository,
 		baseBranch: draft.baseBranch,
-		typedWorkspaceName: draft.workspaceName,
 		onBaseBranchChange: (branch, source) => {
 			if (branchDefaultKey) {
 				if (branch && source) {
@@ -758,7 +760,8 @@ export function NewWorkspaceScreen({
 			}
 			updateDraft({ baseBranch: branch, baseBranchSource: source });
 		},
-		closeModal,
+		// Declared below; only called after render, so no TDZ issue.
+		onOpenWorkspace: (target) => handleSubmit(target),
 	});
 
 	// ── Submit ───────────────────────────────────────────────────────
@@ -946,43 +949,46 @@ export function NewWorkspaceScreen({
 	);
 
 	const isStarting = isCreating || isCreatingProjectEnvironment;
-	const handleSubmit = useCallback(() => {
-		if (isStarting) return;
-		if (needsSetup) {
-			handleGoToSetup();
-			return;
-		}
-		if (submitBlocker) {
-			if (hostId === machineId && !activeHostUrl) {
-				showHostServiceUnavailableToast(hostService, {
-					action: "createWorkspace",
-				});
-			} else {
-				toast.error(submitBlocker);
+	const handleSubmit = useCallback(
+		(openTarget?: OpenWorkspaceTarget) => {
+			if (isStarting) return;
+			if (needsSetup) {
+				handleGoToSetup();
+				return;
 			}
-			return;
-		}
-		if (setupPlan) {
-			void runEnvironmentSetup({
-				cloudPrompt: withEnvironmentSetupSkill,
-				ignoreDraft: false,
-			});
-			return;
-		}
-		void createWorkspace();
-	}, [
-		activeHostUrl,
-		createWorkspace,
-		isStarting,
-		setupPlan,
-		runEnvironmentSetup,
-		hostId,
-		handleGoToSetup,
-		hostService,
-		machineId,
-		needsSetup,
-		submitBlocker,
-	]);
+			if (submitBlocker) {
+				if (hostId === machineId && !activeHostUrl) {
+					showHostServiceUnavailableToast(hostService, {
+						action: "createWorkspace",
+					});
+				} else {
+					toast.error(submitBlocker);
+				}
+				return;
+			}
+			if (setupPlan) {
+				void runEnvironmentSetup({
+					cloudPrompt: withEnvironmentSetupSkill,
+					ignoreDraft: false,
+				});
+				return;
+			}
+			void createWorkspace({ openTarget });
+		},
+		[
+			activeHostUrl,
+			createWorkspace,
+			isStarting,
+			setupPlan,
+			runEnvironmentSetup,
+			hostId,
+			handleGoToSetup,
+			hostService,
+			machineId,
+			needsSetup,
+			submitBlocker,
+		],
+	);
 
 	useEffect(() => {
 		if (!isOpen) return;
@@ -1135,7 +1141,7 @@ export function NewWorkspaceScreen({
 					</span>
 				</>
 			) : isCloudHost ? (
-				<CompareBaseBranchPicker {...pickerProps} />
+				<CompareBaseBranchPicker {...pickerProps} canOpenTypedBranch={false} />
 			) : isSession ? null : (
 				<>
 					<CheckoutPickerPill
