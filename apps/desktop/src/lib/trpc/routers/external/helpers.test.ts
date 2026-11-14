@@ -7,6 +7,7 @@ import {
 	pathIsMissing,
 	RelativePathWithoutCwdError,
 	resolvePath,
+	spawnAsync,
 	stripPathWrappers,
 } from "./helpers";
 
@@ -796,5 +797,55 @@ describe("pathIsMissing", () => {
 		// ENAMETOOLONG: we cannot tell whether the path is there, so the app
 		// still gets to try and its failure still reports.
 		expect(await pathIsMissing(`/${"a".repeat(5000)}`)).toBe(false);
+	});
+});
+
+describe("spawnAsync", () => {
+	const originalPath = process.env.PATH;
+	let binDir: string;
+
+	beforeEach(async () => {
+		binDir = await fs.mkdtemp(path.join(os.tmpdir(), "spawn-async-"));
+		process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
+	});
+
+	afterEach(async () => {
+		process.env.PATH = originalPath;
+		await fs.rm(binDir, { recursive: true, force: true });
+	});
+
+	async function fakeCommand(name: string, stderr: string) {
+		const file = path.join(binDir, name);
+		await fs.writeFile(file, `#!/bin/sh\necho "${stderr}" >&2\nexit 1\n`);
+		await fs.chmod(file, 0o755);
+	}
+
+	test("macOS open with an uninstalled app name is PRECONDITION_FAILED", async () => {
+		await fakeCommand(
+			"open",
+			"Unable to find application named 'Visual Studio Code'",
+		);
+		await expect(
+			spawnAsync("open", ["-a", "Visual Studio Code", "/tmp"]),
+		).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message: "Unable to find application named 'Visual Studio Code'",
+		});
+	});
+
+	test("other open failures are not classified as a missing app", async () => {
+		await fakeCommand("open", "The file /tmp/gone does not exist.");
+		const error = await spawnAsync("open", ["-a", "Cursor", "/tmp/gone"]).catch(
+			(e) => e,
+		);
+		expect(error).toBeInstanceOf(Error);
+		expect(error.code).toBeUndefined();
+	});
+
+	test("the same stderr from a command other than open is not classified", async () => {
+		await fakeCommand("code", "Unable to find application named 'Cursor'");
+		const error = await spawnAsync("code", ["/tmp"]).catch((e) => e);
+		expect(error).toBeInstanceOf(Error);
+		expect(error.code).toBeUndefined();
 	});
 });
