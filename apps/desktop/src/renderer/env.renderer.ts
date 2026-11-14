@@ -17,8 +17,8 @@ const envSchema = z.object({
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development"),
-	NEXT_PUBLIC_API_URL: z.url().default(CANONICAL_URLS.API),
-	NEXT_PUBLIC_WEB_URL: z.url().default(CANONICAL_URLS.APP),
+	NEXT_PUBLIC_API_URL: z.url().default("https://api.paradev.com"),
+	NEXT_PUBLIC_WEB_URL: z.url().default("https://app.paradev.com"),
 	NEXT_PUBLIC_MARKETING_URL: z.url().default(CANONICAL_URLS.MARKETING),
 	NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
 	NEXT_PUBLIC_POSTHOG_HOST: z.string().default("https://us.i.posthog.com"),
