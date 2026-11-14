@@ -80,14 +80,6 @@ export function RenameBranchDialog({
 			);
 			return;
 		}
-		if (targets.kind === "no-match") {
-			toast.error(
-				t({
-					message: `No checkout in this workspace is on ${currentBranchName}`,
-				}),
-			);
-			return;
-		}
 		const client = getHostServiceClientByUrl(workspaceHostUrl);
 		const renamedNames: string[] = [];
 		let failedName: string | undefined;

@@ -14,13 +14,17 @@ describe("resolveRenameTargets", () => {
 		).toEqual({ kind: "rename", repositoryIds: ["a"] });
 	});
 
-	it("renames nothing when no checkout is on the branch", () => {
+	it("renames the primary checkout's branch when background naming renamed it", () => {
 		expect(
 			resolveRenameTargets({
-				checkouts: [{ repositoryId: "a", branch: "main" }],
-				currentBranchName: "feat",
+				checkouts: [
+					{ repositoryId: "a", branch: "andrew/fix-login" },
+					{ repositoryId: "b", branch: "andrew/fix-login", isPrimary: true },
+					{ repositoryId: "c", branch: "main" },
+				],
+				currentBranchName: "andrew/brave-otter-1a2b",
 			}),
-		).toEqual({ kind: "no-match" });
+		).toEqual({ kind: "rename", repositoryIds: ["a", "b"] });
 	});
 
 	it("renames the one checkout of a workspace no host lists", () => {

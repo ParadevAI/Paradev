@@ -1,6 +1,5 @@
 export type RenameTargets =
 	| { kind: "rename"; repositoryIds: (string | undefined)[] }
-	| { kind: "no-match" }
 	| { kind: "unknown-workspace" };
 
 /**
@@ -13,7 +12,11 @@ export function resolveRenameTargets({
 	currentBranchName,
 }: {
 	checkouts:
-		| readonly { repositoryId: string; branch: string | null }[]
+		| readonly {
+				repositoryId: string;
+				branch: string | null;
+				isPrimary?: boolean;
+		  }[]
 		| null
 		| undefined;
 	currentBranchName: string;
@@ -23,12 +26,15 @@ export function resolveRenameTargets({
 	if (checkouts.length === 0) {
 		return { kind: "rename", repositoryIds: [undefined] };
 	}
-	const onBranch = checkouts.filter(
-		(checkout) => checkout.branch === currentBranchName,
-	);
-	if (onBranch.length === 0) return { kind: "no-match" };
-	return {
-		kind: "rename",
-		repositoryIds: onBranch.map((checkout) => checkout.repositoryId),
-	};
+	const onBranch = (branch: string | null) =>
+		checkouts
+			.filter((checkout) => checkout.branch === branch)
+			.map((checkout) => checkout.repositoryId);
+	const matching = onBranch(currentBranchName);
+	if (matching.length > 0) return { kind: "rename", repositoryIds: matching };
+	// Background naming renamed the branch after the dialog read it; the host
+	// renames what each checkout is on now.
+	const primary =
+		checkouts.find((checkout) => checkout.isPrimary) ?? checkouts[0];
+	return { kind: "rename", repositoryIds: onBranch(primary?.branch ?? null) };
 }
