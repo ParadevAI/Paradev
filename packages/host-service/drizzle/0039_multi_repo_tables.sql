@@ -17,19 +17,20 @@ CREATE TABLE `repositories` (
 CREATE UNIQUE INDEX `repositories_project_name_unique` ON `repositories` (`project_id`,`name`);--> statement-breakpoint
 CREATE INDEX `repositories_repo_path_idx` ON `repositories` (`repo_path`);--> statement-breakpoint
 -- Every project becomes a repository with the same id, so pull_requests.project_id
--- copies into repository_id unchanged. Without a repo name it is named after its folder.
+-- copies into repository_id unchanged. Without a repo name it is named after its folder
+-- ('/' or '\' paths), or its id when the path has no folder name.
 INSERT INTO `repositories` (`id`, `project_id`, `name`, `repo_path`, `provider`, `owner`, `repo_name`, `url`, `remote_name`, `sparse_checkout_paths`, `created_at`, `updated_at`)
 SELECT
 	`id`,
 	`id`,
 	CASE
 		WHEN COALESCE(`repo_name`, '') <> '' THEN `repo_name`
-		ELSE replace(`trimmed_path`, rtrim(`trimmed_path`, replace(`trimmed_path`, '/', '')), '')
+		ELSE COALESCE(NULLIF(substr(`trimmed_path`, length(rtrim(`trimmed_path`, replace(replace(`trimmed_path`, '/', ''), '\', ''))) + 1), ''), `id`)
 	END,
 	`repo_path`, `repo_provider`, `repo_owner`, `repo_name`, `repo_url`, `remote_name`, `sparse_checkout_paths`,
 	`created_at`,
 	MAX(`updated_at`, `created_at`)
-FROM (SELECT p.*, rtrim(p.`repo_path`, '/') AS `trimmed_path` FROM `projects` p);
+FROM (SELECT p.*, rtrim(p.`repo_path`, '/\') AS `trimmed_path` FROM `projects` p);
 --> statement-breakpoint
 CREATE TABLE `workspace_repositories` (
 	`workspace_id` text NOT NULL,

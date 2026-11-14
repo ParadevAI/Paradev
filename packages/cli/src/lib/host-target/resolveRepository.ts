@@ -47,10 +47,3 @@ export async function resolveRepository(
 ) {
 	return findRepository(await getHostProject(client, projectId), ref);
 }
-
-export async function primaryRepository(
-	client: HostServiceClient,
-	projectId: string,
-) {
-	return findPrimaryRepository(await getHostProject(client, projectId));
-}

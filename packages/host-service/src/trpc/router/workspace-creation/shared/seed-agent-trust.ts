@@ -7,7 +7,9 @@
  * fresh standalone repo inherits nothing), so every new session would
  * otherwise prompt. Auto-trusting is sound only because the host itself just
  * created the folder as an empty scaffold — never seed a folder with
- * pre-existing user content.
+ * pre-existing user content. A multi-repo root links the primary
+ * repository's agent config (hooks, MCP servers), so it is seeded only when
+ * the user already trusts that repository in the same store.
  *
  * Each store is the CLI's own sanctioned escape hatch: Claude's untrusted-
  * folder error says to set `projects[<path>].hasTrustDialogAccepted: true`
@@ -32,7 +34,7 @@ import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../db";
-import { workspaces } from "../../../../db/schema";
+import { projects, repositories, workspaces } from "../../../../db/schema";
 import { resolveHostAgentConfig } from "../../../../terminal-agents/agent-config";
 import { listWorkspaceCheckouts } from "../../../../workspaces/checkouts";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
@@ -225,6 +227,102 @@ export async function seedAgyFolderTrust(
 	await atomicWrite(settingsFile, JSON.stringify(settings, null, 2));
 }
 
+async function readOptional(file: string): Promise<string | null> {
+	return existsSync(file) ? readFile(file, "utf-8") : null;
+}
+
+/** Claude also honours trust accepted on an ancestor folder. */
+export async function isClaudeFolderTrusted(
+	stateFile: string,
+	folderPaths: string[],
+): Promise<boolean> {
+	const content = await readOptional(stateFile);
+	if (content === null) return false;
+	const projectsByPath = (JSON.parse(content).projects ?? {}) as Record<
+		string,
+		{ hasTrustDialogAccepted?: unknown } | undefined
+	>;
+	return folderPaths.some((folderPath) => {
+		for (let path = folderPath; ; path = dirname(path)) {
+			if (projectsByPath[path]?.hasTrustDialogAccepted === true) return true;
+			if (dirname(path) === path) return false;
+		}
+	});
+}
+
+const CODEX_STRING_KEY = String.raw`(?:"((?:[^"\\]|\\.)*)"|'([^']*)')`;
+const CODEX_PROJECT_HEADER = new RegExp(
+	String.raw`^\s*\[\s*projects\s*\.\s*${CODEX_STRING_KEY}\s*\]\s*(?:#.*)?$`,
+);
+const CODEX_DOTTED_TRUST = new RegExp(
+	String.raw`^\s*projects\s*\.\s*${CODEX_STRING_KEY}\s*\.\s*trust_level\s*=\s*["']trusted["']`,
+);
+const CODEX_TRUST_LINE = /^\s*trust_level\s*=\s*["']trusted["']/;
+
+function codexKey(match: RegExpExecArray): string | undefined {
+	return match[1] !== undefined
+		? match[1].replace(/\\(["\\])/g, "$1")
+		: match[2];
+}
+
+export async function isCodexFolderTrusted(
+	configFile: string,
+	folderPaths: string[],
+): Promise<boolean> {
+	const content = await readOptional(configFile);
+	if (content === null) return false;
+	let table: "top" | "match" | "other" = "top";
+	for (const line of content.split(/\r?\n/)) {
+		const header = CODEX_PROJECT_HEADER.exec(line);
+		if (header) {
+			const key = codexKey(header);
+			table =
+				key !== undefined && folderPaths.includes(key) ? "match" : "other";
+			continue;
+		}
+		if (/^\s*\[/.test(line)) {
+			table = "other";
+			continue;
+		}
+		if (table === "match" && CODEX_TRUST_LINE.test(line)) return true;
+		const dotted = table === "top" ? CODEX_DOTTED_TRUST.exec(line) : null;
+		const dottedKey = dotted ? codexKey(dotted) : undefined;
+		if (dottedKey !== undefined && folderPaths.includes(dottedKey)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+export async function isAgyFolderTrusted(
+	settingsFile: string,
+	folderPaths: string[],
+): Promise<boolean> {
+	const content = await readOptional(settingsFile);
+	if (content === null) return false;
+	const trusted = JSON.parse(content).trustedWorkspaces;
+	return (
+		Array.isArray(trusted) &&
+		folderPaths.some((folderPath) => trusted.includes(folderPath))
+	);
+}
+
+function isFolderTrusted(
+	target: TrustTarget,
+	folderPath: string,
+): Promise<boolean> {
+	const candidates = [
+		...new Set([resolve(folderPath), normalizeFolderPath(folderPath)]),
+	];
+	if (target.family === "claude") {
+		return isClaudeFolderTrusted(target.file, candidates);
+	}
+	if (target.family === "agy") {
+		return isAgyFolderTrusted(target.file, candidates);
+	}
+	return isCodexFolderTrusted(target.file, candidates);
+}
+
 function normalizeFolderPath(path: string): string {
 	try {
 		return realpathSync(path);
@@ -236,17 +334,25 @@ function normalizeFolderPath(path: string): string {
 /**
  * Seed trust for `folderPath` in the launching agent's trust store, if it
  * has a known one. `config` is the already-resolved host agent config of the
- * agent about to launch. Best-effort: failures log and the dialog shows
- * once.
+ * agent about to launch. With `requireTrustedPath`, the seed happens only
+ * when that folder is already trusted in the same store. Best-effort:
+ * failures log and the dialog shows once.
  */
 export async function seedAgentFolderTrust(
 	db: HostDb,
 	folderPath: string,
 	config: { presetId: string; command: string; env: Record<string, string> },
+	requireTrustedPath?: string,
 ): Promise<void> {
 	try {
 		const target = resolveTrustTarget(db, config);
 		if (target === null) return;
+		if (
+			requireTrustedPath !== undefined &&
+			!(await isFolderTrusted(target, requireTrustedPath))
+		) {
+			return;
+		}
 		const normalized = normalizeFolderPath(folderPath);
 		if (target.family === "claude") {
 			await seedClaudeFolderTrust(target.file, normalized);
@@ -265,8 +371,10 @@ export async function seedAgentFolderTrust(
 
 /**
  * Session folders and multi-repo roots are not inside a trusted repository,
- * so the agent about to launch there gets them pre-trusted. A worktree of a
- * single repository inherits trust from the main checkout.
+ * so the agent about to launch there gets them pre-trusted: a session folder
+ * always, a multi-repo root only when the primary repository is already
+ * trusted. A worktree of a single repository inherits trust from the main
+ * checkout.
  */
 export async function seedWorkspaceFolderTrust(
 	db: HostDb,
@@ -278,13 +386,29 @@ export async function seedWorkspaceFolderTrust(
 		.from(workspaces)
 		.where(eq(workspaces.id, workspaceId))
 		.get();
-	if (
-		!workspace ||
-		(workspace.projectId !== null &&
-			listWorkspaceCheckouts(db, workspace).length < 2)
-	) {
-		return;
+	if (!workspace) return;
+	let primaryRepositoryPath: string | undefined;
+	if (workspace.projectId !== null) {
+		if (listWorkspaceCheckouts(db, workspace).length < 2) return;
+		const primary = db
+			.select({ repoPath: repositories.repoPath })
+			.from(projects)
+			.innerJoin(
+				repositories,
+				eq(repositories.id, projects.primaryRepositoryId),
+			)
+			.where(eq(projects.id, workspace.projectId))
+			.get();
+		if (!primary) return;
+		primaryRepositoryPath = primary.repoPath;
 	}
 	const config = resolveHostAgentConfig(db, agent);
-	if (config) await seedAgentFolderTrust(db, workspace.worktreePath, config);
+	if (config) {
+		await seedAgentFolderTrust(
+			db,
+			workspace.worktreePath,
+			config,
+			primaryRepositoryPath,
+		);
+	}
 }

@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { existsSync, openSync, readFileSync, writeFileSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import {
 	type CloudAgentLaunch,
 	readCloudAgentLaunch,
@@ -709,7 +709,7 @@ export function runSandboxSelfSeed(
 			const parsed = parseGitHubRemote(repo.url);
 			const fields = {
 				projectId,
-				name: several || !parsed ? repo.path : parsed.name,
+				name: several ? repo.path : (parsed?.name ?? basename(repoPath)),
 				repoPath,
 				provider: parsed?.provider ?? null,
 				owner: parsed?.owner ?? null,

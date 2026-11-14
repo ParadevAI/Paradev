@@ -97,6 +97,7 @@ export async function createCloudWorkspace(args: {
 		environments,
 		options.environment,
 	);
+	refuseRepositoryPrefix(options.baseBranch, environment.repositories);
 
 	const attachmentFileIds = options.attachment?.length
 		? await uploadToCloudStorage({ api, paths: options.attachment, fetchImpl })
@@ -123,6 +124,28 @@ export async function createCloudWorkspace(args: {
 		data: { ...row, ...links },
 		message: `Provisioning cloud workspace ${row.id} on branch ${row.branch} (environment: ${environment.name})\n${links.webUrl}`,
 	};
+}
+
+// Git allows `=` in a branch name: refuse only a prefix that names a repository.
+function refuseRepositoryPrefix(
+	baseBranch: string | undefined,
+	repositories: ReadonlyArray<{ id: string; name: string; fullName: string }>,
+) {
+	const separator = baseBranch?.indexOf("=") ?? -1;
+	if (!baseBranch || separator <= 0) return;
+	const prefix = baseBranch.slice(0, separator).toLowerCase();
+	const named = repositories.some(
+		(r) =>
+			r.id.toLowerCase() === prefix ||
+			r.name.toLowerCase() === prefix ||
+			r.fullName.toLowerCase() === prefix,
+	);
+	if (named) {
+		throw new CLIError(
+			"A cloud workspace takes --base-branch <branch>, not <repository>=<branch>",
+			"The branch is for the environment's primary repository; the others start from their defaults",
+		);
+	}
 }
 
 /** Without cloud access the default location is refused; point at the others. */

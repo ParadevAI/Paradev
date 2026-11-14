@@ -696,9 +696,12 @@ export const gitRouter = router({
 				? input.oldName
 				: (checkout.row?.branch ?? input.oldName);
 			await assertBranchNotPushed(git, oldName);
+			const renamesCheckedOutBranch =
+				(await git.raw(["rev-parse", "--abbrev-ref", "HEAD"])).trim() ===
+				oldName;
 			await git.raw(["branch", "-m", oldName, input.newName]);
 
-			if (checkout.row) {
+			if (checkout.row && renamesCheckedOutBranch) {
 				ctx.db
 					.update(workspaceRepositories)
 					.set({ branch: input.newName })

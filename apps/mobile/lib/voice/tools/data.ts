@@ -370,14 +370,20 @@ export function createVoiceData({
 
 		async listPullRequests(workspace) {
 			const client = getHostServiceClientByUrl(await hostUrlFor(workspace));
-			const result = await withTimeout(
-				client.pullRequests.historyByWorkspaces.query({
-					workspaceIds: [workspace.id],
-				}),
+			const [result, checkouts] = await withTimeout(
+				Promise.all([
+					client.pullRequests.historyByWorkspaces.query({
+						workspaceIds: [workspace.id],
+					}),
+					client.workspace.get
+						.query({ id: workspace.id })
+						.then((row) => row.checkouts ?? [])
+						.catch(() => []),
+				]),
 				HOST_TIMEOUT_MS,
 				workspace.name,
 			);
-			const rows = flattenPullRequestHistory(result.workspaces[0], []);
+			const rows = flattenPullRequestHistory(result.workspaces[0], checkouts);
 			return rows.map(
 				(row): VoicePullRequest => ({
 					repository: `${row.repoOwner}/${row.repoName}`,

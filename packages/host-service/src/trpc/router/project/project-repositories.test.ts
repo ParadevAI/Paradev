@@ -135,6 +135,28 @@ describe("project repositories", () => {
 		});
 	});
 
+	it("refuses to add a repository while an existing one has a name a workspace folder cannot hold", async () => {
+		const { caller, db } = setup();
+		const project = await caller.create({
+			name: "Migrated",
+			repositories: [local(await gitRepo("web"))],
+		});
+		db.update(schema.repositories)
+			.set({ name: "CLAUDE.md" })
+			.where(eq(schema.repositories.projectId, project.id))
+			.run();
+
+		await expect(
+			caller.addRepository({
+				projectId: project.id,
+				source: local(await gitRepo("api")),
+			}),
+		).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+			message: expect.stringContaining("reserved_name"),
+		});
+	});
+
 	it("refuses a repository whose name would leave the workspace folder", async () => {
 		const { caller } = setup();
 		const escaping = await gitRepo("escaping");

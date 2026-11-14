@@ -181,4 +181,30 @@ describe("0039 multi-repo tables", () => {
 			rows(sqlite, "SELECT origin_workspace_id FROM terminal_sessions"),
 		).toEqual([{ origin_workspace_id: "w1" }]);
 	});
+
+	test("a repository without a repo name is named after the last segment of a POSIX or Windows path, else its id", () => {
+		const sqlite = databaseAt("0038_mobile_devices");
+		sqlite.exec(`
+			INSERT INTO projects (id, repo_path, repo_name, name, created_at, updated_at) VALUES
+				('win', 'C:\\Users\\me\\proj', '', 'Win', 1, 1),
+				('win-trailing', 'D:\\code\\tool\\', NULL, 'Win2', 1, 1),
+				('mixed', 'C:/src\\a/b\\leaf', NULL, 'Mixed', 1, 1),
+				('posix', '/home/u/code/web//', NULL, 'Posix', 1, 1),
+				('root', '/', NULL, 'Root', 1, 1),
+				('empty', '', NULL, 'Empty', 1, 1);
+		`);
+
+		migrateToLatest(sqlite);
+
+		expect(
+			rows(sqlite, "SELECT id, name FROM repositories ORDER BY id"),
+		).toEqual([
+			{ id: "empty", name: "empty" },
+			{ id: "mixed", name: "leaf" },
+			{ id: "posix", name: "web" },
+			{ id: "root", name: "root" },
+			{ id: "win", name: "proj" },
+			{ id: "win-trailing", name: "tool" },
+		]);
+	});
 });

@@ -441,11 +441,12 @@ export async function addRepository(
 					})
 				: repositoryTakenError(resolved.repoPath);
 		}
-		requireUsableName(nameOf(resolved));
-		requireUniqueNames([
+		const names = [
 			...listProjectRepositories(ctx.db, args.projectId).map((r) => r.name),
 			nameOf(resolved),
-		]);
+		];
+		for (const name of names) requireUsableName(name);
+		requireUniqueNames(names);
 		ctx.db
 			.insert(repositories)
 			.values(repositoryValues(args.projectId, resolved))

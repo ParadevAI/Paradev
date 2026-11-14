@@ -32,7 +32,7 @@ export function toHostProjectItem(row: HostProjectRow): HostProjectItem {
 		(repoOwner ? `https://github.com/${repoOwner}.png?size=64` : null);
 	return {
 		id: row.id,
-		name: row.name || row.id,
+		name: row.name || primary?.name || row.id,
 		iconUrl,
 		primaryRepositoryId: row.primaryRepositoryId,
 		repoOwner,

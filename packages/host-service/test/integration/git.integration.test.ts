@@ -318,4 +318,32 @@ describe("git router integration", () => {
 		expect(branches.all).toContain("feature/mine");
 		expect(branches.all).not.toContain("feature/renamed-by-ai");
 	});
+
+	test("renameBranch of a branch the checkout is not on leaves the checkout's branch alone", async () => {
+		await scenario.repo.git.branch(["feature/side"]);
+		await scenario.repo.git.checkoutLocalBranch("feature/current");
+		await scenario.repo.commit("work", { "s.txt": "s" });
+		scenario.host.db
+			.update(workspaceRepositories)
+			.set({ branch: "feature/current" })
+			.where(eq(workspaceRepositories.workspaceId, scenario.workspaceId))
+			.run();
+
+		await scenario.host.trpc.git.renameBranch.mutate({
+			workspaceId: scenario.workspaceId,
+			oldName: "feature/side",
+			newName: "feature/side-renamed",
+		});
+
+		expect((await scenario.repo.git.branchLocal()).all).toContain(
+			"feature/side-renamed",
+		);
+		expect(
+			scenario.host.db
+				.select({ branch: workspaceRepositories.branch })
+				.from(workspaceRepositories)
+				.where(eq(workspaceRepositories.workspaceId, scenario.workspaceId))
+				.all(),
+		).toEqual([{ branch: "feature/current" }]);
+	});
 });

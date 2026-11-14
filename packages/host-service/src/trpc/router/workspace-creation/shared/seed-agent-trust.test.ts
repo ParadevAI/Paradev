@@ -20,6 +20,7 @@ import { seedProject, seedWorkspace } from "../../../../../test/helpers/seed";
 import type { HostDb } from "../../../../db";
 import * as schema from "../../../../db/schema";
 import {
+	isCodexFolderTrusted,
 	resolveTrustFamily,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
@@ -332,8 +333,14 @@ describe("seedWorkspaceFolderTrust", () => {
 		return { db, trusted };
 	}
 
-	test("trusts a multi-repo root, not a worktree of one repository", async () => {
+	test("trusts a multi-repo root whose primary repository is trusted, not a worktree of one repository", async () => {
 		const { db, trusted } = setup();
+		writeFileSync(
+			join(dir, ".claude.json"),
+			JSON.stringify({
+				projects: { [join(dir, "web")]: { hasTrustDialogAccepted: true } },
+			}),
+		);
 		const single = seedProject({ db }, { repoPath: join(dir, "solo") });
 		const multi = seedProject(
 			{ db },
@@ -352,8 +359,60 @@ describe("seedWorkspaceFolderTrust", () => {
 		);
 
 		await seedWorkspaceFolderTrust(db, worktree.id, "claude-test");
-		expect(trusted()).toEqual([]);
+		expect(trusted()).toEqual([join(dir, "web")]);
 		await seedWorkspaceFolderTrust(db, root.id, "claude-test");
-		expect(trusted()).toEqual([join(dir, "root")]);
+		expect(trusted()).toEqual([join(dir, "web"), join(dir, "root")]);
+	});
+
+	test("leaves a multi-repo root untrusted while its primary repository is not trusted", async () => {
+		const { db, trusted } = setup();
+		writeFileSync(
+			join(dir, ".claude.json"),
+			JSON.stringify({
+				projects: {
+					[join(dir, "web")]: { hasTrustDialogAccepted: false },
+					[join(dir, "api")]: { hasTrustDialogAccepted: true },
+				},
+			}),
+		);
+		const multi = seedProject(
+			{ db },
+			{
+				repoPath: join(dir, "web"),
+				repositories: [{ repoPath: join(dir, "api") }],
+			},
+		);
+		const root = seedWorkspace(
+			{ db },
+			{ projectId: multi.id, worktreePath: join(dir, "root"), branch: "b" },
+		);
+
+		await seedWorkspaceFolderTrust(db, root.id, "claude-test");
+		expect(trusted()).toEqual([join(dir, "web"), join(dir, "api")]);
+	});
+});
+
+describe("isCodexFolderTrusted", () => {
+	test("reads trust_level from the project's table or a dotted key only", async () => {
+		const file = join(dir, "config.toml");
+		writeFileSync(
+			file,
+			[
+				'projects."/dotted".trust_level = "trusted"',
+				'[projects."/a"]',
+				'trust_level = "trusted"',
+				"[projects.'/b']",
+				'trust_level = "untrusted"',
+				'[projects."/c"]',
+				"[other]",
+				'trust_level = "trusted"',
+			].join("\n"),
+		);
+
+		expect(await isCodexFolderTrusted(file, ["/a"])).toBe(true);
+		expect(await isCodexFolderTrusted(file, ["/dotted"])).toBe(true);
+		expect(await isCodexFolderTrusted(file, ["/b"])).toBe(false);
+		expect(await isCodexFolderTrusted(file, ["/c"])).toBe(false);
+		expect(await isCodexFolderTrusted(join(dir, "none"), ["/a"])).toBe(false);
 	});
 });

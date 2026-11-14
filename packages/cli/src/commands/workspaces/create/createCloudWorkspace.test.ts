@@ -33,7 +33,11 @@ function recordingApi() {
 		environment: {
 			list: {
 				query: async () => [
-					{ id: "env-1", name: "main", repositories: [{ id: "repo-1" }] },
+					{
+						id: "env-1",
+						name: "main",
+						repositories: [{ id: "repo-1", name: "api", fullName: "acme/api" }],
+					},
 				],
 			},
 		},
@@ -67,6 +71,31 @@ test("sends --base-branch as the branch the cloud workspace starts from", async 
 		options: { baseBranch: "main" },
 	});
 	expect(calls.createInput).toMatchObject({ branch: "main" });
+});
+
+test.each([
+	"api=release",
+	"ACME/API=release",
+])("refuses --base-branch %s that names a repository", async (baseBranch) => {
+	const { api, calls } = recordingApi();
+	await expect(
+		createCloudWorkspace({
+			api,
+			organizationId: "org",
+			options: { baseBranch },
+		}),
+	).rejects.toThrow(/not <repository>=<branch>/);
+	expect(calls.createInput).toBeUndefined();
+});
+
+test("sends a --base-branch with `=` that names no repository", async () => {
+	const { api, calls } = recordingApi();
+	await createCloudWorkspace({
+		api,
+		organizationId: "org",
+		options: { baseBranch: "feat=x" },
+	});
+	expect(calls.createInput).toMatchObject({ branch: "feat=x" });
 });
 
 test("sends --tag to the cloud", async () => {

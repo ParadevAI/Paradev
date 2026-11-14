@@ -15,6 +15,5 @@ export {
 	findPrimaryRepository,
 	findRepository,
 	getHostProject,
-	primaryRepository,
 	resolveRepository,
 } from "./resolveRepository";

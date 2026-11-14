@@ -131,6 +131,21 @@ describe("sandbox self-seed", () => {
 		]);
 	});
 
+	test("a lone repository at the root without a GitHub remote is named after its folder", () => {
+		const db = createDb();
+		const seed = identity(["."]);
+		seed.repositories = seed.repositories.map((repo) => ({
+			...repo,
+			url: "https://git.example.com/solo.git",
+		}));
+
+		runSandboxSelfSeed(db, seed, agentDir());
+
+		expect(db.select().from(schema.repositories).all()).toMatchObject([
+			{ name: "workspace", repoPath: "/workspace", owner: null },
+		]);
+	});
+
 	test("a box seeded before multi-repo folds its sibling projects into the primary's", () => {
 		const db = createDb();
 		const primary = seedProject(
