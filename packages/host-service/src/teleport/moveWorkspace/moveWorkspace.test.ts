@@ -229,13 +229,13 @@ describe("beginWorkspaceMove", () => {
 				name: "a computer without the project",
 				options: { destinationProject: "none" },
 				destination: { kind: "computer", hostId: "other-host" },
-				message: "Add acme/app as a project on that computer first",
+				message: "Add acme/app as a project on that device first",
 			},
 			{
 				name: "a computer on a release without the lookup",
 				options: { destinationProject: "old-host" },
 				destination: { kind: "computer", hostId: "other-host" },
-				message: "Update Paradev on that computer to move workspaces to it",
+				message: "Update Paradev on that device to move workspaces to it",
 			},
 		] as const;
 		for (const refusal of refusals) {

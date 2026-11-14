@@ -2069,8 +2069,8 @@ msgstr "Додати {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Спершу додайте {repositoryName} як проєкт на комп’ютері {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Спочатку додайте {repositoryName} як проєкт на цьому комп'ютері"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Спочатку додайте {repositoryName} як проєкт на цьому пристрої"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Додати #{prNumber} до черги злиття?"
@@ -9657,8 +9657,8 @@ msgstr "Завантажити застосунок для iPhone та iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Отримає запрошення приєднатися до {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Підготовка комп’ютера"
+msgid "Getting the device ready"
+msgstr "Підготовка пристрою"
 
 msgid "Getting Work Done"
 msgstr "Для роботи"
@@ -20201,11 +20201,11 @@ msgstr "Цей обліковий запис більше не підключе�
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити. Його запустили, але так і не надіслали промпт."
 
-msgid "that computer"
-msgstr "цьому комп'ютері"
+msgid "that device"
+msgstr "цьому пристрої"
 
-msgid "That computer can't be reached"
-msgstr "Цей комп’ютер недоступний"
+msgid "That device can't be reached"
+msgstr "Цей пристрій недоступний"
 
 msgid "That endpoint could not be resolved."
 msgstr "Не вдалося знайти адресу цього ендпоінта."
@@ -20521,8 +20521,8 @@ msgstr "Робочий простір з відкритим кодом для Cl
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Робочий простір з відкритим кодом для Claude Code, Codex, OpenCode і будь-якого кодинг-агента. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Інша сторона переміщення використовує старішу версію. Перезапустіть хмарний робочий простір або оновіть хост комп'ютера, а потім спробуйте ще раз."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Інша сторона переміщення використовує старішу версію. Перезапустіть хмарний робочий простір або оновіть хост пристрою, а потім спробуйте ще раз."
 
 msgid "The overnight shift"
 msgstr "Нічна зміна"
@@ -20822,9 +20822,6 @@ msgstr "Цей хмарний робочий простір не може зап
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Цей хмарний робочий простір прокидається; після простою це може тривати до 30 секунд."
 
-msgid "This computer's host is not running"
-msgstr "Хост цього комп'ютера не запущено"
-
 msgid "This conversation is too long for the model"
 msgstr "Ця розмова задовга для моделі"
 
@@ -20845,6 +20842,9 @@ msgstr "цей пристрій ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Цей пристрій не під'єднано до релея Paradev, тож запуски автоматизацій буде пропущено."
+
+msgid "This device's host is not running"
+msgstr "Хост цього пристрою не запущено"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Цієї папки не існує. Скрипт термінала використає корінь робочого простору."

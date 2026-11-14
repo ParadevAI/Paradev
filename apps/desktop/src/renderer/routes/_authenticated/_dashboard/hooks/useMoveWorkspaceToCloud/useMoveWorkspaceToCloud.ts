@@ -64,7 +64,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
 			if (!activeHostUrl) {
-				throw new Error(t`This computer's host is not running`);
+				throw new Error(t`This device's host is not running`);
 			}
 			const assertEnvironmentOpens = (repository: string) => {
 				const environmentRepository = environment.repositoryFullName;

@@ -2075,8 +2075,8 @@ msgstr "Add {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Add {repositoryName} as a project on {computer} first"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Add {repositoryName} as a project on this computer first"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Add {repositoryName} as a project on this device first"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Add #{prNumber} to the merge queue?"
@@ -9663,8 +9663,8 @@ msgstr "Get the iPhone and iPad app"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Gets an invite to join {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Getting the computer ready"
+msgid "Getting the device ready"
+msgstr "Getting the device ready"
 
 msgid "Getting Work Done"
 msgstr "Getting Work Done"
@@ -20207,11 +20207,11 @@ msgstr "That account is no longer connected — choose another."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "That agent session has no conversation to open yet. It was started but never prompted."
 
-msgid "that computer"
-msgstr "that computer"
+msgid "that device"
+msgstr "that device"
 
-msgid "That computer can't be reached"
-msgstr "That computer can't be reached"
+msgid "That device can't be reached"
+msgstr "That device can't be reached"
 
 msgid "That endpoint could not be resolved."
 msgstr "That endpoint could not be resolved."
@@ -20527,8 +20527,8 @@ msgstr "The open-source workspace for Claude Code, Codex, and any coding agent."
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 
 msgid "The overnight shift"
 msgstr "The overnight shift"
@@ -20828,9 +20828,6 @@ msgstr "This cloud workspace can't start"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 
-msgid "This computer's host is not running"
-msgstr "This computer's host is not running"
-
 msgid "This conversation is too long for the model"
 msgstr "This conversation is too long for the model"
 
@@ -20851,6 +20848,9 @@ msgstr "this device ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "This device isn't connected to the Paradev relay, so automation runs will be skipped."
+
+msgid "This device's host is not running"
+msgstr "This device's host is not running"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "This directory does not exist. The terminal script will fall back to the workspace root."

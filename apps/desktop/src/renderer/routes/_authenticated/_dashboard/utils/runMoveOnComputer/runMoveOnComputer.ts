@@ -90,7 +90,7 @@ async function recordFailure(
 			attemptId,
 			error:
 				rawErrorMessage(error).slice(0, 2000) ||
-				"The move to the computer failed",
+				"The move to the device failed",
 		})
 		.catch((failError: unknown) =>
 			console.warn(

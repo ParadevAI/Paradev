@@ -2075,8 +2075,8 @@ msgstr "{localizedName} eklensin mi?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Önce {repositoryName} deposunu {computer} üzerinde proje olarak ekleyin"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Önce {repositoryName} deposunu bu bilgisayarda proje olarak ekleyin"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Önce {repositoryName} deposunu bu cihazda proje olarak ekleyin"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} birleştirme kuyruğuna eklensin mi?"
@@ -9663,8 +9663,8 @@ msgstr "iPhone ve iPad uygulamasını edinin"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
 
-msgid "Getting the computer ready"
-msgstr "Bilgisayar hazırlanıyor"
+msgid "Getting the device ready"
+msgstr "Cihaz hazırlanıyor"
 
 msgid "Getting Work Done"
 msgstr "İş Bitirme"
@@ -20207,11 +20207,11 @@ msgstr "Bu hesap artık bağlı değil — başka bir hesap seçin."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Bu aracı oturumunda açılacak bir konuşma yok. Başlatıldı ama hiç istek almadı."
 
-msgid "that computer"
-msgstr "o bilgisayar"
+msgid "that device"
+msgstr "o cihaz"
 
-msgid "That computer can't be reached"
-msgstr "Bu bilgisayara ulaşılamıyor"
+msgid "That device can't be reached"
+msgstr "Bu cihaza ulaşılamıyor"
 
 msgid "That endpoint could not be resolved."
 msgstr "Bu uç nokta çözümlenemedi."
@@ -20527,8 +20527,8 @@ msgstr "Claude Code, Codex ve her kodlama ajanı için açık kaynak çalışma 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode ve herhangi bir kodlama ajanı için açık kaynak çalışma alanı. Görevleri ayrı dallarda paralel çalıştırın ve her şeyi tek bir yerden inceleyin."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Taşımanın diğer tarafı daha eski bir sürüm çalıştırıyor. Bir bulut çalışma alanını yeniden başlatın veya bilgisayarın host hizmetini güncelleyin, ardından tekrar deneyin."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Taşımanın diğer tarafı daha eski bir sürüm çalıştırıyor. Bir bulut çalışma alanını yeniden başlatın veya cihazın host hizmetini güncelleyin, ardından tekrar deneyin."
 
 msgid "The overnight shift"
 msgstr "Gece vardiyası"
@@ -20828,9 +20828,6 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
 
-msgid "This computer's host is not running"
-msgstr "Bu bilgisayarın host hizmeti çalışmıyor"
-
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
 
@@ -20851,6 +20848,9 @@ msgstr "bu cihaz ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Bu cihaz Paradev rölesine bağlı değil, bu yüzden otomasyon çalıştırmaları atlanacak."
+
+msgid "This device's host is not running"
+msgstr "Bu cihazın host hizmeti çalışmıyor"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Bu dizin mevcut değil. Terminal betiği çalışma alanı köküne geri dönecek."

@@ -470,14 +470,14 @@ export const teleportRouter = router({
 			) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message: "The workspace is already on this computer",
+					message: "The workspace is already on this device",
 				});
 			}
 			const auth = ctx.apiAuth;
 			if (destination.kind === "computer" && !auth) {
 				throw new TRPCError({
 					code: "PRECONDITION_FAILED",
-					message: "This computer cannot reach your other computers",
+					message: "This device cannot reach your other devices",
 				});
 			}
 			if (movesInFlight.has(input.workspaceId)) {
@@ -510,7 +510,7 @@ export const teleportRouter = router({
 						destinationHost: async (hostId) => {
 							const endpoint = await ctx.api.host.relayEndpoint.query();
 							if (!endpoint?.url || !auth) {
-								throw new Error("This computer cannot reach the relay");
+								throw new Error("This device cannot reach the relay");
 							}
 							return createRelayHostClient({
 								relayUrl: endpoint.url,

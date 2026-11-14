@@ -2075,8 +2075,8 @@ msgstr "Tambahkan {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Tambahkan {repositoryName} sebagai proyek di {computer} terlebih dahulu"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Tambahkan {repositoryName} sebagai proyek di komputer ini terlebih dahulu"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Tambahkan {repositoryName} sebagai proyek di perangkat ini terlebih dahulu"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Tambahkan #{prNumber} ke antrean merge?"
@@ -9663,8 +9663,8 @@ msgstr "Dapatkan aplikasi iPhone dan iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Menyiapkan komputer"
+msgid "Getting the device ready"
+msgstr "Menyiapkan perangkat"
 
 msgid "Getting Work Done"
 msgstr "Menyelesaikan Pekerjaan"
@@ -20207,11 +20207,11 @@ msgstr "Akun itu sudah tidak terhubung — pilih yang lain."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Sesi agen itu belum punya percakapan untuk dibuka. Sudah dimulai tetapi belum pernah diberi perintah."
 
-msgid "that computer"
-msgstr "komputer itu"
+msgid "that device"
+msgstr "perangkat itu"
 
-msgid "That computer can't be reached"
-msgstr "Komputer itu tidak dapat dijangkau"
+msgid "That device can't be reached"
+msgstr "Perangkat itu tidak dapat dijangkau"
 
 msgid "That endpoint could not be resolved."
 msgstr "Endpoint itu tidak dapat ditemukan."
@@ -20527,8 +20527,8 @@ msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun.
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host komputer, lalu coba lagi."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host perangkat, lalu coba lagi."
 
 msgid "The overnight shift"
 msgstr "Shift malam"
@@ -20828,9 +20828,6 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
 
-msgid "This computer's host is not running"
-msgstr "Host komputer ini tidak berjalan"
-
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
 
@@ -20851,6 +20848,9 @@ msgstr "perangkat ini ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Perangkat ini tidak terhubung ke relay Paradev, jadi run otomatisasi akan dilewati."
+
+msgid "This device's host is not running"
+msgstr "Host perangkat ini tidak berjalan"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."

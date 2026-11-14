@@ -2075,8 +2075,8 @@ msgstr "{localizedName}을(를) 추가하시겠습니까?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "먼저 {computer}에 {repositoryName}을(를) 프로젝트로 추가하세요"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "먼저 {repositoryName}을(를) 이 컴퓨터의 프로젝트로 추가하세요"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "먼저 {repositoryName}을(를) 이 기기의 프로젝트로 추가하세요"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber}을(를) 머지 대기열에 추가할까요?"
@@ -9663,8 +9663,8 @@ msgstr "iPhone 및 iPad 앱 받기"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} 가입 초대를 받습니다"
 
-msgid "Getting the computer ready"
-msgstr "컴퓨터를 준비하는 중"
+msgid "Getting the device ready"
+msgstr "기기를 준비하는 중"
 
 msgid "Getting Work Done"
 msgstr "업무용"
@@ -20207,11 +20207,11 @@ msgstr "해당 계정은 더 이상 연결되어 있지 않습니다. 다른 계
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "이 에이전트 세션에는 아직 열 대화가 없습니다. 시작되었지만 한 번도 요청을 받지 않았습니다."
 
-msgid "that computer"
-msgstr "그 컴퓨터"
+msgid "that device"
+msgstr "그 기기"
 
-msgid "That computer can't be reached"
-msgstr "그 컴퓨터에 연결할 수 없습니다"
+msgid "That device can't be reached"
+msgstr "그 기기에 연결할 수 없습니다"
 
 msgid "That endpoint could not be resolved."
 msgstr "해당 엔드포인트를 확인할 수 없습니다."
@@ -20527,8 +20527,8 @@ msgstr "Claude Code, Codex, 그리고 모든 코딩 에이전트를 위한 오�
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode, 그리고 모든 코딩 에이전트를 위한 오픈 소스 워크스페이스. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "이동의 다른 쪽에서 이전 버전을 실행 중입니다. 클라우드 워크스페이스를 다시 시작하거나 컴퓨터의 호스트를 업데이트한 다음 다시 시도하세요."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "이동의 다른 쪽에서 이전 버전을 실행 중입니다. 클라우드 워크스페이스를 다시 시작하거나 기기의 호스트를 업데이트한 다음 다시 시도하세요."
 
 msgid "The overnight shift"
 msgstr "야간 근무"
@@ -20828,9 +20828,6 @@ msgstr "이 클라우드 워크스페이스를 시작할 수 없습니다"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안 사용하지 않았다면 최대 30초가 걸릴 수 있습니다."
 
-msgid "This computer's host is not running"
-msgstr "이 컴퓨터의 호스트가 실행되고 있지 않습니다"
-
 msgid "This conversation is too long for the model"
 msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
 
@@ -20851,6 +20848,9 @@ msgstr "이 기기 ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "이 기기가 Paradev 릴레이에 연결되어 있지 않아 자동화 실행이 건너뛰어집니다."
+
+msgid "This device's host is not running"
+msgstr "이 기기의 호스트가 실행되고 있지 않습니다"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페이스 루트에서 실행됩니다."

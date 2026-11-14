@@ -2075,8 +2075,8 @@ msgstr "{localizedName} hinzufügen?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Füge {repositoryName} zuerst als Projekt auf {computer} hinzu"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Füge {repositoryName} zuerst als Projekt auf diesem Computer hinzu"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Füge {repositoryName} zuerst als Projekt auf diesem Gerät hinzu"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} zur Merge-Warteschlange hinzufügen?"
@@ -9663,8 +9663,8 @@ msgstr "iPhone- und iPad-App holen"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Erhält eine Einladung zu {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Der Computer wird vorbereitet"
+msgid "Getting the device ready"
+msgstr "Das Gerät wird vorbereitet"
 
 msgid "Getting Work Done"
 msgstr "Arbeit erledigen"
@@ -20207,11 +20207,11 @@ msgstr "Dieses Konto ist nicht mehr verbunden — wähle ein anderes."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Diese Agenten-Sitzung hat noch keine Unterhaltung zum Öffnen. Sie wurde gestartet, aber nie beauftragt."
 
-msgid "that computer"
-msgstr "diesem Computer"
+msgid "that device"
+msgstr "diesem Gerät"
 
-msgid "That computer can't be reached"
-msgstr "Dieser Computer ist nicht erreichbar"
+msgid "That device can't be reached"
+msgstr "Dieses Gerät ist nicht erreichbar"
 
 msgid "That endpoint could not be resolved."
 msgstr "Dieser Endpunkt konnte nicht aufgelöst werden."
@@ -20527,8 +20527,8 @@ msgstr "Der Open-Source-Arbeitsbereich für Claude Code, Codex und jeden Coding-
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Der Open-Source-Workspace für Claude Code, Codex, OpenCode und jeden anderen Coding-Agenten. Führe Aufgaben parallel auf getrennten Branches aus und reviewe alles an einem Ort."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Die andere Seite des Verschiebens nutzt eine ältere Version. Starte einen Cloud-Arbeitsbereich neu oder aktualisiere den Host des Computers und versuche es dann erneut."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Die andere Seite des Verschiebens nutzt eine ältere Version. Starte einen Cloud-Arbeitsbereich neu oder aktualisiere den Host des Geräts und versuche es dann erneut."
 
 msgid "The overnight shift"
 msgstr "Die Nachtschicht"
@@ -20828,9 +20828,6 @@ msgstr "Dieser Cloud-Arbeitsbereich kann nicht starten"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Dieser Cloud-Workspace wird gerade aufgeweckt. Nach Inaktivität kann das bis zu 30 Sekunden dauern."
 
-msgid "This computer's host is not running"
-msgstr "Der Host dieses Computers läuft nicht"
-
 msgid "This conversation is too long for the model"
 msgstr "Diese Unterhaltung ist zu lang für das Modell"
 
@@ -20851,6 +20848,9 @@ msgstr "diesem Gerät ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Dieses Gerät ist nicht mit dem Paradev-Relay verbunden, daher werden Automatisierungsläufe übersprungen."
+
+msgid "This device's host is not running"
+msgstr "Der Host dieses Geräts läuft nicht"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Dieses Verzeichnis existiert nicht. Das Terminal-Skript greift auf die Wurzel des Arbeitsbereichs zurück."
