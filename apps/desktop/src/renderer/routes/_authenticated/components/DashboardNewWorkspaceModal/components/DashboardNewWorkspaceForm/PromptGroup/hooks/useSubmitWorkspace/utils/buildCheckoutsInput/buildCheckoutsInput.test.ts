@@ -226,4 +226,32 @@ describe("buildCheckoutsInput", () => {
 			}).pullRequest,
 		).toEqual({ repository: "o/web", number: 7 });
 	});
+
+	test("several repositories: a base branch picked in an unresolved PR's repository replaces the PR", () => {
+		const githubNames = { api: "o/api", web: "O/Web" };
+		expect(
+			buildCheckoutsInput({
+				draft: { ...emptyDraft, checkoutBaseBranches: { web: "dev" } },
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+				repositoryIds: ["api", "web"],
+				githubNames,
+			}),
+		).toEqual({
+			checkout: "worktree",
+			isPrCheckout: false,
+			checkouts: { web: { baseBranch: "dev" } },
+		});
+		expect(
+			buildCheckoutsInput({
+				draft: { ...emptyDraft, checkoutBaseBranches: { api: "dev" } },
+				linkedPR,
+				primaryRepositoryId: "api",
+				isMultiRepo: true,
+				repositoryIds: ["api", "web"],
+				githubNames,
+			}).pullRequest,
+		).toEqual({ repository: "o/web", number: 7 });
+	});
 });

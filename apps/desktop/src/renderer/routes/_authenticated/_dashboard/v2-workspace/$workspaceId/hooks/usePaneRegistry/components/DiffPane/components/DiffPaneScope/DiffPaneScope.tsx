@@ -36,11 +36,13 @@ export function DiffPaneScope({
 	repositoryPicker,
 }: DiffPaneScopeProps) {
 	const { t } = useLingui();
-	const scope = useChangesScope(workspaceId, repositoryId);
-	const status = scope.status.data;
-	const clearLabel = t({ message: "Show all changes" });
 	const shown = repositoryPicker?.picker.shown;
 	const showsSeveral = shown !== undefined && shown.size > 1;
+	const scope = useChangesScope(workspaceId, repositoryId, {
+		enabled: !showsSeveral,
+	});
+	const status = scope.status.data;
+	const clearLabel = t({ message: "Show all changes" });
 	const shownStatuses = useCheckoutGitStatuses(showsSeveral ? [...shown] : []);
 	const shownUncommittedCount = shownStatuses.reduce(
 		(sum, { data }) =>

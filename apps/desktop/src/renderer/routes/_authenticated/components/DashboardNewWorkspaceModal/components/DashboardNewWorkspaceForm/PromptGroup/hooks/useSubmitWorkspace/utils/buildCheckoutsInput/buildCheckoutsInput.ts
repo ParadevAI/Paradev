@@ -98,15 +98,16 @@ export function buildCheckoutsInput({
 	} else if (linkedPR) {
 		// Not found in a repository yet: the host matches it, or names what is missing.
 		const unresolved = pullRequestInput(linkedPR);
-		const worktreeReplacesPullRequest = Object.keys(
-			draft.checkoutWorktrees,
-		).some(
+		const pickReplacesPullRequest = [
+			...Object.keys(draft.checkoutWorktrees),
+			...Object.keys(draft.checkoutBaseBranches),
+		].some(
 			(repositoryId) =>
 				known.has(repositoryId) &&
 				githubNames[repositoryId]?.toLowerCase() ===
 					unresolved?.repository.toLowerCase(),
 		);
-		if (!worktreeReplacesPullRequest) pullRequest = unresolved;
+		if (!pickReplacesPullRequest) pullRequest = unresolved;
 	}
 	for (const [repositoryId, baseBranch] of Object.entries(
 		draft.checkoutBaseBranches,

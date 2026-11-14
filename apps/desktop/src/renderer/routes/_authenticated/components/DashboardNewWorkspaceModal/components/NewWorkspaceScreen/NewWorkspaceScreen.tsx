@@ -918,10 +918,6 @@ export function NewWorkspaceScreen({
 				message: "Host service is not running",
 			});
 		}
-		if (needsSetup)
-			return t({
-				message: `${notSetUpProjectName} is not set up on ${notSetUpHostName}. Pick another host, or set it up in project settings.`,
-			});
 		if (!isSession && isHostOutdated)
 			return t({
 				message: `Update ${notSetUpHostName} to manage this project`,
@@ -930,9 +926,7 @@ export function NewWorkspaceScreen({
 			return t({ message: "Loading project repositories…" });
 		return null;
 	}, [
-		needsSetup,
 		isHostOutdated,
-		notSetUpProjectName,
 		notSetUpHostName,
 		primaryRepositoryId,
 		isCloudHost,
