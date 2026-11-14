@@ -88,6 +88,7 @@ import { useMainSend } from "./hooks/useMainSend";
 import { useMoveToBackground } from "./hooks/useMoveToBackground";
 import { usePendingPrompts } from "./hooks/usePendingPrompts";
 import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
+import { useStopConfirmation } from "./hooks/useStopConfirmation";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
@@ -566,21 +567,12 @@ export function SessionView({
 					sessionState?.backgroundTasks ?? [],
 					runningTurnStartedAtMs,
 				);
-	const [confirmingStop, setConfirmingStop] = useState(false);
-	const onCancelTurn = useMemo(
-		() =>
-			stopTurn && runningSubagents > 0
-				? () => setConfirmingStop(true)
-				: stopTurn,
-		[stopTurn, runningSubagents],
-	);
-	useEffect(() => {
-		if (!stopTurn || runningSubagents === 0) setConfirmingStop(false);
-	}, [stopTurn, runningSubagents]);
-	const confirmStop = useCallback(() => {
-		setConfirmingStop(false);
-		stopTurn?.();
-	}, [stopTurn]);
+	const stopConfirmation = useStopConfirmation({
+		runningTurnId,
+		stopTurn,
+		subagentCount: runningSubagents,
+	});
+	const onCancelTurn = stopConfirmation.onCancelTurn;
 	const promptQueue = useMemo(
 		() => ({
 			prompts: queuedPrompts,
@@ -837,9 +829,9 @@ export function SessionView({
 				/>
 				<StopWithSubagentsDialog
 					subagentCount={runningSubagents}
-					open={confirmingStop}
-					onOpenChange={setConfirmingStop}
-					onConfirm={confirmStop}
+					open={stopConfirmation.open}
+					onOpenChange={stopConfirmation.onOpenChange}
+					onConfirm={stopConfirmation.confirm}
 				/>
 			</ComposerDropZone>
 		</ChatPaneActionsProvider>
