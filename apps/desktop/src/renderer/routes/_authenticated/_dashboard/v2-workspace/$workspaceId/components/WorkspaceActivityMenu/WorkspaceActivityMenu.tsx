@@ -111,6 +111,7 @@ import {
 	type BackgroundWork,
 	collectBackgroundWork,
 } from "./utils/collectBackgroundWork";
+import { actionableShipRepositories } from "./utils/actionableShipRepositories";
 import { paneSourceTitle } from "./utils/paneSourceTitle";
 import {
 	pullRequestDisplayState,
@@ -189,6 +190,11 @@ export function WorkspaceActivityMenu({
 	const singleRepoStats = useMemo(
 		() => (gitStatus.data ? changesPillStats(gitStatus.data) : null),
 		[gitStatus.data],
+	);
+	const actionableCheckouts = actionableShipRepositories(
+		checkouts,
+		repositoryShip.byId,
+		shipRepositoryId,
 	);
 	const changesStats = isMultiRepo ? repositoryShip.totals : singleRepoStats;
 	const triggerChangesStats =
@@ -765,14 +771,16 @@ export function WorkspaceActivityMenu({
 									isOpen={changes.isOpen}
 									onToggle={changes.onToggle}
 								/>
-								<RepositoryShipList
-									workspaceId={workspaceId}
-									repositories={checkouts}
-									snapshots={repositoryShip.byId}
-									onOpenPullRequest={onOpenPullRequest}
-									activeRepositoryId={shipRepositoryId}
-									onActiveRepositoryIdChange={setShipRepositoryId}
-								/>
+								{actionableCheckouts.length > 0 && (
+									<RepositoryShipList
+										workspaceId={workspaceId}
+										repositories={actionableCheckouts}
+										snapshots={repositoryShip.byId}
+										onOpenPullRequest={onOpenPullRequest}
+										activeRepositoryId={shipRepositoryId}
+										onActiveRepositoryIdChange={setShipRepositoryId}
+									/>
+								)}
 							</section>
 						) : (
 							changes &&
