@@ -22,6 +22,7 @@ import { PathField } from "./components/PathField";
 import { SetupRepositoryRow } from "./components/SetupRepositoryRow";
 import {
 	buildSetupInput,
+	defaultRepositoryChoice,
 	type RepositoryChoice,
 	type SetupOriginProject,
 } from "./utils/buildSetupInput";
@@ -37,10 +38,6 @@ interface SetupProjectModalProps {
 	hostName: string;
 	isRemoteTarget: boolean;
 	onChanged?: () => void;
-}
-
-function defaultChoice(repository: { url: string | null }): RepositoryChoice {
-	return repository.url ? { kind: "clone" } : { kind: "import", path: "" };
 }
 
 export function SetupProjectModal({
@@ -63,7 +60,7 @@ export function SetupProjectModal({
 	const [browseTarget, setBrowseTarget] = useState<string | null>(null);
 
 	const choiceOf = (repository: SetupOriginProject["repositories"][number]) =>
-		choices[repository.id] ?? defaultChoice(repository);
+		choices[repository.id] ?? defaultRepositoryChoice(repository);
 	const clones = project.repositories.some(
 		(repository) => choiceOf(repository).kind === "clone",
 	);

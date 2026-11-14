@@ -376,6 +376,16 @@ export function NewWorkspaceScreen({
 	const selectedHostProject = isCloudHost
 		? undefined
 		: findHostProjectRow(hostProjectResults, hostId, projectId);
+	const selectedHostRows = hostProjectResults.find(
+		(result) => result.target.machineId === hostId,
+	)?.rows;
+	const isHostOutdated =
+		!isCloudHost &&
+		!needsSetup &&
+		!selectedHostProject &&
+		selectedHostRows !== undefined &&
+		!!projectId &&
+		setUpProjectIds?.has(projectId) === true;
 	const projectRepositories = selectedHostProject?.repositories ?? [];
 	const isMultiRepoProject = projectRepositories.length > 1;
 	const projectRepositoryIdsKey = projectRepositories
@@ -918,13 +928,18 @@ export function NewWorkspaceScreen({
 		}
 		if (needsSetup)
 			return t({
-				message: `${notSetUpProjectName} is not set up on ${notSetUpHostName}. Pick another host.`,
+				message: `${notSetUpProjectName} is not set up on ${notSetUpHostName}. Pick another host, or set it up in project settings.`,
+			});
+		if (!isSession && isHostOutdated)
+			return t({
+				message: `Update ${notSetUpHostName} to manage this project`,
 			});
 		if (!isSession && !primaryRepositoryId)
 			return t({ message: "Loading project repositories…" });
 		return null;
 	}, [
 		needsSetup,
+		isHostOutdated,
 		notSetUpProjectName,
 		notSetUpHostName,
 		primaryRepositoryId,
@@ -1335,13 +1350,27 @@ export function NewWorkspaceScreen({
 			}
 		/>
 	);
-	const notSetUpNotice = needsSetup && (
+	const notSetUpNotice = needsSetup ? (
 		<span className="text-[11px] text-amber-500">
 			<Trans>
 				{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another
-				host.
+				host, or{" "}
+				<button
+					type="button"
+					className="underline underline-offset-2 hover:text-amber-400"
+					onClick={handleGoToProjectSettings}
+				>
+					set it up in project settings
+				</button>
+				.
 			</Trans>
 		</span>
+	) : (
+		isHostOutdated && (
+			<span className="text-[11px] text-amber-500">
+				<Trans>Update {notSetUpHostName} to manage this project</Trans>
+			</span>
+		)
 	);
 
 	if (isParadevShell) {

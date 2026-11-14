@@ -73,6 +73,7 @@ export function NewLocalProjectModal({
 		);
 
 	const handleOpenChange = (next: boolean) => {
+		if (!next && working) return;
 		if (!next) reset();
 		onOpenChange(next);
 	};
@@ -108,7 +109,8 @@ export function NewLocalProjectModal({
 				projectId: result.id,
 			});
 			onSuccess({ projectId: result.id });
-			handleOpenChange(false);
+			reset();
+			onOpenChange(false);
 		} catch (err) {
 			toast.error(t({ message: "Could not create project" }), {
 				description: errorMessage(err),
@@ -217,6 +219,7 @@ export function NewLocalProjectModal({
 					<Button
 						type="button"
 						variant="ghost"
+						disabled={working}
 						onClick={() => handleOpenChange(false)}
 					>
 						<Trans>Cancel</Trans>

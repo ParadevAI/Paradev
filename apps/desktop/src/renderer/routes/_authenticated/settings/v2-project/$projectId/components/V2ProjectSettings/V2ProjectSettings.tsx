@@ -97,16 +97,21 @@ export function V2ProjectSettings({
 		targetHostId && machineId && targetHostId !== machineId,
 	);
 
-	const { data: hostProject, refetch: refetchHostProject } = useQuery({
+	const { data: hostProjectResult, refetch: refetchHostProject } = useQuery({
 		queryKey: ["host-project", "get", targetHostUrl, projectId],
 		enabled: !!targetHostUrl,
 		queryFn: async () => {
-			if (!targetHostUrl) return null;
+			if (!targetHostUrl) return { row: null, isHostOutdated: false };
 			const client = getHostServiceClientByUrl(targetHostUrl);
 			const row = await client.project.get.query({ projectId });
-			return row && isHostProjectRow(row) ? row : null;
+			if (!row) return { row: null, isHostOutdated: false };
+			return isHostProjectRow(row)
+				? { row, isHostOutdated: false }
+				: { row: null, isHostOutdated: true };
 		},
 	});
+	const hostProject = hostProjectResult?.row;
+	const isHostOutdated = hostProjectResult?.isHostOutdated ?? false;
 	// External renames land on the merged fan-out item via project:changed;
 	// re-pull the targeted host's row so host-sourced fields (Name) follow.
 	const mergedUpdatedAt = project?.updatedAt;
@@ -150,6 +155,7 @@ export function V2ProjectSettings({
 			projectId={projectId}
 			project={project}
 			hostProject={hostProject}
+			isHostOutdated={isHostOutdated}
 			targetHostUrl={targetHostUrl}
 			targetHostId={targetHostId}
 			targetHostName={targetHostName}

@@ -1239,8 +1239,11 @@ msgstr "{name}: {monthly} za użytkownika/miesiąc"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za użytkownika/miesiąc lub {yearly} przy rozliczeniu rocznym"
 
-msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
-msgstr "{notSetUpProjectName} nie jest skonfigurowany na {notSetUpHostName}. Wybierz inny host."
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or <0>set it up in project settings</0>."
+msgstr "{notSetUpProjectName} nie jest skonfigurowany na {notSetUpHostName}. Wybierz inny host albo <0>skonfiguruj go w ustawieniach projektu</0>."
+
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or set it up in project settings."
+msgstr "{notSetUpProjectName} nie jest skonfigurowany na {notSetUpHostName}. Wybierz inny host albo skonfiguruj go w ustawieniach projektu."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Podaj co najmniej jedną osobę lub wybierz {choice}.} sender {Podaj co najmniej jednego nadawcę lub wybierz {choice}.} other {Podaj co najmniej jedną pozycję lub wybierz {choice}.}}"
@@ -22030,6 +22033,12 @@ msgstr "Aktualizuj"
 
 msgid "Update {appName} on this machine to attach files"
 msgstr "Zaktualizuj {appName} na tej maszynie, aby dołączać pliki"
+
+msgid "Update {hostName} to manage this project"
+msgstr "Zaktualizuj {hostName}, aby zarządzać tym projektem"
+
+msgid "Update {notSetUpHostName} to manage this project"
+msgstr "Zaktualizuj {notSetUpHostName}, aby zarządzać tym projektem"
 
 msgid "Update available"
 msgstr "Dostępna aktualizacja"

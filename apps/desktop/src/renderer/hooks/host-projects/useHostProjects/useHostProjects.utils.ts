@@ -348,7 +348,7 @@ export function mergeHostProjects({
 	return Array.from(byKey.values());
 }
 
-/** One host's own row for a project; repository ids differ between hosts. */
+/** One host's own row for a project; repository paths, and ids of projects created separately, are per host. */
 export function findHostProjectRow(
 	hostResults: HostProjectRowsResult[],
 	hostId: string | null | undefined,

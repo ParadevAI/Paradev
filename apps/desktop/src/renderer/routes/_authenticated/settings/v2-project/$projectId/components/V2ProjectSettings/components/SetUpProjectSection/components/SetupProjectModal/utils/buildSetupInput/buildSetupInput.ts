@@ -14,6 +14,12 @@ export type BuildSetupInputResult =
 	| { ok: true; input: ProjectSetupInput }
 	| { ok: false; missing: string[] };
 
+export function defaultRepositoryChoice(repository: {
+	url: string | null;
+}): RepositoryChoice {
+	return repository.url ? { kind: "clone" } : { kind: "import", path: "" };
+}
+
 /** Every repository is cloned into `parentDir` unless it has a folder of its own. */
 export function buildSetupInput({
 	projectId,
@@ -31,8 +37,7 @@ export function buildSetupInput({
 	const repositories: ProjectSetupInput["repositories"] = [];
 	for (const repository of project.repositories) {
 		const choice =
-			choices[repository.id] ??
-			(repository.url ? { kind: "clone" } : { kind: "import", path: "" });
+			choices[repository.id] ?? defaultRepositoryChoice(repository);
 		if (choice.kind === "import") {
 			const path = choice.path.trim();
 			if (path)

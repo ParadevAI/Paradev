@@ -190,4 +190,16 @@ describe("V2ProjectSettingsBody with several repositories", () => {
 		expect(view.getByText("Set up on This device")).toBeTruthy();
 		expect(view.queryByText("/repos/api")).toBe(null);
 	});
+
+	test("asks to update a host whose row has no repositories instead of offering set-up", () => {
+		const view = renderBody({
+			project: { ...project, repositories: [api, app] },
+			hostProject: null,
+			isHostOutdated: true,
+		});
+		expect(
+			view.getAllByText("Update This device to manage this project").length,
+		).toBeGreaterThan(0);
+		expect(view.queryByText("Set up on This device")).toBe(null);
+	});
 });

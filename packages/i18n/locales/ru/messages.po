@@ -1239,8 +1239,11 @@ msgstr "{name}: {monthly} за пользователя в месяц"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за пользователя в месяц или {yearly} при оплате за год"
 
-msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
-msgstr "{notSetUpProjectName} не настроен на {notSetUpHostName}. Выберите другой хост."
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or <0>set it up in project settings</0>."
+msgstr "{notSetUpProjectName} не настроен на {notSetUpHostName}. Выберите другой хост или <0>настройте его в параметрах проекта</0>."
+
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or set it up in project settings."
+msgstr "{notSetUpProjectName} не настроен на {notSetUpHostName}. Выберите другой хост или настройте его в параметрах проекта."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
@@ -22030,6 +22033,12 @@ msgstr "Обновить"
 
 msgid "Update {appName} on this machine to attach files"
 msgstr "Обновите {appName} на этой машине, чтобы прикреплять файлы"
+
+msgid "Update {hostName} to manage this project"
+msgstr "Обновите {hostName}, чтобы управлять этим проектом"
+
+msgid "Update {notSetUpHostName} to manage this project"
+msgstr "Обновите {notSetUpHostName}, чтобы управлять этим проектом"
 
 msgid "Update available"
 msgstr "Доступно обновление"

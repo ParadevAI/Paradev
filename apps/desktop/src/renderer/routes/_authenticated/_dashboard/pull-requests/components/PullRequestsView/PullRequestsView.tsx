@@ -214,7 +214,7 @@ export function PullRequestsView({
 				primary ? slugOf(project, primary) : project.name,
 			);
 		}
-		// Each host has its own repository ids; a row's id comes from its host.
+		// Projects created on two hosts separately have different repository ids.
 		for (const result of hostProjectResults) {
 			for (const row of result.rows ?? []) {
 				for (const repository of row.repositories) {

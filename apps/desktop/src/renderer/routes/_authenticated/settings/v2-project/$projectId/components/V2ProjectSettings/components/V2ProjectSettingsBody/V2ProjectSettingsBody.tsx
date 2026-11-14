@@ -38,6 +38,8 @@ interface V2ProjectSettingsBodyProps {
 	projectId: string;
 	project: HostProjectItem;
 	hostProject: HostProjectRow | null | undefined;
+	/** The host has the project, but its row has no `repositories` yet. */
+	isHostOutdated?: boolean;
 	targetHostUrl: string | null;
 	targetHostId: string | null;
 	targetHostName: string;
@@ -55,6 +57,7 @@ export function V2ProjectSettingsBody({
 	projectId,
 	project,
 	hostProject,
+	isHostOutdated = false,
 	targetHostUrl,
 	targetHostId,
 	targetHostName,
@@ -75,8 +78,8 @@ export function V2ProjectSettingsBody({
 	const repositorySource = hostProject ?? project;
 	const primary = getPrimaryRepository(repositorySource);
 	const isMultiRepo = repositorySource.repositories.length > 1;
-	// Repository ids and paths differ between hosts, so a multi-repo project
-	// lists only the targeted host's own rows.
+	// Repository paths are per host, so a multi-repo project lists only the
+	// targeted host's own rows.
 	const repositories =
 		hostProject?.repositories ?? (isMultiRepo ? [] : project.repositories);
 	const iconUrl = resolveProjectIconUrl({
@@ -100,6 +103,11 @@ export function V2ProjectSettingsBody({
 			isRemoteTarget={isRemoteTarget}
 			onChanged={() => onHostProjectChanged()}
 		/>
+	);
+	const updateHostNotice = (
+		<span className="text-sm text-muted-foreground">
+			<Trans>Update {hostName} to manage this project</Trans>
+		</span>
 	);
 	const canRename = Boolean(
 		targetHostUrl && targetHostId && project.hostIds.includes(targetHostId),
@@ -160,6 +168,8 @@ export function V2ProjectSettingsBody({
 									isRemoteTarget={isRemoteTarget}
 									onChanged={() => onHostProjectChanged()}
 								/>
+							) : isHostOutdated ? (
+								updateHostNotice
 							) : hostProject === null ? (
 								<span className="text-sm text-muted-foreground">
 									<Trans>Not set up on {hostName}</Trans>
@@ -273,7 +283,9 @@ export function V2ProjectSettingsBody({
 								message: "Location",
 							})}
 						>
-							{hostProject === null ? (
+							{isHostOutdated ? (
+								updateHostNotice
+							) : hostProject === null ? (
 								<SetUpProjectSection
 									key={`${projectId}:${targetHostId}`}
 									projectId={projectId}

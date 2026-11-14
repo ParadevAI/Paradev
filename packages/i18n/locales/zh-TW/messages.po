@@ -1239,8 +1239,11 @@ msgstr "{name}：每位使用者每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每位使用者每月 {monthly}，或按年計費 {yearly}"
 
-msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
-msgstr "{notSetUpProjectName}尚未在{notSetUpHostName}上設定。請選擇其他主機。"
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or <0>set it up in project settings</0>."
+msgstr "{notSetUpProjectName} 尚未在 {notSetUpHostName} 上設定。請選擇其他主機,或<0>在專案設定中設定</0>。"
+
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or set it up in project settings."
+msgstr "{notSetUpProjectName} 尚未在 {notSetUpHostName} 上設定。請選擇其他主機,或在專案設定中設定。"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {請至少指定一個人員，或選擇{choice}。} sender {請至少指定一個寄件者，或選擇{choice}。} other {請至少指定一個項目，或選擇{choice}。}}"
@@ -22030,6 +22033,12 @@ msgstr "更新"
 
 msgid "Update {appName} on this machine to attach files"
 msgstr "請在這臺機器上更新{appName}以附加檔案"
+
+msgid "Update {hostName} to manage this project"
+msgstr "更新 {hostName} 以管理此專案"
+
+msgid "Update {notSetUpHostName} to manage this project"
+msgstr "更新 {notSetUpHostName} 以管理此專案"
 
 msgid "Update available"
 msgstr "有可用更新"

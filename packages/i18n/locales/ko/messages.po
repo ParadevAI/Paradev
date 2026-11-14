@@ -1239,8 +1239,11 @@ msgstr "{name}: 사용자당 월 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 사용자당 월 {monthly}, 또는 연간 결제 시 {yearly}"
 
-msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host."
-msgstr "{notSetUpProjectName}이(가) {notSetUpHostName}에 설정되지 않았습니다. 다른 호스트를 선택하세요."
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or <0>set it up in project settings</0>."
+msgstr "{notSetUpProjectName}이(가) {notSetUpHostName}에 설정되어 있지 않습니다. 다른 호스트를 선택하거나 <0>프로젝트 설정에서 설정하세요</0>."
+
+msgid "{notSetUpProjectName} is not set up on {notSetUpHostName}. Pick another host, or set it up in project settings."
+msgstr "{notSetUpProjectName}이(가) {notSetUpHostName}에 설정되어 있지 않습니다. 다른 호스트를 선택하거나 프로젝트 설정에서 설정하세요."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {사람을 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} sender {발신자를 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} other {항목을 하나 이상 지정하거나 {choice} 옵션을 선택하세요.}}"
@@ -22030,6 +22033,12 @@ msgstr "업데이트"
 
 msgid "Update {appName} on this machine to attach files"
 msgstr "파일을 첨부하려면 이 컴퓨터에서 {appName}을 업데이트하세요"
+
+msgid "Update {hostName} to manage this project"
+msgstr "이 프로젝트를 관리하려면 {hostName}을(를) 업데이트하세요"
+
+msgid "Update {notSetUpHostName} to manage this project"
+msgstr "이 프로젝트를 관리하려면 {notSetUpHostName}을(를) 업데이트하세요"
 
 msgid "Update available"
 msgstr "업데이트 있음"
