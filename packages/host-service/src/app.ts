@@ -52,7 +52,6 @@ import {
 	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 } from "./runtime/sandbox-self-seed";
-import { MOVE_UNDO_INTERVAL_MS, undoEndedMoves } from "./teleport/moveUndo";
 import {
 	isAgentTerminalAlive,
 	registerWorkspaceTerminalRoute,
@@ -73,7 +72,6 @@ import {
 	disposeLocalMobileDevices,
 	startLocalMobileDeviceCleanup,
 } from "./trpc/router/mobile";
-import { resumeStoppedTerminals } from "./trpc/router/teleport/terminal-sessions";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
@@ -439,34 +437,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 					ATTACHMENT_SWEEP_INTERVAL_MS,
 				);
 	attachmentSweepTimer?.unref?.();
-	let undoingMoves = false;
-	const runMoveUndo = async () => {
-		if (undoingMoves) return;
-		undoingMoves = true;
-		try {
-			await undoEndedMoves({
-				db,
-				statusOf: (workspaceMoveId) =>
-					api.workspaceMove.status.query({ workspaceMoveId }),
-				resumeTerminals: (workspaceId, terminalIds) =>
-					resumeStoppedTerminals(chatAgentContext, workspaceId, terminalIds),
-				forgetChats: (chatIds) => {
-					for (const chatId of chatIds) chatSync.forget(chatId);
-				},
-				now: Date.now(),
-			});
-		} catch (err) {
-			console.warn("[host-service] undoing ended moves failed:", err);
-		} finally {
-			undoingMoves = false;
-		}
-	};
-	const moveUndoTimer = setInterval(
-		() => void runMoveUndo(),
-		MOVE_UNDO_INTERVAL_MS,
-	);
-	moveUndoTimer.unref?.();
-	void runMoveUndo();
 	if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") {
 		startLocalMobileDeviceCleanup(db);
 	}
@@ -645,7 +615,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		agentJobs.stopAll();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		if (attachmentSweepTimer) clearInterval(attachmentSweepTimer);
-		clearInterval(moveUndoTimer);
 		await disposeWorkspaceTitleJobs(db);
 		// Each step is best-effort and isolated: a throw in one cleanup must
 		// not skip the others, otherwise a flaky `.stop()` could leak the

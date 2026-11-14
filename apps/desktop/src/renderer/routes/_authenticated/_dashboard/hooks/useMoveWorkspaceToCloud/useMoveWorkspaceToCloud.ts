@@ -103,7 +103,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 						workspaceId: workspace.id,
 						stopIfBusy,
 						moveTerminals: true,
-						workspaceMoveId,
 					});
 					leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
 					leaving.terminals = (prepared.terminals ?? []).map(
@@ -174,7 +173,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				terminals,
 				source,
 				sourceWorkspaceId: workspace.id,
-				workspaceMoveId,
 				toWorkspaceId: created.id,
 				connect: async () =>
 					getHostServiceClientByUrl(

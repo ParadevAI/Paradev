@@ -115,26 +115,6 @@ export const workspaceMoveRouter = {
 			return { alive, error: ended.move?.error ?? null };
 		}),
 
-	/**
-	 * Where one of the caller's moves stands, read without keeping it alive,
-	 * for the host it left to undo what it stopped once the move is over.
-	 */
-	status: personProcedure
-		.input(workspaceMoveHeartbeatInputSchema)
-		.query(async ({ ctx, input }) => {
-			const mover = await moverOf(ctx);
-			const { move } = await callMoves(mover.organizationId, {
-				op: "workspaceMove",
-				id: input.workspaceMoveId,
-			});
-			if (!move || move.createdBy !== mover.userId) return null;
-			return {
-				status: move.status,
-				hasDestination: move.toWorkspaceId !== null,
-				finishedAt: move.finishedAt?.getTime() ?? null,
-			};
-		}),
-
 	/** The newest move out of or into a workspace, or null when it never moved. */
 	latest: personProcedure
 		.input(workspaceMoveOfWorkspaceInputSchema)
