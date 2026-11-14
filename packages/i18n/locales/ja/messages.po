@@ -860,9 +860,6 @@ msgstr "{0}件中{completed}件のチェックが完了"
 msgid "{completed} of {total} completed"
 msgstr "{total} 件中 {completed} 件完了"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName}（オフライン）"
-
 msgid "{configTitle} font size"
 msgstr "{configTitle}のフォントサイズ"
 
@@ -1809,9 +1806,6 @@ msgstr "クラウドオートメーションの指示は最大 {max} 文字ま�
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "クラウドワークスペースからは {path} を呼び出せません。サインイン済みのクライアントから実行してください。"
 
-msgid "A computer"
-msgstr "コンピューター"
-
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}の削除はすでに進行中です。"
 
@@ -1856,6 +1850,9 @@ msgstr "マニフェストと数個のスキルファイルだけ。Paradevが�
 
 msgid "a message from {authorName}"
 msgstr "{authorName}からのメッセージ"
+
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev の新しいバージョンがあります。続けるには再読み込みしてください。"
 
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "続行するには新しいバージョンのParadevが必要です。最新バージョンに更新してください。"
@@ -2078,8 +2075,8 @@ msgstr "{localizedName} を追加しますか？"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "先に {computer} で {repositoryName} をプロジェクトとして追加してください"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "まず {repositoryName} をこのコンピューターのプロジェクトとして追加してください"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "まず {repositoryName} をこのデバイスのプロジェクトとして追加してください"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber} をマージキューに追加しますか?"
@@ -2137,6 +2134,9 @@ msgstr "さらに追加"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "別のアカウントを接続するか、使わなくなったものを解除します。"
+
+msgid "Add attachment"
+msgstr "添付ファイルを追加"
 
 msgid "Add Attachment"
 msgstr "添付ファイルを追加"
@@ -2340,7 +2340,7 @@ msgstr "エージェントの入力欄に追加しました"
 msgid "Added to merge queue"
 msgstr "マージキューに追加しました"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName} にメンバーを追加するには有料プランが必要です。組織のプランはオーナーが {0} で管理しています。"
 
@@ -2726,6 +2726,9 @@ msgstr "リレー経由のアクセスを許可"
 msgid "Allow for session"
 msgstr "セッション中は許可"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "音声入力するには、設定でマイクへのアクセスを許可してください。"
+
 msgid "Allow microphone access to use dictation"
 msgstr "音声入力を使うにはマイクへのアクセスを許可してください"
 
@@ -2890,9 +2893,6 @@ msgstr "匿名の組立工"
 
 msgid "Another AI assistant"
 msgstr "その他の AI アシスタント"
-
-msgid "Another computer"
-msgstr "別のコンピューター"
 
 msgid "another device"
 msgstr "別のデバイス"
@@ -4018,6 +4018,9 @@ msgstr "Calendar"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "この組織のCalendarとGmailのトリガーは、アカウントを再接続するまで動作しなくなります。"
+
+msgid "Camera"
+msgstr "カメラ"
 
 msgid "Camera access is not allowed"
 msgstr "カメラへのアクセスが許可されていません"
@@ -5580,6 +5583,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "続ける"
 
+msgid "Continue in browser"
+msgstr "ブラウザで続ける"
+
 msgid "Continue in your browser"
 msgstr "ブラウザで続行してください"
 
@@ -5996,6 +6002,9 @@ msgstr "リンクを開けませんでした"
 msgid "Could not open Photos"
 msgstr "「写真」を開けませんでした"
 
+msgid "Could not open this file"
+msgstr "このファイルを開けませんでした"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6118,9 @@ msgstr "チェックアウトを開始できませんでした。もう一度お
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "クラウドワークスペースのプロビジョニングを開始できませんでした"
+
+msgid "Could not start dictation"
+msgstr "音声入力を開始できませんでした"
 
 msgid "Could not start session"
 msgstr "セッションを開始できませんでした"
@@ -7414,11 +7426,20 @@ msgstr "音声入力"
 msgid "Dictation"
 msgstr "音声入力"
 
+msgid "Dictation is not available in this language."
+msgstr "この言語では音声入力を使用できません。"
+
 msgid "Dictation is not available on this device"
 msgstr "このデバイスでは音声入力を利用できません"
 
 msgid "Dictation is not available right now"
 msgstr "現在、音声入力は利用できません"
+
+msgid "Dictation needs a network connection."
+msgstr "音声入力にはネットワーク接続が必要です。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "音声入力が停止しました。ここまでの内容はメッセージに入っています。"
 
 msgid "Didn't hear back"
 msgstr "応答がありません"
@@ -9642,8 +9663,8 @@ msgstr "iPhone・iPad アプリを入手"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
 
-msgid "Getting the computer ready"
-msgstr "コンピューターを準備しています"
+msgid "Getting the device ready"
+msgstr "デバイスを準備しています"
 
 msgid "Getting Work Done"
 msgstr "仕事に役立つ"
@@ -10928,6 +10949,9 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。{computerName} 上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
+
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "再起動するまで、そのワークスペースとターミナルは利用できません。Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してください。"
 
@@ -11883,7 +11907,7 @@ msgstr "MCPサーバーアクセスやClaude Desktop・Claude Codeなどの外�
 msgid "Manage members"
 msgstr "メンバーを管理"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "{0}で管理"
 
@@ -12416,8 +12440,20 @@ msgstr "クラウドの作業を移行"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "このワークスペースを {computerName} に移動しますか？"
+
+msgid "Move this workspace to the cloud?"
+msgstr "このワークスペースをクラウドに移動しますか？"
+
+msgid "Move to"
+msgstr "移動先"
+
 msgid "Move to background"
 msgstr "バックグラウンドに移動"
+
+msgid "Move to cloud"
+msgstr "クラウドに移動"
 
 msgid "Move to group"
 msgstr "グループへ移動"
@@ -12926,6 +12962,9 @@ msgstr "Chrome、Brave、ArcなどのChromiumブラウザが見つかりませ�
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "このマシンでClaudeやCodexの使用がまだ見つかりません。今参加すれば、エージェントを使い始めた時点で表示されます。"
 
+msgid "No cloud environment opens {repository}."
+msgstr "{repository} を開くクラウド環境がありません。"
+
 msgid "No cloud workspaces"
 msgstr "クラウドワークスペースはありません"
 
@@ -13208,8 +13247,8 @@ msgstr "組織が選択されていません"
 msgid "No other chats here"
 msgstr "ほかのチャットはありません"
 
-msgid "No other computer is set up for this account."
-msgstr "このアカウントには他のコンピューターが設定されていません。"
+msgid "No other device is set up for this account."
+msgstr "このアカウントには他のデバイスが設定されていません。"
 
 msgid "No pages match"
 msgstr "一致するページがありません"
@@ -13765,6 +13804,9 @@ msgstr "オフライン"
 
 msgid "Offline / local-first mode"
 msgstr "オフライン/ローカルファーストモード"
+
+msgid "OK"
+msgstr "OK"
 
 msgid "Older"
 msgstr "それ以前"
@@ -15030,6 +15072,9 @@ msgstr "リンクを貼り付け"
 msgid "Paste an API key instead"
 msgstr "代わりにAPIキーを貼り付ける"
 
+msgid "Paste attachment"
+msgstr "添付ファイルをペースト"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "これをParadev CLIに貼り付けてください:"
 
@@ -15171,6 +15216,9 @@ msgstr "スマートフォン"
 msgid "Phone number"
 msgstr "電話番号"
 
+msgid "Photos"
+msgstr "写真"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "テーマ一覧から{name}を選んで適用します。"
 
@@ -15218,6 +15266,9 @@ msgstr "ワークスペースを選択"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "エージェントがあなたの入力を待っている、前回確認してから完了した、またはまだ実行中のワークスペースを選択します"
+
+msgid "Pick an environment"
+msgstr "環境を選択"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "アイコンと色を選ぶか、独自の画像をアップロードします。既定ではリンクされたGitHubオーナーのアバターになります。"
@@ -15920,6 +15971,9 @@ msgstr "よくある質問"
 
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "ご質問、フィードバック、サポート、その他何でも。メッセージをお送りいただければ、適切な担当者にお繋ぎします。"
+
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "メッセージをキューに追加 · {SEND_NOW_KEYS} で今すぐ送信"
 
 msgid "Queue message"
 msgstr "メッセージをキューに追加"
@@ -18486,6 +18540,10 @@ msgstr "ショートカットは使用中です"
 msgid "Show"
 msgstr "表示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "さらに {0} 件を表示"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "アプリ終了時に確認ダイアログを表示"
 
@@ -20149,8 +20207,11 @@ msgstr "このアカウントは接続されていません。別のアカウン
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "このエージェントセッションにはまだ開ける会話がありません。開始されましたが、一度も指示を受けていません。"
 
-msgid "That computer can't be reached"
-msgstr "そのコンピューターに接続できません"
+msgid "that device"
+msgstr "そのデバイス"
+
+msgid "That device can't be reached"
+msgstr "そのデバイスに接続できません"
 
 msgid "That endpoint could not be resolved."
 msgstr "そのエンドポイントを解決できませんでした。"
@@ -20448,8 +20509,14 @@ msgstr "移動がタイムアウトしました。"
 msgid "The move was cancelled."
 msgstr "移動はキャンセルされました。"
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "移動したワークスペースは、準備ができるとホームに表示されます。"
+
 msgid "The name of your organization or team"
 msgstr "組織またはチームの名前"
+
+msgid "The name shows in the sidebar."
+msgstr "この名前はサイドバーに表示されます。"
 
 msgid "The network connection changed"
 msgstr "ネットワーク接続が変更されました"
@@ -20460,8 +20527,8 @@ msgstr "Claude Code、Codex、そしてあらゆるコーディングエージ�
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code、Codex、OpenCode、そしてあらゆるコーディングエージェントのための、オープンソースのワークスペース。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "移動先または移動元で古いバージョンが動作しています。クラウドワークスペースを再起動するか、コンピューターのホストを更新してから、もう一度お試しください。"
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "移動先または移動元で古いバージョンが動作しています。クラウドワークスペースを再起動するか、デバイスのホストを更新してから、もう一度お試しください。"
 
 msgid "The overnight shift"
 msgstr "夜間シフト"
@@ -20761,15 +20828,6 @@ msgstr "このクラウドワークスペースを起動できません"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
 
-msgid "this computer"
-msgstr "このコンピューター"
-
-msgid "This computer"
-msgstr "このコンピューター"
-
-msgid "This computer's host is not running"
-msgstr "このコンピューターのホストが実行されていません"
-
 msgid "This conversation is too long for the model"
 msgstr "この会話はモデルには長すぎます"
 
@@ -20790,6 +20848,9 @@ msgstr "このデバイス ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "このデバイスはParadevリレーに接続されていないため、オートメーションの実行はスキップされます。"
+
+msgid "This device's host is not running"
+msgstr "このデバイスのホストが実行されていません"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "このディレクトリは存在しません。ターミナルスクリプトはワークスペースルートにフォールバックします。"
@@ -21133,6 +21194,9 @@ msgstr "このワークスペースのホストはオフラインです"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "このワークスペースのホストは、このアプリが対応するより古いホストサービスを実行しています。更新して再接続してください。ワークスペースとファイルはそのまま残ります。"
+
+msgid "This workspace's project is not on GitHub."
+msgstr "このワークスペースのプロジェクトは GitHub にありません。"
 
 msgid "Thorough reasoning effort"
 msgstr "徹底的な推論"
@@ -21889,6 +21953,15 @@ msgstr "命名指示を更新"
 msgid "Update naming instructions for {0}"
 msgstr "{0}の命名指示を更新"
 
+msgid "Update on Google Play"
+msgstr "Google Play でアップデート"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "続けるには Google Play から Paradev をアップデートしてください。"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "このスマートフォンからワークスペースを移動するには、{sourceName} の Paradev を更新してください。"
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "そのデバイスで Paradev を更新してください。アプリ内からの更新には、対応するスタンドアロンインストールとリリース済みのアプリバージョンが必要です。"
 
@@ -21955,7 +22028,7 @@ msgstr "アップグレード"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "依存関係を更新して壊れた箇所を直す…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "{0} でアップグレード"
 
@@ -22243,9 +22316,6 @@ msgstr "すべて表示"
 msgid "View All"
 msgstr "すべて表示"
 
-msgid "View all (+{moreCount} more)"
-msgstr "すべて表示（他{moreCount}件）"
-
 msgid "View all members of this channel"
 msgstr "このチャンネルのメンバーをすべて表示"
 
@@ -22382,6 +22452,9 @@ msgstr "サブエージェントの最初のメッセージを待っています
 
 msgid "Waiting for your input"
 msgstr "入力を待っています"
+
+msgid "Waiting on background work"
+msgstr "バックグラウンド処理を待っています"
 
 msgid "Waking up workspace"
 msgstr "ワークスペースを起動中"
@@ -23131,7 +23204,7 @@ msgstr "このページは閲覧できますが、変更はできません"
 msgid "You can view this page but not comment on it"
 msgstr "このページは閲覧できますが、コメントはできません"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "このサブスクリプションはアプリでは変更できません。組織のプランは{0}でオーナーが管理しています。"
 
@@ -23392,6 +23465,9 @@ msgstr "v1 のプロジェクトとワークスペースを新しい Paradev に
 
 msgid "Your version: {currentVersion}"
 msgstr "現在のバージョン: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "コミットされていない変更を含む作業は、リモートの新しいブランチにプッシュされます。選択した環境でそのブランチからクラウドワークスペースが起動し、Claude の各チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはここに残ります。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex のデバイスコードによるサインインは、ワークスペースの管理者が有効にします。"

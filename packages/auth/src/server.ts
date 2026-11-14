@@ -17,6 +17,7 @@ import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { COMPANY } from "@superset/shared/constants";
+import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
@@ -134,6 +135,7 @@ export const auth = betterAuth({
 			env.NEXT_PUBLIC_ADMIN_URL,
 			env.NEXT_PUBLIC_DESKTOP_URL,
 		]),
+		...parseOriginList(env.MOBILE_WEB_ORIGINS),
 		...getTrustedVercelPreviewOrigins(request?.url ?? env.NEXT_PUBLIC_API_URL),
 		...desktopDevOrigins,
 		"superset://app",

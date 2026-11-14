@@ -860,9 +860,6 @@ msgstr "Dokončeno {completed} z {0} kontrol"
 msgid "{completed} of {total} completed"
 msgstr "Dokončeno {completed} z {total}"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
-
 msgid "{configTitle} font size"
 msgstr "Velikost písma: {configTitle}"
 
@@ -1809,9 +1806,6 @@ msgstr "Pokyny cloudové automatizace mohou mít nejvýše {max} znaků"
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Cloudový workspace nemůže volat {path}. Spusť to z klienta, kde jsi přihlášený."
 
-msgid "A computer"
-msgstr "Počítač"
-
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Mazání {workspaceName} už probíhá."
 
@@ -1856,6 +1850,9 @@ msgstr "Manifest a pár souborů se skills. Paradev ho umístí tam, kde ho kaž
 
 msgid "a message from {authorName}"
 msgstr "zpráva od {authorName}"
+
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Je k dispozici nová verze Paradevu. Pokračujte po opětovném načtení."
 
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Pro pokračování je potřeba novější verze Paradev. Aktualizujte prosím na nejnovější verzi."
@@ -2078,8 +2075,8 @@ msgstr "Přidat {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Nejdřív přidejte {repositoryName} jako projekt na počítači {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto počítači"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Nejprve přidejte {repositoryName} jako projekt na tomto zařízení"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Přidat #{prNumber} do fronty slučování?"
@@ -2137,6 +2134,9 @@ msgstr "Přidat další"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Připoj další účet nebo odpoj ten, který už nepoužíváš."
+
+msgid "Add attachment"
+msgstr "Přidat přílohu"
 
 msgid "Add Attachment"
 msgstr "Přidat přílohu"
@@ -2340,7 +2340,7 @@ msgstr "Přidáno do vstupu agenta"
 msgid "Added to merge queue"
 msgstr "Přidáno do fronty slučování"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Přidávání lidí do {organizationName} vyžaduje placený tarif. Tarif vaší organizace spravuje její vlastník na {0}."
 
@@ -2726,6 +2726,9 @@ msgstr "Povolte přístup přes relay"
 msgid "Allow for session"
 msgstr "Povolit pro relaci"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Pro diktování povolte přístup k mikrofonu v Nastavení."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Pro diktování povolte přístup k mikrofonu"
 
@@ -2890,9 +2893,6 @@ msgstr "Anonymní montér"
 
 msgid "Another AI assistant"
 msgstr "Jiný AI asistent"
-
-msgid "Another computer"
-msgstr "Jiný počítač"
 
 msgid "another device"
 msgstr "jiné zařízení"
@@ -4018,6 +4018,9 @@ msgstr "Kalendář"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Spouštěče Kalendáře a Gmailu v této organizaci se přestanou spouštět, dokud znovu nepřipojíte účet."
+
+msgid "Camera"
+msgstr "Fotoaparát"
 
 msgid "Camera access is not allowed"
 msgstr "Přístup k fotoaparátu není povolen"
@@ -5580,6 +5583,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Pokračovat"
 
+msgid "Continue in browser"
+msgstr "Pokračovat v prohlížeči"
+
 msgid "Continue in your browser"
 msgstr "Pokračujte v prohlížeči"
 
@@ -5996,6 +6002,9 @@ msgstr "Odkaz se nepodařilo otevřít"
 msgid "Could not open Photos"
 msgstr "Nepodařilo se otevřít Fotky"
 
+msgid "Could not open this file"
+msgstr "Tento soubor nelze otevřít"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6118,9 @@ msgstr "Platbu se nepodařilo zahájit. Zkuste to znovu."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Nepodařilo se spustit provisioning cloudového pracovního prostoru"
+
+msgid "Could not start dictation"
+msgstr "Diktování se nepodařilo spustit"
 
 msgid "Could not start session"
 msgstr "Relaci se nepodařilo spustit"
@@ -7414,11 +7426,20 @@ msgstr "Diktovat"
 msgid "Dictation"
 msgstr "Diktování"
 
+msgid "Dictation is not available in this language."
+msgstr "Diktování není v tomto jazyce k dispozici."
+
 msgid "Dictation is not available on this device"
 msgstr "Diktování není na tomto zařízení dostupné"
 
 msgid "Dictation is not available right now"
 msgstr "Diktování teď není dostupné"
+
+msgid "Dictation needs a network connection."
+msgstr "Diktování vyžaduje připojení k síti."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Diktování se zastavilo. To, co bylo dosud slyšet, je ve zprávě."
 
 msgid "Didn't hear back"
 msgstr "Bez odpovědi"
@@ -9642,8 +9663,8 @@ msgstr "Stáhnout aplikaci pro iPhone a iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Připravuje se počítač"
+msgid "Getting the device ready"
+msgstr "Připravuje se zařízení"
 
 msgid "Getting Work Done"
 msgstr "Pracovní"
@@ -10928,6 +10949,9 @@ msgstr "Jeho pluginy se objeví po dokončení synchronizace."
 msgid "Its replies go with it."
 msgstr "Smažou se i odpovědi."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na {computerName} začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
+
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Její pracovní prostory a terminály nebudou dostupné, dokud se nerestartuje. Použijte nabídku Paradev na liště > Host Service > Restart."
 
@@ -11883,7 +11907,7 @@ msgstr "Spravujte klíče pro přístup k MCP serveru a externí integrace, jako
 msgid "Manage members"
 msgstr "Spravovat členy"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Spravovat na {0}"
 
@@ -12416,8 +12440,20 @@ msgstr "Přesuňte práci z cloudu"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a otevřít panel, pokud je zavřený"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Přesunout tento pracovní prostor na {computerName}?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Přesunout tento pracovní prostor do cloudu?"
+
+msgid "Move to"
+msgstr "Přesunout do"
+
 msgid "Move to background"
 msgstr "Přesunout na pozadí"
+
+msgid "Move to cloud"
+msgstr "Přesunout do cloudu"
 
 msgid "Move to group"
 msgstr "Přesunout do skupiny"
@@ -12926,6 +12962,9 @@ msgstr "Nebyl nalezen Chrome, Brave, Arc ani jiný prohlížeč založený na Ch
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Na tomto počítači zatím nebylo nalezeno žádné využití Claude ani Codex. Připojte se a objevíte se, jakmile použijete agenta."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Žádné cloudové prostředí neotevírá {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Žádné cloudové pracovní prostory"
 
@@ -13208,8 +13247,8 @@ msgstr "Není vybraná žádná organizace"
 msgid "No other chats here"
 msgstr "Žádné další chaty"
 
-msgid "No other computer is set up for this account."
-msgstr "Pro tento účet není nastavený žádný další počítač."
+msgid "No other device is set up for this account."
+msgstr "Pro tento účet není nastavené žádné další zařízení."
 
 msgid "No pages match"
 msgstr "Žádná stránka neodpovídá"
@@ -13765,6 +13804,9 @@ msgstr "Offline"
 
 msgid "Offline / local-first mode"
 msgstr "Offline / local-first režim"
+
+msgid "OK"
+msgstr "OK"
 
 msgid "Older"
 msgstr "Starší"
@@ -15030,6 +15072,9 @@ msgstr "Vložte odkaz"
 msgid "Paste an API key instead"
 msgstr "Místo toho vložit klíč API"
 
+msgid "Paste attachment"
+msgstr "Vložit přílohu"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Vložte to do Paradev CLI:"
 
@@ -15171,6 +15216,9 @@ msgstr "Telefon"
 msgid "Phone number"
 msgstr "Telefonní číslo"
 
+msgid "Photos"
+msgstr "Fotky"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Vyberte {name} z mřížky motivů a použijte ho."
 
@@ -15218,6 +15266,9 @@ msgstr "Vyberte pracovní prostor"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Vyberte pracovní prostor, jehož agent čeká na váš vstup, od vaší poslední návštěvy dokončil práci, nebo stále běží"
+
+msgid "Pick an environment"
+msgstr "Vyberte prostředí"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Vyberte ikonu a barvu nebo nahrajte vlastní obrázek. Ve výchozím stavu se použije avatar propojeného vlastníka na GitHubu."
@@ -15920,6 +15971,9 @@ msgstr "Otázky"
 
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Dotazy, zpětná vazba, podpora nebo cokoli jiného. Napište nám a předáme to správnému člověku."
+
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Zařaďte zprávu do fronty · {SEND_NOW_KEYS} pro okamžité odeslání"
 
 msgid "Queue message"
 msgstr "Zařadit zprávu do fronty"
@@ -18486,6 +18540,10 @@ msgstr "Zkratka se už používá"
 msgid "Show"
 msgstr "Zobrazit"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Zobrazit další ({0})"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
 
@@ -20149,8 +20207,11 @@ msgstr "Tento účet už není připojený — vyberte jiný."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Tato agentní relace zatím nemá konverzaci k otevření. Byla spuštěna, ale nikdy nedostala zadání."
 
-msgid "That computer can't be reached"
-msgstr "Tento počítač není dostupný"
+msgid "that device"
+msgstr "to zařízení"
+
+msgid "That device can't be reached"
+msgstr "Toto zařízení není dostupné"
 
 msgid "That endpoint could not be resolved."
 msgstr "Tento koncový bod se nepodařilo přeložit."
@@ -20448,8 +20509,14 @@ msgstr "Časový limit přesunu vypršel."
 msgid "The move was cancelled."
 msgstr "Přesun byl zrušen."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Přesunutý pracovní prostor se zobrazí na Domů, až bude připraven."
+
 msgid "The name of your organization or team"
 msgstr "Název vaší organizace nebo týmu"
+
+msgid "The name shows in the sidebar."
+msgstr "Název se zobrazuje v postranním panelu."
 
 msgid "The network connection changed"
 msgstr "Síťové připojení se změnilo"
@@ -20460,8 +20527,8 @@ msgstr "Open-source pracovní prostor pro Claude Code, Codex a jakéhokoli kódo
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Open-source pracovní prostor pro Claude Code, Codex, OpenCode a jakéhokoli kódovacího agenta. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Druhá strana přesunu používá starší verzi. Restartujte cloudový pracovní prostor nebo aktualizujte hostitele počítače a zkuste to znovu."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Druhá strana přesunu používá starší verzi. Restartujte cloudový pracovní prostor nebo aktualizujte hostitele zařízení a zkuste to znovu."
 
 msgid "The overnight shift"
 msgstr "Noční směna"
@@ -20761,15 +20828,6 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
-msgid "this computer"
-msgstr "tento počítač"
-
-msgid "This computer"
-msgstr "Tento počítač"
-
-msgid "This computer's host is not running"
-msgstr "Hostitel tohoto počítače neběží"
-
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -20790,6 +20848,9 @@ msgstr "tomto zařízení ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Toto zařízení není připojené k Paradev relay, takže běhy automatizací budou přeskočeny."
+
+msgid "This device's host is not running"
+msgstr "Hostitel tohoto zařízení neběží"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Tento adresář neexistuje. Terminálový skript se vrátí ke kořeni pracovního prostoru."
@@ -21133,6 +21194,9 @@ msgstr "Host tohoto pracovního prostoru je offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Hostitel tohoto pracovního prostoru používá starší službu hostitele, než tato aplikace podporuje. Aktualizujte ji pro opětovné připojení; pracovní prostor a jeho soubory zůstanou nedotčené."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Projekt tohoto pracovního prostoru není na GitHubu."
 
 msgid "Thorough reasoning effort"
 msgstr "Důkladné uvažování"
@@ -21889,6 +21953,15 @@ msgstr "Upravit pravidla pojmenování"
 msgid "Update naming instructions for {0}"
 msgstr "Upravit pravidla pojmenování pro {0}"
 
+msgid "Update on Google Play"
+msgstr "Aktualizovat na Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Pokud chcete pokračovat, aktualizujte Paradev z Google Play."
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Aktualizujte Paradev na {sourceName}, abyste mohli jeho pracovní prostory přesouvat z tohoto telefonu."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Aktualizujte Paradev na daném zařízení. Aktualizace z aplikace vyžadují podporovanou samostatnou instalaci a vydanou verzi aplikace."
 
@@ -21955,7 +22028,7 @@ msgstr "Přejít výš"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aktualizuj závislost a oprav, co se rozbije…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Přejít na Pro na {0}"
 
@@ -22243,9 +22316,6 @@ msgstr "Zobrazit vše"
 msgid "View All"
 msgstr "Zobrazit vše"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Zobrazit vše (+{moreCount} navíc)"
-
 msgid "View all members of this channel"
 msgstr "Zobrazit všechny členy kanálu"
 
@@ -22382,6 +22452,9 @@ msgstr "Čekání na první zprávu subagenta…"
 
 msgid "Waiting for your input"
 msgstr "Čeká na váš vstup"
+
+msgid "Waiting on background work"
+msgstr "Čeká se na práci na pozadí"
 
 msgid "Waking up workspace"
 msgstr "Probouzení pracovního prostoru"
@@ -23131,7 +23204,7 @@ msgstr "Tuto stránku můžete zobrazit, ale ne změnit"
 msgid "You can view this page but not comment on it"
 msgstr "Tuto stránku můžete zobrazit, ale ne komentovat"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Toto předplatné nelze změnit v aplikaci. Tarif vaší organizace spravuje její vlastník na {0}."
 
@@ -23392,6 +23465,9 @@ msgstr "Vaše projekty a pracovní prostory z v1 se přenášejí do nového Par
 
 msgid "Your version: {currentVersion}"
 msgstr "Vaše verze: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Vaše práce, včetně nepotvrzených změn, se odešle do nové větve ve vzdáleném repozitáři. Z této větve se v prostředí, které vyberete, spustí cloudový pracovní prostor a každý chat s Claude tam bude pokračovat. Agenti, kteří pracují, se nejprve zastaví. Terminály a ostatní chaty zůstanou zde."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Přihlášení kódem zařízení pro Codex zapíná správce vašeho pracovního prostoru."

@@ -4,7 +4,6 @@ import {
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuSeparator,
-	ContextMenuShortcut,
 	ContextMenuSub,
 	ContextMenuSubContent,
 	ContextMenuSubTrigger,
@@ -12,43 +11,28 @@ import {
 } from "@superset/ui/context-menu";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import {
-	LuArchive,
-	LuArrowRightLeft,
 	LuArrowUp,
-	LuBellOff,
-	LuClipboard,
-	LuCopy,
 	LuCpu,
-	LuEye,
-	LuEyeOff,
-	LuFolderOpen,
 	LuFolderPlus,
-	LuGitBranch,
-	LuHash,
-	LuLink,
-	LuPencil,
-	LuPin,
-	LuPinOff,
-	LuRadioTower,
-	LuTrash2,
-	LuUnlink,
-	LuX,
+	LuFolderSymlink,
 } from "react-icons/lu";
-import { useHotkeyDisplay } from "renderer/hotkeys";
+import { CONTEXT_MENU_PARTS } from "renderer/lib/menuParts";
 import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
-import { WorkspaceMoveMenu } from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMoveMenu";
-import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
+import {
+	type WorkspaceMenuActions,
+	WorkspaceMenuItems,
+	type WorkspaceMenuState,
+} from "renderer/routes/_authenticated/_dashboard/components/WorkspaceMenuItems";
 import type {
 	MovableWorkspace,
 	WorkspaceMoveDirection,
 } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
-import { useDashboardSidebarPortKill } from "../../../../hooks/useDashboardSidebarPortKill";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
-import { useDashboardSidebarWorkspacePorts } from "../../../../providers/DashboardSidebarPortsProvider";
 import { MoveToGroupItems } from "./components/MoveToGroupItems";
 
-interface DashboardSidebarWorkspaceContextMenuProps {
-	workspaceId: string;
+interface DashboardSidebarWorkspaceContextMenuProps
+	extends Omit<WorkspaceMenuState, "isCloudWorkspace">,
+		WorkspaceMenuActions {
 	/** Null for project-less session workspaces. */
 	projectId: string | null;
 	/** Absent when the workspace can move nowhere. */
@@ -56,265 +40,122 @@ interface DashboardSidebarWorkspaceContextMenuProps {
 	/** Only sessions and project workspaces can join a group. */
 	isSessionWorkspace?: boolean;
 	isInSection?: boolean;
-	isLocalWorkspace: boolean;
-	/**
-	 * A cloud workspace has no host bindings to clear and is archived rather
-	 * than deleted. Its folder membership is a tag the API keeps, so it groups
-	 * like any other row.
-	 */
+	/** Its folder membership is a tag the API keeps, so it groups like any other row. */
 	isCloudWorkspace?: boolean;
-	isPinned: boolean;
-	isUnread: boolean;
-	hasStatus: boolean;
-	hasPullRequest: boolean;
 	showDeleteHotkey?: boolean;
-	onTogglePin: () => void;
+	environmentItem?: React.ReactNode;
 	onCreateSection: () => void;
 	onMoveToSection: (sectionId: string | null) => void;
-	onOpenInFinder: () => void;
-	onCopyPath: () => void;
-	onCopyBranchName: () => void;
-	onCopyWorkspaceId: () => void;
-	/** Absent when the row can't leave the sidebar (your own cloud workspace). */
-	onRemoveFromSidebar?: () => void;
-	onRename?: () => void;
-	onDelete?: () => void;
-	environmentItem?: React.ReactNode;
-	onToggleUnread: () => void;
-	onClearStatus: () => void;
-	onRemovePullRequest: () => void;
 	children: React.ReactNode;
 }
 
 export function DashboardSidebarWorkspaceContextMenu({
-	workspaceId,
 	projectId,
 	move,
 	isSessionWorkspace = false,
 	isInSection,
-	isLocalWorkspace,
 	isCloudWorkspace = false,
-	isPinned,
-	isUnread,
-	hasStatus,
-	hasPullRequest,
 	showDeleteHotkey = false,
-	onTogglePin,
+	environmentItem,
 	onCreateSection,
 	onMoveToSection,
-	onOpenInFinder,
-	onCopyPath,
-	onCopyBranchName,
-	onCopyWorkspaceId,
-	onRemoveFromSidebar,
 	onRename,
-	onDelete,
-	environmentItem,
-	onToggleUnread,
-	onClearStatus,
-	onRemovePullRequest,
 	children,
+	...rest
 }: DashboardSidebarWorkspaceContextMenuProps) {
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const { setContextMenuOpen } = useDashboardSidebarHoverActions();
-	const copyShareLink = useCopyShareLink();
-	const portGroup = useDashboardSidebarWorkspacePorts(workspaceId);
-	const { isPending: isKillingPorts, killPorts } =
-		useDashboardSidebarPortKill();
-	const ports = portGroup?.ports ?? [];
-	const deleteHotkeyText = useHotkeyDisplay("CLOSE_WORKSPACE").text;
-	const showDeleteShortcut =
-		showDeleteHotkey && deleteHotkeyText !== "Unassigned";
 	const canJoinGroup = projectId !== null || isSessionWorkspace;
-	const handleCloseAllPorts = () => {
-		if (isKillingPorts) return;
-		void killPorts(ports);
-	};
+	const {
+		workspaceId,
+		isLocalWorkspace,
+		isPinned,
+		isUnread,
+		hasStatus,
+		hasPullRequest,
+		...actions
+	} = rest;
 
 	return (
 		<ContextMenu onOpenChange={setContextMenuOpen}>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
-				<ContextMenuItem onSelect={onTogglePin}>
-					{isPinned ? (
+				<WorkspaceMenuItems
+					parts={CONTEXT_MENU_PARTS}
+					state={{
+						workspaceId,
+						isLocalWorkspace,
+						isCloudWorkspace,
+						isPinned,
+						isUnread,
+						hasStatus,
+						hasPullRequest,
+					}}
+					actions={{
+						...actions,
+						onRename: onRename && (() => runAfterClose(onRename)),
+					}}
+					move={move}
+					showDeleteHotkey={showDeleteHotkey}
+					groupItems={
+						// Group actions change placement (sectionId/tabOrder), which a
+						// pinned row doesn't show; the change would only appear on unpin.
 						<>
-							<LuPinOff className="size-4 mr-2" />
-							<Trans>Unpin</Trans>
+							{!isPinned && canJoinGroup && (
+								<>
+									<ContextMenuSeparator />
+									<ContextMenuItem onSelect={onCreateSection}>
+										<LuFolderPlus className="size-4 mr-2" />
+										<Trans>New group from workspace</Trans>
+									</ContextMenuItem>
+									<ContextMenuSub>
+										<ContextMenuSubTrigger>
+											<LuFolderSymlink className="size-4 mr-2" />
+											<Trans>Move to group</Trans>
+										</ContextMenuSubTrigger>
+										<ContextMenuSubContent>
+											<MoveToGroupItems
+												projectId={projectId}
+												onMoveToSection={onMoveToSection}
+											/>
+											<ContextMenuItem onSelect={onCreateSection}>
+												<LuFolderPlus className="size-4 mr-2" />
+												<Trans>Create new group</Trans>
+											</ContextMenuItem>
+										</ContextMenuSubContent>
+									</ContextMenuSub>
+									{isInSection && (
+										<ContextMenuItem onSelect={() => onMoveToSection(null)}>
+											<LuArrowUp className="size-4 mr-2" />
+											<Trans>Ungroup</Trans>
+										</ContextMenuItem>
+									)}
+								</>
+							)}
+							{environmentItem}
 						</>
-					) : (
-						<>
-							<LuPin className="size-4 mr-2" />
-							<Trans>Pin</Trans>
-						</>
-					)}
-				</ContextMenuItem>
-				{onRename && (
-					<ContextMenuItem onSelect={() => runAfterClose(onRename)}>
-						<LuPencil className="size-4 mr-2" />
-						<Trans>Rename</Trans>
-					</ContextMenuItem>
-				)}
-				{onRename && <ContextMenuSeparator />}
-				{isLocalWorkspace && (
-					<ContextMenuItem onSelect={onOpenInFinder}>
-						<LuFolderOpen className="size-4 mr-2" />
-						<Trans>Open in Finder</Trans>
-					</ContextMenuItem>
-				)}
-				<ContextMenuSub>
-					<ContextMenuSubTrigger>
-						<LuCopy className="size-4 mr-2" />
-						<Trans>Copy</Trans>
-					</ContextMenuSubTrigger>
-					<ContextMenuSubContent>
-						<ContextMenuItem
-							onSelect={() => copyShareLink(`workspaces/${workspaceId}`)}
-						>
-							<LuLink className="size-4 mr-2" />
-							<Trans>Copy link</Trans>
-						</ContextMenuItem>
-						<ContextMenuItem onSelect={onCopyBranchName}>
-							<LuGitBranch className="size-4 mr-2" />
-							<Trans>Copy Branch Name</Trans>
-						</ContextMenuItem>
-						{isLocalWorkspace && (
-							<ContextMenuItem onSelect={onCopyPath}>
-								<LuClipboard className="size-4 mr-2" />
-								<Trans>Copy Path</Trans>
-							</ContextMenuItem>
-						)}
-						<ContextMenuItem onSelect={onCopyWorkspaceId}>
-							<LuHash className="size-4 mr-2" />
-							<Trans>Copy Workspace ID</Trans>
-						</ContextMenuItem>
-					</ContextMenuSubContent>
-				</ContextMenuSub>
-				<ContextMenuSeparator />
-				<ContextMenuItem onSelect={onToggleUnread}>
-					{isUnread ? (
-						<>
-							<LuEye className="size-4 mr-2" />
-							<Trans>Mark as Read</Trans>
-						</>
-					) : (
-						<>
-							<LuEyeOff className="size-4 mr-2" />
-							<Trans>Mark as Unread</Trans>
-						</>
-					)}
-				</ContextMenuItem>
-				{hasStatus && !isCloudWorkspace && (
-					<ContextMenuItem onSelect={onClearStatus}>
-						<LuBellOff className="size-4 mr-2" />
-						<Trans>Clear Status</Trans>
-					</ContextMenuItem>
-				)}
-				{hasPullRequest && !isCloudWorkspace && (
-					<ContextMenuItem onSelect={onRemovePullRequest}>
-						<LuUnlink className="size-4 mr-2" />
-						<Trans>Remove PR Link</Trans>
-					</ContextMenuItem>
-				)}
-				{/* Group actions mutate placement (sectionId/tabOrder), which a pinned
-				    row doesn't display — the change would only surface on unpin. */}
-				{!isPinned && canJoinGroup && (
-					<>
-						<ContextMenuSeparator />
-						<ContextMenuItem onSelect={onCreateSection}>
-							<LuFolderPlus className="size-4 mr-2" />
-							<Trans>New group from workspace</Trans>
-						</ContextMenuItem>
-						<ContextMenuSub>
-							<ContextMenuSubTrigger>
-								<LuArrowRightLeft className="size-4 mr-2" />
-								<Trans>Move to group</Trans>
-							</ContextMenuSubTrigger>
-							<ContextMenuSubContent>
-								<MoveToGroupItems
-									projectId={projectId}
-									onMoveToSection={onMoveToSection}
-								/>
-								<ContextMenuItem onSelect={onCreateSection}>
-									<LuFolderPlus className="size-4 mr-2" />
-									<Trans>Create new group</Trans>
-								</ContextMenuItem>
-							</ContextMenuSubContent>
-						</ContextMenuSub>
-						{isInSection && (
-							<ContextMenuItem onSelect={() => onMoveToSection(null)}>
-								<LuArrowUp className="size-4 mr-2" />
-								<Trans>Ungroup</Trans>
-							</ContextMenuItem>
-						)}
-					</>
-				)}
-				{environmentItem}
-				{move && (
-					<>
-						<ContextMenuSeparator />
-						<WorkspaceMoveMenu
-							menu="context"
-							workspace={move.workspace}
-							directions={move.directions}
-						/>
-					</>
-				)}
-				{isCloudWorkspace && (
-					<>
-						<ContextMenuSeparator />
-						<ContextMenuSub>
-							<ContextMenuSubTrigger>
-								<LuCpu className="size-4 mr-2" />
-								<Trans>Machine size</Trans>
-							</ContextMenuSubTrigger>
-							<ContextMenuSubContent className="min-w-64">
-								<MachineSizeMenuItems
-									workspaceId={workspaceId}
-									menu="context"
-									runAfterClose={runAfterClose}
-								/>
-							</ContextMenuSubContent>
-						</ContextMenuSub>
-					</>
-				)}
-				<ContextMenuSeparator />
-				{ports.length > 0 && (
-					<ContextMenuItem
-						onSelect={handleCloseAllPorts}
-						disabled={isKillingPorts}
-						variant="destructive"
-					>
-						<LuRadioTower className="size-4 mr-2" />
-						<Trans>Close all ports</Trans>
-					</ContextMenuItem>
-				)}
-				{onRemoveFromSidebar && (
-					<ContextMenuItem onSelect={onRemoveFromSidebar}>
-						<LuX className="size-4 mr-2" />
-						<Trans>Remove from Sidebar</Trans>
-					</ContextMenuItem>
-				)}
-				{onDelete ? (
-					<ContextMenuItem
-						onSelect={onDelete}
-						className="text-destructive focus:text-destructive"
-					>
-						{isCloudWorkspace ? (
+					}
+					afterMoveItems={
+						isCloudWorkspace && (
 							<>
-								<LuArchive className="size-4 mr-2 text-destructive" />
-								<Trans>Archive</Trans>
+								<ContextMenuSeparator />
+								<ContextMenuSub>
+									<ContextMenuSubTrigger>
+										<LuCpu className="size-4 mr-2" />
+										<Trans>Machine size</Trans>
+									</ContextMenuSubTrigger>
+									<ContextMenuSubContent className="min-w-64">
+										<MachineSizeMenuItems
+											workspaceId={workspaceId}
+											menu="context"
+											runAfterClose={runAfterClose}
+										/>
+									</ContextMenuSubContent>
+								</ContextMenuSub>
 							</>
-						) : (
-							<>
-								<LuTrash2 className="size-4 mr-2 text-destructive" />
-								<Trans>Delete</Trans>
-							</>
-						)}
-						{showDeleteShortcut && (
-							<ContextMenuShortcut>{deleteHotkeyText}</ContextMenuShortcut>
-						)}
-					</ContextMenuItem>
-				) : null}
+						)
+					}
+				/>
 			</ContextMenuContent>
 		</ContextMenu>
 	);

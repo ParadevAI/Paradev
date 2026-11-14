@@ -860,9 +860,6 @@ msgstr "검사 {0}개 중 {completed}개 완료"
 msgid "{completed} of {total} completed"
 msgstr "{total}개 중 {completed}개 완료"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (오프라인)"
-
 msgid "{configTitle} font size"
 msgstr "{configTitle} 글꼴 크기"
 
@@ -1809,9 +1806,6 @@ msgstr "클라우드 자동화의 지침은 최대 {max}자까지 입력할 수 
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "클라우드 워크스페이스에서는 {path}를 호출할 수 없습니다. 로그인한 클라이언트에서 실행하세요."
 
-msgid "A computer"
-msgstr "컴퓨터"
-
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}에 대한 삭제가 이미 진행 중입니다."
 
@@ -1856,6 +1850,9 @@ msgstr "매니페스트와 스킬 파일 몇 개면 됩니다. Paradev가 각 �
 
 msgid "a message from {authorName}"
 msgstr "{authorName}님의 메시지"
+
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev 새 버전이 나왔습니다. 계속하려면 새로고침하세요."
 
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "계속하려면 새 버전의 Paradev가 필요합니다. 최신 버전으로 업데이트해 주세요."
@@ -2078,8 +2075,8 @@ msgstr "{localizedName}을(를) 추가하시겠습니까?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "먼저 {computer}에 {repositoryName}을(를) 프로젝트로 추가하세요"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "먼저 {repositoryName}을(를) 이 컴퓨터의 프로젝트로 추가하세요"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "먼저 {repositoryName}을(를) 이 기기의 프로젝트로 추가하세요"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "#{prNumber}을(를) 머지 대기열에 추가할까요?"
@@ -2137,6 +2134,9 @@ msgstr "하나 더 추가"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "다른 계정을 연결하거나 더 이상 쓰지 않는 계정을 해제하세요."
+
+msgid "Add attachment"
+msgstr "첨부 추가"
 
 msgid "Add Attachment"
 msgstr "첨부 파일 추가"
@@ -2340,7 +2340,7 @@ msgstr "에이전트 입력란에 추가됨"
 msgid "Added to merge queue"
 msgstr "머지 대기열에 추가했습니다"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "{organizationName}에 사람을 추가하려면 유료 플랜이 필요합니다. 조직의 플랜은 소유자가 {0}에서 관리합니다."
 
@@ -2726,6 +2726,9 @@ msgstr "릴레이를 통한 접근 허용"
 msgid "Allow for session"
 msgstr "세션 동안 허용"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "받아쓰기를 하려면 설정에서 마이크 접근을 허용하세요."
+
 msgid "Allow microphone access to use dictation"
 msgstr "받아쓰기를 사용하려면 마이크 접근을 허용하세요"
 
@@ -2890,9 +2893,6 @@ msgstr "익명의 조립공"
 
 msgid "Another AI assistant"
 msgstr "다른 AI 어시스턴트"
-
-msgid "Another computer"
-msgstr "다른 컴퓨터"
 
 msgid "another device"
 msgstr "다른 기기"
@@ -4018,6 +4018,9 @@ msgstr "캘린더"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "계정을 다시 연결할 때까지 이 조직의 Calendar 및 Gmail 트리거가 실행되지 않습니다."
+
+msgid "Camera"
+msgstr "카메라"
 
 msgid "Camera access is not allowed"
 msgstr "카메라 접근이 허용되지 않았습니다"
@@ -5580,6 +5583,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "이어서 하기"
 
+msgid "Continue in browser"
+msgstr "브라우저에서 계속하기"
+
 msgid "Continue in your browser"
 msgstr "브라우저에서 계속하세요"
 
@@ -5996,6 +6002,9 @@ msgstr "링크를 열 수 없습니다"
 msgid "Could not open Photos"
 msgstr "사진 앱을 열지 못했습니다"
 
+msgid "Could not open this file"
+msgstr "이 파일을 열 수 없습니다"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6118,9 @@ msgstr "결제를 시작할 수 없습니다. 다시 시도해 주세요."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "클라우드 워크스페이스 프로비저닝을 시작할 수 없습니다"
+
+msgid "Could not start dictation"
+msgstr "받아쓰기를 시작할 수 없습니다"
 
 msgid "Could not start session"
 msgstr "세션을 시작할 수 없습니다"
@@ -7414,11 +7426,20 @@ msgstr "받아쓰기"
 msgid "Dictation"
 msgstr "받아쓰기"
 
+msgid "Dictation is not available in this language."
+msgstr "이 언어에서는 받아쓰기를 사용할 수 없습니다."
+
 msgid "Dictation is not available on this device"
 msgstr "이 기기에서는 받아쓰기를 사용할 수 없습니다"
 
 msgid "Dictation is not available right now"
 msgstr "지금은 받아쓰기를 사용할 수 없습니다"
+
+msgid "Dictation needs a network connection."
+msgstr "받아쓰기를 사용하려면 네트워크 연결이 필요합니다."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "받아쓰기가 중지되었습니다. 지금까지 들은 내용은 메시지에 있습니다."
 
 msgid "Didn't hear back"
 msgstr "응답이 없습니다"
@@ -9642,8 +9663,8 @@ msgstr "iPhone 및 iPad 앱 받기"
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} 가입 초대를 받습니다"
 
-msgid "Getting the computer ready"
-msgstr "컴퓨터를 준비하는 중"
+msgid "Getting the device ready"
+msgstr "기기를 준비하는 중"
 
 msgid "Getting Work Done"
 msgstr "업무용"
@@ -10928,6 +10949,9 @@ msgstr "동기화가 끝나면 플러그인이 표시됩니다."
 msgid "Its replies go with it."
 msgstr "답글도 함께 삭제됩니다."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "커밋하지 않은 변경 사항을 포함한 작업이 새 브랜치로 푸시됩니다. {computerName}의 워크스페이스가 그 브랜치에서 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 멈춥니다. 터미널과 다른 채팅은 그대로 남습니다."
+
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "다시 시작할 때까지 해당 워크스페이스와 터미널을 사용할 수 없습니다. Paradev 트레이 메뉴 > 호스트 서비스 > 다시 시작을 사용하세요."
 
@@ -11883,7 +11907,7 @@ msgstr "MCP 서버 접근과 Claude Desktop, Claude Code 같은 외부 연동에
 msgid "Manage members"
 msgstr "멤버 관리"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "{0}에서 관리"
 
@@ -12416,8 +12440,20 @@ msgstr "클라우드 작업 옮기기"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "메인 탭과 오른쪽 사이드바 사이에서 포커스를 옮기고, 사이드바가 닫혀 있으면 엽니다"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "이 워크스페이스를 {computerName}(으)로 옮길까요?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "이 워크스페이스를 클라우드로 옮길까요?"
+
+msgid "Move to"
+msgstr "옮길 위치"
+
 msgid "Move to background"
 msgstr "백그라운드로 이동"
+
+msgid "Move to cloud"
+msgstr "클라우드로 옮기기"
 
 msgid "Move to group"
 msgstr "그룹으로 이동"
@@ -12926,6 +12962,9 @@ msgstr "Chrome, Brave, Arc 등 Chromium 기반 브라우저를 찾을 수 없습
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "이 컴퓨터에서 아직 Claude 또는 Codex 사용량을 찾지 못했습니다. 지금 참여하면 에이전트를 사용한 뒤 순위에 표시됩니다."
 
+msgid "No cloud environment opens {repository}."
+msgstr "{repository}을(를) 여는 클라우드 환경이 없습니다."
+
 msgid "No cloud workspaces"
 msgstr "클라우드 워크스페이스 없음"
 
@@ -13208,8 +13247,8 @@ msgstr "선택된 조직이 없습니다"
 msgid "No other chats here"
 msgstr "다른 채팅이 없습니다"
 
-msgid "No other computer is set up for this account."
-msgstr "이 계정에 설정된 다른 컴퓨터가 없습니다."
+msgid "No other device is set up for this account."
+msgstr "이 계정에 설정된 다른 기기가 없습니다."
 
 msgid "No pages match"
 msgstr "일치하는 페이지 없음"
@@ -13765,6 +13804,9 @@ msgstr "오프라인"
 
 msgid "Offline / local-first mode"
 msgstr "오프라인 / 로컬 우선 모드"
+
+msgid "OK"
+msgstr "확인"
 
 msgid "Older"
 msgstr "이전"
@@ -15030,6 +15072,9 @@ msgstr "링크 붙여넣기"
 msgid "Paste an API key instead"
 msgstr "대신 API 키 붙여 넣기"
 
+msgid "Paste attachment"
+msgstr "첨부 파일 붙여넣기"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Paradev CLI에 붙여 넣으세요:"
 
@@ -15171,6 +15216,9 @@ msgstr "휴대폰"
 msgid "Phone number"
 msgstr "전화번호"
 
+msgid "Photos"
+msgstr "사진"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "테마 목록에서 {name}을(를) 선택해 적용하세요."
 
@@ -15218,6 +15266,9 @@ msgstr "워크스페이스 선택"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "에이전트가 입력을 기다리고 있거나, 마지막으로 확인한 뒤 작업을 마쳤거나, 아직 실행 중인 워크스페이스를 선택합니다"
+
+msgid "Pick an environment"
+msgstr "환경 선택"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "아이콘과 색상을 고르거나 직접 만든 이미지를 업로드하세요. 기본값은 연결된 GitHub 소유자의 아바타입니다."
@@ -15920,6 +15971,9 @@ msgstr "자주 묻는 질문"
 
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "질문, 피드백, 지원 등 무엇이든 좋습니다. 메시지를 보내 주시면 담당자에게 전달하겠습니다."
+
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "메시지를 대기열에 추가 · {SEND_NOW_KEYS}로 지금 보내기"
 
 msgid "Queue message"
 msgstr "메시지 대기열에 추가"
@@ -18486,6 +18540,10 @@ msgstr "이미 사용 중인 단축키"
 msgid "Show"
 msgstr "표시"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "{0}개 더 보기"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "앱을 종료할 때 확인 대화 상자를 표시합니다"
 
@@ -20149,8 +20207,11 @@ msgstr "해당 계정은 더 이상 연결되어 있지 않습니다. 다른 계
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "이 에이전트 세션에는 아직 열 대화가 없습니다. 시작되었지만 한 번도 요청을 받지 않았습니다."
 
-msgid "That computer can't be reached"
-msgstr "그 컴퓨터에 연결할 수 없습니다"
+msgid "that device"
+msgstr "그 기기"
+
+msgid "That device can't be reached"
+msgstr "그 기기에 연결할 수 없습니다"
 
 msgid "That endpoint could not be resolved."
 msgstr "해당 엔드포인트를 확인할 수 없습니다."
@@ -20448,8 +20509,14 @@ msgstr "이동 시간이 초과되었습니다."
 msgid "The move was cancelled."
 msgstr "옮기기가 취소되었습니다."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "이동한 워크스페이스는 준비되면 홈에 표시됩니다."
+
 msgid "The name of your organization or team"
 msgstr "조직 또는 팀의 이름"
+
+msgid "The name shows in the sidebar."
+msgstr "이 이름은 사이드바에 표시됩니다."
 
 msgid "The network connection changed"
 msgstr "네트워크 연결이 바뀌었습니다"
@@ -20460,8 +20527,8 @@ msgstr "Claude Code, Codex, 그리고 모든 코딩 에이전트를 위한 오�
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode, 그리고 모든 코딩 에이전트를 위한 오픈 소스 워크스페이스. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "이동의 다른 쪽에서 이전 버전을 실행 중입니다. 클라우드 워크스페이스를 다시 시작하거나 컴퓨터의 호스트를 업데이트한 다음 다시 시도하세요."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "이동의 다른 쪽에서 이전 버전을 실행 중입니다. 클라우드 워크스페이스를 다시 시작하거나 기기의 호스트를 업데이트한 다음 다시 시도하세요."
 
 msgid "The overnight shift"
 msgstr "야간 근무"
@@ -20761,15 +20828,6 @@ msgstr "이 클라우드 워크스페이스를 시작할 수 없습니다"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안 사용하지 않았다면 최대 30초가 걸릴 수 있습니다."
 
-msgid "this computer"
-msgstr "이 컴퓨터"
-
-msgid "This computer"
-msgstr "이 컴퓨터"
-
-msgid "This computer's host is not running"
-msgstr "이 컴퓨터의 호스트가 실행되고 있지 않습니다"
-
 msgid "This conversation is too long for the model"
 msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
 
@@ -20790,6 +20848,9 @@ msgstr "이 기기 ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "이 기기가 Paradev 릴레이에 연결되어 있지 않아 자동화 실행이 건너뛰어집니다."
+
+msgid "This device's host is not running"
+msgstr "이 기기의 호스트가 실행되고 있지 않습니다"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페이스 루트에서 실행됩니다."
@@ -21133,6 +21194,9 @@ msgstr "이 워크스페이스의 호스트가 오프라인입니다"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "이 워크스페이스의 호스트는 이 앱이 지원하는 것보다 오래된 호스트 서비스를 실행 중입니다. 업데이트하면 다시 연결됩니다. 워크스페이스와 파일은 그대로 유지됩니다."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "이 워크스페이스의 프로젝트가 GitHub에 없습니다."
 
 msgid "Thorough reasoning effort"
 msgstr "철저한 추론"
@@ -21889,6 +21953,15 @@ msgstr "이름 지정 지침 업데이트"
 msgid "Update naming instructions for {0}"
 msgstr "{0}의 이름 지정 지침 업데이트"
 
+msgid "Update on Google Play"
+msgstr "Google Play에서 업데이트"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "계속하려면 Google Play에서 Paradev를 업데이트하세요."
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "이 휴대폰에서 워크스페이스를 이동하려면 {sourceName}의 Paradev를 업데이트하세요."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "해당 기기에서 Paradev를 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."
 
@@ -21955,7 +22028,7 @@ msgstr "업그레이드"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "의존성을 업그레이드하고 깨진 부분 고치기…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "{0}에서 업그레이드"
 
@@ -22243,9 +22316,6 @@ msgstr "전체 보기"
 msgid "View All"
 msgstr "전체 보기"
 
-msgid "View all (+{moreCount} more)"
-msgstr "모두 보기 (+{moreCount}개 더)"
-
 msgid "View all members of this channel"
 msgstr "이 채널의 모든 멤버 보기"
 
@@ -22382,6 +22452,9 @@ msgstr "서브 에이전트의 첫 메시지를 기다리는 중…"
 
 msgid "Waiting for your input"
 msgstr "입력을 기다리는 중"
+
+msgid "Waiting on background work"
+msgstr "백그라운드 작업을 기다리는 중"
 
 msgid "Waking up workspace"
 msgstr "워크스페이스 깨우는 중"
@@ -23131,7 +23204,7 @@ msgstr "이 페이지를 볼 수는 있지만 변경할 수는 없습니다"
 msgid "You can view this page but not comment on it"
 msgstr "이 페이지를 볼 수는 있지만 댓글을 달 수는 없습니다"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "이 구독은 앱에서 변경할 수 없습니다. 조직의 플랜은 소유자가 {0}에서 관리합니다."
 
@@ -23392,6 +23465,9 @@ msgstr "v1 프로젝트와 워크스페이스를 새 Paradev로 옮기는 중입
 
 msgid "Your version: {currentVersion}"
 msgstr "현재 버전: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "커밋하지 않은 변경 사항을 포함한 작업이 원격의 새 브랜치로 푸시됩니다. 선택한 환경에서 해당 브랜치로 클라우드 워크스페이스가 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 중지됩니다. 터미널과 다른 채팅은 여기에 남습니다."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex용 기기 코드 로그인은 워크스페이스 관리자가 켭니다."

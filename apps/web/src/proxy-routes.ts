@@ -16,6 +16,7 @@ const otherPublicRoutes = [
 	"/page",
 	"/robots.txt",
 	"/.well-known/apple-app-site-association",
+	"/.well-known/assetlinks.json",
 ] as const;
 
 const publicRoutes = [...authPageRoutes, ...otherPublicRoutes] as const;
@@ -49,6 +50,14 @@ export function safeRedirectUrl(
 	}
 	if (url.origin !== origin || isAuthPageRoute(url.pathname)) return null;
 	return url;
+}
+
+export function isAgentsRoute(pathname: string): boolean {
+	return matchesRouteOrChild(pathname, "/agents");
+}
+
+export function agentsRewriteUrl(url: URL, agentsUrl: string): URL {
+	return new URL(`${url.pathname}${url.search}`, agentsUrl);
 }
 
 export function isInternalRoute(pathname: string): boolean {

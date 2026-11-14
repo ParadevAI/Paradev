@@ -89,6 +89,7 @@ import { useV2WorkspacePaneLayout } from "./hooks/useV2WorkspacePaneLayout";
 import { useV2WorkspaceRun } from "./hooks/useV2WorkspaceRun";
 import { useWorkspaceFileNavigation } from "./hooks/useWorkspaceFileNavigation";
 import { useWorkspaceHotkeys } from "./hooks/useWorkspaceHotkeys";
+import { useWorkspaceOpenInHotkey } from "./hooks/useWorkspaceOpenInHotkey";
 import { useWorkspacePaneOpeners } from "./hooks/useWorkspacePaneOpeners";
 import { useWorkspaceRightPane } from "./hooks/useWorkspaceRightPane";
 import { RightPaneLinkTargetProvider } from "./providers/RightPaneLinkTargetProvider";
@@ -570,6 +571,7 @@ function V2WorkspaceContent() {
 		isSandbox,
 		isMobilePaneEnabled,
 	});
+	useWorkspaceOpenInHotkey(workspaceId);
 	useRightSidebarHotkeys({
 		centerStore: store,
 		rightStore,

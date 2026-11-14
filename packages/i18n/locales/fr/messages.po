@@ -860,9 +860,6 @@ msgstr "{completed} vérifications sur {0} terminées"
 msgid "{completed} of {total} completed"
 msgstr "{completed} sur {total} terminés"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (hors ligne)"
-
 msgid "{configTitle} font size"
 msgstr "Taille de police de {configTitle}"
 
@@ -1809,9 +1806,6 @@ msgstr "Les instructions d'une automatisation cloud peuvent contenir au maximum 
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Un espace de travail cloud ne peut pas appeler {path}. Faites-le depuis un client où vous êtes connecté."
 
-msgid "A computer"
-msgstr "Un ordinateur"
-
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Une suppression est déjà en cours pour {workspaceName}."
 
@@ -1856,6 +1850,9 @@ msgstr "Un manifeste et quelques fichiers de compétences. Paradev le place là 
 
 msgid "a message from {authorName}"
 msgstr "un message de {authorName}"
+
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Une nouvelle version de Paradev est disponible. Rechargez pour continuer."
 
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Une nouvelle version de Paradev est requise pour continuer. Veuillez mettre à jour vers la dernière version."
@@ -2078,8 +2075,8 @@ msgstr "Ajouter {localizedName} ?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Ajoutez d’abord {repositoryName} comme projet sur {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Ajoutez d'abord {repositoryName} comme projet sur cet ordinateur"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Ajoutez d'abord {repositoryName} comme projet sur cet appareil"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Ajouter #{prNumber} à la file de fusion ?"
@@ -2137,6 +2134,9 @@ msgstr "Ajouter une autre"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Connectez un autre compte, ou déconnectez-en un que vous n'utilisez plus."
+
+msgid "Add attachment"
+msgstr "Ajouter une pièce jointe"
 
 msgid "Add Attachment"
 msgstr "Ajouter une pièce jointe"
@@ -2340,7 +2340,7 @@ msgstr "Ajouté à la saisie de l'agent"
 msgid "Added to merge queue"
 msgstr "Ajoutée à la file de fusion"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Ajouter des personnes à {organizationName} nécessite un forfait payant. Le forfait de votre organisation est géré par son propriétaire sur {0}."
 
@@ -2726,6 +2726,9 @@ msgstr "Autoriser l'accès via le relais"
 msgid "Allow for session"
 msgstr "Autoriser pour la session"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Autorisez l’accès au micro dans les Réglages pour dicter."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Autorisez l'accès au microphone pour utiliser la dictée"
 
@@ -2890,9 +2893,6 @@ msgstr "Assembleur anonyme"
 
 msgid "Another AI assistant"
 msgstr "Un autre assistant IA"
-
-msgid "Another computer"
-msgstr "Un autre ordinateur"
 
 msgid "another device"
 msgstr "un autre appareil"
@@ -4018,6 +4018,9 @@ msgstr "Calendrier"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Les déclencheurs Calendar et Gmail de cette organisation cesseront de se déclencher jusqu'à ce qu'un compte soit reconnecté."
+
+msgid "Camera"
+msgstr "Appareil photo"
 
 msgid "Camera access is not allowed"
 msgstr "L'accès à l'appareil photo n'est pas autorisé"
@@ -5580,6 +5583,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Continuer"
 
+msgid "Continue in browser"
+msgstr "Continuer dans le navigateur"
+
 msgid "Continue in your browser"
 msgstr "Continuez dans votre navigateur"
 
@@ -5996,6 +6002,9 @@ msgstr "Impossible d'ouvrir le lien"
 msgid "Could not open Photos"
 msgstr "Impossible d'ouvrir Photos"
 
+msgid "Could not open this file"
+msgstr "Impossible d'ouvrir ce fichier"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6118,9 @@ msgstr "Impossible de lancer le paiement. Veuillez réessayer."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Impossible de démarrer le provisionnement de l'espace de travail cloud"
+
+msgid "Could not start dictation"
+msgstr "Impossible de démarrer la dictée"
 
 msgid "Could not start session"
 msgstr "Impossible de démarrer la session"
@@ -7414,11 +7426,20 @@ msgstr "Dicter"
 msgid "Dictation"
 msgstr "Dictée"
 
+msgid "Dictation is not available in this language."
+msgstr "La dictée n’est pas disponible dans cette langue."
+
 msgid "Dictation is not available on this device"
 msgstr "La dictée n'est pas disponible sur cet appareil"
 
 msgid "Dictation is not available right now"
 msgstr "La dictée n'est pas disponible pour le moment"
+
+msgid "Dictation needs a network connection."
+msgstr "La dictée nécessite une connexion réseau."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "La dictée s’est arrêtée. Ce qui a été entendu jusqu’ici est dans votre message."
 
 msgid "Didn't hear back"
 msgstr "Aucune réponse"
@@ -9642,8 +9663,8 @@ msgstr "Obtenir l'app iPhone et iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Recevra une invitation à rejoindre {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Préparation de l’ordinateur"
+msgid "Getting the device ready"
+msgstr "Préparation de l’appareil"
 
 msgid "Getting Work Done"
 msgstr "Pour le travail"
@@ -10928,6 +10949,9 @@ msgstr "Ses plugins apparaissent à la fin de la synchronisation."
 msgid "Its replies go with it."
 msgstr "Ses réponses seront aussi supprimées."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Son travail, y compris les modifications non commitées, est poussé vers une nouvelle branche. Un espace de travail sur {computerName} démarre depuis cette branche, et chaque discussion Claude s’y poursuit. Les agents en cours de travail s’arrêtent d’abord. Les terminaux et les autres discussions restent où ils sont."
+
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Ses espaces de travail et terminaux sont indisponibles jusqu'à son redémarrage. Utilisez le menu de la barre d'état Paradev > Service hôte > Redémarrer."
 
@@ -11883,7 +11907,7 @@ msgstr "Gérez les clés d'accès aux serveurs MCP et aux intégrations externes
 msgid "Manage members"
 msgstr "Gérer les membres"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Gérer sur {0}"
 
@@ -12416,8 +12440,20 @@ msgstr "Transférer le travail cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Déplacer le focus entre les onglets principaux et la barre latérale droite, et ouvrir la barre latérale si elle est fermée"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Déplacer cet espace de travail vers {computerName} ?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Déplacer cet espace de travail vers le cloud ?"
+
+msgid "Move to"
+msgstr "Déplacer vers"
+
 msgid "Move to background"
 msgstr "Passer en arrière-plan"
+
+msgid "Move to cloud"
+msgstr "Déplacer vers le cloud"
 
 msgid "Move to group"
 msgstr "Déplacer vers un groupe"
@@ -12926,6 +12962,9 @@ msgstr "Aucun navigateur Chrome, Brave, Arc ou autre navigateur Chromium n'a ét
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Aucune utilisation de Claude ou Codex trouvée sur cette machine pour l'instant. Rejoignez maintenant et vous apparaîtrez dès que vous aurez utilisé un agent."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Aucun environnement cloud n'ouvre {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Aucun espace de travail cloud"
 
@@ -13208,8 +13247,8 @@ msgstr "Aucune organisation sélectionnée"
 msgid "No other chats here"
 msgstr "Aucune autre discussion ici"
 
-msgid "No other computer is set up for this account."
-msgstr "Aucun autre ordinateur n’est configuré pour ce compte."
+msgid "No other device is set up for this account."
+msgstr "Aucun autre appareil n’est configuré pour ce compte."
 
 msgid "No pages match"
 msgstr "Aucune page correspondante"
@@ -13765,6 +13804,9 @@ msgstr "Hors ligne"
 
 msgid "Offline / local-first mode"
 msgstr "Mode hors ligne / local d'abord"
+
+msgid "OK"
+msgstr "OK"
 
 msgid "Older"
 msgstr "Plus ancien"
@@ -15030,6 +15072,9 @@ msgstr "Collez un lien"
 msgid "Paste an API key instead"
 msgstr "Coller plutôt une clé API"
 
+msgid "Paste attachment"
+msgstr "Coller la pièce jointe"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Collez ceci dans la CLI Paradev :"
 
@@ -15171,6 +15216,9 @@ msgstr "Téléphone"
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
+msgid "Photos"
+msgstr "Photos"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Choisissez {name} dans la grille des thèmes pour l'appliquer."
 
@@ -15218,6 +15266,9 @@ msgstr "Choisissez un espace de travail"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Choisissez un espace de travail dont l'agent attend votre saisie, a terminé depuis votre dernier passage ou est toujours en cours"
+
+msgid "Pick an environment"
+msgstr "Choisir un environnement"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Choisissez une icône et une couleur, ou envoyez une image personnalisée. Par défaut, l'avatar du propriétaire GitHub lié."
@@ -15920,6 +15971,9 @@ msgstr "Questions"
 
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Questions, retours, support ou autre. Écrivez-nous et nous transmettrons votre message à la bonne personne."
+
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Mettre un message en file d’attente · {SEND_NOW_KEYS} pour l’envoyer maintenant"
 
 msgid "Queue message"
 msgstr "Mettre le message en file"
@@ -18486,6 +18540,10 @@ msgstr "Raccourci déjà utilisé"
 msgid "Show"
 msgstr "Afficher"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Afficher {0} de plus"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Afficher une boîte de dialogue de confirmation à la fermeture de l'application"
 
@@ -20149,8 +20207,11 @@ msgstr "Ce compte n'est plus connecté — choisissez-en un autre."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Cette session d'agent n'a pas encore de conversation à ouvrir : elle a démarré mais n'a jamais reçu de requête."
 
-msgid "That computer can't be reached"
-msgstr "Cet ordinateur est injoignable"
+msgid "that device"
+msgstr "cet appareil"
+
+msgid "That device can't be reached"
+msgstr "Cet appareil est injoignable"
 
 msgid "That endpoint could not be resolved."
 msgstr "Ce point de terminaison n'a pas pu être résolu."
@@ -20448,8 +20509,14 @@ msgstr "Le déplacement a expiré."
 msgid "The move was cancelled."
 msgstr "Le déplacement a été annulé."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "L'espace de travail déplacé apparaîtra dans Accueil dès qu'il sera prêt."
+
 msgid "The name of your organization or team"
 msgstr "Le nom de votre organisation ou équipe"
+
+msgid "The name shows in the sidebar."
+msgstr "Le nom s’affiche dans la barre latérale."
 
 msgid "The network connection changed"
 msgstr "La connexion réseau a changé"
@@ -20460,8 +20527,8 @@ msgstr "L'espace de travail open source pour Claude Code, Codex et n'importe que
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "L'espace de travail open source pour Claude Code, Codex, OpenCode et n'importe quel agent de code. Lancez des tâches en parallèle sur des branches séparées et relisez tout au même endroit."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "L'autre côté du déplacement utilise une version plus ancienne. Redémarrez un espace de travail cloud ou mettez à jour l'hôte de l'ordinateur, puis réessayez."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "L'autre côté du déplacement utilise une version plus ancienne. Redémarrez un espace de travail cloud ou mettez à jour l'hôte de l'appareil, puis réessayez."
 
 msgid "The overnight shift"
 msgstr "L'équipe de nuit"
@@ -20761,15 +20828,6 @@ msgstr "Impossible de démarrer cet espace de travail cloud"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Cet espace de travail cloud est en train de se réveiller, ce qui peut prendre jusqu’à 30 secondes après une période d’inactivité."
 
-msgid "this computer"
-msgstr "cet ordinateur"
-
-msgid "This computer"
-msgstr "Cet ordinateur"
-
-msgid "This computer's host is not running"
-msgstr "L'hôte de cet ordinateur ne fonctionne pas"
-
 msgid "This conversation is too long for the model"
 msgstr "Cette conversation est trop longue pour le modèle"
 
@@ -20790,6 +20848,9 @@ msgstr "cet appareil ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Cet appareil n'est pas connecté au relais Paradev, les exécutions d'automatisations seront donc ignorées."
+
+msgid "This device's host is not running"
+msgstr "L'hôte de cet appareil ne fonctionne pas"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Ce répertoire n'existe pas. Le script de terminal se rabattra sur la racine de l'espace de travail."
@@ -21133,6 +21194,9 @@ msgstr "L'hôte de cet espace de travail est hors ligne"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "L'hôte de cet espace de travail exécute un service d'hôte plus ancien que ce que cette application prend en charge. Mettez-le à jour pour vous reconnecter ; l'espace de travail et ses fichiers sont intacts."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Le projet de cet espace de travail n'est pas sur GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Effort de raisonnement approfondi"
@@ -21889,6 +21953,15 @@ msgstr "Mettre à jour les instructions de nommage"
 msgid "Update naming instructions for {0}"
 msgstr "Mettre à jour les instructions de nommage pour {0}"
 
+msgid "Update on Google Play"
+msgstr "Mettre à jour sur Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Mettez à jour Paradev depuis Google Play pour continuer."
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Mettez à jour Paradev sur {sourceName} pour déplacer ses espaces de travail depuis ce téléphone."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Mettez à jour Paradev sur cet appareil. Les mises à jour depuis l’application nécessitent une installation autonome compatible et une version publiée de l’application."
 
@@ -21955,7 +22028,7 @@ msgstr "Passer à ce forfait"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Mets à jour une dépendance et corrige ce qui casse…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Passer à Pro sur {0}"
 
@@ -22243,9 +22316,6 @@ msgstr "Tout afficher"
 msgid "View All"
 msgstr "Tout afficher"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Tout voir (+{moreCount} de plus)"
-
 msgid "View all members of this channel"
 msgstr "Voir tous les membres de ce canal"
 
@@ -22382,6 +22452,9 @@ msgstr "En attente du premier message du sous-agent…"
 
 msgid "Waiting for your input"
 msgstr "En attente de votre réponse"
+
+msgid "Waiting on background work"
+msgstr "En attente du travail en arrière-plan"
 
 msgid "Waking up workspace"
 msgstr "Réveil de l’espace de travail"
@@ -23131,7 +23204,7 @@ msgstr "Vous pouvez consulter cette page, mais pas la modifier"
 msgid "You can view this page but not comment on it"
 msgstr "Vous pouvez consulter cette page, mais pas la commenter"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Vous ne pouvez pas modifier cet abonnement dans l'application. Le forfait de votre organisation est géré par son propriétaire sur {0}."
 
@@ -23392,6 +23465,9 @@ msgstr "Vos projets et espaces de travail v1 sont transférés vers le nouveau P
 
 msgid "Your version: {currentVersion}"
 msgstr "Votre version : {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Votre travail, y compris les modifications non commitées, est poussé vers une nouvelle branche sur le dépôt distant. Un espace de travail cloud démarre depuis cette branche dans l'environnement que vous choisissez, et chaque discussion Claude s'y poursuit. Les agents qui travaillent s'arrêtent d'abord. Les terminaux et les autres discussions restent ici."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "L’administrateur de votre espace de travail active la connexion par code d’appareil pour Codex."

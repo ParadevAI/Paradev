@@ -16,6 +16,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/RenameDialog";
 import type {
 	ChatPaneData,
 	PaneViewerData,
@@ -30,7 +31,6 @@ import {
 import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
 import { AccountUsageMenuSection } from "../AccountUsageMenuSection";
 import { ForkMenuItems } from "../ForkMenuItems";
-import { RenameDialog } from "../RenameDialog";
 import { StopHeaderEvents } from "../StopHeaderEvents";
 import { UsageWarningDot } from "../UsageWarningDot";
 import { ChatHistoryPicker } from "./components/ChatHistoryPicker";

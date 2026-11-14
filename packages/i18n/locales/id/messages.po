@@ -860,9 +860,6 @@ msgstr "{completed} dari {0} check selesai"
 msgid "{completed} of {total} completed"
 msgstr "{completed} dari {total} selesai"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
-
 msgid "{configTitle} font size"
 msgstr "Ukuran font {configTitle}"
 
@@ -1809,9 +1806,6 @@ msgstr "Instruksi automasi cloud maksimal {max} karakter"
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Workspace cloud tidak bisa memanggil {path}. Lakukan dari klien tempat kamu masuk."
 
-msgid "A computer"
-msgstr "Komputer"
-
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Penghapusan untuk {workspaceName} sedang berlangsung."
 
@@ -1856,6 +1850,9 @@ msgstr "Sebuah manifest dan beberapa file skill. Paradev menaruhnya di tempat se
 
 msgid "a message from {authorName}"
 msgstr "pesan dari {authorName}"
+
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Versi baru Paradev sudah tersedia. Muat ulang untuk melanjutkan."
 
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Versi baru Paradev diperlukan untuk melanjutkan. Silakan perbarui ke versi terbaru."
@@ -2078,8 +2075,8 @@ msgstr "Tambahkan {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Tambahkan {repositoryName} sebagai proyek di {computer} terlebih dahulu"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Tambahkan {repositoryName} sebagai proyek di komputer ini terlebih dahulu"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Tambahkan {repositoryName} sebagai proyek di perangkat ini terlebih dahulu"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Tambahkan #{prNumber} ke antrean merge?"
@@ -2137,6 +2134,9 @@ msgstr "Tambah lagi"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Hubungkan akun lain, atau putuskan yang tidak lagi kamu pakai."
+
+msgid "Add attachment"
+msgstr "Tambah lampiran"
 
 msgid "Add Attachment"
 msgstr "Tambah Lampiran"
@@ -2340,7 +2340,7 @@ msgstr "Ditambahkan ke input agen"
 msgid "Added to merge queue"
 msgstr "Ditambahkan ke antrean merge"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "Menambahkan orang ke {organizationName} memerlukan paket berbayar. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
 
@@ -2726,6 +2726,9 @@ msgstr "Izinkan akses lewat relay"
 msgid "Allow for session"
 msgstr "Izinkan untuk sesi ini"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Izinkan akses mikrofon di Pengaturan untuk menggunakan dikte."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Izinkan akses mikrofon untuk memakai dikte"
 
@@ -2890,9 +2893,6 @@ msgstr "Perakit Anonim"
 
 msgid "Another AI assistant"
 msgstr "Asisten AI lain"
-
-msgid "Another computer"
-msgstr "Komputer lain"
 
 msgid "another device"
 msgstr "perangkat lain"
@@ -4018,6 +4018,9 @@ msgstr "Kalender"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "Pemicu Calendar dan Gmail di organisasi ini akan berhenti berjalan sampai ada akun yang terhubung lagi."
+
+msgid "Camera"
+msgstr "Kamera"
 
 msgid "Camera access is not allowed"
 msgstr "Akses kamera tidak diizinkan"
@@ -5580,6 +5583,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Lanjutkan"
 
+msgid "Continue in browser"
+msgstr "Lanjutkan di browser"
+
 msgid "Continue in your browser"
 msgstr "Lanjutkan di browser Anda"
 
@@ -5996,6 +6002,9 @@ msgstr "Tidak bisa membuka tautan"
 msgid "Could not open Photos"
 msgstr "Tidak bisa membuka Photos"
 
+msgid "Could not open this file"
+msgstr "Tidak dapat membuka file ini"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6118,9 @@ msgstr "Tidak dapat memulai checkout. Coba lagi."
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "Tidak bisa memulai provisioning workspace cloud"
+
+msgid "Could not start dictation"
+msgstr "Tidak dapat memulai dikte"
 
 msgid "Could not start session"
 msgstr "Tidak bisa memulai sesi"
@@ -7414,11 +7426,20 @@ msgstr "Dikte"
 msgid "Dictation"
 msgstr "Dikte"
 
+msgid "Dictation is not available in this language."
+msgstr "Dikte tidak tersedia dalam bahasa ini."
+
 msgid "Dictation is not available on this device"
 msgstr "Dikte tidak tersedia di perangkat ini"
 
 msgid "Dictation is not available right now"
 msgstr "Dikte sedang tidak tersedia"
+
+msgid "Dictation needs a network connection."
+msgstr "Dikte memerlukan koneksi jaringan."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "Dikte berhenti. Yang sudah terdengar sejauh ini ada di pesan Anda."
 
 msgid "Didn't hear back"
 msgstr "Tidak ada respons"
@@ -9642,8 +9663,8 @@ msgstr "Dapatkan aplikasi iPhone dan iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Menyiapkan komputer"
+msgid "Getting the device ready"
+msgstr "Menyiapkan perangkat"
 
 msgid "Getting Work Done"
 msgstr "Menyelesaikan Pekerjaan"
@@ -10928,6 +10949,9 @@ msgstr "Plugin-pluginnya muncul setelah sinkronisasi selesai."
 msgid "Its replies go with it."
 msgstr "Balasannya ikut terhapus."
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di {computerName} dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
+
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Workspace dan terminalnya tidak tersedia sampai layanan ini dimulai ulang. Pakai menu tray Paradev > Host Service > Restart."
 
@@ -11883,7 +11907,7 @@ msgstr "Kelola kunci untuk akses server MCP dan integrasi eksternal seperti Clau
 msgid "Manage members"
 msgstr "Kelola anggota"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "Kelola di {0}"
 
@@ -12416,8 +12440,20 @@ msgstr "Pindahkan pekerjaan cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Pindahkan workspace ini ke {computerName}?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Pindahkan workspace ini ke cloud?"
+
+msgid "Move to"
+msgstr "Pindahkan ke"
+
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
+
+msgid "Move to cloud"
+msgstr "Pindahkan ke cloud"
 
 msgid "Move to group"
 msgstr "Pindahkan ke grup"
@@ -12926,6 +12962,9 @@ msgstr "Tidak ditemukan Chrome, Brave, Arc, atau browser Chromium lainnya."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Belum ada penggunaan Claude atau Codex di mesin ini. Gabung sekarang dan Anda akan muncul setelah memakai agen."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Tidak ada lingkungan cloud yang membuka {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Tidak ada workspace cloud"
 
@@ -13208,8 +13247,8 @@ msgstr "Tidak ada organisasi yang dipilih"
 msgid "No other chats here"
 msgstr "Tidak ada obrolan lain di sini"
 
-msgid "No other computer is set up for this account."
-msgstr "Tidak ada komputer lain yang disiapkan untuk akun ini."
+msgid "No other device is set up for this account."
+msgstr "Tidak ada perangkat lain yang disiapkan untuk akun ini."
 
 msgid "No pages match"
 msgstr "Tidak ada halaman yang cocok"
@@ -13765,6 +13804,9 @@ msgstr "Offline"
 
 msgid "Offline / local-first mode"
 msgstr "Mode offline / local-first"
+
+msgid "OK"
+msgstr "OK"
 
 msgid "Older"
 msgstr "Lebih lama"
@@ -15030,6 +15072,9 @@ msgstr "Tempel tautan"
 msgid "Paste an API key instead"
 msgstr "Tempel kunci API saja"
 
+msgid "Paste attachment"
+msgstr "Tempel lampiran"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "Tempel ini ke Paradev CLI:"
 
@@ -15171,6 +15216,9 @@ msgstr "Ponsel"
 msgid "Phone number"
 msgstr "Nomor telepon"
 
+msgid "Photos"
+msgstr "Foto"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Pilih {name} dari grid tema untuk menerapkannya."
 
@@ -15218,6 +15266,9 @@ msgstr "Pilih workspace"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "Pilih workspace yang agennya menunggu input Anda, sudah selesai sejak terakhir Anda melihatnya, atau masih berjalan"
+
+msgid "Pick an environment"
+msgstr "Pilih lingkungan"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pilih ikon dan warna, atau unggah gambar kustom. Bawaannya memakai avatar pemilik GitHub yang ditautkan."
@@ -15920,6 +15971,9 @@ msgstr "Pertanyaan"
 
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Pertanyaan, masukan, dukungan, atau apa pun. Kirim pesan dan kami akan meneruskannya ke orang yang tepat."
+
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Antrekan pesan · {SEND_NOW_KEYS} untuk mengirim sekarang"
 
 msgid "Queue message"
 msgstr "Antrekan pesan"
@@ -18486,6 +18540,10 @@ msgstr "Pintasan sudah dipakai"
 msgid "Show"
 msgstr "Tampilkan"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Tampilkan {0} lagi"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Tampilkan dialog konfirmasi saat keluar dari aplikasi"
 
@@ -20149,8 +20207,11 @@ msgstr "Akun itu sudah tidak terhubung — pilih yang lain."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Sesi agen itu belum punya percakapan untuk dibuka. Sudah dimulai tetapi belum pernah diberi perintah."
 
-msgid "That computer can't be reached"
-msgstr "Komputer itu tidak dapat dijangkau"
+msgid "that device"
+msgstr "perangkat itu"
+
+msgid "That device can't be reached"
+msgstr "Perangkat itu tidak dapat dijangkau"
 
 msgid "That endpoint could not be resolved."
 msgstr "Endpoint itu tidak dapat ditemukan."
@@ -20448,8 +20509,14 @@ msgstr "Waktu pemindahan habis."
 msgid "The move was cancelled."
 msgstr "Pemindahan dibatalkan."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Workspace yang dipindahkan akan muncul di Beranda saat siap."
+
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
+
+msgid "The name shows in the sidebar."
+msgstr "Nama ini ditampilkan di bilah samping."
 
 msgid "The network connection changed"
 msgstr "Koneksi jaringan berubah"
@@ -20460,8 +20527,8 @@ msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun.
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host komputer, lalu coba lagi."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host perangkat, lalu coba lagi."
 
 msgid "The overnight shift"
 msgstr "Shift malam"
@@ -20761,15 +20828,6 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
 
-msgid "this computer"
-msgstr "komputer ini"
-
-msgid "This computer"
-msgstr "Komputer ini"
-
-msgid "This computer's host is not running"
-msgstr "Host komputer ini tidak berjalan"
-
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
 
@@ -20790,6 +20848,9 @@ msgstr "perangkat ini ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Perangkat ini tidak terhubung ke relay Paradev, jadi run otomatisasi akan dilewati."
+
+msgid "This device's host is not running"
+msgstr "Host perangkat ini tidak berjalan"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."
@@ -21133,6 +21194,9 @@ msgstr "Host workspace ini sedang offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Host workspace ini menjalankan layanan host yang lebih lama dari yang didukung aplikasi ini. Perbarui untuk tersambung kembali; workspace dan berkasnya tidak tersentuh."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Proyek workspace ini tidak ada di GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Upaya penalaran menyeluruh"
@@ -21889,6 +21953,15 @@ msgstr "Perbarui instruksi penamaan"
 msgid "Update naming instructions for {0}"
 msgstr "Perbarui instruksi penamaan untuk {0}"
 
+msgid "Update on Google Play"
+msgstr "Perbarui di Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Perbarui Paradev dari Google Play untuk melanjutkan."
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Perbarui Paradev di {sourceName} untuk memindahkan workspace-nya dari ponsel ini."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Perbarui Paradev di perangkat tersebut. Pembaruan dari aplikasi memerlukan instalasi mandiri yang didukung dan versi aplikasi yang telah dirilis."
 
@@ -21955,7 +22028,7 @@ msgstr "Upgrade"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "Upgrade di {0}"
 
@@ -22243,9 +22316,6 @@ msgstr "Lihat semua"
 msgid "View All"
 msgstr "Lihat Semua"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Lihat semua (+{moreCount} lainnya)"
-
 msgid "View all members of this channel"
 msgstr "Lihat semua anggota saluran ini"
 
@@ -22382,6 +22452,9 @@ msgstr "Menunggu pesan pertama dari subagen…"
 
 msgid "Waiting for your input"
 msgstr "Menunggu masukan Anda"
+
+msgid "Waiting on background work"
+msgstr "Menunggu pekerjaan latar belakang"
 
 msgid "Waking up workspace"
 msgstr "Membangunkan workspace"
@@ -23131,7 +23204,7 @@ msgstr "Anda dapat melihat halaman ini tetapi tidak dapat mengubahnya"
 msgid "You can view this page but not comment on it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "Anda tidak bisa mengubah langganan ini di aplikasi. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
 
@@ -23392,6 +23465,9 @@ msgstr "Proyek dan workspace v1 Anda sedang dipindahkan ke Paradev yang baru. Se
 
 msgid "Your version: {currentVersion}"
 msgstr "Versi Anda: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di sini."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Admin workspace Anda mengaktifkan masuk dengan kode perangkat untuk Codex."

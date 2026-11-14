@@ -46,6 +46,7 @@ export function CloudWorkspaceRowMenu({
 					params: { id: row.id },
 				})
 			}
+			link={{ href: `/workspace/${row.id}`, onCopied }}
 		>
 			{children}
 		</WorkspaceRowMenu>

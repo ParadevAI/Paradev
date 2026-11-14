@@ -1,14 +1,15 @@
 import { Trans } from "@lingui/react/macro";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { LuContainer, LuRefreshCw, LuSettings } from "react-icons/lu";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { MOVE_MENU_PRIMITIVES, type MoveMenuKind } from "../../constants";
+import type { MenuParts } from "renderer/lib/menuParts";
 
 interface MoveToCloudItemsProps {
-	menu: MoveMenuKind;
+	parts: MenuParts;
 	projectId: string | null;
 	onSelectEnvironment: (environment: {
 		id: string;
@@ -18,11 +19,12 @@ interface MoveToCloudItemsProps {
 
 /** Only environments that open the workspace's repository: a move refuses any other. */
 export function MoveToCloudItems({
-	menu,
+	parts,
 	projectId,
 	onSelectEnvironment,
 }: MoveToCloudItemsProps) {
-	const { Item, Separator, iconClassName } = MOVE_MENU_PRIMITIVES[menu];
+	const { Item, Separator } = parts;
+	const iconClassName = cn("size-4", parts.iconClassName);
 	const navigate = useNavigate();
 	const organizationId = useActiveOrganizationId();
 	const { projects } = useHostProjects();

@@ -12,6 +12,7 @@ import {
 	beginWorkspaceMove,
 } from "../chat-move/utils/createWorkspaceMove";
 import { moverOf } from "../chat-move/utils/moverOf";
+import { failChatMove } from "../chat-move/utils/runChatMove";
 import { startChatMove } from "../chat-move/utils/startChatMove";
 import {
 	abandonWorkspaceMoveInputSchema,
@@ -47,8 +48,24 @@ export const workspaceMoveRouter = {
 			});
 			const started = [];
 			for (const move of moves) {
-				const { moveId } = await startChatMove(move);
-				started.push({ moveId, chatSessionId: move.sessionId });
+				const outcome = await startChatMove(move).catch(
+					async (error: unknown) => {
+						await failChatMove(move, error).catch((failError: unknown) =>
+							console.error(
+								`[workspace-move] could not fail move ${move.id}`,
+								failError,
+							),
+						);
+						skipped.push({ chatSessionId: move.sessionId, reason: "failed" });
+						return null;
+					},
+				);
+				if (outcome) {
+					started.push({
+						moveId: outcome.moveId,
+						chatSessionId: move.sessionId,
+					});
+				}
 			}
 			if (moves.length === 0 && !(await isProvisioning(input.toWorkspaceId))) {
 				await callMoves(mover.organizationId, {
@@ -63,13 +80,16 @@ export const workspaceMoveRouter = {
 			};
 		}),
 
-	/** Ends a begun move whose work could not be pushed or whose destination could not be made. */
+	/** Ends a begun move whose work could not be pushed or whose destination could not be made; its chats still moving fail. */
 	abandon: personProcedure
 		.input(abandonWorkspaceMoveInputSchema)
 		.mutation(async ({ ctx, input }) => {
 			const mover = await moverOf(ctx);
-			await abandonWorkspaceMove({ ...input, ...mover });
-			return { workspaceMoveId: input.workspaceMoveId };
+			const { movedChatSessionIds } = await abandonWorkspaceMove({
+				...input,
+				...mover,
+			});
+			return { workspaceMoveId: input.workspaceMoveId, movedChatSessionIds };
 		}),
 
 	/**

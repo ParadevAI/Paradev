@@ -118,7 +118,7 @@ export function useStartWorkspaceMove(workspace: MovableWorkspace) {
 			let stopNextTime = false;
 			const progress = startWorkspaceMoveProgress({
 				name: workspace.name,
-				destination: destination.name ?? t({ message: "this computer" }),
+				destination: destination.name ?? t({ message: "this device" }),
 				toCloud: false,
 				sourceWorkspaceId: workspace.id,
 				retry: () => start(stopNextTime),

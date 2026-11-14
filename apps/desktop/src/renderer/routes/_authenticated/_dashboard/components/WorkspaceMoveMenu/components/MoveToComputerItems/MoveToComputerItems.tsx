@@ -1,13 +1,16 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { listMoveDestinationComputers } from "@superset/shared/move-book";
+import { cn } from "@superset/ui/utils";
 import { useMemo } from "react";
-import { LuLaptop } from "react-icons/lu";
+import { HiOutlineComputerDesktop, HiOutlineServer } from "react-icons/hi2";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import type { MenuParts } from "renderer/lib/menuParts";
+import { OnlineDot } from "renderer/routes/_authenticated/components/OnlineDot";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { MOVE_MENU_PRIMITIVES, type MoveMenuKind } from "../../constants";
 
 interface MoveToComputerItemsProps {
-	menu: MoveMenuKind;
+	parts: MenuParts;
 	/** The computer the workspace is on now, which is never a destination. */
 	hostId: string;
 	onSelectComputer: (destination: {
@@ -17,37 +20,31 @@ interface MoveToComputerItemsProps {
 }
 
 export function MoveToComputerItems({
-	menu,
+	parts,
 	hostId,
 	onSelectComputer,
 }: MoveToComputerItemsProps) {
-	const { Item, iconClassName } = MOVE_MENU_PRIMITIVES[menu];
+	const { Item } = parts;
+	const iconClassName = cn("size-4", parts.iconClassName);
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
 	const { hosts, settled } = useKnownHosts();
 	const { workspaces: cloudWorkspaces = [], isLoading: cloudLoading } =
 		useCloudWorkspaces();
 
-	const computers = useMemo(() => {
-		const others = hosts
-			.filter(
-				(host) =>
-					host.machineId !== hostId &&
-					host.machineId !== machineId &&
-					!cloudWorkspaces.some((row) => row.id === host.machineId),
-			)
-			.map((host) => ({
-				hostId: host.machineId,
-				name: host.name as string | null,
-				online: host.isOnline,
-			}))
-			.sort((a, b) => Number(b.online) - Number(a.online));
-		const thisComputer =
-			machineId && machineId !== hostId
-				? [{ hostId: machineId, name: null, online: true }]
-				: [];
-		return [...thisComputer, ...others];
-	}, [hosts, hostId, cloudWorkspaces, machineId]);
+	const computers = useMemo(
+		() =>
+			listMoveDestinationComputers({
+				hosts,
+				fromHostId: hostId,
+				thisHostId: machineId ?? null,
+				cloudHostIds: new Set(cloudWorkspaces.map((row) => row.id)),
+			}).map((computer) => ({
+				...computer,
+				name: computer.isThisComputer ? null : computer.name,
+			})),
+		[hosts, hostId, cloudWorkspaces, machineId],
+	);
 
 	if (!settled || cloudLoading) {
 		return (
@@ -59,34 +56,34 @@ export function MoveToComputerItems({
 	if (computers.length === 0) {
 		return (
 			<Item disabled>
-				<Trans>No other computer is set up for this account.</Trans>
+				<Trans>No other device is set up for this account.</Trans>
 			</Item>
 		);
 	}
 	return (
 		<>
-			{computers.map((computer) => {
-				const computerName = computer.name ?? t({ message: "This computer" });
-				return (
-					<Item
-						key={computer.hostId}
-						disabled={!computer.online}
-						onSelect={() =>
-							onSelectComputer({
-								hostId: computer.hostId,
-								name: computer.name,
-							})
-						}
-					>
-						<LuLaptop className={iconClassName} />
-						<span className="truncate">
-							{computer.online
-								? computerName
-								: t({ message: `${computerName} (offline)` })}
-						</span>
-					</Item>
-				);
-			})}
+			{computers.map((computer) => (
+				<Item
+					key={computer.hostId}
+					disabled={!computer.online}
+					onSelect={() =>
+						onSelectComputer({
+							hostId: computer.hostId,
+							name: computer.name,
+						})
+					}
+				>
+					{computer.name === null ? (
+						<HiOutlineComputerDesktop className={iconClassName} />
+					) : (
+						<HiOutlineServer className={iconClassName} />
+					)}
+					<span className="min-w-0 flex-1 truncate">
+						{computer.name ?? t({ message: "This device" })}
+					</span>
+					<OnlineDot online={computer.online} />
+				</Item>
+			))}
 		</>
 	);
 }

@@ -860,9 +860,6 @@ msgstr "{0}項檢查中已完成{completed}項"
 msgid "{completed} of {total} completed"
 msgstr "已完成 {completed}/{total} 項"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName}（離線）"
-
 msgid "{configTitle} font size"
 msgstr "{configTitle}字型大小"
 
@@ -1809,9 +1806,6 @@ msgstr "雲端自動化的指示最多 {max} 個字元"
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "雲端工作區無法呼叫 {path}。請在你已登入的用戶端中執行。"
 
-msgid "A computer"
-msgstr "一台電腦"
-
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}已經在刪除中。"
 
@@ -1856,6 +1850,9 @@ msgstr "一個資訊清單檔加幾個技能檔案。Paradev 會把它放到每�
 
 msgid "a message from {authorName}"
 msgstr "來自 {authorName} 的訊息"
+
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "Paradev 已有新版本。請重新載入以繼續。"
 
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "需要新版本的Paradev才能繼續。請更新到最新版本。"
@@ -2078,8 +2075,8 @@ msgstr "要新增「{localizedName}」嗎？"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "請先在 {computer} 上將 {repositoryName} 新增為專案"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "請先將 {repositoryName} 新增為此電腦上的專案"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "請先將 {repositoryName} 新增為本裝置上的專案"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "將 #{prNumber} 加入合併佇列?"
@@ -2137,6 +2134,9 @@ msgstr "再新增一個"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "連接其他帳號，或中斷不再使用的帳號。"
+
+msgid "Add attachment"
+msgstr "新增附件"
 
 msgid "Add Attachment"
 msgstr "新增附件"
@@ -2340,7 +2340,7 @@ msgstr "已加入代理程式輸入框"
 msgid "Added to merge queue"
 msgstr "已加入合併佇列"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
 msgstr "將成員加入 {organizationName} 需要付費方案。你組織的方案由其擁有者在 {0} 管理。"
 
@@ -2726,6 +2726,9 @@ msgstr "允許通過中繼存取"
 msgid "Allow for session"
 msgstr "本次會話內允許"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "請在「設定」中允許存取麥克風以使用聽寫。"
+
 msgid "Allow microphone access to use dictation"
 msgstr "請允許麥克風存取以使用語音輸入"
 
@@ -2890,9 +2893,6 @@ msgstr "匿名組裝工"
 
 msgid "Another AI assistant"
 msgstr "其他 AI 助理"
-
-msgid "Another computer"
-msgstr "另一台電腦"
 
 msgid "another device"
 msgstr "另一臺裝置"
@@ -4018,6 +4018,9 @@ msgstr "日曆"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "在重新連線帳戶之前，此組織中的日曆和Gmail觸發器將停止觸發。"
+
+msgid "Camera"
+msgstr "相機"
 
 msgid "Camera access is not allowed"
 msgstr "相機存取未獲允許"
@@ -5580,6 +5583,9 @@ msgctxt "automation session mode"
 msgid "Continue"
 msgstr "繼續"
 
+msgid "Continue in browser"
+msgstr "在瀏覽器中繼續"
+
 msgid "Continue in your browser"
 msgstr "請在瀏覽器中繼續"
 
@@ -5996,6 +6002,9 @@ msgstr "無法開啟連結"
 msgid "Could not open Photos"
 msgstr "無法開啟「照片」"
 
+msgid "Could not open this file"
+msgstr "無法開啟此檔案"
+
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
 #. placeholder {2}: params?.remote
@@ -6109,6 +6118,9 @@ msgstr "無法開始結帳，請再試一次。"
 
 msgid "Could not start cloud workspace provisioning"
 msgstr "無法開始配置雲端工作區"
+
+msgid "Could not start dictation"
+msgstr "無法啟動聽寫"
 
 msgid "Could not start session"
 msgstr "無法啟動會話"
@@ -7414,11 +7426,20 @@ msgstr "語音輸入"
 msgid "Dictation"
 msgstr "語音輸入"
 
+msgid "Dictation is not available in this language."
+msgstr "此語言不支援聽寫。"
+
 msgid "Dictation is not available on this device"
 msgstr "此裝置不支援語音輸入"
 
 msgid "Dictation is not available right now"
 msgstr "語音輸入暫時無法使用"
+
+msgid "Dictation needs a network connection."
+msgstr "聽寫需要網路連線。"
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "聽寫已停止。目前聽到的內容已在訊息中。"
 
 msgid "Didn't hear back"
 msgstr "未收到回應"
@@ -9642,8 +9663,8 @@ msgstr "取得 iPhone 和 iPad 應用程式"
 msgid "Gets an invite to join {organizationName}"
 msgstr "將收到加入 {organizationName} 的邀請"
 
-msgid "Getting the computer ready"
-msgstr "正在準備電腦"
+msgid "Getting the device ready"
+msgstr "正在準備裝置"
 
 msgid "Getting Work Done"
 msgstr "工作常用"
@@ -10928,6 +10949,9 @@ msgstr "同步完成後，其外掛會顯示出來。"
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
 
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "它的工作（包括未提交的變更）會推送到一個新分支。{computerName} 上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
+
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "在它重啟之前，其工作區和終端都不可用，請使用Paradev托盤選單 > 主機服務 > 重啟。"
 
@@ -11883,7 +11907,7 @@ msgstr "管理用於MCP伺服器存取以及Claude Desktop、Claude Code等外�
 msgid "Manage members"
 msgstr "管理成員"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Manage on {0}"
 msgstr "在{0}管理"
 
@@ -12416,8 +12440,20 @@ msgstr "遷移雲端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主要分頁與右側邊欄之間移動焦點，若側邊欄已關閉則將其開啟"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "要將此工作區移至 {computerName} 嗎？"
+
+msgid "Move this workspace to the cloud?"
+msgstr "要將此工作區移至雲端嗎？"
+
+msgid "Move to"
+msgstr "移至"
+
 msgid "Move to background"
 msgstr "移到背景"
+
+msgid "Move to cloud"
+msgstr "移至雲端"
 
 msgid "Move to group"
 msgstr "移動到群組"
@@ -12926,6 +12962,9 @@ msgstr "未找到Chrome、Brave、Arc或其他Chromium瀏覽器。"
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "這臺機器上還沒有發現Claude或Codex的用量。現在加入，用過代理程式後你就會出現在榜單上。"
 
+msgid "No cloud environment opens {repository}."
+msgstr "沒有雲端環境開啟 {repository}。"
+
 msgid "No cloud workspaces"
 msgstr "沒有雲端工作區"
 
@@ -13208,8 +13247,8 @@ msgstr "未選擇組織"
 msgid "No other chats here"
 msgstr "這裡沒有其他聊天"
 
-msgid "No other computer is set up for this account."
-msgstr "此帳戶沒有設定其他電腦。"
+msgid "No other device is set up for this account."
+msgstr "此帳戶沒有設定其他裝置。"
 
 msgid "No pages match"
 msgstr "沒有匹配的頁面"
@@ -13765,6 +13804,9 @@ msgstr "離線"
 
 msgid "Offline / local-first mode"
 msgstr "離線/本地優先模式"
+
+msgid "OK"
+msgstr "確定"
 
 msgid "Older"
 msgstr "更早"
@@ -15030,6 +15072,9 @@ msgstr "貼上連結"
 msgid "Paste an API key instead"
 msgstr "改為貼上 API 金鑰"
 
+msgid "Paste attachment"
+msgstr "貼上附件"
+
 msgid "Paste this into Paradev CLI:"
 msgstr "把它貼上到Paradev CLI："
 
@@ -15171,6 +15216,9 @@ msgstr "手機"
 msgid "Phone number"
 msgstr "電話號碼"
 
+msgid "Photos"
+msgstr "照片"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "在主題網格中選擇{name}即可應用。"
 
@@ -15218,6 +15266,9 @@ msgstr "選擇一個工作區"
 
 msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
 msgstr "選擇一個工作區：其代理正在等待你的輸入、自你上次查看後已完成，或仍在執行"
+
+msgid "Pick an environment"
+msgstr "選擇環境"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "選擇圖示和顏色，或上傳自訂圖片。預設使用關聯的GitHub擁有者頭像。"
@@ -15920,6 +15971,9 @@ msgstr "常見問題"
 
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "問題、回饋、支援，或者別的什麼都行。寫給我們，我們會轉給合適的人。"
+
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "將訊息加入佇列 · {SEND_NOW_KEYS} 立即傳送"
 
 msgid "Queue message"
 msgstr "將訊息加入佇列"
@@ -18486,6 +18540,10 @@ msgstr "快速鍵已被使用"
 msgid "Show"
 msgstr "顯示"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "再顯示 {0} 個"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "退出應用時顯示確認對話方塊"
 
@@ -20149,8 +20207,11 @@ msgstr "該帳號已中斷連線，請選擇其他帳號。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "該代理工作階段還沒有可開啟的對話。它已啟動但從未收到指令。"
 
-msgid "That computer can't be reached"
-msgstr "無法連線到那台電腦"
+msgid "that device"
+msgstr "那台裝置"
+
+msgid "That device can't be reached"
+msgstr "無法連線到那台裝置"
 
 msgid "That endpoint could not be resolved."
 msgstr "無法解析該端點。"
@@ -20448,8 +20509,14 @@ msgstr "移動逾時。"
 msgid "The move was cancelled."
 msgstr "移動已取消。"
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "移動後的工作區準備好後會顯示在首頁。"
+
 msgid "The name of your organization or team"
 msgstr "你的組織或團隊的名稱"
+
+msgid "The name shows in the sidebar."
+msgstr "此名稱會顯示在側邊欄中。"
 
 msgid "The network connection changed"
 msgstr "網路連線已變更"
@@ -20460,8 +20527,8 @@ msgstr "開源工作區，容納Claude Code、Codex和任何編碼代理程式�
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何程式碼代理。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "移動的另一端執行的是舊版本。請重新啟動雲端工作區或更新電腦的主機，然後再試一次。"
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "移動的另一端執行的是舊版本。請重新啟動雲端工作區或更新裝置的主機，然後再試一次。"
 
 msgid "The overnight shift"
 msgstr "夜班"
@@ -20761,15 +20828,6 @@ msgstr "無法啟動此雲端工作區"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
 
-msgid "this computer"
-msgstr "此電腦"
-
-msgid "This computer"
-msgstr "此電腦"
-
-msgid "This computer's host is not running"
-msgstr "此電腦的主機服務未執行"
-
 msgid "This conversation is too long for the model"
 msgstr "此對話對模型來說太長了"
 
@@ -20790,6 +20848,9 @@ msgstr "此裝置（{id}）"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "此裝置沒有連線到Paradev中繼，自動化的執行會被跳過。"
+
+msgid "This device's host is not running"
+msgstr "本裝置的主機服務未執行"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
@@ -21133,6 +21194,9 @@ msgstr "此工作區的主機已離線"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "此工作區的主機執行的主機服務版本低於此應用程式支援的版本。更新後即可重新連線；工作區及其檔案不受影響。"
+
+msgid "This workspace's project is not on GitHub."
+msgstr "此工作區的專案不在 GitHub 上。"
 
 msgid "Thorough reasoning effort"
 msgstr "深入的推理投入"
@@ -21889,6 +21953,15 @@ msgstr "更新命名規則"
 msgid "Update naming instructions for {0}"
 msgstr "更新{0}的命名規則"
 
+msgid "Update on Google Play"
+msgstr "在 Google Play 中更新"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "請從 Google Play 更新 Paradev 以繼續。"
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "請在 {sourceName} 上更新 Paradev，才能從這支手機移動它的工作區。"
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "請在該裝置上更新 Paradev。應用程式內更新需要受支援的獨立安裝和已發佈的應用程式版本。"
 
@@ -21955,7 +22028,7 @@ msgstr "升級"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "升級一個相依性，並修好被它弄壞的地方…"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "Upgrade on {0}"
 msgstr "在 {0} 升級"
 
@@ -22243,9 +22316,6 @@ msgstr "檢視全部"
 msgid "View All"
 msgstr "檢視全部"
 
-msgid "View all (+{moreCount} more)"
-msgstr "查看全部（另有 {moreCount} 項）"
-
 msgid "View all members of this channel"
 msgstr "查看此頻道的所有成員"
 
@@ -22382,6 +22452,9 @@ msgstr "正在等待子代理程式的第一則訊息…"
 
 msgid "Waiting for your input"
 msgstr "等待你的輸入"
+
+msgid "Waiting on background work"
+msgstr "正在等待背景工作"
 
 msgid "Waking up workspace"
 msgstr "正在喚醒工作區"
@@ -23131,7 +23204,7 @@ msgstr "你可以檢視此頁面，但不能變更"
 msgid "You can view this page but not comment on it"
 msgstr "你可以檢視此頁面，但不能評論"
 
-#. placeholder {0}: COMPANY.DOMAIN
+#. placeholder {0}: webHost()
 msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
 msgstr "無法在應用程式內變更此訂閱。你所在組織的方案由擁有者在{0}管理。"
 
@@ -23392,6 +23465,9 @@ msgstr "你的 v1 專案和工作區正在移轉到新版 Paradev。每一項準
 
 msgid "Your version: {currentVersion}"
 msgstr "你的版本：{currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "你的工作（包括未提交的變更）會推送到遠端的一個新分支。雲端工作區會在你選擇的環境中從該分支啟動，每個 Claude 聊天都將在那裡繼續。正在工作的代理程式會先停止。終端和其他聊天會留在這裡。"
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Codex 的裝置碼登入由你的工作區管理員開啟。"

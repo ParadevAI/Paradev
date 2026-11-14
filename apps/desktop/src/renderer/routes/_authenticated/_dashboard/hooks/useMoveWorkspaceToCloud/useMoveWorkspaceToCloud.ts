@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
@@ -17,7 +18,6 @@ import {
 	mergeHandoffs,
 	skippedTerminalNames,
 } from "../../utils/handOffTerminals";
-import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
@@ -69,8 +69,8 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			if (!sourceUrl) {
 				throw new Error(
 					workspace.hostId === machineId
-						? t`This computer's host is not running`
-						: t`That computer can't be reached`,
+						? t`This device's host is not running`
+						: t`That device can't be reached`,
 				);
 			}
 			const assertEnvironmentOpens = (repository: string) => {
@@ -116,7 +116,10 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 						(terminal) => terminal.terminalId,
 					);
 					if (moveSignal.aborted) {
-						await releaseSourceTerminals(
+						// The move can end while prepare runs, after the catch below released nothing.
+						await releaseSourceChats(source, leaving.chats);
+						leaving.chats = [];
+						leaving.terminals = await releaseSourceTerminals(
 							source,
 							workspace.id,
 							leaving.terminals,
@@ -138,8 +141,17 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					return { prepared, created };
 				},
 			}).catch(async (error: unknown) => {
-				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
-				await releaseSourceChats(source, leaving.chats);
+				const moved = new Set(
+					(await abandonWorkspaceMove(
+						workspaceMoveId,
+						error,
+						signal?.aborted,
+					)) ?? [],
+				);
+				await releaseSourceChats(
+					source,
+					leaving.chats.filter((id) => !moved.has(id)),
+				);
 				await releaseSourceTerminals(source, workspace.id, leaving.terminals);
 				throw error;
 			});

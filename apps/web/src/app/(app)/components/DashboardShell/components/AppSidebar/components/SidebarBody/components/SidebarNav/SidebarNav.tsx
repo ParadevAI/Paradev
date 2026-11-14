@@ -19,8 +19,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			{NAV_ITEMS.map((item) => {
 				const isActive = isNavItemActive(pathname, item.href);
 				const Icon = item.icon;
+				const NavLink = item.reloadDocument ? "a" : Link;
 				return (
-					<Link
+					<NavLink
 						key={item.href}
 						href={item.href}
 						aria-current={isActive ? "page" : undefined}
@@ -39,7 +40,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						<span className="flex-1 truncate text-left">
 							{i18n._(item.label)}
 						</span>
-					</Link>
+					</NavLink>
 				);
 			})}
 		</nav>

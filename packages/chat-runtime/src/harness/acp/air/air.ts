@@ -7,7 +7,14 @@ import { z } from "zod";
  */
 export const AIR_CLIENT_META = {
 	jetbrains: {
-		air: { version: 1, capabilities: ["asyncTasks", "nativeSubagentSessions"] },
+		air: {
+			version: 1,
+			capabilities: [
+				"asyncTasks",
+				"nativeSubagentSessions",
+				"backgroundSubagents",
+			],
+		},
 	},
 };
 
@@ -23,7 +30,11 @@ export const airAsyncTaskSpawnedSchema = z.looseObject({
 	name: z.string().nullable().optional(),
 	description: z.string().nullable().optional(),
 	canStop: z.boolean().nullable().optional(),
+	taskType: z.string().nullable().optional(),
 });
+
+/** An async task of this type is a turn the agent started on its own, without a prompt. */
+export const AIR_AUTONOMOUS_TURN_TASK_TYPE = "turn";
 
 export const airAsyncTaskProgressSchema = z.looseObject({
 	asyncTaskId: z.string().min(1),

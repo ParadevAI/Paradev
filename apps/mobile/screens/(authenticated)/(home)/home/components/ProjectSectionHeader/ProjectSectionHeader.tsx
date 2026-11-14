@@ -46,7 +46,7 @@ export function ProjectSectionHeader({
 				onPress={onToggle}
 				accessibilityLabel={`${name}, ${count} ${count === 1 ? "workspace" : "workspaces"}`}
 				accessibilityState={{ expanded: !collapsed }}
-				className="flex-1 flex-row items-center gap-2.5 active:opacity-60"
+				className="web:hover:opacity-80 flex-1 flex-row items-center gap-2.5 active:opacity-60"
 			>
 				{/* Two icons rather than one rotated: a transform on the icon itself
 				    doesn't reach the underlying SVG, so it renders nothing. */}
