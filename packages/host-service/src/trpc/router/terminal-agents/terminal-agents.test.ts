@@ -162,6 +162,7 @@ describe("resumeTerminalAgentSession", () => {
 				agent: CLAUDE_CONFIG_ID,
 				prompt: "",
 				resumeSessionId: "sess-t1",
+				resumeAgentId: "claude",
 			},
 		]);
 		expect(disposedTerminals).toEqual(["t1"]);

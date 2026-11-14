@@ -60,6 +60,7 @@ export interface ResumeSessionDeps {
 		agent: string;
 		prompt: string;
 		resumeSessionId?: string;
+		resumeAgentId?: TerminalAgentId;
 	}) => Promise<AgentRunResult>;
 	disposeSession: (
 		terminalId: string,
@@ -155,7 +156,12 @@ export async function resumeTerminalAgentSession(
 				workspaceId,
 				agent: config.id,
 				prompt: "",
-				...(resumable ? { resumeSessionId: claimed.agentSessionId } : {}),
+				...(resumable
+					? {
+							resumeSessionId: claimed.agentSessionId,
+							resumeAgentId: claimed.agentId,
+						}
+					: {}),
 			});
 		} catch (error) {
 			unclaimResumeCandidateBinding(deps.db, terminalId);

@@ -339,7 +339,7 @@ describe("getNotifyScriptContent", () => {
 			"HOOK_SESSION_ID=$(json_field session_id sessionId conversationId)",
 		);
 		expect(script).toContain(
-			'dispatch_to_host "{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$AGENT_ID")\\",\\"sessionId\\":\\"$(json_escape "$SESSION_ID")\\"}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"',
+			'dispatch_to_host "{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$AGENT_ID")\\",\\"sessionId\\":\\"$(json_escape "$SESSION_ID")\\"$DEFINITION_FIELD}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"',
 		);
 		// One dispatcher serves both the agent and subagent payloads.
 		expect(script.split('dispatch_to_host "').length - 1).toBe(2);
@@ -897,6 +897,26 @@ it.each([
 		expect(host.requests[0]?.json.preview).toBe(
 			"The provider rejected the request.",
 		);
+	} finally {
+		host.stop();
+	}
+});
+
+it("reports the agent config its launch stamped", async () => {
+	const host = fakeHostService(false);
+	try {
+		await runNotifyHookAsync(
+			{ hook_event_name: "SessionStart" },
+			{
+				SUPERSET_AGENT_ID: "claude",
+				SUPERSET_AGENT_DEFINITION_ID: "00000000-0000-0000-0000-0000000000aa",
+				SUPERSET_HOST_AGENT_HOOK_URL: host.url,
+			},
+		);
+		expect(host.requests[0]?.json.agent).toMatchObject({
+			agentId: "claude",
+			definitionId: "00000000-0000-0000-0000-0000000000aa",
+		});
 	} finally {
 		host.stop();
 	}

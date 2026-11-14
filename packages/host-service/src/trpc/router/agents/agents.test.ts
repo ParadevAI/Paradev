@@ -10,15 +10,21 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
-import { TerminalAgentStore } from "../../../terminal-agents";
+import {
+	SqliteTerminalAgentBindingPersistence,
+	TerminalAgentStore,
+} from "../../../terminal-agents";
+import type { HostAgentConfigId } from "../../../terminal-agents/types";
 import { importCloudAttachments } from "../attachments/attachments";
 import {
 	type AttachmentMetadata,
 	readAttachmentMetadata,
 	writeAttachment,
 } from "../attachments/storage";
+import { resumeTerminalAgentSession } from "../terminal-agents/terminal-agents";
 import { setDefaultAccountSelection } from "../usage/default-account";
 import {
+	type AgentRunInput,
 	bindResumedSession,
 	buildAgentCommandString,
 	buildTerminalAgentLaunch,
@@ -34,7 +40,7 @@ import {
 } from "./agents";
 
 const argvConfig = {
-	id: "00000000-0000-0000-0000-000000000001",
+	id: "00000000-0000-0000-0000-000000000001" as HostAgentConfigId,
 	presetId: "claude",
 	label: "Claude",
 	command: "claude",
@@ -47,7 +53,7 @@ const argvConfig = {
 };
 
 const stdinConfig = {
-	id: "00000000-0000-0000-0000-000000000002",
+	id: "00000000-0000-0000-0000-000000000002" as HostAgentConfigId,
 	presetId: "amp",
 	label: "Amp",
 	command: "amp",
@@ -317,7 +323,7 @@ describe("buildTerminalAgentLaunch", () => {
 		});
 		expect(launch.label).toBe("Claude");
 		expect(launch.fullCommand).toBe(
-			"FOO='bar' claude --dangerously-skip-permissions 'do the thing'",
+			"FOO='bar' SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000a' claude --dangerously-skip-permissions 'do the thing'",
 		);
 	});
 
@@ -331,7 +337,7 @@ describe("buildTerminalAgentLaunch", () => {
 			resumeSessionId: "abc-123",
 		});
 		expect(launch.fullCommand).toBe(
-			"FOO='bar' claude --dangerously-skip-permissions --resume abc-123",
+			"FOO='bar' SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000a' claude --dangerously-skip-permissions --resume abc-123",
 		);
 	});
 
@@ -510,7 +516,7 @@ describe("buildTerminalAgentLaunch", () => {
 		});
 
 		expect(launch.fullCommand).toBe(
-			"omp --model @plan --thinking high --plan-yolo 'do the thing'",
+			"SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000c' omp --model @plan --thinking high --plan-yolo 'do the thing'",
 		);
 	});
 
@@ -605,7 +611,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			prompt: "hi",
 		});
 		expect(launch.fullCommand).toBe(
-			`CLAUDE_CONFIG_DIR='${existingDir}' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' claude hi`,
+			`CLAUDE_CONFIG_DIR='${existingDir}' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000c' claude hi`,
 		);
 	});
 
@@ -622,7 +628,7 @@ describe("buildTerminalAgentLaunch default account env", () => {
 		// twin still carries the host default so the wrapper can re-resolve a
 		// later account switch without overriding the user-pinned value.
 		expect(launch.fullCommand).toBe(
-			`CLAUDE_CONFIG_DIR='/pinned/profile' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' claude hi`,
+			`CLAUDE_CONFIG_DIR='/pinned/profile' SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR='${existingDir}' SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000c' claude hi`,
 		);
 	});
 
@@ -635,7 +641,9 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			agent: "claude",
 			prompt: "hi",
 		});
-		expect(launch.fullCommand).toBe("claude hi");
+		expect(launch.fullCommand).toBe(
+			"SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000c' claude hi",
+		);
 	});
 
 	it("does not leak provider account env into other presets", () => {
@@ -660,7 +668,9 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			agent: "amp",
 			prompt: "hi",
 		});
-		expect(launch.fullCommand).toBe("amp hi");
+		expect(launch.fullCommand).toBe(
+			"SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000d' amp hi",
+		);
 	});
 
 	it("clearing the default (null) restores the system login", () => {
@@ -673,7 +683,9 @@ describe("buildTerminalAgentLaunch default account env", () => {
 			agent: "claude",
 			prompt: "hi",
 		});
-		expect(launch.fullCommand).toBe("claude hi");
+		expect(launch.fullCommand).toBe(
+			"SUPERSET_AGENT_DEFINITION_ID='00000000-0000-0000-0000-00000000000c' claude hi",
+		);
 	});
 });
 
@@ -935,6 +947,7 @@ describe("bindResumedSession", () => {
 				terminalId: TERMINAL_ID,
 				agentId: "codex",
 				agentSessionId: "01a058a7-3990-7921-bb87-66c7370b999e",
+				definitionId: "00000000-0000-0000-0000-00000000000c",
 				lastEventType: "Attached",
 			},
 		]);
@@ -980,6 +993,149 @@ describe("bindResumedSession", () => {
 		expect(store.list()[0]?.agentSessionId).toBe(
 			"01a058a7-3990-7921-bb87-66c7370b999e",
 		);
+	});
+});
+
+describe("custom agent resume", () => {
+	const WORKSPACE_ID = "11111111-1111-1111-1111-111111111111";
+	const TERMINAL_ID = "22222222-2222-2222-2222-222222222222";
+	const CUSTOM_ID = "00000000-0000-0000-0000-0000000000aa";
+
+	function seedClaudeAndWrapper(db: HostDb) {
+		for (const [id, presetId, command, displayOrder] of [
+			["00000000-0000-0000-0000-000000000001", "claude", "claude", 0],
+			[CUSTOM_ID, "custom", "/Users/me/bin/claude-pool.sh", 1],
+		] as const) {
+			db.insert(schema.hostAgentConfigs)
+				.values({
+					id,
+					presetId,
+					label: id === CUSTOM_ID ? "Claude Pool" : "Claude",
+					command,
+					argsJson: "[]",
+					promptTransport: "argv",
+					promptArgsJson: "[]",
+					resumeArgsJson: JSON.stringify(["--resume"]),
+					forkArgsJson: "[]",
+					envJson: "{}",
+					displayOrder,
+				})
+				.run();
+		}
+	}
+
+	it("stamps the launching config on the agent's environment", () => {
+		const db = createTestDb();
+		seedClaudeAndWrapper(db);
+
+		const { fullCommand } = buildTerminalAgentLaunch(db, {
+			workspaceId: WORKSPACE_ID,
+			agent: CUSTOM_ID,
+			prompt: "",
+		});
+
+		expect(fullCommand).toContain(
+			`SUPERSET_AGENT_DEFINITION_ID='${CUSTOM_ID}'`,
+		);
+	});
+
+	it.each([
+		["an argv command", "printenv", ["SUPERSET_AGENT_DEFINITION_ID"]],
+		["a shell-code command", "printenv SUPERSET_AGENT_DEFINITION_ID | cat", []],
+	])("hands the config id to the agent process for %s", (_, command, args) => {
+		const db = createTestDb();
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: CUSTOM_ID,
+				presetId: "custom",
+				label: "Probe",
+				command,
+				argsJson: JSON.stringify(args),
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				envJson: "{}",
+				displayOrder: 0,
+			})
+			.run();
+
+		const { fullCommand } = buildTerminalAgentLaunch(db, {
+			workspaceId: WORKSPACE_ID,
+			agent: CUSTOM_ID,
+			prompt: "",
+		});
+		const run = Bun.spawnSync(["sh", "-c", fullCommand], {
+			env: { PATH: process.env.PATH ?? "" },
+		});
+
+		expect(run.stdout.toString().trim()).toBe(CUSTOM_ID);
+	});
+
+	it("resumes the session with the config its hook reported", async () => {
+		const db = createTestDb();
+		seedClaudeAndWrapper(db);
+		db.insert(schema.terminalSessions)
+			.values({ id: TERMINAL_ID, originWorkspaceId: null })
+			.run();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		store.recordEvent({
+			terminalId: TERMINAL_ID,
+			workspaceId: WORKSPACE_ID,
+			eventType: "Stop",
+			agentId: "claude",
+			agentSessionId: "sess-1",
+			definitionId: CUSTOM_ID as HostAgentConfigId,
+			occurredAt: Date.now(),
+		});
+		store.markTerminalExited(TERMINAL_ID);
+
+		const runCalls: AgentRunInput[] = [];
+		await resumeTerminalAgentSession(
+			{
+				db,
+				terminalAgentStore: store,
+				runAgent: async (input) => {
+					runCalls.push(input);
+					return { kind: "terminal", sessionId: "t-new", label: "" };
+				},
+				disposeSession: async () => ({ daemonCloseSucceeded: true }),
+				hasSession: () => null,
+				eventBus: { broadcastTerminalLifecycle: () => {} },
+			},
+			{ workspaceId: WORKSPACE_ID, terminalId: TERMINAL_ID },
+		);
+
+		expect(runCalls).toMatchObject([
+			{ agent: CUSTOM_ID, resumeSessionId: "sess-1", resumeAgentId: "claude" },
+		]);
+	});
+
+	it("binds a resumed custom session at launch under the harness that reported it", () => {
+		const db = createTestDb();
+		seedClaudeAndWrapper(db);
+		const store = new TerminalAgentStore();
+
+		bindResumedSession(
+			{ db, terminalAgentStore: store },
+			{
+				workspaceId: WORKSPACE_ID,
+				agent: CUSTOM_ID,
+				prompt: "",
+				resumeSessionId: "sess-1",
+				resumeAgentId: "claude",
+			},
+			TERMINAL_ID,
+		);
+
+		expect(store.list()).toMatchObject([
+			{
+				terminalId: TERMINAL_ID,
+				agentId: "claude",
+				agentSessionId: "sess-1",
+				definitionId: CUSTOM_ID,
+			},
+		]);
 	});
 });
 
