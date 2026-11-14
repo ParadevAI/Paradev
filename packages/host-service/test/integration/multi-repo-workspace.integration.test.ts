@@ -1360,6 +1360,32 @@ test("a branch rename or checkout in one checkout broadcasts the workspace and u
 	}
 });
 
+test("rename refuses a branch pushed to origin when the repository remote is another one", async () => {
+	const scenario = await multiRepoScenario();
+	const workspace = await createBoth(scenario);
+	const remote = `${scenario.api.repoPath}-origin.git`;
+	scenario.cleanup.push(remote);
+	await simpleGit().raw(["init", "--bare", "--initial-branch=main", remote]);
+	await scenario.api.git.addRemote("origin", remote);
+	scenario.host.db
+		.update(repositories)
+		.set({ remoteName: "upstream" })
+		.where(eq(repositories.id, scenario.apiId))
+		.run();
+	const apiPath = join(workspace.worktreePath, "api");
+	await simpleGit(apiPath).push(["origin", "feature/both"]);
+
+	await expect(
+		scenario.host.trpc.git.renameBranch.mutate({
+			workspaceId: workspace.id,
+			repositoryId: scenario.apiId,
+			oldName: "feature/both",
+			newName: "feature/renamed",
+		}),
+	).rejects.toThrow("Cannot rename a branch that has been pushed to remote");
+	expect((await headOf(apiPath)).branch).toBe("feature/both");
+});
+
 test("issue content comes from the primary repository unless repositoryId names another", async () => {
 	const repos: string[] = [];
 	const scenario = await multiRepoScenario({

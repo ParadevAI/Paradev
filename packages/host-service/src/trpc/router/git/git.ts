@@ -249,20 +249,43 @@ const CHECKOUT_REFUSALS = {
 async function assertBranchNotPushed(
 	git: SimpleGit,
 	branch: string,
-	remoteName: string,
+	remoteNames: readonly string[],
 ): Promise<void> {
-	try {
-		const remote = await git.raw(["ls-remote", "--heads", remoteName, branch]);
-		if (remote.trim()) {
-			throw new TRPCError({
-				code: "PRECONDITION_FAILED",
-				message: "Cannot rename a branch that has been pushed to remote",
-			});
+	for (const remoteName of new Set(remoteNames)) {
+		try {
+			const remote = await git.raw([
+				"ls-remote",
+				"--heads",
+				remoteName,
+				branch,
+			]);
+			if (remote.trim()) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "Cannot rename a branch that has been pushed to remote",
+				});
+			}
+		} catch (error) {
+			if (error instanceof TRPCError) throw error;
+			// ls-remote failed — probably no remote, safe to rename
 		}
-	} catch (error) {
-		if (error instanceof TRPCError) throw error;
-		// ls-remote failed — probably no remote, safe to rename
 	}
+}
+
+/** Pushes go to origin; a multi-repo checkout can also push to its repository remote or the branch's upstream. */
+async function branchPushRemotes(
+	git: SimpleGit,
+	branch: string,
+	repositoryRemote: string | null,
+): Promise<string[]> {
+	const tracked = (
+		await git
+			.raw(["config", "--get", `branch.${branch}.remote`])
+			.catch(() => "")
+	).trim();
+	return ["origin", repositoryRemote, tracked].filter(
+		(name): name is string => !!name && name !== ".",
+	);
 }
 
 /** Limiter-admitted status snapshot of one checkout; shared by getStatus and
@@ -701,7 +724,9 @@ export const gitRouter = router({
 			await assertBranchNotPushed(
 				git,
 				oldName,
-				multiRepoProject ? (repository.remoteName ?? "origin") : "origin",
+				multiRepoProject
+					? await branchPushRemotes(git, oldName, repository.remoteName)
+					: ["origin"],
 			);
 			const renamesCheckedOutBranch =
 				(await git.raw(["rev-parse", "--abbrev-ref", "HEAD"])).trim() ===

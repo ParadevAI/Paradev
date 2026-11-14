@@ -817,7 +817,7 @@ export async function relocateRepository(
 	if (owner && owner.id !== repository.id) {
 		throw repositoryTakenError(resolved.repoPath);
 	}
-	if (resolved.repoPath !== repository.repoPath) {
+	if (resolvePath(resolved.repoPath) !== resolvePath(repository.repoPath)) {
 		requireNoWorktrees(ctx, repository);
 		await ensureNotUnborn(resolved.repoPath);
 		applyRelocations(
