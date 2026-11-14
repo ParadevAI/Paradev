@@ -204,7 +204,8 @@
 		overflow: hidden; /* prevent scroll-lock adjustments from collapsing layout */
 		user-select: none;
 		scroll-behavior: smooth;
-		-webkit-app-region: no-drag;
+		/* Inherited no-drag regions can extend past a scroll container's clip. */
+		-webkit-app-region: initial;
 		-webkit-font-smoothing: antialiased;
 	}
 
