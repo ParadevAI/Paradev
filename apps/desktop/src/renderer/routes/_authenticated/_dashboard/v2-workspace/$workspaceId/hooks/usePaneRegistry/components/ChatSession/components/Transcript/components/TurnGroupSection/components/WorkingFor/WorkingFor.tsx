@@ -12,12 +12,13 @@ function elapsed(startedAtMs: number, completedAtMs: number | undefined) {
 }
 
 /**
- * The turn's one live line, under the prompt: it sweeps while the agent works
+ * The turn's one live line, at the end of the turn: it sweeps while the agent works
  * and stays afterwards as "Worked for 8s", so a finished turn still says what
- * it cost. It stops while the turn waits on the user. `onToggle` hangs the
- * turn's work off it.
+ * it cost. It stops while the turn waits on the user or only on background
+ * work. `onToggle` hangs the turn's work off it.
  */
 export function WorkingFor({
+	background = false,
 	completedAtMs,
 	expanded,
 	onToggle,
@@ -31,10 +32,11 @@ export function WorkingFor({
 	onToggle?: (() => void) | undefined;
 	waiting?: boolean | undefined;
 	stopped?: boolean | undefined;
+	background?: boolean | undefined;
 }) {
 	const { t } = useLingui();
 	const running = completedAtMs === undefined;
-	const ticking = running && !waiting;
+	const ticking = running && !waiting && !background;
 	const [seconds, setSeconds] = useState(() =>
 		elapsed(startedAtMs, completedAtMs),
 	);
@@ -53,17 +55,19 @@ export function WorkingFor({
 
 	const label = waiting
 		? t({ message: "Needs input" })
-		: stopped && !running
-			? seconds < 60
-				? t`You stopped after ${seconds}s`
-				: t`You stopped after ${Math.floor(seconds / 60)}m ${seconds % 60}s`
-			: seconds < 60
-				? running
-					? t`Working for ${seconds}s`
-					: t`Worked for ${seconds}s`
-				: running
-					? t`Working for ${Math.floor(seconds / 60)}m ${seconds % 60}s`
-					: t`Worked for ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+		: background
+			? t({ message: "Waiting on background work" })
+			: stopped && !running
+				? seconds < 60
+					? t`You stopped after ${seconds}s`
+					: t`You stopped after ${Math.floor(seconds / 60)}m ${seconds % 60}s`
+				: seconds < 60
+					? running
+						? t`Working for ${seconds}s`
+						: t`Worked for ${seconds}s`
+					: running
+						? t`Working for ${Math.floor(seconds / 60)}m ${seconds % 60}s`
+						: t`Worked for ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 
 	const content = (
 		<>
@@ -91,6 +95,9 @@ export function WorkingFor({
 
 	return (
 		<div className="flex min-w-0 items-center gap-1.5 py-1 font-sans text-foreground/50 text-sm">
+			<output className="sr-only">
+				{background ? t({ message: "Waiting on background work" }) : ""}
+			</output>
 			{onToggle ? (
 				<button
 					className="flex min-w-0 items-center gap-1.5 transition-colors duration-200 hover:text-foreground/80"

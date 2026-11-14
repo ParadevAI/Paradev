@@ -15960,6 +15960,9 @@ msgstr "常见问题"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "问题、反馈、支持，或者别的什么都行。写给我们，我们会转给合适的人。"
 
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "将消息加入队列 · {SEND_NOW_KEYS} 立即发送"
+
 msgid "Queue message"
 msgstr "将消息加入队列"
 
@@ -22428,6 +22431,9 @@ msgstr "正在等待子智能体的第一条消息…"
 
 msgid "Waiting for your input"
 msgstr "等待你的输入"
+
+msgid "Waiting on background work"
+msgstr "正在等待后台任务"
 
 msgid "Waking up workspace"
 msgstr "正在唤醒工作区"

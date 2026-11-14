@@ -15954,6 +15954,9 @@ msgstr "Запитання"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Запитання, відгуки, підтримка чи будь-що інше. Надішліть повідомлення, і ми передамо його потрібній людині."
 
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Додайте повідомлення в чергу · {SEND_NOW_KEYS} — надіслати зараз"
+
 msgid "Queue message"
 msgstr "Додати повідомлення в чергу"
 
@@ -22422,6 +22425,9 @@ msgstr "Очікування першого повідомлення субаг�
 
 msgid "Waiting for your input"
 msgstr "Чекає на вашу відповідь"
+
+msgid "Waiting on background work"
+msgstr "Очікування фонових завдань"
 
 msgid "Waking up workspace"
 msgstr "Пробудження робочого простору"

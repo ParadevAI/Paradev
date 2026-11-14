@@ -92,6 +92,7 @@ import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
+import { subagentsInTurn } from "./utils/subagentsInTurn";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
@@ -281,12 +282,17 @@ export function SessionView({
 		() => findRunningTurnId(session.snapshot.turns),
 		[session.snapshot.turns],
 	);
-	const liveRefreshKey = useMemo(
-		() =>
-			settledToolCalls(
-				timeline.find((group) => group.turnId === runningTurnId),
-			),
+	const runningGroup = useMemo(
+		() => timeline.find((group) => group.turnId === runningTurnId),
 		[timeline, runningTurnId],
+	);
+	const liveRefreshKey = useMemo(
+		() => settledToolCalls(runningGroup),
+		[runningGroup],
+	);
+	const runningTurnSubagents = useMemo(
+		() => subagentsInTurn(runningGroup),
+		[runningGroup],
 	);
 	const turnChanges = useMemo<TurnChangesSource>(
 		() => ({
@@ -741,6 +747,9 @@ export function SessionView({
 				{!focusedSubagentId && (
 					<ComposerChips
 						backgroundTasks={sessionState?.backgroundTasks}
+						hiddenSubagents={
+							awaitingBackground ? undefined : runningTurnSubagents
+						}
 						liveRefreshKey={liveRefreshKey}
 						onMoveToBackground={onBackgroundSubagent}
 						onOpenSubagent={openSubagent}

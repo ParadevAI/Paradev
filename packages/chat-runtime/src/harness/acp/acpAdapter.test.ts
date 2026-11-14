@@ -471,6 +471,8 @@ class FakeAcpAgent {
 					return;
 				}
 				this.respond(frame.id as number, { messageId });
+			} else if (frame.method === "_session/async_task/stop") {
+				this.respond(frame.id as number, { stopped: true });
 			} else if (frame.method === "_sh.superset/subagent/background") {
 				if (this.refuseBackground) {
 					this.deliver({
@@ -3445,6 +3447,182 @@ describe("AcpAdapter on protocol v2", () => {
 				: [],
 		);
 		expect(lists).toEqual([["bun run dev"], []]);
+
+		await adapter.dispose();
+	});
+
+	it("reopens the latest turn for a turn the agent starts on its own", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "start a background subagent" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "task-1",
+			name: "sleep 30",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "task-1",
+			state: "completed",
+		});
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			taskType: "turn",
+			showInTranscript: false,
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			content: { type: "text", text: "The subagent finished." },
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "autonomous-turn-1",
+			state: "completed",
+		});
+		await flush();
+
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(new Set(turns.map((turn) => turn.id)).size).toBe(1);
+		expect(turns.map((turn) => turn.status)).toEqual([
+			"running",
+			"completed",
+			"running",
+			"completed",
+		]);
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-2",
+			name: "Claude is working",
+			description: "A scheduled wakeup fired.",
+			taskType: "turn",
+		});
+		await flush();
+		const wakeup = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(wakeup.at(-1)?.id).not.toBe(turns[0]?.id);
+		const reply = events.find(
+			(e) =>
+				e.kind === "item" &&
+				e.item.kind === "agent_message" &&
+				textOf(e.item) === "The subagent finished.",
+		);
+		expect(reply?.kind === "item" ? reply.turnId : null).toBe(
+			turns[0]?.id ?? "",
+		);
+		expect(
+			events.some(
+				(e) =>
+					e.kind === "session" &&
+					(e.session.backgroundTasks ?? []).some(
+						(task) => task.id === "autonomous-turn-1",
+					),
+			),
+		).toBe(false);
+
+		await adapter.dispose();
+	});
+
+	for (const [ending, end] of [
+		["stopped", (agent: FakeAcpAgent) => agent.releasePrompts("cancelled")],
+		["failed", (agent: FakeAcpAgent) => agent.failHeldPrompts(-32603, "boom")],
+	] as const) {
+		it(`leaves a ${ending} turn as it ended when the agent starts a turn on its own`, async () => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.holdPrompts = true;
+			const { adapter, events } = startAdapter(agent);
+			await flush();
+			adapter.prompt([{ type: "text", text: "start a background subagent" }]);
+			await flush();
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_spawned",
+				asyncTaskId: "task-1",
+				name: "sleep 30",
+			});
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_state_update",
+				asyncTaskId: "task-1",
+				state: "completed",
+			});
+			end(agent);
+			await flush();
+
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_spawned",
+				asyncTaskId: "autonomous-turn-1",
+				name: "Claude is working",
+				taskType: "turn",
+			});
+			await flush();
+
+			const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+			const first = turns.filter((turn) => turn.id === "id-1");
+			expect(first.at(-1)?.status).toBe(
+				ending === "stopped" ? "interrupted" : "failed",
+			);
+			expect(turns.at(-1)?.id).not.toBe("id-1");
+			expect(turns.at(-1)?.status).toBe("running");
+
+			await adapter.dispose();
+		});
+	}
+
+	it("gives a turn the agent starts without background work a turn of its own", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "hello" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			description: "A scheduled wakeup fired.",
+			taskType: "turn",
+		});
+		await flush();
+
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(turns.map((turn) => `${turn.id}:${turn.status}`)).toEqual([
+			"id-1:running",
+			"id-1:completed",
+			`${turns[2]?.id}:running`,
+		]);
+		expect(turns[2]?.id).not.toBe("id-1");
+
+		await adapter.dispose();
+	});
+
+	it("stops a turn the agent started on its own through its async task", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(agent);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			taskType: "turn",
+		});
+		await flush();
+		adapter.cancelTurn();
+		await flush();
+
+		const methods = agent.sent.map((f) => f.method);
+		expect(methods).toContain("_session/async_task/stop");
+		expect(methods).not.toContain("session/cancel");
 
 		await adapter.dispose();
 	});

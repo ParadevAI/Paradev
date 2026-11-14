@@ -109,6 +109,9 @@ export function TurnGroupSection({
 		case "working":
 			return (
 				<WorkingFor
+					background={
+						row.running && snapshot.session?.awaitingBackground === true
+					}
 					completedAtMs={row.completedAtMs}
 					startedAtMs={row.startedAtMs}
 					stopped={row.stopped}

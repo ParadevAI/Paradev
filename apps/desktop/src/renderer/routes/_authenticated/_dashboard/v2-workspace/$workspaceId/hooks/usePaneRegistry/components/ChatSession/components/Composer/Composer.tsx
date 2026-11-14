@@ -35,7 +35,7 @@ import {
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
-import { useHotkey } from "renderer/hotkeys";
+import { formatHotkeyDisplay, PLATFORM, useHotkey } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
@@ -160,6 +160,11 @@ function toMenuCommands(
 }
 
 const FOCUS_HANDOFF_MS = 1000;
+
+const SEND_NOW_KEYS = formatHotkeyDisplay(
+	PLATFORM === "mac" ? "meta+enter" : "ctrl+enter",
+	PLATFORM,
+).text;
 let focusHandoff: { draftKey: string; at: number } | null = null;
 
 export const Composer = memo(function Composer({
@@ -658,8 +663,12 @@ export const Composer = memo(function Composer({
 				placeholder={
 					target
 						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
-						: (placeholder ??
-							t({ message: "Ask the agent, @mention files, run /commands" }))
+						: awaitingBackground
+							? t({ message: `Queue a message · ${SEND_NOW_KEYS} to send now` })
+							: (placeholder ??
+								t({
+									message: "Ask the agent, @mention files, run /commands",
+								}))
 				}
 				status={
 					stop || promptPending

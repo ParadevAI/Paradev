@@ -108,12 +108,25 @@ function isWork(row: TranscriptRow | undefined): boolean {
 	);
 }
 
+function isPrompt(row: TranscriptRow | undefined): boolean {
+	if (!row) return false;
+	return (
+		row.kind === "outbox" ||
+		(row.kind === "item" && row.item.kind === "user_message")
+	);
+}
+
 function proseTopPadding(
 	row: TranscriptRow,
 	previous: TranscriptRow | undefined,
 ): string | false {
+	if (row.kind === "working")
+		return previous?.kind === "changed_files" ||
+			(previous?.kind === "item" && previous.item.kind === "agent_message")
+			? "pt-2"
+			: false;
 	if (row.kind !== "item" || row.item.kind !== "agent_message") return false;
-	return isWork(previous) ? "pt-1" : "pt-3";
+	return isWork(previous) || isPrompt(previous) ? "pt-1" : "pt-3";
 }
 
 export function Transcript({
