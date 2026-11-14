@@ -303,6 +303,38 @@ describe("project repositories", () => {
 		expect(checkoutsOf(archived.id)).toEqual([project.primaryRepositoryId]);
 	});
 
+	it("refuses to leave an archived workspace one checkout while its folders are on disk", async () => {
+		const { caller, db } = setup();
+		const project = await caller.create({
+			name: "Acme",
+			repositories: [local(await gitRepo("web")), local(await gitRepo("api"))],
+		});
+		const api = project.repositories.find((r) => r.name === "api");
+		if (!api) throw new Error("no api repository");
+		const workspaceRoot = mkdtempSync(join(root, "archived-"));
+		mkdirSync(join(workspaceRoot, "web"));
+		const archived = seedWorkspace(
+			{ db },
+			{ projectId: project.id, worktreePath: workspaceRoot, branch: "feat" },
+		);
+		db.update(schema.workspaces)
+			.set({ archivedAt: 1 })
+			.where(eq(schema.workspaces.id, archived.id))
+			.run();
+		const remove = () =>
+			caller.removeRepository({ projectId: project.id, repositoryId: api.id });
+
+		await expect(remove()).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message: expect.stringContaining(
+				'repository_in_use: api is checked out by archived workspaces whose folders are still on disk ("feat")',
+			),
+		});
+
+		rmSync(join(workspaceRoot, "web"), { recursive: true });
+		expect((await remove()).repositories.map((r) => r.name)).toEqual(["web"]);
+	});
+
 	it("moves the primary mark, and relocates a repository keeping its name", async () => {
 		const { caller, db, events } = setup();
 		const project = await caller.create({

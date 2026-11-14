@@ -38,6 +38,7 @@ import {
 	adoptLocalRepo,
 	cloneDirectoryName,
 	cloneRepoInto,
+	ensureNotUnborn,
 	type ResolvedRepo,
 	resolveMatchingSlug,
 } from "./utils/resolve-repo";
@@ -121,11 +122,12 @@ function repositoryNotFound(projectId: string, id: string): TRPCError {
 	});
 }
 
+/** Read-only; the caller adopts the folder once every placement is accepted. */
 async function resolveImport(
 	path: string,
 	url: string | null,
 ): Promise<ResolvedRepo> {
-	if (!url) return adoptLocalRepo(path);
+	if (!url) return adoptLocalRepo(path, CHECK_ONLY);
 	const parsed = parseGitHubRemote(url);
 	if (!parsed) {
 		throw new TRPCError({
@@ -133,7 +135,17 @@ async function resolveImport(
 			message: `Could not parse GitHub remote from ${url}`,
 		});
 	}
-	return resolveMatchingSlug(path, `${parsed.owner}/${parsed.name}`);
+	return resolveMatchingSlug(
+		path,
+		`${parsed.owner}/${parsed.name}`,
+		CHECK_ONLY,
+	);
+}
+
+const CHECK_ONLY = { checkOnly: true } as const;
+
+async function adoptAll(folders: ResolvedRepo[]): Promise<void> {
+	for (const { repoPath } of folders) await ensureNotUnborn(repoPath);
 }
 
 function alreadySetUpError(row: HostRepositoryRow): TRPCError {
@@ -156,7 +168,9 @@ async function isCheckoutOf(
 ): Promise<boolean> {
 	if (!existsSync(path)) return false;
 	try {
-		return (await resolveRepositoryFolder(row, path)).repoPath === path;
+		return (
+			(await resolveRepositoryFolder(row, path, CHECK_ONLY)).repoPath === path
+		);
 	} catch (err) {
 		rethrowEnvironmentalGitError(err);
 		return false;
@@ -165,9 +179,10 @@ async function isCheckoutOf(
 
 /**
  * Checks every placement before anything changes, clones the repositories
- * whose folder is gone, then moves the repositories in one transaction and
- * only then brings back a deleted project, so a refused set-up leaves the
- * project and its folders as they were.
+ * whose folder is gone, checks again, then moves the repositories in one
+ * transaction and only then brings back a deleted project, so a refused
+ * set-up leaves the project and its folders as they were. Nothing awaits
+ * between the last check and the restore, so the restore cannot be refused.
  */
 async function placeExisting(
 	ctx: HostServiceContext,
@@ -205,7 +220,7 @@ async function placeExisting(
 			}
 			throw sameParent ? folderUnusableError(row) : alreadySetUpError(row);
 		}
-		const resolved = await resolveRepositoryFolder(row, mode.path);
+		const resolved = await resolveRepositoryFolder(row, mode.path, CHECK_ONLY);
 		if (resolved.repoPath === current) continue;
 		if (!mode.allowRelocate) throw alreadySetUpError(row);
 		relocations.push({ repository: row, resolved });
@@ -218,35 +233,43 @@ async function placeExisting(
 			target ? [[repository.id, target] as const] : [],
 		),
 	]);
-	const targets = new Set<string>();
-	for (const row of projectRows) {
-		const target = relocated.get(row.id) ?? resolvePath(row.repoPath);
-		if (targets.has(target)) throw repositoryTakenError(target);
-		targets.add(target);
-		const mustBeFree = relocated.has(row.id) || project.deletedAt != null;
-		const owner = mustBeFree
-			? getLiveRepositoryAtPath(ctx.db, target)
-			: undefined;
-		if (owner && owner.projectId !== projectId) {
-			throw repositoryTakenError(target);
-		}
-	}
-	const cloned = await cloneAll(ctx, clones, signal);
-	try {
-		applyRelocations(
-			ctx,
-			projectId,
-			[...relocations, ...cloned],
-			movableWorkspaces(ctx, project),
-		);
-		if (project.deletedAt != null && !restoreProject(ctx, projectId)) {
+	const requireFreeTargets = () => {
+		if (!getProjectIncludingDeleted(ctx.db, projectId)) {
 			throw notSetUpError(projectId);
 		}
+		const targets = new Set<string>();
+		for (const row of projectRows) {
+			const target = relocated.get(row.id) ?? resolvePath(row.repoPath);
+			if (targets.has(target)) throw repositoryTakenError(target);
+			targets.add(target);
+			const mustBeFree = relocated.has(row.id) || project.deletedAt != null;
+			const owner = mustBeFree
+				? getLiveRepositoryAtPath(ctx.db, target)
+				: undefined;
+			if (owner && owner.projectId !== projectId) {
+				throw repositoryTakenError(target);
+			}
+		}
+	};
+	requireFreeTargets();
+	const cloned = await cloneAll(ctx, clones, signal);
+	try {
+		await adoptAll(relocations.map(({ resolved }) => resolved));
+		requireFreeTargets();
 	} catch (err) {
 		await removeCreated(
 			cloned.map(({ resolved }) => ({ resolved, created: true })),
 		);
 		throw err;
+	}
+	applyRelocations(
+		ctx,
+		projectId,
+		[...relocations, ...cloned],
+		movableWorkspaces(ctx, project),
+	);
+	if (project.deletedAt != null && !restoreProject(ctx, projectId)) {
+		throw notSetUpError(projectId);
 	}
 }
 
@@ -400,6 +423,10 @@ async function placeNew(
 		throw failed.reason;
 	}
 	try {
+		requireFreePaths(ctx, done);
+		await adoptAll(
+			done.flatMap(({ resolved, created }) => (created ? [] : [resolved])),
+		);
 		insertSetUpProject(ctx, projectId, origin, placements, done);
 	} catch (err) {
 		await removeCreated(done);
@@ -415,16 +442,7 @@ function insertSetUpProject(
 	placements: SetupPlacement[],
 	sources: ResolvedSource[],
 ): void {
-	const paths = new Set<string>();
-	for (const { resolved } of sources) {
-		if (
-			paths.has(resolved.repoPath) ||
-			getLiveRepositoryAtPath(ctx.db, resolved.repoPath)
-		) {
-			throw repositoryTakenError(resolved.repoPath);
-		}
-		paths.add(resolved.repoPath);
-	}
+	requireFreePaths(ctx, sources);
 	const rows = placements.map((placement, index) => {
 		const repository = origin.repositories.find((r) => r.id === placement.id);
 		const source = sources[index];
@@ -469,4 +487,20 @@ function isUniqueViolation(err: unknown): boolean {
 		}
 	}
 	return false;
+}
+
+function requireFreePaths(
+	ctx: HostServiceContext,
+	sources: ResolvedSource[],
+): void {
+	const paths = new Set<string>();
+	for (const { resolved } of sources) {
+		if (
+			paths.has(resolved.repoPath) ||
+			getLiveRepositoryAtPath(ctx.db, resolved.repoPath)
+		) {
+			throw repositoryTakenError(resolved.repoPath);
+		}
+		paths.add(resolved.repoPath);
+	}
 }

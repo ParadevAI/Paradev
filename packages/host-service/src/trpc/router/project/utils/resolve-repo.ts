@@ -223,11 +223,16 @@ async function commitInitialEmpty(repoPath: string): Promise<void> {
  * already avoid this for repos Superset creates from scratch; this covers a
  * repo a caller points us at that already exists but was never committed to.
  */
-async function ensureNotUnborn(repoPath: string): Promise<void> {
+export async function ensureNotUnborn(repoPath: string): Promise<void> {
+	if (await isUnbornBranch(repoPath)) await commitInitialEmpty(repoPath);
+}
+
+/** Read-only. Throws when HEAD names no branch, as no commit can fix that. */
+async function isUnbornBranch(repoPath: string): Promise<boolean> {
 	const git = createUserSimpleGit(repoPath);
 	try {
 		await git.raw(["rev-parse", "--verify", "HEAD"]);
-		return;
+		return false;
 	} catch {}
 	// git commits onto a HEAD that names an invalid ref, then cannot read
 	// that ref back, so only an unborn branch gets the scaffold commit.
@@ -241,7 +246,23 @@ async function ensureNotUnborn(repoPath: string): Promise<void> {
 			cause: err,
 		});
 	}
-	await commitInitialEmpty(repoPath);
+	return true;
+}
+
+export interface AdoptOptions {
+	/**
+	 * Check that the repository can be adopted without writing to it. The
+	 * caller runs `ensureNotUnborn` once it adopts the repository.
+	 */
+	checkOnly?: boolean;
+}
+
+async function prepareForAdoption(
+	gitRoot: string,
+	options: AdoptOptions,
+): Promise<void> {
+	if (options.checkOnly) await isUnbornBranch(gitRoot);
+	else await ensureNotUnborn(gitRoot);
 }
 
 // Git skips a `.git` it cannot read and reports "not a git repository".
@@ -345,10 +366,13 @@ export async function resolveLocalRepo(
  * `HEAD` stays unborn and every later `git worktree add` against it fails
  * outright. Never call this from a read-only/preview path.
  */
-export async function adoptLocalRepo(repoPath: string): Promise<ResolvedRepo> {
+export async function adoptLocalRepo(
+	repoPath: string,
+	options: AdoptOptions = {},
+): Promise<ResolvedRepo> {
 	validateDirectoryPath(repoPath, "Path");
 	const gitRoot = await revParseGitRoot(repoPath);
-	await ensureNotUnborn(gitRoot);
+	await prepareForAdoption(gitRoot, options);
 	return resolveRemotesFor(gitRoot);
 }
 
@@ -398,10 +422,10 @@ export async function initLocalRepoInPlace(
 export async function resolveMatchingSlug(
 	repoPath: string,
 	expectedSlug: string,
+	options: AdoptOptions = {},
 ): Promise<ResolvedGitHubRepo> {
 	validateDirectoryPath(repoPath, "Path");
 	const gitRoot = await revParseGitRoot(repoPath);
-	await ensureNotUnborn(gitRoot);
 	const remotes = await getGitHubRemotes(createUserSimpleGit(gitRoot));
 	const remoteName = findMatchingRemote(remotes, expectedSlug);
 	if (!remoteName) {
@@ -420,6 +444,7 @@ export async function resolveMatchingSlug(
 			message: `Remote "${remoteName}" matched but has no parsed data`,
 		});
 	}
+	await prepareForAdoption(gitRoot, options);
 	return { repoPath: gitRoot, remoteName, parsed };
 }
 

@@ -13,6 +13,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { simpleGit } from "simple-git";
 import {
 	copyGitFixture,
 	createGitFixture,
@@ -224,6 +225,49 @@ describe("project.setup", () => {
 			code: "BAD_REQUEST",
 			message: expect.stringContaining("No remote matches acme/web"),
 		});
+	});
+
+	it("a refused set-up leaves a repository with no commits unborn", async () => {
+		const { caller } = setup();
+		const web = await repo();
+		const api = await repo();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([
+			{ name: "web", url: null },
+			{ name: "api", url: null },
+		]);
+		const [webId, apiId] = ids as [string, string];
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [
+				{ id: webId, mode: { kind: "import", path: web } },
+				{ id: apiId, mode: { kind: "import", path: api } },
+			],
+		});
+		const unborn = mkdtempSync(join(root, "unborn-"));
+		await simpleGit(unborn).init();
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [
+					{
+						id: webId,
+						mode: { kind: "import", path: unborn, allowRelocate: true },
+					},
+					{ id: apiId, mode: { kind: "import", path: await repo() } },
+				],
+			}),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("already_set_up"),
+		});
+		expect(await simpleGit(unborn).raw(["rev-list", "--all", "--count"])).toBe(
+			"0\n",
+		);
 	});
 
 	it("a refused set-up leaves a deleted project deleted", async () => {

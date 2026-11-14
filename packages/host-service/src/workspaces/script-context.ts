@@ -1,7 +1,7 @@
 import type { HostDb } from "../db";
 import { getProjectIncludingDeleted } from "../projects/local-project-store";
 import { getPrimaryRepository } from "../projects/repositories";
-import { listWorkspaceCheckouts } from "./checkouts";
+import { configSourceCheckout, listWorkspaceCheckouts } from "./checkouts";
 
 export interface WorkspaceScriptContext {
 	projectId: string;
@@ -29,9 +29,10 @@ export function resolveWorkspaceScriptContext(
 	const project = getProjectIncludingDeleted(db, workspace.projectId);
 	if (!project) return null;
 	const checkouts = listWorkspaceCheckouts(db, workspace);
-	const configCheckout =
-		checkouts.find((c) => c.repository.id === project.primaryRepositoryId) ??
-		checkouts[0];
+	const configCheckout = configSourceCheckout(
+		checkouts,
+		project.primaryRepositoryId,
+	);
 	const repository =
 		configCheckout?.repository ?? getPrimaryRepository(db, project);
 	if (!repository) return null;

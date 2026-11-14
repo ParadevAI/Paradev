@@ -15,7 +15,10 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../../db";
 import { projects, workspaces } from "../../../../../db/schema";
-import { listWorkspaceCheckouts } from "../../../../../workspaces/checkouts";
+import {
+	listWorkspaceCheckouts,
+	pickConfigSource,
+} from "../../../../../workspaces/checkouts";
 
 export const WORKSPACE_CONTEXT_FILES = ["AGENTS.md", "CLAUDE.md"] as const;
 
@@ -74,9 +77,7 @@ export function writeWorkspaceContextFiles(
 			);
 		}
 	}
-	const configSource =
-		checkouts.find((checkout) => checkout.isPrimary) ??
-		[...checkouts].sort((a, b) => a.name.localeCompare(b.name))[0];
+	const configSource = pickConfigSource(checkouts, (checkout) => checkout);
 	const linked = syncConfigLinks(
 		root,
 		configSource,

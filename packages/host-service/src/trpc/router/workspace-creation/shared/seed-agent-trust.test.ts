@@ -414,6 +414,52 @@ describe("seedWorkspaceFolderTrust", () => {
 		expect(trusted()).toEqual([join(dir, "web"), join(dir, "api")]);
 	});
 
+	test("a root without the primary checkout is trusted by the repository whose config it links", async () => {
+		const { db, trusted } = setup();
+		const store = (apiTrusted: boolean) =>
+			writeFileSync(
+				join(dir, ".claude.json"),
+				JSON.stringify({
+					projects: {
+						[join(dir, "web")]: { hasTrustDialogAccepted: true },
+						[join(dir, "api")]: { hasTrustDialogAccepted: apiTrusted },
+					},
+				}),
+			);
+		const multi = seedProject(
+			{ db },
+			{
+				repoPath: join(dir, "web"),
+				repositories: [
+					{ repoPath: join(dir, "lib") },
+					{ repoPath: join(dir, "api") },
+				],
+			},
+		);
+		const [, libId, apiId] = multi.repositoryIds;
+		const root = seedWorkspace(
+			{ db },
+			{
+				projectId: multi.id,
+				worktreePath: join(dir, "root"),
+				branch: "b",
+				repositoryIds: [libId as string, apiId as string],
+			},
+		);
+
+		store(false);
+		await seedWorkspaceFolderTrust(db, root.id, "claude-test");
+		expect(trusted()).toEqual([join(dir, "web"), join(dir, "api")]);
+
+		store(true);
+		await seedWorkspaceFolderTrust(db, root.id, "claude-test");
+		expect(trusted()).toEqual([
+			join(dir, "web"),
+			join(dir, "api"),
+			join(dir, "root"),
+		]);
+	});
+
 	function seedTrustedRoot(db: HostDb, apiTrusted: boolean) {
 		const rootPath = join(dir, "root");
 		writeFileSync(
@@ -443,7 +489,11 @@ describe("seedWorkspaceFolderTrust", () => {
 			.set({ primaryRepositoryId: apiId })
 			.where(eq(schema.projects.id, multi.id))
 			.run();
-		return { projectId: multi.id, rootPath };
+		return {
+			projectId: multi.id,
+			previousPrimaryId: multi.repositoryId,
+			rootPath,
+		};
 	}
 
 	const readState = () =>
@@ -451,9 +501,12 @@ describe("seedWorkspaceFolderTrust", () => {
 
 	test("a new primary the agent does not trust takes the root's trust away, and nothing else", async () => {
 		const { db } = setup();
-		const { projectId, rootPath } = seedTrustedRoot(db, false);
+		const { projectId, previousPrimaryId, rootPath } = seedTrustedRoot(
+			db,
+			false,
+		);
 
-		await revokeRootTrustForNewPrimary(db, projectId);
+		await revokeRootTrustForNewPrimary(db, projectId, previousPrimaryId);
 
 		expect(readState()).toEqual({
 			theme: "dark",
@@ -467,9 +520,12 @@ describe("seedWorkspaceFolderTrust", () => {
 
 	test("a new primary the agent trusts keeps the root trusted", async () => {
 		const { db } = setup();
-		const { projectId, rootPath } = seedTrustedRoot(db, true);
+		const { projectId, previousPrimaryId, rootPath } = seedTrustedRoot(
+			db,
+			true,
+		);
 
-		await revokeRootTrustForNewPrimary(db, projectId);
+		await revokeRootTrustForNewPrimary(db, projectId, previousPrimaryId);
 
 		expect(readState().projects[rootPath].hasTrustDialogAccepted).toBe(true);
 	});

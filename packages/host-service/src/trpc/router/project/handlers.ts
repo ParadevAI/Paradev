@@ -26,7 +26,9 @@ import {
 	listProjectRepositories,
 	repositoryName,
 } from "../../../projects/repositories";
+import { isMissingPath } from "../../../runtime/path-state";
 import type { HostServiceContext } from "../../../types";
+import { listWorkspaceCheckouts } from "../../../workspaces/checkouts";
 import {
 	emitLocalWorkspaceUpdated,
 	getLocalWorkspace,
@@ -40,6 +42,7 @@ import {
 } from "../workspace-creation/shared/workspace-context-files";
 import { listLiveLocalWorkspaces } from "./utils/create-local-workspace";
 import {
+	type AdoptOptions,
 	adoptLocalRepo,
 	cloneRepoInto,
 	cloneTemplateInto,
@@ -471,9 +474,17 @@ export async function addRepository(
 	return snapshotOf(ctx, args.projectId);
 }
 
+function workspaceList(rows: { name: string }[]): string {
+	const shown = rows.slice(0, 3).map((row) => `"${row.name}"`);
+	const more =
+		rows.length > shown.length ? ` and ${rows.length - shown.length} more` : "";
+	return `${shown.join(", ")}${more}`;
+}
+
 /**
  * Removes the repository from the project, never its files. A repository a
- * live workspace checks out stays; archived workspaces lose that checkout.
+ * live workspace checks out stays; archived workspaces lose that checkout,
+ * unless one would keep a single checkout while its folders are on disk.
  */
 export function removeRepository(
 	ctx: HostServiceContext,
@@ -498,25 +509,31 @@ export function removeRepository(
 		});
 	}
 	const users = ctx.db
-		.select({ id: workspaces.id, name: workspaces.name })
+		.select({ workspace: workspaces })
 		.from(workspaceRepositories)
 		.innerJoin(workspaces, eq(workspaces.id, workspaceRepositories.workspaceId))
-		.where(
-			and(
-				eq(workspaceRepositories.repositoryId, repository.id),
-				isNull(workspaces.archivedAt),
-			),
-		)
-		.all();
-	if (users.length > 0) {
-		const shown = users.slice(0, 3).map((u) => `"${u.name}"`);
-		const more =
-			users.length > shown.length
-				? ` and ${users.length - shown.length} more`
-				: "";
+		.where(eq(workspaceRepositories.repositoryId, repository.id))
+		.all()
+		.map((row) => row.workspace);
+	const live = users.filter((row) => row.archivedAt === null);
+	if (live.length > 0) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
-			message: `repository_in_use: ${repository.name} is checked out by ${shown.join(", ")}${more}; delete them first`,
+			message: `repository_in_use: ${repository.name} is checked out by ${workspaceList(live)}; delete them first`,
+		});
+	}
+	// With one checkout left, its path becomes the root, not the folder on disk.
+	const stranded = users.filter((row) => {
+		const checkouts = listWorkspaceCheckouts(ctx.db, row);
+		return (
+			checkouts.length === 2 &&
+			checkouts.some((checkout) => !isMissingPath(checkout.path))
+		);
+	});
+	if (stranded.length > 0) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: `repository_in_use: ${repository.name} is checked out by archived workspaces whose folders are still on disk (${workspaceList(stranded)}); delete them first`,
 		});
 	}
 	// PR rows are shared by GitHub identity: another clone of the same
@@ -574,7 +591,11 @@ export async function setPrimaryRepository(
 		.where(eq(projects.id, args.projectId))
 		.run();
 	if (project.primaryRepositoryId !== args.repositoryId) {
-		await revokeRootTrustForNewPrimary(ctx.db, args.projectId);
+		await revokeRootTrustForNewPrimary(
+			ctx.db,
+			args.projectId,
+			project.primaryRepositoryId,
+		);
 	}
 	const live = ctx.db
 		.select()
@@ -598,10 +619,15 @@ export async function setPrimaryRepository(
 export function resolveRepositoryFolder(
 	repository: Pick<HostRepositoryRow, "owner" | "repoName">,
 	path: string,
+	options?: AdoptOptions,
 ): Promise<ResolvedRepo> {
 	return repository.owner && repository.repoName
-		? resolveMatchingSlug(path, `${repository.owner}/${repository.repoName}`)
-		: adoptLocalRepo(path);
+		? resolveMatchingSlug(
+				path,
+				`${repository.owner}/${repository.repoName}`,
+				options,
+			)
+		: adoptLocalRepo(path, options);
 }
 
 /**

@@ -7,8 +7,8 @@
  * fresh standalone repo inherits nothing), so every new session would
  * otherwise prompt. Auto-trusting is sound only because the host itself just
  * created the folder as an empty scaffold — never seed a folder with
- * pre-existing user content. A multi-repo root links the primary
- * repository's agent config (hooks, MCP servers), so it is seeded only when
+ * pre-existing user content. A multi-repo root links the agent config
+ * (hooks, MCP servers) of one of its repositories, so it is seeded only when
  * the user already trusts that repository in the same store.
  *
  * Each store is the CLI's own sanctioned escape hatch: Claude's untrusted-
@@ -34,17 +34,15 @@ import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../../../db";
-import {
-	hostAgentConfigs,
-	projects,
-	repositories,
-	workspaces,
-} from "../../../../db/schema";
+import { hostAgentConfigs, projects, workspaces } from "../../../../db/schema";
 import {
 	resolveHostAgentConfig,
 	rowToConfig,
 } from "../../../../terminal-agents/agent-config";
-import { listWorkspaceCheckouts } from "../../../../workspaces/checkouts";
+import {
+	configSourceCheckout,
+	listWorkspaceCheckouts,
+} from "../../../../workspaces/checkouts";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
 type TrustFamily = "claude" | "codex" | "agy";
@@ -437,9 +435,9 @@ export async function seedAgentFolderTrust(
 /**
  * Session folders and multi-repo roots are not inside a trusted repository,
  * so the agent about to launch there gets them pre-trusted: a session folder
- * always, a multi-repo root only when the primary repository is already
- * trusted. A worktree of a single repository inherits trust from the main
- * checkout.
+ * always, a multi-repo root only when the repository whose agent config it
+ * links is already trusted. A worktree of a single repository inherits trust
+ * from the main checkout.
  */
 export async function seedWorkspaceFolderTrust(
 	db: HostDb,
@@ -452,20 +450,16 @@ export async function seedWorkspaceFolderTrust(
 		.where(eq(workspaces.id, workspaceId))
 		.get();
 	if (!workspace) return;
-	let primaryRepositoryPath: string | undefined;
+	let configRepositoryPath: string | undefined;
 	if (workspace.projectId !== null) {
-		if (listWorkspaceCheckouts(db, workspace).length < 2) return;
-		const primary = db
-			.select({ repoPath: repositories.repoPath })
-			.from(projects)
-			.innerJoin(
-				repositories,
-				eq(repositories.id, projects.primaryRepositoryId),
-			)
-			.where(eq(projects.id, workspace.projectId))
-			.get();
-		if (!primary) return;
-		primaryRepositoryPath = primary.repoPath;
+		const checkouts = listWorkspaceCheckouts(db, workspace);
+		if (checkouts.length < 2) return;
+		const source = configSourceCheckout(
+			checkouts,
+			primaryRepositoryIdOf(db, workspace.projectId),
+		);
+		if (!source) return;
+		configRepositoryPath = source.repository.repoPath;
 	}
 	const config = resolveHostAgentConfig(db, agent);
 	if (config) {
@@ -473,9 +467,19 @@ export async function seedWorkspaceFolderTrust(
 			db,
 			workspace.worktreePath,
 			config,
-			primaryRepositoryPath,
+			configRepositoryPath,
 		);
 	}
+}
+
+function primaryRepositoryIdOf(db: HostDb, projectId: string): string | null {
+	return (
+		db
+			.select({ primaryRepositoryId: projects.primaryRepositoryId })
+			.from(projects)
+			.where(eq(projects.id, projectId))
+			.get()?.primaryRepositoryId ?? null
+	);
 }
 
 /** Clears `hasTrustDialogAccepted` on the folder's own entries only. */
@@ -599,29 +603,33 @@ function revokeFolderTrust(
 }
 
 /**
- * A multi-repo root links the primary repository's agent config, so after a
- * primary change every store that does not trust the new primary forgets the
- * roots it was seeded with. Best-effort, like the seed.
+ * After a primary change, a multi-repo root whose agent config now comes
+ * from another repository loses its trust in every store that does not
+ * trust that repository. Best-effort, like the seed.
  */
 export async function revokeRootTrustForNewPrimary(
 	db: HostDb,
 	projectId: string,
+	previousPrimaryRepositoryId: string | null,
 ): Promise<void> {
-	const primary = db
-		.select({ repoPath: repositories.repoPath })
-		.from(projects)
-		.innerJoin(repositories, eq(repositories.id, projects.primaryRepositoryId))
-		.where(eq(projects.id, projectId))
-		.get();
-	if (!primary) return;
-	const roots = db
+	const primaryRepositoryId = primaryRepositoryIdOf(db, projectId);
+	const moved: { root: string; sourcePath: string }[] = [];
+	for (const workspace of db
 		.select()
 		.from(workspaces)
 		.where(eq(workspaces.projectId, projectId))
-		.all()
-		.filter((workspace) => listWorkspaceCheckouts(db, workspace).length > 1)
-		.map((workspace) => workspace.worktreePath);
-	if (roots.length === 0) return;
+		.all()) {
+		const checkouts = listWorkspaceCheckouts(db, workspace);
+		if (checkouts.length < 2) continue;
+		const before = configSourceCheckout(checkouts, previousPrimaryRepositoryId);
+		const after = configSourceCheckout(checkouts, primaryRepositoryId);
+		if (!after || before?.repository.id === after.repository.id) continue;
+		moved.push({
+			root: workspace.worktreePath,
+			sourcePath: after.repository.repoPath,
+		});
+	}
+	if (moved.length === 0) return;
 	const targets = new Map<string, TrustTarget>();
 	for (const row of db.select().from(hostAgentConfigs).all()) {
 		const target = resolveTrustTarget(db, rowToConfig(row));
@@ -629,8 +637,11 @@ export async function revokeRootTrustForNewPrimary(
 	}
 	for (const target of targets.values()) {
 		try {
-			if (await isFolderTrusted(target, primary.repoPath)) continue;
-			for (const root of roots) await revokeFolderTrust(target, root);
+			for (const { root, sourcePath } of moved) {
+				if (!(await isFolderTrusted(target, sourcePath))) {
+					await revokeFolderTrust(target, root);
+				}
+			}
 		} catch (err) {
 			console.warn(
 				`[project.setPrimaryRepository] failed to revoke root trust in '${target.file}':`,

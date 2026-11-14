@@ -39,6 +39,32 @@ export function checkoutPath(
 const byRepositoryName = (a: Checkout, b: Checkout) =>
 	a.repository.name.localeCompare(b.repository.name);
 
+/**
+ * The checkout whose agent config, setup and teardown a workspace uses: the
+ * primary repository's, else the first by repository name.
+ */
+export function pickConfigSource<T>(
+	checkouts: readonly T[],
+	describe: (checkout: T) => { name: string; isPrimary: boolean },
+): T | undefined {
+	return (
+		checkouts.find((checkout) => describe(checkout).isPrimary) ??
+		[...checkouts].sort((a, b) =>
+			describe(a).name.localeCompare(describe(b).name),
+		)[0]
+	);
+}
+
+export function configSourceCheckout(
+	checkouts: readonly Checkout[],
+	primaryRepositoryId: string | null,
+): Checkout | undefined {
+	return pickConfigSource(checkouts, (checkout) => ({
+		name: checkout.repository.name,
+		isPrimary: checkout.repository.id === primaryRepositoryId,
+	}));
+}
+
 export function listWorkspaceCheckouts(
 	db: HostDb,
 	workspace: { id: string; worktreePath: string },
