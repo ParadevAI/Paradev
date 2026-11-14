@@ -878,6 +878,52 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a queued prompt waits for a pending steer before the background-only hold releases it", async () => {
+		let openSteer = () => {};
+		const steerGate = new Promise<void>((resolve) => {
+			openSteer = resolve;
+		});
+		const { runtime, sessionId, adapters } = startSessionWithAdapters({
+			steer: true,
+			steerGate,
+			releasesBackgroundHold: true,
+			turns: [
+				[
+					{ kind: "turn", turn: turn("t1") },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+					{
+						kind: "session",
+						session: { status: "idle", awaitingBackground: true },
+					},
+				],
+				NEXT_TURN,
+			],
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const steer = sendPrompt(runtime, sessionId, "steer", {
+			steer: { expectedTurnId: "t1" },
+		});
+		await waitFor(() => adapters[0]?.steered.length === 1);
+		const queued = sendPrompt(runtime, sessionId, "queued");
+		expect(queued.queued).toBe(true);
+
+		answerApproval(runtime, sessionId);
+		await waitForHold(runtime, sessionId);
+		expect(adapters[0]?.prompted).toHaveLength(1);
+
+		openSteer();
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).items.get(queued.itemId)?.turnId ===
+				"t2",
+		);
+		const snapshot = snapshotOf(runtime, sessionId);
+		expect(snapshot.items.get(steer.itemId)?.turnId).toBe("t1");
+		expect(adapters[0]?.steered).toEqual(["steer"]);
+		await runtime.dispose();
+	});
+
 	test("a prompt sent while the agent is working is queued, not steered", async () => {
 		const { runtime, sessionId } = startSession({
 			...GATED_THEN_QUICK,
@@ -1264,6 +1310,69 @@ describe("LiveSession", () => {
 			third.itemId,
 		]);
 		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(2);
+		await runtime.dispose();
+	});
+
+	test("steerQueuedPrompt does not interrupt a turn whose cancel would stop an older subagent", async () => {
+		const { harnesses, adapters } = fakeHarnessRegistry({
+			turns: [
+				[
+					{
+						kind: "session",
+						session: {
+							backgroundTasks: [
+								{
+									id: "sub-1",
+									kind: "subagent",
+									name: "Helper",
+									canStop: true,
+									startedAtMs: 1,
+								},
+							],
+						},
+					},
+					{ kind: "turn", turn: turn("t1", { startedAtMs: 10 }) },
+					{ kind: "item", item: approvalRequest("ap1"), turnId: "t1" },
+				],
+				...GATED_THEN_QUICK.turns.slice(1),
+			],
+		});
+		const factory = harnesses.get(FAKE_HARNESS);
+		if (!factory) throw new Error("fake harness missing");
+		const runtime = createTestRuntime({
+			harnesses: new Map([["claude-acp", factory]]),
+		});
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: "claude-acp",
+			cwd: "/tmp/workspace",
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		const second = sendPrompt(runtime, sessionId, "second");
+		const third = sendPrompt(runtime, sessionId, "third");
+		const adapter = adapters[0];
+		if (!adapter) throw new Error("adapter missing");
+		let cancels = 0;
+		const cancelTurn = adapter.cancelTurn.bind(adapter);
+		adapter.cancelTurn = () => {
+			cancels += 1;
+			cancelTurn();
+		};
+
+		runtime.commands.steerQueuedPrompt({
+			commandId: randomUUID(),
+			sessionId,
+			itemId: third.itemId,
+		});
+
+		expect(cancels).toBe(0);
+		expect(
+			runtime.live
+				.require(sessionId)
+				.queueState.prompts.map((prompt) => prompt.itemId),
+		).toEqual([third.itemId, second.itemId]);
 		await runtime.dispose();
 	});
 

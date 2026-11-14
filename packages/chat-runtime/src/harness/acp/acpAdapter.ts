@@ -564,6 +564,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const held = this.currentTurn;
 		if (held?.status !== "running") return;
 		this.releasedTurns.add(held.id);
+		this.endCompactions();
 		this.main.flush();
 		this.emitTurn({ ...held, status: "completed", completedAtMs: this.now() });
 	}

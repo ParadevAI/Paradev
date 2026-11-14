@@ -1,13 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SessionClient } from "@superset/chat/client";
 import {
-	cancelStopsBackgroundSubagents,
 	deriveQueuedPrompts,
 	runningTurnId as findRunningTurnId,
 	latestSessionUsage,
 	type OutboxEntry,
 	presetForAnyHarness,
 	type SessionSnapshot,
+	subagentsStoppedByCancel,
 	userMessageText,
 } from "@superset/chat/core";
 import type {
@@ -555,11 +555,17 @@ export function SessionView({
 				: null,
 		[loaded, runningTurnId, awaitingBackground, cancelTurn, held],
 	);
-	const runningSubagents = cancelStopsBackgroundSubagents(harness)
-		? (sessionState?.backgroundTasks ?? []).filter(
-				(task) => task.kind === "subagent",
-			).length
-		: 0;
+	const runningTurnStartedAtMs = runningTurnId
+		? session.snapshot.turns.get(runningTurnId)?.startedAtMs
+		: undefined;
+	const runningSubagents =
+		runningTurnStartedAtMs === undefined
+			? 0
+			: subagentsStoppedByCancel(
+					harness,
+					sessionState?.backgroundTasks ?? [],
+					runningTurnStartedAtMs,
+				);
 	const [confirmingStop, setConfirmingStop] = useState(false);
 	const onCancelTurn = useMemo(
 		() =>

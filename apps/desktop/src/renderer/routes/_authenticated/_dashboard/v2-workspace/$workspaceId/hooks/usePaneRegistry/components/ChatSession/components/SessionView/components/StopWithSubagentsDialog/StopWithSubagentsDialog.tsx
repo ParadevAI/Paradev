@@ -2,13 +2,13 @@ import { Plural, Trans } from "@lingui/react/macro";
 import {
 	AlertDialog,
 	AlertDialogAction,
+	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
-import { Button } from "@superset/ui/button";
 
 interface StopWithSubagentsDialogProps {
 	subagentCount: number;
@@ -39,14 +39,9 @@ export function StopWithSubagentsDialog({
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter className="flex-row justify-end gap-2 px-4 pt-2 pb-4">
-					<Button
-						variant="ghost"
-						size="sm"
-						className="h-7 px-3 text-xs"
-						onClick={() => onOpenChange(false)}
-					>
+					<AlertDialogCancel className="h-7 border-0 bg-transparent px-3 text-xs shadow-none">
 						<Trans>Keep running</Trans>
-					</Button>
+					</AlertDialogCancel>
 					<AlertDialogAction
 						variant="destructive"
 						size="sm"

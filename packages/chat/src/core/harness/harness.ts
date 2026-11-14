@@ -1,3 +1,5 @@
+import type { BackgroundTask } from "../../protocol/envelope";
+
 /**
  * Preset id — not a config id — to the harness that runs it as a chat. The two
  * are different spaces: a config id is a per-user UUID, and every lookup here
@@ -84,21 +86,25 @@ export function presetForAnyHarness(harness: string): string | undefined {
 }
 
 /**
- * Decision note: Stop asks first while a background subagent runs on these harnesses.
- *
- * claude-agent-acp 0.85.0 answers `session/cancel` by interrupting the whole Claude
- * session and finishing every native subagent as cancelled. ACP has no request that
- * stops only the main turn. Since a prompt sent during a background wait starts a
- * new turn instead of queueing, Stop on that turn is a common path, and it silently
- * killed the subagent (seen in the desktop app on 2026-11-13). Remove a harness from
- * this list once its agent can cancel a turn without its background subagents.
+ * claude-agent-acp 0.85.0 answers `session/cancel` by also stopping every subagent, and
+ * ACP cannot cancel only the main turn. Remove a harness once its agent can.
  */
 const CANCEL_STOPS_BACKGROUND_SUBAGENTS: ReadonlySet<string> = new Set([
 	"claude-acp",
 ]);
 
-export function cancelStopsBackgroundSubagents(
+/**
+ * Subagents a cancel of the running turn would also stop, beyond its own.
+ * Agents do not flag a subagent as backgrounded, so one that started before
+ * this turn is the only sign that it outlives the turn.
+ */
+export function subagentsStoppedByCancel(
 	harness: string | null | undefined,
-): boolean {
-	return harness ? CANCEL_STOPS_BACKGROUND_SUBAGENTS.has(harness) : false;
+	tasks: readonly Pick<BackgroundTask, "kind" | "startedAtMs">[],
+	turnStartedAtMs: number,
+): number {
+	if (!harness || !CANCEL_STOPS_BACKGROUND_SUBAGENTS.has(harness)) return 0;
+	return tasks.filter(
+		(task) => task.kind === "subagent" && task.startedAtMs < turnStartedAtMs,
+	).length;
 }

@@ -19,6 +19,7 @@ export type FakeHarnessScript = {
 	turns: ScriptedEvent[][];
 	steer?: boolean;
 	steerDelayMs?: number;
+	steerGate?: Promise<void>;
 	releasesBackgroundHold?: boolean;
 	steerableSubagents?: string[];
 	backgroundableSubagents?: string[];
@@ -125,6 +126,7 @@ export class FakeHarness implements HarnessAdapter {
 		if (this.script.steerDelayMs !== undefined) {
 			await sleep(this.script.steerDelayMs);
 		}
+		await this.script.steerGate;
 		return this.script.steer === true;
 	}
 

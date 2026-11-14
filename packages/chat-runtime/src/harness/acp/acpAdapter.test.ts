@@ -3677,6 +3677,50 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("releasing a background-only hold ends its compaction, so the next turn can steer", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "spawn a helper" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Helper",
+			task: "Help",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "compact-1",
+			title: "Compact conversation",
+			status: "in_progress",
+			_meta: { claudeCode: { toolName: "compact" } },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "usage_update",
+			used: 10,
+			size: 100,
+			cost: { amount: 0.01, currency: "USD" },
+		});
+		await flush();
+		expect(adapter.turnOnlyAwaitsBackground()).toBe(true);
+
+		adapter.prompt([{ type: "text", text: "next question" }]);
+		await flush();
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+
+		expect(steered).toBe(true);
+		expect(agent.sent.at(-1)).toMatchObject({ method: "_session/steering" });
+		await adapter.dispose();
+	});
+
 	it("records a reply in full when the agent's cycle ends, not when the next item starts", async () => {
 		const agent = new FakeAcpAgent();
 		agent.holdPrompts = true;

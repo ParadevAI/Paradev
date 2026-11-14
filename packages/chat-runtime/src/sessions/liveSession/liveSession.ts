@@ -3,6 +3,7 @@ import {
 	type ChatSelections,
 	CONTINUE_PROMPT,
 	sessionSelections,
+	subagentsStoppedByCancel,
 	userStopOf,
 } from "@superset/chat/core";
 import {
@@ -465,7 +466,7 @@ export class LiveSession {
 		}
 		if (this.turnHoldsPrompts()) {
 			this.steerTarget = steered.item.id;
-			this.options.adapter.cancelTurn();
+			if (!this.cancelStopsSubagents()) this.options.adapter.cancelTurn();
 		} else if (this.inFlight()) {
 			this.steerTarget = steered.item.id;
 		} else {
@@ -752,7 +753,11 @@ export class LiveSession {
 					this.attributeAwaitingPrompt(event.turn.id);
 					const steered = this.steerTarget;
 					this.steerTarget = null;
-					if (steered && this.queue[0]?.item.id === steered) {
+					if (
+						steered &&
+						this.queue[0]?.item.id === steered &&
+						!this.cancelStopsSubagents()
+					) {
 						this.options.adapter.cancelTurn();
 					}
 				} else {
@@ -790,7 +795,7 @@ export class LiveSession {
 				}
 				this.releaseCarriedFailure();
 				this.releaseHeldPrompts();
-				if (event.session.awaitingBackground && !this.turnHoldsPrompts()) {
+				if (event.session.awaitingBackground && this.mayDeliverQueued()) {
 					this.deliverNextQueued();
 				}
 				return;
@@ -886,7 +891,7 @@ export class LiveSession {
 		if (status === "dead") return;
 		onReleased?.();
 		const ready = held.map((content) => this.queuedPrompt(content));
-		const idle = !this.turnHoldsPrompts() && !this.inFlight();
+		const idle = this.mayDeliverQueued();
 		const first = idle && this.queuePaused ? ready.shift() : undefined;
 		this.queue.unshift(...ready);
 		if (first) this.deliver(first);
@@ -1231,6 +1236,28 @@ export class LiveSession {
 		return (
 			this.currentTurn?.status === "running" &&
 			this.options.adapter.turnOnlyAwaitsBackground?.() !== true
+		);
+	}
+
+	/** A pending steer goes first: a queued prompt sent before it would start the next turn under it. */
+	private mayDeliverQueued(): boolean {
+		return (
+			!this.turnHoldsPrompts() &&
+			!this.inFlight() &&
+			this.pendingSteers.length === 0
+		);
+	}
+
+	/** A steer that falls back to cancelling must not take older subagents with it. */
+	private cancelStopsSubagents(): boolean {
+		const turn = this.currentTurn;
+		return (
+			turn !== null &&
+			subagentsStoppedByCancel(
+				this.options.harness,
+				this.sessionState.backgroundTasks ?? [],
+				turn.startedAtMs,
+			) > 0
 		);
 	}
 
