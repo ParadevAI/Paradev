@@ -19,14 +19,24 @@ function refusal(code: string) {
 function fakeHost({
 	importSession = () => {},
 	failedRelease = () => [] as string[],
+	markHandingOff = () => {},
 }: {
 	importSession?: (input: { harnessSessionId: string }) => void;
 	failedRelease?: (ids: string[]) => string[];
+	markHandingOff?: (terminalId: string) => void;
 } = {}) {
 	const released: string[][] = [];
 	const imports: string[] = [];
+	const marked: string[] = [];
 	const host = {
 		teleport: {
+			markHandingOff: {
+				mutate: async (input: { terminalId: string }) => {
+					markHandingOff(input.terminalId);
+					marked.push(input.terminalId);
+					return { ok: true };
+				},
+			},
 			importTerminalSession: {
 				mutate: async (input: { harnessSessionId: string }) => {
 					imports.push(input.harnessSessionId);
@@ -45,7 +55,7 @@ function fakeHost({
 			},
 		},
 	} as unknown as Parameters<typeof handOffTerminals>[0]["source"];
-	return { host, released, imports };
+	return { host, released, imports, marked };
 }
 
 const resolveUrls = async (fileIds: string[]) =>
@@ -53,6 +63,48 @@ const resolveUrls = async (fileIds: string[]) =>
 const base = { sourceWorkspaceId: "from", toWorkspaceId: "to", resolveUrls };
 
 describe("handOffTerminals", () => {
+	test("tells the source each terminal is handed off before it moves, and holds back one it could not tell", async () => {
+		const destination = fakeHost();
+		const source = fakeHost({
+			markHandingOff: (terminalId) => {
+				if (terminalId === "b") throw refusal("INTERNAL_SERVER_ERROR");
+			},
+		});
+
+		const result = await handOffTerminals({
+			...base,
+			workspaceMoveId: "move-1",
+			terminals: [terminal("a"), terminal("b")],
+			source: source.host,
+			connect: async () => destination.host,
+		});
+
+		expect(source.marked).toEqual(["a"]);
+		expect(destination.imports).toEqual(["session-a"]);
+		expect(source.released).toEqual([["b"]]);
+		expect(result.stayed).toEqual(["Claude b"]);
+	});
+
+	test("hands off to a source too old to record it", async () => {
+		const destination = fakeHost();
+		const source = fakeHost({
+			markHandingOff: () => {
+				throw refusal("NOT_FOUND");
+			},
+		});
+
+		await handOffTerminals({
+			...base,
+			workspaceMoveId: "move-1",
+			terminals: [terminal("a")],
+			source: source.host,
+			connect: async () => destination.host,
+		});
+
+		expect(destination.imports).toEqual(["session-a"]);
+		expect(source.released).toEqual([]);
+	});
+
 	test("a terminal that does not arrive starts again at the source", async () => {
 		const destination = fakeHost({
 			importSession: ({ harnessSessionId }) => {

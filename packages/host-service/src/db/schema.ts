@@ -421,3 +421,23 @@ export const mobileLastDevices = sqliteTable("mobile_last_devices", {
 	deviceKey: text("device_key").notNull(),
 	pickedAt: integer("picked_at").notNull(),
 });
+
+/**
+ * What a workspace move stopped or followed here, kept until the move ends
+ * so this host can undo it even when the desktop that ran the move is gone.
+ */
+export const workspaceMoveUndos = sqliteTable("workspace_move_undos", {
+	workspaceMoveId: text("workspace_move_id").primaryKey(),
+	workspaceId: text("workspace_id").notNull(),
+	stoppedTerminalIds: text("stopped_terminal_ids", { mode: "json" })
+		.$type<string[]>()
+		.notNull(),
+	/** Handed to the destination, so never started again here. */
+	handingOffTerminalIds: text("handing_off_terminal_ids", { mode: "json" })
+		.$type<string[]>()
+		.notNull(),
+	followedChatIds: text("followed_chat_ids", { mode: "json" })
+		.$type<string[]>()
+		.notNull(),
+	createdAt: integer("created_at").notNull(),
+});

@@ -14,6 +14,11 @@ import {
 	withStage,
 } from "../../../teleport/bundle";
 import {
+	dropUndone,
+	markHandingOff,
+	recordMoveUndo,
+} from "../../../teleport/moveUndo";
+import {
 	type BundleManifest,
 	isPlainSessionId,
 	teleportProviderFor,
@@ -172,6 +177,8 @@ export const teleportRouter = router({
 				workspaceId: z.string(),
 				stopIfBusy: z.boolean().optional(),
 				moveTerminals: z.boolean().optional(),
+				/** Lets this host undo what it stops for the move, without the desktop that runs it. */
+				workspaceMoveId: z.string().uuid().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -393,6 +400,18 @@ export const teleportRouter = router({
 				throw error;
 			}
 
+			if (input.workspaceMoveId) {
+				recordMoveUndo(ctx.db, {
+					workspaceMoveId: input.workspaceMoveId,
+					workspaceId: input.workspaceId,
+					stoppedTerminalIds: movedTerminals.map(
+						(terminal) => terminal.terminalId,
+					),
+					followedChatIds: prepared.map((chat) => chat.chatSessionId),
+					now: Date.now(),
+				});
+			}
+
 			return {
 				branch,
 				repositoryFullName: `${repository.owner}/${repository.name}`,
@@ -414,6 +433,7 @@ export const teleportRouter = router({
 			for (const sessionId of input.chatSessionIds) {
 				ctx.runtime.chatSync?.forget(sessionId);
 			}
+			dropUndone(ctx.db, { chatIds: input.chatSessionIds });
 			return { ok: true };
 		}),
 
@@ -431,7 +451,24 @@ export const teleportRouter = router({
 				input.workspaceId,
 				input.terminalIds,
 			);
+			dropUndone(ctx.db, {
+				workspaceId: input.workspaceId,
+				terminalIds: input.terminalIds.filter((id) => !failed.includes(id)),
+			});
 			return { resumedTerminalIds: resumed, failedTerminalIds: failed };
+		}),
+
+	/** This terminal is being handed to the move's destination, so this host never starts it again. */
+	markHandingOff: protectedProcedure
+		.input(
+			z.object({
+				workspaceMoveId: z.string().uuid(),
+				terminalId: z.string().min(1),
+			}),
+		)
+		.mutation(({ ctx, input }) => {
+			markHandingOff(ctx.db, input.workspaceMoveId, input.terminalId);
+			return { ok: true };
 		}),
 
 	/**

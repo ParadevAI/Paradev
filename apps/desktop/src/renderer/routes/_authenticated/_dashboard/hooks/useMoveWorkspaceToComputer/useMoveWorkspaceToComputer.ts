@@ -134,6 +134,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 							workspaceId: workspace.id,
 							stopIfBusy,
 							moveTerminals: true,
+							workspaceMoveId,
 						});
 						leaving.chats = prepared.chats.map((chat) => chat.chatSessionId);
 						leaving.terminals = (prepared.terminals ?? []).map(
@@ -245,6 +246,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 						terminals,
 						source: leaving.source,
 						sourceWorkspaceId: workspace.id,
+						workspaceMoveId,
 						toWorkspaceId: created.workspaceId,
 						connect: async () => target,
 						resolveUrls: (fileIds) =>

@@ -24,13 +24,35 @@ const RETRYABLE_CODES = new Set([
 	"TIMEOUT",
 ]);
 
+function errorCode(error: unknown): string | undefined {
+	return typeof error === "object" && error !== null && "data" in error
+		? (error as { data?: { code?: string } }).data?.code
+		: undefined;
+}
+
 /** A host that answered with a refusal will answer the same again; one that did not answer, or was not up, may not. */
 function isRetryable(error: unknown): boolean {
-	const code =
-		typeof error === "object" && error !== null && "data" in error
-			? (error as { data?: { code?: string } }).data?.code
-			: undefined;
+	const code = errorCode(error);
 	return code === undefined || RETRYABLE_CODES.has(code);
+}
+
+/**
+ * Tells the source a terminal is going to the destination, so it never
+ * starts it again by itself. False when the source could not record it; a
+ * source too old to know the call keeps no such record, so it is true.
+ */
+async function markHandingOff(
+	source: Host,
+	workspaceMoveId: string | undefined,
+	terminalId: string,
+): Promise<boolean> {
+	if (!workspaceMoveId) return true;
+	return source.teleport.markHandingOff
+		.mutate({ workspaceMoveId, terminalId })
+		.then(
+			() => true,
+			(error: unknown) => errorCode(error) === "NOT_FOUND",
+		);
 }
 
 /**
@@ -43,6 +65,7 @@ export async function handOffTerminals({
 	terminals,
 	source,
 	sourceWorkspaceId,
+	workspaceMoveId,
 	toWorkspaceId,
 	connect,
 	resolveUrls,
@@ -53,6 +76,8 @@ export async function handOffTerminals({
 	terminals: readonly MovingTerminal[];
 	source: Host;
 	sourceWorkspaceId: string;
+	/** The move these terminals belong to, which the source keeps to undo it without this window. */
+	workspaceMoveId?: string;
 	toWorkspaceId: string;
 	connect: () => Promise<Host>;
 	resolveUrls: (
@@ -85,6 +110,16 @@ export async function handOffTerminals({
 					if (!url) {
 						refused.push(terminal);
 						settled.add(terminal);
+						continue;
+					}
+					if (
+						!(await markHandingOff(
+							source,
+							workspaceMoveId,
+							terminal.terminalId,
+						))
+					) {
+						lastError = new Error("The source did not record the handoff");
 						continue;
 					}
 					await host.teleport.importTerminalSession
