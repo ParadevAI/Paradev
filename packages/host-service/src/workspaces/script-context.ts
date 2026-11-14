@@ -5,11 +5,11 @@ import { listWorkspaceCheckouts } from "./checkouts";
 
 export interface WorkspaceScriptContext {
 	projectId: string;
-	/** The primary repository's main checkout. */
+	/** The main checkout of the repository whose config the scripts use. */
 	repoPath: string;
 	/**
-	 * The workspace's checkout of the primary repository, whose config wins
-	 * over the main checkout's. Null when the workspace has no such checkout.
+	 * The workspace's checkout of that repository, whose config wins over the
+	 * main checkout's. Null when the workspace has no such checkout.
 	 */
 	configWorktreePath: string | null;
 	/** Where setup, run and teardown run, and what their `cwd` is relative to. */
@@ -17,8 +17,9 @@ export interface WorkspaceScriptContext {
 }
 
 /**
- * Setup, run and teardown read only the primary repository's config and run
- * in the workspace root. Null for a project-less workspace.
+ * A workspace with one checkout uses that repository's config; a root of
+ * several uses the primary repository's. Scripts run in the workspace root.
+ * Null for a project-less workspace.
  */
 export function resolveWorkspaceScriptContext(
 	db: HostDb,
@@ -26,15 +27,17 @@ export function resolveWorkspaceScriptContext(
 ): WorkspaceScriptContext | null {
 	if (!workspace.projectId) return null;
 	const project = getProjectIncludingDeleted(db, workspace.projectId);
-	const primary = project ? getPrimaryRepository(db, project) : undefined;
-	if (!project || !primary) return null;
-	const primaryCheckout = listWorkspaceCheckouts(db, workspace).find(
-		(checkout) => checkout.repository.id === primary.id,
-	);
+	if (!project) return null;
+	const checkouts = listWorkspaceCheckouts(db, workspace);
+	const only = checkouts.length === 1 ? checkouts[0] : undefined;
+	const repository = only?.repository ?? getPrimaryRepository(db, project);
+	if (!repository) return null;
+	const configCheckout =
+		only ?? checkouts.find((c) => c.repository.id === repository.id);
 	return {
 		projectId: project.id,
-		repoPath: primary.repoPath,
-		configWorktreePath: primaryCheckout?.path ?? null,
+		repoPath: repository.repoPath,
+		configWorktreePath: configCheckout?.path ?? null,
 		scriptRoot: workspace.worktreePath,
 	};
 }

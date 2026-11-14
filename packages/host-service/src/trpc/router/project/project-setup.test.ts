@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { randomUUID } from "node:crypto";
-import { mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
@@ -452,6 +452,123 @@ describe("project.setup", () => {
 			});
 			expect(again.created).toBe(false);
 		}
+	});
+
+	async function setUpClonedAndDeleted(names: string[]) {
+		const { caller, db } = setup();
+		const sources = await Promise.all(names.map(() => repo()));
+		const created = origin(
+			names.map((name, i) => ({ name, url: sources[i] as string })),
+		);
+		const parentDir = mkdtempSync(join(root, "gone-"));
+		const project = await caller.setup({
+			projectId: created.projectId,
+			origin: created.origin,
+			repositories: created.ids.map((id) => ({
+				id,
+				mode: { kind: "clone" as const, parentDir },
+			})),
+		});
+		const paths = project.repositories.map((r) => r.path);
+		created.ids.forEach((id, i) => {
+			db.update(schema.repositories)
+				.set({ url: sources[i] })
+				.where(eq(schema.repositories.id, id))
+				.run();
+		});
+		db.update(schema.projects)
+			.set({ deletedAt: Date.now() })
+			.where(eq(schema.projects.id, created.projectId))
+			.run();
+		for (const path of paths) rmSync(path, { recursive: true, force: true });
+		return { caller, db, parentDir, paths, ...created };
+	}
+
+	it("clones a repository back into its folder when the folder is gone", async () => {
+		const { caller, parentDir, paths, projectId, ids } =
+			await setUpClonedAndDeleted(["web"]);
+		const id = ids[0] as string;
+		const path = paths[0] as string;
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: [{ id, mode: { kind: "import", path } }],
+			}),
+		).rejects.toThrow();
+		expect(await caller.list()).toEqual([]);
+
+		const back = await caller.setup({
+			projectId,
+			repositories: [{ id, mode: { kind: "clone", parentDir } }],
+		});
+
+		expect(back.created).toBe(false);
+		expect(back.repositories.map((r) => r.path)).toEqual([path]);
+		expect(existsSync(join(path, ".git"))).toBe(true);
+		expect((await caller.list()).map((p) => p.id)).toEqual([projectId]);
+	});
+
+	it("removes every clone and leaves the project deleted when one clone fails", async () => {
+		const { caller, db, parentDir, paths, projectId, ids } =
+			await setUpClonedAndDeleted(["web", "api"]);
+		const missingSource = join(
+			root,
+			"no-such-source",
+			basename(paths[1] as string),
+		);
+		db.update(schema.repositories)
+			.set({ url: missingSource })
+			.where(eq(schema.repositories.id, ids[1] as string))
+			.run();
+
+		await expect(
+			caller.setup({
+				projectId,
+				repositories: ids.map((id) => ({
+					id,
+					mode: { kind: "clone" as const, parentDir },
+				})),
+			}),
+		).rejects.toThrow();
+
+		for (const path of paths) expect(existsSync(path)).toBe(false);
+		expect(await caller.list()).toEqual([]);
+	});
+
+	it("a clone matches the folder it would make, not the stored folder's name", async () => {
+		const { caller, db } = setup();
+		const web = await repo();
+		const {
+			projectId,
+			origin: from,
+			ids,
+		} = origin([{ name: "web", url: null }]);
+		const id = ids[0] as string;
+		await caller.setup({
+			projectId,
+			origin: from,
+			repositories: [{ id, mode: { kind: "import", path: web } }],
+		});
+		db.update(schema.repositories)
+			.set({ url: "https://github.com/acme/other" })
+			.where(eq(schema.repositories.id, id))
+			.run();
+		const clone = {
+			id,
+			mode: { kind: "clone" as const, parentDir: dirname(web) },
+		};
+
+		const again = await caller.setup({ projectId, repositories: [clone] });
+		expect(again.created).toBe(false);
+
+		rmSync(web, { recursive: true, force: true });
+		await expect(
+			caller.setup({ projectId, repositories: [clone] }),
+		).rejects.toMatchObject({
+			message: expect.stringContaining("repository_folder_unusable"),
+		});
+		expect(existsSync(join(dirname(web), "other"))).toBe(false);
 	});
 
 	it("gives a legacy cloud candidate the project id as its repository id", async () => {

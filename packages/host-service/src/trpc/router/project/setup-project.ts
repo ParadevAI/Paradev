@@ -1,4 +1,5 @@
-import { basename, join, resolve as resolvePath } from "node:path";
+import { existsSync } from "node:fs";
+import { dirname, join, resolve as resolvePath } from "node:path";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
@@ -18,6 +19,7 @@ import {
 } from "../../../projects/repositories";
 import type { HostServiceContext } from "../../../types";
 import type { HostWorkspaceRow } from "../../../workspaces/local-workspace-store";
+import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import {
 	applyRelocations,
 	type CreateProjectResult,
@@ -34,6 +36,7 @@ import {
 } from "./handlers";
 import {
 	adoptLocalRepo,
+	cloneDirectoryName,
 	cloneRepoInto,
 	type ResolvedRepo,
 	resolveMatchingSlug,
@@ -72,7 +75,7 @@ export async function setupProject(
 	requireDistinctPlacements(args.repositories);
 	const existing = getProjectIncludingDeleted(ctx.db, args.projectId);
 	if (existing) {
-		await placeExisting(ctx, existing, args.repositories);
+		await placeExisting(ctx, existing, args.repositories, args.signal);
 		return { ...snapshotOf(ctx, args.projectId), created: false };
 	}
 	if (!args.origin) {
@@ -135,15 +138,37 @@ function alreadySetUpError(row: HostRepositoryRow): TRPCError {
 	});
 }
 
+function folderUnusableError(row: HostRepositoryRow): TRPCError {
+	return new TRPCError({
+		code: "CONFLICT",
+		message: `repository_folder_unusable: ${row.name} is set up at ${row.repoPath}, but that folder is missing or is not a checkout of it; pick its folder with an import placement`,
+	});
+}
+
+async function isCheckoutOf(
+	row: HostRepositoryRow,
+	path: string,
+): Promise<boolean> {
+	if (!existsSync(path)) return false;
+	try {
+		return (await resolveRepositoryFolder(row, path)).repoPath === path;
+	} catch (err) {
+		rethrowEnvironmentalGitError(err);
+		return false;
+	}
+}
+
 /**
- * Checks every placement before anything changes, then moves the
- * repositories in one transaction and only then brings back a deleted
- * project, so a refused set-up leaves the project as it was.
+ * Checks every placement before anything changes, clones the repositories
+ * whose folder is gone, then moves the repositories in one transaction and
+ * only then brings back a deleted project, so a refused set-up leaves the
+ * project and its folders as they were.
  */
 async function placeExisting(
 	ctx: HostServiceContext,
 	project: HostProjectRow,
 	placements: SetupPlacement[],
+	signal?: AbortSignal,
 ): Promise<void> {
 	const projectId = project.id;
 	const projectRows = listProjectRepositories(ctx.db, projectId);
@@ -154,13 +179,22 @@ async function placeExisting(
 		}
 	}
 	const relocations: Relocation[] = [];
+	const clones: { repository: HostRepositoryRow; url: string }[] = [];
 	for (const { id, mode } of placements) {
 		const row = rows.get(id) as HostRepositoryRow;
 		const current = resolvePath(row.repoPath);
 		if (mode.kind === "clone") {
-			const predicted = join(resolvePath(mode.parentDir), basename(current));
-			if (predicted !== current) throw alreadySetUpError(row);
-			continue;
+			const parentDir = resolvePath(mode.parentDir);
+			const sameParent = dirname(current) === parentDir;
+			if (sameParent && (await isCheckoutOf(row, current))) continue;
+			const target = row.url
+				? join(parentDir, cloneDirectoryName(row.url))
+				: null;
+			if (row.url && target === current && !existsSync(current)) {
+				clones.push({ repository: row, url: row.url });
+				continue;
+			}
+			throw sameParent ? folderUnusableError(row) : alreadySetUpError(row);
 		}
 		const resolved = await resolveRepositoryFolder(row, mode.path);
 		if (resolved.repoPath === current) continue;
@@ -186,13 +220,53 @@ async function placeExisting(
 			throw repositoryTakenError(target);
 		}
 	}
-	applyRelocations(
-		ctx,
-		projectId,
-		relocations,
-		movableWorkspaces(ctx, project),
+	const cloned = await cloneAll(ctx, clones, signal);
+	try {
+		applyRelocations(
+			ctx,
+			projectId,
+			[...relocations, ...cloned],
+			movableWorkspaces(ctx, project),
+		);
+		if (project.deletedAt != null) restoreProject(ctx, projectId);
+	} catch (err) {
+		await removeCreated(
+			cloned.map(({ resolved }) => ({ resolved, created: true })),
+		);
+		throw err;
+	}
+}
+
+/** Every clone lands, or every folder made for them is removed. */
+async function cloneAll(
+	ctx: HostServiceContext,
+	clones: { repository: HostRepositoryRow; url: string }[],
+	signal?: AbortSignal,
+): Promise<Relocation[]> {
+	const settled = await Promise.allSettled(
+		clones.map(async ({ repository, url }) => ({
+			repository,
+			resolved: await classifyGitFailure(
+				cloneRepoInto(
+					url,
+					dirname(resolvePath(repository.repoPath)),
+					ctx.credentials,
+					signal,
+				),
+			),
+		})),
 	);
-	if (project.deletedAt != null) restoreProject(ctx, projectId);
+	const done = settled.flatMap((r) =>
+		r.status === "fulfilled" ? [r.value] : [],
+	);
+	const failed = settled.find((r) => r.status === "rejected");
+	if (failed) {
+		await removeCreated(
+			done.map(({ resolved }) => ({ resolved, created: true })),
+		);
+		throw failed.reason;
+	}
+	return done;
 }
 
 /** The workspaces that may follow a relocated repository: live ones, or those a deleted project will bring back. */

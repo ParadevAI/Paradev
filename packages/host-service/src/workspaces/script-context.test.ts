@@ -18,7 +18,10 @@ function createDb(): HostDb {
 	return db as unknown as HostDb;
 }
 
-function seedTwoRepoWorkspace(db: HostDb, repositories: "both" | "web") {
+function seedTwoRepoWorkspace(
+	db: HostDb,
+	repositories: "both" | "web" | "none",
+) {
 	const project = seedProject(
 		{ db },
 		{
@@ -34,7 +37,9 @@ function seedTwoRepoWorkspace(db: HostDb, repositories: "both" | "web") {
 			projectId: project.id,
 			worktreePath: "/wt/feat",
 			branch: "feat",
-			repositoryIds: repositories === "both" ? [webId, apiId] : [webId],
+			repositoryIds: { both: [webId, apiId], web: [webId], none: [] }[
+				repositories
+			],
 		},
 	);
 	db.update(schema.projects)
@@ -58,9 +63,21 @@ test("scripts read the current primary's checkout and run in the workspace root"
 	});
 });
 
-test("with no checkout of the primary, only its main checkout's config is read", () => {
+test("a single-repo workspace of another repository than the primary uses that repository's config", () => {
 	const db = createDb();
 	const { projectId, workspace } = seedTwoRepoWorkspace(db, "web");
+
+	expect(resolveWorkspaceScriptContext(db, workspace)).toEqual({
+		projectId,
+		repoPath: "/src/web",
+		configWorktreePath: "/wt/feat",
+		scriptRoot: "/wt/feat",
+	});
+});
+
+test("with no checkout, only the primary's main checkout's config is read", () => {
+	const db = createDb();
+	const { projectId, workspace } = seedTwoRepoWorkspace(db, "none");
 
 	expect(resolveWorkspaceScriptContext(db, workspace)).toEqual({
 		projectId,

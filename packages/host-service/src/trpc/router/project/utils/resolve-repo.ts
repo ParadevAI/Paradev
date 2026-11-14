@@ -507,6 +507,13 @@ export async function cloneTemplateInto(
 	}
 }
 
+export function cloneDirectoryName(repoCloneUrl: string): string {
+	return (
+		parseGitHubRemote(repoCloneUrl)?.name ??
+		deriveCloneDirectoryName(repoCloneUrl)
+	);
+}
+
 function deriveCloneDirectoryName(repoCloneUrl: string): string {
 	const normalized = repoCloneUrl
 		.trim()
@@ -540,7 +547,7 @@ export async function cloneRepoInto(
 	const expectedSlug = parsedUrl
 		? `${parsedUrl.owner}/${parsedUrl.name}`
 		: null;
-	const repoName = parsedUrl?.name ?? deriveCloneDirectoryName(repoCloneUrl);
+	const repoName = cloneDirectoryName(repoCloneUrl);
 
 	const resolvedParentDir = resolvePath(parentDir);
 	ensureParentDirectory(resolvedParentDir);

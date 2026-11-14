@@ -695,7 +695,7 @@ test("setup runs once in the workspace root, from the current primary repository
 	}
 });
 
-test("a workspace with no checkout of a new primary repository reads only that repository's config", async () => {
+test("a single-repo workspace keeps its own repository's config after another repository becomes primary", async () => {
 	const host = await createTestHost({
 		apiOverrides: {
 			...cloudFlows.workspaceCreateOk(),
@@ -744,7 +744,7 @@ test("a workspace with no checkout of a new primary repository reads only that r
 
 		expect(started.mock.calls[0]?.[0]).toMatchObject({
 			workspaceId: workspace.id,
-			initialCommand: `(cd '${join(root, "api")}' && echo api-install) && (cd '${root}' && echo api-setup)`,
+			initialCommand: "echo web-setup",
 		});
 	} finally {
 		started.mockRestore();
