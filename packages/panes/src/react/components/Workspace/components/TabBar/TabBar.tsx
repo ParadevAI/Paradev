@@ -296,13 +296,13 @@ export function TabBar<TData>({
 				observeChildren
 				onOverflowChange={handleOverflowChange}
 				className={cn(
-					"hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden",
+					"hide-scrollbar flex min-w-0 flex-initial items-stretch overflow-x-auto overflow-y-hidden",
 					isCards && "pl-1.5",
 				)}
 			>
 				<div
 					ref={tabsTrackRef}
-					className="no-drag relative flex h-full flex-1 items-stretch"
+					className="relative flex h-full flex-1 items-stretch"
 				>
 					{tabs.map((tab, i) => (
 						<div
@@ -356,14 +356,6 @@ export function TabBar<TData>({
 							/>
 						</div>
 					)}
-					{/* Empty space to the right of the tabs (collapses to 0 when the
-					    tabs overflow); the bar's only window-drag region. */}
-					<div
-						className={cn(
-							"drag h-full flex-1",
-							!isCards && "border-b border-border",
-						)}
-					/>
 				</div>
 			</OverflowFadeContainer>
 			{hasHorizontalOverflow && (
@@ -379,6 +371,12 @@ export function TabBar<TData>({
 					/>
 				</div>
 			)}
+			<div
+				className={cn(
+					"drag h-full min-w-8 flex-1",
+					!isCards && "border-b border-border",
+				)}
+			/>
 			{renderTabBarTrailing && (
 				<div
 					className={cn(
