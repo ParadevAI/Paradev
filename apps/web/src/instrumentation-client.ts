@@ -26,6 +26,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 });
 
 registerBaseProperties();
+posthog.capture("$pageview");
 
 Sentry.init({
 	dsn: env.NEXT_PUBLIC_SENTRY_DSN_WEB,
