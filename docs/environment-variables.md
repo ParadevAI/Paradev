@@ -142,8 +142,10 @@ The web proxy reads this optional string directly from `process.env` so its
 auth gate does not load the full app environment schema. The API reads its
 declared server environment value.
 Production API builds and runtime now pass the optional production
-`DOMAIN_MOVE_ENABLED` secret. Production web deliberately does not pass it, so
-desktop sign-in can roll out before existing web pages move. No secret is set
+`DOMAIN_MOVE_ENABLED` secret, and production web passes the same secret. Each
+surface has its own PostHog flag, so they roll out separately: desktop sign-in
+reads `web-domain-move` and old-app pages read `web-pages-domain-move`. A
+missing `web-pages-domain-move` flag retains the old pages. No secret is set
 by merging the wiring. Stage and final artifact preparation explicitly pass
 `false`. See
 [the cutover handoff](paradev-staging.md#inert-domain-cutover-preparation) before
