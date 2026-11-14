@@ -97,8 +97,8 @@ PostHog project. Discard the profile after testing.
 ## Inert domain cutover preparation
 
 Production API build/runtime passthrough reads the optional
-`DOMAIN_MOVE_ENABLED` secret. Production web passthrough remains absent so the
-desktop rollout can precede existing web users. Changing this workflow's
+`DOMAIN_MOVE_ENABLED` secret. Production web reads the same secret and its own
+flag, so the desktop rollout can precede existing web users. Changing this workflow's
 watched path can redeploy relay, realtime and agent-worker; do not weaken those
 filters. Building final artifacts does not activate routing or assign domains.
 
@@ -135,12 +135,13 @@ The optional server setting `DOMAIN_MOVE_ENABLED` must be exactly `true` before
 any domain-move flag lookup, PostHog client import by the routing hook, or rollout
 cookie creation. Missing, empty, `false`, and other values retain the existing
 response. API/web preview jobs pass the optional setting from
-`secrets.DOMAIN_MOVE_ENABLED`; production passes it only to the legacy API.
+`secrets.DOMAIN_MOVE_ENABLED`; production passes it to the legacy API and web.
 Merging the wiring creates or changes no secret. The
 isolated stage/final workflow explicitly keeps the setting `false`.
 
-Once explicitly enabled, eligible requests evaluate the shared PostHog flag
-`web-domain-move`. Only boolean `true` moves the request. Missing/deleted flags,
+Once explicitly enabled, eligible requests evaluate one PostHog flag for each
+surface: `web-domain-move` for desktop sign-in starts and
+`web-pages-domain-move` for old-app pages. Only boolean `true` moves the request. Missing/deleted flags,
 variants, errors and the 500 ms evaluation deadline retain the old flow. Exposure
 events are suppressed. There is no application result cache (maximum age zero)
 and no per-user map. The deadline bounds added request latency, including lazy
@@ -207,11 +208,12 @@ to stage-configured deployments. Do not perform billing/vendor operations as
 part of these checks. Live verification and provider readiness are not proven
 by local tests.
 
-For rollback, turn the shared flag off first; the next completed evaluation
-fails closed without an application cache delay. The server opt-in can also be
+For rollback, turn the flag for the surface off first: `web-pages-domain-move`
+for old-app pages, `web-domain-move` for desktop sign-in. The next completed
+evaluation fails closed without an application cache delay. The server opt-in can also be
 disabled on both legacy deployments. Keep old and new callbacks/deployments so
-in-flight OAuth completes. Do not restore any new-to-old redirect until the
-old-to-new move is disabled. Restoring recorded final alias owners requires its
+in-flight OAuth completes. Do not restore any new-to-old redirect until both
+flags are disabled. Restoring recorded final alias owners requires its
 own routing approval; never send final hosts to stage-configured builds. No DB
 rollback is involved.
 
@@ -287,8 +289,11 @@ After final integrations and marketing acceptance, set the legacy API's optional
 `DOMAIN_MOVE_ENABLED` secret to `true` and deploy while the flag stays inactive.
 Verify excluded requests retain the old flow and final hosts do not reverse
 redirect. Test an explicit functional browser UUID before a small percentage
-rollout. Ordinary legacy web pages remain unchanged because their deployment
-does not pass the opt-in. Broader existing-web activation is a later change.
+rollout. Ordinary legacy web pages move only through the separate
+`web-pages-domain-move` flag. Create it inactive at 0% before the web
+deployment passes the opt-in, test an explicit browser UUID, then raise the
+percentage. Moved users sign in once more on `app.paradev.com`, because the
+session cookie is scoped to `superset.sh`.
 
 Disable the flag first to roll back desktop starts. Restore the marketing
 override and redeploy marketing to roll back its links. Keep both stacks and
