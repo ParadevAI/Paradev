@@ -89,6 +89,16 @@ const config = {
 				destination: "/agents/claude-code",
 				permanent: true,
 			},
+			{
+				source: "/changelog",
+				destination: "https://paradev.com/changelog",
+				permanent: true,
+			},
+			{
+				source: "/agent-orchestration",
+				destination: "https://paradev.com/agent-orchestration",
+				permanent: true,
+			},
 		];
 		return withLegacyHostRedirects(redirects, {
 			rootDomain: readRootDomain(),
