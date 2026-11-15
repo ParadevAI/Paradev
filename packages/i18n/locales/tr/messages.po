@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Geri"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Ödeme sayfasından dönüldü. Faturalandırma yenilendi."
+
 msgid "Back to About"
 msgstr "Hakkımızda sayfasına dön"
 
@@ -15123,9 +15126,6 @@ msgstr "Ödeme yöntemi"
 
 msgid "Payment Successful"
 msgstr "Ödeme başarılı"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "Ödeme başarılı. Planınız güncellendi."
 
 msgid "PDF"
 msgstr "PDF"

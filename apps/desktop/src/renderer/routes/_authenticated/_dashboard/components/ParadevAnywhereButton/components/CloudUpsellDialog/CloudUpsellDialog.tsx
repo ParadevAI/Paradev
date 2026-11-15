@@ -17,10 +17,10 @@ import {
 } from "@superset/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { LuCloud } from "react-icons/lu";
+import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { PlanChangeDialog } from "renderer/routes/_authenticated/components/PlanChangeDialog";
 import { useBillingActions } from "renderer/routes/_authenticated/hooks/useBillingActions";
-import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
 import { usePlanCatalog } from "renderer/routes/_authenticated/hooks/usePlanCatalog";
 
 interface CloudUpsellDialogProps {
@@ -34,11 +34,15 @@ export function CloudUpsellDialog({
 }: CloudUpsellDialogProps) {
 	const { formatCurrency, formatNumber } = useFormat();
 	const navigate = useNavigate();
-	const isOwner = useIsOrganizationOwner();
 	const catalogQuery = usePlanCatalog();
-	const { data: members } = cloudTrpc.organization.listMembers.useQuery({
-		includeDeactivated: false,
-	});
+	const { data: session } = authClient.useSession();
+	const { data: members } = cloudTrpc.organization.listMembers.useQuery(
+		{ includeDeactivated: false },
+		{ enabled: open },
+	);
+	const isOwner =
+		members?.find((member) => member.userId === session?.user?.id)?.role ===
+		"owner";
 	const memberCount =
 		members && members.length > 0 ? members.length : undefined;
 	const {
@@ -69,7 +73,11 @@ export function CloudUpsellDialog({
 
 	const comparePlans = () => {
 		onOpenChange(false);
-		void navigate({ to: "/settings/billing", search: { source: "cloud" } });
+		void navigate(
+			teamFamily
+				? { to: "/settings/billing", search: { source: "cloud" } }
+				: { to: "/settings/billing/plans" },
+		);
 	};
 
 	const handleUpgrade = async () => {
@@ -128,6 +136,18 @@ export function CloudUpsellDialog({
 						<p className="text-sm text-muted-foreground">
 							<Trans>Loading plans...</Trans>
 						</p>
+					)}
+					{catalogQuery.isError && (
+						<div className="flex items-center gap-3 text-sm text-muted-foreground">
+							<Trans>Could not load plans.</Trans>
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => catalogQuery.refetch()}
+							>
+								<Trans>Retry</Trans>
+							</Button>
+						</div>
 					)}
 					{teamFamily && !isOwner && (
 						<p className="text-sm text-muted-foreground">

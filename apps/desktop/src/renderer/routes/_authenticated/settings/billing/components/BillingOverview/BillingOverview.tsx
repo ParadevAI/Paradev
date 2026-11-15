@@ -37,7 +37,6 @@ import { RecentInvoices } from "./components/RecentInvoices";
 
 interface BillingOverviewProps {
 	visibleItems?: SettingItemId[] | null;
-	/** Billing was opened for cloud: point at the plans that include it. */
 	highlightCloud?: boolean;
 }
 
@@ -105,7 +104,8 @@ export function BillingOverview({
 		(organization) => organization.id === activeOrgId,
 	)?.name;
 
-	const catalog = usePlanCatalog().data ?? [];
+	const catalogQuery = usePlanCatalog();
+	const catalog = catalogQuery.data ?? [];
 	const currentFamily =
 		plan === "pro"
 			? (familyForPlan(catalog, activePlan?.autumnPlanId)?.family ?? null)
@@ -129,12 +129,12 @@ export function BillingOverview({
 	const highlightedFamilies = new Set(
 		showCloudPlans ? cloudFamilies.map((family) => family.family) : [],
 	);
-	const showPlanList =
-		catalog.length > 0 &&
-		(plan === "free" ||
-			(plan === "pro" &&
-				activePlan?.billingProvider === "autumn" &&
-				!activePlan?.cancelAt));
+	const offersPlanChange =
+		plan === "free" ||
+		(plan === "pro" &&
+			activePlan?.billingProvider === "autumn" &&
+			!activePlan?.cancelAt);
+	const showPlanList = offersPlanChange && catalog.length > 0;
 
 	const handleUpgrade = async (family: PlanFamily, yearly: boolean) => {
 		const target = planForInterval(family, yearly);
@@ -213,6 +213,18 @@ export function BillingOverview({
 								status={activePlan?.status}
 							/>
 						</div>
+					</div>
+				)}
+				{showOverview && offersPlanChange && catalogQuery.isError && (
+					<div className="flex items-center gap-3 text-sm text-muted-foreground">
+						<Trans>Could not load plans.</Trans>
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => catalogQuery.refetch()}
+						>
+							<Trans>Retry</Trans>
+						</Button>
 					</div>
 				)}
 				{showOverview && showPlanList && (

@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "已从结账页面返回。账单信息已刷新。"
+
 msgid "Back to About"
 msgstr "返回关于页"
 
@@ -15123,9 +15126,6 @@ msgstr "支付方式"
 
 msgid "Payment Successful"
 msgstr "支付成功"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "支付成功。你的方案已更新。"
 
 msgid "PDF"
 msgstr "PDF"

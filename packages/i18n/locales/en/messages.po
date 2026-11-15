@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Back"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Back from checkout. Billing is refreshed."
+
 msgid "Back to About"
 msgstr "Back to About"
 
@@ -15123,9 +15126,6 @@ msgstr "Payment method"
 
 msgid "Payment Successful"
 msgstr "Payment Successful"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "Payment successful. Your plan is updated."
 
 msgid "PDF"
 msgstr "PDF"

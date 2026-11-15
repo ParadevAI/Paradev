@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "戻る"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "チェックアウトから戻りました。請求情報を更新しました。"
+
 msgid "Back to About"
 msgstr "会社概要に戻る"
 
@@ -15123,9 +15126,6 @@ msgstr "支払い方法"
 
 msgid "Payment Successful"
 msgstr "支払いが完了しました"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "支払いが完了しました。プランを更新しました。"
 
 msgid "PDF"
 msgstr "PDF"

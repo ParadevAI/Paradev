@@ -104,7 +104,6 @@ function getPathFromSection(section: SettingsSection): string {
 	return SECTION_PATHS[section] ?? "/settings/account";
 }
 
-/** Pages inside a regular section that lay out their own width. */
 const FULL_WIDTH_SUBPAGE_PATHS = ["/settings/billing/plans"];
 
 /**

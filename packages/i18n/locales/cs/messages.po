@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Zpět"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Návrat z platby. Fakturace je obnovená."
+
 msgid "Back to About"
 msgstr "Zpět na O nás"
 
@@ -15123,9 +15126,6 @@ msgstr "Způsob platby"
 
 msgid "Payment Successful"
 msgstr "Platba proběhla"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "Platba proběhla. Váš plán je aktualizovaný."
 
 msgid "PDF"
 msgstr "PDF"

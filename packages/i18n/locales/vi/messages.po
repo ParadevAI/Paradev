@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Quay lại"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Đã quay lại từ trang thanh toán. Thông tin thanh toán đã được làm mới."
+
 msgid "Back to About"
 msgstr "Quay lại Giới thiệu"
 
@@ -15123,9 +15126,6 @@ msgstr "Phương thức thanh toán"
 
 msgid "Payment Successful"
 msgstr "Thanh toán thành công"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "Thanh toán thành công. Gói của bạn đã được cập nhật."
 
 msgid "PDF"
 msgstr "PDF"

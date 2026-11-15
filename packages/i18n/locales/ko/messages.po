@@ -3530,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "뒤로"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "결제 페이지에서 돌아왔습니다. 결제 정보를 새로 고쳤습니다."
+
 msgid "Back to About"
 msgstr "소개로 돌아가기"
 
@@ -15123,9 +15126,6 @@ msgstr "결제 수단"
 
 msgid "Payment Successful"
 msgstr "결제 완료"
-
-msgid "Payment successful. Your plan is updated."
-msgstr "결제가 완료되었습니다. 플랜이 업데이트되었습니다."
 
 msgid "PDF"
 msgstr "PDF"

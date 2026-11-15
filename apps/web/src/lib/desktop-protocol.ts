@@ -16,7 +16,6 @@ export function isDesktopProtocol(protocol: string): boolean {
 	return DESKTOP_PROTOCOL.test(protocol);
 }
 
-/** Deep link that takes the desktop back to its billing page after checkout. */
 export function desktopCheckoutReturnUrl(
 	protocol: string | undefined,
 ): string | null {

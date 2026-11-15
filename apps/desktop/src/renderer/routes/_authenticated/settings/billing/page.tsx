@@ -25,7 +25,7 @@ function BillingPage() {
 
 	useEffect(() => {
 		if (checkout !== "success") return;
-		toast.success(t({ message: "Payment successful. Your plan is updated." }), {
+		toast.success(t({ message: "Back from checkout. Billing is refreshed." }), {
 			id: "checkout-success",
 		});
 		void utils.billing.invalidate();
