@@ -5,6 +5,7 @@ import { Pressable, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useAccessibilityTextSize } from "@/hooks/useAccessibilityTextSize";
 import { useTheme } from "@/hooks/useTheme";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 
@@ -36,6 +37,7 @@ export function ProjectSectionHeader({
 }: ProjectSectionHeaderProps) {
 	const { t } = useLingui();
 	const theme = useTheme();
+	const accessibilitySize = useAccessibilityTextSize();
 	const Caret = collapsed ? ChevronRight : ChevronDown;
 	return (
 		// The collapse target and the "+" are siblings on purpose: a control
@@ -54,7 +56,11 @@ export function ProjectSectionHeader({
 				<View className="size-6 items-center justify-center">
 					{icon ?? <ProjectAvatar name={name} iconUrl={iconUrl} size={20} />}
 				</View>
-				<Text variant="large" className="shrink" numberOfLines={1}>
+				<Text
+					variant="large"
+					className="shrink"
+					numberOfLines={accessibilitySize ? 2 : 1}
+				>
 					{name}
 				</Text>
 				<Text className="text-muted-foreground font-mono text-[13px]">
