@@ -1,0 +1,26 @@
+diff --git a/react-native.js b/react-native.js
+index afce32b6263fdac1358e6d6e225e0efe3a97132d..6b5d6e0ae262ab26533ac1cb9b6d3958de226142 100644
+--- a/react-native.js
++++ b/react-native.js
+@@ -2107,7 +2107,7 @@ function checkFinishedScrollFallback(ctx) {
+         const shouldRetrySilentInitialNativeScroll = Platform.OS === "android" && canFinishAfterSilentNativeDispatch && !initialScrollCompletion.didRetrySilentInitialScroll(state);
+         const shouldFinishAfterObservedScroll = state.hasScrolled && (!isStillScrollingTo.isInitialScroll || completionState.isAtResolvedTarget);
+         const shouldRetryUnalignedInitialScroll = isStillScrollingTo.isInitialScroll && !completionState.isAtResolvedTarget && numChecks <= maxChecks;
+-        const shouldRetryUnalignedEndScroll = Platform.OS === "ios" && !isStillScrollingTo.isInitialScroll && isEndAlignedLastItemTarget(ctx, isStillScrollingTo) && !completionState.isAtResolvedTarget && numChecks <= maxChecks;
++        const shouldRetryUnalignedEndScroll = Platform.OS !== "web" && !isStillScrollingTo.isInitialScroll && isEndAlignedLastItemTarget(ctx, isStillScrollingTo) && !completionState.isAtResolvedTarget && numChecks <= maxChecks;
+         if (shouldRetrySilentInitialNativeScroll) {
+           const targetOffset = (_b = (_a3 = getInitialScrollWatchdogTargetOffset(state)) != null ? _a3 : isStillScrollingTo.targetOffset) != null ? _b : 0;
+           const jiggleOffset = targetOffset >= SILENT_INITIAL_SCROLL_TARGET_EPSILON ? targetOffset - SILENT_INITIAL_SCROLL_TARGET_EPSILON : targetOffset + SILENT_INITIAL_SCROLL_TARGET_EPSILON;
+diff --git a/react-native.mjs b/react-native.mjs
+index 2f513edf892431af167fec872cf20158dd14f894..4e6e14dee65a22a450a361f51f16f03cfc8206c0 100644
+--- a/react-native.mjs
++++ b/react-native.mjs
+@@ -2086,7 +2086,7 @@ function checkFinishedScrollFallback(ctx) {
+         const shouldRetrySilentInitialNativeScroll = Platform.OS === "android" && canFinishAfterSilentNativeDispatch && !initialScrollCompletion.didRetrySilentInitialScroll(state);
+         const shouldFinishAfterObservedScroll = state.hasScrolled && (!isStillScrollingTo.isInitialScroll || completionState.isAtResolvedTarget);
+         const shouldRetryUnalignedInitialScroll = isStillScrollingTo.isInitialScroll && !completionState.isAtResolvedTarget && numChecks <= maxChecks;
+-        const shouldRetryUnalignedEndScroll = Platform.OS === "ios" && !isStillScrollingTo.isInitialScroll && isEndAlignedLastItemTarget(ctx, isStillScrollingTo) && !completionState.isAtResolvedTarget && numChecks <= maxChecks;
++        const shouldRetryUnalignedEndScroll = Platform.OS !== "web" && !isStillScrollingTo.isInitialScroll && isEndAlignedLastItemTarget(ctx, isStillScrollingTo) && !completionState.isAtResolvedTarget && numChecks <= maxChecks;
+         if (shouldRetrySilentInitialNativeScroll) {
+           const targetOffset = (_b = (_a3 = getInitialScrollWatchdogTargetOffset(state)) != null ? _a3 : isStillScrollingTo.targetOffset) != null ? _b : 0;
+           const jiggleOffset = targetOffset >= SILENT_INITIAL_SCROLL_TARGET_EPSILON ? targetOffset - SILENT_INITIAL_SCROLL_TARGET_EPSILON : targetOffset + SILENT_INITIAL_SCROLL_TARGET_EPSILON;
