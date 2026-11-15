@@ -7,8 +7,8 @@ import { RowLink } from "@/components/RowLink";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useAccessibilityTextSize } from "@/hooks/useAccessibilityTextSize";
 import type { CloudWorkspaceStatus } from "@/hooks/useCloudWorkspaceItems";
+import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type {
 	HostWorkspaceItem,
 	HostWorkspacesCacheOps,
@@ -61,7 +61,7 @@ export function WorkspaceRow({
 	card?: boolean;
 }) {
 	const { t } = useLingui();
-	const accessibilitySize = useAccessibilityTextSize();
+	const enlargedText = useEnlargedText();
 	const router = useRouter();
 	const theme = useTheme();
 	const prIcon = pullRequest
@@ -171,17 +171,22 @@ export function WorkspaceRow({
 					<View className="flex-1">
 						<Text
 							className="font-medium text-[15px]"
-							numberOfLines={accessibilitySize ? 3 : 1}
+							numberOfLines={enlargedText ? undefined : 1}
 						>
 							{workspace.name}
 						</Text>
-						<View className="flex-row flex-wrap items-center gap-1">
+						<View
+							className={cn(
+								"flex-row items-center gap-1",
+								enlargedText && "flex-wrap",
+							)}
+						>
 							{/* A workspace named after its branch says it twice otherwise —
 						    common now that every project shows its `main`. */}
 							{workspace.branch === workspace.name ? null : (
 								<Text
 									className="text-muted-foreground shrink text-xs"
-									numberOfLines={accessibilitySize ? 2 : 1}
+									numberOfLines={enlargedText ? undefined : 1}
 								>
 									{workspace.branch}
 								</Text>
