@@ -72,10 +72,11 @@ rejections in this category are one of these.
       (the headings in that file map to the guidelines reviewers check:
       payments, Sign in with Apple, account deletion, on-device code execution,
       permissions).
-- [ ] Outside the US App Store storefront, no button, link, or copy points at
-      a web page where a plan can be bought, or says how to upgrade (guideline
-      3.1.1; one build ships worldwide). The US storefront may link to checkout
-      (3.1.1(a)). On Android (Google Play Payments: we sell nothing in-app), a
+- [ ] On iOS, no button, link, or copy points at a web page where a plan can
+      be bought, or says how to upgrade (guideline 3.1.1). Our Nov 6, 2026 reply
+      to App Review promised this for every storefront, so the US link-out that
+      3.1.1(a) allows stays off until a release says otherwise in its notes. On
+      Android (Google Play Payments: we sell nothing in-app), a
       paid organization gets a "Manage Plan" link and a Free one gets plain,
       non-tappable "Upgrade to Pro at <host>" text. Billing URLs live only in
       `lib/web-links.ts` and `lib/upgrade/checkout`, read only by `useUpgrade`,
