@@ -208,6 +208,19 @@ describe("ensureSidebarProjectRecord", () => {
 		});
 	});
 
+	it("does not expand a project that stays hidden", () => {
+		const collections = makeCollections();
+		const row = projectRow("proj-1", { isHidden: true, isCollapsed: true });
+		collections.v2SidebarProjects.insert(row);
+
+		ensureSidebarProjectRecord(asProjectArg(collections), "proj-1", {
+			reveal: false,
+			expand: true,
+		});
+
+		expect(collections.v2SidebarProjects.get("proj-1")).toEqual(row);
+	});
+
 	it("inserts a visible row ahead of existing projects when none exists", () => {
 		const collections = makeCollections();
 		collections.v2SidebarProjects.insert(projectRow("proj-1", { tabOrder: 1 }));

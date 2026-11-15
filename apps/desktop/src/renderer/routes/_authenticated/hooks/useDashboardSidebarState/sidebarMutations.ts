@@ -105,7 +105,8 @@ export function ensureSidebarProjectRecord(
 	const existing = collections.v2SidebarProjects.get(projectId);
 	if (existing) {
 		const unhide = existing.isHidden && reveal;
-		const uncollapse = existing.isCollapsed && expand;
+		const staysHidden = existing.isHidden && !reveal;
+		const uncollapse = existing.isCollapsed && expand && !staysHidden;
 		if (unhide || uncollapse) {
 			collections.v2SidebarProjects.update(projectId, (draft) => {
 				if (unhide) draft.isHidden = false;
