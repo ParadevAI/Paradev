@@ -355,6 +355,7 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 			upstreamBranch: "refs/pull/42/head",
 		});
 		const paths: string[] = [];
+		const network = { offline: false };
 		const manager = createManager(db, {
 			readWorkspaceRefs: async () => {
 				const workspace = getWorkspace(db, "ws");
@@ -369,6 +370,11 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 				};
 			},
 			execGh: async (args) => {
+				if (network.offline) {
+					throw Object.assign(new Error("Command failed: gh api"), {
+						stderr: "error connecting to api.github.com",
+					});
+				}
 				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
 				paths.push(path);
 				if (path === `repos/${REPO.owner}/${REPO.name}/pulls/42`) {
@@ -384,7 +390,7 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 				return [];
 			},
 		});
-		return { db, manager, paths };
+		return { db, manager, paths, network };
 	}
 
 	test("discovers a merged PR by its synthetic ref without an existing link", async () => {
@@ -429,6 +435,27 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
 		expect(getWorkspace(db, "ws")?.suppressedPullRequestId).toBe(prId);
+	});
+
+	test.each([
+		{ name: "changed HEAD", headSha: "def456", keepsLink: false },
+		{ name: "matching HEAD", headSha: "abc123", keepsLink: true },
+		{ name: "unknown HEAD", headSha: null, keepsLink: true },
+	])("offline refresh with $name", async ({ headSha, keepsLink }) => {
+		const { db, manager, network } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+
+		db.update(workspaces).set({ headSha }).where(eq(workspaces.id, "ws")).run();
+		network.offline = true;
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(keepsLink ? prId : null);
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
 	});
 
 	test("does not resolve a different repository's synthetic ref in the base repo", async () => {
