@@ -2,6 +2,8 @@ import type { UserContent, UserMessage } from "@superset/chat/protocol";
 
 export type DrawerQueue = {
 	prompts: UserMessage[];
+	/** Prompts on their way to the queue: shown, but not yet the host's to act on. */
+	sending?: UserMessage[];
 	paused: boolean;
 	pausedByLimit?: boolean;
 	pausedByShutdown?: boolean;
