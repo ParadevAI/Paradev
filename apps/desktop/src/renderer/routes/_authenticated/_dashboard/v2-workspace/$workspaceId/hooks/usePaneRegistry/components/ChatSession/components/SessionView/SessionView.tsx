@@ -52,6 +52,7 @@ import { editableMessageIds, rewindTranscript } from "../../utils/messageEdit";
 import { modelDisplayName } from "../../utils/modelDisplayName";
 import { promptHistory } from "../../utils/promptHistory";
 import { railMessages } from "../../utils/railMessages";
+import { splitOutbox } from "../../utils/splitOutbox";
 import { unrunPrompt } from "../../utils/unrunPrompt";
 import {
 	type AgentChoice,
@@ -556,9 +557,22 @@ export function SessionView({
 				: null,
 		[loaded, runningTurnId, awaitingBackground, cancelTurn, held],
 	);
+	const sentOutbox = useMemo(
+		() => splitOutbox(session.outbox, runningTurnId !== null),
+		[session.outbox, runningTurnId],
+	);
+	const sendingPrompts = useMemo(
+		() =>
+			sentOutbox.queue.filter(
+				(sending) =>
+					!queuedPrompts.some((prompt) => prompt.clientId === sending.clientId),
+			),
+		[sentOutbox.queue, queuedPrompts],
+	);
 	const promptQueue = useMemo(
 		() => ({
 			prompts: queuedPrompts,
+			sending: sendingPrompts,
 			paused: sessionState?.queuePaused === true,
 			pausedByLimit:
 				sessionState?.usageLimit !== undefined ||
@@ -572,6 +586,7 @@ export function SessionView({
 		}),
 		[
 			queuedPrompts,
+			sendingPrompts,
 			sessionState?.queuePaused,
 			sessionState?.usageLimit,
 			sessionState?.queuePausedByLimit,
@@ -626,9 +641,9 @@ export function SessionView({
 	const transcriptOutbox = useMemo(
 		() =>
 			heldOutbox.length > 0
-				? [...session.outbox, ...heldOutbox]
-				: session.outbox,
-		[session.outbox, heldOutbox],
+				? [...sentOutbox.transcript, ...heldOutbox]
+				: sentOutbox.transcript,
+		[sentOutbox.transcript, heldOutbox],
 	);
 	const booting = sessionState?.status === "starting";
 	const openModelPicker = useCallback(
