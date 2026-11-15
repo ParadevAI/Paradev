@@ -979,11 +979,19 @@ describe("LiveSession", () => {
 	});
 
 	test("a prompt queued while a join is in flight does not overtake it when the turn ends", async () => {
+		let refuseJoin: () => void = () => {};
+		const steerGate = new Promise<void>((release) => {
+			refuseJoin = release;
+		});
 		const { runtime, sessionId, adapters } = startSessionWithAdapters({
 			...HELD_THEN_QUICK,
 			steer: false,
-			steerDelayMs: 200,
+			steerGate,
 		});
+		const delivered = () =>
+			(adapters[0]?.prompted ?? []).map(
+				(content) => content.find((part) => part.type === "text")?.text ?? "",
+			);
 		sendPrompt(runtime, sessionId, "first");
 		await waitForApproval(runtime, sessionId);
 		sendPrompt(runtime, sessionId, "joined", {
@@ -993,11 +1001,13 @@ describe("LiveSession", () => {
 		await waitFor(() => adapters[0]?.steered.includes("joined") === true);
 		sendPrompt(runtime, sessionId, "later");
 		answerApproval(runtime, sessionId);
+		await waitFor(
+			() =>
+				snapshotOf(runtime, sessionId).turns.get("t1")?.status === "completed",
+		);
 
-		const delivered = () =>
-			(adapters[0]?.prompted ?? []).map(
-				(content) => content.find((part) => part.type === "text")?.text ?? "",
-			);
+		expect(delivered()).not.toContain("later");
+		refuseJoin();
 		await waitFor(
 			() => delivered().includes("joined") && delivered().includes("later"),
 		);
