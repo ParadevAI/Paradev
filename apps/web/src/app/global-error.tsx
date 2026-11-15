@@ -12,7 +12,7 @@ export default function GlobalError({
 }) {
 	useEffect(() => {
 		Sentry.captureException(error);
-		posthog.captureException(error, { digest: error.digest });
+		posthog.captureException(error, { digest: error?.digest });
 	}, [error]);
 
 	return (
