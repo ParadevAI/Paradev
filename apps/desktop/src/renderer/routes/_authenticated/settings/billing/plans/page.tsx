@@ -18,7 +18,7 @@ import { Button } from "@superset/ui/button";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { differenceInDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Fragment, useState } from "react";
 import { HiArrowLeft, HiArrowUpRight, HiCheck } from "react-icons/hi2";
 import { env } from "renderer/env.renderer";
