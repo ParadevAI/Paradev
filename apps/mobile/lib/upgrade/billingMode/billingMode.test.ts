@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { billingAccess } from "./billingAccess";
 import { billingMode } from "./billingMode";
 import type { BillingMode } from "./billingMode.types";
-import { billingModeForStorefront } from "./billingModeForStorefront";
 
 const HOST = "app.example.test";
 const NO_ACCESS = {
@@ -16,21 +15,14 @@ function access(mode: BillingMode, isPaid: boolean, isOwner = true) {
 }
 
 describe("billingMode", () => {
-	test("only the US storefront links; every other storefront says nothing", () => {
-		expect(billingModeForStorefront("USA")).toBe("link");
-		expect(billingModeForStorefront("GBR")).toBe("none");
-		expect(billingModeForStorefront("usa")).toBe("none");
-		expect(billingModeForStorefront(null)).toBe("none");
-	});
-
 	test("Android names the host in plain text", async () => {
 		expect(await billingMode()).toBe("text");
 	});
 });
 
 describe("billingAccess", () => {
-	test("iOS outside the US offers no link and names no host, paid or not", () => {
-		const none = billingModeForStorefront("GBR");
+	test("iOS offers no link and names no host, paid or not", () => {
+		const none: BillingMode = "none";
 		for (const isPaid of [false, true]) {
 			for (const isOwner of [false, true]) {
 				expect(access(none, isPaid, isOwner)).toEqual(NO_ACCESS);
@@ -55,7 +47,7 @@ describe("billingAccess", () => {
 		});
 	});
 
-	test("the US storefront and the web link, and only an owner buys", () => {
+	test("the web links, and only an owner buys", () => {
 		expect(access("link", false)).toEqual({
 			canUpgrade: true,
 			canManagePlan: true,
