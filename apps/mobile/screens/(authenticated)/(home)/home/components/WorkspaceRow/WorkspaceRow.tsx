@@ -112,7 +112,7 @@ export function WorkspaceRow({
 						"bg-background web:hover:bg-accent/60 flex-row items-center gap-3 rounded-xl pr-3",
 						card ? "py-3 pl-3" : "py-2 pl-10",
 					)}
-					onPress={() => router.push(`/(authenticated)${href}`)}
+					onPress={() => router.navigate(`/(authenticated)${href}`)}
 					ph-label="workspace-row"
 				>
 					{/* Desktop WorkspaceIcon semantics: working replaces the icon with

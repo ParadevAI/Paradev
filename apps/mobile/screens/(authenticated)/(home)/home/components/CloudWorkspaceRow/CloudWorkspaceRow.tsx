@@ -84,7 +84,7 @@ export function CloudWorkspaceRow({
 				"bg-background flex-row items-center gap-3 rounded-xl pr-3",
 				card ? "py-3 pl-3" : "py-2 pl-4",
 			)}
-			onPress={() => router.push(`/(authenticated)/workspace/${row.id}`)}
+			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
 			ph-label="cloud-workspace-row"
 		>
 			<ProjectAvatar
