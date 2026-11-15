@@ -164,3 +164,15 @@ still receives its existing schema-validated `NEXT_PUBLIC_WEB_URL` at build
 and runtime, so no additional app schema or local environment value is needed.
 Do not change the shared `NEXT_PUBLIC_WEB_URL` secret to move marketing: the
 legacy API, web, admin, billing and auth returns still depend on it.
+
+## Desktop destination override
+
+The production-only GitHub environment secrets `DESKTOP_API_URL` and
+`DESKTOP_WEB_URL` override `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WEB_URL` only
+in the desktop build jobs (`build-desktop.yml`, stable and canary). An absent
+or empty override retains the shared secret. They take effect in the next
+desktop build; released builds do not change. To roll back, remove them and
+build again.
+
+Do not change the shared secrets to move desktop: the legacy API uses
+`NEXT_PUBLIC_API_URL` as its token issuer and audience.
