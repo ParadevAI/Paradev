@@ -108,6 +108,7 @@ interface CreateNewAgentSessionInput {
 interface DiffPaneProps {
 	context: RendererContext<PaneViewerData>;
 	mainStore: StoreApi<WorkspaceStore<PaneViewerData>>;
+	lastChatTerminalId: string | null;
 	workspaceId: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
 	onCreateNewAgentSession?: (
@@ -135,6 +136,7 @@ const createDiffEditor: EditorFactory<DiffAnnotationMetadata, undefined> = (
 export function DiffPane({
 	context,
 	mainStore,
+	lastChatTerminalId,
 	workspaceId,
 	onOpenFile,
 	onCreateNewAgentSession,
@@ -884,7 +886,7 @@ export function DiffPane({
 				return (
 					<AgentCommentComposer
 						workspaceId={workspaceId}
-						preferredTerminalId={activeChatTerminalId}
+						preferredTerminalId={activeChatTerminalId ?? lastChatTerminalId}
 						contextLabel={
 							m.startLine === m.endLine
 								? t({
@@ -935,6 +937,7 @@ export function DiffPane({
 		[
 			workspaceId,
 			activeChatTerminalId,
+			lastChatTerminalId,
 			targetItemId,
 			data.focusLine,
 			data.focusSide,

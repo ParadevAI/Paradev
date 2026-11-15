@@ -47,7 +47,7 @@ export function decodeSelection(value: string): DecodedSelection | null {
 interface UseAgentSessionTargetArgs {
 	sessions: TerminalAgentBinding[];
 	configs: HostAgentConfig[];
-	preferredTerminalId?: string;
+	preferredTerminalId?: string | null;
 }
 
 interface UseAgentSessionTargetResult {
@@ -81,6 +81,7 @@ export function useAgentSessionTarget({
 	const placement = useAgentSessionPlacement();
 
 	const computedDefault = useMemo<string | null>(() => {
+		if (preferredTerminalId === null) return null;
 		if (preferredTerminalId) {
 			return sessions.some((s) => s.terminalId === preferredTerminalId)
 				? `${EXISTING_PREFIX}${preferredTerminalId}`
@@ -115,7 +116,11 @@ export function useAgentSessionTarget({
 		return configs.some((c) => c.id === decoded.id);
 	}, [override, sessions, configs]);
 
-	const value = overrideIsValid ? override : computedDefault;
+	const value = overrideIsValid
+		? override
+		: override && preferredTerminalId !== undefined
+			? null
+			: computedDefault;
 
 	const resolved = useMemo<AgentTarget | null>(() => {
 		if (!value) return null;

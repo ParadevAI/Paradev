@@ -67,3 +67,28 @@ test("does not send to a different chat while the current chat is missing", () =
 			result.current.resolved.chatSessionId,
 	).toBe("chat-a");
 });
+
+test("requires a choice when the intended chat is unknown or a chosen chat disappears", () => {
+	window.localStorage.setItem("lastSelectedDiffCommentTerminalId", "term-a");
+	const sessions = [
+		{ terminalId: "term-a", chatSessionId: "chat-a" },
+		{ terminalId: "term-b", chatSessionId: "chat-b" },
+	] as TerminalAgentBinding[];
+	const { result, rerender } = renderHook(
+		({ available }) =>
+			useAgentSessionTarget({
+				sessions: available,
+				configs: [],
+				preferredTerminalId: null,
+			}),
+		{ initialProps: { available: sessions } },
+	);
+	expect(result.current.resolved).toBeNull();
+	act(() => result.current.onValueChange("existing:term-b"));
+	expect(
+		result.current.resolved?.kind === "existing" &&
+			result.current.resolved.chatSessionId,
+	).toBe("chat-b");
+	rerender({ available: sessions.slice(0, 1) });
+	expect(result.current.resolved).toBeNull();
+});

@@ -124,6 +124,7 @@ import { TerminalSessionDropdown } from "./components/TerminalPane/components/Te
 import { terminalContextMenuLinkStore } from "./components/TerminalPane/contextMenuLinkStore";
 import { useSurfaceFork } from "./hooks/useSurfaceFork";
 import { useUndoableChatClose } from "./hooks/useUndoableChatClose";
+import { useLastChatTerminalId } from "./useLastChatTerminalId";
 import { openInActions } from "./utils/openInActions";
 import { pagePaneLabel } from "./utils/pagePaneLabel";
 import { pagesListPageUiId } from "./utils/pagesListPageUiId";
@@ -200,6 +201,7 @@ export function usePaneRegistry({
 	rightStore,
 }: UsePaneRegistryOptions): PaneRegistry<PaneViewerData> {
 	const { t } = useLingui();
+	const lastChatTerminalId = useLastChatTerminalId(store);
 	const { workspace } = useWorkspace();
 	const workspaceId = workspace.id;
 	const closeChatWithUndo = useUndoableChatClose({
@@ -449,6 +451,7 @@ export function usePaneRegistry({
 						<DiffPane
 							context={ctx}
 							mainStore={store}
+							lastChatTerminalId={lastChatTerminalId}
 							workspaceId={workspaceId}
 							onOpenFile={onOpenFile}
 							onCreateNewAgentSession={createNewAgentSession}
@@ -1175,6 +1178,7 @@ export function usePaneRegistry({
 			onRevealPath,
 			onSearch,
 			createNewAgentSession,
+			lastChatTerminalId,
 			focusAgentTerminal,
 			workspaceTrpcUtils,
 			t,
