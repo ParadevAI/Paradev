@@ -273,7 +273,10 @@ export function useSubmitWorkspace(
 									action: {
 										label: t({ message: "Open billing" }),
 										onClick: () => {
-											void navigate({ to: "/settings/billing" });
+											void navigate({
+												to: "/settings/billing",
+												search: { source: "cloud" },
+											});
 										},
 									},
 								}

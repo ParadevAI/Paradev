@@ -920,7 +920,10 @@ export function NewWorkspaceScreen({
 									label: t({ message: "Open billing" }),
 									onClick: () => {
 										closeModal();
-										void navigate({ to: "/settings/billing" });
+										void navigate({
+											to: "/settings/billing",
+											search: { source: "cloud" },
+										});
 									},
 								},
 							}

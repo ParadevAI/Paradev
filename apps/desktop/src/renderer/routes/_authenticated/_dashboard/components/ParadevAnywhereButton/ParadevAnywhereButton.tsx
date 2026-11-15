@@ -16,6 +16,7 @@ import {
 	railButtonClass,
 } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { useSettings } from "renderer/stores/settings";
+import { CloudUpsellDialog } from "./components/CloudUpsellDialog";
 import { DevicesIcon } from "./components/DevicesIcon";
 import { ParadevAnywherePanel } from "./components/ParadevAnywherePanel";
 
@@ -36,6 +37,7 @@ export function ParadevAnywhereButton({
 }: ParadevAnywhereButtonProps) {
 	const { t } = useLingui();
 	const [isOpen, setIsOpen] = useState(false);
+	const [isCloudUpsellOpen, setIsCloudUpsellOpen] = useState(false);
 	const isShown = useSettings((s) => s.showParadevAnywhereButton);
 	const updateSetting = useSettings((s) => s.update);
 	const label = t({ message: "Use Paradev anywhere" });
@@ -61,46 +63,56 @@ export function ParadevAnywhereButton({
 	if (!isShown) return null;
 
 	return (
-		<Popover open={isOpen} onOpenChange={handleOpenChange}>
-			<Tooltip delayDuration={300}>
-				<TooltipTrigger asChild>
-					<PopoverTrigger asChild>
-						<button
-							type="button"
-							aria-label={label}
-							className={
-								variant === "rail"
-									? railButtonClass(isOpen)
-									: cn(
-											"flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
-											isOpen
-												? "bg-fill-selected text-muted-foreground"
-												: "text-muted-foreground hover:bg-fill-hover",
-										)
-							}
-						>
-							<DevicesIcon
-								className={variant === "rail" ? RAIL_ICON_CLASS : "size-3.5"}
-								strokeWidth={RAIL_ICON_STROKE_WIDTH}
-							/>
-						</button>
-					</PopoverTrigger>
-				</TooltipTrigger>
-				<TooltipContent side={side}>{label}</TooltipContent>
-			</Tooltip>
-			{/* After the trigger: it also registers as the anchor on mount, and the last one wins. */}
-			{anchorRef && <PopoverAnchor virtualRef={anchorRef as AnchorRef} />}
-			<PopoverContent
-				side={side}
-				align={side === "top" ? "start" : "end"}
-				alignOffset={anchorRef ? 8 : 0}
-				sideOffset={8}
-				collisionPadding={8}
-				onCloseAutoFocus={(event) => event.preventDefault()}
-				className="w-[332px] rounded-xl p-3.5 shadow-lg"
-			>
-				<ParadevAnywherePanel onClose={() => setIsOpen(false)} onHide={hide} />
-			</PopoverContent>
-		</Popover>
+		<>
+			<Popover open={isOpen} onOpenChange={handleOpenChange}>
+				<Tooltip delayDuration={300}>
+					<TooltipTrigger asChild>
+						<PopoverTrigger asChild>
+							<button
+								type="button"
+								aria-label={label}
+								className={
+									variant === "rail"
+										? railButtonClass(isOpen)
+										: cn(
+												"flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
+												isOpen
+													? "bg-fill-selected text-muted-foreground"
+													: "text-muted-foreground hover:bg-fill-hover",
+											)
+								}
+							>
+								<DevicesIcon
+									className={variant === "rail" ? RAIL_ICON_CLASS : "size-3.5"}
+									strokeWidth={RAIL_ICON_STROKE_WIDTH}
+								/>
+							</button>
+						</PopoverTrigger>
+					</TooltipTrigger>
+					<TooltipContent side={side}>{label}</TooltipContent>
+				</Tooltip>
+				{/* After the trigger: it also registers as the anchor on mount, and the last one wins. */}
+				{anchorRef && <PopoverAnchor virtualRef={anchorRef as AnchorRef} />}
+				<PopoverContent
+					side={side}
+					align={side === "top" ? "start" : "end"}
+					alignOffset={anchorRef ? 8 : 0}
+					sideOffset={8}
+					collisionPadding={8}
+					onCloseAutoFocus={(event) => event.preventDefault()}
+					className="w-[332px] rounded-xl p-3.5 shadow-lg"
+				>
+					<ParadevAnywherePanel
+						onClose={() => setIsOpen(false)}
+						onHide={hide}
+						onCloudUpsell={() => setIsCloudUpsellOpen(true)}
+					/>
+				</PopoverContent>
+			</Popover>
+			<CloudUpsellDialog
+				open={isCloudUpsellOpen}
+				onOpenChange={setIsCloudUpsellOpen}
+			/>
+		</>
 	);
 }

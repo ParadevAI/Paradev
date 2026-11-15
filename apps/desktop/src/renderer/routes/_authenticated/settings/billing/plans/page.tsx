@@ -26,9 +26,9 @@ import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { PlanChangeDialog } from "../components/PlanChangeDialog";
-import { useBillingActions } from "../hooks/useBillingActions";
-import { usePlanCatalog } from "../hooks/usePlanCatalog";
+import { PlanChangeDialog } from "renderer/routes/_authenticated/components/PlanChangeDialog";
+import { useBillingActions } from "renderer/routes/_authenticated/hooks/useBillingActions";
+import { usePlanCatalog } from "renderer/routes/_authenticated/hooks/usePlanCatalog";
 
 export const Route = createFileRoute("/_authenticated/settings/billing/plans/")(
 	{
@@ -62,7 +62,6 @@ type PlanCardData = {
 	price: PlanCardText | "seat";
 	priceNote?: PlanCardText;
 	billingText: PlanCardText;
-	showBillingToggle?: boolean;
 	actions: Array<PlanCardActionButton & { label: MessageDescriptor }>;
 };
 
@@ -149,7 +148,6 @@ function paidCard(family: PlanFamily): PlanCardData {
 			: msg({
 					message: "Billed monthly",
 				}),
-		showBillingToggle: yearly,
 		actions: [
 			{
 				label: msg({
@@ -521,7 +519,7 @@ function PlansPage() {
 	};
 
 	return (
-		<div className="p-6 max-w-7xl w-full">
+		<div className="p-6 max-w-7xl w-full mx-auto">
 			<div className="mb-6 space-y-4">
 				<Button variant="ghost" size="sm" asChild>
 					<Link to="/settings/billing">
@@ -560,6 +558,16 @@ function PlansPage() {
 				</div>
 			</div>
 
+			{catalog.some(offersYearlyDiscount) && (
+				<div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+					<Switch
+						checked={isYearly}
+						onCheckedChange={setIsYearly}
+						aria-label={t({ message: "Billed yearly" })}
+					/>
+					{isYearly ? <Trans>Billed yearly</Trans> : <Trans>Billed monthly</Trans>}
+				</div>
+			)}
 			{catalogQuery.isError && (
 				<div className="mb-4 flex items-center gap-3 text-sm text-muted-foreground">
 					<Trans>Could not load plans.</Trans>
@@ -757,15 +765,6 @@ function PlansPage() {
 												key={plan.id}
 												className="flex items-center gap-2 px-4 py-2.5 text-xs text-muted-foreground"
 											>
-												{plan.showBillingToggle && (
-													<Switch
-														checked={isYearly}
-														onCheckedChange={setIsYearly}
-														aria-label={t({
-															message: "Billed yearly",
-														})}
-													/>
-												)}
 												<span>{i18n._(getValue(plan.billingText))}</span>
 											</div>
 										);

@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate} : {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} GB-heures cloud par siège et par mois, dans une réserve unique pour votre organisation."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# ligne masquée} other {# lignes masquées}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes} min"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} par utilisateur/mois en facturation mensuelle, ou {yearlyPrice} en facturation annuelle. Mobile, automatisations, support prioritaire."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} par utilisateur/mois. Mobile, automatisations, support prioritaire."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vos automatisations en échec lors de leur dernière exécution : {myFailedCount}"
@@ -4956,11 +4953,17 @@ msgstr "Espaces de travail cloud"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Les espaces de travail cloud ne sont pas activés pour {account}. Ils sont inclus dans les forfaits Team et Ultra : passez à un forfait supérieur dans Paramètres, Facturation."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Les espaces de travail cloud sont inclus dans les forfaits {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Les espaces de travail cloud commitent, poussent et ouvrent des pull requests en votre nom"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Les espaces de travail cloud ignorent cette variable. Les agents se connectent plutôt dans Paramètres › Agents."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Les espaces de travail cloud permettent aux agents de continuer à travailler quand votre ordinateur est éteint, et toute votre équipe les partage."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Les espaces de travail cloud nécessitent le forfait Team ou Ultra. Passez à un forfait supérieur dans Paramètres, Facturation pour en démarrer un."
@@ -11654,6 +11657,9 @@ msgstr "Chargement..."
 msgid "Loading more…"
 msgstr "Chargement…"
 
+msgid "Loading plans..."
+msgstr "Chargement des forfaits..."
+
 msgid "Loading project…"
 msgstr "Chargement du projet…"
 
@@ -14498,6 +14504,9 @@ msgstr "Ouverture de {appName}…"
 msgid "Opening {what}"
 msgstr "Ouverture de {what}"
 
+msgid "Opening checkout..."
+msgstr "Ouverture du paiement..."
+
 msgid "Opening files"
 msgstr "Ouverture des fichiers"
 
@@ -15114,6 +15123,9 @@ msgstr "Moyen de paiement"
 
 msgid "Payment Successful"
 msgstr "Paiement réussi"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "Paiement réussi. Votre forfait est mis à jour."
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "Riveteur caviardé"
 msgid "Redirecting to desktop app..."
 msgstr "Redirection vers l'application de bureau..."
 
-msgid "Redirecting..."
-msgstr "Redirection..."
-
 msgid "Redo"
 msgstr "Rétablir"
 
@@ -17143,6 +17152,9 @@ msgstr "Nouvelle tentative à {until}"
 msgid "Retrying…"
 msgstr "Nouvelle tentative…"
 
+msgid "Return to {appName}"
+msgstr "Revenir à {appName}"
+
 msgid "Return to dashboard"
 msgstr "Retourner au tableau de bord"
 
@@ -17352,6 +17364,12 @@ msgstr "Exécutez plus de 10 agents de code en parallèle sur votre machine."
 
 msgid "Run again"
 msgstr "Relancer"
+
+msgid "Run agents in the cloud"
+msgstr "Exécuter des agents dans le cloud"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Exécuter des agents dans le cloud avec {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Lancez des agents selon un planning ou quand quelque chose se produit."
@@ -22006,6 +22024,9 @@ msgstr "Passer à Pro sur {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Passer à {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Passez à l'un des forfaits mis en avant pour exécuter des agents dans le cloud. Le forfait s'applique à toute cette organisation."
 
 msgid "Upgrade to Pro"
 msgstr "Passer à Pro"

@@ -2,8 +2,10 @@ import { msg } from "@lingui/core/macro";
 import { Button } from "@superset/ui/button";
 import Link from "next/link";
 import { HiCheckCircle } from "react-icons/hi2";
+import { desktopCheckoutReturnUrl } from "@/lib/desktop-protocol";
 import { initServerI18n } from "@/lib/i18n-server";
 import { BillingSettings } from "./components/BillingSettings";
+import { ReturnToDesktop } from "./components/ReturnToDesktop";
 
 export default async function BillingPage({
 	searchParams,
@@ -13,12 +15,20 @@ export default async function BillingPage({
 		organization?: string;
 		plan?: string;
 		interval?: string;
+		desktop_protocol?: string;
 	}>;
 }) {
-	const { success, organization, plan, interval } = await searchParams;
+	const {
+		success,
+		organization,
+		plan,
+		interval,
+		desktop_protocol: desktopProtocol,
+	} = await searchParams;
 
 	if (success === "true") {
 		const i18n = await initServerI18n();
+		const desktopUrl = desktopCheckoutReturnUrl(desktopProtocol);
 		return (
 			<div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
 				<HiCheckCircle className="h-12 w-12 text-green-500" />
@@ -33,11 +43,15 @@ export default async function BillingPage({
 						}),
 					)}
 				</p>
-				<Button variant="outline" className="mt-3" asChild>
-					<Link href="/settings/billing">
-						{i18n._(msg({ message: "Back to billing" }))}
-					</Link>
-				</Button>
+				{desktopUrl ? (
+					<ReturnToDesktop url={desktopUrl} />
+				) : (
+					<Button variant="outline" className="mt-3" asChild>
+						<Link href="/settings/billing">
+							{i18n._(msg({ message: "Back to billing" }))}
+						</Link>
+					</Button>
+				)}
 			</div>
 		);
 	}

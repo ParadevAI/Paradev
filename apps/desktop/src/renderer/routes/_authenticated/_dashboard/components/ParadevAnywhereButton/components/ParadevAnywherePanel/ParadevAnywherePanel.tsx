@@ -29,11 +29,13 @@ interface Surface {
 interface ParadevAnywherePanelProps {
 	onClose: () => void;
 	onHide: () => void;
+	onCloudUpsell: () => void;
 }
 
 export function ParadevAnywherePanel({
 	onClose,
 	onHide,
+	onCloudUpsell,
 }: ParadevAnywherePanelProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -58,7 +60,7 @@ export function ParadevAnywherePanel({
 			scene: <CloudScene />,
 			open:
 				hasCloud === false
-					? () => navigate({ to: "/settings/billing/plans" })
+					? onCloudUpsell
 					: () => openNewWorkspaceForHost(CLOUD_HOST_ID),
 		},
 		{

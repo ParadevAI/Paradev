@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} GB-giờ đám mây cho mỗi người dùng mỗi tháng, gộp vào một quỹ chung cho tổ chức của bạn."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# dòng ẩn} other {# dòng ẩn}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes} phút"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} phút {rest} giây"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} mỗi người dùng/tháng khi thanh toán theo tháng, hoặc {yearlyPrice} khi thanh toán theo năm. Di động, tự động hóa, hỗ trợ ưu tiên."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} mỗi người dùng/tháng. Di động, tự động hóa, hỗ trợ ưu tiên."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
@@ -4956,11 +4953,17 @@ msgstr "Không gian làm việc đám mây"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Không gian làm việc trên đám mây chưa được bật cho {account}. Tính năng này có trong gói Team và Ultra: nâng cấp trong Cài đặt, Thanh toán."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Không gian làm việc đám mây có trong các gói {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace đám mây commit, push và mở pull request với tư cách là bạn"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Workspace đám mây bỏ qua biến này. Thay vào đó, các agent đăng nhập trong Cài đặt › Agent."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Không gian làm việc đám mây giúp agent tiếp tục làm việc khi máy tính của bạn tắt, và cả nhóm đều dùng chung."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Không gian làm việc trên đám mây cần gói Team hoặc Ultra. Nâng cấp trong Cài đặt, Thanh toán để khởi động."
@@ -11654,6 +11657,9 @@ msgstr "Đang tải thêm..."
 msgid "Loading more…"
 msgstr "Đang tải thêm…"
 
+msgid "Loading plans..."
+msgstr "Đang tải các gói..."
+
 msgid "Loading project…"
 msgstr "Đang tải dự án…"
 
@@ -14498,6 +14504,9 @@ msgstr "Đang mở {appName}…"
 msgid "Opening {what}"
 msgstr "Đang mở {what}"
 
+msgid "Opening checkout..."
+msgstr "Đang mở trang thanh toán..."
+
 msgid "Opening files"
 msgstr "Mở tệp"
 
@@ -15114,6 +15123,9 @@ msgstr "Phương thức thanh toán"
 
 msgid "Payment Successful"
 msgstr "Thanh toán thành công"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "Thanh toán thành công. Gói của bạn đã được cập nhật."
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "Thợ tán đinh giấu tên"
 msgid "Redirecting to desktop app..."
 msgstr "Đang chuyển hướng tới ứng dụng máy tính..."
 
-msgid "Redirecting..."
-msgstr "Đang chuyển hướng..."
-
 msgid "Redo"
 msgstr "Làm lại"
 
@@ -17143,6 +17152,9 @@ msgstr "Thử lại lúc {until}"
 msgid "Retrying…"
 msgstr "Đang thử lại…"
 
+msgid "Return to {appName}"
+msgstr "Quay lại {appName}"
+
 msgid "Return to dashboard"
 msgstr "Quay về dashboard"
 
@@ -17352,6 +17364,12 @@ msgstr "Chạy hơn 10 agent lập trình song song trên máy của bạn."
 
 msgid "Run again"
 msgstr "Chạy lại"
+
+msgid "Run agents in the cloud"
+msgstr "Chạy agent trên đám mây"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Chạy agent trên đám mây với {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Chạy agent theo lịch hoặc khi có sự kiện xảy ra."
@@ -22006,6 +22024,9 @@ msgstr "Nâng cấp trên {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Nâng cấp lên {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Nâng cấp lên một trong các gói được làm nổi bật để chạy agent trên đám mây. Gói áp dụng cho toàn bộ tổ chức này."
 
 msgid "Upgrade to Pro"
 msgstr "Nâng cấp lên Pro"

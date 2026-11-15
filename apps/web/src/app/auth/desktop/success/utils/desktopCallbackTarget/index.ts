@@ -1,4 +1,1 @@
-export {
-	isDesktopProtocol,
-	parseLoopbackCallback,
-} from "./desktopCallbackTarget";
+export { parseLoopbackCallback } from "./desktopCallbackTarget";

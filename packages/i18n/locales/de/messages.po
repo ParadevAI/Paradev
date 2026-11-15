@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} Cloud-GB-Stunden pro Platz und Monat, in einem gemeinsamen Pool für Ihre Organisation."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# ausgeblendete Zeile} other {# ausgeblendete Zeilen}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes} Min."
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} Min. {rest} Sek."
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} pro Nutzer/Monat bei monatlicher Abrechnung oder {yearlyPrice} bei jährlicher Abrechnung. Mobile, Automatisierungen, bevorzugter Support."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} pro Nutzer/Monat. Mobile, Automatisierungen, bevorzugter Support."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Bei {myFailedCount} deiner Automatisierungen ist der letzte Lauf fehlgeschlagen"
@@ -4956,11 +4953,17 @@ msgstr "Cloud-Arbeitsbereiche"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloud-Workspaces sind für {account} nicht aktiviert. Sie sind in den Plänen Team und Ultra enthalten: Upgraden Sie in Einstellungen, Abrechnung."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Cloud-Arbeitsbereiche sind in den Plänen {plans} enthalten."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloud-Arbeitsbereiche committen, pushen und öffnen Pull Requests als du"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloud-Workspaces ignorieren diese Variable. Agenten melden sich stattdessen unter Einstellungen › Agenten an."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Mit Cloud-Arbeitsbereichen arbeiten Agenten weiter, während Ihr Computer aus ist, und Ihr ganzes Team nutzt sie gemeinsam."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloud-Workspaces brauchen den Team- oder Ultra-Plan. Upgraden Sie in Einstellungen, Abrechnung, um einen zu starten."
@@ -11654,6 +11657,9 @@ msgstr "Mehr wird geladen..."
 msgid "Loading more…"
 msgstr "Mehr wird geladen…"
 
+msgid "Loading plans..."
+msgstr "Pläne werden geladen..."
+
 msgid "Loading project…"
 msgstr "Projekt wird geladen…"
 
@@ -14498,6 +14504,9 @@ msgstr "{appName} wird geöffnet…"
 msgid "Opening {what}"
 msgstr "{what} wird geöffnet"
 
+msgid "Opening checkout..."
+msgstr "Checkout wird geöffnet..."
+
 msgid "Opening files"
 msgstr "Dateien öffnen"
 
@@ -15114,6 +15123,9 @@ msgstr "Zahlungsmethode"
 
 msgid "Payment Successful"
 msgstr "Zahlung erfolgreich"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "Zahlung erfolgreich. Ihr Plan ist aktualisiert."
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "Geschwärzter Nieter"
 msgid "Redirecting to desktop app..."
 msgstr "Weiterleitung zur Desktop-App..."
 
-msgid "Redirecting..."
-msgstr "Weiterleitung..."
-
 msgid "Redo"
 msgstr "Wiederholen"
 
@@ -17143,6 +17152,9 @@ msgstr "Neuer Versuch um {until}"
 msgid "Retrying…"
 msgstr "Wird erneut versucht…"
 
+msgid "Return to {appName}"
+msgstr "Zurück zu {appName}"
+
 msgid "Return to dashboard"
 msgstr "Zurück zum Dashboard"
 
@@ -17352,6 +17364,12 @@ msgstr "Betreibe 10+ parallele Coding-Agenten auf deinem Rechner."
 
 msgid "Run again"
 msgstr "Erneut ausführen"
+
+msgid "Run agents in the cloud"
+msgstr "Agenten in der Cloud ausführen"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Agenten in der Cloud ausführen mit {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Agenten nach Zeitplan oder bei Ereignissen ausführen."
@@ -22006,6 +22024,9 @@ msgstr "Auf {0} upgraden"
 
 msgid "Upgrade to {planName}"
 msgstr "Auf {planName} upgraden"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Upgraden Sie auf einen der hervorgehobenen Pläne, um Agenten in der Cloud auszuführen. Der Plan gilt für die gesamte Organisation."
 
 msgid "Upgrade to Pro"
 msgstr "Auf Pro upgraden"

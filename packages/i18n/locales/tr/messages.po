@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "Koltuk başına aylık {gbHours} bulut GB-saat, kuruluşunuz için tek bir havuzda."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# gizli satır} other {# gizli satır}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}dk"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} dk {rest} sn"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "Aylık faturalandırmada kullanıcı başına aylık {monthlyPrice} veya yıllık faturalandırmada {yearlyPrice}. Mobil, otomasyonlar, öncelikli destek."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, öncelikli destek."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
@@ -4956,11 +4953,17 @@ msgstr "Bulut çalışma alanları"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Bulut çalışma alanları {account} için etkin değil. Team ve Ultra planlarıyla gelir: Ayarlar, Faturalandırma bölümünden yükseltin."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Bulut çalışma alanları {plans} planlarıyla gelir."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Bulut çalışma alanları sizin adınıza commit, push yapar ve pull request açar"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Bulut çalışma alanları bu değişkeni yok sayar. Ajanlar bunun yerine Ayarlar › Ajanlar bölümünden oturum açar."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Bulut çalışma alanları, bilgisayarınız kapalıyken de ajanların çalışmasını sürdürür ve tüm ekibiniz bunları paylaşır."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Bulut çalışma alanları Team veya Ultra planı gerektirir. Başlatmak için Ayarlar, Faturalandırma bölümünden yükseltin."
@@ -11654,6 +11657,9 @@ msgstr "Daha fazlası yükleniyor..."
 msgid "Loading more…"
 msgstr "Daha fazlası yükleniyor…"
 
+msgid "Loading plans..."
+msgstr "Planlar yükleniyor..."
+
 msgid "Loading project…"
 msgstr "Proje yükleniyor…"
 
@@ -14498,6 +14504,9 @@ msgstr "{appName} açılıyor…"
 msgid "Opening {what}"
 msgstr "{what} açılıyor"
 
+msgid "Opening checkout..."
+msgstr "Ödeme sayfası açılıyor..."
+
 msgid "Opening files"
 msgstr "Dosyaları açma"
 
@@ -15114,6 +15123,9 @@ msgstr "Ödeme yöntemi"
 
 msgid "Payment Successful"
 msgstr "Ödeme başarılı"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "Ödeme başarılı. Planınız güncellendi."
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "Sansürlü Perçinci"
 msgid "Redirecting to desktop app..."
 msgstr "Masaüstü uygulamasına yönlendiriliyor..."
 
-msgid "Redirecting..."
-msgstr "Yönlendiriliyor..."
-
 msgid "Redo"
 msgstr "Yinele"
 
@@ -17143,6 +17152,9 @@ msgstr "{until} saatinde yeniden denenecek"
 msgid "Retrying…"
 msgstr "Yeniden deneniyor…"
 
+msgid "Return to {appName}"
+msgstr "{appName} uygulamasına dön"
+
 msgid "Return to dashboard"
 msgstr "Panoya dön"
 
@@ -17352,6 +17364,12 @@ msgstr "Makinenizde 10+ paralel kodlama ajanı çalıştırın."
 
 msgid "Run again"
 msgstr "Yeniden çalıştır"
+
+msgid "Run agents in the cloud"
+msgstr "Ajanları bulutta çalıştırın"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Ajanları {planName} ile bulutta çalıştırın"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Ajanları bir zamanlamayla veya bir şey olduğunda çalıştırın."
@@ -22006,6 +22024,9 @@ msgstr "{0} üzerinden yükselt"
 
 msgid "Upgrade to {planName}"
 msgstr "{planName} planına yükselt"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Ajanları bulutta çalıştırmak için vurgulanan planlardan birine yükseltin. Plan bu kuruluşun tamamı için geçerlidir."
 
 msgid "Upgrade to Pro"
 msgstr "Pro'ya yükselt"

@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} облачных ГБ-часов на место в месяц, в одном общем пуле для вашей организации."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# скрытая строка} few {# скрытые строки} many {# скрытых строк} other {# скрытой строки}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes} мин."
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} мин {rest} с"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} за пользователя в месяц при помесячной оплате или {yearlyPrice} при оплате за год. Мобильное приложение, автоматизации, приоритетная поддержка."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} за пользователя в месяц. Мобильное приложение, автоматизации, приоритетная поддержка."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваши автоматизации с ошибкой при последнем запуске: {myFailedCount}"
@@ -4956,11 +4953,17 @@ msgstr "Облачные рабочие области"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Облачные рабочие пространства не включены для {account}. Они входят в планы Team и Ultra: повысьте план в разделе Настройки, Оплата."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Облачные рабочие области входят в планы {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Облачные рабочие области делают коммиты, пуши и открывают pull request от вашего имени"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Облачные рабочие пространства игнорируют эту переменную. Вместо этого агенты входят в систему в разделе «Настройки › Агенты»."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "В облачных рабочих областях агенты продолжают работать, пока ваш компьютер выключен, и ими пользуется вся команда."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Облачным рабочим пространствам нужен план Team или Ultra. Повысьте план в разделе Настройки, Оплата, чтобы запустить его."
@@ -11654,6 +11657,9 @@ msgstr "Загружаем ещё..."
 msgid "Loading more…"
 msgstr "Загружаем ещё…"
 
+msgid "Loading plans..."
+msgstr "Загружаем тарифы..."
+
 msgid "Loading project…"
 msgstr "Загрузка проекта…"
 
@@ -14498,6 +14504,9 @@ msgstr "Открываем {appName}…"
 msgid "Opening {what}"
 msgstr "Открываю {what}"
 
+msgid "Opening checkout..."
+msgstr "Открываем оплату..."
+
 msgid "Opening files"
 msgstr "Открытие файлов"
 
@@ -15114,6 +15123,9 @@ msgstr "Способ оплаты"
 
 msgid "Payment Successful"
 msgstr "Платёж прошёл"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "Платёж прошёл. Тариф обновлён."
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "Засекреченный клепальщик"
 msgid "Redirecting to desktop app..."
 msgstr "Переход в десктопное приложение..."
 
-msgid "Redirecting..."
-msgstr "Перенаправление..."
-
 msgid "Redo"
 msgstr "Повторить"
 
@@ -17143,6 +17152,9 @@ msgstr "Повтор в {until}"
 msgid "Retrying…"
 msgstr "Повтор…"
 
+msgid "Return to {appName}"
+msgstr "Вернуться в {appName}"
+
 msgid "Return to dashboard"
 msgstr "Вернуться на панель"
 
@@ -17352,6 +17364,12 @@ msgstr "Запускайте 10+ параллельных кодовых аге�
 
 msgid "Run again"
 msgstr "Запустить снова"
+
+msgid "Run agents in the cloud"
+msgstr "Запускайте агентов в облаке"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Запускайте агентов в облаке с {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Запускайте агентов по расписанию или когда что-то происходит."
@@ -22006,6 +22024,9 @@ msgstr "Перейти на Pro на {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Перейти на {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Перейдите на один из выделенных тарифов, чтобы запускать агентов в облаке. Тариф действует для всей организации."
 
 msgid "Upgrade to Pro"
 msgstr "Перейти на Pro"

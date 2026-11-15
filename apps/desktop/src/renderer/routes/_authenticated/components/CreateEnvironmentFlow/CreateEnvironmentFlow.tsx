@@ -157,7 +157,11 @@ export function CreateEnvironmentFlow({
 					? {
 							action: {
 								label: t({ message: "Open billing" }),
-								onClick: () => void navigate({ to: "/settings/billing" }),
+								onClick: () =>
+									void navigate({
+										to: "/settings/billing",
+										search: { source: "cloud" },
+									}),
 							},
 						}
 					: undefined,

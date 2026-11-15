@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "1席あたり毎月 {gbHours} クラウド GB 時間。組織全体で 1 つのプールを共有します。"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {非表示の#行} other {非表示の#行}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}分"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}分{rest}秒"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "月払いで1ユーザーあたり月額 {monthlyPrice}、または年払いで {yearlyPrice}。モバイル、オートメーション、優先サポート。"
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オートメーション、優先サポート。"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
@@ -4956,11 +4953,17 @@ msgstr "クラウドワークスペース"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} ではクラウドワークスペースが有効になっていません。Team と Ultra プランで利用できます。設定の請求からアップグレードしてください。"
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "クラウドワークスペースは {plans} プランに含まれます。"
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "クラウドワークスペースはこの変数を無視します。エージェントは代わりに「設定 › エージェント」でサインインします。"
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "クラウドワークスペースなら、コンピューターの電源が切れていてもエージェントが動き続け、チーム全員で共有できます。"
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "クラウドワークスペースには Team または Ultra プランが必要です。起動するには設定の請求からアップグレードしてください。"
@@ -11654,6 +11657,9 @@ msgstr "さらに読み込み中..."
 msgid "Loading more…"
 msgstr "さらに読み込み中…"
 
+msgid "Loading plans..."
+msgstr "プランを読み込み中..."
+
 msgid "Loading project…"
 msgstr "プロジェクトを読み込み中…"
 
@@ -14498,6 +14504,9 @@ msgstr "{appName} を開いています…"
 msgid "Opening {what}"
 msgstr "{what} を開いています"
 
+msgid "Opening checkout..."
+msgstr "チェックアウトを開いています..."
+
 msgid "Opening files"
 msgstr "ファイルを開く"
 
@@ -15114,6 +15123,9 @@ msgstr "支払い方法"
 
 msgid "Payment Successful"
 msgstr "支払いが完了しました"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "支払いが完了しました。プランを更新しました。"
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "秘匿のリベット工"
 msgid "Redirecting to desktop app..."
 msgstr "デスクトップアプリにリダイレクト中..."
 
-msgid "Redirecting..."
-msgstr "リダイレクト中..."
-
 msgid "Redo"
 msgstr "やり直す"
 
@@ -17143,6 +17152,9 @@ msgstr "{until} に再試行"
 msgid "Retrying…"
 msgstr "再試行中…"
 
+msgid "Return to {appName}"
+msgstr "{appName} に戻る"
+
 msgid "Return to dashboard"
 msgstr "ダッシュボードに戻る"
 
@@ -17352,6 +17364,12 @@ msgstr "手元のマシンで10以上のコーディングエージェントを�
 
 msgid "Run again"
 msgstr "再実行"
+
+msgid "Run agents in the cloud"
+msgstr "クラウドでエージェントを実行"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "{planName} を使ってクラウドでエージェントを実行"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "スケジュールで、または何かが起きたときにエージェントを実行します。"
@@ -22006,6 +22024,9 @@ msgstr "{0} でアップグレード"
 
 msgid "Upgrade to {planName}"
 msgstr "{planName} にアップグレード"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "クラウドでエージェントを実行するには、強調表示されたプランのいずれかにアップグレードしてください。プランはこの組織全体に適用されます。"
 
 msgid "Upgrade to Pro"
 msgstr "Pro にアップグレード"

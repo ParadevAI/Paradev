@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} cloudových GB-hodin na místo měsíčně, v jednom fondu pro vaši organizaci."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# skrytý řádek} few {# skryté řádky} many {# skrytého řádku} other {# skrytých řádků}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes} m"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} m {rest} s"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} za uživatele/měs. při měsíční fakturaci, nebo {yearlyPrice} při roční fakturaci. Mobilní aplikace, automatizace, prioritní podpora."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prioritní podpora."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
@@ -4956,11 +4953,17 @@ msgstr "Cloudové pracovní prostory"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součástí plánů Team a Ultra: přejděte na vyšší plán v Nastavení, Fakturace."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Cloudové pracovní prostory jsou součástí plánů {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloudové pracovní prostory tuto proměnnou ignorují. Agenti se místo toho přihlašují v Nastavení › Agenti."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Cloudové pracovní prostory nechají agenty pracovat, i když je váš počítač vypnutý, a sdílí je celý tým."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloudové pracovní prostory vyžadují plán Team nebo Ultra. Přejděte na vyšší plán v Nastavení, Fakturace, abyste ho mohli spustit."
@@ -11654,6 +11657,9 @@ msgstr "Načítám další..."
 msgid "Loading more…"
 msgstr "Načítám další…"
 
+msgid "Loading plans..."
+msgstr "Načítám plány..."
+
 msgid "Loading project…"
 msgstr "Načítám projekt…"
 
@@ -14498,6 +14504,9 @@ msgstr "Otevírá se {appName}…"
 msgid "Opening {what}"
 msgstr "Otevírám {what}"
 
+msgid "Opening checkout..."
+msgstr "Otevírám platbu..."
+
 msgid "Opening files"
 msgstr "Otevírání souborů"
 
@@ -15114,6 +15123,9 @@ msgstr "Způsob platby"
 
 msgid "Payment Successful"
 msgstr "Platba proběhla"
+
+msgid "Payment successful. Your plan is updated."
+msgstr "Platba proběhla. Váš plán je aktualizovaný."
 
 msgid "PDF"
 msgstr "PDF"
@@ -16319,9 +16331,6 @@ msgstr "Utajený nýtař"
 msgid "Redirecting to desktop app..."
 msgstr "Přesměrování do desktopové aplikace..."
 
-msgid "Redirecting..."
-msgstr "Přesměrovávám..."
-
 msgid "Redo"
 msgstr "Znovu"
 
@@ -17143,6 +17152,9 @@ msgstr "Další pokus v {until}"
 msgid "Retrying…"
 msgstr "Zkouším znovu…"
 
+msgid "Return to {appName}"
+msgstr "Zpět do {appName}"
+
 msgid "Return to dashboard"
 msgstr "Zpět na dashboard"
 
@@ -17352,6 +17364,12 @@ msgstr "Spusťte na svém stroji 10+ paralelních programovacích agentů."
 
 msgid "Run again"
 msgstr "Spustit znovu"
+
+msgid "Run agents in the cloud"
+msgstr "Spouštějte agenty v cloudu"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Spouštějte agenty v cloudu s {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Spouštějte agenty podle plánu nebo když se něco stane."
@@ -22006,6 +22024,9 @@ msgstr "Přejít na Pro na {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Přejít na {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Přejděte na jeden ze zvýrazněných plánů, abyste mohli spouštět agenty v cloudu. Plán platí pro celou tuto organizaci."
 
 msgid "Upgrade to Pro"
 msgstr "Přejít na Pro"

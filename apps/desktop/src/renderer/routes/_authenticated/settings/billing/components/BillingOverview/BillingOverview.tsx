@@ -1,8 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import {
+	advertisedGbMinutesPerSeat,
 	familyForPlan,
 	isPaymentFailingStatus,
+	type PlanFamily,
 	planForInterval,
 } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
@@ -14,6 +16,9 @@ import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { PlanChangeDialog } from "renderer/routes/_authenticated/components/PlanChangeDialog";
+import { useBillingActions } from "renderer/routes/_authenticated/hooks/useBillingActions";
+import { usePlanCatalog } from "renderer/routes/_authenticated/hooks/usePlanCatalog";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
@@ -21,21 +26,24 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
-import { useBillingActions } from "../../hooks/useBillingActions";
-import { usePlanCatalog } from "../../hooks/usePlanCatalog";
-import { PlanChangeDialog } from "../PlanChangeDialog";
 import { BillingDetails } from "./components/BillingDetails";
+import { CloudPlansBanner } from "./components/CloudPlansBanner";
 import { CloudUsageCard } from "./components/CloudUsageCard";
 import { CurrentPlanCard } from "./components/CurrentPlanCard";
 import { PaymentFailedBanner } from "./components/PaymentFailedBanner";
+import { PlanList } from "./components/PlanList";
 import { RecentInvoices } from "./components/RecentInvoices";
-import { UpgradeCard } from "./components/UpgradeCard";
 
 interface BillingOverviewProps {
 	visibleItems?: SettingItemId[] | null;
+	/** Billing was opened for cloud: point at the plans that include it. */
+	highlightCloud?: boolean;
 }
 
-export function BillingOverview({ visibleItems }: BillingOverviewProps) {
+export function BillingOverview({
+	visibleItems,
+	highlightCloud = false,
+}: BillingOverviewProps) {
 	const { formatPrice } = useFormat();
 
 	const { t } = useLingui();
@@ -91,16 +99,45 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 		visibleItems,
 	);
 
-	const catalog = usePlanCatalog().data ?? [];
-	const upsellFamily = catalog[0];
+	const { data: organizations } = cloudTrpc.organization.list.useQuery();
+	const organizationName = organizations?.find(
+		(organization) => organization.id === activeOrgId,
+	)?.name;
 
-	const handleUpgrade = async (annual = false) => {
-		if (memberCount === undefined) return;
-		const target = upsellFamily ? planForInterval(upsellFamily, annual) : null;
+	const catalog = usePlanCatalog().data ?? [];
+	const currentFamily =
+		plan === "pro"
+			? (familyForPlan(catalog, activePlan?.autumnPlanId)?.family ?? null)
+			: null;
+	const subscriptionInterval =
+		activePlan?.billingInterval === "year" ||
+		activePlan?.billingInterval === "month"
+			? activePlan.billingInterval
+			: null;
+	const cloudFamilies = catalog.filter(
+		(family) => advertisedGbMinutesPerSeat(family) !== null,
+	);
+	const showCloudPlans =
+		highlightCloud &&
+		cloudFamilies.length > 0 &&
+		!cloudFamilies.some((family) => family.family === currentFamily?.family);
+	const highlightedFamilies = new Set(
+		showCloudPlans ? cloudFamilies.map((family) => family.family) : [],
+	);
+	const showPlanList =
+		catalog.length > 0 &&
+		(plan === "free" ||
+			(plan === "pro" &&
+				activePlan?.billingProvider === "autumn" &&
+				!activePlan?.cancelAt));
+
+	const handleUpgrade = async (family: PlanFamily, yearly: boolean) => {
+		const target = planForInterval(family, yearly);
+		if (memberCount === undefined || !target) return;
 		await upgrade({
-			planId: target?.id ?? "",
-			planName: upsellFamily?.name ?? "",
-			annual: target ? target.interval === "year" : annual,
+			planId: target.id,
+			planName: family.name,
+			annual: target.interval === "year",
 			seats: memberCount,
 			source: "billing_overview",
 		});
@@ -113,18 +150,11 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 					<h2 className="text-xl font-semibold">
 						<Trans>Billing</Trans>
 					</h2>
-					<p className="text-sm text-muted-foreground mt-1">
-						<Trans>
-							For questions about billing,{" "}
-							<a
-								href={COMPANY.MAIL_TO}
-								className="text-primary hover:underline"
-							>
-								contact us
-							</a>
-							.
-						</Trans>
-					</p>
+					{organizationName && (
+						<p className="text-sm text-muted-foreground mt-1">
+							{organizationName}
+						</p>
+					)}
 				</div>
 				<Button variant="ghost" size="sm" asChild>
 					<Link to="/settings/billing/plans">
@@ -140,6 +170,11 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 			</div>
 
 			<div className="space-y-6">
+				{showOverview && showCloudPlans && (
+					<CloudPlansBanner
+						planNames={cloudFamilies.map((family) => family.name)}
+					/>
+				)}
 				{isPaymentFailing && (
 					<PaymentFailedBanner
 						amountDue={amountDue}
@@ -156,9 +191,7 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 						<div className="divide-y divide-border">
 							<CurrentPlanCard
 								currentPlan={plan}
-								planName={
-									familyForPlan(catalog, activePlan?.autumnPlanId)?.family.name
-								}
+								planName={currentFamily?.name}
 								onCancel={handleCancel}
 								isCanceling={isCanceling}
 								onRestore={handleRestore}
@@ -174,21 +207,35 @@ export function BillingOverview({ visibleItems }: BillingOverviewProps) {
 								periodEnd={activePlan?.periodEnd}
 								status={activePlan?.status}
 							/>
-							{plan === "free" && upsellFamily && (
-								<UpgradeCard
-									family={upsellFamily}
-									onUpgrade={() => handleUpgrade(false)}
-									isUpgrading={isUpgrading || memberCount === undefined}
-								/>
-							)}
 						</div>
 					</div>
+				)}
+				{showOverview && showPlanList && (
+					<PlanList
+						catalog={catalog}
+						plan={plan}
+						currentFamily={currentFamily?.family ?? null}
+						subscriptionInterval={subscriptionInterval}
+						highlightedFamilies={highlightedFamilies}
+						canChangePlan={isOwner}
+						isUpgrading={isUpgrading || memberCount === undefined}
+						onUpgrade={handleUpgrade}
+					/>
 				)}
 				{showOverview && (
 					<CloudUsageCard organizationId={activeOrgId} canBuy={isOwner} />
 				)}
 				{showOverview && isOwner && plan !== "free" && <BillingDetails />}
 				<RecentInvoices />
+				<p className="border-t border-border pt-6 text-sm text-muted-foreground">
+					<Trans>
+						For questions about billing,{" "}
+						<a href={COMPANY.MAIL_TO} className="text-primary hover:underline">
+							contact us
+						</a>
+						.
+					</Trans>
+				</p>
 			</div>
 			<PlanChangeDialog
 				change={pendingChange}
