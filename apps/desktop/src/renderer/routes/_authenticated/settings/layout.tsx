@@ -104,6 +104,8 @@ function getPathFromSection(section: SettingsSection): string {
 	return SECTION_PATHS[section] ?? "/settings/account";
 }
 
+const FULL_WIDTH_SUBPAGE_PATHS = ["/settings/billing/plans"];
+
 /**
  * Sections whose drilldown routes (a param segment with no index route of
  * its own) would 404 if the Escape handler below popped just one path
@@ -198,9 +200,10 @@ function SettingsLayout() {
 		[navigate, location.pathname, originRoute],
 	);
 
-	const usesFullWidthContent = FULL_WIDTH_SECTION_PATHS.some((path) =>
-		location.pathname.startsWith(path),
-	);
+	const usesFullWidthContent = [
+		...FULL_WIDTH_SECTION_PATHS,
+		...FULL_WIDTH_SUBPAGE_PATHS,
+	].some((path) => location.pathname.startsWith(path));
 
 	return (
 		<div className="flex h-screen w-screen bg-background">

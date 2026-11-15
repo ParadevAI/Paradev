@@ -1068,6 +1068,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} хмарних ГБ-год на місце щомісяця, в одному пулі для вашої організації."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# прихований рядок} few {# приховані рядки} many {# прихованих рядків} other {# прихованого рядка}}"
 
@@ -1160,12 +1163,6 @@ msgstr "{minutes} хв"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} хв {rest} с"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} за користувача на місяць у разі щомісячної оплати або {yearlyPrice} у разі річної оплати. Мобільний застосунок, автоматизації, пріоритетна підтримка."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} за користувача на місяць. Мобільний застосунок, автоматизації, пріоритетна підтримка."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваших автоматизацій з помилкою під час останнього запуску: {myFailedCount}"
@@ -3527,6 +3524,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Назад"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Ви повернулися з оплати. Дані про оплату оновлено."
+
 msgid "Back to About"
 msgstr "Назад до розділу «Про нас»"
 
@@ -4950,11 +4950,17 @@ msgstr "Хмарні робочі простори"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Хмарні робочі простори не ввімкнено для {account}. Вони входять до тарифів Team і Ultra: перейдіть на вищий тариф у розділі Налаштування, Оплата."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Хмарні робочі простори входять у тарифи {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Хмарні робочі простори комітять, пушать і відкривають пул-реквести від вашого імені"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Хмарні робочі простори ігнорують цю змінну. Натомість агенти входять у розділі Налаштування › Агенти."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Хмарні робочі простори дають агентам працювати, коли ваш комп'ютер вимкнено, і ними користується вся команда."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Для хмарних робочих просторів потрібен тариф Team або Ultra. Щоб запустити такий простір, перейдіть на вищий тариф у розділі Налаштування, Оплата."
@@ -5846,6 +5852,9 @@ msgstr "Не вдалося змінити, хто має доступ"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Не вдалося перевірити ваш тариф. Перевірте з'єднання та спробуйте ще раз."
+
+msgid "Could not check your role in this organization."
+msgstr "Не вдалося перевірити вашу роль у цій організації."
 
 msgid "Could not clear browsing data"
 msgstr "Не вдалося очистити дані перегляду"
@@ -11648,6 +11657,9 @@ msgstr "Завантажуємо ще..."
 msgid "Loading more…"
 msgstr "Завантажуємо ще…"
 
+msgid "Loading plans..."
+msgstr "Завантажуємо тарифи..."
+
 msgid "Loading project…"
 msgstr "Завантаження проєкту…"
 
@@ -14492,6 +14504,9 @@ msgstr "Відкриття {appName}…"
 msgid "Opening {what}"
 msgstr "Відкриття {what}"
 
+msgid "Opening checkout..."
+msgstr "Відкриваємо оплату..."
+
 msgid "Opening files"
 msgstr "Відкриття файлів"
 
@@ -16313,9 +16328,6 @@ msgstr "Засекречений клепальник"
 msgid "Redirecting to desktop app..."
 msgstr "Перенаправлення в десктопний застосунок..."
 
-msgid "Redirecting..."
-msgstr "Перенаправлення..."
-
 msgid "Redo"
 msgstr "Повторити"
 
@@ -17137,6 +17149,9 @@ msgstr "Повторна спроба о {until}"
 msgid "Retrying…"
 msgstr "Повторна спроба…"
 
+msgid "Return to {appName}"
+msgstr "Повернутися до {appName}"
+
 msgid "Return to dashboard"
 msgstr "Повернутися на дашборд"
 
@@ -17346,6 +17361,12 @@ msgstr "Запускайте 10+ паралельних кодинг-агент�
 
 msgid "Run again"
 msgstr "Запустити знову"
+
+msgid "Run agents in the cloud"
+msgstr "Запускати агентів у хмарі"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Запускати агентів у хмарі з {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Запускайте агентів за розкладом або коли щось відбувається."
@@ -22000,6 +22021,9 @@ msgstr "Покращити тариф на {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Перейти на {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Перейдіть на один із виділених тарифів, щоб запускати агентів у хмарі. Тариф діє для всієї цієї організації."
 
 msgid "Upgrade to Pro"
 msgstr "Перейти на Pro"

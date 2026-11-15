@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "每席位每月 {gbHours} 雲端 GB 小時，匯入組織共用的一個額度池。"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隱藏} other {#行已隱藏}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}分"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} 分 {rest} 秒"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "按月計費每位使用者每月 {monthlyPrice}，或按年計費 {yearlyPrice}。行動裝置、自動化、優先支援。"
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "每位使用者每月 {monthlyPrice}。行動裝置、自動化、優先支援。"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}個自動化上次執行失敗"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "已從結帳頁面返回。帳單資訊已重新整理。"
+
 msgid "Back to About"
 msgstr "返回關於頁"
 
@@ -4956,11 +4956,17 @@ msgstr "雲端工作區"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} 尚未啟用雲端工作區。雲端工作區包含在 Team 和 Ultra 方案中：請在設定的帳單中升級。"
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "雲端工作區包含在 {plans} 方案中。"
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "雲端工作區會以你的身分提交、推送並建立提取要求"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "雲端工作區會忽略此變數。代理程式改為在「設定 › 代理程式」中登入。"
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "雲端工作區讓代理程式在你的電腦關機時繼續工作，並由整個團隊共用。"
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "雲端工作區需要 Team 或 Ultra 方案。請在設定的帳單中升級後啟動。"
@@ -5852,6 +5858,9 @@ msgstr "無法變更有存取權限的人"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "無法檢查您的方案。請檢查網路連線後再試一次。"
+
+msgid "Could not check your role in this organization."
+msgstr "無法確認你在此組織中的角色。"
 
 msgid "Could not clear browsing data"
 msgstr "無法清除瀏覽資料"
@@ -11654,6 +11663,9 @@ msgstr "正在載入更多..."
 msgid "Loading more…"
 msgstr "正在載入更多…"
 
+msgid "Loading plans..."
+msgstr "正在載入方案..."
+
 msgid "Loading project…"
 msgstr "正在載入專案…"
 
@@ -14498,6 +14510,9 @@ msgstr "正在開啟 {appName}…"
 msgid "Opening {what}"
 msgstr "正在開啟 {what}"
 
+msgid "Opening checkout..."
+msgstr "正在開啟結帳頁面..."
+
 msgid "Opening files"
 msgstr "開啟檔案"
 
@@ -16319,9 +16334,6 @@ msgstr "保密鉚接工"
 msgid "Redirecting to desktop app..."
 msgstr "正在跳轉到桌面應用程式..."
 
-msgid "Redirecting..."
-msgstr "正在跳轉..."
-
 msgid "Redo"
 msgstr "重做"
 
@@ -17143,6 +17155,9 @@ msgstr "將於 {until} 重試"
 msgid "Retrying…"
 msgstr "正在重試…"
 
+msgid "Return to {appName}"
+msgstr "返回 {appName}"
+
 msgid "Return to dashboard"
 msgstr "返回主頁"
 
@@ -17352,6 +17367,12 @@ msgstr "在你的機器上並行執行10個以上的編碼代理程式。"
 
 msgid "Run again"
 msgstr "重新執行"
+
+msgid "Run agents in the cloud"
+msgstr "在雲端執行代理程式"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "使用 {planName} 在雲端執行代理程式"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "依排程或在發生某件事時執行代理程式。"
@@ -22006,6 +22027,9 @@ msgstr "在 {0} 升級"
 
 msgid "Upgrade to {planName}"
 msgstr "升級至 {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "升級至任一醒目標示的方案即可在雲端執行代理程式。此方案適用於整個組織。"
 
 msgid "Upgrade to Pro"
 msgstr "升級至 Pro"

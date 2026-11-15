@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "每席位每月 {gbHours} 云端 GB 小时，汇入组织共享的一个额度池。"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隐藏} other {#行已隐藏}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}分"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} 分 {rest} 秒"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "按月计费每用户每月 {monthlyPrice}，或按年计费 {yearlyPrice}。移动端、自动化、优先支持。"
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。"
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "已从结账页面返回。账单信息已刷新。"
+
 msgid "Back to About"
 msgstr "返回关于页"
 
@@ -4956,11 +4956,17 @@ msgstr "云工作区"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} 未开通云工作区。云工作区包含在 Team 和 Ultra 方案中：请在设置的账单中升级。"
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "云工作区包含在 {plans} 方案中。"
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "云工作区以你的身份提交、推送并创建拉取请求"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "云工作区会忽略此变量。智能体改为在「设置 › 智能体」中登录。"
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "云工作区让智能体在你的电脑关机时继续工作，并由整个团队共享。"
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "云工作区需要 Team 或 Ultra 方案。请在设置的账单中升级后启动。"
@@ -5852,6 +5858,9 @@ msgstr "无法更改有访问权限的人"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "无法检查您的套餐。请检查网络连接后重试。"
+
+msgid "Could not check your role in this organization."
+msgstr "无法确认你在此组织中的角色。"
 
 msgid "Could not clear browsing data"
 msgstr "无法清除浏览数据"
@@ -11654,6 +11663,9 @@ msgstr "正在加载更多..."
 msgid "Loading more…"
 msgstr "正在加载更多…"
 
+msgid "Loading plans..."
+msgstr "正在加载方案..."
+
 msgid "Loading project…"
 msgstr "正在加载项目…"
 
@@ -14498,6 +14510,9 @@ msgstr "正在打开 {appName}…"
 msgid "Opening {what}"
 msgstr "正在打开 {what}"
 
+msgid "Opening checkout..."
+msgstr "正在打开结账页面..."
+
 msgid "Opening files"
 msgstr "打开文件"
 
@@ -16319,9 +16334,6 @@ msgstr "隐匿铆工"
 msgid "Redirecting to desktop app..."
 msgstr "正在跳转到桌面应用..."
 
-msgid "Redirecting..."
-msgstr "正在跳转..."
-
 msgid "Redo"
 msgstr "重做"
 
@@ -17143,6 +17155,9 @@ msgstr "将于 {until} 重试"
 msgid "Retrying…"
 msgstr "正在重试…"
 
+msgid "Return to {appName}"
+msgstr "返回 {appName}"
+
 msgid "Return to dashboard"
 msgstr "返回主页"
 
@@ -17352,6 +17367,12 @@ msgstr "在你的机器上并行运行10个以上的编码智能体。"
 
 msgid "Run again"
 msgstr "重新运行"
+
+msgid "Run agents in the cloud"
+msgstr "在云端运行智能体"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "使用 {planName} 在云端运行智能体"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "按计划或在发生某件事时运行智能体。"
@@ -22006,6 +22027,9 @@ msgstr "在 {0} 升级"
 
 msgid "Upgrade to {planName}"
 msgstr "升级到 {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "升级到任一突出显示的方案即可在云端运行智能体。该方案适用于整个组织。"
 
 msgid "Upgrade to Pro"
 msgstr "升级到 Pro"

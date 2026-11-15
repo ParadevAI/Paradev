@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} GB-horas en la nube por puesto al mes, en un único fondo para tu organización."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# línea oculta} other {# líneas ocultas}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes} min"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} por usuario/mes con facturación mensual, o {yearlyPrice} con facturación anual. Móvil, automatizaciones y soporte prioritario."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} por usuario/mes. Móvil, automatizaciones y soporte prioritario."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Tus automatizaciones con error en su última ejecución: {myFailedCount}"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Atrás"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "De vuelta del pago. La facturación está actualizada."
+
 msgid "Back to About"
 msgstr "Volver a Acerca de"
 
@@ -4956,11 +4956,17 @@ msgstr "Espacios de trabajo en la nube"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Los espacios de trabajo en la nube no están habilitados para {account}. Vienen con los planes Team y Ultra: mejora tu plan en Configuración, Facturación."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Los espacios de trabajo en la nube vienen con los planes {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Los espacios de trabajo en la nube hacen commit, push y abren pull requests como tú"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Los espacios de trabajo en la nube ignoran esta variable. Los agentes inician sesión en Configuración › Agentes en su lugar."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Los espacios de trabajo en la nube mantienen a los agentes trabajando mientras tu ordenador está apagado, y todo tu equipo los comparte."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Los espacios de trabajo en la nube necesitan el plan Team o Ultra. Mejora tu plan en Configuración, Facturación para iniciar uno."
@@ -5852,6 +5858,9 @@ msgstr "No se pudo cambiar quién tiene acceso"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "No se pudo comprobar tu plan. Revisa tu conexión e inténtalo de nuevo."
+
+msgid "Could not check your role in this organization."
+msgstr "No se pudo comprobar tu rol en esta organización."
 
 msgid "Could not clear browsing data"
 msgstr "No se pudieron borrar los datos de navegación"
@@ -11654,6 +11663,9 @@ msgstr "Cargando más..."
 msgid "Loading more…"
 msgstr "Cargando más…"
 
+msgid "Loading plans..."
+msgstr "Cargando planes..."
+
 msgid "Loading project…"
 msgstr "Cargando proyecto…"
 
@@ -14498,6 +14510,9 @@ msgstr "Abriendo {appName}…"
 msgid "Opening {what}"
 msgstr "Abriendo {what}"
 
+msgid "Opening checkout..."
+msgstr "Abriendo el pago..."
+
 msgid "Opening files"
 msgstr "Abrir archivos"
 
@@ -16319,9 +16334,6 @@ msgstr "Remachador censurado"
 msgid "Redirecting to desktop app..."
 msgstr "Redirigiendo a la app de escritorio..."
 
-msgid "Redirecting..."
-msgstr "Redirigiendo..."
-
 msgid "Redo"
 msgstr "Rehacer"
 
@@ -17143,6 +17155,9 @@ msgstr "Reintento a las {until}"
 msgid "Retrying…"
 msgstr "Reintentando…"
 
+msgid "Return to {appName}"
+msgstr "Volver a {appName}"
+
 msgid "Return to dashboard"
 msgstr "Volver al panel"
 
@@ -17352,6 +17367,12 @@ msgstr "Ejecuta más de 10 agentes de programación en paralelo en tu máquina."
 
 msgid "Run again"
 msgstr "Ejecutar de nuevo"
+
+msgid "Run agents in the cloud"
+msgstr "Ejecuta agentes en la nube"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Ejecuta agentes en la nube con {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Ejecuta agentes según un horario o cuando pasa algo."
@@ -22006,6 +22027,9 @@ msgstr "Actualizar en {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Mejorar a {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Mejora a uno de los planes destacados para ejecutar agentes en la nube. El plan se aplica a toda esta organización."
 
 msgid "Upgrade to Pro"
 msgstr "Actualizar a Pro"

@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "좌석당 매월 클라우드 {gbHours} GB 시간, 조직 전체가 하나의 풀로 공유합니다."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {숨겨진 #줄} other {숨겨진 #줄}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}분"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}분 {rest}초"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "월간 결제 시 사용자당 월 {monthlyPrice}, 연간 결제 시 {yearlyPrice}. 모바일, 자동화, 우선 지원."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "사용자당 월 {monthlyPrice}. 모바일, 자동화, 우선 지원."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "내 자동화 {myFailedCount}개가 마지막 실행에 실패했습니다"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "뒤로"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "결제 페이지에서 돌아왔습니다. 결제 정보를 새로 고쳤습니다."
+
 msgid "Back to About"
 msgstr "소개로 돌아가기"
 
@@ -4956,11 +4956,17 @@ msgstr "클라우드 워크스페이스"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account}에는 클라우드 워크스페이스가 활성화되어 있지 않습니다. Team 및 Ultra 플랜에 포함되어 있습니다. 설정의 결제에서 업그레이드하세요."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "클라우드 워크스페이스는 {plans} 플랜에 포함됩니다."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "클라우드 워크스페이스가 사용자 본인으로 커밋, 푸시하고 풀 리퀘스트를 엽니다"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "클라우드 워크스페이스는 이 변수를 무시합니다. 에이전트는 대신 설정 › 에이전트에서 로그인합니다."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "클라우드 워크스페이스는 컴퓨터가 꺼져 있어도 에이전트가 계속 작업하게 하며, 팀 전체가 함께 사용합니다."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "클라우드 워크스페이스에는 Team 또는 Ultra 플랜이 필요합니다. 시작하려면 설정의 결제에서 업그레이드하세요."
@@ -5852,6 +5858,9 @@ msgstr "접근 권한이 있는 사람을 변경할 수 없습니다"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "플랜을 확인할 수 없습니다. 연결 상태를 확인한 후 다시 시도하세요."
+
+msgid "Could not check your role in this organization."
+msgstr "이 조직에서의 역할을 확인할 수 없습니다."
 
 msgid "Could not clear browsing data"
 msgstr "인터넷 사용 기록을 삭제하지 못했습니다"
@@ -11654,6 +11663,9 @@ msgstr "더 불러오는 중..."
 msgid "Loading more…"
 msgstr "더 불러오는 중…"
 
+msgid "Loading plans..."
+msgstr "플랜 불러오는 중..."
+
 msgid "Loading project…"
 msgstr "프로젝트 불러오는 중…"
 
@@ -14498,6 +14510,9 @@ msgstr "{appName}을(를) 여는 중…"
 msgid "Opening {what}"
 msgstr "{what} 여는 중"
 
+msgid "Opening checkout..."
+msgstr "결제 페이지 여는 중..."
+
 msgid "Opening files"
 msgstr "파일 열기"
 
@@ -16319,9 +16334,6 @@ msgstr "가려진 리벳공"
 msgid "Redirecting to desktop app..."
 msgstr "데스크톱 앱으로 이동 중..."
 
-msgid "Redirecting..."
-msgstr "이동하는 중..."
-
 msgid "Redo"
 msgstr "다시 실행"
 
@@ -17143,6 +17155,9 @@ msgstr "{until}에 다시 시도"
 msgid "Retrying…"
 msgstr "다시 시도하는 중…"
 
+msgid "Return to {appName}"
+msgstr "{appName}(으)로 돌아가기"
+
 msgid "Return to dashboard"
 msgstr "대시보드로 돌아가기"
 
@@ -17352,6 +17367,12 @@ msgstr "내 머신에서 10개 이상의 코딩 에이전트를 병렬로 실행
 
 msgid "Run again"
 msgstr "다시 실행"
+
+msgid "Run agents in the cloud"
+msgstr "클라우드에서 에이전트 실행"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "{planName}(으)로 클라우드에서 에이전트 실행"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "일정에 따라 또는 어떤 일이 생겼을 때 에이전트를 실행하세요."
@@ -22006,6 +22027,9 @@ msgstr "{0}에서 업그레이드"
 
 msgid "Upgrade to {planName}"
 msgstr "{planName}(으)로 업그레이드"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "클라우드에서 에이전트를 실행하려면 강조 표시된 플랜 중 하나로 업그레이드하세요. 플랜은 이 조직 전체에 적용됩니다."
 
 msgid "Upgrade to Pro"
 msgstr "Pro로 업그레이드"

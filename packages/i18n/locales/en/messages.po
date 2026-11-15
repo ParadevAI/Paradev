@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}m"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes}m {rest}s"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} per user/mo. Mobile, automations, priority support."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} of your automations failed their last run"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Back"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Back from checkout. Billing is refreshed."
+
 msgid "Back to About"
 msgstr "Back to About"
 
@@ -4956,11 +4956,17 @@ msgstr "Cloud Workspaces"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloud workspaces are not enabled for {account}. They come with the Team and Ultra plans: upgrade in Settings, Billing."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Cloud workspaces come with the {plans} plans."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloud workspaces commit, push and open pull requests as you"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
@@ -5852,6 +5858,9 @@ msgstr "Could not change who has access"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Could not check your plan. Check your connection and try again."
+
+msgid "Could not check your role in this organization."
+msgstr "Could not check your role in this organization."
 
 msgid "Could not clear browsing data"
 msgstr "Could not clear browsing data"
@@ -11654,6 +11663,9 @@ msgstr "Loading more..."
 msgid "Loading more…"
 msgstr "Loading more…"
 
+msgid "Loading plans..."
+msgstr "Loading plans..."
+
 msgid "Loading project…"
 msgstr "Loading project…"
 
@@ -14498,6 +14510,9 @@ msgstr "Opening {appName}…"
 msgid "Opening {what}"
 msgstr "Opening {what}"
 
+msgid "Opening checkout..."
+msgstr "Opening checkout..."
+
 msgid "Opening files"
 msgstr "Opening files"
 
@@ -16319,9 +16334,6 @@ msgstr "Redacted Riveter"
 msgid "Redirecting to desktop app..."
 msgstr "Redirecting to desktop app..."
 
-msgid "Redirecting..."
-msgstr "Redirecting..."
-
 msgid "Redo"
 msgstr "Redo"
 
@@ -17143,6 +17155,9 @@ msgstr "Retrying at {until}"
 msgid "Retrying…"
 msgstr "Retrying…"
 
+msgid "Return to {appName}"
+msgstr "Return to {appName}"
+
 msgid "Return to dashboard"
 msgstr "Return to dashboard"
 
@@ -17352,6 +17367,12 @@ msgstr "Run 10+ parallel coding agents on your machine."
 
 msgid "Run again"
 msgstr "Run again"
+
+msgid "Run agents in the cloud"
+msgstr "Run agents in the cloud"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Run agents in the cloud with {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Run agents on a schedule or when something happens."
@@ -22006,6 +22027,9 @@ msgstr "Upgrade on {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Upgrade to {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
 
 msgid "Upgrade to Pro"
 msgstr "Upgrade to Pro"

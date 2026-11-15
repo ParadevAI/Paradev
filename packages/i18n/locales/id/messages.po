@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} GB-jam cloud per kursi setiap bulan, dalam satu kumpulan untuk organisasi Anda."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# baris tersembunyi} other {# baris tersembunyi}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}m"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} mnt {rest} dtk"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} per pengguna/bulan ditagih bulanan, atau {yearlyPrice} ditagih tahunan. Seluler, otomatisasi, dukungan prioritas."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan prioritas."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Kembali"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Kembali dari checkout. Penagihan sudah diperbarui."
+
 msgid "Back to About"
 msgstr "Kembali ke Tentang"
 
@@ -4956,11 +4956,17 @@ msgstr "Workspace cloud"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Workspace cloud tidak diaktifkan untuk {account}. Workspace cloud tersedia di paket Team dan Ultra: upgrade di Pengaturan, Penagihan."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Workspace cloud tersedia di paket {plans}."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Workspace cloud mengabaikan variabel ini. Agen masuk melalui Pengaturan › Agen sebagai gantinya."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Workspace cloud membuat agen tetap bekerja saat komputer Anda mati, dan seluruh tim Anda dapat memakainya bersama."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Workspace cloud memerlukan paket Team atau Ultra. Upgrade di Pengaturan, Penagihan untuk memulainya."
@@ -5852,6 +5858,9 @@ msgstr "Tidak bisa mengubah siapa yang punya akses"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Tidak dapat memeriksa paket Anda. Periksa koneksi Anda dan coba lagi."
+
+msgid "Could not check your role in this organization."
+msgstr "Tidak dapat memeriksa peran Anda di organisasi ini."
 
 msgid "Could not clear browsing data"
 msgstr "Tidak bisa membersihkan data penjelajahan"
@@ -11654,6 +11663,9 @@ msgstr "Memuat lagi..."
 msgid "Loading more…"
 msgstr "Memuat lagi…"
 
+msgid "Loading plans..."
+msgstr "Memuat paket..."
+
 msgid "Loading project…"
 msgstr "Memuat proyek…"
 
@@ -14498,6 +14510,9 @@ msgstr "Membuka {appName}…"
 msgid "Opening {what}"
 msgstr "Membuka {what}"
 
+msgid "Opening checkout..."
+msgstr "Membuka checkout..."
+
 msgid "Opening files"
 msgstr "Membuka file"
 
@@ -16319,9 +16334,6 @@ msgstr "Tukang Keling Tersensor"
 msgid "Redirecting to desktop app..."
 msgstr "Mengalihkan ke aplikasi desktop..."
 
-msgid "Redirecting..."
-msgstr "Mengalihkan..."
-
 msgid "Redo"
 msgstr "Redo"
 
@@ -17143,6 +17155,9 @@ msgstr "Dicoba lagi pada {until}"
 msgid "Retrying…"
 msgstr "Mencoba lagi…"
 
+msgid "Return to {appName}"
+msgstr "Kembali ke {appName}"
+
 msgid "Return to dashboard"
 msgstr "Kembali ke dasbor"
 
@@ -17352,6 +17367,12 @@ msgstr "Jalankan 10+ agen coding paralel di mesin Anda."
 
 msgid "Run again"
 msgstr "Jalankan lagi"
+
+msgid "Run agents in the cloud"
+msgstr "Jalankan agen di cloud"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Jalankan agen di cloud dengan {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Jalankan agen sesuai jadwal atau saat sesuatu terjadi."
@@ -22006,6 +22027,9 @@ msgstr "Upgrade di {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Tingkatkan ke {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Upgrade ke salah satu paket yang disorot untuk menjalankan agen di cloud. Paket berlaku untuk seluruh organisasi ini."
 
 msgid "Upgrade to Pro"
 msgstr "Upgrade ke Pro"

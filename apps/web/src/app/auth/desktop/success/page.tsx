@@ -4,13 +4,11 @@ import { db } from "@superset/db/client";
 import { sessions } from "@superset/db/schema/auth";
 import { BRAND } from "@superset/shared/brand";
 import { headers } from "next/headers";
+import { isDesktopProtocol } from "@/lib/desktop-protocol";
 import { initServerI18n } from "@/lib/i18n-server";
 import { DesktopAuthCard } from "./components/DesktopAuthCard";
 import { DesktopRedirect } from "./components/DesktopRedirect";
-import {
-	isDesktopProtocol,
-	parseLoopbackCallback,
-} from "./utils/desktopCallbackTarget";
+import { parseLoopbackCallback } from "./utils/desktopCallbackTarget";
 
 export default async function DesktopSuccessPage({
 	searchParams,

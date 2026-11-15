@@ -9,13 +9,15 @@ import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 import { track } from "renderer/lib/analytics";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { PROTOCOL_SCHEME } from "shared/constants";
+import { checkoutSuccessUrl } from "./utils/checkoutSuccessUrl";
 
 interface UpgradeOptions {
 	planId: string;
 	planName: string;
 	annual: boolean;
 	seats: number;
-	source: "billing_overview" | "billing_plans";
+	source: "billing_overview" | "billing_plans" | "cloud_upsell";
 	returnUrl?: string;
 }
 
@@ -80,7 +82,10 @@ export function useBillingActions() {
 				organizationId: activeOrgId,
 				planId: options.planId,
 				currentPlanId: activePlan?.autumnPlanId ?? null,
-				successUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`,
+				successUrl: checkoutSuccessUrl(
+					env.NEXT_PUBLIC_WEB_URL,
+					PROTOCOL_SCHEME,
+				),
 				cancelUrl: env.NEXT_PUBLIC_WEB_URL,
 				confirmed: true,
 			},
@@ -119,7 +124,10 @@ export function useBillingActions() {
 		const checkoutProperties = checkoutPropertiesFor(options);
 		track("checkout_started", checkoutProperties);
 
-		const successUrl = `${env.NEXT_PUBLIC_WEB_URL}/settings/billing?success=true`;
+		const successUrl = checkoutSuccessUrl(
+			env.NEXT_PUBLIC_WEB_URL,
+			PROTOCOL_SCHEME,
+		);
 
 		setIsUpgrading(true);
 		try {

@@ -26,6 +26,7 @@ export function CloudUsageRefusedBanner({
 			<span className="min-w-0 flex-1 select-text">{errorMessage(error)}</span>
 			<Link
 				to="/settings/billing"
+				search={{ source: "cloud" }}
 				className="shrink-0 font-medium underline underline-offset-4"
 			>
 				{t({ message: "Open billing" })}

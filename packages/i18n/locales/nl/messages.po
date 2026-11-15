@@ -1074,6 +1074,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} cloud GB-hours per seat each month, in one pool for your organization."
+msgstr "{gbHours} cloud-GB-uren per gebruiker per maand, in één pool voor je organisatie."
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# verborgen regel} other {# verborgen regels}}"
 
@@ -1166,12 +1169,6 @@ msgstr "{minutes}m"
 
 msgid "{minutes}m {rest}s"
 msgstr "{minutes} min {rest} s"
-
-msgid "{monthlyPrice} per user/mo billed monthly, or {yearlyPrice} billed yearly. Mobile, automations, priority support."
-msgstr "{monthlyPrice} per gebruiker/maand bij maandelijkse facturering, of {yearlyPrice} bij jaarlijkse facturering. Mobiel, automatiseringen, prioriteitsondersteuning."
-
-msgid "{monthlyPrice} per user/mo. Mobile, automations, priority support."
-msgstr "{monthlyPrice} per gebruiker/maand. Mobiel, automatiseringen, prioriteitsondersteuning."
 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Bij {myFailedCount} van je automatiseringen is de laatste run mislukt"
@@ -3533,6 +3530,9 @@ msgctxt "Android back button"
 msgid "Back"
 msgstr "Terug"
 
+msgid "Back from checkout. Billing is refreshed."
+msgstr "Terug van het afrekenen. Facturering is vernieuwd."
+
 msgid "Back to About"
 msgstr "Terug naar Over ons"
 
@@ -4956,11 +4956,17 @@ msgstr "Cloudwerkruimtes"
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudwerkruimtes zijn niet ingeschakeld voor {account}. Ze horen bij de Team- en Ultra-abonnementen: upgrade in Instellingen, Facturering."
 
+msgid "Cloud workspaces come with the {plans} plans."
+msgstr "Cloudwerkruimtes zitten in de {plans}-abonnementen."
+
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudwerkruimtes committen, pushen en openen pull requests als jou"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloudworkspaces negeren deze variabele. Agents melden zich in plaats daarvan aan via Instellingen › Agents."
+
+msgid "Cloud workspaces keep agents working while your computer is off, and your whole team shares them."
+msgstr "Met cloudwerkruimtes blijven agents werken terwijl je computer uit staat, en je hele team deelt ze."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloudwerkruimtes vereisen het Team- of Ultra-abonnement. Upgrade in Instellingen, Facturering om er een te starten."
@@ -5852,6 +5858,9 @@ msgstr "Kan niet wijzigen wie toegang heeft"
 
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Je abonnement kon niet worden gecontroleerd. Controleer je verbinding en probeer het opnieuw."
+
+msgid "Could not check your role in this organization."
+msgstr "Je rol in deze organisatie kon niet worden gecontroleerd."
 
 msgid "Could not clear browsing data"
 msgstr "Kan browsegegevens niet wissen"
@@ -11654,6 +11663,9 @@ msgstr "Meer laden..."
 msgid "Loading more…"
 msgstr "Meer laden…"
 
+msgid "Loading plans..."
+msgstr "Abonnementen laden..."
+
 msgid "Loading project…"
 msgstr "Project laden…"
 
@@ -14498,6 +14510,9 @@ msgstr "{appName} wordt geopend…"
 msgid "Opening {what}"
 msgstr "{what} openen"
 
+msgid "Opening checkout..."
+msgstr "Afrekenen wordt geopend..."
+
 msgid "Opening files"
 msgstr "Bestanden openen"
 
@@ -16319,9 +16334,6 @@ msgstr "Gecensureerde Klinker"
 msgid "Redirecting to desktop app..."
 msgstr "Doorsturen naar de desktop-app..."
 
-msgid "Redirecting..."
-msgstr "Doorsturen..."
-
 msgid "Redo"
 msgstr "Opnieuw"
 
@@ -17143,6 +17155,9 @@ msgstr "Nieuwe poging om {until}"
 msgid "Retrying…"
 msgstr "Opnieuw proberen…"
 
+msgid "Return to {appName}"
+msgstr "Terug naar {appName}"
+
 msgid "Return to dashboard"
 msgstr "Terug naar dashboard"
 
@@ -17352,6 +17367,12 @@ msgstr "Draai 10+ parallelle coding agents op je machine."
 
 msgid "Run again"
 msgstr "Opnieuw uitvoeren"
+
+msgid "Run agents in the cloud"
+msgstr "Draai agents in de cloud"
+
+msgid "Run agents in the cloud with {planName}"
+msgstr "Draai agents in de cloud met {planName}"
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Draai agents volgens schema of als er iets gebeurt."
@@ -22006,6 +22027,9 @@ msgstr "Upgraden op {0}"
 
 msgid "Upgrade to {planName}"
 msgstr "Upgraden naar {planName}"
+
+msgid "Upgrade to one of the highlighted plans to run agents in the cloud. The plan applies to this whole organization."
+msgstr "Upgrade naar een van de gemarkeerde abonnementen om agents in de cloud te draaien. Het abonnement geldt voor deze hele organisatie."
 
 msgid "Upgrade to Pro"
 msgstr "Upgraden naar Pro"
