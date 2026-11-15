@@ -11,16 +11,18 @@ from urllib.parse import urlparse
 WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/deploy-paradev-staging.yml"
 SOURCE = WORKFLOW.read_text()
 GUARD = textwrap.dedent(SOURCE.split("<<'PYTHON'\n", 1)[1].split("          PYTHON", 1)[0])
-TARGETS = (
+STAGE_TARGETS = (
     ("API", "prj_MmAnFWXbST3HSeLr313KNqZ00Pve", "api-paradev", "api.stage.paradev.com", "apps/api"),
     ("WEB", "prj_7XZEFgKHMki81K1bTCl0JCG4lToQ", "web-paradev", "app.stage.paradev.com", "apps/web"),
 )
+FINAL_TARGETS = tuple((*target[:3], target[3].replace(".stage.", "."), target[4]) for target in STAGE_TARGETS)
 
 
 class GuardTest(unittest.TestCase):
     def run_guard(self, mode, command, mismatch=False, variable_mismatch=False):
         calls = []
         aliases = {}
+        TARGETS = STAGE_TARGETS if mode == "stage" else FINAL_TARGETS
 
         def request(req, timeout):
             path = urlparse(req.full_url).path
@@ -29,7 +31,7 @@ class GuardTest(unittest.TestCase):
                 if path == f"/v9/projects/{project}":
                     return io.BytesIO(json.dumps(dict(id=project, name="wrong" if mismatch else name, accountId="team", rootDirectory=root)).encode())
                 if path == f"/v9/projects/{project}/domains/{host}":
-                    self.assertEqual(mode, "stage", "Final preparation must not require domain ownership")
+                    self.assertNotEqual(mode, "prepare-final", "Final preparation must not require domain ownership")
                     return io.BytesIO(json.dumps(dict(name=host, verified=True)).encode())
                 if path == f"/v13/deployments/{kind.lower()}.vercel.app":
                     return io.BytesIO(json.dumps(dict(id=f"dpl_{kind}", projectId=project, readyState="READY", target="production")).encode())
@@ -69,18 +71,26 @@ class GuardTest(unittest.TestCase):
         calls, error, _ = self.run_guard("stage", "alias")
         self.assertIsNone(error)
         self.assertEqual(sum(method == "POST" for method, _ in calls), 2)
-        for _, project, _, host, _ in TARGETS:
+        for _, project, _, host, _ in STAGE_TARGETS:
+            self.assertIn(("GET", f"/v9/projects/{project}/domains/{host}"), calls)
+
+    def test_final_checks_ownership_and_assigns_both_final_aliases_api_first(self):
+        calls, error, _ = self.run_guard("final", "alias")
+        self.assertIsNone(error)
+        self.assertEqual([path for method, path in calls if method == "POST"],
+                         ["/v2/deployments/dpl_API/aliases", "/v2/deployments/dpl_WEB/aliases"])
+        for _, project, _, host, _ in FINAL_TARGETS:
             self.assertIn(("GET", f"/v9/projects/{project}/domains/{host}"), calls)
 
     def test_project_mismatch_stops_preparation_before_deployment(self):
-        for mode in ("stage", "prepare-final"):
+        for mode in ("stage", "prepare-final", "final"):
             for variable_mismatch in (False, True):
                 calls, error, _ = self.run_guard(mode, "check", mismatch=True, variable_mismatch=variable_mismatch)
                 self.assertIsNotNone(error)
                 self.assertFalse(any("deployments" in path or method != "GET" for method, path in calls))
 
     def test_fixed_modes_static_env_and_skip_domain(self):
-        self.assertIn("default: stage\n        options:\n          - stage\n          - prepare-final", SOURCE)
+        self.assertIn("default: stage\n        options:\n          - stage\n          - prepare-final\n          - final", SOURCE)
         self.assertEqual(SOURCE.count("vercel deploy --prod --skip-domain"), 2)
         self.assertEqual(SOURCE.count("DOMAIN_MOVE_ENABLED: \"false\""), 2)
         for var, final, stage, count in (
@@ -89,9 +99,9 @@ class GuardTest(unittest.TestCase):
             ("NEXT_PUBLIC_WEB_URL", "https://app.paradev.com", "https://app.stage.paradev.com", 2),
             ("NEXT_PUBLIC_COOKIE_DOMAIN", "paradev.com", "stage.paradev.com", 2),
         ):
-            self.assertEqual(SOURCE.count(f"{var}: ${{{{ inputs.mode == 'prepare-final' && '{final}' || '{stage}' }}}}"), count)
+            self.assertEqual(SOURCE.count(f"{var}: ${{{{ inputs.mode != 'stage' && '{final}' || '{stage}' }}}}"), count)
         self.assertIn("NEXT_PUBLIC_API_URL: https://api.superset.sh", SOURCE)
-        self.assertIn("if: inputs.mode == 'stage'", SOURCE)
+        self.assertIn("if: inputs.mode != 'prepare-final'", SOURCE)
         self.assertIn("if: inputs.mode == 'prepare-final'", SOURCE)
         self.assertNotIn("db:migrate", SOURCE)
         self.assertNotIn("wrangler deploy", SOURCE)

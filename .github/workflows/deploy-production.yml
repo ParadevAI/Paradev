@@ -413,6 +413,14 @@ jobs:
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
             --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY
 
+  deploy-paradev:
+    name: Deploy Paradev
+    needs: deploy-database
+    uses: ./.github/workflows/deploy-paradev-staging.yml
+    with:
+      mode: final
+    secrets: inherit
+
   deploy-agents:
     name: Deploy Agents Web to Vercel
     runs-on: blacksmith-4vcpu-ubuntu-2404
