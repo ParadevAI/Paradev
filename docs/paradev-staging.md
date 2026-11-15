@@ -132,14 +132,14 @@ dispatch; preparing source is not dispatch authorization.
 ### Final hosts deploy from main
 
 `api.paradev.com` and `app.paradev.com` serve live traffic, so they follow
-`main`. `deploy-production.yml` calls this workflow with `mode: final` after the
-legacy API and web jobs succeed. `final` builds with the `prepare-final`
+`main`. `deploy-production.yml` calls this workflow with `mode: final` after
+database migrations, in parallel with the legacy API and web jobs. `final` builds with the `prepare-final`
 settings above, then assigns the two final hosts, API first, with the same
 ownership checks as stage: each host must already be a verified domain of its
 project and must not be aliased to another project.
 
-- A failed legacy API or web job skips the Paradev deploy, so the two stacks do
-  not drift apart silently. A failed Paradev job fails the production run.
+- The two stacks deploy independently: a failure in one does not stop the
+  other, and either failure fails the production run.
 - Runs share one concurrency group and do not cancel a run in progress.
 - To deploy by hand, dispatch the workflow on `main` with `mode: final`.
 - To roll back, assign the hosts to the earlier deployments. The run log of each

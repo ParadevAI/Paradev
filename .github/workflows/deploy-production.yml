@@ -415,7 +415,7 @@ jobs:
 
   deploy-paradev:
     name: Deploy Paradev
-    needs: [deploy-api, deploy-web]
+    needs: deploy-database
     uses: ./.github/workflows/deploy-paradev-staging.yml
     with:
       mode: final
