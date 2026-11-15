@@ -113,11 +113,19 @@ export const useNewWorkspaceDraftStore = create<NewWorkspaceDraftState>(
 		// selection that leaves isSession behind makes submit reject PR
 		// checkouts while the picker shows the project as selected.
 		selectProject: (projectId, repository = null) =>
-			set({
+			set((state) => ({
 				selectedProjectId: projectId,
 				selectedProjectRepository: repository,
 				isSession: false,
-			}),
+				...(state.selectedProjectId === projectId
+					? {}
+					: {
+							checkoutBaseBranches: {},
+							checkoutPullRequests: {},
+							checkoutPullRequestsFor: null,
+							checkoutWorktrees: {},
+						}),
+			})),
 		// Sessions can't check out a PR or fork a branch — clear the
 		// repo-scoped inputs instead of failing at submit.
 		selectSession: () =>
