@@ -74,21 +74,6 @@ const config = {
 				destination: "/remote-access",
 				permanent: true,
 			},
-			{
-				source: "/port-management",
-				destination: "/ports",
-				permanent: true,
-			},
-			{
-				source: "/agent-status-notifications",
-				destination: "/agent-status",
-				permanent: true,
-			},
-			{
-				source: "/claude-code",
-				destination: "/agents/claude-code",
-				permanent: true,
-			},
 		];
 		return withLegacyHostRedirects(redirects, {
 			rootDomain: readRootDomain(),
