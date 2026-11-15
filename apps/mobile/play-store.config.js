@@ -7,7 +7,7 @@ const apple = require("./store.config.js").apple;
 const appStore = apple.info["en-US"];
 
 const shortDescription =
-	"Start, follow and review your coding agents from your phone.";
+	"Run many coding agents in parallel. Follow, review and merge from your phone.";
 
 // The App Store review notes argue against Apple's guidelines; Play reviewers
 // need only the access steps.
