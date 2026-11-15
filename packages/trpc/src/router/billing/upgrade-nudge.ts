@@ -9,7 +9,9 @@ const FEATURE_NAMES: Record<string, string> = {
 const SAFE_FEATURE_ID = /^[a-z0-9]+(?:[_.-][a-z0-9]+)*$/i;
 
 export function upgradeNudgeFeatureName(feature: string): string {
-	const known = FEATURE_NAMES[feature];
+	const known = Object.hasOwn(FEATURE_NAMES, feature)
+		? FEATURE_NAMES[feature]
+		: undefined;
 	if (known) return known;
 	if (!SAFE_FEATURE_ID.test(feature)) return "a Pro feature";
 	const words = feature.replace(/[_.-]+/g, " ").toLowerCase();
@@ -32,7 +34,6 @@ export interface UpgradeNudgeDeps {
 	isUnsubscribed(email: string): Promise<boolean>;
 	/** Takes the user's slot for the next 7 days; false when it is taken. */
 	claim(userId: string): Promise<boolean>;
-	release(userId: string): Promise<void>;
 	/** Hands the nudge to the Resend automation, which adds the unsubscribe link. */
 	send(message: UpgradeNudgeMessage): Promise<void>;
 }
@@ -66,14 +67,12 @@ async function nudge(
 	{ user, organizationId, feature }: Parameters<typeof recordUpgradeIntent>[0],
 	deps: UpgradeNudgeDeps,
 ): Promise<UpgradeNudgeOutcome> {
-	let claimed = false;
 	try {
 		if (organizationId && (await deps.isOrganizationPaid(organizationId))) {
 			return "paid";
 		}
 		if (await deps.isUnsubscribed(user.email)) return "unsubscribed";
-		claimed = await deps.claim(user.id);
-		if (!claimed) return "rate_limited";
+		if (!(await deps.claim(user.id))) return "rate_limited";
 		await deps.send({
 			to: user.email,
 			featureName: upgradeNudgeFeatureName(feature),
@@ -81,14 +80,6 @@ async function nudge(
 		return "sent";
 	} catch (error) {
 		console.error(`[billing/upgrade-nudge] ${user.id} nudge failed`, error);
-		if (claimed) {
-			await deps.release(user.id).catch((releaseError) => {
-				console.error(
-					`[billing/upgrade-nudge] ${user.id} claim release failed`,
-					releaseError,
-				);
-			});
-		}
 		return "failed";
 	}
 }

@@ -51,10 +51,6 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 		return result === "OK";
 	},
 
-	async release(userId) {
-		await requireRedis().del(claimKey(userId));
-	},
-
 	async send({ to, featureName }) {
 		if (env.NODE_ENV !== "production") {
 			console.info(

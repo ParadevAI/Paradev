@@ -6,7 +6,13 @@ import {
 	upgradeNudgeFeatureName,
 } from "./upgrade-nudge";
 
-function fakeDeps({ paid = false }: { paid?: boolean } = {}) {
+function fakeDeps({
+	paid = false,
+	sendFails = false,
+}: {
+	paid?: boolean;
+	sendFails?: boolean;
+} = {}) {
 	const claims = new Set<string>();
 	const sent: UpgradeNudgeMessage[] = [];
 	const captured: string[] = [];
@@ -19,10 +25,8 @@ function fakeDeps({ paid = false }: { paid?: boolean } = {}) {
 			claims.add(userId);
 			return true;
 		},
-		release: async (userId) => {
-			claims.delete(userId);
-		},
 		send: async (message) => {
+			if (sendFails) throw new Error("response lost");
 			sent.push(message);
 		},
 	};
@@ -59,6 +63,14 @@ describe("recordUpgradeIntent", () => {
 		expect(sent).toHaveLength(2);
 	});
 
+	test("keeps the claim when the emit may have reached Resend", async () => {
+		const { deps, captured } = fakeDeps({ sendFails: true });
+
+		expect(await recordUpgradeIntent(input, deps)).toBe("failed");
+		expect(await recordUpgradeIntent(input, deps)).toBe("rate_limited");
+		expect(captured).toEqual(["failed", "rate_limited"]);
+	});
+
 	test("skips the nudge when the organization already pays", async () => {
 		const { deps, sent, captured } = fakeDeps({ paid: true });
 
@@ -70,5 +82,7 @@ describe("recordUpgradeIntent", () => {
 	test("names unknown features without passing client text through", () => {
 		expect(upgradeNudgeFeatureName("voice_mode")).toBe("Voice mode");
 		expect(upgradeNudgeFeatureName("<a href=x>win</a>")).toBe("a Pro feature");
+		expect(upgradeNudgeFeatureName("__proto__")).toBe("a Pro feature");
+		expect(upgradeNudgeFeatureName("constructor")).toBe("Constructor");
 	});
 });
