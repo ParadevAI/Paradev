@@ -19,6 +19,60 @@ const api = {
 } as unknown as ApiClient;
 
 describe("resolveHostTarget", () => {
+	test("splits snapshot layout queries before the request URL exceeds the server limit", async () => {
+		const urls: string[] = [];
+		const workspaceIds = Array.from({ length: 407 }, () => crypto.randomUUID());
+		const host = Bun.serve({
+			hostname: "127.0.0.1",
+			port: 0,
+			fetch: (request) => {
+				urls.push(request.url);
+				const inputs = JSON.parse(
+					new URL(request.url).searchParams.get("input") ?? "{}",
+				) as Record<string, { json: { workspaceId: string } }>;
+				return Response.json(
+					Object.values(inputs).map((input) => ({
+						result: {
+							data: {
+								json: {
+									paneId: null,
+									tabId: null,
+									layout: { activeTabId: input.json.workspaceId, tabs: [] },
+								},
+							},
+						},
+					})),
+				);
+			},
+		});
+		try {
+			const target = await resolveHostTarget({
+				requestedHostId: "snapshot-host",
+				organizationId: "1c0587c9-a74c-423c-ae40-b97296ad9b27",
+				userJwt: "",
+				api: {
+					host: {
+						relayEndpoint: { query: async () => ({ url: host.url.origin }) },
+					},
+				} as unknown as ApiClient,
+			});
+			const layouts = await Promise.all(
+				workspaceIds.map((workspaceId) =>
+					target.client.panes.list.query({ workspaceId }),
+				),
+			);
+			expect(layouts.map((result) => result.layout.activeTabId)).toEqual(
+				workspaceIds,
+			);
+			expect(urls.length).toBeGreaterThan(1);
+			expect(Math.max(...urls.map((url) => url.length))).toBeLessThanOrEqual(
+				4096,
+			);
+		} finally {
+			host.stop(true);
+		}
+	});
+
 	test("a cloud workspace calls the relay with no bearer, so its firewall-added credential is what counts", async () => {
 		const target = await resolveHostTarget({
 			requestedHostId: "some-other-host",
