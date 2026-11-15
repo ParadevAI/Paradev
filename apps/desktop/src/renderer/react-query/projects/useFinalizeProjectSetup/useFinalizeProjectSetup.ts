@@ -10,7 +10,7 @@ export interface ProjectSetupResult {
 
 /**
  * Side effects to apply after a project is created or set up on a host:
- * make sure it shows up in the sidebar, and invalidate the cached host
+ * make sure it shows up expanded in the sidebar, and invalidate the cached host
  * project list so callers re-evaluate `needsSetup`. A new project has no
  * workspaces yet; the user creates one from the composer.
  */
@@ -20,7 +20,7 @@ export function useFinalizeProjectSetup() {
 
 	return useCallback(
 		(hostUrl: string, result: ProjectSetupResult) => {
-			ensureProjectInSidebar(result.projectId);
+			ensureProjectInSidebar(result.projectId, { expand: true });
 			void queryClient.invalidateQueries({
 				queryKey: hostProjectListQueryKey(hostUrl),
 			});

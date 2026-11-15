@@ -473,8 +473,8 @@ export function useDashboardSidebarState() {
 	);
 
 	const ensureProjectInSidebar = useCallback(
-		(projectId: string) => {
-			ensureSidebarProjectRecord(collections, projectId);
+		(projectId: string, options?: { expand?: boolean }) => {
+			ensureSidebarProjectRecord(collections, projectId, options);
 		},
 		[collections],
 	);

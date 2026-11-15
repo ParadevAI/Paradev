@@ -191,6 +191,23 @@ describe("ensureSidebarProjectRecord", () => {
 		expect(collections.v2SidebarProjects.get("proj-1")).toEqual(row);
 	});
 
+	it("expands a re-added project that was collapsed before it was hidden", () => {
+		const collections = makeCollections();
+		collections.v2SidebarProjects.insert(
+			projectRow("proj-1", { isHidden: true, isCollapsed: true, tabOrder: 7 }),
+		);
+
+		ensureSidebarProjectRecord(asProjectArg(collections), "proj-1", {
+			expand: true,
+		});
+
+		expect(collections.v2SidebarProjects.get("proj-1")).toMatchObject({
+			isHidden: false,
+			isCollapsed: false,
+			tabOrder: 7,
+		});
+	});
+
 	it("inserts a visible row ahead of existing projects when none exists", () => {
 		const collections = makeCollections();
 		collections.v2SidebarProjects.insert(projectRow("proj-1", { tabOrder: 1 }));
