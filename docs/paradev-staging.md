@@ -129,6 +129,24 @@ Production secrets stay in the existing Actions environment references. Preparin
 these production-state-capable artifacts still requires a separately approved
 dispatch; preparing source is not dispatch authorization.
 
+### Final hosts deploy from main
+
+`api.paradev.com` and `app.paradev.com` serve live traffic, so they follow
+`main`. `deploy-production.yml` calls this workflow with `mode: final` after the
+legacy API and web jobs succeed. `final` builds with the `prepare-final`
+settings above, then assigns the two final hosts, API first, with the same
+ownership checks as stage: each host must already be a verified domain of its
+project and must not be aliased to another project.
+
+- A failed legacy API or web job skips the Paradev deploy, so the two stacks do
+  not drift apart silently. A failed Paradev job fails the production run.
+- Runs share one concurrency group and do not cancel a run in progress.
+- To deploy by hand, dispatch the workflow on `main` with `mode: final`.
+- To roll back, assign the hosts to the earlier deployments. The run log of each
+  earlier run prints its deployment ID for each host.
+
+`prepare-final` stays for a build that must not take traffic.
+
 ### Disabled by default
 
 The optional server setting `DOMAIN_MOVE_ENABLED` must be exactly `true` before
