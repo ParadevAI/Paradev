@@ -3,7 +3,9 @@ import { BRAND } from "@superset/shared/brand";
 export const UPGRADE_NUDGE_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
 
 const FEATURE_NAMES: Record<string, string> = {
-	mobile: `${BRAND.NAME} Mobile`,
+	"mobile-app": `${BRAND.NAME} Mobile`,
+	"invite-members": "Inviting teammates",
+	"cloud-workspaces": "Cloud workspaces",
 };
 
 const SAFE_FEATURE_ID = /^[a-z0-9]+(?:[_.-][a-z0-9]+)*$/i;
@@ -32,6 +34,8 @@ export interface UpgradeNudgeDeps {
 	}): void;
 	isOrganizationPaid(organizationId: string): Promise<boolean>;
 	isUnsubscribed(email: string): Promise<boolean>;
+	/** Reads the user's 7-day slot without taking it. */
+	isClaimed(userId: string): Promise<boolean>;
 	/** Takes the user's slot for the next 7 days; false when it is taken. */
 	claim(userId: string): Promise<boolean>;
 	/** Hands the nudge to the Resend automation, which adds the unsubscribe link. */
@@ -68,6 +72,7 @@ async function nudge(
 	deps: UpgradeNudgeDeps,
 ): Promise<UpgradeNudgeOutcome> {
 	try {
+		if (await deps.isClaimed(user.id)) return "rate_limited";
 		if (organizationId && (await deps.isOrganizationPaid(organizationId))) {
 			return "paid";
 		}

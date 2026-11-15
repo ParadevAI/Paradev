@@ -16,10 +16,18 @@ function fakeDeps({
 	const claims = new Set<string>();
 	const sent: UpgradeNudgeMessage[] = [];
 	const captured: string[] = [];
+	const lookups: string[] = [];
 	const deps: UpgradeNudgeDeps = {
 		capture: (event) => captured.push(event.outcome),
-		isOrganizationPaid: async () => paid,
-		isUnsubscribed: async () => false,
+		isOrganizationPaid: async () => {
+			lookups.push("paid");
+			return paid;
+		},
+		isUnsubscribed: async () => {
+			lookups.push("unsubscribed");
+			return false;
+		},
+		isClaimed: async (userId) => claims.has(userId),
 		claim: async (userId) => {
 			if (claims.has(userId)) return false;
 			claims.add(userId);
@@ -30,13 +38,19 @@ function fakeDeps({
 			sent.push(message);
 		},
 	};
-	return { deps, sent, captured, expireClaims: () => claims.clear() };
+	return {
+		deps,
+		sent,
+		captured,
+		lookups,
+		expireClaims: () => claims.clear(),
+	};
 }
 
 const input = {
 	user: { id: "user-1", email: "ada@example.com" },
 	organizationId: "org-1",
-	feature: "mobile",
+	feature: "mobile-app",
 };
 
 describe("recordUpgradeIntent", () => {
@@ -51,10 +65,12 @@ describe("recordUpgradeIntent", () => {
 	});
 
 	test("sends no second nudge until the 7-day claim expires", async () => {
-		const { deps, sent, captured, expireClaims } = fakeDeps();
+		const { deps, sent, captured, lookups, expireClaims } = fakeDeps();
 
 		await recordUpgradeIntent(input, deps);
+		lookups.length = 0;
 		expect(await recordUpgradeIntent(input, deps)).toBe("rate_limited");
+		expect(lookups).toEqual([]);
 		expect(sent).toHaveLength(1);
 		expect(captured).toEqual(["sent", "rate_limited"]);
 
@@ -80,6 +96,12 @@ describe("recordUpgradeIntent", () => {
 	});
 
 	test("names unknown features without passing client text through", () => {
+		expect(upgradeNudgeFeatureName("invite-members")).toBe(
+			"Inviting teammates",
+		);
+		expect(upgradeNudgeFeatureName("cloud-workspaces")).toBe(
+			"Cloud workspaces",
+		);
 		expect(upgradeNudgeFeatureName("voice_mode")).toBe("Voice mode");
 		expect(upgradeNudgeFeatureName("<a href=x>win</a>")).toBe("a Pro feature");
 		expect(upgradeNudgeFeatureName("__proto__")).toBe("a Pro feature");

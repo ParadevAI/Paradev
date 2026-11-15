@@ -43,6 +43,10 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 		return Boolean(contact.data?.unsubscribed);
 	},
 
+	async isClaimed(userId) {
+		return (await requireRedis().exists(claimKey(userId))) === 1;
+	},
+
 	async claim(userId) {
 		const result = await requireRedis().set(claimKey(userId), Date.now(), {
 			nx: true,
