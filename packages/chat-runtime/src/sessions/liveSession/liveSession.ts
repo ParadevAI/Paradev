@@ -1190,9 +1190,8 @@ export class LiveSession {
 	}
 
 	private deliverNextQueued(): void {
-		// An injection that is still resolving is earlier than anything queued
-		// behind it. Today the injection always settles first, so this only makes
-		// the ordering explicit instead of leaving it to scheduling.
+		// The turn can end while the adapter still holds an injection; sending
+		// the queue then would put a later prompt ahead of it if the agent refuses.
 		if (this.queuePaused || this.inFlight() || this.pendingSteers.length > 0) {
 			return;
 		}

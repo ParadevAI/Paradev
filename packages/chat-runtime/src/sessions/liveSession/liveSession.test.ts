@@ -978,6 +978,34 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
+	test("a prompt queued while a join is in flight does not overtake it when the turn ends", async () => {
+		const { runtime, sessionId, adapters } = startSessionWithAdapters({
+			...HELD_THEN_QUICK,
+			steer: false,
+			steerDelayMs: 200,
+		});
+		sendPrompt(runtime, sessionId, "first");
+		await waitForApproval(runtime, sessionId);
+		sendPrompt(runtime, sessionId, "joined", {
+			join: { expectedTurnId: "t1" },
+		});
+		// Queued any sooner, "later" stops the join from reaching the adapter at all.
+		await waitFor(() => adapters[0]?.steered.includes("joined") === true);
+		sendPrompt(runtime, sessionId, "later");
+		answerApproval(runtime, sessionId);
+
+		const delivered = () =>
+			(adapters[0]?.prompted ?? []).map(
+				(content) => content.find((part) => part.type === "text")?.text ?? "",
+			);
+		await waitFor(
+			() => delivered().includes("joined") && delivered().includes("later"),
+		);
+		const order = delivered();
+		expect(order.indexOf("joined")).toBeLessThan(order.indexOf("later"));
+		await runtime.dispose();
+	});
+
 	test("a join the agent refuses keeps the hidden parts it was sent with", async () => {
 		const { runtime, sessionId } = startSession({
 			...HELD_THEN_QUICK,
