@@ -231,6 +231,17 @@ export const devToolsRouter = {
 				promptId: `parent:${ctx.principal.turnId}:${crypto.randomUUID()}`,
 				text: input.text,
 				reason: "task_update",
+			}).catch(async (error) => {
+				await db
+					.update(agentSessions)
+					.set({ taskStatus: session.status })
+					.where(
+						and(
+							eq(agentSessions.id, session.sessionId),
+							eq(agentSessions.taskStatus, "running"),
+						),
+					);
+				throw error;
 			});
 			return { delivered: outcome.outcome };
 		}),
