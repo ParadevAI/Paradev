@@ -2343,9 +2343,8 @@ msgstr "已加入代理程式輸入框"
 msgid "Added to merge queue"
 msgstr "已加入合併佇列"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "將成員加入 {organizationName} 需要付費方案。你組織的方案由其擁有者在 {0} 管理。"
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "將成員加入 {organizationName} 需要付費方案。"
 
 msgid "Adding to queue…"
 msgstr "正在加入佇列…"
@@ -4922,6 +4921,9 @@ msgstr "雲端環境設定"
 msgid "Cloud environments"
 msgstr "雲端環境"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "您的方案不包含雲端環境。"
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "雲端環境會從 GitHub 檢出你的儲存庫。請先連結這些;只需操作一次。"
 
@@ -4955,6 +4957,9 @@ msgstr "雲端工作區"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} 尚未啟用雲端工作區。雲端工作區包含在 Team 和 Ultra 方案中：請在設定的帳單中升級。"
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "您的方案不包含雲端工作區。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "雲端工作區會以你的身分提交、推送並建立提取要求"
@@ -10765,9 +10770,6 @@ msgstr "邀請成員"
 msgid "Invite pending"
 msgstr "邀請待接受"
 
-msgid "Invite people on a paid plan"
-msgstr "使用付費方案邀請成員"
-
 msgid "Invite teammate"
 msgstr "邀請團隊成員"
 
@@ -11876,15 +11878,11 @@ msgstr "管理用於MCP伺服器存取以及Claude Desktop、Claude Code等外�
 msgid "Manage members"
 msgstr "管理成員"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "在{0}管理"
+msgid "Manage plan"
+msgstr "管理方案"
 
 msgid "Manage Plan"
 msgstr "管理方案"
-
-msgid "Manage plan on the web"
-msgstr "在網頁端管理方案"
 
 msgid "Manage plugins…"
 msgstr "管理外掛程式…"
@@ -13588,6 +13586,9 @@ msgstr "不在頻道中"
 
 msgid "Not included"
 msgstr "不包含"
+
+msgid "Not included in your plan"
+msgstr "您的方案不包含此功能"
 
 msgid "Not installed"
 msgstr "未安裝"
@@ -22000,15 +22001,14 @@ msgstr "升級"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "升級一個相依性，並修好被它弄壞的地方…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "在 {0} 升級"
-
 msgid "Upgrade to {planName}"
 msgstr "升級至 {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "升級至 Pro"
+
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "在 {upgradeHost} 升級至 Pro"
 
 msgid "Upgrade to Team"
 msgstr "升級到 Team"
@@ -23173,10 +23173,6 @@ msgstr "你可以檢視此頁面，但不能變更"
 msgid "You can view this page but not comment on it"
 msgstr "你可以檢視此頁面，但不能評論"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "無法在應用程式內變更此訂閱。你所在組織的方案由擁有者在{0}管理。"
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "此操作無法復原。終端窗格會顯示「處理程序已退出」，之後可以重新啟動。"
 
@@ -23367,8 +23363,14 @@ msgstr "你的組織為你安裝了 {plugin}，因此無法解除安裝。你可
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "你的組織為你安裝了此外掛。你可以停用它，但不能移除。"
 
+msgid "Your organization reached its cloud usage limit."
+msgstr "您的組織已達到雲端使用上限。"
+
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "你的組織已達到雲端用量上限。除非提高上限，此工作區將在幾分鐘後停止。"
+
+msgid "Your organization reached its environment limit."
+msgstr "您的組織已達到環境數量上限。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結你自己的帳戶後，Paradev 為你完成的工作會以你的名義顯示。"

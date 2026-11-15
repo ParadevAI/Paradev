@@ -2337,9 +2337,8 @@ msgstr "Додано в поле введення агента"
 msgid "Added to merge queue"
 msgstr "Додано до черги злиття"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Щоб додавати людей до {organizationName}, потрібен платний тариф. Тарифом вашої організації керує її власник на {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Щоб додавати людей до {organizationName}, потрібен платний тариф."
 
 msgid "Adding to queue…"
 msgstr "Додавання до черги…"
@@ -4916,6 +4915,9 @@ msgstr "Налаштування хмарного середовища"
 msgid "Cloud environments"
 msgstr "Хмарні середовища"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Хмарні середовища не входять у ваш тариф."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Хмарні середовища клонують ваші репозиторії з GitHub. Спершу підключіть їх; це потрібно зробити лише один раз."
 
@@ -4949,6 +4951,9 @@ msgstr "Хмарні робочі простори"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Хмарні робочі простори не ввімкнено для {account}. Вони входять до тарифів Team і Ultra: перейдіть на вищий тариф у розділі Налаштування, Оплата."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Хмарні робочі простори не входять у ваш тариф."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Хмарні робочі простори комітять, пушать і відкривають пул-реквести від вашого імені"
@@ -10759,9 +10764,6 @@ msgstr "Запросити учасника"
 msgid "Invite pending"
 msgstr "Запрошення очікує відповіді"
 
-msgid "Invite people on a paid plan"
-msgstr "Запрошуйте людей на платному тарифі"
-
 msgid "Invite teammate"
 msgstr "Запросити колегу"
 
@@ -11870,15 +11872,11 @@ msgstr "Керуйте ключами для доступу до MCP-серве�
 msgid "Manage members"
 msgstr "Керувати учасниками"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Керувати на {0}"
+msgid "Manage plan"
+msgstr "Керувати тарифом"
 
 msgid "Manage Plan"
 msgstr "Керувати тарифом"
-
-msgid "Manage plan on the web"
-msgstr "Керувати тарифом у вебзастосунку"
 
 msgid "Manage plugins…"
 msgstr "Керувати плагінами…"
@@ -13582,6 +13580,9 @@ msgstr "Не в каналі"
 
 msgid "Not included"
 msgstr "Не входить"
+
+msgid "Not included in your plan"
+msgstr "Не входить у ваш тариф"
 
 msgid "Not installed"
 msgstr "Не встановлено"
@@ -21994,15 +21995,14 @@ msgstr "Покращити тариф"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Онови залежність і виправ те, що зламається…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Покращити тариф на {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Перейти на {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Перейти на Pro"
+
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Перейдіть на Pro на {upgradeHost}"
 
 msgid "Upgrade to Team"
 msgstr "Перейти на Team"
@@ -23167,10 +23167,6 @@ msgstr "Ви можете переглядати цю сторінку, але �
 msgid "You can view this page but not comment on it"
 msgstr "Ви можете переглядати цю сторінку, але не можете її коментувати"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Ви не можете змінити цю підписку в застосунку. Тарифом вашої організації керує її власник на {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Цю дію неможливо скасувати. Панелі терміналів показуватимуть «Process exited», і їх можна буде перезапустити."
 
@@ -23361,8 +23357,14 @@ msgstr "Ваша організація встановлює {plugin} для в�
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Ваша організація встановлює цей плагін для вас. Ви можете його вимкнути, але не видалити."
 
+msgid "Your organization reached its cloud usage limit."
+msgstr "Ваша організація досягла ліміту використання хмари."
+
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Ваша організація досягла ліміту хмарного використання. Цей робочий простір зупиниться за кілька хвилин, якщо ліміт не підвищать."
+
+msgid "Your organization reached its environment limit."
+msgstr "Ваша організація досягла ліміту середовищ."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваші власні облікові записи. Інтеграції вашої організації дають Paradev доступ до її інструментів; якщо підключити власні, робота, яку Paradev виконує для вас, відображатиметься від вашого імені."

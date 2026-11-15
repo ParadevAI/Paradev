@@ -2343,9 +2343,8 @@ msgstr "Ajouté à la saisie de l'agent"
 msgid "Added to merge queue"
 msgstr "Ajoutée à la file de fusion"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Ajouter des personnes à {organizationName} nécessite un forfait payant. Le forfait de votre organisation est géré par son propriétaire sur {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Ajouter des personnes à {organizationName} nécessite un forfait payant."
 
 msgid "Adding to queue…"
 msgstr "Ajout à la file…"
@@ -4922,6 +4921,9 @@ msgstr "Configuration de l'environnement cloud"
 msgid "Cloud environments"
 msgstr "Environnements cloud"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Les environnements cloud ne sont pas inclus dans votre forfait."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Les environnements cloud récupèrent vos dépôts depuis GitHub. Connectez d'abord ces éléments ; vous ne le faites qu'une fois."
 
@@ -4955,6 +4957,9 @@ msgstr "Espaces de travail cloud"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Les espaces de travail cloud ne sont pas activés pour {account}. Ils sont inclus dans les forfaits Team et Ultra : passez à un forfait supérieur dans Paramètres, Facturation."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Les espaces de travail cloud ne sont pas inclus dans votre forfait."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Les espaces de travail cloud commitent, poussent et ouvrent des pull requests en votre nom"
@@ -10765,9 +10770,6 @@ msgstr "Inviter un membre"
 msgid "Invite pending"
 msgstr "Invitation en attente"
 
-msgid "Invite people on a paid plan"
-msgstr "Invitez des personnes avec un forfait payant"
-
 msgid "Invite teammate"
 msgstr "Inviter un coéquipier"
 
@@ -11876,15 +11878,11 @@ msgstr "Gérez les clés d'accès aux serveurs MCP et aux intégrations externes
 msgid "Manage members"
 msgstr "Gérer les membres"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Gérer sur {0}"
+msgid "Manage plan"
+msgstr "Gérer le forfait"
 
 msgid "Manage Plan"
 msgstr "Gérer le forfait"
-
-msgid "Manage plan on the web"
-msgstr "Gérer le forfait sur le web"
 
 msgid "Manage plugins…"
 msgstr "Gérer les plugins…"
@@ -13588,6 +13586,9 @@ msgstr "Pas dans le canal"
 
 msgid "Not included"
 msgstr "Non inclus"
+
+msgid "Not included in your plan"
+msgstr "Non inclus dans votre forfait"
 
 msgid "Not installed"
 msgstr "Non installé"
@@ -22000,15 +22001,14 @@ msgstr "Passer à ce forfait"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Mets à jour une dépendance et corrige ce qui casse…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Passer à Pro sur {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Passer à {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Passer à Pro"
+
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Passez à Pro sur {upgradeHost}"
 
 msgid "Upgrade to Team"
 msgstr "Passer à Team"
@@ -23173,10 +23173,6 @@ msgstr "Vous pouvez consulter cette page, mais pas la modifier"
 msgid "You can view this page but not comment on it"
 msgstr "Vous pouvez consulter cette page, mais pas la commenter"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Vous ne pouvez pas modifier cet abonnement dans l'application. Le forfait de votre organisation est géré par son propriétaire sur {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Cette action est irréversible. Les volets de terminal afficheront « Processus terminé » et pourront être relancés."
 
@@ -23367,8 +23363,14 @@ msgstr "Votre organisation installe {plugin} pour vous, il ne peut donc pas êtr
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Votre organisation installe ce plugin pour vous. Vous pouvez le désactiver, mais pas le supprimer."
 
+msgid "Your organization reached its cloud usage limit."
+msgstr "Votre organisation a atteint sa limite d'utilisation du cloud."
+
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Votre organisation a atteint sa limite d'utilisation du cloud. Cet espace de travail s'arrêtera dans quelques minutes si la limite n'est pas relevée."
+
+msgid "Your organization reached its environment limit."
+msgstr "Votre organisation a atteint sa limite d'environnements."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vos propres comptes. Les intégrations de votre organisation permettent à Paradev d'accéder à ses outils ; connecter les vôtres fait apparaître à votre nom le travail que Paradev fait pour vous."

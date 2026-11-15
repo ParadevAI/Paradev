@@ -2343,9 +2343,8 @@ msgstr "Přidáno do vstupu agenta"
 msgid "Added to merge queue"
 msgstr "Přidáno do fronty slučování"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Přidávání lidí do {organizationName} vyžaduje placený tarif. Tarif vaší organizace spravuje její vlastník na {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Přidávání lidí do {organizationName} vyžaduje placený tarif."
 
 msgid "Adding to queue…"
 msgstr "Přidávání do fronty…"
@@ -4922,6 +4921,9 @@ msgstr "Nastavení cloudového prostředí"
 msgid "Cloud environments"
 msgstr "Cloudová prostředí"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Cloudová prostředí nejsou součástí vašeho tarifu."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Cloudová prostředí si stahují vaše repozitáře z GitHubu. Nejdřív je propojte; děláte to jen jednou."
 
@@ -4955,6 +4957,9 @@ msgstr "Cloudové pracovní prostory"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součástí plánů Team a Ultra: přejděte na vyšší plán v Nastavení, Fakturace."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Cloudové pracovní prostory nejsou součástí vašeho tarifu."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
@@ -10765,9 +10770,6 @@ msgstr "Pozvat člena"
 msgid "Invite pending"
 msgstr "Pozvánka čeká"
 
-msgid "Invite people on a paid plan"
-msgstr "Zvěte lidi s placeným tarifem"
-
 msgid "Invite teammate"
 msgstr "Pozvat kolegu"
 
@@ -11876,15 +11878,11 @@ msgstr "Spravujte klíče pro přístup k MCP serveru a externí integrace, jako
 msgid "Manage members"
 msgstr "Spravovat členy"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Spravovat na {0}"
+msgid "Manage plan"
+msgstr "Spravovat tarif"
 
 msgid "Manage Plan"
 msgstr "Spravovat tarif"
-
-msgid "Manage plan on the web"
-msgstr "Správa tarifu na webu"
 
 msgid "Manage plugins…"
 msgstr "Spravovat pluginy…"
@@ -13588,6 +13586,9 @@ msgstr "Není v kanálu"
 
 msgid "Not included"
 msgstr "Není zahrnuto"
+
+msgid "Not included in your plan"
+msgstr "Není součástí vašeho tarifu"
 
 msgid "Not installed"
 msgstr "Nenainstalováno"
@@ -22000,15 +22001,14 @@ msgstr "Přejít výš"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aktualizuj závislost a oprav, co se rozbije…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Přejít na Pro na {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Přejít na {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Přejít na Pro"
+
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Přejděte na Pro na {upgradeHost}"
 
 msgid "Upgrade to Team"
 msgstr "Přejít na Team"
@@ -23173,10 +23173,6 @@ msgstr "Tuto stránku můžete zobrazit, ale ne změnit"
 msgid "You can view this page but not comment on it"
 msgstr "Tuto stránku můžete zobrazit, ale ne komentovat"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Toto předplatné nelze změnit v aplikaci. Tarif vaší organizace spravuje její vlastník na {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tuto akci nelze vrátit zpět. Panely terminálu zobrazí „Proces skončil“ a půjde je spustit znovu."
 
@@ -23367,8 +23363,14 @@ msgstr "Vaše organizace pro vás instaluje {plugin}, proto jej nelze odinstalov
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Vaše organizace pro vás instaluje tento plugin. Můžete jej zakázat, ale ne odebrat."
 
+msgid "Your organization reached its cloud usage limit."
+msgstr "Vaše organizace dosáhla limitu využití cloudu."
+
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Vaše organizace dosáhla limitu využití cloudu. Tento pracovní prostor se za několik minut zastaví, pokud limit nezvýšíte."
+
+msgid "Your organization reached its environment limit."
+msgstr "Vaše organizace dosáhla limitu prostředí."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."
