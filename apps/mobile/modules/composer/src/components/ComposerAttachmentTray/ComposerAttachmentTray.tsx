@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Image } from "expo-image";
 import { CircleAlert, X } from "lucide-react-native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -16,6 +17,7 @@ export function ComposerAttachmentTray({
 	onPress,
 	onRemove,
 }: ComposerAttachmentTrayProps) {
+	const { t } = useLingui();
 	return (
 		<ScrollView
 			horizontal
@@ -24,6 +26,7 @@ export function ComposerAttachmentTray({
 			contentContainerStyle={styles.content}
 		>
 			{attachments.map((attachment) => {
+				const { name } = attachment;
 				const uploading =
 					attachment.progress !== undefined && !attachment.failed;
 				return (
@@ -61,6 +64,7 @@ export function ComposerAttachmentTray({
 						</Pressable>
 						<Pressable
 							accessibilityRole="button"
+							accessibilityLabel={t`Remove ${name}`}
 							hitSlop={8}
 							onPress={() => onRemove(attachment.id)}
 							style={styles.remove}
