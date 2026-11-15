@@ -26,6 +26,7 @@ import { detachFromLaunchDirectory } from "./runtime/working-directory";
 import { installProcessSafetyNet, installUpgradeSocketGuard } from "./safety";
 import { configureSelfUpdater } from "./self-update";
 import { captureFatalStartupError, initSentry } from "./sentry";
+import { createStandaloneShutdown } from "./standalone-shutdown";
 import { startTerminalBaseEnvResolution } from "./terminal/env";
 import { startTerminalReaper } from "./terminal/reaper";
 import { connectRelay, type TunnelClient } from "./tunnel";
@@ -105,6 +106,7 @@ async function main(): Promise<void> {
 		readLinkedPullRequests,
 		onPullRequestLinked,
 		terminalAgentStore,
+		dispose,
 	} = createApp({
 		config: {
 			organizationId: env.ORGANIZATION_ID,
@@ -124,33 +126,7 @@ async function main(): Promise<void> {
 		},
 	});
 
-	// Dev-mode shutdown: kill the daemon on host-service exit so dev
-	// iteration on daemon code resets cleanly. Production keeps the
-	// daemon detached so PTYs survive host-service restarts.
-	// Per the migration plan's D5 decision.
 	const isDev = process.env.NODE_ENV === "development";
-	if (isDev) {
-		let shuttingDown = false;
-		const devShutdown = async (signal: NodeJS.Signals) => {
-			if (shuttingDown) return;
-			shuttingDown = true;
-			console.log(
-				`[host-service] dev-mode ${signal} — stopping pty-daemon for clean iteration`,
-			);
-			try {
-				await getSupervisor().stop(env.ORGANIZATION_ID);
-			} catch (err) {
-				console.error(
-					"[host-service] dev shutdown: supervisor.stop failed:",
-					err,
-				);
-			} finally {
-				process.exit(0);
-			}
-		};
-		process.on("SIGINT", () => void devShutdown("SIGINT"));
-		process.on("SIGTERM", () => void devShutdown("SIGTERM"));
-	}
 
 	const relayAbort = new AbortController();
 	let tunnelPromise: Promise<TunnelClient | null> = Promise.resolve(null);
@@ -228,26 +204,34 @@ async function main(): Promise<void> {
 	// Standalone only: this process owns its listener and relay socket, so it
 	// can hand the port to a successor build (system.update). The desktop
 	// entry never registers this and its host-service stays non-updatable.
-	const selfUpdater = configureSelfUpdater({
-		stopServing: async () => {
-			// Cancel registration retries before replacing this process.
-			relayAbort.abort();
-			const tunnel = await Promise.race([
-				tunnelPromise,
-				new Promise<null>((resolve) => setTimeout(() => resolve(null), 1_000)),
-			]);
-			tunnel?.close();
-			const httpServer = server as unknown as {
-				closeAllConnections?: () => void;
-				close: (callback: () => void) => void;
-			};
-			httpServer.closeAllConnections?.();
-			await Promise.race([
-				new Promise<void>((resolve) => httpServer.close(() => resolve())),
-				new Promise<void>((resolve) => setTimeout(resolve, 3_000)),
-			]);
-		},
+	const stopServing = async () => {
+		// Cancel registration retries before replacing this process.
+		relayAbort.abort();
+		const tunnel = await Promise.race([
+			tunnelPromise,
+			new Promise<null>((resolve) => setTimeout(() => resolve(null), 1_000)),
+		]);
+		tunnel?.close();
+		const httpServer = server as unknown as {
+			closeAllConnections?: () => void;
+			close: (callback: () => void) => void;
+		};
+		httpServer.closeAllConnections?.();
+		await Promise.race([
+			new Promise<void>((resolve) => httpServer.close(() => resolve())),
+			new Promise<void>((resolve) => setTimeout(resolve, 3_000)),
+		]);
+	};
+	const shutdown = createStandaloneShutdown({
+		stopServing,
+		dispose,
+		stopDaemon: isDev
+			? () => getSupervisor().stop(env.ORGANIZATION_ID)
+			: undefined,
 	});
+	process.on("SIGINT", () => void shutdown("SIGINT"));
+	process.on("SIGTERM", () => void shutdown("SIGTERM"));
+	const selfUpdater = configureSelfUpdater({ stopServing });
 	if (env.SUPERSET_HOST_AUTO_UPDATE && selfUpdater.status().updatable) {
 		const timer = setInterval(
 			() => void selfUpdater.checkForUpdates(),
