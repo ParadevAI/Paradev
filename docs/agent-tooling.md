@@ -54,6 +54,11 @@ re-read those at every launch (`buildDefaultAccountResolver` in agent-setup), so
 existing terminals the next time the agent starts; a value the user exported by hand always wins.
 Paradev never touches the credential stores; the provider CLIs own every login end to end.
 
+The Claude wrapper passes `$SUPERSET_HOME_DIR/hooks/claude-settings.json` with `--settings`
+in Paradev terminals, so its managed hooks also load for a `CLAUDE_CONFIG_DIR` exported by
+hand. This file contains only hooks; it does not copy another account's model, environment,
+or instructions. An explicit `--settings` argument is forwarded unchanged and takes priority.
+
 Because those CLIs read *everything* from their active config dir, a second dir would otherwise
 mean a second, empty setup. `packages/agent-setup/src/provider-profiles.ts` provisions each
 non-default profile from the default account (`~/.claude`, `~/.codex`):

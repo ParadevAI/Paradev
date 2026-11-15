@@ -4,6 +4,7 @@ import {
 	buildDefaultAccountResolver,
 	buildWrapperScript,
 	createWrapper,
+	DYNAMIC_NOTIFY_PATH_MARKER,
 	getManagedArtifactGuardHookCommand,
 	getManagedNotifyHookCommand,
 	isManagedArtifactGuardCommand,
@@ -23,6 +24,7 @@ import {
 } from "./managed-json-hooks";
 import { getNotifyScriptPath } from "./notify-hook";
 import {
+	getHooksDir,
 	getOpenCodeConfigDir,
 	getOpenCodePluginDir,
 	getOpenCodeTuiPluginDir,
@@ -80,6 +82,12 @@ export const CLAUDE_ARTIFACT_GUARD_MATCHER = "Artifact";
  */
 export function getClaudeGlobalSettingsJsonPath(): string {
 	return path.join(resolveUserHomeDir(), ".claude", "settings.json");
+}
+
+const CLAUDE_MANAGED_SETTINGS_NAME = "claude-settings.json";
+
+function getClaudeManagedSettingsJsonPath(): string {
+	return path.join(getHooksDir(), CLAUDE_MANAGED_SETTINGS_NAME);
 }
 
 // StopFailure is the API-error hook; it fires while the session stays alive,
@@ -162,6 +170,11 @@ export function createClaudeSettingsJson(): void {
  * not exist — teardown must never create config files.
  */
 export function removeClaudeManagedHooks(): void {
+	removeOwnedFileIfMarked(
+		getClaudeManagedSettingsJsonPath(),
+		DYNAMIC_NOTIFY_PATH_MARKER,
+		"Claude wrapper hook settings",
+	);
 	removeManagedJsonHooks(claudeHooksSpec(getNotifyScriptPath()));
 }
 
@@ -310,11 +323,23 @@ export function getOpenCodeTuiPluginContent(notifyPath: string): string {
 
 /**
  * Wrapper for Claude: forwards SUPERSET_* env vars into the agent process
- * tree and follows the Usage-tab account switch at launch time. Hooks live
- * in ~/.claude/settings.json (createClaudeSettingsJson).
+ * tree and follows the Usage-tab account switch at launch time. A hooks-only
+ * settings file also covers config dirs exported outside the Usage tab.
  */
 export function createClaudeWrapper(): void {
-	const script = buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
+	const settingsPath = getClaudeManagedSettingsJsonPath();
+	fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+	writeFileIfChanged(
+		settingsPath,
+		`${JSON.stringify({ hooks: claudeHooksSpec(getNotifyScriptPath()).desiredEntriesByEvent }, null, 2)}\n`,
+		0o644,
+	);
+	const execLine = `if [ -n "$SUPERSET_TERMINAL_ID" ] \\
+  && [ -n "$SUPERSET_HOME_DIR" ] && [ -r "$SUPERSET_HOME_DIR/hooks/${CLAUDE_MANAGED_SETTINGS_NAME}" ]; then
+  set -- --settings "$SUPERSET_HOME_DIR/hooks/${CLAUDE_MANAGED_SETTINGS_NAME}" "$@"
+fi
+exec "$REAL_BIN" "$@"`;
+	const script = buildWrapperScript("claude", execLine, {
 		agentId: "claude",
 		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",

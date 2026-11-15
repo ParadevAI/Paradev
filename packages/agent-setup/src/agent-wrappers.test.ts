@@ -70,6 +70,7 @@ const {
 	buildCopilotWrapperExecLine,
 	buildWrapperScript,
 	createClaudeSettingsJson,
+	createClaudeWrapper,
 	createCodexHooksJson,
 	createCodexWrapper,
 	COPILOT_HOOK_MARKER,
@@ -1973,8 +1974,16 @@ describe("agent-wrappers claude settings.json", () => {
 			hooks: [{ type: "command", command: "/opt/my-pretooluse.sh" }],
 		});
 		writeFileSync(claudeSettingsPath, JSON.stringify(withUserHook, null, 2));
+		mkdirSync(TEST_BIN_DIR, { recursive: true });
+		createClaudeWrapper();
+		const wrapperSettingsPath = path.join(
+			TEST_HOOKS_DIR,
+			"claude-settings.json",
+		);
+		expect(existsSync(wrapperSettingsPath)).toBe(true);
 
 		removeClaudeManagedHooks();
+		expect(existsSync(wrapperSettingsPath)).toBe(false);
 
 		const parsed = JSON.parse(readFileSync(claudeSettingsPath, "utf-8")) as {
 			hooks?: Record<string, Array<{ hooks: Array<{ command: string }> }>>;
