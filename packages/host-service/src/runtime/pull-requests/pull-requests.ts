@@ -1139,7 +1139,19 @@ export class PullRequestRuntimeManager {
 				continue;
 			}
 
-			if (failedKeys.has(key)) continue;
+			if (failedKeys.has(key)) {
+				const linkedPr = workspace.pullRequestId
+					? this.findPullRequestRowById(workspace.pullRequestId)
+					: undefined;
+				const knownCheckoutMismatch =
+					!!head &&
+					syntheticPullRequestNumber(head, repo) !== null &&
+					!!workspace.headSha &&
+					!!linkedPr?.headSha &&
+					linkedPr.headSha.toLowerCase() !==
+						workspace.headSha.trim().toLowerCase();
+				if (!knownCheckoutMismatch) continue;
+			}
 
 			if (workspace.pullRequestId) {
 				this.db
