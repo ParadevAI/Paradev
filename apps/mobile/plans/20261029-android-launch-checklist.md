@@ -75,11 +75,10 @@ The listing lives in `apps/mobile/play-store.config.js`. Its text comes from the
 `store.config.js`, and the icon and feature graphic are in `apps/mobile/store/android/`.
 `bun apps/mobile/scripts/play-listing.ts` checks it against Play's limits.
 
-- [x] **Phone screenshots** — 3 drafts taken 2026-10-29 from the review account on production
-      (Home, workspace sheet, new task). Retake the new-task shot once the Android composer's project
-      chip stops overlapping the list header. Was: (2 to 8 PNGs) in `apps/mobile/store/android/phone/`. Take them from the
-      review demo account (`APP_REVIEW_EMAIL`), whose organization has sample sessions, never from
-      a real account. Use `apps/mobile/scripts/android-dev.sh --shot`.
+- [x] **Phone screenshots and feature graphic**: six framed shots (2026-11-15) from a local Android
+      emulator with an "Acme" demo org and real agent sessions. Raw captures are in
+      `apps/mobile/store/captures/android/`; `bun apps/mobile/scripts/store-assets.ts` frames them into
+      `apps/mobile/store/android/phone/` and draws `feature-graphic.png`. Never capture a real account.
 - [ ] **Push text and images**:
       `PLAY_SERVICE_ACCOUNT_KEY=key.json bun apps/mobile/scripts/play-listing.ts --push`. Needs
       the service account above. The push code has not run against Play yet.
