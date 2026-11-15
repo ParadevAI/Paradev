@@ -75,10 +75,11 @@ The listing lives in `apps/mobile/play-store.config.js`. Its text comes from the
 `store.config.js`, and the icon and feature graphic are in `apps/mobile/store/android/`.
 `bun apps/mobile/scripts/play-listing.ts` checks it against Play's limits.
 
-- [x] **Phone screenshots and feature graphic**: six framed shots (2026-11-15) from a local Android
-      emulator with an "Acme" demo org and real agent sessions. Raw captures are in
-      `apps/mobile/store/captures/android/`; `bun apps/mobile/scripts/store-assets.ts` frames them into
-      `apps/mobile/store/android/phone/` and draws `feature-graphic.png`. Never capture a real account.
+- [x] **Phone screenshots and feature graphic**: six shots (2026-11-15) in the App Store set's style,
+      with Android captures from a local emulator ("Acme" demo org, real agent sessions). The source is
+      the Graphics repo (ParadevAI/graphics, `src/store/`, captures in `public/play-store/`):
+      `npm run render:play-store` writes them to `out/play-store/`; copy them to `apps/mobile/store/android/`.
+      Never capture a real account.
 - [ ] **Push text and images**:
       `PLAY_SERVICE_ACCOUNT_KEY=key.json bun apps/mobile/scripts/play-listing.ts --push`. Needs
       the service account above. The push code has not run against Play yet.
