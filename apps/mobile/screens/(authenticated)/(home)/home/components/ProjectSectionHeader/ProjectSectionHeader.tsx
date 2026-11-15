@@ -5,7 +5,7 @@ import { Pressable, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useAccessibilityTextSize } from "@/hooks/useAccessibilityTextSize";
+import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { useTheme } from "@/hooks/useTheme";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 
@@ -37,7 +37,7 @@ export function ProjectSectionHeader({
 }: ProjectSectionHeaderProps) {
 	const { t } = useLingui();
 	const theme = useTheme();
-	const accessibilitySize = useAccessibilityTextSize();
+	const enlargedText = useEnlargedText();
 	const Caret = collapsed ? ChevronRight : ChevronDown;
 	return (
 		// The collapse target and the "+" are siblings on purpose: a control
@@ -59,7 +59,7 @@ export function ProjectSectionHeader({
 				<Text
 					variant="large"
 					className="shrink"
-					numberOfLines={accessibilitySize ? 2 : 1}
+					numberOfLines={enlargedText ? undefined : 1}
 				>
 					{name}
 				</Text>
