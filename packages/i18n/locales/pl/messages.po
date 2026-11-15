@@ -5859,6 +5859,9 @@ msgstr "Nie udało się zmienić, kto ma dostęp"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Nie udało się sprawdzić Twojego planu. Sprawdź połączenie i spróbuj ponownie."
 
+msgid "Could not check your role in this organization."
+msgstr "Nie udało się sprawdzić Twojej roli w tej organizacji."
+
 msgid "Could not clear browsing data"
 msgstr "Nie udało się wyczyścić danych przeglądania"
 

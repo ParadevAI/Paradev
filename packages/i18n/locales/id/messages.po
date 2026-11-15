@@ -5859,6 +5859,9 @@ msgstr "Tidak bisa mengubah siapa yang punya akses"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Tidak dapat memeriksa paket Anda. Periksa koneksi Anda dan coba lagi."
 
+msgid "Could not check your role in this organization."
+msgstr "Tidak dapat memeriksa peran Anda di organisasi ini."
+
 msgid "Could not clear browsing data"
 msgstr "Tidak bisa membersihkan data penjelajahan"
 

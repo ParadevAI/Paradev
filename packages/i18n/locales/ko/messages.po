@@ -5859,6 +5859,9 @@ msgstr "접근 권한이 있는 사람을 변경할 수 없습니다"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "플랜을 확인할 수 없습니다. 연결 상태를 확인한 후 다시 시도하세요."
 
+msgid "Could not check your role in this organization."
+msgstr "이 조직에서의 역할을 확인할 수 없습니다."
+
 msgid "Could not clear browsing data"
 msgstr "인터넷 사용 기록을 삭제하지 못했습니다"
 

@@ -36,10 +36,11 @@ export function CloudUpsellDialog({
 	const navigate = useNavigate();
 	const catalogQuery = usePlanCatalog();
 	const { data: session } = authClient.useSession();
-	const { data: members } = cloudTrpc.organization.listMembers.useQuery(
+	const membersQuery = cloudTrpc.organization.listMembers.useQuery(
 		{ includeDeactivated: false },
 		{ enabled: open },
 	);
+	const members = membersQuery.data;
 	const isOwner =
 		members?.find((member) => member.userId === session?.user?.id)?.role ===
 		"owner";
@@ -149,7 +150,19 @@ export function CloudUpsellDialog({
 							</Button>
 						</div>
 					)}
-					{teamFamily && !isOwner && (
+					{teamFamily && membersQuery.isError && !members && (
+						<div className="flex items-center gap-3 text-sm text-muted-foreground">
+							<Trans>Could not check your role in this organization.</Trans>
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => membersQuery.refetch()}
+							>
+								<Trans>Retry</Trans>
+							</Button>
+						</div>
+					)}
+					{teamFamily && members && !isOwner && (
 						<p className="text-sm text-muted-foreground">
 							<Trans>
 								Only an organization owner can change the plan. Ask yours to

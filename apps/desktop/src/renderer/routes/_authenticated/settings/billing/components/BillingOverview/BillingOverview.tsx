@@ -215,6 +215,11 @@ export function BillingOverview({
 						</div>
 					</div>
 				)}
+				{showOverview && offersPlanChange && catalogQuery.isLoading && (
+					<p className="text-sm text-muted-foreground">
+						<Trans>Loading plans...</Trans>
+					</p>
+				)}
 				{showOverview && offersPlanChange && catalogQuery.isError && (
 					<div className="flex items-center gap-3 text-sm text-muted-foreground">
 						<Trans>Could not load plans.</Trans>

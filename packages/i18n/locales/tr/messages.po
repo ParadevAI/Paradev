@@ -5859,6 +5859,9 @@ msgstr "Erişimi olanlar değiştirilemedi"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Planınız kontrol edilemedi. Bağlantınızı kontrol edip tekrar deneyin."
 
+msgid "Could not check your role in this organization."
+msgstr "Bu kuruluştaki rolünüz kontrol edilemedi."
+
 msgid "Could not clear browsing data"
 msgstr "Tarama verileri temizlenemedi"
 

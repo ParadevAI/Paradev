@@ -5853,6 +5853,9 @@ msgstr "Не вдалося змінити, хто має доступ"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Не вдалося перевірити ваш тариф. Перевірте з'єднання та спробуйте ще раз."
 
+msgid "Could not check your role in this organization."
+msgstr "Не вдалося перевірити вашу роль у цій організації."
+
 msgid "Could not clear browsing data"
 msgstr "Не вдалося очистити дані перегляду"
 

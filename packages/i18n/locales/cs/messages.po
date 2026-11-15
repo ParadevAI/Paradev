@@ -5859,6 +5859,9 @@ msgstr "Nepodařilo se změnit, kdo má přístup"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Nepodařilo se ověřit váš plán. Zkontrolujte připojení a zkuste to znovu."
 
+msgid "Could not check your role in this organization."
+msgstr "Nepodařilo se ověřit vaši roli v této organizaci."
+
 msgid "Could not clear browsing data"
 msgstr "Data prohlížení se nepodařilo vymazat"
 

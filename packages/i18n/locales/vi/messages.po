@@ -5859,6 +5859,9 @@ msgstr "Không thể thay đổi người có quyền truy cập"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "Không thể kiểm tra gói của bạn. Hãy kiểm tra kết nối và thử lại."
 
+msgid "Could not check your role in this organization."
+msgstr "Không thể kiểm tra vai trò của bạn trong tổ chức này."
+
 msgid "Could not clear browsing data"
 msgstr "Không thể xóa dữ liệu duyệt web"
 

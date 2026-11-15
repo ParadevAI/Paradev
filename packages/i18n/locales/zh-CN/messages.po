@@ -5859,6 +5859,9 @@ msgstr "无法更改有访问权限的人"
 msgid "Could not check your plan. Check your connection and try again."
 msgstr "无法检查您的套餐。请检查网络连接后重试。"
 
+msgid "Could not check your role in this organization."
+msgstr "无法确认你在此组织中的角色。"
+
 msgid "Could not clear browsing data"
 msgstr "无法清除浏览数据"
 
