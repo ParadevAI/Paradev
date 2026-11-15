@@ -324,7 +324,7 @@ export function SettingsScreen() {
 								? t({ message: "Manage Plan" })
 								: t({ message: "Plan", context: "billing" })
 						}
-						trailing={<ListRowValue value={planLabel} />}
+						trailing={<ListRowValue value={planLabel} chevron={linksAllowed} />}
 						onPress={linksAllowed ? openBillingSettings : undefined}
 						isLast
 					/>
