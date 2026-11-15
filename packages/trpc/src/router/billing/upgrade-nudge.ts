@@ -1,0 +1,97 @@
+import { BRAND } from "@superset/shared/brand";
+
+export const UPGRADE_NUDGE_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
+
+const FEATURE_NAMES: Record<string, string> = {
+	mobile: `${BRAND.NAME} Mobile`,
+};
+
+const SAFE_FEATURE_ID = /^[a-z0-9]+(?:[_.-][a-z0-9]+)*$/i;
+
+export function upgradeNudgeFeatureName(feature: string): string {
+	const known = FEATURE_NAMES[feature];
+	if (known) return known;
+	if (!SAFE_FEATURE_ID.test(feature)) return "a Pro feature";
+	const words = feature.replace(/[_.-]+/g, " ").toLowerCase();
+	return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+export interface UpgradeNudgeMessage {
+	to: string;
+	recipientName: string | null;
+	featureName: string;
+	organizationId: string | null;
+}
+
+export interface UpgradeNudgeDeps {
+	capture(event: {
+		userId: string;
+		organizationId: string | null;
+		feature: string;
+		outcome: UpgradeNudgeOutcome;
+	}): void;
+	isOrganizationPaid(organizationId: string): Promise<boolean>;
+	isUnsubscribed(email: string): Promise<boolean>;
+	/** Takes the user's slot for the next 7 days; false when it is taken. */
+	claim(userId: string): Promise<boolean>;
+	release(userId: string): Promise<void>;
+	send(message: UpgradeNudgeMessage): Promise<void>;
+}
+
+export type UpgradeNudgeOutcome =
+	| "sent"
+	| "paid"
+	| "unsubscribed"
+	| "rate_limited"
+	| "failed";
+
+export async function recordUpgradeIntent(
+	input: {
+		user: { id: string; email: string; name: string | null };
+		organizationId: string | null;
+		feature: string;
+	},
+	deps: UpgradeNudgeDeps,
+): Promise<UpgradeNudgeOutcome> {
+	const outcome = await nudge(input, deps);
+	deps.capture({
+		userId: input.user.id,
+		organizationId: input.organizationId,
+		feature: input.feature,
+		outcome,
+	});
+	return outcome;
+}
+
+async function nudge(
+	{ user, organizationId, feature }: Parameters<typeof recordUpgradeIntent>[0],
+	deps: UpgradeNudgeDeps,
+): Promise<UpgradeNudgeOutcome> {
+	let claimed = false;
+	try {
+		if (organizationId && (await deps.isOrganizationPaid(organizationId))) {
+			return "paid";
+		}
+		if (await deps.isUnsubscribed(user.email)) return "unsubscribed";
+		claimed = await deps.claim(user.id);
+		if (!claimed) return "rate_limited";
+		await deps.send({
+			to: user.email,
+			recipientName: user.name,
+			featureName: upgradeNudgeFeatureName(feature),
+			organizationId,
+		});
+		return "sent";
+	} catch (error) {
+		console.error(`[billing/upgrade-nudge] ${user.id} nudge failed`, error);
+		if (claimed) {
+			await deps.release(user.id).catch((releaseError) => {
+				console.error(
+					`[billing/upgrade-nudge] ${user.id} claim release failed`,
+					releaseError,
+				);
+			});
+		}
+		return "failed";
+	}
+}
