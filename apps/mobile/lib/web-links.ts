@@ -7,4 +7,3 @@ export function workspaceShareUrl(workspaceId: string): string {
 export function pageUrlForSlug(slug: string): string {
 	return `${env.EXPO_PUBLIC_WEB_URL.replace(/\/$/, "")}/page/${slug}`;
 }
-
