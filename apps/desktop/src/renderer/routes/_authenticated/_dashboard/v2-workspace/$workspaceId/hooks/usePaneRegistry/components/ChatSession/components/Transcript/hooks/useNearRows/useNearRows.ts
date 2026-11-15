@@ -30,7 +30,7 @@ export function useNearRows(
 	requestItemBodies: (itemIds: readonly string[]) => void,
 ): {
 	seenRowKeys: ReadonlySet<string>;
-	observeRow: (rowKey: string) => (element: HTMLElement | null) => void;
+	observeRow: (rowKey: string, element: HTMLElement | null) => void;
 } {
 	const idsByKey = useMemo(() => {
 		const map = new Map<string, string[]>();
@@ -79,17 +79,13 @@ export function useNearRows(
 		if (ids.length > 0) requestRef.current(ids);
 	}, [idsByKey, seenRowKeys]);
 
-	const refs = useRef(new Map<string, (element: HTMLElement | null) => void>());
-	const observeRow = useCallback((rowKey: string) => {
-		const cached = refs.current.get(rowKey);
-		if (cached) return cached;
-		const ref = (element: HTMLElement | null) => {
+	const observeRow = useCallback(
+		(rowKey: string, element: HTMLElement | null) => {
 			const previous = elements.current.get(rowKey);
 			if (previous === element) return;
 			if (previous) observerRef.current?.unobserve(previous);
 			if (!element) {
 				elements.current.delete(rowKey);
-				refs.current.delete(rowKey);
 				setSeenRowKeys((keys) => {
 					if (!keys.has(rowKey)) return keys;
 					const next = new Set(keys);
@@ -101,10 +97,9 @@ export function useNearRows(
 			element.dataset.rowKey = rowKey;
 			elements.current.set(rowKey, element);
 			observerRef.current?.observe(element);
-		};
-		refs.current.set(rowKey, ref);
-		return ref;
-	}, []);
+		},
+		[],
+	);
 
 	return { seenRowKeys, observeRow };
 }

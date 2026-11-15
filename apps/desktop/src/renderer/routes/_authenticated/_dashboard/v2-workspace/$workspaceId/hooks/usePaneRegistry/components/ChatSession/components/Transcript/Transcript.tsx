@@ -393,7 +393,7 @@ export function Transcript({
 						row.key === carriedRowKey
 					}
 					row={row}
-					rowRef={transcriptWindow.rowRef(row.key)}
+					registerRow={transcriptWindow.registerRow}
 					snapshot={snapshot}
 				/>
 			);
