@@ -5,7 +5,11 @@ import {
 	type SelectConnection,
 } from "@superset/db/schema";
 import { eq, sql } from "drizzle-orm";
-import { connectionById, userConnection } from "../../../lib/connectors";
+import {
+	connectionById,
+	userConnection,
+	userConnections,
+} from "../../../lib/connectors";
 import { GMAIL_READ_SCOPES } from "./constants";
 
 /**
@@ -23,14 +27,40 @@ export function googleConfigOf(state: unknown): GoogleConfig {
 }
 
 /**
- * One member's active Google connection in an org, or null. Per user, not per
- * org: a mailbox is personal, and each member connects their own.
+ * One member's active Google connection in an org, or null. Throws when the
+ * member has several, so callers that need one account never pick for them.
  */
 export async function findGoogleConnection(
 	organizationId: string,
 	userId: string,
 ): Promise<SelectConnection | null> {
 	return userConnection(organizationId, "google", userId);
+}
+
+/** All of one member's live Google connections in an org, newest first. */
+export async function findGoogleConnections(
+	organizationId: string,
+	userId: string,
+): Promise<SelectConnection[]> {
+	return userConnections(organizationId, "google", userId);
+}
+
+/**
+ * The status view of a member's Google connections, newest first. Any live
+ * connection counts as connected; a reconnect is needed only when none is live.
+ */
+export function summarizeGoogleConnections(rows: SelectConnection[]) {
+	const live = rows.filter((row) => row.disconnectedAt === null);
+	const primary = live[0] ?? rows[0];
+	if (!primary) return null;
+	return {
+		id: primary.id,
+		email: primary.externalAccountId,
+		emails: live.map((row) => row.externalAccountId),
+		connectedByUserId: primary.connectedByUserId,
+		connectedAt: primary.createdAt,
+		needsReconnect: live.length === 0,
+	};
 }
 
 export async function findGoogleConnectionById(
