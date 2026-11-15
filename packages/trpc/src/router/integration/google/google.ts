@@ -42,7 +42,10 @@ export const googleRouter = {
 				"google",
 				ctx.session.user.id,
 			);
-			for (const connection of owned) await releaseGoogleGrant(connection);
+			const leaving = owned.map((connection) => connection.id);
+			for (const connection of owned) {
+				await releaseGoogleGrant(connection, leaving);
+			}
 
 			const result = await db
 				.delete(connections)
@@ -68,8 +71,9 @@ export const googleRouter = {
  */
 export async function releaseGoogleGrant(
 	connection: SelectConnection,
+	alsoLeaving: readonly string[] = [],
 ): Promise<void> {
-	if (await grantSharedWithAnotherConnection(connection)) return;
+	if (await grantSharedWithAnotherConnection(connection, alsoLeaving)) return;
 	// Best effort: Google keeps pushing until the watch is stopped or
 	// expires, and the push route would only reject pushes for a missing
 	// connection. A failure here must not block the disconnect.
