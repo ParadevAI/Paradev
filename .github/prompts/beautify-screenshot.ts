@@ -195,7 +195,9 @@ const RAIL_GRADIENTS: Record<string, string> = {
 	"corner-br": `radial-gradient(circle at 100% 100%, ${RAIL_CORNER})`,
 };
 const hlStyle = flags.get("hl-style") ?? "";
-const hlRadius = Number(flags.get("hl-radius") ?? "14") || 14;
+const hlRadiusFlag = Number(flags.get("hl-radius") ?? "14");
+const hlRadius =
+	Number.isFinite(hlRadiusFlag) && hlRadiusFlag >= 0 ? hlRadiusFlag : 14;
 // Optional highlight: accent ring + dim outside, in source-pixel coordinates.
 let highlight = "";
 if (flags.has("highlight")) {
